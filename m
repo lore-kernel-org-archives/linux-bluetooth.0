@@ -2,103 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1BAC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Nov 2022 21:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD275C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Nov 2022 21:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235101AbiKQV0T (ORCPT
+        id S235157AbiKQV1s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Nov 2022 16:26:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44032 "EHLO
+        Thu, 17 Nov 2022 16:27:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235028AbiKQVZ0 (ORCPT
+        with ESMTP id S234875AbiKQV1q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Nov 2022 16:25:26 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5799C14001
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 13:24:57 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id f3so3238613pgc.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 13:24:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HDK6PTs4WHQXaAyPS0og+tfnvydmtjAPAtYNd0bfQ/4=;
-        b=XxlukR0uvu/HwnbcxEnRm8KQgnIiH34gamGZvnrEc6es0LnOyLe5EG1pB1enKXSGQP
-         TgmLed85uXtuA2buwFxRWaOgQyjULzGcRcxoXl7Oq9vcoE5RTkEogH06E58NezW2VIgE
-         UvsIOxVnPNqGnA0W+0Zzij4t7yAJOfF2dPv1tpt+8bP7Tm7YhFYeSpSgXzBGTGAdZf4A
-         hWy1IJgGJV2mHq91BRvJVpw6Zjc0VoQw4DyNPDTInZV90hFsDxxVYfyRU9XKQOPEueXS
-         0iSv0Qmfw5ENp4UjamJ7QyjkZMOi20EZTosCiX1ynttMQM53t1OuGIrkBx9Nt7zagQbQ
-         GFVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HDK6PTs4WHQXaAyPS0og+tfnvydmtjAPAtYNd0bfQ/4=;
-        b=4hcjFtC83sHvczaHiCgIMuyc3BDjY1rPi0fEpvyfDmfMgzxa5T1bOdJH5t3tkslpLI
-         3CR4gSg3/4tp/d9zufdlvLUE4y//48e1LIapiuZXJBuMZR1kLrNwjQfD0TP++fIFU+Hj
-         FNXCcN+BUdqu31LeE6yf3GjBnVoYn4C/+su5vJTAg8VT0+fxeemkptW4BZhNNPs4plzd
-         hftRXQTIxZlKjKTDJl6qgbXPoKEHpAxYqsVnpPKBikdG6n83faT+0z9yVQPVvNsrmxKi
-         9wxtKK8AN+cz3efcIE5vVMpGXl7MossmnwrkHw4qMuVCAoxqiKp0AXD8IEwUpXCKAzez
-         /uLQ==
-X-Gm-Message-State: ANoB5pm1vMrmSJXgielC3WEy4F1UBT7ALq2muH+yIG0pIQBhUiaMVhm/
-        7LTze55VugZx6/7Rn3i2S0y1rsgzGkc=
-X-Google-Smtp-Source: AA0mqf7Nvyfgyskc8fhdKeT9dNMbTUheiPWROGo/rBb9e2lj1F73IGx3JhiexISR2wAn3YZm+K1jfw==
-X-Received: by 2002:aa7:947b:0:b0:56b:a3e5:d155 with SMTP id t27-20020aa7947b000000b0056ba3e5d155mr4721332pfq.23.1668720296511;
-        Thu, 17 Nov 2022 13:24:56 -0800 (PST)
-Received: from [172.17.0.2] ([20.245.90.94])
-        by smtp.gmail.com with ESMTPSA id b13-20020a170902650d00b00186b55e3cd6sm1851962plk.133.2022.11.17.13.24.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 13:24:56 -0800 (PST)
-Message-ID: <6376a6a8.170a0220.c05dd.33e9@mx.google.com>
-Date:   Thu, 17 Nov 2022 13:24:56 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0857656791062593309=="
+        Thu, 17 Nov 2022 16:27:46 -0500
+Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.145])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A363EB63
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 13:27:42 -0800 (PST)
+Received: (wp-smtpd smtp.tlen.pl 7271 invoked from network); 17 Nov 2022 22:27:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
+          t=1668720458; bh=QAm84S5ZlKWSWkXCuY0F+3m8n9T5YQX4aAHzSgpv6l4=;
+          h=Subject:To:Cc:From;
+          b=fHRt1v32Oxs2Hu64P5AJEMrSTgjLDRW79rInA1zxuTJftVZ1fJQbOXzV+sVPvbJs5
+           4oERJFR9y81zJWlGBUwfabl0a8mb9+7kdS3ARTOB3cJuHyvXFer5NdC+lskz/TsUQ5
+           xVSMz/AppWVFx6cZtcxVqw3XEBfNzUQLWpupzQmc=
+Received: from aafn183.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.143.183])
+          (envelope-sender <mat.jonczyk@o2.pl>)
+          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <brian.gix@intel.com>; 17 Nov 2022 22:27:38 +0100
+Message-ID: <232fd0ae-0002-53cb-9400-f0347e434d42@o2.pl>
+Date:   Thu, 17 Nov 2022 22:27:37 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [BlueZ] tools: Use portable 64 bit data formats
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221117202150.56236-1-brian.gix@intel.com>
-References: <20221117202150.56236-1-brian.gix@intel.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH] Bluetooth: silence a dmesg error message in hci_request.c
+Content-Language: en-GB
+To:     "Gix, Brian" <brian.gix@intel.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>
+References: <20221116202856.55847-1-mat.jonczyk@o2.pl>
+ <499a1278bcf1b2028f6984d61733717a849d9787.camel@intel.com>
+From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
+In-Reply-To: <499a1278bcf1b2028f6984d61733717a849d9787.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: 7fccb677ad4e849ba835e87700170acb
+X-WP-AV: skaner antywirusowy Poczty o2
+X-WP-SPAM: NO 0000000 [IROE]                               
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0857656791062593309==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+W dniu 17.11.2022 o 21:34, Gix, Brian pisze:
+> Hi Mateusz,
+>
+> On Wed, 2022-11-16 at 21:28 +0100, Mateusz Jończyk wrote:
+>> On kernel 6.1-rcX, I have been getting the following dmesg error
+>> message
+>> on every boot, resume from suspend and rfkill unblock of the
+>> Bluetooth
+>> device:
+>>
+>>         Bluetooth: hci0: HCI_REQ-0xfcf0
+>>
+> This has a patch that fixes the usage of the deprecated HCI_REQ
+> mechanism rather than hiding the fact it is being called, as in this
+> case.
+>
+> I am still waiting for someone to give me a "Tested-By:" tag to patch:
+>
+> [PATCH 1/1] Bluetooth: Convert MSFT filter HCI cmd to hci_sync
+>
+> Which will also stop the dmesg error. If you could try that patch, and
+> resend it to the list with a Tested-By tag, it can be applied.
 
-This is automated email and please do not reply to this email!
+Hello,
 
-Dear submitter,
+I did not receive this patch, as I was not on the CC list; I was not
+aware of it. I will test it shortly.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=696626
+Any guidelines how I should test this functionality? I have a Sony Xperia 10 i4113
+mobile phone with LineageOS 19.1 / Android 12L, which according to the spec supports
+Bluetooth 5.0. Quick Google search tells me that I should do things like 
 
----Test result---
+        hcitool lescan
 
-Test Summary:
-CheckPatch                    PASS      0.62 seconds
-GitLint                       PASS      0.42 seconds
-Prep - Setup ELL              PASS      31.52 seconds
-Build - Prep                  PASS      0.67 seconds
-Build - Configure             PASS      9.93 seconds
-Build - Make                  PASS      946.17 seconds
-Make Check                    PASS      12.36 seconds
-Make Check w/Valgrind         PASS      342.45 seconds
-Make Distcheck                PASS      280.26 seconds
-Build w/ext ELL - Configure   PASS      10.14 seconds
-Build w/ext ELL - Make        PASS      100.46 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      597.33 seconds
+to discover the phone, then use gatttool to list the services, etc.
 
+Greetings,
 
+Mateusz
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0857656791062593309==--
