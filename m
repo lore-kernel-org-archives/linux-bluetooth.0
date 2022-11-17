@@ -2,58 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C28C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Nov 2022 14:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76EC1C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Nov 2022 16:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240313AbiKQOTG convert rfc822-to-8bit (ORCPT
+        id S240052AbiKQQSb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Nov 2022 09:19:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49858 "EHLO
+        Thu, 17 Nov 2022 11:18:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240327AbiKQOTF (ORCPT
+        with ESMTP id S234874AbiKQQS1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Nov 2022 09:19:05 -0500
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0A67640F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 06:19:02 -0800 (PST)
-Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id E269B240003;
-        Thu, 17 Nov 2022 14:18:59 +0000 (UTC)
-Message-ID: <a677f489aa1c0d1c6723761b521d5f65b5d89401.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v7 6/6] adapter: Remove experimental flag for
- PowerState
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Jonas =?ISO-8859-1?Q?Dre=DFler?= <jonas@dressler.it>,
-        linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Date:   Thu, 17 Nov 2022 15:18:59 +0100
-In-Reply-To: <02bf340b-c908-6ee8-ca78-4203b965f3b5@dressler.it>
-References: <20220901110719.176944-1-hadess@hadess.net>
-         <20220901110719.176944-6-hadess@hadess.net>
-         <02bf340b-c908-6ee8-ca78-4203b965f3b5@dressler.it>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.46.0 (3.46.0-2.fc37) 
+        Thu, 17 Nov 2022 11:18:27 -0500
+X-Greylist: delayed 523 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 17 Nov 2022 08:18:22 PST
+Received: from hmr112.pwrz.at (hmr112.pwrz.at [194.30.191.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62EBD786F9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 08:18:22 -0800 (PST)
+Received: from srv345.pwrz.at (unknown [10.10.30.15])
+        by hmr112.pwrz.at (Postfix) with ESMTP id 28C48402E4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 17:09:37 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by srv345.pwrz.at (Postfix) with ESMTP id 04048D21D5;
+        Thu, 17 Nov 2022 17:09:37 +0100 (CET)
+X-Virus-Scanned: amavisd-new at pwrz.at
+Received: from srv345.pwrz.at ([127.0.0.1])
+        by localhost (srv345.pwrz.at [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id UY85BUYg1-ZB; Thu, 17 Nov 2022 17:09:31 +0100 (CET)
+Received: from srv557.sprz.at (srv557.sprz.at [80.122.189.88])
+        by srv345.pwrz.at (Postfix) with ESMTP id 9C5A8D176D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 17:09:31 +0100 (CET)
+Received: from [192.168.2.139] (unknown [80.243.174.92])
+        by srv557.sprz.at (Postfix) with ESMTPSA id 481F2E20605
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 17:09:31 +0100 (CET)
+Message-ID: <92dfa5c7-90db-8100-b481-2bd4972a0ec1@voxel.at>
+Date:   Thu, 17 Nov 2022 17:09:30 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.4.1
+From:   Simon Vogl <simon@voxel.at>
+Subject: Connecting to a BR/EDR+BLE device a via dbus?
+To:     linux-bluetooth@vger.kernel.org
+Content-Language: it
+Organization: VoXel Interaction Design
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-PPP-Message-ID: <166870137165.43692.6116230956194055906@srv557.sprz.at>
+X-PPP-Vhost: voxel.at
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, 2022-11-13 at 16:54 +0100, Jonas Dreßler wrote:
-> Hi everyone,
-> 
-> Can we please apply this one, too? The property being experimental
-> means distros
-> need to downstream patch BlueZ for the feature to work, I'm not sure
-> all packagers
-> are aware of that.
+Dear all,
 
-I enabled it without the experimental flag in Fedora, because I wrote
-it, and I know I'll be responsible for it should there be any bugs.
+we are communicating with a headset-ish device that offers classic 
+bluetooth services and BLE characteristics in parallel.
 
-I really don't want to be on the spot for fixing a problem upstream, or
-in another distribution if another distribution enables the feature
-without testing it, or responsible for fixing their libraries should we
-decide that the API isn't good enough.
+We have code to talk to the Bluetooth classic part via bluetoothd/dbus, 
+and we have code for talking to the BLE parts based on the C-library / 
+gatt-client code ; both run in parallel for some time but not 
+super-stable, so I'd like to move the code over to a dbus version.
 
-> FWIW, I can confirm the feature in gnome-shell works after removing
-> the flag!
+As the device starts advertising BLE characteristics only after a 
+classic connection has been established, it appears as a Bluetooth 
+classic device on the system bus, and I did not find a way to start GATT 
+discovery via the 'official' dbus-API.
+
+I don't fear to tweak bluetoothd nor ~ctl, but would like to know if 
+someone already some development going in that direction?
+
+Simon
+
+-- 
+
+VoXel Interaction Design  |www.voxel.at
+DI Dr.techn. Simon Vogl   |simon@voxel.at
+Tomaschekweg 46           |  +43 650 2323 555
+A-4040 Linz - Austria     |
+Office address: Industriezeile 35, 4020 Linz (2nd floor)
+
