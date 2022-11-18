@@ -2,107 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE06C43217
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 09:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DBBC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 16:14:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241391AbiKRJde (ORCPT
+        id S241629AbiKRQOe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Nov 2022 04:33:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46468 "EHLO
+        Fri, 18 Nov 2022 11:14:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241507AbiKRJdb (ORCPT
+        with ESMTP id S235220AbiKRQOd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Nov 2022 04:33:31 -0500
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E2DBED
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 01:33:25 -0800 (PST)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-14263779059so4506901fac.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 01:33:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/YJGzMMEvaLrs+rNIOoRQAGCjIJ/HDZIG4GUpgVfzQs=;
-        b=ff1M2M1axSeDwJsRqsIjSLDEepO8oobQThF4GLzsFFUipSS0poiZskeA0ZFiuDkgQH
-         nrZBx8QrftDwuVZBsQZeQYv4kWbZIngH4LHIc+E4a9YNcFuWqlmAMWaS0gQ//S7LBxPJ
-         NR2wCK3ckTHRKenaLcsXuMySq8fiAzj6uMe58pco2BEP8JUZMK/2uQEpNp8XEqrgNpcC
-         +BLWhDSxwS3eNoW64dc+9a8gLr0HmkHpXfDTMzbLW22bB8WqW+mvxna7gZx9dnGbRB1G
-         uHidzrfaLM9RTPokKHFJzhK3ie2Fo7Vt00MXAdXamiYOkenanJ81408CW2UgV3GdeMbO
-         4n7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/YJGzMMEvaLrs+rNIOoRQAGCjIJ/HDZIG4GUpgVfzQs=;
-        b=2C87buCZQ+wNmDny9QcyVj3qLm0jQdhx1PIcKFeLc2rdaRAugRv7Wb+M6ZV8fhsNkN
-         UiAwWk/s8oREE8yHfmaeDl0V+s3Eu5LC0WI7pDIkkgh/ZqN1ZQwlZZbn6qzSueiE9Nb8
-         S7A99stJR8DZY2m/RtUgaQ70lj+rU30fKSIgOjcovHds8mP+nuFQRwVYo61cWOxdFXnC
-         2VhvvjcC3BH8PMSSBMV6DVFM74A5eqMv+3uY4Llnw5EXBMnjhNVBFbQcEUw+SZ0oE1bw
-         +lokwSfKYqAGoa8d4VPW+wrrUJyBBt6IbiV2ezhFOMvpBTyhjneJFZr8LDi1EfKUT3B8
-         k5jA==
-X-Gm-Message-State: ANoB5pkxNY0iRLmtSqIU+1iMUQX69xDmV9FOOhqoGxGTwrpMCNx7EJTP
-        rD+OUE6QPqh/eOMgTY543GVxWI7tLhVFrg==
-X-Google-Smtp-Source: AA0mqf6IC5HSKEEyDF13V2LfJYomHq3Dk33sBOuDZ5CL11H5/wMUQ0KK3f0Q+FvBxSPSRqsrpX1JOw==
-X-Received: by 2002:a05:6870:5898:b0:13b:d07f:f28f with SMTP id be24-20020a056870589800b0013bd07ff28fmr6757377oab.41.1668764004459;
-        Fri, 18 Nov 2022 01:33:24 -0800 (PST)
-Received: from [172.17.0.2] ([20.225.226.136])
-        by smtp.gmail.com with ESMTPSA id s27-20020a056870ea9b00b001422f9b5c17sm1702011oap.8.2022.11.18.01.33.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Nov 2022 01:33:24 -0800 (PST)
-Message-ID: <63775164.050a0220.fbc9e.7338@mx.google.com>
-Date:   Fri, 18 Nov 2022 01:33:24 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3669560846697165537=="
+        Fri, 18 Nov 2022 11:14:33 -0500
+X-Greylist: delayed 261 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Nov 2022 08:14:30 PST
+Received: from mailgw1.uni-kl.de (mailgw1.uni-kl.de [IPv6:2001:638:208:120::220])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44491922E6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 08:14:29 -0800 (PST)
+Received: from [192.168.2.118] (dslb-088-068-027-038.088.068.pools.vodafone-ip.de [88.68.27.38])
+        (authenticated bits=0)
+        by mailgw1.uni-kl.de (8.14.4/8.14.4/Debian-8+deb8u2) with ESMTP id 2AIG9xTU065171
+        (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 17:10:03 +0100
+Message-ID: <f9213307-e4c3-902a-e0b6-aed53f3a1e02@rhrk.uni-kl.de>
+Date:   Fri, 18 Nov 2022 17:09:59 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [DNM,v3] Bluetooth: doc: test patch - DO NOT MERGE
-In-Reply-To: <20221116052716.57521-1-hj.tedd.an@gmail.com>
-References: <20221116052716.57521-1-hj.tedd.an@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Content-Language: de-DE, en-GB
+To:     linux-bluetooth@vger.kernel.org
+From:   Marvin Sinnwell <msinnwel@rhrk.uni-kl.de>
+Subject: LE Advertisement on data channels/ btvirt
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3669560846697165537==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello everyone,
 
-This is automated email and please do not reply to this email!
+TL;DR: Seeking advice on advertising on arbitrary channels + usage of 
+btvirt specifically function "send_adv_pkt".
 
-Dear submitter,
+I am currently working on my bachelor thesis and have the following 
+problem with I would like to request some advice:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=695798
+I want to test several algorithms that try to improve the time it takes 
+to find an advertisement packet of another device. For this I not only 
+want to change the method of advertising, on channels 37-39 in 
+sequential order, to something else, but also send advertisement packets 
+on other channels.
 
----Test result---
+My main difficulty currently is composed of trying to find out where the 
+actual advertisement packets are sent. Currently my best guess is, that 
+is is controlled by the firmware of my raspberry pi that I am using 
+(specific model below), because I could not find anything within the 
+bluez stack. Maybe one of you has more knowledge on where I have to search.
 
-Test Summary:
-CheckPatch                    PASS      0.60 seconds
-GitLint                       PASS      0.31 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      37.80 seconds
-BuildKernel32                 PASS      34.42 seconds
-TestRunnerSetup               PASS      486.85 seconds
-TestRunner_l2cap-tester       PASS      17.55 seconds
-TestRunner_iso-tester         PASS      17.63 seconds
-TestRunner_bnep-tester        PASS      6.34 seconds
-TestRunner_mgmt-tester        PASS      119.71 seconds
-TestRunner_rfcomm-tester      PASS      10.69 seconds
-TestRunner_sco-tester         PASS      9.98 seconds
-TestRunner_ioctl-tester       PASS      11.53 seconds
-TestRunner_mesh-tester        PASS      7.91 seconds
-TestRunner_smp-tester         PASS      9.71 seconds
-TestRunner_userchan-tester    PASS      6.77 seconds
-IncrementalBuild              PASS      36.96 seconds
+What I was able to find was the btvirt tool, which could help with my 
+problem. There I found in the file "le.c" in function 
+"adv_timeout_callback" another function called "send_adv_pkt". Sadly 
+while trying out btvirt and clever usage of some print statements I 
+could not see the function be executed. Maybe someone can give me some 
+advice on that, because this function should do exactly what I am 
+looking for. It could be that I was just using the tool incorrectly in 
+which case it would be great if somebody could tell me how to use it. My 
+methodology was: 1. "sudo ./btvirt -L -l2 -d" to create 2 new local LE 
+controller. 2. Start advertisement using hcitool "sudo hcitool -i hci2 
+cmd 0x08 0x000a 01". The advertisement is correct and the other local 
+controller can connect to the first one.
+
+My current equipment is:
+
+Device:                Raspberry Pi 3 Model B+
+
+Kernel + OS:       Linux raspberrypi 5.15.61-v7+ #1579 SMP Fri Aug 26 
+11:10:59 BST 2022 armv7l GNU/Linux
+
+Bluez version:     5.65
+
+
+Kind regards
+
+Marvin Sinnwell
 
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3669560846697165537==--
