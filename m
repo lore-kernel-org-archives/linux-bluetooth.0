@@ -2,107 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D20CAC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 09:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 222D4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 09:31:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241944AbiKRJbE (ORCPT
+        id S241591AbiKRJbG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Nov 2022 04:31:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44618 "EHLO
+        Fri, 18 Nov 2022 04:31:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241946AbiKRJbB (ORCPT
+        with ESMTP id S241932AbiKRJbC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Nov 2022 04:31:01 -0500
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A46998C49D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 01:30:58 -0800 (PST)
-Received: by mail-qt1-x835.google.com with SMTP id s4so2770199qtx.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 01:30:58 -0800 (PST)
+        Fri, 18 Nov 2022 04:31:02 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE10742FB
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 01:31:00 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id r2so2253123ilg.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 01:31:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LvZjF8eLy6qWU5IZHq0PNElE9eZJ0GL9YfLBS+KO32A=;
-        b=GCo75WEGE0wZfaRT/XLe07AoKSqRBZ867x1abJSdSss/p2NtFXV/zywxUShlhu5r19
-         wev2XHzYmuvNVyVUkpS6uEeWRo5rTc79zcKKnNmU3qbJ3+3slpY8VtRHMUi65++16AV5
-         5FdVJ2XbiorX1dchkdBbT0k6HEW2JnsZILrY3oCBl1w48Sv1xZCuVbALQKySuWCJdPtS
-         t6CP1JnyqWgZ2nIdF8LtwnboPKWxqhHPh8L8ZjOXbnqqsxHyXaEUQw7pbP9VjQeGRbUz
-         BZhmiTZWIvTRpSB1RX9nLvEQzusl5+aBuNVuGc7bmkvduDkD8oSA9cxUUM/PoyD3yx0Y
-         tVsg==
+        bh=9EC2+oRv7XKxLQOijsw9gb6Suuzs+f7K3BjDmcbhgGs=;
+        b=UOrH/QdFtela5azAkldazRjwd6adyOaehxNhA7bsjA6pJ1q64UFDPZNMABCiLP688c
+         lUfuZWoqJvFYUaGJ4WxEsy/Aduuw1bk3fpU9za4vObfeX/DiIeqHY/adN3ZdpMzXvIg9
+         RPEsgv9qSVKXIKbJxMKCHpNfXfQ4ic65H0MK1CQ9AI7aA0ER93OicQor2V0ywEeE648+
+         1Pn6fBgeoLMddKDeiQ7wbBDPB/D6ygycfmLIcwTeI4lGw/qZjPBbv4iAph//mhVYgxSK
+         2wXGXCX0739+NDhPikh+cOXKyn5Td3CVtReRXngWjNXAo3uelalRLtZk+Ic9uQ/ISfxm
+         lgWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=LvZjF8eLy6qWU5IZHq0PNElE9eZJ0GL9YfLBS+KO32A=;
-        b=W6L1KlyKmFHKFYWmG8dclvJAGPpW4Tf0vN231UFk8mszFCz46QW/DXmCXvqWyQbZMj
-         mmRvZm5pFWnVfhKN3pBxUsCDmp3TR92LFReln1rWDSXTEJv/GrKILtChlBJMPpKNJMiv
-         0nCU52IMHt6G8mRq4RSJiTOq4dsTVJF6DZ5XxykRaCihJ746DrmHteQ41fsOUHmOT8Q4
-         nBIDEze8aV7RKtmXJpRabx5LvI4JHpQe0xNizjzn60XdASHFfvIWohRMMnjy+MuiXigD
-         cV0+8Do5jRu8DNjek7ljTenEPtoUQ0qEqDwDKKO9gsp4rGvpJFgpPepzh6vKoIJnQFzP
-         SF/Q==
-X-Gm-Message-State: ANoB5plYS1LNA3G4Yt3mytNOW3V1qamFuD4DI2l/N/OOb0FJJjsAszSl
-        CR1dVLP2neV1kG3tNh4MxLiZj0Q8BPrG0w==
-X-Google-Smtp-Source: AA0mqf7Dmc5mijXE0TyFNuDAT7DpoMNfJOADuRax6F77kPZPEFacmLzbBpTIS9nqQmaotZENkRo+vQ==
-X-Received: by 2002:ac8:6792:0:b0:3a5:1c8b:8890 with SMTP id b18-20020ac86792000000b003a51c8b8890mr5990280qtp.63.1668763857493;
-        Fri, 18 Nov 2022 01:30:57 -0800 (PST)
-Received: from [172.17.0.2] ([20.22.184.227])
-        by smtp.gmail.com with ESMTPSA id x30-20020a05620a0b5e00b006fbb833fef8sm2083871qkg.28.2022.11.18.01.30.57
+        bh=9EC2+oRv7XKxLQOijsw9gb6Suuzs+f7K3BjDmcbhgGs=;
+        b=pHlQ+gO/zUyh0rnGwhGcyE175tSsVFOl3lJXm+D6fsLNkhU2BhAuyrAg/vdLH6vHMe
+         jIASJHwNSqZTxm/9tB3jA/qTNQUjIqJR0SxF8QdLEck8onUktCCeHZEhxqxpUJ43HPpk
+         fmlguAIagzZhEqzDMLhxstq0CLuPNQomeQzwtO18rzSOCPvayd4cTW1wCTf9NhTOPJ4H
+         Vz3MOGbZYfXhw0rknaEbTValaa037Y/AXKn8HvZqJ1BiNPCHyPL0dtYqxxX/EwmN7yCI
+         FYr2XKNIAVeznZYiZok/wxpZjMu/WSs5AbEdf8chEn4hTLZ9aDHlwZQ0pC1q69lG/PPC
+         HTOQ==
+X-Gm-Message-State: ANoB5pluf9EVSWaAqRBDULZgpzFgZX1o8sXQk0xnl2EVbqe/41Asq9wY
+        c4xGTR/Ccy6RWusD32chmH2J4FOFLKA=
+X-Google-Smtp-Source: AA0mqf7GLZEMzV5/2qmg/r2UPe8S7t70y4PuYhmvMECh8HfmypRI6vyItwRRQ8ES6q5fydAlNczsqw==
+X-Received: by 2002:a92:ce90:0:b0:2f9:516b:25f3 with SMTP id r16-20020a92ce90000000b002f9516b25f3mr2891397ilo.156.1668763859667;
+        Fri, 18 Nov 2022 01:30:59 -0800 (PST)
+Received: from [172.17.0.2] ([20.9.58.63])
+        by smtp.gmail.com with ESMTPSA id b24-20020a5d8918000000b0069e1bcbddaesm1187874ion.16.2022.11.18.01.30.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Nov 2022 01:30:57 -0800 (PST)
-Message-ID: <637750d1.050a0220.260f3.9a1f@mx.google.com>
-Date:   Fri, 18 Nov 2022 01:30:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7768061432373301413=="
+        Fri, 18 Nov 2022 01:30:59 -0800 (PST)
+Message-ID: <637750d3.5d0a0220.15602.26d3@mx.google.com>
+Date:   Fri, 18 Nov 2022 01:30:59 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3320036724517155253=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [RFC] Bluetooth: Convert MSFT filter HCI cmd to hci_sync
-In-Reply-To: <20221031220205.91975-1-brian.gix@intel.com>
-References: <20221031220205.91975-1-brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org, rostedt@goodmis.org
+Subject: RE: timers: Use timer_shutdown*() before freeing timers
+In-Reply-To: <20221105060156.686027537@goodmis.org>
+References: <20221105060156.686027537@goodmis.org>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7768061432373301413==
-Content-Type: text/plain; charset="us-ascii"
+--===============3320036724517155253==
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
 
-This is automated email and please do not reply to this email!
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjkyMzQ4CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMC44NyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjI5IHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDAuMDkgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MjYuMzggc2Vjb25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjIu
+NjIgc2Vjb25kcwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNDI5LjE4
+IHNlY29uZHMKVGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDE2LjM4IHNl
+Y29uZHMKVGVzdFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDE1LjkzIHNlY29u
+ZHMKVGVzdFJ1bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDUuNjQgc2Vjb25kcwpU
+ZXN0UnVubmVyX21nbXQtdGVzdGVyICAgICAgICBQQVNTICAgICAgMTExLjE5IHNlY29uZHMKVGVz
+dFJ1bm5lcl9yZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDkuNTcgc2Vjb25kcwpUZXN0UnVu
+bmVyX3Njby10ZXN0ZXIgICAgICAgICBQQVNTICAgICAgOC45MCBzZWNvbmRzClRlc3RSdW5uZXJf
+aW9jdGwtdGVzdGVyICAgICAgIFBBU1MgICAgICAxMC40MyBzZWNvbmRzClRlc3RSdW5uZXJfbWVz
+aC10ZXN0ZXIgICAgICAgIFBBU1MgICAgICA3LjExIHNlY29uZHMKVGVzdFJ1bm5lcl9zbXAtdGVz
+dGVyICAgICAgICAgUEFTUyAgICAgIDguNzUgc2Vjb25kcwpUZXN0UnVubmVyX3VzZXJjaGFuLXRl
+c3RlciAgICBQQVNTICAgICAgNS44NiBzZWNvbmRzCkluY3JlbWVudGFsQnVpbGQgICAgICAgICAg
+ICAgIEZBSUwgICAgICAyMy44OSBzZWNvbmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIwpUZXN0OiBCdWlsZEtlcm5lbCAtIEZBSUwKRGVzYzogQnVpbGQgS2VybmVsIGZv
+ciBCbHVldG9vdGgKT3V0cHV0OgoKZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jjc3AuYzogSW4gZnVu
+Y3Rpb24g4oCYYmNzcF9jbG9zZeKAmToKZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jjc3AuYzo3NDA6
+MjogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmHRpbWVyX3NodXRk
+b3duX3N5bmPigJkgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgNzQw
+IHwgIHRpbWVyX3NodXRkb3duX3N5bmMoJmJjc3AtPnRiY3NwKTsKICAgICAgfCAgXn5+fn5+fn5+
+fn5+fn5+fn5+fgpjYzE6IHNvbWUgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFr
+ZVsyXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjI0OTogZHJpdmVycy9ibHVldG9vdGgv
+aGNpX2Jjc3Aub10gRXJyb3IgMQptYWtlWzJdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
+b2JzLi4uLgptYWtlWzFdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDY1OiBkcml2ZXJz
+L2JsdWV0b290aF0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjE4NTI6IGRyaXZlcnNdIEVy
+cm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkS2VybmVsMzIg
+LSBGQUlMCkRlc2M6IEJ1aWxkIDMyYml0IEtlcm5lbCBmb3IgQmx1ZXRvb3RoCk91dHB1dDoKCmRy
+aXZlcnMvYmx1ZXRvb3RoL2hjaV9iY3NwLmM6IEluIGZ1bmN0aW9uIOKAmGJjc3BfY2xvc2XigJk6
+CmRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9iY3NwLmM6NzQwOjI6IGVycm9yOiBpbXBsaWNpdCBkZWNs
+YXJhdGlvbiBvZiBmdW5jdGlvbiDigJh0aW1lcl9zaHV0ZG93bl9zeW5j4oCZIFstV2Vycm9yPWlt
+cGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogIDc0MCB8ICB0aW1lcl9zaHV0ZG93bl9zeW5j
+KCZiY3NwLT50YmNzcCk7CiAgICAgIHwgIF5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBzb21lIHdh
+cm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtl
+ZmlsZS5idWlsZDoyNDk6IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9iY3NwLm9dIEVycm9yIDEKbWFr
+ZVsyXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZVsxXTogKioqIFtz
+Y3JpcHRzL01ha2VmaWxlLmJ1aWxkOjQ2NTogZHJpdmVycy9ibHVldG9vdGhdIEVycm9yIDIKbWFr
+ZTogKioqIFtNYWtlZmlsZToxODUyOiBkcml2ZXJzXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gRkFJTApEZXNjOiBJbmNyZW1l
+bnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgpbdjRhLDEw
+LzM4XSB0aW1lcnM6IEJsdWV0b290aDogVXNlIHRpbWVyX3NodXRkb3duX3N5bmMoKSBiZWZvcmUg
+ZnJlZWluZyB0aW1lcgoKZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jjc3AuYzogSW4gZnVuY3Rpb24g
+4oCYYmNzcF9jbG9zZeKAmToKZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jjc3AuYzo3NDA6MjogZXJy
+b3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmHRpbWVyX3NodXRkb3duX3N5
+bmPigJkgWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgNzQwIHwgIHRp
+bWVyX3NodXRkb3duX3N5bmMoJmJjc3AtPnRiY3NwKTsKICAgICAgfCAgXn5+fn5+fn5+fn5+fn5+
+fn5+fgpjYzE6IHNvbWUgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsyXTog
+KioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjI0OTogZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jj
+c3Aub10gRXJyb3IgMQptYWtlWzJdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
+LgptYWtlWzFdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDY1OiBkcml2ZXJzL2JsdWV0
+b290aF0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjE4NTI6IGRyaXZlcnNdIEVycm9yIDIK
+CgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690652
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-GitLint                       PASS      0.35 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      33.82 seconds
-BuildKernel32                 PASS      30.51 seconds
-TestRunnerSetup               PASS      425.75 seconds
-TestRunner_l2cap-tester       PASS      16.35 seconds
-TestRunner_iso-tester         PASS      15.92 seconds
-TestRunner_bnep-tester        PASS      5.60 seconds
-TestRunner_mgmt-tester        PASS      105.95 seconds
-TestRunner_rfcomm-tester      PASS      9.50 seconds
-TestRunner_sco-tester         PASS      8.96 seconds
-TestRunner_ioctl-tester       PASS      10.28 seconds
-TestRunner_mesh-tester        PASS      6.99 seconds
-TestRunner_smp-tester         PASS      8.75 seconds
-TestRunner_userchan-tester    PASS      5.89 seconds
-IncrementalBuild              PASS      31.59 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7768061432373301413==--
+--===============3320036724517155253==--
