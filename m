@@ -2,137 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CAC2C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 08:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28864C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 08:44:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241143AbiKRIiO (ORCPT
+        id S241262AbiKRIoW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Nov 2022 03:38:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52466 "EHLO
+        Fri, 18 Nov 2022 03:44:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241468AbiKRIh6 (ORCPT
+        with ESMTP id S241598AbiKRIoH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Nov 2022 03:37:58 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E698EB5E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 00:37:39 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id jn7so2114053plb.13
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 00:37:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ws/ob7cX+qH78PjwLOxivNly7ZMLVei6jsvQApHKlVM=;
-        b=HFG68644aDA212OqUNDSguAMGiYXPGZWvx12D573622miiflPJTMz9/5qiR3j9Rrf5
-         /DFItfNhu/nJKjrvuBC93q4QAGQm/RLNvW+KujN+CFTlWh/gGhaHS/jfN5f5CYcvqnXP
-         4zQtPzoQ6pLZsaOD8b4lN6rnxvTNmojj4XBaKvGJfzDZ/xXSJtVFJHROsBCjbNIapj84
-         9gARMvT/y8uY8QDxOiIsX4RxDepxGOPio81ftW1D3Yc4O1huLauxdww70p+knmSAAU6r
-         Knu7OdBVM4tj0AJtr89K01iZX5ALxu/Ad6qIqAWv9q3KG/ItPwEXHrZgewBbm+MPukbi
-         UN7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ws/ob7cX+qH78PjwLOxivNly7ZMLVei6jsvQApHKlVM=;
-        b=05FK1vglZMiz1iSzbd8aELuU4pzl4pRuOHpPd4kvpu/szckKrQIMPbta+qCAamRl0Z
-         cghRbFY9ltSXuulPHrRoCjqjdxB8JVzFVGHiMLTbX7tjfNFTBd2W/fFznJJttmnftF8k
-         XVZuv3jrqchVu/XwuYO4oPShBMPLtgsKsZAoDQ8HKHxMm2ghKdUwx8Yfq9UBmj0dj8kM
-         AsepUgMgin90pZAvOSd7EpwHBu8wU32XCwLXVaWYZb/eVAfdkjOe4cL8vTzDZDRtJt59
-         hqtOSkKi8hBpTB88cSJuQObRbPIOQL/T75e5cylodaQeOG22+1WO22svtY2Qq2CMSB+D
-         KeCQ==
-X-Gm-Message-State: ANoB5pnnoaRr9ncPjJRU8Swd44/bTJKrjMz93P6rWCIUZ6bdnw14Ac1Z
-        wwks+IxlH9ZUiCCiI7KKON0AAjMWguk=
-X-Google-Smtp-Source: AA0mqf7BNU7sZ4Og39evJtKjw2sjNw1Ybb6FwDBP28Tg0LkGmtEKvwAfHxcE4oCWVvHS/BIj/qCUsQ==
-X-Received: by 2002:a17:902:9301:b0:186:a8c1:884f with SMTP id bc1-20020a170902930100b00186a8c1884fmr6850034plb.25.1668760658485;
-        Fri, 18 Nov 2022 00:37:38 -0800 (PST)
-Received: from [172.17.0.2] ([20.66.27.205])
-        by smtp.gmail.com with ESMTPSA id s27-20020aa78bdb000000b0056c704abca7sm2530656pfd.220.2022.11.18.00.37.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Nov 2022 00:37:38 -0800 (PST)
-Message-ID: <63774452.a70a0220.4f8fb.3e51@mx.google.com>
-Date:   Fri, 18 Nov 2022 00:37:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4633743443989578353=="
+        Fri, 18 Nov 2022 03:44:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536516E55C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 00:43:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1668760985;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0xP3BnY5Oo5jPdgLVmQFsxOPOuyQzhEeHptpu8Dd8M0=;
+        b=IxnWzAyFIIf33f7jqjC4bqNRnrL3InPt+y+izP3ejMosRr2x/jxR+Tio+WKj+spFhys/3h
+        Cqwk9bwxqQomTldUwrxijfajiXuGj37jlgvRpKuQ+QpJoXA+HnS8lXV/eFu6LV9/YR4agI
+        FRjyUNZ7QyU6AsdJPgw9yKDKm8nQoVk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-591-usdEjcDrMzC56z2QGN2WKQ-1; Fri, 18 Nov 2022 03:43:02 -0500
+X-MC-Unique: usdEjcDrMzC56z2QGN2WKQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4A2085A59D;
+        Fri, 18 Nov 2022 08:43:01 +0000 (UTC)
+Received: from plouf.redhat.com (unknown [10.39.194.179])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7098F1415119;
+        Fri, 18 Nov 2022 08:43:00 +0000 (UTC)
+From:   Benjamin Tissoires <benjamin.tissoires@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Jiri Kosina <jkosina@suse.cz>
+Cc:     linux-bluetooth@vger.kernel.org, linux-input@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH hid-next] HID: fix BT_HIDP Kconfig dependencies
+Date:   Fri, 18 Nov 2022 09:42:54 +0100
+Message-Id: <20221118084254.1880165-1-benjamin.tissoires@redhat.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org,
-        dominique.martinet@atmark-techno.com
-Subject: RE: Add serdev support for hci h4
-In-Reply-To: <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
-References: <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4633743443989578353==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+If HID_SUPPORT is not selected, BT_HIDP should not be available, simply
+because we disallowed the HID bus entirely.
 
-This is automated email and please do not reply to this email!
+Add a new depends and actually revert this file back to where it was 10
+years ago before it was changed by commit 1f41a6a99476 ("HID: Fix the
+generic Kconfig options").
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=693092
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.91 seconds
-GitLint                       PASS      0.49 seconds
-SubjectPrefix                 FAIL      0.48 seconds
-BuildKernel                   PASS      43.13 seconds
-BuildKernel32                 PASS      38.50 seconds
-TestRunnerSetup               PASS      542.62 seconds
-TestRunner_l2cap-tester       PASS      18.80 seconds
-TestRunner_iso-tester         PASS      19.97 seconds
-TestRunner_bnep-tester        PASS      7.03 seconds
-TestRunner_mgmt-tester        PASS      130.08 seconds
-TestRunner_rfcomm-tester      PASS      11.34 seconds
-TestRunner_sco-tester         PASS      10.45 seconds
-TestRunner_ioctl-tester       PASS      12.19 seconds
-TestRunner_mesh-tester        PASS      8.57 seconds
-TestRunner_smp-tester         PASS      10.33 seconds
-TestRunner_userchan-tester    PASS      7.14 seconds
-IncrementalBuild              PASS      46.04 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[RFC,1/2] dt-bindings: net: h4-bluetooth: add new bindings for hci_h4
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#114: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 49 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13035921.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
+Fixes: 25621bcc8976 ("HID: Kconfig: split HID support and hid-core compilation")
+Reported-by: kernel test robot <lkp@intel.com>
+Link: https://lore.kernel.org/r/202211181514.fLhaiS7o-lkp@intel.com/
+Signed-off-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hidp/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hidp/Kconfig b/net/bluetooth/hidp/Kconfig
+index 14100f341f33..6746be07e222 100644
+--- a/net/bluetooth/hidp/Kconfig
++++ b/net/bluetooth/hidp/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ config BT_HIDP
+ 	tristate "HIDP protocol support"
+-	depends on BT_BREDR && INPUT
++	depends on BT_BREDR && INPUT && HID_SUPPORT
+ 	select HID
+ 	help
+ 	  HIDP (Human Interface Device Protocol) is a transport layer
+-- 
+2.38.1
 
---===============4633743443989578353==--
