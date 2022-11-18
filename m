@@ -2,87 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DBBC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 16:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC57CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 17:14:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241629AbiKRQOe (ORCPT
+        id S242523AbiKRROC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Nov 2022 11:14:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40540 "EHLO
+        Fri, 18 Nov 2022 12:14:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235220AbiKRQOd (ORCPT
+        with ESMTP id S242482AbiKRRNf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Nov 2022 11:14:33 -0500
-X-Greylist: delayed 261 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 18 Nov 2022 08:14:30 PST
-Received: from mailgw1.uni-kl.de (mailgw1.uni-kl.de [IPv6:2001:638:208:120::220])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44491922E6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 08:14:29 -0800 (PST)
-Received: from [192.168.2.118] (dslb-088-068-027-038.088.068.pools.vodafone-ip.de [88.68.27.38])
-        (authenticated bits=0)
-        by mailgw1.uni-kl.de (8.14.4/8.14.4/Debian-8+deb8u2) with ESMTP id 2AIG9xTU065171
-        (version=TLSv1/SSLv3 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 17:10:03 +0100
-Message-ID: <f9213307-e4c3-902a-e0b6-aed53f3a1e02@rhrk.uni-kl.de>
-Date:   Fri, 18 Nov 2022 17:09:59 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Content-Language: de-DE, en-GB
+        Fri, 18 Nov 2022 12:13:35 -0500
+Received: from mail.z3ntu.xyz (mail.z3ntu.xyz [128.199.32.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA02CD2DC;
+        Fri, 18 Nov 2022 09:13:34 -0800 (PST)
+Received: from g550jk.localnet (unknown [62.108.10.64])
+        by mail.z3ntu.xyz (Postfix) with ESMTPSA id 43C19C9C23;
+        Fri, 18 Nov 2022 17:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=z3ntu.xyz; s=z3ntu;
+        t=1668791612; bh=apPOJWrI+8oml1PmcoEWwnJiflUBZ+IttCDrVn4BrbE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=KKNAInBA7AbvAJuaPoOnsgdH0KNymbL8QuY4cAuca6yENAx3Envl5yAMs8cyOIB0c
+         Vk1dK1GPHhoV6+fZcRK4ZvjZwai47OnDAJGm/4zNwTrGpfj051eUqI77zbZI9QKpeh
+         X0EKkwUNB5/9n5uAnyg9kEway2OX2HZBS14efBXI=
+From:   Luca Weiss <luca@z3ntu.xyz>
 To:     linux-bluetooth@vger.kernel.org
-From:   Marvin Sinnwell <msinnwel@rhrk.uni-kl.de>
-Subject: LE Advertisement on data channels/ btvirt
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Rob Herring <robh@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] dt-bindings: bluetooth: broadcom: add BCM43430A0 & BCM43430A1
+Date:   Fri, 18 Nov 2022 18:13:31 +0100
+Message-ID: <2122234.irdbgypaU6@g550jk>
+In-Reply-To: <20220924142154.14217-1-luca@z3ntu.xyz>
+References: <20220924142154.14217-1-luca@z3ntu.xyz>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello everyone,
+Hi all,
 
-TL;DR: Seeking advice on advertising on arbitrary channels + usage of 
-btvirt specifically function "send_adv_pkt".
+On Samstag, 24. September 2022 16:21:55 CET Luca Weiss wrote:
+> Document the compatible string for BCM43430A0 bluetooth used in lg-lenok
+> and BCM43430A1 used in asus-sparrow.
 
-I am currently working on my bachelor thesis and have the following 
-problem with I would like to request some advice:
+Asking again if somebody could pick this patch up, it's been sitting around 
+for 2 months.
 
-I want to test several algorithms that try to improve the time it takes 
-to find an advertisement packet of another device. For this I not only 
-want to change the method of advertising, on channels 37-39 in 
-sequential order, to something else, but also send advertisement packets 
-on other channels.
+Regards
+Luca
 
-My main difficulty currently is composed of trying to find out where the 
-actual advertisement packets are sent. Currently my best guess is, that 
-is is controlled by the firmware of my raspberry pi that I am using 
-(specific model below), because I could not find anything within the 
-bluez stack. Maybe one of you has more knowledge on where I have to search.
+> 
+> Signed-off-by: Luca Weiss <luca@z3ntu.xyz>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Acked-by: Rob Herring <robh@kernel.org>
+> ---
+> Changes in v3:
+> * pick up tags
+> * resend
+> 
+>  Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+> b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml index
+> 445b2a553625..d8d56076d656 100644
+> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+> @@ -19,6 +19,8 @@ properties:
+>        - brcm,bcm4329-bt
+>        - brcm,bcm4330-bt
+>        - brcm,bcm4334-bt
+> +      - brcm,bcm43430a0-bt
+> +      - brcm,bcm43430a1-bt
+>        - brcm,bcm43438-bt
+>        - brcm,bcm4345c5
+>        - brcm,bcm43540-bt
 
-What I was able to find was the btvirt tool, which could help with my 
-problem. There I found in the file "le.c" in function 
-"adv_timeout_callback" another function called "send_adv_pkt". Sadly 
-while trying out btvirt and clever usage of some print statements I 
-could not see the function be executed. Maybe someone can give me some 
-advice on that, because this function should do exactly what I am 
-looking for. It could be that I was just using the tool incorrectly in 
-which case it would be great if somebody could tell me how to use it. My 
-methodology was: 1. "sudo ./btvirt -L -l2 -d" to create 2 new local LE 
-controller. 2. Start advertisement using hcitool "sudo hcitool -i hci2 
-cmd 0x08 0x000a 01". The advertisement is correct and the other local 
-controller can connect to the first one.
-
-My current equipment is:
-
-Device:                Raspberry Pi 3 Model B+
-
-Kernel + OS:       Linux raspberrypi 5.15.61-v7+ #1579 SMP Fri Aug 26 
-11:10:59 BST 2022 armv7l GNU/Linux
-
-Bluez version:     5.65
-
-
-Kind regards
-
-Marvin Sinnwell
 
 
 
