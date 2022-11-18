@@ -2,178 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46F1C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 05:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E13FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 05:29:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239229AbiKRF1A (ORCPT
+        id S240836AbiKRF3o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Nov 2022 00:27:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51696 "EHLO
+        Fri, 18 Nov 2022 00:29:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230004AbiKRF07 (ORCPT
+        with ESMTP id S230004AbiKRF3m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Nov 2022 00:26:59 -0500
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353E758BF4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 21:26:57 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id cl5so7550184wrb.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 21:26:57 -0800 (PST)
+        Fri, 18 Nov 2022 00:29:42 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B0387A5C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 21:29:41 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id x16so2051166ilm.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Nov 2022 21:29:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kT4pxCYfbhjQlzwje4ctWugNbObBPx2k9IpATaGCu0=;
-        b=xqEEGqv1YPI5+ZAiHSwkf1YHHOKWifljWxebwbD8TZMGzV1fTkfA3xCfOf5mktYi3V
-         oK4ll9C/JSi8m13mbD/va81zyC6Ox5tqsfl8cj8bSTNRbALIXIkOSBhwI2ERqIlBTzSg
-         /hxSXKngEgf0kO0sJOdKH0qfV7PM2DLUQA5RA=
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3avOA1sz11Fc0XOZ3JHlqvXV4eenARjE+Lu2TE6bqQ8=;
+        b=H696YE/xmvVKpVBHR0N0T0xOaNhjn7rt/bk5m3A7mHE3KPLGMF06zSBw2hPj2BVS54
+         7f8lldW+/soENsPOc8df1zmeWx4WmIk+eugxqgmlimDdXHTfjtCCrWi+bqGbA6t8F9wy
+         NinuyV80T30H8p5hYLp/H0ScRI/RwczzHZYoSLczsH9WtWf+RyoX3EK+Rtp3eBCheiiq
+         illuu7PEqzNtzE9ECDkCIEKat63CYW2Eb6e+PsKYeApETWrR98vjJd/75y1PYLygAgDy
+         bb5t63uOMKvZXqPEIBlnwhT4mUR3wjiuIWUM/avS/AHA3TFwciiGOhvusc0HNkZm7ajp
+         Ue8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7kT4pxCYfbhjQlzwje4ctWugNbObBPx2k9IpATaGCu0=;
-        b=YgdtfxV2FW9e/TqJd5SoQwJkijkas0NWLiM6Gy5NvLjcNK25JBW2T3P8BrVkMsy+bU
-         0IlWoBoxlx2cgMVudiEjrBAneBDvInwNi9Q7r0RRdAjZyPzkZB9B1KeOJAOQElE4vbMq
-         bBUtP2p4dVtRJ2lH3y5XgHN5BP3+jgaaXUVsqVD01WmN4V7cLhmuatiplHFPFq43+oH/
-         cbog5Q7K5dC1imP8N0U6ynw7MowYdPYZx9uhFtbuBhq+HULBClrr7HrV9d00ruXri0Hk
-         hwzxP4lmMkRrkeeh5OvQXQJCoOhfj4rZUZpE51ojxISmGIRfAc3Qabo51qDJzUUd+/Aw
-         7p5w==
-X-Gm-Message-State: ANoB5plLQk8ZLzFlhQfIsqkQv8wB4scg9to8AvZv7VLQWfqQ6pekP0VS
-        cEYHi7JN9iqXG82JbYlfSWJmhonhfJobgQ==
-X-Google-Smtp-Source: AA0mqf6r7GzZrCsQfAx7eGxc++7UZ1D7fUR1/S9ERe2xJ71tlwfZtcWjp+PcbPwYIbv/Fj2XbNBqcw==
-X-Received: by 2002:a05:6000:18f:b0:241:a046:91ff with SMTP id p15-20020a056000018f00b00241a04691ffmr3226491wrx.23.1668749215580;
-        Thu, 17 Nov 2022 21:26:55 -0800 (PST)
-Received: from Legionbuntu.. ([2a01:c846:10c0:200:7cd0:53cb:9851:e8de])
-        by smtp.gmail.com with ESMTPSA id v11-20020a5d43cb000000b00241bd177f89sm1708365wrr.14.2022.11.17.21.26.54
+        bh=3avOA1sz11Fc0XOZ3JHlqvXV4eenARjE+Lu2TE6bqQ8=;
+        b=4QWzyBVxIRHRZRdOxm/QtFKWWSOYNs7mwOWACrnBmC/I7dajI30AiwhqCCWx1z90cz
+         1bu/T5qSDaJC9W1HeZ+KFy772uwqaxBQPzW5kHP8Wc6mtKVgrDuskxYmvT0wt8LeYwdW
+         WQFJutqb1HMGpC+Tr7KXArl95V4sOdcQr0C+c0vlf5p74NfowH1UfkJtL6ri6tTRRRz9
+         t/CMzntl4kyG30BnZVjDuVsy5BY2fQTu5b9+gKgzkc2khVaxDv/fsN1cKY0ASi2Bm/gc
+         ir4UaBZSb5Nj7dyGcYW6xvFfXta7W/DIeNL3f3oPKEQgY6GL06WgT7uglIFVW9CoY9S1
+         6Yag==
+X-Gm-Message-State: ANoB5pmE8J52iEUn1D192ub9Xf33ye4y7q0oA+FR0xXeIzdTEiTdC2oe
+        haBMqMbd/hrPMut5GK2hJ+vSrQeYSjA=
+X-Google-Smtp-Source: AA0mqf4bIIyaTtXrxyRYKwKjI6XuRxwt7smg+bDOTtDT/GIoNUMLSDp8HrRSn6Sw9RiOTdi2jQcN/Q==
+X-Received: by 2002:a92:d0d1:0:b0:300:ec43:a81f with SMTP id y17-20020a92d0d1000000b00300ec43a81fmr2650732ila.279.1668749381095;
+        Thu, 17 Nov 2022 21:29:41 -0800 (PST)
+Received: from [172.17.0.2] ([20.12.217.203])
+        by smtp.gmail.com with ESMTPSA id q23-20020a05663810d700b0037532823a17sm924475jad.122.2022.11.17.21.29.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Nov 2022 21:26:54 -0800 (PST)
-From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ] main.conf: Add SecureConnections option
-Date:   Fri, 18 Nov 2022 06:26:10 +0100
-Message-Id: <20221118052610.36133-1-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 17 Nov 2022 21:29:40 -0800 (PST)
+Message-ID: <63771844.050a0220.8802.240d@mx.google.com>
+Date:   Thu, 17 Nov 2022 21:29:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0798612476146947008=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, rostedt@goodmis.org
+Subject: RE: timers: Use timer_shutdown*() before freeing timers
+In-Reply-To: <20221104054913.358784408@goodmis.org>
+References: <20221104054913.358784408@goodmis.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This introduces SecureConnections option to main.conf that can be used to
-configure this on adapter initialization.
+--===============0798612476146947008==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-This is useful for:
-- disable for adapters that have a problems with SecureConnections enabled
-- if you want to disable CTKD (cross transport key derivation)
-- add option to enable only SecureConnections
----
- src/adapter.c |  2 +-
- src/btd.h     |  7 +++++++
- src/main.c    | 15 +++++++++++++++
- src/main.conf | 11 +++++++++++
- 4 files changed, 34 insertions(+), 1 deletion(-)
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjkxOTQ0CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMC44NyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjI3IHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDAuMDkgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MjUuMDAgc2Vjb25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjEu
+NDggc2Vjb25kcwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNDE2LjYw
+IHNlY29uZHMKVGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDE1LjY1IHNl
+Y29uZHMKVGVzdFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDE0Ljk5IHNlY29u
+ZHMKVGVzdFJ1bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDUuMjUgc2Vjb25kcwpU
+ZXN0UnVubmVyX21nbXQtdGVzdGVyICAgICAgICBQQVNTICAgICAgMTAyLjM5IHNlY29uZHMKVGVz
+dFJ1bm5lcl9yZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDkuMDYgc2Vjb25kcwpUZXN0UnVu
+bmVyX3Njby10ZXN0ZXIgICAgICAgICBQQVNTICAgICAgOC40OSBzZWNvbmRzClRlc3RSdW5uZXJf
+aW9jdGwtdGVzdGVyICAgICAgIFBBU1MgICAgICA5LjYzIHNlY29uZHMKVGVzdFJ1bm5lcl9tZXNo
+LXRlc3RlciAgICAgICAgUEFTUyAgICAgIDYuNjIgc2Vjb25kcwpUZXN0UnVubmVyX3NtcC10ZXN0
+ZXIgICAgICAgICBQQVNTICAgICAgOC40MCBzZWNvbmRzClRlc3RSdW5uZXJfdXNlcmNoYW4tdGVz
+dGVyICAgIFBBU1MgICAgICA1LjUzIHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAg
+ICAgRkFJTCAgICAgIDIzLjIwIHNlY29uZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjClRlc3Q6IEJ1aWxkS2VybmVsIC0gRkFJTApEZXNjOiBCdWlsZCBLZXJuZWwgZm9y
+IEJsdWV0b290aApPdXRwdXQ6Cgpkcml2ZXJzL2JsdWV0b290aC9oY2lfYmNzcC5jOiBJbiBmdW5j
+dGlvbiDigJhiY3NwX2Nsb3Nl4oCZOgpkcml2ZXJzL2JsdWV0b290aC9oY2lfYmNzcC5jOjc0MDoy
+OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYdGltZXJfc2h1dGRv
+d25fc3luY+KAmSBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICA3NDAg
+fCAgdGltZXJfc2h1dGRvd25fc3luYygmYmNzcC0+dGJjc3ApOwogICAgICB8ICBefn5+fn5+fn5+
+fn5+fn5+fn5+CmNjMTogc29tZSB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtl
+WzJdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjQ5OiBkcml2ZXJzL2JsdWV0b290aC9o
+Y2lfYmNzcC5vXSBFcnJvciAxCm1ha2VbMl06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
+YnMuLi4uCm1ha2VbMV06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjU6IGRyaXZlcnMv
+Ymx1ZXRvb3RoXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTg1MjogZHJpdmVyc10gRXJy
+b3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGRLZXJuZWwzMiAt
+IEZBSUwKRGVzYzogQnVpbGQgMzJiaXQgS2VybmVsIGZvciBCbHVldG9vdGgKT3V0cHV0OgoKZHJp
+dmVycy9ibHVldG9vdGgvaGNpX2Jjc3AuYzogSW4gZnVuY3Rpb24g4oCYYmNzcF9jbG9zZeKAmToK
+ZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jjc3AuYzo3NDA6MjogZXJyb3I6IGltcGxpY2l0IGRlY2xh
+cmF0aW9uIG9mIGZ1bmN0aW9uIOKAmHRpbWVyX3NodXRkb3duX3N5bmPigJkgWy1XZXJyb3I9aW1w
+bGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgNzQwIHwgIHRpbWVyX3NodXRkb3duX3N5bmMo
+JmJjc3AtPnRiY3NwKTsKICAgICAgfCAgXn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IHNvbWUgd2Fy
+bmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsyXTogKioqIFtzY3JpcHRzL01ha2Vm
+aWxlLmJ1aWxkOjI0OTogZHJpdmVycy9ibHVldG9vdGgvaGNpX2Jjc3Aub10gRXJyb3IgMQptYWtl
+WzJdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzFdOiAqKiogW3Nj
+cmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDY1OiBkcml2ZXJzL2JsdWV0b290aF0gRXJyb3IgMgptYWtl
+OiAqKiogW01ha2VmaWxlOjE4NTI6IGRyaXZlcnNdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjClRlc3Q6IEluY3JlbWVudGFsQnVpbGQgLSBGQUlMCkRlc2M6IEluY3JlbWVu
+dGFsIGJ1aWxkIHdpdGggdGhlIHBhdGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6CltSRkMsdjMs
+MDgvMzNdIHRpbWVyczogQmx1ZXRvb3RoOiBVc2UgdGltZXJfc2h1dGRvd25fc3luYygpIGJlZm9y
+ZSBmcmVlaW5nIHRpbWVyCgpkcml2ZXJzL2JsdWV0b290aC9oY2lfYmNzcC5jOiBJbiBmdW5jdGlv
+biDigJhiY3NwX2Nsb3Nl4oCZOgpkcml2ZXJzL2JsdWV0b290aC9oY2lfYmNzcC5jOjc0MDoyOiBl
+cnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYdGltZXJfc2h1dGRvd25f
+c3luY+KAmSBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICA3NDAgfCAg
+dGltZXJfc2h1dGRvd25fc3luYygmYmNzcC0+dGJjc3ApOwogICAgICB8ICBefn5+fn5+fn5+fn5+
+fn5+fn5+CmNjMTogc29tZSB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzJd
+OiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjQ5OiBkcml2ZXJzL2JsdWV0b290aC9oY2lf
+YmNzcC5vXSBFcnJvciAxCm1ha2VbMl06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
+Li4uCm1ha2VbMV06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0NjU6IGRyaXZlcnMvYmx1
+ZXRvb3RoXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTg1MjogZHJpdmVyc10gRXJyb3Ig
+MgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 8fb2acdc8..747f8f8ca 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -10146,7 +10146,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 	}
- 
- 	if (missing_settings & MGMT_SETTING_SECURE_CONN)
--		set_mode(adapter, MGMT_OP_SET_SECURE_CONN, 0x01);
-+		set_mode(adapter, MGMT_OP_SET_SECURE_CONN, btd_opts.secure_conn);
- 
- 	if (adapter->supported_settings & MGMT_SETTING_PRIVACY)
- 		set_privacy(adapter, btd_opts.privacy);
-diff --git a/src/btd.h b/src/btd.h
-index 63be6d8d4..42cffcde4 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -36,6 +36,12 @@ enum mps_mode_t {
- 	MPS_MULTIPLE,
- };
- 
-+enum sc_mode_t {
-+	SC_OFF,
-+	SC_ON,
-+	SC_ONLY,
-+};
-+
- struct btd_br_defaults {
- 	uint16_t	page_scan_type;
- 	uint16_t	page_scan_interval;
-@@ -105,6 +111,7 @@ struct btd_opts {
- 	uint8_t		privacy;
- 	bool		device_privacy;
- 	uint32_t	name_request_retry_delay;
-+	uint8_t		secure_conn;
- 
- 	struct btd_defaults defaults;
- 
-diff --git a/src/main.c b/src/main.c
-index 1d357161f..99d9c508f 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -80,6 +80,7 @@ static const char *supported_options[] = {
- 	"MaxControllers"
- 	"MultiProfile",
- 	"FastConnectable",
-+	"SecureConnections",
- 	"Privacy",
- 	"JustWorksRepairing",
- 	"TemporaryTimeout",
-@@ -881,6 +882,19 @@ static void parse_config(GKeyFile *config)
- 		btd_opts.name_request_retry_delay = val;
- 	}
- 
-+	str = g_key_file_get_string(config, "General",
-+						"SecureConnections", &err);
-+	if (err)
-+		g_clear_error(&err);
-+	else {
-+		if (!strcmp(str, "off"))
-+			btd_opts.secure_conn = SC_OFF;
-+		else if (!strcmp(str, "on"))
-+			btd_opts.secure_conn = SC_ON;
-+		else if (!strcmp(str, "only"))
-+			btd_opts.secure_conn = SC_ONLY;
-+	}
-+
- 	str = g_key_file_get_string(config, "GATT", "Cache", &err);
- 	if (err) {
- 		DBG("%s", err->message);
-@@ -993,6 +1007,7 @@ static void init_defaults(void)
- 	btd_opts.debug_keys = FALSE;
- 	btd_opts.refresh_discovery = TRUE;
- 	btd_opts.name_request_retry_delay = DEFAULT_NAME_REQUEST_RETRY_DELAY;
-+	btd_opts.secure_conn = SC_ON;
- 
- 	btd_opts.defaults.num_entries = 0;
- 	btd_opts.defaults.br.page_scan_type = 0xFFFF;
-diff --git a/src/main.conf b/src/main.conf
-index 2796f155e..f187c9aaa 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -111,6 +111,17 @@
- # profile is connected. Defaults to true.
- #RefreshDiscovery = true
- 
-+# Default Secure Connections setting.
-+# Enables the Secure Connections setting for adapters that support it. It
-+# provides better crypto algorithms for BT links and also enables CTKD (cross
-+# transport key derivation) during pairing on any link.
-+# Possible values: "off", "on", "only"
-+# - "off": Secure Connections are disabled
-+# - "on": Secure Connections are enabled when peer device supports them
-+# - "only": we allow only Secure Connections
-+# Defaults to "on"
-+#SecureConnections = on
-+
- # Enables D-Bus experimental interfaces
- # Possible values: true or false
- #Experimental = false
--- 
-2.34.1
-
+--===============0798612476146947008==--
