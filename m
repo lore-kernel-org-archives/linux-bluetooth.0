@@ -2,117 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CDEC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 20:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4EAC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Nov 2022 21:32:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231223AbiKRUEJ (ORCPT
+        id S229660AbiKRVcX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Nov 2022 15:04:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44198 "EHLO
+        Fri, 18 Nov 2022 16:32:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230322AbiKRUEH (ORCPT
+        with ESMTP id S229802AbiKRVcW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Nov 2022 15:04:07 -0500
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45549DC6;
-        Fri, 18 Nov 2022 12:04:05 -0800 (PST)
-Received: by mail-io1-f46.google.com with SMTP id b2so4604536iof.12;
-        Fri, 18 Nov 2022 12:04:05 -0800 (PST)
+        Fri, 18 Nov 2022 16:32:22 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AD00786C0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 13:32:20 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id h12so8324028ljg.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Nov 2022 13:32:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xytzPwZVsyCz6Lq8RyB7dUYbAuvT8b3vgi/qSIlY7lk=;
+        b=lAYM2OTWE1WbYSKgQ/tjHFV+bHpmffasIm8+SWOKtKf5xGeZv15yCVOp48nSGV+a4I
+         FufkKD3o+JoFylGSmS61jHoNnxoPZPXtSZJD+pxka5Z2MJpX7bx2tT0H9QBGsTXZBaJs
+         DdDeNwSQeH+X+op2QALdMLnqZjQabNfq9FLQf1K3VmXIt5QHhuE2caYB4a3xPMB4ltrz
+         85/omvEUDOcf1UqvSdMZ1vyONlnE8BvluVLdMjlABmrsXd0yH4J3RTB3PguRV6ONnczM
+         dHQl29ssnITnLbYDIVSNQVHXOBLEJvMeNfM+dCSCPJfcD3QZ/aZapuRgZbNXsvFbI4vE
+         pXqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AhdkGygTY3zoLbGAB/+Raeg5fzHG6ZjkIK/WhyIG7oM=;
-        b=qMQUo+5n/Qgrw6orGT5BagNpQES5PYD3ObMq9VBTMugxag5GNnzhDRJJHpaCPgQd3O
-         OWnjrI7GsMeHJ6LG5II/Lg0l1gIgWPP2MUOZsqygOL7XhyYc+NeTcBu/u1WOnOZdevvR
-         IvkN121o63/tvk2nf45xa6T/z3gSPY6aPBHeG91GpGz2rdfXc5VG6g7kl7DGzHrHnOt2
-         hHOt2y6tWMk8T25uXiQtT4A1CtpiOLW2hoNTStO2+L7UaHqFbnj6/FBdIJhRyMI3ATX+
-         4GWqx40BXAf37tN6c5ZZy1fbka3Q8jtyRIoiI97lhHomuCMtm7ajJiVilT5VvoIzOZS5
-         51FQ==
-X-Gm-Message-State: ANoB5pkTcmOXXfnzVq2qiZKgtbh2rK/4tmzOXoVW8rshgaZ3YC4DVUZB
-        9EYjoyEiHm3RJ8CdvbI0Lh8=
-X-Google-Smtp-Source: AA0mqf5Br29FRXK/1NcL4h/veA3rOteAy8JC0XUr5l+LfnOm1RRMi55jyOIwQU0JwxDIIpRa32SFaA==
-X-Received: by 2002:a6b:8d09:0:b0:68b:7b1f:92b9 with SMTP id p9-20020a6b8d09000000b0068b7b1f92b9mr4167072iod.163.1668801844397;
-        Fri, 18 Nov 2022 12:04:04 -0800 (PST)
-Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
-        by smtp.googlemail.com with ESMTPSA id i13-20020a02b68d000000b003638d00b759sm1517966jam.54.2022.11.18.12.04.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Nov 2022 12:04:03 -0800 (PST)
-From:   Sungwoo Kim <iam@sung-woo.kim>
-Cc:     Sungwoo Kim <iam@sung-woo.kim>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix u8 overflow
-Date:   Fri, 18 Nov 2022 15:01:47 -0500
-Message-Id: <20221118200145.1741199-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.25.1
+        bh=xytzPwZVsyCz6Lq8RyB7dUYbAuvT8b3vgi/qSIlY7lk=;
+        b=OkCq5WX4KAkKlvPABkeLav26jVAQiduHPw4q8XL1JEIqvILejunkJfamFUIGtQEZu7
+         4TdmACFl8ADJ7BLPkcSeV2mvkUPmMX0rvHYNuYPUKqRuUkVDaOIWZfkRX8Mcsho087d1
+         ENwPDnIhbN6GQ74s7X57ZRR6ZJcCxcLwvB+3KclZa+ggM6Z9OkvAnei8Odfln1mofbv+
+         2DrBvY6kPSJ30rEV0vn+7QDDnc42JZdqxBEIu1plGZm1UKM2AOreFtzD213upKTyCZ0M
+         s3mzs6v9dZh/oGWIC9C2PvUEZwjzQgSAkh8gik7r+vSFLy69vtj7KyMvece5PgJY17kc
+         CEcg==
+X-Gm-Message-State: ANoB5pmAUlxjVfuxZKeBHLf3lSe6nHVmJKkj+1dAiKyK7dWJrcVqpmbS
+        fniPfMNgXNl3uf7j4kakE8kVx2ALrAcmgh2gu+21dW8W
+X-Google-Smtp-Source: AA0mqf7PwL2ElHtBfx5lGIE2RGklmLVDyBHLBHs8/4gmWSAbt7GQblGTzMRh4xpeKc5ZTbMCaf/h+kqegPOMfisMtUw=
+X-Received: by 2002:a05:651c:389:b0:278:f5de:8478 with SMTP id
+ e9-20020a05651c038900b00278f5de8478mr2822705ljp.65.1668807138603; Fri, 18 Nov
+ 2022 13:32:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+References: <f9213307-e4c3-902a-e0b6-aed53f3a1e02@rhrk.uni-kl.de>
+In-Reply-To: <f9213307-e4c3-902a-e0b6-aed53f3a1e02@rhrk.uni-kl.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 18 Nov 2022 13:32:06 -0800
+Message-ID: <CABBYNZLqGxBC-tNAPMyYrHFqF0PR86CY-G+JWYPYE59ia4-i3w@mail.gmail.com>
+Subject: Re: LE Advertisement on data channels/ btvirt
+To:     Marvin Sinnwell <msinnwel@rhrk.uni-kl.de>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-By keep sending L2CAP_CONF_REQ packets, chan->num_conf_rsp increases
-multiple times and eventually it will wrap around the maximum number
-(i.e., 255).
-This patch prevents this by adding a boundary check with
-L2CAP_MAX_CONF_RSP
+Hi Marvin,
 
-Btmon log:
-Bluetooth monitor ver 5.64
-= Note: Linux version 6.1.0-rc2 (x86_64)                               0.264594
-= Note: Bluetooth subsystem version 2.22                               0.264636
-@ MGMT Open: btmon (privileged) version 1.22                  {0x0001} 0.272191
-= New Index: 00:00:00:00:00:00 (Primary,Virtual,hci0)          [hci0] 13.877604
-@ RAW Open: 9496 (privileged) version 2.22                   {0x0002} 13.890741
-= Open Index: 00:00:00:00:00:00                                [hci0] 13.900426
-(...)
-> ACL Data RX: Handle 200 flags 0x00 dlen 1033             #32 [hci0] 14.273106
-        invalid packet size (12 != 1033)
-        08 00 01 00 02 01 04 00 01 10 ff ff              ............    
-> ACL Data RX: Handle 200 flags 0x00 dlen 1547             #33 [hci0] 14.273561
-        invalid packet size (14 != 1547)
-        0a 00 01 00 04 01 06 00 40 00 00 00 00 00        ........@.....  
-> ACL Data RX: Handle 200 flags 0x00 dlen 2061             #34 [hci0] 14.274390
-        invalid packet size (16 != 2061)
-        0c 00 01 00 04 01 08 00 40 00 00 00 00 00 00 04  ........@.......
-> ACL Data RX: Handle 200 flags 0x00 dlen 2061             #35 [hci0] 14.274932
-        invalid packet size (16 != 2061)
-        0c 00 01 00 04 01 08 00 40 00 00 00 07 00 03 00  ........@.......
-= bluetoothd: Bluetooth daemon 5.43                                   14.401828
-> ACL Data RX: Handle 200 flags 0x00 dlen 1033             #36 [hci0] 14.275753
-        invalid packet size (12 != 1033)
-        08 00 01 00 04 01 04 00 40 00 00 00              ........@...    
+On Fri, Nov 18, 2022 at 8:24 AM Marvin Sinnwell <msinnwel@rhrk.uni-kl.de> wrote:
+>
+> Hello everyone,
+>
+> TL;DR: Seeking advice on advertising on arbitrary channels + usage of
+> btvirt specifically function "send_adv_pkt".
+>
+> I am currently working on my bachelor thesis and have the following
+> problem with I would like to request some advice:
+>
+> I want to test several algorithms that try to improve the time it takes
+> to find an advertisement packet of another device. For this I not only
+> want to change the method of advertising, on channels 37-39 in
+> sequential order, to something else, but also send advertisement packets
+> on other channels.
+>
+> My main difficulty currently is composed of trying to find out where the
+> actual advertisement packets are sent. Currently my best guess is, that
+> is is controlled by the firmware of my raspberry pi that I am using
+> (specific model below), because I could not find anything within the
+> bluez stack. Maybe one of you has more knowledge on where I have to search.
+>
+> What I was able to find was the btvirt tool, which could help with my
+> problem. There I found in the file "le.c" in function
+> "adv_timeout_callback" another function called "send_adv_pkt". Sadly
+> while trying out btvirt and clever usage of some print statements I
+> could not see the function be executed. Maybe someone can give me some
+> advice on that, because this function should do exactly what I am
+> looking for. It could be that I was just using the tool incorrectly in
+> which case it would be great if somebody could tell me how to use it. My
+> methodology was: 1. "sudo ./btvirt -L -l2 -d" to create 2 new local LE
+> controller. 2. Start advertisement using hcitool "sudo hcitool -i hci2
+> cmd 0x08 0x000a 01". The advertisement is correct and the other local
+> controller can connect to the first one.
+
+I don't think vhci will help you given it only emulates HCI layer and
+the channels are actually controlled by the so called Link Layer which
+happens to be under HCI, you might have control over the Link Layer
+using Zephyr though.
+
+> My current equipment is:
+>
+> Device:                Raspberry Pi 3 Model B+
+>
+> Kernel + OS:       Linux raspberrypi 5.15.61-v7+ #1579 SMP Fri Aug 26
+> 11:10:59 BST 2022 armv7l GNU/Linux
+>
+> Bluez version:     5.65
+>
+>
+> Kind regards
+>
+> Marvin Sinnwell
+>
+>
+>
 
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
----
- net/bluetooth/l2cap_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9c24947aa..9fdede5fe 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4453,7 +4453,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
- 
- 	chan->ident = cmd->ident;
- 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONF_RSP, len, rsp);
--	chan->num_conf_rsp++;
-+	if (chan->num_conf_rsp < L2CAP_CONF_MAX_CONF_RSP)
-+		chan->num_conf_rsp++;
- 
- 	/* Reset config buffer. */
- 	chan->conf_len = 0;
 -- 
-2.25.1
-
+Luiz Augusto von Dentz
