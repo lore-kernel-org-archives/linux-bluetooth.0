@@ -2,137 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5DFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 19:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA24C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 20:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233757AbiKST3h (ORCPT
+        id S234820AbiKSUxk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Nov 2022 14:29:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56966 "EHLO
+        Sat, 19 Nov 2022 15:53:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiKST3f (ORCPT
+        with ESMTP id S234895AbiKSUxi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Nov 2022 14:29:35 -0500
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4FC613D2B
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 11:29:32 -0800 (PST)
-Received: by mail-ot1-x330.google.com with SMTP id a7-20020a056830008700b0066c82848060so5097641oto.4
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 11:29:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wHyyYELpoNZxwBCn+EEpw/J5fz3y/7GtFHlU/P1fM9M=;
-        b=AjoLSAtGBdKosqDVsomDEjMvVXin87OsSsXTb2zCZn9VYr3mloYvx44iKz9eNnnx23
-         pB/6LXXQovRVBTpleHEK+EkT7tN/++RoVMa4tOHauKdPqS1FR9v+eTcfZqf8B7jQP/bI
-         VPRkL/g2dqfz7eZ6UzLnW+eqjtYpb/DtFCcpg38U5RyxOqVcZS+SkvjnZnlsLDin420y
-         4fx651J/tz991OuYY3k4IAo/Zl3MTupRhrD2KAHorgXLecB/tam3Pv/X74DuUtSUuEV/
-         CUk8xhHd3s8JIMdb4OszLNnCDr17mEW59ubpDIRsY0lW+sDrQK5gVu0ql0MKYVNz4h8x
-         tc0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wHyyYELpoNZxwBCn+EEpw/J5fz3y/7GtFHlU/P1fM9M=;
-        b=VCjKIzeEQ7Bv8geR9p5xotMDkQmhcpX0tQWGiJbPXbbXG78varfETRGl93Cq0+ZI3m
-         acfJBhj1T88gt2l3IQVuDme6nLYE9cDGjVauHp0vTk+byLTOQYVsOB2h23bhPwj+z/kb
-         /08Yycsbcdmpq2Re6oRw0/yrGeCLG3XuE2c1J1GPha7b+1ZRPeiuiDTEIC0eRo2mqJnx
-         lx1pp6tpkEggLT5La8Ryvet2A78Qc1jySRRNT0+Vzg/k5zOG8Ai0dMqrDpmToMCp4UMA
-         8tjmMt6JS9eWWC3utDTknHEshigESyIXVa9GmRX35EbU8KXfpMcp8aGCdVqFzc2l3nur
-         /f4A==
-X-Gm-Message-State: ANoB5pl8H/GDEVjbTJMJwJaaP2b+iWtVzgwKZagRG5R4LkibCBIJEbio
-        X1ViNV36CYvqCMtkrjZy+BoRrYZbR2GdEg==
-X-Google-Smtp-Source: AA0mqf5+deCPSv8aHvMBxEQx/rxUE8KL4Q9PPqW6wZ9rP+zPMueG6KAHGl2bDl7EiVed/pz+mCcgYg==
-X-Received: by 2002:a05:6830:208f:b0:667:cdec:4c9c with SMTP id y15-20020a056830208f00b00667cdec4c9cmr6483008otq.349.1668886171272;
-        Sat, 19 Nov 2022 11:29:31 -0800 (PST)
-Received: from [172.17.0.2] ([20.165.68.136])
-        by smtp.gmail.com with ESMTPSA id y18-20020a4a6252000000b0049b17794d19sm2674320oog.20.2022.11.19.11.29.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Nov 2022 11:29:30 -0800 (PST)
-Message-ID: <63792e9a.4a0a0220.5f0d.b27f@mx.google.com>
-Date:   Sat, 19 Nov 2022 11:29:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0622173397150502624=="
+        Sat, 19 Nov 2022 15:53:38 -0500
+Received: from msg-4.mailo.com (msg-4.mailo.com [213.182.54.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322E126D9;
+        Sat, 19 Nov 2022 12:53:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailo.com; s=mailo;
+        t=1668891195; bh=fw52bMqQOJVIoYoF40uODbxsnJEZGdDI7hukBF588KA=;
+        h=X-EA-Auth:Date:From:To:Subject:Message-ID:MIME-Version:
+         Content-Type;
+        b=dPP9A7lh5/eSskwwh1iUAlYfE8bGp1mZXfKnZnc5Y1LbSENAM+qcZH27W/uvElmdS
+         Zxec1UAca0RwVNLEVfRr7cC0qH7fDDymgVROFf8IqooQdquN7Nbqi0D6jV6ehffoC7
+         Ce+Y15v8pk+Dc40Z35PK8JAywLB/IjLuHYvXy3hQ=
+Received: by b-3.in.mailobj.net [192.168.90.13] with ESMTP
+        via ip-206.mailobj.net [213.182.55.206]
+        Sat, 19 Nov 2022 21:53:15 +0100 (CET)
+X-EA-Auth: tzzRw3US9AUZnWPyLPpSKljBHOIlqB32lRdAQyZ6nFr5okiIoPGw/HnP9758E9uP3AasUQH9DK7Vq/WNRH+RH3PNRUU3uSGk
+Date:   Sun, 20 Nov 2022 02:23:10 +0530
+From:   Deepak R Varma <drv@mailo.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH] Bluetooth: hci_conn: Use kzalloc for kmalloc+memset
+Message-ID: <Y3lCNjPGoVJT9Y35@qemulion>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, MihirKhatri@proton.me
-Subject: RE: Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
-In-Reply-To: <ehYYBNwlU_5Z9W9Wzl5scfuMSmrs_K_s9vKb0M7nVP5JPgTDJB1q1rrnPCoXbxtirqiG5jy98alelPr2zWh_0BsZDpMLEiMOPfUbwAZ_pWg=@proton.me>
-References: <ehYYBNwlU_5Z9W9Wzl5scfuMSmrs_K_s9vKb0M7nVP5JPgTDJB1q1rrnPCoXbxtirqiG5jy98alelPr2zWh_0BsZDpMLEiMOPfUbwAZ_pWg=@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0622173397150502624==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Use of kzalloc preferred over combination of kmalloc & memset. Issue
+identified using coccicheck.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=697285
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.82 seconds
-GitLint                       FAIL      0.54 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      37.11 seconds
-BuildKernel32                 PASS      34.17 seconds
-TestRunnerSetup               PASS      456.41 seconds
-TestRunner_l2cap-tester       PASS      17.58 seconds
-TestRunner_iso-tester         PASS      18.12 seconds
-TestRunner_bnep-tester        PASS      5.96 seconds
-TestRunner_mgmt-tester        PASS      112.39 seconds
-TestRunner_rfcomm-tester      PASS      9.83 seconds
-TestRunner_sco-tester         PASS      9.26 seconds
-TestRunner_ioctl-tester       PASS      10.61 seconds
-TestRunner_mesh-tester        PASS      7.26 seconds
-TestRunner_smp-tester         PASS      8.97 seconds
-TestRunner_userchan-tester    PASS      6.22 seconds
-IncrementalBuild              PASS      33.32 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
-ERROR: Missing Signed-off-by: line(s)
-
-total: 1 errors, 0 warnings, 7 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13049772.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
-
-1: T1 Title exceeds max length (84>80): "Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones"
-4: B2 Line has trailing whitespace: "on some fake CSR 5.0 clones can them to get "
-6: B2 Line has trailing whitespace: "the bit HCI_QUICK_NO_SUSPEND_NOTIFIER everything works fine "
-
-
+Signed-off-by: Deepak R Varma <drv@mailo.com>
 ---
-Regards,
-Linux Bluetooth
+
+Notes: No changes. Just a gentle reminder for review and feedback.
 
 
---===============0622173397150502624==--
+ net/bluetooth/hci_conn.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7a59c4487050..287d313aa312 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -824,11 +824,10 @@ static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
+
+ 	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
+
+-	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
+
+-	memset(d, 0, sizeof(*d));
+ 	d->big = big;
+ 	d->bis = bis;
+
+@@ -861,11 +860,10 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
+
+ 	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_handle);
+
+-	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
+
+-	memset(d, 0, sizeof(*d));
+ 	d->big = big;
+ 	d->sync_handle = sync_handle;
+
+--
+2.34.1
+
+
+
