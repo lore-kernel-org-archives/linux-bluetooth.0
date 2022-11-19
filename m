@@ -2,92 +2,67 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C2FC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 17:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A23DC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 18:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234148AbiKSRNy (ORCPT
+        id S233394AbiKSSHb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Nov 2022 12:13:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34170 "EHLO
+        Sat, 19 Nov 2022 13:07:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbiKSRNx (ORCPT
+        with ESMTP id S230398AbiKSSHa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Nov 2022 12:13:53 -0500
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8735013F7D
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 09:13:51 -0800 (PST)
-Received: by mail-il1-x12d.google.com with SMTP id o13so3941233ilq.6
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 09:13:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mHhryjDNPwX9Z/3b1iaiutGt1qfy2L0YB9tjdokOIB4=;
-        b=dMBblATU2YbzNP/I1nRl1/D3dlq3+1DxWPOg1XgfkMyCJpMzB0dM+s0yLbPPbqktGS
-         OnYRb8mFBBL3MoM9GEmR1hHN3EgTDlyeaFuc+bNNkhbZtwIseJfrb98E+7RgJ47hlb8f
-         WbI4tv40pey4ygvrl9Y68Q3SXxSwLptDOySmjIPj3ChUTKCyfQPmRoSev8OptH6ZfD8R
-         Q4eh1UZFXrUBVlIL9X76y5GFXZKxUr8MUAveTEhAZbougTl+pa0BE8ToAY4ElbgAKN3R
-         aAv1bSYPD3pOAfew3/88uDyVxlBPFEM/LK3mtjjyg+0zLT1HH5ewwRHHSF1RiMHCgkFs
-         2mmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mHhryjDNPwX9Z/3b1iaiutGt1qfy2L0YB9tjdokOIB4=;
-        b=bOFutBB39SWZzNf0+C6y4pwDK+o3+nkQV563cIeFJcOXG1TCyVNEbaELpp1UenuoBY
-         U4yESukcqB/UZRMdFfkKTSnYCY074hHj24jW/Wet+vQDyl8uHd2YsX7lkyNsVOKldcgV
-         Qj9kOjegzPaMgzy33iGo/TqPxdnL0XWApeHCmJad6cZO7qdgHBMEG7EFH49FjxAgfker
-         eOWfHDmCI9Pj4djN0nnH955k6Hg8kQtYQlx247SbPdtvHU0MOKgykMJa7vrgJyG9UZqK
-         azjiYF4lQ4SUbhUnpCGT0FBHjSCnPS6AgJx8UnrzXHWM9l4YRLPFypmWaw0hrXxVnis/
-         SgEA==
-X-Gm-Message-State: ANoB5pnuC+Ml5GbzuEfDlIhxIY0+4liF1gKDLQhN4SUzJTxLmKKOITkZ
-        +/z8Ja8EIpOOcYlupkLCGIvx45ODv1M=
-X-Google-Smtp-Source: AA0mqf4iDel57YcUWKrr+bqSlH/JHYV2fLA7XnQsXYqrFLPCx2/xis3sSqq1qVhzvdezPJvR7BHGBA==
-X-Received: by 2002:a92:cb4e:0:b0:302:bd25:d752 with SMTP id f14-20020a92cb4e000000b00302bd25d752mr221738ilq.262.1668878030706;
-        Sat, 19 Nov 2022 09:13:50 -0800 (PST)
-Received: from [172.17.0.2] ([40.78.153.184])
-        by smtp.gmail.com with ESMTPSA id p70-20020a022949000000b00374fe4f0bc3sm2378712jap.158.2022.11.19.09.13.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Nov 2022 09:13:50 -0800 (PST)
-Message-ID: <63790ece.020a0220.f799c.57bd@mx.google.com>
-Date:   Sat, 19 Nov 2022 09:13:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7491886932450857178=="
+        Sat, 19 Nov 2022 13:07:30 -0500
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD023C45
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 10:07:28 -0800 (PST)
+Date:   Sat, 19 Nov 2022 18:07:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+        s=protonmail; t=1668881243; x=1669140443;
+        bh=gudxiCCMMQR2wR811CFizNqqpRdnnwgp2LzciDQFvOg=;
+        h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+         Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+        b=Nw5aZNcfsgWzUuylD8fEChUgkNbSpTxIc7m3NMcaRFLDFhMzyXW2Z/+FqP7RBXxjx
+         OGW3XBvkdlhkId9/5Fn+OFMPUrrxN1EpaPEgQ0Td3hqnAsGF8ymvPQegoBLie51ZYo
+         XOjrY2gGSzpUzpr8a95zVZBcUskheMExrYsU5+eeQ/rHyhn1pAy57s20ZjNg3CquS+
+         oSt4Dc68anNVZVdxgYhxFL4F5p220GS4CO3Tmus1tsCgxKUscRzf3TwDiWEI2fWev0
+         V2Pui8nwHIoCjqbbzUWgUrE80mCaniVwJgcnzE2JDSk26D78GzB3VX0QpkFEy8eXfi
+         14SioBJSrJeLg==
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "marcel@holtmann.org" <marcel@holtmann.org>
+From:   Mihir Khatri <MihirKhatri@proton.me>
+Subject: [PATCH] Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
+Message-ID: <CecyZdAwliTFqNWeZYcBef--uL7SBwD_JGjv1i4pxjQPSDNpheMorDHT2dAiFVvcZbO2afBLIVjbE52fcUYLWtEroa68AkhM5GdJLHEsQ6c=@proton.me>
+Feedback-ID: 62013127:user:proton
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, MihirKhatri@proton.me
-Subject: RE: btusb: HCI_QUICK_NO_SUSPEND_NOTIFIER causes kernel panic
-In-Reply-To: <zEEbuiH5Idm8MyWzcjDThSGXk1jtLq8YxNQPGtHSClFG3F-22Zb3kYwj_IR_YVLszbAnWC-9cqTvWS-RjiZHlNqX8Ftduyy6fwIL8iDHkns=@proton.me>
-References: <zEEbuiH5Idm8MyWzcjDThSGXk1jtLq8YxNQPGtHSClFG3F-22Zb3kYwj_IR_YVLszbAnWC-9cqTvWS-RjiZHlNqX8Ftduyy6fwIL8iDHkns=@proton.me>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7491886932450857178==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+It seems that setting the bit HCI_QUICK_NO_SUSPEND_NOTIFIER
+on some fake CSR 5.0 clones can them to get registered 2 times
+causing a kernel panic. After not setting the bit HCI_QUICK_NO_SUSPEND_NOTI=
+FIER
+everything works fine and no kernel panic can be observed.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btusb.c:2267
-error: drivers/bluetooth/btusb.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
+Signed-off-by: Mihir Khatri <MihirKhatri@proton.me>
 
 ---
-Regards,
-Linux Bluetooth
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e7914783d29e..f0d0224ca59e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2267,8 +2267,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+                set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+                set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks)=
+;
+                set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
+-               set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
+                         =20
+                /* Clear the reset quirk since this is not an actual
+                 * early Bluetooth 1.1 device from CSR.
+                 */
 
---===============7491886932450857178==--
