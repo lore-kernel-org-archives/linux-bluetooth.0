@@ -2,103 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A22C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 19:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5DFC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 19:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234139AbiKSTDz (ORCPT
+        id S233757AbiKST3h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Nov 2022 14:03:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52366 "EHLO
+        Sat, 19 Nov 2022 14:29:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233576AbiKSTDx (ORCPT
+        with ESMTP id S229635AbiKST3f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Nov 2022 14:03:53 -0500
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-        by lindbergh.monkeyblade.net (Postfix) with SMTP id B56DD25FB
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 11:03:51 -0800 (PST)
-Received: (qmail 71881 invoked by uid 1000); 19 Nov 2022 14:03:50 -0500
-Date:   Sat, 19 Nov 2022 14:03:50 -0500
-From:   Alan Stern <stern@rowland.harvard.edu>
-To:     Andrew McNaughton <andrewmcnaughton@me.com>
-Cc:     linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: How to get USB bluetooth device supported?
-Message-ID: <Y3kolrNSMDUqFn6f@rowland.harvard.edu>
-References: <8AA450C9-623F-45C0-9981-93F3A3A7AAA0@me.com>
- <A14CCC2A-F874-4B61-B888-DCC12A5E7CEA@me.com>
+        Sat, 19 Nov 2022 14:29:35 -0500
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4FC613D2B
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 11:29:32 -0800 (PST)
+Received: by mail-ot1-x330.google.com with SMTP id a7-20020a056830008700b0066c82848060so5097641oto.4
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 11:29:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wHyyYELpoNZxwBCn+EEpw/J5fz3y/7GtFHlU/P1fM9M=;
+        b=AjoLSAtGBdKosqDVsomDEjMvVXin87OsSsXTb2zCZn9VYr3mloYvx44iKz9eNnnx23
+         pB/6LXXQovRVBTpleHEK+EkT7tN/++RoVMa4tOHauKdPqS1FR9v+eTcfZqf8B7jQP/bI
+         VPRkL/g2dqfz7eZ6UzLnW+eqjtYpb/DtFCcpg38U5RyxOqVcZS+SkvjnZnlsLDin420y
+         4fx651J/tz991OuYY3k4IAo/Zl3MTupRhrD2KAHorgXLecB/tam3Pv/X74DuUtSUuEV/
+         CUk8xhHd3s8JIMdb4OszLNnCDr17mEW59ubpDIRsY0lW+sDrQK5gVu0ql0MKYVNz4h8x
+         tc0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wHyyYELpoNZxwBCn+EEpw/J5fz3y/7GtFHlU/P1fM9M=;
+        b=VCjKIzeEQ7Bv8geR9p5xotMDkQmhcpX0tQWGiJbPXbbXG78varfETRGl93Cq0+ZI3m
+         acfJBhj1T88gt2l3IQVuDme6nLYE9cDGjVauHp0vTk+byLTOQYVsOB2h23bhPwj+z/kb
+         /08Yycsbcdmpq2Re6oRw0/yrGeCLG3XuE2c1J1GPha7b+1ZRPeiuiDTEIC0eRo2mqJnx
+         lx1pp6tpkEggLT5La8Ryvet2A78Qc1jySRRNT0+Vzg/k5zOG8Ai0dMqrDpmToMCp4UMA
+         8tjmMt6JS9eWWC3utDTknHEshigESyIXVa9GmRX35EbU8KXfpMcp8aGCdVqFzc2l3nur
+         /f4A==
+X-Gm-Message-State: ANoB5pl8H/GDEVjbTJMJwJaaP2b+iWtVzgwKZagRG5R4LkibCBIJEbio
+        X1ViNV36CYvqCMtkrjZy+BoRrYZbR2GdEg==
+X-Google-Smtp-Source: AA0mqf5+deCPSv8aHvMBxEQx/rxUE8KL4Q9PPqW6wZ9rP+zPMueG6KAHGl2bDl7EiVed/pz+mCcgYg==
+X-Received: by 2002:a05:6830:208f:b0:667:cdec:4c9c with SMTP id y15-20020a056830208f00b00667cdec4c9cmr6483008otq.349.1668886171272;
+        Sat, 19 Nov 2022 11:29:31 -0800 (PST)
+Received: from [172.17.0.2] ([20.165.68.136])
+        by smtp.gmail.com with ESMTPSA id y18-20020a4a6252000000b0049b17794d19sm2674320oog.20.2022.11.19.11.29.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 19 Nov 2022 11:29:30 -0800 (PST)
+Message-ID: <63792e9a.4a0a0220.5f0d.b27f@mx.google.com>
+Date:   Sat, 19 Nov 2022 11:29:30 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0622173397150502624=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <A14CCC2A-F874-4B61-B888-DCC12A5E7CEA@me.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, MihirKhatri@proton.me
+Subject: RE: Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
+In-Reply-To: <ehYYBNwlU_5Z9W9Wzl5scfuMSmrs_K_s9vKb0M7nVP5JPgTDJB1q1rrnPCoXbxtirqiG5jy98alelPr2zWh_0BsZDpMLEiMOPfUbwAZ_pWg=@proton.me>
+References: <ehYYBNwlU_5Z9W9Wzl5scfuMSmrs_K_s9vKb0M7nVP5JPgTDJB1q1rrnPCoXbxtirqiG5jy98alelPr2zWh_0BsZDpMLEiMOPfUbwAZ_pWg=@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, Nov 19, 2022 at 11:37:51AM +0000, Andrew McNaughton wrote:
-> How does one go about getting a device that should work with btusb but doesn’t? It works fine with Microsoft generic bt drivers.
+--===============0622173397150502624==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-You might try CC'ing the linux-bluetooth mailing list.  They probably 
-have a better idea of what's going on with the btusb driver than people 
-on the linux-usb mailing list do.
+This is automated email and please do not reply to this email!
 
-> I can see people adding new VID/PID’s to btusb but I don’t know if that’s all that’s needed here.
+Dear submitter,
 
-It probably won't make any difference.  Your excerpt from 
-/sys/kernel/debug/usb/devices below shows that the btusb driver is 
-already binding to the device.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=697285
 
-Alan Stern
+---Test result---
 
->  This is for a Bluetooth 5.3 transceiver. There’s not a lot of these about yet but I think important for accessing newer/upcoming audio purposes.
-> 
-> 
-> From /sys/kernel/debug/usb/devices:
-> 
-> T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=10d7 ProdID=b012 Rev=88.91
-> S:  Manufacturer=Actions
-> S:  Product=general adapter
-> S:  SerialNumber=ACTIONS1234
-> C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=01(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=01(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=01(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=01(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=01(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=01(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> 
-> This is on Linux Kernel: 6.0.8-300.fc37.aarch64
-> 
-> 
-> This needs to be added to the usb.ids (I’ve tried submitting to the update robot but I don’t know if that is still alive):
-> 
-> 10d7 Actions Semiconductor Co., Ltd
-> b012 ATS2851 Bluetooth 5.3 Transceiver [Ugreen CM591]
-> 
-> 
-> 
-> Thanks in advance.
-> --
-> Andrew McNaughton
-> 
-> email: andrewmcnaughton@me.com
-> 
-> 
+Test Summary:
+CheckPatch                    FAIL      0.82 seconds
+GitLint                       FAIL      0.54 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      37.11 seconds
+BuildKernel32                 PASS      34.17 seconds
+TestRunnerSetup               PASS      456.41 seconds
+TestRunner_l2cap-tester       PASS      17.58 seconds
+TestRunner_iso-tester         PASS      18.12 seconds
+TestRunner_bnep-tester        PASS      5.96 seconds
+TestRunner_mgmt-tester        PASS      112.39 seconds
+TestRunner_rfcomm-tester      PASS      9.83 seconds
+TestRunner_sco-tester         PASS      9.26 seconds
+TestRunner_ioctl-tester       PASS      10.61 seconds
+TestRunner_mesh-tester        PASS      7.26 seconds
+TestRunner_smp-tester         PASS      8.97 seconds
+TestRunner_userchan-tester    PASS      6.22 seconds
+IncrementalBuild              PASS      33.32 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
+ERROR: Missing Signed-off-by: line(s)
+
+total: 1 errors, 0 warnings, 7 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13049772.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones
+
+1: T1 Title exceeds max length (84>80): "Bluetooth: btusb HCI_QUIRK_NO_SUSPEND_NOTIFIER causes kernel panic on CSR 5.0 clones"
+4: B2 Line has trailing whitespace: "on some fake CSR 5.0 clones can them to get "
+6: B2 Line has trailing whitespace: "the bit HCI_QUICK_NO_SUSPEND_NOTIFIER everything works fine "
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0622173397150502624==--
