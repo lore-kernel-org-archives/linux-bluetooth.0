@@ -2,142 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7394BC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 11:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B041C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 13:27:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbiKULPA (ORCPT
+        id S229721AbiKUN0x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 06:15:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39598 "EHLO
+        Mon, 21 Nov 2022 08:26:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbiKULOh (ORCPT
+        with ESMTP id S229595AbiKUN0X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 06:14:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B54BEAFD
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 03:09:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1669028900;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/+hS5Wzvy+tgi/lKBcaZFtWi/x76gJ+HRemIeEuqod0=;
-        b=RVss9z+utQj6WcxIlXUbn9m/YTZCaTrSIGBJzlIOac8uc1e3FUQap3vDTL7YEbrjsd3kIw
-        SRlRW9MTE3VCCfX20n39hLlOJgW7NYdc/uh57YLkeTwFC7JKMQn89TWtebrrYmBIFrbhXJ
-        oicJcyBX9hVnmFkgOoAaM8CnuunVQeY=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-558-sak_ll6CMF2P-_xMDOGtVQ-1; Mon, 21 Nov 2022 06:08:14 -0500
-X-MC-Unique: sak_ll6CMF2P-_xMDOGtVQ-1
-Received: by mail-pj1-f70.google.com with SMTP id pa16-20020a17090b265000b0020a71040b4cso5822028pjb.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 03:08:13 -0800 (PST)
+        Mon, 21 Nov 2022 08:26:23 -0500
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D2F43AED
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 05:26:21 -0800 (PST)
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id C83A53F328
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 13:26:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1669037178;
+        bh=gKvc2U8eYwANZy7lOYZ9bdcI/4BdKXI/Fb2/9a8b3sg=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=pBt7RGBH6J/q3c81rZpw64rPhg3DsT18UHDCaJdpWPDBk4lEFXio727t8KDMajjmn
+         gpzyl3QP3gMGXse6kyZrYxFal5vFROswppgvhWexN1+wMYPtaAGxv40MG8EcvVs5pO
+         dda5J40gQZg4L0XVNq4VCx7MS8WpqFnzIRhd6fb/1FiAIs9RTdyvGl3rDTk0Fe46b9
+         tikx9hTLBB9zfGCYY16uov3QAn6ksAEqCphRb9LOQZUhs1y8BXAuI63LS46zalp7aQ
+         /N7aR0kg6gySRd/Qw95ngOF7dpLG543AKIKILcZ/C1vcX/GISuUrsbLo38nMiZlsh3
+         nW7fhP5D1Nc8A==
+Received: by mail-wm1-f71.google.com with SMTP id 187-20020a1c02c4000000b003d016c210f7so3275602wmc.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 05:26:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/+hS5Wzvy+tgi/lKBcaZFtWi/x76gJ+HRemIeEuqod0=;
-        b=7G9hvjYUkVo05IaHflgQaOMuvpeV8Z68c4l9zsbwtTpAu9lMtbo4fM06zhA0Og3GYB
-         6hmZGO7hxA30zywLND+4Gx6tNLryBAW0fJEUbCUyZ+tpNCveK8/v8xW68nyHW0gLt1jv
-         S0E8QjUOXluV7Fblt9iB+8tSEBZ9U+uLM39g4LGDOwYx4abY+3ZXA0un76Is30LJjw9B
-         883zgnlvtu8n6hDpdtaF0yVyeD+9aNzh1YH3G00Ro5J1f34A/q8eX5FSvGEaN6npsgPu
-         tXBakPPPCkUHoVhr2EfznMPQzJ/TQLdM8viWw4ZFfvtJo4HRenoakKOgBs+zwIHWQyCF
-         qo5Q==
-X-Gm-Message-State: ANoB5pllTmwolQaDeeU6pfdKQwEA1Ic4Gg8otMgIcYquJCcKKZhZWfCd
-        FDU0atn+af4J+wF+4qzvW+S5TGkQcmM2MHosxdfm64Fh5vrGop2U4UsifrOW+GsD7fDRrys5j81
-        WhBaQ6bT9jdgdzDXEh5exH2f2+hIyVjgDOt1qEPEYjQGm
-X-Received: by 2002:a17:902:ec01:b0:186:a27d:8e81 with SMTP id l1-20020a170902ec0100b00186a27d8e81mr11240128pld.133.1669028893052;
-        Mon, 21 Nov 2022 03:08:13 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6wXoXKtXWP56fuwVrUAnaldXLeUzJ5VYY2hYxD6WCgQh5rXKJhcsrbgHQGM3Zev6E8w7fKzhJhei8cEHFBqUs=
-X-Received: by 2002:a17:902:ec01:b0:186:a27d:8e81 with SMTP id
- l1-20020a170902ec0100b00186a27d8e81mr11240102pld.133.1669028892753; Mon, 21
- Nov 2022 03:08:12 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gKvc2U8eYwANZy7lOYZ9bdcI/4BdKXI/Fb2/9a8b3sg=;
+        b=r7+oYrWKTjc18W44byytamuXtWmocL480TwNatpYkQzv3+JhpCb3gL2QK6OwA973iw
+         jt9KEIjhrFr/kovBfMlRhbzuDVPUGsBBWexUHA4Wd29eZ1XyEBROpzMVP2Hq6ax4ac+e
+         ++7mQwgnxIGWH5NOTO5myCiSMn57oFmwkfPETWBuMkUfxWckUPo7y2y0N1nHkAeHlQY6
+         2OLa5pPP0QA2V0IgAcdK4uqT8nii1HVkul1rT8fKYS9au/c4skGt+wC3my5rmnZmQrgI
+         QY5zlQddibsrt8XoRCls6w160ISKZ7rx21vkA7KyNSNR/VScJmOFSNxJklzk3M/fmH3J
+         V21g==
+X-Gm-Message-State: ANoB5plP56/mjWZRfDUuODX+Mp3pEzLYai/t6jZEavKb7xg7miEQEFCP
+        UZF8GJvqdQ2Wd1kVwIaK17ypJL1S0vULCTqkqNsHE5jMRaAUjybxveZ0BY1fyRPtWZMXdlQ3f5z
+        HZxWfzgnIMhlZ3CEVCHigspkjbPmmtHRG6tJTd73CL99G4A==
+X-Received: by 2002:a05:600c:21d2:b0:3cf:b2b1:3c7 with SMTP id x18-20020a05600c21d200b003cfb2b103c7mr15969458wmj.176.1669037178441;
+        Mon, 21 Nov 2022 05:26:18 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7kdRd3Y+KTXQIY484oaUn0CAkZUThqp6PNDTrZnQyVCgacPzv3epYied5sqcoxsPFb7WkujA==
+X-Received: by 2002:a05:600c:21d2:b0:3cf:b2b1:3c7 with SMTP id x18-20020a05600c21d200b003cfb2b103c7mr15969436wmj.176.1669037178149;
+        Mon, 21 Nov 2022 05:26:18 -0800 (PST)
+Received: from localhost ([137.220.91.195])
+        by smtp.gmail.com with ESMTPSA id hn3-20020a05600ca38300b003c6c1686b10sm17452624wmb.7.2022.11.21.05.26.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Nov 2022 05:26:17 -0800 (PST)
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: btintel: Correctly declare all module firmware files
+Date:   Mon, 21 Nov 2022 13:26:04 +0000
+Message-Id: <20221121132604.1298992-1-dimitri.ledkov@canonical.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <CACT4oucG2z14214jWGJj9XZ5cYMnQpw9CACHvPZ09cbL7m9z_g@mail.gmail.com>
- <100b06a944de88a4b80119c5a2024e0e59cf5243.camel@sipsolutions.net>
- <CACT4oufKgUG5n6Ocgi6r-Z=+Nt9vNVK1e5dJDccogmd8h7xM8Q@mail.gmail.com>
- <5c47143aea07c34dbe95fdb2cab677f2a7a753fb.camel@sipsolutions.net>
- <CACT4ouduybj2Xn_=cgZynf7kF_7tx4cjydkWoTrCAg2=ujR2Tg@mail.gmail.com> <122752227576c059d2b1660934d57e991e7d33c8.camel@sipsolutions.net>
-In-Reply-To: <122752227576c059d2b1660934d57e991e7d33c8.camel@sipsolutions.net>
-From:   =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>
-Date:   Mon, 21 Nov 2022 12:08:01 +0100
-Message-ID: <CACT4oufZpLToemYLHcnQ+hAa=SAbhJT0QxKYjs9fNWV8frsMtg@mail.gmail.com>
-Subject: Re: iwlwifi: AC9560 firmware crash with iwlwifi-QuZ-a0-jf-b0 versions
- above 55
-To:     Johannes Berg <johannes@sipsolutions.net>
-Cc:     gregory.greenman@intel.com, golan.ben.ami@intel.com,
-        jonathan.sade@intel.com,
-        Linux List Kernel Mailing <linux-wireless@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-        Laura Trivelloni <ltrivell@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Nov 21, 2022 at 11:42 AM Johannes Berg
-<johannes@sipsolutions.net> wrote:
->
-> On Mon, 2022-11-21 at 09:32 +0100, =C3=8D=C3=B1igo Huguet wrote:
-> >
-> > > --- a/drivers/net/wireless/intel/iwlwifi/fw/acpi.c
-> > > +++ b/drivers/net/wireless/intel/iwlwifi/fw/acpi.c
-> > > @@ -1119,6 +1119,11 @@ int iwl_read_ppag_table(struct iwl_fw_runtime =
-*fwrt, union iwl_ppag_table_cmd *c
-> > >          int i, j, num_sub_bands;
-> > >          s8 *gain;
-> > >
-> > > +       /* many firmware images for JF lie about this */
-> > > +       if (CSR_HW_RFID_TYPE(fwrt->trans->hw_rf_id) =3D=3D
-> > > +           CSR_HW_RFID_TYPE(CSR_HW_RF_ID_TYPE_JF))
-> > > +               return -EOPNOTSUPP;
-> > > +
-> > >          if (!fw_has_capa(&fwrt->fw->ucode_capa, IWL_UCODE_TLV_CAPA_S=
-ET_PPAG)) {
-> > >                  IWL_DEBUG_RADIO(fwrt,
-> > >                                  "PPAG capability not supported by FW=
-, command not sent.\n");
-> > >
-> > >
-> > > johannes
-> > >
-> >
-> > Sorry for the delay with this, I had some issues with the hardware.
-> >
-> > Using this workaround it doesn't show any errors and I can connect.
->
-> OK.
->
-> > However, using iwlwifi-QuZ-a0-jf-b0-74 from linux-firmware I get lots
-> > of errors, both with this patch applied and without it. Maybe the
-> > driver needs some changes?
-> > I get stack traces, fw dumps and message `iwlwifi 0000:00:14.3: Failed
-> > to send MAC context (action:1): -5`
->
-> Probably some other error?
->
-> > What would you recommend to do? It seems you didn't like this solution
-> > very much (and, as I say, it doesn't work with fw 74)
->
->
-> Well I think we still need this solution even if I didn't like it, and
+Strictly encode patterns of supported hw_variants of firmware files
+the kernel driver supports requesting. This now includes many missing
+and previously undeclared module firmware files for 0x07, 0x08,
+0x11-0x14, 0x17-0x1b hw_variants.
 
-Will you post the patch?
+This especially affects environments that only install firmware files
+declared and referenced by the kernel modules. In such environments,
+only the declared firmware files are copied resulting in most Intel
+Bluetooth devices not working. I.e. host-only dracut-install initrds,
+or Ubuntu Core kernel snaps.
 
-> the fw 74 seems to be a different issue - could you post more info about
-> separately?
+BugLink: https://bugs.launchpad.net/bugs/1970819
+Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+---
+ Changes since v2:
+ - encode patterns for 0x17 0x18 0x19 0x1b hw_variants
+ - rebase on top of latest rc tag
+ 
+ Changes since v1:
+ - encode strict patterns of supported firmware files for each of the
+   supported hw_variant generations.
 
-Sure, will do in a few hours, thanks!
+ drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
->
-> johannes
->
-
-
---=20
-=C3=8D=C3=B1igo Huguet
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index a657e9a3e96a..55efc4a067db 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+-MODULE_FIRMWARE("intel/ibt-11-5.sfi");
+-MODULE_FIRMWARE("intel/ibt-11-5.ddc");
+-MODULE_FIRMWARE("intel/ibt-12-16.sfi");
+-MODULE_FIRMWARE("intel/ibt-12-16.ddc");
++/* hw_variant 0x07 0x08 */
++MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
++MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
++MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
++MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
++/* hw_variant 0x0b 0x0c */
++MODULE_FIRMWARE("intel/ibt-11-*.sfi");
++MODULE_FIRMWARE("intel/ibt-12-*.sfi");
++MODULE_FIRMWARE("intel/ibt-11-*.ddc");
++MODULE_FIRMWARE("intel/ibt-12-*.ddc");
++/* hw_variant 0x11 0x12 0x13 0x14 */
++MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
++MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
++MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
++MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
++/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
++MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].sfi");
++MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].ddc");
+-- 
+2.34.1
 
