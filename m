@@ -2,142 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BC6C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 23:46:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E35F2C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 23:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232059AbiKUXqa (ORCPT
+        id S231995AbiKUXqm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 18:46:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51688 "EHLO
+        Mon, 21 Nov 2022 18:46:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232070AbiKUXqH (ORCPT
+        with ESMTP id S231996AbiKUXqS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 18:46:07 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEA0E0CAE;
-        Mon, 21 Nov 2022 15:44:13 -0800 (PST)
+        Mon, 21 Nov 2022 18:46:18 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3849EDAD17
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 15:44:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669074253; x=1700610253;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=xC7h8r9pMHIQvZ0KVo0bKZvTmlDvxidFVqPF/Ks1PH8=;
-  b=EUM5zyjsbQ2mHUazVgQmkoO3Ic8LXepuo0AU2YhOpjS3qqrgqe8yCXJ9
-   T9/KxQZhjK0Hkn/c5DXoW0p/ZDEHc1VStUbNl84Ch6eUp7v18VvL6OcmK
-   FcD7bSzLd4kp5uX6KTFtiWwo3/boJ4RXf11k9tSRbkopMfgztuvIuOzw/
-   lkdCiSK1owjxRTteyPtFSstaPgodJYJx32EC3hcGkteb4ZDAS33d6VQYK
-   0TbgHEy493QM348NTAHFupMe1KeCuqtMP1HU7BSX3nnF1FLn0fMNWu+Xp
-   aR9b5V9SImOIvYr9My3JGPuaIjyNlM43+W8a5r/QSUjshgxTmXXsR6bvK
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="294077272"
+  t=1669074280; x=1700610280;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=8VVdGqrvO4rN5n2VC5kIKRX1GL4xfQEfz1FS1yeD86g=;
+  b=L9RGTYlAVv8YxMsFjrbmGvrYPi2mJrEJiCHg21/Z7blC3HxuvSWsb47I
+   qruN7QTphJFt96Z8MKpwARSy7PfCiu5Mdpv0DrtSja03ONeATgpUG0kC7
+   hyrjT5SNpOqKaudA9vl2w6/XZv9yqPk5hxkQWx7jI6vLJS1dSJPJj9eoe
+   d4uKLJM/IQ8OARGMaJJsTfZj+FDLhmVr2/X6h7c/WY301Yh2ZmopmbhC/
+   ZkkofByDnUUDdBjk5jclcDURZBDXlUnkrQQn82JHroexBuyXCHKghd/12
+   e7Sl5lk1uHciAcLJ1VFQIWaWYsHx719AbZpAfaWYG24wSMJlchjf5BYIX
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="377946590"
 X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="294077272"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:44:13 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="730193995"
+   d="scan'208";a="377946590"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:44:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="783633435"
 X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
-   d="scan'208";a="730193995"
-Received: from han1-mobl4.jf.intel.com (HELO [10.54.74.10]) ([10.54.74.10])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:44:13 -0800
-Message-ID: <1398b5489da6884d86245e4a6442575e85bf2d73.camel@linux.intel.com>
-Subject: Re: [PATCH v4] Bluetooth: btintel: Correctly declare all module
- firmware files
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Mon, 21 Nov 2022 15:44:05 -0800
-In-Reply-To: <20221121145125.1303097-1-dimitri.ledkov@canonical.com>
-References: <20221121145125.1303097-1-dimitri.ledkov@canonical.com>
-Organization: Intel Corporation
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+   d="scan'208";a="783633435"
+Received: from intel-latitude-e5450.iind.intel.com ([10.224.186.32])
+  by fmsmga001.fm.intel.com with ESMTP; 21 Nov 2022 15:44:38 -0800
+From:   Sathish Narasimman <sathish.narasimman@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ 1/6] lib/uuid: Add CSIS UUIDs
+Date:   Tue, 22 Nov 2022 05:16:19 +0530
+Message-Id: <20221121234624.2961-2-sathish.narasimman@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221121234624.2961-1-sathish.narasimman@intel.com>
+References: <20221121234624.2961-1-sathish.narasimman@intel.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dimitri,
+This adds Coordinated Set Identification Service UUIDs which will
+be used by Coordinated Set Identification Profile.
+---
+ lib/uuid.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-On Mon, 2022-11-21 at 14:51 +0000, Dimitri John Ledkov wrote:
-> Strictly encode patterns of supported hw_variants of firmware files
-> the kernel driver supports requesting. This now includes many missing
-> and previously undeclared module firmware files for 0x07, 0x08,
-> 0x11-0x14, 0x17-0x1b hw_variants.
->=20
-> This especially affects environments that only install firmware files
-> declared and referenced by the kernel modules. In such environments,
-> only the declared firmware files are copied resulting in most Intel
-> Bluetooth devices not working. I.e. host-only dracut-install initrds,
-> or Ubuntu Core kernel snaps.
->=20
-> BugLink: https://bugs.launchpad.net/bugs/1970819
-> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> ---
-> =C2=A0Changes since v3:
-> =C2=A0- Hopefully pacify trailing whitespace from GitLint in this optiona=
-l
-> =C2=A0=C2=A0 portion of the commit.
->=20
-> =C2=A0Changes since v2:
-> =C2=A0- encode patterns for 0x17 0x18 0x19 0x1b hw_variants
-> =C2=A0- rebase on top of latest rc tag
->=20
-> =C2=A0Changes since v1:
-> =C2=A0- encode strict patterns of supported firmware files for each of th=
-e
-> =C2=A0=C2=A0 supported hw_variant generations.
->=20
-> =C2=A0drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
-> =C2=A01 file changed, 22 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index a657e9a3e96a..55efc4a067db 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.or=
-g>");
-> =C2=A0MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSI=
-ON);
-> =C2=A0MODULE_VERSION(VERSION);
-> =C2=A0MODULE_LICENSE("GPL");
-> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
-> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
-> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
-> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
-> +/* hw_variant 0x07 0x08 */
-> +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
-> +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
-> +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
-> +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
-> +/* hw_variant 0x0b 0x0c */
-> +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
-> +/* hw_variant 0x11 0x12 0x13 0x14 */
-> +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
-
-There are firmware files for hw_variant 0x11 and 0x12 in an old format like
-ibt-17-*.sfi, ibt-17-*.ddc, ibt-18-*.sfi, and ibt-18-*.ddc.
-
-> +/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
-> +MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].sfi");
-> +MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].ddc");
-
-I believe these are under intel/ folder.
-
-
-Regards,
-Tedd Ho-Jeong An
+diff --git a/lib/uuid.h b/lib/uuid.h
+index d5e5665e475c..84ff46cd8f36 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -186,6 +186,13 @@ extern "C" {
+ #define MEDIA_CP_OP_SUPPORTED_CHRC_UUID         0x2ba5
+ #define MEDIA_CONTENT_CONTROL_ID_CHRC_UUID      0x2bba
+ 
++/* Coordinated Set Identification Profile(CSIP) */
++#define CSIS_UUID					0x1846
++#define CS_SIRK						0x2B84
++#define CS_SIZE						0x2B85
++#define CS_LOCK						0x2B86
++#define CS_RANK						0x2B87
++
+ typedef struct {
+ 	enum {
+ 		BT_UUID_UNSPEC = 0,
+-- 
+2.25.1
 
