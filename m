@@ -2,43 +2,32 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC58C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 15:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D717C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 15:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231561AbiKUPSp (ORCPT
+        id S232387AbiKUP1Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 10:18:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
+        Mon, 21 Nov 2022 10:27:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231324AbiKUPSZ (ORCPT
+        with ESMTP id S231324AbiKUP1D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 10:18:25 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15AEBC9004;
-        Mon, 21 Nov 2022 07:15:03 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669043701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lQs41vOGOvnHYar/SBs/fIZbe2lCGZcidC+QpnC5+YA=;
-        b=XgZX/EawdUnHd2MXtEoy87d6nt+KM389bWtRrqoe0XFZHtITdDNk4hVa5QwgIBOuehV0Sz
-        lQht1CKPRzB/l4FD4+xLb5StknGESbNfWg2Dm9KazLmvnr3ed/JI4zN39kfgPCGxYB8okH
-        grNhg0KAbltwcAsSTLsvIhJZ0BxohXGTbIB9ne9OnAjLrNfRA0ZX4ULQr2wPoT36+cZnKO
-        4SGTwJDocHdyyD/Auq7blBlhbtVsf/0QPszag7uI39CPfavtspZhsfrlpWcyfyCtBBJFTj
-        x/Ek32HhUuWYUEi4hYeMOguUeIGIUMCjLgDTRjpnyYXLL/I2jh8VZODfaojb3g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669043701;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lQs41vOGOvnHYar/SBs/fIZbe2lCGZcidC+QpnC5+YA=;
-        b=7KRj+LiX/2jRIeYeQzj84IQ0G08p2TBQ3wjPtKuSvCYPFz5aHUno33L+nDPus4CvCeeNAK
-        XbrEhVyN27ccJIDA==
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
+        Mon, 21 Nov 2022 10:27:03 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB35BA44E;
+        Mon, 21 Nov 2022 07:27:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 77AD5612E7;
+        Mon, 21 Nov 2022 15:27:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0D8FC433C1;
+        Mon, 21 Nov 2022 15:26:59 +0000 (UTC)
+Date:   Mon, 21 Nov 2022 10:26:58 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>,
         Anna-Maria Behnsen <anna-maria@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
         Stephen Boyd <sboyd@kernel.org>,
@@ -57,25 +46,28 @@ Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Subject: Re: [patch 00/15] timers: Provide timer_shutdown[_sync]()
-In-Reply-To: <20221115195802.415956561@linutronix.de>
+Message-ID: <20221121102658.12cd3d17@gandalf.local.home>
+In-Reply-To: <87mt8kibkb.ffs@tglx>
 References: <20221115195802.415956561@linutronix.de>
-Date:   Mon, 21 Nov 2022 16:15:00 +0100
-Message-ID: <87mt8kibkb.ffs@tglx>
+        <87mt8kibkb.ffs@tglx>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 15 2022 at 21:28, Thomas Gleixner wrote:
->
-> As Steven is short of cycles, I made some spare cycles available and
-> reworked the patch series to follow the new semantics and plugged the races
-> which were discovered during review.
+On Mon, 21 Nov 2022 16:15:00 +0100
+Thomas Gleixner <tglx@linutronix.de> wrote:
 
-Any opinions on this pile or should I just declare it's perfect and
-queue it for 6.2?
+> > As Steven is short of cycles, I made some spare cycles available and
+> > reworked the patch series to follow the new semantics and plugged the races
+> > which were discovered during review.  
+> 
+> Any opinions on this pile or should I just declare it's perfect and
+> queue it for 6.2?
 
-Thanks,
+I have time cut out of today to go over it. Thanks Thomas,
 
-        tglx
+-- Steve
