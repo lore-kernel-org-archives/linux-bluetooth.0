@@ -2,113 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFD8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 22:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BC6C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 23:46:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231947AbiKUWWF (ORCPT
+        id S232059AbiKUXqa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 17:22:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34748 "EHLO
+        Mon, 21 Nov 2022 18:46:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbiKUWWD (ORCPT
+        with ESMTP id S232070AbiKUXqH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 17:22:03 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 038AE18B0E;
-        Mon, 21 Nov 2022 14:22:03 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 933A8614D7;
-        Mon, 21 Nov 2022 22:22:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2DD2C43147;
-        Mon, 21 Nov 2022 22:21:59 +0000 (UTC)
-Date:   Mon, 21 Nov 2022 17:21:57 -0500
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linuxfoundation.org>,
-        Anna-Maria Behnsen <anna-maria@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Marc Zyngier <maz@kernel.org>,
+        Mon, 21 Nov 2022 18:46:07 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FEA0E0CAE;
+        Mon, 21 Nov 2022 15:44:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669074253; x=1700610253;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=xC7h8r9pMHIQvZ0KVo0bKZvTmlDvxidFVqPF/Ks1PH8=;
+  b=EUM5zyjsbQ2mHUazVgQmkoO3Ic8LXepuo0AU2YhOpjS3qqrgqe8yCXJ9
+   T9/KxQZhjK0Hkn/c5DXoW0p/ZDEHc1VStUbNl84Ch6eUp7v18VvL6OcmK
+   FcD7bSzLd4kp5uX6KTFtiWwo3/boJ4RXf11k9tSRbkopMfgztuvIuOzw/
+   lkdCiSK1owjxRTteyPtFSstaPgodJYJx32EC3hcGkteb4ZDAS33d6VQYK
+   0TbgHEy493QM348NTAHFupMe1KeCuqtMP1HU7BSX3nnF1FLn0fMNWu+Xp
+   aR9b5V9SImOIvYr9My3JGPuaIjyNlM43+W8a5r/QSUjshgxTmXXsR6bvK
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="294077272"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="294077272"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:44:13 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="730193995"
+X-IronPort-AV: E=Sophos;i="5.96,182,1665471600"; 
+   d="scan'208";a="730193995"
+Received: from han1-mobl4.jf.intel.com (HELO [10.54.74.10]) ([10.54.74.10])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2022 15:44:13 -0800
+Message-ID: <1398b5489da6884d86245e4a6442575e85bf2d73.camel@linux.intel.com>
+Subject: Re: [PATCH v4] Bluetooth: btintel: Correctly declare all module
+ firmware files
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch 13/15] timers: Provide timer_shutdown[_sync]()
-Message-ID: <20221121172157.2457df06@gandalf.local.home>
-In-Reply-To: <20221115202117.734852797@linutronix.de>
-References: <20221115195802.415956561@linutronix.de>
-        <20221115202117.734852797@linutronix.de>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Mon, 21 Nov 2022 15:44:05 -0800
+In-Reply-To: <20221121145125.1303097-1-dimitri.ledkov@canonical.com>
+References: <20221121145125.1303097-1-dimitri.ledkov@canonical.com>
+Organization: Intel Corporation
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 15 Nov 2022 21:28:54 +0100 (CET)
-Thomas Gleixner <tglx@linutronix.de> wrote:
+Hi Dimitri,
 
-> +/**
-> + * timer_shutdown_sync - Shutdown a timer and prevent rearming
-> + * @timer: The timer to be shutdown
-> + *
-> + * When the function returns it is guaranteed that:
-> + *   - @timer is not queued
-> + *   - The callback function of @timer is not running
-> + *   - @timer cannot be enqueued again. Any attempt to rearm
-> + *     @timer is silently ignored.
-> + *
-> + * See timer_delete_sync() for synchronization rules.
+On Mon, 2022-11-21 at 14:51 +0000, Dimitri John Ledkov wrote:
+> Strictly encode patterns of supported hw_variants of firmware files
+> the kernel driver supports requesting. This now includes many missing
+> and previously undeclared module firmware files for 0x07, 0x08,
+> 0x11-0x14, 0x17-0x1b hw_variants.
+>=20
+> This especially affects environments that only install firmware files
+> declared and referenced by the kernel modules. In such environments,
+> only the declared firmware files are copied resulting in most Intel
+> Bluetooth devices not working. I.e. host-only dracut-install initrds,
+> or Ubuntu Core kernel snaps.
+>=20
+> BugLink: https://bugs.launchpad.net/bugs/1970819
+> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> ---
+> =C2=A0Changes since v3:
+> =C2=A0- Hopefully pacify trailing whitespace from GitLint in this optiona=
+l
+> =C2=A0=C2=A0 portion of the commit.
+>=20
+> =C2=A0Changes since v2:
+> =C2=A0- encode patterns for 0x17 0x18 0x19 0x1b hw_variants
+> =C2=A0- rebase on top of latest rc tag
+>=20
+> =C2=A0Changes since v1:
+> =C2=A0- encode strict patterns of supported firmware files for each of th=
+e
+> =C2=A0=C2=A0 supported hw_variant generations.
+>=20
+> =C2=A0drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
+> =C2=A01 file changed, 22 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index a657e9a3e96a..55efc4a067db 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.or=
+g>");
+> =C2=A0MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSI=
+ON);
+> =C2=A0MODULE_VERSION(VERSION);
+> =C2=A0MODULE_LICENSE("GPL");
+> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
+> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
+> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
+> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
+> +/* hw_variant 0x07 0x08 */
+> +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
+> +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
+> +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
+> +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
+> +/* hw_variant 0x0b 0x0c */
+> +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
+> +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
+> +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
+> +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
+> +/* hw_variant 0x11 0x12 0x13 0x14 */
+> +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
+> +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
+> +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
+> +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
+> +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
+> +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
+> +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
+> +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
 
- "See timer_delete_sync() for synchronization and context rules."
+There are firmware files for hw_variant 0x11 and 0x12 in an old format like
+ibt-17-*.sfi, ibt-17-*.ddc, ibt-18-*.sfi, and ibt-18-*.ddc.
 
-As where it can be executed is as important as the synchronization that is
-needed.
+> +/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
+> +MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].sfi");
+> +MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].ddc");
 
--- Steve
+I believe these are under intel/ folder.
 
 
-> + *
-> + * This function is useful for final teardown of an infrastructure where
-> + * the timer is subject to a circular dependency problem.
-> + *
-> + * A common pattern for this is a timer and a workqueue where the timer can
-> + * schedule work and work can arm the timer. On shutdown the workqueue must
-> + * be destroyed and the timer must be prevented from rearming. Unless the
-> + * code has conditionals like 'if (mything->in_shutdown)' to prevent that
-> + * there is no way to get this correct with timer_delete_sync().
-> + *
-> + * timer_shutdown_sync() is solving the problem. The correct ordering of
-> + * calls in this case is:
-> + *
-> + *	timer_shutdown_sync(&mything->timer);
-> + *	workqueue_destroy(&mything->workqueue);
-> + *
-> + * After this 'mything' can be safely freed.
-> + *
-> + * This obviously requires that the timer is not required to be functional
-> + * for the rest of the shutdown operation.
-> + *
-> + * Return:
-> + * * %0 - The timer was not pending
-> + * * %1 - The timer was pending
-> + */
-> +int timer_shutdown_sync(struct timer_list *timer)
-> +{
-> +	return __timer_delete_sync(timer, true);
-> +}
-> +EXPORT_SYMBOL_GPL(timer_shutdown_sync);
-> +
+Regards,
+Tedd Ho-Jeong An
+
