@@ -2,131 +2,162 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 038C9C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Nov 2022 22:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE16C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 08:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234508AbiKSWqp (ORCPT
+        id S230095AbiKUIdi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Nov 2022 17:46:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52484 "EHLO
+        Mon, 21 Nov 2022 03:33:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234247AbiKSWqo (ORCPT
+        with ESMTP id S229854AbiKUIdh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Nov 2022 17:46:44 -0500
-Received: from mr85p00im-zteg06021501.me.com (mr85p00im-zteg06021501.me.com [17.58.23.183])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7A495F7B
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 14:46:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=me.com; s=1a1hai;
-        t=1668898003; bh=AR/FIrOLWaA3wFV7lNtNZ7j0pA2fC7HblFa8+hrYJYA=;
-        h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To;
-        b=m7JMULC8956OsUa4+5onDRjNQA94RlcqrkQ199qd7q1VUTdNjtXfnWcuNFhYV8U0G
-         55OUuKMCDT7HXXQ134gWA7mhFTxJAgRaqbGZo3qEko1/Nthx5gUPzv05zc+OBxr+Ht
-         EHiHCc9/KdaxtzF7pUqqYZ+Zc98N8OERh/ub6zsO61hFh6wmO52oPfJj2VTsq+zqWi
-         p932+lsrurwCEOpSh+kahGlZM6aQ7ZHmOggLdVTWLZI2t2xG43WySN5w3nKj62OIof
-         Fo6EPKjTGotD0Gto+yP87nKRFMsFQCiZfSw0JUTWRKpzMRvGJESR2MBPcktw8GiUzM
-         UiPPoLFKhGEJg==
-Received: from smtpclient.apple (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-        by mr85p00im-zteg06021501.me.com (Postfix) with ESMTPSA id B93DE279425A
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Nov 2022 22:46:42 +0000 (UTC)
-From:   Andrew McNaughton <andrewmcnaughton@me.com>
-Content-Type: text/plain;
-        charset=utf-8
+        Mon, 21 Nov 2022 03:33:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A009C1C9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 00:32:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1669019560;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mUjxyZm4bf6OXy+M0eYpXbYeaYwNkkTkGVWURuKWwFs=;
+        b=fkLXg5k1MZUCK4DreBD6jIGetoQY62Mn7Imkv4H1YbH6xwFw+uPQfEt6qZQ0EsS5sBVoBy
+        lXKY4YUa2fSxztKX+BtRY2IKWND7xjUCBIB6LussMKFGxdnP6MP0IFueWcI6i6J4s3c/XP
+        YlKc2HEhJBt6H5BJeSTYt6uzzvHlbaw=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-222-du0cLd5BPPKouvsnOoZLbA-1; Mon, 21 Nov 2022 03:32:39 -0500
+X-MC-Unique: du0cLd5BPPKouvsnOoZLbA-1
+Received: by mail-pg1-f197.google.com with SMTP id h185-20020a636cc2000000b0046fc6e0065dso6511617pgc.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 00:32:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mUjxyZm4bf6OXy+M0eYpXbYeaYwNkkTkGVWURuKWwFs=;
+        b=bHF0sR6qmv+ZsB1soytVlveTFcDbibIRvHURwazSwbghCVZTqBEviZ8/0FrMCP+eB9
+         s588zkkLT2u/Ce6AqqDcClMGzeUlBB0Bp2XBk2786CnkX25seZKm0ZR+eThZy4U/Deqo
+         bKHF9M1Tty/aZumxM75ThlEsDFgXGM0N2FvDldp7wuEdkpv6pb7+VllpdslnDPhxEnK+
+         8NKj+t4fwH7k/Wk5fyuFLx7eo394tNUOjs8p/0/XEbr6M+WKu6ioz9HZ2hj1+8j9dj/X
+         +om0MpX9Y5a/cJSAOH9R+WwigYZe8XxW3QWgE0IPFNcj8V11Ur7MQPgcZAUY6eJWuKza
+         onVQ==
+X-Gm-Message-State: ANoB5pk66sUmY6LGhQql9DJNiW8M1sfSNgRwPSlbihwbIDZA+UtREou5
+        jJX9E5PBUoXFrFUcjyqclfLj+iFk/L/HeLtiuIC0ccnxkYRWtZekMBReoPKD7PFSqnIZewmLQIF
+        fHzVWY3nrkEpTEeKf3fUPIJMXQh+Tbe61nnDdM+KbHQL2
+X-Received: by 2002:a62:1d05:0:b0:56b:a0f4:decc with SMTP id d5-20020a621d05000000b0056ba0f4deccmr3700389pfd.33.1669019558562;
+        Mon, 21 Nov 2022 00:32:38 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6Y0MdiZQcjiiIrvjhe9UwkMeOFVr4gZrJVlsD14N+QNlAq3C/YmTnSYeUbtXOR72xXUr2Mm52oSXY2tM28rN8=
+X-Received: by 2002:a62:1d05:0:b0:56b:a0f4:decc with SMTP id
+ d5-20020a621d05000000b0056ba0f4deccmr3700372pfd.33.1669019558251; Mon, 21 Nov
+ 2022 00:32:38 -0800 (PST)
+MIME-Version: 1.0
+References: <CACT4oucG2z14214jWGJj9XZ5cYMnQpw9CACHvPZ09cbL7m9z_g@mail.gmail.com>
+ <100b06a944de88a4b80119c5a2024e0e59cf5243.camel@sipsolutions.net>
+ <CACT4oufKgUG5n6Ocgi6r-Z=+Nt9vNVK1e5dJDccogmd8h7xM8Q@mail.gmail.com> <5c47143aea07c34dbe95fdb2cab677f2a7a753fb.camel@sipsolutions.net>
+In-Reply-To: <5c47143aea07c34dbe95fdb2cab677f2a7a753fb.camel@sipsolutions.net>
+From:   =?UTF-8?B?w43DsWlnbyBIdWd1ZXQ=?= <ihuguet@redhat.com>
+Date:   Mon, 21 Nov 2022 09:32:26 +0100
+Message-ID: <CACT4ouduybj2Xn_=cgZynf7kF_7tx4cjydkWoTrCAg2=ujR2Tg@mail.gmail.com>
+Subject: Re: iwlwifi: AC9560 firmware crash with iwlwifi-QuZ-a0-jf-b0 versions
+ above 55
+To:     Johannes Berg <johannes@sipsolutions.net>
+Cc:     gregory.greenman@intel.com, golan.ben.ami@intel.com,
+        jonathan.sade@intel.com,
+        Linux List Kernel Mailing <linux-wireless@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
+        Laura Trivelloni <ltrivell@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.300.96\))
-Subject: How to get USB bluetooth device working/supported?
-Message-Id: <37313DFD-3F70-4CA9-BF3E-B08FAB4BEB39@me.com>
-Date:   Sat, 19 Nov 2022 22:46:28 +0000
-To:     linux-bluetooth@vger.kernel.org
-X-Mailer: Apple Mail (2.3731.300.96)
-X-Proofpoint-ORIG-GUID: hK81VmjB6D0RCRfyqtkV44_7WWaxuwsB
-X-Proofpoint-GUID: hK81VmjB6D0RCRfyqtkV44_7WWaxuwsB
-X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
- =?UTF-8?Q?2903e8d5c8f:6.0.425,18.0.572,17.0.605.474.0000000_definitions?=
- =?UTF-8?Q?=3D2022-01-14=5F01:2022-01-14=5F01,2020-02-14=5F11,2020-01-23?=
- =?UTF-8?Q?=5F02_signatures=3D0?=
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 clxscore=1015 spamscore=0
- suspectscore=0 bulkscore=0 mlxlogscore=815 mlxscore=0 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2209130000 definitions=main-2211190178
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-How does one go about getting a device that should work with btusb but =
-doesn=E2=80=99t? It works fine with Microsoft generic bt drivers. There =
-must be some sort of quirk.
+On Wed, Oct 5, 2022 at 12:07 PM Johannes Berg <johannes@sipsolutions.net> w=
+rote:
+>
+> On Wed, 2022-10-05 at 11:50 +0200, =C3=8D=C3=B1igo Huguet wrote:
+> > On Wed, Oct 5, 2022 at 11:35 AM Johannes Berg <johannes@sipsolutions.ne=
+t> wrote:
+> > >
+> > > On Fri, 2022-09-09 at 12:41 +0200, =C3=8D=C3=B1igo Huguet wrote:
+> > > > With an AC9560 installed on a system with Quasar (11th gen processo=
+r,
+> > > > in my case) we're getting a firmware crash as soon as you try to do
+> > > > something with the card. The problem doesn't happen with the card
+> > > > installed in older platforms (8th / 9th gen), and it neither happen=
+s
+> > > > with firmware iwlwifi-QuZ-a0-jf-b0-55 version, but yes with any oth=
+er
+> > > > newer version.
+> > > >
+> > > > I've tried different versions of kernel and firmware, including the
+> > > > latest kernel and linux-firmware available today, and all of them f=
+ail
+> > > > unless I remove all fw files above version 55.
+> > > >
+> > >
+> > > I believe this is a duplicate of
+> > >
+> > > https://bugzilla.kernel.org/show_bug.cgi?id=3D214343
+> > >
+> > > which was supposed to be fixed in firmware, but evidently that fix wa=
+s
+> > > never backported to older images.
+> > >
+> > > Internally, FW commit d8887278 fixed this, so FW version 69 should be
+> > > OK?
+> >
+> > I don't think so, we've reproduced it with iwlwifi-QuZ-a0-jf-b0-71.ucod=
+e
+> >
+>
+> Indeed, my git-fu was bad. Looks like 74 only fixes it (or will, since
+> it hasn't been released, apparently).
+>
+> We could do some awful workaround like this I guess:
+>
+> diff --git a/drivers/net/wireless/intel/iwlwifi/fw/acpi.c b/drivers/net/w=
+ireless/intel/iwlwifi/fw/acpi.c
+> index 009a4074d062..0c0a28d748f2 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/fw/acpi.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/fw/acpi.c
+> @@ -1119,6 +1119,11 @@ int iwl_read_ppag_table(struct iwl_fw_runtime *fwr=
+t, union iwl_ppag_table_cmd *c
+>          int i, j, num_sub_bands;
+>          s8 *gain;
+>
+> +       /* many firmware images for JF lie about this */
+> +       if (CSR_HW_RFID_TYPE(fwrt->trans->hw_rf_id) =3D=3D
+> +           CSR_HW_RFID_TYPE(CSR_HW_RF_ID_TYPE_JF))
+> +               return -EOPNOTSUPP;
+> +
+>          if (!fw_has_capa(&fwrt->fw->ucode_capa, IWL_UCODE_TLV_CAPA_SET_P=
+PAG)) {
+>                  IWL_DEBUG_RADIO(fwrt,
+>                                  "PPAG capability not supported by FW, co=
+mmand not sent.\n");
+>
+>
+> johannes
+>
 
-This is for a Bluetooth 5.3 transceiver. There=E2=80=99s not a lot of =
-these about yet but I think important for accessing newer/upcoming audio =
-purposes.
+Sorry for the delay with this, I had some issues with the hardware.
 
+Using this workaround it doesn't show any errors and I can connect.
 
-=46rom /sys/kernel/debug/usb/devices:
+However, using iwlwifi-QuZ-a0-jf-b0-74 from linux-firmware I get lots
+of errors, both with this patch applied and without it. Maybe the
+driver needs some changes?
+I get stack traces, fw dumps and message `iwlwifi 0000:00:14.3: Failed
+to send MAC context (action:1): -5`
 
-T:  Bus=3D02 Lev=3D02 Prnt=3D02 Port=3D01 Cnt=3D01 Dev#=3D  3 Spd=3D12   =
-MxCh=3D 0
-D:  Ver=3D 2.00 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D10d7 ProdID=3Db012 Rev=3D88.91
-S:  Manufacturer=3DActions
-S:  Product=3Dgeneral adapter
-S:  SerialNumber=3DACTIONS1234
-C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Dc0 MxPwr=3D100mA
-I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D1ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D01(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D01(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D01(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D01(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D01(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 =
-Driver=3Dbtusb
-E:  Ad=3D01(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-
-
-dmesg | grep Bluetooth
-[   11.375035] Bluetooth: Core ver 2.22
-[   11.375054] Bluetooth: HCI device and connection manager initialized
-[   11.375057] Bluetooth: HCI socket layer initialized
-[   11.375059] Bluetooth: L2CAP socket layer initialized
-[   11.375062] Bluetooth: SCO socket layer initialized
-[   11.450398] Bluetooth: hci0: Opcode 0x c5a failed: -56
-[   12.455169] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   12.455173] Bluetooth: BNEP filters: protocol multicast
-[   12.455176] Bluetooth: BNEP socket layer initialized
-
-
-This is on Linux Kernel: 6.0.8-300.fc37.aarch64
-
-
-This needs to be added to the usb.ids (I=E2=80=99ve tried submitting to =
-the update robot but I don=E2=80=99t know if that is still alive):
-
-10d7 Actions Semiconductor Co., Ltd
-b012 ATS2851 Bluetooth 5.3 Transceiver [Ugreen CM591]
-
-
-
-Thanks in advance.
+What would you recommend to do? It seems you didn't like this solution
+very much (and, as I say, it doesn't work with fw 74)
 --
-Andrew McNaughton
+=C3=8D=C3=B1igo Huguet
 
-email: andrewmcnaughton@me.com=
