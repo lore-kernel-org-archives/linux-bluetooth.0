@@ -2,92 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FF3C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 19:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35856C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Nov 2022 20:08:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbiKUTjK (ORCPT
+        id S230075AbiKUUIr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 14:39:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33000 "EHLO
+        Mon, 21 Nov 2022 15:08:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbiKUTjJ (ORCPT
+        with ESMTP id S231843AbiKUUIo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 14:39:09 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A7C6FCE4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 11:39:08 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id w4so7991325qts.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 11:39:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZFvOxIbP8uXV+8ZMqw3Q666qy47mMuK4Zf0O9tWPqzY=;
-        b=Y39QwFxyX/7iRBzjHLEWWWjcvuX3zSK8/IucrBarZwFjWow0he3z4zReSaQDTG/hYc
-         NSo5pPvpeYNTJeGjrDj/QaJ7DiaZf2FmTC2nbxwSMnhezMO8ViExmXrLMyN/ZMnc1MF/
-         baTslUMEwkh1pDOaXx8/THE85qvfDtOmSmXvUv0jZhtNXF5KYo1M9AyllLdoqXiiDTfQ
-         SAAyoVCGrUwvthZeA29aLARW+vLaBXSPtixEoJn1HpmNDy1kHuxXZ/54ZYiEa4X9Q5wc
-         zEXKtgrNRXec6TZOou+q75BVDPxpHoUvZOLob0Vx9XErGte0s1YDlZhx7uJE8rJvkzfz
-         2huQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZFvOxIbP8uXV+8ZMqw3Q666qy47mMuK4Zf0O9tWPqzY=;
-        b=a9FfIf09UMB6s8GkiiIugUsxPSWfOUeNnHZs1QxRYU4HpiF01fb0YCL9TlnuBYF7M0
-         O6QEH/qBWQbFRdjgKCj7U2rH3bAFrHixZQ/CdXqN9wEs8mAPxPl1a7I8bO+WQdWvR7SM
-         ompUUKH9+No34F32atybUfKpgLja0EcYiFP8i6uyeRif8vcFkX3z+bAjkN2J6CVQQNKo
-         R9Vat7WDsxlxrZzMDZ13kE2LfJ5o05JufknrNxrAEEYzWiYHyPquXuIx6F4XFCcnVXK0
-         FyCWCXky9EY0C0x6Pn1/crHdSbtG9fymSVnir9K2XkelAS3c99Q0Vb7YsSzY2aPLf3tZ
-         yFXA==
-X-Gm-Message-State: ANoB5pmAiiGUJ8CGbeQgIj8fSam4RcshNbgssLb5hShB6RsMzEbZgjKD
-        iPzPAZaxSQABVUmsdVBelZJ2bEY7kzC8DQ==
-X-Google-Smtp-Source: AA0mqf7mVRLcOrh9XWLGhwAu+dpVKwi+9mAMkqwnh5llAkOKtcKCaktXC3iYU/BAzc7iqYlNQi+y1Q==
-X-Received: by 2002:a05:622a:4117:b0:3a5:9be8:59f2 with SMTP id cc23-20020a05622a411700b003a59be859f2mr18703958qtb.297.1669059546196;
-        Mon, 21 Nov 2022 11:39:06 -0800 (PST)
-Received: from [172.17.0.2] ([20.119.195.20])
-        by smtp.gmail.com with ESMTPSA id u20-20020a05620a0c5400b006cf8fc6e922sm8763378qki.119.2022.11.21.11.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Nov 2022 11:39:05 -0800 (PST)
-Message-ID: <637bd3d9.050a0220.2d7f0.e6ea@mx.google.com>
-Date:   Mon, 21 Nov 2022 11:39:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2810696396331900548=="
+        Mon, 21 Nov 2022 15:08:44 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF07C72D1;
+        Mon, 21 Nov 2022 12:08:40 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1195BB80FB3;
+        Mon, 21 Nov 2022 20:08:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A16BFC433C1;
+        Mon, 21 Nov 2022 20:08:35 +0000 (UTC)
+Date:   Mon, 21 Nov 2022 15:08:33 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>,
+        Anna-Maria Behnsen <anna-maria@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [patch 04/15] timers: Get rid of del_singleshot_timer_sync()
+Message-ID: <20221121150833.61ab3b01@gandalf.local.home>
+In-Reply-To: <20221115202117.212339280@linutronix.de>
+References: <20221115195802.415956561@linutronix.de>
+        <20221115202117.212339280@linutronix.de>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
-Subject: RE: [v3,1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding
-In-Reply-To: <caf41c6a33b1ceeb36ec7261b0cc894082352c46.1669057170.git.objelf@gmail.com>
-References: <caf41c6a33b1ceeb36ec7261b0cc894082352c46.1669057170.git.objelf@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2810696396331900548==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 15 Nov 2022 21:28:39 +0100 (CET)
+Thomas Gleixner <tglx@linutronix.de> wrote:
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btusb.c:3845
-error: drivers/bluetooth/btusb.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+> del_singleshot_timer_sync() used to be an optimization for deleting timers
+> which are not rearmed from the timer callback function.
+> 
+> This optimization turned out to be broken and got mapped to
+> del_timer_sync() about 17 years ago.
+> 
+> Get rid of the undocumented indirection and use del_timer_sync() directly.
+> 
+> No functional change.
+> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+>
 
 
----
-Regards,
-Linux Bluetooth
+> --- a/net/sunrpc/xprt.c
+> +++ b/net/sunrpc/xprt.c
+> @@ -1164,7 +1164,7 @@ xprt_request_enqueue_receive(struct rpc_
+>  	spin_unlock(&xprt->queue_lock);
+>  
+>  	/* Turn off autodisconnect */
+> -	del_singleshot_timer_sync(&xprt->timer);
+> +	del_timer_sync(&xprt->timer);
+
+And this was not even a single shot timer. It used the
+del_singleshot_timer_sync() function because of incorrect assumptions.
+
+Link: https://lore.kernel.org/all/20221105060155.047357452@goodmis.org/
+
+  0f9dc2b16884b ("RPC: Clean up socket autodisconnect")
+  55c888d6d09a0 ("timers fixes/improvements")
+
+Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+
+-- Steve
 
 
---===============2810696396331900548==--
+>  	return 0;
+>  }
+>  
+
