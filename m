@@ -2,84 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE13C43217
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 02:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB327C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 02:41:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232070AbiKVCiV (ORCPT
+        id S230176AbiKVCli (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 21:38:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35710 "EHLO
+        Mon, 21 Nov 2022 21:41:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231856AbiKVCiN (ORCPT
+        with ESMTP id S229505AbiKVClh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 21:38:13 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890755CD1C;
-        Mon, 21 Nov 2022 18:38:09 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3709061543;
-        Tue, 22 Nov 2022 02:38:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3843FC433D6;
-        Tue, 22 Nov 2022 02:38:06 +0000 (UTC)
-Date:   Mon, 21 Nov 2022 21:38:02 -0500
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linuxfoundation.org>,
-        Anna-Maria Behnsen <anna-maria@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch 00/15] timers: Provide timer_shutdown[_sync]()
-Message-ID: <20221121213802.1cd09674@rorschach.local.home>
-In-Reply-To: <20221115195802.415956561@linutronix.de>
-References: <20221115195802.415956561@linutronix.de>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Mon, 21 Nov 2022 21:41:37 -0500
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9557C21276
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 18:41:36 -0800 (PST)
+Received: from github.com (hubbernetes-node-b9ce309.ac4-iad.github.net [10.52.200.84])
+        by smtp.github.com (Postfix) with ESMTPA id E329F600196
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Nov 2022 18:41:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1669084895;
+        bh=Nh1ojPuvziMH3/MKN3LZg35C49BnvmgtUiPJ6Nwy1Pg=;
+        h=Date:From:To:Subject:From;
+        b=MS+MLACHpY9Q+hk9Tsy47n/qJoxJIu3e2Z2Vo1pBuD+QdWgkoif/VTbDclDwEM7e4
+         WPZt4DdNKx8H56e9FsZGLeGZicedFZLKTmgtympfT6shvSjNjfkP4r24I0rhjKGpWu
+         YY4tC2iBjRJXkq/QBf1jGhHBEX7rM7mMt7bzqJ8c=
+Date:   Mon, 21 Nov 2022 18:41:35 -0800
+From:   =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/818adf-9f5036@github.com>
+Subject: [bluez/bluez] 5a872a: client/player: Fix scan-build warning
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 15 Nov 2022 21:28:32 +0100 (CET)
-Thomas Gleixner <tglx@linutronix.de> wrote:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5a872af406ca2d432e79d978f23a85771c7ce6ea
+      https://github.com/bluez/bluez/commit/5a872af406ca2d432e79d978f23a85771c7ce6ea
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-11-21 (Mon, 21 Nov 2022)
 
-> The patches have been split up into small pieces to make review easier and
-> I took the liberty to throw a bunch of overdue cleanups into the picture
-> instead of proliferating the existing state further.
+  Changed paths:
+    M client/player.c
 
-After applying all these patches, and then my updates to the rest of
-the kernel, as well as my update to the debug objects to require
-shutdown. It reported this was needed:
+  Log Message:
+  -----------
+  client/player: Fix scan-build warning
 
--- Steve
+This fixes the following warning:
 
-diff --git a/kernel/time/timer.c b/kernel/time/timer.c
-index 0fbb71950ca2..3e84a2621913 100644
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -2188,7 +2188,7 @@ signed long __sched schedule_timeout(signed long timeout)
- 	timer_setup_on_stack(&timer.timer, process_timeout, 0);
- 	__mod_timer(&timer.timer, expire, MOD_TIMER_NOTPENDING);
- 	schedule();
--	del_timer_sync(&timer.timer);
-+	timer_shutdown_sync(&timer.timer);
- 
- 	/* Remove the timer from the object tracker */
- 	destroy_timer_on_stack(&timer.timer);
+client/player.c:1775:25: warning: Dereference of null pointer
+[core.NullDereference]
+iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
+                        ^~~~~~~~~~~~~~~~~~~~~
+
+
+  Commit: 9f5036834ba20226456acc0c430642ce36d4eecc
+      https://github.com/bluez/bluez/commit/9f5036834ba20226456acc0c430642ce36d4eecc
+  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
+  Date:   2022-11-21 (Mon, 21 Nov 2022)
+
+  Changed paths:
+    M src/adapter.c
+    M src/btd.h
+    M src/main.c
+    M src/main.conf
+
+  Log Message:
+  -----------
+  main.conf: Add SecureConnections option
+
+This introduces SecureConnections option to main.conf that can be used to
+configure this on adapter initialization.
+
+This is useful for:
+- disable for adapters that have a problems with SecureConnections enabled
+- if you want to disable CTKD (cross transport key derivation)
+- add option to enable only SecureConnections
+
+
+Compare: https://github.com/bluez/bluez/compare/818adf28e518...9f5036834ba2
