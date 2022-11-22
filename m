@@ -2,105 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FEB4C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 00:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE13C43217
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 02:38:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231758AbiKVAuT (ORCPT
+        id S232070AbiKVCiV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Nov 2022 19:50:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35610 "EHLO
+        Mon, 21 Nov 2022 21:38:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229919AbiKVAuS (ORCPT
+        with ESMTP id S231856AbiKVCiN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Nov 2022 19:50:18 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C69F4044E;
-        Mon, 21 Nov 2022 16:50:17 -0800 (PST)
+        Mon, 21 Nov 2022 21:38:13 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 890755CD1C;
+        Mon, 21 Nov 2022 18:38:09 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B350260A51;
-        Tue, 22 Nov 2022 00:50:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 100CFC433C1;
-        Tue, 22 Nov 2022 00:50:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669078216;
-        bh=oaaCKCKoyoc+e6B4sa8JTeueW5S4WbjiWN/m/BqMr4o=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=gSngKmUoadOgDoqdy2eGUF0ondlWkpp6BY07Kj720aiC+it12iCp5QipY0JpHgjwC
-         QiDjsxqlwtCcVU9w9ho20/FK8kuECsx55OAbaje+mYPbkqC5MAllEFQbOBZph0EUE9
-         jAb3FbxgNY+66Tf/nkoB07xN/G2KdET7QJn1RK8ytvRG7yCaVaGH4qAq3UFzEhfP2n
-         23ezwp+psNj7grcV2OZlDYz9FAi+U0rYOkMgM57i3QwVWRw86VtMJYFqhgZH8/R2jZ
-         gcr5FypkD0F68ZMayVP+ajZlERxcyQWbbr3256+7kZZuW+nBn+RG8GlisUVHS4lBTd
-         PL4lawWrgqkJg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E4A81E29F3E;
-        Tue, 22 Nov 2022 00:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3709061543;
+        Tue, 22 Nov 2022 02:38:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3843FC433D6;
+        Tue, 22 Nov 2022 02:38:06 +0000 (UTC)
+Date:   Mon, 21 Nov 2022 21:38:02 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>,
+        Anna-Maria Behnsen <anna-maria@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [patch 00/15] timers: Provide timer_shutdown[_sync]()
+Message-ID: <20221121213802.1cd09674@rorschach.local.home>
+In-Reply-To: <20221115195802.415956561@linutronix.de>
+References: <20221115195802.415956561@linutronix.de>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix u8 overflow
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166907821592.6181.15285782519233443066.git-patchwork-notify@kernel.org>
-Date:   Tue, 22 Nov 2022 00:50:15 +0000
-References: <20221118200145.1741199-1-iam@sung-woo.kim>
-In-Reply-To: <20221118200145.1741199-1-iam@sung-woo.kim>
-To:     Sungwoo Kim <iam@sung-woo.kim>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+On Tue, 15 Nov 2022 21:28:32 +0100 (CET)
+Thomas Gleixner <tglx@linutronix.de> wrote:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> The patches have been split up into small pieces to make review easier and
+> I took the liberty to throw a bunch of overdue cleanups into the picture
+> instead of proliferating the existing state further.
 
-On Fri, 18 Nov 2022 15:01:47 -0500 you wrote:
-> By keep sending L2CAP_CONF_REQ packets, chan->num_conf_rsp increases
-> multiple times and eventually it will wrap around the maximum number
-> (i.e., 255).
-> This patch prevents this by adding a boundary check with
-> L2CAP_MAX_CONF_RSP
-> 
-> Btmon log:
-> Bluetooth monitor ver 5.64
-> = Note: Linux version 6.1.0-rc2 (x86_64)                               0.264594
-> = Note: Bluetooth subsystem version 2.22                               0.264636
-> @ MGMT Open: btmon (privileged) version 1.22                  {0x0001} 0.272191
-> = New Index: 00:00:00:00:00:00 (Primary,Virtual,hci0)          [hci0] 13.877604
-> @ RAW Open: 9496 (privileged) version 2.22                   {0x0002} 13.890741
-> = Open Index: 00:00:00:00:00:00                                [hci0] 13.900426
-> (...)
-> > ACL Data RX: Handle 200 flags 0x00 dlen 1033             #32 [hci0] 14.273106
->         invalid packet size (12 != 1033)
->         08 00 01 00 02 01 04 00 01 10 ff ff              ............
-> > ACL Data RX: Handle 200 flags 0x00 dlen 1547             #33 [hci0] 14.273561
->         invalid packet size (14 != 1547)
->         0a 00 01 00 04 01 06 00 40 00 00 00 00 00        ........@.....
-> > ACL Data RX: Handle 200 flags 0x00 dlen 2061             #34 [hci0] 14.274390
->         invalid packet size (16 != 2061)
->         0c 00 01 00 04 01 08 00 40 00 00 00 00 00 00 04  ........@.......
-> > ACL Data RX: Handle 200 flags 0x00 dlen 2061             #35 [hci0] 14.274932
->         invalid packet size (16 != 2061)
->         0c 00 01 00 04 01 08 00 40 00 00 00 07 00 03 00  ........@.......
-> = bluetoothd: Bluetooth daemon 5.43                                   14.401828
-> > ACL Data RX: Handle 200 flags 0x00 dlen 1033             #36 [hci0] 14.275753
->         invalid packet size (12 != 1033)
->         08 00 01 00 04 01 04 00 40 00 00 00              ........@...
-> 
-> [...]
+After applying all these patches, and then my updates to the rest of
+the kernel, as well as my update to the debug objects to require
+shutdown. It reported this was needed:
 
-Here is the summary with links:
-  - Bluetooth: L2CAP: Fix u8 overflow
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ae4569813a6e
+-- Steve
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+index 0fbb71950ca2..3e84a2621913 100644
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -2188,7 +2188,7 @@ signed long __sched schedule_timeout(signed long timeout)
+ 	timer_setup_on_stack(&timer.timer, process_timeout, 0);
+ 	__mod_timer(&timer.timer, expire, MOD_TIMER_NOTPENDING);
+ 	schedule();
+-	del_timer_sync(&timer.timer);
++	timer_shutdown_sync(&timer.timer);
+ 
+ 	/* Remove the timer from the object tracker */
+ 	destroy_timer_on_stack(&timer.timer);
