@@ -2,117 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F9AC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 14:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05C1C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 15:18:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232784AbiKVOfA (ORCPT
+        id S233773AbiKVPSq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 09:35:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53064 "EHLO
+        Tue, 22 Nov 2022 10:18:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233201AbiKVOex (ORCPT
+        with ESMTP id S232611AbiKVPSl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 09:34:53 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A42062AE16
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 06:34:52 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id g62so14521789pfb.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 06:34:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HZlu6be2IgFDn4h8g7DTpZauPsunSAgUr7tCJoCoqlg=;
-        b=TYbCTR3Mf141uCD7HveLyaUcJvIzh6GO2FtbNhRNWmg/1tEjcq/clh159FVlyqMCsG
-         i6appJfI+XMgMVqyaZvoLQYaPYHAh1wpv2dlMZCNZBg4iSrSWxkfp6ruyJBFXzll+LQN
-         k4qtoJe/6QaQ+TESjqVnmsqNUQ/+ACrPaPw4QC+XmVrFdiTYnHRvkHlUuwG7XB3oHo0u
-         aVchdQ0C/CfY9x8O21ur2Vm35cF51yD0SbZXVhFVWx2Y+FJ1B25ATKON5XdyXwNzsDrB
-         CnkLGWlWMwMckGQ5gbLS1nDIlmT9yknw8u6wlSSHXtJTZhLWj+Nx2CFG5nxqnJxEOqZs
-         YaZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HZlu6be2IgFDn4h8g7DTpZauPsunSAgUr7tCJoCoqlg=;
-        b=SsWbg6J0/8k0li2WczyZ2jlOn0ATdR1wb6ZvLO7miLiJ8E8dYLOD+Zz1E2BR9Sv/3s
-         X1924a9e6QsmhMwpvUvSg+kNDn9i5QxCz9amLUhq3jf5PXK46OLC5r/du4iwObXP6Apk
-         DCmshY7BaifgzhoC4gQKUhNtDZr5sjZaqqPfv01bAZhtK77Yclw8h9HI1U+HaR3cfcrL
-         c9TEdQKmhnqatqyRTSrbkqTajtfWFiKvf4G0Vk4JbCPSlEofaYD3+FDrZaJ5i8B2+TQt
-         N0EcdenRO0uiYRqyrZa7MZiCdEW9/1YBpWIeIj7e97bGhML7jgJGyrQxEy/Q9kHvIRtd
-         LEWA==
-X-Gm-Message-State: ANoB5pmJtVMe35KpM1MhG/Mp9JPJKcktSC6+fxsznX6zeczZYEAzeMH+
-        ocTdeCO6bsknn66OPm3UJQ/IHOlcVXY=
-X-Google-Smtp-Source: AA0mqf7MBbYWza5j0CBnEhx3/WwyamE+ISzYl0j3HHwYyoLC5tvmupAp/sFhh/ZwgCpdu5EGgkI0Aw==
-X-Received: by 2002:a65:594e:0:b0:46f:f911:eee with SMTP id g14-20020a65594e000000b0046ff9110eeemr4321692pgu.432.1669127691740;
-        Tue, 22 Nov 2022 06:34:51 -0800 (PST)
-Received: from [172.17.0.2] ([20.237.213.65])
-        by smtp.gmail.com with ESMTPSA id y185-20020a6232c2000000b0056ddd2b5e9bsm10737447pfy.41.2022.11.22.06.34.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 06:34:51 -0800 (PST)
-Message-ID: <637cde0b.620a0220.82b2d.0dc7@mx.google.com>
-Date:   Tue, 22 Nov 2022 06:34:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2992039303489546795=="
+        Tue, 22 Nov 2022 10:18:41 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DEFC697EF;
+        Tue, 22 Nov 2022 07:18:40 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1669130318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zKbYB4/x4Eioa7NTJUmecxu616udhot1tUi1AdzIwgg=;
+        b=Ey2IoXawMVtLO5Oz/+AojWtt7Y1O6buWlGKuq2VPYazDeXZbmqwmiwCVUWLojKqA8lddS3
+        Vom/NA5oRvZCJhKAvZFTtk7bnke16rUjp4gkbgj1yljYcFgAkgnF5w6gQCmL+YKAm6Mrci
+        Ev09bKcwBCLrD85tFVZfLqCteK++Ydlp/jSNEcK3zLhnQvEiaYozZYkm+O9pz5RrszB/Q6
+        3j9meXZS5KnAd24TvtZcNlDXtsPbobEsmxVGHwnv/UeG/jstji3fqbxhQQQDfwCx1p0nrl
+        J2esgdPB/9O7su2vHr4T5nG9p8wXd6uEuVk1YwnxyH55SwcBMMNwFZwQUZsp/w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1669130318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=zKbYB4/x4Eioa7NTJUmecxu616udhot1tUi1AdzIwgg=;
+        b=ICE1QM57jId/IFgN6qEk+MfqfeLm8OOmL9ViEHwpjhMU2eO4RrRFphenE7lb1cEJa8mvTG
+        Ln7mObid0wx01WDw==
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>,
+        Anna-Maria Behnsen <anna-maria@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [patch 06/15] timers: Update kernel-doc for various functions
+In-Reply-To: <20221121154358.36856ca6@gandalf.local.home>
+References: <20221115195802.415956561@linutronix.de>
+ <20221115202117.323694948@linutronix.de>
+ <20221121154358.36856ca6@gandalf.local.home>
+Date:   Tue, 22 Nov 2022 16:18:37 +0100
+Message-ID: <878rk3ggqa.ffs@tglx>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dimitri.ledkov@canonical.com
-Subject: RE: [v5] Bluetooth: btintel: Correctly declare all module firmware files
-In-Reply-To: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
-References: <20221122140222.1541731-1-dimitri.ledkov@canonical.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2992039303489546795==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Nov 21 2022 at 15:43, Steven Rostedt wrote:
+> On Tue, 15 Nov 2022 21:28:43 +0100 (CET)
+> Thomas Gleixner <tglx@linutronix.de> wrote:
+>>  EXPORT_SYMBOL(mod_timer_pending);
+>>  
+>>  /**
+>> - * mod_timer - modify a timer's timeout
+>> - * @timer: the timer to be modified
+>> - * @expires: new timeout in jiffies
+>> + * mod_timer - Modify a timer's timeout
+>> + * @timer:	The timer to be modified
+>> + * @expires:	New timeout in jiffies
+>>   *
+>>   * mod_timer() is a more efficient way to update the expire field of an
+>
+> BTW, one can ask, "more efficient" than what?
+>
+> If you are updating this, perhaps swap it around a little.
+>
+>  * mod_timer(timer, expires) is equivalent to:
+>  *
+>  *     del_timer(timer); timer->expires = expires; add_timer(timer);
+>  *
+>  * mod_timer() is a more efficient way to update the expire field of an
+>  * active timer (if the timer is inactive it will be activated)
+>  *
+>
+> As seeing the equivalent first and then seeing "more efficient" makes a bit
+> more sense.
 
-This is automated email and please do not reply to this email!
+Point taken.
 
-Dear submitter,
+>>   *
+>> - * The timer's ->expires, ->function fields must be set prior calling this
+>> - * function.
+>> + * The @timer->expires and @timer->function fields must be set prior
+>> + * calling this function.
+>
+>  "set prior to calling this function"
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=698114
+Fixed.
 
----Test result---
+>>   *
+>> - * The function returns whether it has deactivated a pending timer or not.
+>> - * (ie. del_timer() of an inactive timer returns 0, del_timer() of an
+>> - * active timer returns 1.)
+>> + * Contrary to del_timer_sync() this function does not wait for an
+>> + * eventually running timer callback on a different CPU and it neither
+>
+> I'm a little confused with the "eventually running timer". Does that simply
+> mean one that is about to run next (that is, it doesn't handle race
+> conditions and the timer is in the process of starting), but will still
+> deactivate one that has not been started and the timer code for that CPU
+> hasn't triggered yet?
 
-Test Summary:
-CheckPatch                    PASS      0.63 seconds
-GitLint                       FAIL      0.61 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      46.92 seconds
-BuildKernel32                 PASS      43.17 seconds
-TestRunnerSetup               PASS      584.95 seconds
-TestRunner_l2cap-tester       PASS      19.88 seconds
-TestRunner_iso-tester         PASS      21.58 seconds
-TestRunner_bnep-tester        PASS      7.21 seconds
-TestRunner_mgmt-tester        PASS      140.75 seconds
-TestRunner_rfcomm-tester      PASS      12.20 seconds
-TestRunner_sco-tester         PASS      11.33 seconds
-TestRunner_ioctl-tester       PASS      13.48 seconds
-TestRunner_mesh-tester        PASS      9.50 seconds
-TestRunner_smp-tester         PASS      11.12 seconds
-TestRunner_userchan-tester    PASS      7.51 seconds
-IncrementalBuild              PASS      44.08 seconds
+Let me try again.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v5] Bluetooth: btintel: Correctly declare all module firmware files
+  The function only deactivates a pending timer, but contrary to
+  del_timer_sync() it does not take into account whether the timers
+  callback function is concurrently executed on a different CPU or not.
 
-23: B2 Line has trailing whitespace: "    "
-27: B2 Line has trailing whitespace: "    "
-31: B2 Line has trailing whitespace: "    "
+Does that make more sense?
 
+>> + * prevents rearming of the timer.  If @timer can be rearmed concurrently
+>> + * then the return value of this function is meaningless.
+>> + *
+>> + * Return:
+>> + * * %0 - The timer was not pending
+>> + * * %1 - The timer was pending and deactivated
+>>   */
+>>  int del_timer(struct timer_list *timer)
+>>  {
+>> @@ -1270,10 +1284,16 @@ EXPORT_SYMBOL(del_timer);
+>>  
+>>  /**
+>>   * try_to_del_timer_sync - Try to deactivate a timer
+>> - * @timer: timer to delete
+>> + * @timer:	Timer to deactivate
+>>   *
+>> - * This function tries to deactivate a timer. Upon successful (ret >= 0)
+>> - * exit the timer is not queued and the handler is not running on any CPU.
+>> + * This function cannot guarantee that the timer cannot be rearmed right
+>> + * after dropping the base lock. That needs to be prevented by the calling
+>> + * code if necessary.
+>
+>
+> Hmm, you seemed to have deleted the description of what the function does
+> and replaced it with only what it cannot do.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============2992039303489546795==--
+Ooops.
