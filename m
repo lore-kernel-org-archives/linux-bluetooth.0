@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC6EC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 20:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D98C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 20:37:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233908AbiKVUbQ (ORCPT
+        id S233895AbiKVUhq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 15:31:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41584 "EHLO
+        Tue, 22 Nov 2022 15:37:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233871AbiKVUbP (ORCPT
+        with ESMTP id S233908AbiKVUhm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 15:31:15 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4656E14D07
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 12:31:09 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id be13so25272921lfb.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 12:31:09 -0800 (PST)
+        Tue, 22 Nov 2022 15:37:42 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B05621BA
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 12:37:40 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id be13so25295960lfb.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 12:37:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dSepLoDWdLX9h8ni565kGUBAadbDX0GMGFO+LzpqsvE=;
-        b=XrLQyrSbtcDSXsBnIiF/LQnqK3WMUURn/hk5lwTz09GXqBEokGZKjW5uDmWQGdW/Vq
-         dVHIDKhA81i1mELeUdycHxDTIBPN9k1ZvRP6nRDFTkaQ9bVZlKjmoNVUwGAHxSwoUQkQ
-         MIm/YcVDMP54P9we1JlUjGLQPFe50FpYWyyGaMrPhZs8w8/XW0f5KO9ciOt5Hxe0vew7
-         /WdPPRjCRV4iUqJXTJVmN2W9h4REIUmZ2giyhEW/ynu1k8mD2ICYUZM3wSCgwzn3gdYV
-         OMFVdd0IiiD/xTWz9z2EOJQyS/AGHNOJs9Fq/E5EkXQrCY5AxbJ4NmXre1QZitULxF4t
-         yP7g==
+        bh=MUFS3NSjmtD2Cxa6jzaipPFwYorzYIBWWGYQciT3mnA=;
+        b=pzyBE41WZG7HiA5QXtA9cE6d5oVyMXXfdpKStVMun6PCWUwKTU/kwTQ/NFSG/1B2nX
+         g+lBmZlB5z1jnHOn02XlMZPiwaJkO1N2juS9wrdbLpfKjuj0usGrmD+z/T9RCKudn80i
+         G5pKoQZPjjZRU4Bu6Sp7UovVz6BtGetxJfLzBIZJ4mR9Zy8Q9dWPRND/stDpTBpLIsvY
+         gzF2em5F2qR8orKT0ws1zd1AtdEL0arQUSJ2NzvHMNGcTR+H6niuIalrDU1l4ahhTvso
+         w4oeNImjXREYukhDXLvMp87gLdeEsb/WlMgKAD1bBlfV4yua7KjY6Vs6ylayoePFD0/U
+         j1iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dSepLoDWdLX9h8ni565kGUBAadbDX0GMGFO+LzpqsvE=;
-        b=5xpo9iL80dVki2/OJptjgSm/IAj6sfY8izXAhUdRajPql6GqKC/S09jXOQqE3RhuIQ
-         otywwfKtruQadsdU6JONDyE5bHOw1Z7Ovnv/ZBS36tPfiohZ32hnJywjn4qA8HYURAiX
-         jv3FmPk0Y1YYM6kFbx1YkBpxBGanOnxEV0BUgL0rtRIZ1yIdTVovGpRyTlTC1puQ2RXR
-         6mFFIzI0X0p7yH1NkdrH4PLznzOOxXiQDC8iNNdAvGxk1akRGtXXkMWXvVsqWa995yfK
-         6vqGxXecz6zaodTq290j8C5+nKVNTWHpdMq0lnBh3fP2YXBbtUglHXGS5OJ7FkdBnk6M
-         elqg==
-X-Gm-Message-State: ANoB5pkZVqJLa8d8XaAT8ubpIaG+DOPgDmBuccWTOAVwmLydknzgST7m
-        yQ9WVbrEElq+tYEbkTZzYKS5uRmPymY8dO1uFyc9oSo8XHE=
-X-Google-Smtp-Source: AA0mqf5Gb9GCO9Sk/mGU/5MTGswbW8Zkz+CNWOwZgn3O6D/yZSbkBbawTxX1ne4Xl6uQvsiNW5hc0uWqYMf1qqnjNpU=
-X-Received: by 2002:a05:6512:3603:b0:4b4:b5d8:880d with SMTP id
- f3-20020a056512360300b004b4b5d8880dmr7807777lfs.121.1669149067483; Tue, 22
- Nov 2022 12:31:07 -0800 (PST)
+        bh=MUFS3NSjmtD2Cxa6jzaipPFwYorzYIBWWGYQciT3mnA=;
+        b=VG7evZiqHi2YQUwYbDVcabm+fei1TkyBXdmNW9KoRnq/nRg7J3Vs36nc0wMOPo4lrc
+         jH6GWj6AhFw018WHo9SEGKZaxHxax/XOGBC1oa7e0qoOCQmux9U0QVyl+mfUcn/cbAWf
+         Vw3xmxDU8Nf+EsVZlonCZIfyWvFMMuohUmOvbRw79i8qf7/WwBAU2ecXtheUruCE7Zn2
+         4af1IHqeg6EzBT/iYKQ6d9DM+Tq0LbvBwj0E+OMy3VVOlsPQPi41A0Knr4+9SyYy4FbJ
+         pyuQb+ibek/7jhnm+gTw1Pa9Wva/pIdE4fxJyhVX09sboIgis2clVn707C4oOyxvff2J
+         Z6OA==
+X-Gm-Message-State: ANoB5pm08/5g3UnpkkEJguum0LEFsYIG/APN1z5T0i14ascNSQXrIoBo
+        tZgB/Kzl98o9V3JPC78E3JgcEKa3oMaLAGwcGUYz2sJk
+X-Google-Smtp-Source: AA0mqf6CYb/XU7rWMcEJjVEyHJ73PbSIRV1z7O2UDrxzbaYyUetCcFToN5d2AMnuh0rz5xm2fwp8o/3yQOMMDcYZnK8=
+X-Received: by 2002:a05:6512:25a3:b0:4b4:bc44:2b40 with SMTP id
+ bf35-20020a05651225a300b004b4bc442b40mr3396771lfb.564.1669149458493; Tue, 22
+ Nov 2022 12:37:38 -0800 (PST)
 MIME-Version: 1.0
-References: <20221122101232.45320-1-sathish.narasimman@intel.com> <20221122101232.45320-6-sathish.narasimman@intel.com>
-In-Reply-To: <20221122101232.45320-6-sathish.narasimman@intel.com>
+References: <20221122101232.45320-1-sathish.narasimman@intel.com> <20221122101232.45320-5-sathish.narasimman@intel.com>
+In-Reply-To: <20221122101232.45320-5-sathish.narasimman@intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 22 Nov 2022 12:30:55 -0800
-Message-ID: <CABBYNZ+p3k25fo-Qdx_FD1pDJ93NrjbSoLzytdFrCqXVTByp+A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 5/7] profiles: Add initial code for csip plugin
+Date:   Tue, 22 Nov 2022 12:37:26 -0800
+Message-ID: <CABBYNZ+q7HED9supQ4_ZeGAWtQUKHOgjgmc_WQSLsWzpJg0Y-A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 4/7] shared/csip: Add initial code for handling CSIP
 To:     Sathish Narasimman <sathish.narasimman@intel.com>
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -66,382 +66,646 @@ Hi Sathish,
 On Tue, Nov 22, 2022 at 2:16 AM Sathish Narasimman
 <sathish.narasimman@intel.com> wrote:
 >
-> This adds initial code for csip plugin which handles Coordinated
-> set identification Profile and Coordinated Set Identification
-> Service.
+> This adds initial code for Coordinated Set Identification Profile.
 > ---
->  Makefile.plugins      |   5 +
->  configure.ac          |   4 +
->  profiles/audio/csip.c | 319 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 328 insertions(+)
->  create mode 100644 profiles/audio/csip.c
+>  Makefile.am       |   1 +
+>  src/shared/csip.c | 554 ++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/csip.h |  44 ++++
+>  3 files changed, 599 insertions(+)
+>  create mode 100644 src/shared/csip.c
+>  create mode 100644 src/shared/csip.h
 >
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index 20cac384ef44..0f119e8714b7 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -131,3 +131,8 @@ if VCP
->  builtin_modules += vcp
->  builtin_sources += profiles/audio/vcp.c
->  endif
-> +
-> +if CSIP
-> +builtin_modules += csip
-> +builtin_sources += profiles/audio/csip.c
-> +endif
-> diff --git a/configure.ac b/configure.ac
-> index f9f0faf573ca..17c5f904a5c2 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -207,6 +207,10 @@ AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
->                 [disable VCP profile]), [enable_vcp=${enableval}])
->  AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
+> diff --git a/Makefile.am b/Makefile.am
+> index aa3a5e053cd8..b546a1803dfd 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -233,6 +233,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+>                         src/shared/bap.h src/shared/bap.c src/shared/ascs.h \
+>                         src/shared/mcs.h src/shared/mcp.h src/shared/mcp.c \
+>                         src/shared/vcp.c src/shared/vcp.h \
+> +                       src/shared/csip.c src/shared/csip.h \
+>                         src/shared/lc3.h src/shared/tty.h
 >
-> +AC_ARG_ENABLE(csip, AS_HELP_STRING([--disable-csip],
-> +               [disable CSIP profile]), [enable_csip=${enableval}])
-> +AM_CONDITIONAL(CSIP, test "${enable_csip}" != "no")
-> +
->  AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
->                 [disable Bluetooth tools]), [enable_tools=${enableval}])
->  AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
-> diff --git a/profiles/audio/csip.c b/profiles/audio/csip.c
+>  if READLINE
+> diff --git a/src/shared/csip.c b/src/shared/csip.c
 > new file mode 100644
-> index 000000000000..c00065bda676
+> index 000000000000..98e42d914b16
 > --- /dev/null
-> +++ b/profiles/audio/csip.c
-> @@ -0,0 +1,319 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +++ b/src/shared/csip.c
+> @@ -0,0 +1,554 @@
+> +// SPDX-License-Identifier: LGPL-2.1-or-later
 > +/*
 > + *
-> + * BlueZ - Bluetooth protocol stack for Linux
+> + *  BlueZ - Bluetooth protocol stack for Linux
 > + *
-> + * Copyright (C) 2022 Intel Corporation. All rights reserved.
-> + *
+> + *  Copyright (C) 2022  Intel Corporation. All rights reserved.
 > + *
 > + */
 > +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
 > +#define _GNU_SOURCE
-> +
-> +#include <ctype.h>
-> +#include <stdbool.h>
+> +#include <inttypes.h>
+> +#include <string.h>
 > +#include <stdlib.h>
-> +#include <stdio.h>
-> +#include <sys/types.h>
-> +#include <sys/stat.h>
-> +#include <fcntl.h>
+> +#include <stdbool.h>
+> +#include <unistd.h>
 > +#include <errno.h>
 > +
 > +#include <glib.h>
 > +
-> +#include "gdbus/gdbus.h"
-> +
 > +#include "lib/bluetooth.h"
-> +#include "lib/hci.h"
-> +#include "lib/sdp.h"
 > +#include "lib/uuid.h"
 > +
-> +#include "src/dbus-common.h"
-> +#include "src/shared/util.h"
-> +#include "src/shared/att.h"
 > +#include "src/shared/queue.h"
+> +#include "src/shared/util.h"
+> +#include "src/shared/timeout.h"
+> +#include "src/shared/att.h"
 > +#include "src/shared/gatt-db.h"
-> +#include "src/shared/gatt-client.h"
 > +#include "src/shared/gatt-server.h"
+> +#include "src/shared/gatt-client.h"
 > +#include "src/shared/csip.h"
+> +#include "src/btd.h"
 > +
-> +#include "btio/btio.h"
-> +#include "src/plugin.h"
-> +#include "src/adapter.h"
-> +#include "src/gatt-database.h"
-> +#include "src/device.h"
-> +#include "src/profile.h"
-> +#include "src/service.h"
-> +#include "src/log.h"
-> +#include "src/error.h"
+> +#define DBG(_csip, fmt, arg...) \
+> +       csip_debug(_csip, "%s:%s() " fmt, __FILE__, __func__, ## arg)
 > +
-> +#define CSIS_UUID_STR "00001846-0000-1000-8000-00805f9b34fb"
+> +/* SIRK is now hardcoded in the code. This can be moved
+> + * to a configuration file. Since the code is to validate
+> + * the CSIP use case of set member
+> + */
+> +#define SIRK "761FAE703ED681F0C50B34155B6434FB"
+> +#define CSIS_SIZE      0x02
+> +#define CSIS_LOCK      0x01
+> +#define CSIS_RANK      0x01
+> +#define CSIS_PLAINTEXT 0x01
+> +#define CSIS_ENC       0x02
 > +
-> +struct csip_data {
-> +       struct btd_device *device;
-> +       struct btd_service *service;
-> +       struct bt_csip *csip;
+> +struct bt_csip_db {
+> +       struct gatt_db *db;
+> +       struct bt_csis *csis;
 > +};
 > +
+> +struct csis_sirk {
+> +       uint8_t type;
+> +       uint8_t val[16];
+> +} __packed;
+> +
+> +struct bt_csis {
+> +       struct bt_csip_db *cdb;
+> +       struct csis_sirk *sirk;
+> +       uint8_t cs_size;
+> +       uint8_t cs_lock;
+> +       uint8_t cs_rank;
+> +       struct gatt_db_attribute *service;
+> +       struct gatt_db_attribute *csirk;
+> +       struct gatt_db_attribute *csize;
+> +       struct gatt_db_attribute *cslock;
+> +       struct gatt_db_attribute *cslock_ccc;
+> +       struct gatt_db_attribute *crank;
+> +};
+> +
+> +struct bt_csip_cb {
+> +       unsigned int id;
+> +       bt_csip_func_t attached;
+> +       bt_csip_func_t detached;
+> +       void *user_data;
+> +};
+> +
+> +struct bt_csip {
+> +       int ref_count;
+> +       struct bt_csip_db *ldb;
+> +       struct bt_csip_db *rdb;
+> +       struct bt_gatt_client *client;
+> +       struct bt_att *att;
+> +
+> +       struct queue *pending;
+> +
+> +       bt_csip_debug_func_t debug_func;
+> +       bt_csip_destroy_func_t debug_destroy;
+> +       void *debug_data;
+> +       void *user_data;
+> +};
+> +
+> +static struct queue *csip_db;
+> +static struct queue *csip_cbs;
 > +static struct queue *sessions;
 > +
-> +static void csip_debug(const char *str, void *user_data)
+> +static void csip_detached(void *data, void *user_data)
 > +{
-> +       DBG_IDX(0xffff, "%s", str);
+> +       struct bt_csip_cb *cb = data;
+> +       struct bt_csip *csip = user_data;
+> +
+> +       cb->detached(csip, cb->user_data);
 > +}
 > +
-> +static struct csip_data *csip_data_new(struct btd_device *device)
+> +void bt_csip_detach(struct bt_csip *csip)
 > +{
-> +       struct csip_data *data;
+> +       if (!queue_remove(sessions, csip))
+> +               return;
 > +
-> +       data = new0(struct csip_data, 1);
-> +       data->device = device;
+> +       bt_gatt_client_unref(csip->client);
+> +       csip->client = NULL;
 > +
-> +       return data;
+> +       queue_foreach(csip_cbs, csip_detached, csip);
 > +}
 > +
-> +static void csip_data_add(struct csip_data *data)
+> +static void csip_db_free(void *data)
 > +{
-> +       DBG("data %p", data);
+> +       struct bt_csip_db *cdb = data;
 > +
-> +       if (queue_find(sessions, NULL, data)) {
-> +               error("data %p already added", data);
+> +       if (!cdb)
+> +               return;
+> +
+> +       gatt_db_unref(cdb->db);
+> +
+> +       free(cdb->csis);
+> +       free(cdb);
+> +}
+> +static void csip_free(void *data)
+> +{
+> +       struct bt_csip *csip = data;
+> +
+> +       bt_csip_detach(csip);
+> +
+> +       csip_db_free(csip->rdb);
+> +
+> +       queue_destroy(csip->pending, NULL);
+> +
+> +       free(csip);
+> +}
+> +
+> +struct bt_att *bt_csip_get_att(struct bt_csip *csip)
+> +{
+> +       if (!csip)
+> +               return NULL;
+> +
+> +       if (csip->att)
+> +               return csip->att;
+> +
+> +       return bt_gatt_client_get_att(csip->client);
+> +}
+> +
+> +struct bt_csip *bt_csip_ref(struct bt_csip *csip)
+> +{
+> +       if (!csip)
+> +               return NULL;
+> +
+> +       __sync_fetch_and_add(&csip->ref_count, 1);
+> +
+> +       return csip;
+> +}
+> +
+> +void bt_csip_unref(struct bt_csip *csip)
+> +{
+> +       if (!csip)
+> +               return;
+> +
+> +       if (__sync_sub_and_fetch(&csip->ref_count, 1))
+> +               return;
+> +
+> +       csip_free(csip);
+> +}
+> +
+> +static void csip_debug(struct bt_csip *csip, const char *format, ...)
+> +{
+> +       va_list ap;
+> +
+> +       if (!csip || !format || !csip->debug_func)
+> +               return;
+> +
+> +       va_start(ap, format);
+> +       util_debug_va(csip->debug_func, csip->debug_data, format, ap);
+> +       va_end(ap);
+> +}
+> +
+> +static void csis_sirk_read(struct gatt_db_attribute *attrib,
+> +                               unsigned int id, uint16_t offset,
+> +                               uint8_t opcode, struct bt_att *att,
+> +                               void *user_data)
+> +{
+> +       struct bt_csis *csis = user_data;
+> +       struct iovec iov;
+> +
+> +       iov.iov_base = csis->sirk;
+> +       iov.iov_len = sizeof(struct csis_sirk);
+> +
+> +       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+> +                                                       iov.iov_len);
+> +}
+> +
+> +static void csis_size_read(struct gatt_db_attribute *attrib,
+> +                               unsigned int id, uint16_t offset,
+> +                               uint8_t opcode, struct bt_att *att,
+> +                               void *user_data)
+> +{
+> +       struct bt_csis *csis = user_data;
+> +       struct iovec iov;
+> +
+> +       iov.iov_base = &csis->cs_size;
+> +       iov.iov_len = sizeof(csis->cs_size);
+> +
+> +       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+> +                                                       iov.iov_len);
+> +}
+> +
+> +static void csis_lock_read_cb(struct gatt_db_attribute *attrib,
+> +                               unsigned int id, uint16_t offset,
+> +                               uint8_t opcode, struct bt_att *att,
+> +                               void *user_data)
+> +{
+> +       uint8_t value = CSIS_LOCK;
+> +
+> +       gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
+> +}
+> +
+> +static void csis_lock_write_cb(struct gatt_db_attribute *attrib,
+> +                               unsigned int id, uint16_t offset,
+> +                               const uint8_t *value, size_t len,
+> +                               uint8_t opcode, struct bt_att *att,
+> +                               void *user_data)
+> +{
+> +       gatt_db_attribute_write_result(attrib, id, 0);
+> +}
+> +
+> +static void csis_rank_read_cb(struct gatt_db_attribute *attrib,
+> +                               unsigned int id, uint16_t offset,
+> +                               uint8_t opcode, struct bt_att *att,
+> +                               void *user_data)
+> +{
+> +       uint8_t value = CSIS_RANK;
+> +
+> +       gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
+> +}
+> +
+> +static struct bt_csis *csis_new(struct gatt_db *db)
+> +{
+> +       struct bt_csis *csis;
+> +       struct csis_sirk *sirk;
+> +       bt_uuid_t uuid;
+> +
+> +       /* For Common Audio Service*/
+> +       struct gatt_db_attribute *service;
+> +
+> +       if (!db)
+> +               return NULL;
+> +
+> +       csis = new0(struct bt_csis, 1);
+> +       sirk = new0(struct csis_sirk, 1);
+> +
+> +       sirk->type = btd_opts.csis_defaults.sirk_type;
+> +       memcpy(sirk->val, btd_opts.csis_defaults.sirk_val,
+> +                       sizeof(sirk->val));
+> +       csis->sirk = sirk;
+> +       csis->cs_size = btd_opts.csis_defaults.cs_size;
+> +       csis->cs_lock = 1;
+> +       csis->cs_rank = btd_opts.csis_defaults.cs_rank;
+
+We can't have the shared code depending directly on the daemon code
+(e.g. btd_opts) since we want this code to be testable via unit
+testing framework (see unit/test-bap.c), so you probably want to pass
+these values via function parameter.
+
+> +       /* Populate DB with CSIS attributes */
+> +       bt_uuid16_create(&uuid, CSIS_UUID);
+> +       csis->service = gatt_db_add_service(db, &uuid, true, 10);
+> +
+> +       bt_uuid16_create(&uuid, CS_SIRK);
+> +       csis->csirk = gatt_db_service_add_characteristic(csis->service,
+> +                                       &uuid,
+> +                                       BT_ATT_PERM_READ,
+> +                                       BT_GATT_CHRC_PROP_READ,
+> +                                       csis_sirk_read, NULL,
+> +                                       csis);
+> +
+> +       bt_uuid16_create(&uuid, CS_SIZE);
+> +       csis->csize = gatt_db_service_add_characteristic(csis->service,
+> +                                       &uuid,
+> +                                       BT_ATT_PERM_READ,
+> +                                       BT_GATT_CHRC_PROP_READ,
+> +                                       csis_size_read, NULL,
+> +                                       csis);
+> +
+> +       /* Lock */
+> +       bt_uuid16_create(&uuid, CS_LOCK);
+> +       csis->cslock = gatt_db_service_add_characteristic(csis->service, &uuid,
+> +                                       BT_ATT_PERM_READ,
+> +                                       BT_GATT_CHRC_PROP_READ |
+> +                                       BT_GATT_CHRC_PROP_WRITE |
+> +                                       BT_GATT_CHRC_PROP_NOTIFY,
+> +                                       csis_lock_read_cb,
+> +                                       csis_lock_write_cb,
+> +                                       csis);
+> +
+> +       csis->cslock_ccc = gatt_db_service_add_ccc(csis->service,
+> +                                       BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
+> +
+> +       /* Rank */
+> +       bt_uuid16_create(&uuid, CS_RANK);
+> +       csis->crank = gatt_db_service_add_characteristic(csis->service, &uuid,
+> +                                       BT_ATT_PERM_READ,
+> +                                       BT_GATT_CHRC_PROP_READ,
+> +                                       csis_rank_read_cb,
+> +                                       NULL, csis);
+> +
+> +       /* Add the CAS service */
+> +       bt_uuid16_create(&uuid, 0x1853);
+> +       service = gatt_db_add_service(db, &uuid, true, 2);
+> +       gatt_db_service_add_included(service, csis->service);
+> +       gatt_db_service_set_active(service, true);
+> +       gatt_db_service_add_included(service, csis->service);
+> +
+> +       gatt_db_service_set_active(csis->service, true);
+> +
+> +       return csis;
+> +}
+> +
+> +static struct bt_csip_db *csip_db_new(struct gatt_db *db)
+> +{
+> +       struct bt_csip_db *cdb;
+> +
+> +       if (!db)
+> +               return NULL;
+> +
+> +       cdb = new0(struct bt_csip_db, 1);
+> +       cdb->db = gatt_db_ref(db);
+> +
+> +       if (!csip_db)
+> +               csip_db = queue_new();
+> +
+> +       cdb->csis = csis_new(db);
+> +       cdb->csis->cdb = cdb;
+> +
+> +       queue_push_tail(csip_db, cdb);
+> +
+> +       return cdb;
+> +}
+> +
+> +bool bt_csip_set_user_data(struct bt_csip *csip, void *user_data)
+> +{
+> +       if (!csip)
+> +               return false;
+> +
+> +       csip->user_data = user_data;
+> +
+> +       return true;
+> +}
+> +
+> +static bool csip_db_match(const void *data, const void *match_data)
+> +{
+> +       const struct bt_csip_db *cdb = data;
+> +       const struct gatt_db *db = match_data;
+> +
+> +       return (cdb->db == db);
+> +}
+> +
+> +static struct bt_csip_db *csip_get_db(struct gatt_db *db)
+> +{
+> +       struct bt_csip_db *cdb;
+> +
+> +       cdb = queue_find(csip_db, csip_db_match, db);
+> +       if (cdb)
+> +               return cdb;
+> +
+> +       return csip_db_new(db);
+> +}
+> +
+> +void bt_csip_add_db(struct gatt_db *db)
+> +{
+> +       csip_db_new(db);
+> +}
+> +
+> +bool bt_csip_set_debug(struct bt_csip *csip, bt_csip_debug_func_t func,
+> +                       void *user_data, bt_csip_destroy_func_t destroy)
+> +{
+> +       if (!csip)
+> +               return false;
+> +
+> +       if (csip->debug_destroy)
+> +               csip->debug_destroy(csip->debug_data);
+> +
+> +       csip->debug_func = func;
+> +       csip->debug_destroy = destroy;
+> +       csip->debug_data = user_data;
+> +
+> +       return true;
+> +}
+> +
+> +unsigned int bt_csip_register(bt_csip_func_t attached, bt_csip_func_t detached,
+> +                                                       void *user_data)
+> +{
+> +       struct bt_csip_cb *cb;
+> +       static unsigned int id;
+> +
+> +       if (!attached && !detached)
+> +               return 0;
+> +
+> +       if (!csip_cbs)
+> +               csip_cbs = queue_new();
+> +
+> +       cb = new0(struct bt_csip_cb, 1);
+> +       cb->id = ++id ? id : ++id;
+> +       cb->attached = attached;
+> +       cb->detached = detached;
+> +       cb->user_data = user_data;
+> +
+> +       queue_push_tail(csip_cbs, cb);
+> +
+> +       return cb->id;
+> +}
+> +
+> +static bool match_id(const void *data, const void *match_data)
+> +{
+> +       const struct bt_csip_cb *cb = data;
+> +       unsigned int id = PTR_TO_UINT(match_data);
+> +
+> +       return (cb->id == id);
+> +}
+> +
+> +bool bt_csip_unregister(unsigned int id)
+> +{
+> +       struct bt_csip_cb *cb;
+> +
+> +       cb = queue_remove_if(csip_cbs, match_id, UINT_TO_PTR(id));
+> +       if (!cb)
+> +               return false;
+> +
+> +       free(cb);
+> +
+> +       return true;
+> +}
+> +
+> +struct bt_csip *bt_csip_new(struct gatt_db *ldb, struct gatt_db *rdb)
+> +{
+> +       struct bt_csip *csip;
+> +       struct bt_csip_db *db;
+> +
+> +       if (!ldb)
+> +               return NULL;
+> +
+> +       db = csip_get_db(ldb);
+> +       if (!db)
+> +               return NULL;
+> +
+> +       csip = new0(struct bt_csip, 1);
+> +       csip->ldb = db;
+> +       csip->pending = queue_new();
+> +
+> +       if (!rdb)
+> +               goto done;
+> +
+> +       db = new0(struct bt_csip_db, 1);
+> +       db->db = gatt_db_ref(rdb);
+> +
+> +       csip->rdb = db;
+> +
+> +done:
+> +       bt_csip_ref(csip);
+> +
+> +       return csip;
+> +}
+> +
+> +static struct bt_csis *csip_get_csis(struct bt_csip *csip)
+> +{
+> +       if (!csip)
+> +               return NULL;
+> +
+> +       if (csip->rdb->csis)
+> +               return csip->rdb->csis;
+> +
+> +       csip->rdb->csis = new0(struct bt_csis, 1);
+> +       csip->rdb->csis->cdb = csip->rdb;
+> +
+> +       return csip->rdb->csis;
+> +}
+> +
+> +static void foreach_csis_char(struct gatt_db_attribute *attr, void *user_data)
+> +{
+> +       struct bt_csip *csip = user_data;
+> +       uint16_t value_handle;
+> +       bt_uuid_t uuid, uuid_csirk, uuid_csize;
+> +       struct bt_csis *csis;
+> +
+> +       if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
+> +                                               NULL, NULL, &uuid))
+> +               return;
+> +
+> +       bt_uuid16_create(&uuid_csirk, CS_SIRK);
+> +       bt_uuid16_create(&uuid_csize, CS_SIZE);
+> +
+> +       if (!bt_uuid_cmp(&uuid, &uuid_csirk)) {
+> +               DBG(csip, "CSIS IRK found: handle 0x%04x", value_handle);
+> +
+> +               csis = csip_get_csis(csip);
+> +               if (!csis || csis->sirk)
+> +                       return;
+> +
+> +               csis->csirk = attr;
 > +               return;
 > +       }
 > +
-> +       bt_csip_set_debug(data->csip, csip_debug, NULL, NULL);
+> +       if (!bt_uuid_cmp(&uuid, &uuid_csize)) {
+> +               DBG(csip, "CSIS SIZE found: handle 0x%04x", value_handle);
+> +
+> +               csis = csip_get_csis(csip);
+> +               if (!csis)
+> +                       return;
+> +
+> +               csis->csize = attr;
+> +       }
+> +
+> +}
+> +static void foreach_csis_service(struct gatt_db_attribute *attr,
+> +                                               void *user_data)
+> +{
+> +       struct bt_csip *csip = user_data;
+> +       struct bt_csis *csis = csip_get_csis(csip);
+> +
+> +       csis->service = attr;
+> +
+> +       gatt_db_service_set_claimed(attr, true);
+> +
+> +       gatt_db_service_foreach_char(attr, foreach_csis_char, csip);
+> +}
+> +
+> +bool bt_csip_attach(struct bt_csip *csip, struct bt_gatt_client *client)
+> +{
+> +       bt_uuid_t uuid;
 > +
 > +       if (!sessions)
 > +               sessions = queue_new();
 > +
-> +       queue_push_tail(sessions, data);
+> +       queue_push_tail(sessions, csip);
 > +
-> +       if (data->service)
-> +               btd_service_set_user_data(data->service, data);
+> +       if (!client)
+> +               return true;
+> +
+> +       if (csip->client)
+> +               return false;
+> +
+> +       csip->client = bt_gatt_client_clone(client);
+> +       if (!csip->client)
+> +               return false;
+> +
+> +       bt_uuid16_create(&uuid, CSIS_UUID);
+> +       gatt_db_foreach_service(csip->ldb->db, &uuid, foreach_csis_service,
+> +                               csip);
+> +
+> +       return true;
 > +}
 > +
-> +static int csip_disconnect(struct btd_service *service)
-> +{
-> +       DBG("");
-> +       return 0;
-> +}
+> diff --git a/src/shared/csip.h b/src/shared/csip.h
+> new file mode 100644
+> index 000000000000..bd88ccf3a0b2
+> --- /dev/null
+> +++ b/src/shared/csip.h
+> @@ -0,0 +1,44 @@
+> +/* SPDX-License-Identifier: LGPL-2.1-or-later */
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2022  Intel Corporation. All rights reserved.
+> + *
+> + */
 > +
-> +static bool match_data(const void *data, const void *match_data)
-> +{
-> +       const struct csip_data *vdata = data;
-> +       const struct bt_csip *csip = match_data;
+> +#include <stdbool.h>
+> +#include <inttypes.h>
 > +
-> +       return vdata->csip == csip;
-> +}
+> +#include "src/shared/io.h"
 > +
-> +static void csip_data_free(struct csip_data *data)
-> +{
-> +       if (data->service) {
-> +               btd_service_set_user_data(data->service, NULL);
-> +               bt_csip_set_user_data(data->csip, NULL);
-> +       }
+> +#ifndef __packed
+> +#define __packed __attribute__((packed))
+> +#endif
 > +
-> +       bt_csip_unref(data->csip);
-> +       free(data);
-> +}
+> +struct bt_csip;
 > +
+> +typedef void (*bt_csip_destroy_func_t)(void *user_data);
+> +typedef void (*bt_csip_debug_func_t)(const char *str, void *user_data);
+> +typedef void (*bt_csip_func_t)(struct bt_csip *csip, void *user_data);
+> +struct bt_csip *bt_csip_ref(struct bt_csip *csip);
+> +void bt_csip_unref(struct bt_csip *csip);
 > +
-> +static void csip_data_remove(struct csip_data *data)
-> +{
-> +       DBG("data %p", data);
+> +void bt_csip_add_db(struct gatt_db *db);
 > +
-> +       if (!queue_remove(sessions, data))
-> +               return;
+> +bool bt_csip_attach(struct bt_csip *csip, struct bt_gatt_client *client);
+> +void bt_csip_detach(struct bt_csip *csip);
 > +
-> +       csip_data_free(data);
+> +bool bt_csip_set_debug(struct bt_csip *csip, bt_csip_debug_func_t func,
+> +                       void *user_data, bt_csip_destroy_func_t destroy);
 > +
-> +       if (queue_isempty(sessions)) {
-> +               queue_destroy(sessions, NULL);
-> +               sessions = NULL;
-> +       }
-> +}
+> +struct bt_att *bt_csip_get_att(struct bt_csip *csip);
 > +
-> +static void csip_detached(struct bt_csip *csip, void *user_data)
-> +{
-> +       struct csip_data *data;
+> +bool bt_csip_set_user_data(struct bt_csip *csip, void *user_data);
 > +
-> +       DBG("%p", csip);
+> +/* Session related function */
+> +unsigned int bt_csip_register(bt_csip_func_t added, bt_csip_func_t removed,
+> +                                                       void *user_data);
+> +bool bt_csip_unregister(unsigned int id);
+> +struct bt_csip *bt_csip_new(struct gatt_db *ldb, struct gatt_db *rdb);
 > +
-> +       data = queue_find(sessions, match_data, csip);
-> +       if (!data) {
-> +               error("Unable to find csip session");
-> +               return;
-> +       }
-> +
-> +       csip_data_remove(data);
-> +}
-> +
-> +static void csip_attached(struct bt_csip *csip, void *user_data)
-> +{
-> +       struct csip_data *data;
-> +       struct bt_att *att;
-> +       struct btd_device *device;
-> +
-> +       DBG("%p", csip);
-> +
-> +       data = queue_find(sessions, match_data, csip);
-> +       if (data)
-> +               return;
-> +
-> +       att = bt_csip_get_att(csip);
-> +       if (!att)
-> +               return;
-> +
-> +       device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
-> +       if (!device) {
-> +               error("Unable to find device");
-> +               return;
-> +       }
-> +
-> +       data = csip_data_new(device);
-> +       data->csip = csip;
-> +
-> +       csip_data_add(data);
-> +
-> +}
-> +
-> +static int csip_server_probe(struct btd_profile *p,
-> +                               struct btd_adapter *adapter)
-> +{
-> +       struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-> +
-> +       DBG("CSIP path %s", adapter_get_path(adapter));
-> +
-> +       bt_csip_add_db(btd_gatt_database_get_db(database));
-> +
-> +       return 0;
-> +}
-> +
-> +static void csip_server_remove(struct btd_profile *p,
-> +                                       struct btd_adapter *adapter)
-> +{
-> +       DBG("CSIP remove Adapter");
-> +}
-> +
-> +static int csip_accept(struct btd_service *service)
-> +{
-> +       struct btd_device *device = btd_service_get_device(service);
-> +       struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-> +       struct csip_data *data = btd_service_get_user_data(service);
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       if (!data) {
-> +               error("CSIP service not handled by profile");
-> +               return -EINVAL;
-> +       }
-> +
-> +       if (!bt_csip_attach(data->csip, client)) {
-> +               error("CSIP unable to attach");
-> +               return -EINVAL;
-> +       }
-> +
-> +       btd_service_connecting_complete(service, 0);
-> +
-> +       return 0;
-> +}
-> +
-> +static int csip_probe(struct btd_service *service)
-> +{
-> +       struct btd_device *device = btd_service_get_device(service);
-> +       struct btd_adapter *adapter = device_get_adapter(device);
-> +       struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-> +       struct csip_data *data = btd_service_get_user_data(service);
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       /* Ignore, if we were probed for this device already */
-> +       if (data) {
-> +               error("Profile probed twice for the same device!");
-> +               return -EINVAL;
-> +       }
-> +
-> +       data = csip_data_new(device);
-> +       data->service = service;
-> +
-> +       data->csip = bt_csip_new(btd_gatt_database_get_db(database),
-> +                                       btd_device_get_gatt_db(device));
-> +       if (!data->csip) {
-> +               error("Unable to create CSIP instance");
-> +               free(data);
-> +               return -EINVAL;
-> +       }
-> +
-> +       csip_data_add(data);
-> +
-> +       bt_csip_set_user_data(data->csip, service);
-> +
-> +       return 0;
-> +}
-> +
-> +static void csip_remove(struct btd_service *service)
-> +{
-> +       struct btd_device *device = btd_service_get_device(service);
-> +       struct csip_data *data;
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       data = btd_service_get_user_data(service);
-> +       if (!data) {
-> +               error("CSIP service not handled by profile");
-> +               return;
-> +       }
-> +
-> +       csip_data_remove(data);
-> +}
-> +
-> +static struct btd_profile csip_profile = {
-> +       .name           = "csip",
-> +       .priority       = BTD_PROFILE_PRIORITY_MEDIUM,
-> +       .remote_uuid    = CSIS_UUID_STR,
-> +
-> +       .device_probe   = csip_probe,
-> +       .device_remove  = csip_remove,
-> +
-> +       .accept         = csip_accept,
-> +       .disconnect     = csip_disconnect,
-> +
-> +       .adapter_probe  = csip_server_probe,
-> +       .adapter_remove = csip_server_remove,
-> +};
-> +
-> +static unsigned int csip_id;
-> +
-> +static int csip_init(void)
-> +{
-> +       if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-> +               warn("D-Bus experimental not enabled");
-> +               return -ENOTSUP;
-> +       }
-> +
-> +       btd_profile_register(&csip_profile);
-> +       csip_id = bt_csip_register(csip_attached, csip_detached, NULL);
-> +
-> +       return 0;
-> +}
-> +
-> +static void csip_exit(void)
-> +{
-> +       if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
-> +               btd_profile_unregister(&csip_profile);
-> +               bt_csip_unregister(csip_id);
-> +       }
-> +}
-> +
-> +BLUETOOTH_PLUGIN_DEFINE(csip, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-> +                                               csip_init, csip_exit)
 > --
 > 2.25.1
+>
 
-This seems to be handling just the discovery of the CSIS, which is
-fine for now, but we probably need a way to expose the SIRK to the
-daemon core which can then expose via D-Bus, or perhaps you have
-something like that already on the works? I was thinking on something
-like the following:
-
-https://gist.github.com/Vudentz/55a7982b82c7a1156619b2a653969cac
-
-I think as the object path we may need to use the SIRK or something
-that uniquely identifies the set.
 
 -- 
 Luiz Augusto von Dentz
