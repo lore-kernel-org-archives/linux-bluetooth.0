@@ -2,81 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B30B3C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 08:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50681C43219
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 08:32:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232154AbiKVIAT (ORCPT
+        id S232831AbiKVIb6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 03:00:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39784 "EHLO
+        Tue, 22 Nov 2022 03:31:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbiKVIAP (ORCPT
+        with ESMTP id S232801AbiKVIbf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 03:00:15 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5372214D11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 00:00:13 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 22 Nov 2022 03:31:35 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B3C41988;
+        Tue, 22 Nov 2022 00:31:22 -0800 (PST)
+Received: from [192.168.0.2] (ip5f5aee3b.dynamic.kabel-deutschland.de [95.90.238.59])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F0126B818E4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 08:00:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A137C43158
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 08:00:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669104010;
-        bh=TfLmS0NBAx6iJ4RWZCVpRslhy6/URnVjudTPGyhbL+Y=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=M4C0PzmMdewYZsBGAZmHMSEIJPobwx5nwRQuwp+3gakHswdD3P3YVCipydowJQG8I
-         WKBNjKceM4xkEyhQ7Ni/4w7Hg1DBdHaPS7Xxb5LrGbDIFqAP2huf5K3dgN7QuuLjXC
-         sGcM2AvXC/27hn0158hr0HTSf68d0BNDutC3Zyi++cwfBZQKW1CmkvbJTBspp+J3be
-         BaFQ/NCm7b2ZQ8lm0zBKERZ6gXc8qBR7gyoVBAXJePOZt/NirqQXBNYbaAQM5spkqE
-         wS8yeWAwaYNffEVoA1X3fxJvW67A1jV6FxoX9BYFsrcbulAqu9e3INnLp9ym9E5a+2
-         cjAVFqTOKivMw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 8D4B1C433E6; Tue, 22 Nov 2022 08:00:10 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Tue, 22 Nov 2022 08:00:07 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: swyterzone@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-bEco28QDv7@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0E50161EA1932;
+        Tue, 22 Nov 2022 09:31:20 +0100 (CET)
+Message-ID: <29fb52c0-155b-470e-10d5-5e3b2451272d@molgen.mpg.de>
+Date:   Tue, 22 Nov 2022 09:31:19 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH -next] Bluetooth: Fix Kconfig warning for BT_HIDP
+Content-Language: en-US
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, jkosina@suse.cz, gregkh@linuxfoundation.org,
+        benjamin.tissoires@redhat.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20221122034246.24408-1-yuehaibing@huawei.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20221122034246.24408-1-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+Dear YueHaibing,
 
---- Comment #259 from Swyter (swyterzone@gmail.com) ---
-Seems like @JustANormalTinkererMihir was missing a digit in the copy-paste;=
- the
-correct ticket seems to be this one:
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216683
 
---=20
-You may reply to this email to add a comment.
+Thank you for your patch.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
+Am 22.11.22 um 04:42 schrieb YueHaibing:
+
+Maybe use the more specific summary below:
+
+Bluetooth: Add HID_SUPPORT dependency for BT_HIDP
+
+> commit 25621bcc8976 add HID_SUPPORT, and HID depends on it now.
+
+add*s*
+
+or
+
+Commit 25621bcc8976 ("HID: Kconfig: split HID support and hid-core 
+compilation") introduces the new Kconfig symbol HID_SUPPORT …
+
+
+Kind regards,
+
+Paul
+
+
+> Add HID_SUPPORT dependency for BT_HIDP to fix the warning:
+> 
+> WARNING: unmet direct dependencies detected for HID
+>    Depends on [n]: HID_SUPPORT [=n]
+>    Selected by [m]:
+>    - BT_HIDP [=m] && NET [=y] && BT_BREDR [=y] && INPUT [=m]
+> 
+> Fixes: 25621bcc8976 ("HID: Kconfig: split HID support and hid-core compilation")
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>   net/bluetooth/hidp/Kconfig | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hidp/Kconfig b/net/bluetooth/hidp/Kconfig
+> index 14100f341f33..6746be07e222 100644
+> --- a/net/bluetooth/hidp/Kconfig
+> +++ b/net/bluetooth/hidp/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config BT_HIDP
+>   	tristate "HIDP protocol support"
+> -	depends on BT_BREDR && INPUT
+> +	depends on BT_BREDR && INPUT && HID_SUPPORT
+>   	select HID
+>   	help
+>   	  HIDP (Human Interface Device Protocol) is a transport layer
