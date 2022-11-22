@@ -2,171 +2,141 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 429B6C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 12:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E93C43219
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 12:39:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232922AbiKVMcD (ORCPT
+        id S232664AbiKVMjA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 07:32:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
+        Tue, 22 Nov 2022 07:39:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233761AbiKVMcB (ORCPT
+        with ESMTP id S232773AbiKVMis (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 07:32:01 -0500
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FFD65917C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 04:32:00 -0800 (PST)
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com [209.85.128.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 1E2E83F479
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 12:31:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1669120318;
-        bh=cy6P0DKYCsW8gS39/PQJ3z4iEtVvRmbhOaQOE/eo598=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=acDzcSD7Ddjf+KgEECeGYzYo4RQcJ7ekGCxQxc9cJLOcHGCbZ8dzlbFcy0EUsQmpF
-         Z2GWIJ+/123aBdHRBe7ozTT6byyx03drgABuI9tsL+01gqOmleD4j9+4urDLFY9K14
-         oT1qk224al8V9+mY+yK3/fKRDbe56lvb4w73J4wf0FaFIsKEH3oEj8BfukrL7WUjvc
-         i+p/Vzy/DeKFqMm8nsBxMoMSC+5VUvvSP0d3cXCBVPbBnMI5QazMJ4bYdyo5xeb4Mn
-         +sDdDPV8xQS76Sv4fbi27behNDDWkeu/AIbGLAC+0BmAwtYIn+gKZDRK551WedWiqr
-         arESDqrNgAaXg==
-Received: by mail-wm1-f70.google.com with SMTP id m34-20020a05600c3b2200b003cf549cb32bso10937021wms.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 04:31:58 -0800 (PST)
+        Tue, 22 Nov 2022 07:38:48 -0500
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17BE61F61C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 04:38:47 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id w4so9174654qts.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 04:38:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7J36dJHcV3GMiHzwEQ2uHdj4lQVOd14sHgkM//TcrPA=;
+        b=GTzsYXKmMcUJNmYABH9UtzO7/7tubelUvHlDN+LfMq8tmf/BarOoeLoasnhZO8FYW1
+         eUM/qbxTpfXPFUnelb1Yqf4Ss1gspSbEAIjH3lVHgzAsuSw6Ft0H03+yd4b60UoSABnU
+         Sb2qaEQtWJ1AzQ0pS63G8mufHbmFAF0HSIdnTMqF8/GDiPzoZJ1+qpzqiE8p7jdtx4CL
+         i1mhyJSsaZTLV4MNpZ8XrB1spnwMevZhmnF0HyTv5CKmyQmqy0UtAdIqa+BJGVxmJNuS
+         DQUEjjpeqec7qUelP1rIHjKj1aOcMSU5gcIOTEKpoqkkLUgeLa9krpsKIzwMSKKDr47K
+         lTkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cy6P0DKYCsW8gS39/PQJ3z4iEtVvRmbhOaQOE/eo598=;
-        b=bWyachgM1vlEF4oGNQ4XOCnd1RRWypH6H0D131sXoBiW/oKeqLxIBxk/fb3oNdrIvu
-         wYnoBnqq/IurzBKShv71bHq4ws6tHhEPOy+Jp2A14pG8joavKbMWEwlGngiSyZyInjm4
-         DcDufG95iDi2VRpNHeJd46D3SsN4l4OTUqWgzzrHXqycoLQ+I+vEBKoMBhua9H07qg0g
-         G14yfvjusueVFl3lnTGrSb42DQkqQfMdHR5beKaB0OhkRq/fauUHfcFC1xcQGFeAoNpH
-         +pd9tkoZ5lXJNGQUcQYDjMUm9Ap4MoDJSrf8CfezDI1kkXrHYU4WZdT0X2k/Xv+pfBCk
-         rswA==
-X-Gm-Message-State: ANoB5ploCmqKKlsl9KYjXe/4Yu7d1xbYiGtsM2+zeVZiMoYgGgS9VT+t
-        QRl3RVzfg7dswmh7nMRZIFfnQi7m43kRG1srS6+JXQR1PyrAQnSk2xhYkc7a+r04Fj+mU68IoZJ
-        hwmBP6Yf7tiRoz7KrfzrRmZRJX5P43K91qrDSk+bGpx0FPW8YdKRY3UDK6UtGAA==
-X-Received: by 2002:a05:600c:1d12:b0:3cf:8441:4a7c with SMTP id l18-20020a05600c1d1200b003cf84414a7cmr20066042wms.0.1669120317641;
-        Tue, 22 Nov 2022 04:31:57 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf72kPCRsfegXgNVFwZxPIV7WPirSuakl5+M57Sd3IIBXKPC9S7rsbuDbnxmwf4h3n9YGReLhuAy8ffmWSe1Qgg=
-X-Received: by 2002:a05:600c:1d12:b0:3cf:8441:4a7c with SMTP id
- l18-20020a05600c1d1200b003cf84414a7cmr20066028wms.0.1669120317389; Tue, 22
- Nov 2022 04:31:57 -0800 (PST)
+        bh=7J36dJHcV3GMiHzwEQ2uHdj4lQVOd14sHgkM//TcrPA=;
+        b=YLmroW8uLyuLF5HYuA97JDxC5Zd/D+saRGOIbbNxvmKcLp94DI1V+gUCbEf6zsc/VL
+         TSljPBdCrDsqsck94XnbM05O7/7cFc3ESpMjXqlqFV5h0vuZE80vqYaFPPykXCpMHdml
+         PM4j2BCSQ/FQ1Ik8ImoWF0wrrhhPUkj792o6xOLUfnfgDzreBjaN6QL54gRoh/dHhmWY
+         MSkFwKEB8kMR2QhpftM0T22H5V31N9Ce6+WlecZ6XoRNv5w2/yuwvvRJxxFtl9fpUNAm
+         HadI1Av3SQuHmSSdG70e4oOH60A9LrGbpxQHCNmDAMVZ4c0T+zArWda749txz9cvnP5r
+         AXQg==
+X-Gm-Message-State: ANoB5pnr7ZHmlNvU+kesQCPa0R/qlc+pnZgCvohyAQOQ7SnWBzKM33ye
+        0D3cieOl4D0IFqQ7kQYXgHj+/B1DS2dD2Q==
+X-Google-Smtp-Source: AA0mqf7ibYin4a+S5ofwu9ru05fPbPCNMp227baMb/eo6PhRNwhdc4osQnNk3+DdymK/iFsvfxzysQ==
+X-Received: by 2002:ac8:53da:0:b0:3a5:c1e:d8b with SMTP id c26-20020ac853da000000b003a50c1e0d8bmr21077101qtq.537.1669120725989;
+        Tue, 22 Nov 2022 04:38:45 -0800 (PST)
+Received: from [172.17.0.2] ([4.246.211.90])
+        by smtp.gmail.com with ESMTPSA id j11-20020a05620a410b00b006bba46e5eeasm10221076qko.37.2022.11.22.04.38.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Nov 2022 04:38:45 -0800 (PST)
+Message-ID: <637cc2d5.050a0220.73ca7.2ec4@mx.google.com>
+Date:   Tue, 22 Nov 2022 04:38:45 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2093944013392759411=="
 MIME-Version: 1.0
-References: <20221121145125.1303097-1-dimitri.ledkov@canonical.com> <1398b5489da6884d86245e4a6442575e85bf2d73.camel@linux.intel.com>
-In-Reply-To: <1398b5489da6884d86245e4a6442575e85bf2d73.camel@linux.intel.com>
-From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Date:   Tue, 22 Nov 2022 12:31:21 +0000
-Message-ID: <CADWks+aAVzCKd=5jDyD=dWdq2M_ybYNGN2iKV6B1gw3M-Hw_2Q@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: btintel: Correctly declare all module
- firmware files
-To:     Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
+Subject: RE: Csip - Client role
+In-Reply-To: <20221122101232.45320-2-sathish.narasimman@intel.com>
+References: <20221122101232.45320-2-sathish.narasimman@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 21 Nov 2022 at 23:44, Tedd Ho-Jeong An <tedd.an@linux.intel.com> wrote:
->
-> Hi Dimitri,
->
-> On Mon, 2022-11-21 at 14:51 +0000, Dimitri John Ledkov wrote:
-> > Strictly encode patterns of supported hw_variants of firmware files
-> > the kernel driver supports requesting. This now includes many missing
-> > and previously undeclared module firmware files for 0x07, 0x08,
-> > 0x11-0x14, 0x17-0x1b hw_variants.
-> >
-> > This especially affects environments that only install firmware files
-> > declared and referenced by the kernel modules. In such environments,
-> > only the declared firmware files are copied resulting in most Intel
-> > Bluetooth devices not working. I.e. host-only dracut-install initrds,
-> > or Ubuntu Core kernel snaps.
-> >
-> > BugLink: https://bugs.launchpad.net/bugs/1970819
-> > Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> > ---
-> >  Changes since v3:
-> >  - Hopefully pacify trailing whitespace from GitLint in this optional
-> >    portion of the commit.
-> >
-> >  Changes since v2:
-> >  - encode patterns for 0x17 0x18 0x19 0x1b hw_variants
-> >  - rebase on top of latest rc tag
-> >
-> >  Changes since v1:
-> >  - encode strict patterns of supported firmware files for each of the
-> >    supported hw_variant generations.
-> >
-> >  drivers/bluetooth/btintel.c | 26 ++++++++++++++++++++++----
-> >  1 file changed, 22 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> > index a657e9a3e96a..55efc4a067db 100644
-> > --- a/drivers/bluetooth/btintel.c
-> > +++ b/drivers/bluetooth/btintel.c
-> > @@ -2656,7 +2656,25 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-> >  MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
-> >  MODULE_VERSION(VERSION);
-> >  MODULE_LICENSE("GPL");
-> > -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
-> > -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
-> > -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
-> > -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
-> > +/* hw_variant 0x07 0x08 */
-> > +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
-> > +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
-> > +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
-> > +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
-> > +/* hw_variant 0x0b 0x0c */
-> > +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
-> > +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
-> > +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
-> > +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
-> > +/* hw_variant 0x11 0x12 0x13 0x14 */
-> > +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
-> > +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
-> > +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
-> > +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
-> > +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
-> > +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
-> > +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
-> > +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
->
-> There are firmware files for hw_variant 0x11 and 0x12 in an old format like
-> ibt-17-*.sfi, ibt-17-*.ddc, ibt-18-*.sfi, and ibt-18-*.ddc.
->
+--===============2093944013392759411==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I believe 0x11 and 0x12 variants have stopped using the ibt-17-*.sfi,
-ibt-17-*.ddc, ibt-18-*.sfi, and ibt-18-*.ddc patterns in
-af3715e5cef8 ("Bluetooth: btusb: Update firmware filename for Intel
-9x60 and later")
-Which was shipped in v4.15. As long as I mark this patch for stable
-v4.15+ this is documenting the firmware file the current driver can
-request.
-Distributions/deployments that use this current version of the driver
-should not ship  unused ibt-17-*.sfi, ibt-17-*.ddc, ibt-18-*.sfi, and
-ibt-18-*.ddc files anymore.
+This is automated email and please do not reply to this email!
 
-> > +/* hw_variant 0x17 0x18 0x19 0x1b, read and use cnvi/cnvr */
-> > +MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].sfi");
-> > +MODULE_FIRMWARE("ibt-[0-9][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9].ddc");
->
-> I believe these are under intel/ folder.
->
+Dear submitter,
 
-Yes!
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=698015
 
-Will fix this up.
+---Test result---
 
--- 
-okurrr,
+Test Summary:
+CheckPatch                    FAIL      5.01 seconds
+GitLint                       PASS      2.58 seconds
+BuildEll                      PASS      32.32 seconds
+BluezMake                     PASS      986.05 seconds
+MakeCheck                     PASS      12.80 seconds
+MakeDistcheck                 PASS      174.43 seconds
+CheckValgrind                 PASS      290.29 seconds
+bluezmakeextell               PASS      114.13 seconds
+IncrementalBuild              PASS      5622.11 seconds
+ScanBuild                     PASS      1194.14 seconds
 
-Dimitri
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v3,3/7] main.conf: Add CSIP profile configurable options
+WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
+#119: FILE: src/main.c:152:
++static const char *csip_options[] = {
+
+/github/workspace/src/src/13052136.patch total: 0 errors, 1 warnings, 199 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13052136.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v3,4/7] shared/csip: Add initial code for handling CSIP
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#668: FILE: src/shared/csip.h:16:
++#define __packed __attribute__((packed))
+
+/github/workspace/src/src/13052137.patch total: 0 errors, 1 warnings, 605 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13052137.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2093944013392759411==--
