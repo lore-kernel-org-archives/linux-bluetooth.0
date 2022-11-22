@@ -2,131 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96474C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 09:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB70C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 09:32:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233241AbiKVJSl (ORCPT
+        id S232672AbiKVJcw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 04:18:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52400 "EHLO
+        Tue, 22 Nov 2022 04:32:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233352AbiKVJSP (ORCPT
+        with ESMTP id S232525AbiKVJcu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 04:18:15 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C2E43AEA;
-        Tue, 22 Nov 2022 01:18:13 -0800 (PST)
-Received: from canpemm500007.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NGdvW4mv2zRpTQ;
-        Tue, 22 Nov 2022 17:17:43 +0800 (CST)
-Received: from [10.174.179.215] (10.174.179.215) by
- canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Tue, 22 Nov 2022 17:18:11 +0800
-Subject: Re: [PATCH -next] Bluetooth: Fix Kconfig warning for BT_HIDP
-To:     Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>
-CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <jkosina@suse.cz>, <gregkh@linuxfoundation.org>,
-        <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20221122034246.24408-1-yuehaibing@huawei.com>
- <29fb52c0-155b-470e-10d5-5e3b2451272d@molgen.mpg.de>
- <CAO-hwJKraiox13k=ukXOhSNt9sTc6Q0KpGR5=AHDknZeR6omwA@mail.gmail.com>
-From:   YueHaibing <yuehaibing@huawei.com>
-Message-ID: <ee09680a-899c-96c8-778d-0af04d6d59ee@huawei.com>
-Date:   Tue, 22 Nov 2022 17:18:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        Tue, 22 Nov 2022 04:32:50 -0500
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F66EF12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 01:32:49 -0800 (PST)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-14279410bf4so14843898fac.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 01:32:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XI+MWaXZ2KKgddnpv1U5j919ElL5C8ysR3ABeL9wfPA=;
+        b=MC7Cr1QQ0szNwEeWxSKEJqZjJadz9V25dA/FpHnchR3WpE++Rt6DsjRT99DcuqFloo
+         mZov7+Fp5c4CiXnwyKBi6rSAdeLhK4NFR62jhMGGXvfwOf1qUuF6zrovWzhyGcYqPuio
+         wc4ECYMq7ptV1YyPKMKZbTZ9ct98EaeemUmiifwNfcSYFH3vYFlNFfhY8dLSTY61LdBc
+         5xO+QPo3bgWKJTbfPlLBsbJAr5QzAaV9IfGAnI1RPisa+3rUMArpLeCZfDh/0Wm7EpKd
+         TFEMumfkxK+8/fivAPmCwrYjQjj2gJ7PDnrQREPVj7gN5JW2IdBlI0f1raZesz7BGvv/
+         GLkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XI+MWaXZ2KKgddnpv1U5j919ElL5C8ysR3ABeL9wfPA=;
+        b=krTj4zi4/1c/XiMXGR8iniDMdMoUOE5JTH/njsP0Piv1yXoNP7rBoRydt6uWKTQdfT
+         UrooIbfi3hqW9kfsNsq8jQulEbQvPZMprlaT3ew41YBxuKLm7RzoL13h5YuEREs1BPRG
+         KDG9Nr3DlejyW+72eCoBkN+bUgp5eHfumgOyVbLhedd2i5qIabIXJw+6zUmU2mAbCbMH
+         zyTSrArT6azm11XbTOJQEPo8CYA/Go96AqtTGZ9tSY+WfCy1zF3tUUoCZIderily/zxV
+         pTw+vk/7gSYrH94Gc4lJQE4HRTldNAFRriivOR+FLW33+DjwkZ0bXJq6hFzYIND1jFOT
+         8e3Q==
+X-Gm-Message-State: ANoB5pk9PbJpblyXJDE3ywHKvnHgjhkHduLamyFOOkATrRwmat6ubJ87
+        3zDNY+UFENBq64OIbcqW/JmmR06puDU=
+X-Google-Smtp-Source: AA0mqf7gJRPLCo0QfkP8yKPpLhTNXNL/BFZ+mkM6KkGB7vQFTNRI+ZCgQBqVNnfWJmQqELiEvlzVig==
+X-Received: by 2002:a05:6870:eaaa:b0:142:8a73:958b with SMTP id s42-20020a056870eaaa00b001428a73958bmr9780776oap.75.1669109568490;
+        Tue, 22 Nov 2022 01:32:48 -0800 (PST)
+Received: from [172.17.0.2] ([20.225.215.46])
+        by smtp.gmail.com with ESMTPSA id 123-20020aca0781000000b00349a06c581fsm5194392oih.3.2022.11.22.01.32.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Nov 2022 01:32:48 -0800 (PST)
+Message-ID: <637c9740.ca0a0220.5e447.39aa@mx.google.com>
+Date:   Tue, 22 Nov 2022 01:32:48 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1779281326438329356=="
 MIME-Version: 1.0
-In-Reply-To: <CAO-hwJKraiox13k=ukXOhSNt9sTc6Q0KpGR5=AHDknZeR6omwA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- canpemm500007.china.huawei.com (7.192.104.62)
-X-CFilter-Loop: Reflected
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v3,1/2] Bluetooth: Remove codec id field in vendor codec definition
+In-Reply-To: <20221122090257.26564-1-kiran.k@intel.com>
+References: <20221122090257.26564-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--===============1779281326438329356==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 2022/11/22 17:06, Benjamin Tissoires wrote:
-> Hi,
-> 
-> On Tue, Nov 22, 2022 at 9:37 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
->>
->> Dear YueHaibing,
->>
->>
->> Thank you for your patch.
->>
->>
->> Am 22.11.22 um 04:42 schrieb YueHaibing:
->>
->> Maybe use the more specific summary below:
->>
->> Bluetooth: Add HID_SUPPORT dependency for BT_HIDP
->>
->>> commit 25621bcc8976 add HID_SUPPORT, and HID depends on it now.
->>
->> add*s*
->>
->> or
->>
->> Commit 25621bcc8976 ("HID: Kconfig: split HID support and hid-core
->> compilation") introduces the new Kconfig symbol HID_SUPPORT …
->>
->>
->> Kind regards,
->>
->> Paul
->>
->>
->>> Add HID_SUPPORT dependency for BT_HIDP to fix the warning:
->>>
->>> WARNING: unmet direct dependencies detected for HID
->>>    Depends on [n]: HID_SUPPORT [=n]
->>>    Selected by [m]:
->>>    - BT_HIDP [=m] && NET [=y] && BT_BREDR [=y] && INPUT [=m]
->>>
->>> Fixes: 25621bcc8976 ("HID: Kconfig: split HID support and hid-core compilation")
->>> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
->>> ---
-> 
-> 
-> FWIW, a fix is already in -next:
-> https://git.kernel.org/pub/scm/linux/kernel/git/hid/hid.git/commit/?h=for-6.2/hid-bpf&id=6cc90ccd4f6cfed98e2a3a378debc69f28d57473
+This is automated email and please do not reply to this email!
 
-OK, thanks for your info.
+Dear submitter,
 
-> 
->  But thanks for the patch nonetheless!
-> 
-> Cheers,
-> Benjamin
-> 
->>
->>>   net/bluetooth/hidp/Kconfig | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/net/bluetooth/hidp/Kconfig b/net/bluetooth/hidp/Kconfig
->>> index 14100f341f33..6746be07e222 100644
->>> --- a/net/bluetooth/hidp/Kconfig
->>> +++ b/net/bluetooth/hidp/Kconfig
->>> @@ -1,7 +1,7 @@
->>>   # SPDX-License-Identifier: GPL-2.0-only
->>>   config BT_HIDP
->>>       tristate "HIDP protocol support"
->>> -     depends on BT_BREDR && INPUT
->>> +     depends on BT_BREDR && INPUT && HID_SUPPORT
->>>       select HID
->>>       help
->>>         HIDP (Human Interface Device Protocol) is a transport layer
->>
-> 
-> .
-> 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=697980
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.36 seconds
+GitLint                       PASS      0.57 seconds
+SubjectPrefix                 PASS      0.19 seconds
+BuildKernel                   PASS      36.61 seconds
+BuildKernel32                 PASS      32.50 seconds
+TestRunnerSetup               PASS      457.29 seconds
+TestRunner_l2cap-tester       PASS      17.07 seconds
+TestRunner_iso-tester         PASS      16.82 seconds
+TestRunner_bnep-tester        PASS      5.68 seconds
+TestRunner_mgmt-tester        PASS      115.63 seconds
+TestRunner_rfcomm-tester      PASS      10.54 seconds
+TestRunner_sco-tester         PASS      9.60 seconds
+TestRunner_ioctl-tester       PASS      11.14 seconds
+TestRunner_mesh-tester        PASS      7.59 seconds
+TestRunner_smp-tester         PASS      9.83 seconds
+TestRunner_userchan-tester    PASS      6.64 seconds
+IncrementalBuild              PASS      44.26 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1779281326438329356==--
