@@ -2,64 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA655C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 10:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8314CC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 10:10:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232394AbiKVKBH (ORCPT
+        id S232923AbiKVKKx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 05:01:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59258 "EHLO
+        Tue, 22 Nov 2022 05:10:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231998AbiKVKBF (ORCPT
+        with ESMTP id S232372AbiKVKKu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 05:01:05 -0500
-X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 22 Nov 2022 02:01:03 PST
-Received: from mail.axisfairfi.com (mail.axisfairfi.com [94.177.230.134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E99C1C90C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 02:01:03 -0800 (PST)
-Received: by mail.axisfairfi.com (Postfix, from userid 1001)
-        id D9DB182459; Tue, 22 Nov 2022 09:05:21 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=axisfairfi.com;
-        s=mail; t=1669107921;
-        bh=0BgaW9t8GFER5QecxVkFsHrVi3gO/4V5KAZgJaiRYBs=;
-        h=Date:From:To:Subject:From;
-        b=OBQxgG5XPiyG3s9MLGSwCeFt4ULIQptXt2mr1EjBwodBGqxnsDSmkoNnQkmggPgX2
-         Q7E3uvRbxc4p7FFJDl+jCm+HGmCFkeKubTFrVFggeXOaRMBydXfJeIGed3qj5001/a
-         4tojf8Gy70yEr/RzJtR0n2gzhyrY+BxUCSGEXVsjICvL7qnqvLPHN+ZhtOZzQqsCH2
-         +/yn7z/3BYF2gfibAbbArikghNy1+9NlnZvOGb6N31v2vyTupMkLsVG6dkX8DBZEHG
-         F5S/Yj/XZbOshGZxKeqy87NzaUmJpxJ7HbS4GrbP+7dxc+bJLr9d4viMDm0GV6RgQR
-         poOXGf3a7Fn3w==
-Received: by mail.axisfairfi.com for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 09:05:14 GMT
-Message-ID: <20221122074500-0.1.d.nrk.0.fp1masmz44@axisfairfi.com>
-Date:   Tue, 22 Nov 2022 09:05:14 GMT
-From:   "Zbynek Spacek" <zbynek.spacek@axisfairfi.com>
-To:     <linux-bluetooth@vger.kernel.org>
-Subject: Silikonmischungen
-X-Mailer: mail.axisfairfi.com
+        Tue, 22 Nov 2022 05:10:50 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898D553EE1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 02:10:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1669111848; x=1700647848;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=JBZpnua/8DqZ73tVLUeRtSCjqc6C0VrbUO9cyeMoA/4=;
+  b=W8yP4FFdW2f5O2QwSvFH3Htc5PvUfWvLuCZp9o4Zo2MlyZfAx21rKaBq
+   E1x825khUO3snXHNj4VX/sVRC5gj6kBwMyT06eQSfIPNm7gkBLnM4vQPC
+   inlCCTxPm0PE3wOAfMqKjB1fVKTysq7lHECyYGAMmxa1b9nixzHRU3Eip
+   OcRDiQgj6eK0EAtDyRmVgYTuQgbdSPIIoX4OEvfcA/kiHNV1iUNOmKpv8
+   VGBkIAbvnCHeFf+NYYgJ7ehIfJ7oHbhm+7b+qQctDCbCYHY4E2+9SUjXO
+   lIkx8a+4hbSd8Mq4dp+JoafEeSYM/f69nECX1ptT9iZWyPiDZLy8LWnCV
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="378039340"
+X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
+   d="scan'208";a="378039340"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 02:10:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="672431875"
+X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
+   d="scan'208";a="672431875"
+Received: from intel-latitude-e5450.iind.intel.com ([10.224.186.32])
+  by orsmga008.jf.intel.com with ESMTP; 22 Nov 2022 02:10:47 -0800
+From:   Sathish Narasimman <sathish.narasimman@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ v3 1/7] shared/util: Update UUID database for Csip services
+Date:   Tue, 22 Nov 2022 15:42:26 +0530
+Message-Id: <20221122101232.45320-2-sathish.narasimman@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221122101232.45320-1-sathish.narasimman@intel.com>
+References: <20221122101232.45320-1-sathish.narasimman@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Good morning,
+This updates UUID database with the values from assigned numbers for
+co-ordinated set identification services.
+---
+ src/shared/util.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-do you need intermediates for processing, plastics (e.g. rubber) or silic=
-one mixtures?
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 333023e0dcac..d7fbd2322f7b 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -695,6 +695,9 @@ static const struct {
+ 	{ 0x2b82, "Volume Offset Control Point"			},
+ 	{ 0x2b83, "Audio Output Description"			},
+ 	{ 0x2b84, "Set Identity Resolving Key"			},
++	{ 0x2b85, "Csis Size"					},
++	{ 0x2b86, "Csis Lock"					},
++	{ 0x2b87, "Csis Rank"					},
+ 	{ 0x2b93, "Media Player Name"				},
+ 	{ 0x2b94, "Media Player Icon Object ID"			},
+ 	{ 0x2b95, "Media Player Icon URL"			},
+-- 
+2.25.1
 
-We provide a wide range of silicone rubbers with various properties, sili=
-cone mixtures from renowned manufacturers such as Wacker, Elastosil LR an=
-d dyes, stabilizers, primers and anti-adhesive additives.
-
-We also produce technical silicone compounds with increased resistance to=
- oils, resistant to high temperatures and water vapor, conductive and man=
-y more.
-
-We provide fast order fulfillment, timely deliveries and cost optimizatio=
-n.
-
-Can I introduce what we can offer you?
-
-
-Zbynek Spacek
