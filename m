@@ -2,165 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 151F8C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 08:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37187C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 09:06:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232575AbiKVIxe (ORCPT
+        id S233083AbiKVJGP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 03:53:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54766 "EHLO
+        Tue, 22 Nov 2022 04:06:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232102AbiKVIxc (ORCPT
+        with ESMTP id S233076AbiKVJGN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 03:53:32 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C626312
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 00:53:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669107211; x=1700643211;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=VdNSJ4+DvnIiQ5O3FAm82fPJcD7pWNhA55fS3VLRpHI=;
-  b=eQzW2jaVC5xwTUa5CQFfmOrER1FvBRF3lT/OmBOI7tW9cvLJfyiFtlEk
-   Lz4N70WzFxVsIBgqV1KUPuv4pEuwe6m7AUorgixbnSIONmEj7veGq/GlG
-   bvrEHDrFjEBPbVmq0KNPZzfWtIH6MLLi7L6LsLxG5iWW+3u68jD442FrX
-   Eqmwe0sBffmRQgtWAvva4bJhpQazjN27/h3XiNTaufigAeQzm/w37bVXN
-   tteO6Cx9wfSykFoJbOL2K8uYByDTcmdUt+7BbCtqKE2UbodujTuaAp6mV
-   rCfyMON3419UZ79opZYbhNm3QMUFb7sqN1Ep1SSMq20oqnEgLFp3k+zIz
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="340635758"
-X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
-   d="scan'208";a="340635758"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 00:53:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10538"; a="816029138"
-X-IronPort-AV: E=Sophos;i="5.96,183,1665471600"; 
-   d="scan'208";a="816029138"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga005.jf.intel.com with ESMTP; 22 Nov 2022 00:53:29 -0800
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v3 2/2] Bluetooth: Fix support for Read Local Supported Codecs V2
-Date:   Tue, 22 Nov 2022 14:32:57 +0530
-Message-Id: <20221122090257.26564-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20221122090257.26564-1-kiran.k@intel.com>
-References: <20221122090257.26564-1-kiran.k@intel.com>
+        Tue, 22 Nov 2022 04:06:13 -0500
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2765018E01;
+        Tue, 22 Nov 2022 01:06:12 -0800 (PST)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4NGdZR21JWzJnnW;
+        Tue, 22 Nov 2022 17:02:55 +0800 (CST)
+Received: from [10.174.179.215] (10.174.179.215) by
+ canpemm500007.china.huawei.com (7.192.104.62) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Tue, 22 Nov 2022 17:06:09 +0800
+Subject: Re: [PATCH -next] Bluetooth: Fix Kconfig warning for BT_HIDP
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <jkosina@suse.cz>, <gregkh@linuxfoundation.org>,
+        <benjamin.tissoires@redhat.com>, <linux-bluetooth@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20221122034246.24408-1-yuehaibing@huawei.com>
+ <29fb52c0-155b-470e-10d5-5e3b2451272d@molgen.mpg.de>
+From:   YueHaibing <yuehaibing@huawei.com>
+Message-ID: <aa9f5313-df1f-bc9c-8fee-ed8b77099e17@huawei.com>
+Date:   Tue, 22 Nov 2022 17:06:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
+MIME-Version: 1.0
+In-Reply-To: <29fb52c0-155b-470e-10d5-5e3b2451272d@molgen.mpg.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
 
-Handling of Read Local Supported Codecs was broken during the
-HCI serialization design change patches.
+On 2022/11/22 16:31, Paul Menzel wrote:
+> Dear YueHaibing,
+> 
+> 
+> Thank you for your patch.
+> 
+> 
+> Am 22.11.22 um 04:42 schrieb YueHaibing:
+> 
+> Maybe use the more specific summary below:
+> 
+> Bluetooth: Add HID_SUPPORT dependency for BT_HIDP
+> 
+>> commit 25621bcc8976 add HID_SUPPORT, and HID depends on it now.
+> 
+> add*s*
+> 
+> or
+> 
+> Commit 25621bcc8976 ("HID: Kconfig: split HID support and hid-core compilation") introduces the new Kconfig symbol HID_SUPPORT …
+> 
+> 
 
-Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
-changes in v3:
-No change
+Thanks for your review, v2 is on the way.
 
-changes in v2:
-Fix typo in commit message
-
- net/bluetooth/hci_codec.c | 19 ++++++++++---------
- net/bluetooth/hci_sync.c  | 10 ++++++----
- 2 files changed, 16 insertions(+), 13 deletions(-)
-
-diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
-index 38201532f58e..3cc135bb1d30 100644
---- a/net/bluetooth/hci_codec.c
-+++ b/net/bluetooth/hci_codec.c
-@@ -72,9 +72,8 @@ static void hci_read_codec_capabilities(struct hci_dev *hdev, __u8 transport,
- 				continue;
- 			}
- 
--			skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
--					     sizeof(*cmd), cmd,
--					     HCI_CMD_TIMEOUT);
-+			skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
-+						sizeof(*cmd), cmd, 0, HCI_CMD_TIMEOUT, NULL);
- 			if (IS_ERR(skb)) {
- 				bt_dev_err(hdev, "Failed to read codec capabilities (%ld)",
- 					   PTR_ERR(skb));
-@@ -127,8 +126,8 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- 	struct hci_op_read_local_codec_caps caps;
- 	__u8 i;
- 
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
--			     HCI_CMD_TIMEOUT);
-+	skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
-+				0, HCI_CMD_TIMEOUT, NULL);
- 
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
-@@ -158,7 +157,8 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- 	for (i = 0; i < std_codecs->num; i++) {
- 		caps.id = std_codecs->codec[i];
- 		caps.direction = 0x00;
--		hci_read_codec_capabilities(hdev, LOCAL_CODEC_ACL_MASK, &caps);
-+		hci_read_codec_capabilities(hdev,
-+					    LOCAL_CODEC_ACL_MASK | LOCAL_CODEC_SCO_MASK, &caps);
- 	}
- 
- 	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
-@@ -178,7 +178,8 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- 		caps.cid = vnd_codecs->codec[i].cid;
- 		caps.vid = vnd_codecs->codec[i].vid;
- 		caps.direction = 0x00;
--		hci_read_codec_capabilities(hdev, LOCAL_CODEC_ACL_MASK, &caps);
-+		hci_read_codec_capabilities(hdev,
-+					    LOCAL_CODEC_ACL_MASK | LOCAL_CODEC_SCO_MASK, &caps);
- 	}
- 
- error:
-@@ -194,8 +195,8 @@ void hci_read_supported_codecs_v2(struct hci_dev *hdev)
- 	struct hci_op_read_local_codec_caps caps;
- 	__u8 i;
- 
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
--			     HCI_CMD_TIMEOUT);
-+	skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
-+				0, HCI_CMD_TIMEOUT, NULL);
- 
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index d36d72352059..9e2d7e4b850c 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -12,6 +12,7 @@
- #include <net/bluetooth/mgmt.h>
- 
- #include "hci_request.h"
-+#include "hci_codec.h"
- #include "hci_debugfs.h"
- #include "smp.h"
- #include "eir.h"
-@@ -4257,11 +4258,12 @@ static int hci_set_event_mask_page_2_sync(struct hci_dev *hdev)
- /* Read local codec list if the HCI command is supported */
- static int hci_read_local_codecs_sync(struct hci_dev *hdev)
- {
--	if (!(hdev->commands[29] & 0x20))
--		return 0;
-+	if (hdev->commands[45] & 0x04)
-+		hci_read_supported_codecs_v2(hdev);
-+	else if (hdev->commands[29] & 0x20)
-+		hci_read_supported_codecs(hdev);
- 
--	return __hci_cmd_sync_status(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
--				     HCI_CMD_TIMEOUT);
-+	return 0;
- }
- 
- /* Read local pairing options if the HCI command is supported */
--- 
-2.17.1
-
+> Kind regards,
+> 
+> Paul
+> 
+> 
+>> Add HID_SUPPORT dependency for BT_HIDP to fix the warning:
+>>
+>> WARNING: unmet direct dependencies detected for HID
+>>    Depends on [n]: HID_SUPPORT [=n]
+>>    Selected by [m]:
+>>    - BT_HIDP [=m] && NET [=y] && BT_BREDR [=y] && INPUT [=m]
+>>
+>> Fixes: 25621bcc8976 ("HID: Kconfig: split HID support and hid-core compilation")
+>> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+>> ---
+>>   net/bluetooth/hidp/Kconfig | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/hidp/Kconfig b/net/bluetooth/hidp/Kconfig
+>> index 14100f341f33..6746be07e222 100644
+>> --- a/net/bluetooth/hidp/Kconfig
+>> +++ b/net/bluetooth/hidp/Kconfig
+>> @@ -1,7 +1,7 @@
+>>   # SPDX-License-Identifier: GPL-2.0-only
+>>   config BT_HIDP
+>>       tristate "HIDP protocol support"
+>> -    depends on BT_BREDR && INPUT
+>> +    depends on BT_BREDR && INPUT && HID_SUPPORT
+>>       select HID
+>>       help
+>>         HIDP (Human Interface Device Protocol) is a transport layer
+> 
+> .
