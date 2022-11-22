@@ -2,92 +2,141 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E743C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 10:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAD6C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 11:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232593AbiKVKrU (ORCPT
+        id S233559AbiKVL6h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 05:47:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40762 "EHLO
+        Tue, 22 Nov 2022 06:58:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232971AbiKVKqx (ORCPT
+        with ESMTP id S232838AbiKVL6a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 05:46:53 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F6D342F6A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 02:44:44 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id q9so14008481pfg.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 02:44:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3F5qZ9YyI3eYaV1FFM9JsxLecrCY1aqBRJlKPPcwvfk=;
-        b=Je9gAWmUHyspmSw72Oyu05d+jC45THAroL/hNYUCZQ2A7YRrMwNfFew5ICUnWF5PCn
-         QPywHPyj8A8tr78nyxICKLg89kpf72k5vu9P18aNKNdyTj1H0h3UaZ8IQyyTx4tc+dBb
-         gKES9SkyUgpdggL8yWm48yjrv7kU3lVlNJjs+RBSNWs+xcUBaUtd+mugcvCOMlkbzbM3
-         iCcwrPUabh5MaDAwXQnAE0tjHHGnmSU0EIgB3t7mHQEtEac3GOAIChuH98jJWQPbGz39
-         /IlP/GjBExv2H55i8nzZleT1pMTctaPlAggMGr60jpdAeqteg8HWQQF1aaCENdjmtdc/
-         lfjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3F5qZ9YyI3eYaV1FFM9JsxLecrCY1aqBRJlKPPcwvfk=;
-        b=UP1dUTq2Gp5sWFH9bp1+QtLUHMMvQ4AY1Yt/awZoGj69auJrVz6ruM0wIefXtAHFSC
-         9/Fzv2B85yrJ7c/+hA9gW57B4uwrF88iDsvkBFGHu51oTp2R+AVs1toLdgEM6+Ux3aJo
-         fH0PHX0pdWW0Sz/xSYp7VTQ6CF+9zdZdid5WUcWSjm8bN2Qrzbtf2vt3wmoAc4QPMkLK
-         6i8ZIYUEJEE2zNEm0yB5dhy20Ja98pvFpZzs6G2IUYynBIZ4WZJ7FPom6788HLzijEG7
-         apQZAES9yxowDi6n6AgN4QWKWFz4Nu9GKZ1lNQZPRounaEaLvzFzWHt0qeHMc2DPLfya
-         Bhiw==
-X-Gm-Message-State: ANoB5pl6+IZB52QZVdYUC4C5YmkpPKTt5I5oZnfB7DyZ6J3Hbi4RL6LK
-        SkKmI2EnT4nvuLPdGH5dcl/3ogOwyuU=
-X-Google-Smtp-Source: AA0mqf4SmUvhfELsbPhOPyOVzU7nBsn0Qf356Yk8BH2trtkizhUyWKPNj3UNyycH90Pjutun/kNcgA==
-X-Received: by 2002:a63:cd52:0:b0:42a:9ba8:8c6b with SMTP id a18-20020a63cd52000000b0042a9ba88c6bmr21780347pgj.407.1669113883490;
-        Tue, 22 Nov 2022 02:44:43 -0800 (PST)
-Received: from [172.17.0.2] ([20.253.180.235])
-        by smtp.gmail.com with ESMTPSA id p22-20020a17090adf9600b0020b2082e0acsm9322181pjv.0.2022.11.22.02.44.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Nov 2022 02:44:43 -0800 (PST)
-Message-ID: <637ca81b.170a0220.f5153.d2e8@mx.google.com>
-Date:   Tue, 22 Nov 2022 02:44:43 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0940747198713985333=="
+        Tue, 22 Nov 2022 06:58:30 -0500
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2079.outbound.protection.outlook.com [40.107.22.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639FC1D314;
+        Tue, 22 Nov 2022 03:58:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DqBb8lmY9FBaNJ5t+2IiNqOWLq+h49CEYfb5F3OFbH11bmzLSXpP/2fQLSRV7SzajyV1ODIzztHisGHLaXznEKaJ+hTm4IfBo0TsLPdIpHVR2zpfHQupRXHSGD5jWV3XIZWr0gFkDCRSIsryxM8eFvXkU3COSrY6L4MDrwsBl1kH+EGGdht94Ij5IgOmrFUn93V3BU//EVKGyd7CJDPt/CXD1NWKydbAN47CoiCQDahcX7PfM21iIJ8K7zi5ycYshhtWaLq3oyupS5+Qo5F6t09bVWMW7MuU4OOgGXdhEF1NMgkiYU8x8sV1K6oA05J5dxfsqh8JCu4++WKAkJyCfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m9l36Vhq3JyGMCrdSPAOC0EBoTUN5Ij3qw3mtgku6e8=;
+ b=DRHh/ZyBVqLr7vn7Xl4Ry0sGv0U3OC8qvPLeFjPNFB/1+r7VvrZXosutf5lMSkJbdidUEycNHSIdDMF0wSgFnt7mqPxfKC3dbW6A6JldNPZWPllBzP1gBKvT+Qa09g7/i3twUA1f2ANhd/in4YYeZHplFKLkQu38zopU3LvJlKYo4ia6DB0B9TCnNQxae7dMKPkBYPHVRLtNcb/JvBlIq7DBxfgTYbzgR3wCIq/R/1OmF3v27T7uaGtrPflQBkNAgIA/1L+HTPi5dIZQS0GgneY5+fHQaoVrcSnwIsYvKJnRbNSYLA6VwNe46FoIWCNglAILA0xSdeMAvu/3RUh0VQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m9l36Vhq3JyGMCrdSPAOC0EBoTUN5Ij3qw3mtgku6e8=;
+ b=EQDZACWaOk+5h6TzjA66RiT1yBRPTKSahmHfnKv3ejhHL5/l5l/cIPEDcuI5OTAx27d8sErUSEbsbI/unFJy5XQ7izQh2I4ATku2A+kqcSN7jO+7V3FGGNb0XwOm9EGKrxJMwBUTbI6Kkn4qrguiT93/Xyz7OQueTqWKGCRs+YQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
+ by VI1PR04MB6879.eurprd04.prod.outlook.com (2603:10a6:803:132::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.11; Tue, 22 Nov
+ 2022 11:58:26 +0000
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::7686:5382:16d5:c6de]) by AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::7686:5382:16d5:c6de%8]) with mapi id 15.20.5834.015; Tue, 22 Nov 2022
+ 11:58:25 +0000
+From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
+Cc:     neeraj.sanjaykale@nxp.com, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] tools: Add identifier for NXP UART BT devices
+Date:   Tue, 22 Nov 2022 17:27:56 +0530
+Message-Id: <1669118276-30278-1-git-send-email-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR02CA0011.apcprd02.prod.outlook.com
+ (2603:1096:4:194::20) To AM9PR04MB8603.eurprd04.prod.outlook.com
+ (2603:10a6:20b:43a::10)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v2,1/2] Bluetooth: Add hci_nxp to hci_uart module to support NXP BT chipsets
-In-Reply-To: <1669112583-29804-1-git-send-email-neeraj.sanjaykale@nxp.com>
-References: <1669112583-29804-1-git-send-email-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8603:EE_|VI1PR04MB6879:EE_
+X-MS-Office365-Filtering-Correlation-Id: 897a4f32-dc36-4bfd-efa6-08dacc80dc96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aCMNMYHwGJ2reQj414zs75v5OZggTRG4lbpddjvCJ/UwLd6bC73wogQglmRBPWT7tG/yg64y++3hCoern/UzU5S1NQxhD1zEwUrgkeOloMSKUtb3BM2domM7u04Xi8LDMery/uNIySdjio0p6/NXp+Y45pfeE7miT+CgcJNOdsKQ+6udUXhKTls01eBhX2rRBP6aItaDRr+IY2NyJv5KaugwXeP51df+ozY70cUak6jcqnl/1T6sZvSVsPkfR4YKbt9bGy4cNisxavBbyB2/taq+cAlodK8dR+6TSA4Vnr9ainP8y0zOm7iZFqjlftZ0tM0Tmov6qxDPRey5ZIj+W6TNkVbMS68pZopQVjV289P/ZMXzq73HhZaRgebwtPP6mboG2Lm1hiMA+IcuM5VtEQlJdwtnA71j2mUWa0qbyzlV7YbQ2ui4KZM5HPEftg7+M4qwyQXBnUljUEpnh/Uccf0szmoZPBZ3NrGmUxcj2oqUhCdhILkupBkat1aaOikM1MbEafwUs/q/YKNod0tn6JMXGLTey7r9NGrcOMeBU3EBe14LlHaa21hBxKyLXudoqZM2zdcsZjojIALsAYYYoK+r1r9pD+KESWtgSYxItJyTXcgeYAq7FwK+zU8MY+RwE7Pb0kWsIIyGHraj5LcnicEi9zUuBwd1JjizZMnZBAxWCEqTX/xQz086DPWFtzJdJkHbBPTWkXyt5Bb5kvkPEw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(396003)(346002)(136003)(376002)(39860400002)(451199015)(26005)(6506007)(6512007)(38100700002)(38350700002)(52116002)(186003)(4744005)(55236004)(66476007)(2616005)(2906002)(5660300002)(66946007)(478600001)(4326008)(41300700001)(316002)(8676002)(6636002)(6486002)(66556008)(8936002)(6666004)(36756003)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mmCwPssDwac/mYQccDrwXOEY1yT2kjxr7keqKQHCHTm02+FXyQ944A82TpHQ?=
+ =?us-ascii?Q?9yLlO8cx+x1s59HFYqNvYR1GrtinoPqjGP/SFMUbA2XbZwNw01rb6E4bEu4y?=
+ =?us-ascii?Q?Vhzrcn32tXoBvJf8QPRiOvv/C7OMYYe/IV7H9dBvTpvzjbHL2zQlBFx1HKYq?=
+ =?us-ascii?Q?Us33u+wCO+lZOJGOJ8nAo4zN3lJRko13ZBz5q9O4yACutr5RP7ngajKp1t/F?=
+ =?us-ascii?Q?0QL1fZzzeUJloLuTrfNXV9LmKctqGfY5P3mi1iJ4E9KyMe16fgkvvm4xT8x9?=
+ =?us-ascii?Q?Vx1JIh5DdJ+uV4AgZRtPf8YAEBQ65PFEhNf0t3WEdMT6Q+3Z6nCqQ1EGcRiw?=
+ =?us-ascii?Q?vfY0f4GMUTPdNUOJmY+57n5CXIA5JlkH2Qois8ytlA9NTh/usdL6bSqz1zeH?=
+ =?us-ascii?Q?pzLx3rUmUJX+SnrtAHYJCfq+JykIf82gk6w8KwJy/D4vJVTS3+56595qJClR?=
+ =?us-ascii?Q?mKPlr+90rNb+MtRoQT+/EYN82YjnTtYINmkJf3JmzF30afh14+sW1rnifsMm?=
+ =?us-ascii?Q?2TEe4fIyBUXlkjq9uVTw4RK27BDgEtRHl7nzPn5c8bvci7mKKGJfMNIfgjwr?=
+ =?us-ascii?Q?CUbqMDPcKGN+jhb74oSgymIThcheA9m0amB3G2liCBMU5ZeS52bY/sk1et2Q?=
+ =?us-ascii?Q?r/TF1sXAIvQAeAY8RFwWjIl0rtGXZihmIlpZHTZ05T2UzwLVBMhdjtfdVZJd?=
+ =?us-ascii?Q?Hl0UDmrhpdegHuUBlpKXlbdq/TjPQa1pr3Y2ZKJXWNd+OKKnGL7EX9ELSbdo?=
+ =?us-ascii?Q?SMFFnDeuarR92EA1sRpLSX7sDfDWvyhkYPXuGpQj/wd6qxOOMrTdsml3O7Z7?=
+ =?us-ascii?Q?V4yv2y1lcaoZVccCBkMRwL0hLncj98/0RkDYeqBalqLfz+zAE9pl0hWwvApY?=
+ =?us-ascii?Q?i1JBhOPGVw6dc8nLEEBTZofBW3bW97MjrC7hlezhcR0AeiBpkhr7Hc18Wzc/?=
+ =?us-ascii?Q?6sZgn93EQVOy8LdA+TAgxvfUMuq5L3SBRj8FTKkfcJT2721HWa52eQVTA+57?=
+ =?us-ascii?Q?r8kGRefrXIBBt8nXBbrkrSDIanCsWYAXi7iMfoNuWdMz/MHhsEFEiFhSEPoV?=
+ =?us-ascii?Q?eZgr8ZpJk8FUROYyZhW+HCNtMfuZm4IsiLo7NC16pjk4fDPQEoQtDuLKSrGZ?=
+ =?us-ascii?Q?5N5Nw9w2tqz6uyGjGBcpTJXPxdKDc7RXfQcHMluBnt6SkKyD/8RZ5F+U1ixv?=
+ =?us-ascii?Q?OuU4cjvqkkdH6whX5y21AjWp6sWEGR+qSJNAt2kSeObGy5rkbKOUgmiw5Rgz?=
+ =?us-ascii?Q?pYDLyJxwJtdUG45aOUZU8Q/WV9s4HhGAuX7Q5ggbai1mEA6s5RjWSHufQNfs?=
+ =?us-ascii?Q?AjYfljKqDn6/ukyHTYWfLy98whwdCTYcZxQ90o6DiG4566TxQy0FJFZUFLuO?=
+ =?us-ascii?Q?5SvW+6chGVxS+d5wP+SBVtuM2+abAFYtPBPGbiyDOjKsCPeu3KRTebd4Yn5M?=
+ =?us-ascii?Q?3zozouiSGDzEyWSdmvdLZbnY/7ALUTxeMnQlPT4Qab7Z3zD13anwRuRo1JKS?=
+ =?us-ascii?Q?94I3/j4HsZsPGa0+wp2ECqHPDoHaEARuxdAGDvA5n/7kuTRLk/JPK0EYZtsj?=
+ =?us-ascii?Q?Cdw2v5eSaJYcfjA1UNroN5eOIw8kEDo21dmMrJ+itnH33WEGKNaJZT9DY73E?=
+ =?us-ascii?Q?Dw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 897a4f32-dc36-4bfd-efa6-08dacc80dc96
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2022 11:58:25.8556
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1bqk1sRDOs4vAW9xGIblFuhQ0wmI3GWSCgCWUZDT4XrRmgU+oB1+K0HeLxfpBinR6fDH7ObKq9BFT3XvIGdkUQt51cektwiagvRTPnkmcsU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6879
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0940747198713985333==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: tools/btattach.c: does not exist in index
-error: tools/hciattach.h: does not exist in index
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Add identifiers for hci_nxp to support NXP UART BT devices for btattach
 ---
-Regards,
-Linux Bluetooth
+ tools/btattach.c  | 1 +
+ tools/hciattach.h | 1 +
+ 2 files changed, 2 insertions(+)
 
+diff --git a/tools/btattach.c b/tools/btattach.c
+index 4ce1be7..8a30c5b 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -212,6 +212,7 @@ static const struct {
+ 	{ "ag6xx", HCI_UART_AG6XX },
+ 	{ "nokia", HCI_UART_NOKIA },
+ 	{ "mrvl",  HCI_UART_MRVL  },
++	{ "nxp",   HCI_UART_NXP   },
+ 	{ }
+ };
+ 
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 26c0d54..d62cabf 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -32,6 +32,7 @@
+ #define HCI_UART_AG6XX	9
+ #define HCI_UART_NOKIA	10
+ #define HCI_UART_MRVL	11
++#define HCI_UART_NXP	12
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+-- 
+2.7.4
 
---===============0940747198713985333==--
