@@ -2,38 +2,38 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D50D7C43217
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 17:45:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9D4C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Nov 2022 17:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234374AbiKVRpp (ORCPT
+        id S234533AbiKVRpq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 12:45:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59566 "EHLO
+        Tue, 22 Nov 2022 12:45:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234366AbiKVRp2 (ORCPT
+        with ESMTP id S234423AbiKVRp3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 12:45:28 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9E8D9F;
-        Tue, 22 Nov 2022 09:44:59 -0800 (PST)
-Message-ID: <20221122173648.560770928@linutronix.de>
+        Tue, 22 Nov 2022 12:45:29 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF427D51E;
+        Tue, 22 Nov 2022 09:45:02 -0800 (PST)
+Message-ID: <20221122173648.679936164@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669139097;
+        s=2020; t=1669139100;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=EMpM2Y9+AZ3Mkc+gVMKWk6eghahsVVjAJyXVQ6CR7oc=;
-        b=jOfQSKgiI43Mey5tMtwdwq5HcuqumunlijHH9jFhIuNmnqNMa09hn7oPyucrb3Fb7Hy247
-        sBgZzHiczM2XHBKwQ/4ZYgkb4s+rZsXYUF3Hlb5PGQpHYZMAcnEqweoxl780oo2E/ncE12
-        TMxE0d0PhCN97Le4qcdR6JQdxsiQn14ANd53XDmF449szrYZKxUH2Pb664Sf0h4nlVhh0T
-        iVDuKH07E3dFD9TiKVSrbxfy62RC2mLgBJFWStGvY+tVP7RsoeKUtLxXtgQdSFS8Eax6aP
-        QOpN12SrPjoFzA6VWLkFtiCkDix5G133PH+yLVfd6KG+DRNqCUrt/OQ4vhBXxA==
+         references:references; bh=1Q8N97xZ72xYy6vaaOLnyE0AxAlIzspsYSXG7581VxQ=;
+        b=IkD8ianPoPQldqkb3P9hR8nlIuHVqEK6gsxCD0j71FFDedH2uho5vWyvLz+Mq+EYVTG0Pl
+        OwFR45jUL/j9LDD8rBl+552yobOcxn+8xuKQeeGANg27GP/QwCZVOIj/KiNxqbFJt+wwZE
+        UHx8KLgVNnFaAHK40vW0/SIxalv938uEETX9ps7oZQOm0MmKD70z2MBnOmvS2vcEQP6+sa
+        CazvwU2GXkqt8wFkRZ9tLY/YaQI1AqTEePpOsKCV9DOKFkWqyAt9HC6SCjY93mfl2E2T2v
+        nMT5KVujR9X7NI4UhbCoaoe0dQg7HVAUdBQIAJ/TY2NWv5VlVSe6IzsKF9zftQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669139097;
+        s=2020e; t=1669139100;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=EMpM2Y9+AZ3Mkc+gVMKWk6eghahsVVjAJyXVQ6CR7oc=;
-        b=BWp8Zh//+2G8dMEG6BXVGDbM34z0AVD4jWkQgirweP06NXhIGCtYfEjeg8i9J72JprjMmF
-        MOrJTm31/GbXkIBg==
+         references:references; bh=1Q8N97xZ72xYy6vaaOLnyE0AxAlIzspsYSXG7581VxQ=;
+        b=9BIIdv4TvKJqzaHSdYedMWcor4slJm9zpeR2PZ5ms6tHSxp7lUbb90kMBJCRQrZCMelDMS
+        /nOYXb6GFrm1BqAA==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
@@ -55,72 +55,94 @@ Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: [patch V2 08/17] timers: Use del_timer_sync() even on UP
+Subject: [patch V2 10/17] timers: Rename del_timer() to timer_delete()
 References: <20221122171312.191765396@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 22 Nov 2022 18:44:57 +0100 (CET)
+Date:   Tue, 22 Nov 2022 18:45:00 +0100 (CET)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-del_timer_sync() is assumed to be pointless on uniprocessor systems and can
-be mapped to del_timer() because in theory del_timer() can never be invoked
-while the timer callback function is executed.
+The timer related functions do not have a strict timer_ prefixed namespace
+which is really annoying.
 
-This is not entirely true because del_timer() can be invoked from interrupt
-context and therefore hit in the middle of a running timer callback.
+Rename del_timer() to timer_delete() and provide del_timer()
+as a wrapper. Document that del_timer() is not for new code.
 
-Contrary to that del_timer_sync() is not allowed to be invoked from
-interrupt context unless the affected timer is marked with TIMER_IRQSAFE.
-del_timer_sync() has proper checks in place to detect such a situation.
-
-Give up on the UP optimization and make del_timer_sync() unconditionally
-available.
-
-Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
-Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
-Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
 ---
- include/linux/timer.h |    7 +------
- kernel/time/timer.c   |    2 --
- 2 files changed, 1 insertion(+), 8 deletions(-)
+ include/linux/timer.h |   15 ++++++++++++++-
+ kernel/time/timer.c   |    6 +++---
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
 --- a/include/linux/timer.h
 +++ b/include/linux/timer.h
-@@ -183,12 +183,7 @@ extern int timer_reduce(struct timer_lis
- extern void add_timer(struct timer_list *timer);
+@@ -169,7 +169,6 @@ static inline int timer_pending(const st
+ }
+ 
+ extern void add_timer_on(struct timer_list *timer, int cpu);
+-extern int del_timer(struct timer_list * timer);
+ extern int mod_timer(struct timer_list *timer, unsigned long expires);
+ extern int mod_timer_pending(struct timer_list *timer, unsigned long expires);
+ extern int timer_reduce(struct timer_list *timer, unsigned long expires);
+@@ -184,6 +183,7 @@ extern void add_timer(struct timer_list
  
  extern int try_to_del_timer_sync(struct timer_list *timer);
--
--#if defined(CONFIG_SMP) || defined(CONFIG_PREEMPT_RT)
--  extern int del_timer_sync(struct timer_list *timer);
--#else
--# define del_timer_sync(t)		del_timer(t)
--#endif
-+extern int del_timer_sync(struct timer_list *timer);
+ extern int timer_delete_sync(struct timer_list *timer);
++extern int timer_delete(struct timer_list *timer);
  
+ /**
+  * del_timer_sync - Delete a pending timer and wait for a running callback
+@@ -198,6 +198,19 @@ static inline int del_timer_sync(struct
+ 	return timer_delete_sync(timer);
+ }
+ 
++/**
++ * del_timer - Delete a pending timer
++ * @timer:	The timer to be deleted
++ *
++ * See timer_delete() for detailed explanation.
++ *
++ * Do not use in new code. Use timer_delete() instead.
++ */
++static inline int del_timer(struct timer_list *timer)
++{
++	return timer_delete(timer);
++}
++
  extern void init_timers(void);
  struct hrtimer;
+ extern enum hrtimer_restart it_real_fn(struct hrtimer *);
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -1392,7 +1392,6 @@ static inline void timer_sync_wait_runni
- static inline void del_timer_wait_running(struct timer_list *timer) { }
- #endif
+@@ -1253,7 +1253,7 @@ void add_timer_on(struct timer_list *tim
+ EXPORT_SYMBOL_GPL(add_timer_on);
  
--#if defined(CONFIG_SMP) || defined(CONFIG_PREEMPT_RT)
  /**
-  * del_timer_sync - Deactivate a timer and wait for the handler to finish.
+- * del_timer - Deactivate a timer.
++ * timer_delete - Deactivate a timer.
   * @timer:	The timer to be deactivated
-@@ -1473,7 +1472,6 @@ int del_timer_sync(struct timer_list *ti
+  *
+  * The function only deactivates a pending timer, but contrary to
+@@ -1266,7 +1266,7 @@ EXPORT_SYMBOL_GPL(add_timer_on);
+  * * %0 - The timer was not pending
+  * * %1 - The timer was pending and deactivated
+  */
+-int del_timer(struct timer_list *timer)
++int timer_delete(struct timer_list *timer)
+ {
+ 	struct timer_base *base;
+ 	unsigned long flags;
+@@ -1282,7 +1282,7 @@ int del_timer(struct timer_list *timer)
+ 
  	return ret;
  }
- EXPORT_SYMBOL(del_timer_sync);
--#endif
+-EXPORT_SYMBOL(del_timer);
++EXPORT_SYMBOL(timer_delete);
  
- static void call_timer_fn(struct timer_list *timer,
- 			  void (*fn)(struct timer_list *),
+ /**
+  * try_to_del_timer_sync - Try to deactivate a timer
 
