@@ -2,38 +2,38 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E68C46467
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 20:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6609BC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 20:20:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239696AbiKWUUm (ORCPT
+        id S239720AbiKWUU4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 15:20:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43634 "EHLO
+        Wed, 23 Nov 2022 15:20:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239487AbiKWUUN (ORCPT
+        with ESMTP id S237373AbiKWUUP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 15:20:13 -0500
+        Wed, 23 Nov 2022 15:20:15 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4C3A7C33;
-        Wed, 23 Nov 2022 12:18:42 -0800 (PST)
-Message-ID: <20221123201624.706987932@linutronix.de>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8D10B043A;
+        Wed, 23 Nov 2022 12:18:44 -0800 (PST)
+Message-ID: <20221123201624.888306160@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669234718;
+        s=2020; t=1669234723;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=L6OLvdTrTjp+y8rajFPzsnTIgo8oUnw4e56M5qzb6Hk=;
-        b=SqTuXeT5/K63F/GnNVrYmrRtHC4JHzs2kIQhv6uKTdadPmbZ2KwYcbImFcTKnFXfgkqj6W
-        r2r0c8P3CfjjgNx1HS8EhXeodAc44v8FU/EiH3bVHdr+mgcpFrQSXjT0U8Clc69eGxjI8/
-        JPhW2GQv6UR/l84OjSVHMD7ifS2oIXwBHfwrKoKkrnpn2PIqHDHwovn0RTTR4xxalxnaxa
-        zK3X0wIzE4GVxbwh4as6HsundaNn+fpmqcCJo+NcmwZaZmkiObupUznUjglwtdltWCazbd
-        l8JFgFpzYSyI8RsBZ1xgkgdAvnVb9hfO77zZIH0BYAMpDu+4gRe7AoSHERRzOg==
+         references:references; bh=0eY7YnzlwSNTQTRTn0uxqikX7ma7laOZXEtpEJOrwxM=;
+        b=4opf8+/GOXjJNOy6hPzmeTt80WMzIFSy8Am96kclq97AQbJnWOAprC4vzZ1RZ9AbWkSeZk
+        8zxZ4sxeVeoBFgxABFY7ezWo75DXTTNGhM4D5jOMM2E+O2bn+NeGpqfZXBMXe7fEmBdJvK
+        wTJmhUcJZEEsksW+Dkwxwh463sn4aIwrjxMUuHxBlkF9QQB2GcTpqhScr8KqDSwvF2OQfy
+        8ahBVUYnd/xMAqaBzHyud1lYvkZsmsdMMFwp5r3zMlwNBcALp9chFIOkhiH4aIdZi99Xj4
+        l/Rge2vagqPxQK11ZT3jUQu2tE7GP+DsyoC3XzfC0xe7A+phaeCOUeMdBjcw9w==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669234718;
+        s=2020e; t=1669234723;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=L6OLvdTrTjp+y8rajFPzsnTIgo8oUnw4e56M5qzb6Hk=;
-        b=K2mgbma7mgCmvgxL/IrXqyYXQ52uUPOSjuhQ/egNjJvRBNZbLWeMguNKexJ3bTLX8kaPbY
-        qrUdRArbBlUZrTCA==
+         references:references; bh=0eY7YnzlwSNTQTRTn0uxqikX7ma7laOZXEtpEJOrwxM=;
+        b=qUhbnPp1lnq6hw/ZiuMuZPtuw5rIwxw31eQbsu7Um9qICRI4gv+9DhpXmFjAUdmwFAtvnr
+        9j34rhZTb7lka7Cg==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
@@ -56,116 +56,73 @@ Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
         Jacob Keller <jacob.e.keller@intel.com>
-Subject: [patch V3 05/17] timers: Get rid of del_singleshot_timer_sync()
+Subject: [patch V3 08/17] timers: Use del_timer_sync() even on UP
 References: <20221123201306.823305113@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 23 Nov 2022 21:18:37 +0100 (CET)
+Date:   Wed, 23 Nov 2022 21:18:42 +0100 (CET)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-del_singleshot_timer_sync() used to be an optimization for deleting timers
-which are not rearmed from the timer callback function.
+del_timer_sync() is assumed to be pointless on uniprocessor systems and can
+be mapped to del_timer() because in theory del_timer() can never be invoked
+while the timer callback function is executed.
 
-This optimization turned out to be broken and got mapped to
-del_timer_sync() about 17 years ago.
+This is not entirely true because del_timer() can be invoked from interrupt
+context and therefore hit in the middle of a running timer callback.
 
-Get rid of the undocumented indirection and use del_timer_sync() directly.
+Contrary to that del_timer_sync() is not allowed to be invoked from
+interrupt context unless the affected timer is marked with TIMER_IRQSAFE.
+del_timer_sync() has proper checks in place to detect such a situation.
 
-No functional change.
+Give up on the UP optimization and make del_timer_sync() unconditionally
+available.
 
+Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
+Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
 ---
- drivers/char/tpm/tpm-dev-common.c     |    4 ++--
- drivers/staging/wlan-ng/hfa384x_usb.c |    4 ++--
- drivers/staging/wlan-ng/prism2usb.c   |    6 +++---
- include/linux/timer.h                 |    2 --
- kernel/time/timer.c                   |    2 +-
- net/sunrpc/xprt.c                     |    2 +-
- 6 files changed, 9 insertions(+), 11 deletions(-)
+ include/linux/timer.h |    7 +------
+ kernel/time/timer.c   |    2 --
+ 2 files changed, 1 insertion(+), 8 deletions(-)
 
---- a/drivers/char/tpm/tpm-dev-common.c
-+++ b/drivers/char/tpm/tpm-dev-common.c
-@@ -155,7 +155,7 @@ ssize_t tpm_common_read(struct file *fil
- out:
- 	if (!priv->response_length) {
- 		*off = 0;
--		del_singleshot_timer_sync(&priv->user_read_timer);
-+		del_timer_sync(&priv->user_read_timer);
- 		flush_work(&priv->timeout_work);
- 	}
- 	mutex_unlock(&priv->buffer_mutex);
-@@ -262,7 +262,7 @@ ssize_t tpm_common_write(struct file *fi
- void tpm_common_release(struct file *file, struct file_priv *priv)
- {
- 	flush_work(&priv->async_work);
--	del_singleshot_timer_sync(&priv->user_read_timer);
-+	del_timer_sync(&priv->user_read_timer);
- 	flush_work(&priv->timeout_work);
- 	file->private_data = NULL;
- 	priv->response_length = 0;
---- a/drivers/staging/wlan-ng/hfa384x_usb.c
-+++ b/drivers/staging/wlan-ng/hfa384x_usb.c
-@@ -1116,8 +1116,8 @@ static int hfa384x_usbctlx_complete_sync
- 		if (ctlx == get_active_ctlx(hw)) {
- 			spin_unlock_irqrestore(&hw->ctlxq.lock, flags);
- 
--			del_singleshot_timer_sync(&hw->reqtimer);
--			del_singleshot_timer_sync(&hw->resptimer);
-+			del_timer_sync(&hw->reqtimer);
-+			del_timer_sync(&hw->resptimer);
- 			hw->req_timer_done = 1;
- 			hw->resp_timer_done = 1;
- 			usb_kill_urb(&hw->ctlx_urb);
---- a/drivers/staging/wlan-ng/prism2usb.c
-+++ b/drivers/staging/wlan-ng/prism2usb.c
-@@ -170,9 +170,9 @@ static void prism2sta_disconnect_usb(str
- 		 */
- 		prism2sta_ifstate(wlandev, P80211ENUM_ifstate_disable);
- 
--		del_singleshot_timer_sync(&hw->throttle);
--		del_singleshot_timer_sync(&hw->reqtimer);
--		del_singleshot_timer_sync(&hw->resptimer);
-+		del_timer_sync(&hw->throttle);
-+		del_timer_sync(&hw->reqtimer);
-+		del_timer_sync(&hw->resptimer);
- 
- 		/* Unlink all the URBs. This "removes the wheels"
- 		 * from the entire CTLX handling mechanism.
 --- a/include/linux/timer.h
 +++ b/include/linux/timer.h
-@@ -190,8 +190,6 @@ extern int try_to_del_timer_sync(struct
- # define del_timer_sync(t)		del_timer(t)
- #endif
+@@ -183,12 +183,7 @@ extern int timer_reduce(struct timer_lis
+ extern void add_timer(struct timer_list *timer);
  
--#define del_singleshot_timer_sync(t) del_timer_sync(t)
+ extern int try_to_del_timer_sync(struct timer_list *timer);
 -
+-#if defined(CONFIG_SMP) || defined(CONFIG_PREEMPT_RT)
+-  extern int del_timer_sync(struct timer_list *timer);
+-#else
+-# define del_timer_sync(t)		del_timer(t)
+-#endif
++extern int del_timer_sync(struct timer_list *timer);
+ 
  extern void init_timers(void);
  struct hrtimer;
- extern enum hrtimer_restart it_real_fn(struct hrtimer *);
 --- a/kernel/time/timer.c
 +++ b/kernel/time/timer.c
-@@ -1933,7 +1933,7 @@ signed long __sched schedule_timeout(sig
- 	timer_setup_on_stack(&timer.timer, process_timeout, 0);
- 	__mod_timer(&timer.timer, expire, MOD_TIMER_NOTPENDING);
- 	schedule();
--	del_singleshot_timer_sync(&timer.timer);
-+	del_timer_sync(&timer.timer);
+@@ -1396,7 +1396,6 @@ static inline void timer_sync_wait_runni
+ static inline void del_timer_wait_running(struct timer_list *timer) { }
+ #endif
  
- 	/* Remove the timer from the object tracker */
- 	destroy_timer_on_stack(&timer.timer);
---- a/net/sunrpc/xprt.c
-+++ b/net/sunrpc/xprt.c
-@@ -1164,7 +1164,7 @@ xprt_request_enqueue_receive(struct rpc_
- 	spin_unlock(&xprt->queue_lock);
- 
- 	/* Turn off autodisconnect */
--	del_singleshot_timer_sync(&xprt->timer);
-+	del_timer_sync(&xprt->timer);
- 	return 0;
+-#if defined(CONFIG_SMP) || defined(CONFIG_PREEMPT_RT)
+ /**
+  * del_timer_sync - Deactivate a timer and wait for the handler to finish.
+  * @timer:	The timer to be deactivated
+@@ -1477,7 +1476,6 @@ int del_timer_sync(struct timer_list *ti
+ 	return ret;
  }
+ EXPORT_SYMBOL(del_timer_sync);
+-#endif
  
+ static void call_timer_fn(struct timer_list *timer,
+ 			  void (*fn)(struct timer_list *),
 
