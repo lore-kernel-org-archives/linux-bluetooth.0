@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE26C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 09:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2113AC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 10:39:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237610AbiKWJX0 (ORCPT
+        id S237645AbiKWKjf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 04:23:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37208 "EHLO
+        Wed, 23 Nov 2022 05:39:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237425AbiKWJW7 (ORCPT
+        with ESMTP id S236687AbiKWKjH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 04:22:59 -0500
+        Wed, 23 Nov 2022 05:39:07 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECE410CEB1;
-        Wed, 23 Nov 2022 01:22:11 -0800 (PST)
-Date:   Wed, 23 Nov 2022 10:22:08 +0100 (CET)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11663EA126;
+        Wed, 23 Nov 2022 02:23:21 -0800 (PST)
+Date:   Wed, 23 Nov 2022 11:23:18 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669195329;
+        s=2020; t=1669198999;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7RMwYBxd/qD5IH2N5zIliB0q90C6LaQNXHFoiPeMVds=;
-        b=iBHF1UIYWIlQvLJc+DNDRoM9dbBI4oe+b/iIBptIhLCGgf222ipuJ2ESrIvypVgL7H96je
-        YhJZtUK40AVWOiGBVNn15PAfR9MDBFjPbqzuLui/ZC/g6HtGXSEW2g0C5mYZUrvMdNUK4m
-        OTRTFiFF9JygI9nhYYQVi0+IEOS2/HvUeUNhGPZvYoIlZ9r9SL8+aPsMTwjxLM/9HQ3Axl
-        iuk+pmrGSEqSva/NfDA/vOJvOQnVT29f6y7cZ8cDcjC/+v7CLg0mLUlvDzMFy8T+rcTsWI
-        4iTBLY5S7BEL77gu/IiGvjf/nm05bIM44nNjIlFpJYMJ5OVok5GdOmoBOcrmZQ==
+        bh=pCNbF4SuwWPa50jU17KKs3SR5/H3opMA3Pjr70EBkKY=;
+        b=RyyL/kUIfO69KG2ebYhWMU9yRzcCB+OUddjvlP3+8Lzk0x91j1CrFxIfylL+JBIFA2ipQw
+        QC8EvK1gXVHT/9Il0lnsrSaLjRdbmu0ucJy8bKtAzwK1p8nRBSuBR8lqHTQdwB/jCnDpI5
+        0id74nNRF4/PgxZ7EX8MjHVLiRxoFDVXlQKPEm3Cm23yXfBEHNwD1L1lpPzHR2v6GMGWGC
+        1QxLmgBWeZNgEApWLRK77ix/rfcPyEvn42LJZe4FDFwEbej3k8ZoGNpV7U84x1VHvICZXJ
+        dPDamAj8glb6roQxZOorLCefZSAeu3lUQg9GIFtJ9nNn38rEDL9rNOC20dR6xA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669195329;
+        s=2020e; t=1669198999;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7RMwYBxd/qD5IH2N5zIliB0q90C6LaQNXHFoiPeMVds=;
-        b=5Xst4rypB6KjAJo0CRCzi9BjtfZn3S0LF4qAP2RGSLl0LTYmob0DBo4LgG9T44wiBHCdLR
-        EArVEYKQYHKq9eBA==
+        bh=pCNbF4SuwWPa50jU17KKs3SR5/H3opMA3Pjr70EBkKY=;
+        b=Q5HeSF3VEAhUCLuKNJi+gLlPLLnK9ykcngKERUFjUseshebHXLmdxSj87dJvh4qANAFMr8
+        JMuniKC4+2QG8BAQ==
 From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
 To:     Thomas Gleixner <tglx@linutronix.de>
 cc:     LKML <linux-kernel@vger.kernel.org>,
@@ -57,11 +57,11 @@ cc:     LKML <linux-kernel@vger.kernel.org>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch V2 12/17] timers: Silently ignore timers with a NULL
- function
-In-Reply-To: <20221122173648.793640919@linutronix.de>
-Message-ID: <ce3f4736-33de-a6bd-6e86-567bec097bf@linutronix.de>
-References: <20221122171312.191765396@linutronix.de> <20221122173648.793640919@linutronix.de>
+Subject: Re: [patch V2 07/17] timers: Update kernel-doc for various
+ functions
+In-Reply-To: <20221122173648.501792201@linutronix.de>
+Message-ID: <c3e79ef-a9c4-bee8-cf4-1bea9ad85920@linutronix.de>
+References: <20221122171312.191765396@linutronix.de> <20221122173648.501792201@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
@@ -70,74 +70,76 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 On Tue, 22 Nov 2022, Thomas Gleixner wrote:
 
-> Tearing down timers which have circular dependencies to other
-> functionality, e.g. workqueues, where the timer can schedule work and work
-> can arm timers is not trivial.
-
-NIT (comma is missing): can arm timer, is not trivial.
-
-> In those cases it is desired to shutdown the timer in a way which prevents
-> rearming of the timer. The mechanism to do so it to set timer->function to
-
-s/to do so it/to do so is/
-
-> NULL and use this as an indicator for the timer arming functions to ignore
-> the (re)arm request.
+> The kernel-doc of timer related functions is partially uncomprehensible
+> word salad. Rewrite it to make it useful.
 > 
-> In preparation for that replace the warnings in the relevant code pathes
-> with checks for timer->function == NULL and discard the rearm request
-> silently.
-
-Here is a verb missing that this is a grammatically correct (and
-understandable) sentence.
-
-> Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
-> checks so that debug objects can warn about non-initialized timers.
-> 
-> If developers fail to enable debug objects and then waste lots of time to
-> figure out why their non-initialized timer is not firing, they deserve it.
-> 
-> Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 > Tested-by: Guenter Roeck <linux@roeck-us.net>
-> Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
-> Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
 > ---
-> V2: Use continue instead of return and amend the return value docs (Steven)
+> V2: Refined comments (Steven)
 > ---
->  kernel/time/timer.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 55 insertions(+), 5 deletions(-)
+>  kernel/time/timer.c |  148 ++++++++++++++++++++++++++++++----------------------
+>  1 file changed, 88 insertions(+), 60 deletions(-)
 > 
 > --- a/kernel/time/timer.c
 > +++ b/kernel/time/timer.c
-> @@ -1128,8 +1144,12 @@ static inline int
->   * mod_timer_pending() is the same for pending timers as mod_timer(), but
->   * will not activate inactive timers.
+> @@ -1200,11 +1212,12 @@ void add_timer(struct timer_list *timer)
+>  EXPORT_SYMBOL(add_timer);
+>  
+>  /**
+> - * add_timer_on - start a timer on a particular CPU
+> - * @timer: the timer to be added
+> - * @cpu: the CPU to start it on
+> + * add_timer_on - Start a timer on a particular CPU
+> + * @timer:	The timer to be started
+> + * @cpu:	The CPU to start it on
 >   *
-> + * If @timer->function == NULL then the start operation is silently
-> + * discarded.
-> + *
->   * Return:
-> - * * %0 - The timer was inactive and not modified
-> + * * %0 - The timer was inactive and not modified or was is in
-> + *	  shutdown state and the operation was discarded
+> - * This is not very scalable on SMP. Double adds are not possible.
+> + * This can only operate on an inactive timer. Attempts to invoke this on
+> + * an active timer are rejected with a warning.
 
-Do you mean "was" or "is"? Please have also a look at the places where you
-use the same phrase.
+This is also true for add_timer(). Is it possible to add this to
+add_timer() function description and just referencing to add_timer()
+function description in add_timer_on()? They behave the same, only
+difference is the CPU where the timer is enqueued.
 
->   * * %1 - The timer was active and requeued to expire at @expires
 >   */
->  int mod_timer_pending(struct timer_list *timer, unsigned long expires)
-> @@ -1155,8 +1175,12 @@ EXPORT_SYMBOL(mod_timer_pending);
->   * same timer, then mod_timer() is the only safe way to modify the timeout,
->   * since add_timer() cannot modify an already running timer.
+>  void add_timer_on(struct timer_list *timer, int cpu)
+>  {
+> @@ -1240,15 +1253,18 @@ void add_timer_on(struct timer_list *tim
+>  EXPORT_SYMBOL_GPL(add_timer_on);
+>  
+>  /**
+> - * del_timer - deactivate a timer.
+> - * @timer: the timer to be deactivated
+> - *
+> - * del_timer() deactivates a timer - this works on both active and inactive
+> - * timers.
+> + * del_timer - Deactivate a timer.
+> + * @timer:	The timer to be deactivated
 >   *
-> + * If @timer->function == NULL then the start operation is silently
-> + * discarded, the return value is 0 and meaningless.
+> - * The function returns whether it has deactivated a pending timer or not.
+> - * (ie. del_timer() of an inactive timer returns 0, del_timer() of an
+> - * active timer returns 1.)
+> + * The function only deactivates a pending timer, but contrary to
+> + * del_timer_sync() it does not take into account whether the timers
 
-It's easier to read, if you make a dot instead of comma.
+timer's callback function or timer callback function (if the latter one is
+used, please replace it in description for del_timer_sync() as well).
 
+> + * callback function is concurrently executed on a different CPU or not.
+> + * It neither prevents rearming of the timer.  If @timer can be rearmed
+
+NIT                                             ^ two whitespaces
+
+> + * concurrently then the return value of this function is meaningless.
+> + *
+> + * Return:
+> + * * %0 - The timer was not pending
+> + * * %1 - The timer was pending and deactivated
+>   */
+>  int del_timer(struct timer_list *timer)
+>  {
 
 Thanks,
 
