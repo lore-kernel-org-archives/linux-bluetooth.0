@@ -2,38 +2,38 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E58C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 20:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF8FC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 20:20:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235874AbiKWUUS (ORCPT
+        id S239683AbiKWUUl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 15:20:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41752 "EHLO
+        Wed, 23 Nov 2022 15:20:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239249AbiKWUTs (ORCPT
+        with ESMTP id S238765AbiKWUUN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 15:19:48 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4E3E94A72;
-        Wed, 23 Nov 2022 12:18:38 -0800 (PST)
-Message-ID: <20221123201624.634354813@linutronix.de>
+        Wed, 23 Nov 2022 15:20:13 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5094AB0C0;
+        Wed, 23 Nov 2022 12:18:42 -0800 (PST)
+Message-ID: <20221123201624.769128888@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669234716;
+        s=2020; t=1669234719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=jQ2gZORL07is72DtXlAGRimkkLqHHcn1aa3jaD5TFbQ=;
-        b=f36afwovLdkt/bqf4IRU0BGDoE5fzvo/VDvwL6PJu2Mh+s99D7wlaMav0MGn+5d2rkaaFc
-        z78cNFGDfmXIVjUDu58QL17rDAHtDmwUnW3j4FcU5qowBNK3yTdRwbbCvIXotFrKZqr3jC
-        hxokt0BKqQTEnEEgA+UV6h4ySRzoyYWlXHiwWDQjEsOkbhj1W5yIYfKPY0Lvn0AcFg8bK1
-        +vuJoiBcYHufuJQQu/Uj1DpF146Zdd6f/nyBEiq5FrlAnyHa8BTWam9FXeuFsd/OeQM1UX
-        HH4sMAVPw8HzyiJSRDICBS21jomaJ14QdRlOM1fGnycywsiEGQaO65HT9R7jpQ==
+         references:references; bh=eCimoLuvktZLfB1uOtjhcgzwdNyr85jFqFSGejnZxME=;
+        b=CD7L6ldoiPUtWAt54rxE0W37G6sMJzvkUpu0CzeC2d09LvqtPSkoD8xTrpbN5utui5RVLx
+        wikpVoqxmsFwfAl3lvMMOY1yfmJKHCsKaMzvG7n5iAYhOGJddhR3f86fKB8R1c0CUJI8hZ
+        8NcI0p6p+XU8OV6yu98t/zR82Az7tIL1HSZQQU0UL/ki1z9vcaCGW2JY17u2Tz07o3XRIy
+        lnxNbLkht3CJ8veszSeR6zJtFkKsvSz31nUoMWwE3MPgmfxY1THUAqdN32kNeo1OzKdTjL
+        D9eK+z9nRVonc0WfshhEqTrBkLyLzWJkBQdm7QXaqomEGrNjcxkcxxTUYew4Og==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669234716;
+        s=2020e; t=1669234719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=jQ2gZORL07is72DtXlAGRimkkLqHHcn1aa3jaD5TFbQ=;
-        b=Wtyc63rpuXDakzL82wrwab0u5haPiE3yO5Q30MQKacKsZ25IQ7kTiMswpqhBiDs3Bmecf+
-        k/JTjeTf1LKh8FAg==
+         references:references; bh=eCimoLuvktZLfB1uOtjhcgzwdNyr85jFqFSGejnZxME=;
+        b=BahGPyyTQcd2X5VjiZl2zwqvSBRDAeFNKqDQfbrS+8G+gM7ADytoXTQqiaPoAGO5628h/R
+        mcu8C9E6HfyYMqCA==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
@@ -56,69 +56,72 @@ Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
         Jacob Keller <jacob.e.keller@intel.com>
-Subject: [patch V3 04/17] clocksource/drivers/sp804: Do not use timer
- namespace for timer_shutdown() function
+Subject: [patch V3 06/17] timers: Replace BUG_ON()s
 References: <20221123201306.823305113@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 23 Nov 2022 21:18:36 +0100 (CET)
+Date:   Wed, 23 Nov 2022 21:18:39 +0100 (CET)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+The timer code still has a few BUG_ON()s left which are crashing the kernel
+in situations where it still can recover or simply refuse to take an
+action.
 
-A new "shutdown" timer state is being added to the generic timer code. One
-of the functions to change the timer into the state is called
-"timer_shutdown()". This means that there can not be other functions
-called "timer_shutdown()" as the timer code owns the "timer_*" name space.
+Remove the one in the hotplug callback which checks for the CPU being
+offline. If that happens then the whole hotplug machinery will explode in
+colourful ways.
 
-Rename timer_shutdown() to evt_timer_shutdown() to avoid this conflict.
+Replace the rest with WARN_ON_ONCE() and conditional returns where
+appropriate.
 
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 Tested-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Guenter Roeck <linux@roeck-us.net>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://lkml.kernel.org/r/20221106212702.182883323@goodmis.org
-Link: https://lore.kernel.org/all/20221105060155.592778858@goodmis.org/
-Link: https://lore.kernel.org/r/20221110064147.158230501@goodmis.org
-
-
 ---
- drivers/clocksource/timer-sp804.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ kernel/time/timer.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
-index e6a87f4af2b5..cd1916c05325 100644
---- a/drivers/clocksource/timer-sp804.c
-+++ b/drivers/clocksource/timer-sp804.c
-@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void evt_timer_shutdown(struct clock_event_device *evt)
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -1193,7 +1193,8 @@ EXPORT_SYMBOL(timer_reduce);
+  */
+ void add_timer(struct timer_list *timer)
  {
- 	writel(0, common_clkevt->ctrl);
+-	BUG_ON(timer_pending(timer));
++	if (WARN_ON_ONCE(timer_pending(timer)))
++		return;
+ 	__mod_timer(timer, timer->expires, MOD_TIMER_NOTPENDING);
  }
+ EXPORT_SYMBOL(add_timer);
+@@ -1210,7 +1211,8 @@ void add_timer_on(struct timer_list *tim
+ 	struct timer_base *new_base, *base;
+ 	unsigned long flags;
  
- static int sp804_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	evt_timer_shutdown(evt);
- 	return 0;
- }
+-	BUG_ON(timer_pending(timer) || !timer->function);
++	if (WARN_ON_ONCE(timer_pending(timer) || !timer->function))
++		return;
  
-@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
- 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
- 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
+ 	new_base = get_timer_cpu_base(timer->flags, cpu);
  
--	timer_shutdown(evt);
-+	evt_timer_shutdown(evt);
- 	writel(common_clkevt->reload, common_clkevt->load);
- 	writel(ctrl, common_clkevt->ctrl);
- 	return 0;
--- 
-2.35.1
+@@ -2017,8 +2019,6 @@ int timers_dead_cpu(unsigned int cpu)
+ 	struct timer_base *new_base;
+ 	int b, i;
+ 
+-	BUG_ON(cpu_online(cpu));
+-
+ 	for (b = 0; b < NR_BASES; b++) {
+ 		old_base = per_cpu_ptr(&timer_bases[b], cpu);
+ 		new_base = get_cpu_ptr(&timer_bases[b]);
+@@ -2035,7 +2035,8 @@ int timers_dead_cpu(unsigned int cpu)
+ 		 */
+ 		forward_timer_base(new_base);
+ 
+-		BUG_ON(old_base->running_timer);
++		WARN_ON_ONCE(old_base->running_timer);
++		old_base->running_timer = NULL;
+ 
+ 		for (i = 0; i < WHEEL_SIZE; i++)
+ 			migrate_timer_list(new_base, old_base->vectors + i);
 
