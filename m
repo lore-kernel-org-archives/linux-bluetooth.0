@@ -2,113 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC47C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 12:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9B4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 12:53:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237157AbiKWMCf (ORCPT
+        id S238208AbiKWMxm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 07:02:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
+        Wed, 23 Nov 2022 07:53:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235568AbiKWMCe (ORCPT
+        with ESMTP id S238460AbiKWMwi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 07:02:34 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A63FE60;
-        Wed, 23 Nov 2022 04:02:30 -0800 (PST)
-Date:   Wed, 23 Nov 2022 13:02:27 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669204948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GBqote1BzkExg7MDXCmwtPPCsS+a19i+SHqr+lLca80=;
-        b=y0HTq8Y1ZNK8Wtx/oprXpMyJ2N9mqtEFNwZt5LxOb1F9SRbDb3Rhf5nS6KvVLSK2yr+chq
-        UAyUIMyIP5VBrhr2JJnGC3jFzBXDOjNtD8ugbm4sj8C/CFYUJFowIFBG8f9BuwC9O+oqlq
-        LWhr8pvgWkG7kZsIIEKSW+d4BuIGoFCa8Qgf4jXlGE1OFJgFrPJBBtd6ww4aXRoKaoNoyo
-        dl/u7FQPSCSzXHWVDTOl+c2uoYrzmGN/gfKHXj4EgtGiHmOa9gtB3YFnQpjugeSpTfRHZK
-        u90AdOsj9cTnYrqs1rXagGk5UviSpZ6RHlUBx5Kb7CQSJU4MdSeyXZBmTM36nQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669204948;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GBqote1BzkExg7MDXCmwtPPCsS+a19i+SHqr+lLca80=;
-        b=+dQr51Q/aNU9Zi95upJOwnukC6/3AeHNq7llh46X/GY39Cd4rhXeE02hvdPBokTfSOXfey
-        JuOTX+74Hbe2BNBQ==
-From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linuxfoundation.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch V2 15/17] timers: Provide timer_shutdown[_sync]()
-In-Reply-To: <20221122173648.962476045@linutronix.de>
-Message-ID: <3779da12-6da5-8f6b-ec93-f8d52e38a40@linutronix.de>
-References: <20221122171312.191765396@linutronix.de> <20221122173648.962476045@linutronix.de>
+        Wed, 23 Nov 2022 07:52:38 -0500
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2043.outbound.protection.outlook.com [40.107.21.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F3F66F35F;
+        Wed, 23 Nov 2022 04:44:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RM7x1llD1MLj4VRWGmz+m6HKc640/mRqUpYggWhNRYxyYMIc4POBUERVyKL0JAwGGViZun8FQGRORR63LwkaVx9YO1RufLROcVbVUAQ4gKls1uZDb++LomlSh69+NE1A04XiOl5zCb4DoHTpcxCkcENXFGuHP+1F9gziT/fNedZMEQG5yJFvdc52ouaXB+bSl0PLJsdpInECPJlia8cHJk/nSIuCPLbIE9ETP3hf+dUChea+49MLNzNacYbqAjAdpVPFVILwtGC4XURx5LFFe6OfDsjVMhWKSfSISmmAfJ/vMhoM6ZOA4kU/f4hHeCNcor15qkuDsskH98Y9VQy2PA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m9l36Vhq3JyGMCrdSPAOC0EBoTUN5Ij3qw3mtgku6e8=;
+ b=GiOlwLBT/FpoyywfEYUpzAcCB6t9/c5m9k1ELPWNzXica+KCuW1NqNplkaIsunCOIFaSwTNwtbgqMZsrNg/tqNUOgVUNQID727o7tkWep2ObBsM9kdMcJMWxq4482l8MYmsAXmbdf2F9axSV4R9RABbfqO3j4Ryj9981C6RuFYdWw1aphOo7lsP6Jl2QLG/QJ+SlW0CiRPlkkqjCN1ntVbnLY+OGl2i+O4fE0YjycTy20yzynIplECOL1NJyN93BF14Z3KqR6Bz++ihBZS62PRekVDZGQRynYvKSJa2hSBONanlsHukoURtPGfojMOdfIhx123NbqYtJY9TBD9vLCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m9l36Vhq3JyGMCrdSPAOC0EBoTUN5Ij3qw3mtgku6e8=;
+ b=KwU2Eo4Hpiu0WXLQAMF9l7NfmDzxfM1a59uJ8KMS1GDPE85oEUa67EabzCUtJ1PSoHdAb26IeUaKMIDKSpHAa7xfOGqNdtfjTSYMPIQRXOZRk+kLDSxQqKkB1Tr5USXrpwLNb+ev7MlwUW6pv7Ffj3yGIIe28N4YRnPKwzpbPHY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
+ by PA4PR04MB9344.eurprd04.prod.outlook.com (2603:10a6:102:2a8::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5834.15; Wed, 23 Nov
+ 2022 12:44:31 +0000
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::7686:5382:16d5:c6de]) by AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::7686:5382:16d5:c6de%8]) with mapi id 15.20.5834.015; Wed, 23 Nov 2022
+ 12:44:31 +0000
+From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        pmenzel@molgen.mpg.de, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com
+Cc:     neeraj.sanjaykale@nxp.com, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 2/2] tools: Add identifier for NXP UART BT devices
+Date:   Wed, 23 Nov 2022 18:13:41 +0530
+Message-Id: <1669207421-9673-1-git-send-email-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR01CA0127.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:40::31) To AM9PR04MB8603.eurprd04.prod.outlook.com
+ (2603:10a6:20b:43a::10)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8603:EE_|PA4PR04MB9344:EE_
+X-MS-Office365-Filtering-Correlation-Id: 032d9c8d-9bb3-4bc8-cc72-08dacd50779a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qXCF9oW6rKCZIKYKkrbFMu5NfVQN2C8vzyNNwSFXEaK3YoqyfDHUWS0GZuc450+V9+EMzaRYftDD2llaj5gVKIAWulTd9CNaAU+HSTQwna4MfaeSCF9376tcd1IaOey3J8bMHcr6WNr6yctzqe0m3PG4juV0yBKCuQe9TpPCjvAnAG0NO56cXK2o9bepzMhDsNakYw5oDDXGoWPSAC7uDqH4x71ywc+oZhkb9egBSdSgGN/XowMU1O2DwKi18goGjFxLDALvweqzEUBAbheaGQiTKJhUmAH8csLZYrAkdUgOO2h6+h1aycYTUyDbRtgUYHrl2sVd/bkKemsdkal8KchX8blTTq4MgPlz8eYysQq00OGOSKmA+iZH0/4+1dVhKQeWjDo1aye792fm303lAqGchq4pnQsd7wSAei3pxRjuDhqSQbr3/wl/6ne/RKmWsfEkB4ELXbVlqgEz9iATOSeo0kghybt38DVui0pyL0uOoKzW2Bj98XAhW1rrcgTbRPh48zd3r2ocGsom9HEwmKFn1CkKRfSg26QvywufdwPom7OG+PDnEN10rKvB2Xvmi1eJsfKJhd0XE5TMHIo49htisWkyXeZooq85rOltAFpSaF0pEAmdpL3seEO3/wb4jPVt/Qh5AOU1Y3reyGu6fappBIR3fvyVMwosw6ZatE4GdhMyX+qcZaaLcg54IlWpVLr78kBBlUZnWLx9qpQ6vA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(396003)(366004)(39860400002)(376002)(451199015)(6486002)(4326008)(38100700002)(38350700002)(5660300002)(86362001)(26005)(8936002)(66946007)(4744005)(6506007)(66476007)(2906002)(66556008)(41300700001)(8676002)(186003)(6512007)(2616005)(55236004)(316002)(52116002)(6666004)(6636002)(478600001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?72s+/82L4+455HFIdQKzQkzW2xKiKhWrCPAJUHjJ5SuB5di46LRbTG0U4mXp?=
+ =?us-ascii?Q?m+cccbo0Cegq7qsWj/bgLEWMGTPoVaKynp7WXXANlAdHmT8PZlzeailfriWD?=
+ =?us-ascii?Q?0BH3LSzAt7pOtfzXKhWSWi5/4KtSOMKJaybH0jKI5YWkGvQpRuAFAcQMUgDN?=
+ =?us-ascii?Q?Sktc3Ko/M05W/uRrOE7IwXhBZYxJb1AFRQS5JbPen7Ovc8asycjZpzCQ+oIS?=
+ =?us-ascii?Q?y6kRrzE/5eDF9lN/nW65/PcdmCapFZ7QOF/5YRLsgrqyIAzjQAKKY8qjUFjZ?=
+ =?us-ascii?Q?p6WSz1SJ2aUdTSBFzojirbNTBJcgAikRKq2R28aXtEicaBh0RjCHIIXFt3d0?=
+ =?us-ascii?Q?BmLsiZVtrJtS01JZTCnj7f0zomFPKjgKBMVH6KT4hS2Ya3C4vC08+PQdH60C?=
+ =?us-ascii?Q?GKimZMGf3xmR1mgfyipvmFdrzTEGE2rjadTp1XjXChIOqxWA0J4UDVJSGu/o?=
+ =?us-ascii?Q?RIOzdSo8XCr4jDmcZyPuXMMCVO3rEz5/5zhxN2vidBgm5MNfem7Ci0QBJ6Ms?=
+ =?us-ascii?Q?/H1kVTAEAfxFI2SspIbsMtwJS1HsB76sWp3ymO8nDDWJgNtf4s6/txawBDBx?=
+ =?us-ascii?Q?g2HrbGGWlGP1dGnIumwuJM2saIwJvOPGhgy5mbIYnvGXIksfu4DCW9PMzQLj?=
+ =?us-ascii?Q?f+h0yL7Vp6SZloKRliJDCtRxpZy9PzPFtcctwVu6Lao7w/K/MNs5dhpUgLew?=
+ =?us-ascii?Q?sEsFdAu2geSAa5aRvojLc0UqZgFFxDlJg0ozTgphrr1lF0XOjANwnJvVXnT+?=
+ =?us-ascii?Q?WsuqS34hY7xgOeu61d1q0LzVevg9HdGWeJxen8nG5kacqWc/dAcu9SnZk8Hf?=
+ =?us-ascii?Q?QnKp6lXbJrYpF3xNYtW+3v++lf1YoWRfXDoVrZEEY3ej/TRHNX4htxw/fq2c?=
+ =?us-ascii?Q?F9LQUMmlwahc0+CQsewxOvr2ngwRD/Ejj23wUQdgrwxsU1rXV0R7dwmN3rMP?=
+ =?us-ascii?Q?ETwOV9z2AXcsVfX5OTp9D9IgjM0+pfR4kll5FXEFlXwHlmlFjZ9W1N3Yqa+v?=
+ =?us-ascii?Q?cuHv+xpmG4nJCDECUwzBUjRd8atPkTXpe6ZB9BK59WMiRBcetOgk1RQ9mw6v?=
+ =?us-ascii?Q?mLWC/EIvdbxiawlAqXZweDFqf4HG+Od4zFR4TneujUJjzMU65MqOLZ/55CiT?=
+ =?us-ascii?Q?WN9a9hfT96kb71rKlg+QvR8qfdrzd0+DzNZA2FM9KxBiYeB/Sua5Rmxm3t/o?=
+ =?us-ascii?Q?Kdsvl8MSaKCBT7e0A1X7xqJ0gMJQq+SkOgKmxIEHPQUM0widGkbftttWgIpz?=
+ =?us-ascii?Q?r5dhWrAL72u7na/3WajK98g8R4ZXrWXam8hUiMvEpi31H5bxB60/JrSBDdN4?=
+ =?us-ascii?Q?JzEJ+1LiD9YOZB2AHdpXMebu7zUxrHbF7SmS/S+ULbiM9MEAYrtjV5Y2INl2?=
+ =?us-ascii?Q?kQPp8bV2X0bsmSoZL21JX0egzxhmJmW1jlsUsQ/66CMQeMpj/9xr7hPL5JWN?=
+ =?us-ascii?Q?PswxQolw1E8nuKguEzjy8dozFfR46U2uzilYOyzQgTt5fdTOozm0FMSSJLpZ?=
+ =?us-ascii?Q?8ek50YytfA5C3/0HF2Tw/P3t47GzoWDD8G2N+nW6Mlwdl4XJUxV2IdwnFeMA?=
+ =?us-ascii?Q?v700b978RmKpQCQ82NTdHh7KHhsvEJcBCBY82YcD18AQ7p6vb21IYtDDcYoN?=
+ =?us-ascii?Q?Qw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 032d9c8d-9bb3-4bc8-cc72-08dacd50779a
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Nov 2022 12:44:31.7025
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: u3elSAIAK7ZEr0wqkS+JZ0ImRTZZCzzQFE65Q+ipwQTWw7xutnvpV0e3cTk9Pmd8WDUr+B/t+NiCoKxs39lkDgKmKvCNW0q6dzt6/647kGc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9344
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 22 Nov 2022, Thomas Gleixner wrote:
+Add identifiers for hci_nxp to support NXP UART BT devices for btattach
+---
+ tools/btattach.c  | 1 +
+ tools/hciattach.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-> @@ -1605,6 +1629,48 @@ int timer_delete_sync(struct timer_list
->  }
->  EXPORT_SYMBOL(timer_delete_sync);
->  
-> +/**
-> + * timer_shutdown_sync - Shutdown a timer and prevent rearming
-> + * @timer: The timer to be shutdown
-> + *
-> + * When the function returns it is guaranteed that:
-> + *   - @timer is not queued
-> + *   - The callback function of @timer is not running
-> + *   - @timer cannot be enqueued again. Any attempt to rearm
-> + *     @timer is silently ignored.
-> + *
-> + * See timer_delete_sync() for synchronization rules.
-> + *
-> + * This function is useful for final teardown of an infrastructure where
-> + * the timer is subject to a circular dependency problem.
-> + *
-> + * A common pattern for this is a timer and a workqueue where the timer can
-> + * schedule work and work can arm the timer. On shutdown the workqueue must
-> + * be destroyed and the timer must be prevented from rearming. Unless the
-> + * code has conditionals like 'if (mything->in_shutdown)' to prevent that
-> + * there is no way to get this correct with timer_delete_sync().
-> + *
-> + * timer_shutdown_sync() is solving the problem. The correct ordering of
-> + * calls in this case is:
-> + *
-> + *	timer_shutdown_sync(&mything->timer);
-> + *	workqueue_destroy(&mything->workqueue);
-> + *
-> + * After this 'mything' can be safely freed.
-> + *
-> + * This obviously requires that the timer is not required to be functional
-> + * for the rest of the shutdown operation.
-
-NIT... Maybe the first requires could be replaced by
-assumes/expects/presupposes to prevent double use of required?
-
-Thanks,
-
-	Anna-Maria
+diff --git a/tools/btattach.c b/tools/btattach.c
+index 4ce1be7..8a30c5b 100644
+--- a/tools/btattach.c
++++ b/tools/btattach.c
+@@ -212,6 +212,7 @@ static const struct {
+ 	{ "ag6xx", HCI_UART_AG6XX },
+ 	{ "nokia", HCI_UART_NOKIA },
+ 	{ "mrvl",  HCI_UART_MRVL  },
++	{ "nxp",   HCI_UART_NXP   },
+ 	{ }
+ };
+ 
+diff --git a/tools/hciattach.h b/tools/hciattach.h
+index 26c0d54..d62cabf 100644
+--- a/tools/hciattach.h
++++ b/tools/hciattach.h
+@@ -32,6 +32,7 @@
+ #define HCI_UART_AG6XX	9
+ #define HCI_UART_NOKIA	10
+ #define HCI_UART_MRVL	11
++#define HCI_UART_NXP	12
+ 
+ #define HCI_UART_RAW_DEVICE	0
+ #define HCI_UART_RESET_ON_INIT	1
+-- 
+2.7.4
 
