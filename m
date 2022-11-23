@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E27C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 17:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B77E6C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 17:09:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238609AbiKWRGK (ORCPT
+        id S238905AbiKWRJa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 12:06:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55850 "EHLO
+        Wed, 23 Nov 2022 12:09:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237966AbiKWRGJ (ORCPT
+        with ESMTP id S239268AbiKWRJN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 12:06:09 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF666D481;
-        Wed, 23 Nov 2022 09:06:08 -0800 (PST)
+        Wed, 23 Nov 2022 12:09:13 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 687E12BFA;
+        Wed, 23 Nov 2022 09:08:30 -0800 (PST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669223167;
+        s=2020; t=1669223308;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3suul+1WiPGqw/3Olh9Iqz0TaLAlIdZ9odbSxdL1Q4M=;
-        b=rnBo0Myc2Gjm6q/jpnyflSc8oIGL5i6WyHEarFGWBwRWD/QQMoDbOHMaXBTh9RyQjh88+w
-        asPdF79F0YZELl1Y6dlHvNpRmA5fv5uLH6MPGBfrI9Ejh1S87AE0+nqlb+JslZa4WNfoGt
-        klx1mJJE1xSapPwT94C7duVBg7GXXCJqP7b7MToNqY6asSt0A9Xzc3Q48ZfsI3cXe6X2G2
-        qWidx0ga3PmGSsIKa1zzgWclgOQWo3Y+UStcCGkp5QIAkc3KgUlHxecwYIgZ1w3S3/0GzZ
-        jtZLW9AZIgtXv0QmkKJcc5fs4FHJ7iUjJ4YPY0ZEY37fFyZ86OYvP1M2n41Ibw==
+        bh=fuw8Yu7j4q7omEaozhm8BruvfO/pl6W6sJNGVh6Std4=;
+        b=cxW8I6tuErDfif3SfF+LW0dtjhdd+ekiTmScSO/lZhTTiIByQeysTYR90qk75POobXE7+7
+        f9jRamN+kwx6S3vO35jekHbHVWlH2bPu/fN6KaH67z/hMURqrRM0Y3czAV6RXfNCsf7msl
+        U5ZIj8lcJYDngwCgoV/t2sSJr6eDHxVOuelZK5Oe/x+jIa3tQFA6g2z2N8nwGtFJm2m6T/
+        PuDDSgWAnq5QP2uQ6aWhvxhpjm0PGGHgg12D50tLvJwvZAXp/btkDrTTqLbB3r+yauzgsu
+        KRlvvW2RtzpfX2DM8rEXWFrW/VMLx63aJKPkhAORRNGkFUd89XcJxat47dMcUw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669223167;
+        s=2020e; t=1669223308;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=3suul+1WiPGqw/3Olh9Iqz0TaLAlIdZ9odbSxdL1Q4M=;
-        b=wH98igTiSxrUIz+HH4ZvhHQGAjBEGgLlg+9Zda3gyemIFAYGyzcppO6V/aVc8ojRimjt6u
-        /VBvutQLk/TMJqDA==
+        bh=fuw8Yu7j4q7omEaozhm8BruvfO/pl6W6sJNGVh6Std4=;
+        b=PrEYnilOru4c8b+aa1alij9EoHzcVjswvQtTSyBconK07eaaIxvhoXiODoSSmZcXrqiICC
+        0wkdsqA6rTXBH3Bg==
 To:     Anna-Maria Behnsen <anna-maria@linutronix.de>
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linus Torvalds <torvalds@linuxfoundation.org>,
@@ -56,24 +56,31 @@ Cc:     LKML <linux-kernel@vger.kernel.org>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch V2 15/17] timers: Provide timer_shutdown[_sync]()
-In-Reply-To: <3779da12-6da5-8f6b-ec93-f8d52e38a40@linutronix.de>
+Subject: Re: [patch V2 12/17] timers: Silently ignore timers with a NULL
+ function
+In-Reply-To: <165dcea1-2713-218b-fecf-5bf80452229@linutronix.de>
 References: <20221122171312.191765396@linutronix.de>
- <20221122173648.962476045@linutronix.de>
- <3779da12-6da5-8f6b-ec93-f8d52e38a40@linutronix.de>
-Date:   Wed, 23 Nov 2022 18:06:06 +0100
-Message-ID: <87h6ypeh35.ffs@tglx>
+ <20221122173648.793640919@linutronix.de>
+ <165dcea1-2713-218b-fecf-5bf80452229@linutronix.de>
+Date:   Wed, 23 Nov 2022 18:08:27 +0100
+Message-ID: <87edttegz8.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Nov 23 2022 at 13:02, Anna-Maria Behnsen wrote:
->> + * This obviously requires that the timer is not required to be functional
->> + * for the rest of the shutdown operation.
+On Wed, Nov 23 2022 at 12:06, Anna-Maria Behnsen wrote:
+> On Tue, 22 Nov 2022, Thomas Gleixner wrote:
+>> Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
+>> checks so that debug objects can warn about non-initialized timers.
 >
-> NIT... Maybe the first requires could be replaced by
-> assumes/expects/presupposes to prevent double use of required?
+> Could you expand this paragraph, so that is is not missleading when a
+> reader is not aware of the details of debug objects? Otherwise it seems to
+> the reader that debug objects will warn when timer->function == NULL.
+>
+>   The warning of debug objects does not cover the original
+>   WARN_ON_ONCE(!timer->function). It warns when timer was not initialized
+>   using timer_setup[_on_stack]() or via DEFINE_TIMER().
 
-Yes.
+Good point.
