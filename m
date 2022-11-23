@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B29C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 11:25:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC47C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 12:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237104AbiKWLZ1 (ORCPT
+        id S237157AbiKWMCf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 06:25:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32896 "EHLO
+        Wed, 23 Nov 2022 07:02:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237295AbiKWLYz (ORCPT
+        with ESMTP id S235568AbiKWMCe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 06:24:55 -0500
+        Wed, 23 Nov 2022 07:02:34 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB2D2ED71F;
-        Wed, 23 Nov 2022 03:24:54 -0800 (PST)
-Date:   Wed, 23 Nov 2022 12:24:51 +0100 (CET)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A63FE60;
+        Wed, 23 Nov 2022 04:02:30 -0800 (PST)
+Date:   Wed, 23 Nov 2022 13:02:27 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669202692;
+        s=2020; t=1669204948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=e/pytGUU3q5MgRz3Ett1ac81dbifLw/g/iiqb3XVBQ4=;
-        b=UgEGe8bYh/iF22uTEtZ8/Epok3nJNxjKA7hrZHeLWitP/sI4yEL0hiab1QyviHqqhodcQo
-        r61vWBNhqMRI7BmPyT8JPa2MfteiF+fXxruo3Sx+PQ2QHzCUA0lEVCWVxXVKHWhXWwVa8C
-        jy2roiiqIwodjwRhnrBufR+TYZ0JgwNqX0dnNftsHjhpsgTOyD4ejjbEVDkLFK6tcBe5mD
-        j0k+TrJdE66eCP5CjQTbFDLtf7xbgi5DaJ0k28+XGrG43dR1VJ+JI5x7MH3oQfQdGJ2AVW
-        AjHquEGGDoc/pGW3Itd+LYvM4vg6sH8G3gCgyFhG2RZeOx0p6WACe64X9GBy9A==
+        bh=GBqote1BzkExg7MDXCmwtPPCsS+a19i+SHqr+lLca80=;
+        b=y0HTq8Y1ZNK8Wtx/oprXpMyJ2N9mqtEFNwZt5LxOb1F9SRbDb3Rhf5nS6KvVLSK2yr+chq
+        UAyUIMyIP5VBrhr2JJnGC3jFzBXDOjNtD8ugbm4sj8C/CFYUJFowIFBG8f9BuwC9O+oqlq
+        LWhr8pvgWkG7kZsIIEKSW+d4BuIGoFCa8Qgf4jXlGE1OFJgFrPJBBtd6ww4aXRoKaoNoyo
+        dl/u7FQPSCSzXHWVDTOl+c2uoYrzmGN/gfKHXj4EgtGiHmOa9gtB3YFnQpjugeSpTfRHZK
+        u90AdOsj9cTnYrqs1rXagGk5UviSpZ6RHlUBx5Kb7CQSJU4MdSeyXZBmTM36nQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669202692;
+        s=2020e; t=1669204948;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=e/pytGUU3q5MgRz3Ett1ac81dbifLw/g/iiqb3XVBQ4=;
-        b=Kmn39ZL95A84gtClBKV6tvPAOJ367wm4mfUbaCv3RYrsc2YbIfbst5apablvMa/FG33pmy
-        GKlNEF5z2Lwl8bAw==
+        bh=GBqote1BzkExg7MDXCmwtPPCsS+a19i+SHqr+lLca80=;
+        b=+dQr51Q/aNU9Zi95upJOwnukC6/3AeHNq7llh46X/GY39Cd4rhXeE02hvdPBokTfSOXfey
+        JuOTX+74Hbe2BNBQ==
 From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
 To:     Thomas Gleixner <tglx@linutronix.de>
 cc:     LKML <linux-kernel@vger.kernel.org>,
@@ -57,32 +57,58 @@ cc:     LKML <linux-kernel@vger.kernel.org>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch V2 13/17] timers: Split [try_to_]del_timer[_sync]() to
- prepare for shutdown mode
-In-Reply-To: <905da3b-7c86-8ea2-98b2-e53645e7895b@linutronix.de>
-Message-ID: <daf3ca7d-fe47-38d-e99b-3fcfd285b65b@linutronix.de>
-References: <20221122171312.191765396@linutronix.de> <20221122173648.849454220@linutronix.de> <905da3b-7c86-8ea2-98b2-e53645e7895b@linutronix.de>
+Subject: Re: [patch V2 15/17] timers: Provide timer_shutdown[_sync]()
+In-Reply-To: <20221122173648.962476045@linutronix.de>
+Message-ID: <3779da12-6da5-8f6b-ec93-f8d52e38a40@linutronix.de>
+References: <20221122171312.191765396@linutronix.de> <20221122173648.962476045@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 23 Nov 2022, Anna-Maria Behnsen wrote:
+On Tue, 22 Nov 2022, Thomas Gleixner wrote:
 
-> On Tue, 22 Nov 2022, Thomas Gleixner wrote:
-> 
-> > Tearing down timers which have circular dependencies to other
-> > functionality, e.g. workqueues, where the timer can schedule work and work
-> > can arm timers is not trivial.
-> 
-> Comma missing (same as in previous commit message)
-> 
-> > In those cases it is desired to shutdown the timer in a way which prevents
-> > rearming of the timer. The mechanism to do so it to set timer->function to
-> 
-> s/it/is (same as in previous commit message)
-> 
-> 
+> @@ -1605,6 +1629,48 @@ int timer_delete_sync(struct timer_list
+>  }
+>  EXPORT_SYMBOL(timer_delete_sync);
+>  
+> +/**
+> + * timer_shutdown_sync - Shutdown a timer and prevent rearming
+> + * @timer: The timer to be shutdown
+> + *
+> + * When the function returns it is guaranteed that:
+> + *   - @timer is not queued
+> + *   - The callback function of @timer is not running
+> + *   - @timer cannot be enqueued again. Any attempt to rearm
+> + *     @timer is silently ignored.
+> + *
+> + * See timer_delete_sync() for synchronization rules.
+> + *
+> + * This function is useful for final teardown of an infrastructure where
+> + * the timer is subject to a circular dependency problem.
+> + *
+> + * A common pattern for this is a timer and a workqueue where the timer can
+> + * schedule work and work can arm the timer. On shutdown the workqueue must
+> + * be destroyed and the timer must be prevented from rearming. Unless the
+> + * code has conditionals like 'if (mything->in_shutdown)' to prevent that
+> + * there is no way to get this correct with timer_delete_sync().
+> + *
+> + * timer_shutdown_sync() is solving the problem. The correct ordering of
+> + * calls in this case is:
+> + *
+> + *	timer_shutdown_sync(&mything->timer);
+> + *	workqueue_destroy(&mything->workqueue);
+> + *
+> + * After this 'mything' can be safely freed.
+> + *
+> + * This obviously requires that the timer is not required to be functional
+> + * for the rest of the shutdown operation.
 
-Same for patch 14 and 15...
+NIT... Maybe the first requires could be replaced by
+assumes/expects/presupposes to prevent double use of required?
+
+Thanks,
+
+	Anna-Maria
+
