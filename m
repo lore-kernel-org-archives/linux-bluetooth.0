@@ -2,38 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D677CC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 20:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E09AEC46467
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 20:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236263AbiKWUWK (ORCPT
+        id S239556AbiKWUWL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 15:22:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41958 "EHLO
+        Wed, 23 Nov 2022 15:22:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239515AbiKWUUm (ORCPT
+        with ESMTP id S239592AbiKWUVX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 15:20:42 -0500
+        Wed, 23 Nov 2022 15:21:23 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C864C5624;
-        Wed, 23 Nov 2022 12:19:00 -0800 (PST)
-Message-ID: <20221123201625.253883224@linutronix.de>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D0AC78CC;
+        Wed, 23 Nov 2022 12:19:11 -0800 (PST)
+Message-ID: <20221123201625.375284489@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669234732;
+        s=2020; t=1669234735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=udvsR5bjuwgPwBaIW6cLLqel7viRSYpUL0eeQfJ9dPs=;
-        b=EYYiM3G1ql1WLLhz88gV5SUylrr04Gptf6coXwEUFNo3en3WLfueHL3ybMm7AQPcg8Tb4H
-        MaKQ/T5O97cGCvjQMBSt5s6mhlnXqJ2PlkSkb7KdjMwCXATL/qFv8Sd1jn9g21I6TbvBPI
-        uasTp1s9kwVuWLQNAVnUL8KwqDyQSExzdtAJdfpzZoMaPnQK2NyOk+fnUlaak/Pi5+xy8o
-        315PVVPMaOWersP8t87+df0a0CcuklJRB5s2Dd5vns8o/2PHDChFsyIH78n0MwdFLj38A/
-        5E2SE19lKDjTubYVXZ9xeTH9PhlFRLn4T/nqQv2fNn81JMkvA3+w99qa1SXyQA==
+         content-transfer-encoding:content-transfer-encoding:  references:references;
+        bh=8mCfHxFOZzbOCsR313/bDzGhRTnb1fj4Q7VlJBNG0jE=;
+        b=gsOHJxPeeeijJQ12VQfyqzGPX8xgyqZ96mWswxQCmi0j/GQ/N8eEa/pq5VJHwopx9L3PEG
+        LB5I2kBB3h2QVSODmoCyUGI/dS7geEHzN74Ak1KEo9W5UkS/hf6yV8lITtey/5T7dJTemI
+        KleqRuSumcCg2MAH+nAd6Bpi+YQ4wVPn8xj1+IvaSmpzZ13efp5MdqdCTa2mjb3d+MGJcC
+        F9j8c9wv+5EJV9gOoPhtkzPnqEUEsGXHea+yEPHZeKkeKWOb5pJsPaVTKjLPzucEKimo4l
+        3YyEaUFT7VqhaItBqAyU2VfCbZp9nc0nECPk9TQsmRXmvABOWcbborbkjpn1FQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669234732;
+        s=2020e; t=1669234735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=udvsR5bjuwgPwBaIW6cLLqel7viRSYpUL0eeQfJ9dPs=;
-        b=ape3dlhBdUUmZO0KPhO2Ej6zKSIhb+ylm1KT+nUCV1oR8r6HC3CVTSnH8LUYZ3uPnRTIKc
-        454md67Y8G3dIrBA==
+         content-transfer-encoding:content-transfer-encoding:  references:references;
+        bh=8mCfHxFOZzbOCsR313/bDzGhRTnb1fj4Q7VlJBNG0jE=;
+        b=nN2gBcA8qa+c86/g9eNv5e51qKePiLEGDO3stJq4tkr3jZGsTDWvbRhR0cOUM6VloCC2XF
+        P8Ox1KfFtz+yQJBA==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
@@ -56,187 +58,65 @@ Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
         Jacob Keller <jacob.e.keller@intel.com>
-Subject: [patch V3 14/17] timers: Add shutdown mechanism to the internal functions
+Subject: [patch V3 16/17] timers: Update the documentation to reflect on the
+ new timer_shutdown() API
 References: <20221123201306.823305113@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 23 Nov 2022 21:18:52 +0100 (CET)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Date:   Wed, 23 Nov 2022 21:18:55 +0100 (CET)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Tearing down timers which have circular dependencies to other
-functionality, e.g. workqueues, where the timer can schedule work and work
-can arm timers, is not trivial.
-
-In those cases it is desired to shutdown the timer in a way which prevents
-rearming of the timer. The mechanism to do so is to set timer->function to
-NULL and use this as an indicator for the timer arming functions to ignore
-the (re)arm request.
-
-Add a shutdown argument to the relevant internal functions which makes the
-actual deactivation code set timer->function to NULL which in turn prevents
-rearming of the timer.
-
-Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Tested-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
-Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
----
-V2: Add missing commata (Steven)
-V3: Changelog updates (Anna-Maria)
----
- kernel/time/timer.c |   64 ++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 55 insertions(+), 9 deletions(-)
-
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -1297,14 +1297,21 @@ void add_timer_on(struct timer_list *tim
- EXPORT_SYMBOL_GPL(add_timer_on);
- 
- /**
-- * __timer_delete - Internal function: Deactivate a timer.
-+ * __timer_delete - Internal function: Deactivate a timer
-  * @timer:	The timer to be deactivated
-+ * @shutdown:	If true, this indicates that the timer is about to be
-+ *		shutdown permanently.
-+ *
-+ * If @shutdown is true then @timer->function is set to NULL under the
-+ * timer base lock which prevents further rearming of the time. In that
-+ * case any attempt to rearm @timer after this function returns will be
-+ * silently ignored.
-  *
-  * Return:
-  * * %0 - The timer was not pending
-  * * %1 - The timer was pending and deactivated
-  */
--static int __timer_delete(struct timer_list *timer)
-+static int __timer_delete(struct timer_list *timer, bool shutdown)
- {
- 	struct timer_base *base;
- 	unsigned long flags;
-@@ -1312,9 +1319,22 @@ static int __timer_delete(struct timer_l
- 
- 	debug_assert_init(timer);
- 
--	if (timer_pending(timer)) {
-+	/*
-+	 * If @shutdown is set then the lock has to be taken whether the
-+	 * timer is pending or not to protect against a concurrent rearm
-+	 * which might hit between the lockless pending check and the lock
-+	 * aquisition. By taking the lock it is ensured that such a newly
-+	 * enqueued timer is dequeued and cannot end up with
-+	 * timer->function == NULL in the expiry code.
-+	 *
-+	 * If timer->function is currently executed, then this makes sure
-+	 * that the callback cannot requeue the timer.
-+	 */
-+	if (timer_pending(timer) || shutdown) {
- 		base = lock_timer_base(timer, &flags);
- 		ret = detach_if_pending(timer, base, true);
-+		if (shutdown)
-+			timer->function = NULL;
- 		raw_spin_unlock_irqrestore(&base->lock, flags);
- 	}
- 
-@@ -1338,20 +1358,31 @@ EXPORT_SYMBOL(timer_delete);
-  */
- int timer_delete(struct timer_list *timer)
- {
--	return __timer_delete(timer);
-+	return __timer_delete(timer, false);
- }
- EXPORT_SYMBOL(timer_delete);
- 
- /**
-  * __try_to_del_timer_sync - Internal function: Try to deactivate a timer
-  * @timer:	Timer to deactivate
-+ * @shutdown:	If true, this indicates that the timer is about to be
-+ *		shutdown permanently.
-+ *
-+ * If @shutdown is true then @timer->function is set to NULL under the
-+ * timer base lock which prevents further rearming of the timer. Any
-+ * attempt to rearm @timer after this function returns will be silently
-+ * ignored.
-+ *
-+ * This function cannot guarantee that the timer cannot be rearmed
-+ * right after dropping the base lock if @shutdown is false. That
-+ * needs to be prevented by the calling code if necessary.
-  *
-  * Return:
-  * * %0  - The timer was not pending
-  * * %1  - The timer was pending and deactivated
-  * * %-1 - The timer callback function is running on a different CPU
-  */
--static int __try_to_del_timer_sync(struct timer_list *timer)
-+static int __try_to_del_timer_sync(struct timer_list *timer, bool shutdown)
- {
- 	struct timer_base *base;
- 	unsigned long flags;
-@@ -1363,6 +1394,8 @@ static int __try_to_del_timer_sync(struc
- 
- 	if (base->running_timer != timer)
- 		ret = detach_if_pending(timer, base, true);
-+	if (shutdown)
-+		timer->function = NULL;
- 
- 	raw_spin_unlock_irqrestore(&base->lock, flags);
- 
-@@ -1387,7 +1420,7 @@ static int __try_to_del_timer_sync(struc
-  */
- int try_to_del_timer_sync(struct timer_list *timer)
- {
--	return __try_to_del_timer_sync(timer);
-+	return __try_to_del_timer_sync(timer, false);
- }
- EXPORT_SYMBOL(try_to_del_timer_sync);
- 
-@@ -1468,12 +1501,25 @@ static inline void del_timer_wait_runnin
-  * __timer_delete_sync - Internal function: Deactivate a timer and wait
-  *			 for the handler to finish.
-  * @timer:	The timer to be deactivated
-+ * @shutdown:	If true, @timer->function will be set to NULL under the
-+ *		timer base lock which prevents rearming of @timer
-+ *
-+ * If @shutdown is not set the timer can be rearmed later. If the timer can
-+ * be rearmed concurrently, i.e. after dropping the base lock then the
-+ * return value is meaningless.
-+ *
-+ * If @shutdown is set then @timer->function is set to NULL under timer
-+ * base lock which prevents rearming of the timer. Any attempt to rearm
-+ * a shutdown timer is silently ignored.
-+ *
-+ * If the timer should be reused after shutdown it has to be initialized
-+ * again.
-  *
-  * Return:
-  * * %0	- The timer was not pending
-  * * %1	- The timer was pending and deactivated
-  */
--static int __timer_delete_sync(struct timer_list *timer)
-+static int __timer_delete_sync(struct timer_list *timer, bool shutdown)
- {
- 	int ret;
- 
-@@ -1503,7 +1549,7 @@ static int __timer_delete_sync(struct ti
- 		lockdep_assert_preemption_enabled();
- 
- 	do {
--		ret = __try_to_del_timer_sync(timer);
-+		ret = __try_to_del_timer_sync(timer, shutdown);
- 
- 		if (unlikely(ret < 0)) {
- 			del_timer_wait_running(timer);
-@@ -1555,7 +1601,7 @@ static int __timer_delete_sync(struct ti
-  */
- int timer_delete_sync(struct timer_list *timer)
- {
--	return __timer_delete_sync(timer);
-+	return __timer_delete_sync(timer, false);
- }
- EXPORT_SYMBOL(timer_delete_sync);
- 
-
+RnJvbTogIlN0ZXZlbiBSb3N0ZWR0IChHb29nbGUpIiA8cm9zdGVkdEBnb29kbWlzLm9yZz4KCklu
+IG9yZGVyIHRvIG1ha2Ugc3VyZSB0aGF0IGEgdGltZXIgaXMgbm90IHJlLWFybWVkIGFmdGVyIGl0
+IGlzIHN0b3BwZWQKYmVmb3JlIGZyZWVpbmcsIGEgbmV3IHNodXRkb3duIHN0YXRlIGlzIGFkZGVk
+IHRvIHRoZSB0aW1lciBjb2RlLiBUaGUgQVBJCnRpbWVyX3NodXRkb3duX3N5bmMoKSBhbmQgdGlt
+ZXJfc2h1dGRvd24oKSBtdXN0IGJlIGNhbGxlZCBiZWZvcmUgdGhlCm9iamVjdCB0aGF0IGhvbGRz
+IHRoZSB0aW1lciBjYW4gYmUgZnJlZWQuCgpVcGRhdGUgdGhlIGRvY3VtZW50YXRpb24gdG8gcmVm
+bGVjdCB0aGlzIG5ldyB3b3JrZmxvdy4KClsgdGdseDogVXBkYXRlZCB0byB0aGUgbmV3IHNlbWFu
+dGljcyBhbmQgdXBkYXRlZCB0aGUgemhfQ04gdmVyc2lvbiBdCgpTaWduZWQtb2ZmLWJ5OiBTdGV2
+ZW4gUm9zdGVkdCAoR29vZ2xlKSA8cm9zdGVkdEBnb29kbWlzLm9yZz4KU2lnbmVkLW9mZi1ieTog
+VGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+ClRlc3RlZC1ieTogR3VlbnRlciBS
+b2VjayA8bGludXhAcm9lY2stdXMubmV0PgpSZXZpZXdlZC1ieTogSmFjb2IgS2VsbGVyIDxqYWNv
+Yi5lLmtlbGxlckBpbnRlbC5jb20+Ckxpbms6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL3IvMjAy
+MjExMTAwNjQxNDcuNzEyOTM0NzkzQGdvb2RtaXMub3JnCi0tLQogRG9jdW1lbnRhdGlvbi9SQ1Uv
+RGVzaWduL1JlcXVpcmVtZW50cy9SZXF1aXJlbWVudHMucnN0ICB8ICAgIDIgKy0KIERvY3VtZW50
+YXRpb24vY29yZS1hcGkvbG9jYWxfb3BzLnJzdCAgICAgICAgICAgICAgICAgICAgfCAgICAyICst
+CiBEb2N1bWVudGF0aW9uL2tlcm5lbC1oYWNraW5nL2xvY2tpbmcucnN0ICAgICAgICAgICAgICAg
+IHwgICAgNSArKysrKwogRG9jdW1lbnRhdGlvbi90cmFuc2xhdGlvbnMvemhfQ04vY29yZS1hcGkv
+bG9jYWxfb3BzLnJzdCB8ICAgIDIgKy0KIDQgZmlsZXMgY2hhbmdlZCwgOCBpbnNlcnRpb25zKCsp
+LCAzIGRlbGV0aW9ucygtKQoKLS0tIGEvRG9jdW1lbnRhdGlvbi9SQ1UvRGVzaWduL1JlcXVpcmVt
+ZW50cy9SZXF1aXJlbWVudHMucnN0CisrKyBiL0RvY3VtZW50YXRpb24vUkNVL0Rlc2lnbi9SZXF1
+aXJlbWVudHMvUmVxdWlyZW1lbnRzLnJzdApAQCAtMTg1OCw3ICsxODU4LDcgQEAgdW5sb2FkZWQu
+IEFmdGVyIGEgZ2l2ZW4gbW9kdWxlIGhhcyBiZWVuCiBvbmUgb2YgaXRzIGZ1bmN0aW9ucyByZXN1
+bHRzIGluIGEgc2VnbWVudGF0aW9uIGZhdWx0LiBUaGUgbW9kdWxlLXVubG9hZAogZnVuY3Rpb25z
+IG11c3QgdGhlcmVmb3JlIGNhbmNlbCBhbnkgZGVsYXllZCBjYWxscyB0byBsb2FkYWJsZS1tb2R1
+bGUKIGZ1bmN0aW9ucywgZm9yIGV4YW1wbGUsIGFueSBvdXRzdGFuZGluZyBtb2RfdGltZXIoKSBt
+dXN0IGJlIGRlYWx0Ci13aXRoIHZpYSB0aW1lcl9kZWxldGVfc3luYygpIG9yIHNpbWlsYXIuCit3
+aXRoIHZpYSB0aW1lcl9zaHV0ZG93bl9zeW5jKCkgb3Igc2ltaWxhci4KIAogVW5mb3J0dW5hdGVs
+eSwgdGhlcmUgaXMgbm8gd2F5IHRvIGNhbmNlbCBhbiBSQ1UgY2FsbGJhY2s7IG9uY2UgeW91CiBp
+bnZva2UgY2FsbF9yY3UoKSwgdGhlIGNhbGxiYWNrIGZ1bmN0aW9uIGlzIGV2ZW50dWFsbHkgZ29p
+bmcgdG8gYmUKLS0tIGEvRG9jdW1lbnRhdGlvbi9jb3JlLWFwaS9sb2NhbF9vcHMucnN0CisrKyBi
+L0RvY3VtZW50YXRpb24vY29yZS1hcGkvbG9jYWxfb3BzLnJzdApAQCAtMTkxLDcgKzE5MSw3IEBA
+IEhlcmUgaXMgYSBzYW1wbGUgbW9kdWxlIHdoaWNoIGltcGxlbWVudHMKIAogICAgIHN0YXRpYyB2
+b2lkIF9fZXhpdCB0ZXN0X2V4aXQodm9pZCkKICAgICB7Ci0gICAgICAgICAgICB0aW1lcl9kZWxl
+dGVfc3luYygmdGVzdF90aW1lcik7CisgICAgICAgICAgICB0aW1lcl9zaHV0ZG93bl9zeW5jKCZ0
+ZXN0X3RpbWVyKTsKICAgICB9CiAKICAgICBtb2R1bGVfaW5pdCh0ZXN0X2luaXQpOwotLS0gYS9E
+b2N1bWVudGF0aW9uL2tlcm5lbC1oYWNraW5nL2xvY2tpbmcucnN0CisrKyBiL0RvY3VtZW50YXRp
+b24va2VybmVsLWhhY2tpbmcvbG9ja2luZy5yc3QKQEAgLTEwMDcsNiArMTAwNywxMSBAQCBjYWxs
+aW5nIGFkZF90aW1lcigpIGF0IHRoZSBlbmQgb2YgdGhlaXIKIEJlY2F1c2UgdGhpcyBpcyBhIGZh
+aXJseSBjb21tb24gY2FzZSB3aGljaCBpcyBwcm9uZSB0byByYWNlcywgeW91IHNob3VsZAogdXNl
+IHRpbWVyX2RlbGV0ZV9zeW5jKCkgKGBgaW5jbHVkZS9saW51eC90aW1lci5oYGApIHRvIGhhbmRs
+ZSB0aGlzIGNhc2UuCiAKK0JlZm9yZSBmcmVlaW5nIGEgdGltZXIsIHRpbWVyX3NodXRkb3duKCkg
+b3IgdGltZXJfc2h1dGRvd25fc3luYygpIHNob3VsZCBiZQorY2FsbGVkIHdoaWNoIHdpbGwga2Vl
+cCBpdCBmcm9tIGJlaW5nIHJlYXJtZWQuIEFueSBzdWJzZXF1ZW50IGF0dGVtcHQgdG8KK3JlYXJt
+IHRoZSB0aW1lciB3aWxsIGJlIHNpbGVudGx5IGlnbm9yZWQgYnkgdGhlIGNvcmUgY29kZS4KKwor
+CiBMb2NraW5nIFNwZWVkCiA9PT09PT09PT09PT09CiAKLS0tIGEvRG9jdW1lbnRhdGlvbi90cmFu
+c2xhdGlvbnMvemhfQ04vY29yZS1hcGkvbG9jYWxfb3BzLnJzdAorKysgYi9Eb2N1bWVudGF0aW9u
+L3RyYW5zbGF0aW9ucy96aF9DTi9jb3JlLWFwaS9sb2NhbF9vcHMucnN0CkBAIC0xODUsNyArMTg1
+LDcgQEAgVVDkuYvpl7TmsqHmnInkuI3lkIznmoTooYzkuLrvvIzlnKjkvaDvv70KIAogICAgIHN0
+YXRpYyB2b2lkIF9fZXhpdCB0ZXN0X2V4aXQodm9pZCkKICAgICB7Ci0gICAgICAgICAgICB0aW1l
+cl9kZWxldGVfc3luYygmdGVzdF90aW1lcik7CisgICAgICAgICAgICB0aW1lcl9zaHV0ZG93bl9z
+eW5jKCZ0ZXN0X3RpbWVyKTsKICAgICB9CiAKICAgICBtb2R1bGVfaW5pdCh0ZXN0X2luaXQpOwoK
