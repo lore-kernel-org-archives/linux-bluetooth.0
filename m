@@ -2,130 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C58C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 03:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDA0C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 08:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235466AbiKWDR6 (ORCPT
+        id S236460AbiKWIRz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Nov 2022 22:17:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39490 "EHLO
+        Wed, 23 Nov 2022 03:17:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235516AbiKWDRx (ORCPT
+        with ESMTP id S236472AbiKWIRx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Nov 2022 22:17:53 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE66CCE1A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Nov 2022 19:17:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1669173471; x=1700709471;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fcSiowrySn1j4AVw4Eoxb9/JM4TURztw223DJcP8XMc=;
-  b=m4JMM1wESA1V+uxRuiPfalcaCaEt9n7DdHrnG7zbDJyRFYrEwvaPB6XS
-   8tLGhkeDujqHiizZTQbvmjHK+NeoCvI3dE61aluQlmhyjBoByjIBAP7Tx
-   7Wtns19MKw5Lr+/0FmaP90Q3lZtNPzbSmbcjc2eJcv8KVaT4QKUFfz18H
-   09YGdwkZ+/F7iE76fl7HqikN/H5bnh8mSpxdfYACixf0r98+72xNd7m7h
-   Zlng8NO2ts5wHFNMWEWNa3+WbDCRr0CN5wRcpedSpxoTWluFJ4oNOpmC+
-   MCZ3VU4QBqyvjvCbyVSEe6gSq29GCKgACQWMmnSRGl2jC3mdcA5qtUACw
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="315790917"
-X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
-   d="scan'208";a="315790917"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2022 19:17:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10539"; a="672712240"
-X-IronPort-AV: E=Sophos;i="5.96,186,1665471600"; 
-   d="scan'208";a="672712240"
-Received: from lkp-server01.sh.intel.com (HELO 64a2d449c951) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 22 Nov 2022 19:17:47 -0800
-Received: from kbuild by 64a2d449c951 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oxgGg-0002AE-29;
-        Wed, 23 Nov 2022 03:17:46 +0000
-Date:   Wed, 23 Nov 2022 11:17:28 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- f492d22c0e7fb242ff68b61ea86b78ff1f031e59
-Message-ID: <637d90c8.tSvOos8uJMsoveeA%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 23 Nov 2022 03:17:53 -0500
+X-Greylist: delayed 460 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Nov 2022 00:17:51 PST
+Received: from forward104o.mail.yandex.net (forward104o.mail.yandex.net [37.140.190.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEEA13F72
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Nov 2022 00:17:49 -0800 (PST)
+Received: from iva8-56bd2512c3ca.qloud-c.yandex.net (iva8-56bd2512c3ca.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:a8a6:0:640:56bd:2512])
+        by forward104o.mail.yandex.net (Yandex) with ESMTP id 1D03965D3A09
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Nov 2022 11:10:06 +0300 (MSK)
+Received: by iva8-56bd2512c3ca.qloud-c.yandex.net (smtp/Yandex) with ESMTPSA id 5AitUF1VA4Y1-QFWlsy1l;
+        Wed, 23 Nov 2022 11:10:05 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ya.ru; s=mail; t=1669191005;
+        bh=5ltUlEkZ0pW7LNo462g3rAM6u1xeRrzl2sP+R2/dYJ0=;
+        h=Message-Id:Date:Subject:To:From;
+        b=rSnhw/WCALQ4FJhOiAAofPcnfkSG37cHHT7nqpaKzEaJ/nqPlUqGKcMGtxkCBw3ub
+         X4NMTwL/brvhoEsHDw1xI14ZhQTQnF0vFaskF2zvW6OHy+lgmxzStvVLrK6+R9+Oum
+         YnqIHY2LmEGcAr54qPKWwgScHqTEZASSErGf8hkA=
+Authentication-Results: iva8-56bd2512c3ca.qloud-c.yandex.net; dkim=pass header.i=@ya.ru
+From:   Artem Lukyanov <dukzcry@ya.ru>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0cb8:0xc559
+Date:   Wed, 23 Nov 2022 11:10:05 +0300
+Message-Id: <20221123081005.70536-1-dukzcry@ya.ru>
+X-Mailer: git-send-email 2.36.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: f492d22c0e7fb242ff68b61ea86b78ff1f031e59  dt-bindings: bluetooth: broadcom: add BCM43430A0 & BCM43430A1
+Add the support ID(0x0cb8, 0xc559) to usb_device_id table for
+Realtek RTL8852BE.
 
-elapsed time: 1528m
+The device info from /sys/kernel/debug/usb/devices as below.
 
-configs tested: 52
-configs skipped: 2
+T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cb8 ProdID=c559 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Signed-off-by: Artem Lukyanov <dukzcry@ya.ru>
+---
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-gcc tested configs:
-arc                                 defconfig
-alpha                               defconfig
-um                           x86_64_defconfig
-um                             i386_defconfig
-s390                                defconfig
-s390                             allmodconfig
-powerpc                           allnoconfig
-s390                             allyesconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-sh                               allmodconfig
-x86_64                          rhel-8.3-func
-x86_64                    rhel-8.3-kselftests
-ia64                             allmodconfig
-i386                          randconfig-a014
-i386                          randconfig-a012
-i386                          randconfig-a016
-x86_64                              defconfig
-x86_64                           rhel-8.3-kvm
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-x86_64                               rhel-8.3
-x86_64                           allyesconfig
-arc                  randconfig-r043-20221121
-riscv                randconfig-r042-20221121
-s390                 randconfig-r044-20221121
-i386                                defconfig
-alpha                            allyesconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-m68k                             allyesconfig
-i386                             allyesconfig
-x86_64               randconfig-a012-20221121
-x86_64               randconfig-a011-20221121
-x86_64               randconfig-a013-20221121
-x86_64               randconfig-a015-20221121
-x86_64               randconfig-a016-20221121
-x86_64               randconfig-a014-20221121
-arm                                 defconfig
-arm64                            allyesconfig
-arm                              allyesconfig
-
-clang tested configs:
-i386                          randconfig-a013
-i386                          randconfig-a011
-i386                          randconfig-a015
-hexagon              randconfig-r041-20221121
-hexagon              randconfig-r045-20221121
-x86_64               randconfig-a004-20221121
-x86_64               randconfig-a001-20221121
-x86_64               randconfig-a003-20221121
-x86_64               randconfig-a002-20221121
-x86_64               randconfig-a005-20221121
-x86_64               randconfig-a006-20221121
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 271963805..f10d73d5b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -443,6 +443,10 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
++	/* Realtek 8852BE Bluetooth devices */
++	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++
+ 	/* Realtek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_REALTEK },
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.36.2
+
