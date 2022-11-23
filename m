@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD985C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 10:52:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0197C43219
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 11:07:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236996AbiKWKwl (ORCPT
+        id S236655AbiKWLHO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 05:52:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53496 "EHLO
+        Wed, 23 Nov 2022 06:07:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237682AbiKWKwC (ORCPT
+        with ESMTP id S237133AbiKWLGk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 05:52:02 -0500
+        Wed, 23 Nov 2022 06:06:40 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CDDA471;
-        Wed, 23 Nov 2022 02:39:03 -0800 (PST)
-Date:   Wed, 23 Nov 2022 11:39:00 +0100 (CET)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29FEFD7A;
+        Wed, 23 Nov 2022 03:06:15 -0800 (PST)
+Date:   Wed, 23 Nov 2022 12:06:13 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669199942;
+        s=2020; t=1669201574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bWx+syrVkp3Bs5TQK0zJVwfz+f2QVugtV7Vnnswr1DY=;
-        b=KUZzCzQheoKwx9UCNhqqaf0xx6QqkOGpsWdU0nxl2HNAmA9rDPZfgWpo13JlhWHFIZKU1o
-        pxqYLnkC1PWOiRr8zbn0v7fWO+JkspD+ogXX6JE1waI8vy5hKkszeapiQyqw0IRAV8HBpA
-        muGFRmCS/htW9dvZjntjFOsWA0XQFHVvJCPPFcJMjb5DJLVqJ7gdwnYFiuTWezRB7qU6rk
-        hfI60jE3YWZ79eR+QmXw8Rjy6ANnzEbycSsj0BM3rHVRjw95lqkmbPIaozpHAlHP1Fk9H9
-        M+CSZxkD8y2Kvw++fVAnf7jXyRFNiDRSA/rsKmLMAbOPSqcf8a0NC0oTsxdYQw==
+        bh=0+upg52BtLT9oHrczBXFvaIQMySCLIal3hm8l0NDLnQ=;
+        b=l6P32vFF870ypZx6vCoBcNNgylnWvrBUmEtcYRcXy0kC4LhfNZoPFwgNttx+vj4z5wSKMs
+        vn0R0rCHUKYgVmCz92vdsSe961Z3VtAs7dzNEsbFtTOO8XqYz4W8PAMnYdRRVSJ4AFv1Wa
+        ft7/SCUlKy2Jmg2zEGahbi/Vxb9wOE1B1ouYh1jYSbFG/bIN3M24g8kmbQXEIxFzWZA8I9
+        AUncV4boGStW+ocIgtThmc2wweNnOlhxDOGwTfw6KkdaXTbMt0pQfqBCyBuvSaou/mE4Pe
+        JP34yBeyRtHZe8ual+wzjM9X206u7+vlPqIllWbycEFVneffF9kaG4Bi9JrbzQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669199942;
+        s=2020e; t=1669201574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bWx+syrVkp3Bs5TQK0zJVwfz+f2QVugtV7Vnnswr1DY=;
-        b=t4BSrZeM86Ma19HnfSro2jQz0o+kyPq6OWYx9UbNR58mdx5CpR0IaxKKZZZiwJp69uznkV
-        Sewrmksh9/wqZ1CQ==
+        bh=0+upg52BtLT9oHrczBXFvaIQMySCLIal3hm8l0NDLnQ=;
+        b=SxPe9D9BGzUbhvSxqQS4b3uIXz2O6cBpEgHoPX1lNKZsBn8VsZihEBpiNn1TJIoH4DHOj/
+        3ujtJx8+O88t8zAQ==
 From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
 To:     Thomas Gleixner <tglx@linutronix.de>
 cc:     LKML <linux-kernel@vger.kernel.org>,
@@ -60,7 +60,7 @@ cc:     LKML <linux-kernel@vger.kernel.org>,
 Subject: Re: [patch V2 12/17] timers: Silently ignore timers with a NULL
  function
 In-Reply-To: <20221122173648.793640919@linutronix.de>
-Message-ID: <1f8f4b0-f9fe-c9c6-7620-862deff6b9d8@linutronix.de>
+Message-ID: <165dcea1-2713-218b-fecf-5bf80452229@linutronix.de>
 References: <20221122171312.191765396@linutronix.de> <20221122173648.793640919@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -85,38 +85,21 @@ On Tue, 22 Nov 2022, Thomas Gleixner wrote:
 > 
 > Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
 > checks so that debug objects can warn about non-initialized timers.
-> 
+
+Could you expand this paragraph, so that is is not missleading when a
+reader is not aware of the details of debug objects? Otherwise it seems to
+the reader that debug objects will warn when timer->function == NULL.
+
+  The warning of debug objects does not cover the original
+  WARN_ON_ONCE(!timer->function). It warns when timer was not initialized
+  using timer_setup[_on_stack]() or via DEFINE_TIMER().
+
+
 > If developers fail to enable debug objects and then waste lots of time to
 > figure out why their non-initialized timer is not firing, they deserve it.
-> 
-> Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Tested-by: Guenter Roeck <linux@roeck-us.net>
-> Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
-> Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
-> ---
-> V2: Use continue instead of return and amend the return value docs (Steven)
-> ---
->  kernel/time/timer.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 55 insertions(+), 5 deletions(-)
-> 
-> --- a/kernel/time/timer.c
-> +++ b/kernel/time/timer.c
-> @@ -1202,6 +1230,9 @@ EXPORT_SYMBOL(timer_reduce);
->   *
->   * If @timer->expires is already in the past @timer will be queued to
->   * expire at the next timer tick.
-> + *
-> + * If @timer->function == NULL then the start operation is silently
-> + * discarded.
->   */
->  void add_timer(struct timer_list *timer)
->  {
 
-Could you move the new paragraph after the paragraph where is is mentioned,
-that timer->function has to be set prior calling add_timer()?
 
 Thanks,
 
-       	Anna-Maria
+	Anna-Maria
+
