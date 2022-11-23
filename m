@@ -2,107 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F1F0C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 09:00:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE26C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 09:23:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236849AbiKWJA3 (ORCPT
+        id S237610AbiKWJX0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 04:00:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36508 "EHLO
+        Wed, 23 Nov 2022 04:23:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236863AbiKWJA1 (ORCPT
+        with ESMTP id S237425AbiKWJW7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 04:00:27 -0500
-Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67E13FFAA7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Nov 2022 01:00:25 -0800 (PST)
-Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-142306beb9aso20073768fac.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Nov 2022 01:00:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zCyrFB2zuxHn9K17yQBh8wNGJKg8KQfpKd3VOPDXQZs=;
-        b=bs09XflHvCucav/+mJ2ghAsT6oRL5lZTLMP/6UOWmfqkx+1xIvCKbuQtciv10uRySn
-         6+pwZgSPeecDS97Bb3nuLzJMwDRnWpwSvCVASr9kcX4ZmN7SGt9yjJBHfvEp02HO7qCk
-         ummNqew+OdglF6OPOJP2yvejSazjqH67SWEGEsIcDs79StC2XeVnq96mB/oejEm8vDE2
-         B+RZ7ifgl6FXuAXEJnNHqyzDyqxxT90mhsogltO7XImrdA7Nfcg2wHstZ1hhE/qfj0K5
-         5pdQjDKVHFhJEmgASpLpoVqOzZRWs5qTQDEPM43B98XsVFAGYJMKDhMtahW7Pxs9807S
-         Scxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zCyrFB2zuxHn9K17yQBh8wNGJKg8KQfpKd3VOPDXQZs=;
-        b=YLDsen0gawrdCgff9eGAjMRk+iqqyvwXmz8z6+3nKyShOypO/950Jo8rsPuSNfngwv
-         vhZspe6BtTdiZZ/J/MX/9xH+T1EXiLkDQTv5bEoVZCU0j8O2Mo6LrwXS//UeRYSAja0f
-         U/yvsO2t/UNqEZLW3Ec9Kbqr09Q7XGCruzL/jJKCBr2edSe18fD5fYqhIXFT4lvgR8rL
-         jD9PsmsRneP73ZTZ33JepKx693Q90WdXuDgGsVfJ9dzGGzfXtn0PIO4BOOg7s9ggSym+
-         O1D+WJlgU131DD30UEPG/xWzJIAdpu1GEcQjdXiAckebZkI0ONQn/YquLc4c5B9ZaRce
-         e9Nw==
-X-Gm-Message-State: ANoB5pljHRX2oFTDNYV31EslPukVru0OC2z/nSOgyGGFbHWBPKK6ci+s
-        bSLGxnRS96J7SHgjHVqvrkzVGDOBS7Y=
-X-Google-Smtp-Source: AA0mqf6luT6gVhQvxuqwW3Wz7NzKc8ZHCK+1y2IGzjsgU9lmuSQOZrSHoELlRRKtNmMx07/32MIy2A==
-X-Received: by 2002:a05:6870:ab14:b0:13b:8760:5f2b with SMTP id gu20-20020a056870ab1400b0013b87605f2bmr7282803oab.251.1669194024415;
-        Wed, 23 Nov 2022 01:00:24 -0800 (PST)
-Received: from [172.17.0.2] ([13.66.10.164])
-        by smtp.gmail.com with ESMTPSA id l16-20020a056830269000b00655ca9a109bsm7015650otu.36.2022.11.23.01.00.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Nov 2022 01:00:24 -0800 (PST)
-Message-ID: <637de128.050a0220.1488f.a4c5@mx.google.com>
-Date:   Wed, 23 Nov 2022 01:00:24 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6014675261776983545=="
+        Wed, 23 Nov 2022 04:22:59 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECE410CEB1;
+        Wed, 23 Nov 2022 01:22:11 -0800 (PST)
+Date:   Wed, 23 Nov 2022 10:22:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1669195329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7RMwYBxd/qD5IH2N5zIliB0q90C6LaQNXHFoiPeMVds=;
+        b=iBHF1UIYWIlQvLJc+DNDRoM9dbBI4oe+b/iIBptIhLCGgf222ipuJ2ESrIvypVgL7H96je
+        YhJZtUK40AVWOiGBVNn15PAfR9MDBFjPbqzuLui/ZC/g6HtGXSEW2g0C5mYZUrvMdNUK4m
+        OTRTFiFF9JygI9nhYYQVi0+IEOS2/HvUeUNhGPZvYoIlZ9r9SL8+aPsMTwjxLM/9HQ3Axl
+        iuk+pmrGSEqSva/NfDA/vOJvOQnVT29f6y7cZ8cDcjC/+v7CLg0mLUlvDzMFy8T+rcTsWI
+        4iTBLY5S7BEL77gu/IiGvjf/nm05bIM44nNjIlFpJYMJ5OVok5GdOmoBOcrmZQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1669195329;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7RMwYBxd/qD5IH2N5zIliB0q90C6LaQNXHFoiPeMVds=;
+        b=5Xst4rypB6KjAJo0CRCzi9BjtfZn3S0LF4qAP2RGSLl0LTYmob0DBo4LgG9T44wiBHCdLR
+        EArVEYKQYHKq9eBA==
+From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [patch V2 12/17] timers: Silently ignore timers with a NULL
+ function
+In-Reply-To: <20221122173648.793640919@linutronix.de>
+Message-ID: <ce3f4736-33de-a6bd-6e86-567bec097bf@linutronix.de>
+References: <20221122171312.191765396@linutronix.de> <20221122173648.793640919@linutronix.de>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dukzcry@ya.ru
-Subject: RE: Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0cb8:0xc559
-In-Reply-To: <20221123081005.70536-1-dukzcry@ya.ru>
-References: <20221123081005.70536-1-dukzcry@ya.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6014675261776983545==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 22 Nov 2022, Thomas Gleixner wrote:
 
-This is automated email and please do not reply to this email!
+> Tearing down timers which have circular dependencies to other
+> functionality, e.g. workqueues, where the timer can schedule work and work
+> can arm timers is not trivial.
 
-Dear submitter,
+NIT (comma is missing): can arm timer, is not trivial.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=698361
+> In those cases it is desired to shutdown the timer in a way which prevents
+> rearming of the timer. The mechanism to do so it to set timer->function to
 
----Test result---
+s/to do so it/to do so is/
 
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      33.44 seconds
-BuildKernel32                 PASS      31.03 seconds
-TestRunnerSetup               PASS      418.59 seconds
-TestRunner_l2cap-tester       PASS      15.72 seconds
-TestRunner_iso-tester         PASS      15.01 seconds
-TestRunner_bnep-tester        PASS      5.23 seconds
-TestRunner_mgmt-tester        PASS      107.58 seconds
-TestRunner_rfcomm-tester      PASS      9.18 seconds
-TestRunner_sco-tester         PASS      8.51 seconds
-TestRunner_ioctl-tester       PASS      9.82 seconds
-TestRunner_mesh-tester        PASS      6.60 seconds
-TestRunner_smp-tester         PASS      8.43 seconds
-TestRunner_userchan-tester    PASS      5.53 seconds
-IncrementalBuild              PASS      30.94 seconds
+> NULL and use this as an indicator for the timer arming functions to ignore
+> the (re)arm request.
+> 
+> In preparation for that replace the warnings in the relevant code pathes
+> with checks for timer->function == NULL and discard the rearm request
+> silently.
+
+Here is a verb missing that this is a grammatically correct (and
+understandable) sentence.
+
+> Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
+> checks so that debug objects can warn about non-initialized timers.
+> 
+> If developers fail to enable debug objects and then waste lots of time to
+> figure out why their non-initialized timer is not firing, they deserve it.
+> 
+> Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Tested-by: Guenter Roeck <linux@roeck-us.net>
+> Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
+> Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
+> ---
+> V2: Use continue instead of return and amend the return value docs (Steven)
+> ---
+>  kernel/time/timer.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 55 insertions(+), 5 deletions(-)
+> 
+> --- a/kernel/time/timer.c
+> +++ b/kernel/time/timer.c
+> @@ -1128,8 +1144,12 @@ static inline int
+>   * mod_timer_pending() is the same for pending timers as mod_timer(), but
+>   * will not activate inactive timers.
+>   *
+> + * If @timer->function == NULL then the start operation is silently
+> + * discarded.
+> + *
+>   * Return:
+> - * * %0 - The timer was inactive and not modified
+> + * * %0 - The timer was inactive and not modified or was is in
+> + *	  shutdown state and the operation was discarded
+
+Do you mean "was" or "is"? Please have also a look at the places where you
+use the same phrase.
+
+>   * * %1 - The timer was active and requeued to expire at @expires
+>   */
+>  int mod_timer_pending(struct timer_list *timer, unsigned long expires)
+> @@ -1155,8 +1175,12 @@ EXPORT_SYMBOL(mod_timer_pending);
+>   * same timer, then mod_timer() is the only safe way to modify the timeout,
+>   * since add_timer() cannot modify an already running timer.
+>   *
+> + * If @timer->function == NULL then the start operation is silently
+> + * discarded, the return value is 0 and meaningless.
+
+It's easier to read, if you make a dot instead of comma.
 
 
+Thanks,
 
----
-Regards,
-Linux Bluetooth
-
-
---===============6014675261776983545==--
+	Anna-Maria
