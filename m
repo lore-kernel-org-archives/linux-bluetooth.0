@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2113AC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 10:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD985C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Nov 2022 10:52:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237645AbiKWKjf (ORCPT
+        id S236996AbiKWKwl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Nov 2022 05:39:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43530 "EHLO
+        Wed, 23 Nov 2022 05:52:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236687AbiKWKjH (ORCPT
+        with ESMTP id S237682AbiKWKwC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Nov 2022 05:39:07 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11663EA126;
-        Wed, 23 Nov 2022 02:23:21 -0800 (PST)
-Date:   Wed, 23 Nov 2022 11:23:18 +0100 (CET)
+        Wed, 23 Nov 2022 05:52:02 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CDDA471;
+        Wed, 23 Nov 2022 02:39:03 -0800 (PST)
+Date:   Wed, 23 Nov 2022 11:39:00 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669198999;
+        s=2020; t=1669199942;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pCNbF4SuwWPa50jU17KKs3SR5/H3opMA3Pjr70EBkKY=;
-        b=RyyL/kUIfO69KG2ebYhWMU9yRzcCB+OUddjvlP3+8Lzk0x91j1CrFxIfylL+JBIFA2ipQw
-        QC8EvK1gXVHT/9Il0lnsrSaLjRdbmu0ucJy8bKtAzwK1p8nRBSuBR8lqHTQdwB/jCnDpI5
-        0id74nNRF4/PgxZ7EX8MjHVLiRxoFDVXlQKPEm3Cm23yXfBEHNwD1L1lpPzHR2v6GMGWGC
-        1QxLmgBWeZNgEApWLRK77ix/rfcPyEvn42LJZe4FDFwEbej3k8ZoGNpV7U84x1VHvICZXJ
-        dPDamAj8glb6roQxZOorLCefZSAeu3lUQg9GIFtJ9nNn38rEDL9rNOC20dR6xA==
+        bh=bWx+syrVkp3Bs5TQK0zJVwfz+f2QVugtV7Vnnswr1DY=;
+        b=KUZzCzQheoKwx9UCNhqqaf0xx6QqkOGpsWdU0nxl2HNAmA9rDPZfgWpo13JlhWHFIZKU1o
+        pxqYLnkC1PWOiRr8zbn0v7fWO+JkspD+ogXX6JE1waI8vy5hKkszeapiQyqw0IRAV8HBpA
+        muGFRmCS/htW9dvZjntjFOsWA0XQFHVvJCPPFcJMjb5DJLVqJ7gdwnYFiuTWezRB7qU6rk
+        hfI60jE3YWZ79eR+QmXw8Rjy6ANnzEbycSsj0BM3rHVRjw95lqkmbPIaozpHAlHP1Fk9H9
+        M+CSZxkD8y2Kvw++fVAnf7jXyRFNiDRSA/rsKmLMAbOPSqcf8a0NC0oTsxdYQw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669198999;
+        s=2020e; t=1669199942;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pCNbF4SuwWPa50jU17KKs3SR5/H3opMA3Pjr70EBkKY=;
-        b=Q5HeSF3VEAhUCLuKNJi+gLlPLLnK9ykcngKERUFjUseshebHXLmdxSj87dJvh4qANAFMr8
-        JMuniKC4+2QG8BAQ==
+        bh=bWx+syrVkp3Bs5TQK0zJVwfz+f2QVugtV7Vnnswr1DY=;
+        b=t4BSrZeM86Ma19HnfSro2jQz0o+kyPq6OWYx9UbNR58mdx5CpR0IaxKKZZZiwJp69uznkV
+        Sewrmksh9/wqZ1CQ==
 From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
 To:     Thomas Gleixner <tglx@linutronix.de>
 cc:     LKML <linux-kernel@vger.kernel.org>,
@@ -57,11 +57,11 @@ cc:     LKML <linux-kernel@vger.kernel.org>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [patch V2 07/17] timers: Update kernel-doc for various
- functions
-In-Reply-To: <20221122173648.501792201@linutronix.de>
-Message-ID: <c3e79ef-a9c4-bee8-cf4-1bea9ad85920@linutronix.de>
-References: <20221122171312.191765396@linutronix.de> <20221122173648.501792201@linutronix.de>
+Subject: Re: [patch V2 12/17] timers: Silently ignore timers with a NULL
+ function
+In-Reply-To: <20221122173648.793640919@linutronix.de>
+Message-ID: <1f8f4b0-f9fe-c9c6-7620-862deff6b9d8@linutronix.de>
+References: <20221122171312.191765396@linutronix.de> <20221122173648.793640919@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
@@ -70,77 +70,53 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 On Tue, 22 Nov 2022, Thomas Gleixner wrote:
 
-> The kernel-doc of timer related functions is partially uncomprehensible
-> word salad. Rewrite it to make it useful.
+> Tearing down timers which have circular dependencies to other
+> functionality, e.g. workqueues, where the timer can schedule work and work
+> can arm timers is not trivial.
 > 
+> In those cases it is desired to shutdown the timer in a way which prevents
+> rearming of the timer. The mechanism to do so it to set timer->function to
+> NULL and use this as an indicator for the timer arming functions to ignore
+> the (re)arm request.
+> 
+> In preparation for that replace the warnings in the relevant code pathes
+> with checks for timer->function == NULL and discard the rearm request
+> silently.
+> 
+> Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
+> checks so that debug objects can warn about non-initialized timers.
+> 
+> If developers fail to enable debug objects and then waste lots of time to
+> figure out why their non-initialized timer is not firing, they deserve it.
+> 
+> Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 > Tested-by: Guenter Roeck <linux@roeck-us.net>
+> Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
+> Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
 > ---
-> V2: Refined comments (Steven)
+> V2: Use continue instead of return and amend the return value docs (Steven)
 > ---
->  kernel/time/timer.c |  148 ++++++++++++++++++++++++++++++----------------------
->  1 file changed, 88 insertions(+), 60 deletions(-)
+>  kernel/time/timer.c |   60 +++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 55 insertions(+), 5 deletions(-)
 > 
 > --- a/kernel/time/timer.c
 > +++ b/kernel/time/timer.c
-> @@ -1200,11 +1212,12 @@ void add_timer(struct timer_list *timer)
->  EXPORT_SYMBOL(add_timer);
->  
->  /**
-> - * add_timer_on - start a timer on a particular CPU
-> - * @timer: the timer to be added
-> - * @cpu: the CPU to start it on
-> + * add_timer_on - Start a timer on a particular CPU
-> + * @timer:	The timer to be started
-> + * @cpu:	The CPU to start it on
+> @@ -1202,6 +1230,9 @@ EXPORT_SYMBOL(timer_reduce);
 >   *
-> - * This is not very scalable on SMP. Double adds are not possible.
-> + * This can only operate on an inactive timer. Attempts to invoke this on
-> + * an active timer are rejected with a warning.
-
-This is also true for add_timer(). Is it possible to add this to
-add_timer() function description and just referencing to add_timer()
-function description in add_timer_on()? They behave the same, only
-difference is the CPU where the timer is enqueued.
-
->   */
->  void add_timer_on(struct timer_list *timer, int cpu)
->  {
-> @@ -1240,15 +1253,18 @@ void add_timer_on(struct timer_list *tim
->  EXPORT_SYMBOL_GPL(add_timer_on);
->  
->  /**
-> - * del_timer - deactivate a timer.
-> - * @timer: the timer to be deactivated
-> - *
-> - * del_timer() deactivates a timer - this works on both active and inactive
-> - * timers.
-> + * del_timer - Deactivate a timer.
-> + * @timer:	The timer to be deactivated
->   *
-> - * The function returns whether it has deactivated a pending timer or not.
-> - * (ie. del_timer() of an inactive timer returns 0, del_timer() of an
-> - * active timer returns 1.)
-> + * The function only deactivates a pending timer, but contrary to
-> + * del_timer_sync() it does not take into account whether the timers
-
-timer's callback function or timer callback function (if the latter one is
-used, please replace it in description for del_timer_sync() as well).
-
-> + * callback function is concurrently executed on a different CPU or not.
-> + * It neither prevents rearming of the timer.  If @timer can be rearmed
-
-NIT                                             ^ two whitespaces
-
-> + * concurrently then the return value of this function is meaningless.
+>   * If @timer->expires is already in the past @timer will be queued to
+>   * expire at the next timer tick.
 > + *
-> + * Return:
-> + * * %0 - The timer was not pending
-> + * * %1 - The timer was pending and deactivated
+> + * If @timer->function == NULL then the start operation is silently
+> + * discarded.
 >   */
->  int del_timer(struct timer_list *timer)
+>  void add_timer(struct timer_list *timer)
 >  {
+
+Could you move the new paragraph after the paragraph where is is mentioned,
+that timer->function has to be set prior calling add_timer()?
 
 Thanks,
 
-	Anna-Maria
+       	Anna-Maria
