@@ -2,43 +2,42 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D436C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Nov 2022 07:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89AE1C352A1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Nov 2022 08:19:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229436AbiKXHhk (ORCPT
+        id S229723AbiKXITT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Nov 2022 02:37:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60950 "EHLO
+        Thu, 24 Nov 2022 03:19:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbiKXHhi (ORCPT
+        with ESMTP id S230030AbiKXITF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Nov 2022 02:37:38 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B05F95AC;
-        Wed, 23 Nov 2022 23:37:34 -0800 (PST)
-Date:   Thu, 24 Nov 2022 08:37:27 +0100 (CET)
+        Thu, 24 Nov 2022 03:19:05 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C76E24BC9;
+        Thu, 24 Nov 2022 00:18:48 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669275452;
+        s=2020; t=1669277926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=R7IPR3D+2Uj3z9wyAmJvuyCVbX35tyzgdGaPWhfMVFU=;
-        b=cyK3yXtZPH/MmeCGW9/Y7sa0S8j3U4V3cbZvcG7kljTMBRfM0Y0QkdauTW+7DBjoQjZtTr
-        Smv7dXzSJykzTNJSGc8sLgPdzbbDlfoTKd/C8NOokzgmUYyb8tklUcrtDDn4C15je2/t5S
-        qZ1JQCGr47d8HQHaAaN8lAer6OE19hnNpyB1jgifOrlEnW6D7thcZgBd7eWn+yIeCGQbN8
-        JAwvmeLK9L9DAYhNk5u69q40Gq9krI/dQFO6xIn3O7kgU2+P46t20owVpLaEAWKInjhFqR
-        wlWQJvdR2QKQazhoXmXtNlH26Ho7CMc2H6AHQCb4EHtFSJuPBzjiNZwLJTi/Yg==
+        bh=rBNp84cE9rns7J7UgaJIbhZ4vtMYMawfokeJnqIV8yU=;
+        b=3j0Ccw1/zby95sNNg0TIWuyYXsfO/PBhjK2DzrVReplJ9Clf5ntgfXo73fot1qffrB9bbz
+        XSaUGU++P6qnOe2i6cLW+xAV++1Y71qnCmp1PxyVGUSobJAFAURI5N7K4oJ3WEqcYkrT0+
+        1Vll+nrLUDmXBtXJk+d8Wt4+LzKpKMFXf6XgJBVjTG45Xk0AzAmtrlXBTej0SIc1Vy1RhA
+        +/xLZK3MFtgCf/rE9+Q4Gs4k2nLHU3L03wTGn5OsHzrhhNfVYqNuoC7tXCSiMBofdSC9gI
+        Fi68qHxG1/SH4xB4dbdBL8iWXl0c4TU/ji58H1qSntb1UNTQ8xcuIFBFY/JESw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669275452;
+        s=2020e; t=1669277926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=R7IPR3D+2Uj3z9wyAmJvuyCVbX35tyzgdGaPWhfMVFU=;
-        b=upalo9fPCSzAMl+wEAxT8iWIYDUFQBY6xP1a37mssQ+s+quUZB6ymRcbfF4PbBXUAt2ltk
-        VvbgJt/W+r7rfFDQ==
-From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
-To:     Thomas Gleixner <tglx@linutronix.de>
-cc:     LKML <linux-kernel@vger.kernel.org>,
+        bh=rBNp84cE9rns7J7UgaJIbhZ4vtMYMawfokeJnqIV8yU=;
+        b=0NTusCg3KEMlk8MtBj5SWLGIW0kvCMsvAVEt6DpLMhgzsNf+gHGM7ZsiP+hbA1w9EqUUUi
+        TBLn+ePExWkhYYBg==
+To:     Anna-Maria Behnsen <anna-maria@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Linus Torvalds <torvalds@linuxfoundation.org>,
         Steven Rostedt <rostedt@goodmis.org>,
         Peter Zijlstra <peterz@infradead.org>,
@@ -60,80 +59,35 @@ cc:     LKML <linux-kernel@vger.kernel.org>,
         Jacob Keller <jacob.e.keller@intel.com>
 Subject: Re: [patch V3 12/17] timers: Silently ignore timers with a NULL
  function
-In-Reply-To: <20221123201625.135055320@linutronix.de>
-Message-ID: <644695b9-f343-7fb7-ed8e-763e5fe3d158@linutronix.de>
-References: <20221123201306.823305113@linutronix.de> <20221123201625.135055320@linutronix.de>
+In-Reply-To: <644695b9-f343-7fb7-ed8e-763e5fe3d158@linutronix.de>
+References: <20221123201306.823305113@linutronix.de>
+ <20221123201625.135055320@linutronix.de>
+ <644695b9-f343-7fb7-ed8e-763e5fe3d158@linutronix.de>
+Date:   Thu, 24 Nov 2022 09:18:46 +0100
+Message-ID: <87zgcgdau1.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 23 Nov 2022, Thomas Gleixner wrote:
+On Thu, Nov 24 2022 at 08:37, Anna-Maria Behnsen wrote:
 
-> Tearing down timers which have circular dependencies to other
-> functionality, e.g. workqueues, where the timer can schedule work and work
-> can arm timers, is not trivial.
-> 
-> In those cases it is desired to shutdown the timer in a way which prevents
-> rearming of the timer. The mechanism to do so is to set timer->function to
-> NULL and use this as an indicator for the timer arming functions to ignore
-> the (re)arm request.
-> 
-> In preparation for that replace the warnings in the relevant code paths
-> with checks for timer->function == NULL. If the pointer is NULLL, then
+> On Wed, 23 Nov 2022, Thomas Gleixner wrote:
+>
+>> Tearing down timers which have circular dependencies to other
+>> functionality, e.g. workqueues, where the timer can schedule work and work
+>> can arm timers, is not trivial.
+>> 
+>> In those cases it is desired to shutdown the timer in a way which prevents
+>> rearming of the timer. The mechanism to do so is to set timer->function to
+>> NULL and use this as an indicator for the timer arming functions to ignore
+>> the (re)arm request.
+>> 
+>> In preparation for that replace the warnings in the relevant code paths
+>> with checks for timer->function == NULL. If the pointer is NULLL, then
+>
+> s/NULLL/NULL
 
-s/NULLL/NULL
-
-> discard the rearm request silently.
-> 
-> Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
-> checks so that debug objects can warn about non-initialized timers.
-> 
-> The warning of debug objects does warn if timer->function == NULL.  It
-
-does NOT warn
-
-> warns when timer was not initialized using timer_setup[_on_stack]() or via
-> DEFINE_TIMER(). If developers fail to enable debug objects and then waste
-> lots of time to figure out why their non-initialized timer is not firing,
-> they deserve it. Same for initializing a timer with a NULL function.
-> 
-> Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Tested-by: Guenter Roeck <linux@roeck-us.net>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
-> Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
-> ---
-> V2: Use continue instead of return and amend the return value docs (Steven)
-> V3: Changelog and comment updates (Anna-Maria)
-> ---
->  kernel/time/timer.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 52 insertions(+), 5 deletions(-)
-> 
-> --- a/kernel/time/timer.c
-> +++ b/kernel/time/timer.c
-> @@ -1128,8 +1144,12 @@ static inline int
->   * mod_timer_pending() is the same for pending timers as mod_timer(), but
->   * will not activate inactive timers.
->   *
-> + * If @timer->function == NULL then the start operation is silently
-> + * discarded.
-> + *
->   * Return:
-> - * * %0 - The timer was inactive and not modified
-> + * * %0 - The timer was inactive and not modified or was is in
-> + *	  shutdown state and the operation was discarded
-
-You forgot to update this "was is" mistake. All other places are fine.
-
->   * * %1 - The timer was active and requeued to expire at @expires
->   */
->  int mod_timer_pending(struct timer_list *timer, unsigned long expires)
-
-Thanks,
-
-	Anna-Maria
+Bah. I should have went to the bar instead of trying to fix this.
 
