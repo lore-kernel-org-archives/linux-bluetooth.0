@@ -2,247 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0695FC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Nov 2022 08:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54435C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Nov 2022 08:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbiKXIWm (ORCPT
+        id S229646AbiKXIow (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Nov 2022 03:22:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
+        Thu, 24 Nov 2022 03:44:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229695AbiKXIWk (ORCPT
+        with ESMTP id S229572AbiKXIov (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Nov 2022 03:22:40 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D26CE25;
-        Thu, 24 Nov 2022 00:22:38 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1669278157;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=s+nIC3djla2eCKjxSXpIFMphkhy9KsLIp+C+/UiDTis=;
-        b=WnnDkWqesDTvoW0XJWpjXbyMRQFAJEH0gsTD+Vx8b1Veh8xDVHTxzRy23zLdxjs62rP2q+
-        aproFYAw5kBxG/hlnkTjE/1pKUe6sb+MIJIp9SeTtpSQc8QSs8HrlJNYxJ0DartOx91aW6
-        Hm1e5Std3/+gkfZrVxCE6p+qcOXqmRMEYHIgXk1OCe+32RJnxT3njZOn8pW/TCVZ6W0JU4
-        EBYgElc67FYlN1woXMHsxmeS7Vq+n7FRNRallduWcfiBM4PckOrDFFJHrSVRFKdWdua9O3
-        mFYlNUTiMm5ZYNseMfjsylX0PIjnLbgfdXakYNH3Es3GDkNGDLkZzvty7BklwQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1669278157;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=s+nIC3djla2eCKjxSXpIFMphkhy9KsLIp+C+/UiDTis=;
-        b=KLKAKLpPJ0MEuWXdektcZAmtHEhsjdXjfi0MPD+kxV+TF5H5O7xH61chkV/YtffDHzfx6T
-        IrK1S6d26MYxYxAg==
-To:     Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linuxfoundation.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Jacob Keller <jacob.e.keller@intel.com>
-Subject: [patch V3.1 12/17] timers: Silently ignore timers with a NULL function
-In-Reply-To: <87zgcgdau1.ffs@tglx>
-References: <20221123201306.823305113@linutronix.de>
- <20221123201625.135055320@linutronix.de>
- <644695b9-f343-7fb7-ed8e-763e5fe3d158@linutronix.de> <87zgcgdau1.ffs@tglx>
-Date:   Thu, 24 Nov 2022 09:22:36 +0100
-Message-ID: <87wn7kdann.ffs@tglx>
+        Thu, 24 Nov 2022 03:44:51 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27ACB8FFBC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Nov 2022 00:44:49 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id 62so1008629pgb.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Nov 2022 00:44:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CfvPP6nBLP+a7QOb15Z/SSp0285yYyt/9QEDSKLW6Do=;
+        b=egNQKK0gUDI3/0OMl6Qr79+P9JAMfC4oWVnGGY+2MvXqsHmPJEY6nBwNOeR98iRacG
+         Pbcr2G9k6ONArFUEewoGEMjQgtQdBtZEknHU7NVoAwhg6HAElXUR4Ra1CczyDcuM4vv0
+         zowaGZ7Yxmaw/0EUrEQaI2Bt6N51NF6MLoMXaq5bhFFpXS0nm8JuOcG8pFxbcZwF3d8H
+         vGK/j7KcXOJLcFjup1EICyOG5MeK8mCU30UmSiir70XNvSiuqFNabTxLWScyTFKnELcC
+         tMx6pp0dbEZYxPxJ01Lz0IlYilLVcdPHry0ftB7k/jMbw+360hjWW/edPiPYE6fkvwCH
+         GiEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CfvPP6nBLP+a7QOb15Z/SSp0285yYyt/9QEDSKLW6Do=;
+        b=NiaWj2B1CcPzqmINguBTwynD6m72Dn8LI3qeLsN6IpTUBycalaguwUvpij9Ngz1202
+         /8ce1ND7kWvPU9LhFWTl2lT/XacRMA+MjmffTliBbYjd0vMgPwj8W3sApaCSE8v/lJ0i
+         wvS2y9hK/W+SHMj4ftkhBcKJTO/EaYKfc4+d3LqyBlwfiMX3sEAe+GXcz/XuqqMTzG35
+         PZJkw+TGaSjBMbUHRa/neYHe7eMSUDYTboO8pD1idiTAprAC8/vqhueIpaS6JOSzBcwd
+         hODEiG80XNeLcoDOHdXZdenkKuI67hx9CPXkvdPaw5/n2X3YTKMgc5TO0gaWj+abZyT9
+         kJFg==
+X-Gm-Message-State: ANoB5pl039yvNV80tuIngPTjw1gypQsp5b1Osj+eM2qFLCIHn5kmoIlT
+        ilcy+lEHRfhRV0wdBs55+FEg0uR884k=
+X-Google-Smtp-Source: AA0mqf5O+Or9hBQ3WzpL5laOXyDTNNip2addxt6bVMccn6FDreiXf1YOsL8Xdn5K5H9ex7CmQ8Pj5g==
+X-Received: by 2002:a63:5042:0:b0:46f:e658:a8ff with SMTP id q2-20020a635042000000b0046fe658a8ffmr14615033pgl.493.1669279488163;
+        Thu, 24 Nov 2022 00:44:48 -0800 (PST)
+Received: from [172.17.0.2] ([20.245.234.184])
+        by smtp.gmail.com with ESMTPSA id b17-20020a170902ed1100b00186fa988a13sm660350pld.166.2022.11.24.00.44.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Nov 2022 00:44:47 -0800 (PST)
+Message-ID: <637f2eff.170a0220.dec89.0b1a@mx.google.com>
+Date:   Thu, 24 Nov 2022 00:44:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8240151066609535528=="
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, tglx@linutronix.de
+Subject: RE: [V3.1,12/17] timers: Silently ignore timers with a NULL function
+In-Reply-To: <87wn7kdann.ffs@tglx>
+References: <87wn7kdann.ffs@tglx>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Tearing down timers which have circular dependencies to other
-functionality, e.g. workqueues, where the timer can schedule work and work
-can arm timers, is not trivial.
+--===============8240151066609535528==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In those cases it is desired to shutdown the timer in a way which prevents
-rearming of the timer. The mechanism to do so is to set timer->function to
-NULL and use this as an indicator for the timer arming functions to ignore
-the (re)arm request.
+This is an automated email and please do not reply to this email.
 
-In preparation for that replace the warnings in the relevant code paths
-with checks for timer->function == NULL. If the pointer is NULL, then
-discard the rearm request silently.
+Dear Submitter,
 
-Add debug_assert_init() instead of the WARN_ON_ONCE(!timer->function)
-checks so that debug objects can warn about non-initialized timers.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-The warning of debug objects does not warn if timer->function == NULL.  It
-warns when timer was not initialized using timer_setup[_on_stack]() or via
-DEFINE_TIMER(). If developers fail to enable debug objects and then waste
-lots of time to figure out why their non-initialized timer is not firing,
-they deserve it. Same for initializing a timer with a NULL function.
+----- Output -----
 
-Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Tested-by: Guenter Roeck <linux@roeck-us.net>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
-Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
+error: patch failed: kernel/time/timer.c:1128
+error: kernel/time/timer.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-V2: Use continue instead of return and amend the return value docs (Steven)
-V3: Changelog and comment updates (Anna-Maria)
-V3.1: Fix it for real
----
- kernel/time/timer.c |   57 +++++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 52 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
---- a/kernel/time/timer.c
-+++ b/kernel/time/timer.c
-@@ -1017,7 +1017,7 @@ static inline int
- 	unsigned int idx = UINT_MAX;
- 	int ret = 0;
- 
--	BUG_ON(!timer->function);
-+	debug_assert_init(timer);
- 
- 	/*
- 	 * This is a common optimization triggered by the networking code - if
-@@ -1044,6 +1044,14 @@ static inline int
- 		 * dequeue/enqueue dance.
- 		 */
- 		base = lock_timer_base(timer, &flags);
-+		/*
-+		 * Has @timer been shutdown? This needs to be evaluated
-+		 * while holding base lock to prevent a race against the
-+		 * shutdown code.
-+		 */
-+		if (!timer->function)
-+			goto out_unlock;
-+
- 		forward_timer_base(base);
- 
- 		if (timer_pending(timer) && (options & MOD_TIMER_REDUCE) &&
-@@ -1070,6 +1078,14 @@ static inline int
- 		}
- 	} else {
- 		base = lock_timer_base(timer, &flags);
-+		/*
-+		 * Has @timer been shutdown? This needs to be evaluated
-+		 * while holding base lock to prevent a race against the
-+		 * shutdown code.
-+		 */
-+		if (!timer->function)
-+			goto out_unlock;
-+
- 		forward_timer_base(base);
- 	}
- 
-@@ -1128,8 +1144,12 @@ static inline int
-  * mod_timer_pending() is the same for pending timers as mod_timer(), but
-  * will not activate inactive timers.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded.
-+ *
-  * Return:
-- * * %0 - The timer was inactive and not modified
-+ * * %0 - The timer was inactive and not modified or was in
-+ *	  shutdown state and the operation was discarded
-  * * %1 - The timer was active and requeued to expire at @expires
-  */
- int mod_timer_pending(struct timer_list *timer, unsigned long expires)
-@@ -1155,8 +1175,12 @@ EXPORT_SYMBOL(mod_timer_pending);
-  * same timer, then mod_timer() is the only safe way to modify the timeout,
-  * since add_timer() cannot modify an already running timer.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded. In this case the return value is 0 and meaningless.
-+ *
-  * Return:
-- * * %0 - The timer was inactive and started
-+ * * %0 - The timer was inactive and started or was in shutdown
-+ *	  state and the operation was discarded
-  * * %1 - The timer was active and requeued to expire at @expires or
-  *	  the timer was active and not modified because @expires did
-  *	  not change the effective expiry time
-@@ -1176,8 +1200,12 @@ EXPORT_SYMBOL(mod_timer);
-  * modify an enqueued timer if that would reduce the expiration time. If
-  * @timer is not enqueued it starts the timer.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded.
-+ *
-  * Return:
-- * * %0 - The timer was inactive and started
-+ * * %0 - The timer was inactive and started or was in shutdown
-+ *	  state and the operation was discarded
-  * * %1 - The timer was active and requeued to expire at @expires or
-  *	  the timer was active and not modified because @expires
-  *	  did not change the effective expiry time such that the
-@@ -1200,6 +1228,9 @@ EXPORT_SYMBOL(timer_reduce);
-  * The @timer->expires and @timer->function fields must be set prior
-  * to calling this function.
-  *
-+ * If @timer->function == NULL then the start operation is silently
-+ * discarded.
-+ *
-  * If @timer->expires is already in the past @timer will be queued to
-  * expire at the next timer tick.
-  *
-@@ -1228,7 +1259,9 @@ void add_timer_on(struct timer_list *tim
- 	struct timer_base *new_base, *base;
- 	unsigned long flags;
- 
--	if (WARN_ON_ONCE(timer_pending(timer) || !timer->function))
-+	debug_assert_init(timer);
-+
-+	if (WARN_ON_ONCE(timer_pending(timer)))
- 		return;
- 
- 	new_base = get_timer_cpu_base(timer->flags, cpu);
-@@ -1239,6 +1272,13 @@ void add_timer_on(struct timer_list *tim
- 	 * wrong base locked.  See lock_timer_base().
- 	 */
- 	base = lock_timer_base(timer, &flags);
-+	/*
-+	 * Has @timer been shutdown? This needs to be evaluated while
-+	 * holding base lock to prevent a race against the shutdown code.
-+	 */
-+	if (!timer->function)
-+		goto out_unlock;
-+
- 	if (base != new_base) {
- 		timer->flags |= TIMER_MIGRATING;
- 
-@@ -1252,6 +1292,7 @@ void add_timer_on(struct timer_list *tim
- 
- 	debug_timer_activate(timer);
- 	internal_add_timer(base, timer);
-+out_unlock:
- 	raw_spin_unlock_irqrestore(&base->lock, flags);
- }
- EXPORT_SYMBOL_GPL(add_timer_on);
-@@ -1541,6 +1582,12 @@ static void expire_timers(struct timer_b
- 
- 		fn = timer->function;
- 
-+		if (WARN_ON_ONCE(!fn)) {
-+			/* Should never happen. Emphasis on should! */
-+			base->running_timer = NULL;
-+			continue;
-+		}
-+
- 		if (timer->flags & TIMER_IRQSAFE) {
- 			raw_spin_unlock(&base->lock);
- 			call_timer_fn(timer, fn, baseclk);
+
+--===============8240151066609535528==--
