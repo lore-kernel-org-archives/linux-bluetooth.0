@@ -2,80 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE6EC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Nov 2022 12:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C24C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Nov 2022 13:48:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229572AbiKXMic (ORCPT
+        id S229878AbiKXNsG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Nov 2022 07:38:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50692 "EHLO
+        Thu, 24 Nov 2022 08:48:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbiKXMib (ORCPT
+        with ESMTP id S229960AbiKXNsE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Nov 2022 07:38:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC6A6429A2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Nov 2022 04:38:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6CFEFB827BA
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Nov 2022 12:38:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0CDFEC433D7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Nov 2022 12:38:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669293508;
-        bh=vUHw1ew5xiNOoG6tm4FV75HAb+vwofwG8bFGsaLgD5I=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=UNf2OlGmNf05V7T/obx3egFDUTFoBPr9O9/AR8qyeof6khWH2fcwi0cXsZSGm19Rc
-         Ao0I6xHV1+ZZhHyvAlh8I1jEILm3Y7PMglTd6fg8ppkdMKudlgcalED6L86/xosCx+
-         YOjszv2wdefFj0LjQ6jmlfcUoG3htPl9Dcpez3jTrGrjsZGlI867hKCkzExxbqFxLM
-         PYDXYfs6LWHKbn6Xb6aPk8Yw3uuPLHidKIkwp7GHPa07zoGDJfL93eSvotetfz41QN
-         vVpx146J3ikKrH128n77pWGkhvnojXX6xpDBZ3WTyY5JOLdA1M3yMeYehU44XWGUYD
-         irlwEMwEF/LZw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D16FFC433E7; Thu, 24 Nov 2022 12:38:27 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215197] Memory leaks show up when using Edimax Wi-Fi N150
- Bluetooth/Wireless USB Adapter (RTL8XXXU)
-Date:   Thu, 24 Nov 2022 12:38:27 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: network-wireless
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: erhard_f@mailbox.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215197-62941-sRrwItKXH4@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215197-62941@https.bugzilla.kernel.org/>
-References: <bug-215197-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 24 Nov 2022 08:48:04 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC9BA1B791;
+        Thu, 24 Nov 2022 05:48:03 -0800 (PST)
+Date:   Thu, 24 Nov 2022 14:48:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1669297682;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1dPUZbRDq+w3xgCnVHaPIQvAFpBAuWURnnoA1oTqYfw=;
+        b=hoChWmaBUSRzsmSnJk1bQPYhGXlreqbe6wbECUZNgL5vJAHwK6bOKal930Wr0dOfikygao
+        u2Y6+rIOUxHwfxP/tqVqocJpYSl5qFDBl0hMDAO2IgFjyneCf4N7chM1I3uizBRSSqzeZJ
+        KtC/7GdRCs1L5gYOv2Je35011iw608/24FP+Rebtf6PpxXxydoev4BkyI5LtjpRdTxZdWQ
+        QMJCuRGN7MRGWueKt/i3dZkRMiwfUCgsgXOA7rLTJCQcjMv5eJK+WgxfQOOZarm6eXj3py
+        N31e7K5qlDkpf54JunJyXgiVqJqfOJxuCPBZDa9PQQLrq/FsbMO9+G2VzOMDwA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1669297682;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1dPUZbRDq+w3xgCnVHaPIQvAFpBAuWURnnoA1oTqYfw=;
+        b=Z8wXuvr0mnNlK6lDvqG955a3Y2RoB45dCmmYZN4ZXsPsQrCcOgjlOwegYq1sKObXC/YdHw
+        fLm8uZJqtVxo9ZCA==
+From:   Anna-Maria Behnsen <anna-maria@linutronix.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+cc:     LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [patch V3 14/17] timers: Add shutdown mechanism to the internal
+ functions
+In-Reply-To: <20221123201625.253883224@linutronix.de>
+Message-ID: <d68c67a2-6488-89e9-4e56-e6efdb1260f@linutronix.de>
+References: <20221123201306.823305113@linutronix.de> <20221123201625.253883224@linutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215197
+On Wed, 23 Nov 2022, Thomas Gleixner wrote:
 
---- Comment #9 from Erhard F. (erhard_f@mailbox.org) ---
-Thanks! I can test in about 3 weeks and will report back. The machine & sti=
-ck
-in question are not at my place.
+> Tearing down timers which have circular dependencies to other
+> functionality, e.g. workqueues, where the timer can schedule work and work
+> can arm timers, is not trivial.
+> 
+> In those cases it is desired to shutdown the timer in a way which prevents
+> rearming of the timer. The mechanism to do so is to set timer->function to
+> NULL and use this as an indicator for the timer arming functions to ignore
+> the (re)arm request.
+> 
+> Add a shutdown argument to the relevant internal functions which makes the
+> actual deactivation code set timer->function to NULL which in turn prevents
+> rearming of the timer.
+> 
+> Co-developed-by: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Tested-by: Guenter Roeck <linux@roeck-us.net>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Link: https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
+> Link: https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
+> ---
+> V2: Add missing commata (Steven)
+> V3: Changelog updates (Anna-Maria)
+> ---
+>  kernel/time/timer.c |   64 ++++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 55 insertions(+), 9 deletions(-)
+> 
+> --- a/kernel/time/timer.c
+> +++ b/kernel/time/timer.c
+> @@ -1297,14 +1297,21 @@ void add_timer_on(struct timer_list *tim
+>  EXPORT_SYMBOL_GPL(add_timer_on);
+>  
+>  /**
+> - * __timer_delete - Internal function: Deactivate a timer.
+> + * __timer_delete - Internal function: Deactivate a timer
 
---=20
-You may reply to this email to add a comment.
+Some more NIT: You already updated the line a patch before. Maybe remove
+the dot in the patch before and you get rid of this unneccessary
+delete/insert of the above line in this hunk.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+>   * @timer:	The timer to be deactivated
+> + * @shutdown:	If true, this indicates that the timer is about to be
+> + *		shutdown permanently.
+> + *
+> + * If @shutdown is true then @timer->function is set to NULL under the
+> + * timer base lock which prevents further rearming of the time. In that
+> + * case any attempt to rearm @timer after this function returns will be
+> + * silently ignored.
+>   *
+>   * Return:
+>   * * %0 - The timer was not pending
+>   * * %1 - The timer was pending and deactivated
+>   */
+> -static int __timer_delete(struct timer_list *timer)
+> +static int __timer_delete(struct timer_list *timer, bool shutdown)
+>  {
+>  	struct timer_base *base;
+>  	unsigned long flags;
+
+Thanks,
+
+	Anna-Maria
+
