@@ -2,80 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC7AC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Nov 2022 02:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CFAC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Nov 2022 04:10:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbiKYCp6 (ORCPT
+        id S229685AbiKYEKG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Nov 2022 21:45:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51192 "EHLO
+        Thu, 24 Nov 2022 23:10:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbiKYCp4 (ORCPT
+        with ESMTP id S229664AbiKYEKA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Nov 2022 21:45:56 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3A52B1AF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Nov 2022 18:45:56 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1BC50B82931
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Nov 2022 02:45:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D6535C43153
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Nov 2022 02:45:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669344353;
-        bh=++zC8ozXhUoGv+XD/i54UyeX5ETKeW6E/X0l6No4pwY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=R52vRAoNy2t1N+n5LO7Ppf6Gam59CqRZxuFELiRBaF/UpweflmYfrUpEPncaUbUMT
-         T5jn6HTsz4Lir0oUJN3QvHV3OVm2dVdyEAFOajO3WH3bFM/VLO9siEg60gDpq6jIbF
-         76MOcxDKssMruugJ0Eb4WRjcJITf36soK1GRtjh5mUg0HUGRcj5Ye3gBf8LkL2DGpT
-         DOP9zSHKnyHju1+6d3++uXVIPSykdgNM51nE0+PWoaApxB/ZCIR/doAfM7os4PMeoh
-         6Y7VRqJi0axA8j6+zLRrWtKz8SN/eoDEhOB0tGvk2EPc7XA7sj0nShonI2091EpuRc
-         KlZAKs1nd3L8A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C9921C433E4; Fri, 25 Nov 2022 02:45:53 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Fri, 25 Nov 2022 02:45:51 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ostroffjh@users.sourceforge.net
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-wwEmxnxTsU@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 24 Nov 2022 23:10:00 -0500
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF10A21E01;
+        Thu, 24 Nov 2022 20:09:58 -0800 (PST)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id 4BA125C0091;
+        Thu, 24 Nov 2022 23:09:58 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Thu, 24 Nov 2022 23:09:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sholland.org; h=
+        cc:cc:content-transfer-encoding:date:date:from:from:in-reply-to
+        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
+         s=fm2; t=1669349398; x=1669435798; bh=D3Ya00IOWjUA1ivuUsjZGbNXc
+        ZeyrlBHGNEb6dsajtE=; b=UXdwXGKAF1tggqSoC9xdc8x9EFnrS2kqK6Dndv8Dw
+        oshbPm9LyEJLctobNy8qnyMhYQGI3iS3CtHRKPODavPOHXZI20zf+7+Z33c5qmR9
+        7cIJwMCvpgy0eaFbqLDombMR3qnFCquvESic0bHG1YbmveeKI2/zdUyL7mHh7xKd
+        57GpaibRDfxebwtZmPabNaafW8DT3Ynit5mnlyC4Ynysj+OoL90LcmF3D+ozy19u
+        VjK+s2jmUp8YWXZUJ5vxAY5fmVZOI2gFR7fqd+tliUwBo3aj7dlTH+SfUDneZ3WZ
+        YC3yH1kbk+ZZMeZWwgYFll7wWMIhR0nEqKx9Neb3Gl3jA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+        1669349398; x=1669435798; bh=D3Ya00IOWjUA1ivuUsjZGbNXcZeyrlBHGNE
+        b6dsajtE=; b=gktYQczL23IV9BHSpfkZ0yd+HIKORKwM4ZyR+MU4uIoLLwvTgZr
+        Eu2/rOtuK06tnJsMWSm3iSihg40d8BxpgHy9cFl1YhhrHjciwrtwD6LhXIdxM1lv
+        BvB/GTpzUv6TwYWcxyp3E1o31Ql/Ozcz0VWN8NG9e1IkXOMeVSYS2MOsHGzCWYyp
+        gUNZQahDazMNRExHavef2f7wrxLC/fr9ugqr8iaBfqgbe9cA9EQxALHBRlXjv0lK
+        sPN7JDzA3RgRtiFSZJ2FEOw0ePH8469InPoMfLbkHf8clQrtNRP/YhLKgEdHLFzH
+        uj9Jy4m4L+XCuN7PzS88H/aiNbQ06oMSbaQ==
+X-ME-Sender: <xms:FUCAY13E_sL18ztmSwfGt5to5aUZ9AKUqemsQqQWbRBXcZi3bI_cVw>
+    <xme:FUCAY8FFl97ldpYB-iW8Qzw7u6nz9e0iX8wLdWf7MxOINV_AgZ37T41AuRaxNm1Pc
+    CFlqsceE9HR9vxiTA>
+X-ME-Received: <xmr:FUCAY15xYFJBpsHw6FT8k3BzTV_6l_iFg6kQ9DiNdyU_FSLxj5hKpG8lYzRTkPg3mprfgSzYzG2T_Oe2CBufJTW61Si6b3WoZdpZlc2ov-a_zSO6XLrhW9x1hQKH4UlS5d5Qlg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrieeggdeijecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefurghmuhgvlhcu
+    jfholhhlrghnugcuoehsrghmuhgvlhesshhhohhllhgrnhgurdhorhhgqeenucggtffrrg
+    htthgvrhhnpeekveelhfejueelleetvdejvdeffeetgeelheeujeffhefgffefkeehhffh
+    keekgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsrghmuhgvlhesshhhohhllhgrnhgurdhorhhg
+X-ME-Proxy: <xmx:FUCAYy0ldgTP84TT3G4FrKUKIXeHqI7DlFNT1nFn1DuRxxN4E66WeQ>
+    <xmx:FUCAY4EGdJPckBPvcKZXy44NwgAGpkPa7OVoHFvTnK01_8dWA7ubUw>
+    <xmx:FUCAYz9HEWTVG3osiZwzKOsG8UQ1Jhv6QaVytjsnMMK1RBZeWyEL6A>
+    <xmx:FkCAY-H4XAD0nGfOwU3Z97ttnxHPEWZ9TvswaupLlsCl-P3_uKmbcg>
+Feedback-ID: i0ad843c9:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 24 Nov 2022 23:09:57 -0500 (EST)
+From:   Samuel Holland <samuel@sholland.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Samuel Holland <samuel@sholland.org>,
+        Rob Herring <robh@kernel.org>,
+        Alistair Francis <alistair@alistair23.me>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Vasily Khoruzhick <anarsoul@gmail.com>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH v2] dt-bindings: net: realtek-bluetooth: Add RTL8723DS
+Date:   Thu, 24 Nov 2022 22:09:56 -0600
+Message-Id: <20221125040956.18648-1-samuel@sholland.org>
+X-Mailer: git-send-email 2.37.4
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+RTL8723DS is another variant of the RTL8723 WiFi + Bluetooth chip. It is
+already supported by the hci_uart/btrtl driver. Document the compatible.
 
---- Comment #260 from Jack (ostroffjh@users.sourceforge.net) ---
-I have been getting that same kernel fault, most commonly without any
-unplug/replug, and usually when no BT device (headset) is connected.  I just
-posted one of my traces to that bug.
+Acked-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Alistair Francis <alistair@alistair23.me>
+Signed-off-by: Samuel Holland <samuel@sholland.org>
+---
 
---=20
-You may reply to this email to add a comment.
+Changes in v2:
+ - Adjust patch title
+ - Collect Acked-by/Reviewed-by
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+ Documentation/devicetree/bindings/net/realtek-bluetooth.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
+index e329ef06e10f..143b5667abad 100644
+--- a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
+@@ -20,6 +20,7 @@ properties:
+     enum:
+       - realtek,rtl8723bs-bt
+       - realtek,rtl8723cs-bt
++      - realtek,rtl8723ds-bt
+       - realtek,rtl8822cs-bt
+ 
+   device-wake-gpios:
+-- 
+2.37.4
+
