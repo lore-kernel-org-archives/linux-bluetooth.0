@@ -2,90 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20087C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Nov 2022 10:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD938C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Nov 2022 12:32:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229621AbiK0K5m (ORCPT
+        id S229585AbiK0Mce (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 27 Nov 2022 05:57:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59090 "EHLO
+        Sun, 27 Nov 2022 07:32:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbiK0K5k (ORCPT
+        with ESMTP id S229563AbiK0Mcd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 27 Nov 2022 05:57:40 -0500
-Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A952925D9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Nov 2022 02:57:35 -0800 (PST)
-Received: (wp-smtpd smtp.tlen.pl 7192 invoked from network); 27 Nov 2022 11:57:32 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
-          t=1669546652; bh=qS+rKWNvGCE+eobUw/wNc/kwb6l/nshtjygdh0Ja6Pc=;
-          h=Subject:To:Cc:From;
-          b=qOhJgvEQM2pXF7U1NqFXaRELAcH1yunwvj1QB2Mk32WlXn8rvCHn4nE9flVcPfFOu
-           fIE4xF4qXar66d0axeHm2f9tlcRFFQGyaPBkdICagvv+xMTFLUz0cUI5+RKGLo9dPk
-           Gu3E+KRJGC+pSEdVMcWZMUBxFTET4m26NA6+SgMM=
-Received: from aaeq124.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.120.124])
-          (envelope-sender <mat.jonczyk@o2.pl>)
-          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <luiz.von.dentz@intel.com>; 27 Nov 2022 11:57:32 +0100
-Message-ID: <ab910a40-45e8-08c0-dd25-5c9dec0f272a@o2.pl>
-Date:   Sun, 27 Nov 2022 11:57:31 +0100
+        Sun, 27 Nov 2022 07:32:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164A0B8C
+        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Nov 2022 04:32:30 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1D4B860D28
+        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Nov 2022 12:32:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7484FC433C1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Nov 2022 12:32:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669552349;
+        bh=2BHInnwRlNimDBih5L2Qc9X7Zg61CAI/jIw26+aJFAg=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=aXl5kTvjrlYDNFYxHwGSO7YuaXwkslEeVDveUmizqQvfIl2f+oqTemeFxcu0GuzOJ
+         a6GC7POx0razy+4Ly/PuJ50sZF193Q+B9rNYXrZvge7q5p3rY7q0guqc42icedq0oi
+         IbKTE/de1pzs/KkhB5uVtRWqoDhlpi1tCHalBeG7hi0XoGI8LYtxLcooMYekb9r+Li
+         BJ8pPQxlZ3MhAi5FvO/XsDm+QhFb+orvZQ9TI7ea3uCpAw4wEEQLRiPMKMT4423kUr
+         q95RZtmhojIXqzPzqpV0hL33/5QExoSDVycE/4GN5VT5uu/qySWXN3UT5aeEs8Y0H6
+         DfRrO1TWvETRA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 49C28C433E9; Sun, 27 Nov 2022 12:32:29 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216683] [REGRESSION] HCI_QUIRK_NO_SUSPEND_NOTIFIER causes
+ kernel panic on fake CSR 5.0 clones
+Date:   Sun, 27 Nov 2022 12:32:28 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216683-62941-OFSvIiRydZ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216683-62941@https.bugzilla.kernel.org/>
+References: <bug-216683-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH] Bluetooth: silence a dmesg error message in hci_request.c
-To:     luiz.von.dentz@intel.com
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, brian.gix@intel.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com
-References: <20221116202856.55847-1-mat.jonczyk@o2.pl>
- <166863481577.13601.1517745268400800639.git-patchwork-notify@kernel.org>
-Content-Language: en-GB
-From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
-In-Reply-To: <166863481577.13601.1517745268400800639.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: c6c3e251eb3a3a0309f581adaadd77eb
-X-WP-AV: skaner antywirusowy Poczty o2
-X-WP-SPAM: NO 0000000 [UbME]                               
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-W dniu 16.11.2022 o 22:40, patchwork-bot+bluetooth@kernel.org pisze:
-> Hello:
->
-> This patch was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->
-> On Wed, 16 Nov 2022 21:28:56 +0100 you wrote:
->> On kernel 6.1-rcX, I have been getting the following dmesg error message
->> on every boot, resume from suspend and rfkill unblock of the Bluetooth
->> device:
->>
->> 	Bluetooth: hci0: HCI_REQ-0xfcf0
->>
->> After some investigation, it turned out to be caused by
->> commit dd50a864ffae ("Bluetooth: Delete unreferenced hci_request code")
->> which modified hci_req_add() in net/bluetooth/hci_request.c to always
->> print an error message when it is executed. In my case, the function was
->> executed by msft_set_filter_enable() in net/bluetooth/msft.c, which
->> provides support for Microsoft vendor opcodes.
->>
->> [...]
-> Here is the summary with links:
->   - Bluetooth: silence a dmesg error message in hci_request.c
->     https://git.kernel.org/bluetooth/bluetooth-next/c/c3fd63f7fe5a
->
-> You are awesome, thank you!
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216683
 
-Hello,
+The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
+huis.info) changed:
 
-Thank you. I would like to ask: is this patch going to be merged for kernel 6.1?
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |regressions@leemhuis.info
 
-The error message that this patch silences will no doubt confuse some users
-if it will be released in Linux 6.1.0.
+--- Comment #7 from The Linux kernel's regression tracker (Thorsten Leemhui=
+s) (regressions@leemhuis.info) ---
+(In reply to JustANormalTinkererMihir from comment #4)
+> I don't really know what I am doing this is confusing as hell.
 
-Greetings,
+Well, ideally you would have followed these guides:
 
-Mateusz
+https://docs.kernel.org/admin-guide/reporting-issues.html
+https://docs.kernel.org/admin-guide/reporting-regressions.html
 
+But whatever, it's not important.
+
+Thing is: when you patch your kernel (or Gentoo might have -- don't known) =
+you
+are own your own. And that seems to be the case here.
+
+But TBH: the hole situation wrt to the problems recently discussed in Bug 6=
+0824
+are confusing for outsiders like me (and developers likely as well). But I'm
+willing to help there. Could you maybe please provide me with an update? All
+adapters that used to work really should work again without any external
+patches -- and ideally without any new module parameters or similar tricks,
+unless that can't be avoided (for example due to security concerns or becau=
+se
+it would cause regressions for others).
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
