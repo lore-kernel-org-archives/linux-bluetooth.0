@@ -2,93 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900BDC43217
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Nov 2022 23:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20087C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Nov 2022 10:57:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiKZX0z (ORCPT
+        id S229621AbiK0K5m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Nov 2022 18:26:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52562 "EHLO
+        Sun, 27 Nov 2022 05:57:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiKZX0x (ORCPT
+        with ESMTP id S229529AbiK0K5k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Nov 2022 18:26:53 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CEBA1837E;
-        Sat, 26 Nov 2022 15:26:52 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id cl5so11522265wrb.9;
-        Sat, 26 Nov 2022 15:26:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rY0qFZwY0/BCIrgdPn0szxAbcTH1ebNL5IsnvxFbdB0=;
-        b=LWAfhGClWdJxi5v2iwQVrstS3BHDFNh+XMK7I5BOpu3XKMNgGvnUxjtumQPXPOeiJr
-         7dQGMV9jpN/O3lKr08+kTQGl/qlXgWR3ZfVa7lNz0cW+sqE7KGkMZkxXjXt+fC6ytnRN
-         rXdSozgwd5VXMAdNFy+FC1UyELRNzIpyUChFdll/4flG2Te2Kyd4rXIpQYqIzgyqjPq/
-         GW+fWd107oP5DYuZDJS/Ilex6i/FbnudjtWumtFLI9ej1v1YXfgRYhLZXFCGOKfZ1a9B
-         xma+qsR+a7stT4uNihblUbdlnINX5/s67WWxmWad/c8Ks2Bo/ZON8Cljfs26t8qfomlP
-         cbiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rY0qFZwY0/BCIrgdPn0szxAbcTH1ebNL5IsnvxFbdB0=;
-        b=3uefKyEfP0OdC9hGTjZ2Rai09shxILpyeRKeLTY4TKpRyQqDlCZd/ZnnM1fwP6/4He
-         khSgbdFQPIouP/5JShmAjdetLIJGjJ4N63ULUgPu8+t50ol1EHei2ua+rL+sJWdM6/3i
-         kRxRw+51A+a4QyQHL8CMRXBDimvGxWVPRZFf7KQhQH4+sV1eZ1FW/VLkNaB53MCYpgNj
-         ZJ5jq1hdbC7q8RHDRdbkeJR5EHb3KUW14A29eu/M9EQw2uj7MYOG8Fw7tPqNJHXrL6YE
-         lwsj+zOLuMXof9QCzzCa973OFhfRe7JNv2dWXjJ8UjTtd9DPtBeoAIW6OKOV8ZA+p59j
-         jOWQ==
-X-Gm-Message-State: ANoB5pkRfIQI4zt1/mXemDhmRvji4RCtLlIQuCGo+iglscw27d5Wqa5R
-        fDKsZF73fW6Xz+k+ed70hRQ=
-X-Google-Smtp-Source: AA0mqf6JbskAQOr1oPN2nM/EB+HNoBRrCRXirpwflyqpP9Mp/9DqRIVq+03CCFvvgR9CuuQQSz6+/w==
-X-Received: by 2002:adf:ed08:0:b0:241:cd8b:46eb with SMTP id a8-20020adfed08000000b00241cd8b46ebmr21101137wro.503.1669505210790;
-        Sat, 26 Nov 2022 15:26:50 -0800 (PST)
-Received: from 168.52.45.77 (201.ip-51-68-45.eu. [51.68.45.201])
-        by smtp.gmail.com with ESMTPSA id 21-20020a05600c26d500b003c6c3fb3cf6sm9451900wmv.18.2022.11.26.15.26.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 26 Nov 2022 15:26:50 -0800 (PST)
-Message-ID: <c38fe636-f3c3-5465-ebc4-70decca84675@gmail.com>
-Date:   Sun, 27 Nov 2022 00:26:46 +0100
+        Sun, 27 Nov 2022 05:57:40 -0500
+Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A952925D9
+        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Nov 2022 02:57:35 -0800 (PST)
+Received: (wp-smtpd smtp.tlen.pl 7192 invoked from network); 27 Nov 2022 11:57:32 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
+          t=1669546652; bh=qS+rKWNvGCE+eobUw/wNc/kwb6l/nshtjygdh0Ja6Pc=;
+          h=Subject:To:Cc:From;
+          b=qOhJgvEQM2pXF7U1NqFXaRELAcH1yunwvj1QB2Mk32WlXn8rvCHn4nE9flVcPfFOu
+           fIE4xF4qXar66d0axeHm2f9tlcRFFQGyaPBkdICagvv+xMTFLUz0cUI5+RKGLo9dPk
+           Gu3E+KRJGC+pSEdVMcWZMUBxFTET4m26NA6+SgMM=
+Received: from aaeq124.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.120.124])
+          (envelope-sender <mat.jonczyk@o2.pl>)
+          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <luiz.von.dentz@intel.com>; 27 Nov 2022 11:57:32 +0100
+Message-ID: <ab910a40-45e8-08c0-dd25-5c9dec0f272a@o2.pl>
+Date:   Sun, 27 Nov 2022 11:57:31 +0100
 MIME-Version: 1.0
-User-Agent: nano 6.4
-Subject: Re: [PATCH 3/3] Bluetooth: btusb: Add a parameter to let users
- disable the fake CSR force-suspend hack
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, luiz.von.dentz@intel.com,
-        quic_zijuhu@quicinc.com, hdegoede@redhat.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, Jack <ostroffjh@users.sourceforge.net>,
-        Paul Menzel <pmenzel@molgen.mpg.de>, swyterzone@gmail.com
-References: <20221029202454.25651-1-swyterzone@gmail.com>
- <20221029202454.25651-3-swyterzone@gmail.com>
- <CABBYNZKnw+b+KE2=M=gGV+rR_KBJLvrxRrtEc8x12W6PY=LKMw@mail.gmail.com>
- <ac1d556f-fe51-1644-0e49-f7b8cf628969@gmail.com>
- <CABBYNZJytVc8=A0_33EFRS_pMG6aUKnfFPsGii_2uKu7_zENtQ@mail.gmail.com>
-Content-Language: en-US
-From:   Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-In-Reply-To: <CABBYNZJytVc8=A0_33EFRS_pMG6aUKnfFPsGii_2uKu7_zENtQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH] Bluetooth: silence a dmesg error message in hci_request.c
+To:     luiz.von.dentz@intel.com
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, brian.gix@intel.com,
+        marcel@holtmann.org, johan.hedberg@gmail.com
+References: <20221116202856.55847-1-mat.jonczyk@o2.pl>
+ <166863481577.13601.1517745268400800639.git-patchwork-notify@kernel.org>
+Content-Language: en-GB
+From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
+In-Reply-To: <166863481577.13601.1517745268400800639.git-patchwork-notify@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: c6c3e251eb3a3a0309f581adaadd77eb
+X-WP-AV: skaner antywirusowy Poczty o2
+X-WP-SPAM: NO 0000000 [UbME]                               
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 09/11/2022 23:39, Luiz Augusto von Dentz wrote:
-> I see, but for suspend in particular, can't we actually handle it
-> somehow? I mean if we can detect the controller is getting stuck and
-> print some information and flip the quirk? Otherwise Im afraid this
-> parameter will end up always being set by distros to avoid suspend
-> problems.
+W dniu 16.11.2022 o 22:40, patchwork-bot+bluetooth@kernel.org pisze:
+> Hello:
+>
+> This patch was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>
+> On Wed, 16 Nov 2022 21:28:56 +0100 you wrote:
+>> On kernel 6.1-rcX, I have been getting the following dmesg error message
+>> on every boot, resume from suspend and rfkill unblock of the Bluetooth
+>> device:
+>>
+>> 	Bluetooth: hci0: HCI_REQ-0xfcf0
+>>
+>> After some investigation, it turned out to be caused by
+>> commit dd50a864ffae ("Bluetooth: Delete unreferenced hci_request code")
+>> which modified hci_req_add() in net/bluetooth/hci_request.c to always
+>> print an error message when it is executed. In my case, the function was
+>> executed by msft_set_filter_enable() in net/bluetooth/msft.c, which
+>> provides support for Microsoft vendor opcodes.
+>>
+>> [...]
+> Here is the summary with links:
+>   - Bluetooth: silence a dmesg error message in hci_request.c
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/c3fd63f7fe5a
+>
+> You are awesome, thank you!
 
-Hi, Luiz. I haven't seen any movement about the [3/3] patch since a few weeks ago.
+Hello,
 
-Given what Hans clarified in his reply, I wondered if you or any of the other
-Bluetooth maintainers have changed opinions about including this in some form.
+Thank you. I would like to ask: is this patch going to be merged for kernel 6.1?
 
-I'm a kernel development newbie, so I'm not good at this. I don't know if I should
-do anything else, wait a bit more, or just drop this. Thanks in advance. :)
+The error message that this patch silences will no doubt confuse some users
+if it will be released in Linux 6.1.0.
+
+Greetings,
+
+Mateusz
+
