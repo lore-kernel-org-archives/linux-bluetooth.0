@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7317EC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Nov 2022 18:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E41C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Nov 2022 18:24:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234139AbiK1SCn (ORCPT
+        id S232665AbiK1SYh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Nov 2022 13:02:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41736 "EHLO
+        Mon, 28 Nov 2022 13:24:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234336AbiK1SCQ (ORCPT
+        with ESMTP id S232602AbiK1SYU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Nov 2022 13:02:16 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C117F46646
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 09:48:58 -0800 (PST)
+        Mon, 28 Nov 2022 13:24:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD2729822
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 10:14:19 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 86E2C612AF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 17:48:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ECC6AC433C1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 17:48:55 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7101A611B0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 18:14:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CF78DC433B5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 18:14:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669657736;
-        bh=bW/LqSpbHv/gfCX0BeyN+ol7/9bxu6S1iIjJyVlmcRE=;
+        s=k20201202; t=1669659258;
+        bh=93hd8qldF16MselnW47zv+oXIH1NrBUwrx3K36HfEkY=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=WwKFksE5sqrvItIGIy91I0reBv1j+aGFf7eTgGeDgusY4MnCnxQRyZM3yg0cjk8p/
-         koef9JTPUnE+E0Pgx5Gud/eGOyE/j8ZRrYJXiAuu/hHe5eDKKY0k749wtOTQOTiV5z
-         peJWrogv7xTy9DeRfII/gyB+Yy0QNzCWevhtF1pi/dbxB9cCxgsrkf6SeX5d26h9mk
-         r0p2n42FizS00OinTykMmU0vAaZLxyWlfcF3kbAK6mZltilJtY2YViFJz2U+iFP4b8
-         8no3rnQRZfkonoyMAA8FUDBOldKCmW76SRa1dNv+OBeF0zHWpB3/TM6ifjq330A1Xx
-         uKsoJ2/L2YeBw==
+        b=BqtZ2+XR3+g6RWS+454VWUuDYvV73mRUyhCiosjYavYi9wJCe+46+RpXhfFzN7J53
+         xLgrctpifl4Kz1IqCO4HC7kWC4TG6XFkSEeOEzqNZpy1X5QlaVmcp07yGiLol2MBGs
+         Lrv8xJN/L3PZzZwmx4mULTJRxTKtsM7Mgeq0VDYwE8Rra6KlL/fEbBWJn/kDJN1ywE
+         AAeJEYA1KQLMRFBQNkNJTdWbzqGHxxnj0FYR25r8hsP2UTvmG8x65RQOVK7vV8tEvU
+         /dHfjn8JIrEintTT/9MaEuTYWV7fD0TgZ7QyO8SXPspzyzo5yJYcIAHZ10bjEjkaNh
+         x7QooZC9DITbg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D1F2DC433E9; Mon, 28 Nov 2022 17:48:55 +0000 (UTC)
+        id B9418C433E9; Mon, 28 Nov 2022 18:14:18 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 216683] [REGRESSION] HCI_QUIRK_NO_SUSPEND_NOTIFIER causes
  kernel panic on fake CSR 5.0 clones
-Date:   Mon, 28 Nov 2022 17:48:55 +0000
+Date:   Mon, 28 Nov 2022 18:14:18 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -54,8 +54,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216683-62941-c2HwjPErMv@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216683-62941-h19XGaw2lk@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216683-62941@https.bugzilla.kernel.org/>
 References: <bug-216683-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,27 +69,12 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216683
 
-Luiz Von Dentz (luiz.dentz@gmail.com) changed:
+--- Comment #14 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+@JustANormalTinkererMihir
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |luiz.dentz@gmail.com
+Could you try something like bellow:
 
---- Comment #13 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-(In reply to JustANormalTinkererMihir from comment #12)
-> I am now able to reproduce this issue on kernel 5.19. Same kernel fault,
-> same thing happened again, the dongle disconnected and reconnected causing
-> the kernel fault.
-
-I don't think this is related to HCI_QUIRK_NO_SUSPEND_NOTIFIER as it was on=
-ly
-introduced by the following change:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/commit/drivers/bluetooth/btusb.c?id=3Db3cf94c8b6b2f1a2b94825a025db291da2b=
-151fd
-
-Or did it reach 5.19 via stable?
+https://gist.github.com/Vudentz/0e0cb034a434e94daaf219f26f921aa2
 
 --=20
 You may reply to this email to add a comment.
