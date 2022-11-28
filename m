@@ -2,122 +2,130 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBD1C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Nov 2022 07:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9588AC4321E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Nov 2022 16:28:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbiK1Hux (ORCPT
+        id S232623AbiK1Q2S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Nov 2022 02:50:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50430 "EHLO
+        Mon, 28 Nov 2022 11:28:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229723AbiK1Huu (ORCPT
+        with ESMTP id S232535AbiK1Q2O (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Nov 2022 02:50:50 -0500
-Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC93E15819;
-        Sun, 27 Nov 2022 23:50:48 -0800 (PST)
-Received: from localhost.localdomain (unknown [10.101.197.31])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        Mon, 28 Nov 2022 11:28:14 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B98024F07
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 08:28:13 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id E528041D13;
-        Mon, 28 Nov 2022 07:50:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1669621847;
-        bh=TlJGd07YuRU9dcGN2JINT0OC0RtE1ROWr5AyItkonQA=;
-        h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-         MIME-Version;
-        b=blmKYIqatbd9ypklk/s2wL90byYbINqrXN3tOGvWUIU069lKnImNkSZ1s1xOmjm+a
-         tCItppa028vjw7jRP+DPCFKJTQy1gm5IBzQ0XXjDrSbEmYXNmySl6aNVphH/X1QnH1
-         ojUMpuI3s433HJvPwey3I/wahqaGbnJSbYMRZyqvSy3m2kT8FGkxlryC6x+ImC9b73
-         dRV7hY1ODT/2WjiKDYb71E/BWKqolTecakrq/VM8JUk9z09I6Z+kUJODnI3GF6l4c8
-         4fE3Ma7vr1oAWbBu52OBY7GsxQ7W5GOw6zGFzoWKuZWCXql7vo4+zvVl4RBjq2HV2s
-         33VUwGjz+CAJg==
-From:   Andy Chi <andy.chi@canonical.com>
-Cc:     andy.chi@canonical.com, Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Add a new VID/PID 0489/e0f2 for MT7922
-Date:   Mon, 28 Nov 2022 15:49:57 +0800
-Message-Id: <20221128074957.52551-1-andy.chi@canonical.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221128063000.41036-1-andy.chi@canonical.com>
-References: <20221128063000.41036-1-andy.chi@canonical.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 398A5B80DFB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 16:26:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D0D3EC433C1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Nov 2022 16:26:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669652783;
+        bh=v9NoVupXkMdpKazs0AXcQSJxA38ONZ7OEdPqoa6oeMg=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=mT/0/mnv3Cjvddyog2jeLIkWqbdc5fADWzBE0aOm1phPyNtKkga+X61MNEMmU4eh0
+         xuMhpJHdtVGpJ4DQ2VBQZZNEgvj6UZvT9zDsS6iUafpwWJ5OotoSGf1TqUw8FjBX65
+         V8785jhAbUzJ88vSrQVvYYSR8vmDGNH1wNdHAmZJAcQ58B10YW+p3heAJ6cPoc0m7B
+         oJl20n0w03G+DdXTfQLve8rocakc64/NJPO06F33UUjWZWGqSYz/ZtztjLe48KxHT7
+         BPWEbvPxWRVgNrjJATee39qkKdrxewXED+CyYN3C0d8knnGWVZh52KgdyNdpG8PdsF
+         pXLZUDsNQx5uQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id BC4C6C433E7; Mon, 28 Nov 2022 16:26:23 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216683] [REGRESSION] HCI_QUIRK_NO_SUSPEND_NOTIFIER causes
+ kernel panic on fake CSR 5.0 clones
+Date:   Mon, 28 Nov 2022 16:26:23 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: justanormaltinkerermihir@duck.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216683-62941-m2DUrIxpa5@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216683-62941@https.bugzilla.kernel.org/>
+References: <bug-216683-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add VID/PID 0489/e0f2 for MediaTek MT7922 Bluetooth chip. Found
-and tested with HP ProBook.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216683
 
-From /sys/kernel/debug/usb/devices:
+--- Comment #9 from JustANormalTinkererMihir (justanormaltinkerermihir@duck=
+.com) ---
+(In reply to The Linux kernel's regression tracker (Thorsten Leemhuis) from
+comment #7)
+What sort of update do you require? As far as I can tell
+HCI_QUIRK_NO_SUSPEND_NOTIFIER causes this regression, and the dongle contin=
+ues
+to work fine after just removing the line. One thing I have noticed in the
+dmesg log is that the dongle sometimes disconnects and reconnects, this is
+largely the reason why the kernel fault even occurs, it disconnects and
+reconnects like this:
+[   53.494546] Bluetooth: RFCOMM TTY layer initialized
+[   53.494558] Bluetooth: RFCOMM socket layer initialized
+[   53.494561] Bluetooth: RFCOMM ver 1.11
+[   60.757711] rfkill: input handler disabled
+[   73.717144] rfkill: input handler enabled
+[   80.462376] rfkill: input handler disabled
+[   80.468335] EXT4-fs (sdc1): mounted filesystem with ordered data mode. Q=
+uota
+mode: none.
+[   93.275986] input: Airdopes 121v2 (AVRCP) as /devices/virtual/input/inpu=
+t23
+[  136.650027] usb 2-1.5: USB disconnect, device number 3
+[  136.892439] usb 2-1.5: new full-speed USB device number 4 using ehci-pci
+[  136.998154] usb 2-1.5: New USB device found, idVendor=3D0a12, idProduct=
+=3D0001,
+bcdDevice=3D88.91
+[  136.998160] usb 2-1.5: New USB device strings: Mfr=3D0, Product=3D2,
+SerialNumber=3D0
+[  136.998162] usb 2-1.5: Product: BT DONGLE10
+[  137.000158] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9 rev=
+=3D0810;
+LMP ver=3D9 subver=3D2312; manufacturer=3D10
+[  137.000163] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+workarounds...
+[  137.000164] Bluetooth: hci0: CSR: Unbranded CSR clone detected;
+force-suspending once...
+[  137.000166] Bluetooth: hci0: CSR: Couldn't suspend the device for our Ba=
+rrot
+8041a02 receive-issue workaround
+[  137.000188] Bluetooth: hci0: HCI Delete Stored Link Key command is
+advertised, but not supported.
+[  137.000189] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
+command is advertised, but not supported.
+[  137.000190] Bluetooth: hci0: HCI Set Event Filter command not supported.
+[  137.082247] Bluetooth: MGMT ver 1.22
+[  143.561978] usb 2-1.5: USB disconnect, device number 4
 
-T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0f2 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+This seems to only happen when idle not when there is any activity. Maybe t=
+he
+dongle has some built-in power saving feature that disables the dongle when=
+ not
+in use? Please note this also happens after disabling the
+HCI_QUIRK_NO_SUSPEND_NOTIFIER. These dongles seem really messed up.
 
-Signed-off-by: Andy Chi <andy.chi@canonical.com>
----
-Changes in v2:
-- Fix typo in the commit message title.
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+--=20
+You may reply to this email to add a comment.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e7914783d29e..0ce209948621 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -596,6 +596,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0e2), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
--- 
-2.34.1
-
+You are receiving this mail because:
+You are the assignee for the bug.=
