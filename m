@@ -2,81 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B954DC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Nov 2022 21:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD1EC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Nov 2022 23:12:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236729AbiK2Vyh (ORCPT
+        id S235589AbiK2XML (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Nov 2022 16:54:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37746 "EHLO
+        Tue, 29 Nov 2022 18:12:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235700AbiK2Vyf (ORCPT
+        with ESMTP id S233312AbiK2XMI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Nov 2022 16:54:35 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEFCD2A73E
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 13:54:34 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 57498B81977
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 21:54:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1F973C43148
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 21:54:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1669758872;
-        bh=O5wk7g1Wv46VhckbH39pOvaXOKP7hzCzFswTfl8lEWU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=JZBP4Bf+nnXAydHyuTIR/sPnrtmJ4urOZ+tZ1S08UIMePAwxGS6BfSrxlPHcN7jQP
-         NSz1HZnHWgDfOB8ZSNpenpAkAfP+XcnifnbC+C4F4PKxcq7jOQkAmLD5W5O52Lz6bN
-         M7S2hWWuwoo6ewKgBhCx6/GeawT/mgfYWB3YZvt09mBiUULOpygafWWwE4yMeUZiWw
-         ce04+uPyE/ngtb+BjvdphK+r7X2rUHrgEWpF5hRdfw5K4hTbGqdRHxhMnBQkZ9BAD7
-         EoH8IDmVjKMG3VOWckpJCVCVTIbqc7Al1jHMNSdvpt6FQs26w+1wDx5aaBpxgYL2dy
-         UI4BWLp+3qrSg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 04F8DC433E9; Tue, 29 Nov 2022 21:54:32 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216683] [REGRESSION] HCI_QUIRK_NO_SUSPEND_NOTIFIER causes
- kernel panic on fake CSR 5.0 clones
-Date:   Tue, 29 Nov 2022 21:54:31 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: luiz.dentz@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216683-62941-hbOeHEtswA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216683-62941@https.bugzilla.kernel.org/>
-References: <bug-216683-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 29 Nov 2022 18:12:08 -0500
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBED56DFF9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 15:12:07 -0800 (PST)
+Received: by mail-qk1-x72d.google.com with SMTP id x18so11060005qki.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 15:12:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=AllhpDwhkksbARcsqF1jTEQxMqiuMYm+r9gXbbxo6MQ=;
+        b=pqe4oBeP2iZ3OmIPI1DMBsor+IcpiWRqGNYVQNyZoTqbmnYmR2H2y93IJzFH+3LpaX
+         Cx5RoeJtBaZ0OGQp3DGAGRnlbvSIK9c1ukWPmzdo2WHmVfxfhtLZje2+B17DU5U6uN2w
+         J4GQhsC35GftSrhW8c+VQMLzWvoteya+Gv7eQiQ9dAQFLDFF4s2E09SNHKVgmE+GpIBH
+         JO293ihybS4j2kY5QSAVJ+3nPl6f2WAt7tRtK+OGnDyrSfucDw96yF2SsHka9JnrqRk6
+         AASo+e8GO/EZLwEKPQ2YwBRDb8oYviZxGny26UOhac/b5uJ8pso/izd1j4b1NnGn0hw3
+         2Vcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AllhpDwhkksbARcsqF1jTEQxMqiuMYm+r9gXbbxo6MQ=;
+        b=PHUfH3qzgcNLgioEhqx82gFdLbwtnZ5ujeMv4ZJ07B8I0301f9ZI0meuab4yi9PH3I
+         y8ajmm75eNaG/sLP0P/syHb/hSSXfPJG2BMRsOrKR9nZYPoWjct9QApqfC2DAkx5+i7F
+         sPQ7ugeTtrjRdok0Hx1wtrWPhn4K/qSC2E3aXB0/lj4b8GlO1hcXW5FN1ul3NgEFjd7R
+         wC6BXRmMo6aM7qgfwDXZybjftSItzyTv5mSKCk1TkCinOjqUa23LiER9MPI64nLi/nQG
+         EtNAhFQpHPcEALfulABgTpYa1UtJWfSq99r3B1jK2USIO1cOqDwpgkV8IFQBrW/Sh+gI
+         oY/g==
+X-Gm-Message-State: ANoB5pnnjHNJf491s/J6NewFjzGF59imzJJ1iSS0uHvYDvSbJM7ecb0v
+        rV0QQUb7FBKsE/nwzOurjHWbqnLjmIvEzA==
+X-Google-Smtp-Source: AA0mqf7wO5IWbmvYv8ZZ5Omrnb+zFCKBIDXRI40d2Ghu92or9+c6caKyaUKM7X9Z9wd4u7CcPdGnQQ==
+X-Received: by 2002:a05:620a:3710:b0:6fc:90de:af27 with SMTP id de16-20020a05620a371000b006fc90deaf27mr3954460qkb.330.1669763526764;
+        Tue, 29 Nov 2022 15:12:06 -0800 (PST)
+Received: from [172.17.0.2] ([52.188.207.116])
+        by smtp.gmail.com with ESMTPSA id u3-20020a05620a0c4300b006fc8fc061f7sm2050332qki.129.2022.11.29.15.12.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Nov 2022 15:12:06 -0800 (PST)
+Message-ID: <638691c6.050a0220.6ac65.79ea@mx.google.com>
+Date:   Tue, 29 Nov 2022 15:12:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0641341986726689862=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/5] shared/bap: Fix not reading all instances of PAC Sinks/Sources
+In-Reply-To: <20221129204556.1535821-1-luiz.dentz@gmail.com>
+References: <20221129204556.1535821-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216683
+--===============0641341986726689862==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---- Comment #16 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-https://patchwork.kernel.org/project/bluetooth/patch/20221129205413.1537851=
--1-luiz.dentz@gmail.com/
+This is automated email and please do not reply to this email!
 
-Please respond with Tested-by if you are not able to reproduce it anymore.
+Dear submitter,
 
---=20
-You may reply to this email to add a comment.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=700234
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.95 seconds
+GitLint                       PASS      1.87 seconds
+BuildEll                      PASS      33.94 seconds
+BluezMake                     PASS      1007.00 seconds
+MakeCheck                     PASS      13.20 seconds
+MakeDistcheck                 PASS      183.09 seconds
+CheckValgrind                 PASS      297.60 seconds
+bluezmakeextell               PASS      116.65 seconds
+IncrementalBuild              PASS      4089.08 seconds
+ScanBuild                     PASS      1243.14 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0641341986726689862==--
