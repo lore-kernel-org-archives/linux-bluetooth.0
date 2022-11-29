@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA51C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Nov 2022 21:11:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DB0C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Nov 2022 21:11:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236964AbiK2VL3 (ORCPT
+        id S236832AbiK2VLe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Nov 2022 16:11:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37098 "EHLO
+        Tue, 29 Nov 2022 16:11:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237015AbiK2VLH (ORCPT
+        with ESMTP id S237017AbiK2VLH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 29 Nov 2022 16:11:07 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CD57046C;
-        Tue, 29 Nov 2022 13:10:40 -0800 (PST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E4C970474;
+        Tue, 29 Nov 2022 13:10:42 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 358456191A;
+        by ams.source.kernel.org (Postfix) with ESMTPS id E31A5B818F9;
         Tue, 29 Nov 2022 21:10:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 95887C43146;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8AFC6C43470;
         Tue, 29 Nov 2022 21:10:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1669756239;
-        bh=N+tk59LoB7XyWOWV01sRdP6Q4dToVLScOgQeo1D7AWg=;
+        bh=sZ267hcgoA0k83l77ahFnqn9gf/hKDhocjpfrizu128=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=OfjaW2CVEN86SDcy1dg7NAeSEsRmHK3ot81VyOS8gQeFAP8P8994+RjOFsaQrAkZW
-         cJxFtlicC91IGQpTmhEh+Ybg4iVP0YVwiNc4Ywz+eIZN2nLK1WgyunLj0yh4Du8iiK
-         qj1gu1/Ut8nWWEbx224agVV5IMb1Y3xOzezYW2RX596BJ3ZmoLJg1roY+EitZHXLm/
-         63GENsBXKY6C9XwoCWDdQGlGvfuzd1r+0/3dghGbvJKan4IC2In+RDZpVwiMU2lYiO
-         gqtifJxFWCHmdVhLpGyjl2L0BQLuLkhJxTmt6rJd8Z2c3iqyJ2y1j5tcp9XAkhkJWV
-         EqFugx/tM6TbQ==
+        b=F7nZ2uyqPv8qW14hK7m7A1V65W0kdBMkGehQ4VpSbbtFkwrZsF1aldu+/dCp1zz4A
+         0SqdJkr5WvZyJXwuQaZWf9ZeeIw86XLVOWiSh+xuwFo3gv1/4zVlY8tBoibmUV7cZ2
+         sOovxnkUwxbAC5vaJji5DLEVxa4wL9JsJamQn01VfMa5nFNLA20ii/U4n/XSI5ZmQJ
+         IWZOgyPG0n+LajbdXmZ1NhmszrMl58P4cbnKnepG66DJGOq5bCjTnIkAtk8YLM1msZ
+         Kf41ue3YqZ11gSjoow+l5ygHugTKYxE+GMmmZgjdqf103a0wpy+QJ7Sy/WgCA4Me8v
+         ttIWT8FXblvIQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B6F3E52556;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 732CAE21EF7;
         Tue, 29 Nov 2022 21:10:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add a new VID/PID 0489/e0f2 for MT7922
+Subject: Re: [PATCH] Bluteooth: btusb: Add a new VID/PID 0489/e0f2 for MT7922
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166975623950.18742.10279905935853864838.git-patchwork-notify@kernel.org>
+Message-Id: <166975623946.18742.7093581077034194288.git-patchwork-notify@kernel.org>
 Date:   Tue, 29 Nov 2022 21:10:39 +0000
-References: <20221128074957.52551-1-andy.chi@canonical.com>
-In-Reply-To: <20221128074957.52551-1-andy.chi@canonical.com>
+References: <20221128063000.41036-1-andy.chi@canonical.com>
+In-Reply-To: <20221128063000.41036-1-andy.chi@canonical.com>
 To:     Andy Chi <andy.chi@canonical.com>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -57,7 +57,7 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 28 Nov 2022 15:49:57 +0800 you wrote:
+On Mon, 28 Nov 2022 14:30:00 +0800 you wrote:
 > Add VID/PID 0489/e0f2 for MediaTek MT7922 Bluetooth chip. Found
 > and tested with HP ProBook.
 > 
@@ -106,7 +106,7 @@ On Mon, 28 Nov 2022 15:49:57 +0800 you wrote:
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btusb: Add a new VID/PID 0489/e0f2 for MT7922
+  - Bluteooth: btusb: Add a new VID/PID 0489/e0f2 for MT7922
     https://git.kernel.org/bluetooth/bluetooth-next/c/773653b4336d
 
 You are awesome, thank you!
