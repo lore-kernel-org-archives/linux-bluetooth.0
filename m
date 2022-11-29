@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A02C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Nov 2022 20:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA52C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Nov 2022 20:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235900AbiK2UqC (ORCPT
+        id S235908AbiK2UqC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 29 Nov 2022 15:46:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46052 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232970AbiK2UqA (ORCPT
+        with ESMTP id S234423AbiK2UqB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Nov 2022 15:46:00 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A5072657A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 12:45:59 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id d18so3817486pls.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 12:45:59 -0800 (PST)
+        Tue, 29 Nov 2022 15:46:01 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3E32264AE
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 12:46:00 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id q71so14124532pgq.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Nov 2022 12:46:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rIuN04fzi/QvqGgsYhrpXfuUt7W+BqBRJCjrS+p5YYk=;
-        b=iIS4kkzvcBoxVff78BFcY/TwsdgCr+SA1YI2noHW5DTgxfF7vLB6gasNTfU6E9OtZ8
-         bSjV2AKmL7DPqDqce9lOZgiG9kP9PseLTjkoMV7zi2DIbf6gqNmAOQ2tcDhkcNlwHBQM
-         Fye82Edb3s74nqDHL4LcEgWzVRw8nYNg4WSJD5897GpFfv2I8AKYA1I9YYwtW7yT8VCs
-         yUjVu0714Zwm/luY3zrt39nX79ubmpvSkNZ5hykih/cXLpE5vcYIQNktW7UwH65aBcb4
-         r6q3Cxtd0dF8I8RpHO/YpN9NY1HgbcJa8cdxFogiw4gMANmKNwNtcABfPvyAw/pFfBDq
-         PJKA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3I4QWhGq5+m0mrFdydgsfIx9xuQMIkAkxU6vd+76M+8=;
+        b=Yjxv9jEr2dO6GmAjU4TbBNCKWyMq2D/lg9uW0+35Q6e4c5tgesC5ojjtaN2WrPdoRe
+         e7X9QzXyV9fLpQmseejIUqtnSMIdo90uT873cYtjxr4NAaFxO8ak9sEBKvt7ErA+rVu3
+         wKhqtMDUXYRaPQAqd4jVF+rSqmRJFFZmTjeN1s8AND2A4Or+qzsb/EZ51uhH6HLmYRsk
+         8L5b+a/AKvP6jp1v1CjboxsSEGiFlhj3fF0ZYUu8WVN9ggSOtPFlzxBU8evNQY8csJho
+         l60XOlJkc9vj9Y3HrX8Ax6K1nV0Dz31LJsnDvL4QrxxSv22t3veo3L+fwtu/p02g0rPc
+         Ac/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rIuN04fzi/QvqGgsYhrpXfuUt7W+BqBRJCjrS+p5YYk=;
-        b=qeH19kTUS+eQHQIfc224gci6lo6El4ssP05O8Nw37sRaoPmfP65NAg0Nb21Cxy3K2q
-         uWHQ/XUY0k+ERzNy376n+AOAAmwjgPdfY66MDmDyIG4lDG1d7EwYNv5uOCIK/0LSFZBe
-         9cksbk0RiM3QU9FEzj7yLsxe8t3trsCAO+FGfDbVJntaRvozJiqH/O5SlmWsGNNuPpHz
-         sONd1m0hZJV5Q+4BR1tAOSMyvNoqm6+v1IuqGngthK0zBiR4n0Sk22YszS+g4kIT7zcq
-         9IAronPWekKCZSibGDKLtiKqWBlCiSJFMLUjnRt0kIpQoyKpk2Q7wH7dfp6BoKnzo5VD
-         14ng==
-X-Gm-Message-State: ANoB5pkmKOfevY30w8PYSS1pw7j33DLgYYLGRxRqkBkkj/bT5toZHqhs
-        2J6cCxR14nB+dn/ESywNfSifxEsOsA77BA==
-X-Google-Smtp-Source: AA0mqf7W527+rOn/359y1zjNHOBSqnvnPmcYCkTbODDxoxfpGlJr3EWqC/XhnY6ggLMeqEhJ+VJfsw==
-X-Received: by 2002:a17:902:ce90:b0:186:ab02:664c with SMTP id f16-20020a170902ce9000b00186ab02664cmr40647183plg.49.1669754758447;
-        Tue, 29 Nov 2022 12:45:58 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3I4QWhGq5+m0mrFdydgsfIx9xuQMIkAkxU6vd+76M+8=;
+        b=R2GfKRha0n2x5nfiwtFoibH17z5viwxpPs7Ales34JfWTkXGROzYdTqMyBaSqhSx92
+         lCaQEU34Fr1UmVgqF3yef8OjG5SVzlQQso0YBlI3JJQknRsOY44NLtbiZSqCBiEr9Ifp
+         HsQc8KMpQBqKa1regIAxrhKjvExzuNCOjN7Ocd0uKQ27ISAMx9B+DGxR6CGvTBZVNpMy
+         JpFsbcpCVYiloftLNiQobDWFO+m9bgKOM6aR8JF7iAOZKiEEtfBSxa4GgnDQD/lcdTH2
+         dg/vIBATin2c6q7PF6WzsFJNkgFzWMxArYx1EaxCYNOj408iiS7c3ZMTmNYVPVs3NkDa
+         iSpg==
+X-Gm-Message-State: ANoB5pmgpDVgz29FSnWYSK8W+rQf3K1377Q9VXa80FqbbPd4tJFAOa4C
+        WXfirjRNISk+v7pJJUO9ho/LCwmxawk2Zg==
+X-Google-Smtp-Source: AA0mqf5I6KYsUA5YcCIEqvA19e0FwZCDDL12VP2FH1pqVkIWvMbbFU78C8iZd5oY5EJlYacC0D2bIw==
+X-Received: by 2002:a63:2251:0:b0:476:cb2a:b99b with SMTP id t17-20020a632251000000b00476cb2ab99bmr52075953pgm.436.1669754759741;
+        Tue, 29 Nov 2022 12:45:59 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id i7-20020a17090332c700b001887e30b9ddsm11216214plr.257.2022.11.29.12.45.57
+        by smtp.gmail.com with ESMTPSA id i7-20020a17090332c700b001887e30b9ddsm11216214plr.257.2022.11.29.12.45.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Nov 2022 12:45:57 -0800 (PST)
+        Tue, 29 Nov 2022 12:45:58 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] shared/bap: Fix not reading all instances of PAC Sinks/Sources
-Date:   Tue, 29 Nov 2022 12:45:52 -0800
-Message-Id: <20221129204556.1535821-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/5] shared/bap: Fix initiating QoS and Enable procedures as server
+Date:   Tue, 29 Nov 2022 12:45:53 -0800
+Message-Id: <20221129204556.1535821-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20221129204556.1535821-1-luiz.dentz@gmail.com>
+References: <20221129204556.1535821-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,62 +68,54 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Both PAC Sink and Source are allowed to have multiple instances:
-
- - The server wanted to support a smaller maximum transmission unit
- (ATT_MTU, as defined in Volume 3, Part F, Section 3.2.8 in [2]) size.
- Exposing all supported PAC records in a single Sink PAC characteristic
- would require the server to increase its supported Maximum
- Transmission Unit (MTU) size to a value the server considered
- excessive.
- - The server wanted to expose support for proprietary audio
- capabilities (such as vendor-specific audio codecs, as denoted by the
- Codec_ID parameter value) separately from support for
- non-vendor-specific audio capabilities and used separate Sink PAC
- characteristics to expose such support.
- - The server wanted to minimize the amount of data to be transferred,
- when sending notifications to a client that the Sink PAC
- characteristic value changed, by exposing the audio capabilities
- likely to change quicker than others in separate Sink PAC
- characteristics.
+According to Table 3.2: ASE state machine transition these procedures
+can only be initated by clients.
 ---
- src/shared/bap.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ src/shared/bap.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
 diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 21aa8aa6c5ca..7a24824a71fc 100644
+index 7a24824a71fc..f4812a4b9f51 100644
 --- a/src/shared/bap.c
 +++ b/src/shared/bap.c
-@@ -2908,10 +2908,12 @@ static void foreach_pacs_char(struct gatt_db_attribute *attr, void *user_data)
- 		DBG(bap, "Sink PAC found: handle 0x%04x", value_handle);
+@@ -4166,14 +4166,12 @@ unsigned int bt_bap_stream_qos(struct bt_bap_stream *stream,
+ 	struct bt_ascs_qos qos;
+ 	struct bt_bap_req *req;
  
- 		pacs = bap_get_pacs(bap);
--		if (!pacs || pacs->sink)
-+		if (!pacs)
- 			return;
+-	if (!bap_stream_valid(stream))
++	/* Table 3.2: ASE state machine transition
++	 * Initiating device - client Only
++	 */
++	if (!bap_stream_valid(stream) || !stream->client)
+ 		return 0;
  
--		pacs->sink = attr;
-+		if (!pacs->sink)
-+			pacs->sink = attr;
-+
- 		bap_read_value(bap, value_handle, read_sink_pac, bap);
- 	}
+-	if (!stream->client) {
+-		stream_qos(stream, data, NULL);
+-		return 0;
+-	}
+-
+ 	memset(&qos, 0, sizeof(qos));
  
-@@ -2919,10 +2921,12 @@ static void foreach_pacs_char(struct gatt_db_attribute *attr, void *user_data)
- 		DBG(bap, "Source PAC found: handle 0x%04x", value_handle);
+ 	/* TODO: Figure out how to pass these values around */
+@@ -4259,14 +4257,12 @@ unsigned int bt_bap_stream_enable(struct bt_bap_stream *stream,
+ {
+ 	int ret;
  
- 		pacs = bap_get_pacs(bap);
--		if (!pacs || pacs->source)
-+		if (!pacs)
- 			return;
+-	if (!bap_stream_valid(stream))
++	/* Table 3.2: ASE state machine transition
++	 * Initiating device - client Only
++	 */
++	if (!bap_stream_valid(stream) || !stream->client)
+ 		return 0;
  
--		pacs->source = attr;
-+		if (!pacs->source)
-+			pacs->source = attr;
-+
- 		bap_read_value(bap, value_handle, read_source_pac, NULL);
- 	}
- 
+-	if (!stream->client) {
+-		stream_enable(stream, metadata, NULL);
+-		return 0;
+-	}
+-
+ 	ret = bap_stream_metadata(stream, BT_ASCS_ENABLE, metadata, func,
+ 								user_data);
+ 	if (!ret || !enable_links)
 -- 
 2.37.3
 
