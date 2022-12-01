@@ -2,92 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8808EC43217
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Dec 2022 18:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D75C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Dec 2022 18:49:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230370AbiLASsy (ORCPT
+        id S230427AbiLAStG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Dec 2022 13:48:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45526 "EHLO
+        Thu, 1 Dec 2022 13:49:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230140AbiLASsx (ORCPT
+        with ESMTP id S230140AbiLAStE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Dec 2022 13:48:53 -0500
-Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1D597926
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 10:48:52 -0800 (PST)
-Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-13ba8947e4cso1227997fac.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 10:48:52 -0800 (PST)
+        Thu, 1 Dec 2022 13:49:04 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92AB554458
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 10:49:03 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id 130so2714411pfu.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 10:49:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fz64XmEhise6zlFNf9gXrcY3jCvW7vg18NKkQNGf6MI=;
-        b=du2K6qFOjfgtsFrPejkXLX53yFh9FWsmdn5I/CNqJ5IUYKxoDvasDvkR/M8J7WaN3g
-         jBxmpvoQ51HxngeNqtusqik7U+ve0p2DdDDS7Yd8cRMyJY5JEF2teoWkEOgrpYZYV4eI
-         izQxlNstOgJD/d86P7KnLYMMCghgJDYUOqv8vT8aG7L7PLc/SyNI9rqObZ9BVG+s6D46
-         MDd6dwKetIFxxYaF83U7u7/k2BLYGWRrVnhVZI+vrr+w2Oop0FjX84aefsIvhTgueUPA
-         GYXLaPc7xnBgak0NA4cdtnfR4htsoq/kN1yztRZ+nydk61G+BjIKXmR7w7oPWJyhUp5N
-         6Q8A==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DXOO7C09+oJhyAn7CtbXv0hrqHWtJrYdpk1h3VMEARk=;
+        b=Z3iu/CCk0RfqO/QMPok3+zF+MqAYy1zTk5mYKi8kSi3qrpqOXKfPeEtNzCdT6N4+O4
+         ITDRHxpmnxNrRXC/8Yr4JA7/Uy65/bF8oGIGZFT/Hf2nNkDGjwV+1nwK9CrpQf/4YMya
+         218GLGxeQ6J46s9mVNCJ/v1z96N/eTTkGcCXFfMvEXqT2fL+8EhlmUYEv11ScWRQ9yUk
+         2rcmRs1g0/jotzfQPYlPLdwIwwFGxqzw3XHKOZHvC3TlH9SREkavzqkigL3rMBmRhow1
+         6jsBWzoyvlMUWaKqlt7ly1rvIccCuSSSCZhq/GWi0YE5aAAbGG+PwdtjH8fE1indRTwg
+         Hczg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fz64XmEhise6zlFNf9gXrcY3jCvW7vg18NKkQNGf6MI=;
-        b=pLnkQTlIo8ejZJzM8Lmk/uBj0dCBSs+AY2KsO1Qzz0MP/qaH5qs6/ieO8Khfjrr6k0
-         NjmSCtU6NGFwQXj02k7ydapF4T0BMTQj/xmRneu7JX+RzsdgOfKFsNzoVl8F71NjY0Bl
-         XjeoCNY3gVxBZHP21sq3del3GWnIuRQ1M9ECBJaJB650G8NwDq5i8jI4U0XhtzlWDbSB
-         2nqlaoDFyYI9AVw5hy6lTt1r+tYqD8a+GeZFe5ZhiG/m3x1sx3iw3/Stb3rWQSyM13Pv
-         EIft7N5GKXMGvYBj/j+6QD/hKrRxieaiJ2YNl6k7/R6UMhJ9/PsHDteKpYBNqwmqODVO
-         mLEQ==
-X-Gm-Message-State: ANoB5pk9md93G3+iV3uoWzivrkyq7QJabpsOXIRjDPMjzUJlJCoqIeSC
-        A8+ySFH7ThnQhSxTuHkN1gGplgG4woEPI59Eg52bkOykYvHs7/zifUS2NkXKTDzHS4fcmEU9xx6
-        cMhz1OyPBmV845aMTzEOK56Qi3lPoZHhsL2IbCcYT/4XJzZ+c+yAebFTXljPeLXHyooO7pGveJC
-        LTfE4LPw==
-X-Google-Smtp-Source: AA0mqf54r1ri/xaXyip8b6eziCYaNng3I3WDNRAtQnv3neDoveGlAJ63HHvo2q3y7f5gCcLhjuhwqmksfoJrOW4=
-X-Received: from allenwebb.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:12e8])
- (user=allenwebb job=sendgmr) by 2002:a05:6870:a194:b0:13b:b601:cbd8 with SMTP
- id a20-20020a056870a19400b0013bb601cbd8mr37138560oaf.74.1669920531647; Thu,
- 01 Dec 2022 10:48:51 -0800 (PST)
-Date:   Thu,  1 Dec 2022 12:48:48 -0600
-In-Reply-To: <20221201184647.4060523-1-allenwebb@google.com>
-Mime-Version: 1.0
-References: <ed43586d-5db7-862e-f012-1f54b5b6583d@molgen.mpg.de>
-X-Mailer: git-send-email 2.39.0.rc0.267.gcb52ba06e7-goog
-Message-ID: <20221201184848.4061303-1-allenwebb@google.com>
-Subject: [PATCH BlueZ v4 1/1] bluetooth.ver: Export sanitizer symbols
-From:   Allen Webb <allenwebb@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Allen Webb <allenwebb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DXOO7C09+oJhyAn7CtbXv0hrqHWtJrYdpk1h3VMEARk=;
+        b=dh7IzjqPS5FOTUExMr0M5aPw4NQWc/7F59HQQSu2uxwHwJgSnp7w7bK9wIYIkTdUYH
+         3l7L3K9XN8ieOlIwJn+3UjQDPzAEymM8rV331+csqa0YyLVh4YZcaYPtE3NchOihzh/o
+         tFpf+LZfHsgoehG8pEUMyT9beYYYwbGK+PWODi9c0VT48h0uiZ3qM9FuMPvHo4JnpwvY
+         zp4hUB1H/9KotHMK8kkG65WshBLMpRDYwRO2Chyh7oRTEO5Qjiy0x6T1oTewYc7RK4Yf
+         vCqAFa11Sndgw2hZypicQ23VlvCd96r+o92IMifj2LFQex/HHQCcoYUd4QlxYERxuLYI
+         0bdQ==
+X-Gm-Message-State: ANoB5pkwCmjPJLgxqT0wS03B3pTziycnAjJRYFY8u3iffnmp9vpbbWeb
+        pbcs1RkH60/C+2GB11WrdWtgCULsTdM=
+X-Google-Smtp-Source: AA0mqf5NbhXZzPxVfPI1c4yz/CXNT71wb+9zf8UCLxr36jaN8IdDGRWkaL2+smHm156rLhb5Bop8tg==
+X-Received: by 2002:aa7:86c7:0:b0:562:45f0:df50 with SMTP id h7-20020aa786c7000000b0056245f0df50mr49611334pfo.16.1669920542874;
+        Thu, 01 Dec 2022 10:49:02 -0800 (PST)
+Received: from [172.17.0.2] ([20.66.126.119])
+        by smtp.gmail.com with ESMTPSA id t123-20020a628181000000b00561dcfa700asm3569001pfd.107.2022.12.01.10.49.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Dec 2022 10:49:02 -0800 (PST)
+Message-ID: <6388f71e.620a0220.7b7f.74ce@mx.google.com>
+Date:   Thu, 01 Dec 2022 10:49:02 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4670230595142554821=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, allenwebb@google.com
+Subject: RE: Fix git lint error
+In-Reply-To: <20221201171613.1819631-2-allenwebb@google.com>
+References: <20221201171613.1819631-2-allenwebb@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix llvm sanitizer support by not hiding sanitizer related symbols.
+--===============4670230595142554821==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=700921
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.35 seconds
+GitLint                       PASS      0.26 seconds
+BuildEll                      PASS      34.37 seconds
+BluezMake                     PASS      1186.40 seconds
+MakeCheck                     PASS      13.08 seconds
+MakeDistcheck                 PASS      189.04 seconds
+CheckValgrind                 PASS      306.64 seconds
+bluezmakeextell               PASS      124.33 seconds
+IncrementalBuild              PASS      986.86 seconds
+ScanBuild                     PASS      1316.16 seconds
+
+
+
 ---
- src/bluetooth.ver | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/bluetooth.ver b/src/bluetooth.ver
-index 214fa8a61..a96fda2a1 100644
---- a/src/bluetooth.ver
-+++ b/src/bluetooth.ver
-@@ -7,6 +7,14 @@
- 		debug;
- 		baswap;
- 		ba2str;
-+		/* Don't break LLVM sanitizers */
-+		__asan*;
-+		__dfsan*;
-+		__lsan*;
-+		__msan*;
-+		__sanitizer*;
-+		__tsan*;
-+		__ubsan*;
- 	local:
- 		*;
- };
--- 
-2.39.0.rc0.267.gcb52ba06e7-goog
 
+--===============4670230595142554821==--
