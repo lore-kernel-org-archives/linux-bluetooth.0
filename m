@@ -2,116 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB624C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Dec 2022 10:33:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F30DDC43217
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Dec 2022 11:32:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbiLAKdZ (ORCPT
+        id S230078AbiLALcC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Dec 2022 05:33:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39140 "EHLO
+        Thu, 1 Dec 2022 06:32:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbiLAKdA (ORCPT
+        with ESMTP id S230519AbiLALcB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Dec 2022 05:33:00 -0500
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04BF1A2821
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 02:32:09 -0800 (PST)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-13bd19c3b68so1625379fac.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 02:32:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5wZRJpk+Ka/SDa5vmGL95dkvEyEH3SXNXIQ+fhXpfqM=;
-        b=WJg6B59MQYnNDaJcIxtRv1ixoBagI5igggh/M/Keum8ZPrNGWo3VCLZoUGYykGfakN
-         DaaOTHBNB5UWav39WdVI09qwWP5slgwB2QgzjjSZvZWQlRqQgYZH1RUqpERPDnuyhdLK
-         9AT0KymK6/C/F8zroaNnKQPG7msLHW0JkFkVTLeLO1xyf4vpji+YEV01sQANQZkOoUtF
-         97kpt20kT7xF56j4Pz+mcsho19TEAqeluBWG5djtXEslAUkx1E4WXsj8HnUtM8O+TdPJ
-         IRZt51wDkv7CV8i/mzG9EK44h67B+rkEATMgzirUM8ehhrMclJRwOa/zCAKtstUIAk2P
-         mh/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5wZRJpk+Ka/SDa5vmGL95dkvEyEH3SXNXIQ+fhXpfqM=;
-        b=e23Y5TqqAJtLk/rv6ZjkcccS9nbw2qFiUvhLKLN6ETyAjUgxEtoSRGBqxgUgRI9E9j
-         EW6fD1vb+TmMzXuXrmf3nj0AHXwXwbeGr9BPoNhBpUvnyb0+PAcAWcGQcH6rO3TtzWqI
-         i6g3ykhVacoiZV0XqprSYrxLQvGednzCi/SihQiKTEytsZRS1PUCru3GeNQRpm6YTo5u
-         yEXPBBtYlxxyVWk/69G8Uo3LDl3iSSGnkJSs8YrA+yrhqXU9kG/ccbfTJgXSx4SAqc4W
-         QP+MYL/SgaTb+3WX13g46NtyCYjNemn3aMFsHtKIhtdLyaKn/EGiBlk9mtRzoWkQMKnB
-         LhaQ==
-X-Gm-Message-State: ANoB5pktevbhjmTsJQCDT90pp3+sVdhsKLsDFp4+68Oz3Z7D3mK/G6Ot
-        vqzVV8grrPO4OYuU14Otp/qrjV7+OpM=
-X-Google-Smtp-Source: AA0mqf7bNWW7KsWapGsCc/A3GfcUPPruIzCdeg12rG2NjJZQg2CRs4m9ojfwk1t/V7zSNVi/K170ng==
-X-Received: by 2002:a05:6870:81a:b0:143:813a:5ea4 with SMTP id fw26-20020a056870081a00b00143813a5ea4mr15658031oab.198.1669890727823;
-        Thu, 01 Dec 2022 02:32:07 -0800 (PST)
-Received: from [172.17.0.2] ([104.210.215.171])
-        by smtp.gmail.com with ESMTPSA id y201-20020a4a45d2000000b004a08307dc14sm729678ooa.8.2022.12.01.02.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 02:32:07 -0800 (PST)
-Message-ID: <638882a7.4a0a0220.f3244.38f1@mx.google.com>
-Date:   Thu, 01 Dec 2022 02:32:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2257505726687672992=="
+        Thu, 1 Dec 2022 06:32:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC0C353EF0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 03:32:00 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 79E7EB81F08
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 11:31:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3FD0BC433B5
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 11:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1669894318;
+        bh=VwEVODXqAX3Gno6eOljnyjJ1N1VlRj5h50FW8La/DfA=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=qwp7St7CF9oQ8qkQr3sg9g+m7CieddoiyGW/3jPspiHkHz5w36bSckb4YawMedCyw
+         MCmoXHfTMpmC4gHgLRPhBVgsOFJek5AuFs9/z4qVr6aszmCa/7EHg9TkSV52Xi807B
+         SKYVD2Dm3Ocib3Z2xK5MHKD2yOPUIbhjX2z1TqvXKmQBmjV202nBhv3VBF8mSKUXOw
+         5B3nFZJT1UPYlroozGQ+MEiLsJkuL6ZMUcal7oyWmmajD5VowjIMZRJv00nNfKwMfp
+         Sm8mG2EpoQ5MHni7vU9FNapk855bliv7E+PqxUOlXGFHZ5gXZi27//9Aagsx+cgmUh
+         mEO5dlMOS669Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 2F640C433E6; Thu,  1 Dec 2022 11:31:58 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216683] [REGRESSION] HCI_QUIRK_NO_SUSPEND_NOTIFIER causes
+ kernel panic on fake CSR 5.0 clones
+Date:   Thu, 01 Dec 2022 11:31:57 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: kernel@rotce.de
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216683-62941-oDFHFipbWt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216683-62941@https.bugzilla.kernel.org/>
+References: <bug-216683-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, lifangpi@hotmail.com
-Subject: RE: [v4] Bluetooth: btusb: Add a new PID/VID 13d3/3549 for RTL8822CU
-In-Reply-To: <SI2PR02MB4603E18266419AF72EB5864BDD149@SI2PR02MB4603.apcprd02.prod.outlook.com>
-References: <SI2PR02MB4603E18266419AF72EB5864BDD149@SI2PR02MB4603.apcprd02.prod.outlook.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2257505726687672992==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216683
 
-This is automated email and please do not reply to this email!
+Daniel (kernel@rotce.de) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |kernel@rotce.de
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=700773
+--- Comment #18 from Daniel (kernel@rotce.de) ---
+I also need all four patches to make it work. However, after a sleep I get =
+the
+following in my dmesg output:
 
----Test result---
+```
+[32332.754468] Bluetooth: hci0: command 0x0405 tx timeout
+```
 
-Test Summary:
-CheckPatch                    PASS      0.60 seconds
-GitLint                       FAIL      0.53 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      34.83 seconds
-BuildKernel32                 PASS      31.07 seconds
-TestRunnerSetup               PASS      428.94 seconds
-TestRunner_l2cap-tester       PASS      16.10 seconds
-TestRunner_iso-tester         PASS      16.47 seconds
-TestRunner_bnep-tester        PASS      5.53 seconds
-TestRunner_mgmt-tester        PASS      107.12 seconds
-TestRunner_rfcomm-tester      PASS      9.49 seconds
-TestRunner_sco-tester         PASS      8.91 seconds
-TestRunner_ioctl-tester       PASS      10.26 seconds
-TestRunner_mesh-tester        PASS      7.01 seconds
-TestRunner_smp-tester         PASS      8.73 seconds
-TestRunner_userchan-tester    PASS      5.84 seconds
-IncrementalBuild              PASS      32.32 seconds
+After that I get the following repeating:
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v4] Bluetooth: btusb: Add a new PID/VID 13d3/3549 for RTL8822CU
+```
+[36431.813695] Bluetooth: hci0: command 0x0c24 tx timeout
+[36431.813705] Bluetooth: hci0: Opcode 0x c24 failed: -110
+[36533.323814] Bluetooth: hci0: command 0x0408 tx timeout
 
-46: B2 Line has trailing whitespace: "	"
-46: B3 Line contains hard tab characters (\t): "	"
+```
 
+--=20
+You may reply to this email to add a comment.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============2257505726687672992==--
+You are receiving this mail because:
+You are the assignee for the bug.=
