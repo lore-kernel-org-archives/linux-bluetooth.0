@@ -2,58 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD05C43217
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Dec 2022 16:09:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF62C43217
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Dec 2022 16:09:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231789AbiLAQJq (ORCPT
+        id S231910AbiLAQJ6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Dec 2022 11:09:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55396 "EHLO
+        Thu, 1 Dec 2022 11:09:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbiLAQJp (ORCPT
+        with ESMTP id S231986AbiLAQJ4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Dec 2022 11:09:45 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC13EE06
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 08:09:44 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id n23-20020a056602341700b00689fc6dbfd6so1928040ioz.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 08:09:44 -0800 (PST)
+        Thu, 1 Dec 2022 11:09:56 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D497B9560
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 08:09:55 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id f71-20020a25384a000000b006dd7876e98eso2047564yba.15
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 08:09:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=M3A9U63C5zRNJMlSkn9yCQLFJ1yJtBALwxjjInLUcuQ=;
-        b=Mfq2fdU0eUso6YyXZUIJe6fZ6dC06rUxvt7kGT+GlD+ZLiGC7uvIhw47SXLk1kWZWy
-         sct1TODiu/DL9Z4eYYa0n2xEkLEPGgJ/eWVC9YFzSAMsbY4JT3B2EC+IJLEeL5m2k44X
-         p62ILeC2MywNwEAM837I4CFyrOnlvY1V0IFxJVrOSOHjR3lnDKw3WH0TPkD+wKxpT3d/
-         5ZXHOJs1DpkhVQ6jB2Lfz1OvKhgcAbRac1noS6OlLH0GTfodNOx3tys0wcYS0UWUGDUx
-         s85k2kA3TEovWRV/r9GH1Egz0lIijWy/F7grMR/pF2l4tN+POWE9TIVcNVYPtrCvcTAM
-         pjkw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FR107kANSLutJz1BILZr0Vl3fPpqLy52IrhEqRHOMyQ=;
+        b=VatvvIrN09dR1CSWxH0S+f+Gf1FJKhx4zMQMkEY9vkbS0WkzHIJ5hINrvuRmVgUVXo
+         QDOYQdZ/WW5+Ko31lb6PG3avxVVFmSJZZD02LQOf+FjzNW84bx5LTj5yblBeRKVVXGYc
+         9qBojJK2TXko1EHCeT/uIDak6snGJqGFd9gbnTvkYx4P4Kopx8dmXY8rmvgEwl0NQvrk
+         gA3+e9/GDZrEfCh9PYMp8EqOB8B8e6KXRq/DjIRlxig9LmliYBCsXDaz5Nl9IsfZDjHn
+         psd611SHGiP5AO77RQvGKmEVOeP/GoRNO1Pzjs7iq2eW7zdWpVWF5rGrnYpzKMoQ5lt5
+         BHUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M3A9U63C5zRNJMlSkn9yCQLFJ1yJtBALwxjjInLUcuQ=;
-        b=GynM/4aRQSW6RzmAhxvHRaUM97b1Ez7VXHrUhBx1tRlUIJ0dOzRVH41VljuWKhghpS
-         MXd8tUsy+0GtNdT9M8/Z8W44UXNB0uZ+jkgXekW5jDbod3s2ZxnSQXWhU9WkdAGZOTfd
-         SR1JeB1owN8skVdFFcIsA4j+wEyWmlCMIK6pSiOUE8dQ0qEfUralZosvOvkXaBD0noVH
-         bw1oEHVa/vztDMnIAp6ixk4yA5GM2Zattfu0YgPCY7y/ByJKScCD0qbAZ+2ifNOuTnub
-         7M8g1wLPdVjO2gGszmN9Ze+jbcY4P1Lx9BDHzFb5h7LHpkxIeeX3a9dOqtWLC3yCDKuh
-         1vRw==
-X-Gm-Message-State: ANoB5pniMyxfi5iMJt2bwbYg/fpBZr+AUTUz5bKBoUIOH68YcLQmfFch
-        XJziLvfR+Kx+BQUdQ+eZfWE+VGYZTlOM7Vmo85uxFvwKBwdvWgZSfCJwW/77lXxQIjXS7i/4/Zi
-        oKnJZ0X7enaWH7RXoSg0JEKS5dKCEEbyRLZgqbpFX+rIdjV6HMmvv06685TpZqyFJZyDvCwdTuo
-        DoWkcgkg==
-X-Google-Smtp-Source: AA0mqf7z8kzh9mhfposTX2evHfbLOjPIRHwa6Brwv6GpQkUBxnDi69GT7MUx8PeSntu8fsoHVwKu/8ymizpzD6A=
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FR107kANSLutJz1BILZr0Vl3fPpqLy52IrhEqRHOMyQ=;
+        b=7KWvM4D0jgE+Jgx1iNrV0OnhVjz/9UzqTW2R5kmjnY0txIapalMOKwCiHADSD1eIXq
+         JiIaKn4YiHuYTbLeO7AsT7UclI2AKTWEsNjzGKFqGQvoieWW6B1mWzbFuQwI7q3rJ4RB
+         JcINuuoXYOK4fh9Npm6bHWHq5XOgq58jQI6nSTwsN8jpucj5rHNrZdl2qdL/AXoYCsBJ
+         5Hmpr3fsc6G1cHRjrJprqMjbkeaD8YUGFP5idfPOzDaCw0ELN4qYgFPg3IpqaaKBw4DJ
+         NR5LesyqdJwXCa9xgho39obLsU4wM6EN873Db85OgcrRf5n0yT75GHbA9N0QxAkpMgYv
+         6Opg==
+X-Gm-Message-State: ANoB5pmGuL1JY/yY2dy99CygTc/acqB/H4MWk7R+nFjXiXOWTPX08/6N
+        NSCfpXj+ItPvyGzDPo+UiBRxEDJ/EPOrxJLFZg6+22PsFC8x0CqLyOM7w1ZnXaiaUyAsFr1EZHo
+        ZsN/WJWt34nYhjzCH9Ms7OekOLSZxnvDJwgOhE4KZG2oJFx+n65dlqwrr1H9egWaUMYrkHslrkY
+        Att/WGXw==
+X-Google-Smtp-Source: AA0mqf79WxhM2fWLJG9nPbfPrTn1gZmpI8KAgG2ybNaY2pgR7rkX5ufwZPDH0A6w5fF+KIZqSxT7qOHPpxYakPo=
 X-Received: from allenwebb.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:12e8])
- (user=allenwebb job=sendgmr) by 2002:a02:cb99:0:b0:389:e0af:54f7 with SMTP id
- u25-20020a02cb99000000b00389e0af54f7mr10135166jap.216.1669910984106; Thu, 01
- Dec 2022 08:09:44 -0800 (PST)
-Date:   Thu,  1 Dec 2022 10:09:40 -0600
+ (user=allenwebb job=sendgmr) by 2002:a81:f80f:0:b0:38e:e541:d8ca with SMTP id
+ z15-20020a81f80f000000b0038ee541d8camr60632998ywm.283.1669910994443; Thu, 01
+ Dec 2022 08:09:54 -0800 (PST)
+Date:   Thu,  1 Dec 2022 10:09:41 -0600
+In-Reply-To: <20221201160941.1065499-1-allenwebb@google.com>
 Mime-Version: 1.0
+References: <20221201160941.1065499-1-allenwebb@google.com>
 X-Mailer: git-send-email 2.38.1.584.g0f3c55d4c2-goog
-Message-ID: <20221201160941.1065499-1-allenwebb@google.com>
-Subject: [PATCH BlueZ 0/1] bluetooth.ver: Export sanitizer symbols.
+Message-ID: <20221201160941.1065499-2-allenwebb@google.com>
+Subject: [PATCH BlueZ 1/1] bluetooth.ver: Export sanitizer symbols.
 From:   Allen Webb <allenwebb@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Allen Webb <allenwebb@google.com>
@@ -62,24 +64,28 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We landed a ChromeOS-specific patch to make it possible to run bluez
-with sanitizers enabled, and I figured it might make sense to land it
-upstream so it is easier for the community to find bugs.
-
-The patch any LLVM sanitzer related symbols so linking against libbase
-does not fail.
-
-The ChromeOS patch landed here:
-https://crrev.com/c/4060017
-Note that on ChromeOS we don't yet use all the sanitizers so for this
-patch I added the missing sanitizers.
-
-Allen Webb (1):
-  bluetooth.ver: Export sanitizer symbols.
-
+Fix llvm sanitizer support by not hidding sanitizer related symbols.
+---
  src/bluetooth.ver | 6 ++++++
  1 file changed, 6 insertions(+)
 
+diff --git a/src/bluetooth.ver b/src/bluetooth.ver
+index 214fa8a61..158627cc3 100644
+--- a/src/bluetooth.ver
++++ b/src/bluetooth.ver
+@@ -7,6 +7,12 @@
+ 		debug;
+ 		baswap;
+ 		ba2str;
++		/* Sanitizer support */
++		__asan*;
++		__lsan*;
++		__msan*;
++		__sanitizer*;
++		__ubsan*;
+ 	local:
+ 		*;
+ };
 -- 
 2.38.1.584.g0f3c55d4c2-goog
 
