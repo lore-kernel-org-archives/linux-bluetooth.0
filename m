@@ -2,611 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 966F7C3A5A7
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Dec 2022 00:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EE0DC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Dec 2022 02:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231956AbiLBAvJ (ORCPT
+        id S231299AbiLBCAJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Dec 2022 19:51:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42022 "EHLO
+        Thu, 1 Dec 2022 21:00:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232129AbiLBAvG (ORCPT
+        with ESMTP id S230170AbiLBCAI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Dec 2022 19:51:06 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92EB4CE425
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 16:51:03 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id cm20so3470697pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 16:51:03 -0800 (PST)
+        Thu, 1 Dec 2022 21:00:08 -0500
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4483B7F8B6
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Dec 2022 18:00:07 -0800 (PST)
+Received: by mail-qt1-x82a.google.com with SMTP id fz10so3431983qtb.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Dec 2022 18:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lTIhg31Aya/7h5Q6jaESOQKvoXVrtlRlWqeM8R6/glY=;
-        b=ncaFMW4ElHkz7M7c9SyKrxjVyfVnHxBZ095rbYKDHl6GnZA7voIDhG9Fk2/xex1jib
-         txYfJ82lef8ULyifFeF3m82J7ht6vYFbGLfYvzK4bHySFPIx8j7+XlIdltm4vht9j+P8
-         j2JwBxI6XM1EDvtImuz88ikBKOb6OVbtG1rFFpDfjqWHVH3qi0AWy+ZPOWu/PiuxzavE
-         ik3iBEz3boNM4aqdGNCOu7CuCfyduQqjZyIsKax/9QTsyHexKSpkBl98r6PeF4JEMICG
-         +ZPZ9MW1hjwMCRJ78+ZiyiQ0Y/8TFIowySt+hyCU3tBouZ4kBOlqXTtpCsq4sorLCnZ6
-         IB+Q==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GDzDVSv552xue3m9ML6UC0i71CHfPefJDvw03KuU/RA=;
+        b=WDZaT1XAnCrgLsoi55rjS3a28uEnywvAs8RXH1GdNNeQ+J6YZj21mwJVOmaYFFFkjP
+         DQPFHMU65BQ73tZxKVoa15Jqv3Ze7iL5LcmBaGFJ5sVj8X7Dj5Foy26Kpy1NjrdLeg/f
+         sO2jOrj3RxbqQ0inpVUEGlkv6v9b9n9KlM7Aqs7WB0C6/CoGQavDtXFRwaersdqrlu3N
+         GV6BC2Y1JVcnOTpsnDqVE1wuC1wamf1c2JsGVggjdEcRfdwr1qPkhQ2pqveRSEZlGH2c
+         ttYnLhsYtJu8oBsBpssMsp+oBOf8sVVG1pwbgd2TX041MaxH4bXkGph9lHnheYTCd1cW
+         R9kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lTIhg31Aya/7h5Q6jaESOQKvoXVrtlRlWqeM8R6/glY=;
-        b=Ok+NOQHN0VSOEVg0SD0imNoAlrhpomRcEadfran7AkDAzHni+t4VUfoM58ZKEJP7af
-         X1lh2mWieejSZYdqtCAJo+N9RLUJ6ICOlmLmOcmZcXQq3XtmA/C1+mIe8zQc9giQXnCx
-         Qt/g84lQsWe7NVfyG4Kj4JZkLDH3qwcmV57W3MQ/pL+Udb6u6ZhfGiss9fMYRPpWLytO
-         WOAFioWx1ISLtN+N3VH5YbSGlq1E50CVW7H5DgKXUs68b8WgfmKoPS7lfnYpHM6unTSI
-         JU6beeA8aO6FCT1WKeFlfUPOp/FLPx7LCu8K3FbeJjWgxR1ekj8zYWDUAFoAzQ9b33E1
-         kBXQ==
-X-Gm-Message-State: ANoB5pmPdQvxVcpR0k4F2LTFCYHAtrEdmwJIQaPMiYkkKE0YfGq6rw0q
-        xX0E8zDIFkIE/bpRzrz2JjkTCeKUZT78QQ==
-X-Google-Smtp-Source: AA0mqf4RUCA/OVS+SuEYbQeNGV0Rj/6tZBaCB4C9G4IxoJ+gA11imlBSMfrCiDWHbok/7CyBai46Dw==
-X-Received: by 2002:a17:90a:9313:b0:213:2168:1c78 with SMTP id p19-20020a17090a931300b0021321681c78mr74096714pjo.72.1669942262322;
-        Thu, 01 Dec 2022 16:51:02 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f14-20020a170902684e00b0018971fba556sm4246005pln.139.2022.12.01.16.51.01
-        for <linux-bluetooth@vger.kernel.org>
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GDzDVSv552xue3m9ML6UC0i71CHfPefJDvw03KuU/RA=;
+        b=r3OXqMFatvzdtwQQ3cRyP3FkYJSc7DRg/cu9g0GCz5UnmIkFZq6IFnaskaQqFg5fJN
+         WVzkdeIHCg9YByzxItXtFr4d4Ft/FZD6oI5iVzDKR3HWt+p4sX8B0I06NRr08B0UQSw/
+         /A6IIFJm4PbRJpL0kcbwoS4PA5hNT+a7tAwc7wfpI4NpHURS/xPKispdGcXTsO1ry74a
+         dPvKPIV6PaAQZR628pc0WQkOKtyeKKnQRqHSWOXWpahwRwtofEtp+BrE5D8CiBhLuSWf
+         TbSpFM304IgX32KYyJgvi29V0xoPvlSL8mYLPqBvwXxZjexROl2jh4nK0bzuU25jc0O9
+         Xs4A==
+X-Gm-Message-State: ANoB5pll5A/fBGqjzf6iRJrk6GDq6Ged1bBQn69huzjZc7z8suSEvibc
+        NEw6H4neNJqDwrktbS6Rg8oVVAz1reBCrQ==
+X-Google-Smtp-Source: AA0mqf4d+bZMDp3Jp4KFV96r/xtodCcKk6aIOZOxB2yB4IPFhyim0qkX1tZPY8D6LFAVUlkz8ojrfA==
+X-Received: by 2002:a05:622a:1f12:b0:399:36a9:7d9d with SMTP id ca18-20020a05622a1f1200b0039936a97d9dmr46934594qtb.49.1669946406283;
+        Thu, 01 Dec 2022 18:00:06 -0800 (PST)
+Received: from [172.17.0.2] ([20.119.180.158])
+        by smtp.gmail.com with ESMTPSA id w18-20020a05620a425200b006cfc9846594sm4601318qko.93.2022.12.01.18.00.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Dec 2022 16:51:01 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 8/8] client: Move common print_* functions to its own file
-Date:   Thu,  1 Dec 2022 16:50:51 -0800
-Message-Id: <20221202005051.2401504-8-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221202005051.2401504-1-luiz.dentz@gmail.com>
-References: <20221202005051.2401504-1-luiz.dentz@gmail.com>
+        Thu, 01 Dec 2022 18:00:05 -0800 (PST)
+Message-ID: <63895c25.050a0220.95a14.14b2@mx.google.com>
+Date:   Thu, 01 Dec 2022 18:00:05 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4391744915369769038=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] shared/gatt-client: Fix not checking valid ranges
+In-Reply-To: <20221202003237.2371302-1-luiz.dentz@gmail.com>
+References: <20221202003237.2371302-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4391744915369769038==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This move common print_* functions to its own file so they can be
-properly reused instead of duplicating the code.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=701025
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+GitLint                       PASS      0.35 seconds
+BuildEll                      PASS      27.30 seconds
+BluezMake                     PASS      867.15 seconds
+MakeCheck                     PASS      11.62 seconds
+MakeDistcheck                 PASS      145.87 seconds
+CheckValgrind                 PASS      241.01 seconds
+bluezmakeextell               PASS      94.09 seconds
+IncrementalBuild              PASS      699.42 seconds
+ScanBuild                     WARNING   991.88 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/gatt-client.c:387:21: warning: Use of memory after it is freed
+        gatt_db_unregister(op->client->db, op->db_id);
+                           ^~~~~~~~~~
+src/shared/gatt-client.c:600:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, false, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:900:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1009:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1201:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1266:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1537:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1542:2: warning: Use of memory after it is freed
+        discover_all(op);
+        ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2044:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2052:8: warning: Use of memory after it is freed
+                                                        discovery_op_ref(op),
+                                                        ^~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3135:2: warning: Use of memory after it is freed
+        complete_write_long_op(req, success, 0, false);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3157:2: warning: Use of memory after it is freed
+        request_unref(req);
+        ^~~~~~~~~~~~~~~~~~
+12 warnings generated.
+
+
+
 ---
- Makefile.tools  |   4 +-
- client/main.c   | 166 +----------------------------------------
- client/player.c |  83 +--------------------
- client/print.c  | 194 ++++++++++++++++++++++++++++++++++++++++++++++++
- client/print.h  |  14 ++++
- 5 files changed, 213 insertions(+), 248 deletions(-)
- create mode 100644 client/print.c
- create mode 100644 client/print.h
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 4bc355c34b9a..df4cad06589a 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -3,6 +3,7 @@ if CLIENT
- bin_PROGRAMS += client/bluetoothctl
- 
- client_bluetoothctl_SOURCES = client/main.c \
-+					client/print.h client/print.c \
- 					client/display.h client/display.c \
- 					client/agent.h client/agent.c \
- 					client/advertising.h \
-@@ -494,7 +495,8 @@ tools_obex_server_tool_SOURCES = $(gobex_sources) $(btio_sources) \
- tools_obex_server_tool_LDADD = lib/libbluetooth-internal.la \
- 			       src/libshared-glib.la $(GLIB_LIBS)
- 
--tools_bluetooth_player_SOURCES = tools/bluetooth-player.c client/player.c
-+tools_bluetooth_player_SOURCES = tools/bluetooth-player.c client/print.c \
-+				client/player.c
- tools_bluetooth_player_LDADD = gdbus/libgdbus-internal.la \
- 				src/libshared-glib.la \
- 				$(GLIB_LIBS) $(DBUS_LIBS) -lreadline
-diff --git a/client/main.c b/client/main.c
-index 2816e880f151..763f38ac7b0f 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -25,6 +25,7 @@
- #include "src/shared/shell.h"
- #include "src/shared/util.h"
- #include "gdbus/gdbus.h"
-+#include "print.h"
- #include "agent.h"
- #include "gatt.h"
- #include "advertising.h"
-@@ -162,171 +163,6 @@ static void print_device(GDBusProxy *proxy, const char *description)
- 				address, name);
- }
- 
--static void print_fixed_iter(const char *label, const char *name,
--						DBusMessageIter *iter)
--{
--	dbus_bool_t *valbool;
--	dbus_uint32_t *valu32;
--	dbus_uint16_t *valu16;
--	dbus_int16_t *vals16;
--	unsigned char *byte;
--	int len;
--
--	switch (dbus_message_iter_get_arg_type(iter)) {
--	case DBUS_TYPE_BOOLEAN:
--		dbus_message_iter_get_fixed_array(iter, &valbool, &len);
--
--		if (len <= 0)
--			return;
--
--		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_hexdump((void *)valbool, len * sizeof(*valbool));
--
--		break;
--	case DBUS_TYPE_UINT32:
--		dbus_message_iter_get_fixed_array(iter, &valu32, &len);
--
--		if (len <= 0)
--			return;
--
--		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_hexdump((void *)valu32, len * sizeof(*valu32));
--
--		break;
--	case DBUS_TYPE_UINT16:
--		dbus_message_iter_get_fixed_array(iter, &valu16, &len);
--
--		if (len <= 0)
--			return;
--
--		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_hexdump((void *)valu16, len * sizeof(*valu16));
--
--		break;
--	case DBUS_TYPE_INT16:
--		dbus_message_iter_get_fixed_array(iter, &vals16, &len);
--
--		if (len <= 0)
--			return;
--
--		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_hexdump((void *)vals16, len * sizeof(*vals16));
--
--		break;
--	case DBUS_TYPE_BYTE:
--		dbus_message_iter_get_fixed_array(iter, &byte, &len);
--
--		if (len <= 0)
--			return;
--
--		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_hexdump((void *)byte, len * sizeof(*byte));
--
--		break;
--	default:
--		return;
--	};
--}
--
--static void print_iter(const char *label, const char *name,
--						DBusMessageIter *iter)
--{
--	dbus_bool_t valbool;
--	dbus_uint32_t valu32;
--	dbus_uint16_t valu16;
--	dbus_int16_t vals16;
--	unsigned char byte;
--	const char *valstr;
--	DBusMessageIter subiter;
--	char *entry;
--
--	if (iter == NULL) {
--		bt_shell_printf("%s%s is nil\n", label, name);
--		return;
--	}
--
--	switch (dbus_message_iter_get_arg_type(iter)) {
--	case DBUS_TYPE_INVALID:
--		bt_shell_printf("%s%s is invalid\n", label, name);
--		break;
--	case DBUS_TYPE_STRING:
--	case DBUS_TYPE_OBJECT_PATH:
--		dbus_message_iter_get_basic(iter, &valstr);
--		bt_shell_printf("%s%s: %s\n", label, name, valstr);
--		break;
--	case DBUS_TYPE_BOOLEAN:
--		dbus_message_iter_get_basic(iter, &valbool);
--		bt_shell_printf("%s%s: %s\n", label, name,
--					valbool == TRUE ? "yes" : "no");
--		break;
--	case DBUS_TYPE_UINT32:
--		dbus_message_iter_get_basic(iter, &valu32);
--		bt_shell_printf("%s%s: 0x%08x\n", label, name, valu32);
--		break;
--	case DBUS_TYPE_UINT16:
--		dbus_message_iter_get_basic(iter, &valu16);
--		bt_shell_printf("%s%s: 0x%04x\n", label, name, valu16);
--		break;
--	case DBUS_TYPE_INT16:
--		dbus_message_iter_get_basic(iter, &vals16);
--		bt_shell_printf("%s%s: %d\n", label, name, vals16);
--		break;
--	case DBUS_TYPE_BYTE:
--		dbus_message_iter_get_basic(iter, &byte);
--		bt_shell_printf("%s%s: 0x%02x (%d)\n", label, name, byte, byte);
--		break;
--	case DBUS_TYPE_VARIANT:
--		dbus_message_iter_recurse(iter, &subiter);
--		print_iter(label, name, &subiter);
--		break;
--	case DBUS_TYPE_ARRAY:
--		dbus_message_iter_recurse(iter, &subiter);
--
--		if (dbus_type_is_fixed(
--				dbus_message_iter_get_arg_type(&subiter))) {
--			print_fixed_iter(label, name, &subiter);
--			break;
--		}
--
--		while (dbus_message_iter_get_arg_type(&subiter) !=
--							DBUS_TYPE_INVALID) {
--			print_iter(label, name, &subiter);
--			dbus_message_iter_next(&subiter);
--		}
--		break;
--	case DBUS_TYPE_DICT_ENTRY:
--		dbus_message_iter_recurse(iter, &subiter);
--		entry = g_strconcat(name, " Key", NULL);
--		print_iter(label, entry, &subiter);
--		g_free(entry);
--
--		entry = g_strconcat(name, " Value", NULL);
--		dbus_message_iter_next(&subiter);
--		print_iter(label, entry, &subiter);
--		g_free(entry);
--		break;
--	default:
--		bt_shell_printf("%s%s has unsupported type\n", label, name);
--		break;
--	}
--}
--
--static void print_property_with_label(GDBusProxy *proxy, const char *name,
--					const char *label)
--{
--	DBusMessageIter iter;
--
--	if (g_dbus_proxy_get_property(proxy, name, &iter) == FALSE)
--		return;
--
--	print_iter("\t", label ? label : name, &iter);
--}
--
--static void print_property(GDBusProxy *proxy, const char *name)
--{
--	print_property_with_label(proxy, name, NULL);
--}
--
- static void print_uuid(const char *label, const char *uuid)
- {
- 	const char *text;
-diff --git a/client/player.c b/client/player.c
-index 92b2b7a47eaf..b857fa649a6b 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -39,6 +39,7 @@
- #include "src/shared/shell.h"
- #include "src/shared/io.h"
- #include "src/shared/queue.h"
-+#include "print.h"
- #include "player.h"
- 
- /* String display constants */
-@@ -511,88 +512,6 @@ static char *proxy_description(GDBusProxy *proxy, const char *title,
- 					title, path);
- }
- 
--static void print_iter(const char *label, const char *name,
--						DBusMessageIter *iter)
--{
--	dbus_bool_t valbool;
--	dbus_uint32_t valu32;
--	dbus_uint16_t valu16;
--	dbus_int16_t vals16;
--	unsigned char byte;
--	const char *valstr;
--	DBusMessageIter subiter;
--
--	if (iter == NULL) {
--		bt_shell_printf("%s%s is nil\n", label, name);
--		return;
--	}
--
--	switch (dbus_message_iter_get_arg_type(iter)) {
--	case DBUS_TYPE_INVALID:
--		bt_shell_printf("%s%s is invalid\n", label, name);
--		break;
--	case DBUS_TYPE_STRING:
--	case DBUS_TYPE_OBJECT_PATH:
--		dbus_message_iter_get_basic(iter, &valstr);
--		bt_shell_printf("%s%s: %s\n", label, name, valstr);
--		break;
--	case DBUS_TYPE_BOOLEAN:
--		dbus_message_iter_get_basic(iter, &valbool);
--		bt_shell_printf("%s%s: %s\n", label, name,
--					valbool == TRUE ? "yes" : "no");
--		break;
--	case DBUS_TYPE_UINT32:
--		dbus_message_iter_get_basic(iter, &valu32);
--		bt_shell_printf("%s%s: 0x%08x (%u)\n", label, name, valu32,
--								valu32);
--		break;
--	case DBUS_TYPE_UINT16:
--		dbus_message_iter_get_basic(iter, &valu16);
--		bt_shell_printf("%s%s: 0x%04x (%u)\n", label, name, valu16,
--								valu16);
--		break;
--	case DBUS_TYPE_INT16:
--		dbus_message_iter_get_basic(iter, &vals16);
--		bt_shell_printf("%s%s: %d\n", label, name, vals16);
--		break;
--	case DBUS_TYPE_BYTE:
--		dbus_message_iter_get_basic(iter, &byte);
--		bt_shell_printf("%s%s: 0x%02x (%d)\n", label, name, byte, byte);
--		break;
--	case DBUS_TYPE_VARIANT:
--		dbus_message_iter_recurse(iter, &subiter);
--		print_iter(label, name, &subiter);
--		break;
--	case DBUS_TYPE_ARRAY:
--		dbus_message_iter_recurse(iter, &subiter);
--		while (dbus_message_iter_get_arg_type(&subiter) !=
--							DBUS_TYPE_INVALID) {
--			print_iter(label, name, &subiter);
--			dbus_message_iter_next(&subiter);
--		}
--		break;
--	case DBUS_TYPE_DICT_ENTRY:
--		dbus_message_iter_recurse(iter, &subiter);
--		dbus_message_iter_get_basic(&subiter, &valstr);
--		dbus_message_iter_next(&subiter);
--		print_iter(label, valstr, &subiter);
--		break;
--	default:
--		bt_shell_printf("%s%s has unsupported type\n", label, name);
--		break;
--	}
--}
--
--static void print_property(GDBusProxy *proxy, const char *name)
--{
--	DBusMessageIter iter;
--
--	if (g_dbus_proxy_get_property(proxy, name, &iter) == FALSE)
--		return;
--
--	print_iter("\t", name, &iter);
--}
--
- static void print_media(GDBusProxy *proxy, const char *description)
- {
- 	char *str;
-diff --git a/client/print.c b/client/print.c
-new file mode 100644
-index 000000000000..798d22c7e345
---- /dev/null
-+++ b/client/print.c
-@@ -0,0 +1,194 @@
-+
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <stdio.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <fcntl.h>
-+#include <string.h>
-+
-+#include "gdbus/gdbus.h"
-+
-+#include "src/shared/util.h"
-+#include "src/shared/shell.h"
-+#include "print.h"
-+
-+static void print_fixed_iter(const char *label, const char *name,
-+						DBusMessageIter *iter)
-+{
-+	dbus_bool_t *valbool;
-+	dbus_uint32_t *valu32;
-+	dbus_uint16_t *valu16;
-+	dbus_int16_t *vals16;
-+	unsigned char *byte;
-+	int len;
-+
-+	switch (dbus_message_iter_get_arg_type(iter)) {
-+	case DBUS_TYPE_BOOLEAN:
-+		dbus_message_iter_get_fixed_array(iter, &valbool, &len);
-+
-+		if (len <= 0)
-+			return;
-+
-+		bt_shell_printf("%s%s:\n", label, name);
-+		bt_shell_hexdump((void *)valbool, len * sizeof(*valbool));
-+
-+		break;
-+	case DBUS_TYPE_UINT32:
-+		dbus_message_iter_get_fixed_array(iter, &valu32, &len);
-+
-+		if (len <= 0)
-+			return;
-+
-+		bt_shell_printf("%s%s:\n", label, name);
-+		bt_shell_hexdump((void *)valu32, len * sizeof(*valu32));
-+
-+		break;
-+	case DBUS_TYPE_UINT16:
-+		dbus_message_iter_get_fixed_array(iter, &valu16, &len);
-+
-+		if (len <= 0)
-+			return;
-+
-+		bt_shell_printf("%s%s:\n", label, name);
-+		bt_shell_hexdump((void *)valu16, len * sizeof(*valu16));
-+
-+		break;
-+	case DBUS_TYPE_INT16:
-+		dbus_message_iter_get_fixed_array(iter, &vals16, &len);
-+
-+		if (len <= 0)
-+			return;
-+
-+		bt_shell_printf("%s%s:\n", label, name);
-+		bt_shell_hexdump((void *)vals16, len * sizeof(*vals16));
-+
-+		break;
-+	case DBUS_TYPE_BYTE:
-+		dbus_message_iter_get_fixed_array(iter, &byte, &len);
-+
-+		if (len <= 0)
-+			return;
-+
-+		bt_shell_printf("%s%s:\n", label, name);
-+		bt_shell_hexdump((void *)byte, len * sizeof(*byte));
-+
-+		break;
-+	default:
-+		return;
-+	};
-+}
-+
-+void print_iter(const char *label, const char *name, DBusMessageIter *iter)
-+{
-+	dbus_bool_t valbool;
-+	dbus_uint32_t valu32;
-+	dbus_uint16_t valu16;
-+	dbus_int16_t vals16;
-+	unsigned char byte;
-+	const char *valstr;
-+	DBusMessageIter subiter;
-+	char *entry;
-+
-+	if (iter == NULL) {
-+		bt_shell_printf("%s%s is nil\n", label, name);
-+		return;
-+	}
-+
-+	switch (dbus_message_iter_get_arg_type(iter)) {
-+	case DBUS_TYPE_INVALID:
-+		bt_shell_printf("%s%s is invalid\n", label, name);
-+		break;
-+	case DBUS_TYPE_STRING:
-+	case DBUS_TYPE_OBJECT_PATH:
-+		dbus_message_iter_get_basic(iter, &valstr);
-+		bt_shell_printf("%s%s: %s\n", label, name, valstr);
-+		break;
-+	case DBUS_TYPE_BOOLEAN:
-+		dbus_message_iter_get_basic(iter, &valbool);
-+		bt_shell_printf("%s%s: %s\n", label, name,
-+					valbool == TRUE ? "yes" : "no");
-+		break;
-+	case DBUS_TYPE_UINT32:
-+		dbus_message_iter_get_basic(iter, &valu32);
-+		bt_shell_printf("%s%s: 0x%08x\n", label, name, valu32);
-+		break;
-+	case DBUS_TYPE_UINT16:
-+		dbus_message_iter_get_basic(iter, &valu16);
-+		bt_shell_printf("%s%s: 0x%04x\n", label, name, valu16);
-+		break;
-+	case DBUS_TYPE_INT16:
-+		dbus_message_iter_get_basic(iter, &vals16);
-+		bt_shell_printf("%s%s: %d\n", label, name, vals16);
-+		break;
-+	case DBUS_TYPE_BYTE:
-+		dbus_message_iter_get_basic(iter, &byte);
-+		bt_shell_printf("%s%s: 0x%02x (%d)\n", label, name, byte, byte);
-+		break;
-+	case DBUS_TYPE_VARIANT:
-+		dbus_message_iter_recurse(iter, &subiter);
-+		print_iter(label, name, &subiter);
-+		break;
-+	case DBUS_TYPE_ARRAY:
-+		dbus_message_iter_recurse(iter, &subiter);
-+
-+		if (dbus_type_is_fixed(
-+				dbus_message_iter_get_arg_type(&subiter))) {
-+			print_fixed_iter(label, name, &subiter);
-+			break;
-+		}
-+
-+		while (dbus_message_iter_get_arg_type(&subiter) !=
-+							DBUS_TYPE_INVALID) {
-+			print_iter(label, name, &subiter);
-+			dbus_message_iter_next(&subiter);
-+		}
-+		break;
-+	case DBUS_TYPE_DICT_ENTRY:
-+		dbus_message_iter_recurse(iter, &subiter);
-+		entry = g_strconcat(name, " Key", NULL);
-+		print_iter(label, entry, &subiter);
-+		g_free(entry);
-+
-+		entry = g_strconcat(name, " Value", NULL);
-+		dbus_message_iter_next(&subiter);
-+		print_iter(label, entry, &subiter);
-+		g_free(entry);
-+		break;
-+	default:
-+		bt_shell_printf("%s%s has unsupported type\n", label, name);
-+		break;
-+	}
-+}
-+
-+void print_property_with_label(GDBusProxy *proxy, const char *name,
-+					const char *label)
-+{
-+	DBusMessageIter iter;
-+
-+	if (g_dbus_proxy_get_property(proxy, name, &iter) == FALSE)
-+		return;
-+
-+	print_iter("\t", label ? label : name, &iter);
-+}
-+
-+void print_property(GDBusProxy *proxy, const char *name)
-+{
-+	print_property_with_label(proxy, name, NULL);
-+}
-diff --git a/client/print.h b/client/print.h
-new file mode 100644
-index 000000000000..c0866d06c504
---- /dev/null
-+++ b/client/print.h
-@@ -0,0 +1,14 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022 Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+
-+void print_property(GDBusProxy *proxy, const char *name);
-+void print_property_with_label(GDBusProxy *proxy, const char *name,
-+					const char *label);
-+void print_iter(const char *label, const char *name, DBusMessageIter *iter);
--- 
-2.37.3
 
+--===============4391744915369769038==--
