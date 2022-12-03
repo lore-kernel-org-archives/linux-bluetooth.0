@@ -2,121 +2,63 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76041C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Dec 2022 21:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC71C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Dec 2022 00:27:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234618AbiLBVhd (ORCPT
+        id S234928AbiLCA1L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Dec 2022 16:37:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49816 "EHLO
+        Fri, 2 Dec 2022 19:27:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234591AbiLBVha (ORCPT
+        with ESMTP id S234973AbiLCA1C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Dec 2022 16:37:30 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBCF9EF8B7;
-        Fri,  2 Dec 2022 13:37:28 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so6269711pjm.2;
-        Fri, 02 Dec 2022 13:37:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4UOloO9pDz4FtFNPAh4XXQoSepf9fUAyOv9HOH5L6WY=;
-        b=bYC1Lt29qeIQP5kiSMsjIQU2a00Tnc/b3hLSM/Cf5xhl4523GeKTMvATrdjUoS2sMH
-         QmnfnuW7g/Nc1lgogkoikjzENdsuXMwvpT8QJOylyhwXE3M9SU8oB0+nKv4WgcCmsQ2T
-         5trTVrQFDRmACQcFfCavn7OJPAHK8E08DYxHOQOdj8NgDnACfnN8Q2p1gljbFsSwwag/
-         6Z5cvhfa4Yiloyj6NEVfd0G20qTBH8xqCvQdgBmRLTagDtGoN4HyzY/dZXuOC7kwCHqD
-         qqLF7NYLzXlWVLkPI45fj/NZKbhrMQNKbGcXFe715s39OPW7ebqinskoQkcOFIznc1sz
-         Mn+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4UOloO9pDz4FtFNPAh4XXQoSepf9fUAyOv9HOH5L6WY=;
-        b=N2FmV8qqE5WAk1J0T4Hxho3ixvW5HVu4pzQNexwjMFsT3b03TZ9FDF/LESQo+BOtqm
-         u0H8tXWdkGDR+KEAvSRGM++eLh1BqOHhDvADKEna1NEnePdcoRT4nphvd2mGxJUOoxjU
-         0D8J1kxFgfBOhVFpCO8vzCzZGeQbMzpr+ko0Y1q9a39SSn/UiuxgPIuZjkzXXgFKJE9n
-         9Kf8lwNvyV4DDSfapZNPsVhfjiaxXemtYVcofrz+7BuWFaYNsJNbBgtzAi+d4Dlx1wXF
-         +b6EeShHt6RD6LMFrrQMVAlnXpbOzf7wb6uldP0X+xtKY5nQLGpVUR5ijKtJo1Go4Ncf
-         UNnw==
-X-Gm-Message-State: ANoB5pnwydZ3juspqUr1y1PumaQ3wRCoLx3gmDTaS8TmHPrNqyIyKEEK
-        ZTk5j1jcSubm23hmd2QxwpE+TrfcJTvVHIQZ
-X-Google-Smtp-Source: AA0mqf6Dtsu+YQfwTveh56W5hlGVRGotWytljPsWTvRuitoNAjmPyhck/w8ra08ymRmFhackd+yA8A==
-X-Received: by 2002:a17:902:9a87:b0:189:af68:472f with SMTP id w7-20020a1709029a8700b00189af68472fmr12071873plp.134.1670017048260;
-        Fri, 02 Dec 2022 13:37:28 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x8-20020a170902ec8800b001895d87225csm6028779plg.182.2022.12.02.13.37.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Dec 2022 13:37:27 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2022-12-02
-Date:   Fri,  2 Dec 2022 13:37:26 -0800
-Message-Id: <20221202213726.2801581-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Fri, 2 Dec 2022 19:27:02 -0500
+Received: from smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CCCF4643
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Dec 2022 16:26:58 -0800 (PST)
+Received: from github.com (hubbernetes-node-4109849.ash1-iad.github.net [10.56.15.43])
+        by smtp.github.com (Postfix) with ESMTPA id 2A19E8405D3
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Dec 2022 16:26:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1670027218;
+        bh=2ld0VwJyfLAn1ByN8xLOW5r6YHDVrUcHUeTIz46Ex+U=;
+        h=Date:From:To:Subject:From;
+        b=UE5VdCjm23nkdgUtxNvobsnqcuACBW2kpMcpKY8DR9Tulto+J3/IeiSfWF6iUo/Dq
+         I7krW11EXXVSiV9rDW6dTRhhro9WkIou518+TTVCOm/iuMS7nk4zSGgdl1ZGORVjlE
+         3zvdaoCfrhfx3lJ9mPH2c/xm57kFa9zGCIUzvWZE=
+Date:   Fri, 02 Dec 2022 16:26:58 -0800
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/d84ce7-35947e@github.com>
+Subject: [bluez/bluez] 35947e: monitor/att: Fix crash when accessing
+ packet_conn
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit e931a173a685fe213127ae5aa6b7f2196c1d875d:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 35947e26771c89d965aec5ad059267bb8c15298e
+      https://github.com/bluez/bluez/commit/35947e26771c89d965aec5ad059267bb8c15298e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-12-02 (Fri, 02 Dec 2022)
 
-  Merge branch 'vmxnet3-fixes' (2022-12-02 10:30:07 +0000)
+  Changed paths:
+    M monitor/att.c
 
-are available in the Git repository at:
+  Log Message:
+  -----------
+  monitor/att: Fix crash when accessing packet_conn
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-12-02
+This fixes the following crash:
 
-for you to fetch changes up to b5ca338751ad4783ec8d37b5d99c3e37b7813e59:
+:monitor/att.c:2697:11: runtime error: member access within null
+pointer of type 'struct att_conn_data'
 
-  Bluetooth: Fix crash when replugging CSR fake controllers (2022-12-02 13:22:56 -0800)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix regressions with CSR controller clones
- - Fix support for Read Local Supported Codecs V2
- - Fix overflow on L2CAP code
- - Fix missing hci_dev_put on ISO and L2CAP code
-
-----------------------------------------------------------------
-Chen Zhongjin (1):
-      Bluetooth: Fix not cleanup led when bt_init fails
-
-Chethan T N (2):
-      Bluetooth: Remove codec id field in vendor codec definition
-      Bluetooth: Fix support for Read Local Supported Codecs V2
-
-Ismael Ferreras Morezuelas (2):
-      Bluetooth: btusb: Fix CSR clones again by re-adding ERR_DATA_REPORTING quirk
-      Bluetooth: btusb: Add debug message for CSR controllers
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: Fix crash when replugging CSR fake controllers
-
-Mateusz Jończyk (1):
-      Bluetooth: silence a dmesg error message in hci_request.c
-
-Sungwoo Kim (1):
-      Bluetooth: L2CAP: Fix u8 overflow
-
-Wang ShaoBo (2):
-      Bluetooth: 6LoWPAN: add missing hci_dev_put() in get_l2cap_conn()
-      Bluetooth: hci_conn: add missing hci_dev_put() in iso_listen_bis()
-
- drivers/bluetooth/btusb.c    |  6 ++++++
- include/net/bluetooth/hci.h  | 12 +++++++++++-
- net/bluetooth/6lowpan.c      |  1 +
- net/bluetooth/af_bluetooth.c |  4 +++-
- net/bluetooth/hci_codec.c    | 19 ++++++++++---------
- net/bluetooth/hci_core.c     |  8 ++++++--
- net/bluetooth/hci_request.c  |  2 +-
- net/bluetooth/hci_sync.c     | 19 +++++++++++++------
- net/bluetooth/iso.c          |  1 +
- net/bluetooth/l2cap_core.c   |  3 ++-
- 10 files changed, 54 insertions(+), 21 deletions(-)
