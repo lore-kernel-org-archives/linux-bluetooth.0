@@ -2,63 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC71C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Dec 2022 00:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 284A3C47088
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Dec 2022 04:32:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234928AbiLCA1L (ORCPT
+        id S230434AbiLCEca (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Dec 2022 19:27:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58750 "EHLO
+        Fri, 2 Dec 2022 23:32:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234973AbiLCA1C (ORCPT
+        with ESMTP id S229981AbiLCEc3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Dec 2022 19:27:02 -0500
-Received: from smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75CCCF4643
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Dec 2022 16:26:58 -0800 (PST)
-Received: from github.com (hubbernetes-node-4109849.ash1-iad.github.net [10.56.15.43])
-        by smtp.github.com (Postfix) with ESMTPA id 2A19E8405D3
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Dec 2022 16:26:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1670027218;
-        bh=2ld0VwJyfLAn1ByN8xLOW5r6YHDVrUcHUeTIz46Ex+U=;
-        h=Date:From:To:Subject:From;
-        b=UE5VdCjm23nkdgUtxNvobsnqcuACBW2kpMcpKY8DR9Tulto+J3/IeiSfWF6iUo/Dq
-         I7krW11EXXVSiV9rDW6dTRhhro9WkIou518+TTVCOm/iuMS7nk4zSGgdl1ZGORVjlE
-         3zvdaoCfrhfx3lJ9mPH2c/xm57kFa9zGCIUzvWZE=
-Date:   Fri, 02 Dec 2022 16:26:58 -0800
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d84ce7-35947e@github.com>
-Subject: [bluez/bluez] 35947e: monitor/att: Fix crash when accessing
- packet_conn
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+        Fri, 2 Dec 2022 23:32:29 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 675C58D672;
+        Fri,  2 Dec 2022 20:32:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 01C9A60C58;
+        Sat,  3 Dec 2022 04:32:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E527C433C1;
+        Sat,  3 Dec 2022 04:32:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670041947;
+        bh=mY6obiDD681p7cPcrw1nsdg1W5nnw4YZW8+hcL/SnKs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=T6b33vpCepjNjucnYCi/+dCpvk2W3/nxPnP3KM0tdE+n6HDf++0GEYtKqK1tktY2o
+         ScA00bc4mdXoM89vyRbePVdPl6nCTVabX0tb4b4xN4RqocD4LYXIgwctnrMfOzicnP
+         KPOswHxvNyooiXW1mqnf1R8iCxvdl7saLPrQUXrpg9bThY5UkpzadEi9st3lw1q9f0
+         2Aphy476/pwFPLrnTka8J7aEepc7Ol+0ucq2jcy5rfaxTB/N0gmQOAMMITFVZ66N8H
+         swwmzdv4/9HKz9cJ9AlhIf27VTehEWfPplPbVe+4O+Tc1q/4x56Cf8LzoU9BAb+sCp
+         sZrgTUUqWzfFw==
+Date:   Fri, 2 Dec 2022 20:32:26 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: pull-request: bluetooth 2022-12-02
+Message-ID: <20221202203226.6feab9f5@kernel.org>
+In-Reply-To: <20221202213726.2801581-1-luiz.dentz@gmail.com>
+References: <20221202213726.2801581-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 35947e26771c89d965aec5ad059267bb8c15298e
-      https://github.com/bluez/bluez/commit/35947e26771c89d965aec5ad059267bb8c15298e
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-02 (Fri, 02 Dec 2022)
+On Fri,  2 Dec 2022 13:37:26 -0800 Luiz Augusto von Dentz wrote:
+> bluetooth pull request for net:
+> 
+>  - Fix regressions with CSR controller clones
+>  - Fix support for Read Local Supported Codecs V2
+>  - Fix overflow on L2CAP code
+>  - Fix missing hci_dev_put on ISO and L2CAP code
 
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Fix crash when accessing packet_conn
-
-This fixes the following crash:
-
-:monitor/att.c:2697:11: runtime error: member access within null
-pointer of type 'struct att_conn_data'
-
-
+Two new sparse warnings in btusb.c here, please follow up to fix those.
