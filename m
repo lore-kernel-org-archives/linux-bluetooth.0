@@ -2,140 +2,185 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D22F8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Dec 2022 09:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C193C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Dec 2022 11:36:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbiLCJiu (ORCPT
+        id S231140AbiLELg0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 3 Dec 2022 04:38:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
+        Mon, 5 Dec 2022 06:36:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiLCJis (ORCPT
+        with ESMTP id S229970AbiLELgY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 3 Dec 2022 04:38:48 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA1F413E1C
-        for <linux-bluetooth@vger.kernel.org>; Sat,  3 Dec 2022 01:38:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670060327; x=1701596327;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+WgtYDT2s61gpP9CAcBW9u5bzpAvSA+IZRFpervOKU0=;
-  b=mwL7CXLhEHY/Nuf73exjePCfRICvujX302CV37/NGvq5S0KyG/z5D/s1
-   1J/lqXk2QfY4DWMUFgMguG7dZxwe6I6Vd4JnxD0CuP7V8e63y1mEu9r2u
-   oimTcB+UxkzrZiKl0lZf3Szrbvbu0M/s/d2W36y3ALMkyIHYmOoIHN/wE
-   Pyi06Sw/GGklXKbmBfKKC1w2eO3g2nbZLb8sxiB4d7mvdpHggD80+Z8HO
-   +OICn5907gR1lAxl6x0H0lX9ZgLPd3eORwThyURe8XSiEEU9cBiTBFNgH
-   xPM3uc4+kpV7GbPKBCA8c5RmZo0E/yrYvF/zrq2H3wGn72qxVhfebJdnp
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10549"; a="303721742"
-X-IronPort-AV: E=Sophos;i="5.96,214,1665471600"; 
-   d="scan'208";a="303721742"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2022 01:38:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10549"; a="751574295"
-X-IronPort-AV: E=Sophos;i="5.96,214,1665471600"; 
-   d="scan'208";a="751574295"
-Received: from lkp-server01.sh.intel.com (HELO 64a2d449c951) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 03 Dec 2022 01:38:45 -0800
-Received: from kbuild by 64a2d449c951 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1p1Oyr-000ES5-0p;
-        Sat, 03 Dec 2022 09:38:45 +0000
-Date:   Sat, 03 Dec 2022 17:37:51 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- dbd24be484227fe64615fc6c01fa9cf6de0455ac
-Message-ID: <638b18ef.wVVtbKfIQeAfxYE2%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Mon, 5 Dec 2022 06:36:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA3319C15
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 03:36:23 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F2B51B80EF9
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 11:36:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C29FC43154
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 11:36:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670240180;
+        bh=d+b6ziB3TtnEeThLUq1kQRbCzrRWswx7ZGtrzqLeYf0=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=e9vK3NTuc2tyUzwDsF0WiY7WI8MFd5rnz3VoGifVWIvpm0dTqFB0mym+JCdshWZ9o
+         Jo4sefr1HSSpYQbJS+4izrtEIhzIb1vppIRjeLW+i/q49xNlftf1NG9LGHW+ukK0bT
+         EKP4uMsT+vyBU1Hk9H4ON38UkE5UdKTwNBLo7JiM7YkI7XQtwboK2ucX+vV84ojvwC
+         PawuFNUNozpoc+nukjsXNWCpUPEfcHTLZBwsSnkbYTfCTLR8qlu13FkXOv5hJrHScN
+         9LNGGf22MXoERPt5SZd8ZJDnvOv/zG1+bQRIdz567WmOHSZ/0ZTEmxan1dawXHe3dy
+         Q8/oubNJiTTKg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 8CAE1C433E6; Mon,  5 Dec 2022 11:36:20 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Mon, 05 Dec 2022 11:36:19 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: tr.ml@gmx.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215167-62941-yCXDhuT4DN@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: dbd24be484227fe64615fc6c01fa9cf6de0455ac  Bluetooth: Fix crash when replugging CSR fake controllers
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-elapsed time: 721m
+RockT (tr.ml@gmx.de) changed:
 
-configs tested: 62
-configs skipped: 2
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |tr.ml@gmx.de
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #43 from RockT (tr.ml@gmx.de) ---
+I see this problem with the switch of kernel 6.0 (all versions work) to
+6.1.0rc7.
+Bluetooth has stopped working. :(
 
-gcc tested configs:
-um                           x86_64_defconfig
-um                             i386_defconfig
-arc                                 defconfig
-powerpc                           allnoconfig
-alpha                               defconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                          rhel-8.3-func
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-kvm
-x86_64                               rhel-8.3
-x86_64                              defconfig
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                        randconfig-a015
-s390                             allmodconfig
-s390                                defconfig
-ia64                             allmodconfig
-x86_64                           allyesconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-sh                               allmodconfig
-alpha                            allyesconfig
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-s390                             allyesconfig
-x86_64                        randconfig-a006
-mips                             allyesconfig
-powerpc                          allmodconfig
-arc                  randconfig-r043-20221201
-riscv                randconfig-r042-20221201
-s390                 randconfig-r044-20221201
-i386                                defconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-i386                          randconfig-a014
-i386                          randconfig-a012
-i386                          randconfig-a016
-i386                          randconfig-a005
-i386                             allyesconfig
-arm                                 defconfig
-x86_64                            allnoconfig
-arm                              allyesconfig
-arm64                            allyesconfig
+$ dmesg |grep -i bluetooth
+[    0.890611] thinkpad_acpi: rfkill switch tpacpi_bluetooth_sw: radio is
+unblocked
+[    9.373051] Bluetooth: Core ver 2.22
+[    9.373087] NET: Registered PF_BLUETOOTH protocol family
+[    9.373088] Bluetooth: HCI device and connection manager initialized
+[    9.373093] Bluetooth: HCI socket layer initialized
+[    9.373096] Bluetooth: L2CAP socket layer initialized
+[    9.373102] Bluetooth: SCO socket layer initialized
+[    9.667105] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    9.667109] Bluetooth: BNEP filters: protocol multicast
+[    9.667114] Bluetooth: BNEP socket layer initialized
+[   11.669721] Bluetooth: hci0: Reading Intel version command failed (-110)
+[   11.669725] Bluetooth: hci0: command 0xfc05 tx timeout
 
-clang tested configs:
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                        randconfig-a012
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-hexagon              randconfig-r045-20221201
-hexagon              randconfig-r041-20221201
-i386                          randconfig-a013
-i386                          randconfig-a002
-i386                          randconfig-a004
-i386                          randconfig-a011
-i386                          randconfig-a015
-i386                          randconfig-a006
-x86_64                        randconfig-k001
-arm                       spear13xx_defconfig
-arm                          ep93xx_defconfig
+Sys: Lenovo Thinkpad T14s Gen2
+lspci:
+$ lspci
+00:00.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne Root
+Complex
+00:00.2 IOMMU: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne IOMMU
+00:01.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe Dummy H=
+ost
+Bridge
+00:02.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe Dummy H=
+ost
+Bridge
+00:02.1 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:02.2 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:02.3 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:02.5 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:02.7 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:08.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe Dummy H=
+ost
+Bridge
+00:08.1 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir Internal PCIe=
+ GPP
+Bridge to Bus
+00:14.0 SMBus: Advanced Micro Devices, Inc. [AMD] FCH SMBus Controller (rev=
+ 51)
+00:14.3 ISA bridge: Advanced Micro Devices, Inc. [AMD] FCH LPC Bridge (rev =
+51)
+00:18.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 0
+00:18.1 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 1
+00:18.2 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 2
+00:18.3 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 3
+00:18.4 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 4
+00:18.5 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 5
+00:18.6 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 6
+00:18.7 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 7
+01:00.0 Non-Volatile memory controller: Shenzhen Unionmemory Information Sy=
+stem
+Ltd. Device 6304 (rev 03)
+02:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8=
+411
+PCI Express Gigabit Ethernet Controller (rev 0e)
+03:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
+04:00.0 Unassigned class [ff00]: Quectel Wireless Solutions Co., Ltd. EM120=
+R-GL
+LTE Modem
+05:00.0 USB controller: Renesas Technology Corp. uPD720202 USB 3.0 Host
+Controller (rev 02)
+06:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI]
+Cezanne [Radeon Vega Series / Radeon Vega Mobile Series] (rev d1)
+06:00.1 Audio device: Advanced Micro Devices, Inc. [AMD/ATI] Renoir Radeon =
+High
+Definition Audio Controller
+06:00.2 Encryption controller: Advanced Micro Devices, Inc. [AMD] Family 17h
+(Models 10h-1fh) Platform Security Processor
+06:00.3 USB controller: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne U=
+SB
+3.1
+06:00.4 USB controller: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne U=
+SB
+3.1
+06:00.5 Multimedia controller: Advanced Micro Devices, Inc. [AMD]
+ACP/ACP3X/ACP6x Audio Coprocessor (rev 01)
+06:00.6 Audio device: Advanced Micro Devices, Inc. [AMD] Family 17h/19h HD
+Audio Controller
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Any further info to provide?
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
