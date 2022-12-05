@@ -2,107 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64345C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Dec 2022 14:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B05BC4321E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Dec 2022 15:12:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbiLEOaX (ORCPT
+        id S230100AbiLEPMD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Dec 2022 09:30:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41350 "EHLO
+        Mon, 5 Dec 2022 10:12:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230228AbiLEOaV (ORCPT
+        with ESMTP id S231934AbiLEPMB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Dec 2022 09:30:21 -0500
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 687C412767
-        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 06:30:20 -0800 (PST)
-Received: by mail-il1-x12b.google.com with SMTP id z9so5138490ilu.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Dec 2022 06:30:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8gj5/pWWjOsARueaeu5SE+HHBrr/XOL7DTfccem6cc=;
-        b=VBfC/DrOzebPiS37916VBkr9Cr1Ffpwh+Y503RUWlqgv2dLbCZf6oN4YaTN5npAoAF
-         G/MjiI437JCahtfQmhJVzhmdgL+0Z1D6qfJbSmeRf56z5h7ggbwpONY/3Bzot+Te+NZm
-         qUgyR+BsNv+Ex3UA/IjzI0uD4bildOZc2lGa6nmUntpEPGd29VlIIeK+2pOumx3C/Qf8
-         PfreL3uRsZ0ZAfdAwjOSJ2oFkOwNmKT7gtv/EKlk6XNbNym9AhFmZ0qlHypk7U46oJ0N
-         MZ/sDy+ZAPciZsxqxaElIhwtNnwXCjGG1kxQNIoJZtD98R61eMcEwbXmYjheEmmsOohn
-         smwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y8gj5/pWWjOsARueaeu5SE+HHBrr/XOL7DTfccem6cc=;
-        b=pjGqTvkSH4Du1Ty7d57WiL4Kr/RJCGWA152GDRezGvAR9Z9wJ/6Xww8H9kdxnPZle9
-         Qmm/0n5TLPTosD0jR9M83SRTbkvh29/nBLO8cwpglaDvlnt9wR6DNYX9pR4YkMBGKoBA
-         Fw7DvcDEp+cJfUDhRrc6kc6d7w9CrxyG02WSlyKGt7HHaK/vN1Qf+XYqQKvLxxoAUH4Z
-         anStwiEqnsTSRh1k/j/D3b0ayazY5Pf9kgdbfh7/b4rEDfPgF5/7VE2e6I5Gkr2A3mI9
-         IRMu6C7cUdOdGrxr+Ah8X2yo6/zXdWWPTmhfzeL/wXOYxsfPQ2wvtiLkTBkUUfPyjZgS
-         UoOw==
-X-Gm-Message-State: ANoB5pnQOTegEeiK4vHemTaJ3qv0FaQJxZGb00ipzsg14Ej7+j/kmBg0
-        9wMBINreKwCPwXAwrjaVIiEm6n1MHSI=
-X-Google-Smtp-Source: AA0mqf7vFXIFWs/LBgjbuj2ciY0IlnY18BvQfdt4IfIPc63IOCkF25bAxM7neRYTSPq9HDgC+9ZOfQ==
-X-Received: by 2002:a92:d144:0:b0:300:5d50:15d3 with SMTP id t4-20020a92d144000000b003005d5015d3mr27455377ilg.173.1670250619570;
-        Mon, 05 Dec 2022 06:30:19 -0800 (PST)
-Received: from [172.17.0.2] ([20.12.237.122])
-        by smtp.gmail.com with ESMTPSA id z29-20020a05660217dd00b006dffde23fa9sm2865285iox.24.2022.12.05.06.30.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 06:30:19 -0800 (PST)
-Message-ID: <638e007b.050a0220.901b1.3985@mx.google.com>
-Date:   Mon, 05 Dec 2022 06:30:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1786916585663430043=="
+        Mon, 5 Dec 2022 10:12:01 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C602DE6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 07:11:59 -0800 (PST)
+Received: from dggpemm500007.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4NQn7M4rjCz15N6V;
+        Mon,  5 Dec 2022 23:11:11 +0800 (CST)
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Mon, 5 Dec
+ 2022 23:11:58 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <linux-bluetooth@vger.kernel.org>, <yangyingliang@huawei.com>
+Subject: [PATCH 3/6] Bluetooth: hci_h5: don't call kfree_skb() under spin_lock_irqsave()
+Date:   Mon, 5 Dec 2022 23:09:25 +0800
+Message-ID: <20221205150928.4017973-4-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221205150928.4017973-1-yangyingliang@huawei.com>
+References: <20221205150928.4017973-1-yangyingliang@huawei.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, bobo.shaobowang@huawei.com
-Subject: RE: Bluetooth: btintel: Fix missing free skb in btintel_setup_combined()
-In-Reply-To: <20221205135357.3961836-1-bobo.shaobowang@huawei.com>
-References: <20221205135357.3961836-1-bobo.shaobowang@huawei.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1786916585663430043==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+It is not allowed to call kfree_skb() from hardware interrupt
+context or with interrupts being disabled. So add all skb to
+a free list, then free them after spin_unlock_irqrestore() at
+once.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=701819
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.56 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      34.44 seconds
-BuildKernel32                 PASS      31.16 seconds
-TestRunnerSetup               PASS      429.86 seconds
-TestRunner_l2cap-tester       PASS      16.41 seconds
-TestRunner_iso-tester         PASS      16.21 seconds
-TestRunner_bnep-tester        PASS      5.56 seconds
-TestRunner_mgmt-tester        PASS      108.80 seconds
-TestRunner_rfcomm-tester      PASS      9.59 seconds
-TestRunner_sco-tester         PASS      8.97 seconds
-TestRunner_ioctl-tester       PASS      10.19 seconds
-TestRunner_mesh-tester        PASS      7.09 seconds
-TestRunner_smp-tester         PASS      8.76 seconds
-TestRunner_userchan-tester    PASS      5.83 seconds
-IncrementalBuild              PASS      31.75 seconds
-
-
-
+Fixes: 43eb12d78960 ("Bluetooth: Fix/implement Three-wire reliable packet sending")
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_h5.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index c5a0409ef84f..2b97296abb88 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -283,11 +283,13 @@ static int h5_setup(struct hci_uart *hu)
+ 
+ static void h5_pkt_cull(struct h5 *h5)
+ {
++	struct sk_buff_head free_list;
+ 	struct sk_buff *skb, *tmp;
+ 	unsigned long flags;
+ 	int i, to_remove;
+ 	u8 seq;
+ 
++	skb_queue_head_init(&free_list);
+ 	spin_lock_irqsave(&h5->unack.lock, flags);
+ 
+ 	to_remove = skb_queue_len(&h5->unack);
+@@ -313,7 +315,7 @@ static void h5_pkt_cull(struct h5 *h5)
+ 			break;
+ 
+ 		__skb_unlink(skb, &h5->unack);
+-		kfree_skb(skb);
++		__skb_queue_tail(&free_list, skb);
+ 	}
+ 
+ 	if (skb_queue_empty(&h5->unack))
+@@ -321,6 +323,8 @@ static void h5_pkt_cull(struct h5 *h5)
+ 
+ unlock:
+ 	spin_unlock_irqrestore(&h5->unack.lock, flags);
++
++	__skb_queue_purge(&free_list);
+ }
+ 
+ static void h5_handle_internal_rx(struct hci_uart *hu)
+-- 
+2.25.1
 
---===============1786916585663430043==--
