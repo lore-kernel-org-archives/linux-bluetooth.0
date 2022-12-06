@@ -2,117 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A954BC4708C
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Dec 2022 01:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A8CC47089
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Dec 2022 02:34:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbiLFBXx (ORCPT
+        id S233818AbiLFCek (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Dec 2022 20:23:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
+        Mon, 5 Dec 2022 21:34:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbiLFBX0 (ORCPT
+        with ESMTP id S233834AbiLFCeg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Dec 2022 20:23:26 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29F21EC67
-        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 17:23:25 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d3so12494075plr.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Dec 2022 17:23:25 -0800 (PST)
+        Mon, 5 Dec 2022 21:34:36 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263AF1EAE5
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 18:34:33 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id g20so1759330iob.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Dec 2022 18:34:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fi2bsjulIyd9jI+GzTDgQYTOMk+6i0IWxJUAz5Meqtg=;
-        b=IqOi7h3AsyN3rN5ImSXhfo9+SbU55VQg7wgQcdP9cLt5AiiiQSR6ZD9D2/+CIEcDK1
-         DIRB4NyTO3ujd5cMuogBiPv2ui0CnMt9U7EY4XzgCrPTpeirbNhCSY5+prSffivJJItJ
-         TLSJcQjZe+YHxmX3Xi0OXwB5uRaNQLWU5Fx7citQQXFYEQLnO6Hyqb+O41dgY4f+pkTR
-         q9V2VhpKsZ2mk99GoqtNPwmnoYa/47gWkBIkt+ANdvgY5hw4oMr0GYfNKm9UUZvr+ga1
-         jrDawwWZOb8TOm5KHtGVRoCCxmebqta1lu/K3lz1dBxEfsxC+l3NQyxQmhcPymamhSb0
-         fPcg==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vl96vL6m5AEqJNfzJ9JymqtNHrcyexFyxG6iLFazTaA=;
+        b=SYaTWExIO1xx1XmNc4CCukt8i+5xXwcPAelCfWgKQlfZAhGTj1xXUn+5RofwkaoJlA
+         +w5amk7iuAnnihvVABmIy66yGcWJp7n4iSmVbxWnyNLaafrfEq8GRmJZfde+hEk3lGGb
+         gfZ1TVmhBRJ9zAgCh5MsNuNhjxdGJzLfx6z7xWpljFi4JOmgYTeA8SYj4dScawoNGwzG
+         7kb0bNdQ4rGeQF3O6xYdUpltzQ45PxijVI4Xy0kqdMTquukpi+tGF0bRg1KkdQZ8zAAq
+         +vjYcIaDUO9DS7LM9dccLJv64lIp67WV2sNqiIjPze7KU170iNT+DpddWzlAlzO8AkyU
+         VzZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fi2bsjulIyd9jI+GzTDgQYTOMk+6i0IWxJUAz5Meqtg=;
-        b=uFq9iVacRrA/mlXNuzj9gai5VrzMUdZ+wKmFuVLHzfnL8HMlANKRTOZNSZOYXqBsB/
-         6LZ7obx6Kpd3cwQVaAGOrKvTp2gPE/jMdqSDm7McUA/cWSr10KOwK6JBhoyQlACYrUP9
-         F0htZ67ng/4OwVcGOHGoptEHIVm2/NLSHJi5DHxA7f/9vQS3Hx6K3lTQ9ddVw86/siKw
-         pft36Io0Z8GYL+0ZrbE7N2rOS/5Uo5/qanGhxm5LSh6de6/Xg4i6WjVyCk8iIM8bOJTp
-         6AsJMYsWuelal39Gv37PPo4OAkxsUD4SY+v93dZBszlgTRXZz2b82cLLjj7W8R/3xPZJ
-         TEpA==
-X-Gm-Message-State: ANoB5pl3llr8lKUHiWTs3AdSfiDiYhVV3eCZnLlP51NG3OZV2EUs2Mn9
-        Gcdsk38tE09v9JejzTvuCe3Ag/6nr/xvjYCa
-X-Google-Smtp-Source: AA0mqf5p1qHEi5rtkwWkPpiKdinNN7myjln/hIcIbgalpqIC5Dd3f1+HHQl+1qEyFsiabKgUQeQO/w==
-X-Received: by 2002:a17:903:1c3:b0:189:e91b:c35 with SMTP id e3-20020a17090301c300b00189e91b0c35mr1677258plh.173.1670289804883;
-        Mon, 05 Dec 2022 17:23:24 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b00189812a5397sm11127485plb.180.2022.12.05.17.23.23
-        for <linux-bluetooth@vger.kernel.org>
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vl96vL6m5AEqJNfzJ9JymqtNHrcyexFyxG6iLFazTaA=;
+        b=3dMKq/GJAM+lVZdSs++tNDMF9oU5b+TIQbXMcU3RNZhlHQa9l/P8HwEwdz8/B2fNwT
+         PpHKjkGtw/WEAM/N4ZRdsskYnKoU8mq+fOt1vAJ/VqoZEaHkOfFHBQtXjtTQ7xp5WfEz
+         ypvv2ICw64BSzLABMfZkgBYFf5/uJbyhR6jdEGREkjV463ETUWuhgQpkBMWqDX9AHRRP
+         DJ+qV4V1VXcvhaPrGXjy5yZcZ+U8RcGjT3EhdV7HQmCrAEx17xuGq59oPok1oM2VdI5O
+         1dffaIkob3bsuVy/lHDTseHWFfHqUFOIv2BJcDwCsmONKUq5rTmY7wIqT/bgCYzp+Pq4
+         T8PA==
+X-Gm-Message-State: ANoB5pn/sD08C5c06PP9Leswfoj2a5dI5jLrQv2l7nfoA5c8SJvu+KA3
+        W+QQAAs7m7MzG4/0P5IGH4Le+yTbM4Q=
+X-Google-Smtp-Source: AA0mqf6ZjMOD1NuNAXjFmqAsts9rFhru58NIaptqpa22FppfhiL3s9kg/BoBfn6CVYS0vZZAVlBxpg==
+X-Received: by 2002:a5d:9911:0:b0:6db:1f90:7e62 with SMTP id x17-20020a5d9911000000b006db1f907e62mr30064359iol.107.1670294072353;
+        Mon, 05 Dec 2022 18:34:32 -0800 (PST)
+Received: from [172.17.0.2] ([168.61.171.55])
+        by smtp.gmail.com with ESMTPSA id m12-20020a924a0c000000b00300efcac7b7sm5699296ilf.7.2022.12.05.18.34.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 17:23:24 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_conn: Fix crash on hci_create_cis_sync
-Date:   Mon,  5 Dec 2022 17:23:23 -0800
-Message-Id: <20221206012323.3684462-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        Mon, 05 Dec 2022 18:34:32 -0800 (PST)
+Message-ID: <638eaa38.920a0220.e3b93.b357@mx.google.com>
+Date:   Mon, 05 Dec 2022 18:34:32 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2919928006925603072=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: hci_conn: Fix crash on hci_create_cis_sync
+In-Reply-To: <20221206012323.3684462-1-luiz.dentz@gmail.com>
+References: <20221206012323.3684462-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2919928006925603072==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When attempting to connect multiple ISO sockets without using
-DEFER_SETUP may result in the following crash:
+This is automated email and please do not reply to this email!
 
-BUG: KASAN: null-ptr-deref in hci_create_cis_sync+0x18b/0x2b0
-Read of size 2 at addr 0000000000000036 by task kworker/u3:1/50
+Dear submitter,
 
-CPU: 0 PID: 50 Comm: kworker/u3:1 Not tainted
-6.0.0-rc7-02243-gb84a13ff4eda #4373
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
-BIOS 1.16.0-1.fc36 04/01/2014
-Workqueue: hci0 hci_cmd_sync_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0x19/0x27
- kasan_report+0xbc/0xf0
- ? hci_create_cis_sync+0x18b/0x2b0
- hci_create_cis_sync+0x18b/0x2b0
- ? get_link_mode+0xd0/0xd0
- ? __ww_mutex_lock_slowpath+0x10/0x10
- ? mutex_lock+0xe0/0xe0
- ? get_link_mode+0xd0/0xd0
- hci_cmd_sync_work+0x111/0x190
- process_one_work+0x427/0x650
- worker_thread+0x87/0x750
- ? process_one_work+0x650/0x650
- kthread+0x14e/0x180
- ? kthread_exit+0x50/0x50
- ret_from_fork+0x22/0x30
- </TASK>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=702026
 
-Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.59 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      34.15 seconds
+BuildKernel32                 PASS      30.43 seconds
+TestRunnerSetup               PASS      426.68 seconds
+TestRunner_l2cap-tester       PASS      16.16 seconds
+TestRunner_iso-tester         PASS      16.19 seconds
+TestRunner_bnep-tester        PASS      5.58 seconds
+TestRunner_mgmt-tester        PASS      108.27 seconds
+TestRunner_rfcomm-tester      PASS      9.54 seconds
+TestRunner_sco-tester         PASS      8.95 seconds
+TestRunner_ioctl-tester       PASS      10.44 seconds
+TestRunner_mesh-tester        PASS      7.01 seconds
+TestRunner_smp-tester         PASS      8.73 seconds
+TestRunner_userchan-tester    PASS      5.93 seconds
+IncrementalBuild              PASS      31.51 seconds
+
+
+
 ---
- net/bluetooth/hci_conn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 3287b2ca789e..d3e542c2fc3e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1879,7 +1879,7 @@ static int hci_create_cis_sync(struct hci_dev *hdev, void *data)
- 			continue;
- 
- 		/* Check if all CIS(s) belonging to a CIG are ready */
--		if (conn->link->state != BT_CONNECTED ||
-+		if (!conn->link || conn->link->state != BT_CONNECTED ||
- 		    conn->state != BT_CONNECT) {
- 			cmd.cp.num_cis = 0;
- 			break;
--- 
-2.37.3
 
+--===============2919928006925603072==--
