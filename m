@@ -2,100 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2301FC47089
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Dec 2022 23:30:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A954BC4708C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Dec 2022 01:23:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230035AbiLEXaf (ORCPT
+        id S229936AbiLFBXx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Dec 2022 18:30:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48194 "EHLO
+        Mon, 5 Dec 2022 20:23:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230036AbiLEXae (ORCPT
+        with ESMTP id S229457AbiLFBX0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Dec 2022 18:30:34 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A25D13F3F
-        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 15:30:33 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id 21so12933209pfw.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Dec 2022 15:30:33 -0800 (PST)
+        Mon, 5 Dec 2022 20:23:26 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29F21EC67
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 17:23:25 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id d3so12494075plr.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Dec 2022 17:23:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=36kUUdlZRiVUXNgQHuJYI5qLCAbBrTtAcNOuMjO6CW8=;
-        b=aIvKNmTR+1J/VpVjJFHBKSz0390ostikGmeYWa0m+yEn/zSmwBMFfesBd7IlnaJ5os
-         YPwEUdWJAbehAF5A7bM0GVdvJPd13VFxM7KVW77bp2ky9ZWn4XmAgTxPVheuxi/jnw3E
-         JhXWS3yA37cU+zdX4NA5MFIeSXs8zTHrszI4LdD5Sc8UGAW96uC+hZyop1AIKxe/MWv7
-         R3pdbIXASBngfOp1woucU++sgzhdJaqw6cFPiUy4LaWLG3Log/fJoiWLKxP9oA09uMeR
-         Yw3M6kazY5Fk4YpHP7v7iOKP63GT1hbmZtqZASUkBiIYKzXmVTNZEOqXZfK0hsXVIgBi
-         NUWQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fi2bsjulIyd9jI+GzTDgQYTOMk+6i0IWxJUAz5Meqtg=;
+        b=IqOi7h3AsyN3rN5ImSXhfo9+SbU55VQg7wgQcdP9cLt5AiiiQSR6ZD9D2/+CIEcDK1
+         DIRB4NyTO3ujd5cMuogBiPv2ui0CnMt9U7EY4XzgCrPTpeirbNhCSY5+prSffivJJItJ
+         TLSJcQjZe+YHxmX3Xi0OXwB5uRaNQLWU5Fx7citQQXFYEQLnO6Hyqb+O41dgY4f+pkTR
+         q9V2VhpKsZ2mk99GoqtNPwmnoYa/47gWkBIkt+ANdvgY5hw4oMr0GYfNKm9UUZvr+ga1
+         jrDawwWZOb8TOm5KHtGVRoCCxmebqta1lu/K3lz1dBxEfsxC+l3NQyxQmhcPymamhSb0
+         fPcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=36kUUdlZRiVUXNgQHuJYI5qLCAbBrTtAcNOuMjO6CW8=;
-        b=bAQ+YtqcR3OHnx4cqCWYBcOjHPVAdJKxpHviT7iT+OvMSQFkyABaRNzFMaunwJTt5X
-         Cq7LbHupwIdptW1gQPyGqXnuyj7Rczs7ewdMXt95rXeGJeZQ132hIBzraqAcQrjTuMb6
-         Cfsl707Afm7gcx80VzlrrNMS8cccoH6qIZVuzPlV9PI2Me1yme05oSE72MXgH1UWf2GI
-         pm6uvdIpcalM4VhRA4Tqbd+urjmnfJb7yjSr4QccswytURVsCIBqlw1X0BqvyzLHqxvZ
-         C9eRDQf00myYpUVqn1vFZyPZyEf/aXr/iT0uUS8IdhGAB4L3vUDSn72RtjapMkOujATr
-         nSYA==
-X-Gm-Message-State: ANoB5pmuFfj2xL5VpQeRZPp+VjkNGsZNNWS6y/CjlnRjg6SiCVVKLEId
-        ako+EkbhK7ZYZtVJq2IO0cfzY92myiA=
-X-Google-Smtp-Source: AA0mqf6A0/eDw7P9Nbs3BCAlHegK+aPU8PzGeylukiqdyIKRS53L/L38Lbyx90yksVtjDoLWNlDxIg==
-X-Received: by 2002:a63:1803:0:b0:477:6e5d:4e25 with SMTP id y3-20020a631803000000b004776e5d4e25mr64357437pgl.70.1670283032214;
-        Mon, 05 Dec 2022 15:30:32 -0800 (PST)
-Received: from [172.17.0.2] ([104.42.57.134])
-        by smtp.gmail.com with ESMTPSA id k1-20020a170902c40100b0017e64da44c5sm11152536plk.203.2022.12.05.15.30.31
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fi2bsjulIyd9jI+GzTDgQYTOMk+6i0IWxJUAz5Meqtg=;
+        b=uFq9iVacRrA/mlXNuzj9gai5VrzMUdZ+wKmFuVLHzfnL8HMlANKRTOZNSZOYXqBsB/
+         6LZ7obx6Kpd3cwQVaAGOrKvTp2gPE/jMdqSDm7McUA/cWSr10KOwK6JBhoyQlACYrUP9
+         F0htZ67ng/4OwVcGOHGoptEHIVm2/NLSHJi5DHxA7f/9vQS3Hx6K3lTQ9ddVw86/siKw
+         pft36Io0Z8GYL+0ZrbE7N2rOS/5Uo5/qanGhxm5LSh6de6/Xg4i6WjVyCk8iIM8bOJTp
+         6AsJMYsWuelal39Gv37PPo4OAkxsUD4SY+v93dZBszlgTRXZz2b82cLLjj7W8R/3xPZJ
+         TEpA==
+X-Gm-Message-State: ANoB5pl3llr8lKUHiWTs3AdSfiDiYhVV3eCZnLlP51NG3OZV2EUs2Mn9
+        Gcdsk38tE09v9JejzTvuCe3Ag/6nr/xvjYCa
+X-Google-Smtp-Source: AA0mqf5p1qHEi5rtkwWkPpiKdinNN7myjln/hIcIbgalpqIC5Dd3f1+HHQl+1qEyFsiabKgUQeQO/w==
+X-Received: by 2002:a17:903:1c3:b0:189:e91b:c35 with SMTP id e3-20020a17090301c300b00189e91b0c35mr1677258plh.173.1670289804883;
+        Mon, 05 Dec 2022 17:23:24 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b00189812a5397sm11127485plb.180.2022.12.05.17.23.23
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 15:30:31 -0800 (PST)
-Message-ID: <638e7f17.170a0220.8c301.49f5@mx.google.com>
-Date:   Mon, 05 Dec 2022 15:30:31 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3649151649396392011=="
+        Mon, 05 Dec 2022 17:23:24 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_conn: Fix crash on hci_create_cis_sync
+Date:   Mon,  5 Dec 2022 17:23:23 -0800
+Message-Id: <20221206012323.3684462-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] client: Allow gatt.select-attribute to work with local attributes
-In-Reply-To: <20221205222617.3580784-1-luiz.dentz@gmail.com>
-References: <20221205222617.3580784-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3649151649396392011==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+When attempting to connect multiple ISO sockets without using
+DEFER_SETUP may result in the following crash:
 
-Dear submitter,
+BUG: KASAN: null-ptr-deref in hci_create_cis_sync+0x18b/0x2b0
+Read of size 2 at addr 0000000000000036 by task kworker/u3:1/50
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=701982
+CPU: 0 PID: 50 Comm: kworker/u3:1 Not tainted
+6.0.0-rc7-02243-gb84a13ff4eda #4373
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
+BIOS 1.16.0-1.fc36 04/01/2014
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x19/0x27
+ kasan_report+0xbc/0xf0
+ ? hci_create_cis_sync+0x18b/0x2b0
+ hci_create_cis_sync+0x18b/0x2b0
+ ? get_link_mode+0xd0/0xd0
+ ? __ww_mutex_lock_slowpath+0x10/0x10
+ ? mutex_lock+0xe0/0xe0
+ ? get_link_mode+0xd0/0xd0
+ hci_cmd_sync_work+0x111/0x190
+ process_one_work+0x427/0x650
+ worker_thread+0x87/0x750
+ ? process_one_work+0x650/0x650
+ kthread+0x14e/0x180
+ ? kthread_exit+0x50/0x50
+ ret_from_fork+0x22/0x30
+ </TASK>
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-GitLint                       PASS      0.24 seconds
-BuildEll                      PASS      26.97 seconds
-BluezMake                     PASS      862.69 seconds
-MakeCheck                     PASS      11.89 seconds
-MakeDistcheck                 PASS      146.57 seconds
-CheckValgrind                 PASS      243.69 seconds
-bluezmakeextell               PASS      94.53 seconds
-IncrementalBuild              PASS      718.24 seconds
-ScanBuild                     PASS      1008.07 seconds
-
-
-
+Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3287b2ca789e..d3e542c2fc3e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1879,7 +1879,7 @@ static int hci_create_cis_sync(struct hci_dev *hdev, void *data)
+ 			continue;
+ 
+ 		/* Check if all CIS(s) belonging to a CIG are ready */
+-		if (conn->link->state != BT_CONNECTED ||
++		if (!conn->link || conn->link->state != BT_CONNECTED ||
+ 		    conn->state != BT_CONNECT) {
+ 			cmd.cp.num_cis = 0;
+ 			break;
+-- 
+2.37.3
 
---===============3649151649396392011==--
