@@ -2,107 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A8CC47089
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Dec 2022 02:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE63C47089
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Dec 2022 03:16:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233818AbiLFCek (ORCPT
+        id S232084AbiLFDQq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Dec 2022 21:34:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49548 "EHLO
+        Mon, 5 Dec 2022 22:16:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233834AbiLFCeg (ORCPT
+        with ESMTP id S233505AbiLFDQm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Dec 2022 21:34:36 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 263AF1EAE5
-        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 18:34:33 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id g20so1759330iob.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Dec 2022 18:34:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=vl96vL6m5AEqJNfzJ9JymqtNHrcyexFyxG6iLFazTaA=;
-        b=SYaTWExIO1xx1XmNc4CCukt8i+5xXwcPAelCfWgKQlfZAhGTj1xXUn+5RofwkaoJlA
-         +w5amk7iuAnnihvVABmIy66yGcWJp7n4iSmVbxWnyNLaafrfEq8GRmJZfde+hEk3lGGb
-         gfZ1TVmhBRJ9zAgCh5MsNuNhjxdGJzLfx6z7xWpljFi4JOmgYTeA8SYj4dScawoNGwzG
-         7kb0bNdQ4rGeQF3O6xYdUpltzQ45PxijVI4Xy0kqdMTquukpi+tGF0bRg1KkdQZ8zAAq
-         +vjYcIaDUO9DS7LM9dccLJv64lIp67WV2sNqiIjPze7KU170iNT+DpddWzlAlzO8AkyU
-         VzZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vl96vL6m5AEqJNfzJ9JymqtNHrcyexFyxG6iLFazTaA=;
-        b=3dMKq/GJAM+lVZdSs++tNDMF9oU5b+TIQbXMcU3RNZhlHQa9l/P8HwEwdz8/B2fNwT
-         PpHKjkGtw/WEAM/N4ZRdsskYnKoU8mq+fOt1vAJ/VqoZEaHkOfFHBQtXjtTQ7xp5WfEz
-         ypvv2ICw64BSzLABMfZkgBYFf5/uJbyhR6jdEGREkjV463ETUWuhgQpkBMWqDX9AHRRP
-         DJ+qV4V1VXcvhaPrGXjy5yZcZ+U8RcGjT3EhdV7HQmCrAEx17xuGq59oPok1oM2VdI5O
-         1dffaIkob3bsuVy/lHDTseHWFfHqUFOIv2BJcDwCsmONKUq5rTmY7wIqT/bgCYzp+Pq4
-         T8PA==
-X-Gm-Message-State: ANoB5pn/sD08C5c06PP9Leswfoj2a5dI5jLrQv2l7nfoA5c8SJvu+KA3
-        W+QQAAs7m7MzG4/0P5IGH4Le+yTbM4Q=
-X-Google-Smtp-Source: AA0mqf6ZjMOD1NuNAXjFmqAsts9rFhru58NIaptqpa22FppfhiL3s9kg/BoBfn6CVYS0vZZAVlBxpg==
-X-Received: by 2002:a5d:9911:0:b0:6db:1f90:7e62 with SMTP id x17-20020a5d9911000000b006db1f907e62mr30064359iol.107.1670294072353;
-        Mon, 05 Dec 2022 18:34:32 -0800 (PST)
-Received: from [172.17.0.2] ([168.61.171.55])
-        by smtp.gmail.com with ESMTPSA id m12-20020a924a0c000000b00300efcac7b7sm5699296ilf.7.2022.12.05.18.34.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Dec 2022 18:34:32 -0800 (PST)
-Message-ID: <638eaa38.920a0220.e3b93.b357@mx.google.com>
-Date:   Mon, 05 Dec 2022 18:34:32 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2919928006925603072=="
+        Mon, 5 Dec 2022 22:16:42 -0500
+X-Greylist: delayed 305 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 05 Dec 2022 19:16:40 PST
+Received: from net153.net (unknown [38.67.43.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1683025E9A
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 19:16:39 -0800 (PST)
+Received: from [IPV6:2001:470:b965:1:26a1:8f80:3e64:f9a1] (unknown [IPv6:2001:470:b965:1:26a1:8f80:3e64:f9a1])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by net153.net (Postfix) with ESMTPSA id 8BE88778
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Dec 2022 21:11:31 -0600 (CST)
+Message-ID: <f85a4334-fc06-76a1-e693-d5e8dedf5300@net153.net>
+Date:   Mon, 5 Dec 2022 21:11:31 -0600
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: hci_conn: Fix crash on hci_create_cis_sync
-In-Reply-To: <20221206012323.3684462-1-luiz.dentz@gmail.com>
-References: <20221206012323.3684462-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Content-Language: en-US
+To:     linux-bluetooth@vger.kernel.org
+From:   Samuel Smith <satlug@net153.net>
+Subject: Needless logging with QCA WCN6855
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2919928006925603072==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+Not sure if this is the right place, but I've noticed excessive logging 
+coming from the bluetooth stack while using the QCA WCN6855 combined 
+bluetooth/wifi card. Using a bluetooth mouse results in a few messages 
+per minute. Using wireless headphones results in upwards of 3 messages 
+per second.
 
-Dear submitter,
+The computer is a Lenovo T14 Amd Gen 2 (sku 20XK006BUS) Direct link 
+here: https://tinyurl.com/5xrad7w5
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=702026
+The software is Debian Stable, with kernel versions of 5.18, 5.19, and 6.0.
 
----Test result---
+The excessive logging is in the the form of:
 
-Test Summary:
-CheckPatch                    PASS      0.59 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      34.15 seconds
-BuildKernel32                 PASS      30.43 seconds
-TestRunnerSetup               PASS      426.68 seconds
-TestRunner_l2cap-tester       PASS      16.16 seconds
-TestRunner_iso-tester         PASS      16.19 seconds
-TestRunner_bnep-tester        PASS      5.58 seconds
-TestRunner_mgmt-tester        PASS      108.27 seconds
-TestRunner_rfcomm-tester      PASS      9.54 seconds
-TestRunner_sco-tester         PASS      8.95 seconds
-TestRunner_ioctl-tester       PASS      10.44 seconds
-TestRunner_mesh-tester        PASS      7.01 seconds
-TestRunner_smp-tester         PASS      8.73 seconds
-TestRunner_userchan-tester    PASS      5.93 seconds
-IncrementalBuild              PASS      31.51 seconds
+[3400058.603040] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400058.603396] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400058.603916] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400059.000540] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400061.130513] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400083.158218] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400083.158622] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+[3400083.159139] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
+  [3400083.623400] Bluetooth: hci0: ACL packet for unknown connection 
+handle 3804
 
+"Connection handle 3804" coincides with this commit 
+(https://github.com/torvalds/linux/commit/c614ca3f7476934de54dd731e09d094ad822696c) 
+from Oct 2018 where extra logic was added to hci_qca.c to handle the 
+fact that QCA devices use ACL packets to transmit extra controller 
+debugging info. The WCN6855 chipset does not use the UART interface but 
+uses btusb.c. The logic from hci_qca.c was never backported for the USB 
+interface though. I believe that is the problem. There are other 
+manufactures doing similar within btusb.c, see btusb_recv_acl_mtk().
 
+It also seems at one time QCA was disabling the extra logging via some 
+extra commands, at least for the devices that use btqca.c: 
+https://github.com/torvalds/linux/commit/83e81961ff7ef75f97756f316caea5aa6bcc19cc
 
----
-Regards,
-Linux Bluetooth
+So because this is all QCA code, I'm not sure if I'm at liberty to 
+provide a patch. For now, I've simply built the bluetooth stack with 
+logging for "unknown connection handle" disabled (within 
+hci_recv_frame() ). But could someone in the know perhaps forward this 
+to any applicable maintainers?
 
+Feel free to ask me for any extra info if needed.
 
---===============2919928006925603072==--
+Kind regards,
+Samuel Smith
