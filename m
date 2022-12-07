@@ -2,138 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 217D1C4708E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Dec 2022 07:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CE9C63708
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Dec 2022 21:20:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiLGH3I (ORCPT
+        id S229713AbiLGVUf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Dec 2022 02:29:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56406 "EHLO
+        Wed, 7 Dec 2022 16:20:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiLGH3G (ORCPT
+        with ESMTP id S229635AbiLGVUe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Dec 2022 02:29:06 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 195CE27B04
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Dec 2022 23:29:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670398146; x=1701934146;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=cSlQIT5FUSIAPwCsDQy/C8FNH6pA0JDlV64yCZ5mazA=;
-  b=AuuOsDGuo9XmYJ3oYB0h5JyGBcQ6nPXpEQRY3cHq3e8/AqnorXWsm3xS
-   /gAdhJjS3EFHxWH4qq2flFFjRvShqIxZuEZUC5EZsKb/DH6V62dPNeM1I
-   iA5/AmSR164LOzb6S9aPzhcfmOXfJFZyqZC85i7R4dNmymbtBRplSvFgG
-   Ojb2aaVm1On9UYvUFGqLZ39jl9OrlxcwKtXbX+t9F7B1tM2N1kFkVsbDL
-   i8YEq64a53aRkwTe79ebV5C/XHEKDWPLqOhPTl0ghBEYGgN0P/59Cdc6W
-   sBe4TLde9asjfwjGlBvt7l7SKa7jtigz/dtbk2efc7VaPY+CRPkfB/Wx1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10553"; a="314471304"
-X-IronPort-AV: E=Sophos;i="5.96,223,1665471600"; 
-   d="scan'208";a="314471304"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2022 23:29:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10553"; a="715092651"
-X-IronPort-AV: E=Sophos;i="5.96,223,1665471600"; 
-   d="scan'208";a="715092651"
-Received: from lkp-server01.sh.intel.com (HELO b5d47979f3ad) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 06 Dec 2022 23:28:58 -0800
-Received: from kbuild by b5d47979f3ad with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1p2orR-00003b-2Z;
-        Wed, 07 Dec 2022 07:28:57 +0000
-Date:   Wed, 07 Dec 2022 15:28:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 0dff4eccb2edae2754c8a0c7444bf843bd102720
-Message-ID: <63904097.pvyj1Boqsd4E7x0Y%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 7 Dec 2022 16:20:34 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588454E402
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Dec 2022 13:20:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0AEE2B82150
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Dec 2022 21:20:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9DE6EC4314B;
+        Wed,  7 Dec 2022 21:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670448030;
+        bh=S1kx/LFeyIuXBWr3wC4DWo1GS3Cxn7znnqqWmg3W6FM=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=mzktbzd8TxYTQMgfq05Je1atDZLOzhm7uFTGuVyrsi0wC0n/8n8KJ1Wq1ACdDhSiK
+         AAkVHKF6y+rxOLGp6Kn1y4DO1HoG7KQuRjvtEKQvhRDTx7tJ4PY9g2keBfIJ8EtaET
+         S/XxR5NQAtQNnRCbEd75fWnds5bFsIH/KtME5jAUX/mLmOn9P/aEHL5aQeuFYFTw+S
+         Ww1JuawdvwRXm4mi30ufguFWFctkcECzvUnO0kL0JlJ04eCN7CCyy2SSsN0LQNGVDn
+         6jPdfmL3fJ2xqo5dbWW3V92cCLRHzF3/EimzJGtPQNTChaK2Yo9z2fyMq7CpCQ5XzA
+         +PYsEltZRbs3Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8AB2DE29F38;
+        Wed,  7 Dec 2022 21:20:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/6] Bluetooth: don't call kfree_skb() under
+ spin_lock_irqsave()
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167044803056.32577.14108869575726101767.git-patchwork-notify@kernel.org>
+Date:   Wed, 07 Dec 2022 21:20:30 +0000
+References: <20221207021835.3012559-1-yangyingliang@huawei.com>
+In-Reply-To: <20221207021835.3012559-1-yangyingliang@huawei.com>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 0dff4eccb2edae2754c8a0c7444bf843bd102720  Bluetooth: btusb: don't call kfree_skb() under spin_lock_irqsave()
+Hello:
 
-elapsed time: 726m
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-configs tested: 60
-configs skipped: 2
+On Wed, 7 Dec 2022 10:18:29 +0800 you wrote:
+> It is not allowed to call kfree_skb() from hardware interrupt
+> context or with interrupts being disabled. This patchset is
+> replace kfree_skb() with dev_kfree_skb_irq() under
+> spin_lock_irqsave().
+> 
+> v1 -> v2:
+>   Replace kfree_skb() with dev_kfree_skb_irq().
+> 
+> [...]
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Here is the summary with links:
+  - [v2,1/6] Bluetooth: hci_qca: don't call kfree_skb() under spin_lock_irqsave()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/53a3dd1fe59f
+  - [v2,2/6] Bluetooth: hci_ll: don't call kfree_skb() under spin_lock_irqsave()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1813c380e222
+  - [v2,3/6] Bluetooth: hci_h5: don't call kfree_skb() under spin_lock_irqsave()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a1e7f617bc0d
+  - [v2,4/6] Bluetooth: hci_bcsp: don't call kfree_skb() under spin_lock_irqsave()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/0935d021bde3
+  - [v2,5/6] Bluetooth: hci_core: don't call kfree_skb() under spin_lock_irqsave()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a3381581499f
+  - [v2,6/6] Bluetooth: RFCOMM: don't call kfree_skb() under spin_lock_irqsave()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/894e4bc8d807
 
-gcc tested configs:
-powerpc                           allnoconfig
-arc                                 defconfig
-alpha                               defconfig
-s390                             allmodconfig
-s390                                defconfig
-um                           x86_64_defconfig
-sh                               allmodconfig
-um                             i386_defconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-s390                             allyesconfig
-x86_64                          rhel-8.3-rust
-x86_64                    rhel-8.3-kselftests
-x86_64                          rhel-8.3-func
-arm                  randconfig-r046-20221206
-arc                  randconfig-r043-20221206
-i386                                defconfig
-ia64                             allmodconfig
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a006
-x86_64                              defconfig
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                        randconfig-a015
-x86_64                               rhel-8.3
-x86_64                           rhel-8.3-kvm
-i386                          randconfig-a014
-x86_64                           rhel-8.3-syz
-i386                          randconfig-a012
-x86_64                         rhel-8.3-kunit
-arm                                 defconfig
-m68k                             allyesconfig
-i386                          randconfig-a016
-m68k                             allmodconfig
-x86_64                           allyesconfig
-alpha                            allyesconfig
-arc                              allyesconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-i386                          randconfig-a005
-arm64                            allyesconfig
-arm                              allyesconfig
-i386                             allyesconfig
-
-clang tested configs:
-hexagon              randconfig-r041-20221206
-hexagon              randconfig-r045-20221206
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-s390                 randconfig-r044-20221206
-riscv                randconfig-r042-20221206
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                        randconfig-a012
-i386                          randconfig-a013
-i386                          randconfig-a015
-i386                          randconfig-a011
-i386                          randconfig-a004
-i386                          randconfig-a002
-i386                          randconfig-a006
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
