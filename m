@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65438C352A1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Dec 2022 01:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1F3C3A5A7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Dec 2022 01:35:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbiLGBfg (ORCPT
+        id S229878AbiLGBfu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Dec 2022 20:35:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51150 "EHLO
+        Tue, 6 Dec 2022 20:35:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiLGBfe (ORCPT
+        with ESMTP id S229576AbiLGBft (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Dec 2022 20:35:34 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1D904B9A1
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Dec 2022 17:35:33 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id v3so14959081pgh.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Dec 2022 17:35:33 -0800 (PST)
+        Tue, 6 Dec 2022 20:35:49 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDE74B9A1
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Dec 2022 17:35:48 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so73832pjj.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Dec 2022 17:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
         bh=F99bIoVtHG8cjb55LqZzKd/PjrOlVr7ynteymuxY+mc=;
-        b=PPWopMzsZsHtwRtL4ZDlv5UCi2PJufZfUSWIpvtaz5kbr2XB4pBmGZn/55QO0t8eHk
-         ypx1nOaCXUoR+mxYeX/1Ef47ULwKlN4Hesru1Yid7Qbk7UCnTywNzTxbd1pOoV3U5oI4
-         3SLGPF0v8ecCRcmdkKpoXoYS83f1n/T0FQORZbP3ef8jfCRYDd+W5A3jpjJWaTgr6Av+
-         fgHLwF0r4qZ0MdBGXMl6eUZ8+YgtViJhF9ACBNN09LbrcPyTBZtzucsDWxkV5JcXh398
-         W/AWEalx1HTR5dWkwPs8noq9CF68xBgQz1VzytBK+jjyOBaMXIxTxciE19WgAXdJDrMN
-         YA/g==
+        b=IuXFdMlMhsBhY/YLx5VNbAwQypv5EM0iNmdOa03m9eNyHxEl/Ugay9JLfQO4QRD/E6
+         cgtMNanN4YL99RU55KALSdk0lPeLhQMZRb0oVsyU1nxE5/j1wmKc0RgO78n/PH1wSnL0
+         wca9rT4kmgUsdwlqDU5posoxG4Giy2TY0ZwuD4IeuhGTotGQfZvIZKLOkenewoWfyRen
+         9qQHAGHbnwVKLgT1JNnXSO9r0SzUKEt6KtLzwpA4VChPLHVdMCjVtZJa/wv5iukVGfuu
+         WcJ0jM1SQVNPBrM3jnzQlhHdbTpeHCsx71d30wja/yz4YoWcXZCOYt6DSiWrg1bxgYc+
+         3wcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=F99bIoVtHG8cjb55LqZzKd/PjrOlVr7ynteymuxY+mc=;
-        b=0QeF3JvxCPsPqvkiNQF28Q/B2BaBt/foCtwaEf+7Uq3Yh/F5a7NdrWg9CD3DyZ04Mp
-         jCiQ8NIuTu0u8QxDiRPSKGo5KIhDLnAtFrd0/Xz721onyr5Fq/nzdGLrWLAcem5+7d6A
-         B5tTfsklX+bDrK0AGmH17x3jDjlG8iM8PYQA8BP3/Ze5yoepefvGwIbK9RwxWrNMgJOy
-         xbotypQk9gVltmplArA5BmADDUmoI2XgJvorwvCKVqz6fdbH7QYRRu0u3Vqaq527RwOC
-         3bWjboeLWS0j82jnNEbXIj//cNC7JRTLHw/t1EpgUC32GIjmtSpaqbzT913j6/eszXxr
-         repg==
-X-Gm-Message-State: ANoB5pkFPgV1OheNtXONFMvrrBTZaS5dR+tVNJa+hev3eTruZ5BAg7jf
-        4MMU6UnviiL6nz1y4KtqPQ99HOgvo2n+Twat
-X-Google-Smtp-Source: AA0mqf743NdW69LqSAOqAJUWivWyVklAPgabkSXtYwhhsi0MVyvoEW1gIGHOWpw+S81+oQ/1ktzSjA==
-X-Received: by 2002:a62:ed03:0:b0:572:6da6:de57 with SMTP id u3-20020a62ed03000000b005726da6de57mr72943087pfh.30.1670376932739;
-        Tue, 06 Dec 2022 17:35:32 -0800 (PST)
+        b=Judd0qiiQ7wtBwZF51kDbaHTvkmk/HJS+j6PQKd4QWOKQp+sT6nebxloWijmX9Jnxu
+         ZhsFxfll4aEB8GFbtbmdIg80Ky+2sAtnuxk7YV8t1Q115/4Mr22ZBUxNfypf5SCClrmH
+         wVGWafHnLtp3az256O8czxU3LmopZFiAkXf9h9jWRnCxrdXjaBxu4XJnKz+HUbWrZZow
+         S0tbmurH5FrDSnLOv5Jx+pqeEgKSmEK5agol3RNRaOFNchmvResoRX8w7Dd0aUnCNw18
+         hcDA20uLEwswjRpG42M7WC5qGPcQcc8dTGHZ1l7KynkT97YSfUlnU1Pw+LAas5C34jLC
+         xa2g==
+X-Gm-Message-State: ANoB5pkDl23v+36w5VSBBhx1NBEkvIt9cLP+pm7zN3Kl6aqxoQYNyAtP
+        IZC0ERzZpj3KcXD90GqpGLM7rs/htiCF09Z2
+X-Google-Smtp-Source: AA0mqf6oDqHPzV7ko/L3lDSNuNP0W5ey9wmXUMuyuFktWhqhF091lqSKVUCoNaNX7jGRAEupsOpZ6A==
+X-Received: by 2002:a17:903:2345:b0:189:cca6:3969 with SMTP id c5-20020a170903234500b00189cca63969mr16203635plh.88.1670376947940;
+        Tue, 06 Dec 2022 17:35:47 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id k1-20020a170902c40100b00188fc33e96dsm13318903plk.198.2022.12.06.17.35.31
+        by smtp.gmail.com with ESMTPSA id p2-20020a170902780200b001869394a372sm751077pll.201.2022.12.06.17.35.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Dec 2022 17:35:32 -0800 (PST)
+        Tue, 06 Dec 2022 17:35:47 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ 1/2] bthost: Add callback to accept ISO connections
-Date:   Tue,  6 Dec 2022 17:35:29 -0800
-Message-Id: <20221207013531.4162381-1-luiz.dentz@gmail.com>
+Date:   Tue,  6 Dec 2022 17:35:45 -0800
+Message-Id: <20221207013546.4162481-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
