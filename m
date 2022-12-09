@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5829C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Dec 2022 21:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72619C04FDE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Dec 2022 21:30:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiLIVaU (ORCPT
+        id S229798AbiLIVaV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Dec 2022 16:30:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
+        Fri, 9 Dec 2022 16:30:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229555AbiLIVaT (ORCPT
+        with ESMTP id S229865AbiLIVaU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Dec 2022 16:30:19 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E0CA8326C
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 13:30:18 -0800 (PST)
+        Fri, 9 Dec 2022 16:30:20 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7A479CAA
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 13:30:19 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B697762346
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 21:30:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2526FC433EF;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 75E11B828D4
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 21:30:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F6A2C433D2;
         Fri,  9 Dec 2022 21:30:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1670621417;
-        bh=r17QHWHy1C5SuoUoHT/7k89Ovpx4WM63Hiur3MazTro=;
+        bh=SDfhErqHx6HgnnnONSZK60SZDX5pujKv9AlFTu7k7ac=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=UzSH2F31Ev7wJRGLeIJw/v8tV42feRi+zVDdDd2OTe8cKLu9KXb+iobeOoYmemhJm
-         qGQbgE5poiupzNwvNStdc2Hr9eTU1rGYbPQh4uqD5eUqXRxAO1VJVq78b/6FnTQyFy
-         aih2Ea5o0vgTeBTltpT2iZBw5YKBi92Ay0pGZMhxtQFobWGu+/eE5vJHTx/GFcLwAF
-         vIYcKXFBFn2V3nzzvCnL6/MNl4qwRoxX/18n50nbWK9ZPAeHWeI3B/FBe4bBkjaQGl
-         C9gIRjpW7u2GhFaIBPcRVfeYN31xhnCECepf5drqwyQ0/0GpyFIE5ORZ7JrAsBGWjp
-         tHSrK56+FY4pQ==
+        b=UP5GymdEivdcFRo6GBTWlJHX0GphS430dHd7cAT23IzI6no9fqBPk1T8SRNOE2FTx
+         ehJ/LQXSOS4jhci7kBnAc+kPJmJ8R9QYWSIzBqI0bxEDawuC6xTymBoOH7jjylsaLN
+         dDpTj4O8JyU1cfBzk4v566nK4b68pj+hzs7KkfMLlgUGl9lurK3LDp1lO53603NtJC
+         ihsIH6RLZRqvyOKX/p+BwitRK68bA53Xa/cLVsp8xe/O1yfGR3MgH57ETZKO4Pi6/u
+         jZqJYy3MtxV/TiZMpzQZwIV7cJhBzm4ksAqa58i3IXtn6x4J6Wa7ndv//h94p9NwnD
+         xKg3dggvfVoHA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10AB8C41612;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17212C433D7;
         Fri,  9 Dec 2022 21:30:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/5] shared/att: Fix not requeueing in the same channel
+Subject: Re: [PATCH BlueZ] client/player: Fix not calculating time to wait
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167062141706.5923.11666293894073785331.git-patchwork-notify@kernel.org>
+Message-Id: <167062141709.5923.670959168737380822.git-patchwork-notify@kernel.org>
 Date:   Fri, 09 Dec 2022 21:30:17 +0000
-References: <20221209010314.707606-1-luiz.dentz@gmail.com>
-In-Reply-To: <20221209010314.707606-1-luiz.dentz@gmail.com>
+References: <20221209180312.938166-1-luiz.dentz@gmail.com>
+In-Reply-To: <20221209180312.938166-1-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
@@ -53,29 +53,21 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  8 Dec 2022 17:03:10 -0800 you wrote:
+On Fri,  9 Dec 2022 10:03:12 -0800 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> If request needs to be resend due to change in the security use the
-> chan->queue otherwise it may end up using a different channel.
+> The difference of time start and current time may have advanced just
+> enough to add a second leaving start nanoseconds to be bigger.
 > ---
->  src/shared/att.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  client/player.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 
 Here is the summary with links:
-  - [BlueZ,1/5] shared/att: Fix not requeueing in the same channel
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f8670f9aa0a0
-  - [BlueZ,2/5] shared/bap: Log error message if request cannot be sent
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6b5b51392312
-  - [BlueZ,3/5] shared/bap: Read PAC Sink/Source if respective location is found
-    (no matching commit)
-  - [BlueZ,4/5] shared/gatt-db: Allow passing NULL to gatt_db_attribute_write
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=be9fc9222c03
-  - [BlueZ,5/5] shared/bap: Make bt_bap_pac_register to be per session
-    (no matching commit)
+  - [BlueZ] client/player: Fix not calculating time to wait
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e07c1e723ee7
 
 You are awesome, thank you!
 -- 
