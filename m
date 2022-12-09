@@ -2,100 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 832A2C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Dec 2022 19:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5829C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Dec 2022 21:30:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229517AbiLITMU (ORCPT
+        id S229728AbiLIVaU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Dec 2022 14:12:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49732 "EHLO
+        Fri, 9 Dec 2022 16:30:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbiLITMS (ORCPT
+        with ESMTP id S229555AbiLIVaT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Dec 2022 14:12:18 -0500
-Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DE2E2AF5
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 11:12:17 -0800 (PST)
-Received: by mail-vk1-xa36.google.com with SMTP id f24so2600314vkl.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Dec 2022 11:12:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kZmqbtQGoBWYTZCCMzQTB+yc1cpBLbwoYVYgVPdCLuY=;
-        b=Q44i4h6YYzBYG2eAnr2RJlN3KW8vXhW4hawNZW3HIet1uXWhfWmStzuFWYbdl5+tN5
-         B9qFCXGVWNGrNBzWafRvCrtiRku0uXiuZfM68EByqXcjoPNaAfRDp5WhBPSeqLwfmvo0
-         LliTm7H1EnTQN7WOrBxq70wJtCcS092ugvWN6IgPe4Dd49+YQ4s1w3s0/fQ+upwpJ4Y2
-         U0LQa4HsOkCtcHGUfff8/+jS4KcjQaVO5M++p5TbFdMlg/wNWbPh7xAu3MBr4F0C4iDN
-         S+duiH4HJG5ONEA8eoTQnSzVtKjcqperkQC3Rkw8MLWngs1cMo8sYv7f8V28wA4qiUDG
-         VDcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kZmqbtQGoBWYTZCCMzQTB+yc1cpBLbwoYVYgVPdCLuY=;
-        b=xgjsucA5GDwByahMSjChRGlJqY5Ma6HXp14ihTYgCU9cmpM33IcuQ3PDomMYEqKxPg
-         haOCyX1woH4dbWcxkdVCHJrl6m8t39V8hQcFMqkwwNbW5YscKCcOG5crD4MZSGf9YmzG
-         H51jx3ldCi/KYQDD/qC8/DtGAIAdw5seKzIuQhT6drN/n2qDylzNmqEQ0C3AOiycZj+D
-         vpK+xEAXgbY1OvYlSmpQDZE/k1cMkJZk8vVeN1XehQ755vYoY46GVCzbY7BZQedArydz
-         nmqRumeKWAJTFWin46U4W7BXAE+cglrWLqDDM5882zjc/VijhAJNlASko2zCP8DVJCKy
-         Gc4Q==
-X-Gm-Message-State: ANoB5plNdv/xEfZ/TgtKMcmLY+LlErFoXfxl7dR4zxIHQudvzoegC92p
-        30RbPv9xsyHna9s6zGBcnrOC4mFkJt9wrg==
-X-Google-Smtp-Source: AA0mqf4bpcn0JeTUK80WJflfC88t6H+MQLiBi/KipPxWI4RkiMueJIs3gFfqbQavBg0idc6V+4WL4Q==
-X-Received: by 2002:a1f:5c46:0:b0:3bd:f6b7:411f with SMTP id q67-20020a1f5c46000000b003bdf6b7411fmr3886105vkb.10.1670613136305;
-        Fri, 09 Dec 2022 11:12:16 -0800 (PST)
-Received: from [172.17.0.2] ([4.236.135.20])
-        by smtp.gmail.com with ESMTPSA id s10-20020a05620a254a00b006fa43e139b5sm449420qko.59.2022.12.09.11.12.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 11:12:15 -0800 (PST)
-Message-ID: <6393888f.050a0220.dda99.2cc3@mx.google.com>
-Date:   Fri, 09 Dec 2022 11:12:15 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4076630514340726190=="
+        Fri, 9 Dec 2022 16:30:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E0CA8326C
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 13:30:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B697762346
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 21:30:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2526FC433EF;
+        Fri,  9 Dec 2022 21:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670621417;
+        bh=r17QHWHy1C5SuoUoHT/7k89Ovpx4WM63Hiur3MazTro=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=UzSH2F31Ev7wJRGLeIJw/v8tV42feRi+zVDdDd2OTe8cKLu9KXb+iobeOoYmemhJm
+         qGQbgE5poiupzNwvNStdc2Hr9eTU1rGYbPQh4uqD5eUqXRxAO1VJVq78b/6FnTQyFy
+         aih2Ea5o0vgTeBTltpT2iZBw5YKBi92Ay0pGZMhxtQFobWGu+/eE5vJHTx/GFcLwAF
+         vIYcKXFBFn2V3nzzvCnL6/MNl4qwRoxX/18n50nbWK9ZPAeHWeI3B/FBe4bBkjaQGl
+         C9gIRjpW7u2GhFaIBPcRVfeYN31xhnCECepf5drqwyQ0/0GpyFIE5ORZ7JrAsBGWjp
+         tHSrK56+FY4pQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10AB8C41612;
+        Fri,  9 Dec 2022 21:30:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] client/player: Fix not calculating time to wait
-In-Reply-To: <20221209180312.938166-1-luiz.dentz@gmail.com>
-References: <20221209180312.938166-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/5] shared/att: Fix not requeueing in the same channel
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167062141706.5923.11666293894073785331.git-patchwork-notify@kernel.org>
+Date:   Fri, 09 Dec 2022 21:30:17 +0000
+References: <20221209010314.707606-1-luiz.dentz@gmail.com>
+In-Reply-To: <20221209010314.707606-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4076630514340726190==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Thu,  8 Dec 2022 17:03:10 -0800 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> If request needs to be resend due to change in the security use the
+> chan->queue otherwise it may end up using a different channel.
+> ---
+>  src/shared/att.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=703472
+Here is the summary with links:
+  - [BlueZ,1/5] shared/att: Fix not requeueing in the same channel
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f8670f9aa0a0
+  - [BlueZ,2/5] shared/bap: Log error message if request cannot be sent
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6b5b51392312
+  - [BlueZ,3/5] shared/bap: Read PAC Sink/Source if respective location is found
+    (no matching commit)
+  - [BlueZ,4/5] shared/gatt-db: Allow passing NULL to gatt_db_attribute_write
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=be9fc9222c03
+  - [BlueZ,5/5] shared/bap: Make bt_bap_pac_register to be per session
+    (no matching commit)
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      27.75 seconds
-BluezMake                     PASS      902.16 seconds
-MakeCheck                     PASS      11.54 seconds
-MakeDistcheck                 PASS      152.81 seconds
-CheckValgrind                 PASS      250.55 seconds
-bluezmakeextell               PASS      96.53 seconds
-IncrementalBuild              PASS      733.12 seconds
-ScanBuild                     PASS      1040.94 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---===============4076630514340726190==--
