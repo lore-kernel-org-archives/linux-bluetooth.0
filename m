@@ -2,161 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294D0C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Dec 2022 21:31:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D77A9C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Dec 2022 01:20:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229936AbiLIVb0 (ORCPT
+        id S229915AbiLJBUV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Dec 2022 16:31:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60230 "EHLO
+        Fri, 9 Dec 2022 20:20:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229745AbiLIVbY (ORCPT
+        with ESMTP id S229545AbiLJBUT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Dec 2022 16:31:24 -0500
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274B079CBF
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 13:31:24 -0800 (PST)
-Received: from github.com (hubbernetes-node-afe6486.ac4-iad.github.net [10.52.11.145])
-        by smtp.github.com (Postfix) with ESMTPA id 75B4B600206
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 13:31:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1670621483;
-        bh=MAlKgHclu/fpYJt8M750032kBmGtBQs8xx2adxgzuhM=;
-        h=Date:From:To:Subject:From;
-        b=M7KkD8NxtflpR3C2xLdsoF/1o86TOg5DzGOTJOLp9LaxaH1QZnTsU8UDLpF6ZRKPR
-         XpM4p5/zrph2xypCYFnF9Vw8ATUOOGQ44LfTUMJF4Poldvfc0Lab1xTWgjMNXp7lsx
-         vUCDAvdohXxSr2J1qCwQspaLNxukAb6oKyClTBA4=
-Date:   Fri, 09 Dec 2022 13:31:23 -0800
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/758161-3d6e4b@github.com>
-Subject: [bluez/bluez] f8670f: shared/att: Fix not requeueing in the same
- channel
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Fri, 9 Dec 2022 20:20:19 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0672657B4C
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Dec 2022 17:20:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B475CB8282B
+        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Dec 2022 01:20:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DD22C433F0;
+        Sat, 10 Dec 2022 01:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670635216;
+        bh=wPHLPsDmE0Wr/xm0VP+GLp7mRakgVeK4F8FyfqDLqAc=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=dl2w3sth9FpkwBLiesysetpxQvfed9IvCkyilsWlUa0h8dpqNOKMZL2DJ8xlWru/f
+         f8VjyHgb+ovs2p99t6Q8fvPjy3Knl1twWctoiuNWm/hliTISLvkUNSFD3gYc9VZCAO
+         aBU0FRQJEhv3xdP4BlhqRfj+bzjvcfW5Nf7TNz6mImXBa29/P9AUIMMM3x9Amw1b10
+         T5ZKNLY5ZGqAERb4yBWjLCzmWo5XWnhmYt8KdVLouKonlnJzj4y6iMS064AKsCK6P2
+         HIiZiL4DXaecMwoFvJ5g7EQDhFBLP6/92tGK230y7zD+0PsFqTa3L0198TI5HwdNEd
+         6XATTPjsj6I5Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1B914E1B4D8;
+        Sat, 10 Dec 2022 01:20:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: ISO: Avoid circular locking dependency
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167063521609.12528.12154792095768076354.git-patchwork-notify@kernel.org>
+Date:   Sat, 10 Dec 2022 01:20:16 +0000
+References: <20221207013501.4162096-1-luiz.dentz@gmail.com>
+In-Reply-To: <20221207013501.4162096-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: f8670f9aa0a0c60f0d6f246a0eaaa932747140ed
-      https://github.com/bluez/bluez/commit/f8670f9aa0a0c60f0d6f246a0eaaa932747140ed
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
+Hello:
 
-  Changed paths:
-    M src/shared/att.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  shared/att: Fix not requeueing in the same channel
+On Tue,  6 Dec 2022 17:35:01 -0800 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This attempts to avoid circular locking dependency between sock_lock
+> and hdev_lock:
+> 
+> WARNING: possible circular locking dependency detected
+> 6.0.0-rc7-03728-g18dd8ab0a783 #3 Not tainted
+> 
+> [...]
 
-If request needs to be resend due to change in the security use the
-chan->queue otherwise it may end up using a different channel.
+Here is the summary with links:
+  - Bluetooth: ISO: Avoid circular locking dependency
+    https://git.kernel.org/bluetooth/bluetooth-next/c/9e5cfe86387a
 
-
-  Commit: 6b5b5139231246e2ea2b2de1120eabe7de1b7bb8
-      https://github.com/bluez/bluez/commit/6b5b5139231246e2ea2b2de1120eabe7de1b7bb8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Log error message if request cannot be sent
-
-This makes sure a error message is logged if a request cannot be sent
-for some reason.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 3bdc16d9e59cd3e740ed9f7b422e17ada30cd207
-      https://github.com/bluez/bluez/commit/3bdc16d9e59cd3e740ed9f7b422e17ada30cd207
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Read PAC Sink/Source if respective location is found
-
-If PAC Sink/Source has been found but not record has been recovered it
-means an error must have occurred so this attempt to read the records
-once again.
-
-
-  Commit: be9fc9222c033391329e6145ccf4e81dcfcf1934
-      https://github.com/bluez/bluez/commit/be9fc9222c033391329e6145ccf4e81dcfcf1934
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
-
-  Changed paths:
-    M src/shared/gatt-db.c
-
-  Log Message:
-  -----------
-  shared/gatt-db: Allow passing NULL to gatt_db_attribute_write
-
-This makes gatt_db_attribute_write to accept NULL as a func when
-storing directly on the db itself.
-
-
-  Commit: 253502d311bf1858af2aeb90d5996167f1da9bf3
-      https://github.com/bluez/bluez/commit/253502d311bf1858af2aeb90d5996167f1da9bf3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M src/shared/bap.c
-    M src/shared/bap.h
-
-  Log Message:
-  -----------
-  shared/bap: Make bt_bap_pac_register to be per session
-
-This makes bt_bap_pac_register to be per session rather than global so
-the callback don't have to match the session by itself.
-
-
-  Commit: e07c1e723ee72ca6c14fda5c636a702fcbb82ae8
-      https://github.com/bluez/bluez/commit/e07c1e723ee72ca6c14fda5c636a702fcbb82ae8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Fix not calculating time to wait
-
-The difference of time start and current time may have advanced just
-enough to add a second leaving start nanoseconds to be bigger.
-
-
-  Commit: 3d6e4bf14abfe592bb95471eb989a7899febe779
-      https://github.com/bluez/bluez/commit/3d6e4bf14abfe592bb95471eb989a7899febe779
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-09 (Fri, 09 Dec 2022)
-
-  Changed paths:
-    M tools/isotest.c
-
-  Log Message:
-  -----------
-  isotest: Fix not calculating time to wait
-
-The difference of time start and current time may have advanced just
-enough to add a second leaving start nanoseconds to be bigger.
-
-
-Compare: https://github.com/bluez/bluez/compare/758161c422e6...3d6e4bf14abf
