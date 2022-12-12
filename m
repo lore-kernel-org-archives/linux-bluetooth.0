@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46692C4167B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 10:42:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16843C4167B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 10:43:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232172AbiLLKlw (ORCPT
+        id S232254AbiLLKm7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Dec 2022 05:41:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33538 "EHLO
+        Mon, 12 Dec 2022 05:42:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232114AbiLLKk5 (ORCPT
+        with ESMTP id S232123AbiLLKlI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Dec 2022 05:40:57 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9998411820;
-        Mon, 12 Dec 2022 02:35:15 -0800 (PST)
+        Mon, 12 Dec 2022 05:41:08 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BDAF5BE;
+        Mon, 12 Dec 2022 02:36:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 45F5CB80B6E;
-        Mon, 12 Dec 2022 10:35:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FAEEC433D2;
-        Mon, 12 Dec 2022 10:35:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 53F6D60F40;
+        Mon, 12 Dec 2022 10:36:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65552C433D2;
+        Mon, 12 Dec 2022 10:36:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1670841313;
-        bh=DnfjpCyE+1/eoJXeQxrHdCZw0FdF96blYvDk7+L7bdI=;
+        s=k20201202; t=1670841369;
+        bh=riyEXSCxEjeDrWaRHbbQWSjZro/Z222V/DZB1Lk0WYg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DSPMvgpnsfHFL/JXh9W/gAaTCD6pV1MpERylUYp2E10YXsHuMnZtXpsjnE0HcOSa5
-         0ThAdrr5zKAsFtaTuFT0T6lRHUWQVSGz7ouYUujS1c6+hPZjQsBlqxPzZEYMyJD2vi
-         uRb2C8HInKcUtxdfVQ0PzLIZqNIarvSgF8TdfOjf61dSbdSkFFaHTJ30T6dSbwgfzk
-         FarlQyJHR0PuRgoaQ9D76j9dWX883aMwqSVJ0jtFBUCPoXyhyxaB+zttwpMjAp//cb
-         CDsOTdnqw/pHifvZhncC/CoRUlS30A7ngBDEgHFm12sPvVH47rg6vd+/+LmQFmF9TJ
-         /nGtZcPilbHog==
+        b=rRODENRbmkew05Wutd3qM3QiE5oNqGsI6SEQjAfszdwU2lmSN+VSyG629B+JnsvxL
+         mIOVPuAIect+Oimg2Z0YDs5Ed9yC87eijHkvY5bX9wAL6UFhUfNrrDolgV6eIYsxbI
+         hCtfgJ1JI+KL5pRVh0hA7l02sfmGF3Pr6bPVAJXz/LB8UGNqGN6q+f5qFa9YWdl93G
+         F3kKPV6j824cts/0Deh2uDE3+1PWrhJ8NXhgHdajhWjrOig4cihTrEm9RypQxn4ck4
+         30oPSLIDoKORS25UDaccjoA34Ycf9A7TilIgqX4drYPUPKtMWgRV5zFETJ0mw+GfIG
+         cMWosTzDp+UhA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sungwoo Kim <iam@sung-woo.kim>,
@@ -41,12 +41,12 @@ Cc:     Sungwoo Kim <iam@sung-woo.kim>,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 4/7] Bluetooth: L2CAP: Fix u8 overflow
-Date:   Mon, 12 Dec 2022 05:35:00 -0500
-Message-Id: <20221212103504.299281-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 4/6] Bluetooth: L2CAP: Fix u8 overflow
+Date:   Mon, 12 Dec 2022 05:35:56 -0500
+Message-Id: <20221212103600.299810-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221212103504.299281-1-sashal@kernel.org>
-References: <20221212103504.299281-1-sashal@kernel.org>
+In-Reply-To: <20221212103600.299810-1-sashal@kernel.org>
+References: <20221212103600.299810-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -99,7 +99,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9c24947aa41e..9fdede5fe71c 100644
+index 761efd7da514..e15fcf72a342 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
 @@ -4453,7 +4453,8 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
