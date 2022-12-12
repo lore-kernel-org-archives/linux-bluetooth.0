@@ -2,72 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD1CC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 15:36:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDB6C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 15:56:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229827AbiLLPgr (ORCPT
+        id S232611AbiLLP4O (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Dec 2022 10:36:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44574 "EHLO
+        Mon, 12 Dec 2022 10:56:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbiLLPgp (ORCPT
+        with ESMTP id S232427AbiLLPz7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Dec 2022 10:36:45 -0500
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69F696460
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Dec 2022 07:36:44 -0800 (PST)
-Received: (Authenticated sender: arthur@marmottus.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id 9D6F724000B;
-        Mon, 12 Dec 2022 15:36:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marmottus.net;
-        s=gm1; t=1670859403;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:  in-reply-to:in-reply-to;
-        bh=EG34TET7/h55ECfPUlV2gPgr7iQGT/vWNiKrYRt4UZE=;
-        b=ZhjN8mUcpJN5UhagDd6HOIEQrjwdx6QDiL/D6WmiR5gCzViH8SpNMOgd93K9AbrSqXwoEc
-        FOwgZ84BFwfKvqFB64kPEFT8KrlSfLNgDnyQtFJCN/mMP7vomBgWVJlxfLLqJtwGjMyf3y
-        BLWzQwVpxktMEqNQpjPL5ExvtK4d7zdy1q+MRfIj9iui2h5FUz07V7f2njrUBnSm94bw01
-        +uZAXj+fiGWAT+RE5r8uJXgNQeSfcAT+5cMGXtPh3hPkNUFn8y7xRkXhjJmu1rP8cCG289
-        adLqVBtIN2g500jOo7XTQuZ+XZrZNQdq3ZdlN9Y3CCridLTfVLYma5kwODVvwQ==
-From:   "Arthur Crepin-Leblond" <arthur@marmottus.net>
-In-Reply-To: <988dc1f9add28a70ba18ce2f3042aac0bea04b5b.camel@hadess.net>
-Content-Type: text/plain; charset="utf-8"
-X-Forward: 127.0.0.1
-Date:   Mon, 12 Dec 2022 16:36:42 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-To:     "Bastien Nocera" <hadess@hadess.net>
-MIME-Version: 1.0
-Message-ID: <7dc4-63974a80-14d-24592140@246924754>
-Subject: =?utf-8?q?Re=3A?= [PATCH BlueZ 0/1] Expose the disconnect reason over D-Bus
-User-Agent: SOGoMail 5.5.0
+        Mon, 12 Dec 2022 10:55:59 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E8513CC6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Dec 2022 07:55:56 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 21373B80DAD
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Dec 2022 15:55:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DB24CC433F2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Dec 2022 15:55:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670860553;
+        bh=M/hAH46RO7qij6no0upm+ejuPJMwjS+GSw0DdDQSkVo=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=TaixT6rq+A/HcXQm/yf5RAnliHsrzE2gazLE2UqYHi2MsM2mYDy9zLoIxz5AUkVeg
+         eZ48B0sO27AXZbybQ/oXzNf/+BYbwXCq27RoKUeF4ExgF7j9KqBFvMFhca8NLDPCm1
+         fx4fkGDDMXIzsA/UuaM/F8BwtylKp5rN4ViN17QjleO31l2LeBmisP4FkFaKZpWU+n
+         WrCZ4c6skEuSgxNaeNxMSZbizAbFZo8Uu04gqd6eKgtog4v3LiGkzKKWkslgS3GKyB
+         t+VujbYej0aZYWxOuoLQR4BS0vRCPF+jLAjM3riiO/I2hiY1+845DgeZtvBRw/+AKc
+         Kq0V4100WeBYg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id CC130C43141; Mon, 12 Dec 2022 15:55:53 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Mon, 12 Dec 2022 15:55:50 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: swyterzone@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-UA72DLtEGp@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Monday, December 12, 2022 15:49 CET, Bastien Nocera <hadess@hadess.n=
-et> wrote: 
- 
-> On Mon, 2022-12-12 at 14:32 +0100, Arthur Crepin-Leblond wrote:
-> > Hello,
-> > 
-> > I am trying to expose the device disconnect reason over D-Bus and t=
-he
-> > most elegant way I found was to subscribe to the adapter notify
-> > callback that gives the reason as an argument.
-> 
-> Any reason why this can't be a signal with the reason as an argument?=
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
+--- Comment #262 from Swyter (swyterzone@gmail.com) ---
+Quick heads up, the patch thingie that adds further dmesg logging for
+diagnostics has seemingly ended up in 5.10 and 5.15, and 6.0 (which is the
+version that originally broke it) now additionally adds that and the removed
+quirk. Cool beans.
 
-I chose the easy path by copying the existing code for the device prope=
-rties
-that get updated like the "Connected" or "ServicesResolved". 
-I am not too familiar with BlueZ signals other than PropertiesChanged, =
+--=20
+You may reply to this email to add a comment.
 
-InterfacesRemoved/Added. What would you have in mind?
-
-And apologies in advance, it's my first time submitting here, I do not =
-have
-an advanced knowledge of the BlueZ internals.
-
+You are receiving this mail because:
+You are the assignee for the bug.=
