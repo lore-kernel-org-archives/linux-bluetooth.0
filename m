@@ -2,117 +2,237 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15155C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 21:56:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9AEDC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 22:23:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232938AbiLLV4w (ORCPT
+        id S233730AbiLLWX1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Dec 2022 16:56:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48404 "EHLO
+        Mon, 12 Dec 2022 17:23:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbiLLV4v (ORCPT
+        with ESMTP id S233473AbiLLWX0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Dec 2022 16:56:51 -0500
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03361DF3;
-        Mon, 12 Dec 2022 13:56:50 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id f20so1411890lja.4;
-        Mon, 12 Dec 2022 13:56:49 -0800 (PST)
+        Mon, 12 Dec 2022 17:23:26 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4547FB7C1;
+        Mon, 12 Dec 2022 14:23:25 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id js9so1349982pjb.2;
+        Mon, 12 Dec 2022 14:23:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ONvWVsTXgcQGQxqYReYDCDgwMkH4rdX0rn2zZJpZl1o=;
-        b=cCqZ6Id7gIwRoo6xdAl4DcHZMS4nxDoO2ogIdXTS2+JyiPd3lc+MWHvB9iMgBjcZWs
-         +SndWPx6BUJg6IoKySiuj0up3S+uHAwpqzFc55zq1kgf5SFECypMUCWGFBcyhtHAeOYC
-         ap/MAXiwZM195oxqwNL2Zt1tH8GBpH0tyirbwzY3QMgywmgWZ1T2Q5URozedoKmfuQki
-         nJAh3yYFO4WMJjm+hlro7XbJsogUTNw05fiaP6BNmlmxd9La0X3bZPXir8A8e8SHSbgX
-         0XXDiSwLqkcbSqqbynwF+7/R+fRKoe9BbKTchCNLz18gtL75eKRlukeF4Yeu3GO//o9L
-         2j7A==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8XdeAWxI9ZFQ2kkTJY7b4Lpxs5vKZ4OtFA8H35eWfcg=;
+        b=dpF3bjjvVdLu2YyxcYts6VoYYKlG4193SSnqOrVKDJS/jExlEpyNQoXXI94d7pF4fX
+         3xNayRm2fqnpdWsi7nLI6DT9VgNVrcMza2Bw7kg0f7SzEW4aICbqoL0P8Bv20BVncINo
+         3cB5TWSIa0PVJOR4pZPpqsr5/S8azRbt7kkkR+yI8Un/+lpy9aOrkr0q4H6SGdH5GSVo
+         lLm0wAloj7AKK7GKsRY++gVqP0YOpo5keOPthk4troiUgjHB5UsgVF/uldxjhWXElcOM
+         8nsWw+lz/9ZZWxQy/u8o4Iof/2ylfeCFY8jZTigSigW3JknSJsgXDrYEEO72WyB2/7eX
+         YvkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ONvWVsTXgcQGQxqYReYDCDgwMkH4rdX0rn2zZJpZl1o=;
-        b=2QrmHwlq9IO93/ufevCDClH3f6s9311fb+gw+PG6ozazcoor5QkEONDHgyH2Agijxl
-         k8M/4fV/L+DuXH3M74J3V9UgdqhHOGS9Kvaf6FGcEVFq2aoZrRToiwAlueXszYJnDcku
-         rfKQ2fKTeWffZQU4JHlkLF3/QviycS9+/RclUHFrnP+65yud0g16TnL809HR9Q8smdTe
-         srn+v2jVIv6NxsPEd1Dcr8yiRKoPkWVqtezSvTwQ1ejiHxq4MOwqGzDBxz7J3gwnKc1V
-         XcDjkl11hRe2sbufKTyIC16O3Afpc+UXt2x6YvsOQ++pU7bLa6cw5UJmpOpeX8xiWY/f
-         ABuQ==
-X-Gm-Message-State: ANoB5plrAO5xkcKB+GjFIaI5adYbW61l0Zyu5NIp2xdnl8Do2EZb2427
-        /axP65oK215Fs/Hus0XDBqg2XhFWCOPZmZLH1z0=
-X-Google-Smtp-Source: AA0mqf5wMuw0NZFJ8wD4hdKEL46gYVw1QCQ0mk9/jt1JQMplAcQpPMzNdRDacTg3nAQPIDXgIAR5zHZVrHkIaMPDQQE=
-X-Received: by 2002:a05:651c:c8b:b0:277:f8b:bb4f with SMTP id
- bz11-20020a05651c0c8b00b002770f8bbb4fmr27176266ljb.161.1670882207986; Mon, 12
- Dec 2022 13:56:47 -0800 (PST)
-MIME-Version: 1.0
-References: <20221210013456.1085082-1-luiz.dentz@gmail.com> <20221212123624.6c797838@kernel.org>
-In-Reply-To: <20221212123624.6c797838@kernel.org>
+        bh=8XdeAWxI9ZFQ2kkTJY7b4Lpxs5vKZ4OtFA8H35eWfcg=;
+        b=OgewGoS5LVoy3K7RlaAiNDe7nsOeO/KIMCebRkg3UwFGGZksm3GFC4c4hngSG2dx5a
+         8oDZ2peG9VZZukAJtrOOoPBrfs0T9uUC6IiAhUvBxAs/4yYJkvzKHVIi7r5bJ5EqK2Z/
+         +FskIsh2grUDJzBK6RmuOVo5FzDptV3p/xMHl/TX+YpwZLfjlX0+lLTxU0jKSBSx31YC
+         Cao0OfXi+IUivB4AXE2JrgFewIRnOScdu2h4m/K8Bnt6CUaI+9qD3jfx1sse2dDvUjx/
+         7riDvMBTQ2HzLF24mOV80EpMK8VF5bOXFblOwgXejEyvXrlrOdLdMFUoyAv9YM0bdVao
+         c9eQ==
+X-Gm-Message-State: ANoB5pnGmjOVlJuAp6CJK4gkakmDtQqjGV8mJ6d+RG4pj9NqqrMkJNec
+        pMK6hXNPu+4cwBQRl3t7ThNwbzJPt88HIQ==
+X-Google-Smtp-Source: AA0mqf4Adp9WP5xDAhdlA9qxHig5VwqTQGTuC23qGriOVFsOnNPpV0r2FOlunW6Fs++qIWp389Al4A==
+X-Received: by 2002:a17:903:3317:b0:189:e14a:318e with SMTP id jk23-20020a170903331700b00189e14a318emr18346034plb.27.1670883804705;
+        Mon, 12 Dec 2022 14:23:24 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id d1-20020a170903230100b00186f0f59c85sm6876350plh.235.2022.12.12.14.23.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 14:23:23 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 12 Dec 2022 13:56:36 -0800
-Message-ID: <CABBYNZKnCoP1LBUeprS6MVxQBHZQafAT9hBNZQTBQjY+HHDjkg@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2022-12-09
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2022-12-12
+Date:   Mon, 12 Dec 2022 14:23:22 -0800
+Message-Id: <20221212222322.1690780-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+The following changes since commit 15eb1621762134bd3a0f81020359b0c7745d1080:
 
-On Mon, Dec 12, 2022 at 12:36 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Fri,  9 Dec 2022 17:34:56 -0800 Luiz Augusto von Dentz wrote:
-> > bluetooth-next pull request for net-next:
-> >
-> >  - Add a new VID/PID 0489/e0f2 for MT7922
-> >  - Add Realtek RTL8852BE support ID 0x0cb8:0xc559
-> >  - Add a new PID/VID 13d3/3549 for RTL8822CU
-> >  - Add support for broadcom BCM43430A0 & BCM43430A1
-> >  - Add CONFIG_BT_HCIBTUSB_POLL_SYNC
-> >  - Add CONFIG_BT_LE_L2CAP_ECRED
-> >  - Add support for CYW4373A0
-> >  - Add support for RTL8723DS
-> >  - Add more device IDs for WCN6855
-> >  - Add Broadcom BCM4377 family PCIe Bluetooth
->
-> Hm, it's pulling in the commits we merged into net and which
-> are already present in net-next but with a different hash/id.
->
-> With a small overlap which git can't figure out:
->
-> diff --cc drivers/bluetooth/btusb.c
-> index f05018988a17,2ad4efdd9e40..24a8ed3f0458
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@@ -2052,17 -2206,17 +2206,22 @@@ static int btusb_setup_csr(struct hci_d
->                 bt_dev_err(hdev, "CSR: Local version length mismatch");
->                 kfree_skb(skb);
->                 return -EIO;
->         }
->
-> -       rp = (struct hci_rp_read_local_version *)skb->data;
-> +       bt_dev_info(hdev, "CSR: Setting up dongle with HCI ver=%u rev=%04x",
-> +                   rp->hci_ver, le16_to_cpu(rp->hci_rev));
-> +
-> +       bt_dev_info(hdev, "LMP ver=%u subver=%04x; manufacturer=%u",
-> +                   rp->lmp_ver, le16_to_cpu(rp->lmp_subver),
-> +                   le16_to_cpu(rp->manufacturer));
->
->  +      bt_dev_info(hdev, "CSR: Setting up dongle with HCI ver=%u rev=%04x; LMP ver=%u subver=%04x; manufacturer=%u",
->  +              le16_to_cpu(rp->hci_ver), le16_to_cpu(rp->hci_rev),
->  +              le16_to_cpu(rp->lmp_ver), le16_to_cpu(rp->lmp_subver),
->  +              le16_to_cpu(rp->manufacturer));
->  +
->
-> Could you rebase on top of net-next and resend so that the commits
-> which are already applied disappear?
+  dt-bindings: net: Convert Socionext NetSec Ethernet to DT schema (2022-12-12 13:03:45 -0800)
 
-Sure, I will resend it shortly.
+are available in the Git repository at:
 
--- 
-Luiz Augusto von Dentz
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-12-12
+
+for you to fetch changes up to 7aca0ac4792e6cb0f35ef97bfcb39b1663a92fb7:
+
+  Bluetooth: Wait for HCI_OP_WRITE_AUTH_PAYLOAD_TO to complete (2022-12-12 14:19:26 -0800)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add a new VID/PID 0489/e0f2 for MT7922
+ - Add Realtek RTL8852BE support ID 0x0cb8:0xc559
+ - Add a new PID/VID 13d3/3549 for RTL8822CU
+ - Add support for broadcom BCM43430A0 & BCM43430A1
+ - Add CONFIG_BT_HCIBTUSB_POLL_SYNC
+ - Add CONFIG_BT_LE_L2CAP_ECRED
+ - Add support for CYW4373A0
+ - Add support for RTL8723DS
+ - Add more device IDs for WCN6855
+ - Add Broadcom BCM4377 family PCIe Bluetooth
+
+----------------------------------------------------------------
+Andy Chi (1):
+      Bluetooth: btusb: Add a new VID/PID 0489/e0f2 for MT7922
+
+Archie Pusaka (2):
+      Bluetooth: btusb: Introduce generic USB reset
+      Bluetooth: hci_sync: cancel cmd_timer if hci_open failed
+
+Artem Lukyanov (1):
+      Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x0cb8:0xc559
+
+Chethan Tumkur Narayan (1):
+      btusb: Avoid reset of ISOC endpoint alt settings to zero
+
+Christophe JAILLET (1):
+      Bluetooth: Fix EALREADY and ELOOP cases in bt_status()
+
+Gongwei Li (1):
+      Bluetooth: btusb: Add a new PID/VID 13d3/3549 for RTL8822CU
+
+Hilda Wu (2):
+      Bluetooth: btrtl: Add btrealtek data struct
+      Bluetooth: btusb: Ignore zero length of USB packets on ALT 6 for specific chip
+
+Igor Skalkin (1):
+      virtio_bt: Fix alignment in configuration struct
+
+Inga Stotland (1):
+      Bluetooth: MGMT: Fix error report for ADD_EXT_ADV_PARAMS
+
+Jiapeng Chong (1):
+      Bluetooth: Use kzalloc instead of kmalloc/memset
+
+Kang Minchul (1):
+      Bluetooth: Use kzalloc instead of kmalloc/memset
+
+Luca Weiss (1):
+      dt-bindings: bluetooth: broadcom: add BCM43430A0 & BCM43430A1
+
+Luiz Augusto von Dentz (11):
+      Bluetooth: hci_sync: Fix not setting static address
+      Bluetooth: hci_sync: Fix not able to set force_static_address
+      Bluetooth: btusb: Add CONFIG_BT_HCIBTUSB_POLL_SYNC
+      Bluetooth: btusb: Default CONFIG_BT_HCIBTUSB_POLL_SYNC=y
+      Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
+      Bluetooth: btusb: Fix new sparce warnings
+      Bluetooth: btusb: Fix existing sparce warning
+      Bluetooth: btintel: Fix existing sparce warnings
+      Bluetooth: hci_conn: Fix crash on hci_create_cis_sync
+      Bluetooth: ISO: Avoid circular locking dependency
+      Bluetooth: Wait for HCI_OP_WRITE_AUTH_PAYLOAD_TO to complete
+
+Marek Vasut (2):
+      dt-bindings: net: broadcom-bluetooth: Add CYW4373A0 DT binding
+      Bluetooth: hci_bcm: Add CYW4373A0 support
+
+Michael S. Tsirkin (1):
+      Bluetooth: virtio_bt: fix device removal
+
+Nicolas Cavallari (1):
+      Bluetooth: Work around SCO over USB HCI design defect
+
+Pauli Virtanen (1):
+      Bluetooth: hci_conn: use HCI dst_type values also for BIS
+
+Raman Varabets (1):
+      Bluetooth: btusb: Add Realtek 8761BUV support ID 0x2B89:0x8761
+
+Samuel Holland (1):
+      dt-bindings: net: realtek-bluetooth: Add RTL8723DS
+
+Shengyu Qu (1):
+      Bluetooth: btusb: Add more device IDs for WCN6855
+
+Sven Peter (7):
+      dt-bindings: net: Add generic Bluetooth controller
+      dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+      arm64: dts: apple: t8103: Add Bluetooth controller
+      Bluetooth: hci_event: Ignore reserved bits in LE Extended Adv Report
+      Bluetooth: Add quirk to disable extended scanning
+      Bluetooth: Add quirk to disable MWS Transport Configuration
+      Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCIe boards
+
+Wang ShaoBo (1):
+      Bluetooth: btintel: Fix missing free skb in btintel_setup_combined()
+
+Yang Yingliang (9):
+      Bluetooth: hci_core: fix error handling in hci_register_dev()
+      Bluetooth: hci_bcm4377: Fix missing pci_disable_device() on error in bcm4377_probe()
+      Bluetooth: btusb: don't call kfree_skb() under spin_lock_irqsave()
+      Bluetooth: hci_qca: don't call kfree_skb() under spin_lock_irqsave()
+      Bluetooth: hci_ll: don't call kfree_skb() under spin_lock_irqsave()
+      Bluetooth: hci_h5: don't call kfree_skb() under spin_lock_irqsave()
+      Bluetooth: hci_bcsp: don't call kfree_skb() under spin_lock_irqsave()
+      Bluetooth: hci_core: don't call kfree_skb() under spin_lock_irqsave()
+      Bluetooth: RFCOMM: don't call kfree_skb() under spin_lock_irqsave()
+
+Zhengping Jiang (1):
+      Bluetooth: hci_qca: only assign wakeup with serial port support
+
+ .../devicetree/bindings/net/bluetooth.txt          |    5 -
+ .../net/bluetooth/bluetooth-controller.yaml        |   29 +
+ .../net/bluetooth/brcm,bcm4377-bluetooth.yaml      |   81 +
+ .../net/{ => bluetooth}/qualcomm-bluetooth.yaml    |    6 +-
+ .../bindings/net/broadcom-bluetooth.yaml           |    3 +
+ .../devicetree/bindings/net/realtek-bluetooth.yaml |    1 +
+ .../devicetree/bindings/soc/qcom/qcom,wcnss.yaml   |    8 +-
+ MAINTAINERS                                        |    2 +
+ arch/arm64/boot/dts/apple/t8103-j274.dts           |    4 +
+ arch/arm64/boot/dts/apple/t8103-j293.dts           |    4 +
+ arch/arm64/boot/dts/apple/t8103-j313.dts           |    4 +
+ arch/arm64/boot/dts/apple/t8103-j456.dts           |    4 +
+ arch/arm64/boot/dts/apple/t8103-j457.dts           |    4 +
+ arch/arm64/boot/dts/apple/t8103-jxxx.dtsi          |    8 +
+ drivers/bluetooth/Kconfig                          |   23 +
+ drivers/bluetooth/Makefile                         |    1 +
+ drivers/bluetooth/btintel.c                        |   21 +-
+ drivers/bluetooth/btrtl.c                          |    7 +
+ drivers/bluetooth/btrtl.h                          |   21 +
+ drivers/bluetooth/btusb.c                          |  236 +-
+ drivers/bluetooth/hci_bcm.c                        |   13 +-
+ drivers/bluetooth/hci_bcm4377.c                    | 2514 ++++++++++++++++++++
+ drivers/bluetooth/hci_bcsp.c                       |    2 +-
+ drivers/bluetooth/hci_h5.c                         |    2 +-
+ drivers/bluetooth/hci_ll.c                         |    2 +-
+ drivers/bluetooth/hci_qca.c                        |    5 +-
+ drivers/bluetooth/virtio_bt.c                      |   35 +-
+ include/net/bluetooth/hci.h                        |   21 +
+ include/net/bluetooth/hci_core.h                   |    8 +-
+ include/uapi/linux/virtio_bt.h                     |    8 +
+ net/bluetooth/Kconfig                              |   11 +
+ net/bluetooth/hci_conn.c                           |   17 +-
+ net/bluetooth/hci_core.c                           |    4 +-
+ net/bluetooth/hci_debugfs.c                        |    2 +-
+ net/bluetooth/hci_event.c                          |   24 +-
+ net/bluetooth/hci_sync.c                           |   21 +-
+ net/bluetooth/iso.c                                |   67 +-
+ net/bluetooth/l2cap_core.c                         |    2 +-
+ net/bluetooth/lib.c                                |    4 +-
+ net/bluetooth/mgmt.c                               |    2 +-
+ net/bluetooth/rfcomm/core.c                        |    2 +-
+ 41 files changed, 3117 insertions(+), 121 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/bluetooth-controller.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml
+ rename Documentation/devicetree/bindings/net/{ => bluetooth}/qualcomm-bluetooth.yaml (96%)
+ create mode 100644 drivers/bluetooth/hci_bcm4377.c
