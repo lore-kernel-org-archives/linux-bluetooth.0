@@ -2,121 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E813C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 13:09:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0664EC00145
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Dec 2022 13:32:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232496AbiLLNJM (ORCPT
+        id S232123AbiLLNcr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Dec 2022 08:09:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38032 "EHLO
+        Mon, 12 Dec 2022 08:32:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232174AbiLLNJC (ORCPT
+        with ESMTP id S231629AbiLLNco (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Dec 2022 08:09:02 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FC21276B;
-        Mon, 12 Dec 2022 05:09:00 -0800 (PST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BC98JdN023527;
-        Mon, 12 Dec 2022 13:08:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2022-7-12; bh=dxskmic1Yr1+fUcs56ZWXNvxVz9bJt1msmiC1km1d2I=;
- b=Y9n3VwiQoek16COca9Z+xE4V8FWJX8daNOYz4pjVgqQQ9qcBJ2xsMeJYoUCSZCTZjKHU
- tYoNKUmjwvBCQyiW7opAqPCp8gKhnYttjrXcVvwLRt8LZEM0ehjNnJfBdzJeeUtI0vzn
- hw+0B7FOGATOi1YmVHf/4PVVrf1EGvMmDoFSmdMfx/AwzDxXQUfs35zkseoUrw6XPo+c
- omtjBfW8V6Pf9zeIMwcb2kVNy6qSOCu0E1PRQm7ru47JAm5ErxFqg5XL9QM//hGOxgmB
- DgtVZrNs76gTyIUwZPhT7E6lNnMAmiOkR9BoCNmO/hjnjIJ+GrdBBJiWtsoI1dTon6t/ Lg== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mcj092n3v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Dec 2022 13:08:40 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BCBvkII034709;
-        Mon, 12 Dec 2022 13:08:40 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3mcgj40sj5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Dec 2022 13:08:40 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BCD8dRO038889;
-        Mon, 12 Dec 2022 13:08:39 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3mcgj40shq-1;
-        Mon, 12 Dec 2022 13:08:39 +0000
-From:   Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc:     harshit.m.mogalapalli@oracle.com, harshit.m.mogalapalli@gmail.com,
-        error27@gmail.com, darren.kenny@oracle.com,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Brian Gix <brian.gix@intel.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix a buffer overflow in mgmt_mesh_add()
-Date:   Mon, 12 Dec 2022 05:08:28 -0800
-Message-Id: <20221212130828.988528-1-harshit.m.mogalapalli@oracle.com>
-X-Mailer: git-send-email 2.31.1
+        Mon, 12 Dec 2022 08:32:44 -0500
+Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [217.70.178.231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2E3DF70
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Dec 2022 05:32:40 -0800 (PST)
+Received: (Authenticated sender: arthur@marmottus.net)
+        by mail.gandi.net (Postfix) with ESMTPSA id 80A36100008;
+        Mon, 12 Dec 2022 13:32:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marmottus.net;
+        s=gm1; t=1670851959;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2RY7cTrhQEgwdw5WQfvViwhomUucV8XI0mr8amJIJlo=;
+        b=hFJ/EMzXAkvMgpyoP/AWq/cYRXfHBdmCW7QY/HfZ2NMPI2RgIV3l2ui1F2fF2wC6kvGDNr
+        9/rbT4kQ1gKfYsMp/KqfTtCMYSI0qVx+U/JLlmyKIkhCSobdxt8sgROq5fid0AOuvUVD3E
+        r395DLwcujhhyOSQ9RRJP+A9EYEr0c0WyO1lkvMWgU5/aod48nNLGTT3qfMqFBrbr7B1A5
+        I2DBLkLKUvmvM1iadFqMaHFj2ABkknUSQ8OUyqZCfxI0r3ooMPindfAhxV5WJMSf1ULJy1
+        K0kIQDplIfnp2cioop83Q9p1QAnjwoFoOU/Zu/EeN7Ed64dSDoQPX6iH4WEktQ==
+From:   Arthur Crepin-Leblond <arthur@marmottus.net>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Arthur Crepin-Leblond <arthur@marmottus.net>
+Subject: [PATCH BlueZ 0/1] Expose the disconnect reason over D-Bus
+Date:   Mon, 12 Dec 2022 14:32:34 +0100
+Message-Id: <20221212133235.79657-1-arthur@marmottus.net>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-12_02,2022-12-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212120122
-X-Proofpoint-ORIG-GUID: e01joMMkITDIIWfYrGbDlKhSpFsgVQH1
-X-Proofpoint-GUID: e01joMMkITDIIWfYrGbDlKhSpFsgVQH1
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Smatch Warning:
-net/bluetooth/mgmt_util.c:375 mgmt_mesh_add() error: __memcpy()
-'mesh_tx->param' too small (48 vs 50)
+Hello,
 
-Analysis:
+I am trying to expose the device disconnect reason over D-Bus and the
+most elegant way I found was to subscribe to the adapter notify
+callback that gives the reason as an argument.
 
-'mesh_tx->param' is array of size 48. This is the destination.
-u8 param[sizeof(struct mgmt_cp_mesh_send) + 29]; // 19 + 29 = 48.
+Arthur Crepin-Leblond (1):
+  device: Expose the disconnect reason over D-Bus
 
-But in the caller 'mesh_send' we reject only when len > 50.
-len > (MGMT_MESH_SEND_SIZE + 31) // 19 + 31 = 50.
+ src/device.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
----
-This is based on static analysis, I am unsure if we should put
-an upper bound to len(48) instead.
-
-This limit on length changed between v4 and v5 patches of Commit:
-("Bluetooth: Implement support for Mesh") in function mesh_send()
-
-v4: https://lore.kernel.org/all/20220511155412.740249-2-brian.gix@intel.com/
-v5: https://lore.kernel.org/all/20220720194511.320773-2-brian.gix@intel.com/
----
- net/bluetooth/mgmt_util.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
-index 6a8b7e84293d..bdf978605d5a 100644
---- a/net/bluetooth/mgmt_util.h
-+++ b/net/bluetooth/mgmt_util.h
-@@ -27,7 +27,7 @@ struct mgmt_mesh_tx {
- 	struct sock *sk;
- 	u8 handle;
- 	u8 instance;
--	u8 param[sizeof(struct mgmt_cp_mesh_send) + 29];
-+	u8 param[sizeof(struct mgmt_cp_mesh_send) + 31];
- };
- 
- struct mgmt_pending_cmd {
 -- 
 2.38.1
 
