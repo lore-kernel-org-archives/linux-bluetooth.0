@@ -2,84 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8940C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Dec 2022 21:20:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7587EC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Dec 2022 23:08:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230188AbiLOVUv (ORCPT
+        id S229554AbiLOXIm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Dec 2022 16:20:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
+        Thu, 15 Dec 2022 18:08:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbiLOVUU (ORCPT
+        with ESMTP id S229544AbiLOXIl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Dec 2022 16:20:20 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14D65C763;
-        Thu, 15 Dec 2022 13:20:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4F25261DF3;
-        Thu, 15 Dec 2022 21:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AE96CC433F1;
-        Thu, 15 Dec 2022 21:20:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671139217;
-        bh=hTA0Xhc2b0v2QvH2F1ogKmba78dHaUC/h9xat3cSAAQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=UE+aYwats5BEQkJzTkRCOZA5NPpjWXUrzwo8/YDPeqKZxb60XIOmfNo26IqXb52Oq
-         va/CdrbELK+HZG7e7pOJcp/7LV4ynNPjdDdcG4giJJvkq1Wj/8p3/bj+NyubqisgAZ
-         amhuToqqGHg9l74MkmXDGiX4H1XzPTAVzh6boJLd3LIFZCj5FbaFV/EI0LHYSMalyV
-         rWEpB23R2ltE5HvzwYYCRlF50Aan/QyXYoUYKdgw5ZB3EBdWVvb9NT2f+Ku2v3lD2T
-         aYrRpLj61SBKHW7O5s53FbnV93LszAHTvzX035JW9sXDtjX4hmS/6JvJ3I1aq83Thf
-         RebU6UrOMiqDQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8F7A3E4D028;
-        Thu, 15 Dec 2022 21:20:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Thu, 15 Dec 2022 18:08:41 -0500
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 481F914D05
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Dec 2022 15:08:38 -0800 (PST)
+Received: by mail-oo1-xc33.google.com with SMTP id t15-20020a4a96cf000000b0049f7e18db0dso141670ooi.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Dec 2022 15:08:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=q5jxlZFQZ32Yq30E8sqKkOeU1cMEt1wwjvJyDM4mA+k=;
+        b=qp0S/65b08Pf11DpucCJwLoryVWeFDbaYq/EjJ8uJSGCqeqgVQoSf+fnkT6oXpmO/a
+         Ge+T9ShYyrvg/XGWggSi3xXtnP2tdEwGnzcjmkRqUHN+nlW5PP8lGd9AS5VHkB219nEK
+         1jIpoMC1408oR5AHSA+x3I3HIhT4UaafKsuP3C97ESPKzAEHdVVjWZcbQ+2rF4aJvdGW
+         uAxV9Nc369+ONHdi+iI8Rv5XYW0TkXBpjxDi4MtBZx5ZWSCXlVALSZ+7zEvMQOG1zVHy
+         pzdtLH7pP0u5xK/NK1gAdOsxxbRjuk+hq+JtLavSlYvA7omGZQ1CIaJZzB8cpeTzVYLS
+         53cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q5jxlZFQZ32Yq30E8sqKkOeU1cMEt1wwjvJyDM4mA+k=;
+        b=nurBG/lkUqJ1opYBgJ8R7Ba6622v96qHza/+B3xBr1htv3Ontsh0Q+SSYW445AB9Ff
+         hKd+fw55y5pqzU/cXtzC/k57oxtHw0tPeL2zzcmNwoEEcwi6jY8BvA1vk628p0YqoJ4t
+         SlXbdYt9gQBriuuEDpekSxmR995a9w2xhCHlcFZBJWQAyo7f1UMJ4cVfSeY/IQeilIQ1
+         oaExLFoCwmitBZjiVKdGywZ1taF2ceeMgThaxmpD3WizrQpgu15uXT8MLWsQlNOBeyPE
+         /CO85LA2Xz7ljKvFvOQUG6cJrDf25ugzhFQrhBmBe5VPJH/rBjROmEeTZev6gyP3YnAZ
+         5Odg==
+X-Gm-Message-State: ANoB5pnR/oWJyZG/JukoJYuMxmBCnfPYPcbl7xl73p4cNWiscAlipfJz
+        mRuJMecho0bAFbddGDnEjYv2VaCgj5jQrQ==
+X-Google-Smtp-Source: AA0mqf6YiyXOnhEGMXY8uV2kI+mEU6NGLM0FJ5lC5oc4XfPaKw5ugvR86yQEyJLvRGJw7BwvUG2X3A==
+X-Received: by 2002:a4a:d12e:0:b0:4a4:9a57:8eb2 with SMTP id n14-20020a4ad12e000000b004a49a578eb2mr5668526oor.1.1671145717404;
+        Thu, 15 Dec 2022 15:08:37 -0800 (PST)
+Received: from [172.17.0.2] ([104.210.132.178])
+        by smtp.gmail.com with ESMTPSA id r198-20020a4a37cf000000b004a532a32408sm280972oor.16.2022.12.15.15.08.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 15:08:37 -0800 (PST)
+Message-ID: <639ba8f5.4a0a0220.673f6.1c43@mx.google.com>
+Date:   Thu, 15 Dec 2022 15:08:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5970971472181031503=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: Fix a buffer overflow in mgmt_mesh_add()
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167113921758.15811.17067027797406608637.git-patchwork-notify@kernel.org>
-Date:   Thu, 15 Dec 2022 21:20:17 +0000
-References: <20221212130828.988528-1-harshit.m.mogalapalli@oracle.com>
-In-Reply-To: <20221212130828.988528-1-harshit.m.mogalapalli@oracle.com>
-To:     Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc:     harshit.m.mogalapalli@gmail.com, error27@gmail.com,
-        darren.kenny@oracle.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        brian.gix@intel.com, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/5] client/player: Make transport.send non-blocking
+In-Reply-To: <20221215211037.2686489-1-luiz.dentz@gmail.com>
+References: <20221215211037.2686489-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============5970971472181031503==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Mon, 12 Dec 2022 05:08:28 -0800 you wrote:
-> Smatch Warning:
-> net/bluetooth/mgmt_util.c:375 mgmt_mesh_add() error: __memcpy()
-> 'mesh_tx->param' too small (48 vs 50)
-> 
-> Analysis:
-> 
-> 'mesh_tx->param' is array of size 48. This is the destination.
-> u8 param[sizeof(struct mgmt_cp_mesh_send) + 29]; // 19 + 29 = 48.
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - Bluetooth: Fix a buffer overflow in mgmt_mesh_add()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/becee9f3220c
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=704921
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      2.79 seconds
+GitLint                       PASS      1.42 seconds
+BuildEll                      PASS      27.44 seconds
+BluezMake                     PASS      779.86 seconds
+MakeCheck                     PASS      11.19 seconds
+MakeDistcheck                 PASS      149.27 seconds
+CheckValgrind                 PASS      241.68 seconds
+bluezmakeextell               PASS      95.57 seconds
+IncrementalBuild              PASS      3135.98 seconds
+ScanBuild                     WARNING   978.11 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v2,2/5] shared/shell: Add bt_shell_echo
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __printf(1, 2) over __attribute__((format(printf, 1, 2)))
+#131: FILE: src/shared/shell.h:74:
++				...) __attribute__((format(printf, 1, 2)));
+
+/github/workspace/src/src/13074521.patch total: 0 errors, 1 warnings, 34 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13074521.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/shell.c:1180:13: warning: Access to field 'options' results in a dereference of a null pointer (loaded from variable 'opt')
+                        if (c != opt->options[index - offset].val) {
+                                 ^~~~~~~~~~~~
+1 warning generated.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5970971472181031503==--
