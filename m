@@ -2,181 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8CFEC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 06:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1131C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 06:36:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbiLPGIH (ORCPT
+        id S229695AbiLPGgh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 01:08:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43876 "EHLO
+        Fri, 16 Dec 2022 01:36:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiLPGIG (ORCPT
+        with ESMTP id S229736AbiLPGge (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 01:08:06 -0500
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2072.outbound.protection.outlook.com [40.107.20.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FBA2EF5B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Dec 2022 22:08:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fijfLkViynpvhqAI6HixmT/HsIK0aD5aLIZe4peNrf7+05X24kfA6Kv/dlpTewQEVlSFEzs2CEICQ62hOH+l5tHKwXauIGG84nBs602vN6wbiDtHMPtunT5q1zxBTHpVk5TnzM2E7ztsn14yDRHqxXz2iRj5D5ZYDUiXyxQ06SHyg9N1KMpsHmLbEBKFebOS97ePRX/dqE+QFdAmC9VPVenLBm7QKRHJG0Z/BqhdQiVkOT80kXleihPtJaHD0QnqfxjDDPCkny+6t1iu076IqA1UOTkqlgqkua/Tlq0/7nnNB/uB89JNytAIf4Fruoh53tPDdfIvdLQLYAEhTmeCoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8717RcjJlh9SViVxRz+POmFPaBxe0Trtx5MLXOtRSf0=;
- b=GKFwKDdCEiTglJRVP5jd1qjn2C1y2WmnQhldt5m3auAayxxq8qJzaJS3IKdxFD86GO3wDGtZGa844/tLKjm4SR0nGIS8Cg9lhHW92gh/sCi6WkGwI+QJhgeDhZsVF6zr0qzDQe2n43RJgahf+hbl8bZf718d6Ogjoi/vQgLk9tLM1RUVntnFft09mMYNj1Jf7bVwb1o4ANHeVZM+YNI1iTHM7PLInUD/wLFfTCIs6p0j8do/gtlc9cD7IYECwt0TEIXc61UfKzDqlDFxH6YZH1aNBWak2O7X75kF4ZHCQBwBAx9Kqpvjx9PfmHrEt6gV5EipEaewYGtkdiYGf1u3dA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8717RcjJlh9SViVxRz+POmFPaBxe0Trtx5MLXOtRSf0=;
- b=Yz/GDzB+kH/SIJ1iltm1dGWKBEo7GCxHzxwd4iEmpG13zn0h2Fn3DHndXO0QXjvtZpBAgaE+liURkZb07B+Dk8YffawAD3GKZOUBqSRapCKcF6F4KBJkzqJXrhAcj6DuPlmK5LkTgi1FupctUceW5GPqwFn8Br3AQ0UzIYIVfRo=
-Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
- by DU0PR04MB9345.eurprd04.prod.outlook.com (2603:10a6:10:355::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.15; Fri, 16 Dec
- 2022 06:07:58 +0000
-Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
- ([fe80::7686:5382:16d5:c6de]) by AM9PR04MB8603.eurprd04.prod.outlook.com
- ([fe80::7686:5382:16d5:c6de%8]) with mapi id 15.20.5880.019; Fri, 16 Dec 2022
- 06:07:58 +0000
-From:   Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>
-Subject: Re: [v5,1/2] Bluetooth: Add hci_nxp to hci_uart module to support NXP
- BT chipsets
-Thread-Topic: [v5,1/2] Bluetooth: Add hci_nxp to hci_uart module to support
- NXP BT chipsets
-Thread-Index: AQHZERS+/zcyDrvzPUisOAXT7Jy2EA==
-Date:   Fri, 16 Dec 2022 06:07:58 +0000
-Message-ID: <AM9PR04MB860367B24D3866515C206953E7E69@AM9PR04MB8603.eurprd04.prod.outlook.com>
-References: <20221215142150.240712-1-neeraj.sanjaykale@nxp.com>
- <639b31a8.c80a0220.85898.f5be@mx.google.com>
- <CABBYNZKpJCT3VhRgc-a58utFOm7mFz6uOQayzW_+pEbfhbfGqQ@mail.gmail.com>
-In-Reply-To: <CABBYNZKpJCT3VhRgc-a58utFOm7mFz6uOQayzW_+pEbfhbfGqQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8603:EE_|DU0PR04MB9345:EE_
-x-ms-office365-filtering-correlation-id: fe0f0232-4f44-4904-b5c4-08dadf2be154
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /uuG5W5YnjpaSzB06wKWx5fLaIXsqMz13WCpxJ9qMHW12F3gNlOczT8MukG9zOwr9THHVhFvQRA/CG+T/mMHaTdLwvlpKPDpAj6TwGKlmjMv7BIb6yMYX7JJr/A55/dDuRmusD9IMnUErDyrAWOVL993dENfmhlyQLwWrjFIUyxtAdH/aZg50xODbqcLakSwGAR/J516pQyEimT4Qd5xbNwrtJWuVaDt/SQqCPsz+pMfwXToYJiIydS+oGnaj6F/Qe3D7JsBeRpqH7p73UjDMo+xmODtxObPpkKXb4kUABcRD/eKP4HWNCt2t7Fc1PQgdY0Kp7UwQA44Z9/TGnuz7Y0CwM/20pry8hAbppOAfMaegG2x3KUyUm0eijNtRqp1QxtmLZ2KvMm5sm9Fwj0JdQoDKkzImM6wgFbhXL/aHqxxL5x+oVi17Str+4Q8otFPbVCjOi6fL+eaqYEEVkYo43iKefNOyyVdzD5Bnb0hwjuIguakQ1zAvR8RdmtNZd4urPhrm9HAKXIauq8B4cmcXNuYort/kMZouDhj4wB9flUDkhN7osJyU/sHEdsUlQdIudYoCR74i4bwjDZavZAct+a3ycjRkNyaPBiI/j3W+0hLsemJPk+pjCUXoZU6bh6HBwpFH3ReauGSel4ghUCSAdTzoPVzM6VwysdAgCe1DtDA2Fwkxi09PBJ+cJr7xBcvesQQ2WTsh0o7vB/9DjwpUYoU1bLtkA8AuqmDiVLQL2Q=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(376002)(136003)(39860400002)(396003)(451199015)(478600001)(966005)(71200400001)(26005)(186003)(9686003)(8676002)(4326008)(66446008)(64756008)(53546011)(7696005)(6506007)(45080400002)(2906002)(33656002)(316002)(54906003)(83380400001)(6916009)(76116006)(38100700002)(8936002)(5660300002)(66946007)(66556008)(66476007)(52536014)(38070700005)(55016003)(86362001)(122000001)(41300700001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?JBKjFaP3wfAWzwwssxv2pzK5xJTMf3cKZddcBXxdLIa3EKzURFGh/JpaSbJi?=
- =?us-ascii?Q?m+KH+uiW/I1OE3ZdIr3jYeF2Xvi2xbgvhdnNmK/WchyuW3xKELPEeww0u/QI?=
- =?us-ascii?Q?CEKwk3xwAIUjx+ShhBYhZjLGnsn6NA0ydjdsdFOpi6wiFU3bKNwojZ42DBiu?=
- =?us-ascii?Q?uCu4+81AhlAB3LPSDG/O683VDUGQIM+n5W00n0JxyYtTKIDlnO4p5UT7g81B?=
- =?us-ascii?Q?2nb8NcvRwSoann/mOO9KRbWUwhxZuefLvGnTezwEjbEmXASNUAxVIDR2Vyjp?=
- =?us-ascii?Q?5FZo0Zh3FvXNKhfwYPZwK2bpEE9xHf7B4PLk0YZdxb5nnd82raf0UIikJBet?=
- =?us-ascii?Q?qEm8szzNI7YqWg9zbySXXa6GytrdNzUbp2X9LlmLiTw29C02EVV+pSWTTkVJ?=
- =?us-ascii?Q?AVqGvTc2CwM04t37RywkxmNRLVp3PV5KME0ExKhCUxXLhZxdL/hD997zdlgA?=
- =?us-ascii?Q?qNI8B/ePLG1xpvuFekUJ0kvOKgjpd9pBf+Y89o5yHJL2qYXHE8+GW+E0NLzk?=
- =?us-ascii?Q?zqgi0pvb8CNloDuNPCFgmotqz8kNqs6j+Im7cvjTX0xargTRRKzdfEaurpfA?=
- =?us-ascii?Q?SVqPrcjStbeGP98FYVxI0PbTebP6QYR+2oh7+S2aDkooPqMoWBvmnEe0dTZf?=
- =?us-ascii?Q?pYvTtPL5iXM4XmuKQFzedv7Q+u8qLwYKkqER8SOtzJihqPUuctLM3PJAu0ib?=
- =?us-ascii?Q?4VlJLLJgfYQxTzGF2Rz8dlnAwt2QuuDpmSRPzmA6y69W7zt7xVZpDuvzbHtc?=
- =?us-ascii?Q?2lV+EXA9A8dfda23oHvg5ocxl4COzFwIkc5JhygWV4KqSUtW3IILExJfHmWc?=
- =?us-ascii?Q?Cyf32EDTXySvqBUsN1VX888I9z4c0LOGl+Jrwf7jCw69H2LxldbZsJrC535I?=
- =?us-ascii?Q?Rj7HlMyCrLh+nVMdnd3FudxnwFMwZZCK7QX3iLnMjU4r4wrUKCIapxZzoObu?=
- =?us-ascii?Q?M4JzBnBvQ/xhTmV2DEZgo9Uj2sLVIe0dODXj6OLEx959+WzLqOQ8O/dSGPvi?=
- =?us-ascii?Q?xu3mgN+jufzO+nt6PwGkcmomrhVoQu1hYi/f5h/kuYgxOVSHHNP1HFtDfXx0?=
- =?us-ascii?Q?6XynGKaMGXsx5DiqlDawOGH06CW6z3Pa9LtrbUH9fDraAGRUNteJdmq2F/Ks?=
- =?us-ascii?Q?iF+G3ZH56YQF+dMvuILN7hkqkeVtfDBBX6hgh4vYaSOmmhiLfABzuFMJo6+h?=
- =?us-ascii?Q?u35IqzHgq8xc2CEBn7Sotb1AUjwtIhjaQbr0VJmLODVcwidxuWP4r03qw6nx?=
- =?us-ascii?Q?kFO/nH3TPZMn4mCe7YCh2Ea7MPbGgwXKVG56DXCWjd039FwI2fk51pL6gOji?=
- =?us-ascii?Q?wkfD9/mkrr2wiTsv3Y9PQF5YCm0BFvkX8DKCjx7QwPxmO6KsIk4k6J8wC4LI?=
- =?us-ascii?Q?iv0TB71hUrz9r/kV6I6aRNrm7Kf1+RPz7Xh7JynnNkJ0QSl6nz0vH1T+rAYv?=
- =?us-ascii?Q?tsYbMsVq0bGOUAa/xVbp3itH2FqLZ8EqNPmoZnMq3tHvca/+DRnFnL+Fa225?=
- =?us-ascii?Q?L2czV+8kU4y7NlftORr6+XxwhxKvPaDT0/LfRbjbOvBKDwDTyKTHHGSgVMOU?=
- =?us-ascii?Q?Zk4pg9KytWr+XQ2dg6GImYkke8Em6G6mInM7bVGD?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 16 Dec 2022 01:36:34 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C59642C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Dec 2022 22:36:34 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id s187so1187132oie.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Dec 2022 22:36:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lz+dsYIrZnPGciImPUnMwp8VYSoV2WLungKip93LucI=;
+        b=VnmzA6RGaOc2FKAhJdVZ9zUOewoEH9UUc7zvFsNhpkCMVazp1mDYw//1yTl4301f4W
+         x6qIQNy4LmENPymY6+7r8bhkJjETGXUVt0PKXKLKSeZXaWtALlcdzvQateFs+P4VYFop
+         v74ZiGb+g5w7hQFBQjVKpCu4fi1mPhBXEIYUVFpWWFJoKoPFcm4NPVVAzzc0/Hi6cNij
+         8X39ihlvqeMRqCyUyNNhZxYpJVHTE7B9hwQWNWf0H16GvEfj8k5+k0jH0dmIhPk29t9+
+         KtVr7NJXPFMcp+epSAiABHMbT5ZeV2MuJVnuopFapOcN7EuTpeO5IGlO0zFOixyWGPWc
+         m2ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lz+dsYIrZnPGciImPUnMwp8VYSoV2WLungKip93LucI=;
+        b=vw5ow9iXJ9f/fRAygPxkuC9xQzha4BGy45nm7ZuldWjYLqhIgpdizhtNKQ5zVmSap8
+         m+wgSpW2LxZd4j0Vz3RXO7uyHtTYuXONVOksHGU9Inu7rICbypkLxcHA4j0pVwOmfPmZ
+         GSLn+J+ZzuPtg8LEVMj/Z6B/pHn2oeub/H6ONlvEthzlqcuCMsijncI53nwoPaLM2Frr
+         QIGpZQ2Etrv4DsPTJnReXoOA5smiHxqVUsnghv/LcLOdpzaMRiPFEo+pg3hZFzhrJ5m0
+         0f4wHkyDVau+hbu4+Tn4z/BwU0xH7PIhWwslWrrq1oTXZFuVY7N2NlOsGp5+95h/32JU
+         4zeg==
+X-Gm-Message-State: ANoB5pl1fVHx0y3tkQieVMyFro2NivpHNtBhC6JNmsQcjW5zZe8Ibc1v
+        uxuwwVgfpGBUQ/4BVATXX8Cyn+vT1DnvqQ==
+X-Google-Smtp-Source: AA0mqf4tHe8gbsax8uDC9Z5daZiBLdquzqOBRWCBnEpYXwnOjsk/kEJncovVuPqYgTkJziX+ezJWmA==
+X-Received: by 2002:aca:1b1a:0:b0:35e:b08e:165 with SMTP id b26-20020aca1b1a000000b0035eb08e0165mr5650479oib.14.1671172593193;
+        Thu, 15 Dec 2022 22:36:33 -0800 (PST)
+Received: from [172.17.0.2] ([13.65.246.128])
+        by smtp.gmail.com with ESMTPSA id r44-20020a05683044ac00b0066e7e4b2f76sm495968otv.17.2022.12.15.22.36.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 22:36:33 -0800 (PST)
+Message-ID: <639c11f1.050a0220.b057c.2189@mx.google.com>
+Date:   Thu, 15 Dec 2022 22:36:33 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3452260760966823897=="
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe0f0232-4f44-4904-b5c4-08dadf2be154
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2022 06:07:58.3047
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4Bf096dJ8VX3CUUCNB4TlIq+mFL7NXId+MRun/KFNggYTWEduNbh9ewttDCtkpR2wATpCLANTOn183P0/8L6VM0haYjOR3qpMoWB4GKi9CM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9345
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: [v5] Bluetooth: Add hci_nxp to hci_uart module to support NXP BT chipsets
+In-Reply-To: <20221216060058.746276-1-neeraj.sanjaykale@nxp.com>
+References: <20221216060058.746276-1-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============3452260760966823897==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Yes, looks like I was mixing the 2 patches with [Patch v5 1/2] and [Patch v=
-5 2/2], since they seemed related to each other.
-I have re-sent the 2 patches again, this time with the subject [Patch v5] f=
-or kernel changes and [Patch BlueZ] for userspace changes.
-Please discard or ignore previous patches and consider these 2 new patches =
-for further process.
+This is automated email and please do not reply to this email!
 
-Let me know if any concerns or suggestions.
+Dear submitter,
 
-Thanks,
-Neeraj
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=705009
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Sent: Friday, December 16, 2022 2:18 AM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-> Subject: [EXT] Re: [v5,1/2] Bluetooth: Add hci_nxp to hci_uart module to
-> support NXP BT chipsets
->=20
-> Caution: EXT Email
->=20
-> Hi Neeraj,
->=20
-> On Thu, Dec 15, 2022 at 6:46 AM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is an automated email and please do not reply to this email.
-> >
-> > Dear Submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing lis=
-t.
-> > While preparing the CI tests, the patches you submitted couldn't be app=
-lied
-> to the current HEAD of the repository.
-> >
-> > ----- Output -----
-> >
-> > error: tools/btattach.c: does not exist in index
-> > error: tools/hciattach.h: does not exist in index
-> > hint: Use 'git am --show-current-patch' to see the failed patch
-> >
-> > Please resolve the issue and submit the patches again.
->=20
-> Looks like you are mixing up userspace and kernel changes in the same set=
-,
-> please don't do that since they are for different trees and our CI get co=
-nfused
-> when you do that, for the userspace please follow the instructions below:
->=20
-> https://eur01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2Fgit.k=
-er
-> nel.org%2Fpub%2Fscm%2Fbluetooth%2Fbluez.git%2Ftree%2FHACKING%23n
-> 98&amp;data=3D05%7C01%7Cneeraj.sanjaykale%40nxp.com%7Cc3b4bb8a07e
-> d425c542208dadeddb69e%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C
-> 0%7C638067341083595400%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wL
-> jAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%
-> 7C%7C&amp;sdata=3DoBUSpMYxr%2FlbbcAxWRK6IdB%2BGAMNX5n1u1khGGx
-> JqwU%3D&amp;reserved=3D0
->=20
-> --
-> Luiz Augusto von Dentz
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.04 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      37.38 seconds
+CheckAllWarning               PASS      40.53 seconds
+CheckSparse                   PASS      45.53 seconds
+BuildKernel32                 PASS      36.03 seconds
+TestRunnerSetup               PASS      512.22 seconds
+TestRunner_l2cap-tester       PASS      18.33 seconds
+TestRunner_iso-tester         PASS      19.39 seconds
+TestRunner_bnep-tester        PASS      6.57 seconds
+TestRunner_mgmt-tester        PASS      115.01 seconds
+TestRunner_rfcomm-tester      PASS      10.03 seconds
+TestRunner_sco-tester         PASS      9.48 seconds
+TestRunner_ioctl-tester       PASS      10.91 seconds
+TestRunner_mesh-tester        PASS      8.00 seconds
+TestRunner_smp-tester         PASS      9.34 seconds
+TestRunner_userchan-tester    PASS      6.96 seconds
+IncrementalBuild              PASS      33.86 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v5] Bluetooth: Add hci_nxp to hci_uart module to support NXP BT chipsets
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+43: B1 Line exceeds max length (94>80): "v2: Changed the subject/summary lines and added more details in the description. (Paul Menzel)"
+44: B1 Line exceeds max length (88>80): "v3: Made internal functions static, optimized the code, added few comments. (Sherry Sun)"
+45: B1 Line exceeds max length (114>80): "v4: Reworked entire code to send vendor commands cmd23 and cmd53 by using __hci_cmd_sync. (Luiz Augusto von Dentz)"
+46: B1 Line exceeds max length (92>80): "v5: Used hci_command_hdr and combined OGF+OCF into a single opcode. (Luiz Augusto von Dentz)"
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3452260760966823897==--
