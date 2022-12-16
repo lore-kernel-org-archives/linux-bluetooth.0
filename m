@@ -2,122 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 399D3C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 21:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B506C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 21:19:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229583AbiLPVGS (ORCPT
+        id S231283AbiLPVTY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 16:06:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48762 "EHLO
+        Fri, 16 Dec 2022 16:19:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231816AbiLPVGQ (ORCPT
+        with ESMTP id S229453AbiLPVTW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 16:06:16 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F5141209E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 13:06:14 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id l10so3493354plb.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 13:06:14 -0800 (PST)
+        Fri, 16 Dec 2022 16:19:22 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4918A2DF1;
+        Fri, 16 Dec 2022 13:19:21 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id c1so5322749lfi.7;
+        Fri, 16 Dec 2022 13:19:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XTh0KiFSEyER+1gCalnZKYk/yCNIQLse+mLkM0J7Es0=;
-        b=KVQAmOTaKR93YI+zNL8Og9nu8dMcLPQEbfJ7LbWh24VMc1GtkC97P4dxVfVziWh+mL
-         qqTj+FC91Op9QgqReT2XtzOhwYpqVr6KbfqKqio3BJYAElbUiHFldfaMBVhj2Ux1VlmY
-         aPKi+YlEDIvWbdW69BKbLKpNebNxqvSfjGvQmjAzGSRn9pF2tGldz/GcN5U+Y7ST0y8f
-         mjGBuY34QSB91s8rtz/zl2HOxdkRNVRr4UJg7UzHNcvTu0848mS/Cel5556yUiZRYTzb
-         SHA7VQ7MBGY5Zlequ5WaaMCcypqqzH2AkLbnP/cMygXArVLPhOyi9Y4X86DZXc+DQoS/
-         wKYA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=aHl3ThJVXcxIPvZSfmGmQodnvR4tXTxSwW1ZUdG5N74=;
+        b=SMNvDKLNLzLK6LLxhJDL7Pfpyzt5kRltr0KG4HKyy0xtJD1fLg4wzKg3LpeKPtncC9
+         PijOpg0fRnRAn63XaiNtBqXD61IqoXXigl5Uoiusx2bdVjv5DKpkMipRMwA33B4hACGW
+         WrLs76H8f7cv4OxZgiUTkUqhp+BQ7Q81bB4v7IP6mZWRVN6L+Gx1FaFnD1fJQvb1oG5B
+         55+TqQeEyAQ69aAXccNywHHeF81iF7CbEC8BqQVLmod4yH9D8W1NRyHXGw30oopJejPF
+         mXNp/1F4HZiM68fQYIrEDME7fRf43iYNUBmu3hJCEymfDW5+CB+AbCQfYB4itSXotAeU
+         EqrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XTh0KiFSEyER+1gCalnZKYk/yCNIQLse+mLkM0J7Es0=;
-        b=3Xvdxk8jitkk7nZf7vQxmcYK93z0jp7dGXkgJ00Wet3E5L5hP5O+LTnwXTCUtd0viM
-         sGAYKQGz8906PcuCKkuaLtR09RHCDUpyQvGaaYmm7q+HdTvTIRuaDIBRwyQN6qkxIzVm
-         jUClL++UMVH745GoPEkObz44MDasbptUdTcBvx3yglsmDCSG3kQd2VGuLLAdI4F77w9s
-         oFgl7gQLzLGtdDoSA3mBOf7/M8GrQhZ3M1iNxwcReNau7pDScGyCVAOkKjuLULLxZJ8p
-         MGyEyq7AOf+7ybwxEzTGOqtMVlYsq5wnOpA/LQBQvg8rSqGrrn34VhjuIKx3u6G2kTTn
-         NtIw==
-X-Gm-Message-State: ANoB5plEhvyJTaCTxMUM1fOeKaFhnvX4/9mFFgB4Qgj+nO2L5nVLt239
-        qzrOkKIH8LrilaEvvhooh1I5IKnHswjDYIFA
-X-Google-Smtp-Source: AA0mqf5GhGuqu19Wkl13DLOe4HZSDqSZQUN8Agi7C3ErfETIkgouDxWB+xZIow4IraKdwfJbOZWarw==
-X-Received: by 2002:a05:6a21:32a8:b0:9d:efbf:813b with SMTP id yt40-20020a056a2132a800b0009defbf813bmr51586444pzb.4.1671224773230;
-        Fri, 16 Dec 2022 13:06:13 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id e7-20020a635007000000b0046b1dabf9a8sm1893030pgb.70.2022.12.16.13.06.11
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 13:06:12 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] shared/gatt-client: Fix not marking service as active
-Date:   Fri, 16 Dec 2022 13:06:11 -0800
-Message-Id: <20221216210611.2990552-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aHl3ThJVXcxIPvZSfmGmQodnvR4tXTxSwW1ZUdG5N74=;
+        b=I0ZQse01esx1yJOyCO79XPGiX5XlLX+/ESifBpZq3ULGeo4Ad4sQi4IWZSJ+z/dJ7O
+         8TP0l2jGTqC7cZd1bKX2Lx1etXRtQ1iewEY4MjvXq9raDzXCy4njleu7bv+Uo2Tc+TQZ
+         ZJ4Naz1cpmQpD2IU3vHAvbmDXItpyLgslmRf/fMhVbDqm127NDbZ6tsfXIc9s8JEGC/8
+         r3gaThXN7QA67j96j2Vf2CEaemV54kFceaOtg0Ze92cxmRLOI6GGzWlFdqyVTyC2oEj5
+         ePV8+q+or56zg/DGSboh7GiIQj9GmeM7Y5U596oIe4o8HjEIHqNFQttt1S5Ds3AR2koN
+         olIg==
+X-Gm-Message-State: ANoB5pnCnfPC0tq86LvshwBE19gbknEDcXpFhxPQFckFlHNWTwP5EQJw
+        m/qkwz3UnagQEh4K/gix7NoDMTsTWHP26q0zgx/0XZUpbImlSQ==
+X-Google-Smtp-Source: AA0mqf6c0u2NpLrZd4SGv9ca8CXIDbPk5w6xxG9psTSF/BZe6rzjJ13Jyz2uAu2HUAmSxtwTYCmyGazKxp+4k9Vb0OQ=
+X-Received: by 2002:a05:6512:22c4:b0:4b5:6528:fe68 with SMTP id
+ g4-20020a05651222c400b004b56528fe68mr7525225lfu.251.1671225559410; Fri, 16
+ Dec 2022 13:19:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com> <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
+In-Reply-To: <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 16 Dec 2022 13:19:07 -0800
+Message-ID: <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
+Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
+ NXP BT chipsets
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paul Menzel <pmenzel@molgen.mpg.de>, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-If there are no characteristics to discover, or for some reason
-bt_gatt_discover_descriptors is skiped, or the last attribute is
-actually a included service the service should be marked as
-active as there will be no more attributes to be discovered.
+On Fri, Dec 16, 2022 at 12:15 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Neeraj,
+>
+> > Add hci_nxp to the hci_uart module which adds support for the NXP BT
+> > chips. This driver has Power Save feature that will put the NXP bluetooth
+> > chip into sleep state, whenever there is no activity for certain duration
+> > of time (2000ms), and will be woken up when any activity is to be
+> > initiated.
+> >
+> > The Power Save feature can be configured with the following set
+> > of commands (optional):
+> > hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
+> > hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
+> > where,
+> > OGF = 0x3F (vendor specific command)
+> > OCF = 0x23 (command to set Power Save state)
+> > arg[0] = 0x02 (disable Power Save)
+> > arg[0] = 0x03 (enable Power Save)
+> > arg[1,2,...] = XX (don't care)
+> >
+> > The sleep/wake-up source can be configured with the following set
+> > of commands (optional):
+> > hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
+> > hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
+> > where,
+> > OGF = 0x3F (vendor specific command)
+> > OCF = 0x53 (command to set sleep and wake-up source)
+> > arg[0] = 0x00 (Chip to host method NONE)
+> > arg[0] = 0x01 (Chip to host method UART DTR)
+> > arg[0] = 0x02 (Chip to host method UART BREAK)
+> > arg[0] = 0x03 (Chip to host method GPIO)
+> > arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
+> > arg[2] = 0x00 (Host to chip method UART DSR)
+> > arg[2] = 0x01 (Host to chip method UART BREAK)
+> > arg[3] = 0xXX (Reserved for future use)
+> >
+> > By default, the hci_nxp sets power save enable, chip to host wake-up
+> > source as GPIO and host to chip sleep and wake-up source as UART
+> > break during driver initialization, by sending the respective
+> > commands to the chip.
+> >
+> > Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> > ---
+> > v2: Changed the subject/summary lines and added more details in the
+> > description. (Paul Menzel)
+> > v3: Made internal functions static, optimized the code, added few
+> > comments. (Sherry Sun)
+> > v4: Reworked entire code to send vendor commands cmd23 and cmd53 by
+> > using __hci_cmd_sync. (Luiz Augusto von Dentz)
+> > v5: Used hci_command_hdr and combined OGF+OCF into a single opcode.
+> > (Luiz Augusto von Dentz)
+> > ---
+> > MAINTAINERS                   |   6 +
+> > drivers/bluetooth/Kconfig     |  10 +
+> > drivers/bluetooth/Makefile    |   1 +
+> > drivers/bluetooth/hci_ldisc.c |   6 +
+> > drivers/bluetooth/hci_nxp.c   | 592 ++++++++++++++++++++++++++++++++++
+> > drivers/bluetooth/hci_nxp.h   |  94 ++++++
+> > drivers/bluetooth/hci_uart.h  |   8 +-
+> > 7 files changed, 716 insertions(+), 1 deletion(-)
+> > create mode 100644 drivers/bluetooth/hci_nxp.c
+> > create mode 100644 drivers/bluetooth/hci_nxp.h
+>
+> so this is a clear NAK. Add this as serdev driver and not hook further into the
+> mess that is the HCI line discipline.
 
-Fixes: https://github.com/bluez/bluez/issues/438
----
- src/shared/gatt-client.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+I wonder if we should make it more clear somehow, perhaps include a
+text on the likes of BT_HCIUART that is deprecated and new drivers
+shall use BT_HCIUART_SERDEV instead.
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index cf0d2e2b749d..83283110b636 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -576,12 +576,28 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
- 				gatt_db_attribute_get_handle(attr), handle);
- 			goto failed;
- 		}
-+
-+		if (!gatt_db_attribute_get_service_data(attr, NULL, &end,
-+							NULL, NULL)) {
-+			DBG(client, "Unable to get service data at 0x%04x",
-+								handle);
-+			goto failed;
-+		}
-+
-+		/* Skip if there are no attributes */
-+		if (handle == end)
-+			gatt_db_service_set_active(attr, true);
- 	}
- 
- next:
- 	range = queue_pop_head(op->discov_ranges);
--	if (!range)
-+	if (!range) {
-+		/* If there are no range to discover mark current service as
-+		 * active.
-+		 */
-+		gatt_db_service_set_active(op->cur_svc, true);
- 		goto failed;
-+	}
- 
- 	client->discovery_req = bt_gatt_discover_characteristics(client->att,
- 							range->start,
-@@ -725,6 +741,9 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
- 		goto failed;
- 	}
- 
-+	/* Done with the current service */
-+	gatt_db_service_set_active(op->cur_svc, true);
-+
- done:
- 	free(chrc_data);
- 	return true;
+
 -- 
-2.37.3
-
+Luiz Augusto von Dentz
