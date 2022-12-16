@@ -2,111 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27860C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 20:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E34C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 20:56:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231782AbiLPUPJ convert rfc822-to-8bit (ORCPT
+        id S231717AbiLPU4Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 15:15:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57574 "EHLO
+        Fri, 16 Dec 2022 15:56:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231247AbiLPUPG (ORCPT
+        with ESMTP id S229627AbiLPU4X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 15:15:06 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 85B156150E;
-        Fri, 16 Dec 2022 12:15:05 -0800 (PST)
-Received: from smtpclient.apple (p4fefca0f.dip0.t-ipconnect.de [79.239.202.15])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A3441CECCA;
-        Fri, 16 Dec 2022 21:15:04 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
-Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
- NXP BT chipsets
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
-Date:   Fri, 16 Dec 2022 21:15:03 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>, amitkumar.karwar@nxp.com,
-        rohit.fule@nxp.com, sherry.sun@nxp.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
-References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.1)
+        Fri, 16 Dec 2022 15:56:23 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A1FEE22
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 12:56:22 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id v82so3008294oib.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 12:56:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8lY9pQeRjPIgtybElbMj2L34rhigtUsyVzLsNhzIQqg=;
+        b=LcczkdWlGC6/BNhq9jk5XFpy7KnCs0cRsWmhAcgNvH+6W7XmpDxtKjaWZv7q1tBFlv
+         fWOFHdMEqXkyfqu+p+hWBbIe5qdqT+WniZeKSmY461V/FzlbYIsbo4BQFKuXwGv6Tbqh
+         7SeOwkK04Ucjm58xlr30qZOkntKc6r4DZSRKpAJx3CLXfqDg0HQLe1MNSMl7vDYXAL0K
+         0gk+/cO3Anqt/i3Vop+fMcqHPsopDA5r71N0FR7e3FCMab3trEvzPqw5UxoMBp7tsgce
+         BqYEzTRjR9yJKTMtrZg6lc009d2y45qQWaQ3HtEiEa7esOiVBNiBwxwv+krX9Da7XKmy
+         RV+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8lY9pQeRjPIgtybElbMj2L34rhigtUsyVzLsNhzIQqg=;
+        b=OxJN9uNxek1kSdSB5ptBMDuWxz/Ie6Y3Vuj8+21ttlGESGRex+K8ol/hHgN4wdiU1A
+         MQeUyTGccsSCr2RAOi5IWoWRsxRVxZdsXlvhG7HZsBqAmBa//bRbe5CvTLdAYdLWTPuC
+         GbnjNod09tq3NzV7vQ5VvR4sZK1mYdY+4IhZbrPNJiMHm8NjItNCkF/xf4ZLtWVwU/D4
+         3X6vdhYH+WIDLuBbho+em2XKTt6hDBzP0bUnM6frJU9kALYORUNGHbEbqOtd8cVHECze
+         z/ANaTfdn4SgJnxQPVryy3fhbBDuQc62lrwA42twxHcVJCqxHHNbmuwTw9wBonJPyGCJ
+         3PpQ==
+X-Gm-Message-State: AFqh2kpm0v1rQXIHIhDgJfB81TS/XjP/inFcugUt4G/Z5M2e/mcQ9VDD
+        0RgP4HQaQRI5p6aB4I68nxHHG+xnQEg=
+X-Google-Smtp-Source: AMrXdXti/F4qyehPsDKNSq9BgepOvrbxe+/HqD5e1MTvQ7fdTSM6OfWgK7x1P01Q/1Pohcz7hJWjDQ==
+X-Received: by 2002:a05:6808:bd6:b0:35f:a2b9:1773 with SMTP id o22-20020a0568080bd600b0035fa2b91773mr3721200oik.22.1671224181671;
+        Fri, 16 Dec 2022 12:56:21 -0800 (PST)
+Received: from [172.17.0.2] ([104.210.132.177])
+        by smtp.gmail.com with ESMTPSA id c13-20020a056830000d00b0066ebe432518sm1322203otp.38.2022.12.16.12.56.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Dec 2022 12:56:21 -0800 (PST)
+Message-ID: <639cdb75.050a0220.d0b08.6058@mx.google.com>
+Date:   Fri, 16 Dec 2022 12:56:21 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0199843520218017503=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Subject: RE: Bluetooth: Fix issue with Actions Semi ATS2851 based devices
+In-Reply-To: <20221216201247.297210-1-marcel@holtmann.org>
+References: <20221216201247.297210-1-marcel@holtmann.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Neeraj,
+--===============0199843520218017503==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> Add hci_nxp to the hci_uart module which adds support for the NXP BT
-> chips. This driver has Power Save feature that will put the NXP bluetooth
-> chip into sleep state, whenever there is no activity for certain duration
-> of time (2000ms), and will be woken up when any activity is to be
-> initiated.
-> 
-> The Power Save feature can be configured with the following set
-> of commands (optional):
-> hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
-> hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
-> where,
-> OGF = 0x3F (vendor specific command)
-> OCF = 0x23 (command to set Power Save state)
-> arg[0] = 0x02 (disable Power Save)
-> arg[0] = 0x03 (enable Power Save)
-> arg[1,2,...] = XX (don't care)
-> 
-> The sleep/wake-up source can be configured with the following set
-> of commands (optional):
-> hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
-> hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
-> where,
-> OGF = 0x3F (vendor specific command)
-> OCF = 0x53 (command to set sleep and wake-up source)
-> arg[0] = 0x00 (Chip to host method NONE)
-> arg[0] = 0x01 (Chip to host method UART DTR)
-> arg[0] = 0x02 (Chip to host method UART BREAK)
-> arg[0] = 0x03 (Chip to host method GPIO)
-> arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
-> arg[2] = 0x00 (Host to chip method UART DSR)
-> arg[2] = 0x01 (Host to chip method UART BREAK)
-> arg[3] = 0xXX (Reserved for future use)
-> 
-> By default, the hci_nxp sets power save enable, chip to host wake-up
-> source as GPIO and host to chip sleep and wake-up source as UART
-> break during driver initialization, by sending the respective
-> commands to the chip.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
-> v2: Changed the subject/summary lines and added more details in the
-> description. (Paul Menzel)
-> v3: Made internal functions static, optimized the code, added few
-> comments. (Sherry Sun)
-> v4: Reworked entire code to send vendor commands cmd23 and cmd53 by
-> using __hci_cmd_sync. (Luiz Augusto von Dentz)
-> v5: Used hci_command_hdr and combined OGF+OCF into a single opcode.
-> (Luiz Augusto von Dentz)
-> ---
-> MAINTAINERS                   |   6 +
-> drivers/bluetooth/Kconfig     |  10 +
-> drivers/bluetooth/Makefile    |   1 +
-> drivers/bluetooth/hci_ldisc.c |   6 +
-> drivers/bluetooth/hci_nxp.c   | 592 ++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/hci_nxp.h   |  94 ++++++
-> drivers/bluetooth/hci_uart.h  |   8 +-
-> 7 files changed, 716 insertions(+), 1 deletion(-)
-> create mode 100644 drivers/bluetooth/hci_nxp.c
-> create mode 100644 drivers/bluetooth/hci_nxp.h
+This is automated email and please do not reply to this email!
 
-so this is a clear NAK. Add this as serdev driver and not hook further into the
-mess that is the HCI line discipline.
+Dear submitter,
 
-Regards
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=705205
 
-Marcel
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      0.85 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      32.85 seconds
+CheckAllWarning               PASS      36.24 seconds
+CheckSparse                   PASS      41.65 seconds
+BuildKernel32                 PASS      32.38 seconds
+TestRunnerSetup               PASS      461.30 seconds
+TestRunner_l2cap-tester       PASS      17.08 seconds
+TestRunner_iso-tester         PASS      17.46 seconds
+TestRunner_bnep-tester        PASS      5.89 seconds
+TestRunner_mgmt-tester        PASS      112.86 seconds
+TestRunner_rfcomm-tester      PASS      9.38 seconds
+TestRunner_sco-tester         PASS      8.49 seconds
+TestRunner_ioctl-tester       PASS      9.92 seconds
+TestRunner_mesh-tester        PASS      7.46 seconds
+TestRunner_smp-tester         PASS      8.51 seconds
+TestRunner_userchan-tester    PASS      6.18 seconds
+IncrementalBuild              PASS      30.57 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0199843520218017503==--
