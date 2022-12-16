@@ -2,109 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E34C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 20:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 399D3C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 21:06:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231717AbiLPU4Y (ORCPT
+        id S229583AbiLPVGS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 15:56:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45990 "EHLO
+        Fri, 16 Dec 2022 16:06:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbiLPU4X (ORCPT
+        with ESMTP id S231816AbiLPVGQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 15:56:23 -0500
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84A1FEE22
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 12:56:22 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id v82so3008294oib.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 12:56:22 -0800 (PST)
+        Fri, 16 Dec 2022 16:06:16 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F5141209E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 13:06:14 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id l10so3493354plb.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 13:06:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8lY9pQeRjPIgtybElbMj2L34rhigtUsyVzLsNhzIQqg=;
-        b=LcczkdWlGC6/BNhq9jk5XFpy7KnCs0cRsWmhAcgNvH+6W7XmpDxtKjaWZv7q1tBFlv
-         fWOFHdMEqXkyfqu+p+hWBbIe5qdqT+WniZeKSmY461V/FzlbYIsbo4BQFKuXwGv6Tbqh
-         7SeOwkK04Ucjm58xlr30qZOkntKc6r4DZSRKpAJx3CLXfqDg0HQLe1MNSMl7vDYXAL0K
-         0gk+/cO3Anqt/i3Vop+fMcqHPsopDA5r71N0FR7e3FCMab3trEvzPqw5UxoMBp7tsgce
-         BqYEzTRjR9yJKTMtrZg6lc009d2y45qQWaQ3HtEiEa7esOiVBNiBwxwv+krX9Da7XKmy
-         RV+g==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XTh0KiFSEyER+1gCalnZKYk/yCNIQLse+mLkM0J7Es0=;
+        b=KVQAmOTaKR93YI+zNL8Og9nu8dMcLPQEbfJ7LbWh24VMc1GtkC97P4dxVfVziWh+mL
+         qqTj+FC91Op9QgqReT2XtzOhwYpqVr6KbfqKqio3BJYAElbUiHFldfaMBVhj2Ux1VlmY
+         aPKi+YlEDIvWbdW69BKbLKpNebNxqvSfjGvQmjAzGSRn9pF2tGldz/GcN5U+Y7ST0y8f
+         mjGBuY34QSB91s8rtz/zl2HOxdkRNVRr4UJg7UzHNcvTu0848mS/Cel5556yUiZRYTzb
+         SHA7VQ7MBGY5Zlequ5WaaMCcypqqzH2AkLbnP/cMygXArVLPhOyi9Y4X86DZXc+DQoS/
+         wKYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8lY9pQeRjPIgtybElbMj2L34rhigtUsyVzLsNhzIQqg=;
-        b=OxJN9uNxek1kSdSB5ptBMDuWxz/Ie6Y3Vuj8+21ttlGESGRex+K8ol/hHgN4wdiU1A
-         MQeUyTGccsSCr2RAOi5IWoWRsxRVxZdsXlvhG7HZsBqAmBa//bRbe5CvTLdAYdLWTPuC
-         GbnjNod09tq3NzV7vQ5VvR4sZK1mYdY+4IhZbrPNJiMHm8NjItNCkF/xf4ZLtWVwU/D4
-         3X6vdhYH+WIDLuBbho+em2XKTt6hDBzP0bUnM6frJU9kALYORUNGHbEbqOtd8cVHECze
-         z/ANaTfdn4SgJnxQPVryy3fhbBDuQc62lrwA42twxHcVJCqxHHNbmuwTw9wBonJPyGCJ
-         3PpQ==
-X-Gm-Message-State: AFqh2kpm0v1rQXIHIhDgJfB81TS/XjP/inFcugUt4G/Z5M2e/mcQ9VDD
-        0RgP4HQaQRI5p6aB4I68nxHHG+xnQEg=
-X-Google-Smtp-Source: AMrXdXti/F4qyehPsDKNSq9BgepOvrbxe+/HqD5e1MTvQ7fdTSM6OfWgK7x1P01Q/1Pohcz7hJWjDQ==
-X-Received: by 2002:a05:6808:bd6:b0:35f:a2b9:1773 with SMTP id o22-20020a0568080bd600b0035fa2b91773mr3721200oik.22.1671224181671;
-        Fri, 16 Dec 2022 12:56:21 -0800 (PST)
-Received: from [172.17.0.2] ([104.210.132.177])
-        by smtp.gmail.com with ESMTPSA id c13-20020a056830000d00b0066ebe432518sm1322203otp.38.2022.12.16.12.56.21
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XTh0KiFSEyER+1gCalnZKYk/yCNIQLse+mLkM0J7Es0=;
+        b=3Xvdxk8jitkk7nZf7vQxmcYK93z0jp7dGXkgJ00Wet3E5L5hP5O+LTnwXTCUtd0viM
+         sGAYKQGz8906PcuCKkuaLtR09RHCDUpyQvGaaYmm7q+HdTvTIRuaDIBRwyQN6qkxIzVm
+         jUClL++UMVH745GoPEkObz44MDasbptUdTcBvx3yglsmDCSG3kQd2VGuLLAdI4F77w9s
+         oFgl7gQLzLGtdDoSA3mBOf7/M8GrQhZ3M1iNxwcReNau7pDScGyCVAOkKjuLULLxZJ8p
+         MGyEyq7AOf+7ybwxEzTGOqtMVlYsq5wnOpA/LQBQvg8rSqGrrn34VhjuIKx3u6G2kTTn
+         NtIw==
+X-Gm-Message-State: ANoB5plEhvyJTaCTxMUM1fOeKaFhnvX4/9mFFgB4Qgj+nO2L5nVLt239
+        qzrOkKIH8LrilaEvvhooh1I5IKnHswjDYIFA
+X-Google-Smtp-Source: AA0mqf5GhGuqu19Wkl13DLOe4HZSDqSZQUN8Agi7C3ErfETIkgouDxWB+xZIow4IraKdwfJbOZWarw==
+X-Received: by 2002:a05:6a21:32a8:b0:9d:efbf:813b with SMTP id yt40-20020a056a2132a800b0009defbf813bmr51586444pzb.4.1671224773230;
+        Fri, 16 Dec 2022 13:06:13 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id e7-20020a635007000000b0046b1dabf9a8sm1893030pgb.70.2022.12.16.13.06.11
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 12:56:21 -0800 (PST)
-Message-ID: <639cdb75.050a0220.d0b08.6058@mx.google.com>
-Date:   Fri, 16 Dec 2022 12:56:21 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0199843520218017503=="
+        Fri, 16 Dec 2022 13:06:12 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] shared/gatt-client: Fix not marking service as active
+Date:   Fri, 16 Dec 2022 13:06:11 -0800
+Message-Id: <20221216210611.2990552-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Subject: RE: Bluetooth: Fix issue with Actions Semi ATS2851 based devices
-In-Reply-To: <20221216201247.297210-1-marcel@holtmann.org>
-References: <20221216201247.297210-1-marcel@holtmann.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0199843520218017503==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+If there are no characteristics to discover, or for some reason
+bt_gatt_discover_descriptors is skiped, or the last attribute is
+actually a included service the service should be marked as
+active as there will be no more attributes to be discovered.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=705205
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.85 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      32.85 seconds
-CheckAllWarning               PASS      36.24 seconds
-CheckSparse                   PASS      41.65 seconds
-BuildKernel32                 PASS      32.38 seconds
-TestRunnerSetup               PASS      461.30 seconds
-TestRunner_l2cap-tester       PASS      17.08 seconds
-TestRunner_iso-tester         PASS      17.46 seconds
-TestRunner_bnep-tester        PASS      5.89 seconds
-TestRunner_mgmt-tester        PASS      112.86 seconds
-TestRunner_rfcomm-tester      PASS      9.38 seconds
-TestRunner_sco-tester         PASS      8.49 seconds
-TestRunner_ioctl-tester       PASS      9.92 seconds
-TestRunner_mesh-tester        PASS      7.46 seconds
-TestRunner_smp-tester         PASS      8.51 seconds
-TestRunner_userchan-tester    PASS      6.18 seconds
-IncrementalBuild              PASS      30.57 seconds
-
-
-
+Fixes: https://github.com/bluez/bluez/issues/438
 ---
-Regards,
-Linux Bluetooth
+ src/shared/gatt-client.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index cf0d2e2b749d..83283110b636 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -576,12 +576,28 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
+ 				gatt_db_attribute_get_handle(attr), handle);
+ 			goto failed;
+ 		}
++
++		if (!gatt_db_attribute_get_service_data(attr, NULL, &end,
++							NULL, NULL)) {
++			DBG(client, "Unable to get service data at 0x%04x",
++								handle);
++			goto failed;
++		}
++
++		/* Skip if there are no attributes */
++		if (handle == end)
++			gatt_db_service_set_active(attr, true);
+ 	}
+ 
+ next:
+ 	range = queue_pop_head(op->discov_ranges);
+-	if (!range)
++	if (!range) {
++		/* If there are no range to discover mark current service as
++		 * active.
++		 */
++		gatt_db_service_set_active(op->cur_svc, true);
+ 		goto failed;
++	}
+ 
+ 	client->discovery_req = bt_gatt_discover_characteristics(client->att,
+ 							range->start,
+@@ -725,6 +741,9 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+ 		goto failed;
+ 	}
+ 
++	/* Done with the current service */
++	gatt_db_service_set_active(op->cur_svc, true);
++
+ done:
+ 	free(chrc_data);
+ 	return true;
+-- 
+2.37.3
 
---===============0199843520218017503==--
