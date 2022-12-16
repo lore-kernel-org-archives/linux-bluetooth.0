@@ -2,143 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B506C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 21:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3E0C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 21:40:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231283AbiLPVTY (ORCPT
+        id S229674AbiLPVkW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 16:19:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52850 "EHLO
+        Fri, 16 Dec 2022 16:40:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiLPVTW (ORCPT
+        with ESMTP id S229471AbiLPVkS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 16:19:22 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4918A2DF1;
-        Fri, 16 Dec 2022 13:19:21 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id c1so5322749lfi.7;
-        Fri, 16 Dec 2022 13:19:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=aHl3ThJVXcxIPvZSfmGmQodnvR4tXTxSwW1ZUdG5N74=;
-        b=SMNvDKLNLzLK6LLxhJDL7Pfpyzt5kRltr0KG4HKyy0xtJD1fLg4wzKg3LpeKPtncC9
-         PijOpg0fRnRAn63XaiNtBqXD61IqoXXigl5Uoiusx2bdVjv5DKpkMipRMwA33B4hACGW
-         WrLs76H8f7cv4OxZgiUTkUqhp+BQ7Q81bB4v7IP6mZWRVN6L+Gx1FaFnD1fJQvb1oG5B
-         55+TqQeEyAQ69aAXccNywHHeF81iF7CbEC8BqQVLmod4yH9D8W1NRyHXGw30oopJejPF
-         mXNp/1F4HZiM68fQYIrEDME7fRf43iYNUBmu3hJCEymfDW5+CB+AbCQfYB4itSXotAeU
-         EqrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aHl3ThJVXcxIPvZSfmGmQodnvR4tXTxSwW1ZUdG5N74=;
-        b=I0ZQse01esx1yJOyCO79XPGiX5XlLX+/ESifBpZq3ULGeo4Ad4sQi4IWZSJ+z/dJ7O
-         8TP0l2jGTqC7cZd1bKX2Lx1etXRtQ1iewEY4MjvXq9raDzXCy4njleu7bv+Uo2Tc+TQZ
-         ZJ4Naz1cpmQpD2IU3vHAvbmDXItpyLgslmRf/fMhVbDqm127NDbZ6tsfXIc9s8JEGC/8
-         r3gaThXN7QA67j96j2Vf2CEaemV54kFceaOtg0Ze92cxmRLOI6GGzWlFdqyVTyC2oEj5
-         ePV8+q+or56zg/DGSboh7GiIQj9GmeM7Y5U596oIe4o8HjEIHqNFQttt1S5Ds3AR2koN
-         olIg==
-X-Gm-Message-State: ANoB5pnCnfPC0tq86LvshwBE19gbknEDcXpFhxPQFckFlHNWTwP5EQJw
-        m/qkwz3UnagQEh4K/gix7NoDMTsTWHP26q0zgx/0XZUpbImlSQ==
-X-Google-Smtp-Source: AA0mqf6c0u2NpLrZd4SGv9ca8CXIDbPk5w6xxG9psTSF/BZe6rzjJ13Jyz2uAu2HUAmSxtwTYCmyGazKxp+4k9Vb0OQ=
-X-Received: by 2002:a05:6512:22c4:b0:4b5:6528:fe68 with SMTP id
- g4-20020a05651222c400b004b56528fe68mr7525225lfu.251.1671225559410; Fri, 16
- Dec 2022 13:19:19 -0800 (PST)
+        Fri, 16 Dec 2022 16:40:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B8C6C716
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 13:40:17 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4853462222
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 21:40:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0E27C433F0;
+        Fri, 16 Dec 2022 21:40:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671226816;
+        bh=m9ENK0FEZqJsUUsNcHW9cpL46LZyh/6MggDpDWtdlg8=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=hvZqeEhv8NlQ2MVa94pL+uynX1w1qwPiA05qypIkMC9Tdwx2bOyFn6q43jFUvjltM
+         A5qWlovZHKWPhcvxU0XbmIDo5a7k2lc7NQaax1h8oMd2uB3/00Uv0pGRxL3/Gkh0nb
+         MrPAJwxiUbSe38RtGpc6vNRdDI+1/824ku3a6T1q57WtimKhCiWU+W/p6AUzzHsk8u
+         2axmchVgK4o4g2YGfdWH/rBCf4vgIvU22FLa/91JmE0QkOaOXlm4LWpvRsYkR0Kwzf
+         7EAN0fNaLIS4WdoTCIpj844CTh6dugFZRnT5GcC8pU5yWYDXEy5p/OU8QRxFcQB7e8
+         U2KLo3/qrBTMA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 87612E21EFC;
+        Fri, 16 Dec 2022 21:40:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com> <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
-In-Reply-To: <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 16 Dec 2022 13:19:07 -0800
-Message-ID: <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
- NXP BT chipsets
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: Fix issue with Actions Semi ATS2851 based devices
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167122681655.4154.18045394353973425846.git-patchwork-notify@kernel.org>
+Date:   Fri, 16 Dec 2022 21:40:16 +0000
+References: <20221216201247.297210-1-marcel@holtmann.org>
+In-Reply-To: <20221216201247.297210-1-marcel@holtmann.org>
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>, amitkumar.karwar@nxp.com,
-        rohit.fule@nxp.com, sherry.sun@nxp.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hello:
 
-On Fri, Dec 16, 2022 at 12:15 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Neeraj,
->
-> > Add hci_nxp to the hci_uart module which adds support for the NXP BT
-> > chips. This driver has Power Save feature that will put the NXP bluetooth
-> > chip into sleep state, whenever there is no activity for certain duration
-> > of time (2000ms), and will be woken up when any activity is to be
-> > initiated.
-> >
-> > The Power Save feature can be configured with the following set
-> > of commands (optional):
-> > hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
-> > hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
-> > where,
-> > OGF = 0x3F (vendor specific command)
-> > OCF = 0x23 (command to set Power Save state)
-> > arg[0] = 0x02 (disable Power Save)
-> > arg[0] = 0x03 (enable Power Save)
-> > arg[1,2,...] = XX (don't care)
-> >
-> > The sleep/wake-up source can be configured with the following set
-> > of commands (optional):
-> > hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
-> > hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
-> > where,
-> > OGF = 0x3F (vendor specific command)
-> > OCF = 0x53 (command to set sleep and wake-up source)
-> > arg[0] = 0x00 (Chip to host method NONE)
-> > arg[0] = 0x01 (Chip to host method UART DTR)
-> > arg[0] = 0x02 (Chip to host method UART BREAK)
-> > arg[0] = 0x03 (Chip to host method GPIO)
-> > arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
-> > arg[2] = 0x00 (Host to chip method UART DSR)
-> > arg[2] = 0x01 (Host to chip method UART BREAK)
-> > arg[3] = 0xXX (Reserved for future use)
-> >
-> > By default, the hci_nxp sets power save enable, chip to host wake-up
-> > source as GPIO and host to chip sleep and wake-up source as UART
-> > break during driver initialization, by sending the respective
-> > commands to the chip.
-> >
-> > Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> > ---
-> > v2: Changed the subject/summary lines and added more details in the
-> > description. (Paul Menzel)
-> > v3: Made internal functions static, optimized the code, added few
-> > comments. (Sherry Sun)
-> > v4: Reworked entire code to send vendor commands cmd23 and cmd53 by
-> > using __hci_cmd_sync. (Luiz Augusto von Dentz)
-> > v5: Used hci_command_hdr and combined OGF+OCF into a single opcode.
-> > (Luiz Augusto von Dentz)
-> > ---
-> > MAINTAINERS                   |   6 +
-> > drivers/bluetooth/Kconfig     |  10 +
-> > drivers/bluetooth/Makefile    |   1 +
-> > drivers/bluetooth/hci_ldisc.c |   6 +
-> > drivers/bluetooth/hci_nxp.c   | 592 ++++++++++++++++++++++++++++++++++
-> > drivers/bluetooth/hci_nxp.h   |  94 ++++++
-> > drivers/bluetooth/hci_uart.h  |   8 +-
-> > 7 files changed, 716 insertions(+), 1 deletion(-)
-> > create mode 100644 drivers/bluetooth/hci_nxp.c
-> > create mode 100644 drivers/bluetooth/hci_nxp.h
->
-> so this is a clear NAK. Add this as serdev driver and not hook further into the
-> mess that is the HCI line discipline.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I wonder if we should make it more clear somehow, perhaps include a
-text on the likes of BT_HCIUART that is deprecated and new drivers
-shall use BT_HCIUART_SERDEV instead.
+On Fri, 16 Dec 2022 21:12:47 +0100 you wrote:
+> Their devices claim to support the erroneous data reporting, but don't
+> actually support the required commands. So blacklist them and add a
+> quirk.
+> 
+>   < HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0
+>   > HCI Event: Command Status (0x0f) plen 4
+>         Read Default Erroneous Data Reporting (0x03|0x005a) ncmd 1
+>           Status: Unknown HCI Command (0x01)
+> 
+> [...]
 
+Here is the summary with links:
+  - Bluetooth: Fix issue with Actions Semi ATS2851 based devices
+    https://git.kernel.org/bluetooth/bluetooth-next/c/0bb039f39058
 
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
