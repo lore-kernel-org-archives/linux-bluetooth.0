@@ -2,112 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69859C001B2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 20:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27860C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Dec 2022 20:15:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbiLPUNB (ORCPT
+        id S231782AbiLPUPJ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 15:13:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56994 "EHLO
+        Fri, 16 Dec 2022 15:15:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231315AbiLPUM7 (ORCPT
+        with ESMTP id S231247AbiLPUPG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 15:12:59 -0500
+        Fri, 16 Dec 2022 15:15:06 -0500
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A97835FBA8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 12:12:53 -0800 (PST)
-Received: from fedora.. (p4fefca0f.dip0.t-ipconnect.de [79.239.202.15])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CA11DCECCA
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 21:12:52 +0100 (CET)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 85B156150E;
+        Fri, 16 Dec 2022 12:15:05 -0800 (PST)
+Received: from smtpclient.apple (p4fefca0f.dip0.t-ipconnect.de [79.239.202.15])
+        by mail.holtmann.org (Postfix) with ESMTPSA id A3441CECCA;
+        Fri, 16 Dec 2022 21:15:04 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
+Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
+ NXP BT chipsets
 From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix issue with Actions Semi ATS2851 based devices
-Date:   Fri, 16 Dec 2022 21:12:47 +0100
-Message-Id: <20221216201247.297210-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.38.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
+Date:   Fri, 16 Dec 2022 21:15:03 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Paul Menzel <pmenzel@molgen.mpg.de>, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
+References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Their devices claim to support the erroneous data reporting, but don't
-actually support the required commands. So blacklist them and add a
-quirk.
+Hi Neeraj,
 
-  < HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0
-  > HCI Event: Command Status (0x0f) plen 4
-        Read Default Erroneous Data Reporting (0x03|0x005a) ncmd 1
-          Status: Unknown HCI Command (0x01)
+> Add hci_nxp to the hci_uart module which adds support for the NXP BT
+> chips. This driver has Power Save feature that will put the NXP bluetooth
+> chip into sleep state, whenever there is no activity for certain duration
+> of time (2000ms), and will be woken up when any activity is to be
+> initiated.
+> 
+> The Power Save feature can be configured with the following set
+> of commands (optional):
+> hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
+> hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
+> where,
+> OGF = 0x3F (vendor specific command)
+> OCF = 0x23 (command to set Power Save state)
+> arg[0] = 0x02 (disable Power Save)
+> arg[0] = 0x03 (enable Power Save)
+> arg[1,2,...] = XX (don't care)
+> 
+> The sleep/wake-up source can be configured with the following set
+> of commands (optional):
+> hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
+> hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
+> where,
+> OGF = 0x3F (vendor specific command)
+> OCF = 0x53 (command to set sleep and wake-up source)
+> arg[0] = 0x00 (Chip to host method NONE)
+> arg[0] = 0x01 (Chip to host method UART DTR)
+> arg[0] = 0x02 (Chip to host method UART BREAK)
+> arg[0] = 0x03 (Chip to host method GPIO)
+> arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
+> arg[2] = 0x00 (Host to chip method UART DSR)
+> arg[2] = 0x01 (Host to chip method UART BREAK)
+> arg[3] = 0xXX (Reserved for future use)
+> 
+> By default, the hci_nxp sets power save enable, chip to host wake-up
+> source as GPIO and host to chip sleep and wake-up source as UART
+> break during driver initialization, by sending the respective
+> commands to the chip.
+> 
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+> v2: Changed the subject/summary lines and added more details in the
+> description. (Paul Menzel)
+> v3: Made internal functions static, optimized the code, added few
+> comments. (Sherry Sun)
+> v4: Reworked entire code to send vendor commands cmd23 and cmd53 by
+> using __hci_cmd_sync. (Luiz Augusto von Dentz)
+> v5: Used hci_command_hdr and combined OGF+OCF into a single opcode.
+> (Luiz Augusto von Dentz)
+> ---
+> MAINTAINERS                   |   6 +
+> drivers/bluetooth/Kconfig     |  10 +
+> drivers/bluetooth/Makefile    |   1 +
+> drivers/bluetooth/hci_ldisc.c |   6 +
+> drivers/bluetooth/hci_nxp.c   | 592 ++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/hci_nxp.h   |  94 ++++++
+> drivers/bluetooth/hci_uart.h  |   8 +-
+> 7 files changed, 716 insertions(+), 1 deletion(-)
+> create mode 100644 drivers/bluetooth/hci_nxp.c
+> create mode 100644 drivers/bluetooth/hci_nxp.h
 
-T:  Bus=02 Lev=02 Prnt=08 Port=02 Cnt=01 Dev#= 10 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=10d7 ProdID=b012 Rev=88.91
-S:  Manufacturer=Actions
-S:  Product=general adapter
-S:  SerialNumber=ACTIONS1234
-C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+so this is a clear NAK. Add this as serdev driver and not hook further into the
+mess that is the HCI line discipline.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2ad4efdd9e40..afd2f08ffe30 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -64,6 +64,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	BIT(24)
- #define BTUSB_INTEL_BROKEN_INITIAL_NCMD BIT(25)
- #define BTUSB_INTEL_NO_WBS_SUPPORT	BIT(26)
-+#define BTUSB_ACTIONS_SEMI		BIT(27)
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -677,6 +678,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
-+	/* Actions Semiconductor ATS2851 based devices */
-+	{ USB_DEVICE(0x10d7, 0xb012), .driver_info = BTUSB_ACTIONS_SEMI },
-+
- 	/* Silicon Wave based devices */
- 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
- 
-@@ -4098,6 +4102,11 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags);
- 	}
- 
-+	if (id->driver_info & BTUSB_ACTIONS_SEMI) {
-+		/* Support is advertised, but not implemented */
-+		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
-+	}
-+
- 	if (!reset)
- 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 
--- 
-2.38.1
+Regards
+
+Marcel
 
