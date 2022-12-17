@@ -2,143 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7ADC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Dec 2022 03:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB57C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Dec 2022 10:49:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229588AbiLQDTj (ORCPT
+        id S230097AbiLQKtC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 22:19:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33560 "EHLO
+        Sat, 17 Dec 2022 05:49:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiLQDTi (ORCPT
+        with ESMTP id S229789AbiLQKs7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 22:19:38 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13FB21836
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 19:19:37 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id g20so2202408iob.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 19:19:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=znZe4iz81PPcAKrxN2SU6VuOeRq2wGY6TLlm90+vZ7Q=;
-        b=lsHUEYjJLmjJ0RZ1U5FT4oswqs4UFpc0D0cWxV2TIU4DQxgM0shFCnrYG0IH33J20E
-         pBN+VzA7vuMRTOtkfPKGsMgX7TqCmMb9ixDrxkv7QL55ucvzEvO0DPstcca2EfZ/ic8H
-         FkjQgHr3/+gdBl3bGNGQntpw0uH8czpit/W7wuGaqSJ+/KKiwHsbfw5pmEMPgVK+oHR+
-         c9b2iK+06sUEtJtgQ4su1Brt2lrkgzm49Kzc4GuIxk+NVP5EB9fPklJ1QLQWdBqvvVTd
-         YkmjoNBy//p9H3EEVyc9+B2lXQm1yFS1kp1pDHcyXBqgNrvLERp4PbWmwueKLFICtO1U
-         ANeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=znZe4iz81PPcAKrxN2SU6VuOeRq2wGY6TLlm90+vZ7Q=;
-        b=0tW3W0bYY+h1u/9TwaJJeAeBFgU0rDyCZAiRRVtuo1f06pnBk8TaeWJd3AOqtiPpTk
-         dfOFHOve6A3m9xTcglIqZuo0qqNEi3PHoAyfWrIH7Clqh4sKE91xB3eXCt80Fqz+2JVN
-         nlAvQRJU5IPqpjgllMzi7h4dGgHixIfEnXyGmf5ExQVPPDodLnxDnW8z9I4uFoX9G6ig
-         CCHkoy56YL80p99LDwk97ZeQBBHYKK7cKVmDltnzIrf/QObWXg962XXptTuoGxHQJOfL
-         Zm2O0XfzKazxXQ+yfgKVuJsESFEplH9PBzhV0qv5nBHrUdFFpF79IuruZB6JDmatBVO5
-         UGMQ==
-X-Gm-Message-State: ANoB5pmDGFxb2pqGWd3tz7YbrOuOWQvAYUmat3F4J63v5upkWpMErgzr
-        PBqT3C+SaAVkjm8BLHdHa/oN6O0YpWw=
-X-Google-Smtp-Source: AA0mqf6TO+0fkGlDHE2O3CPUsTMEHcXm/fNkn1+rUCHvhURxnsJYCcoCuvv0bUyY59xn5n6Mo4Fhtg==
-X-Received: by 2002:a5d:9517:0:b0:6c3:68f6:be14 with SMTP id d23-20020a5d9517000000b006c368f6be14mr18882648iom.10.1671247176993;
-        Fri, 16 Dec 2022 19:19:36 -0800 (PST)
-Received: from [172.17.0.2] ([40.86.28.128])
-        by smtp.gmail.com with ESMTPSA id l15-20020a05660227cf00b006e580444f02sm1309439ios.39.2022.12.16.19.19.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 19:19:36 -0800 (PST)
-Message-ID: <639d3548.050a0220.9ee4e.20ef@mx.google.com>
-Date:   Fri, 16 Dec 2022 19:19:36 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2937349325402891532=="
+        Sat, 17 Dec 2022 05:48:59 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9A810076
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Dec 2022 02:48:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671274137; x=1702810137;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1zIE2W7WQRbKFOScp9o0l8w7ZU2pecxaPE8gwLCkkkQ=;
+  b=cHNK2goyu8rZRNzVLKadCBJ4tut+8WfOST67J+8NCbttXbvQ2HuiET2n
+   0zYwZ4/6nCgmrAmxqn+uB7UqtOoZJhlNRSHUs2IMj4TKgo0ltJG989mBZ
+   5DDDwJYXrDwTYtz+NXdYZmKw82QJ1/WhL8NX1UNexN///+u21Gg7IU657
+   GWDoHQ0VbxDUS08udIkNpMNJg5Zp3QTk+mWt/nfk/OD+PF0YAd6XpneAY
+   6xZ7HmbE/W7gnX6JyoClge+ejmusBOmrgZmh2gn5CEchfcOOoNcX2iNrB
+   qgap1OgbrXLQ2LRPUyk+cUDe9cBctt33c8qwgLGf8abAmdayru1oX15l4
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10563"; a="320296595"
+X-IronPort-AV: E=Sophos;i="5.96,252,1665471600"; 
+   d="scan'208";a="320296595"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2022 02:48:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10563"; a="895538135"
+X-IronPort-AV: E=Sophos;i="5.96,252,1665471600"; 
+   d="scan'208";a="895538135"
+Received: from lkp-server01.sh.intel.com (HELO b5d47979f3ad) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 17 Dec 2022 02:48:56 -0800
+Received: from kbuild by b5d47979f3ad with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1p6UkR-0007jA-1H;
+        Sat, 17 Dec 2022 10:48:55 +0000
+Date:   Sat, 17 Dec 2022 18:48:18 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 0bb039f39058f4b60bf791e36f13f0552728cd70
+Message-ID: <639d9e72.PFOuelKpRBIlAx70%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v4,1/2] shared/gatt-db: Add gatt_db_attribute_get_service
-In-Reply-To: <20221217011059.3087848-1-luiz.dentz@gmail.com>
-References: <20221217011059.3087848-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2937349325402891532==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 0bb039f39058f4b60bf791e36f13f0552728cd70  Bluetooth: Fix issue with Actions Semi ATS2851 based devices
 
-This is automated email and please do not reply to this email!
+elapsed time: 723m
 
-Dear submitter,
+configs tested: 57
+configs skipped: 7
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=705299
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+gcc tested configs:
+i386                          randconfig-a001
+i386                          randconfig-a003
+x86_64                        randconfig-a013
+x86_64                        randconfig-a011
+um                             i386_defconfig
+um                           x86_64_defconfig
+x86_64                        randconfig-a015
+i386                          randconfig-a005
+i386                                defconfig
+arm                                 defconfig
+x86_64                        randconfig-a002
+x86_64                              defconfig
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+arm                              allyesconfig
+i386                          randconfig-a014
+ia64                             allmodconfig
+x86_64                    rhel-8.3-kselftests
+arm64                            allyesconfig
+riscv                randconfig-r042-20221216
+x86_64                               rhel-8.3
+x86_64                           rhel-8.3-bpf
+i386                          randconfig-a012
+x86_64                          rhel-8.3-func
+x86_64                           rhel-8.3-syz
+arc                  randconfig-r043-20221216
+i386                          randconfig-a016
+i386                             allyesconfig
+x86_64                         rhel-8.3-kunit
+s390                 randconfig-r044-20221216
+x86_64                           rhel-8.3-kvm
+x86_64                           allyesconfig
+powerpc                           allnoconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+alpha                            allyesconfig
+arc                              allyesconfig
+sh                               allmodconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+x86_64                            allnoconfig
 
-Test Summary:
-CheckPatch                    PASS      1.17 seconds
-GitLint                       PASS      0.52 seconds
-BuildEll                      PASS      26.63 seconds
-BluezMake                     PASS      740.12 seconds
-MakeCheck                     PASS      10.93 seconds
-MakeDistcheck                 PASS      145.54 seconds
-CheckValgrind                 PASS      237.68 seconds
-bluezmakeextell               PASS      93.02 seconds
-IncrementalBuild              PASS      1204.05 seconds
-ScanBuild                     WARNING   930.96 seconds
+clang tested configs:
+i386                          randconfig-a002
+i386                          randconfig-a004
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+x86_64                        randconfig-a001
+x86_64                        randconfig-a003
+i386                          randconfig-a006
+x86_64                        randconfig-a005
+arm                  randconfig-r046-20221216
+i386                          randconfig-a013
+hexagon              randconfig-r041-20221216
+x86_64                          rhel-8.3-rust
+i386                          randconfig-a011
+hexagon              randconfig-r045-20221216
+i386                          randconfig-a015
 
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/gatt-client.c:387:21: warning: Use of memory after it is freed
-        gatt_db_unregister(op->client->db, op->db_id);
-                           ^~~~~~~~~~
-src/shared/gatt-client.c:632:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, false, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:929:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1035:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1227:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1292:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1563:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1568:2: warning: Use of memory after it is freed
-        discover_all(op);
-        ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2070:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2078:8: warning: Use of memory after it is freed
-                                                        discovery_op_ref(op),
-                                                        ^~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3161:2: warning: Use of memory after it is freed
-        complete_write_long_op(req, success, 0, false);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3183:2: warning: Use of memory after it is freed
-        request_unref(req);
-        ^~~~~~~~~~~~~~~~~~
-12 warnings generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2937349325402891532==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
