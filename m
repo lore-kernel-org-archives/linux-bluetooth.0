@@ -2,175 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 243FAC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Dec 2022 01:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7ADC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Dec 2022 03:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbiLQBPb (ORCPT
+        id S229588AbiLQDTj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Dec 2022 20:15:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52512 "EHLO
+        Fri, 16 Dec 2022 22:19:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229880AbiLQBP3 (ORCPT
+        with ESMTP id S229469AbiLQDTi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Dec 2022 20:15:29 -0500
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF9F04D5F2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 17:15:28 -0800 (PST)
-Received: by mail-ot1-x329.google.com with SMTP id p24-20020a0568301d5800b0066e6dc09be5so2378648oth.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 17:15:28 -0800 (PST)
+        Fri, 16 Dec 2022 22:19:38 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13FB21836
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 19:19:37 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id g20so2202408iob.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Dec 2022 19:19:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=X/wPjOcOA4LyLTLHN4vmxdMcdgXja3kiFxxYm6skXgs=;
-        b=aKs8bkksBIL2qwl7xUaCluj7GbJQfKpzH4hM0hbiQVbUNL0PMjv1CaFMS5RW+jrJiw
-         MudiZ/jonihwjvgpckBERSlyErnaL3X5HPujEEiewCBTdPbndLofZkOp3jwyoEDydoVc
-         owxXIcCU772uUgHcimdCA3waKy7c21FAxEUmfY5wN+ipz/q9bkjE5mBWWTlhAzEEo2WC
-         Z4Gf8FPg0yCibR76yLem5BatPNnhm7NUEkZo83zvuwCVWuX67p85P+XXA0Ml322LnoxX
-         4Pw25nI08m3tjfr92YjRupMa0+GKJjoV9Fo1BHgbS7/pH+WViBxIEc5gZUYA5kGTekiz
-         dUTA==
+        bh=znZe4iz81PPcAKrxN2SU6VuOeRq2wGY6TLlm90+vZ7Q=;
+        b=lsHUEYjJLmjJ0RZ1U5FT4oswqs4UFpc0D0cWxV2TIU4DQxgM0shFCnrYG0IH33J20E
+         pBN+VzA7vuMRTOtkfPKGsMgX7TqCmMb9ixDrxkv7QL55ucvzEvO0DPstcca2EfZ/ic8H
+         FkjQgHr3/+gdBl3bGNGQntpw0uH8czpit/W7wuGaqSJ+/KKiwHsbfw5pmEMPgVK+oHR+
+         c9b2iK+06sUEtJtgQ4su1Brt2lrkgzm49Kzc4GuIxk+NVP5EB9fPklJ1QLQWdBqvvVTd
+         YkmjoNBy//p9H3EEVyc9+B2lXQm1yFS1kp1pDHcyXBqgNrvLERp4PbWmwueKLFICtO1U
+         ANeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=X/wPjOcOA4LyLTLHN4vmxdMcdgXja3kiFxxYm6skXgs=;
-        b=e4kq/lSgygzy7Loinfmpuyj2TFrqt/e6P2UvvIotdyt/vZQheAeH7HMkOlHx1EGQrj
-         H6rfoa/ckFFmjleBXqjv2lIWxA2uTKTdRYMpUFp4X04EHX4Qvb6UfiyXYlX0Bu90IS39
-         BkRTT+5uSYM0yQY/Qi5T3i8d3bbtdHdTghUFHC7TVAQ52Z/kjWwiRbGFqEvWj7eGN+Bq
-         Jx3cwTEs4MYbSqB2XIDhTsahbpIlhWWRHnMcBtoi+hUW1wMNwZijMISwyTkEgH1fJgeA
-         14ML6rETbacYx1/kGjikxYEL7tgUoWHnTntvnSIBUOEJvNtwq2VsDep4GNKN0yhegmBm
-         5N6Q==
-X-Gm-Message-State: ANoB5pmVVDNPlIEAWwWdb/6GHoLRvy39wN2aCNUnrkEZrRg8uHZyEVNR
-        M6Ybk1JC9xMA4VCJf+T+3oGJBb1P/Go=
-X-Google-Smtp-Source: AA0mqf5YvMy1Q6yXMjWgOfgPXy/dfkF+xrLqtDqSxfLc6sdzuqCQOmX2xmn+Y3K4h4XUy0v1GSdjUg==
-X-Received: by 2002:a9d:5917:0:b0:66e:b4ec:593e with SMTP id t23-20020a9d5917000000b0066eb4ec593emr14792546oth.36.1671239728013;
-        Fri, 16 Dec 2022 17:15:28 -0800 (PST)
-Received: from [172.17.0.2] ([23.98.147.219])
-        by smtp.gmail.com with ESMTPSA id b4-20020a9d4784000000b0066f09567827sm1514923otf.78.2022.12.16.17.15.26
+        bh=znZe4iz81PPcAKrxN2SU6VuOeRq2wGY6TLlm90+vZ7Q=;
+        b=0tW3W0bYY+h1u/9TwaJJeAeBFgU0rDyCZAiRRVtuo1f06pnBk8TaeWJd3AOqtiPpTk
+         dfOFHOve6A3m9xTcglIqZuo0qqNEi3PHoAyfWrIH7Clqh4sKE91xB3eXCt80Fqz+2JVN
+         nlAvQRJU5IPqpjgllMzi7h4dGgHixIfEnXyGmf5ExQVPPDodLnxDnW8z9I4uFoX9G6ig
+         CCHkoy56YL80p99LDwk97ZeQBBHYKK7cKVmDltnzIrf/QObWXg962XXptTuoGxHQJOfL
+         Zm2O0XfzKazxXQ+yfgKVuJsESFEplH9PBzhV0qv5nBHrUdFFpF79IuruZB6JDmatBVO5
+         UGMQ==
+X-Gm-Message-State: ANoB5pmDGFxb2pqGWd3tz7YbrOuOWQvAYUmat3F4J63v5upkWpMErgzr
+        PBqT3C+SaAVkjm8BLHdHa/oN6O0YpWw=
+X-Google-Smtp-Source: AA0mqf6TO+0fkGlDHE2O3CPUsTMEHcXm/fNkn1+rUCHvhURxnsJYCcoCuvv0bUyY59xn5n6Mo4Fhtg==
+X-Received: by 2002:a5d:9517:0:b0:6c3:68f6:be14 with SMTP id d23-20020a5d9517000000b006c368f6be14mr18882648iom.10.1671247176993;
+        Fri, 16 Dec 2022 19:19:36 -0800 (PST)
+Received: from [172.17.0.2] ([40.86.28.128])
+        by smtp.gmail.com with ESMTPSA id l15-20020a05660227cf00b006e580444f02sm1309439ios.39.2022.12.16.19.19.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 17:15:27 -0800 (PST)
-Message-ID: <639d182f.9d0a0220.9830f.6c33@mx.google.com>
-Date:   Fri, 16 Dec 2022 17:15:27 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1325571009853941622=="
+        Fri, 16 Dec 2022 19:19:36 -0800 (PST)
+Message-ID: <639d3548.050a0220.9ee4e.20ef@mx.google.com>
+Date:   Fri, 16 Dec 2022 19:19:36 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2937349325402891532=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3] shared/gatt-client: Fix not marking service as active
-In-Reply-To: <20221216234517.3026289-1-luiz.dentz@gmail.com>
-References: <20221216234517.3026289-1-luiz.dentz@gmail.com>
+Subject: RE: [BlueZ,v4,1/2] shared/gatt-db: Add gatt_db_attribute_get_service
+In-Reply-To: <20221217011059.3087848-1-luiz.dentz@gmail.com>
+References: <20221217011059.3087848-1-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1325571009853941622==
-Content-Type: text/plain; charset="utf-8"
+--===============2937349325402891532==
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NzA1MjgyCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMC44MiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjMxIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDMwLjk0IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
-IDE0Ljk5IHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDIx
-LjQ4IHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDM1LjU3
-IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE1LjE2IHNl
-Y29uZHMKYmx1ZXptYWtlZXh0ZWxsICAgICAgICAgICAgICAgRkFJTCAgICAgIDEyLjA2IHNlY29u
-ZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgRkFJTCAgICAgIDE1LjU4IHNlY29uZHMK
-U2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDU3Mi44NiBzZWNvbmRzCgpE
-ZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1ha2UgLSBG
-QUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzog
-SW4gZnVuY3Rpb24g4oCYZGlzY292ZXJfZGVzY3PigJk6CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQu
-Yzo3MTM6OTogZXJyb3I6IOKAmGRlc3Rfc3RhcnTigJkgdW5kZWNsYXJlZCAoZmlyc3QgdXNlIGlu
-IHRoaXMgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4g4oCYZGVzY19zdGFydOKAmT8KICA3MTMgfCAg
-ICAgaWYgKGRlc3Rfc3RhcnQgPT0gZW5kKQogICAgICB8ICAgICAgICAgXn5+fn5+fn5+fgogICAg
-ICB8ICAgICAgICAgZGVzY19zdGFydApzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6NzEzOjk6IG5v
-dGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25jZSBmb3Ig
-ZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODIyMDog
-c3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtZ2F0dC1jbGllbnQubG9dIEVycm9yIDEK
-bWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtN
-YWtlZmlsZTo0NDgyOiBhbGxdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IE1ha2VDaGVjayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0
-OgoKc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOiBJbiBmdW5jdGlvbiDigJhkaXNjb3Zlcl9kZXNj
-c+KAmToKc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjcxMzo5OiBlcnJvcjog4oCYZGVzdF9zdGFy
-dOKAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVh
-biDigJhkZXNjX3N0YXJ04oCZPwogIDcxMyB8ICAgICBpZiAoZGVzdF9zdGFydCA9PSBlbmQpCiAg
-ICAgIHwgICAgICAgICBefn5+fn5+fn5+CiAgICAgIHwgICAgICAgICBkZXNjX3N0YXJ0CnNyYy9z
-aGFyZWQvZ2F0dC1jbGllbnQuYzo3MTM6OTogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZp
-ZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4K
-bWFrZVsxXTogKioqIFtNYWtlZmlsZTo4MDE3OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xh
-LWdhdHQtY2xpZW50LmxvXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTE2ODQ6IGNoZWNr
-XSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlzdGNo
-ZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKLi4vLi4v
-c3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOiBJbiBmdW5jdGlvbiDigJhkaXNjb3Zlcl9kZXNjc+KA
-mToKLi4vLi4vc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjcxMzo5OiBlcnJvcjog4oCYZGVzdF9z
-dGFydOKAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3Ug
-bWVhbiDigJhkZXNjX3N0YXJ04oCZPwogIDcxMyB8ICAgICBpZiAoZGVzdF9zdGFydCA9PSBlbmQp
-CiAgICAgIHwgICAgICAgICBefn5+fn5+fn5+CiAgICAgIHwgICAgICAgICBkZXNjX3N0YXJ0Ci4u
-Ly4uL3NyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzo3MTM6OTogbm90ZTogZWFjaCB1bmRlY2xhcmVk
-IGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFw
-cGVhcnMgaW4KbWFrZVsyXTogKioqIFtNYWtlZmlsZTo4MjIwOiBzcmMvc2hhcmVkL2xpYnNoYXJl
-ZF9tYWlubG9vcF9sYS1nYXR0LWNsaWVudC5sb10gRXJyb3IgMQptYWtlWzJdOiAqKiogV2FpdGlu
-ZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjQ0ODI6IGFs
-bF0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjExNjA1OiBkaXN0Y2hlY2tdIEVycm9yIDEK
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlM
-CkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKc3JjL3No
-YXJlZC9nYXR0LWNsaWVudC5jOiBJbiBmdW5jdGlvbiDigJhkaXNjb3Zlcl9kZXNjc+KAmToKc3Jj
-L3NoYXJlZC9nYXR0LWNsaWVudC5jOjcxMzo5OiBlcnJvcjog4oCYZGVzdF9zdGFydOKAmSB1bmRl
-Y2xhcmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhkZXNj
-X3N0YXJ04oCZPwogIDcxMyB8ICAgICBpZiAoZGVzdF9zdGFydCA9PSBlbmQpCiAgICAgIHwgICAg
-ICAgICBefn5+fn5+fn5+CiAgICAgIHwgICAgICAgICBkZXNjX3N0YXJ0CnNyYy9zaGFyZWQvZ2F0
-dC1jbGllbnQuYzo3MTM6OTogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVw
-b3J0ZWQgb25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4KbWFrZVsxXTog
-KioqIFtNYWtlZmlsZTo4MjIwOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1nYXR0
-LWNsaWVudC5sb10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBq
-b2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxlOjExNjg0OiBjaGVja10gRXJyb3IgMgojIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogYmx1ZXptYWtlZXh0ZWxsIC0gRkFJTApEZXNj
-OiBCdWlsZCBCbHVleiB3aXRoIEV4dGVybmFsIEVMTApPdXRwdXQ6CgpzcmMvc2hhcmVkL2dhdHQt
-Y2xpZW50LmM6IEluIGZ1bmN0aW9uIOKAmGRpc2NvdmVyX2Rlc2Nz4oCZOgpzcmMvc2hhcmVkL2dh
-dHQtY2xpZW50LmM6NzEzOjk6IGVycm9yOiDigJhkZXN0X3N0YXJ04oCZIHVuZGVjbGFyZWQgKGZp
-cnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKTsgZGlkIHlvdSBtZWFuIOKAmGRlc2Nfc3RhcnTigJk/
-CiAgNzEzIHwgICAgIGlmIChkZXN0X3N0YXJ0ID09IGVuZCkKICAgICAgfCAgICAgICAgIF5+fn5+
-fn5+fn4KICAgICAgfCAgICAgICAgIGRlc2Nfc3RhcnQKc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5j
-OjcxMzo5OiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBpcyByZXBvcnRlZCBvbmx5
-IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBpbgptYWtlWzFdOiAqKiogW01ha2Vm
-aWxlOjgyMjA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWdhdHQtY2xpZW50Lmxv
-XSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1h
-a2U6ICoqKiBbTWFrZWZpbGU6NDQ4MjogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gRkFJTApEZXNjOiBJbmNyZW1lbnRh
-bCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgpbQmx1ZVosdjNd
-IHNoYXJlZC9nYXR0LWNsaWVudDogRml4IG5vdCBtYXJraW5nIHNlcnZpY2UgYXMgYWN0aXZlCgpz
-cmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6IEluIGZ1bmN0aW9uIOKAmGRpc2NvdmVyX2Rlc2Nz4oCZ
-OgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6NzEzOjk6IGVycm9yOiDigJhkZXN0X3N0YXJ04oCZ
-IHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKTsgZGlkIHlvdSBtZWFuIOKA
-mGRlc2Nfc3RhcnTigJk/CiAgNzEzIHwgICAgIGlmIChkZXN0X3N0YXJ0ID09IGVuZCkKICAgICAg
-fCAgICAgICAgIF5+fn5+fn5+fn4KICAgICAgfCAgICAgICAgIGRlc2Nfc3RhcnQKc3JjL3NoYXJl
-ZC9nYXR0LWNsaWVudC5jOjcxMzo5OiBub3RlOiBlYWNoIHVuZGVjbGFyZWQgaWRlbnRpZmllciBp
-cyByZXBvcnRlZCBvbmx5IG9uY2UgZm9yIGVhY2ggZnVuY3Rpb24gaXQgYXBwZWFycyBpbgptYWtl
-WzFdOiAqKiogW01ha2VmaWxlOjgyMjA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xh
-LWdhdHQtY2xpZW50LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
-aGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDQ4MjogYWxsXSBFcnJvciAyCiMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBTY2FuQnVpbGQgLSBGQUlMCkRlc2M6IFJ1
-biBTY2FuIEJ1aWxkCk91dHB1dDoKCnNyYy9zaGFyZWQvYWQuYzozNjk6MTk6IHdhcm5pbmc6IFVz
-ZSBvZiB6ZXJvLWFsbG9jYXRlZCBtZW1vcnkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBidWZbKCpwb3MpKytdID0gYWRfdHlwZTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIF4KMSB3YXJuaW5nIGdlbmVyYXRlZC4Kc3JjL3NoYXJlZC9nYXR0LWNs
-aWVudC5jOiBJbiBmdW5jdGlvbiDigJhkaXNjb3Zlcl9kZXNjc+KAmToKc3JjL3NoYXJlZC9nYXR0
-LWNsaWVudC5jOjcxMzo5OiBlcnJvcjog4oCYZGVzdF9zdGFydOKAmSB1bmRlY2xhcmVkIChmaXJz
-dCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhkZXNjX3N0YXJ04oCZPwog
-IDcxMyB8ICAgICBpZiAoZGVzdF9zdGFydCA9PSBlbmQpCiAgICAgIHwgICAgICAgICBefn5+fn5+
-fn5+CiAgICAgIHwgICAgICAgICBkZXNjX3N0YXJ0CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzo3
-MTM6OTogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZpZXIgaXMgcmVwb3J0ZWQgb25seSBv
-bmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4KbWFrZVsxXTogKioqIFtNYWtlZmls
-ZTo4MjIwOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1nYXR0LWNsaWVudC5sb10g
-RXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtl
-OiAqKiogW01ha2VmaWxlOjQ0ODI6IGFsbF0gRXJyb3IgMgoKCi0tLQpSZWdhcmRzLApMaW51eCBC
-bHVldG9vdGgKCg==
+This is automated email and please do not reply to this email!
 
---===============1325571009853941622==--
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=705299
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.17 seconds
+GitLint                       PASS      0.52 seconds
+BuildEll                      PASS      26.63 seconds
+BluezMake                     PASS      740.12 seconds
+MakeCheck                     PASS      10.93 seconds
+MakeDistcheck                 PASS      145.54 seconds
+CheckValgrind                 PASS      237.68 seconds
+bluezmakeextell               PASS      93.02 seconds
+IncrementalBuild              PASS      1204.05 seconds
+ScanBuild                     WARNING   930.96 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/gatt-client.c:387:21: warning: Use of memory after it is freed
+        gatt_db_unregister(op->client->db, op->db_id);
+                           ^~~~~~~~~~
+src/shared/gatt-client.c:632:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, false, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:929:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1035:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1227:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1292:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1563:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1568:2: warning: Use of memory after it is freed
+        discover_all(op);
+        ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2070:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2078:8: warning: Use of memory after it is freed
+                                                        discovery_op_ref(op),
+                                                        ^~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3161:2: warning: Use of memory after it is freed
+        complete_write_long_op(req, success, 0, false);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3183:2: warning: Use of memory after it is freed
+        request_unref(req);
+        ^~~~~~~~~~~~~~~~~~
+12 warnings generated.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2937349325402891532==--
