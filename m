@@ -2,48 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C07C4708E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Dec 2022 16:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE9BC46467
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Dec 2022 16:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232385AbiLRQfN (ORCPT
+        id S232361AbiLRQfK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Dec 2022 11:35:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
+        Sun, 18 Dec 2022 11:35:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231363AbiLRQdt (ORCPT
+        with ESMTP id S232246AbiLRQdr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Dec 2022 11:33:49 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4552BB853;
-        Sun, 18 Dec 2022 08:12:43 -0800 (PST)
+        Sun, 18 Dec 2022 11:33:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A78E510C;
+        Sun, 18 Dec 2022 08:12:39 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D5B5F60C99;
-        Sun, 18 Dec 2022 16:12:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E84D3C433F0;
-        Sun, 18 Dec 2022 16:12:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6C2F4B80BA4;
+        Sun, 18 Dec 2022 16:12:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A4B8C433F0;
+        Sun, 18 Dec 2022 16:12:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671379962;
-        bh=V1iZjnY+Fu3/ryfiijjX5kukUbPZuFNdU84KcYkm+K4=;
+        s=k20201202; t=1671379957;
+        bh=zf7RAbo9htvu/+5dLGrdZRXxBzlJZ32Qyt64KwWEkBE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XFQZbEqNxfuPSDX72A5MknYA/LzfZ0EAEjAH+rDIAicGdSo4mzd5tXaKIUB24bH9Y
-         9bwgVc0g/eiB0lcBmOFkXEpDX2XD+Dr8x467VvB63aSitu/nl6WXvtp/Hw55xBcVEz
-         NAH3gToh+4YKMgHXv9iCJCWiCzCXwE5oB4pesIP+PdUJDvo22JrSE4tALH1AcpBLB0
-         j+HfQH+sH979DiO+ATzFHhRxfENplJRFnlejoSvNIHtb0enWRxfpbtGhojUJSyEehq
-         5wx00pGZH+EW7lm3s3cHQSaY6fZ9vZRBZPSG3XM0mUWkQU8kXuwSzwuDd77qlAOlmn
-         +FV2dtlmVu24g==
+        b=ThVkszKfcNItmqBSLQTiBG5rwQtwHfuLUEZRbwX/5cHK4QQGvKZlL3T6w/qcwVJnB
+         0JLPIZcqh5QW+6k5PUPqABaDb21csBh/I48t+KNbi+zUUcQ4kZdiputghqUmRBYWwj
+         axGGjACcTDyNTn6F+hOOlRcS1yN9pks4PX2Jji6Uyy2LW5wa2VoI0E95GJBza3oQv4
+         OCVqs5DQMidZ6jthQ2fD2pObhz+alPcMCzdIwkMJKwtSklKTJUTZOgBN6UST0nxRs4
+         APyGCTekxsi1FdtcZfqsOEIQtOSspSampMZwwLHX5BWc0OUPilPhCnywalWkk1mvkm
+         XNeG7C/2NzvcQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sven Peter <sven@svenpeter.dev>,
+Cc:     Marek Vasut <marex@denx.de>,
+        Linus Walleij <linus.walleij@linaro.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 73/73] Bluetooth: Add quirk to disable MWS Transport Configuration
-Date:   Sun, 18 Dec 2022 11:07:41 -0500
-Message-Id: <20221218160741.927862-73-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.0 71/73] Bluetooth: hci_bcm: Add CYW4373A0 support
+Date:   Sun, 18 Dec 2022 11:07:39 -0500
+Message-Id: <20221218160741.927862-71-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221218160741.927862-1-sashal@kernel.org>
 References: <20221218160741.927862-1-sashal@kernel.org>
@@ -55,87 +55,107 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sven Peter <sven@svenpeter.dev>
+From: Marek Vasut <marex@denx.de>
 
-[ Upstream commit ffcb0a445ec2d5753751437706aa0a7ea8351099 ]
+[ Upstream commit 02d056a3404e20245a69dcb4022a0930085fc5ec ]
 
-Broadcom 4378/4387 controllers found in Apple Silicon Macs claim to
-support getting MWS Transport Layer Configuration,
+CYW4373A0 is a Wi-Fi + Bluetooth combo device from Cypress.
+This chip is present e.g. on muRata 2AE module.
 
-< HCI Command: Read Local Supported... (0x04|0x0002) plen 0
-> HCI Event: Command Complete (0x0e) plen 68
-      Read Local Supported Commands (0x04|0x0002) ncmd 1
-        Status: Success (0x00)
-[...]
-          Get MWS Transport Layer Configuration (Octet 30 - Bit 3)]
-[...]
+This chip has additional quirk where the HCI command 0xfc45, used on
+older chips to switch UART clock from 24 MHz to 48 MHz, to support
+baudrates over 3 Mbdps, is no longer recognized by this newer chip.
+This newer chip can configure the 4 Mbdps baudrate without the need
+to issue HCI command 0xfc45, so add flag to indicate this and do not
+issue the command on this chip to avoid failure to set 4 Mbdps baud
+rate.
 
-, but then don't actually allow the required command:
+It is not clear whether there is a way to determine which chip does
+and which chip does not support the HCI command 0xfc45, other than
+trial and error.
 
-> HCI Event: Command Complete (0x0e) plen 15
-      Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
-        Status: Command Disallowed (0x0c)
-        Number of transports: 0
-        Baud rate list: 0 entries
-        00 00 00 00 00 00 00 00 00 00
-
-Signed-off-by: Sven Peter <sven@svenpeter.dev>
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Signed-off-by: Marek Vasut <marex@denx.de>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci.h      | 10 ++++++++++
- include/net/bluetooth/hci_core.h |  3 +++
- net/bluetooth/hci_sync.c         |  2 +-
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_bcm.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 78c55b69919d..dd455ce06770 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -284,6 +284,16 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_BROKEN_EXT_SCAN,
-+
-+	/*
-+	 * When this quirk is set, the HCI_OP_GET_MWS_TRANSPORT_CONFIG command is
-+	 * disabled. This is required for some Broadcom controllers which
-+	 * erroneously claim to support MWS Transport Layer Configuration.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
-+	 */
-+	HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index d7e0b75db8a6..2b6c0e1922cb 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -53,11 +53,13 @@
+  * struct bcm_device_data - device specific data
+  * @no_early_set_baudrate: Disallow set baudrate before driver setup()
+  * @drive_rts_on_open: drive RTS signal on ->open() when platform requires it
++ * @no_uart_clock_set: UART clock set command for >3Mbps mode is unavailable
+  * @max_autobaud_speed: max baudrate supported by device in autobaud mode
+  */
+ struct bcm_device_data {
+ 	bool	no_early_set_baudrate;
+ 	bool	drive_rts_on_open;
++	bool	no_uart_clock_set;
+ 	u32	max_autobaud_speed;
  };
  
- /* HCI device flags */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 29d1254f9856..6afb4771ce35 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1711,6 +1711,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- 	((dev)->le_features[3] & HCI_LE_CIS_PERIPHERAL)
- #define bis_capable(dev) ((dev)->le_features[3] & HCI_LE_ISO_BROADCASTER)
- 
-+#define mws_transport_config_capable(dev) (((dev)->commands[30] & 0x08) && \
-+	(!test_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &(dev)->quirks)))
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a5e89e1b5452..117537f3e7ad 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3940,7 +3940,7 @@ static int hci_read_local_pairing_opts_sync(struct hci_dev *hdev)
- /* Get MWS transport configuration if the HCI command is supported */
- static int hci_get_mws_transport_config_sync(struct hci_dev *hdev)
+@@ -100,6 +102,7 @@ struct bcm_device_data {
+  * @is_suspended: whether flow control is currently disabled
+  * @no_early_set_baudrate: don't set_baudrate before setup()
+  * @drive_rts_on_open: drive RTS signal on ->open() when platform requires it
++ * @no_uart_clock_set: UART clock set command for >3Mbps mode is unavailable
+  * @pcm_int_params: keep the initial PCM configuration
+  * @use_autobaud_mode: start Bluetooth device in autobaud mode
+  * @max_autobaud_speed: max baudrate supported by device in autobaud mode
+@@ -140,6 +143,7 @@ struct bcm_device {
+ #endif
+ 	bool			no_early_set_baudrate;
+ 	bool			drive_rts_on_open;
++	bool			no_uart_clock_set;
+ 	bool			use_autobaud_mode;
+ 	u8			pcm_int_params[5];
+ 	u32			max_autobaud_speed;
+@@ -172,10 +176,11 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
  {
--	if (!(hdev->commands[30] & 0x08))
-+	if (!mws_transport_config_capable(hdev))
- 		return 0;
+ 	struct hci_dev *hdev = hu->hdev;
++	struct bcm_data *bcm = hu->priv;
+ 	struct sk_buff *skb;
+ 	struct bcm_update_uart_baud_rate param;
  
- 	return __hci_cmd_sync_status(hdev, HCI_OP_GET_MWS_TRANSPORT_CONFIG,
+-	if (speed > 3000000) {
++	if (speed > 3000000 && !bcm->dev->no_uart_clock_set) {
+ 		struct bcm_write_uart_clock_setting clock;
+ 
+ 		clock.type = BCM_UART_CLOCK_48MHZ;
+@@ -1529,6 +1534,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
+ 		bcmdev->max_autobaud_speed = data->max_autobaud_speed;
+ 		bcmdev->no_early_set_baudrate = data->no_early_set_baudrate;
+ 		bcmdev->drive_rts_on_open = data->drive_rts_on_open;
++		bcmdev->no_uart_clock_set = data->no_uart_clock_set;
+ 	}
+ 
+ 	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
+@@ -1550,6 +1556,10 @@ static struct bcm_device_data bcm43438_device_data = {
+ 	.drive_rts_on_open = true,
+ };
+ 
++static struct bcm_device_data cyw4373a0_device_data = {
++	.no_uart_clock_set = true,
++};
++
+ static struct bcm_device_data cyw55572_device_data = {
+ 	.max_autobaud_speed = 921600,
+ };
+@@ -1566,6 +1576,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
+ 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
+ 	{ .compatible = "brcm,bcm4335a0" },
++	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
+ 	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
+ 	{ },
+ };
 -- 
 2.35.1
 
