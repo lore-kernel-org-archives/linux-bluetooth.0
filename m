@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F0CC4167B
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Dec 2022 16:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA40C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Dec 2022 16:35:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231840AbiLRQUy (ORCPT
+        id S232373AbiLRQfL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Dec 2022 11:20:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59598 "EHLO
+        Sun, 18 Dec 2022 11:35:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231674AbiLRQUC (ORCPT
+        with ESMTP id S232250AbiLRQdr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Dec 2022 11:20:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C260ECE0A;
-        Sun, 18 Dec 2022 08:08:07 -0800 (PST)
+        Sun, 18 Dec 2022 11:33:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50A2FD93;
+        Sun, 18 Dec 2022 08:12:41 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CAB4660DDB;
-        Sun, 18 Dec 2022 16:07:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9ED3C43392;
-        Sun, 18 Dec 2022 16:07:34 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id ECFE0B80BA4;
+        Sun, 18 Dec 2022 16:12:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BB94C433F1;
+        Sun, 18 Dec 2022 16:12:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671379656;
-        bh=r1Tr7Ex1lfuWB1lk5cCRThE2qppV0fzq6eYgqDGwVGc=;
+        s=k20201202; t=1671379959;
+        bh=MsKCMRgsRiM3cHpDyWcl/k/gwLX4zmA6DMHBQa4n8gM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RLIia0J1zkGFHNU5Y5sxRiwtLM1leREctrQp3OO1Uw3LKjV8D5P0B2104URKRigVP
-         CZze5tx9RT2yhAiyrqyJzf+U53HFni1JoRXH10LCiFVQ4r95AzvUOMX1SFq7LrBetw
-         a/WIx51Ku1LiZSjAphhU4IuC2uZnkdyKEFYPypwNLgR1o5TQJ8JcXuivYhw1RuUWaf
-         xa1syUY+7vL+AthdhJR9yvdPaZy+XcqUMDMRUjSK038NJhfsCx5WPYkG8Vv2fPtr/O
-         57iovPL5gx0rHkK/u2hdTNvT8PKgOmijCeNNkBpi0Vp6WxN+PVkT/tE/2d5yXQv6/r
-         JOO7eUuW9grWQ==
+        b=cJK6e7B+RKAxHpw/HF+BDvhzHeJFBQeo4a/CK3SpMPclHqQRC2O+sjfvM6lYMMi0R
+         VYb+/UsJlNHNpSs8XIl4kmPAKSVgAvRTyHWpwE+rSVT52W3WU78a9Ubn957gKdroOc
+         MIJEqzI0TH1xy1qYTe/xMGLGEhlqk2HW8G0tAaLPwrTahEJEuLCdi2gKCn/8KLjF7B
+         6tN/NaH88rP0wSsRzCD+sL799biMuBaWrKogIX3NR5mXPuZk9Kud0EJ7302I2ETvdR
+         JU0JYZosF1tmUybnyxhKkdHCjCag7gS45JkmmiWhfcTxaf8cLXVA0fsOvBLcgA2yrM
+         uR+lWPFTmjFiQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Sven Peter <sven@svenpeter.dev>,
@@ -41,12 +41,12 @@ Cc:     Sven Peter <sven@svenpeter.dev>,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 84/85] Bluetooth: Add quirk to disable extended scanning
-Date:   Sun, 18 Dec 2022 11:01:41 -0500
-Message-Id: <20221218160142.925394-84-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.0 72/73] Bluetooth: Add quirk to disable extended scanning
+Date:   Sun, 18 Dec 2022 11:07:40 -0500
+Message-Id: <20221218160741.927862-72-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221218160142.925394-1-sashal@kernel.org>
-References: <20221218160142.925394-1-sashal@kernel.org>
+In-Reply-To: <20221218160741.927862-1-sashal@kernel.org>
+References: <20221218160741.927862-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -95,7 +95,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 13 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 684f1cd28730..d8abeac2fc1e 100644
+index 4518c63e9d17..78c55b69919d 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
 @@ -274,6 +274,16 @@ enum {
@@ -116,10 +116,10 @@ index 684f1cd28730..d8abeac2fc1e 100644
  
  /* HCI device flags */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c54bc71254af..3cd00be0fcd2 100644
+index e7862903187d..29d1254f9856 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1689,7 +1689,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+@@ -1681,7 +1681,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
  
  /* Use ext scanning if set ext scan param and ext scan enable is supported */
  #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
