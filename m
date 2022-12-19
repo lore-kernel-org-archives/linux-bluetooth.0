@@ -2,92 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D54EAC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 21:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E574C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 21:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232302AbiLSVOA (ORCPT
+        id S232681AbiLSVhN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Dec 2022 16:14:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43288 "EHLO
+        Mon, 19 Dec 2022 16:37:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231862AbiLSVOA (ORCPT
+        with ESMTP id S231693AbiLSVhH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Dec 2022 16:14:00 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43EE5EE16
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:13:59 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id t11-20020a17090a024b00b0021932afece4so14408864pje.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:13:59 -0800 (PST)
+        Mon, 19 Dec 2022 16:37:07 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 060CF13E23
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:37:06 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id b13-20020a17090a5a0d00b0021906102d05so10146401pjd.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:37:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=c9e8y4t56x7b6AmK/lyWNMYJ7TsVo1FqadbWP2nJVRo=;
-        b=Pti0fZivwtM0PcSPZstoyibBbzolr7UwldMLKFPeC4jxfR+hc88VbMA2lCvaZ/BiQ8
-         bScpP1pDlDh0gVsLPTzA6ZJlTV5Jsd9GtZmj/hSCL5vKfEf0NL2KNoiJ3000WrttARNW
-         FYclp1RYti8d3CL5b87G1xWqJKIL3B6mWCno4+Wu8+BSnbUqaWGeTAa0NgDDRPwJT6BL
-         ZyryiiQN1rLXtNnb/3BOI+nB+n1T0tLCKPjBXUWpuEZxBh+M9C55fHMvHu4Hv/CsUELY
-         2B8l/THN+zFkf6M4X3aY0evacpIDQJHSrjspqi+KvPawFk40iQCLCzuwAEXCW12ZOCnF
-         6/WA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cr6/l6xNH/9Pi+33Q0P1XjTiBGSRTzK0/VL1DLYjTIE=;
+        b=FYQJMyu47ZcfDAdWhgH3aLHAlOIJYdAu6bMyPCeblz/lMnTjtCx5vuxcV3KLHN8WEh
+         8jgwNBzbpQcs8Wq/9lJC52V9p3IR89Ul1of2nLTnOg9LIy+F5JcsqgmBIpGl8+uJVvsE
+         azhgOXgeDhaNTwr7dLQHFC2oJxZJbxs1oMbANzsgIHxfVk/3dwHCvJ2TTUE91sby++UE
+         jSA2juWIcosK2PakDCHkKhiblQec2hJCwYGCt1kvCRwyX2VmdT7w/kZy6/sXEcOxmGzJ
+         gdTUF9DcIGbOgl6PHbaUdiHd751ROXynEBvyBpYcE4NyEhuEmpQl9b5t8/DzBJpXdJJN
+         kbnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c9e8y4t56x7b6AmK/lyWNMYJ7TsVo1FqadbWP2nJVRo=;
-        b=cG7H/U69bngRcZeUaDyIJjLKUGn0xidC5wvmqa6x+HxqeIuRK7Y3Hg5SWUJpJVW9hK
-         9BcFriqLliZECq6lQpUvTZAZOZJqCVoNarbRaGUSt2i+wWUdSonYbqW2WtaKB8QS+DLT
-         chr8nI1F2ByA/fJ1/JLHIBVjJ6A5lmxm5bioHzJtdkOZ7juJpX2jz0Xr/3h01JIV7n7G
-         IYNgSsJVI+jvOAevQiRYzL0gVG6AvU3IkZhn2ez4u2OizPAXD7e9JNUT+bittraYAasf
-         WnntSxHQZt2d7za1f+8s3wzHtLtDrMKH8LC64iz+OaoeHkTG1bKbIk0r7TtvgF3+O6uD
-         Pgdg==
-X-Gm-Message-State: ANoB5pl35htplBO0oHvHdlC+YTMyIopCJLgaD913OeIWGwwhuF9xlkr2
-        FRrF5BMnYpe4/Qjp9D1Qirhv5YFZMX6WWg==
-X-Google-Smtp-Source: AA0mqf6498NY5t0CvsjdUh5S493GcQhL/WtwVh6CD5MN0UYQg3yDDKx7aP1PC4FFVUbjb6X9oL/9VQ==
-X-Received: by 2002:a17:902:f548:b0:18e:c6b0:b2f6 with SMTP id h8-20020a170902f54800b0018ec6b0b2f6mr51118325plf.14.1671484438592;
-        Mon, 19 Dec 2022 13:13:58 -0800 (PST)
-Received: from [172.17.0.2] ([20.253.144.192])
-        by smtp.gmail.com with ESMTPSA id x1-20020a170902ec8100b001895b2c4cf6sm7623644plg.297.2022.12.19.13.13.57
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cr6/l6xNH/9Pi+33Q0P1XjTiBGSRTzK0/VL1DLYjTIE=;
+        b=A9BUbYe4fKcIqqJv7MIUiytttd0uKJKLBnAYKzKm952ZILonyC2J5EOfQwNzglvRL1
+         +52ugHpOVpVVl8NqdkAYg5lBzAClDAIIY5QqG/v2rAZqC1KDbj/IeqZ87rnCzXtAyUbM
+         oZOMyndWMx+9O7IngFlZ3vBui4R7u+ddExNLvOy/q/DSjc1MHH68YtrEtTOheeYR7++0
+         NsBFFy7/t+QH29LugdfiyWp5chb3N3hWY3WZDZaLZ3krCgSUeLgQnZVi7IgQDl2HW0vM
+         e6KUhUrj9SjAblbkcnp3kRed9osfda2ygaBxRL2dpMEvHhDGvFNTznkffRLZiV4C7D1O
+         oOTQ==
+X-Gm-Message-State: ANoB5plL5xPxldAUAX95g1R4ZL6DJ+2LRdCbMSt5cb6SwYWex4+vY/0M
+        CxceQuh77yu9kECtlHQZkUr1dJuaCqt7sg==
+X-Google-Smtp-Source: AA0mqf6crRHzTBz9W8EjrrlChKzVm32Exzr99cg2fucJlY9VbHjpYDEMK9jncqDUGPpHb9qjSn6uYQ==
+X-Received: by 2002:a17:903:2345:b0:189:ba1f:b178 with SMTP id c5-20020a170903234500b00189ba1fb178mr64139773plh.9.1671485824891;
+        Mon, 19 Dec 2022 13:37:04 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id ij24-20020a170902ab5800b00177efb56475sm7668116plb.85.2022.12.19.13.37.03
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Dec 2022 13:13:57 -0800 (PST)
-Message-ID: <63a0d415.170a0220.4f57c.cb7a@mx.google.com>
-Date:   Mon, 19 Dec 2022 13:13:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7157426389866104771=="
+        Mon, 19 Dec 2022 13:37:04 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RESEND 1/2] Bluetooth: MGMT: Fix Set PHY Configuration command
+Date:   Mon, 19 Dec 2022 13:37:01 -0800
+Message-Id: <20221219213702.3659417-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, bugzilla-daemon@kernel.org
-Subject: RE: [Bug,216817] btusb device with ID 0489:e0d0 no longer working after v6.0
-In-Reply-To: <bug-216817-62941-DWPzypSwyv@https.bugzilla.kernel.org/>
-References: <bug-216817-62941-DWPzypSwyv@https.bugzilla.kernel.org/>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7157426389866104771==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is an automated email and please do not reply to this email.
+The command shall accept any subset that is considered configurable but
+instead it was only accepting the exact match causing errors such as:
 
-Dear Submitter,
+[mgmt]# phy
+Supported phys: BR1M1SLOT BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT
+EDR2M5SLOT EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE1MTX LE1MRX LE2MTX
+LE2MRX LECODEDTX LECODEDRX
+Configurable phys: BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT EDR2M5SLOT
+EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE2MTX LE2MRX LECODEDTX LECODEDRX
+Selected phys: BR1M1SLOT BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT
+EDR2M5SLOT EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE1MTX LE1MRX
+[mgmt]# phy BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT EDR2M5SLOT
+EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE2MTX LE2MRX
+Could not set PHY Configuration with status 0x0d (Invalid Parameters)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: net/bluetooth/hci_sync.c:3572
-error: net/bluetooth/hci_sync.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Fixes: 0314f2867fa0 ("Bluetooth: Implement Set PHY Confguration command")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/mgmt.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0dd30a3beb77..dad6fd9abe95 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4022,8 +4022,8 @@ static int set_default_phy_sync(struct hci_dev *hdev, void *data)
+ 	if (!(selected_phys & MGMT_PHY_LE_RX_MASK))
+ 		cp_phy.all_phys |= 0x02;
+ 
+-	if (selected_phys & MGMT_PHY_LE_1M_TX)
+-		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
++	/* 1M PHY shall always be supported */
++	cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
+ 
+ 	if (selected_phys & MGMT_PHY_LE_2M_TX)
+ 		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
+@@ -4031,8 +4031,8 @@ static int set_default_phy_sync(struct hci_dev *hdev, void *data)
+ 	if (selected_phys & MGMT_PHY_LE_CODED_TX)
+ 		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
+ 
+-	if (selected_phys & MGMT_PHY_LE_1M_RX)
+-		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
++	/* 1M PHY shall always be supported */
++	cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
+ 
+ 	if (selected_phys & MGMT_PHY_LE_2M_RX)
+ 		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
+@@ -4051,14 +4051,13 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_cp_set_phy_configuration *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	u32 selected_phys, configurable_phys, supported_phys, unconfigure_phys;
++	u32 selected_phys, supported_phys;
+ 	u16 pkt_type = (HCI_DH1 | HCI_DM1);
+ 	bool changed = false;
+ 	int err;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+ 
+-	configurable_phys = get_configurable_phys(hdev);
+ 	supported_phys = get_supported_phys(hdev);
+ 	selected_phys = __le32_to_cpu(cp->selected_phys);
+ 
+@@ -4067,13 +4066,6 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 				       MGMT_OP_SET_PHY_CONFIGURATION,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 
+-	unconfigure_phys = supported_phys & ~configurable_phys;
+-
+-	if ((selected_phys & unconfigure_phys) != unconfigure_phys)
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_PHY_CONFIGURATION,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+ 	if (selected_phys == get_selected_phys(hdev))
+ 		return mgmt_cmd_complete(sk, hdev->id,
+ 					 MGMT_OP_SET_PHY_CONFIGURATION,
+-- 
+2.37.3
 
---===============7157426389866104771==--
