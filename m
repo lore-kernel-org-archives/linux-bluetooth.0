@@ -2,79 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1C5C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 10:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAEC0C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 11:10:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231234AbiLSKzY (ORCPT
+        id S231750AbiLSLKI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Dec 2022 05:55:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54842 "EHLO
+        Mon, 19 Dec 2022 06:10:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbiLSKzR (ORCPT
+        with ESMTP id S229957AbiLSLKG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Dec 2022 05:55:17 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3862EEE06
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 02:55:16 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E3F8EB80D6E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 10:55:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F312C433F0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 10:55:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671447313;
-        bh=NdE8b5f7uPOy46kmG1SThlhclGUJHZfzUxWen8LV/XE=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=uvq1vFz0UTMpV9xRLxKqx8erNJDLhcDeh87wUpgnAE+3FmH6c9XjSxLOzctmhQP45
-         YSYVm7444iTF/ZF5hgbtQb8iVUEp9V1U5ph8KakQDrhO9Y69EPQfJs9WeXEUFHX679
-         DaaTiWAZTWGZNMd0FbRFv+eBJ3UtGy9h6pA1dqTfYawHP9Ev8CwgYHTRxskn1XraoW
-         xtI42KORyOcBuAV2icco0ndZ4JaZC7SfpNfpdETPIA6KufcMgfAeflUf6kymHXsRo5
-         9BRFlrJvhgQREQmO3vcJzhLuRVcZ0pedFQHlOMHlnO3AGTtr6U/wRlD2D0+WK7lPU1
-         1+C0oN0SRVL/Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 6B5CEC43141; Mon, 19 Dec 2022 10:55:13 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216817] btusb device with ID 0489:e0d0 no longer working after
- v6.0
-Date:   Mon, 19 Dec 2022 10:55:13 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quantumphazor@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216817-62941-LybIjk1Xgd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216817-62941@https.bugzilla.kernel.org/>
-References: <bug-216817-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 19 Dec 2022 06:10:06 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4121510DA;
+        Mon, 19 Dec 2022 03:10:05 -0800 (PST)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1p7E1z-0004IE-OX; Mon, 19 Dec 2022 12:10:03 +0100
+Message-ID: <12c40aac-8f3b-fea2-17bb-d6a954d26597@leemhuis.info>
+Date:   Mon, 19 Dec 2022 12:10:03 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Content-Language: en-US, de-DE
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Andrew M <quantumphazor@gmail.com>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: =?UTF-8?Q?=5bregression=5d_Bug=c2=a0216817_-_btusb_device_with_ID_0?=
+ =?UTF-8?Q?489=3ae0d0_no_longer_working_after_v6=2e0?=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1671448205;e76b99f4;
+X-HE-SMSGID: 1p7E1z-0004IE-OX
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216817
+Hi, this is your Linux kernel regression tracker speaking.
 
---- Comment #3 from Andrew M (quantumphazor@gmail.com) ---
-Unfortunately it sill fails with 6.1 from Arch testing and a latest git pull
-(6.1.r13139.gf9ff5644bcc0) which both include that change.
+I noticed a regression report in bugzilla.kernel.org. As many (most?)
+kernel developer don't keep an eye on it, I decided to forward it by
+mail. Quoting from https://bugzilla.kernel.org/show_bug.cgi?id=216817 :
 
---=20
-You may reply to this email to add a comment.
+>  Andrew M 2022-12-18 04:28:43 UTC
+> 
+> The internal USB Bluetooth device in my laptop no longer works since v6.0
+> 
+> Device in question:
+> ID 0489:e0d0 Foxconn / Hon Hai
+> 
+> Works fine in 5.19.x and fails after 6.0
+> I ran a bisect that resulted in it breaking after this commit:
+> 26afbd826ee326e63a334c37fd45e82e50a615ec Bluetooth: Add initial implementation of CIS connections
+> 
+> System: Lenovo ThinkPad T14 (AMD) Gen 2
+> 
+> dmesg output:
+> 
+> [    0.978396] usb 5-4: new full-speed USB device number 2 using xhci_hcd
+> [    1.142461] usb 5-4: New USB device found, idVendor=0489, idProduct=e0d0, bcdDevice= 0.01
+> [    1.142467] usb 5-4: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+> [    4.591285] Bluetooth: Core ver 2.22
+> [    4.591304] Bluetooth: HCI device and connection manager initialized
+> [    4.591308] Bluetooth: HCI socket layer initialized
+> [    4.591309] Bluetooth: L2CAP socket layer initialized
+> [    4.591315] Bluetooth: SCO socket layer initialized
+> [    4.871972] usbcore: registered new interface driver btusb
+> [    4.883484] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+> [    4.973465] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+> [    4.973468] Bluetooth: BNEP filters: protocol multicast
+> [    4.973472] Bluetooth: BNEP socket layer initialized
+> [    4.975525] Bluetooth: hci0: unexpected cc 0x2060 length: 1 < 7
+> [    4.975537] Bluetooth: hci0: Opcode 0x2060 failed: -38
+> [    6.985714] Bluetooth: hci0: command tx timeout
+> 
+> Attached is output of lsusb -v -d 0489:e0d0
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+See the ticket for more details.
+
+BTW, let me use this mail to also add the report to the list of tracked
+regressions to ensure it's doesn't fall through the cracks:
+
+#regzbot introduced: 26afbd826ee3
+https://bugzilla.kernel.org/show_bug.cgi?id=216817
+#regzbot ignore-activity
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+
+P.S.: As the Linux kernel's regression tracker I deal with a lot of
+reports and sometimes miss something important when writing mails like
+this. If that's the case here, don't hesitate to tell me in a public
+reply, it's in everyone's interest to set the public record straight.
