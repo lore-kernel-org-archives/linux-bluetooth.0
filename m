@@ -2,99 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAEC0C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 11:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55A10C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 11:42:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231750AbiLSLKI (ORCPT
+        id S231974AbiLSLmK convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Dec 2022 06:10:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60334 "EHLO
+        Mon, 19 Dec 2022 06:42:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbiLSLKG (ORCPT
+        with ESMTP id S231197AbiLSLmJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Dec 2022 06:10:06 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4121510DA;
-        Mon, 19 Dec 2022 03:10:05 -0800 (PST)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1p7E1z-0004IE-OX; Mon, 19 Dec 2022 12:10:03 +0100
-Message-ID: <12c40aac-8f3b-fea2-17bb-d6a954d26597@leemhuis.info>
-Date:   Mon, 19 Dec 2022 12:10:03 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Content-Language: en-US, de-DE
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Andrew M <quantumphazor@gmail.com>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
+        Mon, 19 Dec 2022 06:42:09 -0500
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C661660E8;
+        Mon, 19 Dec 2022 03:42:04 -0800 (PST)
+Received: from smtpclient.apple (p4fefcc21.dip0.t-ipconnect.de [79.239.204.33])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BEF6ECECF2;
+        Mon, 19 Dec 2022 12:42:03 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
+Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
+ NXP BT chipsets
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
+Date:   Mon, 19 Dec 2022 12:42:03 +0100
+Cc:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: =?UTF-8?Q?=5bregression=5d_Bug=c2=a0216817_-_btusb_device_with_ID_0?=
- =?UTF-8?Q?489=3ae0d0_no_longer_working_after_v6=2e0?=
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1671448205;e76b99f4;
-X-HE-SMSGID: 1p7E1z-0004IE-OX
+        Paul Menzel <pmenzel@molgen.mpg.de>, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <5742801D-881A-45BC-A8A7-28D694179D8E@holtmann.org>
+References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
+ <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
+ <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker speaking.
+Hi Luiz,
 
-I noticed a regression report in bugzilla.kernel.org. As many (most?)
-kernel developer don't keep an eye on it, I decided to forward it by
-mail. Quoting from https://bugzilla.kernel.org/show_bug.cgi?id=216817 :
+>>> Add hci_nxp to the hci_uart module which adds support for the NXP BT
+>>> chips. This driver has Power Save feature that will put the NXP bluetooth
+>>> chip into sleep state, whenever there is no activity for certain duration
+>>> of time (2000ms), and will be woken up when any activity is to be
+>>> initiated.
+>>> 
+>>> The Power Save feature can be configured with the following set
+>>> of commands (optional):
+>>> hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
+>>> hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
+>>> where,
+>>> OGF = 0x3F (vendor specific command)
+>>> OCF = 0x23 (command to set Power Save state)
+>>> arg[0] = 0x02 (disable Power Save)
+>>> arg[0] = 0x03 (enable Power Save)
+>>> arg[1,2,...] = XX (don't care)
+>>> 
+>>> The sleep/wake-up source can be configured with the following set
+>>> of commands (optional):
+>>> hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
+>>> hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
+>>> where,
+>>> OGF = 0x3F (vendor specific command)
+>>> OCF = 0x53 (command to set sleep and wake-up source)
+>>> arg[0] = 0x00 (Chip to host method NONE)
+>>> arg[0] = 0x01 (Chip to host method UART DTR)
+>>> arg[0] = 0x02 (Chip to host method UART BREAK)
+>>> arg[0] = 0x03 (Chip to host method GPIO)
+>>> arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
+>>> arg[2] = 0x00 (Host to chip method UART DSR)
+>>> arg[2] = 0x01 (Host to chip method UART BREAK)
+>>> arg[3] = 0xXX (Reserved for future use)
+>>> 
+>>> By default, the hci_nxp sets power save enable, chip to host wake-up
+>>> source as GPIO and host to chip sleep and wake-up source as UART
+>>> break during driver initialization, by sending the respective
+>>> commands to the chip.
+>>> 
+>>> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+>>> ---
+>>> v2: Changed the subject/summary lines and added more details in the
+>>> description. (Paul Menzel)
+>>> v3: Made internal functions static, optimized the code, added few
+>>> comments. (Sherry Sun)
+>>> v4: Reworked entire code to send vendor commands cmd23 and cmd53 by
+>>> using __hci_cmd_sync. (Luiz Augusto von Dentz)
+>>> v5: Used hci_command_hdr and combined OGF+OCF into a single opcode.
+>>> (Luiz Augusto von Dentz)
+>>> ---
+>>> MAINTAINERS                   |   6 +
+>>> drivers/bluetooth/Kconfig     |  10 +
+>>> drivers/bluetooth/Makefile    |   1 +
+>>> drivers/bluetooth/hci_ldisc.c |   6 +
+>>> drivers/bluetooth/hci_nxp.c   | 592 ++++++++++++++++++++++++++++++++++
+>>> drivers/bluetooth/hci_nxp.h   |  94 ++++++
+>>> drivers/bluetooth/hci_uart.h  |   8 +-
+>>> 7 files changed, 716 insertions(+), 1 deletion(-)
+>>> create mode 100644 drivers/bluetooth/hci_nxp.c
+>>> create mode 100644 drivers/bluetooth/hci_nxp.h
+>> 
+>> so this is a clear NAK. Add this as serdev driver and not hook further into the
+>> mess that is the HCI line discipline.
+> 
+> I wonder if we should make it more clear somehow, perhaps include a
+> text on the likes of BT_HCIUART that is deprecated and new drivers
+> shall use BT_HCIUART_SERDEV instead.
 
->  Andrew M 2022-12-18 04:28:43 UTC
-> 
-> The internal USB Bluetooth device in my laptop no longer works since v6.0
-> 
-> Device in question:
-> ID 0489:e0d0 Foxconn / Hon Hai
-> 
-> Works fine in 5.19.x and fails after 6.0
-> I ran a bisect that resulted in it breaking after this commit:
-> 26afbd826ee326e63a334c37fd45e82e50a615ec Bluetooth: Add initial implementation of CIS connections
-> 
-> System: Lenovo ThinkPad T14 (AMD) Gen 2
-> 
-> dmesg output:
-> 
-> [    0.978396] usb 5-4: new full-speed USB device number 2 using xhci_hcd
-> [    1.142461] usb 5-4: New USB device found, idVendor=0489, idProduct=e0d0, bcdDevice= 0.01
-> [    1.142467] usb 5-4: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> [    4.591285] Bluetooth: Core ver 2.22
-> [    4.591304] Bluetooth: HCI device and connection manager initialized
-> [    4.591308] Bluetooth: HCI socket layer initialized
-> [    4.591309] Bluetooth: L2CAP socket layer initialized
-> [    4.591315] Bluetooth: SCO socket layer initialized
-> [    4.871972] usbcore: registered new interface driver btusb
-> [    4.883484] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-> [    4.973465] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-> [    4.973468] Bluetooth: BNEP filters: protocol multicast
-> [    4.973472] Bluetooth: BNEP socket layer initialized
-> [    4.975525] Bluetooth: hci0: unexpected cc 0x2060 length: 1 < 7
-> [    4.975537] Bluetooth: hci0: Opcode 0x2060 failed: -38
-> [    6.985714] Bluetooth: hci0: command tx timeout
-> 
-> Attached is output of lsusb -v -d 0489:e0d0
+not even that. They need to be separate drivers. A long time ago I posted
+the skeleton for btuart.ko and bt3wire.ko and that is where this has to go.
 
-See the ticket for more details.
+Regards
 
-BTW, let me use this mail to also add the report to the list of tracked
-regressions to ensure it's doesn't fall through the cracks:
+Marcel
 
-#regzbot introduced: 26afbd826ee3
-https://bugzilla.kernel.org/show_bug.cgi?id=216817
-#regzbot ignore-activity
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-
-P.S.: As the Linux kernel's regression tracker I deal with a lot of
-reports and sometimes miss something important when writing mails like
-this. If that's the case here, don't hesitate to tell me in a public
-reply, it's in everyone's interest to set the public record straight.
