@@ -2,83 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 336AFC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 21:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2361C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 21:06:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232574AbiLSVDU (ORCPT
+        id S232246AbiLSVGm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Dec 2022 16:03:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40432 "EHLO
+        Mon, 19 Dec 2022 16:06:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231967AbiLSVDT (ORCPT
+        with ESMTP id S230470AbiLSVGl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Dec 2022 16:03:19 -0500
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D3AA44A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:03:18 -0800 (PST)
-Received: from github.com (hubbernetes-node-ec9f30c.ash1-iad.github.net [10.56.14.70])
-        by smtp.github.com (Postfix) with ESMTPA id E18179004B3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:03:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1671483797;
-        bh=9j4p59V3VQcWY/TgDKhOiXGSPOw+NlPMhszTHmziRTc=;
-        h=Date:From:To:Subject:From;
-        b=xPJMyteLnGsAdi8eRWyxw/LuDhhbJvQXXOHxQKJKpmlAIs4ldzRMKr+AqGUiKi0b5
-         JXJmSpwqU9HW+PMvSSUoXQa/IrxDooJrIMvqT1kJdUl5DI3CeCtZLPnOjLg0/iLih3
-         z5YHGr/QCLg8nP/2dYJ/xJnbEyoy73zZOjwAnHag=
-Date:   Mon, 19 Dec 2022 13:03:17 -0800
-From:   Luiz Augusto von Dentz <noreply@github.com>
+        Mon, 19 Dec 2022 16:06:41 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DE02DF4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:06:40 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0324661156
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 21:06:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 52F09C433EF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 21:06:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671483999;
+        bh=bRpzEg/ChzUYvonZSvjCdTwZ9tQXpoHHYnKHA7NSrx8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=BBy+/nolrcuLRYIMJIq+hp1EqVSBLWqR7RoTiFUkoI5BNK+IC4xqbqNXvQYqWJB9K
+         CkeVdYFErY0/hM3XqSEChXpqdp3jYNp4aedTXfHP0gmLtvjSTi5nNaQsma3wG3D8B3
+         DkiG9r70d3kp7A0O3gDB7iK7CkYhlKIawtPJ89WubNCkOjKAdoQdkzYWFDNh0AE3SJ
+         8FBYc/AgfV2cVUcoSl1E4U0tqq6wj6pGgd+C1P7K+LuRQEz6/zoXf8Tx9xvSaBhPpE
+         cB709+5WRz9LnrfP0s0L9nQFCJOyRPA+teBaWPM/44L134XjXKScewddVV4yUllthb
+         tiKzFFAyxeeZQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3B3FAC43143; Mon, 19 Dec 2022 21:06:39 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/1270af-da203f@github.com>
-Subject: [bluez/bluez] b91d92: shared/gatt-db: Add
- gatt_db_attribute_get_service
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Subject: [Bug 216817] btusb device with ID 0489:e0d0 no longer working after
+ v6.0
+Date:   Mon, 19 Dec 2022 21:06:39 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216817-62941-XAUo2s4kss@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216817-62941@https.bugzilla.kernel.org/>
+References: <bug-216817-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b91d9213d951277896845830d0680061c7643828
-      https://github.com/bluez/bluez/commit/b91d9213d951277896845830d0680061c7643828
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-16 (Fri, 16 Dec 2022)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216817
 
-  Changed paths:
-    M src/shared/gatt-db.c
-    M src/shared/gatt-db.h
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-  Log Message:
-  -----------
-  shared/gatt-db: Add gatt_db_attribute_get_service
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
-This adds gatt_db_attribute_get_service which can be used to get the
-service which the given attribute belongs to.
+--- Comment #4 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+Looks like the command that is failing is HCI_OP_LE_READ_BUFFER_SIZE_V2:
 
+#define HCI_OP_LE_READ_BUFFER_SIZE_V2   0x2060
 
-  Commit: da203f5dbc7edaa15b55d1efcea3fda5e43cfc2e
-      https://github.com/bluez/bluez/commit/da203f5dbc7edaa15b55d1efcea3fda5e43cfc2e
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-12-16 (Fri, 16 Dec 2022)
+Looks like the controller is marking as supported but in fact it doesn't:
 
-  Changed paths:
-    M src/shared/gatt-client.c
+        /* Use Read LE Buffer Size V2 if supported */
+        if (hdev->commands[41] & 0x20)
+                return __hci_cmd_sync_status(hdev,
+                                             HCI_OP_LE_READ_BUFFER_SIZE_V2,
+                                             0, NULL, HCI_CMD_TIMEOUT);
 
-  Log Message:
-  -----------
-  shared/gatt-client: Fix not removing pending services
+So either we introduce a quirk that must be set by the driver or we fallbac=
+k to
+HCI_OP_LE_READ_BUFFER_SIZE if HCI_OP_LE_READ_BUFFER_SIZE_V2 is not supporte=
+d,
+the later perhaps save us more time detecting this broken behavior since so=
+me
+manufacturers don't seem to even care to qualify their controllers.
 
-If there are no characteristics to discover, or for some reason
-bt_gatt_discover_descriptors is skiped, or the last attribute is
-actually a included service the service should be removed from
-pending list as there will be no more attributes to be discovered.
+--=20
+You may reply to this email to add a comment.
 
-Fixes: https://github.com/bluez/bluez/issues/438
-
-
-Compare: https://github.com/bluez/bluez/compare/1270afa5aa1c...da203f5dbc7e
+You are receiving this mail because:
+You are the assignee for the bug.=
