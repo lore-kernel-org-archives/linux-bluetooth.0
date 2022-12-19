@@ -2,157 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F08C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 21:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE25C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 22:31:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232747AbiLSVvc (ORCPT
+        id S232642AbiLSWbp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Dec 2022 16:51:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57984 "EHLO
+        Mon, 19 Dec 2022 17:31:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231344AbiLSVvb (ORCPT
+        with ESMTP id S229532AbiLSWbo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Dec 2022 16:51:31 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08A36306;
-        Mon, 19 Dec 2022 13:51:29 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id j4so15844500lfk.0;
-        Mon, 19 Dec 2022 13:51:29 -0800 (PST)
+        Mon, 19 Dec 2022 17:31:44 -0500
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2368DFB0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 14:31:43 -0800 (PST)
+Received: by mail-ot1-x32b.google.com with SMTP id x25-20020a056830115900b00670932eff32so6211134otq.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 14:31:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YpyHMvBi47xap8b8pdoC+5U4ffS+1ERoafLFlXosTRE=;
-        b=YdEUetwqEwCJ1mgRm6RZF5b7XBxE4GFs+IRWlH7ep/wZJhcQpakIaGnU/JRGzFCYHh
-         au8TtIYyNd9MlBe0FTrt8ozKO71rlqLcGjE5Y1H1H2hXY7CF9SWhNm8IHNof7zo5wnzJ
-         W+xxuhMJ8bfxQPKY6J838VEMWEvrSiSmDVJYxUp62dr6grKER8sYEhAcNK2iVCiICmko
-         iT4SfsrDjntcIcF5oao2sR4gg4qiuyZYpBqg54X85+wr7oe4TvNkMW9bLle3g5YvzrDA
-         cFp1XS5dOHkh8bQHFHCznHUSlEOrctqRG0JOy/tipoX6W+j2/dBAHf8KXB7fyQQhLMWA
-         gw2Q==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/oYWJr9SrqfmHplYs7/9CbKDoWpCwxaDwLbqkL/OaTg=;
+        b=aW4qB0gs2Dv6j6dg4mbZILoe0fRk+ssBULETp5s50Re8uKexDypyRy4DHQIT/8rm7m
+         1+AUWt+qMBtLg5Yy8zuB5EZoWEyWdo1WZ8TT2mqs36MGcLW/8TV0prTM+eNeOOT+Mc7z
+         Jj/gHbDvxAKd+BK+lYp1yqCtl/Hs5oBhPJSyLtbfisNaaSidk4bgXbz34IoAn4H0Bi0I
+         YtPKeZIKy0Jvu5hGKtEYhCEppweVu2MWNc47Kf6AYBvb5r6/gEe5ODjK0kGJLa0gf2D3
+         Xo4ZBJUebyoelRVTekBG9cVay+Hb6fm0UXv3JjAJp0pbjM1pFw6dWRYMxjdGg74P4cnY
+         TJLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YpyHMvBi47xap8b8pdoC+5U4ffS+1ERoafLFlXosTRE=;
-        b=xaxOMS01ca/uF9uXTDW6h4JFQ4g/2V8L/I4JLOVvijZR76KMhKycxNK1wU4H/A7fOa
-         pk1YFv1XwNXqCLTYURAJe87kEpeoeSThf4ckqr4G3a2Nqz7jDSNTVlrYAvJJTnaJzrkx
-         imvBjPwNFWb8GAwTbjX/cgVgx/655rVIuTeNNKDUL7Wlo8U7p1uMHos2nacyqUxOmsvg
-         PP2KP1V/Pmw/sMbBkdpY4U61PG+/lFiuBFkXXekyCHffK7utZEP/atkNzmBmTRGC4HA5
-         N1cEe7CzyR3MtJwLyuKo0Tqm9YQNOkPG/YRyLc185Ko00tyWiqw4GeUxSNlZ9SXRxwaq
-         5/7w==
-X-Gm-Message-State: ANoB5plVWbkjlHP8l48tbWPziO6LxSRo9ecn3QjCtxEda8DNIhnDYW4I
-        R82W6yAEnF7mn8f3AcKpvIw6GASSQPCy17R6yk8=
-X-Google-Smtp-Source: AA0mqf5nPiDYG7LgLKyj3PFuCrFegQFpXo67fz4SzFvfJh5xZyLdWOOuEGSf5MGn4+PiPdgTJz77vBFrJts1m6ESHkk=
-X-Received: by 2002:a05:6512:3f0f:b0:4b5:1034:41b1 with SMTP id
- y15-20020a0565123f0f00b004b5103441b1mr23828971lfa.198.1671486687752; Mon, 19
- Dec 2022 13:51:27 -0800 (PST)
+        bh=/oYWJr9SrqfmHplYs7/9CbKDoWpCwxaDwLbqkL/OaTg=;
+        b=xq2kx2hrZIA9gnygRPSqGlxzQ5SqvmVcr9kZMEgYzt0t/o7p71AcomSxOi4FR01sPA
+         3YUh7PLoyBky2iuElOYkMW7tAF6bUKXBUCtlgGtQEiXKowDBQcRqjo3kHE0y4xRd9zuA
+         PQSkHr9owFg3f1f1xY8fMybn44A/AeDthicjG8qb+H4drpOrmuK1BljpCGirE8LVfHJQ
+         1YIYJLxdCvNDNfbG3paF33iA4INdZ4t7txurxru1jwSHvVH85cV6NAjERP5Sj7Wno5Es
+         +Vbb0f9RgVUiB9vLZx52DL/Q6WMPuiGoH33r350H4sRdt9lRTrR304eBVQC6rlWAcJQ7
+         kEkw==
+X-Gm-Message-State: ANoB5pl0rZmDFqavioYhffbp3Gp/Vz+qDOHvSfWqgolG9p82Zx6d7URr
+        2PrgB8fTlG+iKOV/ByDtE4Eq2dZPQtzFTA==
+X-Google-Smtp-Source: AA0mqf5EH1lGDh/H/4jnB4ACd6obh21+M+wOabIF2A6oPO/+lllc/1aUR5MVJQHUGtmW74sRa2kzWQ==
+X-Received: by 2002:a9d:70ca:0:b0:670:804b:21f with SMTP id w10-20020a9d70ca000000b00670804b021fmr18378436otj.26.1671489102825;
+        Mon, 19 Dec 2022 14:31:42 -0800 (PST)
+Received: from [172.17.0.2] ([20.165.57.34])
+        by smtp.gmail.com with ESMTPSA id 89-20020a9d0862000000b0066e820696edsm4913745oty.13.2022.12.19.14.31.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 19 Dec 2022 14:31:42 -0800 (PST)
+Message-ID: <63a0e64e.9d0a0220.ba65.1a56@mx.google.com>
+Date:   Mon, 19 Dec 2022 14:31:42 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5378276736529828407=="
 MIME-Version: 1.0
-References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
- <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org> <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
- <5742801D-881A-45BC-A8A7-28D694179D8E@holtmann.org>
-In-Reply-To: <5742801D-881A-45BC-A8A7-28D694179D8E@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 19 Dec 2022 13:51:16 -0800
-Message-ID: <CABBYNZKZ+uenPGQiLmkJLYPOW66fZ=AihimAiv_tFpA0ab5QyA@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
- NXP BT chipsets
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>, amitkumar.karwar@nxp.com,
-        rohit.fule@nxp.com, sherry.sun@nxp.com,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [RESEND,1/2] Bluetooth: MGMT: Fix Set PHY Configuration command
+In-Reply-To: <20221219213702.3659417-1-luiz.dentz@gmail.com>
+References: <20221219213702.3659417-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+--===============5378276736529828407==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 19, 2022 at 3:42 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Luiz,
->
-> >>> Add hci_nxp to the hci_uart module which adds support for the NXP BT
-> >>> chips. This driver has Power Save feature that will put the NXP bluetooth
-> >>> chip into sleep state, whenever there is no activity for certain duration
-> >>> of time (2000ms), and will be woken up when any activity is to be
-> >>> initiated.
-> >>>
-> >>> The Power Save feature can be configured with the following set
-> >>> of commands (optional):
-> >>> hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
-> >>> hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
-> >>> where,
-> >>> OGF = 0x3F (vendor specific command)
-> >>> OCF = 0x23 (command to set Power Save state)
-> >>> arg[0] = 0x02 (disable Power Save)
-> >>> arg[0] = 0x03 (enable Power Save)
-> >>> arg[1,2,...] = XX (don't care)
-> >>>
-> >>> The sleep/wake-up source can be configured with the following set
-> >>> of commands (optional):
-> >>> hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
-> >>> hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
-> >>> where,
-> >>> OGF = 0x3F (vendor specific command)
-> >>> OCF = 0x53 (command to set sleep and wake-up source)
-> >>> arg[0] = 0x00 (Chip to host method NONE)
-> >>> arg[0] = 0x01 (Chip to host method UART DTR)
-> >>> arg[0] = 0x02 (Chip to host method UART BREAK)
-> >>> arg[0] = 0x03 (Chip to host method GPIO)
-> >>> arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
-> >>> arg[2] = 0x00 (Host to chip method UART DSR)
-> >>> arg[2] = 0x01 (Host to chip method UART BREAK)
-> >>> arg[3] = 0xXX (Reserved for future use)
-> >>>
-> >>> By default, the hci_nxp sets power save enable, chip to host wake-up
-> >>> source as GPIO and host to chip sleep and wake-up source as UART
-> >>> break during driver initialization, by sending the respective
-> >>> commands to the chip.
-> >>>
-> >>> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> >>> ---
-> >>> v2: Changed the subject/summary lines and added more details in the
-> >>> description. (Paul Menzel)
-> >>> v3: Made internal functions static, optimized the code, added few
-> >>> comments. (Sherry Sun)
-> >>> v4: Reworked entire code to send vendor commands cmd23 and cmd53 by
-> >>> using __hci_cmd_sync. (Luiz Augusto von Dentz)
-> >>> v5: Used hci_command_hdr and combined OGF+OCF into a single opcode.
-> >>> (Luiz Augusto von Dentz)
-> >>> ---
-> >>> MAINTAINERS                   |   6 +
-> >>> drivers/bluetooth/Kconfig     |  10 +
-> >>> drivers/bluetooth/Makefile    |   1 +
-> >>> drivers/bluetooth/hci_ldisc.c |   6 +
-> >>> drivers/bluetooth/hci_nxp.c   | 592 ++++++++++++++++++++++++++++++++++
-> >>> drivers/bluetooth/hci_nxp.h   |  94 ++++++
-> >>> drivers/bluetooth/hci_uart.h  |   8 +-
-> >>> 7 files changed, 716 insertions(+), 1 deletion(-)
-> >>> create mode 100644 drivers/bluetooth/hci_nxp.c
-> >>> create mode 100644 drivers/bluetooth/hci_nxp.h
-> >>
-> >> so this is a clear NAK. Add this as serdev driver and not hook further into the
-> >> mess that is the HCI line discipline.
-> >
-> > I wonder if we should make it more clear somehow, perhaps include a
-> > text on the likes of BT_HCIUART that is deprecated and new drivers
-> > shall use BT_HCIUART_SERDEV instead.
->
-> not even that. They need to be separate drivers. A long time ago I posted
-> the skeleton for btuart.ko and bt3wire.ko and that is where this has to go.
+This is automated email and please do not reply to this email!
 
-Perhaps if you can resend these changes, at least I couldn't find them
-in the archives.
+Dear submitter,
 
-> Regards
->
-> Marcel
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=705741
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.88 seconds
+GitLint                       PASS      0.59 seconds
+SubjectPrefix                 PASS      0.21 seconds
+BuildKernel                   PASS      32.55 seconds
+CheckAllWarning               PASS      35.03 seconds
+CheckSparse                   PASS      40.20 seconds
+BuildKernel32                 PASS      30.04 seconds
+TestRunnerSetup               PASS      444.98 seconds
+TestRunner_l2cap-tester       PASS      16.75 seconds
+TestRunner_iso-tester         PASS      17.06 seconds
+TestRunner_bnep-tester        PASS      5.81 seconds
+TestRunner_mgmt-tester        FAIL      114.16 seconds
+TestRunner_rfcomm-tester      PASS      9.12 seconds
+TestRunner_sco-tester         PASS      8.40 seconds
+TestRunner_ioctl-tester       PASS      9.90 seconds
+TestRunner_mesh-tester        PASS      7.18 seconds
+TestRunner_smp-tester         PASS      8.36 seconds
+TestRunner_userchan-tester    PASS      5.99 seconds
+IncrementalBuild              PASS      56.30 seconds
+
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 491 (99.4%), Failed: 3, Not Run: 0
+
+Failed Test Cases
+Get PHY Success                                      Failed       0.134 seconds
+Set PHY 1m 2m coded Succcess                         Timed out    2.777 seconds
+Start Discovery LE - (Ext Scan Param)                Failed       0.141 seconds
 
 
--- 
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5378276736529828407==--
