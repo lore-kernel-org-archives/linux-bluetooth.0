@@ -2,80 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFF5C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 20:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 336AFC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Dec 2022 21:03:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbiLSUvr (ORCPT
+        id S232574AbiLSVDU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Dec 2022 15:51:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58276 "EHLO
+        Mon, 19 Dec 2022 16:03:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232742AbiLSUvQ (ORCPT
+        with ESMTP id S231967AbiLSVDT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Dec 2022 15:51:16 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F89112AC3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 12:50:17 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 15DDA61169
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 20:50:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7121EC433F0;
-        Mon, 19 Dec 2022 20:50:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671483016;
-        bh=j6FCh4ezMivVpkhc1k5ftBikW2G9UsZV5DRwmyDvJRw=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=El7jnVs4/PG1TRFmK1JidUJx6dLU9T9rTFliKx6rZz43W0kw+67q77uqlbvdMKFxz
-         4d1tjrzU8JgQWC+H01FVidZdlz4Fg9NCQfVDsIEHQuaowB0mc3ZNIW8ZpBpmHVd+qS
-         uBXOMuHDkai9Uv0yyGhQA2zptc8EL060AbKihTn/yWUyEhypf0oEyUIiefnkcZuBw0
-         JfMiV02Kp8+F0EyzUFkpFWYyIdJhmymLBvOJrUW1Pun+Y/4Ewy3IRWbe8q2Bnp/PBC
-         AoQm1DD7iYaU0WqoTdCPFaAsGvSLjIcpUA1THUN6C22T6dApPFt2JSb7dWEgNODBDt
-         XCh8fwXtBF9ww==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54579E29F4C;
-        Mon, 19 Dec 2022 20:50:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v4 1/2] shared/gatt-db: Add
+        Mon, 19 Dec 2022 16:03:19 -0500
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D3AA44A
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:03:18 -0800 (PST)
+Received: from github.com (hubbernetes-node-ec9f30c.ash1-iad.github.net [10.56.14.70])
+        by smtp.github.com (Postfix) with ESMTPA id E18179004B3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Dec 2022 13:03:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1671483797;
+        bh=9j4p59V3VQcWY/TgDKhOiXGSPOw+NlPMhszTHmziRTc=;
+        h=Date:From:To:Subject:From;
+        b=xPJMyteLnGsAdi8eRWyxw/LuDhhbJvQXXOHxQKJKpmlAIs4ldzRMKr+AqGUiKi0b5
+         JXJmSpwqU9HW+PMvSSUoXQa/IrxDooJrIMvqT1kJdUl5DI3CeCtZLPnOjLg0/iLih3
+         z5YHGr/QCLg8nP/2dYJ/xJnbEyoy73zZOjwAnHag=
+Date:   Mon, 19 Dec 2022 13:03:17 -0800
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/1270af-da203f@github.com>
+Subject: [bluez/bluez] b91d92: shared/gatt-db: Add
  gatt_db_attribute_get_service
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167148301634.14818.13991356327697319132.git-patchwork-notify@kernel.org>
-Date:   Mon, 19 Dec 2022 20:50:16 +0000
-References: <20221217011059.3087848-1-luiz.dentz@gmail.com>
-In-Reply-To: <20221217011059.3087848-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: b91d9213d951277896845830d0680061c7643828
+      https://github.com/bluez/bluez/commit/b91d9213d951277896845830d0680061c7643828
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-12-16 (Fri, 16 Dec 2022)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/gatt-db.c
+    M src/shared/gatt-db.h
 
-On Fri, 16 Dec 2022 17:10:58 -0800 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds gatt_db_attribute_get_service which can be used to get the
-> service which the given attribute belongs to.
-> ---
->  src/shared/gatt-db.c | 9 +++++++++
->  src/shared/gatt-db.h | 3 +++
->  2 files changed, 12 insertions(+)
+  Log Message:
+  -----------
+  shared/gatt-db: Add gatt_db_attribute_get_service
 
-Here is the summary with links:
-  - [BlueZ,v4,1/2] shared/gatt-db: Add gatt_db_attribute_get_service
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b91d9213d951
-  - [BlueZ,v4,2/2] shared/gatt-client: Fix not removing pending services
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=da203f5dbc7e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This adds gatt_db_attribute_get_service which can be used to get the
+service which the given attribute belongs to.
 
 
+  Commit: da203f5dbc7edaa15b55d1efcea3fda5e43cfc2e
+      https://github.com/bluez/bluez/commit/da203f5dbc7edaa15b55d1efcea3fda5e43cfc2e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-12-16 (Fri, 16 Dec 2022)
+
+  Changed paths:
+    M src/shared/gatt-client.c
+
+  Log Message:
+  -----------
+  shared/gatt-client: Fix not removing pending services
+
+If there are no characteristics to discover, or for some reason
+bt_gatt_discover_descriptors is skiped, or the last attribute is
+actually a included service the service should be removed from
+pending list as there will be no more attributes to be discovered.
+
+Fixes: https://github.com/bluez/bluez/issues/438
+
+
+Compare: https://github.com/bluez/bluez/compare/1270afa5aa1c...da203f5dbc7e
