@@ -2,125 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5722EC3DA7B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Dec 2022 19:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E6AC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Dec 2022 20:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233995AbiLTTkC (ORCPT
+        id S234156AbiLTUZH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Dec 2022 14:40:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33230 "EHLO
+        Tue, 20 Dec 2022 15:25:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbiLTTkA (ORCPT
+        with ESMTP id S234048AbiLTUZF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Dec 2022 14:40:00 -0500
-Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75C3D2187;
-        Tue, 20 Dec 2022 11:39:58 -0800 (PST)
-Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
-        id 8D0971C09F9; Tue, 20 Dec 2022 20:39:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ucw.cz; s=gen1;
-        t=1671565196;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z6Z4LV97YlfeiHNsI0GPtvBWuPiFBia9iXHj9p0V7f4=;
-        b=iSK/6k6YdYfe0pf3QIaGF0m9os72nxF3CAqc4kVpFydNcBeDZyAXwLd29ygI3aWdCD/P4E
-        hjb1tP04xpxvEqTGSku5jVwZ3Ze5vyiRMUS/PfukmleXTPDA24OIQLtf5lIYLLX2i19Nc9
-        ctnIK+xkRK2AK199jxQW3iEge/uxrTY=
-Date:   Tue, 20 Dec 2022 20:39:56 +0100
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        brcm80211-dev-list.pdl@broadcom.com,
-        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
-Message-ID: <Y6IPjC9mpnoquL8S@duo.ucw.cz>
-References: <20221220134519.3dd1318b@gandalf.local.home>
+        Tue, 20 Dec 2022 15:25:05 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C19F387
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Dec 2022 12:25:04 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D3F586159E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Dec 2022 20:25:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 35903C433D2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Dec 2022 20:25:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671567903;
+        bh=0MF/g2c2rUtLsH5yaz3wvkOaetUO2zEEC10kSFu1R+E=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=M/P2PqWgA99iGJp1qHOFumgo3HFYcCnluKokDx2pkQrxV6W2eSLikoYJHro16QKHE
+         HWc+wbooc3c4n1f2h2F5Ym80GRl1Yag1PVnpMkvrhi/mDMp7mtRLrkLS/J08NYhSIO
+         hLhDml6timyhxzo/9MDMNYjDtmrEEhpe4jEtYRrzO/JrB52Z9cThjDhlrAgslhbnzh
+         sRdseFQRYWU8B3E9sZmistIq+ySNwgSNBDNyTQJTOy6hFD5bLzf0PpGY5ReMkObOAC
+         6NVlpz+IbENPhJbvhIb5CGcqaWVh31e07nPGMmkhxfC3+OvUBbzwZGWdyecri2uVg2
+         MivOaGomSeGtA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 122DFC43143; Tue, 20 Dec 2022 20:25:03 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216817] btusb device with ID 0489:e0d0 no longer working after
+ v6.0
+Date:   Tue, 20 Dec 2022 20:25:02 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216817-62941-rPaab2TojL@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216817-62941@https.bugzilla.kernel.org/>
+References: <bug-216817-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="Q4QndSuPZQc8d5xp"
-Content-Disposition: inline
-In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216817
 
---Q4QndSuPZQc8d5xp
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+--- Comment #7 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+(In reply to Andrew M from comment #6)
+> (In reply to Luiz Von Dentz from comment #5)
+> > Can you try with the following patch
+>=20
+> Thanks for the quick response. Tried the patch and it has solved the prob=
+lem
+> for me on both 6.1.0 and git.
+> I hope it makes it into 6.1.1
 
-On Tue 2022-12-20 13:45:19, Steven Rostedt wrote:
-> [
->   Linus,
->=20
->     I ran the script against your latest master branch:
->     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
->=20
->     As the timer_shutdown*() code is now in your tree, I figured
->     we can start doing the conversions. At least add the trivial ones
->     now as Thomas suggested that this gets applied at the end of the
->     merge window, to avoid conflicts with linux-next during the
->     development cycle. I can wait to Friday to run it again, and
->     resubmit.
->=20
->     What is the best way to handle this?
-> ]
->=20
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
->=20
-> Due to several bugs caused by timers being re-armed after they are
-> shutdown and just before they are freed, a new state of timers was added
-> called "shutdown". After a timer is set to this state, then it can no
-> longer be re-armed.
->=20
-> The following script was run to find all the trivial locations where
-> del_timer() or del_timer_sync() is called in the same function that the
-> object holding the timer is freed. It also ignores any locations where the
-> timer->function is modified between the del_timer*() and the free(), as
-> that is not considered a "trivial" case.
->=20
-> This was created by using a coccinelle script and the following
-commands:
+Please test with the latest version:
 
-LED parts looks good to me.
+https://patchwork.kernel.org/project/bluetooth/patch/20221219234945.3733741=
+-1-luiz.dentz@gmail.com/
 
-Getting it in just before -rc1 would be best solution for me.
+It turns out the features are not ready if we don't change the command sequ=
+ence
+so iso_capable would always evaluate to false.
 
-Best regards,
-								Pavel
 --=20
-People of Russia, stop Putin before his war on Ukraine escalates.
+You may reply to this email to add a comment.
 
---Q4QndSuPZQc8d5xp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQRPfPO7r0eAhk010v0w5/Bqldv68gUCY6IPjAAKCRAw5/Bqldv6
-8qFnAJ4h7/YkgMmaMAi5FTo4aeUHj64lowCgv7jO/1JyimzJx+06JHTOXFlIAIk=
-=01ne
------END PGP SIGNATURE-----
-
---Q4QndSuPZQc8d5xp--
+You are receiving this mail because:
+You are the assignee for the bug.=
