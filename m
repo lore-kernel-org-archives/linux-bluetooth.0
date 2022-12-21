@@ -2,144 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB01C3DA79
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Dec 2022 17:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 204ECC10F1B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Dec 2022 18:48:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234581AbiLURml (ORCPT
+        id S234882AbiLUSsE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Dec 2022 12:42:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48258 "EHLO
+        Wed, 21 Dec 2022 13:48:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233757AbiLURmi (ORCPT
+        with ESMTP id S234296AbiLUSsC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Dec 2022 12:42:38 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B3823141;
-        Wed, 21 Dec 2022 09:42:37 -0800 (PST)
+        Wed, 21 Dec 2022 13:48:02 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA2E01E70C;
+        Wed, 21 Dec 2022 10:48:01 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id AA218618A0;
-        Wed, 21 Dec 2022 17:42:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C1ECC433D2;
-        Wed, 21 Dec 2022 17:42:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1671644556;
-        bh=OmqaTEeh+/ZOqMuJ9Z6m3oZQpDCaCjoHmQbvnj5OEYo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HObPDAmKlOF6qqsdZFHgiGA2INgr/+4eWPZLhRul1r203jOAT0SiTUeGPj2nqZZWV
-         zgd8IO6gTn3ZlDBRaIy0l5DkQSDk+zBpqshXiRZArqbVm4F8wvyH218gdhLqWLjG7N
-         ZhnW3Gg3LP2K01LoIgNWmBrDAwC0g2c2WOxpsc2Y=
-Date:   Wed, 21 Dec 2022 18:42:33 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Zijun Hu <zijuhu@codeaurora.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-serial@vger.kernel.org,
-        Sai Teja Aluvala <quic_saluvala@quicinc.com>,
-        Panicker Harish <quic_pharish@quicinc.com>,
-        Johan Hovold <johan@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] serdev: ttyport: fix use-after-free on closed TTY
-Message-ID: <Y6NFiXEG+sodmC5S@kroah.com>
-References: <20221221163249.1058459-1-krzysztof.kozlowski@linaro.org>
- <Y6M2vLV9PM3HfXZY@kroah.com>
- <e2925111-abcf-26fb-59e0-9bd4fb3f7b8e@linaro.org>
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8D247B81BA6;
+        Wed, 21 Dec 2022 18:48:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6C4C433EF;
+        Wed, 21 Dec 2022 18:47:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671648479;
+        bh=hTuIjHBHd+Tec1DAOqqIPFW5jFXlpQ7ZWnftXs2hg6Q=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=XiS53svtnGlZKUpJLWpjIb00pvlTavkGyE/yhXeS7hKFYS8V/5Xav/+mlpRGezW6h
+         BljUFnHKQWw/igsJKn42+z68Zwy3Z5sPZrjhFME/Kwqkbwjx7njFSsJY/zjJWCYIs2
+         hg7VB/Upxxl01DViL7TGCOLjNQW9ZDg1YFt1aai4iFOc2yVu8ujua8wy7VEyZXvui4
+         /1bJ/zTi5VZkqa0c9me5b9nyIRR+8AGM7a6aXGScjL7jgysNOOGh6mrX4vs3UGAGXF
+         1s0aX5L7Ze9A8zWY2oezGwBJF7QaIiwiLIJLyqjhe4qpPeepExO7oc4XqzOCONcDBc
+         /pYLvZHxEpyuQ==
+From:   Kalle Valo <kvalo@kernel.org>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
+        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        brcm80211-dev-list.pdl@broadcom.com,
+        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
+References: <20221220134519.3dd1318b@gandalf.local.home>
+Date:   Wed, 21 Dec 2022 20:47:50 +0200
+In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home> (Steven Rostedt's
+        message of "Tue, 20 Dec 2022 13:45:19 -0500")
+Message-ID: <87mt7gk2zt.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e2925111-abcf-26fb-59e0-9bd4fb3f7b8e@linaro.org>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 06:37:59PM +0100, Krzysztof Kozlowski wrote:
-> On 21/12/2022 17:39, Greg Kroah-Hartman wrote:
-> > On Wed, Dec 21, 2022 at 05:32:48PM +0100, Krzysztof Kozlowski wrote:
-> >> use-after-free is visible in serdev-ttyport, e.g. during system reboot
-> >> with Qualcomm Atheros Bluetooth.  The TTY is closed, thus "struct
-> >> tty_struct" is being released, but the hci_uart_qca driver performs
-> >> writes and flushes during system shutdown in qca_serdev_shutdown().
-> >>
-> >>   Unable to handle kernel paging request at virtual address 0072662f67726fd7
-> >>   ...
-> >>   CPU: 6 PID: 1 Comm: systemd-shutdow Tainted: G        W          6.1.0-rt5-00325-g8a5f56bcfcca #8
-> >>   Hardware name: Qualcomm Technologies, Inc. Robotics RB5 (DT)
-> >>   Call trace:
-> >>    tty_driver_flush_buffer+0x4/0x30
-> >>    serdev_device_write_flush+0x24/0x34
-> >>    qca_serdev_shutdown+0x80/0x130 [hci_uart]
-> >>    device_shutdown+0x15c/0x260
-> >>    kernel_restart+0x48/0xac
-> >>
-> >> KASAN report:
-> >>
-> >>   BUG: KASAN: use-after-free in tty_driver_flush_buffer+0x1c/0x50
-> >>   Read of size 8 at addr ffff16270c2e0018 by task systemd-shutdow/1
-> >>
-> >>   CPU: 7 PID: 1 Comm: systemd-shutdow Not tainted 6.1.0-next-20221220-00014-gb85aaf97fb01-dirty #28
-> >>   Hardware name: Qualcomm Technologies, Inc. Robotics RB5 (DT)
-> >>   Call trace:
-> >>    dump_backtrace.part.0+0xdc/0xf0
-> >>    show_stack+0x18/0x30
-> >>    dump_stack_lvl+0x68/0x84
-> >>    print_report+0x188/0x488
-> >>    kasan_report+0xa4/0xf0
-> >>    __asan_load8+0x80/0xac
-> >>    tty_driver_flush_buffer+0x1c/0x50
-> >>    ttyport_write_flush+0x34/0x44
-> >>    serdev_device_write_flush+0x48/0x60
-> >>    qca_serdev_shutdown+0x124/0x274
-> >>    device_shutdown+0x1e8/0x350
-> >>    kernel_restart+0x48/0xb0
-> >>    __do_sys_reboot+0x244/0x2d0
-> >>    __arm64_sys_reboot+0x54/0x70
-> >>    invoke_syscall+0x60/0x190
-> >>    el0_svc_common.constprop.0+0x7c/0x160
-> >>    do_el0_svc+0x44/0xf0
-> >>    el0_svc+0x2c/0x6c
-> >>    el0t_64_sync_handler+0xbc/0x140
-> >>    el0t_64_sync+0x190/0x194
-> >>
-> >> Fixes: bed35c6dfa6a ("serdev: add a tty port controller driver")
-> >> Cc: <stable@vger.kernel.org>
-> >> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> >> ---
-> >>  drivers/tty/serdev/serdev-ttyport.c | 24 ++++++++++++++++++++++++
-> >>  1 file changed, 24 insertions(+)
-> >>
-> >> diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
-> >> index d367803e2044..3d2bab91a988 100644
-> >> --- a/drivers/tty/serdev/serdev-ttyport.c
-> >> +++ b/drivers/tty/serdev/serdev-ttyport.c
-> >> @@ -91,6 +91,9 @@ static void ttyport_write_flush(struct serdev_controller *ctrl)
-> >>  	struct serport *serport = serdev_controller_get_drvdata(ctrl);
-> >>  	struct tty_struct *tty = serport->tty;
-> >>  
-> >> +	if (!test_bit(SERPORT_ACTIVE, &serport->flags))
-> >> +		return;
-> > 
-> > Shouldn't that be a more useful macro/function instead?
-> > 	serport_is_active(serport)
-> 
-> Sure, makes sense.
-> 
-> > 
-> > Anyway, what prevents this from changing _right_ after you test it and
-> > before you call the next line in this function (same for all invocations
-> > here.)
-> 
-> Eh, you're right. I got suggested by such solution in
-> ttyport_write_buf() assuming it was correct in the first place. Is
-> holding tty_lock for entire function here reasonable?
+Steven Rostedt <rostedt@goodmis.org> writes:
 
-For every function you added this check to?  I don't know, would need to
-audit them all before being able to answer that :(
+> [
+>   Linus,
+>
+>     I ran the script against your latest master branch:
+>     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
+>
+>     As the timer_shutdown*() code is now in your tree, I figured
+>     we can start doing the conversions. At least add the trivial ones
+>     now as Thomas suggested that this gets applied at the end of the
+>     merge window, to avoid conflicts with linux-next during the
+>     development cycle. I can wait to Friday to run it again, and
+>     resubmit.
+>
+>     What is the best way to handle this?
+> ]
+>
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+>
+> Due to several bugs caused by timers being re-armed after they are
+> shutdown and just before they are freed, a new state of timers was added
+> called "shutdown". After a timer is set to this state, then it can no
+> longer be re-armed.
+>
+> The following script was run to find all the trivial locations where
+> del_timer() or del_timer_sync() is called in the same function that the
+> object holding the timer is freed. It also ignores any locations where the
+> timer->function is modified between the del_timer*() and the free(), as
+> that is not considered a "trivial" case.
+>
+> This was created by using a coccinelle script and the following commands:
+>
+>  $ cat timer.cocci
+> @@
+> expression ptr, slab;
+> identifier timer, rfield;
+> @@
+> (
+> -       del_timer(&ptr->timer);
+> +       timer_shutdown(&ptr->timer);
+> |
+> -       del_timer_sync(&ptr->timer);
+> +       timer_shutdown_sync(&ptr->timer);
+> )
+>   ... when strict
+>       when != ptr->timer
+> (
+>         kfree_rcu(ptr, rfield);
+> |
+>         kmem_cache_free(slab, ptr);
+> |
+>         kfree(ptr);
+> )
+>
+>  $ spatch timer.cocci . > /tmp/t.patch
+>  $ patch -p1 < /tmp/t.patch
+>
+> Link: https://lore.kernel.org/lkml/20221123201306.823305113@linutronix.de/
+>
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-thanks,
+For wireless:
 
-greg k-h
+>  .../broadcom/brcm80211/brcmfmac/btcoex.c         |  2 +-
+>  drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.c |  2 +-
+>  drivers/net/wireless/intel/iwlwifi/mvm/sta.c     |  2 +-
+>  drivers/net/wireless/intersil/hostap/hostap_ap.c |  2 +-
+>  drivers/net/wireless/marvell/mwifiex/main.c      |  2 +-
+>  drivers/net/wireless/microchip/wilc1000/hif.c    |  6 +++---
+
+Acked-by: Kalle Valo <kvalo@kernel.org>
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
