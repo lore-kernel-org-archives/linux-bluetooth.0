@@ -2,34 +2,34 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF72FC001B2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Dec 2022 05:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF9CC4167B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Dec 2022 05:11:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234779AbiLVFKz (ORCPT
+        id S235036AbiLVFLL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Dec 2022 00:10:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59880 "EHLO
+        Thu, 22 Dec 2022 00:11:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230417AbiLVFKw (ORCPT
+        with ESMTP id S234973AbiLVFK5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Dec 2022 00:10:52 -0500
-Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12268165B2;
-        Wed, 21 Dec 2022 21:10:50 -0800 (PST)
+        Thu, 22 Dec 2022 00:10:57 -0500
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E42F178A5;
+        Wed, 21 Dec 2022 21:10:55 -0800 (PST)
 From:   Thomas =?utf-8?q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=weissschuh.net;
         s=mail; t=1671685848;
-        bh=RIY1KZguWJeqHeg13Dbz3EKLW3n5Yawly4C6fJX/LRo=;
+        bh=FtucXeOqhf/uwSmZUOmwGhFgKFDCA9qaKfFhVklXs0M=;
         h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-        b=B4KopxcGDKneLhdAvB+atbk/GeTqzo6ATdvLeucyapM3W/3YYRA4GH5o+Aa+jUqvr
-         DsyaescBu1lPdwZen5tz3kT2577Fh2cp5C3B75c5tTBQfFMdE6YSMkbudcV3v/42nf
-         0mRODCEI7Tom4lYQPSvqzdcZijSAf7VZXJ4NEWcs=
-Date:   Thu, 22 Dec 2022 05:10:47 +0000
-Subject: [PATCH 4/8] HID: Unexport struct usb_hid_driver
+        b=YHzejwL7SuWZwjrhLR4DKptcjvIT0orp+tF+YwprS6dypbmp5pN0ErmSymXZ8rHaq
+         b8qEunKXylgKdVCial+uCfm7rLoNo7q8xzz45BIpWTtgePfpw4VyOgJVJvCkOwN+9g
+         yQ/FHPfOZM2uuJfFqb6bSYCIuDa3BOIqIjvhYnd4=
+Date:   Thu, 22 Dec 2022 05:10:45 +0000
+Subject: [PATCH 2/8] HID: usbhid: Make hid_is_usb() non-inline
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Message-Id: <20221222-hid-v1-4-f4a6c35487a5@weissschuh.net>
+Message-Id: <20221222-hid-v1-2-f4a6c35487a5@weissschuh.net>
 References: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
 In-Reply-To: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
 To:     Hans de Goede <hdegoede@redhat.com>,
@@ -48,59 +48,61 @@ Cc:     linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org,
         Thomas =?utf-8?q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 X-Mailer: b4 0.11.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1671685845; l=1454;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1671685845; l=1506;
  i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=RIY1KZguWJeqHeg13Dbz3EKLW3n5Yawly4C6fJX/LRo=;
- b=Twlbh9MUsolPC82vCzevu0rgTC04hHdXtPIymvu1dlWN4lhliG2xZcHHYVBpMH7XO1SMuEjKKlp7
- hpKtj9u4C3bfXOpPLVvR2NF9tVYHgzvL6IRNjQZRixgb8yX4EhSl
+ bh=FtucXeOqhf/uwSmZUOmwGhFgKFDCA9qaKfFhVklXs0M=;
+ b=UB9Y4WcNg/MqRsY8fH/mjN2XW796kfEfNDKTuo1LtScaZE8nN1kABWW19n6EWmxAjQoUxpyFCdsW
+ iDklWEpCCfNE5urMvYanl8sjuNuTpr5lCp+bnHJVX94T5Pje9X+N
 X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-As no external users remain this implementation detail does not need to
-be exported anymore.
+By making hid_is_usb() a non-inline function the lowlevel usbhid driver
+does not have to be exported anymore.
+
+Also mark the argument as const as it is not modified.
 
 Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
- drivers/hid/usbhid/hid-core.c | 3 +--
- include/linux/hid.h           | 1 -
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ drivers/hid/usbhid/hid-core.c | 6 ++++++
+ include/linux/hid.h           | 5 +----
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/hid/usbhid/hid-core.c b/drivers/hid/usbhid/hid-core.c
-index 54b0280d0073..4143bab3380a 100644
+index be4c731aaa65..54b0280d0073 100644
 --- a/drivers/hid/usbhid/hid-core.c
 +++ b/drivers/hid/usbhid/hid-core.c
-@@ -1318,7 +1318,7 @@ static bool usbhid_may_wakeup(struct hid_device *hid)
- 	return device_may_wakeup(&dev->dev);
- }
- 
--struct hid_ll_driver usb_hid_driver = {
-+static struct hid_ll_driver usb_hid_driver = {
- 	.parse = usbhid_parse,
- 	.start = usbhid_start,
- 	.stop = usbhid_stop,
-@@ -1332,7 +1332,6 @@ struct hid_ll_driver usb_hid_driver = {
- 	.idle = usbhid_idle,
- 	.may_wakeup = usbhid_may_wakeup,
+@@ -1334,6 +1334,12 @@ struct hid_ll_driver usb_hid_driver = {
  };
--EXPORT_SYMBOL_GPL(usb_hid_driver);
+ EXPORT_SYMBOL_GPL(usb_hid_driver);
  
- bool hid_is_usb(const struct hid_device *hdev)
++bool hid_is_usb(const struct hid_device *hdev)
++{
++	return hdev->ll_driver == &usb_hid_driver;
++}
++EXPORT_SYMBOL_GPL(hid_is_usb);
++
+ static int usbhid_probe(struct usb_interface *intf, const struct usb_device_id *id)
  {
+ 	struct usb_host_interface *interface = intf->cur_altsetting;
 diff --git a/include/linux/hid.h b/include/linux/hid.h
-index 7c5fce6a189e..170cad696541 100644
+index 8677ae38599e..e8400aa78522 100644
 --- a/include/linux/hid.h
 +++ b/include/linux/hid.h
-@@ -856,7 +856,6 @@ struct hid_ll_driver {
- extern struct hid_ll_driver i2c_hid_ll_driver;
- extern struct hid_ll_driver hidp_hid_driver;
- extern struct hid_ll_driver uhid_hid_driver;
--extern struct hid_ll_driver usb_hid_driver;
+@@ -864,10 +864,7 @@ static inline bool hid_is_using_ll_driver(struct hid_device *hdev,
+ 	return hdev->ll_driver == driver;
+ }
  
- extern bool hid_is_usb(const struct hid_device *hdev);
+-static inline bool hid_is_usb(struct hid_device *hdev)
+-{
+-	return hid_is_using_ll_driver(hdev, &usb_hid_driver);
+-}
++extern bool hid_is_usb(const struct hid_device *hdev);
  
+ #define	PM_HINT_FULLON	1<<5
+ #define PM_HINT_NORMAL	1<<1
 
 -- 
 2.39.0
