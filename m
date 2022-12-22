@@ -2,183 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31FDAC001B2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Dec 2022 10:04:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18EB2C46467
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Dec 2022 15:27:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235324AbiLVKEo (ORCPT
+        id S235731AbiLVP1r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Dec 2022 05:04:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57518 "EHLO
+        Thu, 22 Dec 2022 10:27:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235334AbiLVKEd (ORCPT
+        with ESMTP id S235340AbiLVP12 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Dec 2022 05:04:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E17D26AA3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Dec 2022 02:02:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671703335;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=o6jO/LCV2IF2UxvEuH5GPFWr6SJ3JZsJjPnFQmLY128=;
-        b=J8KWvYrdRMUcYz7OnJvR3piSBL6vCgwTYe3bO3Dqtp49Sg6Y/qebYMpzuIEshDIJG8Qt3y
-        lS2qdgP1B3JZgpTOOj6uaU1Y9PF8OUSt5m6erW4AHvpyUR3x9R1GtjSpneZ2cHHuffH6kI
-        Zvnnxi2agB3WktngJWxi5AbDBdsHoCk=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-626-qv_CTOiiPq2BW-kHJmqvbA-1; Thu, 22 Dec 2022 05:02:11 -0500
-X-MC-Unique: qv_CTOiiPq2BW-kHJmqvbA-1
-Received: by mail-qk1-f197.google.com with SMTP id bk24-20020a05620a1a1800b006ffcdd05756so889763qkb.22
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Dec 2022 02:02:11 -0800 (PST)
+        Thu, 22 Dec 2022 10:27:28 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B3F2A53D;
+        Thu, 22 Dec 2022 07:27:27 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id u9so5819045ejo.0;
+        Thu, 22 Dec 2022 07:27:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nba1yEUQ4IspImoTxgBgulwRJGaLwUT3y2k3SAEhk2w=;
+        b=CaCIlnKjNyZ4IyoUl+CgZj1LqeAv9MAUxcCT859S9HP2t5qJm9Z4T8ey94mFBH8ttk
+         rRfDw3HtPeNHw+PyicPwUuEWNZKkQiijoLR4MytrrV+YDkcOxqCH9i9t9EWROX1eDlTG
+         /16W1xVzGdK/R2S8hFNqPaspaZhRiVygxVhZHBzaz5uxAVfcNYlqeEzqvGFepV1bwBcY
+         gACWjC5FWnUjp96e35P6klxU71HUaaF6DdRIGf/8S7Uir5/qtheBU+fiVk3o1j2uar9B
+         DPmWS7QT7jqvjX4YY62nbAocHeExvpWxEGASrJ5QGIBtylTjaIhuR/h7N4r3j6oPyxVb
+         cFiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o6jO/LCV2IF2UxvEuH5GPFWr6SJ3JZsJjPnFQmLY128=;
-        b=rO9RjIJREXKpL4oTKm19nmUDftOMghiAdaKm2qc638UafipcFgCDhRkVzT5x9GPhsX
-         N2QBlA3vVHAI2dQuXSEGyRgwDq8qE/40AzRN6uRoT5QjCpUtE1zT8XmE9OeN1Qrsjli9
-         tkb0BJCeOsMyACN1W5dKql6laz0KpuTn8YfK0O+eJGtMLusl6ZMemgui3UWHQV8wpJMi
-         rKMa+dmTsKCpXyHLBSuPYVhPJxO26aIFK5QYSUTKcy+em3yOcpfTcq0pOQAx/LMGCCnc
-         Ll/IdL6WWM2oyh/cqgG3BiQg6IMKu92gFRJ7mWhMpo7SPP8LntZZzuuaxrK94i7kPzC6
-         I2AQ==
-X-Gm-Message-State: AFqh2kohC9dorYSqcJKir34ZZoXTZI5J9PBYT+1FlccwO4OybWbVGNAY
-        XknmJMjJyn+2MO8n1gjjAOYTDktUGP2694tGlfilYFWhbb4JqLH/pTbs7BqGOHgEf64S9GkDONY
-        AAjWT2m3c2CXi2xmeiyNcNOFOJKPU
-X-Received: by 2002:a0c:c508:0:b0:4e5:a127:382f with SMTP id x8-20020a0cc508000000b004e5a127382fmr6466202qvi.48.1671703331034;
-        Thu, 22 Dec 2022 02:02:11 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtZnBvcAi4VqZ0nAfseRa5ZZncJObkgh59kN1yODkWBS5WICo+kLsdO+KK5pqcbrrZqdW1DHQ==
-X-Received: by 2002:a0c:c508:0:b0:4e5:a127:382f with SMTP id x8-20020a0cc508000000b004e5a127382fmr6466171qvi.48.1671703330733;
-        Thu, 22 Dec 2022 02:02:10 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-101-173.dyn.eolo.it. [146.241.101.173])
-        by smtp.gmail.com with ESMTPSA id f1-20020a05620a408100b006cfc9846594sm4269qko.93.2022.12.22.02.02.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Dec 2022 02:02:10 -0800 (PST)
-Message-ID: <8d91ab13f56e88af0f6133130808f9623b3adb2e.camel@redhat.com>
-Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Steven Rostedt <rostedt@goodmis.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        brcm80211-dev-list.pdl@broadcom.com,
-        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
-        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Date:   Thu, 22 Dec 2022 11:02:01 +0100
-In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home>
-References: <20221220134519.3dd1318b@gandalf.local.home>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nba1yEUQ4IspImoTxgBgulwRJGaLwUT3y2k3SAEhk2w=;
+        b=zsUbUOn5Bx6YFmwDnBfp5hhfSS3nIma79g/QvshFtSi5BJlISVqHhQ54DkNc0jMb8H
+         vZzcjDVsAXcOUYip8yLIvHTkmcUavj57Mxu7zBzljBIvPpVlh9iZ//bPUA5g5q3o9zrL
+         T6K46N7mLKE/LSYwT943Q6pcCryUxlIatIBqRb3/ZbQ01KuY+56RrJ3UN5D1soZtpta0
+         0ozeittyN5AwMOcsOaTkCqDwHUfYElWYoynC6Gl/TvOyZkv44mlyKewacdFmob6szI/i
+         8Bj4zVsbU7sPz+kUOvvS/SqYA+TbpfCjmxWADeOm7tX99p4DHn5Cf/o5Vxij6bsnPWkL
+         qYOQ==
+X-Gm-Message-State: AFqh2kqc6V+GAdLYJWrLNATFeDX/hSOw1H6CLriMZq2coWmpLgAncP8b
+        O/arimf3O5459TPAHn2DzBBqJhkzT6QVXqeJRl+MDOLD18w=
+X-Google-Smtp-Source: AMrXdXuKwHbEzVI/+VFZfpbd00bwED3WJ37vP8KCdY6EfPyam9i8faYgGpnmna4jNYZ3lVMwBm89LZRw3SLaZIlWnuM=
+X-Received: by 2002:a17:907:6f13:b0:7ad:e161:b026 with SMTP id
+ sy19-20020a1709076f1300b007ade161b026mr792609ejc.760.1671722846022; Thu, 22
+ Dec 2022 07:27:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
+In-Reply-To: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
+From:   David Rheinsberg <david.rheinsberg@gmail.com>
+Date:   Thu, 22 Dec 2022 16:27:14 +0100
+Message-ID: <CADyDSO7ui6cmhga-vjaxfw82gK6erDO54aYRWWqO4L6DKzNgug@mail.gmail.com>
+Subject: Re: [PATCH 0/8] HID: remove some unneeded exported symbols from hid.h
+To:     =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Cc:     Jiri Kosina <jikos@kernel.org>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 2022-12-20 at 13:45 -0500, Steven Rostedt wrote:
-> [
->   Linus,
-> 
->     I ran the script against your latest master branch:
->     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
-> 
->     As the timer_shutdown*() code is now in your tree, I figured
->     we can start doing the conversions. At least add the trivial ones
->     now as Thomas suggested that this gets applied at the end of the
->     merge window, to avoid conflicts with linux-next during the
->     development cycle. I can wait to Friday to run it again, and
->     resubmit.
-> 
->     What is the best way to handle this?
-> ]
-> 
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
-> 
-> Due to several bugs caused by timers being re-armed after they are
-> shutdown and just before they are freed, a new state of timers was added
-> called "shutdown". After a timer is set to this state, then it can no
-> longer be re-armed.
-> 
-> The following script was run to find all the trivial locations where
-> del_timer() or del_timer_sync() is called in the same function that the
-> object holding the timer is freed. It also ignores any locations where the
-> timer->function is modified between the del_timer*() and the free(), as
-> that is not considered a "trivial" case.
-> 
-> This was created by using a coccinelle script and the following commands:
-> 
->  $ cat timer.cocci
-> @@
-> expression ptr, slab;
-> identifier timer, rfield;
-> @@
-> (
-> -       del_timer(&ptr->timer);
-> +       timer_shutdown(&ptr->timer);
-> > 
-> -       del_timer_sync(&ptr->timer);
-> +       timer_shutdown_sync(&ptr->timer);
-> )
->   ... when strict
->       when != ptr->timer
-> (
->         kfree_rcu(ptr, rfield);
-> > 
->         kmem_cache_free(slab, ptr);
-> > 
->         kfree(ptr);
-> )
-> 
->  $ spatch timer.cocci . > /tmp/t.patch
->  $ patch -p1 < /tmp/t.patch
-> 
-> Link: https://lore.kernel.org/lkml/20221123201306.823305113@linutronix.de/
-> 
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+Hi
 
-For the networking bits:
+On Thu, 22 Dec 2022 at 06:10, Thomas Wei=C3=9Fschuh <linux@weissschuh.net> =
+wrote:
+> Small cleanup to get rid of exports of the lowlevel hid drivers and to ma=
+ke
+> them const.
+[...]
+> Thomas Wei=C3=9Fschuh (8):
+>       HID: letsketch: Use hid_is_usb()
+>       HID: usbhid: Make hid_is_usb() non-inline
+>       HID: Remove unused function hid_is_using_ll_driver()
+>       HID: Unexport struct usb_hid_driver
+>       HID: Unexport struct uhid_hid_driver
+>       HID: Unexport struct hidp_hid_driver
+>       HID: Unexport struct i2c_hid_ll_driver
+>       HID: Make lowlevel driver structs const
 
->  drivers/net/ethernet/intel/i40e/i40e_main.c      |  6 +++---
->  drivers/net/ethernet/marvell/sky2.c              |  2 +-
->  drivers/net/ethernet/sun/sunvnet.c               |  2 +-
->  drivers/net/usb/sierra_net.c                     |  2 +-
->  net/802/garp.c                                   |  2 +-
->  net/802/mrp.c                                    |  4 ++--
->  net/bridge/br_multicast.c                        |  8 ++++----
->  net/bridge/br_multicast_eht.c                    |  4 ++--
->  net/core/gen_estimator.c                         |  2 +-
->  net/ipv4/ipmr.c                                  |  2 +-
->  net/ipv6/ip6mr.c                                 |  2 +-
->  net/mac80211/mesh_pathtbl.c                      |  2 +-
->  net/netfilter/ipset/ip_set_list_set.c            |  2 +-
->  net/netfilter/ipvs/ip_vs_lblc.c                  |  2 +-
->  net/netfilter/ipvs/ip_vs_lblcr.c                 |  2 +-
->  net/netfilter/xt_IDLETIMER.c                     |  4 ++--
->  net/netfilter/xt_LED.c                           |  2 +-
->  net/sched/cls_flow.c                             |  2 +-
->  net/sunrpc/svc.c                                 |  2 +-
->  net/tipc/discover.c                              |  2 +-
->  net/tipc/monitor.c                               |  2 +-
+Yeah, it makes sense to avoid exposing the structs.
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: David Rheinsberg <david.rheinsberg@gmail.com>
 
+Thanks
+David
