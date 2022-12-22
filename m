@@ -2,37 +2,36 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D3DC10F1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Dec 2022 05:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC21C3DA7B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Dec 2022 05:11:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234995AbiLVFK6 (ORCPT
+        id S235028AbiLVFLF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Dec 2022 00:10:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59884 "EHLO
+        Thu, 22 Dec 2022 00:11:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230451AbiLVFKx (ORCPT
+        with ESMTP id S234942AbiLVFK4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Dec 2022 00:10:53 -0500
+        Thu, 22 Dec 2022 00:10:56 -0500
 Received: from todd.t-8ch.de (todd.t-8ch.de [IPv6:2a01:4f8:c010:41de::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12959167EA;
-        Wed, 21 Dec 2022 21:10:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F22167EA;
+        Wed, 21 Dec 2022 21:10:54 -0800 (PST)
 From:   Thomas =?utf-8?q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=weissschuh.net;
-        s=mail; t=1671685848;
-        bh=0453VDQMas3wzKqIyLohx5n71ZFMChZfy4arzHwtRes=;
-        h=From:Subject:Date:To:Cc:From;
-        b=U7HBuKeJ5i4EX7wUylFkiAHnl1f3RpDqejjXskNL6OiypyU7jAF3z2zu9pLvh5qUH
-         4SklyXuN90pOkjWuoxDYkndbqcVFRwtvDaVOVm3CrpP0yCGCM/h82sF4Xxjhrnof1N
-         nyXcaDDKSwzeO87AD6MBrcF6Y7ukrq8W4I8FpBxo=
-Subject: [PATCH 0/8] HID: remove some unneeded exported symbols from hid.h
-Date:   Thu, 22 Dec 2022 05:10:44 +0000
-Message-Id: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
+        s=mail; t=1671685851;
+        bh=KNDYF1vETUCv281B3wbscifz4EYdRKLnRT85P8QGRws=;
+        h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+        b=n5IDgDSgJ5Ft1nF8p7+fU1/gjFaYNms0ca7zuYALHWWAbIhrWhLcBASZkKCvQ0947
+         fYurq0cMzFzNMk96ev9jnrGRWWj4bd1BF26Ct/acvIpq0JAv+fYpVvGflq5o0vNbJR
+         rUlHKN6n/c2XGX6Smjaq1ugRhTBew55yFB8lHujg=
+Date:   Thu, 22 Dec 2022 05:10:49 +0000
+Subject: [PATCH 6/8] HID: Unexport struct hidp_hid_driver
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIANTmo2MC/x2MQQqAIBAAvxJ7TsiNgvpKdNBcc0EslCKQ/t7Sc
- YZhKhTKTAXmpkKmmwsfSUC3DWzBpJ0UO2HADlEjogrslJ2GQfvJG+xHkNKaQspmk7YgbbpiFHlm
- 8vz862V93w/PlUFSagAAAA==
+Message-Id: <20221222-hid-v1-6-f4a6c35487a5@weissschuh.net>
+References: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
+In-Reply-To: <20221222-hid-v1-0-f4a6c35487a5@weissschuh.net>
 To:     Hans de Goede <hdegoede@redhat.com>,
         Jiri Kosina <jikos@kernel.org>,
         Benjamin Tissoires <benjamin.tissoires@redhat.com>,
@@ -49,59 +48,59 @@ Cc:     linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org,
         Thomas =?utf-8?q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
 X-Mailer: b4 0.11.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1671685844; l=1655;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1671685845; l=1398;
  i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=0453VDQMas3wzKqIyLohx5n71ZFMChZfy4arzHwtRes=;
- b=UEW9J5h8xA21rKQnW8+3rDycmx36CZWyTIZ1aT3QhxmBfaPk55tlGKBzP0cAsc7Qokuw2YBn0eU1
- ZGj5kp4fCIjcqWWyHO+RRkz/w4oqGlVjnPMAoxSyjhhTz2M8phYc
+ bh=KNDYF1vETUCv281B3wbscifz4EYdRKLnRT85P8QGRws=;
+ b=/j3ygvhvFnOJULkdDMIiuq/c9IGI+in3/gju7WW3oMVJqQB8gWnhTYfiOIas7RwHuyv55bC8Ja/X
+ MPkr7wWnAOo8Xb1xC5QrYW+9yzNGJOVrbkxXKNcJN6fTqBptKkmK
 X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Small cleanup to get rid of exports of the lowlevel hid drivers and to make
-them const.
+As there are no external users this implementation detail does not need
+to be exported.
 
-To: Hans de Goede <hdegoede@redhat.com>
-To: Jiri Kosina <jikos@kernel.org>
-To: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-To: David Rheinsberg <david.rheinsberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>
-To: Eric Dumazet <edumazet@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-input@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-usb@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
 ---
-Thomas Weißschuh (8):
-      HID: letsketch: Use hid_is_usb()
-      HID: usbhid: Make hid_is_usb() non-inline
-      HID: Remove unused function hid_is_using_ll_driver()
-      HID: Unexport struct usb_hid_driver
-      HID: Unexport struct uhid_hid_driver
-      HID: Unexport struct hidp_hid_driver
-      HID: Unexport struct i2c_hid_ll_driver
-      HID: Make lowlevel driver structs const
+ include/linux/hid.h       | 1 -
+ net/bluetooth/hidp/core.c | 3 +--
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
- drivers/hid/hid-letsketch.c        |  2 +-
- drivers/hid/i2c-hid/i2c-hid-core.c |  3 +--
- drivers/hid/uhid.c                 |  3 +--
- drivers/hid/usbhid/hid-core.c      |  9 +++++++--
- include/linux/hid.h                | 18 ++----------------
- net/bluetooth/hidp/core.c          |  3 +--
- 6 files changed, 13 insertions(+), 25 deletions(-)
----
-base-commit: d264dd3bbbd16b56239e889023fbe49413a58eaf
-change-id: 20221222-hid-b9551f9fa236
+diff --git a/include/linux/hid.h b/include/linux/hid.h
+index 3fcc47a9d0e8..21017e1ddbdb 100644
+--- a/include/linux/hid.h
++++ b/include/linux/hid.h
+@@ -854,7 +854,6 @@ struct hid_ll_driver {
+ };
+ 
+ extern struct hid_ll_driver i2c_hid_ll_driver;
+-extern struct hid_ll_driver hidp_hid_driver;
+ 
+ extern bool hid_is_usb(const struct hid_device *hdev);
+ 
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index cc20e706c639..c4a741f6ed5c 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -739,7 +739,7 @@ static void hidp_stop(struct hid_device *hid)
+ 	hid->claimed = 0;
+ }
+ 
+-struct hid_ll_driver hidp_hid_driver = {
++static struct hid_ll_driver hidp_hid_driver = {
+ 	.parse = hidp_parse,
+ 	.start = hidp_start,
+ 	.stop = hidp_stop,
+@@ -748,7 +748,6 @@ struct hid_ll_driver hidp_hid_driver = {
+ 	.raw_request = hidp_raw_request,
+ 	.output_report = hidp_output_report,
+ };
+-EXPORT_SYMBOL_GPL(hidp_hid_driver);
+ 
+ /* This function sets up the hid device. It does not add it
+    to the HID system. That is done in hidp_add_connection(). */
 
-Best regards,
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
+2.39.0
