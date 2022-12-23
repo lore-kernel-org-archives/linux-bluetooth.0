@@ -2,145 +2,84 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5470CC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Dec 2022 12:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9799BC4708D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Dec 2022 15:41:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236145AbiLWMyR (ORCPT
+        id S236475AbiLWPld (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Dec 2022 07:54:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57706 "EHLO
+        Fri, 23 Dec 2022 10:41:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiLWMyP (ORCPT
+        with ESMTP id S236522AbiLWPlV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Dec 2022 07:54:15 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76F9A1E722
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 04:54:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671800054; x=1703336054;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=6FFnF6avXI+qREBLvmZYujuVkfY2Hw1J4UOZtoZav2o=;
-  b=e74/3em8DkOZB9sRHqDjQCIpwrRtWoWao0kjNqux9UE1xup4kcp6WDU+
-   Ni71p+kEJ7m80rs3ILOQqtVv1aNbDIpYZNkKrVSIepXHO8HegsBP+BLTg
-   a1uc5smcmu52G5qPhxAqp3eG0TrHFOTr1JoW3W+uJS8s3qCSvK6ZaA6fX
-   oAJ9p0SYEbG8Tr5hghzGcCBFZ4bGAZYugSVe/HXNhP8BT97L7F+T0F8ZO
-   /7hoIq15xFAgUehY2Y6lVbXQAtDpO6ndgaM8anKvK6LhBR3+FqihvVf0F
-   4/WgBWalSPHjKbIGVSiGlUX9FgI7Z2OuXYN+saQJER29AyIyb5/oRKAa+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10569"; a="406566081"
-X-IronPort-AV: E=Sophos;i="5.96,268,1665471600"; 
-   d="scan'208";a="406566081"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2022 04:54:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10569"; a="720636739"
-X-IronPort-AV: E=Sophos;i="5.96,268,1665471600"; 
-   d="scan'208";a="720636739"
-Received: from lkp-server01.sh.intel.com (HELO b5d47979f3ad) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 23 Dec 2022 04:54:13 -0800
-Received: from kbuild by b5d47979f3ad with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1p8hYy-000CgL-0l;
-        Fri, 23 Dec 2022 12:54:12 +0000
-Date:   Fri, 23 Dec 2022 20:53:58 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 711d2d5f3b42c3e9658371089d400758cc54f307
-Message-ID: <63a5a4e6.ftlpuqB3DCm3MfRh%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 23 Dec 2022 10:41:21 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3314A1148;
+        Fri, 23 Dec 2022 07:41:20 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A9E326158B;
+        Fri, 23 Dec 2022 15:41:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55F15C433D2;
+        Fri, 23 Dec 2022 15:41:15 +0000 (UTC)
+Date:   Fri, 23 Dec 2022 10:41:13 -0500
+From:   Steven Rostedt <rostedt@goodmis.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
+        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        brcm80211-dev-list.pdl@broadcom.com,
+        SHA-cyfmac-dev-list@infineon.com, linux-scsi@vger.kernel.org,
+        linux-staging@lists.linux.dev, linux-ext4@vger.kernel.org,
+        linux-nilfs@vger.kernel.org, bridge@lists.linux-foundation.org,
+        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+        lvs-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [PATCH] treewide: Convert del_timer*() to timer_shutdown*()
+Message-ID: <20221223104113.0bc8d37f@gandalf.local.home>
+In-Reply-To: <20221220134519.3dd1318b@gandalf.local.home>
+References: <20221220134519.3dd1318b@gandalf.local.home>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 711d2d5f3b42c3e9658371089d400758cc54f307  Bluetooth: hci_sync: Fix use HCI_OP_LE_READ_BUFFER_SIZE_V2
+On Tue, 20 Dec 2022 13:45:19 -0500
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-elapsed time: 722m
+> [
+>   Linus,
+> 
+>     I ran the script against your latest master branch:
+>     commit b6bb9676f2165d518b35ba3bea5f1fcfc0d969bf
+> 
+>     As the timer_shutdown*() code is now in your tree, I figured
+>     we can start doing the conversions. At least add the trivial ones
+>     now as Thomas suggested that this gets applied at the end of the
+>     merge window, to avoid conflicts with linux-next during the
+>     development cycle. I can wait to Friday to run it again, and
+>     resubmit.
+> 
+>     What is the best way to handle this?
+> ]
 
-configs tested: 67
-configs skipped: 2
+Note, I just did a git remote update, checked out the latest, re-ran the
+script, and this patch hasn't changed.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-powerpc                           allnoconfig
-um                           x86_64_defconfig
-um                             i386_defconfig
-arc                                 defconfig
-alpha                               defconfig
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                              defconfig
-x86_64                        randconfig-a015
-x86_64                               rhel-8.3
-i386                                defconfig
-x86_64                           allyesconfig
-i386                             allyesconfig
-ia64                             allmodconfig
-m68k                             allyesconfig
-x86_64                         rhel-8.3-kunit
-sh                               allmodconfig
-m68k                             allmodconfig
-x86_64                           rhel-8.3-bpf
-x86_64                           rhel-8.3-syz
-arc                              allyesconfig
-arm                                 defconfig
-alpha                            allyesconfig
-mips                             allyesconfig
-x86_64                           rhel-8.3-kvm
-i386                 randconfig-a004-20221219
-powerpc                          allmodconfig
-x86_64               randconfig-a003-20221219
-i386                 randconfig-a001-20221219
-x86_64               randconfig-a001-20221219
-x86_64               randconfig-a004-20221219
-i386                 randconfig-a003-20221219
-s390                                defconfig
-i386                 randconfig-a002-20221219
-x86_64               randconfig-a006-20221219
-x86_64               randconfig-a005-20221219
-x86_64                    rhel-8.3-kselftests
-i386                 randconfig-a006-20221219
-x86_64                          rhel-8.3-func
-i386                 randconfig-a005-20221219
-s390                             allmodconfig
-x86_64               randconfig-a002-20221219
-arm                              allyesconfig
-riscv                randconfig-r042-20221218
-arm64                            allyesconfig
-arc                  randconfig-r043-20221219
-arm                  randconfig-r046-20221219
-arc                  randconfig-r043-20221218
-s390                 randconfig-r044-20221218
-s390                             allyesconfig
-
-clang tested configs:
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                          rhel-8.3-rust
-arm                  randconfig-r046-20221218
-hexagon              randconfig-r041-20221218
-hexagon              randconfig-r045-20221219
-hexagon              randconfig-r041-20221219
-hexagon              randconfig-r045-20221218
-riscv                randconfig-r042-20221219
-s390                 randconfig-r044-20221219
-i386                 randconfig-a014-20221219
-i386                 randconfig-a012-20221219
-i386                 randconfig-a013-20221219
-i386                 randconfig-a015-20221219
-i386                 randconfig-a016-20221219
-i386                 randconfig-a011-20221219
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+-- Steve
