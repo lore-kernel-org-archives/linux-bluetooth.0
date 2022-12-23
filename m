@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4A9C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Dec 2022 18:42:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A949C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Dec 2022 22:33:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231415AbiLWSmW (ORCPT
+        id S230498AbiLWWdJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Dec 2022 13:42:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57122 "EHLO
+        Fri, 23 Dec 2022 17:33:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231467AbiLWSmU (ORCPT
+        with ESMTP id S230426AbiLWWdH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Dec 2022 13:42:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AE01F608
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 10:42:18 -0800 (PST)
+        Fri, 23 Dec 2022 17:33:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 747C65FD4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 14:33:06 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0779BB8210A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 18:42:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B761FC433AE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 18:42:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1444A61F84
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 22:33:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6EAA7C43398
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Dec 2022 22:33:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671820935;
-        bh=YwiVw6PeXZnaskbtiR6SnH5zDlxVPUm4J94pKP39Iek=;
+        s=k20201202; t=1671834785;
+        bh=5DJnhZZ5q0r0m5gDnxq4taIFClsXFrAZ3jXpT/uq7RU=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=rqLGpeAFbrqEKhI4uOT1v5QOgjCDFhwWme+8g7wKguHgTgUmpZVg2kSBHz3NlUCNE
-         /pjRoD1ivJU0HCiIs9D/CHvulUGBJb09cjWpRnxGvYqetWLSimGAWWIUBfJ0DW+/Gm
-         cY+5hsK6ykdaw5P7IZqYAxZjjN2zM1tj2ziUW5Q43iYmR/HHRvzPebVvMSyhRyZH57
-         wGREGT27IntrwWATZBjkTPNe/EZIGbiSxcS7Y4vWXlCX3MLyXRpFZLw3plrtB02kef
-         Mxh8JEM2ie8B7VVwHqvnThs2g8GAB5H9aYq2NgIU0Rj1kqlxGm0n5OO5Czbqo9Olhp
-         UziPxxTImWuEA==
+        b=A/rI5fk2X81YoVCCuACRi1edXGdLOMDu2Ffprsu68gA5T5M5Oz59Hx8l4EGeglZWu
+         7KjzmPw9YEWK4qrKVm3YO2+fYccWhc9BbYg5XCAGquVSh7K3Zq5u4S+GohjMKJTRJz
+         eHvThPj3cdNH6COqOnYoHARNHpWF9TiDkDPDStXDd9lMF55lpGs4JsGTTa51QEq061
+         G8t38Cjx3oi9jVG4AIcEb0oOfLaAF2QwYDC1KsIUZ1VmHEa2nlVu0WEOBJddlGvoCU
+         SZ7NHFpmOwFbwTR9dArYCuyxfPPZMwCC7kkQtTc6xZbYOOMdt7AtypOd7aMyF+rmX2
+         O/UgTEI1ExKIA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id A987AC43143; Fri, 23 Dec 2022 18:42:15 +0000 (UTC)
+        id 5F4E0C05FD2; Fri, 23 Dec 2022 22:33:05 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Fri, 23 Dec 2022 18:42:12 +0000
+Date:   Fri, 23 Dec 2022 22:33:01 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,14 +48,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: yrds96@protonmail.com
+X-Bugzilla-Who: guimarcalsilva@gmail.com
 X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-FOR6l3ngRz@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-VvgpMY362q@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,70 +69,82 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
---- Comment #264 from Yuri Santos (yrds96@protonmail.com) ---
-(In reply to Swyter from comment #263)
-> For those using Arch Linux, the patches arrived to the =C2=ABcore=C2=BB r=
-epo yesterday
-> with the linux 6.1.1.arch1-1 package. Your dongles should work out of the
-> box again:
->=20
-> https://github.com/archlinux/linux/commit/
-> 42d7731e3e7409f9444ff44e30c025958f1b14f0
-> https://github.com/archlinux/linux/commit/
-> 955aebd445e2b49622f2184b7abb82b05c060549
->=20
-> https://github.com/archlinux/linux/commits/v6.1.1-
-> arch1?after=3D56bc7b09f7640a2b6e974ccbb191693fbb25f4d9+174&branch=3Dv6.1.=
-1-arch1
->=20
-> Some other mainstream distros may be in a similar situation, let me know =
-how
-> it goes. Happy to see this going downstream fast. :)
->=20
-> [    6.711218] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9
-> rev=3D0810; LMP ver=3D9 subver=3D2312; manufacturer=3D10
-> [    6.711226] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+--- Comment #265 from guimarcalsilva@gmail.com ---
+Let me preface this by saying that this specific dongle might be already br=
+oken
+since even on Windows it works but disconnects after a while. Personally, I=
+'ve
+given up on those fake adapters and ended up buying a good one, but I'll sh=
+are
+my test results here just in case it helps someone else.
+
+
+For me, with this latest patch (On Arch with kernel 6.1.1-arch1-1) the dong=
+le
+still doesn't work.
+
+
+When I boot up with it connected, btmon gives it an empty index:
+
+
+> New Index: 00:00:00:00:00:00 (Primary,USB,hci0)
+
+
+dmesg outputs:
+
+
+> [    4.915236] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9
+> rev=3D3120; LMP ver=3D9 subver=3D22bb; manufacturer=3D10
+> [    4.915243] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
 > workarounds and force-suspending once...
-> [    7.061122] systemd[1]: Starting Bluetooth service...
-> [    7.083941] Bluetooth: hci0: HCI Delete Stored Link Key command is
+> [    5.466031] usb 1-5: new full-speed USB device number 5 using xhci_hcd
+> [    9.953845] Bluetooth: hci0: CSR: Couldn't suspend the device for our
+> Barrot 8041a02 receive-issue workaround
+> [    9.953958] Bluetooth: hci0: HCI Delete Stored Link Key command is
 > advertised, but not supported.
-> [    7.083945] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
+> [    9.953967] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
 > command is advertised, but not supported.
-> [    7.083948] Bluetooth: hci0: HCI Set Event Filter command not supporte=
+> [    9.953974] Bluetooth: hci0: HCI Set Event Filter command not supporte=
 d.
->=20
-> Check your `dmesg | grep Bluetooth` out.
+> [   12.086015] Bluetooth: hci0: Opcode 0x c03 failed: -110
 
-Can confirm. It's now working on my machine with Archlinux kernel
-6.1.1-zen1-1-zen. I was experiencing crashes when plugging my usb dongle, b=
-ut
-I'm not sure the root of the problem. But after this patch I'm not experien=
-cing
-any crashes.
 
-My `dmesg | grep Bluetooth` output:
-[19477.778324] Bluetooth: Core ver 2.22
-[19477.778352] Bluetooth: HCI device and connection manager initialized
-[19477.778355] Bluetooth: HCI socket layer initialized
-[19477.778357] Bluetooth: L2CAP socket layer initialized
-[19477.778361] Bluetooth: SCO socket layer initialized
-[19477.809618] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D6 rev=
-=3D3120;
-LMP ver=3D6 subver=3D22bb; manufacturer=3D10
-[19477.809623] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds and force-suspending once...
-[19477.809626] Bluetooth: hci0: CSR: Couldn't suspend the device for our Ba=
-rrot
-8041a02 receive-issue workaround
-[19477.809632] Bluetooth: hci0: HCI Delete Stored Link Key command is
-advertised, but not supported.
-[19477.809634] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
-command is advertised, but not supported.
-[19477.809636] Bluetooth: hci0: HCI Set Event Filter command not supported.
-[19484.411012] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[19484.411016] Bluetooth: BNEP filters: protocol multicast
-[19484.411022] Bluetooth: BNEP socket layer initialized
-[19484.412616] Bluetooth: MGMT ver 1.22
+Curiously, if I disconnect it and reconnect it quickly, btmon does give it a
+valid index:
+
+
+> =3D New Index: 00:1A:7D:DA:71:10 (Primary,USB,hci0)
+
+
+And Dmesg outputs the following (notice the two last messages are different=
+):
+
+
+> [   79.189612] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9
+> rev=3D3120; LMP ver=3D9 subver=3D22bb; manufacturer=3D10
+> [   79.189644] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+> workarounds and force-suspending once...
+> [   79.189654] Bluetooth: hci0: CSR: Couldn't suspend the device for our
+> Barrot 8041a02 receive-issue workaround
+> [   79.190111] Bluetooth: hci0: HCI Delete Stored Link Key command is
+> advertised, but not supported.
+> [   79.190124] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
+> command is advertised, but not supported.
+> [   79.190131] Bluetooth: hci0: HCI Set Event Filter command not supporte=
+d.
+> [   79.231713] Bluetooth: hci0: unexpected cc 0x0c25 length: 2 < 3
+> [   79.231781] Bluetooth: hci0: Opcode 0x c25 failed: -38
+
+
+This only happens if I connect it quickly after disconnecting, it I take a =
+few
+more seconds, btmon still gives it an empty Index.
+
+Either way, the dongle doesn't work at all and doesn't even show up in Plas=
+ma,
+even with a non-zero Index.
+
+I hope this can be useful.
 
 --=20
 You may reply to this email to add a comment.
