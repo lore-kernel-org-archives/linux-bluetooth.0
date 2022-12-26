@@ -2,59 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E05E2C4167B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Dec 2022 00:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6A99C4167B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Dec 2022 00:55:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230058AbiLZAsJ (ORCPT
+        id S229975AbiLZAzh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 25 Dec 2022 19:48:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
+        Sun, 25 Dec 2022 19:55:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230048AbiLZAsI (ORCPT
+        with ESMTP id S229804AbiLZAzf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 25 Dec 2022 19:48:08 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48D5A2DEC
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Dec 2022 16:48:07 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id 19so2609221plo.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Dec 2022 16:48:07 -0800 (PST)
+        Sun, 25 Dec 2022 19:55:35 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40461E7F
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Dec 2022 16:55:35 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id u4-20020a17090a518400b00223f7eba2c4so9508360pjh.5
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Dec 2022 16:55:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Lj8DB/E+MHVa2rvROd3IiNY7hG0tWW3VWvMIGA+blE=;
-        b=loV0JfQtwwKGiVY8FLwQpZrV/pmUDSjkof8fzg6VsmoiJYfO4A8tMTZs4GIB/GCWVB
-         aud3qUbhlVskV5+yCnYVy0o/IXDgiTzKu3pUoQsqaxPjT7Q8tzZ6mUM1hyNSutrpm5xB
-         DYMyGte2+LTm/ZzO9hvfXAx7ctOewO4SAmRjqpTa86r2dJMTU3aazJ9oMWZ/LXUhNQXE
-         1eZiNgB3O+X9SCnyF/wT22V9lJTw0yZjt2bW12j2BwZEbDCRmEsuThTTrUHjwqU/hvnI
-         LGC5nvjn1CN/6XEp+RLQjoyGfYmz2bBE2yZzYvC+PzChLLfAwMMmbDnOmBdLCC0oV2rC
-         1r8g==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n2VkbX3Z25q2qP5aLvxzErczZPWPbnw0jFBKn11DChg=;
+        b=lGS9R0CCRslMR8ApgJeNEkPyJKGgsivIks1y6kXQiHVaTub4UUuDRU4F1n7C0gHvhV
+         t+UB5kokkKVW9Mk/AEI4ahk8v/bxP90AHemtgzjGEnv/atEL59GZ2B9zt/dH0tTqZLHE
+         YfCuUoqSE2BIoBMEJj6jOZmqEcqWRZtOP/ukfbhMRm0amXEpG/qPnBPV0cD+mfoFbhC6
+         VRqbKmq4S/CdO1eyVpC1dFxJXDz4hUdo+2pQlvlpJHTyDp/LuJ6qMFG1PWpCK77k9wUB
+         rW7aPdwMsWVD4NRTRGi2VXh1k6OSobddSmZwROH5X/9Cg+NsomoY6gR90CKtc5WAzND5
+         PCGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Lj8DB/E+MHVa2rvROd3IiNY7hG0tWW3VWvMIGA+blE=;
-        b=3NmxMORFx53Er9FuzGf0WHcQ6COwWDdlBq318gUzAIRZsAmBM/NjLYInyRCxZhd1Ao
-         plNzXl+dTpnmudEH9duxeDIpuI1MmEpX9UlnlmJrLeS63/6nthNa0T6xuC+mWh1AmHot
-         +MiFE/58kVE53aN7pnR5kpK8Gjs757CfuOq3ieFoPf+fksXmmxlt3W1dzO2+W2gch5/a
-         6/aquJGaYkLIdAJUOVZ8GFoZ3BT/0Pu7ZESa4n1h83y63eoceHgaoLUzCK9DDNN8Nh/C
-         S1flfIgzTSI1taEMbD6amm6ml+DCL4WETK68F94GbxZk4pWe111BQ7UrJg9a7XSq68gg
-         6NxQ==
-X-Gm-Message-State: AFqh2koy3xKsk96Vfr7lGJP/g2kqNYDjNw9zxoGd7DNTT1mDhtyA5zW3
-        XPAWY57pazlOl+3vh5xjUOTNvtXRsNoHlQ==
-X-Google-Smtp-Source: AMrXdXsZe5bLD3iSJYNzwxkTzjhdqrY5L+oc/ul0SS6aVbWyyaFWmJbA5/xLJNn9CY5yJc4w4uRZBQ==
-X-Received: by 2002:a05:6a20:c1a9:b0:a3:9598:e5c5 with SMTP id bg41-20020a056a20c1a900b000a39598e5c5mr40400009pzb.35.1672015686582;
-        Sun, 25 Dec 2022 16:48:06 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n2VkbX3Z25q2qP5aLvxzErczZPWPbnw0jFBKn11DChg=;
+        b=MuXEM0KRQ5NE6ZoHLTfcyouMBmxygpnT+Va5atxzbn8HQ/73dr8jwUvYrwZGAFJC12
+         L6/XlvmJdzddugCmmNR+ZBImTH+0mFo1Io+RHyBVkMv+zSd2G9+hL8vxKg2n5Ov5CpcR
+         E+pikiaRd0hMpR74DaxLh9+gnUu5cCJWZwUPX+6y/WFjLyKM3WtOtVDzv1g5xcEoULLe
+         f0JfjRVIF+iQCvKzXdmmjXUPbj0BsmfrrLUdn4anFIk3Ycy9alIdN2FFN1ZfJ32PoEcp
+         mORvMyRSwMDG3lhkUZnTFLOLSv60+QLj70KxogPCz9QuyQX/39k0v9noivdMvH/y5JHE
+         5BRw==
+X-Gm-Message-State: AFqh2konkXt28doKURbPFDdbyHtDLo5+XvFmFndaDLZ391MfYw2AbbUc
+        3gV5q8Pal+9BLXTFBoYy290IUyVBaxealQ==
+X-Google-Smtp-Source: AMrXdXuRDmzPcogPLIqSxiezvT4+CeDMNw84CxJHawWVnmpSDrrFvL8fUrZnwW3scCQCueGJ/qJHFA==
+X-Received: by 2002:a17:903:2603:b0:192:6854:3ecf with SMTP id jd3-20020a170903260300b0019268543ecfmr7330072plb.31.1672016134500;
+        Sun, 25 Dec 2022 16:55:34 -0800 (PST)
 Received: from fedora.hsd1.or.comcast.net ([2601:1c0:5e81:6f50::f30b])
-        by smtp.gmail.com with ESMTPSA id a8-20020a17090a688800b002135e8074b1sm7751926pjd.55.2022.12.25.16.48.05
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id x10-20020a17090300ca00b00189e1522982sm5842122plc.168.2022.12.25.16.55.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Dec 2022 16:48:06 -0800 (PST)
+        Sun, 25 Dec 2022 16:55:34 -0800 (PST)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [DNM BlueZ PATCH] doc: test patch - DO NOT MERGE
-Date:   Sun, 25 Dec 2022 16:48:04 -0800
-Message-Id: <20221226004804.107211-1-hj.tedd.an@gmail.com>
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [DNM PATCH v5] Bluetooth: doc: test patch - DO NOT MERGE
+Date:   Sun, 25 Dec 2022 16:55:32 -0800
+Message-Id: <20221226005532.119835-1-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,24 +65,26 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This is the test patch and do not merge.
+This is the test patch. DO NOT MERGE.
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
  README | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/README b/README
-index 7de7045a8..a03cd4d73 100644
+index 669ac7c32292..f6fd6fc4d1bf 100644
 --- a/README
 +++ b/README
 @@ -1,6 +1,8 @@
- BlueZ - Bluetooth protocol stack for Linux
- ******************************************
+ Linux kernel
+ ============
  
-+INSERT NEW LNIE FOR TESTING. DO NOT MERGE
++THIS IS THE TEST PATCH. DO NOT MERGE.
 +
- Copyright (C) 2000-2001  Qualcomm Incorporated
- Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
- Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+ There are several guides for kernel developers and users. These guides can
+ be rendered in a number of formats, like HTML and PDF. Please read
+ Documentation/admin-guide/README.rst first.
 -- 
 2.38.1
 
