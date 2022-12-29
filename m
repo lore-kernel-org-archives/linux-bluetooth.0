@@ -2,155 +2,147 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DE1C3DA7D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Dec 2022 10:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1280BC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Dec 2022 10:58:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbiL2K26 (ORCPT
+        id S233287AbiL2K6O (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Dec 2022 05:28:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55324 "EHLO
+        Thu, 29 Dec 2022 05:58:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbiL2K2j (ORCPT
+        with ESMTP id S233212AbiL2K6J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Dec 2022 05:28:39 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D8A383
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Dec 2022 02:28:37 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id n1so19009761ljg.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Dec 2022 02:28:37 -0800 (PST)
+        Thu, 29 Dec 2022 05:58:09 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0575CDF04
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Dec 2022 02:58:08 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id 3so9551405iou.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Dec 2022 02:58:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tTij5lXnahNVnZelM9IFWy8LRMTXDX20UWVAv2jM92s=;
-        b=aOyIJd5P9eX5swjwULosY3OgLA4/BTPCObCz76Xo9ft+wLJ1VspYKdA7s/qvxMF0ne
-         CYVjdU8JSUsK5dsJVZJaeiLE7JHITgQY4Os9x4Lz7RLp272ZFJmoYQ/r5RHdxupKHWji
-         TslHvBAMc1AaiQeTstPpiEbZOCHJaTj0VgNHNsnT2Kd9cq2RxxLBND7y12Okxswhoa3Z
-         GO6lR3xLwlVWSzW/g5Y33cSRMXtlsR6h4jEyp7b0jSeFqj4a75CZrgDgdvrhnM8um7/f
-         /VlSTeInKC+J1X0yJCNDnKOEG0tnvbfDb+A2xkf6SHRL8fbYW4vkJ7AsloYtGlGEvS5z
-         biXA==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dkl+S0qQTp84V8nQ2X7X+u7jEjKnedbD8/wecF0R+V0=;
+        b=Uz1n5drGcckwxvIxC9CtOx+jRKbXu+oteXYZTIFAlSP25eOz2svUyWMJc6KFPQhruI
+         L8F9eyAYIxW0Je1adjS+8lV+KvThxDAMrTzeI0/2H8OZxVCyA+Sqp4KL1YnR0OeIF4+K
+         dDifwjSQOzrUCqs5JUyLprY0mOUfAneelVBrdWSsB6TH4oJBtWuz4pTF7m74LJeFEuE4
+         Jimik6NhkkUZLhJb2VuGr292RY3p29LdqWcqSfPzENke8sHxdunWro5zW0zEleqsXTdv
+         Pmx7CWxVNo8IjEEETcBwGzHkTAd88jFZrPEDci6gjnT/0uphdXtGe960LKb1MZBtIXt4
+         5U0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tTij5lXnahNVnZelM9IFWy8LRMTXDX20UWVAv2jM92s=;
-        b=bbawOHPRBj9mvtRtEp79BjQG1F09oQWIMSR54yOyLLzYeq3Ata7RklkADmKy8fM9Jj
-         Da9cUK8ljoNRKF/qhszrLx95/BoX6O1oSlYuX5q8QlGE4P63++LUi9XD4mMeMPnQJ/tc
-         AdWES/xCHJHGp0qhEZMyLvDp7kyhWtFKUwKBWV2zYxDYe6aBREZvEbNnZc1MKCBovwFe
-         UD83AA0Tu7DkPk+7qml6Ml5rQSR3lQ8TXGUDsKWMRaExV/1qRIhD12awJQmwHBE3jKLI
-         42+TpcnmZ2Cv0TxehCR+BNA932ThqNr+ElsggSLpRnBdx+t2Rh5AyUb/pACNcXcVRz7q
-         nvmA==
-X-Gm-Message-State: AFqh2kqdw0VRpZvAQpTob//2XWvnwb2jprZ2i2wc5Eo+8A6TJKYQDtyJ
-        fMYDzeLzXulf16UCNPcEL4BKWw==
-X-Google-Smtp-Source: AMrXdXtuqSCzj5t/76hqWuJ8YtdcnvJxyoU7SvtsoTpceWh72rF+i76AJ/OwhAzsrAOPFlzremP46w==
-X-Received: by 2002:a2e:a481:0:b0:277:913:aed0 with SMTP id h1-20020a2ea481000000b002770913aed0mr7327380lji.4.1672309716014;
-        Thu, 29 Dec 2022 02:28:36 -0800 (PST)
-Received: from krzk-bin.NAT.warszawa.vectranet.pl (088156142067.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.67])
-        by smtp.gmail.com with ESMTPSA id r22-20020a2eb616000000b0027fbfaa26dbsm1291311ljn.14.2022.12.29.02.28.34
+        bh=dkl+S0qQTp84V8nQ2X7X+u7jEjKnedbD8/wecF0R+V0=;
+        b=dcWwgY0CWx4PskufA7O43ntcmDHrIVaSJkhAUXJNDnFIYQdZHsPmp8Ru7V+eWWuurN
+         rNJ5+FeznLUgRt1BZcrEWARmnu3P/JFM7e1Jy5i2n5RPoBImjTuOJrsLDsAgUVaZkHd2
+         flm+SgEbBf92Xvu5zdkxseGq1toChAcjyQQPp+2CjE1ujKK2Xas+f0wY9O1qIxWnY9Cq
+         ySfdR7wfZ/JoXCWWghZVyNtT7mRRNRJhU6JG62vrFYYorH/r9sYTETV6GQaK+vuJYO0N
+         YtztBJtK3khvTCM6Db9N7hSXSpc/zP029zFLttCjwzBxawL5OaAZTDtAlB64mIrVLcke
+         JNgw==
+X-Gm-Message-State: AFqh2ko9Mu0XSVN4BXtL4SPk3PBpfcjF/ku9EuNERR71lT8S4DubuUFK
+        GG8kB4Br58wNdGESuh2rBTsby0lTpgo=
+X-Google-Smtp-Source: AMrXdXvNaYyzpoZFEL7j97RZYiDf4AXmyez/mnYJNe0X8EOIK8W8g4OEqFKQpXleWkWHFMswhB9xdA==
+X-Received: by 2002:a6b:dd08:0:b0:6df:f420:8999 with SMTP id f8-20020a6bdd08000000b006dff4208999mr21366180ioc.15.1672311487065;
+        Thu, 29 Dec 2022 02:58:07 -0800 (PST)
+Received: from [172.17.0.2] ([13.86.65.52])
+        by smtp.gmail.com with ESMTPSA id q26-20020a05663810da00b0036c8a246f54sm5990775jad.142.2022.12.29.02.58.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Dec 2022 02:28:35 -0800 (PST)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Zijun Hu <zijuhu@codeaurora.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        stable@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_qca: Fix driver shutdown on closed serdev
-Date:   Thu, 29 Dec 2022 11:28:29 +0100
-Message-Id: <20221229102829.403917-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
+        Thu, 29 Dec 2022 02:58:06 -0800 (PST)
+Message-ID: <63ad72be.050a0220.3f416.71a6@mx.google.com>
+Date:   Thu, 29 Dec 2022 02:58:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4212604652345656425=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org
+Subject: RE: [v2] Bluetooth: hci_qca: Fix driver shutdown on closed serdev
+In-Reply-To: <20221229102829.403917-1-krzysztof.kozlowski@linaro.org>
+References: <20221229102829.403917-1-krzysztof.kozlowski@linaro.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The driver shutdown callback (which sends EDL_SOC_RESET to the device
-over serdev) should not be invoked when HCI device is not open (e.g. if
-hci_dev_open_sync() failed), because the serdev and its TTY are not open
-either.  Also skip this step if device is powered off
-(qca_power_shutdown()).
+--===============4212604652345656425==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The shutdown callback causes use-after-free during system reboot with
-Qualcomm Atheros Bluetooth:
+This is automated email and please do not reply to this email!
 
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=707494
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.02 seconds
+GitLint                       FAIL      0.54 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      31.41 seconds
+CheckAllWarning               PASS      34.25 seconds
+CheckSparse                   WARNING   38.73 seconds
+CheckSmatch                   PASS      105.67 seconds
+BuildKernel32                 PASS      30.25 seconds
+TestRunnerSetup               PASS      437.49 seconds
+TestRunner_l2cap-tester       PASS      16.61 seconds
+TestRunner_iso-tester         PASS      17.11 seconds
+TestRunner_bnep-tester        PASS      5.75 seconds
+TestRunner_mgmt-tester        PASS      109.64 seconds
+TestRunner_rfcomm-tester      PASS      9.02 seconds
+TestRunner_sco-tester         PASS      8.39 seconds
+TestRunner_ioctl-tester       PASS      9.74 seconds
+TestRunner_mesh-tester        PASS      7.16 seconds
+TestRunner_smp-tester         PASS      8.16 seconds
+TestRunner_userchan-tester    PASS      6.01 seconds
+IncrementalBuild              PASS      28.30 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: hci_qca: Fix driver shutdown on closed serdev
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#93: 
   Unable to handle kernel paging request at virtual address 0072662f67726fd7
-  ...
-  CPU: 6 PID: 1 Comm: systemd-shutdow Tainted: G        W          6.1.0-rt5-00325-g8a5f56bcfcca #8
-  Hardware name: Qualcomm Technologies, Inc. Robotics RB5 (DT)
-  Call trace:
-   tty_driver_flush_buffer+0x4/0x30
-   serdev_device_write_flush+0x24/0x34
-   qca_serdev_shutdown+0x80/0x130 [hci_uart]
-   device_shutdown+0x15c/0x260
-   kernel_restart+0x48/0xac
 
-KASAN report:
+total: 0 errors, 1 warnings, 16 lines checked
 
-  BUG: KASAN: use-after-free in tty_driver_flush_buffer+0x1c/0x50
-  Read of size 8 at addr ffff16270c2e0018 by task systemd-shutdow/1
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-  CPU: 7 PID: 1 Comm: systemd-shutdow Not tainted 6.1.0-next-20221220-00014-gb85aaf97fb01-dirty #28
-  Hardware name: Qualcomm Technologies, Inc. Robotics RB5 (DT)
-  Call trace:
-   dump_backtrace.part.0+0xdc/0xf0
-   show_stack+0x18/0x30
-   dump_stack_lvl+0x68/0x84
-   print_report+0x188/0x488
-   kasan_report+0xa4/0xf0
-   __asan_load8+0x80/0xac
-   tty_driver_flush_buffer+0x1c/0x50
-   ttyport_write_flush+0x34/0x44
-   serdev_device_write_flush+0x48/0x60
-   qca_serdev_shutdown+0x124/0x274
-   device_shutdown+0x1e8/0x350
-   kernel_restart+0x48/0xb0
-   __do_sys_reboot+0x244/0x2d0
-   __arm64_sys_reboot+0x54/0x70
-   invoke_syscall+0x60/0x190
-   el0_svc_common.constprop.0+0x7c/0x160
-   do_el0_svc+0x44/0xf0
-   el0_svc+0x2c/0x6c
-   el0t_64_sync_handler+0xbc/0x140
-   el0t_64_sync+0x190/0x194
+/github/workspace/src/src/13083411.patch has style problems, please review.
 
-Fixes: 7e7bbddd029b ("Bluetooth: hci_qca: Fix qca6390 enable failure after warm reboot")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: hci_qca: Fix driver shutdown on closed serdev
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+14: B1 Line exceeds max length (99>80): "  CPU: 6 PID: 1 Comm: systemd-shutdow Tainted: G        W          6.1.0-rt5-00325-g8a5f56bcfcca #8"
+28: B1 Line exceeds max length (99>80): "  CPU: 7 PID: 1 Comm: systemd-shutdow Not tainted 6.1.0-next-20221220-00014-gb85aaf97fb01-dirty #28"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/hci_qca.c:1014:26: warning: cast to restricted __le16drivers/bluetooth/hci_qca.c:1028:37: warning: cast to restricted __le32
+
 
 ---
+Regards,
+Linux Bluetooth
 
-Changes since v1:
-1. Drop serdev patch and fix it only on BT side.
-2. Update commit msg.
----
- drivers/bluetooth/hci_qca.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index bb7623fe53a8..157fc4d024c1 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2166,10 +2166,16 @@ static void qca_serdev_shutdown(struct device *dev)
- 	int timeout = msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS);
- 	struct serdev_device *serdev = to_serdev_device(dev);
- 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
-+	struct hci_uart *hu = &qcadev->serdev_hu;
-+	struct hci_dev *hdev = hu->hdev;
-+	struct qca_data *qca = hu->priv;
- 	const u8 ibs_wake_cmd[] = { 0xFD };
- 	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
- 
- 	if (qcadev->btsoc_type == QCA_QCA6390) {
-+		if (test_bit(QCA_BT_OFF, &qca->flags) || !test_bit(HCI_RUNNING, &hdev->flags))
-+			return;
-+
- 		serdev_device_write_flush(serdev);
- 		ret = serdev_device_write_buf(serdev, ibs_wake_cmd,
- 					      sizeof(ibs_wake_cmd));
--- 
-2.34.1
-
+--===============4212604652345656425==--
