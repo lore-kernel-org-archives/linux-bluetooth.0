@@ -2,146 +2,85 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8032C3DA7D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Jan 2023 22:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A02C5479D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Jan 2023 22:23:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238428AbjACWUp convert rfc822-to-8bit (ORCPT
+        id S238921AbjACWX1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Jan 2023 17:20:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43730 "EHLO
+        Tue, 3 Jan 2023 17:23:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237008AbjACWT4 (ORCPT
+        with ESMTP id S238925AbjACWVs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Jan 2023 17:19:56 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C06A215FCA;
-        Tue,  3 Jan 2023 14:19:46 -0800 (PST)
-Received: from smtpclient.apple (p4ff9ff43.dip0.t-ipconnect.de [79.249.255.67])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7A930CECF2;
-        Tue,  3 Jan 2023 23:19:45 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
-Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
- NXP BT chipsets
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <AM9PR04MB86031859F17AE8D5B563D103E7F79@AM9PR04MB8603.eurprd04.prod.outlook.com>
-Date:   Tue, 3 Jan 2023 23:19:44 +0100
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <61D5389C-013E-452C-ACE7-30708F0C1A35@holtmann.org>
-References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
- <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
- <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
- <5742801D-881A-45BC-A8A7-28D694179D8E@holtmann.org>
- <AM9PR04MB86031859F17AE8D5B563D103E7F79@AM9PR04MB8603.eurprd04.prod.outlook.com>
-To:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.1)
+        Tue, 3 Jan 2023 17:21:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D2B71707D
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jan 2023 14:20:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 93080B81133
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jan 2023 22:20:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3BCB7C433F0;
+        Tue,  3 Jan 2023 22:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672784417;
+        bh=2F2WHvOUiToSkkgOQu4voRla6TBSyHL8tigm68+Uzng=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=AloaWcHuWghWw6XSibJCJEK/5hdgTUXTrphSLpHNJuRRRJ3NOu7Bx14UKDRfjTY9S
+         tWQeKwUtJyr7yrMe53LjkFVverOtLP5OOVXhG6ZykLTnidrjCNrkPKmvr5NIVsU87+
+         r7RcEUjgU1TQ53JffqOeiXnu4UbhnbhoUwzDJlJ+UOecdAK7dJiwV6YjUEvPyiLr6B
+         pSqnSiWi8obHkhpk9C6u2Y5EG04J38qBDMmkMRDmSn+7fUnqICMTYF6Vq6oxq7UfId
+         frDGELnFAXLV0yV1gDHEAGl8ySIK4NiQF0Ntks5OhpN5rN0yBDzUYz19+jJjBrSoMg
+         uS0yuhJRkMJ9Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 27D0FC395DF;
+        Tue,  3 Jan 2023 22:20:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/5] shared/crypto: Adds bt_crypto_sih
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167278441716.15653.1206951664014036723.git-patchwork-notify@kernel.org>
+Date:   Tue, 03 Jan 2023 22:20:17 +0000
+References: <20221222224329.685837-1-luiz.dentz@gmail.com>
+In-Reply-To: <20221222224329.685837-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Neeraj,
+Hello:
 
->>>>> Add hci_nxp to the hci_uart module which adds support for the NXP BT
->>>>> chips. This driver has Power Save feature that will put the NXP
->>>>> bluetooth chip into sleep state, whenever there is no activity for
->>>>> certain duration of time (2000ms), and will be woken up when any
->>>>> activity is to be initiated.
->>>>> 
->>>>> The Power Save feature can be configured with the following set of
->>>>> commands (optional):
->>>>> hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
->>>>> hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
->>>>> where,
->>>>> OGF = 0x3F (vendor specific command) OCF = 0x23 (command to set
->>>>> Power Save state) arg[0] = 0x02 (disable Power Save) arg[0] = 0x03
->>>>> (enable Power Save) arg[1,2,...] = XX (don't care)
->>>>> 
->>>>> The sleep/wake-up source can be configured with the following set of
->>>>> commands (optional):
->>>>> hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
->>>>> hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
->>>>> where,
->>>>> OGF = 0x3F (vendor specific command) OCF = 0x53 (command to set
->>>>> sleep and wake-up source) arg[0] = 0x00 (Chip to host method NONE)
->>>>> arg[0] = 0x01 (Chip to host method UART DTR) arg[0] = 0x02 (Chip to
->>>>> host method UART BREAK) arg[0] = 0x03 (Chip to host method GPIO)
->>>>> arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
->>>>> arg[2] = 0x00 (Host to chip method UART DSR) arg[2] = 0x01 (Host to
->>>>> chip method UART BREAK) arg[3] = 0xXX (Reserved for future use)
->>>>> 
->>>>> By default, the hci_nxp sets power save enable, chip to host wake-up
->>>>> source as GPIO and host to chip sleep and wake-up source as UART
->>>>> break during driver initialization, by sending the respective
->>>>> commands to the chip.
->>>>> 
->>>>> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
->>>>> ---
->>>>> v2: Changed the subject/summary lines and added more details in the
->>>>> description. (Paul Menzel)
->>>>> v3: Made internal functions static, optimized the code, added few
->>>>> comments. (Sherry Sun)
->>>>> v4: Reworked entire code to send vendor commands cmd23 and cmd53
->> by
->>>>> using __hci_cmd_sync. (Luiz Augusto von Dentz)
->>>>> v5: Used hci_command_hdr and combined OGF+OCF into a single
->> opcode.
->>>>> (Luiz Augusto von Dentz)
->>>>> ---
->>>>> MAINTAINERS                   |   6 +
->>>>> drivers/bluetooth/Kconfig     |  10 +
->>>>> drivers/bluetooth/Makefile    |   1 +
->>>>> drivers/bluetooth/hci_ldisc.c |   6 +
->>>>> drivers/bluetooth/hci_nxp.c   | 592
->> ++++++++++++++++++++++++++++++++++
->>>>> drivers/bluetooth/hci_nxp.h   |  94 ++++++
->>>>> drivers/bluetooth/hci_uart.h  |   8 +-
->>>>> 7 files changed, 716 insertions(+), 1 deletion(-) create mode 100644
->>>>> drivers/bluetooth/hci_nxp.c create mode 100644
->>>>> drivers/bluetooth/hci_nxp.h
->>>> 
->>>> so this is a clear NAK. Add this as serdev driver and not hook
->>>> further into the mess that is the HCI line discipline.
->>> 
->>> I wonder if we should make it more clear somehow, perhaps include a
->>> text on the likes of BT_HCIUART that is deprecated and new drivers
->>> shall use BT_HCIUART_SERDEV instead.
->> 
->> not even that. They need to be separate drivers. A long time ago I posted the
->> skeleton for btuart.ko and bt3wire.ko and that is where this has to go.
->> 
->> Regards
->> 
->> Marcel
-> 
-> Thanks for your comment. 
-> Based on your comment, I re-worked the entire driver with reference to following patches:
-> https://www.spinics.net/lists/linux-bluetooth/msg74918.html
-> https://elixir.bootlin.com/linux/v6.1-rc4/source/drivers/bluetooth/btmtkuart.c
-> 
-> I am able to create a standalone btnxp.ko which is able to run basic BT operations along with FW download with NXP chipsets.
-> 
-> However I have now hit a blocker. The NXP chipsets require support for break signal, by which the host can put the chip into sleep, and wake it up.
-> 
-> However, it seems that the serdev API's in https://elixir.bootlin.com/linux/v6.1-rc8/source/include/linux/serdev.h do not support break assertion over serial TX line.
-> 
-> Is there any plan for serdev to support break signaling?
-> 
-> Any help on this blocker would be highly appreciated.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I recall some posts about that. Either on LKML or some other mailing list. Don’t
-remember what the outcome was though.
+On Thu, 22 Dec 2022 14:43:25 -0800 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds bt_crypto_sih is is used to create a hash as stated on
+> CSIS[1] spec:
+> 
+>   '4.7. Resolvable Set Identifier hash function sih'
+> 
+> [...]
 
-Regards
+Here is the summary with links:
+  - [BlueZ,1/5] shared/crypto: Adds bt_crypto_sih
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5abd9914a1eb
+  - [BlueZ,2/5] test-crypto: Add /crypto/sih test
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=09293fd22b3e
+  - [BlueZ,3/5] shared/crypto: Adds bt_crypto_sef
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a38b6ca525b3
+  - [BlueZ,4/5] test-crypto: Add /crypto/sef test
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=051ccb1e878b
+  - [BlueZ,5/5] monitor: Add support for decoding RSI
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7a32f2918035
 
-Marcel
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
