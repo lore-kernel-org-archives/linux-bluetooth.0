@@ -2,134 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5D0C3DA7D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Jan 2023 20:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8032C3DA7D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Jan 2023 22:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233873AbjACUlr (ORCPT
+        id S238428AbjACWUp convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Jan 2023 15:41:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60050 "EHLO
+        Tue, 3 Jan 2023 17:20:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233685AbjACUlg (ORCPT
+        with ESMTP id S237008AbjACWT4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Jan 2023 15:41:36 -0500
-X-Greylist: delayed 627 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 03 Jan 2023 12:41:27 PST
-Received: from smtp-out-04.comm2000.it (smtp-out-04.comm2000.it [212.97.32.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E212D74;
-        Tue,  3 Jan 2023 12:41:27 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (31-10-206-125.static.upc.ch [31.10.206.125])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-04.comm2000.it (Postfix) with ESMTPSA id 7FD19BC32C1;
-        Tue,  3 Jan 2023 21:30:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1672777856;
-        bh=7UNz47u0wSsUl65PKsRxKJg9i0qWtwpdgL6NpbhB558=;
-        h=Date:From:To:Cc:Subject;
-        b=kZVBqsFP2rqqD2B6XQKv5E0TNJf/cO2ecBvEqQUov/JeD1L9NJEDgwiBL1m9b9Uu2
-         hR6JVTinSpFeeGK7iC84IilpKGmR/WysoazEffD8t+81ikayE49P6m5DAJHJcim7B4
-         rzkNXbBKY7ewJOBJvO2mo4uuMRELDNNIrUAdclLwwFa3AvRf5cBZPNmf481pa728YU
-         mRCqhOzjIxRgMQNT9+cYWwsFNKiuV+HFspno3GHeHIEItOIUZLA5Q+Cy31/WmSbmhP
-         0vKhWoFuhYQEnsmb7rQn6P+YkFZ4ric6AGVvALwsy9srkcngSBczTNs1jf9hntEE+5
-         Dj7FmnTCfWKPg==
-Date:   Tue, 3 Jan 2023 21:30:41 +0100
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Cc:     Zhengping Jiang <jiangzp@google.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Tue, 3 Jan 2023 17:19:56 -0500
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C06A215FCA;
+        Tue,  3 Jan 2023 14:19:46 -0800 (PST)
+Received: from smtpclient.apple (p4ff9ff43.dip0.t-ipconnect.de [79.249.255.67])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7A930CECF2;
+        Tue,  3 Jan 2023 23:19:45 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
+Subject: Re: [PATCH v5] Bluetooth: Add hci_nxp to hci_uart module to support
+ NXP BT chipsets
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <AM9PR04MB86031859F17AE8D5B563D103E7F79@AM9PR04MB8603.eurprd04.prod.outlook.com>
+Date:   Tue, 3 Jan 2023 23:19:44 +0100
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: hdev->le_scan_disable - WARNING: possible circular locking
- dependency detected
-Message-ID: <Y7SQcdg33X8xTPzs@francesco-nb.int.toradex.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+        Rohit Fule <rohit.fule@nxp.com>,
+        Sherry Sun <sherry.sun@nxp.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <61D5389C-013E-452C-ACE7-30708F0C1A35@holtmann.org>
+References: <20221216094350.1121354-1-neeraj.sanjaykale@nxp.com>
+ <85D2AE3F-97A5-4C88-8FC4-1684F3FD4438@holtmann.org>
+ <CABBYNZLWFNWp=StPQ0=8hQe8bUoJzwSvCBk7Ybd=2oe=NROCgQ@mail.gmail.com>
+ <5742801D-881A-45BC-A8A7-28D694179D8E@holtmann.org>
+ <AM9PR04MB86031859F17AE8D5B563D103E7F79@AM9PR04MB8603.eurprd04.prod.outlook.com>
+To:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
+X-Mailer: Apple Mail (2.3696.120.41.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello all,
-When enabling BT discovery I have this WARNING.
+Hi Neeraj,
 
-Linux 6.0.16, ARM, i.MX6ULL, with a Marvell BT device.
+>>>>> Add hci_nxp to the hci_uart module which adds support for the NXP BT
+>>>>> chips. This driver has Power Save feature that will put the NXP
+>>>>> bluetooth chip into sleep state, whenever there is no activity for
+>>>>> certain duration of time (2000ms), and will be woken up when any
+>>>>> activity is to be initiated.
+>>>>> 
+>>>>> The Power Save feature can be configured with the following set of
+>>>>> commands (optional):
+>>>>> hcitool -i hci0 cmd 3F 23 02 00 00    (enable Power Save)
+>>>>> hcitool -i hci0 cmd 3F 23 03 00 00    (disable Power Save)
+>>>>> where,
+>>>>> OGF = 0x3F (vendor specific command) OCF = 0x23 (command to set
+>>>>> Power Save state) arg[0] = 0x02 (disable Power Save) arg[0] = 0x03
+>>>>> (enable Power Save) arg[1,2,...] = XX (don't care)
+>>>>> 
+>>>>> The sleep/wake-up source can be configured with the following set of
+>>>>> commands (optional):
+>>>>> hcitool -i hci0 cmd 3F 53 03 14 01 FF    (set UART break method)
+>>>>> hcitool -i hci0 cmd 3F 53 03 14 00 FF    (set UART DSR method)
+>>>>> where,
+>>>>> OGF = 0x3F (vendor specific command) OCF = 0x53 (command to set
+>>>>> sleep and wake-up source) arg[0] = 0x00 (Chip to host method NONE)
+>>>>> arg[0] = 0x01 (Chip to host method UART DTR) arg[0] = 0x02 (Chip to
+>>>>> host method UART BREAK) arg[0] = 0x03 (Chip to host method GPIO)
+>>>>> arg[1] = 0x14 (Chip to host GPIO[20] if arg[0] is 0x03, else 0xFF)
+>>>>> arg[2] = 0x00 (Host to chip method UART DSR) arg[2] = 0x01 (Host to
+>>>>> chip method UART BREAK) arg[3] = 0xXX (Reserved for future use)
+>>>>> 
+>>>>> By default, the hci_nxp sets power save enable, chip to host wake-up
+>>>>> source as GPIO and host to chip sleep and wake-up source as UART
+>>>>> break during driver initialization, by sending the respective
+>>>>> commands to the chip.
+>>>>> 
+>>>>> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+>>>>> ---
+>>>>> v2: Changed the subject/summary lines and added more details in the
+>>>>> description. (Paul Menzel)
+>>>>> v3: Made internal functions static, optimized the code, added few
+>>>>> comments. (Sherry Sun)
+>>>>> v4: Reworked entire code to send vendor commands cmd23 and cmd53
+>> by
+>>>>> using __hci_cmd_sync. (Luiz Augusto von Dentz)
+>>>>> v5: Used hci_command_hdr and combined OGF+OCF into a single
+>> opcode.
+>>>>> (Luiz Augusto von Dentz)
+>>>>> ---
+>>>>> MAINTAINERS                   |   6 +
+>>>>> drivers/bluetooth/Kconfig     |  10 +
+>>>>> drivers/bluetooth/Makefile    |   1 +
+>>>>> drivers/bluetooth/hci_ldisc.c |   6 +
+>>>>> drivers/bluetooth/hci_nxp.c   | 592
+>> ++++++++++++++++++++++++++++++++++
+>>>>> drivers/bluetooth/hci_nxp.h   |  94 ++++++
+>>>>> drivers/bluetooth/hci_uart.h  |   8 +-
+>>>>> 7 files changed, 716 insertions(+), 1 deletion(-) create mode 100644
+>>>>> drivers/bluetooth/hci_nxp.c create mode 100644
+>>>>> drivers/bluetooth/hci_nxp.h
+>>>> 
+>>>> so this is a clear NAK. Add this as serdev driver and not hook
+>>>> further into the mess that is the HCI line discipline.
+>>> 
+>>> I wonder if we should make it more clear somehow, perhaps include a
+>>> text on the likes of BT_HCIUART that is deprecated and new drivers
+>>> shall use BT_HCIUART_SERDEV instead.
+>> 
+>> not even that. They need to be separate drivers. A long time ago I posted the
+>> skeleton for btuart.ko and bt3wire.ko and that is where this has to go.
+>> 
+>> Regards
+>> 
+>> Marcel
+> 
+> Thanks for your comment. 
+> Based on your comment, I re-worked the entire driver with reference to following patches:
+> https://www.spinics.net/lists/linux-bluetooth/msg74918.html
+> https://elixir.bootlin.com/linux/v6.1-rc4/source/drivers/bluetooth/btmtkuart.c
+> 
+> I am able to create a standalone btnxp.ko which is able to run basic BT operations along with FW download with NXP chipsets.
+> 
+> However I have now hit a blocker. The NXP chipsets require support for break signal, by which the host can put the chip into sleep, and wake it up.
+> 
+> However, it seems that the serdev API's in https://elixir.bootlin.com/linux/v6.1-rc8/source/include/linux/serdev.h do not support break assertion over serial TX line.
+> 
+> Is there any plan for serdev to support break signaling?
+> 
+> Any help on this blocker would be highly appreciated.
 
-This looks like a regression on Linux 6.0, however I had no way to try
-to bisect this yet. Any suggestion?
+I recall some posts about that. Either on LKML or some other mailing list. Don’t
+remember what the outcome was though.
 
-[  493.824758] ======================================================
-[  493.831012] WARNING: possible circular locking dependency detected
-[  493.837261] 6.0.16-6.1.0-devel+git.29e1bc6a55de #1 Not tainted
-[  493.843171] ------------------------------------------------------
-[  493.849416] kworker/u3:0/39 is trying to acquire lock:
-[  493.854627] c2adcb18 (&hdev->req_lock){+.+.}-{3:3}, at: le_scan_disable_work+0x68/0x200
-[  493.862877]
-[  493.862877] but task is already holding lock:
-[  493.868773] e0abdf28 ((work_completion)(&(&hdev->le_scan_disable)->work)){+.+.}-{0:0}, at: process_one_work+0x1e4/0x6f4
-[  493.879775]
-[  493.879775] which lock already depends on the new lock.
-[  493.879775]
-[  493.888017]
-[  493.888017] the existing dependency chain (in reverse order) is:
-[  493.895564]
-[  493.895564] -> #1 ((work_completion)(&(&hdev->le_scan_disable)->work)){+.+.}-{0:0}:
-[  493.904868]        __cancel_work_timer+0x198/0x224
-[  493.909762]        hci_request_cancel_all+0x1c/0xb0
-[  493.914746]        hci_dev_close_sync+0x38/0x5ac
-[  493.919456]        hci_dev_do_close+0x30/0x64
-[  493.923904]        process_one_work+0x280/0x6f4
-[  493.928526]        worker_thread+0x40/0x4f8
-[  493.932801]        kthread+0xe0/0x100
-[  493.936550]        ret_from_fork+0x14/0x2c
-[  493.940738]
-[  493.940738] -> #0 (&hdev->req_lock){+.+.}-{3:3}:
-[  493.947001]        lock_acquire+0xf4/0x364
-[  493.951190]        __mutex_lock+0x80/0x8a0
-[  493.955378]        mutex_lock_nested+0x1c/0x24
-[  493.959912]        le_scan_disable_work+0x68/0x200
-[  493.964800]        process_one_work+0x280/0x6f4
-[  493.969424]        worker_thread+0x40/0x4f8
-[  493.973698]        kthread+0xe0/0x100
-[  493.977447]        ret_from_fork+0x14/0x2c
-[  493.981632]
-[  493.981632] other info that might help us debug this:
-[  493.981632]
-[  493.989702]  Possible unsafe locking scenario:
-[  493.989702]
-[  493.995682]        CPU0                    CPU1
-[  494.000270]        ----                    ----
-[  494.004857]   lock((work_completion)(&(&hdev->le_scan_disable)->work));
-[  494.011583]                                lock(&hdev->req_lock);
-[  494.017783]                                lock((work_completion)(&(&hdev->le_scan_disable)->work));
-[  494.027025]   lock(&hdev->req_lock);
-[  494.030704]
-[  494.030704]  *** DEADLOCK ***
-[  494.030704]
-[  494.036685] 2 locks held by kworker/u3:0/39:
-[  494.041026]  #0: c2bb6ca8 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work+0x1e4/0x6f4
-[  494.049786]  #1: e0abdf28 ((work_completion)(&(&hdev->le_scan_disable)->work)){+.+.}-{0:0}, at: process_one_work+0x1e4/0x6f4
-[  494.061236]
-[  494.061236] stack backtrace:
-[  494.065659] CPU: 0 PID: 39 Comm: kworker/u3:0 Not tainted 6.0.16-6.1.0-devel+git.29e1bc6a55de #1
-[  494.074540] Hardware name: Freescale i.MX6 Ultralite (Device Tree)
-[  494.080797] Workqueue: hci0 le_scan_disable_work
-[  494.085547]  unwind_backtrace from show_stack+0x10/0x14
-[  494.090902]  show_stack from dump_stack_lvl+0x58/0x70
-[  494.096089]  dump_stack_lvl from check_noncircular+0xe8/0x158
-[  494.101985]  check_noncircular from __lock_acquire+0x1510/0x288c
-[  494.108120]  __lock_acquire from lock_acquire+0xf4/0x364
-[  494.113541]  lock_acquire from __mutex_lock+0x80/0x8a0
-[  494.118789]  __mutex_lock from mutex_lock_nested+0x1c/0x24
-[  494.124384]  mutex_lock_nested from le_scan_disable_work+0x68/0x200
-[  494.130770]  le_scan_disable_work from process_one_work+0x280/0x6f4
-[  494.137160]  process_one_work from worker_thread+0x40/0x4f8
-[  494.142852]  worker_thread from kthread+0xe0/0x100
-[  494.147756]  kthread from ret_from_fork+0x14/0x2c
-[  494.152565] Exception stack(0xe0abdfb0 to 0xe0abdff8)
-[  494.157708] dfa0:                                     00000000 00000000 00000000 00000000
-[  494.165982] dfc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-[  494.174248] dfe0: 00000000 00000000 00000000 00000000 00000013 00000000
+Regards
 
-Francesco
+Marcel
+
 
