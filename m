@@ -2,167 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E59F6C46467
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Jan 2023 06:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BEFC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Jan 2023 07:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233520AbjADGwG (ORCPT
+        id S230404AbjADHBA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Jan 2023 01:52:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
+        Wed, 4 Jan 2023 02:01:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231418AbjADGwF (ORCPT
+        with ESMTP id S229469AbjADHA7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Jan 2023 01:52:05 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C08CA1B9;
-        Tue,  3 Jan 2023 22:52:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D247614C9;
-        Wed,  4 Jan 2023 06:52:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC92C433EF;
-        Wed,  4 Jan 2023 06:52:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672815123;
-        bh=pDiCr5T0XwZuBMZBsD7n9CvwBlAFTQHGPOasPj5AszA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UlYBfTCTWX253/kPH/ONnwnvkfZzWd+pCr83/ctVImB/sfhBC73DEavQaaGyWLZ76
-         upGaWUKRcOg575cltvEW/fJNCraAdwsFBP/8xh3Ve2Tf2xyCVT8auKFEcgp8AsEXGz
-         TlA74TLF22ZfiUNsahLlkDSFOIlpsb9CrFghZPaokey+TNcx/oTIqj8gT9qf8b6MfU
-         if/zxuZZ0g3zhbARyM7iFZGrJ+Fde+Iys0PrLPSsf9thN0uNQNGPBLSRDNrQtkMo7T
-         VRNC+MmVJ+8iPXPwWikc8SINZ6aFslKg1arDTwDZfXlH/3Pm6vVQ1uRX833m777NzG
-         bYzgTnb51Ngpg==
-Date:   Wed, 4 Jan 2023 08:51:58 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Ying Hsu <yinghsu@chromium.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix possible deadlock in
- rfcomm_sk_state_change
-Message-ID: <Y7UiDn3Gi5YdNIoC@unreal>
-References: <20230103111221.1.I1f29bb547a03e9adfe2e6754212f9d14a2e39c4b@changeid>
+        Wed, 4 Jan 2023 02:00:59 -0500
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DC6B296
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jan 2023 23:00:57 -0800 (PST)
+Received: by mail-qv1-xf2a.google.com with SMTP id t17so12977817qvw.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Jan 2023 23:00:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=eRaX9pwusz9LR0nnm4RejGPXLWocpttFvSmXHtItZMU=;
+        b=TiTV2IRjvpFTA+wnkX9Js9KLqLSP7TSj1NmB2okCdGCZLG0JhHXi4o+pN3UXTMJF0T
+         K2rTBOnMFtxIiSipC+JqwXg7a7G5mBR6gozvPyVC9sfkkmUs3cXw4LPYAkbWPTcWHgre
+         LQxzzvK+lhTMjv6aSromuF1Och3GgaXRRk6Sj24ytPN7GYj6xptw8MEOTpt3VsmwBDM9
+         htlyNuJ2GilNhRriubIiuriQ1zMshIC1aYAb5kk+FzulxE9iy3oQb7FPOpM90/Ao378y
+         6/t8jcD1tfqIVnxu3/T3ZmPa+wwrnPX71o0Jjsz6dEuIW71NYcqF6q60xKiWD2I5NKNG
+         0dCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eRaX9pwusz9LR0nnm4RejGPXLWocpttFvSmXHtItZMU=;
+        b=JWaX4oPaoGpe+Tv/Oz21D6udaiQOMhBgBYw0nw+Er7FZecIRx2cyt+Jql7MJLdtKjw
+         XtuyDhSwf5KfvY2o5MEavawJSCdVDHICvCUY+206KbFGn1OWtjJRnZTe5lTvCtdlxWus
+         wrkRiFtgKsdURDkfIKUmZtWCDfoauaBvtLpHC2dY+UALx6ZajUoH+emTYeMW4ro9rFwv
+         IMe7epH83XMiqhaWT+h16MvSdN8eMI5iDg3HtoiEq3lPL7tjjzUwbxz5J4WEZkwS0zOb
+         MUyg7qvwuEqRP4d2UoH0kNAl/JNLNG3nW5fAk2SmYmuEgBs/xChje4Ajqmi6a1thZFT3
+         84zA==
+X-Gm-Message-State: AFqh2kpf4HXIrZ15SSRBGbJU+ygI54+8t49jguzHZIEKupBUyDzN+TmR
+        bAOVetQrLHb5zPTUDskIgE4RiDE5746KfA==
+X-Google-Smtp-Source: AMrXdXuFV4Tf6uBaz7RVuY9Dk5+yJZcZN3V+pH3BPaimoAa99kif9bElCcEQEusJg275Lp7vYn2D2Q==
+X-Received: by 2002:a05:6214:2c06:b0:4e3:6a82:82ba with SMTP id lc6-20020a0562142c0600b004e36a8282bamr77121768qvb.33.1672815656640;
+        Tue, 03 Jan 2023 23:00:56 -0800 (PST)
+Received: from [172.17.0.2] ([104.45.204.113])
+        by smtp.gmail.com with ESMTPSA id m20-20020a05620a24d400b006fc9fe67e34sm23751716qkn.81.2023.01.03.23.00.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jan 2023 23:00:56 -0800 (PST)
+Message-ID: <63b52428.050a0220.f9d6f.f217@mx.google.com>
+Date:   Tue, 03 Jan 2023 23:00:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0825366806258399692=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230103111221.1.I1f29bb547a03e9adfe2e6754212f9d14a2e39c4b@changeid>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, shaozhengchao@huawei.com
+Subject: RE: Bluetooth: hci_conn: fix memory leak in hci_le_terminate_big() and hci_le_big_terminate()
+In-Reply-To: <20230104064623.1140644-1-shaozhengchao@huawei.com>
+References: <20230104064623.1140644-1-shaozhengchao@huawei.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 11:12:46AM +0000, Ying Hsu wrote:
-> There's a possible deadlock when two processes are connecting
-> and closing concurrently:
->   + CPU0: __rfcomm_dlc_close locks rfcomm and then calls
->   rfcomm_sk_state_change which locks the sock.
->   + CPU1: rfcomm_sock_connect locks the socket and then calls
->   rfcomm_dlc_open which locks rfcomm.
-> 
-> Here's the call trace:
-> 
-> -> #2 (&d->lock){+.+.}-{3:3}:
->        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
->        __mutex_lock0x12f/0x1360 kernel/locking/mutex.c:747
->        __rfcomm_dlc_close+0x15d/0x890 net/bluetooth/rfcomm/core.c:487
->        rfcomm_dlc_close+1e9/0x240 net/bluetooth/rfcomm/core.c:520
->        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
->        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
->        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
->        __sock_release+0xcd/0x280 net/socket.c:650
->        sock_close+0x1c/0x20 net/socket.c:1365
->        __fput+0x27c/0xa90 fs/file_table.c:320
->        task_work_run+0x16f/0x270 kernel/task_work.c:179
->        exit_task_work include/linux/task_work.h:38 [inline]
->        do_exit+0xaa8/0x2950 kernel/exit.c:867
->        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
->        get_signal+0x21c3/0x2450 kernel/signal.c:2859
->        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
->        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
->        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
->        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
->        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
->        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
->        entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> -> #1 (rfcomm_mutex){+.+.}-{3:3}:
->        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
->        __mutex_lock+0x12f/0x1360 kernel/locking/mutex.c:747
->        rfcomm_dlc_open+0x93/0xa80 net/bluetooth/rfcomm/core.c:425
->        rfcomm_sock_connect+0x329/0x450 net/bluetooth/rfcomm/sock.c:413
->        __sys_connect_file+0x153/0x1a0 net/socket.c:1976
->        __sys_connect+0x165/0x1a0 net/socket.c:1993
->        __do_sys_connect net/socket.c:2003 [inline]
->        __se_sys_connect net/socket.c:2000 [inline]
->        __x64_sys_connect+0x73/0xb0 net/socket.c:2000
->        do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->        do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->        entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
->        check_prev_add kernel/locking/lockdep.c:3097 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3216 [inline]
->        validate_chain kernel/locking/lockdep.c:3831 [inline]
->        __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5055
->        lock_acquire kernel/locking/lockdep.c:5668 [inline]
->        lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
->        lock_sock_nested+0x3a/0xf0 net/core/sock.c:3470
->        lock_sock include/net/sock.h:1725 [inline]
->        rfcomm_sk_state_change+0x6d/0x3a0 net/bluetooth/rfcomm/sock.c:73
->        __rfcomm_dlc_close+0x1b1/0x890 net/bluetooth/rfcomm/core.c:489
->        rfcomm_dlc_close+0x1e9/0x240 net/bluetooth/rfcomm/core.c:520
->        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
->        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
->        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
->        __sock_release+0xcd/0x280 net/socket.c:650
->        sock_close+0x1c/0x20 net/socket.c:1365
->        __fput+0x27c/0xa90 fs/file_table.c:320
->        task_work_run+0x16f/0x270 kernel/task_work.c:179
->        exit_task_work include/linux/task_work.h:38 [inline]
->        do_exit+0xaa8/0x2950 kernel/exit.c:867
->        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
->        get_signal+0x21c3/0x2450 kernel/signal.c:2859
->        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
->        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
->        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
->        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
->        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
->        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
->        entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
-> ---
-> This commit has been tested with a C reproducer on qemu-x86_64.
-> 
->  net/bluetooth/rfcomm/sock.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 21e24da4847f..29f9a88a3dc8 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -410,8 +410,10 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
->  	d->sec_level = rfcomm_pi(sk)->sec_level;
->  	d->role_switch = rfcomm_pi(sk)->role_switch;
->  
-> +	release_sock(sk);
->  	err = rfcomm_dlc_open(d, &rfcomm_pi(sk)->src, &sa->rc_bdaddr,
-                                           ^^^^
-Are you sure that "sk" still exists here after you called to release_sock(sk)?
-What prevents from use-after-free here?
+--===============0825366806258399692==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
->  			      sa->rc_channel);
-> +	lock_sock(sk);
->  	if (!err)
->  		err = bt_sock_wait_state(sk, BT_CONNECTED,
->  				sock_sndtimeo(sk, flags & O_NONBLOCK));
-> -- 
-> 2.39.0.314.g84b9a713c41-goog
-> 
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=708675
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.00 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      31.85 seconds
+CheckAllWarning               PASS      35.37 seconds
+CheckSparse                   PASS      39.44 seconds
+CheckSmatch                   PASS      106.53 seconds
+BuildKernel32                 PASS      30.45 seconds
+TestRunnerSetup               PASS      439.69 seconds
+TestRunner_l2cap-tester       PASS      16.69 seconds
+TestRunner_iso-tester         PASS      17.27 seconds
+TestRunner_bnep-tester        PASS      5.90 seconds
+TestRunner_mgmt-tester        PASS      110.61 seconds
+TestRunner_rfcomm-tester      PASS      9.14 seconds
+TestRunner_sco-tester         PASS      8.44 seconds
+TestRunner_ioctl-tester       PASS      9.89 seconds
+TestRunner_mesh-tester        PASS      7.42 seconds
+TestRunner_smp-tester         PASS      8.27 seconds
+TestRunner_userchan-tester    PASS      6.04 seconds
+IncrementalBuild              PASS      28.83 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: hci_conn: fix memory leak in hci_le_terminate_big() and hci_le_big_terminate()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (89>80): "Bluetooth: hci_conn: fix memory leak in hci_le_terminate_big() and hci_le_big_terminate()"
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0825366806258399692==--
