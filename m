@@ -2,109 +2,167 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1421C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Jan 2023 06:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E59F6C46467
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Jan 2023 06:52:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233563AbjADGhG (ORCPT
+        id S233520AbjADGwG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Jan 2023 01:37:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51548 "EHLO
+        Wed, 4 Jan 2023 01:52:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233497AbjADGhB (ORCPT
+        with ESMTP id S231418AbjADGwF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Jan 2023 01:37:01 -0500
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF16BF6C;
-        Tue,  3 Jan 2023 22:37:00 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Nn0GP5F6gzRqmh;
-        Wed,  4 Jan 2023 14:35:25 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 4 Jan
- 2023 14:36:56 +0800
-From:   Zhengchao Shao <shaozhengchao@huawei.com>
-To:     <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC:     <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-        <shaozhengchao@huawei.com>
-Subject: [PATCH] Bluetooth: hci_conn: fix memory leak in hci_le_terminate_big() and hci_le_big_terminate()
-Date:   Wed, 4 Jan 2023 14:46:23 +0800
-Message-ID: <20230104064623.1140644-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 4 Jan 2023 01:52:05 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C08CA1B9;
+        Tue,  3 Jan 2023 22:52:04 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D247614C9;
+        Wed,  4 Jan 2023 06:52:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC92C433EF;
+        Wed,  4 Jan 2023 06:52:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672815123;
+        bh=pDiCr5T0XwZuBMZBsD7n9CvwBlAFTQHGPOasPj5AszA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UlYBfTCTWX253/kPH/ONnwnvkfZzWd+pCr83/ctVImB/sfhBC73DEavQaaGyWLZ76
+         upGaWUKRcOg575cltvEW/fJNCraAdwsFBP/8xh3Ve2Tf2xyCVT8auKFEcgp8AsEXGz
+         TlA74TLF22ZfiUNsahLlkDSFOIlpsb9CrFghZPaokey+TNcx/oTIqj8gT9qf8b6MfU
+         if/zxuZZ0g3zhbARyM7iFZGrJ+Fde+Iys0PrLPSsf9thN0uNQNGPBLSRDNrQtkMo7T
+         VRNC+MmVJ+8iPXPwWikc8SINZ6aFslKg1arDTwDZfXlH/3Pm6vVQ1uRX833m777NzG
+         bYzgTnb51Ngpg==
+Date:   Wed, 4 Jan 2023 08:51:58 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Ying Hsu <yinghsu@chromium.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix possible deadlock in
+ rfcomm_sk_state_change
+Message-ID: <Y7UiDn3Gi5YdNIoC@unreal>
+References: <20230103111221.1.I1f29bb547a03e9adfe2e6754212f9d14a2e39c4b@changeid>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230103111221.1.I1f29bb547a03e9adfe2e6754212f9d14a2e39c4b@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When hci_cmd_sync_queue() failed in hci_le_terminate_big() or
-hci_le_big_terminate(), the memory pointed by variable d is not freed,
-which will cause memory leak. Add release process to error path.
+On Tue, Jan 03, 2023 at 11:12:46AM +0000, Ying Hsu wrote:
+> There's a possible deadlock when two processes are connecting
+> and closing concurrently:
+>   + CPU0: __rfcomm_dlc_close locks rfcomm and then calls
+>   rfcomm_sk_state_change which locks the sock.
+>   + CPU1: rfcomm_sock_connect locks the socket and then calls
+>   rfcomm_dlc_open which locks rfcomm.
+> 
+> Here's the call trace:
+> 
+> -> #2 (&d->lock){+.+.}-{3:3}:
+>        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+>        __mutex_lock0x12f/0x1360 kernel/locking/mutex.c:747
+>        __rfcomm_dlc_close+0x15d/0x890 net/bluetooth/rfcomm/core.c:487
+>        rfcomm_dlc_close+1e9/0x240 net/bluetooth/rfcomm/core.c:520
+>        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
+>        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
+>        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
+>        __sock_release+0xcd/0x280 net/socket.c:650
+>        sock_close+0x1c/0x20 net/socket.c:1365
+>        __fput+0x27c/0xa90 fs/file_table.c:320
+>        task_work_run+0x16f/0x270 kernel/task_work.c:179
+>        exit_task_work include/linux/task_work.h:38 [inline]
+>        do_exit+0xaa8/0x2950 kernel/exit.c:867
+>        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
+>        get_signal+0x21c3/0x2450 kernel/signal.c:2859
+>        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+>        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+>        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+>        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+>        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+>        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> -> #1 (rfcomm_mutex){+.+.}-{3:3}:
+>        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+>        __mutex_lock+0x12f/0x1360 kernel/locking/mutex.c:747
+>        rfcomm_dlc_open+0x93/0xa80 net/bluetooth/rfcomm/core.c:425
+>        rfcomm_sock_connect+0x329/0x450 net/bluetooth/rfcomm/sock.c:413
+>        __sys_connect_file+0x153/0x1a0 net/socket.c:1976
+>        __sys_connect+0x165/0x1a0 net/socket.c:1993
+>        __do_sys_connect net/socket.c:2003 [inline]
+>        __se_sys_connect net/socket.c:2000 [inline]
+>        __x64_sys_connect+0x73/0xb0 net/socket.c:2000
+>        do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>        do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
+>        check_prev_add kernel/locking/lockdep.c:3097 [inline]
+>        check_prevs_add kernel/locking/lockdep.c:3216 [inline]
+>        validate_chain kernel/locking/lockdep.c:3831 [inline]
+>        __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5055
+>        lock_acquire kernel/locking/lockdep.c:5668 [inline]
+>        lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
+>        lock_sock_nested+0x3a/0xf0 net/core/sock.c:3470
+>        lock_sock include/net/sock.h:1725 [inline]
+>        rfcomm_sk_state_change+0x6d/0x3a0 net/bluetooth/rfcomm/sock.c:73
+>        __rfcomm_dlc_close+0x1b1/0x890 net/bluetooth/rfcomm/core.c:489
+>        rfcomm_dlc_close+0x1e9/0x240 net/bluetooth/rfcomm/core.c:520
+>        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
+>        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
+>        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
+>        __sock_release+0xcd/0x280 net/socket.c:650
+>        sock_close+0x1c/0x20 net/socket.c:1365
+>        __fput+0x27c/0xa90 fs/file_table.c:320
+>        task_work_run+0x16f/0x270 kernel/task_work.c:179
+>        exit_task_work include/linux/task_work.h:38 [inline]
+>        do_exit+0xaa8/0x2950 kernel/exit.c:867
+>        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
+>        get_signal+0x21c3/0x2450 kernel/signal.c:2859
+>        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+>        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+>        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+>        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+>        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+>        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> 
+> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+> ---
+> This commit has been tested with a C reproducer on qemu-x86_64.
+> 
+>  net/bluetooth/rfcomm/sock.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index 21e24da4847f..29f9a88a3dc8 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -410,8 +410,10 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
+>  	d->sec_level = rfcomm_pi(sk)->sec_level;
+>  	d->role_switch = rfcomm_pi(sk)->role_switch;
+>  
+> +	release_sock(sk);
+>  	err = rfcomm_dlc_open(d, &rfcomm_pi(sk)->src, &sa->rc_bdaddr,
+                                           ^^^^
+Are you sure that "sk" still exists here after you called to release_sock(sk)?
+What prevents from use-after-free here?
 
-Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
----
- net/bluetooth/hci_conn.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index d3e542c2fc3e..acf563fbdfd9 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -821,6 +821,7 @@ static void terminate_big_destroy(struct hci_dev *hdev, void *data, int err)
- static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
- {
- 	struct iso_list_data *d;
-+	int ret;
- 
- 	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
- 
-@@ -831,8 +832,12 @@ static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
- 	d->big = big;
- 	d->bis = bis;
- 
--	return hci_cmd_sync_queue(hdev, terminate_big_sync, d,
--				  terminate_big_destroy);
-+	ret = hci_cmd_sync_queue(hdev, terminate_big_sync, d,
-+				 terminate_big_destroy);
-+	if (ret)
-+		kfree(d);
-+
-+	return ret;
- }
- 
- static int big_terminate_sync(struct hci_dev *hdev, void *data)
-@@ -857,6 +862,7 @@ static int big_terminate_sync(struct hci_dev *hdev, void *data)
- static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
- {
- 	struct iso_list_data *d;
-+	int ret;
- 
- 	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_handle);
- 
-@@ -867,8 +873,12 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
- 	d->big = big;
- 	d->sync_handle = sync_handle;
- 
--	return hci_cmd_sync_queue(hdev, big_terminate_sync, d,
--				  terminate_big_destroy);
-+	ret = hci_cmd_sync_queue(hdev, big_terminate_sync, d,
-+				 terminate_big_destroy);
-+	if (ret)
-+		kfree(d);
-+
-+	return ret;
- }
- 
- /* Cleanup BIS connection
--- 
-2.34.1
-
+>  			      sa->rc_channel);
+> +	lock_sock(sk);
+>  	if (!err)
+>  		err = bt_sock_wait_state(sk, BT_CONNECTED,
+>  				sock_sndtimeo(sk, flags & O_NONBLOCK));
+> -- 
+> 2.39.0.314.g84b9a713c41-goog
+> 
