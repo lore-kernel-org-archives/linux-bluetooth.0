@@ -2,337 +2,109 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89783C3DA7D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Jan 2023 00:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1421C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Jan 2023 06:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233366AbjADAl7 (ORCPT
+        id S233563AbjADGhG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Jan 2023 19:41:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
+        Wed, 4 Jan 2023 01:37:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238842AbjADAl4 (ORCPT
+        with ESMTP id S233497AbjADGhB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Jan 2023 19:41:56 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E6016586
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Jan 2023 16:41:54 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id x37so27032499ljq.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Jan 2023 16:41:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hz13+EskcgyouK62xEU1xMVMi/1CsedMBb94vxwuakU=;
-        b=ena+ZaIAB98AUexhXo/VDihcmr9rIUSDojrT+hISAatTdCFWS4maJtWyfQins41TtT
-         ODH4ogz0M6T1Gqx4yMFn1IDzjd6he2oKHsdairZitAPAGef24OIf/uhsR7uqpcnXQMg+
-         rUD9i1nWTRjhwVmgvBvCAOyMniruzdsCg4S+WW/2dHQFl3TjKmUeZY5rfZ5gTDPz5fvF
-         w9YauGSpLyYQFeQpU93u06WsaVnBmlRc3wLbf9fQzZ9LxnVYgRXTrCBqPuubQAE8QpBF
-         df4tJPhYjEH8k1iWAeoKSxFh7YEmK1XQj63PizyaFFWnT7Wlv1gsGAbqqnHZvXBi9lKp
-         Uifw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hz13+EskcgyouK62xEU1xMVMi/1CsedMBb94vxwuakU=;
-        b=TnfGLCbz9YuiOfgLwBlhXPjuJGL80uWmNJ73JDkSmXbKJvNN4R2YW3FxSDtRCX9zIb
-         WXT3RZcd0fLvc4+eK3Coy9ULc52/HUF9qjKfsuAzrSPnBrL4qyB7dvyuD89Os05EOfo5
-         sU87UkcTqdOugt50ywEjp7gLt5Uu49gijO017iRqrB1+/EY2vMJ60Le75Nmd4TLkQMO+
-         PLHclWs35PBwYYCQwTz63AZjpgqP1We6ZITWvMRk1zdyKvZVQ9qUI966CWjOh8WweSNs
-         F+Sjz7y1DaivUejgOSB55pbG+mOzqgTCre+kkLFTSC8R0d87FGz2UVx8TjKzQp3aiZFC
-         tFFw==
-X-Gm-Message-State: AFqh2kq3/GrtVGgTjoy/db2rbGno80kgZZ1T5a4sxr6R+ZoY21+VN1jn
-        jVnEFyNw+Jg1EIFU+n6rcwxz4QjbK9G9ePM63xs=
-X-Google-Smtp-Source: AMrXdXuUDLRasfxos2xRiocCMraqsuJ04V/aLI+9jYAhxaIk2p8+Q3774nsx5rHKJjbS7Ywl8ENyv62YVzLWDwrYlwY=
-X-Received: by 2002:a2e:9d89:0:b0:27f:ee1b:770b with SMTP id
- c9-20020a2e9d89000000b0027fee1b770bmr388046ljj.65.1672792912493; Tue, 03 Jan
- 2023 16:41:52 -0800 (PST)
+        Wed, 4 Jan 2023 01:37:01 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF16BF6C;
+        Tue,  3 Jan 2023 22:37:00 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Nn0GP5F6gzRqmh;
+        Wed,  4 Jan 2023 14:35:25 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 4 Jan
+ 2023 14:36:56 +0800
+From:   Zhengchao Shao <shaozhengchao@huawei.com>
+To:     <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC:     <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+        <shaozhengchao@huawei.com>
+Subject: [PATCH] Bluetooth: hci_conn: fix memory leak in hci_le_terminate_big() and hci_le_big_terminate()
+Date:   Wed, 4 Jan 2023 14:46:23 +0800
+Message-ID: <20230104064623.1140644-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <20221229155257.341327-1-abhay.maheshbhai.maheta@intel.com> <20221229155257.341327-6-abhay.maheshbhai.maheta@intel.com>
-In-Reply-To: <20221229155257.341327-6-abhay.maheshbhai.maheta@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 3 Jan 2023 16:41:40 -0800
-Message-ID: <CABBYNZK5Dp1u_3x9YMKdAA1y8+0GSh8-ZMbnHwXGUb94ynU_Gw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 5/6] client/player: Add support for Company ID,
- Vendor ID
-To:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, Abhay Maheta <mabhay125@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhay,
+When hci_cmd_sync_queue() failed in hci_le_terminate_big() or
+hci_le_big_terminate(), the memory pointed by variable d is not freed,
+which will cause memory leak. Add release process to error path.
 
-On Thu, Dec 29, 2022 at 7:58 AM Abhay Maheta
-<abhay.maheshbhai.maheta@intel.com> wrote:
->
-> This adds support for Company ID and Vendor Codec ID in  BAP profile.
-> This also adds handling of Vendor Specific Coding format for BAP
-> Profile.
->
-> Now it allows to enter zero codec capabilities.
-> In order to register zero codec capabilities, 0 shall be
-> entered when prompted.
->
-> [bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0xff
-> [/local/endpoint/ep2] Enter Capabilities: 0
-> [/local/endpoint/ep2] Enter Company ID & Vendor ID: 0xaabbccdd
+Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+---
+ net/bluetooth/hci_conn.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-Lets do this a little differently:
-
-<UUID> <codec[:company]> [capabilities...]
-endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0xccdd:0xaabb
-
-So you can detect if the user has entered a tuble by parsing ':', if
-it does you assume the Codec to be 0xff and use the tuple entered as
-Vendor otherwise you must omit the Vendor, which means you need to
-have a exists callback that returns cid && vid.
-
-> [/local/endpoint/ep2] Auto Accept (yes/no): y
-
-I don't think it makes any sense to Auto Accept in case of vendor
-codecs since we don't have presets for them, except if you want to
-default to custom preset which the user can change.
-
-> [/local/endpoint/ep2] CIG (auto/value): a
-> [/local/endpoint/ep2] CIS (auto/value): a
-> Endpoint /local/endpoint/ep2 registered
-> ---
->  client/player.c | 131 +++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 114 insertions(+), 17 deletions(-)
->
-> diff --git a/client/player.c b/client/player.c
-> index eba233329..ff1ff209c 100644
-> --- a/client/player.c
-> +++ b/client/player.c
-> @@ -66,6 +66,8 @@ struct endpoint {
->         char *path;
->         char *uuid;
->         uint8_t codec;
-> +       uint16_t cid;
-> +       uint16_t vid;
->         struct iovec *caps;
->         bool auto_accept;
->         bool acquiring;
-> @@ -85,6 +87,7 @@ static GList *endpoints = NULL;
->  static GList *local_endpoints = NULL;
->  static GList *transports = NULL;
->  static struct queue *ios = NULL;
-> +static bool is_cid_available = FALSE;
->
->  struct transport {
->         GDBusProxy *proxy;
-> @@ -1815,7 +1818,8 @@ static void endpoint_free(void *data)
->         struct endpoint *ep = data;
->
->         if (ep->caps) {
-> -               g_free(ep->caps->iov_base);
-> +               if (ep->caps->iov_base)
-> +                       g_free(ep->caps->iov_base);
->                 g_free(ep->caps);
->         }
->
-> @@ -1865,10 +1869,32 @@ static gboolean endpoint_get_capabilities(const GDBusPropertyTable *property,
->         return TRUE;
->  }
->
-> +static gboolean endpoint_get_cid(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct endpoint *ep = data;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &ep->cid);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static gboolean endpoint_get_vid(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct endpoint *ep = data;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &ep->vid);
-> +
-> +       return TRUE;
-> +}
-> +
->  static const GDBusPropertyTable endpoint_properties[] = {
->         { "UUID", "s", endpoint_get_uuid, NULL, NULL },
->         { "Codec", "y", endpoint_get_codec, NULL, NULL },
->         { "Capabilities", "ay", endpoint_get_capabilities, NULL, NULL },
-> +       { "CompanyID", "q", endpoint_get_cid, NULL, NULL },
-> +       { "VendorCodecID", "q", endpoint_get_vid, NULL, NULL },
->         { }
->  };
->
-> @@ -1886,12 +1912,20 @@ static void register_endpoint_setup(DBusMessageIter *iter, void *user_data)
->
->         g_dbus_dict_append_entry(&dict, "Codec", DBUS_TYPE_BYTE, &ep->codec);
->
-> -       g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
-> +       g_dbus_dict_append_entry(&dict, "CompanyID", DBUS_TYPE_UINT16,
-> +                                       &ep->cid);
-> +
-> +       g_dbus_dict_append_entry(&dict, "VendorCodecID", DBUS_TYPE_UINT16,
-> +                                       &ep->vid);
-> +
-> +       if (ep->caps->iov_len) {
-> +               g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
->                                         DBUS_TYPE_BYTE, &ep->caps->iov_base,
->                                         ep->caps->iov_len);
->
-> -       bt_shell_printf("Capabilities:\n");
-> -       bt_shell_hexdump(ep->caps->iov_base, ep->caps->iov_len);
-> +               bt_shell_printf("Capabilities:\n");
-> +               bt_shell_hexdump(ep->caps->iov_base, ep->caps->iov_len);
-> +       }
->
->         dbus_message_iter_close_container(iter, &dict);
->  }
-> @@ -1950,6 +1984,21 @@ fail:
->
->  }
->
-> +static void get_cid_vid(const char *input, uint32_t *id)
-> +{
-> +       char *endptr = NULL;
-> +       int value;
-> +
-> +       value = strtol(input, &endptr, 0);
-> +
-> +       if (!endptr || (char)*endptr != (char)'\0' || value > UINT32_MAX) {
-> +               bt_shell_printf("Invalid argument: %s\n", input);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       *id = (uint32_t)value;
-> +}
-> +
->  static void endpoint_cis(const char *input, void *user_data)
->  {
->         struct endpoint *ep = user_data;
-> @@ -2010,19 +2059,55 @@ static void endpoint_auto_accept(const char *input, void *user_data)
->         bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
->  }
->
-> +static void endpoint_set_id(const char *input, void *user_data)
-> +{
-> +       struct endpoint *ep = user_data;
-> +       uint32_t val;
-> +
-> +       get_cid_vid(input, &val);
-> +       ep->cid = (uint16_t)(val & 0x0000ffff);
-> +       ep->vid = (uint16_t)((val & 0xffff0000) >> 16);
-> +
-> +       bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
-> +                       endpoint_auto_accept, ep);
-> +}
-> +
-> +static void endpoint_set_parameters(struct endpoint *ep)
-> +{
-> +       if (!(strcasecmp(ep->uuid, PAC_SINK_UUID)) ||
-> +               !(strcasecmp(ep->uuid, PAC_SOURCE_UUID))) {
-> +               if ((ep->codec == 0xff) && (is_cid_available == FALSE))
-> +                       bt_shell_prompt_input(ep->path,
-> +                               "Enter Company ID & Vendor ID:",
-> +                               endpoint_set_id, ep);
-> +               else
-> +                       bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
-> +                                       endpoint_auto_accept, ep);
-> +       } else
-> +               bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
-> +                               endpoint_auto_accept, ep);
-> +}
-> +
->  static void endpoint_set_capabilities(const char *input, void *user_data)
->  {
->         struct endpoint *ep = user_data;
->
-> -       if (ep->caps)
-> +       if (ep->caps && ep->caps->iov_base) {
->                 g_free(ep->caps->iov_base);
-> -       else
-> +               ep->caps = g_new0(struct iovec, 1);
-> +       } else
->                 ep->caps = g_new0(struct iovec, 1);
->
->         ep->caps->iov_base = str2bytearray((char *) input, &ep->caps->iov_len);
->
-> -       bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
-> -                                               endpoint_auto_accept, ep);
-> +       if (ep->caps->iov_len == 0x01 &&
-> +                       (*(uint8_t *)(ep->caps->iov_base)) == 0x00) {
-> +               g_free(ep->caps->iov_base);
-> +               ep->caps->iov_base = NULL;
-> +               ep->caps->iov_len = 0x00;
-> +       }
-> +
-> +       endpoint_set_parameters(ep);
->  }
->
->  static char *uuid_generator(const char *text, int state)
-> @@ -2073,13 +2158,13 @@ static void cmd_register_endpoint(int argc, char *argv[])
->         ep = g_new0(struct endpoint, 1);
->         ep->uuid = g_strdup(argv[1]);
->         ep->codec = strtol(argv[2], &endptr, 0);
-> +       ep->cid = 0x0000;
-> +       ep->vid = 0x0000;
->         ep->path = g_strdup_printf("%s/ep%u", BLUEZ_MEDIA_ENDPOINT_PATH,
->                                         g_list_length(local_endpoints));
->         local_endpoints = g_list_append(local_endpoints, ep);
->
-> -       if (argc > 3)
-> -               endpoint_set_capabilities(argv[3], ep);
-> -       else {
-> +       if (argc == 3) {
->                 const struct capabilities *cap;
->
->                 cap = find_capabilities(ep->uuid, ep->codec);
-> @@ -2089,13 +2174,25 @@ static void cmd_register_endpoint(int argc, char *argv[])
->
->                         /* Copy capabilities */
->                         iov_append(&ep->caps, cap->data.iov_base,
-> -                                                       cap->data.iov_len);
-> +                                       cap->data.iov_len);
->
-> -                       bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
-> -                                               endpoint_auto_accept, ep);
-> +                       endpoint_set_parameters(ep);
->                 } else
-> -                       bt_shell_prompt_input(ep->path, "Enter capabilities:",
-> -                                               endpoint_set_capabilities, ep);
-> +                       bt_shell_prompt_input(ep->path, "Enter Capabilities:",
-> +                                       endpoint_set_capabilities, ep);
-> +       } else if (argc == 4) {
-> +               endpoint_set_capabilities(argv[3], ep);
-> +       } else if (argc == 5) {
-> +               uint32_t val = 0;
-> +
-> +               get_cid_vid(argv[4], &val);
-> +               ep->cid = (uint16_t)(val & 0x0000ffff);
-> +               ep->vid = (uint16_t)((val & 0xffff0000) >> 16);
-> +               is_cid_available = TRUE;
-> +
-> +               endpoint_set_capabilities(argv[3], ep);
-> +
-> +               is_cid_available = FALSE;
->         }
->  }
->
-> @@ -2638,7 +2735,7 @@ static const struct bt_shell_menu endpoint_menu = {
->         { "show",         "<endpoint>", cmd_show_endpoint,
->                                                 "Endpoint information",
->                                                 endpoint_generator },
-> -       { "register",     "<UUID> <codec> [capabilities...]",
-> +       { "register",     "<UUID> <codec> [capabilities...] [Company ID]",
->                                                 cmd_register_endpoint,
->                                                 "Register Endpoint",
->                                                 uuid_generator },
-> --
-> 2.25.1
->
-
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d3e542c2fc3e..acf563fbdfd9 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -821,6 +821,7 @@ static void terminate_big_destroy(struct hci_dev *hdev, void *data, int err)
+ static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
+ {
+ 	struct iso_list_data *d;
++	int ret;
+ 
+ 	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
+ 
+@@ -831,8 +832,12 @@ static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
+ 	d->big = big;
+ 	d->bis = bis;
+ 
+-	return hci_cmd_sync_queue(hdev, terminate_big_sync, d,
+-				  terminate_big_destroy);
++	ret = hci_cmd_sync_queue(hdev, terminate_big_sync, d,
++				 terminate_big_destroy);
++	if (ret)
++		kfree(d);
++
++	return ret;
+ }
+ 
+ static int big_terminate_sync(struct hci_dev *hdev, void *data)
+@@ -857,6 +862,7 @@ static int big_terminate_sync(struct hci_dev *hdev, void *data)
+ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
+ {
+ 	struct iso_list_data *d;
++	int ret;
+ 
+ 	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_handle);
+ 
+@@ -867,8 +873,12 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
+ 	d->big = big;
+ 	d->sync_handle = sync_handle;
+ 
+-	return hci_cmd_sync_queue(hdev, big_terminate_sync, d,
+-				  terminate_big_destroy);
++	ret = hci_cmd_sync_queue(hdev, big_terminate_sync, d,
++				 terminate_big_destroy);
++	if (ret)
++		kfree(d);
++
++	return ret;
+ }
+ 
+ /* Cleanup BIS connection
 -- 
-Luiz Augusto von Dentz
+2.34.1
+
