@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ADA4C54EBC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A5FC54EBD
 	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Jan 2023 22:10:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235444AbjAEWKJ (ORCPT
+        id S235717AbjAEWKM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Jan 2023 17:10:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47104 "EHLO
+        Thu, 5 Jan 2023 17:10:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235705AbjAEWJt (ORCPT
+        with ESMTP id S235623AbjAEWJw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Jan 2023 17:09:49 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D37C167BEA
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jan 2023 14:09:47 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d3so40764809plr.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jan 2023 14:09:47 -0800 (PST)
+        Thu, 5 Jan 2023 17:09:52 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F30367BE4
+        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jan 2023 14:09:52 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id cl14so4846579pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jan 2023 14:09:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLx/zURPiGT0IcVnLTUycL4Bg0QmQuAYlvG/tHxlN70=;
-        b=PW8wjLZmTcfPe9sjHOqaoPZJYFTtlILPY/B3AOeu/dqQKeGMrMdTDbVdGmcROyUNVB
-         6Mi6C3eb5BQlzi/sSMtZ+CavvTcr1qOtyYTG4acympyqvhpeVDZecLmuK3HHe2BBcj0V
-         /fkK1NwWkpCbTnqQpYTUH3zFlVzO/v89x6RPZNialEwkqLeRBFHitPaZ5/qQ8FOMvAnh
-         3Yl9myBu2wVTvoHP0wyWF95vaU9sGe8x7Sq5eJlJazvdWAfxH5IGMvNB7s2afFrbm9+Z
-         4BofFE0v8Ex6Ge9BsLNh7YTRudRUtVrG6oh6BtxoP8K61puQc6aNN+ZmxHCYsb4QhpAh
-         ArVg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cNud4kWdkw52+hXAnumbx8Ikmuw+BRe/Pf1t1Z/q3Y8=;
+        b=QOvEbBJ6Pz0b7wJvrbxCCq88bebfI8kMwj31mnJ1IkhpwRY+xbW4RwogMOM/uc90KK
+         h07gzh0+83sDvk19FB091QxdWESboAEzMoW/PxF1Q/q3h2t2favLsXUuMKgLDNzRnkge
+         l05gV0kCYJ5/RNaKgQoWsTm5M1rReUuPQKhKPY8McLsPx+7033AHoEVRS17YWp1P9Y8X
+         jc9Nl7G5uSBeHTqp/TKEldlTnXK3eCA1/a5Okez6Cf4l7p88c6zprnWCkY5JkiBvgqa7
+         60g7ORKbe/9XUghUtkSEtCuuN/SBz08DR0aRtFWvkvJKLaxQHc1eiJdP+f5O1aMO7iwa
+         p4jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLx/zURPiGT0IcVnLTUycL4Bg0QmQuAYlvG/tHxlN70=;
-        b=WpSuXFtQrVSu6YkptW3mFG4BQxfQMOkPQhLot5htZoCOfE/oVGBn9ydz/VffC7ATpT
-         23lLZpY31ch16hqQle1KSIxiqLkWk2MoYSjJoVoGLllfYnkTrp7AVax4+oVyDmvG9956
-         WAuwUkWG18VQTKxaGTQp6b+PZ7Q9lSQSNTYG63y6CkYhR8y1Rc1IvU1MCLWr2nwgb+MO
-         CnwjE8Wcq0xblk/rg+uhKBgZxd5lwtaSuUALG3tY9y2vJ/BO4h9nFXVWX8ifCgUcFyjm
-         /cZUP36yWpeva8s4UVWM3vr/IbvOLH5quWANAzrLmXYMY5Nl4DTXKw4j/yoe/TvKsEMb
-         RBlQ==
-X-Gm-Message-State: AFqh2koRhxCUyM5wyvr7pigArXRMEd6tnU3qYTWJbPTzxUglQQEejext
-        XbAVzXJMFsSyR1YmID2NDTyv8hMJtvA=
-X-Google-Smtp-Source: AMrXdXuRs/vB5vvxevfw5/gHrqACbw/dmWl1t/+sd/0dwtuX2cTS+wqq7aaanxfe7EIbKYjnV1DuJQ==
-X-Received: by 2002:a17:902:f201:b0:189:377c:9ab with SMTP id m1-20020a170902f20100b00189377c09abmr48996978plc.51.1672956586631;
-        Thu, 05 Jan 2023 14:09:46 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cNud4kWdkw52+hXAnumbx8Ikmuw+BRe/Pf1t1Z/q3Y8=;
+        b=5U3/Z34S6tAsuoue0Mb35CKafc9E26c9srW6ZjHt5d3mzbUZGBc1mDgqGGltgeKi4n
+         p8aWuJldRG/p9i6U6klIANAlQkI+K4Oe18/7fyJwXUYGQYTwrJk/0cwdJzimQqYDVl/u
+         5lenusYosRwoDtmW3KuWBEosSEILJTgxNA9b98QZ9oq+rPDTyvgUWQ40adpFqg9hYu8L
+         zpcdOiO0TApwVvX0sJ9jE9Q5Sz44ODUWctZb64z7LVUIH47QUS9jmhulc6U8c/619ucW
+         QPcSDOjDgfITRjJcZFA/izWmcmpdpafvwLyYjqZd/T0KCwSWAKsi140MCn8bUDdWcQZ4
+         yeKA==
+X-Gm-Message-State: AFqh2koMnpS9g1mj+WR0NS/LjyeeTije3N27TMZ0FT6IUGbb0a/lcs1G
+        vV2ebi9BuIElQ2FlOT/l5rmo7ntu52s=
+X-Google-Smtp-Source: AMrXdXsGCBdyo3L4/G7HSss0WYQ8vB2kK8TMOpoguSJR2DQsPCYdFgmKK17/6fMgZVFfnXgXj3iQGA==
+X-Received: by 2002:a17:902:f145:b0:191:10e0:b912 with SMTP id d5-20020a170902f14500b0019110e0b912mr52494033plb.41.1672956591194;
+        Thu, 05 Jan 2023 14:09:51 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id jg21-20020a17090326d500b001929827731esm16744861plb.201.2023.01.05.14.09.45
+        by smtp.gmail.com with ESMTPSA id jg21-20020a17090326d500b001929827731esm16744861plb.201.2023.01.05.14.09.50
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 14:09:46 -0800 (PST)
+        Thu, 05 Jan 2023 14:09:50 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/gatt-client: Use parent debug_callback if not set on clone
-Date:   Thu,  5 Jan 2023 14:09:41 -0800
-Message-Id: <20230105220944.2373424-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] hog-lib: Fix not handling BT_ATT_OP_HANDLE_NFY_MULT
+Date:   Thu,  5 Jan 2023 14:09:44 -0800
+Message-Id: <20230105220944.2373424-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20230105220944.2373424-1-luiz.dentz@gmail.com>
+References: <20230105220944.2373424-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,58 +68,77 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If clone don't have a dedicated callback set use its parent so users of
-bt_gatt_client_clone don't have to keep setting the same callback for
-all clone instances.
----
- src/shared/gatt-client.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+This is a temporary fix for not handling BT_ATT_OP_HANDLE_NFY_MULT in
+GAttr so the code will use g_attrib_attach_client to attach the
+bt_gatt_client instance which is then used to register notifications
+including those sent with BT_ATT_OP_HANDLE_NFY_MULT.
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index cb2e64b6cc6b..4aa5d7d92957 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -38,7 +38,8 @@
- #define GATT_SVC_UUID	0x1801
- #define SVC_CHNGD_UUID	0x2a05
- #define DBG(_client, _format, arg...) \
--	gatt_log(_client, "%s:%s() " _format, __FILE__, __func__, ## arg)
-+	gatt_log(_client, "[%p] %s:%s() " _format, _client, __FILE__, \
-+		__func__, ## arg)
- 
- struct ready_cb {
- 	bt_gatt_client_callback_t callback;
-@@ -357,15 +358,28 @@ static void discovery_op_free(struct discovery_op *op)
- 
- static bool read_db_hash(struct discovery_op *op);
- 
-+static void gatt_log_va(struct bt_gatt_client *client, const char *format,
-+						va_list va)
-+{
-+	if (!client || !format)
-+		return;
-+
-+	if (client->debug_callback)
-+		util_debug_va(client->debug_callback, client->debug_data,
-+							format, va);
-+	else
-+		gatt_log_va(client->parent, format, va);
-+}
-+
- static void gatt_log(struct bt_gatt_client *client, const char *format, ...)
- {
- 	va_list ap;
- 
--	if (!client || !format || !client->debug_callback)
-+	if (!client || !format)
- 		return;
- 
- 	va_start(ap, format);
--	util_debug_va(client->debug_callback, client->debug_data, format, ap);
-+	gatt_log_va(client, format, ap);
- 	va_end(ap);
+Fixes: https://github.com/bluez/bluez/issues/71
+---
+ profiles/input/hog-lib.c | 23 +++++++++++++++++++++--
+ src/device.c             |  1 +
+ 2 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 021db386f3b7..7ff1ede3db35 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -374,6 +374,15 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
  }
  
++static void report_notify_destroy(void *user_data)
++{
++	struct report *report = user_data;
++
++	DBG("");
++
++	report->notifyid = 0;
++}
++
+ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+@@ -393,7 +402,13 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ 	report->notifyid = g_attrib_register(hog->attrib,
+ 					ATT_OP_HANDLE_NOTIFY,
+ 					report->value_handle,
+-					report_value_cb, report, NULL);
++					report_value_cb, report,
++					report_notify_destroy);
++	if (!report->notifyid) {
++		error("Unable to register report notification: handle 0x%04x",
++					report->value_handle);
++		goto remove;
++	}
+ 
+ 	DBG("Report characteristic descriptor written: notifications enabled");
+ 
+@@ -1798,7 +1813,11 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ 		r->notifyid = g_attrib_register(hog->attrib,
+ 					ATT_OP_HANDLE_NOTIFY,
+ 					r->value_handle,
+-					report_value_cb, r, NULL);
++					report_value_cb, r,
++					report_notify_destroy);
++		if (!r->notifyid)
++			error("Unable to register report notification: "
++				"handle 0x%04x", r->value_handle);
+ 	}
+ 
+ 	return true;
+diff --git a/src/device.c b/src/device.c
+index 995d39f2ccee..28b93eb9ac38 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5152,6 +5152,7 @@ static void gatt_client_init(struct btd_device *device)
+ 	}
+ 
+ 	bt_gatt_client_set_debug(device->client, gatt_debug, NULL, NULL);
++	g_attrib_attach_client(device->attrib, device->client);
+ 
+ 	/*
+ 	 * Notify notify existing service about the new connection so they can
 -- 
 2.37.3
 
