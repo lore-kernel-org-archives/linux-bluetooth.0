@@ -2,180 +2,182 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 449DFC3DA7A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Jan 2023 00:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE3BC4708E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Jan 2023 00:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235600AbjAFALp (ORCPT
+        id S236034AbjAFAYQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Jan 2023 19:11:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41026 "EHLO
+        Thu, 5 Jan 2023 19:24:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232288AbjAFALo (ORCPT
+        with ESMTP id S235829AbjAFAYP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Jan 2023 19:11:44 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ABDC3C0D0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Jan 2023 16:11:43 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id f34so57220967lfv.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Jan 2023 16:11:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+uNu0ILOzwlGDT8oO7nCLCfdhaN3mPgL/+wr/CPYVWQ=;
-        b=eQhGWiMV7unhqVe88eoYbLWDxKdA2sjezvCDVj8gbwwN1ik075ndqTrywJODHVZBOo
-         SPlrsHHcrJ85cXPcDwRSThksC637AHfFhr+5s9k5VvZyRqZm7BkNj6TzEbftLEGT9B3R
-         KtCxRwc6JFtLDZLRxsbDRw/XxxpBFrOAYp+M4lxqDibWwR74BVhSsW09aD9Zpmh439ie
-         MaZIqWQQD8Z0yDpGAO/DBi+6jwrDULwFYsSYXZgLYa+fDhEP/0zvIRd//cbEQdvdcH5a
-         gRvkzRek1aSD9rDOZZHrNGPUEY9lDZHqQfOeDTj0AgdKdBZJyH2ponJPcAvgNjWI7rc7
-         4V/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+uNu0ILOzwlGDT8oO7nCLCfdhaN3mPgL/+wr/CPYVWQ=;
-        b=xwfF0aSw8m15KUlHcuPUAEaE2kqBGA7KDUt1zzdn686ApcDCz4u3zOku5+zHXdZTro
-         OiEjgxwBgk9kzRWUXtPs4ylTkqbjZI12ucCl+SHKtHyj58rCrdj68gtWZZ8HW3p5JlAO
-         7CjziiW5oJdQ7wVHaGDstl+nsi6AkSxULdHXHYKQ1Qxf9y332s5lTn+5qMoy2eKCxxHE
-         cR5BS9q7DeHhTjpQsA60IdIXNqTo58w/Y5yXnwn48SIbXZh4zdR1jWmbKEB3Qkb+eqYr
-         0uxgbLgSRbebOpON+iUQI9cGXEO/IuxMe8VN6xYfXwa1dFYVy3B3E8ADopJQlhcYUgDu
-         mFcg==
-X-Gm-Message-State: AFqh2kpxmYEr/e3HtYMS6olMA0eb9eWELJ+S+y7VN1CutnwUgR+tdyKJ
-        5ay5H69MaCWxdeMEPFBoj/VzTDyz8N/mUfBt/sxB1akj
-X-Google-Smtp-Source: AMrXdXsawMtsf547xT741xZECt0Zg8HvLX9CwuaEd2guUnAnYVbpGVlnnkRp9DsvabuXK1VDgu5thpFMgNjRSIXmNfI=
-X-Received: by 2002:ac2:597a:0:b0:4cb:22ab:ce08 with SMTP id
- h26-20020ac2597a000000b004cb22abce08mr900375lfp.251.1672963901020; Thu, 05
- Jan 2023 16:11:41 -0800 (PST)
+        Thu, 5 Jan 2023 19:24:15 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E593D5E7;
+        Thu,  5 Jan 2023 16:24:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EA471B81C1D;
+        Fri,  6 Jan 2023 00:24:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84D0AC433EF;
+        Fri,  6 Jan 2023 00:24:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672964651;
+        bh=Pr+ByNbnKnyylNHymZV2KojcC95mHZk9AOH8Fd3/i0c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Vj5bJav6AbfJrIGZRQRFk79a4eWhGWNCku0ikf98IQdE/cy6oYSJRR981IYDMPduN
+         ua3U0S7rIzOUnf+eQimZw0/cdjb4QbYolcAlip2PCMFwES+vf/dEGF3UJgSomx+9ho
+         B8FrEoWGtB9TL2kUcVgrVchpY7oFO86PcdEVRHacm3jf/4mcWi+8DnjNwZrsdhuPmh
+         CLO5eiTTRD7yYIEgtW0O7Arfsyda8nSU8yDTVE2q6PC8Jmj1MY/8ErIfh48Zs71pbr
+         MjkhN5uNOD2hpavHEfWFems11bzTuwj2zSx3scFx2yFarEnNuaSxRJ8gHi4uWMiF3w
+         /ZPyjFfwa650g==
+Date:   Thu, 5 Jan 2023 16:24:10 -0800
+From:   Saeed Mahameed <saeed@kernel.org>
+To:     Leon Romanovsky <leon@kernel.org>
+Cc:     Ying Hsu <yinghsu@chromium.org>, linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix possible deadlock in
+ rfcomm_sk_state_change
+Message-ID: <Y7dqKnQe8UUeQ/CD@x130>
+References: <20230103111221.1.I1f29bb547a03e9adfe2e6754212f9d14a2e39c4b@changeid>
+ <Y7UiDn3Gi5YdNIoC@unreal>
 MIME-Version: 1.0
-References: <20230105220944.2373424-1-luiz.dentz@gmail.com> <63b76559.050a0220.cbe75.dd46@mx.google.com>
-In-Reply-To: <63b76559.050a0220.cbe75.dd46@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 5 Jan 2023 16:11:29 -0800
-Message-ID: <CABBYNZ+_PgENto6BgULY_O9kgpAAmSmigAwq2U=9tmo-2J2GJg@mail.gmail.com>
-Subject: Re: [BlueZ,1/4] shared/gatt-client: Use parent debug_callback if not
- set on clone
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <Y7UiDn3Gi5YdNIoC@unreal>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
-
-On Thu, Jan 5, 2023 at 4:03 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D709=
-312
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      2.39 seconds
-> GitLint                       PASS      1.39 seconds
-> BuildEll                      PASS      33.02 seconds
-> BluezMake                     PASS      998.52 seconds
-> MakeCheck                     PASS      12.62 seconds
-> MakeDistcheck                 PASS      178.17 seconds
-> CheckValgrind                 PASS      289.84 seconds
-> CheckSmatch                   WARNING   383.95 seconds
-> bluezmakeextell               PASS      116.46 seconds
-> IncrementalBuild              PASS      3284.64 seconds
-> ScanBuild                     WARNING   1193.87 seconds
->
-> Details
-> ##############################
-> Test: CheckSmatch - WARNING
-> Desc: Run smatch tool with source
-> Output:
-> src/shared/gatt-client.c:2764:33: warning: Variable length array is used.=
-src/shared/gatt-client.c:2994:23: warning: Variable length array is used.sr=
-c/shared/gatt-client.c:3075:23: warning: Variable length array is used.src/=
-shared/gatt-client.c:3514:23: warning: Variable length array is used.src/sh=
-ared/gatt-client.c:2764:33: warning: Variable length array is used.src/shar=
-ed/gatt-client.c:2994:23: warning: Variable length array is used.src/shared=
-/gatt-client.c:3075:23: warning: Variable length array is used.src/shared/g=
-att-client.c:3514:23: warning: Variable length array is used.src/shared/gat=
-t-client.c:2764:33: warning: Variable length array is used.src/shared/gatt-=
-client.c:2994:23: warning: Variable length array is used.src/shared/gatt-cl=
-ient.c:3075:23: warning: Variable length array is used.src/shared/gatt-clie=
-nt.c:3514:23: warning: Variable length array is used.src/shared/gatt-client=
-.c:2764:33: warning: Variable length array is used.src/shared/gatt-client.c=
-:2994:23: warning: Variable length array is used.src/shared/gatt-client.c:3=
-075:23: warning: Variable length array is used.src/shared/gatt-client.c:351=
-4:23: warning: Variable length array is used.src/shared/gatt-client.c:2764:=
-33: warning: Variable length array is used.src/shared/gatt-client.c:2994:23=
-: warning: Variable length array is used.src/shared/gatt-client.c:3075:23: =
-warning: Variable length array is used.src/shared/gatt-client.c:3514:23: wa=
-rning: Variable length array is used.src/shared/gatt-client.c:2764:33: warn=
-ing: Variable length array is used.src/shared/gatt-client.c:2994:23: warnin=
-g: Variable length array is used.src/shared/gatt-client.c:3075:23: warning:=
- Variable length array is used.src/shared/gatt-client.c:3514:23: warning: V=
-ariable length array is used.
-
-Looks like the output of smatch is not quite right, it is probably
-missing new line or something.
-
-> ##############################
-> Test: ScanBuild - WARNING
-> Desc: Run Scan Build
-> Output:
-> src/shared/gatt-client.c:401:21: warning: Use of memory after it is freed
->         gatt_db_unregister(op->client->db, op->db_id);
->                            ^~~~~~~~~~
-> src/shared/gatt-client.c:646:2: warning: Use of memory after it is freed
->         discovery_op_complete(op, false, att_ecode);
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:943:2: warning: Use of memory after it is freed
->         discovery_op_complete(op, success, att_ecode);
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:1049:2: warning: Use of memory after it is freed
->         discovery_op_complete(op, success, att_ecode);
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:1241:2: warning: Use of memory after it is freed
->         discovery_op_complete(op, success, att_ecode);
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:1306:2: warning: Use of memory after it is freed
->         discovery_op_complete(op, success, att_ecode);
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:1577:6: warning: Use of memory after it is freed
->         if (read_db_hash(op)) {
->             ^~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:1582:2: warning: Use of memory after it is freed
->         discover_all(op);
->         ^~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:2088:6: warning: Use of memory after it is freed
->         if (read_db_hash(op)) {
->             ^~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:2096:8: warning: Use of memory after it is freed
->                                                         discovery_op_ref(=
-op),
->                                                         ^~~~~~~~~~~~~~~~~=
-~~~
-> src/shared/gatt-client.c:3182:2: warning: Use of memory after it is freed
->         complete_write_long_op(req, success, 0, false);
->         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> src/shared/gatt-client.c:3204:2: warning: Use of memory after it is freed
->         request_unref(req);
->         ^~~~~~~~~~~~~~~~~~
-> 12 warnings generated.
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+On 04 Jan 08:51, Leon Romanovsky wrote:
+>On Tue, Jan 03, 2023 at 11:12:46AM +0000, Ying Hsu wrote:
+>> There's a possible deadlock when two processes are connecting
+>> and closing concurrently:
+>>   + CPU0: __rfcomm_dlc_close locks rfcomm and then calls
+>>   rfcomm_sk_state_change which locks the sock.
+>>   + CPU1: rfcomm_sock_connect locks the socket and then calls
+>>   rfcomm_dlc_open which locks rfcomm.
+>>
+>> Here's the call trace:
+>>
+>> -> #2 (&d->lock){+.+.}-{3:3}:
+>>        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+>>        __mutex_lock0x12f/0x1360 kernel/locking/mutex.c:747
+>>        __rfcomm_dlc_close+0x15d/0x890 net/bluetooth/rfcomm/core.c:487
+>>        rfcomm_dlc_close+1e9/0x240 net/bluetooth/rfcomm/core.c:520
+>>        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
+>>        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
+>>        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
+>>        __sock_release+0xcd/0x280 net/socket.c:650
+>>        sock_close+0x1c/0x20 net/socket.c:1365
+>>        __fput+0x27c/0xa90 fs/file_table.c:320
+>>        task_work_run+0x16f/0x270 kernel/task_work.c:179
+>>        exit_task_work include/linux/task_work.h:38 [inline]
+>>        do_exit+0xaa8/0x2950 kernel/exit.c:867
+>>        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
+>>        get_signal+0x21c3/0x2450 kernel/signal.c:2859
+>>        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+>>        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+>>        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+>>        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+>>        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+>>        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+>>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>>
+>> -> #1 (rfcomm_mutex){+.+.}-{3:3}:
+>>        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+>>        __mutex_lock+0x12f/0x1360 kernel/locking/mutex.c:747
+>>        rfcomm_dlc_open+0x93/0xa80 net/bluetooth/rfcomm/core.c:425
+>>        rfcomm_sock_connect+0x329/0x450 net/bluetooth/rfcomm/sock.c:413
+>>        __sys_connect_file+0x153/0x1a0 net/socket.c:1976
+>>        __sys_connect+0x165/0x1a0 net/socket.c:1993
+>>        __do_sys_connect net/socket.c:2003 [inline]
+>>        __se_sys_connect net/socket.c:2000 [inline]
+>>        __x64_sys_connect+0x73/0xb0 net/socket.c:2000
+>>        do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>>        do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>>
+>> -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
+>>        check_prev_add kernel/locking/lockdep.c:3097 [inline]
+>>        check_prevs_add kernel/locking/lockdep.c:3216 [inline]
+>>        validate_chain kernel/locking/lockdep.c:3831 [inline]
+>>        __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5055
+>>        lock_acquire kernel/locking/lockdep.c:5668 [inline]
+>>        lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
+>>        lock_sock_nested+0x3a/0xf0 net/core/sock.c:3470
+>>        lock_sock include/net/sock.h:1725 [inline]
+>>        rfcomm_sk_state_change+0x6d/0x3a0 net/bluetooth/rfcomm/sock.c:73
+>>        __rfcomm_dlc_close+0x1b1/0x890 net/bluetooth/rfcomm/core.c:489
+>>        rfcomm_dlc_close+0x1e9/0x240 net/bluetooth/rfcomm/core.c:520
+>>        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
+>>        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
+>>        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
+>>        __sock_release+0xcd/0x280 net/socket.c:650
+>>        sock_close+0x1c/0x20 net/socket.c:1365
+>>        __fput+0x27c/0xa90 fs/file_table.c:320
+>>        task_work_run+0x16f/0x270 kernel/task_work.c:179
+>>        exit_task_work include/linux/task_work.h:38 [inline]
+>>        do_exit+0xaa8/0x2950 kernel/exit.c:867
+>>        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
+>>        get_signal+0x21c3/0x2450 kernel/signal.c:2859
+>>        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+>>        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+>>        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+>>        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+>>        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+>>        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+>>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>>
+>> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+>> ---
+>> This commit has been tested with a C reproducer on qemu-x86_64.
+>>
+>>  net/bluetooth/rfcomm/sock.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+>> index 21e24da4847f..29f9a88a3dc8 100644
+>> --- a/net/bluetooth/rfcomm/sock.c
+>> +++ b/net/bluetooth/rfcomm/sock.c
+>> @@ -410,8 +410,10 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
+>>  	d->sec_level = rfcomm_pi(sk)->sec_level;
+>>  	d->role_switch = rfcomm_pi(sk)->role_switch;
+>>
+>> +	release_sock(sk);
+>>  	err = rfcomm_dlc_open(d, &rfcomm_pi(sk)->src, &sa->rc_bdaddr,
+>                                           ^^^^
+>Are you sure that "sk" still exists here after you called to release_sock(sk)?
+>What prevents from use-after-free here?
 >
 
+sk must be valid to be locked in first place.
+release_sock() has mutex unlock semantics so it doesn't free anything..
 
---=20
-Luiz Augusto von Dentz
+from a quick review it doesn't seem to be necessary to keep the lock held
+around rfcomm_dlc_open, and looking into bt_sock_wait_state, it also
+releases the lock temporarily internally ..  so it won't matter if the lock
+got released temporarily earlier, IMHO. 
+Though you might want to make sure rfcomm_pi(sk)->src won't change,
+it seems like other functions use &rfcomm_sk_list.lock to protect it.
+
+Reviewed-by: Saeed Mahameed <saeed@kernel.org>
+
+>>  			      sa->rc_channel);
+>> +	lock_sock(sk);
+>>  	if (!err)
+>>  		err = bt_sock_wait_state(sk, BT_CONNECTED,
+>>  				sock_sndtimeo(sk, flags & O_NONBLOCK));
+>> --
+>> 2.39.0.314.g84b9a713c41-goog
+>>
