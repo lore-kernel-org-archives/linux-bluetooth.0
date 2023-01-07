@@ -2,171 +2,86 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B486C46467
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Jan 2023 08:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 068C1C46467
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 Jan 2023 15:51:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbjAGIt2 (ORCPT
+        id S231445AbjAGPvK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 7 Jan 2023 03:49:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56726 "EHLO
+        Sat, 7 Jan 2023 10:51:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbjAGIt0 (ORCPT
+        with ESMTP id S229754AbjAGPvJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 7 Jan 2023 03:49:26 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538A861457
-        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Jan 2023 00:49:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673081365; x=1704617365;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ZomSABJESjT32Q7Iimj2sUF5BP4HL5mTKL4LigcdD94=;
-  b=NdjEDB59r3v0YWY7ZigneunDEEmViBWHJwKcClkRXDsbMSU4CfYoc6r0
-   H4MLjRjuspbW3BhSel9KG52CxRQYrrVIj+mzYpeTsVo3jtm+8QPF9F1ua
-   T3BvXs3vzRpfLs77nQrTQ8hJf1zmEy9YqcG69qWQVHaMg6CJGyw33f0JU
-   rLbefVTnXQtn2alz3tJ6o/yYLQiFgmPMHBbDMXrpxIft5P/G/JfGPXMAs
-   MJFwd9HTCqf8EmmtcjYCWlvQr3xNvB6olnc+GGHXXJ3F8M5aJiArfporc
-   9e6hf4x6/y1AU6NslAOf3nR5gVz5ZrEFD9Nq5e9WWHQqmRIzaqIVmtcAQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="306142065"
-X-IronPort-AV: E=Sophos;i="5.96,308,1665471600"; 
-   d="scan'208";a="306142065"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2023 00:49:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="798505012"
-X-IronPort-AV: E=Sophos;i="5.96,308,1665471600"; 
-   d="scan'208";a="798505012"
-Received: from lkp-server02.sh.intel.com (HELO f1920e93ebb5) ([10.239.97.151])
-  by fmsmga001.fm.intel.com with ESMTP; 07 Jan 2023 00:49:23 -0800
-Received: from kbuild by f1920e93ebb5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pE4tG-0004R0-22;
-        Sat, 07 Jan 2023 08:49:22 +0000
-Date:   Sat, 07 Jan 2023 16:49:21 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- a288d38b19962efac5689dfa3eb9e7e111e39870
-Message-ID: <63b93211.wLGVew8FdwWr/qHY%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 7 Jan 2023 10:51:09 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C7604A974
+        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Jan 2023 07:51:05 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C0A68B810B2
+        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Jan 2023 15:51:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5DF23C433F0
+        for <linux-bluetooth@vger.kernel.org>; Sat,  7 Jan 2023 15:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673106662;
+        bh=CwKpH26a6ip5jEG52vrvq59um8eLk+G5vp62qXoqEg8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=h6HlCNa3jiNdr7b8/fjWRMQPzIc3wX3UaMr8KppFb1VdXVsnI69B4YbHo4GWeLBjQ
+         pk384FbycHVPMEERGLCA6RBqiNmIasx8GfPMSgUmE75FAkfZrGhq48QuEirKzqnXKl
+         5aYsM4rkTapYYAqgmC1CWSHGcOqpxwhqDzHSIEifN0uyl6qilSIblJ26Lvi+RL5UAL
+         3dE7nIb9jiXfE5/cRNJZNgFy6+qrTet9/Q5mOThi3kKS3pcyXnJLG2Op6MsN5qnU4H
+         kABJaFoo2HPSihah23HuVOWGY4+QFSdW+AnhZfVSx479a7tlwFiWXombZBQmdGiKCj
+         Uw2B+zXhi8WLA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3E563C43141; Sat,  7 Jan 2023 15:51:02 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216819] kernel detects Mediatek bluetooth does not work
+Date:   Sat, 07 Jan 2023 15:51:02 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: jeremy53561@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216819-62941-to3E7EsVxU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216819-62941@https.bugzilla.kernel.org/>
+References: <bug-216819-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: a288d38b19962efac5689dfa3eb9e7e111e39870  Bluetooth: qca: Fix sparse warnings
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216819
 
-elapsed time: 724m
+jeremy (jeremy53561@gmail.com) changed:
 
-configs tested: 93
-configs skipped: 3
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jeremy53561@gmail.com
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #2 from jeremy (jeremy53561@gmail.com) ---
+Looks like it needs a patch similar to
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+h=3Dv6.2-rc2&id=3D393dc5d19c825906f955210f10ee3befc39854f7
+for it to be supported
 
-gcc tested configs:
-um                           x86_64_defconfig
-um                             i386_defconfig
-arc                                 defconfig
-alpha                               defconfig
-s390                             allmodconfig
-s390                                defconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-s390                             allyesconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-x86_64                            allnoconfig
-x86_64                           rhel-8.3-kvm
-x86_64                           rhel-8.3-syz
-x86_64                           rhel-8.3-bpf
-x86_64                         rhel-8.3-kunit
-x86_64                          rhel-8.3-func
-x86_64                    rhel-8.3-kselftests
-ia64                             allmodconfig
-x86_64                              defconfig
-x86_64                           allyesconfig
-x86_64                               rhel-8.3
-i386                             allyesconfig
-i386                                defconfig
-powerpc                           allnoconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-sh                               allmodconfig
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-arm64                            allyesconfig
-arm                                 defconfig
-arm                              allyesconfig
-sparc64                             defconfig
-powerpc                       ppc64_defconfig
-sh                            titan_defconfig
-ia64                             alldefconfig
-powerpc                     mpc83xx_defconfig
-i386                          debian-10.3-kvm
-i386                        debian-10.3-kunit
-i386                         debian-10.3-func
-powerpc                      ppc40x_defconfig
-arc                              alldefconfig
-mips                           ci20_defconfig
-arm                        cerfcube_defconfig
-m68k                        mvme147_defconfig
-powerpc                 linkstation_defconfig
-arm                        clps711x_defconfig
-arm                       imx_v6_v7_defconfig
-mips                           xway_defconfig
-sh                          rsk7264_defconfig
-x86_64                           alldefconfig
-i386                          randconfig-c001
-sparc                             allnoconfig
-arc                     haps_hs_smp_defconfig
-sh                           sh2007_defconfig
-ia64                      gensparse_defconfig
-powerpc                      pasemi_defconfig
-arm                            lart_defconfig
-mips                         db1xxx_defconfig
-powerpc                      ppc6xx_defconfig
-mips                         cobalt_defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-riscv                             allnoconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
+--=20
+You may reply to this email to add a comment.
 
-clang tested configs:
-x86_64                        randconfig-a005
-x86_64                        randconfig-a003
-x86_64                        randconfig-a001
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-s390                 randconfig-r044-20230106
-hexagon              randconfig-r041-20230106
-hexagon              randconfig-r045-20230106
-riscv                randconfig-r042-20230106
-hexagon              randconfig-r041-20230107
-hexagon              randconfig-r045-20230107
-arm                  randconfig-r046-20230107
-powerpc                 xes_mpc85xx_defconfig
-powerpc                          g5_defconfig
-arm                          ixp4xx_defconfig
-x86_64                        randconfig-k001
-x86_64                          rhel-8.3-rust
-arm                         palmz72_defconfig
-arm                         orion5x_defconfig
-arm                           spitz_defconfig
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+You are receiving this mail because:
+You are the assignee for the bug.=
