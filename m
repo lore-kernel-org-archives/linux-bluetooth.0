@@ -2,80 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 379EEC54EBC
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Jan 2023 01:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C82FC54EBD
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Jan 2023 02:38:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233920AbjAIBRj (ORCPT
+        id S233682AbjAICiK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Jan 2023 20:17:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38556 "EHLO
+        Sun, 8 Jan 2023 21:38:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233682AbjAIBRh (ORCPT
+        with ESMTP id S231325AbjAICiJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Jan 2023 20:17:37 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC08BEA;
-        Sun,  8 Jan 2023 17:17:35 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NqwxY5RdGznVHt;
-        Mon,  9 Jan 2023 09:16:01 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 9 Jan
- 2023 09:17:33 +0800
-From:   Zhengchao Shao <shaozhengchao@huawei.com>
-To:     <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC:     <brian.gix@intel.com>, <weiyongjun1@huawei.com>,
-        <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
-Subject: [PATCH] Bluetooth: hci_sync: fix memory leak in hci_update_adv_data()
-Date:   Mon, 9 Jan 2023 09:26:51 +0800
-Message-ID: <20230109012651.3127529-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 8 Jan 2023 21:38:09 -0500
+Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217CCA45D
+        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jan 2023 18:38:08 -0800 (PST)
+Received: by mail-oi1-x235.google.com with SMTP id j130so6082422oif.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Jan 2023 18:38:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=y9jh/ycef+3G5tjWuALoc0diTuFr7W+NbiPHKj+q1o8=;
+        b=DLlH5vYdKMhQl9kWk6ujeEIYl98yAtLE/vnGvLVAjMkWcFgUqiDj4/poRuM1sWNaNE
+         8r4sxAI821E6gMI7zkJZpRJEMc3oGnzd+CNxPZ5nvl2o/zwPL3XhD6QngGnEsPRGIMSc
+         ndbyhDqY2OtYO+QkTqt/ZNrrch9n28nKmsPnjm3oNNxOBe8AM7/aa+VG4+uLKsBKiujv
+         EclaXQZybW4pqQm9/6vXRJ4rcpk3L7VS2kQw/60Znh/m1KpLm3oLCvFFqd/ci97CG8Kf
+         Gc0XeapogXGO0wRcBst9qZ5gqiQRhZZJ0iwMwGWovXLAPSqlKVU7AOJ40p8HtDaMvMTv
+         xtQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y9jh/ycef+3G5tjWuALoc0diTuFr7W+NbiPHKj+q1o8=;
+        b=rXF4F0VFxNPMpS9AjrXEXyqBxVwtVM4CQRYjd8YoNDakoH+hnAc6radd5h4SA+EpYz
+         PkgLZJHdGZl1weYPB1yrRoOK9HSNpPeJVwX7N2WbJqp+jXRdFgXvCTny9h9qa3S67Aad
+         apshUc4wEN4NKFh07vp6ymVsoyc66E3Fhj9Zf6qTdXl/FC1b7Jf33/064r+rdYGDhTos
+         4srLg3+7MhuYthtQ2QFzl8t6GwllHFI2TQET7Ie8bd4R3eGGh/ZLqvBZknz5Ho6uNrnK
+         G0xOTPtBJj8gWS1peAXMKEv9l8/z6BWGvoLAST1rXKWoulBVpKDsw0bb3ITdy01qnvvy
+         0eAw==
+X-Gm-Message-State: AFqh2kpN7pI4ynZcFCpR82G3vK6SKIP7U4eyylNr6v0FOu2Z/Ovs99Oc
+        BUaZARk+S68i1BHdnn8UV/srd6a71Sk=
+X-Google-Smtp-Source: AMrXdXt3xgRGhBcu3qEnY7tKz7QY1m1afKhbksbWFqSgfWd9QEGpFZOiDF7+g5PGxtnrLxzNJCfY3A==
+X-Received: by 2002:a05:6808:9bb:b0:35a:6cc2:21bd with SMTP id e27-20020a05680809bb00b0035a6cc221bdmr27043111oig.30.1673231887369;
+        Sun, 08 Jan 2023 18:38:07 -0800 (PST)
+Received: from [172.17.0.2] ([13.66.72.33])
+        by smtp.gmail.com with ESMTPSA id bg31-20020a056808179f00b00363b5a6bc9esm3369562oib.12.2023.01.08.18.38.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 08 Jan 2023 18:38:07 -0800 (PST)
+Message-ID: <63bb7e0f.050a0220.4082a.9a36@mx.google.com>
+Date:   Sun, 08 Jan 2023 18:38:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0426561017546014440=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.101.6]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, shaozhengchao@huawei.com
+Subject: RE: Bluetooth: hci_sync: fix memory leak in hci_update_adv_data()
+In-Reply-To: <20230109012651.3127529-1-shaozhengchao@huawei.com>
+References: <20230109012651.3127529-1-shaozhengchao@huawei.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When hci_cmd_sync_queue() failed in hci_update_adv_data(), inst_ptr is
-not freed, which will cause memory leak. Add release process to error
-path.
+--===============0426561017546014440==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 651cd3d65b0f ("Bluetooth: convert hci_update_adv_data to hci_sync")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=709918
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.92 seconds
+GitLint                       PASS      0.30 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      38.84 seconds
+CheckAllWarning               PASS      41.58 seconds
+CheckSparse                   PASS      47.14 seconds
+CheckSmatch                   PASS      125.03 seconds
+BuildKernel32                 PASS      36.81 seconds
+TestRunnerSetup               PASS      530.67 seconds
+TestRunner_l2cap-tester       PASS      18.93 seconds
+TestRunner_iso-tester         PASS      20.55 seconds
+TestRunner_bnep-tester        PASS      6.73 seconds
+TestRunner_mgmt-tester        PASS      130.79 seconds
+TestRunner_rfcomm-tester      PASS      10.78 seconds
+TestRunner_sco-tester         PASS      9.96 seconds
+TestRunner_ioctl-tester       PASS      12.30 seconds
+TestRunner_mesh-tester        PASS      8.37 seconds
+TestRunner_smp-tester         PASS      9.40 seconds
+TestRunner_userchan-tester    PASS      6.94 seconds
+IncrementalBuild              PASS      34.65 seconds
+
+
+
 ---
- net/bluetooth/hci_sync.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9e2d7e4b850c..1485501bd72f 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6197,10 +6197,15 @@ static int _update_adv_data_sync(struct hci_dev *hdev, void *data)
- int hci_update_adv_data(struct hci_dev *hdev, u8 instance)
- {
- 	u8 *inst_ptr = kmalloc(1, GFP_KERNEL);
-+	int ret;
- 
- 	if (!inst_ptr)
- 		return -ENOMEM;
- 
- 	*inst_ptr = instance;
--	return hci_cmd_sync_queue(hdev, _update_adv_data_sync, inst_ptr, NULL);
-+	ret = hci_cmd_sync_queue(hdev, _update_adv_data_sync, inst_ptr, NULL);
-+	if (ret)
-+		kfree(inst_ptr);
-+
-+	return ret;
- }
--- 
-2.34.1
 
+--===============0426561017546014440==--
