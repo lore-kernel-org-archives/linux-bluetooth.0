@@ -2,110 +2,291 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C82FC54EBD
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Jan 2023 02:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22BB3C5479D
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Jan 2023 07:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233682AbjAICiK (ORCPT
+        id S230494AbjAIHGp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 Jan 2023 21:38:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54168 "EHLO
+        Mon, 9 Jan 2023 02:06:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231325AbjAICiJ (ORCPT
+        with ESMTP id S230491AbjAIHGn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 Jan 2023 21:38:09 -0500
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 217CCA45D
-        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jan 2023 18:38:08 -0800 (PST)
-Received: by mail-oi1-x235.google.com with SMTP id j130so6082422oif.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Jan 2023 18:38:08 -0800 (PST)
+        Mon, 9 Jan 2023 02:06:43 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7511364CD
+        for <linux-bluetooth@vger.kernel.org>; Sun,  8 Jan 2023 23:06:42 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id b9-20020a17090a7ac900b00226ef160dcaso6704725pjl.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Jan 2023 23:06:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=y9jh/ycef+3G5tjWuALoc0diTuFr7W+NbiPHKj+q1o8=;
-        b=DLlH5vYdKMhQl9kWk6ujeEIYl98yAtLE/vnGvLVAjMkWcFgUqiDj4/poRuM1sWNaNE
-         8r4sxAI821E6gMI7zkJZpRJEMc3oGnzd+CNxPZ5nvl2o/zwPL3XhD6QngGnEsPRGIMSc
-         ndbyhDqY2OtYO+QkTqt/ZNrrch9n28nKmsPnjm3oNNxOBe8AM7/aa+VG4+uLKsBKiujv
-         EclaXQZybW4pqQm9/6vXRJ4rcpk3L7VS2kQw/60Znh/m1KpLm3oLCvFFqd/ci97CG8Kf
-         Gc0XeapogXGO0wRcBst9qZ5gqiQRhZZJ0iwMwGWovXLAPSqlKVU7AOJ40p8HtDaMvMTv
-         xtQQ==
+        d=chromium.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mWQ0kDsyvcih2dH/qpkcVXNF1elAyvevQFayUEjDoXg=;
+        b=D7eNMvpLZWjM1JtA6zqqtVuKykRRT/UPqzjlzUUp1rSBd+O+T59BOhfSfcHfUlAx8g
+         +icBzLcYYhab5ytZOBEycGIHmDdezmXd6xcqs8KvkOUOdyPJ/aCns6W6ofLmZj2k2158
+         5KgIzP4qOJlZVbuYQzIebsozSQ5uCNdUUNJcQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=y9jh/ycef+3G5tjWuALoc0diTuFr7W+NbiPHKj+q1o8=;
-        b=rXF4F0VFxNPMpS9AjrXEXyqBxVwtVM4CQRYjd8YoNDakoH+hnAc6radd5h4SA+EpYz
-         PkgLZJHdGZl1weYPB1yrRoOK9HSNpPeJVwX7N2WbJqp+jXRdFgXvCTny9h9qa3S67Aad
-         apshUc4wEN4NKFh07vp6ymVsoyc66E3Fhj9Zf6qTdXl/FC1b7Jf33/064r+rdYGDhTos
-         4srLg3+7MhuYthtQ2QFzl8t6GwllHFI2TQET7Ie8bd4R3eGGh/ZLqvBZknz5Ho6uNrnK
-         G0xOTPtBJj8gWS1peAXMKEv9l8/z6BWGvoLAST1rXKWoulBVpKDsw0bb3ITdy01qnvvy
-         0eAw==
-X-Gm-Message-State: AFqh2kpN7pI4ynZcFCpR82G3vK6SKIP7U4eyylNr6v0FOu2Z/Ovs99Oc
-        BUaZARk+S68i1BHdnn8UV/srd6a71Sk=
-X-Google-Smtp-Source: AMrXdXt3xgRGhBcu3qEnY7tKz7QY1m1afKhbksbWFqSgfWd9QEGpFZOiDF7+g5PGxtnrLxzNJCfY3A==
-X-Received: by 2002:a05:6808:9bb:b0:35a:6cc2:21bd with SMTP id e27-20020a05680809bb00b0035a6cc221bdmr27043111oig.30.1673231887369;
-        Sun, 08 Jan 2023 18:38:07 -0800 (PST)
-Received: from [172.17.0.2] ([13.66.72.33])
-        by smtp.gmail.com with ESMTPSA id bg31-20020a056808179f00b00363b5a6bc9esm3369562oib.12.2023.01.08.18.38.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Jan 2023 18:38:07 -0800 (PST)
-Message-ID: <63bb7e0f.050a0220.4082a.9a36@mx.google.com>
-Date:   Sun, 08 Jan 2023 18:38:07 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0426561017546014440=="
+        bh=mWQ0kDsyvcih2dH/qpkcVXNF1elAyvevQFayUEjDoXg=;
+        b=OecYxUkhz4ZdJOlN3zFnx0lC/0or+QkdLdqj/Bm5rZH9ykWO1P/DHJ14KDWeqOJGGi
+         BFLmKsxT5e9WoJtGyXBLwNBhz1kn04nk8srr3k+DC27kI08QGRsN4WjtK+vM6J2zJ2KL
+         chusaX2qXgFbyY6VmmU0nfdhPAQBVf0AnjF3GEcqraOaqcAKgW6AcHcVv+s037rgeiAo
+         BtHsouNFI0I1Mv84arTckwdHuYVuMdnCIuekf6ufEy0V0sQdaQilvXKhUfXHzaX85uEH
+         ROtgBdoV8Im1qO0hYpVPZQNaN3xiMQomAmG97V5XDsIzwoP6XJbqgA8PcfHsB1ShjXmM
+         Ta2w==
+X-Gm-Message-State: AFqh2kpiEV6UMzQLCWGsk2jqc9CPR63H4BdiloNVsamXIvnOuiLfeYTW
+        Rl5PepVZlAWyny6ppF9A/Jq/yg5G+iTU6OLKvUs=
+X-Google-Smtp-Source: AMrXdXuC0x7jnBbfy6iTnUJIW3dk65dw1o/wqTTp9CcRkjG+E2ENMvci8DxbUG91d3m2r2Qsa6SZtg==
+X-Received: by 2002:a05:6a20:4a05:b0:a4:cb40:cf2e with SMTP id fr5-20020a056a204a0500b000a4cb40cf2emr68647277pzb.47.1673248001801;
+        Sun, 08 Jan 2023 23:06:41 -0800 (PST)
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com. [209.85.216.53])
+        by smtp.gmail.com with ESMTPSA id a10-20020a170902ecca00b001891a17bd93sm5366300plh.43.2023.01.08.23.06.40
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 08 Jan 2023 23:06:40 -0800 (PST)
+Received: by mail-pj1-f53.google.com with SMTP id l1-20020a17090a384100b00226f05b9595so6425635pjf.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Jan 2023 23:06:40 -0800 (PST)
+X-Received: by 2002:a17:902:9883:b0:193:1c8f:182f with SMTP id
+ s3-20020a170902988300b001931c8f182fmr347084plp.14.1673247999674; Sun, 08 Jan
+ 2023 23:06:39 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, shaozhengchao@huawei.com
-Subject: RE: Bluetooth: hci_sync: fix memory leak in hci_update_adv_data()
-In-Reply-To: <20230109012651.3127529-1-shaozhengchao@huawei.com>
-References: <20230109012651.3127529-1-shaozhengchao@huawei.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230104150642.v2.1.I1f29bb547a03e9adfe2e6754212f9d14a2e39c4b@changeid>
+ <CABBYNZL9FiZjRYJE_h4n2kf9LKv_5XF3Fd=bz=cU4bTcDR-QHQ@mail.gmail.com>
+ <Y7d26dhGXOij+xSO@x130> <CABBYNZ+0DsjdQ4z2CEj95VnyR9Nnsemq7FCWYwO=M1gz3WD+=Q@mail.gmail.com>
+In-Reply-To: <CABBYNZ+0DsjdQ4z2CEj95VnyR9Nnsemq7FCWYwO=M1gz3WD+=Q@mail.gmail.com>
+From:   Ying Hsu <yinghsu@chromium.org>
+Date:   Mon, 9 Jan 2023 15:06:03 +0800
+X-Gmail-Original-Message-ID: <CAAa9mD2UYXi+9GpGypOoo119TckDSHc_SDHXrEWAqd3-FsFhtA@mail.gmail.com>
+Message-ID: <CAAa9mD2UYXi+9GpGypOoo119TckDSHc_SDHXrEWAqd3-FsFhtA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Fix possible deadlock in rfcomm_sk_state_change
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Saeed Mahameed <saeed@kernel.org>, linux-bluetooth@vger.kernel.org,
+        marcel@holtmann.org, leon@kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0426561017546014440==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+Based on the stack trace reported by syzbot, the deadlock happened in
+a single process.
+I'll revise the commit message in the next revision. Thank you for
+catching that.
 
-Dear submitter,
+Generalizing it sounds good.
+But if it releases the sk lock as below, the do_something() part might
+be different for different proto.
+```
+bt_sock_connect_v1(..., callback) {
+    sock_hold(sk);
+    release_sock(sk);
+    err = callback(...);
+    lock_sock(sk);
+    if (!err && !sock_flag(sk, SOCK_ZAPPED)) {
+        do_something();
+    }
+    sock_put(sk);
+    return err;
+}
+```
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=709918
+Another proposal is to have the callback executed with sk lock
+acquired, and the callback is almost the same as the original connect
+function for each proto,
+but they'll have to manage the sk lock and check its ZAPPED state.
+What do you think?
+```
+bt_sock_connect_v2(..., callback) {
+    sock_hold(sk);
+    lock_sock(sk);
+    err = callback(...);
+    release_sock(sk);
+    sock_put(sk);
+    return err;
+}
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.92 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      38.84 seconds
-CheckAllWarning               PASS      41.58 seconds
-CheckSparse                   PASS      47.14 seconds
-CheckSmatch                   PASS      125.03 seconds
-BuildKernel32                 PASS      36.81 seconds
-TestRunnerSetup               PASS      530.67 seconds
-TestRunner_l2cap-tester       PASS      18.93 seconds
-TestRunner_iso-tester         PASS      20.55 seconds
-TestRunner_bnep-tester        PASS      6.73 seconds
-TestRunner_mgmt-tester        PASS      130.79 seconds
-TestRunner_rfcomm-tester      PASS      10.78 seconds
-TestRunner_sco-tester         PASS      9.96 seconds
-TestRunner_ioctl-tester       PASS      12.30 seconds
-TestRunner_mesh-tester        PASS      8.37 seconds
-TestRunner_smp-tester         PASS      9.40 seconds
-TestRunner_userchan-tester    PASS      6.94 seconds
-IncrementalBuild              PASS      34.65 seconds
+rfcomm_sock_connect(...) {
+    return bt_sock_connect_v2(..., __rfcomm_sock_connect);
+}
+```
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0426561017546014440==--
+On Sat, Jan 7, 2023 at 3:45 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Saeed,
+>
+> On Thu, Jan 5, 2023 at 5:18 PM Saeed Mahameed <saeed@kernel.org> wrote:
+> >
+> > On 04 Jan 14:21, Luiz Augusto von Dentz wrote:
+> > >Hi Ying,
+> > >
+> > >On Wed, Jan 4, 2023 at 7:07 AM Ying Hsu <yinghsu@chromium.org> wrote:
+> > >>
+> > >> There's a possible deadlock when two processes are connecting
+> > >> and closing a RFCOMM socket concurrently. Here's the call trace:
+> > >
+> > >Are you sure it is 2 different processes? Usually that would mean 2
+> > >different sockets (sk) then so they wouldn't share the same lock, so
+> > >this sounds more like 2 different threads, perhaps it is worth
+> > >creating a testing case in our rfcomm-tester so we are able to detect
+> > >this sort of thing in the future.
+> > >
+> > >> -> #2 (&d->lock){+.+.}-{3:3}:
+> > >>        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+> > >>        __mutex_lock0x12f/0x1360 kernel/locking/mutex.c:747
+> > >>        __rfcomm_dlc_close+0x15d/0x890 net/bluetooth/rfcomm/core.c:487
+> > >>        rfcomm_dlc_close+1e9/0x240 net/bluetooth/rfcomm/core.c:520
+> > >>        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
+> > >>        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
+> > >>        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
+> > >>        __sock_release+0xcd/0x280 net/socket.c:650
+> > >>        sock_close+0x1c/0x20 net/socket.c:1365
+> > >>        __fput+0x27c/0xa90 fs/file_table.c:320
+> > >>        task_work_run+0x16f/0x270 kernel/task_work.c:179
+> > >>        exit_task_work include/linux/task_work.h:38 [inline]
+> > >>        do_exit+0xaa8/0x2950 kernel/exit.c:867
+> > >>        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
+> > >>        get_signal+0x21c3/0x2450 kernel/signal.c:2859
+> > >>        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+> > >>        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+> > >>        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+> > >>        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+> > >>        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+> > >>        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+> > >>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > >>
+> > >> -> #1 (rfcomm_mutex){+.+.}-{3:3}:
+> > >>        __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+> > >>        __mutex_lock+0x12f/0x1360 kernel/locking/mutex.c:747
+> > >>        rfcomm_dlc_open+0x93/0xa80 net/bluetooth/rfcomm/core.c:425
+> > >>        rfcomm_sock_connect+0x329/0x450 net/bluetooth/rfcomm/sock.c:413
+> > >>        __sys_connect_file+0x153/0x1a0 net/socket.c:1976
+> > >>        __sys_connect+0x165/0x1a0 net/socket.c:1993
+> > >>        __do_sys_connect net/socket.c:2003 [inline]
+> > >>        __se_sys_connect net/socket.c:2000 [inline]
+> > >>        __x64_sys_connect+0x73/0xb0 net/socket.c:2000
+> > >>        do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> > >>        do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+> > >>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > >>
+> > >> -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
+> > >>        check_prev_add kernel/locking/lockdep.c:3097 [inline]
+> > >>        check_prevs_add kernel/locking/lockdep.c:3216 [inline]
+> > >>        validate_chain kernel/locking/lockdep.c:3831 [inline]
+> > >>        __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5055
+> > >>        lock_acquire kernel/locking/lockdep.c:5668 [inline]
+> > >>        lock_acquire+0x1e3/0x630 kernel/locking/lockdep.c:5633
+> > >>        lock_sock_nested+0x3a/0xf0 net/core/sock.c:3470
+> > >>        lock_sock include/net/sock.h:1725 [inline]
+> > >>        rfcomm_sk_state_change+0x6d/0x3a0 net/bluetooth/rfcomm/sock.c:73
+> > >>        __rfcomm_dlc_close+0x1b1/0x890 net/bluetooth/rfcomm/core.c:489
+> > >>        rfcomm_dlc_close+0x1e9/0x240 net/bluetooth/rfcomm/core.c:520
+> > >>        __rfcomm_sock_close+0x13c/0x250 net/bluetooth/rfcomm/sock.c:220
+> > >>        rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:907
+> > >>        rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:928
+> > >>        __sock_release+0xcd/0x280 net/socket.c:650
+> > >>        sock_close+0x1c/0x20 net/socket.c:1365
+> > >>        __fput+0x27c/0xa90 fs/file_table.c:320
+> > >>        task_work_run+0x16f/0x270 kernel/task_work.c:179
+> > >>        exit_task_work include/linux/task_work.h:38 [inline]
+> > >>        do_exit+0xaa8/0x2950 kernel/exit.c:867
+> > >>        do_group_exit+0xd4/0x2a0 kernel/exit.c:1012
+> > >>        get_signal+0x21c3/0x2450 kernel/signal.c:2859
+> > >>        arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+> > >>        exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+> > >>        exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+> > >>        __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+> > >>        syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+> > >>        do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+> > >>        entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> > >>
+> > >> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+> > >> ---
+> > >> This commit has been tested with a C reproducer on qemu-x86_64
+> > >> and a ChromeOS device.
+> > >>
+> > >> Changes in v2:
+> > >> - Fix potential use-after-free in rfc_comm_sock_connect.
+> > >>
+> > >>  net/bluetooth/rfcomm/sock.c | 7 ++++++-
+> > >>  1 file changed, 6 insertions(+), 1 deletion(-)
+> > >>
+> > >> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> > >> index 21e24da4847f..4397e14ff560 100644
+> > >> --- a/net/bluetooth/rfcomm/sock.c
+> > >> +++ b/net/bluetooth/rfcomm/sock.c
+> > >> @@ -391,6 +391,7 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
+> > >>             addr->sa_family != AF_BLUETOOTH)
+> > >>                 return -EINVAL;
+> > >>
+> > >> +       sock_hold(sk);
+> > >>         lock_sock(sk);
+> > >>
+> > >>         if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
+> > >> @@ -410,14 +411,18 @@ static int rfcomm_sock_connect(struct socket *sock, struct sockaddr *addr, int a
+> > >>         d->sec_level = rfcomm_pi(sk)->sec_level;
+> > >>         d->role_switch = rfcomm_pi(sk)->role_switch;
+> > >>
+> > >> +       /* Drop sock lock to avoid potential deadlock with the RFCOMM lock */
+> > >> +       release_sock(sk);
+> > >>         err = rfcomm_dlc_open(d, &rfcomm_pi(sk)->src, &sa->rc_bdaddr,
+> > >>                               sa->rc_channel);
+> > >> -       if (!err)
+> > >> +       lock_sock(sk);
+> > >> +       if (!err && !sock_flag(sk, SOCK_ZAPPED))
+> > >>                 err = bt_sock_wait_state(sk, BT_CONNECTED,
+> > >>                                 sock_sndtimeo(sk, flags & O_NONBLOCK));
+> > >>
+> > >>  done:
+> > >>         release_sock(sk);
+> > >> +       sock_put(sk);
+> > >>         return err;
+> > >>  }
+> > >
+> > >This sounds like a great solution to hold the reference and then
+> >
+> > Why do you need sock_hold/put in the same proto_ops.callback sock opts ?
+> > it should be guaranteed by the caller the sk will remain valid
+> > or if you are paranoid then sock_hold() on your proto_ops.bind() and put()
+> > on your proto_ops.release()
+>
+> It doesn't looks like there is a sock_hold done in the likes of
+> __sys_connect/__sys_connect_file so afaik it is possible that the sk
+> is freed in the meantime if we attempt to release and lock afterward,
+> and about being paranoid I guess we are past that already since with
+> the likes of fuzzing testing is already paranoid in itself.
+>
+> > >checking if the socket has been zapped when attempting to lock_sock,
+> > >so Ive been thinking on generalize this into something like
+> > >bt_sock_connect(sock, addr, alen, callback) so we make sure the
+> > >callback is done while holding a reference but with the socket
+> > >unlocked since typically the underline procedure only needs to access
+> > >the pi(sk) information without changing it e.g. rfcomm_dlc_open,
+> > >anyway Im fine if you don't want to pursue doing it right now but I'm
+> > >afraid these type of locking problem is no restricted to RFCOMM only.
+> > >
+> > >> --
+> > >> 2.39.0.314.g84b9a713c41-goog
+> > >>
+> > >
+> > >
+> > >--
+> > >Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
