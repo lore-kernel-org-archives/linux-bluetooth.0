@@ -2,119 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B300FC54EBD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Jan 2023 02:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB69FC54EBE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Jan 2023 06:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229582AbjAJClV (ORCPT
+        id S229655AbjAJGSy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Jan 2023 21:41:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33698 "EHLO
+        Tue, 10 Jan 2023 01:18:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbjAJClS (ORCPT
+        with ESMTP id S231177AbjAJGSe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Jan 2023 21:41:18 -0500
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C783695A0
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Jan 2023 18:41:16 -0800 (PST)
-Received: by mail-qt1-x832.google.com with SMTP id a25so2724667qto.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Jan 2023 18:41:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tTnRrr33xJNB3tSqYYuFfDfK/h3p/XkTzHdGP+1yz+E=;
-        b=ZI1lZfLXBlpVucCddfsvREvuc0M4KJUGp6j5z8hJ6RoXT5Jg2g3NV7oh887TWLEvAy
-         +plIE1TwUs8CtuGdkFyxCVZT7Vid7yfXfqSBtn20p4HlGgnTYFvpqyslCmM9WqoEO1l6
-         be5lmvgyCI/BB/ac639QKt+PqMj/W5+Ig3xiqpN2OMQQQ02UIv1CZh8XEvEHddtxawnH
-         aTjxnabr5za7PqDw6pPu+aw0r1QzMx+DQm4TfNObo6ARLLkJUalFm0n0fQhnRuWr/QIE
-         k/Fx8OfYD2xpKNRUmmd46EZrP7XZsYh/nAg2q09gVV1fCSK1/d4nGoINtJ52jEKiG/+n
-         w1BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tTnRrr33xJNB3tSqYYuFfDfK/h3p/XkTzHdGP+1yz+E=;
-        b=CwJ1GJ18NBsa8X8id3952mHRJZwBlsA31YOqdB0XOwfVed+cJIvOwKU28YC9aimL3q
-         Ykfv/YK+6EV0xPhHHjLBY/HYtlFcXNGy83HLoy++raq3GB07PSNnGmX9NFZ0VxgZMzQC
-         L9l72qIDuLMVG2tO4Ynl27um1hVII1tNAHpJI10khEDACbJReqGz2uATvxJKdvrik6F0
-         VIHEuw/SZvIlykqsLYGZ/0KDsZjF7liIAH/qqkZA17SOLfxZPh0izMKt7w0rz7v+UXRo
-         Q0OXHMzs1lIG5q8tr33pFIY1hkEnrfZUlqg3ytfPwUQmOHWChTMXyKcrRoMYXnKUmqXj
-         Mmtw==
-X-Gm-Message-State: AFqh2kqGK73M7kLum0eRYPamAZac0MrVl+jThXIx1pQVcPrGs80gk5/1
-        4VBiQDY73sr3/eM65Am9uwB2kKs7Vq1eCA==
-X-Google-Smtp-Source: AMrXdXsHIv1zR7+AfwrNxmayZlaQXGDxtuCnX7DHP4kWvlCusNojsvhxhFhKM5AOimmhOiJuGm+Asg==
-X-Received: by 2002:a05:622a:1e18:b0:3a7:e1db:2fd8 with SMTP id br24-20020a05622a1e1800b003a7e1db2fd8mr1674799qtb.50.1673318475824;
-        Mon, 09 Jan 2023 18:41:15 -0800 (PST)
-Received: from [172.17.0.2] ([172.176.229.19])
-        by smtp.gmail.com with ESMTPSA id 7-20020ac85647000000b0039cc82a319asm5447397qtt.76.2023.01.09.18.41.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 18:41:15 -0800 (PST)
-Message-ID: <63bcd04b.c80a0220.9c81a.0ca1@mx.google.com>
-Date:   Mon, 09 Jan 2023 18:41:15 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8373065897262455154=="
+        Tue, 10 Jan 2023 01:18:34 -0500
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16C01C927;
+        Mon,  9 Jan 2023 22:18:32 -0800 (PST)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4NrgZH3Fp2znV8B;
+        Tue, 10 Jan 2023 14:16:55 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Tue, 10 Jan 2023 14:18:28 +0800
+Message-ID: <d773f69b-855f-d679-9e4c-c0a260411687@huawei.com>
+Date:   Tue, 10 Jan 2023 14:18:28 +0800
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, gustavoars@kernel.org
-Subject: RE: [next] Bluetooth: HCI: Replace zero-length arrays with flexible-array members
-In-Reply-To: <Y7zBcCkkuIIS4ueP@work>
-References: <Y7zBcCkkuIIS4ueP@work>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH] Bluetooth: hci_sync: fix memory leak in
+ hci_update_adv_data()
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <brian.gix@intel.com>,
+        <weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
+References: <20230109012651.3127529-1-shaozhengchao@huawei.com>
+ <CABBYNZK=GXHO3QrEF2ZXWohnYkyPsfo0K9ZPxe0aMK_wuK1myQ@mail.gmail.com>
+From:   shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <CABBYNZK=GXHO3QrEF2ZXWohnYkyPsfo0K9ZPxe0aMK_wuK1myQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8373065897262455154==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=710341
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.68 seconds
-GitLint                       FAIL      0.54 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      32.38 seconds
-CheckAllWarning               PASS      35.39 seconds
-CheckSparse                   PASS      40.35 seconds
-CheckSmatch                   PASS      110.13 seconds
-BuildKernel32                 PASS      30.87 seconds
-TestRunnerSetup               PASS      444.99 seconds
-TestRunner_l2cap-tester       PASS      15.92 seconds
-TestRunner_iso-tester         PASS      16.11 seconds
-TestRunner_bnep-tester        PASS      5.51 seconds
-TestRunner_mgmt-tester        PASS      105.91 seconds
-TestRunner_rfcomm-tester      PASS      8.70 seconds
-TestRunner_sco-tester         PASS      7.97 seconds
-TestRunner_ioctl-tester       PASS      9.41 seconds
-TestRunner_mesh-tester        PASS      6.91 seconds
-TestRunner_smp-tester         PASS      7.87 seconds
-TestRunner_userchan-tester    PASS      5.96 seconds
-IncrementalBuild              PASS      29.63 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[next] Bluetooth: HCI: Replace zero-length arrays with flexible-array members
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-11: B1 Line exceeds max length (107>80): "Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays [1]"
 
 
----
-Regards,
-Linux Bluetooth
+On 2023/1/10 5:11, Luiz Augusto von Dentz wrote:
+> Hi Zhengchao,
+> 
+> On Sun, Jan 8, 2023 at 5:17 PM Zhengchao Shao <shaozhengchao@huawei.com> wrote:
+>>
+>> When hci_cmd_sync_queue() failed in hci_update_adv_data(), inst_ptr is
+>> not freed, which will cause memory leak. Add release process to error
+>> path.
+>>
+>> Fixes: 651cd3d65b0f ("Bluetooth: convert hci_update_adv_data to hci_sync")
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> ---
+>>   net/bluetooth/hci_sync.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>> index 9e2d7e4b850c..1485501bd72f 100644
+>> --- a/net/bluetooth/hci_sync.c
+>> +++ b/net/bluetooth/hci_sync.c
+>> @@ -6197,10 +6197,15 @@ static int _update_adv_data_sync(struct hci_dev *hdev, void *data)
+>>   int hci_update_adv_data(struct hci_dev *hdev, u8 instance)
+>>   {
+>>          u8 *inst_ptr = kmalloc(1, GFP_KERNEL);
+>> +       int ret;
+>>
+>>          if (!inst_ptr)
+>>                  return -ENOMEM;
+>>
+>>          *inst_ptr = instance;
+>> -       return hci_cmd_sync_queue(hdev, _update_adv_data_sync, inst_ptr, NULL);
+>> +       ret = hci_cmd_sync_queue(hdev, _update_adv_data_sync, inst_ptr, NULL);
+>> +       if (ret)
+>> +               kfree(inst_ptr);
+>> +
+>> +       return ret;
+>>   }
+> 
+> While this is correct I do wonder why we haven't used ERR_PTR/PTR_ERR
+> like we did with the likes of abort_conn_sync, that way we don't have
+> to allocate anything which makes things a lot simpler.
+> 
 
+Hi Luiz:
+	Thank you for your advice. I think it is better to use
+ERR_PTR/PTR_ERR to replace allocation. I will send V2.
 
---===============8373065897262455154==--
+Zhengchao Shao
+>> --
+>> 2.34.1
+>>
+> 
+> 
