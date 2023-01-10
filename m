@@ -2,198 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7979DC54EBE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Jan 2023 12:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B29B5C46467
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Jan 2023 15:49:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238112AbjAJMiY (ORCPT
+        id S234632AbjAJPth (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Jan 2023 07:38:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49314 "EHLO
+        Tue, 10 Jan 2023 10:49:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238438AbjAJMha (ORCPT
+        with ESMTP id S234695AbjAJPt1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Jan 2023 07:37:30 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9909BDF99
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jan 2023 04:37:21 -0800 (PST)
+        Tue, 10 Jan 2023 10:49:27 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A4944C5B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jan 2023 07:49:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673354241; x=1704890241;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=a/wrkIMUgdu1vzckIbvpelpLNhr+3HX5TPQLK4CscAg=;
-  b=b3JCTN2Hr+vlUKwfJAeuyJEyT5Lm5sIFy08CxMOG05u2EFdaRNCvuUT1
-   u8niJNil9V5D5n3q5yn3J8YLXkEXtgLNPXhJfFUenFI9SU+vlg0nMx3R3
-   0mO9H+YgGCIxhpOWd4ZAumMwxhnN8Tu2aBkGRua/cFnINp2viXTTO6oDj
-   nkuh10wrfJtaGGBFVRoYsCq1wxtcm7/6TbSCvfovU+LmOWGSyANa5rLoA
-   w6rp9SFQZpGkkWtU3+8ONJ/Otei5WgAZ6fvRD1rzVOQYm2JVNhKIoBTdZ
-   DN5pbCe52rZYiUh2gDGAxFKHNEPjKmp307Mir+HZb3G5q17JR3ZJZLuqv
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="321834252"
+  t=1673365765; x=1704901765;
+  h=from:to:cc:subject:date:message-id;
+  bh=klDJ3cXO3vOmIiwnOoIGpsEH2vvVWuW494w103h4vC4=;
+  b=GF6YoIxA7ovqH0Jw3leInXSX1VYmvkiEkCoG99v7wMZA0rJwliu2KTry
+   XoZb0AcSVepbsNmX/Rse8sE2232h9ibpVIWSWqCUcNtBO5Q0LOEKi0/g4
+   R3mJ7Yc/sa/x3MhHskd8P2wTb58+/qxDGmpiDCVDdUuOiW8WD9TIgHMiS
+   Jbz5PCaFKA3N0lL6xZgaX0/CSPrHJXZGHnZnSaCb562qZzp4/jORaV10k
+   5HpQ2Cc5Z0L4Xbp8xDtfGBrTHyGX9p/NbILni2uMeVy/3wNG77WVTaTdl
+   pxPLcR4f1YYRpLCD3z928nIjAO8sl4ikrRuQ0LXBSOIBsOE1vmO2nbBUy
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="310977121"
 X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="321834252"
+   d="scan'208";a="310977121"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 04:37:21 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 07:49:16 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="745760756"
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="745812943"
 X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="745760756"
-Received: from lkp-server02.sh.intel.com (HELO f1920e93ebb5) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 10 Jan 2023 04:37:10 -0800
-Received: from kbuild by f1920e93ebb5 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pFDsL-0007y1-0z;
-        Tue, 10 Jan 2023 12:37:09 +0000
-Date:   Tue, 10 Jan 2023 20:37:06 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- e8b5fd71713bb440fbe0ddac0c1e48c6326fddd4
-Message-ID: <63bd5bf2.uLvunQwwnu0zd7rt%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+   d="scan'208";a="745812943"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by FMSMGA003.fm.intel.com with ESMTP; 10 Jan 2023 07:49:13 -0800
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, Kiran K <kiran.k@intel.com>,
+        Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
+Subject: [PATCH v1] btintel: Add recovery when secure verification of firmware fails
+Date:   Tue, 10 Jan 2023 21:29:05 +0530
+Message-Id: <20230110155905.18203-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: e8b5fd71713bb440fbe0ddac0c1e48c6326fddd4  Bluetooth: hci_sync: fix memory leak in hci_update_adv_data()
+On warm reboot stress test case, firmware download failure
+has been observed with failure in secure verification of firmware
+and BT becomes completely inaccessible. This can happen due to a race
+condition in TOP registers when Wifi driver is also getting loaded
+at the same time. This patch adds a work around to load the BT firmware
+again when secure verify failure is observed.
 
-elapsed time: 720m
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
+---
+ drivers/bluetooth/btintel.c | 20 ++++++++++++++++----
+ drivers/bluetooth/btintel.h |  1 +
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-configs tested: 120
-configs skipped: 2
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-x86_64                            allnoconfig
-um                           x86_64_defconfig
-powerpc                           allnoconfig
-um                             i386_defconfig
-arc                                 defconfig
-s390                             allmodconfig
-alpha                               defconfig
-s390                                defconfig
-s390                             allyesconfig
-sh                               allmodconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-x86_64                           rhel-8.3-bpf
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-kvm
-i386                 randconfig-a014-20230109
-arm                                 defconfig
-x86_64                              defconfig
-i386                 randconfig-a011-20230109
-ia64                             allmodconfig
-i386                 randconfig-a016-20230109
-i386                                defconfig
-m68k                             allyesconfig
-x86_64                               rhel-8.3
-i386                 randconfig-a015-20230109
-arm                              allyesconfig
-i386                 randconfig-a013-20230109
-m68k                             allmodconfig
-x86_64               randconfig-a011-20230109
-x86_64                           allyesconfig
-arc                              allyesconfig
-x86_64               randconfig-a016-20230109
-i386                 randconfig-a012-20230109
-x86_64                        randconfig-a004
-arm64                            allyesconfig
-x86_64               randconfig-a013-20230109
-x86_64                    rhel-8.3-kselftests
-alpha                            allyesconfig
-x86_64               randconfig-a015-20230109
-x86_64               randconfig-a012-20230109
-x86_64                          rhel-8.3-func
-x86_64                        randconfig-a002
-x86_64               randconfig-a014-20230109
-x86_64                        randconfig-a006
-riscv                             allnoconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-i386                             allyesconfig
-mips                           jazz_defconfig
-sparc64                          alldefconfig
-arc                         haps_hs_defconfig
-arc                  randconfig-r043-20230108
-arm                  randconfig-r046-20230108
-arm                             pxa_defconfig
-powerpc                         ps3_defconfig
-sh                          polaris_defconfig
-powerpc                 canyonlands_defconfig
-m68k                           sun3_defconfig
-powerpc                      ppc6xx_defconfig
-x86_64                           alldefconfig
-powerpc                 mpc834x_mds_defconfig
-m68k                        stmark2_defconfig
-arm                             rpc_defconfig
-arm                           corgi_defconfig
-xtensa                    xip_kc705_defconfig
-powerpc                     asp8347_defconfig
-parisc                generic-32bit_defconfig
-sh                     sh7710voipgw_defconfig
-mips                            gpr_defconfig
-i386                          randconfig-c001
-m68k                        m5407c3_defconfig
-xtensa                           allyesconfig
-ia64                         bigsur_defconfig
-m68k                        mvme147_defconfig
-sh                           se7712_defconfig
-riscv                randconfig-r042-20230110
-s390                 randconfig-r044-20230109
-arc                  randconfig-r043-20230109
-s390                 randconfig-r044-20230110
-riscv                randconfig-r042-20230109
-arc                  randconfig-r043-20230110
-loongarch                           defconfig
-loongarch                         allnoconfig
-loongarch                        allmodconfig
-powerpc                    amigaone_defconfig
-arm                            hisi_defconfig
-arm                            pleb_defconfig
-sh                      rts7751r2d1_defconfig
-arc                           tb10x_defconfig
-arm                       multi_v4t_defconfig
-arc                    vdk_hs38_smp_defconfig
-arm                        trizeps4_defconfig
-arm                         s3c6400_defconfig
-sh                               alldefconfig
-
-clang tested configs:
-x86_64                          rhel-8.3-rust
-x86_64                        randconfig-a001
-i386                 randconfig-a001-20230109
-x86_64                        randconfig-a003
-i386                 randconfig-a004-20230109
-x86_64                        randconfig-a005
-i386                 randconfig-a002-20230109
-i386                 randconfig-a003-20230109
-i386                 randconfig-a006-20230109
-i386                 randconfig-a005-20230109
-x86_64               randconfig-a001-20230109
-x86_64               randconfig-a002-20230109
-x86_64               randconfig-a004-20230109
-x86_64               randconfig-a003-20230109
-x86_64               randconfig-a006-20230109
-x86_64               randconfig-a005-20230109
-x86_64                        randconfig-k001
-arm                        multi_v5_defconfig
-arm                          ep93xx_defconfig
-powerpc                     ksi8560_defconfig
-arm                          pcm027_defconfig
-powerpc                       ebony_defconfig
-
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index d4e2cb9a4eb4..3f2976fb056a 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1700,6 +1700,11 @@ static int btintel_download_wait(struct hci_dev *hdev, ktime_t calltime, int mse
+ 		return -ETIMEDOUT;
+ 	}
+ 
++	if (btintel_test_flag(hdev, INTEL_FIRMWARE_VERIFY_FAILED)) {
++		bt_dev_err(hdev, "Firmware secure verification failed");
++		return -EAGAIN;
++	}
++
+ 	if (btintel_test_flag(hdev, INTEL_FIRMWARE_FAILED)) {
+ 		bt_dev_err(hdev, "Firmware loading failed");
+ 		return -ENOEXEC;
+@@ -1961,7 +1966,7 @@ static int btintel_download_fw(struct hci_dev *hdev,
+ 	 * of this device.
+ 	 */
+ 	err = btintel_download_wait(hdev, calltime, 5000);
+-	if (err == -ETIMEDOUT)
++	if (err == -ETIMEDOUT || err == -EAGAIN)
+ 		btintel_reset_to_bootloader(hdev);
+ 
+ done:
+@@ -2153,7 +2158,7 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+ 	 * of this device.
+ 	 */
+ 	err = btintel_download_wait(hdev, calltime, 5000);
+-	if (err == -ETIMEDOUT)
++	if (err == -ETIMEDOUT || err == -EAGAIN)
+ 		btintel_reset_to_bootloader(hdev);
+ 
+ done:
+@@ -2644,8 +2649,15 @@ void btintel_secure_send_result(struct hci_dev *hdev,
+ 	if (len != sizeof(*evt))
+ 		return;
+ 
+-	if (evt->result)
+-		btintel_set_flag(hdev, INTEL_FIRMWARE_FAILED);
++	if (evt->result) {
++		bt_dev_err(hdev, "Intel Secure Send Results event result: %u status: %u",
++			   evt->result, evt->status);
++
++		if (evt->result == 3)
++			btintel_set_flag(hdev, INTEL_FIRMWARE_VERIFY_FAILED);
++		else
++			btintel_set_flag(hdev, INTEL_FIRMWARE_FAILED);
++	}
+ 
+ 	if (btintel_test_and_clear_flag(hdev, INTEL_DOWNLOADING) &&
+ 	    btintel_test_flag(hdev, INTEL_FIRMWARE_LOADED))
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index e0060e58573c..10e5be7e451a 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -147,6 +147,7 @@ enum {
+ 	INTEL_BOOTLOADER,
+ 	INTEL_DOWNLOADING,
+ 	INTEL_FIRMWARE_LOADED,
++	INTEL_FIRMWARE_VERIFY_FAILED,
+ 	INTEL_FIRMWARE_FAILED,
+ 	INTEL_BOOTING,
+ 	INTEL_BROKEN_INITIAL_NCMD,
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.17.1
+
