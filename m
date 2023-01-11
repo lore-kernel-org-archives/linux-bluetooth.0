@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A6BC54EBC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E679CC677F1
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Jan 2023 01:23:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235077AbjAKBXA (ORCPT
+        id S235274AbjAKBXB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Jan 2023 20:23:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45878 "EHLO
+        Tue, 10 Jan 2023 20:23:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235224AbjAKBW6 (ORCPT
+        with ESMTP id S235276AbjAKBW7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Jan 2023 20:22:58 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F242C19
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jan 2023 17:22:57 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so15460012pjj.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jan 2023 17:22:57 -0800 (PST)
+        Tue, 10 Jan 2023 20:22:59 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B94101D8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jan 2023 17:22:58 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id o8-20020a17090a9f8800b00223de0364beso18348147pjp.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Jan 2023 17:22:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1hZyYu1D4iIf/DIUik1bt7umt7x6WYLcjANjQoC4Ukw=;
-        b=WHNT5xsLl203jJWfE7lkeXoDcs5HAE/soYai0gVdXHyOQygzHxIp0233WAsnEBxT/B
-         qVNmec6TYrK6LFM/xFnK3N8UuDD7mHHGeL9IlIKrtHV9sHXaliW1kcMnWV0Eirs3+F6d
-         ZIqL6SoGhtixBERqDBTIYJ4LkSB6WPMrqzbvcPie94pH25Mgqh3K7EYvapTp4ckV/7tj
-         UiK7AMYUW+rlur/RP9Fy/boIQaMz3jCOJnCrSx4C6l4Q/fJEuz7PbBUMdQ0kk7UCXGLG
-         lGiNvcWnzfgwUNxLLYD5zQbNghe27luIxtpUBa9WNg8WKHToJA5Sp4d/QPxwqT0Yqrv3
-         QQfA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=maE/prng7KLiQSTifzcWotx3MOWGOQxNw77MFHWc1yo=;
+        b=IhujJeSwFFUZichpfkSq5IZmD5vhYXJUOogRYTAwGqOtPR1MZKzyddvipU9XIkFtnF
+         dJ/i40kgKRPyWmnBZN9bVHMZSB8jgf7euqBIejJnKq5xB4MHAh9eS9eKOeDFsbG6s79h
+         74EQtq/SDLlc+51kDBH2MijMEtz2VZ2+YbVDt9rgcVMT7AKiESS7DWtQkExBJk0dcrVA
+         4p01DxULPvqdFX9VzjqOj0HPxvHxfCYxv2swR3y6RING98DeHIZraGsl8W5bQ04epRoZ
+         Z3nMQw4SKMuRzfX7YWrpaDl672Ukd4Q4O4OybR2ELOU3B71p5GihnoB/FoZSQcnRaVbc
+         BsUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1hZyYu1D4iIf/DIUik1bt7umt7x6WYLcjANjQoC4Ukw=;
-        b=mQPVD/RUDttRRSv4pdcz6LuH48MGaSqd+FjvKsdFSKN27Ks9GgMCPeU7nuhQFaa01+
-         b6gqCuZgBYD6pHfkJ8FaU5dEZN8SZ5rrr1cLbTn2ygBQTvRFZGY7ZevgB4Z3qjrcWIXY
-         3FKWUS3yfaFktAE68jWdmdXqyQE1W/s8cNVGerNkGtB/4UViotHpxBwDKLDHAAZ2PTux
-         wf7pUvfrAJnNmVg3ANPla28BQxUkMItST4bAcQ2TNaKlIqGwRajfzn7PLnE5e/4rv+kB
-         Icta7VuoR3J+IB6PH3SKnQGnwc/y/g38DPjKi2AHJz2kOJQJIt1ykSjBUVQTBKiExwMH
-         IDPg==
-X-Gm-Message-State: AFqh2krrR3QTxJBbxmYNNpusUOaQnTOeyCTEsgtFjFJzLMPmO9JUOtFM
-        PCivV2JALJVKUxyw5+f882iNXOl795o=
-X-Google-Smtp-Source: AMrXdXvi7HbpJJmFCzNY6QSYWN5ULwKtK5hjxy1VrY39Txkp2UoK4W+rRziaBok7kCcu+Wq+AUhZsQ==
-X-Received: by 2002:a17:902:e84e:b0:189:aedf:677d with SMTP id t14-20020a170902e84e00b00189aedf677dmr1022845plg.69.1673400176377;
-        Tue, 10 Jan 2023 17:22:56 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=maE/prng7KLiQSTifzcWotx3MOWGOQxNw77MFHWc1yo=;
+        b=C1nz0IlBhL56fA6HOdDSGLpEkpnqSUzJl5dtNrTAKpsBsUwOn3I7zaZv6tpQStXJvr
+         +jx2jpxr+OX6AjuRIO8ai1zsdyeEWFc+WcA5BnaiO6ufBKn0JAuxeBxqu0XxzcAuZV0D
+         uZNaZ4BBs4YwukLeLF1b8+mC3Jk/vmU1TxuBpyKL2nRzHnGHji6Fc/a1BCHp64os9BYk
+         ECFZfP3H8dJJ47oMktppi8aP/UScPkJbpXkrQCYSl8Xki7MuMQyKftHrgQxrhdBNG1tr
+         DNG5+x3VhH9v+QoPnZ4TKzGoem/1Ez4v+QAjEJqWR2mAAJcX1Evyb0Qo4XauSq0YoGkM
+         aSaQ==
+X-Gm-Message-State: AFqh2kpGNj5R7KcTn1VLqepEOYUso47aWTm5IjKv/2GOTKmenYHR5pz7
+        zYuIqh1e1lujidLtoYaieSAvD7GvSfs=
+X-Google-Smtp-Source: AMrXdXvorzBk3o1WXEFBg53AZV+aR+qwb/a3aVh6ythPcqYADFSYpyCa4B0M9TFUlgsoHx/NKvacjw==
+X-Received: by 2002:a17:902:c106:b0:193:24fb:ec65 with SMTP id 6-20020a170902c10600b0019324fbec65mr13117740pli.56.1673400177738;
+        Tue, 10 Jan 2023 17:22:57 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id m7-20020a170902db0700b00192b0a07891sm8784670plx.101.2023.01.10.17.22.55
+        by smtp.gmail.com with ESMTPSA id m7-20020a170902db0700b00192b0a07891sm8784670plx.101.2023.01.10.17.22.56
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Jan 2023 17:22:55 -0800 (PST)
+        Tue, 10 Jan 2023 17:22:57 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_event: Fix Invalid wait context
-Date:   Tue, 10 Jan 2023 17:22:53 -0800
-Message-Id: <20230111012254.3724082-1-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: ISO: Fix possible circular locking dependency
+Date:   Tue, 10 Jan 2023 17:22:54 -0800
+Message-Id: <20230111012254.3724082-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20230111012254.3724082-1-luiz.dentz@gmail.com>
+References: <20230111012254.3724082-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,47 +68,99 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following trace caused by attempting to lock
-cmd_sync_work_lock while holding the rcu_read_lock:
+This attempts to fix the following trace:
 
-kworker/u3:2/212 is trying to lock:
-ffff888002600910 (&hdev->cmd_sync_work_lock){+.+.}-{3:3}, at:
-hci_cmd_sync_queue+0xad/0x140
+iso-tester/52 is trying to acquire lock:
+ffff8880024e0070 (&hdev->lock){+.+.}-{3:3}, at:
+iso_sock_listen+0x29e/0x440
+
+but task is already holding lock:
+ffff888001978130 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0}, at:
+iso_sock_listen+0x8b/0x440
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0}:
+       lock_acquire+0x176/0x3d0
+       lock_sock_nested+0x32/0x80
+       iso_connect_cfm+0x1a3/0x630
+       hci_cc_le_setup_iso_path+0x195/0x340
+       hci_cmd_complete_evt+0x1ae/0x500
+       hci_event_packet+0x38e/0x7c0
+       hci_rx_work+0x34c/0x980
+       process_one_work+0x5a5/0x9a0
+       worker_thread+0x89/0x6f0
+       kthread+0x14e/0x180
+       ret_from_fork+0x22/0x30
+
+-> #1 (hci_cb_list_lock){+.+.}-{3:3}:
+       lock_acquire+0x176/0x3d0
+       __mutex_lock+0x13b/0xf50
+       hci_le_remote_feat_complete_evt+0x17e/0x320
+       hci_event_packet+0x38e/0x7c0
+       hci_rx_work+0x34c/0x980
+       process_one_work+0x5a5/0x9a0
+       worker_thread+0x89/0x6f0
+       kthread+0x14e/0x180
+       ret_from_fork+0x22/0x30
+
+-> #0 (&hdev->lock){+.+.}-{3:3}:
+       check_prev_add+0xfc/0x1190
+       __lock_acquire+0x1e27/0x2750
+       lock_acquire+0x176/0x3d0
+       __mutex_lock+0x13b/0xf50
+       iso_sock_listen+0x29e/0x440
+       __sys_listen+0xe6/0x160
+       __x64_sys_listen+0x25/0x30
+       do_syscall_64+0x42/0x90
+       entry_SYSCALL_64_after_hwframe+0x62/0xcc
+
 other info that might help us debug this:
-context-{4:4}
-4 locks held by kworker/u3:2/212:
- #0: ffff8880028c6530 ((wq_completion)hci0#2){+.+.}-{0:0}, at:
- process_one_work+0x4dc/0x9a0
- #1: ffff888001aafde0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0},
- at: process_one_work+0x4dc/0x9a0
- #2: ffff888002600070 (&hdev->lock){+.+.}-{3:3}, at:
- hci_cc_le_set_cig_params+0x64/0x4f0
- #3: ffffffffa5994b00 (rcu_read_lock){....}-{1:2}, at:
- hci_cc_le_set_cig_params+0x2f9/0x4f0
 
-Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
+Chain exists of:
+  &hdev->lock --> hci_cb_list_lock --> sk_lock-AF_BLUETOOTH-BTPROTO_ISO
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(sk_lock-AF_BLUETOOTH-BTPROTO_ISO);
+                               lock(hci_cb_list_lock);
+                               lock(sk_lock-AF_BLUETOOTH-BTPROTO_ISO);
+  lock(&hdev->lock);
+
+ *** DEADLOCK ***
+
+1 lock held by iso-tester/52:
+ #0: ffff888001978130 (sk_lock-AF_BLUETOOTH-BTPROTO_ISO){+.+.}-{0:0}, at:
+ iso_sock_listen+0x8b/0x440
+
+Fixes: f764a6c2c1e4 ("Bluetooth: ISO: Add broadcast support")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_event.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ net/bluetooth/iso.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0594af4e37ca..ad92a4be5851 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3848,8 +3848,11 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
- 			   conn->handle, conn->link);
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 6157bc12b373..24444b502e58 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -893,13 +893,10 @@ static int iso_listen_bis(struct sock *sk)
+ 	if (!hdev)
+ 		return -EHOSTUNREACH;
  
- 		/* Create CIS if LE is already connected */
--		if (conn->link && conn->link->state == BT_CONNECTED)
-+		if (conn->link && conn->link->state == BT_CONNECTED) {
-+			rcu_read_unlock();
- 			hci_le_create_cis(conn->link);
-+			rcu_read_lock();
-+		}
+-	hci_dev_lock(hdev);
+-
+ 	err = hci_pa_create_sync(hdev, &iso_pi(sk)->dst,
+ 				 le_addr_type(iso_pi(sk)->dst_type),
+ 				 iso_pi(sk)->bc_sid);
  
- 		if (i == rp->num_handles)
- 			break;
+-	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+ 
+ 	return err;
 -- 
 2.37.3
 
