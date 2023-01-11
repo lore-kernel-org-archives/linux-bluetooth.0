@@ -2,121 +2,89 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E206EC54EBC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Jan 2023 17:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE21C46467
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Jan 2023 19:46:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234535AbjAKRag (ORCPT
+        id S235822AbjAKTqj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Jan 2023 12:30:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56222 "EHLO
+        Wed, 11 Jan 2023 14:46:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239669AbjAKR2s (ORCPT
+        with ESMTP id S235870AbjAKTpZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Jan 2023 12:28:48 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16CAB3AA9A;
-        Wed, 11 Jan 2023 09:25:03 -0800 (PST)
+        Wed, 11 Jan 2023 14:45:25 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7E713CC1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jan 2023 11:44:12 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A715461DA8;
-        Wed, 11 Jan 2023 17:25:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D301C433F0;
-        Wed, 11 Jan 2023 17:25:02 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C259FB81C9B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jan 2023 19:44:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6ACF6C433EF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Jan 2023 19:44:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673457902;
-        bh=DVZXWm+6uZXTGUquageewQdNitAS0dZ/Rv0HUi2X+jA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DPY8nHsUYUyB1FMkKMK5P8AKgMQ9KX2B6f247PvJ+riiRDiQoqC/5OzHrzDJ/Vl1P
-         1UCrywVZq6EVIa8yMp/Du7Rec5ZCul8/WdqXUQfJm37zgP/MNHnH93azniNI3/rVXx
-         JKKKrg/yVcOa+w+hxVOEuMn84V+9VByHs+tKbf+o5cVdHYnFE0tlH2u0Ijl9t9Vj0s
-         9m7y2y55yRrNes8naqVEoTmKvUBBRJVkmIzPCN1k/cZTmMONERW9vmSYAW07lKNVS3
-         Wdg41E/mJeGERYO6QM58xc3RtY0Z4fSp909QhAK3H+x5ZZ0xLItWwz4oxSB4nDhied
-         fWU9/PViL4aPg==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1pFeqT-00045s-AT; Wed, 11 Jan 2023 18:25:02 +0100
-Date:   Wed, 11 Jan 2023 18:25:01 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc:     linux-serial@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        Samuel Iglesias =?utf-8?Q?Gons=C3=A1lvez?= 
-        <siglesias@igalia.com>, Rodolfo Giometti <giometti@enneenne.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH v3 06/13] tty: Convert ->carrier_raised() and callchains
- to bool
-Message-ID: <Y77w7aUX4f/f6kFV@hovoldconsulting.com>
-References: <20230111142331.34518-1-ilpo.jarvinen@linux.intel.com>
- <20230111142331.34518-7-ilpo.jarvinen@linux.intel.com>
+        s=k20201202; t=1673466249;
+        bh=ZQtyafo06LAopPy/HVHbPo5HRoRVE13d17ZLiIuRUPM=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=dLHArG7DPoJe7OyZzLOhsCx1CASsG+5fTVwocwGw1PMDLq0UHGrPjxD4yKC0qlXEU
+         UmeN+BPtrgeT/EWK3cBX7+4E5lF4C43qJJbU3XgCrdQZ5chu8zKVCqZyRwh3Mllrtc
+         IaTxia4uj+h8HwT0IiVesW3qqHTtgmskH1/EcrX7HAusJHmNA2pDyBpSYEr7RPj5CI
+         KC0kiyQ8F0b+PKywJSIgEpzogBGp8N4WVkSW2rDLLUPJm3AJCLRVfhN1m0p+WRgLsw
+         J4akNgx+Dnz1MufLXWuPHcD5w7enFJULJQwdMZLjUfg//LqvnMQQUx+OeMYUGW458d
+         M1WHS5PmvECdg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 49D48C43144; Wed, 11 Jan 2023 19:44:09 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216817] btusb device with ID 0489:e0d0 no longer working after
+ v6.0
+Date:   Wed, 11 Jan 2023 19:44:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mario.limonciello@amd.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216817-62941-l33pAkN9VB@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216817-62941@https.bugzilla.kernel.org/>
+References: <bug-216817-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230111142331.34518-7-ilpo.jarvinen@linux.intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jan 11, 2023 at 04:23:24PM +0200, Ilpo Järvinen wrote:
-> Return boolean from ->carrier_raised() instead of 0 and 1. Make the
-> return type change also to tty_port_carrier_raised() that makes the
-> ->carrier_raised() call (+ cd variable in moxa into which its return
-> value is stored).
-> 
-> Also cleans up a few unnecessary constructs related to this change:
-> 
-> 	return xx ? 1 : 0;
-> 	-> return xx;
-> 
-> 	if (xx)
-> 		return 1;
-> 	return 0;
-> 	-> return xx;
-> 
-> Reviewed-by: Jiri Slaby <jirislaby@kernel.org>
-> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/char/pcmcia/synclink_cs.c | 8 +++-----
->  drivers/mmc/core/sdio_uart.c      | 7 +++----
->  drivers/tty/amiserial.c           | 2 +-
->  drivers/tty/moxa.c                | 4 ++--
->  drivers/tty/mxser.c               | 5 +++--
->  drivers/tty/n_gsm.c               | 8 ++++----
->  drivers/tty/serial/serial_core.c  | 9 ++++-----
->  drivers/tty/synclink_gt.c         | 7 ++++---
->  drivers/tty/tty_port.c            | 4 ++--
->  drivers/usb/serial/ch341.c        | 7 +++----
->  drivers/usb/serial/f81232.c       | 6 ++----
->  drivers/usb/serial/pl2303.c       | 7 ++-----
->  drivers/usb/serial/spcp8x5.c      | 7 ++-----
->  drivers/usb/serial/usb-serial.c   | 4 ++--
->  include/linux/tty_port.h          | 6 +++---
->  include/linux/usb/serial.h        | 2 +-
->  net/bluetooth/rfcomm/tty.c        | 2 +-
->  17 files changed, 42 insertions(+), 53 deletions(-)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216817
 
-Same here, please split out the USB serial changes except for the
-actual tty-port op change in usb-serial.c.
+Mario Limonciello (AMD) (mario.limonciello@amd.com) changed:
 
-You can submit a follow-up series for USB serial as those changes are
-otherwise unrelated to the changed tty-port interface.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |mario.limonciello@amd.com
 
-Johan
+--- Comment #9 from Mario Limonciello (AMD) (mario.limonciello@amd.com) ---
+As this completely broke bluetooth for a number of people, can you please
+consider this to be sent up to 6.2-rc in a fixes PR rather than waiting for=
+ 6.3
+and
+
+Cc: stable@vger.kernel.org # 6.1
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
