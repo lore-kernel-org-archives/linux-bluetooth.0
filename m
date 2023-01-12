@@ -2,72 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 340CFC61DB3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Jan 2023 08:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D073EC54EBC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Jan 2023 08:52:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbjALIn4 (ORCPT
+        id S239908AbjALIwh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Jan 2023 03:43:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40078 "EHLO
+        Thu, 12 Jan 2023 03:52:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235699AbjALInX (ORCPT
+        with ESMTP id S230462AbjALIvp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Jan 2023 03:43:23 -0500
-Received: from smtp-out-04.comm2000.it (smtp-out-04.comm2000.it [212.97.32.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E47CA1BEA8;
-        Thu, 12 Jan 2023 00:41:07 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-04.comm2000.it (Postfix) with ESMTPSA id 77D0FBC275A;
-        Thu, 12 Jan 2023 09:40:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1673512865;
-        bh=q7/QXGC8LvChtABBnwOd3fn/aSfDqv0+mtSb62EsXKM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=gU9receeEdVH4ysN9OqHZD4NN3/bNv2mQcvbL4cJB3mQiJGgeSMbD+i/gRQW4VtE+
-         1Jmab0g21Geg4Sxi2StPqDBb++JlquFM+rg/i+WvIellwedV0I5p/TTNaQoiuFJigt
-         VBZKvSuq+nXyiBfxsdeLtXPqAtaEkEYfOibAjOmuTeNsG/MqzcHsubOaC95G5I/rFV
-         HcoEskcyKMVA4qSEn8evTf1IxT9guu4gcYIy+58wvdTOpQXeOBd2EiupJitYMsE0WF
-         nO8LIkznyH9gXlWTVZ4CHNrLQ+ip94eSFSG3YuGsKVLUFy6WPha2ujFHXbhTAHYREg
-         2fDC3yBBKr+oA==
-Date:   Thu, 12 Jan 2023 09:40:47 +0100
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     Francesco Dolcini <francesco@dolcini.it>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Zhengping Jiang <jiangzp@google.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: hdev->le_scan_disable - WARNING: possible circular locking
- dependency detected
-Message-ID: <Y7/Hj7EXceqp54UU@francesco-nb.int.toradex.com>
-References: <Y7SQcdg33X8xTPzs@francesco-nb.int.toradex.com>
+        Thu, 12 Jan 2023 03:51:45 -0500
+Received: from mail.glencoeaur.com (mail.glencoeaur.com [217.61.97.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE41C2F79D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jan 2023 00:50:02 -0800 (PST)
+Received: by mail.glencoeaur.com (Postfix, from userid 1001)
+        id 980788226A; Thu, 12 Jan 2023 08:40:47 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=glencoeaur.com;
+        s=mail; t=1673512853;
+        bh=2S0GQFScndXkBEK4sqdoOhOYLqsB2sEH8Q5XQfVvKpo=;
+        h=Date:From:To:Subject:From;
+        b=btJ9KB71FoZ3YrDzjf0tVrnwdg3g5sdkT/9xX2ypG4ckEHHUrviuvh4axB9ne4bPi
+         qNh/D5qWltQItOVj5PMCn5pQkw+B6dQ/0PAzhDsRXkoCRhNSdpiysUEaTU7capI5QW
+         OFD+FATHFN3/tCdTYnQL6CKJ7dXBlWDzGyFA1YOo2E3RRaJ6i4deUvpD2VZsV/cmza
+         asfrCeDwle9CL4G2U6A65nVpZNXmsn1DO0JAFHlnLlpwfy9atKwZ/Xq3HG2UND+3Km
+         /C4eh3jwQqEzeoeVWiFV1OD/fNE6R+lFOIQBzyL8yRLRmhO1ARwhzBYpvezAEB5FIg
+         8W5VhLez2/bGg==
+Received: by mail.glencoeaur.com for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jan 2023 08:40:39 GMT
+Message-ID: <20230112074500-0.1.z.3gbh.0.5jw2iblcop@glencoeaur.com>
+Date:   Thu, 12 Jan 2023 08:40:39 GMT
+From:   "Zbynek Spacek" <zbynek.spacek@glencoeaur.com>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: Silikonmischungen
+X-Mailer: mail.glencoeaur.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y7SQcdg33X8xTPzs@francesco-nb.int.toradex.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jan 03, 2023 at 09:31:24PM +0100, Francesco Dolcini wrote:
-> Hello all,
-> When enabling BT discovery I have this WARNING.
-> 
-> Linux 6.0.16, ARM, i.MX6ULL, with a Marvell BT device.
+Good morning,
 
-Linux 6.1.4 is fine.
-I'm not planning to bisect it since I can just move to the new kernel.
+do you need intermediates for processing, plastics (e.g. rubber) or silic=
+one mixtures?
 
-> This looks like a regression on Linux 6.0, however I had no way to try
-> to bisect this yet. Any suggestion?
-> 
-> [  493.824758] ======================================================
-> [  493.831012] WARNING: possible circular locking dependency detected
-> [  493.837261] 6.0.16-6.1.0-devel+git.29e1bc6a55de #1 Not tainted
+We provide a wide range of silicone rubbers with various properties, sili=
+cone mixtures from renowned manufacturers such as Wacker, Elastosil LR an=
+d dyes, stabilizers, primers and anti-adhesive additives.
+
+We also produce technical silicone compounds with increased resistance to=
+ oils, resistant to high temperatures and water vapor, conductive and man=
+y more.
+
+We provide fast order fulfillment, timely deliveries and cost optimizatio=
+n.
+
+Can I introduce what we can offer you?
 
 
-Francesco
-
+Best regards
+Zbynek Spacek
