@@ -2,101 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C434EC54EBD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Jan 2023 00:31:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA3DDC54EBE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Jan 2023 05:06:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232156AbjAMAbP (ORCPT
+        id S230444AbjAMFGT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Jan 2023 19:31:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40534 "EHLO
+        Fri, 13 Jan 2023 00:06:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232439AbjAMAbN (ORCPT
+        with ESMTP id S230172AbjAMFGP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Jan 2023 19:31:13 -0500
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E674100A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jan 2023 16:30:54 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id d188so5476619oia.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jan 2023 16:30:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mFkQOQYxDnJavLSO2TiOV4YY7DGtgbNim/7misooHJI=;
-        b=l6USxF2PRGU9BKG5m3ULZ/yP20PtET3uYibCeRWJkoulHpe2WjzhlISF5SOZao2zdQ
-         TZU9SUnvye29Xgl/vPLgMBdX+6FUeT2dC8e3dFbCVUIlbKeIrBWYoPPk4ZM9KuWE1iq3
-         /S9ZkhXyNdJNXLPe7LpdHIkJTfiIDn0Nci33SqeQ4HymdUwJNCZEoP5cpO2gr4zPj2+a
-         PCZzj26qMnDZMPpd9AcPN10gZWhM43bXe6m+awfBwpvoY0MEOyfnEBXogGjrNjcltFcv
-         5ULzJ3TiXbiaNtSQ1W3RmIC/S8yl3AwWJ8Ay417QfWUb3c95wh0PRWZcCGtw1pZ5d7T4
-         dwWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mFkQOQYxDnJavLSO2TiOV4YY7DGtgbNim/7misooHJI=;
-        b=RU+ynGuzBf7T5E4PvgoBQGDtYW5yQA+sqvCAZBgcel/JhJ59qIF3y7KHbdE2DUixrj
-         tHv9B0p36KQM6GA6a0qwc/JjVndbgm78oQSv1xTZUIrpiwOMC7eLURNTuc5ihMdYxM9f
-         5FmCjZT8QRSfRAhpya8nv6P3KZtuiojQYer5VsNmiYLSysOEf26rHk8oCE99wivCArz5
-         XoRK61SqL3tj41o/61nvdnDiGlSYm6gO/iz0emK2UBZEf8NYi+N6UOngEKYm3scq5RSE
-         roXpR4bWUESdA9SCIbla5BmiIAo7pj89gyEl5yMGHHgbkqjmerD2v9eCDZYJhzPXwME8
-         rlFg==
-X-Gm-Message-State: AFqh2kqgo9PKS60F/ZkJVXSiap/INZ5D0ywWS2bWJ+xE08/gqF2GD0mT
-        5NQi9tnWQZt3iGbGTFJOzHQytNLEt3Y=
-X-Google-Smtp-Source: AMrXdXtEUXh9wTHVV1qmnWQxOwoX19yKj85SQX6nc8mGXA04TsF8xu0Ise7BXseCX9oAfJ7F4wDtMA==
-X-Received: by 2002:a05:6808:1493:b0:361:9f8:84e7 with SMTP id e19-20020a056808149300b0036109f884e7mr46288243oiw.6.1673569853805;
-        Thu, 12 Jan 2023 16:30:53 -0800 (PST)
-Received: from [172.17.0.2] ([13.65.246.129])
-        by smtp.gmail.com with ESMTPSA id db11-20020a0568306b0b00b006391adb6034sm9851170otb.72.2023.01.12.16.30.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 16:30:53 -0800 (PST)
-Message-ID: <63c0a63d.050a0220.aec60.1a39@mx.google.com>
-Date:   Thu, 12 Jan 2023 16:30:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4846464029249684778=="
+        Fri, 13 Jan 2023 00:06:15 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F4F13CC0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Jan 2023 21:06:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673586373; x=1705122373;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xibHF4Rx49aQDlgxbf/eboSogVxmbrDDbEEj2z5HdmA=;
+  b=gd9FtTTqfy+Sq2yTARIk5P9pioNWDz8gmXBSwCj3u8d+W7cFR8LyFFb5
+   aVlS8cQLPUev14vv5F5RkkA7UjDqoKPPF/RjX/GJUNFyuo8snA5MPNLgi
+   iZRp7OIwBE6wIRSKkGxp7vJnJt9U7OtyrbMnQHEjJ0GQzulY7qPa8yC16
+   O8HYVd8BUQoute0DA4hKWAW6hlJgj5LKVywll0U1PbVJuAnIP2tDe0Nv8
+   lGQAsa711o2gUMLG5GjHwREJsiGJ/oUoPqBhY6q9ixLu7DnndFH5WO7a9
+   zFdQaZHZPvKaOIr/zIE6ngtZLbDdOzyaOGuEIBdka7Yupl+Z+4+5qT41y
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="325973927"
+X-IronPort-AV: E=Sophos;i="5.97,213,1669104000"; 
+   d="scan'208";a="325973927"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 21:06:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="690386027"
+X-IronPort-AV: E=Sophos;i="5.97,213,1669104000"; 
+   d="scan'208";a="690386027"
+Received: from tester-latitude-7480.iind.intel.com ([10.224.186.122])
+  by orsmga001.jf.intel.com with ESMTP; 12 Jan 2023 21:06:11 -0800
+From:   Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>,
+        Abhay Maheta <mabhay125@gmail.com>
+Subject: [PATCH BlueZ v3] shared/bap: Fixing Company ID, Vendor ID and Metadata handling
+Date:   Fri, 13 Jan 2023 10:36:05 +0530
+Message-Id: <20230113050604.71398-1-abhay.maheshbhai.maheta@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jingq77@gmail.com
-Subject: RE: *** hcidump: fix array boundary issue le_meta_ev_dump ***
-In-Reply-To: <20230112232112.212021-2-jqian@calamp.com>
-References: <20230112232112.212021-2-jqian@calamp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4846464029249684778==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=711516
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      26.78 seconds
-BluezMake                     PASS      760.11 seconds
-MakeCheck                     PASS      11.57 seconds
-MakeDistcheck                 PASS      148.88 seconds
-CheckValgrind                 PASS      239.87 seconds
-CheckSmatch                   PASS      320.10 seconds
-bluezmakeextell               PASS      96.40 seconds
-IncrementalBuild              PASS      610.04 seconds
-ScanBuild                     PASS      954.08 seconds
-
-
-
+This fixes Company ID, Vendor Codec ID and metadata storing
+PAC record.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/bap.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 0cafb75e6..463cdb7a6 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -344,8 +344,10 @@ static void pac_foreach(void *data, void *user_data)
+ 
+ 	p = util_iov_push(iov, sizeof(*p));
+ 	p->codec.id = pac->codec.id;
+-	p->codec.cid = pac->codec.cid;
+-	p->codec.vid = pac->codec.vid;
++	if (p->codec.id == 0xff) {
++		p->codec.cid = cpu_to_le16(pac->codec.cid);
++		p->codec.vid = cpu_to_le16(pac->codec.vid);
++	}
+ 
+ 	if (pac->data) {
+ 		p->cc_len = pac->data->iov_len;
+@@ -2773,7 +2775,7 @@ static void bap_parse_pacs(struct bt_bap *bap, uint8_t type,
+ 		struct bt_pac *p;
+ 		struct bt_ltv *cc;
+ 		struct bt_pac_metadata *meta;
+-		struct iovec data, metadata;
++		struct iovec data, *metadata = NULL;
+ 
+ 		p = util_iov_pull_mem(&iov, sizeof(*p));
+ 		if (!p) {
+@@ -2802,8 +2804,11 @@ static void bap_parse_pacs(struct bt_bap *bap, uint8_t type,
+ 		data.iov_len = p->cc_len;
+ 		data.iov_base = cc;
+ 
+-		metadata.iov_len = meta->len;
+-		metadata.iov_base = meta->data;
++		if (meta->len) {
++			metadata = new0(struct iovec, 1);
++			metadata->iov_len = meta->len;
++			metadata->iov_base = meta->data;
++		}
+ 
+ 		util_iov_pull_mem(&iov, meta->len);
+ 
+@@ -2813,12 +2818,14 @@ static void bap_parse_pacs(struct bt_bap *bap, uint8_t type,
+ 		/* Check if there is already a PAC record for the codec */
+ 		pac = bap_pac_find(bap->rdb, type, &p->codec);
+ 		if (pac) {
+-			bap_pac_merge(pac, &data, &metadata);
++			bap_pac_merge(pac, &data, metadata);
++			free(metadata);
+ 			continue;
+ 		}
+ 
+ 		pac = bap_pac_new(bap->rdb, NULL, type, &p->codec, NULL, &data,
+-								&metadata);
++								metadata);
++		free(metadata);
+ 		if (!pac)
+ 			continue;
+ 
+-- 
+2.25.1
 
---===============4846464029249684778==--
