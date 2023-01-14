@@ -2,61 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49158C54EBE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Jan 2023 00:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11621C46467
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Jan 2023 09:11:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230252AbjANA2v (ORCPT
+        id S229850AbjANJLR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Jan 2023 19:28:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33452 "EHLO
+        Sat, 14 Jan 2023 04:11:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbjANA2u (ORCPT
+        with ESMTP id S229747AbjANJLP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Jan 2023 19:28:50 -0500
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F7CF84F9D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Jan 2023 16:28:48 -0800 (PST)
-Received: from github.com (hubbernetes-node-965dff6.ash1-iad.github.net [10.56.211.73])
-        by smtp.github.com (Postfix) with ESMTPA id ACF20900103
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Jan 2023 16:28:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1673656127;
-        bh=utt853o7sUDn9gE7wlnwPEAqekrjuDHZ45eyF5Z7uGI=;
-        h=Date:From:To:Subject:From;
-        b=n0w6m5Cu1qjqmeMq+nBkizOKQ/MVXTrxMAH63kssakEnFRa6KgpD0xDJ2ype1nsVY
-         esm1Swr/HyhlPiJyFXzpLc+4ZYK2DIWiEsxuic8aWvf0gqLP9nzVyBM1DT7gyFxlpA
-         jgsZVpSlgalntLRHwN+OW2nkm0TE3bvY1Yz/Zxqg=
-Date:   Fri, 13 Jan 2023 16:28:47 -0800
-From:   Abhay <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/fd893f-a1736d@github.com>
-Subject: [bluez/bluez] a1736d: shared/bap: Fixing Company ID and Vendor ID
- endianess
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Sat, 14 Jan 2023 04:11:15 -0500
+Received: from smtp.smtpout.orange.fr (smtp-19.smtpout.orange.fr [80.12.242.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D473A35B0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Jan 2023 01:11:14 -0800 (PST)
+Received: from pop-os.home ([86.243.2.178])
+        by smtp.orange.fr with ESMTPA
+        id GcZDpq3gg29hWGcZDp72BO; Sat, 14 Jan 2023 10:11:13 +0100
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 14 Jan 2023 10:11:13 +0100
+X-ME-IP: 86.243.2.178
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: hci_debugfs: Use kstrtobool() instead of strtobool()
+Date:   Sat, 14 Jan 2023 10:11:04 +0100
+Message-Id: <58207d5b81c5739c037c030893fb08ea3dbedc57.1673687451.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a1736d8990ff56bba453ff81a25156316bdd118f
-      https://github.com/bluez/bluez/commit/a1736d8990ff56bba453ff81a25156316bdd118f
-  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-  Date:   2023-01-13 (Fri, 13 Jan 2023)
+strtobool() is the same as kstrtobool().
+However, the latter is more used within the kernel.
 
-  Changed paths:
-    M src/shared/bap.c
+In order to remove strtobool() and slightly simplify kstrtox.h, switch to
+the other function name.
 
-  Log Message:
-  -----------
-  shared/bap: Fixing Company ID and Vendor ID endianess
+While at it, include the corresponding header file (<linux/kstrtox.h>)
 
-This fixes Company ID and Vendor Codec ID which are supposed to be
-little endian.
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+This patch was already sent as a part of a serie ([1]) that axed all usages
+of strtobool().
+Most of the patches have been merged in -next.
 
+I synch'ed with latest -next and re-send the remaining ones as individual
+patches.
+
+Changes in v2:
+  - No change
+
+[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
+
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+ net/bluetooth/hci_debugfs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index b7f682922a16..f1ef60ddd4a6 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -22,6 +22,7 @@
+ */
+ 
+ #include <linux/debugfs.h>
++#include <linux/kstrtox.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -1152,7 +1153,7 @@ static ssize_t force_no_mitm_write(struct file *file,
+ 		return -EFAULT;
+ 
+ 	buf[buf_size] = '\0';
+-	if (strtobool(buf, &enable))
++	if (kstrtobool(buf, &enable))
+ 		return -EINVAL;
+ 
+ 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
+-- 
+2.34.1
 
