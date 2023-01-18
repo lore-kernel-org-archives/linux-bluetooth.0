@@ -2,123 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 478CCC46467
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Jan 2023 14:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64404C32793
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Jan 2023 21:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbjAROEZ (ORCPT
+        id S230453AbjARVKm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Jan 2023 09:04:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
+        Wed, 18 Jan 2023 16:10:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230519AbjARODs (ORCPT
+        with ESMTP id S230445AbjARVKB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Jan 2023 09:03:48 -0500
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B010823C79
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jan 2023 05:39:58 -0800 (PST)
-Received: by mail-il1-x133.google.com with SMTP id u8so17033071ilg.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jan 2023 05:39:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ktHpKKRwt02c5GM1eNMxxkzVXQO/hlKlwIWAAgPH4P8=;
-        b=hp42EIeqq9vKYkcyvFURyHzQLZ0cbTZUhxjTdJPSj9Q5zULqsMp6Fk2OYjbn8AH4Kd
-         AgcTPUx3dL9S3Ed+7FcVSvcud9d+IPpyha2nK4l+Cpz3eMrIg941y5MQhUEyVITz6Qlk
-         N3+1jJjlcDx0sp0RpUgefw/ToAivongglFDYC4VJyAtBf5ooFC97armJIPhJIhE8qxSA
-         J9NlDZPflXsxtt23XdZ2QlZ6XX0iTvG0xqJxTbeyFRK2NWgfqgnTnypXmKL40UsrX6mY
-         sViUW5/BNo3JF2BFxl86F+CBQXPEPEgz/A6/w3wQ0VXiQ5Ypx7XmRsvEJmo4DXWXB2cY
-         TN3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ktHpKKRwt02c5GM1eNMxxkzVXQO/hlKlwIWAAgPH4P8=;
-        b=gJOx8yR9b/tr3N+MWqx8MJzmQHdbS9GXpB7VqdfKEJ/giULWbS+FOHRosczWnlXMav
-         MJfNXhi7fjaQpOLfnKmoj6pkbRi3bPRuLk6tK2Li6htUFiSrS4s+SGuJpnKvKeznwt2W
-         jvzlxbTnXNmsdZwaDuQyq3Wbz2T1J98Nu7T97N+AfXdCcQVAx+Kri0gwUEEz4rMp4aig
-         bDTAv+krVku8e2QiZSAhBenhcLtm10QIKf/8x8hXIjibemVUMFRPwe3LMEIe2A2zyfqk
-         IDizJxmzmFXkv5xEy8Vn3Fvf/jaFwHaDSFR7S4PD+aOQaIxgsWvo7MdyAQhcTJ3M6+hA
-         xeWQ==
-X-Gm-Message-State: AFqh2kpDNrWQ1PsSmPAspbZTxxg7vk041v/paLcuX+G/YYYjY6CpAvmD
-        VvEdp8iKMKTJChWWQFfgYbEEyYODMcA=
-X-Google-Smtp-Source: AMrXdXtxCFUGRWrzjCD0SATOXumXMKy83k8+yiXItWo9btUwWZ/tvoWqw9JkUD7Ex2VKSrKZSrmZdQ==
-X-Received: by 2002:a05:6e02:5ab:b0:304:c709:b876 with SMTP id k11-20020a056e0205ab00b00304c709b876mr21356173ils.23.1674049197918;
-        Wed, 18 Jan 2023 05:39:57 -0800 (PST)
-Received: from [172.17.0.2] ([40.122.243.82])
-        by smtp.gmail.com with ESMTPSA id k8-20020a056e02134800b0030dc530050dsm5899003ilr.85.2023.01.18.05.39.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 05:39:57 -0800 (PST)
-Message-ID: <63c7f6ad.050a0220.a074f.c28a@mx.google.com>
-Date:   Wed, 18 Jan 2023 05:39:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1760951501073745881=="
+        Wed, 18 Jan 2023 16:10:01 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA3063E12;
+        Wed, 18 Jan 2023 13:09:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674076160; x=1705612160;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aFZmV5/PJ5rjlHfW0M/ptY8pOy0cNbcqOFnEPik/kHM=;
+  b=Bb3gpWhzEaJzWTkYUkQCLjRWo17XdKh5k3c7cCwPSOon5H0WNPZrUfk8
+   UWJjZtmT/pprBoutod00oIbvJuM+TaIWO8mcBgxwsixKloLemIfQ9iIFJ
+   otYZG3sAQrYPpGYGx/iCSNPUE3l6vE+PcAFOOtjdvvY06vXa7zbOzLcXG
+   oHY/uZexr/nutbfa1adSGqQwI7+BtHozM//lQf19wmAF1kzRE4kQFuZmE
+   HTq222kum88vZ4Iyin89qm80fENNIKI3Dp48tN6jJ52s/Xl9GOwtLElIp
+   jFv60eTmPMUoQ5v7mRst/pgEFRxELorYIzzcG+SegNc3Z+CgrCesXWT1C
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="411341456"
+X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
+   d="scan'208";a="411341456"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 13:09:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="783823051"
+X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
+   d="scan'208";a="783823051"
+Received: from lkp-server01.sh.intel.com (HELO 5646d64e7320) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 18 Jan 2023 13:09:14 -0800
+Received: from kbuild by 5646d64e7320 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pIFgH-0000iv-2b;
+        Wed, 18 Jan 2023 21:09:13 +0000
+Date:   Thu, 19 Jan 2023 05:08:47 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Francesco Dolcini <francesco@dolcini.it>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     oe-kbuild-all@lists.linux.dev,
+        Stefan Eichenberger <stefan.eichenberger@toradex.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Francesco Dolcini <francesco.dolcini@toradex.com>
+Subject: Re: [PATCH v1 3/4] Bluetooth: hci_mrvl: Add serdev support for
+ 88W8997
+Message-ID: <202301190442.n6v4c2yc-lkp@intel.com>
+References: <20230118122817.42466-4-francesco@dolcini.it>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, francesco@dolcini.it
-Subject: RE: Bluetooth: hci_mrvl: Add serdev support for 88W8997
-In-Reply-To: <20230118122817.42466-2-francesco@dolcini.it>
-References: <20230118122817.42466-2-francesco@dolcini.it>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230118122817.42466-4-francesco@dolcini.it>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1760951501073745881==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Francesco,
 
-This is automated email and please do not reply to this email!
+Thank you for the patch! Perhaps something to improve:
 
-Dear submitter,
+[auto build test WARNING on robh/for-next]
+[also build test WARNING on bluetooth-next/master bluetooth/master horms-ipvs/master net/master net-next/master linus/master v6.2-rc4 next-20230118]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=713265
+url:    https://github.com/intel-lab-lkp/linux/commits/Francesco-Dolcini/dt-bindings-bluetooth-marvell-add-88W8997-DT-binding/20230118-210919
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
+patch link:    https://lore.kernel.org/r/20230118122817.42466-4-francesco%40dolcini.it
+patch subject: [PATCH v1 3/4] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+config: i386-randconfig-s002 (https://download.01.org/0day-ci/archive/20230119/202301190442.n6v4c2yc-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/2ae116c8ad209e0bf11559519915e511c44c28be
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Francesco-Dolcini/dt-bindings-bluetooth-marvell-add-88W8997-DT-binding/20230118-210919
+        git checkout 2ae116c8ad209e0bf11559519915e511c44c28be
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 olddefconfig
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash drivers/bluetooth/
 
----Test result---
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
 
-Test Summary:
-CheckPatch                    PASS      2.50 seconds
-GitLint                       PASS      1.05 seconds
-SubjectPrefix                 FAIL      0.65 seconds
-BuildKernel                   PASS      31.25 seconds
-CheckAllWarning               PASS      34.68 seconds
-CheckSparse                   WARNING   39.13 seconds
-CheckSmatch                   PASS      107.68 seconds
-BuildKernel32                 PASS      30.24 seconds
-TestRunnerSetup               PASS      433.10 seconds
-TestRunner_l2cap-tester       PASS      15.97 seconds
-TestRunner_iso-tester         PASS      16.17 seconds
-TestRunner_bnep-tester        PASS      5.47 seconds
-TestRunner_mgmt-tester        PASS      105.86 seconds
-TestRunner_rfcomm-tester      PASS      8.68 seconds
-TestRunner_sco-tester         PASS      7.96 seconds
-TestRunner_ioctl-tester       PASS      9.21 seconds
-TestRunner_mesh-tester        PASS      6.86 seconds
-TestRunner_smp-tester         PASS      7.89 seconds
-TestRunner_userchan-tester    PASS      5.75 seconds
-IncrementalBuild              PASS      41.39 seconds
+All warnings (new ones prefixed by >>):
 
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/hci_mrvl.c:170:23: warning: restricted __le16 degrades to integerdrivers/bluetooth/hci_mrvl.c:203:23: warning: restricted __le16 degrades to integer
+>> drivers/bluetooth/hci_mrvl.c:450:36: warning: 'mrvl_proto_8997' defined but not used [-Wunused-const-variable=]
+     450 | static const struct hci_uart_proto mrvl_proto_8997 = {
+         |                                    ^~~~~~~~~~~~~~~
 
 
----
-Regards,
-Linux Bluetooth
+vim +/mrvl_proto_8997 +450 drivers/bluetooth/hci_mrvl.c
 
+   449	
+ > 450	static const struct hci_uart_proto mrvl_proto_8997 = {
+   451		.id		= HCI_UART_MRVL,
+   452		.name		= "Marvell 8997",
+   453		.init_speed	= 115200,
+   454		.oper_speed	= 3000000,
+   455		.open		= mrvl_open,
+   456		.close		= mrvl_close,
+   457		.flush		= mrvl_flush,
+   458		.set_baudrate   = mrvl_set_baudrate,
+   459		.recv		= mrvl_recv,
+   460		.enqueue	= mrvl_enqueue,
+   461		.dequeue	= mrvl_dequeue,
+   462	};
+   463	
 
---===============1760951501073745881==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
