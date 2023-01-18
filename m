@@ -2,79 +2,89 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5ADC00A5A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Jan 2023 03:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2EFFC46467
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Jan 2023 13:07:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbjARDaW (ORCPT
+        id S231204AbjARNHV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Jan 2023 22:30:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51588 "EHLO
+        Wed, 18 Jan 2023 08:07:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjARDaT (ORCPT
+        with ESMTP id S231200AbjARNG6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Jan 2023 22:30:19 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604493803F;
-        Tue, 17 Jan 2023 19:30:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 18 Jan 2023 08:06:58 -0500
+Received: from smtp-out-01.comm2000.it (smtp-out-01.comm2000.it [212.97.32.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0487A2963;
+        Wed, 18 Jan 2023 04:29:00 -0800 (PST)
+Received: from francesco-nb.toradex.int (31-10-206-125.static.upc.ch [31.10.206.125])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EE82A61616;
-        Wed, 18 Jan 2023 03:30:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C73DC433F0;
-        Wed, 18 Jan 2023 03:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674012617;
-        bh=omuTl0GGgedXhUw1Vk2tUrg0Bj+JCA067Dy7TMk4jf4=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=rtSlp0RM2dAifNHloO1bbrOirT/6VJiLDaYTkbnTXLJWEaG/9ZQ3eBeJF/3v9/LMl
-         CwUKDazGZUOAfYCN3xzOJB7R6B3s/JIpiO+fVetrEg3NrPgkiDiLXeyXObJ8vh5IQJ
-         qP0fjYjNL2fA4ls29qfedhn+sHcGlmHvY8idu7Cso3iJTVSD7xm0e0JldM66RVRvhx
-         uxNP5hrLbkBO3B0XPgTYqSzE8bA49TRq4t19bBQ4go1HD+dZyMN2azzW9Hc06HK0Ks
-         bRvMevEcKJKUwse2zxPhS2eC9ho6u4AOEsDQR8ofp7Yr85dNjc3z1x7Hk+zpV70hRE
-         J8/gF/GzT/RWA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2E094C43159;
-        Wed, 18 Jan 2023 03:30:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        (Authenticated sender: francesco@dolcini.it)
+        by smtp-out-01.comm2000.it (Postfix) with ESMTPSA id B6F05842D2D;
+        Wed, 18 Jan 2023 13:28:46 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
+        s=mailsrv; t=1674044927;
+        bh=ydMytKybg4Bf1BHsNiOQ5zccoMmX2G8pKIP49hBn8DY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=dvN2yIaASALK3+hYpiG6M6OwYHlXwprVEFYQKv3T4XHoL7FpdWF6q57VRpqCsqNjY
+         ymnaeWg1QAtWtw3+jT/BMcClEhcMPj+atc0HScAg01x5bBvCRdJSP54hIL7VrsL9oa
+         /g4aqTGfcK7ng6sDddf9e6Ooe/yssia9o3JJjCXyZmd0PqED3pnyWH62X+nsVLsfAz
+         loVEdZbu1rDhZg9bDq1ZkZcireiavw06cZ9FD2Oz+IeSMB1dRPmiTidbn0uAjHaec7
+         Deg3ce8F1P4aE8SS7hedIAbwYnVgbycvHZ7zfik607nhJs1RdDU95/cd1qHWEFTEn8
+         qSbq2Q/fAlpug==
+From:   Francesco Dolcini <francesco@dolcini.it>
+To:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Stefan Eichenberger <stefan.eichenberger@toradex.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Francesco Dolcini <francesco.dolcini@toradex.com>
+Subject: [PATCH v1 1/4] dt-bindings: bluetooth: marvell: add 88W8997 DT binding
+Date:   Wed, 18 Jan 2023 13:28:14 +0100
+Message-Id: <20230118122817.42466-2-francesco@dolcini.it>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230118122817.42466-1-francesco@dolcini.it>
+References: <20230118122817.42466-1-francesco@dolcini.it>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bluetooth 2023-01-17
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167401261718.15291.7727489631552411242.git-patchwork-notify@kernel.org>
-Date:   Wed, 18 Jan 2023 03:30:17 +0000
-References: <20230118002944.1679845-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230118002944.1679845-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 
-This pull request was applied to netdev/net.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+Update the documentation with the device tree binding for the Marvell
+88W8997 bluetooth device.
 
-On Tue, 17 Jan 2023 16:29:44 -0800 you wrote:
-> The following changes since commit 1f3bd64ad921f051254591fbed04fd30b306cde6:
-> 
->   net: stmmac: fix invalid call to mdiobus_get_phy() (2023-01-17 13:33:19 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-01-17
-> 
-> [...]
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+---
+ Documentation/devicetree/bindings/net/marvell-bluetooth.yaml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - pull-request: bluetooth 2023-01-17
-    https://git.kernel.org/netdev/net/c/010a74f52203
-
-You are awesome, thank you!
+diff --git a/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml b/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml
+index 309ef21a1e37..83b64ed730f5 100644
+--- a/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml
+@@ -15,7 +15,9 @@ maintainers:
+ 
+ properties:
+   compatible:
+-    const: mrvl,88w8897
++    enum:
++      - mrvl,88w8897
++      - mrvl,88w8997
+ 
+ required:
+   - compatible
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
