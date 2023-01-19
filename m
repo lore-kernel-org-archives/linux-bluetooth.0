@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF094C004D4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 23:58:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6280DC6379F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 23:58:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230166AbjASX6R (ORCPT
+        id S230358AbjASX6R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 19 Jan 2023 18:58:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53602 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230117AbjASX6P (ORCPT
+        with ESMTP id S230341AbjASX6P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 19 Jan 2023 18:58:15 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A0959FDCD
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 15:58:08 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id n20-20020a17090aab9400b00229ca6a4636so6621048pjq.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 15:58:08 -0800 (PST)
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2459F3BE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 15:58:09 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id lp10so615132pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 15:58:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6IbjGmvpVt2am6W6/Kww6kXKnPQ6CQRTRqXyvFQ8XB0=;
-        b=Up5qblDm6JUfyQiZ15D0Ib7HkzGG2fYMxmKZeiTHvjtqtW5ZWRLEuWiXkdggOVoc5a
-         jKLzUP0qULDv+SWHDc2U1b6e5nDRgKaC47YbhoaLuoTGn4rR5O9pPPUftUyiOxOAH1RS
-         fV7y+JQD+5fQ1JRFeb3u4fzCAuhZfSACwVJXfBQOx4DCXELzd/qZdxj/jJeOm1L8jQ9I
-         fqLLSKB/RV7pabQmXwiYQUtj37uv9CVqEBEbp9plJOSjTY374LRyHVhQ11WsMf9i3kth
-         rK2jHHA5SzUrGXoMPFxIk0I7blbuLXtOH4hQfP+r7GHu/6LVvBYwQkRssVnSjSYlWEmw
-         gbCw==
+        bh=08CrBAafLslfGPyiK/2T0o4lZBM7Wi0H+qTwkhmyjWU=;
+        b=pOKgL0pHXi4ZMJrazSPF+bBj7qn8b0BH3XGnbKkBybOouDTuAe6mF11C3w/U77U3AJ
+         2o6rAvXL/XJqcOfGe3OsCdQ1PiUAIUGVYkpTAQDEnsFUDZyLpV2ZqlItUak2XX+yQl7w
+         CWRtnr6pB2axNJ1Vda/IaN7JREFS8XYsfIE0a3FGKqTm8XmFHPb6z7u+ZYaMfCGP06Lz
+         appayVfaZ9gB2qoHtsigKOZLD1fyYmA9q0tVBAe1Ycdmt6SMFKTirzyDCFp/dUGSiBlK
+         KGn7/KPHKcp1xDuFVGrJ8MZ3wH/TmAwf7Pv28DOrPGs7gyi3M86oNMelQDNE2Rv+lB8d
+         mc6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6IbjGmvpVt2am6W6/Kww6kXKnPQ6CQRTRqXyvFQ8XB0=;
-        b=8M4I9FziVGZOjuaYiMOutHE+bq+WGXPDlfeUlSFGtuX4ZzXGM5cQZjwUdLGCt7K65q
-         WWCP4qitjezFSOMb124iY2eeOWQ2o83x/dzeqo9cN01UsKYmTiPLNwHd6yCx+nbEQbZu
-         KKumQGb6O8vdFb24dNGAsvcBLFAQY2kpgFTsXuFommds8y1sr+OOkR2hNfXKXs0PHCGP
-         nn3j0KMvi9agvQCqfluhNHi7D4CNVmY6fCfjr4hNETjegUtXDai+C9kVsV3p3l4J/ZTa
-         LKEmJ6MD1QXt/gw7wDR9KtYEAZcRx2bGF/3h/sWkO3pAVuxupt2HCM1ByhkKz4xrw4+0
-         gHLA==
-X-Gm-Message-State: AFqh2kqxz9+O7yV2Ww9Pe8jaCyeMWLzDB8MvuE9GRpLYjJ9dewz/r09w
-        KjqeZyV+q/PefputfLCS7jVSroBGzg4BfQ==
-X-Google-Smtp-Source: AMrXdXuxaVet186JES4ZIh+fCEaaZPnxgxM8qwigtcfUODiaSDVaJD0m4SbNffizj1+gj6EU9t7T4Q==
-X-Received: by 2002:a17:902:d651:b0:194:bdcf:1ab8 with SMTP id y17-20020a170902d65100b00194bdcf1ab8mr7259468plh.37.1674172687137;
-        Thu, 19 Jan 2023 15:58:07 -0800 (PST)
+        bh=08CrBAafLslfGPyiK/2T0o4lZBM7Wi0H+qTwkhmyjWU=;
+        b=1zKUWoEEoVSZSpJ0yLnPZiSgnPDbIO4hv/gsliqdm9jUrG0zVmVPRXzc1Of5t4Ty70
+         wo0To7+u26uDU4BsXYQ9gKGFcpXeTWDvWh2ZvTD79tT505n00zLFFURp3fu23RGrOVQ2
+         C+q0KgPBlWa0/mNO9y7IkkBmW8aPpEjZAJinP3ZN1W/bx6/8zcJyNB/HC6BjgzWL5+qY
+         TfZH5+tzCnASrJyXFlBTjSrO6D8wkxvbi168Lfb74uYR9IK2nJXs1MMhbxslYPHp4CNc
+         oAcg7tiQjy4rYwJUUFH4jBBslMCLXDis8wrZU9UeRNRPDxYZib5m9l8cETxm75RNgAc+
+         IK+A==
+X-Gm-Message-State: AFqh2kq6GB7lnujXDYmnJdx2kJOFcaUsuijKCZCaQJ0RryYvuQ5Dy46A
+        XapgdLaTVd4j4ZHfyNtO45EnLLpV23VfTQ==
+X-Google-Smtp-Source: AMrXdXu4C2m9mI77pVyOTncWy2rg5LZRdlo3XRVeHY4bRdRm4vp1ZwFExlAUgw2LGSAE+mPPDbXw5A==
+X-Received: by 2002:a17:902:d706:b0:193:2c1b:3367 with SMTP id w6-20020a170902d70600b001932c1b3367mr13429556ply.1.1674172688245;
+        Thu, 19 Jan 2023 15:58:08 -0800 (PST)
 Received: from fedora.. (97-113-173-242.tukw.qwest.net. [97.113.173.242])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170902d2ca00b0019460c34839sm14826373plc.185.2023.01.19.15.58.06
+        by smtp.gmail.com with ESMTPSA id n10-20020a170902d2ca00b0019460c34839sm14826373plc.185.2023.01.19.15.58.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 15:58:06 -0800 (PST)
+        Thu, 19 Jan 2023 15:58:07 -0800 (PST)
 From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ 04/12] mesh: Rename parameter list per crypto usage
-Date:   Thu, 19 Jan 2023 15:57:47 -0800
-Message-Id: <20230119235755.46002-5-brian.gix@gmail.com>
+Subject: [PATCH BlueZ 05/12] unit/mesh:  Add unit testing of Mesh Private Beaconing
+Date:   Thu, 19 Jan 2023 15:57:48 -0800
+Message-Id: <20230119235755.46002-6-brian.gix@gmail.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230119235755.46002-1-brian.gix@gmail.com>
 References: <20230119235755.46002-1-brian.gix@gmail.com>
@@ -68,42 +68,145 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-The derived key generated by the "nkpk" salt and network master key is
-used to create Private Beacons as of Mesh Profile Specification v1.1
+This includes the Sample Data from the Mesh Profile specification v1.1,
+and validates that the beacon crypto functions work as expected.
 ---
- mesh/crypto.c | 4 ++--
- mesh/crypto.h | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ unit/test-mesh-crypto.c | 87 ++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 72 insertions(+), 15 deletions(-)
 
-diff --git a/mesh/crypto.c b/mesh/crypto.c
-index 668d16877..3754cb012 100644
---- a/mesh/crypto.c
-+++ b/mesh/crypto.c
-@@ -251,9 +251,9 @@ bool mesh_crypto_nkbk(const uint8_t n[16], uint8_t beacon_key[16])
- 	return crypto_128(n, "nkbk", beacon_key);
- }
+diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
+index f9b7d81da..86aa265a5 100644
+--- a/unit/test-mesh-crypto.c
++++ b/unit/test-mesh-crypto.c
+@@ -633,6 +633,36 @@ static const struct mesh_crypto_test s8_4_3 = {
+ 	.beacon		= "01003ecaff672f673370123456788ea261582f364f6f",
+ };
  
--bool mesh_crypto_nkpk(const uint8_t n[16], uint8_t proxy_key[16])
-+bool mesh_crypto_nkpk(const uint8_t n[16], uint8_t private_key[16])
++static const struct mesh_crypto_test s8_4_6_1 = {
++	.name		= "8.4.6.1 Private Beacon IVU",
++
++	.net_key	= "f7a2a44f8e8a8029064f173ddc1e2b00",
++	.iv_index	= 0x1010abcd,
++
++	.enc_key	= "6be76842460b2d3a5850d4698409f1bb",
++	.rand		= "435f18f85cf78a3121f58478a5",
++
++	.beacon_type	= 0x02,
++	.beacon_flags	= 0x02,
++	.beacon_cmac	= "f3174f022a514741",
++	.beacon	= "02435f18f85cf78a3121f58478a561e488e7cbf3174f022a514741",
++};
++
++static const struct mesh_crypto_test s8_4_6_2 = {
++	.name		= "8.4.6.2 Private Beacon IVU Complete",
++
++	.net_key	= "3bbb6f1fbd53e157417f308ce7aec58f",
++	.iv_index	= 0x00000000,
++
++	.enc_key	= "ca478cdac626b7a8522d7272dd124f26",
++	.rand		= "1b998f82927535ea6f3076f422",
++
++	.beacon_type	= 0x02,
++	.beacon_flags	= 0x00,
++	.beacon_cmac	= "2f0ffb94cf97f881",
++	.beacon	= "021b998f82927535ea6f3076f422ce827408ab2f0ffb94cf97f881",
++};
++
+ static const struct mesh_crypto_test s8_6_2 = {
+ 	.name		= "8.6.2 Service Data using Node Identity",
+ 
+@@ -1731,42 +1761,67 @@ static void check_beacon(const struct mesh_crypto_test *keys)
  {
--	return crypto_128(n, "nkpk", proxy_key);
-+	return crypto_128(n, "nkpk", private_key);
- }
+ 	uint8_t *net_key;
+ 	uint8_t *beacon_cmac;
+-	uint8_t beacon[22];
++	uint8_t *random = NULL;
++	uint8_t beacon[29];
+ 	uint8_t enc_key[16];
+ 	uint8_t net_id[8];
+ 	uint8_t cmac[8];
+ 	uint64_t cmac_tmp;
  
- bool mesh_crypto_k3(const uint8_t n[16], uint8_t out64[8])
-diff --git a/mesh/crypto.h b/mesh/crypto.h
-index c31abbbbd..55789886e 100644
---- a/mesh/crypto.h
-+++ b/mesh/crypto.h
-@@ -26,7 +26,7 @@ bool mesh_aes_ecb_one(const uint8_t key[16],
- 			const uint8_t plaintext[16], uint8_t encrypted[16]);
- bool mesh_crypto_nkik(const uint8_t network_key[16], uint8_t identity_key[16]);
- bool mesh_crypto_nkbk(const uint8_t network_key[16], uint8_t beacon_key[16]);
--bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t proxy_key[16]);
-+bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t private_key[16]);
- bool mesh_crypto_identity(const uint8_t net_key[16], uint16_t addr,
- 							uint8_t id[16]);
- bool mesh_crypto_beacon_cmac(const uint8_t encryption_key[16],
++	if (keys->beacon_type < 1 || keys->beacon_type > 2)
++		verify_uint8("Unknown Beacon", 0, true,
++			(keys->beacon_type >= 1 || keys->beacon_type <= 2));
++
+ 	net_key = l_util_from_hexstring(keys->net_key, NULL);
+ 	beacon_cmac = l_util_from_hexstring(keys->beacon_cmac, NULL);
+ 
+-	mesh_crypto_nkbk(net_key, enc_key);
++	if (keys->beacon_type == 1) {
++		mesh_crypto_nkbk(net_key, enc_key);
++	} else {
++		mesh_crypto_nkpk(net_key, enc_key);
++		random = l_util_from_hexstring(keys->rand, NULL);
++	}
++
+ 	mesh_crypto_k3(net_key, net_id);
+ 
+ 	l_info(COLOR_BLUE "[%s]" COLOR_OFF, keys->name);
+ 
+ 	verify_data("NetworkKey", 0, keys->net_key, net_key, 16);
++	show_uint8("Beacon Flags", 0, keys->beacon_flags);
+ 	show_uint32("IVindex", 0, keys->iv_index);
+ 
+ 	verify_data("BeaconKey", 0, keys->enc_key, enc_key, 16);
+-	verify_data("NetworkID", 0, keys->net_id, net_id, 8);
+ 
+ 	beacon[0] = keys->beacon_type;
+-	beacon[1] = keys->beacon_flags;
+-	memcpy(beacon + 2, net_id, 8);
+-	l_put_be32(keys->iv_index, beacon + 10);
+-	mesh_crypto_beacon_cmac(enc_key, net_id, keys->iv_index,
+-					!!(keys->beacon_flags & 0x01),
+-					!!(keys->beacon_flags & 0x02),
+-					&cmac_tmp);
+-
+-	l_put_be64(cmac_tmp, cmac);
+-	l_put_be64(cmac_tmp, beacon + 14);
+-	verify_data("BeaconCMAC", 0, keys->beacon_cmac, cmac, 8);
+-	verify_data("Beacon", 0, keys->beacon, beacon, sizeof(beacon));
++	if (keys->beacon_type == 1) {
++		verify_data("NetworkID", 0, keys->net_id, net_id, 8);
++		beacon[1] = keys->beacon_flags;
++		memcpy(beacon + 2, net_id, 8);
++		l_put_be32(keys->iv_index, beacon + 10);
++		mesh_crypto_beacon_cmac(enc_key, net_id, keys->iv_index,
++				!!(keys->beacon_flags & 0x01),
++				!!(keys->beacon_flags & 0x02),
++				&cmac_tmp);
++
++		l_put_be64(cmac_tmp, cmac);
++		l_put_be64(cmac_tmp, beacon + 14);
++		verify_data("BeaconCMAC", 0, keys->beacon_cmac, cmac, 8);
++		verify_data("SNBeacon", 0, keys->beacon, beacon, 22);
++	} else {
++		show_data("Random", 0, random, sizeof(random));
++		beacon[14] = keys->beacon_flags;
++		l_put_be32(keys->iv_index, beacon + 15);
++		mesh_crypto_aes_ccm_encrypt(random, enc_key, NULL, 0,
++							beacon + 14, 5,
++							beacon + 14, NULL, 8);
++		memcpy(beacon + 1, random, 13);
++		verify_data("BeaconMIC", 0, keys->beacon_cmac, beacon + 19, 8);
++		verify_data("PrivBeacon", 0, keys->beacon, beacon, 27);
++	}
+ 
+ 	l_info("");
+ 
++	l_free(random);
+ 	l_free(beacon_cmac);
+ 	l_free(net_key);
+ }
+@@ -2071,6 +2126,8 @@ int main(int argc, char *argv[])
+ 
+ 	/* Section 8.4 Beacon Sample Data */
+ 	check_beacon(&s8_4_3);
++	check_beacon(&s8_4_6_1);
++	check_beacon(&s8_4_6_2);
+ 
+ 	/* Section 8.6 Mesh Proxy Service sample data */
+ 	check_id_beacon(&s8_6_2);
 -- 
 2.39.0
 
