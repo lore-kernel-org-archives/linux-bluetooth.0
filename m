@@ -2,88 +2,116 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F289C38159
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 02:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0529DC677F1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 02:44:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229681AbjASCFJ (ORCPT
+        id S229968AbjASCoU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Jan 2023 21:05:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33064 "EHLO
+        Wed, 18 Jan 2023 21:44:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229889AbjASCEm (ORCPT
+        with ESMTP id S229983AbjASCoR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Jan 2023 21:04:42 -0500
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2655E29E3B;
-        Wed, 18 Jan 2023 18:04:36 -0800 (PST)
-Received: by mail-io1-f50.google.com with SMTP id i70so356328ioa.12;
-        Wed, 18 Jan 2023 18:04:36 -0800 (PST)
+        Wed, 18 Jan 2023 21:44:17 -0500
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67EF06D68A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jan 2023 18:44:15 -0800 (PST)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1433ef3b61fso1091263fac.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Jan 2023 18:44:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5aWvWMMr5mJBRgmUAyLe5Dyn6w74gnkUeVPCdGCFfMU=;
+        b=NzZity7O3ex8Av6UfOvrD+wqfc8CVzZTbGV/b5TEAPQRTEO9k2E7pac7IMYhvWhW2C
+         5HhUa8gCOW75TtyH9/WrOWCXw1NSJqmeV5RS3QzGR/DpZCZU0G4ZYLaTjVi24XRgsIhN
+         vBtowhgsvLhAb4nTVJeQrML3a2GlG0SO5DF6Q6zfXXkbtaNv7Qw72XxvGHXYtQg+UsVr
+         ODti+2jmpZE8umcDgyn/i4aMeSa4Lry58u4yYvrnY8fdx8fN6lO9q2Fi99b8o1gA0uiB
+         olgVW/wpVTsVOoY4Jbqrv4igmyrqU4smtig5GskK8ej2gkmrEeVaDBRQPy35A68gUJw6
+         +QvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MM+Dhy8E31duBDrBRfUCSOTn9Cy8FOge7XCfAeSm4uQ=;
-        b=ctsGKNNmPFc3fGuYsqN64vsOZeNb8Zq/DvK2XCcd8EXnH5WuhNOV0tRdId9newnG2T
-         T/ivxBo3H4NAvDzy7GMEZHRhVLqdMg4s+BxzaQpZF2DgzzfLQvN3+e4CzxVOeCuxByFR
-         rVW6avg4JOrdyqiXT5gbTzFPs/fLNSKhVhA931xy+jp1u0wAJkIGdchoUH+Ka/d1niUe
-         Q/D0PKImbZoFg3sOjHVEBDggGXn5UWAkkQ7Ib+A2PbSyGIxtx1NW1/AXYgFUPCAlDVGq
-         KGjIWx/T+Cyol+23Ej5IRf8U4EzSNzDszJMlQLTgTpCrwgrJRIeH7Zs0MxCJV+2fRL/c
-         FU1g==
-X-Gm-Message-State: AFqh2kppE/43pJP2InjRpZa90ne4dk92wbCK+6fWv2bx9wmDNBF26DRu
-        Yic6nfGQXz4apJGEF5Zut60=
-X-Google-Smtp-Source: AMrXdXsBfNz2Ma45dlU+sOA80H4I1bfauU80Tz34bDdys5gY4Zzh1WjTmTkmVsuUkAYHFrzRnx3gpg==
-X-Received: by 2002:a5d:9f0c:0:b0:6e2:d23a:6296 with SMTP id q12-20020a5d9f0c000000b006e2d23a6296mr6257857iot.20.1674093875324;
-        Wed, 18 Jan 2023 18:04:35 -0800 (PST)
-Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
-        by smtp.googlemail.com with ESMTPSA id e5-20020a056602158500b006ff6e8b3b8csm372247iow.41.2023.01.18.18.04.33
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5aWvWMMr5mJBRgmUAyLe5Dyn6w74gnkUeVPCdGCFfMU=;
+        b=pbYns5UCjzHmNGad7j1SSXaPcrYulo63p4wBZj/j/SFBot115hDkWthprAGJIxvUjt
+         MDcJocwN0Hw0XBM2nCAKuPu6DKJciz5wXAOFXTpX2dqwydRi+23X2ceYHqoMMB2oF17z
+         HxvxVnGesCLRw4vVlpbmGBwxiuWPK58NVyuDgXPqcq54Udo4N/RLqUsnTsrtDFMRiGLq
+         hM7AH5DOZHpSsh/eyg9RlP3FiGOgnmYQsZFaf2DEu8HoES3kxuNv1iJFB68m+3mjRbr6
+         iahlB+nmTUC3s0SRlvJueoV9WpaV1lObnwEPUS47kpsziOT6GjbyuslTv1gbe2n9KUd5
+         keug==
+X-Gm-Message-State: AFqh2kpttexHWNo5oH0C62Ej8Nd9kOLckf9xNS97cqIYIjgU8mAR7Hqf
+        +UPQO7KYlbqPvDiFHDNe7y75qpUJ6R4=
+X-Google-Smtp-Source: AMrXdXvjArPft+vXPywHutupJQHCN6eOpgVDwT/iso+HUrWRQC5HmshnSQN2CITspXPHJUHh9TrfmA==
+X-Received: by 2002:a05:6870:5386:b0:15e:efc5:35fc with SMTP id h6-20020a056870538600b0015eefc535fcmr5861820oan.30.1674096255000;
+        Wed, 18 Jan 2023 18:44:15 -0800 (PST)
+Received: from [172.17.0.2] ([52.171.137.242])
+        by smtp.gmail.com with ESMTPSA id s18-20020a056870611200b0014c7958c55bsm19437537oae.42.2023.01.18.18.44.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 18:04:34 -0800 (PST)
-From:   Sungwoo Kim <iam@sung-woo.kim>
-To:     iam@sung-woo.kim
-Cc:     benquike@gmail.com, davem@davemloft.net, daveti@purdue.edu,
-        edumazet@google.com, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, wuruoyu@me.com
-Subject: [PATCH] L2CAP: Fix null-ptr-deref in l2cap_sock_set_shutdown_cb
-Date:   Wed, 18 Jan 2023 21:04:07 -0500
-Message-Id: <20230119020406.3900747-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230119014057.3879476-1-iam@sung-woo.kim>
-References: <20230119014057.3879476-1-iam@sung-woo.kim>
+        Wed, 18 Jan 2023 18:44:14 -0800 (PST)
+Message-ID: <63c8ae7e.050a0220.1969.ec73@mx.google.com>
+Date:   Wed, 18 Jan 2023 18:44:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6328152759138672670=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
+Subject: RE: L2CAP: Fix null-ptr-deref in l2cap_sock_set_shutdown_cb
+In-Reply-To: <20230119013405.3870506-1-iam@sung-woo.kim>
+References: <20230119013405.3870506-1-iam@sung-woo.kim>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix a critical typo on the prev patch - Sorry!
+--===============6328152759138672670==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=713481
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.94 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 FAIL      0.53 seconds
+BuildKernel                   PASS      38.21 seconds
+CheckAllWarning               PASS      41.62 seconds
+CheckSparse                   PASS      46.12 seconds
+CheckSmatch                   PASS      124.89 seconds
+BuildKernel32                 PASS      36.50 seconds
+TestRunnerSetup               PASS      513.51 seconds
+TestRunner_l2cap-tester       PASS      18.77 seconds
+TestRunner_iso-tester         PASS      19.40 seconds
+TestRunner_bnep-tester        PASS      6.99 seconds
+TestRunner_mgmt-tester        PASS      123.49 seconds
+TestRunner_rfcomm-tester      PASS      10.74 seconds
+TestRunner_sco-tester         PASS      9.58 seconds
+TestRunner_ioctl-tester       PASS      10.96 seconds
+TestRunner_mesh-tester        PASS      8.25 seconds
+TestRunner_smp-tester         PASS      9.34 seconds
+TestRunner_userchan-tester    PASS      6.94 seconds
+IncrementalBuild              PASS      34.93 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+
+
 ---
- net/bluetooth/l2cap_sock.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index ca8f07f35..b9381d45d 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1681,9 +1681,11 @@ static void l2cap_sock_set_shutdown_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->data;
- 
--	lock_sock(sk);
--	sk->sk_shutdown = SHUTDOWN_MASK;
--	release_sock(sk);
-+	if (sk) {
-+		lock_sock(sk);
-+		sk->sk_shutdown = SHUTDOWN_MASK;
-+		release_sock(sk);
-+	}
- }
- 
- static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
--- 
-2.25.1
 
+--===============6328152759138672670==--
