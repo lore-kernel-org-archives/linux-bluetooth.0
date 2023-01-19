@@ -2,132 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64404C32793
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Jan 2023 21:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D14C38159
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 01:37:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbjARVKm (ORCPT
+        id S229646AbjASBhx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Jan 2023 16:10:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37476 "EHLO
+        Wed, 18 Jan 2023 20:37:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230445AbjARVKB (ORCPT
+        with ESMTP id S229899AbjASBfs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Jan 2023 16:10:01 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA3063E12;
-        Wed, 18 Jan 2023 13:09:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674076160; x=1705612160;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aFZmV5/PJ5rjlHfW0M/ptY8pOy0cNbcqOFnEPik/kHM=;
-  b=Bb3gpWhzEaJzWTkYUkQCLjRWo17XdKh5k3c7cCwPSOon5H0WNPZrUfk8
-   UWJjZtmT/pprBoutod00oIbvJuM+TaIWO8mcBgxwsixKloLemIfQ9iIFJ
-   otYZG3sAQrYPpGYGx/iCSNPUE3l6vE+PcAFOOtjdvvY06vXa7zbOzLcXG
-   oHY/uZexr/nutbfa1adSGqQwI7+BtHozM//lQf19wmAF1kzRE4kQFuZmE
-   HTq222kum88vZ4Iyin89qm80fENNIKI3Dp48tN6jJ52s/Xl9GOwtLElIp
-   jFv60eTmPMUoQ5v7mRst/pgEFRxELorYIzzcG+SegNc3Z+CgrCesXWT1C
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="411341456"
-X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
-   d="scan'208";a="411341456"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 13:09:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="783823051"
-X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
-   d="scan'208";a="783823051"
-Received: from lkp-server01.sh.intel.com (HELO 5646d64e7320) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 18 Jan 2023 13:09:14 -0800
-Received: from kbuild by 5646d64e7320 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pIFgH-0000iv-2b;
-        Wed, 18 Jan 2023 21:09:13 +0000
-Date:   Thu, 19 Jan 2023 05:08:47 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Francesco Dolcini <francesco@dolcini.it>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Wed, 18 Jan 2023 20:35:48 -0500
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D631665AC;
+        Wed, 18 Jan 2023 17:35:46 -0800 (PST)
+Received: by mail-il1-f179.google.com with SMTP id p12so487523ilq.10;
+        Wed, 18 Jan 2023 17:35:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tcLHpnRNh3ty5rv7JErXW5X+LMKRtJ6Ae8+AonT+Wt4=;
+        b=0jLa0aGyVKMnt4/0y0IWTAk3bDxbSkFR0OThuSTTcKbqr3Vp/umF+56yBIgQT+wncE
+         9VcozD8zQMNki1kQCYc/uiQEVqjlzUiys0nVyCbaN+Wh02A2uUCcOmahXXdOz5N0Tkhl
+         boCWyHypS7aGaspb39mZmvhXYQSIgYqOdd2yqoSgXPCBbVr+g3Adu9xhM6foy7j0oqwT
+         gUeStPSpjBJxe31zJ5yMLtwuIjqfMCHYJ3j8Y6qxN+B0l62eZXkohMHOdpI+8sQCSE8D
+         WvVMbfiYl9/bMPZRk4LXmORvhUatK9i0Xtmn7h/8pDVf+7pjzLOPJfqfjOKmUOUO1REX
+         J/6Q==
+X-Gm-Message-State: AFqh2krR2gR//MhucOdkk6bRryC69FI7CZ3P4AvPK+0nkkA71TcYIPoM
+        K4eirovp6NRuwyCASLUHyxg=
+X-Google-Smtp-Source: AMrXdXvxlTgKBAhWQR4LZca7F3Mn+uGGZnTz9tjG2PdmlP9Pq5eRuymaOtgjrbYGoVOO6TucK1UGTg==
+X-Received: by 2002:a05:6e02:2191:b0:30f:12c9:f767 with SMTP id j17-20020a056e02219100b0030f12c9f767mr9659967ila.11.1674092145973;
+        Wed, 18 Jan 2023 17:35:45 -0800 (PST)
+Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
+        by smtp.googlemail.com with ESMTPSA id cs10-20020a056638470a00b0039d756fb908sm3547284jab.40.2023.01.18.17.35.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jan 2023 17:35:44 -0800 (PST)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+Cc:     daveti@purdue.edu, wuruoyu@me.com, benquike@gmail.com,
+        Sungwoo Kim <iam@sung-woo.kim>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Stefan Eichenberger <stefan.eichenberger@toradex.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Francesco Dolcini <francesco.dolcini@toradex.com>
-Subject: Re: [PATCH v1 3/4] Bluetooth: hci_mrvl: Add serdev support for
- 88W8997
-Message-ID: <202301190442.n6v4c2yc-lkp@intel.com>
-References: <20230118122817.42466-4-francesco@dolcini.it>
+        linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM),
+        netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] L2CAP: Fix null-ptr-deref in l2cap_sock_set_shutdown_cb
+Date:   Wed, 18 Jan 2023 20:34:05 -0500
+Message-Id: <20230119013405.3870506-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118122817.42466-4-francesco@dolcini.it>
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Francesco,
+The L2CAP socket shutdown invokes l2cap_sock_destruct without a lock
+on conn->chan_lock, assigning NULL to chan->data *just before*
+the l2cap_disconnect_req thread that accesses to chan->data.
+This patch prevent it by adding a null check for a workaround, instead
+of fixing a lock.
 
-Thank you for the patch! Perhaps something to improve:
+This bug is found by FuzzBT, a modified Syzkaller by Sungwoo Kim(me).
+Ruoyu Wu(wuruoyu@me.com) and Hui Peng(benquike@gmail.com) has helped
+the FuzzBT project.
 
-[auto build test WARNING on robh/for-next]
-[also build test WARNING on bluetooth-next/master bluetooth/master horms-ipvs/master net/master net-next/master linus/master v6.2-rc4 next-20230118]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+ net/bluetooth/l2cap_sock.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Francesco-Dolcini/dt-bindings-bluetooth-marvell-add-88W8997-DT-binding/20230118-210919
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20230118122817.42466-4-francesco%40dolcini.it
-patch subject: [PATCH v1 3/4] Bluetooth: hci_mrvl: Add serdev support for 88W8997
-config: i386-randconfig-s002 (https://download.01.org/0day-ci/archive/20230119/202301190442.n6v4c2yc-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-39-gce1a6720-dirty
-        # https://github.com/intel-lab-lkp/linux/commit/2ae116c8ad209e0bf11559519915e511c44c28be
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Francesco-Dolcini/dt-bindings-bluetooth-marvell-add-88W8997-DT-binding/20230118-210919
-        git checkout 2ae116c8ad209e0bf11559519915e511c44c28be
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 olddefconfig
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash drivers/bluetooth/
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> drivers/bluetooth/hci_mrvl.c:450:36: warning: 'mrvl_proto_8997' defined but not used [-Wunused-const-variable=]
-     450 | static const struct hci_uart_proto mrvl_proto_8997 = {
-         |                                    ^~~~~~~~~~~~~~~
-
-
-vim +/mrvl_proto_8997 +450 drivers/bluetooth/hci_mrvl.c
-
-   449	
- > 450	static const struct hci_uart_proto mrvl_proto_8997 = {
-   451		.id		= HCI_UART_MRVL,
-   452		.name		= "Marvell 8997",
-   453		.init_speed	= 115200,
-   454		.oper_speed	= 3000000,
-   455		.open		= mrvl_open,
-   456		.close		= mrvl_close,
-   457		.flush		= mrvl_flush,
-   458		.set_baudrate   = mrvl_set_baudrate,
-   459		.recv		= mrvl_recv,
-   460		.enqueue	= mrvl_enqueue,
-   461		.dequeue	= mrvl_dequeue,
-   462	};
-   463	
-
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ca8f07f35..350c7afdf 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1681,9 +1681,11 @@ static void l2cap_sock_set_shutdown_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk = chan->data;
+ 
+-	lock_sock(sk);
+-	sk->sk_shutdown = SHUTDOWN_MASK;
+-	release_sock(sk);
++	if (!sk) {
++		lock_sock(sk);
++		sk->sk_shutdown = SHUTDOWN_MASK;
++		release_sock(sk);
++	}
+ }
+ 
+ static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.25.1
+
