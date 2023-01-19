@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5EF1C00A5A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 11:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B16C004D4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 11:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbjASLoV (ORCPT
+        id S230272AbjASLqJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Jan 2023 06:44:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49150 "EHLO
+        Thu, 19 Jan 2023 06:46:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230461AbjASLnv (ORCPT
+        with ESMTP id S230437AbjASLpz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Jan 2023 06:43:51 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6454D46722
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 03:43:30 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id r2so1570301wrv.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 03:43:30 -0800 (PST)
+        Thu, 19 Jan 2023 06:45:55 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4AD51DB94
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 03:45:50 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id m5-20020a05600c4f4500b003db03b2559eso1045791wmq.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 03:45:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DsM8SnUX6738vv+FuZQZAB/Sb1enJJrq9R2KmfyF4DI=;
-        b=I/NXo+JB+dcup6NvcY8BqxzMi77cSBmI2IToRjwoTrQqSmADhE+sn4M1eU9bhKi1QP
-         N7W/AGnmDS83tZtL91EJGXFINWvkUUWmMERIMmM2jJnxmSQo51T7j0hMEhHHYb0S15AV
-         kTix2fUMeczs5T8IF7DnYBbY1Cnuwza0sxbFPAE8CdLJo4lwuylQ9aLqHs5iNuc1nOxR
-         n6ZinYbjOWPYAqajmOE48LjEw96HGmfDpoStrM01GS2WGQaVj5tn58faWtBgxHtULUrO
-         eC7TXRsJZ1pQWv5bc+9v2q37CiCKnvwSgsFMHtKbpFvmY2qQoTKARBbuGpaJ66N9gMok
-         Tq+Q==
+        bh=EegNtTy/sMvWBoyNWhH9yCq0I9Ve3LXWODIPFxTqqBU=;
+        b=zclGPs8dfnB2v94HoRUfyCsXQnZE9vaqOARUnsItTYOj/BZ8EW/trKTeUrvR1DCYHJ
+         VzmyzZLQ+trGjlmZLVL2ooBYGvFTtps/DYb3Lq56srB+EZSPMcJLaHxAaJUbdhWoZDV5
+         aUvgzz5HEgMRxhNr45BF1iWmY5aIc3P5ibh5lKoO6QxPq02ERq4LCnCXJrRCi3AU515f
+         8Y9GQQOeBLdV4o0v/9lKzDfBA8klXxifAqJKn+rMdzgq3tkqFVVsOe67qfmPjNtupZog
+         i/s6VzEGYu+m/EQYJp8jmxQdgVCm3L2ubdG8NIWjrMv0kgoFUCHHHvBIi3peraRAJbK6
+         CovA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DsM8SnUX6738vv+FuZQZAB/Sb1enJJrq9R2KmfyF4DI=;
-        b=SeKZGMtk2S1s3oMKt4Pz7JZLDHM+bbpUkwOLK977HLGTXFU8DPe/7PH9Djb5DbMU4v
-         VKFx++1kmmgU49WC4N3ER7NOd41ihwxikKn0SRjSbE6aHi0yb9amnyvfj6v8kELuAqoW
-         3fJW81ZrXHcD4wv1vfwxC28i9ICqdMuE6KVDxC79XM4EcYbowO+NIy84v5eTiQEaW8W4
-         2b6uQu22SMsXJkSMyqxeZ0cEcn+GU2ynZ+wKqMm5MU2IZ3XA+6lAr4ECNgqxx4JLISYI
-         tsyDH9ASxPS0OiYUREDiyFmXaQqW1R4qkRkaJtLlFds3cx7xWnBmtHeYgWCfeU4ZNLJ0
-         SVqg==
-X-Gm-Message-State: AFqh2koFizYJsga2WSKvwppq+KFfPRSIlEN07MP+li/LMo3yGVqozpEd
-        xZ1VB53ON6nTI+oe8mqSyXeHWA==
-X-Google-Smtp-Source: AMrXdXv0v3jBWqBuFxLi8NxQbVFDlr7srs6jAca5/ZayShqefie0jHw4QWVBoBpugpkzBHTlW5nSZA==
-X-Received: by 2002:a5d:6988:0:b0:2bd:f18d:e909 with SMTP id g8-20020a5d6988000000b002bdf18de909mr8898365wru.1.1674128608983;
-        Thu, 19 Jan 2023 03:43:28 -0800 (PST)
+        bh=EegNtTy/sMvWBoyNWhH9yCq0I9Ve3LXWODIPFxTqqBU=;
+        b=oYneXrrodUocYTBlg7Y4tOJ1/yGgvVKQpy4ponaB4PQSrgLh3DyLjxt/L8www1nUVw
+         D7Ygw63HOU/VleZIsJVsSZRXNqHDP81LmOsQrePSu71MpfYTCWiPIjSaSiLwGWu8jltp
+         PsScr9sc6JpnPyyt5Q71Yf0dlg5NinxAXBYjZJmU9P+3X6E39nc4qdWhccmbh9hk/jz1
+         paQNvmAUe6xG53FsbVSzrf8+ymmLopTPELJ/+b/Gcf2/8TXIqn0+NEYvLy+wcrjokZgk
+         VLwzcEHoaR/2a/exivQ1jzhcRMWVN+mxsO7C8Lz6DYhJyUNUxGMxwk2xXtETcNDzcW/L
+         w/Kg==
+X-Gm-Message-State: AFqh2kppwxu4QTpxn85wZLJHXxNzqkmJcGmluOkxOJfaihlYk82GTdJB
+        49te0lC8cDKcHjyEBIT/frHcvg==
+X-Google-Smtp-Source: AMrXdXvvILwOluVAOsH2m1VZJBTVlAxx87YaERZAYpsns382Rz32yl41uxvU8muTuIj0ImWPTBVf/Q==
+X-Received: by 2002:a05:600c:1ca0:b0:3db:1ded:1769 with SMTP id k32-20020a05600c1ca000b003db1ded1769mr2214997wms.10.1674128749227;
+        Thu, 19 Jan 2023 03:45:49 -0800 (PST)
 Received: from [192.168.1.109] ([178.197.216.144])
-        by smtp.gmail.com with ESMTPSA id l1-20020adfe9c1000000b00289bdda07b7sm32739711wrn.92.2023.01.19.03.43.27
+        by smtp.gmail.com with ESMTPSA id r6-20020a1c2b06000000b003a6125562e1sm4489912wmr.46.2023.01.19.03.45.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Jan 2023 03:43:28 -0800 (PST)
-Message-ID: <73e4c2e5-800d-5595-004c-03f9cdf7f567@linaro.org>
-Date:   Thu, 19 Jan 2023 12:43:26 +0100
+        Thu, 19 Jan 2023 03:45:48 -0800 (PST)
+Message-ID: <77e5fbd2-636c-70a9-f4bf-3df631413a6d@linaro.org>
+Date:   Thu, 19 Jan 2023 12:45:46 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.0
-Subject: Re: [PATCH v1 1/4] dt-bindings: bluetooth: marvell: add 88W8997 DT
- binding
+Subject: Re: [PATCH v1 2/4] dt-bindings: bluetooth: marvell: add max-speed
+ property
 Content-Language: en-US
 To:     Francesco Dolcini <francesco@dolcini.it>, netdev@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -75,9 +75,9 @@ Cc:     Stefan Eichenberger <stefan.eichenberger@toradex.com>,
         Sascha Hauer <s.hauer@pengutronix.de>,
         Francesco Dolcini <francesco.dolcini@toradex.com>
 References: <20230118122817.42466-1-francesco@dolcini.it>
- <20230118122817.42466-2-francesco@dolcini.it>
+ <20230118122817.42466-3-francesco@dolcini.it>
 From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230118122817.42466-2-francesco@dolcini.it>
+In-Reply-To: <20230118122817.42466-3-francesco@dolcini.it>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -87,16 +87,37 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 On 18/01/2023 13:28, Francesco Dolcini wrote:
 > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > 
-> Update the documentation with the device tree binding for the Marvell
-> 88W8997 bluetooth device.
+> The 88W8997 bluetooth module supports setting the max-speed property.
+> 
+> Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+> ---
+>  .../bindings/net/marvell-bluetooth.yaml          | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml b/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml
+> index 83b64ed730f5..2fccea30c58d 100644
+> --- a/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml
+> +++ b/Documentation/devicetree/bindings/net/marvell-bluetooth.yaml
+> @@ -19,9 +19,25 @@ properties:
+>        - mrvl,88w8897
+>        - mrvl,88w8997
+>  
+> +  max-speed:
+> +    description: see Documentation/devicetree/bindings/serial/serial.yaml
+> +
+>  required:
+>    - compatible
+>  
+> +allOf:
+> +  - if:
+> +    properties:
 
-Subject: drop second/last, redundant "DT binding". The "dt-bindings"
-prefix is already stating that these are bindings.
+Wrong indentation, missing two spaces.
 
-With above:
-
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
+Does not look like you tested the bindings. Please run `make
+dt_binding_check` (see
+Documentation/devicetree/bindings/writing-schema.rst for instructions).
 
 Best regards,
 Krzysztof
