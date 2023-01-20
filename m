@@ -2,337 +2,244 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 823A5C004D4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Jan 2023 23:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25F85C38159
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 04:12:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230389AbjASX6d (ORCPT
+        id S229495AbjATEM3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Jan 2023 18:58:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
+        Thu, 19 Jan 2023 23:12:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230378AbjASX63 (ORCPT
+        with ESMTP id S229525AbjATEM2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Jan 2023 18:58:29 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AEBFA1005
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 15:58:14 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id d8so4032475pjc.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 15:58:14 -0800 (PST)
+        Thu, 19 Jan 2023 23:12:28 -0500
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B967E9EE13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 20:12:26 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id fd15so3312228qtb.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Jan 2023 20:12:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FZywWneBzfnS1YhNnPrphi7pBqCuQFz4CPvLAU9MWVM=;
-        b=jFzYhUWk9X6MsXmnT+3dgTeO0eyjvoVbMgA+Ia/iL676frpSyo4LDSuuvsC5qVvxIz
-         MrJEoQQbpW3v9tK0Q8FARrRIp0RLAeIi6K8Zui1aRBlNAFlOfPl4k4ztJ3HTnVD4pFC9
-         JAiHLNd4/ubLzVPcC8fo8moD3V5BRd/hYUfS2ezw7mulzBTb+1DpBIbZN83K2cVVfAOe
-         qDw8Ra488eiDe0CeDBKc2RweyVvlrrVXoS/v75A3/6qRoJbR2t4VXBfqOkXQzD9CD4d4
-         wBpDAxYV8vmLkZMf832OlSc2y6U0Gweys+pkZW0pf6uGGugR2nSJy266ADghOWdQE7ze
-         7v+A==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=V0mhW4Ax1KfIELdqY0XfBMaMuxja46f70Q4U/DW6hoo=;
+        b=Y4aApzRg1BdViP6UEcmjLPo2gcY1eMoZxLumFtQ1SULaWwR4XqJj1DfXFAfzP2ymX8
+         N0VsxU0zVnKI5hbc7kGL8Gsaw1oND0EKlK0sOJzaNObCVBc7OgNpYVF01Gh3cmC3hP/U
+         zXoo4wyRZ46d27NuwirnvQ1RBJJQlY1mu3/2FLxchET6bw49j4BF9xgIij26HEDJgKaS
+         5yG35Sxv2a6bxrsf415reH/hoVn/+vneDYBCEnxhAc0wgUgnGLQrNjXLPPoyURXz+ia0
+         YUHDVIyCvfYMz/uG6WuP8Qp6nMJhO7PftFucZHc4H8HovZpVw4wlKy+laWqTANN6s/39
+         +p2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FZywWneBzfnS1YhNnPrphi7pBqCuQFz4CPvLAU9MWVM=;
-        b=R2ku859zaTORZYXn9z907a5WXGJu8ti+pp2Ov3mhFXjhMsecBeHAWVxY+EJq8K9YKB
-         PqG3mbNtilcY5t9Zbv7iarsMV7f045qIBPnRVhGi3LFLz1mWwrH9yNa9x2epZUKGEwvc
-         RpKY/3ifHvLTdUtz6LCeT6s5Bk3JlPP1npTU1wb3P5adEWaDMjHhmz+5XC5wor0xXuuu
-         GutuO/S62HlZveH9a73XLPogfWJ9HC4pqAxfJN7loc15K95k3LSdX80Yp/dFTffe/mCP
-         gZZPsQmTW0CPnol/asfQIMNrFKzQfjFEqUPQUxjkGjRdbUkHTwTQQ0Cdp5W56PLxvELQ
-         78vA==
-X-Gm-Message-State: AFqh2kopQcu0RXS4EdG7wFoYowM/TffVLZRzQPpXkp+OXUwWKlgAJGnt
-        wv4WOeF6ZeNleOdrfjSI/QA1WwQYP2fdKg==
-X-Google-Smtp-Source: AMrXdXvEh9i3/zc+MRzr9c5X7JDoTdwPlbiAbbe+wUvstV1wYEASon8Flb3/X/bjXx64/VcuGLgAVg==
-X-Received: by 2002:a17:902:e194:b0:18f:98bb:c08e with SMTP id y20-20020a170902e19400b0018f98bbc08emr11656708pla.36.1674172693448;
-        Thu, 19 Jan 2023 15:58:13 -0800 (PST)
-Received: from fedora.. (97-113-173-242.tukw.qwest.net. [97.113.173.242])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170902d2ca00b0019460c34839sm14826373plc.185.2023.01.19.15.58.12
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V0mhW4Ax1KfIELdqY0XfBMaMuxja46f70Q4U/DW6hoo=;
+        b=wlDSGJ379gdYk918z2YNIw7uOWGRugut91BFd6deCXcvh6S1bNE2aArf+68h1uB1Ya
+         wACObZAUvfb8/xqMN6z95aLY2MplGZaHeNR+rkdokLAOK6lvhH4uHFzkGI156sBEPG6S
+         bFclA9wWj4ruSuR5Kxuk2KF/EANgY6zECDm3O1d7hQpAjvGdt9JEqkhls2DGExAHcVoj
+         Ll3Mh2vbSSCiltkguSHxMMZq6hI4HBBQ6VtF5fYwSYjaWLtp1+0hw4t3iaCi2nDUOWeI
+         z6bSx2/bIQ2usW6fETyG7CxA+aBsL2381gxmPdQ7bELI8ojZ90psm1xdQbx0QiT6Zx3i
+         f/2Q==
+X-Gm-Message-State: AFqh2kpW7Pn+OESp28lU2urT0zOPCXAYomuSdPQRTBgQbQSeukoGg9jc
+        YA2CP1sw+tWvKzkFitjhSwHP7WemMtwSug==
+X-Google-Smtp-Source: AMrXdXtsGUAkeaBbSepHkCBHWiapy8778bFlozaA2Nv6Y6Y81ZoHlaPQlLbPpKgmnn13CTkVD81WAA==
+X-Received: by 2002:a05:622a:6094:b0:3a5:fd39:ff90 with SMTP id hf20-20020a05622a609400b003a5fd39ff90mr54139532qtb.3.1674187945636;
+        Thu, 19 Jan 2023 20:12:25 -0800 (PST)
+Received: from [172.17.0.2] ([172.176.196.113])
+        by smtp.gmail.com with ESMTPSA id bz25-20020a05622a1e9900b003a591194221sm4703545qtb.7.2023.01.19.20.12.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 15:58:13 -0800 (PST)
-From:   Brian Gix <brian.gix@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ 10/12] mesh: Plumb in Mesh Private Beacon model
-Date:   Thu, 19 Jan 2023 15:57:53 -0800
-Message-Id: <20230119235755.46002-11-brian.gix@gmail.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230119235755.46002-1-brian.gix@gmail.com>
-References: <20230119235755.46002-1-brian.gix@gmail.com>
+        Thu, 19 Jan 2023 20:12:25 -0800 (PST)
+Message-ID: <63ca14a9.050a0220.c4a4e.2490@mx.google.com>
+Date:   Thu, 19 Jan 2023 20:12:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1882843315939663940=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@gmail.com
+Subject: RE: Mesh v1.1 additions
+In-Reply-To: <20230119235755.46002-2-brian.gix@gmail.com>
+References: <20230119235755.46002-2-brian.gix@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Brian Gix <brian.gix@intel.com>
+--===============1882843315939663940==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This allows nodes with this nodes Device Key to make changes to the
-behavior of this node's Mesh Private Beaconing.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=713938
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      9.88 seconds
+GitLint                       FAIL      4.26 seconds
+BuildEll                      PASS      27.14 seconds
+BluezMake                     PASS      835.50 seconds
+MakeCheck                     PASS      11.77 seconds
+MakeDistcheck                 PASS      147.68 seconds
+CheckValgrind                 PASS      243.94 seconds
+CheckSmatch                   WARNING   326.37 seconds
+bluezmakeextell               PASS      97.49 seconds
+IncrementalBuild              PASS      8277.83 seconds
+ScanBuild                     WARNING   997.72 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,02/12] mesh: Add Remote Provisioning
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#3305: FILE: mesh/remprv-server.c:238:
++		/* Fall Through */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#3514: FILE: mesh/remprv-server.c:447:
++		/* Fall Through */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#3518: FILE: mesh/remprv-server.c:451:
++		/* Fall Through */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#3797: FILE: mesh/remprv-server.c:730:
++		/* Fall Through */
+
+/github/workspace/src/src/13108984.patch total: 0 errors, 4 warnings, 3740 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13108984.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,07/12] mesh: Add Mesh Private Beacon server
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#228: FILE: mesh/prvbeac-server.c:74:
++		/* Fall Through */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#240: FILE: mesh/prvbeac-server.c:86:
++		/* Fall Through */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#247: FILE: mesh/prvbeac-server.c:93:
++		/* Fall Through */
+
+/github/workspace/src/src/13108981.patch total: 0 errors, 3 warnings, 166 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13108981.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,08/12] mesh: Add Tx/Rx support of Mesh Private Beacons
+ERROR:INITIALISED_STATIC: do not initialise statics to NULL
+#163: FILE: mesh/net-keys.c:70:
++static struct l_queue *beacons = NULL;
+
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#981: FILE: mesh/net.c:2834:
++							beacon_data->net_key_id);
+
+/github/workspace/src/src/13108983.patch total: 1 errors, 1 warnings, 1067 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13108983.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,01/12] doc/mesh: Add Remote Provisioning DBus APIs
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+11: B3 Line contains hard tab characters (\t): "	* Refresh Device Keys"
+12: B3 Line contains hard tab characters (\t): "	* Reassign Node Addresses"
+13: B3 Line contains hard tab characters (\t): "	* Refresh Node Composition"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+mesh/manager.c:113:35: warning: non-ANSI function declaration of function 'free_pending_add_call'mesh/crypto.c:1023:30: warning: non-ANSI function declaration of function 'mesh_crypto_check_avail'unit/test-mesh-crypto.c: note: in included file:
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+mesh/remprv-server.c:735:12: warning: Assigned value is garbage or undefined
+                msg[n++] = status;
+                         ^ ~~~~~~
+1 warning generated.
+mesh/prov-initiator.c:123:7: warning: Access to field 'server' results in a dereference of a null pointer (loaded from variable 'prov')
+        if (!prov->server)
+             ^~~~~~~~~~~~
+1 warning generated.
+tools/mesh/mesh-db.c:1978:4: warning: Value stored to 'jobj' is never read
+                        jobj = json_object_new_object();
+                        ^      ~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+In file included from unit/test-mesh-crypto.c:20:
+In file included from ./mesh/crypto.c:18:
+In file included from ./ell/ell.h:1:
+./ell/util.h:187:9: warning: 1st function call argument is an uninitialized value
+        return L_BE32_TO_CPU(L_GET_UNALIGNED((const uint32_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./ell/util.h:89:28: note: expanded from macro 'L_BE32_TO_CPU'
+#define L_BE32_TO_CPU(val) bswap_32(val)
+                           ^~~~~~~~~~~~~
+/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
+#define bswap_32(x) __bswap_32 (x)
+                    ^~~~~~~~~~~~~~
+unit/test-mesh-crypto.c:995:11: warning: The left expression of the compound assignment is an uninitialized value. The computed value will also be garbage
+                key_aid |= KEY_ID_AKF;
+                ~~~~~~~ ^
+unit/test-mesh-crypto.c:1038:2: warning: 4th function call argument is an uninitialized value
+        verify_uint8("NID", 0, keys->net_nid, nid);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+unit/test-mesh-crypto.c:1319:6: warning: Branch condition evaluates to a garbage value
+        if (ctl) {
+            ^~~
+unit/test-mesh-crypto.c:1539:7: warning: Branch condition evaluates to a garbage value
+                if (net_ctl) {
+                    ^~~~~~~
+unit/test-mesh-crypto.c:1806:3: warning: 1st function call argument is an uninitialized value
+                l_put_be64(cmac_tmp, cmac);
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+6 warnings generated.
+
+
+
 ---
- mesh/net-keys.c       |  5 ++++
- mesh/net-keys.h       |  1 +
- mesh/node.c           | 67 +++++++++++++++++++++++++++++++++++++++----
- mesh/node.h           |  2 ++
- mesh/prvbeac-server.c | 11 +++++--
- 5 files changed, 77 insertions(+), 9 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/net-keys.c b/mesh/net-keys.c
-index 429ca1f46..c7becb422 100644
---- a/mesh/net-keys.c
-+++ b/mesh/net-keys.c
-@@ -123,6 +123,7 @@ uint32_t net_key_add(const uint8_t flooding[16])
- 	key = l_new(struct net_key, 1);
- 	memcpy(key->flooding, flooding, 16);
- 	key->ref_cnt++;
-+	key->mpb_refresh = NET_MPB_REFRESH_DEFAULT;
- 	result = mesh_crypto_k2(flooding, p, sizeof(p), &key->nid, key->enc_key,
- 								key->prv_key);
- 	if (!result)
-@@ -664,6 +665,10 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t ivi, bool kr, bool ivu,
- 
- 	l_debug("Set Beacon: IVI: %8.8x, IVU: %d, KR: %d", ivi, ivu, kr);
- 
-+	key->ivi = ivi;
-+	key->ivu = ivu;
-+	key->kr = kr;
-+
- 	/* Propagate changes to all local nodes */
- 	net_local_beacon(id, ivi, ivu, kr);
- 
-diff --git a/mesh/net-keys.h b/mesh/net-keys.h
-index a3909448c..e73812481 100644
---- a/mesh/net-keys.h
-+++ b/mesh/net-keys.h
-@@ -12,6 +12,7 @@
- #define BEACON_TYPE_MPB		0x02
- #define KEY_REFRESH		0x01
- #define IV_INDEX_UPDATE		0x02
-+#define NET_MPB_REFRESH_DEFAULT	60
- 
- void net_key_cleanup(void);
- bool net_key_confirm(uint32_t id, const uint8_t flooding[16]);
-diff --git a/mesh/node.c b/mesh/node.c
-index a2a330518..ed3212685 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -32,6 +32,7 @@
- #include "mesh/model.h"
- #include "mesh/cfgmod.h"
- #include "mesh/remprv.h"
-+#include "mesh/prv-beacon.h"
- #include "mesh/util.h"
- #include "mesh/error.h"
- #include "mesh/dbus.h"
-@@ -100,6 +101,8 @@ struct mesh_node {
- 	uint8_t proxy;
- 	uint8_t friend;
- 	uint8_t beacon;
-+	uint8_t mpb;
-+	uint8_t mpb_period;
- };
- 
- struct node_import {
-@@ -206,6 +209,8 @@ static void set_defaults(struct mesh_node *node)
- {
- 	node->lpn = MESH_MODE_UNSUPPORTED;
- 	node->proxy = MESH_MODE_UNSUPPORTED;
-+	node->mpb = MESH_MODE_DISABLED;
-+	node->mpb_period = NET_MPB_REFRESH_DEFAULT;
- 	node->friend = (mesh_friendship_supported()) ? MESH_MODE_DISABLED :
- 							MESH_MODE_UNSUPPORTED;
- 	node->beacon = (mesh_beacon_enabled()) ? MESH_MODE_ENABLED :
-@@ -403,7 +408,7 @@ static bool init_storage_dir(struct mesh_node *node)
- 	return rpl_init(node->storage_dir);
- }
- 
--static void update_net_settings(struct mesh_node *node)
-+static void init_net_settings(struct mesh_node *node)
- {
- 	struct mesh_net *net = node->net;
- 
-@@ -415,6 +420,8 @@ static void update_net_settings(struct mesh_node *node)
- 					node->relay.cnt, node->relay.interval);
- 
- 	mesh_net_set_snb_mode(net, node->beacon == MESH_MODE_ENABLED);
-+	mesh_net_set_mpb_mode(net, node->mpb == MESH_MODE_ENABLED,
-+							node->mpb_period, true);
- }
- 
- static bool init_from_storage(struct mesh_config_node *db_node,
-@@ -442,6 +449,8 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	node->relay.cnt = db_node->modes.relay.cnt;
- 	node->relay.interval = db_node->modes.relay.interval;
- 	node->beacon = db_node->modes.beacon;
-+	node->mpb = db_node->modes.mpb;
-+	node->mpb_period = db_node->modes.mpb_period;
- 
- 	l_debug("relay %2.2x, proxy %2.2x, lpn %2.2x, friend %2.2x",
- 			node->relay.mode, node->proxy, node->lpn, node->friend);
-@@ -495,7 +504,7 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	mesh_net_set_seq_num(node->net, node->seq_number);
- 	mesh_net_set_default_ttl(node->net, node->ttl);
- 
--	update_net_settings(node);
-+	init_net_settings(node);
- 
- 	/* Initialize configuration server model */
- 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
-@@ -504,6 +513,9 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	remote_prov_server_init(node, PRIMARY_ELE_IDX);
- 	remote_prov_client_init(node, PRIMARY_ELE_IDX);
- 
-+	/* Initialize Private Beacon server model */
-+	prv_beacon_server_init(node, PRIMARY_ELE_IDX);
-+
- 	node->cfg = cfg;
- 
- 	return true;
-@@ -839,6 +851,36 @@ uint8_t node_beacon_mode_get(struct mesh_node *node)
- 	return node->beacon;
- }
- 
-+bool node_mpb_mode_set(struct mesh_node *node, bool enable, uint8_t period)
-+{
-+	bool res;
-+	uint8_t beacon;
-+
-+	if (!node)
-+		return false;
-+
-+	beacon = enable ? MESH_MODE_ENABLED : MESH_MODE_DISABLED;
-+	res = mesh_config_write_mpb(node->cfg, beacon, period);
-+
-+	if (res) {
-+		node->mpb = beacon;
-+		node->mpb_period = period;
-+		mesh_net_set_mpb_mode(node->net, enable, period, false);
-+	}
-+
-+	return res;
-+}
-+
-+uint8_t node_mpb_mode_get(struct mesh_node *node, uint8_t *period)
-+{
-+	if (!node)
-+		return MESH_MODE_DISABLED;
-+
-+	*period = node->mpb_period;
-+
-+	return node->mpb;
-+}
-+
- bool node_friend_mode_set(struct mesh_node *node, bool enable)
- {
- 	bool res;
-@@ -951,6 +993,8 @@ static void convert_node_to_storage(struct mesh_node *node,
- 	db_node->modes.relay.cnt = node->relay.cnt;
- 	db_node->modes.relay.interval = node->relay.interval;
- 	db_node->modes.beacon = node->beacon;
-+	db_node->modes.mpb = node->mpb;
-+	db_node->modes.mpb_period = node->mpb_period;
- 
- 	db_node->ttl = node->ttl;
- 	db_node->seq_number = node->seq_number;
-@@ -1173,9 +1217,16 @@ static bool get_sig_models_from_properties(struct mesh_node *node,
- 	while (l_dbus_message_iter_next_entry(&mods, &m_id, &var)) {
- 		uint32_t id = SET_ID(SIG_VENDOR, m_id);
- 
--		/* Allow Config Server Model only on the primary element */
--		if (ele->idx != PRIMARY_ELE_IDX && id == CONFIG_SRV_MODEL)
--			return false;
-+		/*
-+		 * Allow Config Server & Private Beacon Models only on
-+		 * the primary element
-+		 */
-+		if (ele->idx != PRIMARY_ELE_IDX) {
-+			if (id == CONFIG_SRV_MODEL)
-+				return false;
-+			if (id == PRV_BEACON_SRV_MODEL)
-+				return false;
-+		}
- 
- 		if (!mesh_model_add(node, ele->models, id, &var))
- 			return false;
-@@ -1278,6 +1329,7 @@ static bool get_element_properties(struct mesh_node *node, const char *path,
- 	 */
- 	if (ele->idx == PRIMARY_ELE_IDX) {
- 		mesh_model_add(node, ele->models, CONFIG_SRV_MODEL, NULL);
-+		mesh_model_add(node, ele->models, PRV_BEACON_SRV_MODEL, NULL);
- 		mesh_model_add(node, ele->models, REM_PROV_SRV_MODEL, NULL);
- 		if (node->provisioner)
- 			mesh_model_add(node, ele->models, REM_PROV_CLI_MODEL,
-@@ -1397,13 +1449,16 @@ static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
- 
- 	l_queue_foreach(node->pages, save_pages, node);
- 
--	update_net_settings(node);
-+	init_net_settings(node);
- 
- 	/* Initialize internal server models */
- 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
- 	remote_prov_server_init(node, PRIMARY_ELE_IDX);
- 	remote_prov_client_init(node, PRIMARY_ELE_IDX);
- 
-+	/* Initialize Private Beacon server model */
-+	prv_beacon_server_init(node, PRIMARY_ELE_IDX);
-+
- 	node->busy = true;
- 
- 	return true;
-diff --git a/mesh/node.h b/mesh/node.h
-index a98945223..4f31c5056 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -63,6 +63,8 @@ uint8_t node_relay_mode_get(struct mesh_node *node, uint8_t *cnt,
- bool node_proxy_mode_set(struct mesh_node *node, bool enable);
- uint8_t node_proxy_mode_get(struct mesh_node *node);
- bool node_beacon_mode_set(struct mesh_node *node, bool enable);
-+bool node_mpb_mode_set(struct mesh_node *node, bool enable, uint8_t period);
-+uint8_t node_mpb_mode_get(struct mesh_node *node, uint8_t *period);
- uint8_t node_beacon_mode_get(struct mesh_node *node);
- bool node_friend_mode_set(struct mesh_node *node, bool enable);
- uint8_t node_friend_mode_get(struct mesh_node *node);
-diff --git a/mesh/prvbeac-server.c b/mesh/prvbeac-server.c
-index 4d33f2823..d4475fb09 100644
---- a/mesh/prvbeac-server.c
-+++ b/mesh/prvbeac-server.c
-@@ -43,7 +43,7 @@ static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 	uint32_t opcode;
- 	uint8_t msg[5];
- 	uint16_t n;
--	uint8_t period = 0;
-+	uint8_t period;
- 
- 	if (app_idx != APP_IDX_DEV_LOCAL)
- 		return false;
-@@ -65,18 +65,23 @@ static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 
- 	case OP_PRIVATE_BEACON_SET:
- 		if (size == 1)
--			period = 0xff;
-+			node_mpb_mode_get(node, &period);
- 		else if (size == 2)
- 			period = pkt[1];
- 		else
- 			return true;
- 
-+		if (pkt[0] > 1)
-+			return true;
-+
-+		node_mpb_mode_set(node, !!pkt[0], period);
-+
- 		/* Fall Through */
- 
- 	case OP_PRIVATE_BEACON_GET:
- 		n = mesh_model_opcode_set(OP_PRIVATE_BEACON_STATUS, msg);
- 
--		msg[n++] = NOT_SUPPORTED;
-+		msg[n++] = node_mpb_mode_get(node, &period);
- 		msg[n++] = period;
- 
- 		l_debug("Get/Set Private Beacon (%d)", msg[n-2]);
--- 
-2.39.0
 
+--===============1882843315939663940==--
