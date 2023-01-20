@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF789C27C76
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 19:47:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBFCC25B50
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 19:47:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbjATTrn (ORCPT
+        id S229799AbjATTrp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Jan 2023 14:47:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41024 "EHLO
+        Fri, 20 Jan 2023 14:47:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbjATTrk (ORCPT
+        with ESMTP id S229379AbjATTro (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Jan 2023 14:47:40 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14D54457C5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 11:47:39 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id g23so6212166plq.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 11:47:39 -0800 (PST)
+        Fri, 20 Jan 2023 14:47:44 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2718CE7E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 11:47:43 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id u1-20020a17090a450100b0022936a63a21so10033564pjg.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 11:47:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dg+OLczEsFoyAkjMV+YWxfgBqPA3+Kql+jsBQri6mKE=;
-        b=EOfmrAVaCLcKYNPARBWSYoqPz4u8N/9iHYVMUkZM0IliTrExXB2m3z3TTvc/yfe4ku
-         LkG3KkN9we7qXJFvtBM0gCGs1nsZvvrigoIF2gLP5C7M0Zbc6qMDJhkbtM+363Z7opwx
-         7w6lLUdSQtbtIH+z/Uis3v/u2V3auO/zkUQJM1SIOq6I2yOc6MIMvLqEiOwx+muHWzoE
-         qxsPJ5PIyNvIdhzhb35O8B+cfkUmUFdrRD7AwUAK5F9on+9YntA+I6TgplVKWOIuRiLP
-         7GzMQb4ble00AY/+qVxb/zZJ8OTJeQmYYui30PhnA5Rm4Q66Q+G3uZrNjI4rMb7NXOYy
-         rcBA==
+        bh=b48kmI/BztgRM+uAhPW4+zfV7sMkQU8z8Z1nGlrlajc=;
+        b=RlAmG8kzgcYe2iBvDZYJqNezC2/ar7qUwvB/hC3ZkHgq4LPQL0r7WlsKEbB7AY6lR5
+         KNkFf9zc2WtXpXrc74UDq2RM1kJWANUUiB8bqiLXaJTuw6IogJOFecdi50OVznr2LVp9
+         1eicY1+i7UPsQMjIal52EoYKqkS/Lovom2XIhU9uXBvNPLwgz0uAJ/a8sL0iQvTBHU39
+         kIk+9G6OA8ltOrdqxt6XqA677xiNkvOazSvyCs+M4ZNbgPhXVGyvNbMQkyu3gGzfUmpZ
+         CaYLhkwZ18tgMp1iv4uVxL8BoD+UD5k5PFJaTFZYyoc4x/shtY0TLsRgwMwE//mpk/LN
+         2H+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dg+OLczEsFoyAkjMV+YWxfgBqPA3+Kql+jsBQri6mKE=;
-        b=BqbIORbvf5m4Y2sWx6sn44/44nZJKPGXLgj/VU4kTdcVLkeSdGqrKDoAomaoIatRhR
-         Zi/q7wLoqA4GGH81loMDjrROEdayr+uA8hxEmnZ4t6Y4OxhIoIMncBH1PAs5oDypxsFR
-         myjzWqeSQ3evN9J5F1a91R8p1gsl3HPOBPwx1ekVxD1W8ZIrcf9eT+i6nQy7tfGc0VTv
-         C1VB7fPG/JrO8Bma/fU4S4yn56ArixPSNqRMWuPt/S3ynOD8VuX1iX72HfDqB8RsE0OD
-         rP/1MDResXsnOT2bloG3OK6JaRwnC5WD12N2YVttRjWHAsKQGptYygXvkxquJhrInaHB
-         bd2Q==
-X-Gm-Message-State: AFqh2kpSKTQ3E0W+x0G6zz1gDt/ceFnhs/WWNxo47wlsN9Zb1PCharfg
-        EjUcePO5nFrBcpTvSXFdVoiBAbYCcElABQ==
-X-Google-Smtp-Source: AMrXdXsFy2s3neh9mjhoHJTAgeu666m7W7xmOog+VYt8ocG/6uNUcfcODS2MwG1/yxEJB3wVtsKjgw==
-X-Received: by 2002:a17:903:54d:b0:193:a5b:ccf6 with SMTP id jo13-20020a170903054d00b001930a5bccf6mr14403211plb.0.1674244057824;
-        Fri, 20 Jan 2023 11:47:37 -0800 (PST)
+        bh=b48kmI/BztgRM+uAhPW4+zfV7sMkQU8z8Z1nGlrlajc=;
+        b=vpe2+L9CixEGF0mpyGQSwx2NjxLdzUPEpmaRzmC6l/NPTUu9KCfpFJkcCAaAAw+tus
+         c/9k8UydCvYU1iQKn0GziUJ0u0NZA1+XOIORfL3iguxEodbucrXDuFEhDNWr6ahf/dQN
+         zU5MYziyzey14ZyGfOWUJEiRK3pVWXK96btkSqo3friuwwFKIBfpceoM6ixOSxpGN7jv
+         1TDqK5IQnhGOjST5FevZ4n6uNRy0VlO64HxZhyVdOLMkrbVtcRWkPVW3nOgsvaeb3BBt
+         ID/01z4JZMx77f9dUvfV/DMjLM6IiRMcrM7NQTmh3lZkRaquz61aHFzeJesyeldWz0os
+         Id8w==
+X-Gm-Message-State: AFqh2kpDCwqWHCcWRZDp7Rcg+EkSpwZP5Xer58xHo3F9TnH1SbFeJ9A1
+        wmLrGLc+ZRQY9syXut/mDSqbgrnEBIJIoQ==
+X-Google-Smtp-Source: AMrXdXuXuK92aTyAxyB0wegeWwhAnfPDRj/FvVN5KQ+LeXDjuNMrvZcuOZw7VtGFG2miAs3mT7kH4w==
+X-Received: by 2002:a17:902:efc3:b0:194:45d0:3b21 with SMTP id ja3-20020a170902efc300b0019445d03b21mr16319342plb.4.1674244062084;
+        Fri, 20 Jan 2023 11:47:42 -0800 (PST)
 Received: from fedora.. (174-21-24-126.tukw.qwest.net. [174.21.24.126])
-        by smtp.gmail.com with ESMTPSA id y13-20020a17090322cd00b001896af10ca7sm5149967plg.134.2023.01.20.11.47.37
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090322cd00b001896af10ca7sm5149967plg.134.2023.01.20.11.47.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 11:47:37 -0800 (PST)
+        Fri, 20 Jan 2023 11:47:41 -0800 (PST)
 From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v2 01/11] doc/mesh: Add Remote Provisioning DBus APIs
-Date:   Fri, 20 Jan 2023 11:47:21 -0800
-Message-Id: <20230120194731.90065-2-brian.gix@gmail.com>
+Subject: [PATCH BlueZ v2 06/11] mesh: Add storage of Mesh Private Beacon settings
+Date:   Fri, 20 Jan 2023 11:47:26 -0800
+Message-Id: <20230120194731.90065-7-brian.gix@gmail.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230120194731.90065-1-brian.gix@gmail.com>
 References: <20230120194731.90065-1-brian.gix@gmail.com>
@@ -68,207 +68,120 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-Remote Provisioning (introduced in Mesh Profile Specification v1.1)
-
-* Allows Provisioners to use a remote server to scan for and
-  provision devices.
-
-* Allows Config managers to reprovision existing nodes to:
-	* Refresh Device Keys
-	* Reassign Node Addresses
-	* Refresh Node Composition
+If current storage does not exist in node.json, the Mesh Private
+Beacon will be disabled.
 ---
- doc/mesh-api.txt | 140 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 134 insertions(+), 6 deletions(-)
+ mesh/mesh-config-json.c | 48 +++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-config.h      |  6 ++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index 85de6705e..393ae566f 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -484,7 +484,28 @@ Methods:
- 			Specifies number of seconds for scanning to be active.
- 			If set to 0 or if this key is not present, then the
- 			scanning will continue until UnprovisionedScanCancel()
--			or AddNode() methods are called.
-+			or AddNode() methods are called. If not present, and a
-+			remote server is specified, the default timeout will be
-+			60 seconds.
-+
-+		uint16 Server
-+			Specifies a remote server on which to perform scanning.
-+			If not present, scanning will be local. If present,
-+			the timeout must be between 1 and 60 seconds.
-+
-+		uint16 Subnet
-+			Specifies a subnet for the remote server. If not
-+			present, primary subnet will be used. If Server not
-+			present, the Subnet will be ignored.
-+
-+		array{byte}[16] Filter
-+			Specifies a specific UUID to search for. If not
-+			present, all found UUIDs will be returned.
-+
-+		uint8 array Extended
-+			Specifies variable number of Bluetooth AD types to
-+			return with scan result. Only valid if a Filter has been
-+			specified.
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index 8f321a731..c198627c6 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -1337,6 +1337,19 @@ static void parse_features(json_object *jconfig, struct mesh_config_node *node)
+ 			node->modes.beacon = mode;
+ 	}
  
- 		Each time a unique unprovisioned beacon is heard, the
- 		ScanResult() method on the app will be called with the result.
-@@ -514,8 +535,48 @@ Methods:
- 		of the unprovisioned device to be added to the network.
++	if (json_object_object_get_ex(jconfig, "mpb", &jvalue)) {
++		mode = get_mode(jvalue);
++		if (mode <= MESH_MODE_UNSUPPORTED)
++			node->modes.mpb = mode;
++
++		if (node->modes.mpb == MESH_MODE_ENABLED) {
++			if (json_object_object_get_ex(jconfig, "mpbPeriod",
++								&jvalue))
++				node->modes.mpb_period =
++						json_object_get_int(jvalue);
++		}
++	}
++
+ 	if (!json_object_object_get_ex(jconfig, "relay", &jrelay))
+ 		return;
  
- 		The options parameter is a dictionary that may contain
--		additional configuration info (currently an empty placeholder
--		for forward compatibility).
-+		additional optional configuration info:
-+
-+		uint16 Server
-+			Specifies a remote server to perform provisioning on. If
-+			not present, provisioning will be done locally.
-+
-+		uint16 Subnet
-+			Specifies a subnet for the remote server. If not
-+			present, primary subnet will be used. If Server not
-+			present Subnet will be ignored.
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.InvalidArguments
-+			org.bluez.mesh.Error.NotAuthorized
-+
-+	void Reprovision(uint16 unicast, dict options)
-+
-+		This method is used by the application that supports
-+		org.bluez.mesh.Provisioner1 interface to perform one of the
-+		Node Provisioning Protocol Interface procedures with a remote
-+		node to refresh its device key, unicast address, and
-+		composition. Remote node being reprovisioned must have the
-+		Remote Provisioning Server model.
-+
-+		The unicast parameter is the 16-bit primary node address of
-+		the remote node being reprovisioned.
-+
-+		The options parameter is a dictionary that may contain
-+		additional optional configuration info:
-+
-+		uint8 NPPI
-+			Specifies the Node Provisioning Protocol Interface
-+			behavior, as defined in the Mesh Profile Specification:
-+				0 - Device Key Refresh Only
-+				1 - Node Address Refresh
-+				2 - Node Composition Refresh
-+
-+			If not present, behavior 0 will be used.
-+
-+		uint16 Subnet
-+			Specifies the subnet remote node is on. If not
-+			present, primary subnet will be tried.
+@@ -1576,6 +1589,18 @@ bool mesh_config_write_mode(struct mesh_config *cfg, const char *keyword,
+ 	return save_config(cfg->jnode, cfg->node_dir_path);
+ }
  
- 		PossibleErrors:
- 			org.bluez.mesh.Error.InvalidArguments
-@@ -1055,11 +1116,19 @@ Object path	freely definable
- 		byte remote device UUID (always), a 16 bit mask of OOB
- 		authentication flags (optional), and a 32 bit URI hash (if URI
- 		bit set in OOB mask). Whether these fields exist or not is a
--		decision of the remote device.
-+		decision of the unprovisioned device.
++bool mesh_config_write_mode_ex(struct mesh_config *cfg, const char *keyword,
++							int value, bool save)
++{
++	if (!cfg)
++		return false;
++
++	if (save)
++		return mesh_config_write_mode(cfg, keyword, value);
++	else
++		return write_mode(cfg->jnode, keyword, value);
++}
++
+ static bool write_relay_mode(json_object *jobj, uint8_t mode,
+ 					uint8_t count, uint16_t interval)
+ {
+@@ -1622,6 +1647,21 @@ bool mesh_config_write_relay_mode(struct mesh_config *cfg, uint8_t mode,
+ 	return save_config(cfg->jnode, cfg->node_dir_path);
+ }
  
- 		The options parameter is a dictionary that may contain
--		additional scan result info (currently an empty placeholder for
--		forward compatibility).
-+		additional optional configuration info:
++bool mesh_config_write_mpb(struct mesh_config *cfg, uint8_t mode,
++								uint8_t period)
++{
 +
-+		uint16 Server
-+			Specifies the remote server that received the
-+			Unprovisioned beacon. If not present, beacon was
-+			received locally.
++	if (!cfg || !write_mode(cfg->jnode, "mpb", mode))
++		return false;
 +
-+		uint8 array ExtendedData
-+			If Extended data was requested during scanning, any
-+			received data will be returned here.
++	if (mode) {
++		if (!write_int(cfg->jnode, "mpbPeriod", period))
++			return false;
++	}
++
++	return save_config(cfg->jnode, cfg->node_dir_path);
++}
++
+ bool mesh_config_write_net_transmit(struct mesh_config *cfg, uint8_t cnt,
+ 							uint16_t interval)
+ {
+@@ -1746,6 +1786,14 @@ static struct mesh_config *create_config(const char *cfg_path,
+ 	if (!write_mode(jnode, "beacon", modes->beacon))
+ 		return NULL;
  
- 		If a beacon with a UUID that has already been reported is
- 		recieved by the daemon, it will be silently discarded unless it
-@@ -1082,6 +1151,26 @@ Object path	freely definable
- 		PossibleErrors:
- 			org.bluez.mesh.Error.Abort
++	if (!write_mode(jnode, "mpb", modes->mpb))
++		return NULL;
++
++	if (modes->mpb) {
++		if (!write_int(jnode, "mpbPeriod", modes->mpb_period))
++			return NULL;
++	}
++
+ 	/* Sequence number */
+ 	json_object_object_add(jnode, sequenceNumber,
+ 					json_object_new_int(node->seq_number));
+diff --git a/mesh/mesh-config.h b/mesh/mesh-config.h
+index ed1b610de..3cb20b85d 100644
+--- a/mesh/mesh-config.h
++++ b/mesh/mesh-config.h
+@@ -60,6 +60,8 @@ struct mesh_config_modes {
+ 	uint8_t friend;
+ 	uint8_t proxy;
+ 	uint8_t beacon;
++	uint8_t mpb;
++	uint8_t mpb_period;
+ };
  
-+	uint16 unicast RequestReprovData(uint16 original, uint8 count)
-+
-+		This method is implemented by a Provisioner capable application
-+		and is called when the remote node being reprovisioned has been
-+		fully authenticated and confirmed. This method will only be
-+		called if the NPPI-1 procedure (Node Address Refresh) is being
-+		performed.
-+
-+		The original parameter is the current unicast address of the
-+		node being reprovisioned.
-+
-+		The count parameter is the number of consecutive unicast
-+		addresses the remote node is requesting.
-+
-+		Return Parameter:
-+		unicast - Primary Unicast address of the new node
-+
-+		PossibleErrors:
-+			org.bluez.mesh.Error.Abort
-+
- 	void AddNodeComplete(array{byte}[16] uuid, uint16 unicast, uint8 count)
- 
- 		This method is called when the node provisioning initiated
-@@ -1096,6 +1185,33 @@ Object path	freely definable
- 		The new node may now be sent messages using the credentials
- 		supplied by the RequestProvData method.
- 
-+	void ReprovComplete(uint16 original, uint8 nppi, uint16 unicast,
-+								uint8 count)
-+
-+		This method is called when the node Reprovisioning initiated
-+		by a Reprovision() method call successfully completed.
-+
-+		The original parameter is the former primary address of the
-+		node that has been reprovisioned.
-+
-+		The nppi parameter indicates which NPPI behavior was performed.
-+		If behavior 1 or 2 was performed, the node is materially
-+		different than it was before reprovisioning, and Composition,
-+		Bindings, Publication and Subscription settings should be
-+		refreshed.
-+
-+		The unicast parameter is the new primary address that has been
-+		assigned to the node, If NPPI behavior 1 was performed this
-+		value may be different from the original. If behavior 0 or 2
-+		was performed, the original and new primary address should be
-+		the same.
-+
-+		The count parameter is the number of unicast addresses assigned
-+		to the node.
-+
-+		The node may now be sent messages using the credentials
-+		supplied by the RequestReprovData method.
-+
- 	void AddNodeFailed(array{byte}[16] uuid, string reason)
- 
- 		This method is called when the node provisioning initiated by
-@@ -1109,6 +1225,18 @@ Object path	freely definable
- 		"decryption-error", "unexpected-error",
- 		"cannot-assign-addresses".
- 
-+	void ReprovFailed(uint16 unicast, string reason)
-+
-+		This method is called when node reprovisioning initiated by
-+		Reprovision() has failed. If reprovisioning has failed, the
-+		prior credentials of the remote node may still be valid.
-+
-+		The reason parameter identifies the reason for provisioning
-+		failure. The defined values are: "aborted", "timeout",
-+		"bad-pdu", "confirmation-failed", "out-of-resources",
-+		"decryption-error", "unexpected-error",
-+		"cannot-assign-addresses".
-+
- Provisioning Agent Hierarchy
- ============================
- Service		unique name
+ struct mesh_config_netkey {
+@@ -140,9 +142,13 @@ bool mesh_config_write_seq_number(struct mesh_config *cfg, uint32_t seq,
+ bool mesh_config_write_unicast(struct mesh_config *cfg, uint16_t unicast);
+ bool mesh_config_write_relay_mode(struct mesh_config *cfg, uint8_t mode,
+ 					uint8_t count, uint16_t interval);
++bool mesh_config_write_mpb(struct mesh_config *cfg, uint8_t mode,
++								uint8_t period);
+ bool mesh_config_write_ttl(struct mesh_config *cfg, uint8_t ttl);
+ bool mesh_config_write_mode(struct mesh_config *cfg, const char *keyword,
+ 								int value);
++bool mesh_config_write_mode_ex(struct mesh_config *cfg, const char *keyword,
++							int value, bool save);
+ bool mesh_config_comp_page_add(struct mesh_config *cfg, uint8_t page,
+ 						uint8_t *data, uint16_t size);
+ void mesh_config_comp_page_del(struct mesh_config *cfg, uint8_t page);
 -- 
 2.39.0
 
