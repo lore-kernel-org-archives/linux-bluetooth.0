@@ -2,126 +2,108 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB3DC38141
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 16:40:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85261C38A23
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 19:47:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230307AbjATQkA (ORCPT
+        id S229747AbjATTrn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Jan 2023 11:40:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49992 "EHLO
+        Fri, 20 Jan 2023 14:47:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230119AbjATQj6 (ORCPT
+        with ESMTP id S229379AbjATTrm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Jan 2023 11:39:58 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D6E340E9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 08:39:56 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id z5so5354458wrt.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 08:39:56 -0800 (PST)
+        Fri, 20 Jan 2023 14:47:42 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226F6872B0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 11:47:41 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id z13so6239324plg.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 11:47:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pGYySup8p6S2QLbw0VKiZbUhVbWmQ+yt84mNVfAu/t0=;
-        b=UApWjzlXda6CKOsxYSAekXBHCiPYv6pVkiWHbI7PK6NXlDBf2dZaBDBu3pcMBX4Dvp
-         6pVJCoYaf28tSrmY+cQXTcE5NCML/7/aNdhPsd9f1zZGxwjZ8KtIc0zafg1CDt+MmL1t
-         ht+1uJ+qps8er08SQIPj8jCpqo9gs3doYVucXRacX8doWIlUzIZI6fYKJoTuT8NrG42t
-         MEw5W4JoUE4dXTKy6NU3b03SLyKAPuoCmZGqaBryF9fm76CMUuyzmAcMzhe2Gc9aBSvv
-         rVqHAHr0IWrNPbn8V79yED7CryU1Vk3Sen0HSlqKLB5YcHIC9rN/57uXiyLuvli0/Rbt
-         Yz+w==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6IbjGmvpVt2am6W6/Kww6kXKnPQ6CQRTRqXyvFQ8XB0=;
+        b=dy7i0Yi6nKZvHJHgIejbM0IyDspiYWXVYMqmGr/TI7fake3GIOsDBS7edMLHQOrL0a
+         YALpqsoq6PPtfJKIPcxznmrakF1k99q0x9kkZr3akAM/fFNpxWcK4DVjlJlYSOglIu0W
+         M6Fy5QJXtlOkzmNPeKxgBb9Wm9Vzqi7/zYh77oTsOUfkCbG0ukkEaFaCDxx1XuSvF79b
+         rqCa/KSmHZMVo6I5NC1ZHM62IkZbpNuKfl2XUPExTL+7Fmq8JFsR9nItBKQ0m/mJmakL
+         ti5Jlr3AAjnOM2pmfEldtbqAKgoQM3HjFRoqjRsnIZifJ8yOGaNA1W0Annls2aomAIgk
+         oU3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pGYySup8p6S2QLbw0VKiZbUhVbWmQ+yt84mNVfAu/t0=;
-        b=Cow2+xyPLbVXSl38WVWUrtjj5vim1idg/9AQfPYpaz7ReDjyOzLSleBCcjr6+IvDgI
-         LyzsKmMHZNkh0EmRl+UMRXEH3BA9+JeCN1+pReEjjACcJeBMrRjhmFEQawOfXf9L8iPY
-         jaYvr7IvK3vwW8h8in8cN+BJKUyUfArhyfj6dj3r5AM+EvLrb4/HgOtdIOwDsg301h8B
-         9pZYP1avbHAiP/iXHfKO2i3q3ak1md4tSK66w+EAtYRBlAjoHGG7hPyCo4ehVeJLSprT
-         /ZTDTxfZzc0w58X4UmljDy8ZiFgA1itYigv4Uzg6pltGkxBkc7BY010OCXKmLhSnv1zw
-         NsZg==
-X-Gm-Message-State: AFqh2krvYt5CRZ18b6KRL/itdJnyDcQWgIFtTYbZIj/98y1G/YDPS0x3
-        PkW+jybed78/cbRVylwH481pRQ==
-X-Google-Smtp-Source: AMrXdXtZ9DWblZSaKSzMSMqI/0YMAXlKAx5MWIAT7Z2mmChtlRMs75VNjLqzEiOVvNoaJZ95nuiIUg==
-X-Received: by 2002:a05:6000:98d:b0:25f:8ead:96cc with SMTP id by13-20020a056000098d00b0025f8ead96ccmr14507795wrb.70.1674232794812;
-        Fri, 20 Jan 2023 08:39:54 -0800 (PST)
-Received: from [192.168.1.109] ([178.197.216.144])
-        by smtp.gmail.com with ESMTPSA id z12-20020adfd0cc000000b002bdff778d87sm13385996wrh.34.2023.01.20.08.39.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Jan 2023 08:39:54 -0800 (PST)
-Message-ID: <0bb76233-062c-a1c5-da88-4f04feccd5b2@linaro.org>
-Date:   Fri, 20 Jan 2023 17:39:52 +0100
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6IbjGmvpVt2am6W6/Kww6kXKnPQ6CQRTRqXyvFQ8XB0=;
+        b=n/zli0we6m4ALwIM38oI/4CPlER4aNRi55CzJtsCCZqnvQHqcEpAfTqGn2j/Qd7loU
+         ep1Qe0hx9yVSG+X4BNqi1E1doJASPOwVYDrEoS7CHwU11RpjKqHkx46cfM39MRg08lcW
+         sL19ZM5MnLlud1U19sHp8xfPbBkWKj68Pw8LyxTzpGQkkpohljK/S/rpUj1OWg3AYcVo
+         IV6hC5aWTj2/VZAQBrs7fxuqvl2a6DU5HoXPY7hr9luzqsEWW07tDRAolPIELKFtLAtu
+         Y/YskJOUuhx7ezWA7MWU8eXTKpLipeEFYGwhNKIosFXysrpW+LEyGSCsAGKy3BQHn1WC
+         5iog==
+X-Gm-Message-State: AFqh2koUlbVgdtbBz29k3h1KRxazQOHTybGxIFnt6PPYJW2W35dZZpU7
+        E+9+JDbzjSezd35qo66KgTu3U7xLS51X7g==
+X-Google-Smtp-Source: AMrXdXugVYSRK33mLZYhiBKEXE0gYOldsew6ya/V9BsEz3hSDZvdgm9Gd2H+ybYCKHspCKyXYsBdBQ==
+X-Received: by 2002:a17:903:543:b0:194:6110:9fe1 with SMTP id jo3-20020a170903054300b0019461109fe1mr14939059plb.4.1674244060145;
+        Fri, 20 Jan 2023 11:47:40 -0800 (PST)
+Received: from fedora.. (174-21-24-126.tukw.qwest.net. [174.21.24.126])
+        by smtp.gmail.com with ESMTPSA id y13-20020a17090322cd00b001896af10ca7sm5149967plg.134.2023.01.20.11.47.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jan 2023 11:47:39 -0800 (PST)
+From:   Brian Gix <brian.gix@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 04/11] mesh: Rename parameter list per crypto usage
+Date:   Fri, 20 Jan 2023 11:47:24 -0800
+Message-Id: <20230120194731.90065-5-brian.gix@gmail.com>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230120194731.90065-1-brian.gix@gmail.com>
+References: <20230120194731.90065-1-brian.gix@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.0
-Subject: Re: [PATCH] dt-bindings: leds: Document Bluetooth and WLAN triggers
-To:     Geert Uytterhoeven <geert+renesas@glider.be>,
-        Pavel Machek <pavel@ucw.cz>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Cc:     linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
-References: <a85c256af01f64389a078c2b37c3b72a27d97536.1668005062.git.geert+renesas@glider.be>
-Content-Language: en-US
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <a85c256af01f64389a078c2b37c3b72a27d97536.1668005062.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 09/11/2022 15:46, Geert Uytterhoeven wrote:
-> Add the missing trigger patterns for Bluetooth and WLAN activity, which
-> are already in active use.
-> 
-> While at it, move the mmc pattern comment where it belongs, and restore
-> alphabetical sort order.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: bt_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-> 	'hci0-power' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-> 	'hci0-power' does not match '^mmc[0-9]+$'
-> 	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
-> arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: wlan_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-> 	'phy0tx' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-> 	'phy0tx' does not match '^mmc[0-9]+$'
-> 	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
+From: Brian Gix <brian.gix@intel.com>
 
-This patch got lost... Rob, Lee or Pavel, can you pick it up?
+The derived key generated by the "nkpk" salt and network master key is
+used to create Private Beacons as of Mesh Profile Specification v1.1
+---
+ mesh/crypto.c | 4 ++--
+ mesh/crypto.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-It's with Rob's approval:
-https://lore.kernel.org/all/166861772609.231295.14812410099261417331.robh@kernel.org/
-
-> ---
->  Documentation/devicetree/bindings/leds/common.yaml | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
-> index f5c57a580078ea23..d34bb58c00371402 100644
-> --- a/Documentation/devicetree/bindings/leds/common.yaml
-> +++ b/Documentation/devicetree/bindings/leds/common.yaml
-> @@ -98,9 +98,13 @@ properties:
->              # LED alters the brightness for the specified duration with one software
->              # timer (requires "led-pattern" property)
->            - pattern
-> -        # LED is triggered by SD/MMC activity
-> -      - pattern: "^mmc[0-9]+$"
->        - pattern: "^cpu[0-9]*$"
-> +      - pattern: "^hci[0-9]+-power$"
-> +        # LED is triggered by Bluetooth activity
-> +      - pattern: "^mmc[0-9]+$"
-> +        # LED is triggered by SD/MMC activity
-> +      - pattern: "^phy[0-9]+tx$"
-> +        # LED is triggered by WLAN activity
->  
->    led-pattern:
->      description: |
-
-Best regards,
-Krzysztof
+diff --git a/mesh/crypto.c b/mesh/crypto.c
+index 668d16877..3754cb012 100644
+--- a/mesh/crypto.c
++++ b/mesh/crypto.c
+@@ -251,9 +251,9 @@ bool mesh_crypto_nkbk(const uint8_t n[16], uint8_t beacon_key[16])
+ 	return crypto_128(n, "nkbk", beacon_key);
+ }
+ 
+-bool mesh_crypto_nkpk(const uint8_t n[16], uint8_t proxy_key[16])
++bool mesh_crypto_nkpk(const uint8_t n[16], uint8_t private_key[16])
+ {
+-	return crypto_128(n, "nkpk", proxy_key);
++	return crypto_128(n, "nkpk", private_key);
+ }
+ 
+ bool mesh_crypto_k3(const uint8_t n[16], uint8_t out64[8])
+diff --git a/mesh/crypto.h b/mesh/crypto.h
+index c31abbbbd..55789886e 100644
+--- a/mesh/crypto.h
++++ b/mesh/crypto.h
+@@ -26,7 +26,7 @@ bool mesh_aes_ecb_one(const uint8_t key[16],
+ 			const uint8_t plaintext[16], uint8_t encrypted[16]);
+ bool mesh_crypto_nkik(const uint8_t network_key[16], uint8_t identity_key[16]);
+ bool mesh_crypto_nkbk(const uint8_t network_key[16], uint8_t beacon_key[16]);
+-bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t proxy_key[16]);
++bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t private_key[16]);
+ bool mesh_crypto_identity(const uint8_t net_key[16], uint16_t addr,
+ 							uint8_t id[16]);
+ bool mesh_crypto_beacon_cmac(const uint8_t encryption_key[16],
+-- 
+2.39.0
 
