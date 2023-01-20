@@ -2,241 +2,126 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03982C05027
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 16:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB3DC38141
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 16:40:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230339AbjATQfe (ORCPT
+        id S230307AbjATQkA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Jan 2023 11:35:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
+        Fri, 20 Jan 2023 11:40:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjATQfc (ORCPT
+        with ESMTP id S230119AbjATQj6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Jan 2023 11:35:32 -0500
-Received: from mail-il1-x148.google.com (mail-il1-x148.google.com [IPv6:2607:f8b0:4864:20::148])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F01B7C1303
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 08:34:57 -0800 (PST)
-Received: by mail-il1-x148.google.com with SMTP id g1-20020a92cda1000000b0030c45d93884so4046776ild.16
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 08:34:57 -0800 (PST)
+        Fri, 20 Jan 2023 11:39:58 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D6E340E9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 08:39:56 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id z5so5354458wrt.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Jan 2023 08:39:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pGYySup8p6S2QLbw0VKiZbUhVbWmQ+yt84mNVfAu/t0=;
+        b=UApWjzlXda6CKOsxYSAekXBHCiPYv6pVkiWHbI7PK6NXlDBf2dZaBDBu3pcMBX4Dvp
+         6pVJCoYaf28tSrmY+cQXTcE5NCML/7/aNdhPsd9f1zZGxwjZ8KtIc0zafg1CDt+MmL1t
+         ht+1uJ+qps8er08SQIPj8jCpqo9gs3doYVucXRacX8doWIlUzIZI6fYKJoTuT8NrG42t
+         MEw5W4JoUE4dXTKy6NU3b03SLyKAPuoCmZGqaBryF9fm76CMUuyzmAcMzhe2Gc9aBSvv
+         rVqHAHr0IWrNPbn8V79yED7CryU1Vk3Sen0HSlqKLB5YcHIC9rN/57uXiyLuvli0/Rbt
+         Yz+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B2p7MpVUpBtVLJmXNTd9D6MvB8cOHwIRNVQLP6X0jY4=;
-        b=yq/qRsDTrwufEmeCowJIF63U3AwL5m/bcXeSK3VxqRX8tKdGygbAmTGdcXi94ElYnQ
-         lBXsmA3Xf993Hr+ls7RzPuiPHkvQm4/PWcQPiW7vvZary7ZXzfmcciKtjLuP55w41xFU
-         SCDyp03NuW9BaDrWB5jYwnkGAa5aWgNK5Y9mmbxvPHPQP5IwHuKQxtG5HQxev05gdhfK
-         G9QWxdpRS/g1/b3/WJkZldZTDaRyui/Kg+RhDKNHpizGCyEz2Gl0dt+wuct6zFTX46Bd
-         bg9JJYwA9ZNiaBtjbHFW0VoBlMBZh4HQxiPt1n5XR3/UtSNfbPT/DFqkwRJIJxc65iSV
-         rHRA==
-X-Gm-Message-State: AFqh2krVDp3QBfH0hV3OUXSg8du3LnHZpiDQfsHzS1tPp8D0+YnChYO0
-        OgJRSFomWuxv4tqe+RJgHC11K19DCsg2lS1XyAvWv6MWaHAO
-X-Google-Smtp-Source: AMrXdXuncck+O7UwU3Iv++5VzRnleVcmh0QYc7PQCcg8c92S15JORDT8nQ21WGjCcAmTFVe3bry6eiHDFHd2rA9zJV6V/b3gUFL6
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pGYySup8p6S2QLbw0VKiZbUhVbWmQ+yt84mNVfAu/t0=;
+        b=Cow2+xyPLbVXSl38WVWUrtjj5vim1idg/9AQfPYpaz7ReDjyOzLSleBCcjr6+IvDgI
+         LyzsKmMHZNkh0EmRl+UMRXEH3BA9+JeCN1+pReEjjACcJeBMrRjhmFEQawOfXf9L8iPY
+         jaYvr7IvK3vwW8h8in8cN+BJKUyUfArhyfj6dj3r5AM+EvLrb4/HgOtdIOwDsg301h8B
+         9pZYP1avbHAiP/iXHfKO2i3q3ak1md4tSK66w+EAtYRBlAjoHGG7hPyCo4ehVeJLSprT
+         /ZTDTxfZzc0w58X4UmljDy8ZiFgA1itYigv4Uzg6pltGkxBkc7BY010OCXKmLhSnv1zw
+         NsZg==
+X-Gm-Message-State: AFqh2krvYt5CRZ18b6KRL/itdJnyDcQWgIFtTYbZIj/98y1G/YDPS0x3
+        PkW+jybed78/cbRVylwH481pRQ==
+X-Google-Smtp-Source: AMrXdXtZ9DWblZSaKSzMSMqI/0YMAXlKAx5MWIAT7Z2mmChtlRMs75VNjLqzEiOVvNoaJZ95nuiIUg==
+X-Received: by 2002:a05:6000:98d:b0:25f:8ead:96cc with SMTP id by13-20020a056000098d00b0025f8ead96ccmr14507795wrb.70.1674232794812;
+        Fri, 20 Jan 2023 08:39:54 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id z12-20020adfd0cc000000b002bdff778d87sm13385996wrh.34.2023.01.20.08.39.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Jan 2023 08:39:54 -0800 (PST)
+Message-ID: <0bb76233-062c-a1c5-da88-4f04feccd5b2@linaro.org>
+Date:   Fri, 20 Jan 2023 17:39:52 +0100
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d99:b0:30f:11bc:cc6e with SMTP id
- h25-20020a056e021d9900b0030f11bccc6emr1524212ila.87.1674232130203; Fri, 20
- Jan 2023 08:28:50 -0800 (PST)
-Date:   Fri, 20 Jan 2023 08:28:50 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006477b305f2b48b58@google.com>
-Subject: [syzbot] possible deadlock in rfcomm_dlc_exists
-From:   syzbot <syzbot+b69a625d06e8ece26415@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com, yangyingliang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.0
+Subject: Re: [PATCH] dt-bindings: leds: Document Bluetooth and WLAN triggers
+To:     Geert Uytterhoeven <geert+renesas@glider.be>,
+        Pavel Machek <pavel@ucw.cz>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Jacek Anaszewski <jacek.anaszewski@gmail.com>
+Cc:     linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org
+References: <a85c256af01f64389a078c2b37c3b72a27d97536.1668005062.git.geert+renesas@glider.be>
+Content-Language: en-US
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <a85c256af01f64389a078c2b37c3b72a27d97536.1668005062.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On 09/11/2022 15:46, Geert Uytterhoeven wrote:
+> Add the missing trigger patterns for Bluetooth and WLAN activity, which
+> are already in active use.
+> 
+> While at it, move the mmc pattern comment where it belongs, and restore
+> alphabetical sort order.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: bt_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
+> 	'hci0-power' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
+> 	'hci0-power' does not match '^mmc[0-9]+$'
+> 	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
+> arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: wlan_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
+> 	'phy0tx' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
+> 	'phy0tx' does not match '^mmc[0-9]+$'
+> 	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
 
-syzbot found the following issue on:
+This patch got lost... Rob, Lee or Pavel, can you pick it up?
 
-HEAD commit:    c12e2e5b76b2 Add linux-next specific files for 20230116
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=154e0046480000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ef6b6ac6c6c96c0e
-dashboard link: https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+It's with Rob's approval:
+https://lore.kernel.org/all/166861772609.231295.14812410099261417331.robh@kernel.org/
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> ---
+>  Documentation/devicetree/bindings/leds/common.yaml | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
+> index f5c57a580078ea23..d34bb58c00371402 100644
+> --- a/Documentation/devicetree/bindings/leds/common.yaml
+> +++ b/Documentation/devicetree/bindings/leds/common.yaml
+> @@ -98,9 +98,13 @@ properties:
+>              # LED alters the brightness for the specified duration with one software
+>              # timer (requires "led-pattern" property)
+>            - pattern
+> -        # LED is triggered by SD/MMC activity
+> -      - pattern: "^mmc[0-9]+$"
+>        - pattern: "^cpu[0-9]*$"
+> +      - pattern: "^hci[0-9]+-power$"
+> +        # LED is triggered by Bluetooth activity
+> +      - pattern: "^mmc[0-9]+$"
+> +        # LED is triggered by SD/MMC activity
+> +      - pattern: "^phy[0-9]+tx$"
+> +        # LED is triggered by WLAN activity
+>  
+>    led-pattern:
+>      description: |
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4fb49204daa9/disk-c12e2e5b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7b02ca8eacc0/vmlinux-c12e2e5b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/94539232cf54/bzImage-c12e2e5b.xz
+Best regards,
+Krzysztof
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b69a625d06e8ece26415@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.2.0-rc4-next-20230116-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor.2/27510 is trying to acquire lock:
-ffffffff8e322188 (rfcomm_mutex){+.+.}-{3:3}, at: rfcomm_dlc_exists+0x58/0x190 net/bluetooth/rfcomm/core.c:542
-
-but task is already holding lock:
-ffffffff8e3270c8 (rfcomm_ioctl_mutex){+.+.}-{3:3}, at: rfcomm_create_dev net/bluetooth/rfcomm/tty.c:484 [inline]
-ffffffff8e3270c8 (rfcomm_ioctl_mutex){+.+.}-{3:3}, at: rfcomm_dev_ioctl+0x8a2/0x1c00 net/bluetooth/rfcomm/tty.c:587
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #3 (rfcomm_ioctl_mutex){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
-       rfcomm_create_dev net/bluetooth/rfcomm/tty.c:484 [inline]
-       rfcomm_dev_ioctl+0x8a2/0x1c00 net/bluetooth/rfcomm/tty.c:587
-       rfcomm_sock_ioctl+0xb7/0xe0 net/bluetooth/rfcomm/sock.c:880
-       sock_do_ioctl+0xcc/0x230 net/socket.c:1194
-       sock_ioctl+0x1f8/0x680 net/socket.c:1311
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:870 [inline]
-       __se_sys_ioctl fs/ioctl.c:856 [inline]
-       __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
--> #2 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
-       lock_sock_nested+0x3a/0xf0 net/core/sock.c:3470
-       lock_sock include/net/sock.h:1725 [inline]
-       rfcomm_sk_state_change+0x6d/0x3a0 net/bluetooth/rfcomm/sock.c:73
-       __rfcomm_dlc_close+0x1b1/0x890 net/bluetooth/rfcomm/core.c:489
-       rfcomm_dlc_close+0x1e9/0x240 net/bluetooth/rfcomm/core.c:520
-       __rfcomm_sock_close+0x17a/0x2f0 net/bluetooth/rfcomm/sock.c:220
-       rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:912
-       rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:933
-       __sock_release+0xcd/0x280 net/socket.c:651
-       sock_close+0x1c/0x20 net/socket.c:1390
-       __fput+0x27c/0xa90 fs/file_table.c:321
-       task_work_run+0x16f/0x270 kernel/task_work.c:179
-       get_signal+0x1c7/0x24f0 kernel/signal.c:2635
-       arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
-       exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
-       exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
-       syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
-       do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
--> #1 (&d->lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
-       __rfcomm_dlc_close+0x15d/0x890 net/bluetooth/rfcomm/core.c:487
-       rfcomm_dlc_close+0x1e9/0x240 net/bluetooth/rfcomm/core.c:520
-       __rfcomm_sock_close+0x17a/0x2f0 net/bluetooth/rfcomm/sock.c:220
-       rfcomm_sock_shutdown+0xd8/0x230 net/bluetooth/rfcomm/sock.c:912
-       rfcomm_sock_release+0x68/0x140 net/bluetooth/rfcomm/sock.c:933
-       __sock_release+0xcd/0x280 net/socket.c:651
-       sock_close+0x1c/0x20 net/socket.c:1390
-       __fput+0x27c/0xa90 fs/file_table.c:321
-       task_work_run+0x16f/0x270 kernel/task_work.c:179
-       get_signal+0x1c7/0x24f0 kernel/signal.c:2635
-       arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
-       exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
-       exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
-       syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
-       do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
--> #0 (rfcomm_mutex){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3107 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3226 [inline]
-       validate_chain kernel/locking/lockdep.c:3841 [inline]
-       __lock_acquire+0x2a9d/0x5780 kernel/locking/lockdep.c:5073
-       lock_acquire.part.0+0x11c/0x350 kernel/locking/lockdep.c:5690
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
-       rfcomm_dlc_exists+0x58/0x190 net/bluetooth/rfcomm/core.c:542
-       __rfcomm_create_dev net/bluetooth/rfcomm/tty.c:414 [inline]
-       rfcomm_create_dev net/bluetooth/rfcomm/tty.c:485 [inline]
-       rfcomm_dev_ioctl+0x966/0x1c00 net/bluetooth/rfcomm/tty.c:587
-       rfcomm_sock_ioctl+0xb7/0xe0 net/bluetooth/rfcomm/sock.c:880
-       sock_do_ioctl+0xcc/0x230 net/socket.c:1194
-       sock_ioctl+0x1f8/0x680 net/socket.c:1311
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:870 [inline]
-       __se_sys_ioctl fs/ioctl.c:856 [inline]
-       __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-other info that might help us debug this:
-
-Chain exists of:
-  rfcomm_mutex --> sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM --> rfcomm_ioctl_mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(rfcomm_ioctl_mutex);
-                               lock(sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM);
-                               lock(rfcomm_ioctl_mutex);
-  lock(rfcomm_mutex);
-
- *** DEADLOCK ***
-
-2 locks held by syz-executor.2/27510:
- #0: ffff88804d0ad130 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1725 [inline]
- #0: ffff88804d0ad130 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: rfcomm_sock_ioctl+0xaa/0xe0 net/bluetooth/rfcomm/sock.c:879
- #1: ffffffff8e3270c8 (rfcomm_ioctl_mutex){+.+.}-{3:3}, at: rfcomm_create_dev net/bluetooth/rfcomm/tty.c:484 [inline]
- #1: ffffffff8e3270c8 (rfcomm_ioctl_mutex){+.+.}-{3:3}, at: rfcomm_dev_ioctl+0x8a2/0x1c00 net/bluetooth/rfcomm/tty.c:587
-
-stack backtrace:
-CPU: 1 PID: 27510 Comm: syz-executor.2 Not tainted 6.2.0-rc4-next-20230116-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/26/2022
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd1/0x138 lib/dump_stack.c:106
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3107 [inline]
- check_prevs_add kernel/locking/lockdep.c:3226 [inline]
- validate_chain kernel/locking/lockdep.c:3841 [inline]
- __lock_acquire+0x2a9d/0x5780 kernel/locking/lockdep.c:5073
- lock_acquire.part.0+0x11c/0x350 kernel/locking/lockdep.c:5690
- __mutex_lock_common kernel/locking/mutex.c:603 [inline]
- __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
- rfcomm_dlc_exists+0x58/0x190 net/bluetooth/rfcomm/core.c:542
- __rfcomm_create_dev net/bluetooth/rfcomm/tty.c:414 [inline]
- rfcomm_create_dev net/bluetooth/rfcomm/tty.c:485 [inline]
- rfcomm_dev_ioctl+0x966/0x1c00 net/bluetooth/rfcomm/tty.c:587
- rfcomm_sock_ioctl+0xb7/0xe0 net/bluetooth/rfcomm/sock.c:880
- sock_do_ioctl+0xcc/0x230 net/socket.c:1194
- sock_ioctl+0x1f8/0x680 net/socket.c:1311
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7efe0208c0c9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007efe02d1a168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007efe021ac120 RCX: 00007efe0208c0c9
-RDX: 0000000020000100 RSI: 00000000400452c8 RDI: 0000000000000008
-RBP: 00007efe020e7ae9 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffe7923c9af R14: 00007efe02d1a300 R15: 0000000000022000
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
