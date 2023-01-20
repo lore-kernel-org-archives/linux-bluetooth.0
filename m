@@ -2,133 +2,148 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A690C25B50
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 21:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A17C05027
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Jan 2023 22:10:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229883AbjATV2X (ORCPT
+        id S229984AbjATWKG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Jan 2023 16:28:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44926 "EHLO
+        Fri, 20 Jan 2023 17:10:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbjATV2W (ORCPT
+        with ESMTP id S229937AbjATWKA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Jan 2023 16:28:22 -0500
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7C413525;
-        Fri, 20 Jan 2023 13:28:20 -0800 (PST)
-Received: by mail-lj1-x234.google.com with SMTP id o7so6862567ljj.8;
-        Fri, 20 Jan 2023 13:28:20 -0800 (PST)
+        Fri, 20 Jan 2023 17:10:00 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20FE5D0D81;
+        Fri, 20 Jan 2023 14:09:42 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id e16so6980107ljn.3;
+        Fri, 20 Jan 2023 14:09:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L6XTbctyjJuiaEzlBOG1ARAyGnfelnTEYPz3b788Q50=;
-        b=jkyTlGVIJzztnDFFrJNnHyxRnrtmCbyk3jOf5SUuvDV71gDGIHYAT9gKDThokvojYQ
-         NbniCrDCFhv0+oYTu2ExkvtsoHzY3FvjzsfvpVWkV0Admv4yiX/m8RYzbb5MHmpPXk9Z
-         fsBG6eTMZ/iAgD66ERU3UO1yx8igBJxhjmpMRlwz0epMLs5VUxBBoH9qu4Fywb90Zzeq
-         DoUse+wahv+6vaxle4kT9fXMgqrhp+M+qgqPR2rXIzROY+ZfvP5nJv96dlf3felIrN3d
-         /jbB19KXFQj4ErcSKw/MJ/aUG854BdpqBwV87GAXU6Rv/LxIxLTvjT/+Lopa2JOSA1c1
-         bM7g==
+        bh=r7JMo/8jUy1YwCi30xnqBLGfAJQOml4Ba08RGnQLTpM=;
+        b=e7Ogm9vHshuNm0fmYMOOMTQBjRIfYf9q3y75nC7pXX7JxBiHeQvNy0yUopH4PTKgTi
+         50x8UUqqL1VWG9FvuLxk6sFpG8ZFqbicSXVw3esTESwyyOeHMB5LVYrdfOoVXc+ojukx
+         hqMgQebY4dpx2rIBVv51iL4Ju8wPN7nQTs3StE90386JTPOVsFrTWS1XCRe5ZaQJj/Ad
+         lCO1IXlbx4BKasOOlvYmIxmssHrPtHgh99AEsesKcgPF5RVCE65rG6Z3VglyILtfRQqt
+         /1eqjUpQsUNAAHhztiznsJLgP14Mke7zUndI9VvhLYH3YYYx5EM1k8QCMladyU+dVVPq
+         8C1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L6XTbctyjJuiaEzlBOG1ARAyGnfelnTEYPz3b788Q50=;
-        b=rLGrVfJXjeVrPd8z/OSrXqHxptMXMqvohP8V2VZWi7b4Y96Yk+WWleYAot/9d3ZrEC
-         OJUaUabA5KAben+KariJob934zbe94VX/o7Q/6UVnZZT5pC6yFuETppsFCXj+lWOpuwe
-         ODNgQYyxHa3O4nwlM3OPp5VkT9TyTuDK3nlGWDSgSHxdJsSzTm8vTurOVvZiHfXWVGvk
-         p780etH4+X/j7wh3Sev1tw9TU0X72xVFicibhqlbHNQ0pKeFMOpYoh/wMX0Lvdl4MBgZ
-         JwPqTdYJsRMBl47cgTVbKH3hjCAAZuP6YRSrU4KNqxbgQJ5VN0ZMsCCwfn2S8sryjbqB
-         /3rg==
-X-Gm-Message-State: AFqh2kp5JbcWQBG/DbaOekHw07t+eoayQJkq0gso8NChahidFhnNzYk3
-        pK5nT9kkAAWrfAYnG/ihd5g61hUTDNGyb1pCVa8=
-X-Google-Smtp-Source: AMrXdXvbYs0GsrXDeFVwrDWcr/ZKXKHi4GXDCr076tjbDWyLo6wIxf7LwFWlW3g3q3cFLgPGCLjJFF/gKeQxPEoEg8M=
+        bh=r7JMo/8jUy1YwCi30xnqBLGfAJQOml4Ba08RGnQLTpM=;
+        b=HlduWYqOa5yfoka6O4SYgJrn6J8dUEOj6JFm+A22b+AGXb5o1aqvZIxqWGvXgdogVF
+         Szx8zg5nZwfinAfCm5mlCjz+MHNj0E/oXR5MwZPklLOMqxHkWKq+rbsvHRAXEdWcCp42
+         6u86H8Cfc4Ns7EKpp4Y29cGXS4BNxWyKjKeKIxPMgisGAD1sTe2Tlos6NTTX76jE5DM8
+         GrE/Q9DcSNdRexG83kZUIJXwTTGdibYTSngXuHEmAHWW5jabgxFQV2Y+scLJsDORzje1
+         B85JhgWfo0w7gJQ/yeNHxi3jxP7tnW0Y9QwkIVjKi5OTEY9l/6n7qJLs86HT2JwpYacX
+         /aHg==
+X-Gm-Message-State: AFqh2kq63EF3Je0+8Jq0E0RtNIENrY2LjX4mEkDDVoeR7v7sOhIkElta
+        xJDKi4n9f2OJYJ6Uoo18E+hZWJu6pUjCPAdEjwPPP/dai6Q=
+X-Google-Smtp-Source: AMrXdXsT+fIOKoxg6t5uKBfK4/Jl0IjZ54vG6SSY0YhbeY6uks905xPeZy4szEEgG7OW68et2YzM91+A9/dDv/ehjK8=
 X-Received: by 2002:a2e:b94f:0:b0:28b:88b3:2ead with SMTP id
- 15-20020a2eb94f000000b0028b88b32eadmr1389772ljs.293.1674250098612; Fri, 20
- Jan 2023 13:28:18 -0800 (PST)
+ 15-20020a2eb94f000000b0028b88b32eadmr1397218ljs.293.1674252580252; Fri, 20
+ Jan 2023 14:09:40 -0800 (PST)
 MIME-Version: 1.0
-References: <a85c256af01f64389a078c2b37c3b72a27d97536.1668005062.git.geert+renesas@glider.be>
- <0bb76233-062c-a1c5-da88-4f04feccd5b2@linaro.org>
-In-Reply-To: <0bb76233-062c-a1c5-da88-4f04feccd5b2@linaro.org>
+References: <20230119013405.3870506-1-iam@sung-woo.kim> <CANn89iK6DZodENC8pR-toW_n5-VFyQR8X1XOuG9Lx1-kr1tmqQ@mail.gmail.com>
+In-Reply-To: <CANn89iK6DZodENC8pR-toW_n5-VFyQR8X1XOuG9Lx1-kr1tmqQ@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 20 Jan 2023 13:28:07 -0800
-Message-ID: <CABBYNZJX+9SxW48qSSmyyMa7_bvqzwHafa0BNOz4Kz_Jc+gu9Q@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: leds: Document Bluetooth and WLAN triggers
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
-        Pavel Machek <pavel@ucw.cz>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-        linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
+Date:   Fri, 20 Jan 2023 14:09:28 -0800
+Message-ID: <CABBYNZLifwiJdeKmH4Abpe_uU_1BaCCPhuaUH=DtGLqGNFHHpQ@mail.gmail.com>
+Subject: Re: [PATCH] L2CAP: Fix null-ptr-deref in l2cap_sock_set_shutdown_cb
+To:     Eric Dumazet <edumazet@google.com>
+Cc:     Sungwoo Kim <iam@sung-woo.kim>, daveti@purdue.edu, wuruoyu@me.com,
+        benquike@gmail.com, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Krzysztof,
+Hi Kim, Eric,
 
-On Fri, Jan 20, 2023 at 8:42 AM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
+On Wed, Jan 18, 2023 at 8:16 PM Eric Dumazet <edumazet@google.com> wrote:
 >
-> On 09/11/2022 15:46, Geert Uytterhoeven wrote:
-> > Add the missing trigger patterns for Bluetooth and WLAN activity, which
-> > are already in active use.
+> On Thu, Jan 19, 2023 at 2:35 AM Sungwoo Kim <iam@sung-woo.kim> wrote:
 > >
-> > While at it, move the mmc pattern comment where it belongs, and restore
-> > alphabetical sort order.
+> > The L2CAP socket shutdown invokes l2cap_sock_destruct without a lock
+> > on conn->chan_lock, assigning NULL to chan->data *just before*
+> > the l2cap_disconnect_req thread that accesses to chan->data.
+>
+> This is racy then ?
+>
+> > This patch prevent it by adding a null check for a workaround, instead
+> > of fixing a lock.
+>
+> This would at least require some barriers I think.
+>
+> What about other _cb helpers also reading/using chan->data ?
+
+Perhaps it would be a good idea to include the stack backtrace so we
+can better understand it, at some point we might need to refactor or
+locks to avoid circular dependencies.
+
 > >
-> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > This bug is found by FuzzBT, a modified Syzkaller by Sungwoo Kim(me).
+> > Ruoyu Wu(wuruoyu@me.com) and Hui Peng(benquike@gmail.com) has helped
+> > the FuzzBT project.
+> >
+> > Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+>
+> I would also add
+>
+> Fixes: 1bff51ea59a9 ("Bluetooth: fix use-after-free error in
+> lock_sock_nested()")
+
++1
+
 > > ---
-> > arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: bt_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-> >       'hci0-power' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-> >       'hci0-power' does not match '^mmc[0-9]+$'
-> >       From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
-> > arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: wlan_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-> >       'phy0tx' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-> >       'phy0tx' does not match '^mmc[0-9]+$'
-> >       From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
->
-> This patch got lost... Rob, Lee or Pavel, can you pick it up?
->
-> It's with Rob's approval:
-> https://lore.kernel.org/all/166861772609.231295.14812410099261417331.robh@kernel.org/
-
-If it is going to be applied via bluetooth-next make sure to resend it
-since last time our CI was not able to apply it thus why we didn't
-apply it in the first place.
-
->
-> > ---
-> >  Documentation/devicetree/bindings/leds/common.yaml | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
+> >  net/bluetooth/l2cap_sock.c | 8 +++++---
+> >  1 file changed, 5 insertions(+), 3 deletions(-)
 > >
-> > diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
-> > index f5c57a580078ea23..d34bb58c00371402 100644
-> > --- a/Documentation/devicetree/bindings/leds/common.yaml
-> > +++ b/Documentation/devicetree/bindings/leds/common.yaml
-> > @@ -98,9 +98,13 @@ properties:
-> >              # LED alters the brightness for the specified duration with one software
-> >              # timer (requires "led-pattern" property)
-> >            - pattern
-> > -        # LED is triggered by SD/MMC activity
-> > -      - pattern: "^mmc[0-9]+$"
-> >        - pattern: "^cpu[0-9]*$"
-> > +      - pattern: "^hci[0-9]+-power$"
-> > +        # LED is triggered by Bluetooth activity
-> > +      - pattern: "^mmc[0-9]+$"
-> > +        # LED is triggered by SD/MMC activity
-> > +      - pattern: "^phy[0-9]+tx$"
-> > +        # LED is triggered by WLAN activity
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index ca8f07f35..350c7afdf 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -1681,9 +1681,11 @@ static void l2cap_sock_set_shutdown_cb(struct l2cap_chan *chan)
+> >  {
+> >         struct sock *sk = chan->data;
 > >
-> >    led-pattern:
-> >      description: |
 >
-> Best regards,
-> Krzysztof
+> Other similar fixes simply do:
 >
+>      if (!sk)
+>           return;
+>
+> I would chose to use the same coding style in net/bluetooth/l2cap_sock.c
+
+Yep, at least l2cap_sock_close_cb and l2cap_sock_shutdown do that already.
+
+>
+> > -       lock_sock(sk);
+> > -       sk->sk_shutdown = SHUTDOWN_MASK;
+> > -       release_sock(sk);
+> > +       if (!sk) {
+> > +               lock_sock(sk);
+> > +               sk->sk_shutdown = SHUTDOWN_MASK;
+> > +               release_sock(sk);
+> > +       }
+> >  }
+> >
+> >  static long l2cap_sock_get_sndtimeo_cb(struct l2cap_chan *chan)
+> > --
+> > 2.25.1
+> >
+
 
 
 -- 
