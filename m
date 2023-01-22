@@ -2,96 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7499AC61D97
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Jan 2023 10:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE64EC25B4E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Jan 2023 11:11:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229988AbjAVKs7 (ORCPT
+        id S229672AbjAVLLk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 Jan 2023 05:48:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
+        Sun, 22 Jan 2023 06:11:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229937AbjAVKs6 (ORCPT
+        with ESMTP id S229480AbjAVLLj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 Jan 2023 05:48:58 -0500
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 125C6166D5
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Jan 2023 02:48:55 -0800 (PST)
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed50:4d08:7796:61ee:69a0])
-        by albert.telenet-ops.be with bizsmtp
-        id Bmop2900G0XvA8106mopjH; Sun, 22 Jan 2023 11:48:52 +0100
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan.of.borg with esmtp (Exim 4.95)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1pJXtx-006qbZ-IN;
-        Sun, 22 Jan 2023 11:48:49 +0100
-Received: from geert by rox.of.borg with local (Exim 4.95)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1pJXso-0037wg-Qn;
-        Sun, 22 Jan 2023 11:47:30 +0100
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Cc:     linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Rob Herring <robh@kernel.org>
-Subject: [PATCH v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
-Date:   Sun, 22 Jan 2023 11:47:27 +0100
-Message-Id: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.34.1
+        Sun, 22 Jan 2023 06:11:39 -0500
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FD8F1B55B
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Jan 2023 03:11:38 -0800 (PST)
+Received: by mail-qt1-x832.google.com with SMTP id q15so7684435qtn.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Jan 2023 03:11:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8aNUOPbCLHUnA0LSzw3gH9FaCgPV+hxaxVHl1PHfPKY=;
+        b=O9GBtoujjmrswqctxb8FuFTaMUuzYEay+vGaqnT4ZBB5oti00MnVWaUc2GgjDUtepw
+         lvdoHVw5HKCeCPI+wm5fHiPxW30rb6bSXcrne+xOO3eoPhkGyx5vsM6Ce2c+9mqApmVJ
+         lHnXGnliH5RYPmP+Gzr//VfG+TbvvIiy2Zfy5nmLppJnSDwHGmwXM6Qg4GQzZSLwB1dc
+         pJbXaSpfybZZ4N8hUCuU8hEm/o9O8yqRz+RdvKFDFF/+6HhN5LOJEEaxw4ze0N+iTZ8j
+         1RDaUc0xO3jpRB69bofA5ysY0EDo0qz6mrvyAEDBjn7qmNJlvW9U5fgQTCQIPBYEjaVd
+         kWUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8aNUOPbCLHUnA0LSzw3gH9FaCgPV+hxaxVHl1PHfPKY=;
+        b=usG3RJnC721wgIMfKiMDbqgEHys3eYYB4c9PveuBXshpkbXFKzh+CSgtyQuZJIfqph
+         igt0tKsUXNmX0isNVciB/KyQncvDsqnsOoduyxGS0iD7raza07gEVlt6jWYFR7Ead1WB
+         UpbJ2gAGmWN0B5PXW4wNSelzRd3i4RU07Q9a6YyoRlGj20+uKKbJQ31USms9bFCGJ9cj
+         JPoq5V5/d0r0qvhfUSX11pslXufRQCBMq+QDUwrMGsDJdrTgvBCyDUsWvuo8t71A8MxU
+         W5VwekGJnXGeGncMMSPPJJdHOVDBUOTRtxVa4rsHv5e9sBscnDN3AV6VSIWvjsjd/Bnw
+         Cp8w==
+X-Gm-Message-State: AFqh2kpFPULLIaNE6/sqkoVcMa7SWjPDVY77tWte8SVIavRAR7a+LcHD
+        0pzUHn1RQ44u4jG1KjO4OAsCdb870mQ=
+X-Google-Smtp-Source: AMrXdXseSiSaM7oNSMedRR2CDLHEGjUkdv/JuT2rJif7+Mr2UrlQWTdy2KNfke3Z2Td1TtZvw7wzxQ==
+X-Received: by 2002:a05:622a:4813:b0:3a7:f6cf:a597 with SMTP id fb19-20020a05622a481300b003a7f6cfa597mr35862020qtb.33.1674385897446;
+        Sun, 22 Jan 2023 03:11:37 -0800 (PST)
+Received: from [172.17.0.2] ([172.177.106.96])
+        by smtp.gmail.com with ESMTPSA id t1-20020ac86a01000000b003a7e4129f83sm23092309qtr.85.2023.01.22.03.11.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Jan 2023 03:11:37 -0800 (PST)
+Message-ID: <63cd19e9.c80a0220.457b9.e801@mx.google.com>
+Date:   Sun, 22 Jan 2023 03:11:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5937494530199524462=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, geert+renesas@glider.be
+Subject: RE: [v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
+In-Reply-To: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
+References: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add the missing trigger patterns for Bluetooth and WLAN activity, which
-are already in active use.
+--===============5937494530199524462==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-While at it, move the mmc pattern comment where it belongs, and restore
-alphabetical sort order.
+This is an automated email and please do not reply to this email.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Reviewed-by: Rob Herring <robh@kernel.org>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: Documentation/devicetree/bindings/leds/common.yaml:98
+error: Documentation/devicetree/bindings/leds/common.yaml: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: bt_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-	'hci0-power' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-	'hci0-power' does not match '^mmc[0-9]+$'
-	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
-arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: wlan_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-	'phy0tx' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-	'phy0tx' does not match '^mmc[0-9]+$'
-	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
+Regards,
+Linux Bluetooth
 
-v2:
-  - Add Reviewed-by.
----
- Documentation/devicetree/bindings/leds/common.yaml | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/leds/common.yaml b/Documentation/devicetree/bindings/leds/common.yaml
-index f5c57a580078ea23..d34bb58c00371402 100644
---- a/Documentation/devicetree/bindings/leds/common.yaml
-+++ b/Documentation/devicetree/bindings/leds/common.yaml
-@@ -98,9 +98,13 @@ properties:
-             # LED alters the brightness for the specified duration with one software
-             # timer (requires "led-pattern" property)
-           - pattern
--        # LED is triggered by SD/MMC activity
--      - pattern: "^mmc[0-9]+$"
-       - pattern: "^cpu[0-9]*$"
-+      - pattern: "^hci[0-9]+-power$"
-+        # LED is triggered by Bluetooth activity
-+      - pattern: "^mmc[0-9]+$"
-+        # LED is triggered by SD/MMC activity
-+      - pattern: "^phy[0-9]+tx$"
-+        # LED is triggered by WLAN activity
- 
-   led-pattern:
-     description: |
--- 
-2.34.1
-
+--===============5937494530199524462==--
