@@ -2,120 +2,176 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B00EC25B4E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Jan 2023 11:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2DAC61D97
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Jan 2023 09:17:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbjAVLci (ORCPT
+        id S231786AbjAWJRC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 Jan 2023 06:32:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40112 "EHLO
+        Mon, 23 Jan 2023 04:17:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjAVLch (ORCPT
+        with ESMTP id S231607AbjAWJRA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 Jan 2023 06:32:37 -0500
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E45CD83F3;
-        Sun, 22 Jan 2023 03:32:36 -0800 (PST)
-Received: by mail-qt1-f182.google.com with SMTP id z9so7658753qtv.5;
-        Sun, 22 Jan 2023 03:32:36 -0800 (PST)
+        Mon, 23 Jan 2023 04:17:00 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC9A1EFE0;
+        Mon, 23 Jan 2023 01:16:58 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id h15so5383036ilh.4;
+        Mon, 23 Jan 2023 01:16:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=85ijn7vYPCOE7OcuuEa7nG/7FhvAgHuIdbSA+ZZxQyo=;
+        b=DzLRo2Dbso8NlEly7wAqKN9zLUeceO/rl+TeFr+KpnxuQmGjTI8A8d+sSUJqXw6J8n
+         M3RfdZHeh/0mbC138zdAo6UiCBpbkrSOlCHuISN2pChFCgDlKD/g7tGoDgksH44pN/0Z
+         gtQ22IWyLA0bIcI00K4IqqWJE6bFLM+jNQKDYzdy5++FwFe1JcERgyl3jxhM8o4zBvVa
+         gNDWEuE1rj/9tC89HKg7S/PyP1QgGnHHtxXhTTpMWFhgk7c2ALGrGBXnUY+BDdUIBnBZ
+         vCkR+fqfR7c05fRdtnI3vjHLdgKuULjmbCEhD13EVLr2GeRJhKPk7ze8gcyFTvfsnbvV
+         +myw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MoUQsuWkxLgz5UoczyxhIR2hsfTe+OgnR3rck5uq+v8=;
-        b=CdZVf5fqDcUBqQr1ez5IG+dmI1TYVx1fuO5BLcSgxqysWAnFIVuxlN7/ABjrIzAICj
-         8cEwCSdsmkAQhYKCy+w6lLPpNepXHYoKftwpxYmCz92/wjUPAsYSIA93/GRKhUQ8KjK6
-         E6Doks5u10OFzJphoTi60GEDQHeTvynsA8M0RqHM6br6X59f634vmlREkw2D0ws1vJSQ
-         QJz8etPaPDnWXzsvG+56TPLDYVgNIFZNq5bA1IUsF/TTKgT+90Xfc38x1BwpwnEhi5Qc
-         vk9A2oKYz3NrDjEJG0+dPWuRNl4BcLegzAF0lHifBkTzoJdsPzme6DOIe/11SidrIqA5
-         BJxQ==
-X-Gm-Message-State: AFqh2kpUAzQ0ZFeiQbzv3fdI88YCibYvUZwYUawyHpLkQiariplmwn3c
-        HI/cst16fg9nlx7peovREBqMcD6FLQooKg==
-X-Google-Smtp-Source: AMrXdXvbJKdCADp7ev5qF3k5yzvEOd9jCu7JWGkWAqTCOOFrTBijM9DkkfFi0/MgIMPGu39YEOq1Hw==
-X-Received: by 2002:ac8:6e84:0:b0:3b6:2f47:de80 with SMTP id c4-20020ac86e84000000b003b62f47de80mr32146859qtv.20.1674387155834;
-        Sun, 22 Jan 2023 03:32:35 -0800 (PST)
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com. [209.85.128.175])
-        by smtp.gmail.com with ESMTPSA id t1-20020ac86a01000000b003a7e4129f83sm23110406qtr.85.2023.01.22.03.32.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Jan 2023 03:32:35 -0800 (PST)
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-4ff07dae50dso89820817b3.2;
-        Sun, 22 Jan 2023 03:32:35 -0800 (PST)
-X-Received: by 2002:a05:690c:c89:b0:4dd:7a8e:1cf3 with SMTP id
- cm9-20020a05690c0c8900b004dd7a8e1cf3mr2209934ywb.384.1674387155088; Sun, 22
- Jan 2023 03:32:35 -0800 (PST)
+        bh=85ijn7vYPCOE7OcuuEa7nG/7FhvAgHuIdbSA+ZZxQyo=;
+        b=jPpzm0CUoHTQtJxuX2zCCQ9MUdJLRBhgJUYs7S8dBCxMCbl9pbJJ8sgVMYbnkIip6p
+         l42anDi2HrEaahDsV4ytPihrVgSAHcgNvNHpwXk0JYXlpP6u7+1YgsiIskUM1Ew/DTFc
+         c3PCBPNA2+WfW9mBgJnfX8flUjzDEx9jb56P8A/uYknN+9R7UDh2ppAEyxtk8gEM0LvH
+         Dh51nHIRMOWxb2LmNdPZndzU7/mG5NOJ4qIEwu3opnpy5ozgm2Wo76MexJqlx+0tDrci
+         RvJo/APM8IkiITizFEn2+onFeuR8wccH7QKqVWbpeOLO4ZOT8xiFoxKjfC7WFTDIy3/w
+         d6uw==
+X-Gm-Message-State: AFqh2kqKAf6IdwLVCUGThz1bWzLh1NnkH9fhYQGe3kgxUF5VHMumlBUS
+        qsBBQMIlMZ2/ikdlAb9bgkM=
+X-Google-Smtp-Source: AMrXdXtGLVfuwrR5oQIz47G9r+m6obQtdCl0B3fHV+9SsbpLoX1gQ7TcfXTl7/moZHEL/NH17nWVhQ==
+X-Received: by 2002:a05:6e02:1a2b:b0:30f:5d64:cc3 with SMTP id g11-20020a056e021a2b00b0030f5d640cc3mr9050524ile.9.1674465417940;
+        Mon, 23 Jan 2023 01:16:57 -0800 (PST)
+Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
+        by smtp.googlemail.com with ESMTPSA id m3-20020a923f03000000b00300b9b7d594sm13851891ila.20.2023.01.23.01.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jan 2023 01:16:57 -0800 (PST)
+From:   Sungwoo Kim <happiness.sung.woo@gmail.com>
+X-Google-Original-From: Sungwoo Kim <git@sung-woo.kim>
+Cc:     wuruoyu@me.com, benquike@gmail.com, daveti@purdue.edu,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM),
+        netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+        linux-kernel@vger.kernel.org (open list)
+Subject: Bluetooth: L2cap: use-after-free in l2cap_sock_ready_cb
+Date:   Mon, 23 Jan 2023 04:15:57 -0500
+Message-Id: <20230123091556.4109694-1-git@sung-woo.kim>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <a85c256af01f64389a078c2b37c3b72a27d97536.1668005062.git.geert+renesas@glider.be>
- <0bb76233-062c-a1c5-da88-4f04feccd5b2@linaro.org> <CABBYNZJX+9SxW48qSSmyyMa7_bvqzwHafa0BNOz4Kz_Jc+gu9Q@mail.gmail.com>
- <CAMuHMdUHo6zEPMF_VR=0Xn2PNHrQRGwzrOP2GXvDN9S19jMaGQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdUHo6zEPMF_VR=0Xn2PNHrQRGwzrOP2GXvDN9S19jMaGQ@mail.gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Sun, 22 Jan 2023 12:32:21 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXA_htZuV0VORpfnf9NTvTO=UPne-Y7UV7Fr=KvRxe==A@mail.gmail.com>
-Message-ID: <CAMuHMdXA_htZuV0VORpfnf9NTvTO=UPne-Y7UV7Fr=KvRxe==A@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: leds: Document Bluetooth and WLAN triggers
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Pavel Machek <pavel@ucw.cz>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-        linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+It's a racy bug. e1000_clean() forcefully frees a socket even if
+l2cap_sock_ready_cb() already have the socket lock, resulting in
+use-after-free for accessing the socket.
+I don't have a clever idea to handle this, since it looks beyond
+the Bluetooth system.
+For the l2cap_sock.c in the stack trace, please refer this file
+for your convenience:
+https://gist.github.com/swkim101/5c3b8cb7c7d7172aef23810c9412f323
 
-On Sun, Jan 22, 2023 at 11:48 AM Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> On Fri, Jan 20, 2023 at 10:42 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> > On Fri, Jan 20, 2023 at 8:42 AM Krzysztof Kozlowski
-> > <krzysztof.kozlowski@linaro.org> wrote:
-> > > On 09/11/2022 15:46, Geert Uytterhoeven wrote:
-> > > > Add the missing trigger patterns for Bluetooth and WLAN activity, which
-> > > > are already in active use.
-> > > >
-> > > > While at it, move the mmc pattern comment where it belongs, and restore
-> > > > alphabetical sort order.
-> > > >
-> > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > > > ---
-> > > > arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: bt_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-> > > >       'hci0-power' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-> > > >       'hci0-power' does not match '^mmc[0-9]+$'
-> > > >       From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
-> > > > arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: wlan_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
-> > > >       'phy0tx' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
-> > > >       'phy0tx' does not match '^mmc[0-9]+$'
-> > > >       From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
-> > >
-> > > This patch got lost... Rob, Lee or Pavel, can you pick it up?
-> > >
-> > > It's with Rob's approval:
-> > > https://lore.kernel.org/all/166861772609.231295.14812410099261417331.robh@kernel.org/
-> >
-> > If it is going to be applied via bluetooth-next make sure to resend it
-> > since last time our CI was not able to apply it thus why we didn't
-> > apply it in the first place.
->
-> Resent as v2, https://lore.kernel.org/r/0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be
+This is discovered by FuzzBT on top of Syzkaller with Sungwoo Kim (me).
+Other contributors for FuzzBT project are Ruoyu Wu(wuruoyu@me.com)
+and Hui Peng(benquike@gmail.com).
 
-According to your CI, it still does not apply.
-However, there are no changes to
-Documentation/devicetree/bindings/leds/leds-gpio.yaml
-between v6.2-rc1 and next-20230120.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+==================================================================
+BUG: KASAN: use-after-free in l2cap_sock_ready_cb (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_sock.c:1685) 
+Read of size 8 at addr ffff88800f6efaa8 by task kworker/u3:0/76
+CPU: 0 PID: 76 Comm: kworker/u3:0 Not tainted 6.1.0-rc2 #129
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+dump_stack_lvl (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/lib/dump_stack.c:105) 
+print_address_description+0x7e/0x360 
+print_report (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report.c:187 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report.c:389) 
+? __virt_addr_valid (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/linux/mmzone.h:1855 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/arch/x86/mm/physaddr.c:65) 
+? kasan_complete_mode_report_info (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report_generic.c:104 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report_generic.c:127 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report_generic.c:136) 
+? l2cap_sock_ready_cb (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_sock.c:1685) 
+kasan_report (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report.c:? /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/report.c:484) 
+? l2cap_sock_ready_cb (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_sock.c:1685) 
+__asan_load8 (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:45 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:67 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:151 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:180 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:256) 
+l2cap_sock_ready_cb (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_sock.c:1685) 
+l2cap_bredr_sig_cmd (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_core.c:4703 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_core.c:5884) 
+? vprintk_default (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/printk/printk.c:2279) 
+? vprintk (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/printk/printk_safe.c:50) 
+? _printk (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/printk/printk.c:2289) 
+? bt_err (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/lib.c:?) 
+? bt_err (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/lib.c:249) 
+l2cap_recv_frame (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_core.c:7851 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_core.c:7919) 
+? _printk (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/printk/printk.c:2289) 
+? bt_err (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/lib.c:?) 
+? __wake_up_klogd (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/printk/printk.c:3481) 
+l2cap_recv_acldata (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_core.c:8601 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/l2cap_core.c:8631) 
+? hci_conn_enter_active_mode (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/hci_conn.c:?) 
+hci_rx_work (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/net/bluetooth/hci_core.h:1121 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/hci_core.c:3937 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/bluetooth/hci_core.c:4189) 
+process_one_work (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/workqueue.c:2225) 
+worker_thread (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/workqueue.c:816 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/workqueue.c:2107 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/workqueue.c:2159 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/workqueue.c:2408) 
+kthread (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/kthread.c:361) 
+? process_one_work (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/workqueue.c:2321) 
+? kthread_blkcg (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/kthread.c:76 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/kernel/kthread.c:1519) 
+ret_from_fork (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/arch/x86/entry/entry_64.S:306) 
+ </TASK>
+Allocated by task 328:
+kasan_set_track (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/common.c:51) 
+kasan_save_alloc_info (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:432 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:498) 
+__kasan_kmalloc (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/common.c:356) 
+__kmalloc_node_track_caller (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slab_common.c:943 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slab_common.c:975) 
+__alloc_skb (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/core/skbuff.c:516) 
+__tcp_send_ack (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/net/sock.h:1010 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/tcp_output.c:3961) 
+tcp_send_ack (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/tcp_output.c:3992) 
+__tcp_cleanup_rbuf (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/tcp.c:1579) 
+tcp_recvmsg_locked (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/linux/skbuff.h:2324 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/tcp.c:1633 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/tcp.c:2633) 
+tcp_recvmsg (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/net/busy_poll.h:107 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/tcp.c:2676) 
+inet_recvmsg (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/ipv4/af_inet.c:859) 
+sock_read_iter (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/socket.c:1073) 
+vfs_read (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/linux/uio.h:345 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/fs/read_write.c:387 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/fs/read_write.c:470) 
+ksys_read (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/fs/read_write.c:?) 
+__x64_sys_read (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/fs/read_write.c:621) 
+do_syscall_64 (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/arch/x86/entry/common.c:49 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/arch/x86/entry/common.c:80) 
+entry_SYSCALL_64_after_hwframe (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/arch/x86/entry/entry_64.S:120) 
+Freed by task 328:
+kasan_set_track (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/common.c:51) 
+kasan_save_free_info (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/generic.c:508) 
+____kasan_slab_free (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/linux/slub_def.h:164 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/common.c:214) 
+__kasan_slab_free (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/kasan/common.c:244) 
+slab_free_freelist_hook (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slub.c:381 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slub.c:1747) 
+__kmem_cache_free (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slub.c:3656 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slub.c:3674) 
+kfree (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/mm/slab_common.c:1007) 
+skb_release_data (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/core/skbuff.c:782) 
+napi_consume_skb (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/core/skbuff.c:?) 
+e1000_clean (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/drivers/net/ethernet/intel/e1000/e1000_main.c:3855 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/drivers/net/ethernet/intel/e1000/e1000_main.c:3801) 
+__napi_poll (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./arch/x86/include/asm/bitops.h:207 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./arch/x86/include/asm/bitops.h:239 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./include/asm-generic/bitops/instrumented-non-atomic.h:142 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/core/dev.c:6497) 
+net_rx_action (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/core/dev.c:6639 /home/sungwoo/fuzzbt/v6.1-rc2-bzimage/net/core/dev.c:6667) 
+__do_softirq (/home/sungwoo/fuzzbt/v6.1-rc2-bzimage/./arch/x86/include/asm/current.h:?) 
+The buggy address belongs to the object at ffff88800f6ef800
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 680 bytes inside of
+ 1024-byte region [ffff88800f6ef800, ffff88800f6efc00)
+The buggy address belongs to the physical page:
+page:00000000b954ec57 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0xf6ec
+head:00000000b954ec57 order:2 compound_mapcount:0 compound_pincount:0
+flags: 0xfffffc0010200(slab|head|node=0|zone=1|lastcpupid=0x1fffff)
+raw: 000fffffc0010200 ffffea0000864c00 dead000000000003 ffff888005841dc0
+raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+Memory state around the buggy address:
+ ffff88800f6ef980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88800f6efa00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88800f6efa80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff88800f6efb00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88800f6efb80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
