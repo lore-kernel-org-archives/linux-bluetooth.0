@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F761C54EED
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Jan 2023 19:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFEAC05027
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Jan 2023 19:49:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230040AbjAWTtP (ORCPT
+        id S231915AbjAWTtP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 23 Jan 2023 14:49:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53716 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbjAWTtG (ORCPT
+        with ESMTP id S232882AbjAWTtG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 23 Jan 2023 14:49:06 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA04C366BF
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF4A366B3
         for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jan 2023 11:48:51 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id x24-20020a17090ab01800b00229f43b506fso11259366pjq.5
+Received: by mail-pj1-x102a.google.com with SMTP id s13-20020a17090a6e4d00b0022900843652so16315042pjm.1
         for <linux-bluetooth@vger.kernel.org>; Mon, 23 Jan 2023 11:48:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UsNi4+xXo9Re2YmLXhdvMFlGFeCBOiSSV9tBKSsL3Qc=;
-        b=BhQK4p5b4V8RpqTSTo++c4gsNI+ucP7hXd5q0T+fooyeibcbasHQ8WANERGxRJrF4U
-         9xBUHelujrif4YS6C7GJj1zZCdag9i7hM/AT6zOcN2cWJ7UYBD8DHQf5WLUXS/b5tdVy
-         BQuljejnThhay13v+Cnk14+VJPA3Z6f+LZTEPWbnEa63dlztaCsacDJq/vDtd/Ej/I/G
-         bpckO9tDwgAbbtuDlwXqjsrTRSTbLI/ySW1t1CspZXKvtX1ocMrIr67skwxIOILFe4rE
-         NF9TzWFIhRuOCHPtpgWrjzugIfmkdLoFFO3ZBWekymJtG88QBgUfjNRI5PurbxTO5h3j
-         N8rA==
+        bh=407Z2w0BBlNKEhCLrOumCSQPsx6l5mvADFbiNUhctXE=;
+        b=qWr/S1X+JHOZ/wYcc9I22LtcIXaNo5oY8S8rZtj6xsaGJ8FlEyp5/VNL5xqgw71uL6
+         urzNEHZIhizB6MDmo7XEbfwfzWiaoIgZmb5E7LR1ewQ/tBwpl167CU5DL03W6bt7/nGd
+         Dmo4KGg416XdmkPpHzOJ5mUqgYGxO1rbSPPWXoQkqhAaDIqoRLZbF8FVgQPI8vlB2gmQ
+         917RGGV4AEbd1Z6STwehS0orJ0Jlun/bEk1Frb8YukKaBKKEwfJFKMt3Z+O5J4Lodgp9
+         067ogX25usU6uzFVFie98XgnCcwwitD8XLq1cjaI11xf9iXH2PFGk2oocIeB/g43NQT4
+         whRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UsNi4+xXo9Re2YmLXhdvMFlGFeCBOiSSV9tBKSsL3Qc=;
-        b=rne59xoDunVbDX2a3SVNdX3rx/YBabDi8qfQdqJ35ipKJ59kgMqwcgDC7IHMK1yC0K
-         /acDW7UbzK1Qys6F1DjO7BQJmoBOTaft/4rCqtvN+CSH2x2O3FAakiMrafxESv18FSU9
-         hQuZCkTaJItNHU8H7jeJ+zZE121TPb6F9B+B4qdvQFdCAxN/f/LNEMyM+8RdsyZQa9tV
-         cGJIY+nPEOKiOu2/HyziGrqDTGDfDetLOyqdWeUFAPVPKBAsCp6cB+T+7Wt7MpzQbcXW
-         5Zb82vD1xTfLayT2InD4FNUYcJsCBaUaFceJgv9Cz7A0edUGYw8SMyJnsRczJno/3tiU
-         CvYQ==
-X-Gm-Message-State: AFqh2kpQyW6J2ER0IoHATCNkzG1YwXwNGsUxnnmBrhQsBuExtV02RP4N
-        BJ/INKkkHU+eFD2aFtYToSj4vxrabBXrQw==
-X-Google-Smtp-Source: AMrXdXtgd/B8J3ykpfijzl13IscvYBVgyohOvi6HDaBzSREcWEcnk3/+egs1tF4ohtPl/bAwLR16dQ==
-X-Received: by 2002:a17:902:db0d:b0:195:6065:afa3 with SMTP id m13-20020a170902db0d00b001956065afa3mr18475694plx.44.1674503330678;
-        Mon, 23 Jan 2023 11:48:50 -0800 (PST)
+        bh=407Z2w0BBlNKEhCLrOumCSQPsx6l5mvADFbiNUhctXE=;
+        b=Yvl8qSS/0goydldluabx8esBTzZsaEIeA1bx49D5rLgvyFnIASQtl5j82z7VyKKzzk
+         RAo3uNgYFD9VeR23gEOAA1oa1RIalQkdRDT6okonlNhhrQomP/oVUvqia5u7eFu4qgKQ
+         l1gMUrwpjjKN3zy7NwCULeC/+CwZ97qGnucITVZ/T2ZfqDNFb00Hj9weYHwGXV+NsNJz
+         4Oj6g0z1kiOt1dH4LVcq/fzKeImXPVGEYrWx3Q7bSo/WcY7mNn61QGVpGPt3CH39lYdc
+         XVQzXvqDjrNEKCRQSB09wfMYL6Ohau6uuSkgDjl4Ct1hbEe7GYmOu4XZMCg2vKBEGGVg
+         O0lQ==
+X-Gm-Message-State: AFqh2kr/c9tMQpNDqlNXSt3m6eeCVLPbTBNfHJpDwwSl+GdlnEGDSEiQ
+        K2oEPGet4IdvZWrX806X85/uDPPRY3UIVw==
+X-Google-Smtp-Source: AMrXdXuNO7DtEkAb/ZAc/vXcko4yY3xytuGG4CcmpWrjNTB6bcwdBzkMpk5BU4yimXVMWisNPmvXVg==
+X-Received: by 2002:a17:902:b413:b0:192:6bb1:ed5a with SMTP id x19-20020a170902b41300b001926bb1ed5amr23799502plr.38.1674503329952;
+        Mon, 23 Jan 2023 11:48:49 -0800 (PST)
 Received: from fedora.. (97-126-124-199.tukw.qwest.net. [97.126.124.199])
-        by smtp.gmail.com with ESMTPSA id jj5-20020a170903048500b0017d97d13b18sm97068plb.65.2023.01.23.11.48.50
+        by smtp.gmail.com with ESMTPSA id jj5-20020a170903048500b0017d97d13b18sm97068plb.65.2023.01.23.11.48.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jan 2023 11:48:50 -0800 (PST)
+        Mon, 23 Jan 2023 11:48:49 -0800 (PST)
 From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com
-Subject: [PATCH BlueZ v3 09/11] mesh: Add internal Mesh Private Beacon model
-Date:   Mon, 23 Jan 2023 11:48:22 -0800
-Message-Id: <20230123194824.257351-10-brian.gix@gmail.com>
+Subject: [PATCH BlueZ v3 08/11] mesh: Add Tx/Rx support of Mesh Private Beacons
+Date:   Mon, 23 Jan 2023 11:48:21 -0800
+Message-Id: <20230123194824.257351-9-brian.gix@gmail.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230123194824.257351-1-brian.gix@gmail.com>
 References: <20230123194824.257351-1-brian.gix@gmail.com>
@@ -68,314 +68,1146 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-Adds recgnition that the Mesh Private Beacon model is internal
-and foundational, without bindings.
+With this change, we start evaluating received Mesh Private Beacons in
+addition to the legacy Secure Network Beacons. We also add the ability
+to request Tx of Mesh Private Beacons, which are regenerated with new
+Random Nonce a minimum of every 0 - 2550 seconds.
 ---
- mesh/model.c          | 10 ++++++-
- mesh/net-keys.c       |  5 ++++
- mesh/net-keys.h       |  1 +
- mesh/node.c           | 67 +++++++++++++++++++++++++++++++++++++++----
- mesh/node.h           |  2 ++
- mesh/prvbeac-server.c | 11 +++++--
- 6 files changed, 86 insertions(+), 10 deletions(-)
+ mesh/net-keys.c | 501 +++++++++++++++++++++++++++++++++++++-----------
+ mesh/net-keys.h |  10 +-
+ mesh/net.c      | 172 ++++++++++++-----
+ mesh/net.h      |   6 +-
+ mesh/node.c     |   4 +-
+ 5 files changed, 519 insertions(+), 174 deletions(-)
 
-diff --git a/mesh/model.c b/mesh/model.c
-index e2babea10..4ccafa17e 100644
---- a/mesh/model.c
-+++ b/mesh/model.c
-@@ -26,6 +26,7 @@
- #include "mesh/cfgmod.h"
- #include "mesh/prov.h"
- #include "mesh/remprv.h"
-+#include "mesh/prv-beacon.h"
- #include "mesh/error.h"
- #include "mesh/dbus.h"
- #include "mesh/util.h"
-@@ -81,6 +82,9 @@ static bool is_internal(uint32_t id)
- 	if (id == REM_PROV_SRV_MODEL || id == REM_PROV_CLI_MODEL)
- 		return true;
- 
-+	if (id == PRV_BEACON_SRV_MODEL || id == PRV_BEACON_CLI_MODEL)
-+		return true;
-+
- 	return false;
- }
- 
-@@ -647,6 +651,9 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
- 	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
- 		return MESH_STATUS_INVALID_MODEL;
- 
-+	if (id == PRV_BEACON_SRV_MODEL || id == PRV_BEACON_CLI_MODEL)
-+		return MESH_STATUS_INVALID_MODEL;
-+
- 	if (!appkey_have_key(node_get_net(node), app_idx))
- 		return MESH_STATUS_INVALID_APPKEY;
- 
-@@ -1655,7 +1662,8 @@ static struct mesh_model *model_setup(struct mesh_net *net, uint8_t ele_idx,
- 						SET_ID(SIG_VENDOR, db_mod->id));
- 
- 	/* Implicitly bind config server model to device key */
--	if (db_mod->id == CONFIG_SRV_MODEL) {
-+	if (db_mod->id == CONFIG_SRV_MODEL ||
-+					db_mod->id == PRV_BEACON_SRV_MODEL) {
- 
- 		if (ele_idx != PRIMARY_ELE_IDX) {
- 			l_free(mod);
 diff --git a/mesh/net-keys.c b/mesh/net-keys.c
-index 0ba051d79..57a9df04a 100644
+index ee7bbf0c0..0ba051d79 100644
 --- a/mesh/net-keys.c
 +++ b/mesh/net-keys.c
-@@ -123,6 +123,7 @@ uint32_t net_key_add(const uint8_t flooding[16])
+@@ -21,39 +21,55 @@
+ #include "mesh/net.h"
+ #include "mesh/net-keys.h"
+ 
+-#define BEACON_TYPE_SNB		0x01
+-#define KEY_REFRESH		0x01
+-#define IV_INDEX_UPDATE		0x02
+-
+ #define BEACON_INTERVAL_MIN	10
+ #define BEACON_INTERVAL_MAX	600
+ 
+-struct net_beacon {
++/* This allows daemon to skip decryption on recently seen beacons */
++#define BEACON_CACHE_MAX	10
++
++struct beacon_rx {
++	uint8_t data[28];
++	uint32_t id;
++	uint32_t ivi;
++	bool kr;
++	bool ivu;
++};
++
++struct beacon_observe {
+ 	struct l_timeout *timeout;
+ 	uint32_t ts;
+-	uint16_t observe_period;
+-	uint16_t observed;
++	uint16_t period;
++	uint16_t seen;
+ 	uint16_t expected;
+ 	bool half_period;
+-	uint8_t beacon[23];
+ };
+ 
+ struct net_key {
+ 	uint32_t id;
+-	struct net_beacon snb;
++	struct l_timeout *mpb_to;
++	uint8_t *mpb;
++	uint8_t *snb;
++	struct beacon_observe observe;
++	uint32_t ivi;
+ 	uint16_t ref_cnt;
+-	uint16_t beacon_enables;
++	uint16_t mpb_enables;
++	uint16_t snb_enables;
++	uint8_t mpb_refresh;
+ 	uint8_t friend_key;
+ 	uint8_t nid;
+ 	uint8_t flooding[16];
+-	uint8_t encrypt[16];
+-	uint8_t privacy[16];
+-	uint8_t beacon[16];
+-	uint8_t network[8];
++	uint8_t enc_key[16];
++	uint8_t prv_key[16];
++	uint8_t snb_key[16];
++	uint8_t pvt_key[16];
++	uint8_t net_id[8];
++	bool kr;
++	bool ivu;
+ };
+ 
+-static struct l_queue *keys = NULL;
+-static uint32_t last_flooding_id = 0;
++static struct l_queue *beacons;
++static struct l_queue *keys;
++static uint32_t last_flooding_id;
+ 
+ /* To avoid re-decrypting same packet for multiple nodes, cache and check */
+ static uint8_t cache_pkt[29];
+@@ -81,9 +97,9 @@ static bool match_id(const void *a, const void *b)
+ static bool match_network(const void *a, const void *b)
+ {
+ 	const struct net_key *key = a;
+-	const uint8_t *network = b;
++	const uint8_t *net_id = b;
+ 
+-	return memcmp(key->network, network, sizeof(key->network)) == 0;
++	return memcmp(key->net_id, net_id, sizeof(key->net_id)) == 0;
+ }
+ 
+ /* Key added from Provisioning, NetKey Add or NetKey update */
+@@ -101,19 +117,26 @@ uint32_t net_key_add(const uint8_t flooding[16])
+ 	if (!keys)
+ 		keys = l_queue_new();
+ 
++	if (!beacons)
++		beacons = l_queue_new();
++
  	key = l_new(struct net_key, 1);
  	memcpy(key->flooding, flooding, 16);
  	key->ref_cnt++;
-+	key->mpb_refresh = NET_MPB_REFRESH_DEFAULT;
- 	result = mesh_crypto_k2(flooding, p, sizeof(p), &key->nid, key->enc_key,
- 								key->prv_key);
+-	result = mesh_crypto_k2(flooding, p, sizeof(p), &key->nid, key->encrypt,
+-								key->privacy);
++	result = mesh_crypto_k2(flooding, p, sizeof(p), &key->nid, key->enc_key,
++								key->prv_key);
  	if (!result)
-@@ -664,6 +665,10 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t ivi, bool kr, bool ivu,
+ 		goto fail;
  
- 	l_debug("Set Beacon: IVI: %8.8x, IVU: %d, KR: %d", ivi, ivu, kr);
+-	result = mesh_crypto_k3(flooding, key->network);
++	result = mesh_crypto_k3(flooding, key->net_id);
+ 	if (!result)
+ 		goto fail;
  
-+	key->ivi = ivi;
-+	key->ivu = ivu;
-+	key->kr = kr;
+-	result = mesh_crypto_nkbk(flooding, key->beacon);
++	result = mesh_crypto_nkbk(flooding, key->snb_key);
++	if (!result)
++		goto fail;
 +
- 	/* Propagate changes to all local nodes */
- 	net_local_beacon(id, ivi, ivu, kr);
++	result = mesh_crypto_nkpk(flooding, key->pvt_key);
+ 	if (!result)
+ 		goto fail;
  
-diff --git a/mesh/net-keys.h b/mesh/net-keys.h
-index a3909448c..e73812481 100644
---- a/mesh/net-keys.h
-+++ b/mesh/net-keys.h
-@@ -12,6 +12,7 @@
- #define BEACON_TYPE_MPB		0x02
- #define KEY_REFRESH		0x01
- #define IV_INDEX_UPDATE		0x02
-+#define NET_MPB_REFRESH_DEFAULT	60
+@@ -146,7 +169,7 @@ uint32_t net_key_frnd_add(uint32_t flooding_id, uint16_t lpn, uint16_t frnd,
+ 	l_put_be16(fn_cnt, p + 7);
  
- void net_key_cleanup(void);
- bool net_key_confirm(uint32_t id, const uint8_t flooding[16]);
-diff --git a/mesh/node.c b/mesh/node.c
-index a2a330518..ed3212685 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -32,6 +32,7 @@
- #include "mesh/model.h"
- #include "mesh/cfgmod.h"
- #include "mesh/remprv.h"
-+#include "mesh/prv-beacon.h"
- #include "mesh/util.h"
- #include "mesh/error.h"
- #include "mesh/dbus.h"
-@@ -100,6 +101,8 @@ struct mesh_node {
- 	uint8_t proxy;
- 	uint8_t friend;
- 	uint8_t beacon;
-+	uint8_t mpb;
-+	uint8_t mpb_period;
- };
+ 	result = mesh_crypto_k2(key->flooding, p, sizeof(p), &frnd_key->nid,
+-				frnd_key->encrypt, frnd_key->privacy);
++				frnd_key->enc_key, frnd_key->prv_key);
  
- struct node_import {
-@@ -206,6 +209,8 @@ static void set_defaults(struct mesh_node *node)
- {
- 	node->lpn = MESH_MODE_UNSUPPORTED;
- 	node->proxy = MESH_MODE_UNSUPPORTED;
-+	node->mpb = MESH_MODE_DISABLED;
-+	node->mpb_period = NET_MPB_REFRESH_DEFAULT;
- 	node->friend = (mesh_friendship_supported()) ? MESH_MODE_DISABLED :
- 							MESH_MODE_UNSUPPORTED;
- 	node->beacon = (mesh_beacon_enabled()) ? MESH_MODE_ENABLED :
-@@ -403,7 +408,7 @@ static bool init_storage_dir(struct mesh_node *node)
- 	return rpl_init(node->storage_dir);
+ 	if (!result) {
+ 		l_free(frnd_key);
+@@ -167,7 +190,7 @@ void net_key_unref(uint32_t id)
+ 
+ 	if (key && key->ref_cnt) {
+ 		if (--key->ref_cnt == 0) {
+-			l_timeout_remove(key->snb.timeout);
++			l_timeout_remove(key->observe.timeout);
+ 			l_queue_remove(keys, key);
+ 			l_free(key);
+ 		}
+@@ -206,7 +229,7 @@ static void decrypt_net_pkt(void *a, void *b)
+ 
+ 	result = mesh_crypto_packet_decode(cache_pkt, cache_len, false,
+ 						cache_plain, cache_iv_index,
+-						key->encrypt, key->privacy);
++						key->enc_key, key->prv_key);
+ 
+ 	if (result) {
+ 		cache_id = key->id;
+@@ -254,8 +277,8 @@ bool net_key_encrypt(uint32_t id, uint32_t iv_index, uint8_t *pkt, size_t len)
+ 	if (!key)
+ 		return false;
+ 
+-	result = mesh_crypto_packet_encode(pkt, len, iv_index, key->encrypt,
+-							key->privacy);
++	result = mesh_crypto_packet_encode(pkt, len, iv_index, key->enc_key,
++							key->prv_key);
+ 
+ 	if (!result)
+ 		return false;
+@@ -265,9 +288,9 @@ bool net_key_encrypt(uint32_t id, uint32_t iv_index, uint8_t *pkt, size_t len)
+ 	return result;
  }
  
--static void update_net_settings(struct mesh_node *node)
-+static void init_net_settings(struct mesh_node *node)
+-uint32_t net_key_network_id(const uint8_t network[8])
++uint32_t net_key_network_id(const uint8_t net_id[8])
  {
- 	struct mesh_net *net = node->net;
+-	struct net_key *key = l_queue_find(keys, match_network, network);
++	struct net_key *key = l_queue_find(keys, match_network, net_id);
  
-@@ -415,6 +420,8 @@ static void update_net_settings(struct mesh_node *node)
+ 	if (!key)
+ 		return 0;
+@@ -275,6 +298,55 @@ uint32_t net_key_network_id(const uint8_t network[8])
+ 	return key->id;
+ }
+ 
++struct auth_check {
++	const uint8_t *data;
++	uint32_t id;
++	uint32_t ivi;
++	bool ivu;
++	bool kr;
++};
++
++static void check_auth(void *a, void *b)
++{
++	struct net_key *key = a;
++	struct auth_check *auth = b;
++	uint8_t out[5];
++
++
++	/* Stop checking if already found */
++	if (auth->id)
++		return;
++
++	if (mesh_crypto_aes_ccm_decrypt(auth->data + 1, key->pvt_key, NULL, 0,
++							auth->data + 14, 13,
++							out, NULL, 8)) {
++		auth->id = key->id;
++		auth->ivi = l_get_be32(out + 1);
++		auth->ivu = !!(out[0] & 0x02);
++		auth->kr = !!(out[0] & 0x01);
++	}
++}
++
++static uint32_t private_beacon_check(const void *beacon, uint32_t *ivi,
++							bool *ivu, bool *kr)
++{
++	struct auth_check auth = {
++		.data = beacon,
++		.id = 0,
++	};
++
++	auth.id = 0;
++	l_queue_foreach(keys, check_auth, &auth);
++
++	if (auth.id) {
++		*ivi = auth.ivi;
++		*ivu = auth.ivu;
++		*kr = auth.kr;
++	}
++
++	return auth.id;
++}
++
+ bool net_key_snb_check(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+ 								uint64_t cmac)
+ {
+@@ -285,7 +357,7 @@ bool net_key_snb_check(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+ 		return false;
+ 
+ 	/* Any behavioral changes must pass CMAC test */
+-	if (!mesh_crypto_beacon_cmac(key->beacon, key->network, iv_index, kr,
++	if (!mesh_crypto_beacon_cmac(key->snb_key, key->net_id, iv_index, kr,
+ 							ivu, &cmac_check)) {
+ 		l_error("mesh_crypto_beacon_cmac failed");
+ 		return false;
+@@ -300,39 +372,142 @@ bool net_key_snb_check(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+ 	return true;
+ }
+ 
+-bool net_key_snb_compose(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+-								uint8_t *snb)
++static bool mpb_compose(struct net_key *key, uint32_t ivi, bool kr, bool ivu)
++{
++	uint8_t b_data[5 + 8];
++	uint8_t random[13];
++
++	if (!key)
++		return false;
++
++	b_data[0] = 0;
++	l_put_be32(ivi, b_data + 1);
++
++	if (kr)
++		b_data[0] |= KEY_REFRESH;
++
++	if (ivu)
++		b_data[0] |= IV_INDEX_UPDATE;
++
++	l_getrandom(random, sizeof(random));
++	if (!mesh_crypto_aes_ccm_encrypt(random, key->pvt_key, NULL, 0,
++						b_data, 5, b_data, NULL, 8))
++		return false;
++
++	key->mpb[0] = MESH_AD_TYPE_BEACON;
++	key->mpb[1] = BEACON_TYPE_MPB;
++	memcpy(key->mpb + 2, random, 13);
++	memcpy(key->mpb + 15, b_data, 13);
++
++	return true;
++}
++
++static bool snb_compose(struct net_key *key, uint32_t ivi, bool kr, bool ivu)
+ {
+-	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+ 	uint64_t cmac;
+ 
+ 	if (!key)
+ 		return false;
+ 
+ 	/* Any behavioral changes must pass CMAC test */
+-	if (!mesh_crypto_beacon_cmac(key->beacon, key->network, iv_index, kr,
++	if (!mesh_crypto_beacon_cmac(key->snb_key, key->net_id, ivi, kr,
+ 								ivu, &cmac)) {
+ 		l_error("mesh_crypto_beacon_cmac failed");
+ 		return false;
+ 	}
+ 
+-	snb[0] = MESH_AD_TYPE_BEACON;
+-	snb[1] = BEACON_TYPE_SNB;
+-	snb[2] = 0;
++	key->snb[0] = MESH_AD_TYPE_BEACON;
++	key->snb[1] = BEACON_TYPE_SNB;
++	key->snb[2] = 0;
+ 
+ 	if (kr)
+-		snb[2] |= KEY_REFRESH;
++		key->snb[2] |= KEY_REFRESH;
+ 
+ 	if (ivu)
+-		snb[2] |= IV_INDEX_UPDATE;
++		key->snb[2] |= IV_INDEX_UPDATE;
+ 
+-	memcpy(snb + 3, key->network, 8);
+-	l_put_be32(iv_index, snb + 11);
+-	l_put_be64(cmac, snb + 15);
++	memcpy(key->snb + 3, key->net_id, 8);
++	l_put_be32(ivi, key->snb + 11);
++	l_put_be64(cmac, key->snb + 15);
+ 
+ 	return true;
+ }
+ 
++static bool match_beacon(const void *a, const void *b)
++{
++	const struct beacon_rx *cached = a;
++	const uint8_t *incoming = b;
++
++	if (incoming[0] == BEACON_TYPE_MPB)
++		return !memcmp(cached->data, incoming, 27);
++
++	if (incoming[0] == BEACON_TYPE_SNB)
++		return !memcmp(cached->data, incoming, 22);
++
++	return false;
++}
++
++uint32_t net_key_beacon(const uint8_t *data, uint16_t len, uint32_t *ivi,
++							bool *ivu, bool *kr)
++{
++	struct net_key *key;
++	struct beacon_rx *beacon;
++	uint32_t b_id, b_ivi;
++	bool b_ivu, b_kr;
++
++	if (data[1] == BEACON_TYPE_SNB && len != 23)
++		return 0;
++
++	if (data[1] == BEACON_TYPE_MPB && len != 28)
++		return 0;
++
++	beacon = l_queue_remove_if(beacons, match_beacon, data + 1);
++
++	if (beacon)
++		goto accept;
++
++	/* Validate beacon data */
++	if (data[1] == BEACON_TYPE_SNB) {
++		key = l_queue_find(keys, match_network, data + 3);
++
++		if (!key)
++			return 0;
++
++		b_id = key->id;
++		b_ivu = !!(data[2] & 0x02);
++		b_kr = !!(data[2] & 0x01);
++		b_ivi = l_get_be32(data + 11);
++
++		if (!net_key_snb_check(b_id, b_ivi, b_kr, b_ivu,
++							l_get_be64(data + 15)))
++			return 0;
++
++	} else if (data[1] == BEACON_TYPE_MPB) {
++		b_id = private_beacon_check(data + 1, &b_ivi, &b_ivu, &b_kr);
++
++		if (!b_id)
++			return 0;
++
++	} else
++		return 0;
++
++	beacon = l_new(struct beacon_rx, 1);
++	memcpy(beacon->data, data + 1, len - 1);
++	beacon->id = b_id;
++	beacon->ivi = b_ivi;
++	beacon->ivu = b_ivu;
++	beacon->kr = b_kr;
++
++accept:
++	*ivi = beacon->ivi;
++	*ivu = beacon->ivu;
++	*kr = beacon->kr;
++
++	l_queue_push_head(beacons, beacon);
++
++	return beacon->id;
++}
++
+ static void send_network_beacon(struct net_key *key)
+ {
+ 	struct mesh_io_send_info info = {
+@@ -343,10 +518,26 @@ static void send_network_beacon(struct net_key *key)
+ 		.u.gen.max_delay = DEFAULT_MAX_DELAY
+ 	};
+ 
+-	mesh_io_send(NULL, &info, key->snb.beacon, sizeof(key->snb.beacon));
++	if (key->mpb_enables) {
++		/* If Interval steps == 0, refresh key every time */
++		if (!key->mpb_refresh || !key->mpb || !key->mpb[0])
++			net_key_beacon_refresh(key->id, key->ivi, key->kr,
++								key->ivu, true);
++
++		mesh_io_send(NULL, &info, key->mpb, 28);
++	}
++
++	if (key->snb_enables) {
++		if (!key->snb || !key->snb[0]) {
++			net_key_beacon_refresh(key->id, key->ivi, key->kr,
++								key->ivu, true);
++		}
++
++		mesh_io_send(NULL, &info, key->snb, 23);
++	}
+ }
+ 
+-static void snb_timeout(struct l_timeout *timeout, void *user_data)
++static void beacon_timeout(struct l_timeout *timeout, void *user_data)
+ {
+ 	struct net_key *key = user_data;
+ 	uint32_t interval, scale_factor;
+@@ -355,29 +546,29 @@ static void snb_timeout(struct l_timeout *timeout, void *user_data)
+ 	send_network_beacon(key);
+ 
+ 	/* Count our own beacons towards the vicinity total */
+-	key->snb.observed++;
++	key->observe.seen++;
+ 
+-	if (!key->snb.half_period) {
++	if (!key->observe.half_period) {
+ 
+ 		l_debug("beacon %d for %d nodes, period %d, obs %d, exp %d",
+-						key->id,
+-						key->beacon_enables,
+-						key->snb.observe_period,
+-						key->snb.observed,
+-						key->snb.expected);
++					key->id,
++					key->snb_enables + key->mpb_enables,
++					key->observe.period,
++					key->observe.seen,
++					key->observe.expected);
+ 
+ 
+-		interval = (key->snb.observe_period * key->snb.observed)
+-							/ key->snb.expected;
++		interval = (key->observe.period * key->observe.seen)
++							/ key->observe.expected;
+ 
+ 		/* Limit Increases and Decreases by 10 seconds Up and
+ 		 * 20 seconds down each step, to avoid going nearly silent
+ 		 * in highly populated environments.
+ 		 */
+-		if (interval - 10 > key->snb.observe_period)
+-			interval = key->snb.observe_period + 10;
+-		else if (interval + 20 < key->snb.observe_period)
+-			interval = key->snb.observe_period - 20;
++		if (interval - 10 > key->observe.period)
++			interval = key->observe.period + 10;
++		else if (interval + 20 < key->observe.period)
++			interval = key->observe.period - 20;
+ 
+ 		/* Beaconing must be no *slower* than once every 10 minutes,
+ 		 * and no *faster* than once every 10 seconds, per spec.
+@@ -388,26 +579,26 @@ static void snb_timeout(struct l_timeout *timeout, void *user_data)
+ 		else if (interval > BEACON_INTERVAL_MAX * 2)
+ 			interval = BEACON_INTERVAL_MAX * 2;
+ 
+-		key->snb.observe_period = interval;
+-		key->snb.observed = 0;
++		key->observe.period = interval;
++		key->observe.seen = 0;
+ 
+ 		/* To prevent "over slowing" of the beaconing frequency,
+ 		 * require more significant "over observing" the slower
+ 		 * our own beaconing frequency.
+ 		 */
+-		key->snb.expected = interval / 10;
++		key->observe.expected = interval / 10;
+ 		scale_factor = interval / 60;
+-		key->snb.expected += scale_factor * 3;
++		key->observe.expected += scale_factor * 3;
+ 	}
+ 
+-	interval = key->snb.observe_period / 2;
+-	key->snb.half_period = !key->snb.half_period;
++	interval = key->observe.period / 2;
++	key->observe.half_period = !key->observe.half_period;
+ 
+-	if (key->beacon_enables)
++	if (key->mpb_enables || key->snb_enables)
+ 		l_timeout_modify(timeout, interval);
+ 	else {
+ 		l_timeout_remove(timeout);
+-		key->snb.timeout = NULL;
++		key->observe.timeout = NULL;
+ 	}
+ }
+ 
+@@ -416,8 +607,8 @@ void net_key_beacon_seen(uint32_t id)
+ 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+ 
+ 	if (key) {
+-		key->snb.observed++;
+-		key->snb.ts = get_timestamp_secs();
++		key->observe.seen++;
++		key->observe.ts = get_timestamp_secs();
+ 	}
+ }
+ 
+@@ -426,12 +617,83 @@ uint32_t net_key_beacon_last_seen(uint32_t id)
+ 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+ 
+ 	if (key)
+-		return key->snb.ts;
++		return key->observe.ts;
+ 
+ 	return 0;
+ }
+ 
+-void net_key_beacon_enable(uint32_t id)
++bool net_key_beacon_refresh(uint32_t id, uint32_t ivi, bool kr, bool ivu,
++								bool force)
++{
++	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
++	bool refresh = force;
++	uint32_t rand_ms;
++
++	if (!key)
++		return false;
++
++	if (key->snb_enables && !key->snb) {
++		key->snb = l_new(uint8_t, 23);
++		refresh = true;
++	}
++
++	if (key->mpb_enables && !key->mpb) {
++		key->mpb = l_new(uint8_t, 28);
++		refresh = true;
++	}
++
++	if (key->ivi != ivi || key->ivu != ivu || key->kr != kr)
++		refresh = true;
++
++	if (!refresh)
++		return true;
++
++	if (key->mpb) {
++		if (!mpb_compose(key, ivi, kr, ivu))
++			return false;
++
++		print_packet("Set MPB to", key->mpb, 28);
++	}
++
++	if (key->snb) {
++		if (!snb_compose(key, ivi, kr, ivu))
++			return false;
++
++		print_packet("Set SNB to", key->snb, 23);
++	}
++
++	l_debug("Set Beacon: IVI: %8.8x, IVU: %d, KR: %d", ivi, ivu, kr);
++
++	/* Propagate changes to all local nodes */
++	net_local_beacon(id, ivi, ivu, kr);
++
++	/* Send one new SNB soon, after all nodes have seen it */
++	l_getrandom(&rand_ms, sizeof(rand_ms));
++	rand_ms %= 1000;
++	key->observe.expected++;
++
++	if (key->observe.timeout)
++		l_timeout_modify_ms(key->observe.timeout, 500 + rand_ms);
++	else
++		key->observe.timeout = l_timeout_create_ms(500 + rand_ms,
++						beacon_timeout, key, NULL);
++
++	return true;
++}
++
++static void mpb_timeout(struct l_timeout *timeout, void *user_data)
++{
++	struct net_key *key = user_data;
++
++	if (key->mpb_refresh) {
++		l_debug("Refresh in %d seconds", key->mpb_refresh * 10);
++		l_timeout_modify(timeout, key->mpb_refresh * 10);
++	}
++
++	net_key_beacon_refresh(key->id, key->ivi, key->kr, key->ivu, true);
++}
++
++void net_key_beacon_enable(uint32_t id, bool mpb, uint8_t refresh_count)
+ {
+ 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+ 	bool enabled;
+@@ -440,8 +702,19 @@ void net_key_beacon_enable(uint32_t id)
+ 	if (!key)
+ 		return;
+ 
+-	enabled = !!key->beacon_enables;
+-	key->beacon_enables++;
++	enabled = !!key->snb_enables || !!key->mpb_enables;
++
++	if (mpb) {
++		key->mpb_enables++;
++		key->mpb_refresh = refresh_count;
++		l_timeout_remove(key->mpb_to);
++		if (refresh_count)
++			key->mpb_to = l_timeout_create(refresh_count * 10,
++						mpb_timeout, key, NULL);
++		else
++			key->mpb_to = NULL;
++	} else
++		key->snb_enables++;
+ 
+ 	/* If already Enabled, do nothing */
+ 	if (enabled)
+@@ -453,70 +726,68 @@ void net_key_beacon_enable(uint32_t id)
+ 	rand_ms++;
+ 
+ 	/* Enable Periodic Beaconing on this key */
+-	key->snb.observe_period = BEACON_INTERVAL_MIN * 2;
+-	key->snb.expected = 2;
+-	key->snb.observed = 0;
+-	key->snb.half_period = true;
+-	l_timeout_remove(key->snb.timeout);
+-	key->snb.timeout = l_timeout_create_ms(rand_ms, snb_timeout, key, NULL);
++	key->observe.period = BEACON_INTERVAL_MIN * 2;
++	key->observe.expected = 2;
++	key->observe.seen = 0;
++	key->observe.half_period = true;
++	l_timeout_remove(key->observe.timeout);
++	key->observe.timeout = l_timeout_create_ms(rand_ms, beacon_timeout,
++								key, NULL);
+ }
+ 
+-bool net_key_beacon_refresh(uint32_t id, uint32_t iv_index, bool kr, bool ivu)
++void net_key_beacon_disable(uint32_t id, bool mpb)
+ {
+ 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+-	uint8_t beacon[23];
+-	uint32_t rand_ms;
+ 
+ 	if (!key)
+-		return false;
++		return;
+ 
+-	if (!net_key_snb_compose(id, iv_index, kr, ivu, beacon))
+-		return false;
++	if (mpb) {
++		if (!key->mpb_enables)
++			return;
+ 
+-	if (memcmp(key->snb.beacon, beacon, sizeof(beacon)))
+-		memcpy(key->snb.beacon, beacon, sizeof(beacon));
+-	else
+-		return false;
++		key->mpb_enables--;
+ 
+-	l_debug("Setting SNB: IVI: %8.8x, IVU: %d, KR: %d", iv_index, ivu, kr);
+-	print_packet("Set SNB Beacon to", beacon, sizeof(beacon));
++		if (!key->mpb_enables) {
++			l_free(key->mpb);
++			key->mpb = NULL;
++			l_timeout_remove(key->mpb_to);
++			key->mpb_to = NULL;
++		}
++	} else {
++		if (!key->snb_enables)
++			return;
+ 
+-	/* Propagate changes to all local nodes */
+-	net_local_beacon(id, beacon);
++		key->snb_enables--;
+ 
+-	/* Send one new SNB soon, after all nodes have seen it */
+-	l_getrandom(&rand_ms, sizeof(rand_ms));
+-	rand_ms %= 1000;
+-	key->snb.expected++;
++		if (!key->snb_enables) {
++			l_free(key->snb);
++			key->snb = NULL;
++		}
++	}
+ 
+-	if (key->snb.timeout)
+-		l_timeout_modify_ms(key->snb.timeout, 500 + rand_ms);
+-	else
+-		key->snb.timeout = l_timeout_create_ms(500 + rand_ms,
+-						snb_timeout, key, NULL);
++	if (key->snb_enables || key->mpb_enables)
++		return;
+ 
+-	return true;
++	/* Disable periodic Beaconing on this key */
++	l_timeout_remove(key->observe.timeout);
++	key->observe.timeout = NULL;
+ }
+ 
+-void net_key_beacon_disable(uint32_t id)
++static void free_key(void *data)
+ {
+-	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
+-
+-	if (!key || !key->beacon_enables)
+-		return;
+-
+-	key->beacon_enables--;
++	struct net_key *key = data;
+ 
+-	if (key->beacon_enables)
+-		return;
+-
+-	/* Disable periodic Beaconing on this key */
+-	l_timeout_remove(key->snb.timeout);
+-	key->snb.timeout = NULL;
++	l_timeout_remove(key->mpb_to);
++	l_free(key->snb);
++	l_free(key->mpb);
++	l_free(key);
+ }
+ 
+ void net_key_cleanup(void)
+ {
+-	l_queue_destroy(keys, l_free);
++	l_queue_destroy(keys, free_key);
+ 	keys = NULL;
++	l_queue_destroy(beacons, l_free);
++	beacons = NULL;
+ }
+diff --git a/mesh/net-keys.h b/mesh/net-keys.h
+index 420618f71..a3909448c 100644
+--- a/mesh/net-keys.h
++++ b/mesh/net-keys.h
+@@ -9,6 +9,7 @@
+  */
+ 
+ #define BEACON_TYPE_SNB		0x01
++#define BEACON_TYPE_MPB		0x02
+ #define KEY_REFRESH		0x01
+ #define IV_INDEX_UPDATE		0x02
+ 
+@@ -23,12 +24,15 @@ uint32_t net_key_decrypt(uint32_t iv_index, const uint8_t *pkt, size_t len,
+ 					uint8_t **plain, size_t *plain_len);
+ bool net_key_encrypt(uint32_t id, uint32_t iv_index, uint8_t *pkt, size_t len);
+ uint32_t net_key_network_id(const uint8_t network[8]);
++uint32_t net_key_beacon(const uint8_t *data, uint16_t len, uint32_t *ivi,
++							bool *ivu, bool *kr);
+ bool net_key_snb_check(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+ 								uint64_t cmac);
+ bool net_key_snb_compose(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
+ 								uint8_t *snb);
+ void net_key_beacon_seen(uint32_t id);
+-void net_key_beacon_enable(uint32_t id);
+-bool net_key_beacon_refresh(uint32_t id, uint32_t iv_index, bool kr, bool ivu);
+-void net_key_beacon_disable(uint32_t id);
++bool net_key_beacon_refresh(uint32_t id, uint32_t iv_index, bool kr, bool ivu,
++								bool force);
++void net_key_beacon_enable(uint32_t id, bool mpb, uint8_t refresh_count);
++void net_key_beacon_disable(uint32_t id, bool mpb);
+ uint32_t net_key_beacon_last_seen(uint32_t id);
+diff --git a/mesh/net.c b/mesh/net.c
+index 1d27289bf..81f1e57ee 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -102,7 +102,8 @@ struct mesh_net {
+ 	unsigned int sar_id_next;
+ 
+ 	bool friend_enable;
+-	bool beacon_enable;
++	bool snb_enable;
++	bool mpb_enable;
+ 	bool proxy_enable;
+ 	bool friend_seq;
+ 	struct l_timeout *iv_update_timeout;
+@@ -119,6 +120,7 @@ struct mesh_net {
+ 	uint8_t chan; /* Channel of recent Rx */
+ 	uint8_t default_ttl;
+ 	uint8_t tid;
++	uint8_t mpb_period;
+ 
+ 	struct {
+ 		bool enable;
+@@ -217,6 +219,7 @@ struct net_beacon_data {
+ 	bool ivu;
+ 	bool kr;
+ 	bool processed;
++	bool local;
+ };
+ 
+ static struct l_queue *fast_cache;
+@@ -526,6 +529,13 @@ static void mesh_sar_free(void *data)
+ static void subnet_free(void *data)
+ {
+ 	struct mesh_subnet *subnet = data;
++	struct mesh_net *net = subnet->net;
++
++	if (net->snb_enable)
++		net_key_beacon_disable(subnet->net_key_tx, false);
++
++	if (net->mpb_enable)
++		net_key_beacon_disable(subnet->net_key_tx, true);
+ 
+ 	net_key_unref(subnet->net_key_cur);
+ 	net_key_unref(subnet->net_key_upd);
+@@ -545,15 +555,27 @@ static struct mesh_subnet *subnet_new(struct mesh_net *net, uint16_t idx)
+ 	return subnet;
+ }
+ 
+-static void enable_beacon(void *a, void *b)
++static void enable_snb(void *a, void *b)
+ {
+ 	struct mesh_subnet *subnet = a;
+ 	struct mesh_net *net = b;
+ 
+-	if (net->beacon_enable)
+-		net_key_beacon_enable(subnet->net_key_tx);
++	if (net->snb_enable)
++		net_key_beacon_enable(subnet->net_key_tx, false, 0);
+ 	else
+-		net_key_beacon_disable(subnet->net_key_tx);
++		net_key_beacon_disable(subnet->net_key_tx, false);
++}
++
++static void enable_mpb(void *a, void *b)
++{
++	struct mesh_subnet *subnet = a;
++	struct mesh_net *net = b;
++
++	if (net->mpb_enable)
++		net_key_beacon_enable(subnet->net_key_tx, true,
++							net->mpb_period);
++	else
++		net_key_beacon_disable(subnet->net_key_tx, true);
+ }
+ 
+ static void enqueue_update(void *a, void *b);
+@@ -602,7 +624,8 @@ static void refresh_beacon(void *a, void *b)
+ 	struct mesh_net *net = b;
+ 
+ 	net_key_beacon_refresh(subnet->net_key_tx, net->iv_index,
+-		!!(subnet->kr_phase == KEY_REFRESH_PHASE_TWO), net->iv_update);
++		!!(subnet->kr_phase == KEY_REFRESH_PHASE_TWO), net->iv_update,
++									false);
+ }
+ 
+ struct mesh_net *mesh_net_new(struct mesh_node *node)
+@@ -826,7 +849,7 @@ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
+ 	if (idx == net->hb_pub.net_idx)
+ 		net->hb_pub.dst = UNASSIGNED_ADDRESS;
+ 
+-	/* TODO: cancel beacon_enable on this subnet */
++	/* TODO: cancel snb_enable on this subnet */
+ 
+ 	l_queue_remove(net->subnets, subnet);
+ 	subnet_free(subnet);
+@@ -853,10 +876,14 @@ static struct mesh_subnet *add_key(struct mesh_net *net, uint16_t idx,
+ 	}
+ 
+ 	net_key_beacon_refresh(subnet->net_key_tx, net->iv_index,
+-						false, net->iv_update);
++						false, net->iv_update, false);
+ 
+-	if (net->beacon_enable)
+-		net_key_beacon_enable(subnet->net_key_tx);
++	if (net->snb_enable)
++		net_key_beacon_enable(subnet->net_key_tx, false, 0);
++
++	if (net->mpb_enable)
++		net_key_beacon_enable(subnet->net_key_tx, true,
++							net->mpb_period);
+ 
+ 	l_queue_push_tail(net->subnets, subnet);
+ 
+@@ -2794,83 +2821,111 @@ static void process_beacon(void *net_ptr, void *user_data)
+ 	beacon_data->processed = true;
+ 
+ 	/*
+-	 * Ignore the beacon if it doesn't change anything, unless we're
+-	 * doing IV Recovery
++	 * Ignore local beacons and beacons that don't change anything,
++	 * unless we're doing IV Recovery
+ 	 */
+-	if (net->iv_upd_state == IV_UPD_INIT || ivi != net->iv_index ||
++	if (!beacon_data->local) {
++		if (net->iv_upd_state == IV_UPD_INIT || ivi != net->iv_index ||
+ 							ivu != net->iv_update)
+-		updated |= update_iv_ivu_state(net, ivi, ivu);
++			updated |= update_iv_ivu_state(net, ivi, ivu);
++
++		if (kr != local_kr)
++			updated |= update_kr_state(subnet, kr,
++						beacon_data->net_key_id);
+ 
+-	if (kr != local_kr || beacon_data->net_key_id != subnet->net_key_cur)
+-		updated |= update_kr_state(subnet, kr, beacon_data->net_key_id);
+ 
+-	if (updated)
+-		net_key_beacon_refresh(subnet->net_key_tx, net->iv_index,
++		if (updated)
++			net_key_beacon_refresh(beacon_data->net_key_id,
++				net->iv_index,
+ 				!!(subnet->kr_phase == KEY_REFRESH_PHASE_TWO),
+-								net->iv_update);
++				net->iv_update, false);
++	}
+ }
+ 
+ static void beacon_recv(void *user_data, struct mesh_io_recv_info *info,
+ 					const uint8_t *data, uint16_t len)
+ {
+ 	struct net_beacon_data beacon_data = {
++		.local = false,
+ 		.processed = false,
+ 	};
+ 
+-	if (len != 23 || data[1] != 0x01)
+-		return;
++	beacon_data.net_key_id = net_key_beacon(data, len, &beacon_data.ivi,
++					&beacon_data.ivu, &beacon_data.kr);
+ 
+-	/* Ignore Network IDs unknown to this daemon */
+-	beacon_data.net_key_id = net_key_network_id(data + 3);
+ 	if (!beacon_data.net_key_id)
+ 		return;
+ 
+-	/* Get data bits from beacon */
+-	beacon_data.ivu = !!(data[2] & 0x02);
+-	beacon_data.kr = !!(data[2] & 0x01);
+-	beacon_data.ivi = l_get_be32(data + 11);
+-
+-	/* Validate beacon before accepting */
+-	if (!net_key_snb_check(beacon_data.net_key_id, beacon_data.ivi,
+-					beacon_data.kr, beacon_data.ivu,
+-					l_get_be64(data + 15))) {
+-		l_error("mesh_crypto_beacon verify failed");
+-		return;
+-	}
+-
+ 	l_queue_foreach(nets, process_beacon, &beacon_data);
+ 
+ 	if (beacon_data.processed)
+ 		net_key_beacon_seen(beacon_data.net_key_id);
+ }
+ 
+-void net_local_beacon(uint32_t net_key_id, uint8_t *beacon)
++void net_local_beacon(uint32_t net_key_id, uint32_t ivi, bool ivu, bool kr)
+ {
+ 	struct net_beacon_data beacon_data = {
++		.local = true,
++		.processed = false,
+ 		.net_key_id = net_key_id,
+-		.ivu = !!(beacon[2] & 0x02),
+-		.kr = !!(beacon[2] & 0x01),
+-		.ivi = l_get_be32(beacon + 11),
++		.ivu = ivu,
++		.kr = kr,
++		.ivi = ivi,
+ 	};
+ 
+ 	/* Deliver locally generated beacons to all nodes */
+ 	l_queue_foreach(nets, process_beacon, &beacon_data);
+ }
+ 
+-bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable)
++bool mesh_net_set_snb_mode(struct mesh_net *net, bool enable)
+ {
+ 	if (!net)
+ 		return false;
+ 
+-	if (net->beacon_enable == enable)
++	if (net->snb_enable == enable)
+ 		return true;
+ 
+-	net->beacon_enable = enable;
++	net->snb_enable = enable;
+ 
+ 	if (enable)
+ 		l_queue_foreach(net->subnets, refresh_beacon, net);
+ 
+-	l_queue_foreach(net->subnets, enable_beacon, net);
++	l_queue_foreach(net->subnets, enable_snb, net);
++	queue_friend_update(net);
++
++	return true;
++}
++
++bool mesh_net_set_mpb_mode(struct mesh_net *net, bool enable, uint8_t period,
++								bool initialize)
++{
++	uint8_t old_period;
++	bool old_enable;
++
++	if (!net)
++		return false;
++
++	old_enable = net->mpb_enable;
++	old_period = net->mpb_period;
++
++	if (enable)
++		net->mpb_period = period;
++
++	if (old_enable == enable && old_period == net->mpb_period)
++		return true;
++
++	if (enable && !initialize) {
++		/* If enable with different period, disable and re-enable */
++		net->mpb_enable = false;
++		l_queue_foreach(net->subnets, enable_mpb, net);
++	}
++
++	net->mpb_enable = enable;
++
++	if (enable)
++		l_queue_foreach(net->subnets, refresh_beacon, net);
++
++	l_queue_foreach(net->subnets, enable_mpb, net);
+ 	queue_friend_update(net);
+ 
+ 	return true;
+@@ -2908,17 +2963,25 @@ bool mesh_net_set_key(struct mesh_net *net, uint16_t idx, const uint8_t *key,
+ 		subnet->key_refresh = 1;
+ 		subnet->net_key_tx = subnet->net_key_upd;
+ 
+-		if (net->beacon_enable) {
++		if (net->snb_enable) {
+ 			/* Switch beaconing key */
+-			net_key_beacon_disable(subnet->net_key_cur);
+-			net_key_beacon_enable(subnet->net_key_upd);
++			net_key_beacon_disable(subnet->net_key_cur, false);
++			net_key_beacon_enable(subnet->net_key_upd, false, 0);
++		}
++
++		if (net->mpb_enable) {
++			/* Switch beaconing key */
++			net_key_beacon_disable(subnet->net_key_cur, true);
++			net_key_beacon_enable(subnet->net_key_upd, true,
++							net->mpb_period);
+ 		}
+ 	}
+ 
+ 	subnet->kr_phase = phase;
+ 
+ 	net_key_beacon_refresh(subnet->net_key_tx, net->iv_index,
+-		!!(subnet->kr_phase == KEY_REFRESH_PHASE_TWO), net->iv_update);
++		!!(subnet->kr_phase == KEY_REFRESH_PHASE_TWO), net->iv_update,
++									false);
+ 
+ 
+ 	return true;
+@@ -2933,8 +2996,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 
+ 	first = l_queue_isempty(nets);
+ 	if (first) {
+-		uint8_t snb[] = {MESH_AD_TYPE_BEACON, 0x01};
+-		uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
++		const uint8_t snb[] = {MESH_AD_TYPE_BEACON, 1};
++		const uint8_t mpb[] = {MESH_AD_TYPE_BEACON, 2};
++		const uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
+ 
+ 		if (!nets)
+ 			nets = l_queue_new();
+@@ -2944,6 +3008,8 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 
+ 		mesh_io_register_recv_cb(io, snb, sizeof(snb),
+ 							beacon_recv, NULL);
++		mesh_io_register_recv_cb(io, mpb, sizeof(mpb),
++							beacon_recv, NULL);
+ 		mesh_io_register_recv_cb(io, pkt, sizeof(pkt),
+ 							net_msg_recv, NULL);
+ 	}
+@@ -2960,8 +3026,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 
+ struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ {
+-	uint8_t snb[] = {MESH_AD_TYPE_BEACON, 0x01};
+-	uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
++	const uint8_t snb[] = {MESH_AD_TYPE_BEACON, 1};
++	const uint8_t mpb[] = {MESH_AD_TYPE_BEACON, 2};
++	const uint8_t pkt[] = {MESH_AD_TYPE_NETWORK};
+ 	struct mesh_io *io;
+ 	uint8_t type = 0;
+ 
+@@ -2975,6 +3042,7 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ 	/* Only deregister io if this is the last network detached.*/
+ 	if (l_queue_length(nets) < 2) {
+ 		mesh_io_deregister_recv_cb(io, snb, sizeof(snb));
++		mesh_io_deregister_recv_cb(io, mpb, sizeof(mpb));
+ 		mesh_io_deregister_recv_cb(io, pkt, sizeof(pkt));
+ 	}
+ 
+diff --git a/mesh/net.h b/mesh/net.h
+index 0bacbbbbf..d385ba16e 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -236,8 +236,10 @@ void mesh_net_set_frnd_seq(struct mesh_net *net, bool seq);
+ uint16_t mesh_net_get_address(struct mesh_net *net);
+ bool mesh_net_register_unicast(struct mesh_net *net,
+ 					uint16_t unicast, uint8_t num_ele);
+-void net_local_beacon(uint32_t net_key_id, uint8_t *beacon);
+-bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable);
++void net_local_beacon(uint32_t key_id, uint32_t ivi, bool ivu, bool kr);
++bool mesh_net_set_snb_mode(struct mesh_net *net, bool enable);
++bool mesh_net_set_mpb_mode(struct mesh_net *net, bool enabla, uint8_t period,
++								bool init);
+ bool mesh_net_set_proxy_mode(struct mesh_net *net, bool enable);
+ bool mesh_net_set_relay_mode(struct mesh_net *net, bool enable, uint8_t cnt,
+ 							uint8_t interval);
+diff --git a/mesh/node.c b/mesh/node.c
+index 5150a085a..a2a330518 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -414,7 +414,7 @@ static void update_net_settings(struct mesh_node *node)
+ 	mesh_net_set_relay_mode(net, node->relay.mode == MESH_MODE_ENABLED,
  					node->relay.cnt, node->relay.interval);
  
- 	mesh_net_set_snb_mode(net, node->beacon == MESH_MODE_ENABLED);
-+	mesh_net_set_mpb_mode(net, node->mpb == MESH_MODE_ENABLED,
-+							node->mpb_period, true);
+-	mesh_net_set_beacon_mode(net, node->beacon == MESH_MODE_ENABLED);
++	mesh_net_set_snb_mode(net, node->beacon == MESH_MODE_ENABLED);
  }
  
  static bool init_from_storage(struct mesh_config_node *db_node,
-@@ -442,6 +449,8 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	node->relay.cnt = db_node->modes.relay.cnt;
- 	node->relay.interval = db_node->modes.relay.interval;
- 	node->beacon = db_node->modes.beacon;
-+	node->mpb = db_node->modes.mpb;
-+	node->mpb_period = db_node->modes.mpb_period;
+@@ -825,7 +825,7 @@ bool node_beacon_mode_set(struct mesh_node *node, bool enable)
  
- 	l_debug("relay %2.2x, proxy %2.2x, lpn %2.2x, friend %2.2x",
- 			node->relay.mode, node->proxy, node->lpn, node->friend);
-@@ -495,7 +504,7 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	mesh_net_set_seq_num(node->net, node->seq_number);
- 	mesh_net_set_default_ttl(node->net, node->ttl);
+ 	if (res) {
+ 		node->beacon = beacon;
+-		mesh_net_set_beacon_mode(node->net, enable);
++		mesh_net_set_snb_mode(node->net, enable);
+ 	}
  
--	update_net_settings(node);
-+	init_net_settings(node);
- 
- 	/* Initialize configuration server model */
- 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
-@@ -504,6 +513,9 @@ static bool init_from_storage(struct mesh_config_node *db_node,
- 	remote_prov_server_init(node, PRIMARY_ELE_IDX);
- 	remote_prov_client_init(node, PRIMARY_ELE_IDX);
- 
-+	/* Initialize Private Beacon server model */
-+	prv_beacon_server_init(node, PRIMARY_ELE_IDX);
-+
- 	node->cfg = cfg;
- 
- 	return true;
-@@ -839,6 +851,36 @@ uint8_t node_beacon_mode_get(struct mesh_node *node)
- 	return node->beacon;
- }
- 
-+bool node_mpb_mode_set(struct mesh_node *node, bool enable, uint8_t period)
-+{
-+	bool res;
-+	uint8_t beacon;
-+
-+	if (!node)
-+		return false;
-+
-+	beacon = enable ? MESH_MODE_ENABLED : MESH_MODE_DISABLED;
-+	res = mesh_config_write_mpb(node->cfg, beacon, period);
-+
-+	if (res) {
-+		node->mpb = beacon;
-+		node->mpb_period = period;
-+		mesh_net_set_mpb_mode(node->net, enable, period, false);
-+	}
-+
-+	return res;
-+}
-+
-+uint8_t node_mpb_mode_get(struct mesh_node *node, uint8_t *period)
-+{
-+	if (!node)
-+		return MESH_MODE_DISABLED;
-+
-+	*period = node->mpb_period;
-+
-+	return node->mpb;
-+}
-+
- bool node_friend_mode_set(struct mesh_node *node, bool enable)
- {
- 	bool res;
-@@ -951,6 +993,8 @@ static void convert_node_to_storage(struct mesh_node *node,
- 	db_node->modes.relay.cnt = node->relay.cnt;
- 	db_node->modes.relay.interval = node->relay.interval;
- 	db_node->modes.beacon = node->beacon;
-+	db_node->modes.mpb = node->mpb;
-+	db_node->modes.mpb_period = node->mpb_period;
- 
- 	db_node->ttl = node->ttl;
- 	db_node->seq_number = node->seq_number;
-@@ -1173,9 +1217,16 @@ static bool get_sig_models_from_properties(struct mesh_node *node,
- 	while (l_dbus_message_iter_next_entry(&mods, &m_id, &var)) {
- 		uint32_t id = SET_ID(SIG_VENDOR, m_id);
- 
--		/* Allow Config Server Model only on the primary element */
--		if (ele->idx != PRIMARY_ELE_IDX && id == CONFIG_SRV_MODEL)
--			return false;
-+		/*
-+		 * Allow Config Server & Private Beacon Models only on
-+		 * the primary element
-+		 */
-+		if (ele->idx != PRIMARY_ELE_IDX) {
-+			if (id == CONFIG_SRV_MODEL)
-+				return false;
-+			if (id == PRV_BEACON_SRV_MODEL)
-+				return false;
-+		}
- 
- 		if (!mesh_model_add(node, ele->models, id, &var))
- 			return false;
-@@ -1278,6 +1329,7 @@ static bool get_element_properties(struct mesh_node *node, const char *path,
- 	 */
- 	if (ele->idx == PRIMARY_ELE_IDX) {
- 		mesh_model_add(node, ele->models, CONFIG_SRV_MODEL, NULL);
-+		mesh_model_add(node, ele->models, PRV_BEACON_SRV_MODEL, NULL);
- 		mesh_model_add(node, ele->models, REM_PROV_SRV_MODEL, NULL);
- 		if (node->provisioner)
- 			mesh_model_add(node, ele->models, REM_PROV_CLI_MODEL,
-@@ -1397,13 +1449,16 @@ static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
- 
- 	l_queue_foreach(node->pages, save_pages, node);
- 
--	update_net_settings(node);
-+	init_net_settings(node);
- 
- 	/* Initialize internal server models */
- 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
- 	remote_prov_server_init(node, PRIMARY_ELE_IDX);
- 	remote_prov_client_init(node, PRIMARY_ELE_IDX);
- 
-+	/* Initialize Private Beacon server model */
-+	prv_beacon_server_init(node, PRIMARY_ELE_IDX);
-+
- 	node->busy = true;
- 
- 	return true;
-diff --git a/mesh/node.h b/mesh/node.h
-index a98945223..4f31c5056 100644
---- a/mesh/node.h
-+++ b/mesh/node.h
-@@ -63,6 +63,8 @@ uint8_t node_relay_mode_get(struct mesh_node *node, uint8_t *cnt,
- bool node_proxy_mode_set(struct mesh_node *node, bool enable);
- uint8_t node_proxy_mode_get(struct mesh_node *node);
- bool node_beacon_mode_set(struct mesh_node *node, bool enable);
-+bool node_mpb_mode_set(struct mesh_node *node, bool enable, uint8_t period);
-+uint8_t node_mpb_mode_get(struct mesh_node *node, uint8_t *period);
- uint8_t node_beacon_mode_get(struct mesh_node *node);
- bool node_friend_mode_set(struct mesh_node *node, bool enable);
- uint8_t node_friend_mode_get(struct mesh_node *node);
-diff --git a/mesh/prvbeac-server.c b/mesh/prvbeac-server.c
-index f3a6eaa82..a55e130d2 100644
---- a/mesh/prvbeac-server.c
-+++ b/mesh/prvbeac-server.c
-@@ -43,7 +43,7 @@ static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 	uint32_t opcode;
- 	uint8_t msg[5];
- 	uint16_t n;
--	uint8_t period = 0;
-+	uint8_t period;
- 
- 	if (app_idx != APP_IDX_DEV_LOCAL)
- 		return false;
-@@ -65,18 +65,23 @@ static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
- 
- 	case OP_PRIVATE_BEACON_SET:
- 		if (size == 1)
--			period = 0xff;
-+			node_mpb_mode_get(node, &period);
- 		else if (size == 2)
- 			period = pkt[1];
- 		else
- 			return true;
- 
-+		if (pkt[0] > 1)
-+			return true;
-+
-+		node_mpb_mode_set(node, !!pkt[0], period);
-+
- 		/* fallthrough */
- 
- 	case OP_PRIVATE_BEACON_GET:
- 		n = mesh_model_opcode_set(OP_PRIVATE_BEACON_STATUS, msg);
- 
--		msg[n++] = NOT_SUPPORTED;
-+		msg[n++] = node_mpb_mode_get(node, &period);
- 		msg[n++] = period;
- 
- 		l_debug("Get/Set Private Beacon (%d)", msg[n-2]);
+ 	return res;
 -- 
 2.39.1
 
