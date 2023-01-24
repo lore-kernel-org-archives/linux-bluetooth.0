@@ -2,111 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8427BC61D9D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 23:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF504C61DA0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 23:40:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234216AbjAXXIv (ORCPT
+        id S233694AbjAXXkm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 18:08:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56394 "EHLO
+        Tue, 24 Jan 2023 18:40:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232306AbjAXXIu (ORCPT
+        with ESMTP id S229646AbjAXXkl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 18:08:50 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38B44DBF4;
-        Tue, 24 Jan 2023 15:08:45 -0800 (PST)
+        Tue, 24 Jan 2023 18:40:41 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABFDDEC47;
+        Tue, 24 Jan 2023 15:40:40 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 82EA3B816A2;
-        Tue, 24 Jan 2023 23:08:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F46C433A0;
-        Tue, 24 Jan 2023 23:08:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3B3A1613F7;
+        Tue, 24 Jan 2023 23:40:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8578DC433EF;
+        Tue, 24 Jan 2023 23:40:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674601723;
-        bh=ZdLDi/+DVztZ9DhXm79AtQNOd374EXmydeSyFKj+5G8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=f0+/z0CMJl2SpFlJbN7wllOJMQKobBqaSrtTN5aIgyr99P3xhOM3HmjQ/DRDN+w7V
-         EPvITU6fI+o8rm8pV8Ds43XsPgUFlPp6c6VmccxO66P3Bfao6Xmbno3XM7+8ArrkTJ
-         Jb0lkMcUnrUXuVWYOnhetXmS+NWAtstJsI4ss7gXFlhiHO89fQ//+TeWCbxY7clRkh
-         Duwr35kDQK3GBRN+ueUo1DD8fq4NGJqDwN375BE9DTjSXhZhgpQszEK6v2UsS0NXZ/
-         lG5dAlBAoOu9rI7HTIKdWSxa9y4ZEX4T037tgpU9jK6SjG2qJHQSe/u3jKxGQzNqyt
-         HPpnnpj5j6VMg==
-Received: by mail-ua1-f53.google.com with SMTP id i23so4171388ual.13;
-        Tue, 24 Jan 2023 15:08:43 -0800 (PST)
-X-Gm-Message-State: AO0yUKW4/nbyGVJIxcEb5kx2dXEesw3ziUlzpStmKqMy24Zxp98Ty6b0
-        V6wEsoDdlo084OCanMBuyBenzMYb54Hf7MlQmA==
-X-Google-Smtp-Source: AK7set+XHOdnzF4SR3B3+FFd0Ftxg5GKYZ4DgGcss8AsTbvEbnamxUgbBbYhk446PYIeFe15Ip5Ly7OjAHZFVOHDBvM=
-X-Received: by 2002:a05:6130:83:b0:655:5dfb:9d10 with SMTP id
- x3-20020a056130008300b006555dfb9d10mr331055uaf.63.1674601721971; Tue, 24 Jan
- 2023 15:08:41 -0800 (PST)
+        s=k20201202; t=1674603639;
+        bh=j8nMb346Q2XEu+B8UmKpDg7d0MtdIuRWSU/yR8zKkks=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=l9GiQ+5lWUAsI1uD7ZKPyK9VpiTyd9R33p2+i49ZFSqHTKy0/1x0DvrRzTRVlEW0o
+         /KE5YoSRonbCFy4EL8caFH8+J8bolf7tDfYJw8ib6tzhqNoW/xn//IL3+a5OTnh7XN
+         XZQYLPtSloF7ID23EG8UGhanl/hRw+buxHE0UO8EX9ds/gn0Gj08hGEBPD56ck9WUG
+         JPYqXgi4Z2oWCeCyt28y9eL3SinfTiZ5G0+SDnEGzRJDBw4nPX7GOLMg4pKdDG6p5L
+         N96NqUx+EObMnzc89vy34zX79BxU9l6kOhkDZKcsu/6LlLoq0HaIlSdOBq5MGQXj0D
+         fZ86exPy+lgTw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D348F83ED1;
+        Tue, 24 Jan 2023 23:40:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20230124174714.2775680-1-neeraj.sanjaykale@nxp.com>
- <20230124174714.2775680-3-neeraj.sanjaykale@nxp.com> <167458712396.1259484.1395941797664824881.robh@kernel.org>
- <CABBYNZKAwp3Wqjrcp4k3wvjZSNfJhRWA5ytH7oNWXCG7V4k2ow@mail.gmail.com>
-In-Reply-To: <CABBYNZKAwp3Wqjrcp4k3wvjZSNfJhRWA5ytH7oNWXCG7V4k2ow@mail.gmail.com>
-From:   Rob Herring <robh@kernel.org>
-Date:   Tue, 24 Jan 2023 17:08:30 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJged+SwGy5b1w2Cx-dV06=LKb1mX9ykN7GrpR6P4gUVw@mail.gmail.com>
-Message-ID: <CAL_JsqJged+SwGy5b1w2Cx-dV06=LKb1mX9ykN7GrpR6P4gUVw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth support
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>,
-        Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-        jirislaby@kernel.org, sherry.sun@nxp.com, marcel@holtmann.org,
-        linux-serial@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        rohit.fule@nxp.com, devicetree@vger.kernel.org,
-        amitkumar.karwar@nxp.com, linux-bluetooth@vger.kernel.org,
-        edumazet@google.com, pabeni@redhat.com, gregkh@linuxfoundation.org,
-        netdev@vger.kernel.org, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, davem@davemloft.net,
-        johan.hedberg@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167460363944.4058.4676712965831302643.git-patchwork-notify@kernel.org>
+Date:   Tue, 24 Jan 2023 23:40:39 +0000
+References: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
+In-Reply-To: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     pavel@ucw.cz, lee@kernel.org, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, jacek.anaszewski@gmail.com,
+        linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-renesas-soc@vger.kernel.org, robh@kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 3:44 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Rob, Tedd,
->
-> On Tue, Jan 24, 2023 at 11:06 AM Rob Herring <robh@kernel.org> wrote:
-> >
-> >
-> > On Tue, 24 Jan 2023 23:17:13 +0530, Neeraj Sanjay Kale wrote:
-> > > Add binding document for generic and legacy NXP bluetooth
-> > > chipset.
-> > >
-> > > Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> > > ---
-> > >  .../bindings/net/bluetooth/nxp-bluetooth.yaml | 67 +++++++++++++++++++
-> > >  1 file changed, 67 insertions(+)
-> > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml
-> > >
-> >
-> > My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-> > on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> >
-> > yamllint warnings/errors:
-> > ./Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml:67:1: [warning] too many blank lines (2 > 1) (empty-lines)
-> >
-> > dtschema/dtc warnings/errors:
-> > Error: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.example.dts:18.9-15 syntax error
-> > FATAL ERROR: Unable to parse input tree
-> > make[1]: *** [scripts/Makefile.lib:434: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.example.dtb] Error 1
-> > make[1]: *** Waiting for unfinished jobs....
-> > make: *** [Makefile:1508: dt_binding_check] Error 2
->
-> I wonder if that is something that we could incorporate to our CI,
-> perhaps we can detect if the subject starts with dt-binding then we
-> attempt to make with DT_CHECKER_FLAGS, thoughts?
+Hello:
 
-What CI is that?
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Better to look at the diffstat of the patch than subject. Lots of
-subjects are wrong and I suspect there would be a fairly high
-correlation of wrong subjects to schema errors.
+On Sun, 22 Jan 2023 11:47:27 +0100 you wrote:
+> Add the missing trigger patterns for Bluetooth and WLAN activity, which
+> are already in active use.
+> 
+> While at it, move the mmc pattern comment where it belongs, and restore
+> alphabetical sort order.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> 
+> [...]
 
-Rob
+Here is the summary with links:
+  - [v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ef017002b93b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
