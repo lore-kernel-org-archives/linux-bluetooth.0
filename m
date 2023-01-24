@@ -2,101 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2E4C54E94
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 23:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8427BC61D9D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 23:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230160AbjAXXIB (ORCPT
+        id S234216AbjAXXIv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 18:08:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55870 "EHLO
+        Tue, 24 Jan 2023 18:08:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbjAXXIA (ORCPT
+        with ESMTP id S232306AbjAXXIu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 18:08:00 -0500
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14C83754D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 15:07:54 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id d188so14809577oia.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 15:07:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EWZkb5dTuQey5hR+Ex537evUJ1+GwgrKughkd86OrXY=;
-        b=HfNJ1/qpfVuc+kfpfnZCRozAuntWt3Y3zUP0HYp8lwsCNnUw6u68qgQZSxe+tlymop
-         oo2Fxb/9lKxMDaLMHVUBn6XjWGexuC1tPv5TI5N3crGGP+GuyOqiHlxavdxpNyOa3ntV
-         1o1U0oVxXf3zSGDm9E2C+w6dU5DiVyjs7Tmkk6xhUIJ+s9PoCZv/Fl4VChbVBb23QnQh
-         8Nideifyxqi49zxv014tPlKECh4QHm7Kdu8XyUseYpvtfzX4jjO3mgVxWZGYRseiEDLw
-         m+WbdZrf5MkB9U+ily1uUS+wRbWn1H6+aUeomNwnYehTBLTxuDpwftYcmUtkpwsq9Nbr
-         MeTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EWZkb5dTuQey5hR+Ex537evUJ1+GwgrKughkd86OrXY=;
-        b=eOJ2FS+jrpj0r4klr2fsl76YSxJq4CK0ZtjFUllpc/dsx0knTg4xcYrclZ7sVJvYt0
-         qocSbgzAxOFGE6IgV0TvXnjbSCV0M+D+FuCpDbjUtYcWFDle2fE0J98+HBVcylyJVjQj
-         1SWW8HvT3lZ7sIg1VIlSrAUVeHBZ4xGAgmoxGJkwSqkTwZSofJkN6WH/MXlJPie0lBDq
-         SDdWNNpbltMkex6Rz2a38gT842+WvWY5HrdiRvvOY7BjtnKo9V2ZbV591L7H8QzN3DIE
-         UiF1kjbTmOThAlo7+KZXfJYadlfXQclQQamJywfmfsqHY25vIHTL+aIOhmMC6zjuNahm
-         YBTA==
-X-Gm-Message-State: AFqh2kq0TNwwSYfLACUHTYEwbcvLXE5adYicaj1AqAxYumq8hZusuAjK
-        FsysBBQ6NL7MLy8eA5kTTQO3OnOjLzc=
-X-Google-Smtp-Source: AMrXdXtPTrylllplYUpMEetsX5lmX6y65wpn7UrgdD+6spcqIzmj3JtWyAKAY9ePOJyOgbCKFxHpkQ==
-X-Received: by 2002:aca:2402:0:b0:364:88b:842c with SMTP id n2-20020aca2402000000b00364088b842cmr14495284oic.24.1674601674140;
-        Tue, 24 Jan 2023 15:07:54 -0800 (PST)
-Received: from [172.17.0.2] ([65.52.35.18])
-        by smtp.gmail.com with ESMTPSA id q9-20020a056830232900b006705829996fsm1488749otg.56.2023.01.24.15.07.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 15:07:53 -0800 (PST)
-Message-ID: <63d064c9.050a0220.39c8e.6c58@mx.google.com>
-Date:   Tue, 24 Jan 2023 15:07:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3446226641721294608=="
+        Tue, 24 Jan 2023 18:08:50 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D38B44DBF4;
+        Tue, 24 Jan 2023 15:08:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 82EA3B816A2;
+        Tue, 24 Jan 2023 23:08:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22F46C433A0;
+        Tue, 24 Jan 2023 23:08:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674601723;
+        bh=ZdLDi/+DVztZ9DhXm79AtQNOd374EXmydeSyFKj+5G8=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=f0+/z0CMJl2SpFlJbN7wllOJMQKobBqaSrtTN5aIgyr99P3xhOM3HmjQ/DRDN+w7V
+         EPvITU6fI+o8rm8pV8Ds43XsPgUFlPp6c6VmccxO66P3Bfao6Xmbno3XM7+8ArrkTJ
+         Jb0lkMcUnrUXuVWYOnhetXmS+NWAtstJsI4ss7gXFlhiHO89fQ//+TeWCbxY7clRkh
+         Duwr35kDQK3GBRN+ueUo1DD8fq4NGJqDwN375BE9DTjSXhZhgpQszEK6v2UsS0NXZ/
+         lG5dAlBAoOu9rI7HTIKdWSxa9y4ZEX4T037tgpU9jK6SjG2qJHQSe/u3jKxGQzNqyt
+         HPpnnpj5j6VMg==
+Received: by mail-ua1-f53.google.com with SMTP id i23so4171388ual.13;
+        Tue, 24 Jan 2023 15:08:43 -0800 (PST)
+X-Gm-Message-State: AO0yUKW4/nbyGVJIxcEb5kx2dXEesw3ziUlzpStmKqMy24Zxp98Ty6b0
+        V6wEsoDdlo084OCanMBuyBenzMYb54Hf7MlQmA==
+X-Google-Smtp-Source: AK7set+XHOdnzF4SR3B3+FFd0Ftxg5GKYZ4DgGcss8AsTbvEbnamxUgbBbYhk446PYIeFe15Ip5Ly7OjAHZFVOHDBvM=
+X-Received: by 2002:a05:6130:83:b0:655:5dfb:9d10 with SMTP id
+ x3-20020a056130008300b006555dfb9d10mr331055uaf.63.1674601721971; Tue, 24 Jan
+ 2023 15:08:41 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@gmail.com
-Subject: RE: [BlueZ] AUTHORS: modify email address
-In-Reply-To: <20230124220416.312697-1-brian.gix@gmail.com>
-References: <20230124220416.312697-1-brian.gix@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230124174714.2775680-1-neeraj.sanjaykale@nxp.com>
+ <20230124174714.2775680-3-neeraj.sanjaykale@nxp.com> <167458712396.1259484.1395941797664824881.robh@kernel.org>
+ <CABBYNZKAwp3Wqjrcp4k3wvjZSNfJhRWA5ytH7oNWXCG7V4k2ow@mail.gmail.com>
+In-Reply-To: <CABBYNZKAwp3Wqjrcp4k3wvjZSNfJhRWA5ytH7oNWXCG7V4k2ow@mail.gmail.com>
+From:   Rob Herring <robh@kernel.org>
+Date:   Tue, 24 Jan 2023 17:08:30 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJged+SwGy5b1w2Cx-dV06=LKb1mX9ykN7GrpR6P4gUVw@mail.gmail.com>
+Message-ID: <CAL_JsqJged+SwGy5b1w2Cx-dV06=LKb1mX9ykN7GrpR6P4gUVw@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth support
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>,
+        Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
+        jirislaby@kernel.org, sherry.sun@nxp.com, marcel@holtmann.org,
+        linux-serial@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        rohit.fule@nxp.com, devicetree@vger.kernel.org,
+        amitkumar.karwar@nxp.com, linux-bluetooth@vger.kernel.org,
+        edumazet@google.com, pabeni@redhat.com, gregkh@linuxfoundation.org,
+        netdev@vger.kernel.org, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, davem@davemloft.net,
+        johan.hedberg@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3446226641721294608==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Jan 24, 2023 at 3:44 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Rob, Tedd,
+>
+> On Tue, Jan 24, 2023 at 11:06 AM Rob Herring <robh@kernel.org> wrote:
+> >
+> >
+> > On Tue, 24 Jan 2023 23:17:13 +0530, Neeraj Sanjay Kale wrote:
+> > > Add binding document for generic and legacy NXP bluetooth
+> > > chipset.
+> > >
+> > > Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> > > ---
+> > >  .../bindings/net/bluetooth/nxp-bluetooth.yaml | 67 +++++++++++++++++++
+> > >  1 file changed, 67 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml
+> > >
+> >
+> > My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+> > on your patch (DT_CHECKER_FLAGS is new in v5.13):
+> >
+> > yamllint warnings/errors:
+> > ./Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml:67:1: [warning] too many blank lines (2 > 1) (empty-lines)
+> >
+> > dtschema/dtc warnings/errors:
+> > Error: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.example.dts:18.9-15 syntax error
+> > FATAL ERROR: Unable to parse input tree
+> > make[1]: *** [scripts/Makefile.lib:434: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.example.dtb] Error 1
+> > make[1]: *** Waiting for unfinished jobs....
+> > make: *** [Makefile:1508: dt_binding_check] Error 2
+>
+> I wonder if that is something that we could incorporate to our CI,
+> perhaps we can detect if the subject starts with dt-binding then we
+> attempt to make with DT_CHECKER_FLAGS, thoughts?
 
-This is automated email and please do not reply to this email!
+What CI is that?
 
-Dear submitter,
+Better to look at the diffstat of the patch than subject. Lots of
+subjects are wrong and I suspect there would be a fairly high
+correlation of wrong subjects to schema errors.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=715289
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.47 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      27.13 seconds
-BluezMake                     PASS      769.57 seconds
-MakeCheck                     PASS      11.24 seconds
-MakeDistcheck                 PASS      149.43 seconds
-CheckValgrind                 PASS      241.13 seconds
-CheckSmatch                   PASS      321.20 seconds
-bluezmakeextell               PASS      96.49 seconds
-IncrementalBuild              PASS      612.90 seconds
-ScanBuild                     PASS      970.85 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3446226641721294608==--
+Rob
