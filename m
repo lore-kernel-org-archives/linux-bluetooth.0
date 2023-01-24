@@ -2,187 +2,156 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 097C7C38142
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 06:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3BF9C54EED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 17:48:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232855AbjAXGiv (ORCPT
+        id S233995AbjAXRsG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 01:38:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55372 "EHLO
+        Tue, 24 Jan 2023 12:48:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231921AbjAXGit (ORCPT
+        with ESMTP id S233062AbjAXRsF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 01:38:49 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3685B4C31;
-        Mon, 23 Jan 2023 22:38:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674542328; x=1706078328;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nCllPZY6zrzrfh4fFvccqk4bgDomrRfcoK4PfShWMzQ=;
-  b=KwR+bIrJ8od/KfJySIUfd5lRGtkmRTNAajbNqPvP6sZ+BcsEgtBxkeA9
-   YjRHpiePxk+J/uFLLqwsAuYhB6RCJNYmEU39t+Z0KQE8LY7BLNfiNiqbC
-   Y/ZriBtPEGRrIRGjHC6XRdOJERIRdHvCNTQWME1QT/uVs87MM65Z9QWbU
-   9H/kD8tWryevzM17tE28vOzRssZ1Huno3Djx/YHFHF9ktB9JiOFV5qySg
-   6pYLCOpCuVj3du0kFN7xXPMBiAmhn7/V4P8tKahxwHOVZn20SOzrceDIw
-   cb/sCo37xD91h/AHPogJw/1QRfpgBexZBv/t3MCvHYxgiJ/Wv2hQVFqeB
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10599"; a="388584537"
-X-IronPort-AV: E=Sophos;i="5.97,241,1669104000"; 
-   d="scan'208";a="388584537"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2023 22:38:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10599"; a="639475752"
-X-IronPort-AV: E=Sophos;i="5.97,241,1669104000"; 
-   d="scan'208";a="639475752"
-Received: from lkp-server01.sh.intel.com (HELO 5646d64e7320) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 23 Jan 2023 22:38:43 -0800
-Received: from kbuild by 5646d64e7320 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pKCx8-0006D6-1U;
-        Tue, 24 Jan 2023 06:38:42 +0000
-Date:   Tue, 24 Jan 2023 14:38:37 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Francesco Dolcini <francesco@dolcini.it>, netdev@vger.kernel.org,
+        Tue, 24 Jan 2023 12:48:05 -0500
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2041.outbound.protection.outlook.com [40.107.7.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BB536FC6;
+        Tue, 24 Jan 2023 09:48:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HUDEA8Lxt/rOu1BtbgKH5Hm6/He2AaZIqC78r/Sbay0myuz6fLooBjugxwHcIi5Vgaj1LB70vTVGX21P2gMi945eJMmpSwQCs18g3Ue4QdzVrgibucBJawfDO8tfSNWnlVR/Ad5TCRVkWsbtEkgdvvrJnmLH3LWeVxUPVOhRXIga6/tDKfbghmeGox8dwFCHKZY1kEhF51AbZ9D7WH9lMBZ17vm5IldVpKozHNv+KWgJwn7+gDYmgIyBoMYigVthsd2W6cgO5S7pPA96SiaAJtZo4xijvyhrXRMsMlO/jZ+peZNALyDWotY63MbQmK+4b2drHfPS/oMpf/2CqyQvlQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FQ3b2QLhz7WRUQJs4C8t3KFBNDEodREWIhI58Em3PYI=;
+ b=lyfCntKQn3yRiGhxe4mDbN5Rvemju+n34JPDGGSrflViqCnMZP1affLE8eA5PUIXu0aDtseK9hHsdauLDUXC0CptDcZztu4tcoxlt9T8RO/t4uetK7vR6UzWYj2FyozdYOk8p5V9Qcat90fvIY5IBWZtDVYxfQQLPoRKd3my4w1BmNuCdapi2m0g3TOMjcTWEZvG81KT+z4Ez62eKqj8eNkSgzkRWb3hnm90Czsnn/AuLqZSxH5M+cWogC6j20/zFDCyfGcy+G6yhpLqG+4vkbCW7m+W6Poo7ihMiJcIOTmP68BH7rVvyKrRpCumvR8ICP7E1GqFFC2q7JVST536XQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FQ3b2QLhz7WRUQJs4C8t3KFBNDEodREWIhI58Em3PYI=;
+ b=jpOgMfUy13DngAecsIL9eEk54ly8Ddr8RnKPtAZNVv63NqY4h88/2PtT72paPhrTGFa7OTS3YFUCbIhPfHo17izpMH4K3jqZQv7mGMYA/4+3Y9qEFGdIEGteK4Wj1/brbsg1wIX4I4Me4IWfzo3/ZbeiYBFB8v+hjmeL/IcJqvY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
+ by AM0PR04MB7026.eurprd04.prod.outlook.com (2603:10a6:208:192::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.28; Tue, 24 Jan
+ 2023 17:48:01 +0000
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::f8fe:ab7c:ef5d:9189]) by AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::f8fe:ab7c:ef5d:9189%5]) with mapi id 15.20.6002.033; Tue, 24 Jan 2023
+ 17:48:01 +0000
+From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        Stefan Eichenberger <stefan.eichenberger@toradex.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Francesco Dolcini <francesco.dolcini@toradex.com>
-Subject: Re: [PATCH v1 3/4] Bluetooth: hci_mrvl: Add serdev support for
- 88W8997
-Message-ID: <202301241423.sEVD92vC-lkp@intel.com>
-References: <20230118122817.42466-4-francesco@dolcini.it>
+        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com, neeraj.sanjaykale@nxp.com
+Subject: [PATCH v1 0/3] Add support for NXP bluetooth chipsets
+Date:   Tue, 24 Jan 2023 23:17:11 +0530
+Message-Id: <20230124174714.2775680-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR02CA0008.apcprd02.prod.outlook.com
+ (2603:1096:4:194::12) To AM9PR04MB8603.eurprd04.prod.outlook.com
+ (2603:10a6:20b:43a::10)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118122817.42466-4-francesco@dolcini.it>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8603:EE_|AM0PR04MB7026:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1087160-f287-49f3-22cd-08dafe332330
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: P86tX+e0bNQ0DuxU5Q1v5BQaqOtloS7H/z2NZsiHvvcPmpzdqPFnZdZj0+KmeGgeFzgYMqSxUlmNIaaXNA53EOA79dogn4ZAKV19KZP4XwIoxqpOT/HYIsTzrUR2jolCOBWPBlaEiioCjJEEa+7uf2ktrRk9Xf3BV8LPeMf74IbEOt95XFZmKEAVFJyuBwJLJIScycdsfECPZJEkTqrtuiRleDWSwIOHdJADJtYNYZ/83QuQYKBlb+qckVB7oYkqStBaDQEcAWmjEZy9ug970/K0DNGzK2gcKJiG4ERdqnwyVrxszjYtelcYyS9gBk2VImPtsitOPZQi2p//0qwgfMRyxu1FsQthZkt4wmkaOEcCmpGkJux6wAAGhGpyBn7PI6ZxqKh4sAIWTC6FhzbY5IugN4+TB61CdbONIizNfsgv4e3aMaq7C+pIUTXu1rJ+Y8jeAR501ZXI0kjMyjSU19px3UrwECz2pvLNO+UKIhLUZTdAHs0Q+jGSVd/4ckXz2HyiBfCq2D5KXveOH2/K0E4Ix8FndmsIEAq286Upl+YBUDpqq3TUOgIIuSIm+agQd1a78pSrXBIAF9Csp0/U8IEjfqqkMSGoRyPHE2EeaLEmnGtVaiFxgY8kFd56iOA2yximrsFv1eROR7ckwfeuitKlgcRnmqcuvvpwZbGiqMSPYab7CivEIMUxNkizb7mr7+9aTD9YdI5EzJQXdqRSBywlR/X62UD2orwzyDivzd8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(376002)(396003)(39860400002)(136003)(451199015)(36756003)(86362001)(921005)(66556008)(66476007)(4326008)(66946007)(2906002)(8936002)(8676002)(5660300002)(7416002)(38350700002)(38100700002)(6666004)(52116002)(316002)(478600001)(6486002)(41300700001)(6506007)(26005)(83380400001)(2616005)(1076003)(186003)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GWbxvnBeEpmDUnJ6ApW5VcSx7ILJZsSbmqw9Aqc6NS8sAjBxDgYB7IlqJ+gB?=
+ =?us-ascii?Q?KmmA6QcfOBQFtjsglxUdlVnQnIiFEsBk+Dqz4wy+swdMqJdU5ADjNTFLqL0A?=
+ =?us-ascii?Q?F5s2p6z+ByLxRF0FrvAsd5cZgIxU0V1UonHxu9gO81MyVY5tFkGLEQK/rLuk?=
+ =?us-ascii?Q?AAry+MlAROPmrFmGMypiR1cgNtyGbBALSj/025ZBzI4HFh3kqnaZHJFtbPTa?=
+ =?us-ascii?Q?Ws533OVHe6ghRuPdEQVill9itMl8NLpoYntQnnj4y3iUWW1wK3F11H8iUz2O?=
+ =?us-ascii?Q?YRlHGOnnLks/xK9BG8YkTwN3aLAzzPLnmepl57E+pPc3JieDh8IuwBIhxxZ1?=
+ =?us-ascii?Q?YD90Q2pvkIrnNTAsqWUCTWpaxB8encRb3Qb3zTspT64kCsvfdNr+JTbLbNfo?=
+ =?us-ascii?Q?aqwpXJ1MK8+TjbsrM47zc/bagaFHfNhHbTZfM0WjUrSex8r9gHkWEiiTuJ0T?=
+ =?us-ascii?Q?es36usNEw6EyHaYvmYQucq9dhKozR78X2EXl5h4pK8aplVQ+7ndKgHnzLEO9?=
+ =?us-ascii?Q?fVwxiq3Gs4jVvndHexXj9mUwbSZKTp+7XGCJLptrapJatJdYaiJXyjGrMP5f?=
+ =?us-ascii?Q?4+9e5m5He57XEEMyd3563BaSqQK8Se4F4SGeYFZjZHMqC2JtENTgEG6vVXZG?=
+ =?us-ascii?Q?U7SUUvp3NMR4QONcNbXoP8JGIEGqgR3D+wA/wiv6zodwwbjzTObZcT340A00?=
+ =?us-ascii?Q?3JIGI7cB+WzgE9mrajbvxNncu81hjsTigAMIxSedskEsdFwg8CUI5XOudi4A?=
+ =?us-ascii?Q?3zD7lUEnhT1nPMS+hQjoGFSn7EEF9vQlltY9y6XS5142/Hpzd7dpVyab9JsF?=
+ =?us-ascii?Q?8a0cryS4hRguEDkJz9Izrl37JtGlx0/eB8TG2b/rM0w/S9enkuhycngrX2sb?=
+ =?us-ascii?Q?6EqFIxMLg/IuyG0dnH0IDpQ6eAFMYaHZz7Cn1imM46vgh48OK6YWu+4uWyJQ?=
+ =?us-ascii?Q?fiu6iuDVGDlwf8lcyjOPV18XVoi5i/OKyWeLfAW76fsHKKrPjwy/3G9lt7zD?=
+ =?us-ascii?Q?tZCc7+iM3sAnd+P8e/s1gfNf8WSrna/M4c2dqcgXljIVpGdH6SaTVCX5fRmr?=
+ =?us-ascii?Q?ZQOGJVjkTm1sFbE85lTHCUsu1TdgOXxz3M/pUshEDjST9NsxrRZ5LPJgbgxi?=
+ =?us-ascii?Q?baMWAAgvTmoAsR2/0VRUzJEcJ36au040eqtG0v09EvtO23/V7/e71Abx5pG4?=
+ =?us-ascii?Q?3vu70QqObYqOMrHkyxz0OJMTuuiEFjrKSezVNDGhI1VcCM0tY8S8Awe24N2e?=
+ =?us-ascii?Q?16jqOMDS1ncfzHIZi4cSaVbZNb/hoY0KUY6VSlIZ7/+pQWuWtpAWkutXaut0?=
+ =?us-ascii?Q?3l0JPkdlHAG1/qYxOFEdnJ53WzY97ETIC942RteRDGPqVeLbV5pGqlhl9CB0?=
+ =?us-ascii?Q?Sx9HypJAof3JbpwR5P/Y6rwPENCMyO5S4eApHW+7Q8tDr7+KljqaIz9dJFb7?=
+ =?us-ascii?Q?rT+zAofFA4JeZI9z0cMzlqi+U7pnaeuj5obwa7HrTBnHSBxUZ+VaU/bR2NxM?=
+ =?us-ascii?Q?ecFLAT1rtlIsJlqW3xy5Il6KBYhjj50OstAjrdBbx6GR5ZwOxoX2HGcq2Pj5?=
+ =?us-ascii?Q?LTKJIW+cZNxAbpF295E57gv9jY0SptM4L8LDwJYaUSrtYHVSEcMMxHGP4Cr9?=
+ =?us-ascii?Q?kg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1087160-f287-49f3-22cd-08dafe332330
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2023 17:48:01.6939
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gmGsVp55DAXbXq4VxqhWhM5Z0gwsyiCHvwAmqQLdO1lnIJlGmlv4TrPGy1N/jA6DDH4EQh4Qyv7M6oFlKfc+8JT2NOHaMuRLTn5ocPPER9A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7026
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Francesco,
+This patch adds a driver for NXP bluetooth chipsets.
+The driver is based on H4 protocol, and uses serdev
+APIs. It supports host to chip power save feature,
+which is signalled by the host by asserting break
+over UART TX lines, to put the chip into sleep state.
 
-Thank you for the patch! Perhaps something to improve:
+To support this feature, break_ctl has also been
+added to serdev-tty along with a new serdev API
+serdev_device_break_ctl().
 
-[auto build test WARNING on robh/for-next]
-[also build test WARNING on bluetooth-next/master bluetooth/master horms-ipvs/master net/master net-next/master linus/master v6.2-rc5 next-20230123]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+This driver is capable of downloading chip specific
+firmware, where user can either define the firmware
+file name in DTS file, or in the user-space config
+file. Each chip has a unique bootloader signature,
+and the driver is capable of selecting firmware file
+based on the signature received.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Francesco-Dolcini/dt-bindings-bluetooth-marvell-add-88W8997-DT-binding/20230118-210919
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-patch link:    https://lore.kernel.org/r/20230118122817.42466-4-francesco%40dolcini.it
-patch subject: [PATCH v1 3/4] Bluetooth: hci_mrvl: Add serdev support for 88W8997
-config: hexagon-randconfig-r021-20230123 (https://download.01.org/0day-ci/archive/20230124/202301241423.sEVD92vC-lkp@intel.com/config)
-compiler: clang version 16.0.0 (https://github.com/llvm/llvm-project 4196ca3278f78c6e19246e54ab0ecb364e37d66a)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/2ae116c8ad209e0bf11559519915e511c44c28be
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Francesco-Dolcini/dt-bindings-bluetooth-marvell-add-88W8997-DT-binding/20230118-210919
-        git checkout 2ae116c8ad209e0bf11559519915e511c44c28be
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash drivers/bluetooth/ lib/
+The document specifying device tree bindings for
+this driver is also included in this patch series.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
+Neeraj Sanjay Kale (3):
+  serdev: Add method to assert break
+  dt-bindings: net: bluetooth: Add NXP bluetooth support
+  Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets
 
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/bluetooth/hci_mrvl.c:12:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __raw_readb(PCI_IOBASE + addr);
-                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-                                                           ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-   #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-                                                     ^
-   In file included from drivers/bluetooth/hci_mrvl.c:12:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-                                                           ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-   #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-                                                     ^
-   In file included from drivers/bluetooth/hci_mrvl.c:12:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writeb(value, PCI_IOBASE + addr);
-                               ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-                                                         ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-                                                         ~~~~~~~~~~ ^
->> drivers/bluetooth/hci_mrvl.c:450:36: warning: unused variable 'mrvl_proto_8997' [-Wunused-const-variable]
-   static const struct hci_uart_proto mrvl_proto_8997 = {
-                                      ^
-   7 warnings generated.
-
-
-vim +/mrvl_proto_8997 +450 drivers/bluetooth/hci_mrvl.c
-
-   449	
- > 450	static const struct hci_uart_proto mrvl_proto_8997 = {
-   451		.id		= HCI_UART_MRVL,
-   452		.name		= "Marvell 8997",
-   453		.init_speed	= 115200,
-   454		.oper_speed	= 3000000,
-   455		.open		= mrvl_open,
-   456		.close		= mrvl_close,
-   457		.flush		= mrvl_flush,
-   458		.set_baudrate   = mrvl_set_baudrate,
-   459		.recv		= mrvl_recv,
-   460		.enqueue	= mrvl_enqueue,
-   461		.dequeue	= mrvl_dequeue,
-   462	};
-   463	
+ .../bindings/net/bluetooth/nxp-bluetooth.yaml |  45 +
+ MAINTAINERS                                   |   6 +
+ drivers/bluetooth/Kconfig                     |  11 +
+ drivers/bluetooth/Makefile                    |   1 +
+ drivers/bluetooth/btnxp.c                     | 947 ++++++++++++++++++
+ drivers/bluetooth/btnxp.h                     | 188 ++++
+ drivers/tty/serdev/core.c                     |  11 +
+ drivers/tty/serdev/serdev-ttyport.c           |  12 +
+ include/linux/serdev.h                        |   6 +
+ 9 files changed, 1227 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml
+ create mode 100644 drivers/bluetooth/btnxp.c
+ create mode 100644 drivers/bluetooth/btnxp.h
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.34.1
+
