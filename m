@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208AEC61D97
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 20:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 816F3C54E94
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 20:26:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233860AbjAXU0w (ORCPT
+        id S232988AbjAXU0y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 15:26:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40950 "EHLO
+        Tue, 24 Jan 2023 15:26:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233994AbjAXU0h (ORCPT
+        with ESMTP id S233999AbjAXU0j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 15:26:37 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6280F4F368
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 12:26:28 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id z9-20020a17090a468900b00226b6e7aeeaso15189289pjf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 12:26:28 -0800 (PST)
+        Tue, 24 Jan 2023 15:26:39 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D747B4ABCF
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 12:26:30 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id y3-20020a17090a390300b00229add7bb36so15168213pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 12:26:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1a3aYIMG+q2Z8SGiFbGIaEZYG93dx1y1tHc6w6IZngM=;
-        b=JBGxsSgvQYY7CWgP4HPbhxpri6Ai8IKiS4Cer9ymlosH0xmez/jszX/9E4xtJSLOnc
-         ThOCmSd2QfWkf+3TF9DL4zqOD/MO3W0xPjq6pbXyX8snFQRy7iq8le1lZ+yCKXMF0xnI
-         4rZMhIHo4wJi/V0b8T6nL/54EtZHg/t7FaN1DoHby8z+XrcyKYPJ3cSzo5kg3Ta/MunE
-         O5g5LG+uMRkYeJO824HgrzjU6j/WyjUiSGrBXRGFvzbEI753qbJ7vOkpY0ATYntaO0qQ
-         rM5rvLN3ZTMhmla0Q3Ba0PIwft9B/O9mMxpc14bv5BfKEpJjx42oLzMpISgB8Tze2h59
-         CsnA==
+        bh=TH46ocFCk8kezNiIY8wxOx17wU4aswIas0eNpONaepE=;
+        b=IGtMQru1m42wIKxC3mm0BhH77v4NQ9xQ1oiaPP+Z43egt9ZcQkWsNoVFb90350sMfC
+         40RILffGQm88Xqzeq6NnN5vr1+iiko6Q41Ov5Eo84s+83P/y72e5EhTPSzo+1NKjhecs
+         3/pGSwGcUDM+/LSaagJxjPYc66D4w1A4ATM0u13wVJr7WfLuZj7VPYDREs56iN3TKAxY
+         VRlX22rGcqn6GcVSxg9CfGQoTgQvlho+QkjXDyIf2B7fNO71a0/eALsWQSG/uXXKn2VN
+         0EPyH8AlKPZALs9By2WhUaB9LDOyP3UxWXEZVT+kv2NltkhMy19YYEXOiSx93tWSQvCu
+         1MGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1a3aYIMG+q2Z8SGiFbGIaEZYG93dx1y1tHc6w6IZngM=;
-        b=wrrG+8FUA6FUx5SrpM6/T0aGlGXGR4sdBvDVEvL41vrHu/OWRMolJDwa8x9aDIbhHZ
-         TYznXTzrcdMcJ8DjwdbQh9iUgWZ+nVC3SZ1cgPTGnR7xGBD7ZSsx/SiSBnsix2tPYYYp
-         NcRazjpS02ni5uvmsTJRFa1FzvQDCJzotNxH89bBS8cXLdWShJ6Zgj/TpaV6aOT3ib65
-         fwK6HfAPO2e7GDJLd+slFKQKJ/mxJ8dKu9AGwfyHlDD+oiJrvKEN4x+7w0h3Y0TUiLXY
-         FdVJiM9Y8W6nPC4bMFASnPWul6vnR4D2oV7ClysyKiqFH75aXN6hFAUbfz8KTSEfCr6L
-         IVzQ==
-X-Gm-Message-State: AFqh2kqk1S4kitIp32K50/GqRdJdVTJxdruLt6DI9HV4DpVxZwXzU1D2
-        WHxSoe7RFxArHSDlSXdvgU8K1ZvNDQLBYA==
-X-Google-Smtp-Source: AMrXdXs1dz0Aawvqy27qsxZRTPSITDDvBkz25wn9vu48jcHkAx0XboWh/6CqRGAzaMDBPoGQgc8V2g==
-X-Received: by 2002:a17:903:1355:b0:194:4339:112e with SMTP id jl21-20020a170903135500b001944339112emr26821925plb.60.1674591987233;
-        Tue, 24 Jan 2023 12:26:27 -0800 (PST)
+        bh=TH46ocFCk8kezNiIY8wxOx17wU4aswIas0eNpONaepE=;
+        b=au+Vlt4gr+d7ERGhJLu16x9l2uPQ+ImsZVhdgKEgJka4NoMYAhVRXhoptV4lj1SQC9
+         Ou1/v5qaJLMR6aEmYRroSpru0sdnVmog7tnaej8/IhNa+qdAqjOl3T4dSL6J16Iedt/I
+         TG4gpIvDnor/hT3odoa7XJAiVRcBxHBM7ykmSKQ+2ydpbEkEDvzv8zXMHpPSwQsLwQQB
+         Xq/gPgyMc1uutucoHi879kL1r3f3Gz+BxQ0aYPLxY2TK3dbBu2c06s3gJCzfi+4yIbkp
+         jJoLjcUAihkX5GsmtwHwozwKakKeLB7inuRhzjElQxDwvGYtxo48CL88jx6NPmEQFntR
+         5lrg==
+X-Gm-Message-State: AO0yUKX2a3uzlD9/yXWD2ZGFIz8kWSPBvXxXTFigWDOXeDgEf8fv46rF
+        qzUvdCJXVgZVnjfURRqjraf/156eDfnWeg==
+X-Google-Smtp-Source: AK7set+mOif9ka5GhSM9dONfmucFq8LZu6tC+c7YnEnQaM4TmXU0zBvSEb9vmJIrrzO6PGSvZEzHTw==
+X-Received: by 2002:a17:902:c40b:b0:196:15ad:91ea with SMTP id k11-20020a170902c40b00b0019615ad91eamr3777863plk.63.1674591989841;
+        Tue, 24 Jan 2023 12:26:29 -0800 (PST)
 Received: from fedora.. (97-126-124-199.tukw.qwest.net. [97.126.124.199])
-        by smtp.gmail.com with ESMTPSA id ju21-20020a170903429500b0019600b78487sm2108099plb.33.2023.01.24.12.26.26
+        by smtp.gmail.com with ESMTPSA id ju21-20020a170903429500b0019600b78487sm2108099plb.33.2023.01.24.12.26.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 12:26:26 -0800 (PST)
+        Tue, 24 Jan 2023 12:26:29 -0800 (PST)
 From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v4 07/13] mesh: Add Mesh Private Beacon server
-Date:   Tue, 24 Jan 2023 12:26:10 -0800
-Message-Id: <20230124202616.310544-8-brian.gix@gmail.com>
+Subject: [PATCH BlueZ v4 10/13] tools/mesh: Add support for Mesh Private Beacons
+Date:   Tue, 24 Jan 2023 12:26:13 -0800
+Message-Id: <20230124202616.310544-11-brian.gix@gmail.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230124202616.310544-1-brian.gix@gmail.com>
 References: <20230124202616.310544-1-brian.gix@gmail.com>
@@ -68,200 +68,193 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-This initial server supports only the Mesh Private Beacon and returns
-"Not Suppoerted" for Get/Set of Private GATT Proxy and Private Node
-Identity beacons.
+This allows generation of Mesh Private Beacon server commands, and
+recognition of the resulting Status messages.
 ---
- Makefile.mesh         |   1 +
- mesh/prv-beacon.h     |  36 +++++++++++++
- mesh/prvbeac-server.c | 123 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 160 insertions(+)
- create mode 100644 mesh/prv-beacon.h
- create mode 100644 mesh/prvbeac-server.c
+ tools/mesh-cfgclient.c |  9 ++++--
+ tools/mesh/cfgcli.c    | 62 +++++++++++++++++++++++++++++++++++-------
+ tools/mesh/util.c      |  3 ++
+ 3 files changed, 62 insertions(+), 12 deletions(-)
 
-diff --git a/Makefile.mesh b/Makefile.mesh
-index e18a169eb..63f085de1 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -36,6 +36,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/pb-adv.h mesh/pb-adv.c \
- 				mesh/keyring.h mesh/keyring.c \
- 				mesh/rpl.h mesh/rpl.c \
-+				mesh/prv-beacon.h mesh/prvbeac-server.c \
- 				mesh/mesh-defs.h
- pkglibexec_PROGRAMS += mesh/bluetooth-meshd
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index f3e9af8fb..50be82bcf 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -44,6 +44,8 @@
+ #define CFG_SRV_MODEL	0x0000
+ #define CFG_CLI_MODEL	0x0001
+ #define RPR_SVR_MODEL	0xFFFF0004
++#define PRV_BEACON_SVR	0x0008
++#define PRV_BEACON_CLI	0x0009
  
-diff --git a/mesh/prv-beacon.h b/mesh/prv-beacon.h
-new file mode 100644
-index 000000000..7be7a01c8
---- /dev/null
-+++ b/mesh/prv-beacon.h
-@@ -0,0 +1,36 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+struct mesh_node;
-+
-+#define PRV_BEACON_SRV_MODEL	SET_ID(SIG_VENDOR, 0x0008)
-+#define PRV_BEACON_CLI_MODEL	SET_ID(SIG_VENDOR, 0x0009)
-+
-+/* Private Beacon opcodes */
-+#define OP_PRIVATE_BEACON_GET			0x8060
-+#define OP_PRIVATE_BEACON_SET			0x8061
-+#define OP_PRIVATE_BEACON_STATUS		0x8062
-+#define OP_PRIVATE_GATT_PROXY_GET		0x8063
-+#define OP_PRIVATE_GATT_PROXY_SET		0x8064
-+#define OP_PRIVATE_GATT_PROXY_STATUS		0x8065
-+#define OP_PRIVATE_NODE_ID_GET			0x8066
-+#define OP_PRIVATE_NODE_ID_SET			0x8067
-+#define OP_PRIVATE_NODE_ID_STATUS		0x8068
-+
-+void prv_beacon_server_init(struct mesh_node *node, uint8_t ele_idx);
-diff --git a/mesh/prvbeac-server.c b/mesh/prvbeac-server.c
-new file mode 100644
-index 000000000..78ab94eb3
---- /dev/null
-+++ b/mesh/prvbeac-server.c
-@@ -0,0 +1,123 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <sys/time.h>
-+#include <ell/ell.h>
-+
-+#include "mesh/mesh-defs.h"
-+#include "mesh/node.h"
-+#include "mesh/net.h"
-+#include "mesh/appkey.h"
-+#include "mesh/model.h"
-+#include "mesh/mesh-config.h"
+ #define UNPROV_SCAN_MAX_SECS	300
+ 
+@@ -58,7 +60,7 @@
+ struct meshcfg_el {
+ 	const char *path;
+ 	uint8_t index;
+-	uint16_t mods[2];
++	uint16_t mods[4];
+ };
+ 
+ struct meshcfg_app {
+@@ -143,7 +145,8 @@ static struct meshcfg_app app = {
+ 	.ele = {
+ 		.path = "/mesh/cfgclient/ele0",
+ 		.index = 0,
+-		.mods = {CFG_SRV_MODEL, CFG_CLI_MODEL}
++		.mods = {CFG_SRV_MODEL, CFG_CLI_MODEL,
++					PRV_BEACON_SVR, PRV_BEACON_CLI}
+ 	}
+ };
+ 
+@@ -1889,6 +1892,8 @@ static bool mod_getter(struct l_dbus *dbus,
+ 	l_dbus_message_builder_enter_array(builder, "(qa{sv})");
+ 	build_model(builder, app.ele.mods[0], false, false);
+ 	build_model(builder, app.ele.mods[1], false, false);
++	build_model(builder, app.ele.mods[2], false, false);
++	build_model(builder, app.ele.mods[3], false, false);
+ 	l_dbus_message_builder_leave_array(builder);
+ 
+ 	return true;
+diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
+index ad572f694..4f6248e48 100644
+--- a/tools/mesh/cfgcli.c
++++ b/tools/mesh/cfgcli.c
+@@ -21,6 +21,7 @@
+ #include "src/shared/util.h"
+ 
+ #include "mesh/mesh-defs.h"
 +#include "mesh/prv-beacon.h"
-+
-+#define NOT_SUPPORTED 0x02
-+
-+static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
-+				uint16_t net_idx, const uint8_t *data,
-+				uint16_t size, const void *user_data)
-+{
-+	struct mesh_node *node = (struct mesh_node *) user_data;
-+	const uint8_t *pkt = data;
-+	uint32_t opcode;
-+	uint8_t msg[5];
-+	uint16_t n;
-+	uint8_t period = 0;
-+
-+	if (app_idx != APP_IDX_DEV_LOCAL)
-+		return false;
-+
-+	if (mesh_model_opcode_get(pkt, size, &opcode, &n)) {
-+		size -= n;
-+		pkt += n;
-+	} else
-+		return false;
-+
-+	l_debug("PRV-BEAC-SRV-opcode 0x%x size %u idx %3.3x", opcode, size,
-+								net_idx);
-+
-+	n = 0;
-+
-+	switch (opcode) {
-+	default:
-+		return false;
-+
-+	case OP_PRIVATE_BEACON_SET:
-+		if (size == 1)
-+			period = 0xff;
-+		else if (size == 2)
-+			period = pkt[1];
-+		else
+ #include "mesh/util.h"
+ #include "mesh/crypto.h"
+ 
+@@ -73,9 +74,12 @@ static struct cfg_cmd cmds[] = {
+ 	{ OP_APPKEY_UPDATE, OP_APPKEY_STATUS, "AppKeyUpdate" },
+ 	{ OP_DEV_COMP_GET, OP_DEV_COMP_STATUS, "DeviceCompositionGet" },
+ 	{ OP_DEV_COMP_STATUS, NO_RESPONSE, "DeviceCompositionStatus" },
+-	{ OP_CONFIG_BEACON_GET, OP_CONFIG_BEACON_STATUS, "BeaconGet" },
+-	{ OP_CONFIG_BEACON_SET, OP_CONFIG_BEACON_STATUS, "BeaconSet" },
+-	{ OP_CONFIG_BEACON_STATUS, NO_RESPONSE, "BeaconStatus" },
++	{ OP_CONFIG_BEACON_GET, OP_CONFIG_BEACON_STATUS, "SNBGet" },
++	{ OP_CONFIG_BEACON_SET, OP_CONFIG_BEACON_STATUS, "SNBSet" },
++	{ OP_CONFIG_BEACON_STATUS, NO_RESPONSE, "SNBStatus" },
++	{ OP_PRIVATE_BEACON_GET, OP_PRIVATE_BEACON_STATUS, "MPBGet" },
++	{ OP_PRIVATE_BEACON_SET, OP_PRIVATE_BEACON_STATUS, "MPBSet" },
++	{ OP_PRIVATE_BEACON_STATUS, NO_RESPONSE, "MPBStatus" },
+ 	{ OP_CONFIG_DEFAULT_TTL_GET, OP_CONFIG_DEFAULT_TTL_STATUS,
+ 							"DefaultTTLGet" },
+ 	{ OP_CONFIG_DEFAULT_TTL_SET, OP_CONFIG_DEFAULT_TTL_STATUS,
+@@ -617,12 +621,20 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 		if (len != 1)
+ 			return true;
+ 
+-		bt_shell_printf("Node %4.4x: Config Beacon Status 0x%02x\n",
++		bt_shell_printf("Node %4.4x: SecBeacon Status 0x%02x\n",
+ 				src, data[0]);
+ 
+ 		saved = mesh_db_node_set_beacon(src, data[0] != 0);
+ 		break;
+ 
++	case OP_PRIVATE_BEACON_STATUS:
++		if (len != 2)
 +			return true;
 +
-+		/* fall through */
-+
-+	case OP_PRIVATE_BEACON_GET:
-+		n = mesh_model_opcode_set(OP_PRIVATE_BEACON_STATUS, msg);
-+
-+		msg[n++] = NOT_SUPPORTED;
-+		msg[n++] = period;
-+
-+		l_debug("Get/Set Private Beacon (%d)", msg[n-2]);
++		bt_shell_printf("Node %4.4x: PrivBeacon Status 0x%02x 0x%02x\n",
++				src, data[0], data[1]);
 +		break;
 +
-+	case OP_PRIVATE_GATT_PROXY_SET:
-+		/* fall through */
-+	case OP_PRIVATE_GATT_PROXY_GET:
-+		n = mesh_model_opcode_set(OP_PRIVATE_GATT_PROXY_STATUS, msg);
-+		msg[n++] = NOT_SUPPORTED;
-+		break;
+ 	case OP_CONFIG_RELAY_STATUS:
+ 		if (len != 2)
+ 			return true;
+@@ -1345,7 +1357,7 @@ static void cmd_del_binding(int argc, char *argv[])
+ 	cmd_bind(OP_MODEL_APP_UNBIND, argc, argv);
+ }
+ 
+-static void cmd_beacon_set(int argc, char *argv[])
++static void cmd_snb_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[2 + 1];
+@@ -1367,11 +1379,41 @@ static void cmd_beacon_set(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+-static void cmd_beacon_get(int argc, char *argv[])
++static void cmd_mpb_set(int argc, char *argv[])
++{
++	uint16_t n;
++	uint8_t msg[2 + 2];
++	uint32_t parm_cnt;
 +
-+	case OP_PRIVATE_NODE_ID_SET:
-+		/* fall through */
-+	case OP_PRIVATE_NODE_ID_GET:
-+		n = mesh_model_opcode_set(OP_PRIVATE_NODE_ID_STATUS, msg);
-+		msg[n++] = NOT_SUPPORTED;
-+		break;
++	n = mesh_opcode_set(OP_PRIVATE_BEACON_SET, msg);
++
++	parm_cnt = read_input_parameters(argc, argv);
++	if (parm_cnt != 1  && parm_cnt != 2) {
++		bt_shell_printf("bad arguments\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +
-+	if (n)
-+		mesh_model_send(node, dst, src, APP_IDX_DEV_LOCAL, net_idx,
-+						DEFAULT_TTL, false, n, msg);
++	msg[n++] = parms[0];
 +
-+	return true;
++	if (parm_cnt == 2)
++		msg[n++] = parms[1];
++
++	if (!config_send(msg, n, OP_PRIVATE_BEACON_SET))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
 +}
 +
-+static void prvbec_srv_unregister(void *user_data)
++static void cmd_snb_get(int argc, char *argv[])
+ {
+ 	cmd_default(OP_CONFIG_BEACON_GET);
+ }
+ 
++static void cmd_mpb_get(int argc, char *argv[])
 +{
++	cmd_default(OP_PRIVATE_BEACON_GET);
 +}
 +
-+static const struct mesh_model_ops ops = {
-+	.unregister = prvbec_srv_unregister,
-+	.recv = prvbec_srv_pkt,
-+	.bind = NULL,
-+	.sub = NULL,
-+	.pub = NULL
-+};
-+
-+void prv_beacon_server_init(struct mesh_node *node, uint8_t ele_idx)
-+{
-+	l_debug("%2.2x", ele_idx);
-+	mesh_model_register(node, ele_idx, PRV_BEACON_SRV_MODEL, &ops, node);
-+}
+ static void cmd_ident_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+@@ -2077,10 +2119,10 @@ static const struct bt_shell_menu cfg_menu = {
+ 				"Set node identity state"},
+ 	{"ident-get", "<net_idx>", cmd_ident_get,
+ 				"Get node identity state"},
+-	{"beacon-set", "<state>", cmd_beacon_set,
+-				"Set node identity state"},
+-	{"beacon-get", NULL, cmd_beacon_get,
+-				"Get node beacon state"},
++	{"snb-set", "<state>", cmd_snb_set, "Set node SNB state"},
++	{"snb-get", NULL, cmd_snb_get, "Get node SNB state"},
++	{"mpb-set", "<state> <period>", cmd_mpb_set, "Set node MPB state"},
++	{"mpb-get", NULL, cmd_mpb_get, "Get node MPB state"},
+ 	{"relay-set", "<relay> <rexmt count> <rexmt steps>", cmd_relay_set,
+ 				"Set relay"},
+ 	{"relay-get", NULL, cmd_relay_get,
+diff --git a/tools/mesh/util.c b/tools/mesh/util.c
+index 29641439f..d8c47c0e9 100644
+--- a/tools/mesh/util.c
++++ b/tools/mesh/util.c
+@@ -20,6 +20,7 @@
+ #include "src/shared/util.h"
+ 
+ #include "mesh/mesh-defs.h"
++#include "mesh/prv-beacon.h"
+ 
+ #include "tools/mesh/util.h"
+ 
+@@ -137,6 +138,8 @@ const char *sig_model_string(uint16_t sig_model_id)
+ 	case 0x0001: return "Configuration Client";
+ 	case 0x0002: return "Health Server";
+ 	case 0x0003: return "Health Client";
++	case 0x0008: return "Private Beacon Server";
++	case 0x0009: return "Private Beacon Client";
+ 	case 0x1000: return "Generic OnOff Server";
+ 	case 0x1001: return "Generic OnOff Client";
+ 	case 0x1002: return "Generic Level Server";
 -- 
 2.39.1
 
