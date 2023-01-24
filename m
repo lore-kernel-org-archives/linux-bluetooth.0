@@ -2,84 +2,179 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8ACC54EED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 22:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A92AC61DA0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 22:17:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235123AbjAXWEw (ORCPT
+        id S235210AbjAXWRR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 17:04:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42690 "EHLO
+        Tue, 24 Jan 2023 17:17:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235142AbjAXWEt (ORCPT
+        with ESMTP id S233643AbjAXWRQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 17:04:49 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B1714FCD6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 14:04:27 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id 5so10821357plo.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 14:04:27 -0800 (PST)
+        Tue, 24 Jan 2023 17:17:16 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0EEEC50;
+        Tue, 24 Jan 2023 14:17:14 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id g13so25808216lfv.7;
+        Tue, 24 Jan 2023 14:17:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PjDKNnXKI4DZyDT6VREKL9OJAP8DQS9re1UFtOGenYY=;
-        b=Triw851jDp5rCcwa38GvZnX9afmN3AdhHiwRYVFQYxUj1eHIJsxU5Bujl9svEcFE1F
-         kQH1PEomST7IRMEPz2+AqvyOTX6PtPE2ubRAOHh6q/L5SULqTLaFvU4qrOhC9qectat/
-         Fqjiu8CZUTCg4AxAkfvmWAlUpeFvsWo0Qo93BcBIIByaHg0UekeSW9p3y/vvMwMlzYsP
-         ZXhnhD3lU3S3awPmru2uU1KQyEsxTxKrxCP2cmxf6g/gO85FnXo9TtZZCYWqC0xt7dtL
-         54HF+0pArMYY5/E+RU0GaqQZM068TVuMPeSEuSbbRymyQkR4qk1aP7FSgyrORb0TkJAv
-         Ihnw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mhJX74SyXpEe21VKvtmYRp6Q7Ngr55XoXxrS6GHTUaM=;
+        b=lIOkQn3uy7/I/z2v8Q85L0rLBL7SX9DrJ6x65AriCaUZU12w6lgUwTBkK9bJzvqsbV
+         AGimKEMkNWeNnOND/KABFJLrBc8vXvJ3gqpf+vIRKGOA31TqNm+YVIGpsXKYPx8jgce3
+         2ILeWIph/JftA1Yj53Sq1jDrCHnyp4E6ua4ibXfT3nMhNt9vW7/ouWyn3wgZiGJAPOCU
+         B0LAhuEYvIUp/8lluMUpB0iSfxvIbNcR+tD+q69FIabOyc1m8n7KQnJC5Qj84AbRi3fv
+         bZ+sAwmoB7z60IocecZ6Y9UWh/bV5WXO+rcK7a+EUWW3bwdpDEYgf3rbMGN11Ap1Nywv
+         xEWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=PjDKNnXKI4DZyDT6VREKL9OJAP8DQS9re1UFtOGenYY=;
-        b=Z3hK1+zNo74VG4toO8LtH8erG9AEG4bbdkVZcsUQWVXAaVcfPYZhA/Hn2Pu5AjJsp5
-         ngoOnWRfrRVAbVsyTHNKvk+mXpjaxOHeBArvJVI1/MiZupekGm2sCGJdfKC1W5UXNbgL
-         xL5RxTpSrhlTiLq7p7r/vtkMO7jfqjGdiZ5frtd7512F5dZ6VsxTpLjJAVfhOQXGxgKZ
-         YJGRGrCiIxNP9qd03OPQe6fSPeqhFm84wMIdTdtPgdGRzcpNPbsn6dPCiXXb41tNoE3C
-         QR+GGo9hVbgNCqhmGhTVnkVxRscYgMTWKIbjUImZTnWZZBuUzKa3/zkTDAZsoic98eki
-         bmSQ==
-X-Gm-Message-State: AFqh2kqWJ+usr74KtAkZDl9YD5+cTmQnmMwQhtnssoXiaOCqLR+xdktB
-        FE+EqBHfLAuumq+y2LRj0/GyZeu6F1d9Zw==
-X-Google-Smtp-Source: AMrXdXsFCAMv5vfotu7OzYgA7YbG7Kjh0l6nSPgBSjkJdXpdwkUiaXgOFVf1WeyVg3yLPD4naUepVQ==
-X-Received: by 2002:a05:6a21:2d88:b0:b8:7b63:252a with SMTP id ty8-20020a056a212d8800b000b87b63252amr27035065pzb.51.1674597865087;
-        Tue, 24 Jan 2023 14:04:25 -0800 (PST)
-Received: from fedora.. (97-126-124-199.tukw.qwest.net. [97.126.124.199])
-        by smtp.gmail.com with ESMTPSA id x18-20020aa79572000000b00581d62be96dsm2070958pfq.197.2023.01.24.14.04.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 14:04:24 -0800 (PST)
-From:   Brian Gix <brian.gix@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, Brian Gix <brian.gix@gmail.com>
-Subject: [PATCH BlueZ] AUTHORS: modify email address
-Date:   Tue, 24 Jan 2023 14:04:16 -0800
-Message-Id: <20230124220416.312697-1-brian.gix@gmail.com>
-X-Mailer: git-send-email 2.39.1
+        bh=mhJX74SyXpEe21VKvtmYRp6Q7Ngr55XoXxrS6GHTUaM=;
+        b=e3Jz8gFwQlrG0xZ9Gp9IC6nE/IZgKdy9pfV7angGzNagGYgbslIUfLPssX0t4G76cD
+         9sn3rGXOzBgKL1YhLDH8tOLSmmMpynD3grXXdpKgCfapuuYj4qARGqsI3g2nhuvPXAvW
+         +p28KOox72oj9jsbsLwCuYznGBhVvzRKEYWyN3CFmn1UDNophaykEvjCHlgN2MMJwKaC
+         QyjEHemMePj7tXOVfIQqWLmoyBKviv6z33irNczgwwePsT/UqiSDihKTJKKv7o2xHn6I
+         2o4o+BkOep8j8tGwvn5Cwi7RQ566Hv2rZT94ZPCH8lvGByWyfSnIEoCz62PAQ21p4qB8
+         Xrfg==
+X-Gm-Message-State: AFqh2krEwZn9JM0MbP3DGk3fKUHYwVZKs4j3GwjI7XV9N9rfZtr4l1DA
+        G4Thjdz2OE95rCov/oto+4B6sFm3ecVDeEMThDo=
+X-Google-Smtp-Source: AMrXdXvh8qx1S3WVzfwHHfZuCvapRPm6sYF0vH2DvRk+gdpioHeoX/MqsquNKQupOjAQ08YfWwH8Fjy+DHTSajvohcw=
+X-Received: by 2002:ac2:4bd3:0:b0:4cc:789a:dac8 with SMTP id
+ o19-20020ac24bd3000000b004cc789adac8mr3098851lfq.198.1674598633139; Tue, 24
+ Jan 2023 14:17:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230124174714.2775680-1-neeraj.sanjaykale@nxp.com> <20230124174714.2775680-2-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20230124174714.2775680-2-neeraj.sanjaykale@nxp.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 24 Jan 2023 14:17:01 -0800
+Message-ID: <CABBYNZJ3CVO4fxN55YQ_d+Z2kvxR5H31cEG_CPxmVXfcsSGWeg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/3] serdev: Add method to assert break
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, gregkh@linuxfoundation.org,
+        jirislaby@kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- AUTHORS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Neeraj,
 
-diff --git a/AUTHORS b/AUTHORS
-index 291d9b049..45572d1db 100644
---- a/AUTHORS
-+++ b/AUTHORS
-@@ -53,7 +53,7 @@ Daniel Orstadius <daniel.orstadius@gmail.com>
- Anderson Briglia <anderson.briglia@openbossa.org>
- Anderson Lizardo <anderson.lizardo@openbossa.org>
- Bruna Moreira <bruna.moreira@openbossa.org>
--Brian Gix <brian.gix@intel.com>
-+Brian Gix <brian.gix@gmail.com>
- Andre Guedes <andre.guedes@openbossa.org>
- Sheldon Demario <sheldon.demario@openbossa.org>
- Lucas De Marchi <lucas.demarchi@profusion.mobi>
+On Tue, Jan 24, 2023 at 9:48 AM Neeraj Sanjay Kale
+<neeraj.sanjaykale@nxp.com> wrote:
+>
+> Adds serdev_device_break_ctl() and an implementation for ttyport.
+>
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+>  drivers/tty/serdev/core.c           | 11 +++++++++++
+>  drivers/tty/serdev/serdev-ttyport.c | 12 ++++++++++++
+>  include/linux/serdev.h              |  6 ++++++
+>  3 files changed, 29 insertions(+)
+>
+> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+> index 0180e1e4e75d..26321ad7e71d 100644
+> --- a/drivers/tty/serdev/core.c
+> +++ b/drivers/tty/serdev/core.c
+> @@ -405,6 +405,17 @@ int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
+>  }
+>  EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
+>
+> +int serdev_device_break_ctl(struct serdev_device *serdev, int break_state)
+> +{
+> +       struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +       if (!ctrl || !ctrl->ops->break_ctl)
+> +               return -ENOTSUPP;
+> +
+> +       return ctrl->ops->break_ctl(ctrl, break_state);
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_break_ctl);
+> +
+>  static int serdev_drv_probe(struct device *dev)
+>  {
+>         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
+> diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+> index d367803e2044..847b1f71ab73 100644
+> --- a/drivers/tty/serdev/serdev-ttyport.c
+> +++ b/drivers/tty/serdev/serdev-ttyport.c
+> @@ -247,6 +247,17 @@ static int ttyport_set_tiocm(struct serdev_controller *ctrl, unsigned int set, u
+>         return tty->ops->tiocmset(tty, set, clear);
+>  }
+>
+> +static int ttyport_break_ctl(struct serdev_controller *ctrl, unsigned int break_state)
+> +{
+> +       struct serport *serport = serdev_controller_get_drvdata(ctrl);
+> +       struct tty_struct *tty = serport->tty;
+> +
+> +       if (!tty->ops->break_ctl)
+> +               return -ENOTSUPP;
+> +
+> +       return tty->ops->break_ctl(tty, break_state);
+> +}
+> +
+>  static const struct serdev_controller_ops ctrl_ops = {
+>         .write_buf = ttyport_write_buf,
+>         .write_flush = ttyport_write_flush,
+> @@ -259,6 +270,7 @@ static const struct serdev_controller_ops ctrl_ops = {
+>         .wait_until_sent = ttyport_wait_until_sent,
+>         .get_tiocm = ttyport_get_tiocm,
+>         .set_tiocm = ttyport_set_tiocm,
+> +       .break_ctl = ttyport_break_ctl,
+>  };
+>
+>  struct device *serdev_tty_port_register(struct tty_port *port,
+> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+> index 66f624fc618c..01b5b8f308cb 100644
+> --- a/include/linux/serdev.h
+> +++ b/include/linux/serdev.h
+> @@ -92,6 +92,7 @@ struct serdev_controller_ops {
+>         void (*wait_until_sent)(struct serdev_controller *, long);
+>         int (*get_tiocm)(struct serdev_controller *);
+>         int (*set_tiocm)(struct serdev_controller *, unsigned int, unsigned int);
+> +       int (*break_ctl)(struct serdev_controller *, unsigned int);
+
+Looks like these callbacks don't have any documentation, not sure if
+that is because the operation itself is self explanatory, anyway I
+hope someone can review this from serdev before it can be merged into
+bluetooth-next.
+
+>  };
+>
+>  /**
+> @@ -202,6 +203,7 @@ int serdev_device_write_buf(struct serdev_device *, const unsigned char *, size_
+>  void serdev_device_wait_until_sent(struct serdev_device *, long);
+>  int serdev_device_get_tiocm(struct serdev_device *);
+>  int serdev_device_set_tiocm(struct serdev_device *, int, int);
+> +int serdev_device_break_ctl(struct serdev_device *, int);
+>  void serdev_device_write_wakeup(struct serdev_device *);
+>  int serdev_device_write(struct serdev_device *, const unsigned char *, size_t, long);
+>  void serdev_device_write_flush(struct serdev_device *);
+> @@ -255,6 +257,10 @@ static inline int serdev_device_set_tiocm(struct serdev_device *serdev, int set,
+>  {
+>         return -ENOTSUPP;
+>  }
+> +static inline int serdev_device_break_ctl(struct serdev_device *serdev, int break_state)
+> +{
+> +       return -ENOTSUPP;
+> +}
+>  static inline int serdev_device_write(struct serdev_device *sdev, const unsigned char *buf,
+>                                       size_t count, unsigned long timeout)
+>  {
+> --
+> 2.34.1
+>
+
+
 -- 
-2.39.1
-
+Luiz Augusto von Dentz
