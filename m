@@ -2,179 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A92AC61DA0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 22:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2E4C54E94
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Jan 2023 23:08:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235210AbjAXWRR (ORCPT
+        id S230160AbjAXXIB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 17:17:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
+        Tue, 24 Jan 2023 18:08:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233643AbjAXWRQ (ORCPT
+        with ESMTP id S229715AbjAXXIA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 17:17:16 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0EEEC50;
-        Tue, 24 Jan 2023 14:17:14 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id g13so25808216lfv.7;
-        Tue, 24 Jan 2023 14:17:14 -0800 (PST)
+        Tue, 24 Jan 2023 18:08:00 -0500
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14C83754D
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 15:07:54 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id d188so14809577oia.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 15:07:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mhJX74SyXpEe21VKvtmYRp6Q7Ngr55XoXxrS6GHTUaM=;
-        b=lIOkQn3uy7/I/z2v8Q85L0rLBL7SX9DrJ6x65AriCaUZU12w6lgUwTBkK9bJzvqsbV
-         AGimKEMkNWeNnOND/KABFJLrBc8vXvJ3gqpf+vIRKGOA31TqNm+YVIGpsXKYPx8jgce3
-         2ILeWIph/JftA1Yj53Sq1jDrCHnyp4E6ua4ibXfT3nMhNt9vW7/ouWyn3wgZiGJAPOCU
-         B0LAhuEYvIUp/8lluMUpB0iSfxvIbNcR+tD+q69FIabOyc1m8n7KQnJC5Qj84AbRi3fv
-         bZ+sAwmoB7z60IocecZ6Y9UWh/bV5WXO+rcK7a+EUWW3bwdpDEYgf3rbMGN11Ap1Nywv
-         xEWw==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EWZkb5dTuQey5hR+Ex537evUJ1+GwgrKughkd86OrXY=;
+        b=HfNJ1/qpfVuc+kfpfnZCRozAuntWt3Y3zUP0HYp8lwsCNnUw6u68qgQZSxe+tlymop
+         oo2Fxb/9lKxMDaLMHVUBn6XjWGexuC1tPv5TI5N3crGGP+GuyOqiHlxavdxpNyOa3ntV
+         1o1U0oVxXf3zSGDm9E2C+w6dU5DiVyjs7Tmkk6xhUIJ+s9PoCZv/Fl4VChbVBb23QnQh
+         8Nideifyxqi49zxv014tPlKECh4QHm7Kdu8XyUseYpvtfzX4jjO3mgVxWZGYRseiEDLw
+         m+WbdZrf5MkB9U+ily1uUS+wRbWn1H6+aUeomNwnYehTBLTxuDpwftYcmUtkpwsq9Nbr
+         MeTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mhJX74SyXpEe21VKvtmYRp6Q7Ngr55XoXxrS6GHTUaM=;
-        b=e3Jz8gFwQlrG0xZ9Gp9IC6nE/IZgKdy9pfV7angGzNagGYgbslIUfLPssX0t4G76cD
-         9sn3rGXOzBgKL1YhLDH8tOLSmmMpynD3grXXdpKgCfapuuYj4qARGqsI3g2nhuvPXAvW
-         +p28KOox72oj9jsbsLwCuYznGBhVvzRKEYWyN3CFmn1UDNophaykEvjCHlgN2MMJwKaC
-         QyjEHemMePj7tXOVfIQqWLmoyBKviv6z33irNczgwwePsT/UqiSDihKTJKKv7o2xHn6I
-         2o4o+BkOep8j8tGwvn5Cwi7RQ566Hv2rZT94ZPCH8lvGByWyfSnIEoCz62PAQ21p4qB8
-         Xrfg==
-X-Gm-Message-State: AFqh2krEwZn9JM0MbP3DGk3fKUHYwVZKs4j3GwjI7XV9N9rfZtr4l1DA
-        G4Thjdz2OE95rCov/oto+4B6sFm3ecVDeEMThDo=
-X-Google-Smtp-Source: AMrXdXvh8qx1S3WVzfwHHfZuCvapRPm6sYF0vH2DvRk+gdpioHeoX/MqsquNKQupOjAQ08YfWwH8Fjy+DHTSajvohcw=
-X-Received: by 2002:ac2:4bd3:0:b0:4cc:789a:dac8 with SMTP id
- o19-20020ac24bd3000000b004cc789adac8mr3098851lfq.198.1674598633139; Tue, 24
- Jan 2023 14:17:13 -0800 (PST)
+        bh=EWZkb5dTuQey5hR+Ex537evUJ1+GwgrKughkd86OrXY=;
+        b=eOJ2FS+jrpj0r4klr2fsl76YSxJq4CK0ZtjFUllpc/dsx0knTg4xcYrclZ7sVJvYt0
+         qocSbgzAxOFGE6IgV0TvXnjbSCV0M+D+FuCpDbjUtYcWFDle2fE0J98+HBVcylyJVjQj
+         1SWW8HvT3lZ7sIg1VIlSrAUVeHBZ4xGAgmoxGJkwSqkTwZSofJkN6WH/MXlJPie0lBDq
+         SDdWNNpbltMkex6Rz2a38gT842+WvWY5HrdiRvvOY7BjtnKo9V2ZbV591L7H8QzN3DIE
+         UiF1kjbTmOThAlo7+KZXfJYadlfXQclQQamJywfmfsqHY25vIHTL+aIOhmMC6zjuNahm
+         YBTA==
+X-Gm-Message-State: AFqh2kq0TNwwSYfLACUHTYEwbcvLXE5adYicaj1AqAxYumq8hZusuAjK
+        FsysBBQ6NL7MLy8eA5kTTQO3OnOjLzc=
+X-Google-Smtp-Source: AMrXdXtPTrylllplYUpMEetsX5lmX6y65wpn7UrgdD+6spcqIzmj3JtWyAKAY9ePOJyOgbCKFxHpkQ==
+X-Received: by 2002:aca:2402:0:b0:364:88b:842c with SMTP id n2-20020aca2402000000b00364088b842cmr14495284oic.24.1674601674140;
+        Tue, 24 Jan 2023 15:07:54 -0800 (PST)
+Received: from [172.17.0.2] ([65.52.35.18])
+        by smtp.gmail.com with ESMTPSA id q9-20020a056830232900b006705829996fsm1488749otg.56.2023.01.24.15.07.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 15:07:53 -0800 (PST)
+Message-ID: <63d064c9.050a0220.39c8e.6c58@mx.google.com>
+Date:   Tue, 24 Jan 2023 15:07:53 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3446226641721294608=="
 MIME-Version: 1.0
-References: <20230124174714.2775680-1-neeraj.sanjaykale@nxp.com> <20230124174714.2775680-2-neeraj.sanjaykale@nxp.com>
-In-Reply-To: <20230124174714.2775680-2-neeraj.sanjaykale@nxp.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 24 Jan 2023 14:17:01 -0800
-Message-ID: <CABBYNZJ3CVO4fxN55YQ_d+Z2kvxR5H31cEG_CPxmVXfcsSGWeg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] serdev: Add method to assert break
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, gregkh@linuxfoundation.org,
-        jirislaby@kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@gmail.com
+Subject: RE: [BlueZ] AUTHORS: modify email address
+In-Reply-To: <20230124220416.312697-1-brian.gix@gmail.com>
+References: <20230124220416.312697-1-brian.gix@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Neeraj,
+--===============3446226641721294608==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 24, 2023 at 9:48 AM Neeraj Sanjay Kale
-<neeraj.sanjaykale@nxp.com> wrote:
->
-> Adds serdev_device_break_ctl() and an implementation for ttyport.
->
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
->  drivers/tty/serdev/core.c           | 11 +++++++++++
->  drivers/tty/serdev/serdev-ttyport.c | 12 ++++++++++++
->  include/linux/serdev.h              |  6 ++++++
->  3 files changed, 29 insertions(+)
->
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index 0180e1e4e75d..26321ad7e71d 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -405,6 +405,17 @@ int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
->  }
->  EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
->
-> +int serdev_device_break_ctl(struct serdev_device *serdev, int break_state)
-> +{
-> +       struct serdev_controller *ctrl = serdev->ctrl;
-> +
-> +       if (!ctrl || !ctrl->ops->break_ctl)
-> +               return -ENOTSUPP;
-> +
-> +       return ctrl->ops->break_ctl(ctrl, break_state);
-> +}
-> +EXPORT_SYMBOL_GPL(serdev_device_break_ctl);
-> +
->  static int serdev_drv_probe(struct device *dev)
->  {
->         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-> diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
-> index d367803e2044..847b1f71ab73 100644
-> --- a/drivers/tty/serdev/serdev-ttyport.c
-> +++ b/drivers/tty/serdev/serdev-ttyport.c
-> @@ -247,6 +247,17 @@ static int ttyport_set_tiocm(struct serdev_controller *ctrl, unsigned int set, u
->         return tty->ops->tiocmset(tty, set, clear);
->  }
->
-> +static int ttyport_break_ctl(struct serdev_controller *ctrl, unsigned int break_state)
-> +{
-> +       struct serport *serport = serdev_controller_get_drvdata(ctrl);
-> +       struct tty_struct *tty = serport->tty;
-> +
-> +       if (!tty->ops->break_ctl)
-> +               return -ENOTSUPP;
-> +
-> +       return tty->ops->break_ctl(tty, break_state);
-> +}
-> +
->  static const struct serdev_controller_ops ctrl_ops = {
->         .write_buf = ttyport_write_buf,
->         .write_flush = ttyport_write_flush,
-> @@ -259,6 +270,7 @@ static const struct serdev_controller_ops ctrl_ops = {
->         .wait_until_sent = ttyport_wait_until_sent,
->         .get_tiocm = ttyport_get_tiocm,
->         .set_tiocm = ttyport_set_tiocm,
-> +       .break_ctl = ttyport_break_ctl,
->  };
->
->  struct device *serdev_tty_port_register(struct tty_port *port,
-> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-> index 66f624fc618c..01b5b8f308cb 100644
-> --- a/include/linux/serdev.h
-> +++ b/include/linux/serdev.h
-> @@ -92,6 +92,7 @@ struct serdev_controller_ops {
->         void (*wait_until_sent)(struct serdev_controller *, long);
->         int (*get_tiocm)(struct serdev_controller *);
->         int (*set_tiocm)(struct serdev_controller *, unsigned int, unsigned int);
-> +       int (*break_ctl)(struct serdev_controller *, unsigned int);
+This is automated email and please do not reply to this email!
 
-Looks like these callbacks don't have any documentation, not sure if
-that is because the operation itself is self explanatory, anyway I
-hope someone can review this from serdev before it can be merged into
-bluetooth-next.
+Dear submitter,
 
->  };
->
->  /**
-> @@ -202,6 +203,7 @@ int serdev_device_write_buf(struct serdev_device *, const unsigned char *, size_
->  void serdev_device_wait_until_sent(struct serdev_device *, long);
->  int serdev_device_get_tiocm(struct serdev_device *);
->  int serdev_device_set_tiocm(struct serdev_device *, int, int);
-> +int serdev_device_break_ctl(struct serdev_device *, int);
->  void serdev_device_write_wakeup(struct serdev_device *);
->  int serdev_device_write(struct serdev_device *, const unsigned char *, size_t, long);
->  void serdev_device_write_flush(struct serdev_device *);
-> @@ -255,6 +257,10 @@ static inline int serdev_device_set_tiocm(struct serdev_device *serdev, int set,
->  {
->         return -ENOTSUPP;
->  }
-> +static inline int serdev_device_break_ctl(struct serdev_device *serdev, int break_state)
-> +{
-> +       return -ENOTSUPP;
-> +}
->  static inline int serdev_device_write(struct serdev_device *sdev, const unsigned char *buf,
->                                       size_t count, unsigned long timeout)
->  {
-> --
-> 2.34.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=715289
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.47 seconds
+GitLint                       PASS      0.27 seconds
+BuildEll                      PASS      27.13 seconds
+BluezMake                     PASS      769.57 seconds
+MakeCheck                     PASS      11.24 seconds
+MakeDistcheck                 PASS      149.43 seconds
+CheckValgrind                 PASS      241.13 seconds
+CheckSmatch                   PASS      321.20 seconds
+bluezmakeextell               PASS      96.49 seconds
+IncrementalBuild              PASS      612.90 seconds
+ScanBuild                     PASS      970.85 seconds
 
 
--- 
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3446226641721294608==--
