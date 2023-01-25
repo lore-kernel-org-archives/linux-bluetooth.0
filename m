@@ -2,115 +2,95 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF2BC61D9D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Jan 2023 19:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6478FC54E94
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Jan 2023 21:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234966AbjAYTYP (ORCPT
+        id S236226AbjAYVMj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Jan 2023 14:24:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        Wed, 25 Jan 2023 16:12:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234990AbjAYTYG (ORCPT
+        with ESMTP id S236283AbjAYVM0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Jan 2023 14:24:06 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521172696;
-        Wed, 25 Jan 2023 11:24:05 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id g13so30642112lfv.7;
-        Wed, 25 Jan 2023 11:24:05 -0800 (PST)
+        Wed, 25 Jan 2023 16:12:26 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B65E54209
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jan 2023 13:12:15 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id e11-20020a17090a77cb00b0022925dd66d3so1634010pjs.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Jan 2023 13:12:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EAJi7cEGTjWV9IwRKrSvkgUo30I57ewaSMmGfmlLHz8=;
-        b=ApzBh8gBTYGfEWKkWdM/Y4W/yfXXkI+4ImSbMg90yw+tjGtOcGF7SZotKBxDJbIxAP
-         3cdkiQAmacyGU+Hy/NdGgFPMXaxOTSVpXuL6h6Q+TWCDzJ5SG1PU2Jm3Zz3aNb9wf9SC
-         dBPf2JxjtQ1+mPgEULT+B8LPFCFLVdtnKZFO5+jHxF1K8YYwPOG9STr6CO4DKn/DuJcx
-         l8N8KmQRqQ3QguZy2NHFoU7zhazTHmqXQ/LWTiWuAIbuHQlU75xLQWTIcxdy0iDcJqNb
-         uIRp0v07jU67lbeQ90jn0Li/zW4Z5KIBahG4S76OxnNRZalXQiMVx0yATN4iqaCpbUzo
-         pCCg==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V7hcBGquDXE1ItKYAPtHX4Q2dU+QIoSg4FK+T/D54PA=;
+        b=L3NS8SHVeGfpP8K/JnRDmG6rwnuTD7bUQPX9vwPg3CHqHUok3RLjFxC0zFNpqDnaeh
+         Hx93o78ZU46ooMSpQw6aRrqirTJde4WdlhK4xSLWkZNygnuWtZpcF98c/y/1QUvGfyZJ
+         FqsqDPg0g+TI3Lw0tnqtvMnoXN+uMo0PNhg++KqF8iThWlGYxvVHP7lsfsgp9g5TgSee
+         X1abd54KYFSDbLmoglzJSriOoi7uC4RZlxo6NJCVHpj0lB8fKFZ7YExlWS5Zw4sJroSJ
+         uUtTpP1jcy1TC2tsAruW+WUDLrjO+nXEaFFQmHBtofDQhyYgAUHMhtg7kb4FKjbREwOn
+         Etcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EAJi7cEGTjWV9IwRKrSvkgUo30I57ewaSMmGfmlLHz8=;
-        b=mOqyyiQ+tPAe8y9a8UAUBjCcjper7cpATSI9G1Yf6kRS/lOf31vIW1otU/DsNTW+OK
-         0b2Lro8qMo1aolKzaxPAp9HgsZpJGZey610IhI5pzoDQlzk/yQ+tCIQ1/TCh8Xord/Zj
-         ogeAAvYuk8U866WomuB+/66Pnw/lb1yGGmSC4Zuqyx+wtns88aNhGeLEaw1KcwZSPm55
-         Y/QACpKH7kzXnsTe2WGbrUbLd301Kcv6m4bYEFJvJ//USdYjDp0DGEdDEQu00JodvUS5
-         H9w3XLcHfG2kJADCFXKaXFB1dmmLjVhHLuiWEj7gHCYup3vKd2O5Vjo4RD1TOgVweY38
-         pPAw==
-X-Gm-Message-State: AFqh2kpMGc+5LQ7o5cY1moouXuaB3vywDYO9SKnX+73h/jMPA2wxoaeO
-        53oR84W8DXPpUvRib1501JXM0mHH9eMQeHkcNDs=
-X-Google-Smtp-Source: AMrXdXteIrzvZmGI6O5UtF7QO0OPrziTlpj1+GX6WXGxrIX3DEQLDEJ+bwSCrGld4MObdjle7crCKAp+KMyDP77JqfY=
-X-Received: by 2002:a05:6512:3683:b0:4b5:bc2a:8bd9 with SMTP id
- d3-20020a056512368300b004b5bc2a8bd9mr1468674lfs.121.1674674643511; Wed, 25
- Jan 2023 11:24:03 -0800 (PST)
-MIME-Version: 1.0
-References: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
- <167460363944.4058.4676712965831302643.git-patchwork-notify@kernel.org> <Y9FG5Wg0PmP4zfV6@google.com>
-In-Reply-To: <Y9FG5Wg0PmP4zfV6@google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 25 Jan 2023 11:23:51 -0800
-Message-ID: <CABBYNZJEU-GD5J6K8_Ur4PWLvP10VNJGP7e_43H0=W3DOS=PNw@mail.gmail.com>
-Subject: Re: [PATCH v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
-To:     Lee Jones <lee@kernel.org>
-Cc:     patchwork-bot+bluetooth@kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>, pavel@ucw.cz,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        jacek.anaszewski@gmail.com, linux-leds@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        robh@kernel.org
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=V7hcBGquDXE1ItKYAPtHX4Q2dU+QIoSg4FK+T/D54PA=;
+        b=ek3PP5NIdxswoAB06kOGxXM44o37goKJ81U31kSXq6eZ9IkBSaVASN6/O0WX15TMHJ
+         PKjmjHa582rlT+X+gOfsJ8TAtGUQi9AN0UP9Q0ibkasSHSPN8De8JR2lI1d7pUuJ3763
+         i6dCc0kxAPrBVR3GG+A2Omdw3rCzXHt+uWaJ+BikYiieb/JFYUUXpD6+9VYr9OOnyk91
+         fyPysQ0tN47PII0M65h9sK8HP+9J8dDLLmrnUwiZOgRwswvUZ4AGpw14nDBp1aswpt5j
+         pAtK5ovFu4Cq2iQmZMJGQREeGpnjkkgfSErkPiprgzR/ms6XBpTAyIJyPMK70iUkf1BB
+         n6tg==
+X-Gm-Message-State: AFqh2krJJdZ0p4fK3yKwvKTmtGA5hMp4mQsPlu78wJNtkO9YXbQ8/hFo
+        kMdPlaRFCw9p4CBv9bWK+c62gN++EyLcwCykol8V2hLSFzHiNndKrUuGG/tlXkQ/ornj1o/5Mip
+        C79Qc9qFY4hCgU0yrQYx57AtfY9HNCXsJjjLE1LeMq87nOgDjZk4en++1I/iM2OMzMuEuvFM8rE
+        Lo
+X-Google-Smtp-Source: AMrXdXurpipw0Ob2XUbpzap2fmXipRkyZte6Rsax47X//HKaWpT1QbUHEQGrvK5nz9rePsp4XryFA7XgyMhb
+X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
+ (user=jiangzp job=sendgmr) by 2002:a05:6a00:e83:b0:56b:9ce2:891f with SMTP id
+ bo3-20020a056a000e8300b0056b9ce2891fmr3438596pfb.43.1674681134438; Wed, 25
+ Jan 2023 13:12:14 -0800 (PST)
+Date:   Wed, 25 Jan 2023 13:12:09 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
+Message-ID: <20230125211210.552679-1-jiangzp@google.com>
+Subject: [kernel PATCH v1 0/1] Reason to disable adv during power off without clearing
+From:   Zhengping Jiang <jiangzp@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Zhengping Jiang <jiangzp@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Lee,
 
-On Wed, Jan 25, 2023 at 7:16 AM Lee Jones <lee@kernel.org> wrote:
->
-> On Tue, 24 Jan 2023, patchwork-bot+bluetooth@kernel.org wrote:
->
-> > Hello:
-> >
-> > This patch was applied to bluetooth/bluetooth-next.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >
-> > On Sun, 22 Jan 2023 11:47:27 +0100 you wrote:
-> > > Add the missing trigger patterns for Bluetooth and WLAN activity, whi=
-ch
-> > > are already in active use.
-> > >
-> > > While at it, move the mmc pattern comment where it belongs, and resto=
-re
-> > > alphabetical sort order.
-> > >
-> > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > > Reviewed-by: Rob Herring <robh@kernel.org>
-> > >
-> > > [...]
-> >
-> > Here is the summary with links:
-> >   - [v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/ef017002b93b
->
-> Why are you taking LED patches through the Bluetooth tree?
+This change was made to keep the same behavior as before the hci_sync
+rework. When the adapter is powered off, the advertisement will be
+disabled, instead of being cleared. As a result, when the adapter is powered
+on, the advertisement can be re-enabled. There is no need to re-register
+the same advertisement.
 
-I assume there isn't a tree dedicated to dt-bindings/leds, not to
-mention this was submitted to linux-bluetooth and nobody else other
-than Rob reviewed it, anyway I'd be happy if the dt-bindings patches
-would be handled elsewhere.
+However, if the adv is not cleared and the user requested to remove the
+adv when the adapter is off, it will trigger GPIO reset, so we will not
+send the HCI command in this case.
 
->
-> --
-> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+Changes in v1:
+- Mark the advertisement as disabled instead of clearing it.
+- Remove the advertisement without sending HCI command if the adapter is off.
 
+Archie Pusaka (1):
+  Bluetooth: Don't send HCI commands to remove adv if adapter is off
 
+ net/bluetooth/hci_sync.c | 57 +++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 53 insertions(+), 4 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+-- 
+2.39.1.456.gfc5497dd1b-goog
+
