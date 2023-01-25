@@ -2,135 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4910DC61D9D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Jan 2023 01:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EFF7C38142
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Jan 2023 02:37:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbjAYBEV (ORCPT
+        id S231563AbjAYCh5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Jan 2023 20:04:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59948 "EHLO
+        Tue, 24 Jan 2023 21:37:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232542AbjAYBES (ORCPT
+        with ESMTP id S229534AbjAYCh4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Jan 2023 20:04:18 -0500
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9EDF530EC;
-        Tue, 24 Jan 2023 17:03:54 -0800 (PST)
-Received: by mail-lj1-x230.google.com with SMTP id g14so18647113ljh.10;
-        Tue, 24 Jan 2023 17:03:54 -0800 (PST)
+        Tue, 24 Jan 2023 21:37:56 -0500
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B22A49423
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 18:37:55 -0800 (PST)
+Received: by mail-qt1-x835.google.com with SMTP id o5so14908957qtr.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Jan 2023 18:37:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+n01u9NXtWcuGWgAPYEZfG87R2VPeQABZEmCZNZy7Ks=;
-        b=HBCuX9pXxLTHsYqFePasL0AEPRmLXa0YRu3t8+wIimZC+QLNDYeCBDDOnC4iy3Bb44
-         ZFxOrT4EcBGOtESECnVRBGb6X8GhJ6nDB28f1VcuzbERT5a+pej+B8J4101b4I3MP3yb
-         K1R4IYnkWJ3xXPMg40cGQ846lxzBaSDHUPHu2qZ2TW9YDDzD8BrlT8rhW071hYfAZsZs
-         NGJP624w9tmkKrBpNR9gF6ku/MLtM0g6YOy89wynOHQztnbqNCz/8VafsMvee+uJ2CP+
-         R/+xsXUkLB2ZCPM6wXe2l+ScKN/yjIWPK8ofAoQbQpAhEs8F42yvu//4hMAp/gy+BJbw
-         iblg==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=aFDMdh/xkTDpiL7znqPFJMo8kBfbEUUM6lI/k1cSNiI=;
+        b=SbGrCRb66sf0moealgZKRZgp5i1NznfM1w+gJxRo74GK42iqja/KjlnFT3YYxZ1L3k
+         hZGHeCEEpLyLcwzX9d/5M/UZ5LuztYrTQf1zvrJtHLNa2Y8GubVHRo/N2jBloLl4JwLG
+         0jro4YC3Bho2trPPvcTmPbeYhb8GTRpbccDxG3FfvvGFyMJQ3TUWr0JhHZUJW8I4+KY2
+         Eniw9bqsQthT2ePV7SlhcPmzMUb87t+dM7VtnI2WzbzET7dsRJ60oXDB+gK585yHL1qq
+         w96tnJSM/XZ67+hLBnXHhah3YtGLPF7PZkFfkF+EccVI12ptXU1dVnvFIqD4p6ARvEtq
+         DB3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+n01u9NXtWcuGWgAPYEZfG87R2VPeQABZEmCZNZy7Ks=;
-        b=Up18YWvd1/wkLENmsK6hzEvXj0okiRGrf/3iw74OGBERBOjUYOKAQN4vCdkzXISR79
-         isiRqSOzc3kqGwfHklpMvrh4mZDlkq0FzLrbaew6LIFJGSmJKRYvF66mev92ga9squBP
-         QfzMg04aAw3mEpbJko/emHih8+L7JnsTeJ0IqDkO5ttva2qV508YJY3pogkgJ+lqQmE8
-         8CGlMaw3ifKuMsOFSvRb7Z2NVG2Ii+ieQ4e8DExDisZuObqadZ+nPhWV8Fk5iut8Zb1I
-         iB7EhCHTkOow2mKc+LztgjryiQFZbVceFYOGIB+Wh3IT0bU/NBIqsGD8aGoB11WpqZjT
-         R5zg==
-X-Gm-Message-State: AFqh2krDqgU3aJsmBf/O89a2eYUr14HnWcZsKoT6KGYNbrFm54evh+lE
-        zAzw8d2SBicqsDxcPk7BXpv5umJJYDm8sFWvxN0=
-X-Google-Smtp-Source: AMrXdXs3/97nZJqGIZCdAk2Lr/mMkpuqxNBScacxcEE9J2bNRl6LUVLx2X9lOu9oSZN3BN9Ma34T0Wbd3DsEpIdGoZI=
-X-Received: by 2002:a2e:9212:0:b0:28b:63dc:4c7 with SMTP id
- k18-20020a2e9212000000b0028b63dc04c7mr1626927ljg.423.1674608629060; Tue, 24
- Jan 2023 17:03:49 -0800 (PST)
+        bh=aFDMdh/xkTDpiL7znqPFJMo8kBfbEUUM6lI/k1cSNiI=;
+        b=eduZLUrfqaLyQUbJqx4EYtpP0ef11d0c0QXXfzMO4Uq9HBGvZnhJdW9DyysuB05Gc9
+         TtofoD8IJIdhS4l8HW8TzaXpSw+gkPLupymgoXLg9W66aMUVvB4GhMPLp/q80CuXGHEv
+         e3WljyxV86FxJbCQ97eKwDulNSxsLrNu2N7JiMjbeGf2zvdPqxmBQir2f0nKaKjHI18I
+         tNdUGF50Qqv7Ono6vBwRGB09A/RQ6Ioht2pgu0D8es6kbtacPcMYE0EfkjO7s/OGBmfh
+         LglExJ8ngxKY3kVxBsEhL1u9EWmnvtPWsfqzOF6UmQbWU9ohH2Ukhg89szu5jYKZ5rut
+         1ciA==
+X-Gm-Message-State: AO0yUKXicWqhLrxniCii7f1Op5Zn7686tr1qxBnMaabU5UT6qvNmv3e8
+        rEk5W0X5bcSgFaawPq7PoRBv8OTVH8feyg==
+X-Google-Smtp-Source: AK7set/ZL90viGtEcWfoos5ixGBsb5ZT5RiaTzNPHLGvQZeAj1YAququPQ/NnKOVqS484zHZhwJPUQ==
+X-Received: by 2002:ac8:7e8d:0:b0:3b6:3022:688e with SMTP id w13-20020ac87e8d000000b003b63022688emr1400135qtj.53.1674614271868;
+        Tue, 24 Jan 2023 18:37:51 -0800 (PST)
+Received: from [172.17.0.2] ([172.176.163.146])
+        by smtp.gmail.com with ESMTPSA id o63-20020a374142000000b006b615cd8c13sm2516388qka.106.2023.01.24.18.37.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 18:37:51 -0800 (PST)
+Message-ID: <63d095ff.370a0220.2be7f.9588@mx.google.com>
+Date:   Tue, 24 Jan 2023 18:37:51 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3730209079445069729=="
 MIME-Version: 1.0
-References: <20230124174714.2775680-1-neeraj.sanjaykale@nxp.com>
- <20230124174714.2775680-3-neeraj.sanjaykale@nxp.com> <167458712396.1259484.1395941797664824881.robh@kernel.org>
- <CABBYNZKAwp3Wqjrcp4k3wvjZSNfJhRWA5ytH7oNWXCG7V4k2ow@mail.gmail.com> <CAL_JsqJged+SwGy5b1w2Cx-dV06=LKb1mX9ykN7GrpR6P4gUVw@mail.gmail.com>
-In-Reply-To: <CAL_JsqJged+SwGy5b1w2Cx-dV06=LKb1mX9ykN7GrpR6P4gUVw@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 24 Jan 2023 17:03:37 -0800
-Message-ID: <CABBYNZJusgf7vQU4g6zvOLj2dsJ7Pf1A6k2myjpzW+JKkw+sQw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth support
-To:     Rob Herring <robh@kernel.org>
-Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>,
-        Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-        jirislaby@kernel.org, sherry.sun@nxp.com, marcel@holtmann.org,
-        linux-serial@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        rohit.fule@nxp.com, devicetree@vger.kernel.org,
-        amitkumar.karwar@nxp.com, linux-bluetooth@vger.kernel.org,
-        edumazet@google.com, pabeni@redhat.com, gregkh@linuxfoundation.org,
-        netdev@vger.kernel.org, kuba@kernel.org,
-        linux-kernel@vger.kernel.org, davem@davemloft.net,
-        johan.hedberg@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,1/3] shared/bap: Fix not detaching streams when PAC is removed
+In-Reply-To: <20230124235923.3623705-1-luiz.dentz@gmail.com>
+References: <20230124235923.3623705-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rob,
+--===============3730209079445069729==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 24, 2023 at 3:08 PM Rob Herring <robh@kernel.org> wrote:
->
-> On Tue, Jan 24, 2023 at 3:44 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Rob, Tedd,
-> >
-> > On Tue, Jan 24, 2023 at 11:06 AM Rob Herring <robh@kernel.org> wrote:
-> > >
-> > >
-> > > On Tue, 24 Jan 2023 23:17:13 +0530, Neeraj Sanjay Kale wrote:
-> > > > Add binding document for generic and legacy NXP bluetooth
-> > > > chipset.
-> > > >
-> > > > Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> > > > ---
-> > > >  .../bindings/net/bluetooth/nxp-bluetooth.yaml | 67 +++++++++++++++++++
-> > > >  1 file changed, 67 insertions(+)
-> > > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml
-> > > >
-> > >
-> > > My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-> > > on your patch (DT_CHECKER_FLAGS is new in v5.13):
-> > >
-> > > yamllint warnings/errors:
-> > > ./Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml:67:1: [warning] too many blank lines (2 > 1) (empty-lines)
-> > >
-> > > dtschema/dtc warnings/errors:
-> > > Error: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.example.dts:18.9-15 syntax error
-> > > FATAL ERROR: Unable to parse input tree
-> > > make[1]: *** [scripts/Makefile.lib:434: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.example.dtb] Error 1
-> > > make[1]: *** Waiting for unfinished jobs....
-> > > make: *** [Makefile:1508: dt_binding_check] Error 2
-> >
-> > I wonder if that is something that we could incorporate to our CI,
-> > perhaps we can detect if the subject starts with dt-binding then we
-> > attempt to make with DT_CHECKER_FLAGS, thoughts?
->
-> What CI is that?
+This is automated email and please do not reply to this email!
 
-We have github actions that we run when a new patch appears on patchwork e.g:
+Dear submitter,
 
-https://patchwork.kernel.org/project/bluetooth/patch/20230124174714.2775680-3-neeraj.sanjaykale@nxp.com/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=715328
 
-> Better to look at the diffstat of the patch than subject. Lots of
-> subjects are wrong and I suspect there would be a fairly high
-> correlation of wrong subjects to schema errors.
+---Test result---
 
-For now I'd keep it simple since otherwise we would have to probably
-attempt to apply and make with DT_CHECKER_FLAGS every patch, well
-perhaps that is ok if that doesn't produce too many false positives,
-otherwise we have to filter the output like we do with the likes of
-smatch and building with make W=1 C=1.
-
-> Rob
+Test Summary:
+CheckPatch                    PASS      1.58 seconds
+GitLint                       PASS      0.99 seconds
+BuildEll                      PASS      27.87 seconds
+BluezMake                     PASS      1017.09 seconds
+MakeCheck                     PASS      11.69 seconds
+MakeDistcheck                 PASS      154.62 seconds
+CheckValgrind                 PASS      250.50 seconds
+CheckSmatch                   PASS      332.76 seconds
+bluezmakeextell               PASS      98.83 seconds
+IncrementalBuild              PASS      2597.74 seconds
+ScanBuild                     PASS      1010.50 seconds
 
 
 
--- 
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3730209079445069729==--
