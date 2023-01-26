@@ -2,159 +2,113 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E70C61DA3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 20:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D28C54EAA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 20:59:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232149AbjAZUrN (ORCPT
+        id S229886AbjAZU7w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Jan 2023 15:47:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53084 "EHLO
+        Thu, 26 Jan 2023 15:59:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230371AbjAZUrK (ORCPT
+        with ESMTP id S229727AbjAZU7v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Jan 2023 15:47:10 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F9E24C95;
-        Thu, 26 Jan 2023 12:46:34 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id j15so2377945ljg.8;
-        Thu, 26 Jan 2023 12:46:34 -0800 (PST)
+        Thu, 26 Jan 2023 15:59:51 -0500
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADFD7AA1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 12:59:50 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id o12so3324767ljp.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 12:59:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e8JRQs423qpWUog+nHFrhwfEo9FGIHhJlHpgtXHnAI8=;
-        b=CsuY8hOc0S6TR3cGDg1ExGVIPOKn+OqJ1OwxwuO0c8Gdz2WpuxTlcEP+ZPFz3Khu5F
-         475ELIhic+XXrq8MLA7tnMYq0CUF/u/GlT7ksJOKJ+9SF8OzL7cikSLpwu+vlDbPo/+v
-         o4EuGtkgRM1pipK8GTVOHiRBBm8I26P6qj66tdVgOb5Py5a7Xnz+q/qIjkt11N2zpMRk
-         xN/7D0VapK/jGTPA1fxq0lNuyZoliqV296SJh01eyNJvVjfwE6kjR69QdrmEEWNtAHP6
-         FV6cMMcQe0mHT0U22M/B9oceNBLNeLuwNd9o64spofEtq2H02/uA+JpZQT+o0gpoNMbs
-         6CCw==
+        bh=4/zoSGpXYS8dvMZ6OZp5hoypKJ1SmuuoY05IJFyDgBg=;
+        b=ES4P6mQqRoLbv7u+hsbiYB0dAxk6JFRLuTZOWGFEEhj4t5c78lf8hv3UBdQsfBAsQc
+         INjt+o3OZM+W42WHN1+5IKMpnZVU7IQs8vV/BKOf9yUaj3a525q14qak0BaFdVkqqh/L
+         5D9sm60PXXA+gVx20/b7E7pc2UO3uniVLEVLJF5ARZZrEsiLmaQ7E1RJGTyySau+u1Nc
+         Ik+bYJvdsaLc17UR5xAaccZFqyuc1Qt2PGoZJJug5XmUBVjXFD42Lcm4Avy1GLkxKCVX
+         0qkak7+eIl//hz+67+EaYFpJ2iYfwdNddwedQHeUamIKMDdmktj9zK6GbfrereAj0In6
+         0G/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e8JRQs423qpWUog+nHFrhwfEo9FGIHhJlHpgtXHnAI8=;
-        b=UIHs2FlG/AwJbe8bCVB1CKtACCL0AIA1YzjhTC6I8qb+WKPeoAWcBpiqFcNynVmjiM
-         7bD/LeObK29mjgpy3KX3jv7zK5c82l8VNUYY8bbvD6wNUo6vV0dKLaL3z9Y1XXWDmNQB
-         rJG/598q9JIc7++zX9ziuTAXGnBLBWdbRFyeTLEGYt1A+MYxTIL5VWVowpNr5i0Mepuu
-         aKxua3UQ8mIoTj+wxHwHCUnZ9uzWvokFBXATTKEGXMSts4Bf+1dg9U3sjj6ajExayMsG
-         caOnpxzkXhZ7gUkzDgbNj6EZHvUm4SPLrWvZ5uiQ09OFZ1IsY6KJ5Ir9q96tQ7FiN57D
-         ExkQ==
-X-Gm-Message-State: AFqh2kriAy5jud22BVB3t/ASu4f1BhZeABoXI6pQJYgZdWCjiQEZF2Dr
-        5P88w6q4VkqhQMV1D14twaNX+FxhK2l5BfZ6KmKfWCpVOrk=
-X-Google-Smtp-Source: AMrXdXu5PjFxdJB5hjmPujykCvCLIaf5NB7r9JeAmJ8eyeje/IITqH8iAEreW99bV6+d700rH1R32SF16e+bCJKaYpY=
-X-Received: by 2002:a2e:8e84:0:b0:289:ae03:644b with SMTP id
- z4-20020a2e8e84000000b00289ae03644bmr2348689ljk.66.1674765981705; Thu, 26 Jan
- 2023 12:46:21 -0800 (PST)
+        bh=4/zoSGpXYS8dvMZ6OZp5hoypKJ1SmuuoY05IJFyDgBg=;
+        b=CiejhI/WXxydXFrSKP3D3Vl7vUMpTXzNR555UKBHwFMybJ22n3eDMRSCMfd63LbjKz
+         duQPv6u5oqIW9juuJGQM3FGTLi9W/vrG2zjZeb0uHNdIm2JAp5DWA5lw5AS6ZASV6709
+         TtCOnr/ND2UtTShjTjMWt5COYBrqKAHk5RNRDkXNonyHKj/2uIJPqhS/+sxo3ayteBXy
+         muTAbRMbu7rOnplSgdV6RMcaf7XR5Ks5L+pPjFots32yK0F1s+U8gBo+URxlaFRE+LZb
+         V5jGhYlXZ+diwI2TzYYSrguWVLgiRm7o/masYy2ISIvD6nbOtionOjYN51fH9WMABJps
+         ktgg==
+X-Gm-Message-State: AFqh2kqx5FwhK7sk94Vw/imMDGSAejYkigg9LQMF+TN8LMZMMNb0Psj0
+        pS4kUhfNyZ0zhvIVo2Wgtyzb2cfmaoR7qs1L1G1ELJ0K
+X-Google-Smtp-Source: AMrXdXtAjWZ43sdoomh8isAjV8SnAHmLpPU05Ll2G3jA3hqzu78hqjA0cmAOFZvyJBbGO5w9oDZRJpdkulikhSrnLzA=
+X-Received: by 2002:a2e:914b:0:b0:28b:75e1:ec29 with SMTP id
+ q11-20020a2e914b000000b0028b75e1ec29mr1966003ljg.96.1674766788613; Thu, 26
+ Jan 2023 12:59:48 -0800 (PST)
 MIME-Version: 1.0
-References: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
- <167460363944.4058.4676712965831302643.git-patchwork-notify@kernel.org>
- <Y9FG5Wg0PmP4zfV6@google.com> <CABBYNZJEU-GD5J6K8_Ur4PWLvP10VNJGP7e_43H0=W3DOS=PNw@mail.gmail.com>
- <Y9IzMWnOq+r2/4V2@google.com>
-In-Reply-To: <Y9IzMWnOq+r2/4V2@google.com>
+References: <20230126074356.431306-2-francesco@dolcini.it> <63d23c50.170a0220.124e7.0ce5@mx.google.com>
+ <Y9KYpw+V1e7wLiT/@francesco-nb.int.toradex.com>
+In-Reply-To: <Y9KYpw+V1e7wLiT/@francesco-nb.int.toradex.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 26 Jan 2023 12:46:09 -0800
-Message-ID: <CABBYNZ+Na7os7D_C_iV22UhyhobxiETjKkngPWVr14QAph6DfQ@mail.gmail.com>
-Subject: Re: [PATCH v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
-To:     Lee Jones <lee@kernel.org>
-Cc:     patchwork-bot+bluetooth@kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>, pavel@ucw.cz,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        jacek.anaszewski@gmail.com, linux-leds@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        robh@kernel.org
+Date:   Thu, 26 Jan 2023 12:59:36 -0800
+Message-ID: <CABBYNZKsD1FAXz1y+8=ogWLmrN0OhctcoRJJXEz=dorv8H8nfQ@mail.gmail.com>
+Subject: Re: Bluetooth: hci_mrvl: Add serdev support for 88W8997
+To:     Francesco Dolcini <francesco@dolcini.it>
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Lee,
+Hi Francesco,
 
-On Thu, Jan 26, 2023 at 12:00 AM Lee Jones <lee@kernel.org> wrote:
+On Thu, Jan 26, 2023 at 7:15 AM Francesco Dolcini <francesco@dolcini.it> wr=
+ote:
 >
-> On Wed, 25 Jan 2023, Luiz Augusto von Dentz wrote:
+> On Thu, Jan 26, 2023 at 12:39:44AM -0800, bluez.test.bot@gmail.com wrote:
+> > Thank you for submitting the patches to the linux bluetooth mailing lis=
+t.
+> > This is a CI test results with your patch series:
+> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D7=
+15765
+> [snip]
+> > Test: SubjectPrefix - FAIL
+> > Desc: Check subject contains "Bluetooth" prefix
+> > Output:
+> > "Bluetooth: " prefix is not specified in the subject
+> > "Bluetooth: " prefix is not specified in the subject
+> > "Bluetooth: " prefix is not specified in the subject
 >
-> > Hi Lee,
-> >
-> > On Wed, Jan 25, 2023 at 7:16 AM Lee Jones <lee@kernel.org> wrote:
-> > >
-> > > On Tue, 24 Jan 2023, patchwork-bot+bluetooth@kernel.org wrote:
-> > >
-> > > > Hello:
-> > > >
-> > > > This patch was applied to bluetooth/bluetooth-next.git (master)
-> > > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> > > >
-> > > > On Sun, 22 Jan 2023 11:47:27 +0100 you wrote:
-> > > > > Add the missing trigger patterns for Bluetooth and WLAN activity,=
- which
-> > > > > are already in active use.
-> > > > >
-> > > > > While at it, move the mmc pattern comment where it belongs, and r=
-estore
-> > > > > alphabetical sort order.
-> > > > >
-> > > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > > > > Reviewed-by: Rob Herring <robh@kernel.org>
-> > > > >
-> > > > > [...]
-> > > >
-> > > > Here is the summary with links:
-> > > >   - [v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
-> > > >     https://git.kernel.org/bluetooth/bluetooth-next/c/ef017002b93b
-> > >
-> > > Why are you taking LED patches through the Bluetooth tree?
-> >
-> > I assume there isn't a tree dedicated to dt-bindings/leds
->
-> % ./scripts/get_maintainer.pl -f Documentation/devicetree/bindings/leds/c=
-ommon.yaml
->  Pavel Machek <pavel@ucw.cz> (maintainer:LED SUBSYSTEM,in file)
->  Lee Jones <lee@kernel.org> (maintainer:LED SUBSYSTEM)
->  Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED=
- DEVICE TREE BINDINGS)
->  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org> (maintainer:OPEN=
- FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
->  Jacek Anaszewski <jacek.anaszewski@gmail.com> (in file)
->  linux-leds@vger.kernel.org (open list:LED SUBSYSTEM)
->  devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE=
- TREE BINDINGS)
->  linux-kernel@vger.kernel.org (open list)
+> These warning are bogus, the reason is that the series include a couple
+> dts/binding changes that have a different rule on the commit message
+> prefix.
 
-Well this doesn't tell us what parts of the dt_bindings have a
-dedicated tree and which doesn't, anyway this doesn't show
-linux-bluetooth so I wonder why people are CCing it.
+Or CI only expects patches to Bluetooth subsystem or drivers, so
+perhaps the dt-bindings changes shouldn't actually be send here if
+there are not meant to be applied to bluetooth-next? Or we need some
+sort of smart filtering so PW don't assume everything sent to
+linux-bluetooth shall be tested by our CI.
 
-> > not to mention this was submitted to linux-bluetooth and nobody else
-> > other than Rob reviewed it,
->
-> To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
->     Rob Herring <robh+dt@kernel.org>,
->     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
->     Jacek Anaszewski <jacek.anaszewski@gmail.com>
-> Cc: linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
->     linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
->     linux-renesas-soc@vger.kernel.org,
->     Geert Uytterhoeven <geert+renesas@glider.be>,
->     Rob Herring <robh@kernel.org>
->
-> > anyway I'd be happy if the dt-bindings patches
-> > would be handled elsewhere.
->
-> Yep, we got this. :)
+> > ##############################
+> > Test: CheckSparse - WARNING
+> > Desc: Run sparse tool with linux kernel
+> > Output:
+> > drivers/bluetooth/hci_mrvl.c:170:23: warning: restricted __le16 degrade=
+s to integerdrivers/bluetooth/hci_mrvl.c:203:23: warning: restricted __le16=
+ degrades to integerdrivers/bluetooth/hci_mrvl.c:170:23: warning: restricte=
+d __le16 degrades to integerdrivers/bluetooth/hci_mrvl.c:203:23: warning: r=
+estricted __le16 degrades to integer
+> This sparse warning was not introduced by this series.
 
-So if it starts with dt-binding: prefix shall we ignore? Or is just
-for dt-bindings: leds? Or perhaps we can just ignore patches received
-as CC: rather than directly To: field.
+Yep, that is why they are treated as warnings not errors, still it
+would be a good idea to fix those to avoid it popping up again.
 
+> Francesco
 >
-> --
-> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
-
 
 
 --=20
