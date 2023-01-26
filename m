@@ -2,126 +2,93 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98721C05027
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 17:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63671C54EAA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 20:12:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232132AbjAZRgE (ORCPT
+        id S230250AbjAZUMq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Jan 2023 12:36:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41464 "EHLO
+        Thu, 26 Jan 2023 15:12:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231822AbjAZRf6 (ORCPT
+        with ESMTP id S229784AbjAZUMp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Jan 2023 12:35:58 -0500
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A28E16ACB9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 09:35:43 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id m26so1864097qtp.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 09:35:43 -0800 (PST)
+        Thu, 26 Jan 2023 15:12:45 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C0628D2B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 12:12:45 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id o13so2601563pjg.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 12:12:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=anpMbEVRblybJ0tnnRqcZwVZoie2rKc9wCS16bNa+yQ=;
-        b=iWhvy2/GyB+41xYGajH2oXpXf2oafSDwYyfDrRCC/lkmtaHiV5ZdC46YW+e0PjT724
-         52nuVNNl47NUEakUHlyc5QTt8OFvaMLwp443jOBXpXx90lftCeJ7UsDOr++RGp7mWGJA
-         TqDMJ6X9qfnbKQMR559XUXgRj+ZWbYBfe/ONSSOC0aX06ZRWD0bcLpWs9YyqXwyYDCqv
-         r0FbSdjtHQP6EyEILGc0vWzjoOHP1EgRjYCHv+fqLXyUyBVhvm4KsfE9mByEOJ/bJtvM
-         /cjgIRyz4fzrFfpw1DC16FqsrOrpHtNXRWv/DEzhx9J118sfV0osI1jfaoYNz53OONK4
-         VcFw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NOP5sc6GAk/5mEPeE8p07kGXaiP2fSMYAITGHTtqSyg=;
+        b=CAJefpuWN7ZPtn7NtNPgIDWQM7QDQOvpSLFNZvyNErRQkhr1bviYZ8Qt9z2ioIX1JL
+         hz3puOdko8N4HTqPY+Rb4XptMNAbce5ZzZuHVtIBN1kpl/2/Phh6qYKPTeA2myWFUg91
+         QKfNgzAj4QVi4obXyEJDzisuejffHQuVR5y4Fg6MHdN2FWpAPSr0w0+xzYjbDJqC8GVc
+         PwTDxvHSpojhDzlQLSnAzo1k3lCgtXh2YZtSvav4CP+0WOlep4WF0ox1Vi0flnMXLRDu
+         46eoLOiom1lNjIq0tm0bucm/s72fKcUNinWH8OaaShp1M8+rbY7lMWCtYn4OanJcfTZE
+         7CCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=anpMbEVRblybJ0tnnRqcZwVZoie2rKc9wCS16bNa+yQ=;
-        b=huBfZlPem7cCsixa9F76v1M04wQWa+Guuqtbjk38bbMOgl+RmNzvm0FZpKMMxCh9Br
-         DQX8mZi120xAXGl6rjb8Ps8GfNKo+K9/KdHdGaKVvj7k/PDhWcR/65UmmQtuUBIvudJR
-         iYuKwHWqMuQp1t6sNIMC03aH3Al35/SsSxVXyOpDnjPOAeIrJCaJ1d+NWR4lupMWL8Oe
-         G1LG4PLaZ45MLQ3Pyv0njE0PD2km+jroFi0TTkColiT+kMiJnA8MhEZNq8M5PNOUnRFp
-         60Itvmq7FEZvko774pCwo+dPIPXIsI/fSnQQ997/JOt9XLBHul6ee5dRcbnElkhywyE7
-         Fseg==
-X-Gm-Message-State: AO0yUKUgKPNDpc+vqKfAkgUPHwym9g1wT91vHLwWAvNIYXPRX4e2b+sl
-        uDD5BTrUpzSUHg0PfPicBIq+hzNNI4E=
-X-Google-Smtp-Source: AK7set9vkuq6WLz1KDKl9+/BXFi0kINzb70aoxo3ZcFopncGIgoM+GNszn2j0oXvG49b31OqMJ8bfA==
-X-Received: by 2002:ac8:5796:0:b0:3b6:2fcd:6d3e with SMTP id v22-20020ac85796000000b003b62fcd6d3emr12150945qta.33.1674754542686;
-        Thu, 26 Jan 2023 09:35:42 -0800 (PST)
-Received: from [172.17.0.2] ([104.45.204.48])
-        by smtp.gmail.com with ESMTPSA id u20-20020ae9c014000000b006bb29d932e1sm1228681qkk.105.2023.01.26.09.35.42
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NOP5sc6GAk/5mEPeE8p07kGXaiP2fSMYAITGHTtqSyg=;
+        b=Otwbmkq5eQn0+/2ynMIK8AAkTfO9oxe06WE8iiZqPa+xKkIGr6Fy4NEAjMzIphg2JF
+         KcVhcsEiS9qfC1BvpJcookOt0cN6LEJJw0kmNsD/lGpjWfmfYAERUqVSreeWM+b16xWQ
+         e0Yk4S6oCwNDPcsQCMKbkfrYXy30MNxQvxcEatFcljN/c9dNqdoMDZaIDS2efhr+XTlU
+         boI0EADZFdqZXvKUeN+VdXKk5DYJWbFxtlSkVrEd1xYDor1akRkAOzHeDBf3HIq/tjJl
+         iahqgXb9Xf8jtYA8RDPIxcqT2dUjEermbRW7uRzB+x+FlFdwUUP0aQJ1VCLegFlHSCBO
+         21mQ==
+X-Gm-Message-State: AFqh2kqJCebaZQuVK4yNBMh1ZNwEiLDyiRP2+Dlzx5cUswVPMjgWzqxk
+        /pm6zq0g5H7CsSQ3M3hTdnxlmV4psQ0=
+X-Google-Smtp-Source: AMrXdXvuEJvpkpQCWhOb01D1yKmXRcdnxF2n0GD0x2eIFuyakWjSpS1JaxH3pGZwCtgZom0rtk/o9Q==
+X-Received: by 2002:a17:902:da8d:b0:194:7a42:2d33 with SMTP id j13-20020a170902da8d00b001947a422d33mr46784859plx.28.1674763964066;
+        Thu, 26 Jan 2023 12:12:44 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id w1-20020a170902c78100b00194955b7898sm1341045pla.237.2023.01.26.12.12.43
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 09:35:42 -0800 (PST)
-Message-ID: <63d2b9ee.e90a0220.863c.3f4c@mx.google.com>
-Date:   Thu, 26 Jan 2023 09:35:42 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1043284415188947935=="
+        Thu, 26 Jan 2023 12:12:43 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/5] shared/bap: Fix not detaching streams when PAC is removed
+Date:   Thu, 26 Jan 2023 12:12:38 -0800
+Message-Id: <20230126201242.4110305-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, macroalpha82@gmail.com
-Subject: RE: Bluetooth: Add support for RTL8821CS
-In-Reply-To: <20230126165529.1452252-2-macroalpha82@gmail.com>
-References: <20230126165529.1452252-2-macroalpha82@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1043284415188947935==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+When local PAC is removed we attempt to release the streams but we left
+it still attached to the endpoint, so this makes sure the stream is
+properly detached by setting its state to idle.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=715934
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.17 seconds
-GitLint                       PASS      0.75 seconds
-SubjectPrefix                 FAIL      0.58 seconds
-BuildKernel                   PASS      38.49 seconds
-CheckAllWarning               PASS      41.50 seconds
-CheckSparse                   WARNING   47.05 seconds
-CheckSmatch                   WARNING   127.35 seconds
-BuildKernel32                 PASS      36.70 seconds
-TestRunnerSetup               PASS      526.86 seconds
-TestRunner_l2cap-tester       PASS      19.05 seconds
-TestRunner_iso-tester         PASS      20.75 seconds
-TestRunner_bnep-tester        PASS      6.80 seconds
-TestRunner_mgmt-tester        PASS      129.94 seconds
-TestRunner_rfcomm-tester      PASS      10.75 seconds
-TestRunner_sco-tester         PASS      9.87 seconds
-TestRunner_ioctl-tester       PASS      11.82 seconds
-TestRunner_mesh-tester        PASS      8.72 seconds
-TestRunner_smp-tester         PASS      9.75 seconds
-TestRunner_userchan-tester    PASS      7.21 seconds
-IncrementalBuild              PASS      40.32 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warning: array of flexible structures
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warning: array of flexible structures
-
-
+Fixes: https://github.com/bluez/bluez/issues/457
 ---
-Regards,
-Linux Bluetooth
+ src/shared/bap.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index db7def7999b7..4ba65cbaa8f9 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2478,8 +2478,10 @@ static void remove_streams(void *data, void *user_data)
+ 	struct bt_bap_stream *stream;
+ 
+ 	stream = queue_remove_if(bap->streams, match_stream_lpac, pac);
+-	if (stream)
++	if (stream) {
+ 		bt_bap_stream_release(stream, NULL, NULL);
++		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
++	}
+ }
+ 
+ bool bt_bap_remove_pac(struct bt_bap_pac *pac)
+-- 
+2.37.3
 
---===============1043284415188947935==--
