@@ -2,124 +2,160 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2019CC05027
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 20:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E70C61DA3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 20:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231915AbjAZUMy (ORCPT
+        id S232149AbjAZUrN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Jan 2023 15:12:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34686 "EHLO
+        Thu, 26 Jan 2023 15:47:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232180AbjAZUMw (ORCPT
+        with ESMTP id S230371AbjAZUrK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Jan 2023 15:12:52 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6663B65AF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 12:12:50 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id d9so2870327pll.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 12:12:50 -0800 (PST)
+        Thu, 26 Jan 2023 15:47:10 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F9E24C95;
+        Thu, 26 Jan 2023 12:46:34 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id j15so2377945ljg.8;
+        Thu, 26 Jan 2023 12:46:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=91fk8UQcmph4sRXVIFsVDlzR6bO+9TiL/3utzzRGgmo=;
-        b=dSskUUDdwmfXa92tg3KKpHKTPaXplpfuuDO0OeWso7+Q8TynV2Gp9qSqVW+FaNsIhL
-         JPjDkXY5Qe59sJmTmfM0OCLF4oMARDQozWsNSvKmIb0kQKatT2WmGrwZxLpKj5Ah6igb
-         B0UbPAOeRJoqb8GFf9P78TbBSWutupN9moH7IneYs4eN4DQKASwyr+NPbDlxhM5e/qJ7
-         M6yus1Qdf91HHevunf5kzEzVHCz+EFoi93v3UvZfeSLHJwvL2G+IAI+2Asq4H7g6AjYQ
-         cr7yYfm9pBgq/Gl6Cv5YC2Yqjw+yMI86+vxIoWjJjtiWHv95HUcZJMVvyGBPDGvDKPL5
-         mwGQ==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e8JRQs423qpWUog+nHFrhwfEo9FGIHhJlHpgtXHnAI8=;
+        b=CsuY8hOc0S6TR3cGDg1ExGVIPOKn+OqJ1OwxwuO0c8Gdz2WpuxTlcEP+ZPFz3Khu5F
+         475ELIhic+XXrq8MLA7tnMYq0CUF/u/GlT7ksJOKJ+9SF8OzL7cikSLpwu+vlDbPo/+v
+         o4EuGtkgRM1pipK8GTVOHiRBBm8I26P6qj66tdVgOb5Py5a7Xnz+q/qIjkt11N2zpMRk
+         xN/7D0VapK/jGTPA1fxq0lNuyZoliqV296SJh01eyNJvVjfwE6kjR69QdrmEEWNtAHP6
+         FV6cMMcQe0mHT0U22M/B9oceNBLNeLuwNd9o64spofEtq2H02/uA+JpZQT+o0gpoNMbs
+         6CCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=91fk8UQcmph4sRXVIFsVDlzR6bO+9TiL/3utzzRGgmo=;
-        b=ft8YM/3D4VZpr9Tqnjp+vfmMgqBburIlXshEYaWexsA96zIp42CHDuYKS1ZYh8Hjw6
-         VgSGdtJ7mQscof3+jMyZgzgSmyOWB7kuBPibEOFGGJujTiRlM1/My1wVY7K+79hWdQIa
-         gOSTIAcC5xfcg7qRGHKsonsUflA3mSdZ+UjIo8wcCvRRdGZI++HndK5xo14krviYpN2a
-         6YXsMGH162nmtNz2YKCkAUR2mAeTxvmyLUc/u4+WiUovg/daIzTAxzxZL82deXa1RcJJ
-         W+v09tNUgF9Abu6swAzNAqozv20mv8TDG5buRjfCeoQ/wHeu7DcVBDYPxWb5jOVQtHGs
-         X+GQ==
-X-Gm-Message-State: AO0yUKWcxUFowxRK/Xm2/mpusIBylMqTQ40MaFEZtwV99wH7Kskl2DIh
-        3+gS9PwqRCeKQsb7rEXflwBK/TfFQx4=
-X-Google-Smtp-Source: AK7set9sdqp4k58aF7dIEwWg94V5R8Aq3RZ0GoqqBVTv9sOo1fmoHk/JOB4k3A8q/bU7Vo1lSxhFRw==
-X-Received: by 2002:a17:902:ec88:b0:196:1d60:b1b8 with SMTP id x8-20020a170902ec8800b001961d60b1b8mr11106580plg.34.1674763969340;
-        Thu, 26 Jan 2023 12:12:49 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id w1-20020a170902c78100b00194955b7898sm1341045pla.237.2023.01.26.12.12.48
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 12:12:48 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 5/5] bap: Fix registering multiple endpoint for the same PAC set
-Date:   Thu, 26 Jan 2023 12:12:42 -0800
-Message-Id: <20230126201242.4110305-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20230126201242.4110305-1-luiz.dentz@gmail.com>
-References: <20230126201242.4110305-1-luiz.dentz@gmail.com>
+        bh=e8JRQs423qpWUog+nHFrhwfEo9FGIHhJlHpgtXHnAI8=;
+        b=UIHs2FlG/AwJbe8bCVB1CKtACCL0AIA1YzjhTC6I8qb+WKPeoAWcBpiqFcNynVmjiM
+         7bD/LeObK29mjgpy3KX3jv7zK5c82l8VNUYY8bbvD6wNUo6vV0dKLaL3z9Y1XXWDmNQB
+         rJG/598q9JIc7++zX9ziuTAXGnBLBWdbRFyeTLEGYt1A+MYxTIL5VWVowpNr5i0Mepuu
+         aKxua3UQ8mIoTj+wxHwHCUnZ9uzWvokFBXATTKEGXMSts4Bf+1dg9U3sjj6ajExayMsG
+         caOnpxzkXhZ7gUkzDgbNj6EZHvUm4SPLrWvZ5uiQ09OFZ1IsY6KJ5Ir9q96tQ7FiN57D
+         ExkQ==
+X-Gm-Message-State: AFqh2kriAy5jud22BVB3t/ASu4f1BhZeABoXI6pQJYgZdWCjiQEZF2Dr
+        5P88w6q4VkqhQMV1D14twaNX+FxhK2l5BfZ6KmKfWCpVOrk=
+X-Google-Smtp-Source: AMrXdXu5PjFxdJB5hjmPujykCvCLIaf5NB7r9JeAmJ8eyeje/IITqH8iAEreW99bV6+d700rH1R32SF16e+bCJKaYpY=
+X-Received: by 2002:a2e:8e84:0:b0:289:ae03:644b with SMTP id
+ z4-20020a2e8e84000000b00289ae03644bmr2348689ljk.66.1674765981705; Thu, 26 Jan
+ 2023 12:46:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
+ <167460363944.4058.4676712965831302643.git-patchwork-notify@kernel.org>
+ <Y9FG5Wg0PmP4zfV6@google.com> <CABBYNZJEU-GD5J6K8_Ur4PWLvP10VNJGP7e_43H0=W3DOS=PNw@mail.gmail.com>
+ <Y9IzMWnOq+r2/4V2@google.com>
+In-Reply-To: <Y9IzMWnOq+r2/4V2@google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 26 Jan 2023 12:46:09 -0800
+Message-ID: <CABBYNZ+Na7os7D_C_iV22UhyhobxiETjKkngPWVr14QAph6DfQ@mail.gmail.com>
+Subject: Re: [PATCH v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
+To:     Lee Jones <lee@kernel.org>
+Cc:     patchwork-bot+bluetooth@kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>, pavel@ucw.cz,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        jacek.anaszewski@gmail.com, linux-leds@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        robh@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Lee,
 
-This makes sure there is only one endpoint representing a local and
-remote PAC set.
----
- profiles/audio/bap.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+On Thu, Jan 26, 2023 at 12:00 AM Lee Jones <lee@kernel.org> wrote:
+>
+> On Wed, 25 Jan 2023, Luiz Augusto von Dentz wrote:
+>
+> > Hi Lee,
+> >
+> > On Wed, Jan 25, 2023 at 7:16 AM Lee Jones <lee@kernel.org> wrote:
+> > >
+> > > On Tue, 24 Jan 2023, patchwork-bot+bluetooth@kernel.org wrote:
+> > >
+> > > > Hello:
+> > > >
+> > > > This patch was applied to bluetooth/bluetooth-next.git (master)
+> > > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> > > >
+> > > > On Sun, 22 Jan 2023 11:47:27 +0100 you wrote:
+> > > > > Add the missing trigger patterns for Bluetooth and WLAN activity,=
+ which
+> > > > > are already in active use.
+> > > > >
+> > > > > While at it, move the mmc pattern comment where it belongs, and r=
+estore
+> > > > > alphabetical sort order.
+> > > > >
+> > > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > > > > Reviewed-by: Rob Herring <robh@kernel.org>
+> > > > >
+> > > > > [...]
+> > > >
+> > > > Here is the summary with links:
+> > > >   - [v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
+> > > >     https://git.kernel.org/bluetooth/bluetooth-next/c/ef017002b93b
+> > >
+> > > Why are you taking LED patches through the Bluetooth tree?
+> >
+> > I assume there isn't a tree dedicated to dt-bindings/leds
+>
+> % ./scripts/get_maintainer.pl -f Documentation/devicetree/bindings/leds/c=
+ommon.yaml
+>  Pavel Machek <pavel@ucw.cz> (maintainer:LED SUBSYSTEM,in file)
+>  Lee Jones <lee@kernel.org> (maintainer:LED SUBSYSTEM)
+>  Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED=
+ DEVICE TREE BINDINGS)
+>  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org> (maintainer:OPEN=
+ FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
+>  Jacek Anaszewski <jacek.anaszewski@gmail.com> (in file)
+>  linux-leds@vger.kernel.org (open list:LED SUBSYSTEM)
+>  devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE=
+ TREE BINDINGS)
+>  linux-kernel@vger.kernel.org (open list)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 5a50a2cc6105..e5ffb7230580 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -510,6 +510,22 @@ static void ep_free(void *data)
- 	free(ep);
- }
- 
-+struct match_ep {
-+	struct bt_bap_pac *lpac;
-+	struct bt_bap_pac *rpac;
-+};
-+
-+static bool match_ep(const void *data, const void *user_data)
-+{
-+	const struct bap_ep *ep = data;
-+	const struct match_ep *match = user_data;
-+
-+	if (ep->lpac != match->lpac)
-+		return false;
-+
-+	return ep->rpac == match->rpac;
-+}
-+
- static struct bap_ep *ep_register(struct btd_service *service,
- 					struct bt_bap_pac *lpac,
- 					struct bt_bap_pac *rpac)
-@@ -520,6 +536,7 @@ static struct bap_ep *ep_register(struct btd_service *service,
- 	struct queue *queue;
- 	int i, err;
- 	const char *suffix;
-+	struct match_ep match = { lpac, rpac };
- 
- 	switch (bt_bap_pac_get_type(rpac)) {
- 	case BT_BAP_SINK:
-@@ -536,6 +553,10 @@ static struct bap_ep *ep_register(struct btd_service *service,
- 		return NULL;
- 	}
- 
-+	ep = queue_find(queue, match_ep, &match);
-+	if (ep)
-+		return ep;
-+
- 	ep = new0(struct bap_ep, 1);
- 	ep->data = data;
- 	ep->lpac = lpac;
--- 
-2.37.3
+Well this doesn't tell us what parts of the dt_bindings have a
+dedicated tree and which doesn't, anyway this doesn't show
+linux-bluetooth so I wonder why people are CCing it.
 
+> > not to mention this was submitted to linux-bluetooth and nobody else
+> > other than Rob reviewed it,
+>
+> To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+>     Rob Herring <robh+dt@kernel.org>,
+>     Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+>     Jacek Anaszewski <jacek.anaszewski@gmail.com>
+> Cc: linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+>     linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+>     linux-renesas-soc@vger.kernel.org,
+>     Geert Uytterhoeven <geert+renesas@glider.be>,
+>     Rob Herring <robh@kernel.org>
+>
+> > anyway I'd be happy if the dt-bindings patches
+> > would be handled elsewhere.
+>
+> Yep, we got this. :)
+
+So if it starts with dt-binding: prefix shall we ignore? Or is just
+for dt-bindings: leds? Or perhaps we can just ignore patches received
+as CC: rather than directly To: field.
+
+>
+> --
+> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+
+
+
+--=20
+Luiz Augusto von Dentz
