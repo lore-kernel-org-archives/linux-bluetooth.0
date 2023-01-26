@@ -2,84 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70EEEC54E94
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 13:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3327C05027
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 13:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235630AbjAZNif (ORCPT
+        id S231542AbjAZNn5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Jan 2023 08:38:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49810 "EHLO
+        Thu, 26 Jan 2023 08:43:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbjAZNie (ORCPT
+        with ESMTP id S231378AbjAZNny (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Jan 2023 08:38:34 -0500
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 069E83EFE9;
-        Thu, 26 Jan 2023 05:38:34 -0800 (PST)
-Received: from fedcomp.intra.ispras.ru (unknown [46.242.14.200])
-        by mail.ispras.ru (Postfix) with ESMTPSA id 168DF40D403D;
-        Thu, 26 Jan 2023 13:38:32 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 168DF40D403D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-        s=default; t=1674740312;
-        bh=QkDEpXH1Gip6cB8Z5DI/PU+3Jf6pqpNZOdCpsXvaOQk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=jPwPhgaK9hbw2qhoci3+jAswqFODFk4bJLcZDSq7CHjM/4wkDP/URh8cHoFN5hYYp
-         BHgB914VZRTVajsL3nyu2nWNAvsYjv6yW18W7ytB3QrZ4iKJqDn4+UKsjwINU/MmGu
-         vx8bAH3BE6ZeXsuCT9US8r2M1kWX2ahok90vefig=
-From:   Fedor Pchelkin <pchelkin@ispras.ru>
-To:     stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Fedor Pchelkin <pchelkin@ispras.ru>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@google.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        lvc-project@linuxtesting.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH 4.14/4.19/5.4/5.10/5.15] Bluetooth: hci_sync: cancel cmd_timer if hci_open failed
-Date:   Thu, 26 Jan 2023 16:38:17 +0300
-Message-Id: <20230126133817.819879-1-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.34.1
+        Thu, 26 Jan 2023 08:43:54 -0500
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7543A3C2C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 05:43:50 -0800 (PST)
+Received: by mail-vs1-xe2d.google.com with SMTP id 187so1883949vsv.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Jan 2023 05:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cj+QaIYKyrU14fPXJUuR+N6o3Kv3DDMa4FhBVagEzEU=;
+        b=ImLkIcJXj/LdO04EmcCPg/NG6qwPgIvevezwiCqxAey01sUVBjCH4lmk+xMiL3/9s1
+         W1ocssQLWdodz56CKuZRvjxUkz+tk8PNRX1CilrPVGVgLe6ccW1JkEIOgxbk9iwLKzl9
+         P/P3890bwsxaRCpcXBcbOLU2O5Nbj9eSMJq0N42pXSOK7HOzlZE4+GHzMbWTXfqhhUfL
+         oMrE9PQoeMxrRevBZZHZrMDpuksbmZZ5kexx5GvuezrVGDzutAO02j98IIz3mLPKAghf
+         uAylowe09vReXs4gHOkK/S0NPEVItOXLMQAh5QCFUxUYacEnHcrEReq66oLwLjwo/Fwk
+         xEfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cj+QaIYKyrU14fPXJUuR+N6o3Kv3DDMa4FhBVagEzEU=;
+        b=8B9GRVN0hXKCv0tmvdQKtVLEjWn1l0NcYqj4aukkyiKXP6X8FDLnVWeM+KS4TOorLH
+         6/JS4TiltwyxfnY0ZFHawmF7Z1PRy/X1hU49J30lPuz8jJzJY1TcihBw+i1S/w0rkPHr
+         vycFe6BLF+359NOkdSb9NDuo9Ylu55ab/viALX0ZCykMCoQM/2AINypFstYVu/59uaGr
+         rgfKqK2b6zZeZwjDbXVq0LQpHNS2GGjU1H4FiABWxNtrCUwU+VexHPwZf1/CBkj48TWb
+         DFbXMj93Tw8/b4xfabZL1UILWvqQoKv3H4RiPhpo1zrf8n4bjMudRfOUmHRkj0fiZgmz
+         aMiQ==
+X-Gm-Message-State: AO0yUKW4/xO2AkJeANbSNtNQDshkclw6EtWwBYK+zH2y/bx8zPGi/0wr
+        sanUyuF0KTKgt2OK9awf7TR9Fmery8qJ/g==
+X-Google-Smtp-Source: AK7set9leNTwSHVkFWFUUwhKfA0XkAUK3NJvV1fhpTvJmmqkQSxWIzNP46/Lb2osxe9h8PGSI/7bOw==
+X-Received: by 2002:a05:6102:558b:b0:3e4:a209:e8d with SMTP id dc11-20020a056102558b00b003e4a2090e8dmr11665012vsb.2.1674740629112;
+        Thu, 26 Jan 2023 05:43:49 -0800 (PST)
+Received: from [172.17.0.2] ([172.176.217.64])
+        by smtp.gmail.com with ESMTPSA id i7-20020a05620a0a0700b006fbbdc6c68fsm917678qka.68.2023.01.26.05.43.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 05:43:47 -0800 (PST)
+Message-ID: <63d28393.050a0220.2ff5a.250e@mx.google.com>
+Date:   Thu, 26 Jan 2023 05:43:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5351782364333776931=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pchelkin@ispras.ru
+Subject: RE: Bluetooth: hci_sync: cancel cmd_timer if hci_open failed
+In-Reply-To: <20230126133613.815127-2-pchelkin@ispras.ru>
+References: <20230126133613.815127-2-pchelkin@ispras.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============5351782364333776931==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-commit 97dfaf073f5881c624856ef293be307b6166115c upstream.
+This is an automated email and please do not reply to this email.
 
-If a command is already sent, we take care of freeing it, but we
-also need to cancel the timeout as well.
+Dear Submitter,
 
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: net/bluetooth/hci_sync.c:4703
+error: net/bluetooth/hci_sync.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- net/bluetooth/hci_core.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a41b4dcf1a7a..cabe8eb4c14f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1632,6 +1632,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- 			hdev->flush(hdev);
- 
- 		if (hdev->sent_cmd) {
-+			cancel_delayed_work_sync(&hdev->cmd_timer);
- 			kfree_skb(hdev->sent_cmd);
- 			hdev->sent_cmd = NULL;
- 		}
--- 
-2.34.1
 
+--===============5351782364333776931==--
