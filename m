@@ -2,96 +2,123 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B42FC54E94
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 07:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63882C54EED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Jan 2023 08:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236104AbjAZHqJ (ORCPT
+        id S236245AbjAZIBG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Jan 2023 02:46:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59280 "EHLO
+        Thu, 26 Jan 2023 03:01:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236130AbjAZHpv (ORCPT
+        with ESMTP id S236249AbjAZIBD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Jan 2023 02:45:51 -0500
-Received: from smtp-out-06.comm2000.it (smtp-out-06.comm2000.it [212.97.32.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8529169B1B;
-        Wed, 25 Jan 2023 23:45:26 -0800 (PST)
-Received: from francesco-nb.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Thu, 26 Jan 2023 03:01:03 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5317669B23;
+        Thu, 26 Jan 2023 00:00:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-06.comm2000.it (Postfix) with ESMTPSA id D51BC561372;
-        Thu, 26 Jan 2023 08:45:09 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1674719110;
-        bh=Y9XCnAPij17MA+QoBNd8FvPcBvFaxXeiz+vHwwOCDWE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=I2CYUxZwZ+wcSRyagmyhnstP4jB889U8C2lqZHpElTSvXWVR1/M7WQiK0ZxYc0UKq
-         0LMoyg4QPXsFwbl4KGpeTUvIguB6XcOlKh/hMUzofuiaMrmsxmuQZnNJXaMIoKd/XM
-         oI4pq0Qa6uQI24787uklIx/aJQ5uwuyYfM5YejbEBGFD2NKqOYJobBaBYLPNIXTZXu
-         4d4pVwWCZNAewoeChn75KpnBz32Lu2jtDQ3zieRArOSZOEmBR/ie3E7MbDgN04jfdc
-         xh/RqctVwlWC+hcSFFKwoH40lFg8psglNFENlygH5e3aTDy7+Ars85MMWm2vy460W/
-         Y11hPaXaXkH9A==
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Shawn Guo <shawnguo@kernel.org>
-Cc:     Stefan Eichenberger <stefan.eichenberger@toradex.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        Francesco Dolcini <francesco.dolcini@toradex.com>
-Subject: [PATCH v2 5/5] arm64: dts: imx8mp-verdin: add 88W8997 serdev to uart4
-Date:   Thu, 26 Jan 2023 08:43:56 +0100
-Message-Id: <20230126074356.431306-6-francesco@dolcini.it>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230126074356.431306-1-francesco@dolcini.it>
-References: <20230126074356.431306-1-francesco@dolcini.it>
+        by sin.source.kernel.org (Postfix) with ESMTPS id BBB69CE0FE6;
+        Thu, 26 Jan 2023 08:00:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37ED4C4339B;
+        Thu, 26 Jan 2023 08:00:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674720056;
+        bh=w0GyxWtuZcSCJLuH4x+Imjzwl60UHza1uCdMsCstLZ8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=In7j/G3aHj0zUfdQn9EUP96LDFSx8DSrzm8RD3NDnpy15PMsiUtL0U7JIiRMPSUag
+         +9DAns2GS9mFk0oKN9/ixWhHGTYa4t86Ow4n9LOORddrI52CtVC/smabFlaGjfSUWU
+         j5jl7qZ/fFpHEruQI5KrLy0JYrUZBSJE6PAC7UiYo5mOpGkIbLw5PJW2wDvjWt6TxE
+         85Hd3wcczhWI4GYDrbWoOeX83mk7jKmkGdIhHXTdCmtVML8ZxBw1t7sSz/bsfLS2T8
+         FqfPyQkCfzj6mjaJ8Ko5iGeyttiKTIFIysh98qTRp5dUYw4lxK5AjRVQBzYUQXWiup
+         XOYhf9wX0SBqw==
+Date:   Thu, 26 Jan 2023 08:00:49 +0000
+From:   Lee Jones <lee@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     patchwork-bot+bluetooth@kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>, pavel@ucw.cz,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        jacek.anaszewski@gmail.com, linux-leds@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        robh@kernel.org
+Subject: Re: [PATCH v2] dt-bindings: leds: Document Bluetooth and WLAN
+ triggers
+Message-ID: <Y9IzMWnOq+r2/4V2@google.com>
+References: <0d0de1bc949d24e08174205c13c0b59bd73c1ea8.1674384302.git.geert+renesas@glider.be>
+ <167460363944.4058.4676712965831302643.git-patchwork-notify@kernel.org>
+ <Y9FG5Wg0PmP4zfV6@google.com>
+ <CABBYNZJEU-GD5J6K8_Ur4PWLvP10VNJGP7e_43H0=W3DOS=PNw@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZJEU-GD5J6K8_Ur4PWLvP10VNJGP7e_43H0=W3DOS=PNw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+On Wed, 25 Jan 2023, Luiz Augusto von Dentz wrote:
 
-Use the serdev feature to load the driver for the 88W8997 bluetooth
-driver.
+> Hi Lee,
+> 
+> On Wed, Jan 25, 2023 at 7:16 AM Lee Jones <lee@kernel.org> wrote:
+> >
+> > On Tue, 24 Jan 2023, patchwork-bot+bluetooth@kernel.org wrote:
+> >
+> > > Hello:
+> > >
+> > > This patch was applied to bluetooth/bluetooth-next.git (master)
+> > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> > >
+> > > On Sun, 22 Jan 2023 11:47:27 +0100 you wrote:
+> > > > Add the missing trigger patterns for Bluetooth and WLAN activity, which
+> > > > are already in active use.
+> > > >
+> > > > While at it, move the mmc pattern comment where it belongs, and restore
+> > > > alphabetical sort order.
+> > > >
+> > > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > > > Reviewed-by: Rob Herring <robh@kernel.org>
+> > > >
+> > > > [...]
+> > >
+> > > Here is the summary with links:
+> > >   - [v2] dt-bindings: leds: Document Bluetooth and WLAN triggers
+> > >     https://git.kernel.org/bluetooth/bluetooth-next/c/ef017002b93b
+> >
+> > Why are you taking LED patches through the Bluetooth tree?
+> 
+> I assume there isn't a tree dedicated to dt-bindings/leds
 
-Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
----
-v2: no changes
----
- arch/arm64/boot/dts/freescale/imx8mp-verdin-wifi.dtsi | 5 +++++
- 1 file changed, 5 insertions(+)
+% ./scripts/get_maintainer.pl -f Documentation/devicetree/bindings/leds/common.yaml
+ Pavel Machek <pavel@ucw.cz> (maintainer:LED SUBSYSTEM,in file)
+ Lee Jones <lee@kernel.org> (maintainer:LED SUBSYSTEM)
+ Rob Herring <robh+dt@kernel.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org> (maintainer:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
+ Jacek Anaszewski <jacek.anaszewski@gmail.com> (in file)
+ linux-leds@vger.kernel.org (open list:LED SUBSYSTEM)
+ devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS)
+ linux-kernel@vger.kernel.org (open list)
 
-diff --git a/arch/arm64/boot/dts/freescale/imx8mp-verdin-wifi.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-verdin-wifi.dtsi
-index 36289c175e6e..ef94f9a57e20 100644
---- a/arch/arm64/boot/dts/freescale/imx8mp-verdin-wifi.dtsi
-+++ b/arch/arm64/boot/dts/freescale/imx8mp-verdin-wifi.dtsi
-@@ -65,6 +65,11 @@ &uart4 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&pinctrl_bt_uart>;
- 	status = "okay";
-+
-+	bluetooth {
-+		compatible = "mrvl,88w8997";
-+		max-speed = <921600>;
-+	};
- };
- 
- /* On-module Wi-Fi */
+> not to mention this was submitted to linux-bluetooth and nobody else
+> other than Rob reviewed it,
+
+To: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+    Rob Herring <robh+dt@kernel.org>,
+    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+    Jacek Anaszewski <jacek.anaszewski@gmail.com>                                      
+Cc: linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+    linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+    linux-renesas-soc@vger.kernel.org,
+    Geert Uytterhoeven <geert+renesas@glider.be>,
+    Rob Herring <robh@kernel.org>
+
+> anyway I'd be happy if the dt-bindings patches
+> would be handled elsewhere.
+
+Yep, we got this. :)
+
 -- 
-2.25.1
-
+Lee Jones [李琼斯]
