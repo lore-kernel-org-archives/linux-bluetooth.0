@@ -2,93 +2,95 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5269C38142
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Jan 2023 09:30:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9271C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Jan 2023 10:24:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232491AbjA0Ja4 (ORCPT
+        id S229909AbjA0KYJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Jan 2023 04:30:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44792 "EHLO
+        Fri, 27 Jan 2023 05:24:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232063AbjA0Jay (ORCPT
+        with ESMTP id S229716AbjA0KYI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Jan 2023 04:30:54 -0500
-Received: from smtp-out-04.comm2000.it (smtp-out-04.comm2000.it [212.97.32.67])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E0E7BE40
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 01:30:31 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-04.comm2000.it (Postfix) with ESMTPSA id E5C26BC66B6;
-        Fri, 27 Jan 2023 10:30:27 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1674811828;
-        bh=LecWo0t3gNR6fmC3JLS/id77wMIEJD+4ricxkYB0teY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=Xyxivf4m672GFIBh/3lS3hT20SgCObBrlrPJm2iBrgoO3+dsYDhaL52n2t9Ec47Pp
-         0+B0YhV+IyQ3sJEQyy5LywX+v45jj2RX5S8C5T687/lydQMO5/XBSBcw647bZ7NSEJ
-         z/t5dAs2Ipvs6oYZPv0F4mZon6UaVbc2uGUzhsVSprUnsIMuwOBJh8QQ3tzFCLU4Zz
-         CgeQ8gQAJgfRKbsdD+N/WITa59S9qVSPmlqjp197DO8LKEB+T/U6J5FWOpqnTqfJct
-         1HmklVI4n1A8GtHNaOsIbHkyBqdkC2u93zAYNEEXq554KWGmyp449HkVCIjka7gIwE
-         EuZhScDTKeUlA==
-Date:   Fri, 27 Jan 2023 10:30:23 +0100
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Francesco Dolcini <francesco@dolcini.it>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: Bluetooth: hci_mrvl: Add serdev support for 88W8997
-Message-ID: <Y9OZrx2fpjjLYLxx@francesco-nb.int.toradex.com>
-References: <20230126074356.431306-2-francesco@dolcini.it>
- <63d23c50.170a0220.124e7.0ce5@mx.google.com>
- <Y9KYpw+V1e7wLiT/@francesco-nb.int.toradex.com>
- <CABBYNZKsD1FAXz1y+8=ogWLmrN0OhctcoRJJXEz=dorv8H8nfQ@mail.gmail.com>
+        Fri, 27 Jan 2023 05:24:08 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4FB28D3F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 02:24:07 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id q10so4530191wrm.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 02:24:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B1g62FaAwzxRCWTCMBiuBoyOeT/DGaVIfmpUN4XH4l8=;
+        b=WBlhHJ+QydO7/c8H/iv+cPA7WBy/euWH0c8rSU9mF1lm2EpoVxBq+pVtfH+47E98M6
+         +LgVVY709ef+XJl6G++miNZIJFhxCswEpPlWqHNOnrYCd/THbh2EqLDQMAEIB2rcAkt7
+         sUyrebJsnBw5YmDFJzjhYF4op3LYqIvJdPfISDfh/G4H/jmVQqbWxhBbcvK8PlgoX3O9
+         7oQqATG5Y4noaKCX6g8Jd1lCqjY7c2/I5Hog7Of5ye+dSSyvMmOlPUHcNoI3yn/eWrgA
+         kdGSqnAW1ZFawjT75+5dC1O/2bE17OJTDg45ix6c2eLnZ2r7nbMtK1/qbeaVhqENNKjy
+         iLkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B1g62FaAwzxRCWTCMBiuBoyOeT/DGaVIfmpUN4XH4l8=;
+        b=EOmaCm1oKPLpOjUdawQzH0IS1g/9Pq7cwuo6LFKTzDMuOIKC1WDpbZt/EUmc8fgMZi
+         khMr/mom+uZeFQwdZwJn5MoEVrBKzoWyLP/1Fhk3KX80zfA3ypqXVP2SUKXCnD6F2GH2
+         F5sFFgFnB2c0o6GB7zxSiTFkeqQVOxJynREJwFekeE9Ajgxu9iP1bZ5BW4kLGaEyEjBU
+         O1XIKFnkCwc/VNu/zjmAjTeYVwMdGJYP67jbnjL4k+ipONhWTZ0PnWcAM5ol7M0Lna9Q
+         iC86OdI+2/pGqXK/J15mJCQm4uPkcqppn46dEzcI5m/uT0d6c5ukVPRLh7FJwhzVEzg/
+         ib2Q==
+X-Gm-Message-State: AFqh2krrvhN+kJHAy0MmpCvCfnVyXcqtFjcDvQq1x1CdYKYBKnstYt3v
+        wk82esALVle7BVoY1w9R5+BI8Q==
+X-Google-Smtp-Source: AMrXdXte3GUMCRyW8iKhTS2WKAAQM1NZf4WbfuSy6VgAENXlAWYiUaqyjwMtBrRnpXlHV1p9vrcnBA==
+X-Received: by 2002:a05:6000:5c2:b0:2bb:eb3d:8d20 with SMTP id bh2-20020a05600005c200b002bbeb3d8d20mr32682504wrb.43.1674815045619;
+        Fri, 27 Jan 2023 02:24:05 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id j15-20020a5d452f000000b002be505ab59asm3704070wra.97.2023.01.27.02.24.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Jan 2023 02:24:05 -0800 (PST)
+Message-ID: <02bddab6-4c63-bb39-9a11-8dab81322c28@linaro.org>
+Date:   Fri, 27 Jan 2023 11:24:03 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZKsD1FAXz1y+8=ogWLmrN0OhctcoRJJXEz=dorv8H8nfQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH RFC 1/2] dt-bindings: net: realtek-bluetooth: Add
+ RTL8821CS
+Content-Language: en-US
+To:     Chris Morgan <macroalpha82@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     devicetree@vger.kernel.org, alistair@alistair23.me,
+        anarsoul@gmail.com, krzysztof.kozlowski+dt@linaro.org,
+        robh+dt@kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, max.chou@realtek.com, hildawu@realtek.com,
+        Chris Morgan <macromorgan@hotmail.com>
+References: <20230126165529.1452252-1-macroalpha82@gmail.com>
+ <20230126165529.1452252-2-macroalpha82@gmail.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230126165529.1452252-2-macroalpha82@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Luiz,
-
-On Thu, Jan 26, 2023 at 12:59:36PM -0800, Luiz Augusto von Dentz wrote:
-> On Thu, Jan 26, 2023 at 7:15 AM Francesco Dolcini <francesco@dolcini.it> wrote:
-> > On Thu, Jan 26, 2023 at 12:39:44AM -0800, bluez.test.bot@gmail.com wrote:
-> > > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > > This is a CI test results with your patch series:
-> > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=715765
-> > [snip]
-> > > Test: SubjectPrefix - FAIL
-> > > Desc: Check subject contains "Bluetooth" prefix
-> > > Output:
-> > > "Bluetooth: " prefix is not specified in the subject
-> > > "Bluetooth: " prefix is not specified in the subject
-> > > "Bluetooth: " prefix is not specified in the subject
-> >
-> > These warning are bogus, the reason is that the series include a couple
-> > dts/binding changes that have a different rule on the commit message
-> > prefix.
+On 26/01/2023 17:55, Chris Morgan wrote:
+> From: Chris Morgan <macromorgan@hotmail.com>
 > 
-> Or CI only expects patches to Bluetooth subsystem or drivers, so
-> perhaps the dt-bindings changes shouldn't actually be send here if
-> there are not meant to be applied to bluetooth-next? Or we need some
-From what I saw bindings changes
-(Documentation/devicetree/bindings/net/) on bluetooth goes through you
-once they are acked by the DT maintainer.
+> Add compatible string for RTL8821CS for existing Realtek Bluetooth
+> driver.
+> 
+> Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+> ---
+>  Documentation/devicetree/bindings/net/realtek-bluetooth.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+> 
 
-Last patch ([PATCH v2 5/5] arm64: dts: imx8mp-verdin: add 88W8997 serdev to uart4)
-needs to go through Shawn and the SOC/i.MX tree, but it makes sense to
-have it part of this whole series (at least to me). No reason to apply
-it until the rest of the series is deemed fine.
+Based on your driver it is compatible with rtl8822cs, so you can
+indicate it in the binding and use just one of_device_id entry.
 
-Anyway, all good from my point of view, I replied to the CI email just
-to let people know that I checked at the CI results and I believe is
-all good on the series on this regard, not planning any change because
-of it and that IMO it should not be a reason to hold on any review.
-Just speak-up if I'm wrong here :-)
-
-Thanks,
-Francesco
+Best regards,
+Krzysztof
 
