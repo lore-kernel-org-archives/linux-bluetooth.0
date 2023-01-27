@@ -2,87 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7176EC61DB3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Jan 2023 20:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A49F1C38142
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Jan 2023 20:12:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbjA0ULE (ORCPT
+        id S229702AbjA0UMO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Jan 2023 15:11:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
+        Fri, 27 Jan 2023 15:12:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233422AbjA0UKu (ORCPT
+        with ESMTP id S232132AbjA0UMB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Jan 2023 15:10:50 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD1C29402
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 12:10:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C6581B821D3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 20:10:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 827DBC433D2;
-        Fri, 27 Jan 2023 20:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674850217;
-        bh=fU1DrFktkMFUwCVBz7oqhY3pZl8+6dZkg/IWY5+2wR4=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=tJSaEHP3R8IdJVj1YMgo2ZQQj/XTn6SOeGBDWruDXU1mzSzUYMTfc/s75sQugnzDG
-         DBVtZeV30KtwIStwzyxRmEjReJ8Fgzp4pBzw7/7d7GA3jfNJ+v7uEr9G9tDxkaA5mG
-         koUjB9gdAwHLDb25kRcu+W2dwbOnDHrBZXwCmYZFP2dlW1arDCd2zNqCb9nob/eMny
-         tz+qqDaiz+9zSPaXRE8PKxQ47qOLim1JDQ9nPifij97GpDl2k0mb2vt8EcxEyDR8rs
-         lhxAkGphIGmu2CmoxCPIDAG9j3TAq91/Kc8D8X/h1igCV7Dw3dB6rl+eQZxM7MYMRx
-         G6+NGF5wfGHlw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6EC05F83ECF;
-        Fri, 27 Jan 2023 20:10:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 27 Jan 2023 15:12:01 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BC17EC5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 12:11:47 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id o20so9893954lfk.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 12:11:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lMMZ9rolSe9Ajlv1m2tj/H8KqF6hTQtzGPU1trMHjk4=;
+        b=RKtqK6ttvSIXAZ9GybpM993JWWXv4J/9c5uLG5w58H0vEec3LI7JXfeQlsRrjjLovr
+         ehMhAk4MNDAcT+4nGG0A9GYIaMTzV2J4S3jKtDNYplorVlAsJxnmn1HT34QXScKSCKH/
+         ICW0FW+3pWVGEWSuJqViiifLvTVZXUtlKKZBz96xnfdCEgd3QC7Zefj70ZTm+7QOLoTo
+         OpUNrZXvdxmPPSSSpbyEH86wSLYjQqhQ7hmYpSk9UkR799tCAiLLJyfFHXrnJXNdMaqK
+         8lukeqXfJZtQR06ZCkbX2vrXC2/Ou4rty3+b3WrK1pjPSImyGXtZqIdT+vQkjDt/jHv6
+         TRWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lMMZ9rolSe9Ajlv1m2tj/H8KqF6hTQtzGPU1trMHjk4=;
+        b=cMGXZenxw9/ThZ4SLSXcyNL1B0ZnKrfeWgBliZHSW+xcpVZvCaZckXJKLcRsOTcn1w
+         zs01lzP3GkCAAtEmtUih9AeGncnObFRA4bnMPoOosNiezILIrB4Nce+m3H+eKLDUODjK
+         uPjjyQvT8mwCB/UFVDL16C6Sv0hlge0AfNwiCfKcKAkZ0U1mqK9a++dTS8tjnNPqD231
+         PUbRn4aPxxb9WrrTSSeIyGcn5wGSwybtuevH2tEYzhHFS8l9F9pAk2C1MX0YAioBkOTz
+         hrNVZ7yq4jV8tN7ns037XLhvdrWLvmb2ms7HfUBdQPN4jXBPPIkWuxG4OaE3umigiOsB
+         yzGg==
+X-Gm-Message-State: AFqh2kqtOODkSnFN9YYLaolqGdcrbuur9KB/rCAEmT0xTv785Hc0lY5d
+        30+2Yvl1ZVRZ9wmEQes4rXShEllTXHKHCb3lBJr4+2xS
+X-Google-Smtp-Source: AMrXdXvy8xodaLPD4VxZmYj/WnVC5q68ql/25WoOHx7n7aDWXpTXQr4XvnO4YEON+7YlvjiO+BucR9ekMim33/3w7Sg=
+X-Received: by 2002:ac2:4c0c:0:b0:4cb:22ab:ce08 with SMTP id
+ t12-20020ac24c0c000000b004cb22abce08mr1942898lfq.251.1674850305934; Fri, 27
+ Jan 2023 12:11:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 1/5] shared/bap: Fix not detaching streams when PAC is
- removed
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167485021744.15183.7216347847931429843.git-patchwork-notify@kernel.org>
-Date:   Fri, 27 Jan 2023 20:10:17 +0000
-References: <20230126201242.4110305-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230126201242.4110305-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20230127113504.134109-1-marcin.kraglak@telink-semi.com>
+In-Reply-To: <20230127113504.134109-1-marcin.kraglak@telink-semi.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 27 Jan 2023 12:11:33 -0800
+Message-ID: <CABBYNZ+AeLnokfsrTp3=vsC7j6E4Uei_U=1Ex6LhYzU_-PDzMw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] shared/util: Add CAS, HAS, TMAS and PBAS UUIDs
+To:     Marcin Kraglak <marcin.kraglak@telink-semi.com>
 Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi Marcin,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Fri, Jan 27, 2023 at 3:42 AM Marcin Kraglak
+<marcin.kraglak@telink-semi.com> wrote:
+>
+> Add UUIDs for: Common Audio service, Hearing Aid service,
+> TMAS service and Public Broadcast Announcement service.
+> ---
+>  src/shared/util.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/shared/util.c b/src/shared/util.c
+> index 69abfba31..1ff9c56fc 100644
+> --- a/src/shared/util.c
+> +++ b/src/shared/util.c
+> @@ -447,7 +447,11 @@ static const struct {
+>         { 0x1850, "Published Audio Capabilities"                },
+>         { 0x1851, "Basic Audio Announcement"                    },
+>         { 0x1852, "Broadcast Audio Announcement"                },
+> -       /* 0x1853 to 0x27ff undefined */
+> +       { 0x1853, "Common Audio"                                },
+> +       { 0x1854, "Hearing Aid"                                 },
+> +       { 0x1855, "TMAS"                                        },
 
-On Thu, 26 Jan 2023 12:12:38 -0800 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> When local PAC is removed we attempt to release the streams but we left
-> it still attached to the endpoint, so this makes sure the stream is
-> properly detached by setting its state to idle.
-> 
-> Fixes: https://github.com/bluez/bluez/issues/457
-> 
-> [...]
+We don't use the abbreviation here, so it should be Telephony and Media Audio
 
-Here is the summary with links:
-  - [v3,1/5] shared/bap: Fix not detaching streams when PAC is removed
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d159973ecec8
-  - [v3,2/5] bap: Fix not setting stream to NULL
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=414c8650acfe
-  - [v3,3/5] bap: Fix not removing endpoint if local PAC is unregistered
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8aed9db4b13f
-  - [v3,4/5] bap: Fix not checking if request fits when grouping
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=814e3535a1bc
-  - [v3,5/5] bap: Fix registering multiple endpoint for the same PAC set
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b61044d52917
+> +       { 0x1856, "Public Broadcast Announcement"               },
+> +       /* 0x1857 to 0x27ff undefined */
+>         { 0x2800, "Primary Service"                             },
+>         { 0x2801, "Secondary Service"                           },
+>         { 0x2802, "Include"                                     },
+> @@ -681,6 +685,7 @@ static const struct {
+>         { 0x2b29, "Client Supported Features"                   },
+>         { 0x2b2A, "Database Hash"                               },
+>         { 0x2b3a, "Server Supported Features"                   },
+> +       { 0x2b51, "TMAP Role"                                   },
 
-You are awesome, thank you!
+Ditto.
+
+>         { 0x2b77, "Audio Input State"                           },
+>         { 0x2b78, "Gain Settings Attribute"                     },
+>         { 0x2b79, "Audio Input Type"                            },
+> @@ -751,6 +756,9 @@ static const struct {
+>         { 0x2bcc, "Source Audio Locations"                      },
+>         { 0x2bcd, "Available Audio Contexts"                    },
+>         { 0x2bce, "Supported Audio Contexts"                    },
+> +       { 0x2bda, "Hearing Aid Features"                        },
+> +       { 0x2bdb, "Hearing Aid Preset Control Point"            },
+> +       { 0x2bdc, "Active Preset Index"                         },
+>         /* vendor defined */
+>         { 0xfeff, "GN Netcom"                                   },
+>         { 0xfefe, "GN ReSound A/S"                              },
+> --
+> 2.39.0
+>
+
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Luiz Augusto von Dentz
