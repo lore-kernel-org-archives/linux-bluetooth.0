@@ -2,95 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9271C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Jan 2023 10:24:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E99C54EAA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 Jan 2023 11:37:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjA0KYJ (ORCPT
+        id S233248AbjA0Lh0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Jan 2023 05:24:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35880 "EHLO
+        Fri, 27 Jan 2023 06:37:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjA0KYI (ORCPT
+        with ESMTP id S233293AbjA0LhV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Jan 2023 05:24:08 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4FB28D3F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 02:24:07 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id q10so4530191wrm.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 02:24:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B1g62FaAwzxRCWTCMBiuBoyOeT/DGaVIfmpUN4XH4l8=;
-        b=WBlhHJ+QydO7/c8H/iv+cPA7WBy/euWH0c8rSU9mF1lm2EpoVxBq+pVtfH+47E98M6
-         +LgVVY709ef+XJl6G++miNZIJFhxCswEpPlWqHNOnrYCd/THbh2EqLDQMAEIB2rcAkt7
-         sUyrebJsnBw5YmDFJzjhYF4op3LYqIvJdPfISDfh/G4H/jmVQqbWxhBbcvK8PlgoX3O9
-         7oQqATG5Y4noaKCX6g8Jd1lCqjY7c2/I5Hog7Of5ye+dSSyvMmOlPUHcNoI3yn/eWrgA
-         kdGSqnAW1ZFawjT75+5dC1O/2bE17OJTDg45ix6c2eLnZ2r7nbMtK1/qbeaVhqENNKjy
-         iLkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B1g62FaAwzxRCWTCMBiuBoyOeT/DGaVIfmpUN4XH4l8=;
-        b=EOmaCm1oKPLpOjUdawQzH0IS1g/9Pq7cwuo6LFKTzDMuOIKC1WDpbZt/EUmc8fgMZi
-         khMr/mom+uZeFQwdZwJn5MoEVrBKzoWyLP/1Fhk3KX80zfA3ypqXVP2SUKXCnD6F2GH2
-         F5sFFgFnB2c0o6GB7zxSiTFkeqQVOxJynREJwFekeE9Ajgxu9iP1bZ5BW4kLGaEyEjBU
-         O1XIKFnkCwc/VNu/zjmAjTeYVwMdGJYP67jbnjL4k+ipONhWTZ0PnWcAM5ol7M0Lna9Q
-         iC86OdI+2/pGqXK/J15mJCQm4uPkcqppn46dEzcI5m/uT0d6c5ukVPRLh7FJwhzVEzg/
-         ib2Q==
-X-Gm-Message-State: AFqh2krrvhN+kJHAy0MmpCvCfnVyXcqtFjcDvQq1x1CdYKYBKnstYt3v
-        wk82esALVle7BVoY1w9R5+BI8Q==
-X-Google-Smtp-Source: AMrXdXte3GUMCRyW8iKhTS2WKAAQM1NZf4WbfuSy6VgAENXlAWYiUaqyjwMtBrRnpXlHV1p9vrcnBA==
-X-Received: by 2002:a05:6000:5c2:b0:2bb:eb3d:8d20 with SMTP id bh2-20020a05600005c200b002bbeb3d8d20mr32682504wrb.43.1674815045619;
-        Fri, 27 Jan 2023 02:24:05 -0800 (PST)
-Received: from [192.168.1.109] ([178.197.216.144])
-        by smtp.gmail.com with ESMTPSA id j15-20020a5d452f000000b002be505ab59asm3704070wra.97.2023.01.27.02.24.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Jan 2023 02:24:05 -0800 (PST)
-Message-ID: <02bddab6-4c63-bb39-9a11-8dab81322c28@linaro.org>
-Date:   Fri, 27 Jan 2023 11:24:03 +0100
+        Fri, 27 Jan 2023 06:37:21 -0500
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D55526F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 03:36:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=telink-semi.com;
+        s=lgqu2209; t=1674819354;
+        bh=t5kqM9Mdc2cjP6dWR/M7Zj+X4nGZ1XKCrufM6XQx7b0=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version;
+        b=M0iK1+NCbZK0w+8C4wZ3a4v9qUC6v/l8jwjpwx+drbsUcePtvWp2nq1J72lPeoUQH
+         ljHnYNkH+GOk2WyEIpWLfZVUo2ekYonEE4msVapCXgn5bv1+xW42ftRTwQ7N5d56E4
+         deyUObYa7LvYSKCVa72/XC7i/z/EVvLT2zFZS/GM=
+X-QQ-mid: bizesmtp91t1674819353tdm2uhgu
+Received: from fedora.. ( [85.31.249.147])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Fri, 27 Jan 2023 19:35:44 +0800 (CST)
+X-QQ-SSF: 0140000000200030D000B00A0000000
+X-QQ-FEAT: mRz6/7wsmIiYJWmPRvZI8sCB1m1vLYemnW2T4cKwjQpFZBua/l4zqeHc6S33Y
+        Hs6yozdddhlc/Id4ZwojKGLTKW5oaXOLHigZVv+6caP0CCWUosrnHmstW6uu0Xld/3slwag
+        zX1ndOCOReIzpwkOIrYFChpaEeebzRsZsMJnz7O7nU7yf/AlGC5+3FOF0IXJG0HG1hU+rJk
+        Q+Ux5W6PhkVMM1AAyG0hwMWZuM9AVnEku43newSY0K90nXkk7rjwmcvUBj87FfllUdX62yg
+        Ut99UxaJrtzRLTcaSnWuici25iSy9EmlzeypwY6IsBh/U+mYknTcTzryrUdOFoiV/yET8/3
+        i9QUsD9ovCpcGHogGKEZLd4GEukjOGcHk69xO90XGHXdnpxI3DNpuc+1FTXLTsnByT/SuBC
+        /ELULJ+uKFk=
+X-QQ-GoodBg: 2
+From:   Marcin Kraglak <marcin.kraglak@telink-semi.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marcin Kraglak <marcin.kraglak@telink-semi.com>
+Subject: [PATCH 1/2] shared/util: Add CAS, HAS, TMAS and PBAS UUIDs
+Date:   Fri, 27 Jan 2023 12:35:02 +0100
+Message-Id: <20230127113504.134109-1-marcin.kraglak@telink-semi.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH RFC 1/2] dt-bindings: net: realtek-bluetooth: Add
- RTL8821CS
-Content-Language: en-US
-To:     Chris Morgan <macroalpha82@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     devicetree@vger.kernel.org, alistair@alistair23.me,
-        anarsoul@gmail.com, krzysztof.kozlowski+dt@linaro.org,
-        robh+dt@kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, max.chou@realtek.com, hildawu@realtek.com,
-        Chris Morgan <macromorgan@hotmail.com>
-References: <20230126165529.1452252-1-macroalpha82@gmail.com>
- <20230126165529.1452252-2-macroalpha82@gmail.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230126165529.1452252-2-macroalpha82@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:telink-semi.com:qybglogicsvr:qybglogicsvr7
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 26/01/2023 17:55, Chris Morgan wrote:
-> From: Chris Morgan <macromorgan@hotmail.com>
-> 
-> Add compatible string for RTL8821CS for existing Realtek Bluetooth
-> driver.
-> 
-> Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
-> ---
->  Documentation/devicetree/bindings/net/realtek-bluetooth.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
+Add UUIDs for: Common Audio service, Hearing Aid service,
+TMAS service and Public Broadcast Announcement service.
+---
+ src/shared/util.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Based on your driver it is compatible with rtl8822cs, so you can
-indicate it in the binding and use just one of_device_id entry.
-
-Best regards,
-Krzysztof
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 69abfba31..1ff9c56fc 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -447,7 +447,11 @@ static const struct {
+ 	{ 0x1850, "Published Audio Capabilities"		},
+ 	{ 0x1851, "Basic Audio Announcement"			},
+ 	{ 0x1852, "Broadcast Audio Announcement"		},
+-	/* 0x1853 to 0x27ff undefined */
++	{ 0x1853, "Common Audio"				},
++	{ 0x1854, "Hearing Aid"					},
++	{ 0x1855, "TMAS"					},
++	{ 0x1856, "Public Broadcast Announcement"		},
++	/* 0x1857 to 0x27ff undefined */
+ 	{ 0x2800, "Primary Service"				},
+ 	{ 0x2801, "Secondary Service"				},
+ 	{ 0x2802, "Include"					},
+@@ -681,6 +685,7 @@ static const struct {
+ 	{ 0x2b29, "Client Supported Features"			},
+ 	{ 0x2b2A, "Database Hash"				},
+ 	{ 0x2b3a, "Server Supported Features"			},
++	{ 0x2b51, "TMAP Role"					},
+ 	{ 0x2b77, "Audio Input State"				},
+ 	{ 0x2b78, "Gain Settings Attribute"			},
+ 	{ 0x2b79, "Audio Input Type"				},
+@@ -751,6 +756,9 @@ static const struct {
+ 	{ 0x2bcc, "Source Audio Locations"			},
+ 	{ 0x2bcd, "Available Audio Contexts"			},
+ 	{ 0x2bce, "Supported Audio Contexts"			},
++	{ 0x2bda, "Hearing Aid Features"			},
++	{ 0x2bdb, "Hearing Aid Preset Control Point"		},
++	{ 0x2bdc, "Active Preset Index"				},
+ 	/* vendor defined */
+ 	{ 0xfeff, "GN Netcom"					},
+ 	{ 0xfefe, "GN ReSound A/S"				},
+-- 
+2.39.0
 
