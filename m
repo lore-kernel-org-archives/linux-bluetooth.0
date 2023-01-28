@@ -2,142 +2,140 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF54C54EAA
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 01:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3844BC61DB3
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 01:21:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233262AbjA1BPa (ORCPT
+        id S233493AbjA1BVG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Jan 2023 20:15:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45996 "EHLO
+        Fri, 27 Jan 2023 20:21:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232953AbjA1BP3 (ORCPT
+        with ESMTP id S233437AbjA1BVF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Jan 2023 20:15:29 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07358222D4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 17:15:27 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id h24so5581808qta.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 17:15:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Firqyz1n+2qQbJHI4kD1QUdyNuPl2JdNqyqQmLW0wQ=;
-        b=BWfy72jcCOH0RJPe1rzK+GSNLdQTfpHeMyT7cPayJok8bysTxFUa/zd5Fy1lU4VfD/
-         a/M0uCWoqbYhildbDCkPu/ih/spSbMkk+ilt9I0TFEd0ouB0GHb/6OUfVRBUeLnHGwuU
-         MHM2rnFJHJQSPOz7wCM9Czw5kIk5m1sxpEtjJ1uAnlVsYWGX83t/4d5+uWVnnUmeVe0B
-         6aQeSXZj1JSp+E9b+tkdLAm4G7l6Zh0VPVL01dtvFxAOKvVtVOZEZ+qx4pviZzUpa5qP
-         SDbuSVa2mKWdWjHQyS7I6qRpRZgamOz+Sl0OzEn16us7XP0Gm5HEsrvFTq8troQpLNyx
-         2I8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0Firqyz1n+2qQbJHI4kD1QUdyNuPl2JdNqyqQmLW0wQ=;
-        b=G23oRlrcemXjcykHJbwEDDky6HhJawUdc8FT+hOxYB5K6bd0t3tweI3OHcOtlWasJ9
-         uU1bK8HARWETVqEf61kOPEwqBACbISUs+ovSUMW0Gudac3JPKpAOPTAu1/rEsLbdlQ0m
-         6GQvUMSYpbK2vZKC4+hin+rd6SDdGiJebtwls8ZvWtwieoIM9pb5sWawKM/EPcT0pth0
-         Y1Ilkhh+pMhDaZ5vo0MV5uTo7ai+/3qyNhImT23g0QppiObSctenwT41UO+9+tkorCzV
-         EC71EUGgCyt0dmtBEujfjOD30KVdhdtXCJ+JltTPj/ojvV1GMX4QLV0PUiqkaO7qLGhe
-         9caQ==
-X-Gm-Message-State: AO0yUKXe1e3OzlVH9dr6o4sNfKaGyDyDZIB6eAWT6FzmManQ2I/J6DSh
-        OezNtQA59l9FiifZfLfLs6esh5XLb18+Og==
-X-Google-Smtp-Source: AK7set8ydobvWNwJe3ef9Te9+d+9eBZ7UZHePEeP4aGsr9iHEne8EqszNTlYw+3z9xqmThykeaO4/A==
-X-Received: by 2002:a05:622a:1884:b0:3b4:d5be:a2e0 with SMTP id v4-20020a05622a188400b003b4d5bea2e0mr1701762qtc.20.1674868525897;
-        Fri, 27 Jan 2023 17:15:25 -0800 (PST)
-Received: from [172.17.0.2] ([20.42.13.16])
-        by smtp.gmail.com with ESMTPSA id x1-20020ac80181000000b003a527d29a41sm3695408qtf.75.2023.01.27.17.15.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 17:15:25 -0800 (PST)
-Message-ID: <63d4772d.c80a0220.37331.ce8c@mx.google.com>
-Date:   Fri, 27 Jan 2023 17:15:25 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7854795504131870001=="
+        Fri, 27 Jan 2023 20:21:05 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB63C12F09
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 17:21:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674868864; x=1706404864;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GvVbQwkccpmRQlW8t8mZS2RAKjfYhl8SeDfx5uemU6g=;
+  b=GdTh4hzOdiZZkrftMyU9/68LVIyfDKSdc5GlRwDK/9FJB0/Wf/mhWPpd
+   nX0iw8oLQOz9WxR6otXkY3j2vC2oPRiHp7YsFQeGbnwvlU1gZY0nG4+6I
+   cUWralYdis4Pq8+8MKyU72Ec2G+XjX5VoF6AOq2r/zGAFGaXFsDHx3jvP
+   Yh+6IF0J9uxi/xiyF8Y/H1793bTPJ9bBi/I9z2hEjkDl4oaXlvIZrc8+7
+   zvr6fyJQbZbTEfpt6tPIZZSN/G4Ffl+D1ZWBI287bLYcPW/kYLY/NtuwR
+   zWnsLXuzOO8C9Mw9ScCmTeRQdgi2VRic+M1lHmw2N3/TRPa1qW1BPY3ut
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10603"; a="307587326"
+X-IronPort-AV: E=Sophos;i="5.97,252,1669104000"; 
+   d="scan'208";a="307587326"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2023 17:21:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10603"; a="695722647"
+X-IronPort-AV: E=Sophos;i="5.97,252,1669104000"; 
+   d="scan'208";a="695722647"
+Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 27 Jan 2023 17:21:02 -0800
+Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pLZtu-0000CA-11;
+        Sat, 28 Jan 2023 01:21:02 +0000
+Date:   Sat, 28 Jan 2023 09:20:19 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ ef017002b93b8c5213c3a3e31fdc463bb6358cba
+Message-ID: <63d47853.6xRvXmNrg6YMPsDV%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, keescook@chromium.org
-Subject: RE: Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
-In-Reply-To: <20230128005150.never.909-kees@kernel.org>
-References: <20230128005150.never.909-kees@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7854795504131870001==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: ef017002b93b8c5213c3a3e31fdc463bb6358cba  dt-bindings: leds: Document Bluetooth and WLAN triggers
 
-This is automated email and please do not reply to this email!
+elapsed time: 4373m
 
-Dear submitter,
+configs tested: 62
+configs skipped: 2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=716493
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+gcc tested configs:
+x86_64                            allnoconfig
+arc                                 defconfig
+s390                             allmodconfig
+alpha                               defconfig
+um                             i386_defconfig
+s390                                defconfig
+um                           x86_64_defconfig
+s390                             allyesconfig
+powerpc                           allnoconfig
+i386                                defconfig
+x86_64                              defconfig
+arc                  randconfig-r043-20230123
+arm                  randconfig-r046-20230123
+x86_64                               rhel-8.3
+sh                               allmodconfig
+x86_64                           allyesconfig
+ia64                             allmodconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+x86_64                           rhel-8.3-syz
+x86_64               randconfig-a002-20230123
+x86_64                         rhel-8.3-kunit
+x86_64               randconfig-a001-20230123
+x86_64               randconfig-a004-20230123
+x86_64                           rhel-8.3-kvm
+x86_64               randconfig-a003-20230123
+x86_64                           rhel-8.3-bpf
+x86_64               randconfig-a006-20230123
+x86_64               randconfig-a005-20230123
+i386                             allyesconfig
+arm                                 defconfig
+i386                 randconfig-a003-20230123
+i386                 randconfig-a002-20230123
+i386                 randconfig-a001-20230123
+i386                 randconfig-a004-20230123
+i386                 randconfig-a005-20230123
+i386                 randconfig-a006-20230123
+arm64                            allyesconfig
+arm                              allyesconfig
+x86_64                          rhel-8.3-func
+m68k                             allyesconfig
+alpha                            allyesconfig
+arc                              allyesconfig
+x86_64                    rhel-8.3-kselftests
+m68k                             allmodconfig
 
-Test Summary:
-CheckPatch                    FAIL      1.23 seconds
-GitLint                       FAIL      0.61 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      31.60 seconds
-CheckAllWarning               PASS      34.13 seconds
-CheckSparse                   PASS      38.76 seconds
-CheckSmatch                   PASS      105.61 seconds
-BuildKernel32                 PASS      30.23 seconds
-TestRunnerSetup               PASS      435.80 seconds
-TestRunner_l2cap-tester       PASS      16.61 seconds
-TestRunner_iso-tester         PASS      17.48 seconds
-TestRunner_bnep-tester        PASS      5.76 seconds
-TestRunner_mgmt-tester        PASS      115.04 seconds
-TestRunner_rfcomm-tester      PASS      9.17 seconds
-TestRunner_sco-tester         PASS      8.47 seconds
-TestRunner_ioctl-tester       PASS      10.05 seconds
-TestRunner_mesh-tester        PASS      7.27 seconds
-TestRunner_smp-tester         PASS      8.40 seconds
-TestRunner_userchan-tester    PASS      6.03 seconds
-IncrementalBuild              PASS      28.34 seconds
+clang tested configs:
+hexagon              randconfig-r041-20230123
+hexagon              randconfig-r045-20230123
+s390                 randconfig-r044-20230123
+riscv                randconfig-r042-20230123
+x86_64               randconfig-a013-20230123
+x86_64               randconfig-a011-20230123
+x86_64               randconfig-a012-20230123
+x86_64               randconfig-a014-20230123
+x86_64               randconfig-a015-20230123
+x86_64               randconfig-a016-20230123
+x86_64                          rhel-8.3-rust
+i386                 randconfig-a012-20230123
+i386                 randconfig-a013-20230123
+i386                 randconfig-a011-20230123
+i386                 randconfig-a014-20230123
+i386                 randconfig-a016-20230123
+i386                 randconfig-a015-20230123
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
-WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#105: 
-    inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,
-
-total: 0 errors, 1 warnings, 0 checks, 30 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13119595.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B1 Line exceeds max length (94>80): "    inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,"
-11: B1 Line exceeds max length (123>80): "../arch/x86/include/asm/rmwcc.h:37:9: warning: array subscript 0 is outside array bounds of 'atomic_t[0]' [-Warray-bounds=]"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7854795504131870001==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
