@@ -2,141 +2,142 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87517C61DA7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 00:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF54C54EAA
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 01:15:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233416AbjA1AwA (ORCPT
+        id S233262AbjA1BPa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 27 Jan 2023 19:52:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59684 "EHLO
+        Fri, 27 Jan 2023 20:15:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232504AbjA1Av6 (ORCPT
+        with ESMTP id S232953AbjA1BP3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 27 Jan 2023 19:51:58 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA557D287
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 16:51:57 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 143so4266201pgg.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 16:51:57 -0800 (PST)
+        Fri, 27 Jan 2023 20:15:29 -0500
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07358222D4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 17:15:27 -0800 (PST)
+Received: by mail-qt1-x82f.google.com with SMTP id h24so5581808qta.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 17:15:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MiU9G7/Ds/01bMEGuQC9LxFoYAJoQIyJyB7uaGN1BVg=;
-        b=OLznq80N8Oh4QKvXlMNb3ih7XmBuOr005NMxnz1LIqYtgjmVS4YuyblUnj4zWitmjZ
-         lJCBYiXm4J7ZPtv8qMBJLQ2QyrCPUVlMoHuTzG6nrKbe2t4bMMlp9FCurOKdogoN8i4l
-         hQWxAh2177dSgrm4CatTUBP0hAX9SrJm5fmoc=
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Firqyz1n+2qQbJHI4kD1QUdyNuPl2JdNqyqQmLW0wQ=;
+        b=BWfy72jcCOH0RJPe1rzK+GSNLdQTfpHeMyT7cPayJok8bysTxFUa/zd5Fy1lU4VfD/
+         a/M0uCWoqbYhildbDCkPu/ih/spSbMkk+ilt9I0TFEd0ouB0GHb/6OUfVRBUeLnHGwuU
+         MHM2rnFJHJQSPOz7wCM9Czw5kIk5m1sxpEtjJ1uAnlVsYWGX83t/4d5+uWVnnUmeVe0B
+         6aQeSXZj1JSp+E9b+tkdLAm4G7l6Zh0VPVL01dtvFxAOKvVtVOZEZ+qx4pviZzUpa5qP
+         SDbuSVa2mKWdWjHQyS7I6qRpRZgamOz+Sl0OzEn16us7XP0Gm5HEsrvFTq8troQpLNyx
+         2I8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MiU9G7/Ds/01bMEGuQC9LxFoYAJoQIyJyB7uaGN1BVg=;
-        b=eeOnz54ORFEmSRj0FNzx48Obk7a9t0eAXlzmXCSUNEIjsEQME0hnH7X8jqUT3OfbZV
-         Zn53yBoFwKZ4CrpjhUowKBK0eY299oFlp60cnvrFd5TwUyDxrjb5wdppbq+p+L6NMOWF
-         PWtEjCqON7AQjdf6Ib5Z4l7ixxU3hjpzR3wypjCjd3JK202u6LtykHfOCYcoRNFQ1DTR
-         T3pkkBE7wYq8QAnqISG4j58jfwLCUtdNyhC84qVIUKG3Oi9Nw6JwWHSHHGBI84FctyQT
-         DUskFhsPfFD9Wfdq3sIHf1f69PAYoPGlQG9URK3AJt1GAj3aEfumKvc3ywFWOyvdsTwC
-         X7lQ==
-X-Gm-Message-State: AO0yUKV218zGiGlm07idHu6SXAPwW6Tf9yyBtbcwsN0mXOfrfuRa4Usn
-        LVcmdYVl1qg6KC09/3inPjzLWw==
-X-Google-Smtp-Source: AK7set/63G02VXwkIsu1E4p409jYWDbrPfYLbnmPnCzvwiV1jwDFggi8v/o9Uk6HJHHBGWdI8SwqBg==
-X-Received: by 2002:a05:6a00:1916:b0:58d:aae3:bcc1 with SMTP id y22-20020a056a00191600b0058daae3bcc1mr590500pfi.5.1674867116995;
-        Fri, 27 Jan 2023 16:51:56 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id i2-20020a056a00004200b0059392f591b0sm202309pfk.53.2023.01.27.16.51.56
+        bh=0Firqyz1n+2qQbJHI4kD1QUdyNuPl2JdNqyqQmLW0wQ=;
+        b=G23oRlrcemXjcykHJbwEDDky6HhJawUdc8FT+hOxYB5K6bd0t3tweI3OHcOtlWasJ9
+         uU1bK8HARWETVqEf61kOPEwqBACbISUs+ovSUMW0Gudac3JPKpAOPTAu1/rEsLbdlQ0m
+         6GQvUMSYpbK2vZKC4+hin+rd6SDdGiJebtwls8ZvWtwieoIM9pb5sWawKM/EPcT0pth0
+         Y1Ilkhh+pMhDaZ5vo0MV5uTo7ai+/3qyNhImT23g0QppiObSctenwT41UO+9+tkorCzV
+         EC71EUGgCyt0dmtBEujfjOD30KVdhdtXCJ+JltTPj/ojvV1GMX4QLV0PUiqkaO7qLGhe
+         9caQ==
+X-Gm-Message-State: AO0yUKXe1e3OzlVH9dr6o4sNfKaGyDyDZIB6eAWT6FzmManQ2I/J6DSh
+        OezNtQA59l9FiifZfLfLs6esh5XLb18+Og==
+X-Google-Smtp-Source: AK7set8ydobvWNwJe3ef9Te9+d+9eBZ7UZHePEeP4aGsr9iHEne8EqszNTlYw+3z9xqmThykeaO4/A==
+X-Received: by 2002:a05:622a:1884:b0:3b4:d5be:a2e0 with SMTP id v4-20020a05622a188400b003b4d5bea2e0mr1701762qtc.20.1674868525897;
+        Fri, 27 Jan 2023 17:15:25 -0800 (PST)
+Received: from [172.17.0.2] ([20.42.13.16])
+        by smtp.gmail.com with ESMTPSA id x1-20020ac80181000000b003a527d29a41sm3695408qtf.75.2023.01.27.17.15.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 16:51:56 -0800 (PST)
-From:   Kees Cook <keescook@chromium.org>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
-Date:   Fri, 27 Jan 2023 16:51:54 -0800
-Message-Id: <20230128005150.never.909-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        Fri, 27 Jan 2023 17:15:25 -0800 (PST)
+Message-ID: <63d4772d.c80a0220.37331.ce8c@mx.google.com>
+Date:   Fri, 27 Jan 2023 17:15:25 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7854795504131870001=="
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2549; h=from:subject:message-id; bh=mVnvB6NOyfWKqwGU5dfT8S9lHvRpK/kONHhCQ2CZubo=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBj1HGqBJHOTl2sp2HPsmuw4TM++NQqA2fhgVBlGeK4 MQdzgL2JAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCY9RxqgAKCRCJcvTf3G3AJjDqD/ 0V0RCFZ3es87Ut1Lhxbg2HbsAjs/19gb8HGiAWmEiBRCm82CiN1ITFJVmYFH0xvuismK6BY5FNj8lS CMX08uMHTIswyaN5ofAc9gyH8zLHzyyEnNe+hJrJlN4vqzi0QGNy5uAyt6QG/7kQvabiiQXS34cOsr VJI3asei8wsGFxCvYz/vBYL7zz6j1aQ1ZdnRrRt6yOk7XIfpp6M65oPkznc/2vtOsgb9BQ5eQsvvA5 hbDSzxnlzxviJ5nXIZSKQcn6F5raQ0Yy3rj6dLnGt2JkESmUwvuXBmU0alQK2uuW9f0MNYlDAboyvX VwuTTivoEkQbOM3AzdHp6JOQP7daw+nRfxiiqiffRME5JbQckkDi9wjaBZvBrcWRLDIoQPTgBOWGKD f1xNi2lOWu6AOrsv6ZGKTp72iZsieXDBwBc2TbeGZ4+9PhS4g8jQQ1QLHQCUKVBLk/GNpTcYWO8+Nw i0CrHq5WR2SmhGB/UYiZON2eOmeugzjRR8XWZFk+tgiGsjlwIFJn4MyIv4bT+GFcnm2w5J8NEfc85q fWVG3gz0ySWvP5ysxUpuv6GlMw8Tobx+52ascosL0U43MqZJ8/ZrSe/99wfCbdUcblc1BkWp3ggxRJ ezfgazR7DB1IvBC35Sm6nk2z2M7+PLYlE0jWeC8Amh3+ty78ipc69h9JwAYA==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, keescook@chromium.org
+Subject: RE: Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
+In-Reply-To: <20230128005150.never.909-kees@kernel.org>
+References: <20230128005150.never.909-kees@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The compiler thinks "conn" might be NULL after a call to hci_bind_bis(),
-which cannot happen. Avoid any confusion by just making it not return a
-value since it cannot fail. Fixes the warnings seen with GCC 13:
+--===============7854795504131870001==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In function 'arch_atomic_dec_and_test',
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=716493
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.23 seconds
+GitLint                       FAIL      0.61 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      31.60 seconds
+CheckAllWarning               PASS      34.13 seconds
+CheckSparse                   PASS      38.76 seconds
+CheckSmatch                   PASS      105.61 seconds
+BuildKernel32                 PASS      30.23 seconds
+TestRunnerSetup               PASS      435.80 seconds
+TestRunner_l2cap-tester       PASS      16.61 seconds
+TestRunner_iso-tester         PASS      17.48 seconds
+TestRunner_bnep-tester        PASS      5.76 seconds
+TestRunner_mgmt-tester        PASS      115.04 seconds
+TestRunner_rfcomm-tester      PASS      9.17 seconds
+TestRunner_sco-tester         PASS      8.47 seconds
+TestRunner_ioctl-tester       PASS      10.05 seconds
+TestRunner_mesh-tester        PASS      7.27 seconds
+TestRunner_smp-tester         PASS      8.40 seconds
+TestRunner_userchan-tester    PASS      6.03 seconds
+IncrementalBuild              PASS      28.34 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#105: 
     inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,
-    inlined from 'hci_conn_drop' at ../include/net/bluetooth/hci_core.h:1391:6,
-    inlined from 'hci_connect_bis' at ../net/bluetooth/hci_conn.c:2124:3:
-../arch/x86/include/asm/rmwcc.h:37:9: warning: array subscript 0 is outside array bounds of 'atomic_t[0]' [-Warray-bounds=]
-   37 |         asm volatile (fullop CC_SET(cc) \
-      |         ^~~
-...
-In function 'hci_connect_bis':
-cc1: note: source object is likely at address zero
 
-Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
+total: 0 errors, 1 warnings, 0 checks, 30 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13119595.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+8: B1 Line exceeds max length (94>80): "    inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,"
+11: B1 Line exceeds max length (123>80): "../arch/x86/include/asm/rmwcc.h:37:9: warning: array subscript 0 is outside array bounds of 'atomic_t[0]' [-Warray-bounds=]"
+
+
 ---
- net/bluetooth/hci_conn.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index acf563fbdfd9..61a34801e61e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1981,16 +1981,14 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
- 		qos->latency = conn->le_conn_latency;
- }
- 
--static struct hci_conn *hci_bind_bis(struct hci_conn *conn,
--				     struct bt_iso_qos *qos)
-+static void hci_bind_bis(struct hci_conn *conn,
-+			 struct bt_iso_qos *qos)
- {
- 	/* Update LINK PHYs according to QoS preference */
- 	conn->le_tx_phy = qos->out.phy;
- 	conn->le_tx_phy = qos->out.phy;
- 	conn->iso_qos = *qos;
- 	conn->state = BT_BOUND;
--
--	return conn;
- }
- 
- static int create_big_sync(struct hci_dev *hdev, void *data)
-@@ -2119,11 +2117,7 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (IS_ERR(conn))
- 		return conn;
- 
--	conn = hci_bind_bis(conn, qos);
--	if (!conn) {
--		hci_conn_drop(conn);
--		return ERR_PTR(-ENOMEM);
--	}
-+	hci_bind_bis(conn, qos);
- 
- 	/* Add Basic Announcement into Peridic Adv Data if BASE is set */
- 	if (base_len && base) {
--- 
-2.34.1
 
+--===============7854795504131870001==--
