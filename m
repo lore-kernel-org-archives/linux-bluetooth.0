@@ -2,264 +2,149 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A57C38142
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 09:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2A4C61D97
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 13:45:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233622AbjA1J2D convert rfc822-to-8bit (ORCPT
+        id S234543AbjA1NpF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 28 Jan 2023 04:28:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49908 "EHLO
+        Sat, 28 Jan 2023 08:45:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233538AbjA1J2C (ORCPT
+        with ESMTP id S233276AbjA1NpE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 28 Jan 2023 04:28:02 -0500
-X-Greylist: delayed 93 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 28 Jan 2023 01:27:58 PST
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAD313509
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Jan 2023 01:27:57 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id BAB40240443
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Jan 2023 10:26:22 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4P3pwY6yYVz9rxB;
-        Sat, 28 Jan 2023 10:26:21 +0100 (CET)
-Message-ID: <00234f093d58acd5545eb10c6f956ba04393f645.camel@iki.fi>
-Subject: Re: [RFC, BlueZ] bap: check adapter support before enabling BAP
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Sat, 28 Jan 2023 09:26:21 +0000
-In-Reply-To: <CABBYNZLBUXuYLBdRDba2ReGLe0wgXx-=4itG3qczqKker5ZVmw@mail.gmail.com>
-References: <20230127205205.20235-1-pav@iki.fi>
-         <CABBYNZLBUXuYLBdRDba2ReGLe0wgXx-=4itG3qczqKker5ZVmw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Sat, 28 Jan 2023 08:45:04 -0500
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2126.outbound.protection.outlook.com [40.107.100.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFCF234C2;
+        Sat, 28 Jan 2023 05:45:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aH05U2TmJXjli0tAYFhjxb8Bx4C8EM/7Nda5FCQejIqi7yYEWXuOxv47YbtwNlpmAKSPqeUFvsopf5jG4U4hg0OrF8XY0dMDkqscees7Ivyi/+c9GW84Or8FK8LLamU9EDk/mIaoCBky6mqgNQC0hMBN5+5JViPvyDAXj1n9kI9DBffjkX82wXDCGxJt+IdEPESAg4zuwF8j5Zd59HO0A47ITCfav/7FaHzrHxdIgZAOSf8+s2wZMSI8XVHYCY9tY3iBSdBOF9g/ghRHC+ggWEGolPOWde7MNhCJ6zzmoOTKF5mJg2R1Fj1V+0VxgJQowIdtSuIHcC68XeLyEmRzLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YZowlLrxjQ8qeJZqwDBY8sJGeuBkkSbFWxJBEwjTJQ0=;
+ b=Yh/FQZ8y/o1qtWCuAqxp/ORfw1d16G0Zwkoa6ft8Z7Q4+K/OyNUBExdJ/wSn7w844KctNiGofiFrjUeYfkgmpIjE3RETpHTxrFoM2Vr2OuEq2Jwt5WoApJkyRodsXiwgKVXW5cvq1ppz9/a81dgojfhcsyA5HT0r1rsnB9WgyVVQ1doIeaTdcwdwtGOOdJpSfPFN3qlYJV4y5QrB5wG5lEoqsPAxJ8EVpsK18zcN21IRxfqj/hN0fyeQZ+Vzq2uGf21M336qAhdjL6lKMpZDvH0F9VCDyjbC7/TEMGzEMVkp/sXlTN4QfadJsVrDe7qWu8+s9x6kRnq3FD3HTqTm8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YZowlLrxjQ8qeJZqwDBY8sJGeuBkkSbFWxJBEwjTJQ0=;
+ b=wQJmRoW6UnEYdNqqEX3QhAEhEe+S8121vMwHF27jKgOqblUOlM4cpLJHrKmgMJWJTc6Kiw0LU1RdEgJ1tkpLb5gck2jet8b8SMftXTSoW+EOxQv1g/kDrGS8CdOuMPOG4M6QQ0Ok+MNjt4glHfm+CVOjurLlppz51YIsqxdlvCo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SA1PR13MB5444.namprd13.prod.outlook.com (2603:10b6:806:233::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23; Sat, 28 Jan
+ 2023 13:45:01 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb5c:910f:3730:fd65]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb5c:910f:3730:fd65%6]) with mapi id 15.20.6043.028; Sat, 28 Jan 2023
+ 13:45:01 +0000
+Date:   Sat, 28 Jan 2023 14:44:54 +0100
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_conn: Refactor hci_bind_bis() since it
+ always succeeds
+Message-ID: <Y9Um1h/2V9mxDrIC@corigine.com>
+References: <20230128005150.never.909-kees@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230128005150.never.909-kees@kernel.org>
+X-ClientProxiedBy: AM0PR02CA0159.eurprd02.prod.outlook.com
+ (2603:10a6:20b:28d::26) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA1PR13MB5444:EE_
+X-MS-Office365-Filtering-Correlation-Id: 399e902e-7d74-4a74-280f-08db0135da7d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XksWpPVuelSseZAR9iY/qSXybq6oVtefmuMleOWfBZT9EZBLcECsktWV7qh9WU/FrmXYQ0nM6CfTc7WSFU2Xt+y891urIiTF6LTIS9L1CixOrTOspBoWwcPd7zqbBLhNd5OT1QbLO9ftKgx6+lSUycgkNvDZZ5e9FB/+ibrfjxpeuOF9PqB9TRtXiP21ffT0Mw10gOlQ66BoeIRRE0C5Gm8ZgFOFqx2VticONP01z8koVKszTqG8Y2uZq4iXkGV3CPSa+49L+hkQv3shjkH28LnJF6gex/8Kr44WS76aZKPBbz4gfdoT0FwlQ9vnh4lI0DIRLbuKKK+2KxDzxGqM1P6SWE5QITmhP7tvgTZ4RY8pFhpNHCbQ2PbuBQu2L74jk+s4V8RKLGO9a6FuVVIKOG+J/h1ysHo4Gv1cly5Xfw9sTvDG7QygA2wUsDKQKgoghQDV1tXCWg6vujQEb7+3aGyaSzMEf+RcGqz6dV57cQngMXRq4aDR5LssqwRS3KkHnf8/YYEJlXtpVdQ1O+sVV2mDn4G+qUxb3/kPA2qFyOxsqHUF94pVE8GPMbo+ULoKsHNN8/5GbVYcPiGhttRqEZCXegSWPikWhnpVT+M4LszcFN9umHh7Y57UXEQVmxNzPzAl9GS2RNtfpaVpjYFYUA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(136003)(346002)(39830400003)(376002)(396003)(451199018)(86362001)(38100700002)(2616005)(54906003)(316002)(2906002)(4326008)(6916009)(8936002)(66946007)(5660300002)(8676002)(83380400001)(66556008)(41300700001)(6512007)(186003)(66476007)(36756003)(6486002)(478600001)(7416002)(44832011)(6666004)(6506007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6KLc2LFhD7HIJA+tSqatk0bck4OZxL12/00RO88V4VBP13s/Of3zi5BMfR4y?=
+ =?us-ascii?Q?fWSfOYAk9xcYh3wmon19dq6DiDe7yd5JOWcM3TH6saxueuMHmI0qwrVjsxsG?=
+ =?us-ascii?Q?YGwuerTWPNci77wOd+eXMyykhYQA/Rkf32gn1xUzTDYbiWGXfsbkU7o2T/1c?=
+ =?us-ascii?Q?lT/+juaX6vYmr8KWP9/esl8UoPbxKLbgVq6kCxQ2lLDcgNvmmveBW80qjJfn?=
+ =?us-ascii?Q?/vLaThH/l2dS6jgLVTpPp4mifnpf9gfKDsiAGeqb6r2ly2YVgLZKyjSRqyNm?=
+ =?us-ascii?Q?fFN/3OafwhZMgPxYmHNmQ4clLwEm6uj2Og49gFIzHlE26W080nFzeRbfxGJH?=
+ =?us-ascii?Q?2G/ODnwLewrzNYKuAnYjZwgW30SHQcF5vOvyhCjXLseohzxaidNYsBkSP0BX?=
+ =?us-ascii?Q?hUWjVWE1TG2kUXq14y68ugjIZsazXdkGi30xYz73I/14tg0bMvLpQw1tbIV/?=
+ =?us-ascii?Q?+LcKl3vGUt5Tl6SU2zUDDYUbnX67SmdXuRR1nImlCFws0YHJONv9TAd88Qdt?=
+ =?us-ascii?Q?+f12T6ZO/QLKBO88dnG3k8zPDg4PvledUJ8JGiZn7KbtSahKl1CYFPxKAxWj?=
+ =?us-ascii?Q?Bp4p81kzUfNVIiVNcb9t5LMW+xWvetMK4CsBiWyGtsFcrweGdH1bICD4yv4c?=
+ =?us-ascii?Q?2GCat5M24YxeOklkZkTLfdH/rdl0+KX1XDhFpEIgciAsBDe0vC7CiFBRJ3+W?=
+ =?us-ascii?Q?KCiejY44UgBaZjTsx+skfezdBWYczUrYV/K6yL3asKpABuChjpkVDk7fUOg2?=
+ =?us-ascii?Q?HBekX/6un7C38NUM9G0NGn+dlOEq+PVohKhimO0UuAEpFwFbgdr4waJvl+Lq?=
+ =?us-ascii?Q?sT2niEfAiSbtevg6XITw3Bq/UloLVz7vyUsEgpRo8FEZdVHxaBTbEiz+EEK5?=
+ =?us-ascii?Q?8QU9qC2HSFNZF/9DOPOsZUsu7FYx7Bv6oANZ6ofkqTD2uxZ0Jcich0QdpOL7?=
+ =?us-ascii?Q?f4ruDZB0ZOkyKqSf9NaV+AK8lE4L3p3uFnf5r8U6/ab/2P+CHBjFRvooQPZb?=
+ =?us-ascii?Q?4moXVAZvROHJoIQ1ITLgTT/3jp4vbqdM4k+BBvUsTjSVKr9XGX4BKF3Ae++h?=
+ =?us-ascii?Q?/pCdiEBBzS73E/35adevMrh/t9c2FGtxIJwxuNogClt/XcXYDZPSbWGcr/Pa?=
+ =?us-ascii?Q?aOuJkmc1WxSdI9CQplgOXwJAXxlvmecMNuLC7R1ayym/gtW0oNVtGhH/spO+?=
+ =?us-ascii?Q?Y2VGyknCH1FT427k/ukeyph3l5kgqg2YGJu8uNWkCs7qGwU5upjTf0j/JWmq?=
+ =?us-ascii?Q?BfFa0yayhJdVXBAcymhm44EdwowS4xlO5rAPrgWsd0Tg7bhBM8CUyh9jGpxD?=
+ =?us-ascii?Q?AuFU6f+svwqIZnUT8lrAWmiVdqzTy7QjaWihCo8Nf+ns8X6+yIkpTs30ODiM?=
+ =?us-ascii?Q?oDFDiWfcivV0leOnkfMDLKBDz2C2lz/qIyKxo5MXckKP3Rfb/SzZbYvee+jy?=
+ =?us-ascii?Q?UR/tAllLrC6h7L5kEBb2kWMEZR0AciNdcI9Jn4jncfaKfyi04PkYlv+OPxF0?=
+ =?us-ascii?Q?Dbm0WvPCbABvHGmJno27zxy7GxORwjGYQSM1mRYXaRlA/xWuI7jjk4Q7gVru?=
+ =?us-ascii?Q?9m5AF1EGXFH1MvBwZw/7FONHDdEA30nH1EEV0D7iPTVjWSbj72scKZI48VL+?=
+ =?us-ascii?Q?pLlnqX1sM1SZpeVAZscCMnen9eDK79oBNcoe14YwOnifWN0/uSudsNpk1gS8?=
+ =?us-ascii?Q?DBgEQA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 399e902e-7d74-4a74-280f-08db0135da7d
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2023 13:45:01.5305
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EseaYuyN9Mk4ZymVwhmVAEbGHixmc6H4KzqORkdL3rq/VOZt680N9Xx6/R7aHSIjlKYjTQLa9gMFf2Klm5IJ+vaQ0SUm4AZGOose4atUXUY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR13MB5444
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+On Fri, Jan 27, 2023 at 04:51:54PM -0800, Kees Cook wrote:
+> The compiler thinks "conn" might be NULL after a call to hci_bind_bis(),
+> which cannot happen. Avoid any confusion by just making it not return a
+> value since it cannot fail. Fixes the warnings seen with GCC 13:
+> 
+> In function 'arch_atomic_dec_and_test',
+>     inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,
+>     inlined from 'hci_conn_drop' at ../include/net/bluetooth/hci_core.h:1391:6,
+>     inlined from 'hci_connect_bis' at ../net/bluetooth/hci_conn.c:2124:3:
+> ../arch/x86/include/asm/rmwcc.h:37:9: warning: array subscript 0 is outside array bounds of 'atomic_t[0]' [-Warray-bounds=]
+>    37 |         asm volatile (fullop CC_SET(cc) \
+>       |         ^~~
+> ...
+> In function 'hci_connect_bis':
+> cc1: note: source object is likely at address zero
+> 
+> Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
+...
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  net/bluetooth/hci_conn.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
 
-pe, 2023-01-27 kello 16:28 -0800, Luiz Augusto von Dentz kirjoitti:
-> On Fri, Jan 27, 2023 at 12:56 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > When the BT adapter does not have the "Connected Isochronous Stream - Central"
-> > feature, establishing ISO connections fails at a late stage.  Namely, we get
-> > EOPNOTSUPP in connect() due to cis_central_capable(hdev) being false.  However,
-> > at that point BlueZ and the rest of the userspace like sound servers have
-> > already set up the BAP stuff, and think they are trying to do something that
-> > should succeed under normal conditions.
-> > 
-> > It appears the information about what features the adapter actually has should
-> > be available to BlueZ earlier, and BlueZ should provide accurate information
-> > about the adapter capabilities to the rest of the userspace.
-> > 
-> > For LE Audio in particular this is sort of important, because the adapter
-> > support is not currently there, and only fairly new adapter models have these
-> > features. There's also a few other bits (Core Sec 4.6, table 4.6) that BlueZ
-> > might need to know later on, once support for more LE Audio parts is added.
-> > 
-> > At the moment the ISO sockets are under the experimental feature flag, so I'm
-> > not sure if this is something that is to be added right now.
-> > 
-> > Below is a quick hack, which just exposes these bits to the mgmt settings a la
-> > WBS and handles them in BlueZ.  But would this be the right place to put them
-> > in the first place? Other ideas?  Trying to connect() to some random addresses
-> > from userspace just to probe the feature capability probably is not the right
-> > thing.
-> 
-> While it is probably a good idea to add as a feature it should be
-> tight to ISO sockets itself, and perhaps we should have both central
-> and peripheral flags so we can detect if we need to register the GATT
-> services when registering the MediaEndpoint.
+Is this really a 'fix' ?
 
-Thanks, I'll make a proper patch along these lines then, with the three
-CIS and BIS feature bits that are currently checked on kernel side in
-connect() in the mgmt controller info.
+In any case, the change looks good to me.
 
-> > 
-> > ---
-> >  doc/mgmt-api.txt       |  2 ++
-> >  lib/mgmt.h             |  1 +
-> >  profiles/audio/bap.c   |  5 +++++
-> >  profiles/audio/media.c |  3 +++
-> >  src/adapter.c          | 11 +++++++++++
-> >  src/adapter.h          |  6 ++++++
-> >  tools/btmgmt.c         |  1 +
-> >  7 files changed, 29 insertions(+)
-> > 
-> >  include/net/bluetooth/mgmt.h | 1 +
-> >  net/bluetooth/mgmt.c         | 6 ++++++
-> >  2 files changed, 7 insertions(+)
-> > 
-> > 
-> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> > index 90d612ed8..11798629a 100644
-> > --- a/doc/mgmt-api.txt
-> > +++ b/doc/mgmt-api.txt
-> > @@ -333,6 +333,7 @@ Read Controller Information Command
-> >                 16      PHY Configuration
-> >                 17      Wideband Speech
-> >                 18      Quality Report
-> > +               19      Connected Isochronous Stream Central
-> > 
-> >         This command generates a Command Complete event on success or
-> >         a Command Status event on failure.
-> > @@ -2926,6 +2927,7 @@ Read Extended Controller Information Command
-> >                 16      PHY Configuration
-> >                 17      Wideband Speech
-> >                 18      Quality Report
-> > +               19      Connected Isochronous Stream Central
-> > 
-> >         The EIR_Data field contains information about class of device,
-> >         local name and other values. Not all of them might be present. For
-> > diff --git a/lib/mgmt.h b/lib/mgmt.h
-> > index 796190cd9..610770491 100644
-> > --- a/lib/mgmt.h
-> > +++ b/lib/mgmt.h
-> > @@ -96,6 +96,7 @@ struct mgmt_rp_read_index_list {
-> >  #define MGMT_SETTING_STATIC_ADDRESS    0x00008000
-> >  #define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
-> >  #define MGMT_SETTING_WIDEBAND_SPEECH   0x00020000
-> > +#define MGMT_SETTING_CIS_CENTRAL       0x00040000
-> > 
-> >  #define MGMT_OP_READ_INFO              0x0004
-> >  struct mgmt_rp_read_info {
-> > diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> > index e5ffb7230..2cd12465a 100644
-> > --- a/profiles/audio/bap.c
-> > +++ b/profiles/audio/bap.c
-> > @@ -1264,6 +1264,11 @@ static int bap_probe(struct btd_service *service)
-> >                 return -ENOTSUP;
-> >         }
-> > 
-> > +       if (!btd_adapter_has_feature(adapter, ADAPTER_FEAT_CIS_CENTRAL)) {
-> > +               error("BAP requires CIS Central, but unsupported by adapter");
-> > +               return -ENOTSUP;
-> 
-> In theory this is correct, BAP shall only be used by the central, but
-> we need to make sure the code doesn't assume bap driver is also needed
-> when acting as peripheral.
-> 
-> > +       }
-> > +
-> >         /* Ignore, if we were probed for this device already */
-> >         if (data) {
-> >                 error("Profile probed twice for the same device!");
-> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> > index fbb350889..873dee33e 100644
-> > --- a/profiles/audio/media.c
-> > +++ b/profiles/audio/media.c
-> > @@ -1259,6 +1259,9 @@ static bool experimental_endpoint_supported(struct btd_adapter *adapter)
-> >         if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET))
-> >                 return false;
-> > 
-> > +       if (!btd_adapter_has_feature(adapter, ADAPTER_FEAT_CIS_CENTRAL))
-> > +               return false;
-> 
-> We can act both as central and peripheral so we need to check none of
-> those are supported then the UUIDs shall not be listed.
-> 
-> >         return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
-> >  }
-> > 
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index aadad4016..2e038ace0 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -10717,6 +10717,17 @@ bool btd_has_kernel_features(uint32_t features)
-> >         return (kernel_features & features) ? true : false;
-> >  }
-> > 
-> > +bool btd_adapter_has_feature(struct btd_adapter *adapter, uint32_t feature)
-> > +{
-> > +       size_t i;
-> > +       uint32_t features = 0;
-> > +
-> > +       if (adapter->supported_settings & MGMT_SETTING_CIS_CENTRAL)
-> > +               features |= ADAPTER_FEAT_CIS_CENTRAL;
-> > +
-> > +       return features & feature;
-> > +}
-> > +
-> >  bool btd_adapter_has_exp_feature(struct btd_adapter *adapter, uint32_t feature)
-> >  {
-> >         size_t i;
-> > diff --git a/src/adapter.h b/src/adapter.h
-> > index 78eb069ae..6a9a626bc 100644
-> > --- a/src/adapter.h
-> > +++ b/src/adapter.h
-> > @@ -256,6 +256,12 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
-> > 
-> >  bool btd_le_connect_before_pairing(void);
-> > 
-> > +enum adapter_features {
-> > +       ADAPTER_FEAT_CIS_CENTRAL        = 1 << 0,
-> > +};
-> > +
-> > +bool btd_adapter_has_feature(struct btd_adapter *adapter, uint32_t feature);
-> > +
-> >  enum experimental_features {
-> >         EXP_FEAT_DEBUG                  = 1 << 0,
-> >         EXP_FEAT_LE_SIMULT_ROLES        = 1 << 1,
-> > diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> > index 29f86091f..de614ced1 100644
-> > --- a/tools/btmgmt.c
-> > +++ b/tools/btmgmt.c
-> > @@ -353,6 +353,7 @@ static const char *settings_str[] = {
-> >                                 "static-addr",
-> >                                 "phy-configuration",
-> >                                 "wide-band-speech",
-> > +                               "cis-central",
-> >  };
-> > 
-> >  static const char *settings2str(uint32_t settings)
-> > diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> > index 743f6f59dff8..dc284c5f5cbb 100644
-> > --- a/include/net/bluetooth/mgmt.h
-> > +++ b/include/net/bluetooth/mgmt.h
-> > @@ -109,6 +109,7 @@ struct mgmt_rp_read_index_list {
-> >  #define MGMT_SETTING_STATIC_ADDRESS    0x00008000
-> >  #define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
-> >  #define MGMT_SETTING_WIDEBAND_SPEECH   0x00020000
-> > +#define MGMT_SETTING_CIS_CENTRAL       0x00040000
-> > 
-> >  #define MGMT_OP_READ_INFO              0x0004
-> >  #define MGMT_READ_INFO_SIZE            0
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index 0dd30a3beb77..d802faf60f26 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -859,6 +859,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
-> >             hdev->set_bdaddr)
-> >                 settings |= MGMT_SETTING_CONFIGURATION;
-> > 
-> > +       if (cis_central_capable(hdev))
-> > +               settings |= MGMT_SETTING_CIS_CENTRAL;
-> > +
-> >         settings |= MGMT_SETTING_PHY_CONFIGURATION;
-> > 
-> >         return settings;
-> > @@ -932,6 +935,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
-> >         if (hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED))
-> >                 settings |= MGMT_SETTING_WIDEBAND_SPEECH;
-> > 
-> > +       if (cis_central_capable(hdev) && iso_enabled())
-> > +               settings |= MGMT_SETTING_CIS_CENTRAL;
-> 
-> I'd drop iso_enabled() from above, the features bits shall indicate
-> the controller capability only, right now ISO packets can only be
-> transferred via ISO sockets but this may change in the future if
-> vendors decide they need a more specialized transport for audio.
-> 
-> >         return settings;
-> >  }
-> > 
-> > --
-> > 2.39.1
-> > 
-> 
-> 
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
--- 
-Pauli Virtanen
