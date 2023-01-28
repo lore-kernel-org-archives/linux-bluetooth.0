@@ -2,75 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA44C38142
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 06:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288D3C27C76
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 08:16:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232455AbjA1GjR (ORCPT
+        id S233773AbjA1IQo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 28 Jan 2023 01:39:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42268 "EHLO
+        Sat, 28 Jan 2023 03:16:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbjA1GjQ (ORCPT
+        with ESMTP id S229619AbjA1IQn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 28 Jan 2023 01:39:16 -0500
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109494A1F0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Jan 2023 22:39:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=telink-semi.com;
-        s=lgqu2209; t=1674887952;
-        bh=Sj80bPQmLV7ASK4fKR2qWToQ0Hu/WsXnHdSMBG9M6YY=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=ENvcybLxGdOvgE69+VmOdZlJhNOYoVh3Dxx/wd1ePvzkWv9JIckxhqZwRqPfefp2v
-         f2i3l2n/GOu4xYLIJCzlZauwar3ln02LG7VMm01TMzJShZ0DhzrluHajlgeQ1Mpp5o
-         DIu+A98RfYtdZV5nDQe7gwWUIn0KHCgyKHuoIio4=
-X-QQ-mid: bizesmtp89t1674887886t1mo3mle
-Received: from fedora.. ( [85.31.249.147])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Sat, 28 Jan 2023 14:37:53 +0800 (CST)
-X-QQ-SSF: 0140000000200060D000B00A0000000
-X-QQ-FEAT: znfcQSa1hKZBIBR//c2YM6++Mn+zQGuddaBEgouTIt8Xz/NHvaa6eDtr8hoew
-        aSTNot01ukRe8JvDQuCWiZqoipv/YiSolKJzQIOnGtPc/o6tFjg6ZYg1evztdd65yRlPW/N
-        YwlwLIq89wke3pfEKfNe86E0wZadaT9TalXn9w41JC5tRZ9aNJFU0PZMAWI2xajLLPC9mTO
-        HQzfzyvzMMQ+PM3pBV8udzWSyw92j/IrX3vrKU7R1GGl2x12jNe+vtoYvl7e9sMAu7HVQJV
-        Ilh0wcfPKb10rKqQVtOb38IVb7QFwvx1+1lLVxFJHA0yKKDqp9V1Oqz0lV84KQcg+KNvGob
-        gRyJBD+pDWx1mJ5U8yaPFo72q85flxbQl16UA6GFKmBUDNtAcMOub2IDAdLuB2ARz9wUC6U
-        bksn1yaw8iE=
-X-QQ-GoodBg: 2
-From:   Marcin Kraglak <marcin.kraglak@telink-semi.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcin Kraglak <marcin.kraglak@telink-semi.com>
-Subject: [PATCH 2/2] AUTHORS: Update Marcin's email
-Date:   Sat, 28 Jan 2023 07:37:33 +0100
-Message-Id: <20230128063733.18131-2-marcin.kraglak@telink-semi.com>
-X-Mailer: git-send-email 2.39.1
+        Sat, 28 Jan 2023 03:16:43 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D285F771
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Jan 2023 00:16:42 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id z3so4731466pfb.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 Jan 2023 00:16:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=k+51GqVhRsV8g2sIP1YNWJQ9/g1H2A6qvcJQU6rohW0=;
+        b=bod0vhL3cR7bTa7Jjlvs5Ml9Le+MZZa02i60PDIAxxphgqeosJpAE7MgSOOgXkpxMH
+         gn5QoQP4bq6822TZR7dyAL18SIzhR9GUvvnTAhhEOGXS4GrEfSNJWU4Rp6iYP+oZXEZF
+         3w7cp2wh+ApbEFu5KnWOXdJwoKCfogfdBTGrmzk6+JMFzO+YASpj/swBkjNHBXWBbOzU
+         uz9dzQaa/xtQsuvtkbDJ8QGJourgwW8M8jjN+skwFHopJwm0ycfUlxwsMcKVUMsgQJSj
+         eXkAOtUwYOzw/jFpfc0146Gdsr77btXvb0ZzQrDXtxE/IrJ/krbuu+nnnVx2z1GWHIwv
+         2u4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k+51GqVhRsV8g2sIP1YNWJQ9/g1H2A6qvcJQU6rohW0=;
+        b=E7AFTw95usHxO1k/DNRuscNkTRoyEjx9g9wphpNMAsITh8clOtQzmt2W5Z2L0jSNub
+         2zVdsYGoyYSeOdIpFHyxjhKcp+xH6jLAEltj4vRiJT9JwueOsouo45E9Rc2VtDpkDG/4
+         Soa2n6w9HGFKkQic9hFPSzMlqFGKdylvOzZCvXgTlvahInOleaghK/uMfaHdpWTO3ZLo
+         bCOTaHmEQkJUMMBloScOxYpvFeDUVGeCMG9kFe8XU1qR0eDNyDLgxuuEpH63/SEE1mHV
+         OLINtnoN7BqQQHFAmj3DU5oV4g2VV554B99lAo9gbGm8D7NJEuvD3jG0uqsBHMYNyty5
+         7CDA==
+X-Gm-Message-State: AO0yUKX2zRxyH3JzCwUV5Q3tJzvX8HLdsLQE9c1f1Jlb3m1n/O96cfS8
+        A5MES2hkkgDgL28D59iE8vMUPneD8Yo=
+X-Google-Smtp-Source: AK7set8Yp8r6zOnqB8flZkS1Ob25dDs7/FrElHsQar+hYpt3Bj9Z26QHFrWLKa+V7QFBgyBSc2s7KQ==
+X-Received: by 2002:a62:1e05:0:b0:593:a131:3692 with SMTP id e5-20020a621e05000000b00593a1313692mr202365pfe.13.1674893801544;
+        Sat, 28 Jan 2023 00:16:41 -0800 (PST)
+Received: from [172.17.0.2] ([4.227.9.17])
+        by smtp.gmail.com with ESMTPSA id c10-20020aa78c0a000000b00582bdaab584sm3815164pfd.81.2023.01.28.00.16.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Jan 2023 00:16:41 -0800 (PST)
+Message-ID: <63d4d9e9.a70a0220.5ef34.68d5@mx.google.com>
+Date:   Sat, 28 Jan 2023 00:16:41 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6042122914273892518=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, marcin.kraglak@telink-semi.com
+Subject: RE: [1/2] shared/util: Add CAS, HAS, TMAS and PBAS UUIDs
 In-Reply-To: <20230128063733.18131-1-marcin.kraglak@telink-semi.com>
 References: <20230128063733.18131-1-marcin.kraglak@telink-semi.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:telink-semi.com:qybglogicsvr:qybglogicsvr7
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--===============6042122914273892518==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=716526
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.49 seconds
+BuildEll                      PASS      26.46 seconds
+BluezMake                     PASS      771.91 seconds
+MakeCheck                     PASS      10.72 seconds
+MakeDistcheck                 PASS      147.81 seconds
+CheckValgrind                 PASS      239.91 seconds
+CheckSmatch                   PASS      319.65 seconds
+bluezmakeextell               PASS      96.13 seconds
+IncrementalBuild              PASS      1222.26 seconds
+ScanBuild                     PASS      961.02 seconds
+
+
+
 ---
- AUTHORS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/AUTHORS b/AUTHORS
-index 291d9b049..5d2d09688 100644
---- a/AUTHORS
-+++ b/AUTHORS
-@@ -84,7 +84,7 @@ Petri Gynther <pgynther@google.com>
- Scott James Remnant <scott@netsplit.com>
- Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
- Grzegorz Kołodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
--Marcin Krąglak <marcin.kraglak@tieto.com>
-+Marcin Krąglak <marcin.kraglak@telink-semi.com>
- Łukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
- Jerzy Kasenberg <jerzy.kasenberg@tieto.com>
- Arman Uguray <armansito@chromium.org>
--- 
-2.39.1
 
+--===============6042122914273892518==--
