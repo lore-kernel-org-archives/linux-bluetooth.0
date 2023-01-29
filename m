@@ -2,149 +2,184 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2A4C61D97
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Jan 2023 13:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DDAC05027
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Jan 2023 21:51:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234543AbjA1NpF (ORCPT
+        id S235239AbjA2Vvm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 28 Jan 2023 08:45:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44000 "EHLO
+        Sun, 29 Jan 2023 16:51:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233276AbjA1NpE (ORCPT
+        with ESMTP id S235207AbjA2Vvl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 28 Jan 2023 08:45:04 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2126.outbound.protection.outlook.com [40.107.100.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFCF234C2;
-        Sat, 28 Jan 2023 05:45:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aH05U2TmJXjli0tAYFhjxb8Bx4C8EM/7Nda5FCQejIqi7yYEWXuOxv47YbtwNlpmAKSPqeUFvsopf5jG4U4hg0OrF8XY0dMDkqscees7Ivyi/+c9GW84Or8FK8LLamU9EDk/mIaoCBky6mqgNQC0hMBN5+5JViPvyDAXj1n9kI9DBffjkX82wXDCGxJt+IdEPESAg4zuwF8j5Zd59HO0A47ITCfav/7FaHzrHxdIgZAOSf8+s2wZMSI8XVHYCY9tY3iBSdBOF9g/ghRHC+ggWEGolPOWde7MNhCJ6zzmoOTKF5mJg2R1Fj1V+0VxgJQowIdtSuIHcC68XeLyEmRzLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YZowlLrxjQ8qeJZqwDBY8sJGeuBkkSbFWxJBEwjTJQ0=;
- b=Yh/FQZ8y/o1qtWCuAqxp/ORfw1d16G0Zwkoa6ft8Z7Q4+K/OyNUBExdJ/wSn7w844KctNiGofiFrjUeYfkgmpIjE3RETpHTxrFoM2Vr2OuEq2Jwt5WoApJkyRodsXiwgKVXW5cvq1ppz9/a81dgojfhcsyA5HT0r1rsnB9WgyVVQ1doIeaTdcwdwtGOOdJpSfPFN3qlYJV4y5QrB5wG5lEoqsPAxJ8EVpsK18zcN21IRxfqj/hN0fyeQZ+Vzq2uGf21M336qAhdjL6lKMpZDvH0F9VCDyjbC7/TEMGzEMVkp/sXlTN4QfadJsVrDe7qWu8+s9x6kRnq3FD3HTqTm8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+        Sun, 29 Jan 2023 16:51:41 -0500
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48D8199EE
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Jan 2023 13:51:38 -0800 (PST)
+Received: by mail-oi1-x231.google.com with SMTP id bg12so1993104oib.5
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Jan 2023 13:51:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YZowlLrxjQ8qeJZqwDBY8sJGeuBkkSbFWxJBEwjTJQ0=;
- b=wQJmRoW6UnEYdNqqEX3QhAEhEe+S8121vMwHF27jKgOqblUOlM4cpLJHrKmgMJWJTc6Kiw0LU1RdEgJ1tkpLb5gck2jet8b8SMftXTSoW+EOxQv1g/kDrGS8CdOuMPOG4M6QQ0Ok+MNjt4glHfm+CVOjurLlppz51YIsqxdlvCo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SA1PR13MB5444.namprd13.prod.outlook.com (2603:10b6:806:233::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23; Sat, 28 Jan
- 2023 13:45:01 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb5c:910f:3730:fd65]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb5c:910f:3730:fd65%6]) with mapi id 15.20.6043.028; Sat, 28 Jan 2023
- 13:45:01 +0000
-Date:   Sat, 28 Jan 2023 14:44:54 +0100
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        d=kali.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zFiSJsxbVNP6iSln86409bsy54CkshWpdq97AEc134M=;
+        b=E94+MPEpN/TNYg3BdBZ5EFjP5Yautut+jtwYkZvz2oMLpUiI9Yrles+AUblQ4bPboY
+         EsVgf1k0JYvmBannURtMUw96aEgju921qStOkHoYWZskNasd02kGOFHT20/h4Bj3k4bu
+         SeFj0NFFfiiyl3ZPzSGdNtPM8ILTPmqLcwbVWH1WLR4KSTuROICFs8sfzgZOxSrEtFwZ
+         rYjc21gMXHYl5s0exgKzKbiVUH/vKHhoeLL3Nn8997ko+BwbTb1P7n1rK6EvP1OXH/ga
+         s6pfYI5O2XYvzBinAb4+NdyHFv0yhl2VVp1IV8H4wRNp9LQpMb+RG1Z33todyfrlF12k
+         K3tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zFiSJsxbVNP6iSln86409bsy54CkshWpdq97AEc134M=;
+        b=6u6UCnz6zHGPqU45tEzg3ISeffgmv7zZZFJFVY1W36y0GodOPjTzwYJ+zmBSQtDhzD
+         xiH811NG+b4GmpcsBEYlNw0Cs7QTg/K+zp7sdJzDM9x10PzJCntnwL+PnZIPxAJb7AdI
+         sHnih6q+IsR8f8ZGeKGywuiLy2McbKnc5x95J404jOIFLAR0G0X68Wwo8NDFTU5vVzW4
+         cbO2gQiNXorRLYNaSUGrd/fOyZHOCKSn8Ir1LhTt1zGMbPK4RRo5kslJoTr/ntMllaMO
+         IZxinIgkalpbjc0W7cmLW0rFzP4har63FaAwiWThqkOSS2w09hmqhJH47yx0DRomcMtz
+         Ikyw==
+X-Gm-Message-State: AFqh2kow3cCkvvvoNFx8gz1PxQpb5Qdxh7Spr0b5vT5Ucfk1i9q1yVkC
+        uzPxaOlzf481j3MSRMe1tO1Mzg==
+X-Google-Smtp-Source: AMrXdXsOzuRHTVu/dKRYKIffFpHK3+YqjNy/Qee5C9BkP0mcJqEfueB2r2Xo3WoZEODLX6Zn+RbirA==
+X-Received: by 2002:a05:6808:1982:b0:35e:bd7e:c89a with SMTP id bj2-20020a056808198200b0035ebd7ec89amr31944819oib.16.1675029098237;
+        Sun, 29 Jan 2023 13:51:38 -0800 (PST)
+Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
+        by smtp.gmail.com with ESMTPSA id de5-20020a056808608500b00377ee54431asm2847836oib.57.2023.01.29.13.51.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Jan 2023 13:51:37 -0800 (PST)
+From:   Steev Klimaszewski <steev@kali.org>
+To:     steev@kali.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_conn: Refactor hci_bind_bis() since it
- always succeeds
-Message-ID: <Y9Um1h/2V9mxDrIC@corigine.com>
-References: <20230128005150.never.909-kees@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230128005150.never.909-kees@kernel.org>
-X-ClientProxiedBy: AM0PR02CA0159.eurprd02.prod.outlook.com
- (2603:10a6:20b:28d::26) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        Sven Peter <sven@svenpeter.dev>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH 0/4] Attempt at adding WCN6855 BT support
+Date:   Sun, 29 Jan 2023 15:51:26 -0600
+Message-Id: <20230129215136.5557-1-steev@kali.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA1PR13MB5444:EE_
-X-MS-Office365-Filtering-Correlation-Id: 399e902e-7d74-4a74-280f-08db0135da7d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XksWpPVuelSseZAR9iY/qSXybq6oVtefmuMleOWfBZT9EZBLcECsktWV7qh9WU/FrmXYQ0nM6CfTc7WSFU2Xt+y891urIiTF6LTIS9L1CixOrTOspBoWwcPd7zqbBLhNd5OT1QbLO9ftKgx6+lSUycgkNvDZZ5e9FB/+ibrfjxpeuOF9PqB9TRtXiP21ffT0Mw10gOlQ66BoeIRRE0C5Gm8ZgFOFqx2VticONP01z8koVKszTqG8Y2uZq4iXkGV3CPSa+49L+hkQv3shjkH28LnJF6gex/8Kr44WS76aZKPBbz4gfdoT0FwlQ9vnh4lI0DIRLbuKKK+2KxDzxGqM1P6SWE5QITmhP7tvgTZ4RY8pFhpNHCbQ2PbuBQu2L74jk+s4V8RKLGO9a6FuVVIKOG+J/h1ysHo4Gv1cly5Xfw9sTvDG7QygA2wUsDKQKgoghQDV1tXCWg6vujQEb7+3aGyaSzMEf+RcGqz6dV57cQngMXRq4aDR5LssqwRS3KkHnf8/YYEJlXtpVdQ1O+sVV2mDn4G+qUxb3/kPA2qFyOxsqHUF94pVE8GPMbo+ULoKsHNN8/5GbVYcPiGhttRqEZCXegSWPikWhnpVT+M4LszcFN9umHh7Y57UXEQVmxNzPzAl9GS2RNtfpaVpjYFYUA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(136003)(346002)(39830400003)(376002)(396003)(451199018)(86362001)(38100700002)(2616005)(54906003)(316002)(2906002)(4326008)(6916009)(8936002)(66946007)(5660300002)(8676002)(83380400001)(66556008)(41300700001)(6512007)(186003)(66476007)(36756003)(6486002)(478600001)(7416002)(44832011)(6666004)(6506007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6KLc2LFhD7HIJA+tSqatk0bck4OZxL12/00RO88V4VBP13s/Of3zi5BMfR4y?=
- =?us-ascii?Q?fWSfOYAk9xcYh3wmon19dq6DiDe7yd5JOWcM3TH6saxueuMHmI0qwrVjsxsG?=
- =?us-ascii?Q?YGwuerTWPNci77wOd+eXMyykhYQA/Rkf32gn1xUzTDYbiWGXfsbkU7o2T/1c?=
- =?us-ascii?Q?lT/+juaX6vYmr8KWP9/esl8UoPbxKLbgVq6kCxQ2lLDcgNvmmveBW80qjJfn?=
- =?us-ascii?Q?/vLaThH/l2dS6jgLVTpPp4mifnpf9gfKDsiAGeqb6r2ly2YVgLZKyjSRqyNm?=
- =?us-ascii?Q?fFN/3OafwhZMgPxYmHNmQ4clLwEm6uj2Og49gFIzHlE26W080nFzeRbfxGJH?=
- =?us-ascii?Q?2G/ODnwLewrzNYKuAnYjZwgW30SHQcF5vOvyhCjXLseohzxaidNYsBkSP0BX?=
- =?us-ascii?Q?hUWjVWE1TG2kUXq14y68ugjIZsazXdkGi30xYz73I/14tg0bMvLpQw1tbIV/?=
- =?us-ascii?Q?+LcKl3vGUt5Tl6SU2zUDDYUbnX67SmdXuRR1nImlCFws0YHJONv9TAd88Qdt?=
- =?us-ascii?Q?+f12T6ZO/QLKBO88dnG3k8zPDg4PvledUJ8JGiZn7KbtSahKl1CYFPxKAxWj?=
- =?us-ascii?Q?Bp4p81kzUfNVIiVNcb9t5LMW+xWvetMK4CsBiWyGtsFcrweGdH1bICD4yv4c?=
- =?us-ascii?Q?2GCat5M24YxeOklkZkTLfdH/rdl0+KX1XDhFpEIgciAsBDe0vC7CiFBRJ3+W?=
- =?us-ascii?Q?KCiejY44UgBaZjTsx+skfezdBWYczUrYV/K6yL3asKpABuChjpkVDk7fUOg2?=
- =?us-ascii?Q?HBekX/6un7C38NUM9G0NGn+dlOEq+PVohKhimO0UuAEpFwFbgdr4waJvl+Lq?=
- =?us-ascii?Q?sT2niEfAiSbtevg6XITw3Bq/UloLVz7vyUsEgpRo8FEZdVHxaBTbEiz+EEK5?=
- =?us-ascii?Q?8QU9qC2HSFNZF/9DOPOsZUsu7FYx7Bv6oANZ6ofkqTD2uxZ0Jcich0QdpOL7?=
- =?us-ascii?Q?f4ruDZB0ZOkyKqSf9NaV+AK8lE4L3p3uFnf5r8U6/ab/2P+CHBjFRvooQPZb?=
- =?us-ascii?Q?4moXVAZvROHJoIQ1ITLgTT/3jp4vbqdM4k+BBvUsTjSVKr9XGX4BKF3Ae++h?=
- =?us-ascii?Q?/pCdiEBBzS73E/35adevMrh/t9c2FGtxIJwxuNogClt/XcXYDZPSbWGcr/Pa?=
- =?us-ascii?Q?aOuJkmc1WxSdI9CQplgOXwJAXxlvmecMNuLC7R1ayym/gtW0oNVtGhH/spO+?=
- =?us-ascii?Q?Y2VGyknCH1FT427k/ukeyph3l5kgqg2YGJu8uNWkCs7qGwU5upjTf0j/JWmq?=
- =?us-ascii?Q?BfFa0yayhJdVXBAcymhm44EdwowS4xlO5rAPrgWsd0Tg7bhBM8CUyh9jGpxD?=
- =?us-ascii?Q?AuFU6f+svwqIZnUT8lrAWmiVdqzTy7QjaWihCo8Nf+ns8X6+yIkpTs30ODiM?=
- =?us-ascii?Q?oDFDiWfcivV0leOnkfMDLKBDz2C2lz/qIyKxo5MXckKP3Rfb/SzZbYvee+jy?=
- =?us-ascii?Q?UR/tAllLrC6h7L5kEBb2kWMEZR0AciNdcI9Jn4jncfaKfyi04PkYlv+OPxF0?=
- =?us-ascii?Q?Dbm0WvPCbABvHGmJno27zxy7GxORwjGYQSM1mRYXaRlA/xWuI7jjk4Q7gVru?=
- =?us-ascii?Q?9m5AF1EGXFH1MvBwZw/7FONHDdEA30nH1EEV0D7iPTVjWSbj72scKZI48VL+?=
- =?us-ascii?Q?pLlnqX1sM1SZpeVAZscCMnen9eDK79oBNcoe14YwOnifWN0/uSudsNpk1gS8?=
- =?us-ascii?Q?DBgEQA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 399e902e-7d74-4a74-280f-08db0135da7d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2023 13:45:01.5305
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: EseaYuyN9Mk4ZymVwhmVAEbGHixmc6H4KzqORkdL3rq/VOZt680N9Xx6/R7aHSIjlKYjTQLa9gMFf2Klm5IJ+vaQ0SUm4AZGOose4atUXUY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR13MB5444
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 04:51:54PM -0800, Kees Cook wrote:
-> The compiler thinks "conn" might be NULL after a call to hci_bind_bis(),
-> which cannot happen. Avoid any confusion by just making it not return a
-> value since it cannot fail. Fixes the warnings seen with GCC 13:
-> 
-> In function 'arch_atomic_dec_and_test',
->     inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,
->     inlined from 'hci_conn_drop' at ../include/net/bluetooth/hci_core.h:1391:6,
->     inlined from 'hci_connect_bis' at ../net/bluetooth/hci_conn.c:2124:3:
-> ../arch/x86/include/asm/rmwcc.h:37:9: warning: array subscript 0 is outside array bounds of 'atomic_t[0]' [-Warray-bounds=]
->    37 |         asm volatile (fullop CC_SET(cc) \
->       |         ^~~
-> ...
-> In function 'hci_connect_bis':
-> cc1: note: source object is likely at address zero
-> 
-> Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
-...
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  net/bluetooth/hci_conn.c | 12 +++---------
->  1 file changed, 3 insertions(+), 9 deletions(-)
+This patchset is somewhat of an RFC/RFT, and also just something to get this out
+there.
 
-Is this really a 'fix' ?
+First things first, I do not have access to the specs nor the schematics, so a
+lot of this was done via guess work, looking at the acpi tables, and looking at
+how a similar device (wcn6750) was added.
 
-In any case, the change looks good to me.
+There are definitely checkpatch warnings, and I do apologize to those who won't
+review things until there are no warnings for wasting your time.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+One example is that I have the vregs commented out, the dt-bindings say that
+they are required since it's based on the wcn6750 work but also like the 6750,
+I've added defaults into the driver, and those seem to work, at least for the
+initial testing.
+
+The end result is that we do have a working device, but not entirely reliable.
+
+Hopefully by getting this out there, people who do have access to the specs or
+schematics can see where the improvements or fixes need to come.
+
+There are a few things that I am not sure why they happen, and don't have the
+knowledge level to figure out why they happen or debugging it.
+
+Bluetooth: hci0: setting up wcn6855
+Bluetooth: hci0: Frame reassembly failed (-84)
+Bluetooth: hci0: QCA Product ID   :0x00000013
+Bluetooth: hci0: QCA SOC Version  :0x400c0210
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x000038e6
+Bluetooth: hci0: QCA controller version 0x02100201
+Bluetooth: hci0: unexpected event for opcode 0xfc48
+Bluetooth: hci0: Sending QCA Patch config failed (-110)
+Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
+Bluetooth: hci0: QCA setup on UART is completed
+
+I do not know why the Frame assembly failed, nor the unexpected event.
+
+Likewise, I'm not entirely sure why it says the patch config send times out, and
+*then* seems to send it?
+
+The BD Address also seems to be incorrect, and I'm not sure what is going on
+there either.
+
+Additionally, I've tried with an additional patch that I'm not including that is
+based on commit 059924fdf6c1 ("Bluetooth: btqca: Use NVM files based on SoC ID
+for WCN3991") to try using the hpnv21g.bin or hpnv21.bin, and the firmware acted
+the same regardless, so I am assuming I don't truly need the "g" firmware on my
+Thinkpad X13s.
+
+Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+well as connecting to and using an H2GO bluetooth speaker and playing audio out
+via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+
+The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+"A2DP Sink, codec SBC" would provide audio output, and while I could see that
+data was being sent to the speaker, it wasn't always outputting, and going >
+4ft. away, would often disconnect.
+
+steev@wintermute:~$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+        UP RUNNING PSCAN
+        RX bytes:1492 acl:0 sco:0 events:126 errors:0
+        TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'wintermute'
+        Class: 0x0c010c
+        Service Classes: Rendering, Capturing
+        Device Class: Computer, Laptop
+        HCI Version:  (0xc)  Revision: 0x0
+        LMP Version:  (0xc)  Subversion: 0x46f7
+        Manufacturer: Qualcomm (29)
+
+steev@wintermute:~$ dmesg | grep Razer
+[ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+[ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+steev@wintermute:~$ dmesg | grep H2GO
+[ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
+
+Bjorn Andersson (1):
+  arm64: dts: qcom: sc8280xp: Enable BT
+
+Steev Klimaszewski (3):
+  dt-bindings: net: Add WCN6855 Bluetooth bindings
+  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+  arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     |  2 +
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+ drivers/bluetooth/btqca.c                     | 24 ++++++-
+ drivers/bluetooth/btqca.h                     | 10 +++
+ drivers/bluetooth/hci_qca.c                   | 59 ++++++++++++----
+ 6 files changed, 162 insertions(+), 15 deletions(-)
+
+
+base-commit: e2f86c02fdc96ca29ced53221a3cbf50aa6f8b49
+-- 
+2.39.0
 
