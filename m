@@ -2,337 +2,141 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F804C636CD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 20:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F5DBC54EAA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 20:13:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235333AbjA3UEq convert rfc822-to-8bit (ORCPT
+        id S229496AbjA3UNy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 15:04:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52456 "EHLO
+        Mon, 30 Jan 2023 15:13:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238041AbjA3UEn (ORCPT
+        with ESMTP id S229495AbjA3UNt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 15:04:43 -0500
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C42CB46D4B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 12:04:36 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 5C9DF240283
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 21:04:35 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4P5K0252DZz6tmS;
-        Mon, 30 Jan 2023 21:04:34 +0100 (CET)
-Message-ID: <f81b39d2de64714e9c73b01165b5d5a4c4b42e41.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 7/8] shared/bap: handle central-only case
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Mon, 30 Jan 2023 20:04:34 +0000
-In-Reply-To: <CABBYNZ+Vrzpa4ppBkLTcHXbXUgJxL1CsW00yzn-inWqBwUmo2w@mail.gmail.com>
-References: <20230127205205.20235-1-pav@iki.fi>
-         <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
-         <161c4172f60d926d015a5b48de48b890412d57e5.1675103676.git.pav@iki.fi>
-         <CABBYNZ+Vrzpa4ppBkLTcHXbXUgJxL1CsW00yzn-inWqBwUmo2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Mon, 30 Jan 2023 15:13:49 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBCCF34C27
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 12:13:47 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id cq16-20020a17090af99000b0022c9791ac39so4334921pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 12:13:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ngvkp4XPvAk8cYdxDzGQsNUDHWTDQu90l18M9I/4zYA=;
+        b=bUT1gylYp5WCC/5uX/cuNcdcdbw/eDBhGyrzxIxDT5f6P6A9gQ7Ruzt7RgPqWcVJu8
+         i5vRKOR/RkZIeN5HMTDDYiHBcSK5oo6YyCIya+ECc1mKOJSEoOlAv7c/2LF+RXB5qLfJ
+         oZy9A2tvmYf7gNnMWvQCPRz5eXZmrve1/pXoOizyhbPD+7K0878AoFQoX8CDJg3Zv4Ks
+         oJm+izsgf6oqdpw3oD2pNrTvTb4c6PwTtPYEz1cDk0ZYDXDn8alA3QDxEZsMtNxV2drp
+         PQdD2qf+MQa02I/yIZ+dJKB2ucmA+F+eKPeH5fBL4CsXyNLeZB2WOeC1Fr6ZApOlY6Pd
+         +UAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ngvkp4XPvAk8cYdxDzGQsNUDHWTDQu90l18M9I/4zYA=;
+        b=F9Tqkom/fEGdicwgL5v4O/mMgTGhomeZV8TzXlr7jga+n5ygUhA4uPr+YD9F/l2XdF
+         XXtHUr52EusCBQbOPvFSF6nHV8fECc4o55Ut6FyM94H3F+qoXpBa2SkOaDf3uWo8nSVx
+         G0fHVHhTZdYJNIZkmV4V8XrmjIdjd9IcWtIOQSe2dGMENgxrxOXMh8LIlt199l2kUoVs
+         nXB6OWtPb/htTL5Ae55/aguc4vm7joN2zDapZ2vPXKFJICbU257hXX5ohkJGOHrFfUYA
+         KIAlfrEbroirmjwXvXR8zR1nJcjzV5FCdPrt52cfGZ470dja6C//Ve0AWNma1NoQwzdF
+         UNJQ==
+X-Gm-Message-State: AFqh2kpMXcRxvH33UbQ7H41pxylR7XV/6jT3jssMunv0uP4LA+m7C3sU
+        A+1rI2p8M9sUVS2LXnHrWfhRwgsEfbA=
+X-Google-Smtp-Source: AMrXdXvDW9wvbMToLCitRn3VwlblvI9UnQg7soTpjX+/vakVtRlMlFVFrfQI1Z42n9C0nhhTi/cdUw==
+X-Received: by 2002:a17:902:e88d:b0:195:f401:26b9 with SMTP id w13-20020a170902e88d00b00195f40126b9mr43206475plg.26.1675109627160;
+        Mon, 30 Jan 2023 12:13:47 -0800 (PST)
+Received: from [172.17.0.2] ([20.171.63.114])
+        by smtp.gmail.com with ESMTPSA id p25-20020aa78619000000b00592d16e9a12sm6329257pfn.135.2023.01.30.12.13.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 12:13:46 -0800 (PST)
+Message-ID: <63d824fa.a70a0220.17484.a766@mx.google.com>
+Date:   Mon, 30 Jan 2023 12:13:46 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4054595936541905323=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/8] doc: add MGMT setting for CIS features, remove Quality Report
+In-Reply-To: <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
+References: <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============4054595936541905323==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ma, 2023-01-30 kello 11:39 -0800, Luiz Augusto von Dentz kirjoitti:
-> On Mon, Jan 30, 2023 at 11:06 AM Pauli Virtanen <pav@iki.fi> wrote:
-> > 
-> > Support central-only case, where no local endpoints are created, and
-> > nothing is registered in the local GATT database.
-> > 
-> > In this case, we keep track of the local PACs ("sinks" and "sources"),
-> > but there are no PACS and ASCS registrations or endpoints.
-> 
-> I'm not really following how that would work without local endpoints
-> since the endpoints are the interface which is used to setup the
-> stream with the likes of pipewire/pulseaudio we can't really remove
-> them, what Id would suggest doing is to have a flag indicating if the
-> instance is client only or not, that way bt_bap can identify if it
-> needs to register services or not.
+This is automated email and please do not reply to this email!
 
-What I tried to say here is that in the central-only (or client in
-other words) mode, no ASEs or PACs are registered in the local GATT DB.
-The local endpoints do still exist in the Media1 API. In shared/bap.c
-they are always associated with the PACs (not ASEs), so the client-only
-mode does not need ASEs. So what is done is to my understanding what
-you write above --- maybe I am missing something?
+Dear submitter,
 
-I've tested playback on this patchset for pipewire -> pipewire between
-two machines, with the CIS Central flag forced to false on one end, and
-CIS Peripheral false on the other end. Also playback to non-BlueZ
-device works with CIS Peripheral flag disabled.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=717083
 
-> 
-> > ---
-> >  src/shared/bap.c | 58 ++++++++++++++++++++++++++----------------------
-> >  src/shared/bap.h |  9 +++++---
-> >  unit/test-bap.c  |  4 +++-
-> >  3 files changed, 40 insertions(+), 31 deletions(-)
-> > 
-> > diff --git a/src/shared/bap.c b/src/shared/bap.c
-> > index 22f2e6714..24113bb34 100644
-> > --- a/src/shared/bap.c
-> > +++ b/src/shared/bap.c
-> > @@ -110,11 +110,13 @@ struct bt_ascs {
-> > 
-> >  struct bt_bap_db {
-> >         struct gatt_db *db;
-> > -       struct bt_pacs *pacs;
-> > -       struct bt_ascs *ascs;
-> >         struct queue *sinks;
-> >         struct queue *sources;
-> > +
-> > +       /* The following are NULL if central-only (no GATT) */
-> >         struct queue *endpoints;
-> > +       struct bt_pacs *pacs;
-> > +       struct bt_ascs *ascs;
-> >  };
-> > 
-> >  struct bt_bap_req {
-> > @@ -565,6 +567,7 @@ static void bap_disconnected(int err, void *user_data)
-> >  static struct bt_bap *bap_get_session(struct bt_att *att, struct gatt_db *db)
-> >  {
-> >         const struct queue_entry *entry;
-> > +       struct bt_bap_db *ldb;
-> >         struct bt_bap *bap;
-> > 
-> >         for (entry = queue_get_entries(sessions); entry; entry = entry->next) {
-> > @@ -574,7 +577,8 @@ static struct bt_bap *bap_get_session(struct bt_att *att, struct gatt_db *db)
-> >                         return bap;
-> >         }
-> > 
-> > -       bap = bt_bap_new(db, NULL);
-> > +       ldb = bt_bap_get_local_db(db, true);
-> > +       bap = bt_bap_new(ldb, NULL);
-> >         bap->att = att;
-> > 
-> >         bt_bap_attach(bap, NULL);
-> > @@ -620,7 +624,7 @@ static struct bt_bap_endpoint *bap_get_endpoint(struct bt_bap_db *db,
-> >  {
-> >         struct bt_bap_endpoint *ep;
-> > 
-> > -       if (!db || !attr)
-> > +       if (!db || !attr || !db->endpoints)
-> >                 return NULL;
-> > 
-> >         ep = queue_find(db->endpoints, bap_endpoint_match, attr);
-> > @@ -652,7 +656,7 @@ static struct bt_bap_endpoint *bap_get_endpoint_id(struct bt_bap *bap,
-> >         struct gatt_db_attribute *attr = NULL;
-> >         size_t i;
-> > 
-> > -       if (!bap || !db)
-> > +       if (!bap || !db || !db->endpoints)
-> >                 return NULL;
-> > 
-> >         ep = queue_find(db->endpoints, bap_endpoint_match_id, UINT_TO_PTR(id));
-> > @@ -2170,7 +2174,7 @@ static struct bt_ascs *ascs_new(struct gatt_db *db)
-> >         return ascs;
-> >  }
-> > 
-> > -static struct bt_bap_db *bap_db_new(struct gatt_db *db)
-> > +static struct bt_bap_db *bap_db_new(struct gatt_db *db, bool peripheral)
-> >  {
-> >         struct bt_bap_db *bdb;
-> > 
-> > @@ -2181,23 +2185,26 @@ static struct bt_bap_db *bap_db_new(struct gatt_db *db)
-> >         bdb->db = gatt_db_ref(db);
-> >         bdb->sinks = queue_new();
-> >         bdb->sources = queue_new();
-> > -       bdb->endpoints = queue_new();
-> > 
-> >         if (!bap_db)
-> >                 bap_db = queue_new();
-> > 
-> > -       bdb->pacs = pacs_new(db);
-> > -       bdb->pacs->bdb = bdb;
-> > +       if (peripheral) {
-> > +               bdb->endpoints = queue_new();
-> > 
-> > -       bdb->ascs = ascs_new(db);
-> > -       bdb->ascs->bdb = bdb;
-> > +               bdb->pacs = pacs_new(db);
-> > +               bdb->pacs->bdb = bdb;
-> > +
-> > +               bdb->ascs = ascs_new(db);
-> > +               bdb->ascs->bdb = bdb;
-> > +       }
-> > 
-> >         queue_push_tail(bap_db, bdb);
-> > 
-> >         return bdb;
-> >  }
-> > 
-> > -static struct bt_bap_db *bap_get_db(struct gatt_db *db)
-> > +struct bt_bap_db *bt_bap_get_local_db(struct gatt_db *db, bool peripheral)
-> >  {
-> >         struct bt_bap_db *bdb;
-> > 
-> > @@ -2205,7 +2212,7 @@ static struct bt_bap_db *bap_get_db(struct gatt_db *db)
-> >         if (bdb)
-> >                 return bdb;
-> > 
-> > -       return bap_db_new(db);
-> > +       return bap_db_new(db, peripheral);
-> >  }
-> > 
-> >  static struct bt_pacs *bap_get_pacs(struct bt_bap *bap)
-> > @@ -2328,6 +2335,9 @@ static void bap_add_sink(struct bt_bap_pac *pac)
-> > 
-> >         queue_push_tail(pac->bdb->sinks, pac);
-> > 
-> > +       if (!pac->bdb->endpoints)
-> > +               return;
-> > +
-> >         memset(value, 0, sizeof(value));
-> > 
-> >         iov.iov_base = value;
-> > @@ -2346,6 +2356,9 @@ static void bap_add_source(struct bt_bap_pac *pac)
-> > 
-> >         queue_push_tail(pac->bdb->sources, pac);
-> > 
-> > +       if (!pac->bdb->endpoints)
-> > +               return;
-> > +
-> >         memset(value, 0, sizeof(value));
-> > 
-> >         iov.iov_base = value;
-> > @@ -2373,21 +2386,16 @@ static void notify_session_pac_added(void *data, void *user_data)
-> >         queue_foreach(bap->pac_cbs, notify_pac_added, user_data);
-> >  }
-> > 
-> > -struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
-> > +struct bt_bap_pac *bt_bap_add_vendor_pac(struct bt_bap_db *bdb,
-> >                                         const char *name, uint8_t type,
-> >                                         uint8_t id, uint16_t cid, uint16_t vid,
-> >                                         struct bt_bap_pac_qos *qos,
-> >                                         struct iovec *data,
-> >                                         struct iovec *metadata)
-> >  {
-> > -       struct bt_bap_db *bdb;
-> >         struct bt_bap_pac *pac;
-> >         struct bt_bap_codec codec;
-> > 
-> > -       if (!db)
-> > -               return NULL;
-> > -
-> > -       bdb = bap_get_db(db);
-> >         if (!bdb)
-> >                 return NULL;
-> > 
-> > @@ -2417,13 +2425,13 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
-> >         return pac;
-> >  }
-> > 
-> > -struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
-> > +struct bt_bap_pac *bt_bap_add_pac(struct bt_bap_db *bdb, const char *name,
-> >                                         uint8_t type, uint8_t id,
-> >                                         struct bt_bap_pac_qos *qos,
-> >                                         struct iovec *data,
-> >                                         struct iovec *metadata)
-> >  {
-> > -       return bt_bap_add_vendor_pac(db, name, type, id, 0x0000, 0x0000, qos,
-> > +       return bt_bap_add_vendor_pac(bdb, name, type, id, 0x0000, 0x0000, qos,
-> >                                                         data, metadata);
-> >  }
-> > 
-> > @@ -2635,7 +2643,7 @@ static void bap_attached(void *data, void *user_data)
-> >         cb->attached(bap, cb->user_data);
-> >  }
-> > 
-> > -struct bt_bap *bt_bap_new(struct gatt_db *ldb, struct gatt_db *rdb)
-> > +struct bt_bap *bt_bap_new(struct bt_bap_db *ldb, struct gatt_db *rdb)
-> >  {
-> >         struct bt_bap *bap;
-> >         struct bt_bap_db *bdb;
-> > @@ -2643,12 +2651,8 @@ struct bt_bap *bt_bap_new(struct gatt_db *ldb, struct gatt_db *rdb)
-> >         if (!ldb)
-> >                 return NULL;
-> > 
-> > -       bdb = bap_get_db(ldb);
-> > -       if (!bdb)
-> > -               return NULL;
-> > -
-> >         bap = new0(struct bt_bap, 1);
-> > -       bap->ldb = bdb;
-> > +       bap->ldb = ldb;
-> >         bap->reqs = queue_new();
-> >         bap->pending = queue_new();
-> >         bap->notify = queue_new();
-> > diff --git a/src/shared/bap.h b/src/shared/bap.h
-> > index 47a15636c..a4e8549a5 100644
-> > --- a/src/shared/bap.h
-> > +++ b/src/shared/bap.h
-> > @@ -34,6 +34,7 @@
-> >  #define BT_BAP_CONFIG_PHY_CODEC                0x03
-> > 
-> >  struct bt_bap;
-> > +struct bt_bap_db;
-> >  struct bt_bap_pac;
-> >  struct bt_bap_stream;
-> > 
-> > @@ -98,14 +99,14 @@ struct bt_bap_pac_qos {
-> >         uint32_t ppd_max;
-> >  };
-> > 
-> > -struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
-> > +struct bt_bap_pac *bt_bap_add_vendor_pac(struct bt_bap_db *bdb,
-> >                                         const char *name, uint8_t type,
-> >                                         uint8_t id, uint16_t cid, uint16_t vid,
-> >                                         struct bt_bap_pac_qos *qos,
-> >                                         struct iovec *data,
-> >                                         struct iovec *metadata);
-> > 
-> > -struct bt_bap_pac *bt_bap_add_pac(struct gatt_db *db, const char *name,
-> > +struct bt_bap_pac *bt_bap_add_pac(struct bt_bap_db *bdb, const char *name,
-> >                                         uint8_t type, uint8_t id,
-> >                                         struct bt_bap_pac_qos *qos,
-> >                                         struct iovec *data,
-> > @@ -135,7 +136,9 @@ unsigned int bt_bap_register(bt_bap_func_t added, bt_bap_func_t removed,
-> >                                                         void *user_data);
-> >  bool bt_bap_unregister(unsigned int id);
-> > 
-> > -struct bt_bap *bt_bap_new(struct gatt_db *ldb, struct gatt_db *rdb);
-> > +struct bt_bap_db *bt_bap_get_local_db(struct gatt_db *db, bool peripheral);
-> > +
-> > +struct bt_bap *bt_bap_new(struct bt_bap_db *ldb, struct gatt_db *rdb);
-> > 
-> >  bool bt_bap_set_user_data(struct bt_bap *bap, void *user_data);
-> > 
-> > diff --git a/unit/test-bap.c b/unit/test-bap.c
-> > index afeefac84..b677f5197 100644
-> > --- a/unit/test-bap.c
-> > +++ b/unit/test-bap.c
-> > @@ -311,6 +311,7 @@ static void test_client(const void *user_data)
-> >  {
-> >         struct test_data *data = (void *)user_data;
-> >         struct io *io;
-> > +       struct bt_bap_db *ldb;
-> >         struct gatt_db *db;
-> > 
-> >         io = tester_setup_io(data->iov, data->iovcnt);
-> > @@ -321,7 +322,8 @@ static void test_client(const void *user_data)
-> >         db = gatt_db_new();
-> >         g_assert(db);
-> > 
-> > -       data->bap = bt_bap_new(db, bt_gatt_client_get_db(data->client));
-> > +       ldb = bt_bap_get_local_db(db, true);
-> > +       data->bap = bt_bap_new(ldb, bt_gatt_client_get_db(data->client));
-> >         g_assert(data->bap);
-> > 
-> >         bt_bap_set_debug(data->bap, print_debug, "bt_bap:", NULL);
-> > --
-> > 2.39.1
-> > 
-> 
-> 
+---Test result---
 
--- 
-Pauli Virtanen
+Test Summary:
+CheckPatch                    FAIL      2.20 seconds
+GitLint                       FAIL      1.53 seconds
+BuildEll                      PASS      27.04 seconds
+BluezMake                     PASS      745.55 seconds
+MakeCheck                     PASS      11.00 seconds
+MakeDistcheck                 PASS      146.65 seconds
+CheckValgrind                 PASS      238.51 seconds
+CheckSmatch                   WARNING   317.34 seconds
+bluezmakeextell               PASS      95.56 seconds
+IncrementalBuild              PASS      3050.31 seconds
+ScanBuild                     PASS      938.84 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,1/8] doc: add MGMT setting for CIS features, remove Quality Report
+WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '0454e2d09570', maybe rebased or not pulled?
+#99: 
+commit 0454e2d09570 ("mgmt: Add support for Mesh in the kernel"),
+
+/github/workspace/src/src/13121669.patch total: 0 errors, 1 warnings, 18 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13121669.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,1/8] doc: add MGMT setting for CIS features, remove Quality Report
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+15: B2 Line has trailing whitespace: "    "
+[BlueZ,4/8] tools/btmgmt: add names for MGMT setting bits for CIS feature support
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (81>80): "[BlueZ,4/8] tools/btmgmt: add names for MGMT setting bits for CIS feature support"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1799:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3551:52: warning: array of flexible structuresmonitor/bt.h:3539:40: warning: array of flexible structures
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4054595936541905323==--
