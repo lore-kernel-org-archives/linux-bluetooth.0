@@ -2,79 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 091BCC54EED
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 09:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8002BC54EED
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 10:55:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236125AbjA3JOd (ORCPT
+        id S235466AbjA3Kzi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 04:14:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50578 "EHLO
+        Mon, 30 Jan 2023 05:55:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235725AbjA3JOc (ORCPT
+        with ESMTP id S235861AbjA3Kzg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 04:14:32 -0500
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97241166D4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 01:14:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=telink-semi.com;
-        s=lgqu2209; t=1675070061;
-        bh=e5tdljEJvw/+kd9HqfPocsKcx8f1yMmOSylI5TsJ4IY=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=ifWy8s0aGiXy0ecOmSjuW5RUIyc+zEEIXhSPzW/l4sYMIgar8uoZkzatwHBF2DXlF
-         zhnLo6y6CzFjX1rq88NEBBGjqih3W/p97UmlzQVqUqulBBTBOY+i/2p9h0O/tK8L3O
-         G4a6YPvOn23KLx71kP/2nVKqGdhlI+Lg+F0tFGE4=
-X-QQ-mid: bizesmtp90t1675070059ti9m5h4l
-Received: from fedora.. ( [85.31.249.147])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Mon, 30 Jan 2023 17:14:12 +0800 (CST)
-X-QQ-SSF: 0140000000200070D000B00A0000000
-X-QQ-FEAT: CR3LFp2JE4nuRAt3y5hdzUGhalcrmFhxI1XGtMqdcOeniUiLQXeZFVgLMg8ev
-        EomLycfo8iqfpUNSldyx2XeYaGUnzI7B43qO0WGY3iIz+wRGDHqojP3IR+B5CPtYbTx94om
-        DD0ws3hkLqXJ5T/4GrUhK+KtR9HorHgfH2wiB99O2ozZGbUupNvD4oxhLMR7ZbCSyHu6DmR
-        6YcFTc82SKSmTAzkoWcDVm4PZpTjkVmfOGns5ElgeIrOEyyJA6944BKLmM3uN1PYajGTONm
-        m2kTmuxiWez25Mhs0tEAiu2TUQkZKP/w4FlS1XA8wPxZZ4zL20wiDkPPHHfwJAYMSTYZ3CV
-        mdl/gtXZHZA50H6p18V/aRhuiKFjZ4S5vEVdj2lVkZeieWwYyA=
-X-QQ-GoodBg: 2
-From:   Marcin Kraglak <marcin.kraglak@telink-semi.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcin Kraglak <marcin.kraglak@telink-semi.com>
-Subject: [PATCH] monitor/att: Fix Set Member Lock decoding
-Date:   Mon, 30 Jan 2023 10:13:36 +0100
-Message-Id: <20230130091336.19098-1-marcin.kraglak@telink-semi.com>
-X-Mailer: git-send-email 2.39.1
+        Mon, 30 Jan 2023 05:55:36 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FF117CC0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 02:55:36 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id nn18-20020a17090b38d200b0022bfb584987so10703155pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 02:55:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cHGWzOCStbmROKGOpzyS/Tkh1EXQSVXLbdMC/nE/Evs=;
+        b=cm9wy/6KWho/ugLjtDcyLHz/4rOXc4ZDC7KBpxbhLt43ELRBZXLqMDqmLFidIyFbwR
+         u3SIUGFa3RH+cwZOAnRUbtr1++aJqNjunYrotaWQL3XtsdPw6lkx4o8TgVXJRJGG3Q+V
+         dey+SCBto9RpYuV6s8O0i9u8KYjWOV0+nhazU71L9DsxaTKpDZUm7sBZ6DyC0UH4M8w0
+         RV4dhml+d42APP8DW8HF+2J5NwvwMrHI6JhxXw92cH+zj4REsjvBveQO5b/lo1NCqbfo
+         Ozk2nM4b1OD6iduYP0Zw7zxqsgX4DVGrhF4PcPMa7jPWmHzRCU7hgU69F2GFrFdN7oan
+         R9Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cHGWzOCStbmROKGOpzyS/Tkh1EXQSVXLbdMC/nE/Evs=;
+        b=jG+4Tc/vttSMh9y/p6XJC78LoacWqsXUUMmTUA7VMfPVUEIOWcgBf8oUSFQqC13tgR
+         AYQhX6xmzOmbArJdprc/GltVW3q2yVKCEHEqSpwCn2wviASpOnbts48zi9cshj50Hf7f
+         dU6BxJ0QSTDbz21sGvYsrxANvmfhwv20B7ZBIeSgYRAGF4rpY+CtIRP1HyWyZ0kkivcB
+         VyHT8eebE762rp2cPXUPRvYDPGePX2xazxOLG9mfdqElcOFvT20d0yH/c5O3uTHk6Zwg
+         Yq0B7y63aD9mBOJj83NbFE9FagQ+xrQcEEn5jDlijQRuJqJtbi+Udf4MUCtEYYA3uCpb
+         MT8w==
+X-Gm-Message-State: AO0yUKWmSxdq7ngxNe9WpBeYFIxCITRDHmfwdX+GY7xy37nTzmlo66TU
+        j1WuEvjST8S2AQfx3Mv48tWvcGQGjUQ=
+X-Google-Smtp-Source: AK7set/9pqU+afc+MvOki3vocTmCLT9C6elGjmtcIA1GOrQyBpVAzDpAXZD3BNAfjz710ydCPYvt8Q==
+X-Received: by 2002:a17:90b:4ac5:b0:22c:a544:e543 with SMTP id mh5-20020a17090b4ac500b0022ca544e543mr3132264pjb.3.1675076135512;
+        Mon, 30 Jan 2023 02:55:35 -0800 (PST)
+Received: from [172.17.0.2] ([13.64.11.209])
+        by smtp.gmail.com with ESMTPSA id bt8-20020a17090af00800b00212e5fe09d7sm6923134pjb.10.2023.01.30.02.55.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 02:55:35 -0800 (PST)
+Message-ID: <63d7a227.170a0220.92470.aa7b@mx.google.com>
+Date:   Mon, 30 Jan 2023 02:55:35 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8433309666496349925=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:telink-semi.com:qybglogicsvr:qybglogicsvr7
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, marcin.kraglak@telink-semi.com
+Subject: RE: monitor/att: Fix Set Member Lock decoding
+In-Reply-To: <20230130091336.19098-1-marcin.kraglak@telink-semi.com>
+References: <20230130091336.19098-1-marcin.kraglak@telink-semi.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-According to CSIS specification v1.0.1: "Allowed values for the Set
-Member Lock characteristic are Unlocked (corresponding to the
-numeric value 0x01) and Locked (corresponding to the numeric
-value 0x02); all other values are RFU".
+--===============8433309666496349925==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=716824
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.75 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      35.55 seconds
+BluezMake                     PASS      1167.50 seconds
+MakeCheck                     PASS      13.44 seconds
+MakeDistcheck                 PASS      191.67 seconds
+CheckValgrind                 PASS      314.94 seconds
+CheckSmatch                   WARNING   434.30 seconds
+bluezmakeextell               PASS      127.17 seconds
+IncrementalBuild              PASS      970.60 seconds
+ScanBuild                     PASS      1386.96 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
+
+
 ---
- monitor/att.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/att.c b/monitor/att.c
-index 3b78884bc..05784e9f4 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -1760,10 +1760,10 @@ static void csip_lock_read(const struct l2cap_frame *frame)
- 
- 	switch (lock) {
- 	case 0x01:
--		print_field("    Locked (0x%02x)", lock);
-+		print_field("    Unlocked (0x%02x)", lock);
- 		break;
- 	case 0x02:
--		print_field("    Unlocked (0x%02x)", lock);
-+		print_field("    Locked (0x%02x)", lock);
- 		break;
- 	default:
- 		print_field("    RFU (0x%02x)", lock);
--- 
-2.39.1
 
+--===============8433309666496349925==--
