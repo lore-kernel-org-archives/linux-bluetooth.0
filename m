@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3A0C636D7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 23:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05962C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 23:52:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbjA3Xwa (ORCPT
+        id S230491AbjA3Xwc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 18:52:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37330 "EHLO
+        Mon, 30 Jan 2023 18:52:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230320AbjA3Xw0 (ORCPT
+        with ESMTP id S229503AbjA3Xw2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 18:52:26 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE8C2E0F7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 15:52:21 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id rm7-20020a17090b3ec700b0022c05558d22so12725330pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 15:52:21 -0800 (PST)
+        Mon, 30 Jan 2023 18:52:28 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8641C2F7AE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 15:52:25 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id cl23-20020a17090af69700b0022c745bfdc3so6150551pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 15:52:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jgg095BP9CvRZQPCBsSZJQvpKkFnYIbeudLqnD2y42A=;
-        b=L4+vruXAJU85YiGL2tAd12NwWyLg487D2yoJiBDxwm96KuYX9L5pTunPNHixz0Fuyo
-         eA2d3NS53z9pysz9211vgQExqAWzrMBetNjbko/k/Eh+8pM8L/KD/M6qhuOMJyP0EBCu
-         31nv+ISoqwtQII70hLXXrjC/s8AdsV+SvFR5ikrr+jouhFhNmktONUIYVYfv3Yyf0x3I
-         UdyxQtTI1T2zi0paP42kVyD/3EaR3fZ+qr42kllrmjeFy/10T/CbDVhHdXey3oy5Kgd7
-         pTT69lUvSNx8K5uVdn2p893cOsxcnoUbslw2/iNxFO24IoJWoHv85Ll8ZhrVP/8PkBkt
-         xVBw==
+        bh=JHc1WD7oRJPg7EeaWXDZ/l7T1fOswZZvE3tAmq4YIi8=;
+        b=nmCYBGlz4vVjg+AVmi4Ozcmva9inkl6ymH5i09sX2mWBlMSk0M+osZc6L6tgYPyYGX
+         olwLFe2T/GZt3C//aPnoAPBqNm1uIy//SctNXgI5FuKkW2ii/bCTc7Itfpp8rZ80s2Qn
+         GnaXQnBuZes2EJLNAh+gv0eB26PtfX0kGT7t3tAtNlaDHrrVr/pwBW34si1M5JSdhVZc
+         1zw9NHe4P0BIs1C4ArSP5bBHYY2Dmldt0MSdvJQ/MH0NjfkTVce1s8N8gRlBznCX3/t8
+         qaSLtxJ7JGEQbszO57le7v5zwz2Lh1cb5LevuDyHqTmILW7IvSIozxCVkjl8cpuTfRo8
+         pIoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Jgg095BP9CvRZQPCBsSZJQvpKkFnYIbeudLqnD2y42A=;
-        b=1Sn8Ihpx/igreUhRxfyetHN4meYEuknEoCyi0jVrH7cFnAXLCRT1tMPS4EgVoH7YA0
-         UWC4tqeUAzDgLn+ghcwVs94LjgCEFyaVthe8cxfrP59CL7l2qoPdNNutSVvc7FqSik5Q
-         PuuAhyUaQNW1RUHUo55sfeK5dSgODzY+nmJIryZ6pi0OddJRdBZeFCSr+D0/ahMPy3S2
-         O2ayU+08VlyToSgjmbzcKowwNl1Ytt3+Lxk9a6byzZu3NOlcc3pspgOeCXdaPw+CRqXg
-         HKnxGzuctbxf4LDSyqcOFiPxbTI1GLVcQ4MRPoOvnQZtH05a7UNcUB8wL4ceijfVPaWZ
-         TGOg==
-X-Gm-Message-State: AO0yUKXHEHmv5Mj/8ieYMIVzxPHGUeQXUP3SWFBYITLxPkqTueR8U4Uq
-        RfE644ykigZdUrSdaGwIbjKrlSuyotqFxw==
-X-Google-Smtp-Source: AK7set9jo8F7mZkJx9de24qLtFegsFtrKn+s7//jvkoh3ZTLLsZbbdvCdR2oRuhoD7pafc9yG1gKJg==
-X-Received: by 2002:a05:6a21:7890:b0:bc:d4cf:d647 with SMTP id bf16-20020a056a21789000b000bcd4cfd647mr9075366pzc.6.1675122739827;
-        Mon, 30 Jan 2023 15:52:19 -0800 (PST)
+        bh=JHc1WD7oRJPg7EeaWXDZ/l7T1fOswZZvE3tAmq4YIi8=;
+        b=qc7jrGr+Ntumx+Bmklbcy681HJzyTA9ECP90692dUwmsgQKfOiSGFc6456YLY1hPvO
+         +20q3n7aY9JU+Y+VarXfVi7hJTvDEDtcQDkxBGM7wtTJdTjCbM0ZF1mCpdgZUkqthNFq
+         7c38ImD9gF5DGikO6w0Z3f8TdOwc7KBhN5QYoyPGT/SS6zxeD9uMESbaosM4x8JkD2Zf
+         nHG9GUo3TLSIpsoPnr4BopQoNL8+Fj3DXQCLEmMWVXQNxK5yhLyo15MCbbxATUwvubWZ
+         OVuNQ8Fk4kt1goo3k5xBnk/oKa+svsl9GC1tub/sNcZyNZ4wqLXcmplzxCVt15XOT3do
+         8R5g==
+X-Gm-Message-State: AO0yUKWsNYNLwJ5Jg+i+vQEKDuPzhtI9++Rik4MqgtkOd++fUd35OF38
+        FzvGkTlM0kKe1FibRDYClopQZL9JT0WWvQ==
+X-Google-Smtp-Source: AK7set+yzKXD+aIWdinl79zomfjSK26xaEqqHskur2BccAnsyxWawgQHtG1vwG1IJX/owAJwfNpk/g==
+X-Received: by 2002:a05:6a20:8427:b0:bb:c422:809f with SMTP id c39-20020a056a20842700b000bbc422809fmr32921158pzd.4.1675122744989;
+        Mon, 30 Jan 2023 15:52:24 -0800 (PST)
 Received: from fedora.. (97-126-124-199.tukw.qwest.net. [97.126.124.199])
-        by smtp.gmail.com with ESMTPSA id t191-20020a6381c8000000b004e8f7f23c4bsm2663948pgd.76.2023.01.30.15.52.19
+        by smtp.gmail.com with ESMTPSA id t191-20020a6381c8000000b004e8f7f23c4bsm2663948pgd.76.2023.01.30.15.52.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 15:52:19 -0800 (PST)
+        Mon, 30 Jan 2023 15:52:24 -0800 (PST)
 From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ v5 03/14] tools/mesh: Optimize for multiple RPR servers and NPPI
-Date:   Mon, 30 Jan 2023 15:51:59 -0800
-Message-Id: <20230130235210.94385-4-brian.gix@gmail.com>
+Subject: [PATCH BlueZ v5 09/14] mesh: Add internal Mesh Private Beacon model
+Date:   Mon, 30 Jan 2023 15:52:05 -0800
+Message-Id: <20230130235210.94385-10-brian.gix@gmail.com>
 X-Mailer: git-send-email 2.39.1
 In-Reply-To: <20230130235210.94385-1-brian.gix@gmail.com>
 References: <20230130235210.94385-1-brian.gix@gmail.com>
@@ -68,1072 +68,314 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-These changes allow the mesh-cfgclient tool to request remote node
-compositions from page 128. Depending on the differences between
-there and what is stored in the local configuration database, it may
-recomend reprovisioning with NPPI-1 (Address Refresh) or NPPI-2
-(Composition Refresh).
-
-Additionally, NPPI-0 may be performed to refresh the Device Key only.
+Adds recgnition that the Mesh Private Beacon model is internal
+and foundational, without bindings.
 ---
- tools/mesh-cfgclient.c | 479 ++++++++++++++++++++++++++++++++++-------
- tools/mesh/cfgcli.c    |  37 +++-
- tools/mesh/mesh-db.c   |  37 +++-
- tools/mesh/mesh-db.h   |   1 +
- tools/mesh/remote.c    | 122 +++++++++++
- tools/mesh/remote.h    |   9 +
- 6 files changed, 598 insertions(+), 87 deletions(-)
+ mesh/model.c          | 10 ++++++-
+ mesh/net-keys.c       |  5 ++++
+ mesh/net-keys.h       |  1 +
+ mesh/node.c           | 67 +++++++++++++++++++++++++++++++++++++++----
+ mesh/node.h           |  2 ++
+ mesh/prvbeac-server.c | 11 +++++--
+ 6 files changed, 86 insertions(+), 10 deletions(-)
 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index 237afbb5f..f3e9af8fb 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -43,6 +43,7 @@
- 
- #define CFG_SRV_MODEL	0x0000
- #define CFG_CLI_MODEL	0x0001
-+#define RPR_SVR_MODEL	0xFFFF0004
- 
- #define UNPROV_SCAN_MAX_SECS	300
- 
-@@ -83,8 +84,12 @@ struct meshcfg_node {
- 
- struct unprov_device {
- 	time_t last_seen;
--	int16_t rssi;
-+	int id;
-+	uint32_t uri_hash;
- 	uint8_t uuid[16];
-+	int16_t rssi;
-+	uint16_t server;
-+	uint16_t oob_info;
- };
- 
- struct generic_request {
-@@ -96,8 +101,16 @@ struct generic_request {
- 	const char *str;
- };
- 
-+struct scan_data {
-+	uint16_t dst;
-+	uint16_t secs;
-+};
-+
-+static void *finalized = L_UINT_TO_PTR(-1);
-+
- static struct l_dbus *dbus;
- 
-+static struct l_timeout *scan_timeout;
- static struct l_queue *node_proxies;
- static struct l_dbus_proxy *net_proxy;
- static struct meshcfg_node *local;
-@@ -197,23 +210,57 @@ static bool parse_argument_on_off(int argc, char *argv[], bool *value)
- static bool match_device_uuid(const void *a, const void *b)
- {
- 	const struct unprov_device *dev = a;
--	const uint8_t *uuid = b;
- 
--	return (memcmp(dev->uuid, uuid, 16) == 0);
-+	if (a == finalized)
-+		return false;
-+
-+	return memcmp(dev->uuid, b, 16) == 0;
- }
- 
--static void print_device(void *a, void *b)
-+static bool match_by_id(const void *a, const void *b)
- {
- 	const struct unprov_device *dev = a;
--	struct tm *tm = localtime(&dev->last_seen);
-+	int id = L_PTR_TO_UINT(b);
-+
-+	if (a == finalized)
-+		return false;
-+
-+	l_info("test %d %d", dev->id, id);
-+	return dev->id == id;
-+}
-+
-+static bool match_by_srv_uuid(const void *a, const void *b)
-+{
-+	const struct unprov_device *dev = a;
-+	const struct unprov_device *new_dev = b;
-+
-+	if (a == finalized)
-+		return false;
-+
-+	return (dev->server == new_dev->server) &&
-+				(memcmp(dev->uuid, new_dev->uuid, 16) == 0);
-+}
-+
-+static void print_device(void *a, void *b)
-+{
-+	struct unprov_device *dev = a;
-+	int *cnt = b;
-+	struct tm *tm;
- 	char buf[80];
- 	char *str;
- 
-+	if (a == finalized)
-+		return;
-+
-+	tm = localtime(&dev->last_seen);
- 	assert(strftime(buf, sizeof(buf), "%c", tm));
-+	(*cnt)++;
- 
-+	dev->id = *cnt;
- 	str = l_util_hexstring_upper(dev->uuid, sizeof(dev->uuid));
--	bt_shell_printf("UUID: %s, RSSI %d, Seen: %s\n",
--			str, dev->rssi, buf);
-+	bt_shell_printf(COLOR_YELLOW "#%d" COLOR_OFF
-+			" UUID: %s, RSSI %d, Server: %4.4x\n Seen: %s\n",
-+			*cnt, str, dev->rssi, dev->server, buf);
- 
- 	l_free(str);
- }
-@@ -794,15 +841,56 @@ static void scan_reply(struct l_dbus_proxy *proxy, struct l_dbus_message *msg,
- 
- static void scan_setup(struct l_dbus_message *msg, void *user_data)
- {
--	uint16_t secs = (uint16_t) L_PTR_TO_UINT(user_data);
-+	struct scan_data *data = user_data;
- 	struct l_dbus_message_builder *builder;
- 
- 	builder = l_dbus_message_builder_new(msg);
- 	l_dbus_message_builder_enter_array(builder, "{sv}");
--	append_dict_entry_basic(builder, "Seconds", "q", &secs);
-+	append_dict_entry_basic(builder, "Seconds", "q", &data->secs);
-+	append_dict_entry_basic(builder, "Server", "q", &data->dst);
- 	l_dbus_message_builder_leave_array(builder);
- 	l_dbus_message_builder_finalize(builder);
- 	l_dbus_message_builder_destroy(builder);
-+
-+	/* Destination info not needed after call */
-+	l_free(data);
-+}
-+
-+static void scan_start(void *user_data, uint16_t dst, uint32_t model)
-+{
-+	struct scan_data *data;
-+
-+	if (model != RPR_SVR_MODEL)
-+		return;
-+
-+	data = l_malloc(sizeof(struct scan_data));
-+	data->secs = L_PTR_TO_UINT(user_data);
-+	data->dst = dst;
-+
-+	if (!l_dbus_proxy_method_call(local->mgmt_proxy, "UnprovisionedScan",
-+					scan_setup, scan_reply, data, NULL))
-+		l_free(data);
-+}
-+
-+static void scan_to(struct l_timeout *timeout, void *user_data)
-+{
-+	int cnt = 0;
-+
-+	if (l_queue_peek_head(devices) != finalized)
-+		l_queue_push_head(devices, finalized);
-+
-+	l_timeout_remove(timeout);
-+	scan_timeout = NULL;
-+	bt_shell_printf(COLOR_YELLOW "Unprovisioned devices:\n" COLOR_OFF);
-+	l_queue_foreach(devices, print_device, &cnt);
-+}
-+
-+static void free_devices(void *a)
-+{
-+	if (a == finalized)
-+		return;
-+
-+	l_free(a);
- }
- 
- static void cmd_scan_unprov(int argc, char *argv[])
-@@ -820,21 +908,28 @@ static void cmd_scan_unprov(int argc, char *argv[])
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	if (argc == 3)
-+	if (argc == 3) {
- 		sscanf(argv[2], "%u", &secs);
- 
--	if (secs > UNPROV_SCAN_MAX_SECS)
--		secs = UNPROV_SCAN_MAX_SECS;
-+		if (secs > UNPROV_SCAN_MAX_SECS)
-+			secs = UNPROV_SCAN_MAX_SECS;
-+	} else
-+		secs = 60;
- 
--	if (enable)
--		l_dbus_proxy_method_call(local->mgmt_proxy, "UnprovisionedScan",
--						scan_setup, scan_reply,
--						L_UINT_TO_PTR(secs), NULL);
--	else
-+	l_timeout_remove(scan_timeout);
-+	scan_timeout = NULL;
-+
-+	if (enable) {
-+		l_queue_clear(devices, free_devices);
-+		remote_foreach_model(scan_start, L_UINT_TO_PTR(secs));
-+		scan_timeout = l_timeout_create(secs, scan_to, NULL, NULL);
-+	} else {
-+		/* Mark devices queue as finalized */
-+		l_queue_push_head(devices, finalized);
- 		l_dbus_proxy_method_call(local->mgmt_proxy,
- 						"UnprovisionedScanCancel",
- 						NULL, NULL, NULL, NULL);
--
-+	}
- }
- 
- static uint8_t *parse_key(struct l_dbus_message_iter *iter, uint16_t id,
-@@ -1030,8 +1125,10 @@ static void cmd_export_db(int argc, char *argv[])
- 
- static void cmd_list_unprov(int argc, char *argv[])
- {
-+	int cnt = 0;
-+
- 	bt_shell_printf(COLOR_YELLOW "Unprovisioned devices:\n" COLOR_OFF);
--	l_queue_foreach(devices, print_device, NULL);
-+	l_queue_foreach(devices, print_device, &cnt);
- }
- 
- static void cmd_list_nodes(int argc, char *argv[])
-@@ -1505,32 +1602,56 @@ static void add_node_reply(struct l_dbus_proxy *proxy,
- 	bt_shell_printf("Provisioning started\n");
- }
- 
--static void add_node_setup(struct l_dbus_message *msg, void *user_data)
-+static void reprov_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *msg, void *user_data)
- {
--	char *str = user_data;
--	size_t sz;
--	unsigned char *uuid;
--	struct l_dbus_message_builder *builder;
-+	if (l_dbus_message_is_error(msg)) {
-+		const char *name;
- 
--	uuid = l_util_from_hexstring(str, &sz);
--	if (!uuid || sz != 16 || !l_uuid_is_valid(uuid)) {
--		l_error("Failed to generate UUID array from %s", str);
-+		prov_in_progress = false;
-+		l_dbus_message_get_error(msg, &name, NULL);
-+		l_error("Failed to start provisioning: %s", name);
- 		return;
- 	}
- 
-+	bt_shell_printf("Reprovisioning started\n");
-+}
-+
-+static void reprovision_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	uint16_t target = L_PTR_TO_UINT(user_data);
-+	uint8_t nppi = L_PTR_TO_UINT(user_data) >> 16;
-+	struct l_dbus_message_builder *builder;
-+
- 	builder = l_dbus_message_builder_new(msg);
--	append_byte_array(builder, uuid, 16);
-+	l_dbus_message_builder_append_basic(builder, 'q', &target);
- 	l_dbus_message_builder_enter_array(builder, "{sv}");
- 	/* TODO: populate with options when defined */
-+	append_dict_entry_basic(builder, "NPPI", "y", &nppi);
- 	l_dbus_message_builder_leave_array(builder);
- 	l_dbus_message_builder_finalize(builder);
- 	l_dbus_message_builder_destroy(builder);
-+}
- 
--	l_free(uuid);
-+static void add_node_setup(struct l_dbus_message *msg, void *user_data)
-+{
-+	struct unprov_device *dev = user_data;
-+	struct l_dbus_message_builder *builder;
-+
-+	builder = l_dbus_message_builder_new(msg);
-+	append_byte_array(builder, dev->uuid, 16);
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+	/* TODO: populate with options when defined */
-+	l_dbus_message_builder_leave_array(builder);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
- }
- 
- static void cmd_start_prov(int argc, char *argv[])
- {
-+	struct unprov_device *dev = NULL;
-+	int id;
-+
- 	if (!local || !local->proxy || !local->mgmt_proxy) {
- 		bt_shell_printf("Node is not attached\n");
- 		return;
-@@ -1541,14 +1662,96 @@ static void cmd_start_prov(int argc, char *argv[])
- 		return;
- 	}
- 
--	if (!argv[1] || (strlen(argv[1]) != 32)) {
-+	if (!argv[1]) {
-+		bt_shell_printf(COLOR_RED "Requires UUID\n" COLOR_RED);
-+		return;
-+	}
-+
-+	if (*(argv[1]) == '#') {
-+		if (sscanf(argv[1] + 1, "%d", &id) == 1)
-+			dev = l_queue_find(devices, match_by_id,
-+							L_UINT_TO_PTR(id));
-+
-+		if (!dev) {
-+			bt_shell_printf(COLOR_RED "unknown id\n" COLOR_RED);
-+			return;
-+		}
-+	} else if (strlen(argv[1]) == 32) {
-+		size_t sz;
-+		uint8_t *uuid = l_util_from_hexstring(argv[1], &sz);
-+
-+		if (sz != 16) {
-+			bt_shell_printf(COLOR_RED "Invalid UUID\n" COLOR_RED);
-+			return;
-+		}
-+
-+		dev = l_queue_find(devices, match_device_uuid, uuid);
-+
-+		if (!dev) {
-+			dev = l_new(struct unprov_device, 1);
-+			memcpy(dev->uuid, uuid, 16);
-+			l_queue_push_tail(devices, dev);
-+		}
-+
-+		l_free(uuid);
-+
-+	} else {
- 		bt_shell_printf(COLOR_RED "Requires UUID\n" COLOR_RED);
- 		return;
- 	}
- 
- 	if (l_dbus_proxy_method_call(local->mgmt_proxy, "AddNode",
- 						add_node_setup, add_node_reply,
--						argv[1], NULL))
-+						dev, NULL))
-+		prov_in_progress = true;
-+}
-+
-+static void cmd_start_reprov(int argc, char *argv[])
-+{
-+	uint16_t target = 0;
-+	uint8_t nppi = 0;
-+
-+	if (!local || !local->proxy || !local->mgmt_proxy) {
-+		bt_shell_printf("Node is not attached\n");
-+		return;
-+	}
-+
-+	if (prov_in_progress) {
-+		bt_shell_printf("Provisioning is already in progress\n");
-+		return;
-+	}
-+
-+	if (!argv[1]) {
-+		bt_shell_printf(COLOR_RED "Requires Unicast\n" COLOR_RED);
-+		return;
-+	}
-+
-+	if (argv[2]) {
-+		char *end;
-+
-+		nppi = strtol(argv[2], &end, 16);
-+	}
-+
-+	if (strlen(argv[1]) == 4) {
-+		char *end;
-+
-+		target = strtol(argv[1], &end, 16);
-+
-+		if (end != (argv[1] + 4)) {
-+			bt_shell_printf(COLOR_RED "Invalid Unicast\n"
-+								COLOR_RED);
-+			return;
-+		}
-+
-+	} else {
-+		bt_shell_printf(COLOR_RED "Requires Unicast\n" COLOR_RED);
-+		return;
-+	}
-+
-+	if (l_dbus_proxy_method_call(local->mgmt_proxy, "Reprovision",
-+					reprovision_setup, reprov_reply,
-+					L_UINT_TO_PTR(target + (nppi << 16)),
-+					NULL))
- 		prov_in_progress = true;
- }
- 
-@@ -1581,6 +1784,8 @@ static const struct bt_shell_menu main_menu = {
- 			"List unprovisioned devices" },
- 	{ "provision", "<uuid>", cmd_start_prov,
- 			"Initiate provisioning"},
-+	{ "reprovision", "<unicast> [0|1|2]", cmd_start_reprov,
-+			"Refresh Device Key"},
- 	{ "node-import", "<uuid> <net_idx> <primary> <ele_count> <dev_key>",
- 			cmd_import_node,
- 			"Import an externally provisioned remote node"},
-@@ -1758,18 +1963,34 @@ static void setup_ele_iface(struct l_dbus_interface *iface)
- 	/* TODO: Other methods */
- }
- 
-+static int sort_rssi(const void *a, const void *b, void *user_data)
-+{
-+	const struct unprov_device *new_dev = a;
-+	const struct unprov_device *dev = b;
-+
-+	if (b == finalized)
-+		return 1;
-+
-+	return dev->rssi - new_dev->rssi;
-+}
-+
- static struct l_dbus_message *scan_result_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
--	struct l_dbus_message_iter iter, opts;
-+	struct l_dbus_message_iter iter, opts, var;
-+	struct unprov_device result, *dev;
- 	int16_t rssi;
-+	uint16_t server = 0;
- 	uint32_t n;
- 	uint8_t *prov_data;
--	char *str;
--	struct unprov_device *dev;
-+	const char *key;
- 	const char *sig = "naya{sv}";
- 
-+	if (finalized == l_queue_peek_head(devices))
-+		goto done;
-+
-+
- 	if (!l_dbus_message_get_arguments(msg, sig, &rssi, &iter, &opts)) {
- 		l_error("Cannot parse scan results");
- 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
-@@ -1781,42 +2002,72 @@ static struct l_dbus_message *scan_result_call(struct l_dbus *dbus,
- 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
- 	}
- 
--	bt_shell_printf("Scan result:\n");
--	bt_shell_printf("\t" COLOR_GREEN "rssi = %d\n" COLOR_OFF, rssi);
--	str = l_util_hexstring_upper(prov_data, 16);
--	bt_shell_printf("\t" COLOR_GREEN "UUID = %s\n" COLOR_OFF, str);
--	l_free(str);
--
--	if (n >= 18) {
--		str = l_util_hexstring_upper(prov_data + 16, 2);
--		bt_shell_printf("\t" COLOR_GREEN "OOB = %s\n" COLOR_OFF, str);
--		l_free(str);
-+	while (l_dbus_message_iter_next_entry(&opts, &key, &var)) {
-+		if (!strcmp(key, "Server"))
-+			l_dbus_message_iter_get_variant(&var, "q", &server);
- 	}
- 
--	if (n >= 22) {
--		str = l_util_hexstring_upper(prov_data + 18, 4);
--		bt_shell_printf("\t" COLOR_GREEN "URI Hash = %s\n" COLOR_OFF,
--									str);
--		l_free(str);
--	}
-+	memcpy(result.uuid, prov_data, 16);
-+	result.server = server;
-+	result.rssi = rssi;
-+	result.id = 0;
- 
--	/* TODO: Handle the rest of provisioning data if present */
-+	if (n > 16 && n <= 18)
-+		result.oob_info = l_get_be16(prov_data + 16);
-+	else
-+		result.oob_info = 0;
-+
-+	if (n > 18 && n <= 22)
-+		result.uri_hash = l_get_be32(prov_data + 18);
-+	else
-+		result.uri_hash = 0;
-+
-+	dev = l_queue_remove_if(devices, match_by_srv_uuid, &result);
- 
--	dev = l_queue_find(devices, match_device_uuid, prov_data);
- 	if (!dev) {
--		dev = l_new(struct unprov_device, 1);
--		memcpy(dev->uuid, prov_data, sizeof(dev->uuid));
--		/* TODO: timed self-destructor */
--		l_queue_push_tail(devices, dev);
--	}
-+		bt_shell_printf("\r" COLOR_YELLOW "Results = %d\n" COLOR_OFF,
-+						l_queue_length(devices) + 1);
-+		dev = l_malloc(sizeof(struct unprov_device));
-+		*dev = result;
-+
-+	} else if (dev->rssi < result.rssi)
-+		*dev = result;
- 
--	/* Update with the latest rssi */
--	dev->rssi = rssi;
- 	dev->last_seen = time(NULL);
- 
-+	l_queue_insert(devices, dev, sort_rssi, NULL);
-+
-+done:
- 	return l_dbus_message_new_method_return(msg);
- }
- 
-+static struct l_dbus_message *req_reprov_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	uint8_t cnt;
-+	uint16_t unicast, original;
-+	struct l_dbus_message *reply;
-+
-+
-+	if (!l_dbus_message_get_arguments(msg, "qy", &original, &cnt) ||
-+							!IS_UNICAST(original)) {
-+		l_error("Cannot parse request for reprov data");
-+		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
-+
-+	}
-+
-+	unicast = remote_get_next_unicast(low_addr, high_addr, cnt);
-+
-+	bt_shell_printf("Assign addresses for %u elements\n", cnt);
-+	bt_shell_printf("Original: %4.4x New: %4.4x\n", original, unicast);
-+
-+	reply = l_dbus_message_new_method_return(msg);
-+	l_dbus_message_set_arguments(reply, "q", unicast);
-+
-+	return reply;
-+}
-+
- static struct l_dbus_message *req_prov_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
-@@ -1825,6 +2076,7 @@ static struct l_dbus_message *req_prov_call(struct l_dbus *dbus,
- 	uint16_t unicast;
- 	struct l_dbus_message *reply;
- 
-+	/* Both calls handled identicaly except for parameter list */
- 	if (!l_dbus_message_get_arguments(msg, "y", &cnt)) {
- 		l_error("Cannot parse request for prov data");
- 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
-@@ -1833,14 +2085,14 @@ static struct l_dbus_message *req_prov_call(struct l_dbus *dbus,
- 
- 	unicast = remote_get_next_unicast(low_addr, high_addr, cnt);
- 
--	if (unicast == 0) {
-+	if (!IS_UNICAST(unicast)) {
- 		l_error("Failed to allocate addresses for %u elements\n", cnt);
- 		return l_dbus_message_new_error(msg,
- 					"org.freedesktop.DBus.Error."
- 					"Failed to allocate address", NULL);
- 	}
- 
--	bt_shell_printf("Assign addresses for %u elements\n", cnt);
-+	bt_shell_printf("Assign addresses: %4.4x (cnt: %d)\n", unicast, cnt);
- 
- 	reply = l_dbus_message_new_method_return(msg);
- 	l_dbus_message_set_arguments(reply, "qq", prov_net_idx, unicast);
-@@ -1852,11 +2104,13 @@ static void remove_device(uint8_t *uuid)
- {
- 	struct unprov_device *dev;
- 
--	dev = l_queue_remove_if(devices, match_device_uuid, uuid);
--	l_free(dev);
-+	do {
-+		dev = l_queue_remove_if(devices, match_device_uuid, uuid);
-+		l_free(dev);
-+	} while (dev);
- }
- 
--static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
-+static struct l_dbus_message *prov_cmplt_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-@@ -1866,6 +2120,7 @@ static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
- 	uint32_t n;
- 	uint8_t *uuid;
- 
-+	l_debug("ProvComplete");
- 	if (!prov_in_progress)
- 		return l_dbus_message_new_error(msg, dbus_err_fail, NULL);
- 
-@@ -1896,7 +2151,49 @@ static struct l_dbus_message *add_node_cmplt_call(struct l_dbus *dbus,
- 	return l_dbus_message_new_method_return(msg);
- }
- 
--static struct l_dbus_message *add_node_fail_call(struct l_dbus *dbus,
-+static struct l_dbus_message *reprov_cmplt_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	uint16_t unicast, original;
-+	uint8_t old_cnt, cnt, nppi;
-+
-+	l_debug("ReprovComplete");
-+	if (!prov_in_progress)
-+		return l_dbus_message_new_error(msg, dbus_err_fail, NULL);
-+
-+	prov_in_progress = false;
-+
-+	if (!l_dbus_message_get_arguments(msg, "qyqy", &original, &nppi,
-+							&unicast, &cnt)) {
-+		l_error("Cannot parse reprov complete message");
-+		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
-+
-+	}
-+
-+	l_debug("ReprovComplete org: %4.4x, nppi: %d, new: %4.4x, cnt: %d",
-+						original, nppi, unicast, cnt);
-+	old_cnt = remote_ele_cnt(original);
-+
-+	if (nppi != 1 && (original != unicast || cnt != old_cnt)) {
-+		l_error("Invalid reprov complete message (NPPI == %d)", nppi);
-+		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
-+	}
-+
-+	if (nppi)
-+		remote_reset_node(original, unicast, cnt,
-+						mesh_db_get_iv_index());
-+
-+	bt_shell_printf("Reprovisioning done (nppi: %d):\n", nppi);
-+	remote_print_node(unicast);
-+
-+	if (!mesh_db_reset_node(original, unicast, cnt))
-+		l_error("Failed to reset remote node");
-+
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
-+static struct l_dbus_message *prov_fail_call(struct l_dbus *dbus,
- 						struct l_dbus_message *msg,
- 						void *user_data)
- {
-@@ -1911,24 +2208,49 @@ static struct l_dbus_message *add_node_fail_call(struct l_dbus *dbus,
- 	prov_in_progress = false;
- 
- 	if (!l_dbus_message_get_arguments(msg, "ays", &iter, &reason)) {
--		l_error("Cannot parse add node failed message");
-+		l_error("Cannot parse failed message");
- 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
--
- 	}
- 
--	if (!l_dbus_message_iter_get_fixed_array(&iter, &uuid, &n) ||
--								n != 16) {
--		l_error("Cannot parse add node failed message: uuid");
-+	if (!l_dbus_message_iter_get_fixed_array(&iter, &uuid, &n) || n != 16) {
-+		l_error("Cannot parse failed message: uuid");
- 		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
- 	}
- 
- 	bt_shell_printf("Provisioning failed:\n");
+diff --git a/mesh/model.c b/mesh/model.c
+index e2babea10..4ccafa17e 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -26,6 +26,7 @@
+ #include "mesh/cfgmod.h"
+ #include "mesh/prov.h"
+ #include "mesh/remprv.h"
++#include "mesh/prv-beacon.h"
+ #include "mesh/error.h"
+ #include "mesh/dbus.h"
+ #include "mesh/util.h"
+@@ -81,6 +82,9 @@ static bool is_internal(uint32_t id)
+ 	if (id == REM_PROV_SRV_MODEL || id == REM_PROV_CLI_MODEL)
+ 		return true;
+ 
++	if (id == PRV_BEACON_SRV_MODEL || id == PRV_BEACON_CLI_MODEL)
++		return true;
 +
- 	str = l_util_hexstring_upper(uuid, 16);
- 	bt_shell_printf("\t" COLOR_RED "UUID = %s\n" COLOR_OFF, str);
- 	l_free(str);
-+	remove_device(uuid);
- 	bt_shell_printf("\t" COLOR_RED "%s\n" COLOR_OFF, reason);
- 
--	remove_device(uuid);
-+	return l_dbus_message_new_method_return(msg);
-+}
-+
-+static struct l_dbus_message *reprov_fail_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	struct l_dbus_message_iter iter;
-+	uint16_t original = UNASSIGNED_ADDRESS;
-+	char *reason;
-+
-+	if (!prov_in_progress)
-+		return l_dbus_message_new_error(msg, dbus_err_fail, NULL);
-+
-+	prov_in_progress = false;
-+
-+	if (!l_dbus_message_get_arguments(msg, "qs", &iter, &reason) ||
-+							!IS_UNICAST(original)) {
-+
-+		l_error("Cannot parse Reprov failed message");
-+		return l_dbus_message_new_error(msg, dbus_err_args, NULL);
-+	}
-+
-+	bt_shell_printf("Reprovisioning failed:\n");
-+	bt_shell_printf("\t" COLOR_RED "UNICAST = %4.4x\n" COLOR_OFF, original);
-+	bt_shell_printf("\t" COLOR_RED "%s\n" COLOR_OFF, reason);
- 
- 	return l_dbus_message_new_method_return(msg);
- }
-@@ -1941,12 +2263,23 @@ static void setup_prov_iface(struct l_dbus_interface *iface)
- 	l_dbus_interface_method(iface, "RequestProvData", 0, req_prov_call,
- 				"qq", "y", "net_index", "unicast", "count");
- 
-+	l_dbus_interface_method(iface, "RequestReprovData", 0, req_reprov_call,
-+					"q", "qy", "unicast",
-+					"original", "count");
-+
- 	l_dbus_interface_method(iface, "AddNodeComplete", 0,
--					add_node_cmplt_call, "", "ayqy",
-+					prov_cmplt_call, "", "ayqy",
- 					"uuid", "unicast", "count");
- 
--	l_dbus_interface_method(iface, "AddNodeFailed", 0, add_node_fail_call,
-+	l_dbus_interface_method(iface, "ReprovComplete", 0,
-+					reprov_cmplt_call, "", "qyqy",
-+					"original", "nppi", "unicast", "count");
-+
-+	l_dbus_interface_method(iface, "AddNodeFailed", 0, prov_fail_call,
- 					"", "ays", "uuid", "reason");
-+
-+	l_dbus_interface_method(iface, "ReprovFailed", 0, reprov_fail_call,
-+					"", "qs", "unicast", "reason");
- }
- 
- static bool cid_getter(struct l_dbus *dbus,
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index a48eace74..ad572f694 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -266,14 +266,21 @@ static uint32_t print_mod_id(uint8_t *data, bool vendor, const char *offset)
- 	return mod_id;
- }
- 
--static void print_composition(uint8_t *data, uint16_t len)
-+static uint8_t print_composition(uint8_t *data, uint16_t len)
- {
- 	uint16_t features;
- 	int i = 0;
-+	bool nppi = false;
- 
--	bt_shell_printf("Received composion:\n");
-+	bt_shell_printf("Received composition:\n");
-+
-+	/* We only support Pages 0 && 128 */
-+	if (*data == 128) {
-+		bt_shell_printf("Dev Key Refresh (NPPI) required\n");
-+		nppi = true;
-+	} else if (*data != 0)
-+		return 0;
- 
--	/* skip page -- We only support Page Zero */
- 	data++;
- 	len--;
- 
-@@ -328,6 +335,11 @@ static void print_composition(uint8_t *data, uint16_t len)
- 
- 		i++;
- 	}
-+
-+	if (nppi)
-+		return (uint8_t) i;
-+	else
-+		return 0;
- }
- 
- static void print_pub(uint16_t ele_addr, uint32_t mod_id,
-@@ -402,6 +414,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 	const struct cfg_cmd *cmd;
- 	uint16_t app_idx, net_idx, addr, ele_addr, features;
- 	struct mesh_group *grp;
-+	uint8_t page128_cnt;
- 	struct model_pub pub;
- 	int n;
- 	struct pending_req *req;
-@@ -431,7 +444,19 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		if (len < MIN_COMPOSITION_LEN)
- 			return true;
- 
--		print_composition(data, len);
-+		page128_cnt = print_composition(data, len);
-+		if (page128_cnt) {
-+			if (page128_cnt != remote_ele_cnt(src)) {
-+				bt_shell_printf("Ele count was %d, now %d\n",
-+					remote_ele_cnt(src), page128_cnt);
-+				bt_shell_printf("Reprovision with NPPI-1\n");
-+			} else {
-+				bt_shell_printf("Models or Features changed\n");
-+				bt_shell_printf("Reprovision with NPPI-2\n");
-+			}
-+
-+			break;
-+		}
- 
- 		saved = mesh_db_node_set_composition(src, data, len);
- 		if (saved)
-@@ -1051,8 +1076,8 @@ static void cmd_composition_get(int argc, char *argv[])
- 
- 	n = mesh_opcode_set(OP_DEV_COMP_GET, msg);
- 
--	/* By default, use page 0 */
--	msg[n++] = (read_input_parameters(argc, argv) == 1) ? parms[0] : 0;
-+	/* By default, use page 128 */
-+	msg[n++] = (read_input_parameters(argc, argv) == 1) ? parms[0] : 128;
- 
- 	if (!config_send(msg, n, OP_DEV_COMP_GET))
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index 896ff722c..c0c05a29a 100644
---- a/tools/mesh/mesh-db.c
-+++ b/tools/mesh/mesh-db.c
-@@ -1702,6 +1702,29 @@ static json_object *init_elements(uint8_t num_els)
- 	return jelements;
- }
- 
-+bool mesh_db_reset_node(uint16_t original, uint16_t unicast, uint8_t num_els)
-+{
-+	json_object *jnode, *jelements;
-+
-+	if (!cfg || !cfg->jcfg)
-+		return false;
-+
-+	jnode = get_node_by_unicast(cfg->jcfg, original);
-+	if (!jnode) {
-+		l_error("Node %4.4x does not exist", original);
-+		return false;
-+	}
-+
-+	if (!write_uint16_hex(jnode, "unicastAddress", unicast))
-+		return false;
-+
-+	json_object_object_del(jnode, "elements");
-+	jelements = init_elements(num_els);
-+	json_object_object_add(jnode, "elements", jelements);
-+
-+	return save_config();
-+}
-+
- bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
- 							uint16_t net_idx)
- {
-@@ -1864,13 +1887,11 @@ bool mesh_db_node_set_composition(uint16_t unicast, uint8_t *data, uint16_t len)
- 	if (!jnode)
- 		return false;
- 
--	/* skip page -- We only support Page Zero */
--	data++;
--	len--;
-+	/* This is for page-0 only */
-+	if (*data++ != 0)
-+		return false;
- 
--	/* If "crpl" property is present, composition is already recorded */
--	if (json_object_object_get_ex(jnode, "crpl", &jobj))
--		return true;
-+	len--;
- 
- 	if (!write_uint16_hex(jnode, "cid", l_get_le16(&data[0])))
- 		return false;
-@@ -1954,7 +1975,6 @@ bool mesh_db_node_set_composition(uint16_t unicast, uint8_t *data, uint16_t len)
- 		}
- 
- 		while (len >= 4 && v--) {
--			jobj = json_object_new_object();
- 			mod_id = l_get_le16(data + 2);
- 			mod_id = l_get_le16(data) << 16 | mod_id;
- 
-@@ -1984,7 +2004,8 @@ bool mesh_db_node_set_composition(uint16_t unicast, uint8_t *data, uint16_t len)
- fail:
- 	/* Reset elements array */
- 	json_object_object_del(jnode, "elements");
--	init_elements(sz);
-+	jelements = init_elements(sz);
-+	json_object_object_add(jnode, "elements", jelements);
- 
  	return false;
  }
-diff --git a/tools/mesh/mesh-db.h b/tools/mesh/mesh-db.h
-index 4b6b2adb3..0e45112b7 100644
---- a/tools/mesh/mesh-db.h
-+++ b/tools/mesh/mesh-db.h
-@@ -29,6 +29,7 @@ bool mesh_db_del_app_key(uint16_t app_idx);
- bool mesh_db_get_addr_range(uint16_t *low, uint16_t *high);
- bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
- 							uint16_t net_idx);
-+bool mesh_db_reset_node(uint16_t original, uint16_t unicast, uint8_t num_els);
- bool mesh_db_del_node(uint16_t unicast);
- bool mesh_db_node_set_composition(uint16_t unicast, uint8_t *data,
- 								uint16_t len);
-diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
-index 6ec220a6f..cee711dec 100644
---- a/tools/mesh/remote.c
-+++ b/tools/mesh/remote.c
-@@ -30,6 +30,12 @@ struct remote_key {
- 	bool updated;
+ 
+@@ -647,6 +651,9 @@ static int update_binding(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
+ 		return MESH_STATUS_INVALID_MODEL;
+ 
++	if (id == PRV_BEACON_SRV_MODEL || id == PRV_BEACON_CLI_MODEL)
++		return MESH_STATUS_INVALID_MODEL;
++
+ 	if (!appkey_have_key(node_get_net(node), app_idx))
+ 		return MESH_STATUS_INVALID_APPKEY;
+ 
+@@ -1655,7 +1662,8 @@ static struct mesh_model *model_setup(struct mesh_net *net, uint8_t ele_idx,
+ 						SET_ID(SIG_VENDOR, db_mod->id));
+ 
+ 	/* Implicitly bind config server model to device key */
+-	if (db_mod->id == CONFIG_SRV_MODEL) {
++	if (db_mod->id == CONFIG_SRV_MODEL ||
++					db_mod->id == PRV_BEACON_SRV_MODEL) {
+ 
+ 		if (ele_idx != PRIMARY_ELE_IDX) {
+ 			l_free(mod);
+diff --git a/mesh/net-keys.c b/mesh/net-keys.c
+index 0ba051d79..57a9df04a 100644
+--- a/mesh/net-keys.c
++++ b/mesh/net-keys.c
+@@ -123,6 +123,7 @@ uint32_t net_key_add(const uint8_t flooding[16])
+ 	key = l_new(struct net_key, 1);
+ 	memcpy(key->flooding, flooding, 16);
+ 	key->ref_cnt++;
++	key->mpb_refresh = NET_MPB_REFRESH_DEFAULT;
+ 	result = mesh_crypto_k2(flooding, p, sizeof(p), &key->nid, key->enc_key,
+ 								key->prv_key);
+ 	if (!result)
+@@ -664,6 +665,10 @@ bool net_key_beacon_refresh(uint32_t id, uint32_t ivi, bool kr, bool ivu,
+ 
+ 	l_debug("Set Beacon: IVI: %8.8x, IVU: %d, KR: %d", ivi, ivu, kr);
+ 
++	key->ivi = ivi;
++	key->ivu = ivu;
++	key->kr = kr;
++
+ 	/* Propagate changes to all local nodes */
+ 	net_local_beacon(id, ivi, ivu, kr);
+ 
+diff --git a/mesh/net-keys.h b/mesh/net-keys.h
+index a3909448c..e73812481 100644
+--- a/mesh/net-keys.h
++++ b/mesh/net-keys.h
+@@ -12,6 +12,7 @@
+ #define BEACON_TYPE_MPB		0x02
+ #define KEY_REFRESH		0x01
+ #define IV_INDEX_UPDATE		0x02
++#define NET_MPB_REFRESH_DEFAULT	60
+ 
+ void net_key_cleanup(void);
+ bool net_key_confirm(uint32_t id, const uint8_t flooding[16]);
+diff --git a/mesh/node.c b/mesh/node.c
+index a2a330518..ed3212685 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -32,6 +32,7 @@
+ #include "mesh/model.h"
+ #include "mesh/cfgmod.h"
+ #include "mesh/remprv.h"
++#include "mesh/prv-beacon.h"
+ #include "mesh/util.h"
+ #include "mesh/error.h"
+ #include "mesh/dbus.h"
+@@ -100,6 +101,8 @@ struct mesh_node {
+ 	uint8_t proxy;
+ 	uint8_t friend;
+ 	uint8_t beacon;
++	uint8_t mpb;
++	uint8_t mpb_period;
  };
  
-+struct foreach_data {
-+	remote_foreach_t each;
-+	void *user_data;
-+	uint16_t dst;
-+};
-+
- struct remote_node {
- 	uint16_t unicast;
- 	struct l_queue *net_keys;
-@@ -138,6 +144,40 @@ uint8_t remote_del_node(uint16_t unicast)
- 	return num_ele;
+ struct node_import {
+@@ -206,6 +209,8 @@ static void set_defaults(struct mesh_node *node)
+ {
+ 	node->lpn = MESH_MODE_UNSUPPORTED;
+ 	node->proxy = MESH_MODE_UNSUPPORTED;
++	node->mpb = MESH_MODE_DISABLED;
++	node->mpb_period = NET_MPB_REFRESH_DEFAULT;
+ 	node->friend = (mesh_friendship_supported()) ? MESH_MODE_DISABLED :
+ 							MESH_MODE_UNSUPPORTED;
+ 	node->beacon = (mesh_beacon_enabled()) ? MESH_MODE_ENABLED :
+@@ -403,7 +408,7 @@ static bool init_storage_dir(struct mesh_node *node)
+ 	return rpl_init(node->storage_dir);
  }
  
-+bool remote_reset_node(uint16_t original, uint16_t unicast, uint8_t ele_cnt,
-+							uint32_t iv_index)
-+{
-+	struct remote_node *rmt;
-+	bool reject = true;
-+	int i;
+-static void update_net_settings(struct mesh_node *node)
++static void init_net_settings(struct mesh_node *node)
+ {
+ 	struct mesh_net *net = node->net;
+ 
+@@ -415,6 +420,8 @@ static void update_net_settings(struct mesh_node *node)
+ 					node->relay.cnt, node->relay.interval);
+ 
+ 	mesh_net_set_snb_mode(net, node->beacon == MESH_MODE_ENABLED);
++	mesh_net_set_mpb_mode(net, node->mpb == MESH_MODE_ENABLED,
++							node->mpb_period, true);
+ }
+ 
+ static bool init_from_storage(struct mesh_config_node *db_node,
+@@ -442,6 +449,8 @@ static bool init_from_storage(struct mesh_config_node *db_node,
+ 	node->relay.cnt = db_node->modes.relay.cnt;
+ 	node->relay.interval = db_node->modes.relay.interval;
+ 	node->beacon = db_node->modes.beacon;
++	node->mpb = db_node->modes.mpb;
++	node->mpb_period = db_node->modes.mpb_period;
+ 
+ 	l_debug("relay %2.2x, proxy %2.2x, lpn %2.2x, friend %2.2x",
+ 			node->relay.mode, node->proxy, node->lpn, node->friend);
+@@ -495,7 +504,7 @@ static bool init_from_storage(struct mesh_config_node *db_node,
+ 	mesh_net_set_seq_num(node->net, node->seq_number);
+ 	mesh_net_set_default_ttl(node->net, node->ttl);
+ 
+-	update_net_settings(node);
++	init_net_settings(node);
+ 
+ 	/* Initialize configuration server model */
+ 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
+@@ -504,6 +513,9 @@ static bool init_from_storage(struct mesh_config_node *db_node,
+ 	remote_prov_server_init(node, PRIMARY_ELE_IDX);
+ 	remote_prov_client_init(node, PRIMARY_ELE_IDX);
+ 
++	/* Initialize Private Beacon server model */
++	prv_beacon_server_init(node, PRIMARY_ELE_IDX);
 +
-+	rmt = l_queue_remove_if(nodes, match_node_addr,
-+						L_UINT_TO_PTR(original));
-+	if (!rmt)
+ 	node->cfg = cfg;
+ 
+ 	return true;
+@@ -839,6 +851,36 @@ uint8_t node_beacon_mode_get(struct mesh_node *node)
+ 	return node->beacon;
+ }
+ 
++bool node_mpb_mode_set(struct mesh_node *node, bool enable, uint8_t period)
++{
++	bool res;
++	uint8_t beacon;
++
++	if (!node)
 +		return false;
 +
-+	if (unicast == rmt->unicast)
-+		reject = false;
++	beacon = enable ? MESH_MODE_ENABLED : MESH_MODE_DISABLED;
++	res = mesh_config_write_mpb(node->cfg, beacon, period);
 +
-+	for (i = 0; i < rmt->num_ele; ++i) {
-+		l_queue_destroy(rmt->els[i], NULL);
-+		if (reject)
-+			remote_add_rejected_address(rmt->unicast + i,
-+								iv_index, true);
++	if (res) {
++		node->mpb = beacon;
++		node->mpb_period = period;
++		mesh_net_set_mpb_mode(node->net, enable, period, false);
 +	}
 +
-+	if (ele_cnt != rmt->num_ele) {
-+		l_free(rmt->els);
-+		rmt->els = l_new(struct l_queue *, ele_cnt);
-+	} else
-+		memset(rmt->els, 0, sizeof(struct l_queue *) * ele_cnt);
-+
-+	rmt->unicast = unicast;
-+	rmt->num_ele = ele_cnt;
-+	l_queue_insert(nodes, rmt, compare_unicast, NULL);
-+	return true;
++	return res;
 +}
 +
- bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
- 					uint8_t ele_cnt, uint16_t net_idx)
++uint8_t node_mpb_mode_get(struct mesh_node *node, uint8_t *period)
++{
++	if (!node)
++		return MESH_MODE_DISABLED;
++
++	*period = node->mpb_period;
++
++	return node->mpb;
++}
++
+ bool node_friend_mode_set(struct mesh_node *node, bool enable)
  {
-@@ -526,6 +566,76 @@ void remote_print_all(void)
- 	l_queue_foreach(nodes, print_node, NULL);
- }
+ 	bool res;
+@@ -951,6 +993,8 @@ static void convert_node_to_storage(struct mesh_node *node,
+ 	db_node->modes.relay.cnt = node->relay.cnt;
+ 	db_node->modes.relay.interval = node->relay.interval;
+ 	db_node->modes.beacon = node->beacon;
++	db_node->modes.mpb = node->mpb;
++	db_node->modes.mpb_period = node->mpb_period;
  
-+static void each_node(void *rmt, void *user_data)
-+{
-+	struct remote_node *node = rmt;
-+	struct foreach_data *data = user_data;
-+
-+	data->each(data->user_data, node->unicast, (uint32_t) -1);
-+}
-+
-+static void each_addr(void *rmt, void *user_data)
-+{
-+	struct remote_node *node = rmt;
-+	struct foreach_data *data = user_data;
-+	uint16_t cnt;
-+
-+	for (cnt = 0; cnt <= node->num_ele; cnt++)
-+		data->each(data->user_data, node->unicast + cnt, (uint32_t) -1);
-+}
-+
-+static void parse_model(void *model, void *user_data)
-+{
-+	struct foreach_data *data = user_data;
-+
-+	data->each(data->user_data, data->dst, L_PTR_TO_UINT(model));
-+}
-+
-+static void each_model(void *rmt, void *user_data)
-+{
-+	struct remote_node *node = rmt;
-+	struct foreach_data *data = user_data;
-+	uint16_t cnt;
-+
-+	for (cnt = 0; cnt < node->num_ele; cnt++) {
-+		data->dst = node->unicast + cnt;
-+		l_queue_foreach(node->els[cnt], parse_model, data);
-+	}
-+}
-+
-+void remote_foreach(remote_foreach_t each, void *user_data)
-+{
-+	struct foreach_data data = {
-+		.each = each,
-+		.user_data = user_data
-+	};
-+
-+	if (each)
-+		l_queue_foreach(nodes, each_node, &data);
-+}
-+
-+void remote_foreach_unicast(remote_foreach_t each, void *user_data)
-+{
-+	struct foreach_data data = {
-+		.each = each,
-+		.user_data = user_data
-+	};
-+
-+	if (each)
-+		l_queue_foreach(nodes, each_addr, &data);
-+}
-+
-+void remote_foreach_model(remote_foreach_t each, void *user_data)
-+{
-+	struct foreach_data data = {
-+		.each = each,
-+		.user_data = user_data
-+	};
-+
-+	if (each)
-+		l_queue_foreach(nodes, each_model, &data);
-+}
-+
- uint16_t remote_get_next_unicast(uint16_t low, uint16_t high, uint8_t ele_cnt)
- {
- 	struct remote_node *rmt;
-@@ -598,3 +708,15 @@ void remote_clear_rejected_addresses(uint32_t iv_index)
+ 	db_node->ttl = node->ttl;
+ 	db_node->seq_number = node->seq_number;
+@@ -1173,9 +1217,16 @@ static bool get_sig_models_from_properties(struct mesh_node *node,
+ 	while (l_dbus_message_iter_next_entry(&mods, &m_id, &var)) {
+ 		uint32_t id = SET_ID(SIG_VENDOR, m_id);
  
- 	mesh_db_clear_rejected(iv_index);
- }
-+
-+uint8_t remote_ele_cnt(uint16_t unicast)
-+{
-+	struct remote_node *rmt;
-+
-+	rmt = l_queue_find(nodes, match_node_addr, L_UINT_TO_PTR(unicast));
-+
-+	if (rmt)
-+		return rmt->num_ele;
-+
-+	return 0;
-+}
-diff --git a/tools/mesh/remote.h b/tools/mesh/remote.h
-index 66457237e..2a3947b58 100644
---- a/tools/mesh/remote.h
-+++ b/tools/mesh/remote.h
-@@ -8,8 +8,13 @@
-  *
-  */
+-		/* Allow Config Server Model only on the primary element */
+-		if (ele->idx != PRIMARY_ELE_IDX && id == CONFIG_SRV_MODEL)
+-			return false;
++		/*
++		 * Allow Config Server & Private Beacon Models only on
++		 * the primary element
++		 */
++		if (ele->idx != PRIMARY_ELE_IDX) {
++			if (id == CONFIG_SRV_MODEL)
++				return false;
++			if (id == PRV_BEACON_SRV_MODEL)
++				return false;
++		}
  
-+typedef void (*remote_foreach_t)(void *user_data, uint16_t dst,
-+								uint32_t model);
+ 		if (!mesh_model_add(node, ele->models, id, &var))
+ 			return false;
+@@ -1278,6 +1329,7 @@ static bool get_element_properties(struct mesh_node *node, const char *path,
+ 	 */
+ 	if (ele->idx == PRIMARY_ELE_IDX) {
+ 		mesh_model_add(node, ele->models, CONFIG_SRV_MODEL, NULL);
++		mesh_model_add(node, ele->models, PRV_BEACON_SRV_MODEL, NULL);
+ 		mesh_model_add(node, ele->models, REM_PROV_SRV_MODEL, NULL);
+ 		if (node->provisioner)
+ 			mesh_model_add(node, ele->models, REM_PROV_CLI_MODEL,
+@@ -1397,13 +1449,16 @@ static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
+ 
+ 	l_queue_foreach(node->pages, save_pages, node);
+ 
+-	update_net_settings(node);
++	init_net_settings(node);
+ 
+ 	/* Initialize internal server models */
+ 	cfgmod_server_init(node, PRIMARY_ELE_IDX);
+ 	remote_prov_server_init(node, PRIMARY_ELE_IDX);
+ 	remote_prov_client_init(node, PRIMARY_ELE_IDX);
+ 
++	/* Initialize Private Beacon server model */
++	prv_beacon_server_init(node, PRIMARY_ELE_IDX);
 +
- bool remote_add_node(const uint8_t uuid[16], uint16_t unicast,
- 					uint8_t ele_cnt, uint16_t net_idx);
-+bool remote_reset_node(uint16_t original, uint16_t unicast, uint8_t ele_cnt,
-+							uint32_t iv_index);
- uint8_t remote_del_node(uint16_t unicast);
- bool remote_set_model(uint16_t unicast, uint8_t ele_idx, uint32_t mod_id,
- 								bool vendor);
-@@ -30,3 +35,7 @@ bool remote_has_composition(uint16_t addr);
- uint16_t remote_get_subnet_idx(uint16_t addr);
- void remote_print_node(uint16_t addr);
- void remote_print_all(void);
-+void remote_foreach(remote_foreach_t each, void *user_data);
-+void remote_foreach_unicast(remote_foreach_t each, void *user_data);
-+void remote_foreach_model(remote_foreach_t each, void *user_data);
-+uint8_t remote_ele_cnt(uint16_t unicast);
+ 	node->busy = true;
+ 
+ 	return true;
+diff --git a/mesh/node.h b/mesh/node.h
+index a98945223..4f31c5056 100644
+--- a/mesh/node.h
++++ b/mesh/node.h
+@@ -63,6 +63,8 @@ uint8_t node_relay_mode_get(struct mesh_node *node, uint8_t *cnt,
+ bool node_proxy_mode_set(struct mesh_node *node, bool enable);
+ uint8_t node_proxy_mode_get(struct mesh_node *node);
+ bool node_beacon_mode_set(struct mesh_node *node, bool enable);
++bool node_mpb_mode_set(struct mesh_node *node, bool enable, uint8_t period);
++uint8_t node_mpb_mode_get(struct mesh_node *node, uint8_t *period);
+ uint8_t node_beacon_mode_get(struct mesh_node *node);
+ bool node_friend_mode_set(struct mesh_node *node, bool enable);
+ uint8_t node_friend_mode_get(struct mesh_node *node);
+diff --git a/mesh/prvbeac-server.c b/mesh/prvbeac-server.c
+index e712778f8..dd0e4cbf4 100644
+--- a/mesh/prvbeac-server.c
++++ b/mesh/prvbeac-server.c
+@@ -43,7 +43,7 @@ static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 	uint32_t opcode;
+ 	uint8_t msg[5];
+ 	uint16_t n;
+-	uint8_t period = 0;
++	uint8_t period;
+ 
+ 	if (app_idx != APP_IDX_DEV_LOCAL)
+ 		return false;
+@@ -65,18 +65,23 @@ static bool prvbec_srv_pkt(uint16_t src, uint16_t dst, uint16_t app_idx,
+ 
+ 	case OP_PRIVATE_BEACON_SET:
+ 		if (size == 1)
+-			period = 0xff;
++			node_mpb_mode_get(node, &period);
+ 		else if (size == 2)
+ 			period = pkt[1];
+ 		else
+ 			return true;
+ 
++		if (pkt[0] > 1)
++			return true;
++
++		node_mpb_mode_set(node, !!pkt[0], period);
++
+ 		/* fall through */
+ 
+ 	case OP_PRIVATE_BEACON_GET:
+ 		n = mesh_model_opcode_set(OP_PRIVATE_BEACON_STATUS, msg);
+ 
+-		msg[n++] = NOT_SUPPORTED;
++		msg[n++] = node_mpb_mode_get(node, &period);
+ 		msg[n++] = period;
+ 
+ 		l_debug("Get/Set Private Beacon (%d)", msg[n-2]);
 -- 
 2.39.1
 
