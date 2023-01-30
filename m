@@ -2,33 +2,34 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EA8C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 06:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E96C636CB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 06:53:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235611AbjA3Gnc (ORCPT
+        id S235851AbjA3Gx1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 01:43:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53808 "EHLO
+        Mon, 30 Jan 2023 01:53:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbjA3Gnb (ORCPT
+        with ESMTP id S231161AbjA3Gx0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 01:43:31 -0500
+        Mon, 30 Jan 2023 01:53:26 -0500
 Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4C213DEF;
-        Sun, 29 Jan 2023 22:43:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E34113CB;
+        Sun, 29 Jan 2023 22:53:23 -0800 (PST)
 Received: from [10.59.106.37] (unknown [77.235.169.38])
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
         (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 51C6561CC457B;
-        Mon, 30 Jan 2023 07:43:24 +0100 (CET)
-Message-ID: <b55d06ad-5031-791c-b79c-6a5014020aec@molgen.mpg.de>
-Date:   Mon, 30 Jan 2023 07:43:20 +0100
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4030661CC457B;
+        Mon, 30 Jan 2023 07:53:21 +0100 (CET)
+Message-ID: <8d61fb12-eec4-0bc4-f1f4-87fdb7c5407f@molgen.mpg.de>
+Date:   Mon, 30 Jan 2023 07:53:20 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.7.1
 Subject: Re: [PATCH 0/4] Attempt at adding WCN6855 BT support
+Content-Language: en-US
 To:     Steev Klimaszewski <steev@kali.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
@@ -44,12 +45,10 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Sven Peter <sven@svenpeter.dev>,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
 References: <20230129215136.5557-1-steev@kali.org>
-Content-Language: en-US
 From:   Paul Menzel <pmenzel@molgen.mpg.de>
 In-Reply-To: <20230129215136.5557-1-steev@kali.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
@@ -58,10 +57,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[Cc: +Mark Pearson]
-
-Dear Steev,
-
+[Cc: Remove undeliverable rjliao@codeaurora.org]
 
 Am 29.01.23 um 22:51 schrieb Steev Klimaszewski:
 > This patchset is somewhat of an RFC/RFT, and also just something to get this out
@@ -83,19 +79,7 @@ Am 29.01.23 um 22:51 schrieb Steev Klimaszewski:
 > 
 > Hopefully by getting this out there, people who do have access to the specs or
 > schematics can see where the improvements or fixes need to come.
-
-Thank you for the patches. Reading until the end and seeing patch 4/4, 
-this is related to the Lenovo Thinkpad X13s. I am adding Mark Pearson to 
-the Cc list. No idea if GNU/Linux is officially supported by Lenovo, but 
-even if not, maybe Mark is able to get you access to the specifications 
-and schematics.
-
-
-Kind regards,
-
-Paul
-
-
+> 
 > There are a few things that I am not sure why they happen, and don't have the
 > knowledge level to figure out why they happen or debugging it.
 > 
