@@ -2,92 +2,178 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3914BC54EED
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Jan 2023 22:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EA8C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 06:43:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235342AbjA2WMr (ORCPT
+        id S235611AbjA3Gnc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 29 Jan 2023 17:12:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39576 "EHLO
+        Mon, 30 Jan 2023 01:43:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230365AbjA2WMq (ORCPT
+        with ESMTP id S230024AbjA3Gnb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 29 Jan 2023 17:12:46 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715C31C33D
-        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Jan 2023 14:12:45 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id e6so1578021plg.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Jan 2023 14:12:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DDjKxSpfVz6Wg1n8ul67C+etQx+ZGNvgBuw1HehC65E=;
-        b=i6jt48w35PmHamynGHsz1cn47uileyi/PYXVkvP9P2iWaZ5H3oTNZBt2/NOnjWaIG1
-         wxNaBKP5ZhRlVuE7Ru2IKzC2C07H0cy4g6x+50K0MbMKU8zhOIYJyCNw1JkpKNPh4hfO
-         sMCcOW1Z/iVE4HYgMiJ0QnwmyO7co1L4AGpn/2V2B2y4G6qZAMs7NmyRB+WWMBXmW64I
-         1CTThBs6LTIDoRCca2nW4/j1Z7Q9ssauCdRNiDZP1ZrRE5bD7Xnd42opQdnbvgVxy2FR
-         HEiNGs8aHItYlF1atZBOE9V+elMuwpq7voKUqo8bWl9ynRplEwuSr91zUHliWsASK4tZ
-         Prkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DDjKxSpfVz6Wg1n8ul67C+etQx+ZGNvgBuw1HehC65E=;
-        b=eFoGlsmpXi6lkgBwul4L9SQe5wC/3ZvTulDyRxAp0HubTu1KDBLiNAgv6IKISnjQgT
-         g6l4ejNm7bX6kdR3xOoLmihxXGbZ0U5IFTPsgEwqoMRazA+0oXA9qWherRZOBr8qKr4Q
-         lAzGEG/rW34J5vnCNkzX0xQZt4sDwys3nlI/xI68Il8bzNkrLbNG4D9X2bcV/winufk+
-         M9PFcec5AubHidGkl8dyHAB7RkKXgMlFamCjdXJIVLq91LjzzMSWVLbaniVzPham0lQe
-         bNpfRYWuFediC0v47GldOgAk80ZpKLX2E9VM1xlnVjjtW7JsGwKYjj5FvAKFzE6Hfeeq
-         1/fQ==
-X-Gm-Message-State: AFqh2kplGD9hg9hzqQ1RbcbxnhcBuwbZXLVoq21BkUzAJqLYqUahvaAh
-        wI6fW32EG5JrRysoQr9oXmnIhabf5mU=
-X-Google-Smtp-Source: AMrXdXuDr2nQRxetITGaAU32kDXyvwsM+Hg8NUf5A3O/pYlbwwwjduAP2H+sC+MwcuWGngyjuKMk+g==
-X-Received: by 2002:a17:902:b496:b0:193:11df:670 with SMTP id y22-20020a170902b49600b0019311df0670mr44912267plr.20.1675030364720;
-        Sun, 29 Jan 2023 14:12:44 -0800 (PST)
-Received: from [172.17.0.2] ([4.227.0.129])
-        by smtp.gmail.com with ESMTPSA id g5-20020a1709026b4500b0019479636f84sm6339924plt.11.2023.01.29.14.12.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Jan 2023 14:12:44 -0800 (PST)
-Message-ID: <63d6ef5c.170a0220.3515b.9c2a@mx.google.com>
-Date:   Sun, 29 Jan 2023 14:12:44 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7931517096526200475=="
+        Mon, 30 Jan 2023 01:43:31 -0500
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD4C213DEF;
+        Sun, 29 Jan 2023 22:43:28 -0800 (PST)
+Received: from [10.59.106.37] (unknown [77.235.169.38])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 51C6561CC457B;
+        Mon, 30 Jan 2023 07:43:24 +0100 (CET)
+Message-ID: <b55d06ad-5031-791c-b79c-6a5014020aec@molgen.mpg.de>
+Date:   Mon, 30 Jan 2023 07:43:20 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, steev@kali.org
-Subject: RE: Attempt at adding WCN6855 BT support
-In-Reply-To: <20230129215136.5557-2-steev@kali.org>
-References: <20230129215136.5557-2-steev@kali.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH 0/4] Attempt at adding WCN6855 BT support
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+References: <20230129215136.5557-1-steev@kali.org>
+Content-Language: en-US
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20230129215136.5557-1-steev@kali.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7931517096526200475==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+[Cc: +Mark Pearson]
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: arch/arm64/boot/dts/qcom/sc8280xp.dtsi:1244
-error: arch/arm64/boot/dts/qcom/sc8280xp.dtsi: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+Dear Steev,
 
 
----
-Regards,
-Linux Bluetooth
+Am 29.01.23 um 22:51 schrieb Steev Klimaszewski:
+> This patchset is somewhat of an RFC/RFT, and also just something to get this out
+> there.
+> 
+> First things first, I do not have access to the specs nor the schematics, so a
+> lot of this was done via guess work, looking at the acpi tables, and looking at
+> how a similar device (wcn6750) was added.
+> 
+> There are definitely checkpatch warnings, and I do apologize to those who won't
+> review things until there are no warnings for wasting your time.
+> 
+> One example is that I have the vregs commented out, the dt-bindings say that
+> they are required since it's based on the wcn6750 work but also like the 6750,
+> I've added defaults into the driver, and those seem to work, at least for the
+> initial testing.
+> 
+> The end result is that we do have a working device, but not entirely reliable.
+> 
+> Hopefully by getting this out there, people who do have access to the specs or
+> schematics can see where the improvements or fixes need to come.
+
+Thank you for the patches. Reading until the end and seeing patch 4/4, 
+this is related to the Lenovo Thinkpad X13s. I am adding Mark Pearson to 
+the Cc list. No idea if GNU/Linux is officially supported by Lenovo, but 
+even if not, maybe Mark is able to get you access to the specifications 
+and schematics.
 
 
---===============7931517096526200475==--
+Kind regards,
+
+Paul
+
+
+> There are a few things that I am not sure why they happen, and don't have the
+> knowledge level to figure out why they happen or debugging it.
+> 
+> Bluetooth: hci0: setting up wcn6855
+> Bluetooth: hci0: Frame reassembly failed (-84)
+> Bluetooth: hci0: QCA Product ID   :0x00000013
+> Bluetooth: hci0: QCA SOC Version  :0x400c0210
+> Bluetooth: hci0: QCA ROM Version  :0x00000201
+> Bluetooth: hci0: QCA Patch Version:0x000038e6
+> Bluetooth: hci0: QCA controller version 0x02100201
+> Bluetooth: hci0: unexpected event for opcode 0xfc48
+> Bluetooth: hci0: Sending QCA Patch config failed (-110)
+> Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+> Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
+> Bluetooth: hci0: QCA setup on UART is completed
+> 
+> I do not know why the Frame assembly failed, nor the unexpected event.
+> 
+> Likewise, I'm not entirely sure why it says the patch config send times out, and
+> *then* seems to send it?
+> 
+> The BD Address also seems to be incorrect, and I'm not sure what is going on
+> there either.
+> 
+> Additionally, I've tried with an additional patch that I'm not including that is
+> based on commit 059924fdf6c1 ("Bluetooth: btqca: Use NVM files based on SoC ID
+> for WCN3991") to try using the hpnv21g.bin or hpnv21.bin, and the firmware acted
+> the same regardless, so I am assuming I don't truly need the "g" firmware on my
+> Thinkpad X13s.
+> 
+> Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+> well as connecting to and using an H2GO bluetooth speaker and playing audio out
+> via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+> 
+> The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+> "A2DP Sink, codec SBC" would provide audio output, and while I could see that
+> data was being sent to the speaker, it wasn't always outputting, and going >
+> 4ft. away, would often disconnect.
+> 
+> steev@wintermute:~$ hciconfig -a
+> hci0:   Type: Primary  Bus: UART
+>          BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+>          UP RUNNING PSCAN
+>          RX bytes:1492 acl:0 sco:0 events:126 errors:0
+>          TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+>          Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+>          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>          Link policy: RSWITCH HOLD SNIFF
+>          Link mode: PERIPHERAL ACCEPT
+>          Name: 'wintermute'
+>          Class: 0x0c010c
+>          Service Classes: Rendering, Capturing
+>          Device Class: Computer, Laptop
+>          HCI Version:  (0xc)  Revision: 0x0
+>          LMP Version:  (0xc)  Subversion: 0x46f7
+>          Manufacturer: Qualcomm (29)
+> 
+> steev@wintermute:~$ dmesg | grep Razer
+> [ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+> [ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+> steev@wintermute:~$ dmesg | grep H2GO
+> [ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
+> 
+> Bjorn Andersson (1):
+>    arm64: dts: qcom: sc8280xp: Enable BT
+> 
+> Steev Klimaszewski (3):
+>    dt-bindings: net: Add WCN6855 Bluetooth bindings
+>    Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+>    arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+> 
+>   .../net/bluetooth/qualcomm-bluetooth.yaml     |  2 +
+>   .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
+>   arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+>   drivers/bluetooth/btqca.c                     | 24 ++++++-
+>   drivers/bluetooth/btqca.h                     | 10 +++
+>   drivers/bluetooth/hci_qca.c                   | 59 ++++++++++++----
+>   6 files changed, 162 insertions(+), 15 deletions(-)
+> 
+> 
+> base-commit: e2f86c02fdc96ca29ced53221a3cbf50aa6f8b49
