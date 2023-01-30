@@ -2,162 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E96C636CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 06:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 091BCC54EED
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 09:14:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235851AbjA3Gx1 (ORCPT
+        id S236125AbjA3JOd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 01:53:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35860 "EHLO
+        Mon, 30 Jan 2023 04:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbjA3Gx0 (ORCPT
+        with ESMTP id S235725AbjA3JOc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 01:53:26 -0500
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E34113CB;
-        Sun, 29 Jan 2023 22:53:23 -0800 (PST)
-Received: from [10.59.106.37] (unknown [77.235.169.38])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4030661CC457B;
-        Mon, 30 Jan 2023 07:53:21 +0100 (CET)
-Message-ID: <8d61fb12-eec4-0bc4-f1f4-87fdb7c5407f@molgen.mpg.de>
-Date:   Mon, 30 Jan 2023 07:53:20 +0100
+        Mon, 30 Jan 2023 04:14:32 -0500
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97241166D4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 01:14:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=telink-semi.com;
+        s=lgqu2209; t=1675070061;
+        bh=e5tdljEJvw/+kd9HqfPocsKcx8f1yMmOSylI5TsJ4IY=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version;
+        b=ifWy8s0aGiXy0ecOmSjuW5RUIyc+zEEIXhSPzW/l4sYMIgar8uoZkzatwHBF2DXlF
+         zhnLo6y6CzFjX1rq88NEBBGjqih3W/p97UmlzQVqUqulBBTBOY+i/2p9h0O/tK8L3O
+         G4a6YPvOn23KLx71kP/2nVKqGdhlI+Lg+F0tFGE4=
+X-QQ-mid: bizesmtp90t1675070059ti9m5h4l
+Received: from fedora.. ( [85.31.249.147])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Mon, 30 Jan 2023 17:14:12 +0800 (CST)
+X-QQ-SSF: 0140000000200070D000B00A0000000
+X-QQ-FEAT: CR3LFp2JE4nuRAt3y5hdzUGhalcrmFhxI1XGtMqdcOeniUiLQXeZFVgLMg8ev
+        EomLycfo8iqfpUNSldyx2XeYaGUnzI7B43qO0WGY3iIz+wRGDHqojP3IR+B5CPtYbTx94om
+        DD0ws3hkLqXJ5T/4GrUhK+KtR9HorHgfH2wiB99O2ozZGbUupNvD4oxhLMR7ZbCSyHu6DmR
+        6YcFTc82SKSmTAzkoWcDVm4PZpTjkVmfOGns5ElgeIrOEyyJA6944BKLmM3uN1PYajGTONm
+        m2kTmuxiWez25Mhs0tEAiu2TUQkZKP/w4FlS1XA8wPxZZ4zL20wiDkPPHHfwJAYMSTYZ3CV
+        mdl/gtXZHZA50H6p18V/aRhuiKFjZ4S5vEVdj2lVkZeieWwYyA=
+X-QQ-GoodBg: 2
+From:   Marcin Kraglak <marcin.kraglak@telink-semi.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marcin Kraglak <marcin.kraglak@telink-semi.com>
+Subject: [PATCH] monitor/att: Fix Set Member Lock decoding
+Date:   Mon, 30 Jan 2023 10:13:36 +0100
+Message-Id: <20230130091336.19098-1-marcin.kraglak@telink-semi.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH 0/4] Attempt at adding WCN6855 BT support
-Content-Language: en-US
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-References: <20230129215136.5557-1-steev@kali.org>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230129215136.5557-1-steev@kali.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:telink-semi.com:qybglogicsvr:qybglogicsvr7
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[Cc: Remove undeliverable rjliao@codeaurora.org]
+According to CSIS specification v1.0.1: "Allowed values for the Set
+Member Lock characteristic are Unlocked (corresponding to the
+numeric value 0x01) and Locked (corresponding to the numeric
+value 0x02); all other values are RFU".
+---
+ monitor/att.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Am 29.01.23 um 22:51 schrieb Steev Klimaszewski:
-> This patchset is somewhat of an RFC/RFT, and also just something to get this out
-> there.
-> 
-> First things first, I do not have access to the specs nor the schematics, so a
-> lot of this was done via guess work, looking at the acpi tables, and looking at
-> how a similar device (wcn6750) was added.
-> 
-> There are definitely checkpatch warnings, and I do apologize to those who won't
-> review things until there are no warnings for wasting your time.
-> 
-> One example is that I have the vregs commented out, the dt-bindings say that
-> they are required since it's based on the wcn6750 work but also like the 6750,
-> I've added defaults into the driver, and those seem to work, at least for the
-> initial testing.
-> 
-> The end result is that we do have a working device, but not entirely reliable.
-> 
-> Hopefully by getting this out there, people who do have access to the specs or
-> schematics can see where the improvements or fixes need to come.
-> 
-> There are a few things that I am not sure why they happen, and don't have the
-> knowledge level to figure out why they happen or debugging it.
-> 
-> Bluetooth: hci0: setting up wcn6855
-> Bluetooth: hci0: Frame reassembly failed (-84)
-> Bluetooth: hci0: QCA Product ID   :0x00000013
-> Bluetooth: hci0: QCA SOC Version  :0x400c0210
-> Bluetooth: hci0: QCA ROM Version  :0x00000201
-> Bluetooth: hci0: QCA Patch Version:0x000038e6
-> Bluetooth: hci0: QCA controller version 0x02100201
-> Bluetooth: hci0: unexpected event for opcode 0xfc48
-> Bluetooth: hci0: Sending QCA Patch config failed (-110)
-> Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
-> Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
-> Bluetooth: hci0: QCA setup on UART is completed
-> 
-> I do not know why the Frame assembly failed, nor the unexpected event.
-> 
-> Likewise, I'm not entirely sure why it says the patch config send times out, and
-> *then* seems to send it?
-> 
-> The BD Address also seems to be incorrect, and I'm not sure what is going on
-> there either.
-> 
-> Additionally, I've tried with an additional patch that I'm not including that is
-> based on commit 059924fdf6c1 ("Bluetooth: btqca: Use NVM files based on SoC ID
-> for WCN3991") to try using the hpnv21g.bin or hpnv21.bin, and the firmware acted
-> the same regardless, so I am assuming I don't truly need the "g" firmware on my
-> Thinkpad X13s.
-> 
-> Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
-> well as connecting to and using an H2GO bluetooth speaker and playing audio out
-> via canberra-gtk-play as well as a couple of YouTube videos in a browser.
-> 
-> The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
-> "A2DP Sink, codec SBC" would provide audio output, and while I could see that
-> data was being sent to the speaker, it wasn't always outputting, and going >
-> 4ft. away, would often disconnect.
-> 
-> steev@wintermute:~$ hciconfig -a
-> hci0:   Type: Primary  Bus: UART
->          BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
->          UP RUNNING PSCAN
->          RX bytes:1492 acl:0 sco:0 events:126 errors:0
->          TX bytes:128743 acl:0 sco:0 commands:597 errors:0
->          Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
->          Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
->          Link policy: RSWITCH HOLD SNIFF
->          Link mode: PERIPHERAL ACCEPT
->          Name: 'wintermute'
->          Class: 0x0c010c
->          Service Classes: Rendering, Capturing
->          Device Class: Computer, Laptop
->          HCI Version:  (0xc)  Revision: 0x0
->          LMP Version:  (0xc)  Subversion: 0x46f7
->          Manufacturer: Qualcomm (29)
-> 
-> steev@wintermute:~$ dmesg | grep Razer
-> [ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
-> [ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
-> steev@wintermute:~$ dmesg | grep H2GO
-> [ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
-> 
-> Bjorn Andersson (1):
->    arm64: dts: qcom: sc8280xp: Enable BT
-> 
-> Steev Klimaszewski (3):
->    dt-bindings: net: Add WCN6855 Bluetooth bindings
->    Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
->    arm64: dts: qcom: thinkpad-x13s: Add bluetooth
-> 
->   .../net/bluetooth/qualcomm-bluetooth.yaml     |  2 +
->   .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
->   arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
->   drivers/bluetooth/btqca.c                     | 24 ++++++-
->   drivers/bluetooth/btqca.h                     | 10 +++
->   drivers/bluetooth/hci_qca.c                   | 59 ++++++++++++----
->   6 files changed, 162 insertions(+), 15 deletions(-)
-> 
-> 
-> base-commit: e2f86c02fdc96ca29ced53221a3cbf50aa6f8b49
+diff --git a/monitor/att.c b/monitor/att.c
+index 3b78884bc..05784e9f4 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -1760,10 +1760,10 @@ static void csip_lock_read(const struct l2cap_frame *frame)
+ 
+ 	switch (lock) {
+ 	case 0x01:
+-		print_field("    Locked (0x%02x)", lock);
++		print_field("    Unlocked (0x%02x)", lock);
+ 		break;
+ 	case 0x02:
+-		print_field("    Unlocked (0x%02x)", lock);
++		print_field("    Locked (0x%02x)", lock);
+ 		break;
+ 	default:
+ 		print_field("    RFU (0x%02x)", lock);
+-- 
+2.39.1
+
