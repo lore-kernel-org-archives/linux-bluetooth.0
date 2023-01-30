@@ -2,107 +2,154 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8002BC54EED
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 10:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 779ECC61D97
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Jan 2023 18:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235466AbjA3Kzi (ORCPT
+        id S237807AbjA3SGU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 05:55:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44492 "EHLO
+        Mon, 30 Jan 2023 13:06:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235861AbjA3Kzg (ORCPT
+        with ESMTP id S234038AbjA3SGS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 05:55:36 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35FF117CC0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 02:55:36 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id nn18-20020a17090b38d200b0022bfb584987so10703155pjb.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 02:55:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cHGWzOCStbmROKGOpzyS/Tkh1EXQSVXLbdMC/nE/Evs=;
-        b=cm9wy/6KWho/ugLjtDcyLHz/4rOXc4ZDC7KBpxbhLt43ELRBZXLqMDqmLFidIyFbwR
-         u3SIUGFa3RH+cwZOAnRUbtr1++aJqNjunYrotaWQL3XtsdPw6lkx4o8TgVXJRJGG3Q+V
-         dey+SCBto9RpYuV6s8O0i9u8KYjWOV0+nhazU71L9DsxaTKpDZUm7sBZ6DyC0UH4M8w0
-         RV4dhml+d42APP8DW8HF+2J5NwvwMrHI6JhxXw92cH+zj4REsjvBveQO5b/lo1NCqbfo
-         Ozk2nM4b1OD6iduYP0Zw7zxqsgX4DVGrhF4PcPMa7jPWmHzRCU7hgU69F2GFrFdN7oan
-         R9Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cHGWzOCStbmROKGOpzyS/Tkh1EXQSVXLbdMC/nE/Evs=;
-        b=jG+4Tc/vttSMh9y/p6XJC78LoacWqsXUUMmTUA7VMfPVUEIOWcgBf8oUSFQqC13tgR
-         AYQhX6xmzOmbArJdprc/GltVW3q2yVKCEHEqSpwCn2wviASpOnbts48zi9cshj50Hf7f
-         dU6BxJ0QSTDbz21sGvYsrxANvmfhwv20B7ZBIeSgYRAGF4rpY+CtIRP1HyWyZ0kkivcB
-         VyHT8eebE762rp2cPXUPRvYDPGePX2xazxOLG9mfdqElcOFvT20d0yH/c5O3uTHk6Zwg
-         Yq0B7y63aD9mBOJj83NbFE9FagQ+xrQcEEn5jDlijQRuJqJtbi+Udf4MUCtEYYA3uCpb
-         MT8w==
-X-Gm-Message-State: AO0yUKWmSxdq7ngxNe9WpBeYFIxCITRDHmfwdX+GY7xy37nTzmlo66TU
-        j1WuEvjST8S2AQfx3Mv48tWvcGQGjUQ=
-X-Google-Smtp-Source: AK7set/9pqU+afc+MvOki3vocTmCLT9C6elGjmtcIA1GOrQyBpVAzDpAXZD3BNAfjz710ydCPYvt8Q==
-X-Received: by 2002:a17:90b:4ac5:b0:22c:a544:e543 with SMTP id mh5-20020a17090b4ac500b0022ca544e543mr3132264pjb.3.1675076135512;
-        Mon, 30 Jan 2023 02:55:35 -0800 (PST)
-Received: from [172.17.0.2] ([13.64.11.209])
-        by smtp.gmail.com with ESMTPSA id bt8-20020a17090af00800b00212e5fe09d7sm6923134pjb.10.2023.01.30.02.55.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 02:55:35 -0800 (PST)
-Message-ID: <63d7a227.170a0220.92470.aa7b@mx.google.com>
-Date:   Mon, 30 Jan 2023 02:55:35 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8433309666496349925=="
+        Mon, 30 Jan 2023 13:06:18 -0500
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2071.outbound.protection.outlook.com [40.107.7.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26EC83B3DD;
+        Mon, 30 Jan 2023 10:06:15 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F6MUyhyAppzWQW5fOaoTgsz85vhlPXiitBozskS7XwUpoqI+ODP8d3tTDzBJHKpBvAnaMjI02kKC3h4GSY+8FWHZwlcY7iTnkQEBsqY14h2/eogaSCE6VOg4eY5cNrwFaLEGmphKT0S8LR6mr8h7TmBN0t3Ni0OFFoDoiSMHlnq5yPKEoKckkGr+x1qrF8/nH1TohJOGY7Rggi+FdO1ogfvJl8mMwt7kKxMGprdTZx4OUY9abz8tDwoFnJl0eB31wrU81wPAE1wQE1POsXmGOz0VQPPEzALqoLt3PAX/nV/Zq7czuxz0KMkuLE9jTKvSCCYHQ/ucar/stKeW/GpcOQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H4cTBJEo0OjgMKQJwnn3TzO48Pw56uEYV5S0D9ZAAyI=;
+ b=UJ08TgSYfUsGjHcbiG7iKWxpV27LJ8j0DgWrLAmgmutThMEBgHvy9Kqt0wWMrSHjtDjhLwr3ZEwbR61IdVWCFd7YbMyuoJ+13QeEjzk9DbDXu4MMuy7VOOiNm+g2wpQcdPEQe9n2c9BCZPHmofQJNngG+poADRKdvo7P9HqBmd+lBuaecedH8UPTNcxP2uK450Je8yJn4ECYTL9e0CbqALlFRBdtI3i8GCpkyUV9EOfbyLoqfCnqc0czeBenxIEX0flXSBiQBpbdovYGN1d8ZlMIYQynnexT8kJaudiaHFUeovyQ3KQUD9lnUY9NKoP9uqEviGJ96s7MfLru55mWng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H4cTBJEo0OjgMKQJwnn3TzO48Pw56uEYV5S0D9ZAAyI=;
+ b=N47iM3LDktMN1jf0F0SjRNFag8keS7GFLRDNpSkak0aOUF8mZ+Y4n9ca7WxqFFkJgScBe4W3bQ7dxQ8y+7Z4v37OR3XeWnUUj4HsrzXGmtuhZtrykS7ifVBR8ePR2YCmFVM55aS7k8MdX/h2O7vzcIi4lIQ5o3rgpbkFT8JbZP0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
+ by DB8PR04MB7129.eurprd04.prod.outlook.com (2603:10a6:10:127::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.28; Mon, 30 Jan
+ 2023 18:06:12 +0000
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::f8fe:ab7c:ef5d:9189]) by AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::f8fe:ab7c:ef5d:9189%6]) with mapi id 15.20.6043.036; Mon, 30 Jan 2023
+ 18:06:12 +0000
+From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org,
+        alok.a.tiwari@oracle.com, hdanton@sina.com,
+        ilpo.jarvinen@linux.intel.com
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com, neeraj.sanjaykale@nxp.com
+Subject: [PATCH v2 0/3] Add support for NXP bluetooth chipsets
+Date:   Mon, 30 Jan 2023 23:35:01 +0530
+Message-Id: <20230130180504.2029440-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2P153CA0008.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::19) To AM9PR04MB8603.eurprd04.prod.outlook.com
+ (2603:10a6:20b:43a::10)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, marcin.kraglak@telink-semi.com
-Subject: RE: monitor/att: Fix Set Member Lock decoding
-In-Reply-To: <20230130091336.19098-1-marcin.kraglak@telink-semi.com>
-References: <20230130091336.19098-1-marcin.kraglak@telink-semi.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8603:EE_|DB8PR04MB7129:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4dfbe566-7bc2-4518-b469-08db02ecabe0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9unhWjM3NsXoZibV193tUxnAvTlELWJIVyX3mrpIaQ8Zp4ttRyYSVtitrk1/9LFBlxslpWZstmvE12Dl5Yl8rgknYymEYMp3g1pypxBgNirLPgQyif51pYIPlOHJFRkk6rc7RpGWNky6qBDm4U7MYX7iVGQuVlo6mm2zRYb3ZQN+w6bcL2gJZ64CBq58RX+wzaM9FpjGuUMZUfqFCGG2X1VRHRM4s2lAR7sCAhKv8QEgstJn+yu5E0g6puI76r5rswxhzqb2/xCvnpCbeQWvu2Amlh9D2cU4GuwGvmlDLMM9+oJZ6Lvwz7wwWamreLwCjFScP2kmWE/uLGwrMiOW0aH1BjL/C3UJDsIQPEyJydhN6JVqiU/4o25tUkxxjDYzv+JMQSN5gGfgww1zTuc2vg5Q9ljD3LJ78i6KASvbUpOYphVhSfH7P6SL5HPM50VCXlnApxMV7GL45zzL2sSNZ+0bmWDObyItUxXkEdc8rXVblaKxbXzZynNEJfaE70SkcMEMGatKeF2O98VQ9SBm+Sk62ZxBOhjjkS22xnprXGtEDn8KvOPbE7/GBRL89h/3nb0S0sZBdvK3X11K2erM+5mDZ23hK4xfc+7q0JzSv7AwA0QLaZUvTYGy+zMq+BaVD7khNncx56ZvGwmuRMqDXE4A0biPyzyD/2d0JO9lflspqovrcjqqaPvtUIwh8MX34kYSy02irSYr4ZaLKfbPhMDCWrpIueYeIy6JMzbhIf0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(376002)(136003)(39860400002)(396003)(451199018)(186003)(6512007)(86362001)(26005)(6506007)(1076003)(921005)(38350700002)(38100700002)(83380400001)(2616005)(36756003)(316002)(6486002)(6666004)(8936002)(52116002)(41300700001)(478600001)(7416002)(5660300002)(2906002)(66556008)(8676002)(4326008)(66946007)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5jP20E1GCs4nQQhhWBsyA7doPFMv/E1F0XrjQlZ6ubdyagmdC6VJmsDwdhrl?=
+ =?us-ascii?Q?+j4b4n+dsySun5SaE5UcsEvUAbmwEAiUKkD9MzJWgBzisCrhoCETogeLgmuW?=
+ =?us-ascii?Q?e4bHCljWHt8nEkTQMdPpCKEt04YY3CW/me8Mj44FAs26UFoWdN55fb98d/O3?=
+ =?us-ascii?Q?MhRUCOVTuRzzmxIAyiNY2Ja1uVqI5C+gZErvvjGIR0qajTY1tjMGxzqDab+u?=
+ =?us-ascii?Q?jdHV+PfIvr4SCsFv80OMX9ekcQpIM9oXbXDg4u4a0FxL5dePXu+R+yThj+xS?=
+ =?us-ascii?Q?ndjfgxY6cNt8G7vrpblhwf3Z5wULa5nQa6+z4IO+pbsw/E1+oWwiuDK1QcCW?=
+ =?us-ascii?Q?5vHV7jZo82XKvvbfaJd9kYPNuZ4qrsFkFvf5g7jUXTzHTOrPupt58eCOhUOE?=
+ =?us-ascii?Q?CP4TA8l+iPo4yqjEU0pgQ4nkhdgrRwGYcwUqth46oaSWHyfNfDRs4uu7wFc1?=
+ =?us-ascii?Q?6wjkAQTC6lVYMVAlhptTv17jCpO033NCpEdaHmdbLWU1fEIe6HZ3obqqd8jV?=
+ =?us-ascii?Q?30Nm8XjTWxZBfpWBU/iZM7Wb0AcXTtZWi3V2HskF1T86mhAfk6+o5VRBBv17?=
+ =?us-ascii?Q?2MC9j/HYHXTgNDW/gEeN6noTfnoW9QMzvnkeLCAMz2StvsF5ch27Ma4BgV/U?=
+ =?us-ascii?Q?OtUppYe3NYHWjrjwtOo3GwFokhoLiXJMpV/ta6nuxZnHcfHuX+K+xthRaLTh?=
+ =?us-ascii?Q?a0yzGLwizoIbA7guadmKoQUHJxMmVfhzvvnxqbAssLIfT2ORC7PwNjJAigtV?=
+ =?us-ascii?Q?+bTHmJfhwCgTu4lqqv07/CbDlJudi+YEZDkFh7FnTDj8zh/p7bUqzVKSNYcN?=
+ =?us-ascii?Q?DFiOeIQUJ1thM0Pos+426SQIpj75vv4RRrZOvVEEoSYJkh/8WCQdAshltcu7?=
+ =?us-ascii?Q?teVWmHv1eg5J3OTk7JRzbUz08iD1L6JO9ANBOyTonZRCO4LDJk/ZMw9HK5cJ?=
+ =?us-ascii?Q?EvnCsmxbgySlX3mGgQ+n7KsvZkqUZDi8It6PQwjj9UfyN+2NPq3N2Fyc6mBg?=
+ =?us-ascii?Q?v0/tzS3BORLbBs3oEBVp6JO7wFkFZn28rkSWZ9OgQeV+w0ABKIVT8cKG2yTK?=
+ =?us-ascii?Q?TY+77s3Moyo9pNiowZmOoRl6TdO/5MELc0n1sU0yi8zIoVYl+1CT6TqMTPMH?=
+ =?us-ascii?Q?04bE7D3by1T9equuGw6gX39TVoXdt70wkRW9fmMOrP8/kysHJhB217hY1L5O?=
+ =?us-ascii?Q?5b/ZBjjgHAE4KTUJyWOwoUOzykvsSMXEljNxv2MtRUpLpnCX+nWaBIsbpwVb?=
+ =?us-ascii?Q?JT/3IOJj+7htwhYwmRCR7YxN86PLLNjTu8OC1N97I21TRP5SE01ZY0ButeCG?=
+ =?us-ascii?Q?+mF8BcH+olcBmtNlM8JjQINmI9QsZxEHGv2Cvm3DEgCTLn+WG8BfbPUoW1TC?=
+ =?us-ascii?Q?v8O1KFjqAnpWBengb+v7+zkMzbqiCsErt+FjokftIdRyyEbFCBKzDJvnTSAf?=
+ =?us-ascii?Q?MhrjD6A/v6C1BcI3U1FW79/zOITHmA6eEj29rsXQ14u88VfgbqembKGr2iRG?=
+ =?us-ascii?Q?eflwMRhh+lCGA5l86kKHNN0mIgQm8EYnzYpE/WsS5bH0c3yc/pcUk7444+4Q?=
+ =?us-ascii?Q?rGlaGVzw50DavXiqLeGS4FAZoCvhjPObS6mF7VHOa5Kp5qVlLQ7Q+tAbIhC4?=
+ =?us-ascii?Q?nQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dfbe566-7bc2-4518-b469-08db02ecabe0
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2023 18:06:12.3942
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: r1/H3Rhhqcfk7+rEeNu+4o/vDmEpsiaPDU13zV2vDZIxC2/+T6TuVgk++9ekYmqrlrJQHAXltdbZq/vkh23lz4bkKRt1l58dGvYWHazxcwQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7129
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8433309666496349925==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch adds a driver for NXP bluetooth chipsets.
+The driver is based on H4 protocol, and uses serdev
+APIs. It supports host to chip power save feature,
+which is signalled by the host by asserting break
+over UART TX lines, to put the chip into sleep state.
 
-This is automated email and please do not reply to this email!
+To support this feature, break_ctl has also been
+added to serdev-tty along with a new serdev API
+serdev_device_break_ctl().
 
-Dear submitter,
+This driver is capable of downloading firmware into
+the chip over UART.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=716824
+The document specifying device tree bindings for
+this driver is also included in this patch series.
 
----Test result---
+Neeraj Sanjay Kale (3):
+  serdev: Add method to assert break
+  dt-bindings: net: bluetooth: Add NXP bluetooth support
+  Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets
 
-Test Summary:
-CheckPatch                    PASS      0.75 seconds
-GitLint                       PASS      0.30 seconds
-BuildEll                      PASS      35.55 seconds
-BluezMake                     PASS      1167.50 seconds
-MakeCheck                     PASS      13.44 seconds
-MakeDistcheck                 PASS      191.67 seconds
-CheckValgrind                 PASS      314.94 seconds
-CheckSmatch                   WARNING   434.30 seconds
-bluezmakeextell               PASS      127.17 seconds
-IncrementalBuild              PASS      970.60 seconds
-ScanBuild                     PASS      1386.96 seconds
+ .../bindings/net/bluetooth/nxp-bluetooth.yaml |   42 +
+ MAINTAINERS                                   |    7 +
+ drivers/bluetooth/Kconfig                     |   11 +
+ drivers/bluetooth/Makefile                    |    1 +
+ drivers/bluetooth/btnxpuart.c                 | 1145 +++++++++++++++++
+ drivers/bluetooth/btnxpuart.h                 |  227 ++++
+ drivers/tty/serdev/core.c                     |   11 +
+ drivers/tty/serdev/serdev-ttyport.c           |   12 +
+ include/linux/serdev.h                        |    6 +
+ 9 files changed, 1462 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml
+ create mode 100644 drivers/bluetooth/btnxpuart.c
+ create mode 100644 drivers/bluetooth/btnxpuart.h
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
+-- 
+2.34.1
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8433309666496349925==--
