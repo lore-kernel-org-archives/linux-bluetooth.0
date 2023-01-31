@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DAFC636D3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 03:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF61C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 03:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230348AbjAaDBL (ORCPT
+        id S229909AbjAaDGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 22:01:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35986 "EHLO
+        Mon, 30 Jan 2023 22:06:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbjAaDBI (ORCPT
+        with ESMTP id S229634AbjAaDGJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 22:01:08 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E7230E93
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 19:01:02 -0800 (PST)
+        Mon, 30 Jan 2023 22:06:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80401298D1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 19:06:08 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A169D61231
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:01:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 03BB2C4339B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:01:00 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 113CC61362
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:06:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B3C0C4339C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:06:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675134061;
-        bh=ny8mZX1Y+pKD1XkQj9BnD1b7kccInMmgLJ9+o7nOC9k=;
+        s=k20201202; t=1675134367;
+        bh=PzYXWTUN0f/TzNUtVpUqfd9Jtlm5BrqtNB4ugLpc3BI=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qwiyHcZElONBdVUYrhQ9pHmMws19D9LdNYmevD0xaQ30W2JCKnV7uUOFRwtuH9zwT
-         QBkjMpTWupHLBkNCmS0hWD/vMQrvAPKQ6VW4+WsoI93gD3NwlcLdepIFS/FEN0Lt2L
-         GSy7J7PrKw9heu7WI71SCZ8KdwjwZIezyH7RH/uMm89ciP0yN9HUXwDPqem2nw9R1l
-         KEwU+FLliTDxoQfn6/aEmXph2a/3mw/+AjZxwUY3yKoHZOChPNFKMwAjY0zTlsrGmH
-         azQs3+TF9PURIaGvpbTT/4Jtc8gSLpICwOek6CUyPwD5wfPbYiV15eTuXtBuZDXBe6
-         p7QwL5mHoB3vQ==
+        b=byWNVFaGgM4HR/nKBcYJiraYdOCfL0Rr+MzXkLKolh2bU8f2wIj/RzgQ0b/LgIXzK
+         BHcmaPiGJ9bOsfC6rNAm7FZzAH0D1LqlGiAEOP81AwoNaNCIkLsyCnxC71cdyRVWjw
+         7WlVil1bTufCJOgTrpFm05UunbakN9c6a/J4lH/SaOGDg0AK/wolbS4FC14QFXd0eL
+         HOAsA0KARygbv4o1yifUhDUYwx4YvdYyAdi397Zb0eSAODbUk6AMNw6EDBuc4RA7ox
+         tCGoAmFJdJCnJlyzEr0I1HoZA4+bwm/ZeXQwR+lmYnRk5SrWUjizZ4G7qB37MRrp/k
+         bbXPgpmydEzJw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id E077DC43143; Tue, 31 Jan 2023 03:01:00 +0000 (UTC)
+        id 4095BC43144; Tue, 31 Jan 2023 03:06:07 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
  fails (a timing issue?)
-Date:   Tue, 31 Jan 2023 03:01:00 +0000
+Date:   Tue, 31 Jan 2023 03:06:06 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -54,8 +54,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216936-62941-dpDO2zW8B4@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216936-62941-mplRfukZvq@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
 References: <bug-216936-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,14 +69,14 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
 
---- Comment #5 from Artem S. Tashkinov (aros@gmx.com) ---
-This seemingly happens only after rebooting from Windows 10. It does not ha=
-ppen
-when cold booting.
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-I guess if the firmware is already uploaded, then there's an error.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |johannes@sipsolutions.net
 
-Maybe it happened before, I just didn't reboot after Windows so often.
+--- Comment #6 from Artem S. Tashkinov (aros@gmx.com) ---
+Johannes, could you take a look please?
 
 --=20
 You may reply to this email to add a comment.
