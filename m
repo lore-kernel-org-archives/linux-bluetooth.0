@@ -2,38 +2,38 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36AFFC636CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 09:02:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7A3C636CD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 09:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232272AbjAaJCP (ORCPT
+        id S232413AbjAaJF5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Jan 2023 04:02:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50436 "EHLO
+        Tue, 31 Jan 2023 04:05:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232228AbjAaJB5 (ORCPT
+        with ESMTP id S232157AbjAaJFY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:01:57 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2014F474E0;
-        Tue, 31 Jan 2023 00:58:21 -0800 (PST)
+        Tue, 31 Jan 2023 04:05:24 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3DA7EFD;
+        Tue, 31 Jan 2023 01:01:50 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BE08F6146C;
-        Tue, 31 Jan 2023 08:57:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B4D8C433EF;
-        Tue, 31 Jan 2023 08:57:27 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 531A46146C;
+        Tue, 31 Jan 2023 09:01:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E91B0C433D2;
+        Tue, 31 Jan 2023 09:01:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675155448;
-        bh=ISESLkl40Te6umM1VGiHLeoxC2NCXAUuGsERDg2T2Ns=;
+        s=k20201202; t=1675155677;
+        bh=FxfUAfy1NrNxn5s+/Ay/JREjg2ryukTPquy/zDB8xuo=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LZdmeEcJGHXPpZkhbNBV0YJd6M2xFbOvCEdYFdOdqw8HCpra4ZxCEU3PvSkpmu9EF
-         qDA/ZdELX1DaOp36+55eJukXKgCA72SJAjByYQzoKvggOPLDQVoAX6MhJ3YeYzHPyk
-         VjyYZ1u6H2OW/wbcofU194G/2uIvzMN4vJxT6S6+Jr7P7AvDXhJuZhprfvrHDrH8cp
-         nOeDz7IP0XKLGttwMGTuXiuKc2zrmgsy/wyODIyfTX6JnfXvEKLbqFOLssw8AB8ve0
-         8pHmGr3FmM2Q6cgkQ5VFAuqW6CnUunG0EHnEhapCEciHMcOrXHsknTRXmQMz1ccCc8
-         GgT2S8Iyqjtag==
-Date:   Tue, 31 Jan 2023 10:57:23 +0200
+        b=SJd8xvUJOlfRU7uq4LJguUZ6s3fpp+imgdnEzqOBwh8IbVKHsVv7NP8hbC+mr5060
+         jxwExn4RLAbFNGFwXpCsavrbYFEC33DAJXQilzeeMNxEXqG04c0R/TCDUt6r/crqN0
+         Nf5J9suSO7ZPkFo5fMA+Ll2YuEfGcxrtcjVJOPed0QhbK06eEBbUshoF7OKCMR4m3d
+         e88lhpOZ/1xEzWnqlIAywoATlNuZs+HsI5e2CrvT3CGAjX5nDFzK2tWvjcCs6R9nHB
+         ZFxl+859upfY+UDPElWvCjmkn92i5cp0qOLwuk3bBqnGe4M6IW13NLOjZ8fJouRlzY
+         j2eFtmxQxmIPw==
+Date:   Tue, 31 Jan 2023 11:01:13 +0200
 From:   Leon Romanovsky <leon@kernel.org>
 To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -46,42 +46,118 @@ Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
         amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
-Subject: Re: [PATCH v2 1/3] serdev: Add method to assert break
-Message-ID: <Y9jX81zJTM9xzDo2@unreal>
+Subject: Re: [PATCH v2 3/3] Bluetooth: NXP: Add protocol support for NXP
+ Bluetooth chipsets
+Message-ID: <Y9jY2TXpl0rylQW3@unreal>
 References: <20230130180504.2029440-1-neeraj.sanjaykale@nxp.com>
- <20230130180504.2029440-2-neeraj.sanjaykale@nxp.com>
+ <20230130180504.2029440-4-neeraj.sanjaykale@nxp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230130180504.2029440-2-neeraj.sanjaykale@nxp.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230130180504.2029440-4-neeraj.sanjaykale@nxp.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 11:35:02PM +0530, Neeraj Sanjay Kale wrote:
-> Adds serdev_device_break_ctl() and an implementation for ttyport.
+On Mon, Jan 30, 2023 at 11:35:04PM +0530, Neeraj Sanjay Kale wrote:
+> This adds a driver based on serdev driver for the NXP BT serial
+> protocol based on running H:4, which can enable the built-in
+> Bluetooth device inside a generic NXP BT chip.
+> 
+> This driver has Power Save feature that will put the chip into
+> sleep state whenever there is no activity for 2000ms, and will
+> be woken up when any activity is to be initiated.
+> 
+> This driver enables the power save feature by default by sending
+> the vendor specific commands to the chip during setup.
+> 
+> During setup, the driver is capable of validating correct chip
+> is attached to the host based on the compatibility parameter
+> from DT and chip's unique bootloader signature, and download
+> firmware.
 > 
 > Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 > ---
->  drivers/tty/serdev/core.c           | 11 +++++++++++
->  drivers/tty/serdev/serdev-ttyport.c | 12 ++++++++++++
->  include/linux/serdev.h              |  6 ++++++
->  3 files changed, 29 insertions(+)
+> v2: Removed conf file support and added static data for each chip based
+> on compatibility devices mentioned in DT bindings. Handled potential
+> memory leaks and null pointer dereference issues, simplified FW download
+> feature, handled byte-order and few cosmetic changes. (Ilpo Järvinen,
+> Alok Tiwari, Hillf Danton)
+> ---
+>  MAINTAINERS                   |    1 +
+>  drivers/bluetooth/Kconfig     |   11 +
+>  drivers/bluetooth/Makefile    |    1 +
+>  drivers/bluetooth/btnxpuart.c | 1145 +++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/btnxpuart.h |  227 +++++++
+>  5 files changed, 1385 insertions(+)
+>  create mode 100644 drivers/bluetooth/btnxpuart.c
+>  create mode 100644 drivers/bluetooth/btnxpuart.h
 
 <...>
 
-> +{
-> +	struct serport *serport = serdev_controller_get_drvdata(ctrl);
-> +	struct tty_struct *tty = serport->tty;
-> +
-> +	if (!tty->ops->break_ctl)
-> +		return -ENOTSUPP;
+> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+> new file mode 100644
+> index 000000000000..6e6bc5a70af2
+> --- /dev/null
+> +++ b/drivers/bluetooth/btnxpuart.c
+> @@ -0,0 +1,1145 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  NXP Bluetooth driver
+> + *  Copyright 2018-2023 NXP
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
 
-Documentation/dev-tools/checkpatch.rst
-   429   **ENOTSUPP**
-   430     ENOTSUPP is not a standard error code and should be avoided in new patches.
-   431     EOPNOTSUPP should be used instead.
-   432 
-   433     See: https://lore.kernel.org/netdev/20200510182252.GA411829@lunn.ch/
+Please don't add license text, SPDX tag is enough.
+
+<...>
+
+> +	skb = nxp_drv_send_cmd(hdev, HCI_NXP_AUTO_SLEEP_MODE, 1, &pcmd);
+> +
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "Setting Power Save mode failed (%ld)", PTR_ERR(skb));
+> +		return PTR_ERR(skb);
+> +	}
+> +
+> +	status = skb_pull_data(skb, 1);
+> +
+> +	if (status) {
+
+Please don't add blank lines between function call and error checks of
+that function.
+
+> +		if (!*status)
+> +			psdata->cur_psmode = psdata->ps_mode;
+> +		else
+> +			psdata->ps_mode = psdata->cur_psmode;
+> +		if (psdata->cur_psmode == PS_MODE_ENABLE)
+> +			ps_start_timer(nxpdev);
+> +		else
+> +			ps_wakeup(nxpdev);
+> +		BT_INFO("Power Save mode response: status=%d, ps_mode=%d",
+> +			*status, psdata->cur_psmode);
+> +	}
+> +	kfree_skb(skb);
+
+<...>
+
+> +module_serdev_device_driver(nxp_serdev_driver);
+> +
+> +MODULE_AUTHOR("Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>");
+> +MODULE_DESCRIPTION("NXP Bluetooth Serial driver v1.0 ");
+> +MODULE_VERSION("v1.0");
+
+No module versions in new code.
 
 Thanks
