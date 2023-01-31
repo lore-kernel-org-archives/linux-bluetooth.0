@@ -2,84 +2,182 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF61C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 03:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7A46C636D3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 04:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjAaDGK (ORCPT
+        id S230347AbjAaEjR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 22:06:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37344 "EHLO
+        Mon, 30 Jan 2023 23:39:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbjAaDGJ (ORCPT
+        with ESMTP id S229572AbjAaEi5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 22:06:09 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80401298D1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 19:06:08 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 113CC61362
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:06:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B3C0C4339C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:06:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675134367;
-        bh=PzYXWTUN0f/TzNUtVpUqfd9Jtlm5BrqtNB4ugLpc3BI=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=byWNVFaGgM4HR/nKBcYJiraYdOCfL0Rr+MzXkLKolh2bU8f2wIj/RzgQ0b/LgIXzK
-         BHcmaPiGJ9bOsfC6rNAm7FZzAH0D1LqlGiAEOP81AwoNaNCIkLsyCnxC71cdyRVWjw
-         7WlVil1bTufCJOgTrpFm05UunbakN9c6a/J4lH/SaOGDg0AK/wolbS4FC14QFXd0eL
-         HOAsA0KARygbv4o1yifUhDUYwx4YvdYyAdi397Zb0eSAODbUk6AMNw6EDBuc4RA7ox
-         tCGoAmFJdJCnJlyzEr0I1HoZA4+bwm/ZeXQwR+lmYnRk5SrWUjizZ4G7qB37MRrp/k
-         bbXPgpmydEzJw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 4095BC43144; Tue, 31 Jan 2023 03:06:07 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
- fails (a timing issue?)
-Date:   Tue, 31 Jan 2023 03:06:06 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216936-62941-mplRfukZvq@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
-References: <bug-216936-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 30 Jan 2023 23:38:57 -0500
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EEB23C2AC
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:19 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id cm26-20020a056830651a00b00684e5c0108dso5139618otb.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kali.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJ0/xhaPKfH2Cca60pE6TWrTG0mtzLgrVF2qyKPFbpg=;
+        b=WlNsctbWgszBVDSa31eYVUcKBkTha+aPKciVsSkkfNJrLyugJvrClllNhEJpOPqKmj
+         urVajDaEhBnXOosH6TVL6jCExSfgb3lqFPhHUIV0ZMxUETx/geBHwc47RYQHvYq1MHPi
+         RW5l9JuTVa6zDdyRdi+txkAzuBhzT7D3iiiYtLEP68GPJJywOfDDtgYGFwrJ+P5hzFE8
+         xX2d+ZFz8wkNHe/dZLFQKHEGSwR5da8if3sPvG/V5M8rxjsxEL57sGVY4HEtC0o2Vr5O
+         xkjuITMbL2wmFaszsf349bW6tbBkhuvHPkvIMfFnF4UiHtbyB8RPVTK8cGs1B1dfoiu1
+         1eSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QJ0/xhaPKfH2Cca60pE6TWrTG0mtzLgrVF2qyKPFbpg=;
+        b=6sVIdLEmDLSLAOm3J8pnjX6iiYdFZ7YprxeBDMbV5HO/kCQWfJB2xCJcdyrIc8o2M2
+         4BS2Y6V05lu7FBQtIbEDW/3ar6Oo3oWRvt8xHFJAYY/r4FLvoko5ie1ExIOeUmhmwFHE
+         XVM158Vbxjop3+twSuAPwX+A7DGHnrT9QaU2vqNfbrPnU1k6DGTADfl3QPVwl/Ft8GTD
+         1E9zVMXRe+yBatUrE8wfIsD0rnJ5m4aVM2Sg2Wv+0PrwI0QVO7JNmU2muon+F0jrys1X
+         Gcpj1wPN5o9gxxevFhen/SpDcsCDah5AM2/9d/ysYZScDJG2/hHwsUVdQwle4YPYZx7N
+         U7VA==
+X-Gm-Message-State: AO0yUKWAiGXRpmcuwrr2TgQ3uQnkgbXpHT1K5ypX4sTrvObew+ORssAY
+        QjkYGKW0tXWyC7GufjY8+4ikdw==
+X-Google-Smtp-Source: AK7set8mqgpo6LDyA44nF65Bocpb54FWrJD5HkLb7CaloqZ7a2Ml9jiEFXTqnkcxm1PGEiGuYpwY1A==
+X-Received: by 2002:a05:6830:6989:b0:68a:443c:8c9e with SMTP id cy9-20020a056830698900b0068a443c8c9emr7863229otb.4.1675139898324;
+        Mon, 30 Jan 2023 20:38:18 -0800 (PST)
+Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
+        by smtp.gmail.com with ESMTPSA id c14-20020a9d614e000000b0068bd04b4292sm2174018otk.31.2023.01.30.20.38.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 20:38:17 -0800 (PST)
+From:   Steev Klimaszewski <steev@kali.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: [PATCH v2 0/4] Attempt at adding WCN6855 BT support
+Date:   Mon, 30 Jan 2023 22:38:12 -0600
+Message-Id: <20230131043816.4525-1-steev@kali.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
+This v2 of the patchset is somewhat of an RFC/RFT, and also just something to
+get this out there.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+First things first, I do not have access to the specs nor the schematics, so a
+lot of this was done via guess work, looking at the acpi tables, and looking at
+how a similar device (wcn6750) was added.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |johannes@sipsolutions.net
+There are possibly checkpatch warnings, and I do apologize to those who won't
+review things until there are no warnings for wasting your time, I did try to
+correct the ones I came across and seemed to be needed.
 
---- Comment #6 from Artem S. Tashkinov (aros@gmx.com) ---
-Johannes, could you take a look please?
+One example is that I have the vregs commented out, the dt-bindings say that
+they are required since it's based on the wcn6750 work but also like the 6750,
+I've added defaults into the driver, and those seem to work, at least for the
+initial testing.
 
---=20
-You may reply to this email to add a comment.
+The end result is that we do have a working device, but not entirely reliable.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Hopefully by getting this out there, people who do have access to the specs or
+schematics can see where the improvements or fixes need to come.
+
+There are a few things that I am not sure why they happen, and don't have the
+knowledge level to figure out why they happen or debugging it.
+
+Bluetooth: hci0: setting up wcn6855
+Bluetooth: hci0: Frame reassembly failed (-84)
+Bluetooth: hci0: QCA Product ID   :0x00000013
+Bluetooth: hci0: QCA SOC Version  :0x400c0210
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x000038e6
+Bluetooth: hci0: QCA controller version 0x02100201
+Bluetooth: hci0: unexpected event for opcode 0xfc48
+Bluetooth: hci0: Sending QCA Patch config failed (-110)
+Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
+Bluetooth: hci0: QCA setup on UART is completed
+
+I do not know why the Frame assembly failed, nor the unexpected event.
+
+Likewise, I'm not entirely sure why it says the patch config send times out, and
+*then* seems to send it?
+
+The BD Address also seems to be incorrect, and I'm not sure what is going on
+there either.
+
+Additionally, I've tried with an additional patch that I'm not including that is
+based on commit 059924fdf6c1 ("Bluetooth: btqca: Use NVM files based on SoC ID
+for WCN3991") to try using the hpnv21g.bin or hpnv21.bin, and the firmware acted
+the same regardless, so I am assuming I don't truly need the "g" firmware on my
+Thinkpad X13s.
+
+Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+well as connecting to and using an H2GO bluetooth speaker and playing audio out
+via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+
+The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+"A2DP Sink, codec SBC" would provide audio output, and while I could see that
+data was being sent to the speaker, it wasn't always outputting, and going >
+4ft. away, would often disconnect.
+
+steev@wintermute:~$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+        UP RUNNING PSCAN
+        RX bytes:1492 acl:0 sco:0 events:126 errors:0
+        TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'wintermute'
+        Class: 0x0c010c
+        Service Classes: Rendering, Capturing
+        Device Class: Computer, Laptop
+        HCI Version:  (0xc)  Revision: 0x0
+        LMP Version:  (0xc)  Subversion: 0x46f7
+        Manufacturer: Qualcomm (29)
+
+steev@wintermute:~$ dmesg | grep Razer
+[ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+[ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+steev@wintermute:~$ dmesg | grep H2GO
+[ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
+
+Bjorn Andersson (1):
+  arm64: dts: qcom: sc8280xp: Define uart2
+
+Steev Klimaszewski (3):
+  dt-bindings: net: Add WCN6855 Bluetooth
+  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+  arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     |  2 +
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+ drivers/bluetooth/btqca.c                     | 24 ++++++-
+ drivers/bluetooth/btqca.h                     | 10 +++
+ drivers/bluetooth/hci_qca.c                   | 59 ++++++++++++----
+ 6 files changed, 162 insertions(+), 15 deletions(-)
+
+-- 
+2.39.0
+
