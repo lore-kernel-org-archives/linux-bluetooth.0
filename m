@@ -2,197 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77456C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 04:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE359C636CD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 05:13:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231129AbjAaEjw (ORCPT
+        id S229981AbjAaFNo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 23:39:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44184 "EHLO
+        Tue, 31 Jan 2023 00:13:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbjAaEjE (ORCPT
+        with ESMTP id S229969AbjAaFNn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 23:39:04 -0500
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C6C3B675
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:26 -0800 (PST)
-Received: by mail-oi1-x22b.google.com with SMTP id s66so11895199oib.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:25 -0800 (PST)
+        Tue, 31 Jan 2023 00:13:43 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22353526E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 21:13:41 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id c124so9430049pfb.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 21:13:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eVFjUAudhz48B1PG37PF0oDcvMhXp172jIwuWPlj7hM=;
-        b=WxKR1qFCYmq75yM8ksUFDRSsFWXpnPcTkqYKr/NifhNqXlx+tnPSHWA/IqxgveYdHa
-         qcGsxnQdHae2UyazsMBt6XhYQAy+fGBPn7rR7N7t/PpyTTwKbA9KYbRrtYpHMHPwQYxa
-         I0wYi3HqYWr6l8ejdFryo9/Pbe0UW5pbpP2y8uuz58a0TqUgGOyLuUy2euTmy2MlqMxW
-         4p/gnpw+B40IBjEY6IGQ2ODiCaNOs1jroe7eP73Wh3LtVg1IR2122ooawoFA5p85TRfA
-         BC3EcovRFWsbDd43Kkv/4P++7ZcZxQEPQ+rgmTXuE0wkAaiWHLJFyiqZsDV7orw2Dwi9
-         g8Vw==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9XJ5jG68NuP/zHCB8iHwu9328X63VCrkpzoGhzcdpTc=;
+        b=WUISFya/1/At5cqpz7oM8E1aThKkqIXanoNIBaBDT43c/lJ4o7Vepmz5/1/KEBXjIO
+         HdsILXOaQmhLbDRbnzmeGhf27y0zncsMvjiouBsqiIRgWPozAdMXekd+KoyQCVpAhksq
+         dX6yoCd7s4H2DLlEN/hRiS5aJddul+jeusSXJitXzQDH627c1PuQimA/onrAFPdZFGDx
+         n5FVZTG+w6q75lHzCuFLkmW+y1W++8XeJXP4g7v7IGXkfhwaSB+FpiBTblQ1f0d/fsw7
+         48UJZTlAu+7X1cxve6/Ds4fV18PkeIgEAbxM8Wea+koEOFTSS26ijMr99da9Grt6B9Mg
+         DQ9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eVFjUAudhz48B1PG37PF0oDcvMhXp172jIwuWPlj7hM=;
-        b=kqQm0eOc734zY+E/1Atd8/saYf/xrlDx9wUXrvIlxUsQuHcMhtUyBqNfU/dhgv0bEo
-         7YyRzRCDYTJuzBTZQ0foegix2ERkijr1e0ftn/yKnscEv1oUKLHiqinctecBFch8JjFR
-         7sBuFi1I9dqcB4xP/adsEHso/hLq7WEzNTjG+Nc7mpqYjsungKAiJWk1/LYnezxKtUVP
-         O8O4nmb430/P9SDvO8AP8p40IaWVnRxUPckc5pifOk4hc7HCK7vJYi9R5PfnzfFabZFl
-         qmjCqLt28gY3fOq6Vp8Z/voZ/bhl37246jJAMslOKUJvMGiQ8/kg3luv3s0iMA4bqD72
-         kI6g==
-X-Gm-Message-State: AFqh2kr7uKeVFkOpUeMC8XjilisAosYGyhGePUbJWU91DF2aVfptwdRY
-        w/DFlMM7SgxzyaOIz8wDFUa0Zg==
-X-Google-Smtp-Source: AMrXdXvaEIEHQxmGGUSLDqOZjf++5rSIBsjsT19PE0dlt7VSbc4D+DUnkT6Qp/lNws2gihhJ93yCeA==
-X-Received: by 2002:a05:6808:1247:b0:360:e643:7e27 with SMTP id o7-20020a056808124700b00360e6437e27mr30333622oiv.36.1675139904792;
-        Mon, 30 Jan 2023 20:38:24 -0800 (PST)
-Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
-        by smtp.gmail.com with ESMTPSA id u14-20020a056808150e00b0035418324b78sm4276083oiw.11.2023.01.30.20.38.24
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9XJ5jG68NuP/zHCB8iHwu9328X63VCrkpzoGhzcdpTc=;
+        b=R8J0vwfWme7yIu26h2Tx8Bb2sal0TgQKWdw+o1cDfEL5jcoCEm9pyYna1e267SRNh8
+         j0J09TnKmtKvzAIcMcbIQ4+tjmBHPtuIBYVj5YbC4f2S84e5ZiI07FZwhWTPixjtPL78
+         YTw35L0YZLzLhfNUN5cs5RpABXrlCLblHrJlmXaAbca929wz5bGU7NxzjyF5m481vDcI
+         2PJJPDEvsUX5xdKdOAcXj9epPJYVtrEpQtnlty+clwon+F+CEiUvjfk+rAb36OgZhquc
+         wwfmTKuJOm+tJotV5FDmq0M7ZEcKntF8Olnj/QJqI4BaU5ueLY8Yo73qezcoPe4ZzKDE
+         SPWg==
+X-Gm-Message-State: AO0yUKUFXJRhFd3lTxbAvuQszPF3WUowc19zoXXSyqJoDKFlnEABJnE6
+        30kiG8et5UZ+0BQJEaEnGv/AamkNGvw=
+X-Google-Smtp-Source: AK7set+Uvo588fm7j3BRvNK5uUDiOqU4QwxlG0W87bef1yJiYJVlwHPwK3EBRRdKWeyTNeeaenQbEQ==
+X-Received: by 2002:a62:19c4:0:b0:592:3bf3:f557 with SMTP id 187-20020a6219c4000000b005923bf3f557mr18379665pfz.22.1675142021104;
+        Mon, 30 Jan 2023 21:13:41 -0800 (PST)
+Received: from [172.17.0.2] ([13.64.13.81])
+        by smtp.gmail.com with ESMTPSA id k62-20020a628441000000b00581dd94be3asm4161877pfd.61.2023.01.30.21.13.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 20:38:24 -0800 (PST)
-From:   Steev Klimaszewski <steev@kali.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>
-Subject: [PATCH v2 4/4] arm64: dts: qcom: thinkpad-x13s: Add bluetooth
-Date:   Mon, 30 Jan 2023 22:38:16 -0600
-Message-Id: <20230131043816.4525-5-steev@kali.org>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230131043816.4525-1-steev@kali.org>
-References: <20230131043816.4525-1-steev@kali.org>
+        Mon, 30 Jan 2023 21:13:40 -0800 (PST)
+Message-ID: <63d8a384.620a0220.2c22b.7944@mx.google.com>
+Date:   Mon, 30 Jan 2023 21:13:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6367146291339365782=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, steev@kali.org
+Subject: RE: Attempt at adding WCN6855 BT support
+In-Reply-To: <20230131043816.4525-2-steev@kali.org>
+References: <20230131043816.4525-2-steev@kali.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Signed-off-by: Steev Klimaszewski <steev@kali.org>
+--===============6367146291339365782==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: arch/arm64/boot/dts/qcom/sc8280xp.dtsi:1207
+error: arch/arm64/boot/dts/qcom/sc8280xp.dtsi: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
- 1 file changed, 68 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-index f936b020a71d..951438ac5946 100644
---- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-+++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-@@ -24,6 +24,8 @@ / {
- 	aliases {
- 		i2c4 = &i2c4;
- 		i2c21 = &i2c21;
-+		serial0 = &uart17;
-+		serial1 = &uart2;
- 	};
- 
- 	wcd938x: audio-codec {
-@@ -712,6 +714,32 @@ &qup0 {
- 	status = "okay";
- };
- 
-+&uart2 {
-+	status = "okay";
-+
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart2_state>;
-+
-+	bluetooth {
-+		compatible = "qcom,wcn6855-bt";
-+
-+/*
-+		vddio-supply = <&vreg_s4a_1p8>;
-+		vddxo-supply = <&vreg_l7a_1p8>;
-+		vddrf-supply = <&vreg_l17a_1p3>;
-+		vddch0-supply = <&vreg_l25a_3p3>;
-+		vddch1-supply = <&vreg_l23a_3p3>;
-+*/
-+		max-speed = <3200000>;
-+
-+		enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
-+		swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
-+
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&bt_en>;
-+	};
-+};
-+
- &qup1 {
- 	status = "okay";
- };
-@@ -720,6 +748,12 @@ &qup2 {
- 	status = "okay";
- };
- 
-+&uart17 {
-+	compatible = "qcom,geni-debug-uart";
-+
-+	status = "okay";
-+};
-+
- &remoteproc_adsp {
- 	firmware-name = "qcom/sc8280xp/LENOVO/21BX/qcadsp8280.mbn";
- 
-@@ -980,6 +1014,19 @@ hastings_reg_en: hastings-reg-en-state {
- &tlmm {
- 	gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
- 
-+	bt_en: bt-en-state {
-+		hstp-sw-ctrl {
-+			pins = "gpio132";
-+			function = "gpio";
-+		};
-+
-+		hstp-bt-en {
-+			pins = "gpio133";
-+			function = "gpio";
-+			drive-strength = <16>;
-+		};
-+	};
-+
- 	edp_reg_en: edp-reg-en-state {
- 		pins = "gpio25";
- 		function = "gpio";
-@@ -1001,6 +1048,27 @@ i2c4_default: i2c4-default-state {
- 		bias-disable;
- 	};
- 
-+	uart2_state: uart2-state {
-+		cts {
-+			pins = "gpio122";
-+			function = "qup2";
-+			bias-disable;
-+		};
-+
-+		rts-tx {
-+			pins = "gpio122", "gpio123";
-+			function = "qup2";
-+			drive-strength = <2>;
-+			bias-disable;
-+		};
-+
-+		rx {
-+			pins = "gpio124";
-+			function = "qup2";
-+			bias-pull-up;
-+		};
-+	};
-+
- 	i2c21_default: i2c21-default-state {
- 		pins = "gpio81", "gpio82";
- 		function = "qup21";
--- 
-2.39.0
 
+--===============6367146291339365782==--
