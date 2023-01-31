@@ -2,84 +2,72 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA29C636D6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 00:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F72CC636D3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 00:20:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbjAaAMt (ORCPT
+        id S229637AbjAaAU0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 19:12:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50360 "EHLO
+        Mon, 30 Jan 2023 19:20:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229764AbjAaAMs (ORCPT
+        with ESMTP id S229874AbjAaAUT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 19:12:48 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F95A1A947
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 16:12:46 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id m11so12704425pji.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 16:12:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vyzKrEbDB2xWI/28NRdzcFkXOmOLjuNarCX8LU0sVS4=;
-        b=LZ/PUJ/PEqEXqNA9UtK4BKyCGHLFJov8CwoJbVkgttfi1HPqI9gHIGET10yHL9ci/h
-         dsvENO/1p6T6eINfPpUvZ+euF7/5Pfgurd6t5kLaqTX+V0yy1D4+EeE6By1896wHwTNK
-         fmSz1atXt051fBNuZIInxZnoLuHDGfKkRNwaMeyEH54pr3JGLrIflkn234luLaVUm4KU
-         +QvYUl1cUT/DiCnntpZA8SywDTcqWPIxd2TMUQ/XTCWkwrJngj1vuromvv6ts9+tFPuJ
-         73C9CMdWFAMR96w7pHLVz/WO5sFs5IjYCaaQSmUSZo1lODLboD9B9Yp5Z0MHexMdGBVd
-         Z/3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vyzKrEbDB2xWI/28NRdzcFkXOmOLjuNarCX8LU0sVS4=;
-        b=V5lsPU0YcSDOXkXqoa4ibQMVC0CEMIyMBGdOWYxMR5WmU7u9EwUzKZgCV8NQu8frL6
-         6HKR1Bp4/MTF5/Me61NPME+k4MQEPcdcatrV/ZX2BuAqngghN4k96QFnZNzt1EkaC3uN
-         M4j4BU59asPTKjTyeLOl9K9+Bw8chI4zgePx40bbsv7kZL2jymrjz14h3fGwp4UiM8fQ
-         zUEy+wTnhUUGEUyL89jf/BWTg2RfyMfCxZxiZ8P8rK8qAo8Flp1aIY5eEXNrqTgynZwT
-         WOAzp77ZgH75rk0tfe5XR9Kzp111WOkzfFK6AQx93RYjse8T5j5tJt6rhdjfcClsABOQ
-         6Qhg==
-X-Gm-Message-State: AO0yUKVzGEx+JKilaokjrzeVCwrXKTP3dI3BQIH04Y6omg5CXqD5JG0Z
-        f/IeKeBF0lCgZelJBHEcnjgx82ZFE4/IPg==
-X-Google-Smtp-Source: AK7set//0x3SLjKDLBl+9R9sjKPK+n7b1deUaGfXslJQOPKSJgAj9uYoLJboi3NZc+RocTlWkr+ZSQ==
-X-Received: by 2002:a17:902:dacb:b0:196:3bbb:e9e3 with SMTP id q11-20020a170902dacb00b001963bbbe9e3mr23217633plx.28.1675123964986;
-        Mon, 30 Jan 2023 16:12:44 -0800 (PST)
-Received: from fedora.. (97-126-124-199.tukw.qwest.net. [97.126.124.199])
-        by smtp.gmail.com with ESMTPSA id bc7-20020a170902930700b001960283eca8sm8330371plb.94.2023.01.30.16.12.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 16:12:44 -0800 (PST)
-From:   Brian Gix <brian.gix@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Brian Gix <brian.gix@gmail.com>
-Subject: [PATCH BlueZ v2] AUTHORS: modify Brian Gix email address
-Date:   Mon, 30 Jan 2023 16:12:41 -0800
-Message-Id: <20230131001241.95001-1-brian.gix@gmail.com>
-X-Mailer: git-send-email 2.39.1
+        Mon, 30 Jan 2023 19:20:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1284625E20
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 16:20:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A329D61341
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 00:20:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 17EC0C433D2;
+        Tue, 31 Jan 2023 00:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675124417;
+        bh=J0MBIuQ8eyrCv4CUVRLeVWbM3qXzeqT1mkj4DtGlnjo=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=XzOW5r5Z4AADO6r507u6tS4qcVXR4wPc6IA2pQW/JAFZvUWJsp+wtwuYx1aopPDlM
+         ZzL0uBKd6XclL6uftorj7nytDhQFLbetbXDA9ElIQQrz5x5aV2gy2ml9czQ3lYg9er
+         Tya38lAn/VwCTX9qu0MzFj3kBUxF1VvF3T9X/nqEkxFYSRfxHIoN2W/Iiz2rmm6jLg
+         Glk8jAAHOhkF/KJ5ekjV0sDds7RgAAYxMhOt8Iuf0LD1X6gzOYlSFlRmYc/Fc1e/RD
+         YcIXgr7MKwjxiw9iO11y1g1HxGcbxORLXO5TdI1tALWwnJaD4eZwHa39/XT+EZlmHf
+         jJmUsOVkJgASA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EB35DE4D014;
+        Tue, 31 Jan 2023 00:20:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] AUTHORS: modify email address
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167512441695.21902.10429238330080152037.git-patchwork-notify@kernel.org>
+Date:   Tue, 31 Jan 2023 00:20:16 +0000
+References: <20230124220416.312697-1-brian.gix@gmail.com>
+In-Reply-To: <20230124220416.312697-1-brian.gix@gmail.com>
+To:     Brian Gix <brian.gix@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- AUTHORS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hello:
 
-diff --git a/AUTHORS b/AUTHORS
-index 5d2d09688..879f97f99 100644
---- a/AUTHORS
-+++ b/AUTHORS
-@@ -53,7 +53,7 @@ Daniel Orstadius <daniel.orstadius@gmail.com>
- Anderson Briglia <anderson.briglia@openbossa.org>
- Anderson Lizardo <anderson.lizardo@openbossa.org>
- Bruna Moreira <bruna.moreira@openbossa.org>
--Brian Gix <brian.gix@intel.com>
-+Brian Gix <brian.gix@gmail.com>
- Andre Guedes <andre.guedes@openbossa.org>
- Sheldon Demario <sheldon.demario@openbossa.org>
- Lucas De Marchi <lucas.demarchi@profusion.mobi>
+This patch was applied to bluetooth/bluez.git (master)
+by Brian Gix <brian.gix@gmail.com>:
+
+On Tue, 24 Jan 2023 14:04:16 -0800 you wrote:
+> ---
+>  AUTHORS | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Here is the summary with links:
+  - [BlueZ] AUTHORS: modify email address
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5845f003ac27
+
+You are awesome, thank you!
 -- 
-2.39.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
