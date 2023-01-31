@@ -2,146 +2,99 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1972C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 10:49:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B34F5C636D3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 11:16:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjAaKs7 (ORCPT
+        id S231767AbjAaLQJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Jan 2023 05:48:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
+        Tue, 31 Jan 2023 06:16:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231577AbjAaKs5 (ORCPT
+        with ESMTP id S231786AbjAaLQD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Jan 2023 05:48:57 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A1322DEF
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 02:48:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675162131; x=1706698131;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=X29vnypsxMMsZg3gs4wW2/GQ2lMoKKWQMIfn7QUbWv0=;
-  b=X+6xPKh3XZ4Hbt9HHY7uRnj38WLbqXFLLmqIO1o+De5Qt24+JfGG4xw9
-   wYiECfgtox16pQ6vRGL3Kg+6dsLO9p3WWVy2wAyeSilae/pGWbvvgFi7O
-   NsRJ0ZcwauP0QF6Zyz3CtlC3nauRv/UqZo5ysMqhfr8sqvQ3zlzEcJNTI
-   RXLoJAUz9fIx6xX2BLA0fPkNSHJOrlX/QSwI8hpGxjvGS8Os4yNb6c3Ka
-   LSEct77OCsjgQOTQ/HqIahibynyJ2fcf39RAPThq2pSRHadocjbE4Ugwq
-   BIMAA8H/eKEqgIu+7xtVa72+YdQKJdgFEZbI4txGW85/ha2FSXVSXuGDB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10606"; a="329917152"
-X-IronPort-AV: E=Sophos;i="5.97,261,1669104000"; 
-   d="scan'208";a="329917152"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2023 02:48:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10606"; a="696771840"
-X-IronPort-AV: E=Sophos;i="5.97,261,1669104000"; 
-   d="scan'208";a="696771840"
-Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 31 Jan 2023 02:48:49 -0800
-Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pMoC0-0004NO-37;
-        Tue, 31 Jan 2023 10:48:48 +0000
-Date:   Tue, 31 Jan 2023 18:48:47 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- d57d873e68517300ca7d32623e77b7f333534c44
-Message-ID: <63d8f20f.gKao5AbV43SFTRQY%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Tue, 31 Jan 2023 06:16:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D404B4B6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:15:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675163710;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=r5WDosCN8ptqhgrL1cgVrQgfmxbqRf8M/DBi7ayRhQA=;
+        b=JOj28pt/5tSkoR2voFgvxr/7OhWYhEkibJo5LD4HWS0ZPJduxO3d3Lf3xYp7L7RKAtOcm0
+        89XNojvtuvUrUUwnzKcHEhkaOszzIEEKaaX+901qrn/BFv19NgaEz+twfHkTlKEJGTjLrd
+        87j+VeOlFO/WzXhVhqPRO+k8mseKxuw=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-570-UNpIgpF2O_CrHg3dzYPuIA-1; Tue, 31 Jan 2023 06:15:08 -0500
+X-MC-Unique: UNpIgpF2O_CrHg3dzYPuIA-1
+Received: by mail-qt1-f198.google.com with SMTP id f22-20020a05622a1a1600b003b8674f2302so2666141qtb.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 03:15:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r5WDosCN8ptqhgrL1cgVrQgfmxbqRf8M/DBi7ayRhQA=;
+        b=cOCxtHLtTm//8YctLUGwNbxo+tZmJPnqhJn9ycA3bbdu5ESAF/P7CdEr8BDWtK0oHa
+         ulfICrqlGs+7ajSLM1Yl7hKf/axcGUyMANfcmLL0Adb2nXncc4lrXqrxUeGjORhTrnXR
+         IFn0dZrd/+D4o03bNmfZYft3VTKsAyrQpTAvKfjiCDglezeHjoU35BAp37qr/bTaJmqW
+         mm8Blc6kUL1smXrR438Djgw0FI+IL6h/qORkh5Zt2n7rJgYlbqBA9TJTdy3OVoiwXziA
+         n7UsXOWgtQm/LRSOIG5lXXd2ks9KnF1QbC/x4pOLWdULNTgYOBbM7Zk44WwJ+7xcgd9E
+         L+xA==
+X-Gm-Message-State: AO0yUKUgVluGj5bYwcuzO1I/+EYSdeBrnBw9h6ugTkZUNCb3OFU2nDC3
+        yCQXIO7FeFuzQdDnMwiP9qzvewZQqjznPlU/YkJY7b1KhISqa73iY1PcXIHcm5CElRKMkAbQ5F7
+        fmwT9SF8CqLlZA1mWoIP5O9AS9jMn
+X-Received: by 2002:a05:6214:b85:b0:537:6dfa:efaf with SMTP id fe5-20020a0562140b8500b005376dfaefafmr33023143qvb.13.1675163708314;
+        Tue, 31 Jan 2023 03:15:08 -0800 (PST)
+X-Google-Smtp-Source: AK7set9PvPYF6HAkQ+AlinxEAf03bWrkLFOaUAgoOy2qSI7bVMAHunwsC9vjqR1Y96nmCMq2TF5yVg==
+X-Received: by 2002:a05:6214:b85:b0:537:6dfa:efaf with SMTP id fe5-20020a0562140b8500b005376dfaefafmr33023117qvb.13.1675163708088;
+        Tue, 31 Jan 2023 03:15:08 -0800 (PST)
+Received: from x1 (c-73-214-169-22.hsd1.pa.comcast.net. [73.214.169.22])
+        by smtp.gmail.com with ESMTPSA id bs32-20020a05620a472000b0071d7ade87afsm4839339qkb.67.2023.01.31.03.15.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Jan 2023 03:15:07 -0800 (PST)
+Date:   Tue, 31 Jan 2023 06:15:05 -0500
+From:   Brian Masney <bmasney@redhat.com>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: Re: [PATCH v2 3/4] arm64: dts: qcom: sc8280xp: Define uart2
+Message-ID: <Y9j4ORb4r8+QXx4J@x1>
+References: <20230131043816.4525-1-steev@kali.org>
+ <20230131043816.4525-4-steev@kali.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20230131043816.4525-4-steev@kali.org>
+User-Agent: Mutt/2.2.7 (2022-08-07)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: d57d873e68517300ca7d32623e77b7f333534c44  Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
+On Mon, Jan 30, 2023 at 10:38:15PM -0600, Steev Klimaszewski wrote:
+> From: Bjorn Andersson <bjorn.andersson@linaro.org>
+> 
+> 
+> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Signed-off-by: Steev Klimaszewski <steev@kali.org>
 
-elapsed time: 724m
+Reviewed-by: Brian Masney <bmasney@redhat.com>
 
-configs tested: 68
-configs skipped: 2
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-x86_64                            allnoconfig
-um                             i386_defconfig
-um                           x86_64_defconfig
-powerpc                           allnoconfig
-arc                                 defconfig
-s390                             allmodconfig
-alpha                               defconfig
-x86_64                              defconfig
-s390                                defconfig
-x86_64                               rhel-8.3
-sh                               allmodconfig
-s390                             allyesconfig
-powerpc                          allmodconfig
-mips                             allyesconfig
-x86_64                           allyesconfig
-x86_64                          rhel-8.3-func
-ia64                             allmodconfig
-x86_64                    rhel-8.3-kselftests
-m68k                             allyesconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-i386                                defconfig
-i386                          randconfig-a005
-x86_64               randconfig-a001-20230130
-arc                  randconfig-r043-20230129
-x86_64               randconfig-a003-20230130
-x86_64               randconfig-a002-20230130
-x86_64               randconfig-a004-20230130
-arm                  randconfig-r046-20230129
-x86_64                           rhel-8.3-bpf
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-kvm
-x86_64               randconfig-a006-20230130
-x86_64               randconfig-a005-20230130
-arm                  randconfig-r046-20230130
-arc                  randconfig-r043-20230130
-i386                             allyesconfig
-arm                                 defconfig
-arm64                            allyesconfig
-arm                              allyesconfig
-
-clang tested configs:
-x86_64                          rhel-8.3-rust
-i386                          randconfig-a002
-i386                          randconfig-a004
-i386                          randconfig-a006
-hexagon              randconfig-r041-20230129
-riscv                randconfig-r042-20230129
-hexagon              randconfig-r045-20230130
-i386                 randconfig-a013-20230130
-hexagon              randconfig-r041-20230130
-i386                 randconfig-a012-20230130
-hexagon              randconfig-r045-20230129
-i386                 randconfig-a014-20230130
-i386                 randconfig-a011-20230130
-i386                 randconfig-a015-20230130
-s390                 randconfig-r044-20230129
-i386                 randconfig-a016-20230130
-riscv                randconfig-r042-20230130
-s390                 randconfig-r044-20230130
-x86_64               randconfig-a014-20230130
-x86_64               randconfig-a013-20230130
-x86_64               randconfig-a011-20230130
-x86_64               randconfig-a015-20230130
-x86_64               randconfig-a012-20230130
-x86_64               randconfig-a016-20230130
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
