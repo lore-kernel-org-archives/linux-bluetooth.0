@@ -2,79 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D21C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 22:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D8CCC636CC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 23:02:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231557AbjAaWU2 (ORCPT
+        id S231272AbjAaXCC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Jan 2023 17:20:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48344 "EHLO
+        Tue, 31 Jan 2023 18:02:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231670AbjAaWU0 (ORCPT
+        with ESMTP id S229637AbjAaXCB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Jan 2023 17:20:26 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C00CC
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 14:20:25 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 60A1261710
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 22:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C5C74C4339B;
-        Tue, 31 Jan 2023 22:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675203624;
-        bh=uiiGIt9zpn41sDMeTFnNYF0AeGBEQi2JLlGMz65ZLXw=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=W3rAL4Vj/2Eho0RdFiCNjgSMWHgjKWNLVLBbNADf2YmPpowqeS4E+o7OLB1qMnBm3
-         EkcTvWQh/rwKVPW/hTImE+yYEAL8rDViWfUiciUHne53VF9PaFwQPs1xmACw4ZZEQD
-         uPNZvvcFTi6FB7XmuxruLFbE7kjd5zjpSnZdbz+lmSEuMKBTRW/X5r7N8B76mR88bo
-         X8zeEqoWwGdrq3px1WYNXSi/JppC8+mmlbcpCYwqpYCmLoryC4NTwm1GAiKfQ/HFx8
-         gfMK/T6VWK/G2rdvGhOHoCysGSqRAyqO/gj601J2yaAqJPMX5Qmms/kilhFkuTmTXp
-         ZITzUH7UVU/EQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A80BDC072E7;
-        Tue, 31 Jan 2023 22:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 31 Jan 2023 18:02:01 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B77CC671
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 15:02:00 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id e10-20020a17090a630a00b0022bedd66e6dso193371pjj.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 15:02:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=matician-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jluehKlxUGXq2+vghVWnC4Xvup58MfvgTPLtNeMpSHM=;
+        b=1yew5PdhDVPlDigntwUhgb9kySg7cAFSLW1V+B0EMVtJAcdfgcnLMPtedIO7SQ3mOB
+         TGj74Mmnqu3uBUhLF2wXKPMpbVWWSroRYohP08qK9/rJkFTDuNaDrSc2Xpai2EksU7cz
+         N4CXm5n8oat7qhcdq4X71EV6Zp7Urf9RIknwPfqq9fmcgHWrpQu2LKjB54TrarLk6MLF
+         /zEGNZN6bG0OMjYM7UlhtaQVYKeNVX35rrJkAGgByfkTfgCLyE90sYdsBfHPe/btSzjc
+         COStr7ktdD4laT8n92WCne+qOz8QfzeMQlIKRnvP6cVFFpS8OVKMlIBw+rvSrBqq/PBE
+         xDCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jluehKlxUGXq2+vghVWnC4Xvup58MfvgTPLtNeMpSHM=;
+        b=rPDJhubKb3cVlXLaAcehRYwMgiGFwxEZITz8sRFwPqAxqG64Wu2HtapMCxV7vPcJSQ
+         XFi6T3bhzno6jwvp8pIZv1VHZpTBxPQS2BOobVs6F7ocV4Hfzg4anCTCZSfe+UbGOZ3F
+         YjAm+NHcYuSa5SN/Mjrdy2GzhL65Amz25rBaY3UND8Ot0ODxjQPdC7RflMq0+yTCZXnn
+         NX893D8pmnTw2fEI7R4hFbeOkllU94iivnfXZFaxKauIBB1fnmQcDO7DUk7sCIPwty3n
+         WRZnILwfJjHctmXBbyB2Shor0649He9WtzpJNdxbfdR2SLOryLlpKX/DTZJ4NEkbwK/2
+         qs+w==
+X-Gm-Message-State: AO0yUKVOQN4wkfD+5WlzCa1BkXotTJ6vEhfP9UUyCcX2IsL+TSx4ds26
+        /Gy2dyq5ibCfGtC4oT7Z2IVS0C8oKRl7WfRJeAw=
+X-Google-Smtp-Source: AK7set8waaM1o+akQkVVSrA1DxrqfGIFtDNW1h/vn+KCFdTIHRxk3w+JVp5x/VnTMvp3EUZWur4Uaw==
+X-Received: by 2002:a17:903:1cc:b0:196:63d0:a674 with SMTP id e12-20020a17090301cc00b0019663d0a674mr871418plh.9.1675206119656;
+        Tue, 31 Jan 2023 15:01:59 -0800 (PST)
+Received: from coffindebian.corp.matician.com ([209.214.194.154])
+        by smtp.gmail.com with ESMTPSA id c4-20020a170902d90400b0017f756563bcsm10296025plz.47.2023.01.31.15.01.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Jan 2023 15:01:59 -0800 (PST)
+From:   Alexander Coffin <alex.coffin@matician.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Alexander Coffin <alex.coffin@matician.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH] bluetooth: fix use-after-delete
+Date:   Tue, 31 Jan 2023 15:01:05 -0800
+Message-Id: <20230131230105.139035-1-alex.coffin@matician.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] shared: define MAX_INPUT for musl
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167520362468.18452.17996354116446297750.git-patchwork-notify@kernel.org>
-Date:   Tue, 31 Jan 2023 22:20:24 +0000
-References: <20230131055258.3311810-1-sam@gentoo.org>
-In-Reply-To: <20230131055258.3311810-1-sam@gentoo.org>
-To:     Sam James <sam@gentoo.org>
-Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+the use-after-delete occurs when the bluetooth connection closes while
+messages are still being sent.
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Signed-off-by: Alexander Coffin <alex.coffin@matician.com>
+---
+ net/bluetooth/l2cap_core.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-On Tue, 31 Jan 2023 05:52:58 +0000 you wrote:
-> musl systems don't have MAX_INPUT. Just define it to _POSIX_MAX_INPUT which
-> musl does have if it's not already defined.
-> 
-> Note that on glibc, the values match anyway (as of glibc-2.36), and indeed
-> POSIX_MAX_INPUT has the same value on musl too.
-> 
-> Bug: https://bugs.gentoo.org/888467
-> Signed-off-by: Sam James <sam@gentoo.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - shared: define MAX_INPUT for musl
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ca6546fe5213
-
-You are awesome, thank you!
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a3e0dc6a6e73..6cf5ed9a1a7b 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2350,6 +2350,10 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 					 struct msghdr *msg, int len,
+ 					 int count, struct sk_buff *skb)
+ {
++	/* `conn` may be NULL, or dangling as this is called from some contexts
++	 * where `chan->ops->alloc_skb` was just called, and the connection
++	 * status was not checked afterward.
++	 */
+ 	struct l2cap_conn *conn = chan->conn;
+ 	struct sk_buff **frag;
+ 	int sent = 0;
+@@ -2365,6 +2369,13 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 	while (len) {
+ 		struct sk_buff *tmp;
+ 
++		/* Channel lock is released before requesting new skb and then
++		 * reacquired thus we need to recheck channel state.
++		 * chan->state == BT_CONNECTED implies that conn is still valid.
++		 */
++		if (chan->state != BT_CONNECTED)
++			return -ENOTCONN;
++
+ 		count = min_t(unsigned int, conn->mtu, len);
+ 
+ 		tmp = chan->ops->alloc_skb(chan, 0, count,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.2
 
