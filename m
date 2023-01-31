@@ -2,75 +2,75 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AEE9C38142
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 21:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D21C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 22:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232100AbjAaVLk (ORCPT
+        id S231557AbjAaWU2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Jan 2023 16:11:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43388 "EHLO
+        Tue, 31 Jan 2023 17:20:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231731AbjAaVLi (ORCPT
+        with ESMTP id S231670AbjAaWU0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Jan 2023 16:11:38 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E532353982;
-        Tue, 31 Jan 2023 13:11:37 -0800 (PST)
+        Tue, 31 Jan 2023 17:20:26 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C00CC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 14:20:25 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 894FBB81EE8;
-        Tue, 31 Jan 2023 21:11:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D0A2C4339B;
-        Tue, 31 Jan 2023 21:11:35 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 60A1261710
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 22:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C5C74C4339B;
+        Tue, 31 Jan 2023 22:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675199495;
-        bh=FtFbTECF8aJmVoN2xuSg6nQJs6CSQud4v1pc5jlGhKM=;
+        s=k20201202; t=1675203624;
+        bh=uiiGIt9zpn41sDMeTFnNYF0AeGBEQi2JLlGMz65ZLXw=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=KTr3Hq/yia3qU2eskoRJ7RGtbkglsIEtWsIrEkRvDwiD1a98U7w+gdQzmq9B+NSl2
-         El8SICFq6ZXAthGUV/pGuxQO3OzAcs4izzpUHikigRMrQ+V7SiLz54L5MRuO2un3YH
-         yW+no/WNXEOoiUQOzMVrgRv0IVBSChtC9Hv1Gg4X0NjCYnUet61IzTX9NM0yWjuOlb
-         IZ0nOE1HZfGJ13oHSWsL1YNUYcMKZZaWBG1EUOUm3oTVmkbWdE8rU1j6dbzsUkCp1E
-         5zVVAE02q5koBP1xdfyug3pIHrbSdUtGHPL9G2/NRlrS7yrqrZtQnOdua3QfuJY5H3
-         7h7Kndy+XioUg==
+        b=W3rAL4Vj/2Eho0RdFiCNjgSMWHgjKWNLVLBbNADf2YmPpowqeS4E+o7OLB1qMnBm3
+         EkcTvWQh/rwKVPW/hTImE+yYEAL8rDViWfUiciUHne53VF9PaFwQPs1xmACw4ZZEQD
+         uPNZvvcFTi6FB7XmuxruLFbE7kjd5zjpSnZdbz+lmSEuMKBTRW/X5r7N8B76mR88bo
+         X8zeEqoWwGdrq3px1WYNXSi/JppC8+mmlbcpCYwqpYCmLoryC4NTwm1GAiKfQ/HFx8
+         gfMK/T6VWK/G2rdvGhOHoCysGSqRAyqO/gj601J2yaAqJPMX5Qmms/kilhFkuTmTXp
+         ZITzUH7UVU/EQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F119C072E7;
-        Tue, 31 Jan 2023 21:11:35 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A80BDC072E7;
+        Tue, 31 Jan 2023 22:20:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bluetooth 2023-01-17
+Subject: Re: [PATCH] shared: define MAX_INPUT for musl
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167519949505.16885.5483010314235068928.git-patchwork-notify@kernel.org>
-Date:   Tue, 31 Jan 2023 21:11:35 +0000
-References: <20230118002944.1679845-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230118002944.1679845-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Message-Id: <167520362468.18452.17996354116446297750.git-patchwork-notify@kernel.org>
+Date:   Tue, 31 Jan 2023 22:20:24 +0000
+References: <20230131055258.3311810-1-sam@gentoo.org>
+In-Reply-To: <20230131055258.3311810-1-sam@gentoo.org>
+To:     Sam James <sam@gentoo.org>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 17 Jan 2023 16:29:44 -0800 you wrote:
-> The following changes since commit 1f3bd64ad921f051254591fbed04fd30b306cde6:
+On Tue, 31 Jan 2023 05:52:58 +0000 you wrote:
+> musl systems don't have MAX_INPUT. Just define it to _POSIX_MAX_INPUT which
+> musl does have if it's not already defined.
 > 
->   net: stmmac: fix invalid call to mdiobus_get_phy() (2023-01-17 13:33:19 +0100)
+> Note that on glibc, the values match anyway (as of glibc-2.36), and indeed
+> POSIX_MAX_INPUT has the same value on musl too.
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-01-17
+> Bug: https://bugs.gentoo.org/888467
+> Signed-off-by: Sam James <sam@gentoo.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: bluetooth 2023-01-17
-    https://git.kernel.org/bluetooth/bluetooth-next/c/010a74f52203
+  - shared: define MAX_INPUT for musl
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ca6546fe5213
 
 You are awesome, thank you!
 -- 
