@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D06C38142
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 04:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77456C636D4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Jan 2023 04:39:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbjAaEjZ (ORCPT
+        id S231129AbjAaEjw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Jan 2023 23:39:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43344 "EHLO
+        Mon, 30 Jan 2023 23:39:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbjAaEi7 (ORCPT
+        with ESMTP id S230058AbjAaEjE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Jan 2023 23:38:59 -0500
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25C6A3B0DA
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:21 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id o66so11903698oia.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:21 -0800 (PST)
+        Mon, 30 Jan 2023 23:39:04 -0500
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C6C3B675
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:26 -0800 (PST)
+Received: by mail-oi1-x22b.google.com with SMTP id s66so11895199oib.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Jan 2023 20:38:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kali.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SXzzK5FVdbfjHsKczaF+d6bF7UcG4AwVnTFb17KpdMo=;
-        b=DPHIeeG9Qe9vZAwktVaCedN0BzLtD2Z2DSdlJW2dkkvtyoMJDr/asztI4JA/x2VJ2F
-         yvql4TTLDepezfWIGYDPI9Pyw4kATNQmcuU2ZfZHIAXHaQFJsbhlzp7r834T/0i7ajaZ
-         eWoGSwmH/ONGpWW7rsGMZW4mxqrmmgj8fCB8jG9beTanzODbaMsh01KpPOCQsfRVRB/P
-         8GqdIqlKRclU1qvQa0y1PTMg/7vAKRSJuYHMf4G4VPdOlSYSbbn77ZzQOg0Nikj0HsuL
-         sTln9p4hrOb6UCYsJSppQ+LPTDKpKnNRs5BgzDzJ0IaF9+NbYkBqngTFCpk0y/0T+UUE
-         VdMw==
+        bh=eVFjUAudhz48B1PG37PF0oDcvMhXp172jIwuWPlj7hM=;
+        b=WxKR1qFCYmq75yM8ksUFDRSsFWXpnPcTkqYKr/NifhNqXlx+tnPSHWA/IqxgveYdHa
+         qcGsxnQdHae2UyazsMBt6XhYQAy+fGBPn7rR7N7t/PpyTTwKbA9KYbRrtYpHMHPwQYxa
+         I0wYi3HqYWr6l8ejdFryo9/Pbe0UW5pbpP2y8uuz58a0TqUgGOyLuUy2euTmy2MlqMxW
+         4p/gnpw+B40IBjEY6IGQ2ODiCaNOs1jroe7eP73Wh3LtVg1IR2122ooawoFA5p85TRfA
+         BC3EcovRFWsbDd43Kkv/4P++7ZcZxQEPQ+rgmTXuE0wkAaiWHLJFyiqZsDV7orw2Dwi9
+         g8Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SXzzK5FVdbfjHsKczaF+d6bF7UcG4AwVnTFb17KpdMo=;
-        b=Gl2mk/L0PaRQRgQMDCJ2HKkLOZ3e6Y1J4ra473e0gMuWBgFiZyMf7xOBJ7VpD9Fs5V
-         X8XskWHjHlrVhK1dIuAPydFkKjIFuYtGFfnkkHmFowQlLTamCymljfYWjAzAkqCVuzK3
-         tTwU+EyWxCFuqyaihAxuuespHXuteWX4GiLKWf/xCTLvMRjyCUsEhY1zrt79ulTeHAdC
-         kFcDvHkN4617Ah0+Za1EJN+rroIMYyyraZJdcK4HGUvy5hNub4gQBjArFqz3hhvEWhkJ
-         NvNztJbn6hRv3c1I0B2NdsH3zvq+RJwKCrGVK0yFGX9cUJBUSCafaZaqz23v562u8qpz
-         j23w==
-X-Gm-Message-State: AO0yUKWnI/QaBd0WhDXueh3LHrQ9FzZV1vuJrs72H7e89HzFJ2BuyTpq
-        CzuyERrGNBvm1QrP3WAwRS68aeKJOEQzb94q66g=
-X-Google-Smtp-Source: AK7set+0SX5l6OqA15wmfLibMyvjJLh+/cHpE/VbiBm1eq26fmxp8x6bMw7gKOpfZA/YEQJO5hKi0A==
-X-Received: by 2002:a05:6808:1987:b0:378:6ebe:a98b with SMTP id bj7-20020a056808198700b003786ebea98bmr2054601oib.37.1675139900468;
-        Mon, 30 Jan 2023 20:38:20 -0800 (PST)
+        bh=eVFjUAudhz48B1PG37PF0oDcvMhXp172jIwuWPlj7hM=;
+        b=kqQm0eOc734zY+E/1Atd8/saYf/xrlDx9wUXrvIlxUsQuHcMhtUyBqNfU/dhgv0bEo
+         7YyRzRCDYTJuzBTZQ0foegix2ERkijr1e0ftn/yKnscEv1oUKLHiqinctecBFch8JjFR
+         7sBuFi1I9dqcB4xP/adsEHso/hLq7WEzNTjG+Nc7mpqYjsungKAiJWk1/LYnezxKtUVP
+         O8O4nmb430/P9SDvO8AP8p40IaWVnRxUPckc5pifOk4hc7HCK7vJYi9R5PfnzfFabZFl
+         qmjCqLt28gY3fOq6Vp8Z/voZ/bhl37246jJAMslOKUJvMGiQ8/kg3luv3s0iMA4bqD72
+         kI6g==
+X-Gm-Message-State: AFqh2kr7uKeVFkOpUeMC8XjilisAosYGyhGePUbJWU91DF2aVfptwdRY
+        w/DFlMM7SgxzyaOIz8wDFUa0Zg==
+X-Google-Smtp-Source: AMrXdXvaEIEHQxmGGUSLDqOZjf++5rSIBsjsT19PE0dlt7VSbc4D+DUnkT6Qp/lNws2gihhJ93yCeA==
+X-Received: by 2002:a05:6808:1247:b0:360:e643:7e27 with SMTP id o7-20020a056808124700b00360e6437e27mr30333622oiv.36.1675139904792;
+        Mon, 30 Jan 2023 20:38:24 -0800 (PST)
 Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
-        by smtp.gmail.com with ESMTPSA id s1-20020a056808208100b0037841fb9a65sm2049736oiw.5.2023.01.30.20.38.19
+        by smtp.gmail.com with ESMTPSA id u14-20020a056808150e00b0035418324b78sm4276083oiw.11.2023.01.30.20.38.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 20:38:19 -0800 (PST)
+        Mon, 30 Jan 2023 20:38:24 -0800 (PST)
 From:   Steev Klimaszewski <steev@kali.org>
 To:     Steev Klimaszewski <steev@kali.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -69,9 +69,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Mark Pearson <markpearson@lenovo.com>
-Subject: [PATCH v2 1/4] dt-bindings: net: Add WCN6855 Bluetooth
-Date:   Mon, 30 Jan 2023 22:38:13 -0600
-Message-Id: <20230131043816.4525-2-steev@kali.org>
+Subject: [PATCH v2 4/4] arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+Date:   Mon, 30 Jan 2023 22:38:16 -0600
+Message-Id: <20230131043816.4525-5-steev@kali.org>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20230131043816.4525-1-steev@kali.org>
 References: <20230131043816.4525-1-steev@kali.org>
@@ -81,36 +81,118 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add bindings for the QTI WCN6855 chipset, based on the WCN6750.
-
 Signed-off-by: Steev Klimaszewski <steev@kali.org>
 ---
-Changes since v1:
-* drop second binding in subject line
----
- .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml   | 2 ++
- 1 file changed, 2 insertions(+)
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index a6a6b0e4df7a..64e278561ba8 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -23,6 +23,7 @@ properties:
-       - qcom,wcn3998-bt
-       - qcom,qca6390-bt
-       - qcom,wcn6750-bt
-+      - qcom,wcn6855-bt
+diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+index f936b020a71d..951438ac5946 100644
+--- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
++++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+@@ -24,6 +24,8 @@ / {
+ 	aliases {
+ 		i2c4 = &i2c4;
+ 		i2c21 = &i2c21;
++		serial0 = &uart17;
++		serial1 = &uart2;
+ 	};
  
-   enable-gpios:
-     maxItems: 1
-@@ -121,6 +122,7 @@ allOf:
-           contains:
-             enum:
-               - qcom,wcn6750-bt
-+              - qcom,wcn6855-bt
-     then:
-       required:
-         - enable-gpios
+ 	wcd938x: audio-codec {
+@@ -712,6 +714,32 @@ &qup0 {
+ 	status = "okay";
+ };
+ 
++&uart2 {
++	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart2_state>;
++
++	bluetooth {
++		compatible = "qcom,wcn6855-bt";
++
++/*
++		vddio-supply = <&vreg_s4a_1p8>;
++		vddxo-supply = <&vreg_l7a_1p8>;
++		vddrf-supply = <&vreg_l17a_1p3>;
++		vddch0-supply = <&vreg_l25a_3p3>;
++		vddch1-supply = <&vreg_l23a_3p3>;
++*/
++		max-speed = <3200000>;
++
++		enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
++		swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&bt_en>;
++	};
++};
++
+ &qup1 {
+ 	status = "okay";
+ };
+@@ -720,6 +748,12 @@ &qup2 {
+ 	status = "okay";
+ };
+ 
++&uart17 {
++	compatible = "qcom,geni-debug-uart";
++
++	status = "okay";
++};
++
+ &remoteproc_adsp {
+ 	firmware-name = "qcom/sc8280xp/LENOVO/21BX/qcadsp8280.mbn";
+ 
+@@ -980,6 +1014,19 @@ hastings_reg_en: hastings-reg-en-state {
+ &tlmm {
+ 	gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
+ 
++	bt_en: bt-en-state {
++		hstp-sw-ctrl {
++			pins = "gpio132";
++			function = "gpio";
++		};
++
++		hstp-bt-en {
++			pins = "gpio133";
++			function = "gpio";
++			drive-strength = <16>;
++		};
++	};
++
+ 	edp_reg_en: edp-reg-en-state {
+ 		pins = "gpio25";
+ 		function = "gpio";
+@@ -1001,6 +1048,27 @@ i2c4_default: i2c4-default-state {
+ 		bias-disable;
+ 	};
+ 
++	uart2_state: uart2-state {
++		cts {
++			pins = "gpio122";
++			function = "qup2";
++			bias-disable;
++		};
++
++		rts-tx {
++			pins = "gpio122", "gpio123";
++			function = "qup2";
++			drive-strength = <2>;
++			bias-disable;
++		};
++
++		rx {
++			pins = "gpio124";
++			function = "qup2";
++			bias-pull-up;
++		};
++	};
++
+ 	i2c21_default: i2c21-default-state {
+ 		pins = "gpio81", "gpio82";
+ 		function = "qup21";
 -- 
 2.39.0
 
