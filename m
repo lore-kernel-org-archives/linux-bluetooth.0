@@ -2,79 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A9A1C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Feb 2023 19:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CC4C05027
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Feb 2023 19:10:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231597AbjBATD5 (ORCPT
+        id S231520AbjBATKb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Feb 2023 14:03:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
+        Wed, 1 Feb 2023 14:10:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjBATD4 (ORCPT
+        with ESMTP id S231552AbjBATK1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Feb 2023 14:03:56 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8AB74C3E
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 11:03:55 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id br9so30763115lfb.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Feb 2023 11:03:55 -0800 (PST)
+        Wed, 1 Feb 2023 14:10:27 -0500
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 643B87D9A5
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 11:10:26 -0800 (PST)
+Received: by mail-lj1-x22a.google.com with SMTP id u27so13866409ljo.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Feb 2023 11:10:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=matician-com.20210112.gappssmtp.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=oIYfXXbH0YLdNuKyhSoR7UV30Dc7GEfCrSfiuZy4dT8=;
-        b=gx/WghhM4DxaEKjLAnecE//6FsK15ytiibDIqLV9m4ZgWsarb9qRSQ8xwzw/UKsJEs
-         uZUAZHQWyX+05fDma2CYnznlLrEiv/o8nboZjbbzoop9AIQZPuN5kfILrIJ0INDwZdeB
-         TvBioogSpWBRFiFbKjFX9ImgX/2gNa1pp+EuVmcqOqu+XmlkyqdMJoD1DQOBkpMk40xv
-         y5oLrBXhDQHWY96WEfM//73QPb9JacAJNCC/lCGzfc0fDrOPoLxcT2oj2G261I3ztTXX
-         W6XRQ/F73ZqmXjhjd5WHYbSNHXePxroL70Bm/qzPlGfUXpJChF4Dmn/YfvXdKfLjQn1X
-         q7/g==
+        bh=RvDQ7jr6dJVJMgML4GZIsPeERmGp31G+SoskmGCaImQ=;
+        b=Ucqf6JTzy/1efj1G0lUF8tHlZtOA5MGpXtm6v17byf4JKPQbgJjX5CeOxFYt6QumK/
+         Iv626M5LlRGezUqYfXsYz60kEuSYrWQbzuhd/b/8lTHj0CH3zRYxxTmF3QCND6BJJDjs
+         p62OQa+QNGt6GBXmmoHFozJGaMsC7pdbDM6xdHWZ04dbJ1YbsJNMyUeBxP1XKJJLM9bh
+         hWPgghQtaTdLFIko0sDneiQKYp74lJwTSIM0btTrk4VemaZ3ttXXmDxEmpkiy+aPwU9h
+         nBH8CuEIXKCT6j6gEx2e2SZjJxtbJVWxIdDKAd6a0BJa10FroEyBlNytuTfT0Bu+W90o
+         IorA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oIYfXXbH0YLdNuKyhSoR7UV30Dc7GEfCrSfiuZy4dT8=;
-        b=5GOnqOpN/kEpk3iIM1H8kvUK46wzMMr1pMz5/zC1DFH34PSRlgWKxm9F52TrnGRHOB
-         hkkhkYz4b2CLHfFr/hJ971zMlpy1b6PYyFswdKvAJMxgyBtJI+6HvTpgGUA4ZqGvC10t
-         S4XZKQJHD5MxObq3I3tvhxZG8G+eMA3tSE6tXYUwf0pSD+o5hZQ459I+yIuDsZzw/Iyl
-         xui8TbeMLrdj/nBrf76/XOIoTwAyorP+pT8xDcC2DVHskO9c+SzRA5jF0ufLukkcsSga
-         wUZuJA9s3p8KOquTtx/hxchQTS9x5WcMw3heB9NPl5a48Iu6dnUWeE5Hr7ZEm9RART5+
-         Zqvg==
-X-Gm-Message-State: AO0yUKVw2LiIq0YtTiQRxq2l6Nw1F9xUzZI5vob+ITbtgoycoXt5+99j
-        +7SvlABVixkIbRKcoZHQshYvwMAMSqLWEap+PVNi+APLftEZcOwB
-X-Google-Smtp-Source: AK7set/5VBsyNFdL35j9EXMMf2WgjjUTdKcbUD0PW81ZDA1fTTKjiAHqPjuTkR5iZ3UVqBwrvh8nmquVwj5yI7TYLl4=
-X-Received: by 2002:a19:ee17:0:b0:4d3:d4e4:9b85 with SMTP id
- g23-20020a19ee17000000b004d3d4e49b85mr641310lfb.46.1675278234024; Wed, 01 Feb
- 2023 11:03:54 -0800 (PST)
+        bh=RvDQ7jr6dJVJMgML4GZIsPeERmGp31G+SoskmGCaImQ=;
+        b=c2utmJzYZuSv1Dncejvgoefb3OKmoY7F06YuAXtz9+IclGMR70yvyynhr6Gi41EG30
+         0NaPxgEJQu3rJXxBqiUfasZV/xToojT2E23SkiLlN/wEE5ER3i1cTANPUrBnZEhChpga
+         vMQ/kBwKE197jnwE9QII0vi4liFORt/iV9XJP6RG+nQEpqmz3xZ/coNaLEp8IS9zJM03
+         QxXtMX6hcS6AQQsTbuzYWYajmdfjnl/nbFTSMtKxGoZO3b1p/kpcx3v4l2L+/dkdc+1P
+         v+R+3QPUgupM8kqOCjRDV2ROjE5h3HGQF4Ozqu8SlujMq4Z68hh1C9sR1KmlttONSyd6
+         GOvQ==
+X-Gm-Message-State: AO0yUKX/D78FhAsj0ejx/rls1sU13AvFx7D0e3+Tgl3m8YbsDZHzOqe2
+        iMUE3/4g4yaR11vN2S2FKIty+FFvYpN5R6J+weQ=
+X-Google-Smtp-Source: AK7set8LmzeX3W8x2ftgG9rd1NgPZ4sEJqHLMpz5Hb97Xb8OYEmnLz2rU9LgxKv4u/kjZ0WmOeaXkZO3TP+211SMEOg=
+X-Received: by 2002:a2e:a4c3:0:b0:28e:92b2:a04a with SMTP id
+ p3-20020a2ea4c3000000b0028e92b2a04amr545243ljm.34.1675278624229; Wed, 01 Feb
+ 2023 11:10:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20230131230105.139035-1-alex.coffin@matician.com>
- <CABBYNZ+wXYH8vag6Xk2X7U7U096_YENasq1cPCEo-0SD5ut_wA@mail.gmail.com>
- <CA+hUFcszm1UnoqeEsViR=0NO4M=rQMu-2DvaefJ70HDNR_9dtg@mail.gmail.com> <CABBYNZLOxU9WphAsjVMHdGYRJ1OF4OBsmRrZF9jMqRa5ktOj+g@mail.gmail.com>
-In-Reply-To: <CABBYNZLOxU9WphAsjVMHdGYRJ1OF4OBsmRrZF9jMqRa5ktOj+g@mail.gmail.com>
-From:   Alexander Coffin <alex.coffin@matician.com>
-Date:   Wed, 1 Feb 2023 11:03:37 -0800
-Message-ID: <CA+hUFcuoM+6tQyw0YPnYCJZ6TSrgVfdUf297DVPStGahRhhJLA@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: fix use-after-delete
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
+References: <d23190507e9c7131481648848d0afd62448226d3.1675276185.git.pav@iki.fi>
+In-Reply-To: <d23190507e9c7131481648848d0afd62448226d3.1675276185.git.pav@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 1 Feb 2023 11:10:12 -0800
+Message-ID: <CABBYNZK145J6kOOhDCF1=tA13B3ta57dHPfuWBKXaC6pWzQTAQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] media: set default value for BAP endpoint Vendor field
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Pauli,
 
-> I will prepare a proper patch then, but I don't have access to your
-> testing bot so it is probably a good idea that you test it yourself as
-> well.
+On Wed, Feb 1, 2023 at 10:57 AM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> The "Vendor" field is optional, and should have an initialized valid
+> default value.
 
-Sure, we will switch to it, and let you know if we face any issues
-(the issues don't always pop up right away, and we don't always test
-the newest version of the kernel on all of our bots so it may be a few
-days before we would notice issues).
+It is probably a good idea to include logs where the problem is detected.
 
-Regards,
-Alexander Coffin
+> ---
+>  profiles/audio/media.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> index d96367454..a62755f69 100644
+> --- a/profiles/audio/media.c
+> +++ b/profiles/audio/media.c
+> @@ -2551,7 +2551,7 @@ static void app_register_endpoint(void *data, void *user_data)
+>         const char *uuid;
+>         gboolean delay_reporting = FALSE;
+>         uint8_t codec;
+> -       struct vendor vendor;
+> +       struct vendor vendor = { 0 };
+
+I guess {}; or { 0,0 }; are clearer here since there are 2 fields in
+the struct, although it is probably safer to go with memset(&vendor,
+0, sizeof(vendor)).
+
+>         struct bt_bap_pac_qos qos;
+>         uint8_t *capabilities = NULL;
+>         int size = 0;
+> --
+> 2.39.1
+>
+
+
+-- 
+Luiz Augusto von Dentz
