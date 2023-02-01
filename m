@@ -2,110 +2,86 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4283EC05027
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Feb 2023 21:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C38FC636D4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Feb 2023 21:17:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbjBAVOK (ORCPT
+        id S231207AbjBAVQ7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Feb 2023 16:14:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51352 "EHLO
+        Wed, 1 Feb 2023 16:16:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjBAVOJ (ORCPT
+        with ESMTP id S230479AbjBAVQ5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Feb 2023 16:14:09 -0500
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D056E6D5FD
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 13:14:07 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id z5so8956397qtn.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Feb 2023 13:14:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6BE23Ibgpd5SkYut9PJ2Ej04FkJvUgRkE+ESKntf7Hc=;
-        b=PpwjU+sH1yU05Uyvt2Iyw7CTMdNpIuFxR4okKt6w6jHu5DV8jk5R6k7FVaCdMpPmgU
-         0dhW1Go3s9dL6WN/KW6MQKs0xEmRX2ivNFRrqiLqZi/E6pyaegE7dan4ZIiOF7n93Kld
-         xwg184ibp2DKS+RciJvfEMCU4QSvw6HfJs0zMiBM9J9tAlAtCW/q4x3KC3J6eCoIwfOe
-         SH+yz1kq6GudDlnUoGniTtsiVR4EdgSrcWzyn3iSBVbG6eFNonm2+caGzxTruamRwwoS
-         b1q7kuoFOKlKDxRwiJV0Z+Bw4a2/nf7ZeBOLOFlC3BTgx98nu9gNUpqISru50Rb64t6T
-         LuCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6BE23Ibgpd5SkYut9PJ2Ej04FkJvUgRkE+ESKntf7Hc=;
-        b=chPt3yckKIP+G+bK53ESKPgrYyCdIVIcYzWJo1NFHClU2cpCrjREtlL4D17OhJUiqh
-         ulKfiTfuu3avKy5B7miIlB8vfD+gXGpbE508C2/jGQ74FBlp8mtyqUIevttlgn29nGH9
-         31KbBxLP7EzQCXHKWXUAJeANR5vT+Nr0M86D1Q8VV1zVZJYtKWX7MjBS6JkGGWFCV2EZ
-         Z0xTXDleM2H2/HhzfnHsZ+WojQRUgrcdbO2EOJ9GENCxiZA2ZsXdD2aWfhQgganmwTXu
-         SIQ5Qw+vXZrldjwcPk9XykeV34w2oxF+m4etmgBt8fsfymiZDBquEw9lDg0aXhmTnLr4
-         IKsw==
-X-Gm-Message-State: AO0yUKWHoMvnumbqQ4MeZnKCpZh2g08b8ETVx8hh7B0hW1+8f49VwDhH
-        GZJexF4uStvONX1ju7N3r9SX8Y/guCB3CA==
-X-Google-Smtp-Source: AK7set9kd/g/FOwkQC+kUtb6z45fVplOFy9c5fF9CCCqaTqr/aJjt0SlePf49UNqEkOZQK6efw01gQ==
-X-Received: by 2002:a05:622a:28a:b0:3b9:7051:255d with SMTP id z10-20020a05622a028a00b003b97051255dmr6685298qtw.63.1675286046854;
-        Wed, 01 Feb 2023 13:14:06 -0800 (PST)
-Received: from [172.17.0.2] ([52.179.102.210])
-        by smtp.gmail.com with ESMTPSA id fu3-20020a05622a5d8300b003a7eb5baf3csm12356647qtb.69.2023.02.01.13.14.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 13:14:06 -0800 (PST)
-Message-ID: <63dad61e.050a0220.3c3a7.9983@mx.google.com>
-Date:   Wed, 01 Feb 2023 13:14:06 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4515315834808971046=="
+        Wed, 1 Feb 2023 16:16:57 -0500
+X-Greylist: delayed 560 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 01 Feb 2023 13:16:56 PST
+Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD5C6D5FE
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 13:16:55 -0800 (PST)
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4P6ZHl6Cjsz9tC8
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 22:07:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+        t=1675285651;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Pehp1lZFQkpVsnHfdBd8UdfGETbWI7z1MARaSHIXVr4=;
+        b=ilgiFOx87yZprRC7o78bAt07zHHkg8bpS1oqPrCHoliDD/T/KrqjEzALwXeGI15OuWcOvT
+        XP+W9xOMDPoh3YLUrsF0zyVegJlefOyKej6AFWN6LH9tEI46oeCGXRitu01jtspO+4HHIk
+        9NzYaE7fZfsYUiRYeMPvOfyMinDU23HfasSIJI2QZjZdYFsRXj38NITajCmiEB+4d/YF1l
+        Mf0Ufjrr5U+K2Gylg6cC5d9M3K6nD8ZESXsPQZRYP/scna0Dfc22zcyOxSMVxGj05Hee5o
+        4W/cBMBQYGzlBoIl5dLnu+f7hl1pUK8RoCXLeOlvIhFe3LETrjL+RZQZDiZA4Q==
+Message-ID: <6950dd49-7436-ebef-eb88-940597472ce1@tavla.de>
+Date:   Wed, 1 Feb 2023 22:07:30 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2] media: set default value for BAP endpoint Vendor field
-In-Reply-To: <26d36cc8d645773b6795a18355631134bf2bd074.1675281104.git.pav@iki.fi>
-References: <26d36cc8d645773b6795a18355631134bf2bd074.1675281104.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Content-Language: en-GB
+From:   Martin Petzold <martin.petzold@tavla.de>
+Subject: How to Automatically Re-Connect Bluetooth HID over GATT (HOG) Device
+ when BlueZ Plugin "hog" is Disabled
+Organization: TAVLA Technology GmbH
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 4P6ZHl6Cjsz9tC8
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4515315834808971046==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+Linux 5.10, BlueZ 5.55
 
-Dear submitter,
+I have a remote control which implements Bluetooth LE. If I use the 
+default Bluetooth daemon, I am able to pair and trust using 
+bluetoothctl. If the connection is lost after a while (or days) and a 
+button on the remote control is pressed, the daemon re-connects 
+automatically (because the device is paired). This is basically what I need.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=717874
+But, I would also like to manually set notifying for characteristics 
+(Report) on the HID service within my application (Java via d-bus). This 
+is not possible anymore (also not via bluetoothctl) because the "hog" 
+(or "input") plugin manages the input device and the related HID 
+services are now hidden.
 
----Test result---
+I then added "--noplugin=input,hog" to my Bluetooth daemon. Which is 
+okay, because I don't need this support for Kernel HID. Great, now the 
+HID services are available (also using bluetoothctl), but the peripheral 
+does not re-connect automatically any more. I always have to connect 
+manually first. I also have no signal on the d-bus when I press the 
+button of the remote control, when it is disconnected.
 
-Test Summary:
-CheckPatch                    PASS      1.01 seconds
-GitLint                       FAIL      0.67 seconds
-BuildEll                      PASS      28.44 seconds
-BluezMake                     PASS      860.68 seconds
-MakeCheck                     PASS      11.86 seconds
-MakeDistcheck                 PASS      148.18 seconds
-CheckValgrind                 PASS      244.17 seconds
-CheckSmatch                   PASS      325.68 seconds
-bluezmakeextell               PASS      97.45 seconds
-IncrementalBuild              PASS      703.79 seconds
-ScanBuild                     PASS      1001.52 seconds
+How can I enable automatic re-connect for devices, when these plugins 
+are disabled?
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2] media: set default value for BAP endpoint Vendor field
+The only other way I was thinking of is to leave the "hog" plugin 
+enabled and use the operating system HID interface. However, my 
+application runs as non-root which makes it complicated and also I would 
+like to have direct connection and control to my device.
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-12: B2 Line has trailing whitespace: "    "
+Thanks,
 
+Martin
 
----
-Regards,
-Linux Bluetooth
-
-
---===============4515315834808971046==--
