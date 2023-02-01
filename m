@@ -2,85 +2,72 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF8DC636CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Feb 2023 01:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A61C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Feb 2023 02:39:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbjBABKW (ORCPT
+        id S230207AbjBACje (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Jan 2023 20:10:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47684 "EHLO
+        Tue, 31 Jan 2023 21:39:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbjBABKU (ORCPT
+        with ESMTP id S231297AbjBACjd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Jan 2023 20:10:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35BA254239
-        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 17:10:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E8001B81FDB
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 01:10:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7253EC433EF;
-        Wed,  1 Feb 2023 01:10:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675213817;
-        bh=h4FnAriTeFeshCr2iPlT/uKwlyR5N8sxgsmICoEjynk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=uhANKCdP5tGb4w5PjBQSWn//lmRBYNdNlXsUW8Qp5ijtPY2CAvQeBBigK9Pa3/1Tv
-         PQ/MUeghmvEnQ33NWbm0bzHj8Jf63kCdFG3YBpwiTjja9Z7/nHvs5M7vRFeg6GpusZ
-         d4VQhYuoKHSbFfvu8rxR5fZw7UNLynXpMdnosE2/wYoWXvYRE+f8q/4Tyg7ydLdD3r
-         8SCUiB01xAHc8IlBztlrciC1Xenfw4sJLHq2p7J8tsX+rpPZoZ/2HBa8kC10ASU4ym
-         o2WlEKORMxzY6BAblTJOquif78ay91zKTPB1xOeAVmwabtcQ7I7g2MhjXj3rt1bBn1
-         hXw1BUUlUit8w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 567B3E4D00A;
-        Wed,  1 Feb 2023 01:10:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 31 Jan 2023 21:39:33 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D95F4ABF6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 18:39:32 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id y25so27162377lfa.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 31 Jan 2023 18:39:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=matician-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ap3Lc51bsx1q36vE4wSazR2PmZFf0he7F6ZwCbI9w8U=;
+        b=zeqoSuByf/XFo4DWNh3Jdqkj6zmBsfrxHNI2NBIn8/oTknNVbPcO13ZugnDV+f2tu7
+         3mWDaNWwacxDc5pi2dAtrZQZWYcgjQMRNc7baVGiqr8PQtPyM2n5CkiIZ2JWC1xEvbwq
+         KV04q045CngSzrXTmIWN2i0HUA9ZNP27Rq9kU28+4GK1ZHzejBjFRwWhoqjcPegKG359
+         p0gW6Td0tKVezqapOEt3aLH2jgg0j6IM7qtGvmoazWZ/lnRJpka7NesbHr+3v9kC19ry
+         4kj4ygZUkm9wwD1X8wJ0CMFu1vlhAsMW/DNONertZTdIJ01hbXipNhYs2/OoKUY1GFha
+         0smA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ap3Lc51bsx1q36vE4wSazR2PmZFf0he7F6ZwCbI9w8U=;
+        b=LsNHG0P/jmB+dG0k/U6iVRs0mM0v5pwYHNYN6WSoQCdHgB7mCt/VdRO4TsDzn1+Q8Y
+         o9wrU1QKmqVIyllh4mXpMGbXQVgdeNs/BApEwbJMCLRlJTsA7bRNHZvqetoXPL5qyb7g
+         oyHjUr6X+N4GJpRIocUcyjuMvL7lLhRzDJv6USaUaNRoiTAenH6ddc9sgygEwSYJuVb8
+         r6DWcH4e9dM3ANZCu6dwY09P3KQJmMpHx8q+KLl7iipmPkdRd4sKq5V3i6wuzseFBeRV
+         FLpo3zT8whIZci2F8XHV303Gu1X/qNLSUBSEYfmh4T/7fS5qjkSw46WLtHRmTjEYegvo
+         hqRw==
+X-Gm-Message-State: AO0yUKVu06UgSm/D9GYjkYN8o8/CMwlxo8qWt5SU+KIgw9ITclzdEwd2
+        w/Xo9eVYqwcw1pXS4wMqzZEjVetxlEauuOTRi7JLxA==
+X-Google-Smtp-Source: AK7set+xQZPtIDdtcmpRlO34w1ZoCsDW0ood116WFdvqacM/dMg6Rar8puPxy7chKaZAXBYHVIG3fGffV2rl5hZAFY8=
+X-Received: by 2002:a05:6512:2399:b0:4cb:34b5:3196 with SMTP id
+ c25-20020a056512239900b004cb34b53196mr79407lfv.240.1675219170230; Tue, 31 Jan
+ 2023 18:39:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/5] profiles: Add Support for Metadata, CID and VID
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167521381735.32644.5977585726413771767.git-patchwork-notify@kernel.org>
-Date:   Wed, 01 Feb 2023 01:10:17 +0000
-References: <20230123235649.3231488-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230123235649.3231488-1-luiz.dentz@gmail.com>
+References: <20230131230105.139035-1-alex.coffin@matician.com> <CABBYNZ+wXYH8vag6Xk2X7U7U096_YENasq1cPCEo-0SD5ut_wA@mail.gmail.com>
+In-Reply-To: <CABBYNZ+wXYH8vag6Xk2X7U7U096_YENasq1cPCEo-0SD5ut_wA@mail.gmail.com>
+From:   Alexander Coffin <alex.coffin@matician.com>
+Date:   Tue, 31 Jan 2023 18:39:14 -0800
+Message-ID: <CA+hUFcszm1UnoqeEsViR=0NO4M=rQMu-2DvaefJ70HDNR_9dtg@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: fix use-after-delete
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi Luiz,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+I like your proposed patch, and think it is much better (and what
+should be used instead of mine) assuming that you have tested, and
+verified that no code requires allocating buffers on a closed channel.
 
-On Mon, 23 Jan 2023 15:56:45 -0800 you wrote:
-> From: "Maheta, Abhay" <abhay.maheshbhai.maheta@intel.com>
-> 
-> This adds support for Metadata, Company ID and Vendor Codec ID
-> ---
->  profiles/audio/bap.c       |   7 ++-
->  profiles/audio/media.c     | 106 +++++++++++++++++++++++++++++++++----
->  profiles/audio/transport.c |   4 +-
->  3 files changed, 105 insertions(+), 12 deletions(-)
-
-Here is the summary with links:
-  - [BlueZ,1/5] profiles: Add Support for Metadata, CID and VID
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=17bcd2a37629
-  - [BlueZ,2/5] client/player: Add support for Company ID, Vendor ID
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=33d99e12c37f
-  - [BlueZ,3/5] shared/util: Check arguments on util_memcpy
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=be5c49385e4d
-  - [BlueZ,4/5] media-api: Make Vendor a uint32_t
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d611a40ffc7b
-  - [BlueZ,5/5] media: Rework support of Vendor to use uint32_t as type
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards,
+Alexander Coffin
