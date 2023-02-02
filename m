@@ -2,120 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF594C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 15:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 704FAC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 17:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232637AbjBBPsF (ORCPT
+        id S231614AbjBBRrI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Feb 2023 10:48:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48804 "EHLO
+        Thu, 2 Feb 2023 12:47:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232799AbjBBPsD (ORCPT
+        with ESMTP id S230070AbjBBRrH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Feb 2023 10:48:03 -0500
-X-Greylist: delayed 546 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 02 Feb 2023 07:47:38 PST
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49128783C7;
-        Thu,  2 Feb 2023 07:47:38 -0800 (PST)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d70fe3302f912753a56ba0ed.dip0.t-ipconnect.de [IPv6:2003:e9:d70f:e330:2f91:2753:a56b:a0ed])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id D44C9C008D;
-        Thu,  2 Feb 2023 16:37:27 +0100 (CET)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        miquel.raynal@bootlin.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: pull-request: ieee802154-next 2023-02-02
-Date:   Thu,  2 Feb 2023 16:37:23 +0100
-Message-Id: <20230202153723.1554935-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.39.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 2 Feb 2023 12:47:07 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B1CA24C
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 09:47:05 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4fa63c84621so27319627b3.20
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 09:47:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YtU9CnX3cBpyenF2XQ9oEZnYd7Lwckg3sr9WC007xnQ=;
+        b=AuQ1JoDOl140cHDdE+mSysSLsYrmA6SHdMNLIy6+bukO+9pa133u4WE9RaE6dZo+IH
+         NAHnD6OKqnddDShq7snW9N5JW+UhY8flJJlwPoDvHCyAwohRZPLVITM5GMrGlScLMVvj
+         E1IqFR3BGmI1FpBBTcORh1WiRYesGfsXfI1TjAqMuprXlhuuypMG+jDxMQwLa4T6sWHL
+         D7svt0DE69yjHehpCufriBMDu5td4/of0IN637OTfFSAqDgeWAWb6by2ve586WvrzAdU
+         9awYYGTlR+2NsJkO3KahX27ffLLefnnhJCAPq0k05eSKmMphdBuXn6F5O/thap/lVTHg
+         blbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YtU9CnX3cBpyenF2XQ9oEZnYd7Lwckg3sr9WC007xnQ=;
+        b=wI+F1vNq+FYrvdRVflaM2ckU8Vv+e8JjqOQOkBX/JlDkw+CF5oL64RWumf4C89uLAP
+         A6/7Q9zERzEiaJPtUBuBuCXmQNomT+UXL12//kQD4Isa6aBYYGcAa4sVuIufg+65HB1+
+         BGy6i66aC4pNsOvnOcDOSN4StdSAmdfKQ0jdlLLUKtRg63/iozAxGxND30O/OaWeG/WY
+         BRTZ63d87lBraKsLbZ8CYUlLJBwLkKitM0I/55vSVNJWtXSWV4dCD0yFjwJ5XJ83b2DH
+         8DYVtjO3Of0gsx7M1iwgJJ05x5V0COyrThNNYEj9EeQDNhBzyPH03cG2aYLnEwgSP8Bp
+         jRrw==
+X-Gm-Message-State: AO0yUKV36EPVjUMIP4o0SOtFMRlLBQ8jL1D+lfu59+SIkR4L2ZXvuOtw
+        ZoGEy0B8YvUFZhQ/DdwHjw6D3JE728GLSY0Kt9aAWS5/MCOW118mbhHv7S+6kEkFWx25lEeAPf5
+        zXS+eGrTat+AVyw6pbt3B8KMDzmMM7xNh2Zo7FxGc0myAiHmqSAfMSQKLD5KsUq2xfVCU8kETOA
+        j4
+X-Google-Smtp-Source: AK7set/pUtumSbmYthYO0RyWEklWO3fDPp1Ppdq+qBMUaWpNx51lrqWOcR0a5KfhivtIjbFwM0b6yUCcg5la
+X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
+ (user=jiangzp job=sendgmr) by 2002:a0d:cc84:0:b0:507:3872:5210 with SMTP id
+ o126-20020a0dcc84000000b0050738725210mr761280ywd.152.1675360024329; Thu, 02
+ Feb 2023 09:47:04 -0800 (PST)
+Date:   Thu,  2 Feb 2023 09:47:01 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
+Message-ID: <20230202094659.kernel.v1.1.I7d79501f333609addbb0b39803a7bafb99e5b728@changeid>
+Subject: [kernel PATCH v1] Bluetooth: hci_qca: get wakeup status from serdev
+ device handle
+From:   Zhengping Jiang <jiangzp@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Zhengping Jiang <jiangzp@google.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Dave, Jakub.
+Bluetooth controller attached via the UART is handled by the serdev driver.
+Get the wakeup status from the device handle through serdev, instead of the
+parent path.
 
-An update from ieee802154 for *net-next*
+Fixes: c1a74160eaf1 ("Bluetooth: hci_qca: Add device_may_wakeup support")
+Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+---
 
-Miquel Raynal build upon his earlier work and introduced two new
-features into the ieee802154 stack. Beaconing to announce existing
-PAN's and passive scanning to discover the beacons and associated
-PAN's. The matching changes to the userspace configuration tool
-have been posted as well and will be released when 6.3 is ready.
+Changes in v1:
+- Get wakeup status from device handle of serdev driver
 
-Arnd Bergmann and Dmitry Torokhov worked on converting the
-at86rf230 and cc2520 drivers away from the unused platform_data
-usage and towards the new gpiod API. (I had to add a revert as
-Dmitry found a regression on an already pushed tree on my side).
+ drivers/bluetooth/hci_qca.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-regards
-Stefan Schmidt
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index a5c19f32926b..3df8c3606e93 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1588,10 +1588,11 @@ static bool qca_wakeup(struct hci_dev *hdev)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	bool wakeup;
+ 
+-	/* UART driver handles the interrupt from BT SoC.So we need to use
+-	 * device handle of UART driver to get the status of device may wakeup.
++	/* BT SoC attached through the serial bus is handled by the serdev driver.
++	 * So we need to use the device handle of the serdev driver to get the
++	 * status of device may wakeup.
+ 	 */
+-	wakeup = device_may_wakeup(hu->serdev->ctrl->dev.parent);
++	wakeup = device_may_wakeup(&hu->serdev->ctrl->dev);
+ 	bt_dev_dbg(hu->hdev, "wakeup status : %d", wakeup);
+ 
+ 	return wakeup;
+-- 
+2.39.1.519.gcb327c4b5f-goog
 
-The following changes since commit d8b879c00f69a22738f6bb7198e763cfcc6b68f8:
-
-  Merge branch 'net-ethernet-ti-am65-cpsw-fix-set-channel-operation' (2022-12-07 20:17:35 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git tags/ieee802154-for-net-next-2023-02-02
-
-for you to fetch changes up to 6130543654e0e5a79485ed8538c0bf2259fe7431:
-
-  ieee802154: at86rf230: switch to using gpiod API (2023-02-01 21:30:09 +0100)
-
-----------------------------------------------------------------
-Arnd Bergmann (2):
-      at86rf230: convert to gpio descriptors
-      cc2520: move to gpio descriptors
-
-Dmitry Torokhov (2):
-      ieee802154: at86rf230: drop support for platform data
-      ieee802154: at86rf230: switch to using gpiod API
-
-Miquel Raynal (9):
-      ieee802154: Add support for user scanning requests
-      ieee802154: Define a beacon frame header
-      ieee802154: Introduce a helper to validate a channel
-      mac802154: Prepare forcing specific symbol duration
-      mac802154: Add MLME Tx locked helpers
-      mac802154: Handle passive scanning
-      ieee802154: Add support for user beaconing requests
-      mac802154: Handle basic beaconing
-      mac802154: Avoid superfluous endianness handling
-
-Stefan Schmidt (1):
-      Revert "at86rf230: convert to gpio descriptors"
-
- MAINTAINERS                        |   1 -
- drivers/net/ieee802154/at86rf230.c |  90 +++-----
- drivers/net/ieee802154/cc2520.c    | 136 ++++--------
- include/linux/ieee802154.h         |   7 +
- include/linux/spi/at86rf230.h      |  20 --
- include/linux/spi/cc2520.h         |  21 --
- include/net/cfg802154.h            |  78 ++++++-
- include/net/ieee802154_netdev.h    |  52 +++++
- include/net/nl802154.h             |  61 ++++++
- net/ieee802154/header_ops.c        |  24 ++
- net/ieee802154/nl802154.c          | 316 +++++++++++++++++++++++++-
- net/ieee802154/nl802154.h          |   4 +
- net/ieee802154/rdev-ops.h          |  56 +++++
- net/ieee802154/trace.h             |  61 ++++++
- net/mac802154/Makefile             |   2 +-
- net/mac802154/cfg.c                |  60 ++++-
- net/mac802154/ieee802154_i.h       |  61 +++++-
- net/mac802154/iface.c              |   6 +
- net/mac802154/llsec.c              |   5 +-
- net/mac802154/main.c               |  37 +++-
- net/mac802154/rx.c                 |  36 ++-
- net/mac802154/scan.c               | 439 +++++++++++++++++++++++++++++++++++++
- net/mac802154/tx.c                 |  42 ++--
- 23 files changed, 1386 insertions(+), 229 deletions(-)
- delete mode 100644 include/linux/spi/at86rf230.h
- delete mode 100644 include/linux/spi/cc2520.h
- create mode 100644 net/mac802154/scan.c
