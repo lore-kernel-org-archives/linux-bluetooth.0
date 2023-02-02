@@ -2,105 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704FAC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 17:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E405C05027
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 18:36:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231614AbjBBRrI (ORCPT
+        id S231133AbjBBSgq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Feb 2023 12:47:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37244 "EHLO
+        Thu, 2 Feb 2023 13:36:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230070AbjBBRrH (ORCPT
+        with ESMTP id S232265AbjBBSgo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Feb 2023 12:47:07 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29B1CA24C
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 09:47:05 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4fa63c84621so27319627b3.20
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 09:47:05 -0800 (PST)
+        Thu, 2 Feb 2023 13:36:44 -0500
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB9776A73E
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 10:36:18 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id cr22so2890783qtb.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 10:36:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YtU9CnX3cBpyenF2XQ9oEZnYd7Lwckg3sr9WC007xnQ=;
-        b=AuQ1JoDOl140cHDdE+mSysSLsYrmA6SHdMNLIy6+bukO+9pa133u4WE9RaE6dZo+IH
-         NAHnD6OKqnddDShq7snW9N5JW+UhY8flJJlwPoDvHCyAwohRZPLVITM5GMrGlScLMVvj
-         E1IqFR3BGmI1FpBBTcORh1WiRYesGfsXfI1TjAqMuprXlhuuypMG+jDxMQwLa4T6sWHL
-         D7svt0DE69yjHehpCufriBMDu5td4/of0IN637OTfFSAqDgeWAWb6by2ve586WvrzAdU
-         9awYYGTlR+2NsJkO3KahX27ffLLefnnhJCAPq0k05eSKmMphdBuXn6F5O/thap/lVTHg
-         blbQ==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=A7EjDWs33ySw6frUD54yPEd8FVaqg/O7ZXEV+Dn4dbg=;
+        b=p95hdLk7PjUZWpbkz+yKkJXfba2khUSr9vIbgrsR0IDbJ7xUwBiVIZgB8pw0l8e6Co
+         ImehC14Dh+dpzIePCPsntIxPGmT2NO0JC+9ptL1dgW12fpH2K5XM4ce+S6a+W33fyR9p
+         FVuz53WbHH0lApa/uk4hmNBbMqGBHleAsGfKxwJXpgL8wiMz726lzjI3VT9CEWvHdp+T
+         S5btc8z27+unxgnHHVloa+v1t01l/5R47eQzQpejsom8aie433aps8oa/z8UM0Znacz8
+         fHiIzHyvQN0qYoiIVW0jDfjYhbxa+FD6mpMpLGJAqLJLIcxbRjS8tstxCX9Q+J6N4pXQ
+         TRDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YtU9CnX3cBpyenF2XQ9oEZnYd7Lwckg3sr9WC007xnQ=;
-        b=wI+F1vNq+FYrvdRVflaM2ckU8Vv+e8JjqOQOkBX/JlDkw+CF5oL64RWumf4C89uLAP
-         A6/7Q9zERzEiaJPtUBuBuCXmQNomT+UXL12//kQD4Isa6aBYYGcAa4sVuIufg+65HB1+
-         BGy6i66aC4pNsOvnOcDOSN4StdSAmdfKQ0jdlLLUKtRg63/iozAxGxND30O/OaWeG/WY
-         BRTZ63d87lBraKsLbZ8CYUlLJBwLkKitM0I/55vSVNJWtXSWV4dCD0yFjwJ5XJ83b2DH
-         8DYVtjO3Of0gsx7M1iwgJJ05x5V0COyrThNNYEj9EeQDNhBzyPH03cG2aYLnEwgSP8Bp
-         jRrw==
-X-Gm-Message-State: AO0yUKV36EPVjUMIP4o0SOtFMRlLBQ8jL1D+lfu59+SIkR4L2ZXvuOtw
-        ZoGEy0B8YvUFZhQ/DdwHjw6D3JE728GLSY0Kt9aAWS5/MCOW118mbhHv7S+6kEkFWx25lEeAPf5
-        zXS+eGrTat+AVyw6pbt3B8KMDzmMM7xNh2Zo7FxGc0myAiHmqSAfMSQKLD5KsUq2xfVCU8kETOA
-        j4
-X-Google-Smtp-Source: AK7set/pUtumSbmYthYO0RyWEklWO3fDPp1Ppdq+qBMUaWpNx51lrqWOcR0a5KfhivtIjbFwM0b6yUCcg5la
-X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
- (user=jiangzp job=sendgmr) by 2002:a0d:cc84:0:b0:507:3872:5210 with SMTP id
- o126-20020a0dcc84000000b0050738725210mr761280ywd.152.1675360024329; Thu, 02
- Feb 2023 09:47:04 -0800 (PST)
-Date:   Thu,  2 Feb 2023 09:47:01 -0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230202094659.kernel.v1.1.I7d79501f333609addbb0b39803a7bafb99e5b728@changeid>
-Subject: [kernel PATCH v1] Bluetooth: hci_qca: get wakeup status from serdev
- device handle
-From:   Zhengping Jiang <jiangzp@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Zhengping Jiang <jiangzp@google.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=A7EjDWs33ySw6frUD54yPEd8FVaqg/O7ZXEV+Dn4dbg=;
+        b=N9IBh/UIcSPh+ShSb81Kd2u/5PPotNBMh8hnTE5vDKzOO96488PSoFnUtVVV5Fuuul
+         dntxfNzRqC7br0lj6SajNfTgF6IcVUaWTDvc6Rl6Rx8gjUKulp9c18Ukv0QYlfLjHbp8
+         7Z8E4ngX1lEQBFkuh2fVKvmZYvZsOWTdvZh9N/uYXy30aRHiQmq7Lk7vzcfiqheg1JUD
+         sJhFcp699fa7sxJ2iG3bcjRQdLgv73xRQOijaqKzRrXECe+SyA91hR6JHPybj3yCuWmQ
+         LjjM8otLjTbFJEutbQH1eCHkuM5we0OysLxR5hKWPSx3yMeL6RTzo/DBE0TYLjjwputn
+         tFIQ==
+X-Gm-Message-State: AO0yUKWa1ZC8EP53E6qp+Fd0tNTUEFtatuBvEcZvm1BdKodcB5y9ba56
+        S/e+kncz2xtyDtpce22ig0/sskVXxuC7uA==
+X-Google-Smtp-Source: AK7set+B4pI3TrkxFTRYkWf3VVM7pA5HVolWceC7bcvHTobbS/Ki1pEmGLqMpnqd+61hTkYjJAmQfw==
+X-Received: by 2002:a05:622a:306:b0:3b2:365c:9a9e with SMTP id q6-20020a05622a030600b003b2365c9a9emr14111283qtw.61.1675362944123;
+        Thu, 02 Feb 2023 10:35:44 -0800 (PST)
+Received: from [172.17.0.2] ([172.177.255.80])
+        by smtp.gmail.com with ESMTPSA id dw28-20020a05620a601c00b00728bbe45888sm250044qkb.10.2023.02.02.10.35.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 10:35:43 -0800 (PST)
+Message-ID: <63dc027f.050a0220.50c76.1949@mx.google.com>
+Date:   Thu, 02 Feb 2023 10:35:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0393869588242039062=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
+Subject: RE: [kernel,v1] Bluetooth: hci_qca: get wakeup status from serdev device handle
+In-Reply-To: <20230202094659.kernel.v1.1.I7d79501f333609addbb0b39803a7bafb99e5b728@changeid>
+References: <20230202094659.kernel.v1.1.I7d79501f333609addbb0b39803a7bafb99e5b728@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Bluetooth controller attached via the UART is handled by the serdev driver.
-Get the wakeup status from the device handle through serdev, instead of the
-parent path.
+--===============0393869588242039062==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: c1a74160eaf1 ("Bluetooth: hci_qca: Add device_may_wakeup support")
-Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=718272
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.80 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      30.86 seconds
+CheckAllWarning               PASS      34.19 seconds
+CheckSparse                   PASS      38.46 seconds
+CheckSmatch                   PASS      106.74 seconds
+BuildKernel32                 PASS      29.81 seconds
+TestRunnerSetup               PASS      431.37 seconds
+TestRunner_l2cap-tester       PASS      16.26 seconds
+TestRunner_iso-tester         PASS      16.50 seconds
+TestRunner_bnep-tester        PASS      5.45 seconds
+TestRunner_mgmt-tester        PASS      110.09 seconds
+TestRunner_rfcomm-tester      PASS      8.63 seconds
+TestRunner_sco-tester         PASS      8.06 seconds
+TestRunner_ioctl-tester       PASS      9.33 seconds
+TestRunner_mesh-tester        PASS      6.86 seconds
+TestRunner_smp-tester         PASS      7.85 seconds
+TestRunner_userchan-tester    PASS      5.73 seconds
+IncrementalBuild              PASS      27.67 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes in v1:
-- Get wakeup status from device handle of serdev driver
 
- drivers/bluetooth/hci_qca.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index a5c19f32926b..3df8c3606e93 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1588,10 +1588,11 @@ static bool qca_wakeup(struct hci_dev *hdev)
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	bool wakeup;
- 
--	/* UART driver handles the interrupt from BT SoC.So we need to use
--	 * device handle of UART driver to get the status of device may wakeup.
-+	/* BT SoC attached through the serial bus is handled by the serdev driver.
-+	 * So we need to use the device handle of the serdev driver to get the
-+	 * status of device may wakeup.
- 	 */
--	wakeup = device_may_wakeup(hu->serdev->ctrl->dev.parent);
-+	wakeup = device_may_wakeup(&hu->serdev->ctrl->dev);
- 	bt_dev_dbg(hu->hdev, "wakeup status : %d", wakeup);
- 
- 	return wakeup;
--- 
-2.39.1.519.gcb327c4b5f-goog
-
+--===============0393869588242039062==--
