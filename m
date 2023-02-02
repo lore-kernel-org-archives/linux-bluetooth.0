@@ -2,313 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 814B2C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 12:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F13F7C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 12:43:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231364AbjBBMgQ (ORCPT
+        id S231629AbjBBMnw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Feb 2023 07:36:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35166 "EHLO
+        Thu, 2 Feb 2023 07:43:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231133AbjBBMgP (ORCPT
+        with ESMTP id S231216AbjBBMnu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Feb 2023 07:36:15 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604AE84B62
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 04:36:10 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id 74so1705327ybl.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 04:36:10 -0800 (PST)
+        Thu, 2 Feb 2023 07:43:50 -0500
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0B0789FAC
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 04:43:11 -0800 (PST)
+Received: by mail-qt1-x832.google.com with SMTP id v17so1620411qto.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 04:43:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1H8wFBOyPkjGl14ZZGifIpI9n23/NSkoyGUNWz/xoCY=;
-        b=MNLy31iC/RKvsSK9GZsB186SPDmdAnN6ZwbOkN0qCYzXppcsf2ef2v1e+JrB01pUae
-         sIG7jMW0R9rQMd1Qoq06n9tsyJ0XnF2IdOYiISLXSpiC1+v1az9PIn/nfwz5RQPoqhxF
-         2YvQ9ZLvMK98LWoNjDEvuzpBqTmx9JwyMHxzd3TcGrTm4zrO4s8duA+VoHhKl1K/3gg9
-         KGH5BnjMtI1JwYrmrSEs/Omvjz+lZHs8bSoNy8OGNrWCvPN45IkN2L3Hu2ZaSh+66Iad
-         DpWMC4UWWGELS5y28tBiu1tP1W+mw8Z2xy9lUD9jz0lizh2eGAdqu+c4wEyJksHYTCIK
-         PWMA==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HXzrTC3ZODUU4poqnw//uLiji7zxiHrJDMPUfuV8ogQ=;
+        b=IRVFAjUyBA3lbSI2UxCBSU1q5Qd826sgxv46PinYtjc0epPKNsQHHGTKDHu6YvJPWH
+         ETnhg4pzTnEmEV72wJ2/cOZO1+5GQzwTR4NmbXIH9KC8/TAYfXMCIWpKKiyxl/EiGlEG
+         aG3Pnpl4lRXmzJR6h4wz8RPI9HfXABpZTs3KIwycI8BxAbIwjTd8ynmn+mcwLbYIHJj2
+         Lxt/0Q+ut4JqMFbrGvrCnBAmhDH79aL6pOYo5JQo6qp8oP29roVYGTYwZnRdvc9lMP1p
+         XxRHtbk7lj22exX2IH8wl7orUUj1xDXBSBMAeMfyOidMK7fq63PUN0a1BqCjzG/z8FSF
+         jgFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1H8wFBOyPkjGl14ZZGifIpI9n23/NSkoyGUNWz/xoCY=;
-        b=OI+W565jFp6ziHmvbHTmMAX2yiGTXvVL+4aWKDBnIUvBMHeDpb9vCnb+40Ri4irlDu
-         PXwj/eMl35373t6nh7bhx8UyMZ7YmgciI8qv8BQlUH/6ffGflUEHDJZMg34qfHI3AKSG
-         5Fv8G6OUmSrGOGAPDQUPEwb6ukRSLy5oIDKSJJZxDI98AnL956hiwta+fEpSMMaq0FO3
-         lIjgkKsh1zG+k+rKzMQ1s0w8Nerjq56eGTdO2l+QcFyeSH1H5kocR9bDWqAGKzId0mFb
-         5fv0WL0AtPVNwXiq1sdnpTFf0tRo2lsW2KWLi8nO3t6Cl1eIcw8+cG6B0jmw66ptxuXx
-         hAlA==
-X-Gm-Message-State: AO0yUKX3fODRAmRM46rq7GnF8gsdPDYdtBC+gxpAQ19IuRBIqjvX9Tqw
-        vZG2c2yRx4O+p5pa//uBGzKklskTC/dDd2HNnV6ziQ==
-X-Google-Smtp-Source: AK7set96i5msEO6+Tf/ghTVEhAq48i95AHAjRKXlmu837XwqQ+AG3Nrx+hQbKqODLSNsVVpTgak6Y9WsCIEm/1kRUl4=
-X-Received: by 2002:a25:8711:0:b0:80b:5c18:a17 with SMTP id
- a17-20020a258711000000b0080b5c180a17mr735338ybl.394.1675341369046; Thu, 02
- Feb 2023 04:36:09 -0800 (PST)
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HXzrTC3ZODUU4poqnw//uLiji7zxiHrJDMPUfuV8ogQ=;
+        b=wWsujBnZsltfEZ95/+MRMxxdeEI0OIkvRtat2UZig7Dt7lW9RCiq1u5V4v2O/f+7Kt
+         iIwevx7kStTVBF0ZAFF7AZBUfyU15RvscobR1sIDC6FIt66yeMAWrco33ew+lxJ+sxkX
+         s0N+FNUqCwPyINApHVzcFVdB21pUg9UrWE6eH4nI9m6AS67L5stvPg1gMNR+kM0e/+22
+         Vs0HB+zC+sL6NYYzNUQYfTvLFP83KfA3Tc3gADGV4wSOgf54MLy8UnlJfTa20BawXAdh
+         0Vv1IicBVR2eoSfJRFcyBGWCt8itFWjqepdL9GeihGX2FgRwG+nZG8K5QQ7IWYtBY5Cf
+         LX6A==
+X-Gm-Message-State: AO0yUKUmqPmiSvv02DG5MFTwYyDS0boqTVQBez+X3BPXUXESqFL30Ou8
+        h1SJMVDf/2Ck343DbslhIOYY6BS5qF4=
+X-Google-Smtp-Source: AK7set+naYuRQuiedhivkDnjzOIlm8V56HvznzciRVpkSYsyryEmW4BYJg1mIYfXO/AUnUdjrfeOJw==
+X-Received: by 2002:a05:622a:294:b0:3b6:3e4f:f876 with SMTP id z20-20020a05622a029400b003b63e4ff876mr10933568qtw.18.1675341723644;
+        Thu, 02 Feb 2023 04:42:03 -0800 (PST)
+Received: from [172.17.0.2] ([104.45.203.195])
+        by smtp.gmail.com with ESMTPSA id z20-20020ac84314000000b003b960aad697sm6192431qtm.9.2023.02.02.04.42.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 04:42:03 -0800 (PST)
+Message-ID: <63dbaf9b.c80a0220.30d2e.7d9c@mx.google.com>
+Date:   Thu, 02 Feb 2023 04:42:03 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4285628920454705461=="
 MIME-Version: 1.0
-References: <CANn89i+hAht=g1F6kjPfq8eO4j6-2WEE+CNtRtq1S4UnwXEQaw@mail.gmail.com>
- <20230202120902.2827191-1-iam@sung-woo.kim>
-In-Reply-To: <20230202120902.2827191-1-iam@sung-woo.kim>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Thu, 2 Feb 2023 13:35:57 +0100
-Message-ID: <CANn89i+CiUvz-7PmQUAs3Lq7ZEcbonmkyUOegxGDN7N0VX5Xdg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free
-To:     Sungwoo Kim <iam@sung-woo.kim>
-Cc:     benquike@gmail.com, davem@davemloft.net, daveti@purdue.edu,
-        happiness.sung.woo@gmail.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        wuruoyu@me.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, max.chou@realtek.com
+Subject: RE: [v2] Bluetooth: btrtl: Firmware format v2 support
+In-Reply-To: <20230202114614.53907-1-max.chou@realtek.com>
+References: <20230202114614.53907-1-max.chou@realtek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Feb 2, 2023 at 1:09 PM Sungwoo Kim <iam@sung-woo.kim> wrote:
->
-> On Thu, Feb 2, 2023 at 4:26 AM Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > On Thu, Feb 2, 2023 at 10:07 AM Sungwoo Kim <iam@sung-woo.kim> wrote:
-> > >
-> > > Due to the race condition between l2cap_sock_cleanup_listen and
-> > > l2cap_sock_close_cb, l2cap_sock_kill can receive already freed sk,
-> > > resulting in use-after-free inside l2cap_sock_kill.
-> > > This patch prevent this by adding a null check in l2cap_sock_kill.
-> > >
-> > > Context 1:
-> > > l2cap_sock_cleanup_listen();
-> > >   // context switched
-> > >   l2cap_chan_lock(chan);
-> > >   l2cap_sock_kill(sk); // <-- sk is already freed below
-> >
-> > But sk is used in l2cap_sock_cleanup_listen()
-> > and should not be NULL...
-> >
-> > while ((sk =3D bt_accept_dequeue(parent, NULL))) {
-> >   ...
-> >   l2cap_sock_kill(sk);
-> >   ..
-> > }
-> >
-> > It would help if you send us a stack trace ...
->
-> Here is the stack trace and l2cap_sock.c:
-> https://gist.github.com/swkim101/5c3b8cb7c7d7172aef23810c9412f323
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: use-after-free in l2cap_sock_kill (/v6.1-rc2/./include/net/so=
-ck.h:986 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1281)
-> Read of size 8 at addr ffff88800f7f4060 by task l2cap-server/1764
-> CPU: 0 PID: 1764 Comm: l2cap-server Not tainted 6.1.0-rc2 #129
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubunt=
-u1.1 04/01/2014
-> Call Trace:
->  <TASK>
-> dump_stack_lvl (/v6.1-rc2/lib/dump_stack.c:105)
-> print_address_description+0x7e/0x360
-> print_report (/v6.1-rc2/mm/kasan/report.c:187 /v6.1-rc2/mm/kasan/report.c=
-:389)
-> ? __virt_addr_valid (/v6.1-rc2/./include/linux/mmzone.h:1855 /v6.1-rc2/ar=
-ch/x86/mm/physaddr.c:65)
-> ? kasan_complete_mode_report_info (/v6.1-rc2/mm/kasan/report_generic.c:10=
-4 /v6.1-rc2/mm/kasan/report_generic.c:127 /v6.1-rc2/mm/kasan/report_generic=
-.c:136)
-> ? l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluet=
-ooth/l2cap_sock.c:1281)
-> kasan_report (/v6.1-rc2/mm/kasan/report.c:? /v6.1-rc2/mm/kasan/report.c:4=
-84)
-> ? l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluet=
-ooth/l2cap_sock.c:1281)
-> kasan_check_range (/v6.1-rc2/mm/kasan/generic.c:85 /v6.1-rc2/mm/kasan/gen=
-eric.c:115 /v6.1-rc2/mm/kasan/generic.c:128 /v6.1-rc2/mm/kasan/generic.c:15=
-9 /v6.1-rc2/mm/kasan/generic.c:180 /v6.1-rc2/mm/kasan/generic.c:189)
-> __kasan_check_read (/v6.1-rc2/mm/kasan/shadow.c:31)
-> l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluetoo=
-th/l2cap_sock.c:1281)
-> l2cap_sock_teardown_cb (/v6.1-rc2/./include/net/bluetooth/bluetooth.h:304=
- /v6.1-rc2/net/bluetooth/l2cap_sock.c:1475 /v6.1-rc2/net/bluetooth/l2cap_so=
-ck.c:1612)
-> l2cap_chan_close (/v6.1-rc2/net/bluetooth/l2cap_core.c:885)
-> ? __kasan_check_write (/v6.1-rc2/mm/kasan/shadow.c:37)
-> l2cap_sock_shutdown (/v6.1-rc2/./include/linux/kcsan-checks.h:231 /v6.1-r=
-c2/./include/net/sock.h:2470 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1321 /v6.=
-1-rc2/net/bluetooth/l2cap_sock.c:1377)
-> ? _raw_write_unlock (/v6.1-rc2/./include/asm-generic/qrwlock.h:122 /v6.1-=
-rc2/./include/linux/rwlock_api_smp.h:225 /v6.1-rc2/kernel/locking/spinlock.=
-c:342)
-> l2cap_sock_release (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1453)
-> sock_close (/v6.1-rc2/net/socket.c:1382)
-> ? sock_mmap (/v6.1-rc2/net/socket.c:?)
-> __fput (/v6.1-rc2/./include/linux/fsnotify.h:? /v6.1-rc2/./include/linux/=
-fsnotify.h:99 /v6.1-rc2/./include/linux/fsnotify.h:341 /v6.1-rc2/fs/file_ta=
-ble.c:306)
-> ____fput (/v6.1-rc2/fs/file_table.c:348)
-> task_work_run (/v6.1-rc2/kernel/task_work.c:165)
-> do_exit (/v6.1-rc2/kernel/exit.c:?)
-> do_group_exit (/v6.1-rc2/kernel/exit.c:943)
+--===============4285628920454705461==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-OK, now compare this trace with what you put in your changelog...
+This is automated email and please do not reply to this email!
 
-Very different problem.
+Dear submitter,
 
-Context 1:
-l2cap_sock_cleanup_listen();
-  // context switched
-  l2cap_chan_lock(chan);
-  l2cap_sock_kill(sk); // <-- sk is already freed below
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=718117
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.47 seconds
+GitLint                       FAIL      0.59 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      32.41 seconds
+CheckAllWarning               PASS      34.42 seconds
+CheckSparse                   WARNING   39.28 seconds
+CheckSmatch                   WARNING   107.00 seconds
+BuildKernel32                 PASS      30.51 seconds
+TestRunnerSetup               PASS      438.93 seconds
+TestRunner_l2cap-tester       PASS      16.68 seconds
+TestRunner_iso-tester         PASS      17.51 seconds
+TestRunner_bnep-tester        PASS      5.83 seconds
+TestRunner_mgmt-tester        PASS      113.14 seconds
+TestRunner_rfcomm-tester      PASS      9.24 seconds
+TestRunner_sco-tester         PASS      8.45 seconds
+TestRunner_ioctl-tester       PASS      9.90 seconds
+TestRunner_mesh-tester        PASS      7.34 seconds
+TestRunner_smp-tester         PASS      8.30 seconds
+TestRunner_userchan-tester    PASS      6.11 seconds
+IncrementalBuild              PASS      28.50 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: btrtl: Firmware format v2 support
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+24: B1 Line exceeds max length (83>80): "> I rather use an skb for parsing the data instead of parsing via pointer directly,"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btrtl.c:882:22: warning: cast to restricted __le16drivers/bluetooth/btrtl.c:888:27: warning: cast to restricted __le16drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warning: array of flexible structures
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warning: array of flexible structures
 
 
-On current linux tree, all l2cap_sock_kill() callers already checked sk !=
-=3D NULL
+---
+Regards,
+Linux Bluetooth
 
-Do you have a repro ?
 
-> ? __kasan_check_write (/v6.1-rc2/mm/kasan/shadow.c:37)
-> get_signal (/v6.1-rc2/kernel/signal.c:2863)
-> ? _raw_spin_unlock (/v6.1-rc2/./include/linux/spinlock_api_smp.h:142 /v6.=
-1-rc2/kernel/locking/spinlock.c:186)
-> ? finish_task_switch (/v6.1-rc2/./arch/x86/include/asm/current.h:15 /v6.1=
--rc2/kernel/sched/core.c:5065)
-> arch_do_signal_or_restart (/v6.1-rc2/arch/x86/kernel/signal.c:869)
-> exit_to_user_mode_prepare (/v6.1-rc2/kernel/entry/common.c:383)
-> syscall_exit_to_user_mode (/v6.1-rc2/./arch/x86/include/asm/current.h:15 =
-/v6.1-rc2/kernel/entry/common.c:261 /v6.1-rc2/kernel/entry/common.c:283 /v6=
-.1-rc2/kernel/entry/common.c:296)
-> do_syscall_64 (/v6.1-rc2/arch/x86/entry/common.c:50 /v6.1-rc2/arch/x86/en=
-try/common.c:80)
-> ? sysvec_apic_timer_interrupt (/v6.1-rc2/arch/x86/kernel/apic/apic.c:1107=
-)
-> entry_SYSCALL_64_after_hwframe (/v6.1-rc2/arch/x86/entry/entry_64.S:120)
-> RIP: 0033:0x7f66c14db970
-> Code: Unable to access opcode bytes at 0x7f66c14db946.
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> RSP: 002b:00007ffe166a5508 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> RAX: 0000000000000013 RBX: 0000000000000013 RCX: 00007f66c14db970
-> RDX: 0000000000000013 RSI: 00007ffe166a56d0 RDI: 0000000000000002
-> RBP: 00007ffe166a56d0 R08: 00007f66c1a28440 R09: 0000000000000013
-> R10: 0000000000000078 R11: 0000000000000246 R12: 0000000000000013
-> R13: 0000000000000001 R14: 00007f66c179a520 R15: 0000000000000013
->  </TASK>
-> Allocated by task 77:
-> kasan_set_track (/v6.1-rc2/mm/kasan/common.c:51)
-> kasan_save_alloc_info (/v6.1-rc2/mm/kasan/generic.c:432 /v6.1-rc2/mm/kasa=
-n/generic.c:498)
-> __kasan_kmalloc (/v6.1-rc2/mm/kasan/common.c:356)
-> __kmalloc (/v6.1-rc2/mm/slab_common.c:943 /v6.1-rc2/mm/slab_common.c:968)
-> sk_prot_alloc (/v6.1-rc2/net/core/sock.c:2028)
-> sk_alloc (/v6.1-rc2/net/core/sock.c:2083)
-> l2cap_sock_alloc (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1903)
-> l2cap_sock_new_connection_cb (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1504)
-> l2cap_connect (/v6.1-rc2/net/bluetooth/l2cap_core.c:102 /v6.1-rc2/net/blu=
-etooth/l2cap_core.c:4277)
-> l2cap_bredr_sig_cmd (/v6.1-rc2/net/bluetooth/l2cap_core.c:5634 /v6.1-rc2/=
-net/bluetooth/l2cap_core.c:5927)
-> l2cap_recv_frame (/v6.1-rc2/net/bluetooth/l2cap_core.c:7851 /v6.1-rc2/net=
-/bluetooth/l2cap_core.c:7919)
-> l2cap_recv_acldata (/v6.1-rc2/net/bluetooth/l2cap_core.c:8601 /v6.1-rc2/n=
-et/bluetooth/l2cap_core.c:8631)
-> hci_rx_work (/v6.1-rc2/./include/net/bluetooth/hci_core.h:1121 /v6.1-rc2/=
-net/bluetooth/hci_core.c:3937 /v6.1-rc2/net/bluetooth/hci_core.c:4189)
-> process_one_work (/v6.1-rc2/kernel/workqueue.c:2225)
-> worker_thread (/v6.1-rc2/kernel/workqueue.c:816 /v6.1-rc2/kernel/workqueu=
-e.c:2107 /v6.1-rc2/kernel/workqueue.c:2159 /v6.1-rc2/kernel/workqueue.c:240=
-8)
-> kthread (/v6.1-rc2/kernel/kthread.c:361)
-> ret_from_fork (/v6.1-rc2/arch/x86/entry/entry_64.S:306)
-> Freed by task 52:
-> kasan_set_track (/v6.1-rc2/mm/kasan/common.c:51)
-> kasan_save_free_info (/v6.1-rc2/mm/kasan/generic.c:508)
-> ____kasan_slab_free (/v6.1-rc2/./include/linux/slub_def.h:164 /v6.1-rc2/m=
-m/kasan/common.c:214)
-> __kasan_slab_free (/v6.1-rc2/mm/kasan/common.c:244)
-> slab_free_freelist_hook (/v6.1-rc2/mm/slub.c:381 /v6.1-rc2/mm/slub.c:1747=
-)
-> __kmem_cache_free (/v6.1-rc2/mm/slub.c:3656 /v6.1-rc2/mm/slub.c:3674)
-> kfree (/v6.1-rc2/mm/slab_common.c:1007)
-> __sk_destruct (/v6.1-rc2/./include/linux/cred.h:288 /v6.1-rc2/net/core/so=
-ck.c:2147)
-> __sk_free (/v6.1-rc2/./include/linux/sock_diag.h:87 /v6.1-rc2/net/core/so=
-ck.c:2175)
-> sk_free (/v6.1-rc2/./include/linux/instrumented.h:? /v6.1-rc2/./include/l=
-inux/atomic/atomic-instrumented.h:176 /v6.1-rc2/./include/linux/refcount.h:=
-272 /v6.1-rc2/./include/linux/refcount.h:315 /v6.1-rc2/./include/linux/refc=
-ount.h:333 /v6.1-rc2/net/core/sock.c:2188)
-> l2cap_sock_kill (/v6.1-rc2/./include/net/bluetooth/bluetooth.h:286 /v6.1-=
-rc2/net/bluetooth/l2cap_sock.c:1284)
-> l2cap_sock_close_cb (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1576)
-> l2cap_chan_timeout (/v6.1-rc2/./include/net/bluetooth/bluetooth.h:296 /v6=
-.1-rc2/net/bluetooth/l2cap_core.c:462)
-> process_one_work (/v6.1-rc2/kernel/workqueue.c:2225)
-> worker_thread (/v6.1-rc2/kernel/workqueue.c:816 /v6.1-rc2/kernel/workqueu=
-e.c:2107 /v6.1-rc2/kernel/workqueue.c:2159 /v6.1-rc2/kernel/workqueue.c:240=
-8)
-> kthread (/v6.1-rc2/kernel/kthread.c:361)
-> ret_from_fork (/v6.1-rc2/arch/x86/entry/entry_64.S:306)
-> The buggy address belongs to the object at ffff88800f7f4000
->  which belongs to the cache kmalloc-1k of size 1024
-> The buggy address is located 96 bytes inside of
->  1024-byte region [ffff88800f7f4000, ffff88800f7f4400)
-> The buggy address belongs to the physical page:
-> page:00000000b8d65c1d refcount:1 mapcount:0 mapping:0000000000000000 inde=
-x:0xffff88800f7f6800 pfn:0xf7f4
-> head:00000000b8d65c1d order:2 compound_mapcount:0 compound_pincount:0
-> flags: 0xfffffc0010200(slab|head|node=3D0|zone=3D1|lastcpupid=3D0x1fffff)
-> raw: 000fffffc0010200 ffffea0000993408 ffffea0000991308 ffff888005841dc0
-> raw: ffff88800f7f6800 0000000000080002 00000001ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> Memory state around the buggy address:
->  ffff88800f7f3f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->  ffff88800f7f3f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> >ffff88800f7f4000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                                                        ^
->  ffff88800f7f4080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff88800f7f4100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> > >
-> > > Context 2:
-> > > l2cap_chan_timeout();
-> > >   l2cap_chan_lock(chan);
-> > >   chan->ops->close(chan);
-> > >     l2cap_sock_close_cb()
-> > >     l2cap_sock_kill(sk); // <-- sk is freed here
-> > >   l2cap_chan_unlock(chan);
-> > >
-> >
-> > Please add a Fixes: tag
->
-> Fixes: 6c08fc896b60 ("Bluetooth: Fix refcount use-after-free issue")
-> > > Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
-> > > ---
-> > >  net/bluetooth/l2cap_sock.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > > index ca8f07f35..657704059 100644
-> > > --- a/net/bluetooth/l2cap_sock.c
-> > > +++ b/net/bluetooth/l2cap_sock.c
-> > > @@ -1245,7 +1245,7 @@ static int l2cap_sock_recvmsg(struct socket *so=
-ck, struct msghdr *msg,
-> > >   */
-> > >  static void l2cap_sock_kill(struct sock *sk)
-> > >  {
-> > > -       if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
-> > > +       if (!sk || !sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
-> > >                 return;
-> > >
-> > >         BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
-> > > --
-> > > 2.25.1
-> > >
+--===============4285628920454705461==--
