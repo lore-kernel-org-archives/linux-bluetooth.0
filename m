@@ -2,76 +2,99 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D173C636D7
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 04:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C57E5C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 09:07:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230375AbjBBEzd (ORCPT
+        id S232318AbjBBJH6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Feb 2023 23:55:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43486 "EHLO
+        Thu, 2 Feb 2023 04:07:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230048AbjBBEzc (ORCPT
+        with ESMTP id S229602AbjBBJH5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Feb 2023 23:55:32 -0500
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E81762780
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Feb 2023 20:55:29 -0800 (PST)
-Received: by mail-io1-f71.google.com with SMTP id d24-20020a5d9bd8000000b006ee2ddf6d77so545166ion.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Feb 2023 20:55:29 -0800 (PST)
+        Thu, 2 Feb 2023 04:07:57 -0500
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19DC5457E;
+        Thu,  2 Feb 2023 01:07:54 -0800 (PST)
+Received: by mail-il1-f169.google.com with SMTP id k12so511989ilv.10;
+        Thu, 02 Feb 2023 01:07:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xCXSBKHFGkOitij945KHNCtiG7h7wsgd2ox/b52l/XU=;
-        b=kWRCrcIAoK5rv568xYbAMLgeR/S8RjICGHe3QRe9vcoTXZFsxFa6Le8LTD6Jhp8FHL
-         5OWf+qSaJ67Ly1vucC55x0G0Azdel7boGNZSTrnCU3Og16zGZ/8F9q37s9IeocfQu12M
-         BysX212OayP6Xf2rfQ3xNPiZSz2b8FxTJxcRPdbjwB42W2aFXuaHJQJLrV7eTP22IJiW
-         s7gjclb7o/7M/6mzyM62iWTt+F+GIol3IRCqiLy4FUu15iLLhtusSnQ8X0maVBqQ2quq
-         k2CwFBFukVk+QyqyL6KmKFx4sOaiivvzNUNEqhToShVQpv5XL+7UvZ1cYThzMNFPT7O1
-         fiwQ==
-X-Gm-Message-State: AO0yUKUnEjsHgUyoZZ+1yhgpjFL9V/RHVcw6tY0yNRY8sPZEv2wxE7vl
-        KfC3i+6ybOhKo4Zo36PndfrYBprMjAZ3aPEQheYqZ+PmOgrz
-X-Google-Smtp-Source: AK7set+N2Jjm/A0Fcquix/C4kGyTpSc3SJa3KNEpZGWx5tPfcEn1CG5T8fQ71o0Ao+DdWsZSutWOpYedoho79O8kyl9cOTdEQUKN
-MIME-Version: 1.0
-X-Received: by 2002:a92:b302:0:b0:310:c8e5:a1a6 with SMTP id
- p2-20020a92b302000000b00310c8e5a1a6mr1184080ilh.129.1675313728754; Wed, 01
- Feb 2023 20:55:28 -0800 (PST)
-Date:   Wed, 01 Feb 2023 20:55:28 -0800
-In-Reply-To: <0000000000005e857005db658b71@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b09dc705f3b05f9b@google.com>
-Subject: Re: [syzbot] INFO: task hung in rfcomm_process_sessions (2)
-From:   syzbot <syzbot+d761775dff24be3ad4be@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, hdanton@sina.com,
-        johan.hedberg@gmail.com, kuba@kernel.org,
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zIRdF85vz4XW6DcLekDt+urDLZMgRkhDxffDT09XGig=;
+        b=v3/AjWBkPGYl8kZF6pnz+36Rs5AN0jHmUCERNFHTjZL+/aGN640pU7HIdm3j734V6i
+         Miy1Tcc3w9MfVzJyV8/iEFWWOO3xGh8EzbALzUYhUhD8VwjAKDMpjNO7O6G52etYmiFn
+         XWuqWZT7/M7y9XWEOHnL5f85f6aOxY7gS5x/L9ypzzBGKMlxH6TTZnIew14Vvdy+PvBs
+         yvkq0SWRG8WidfW1jUh4BSbNmZ4u8CfNNtTTeMPwqaiAURiLEJTzA0qONRvJ5FAer6Mk
+         SKzmpouLyjDAih6P8z3qEctda0plgayGq96lZOtyDWwqsfXqovXFOggjPaCsUGRsEWuQ
+         5M9w==
+X-Gm-Message-State: AO0yUKXbzENfXT0UsCFweJ1wnERo9ablNIXCQ83wIvQ2WH5q2P105Q/N
+        +p1KJDq17S7c0R9yalFC0X8=
+X-Google-Smtp-Source: AK7set8lXx3igPuv310qG/qtYBdKrnlNfIecy7hsXLIWasL58nylKiiZ/rDT5vvQZvxmn8FET4zRAw==
+X-Received: by 2002:a92:c56a:0:b0:310:eb55:3856 with SMTP id b10-20020a92c56a000000b00310eb553856mr1376591ilj.9.1675328873930;
+        Thu, 02 Feb 2023 01:07:53 -0800 (PST)
+Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
+        by smtp.googlemail.com with ESMTPSA id x12-20020a92dc4c000000b003110c59e2easm2060637ilq.37.2023.02.02.01.07.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 01:07:53 -0800 (PST)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+To:     happiness.sung.woo@gmail.com
+Cc:     benquike@gmail.com, davem@davemloft.net, daveti@purdue.edu,
+        edumazet@google.com, johan.hedberg@gmail.com, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com, yinghsu@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, wuruoyu@me.com, Sungwoo Kim <iam@sung-woo.kim>
+Subject: [PATCH] Bluetooth: L2CAP: Fix use-after-free
+Date:   Thu,  2 Feb 2023 04:05:10 -0500
+Message-Id: <20230202090509.2774062-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230123091708.4112735-1-git@sung-woo.kim>
+References: <20230123091708.4112735-1-git@sung-woo.kim>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+Due to the race condition between l2cap_sock_cleanup_listen and
+l2cap_sock_close_cb, l2cap_sock_kill can receive already freed sk,
+resulting in use-after-free inside l2cap_sock_kill.
+This patch prevent this by adding a null check in l2cap_sock_kill.
 
-commit 1d80d57ffcb55488f0ec0b77928d4f82d16b6a90
-Author: Ying Hsu <yinghsu@chromium.org>
-Date:   Wed Jan 11 03:16:14 2023 +0000
+Context 1:
+l2cap_sock_cleanup_listen();
+  // context switched
+  l2cap_chan_lock(chan);
+  l2cap_sock_kill(sk); // <-- sk is already freed below
 
-    Bluetooth: Fix possible deadlock in rfcomm_sk_state_change
+Context 2:
+l2cap_chan_timeout();
+  l2cap_chan_lock(chan);
+  chan->ops->close(chan);
+    l2cap_sock_close_cb()
+    l2cap_sock_kill(sk); // <-- sk is freed here
+  l2cap_chan_unlock(chan);
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=154b77b5480000
-start commit:   d888c83fcec7 fs: fix fd table size alignment properly
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=69c8957f4ac2dea6
-dashboard link: https://syzkaller.appspot.com/bug?extid=d761775dff24be3ad4be
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=162ca1fd700000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1036182d700000
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+ net/bluetooth/l2cap_sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If the result looks correct, please mark the issue as fixed by replying with:
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ca8f07f35..657704059 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1245,7 +1245,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+  */
+ static void l2cap_sock_kill(struct sock *sk)
+ {
+-	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
++	if (!sk || !sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+ 		return;
+ 
+ 	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+-- 
+2.25.1
 
-#syz fix: Bluetooth: Fix possible deadlock in rfcomm_sk_state_change
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
