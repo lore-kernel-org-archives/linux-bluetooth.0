@@ -2,642 +2,232 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3258EC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 11:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC19C636D3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 12:09:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232088AbjBBLqi (ORCPT
+        id S231752AbjBBMJ1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Feb 2023 06:46:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
+        Thu, 2 Feb 2023 07:09:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbjBBLqh (ORCPT
+        with ESMTP id S231725AbjBBMJ0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Feb 2023 06:46:37 -0500
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C06B8C43C;
-        Thu,  2 Feb 2023 03:46:34 -0800 (PST)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 312BkILp9018725, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 312BkILp9018725
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
-        Thu, 2 Feb 2023 19:46:18 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.9; Thu, 2 Feb 2023 19:46:24 +0800
-Received: from localhost (172.21.132.123) by RTEXMBS03.realtek.com.tw
- (172.21.6.96) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Thu, 2 Feb 2023
- 19:46:23 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <alex_lu@realsil.com.cn>, <allen_chen@realsil.com.cn>,
-        <hildawu@realtek.com>, <max.chou@realtek.com>
-Subject: [PATCH v2] Bluetooth: btrtl: Firmware format v2 support
-Date:   Thu, 2 Feb 2023 19:46:14 +0800
-Message-ID: <20230202114614.53907-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 2 Feb 2023 07:09:26 -0500
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15E2E89367;
+        Thu,  2 Feb 2023 04:09:24 -0800 (PST)
+Received: by mail-io1-f41.google.com with SMTP id y2so647810iot.4;
+        Thu, 02 Feb 2023 04:09:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3yqTjoiurUNw6iqh9W7t7GhYeJehAa2SRb6L8gDpCOM=;
+        b=Bsg3ixvJWp0Em5RjlTrKNtLOX0ZC5lx/Rc3nNG7RPaT/OtwLTBQxFIJl2JNKb6Jl+E
+         xoTKIvcUzlzUwuSXrjlqSZHw1O3iptU6RhI22n/OzSKTOy60Ms4/Qf7V6mcYskfmgCkN
+         s5fvymOOyURpIRqY1Jig/UAuu7MYef9WVW2RtvK1Kfdyv6l2ia6xH3yWS9EqSaiDhDsW
+         6ra+535kHg+TRvARVg0CusV8XjhTcZ14LxfsR4QQ2egH2nNVsu4CLtW7fvHb8fl+l3Mq
+         eAkueQCHeid5nLKK+4tQKJNIEZAXQOZRGlHHDAZy6FSsj5/jzl6/ZcUXxDJ7VxeuhjOu
+         sOOw==
+X-Gm-Message-State: AO0yUKUSMygaqBRos658Y0X3laZu/pvGJNqrsB7l/P9SiaAr3lFYzQ3G
+        4kEi7oj5vZERk1X8bfksAZ1jMSr+n+p5mQ==
+X-Google-Smtp-Source: AK7set/9ESYYv6tvDVUzrWC+jHT3ARDbiwbIrf6ZCRppJHxvXsPr55Y7CDsrH4Cy0xNnPFa7/C0rkw==
+X-Received: by 2002:a05:6602:2748:b0:704:c2fe:d923 with SMTP id b8-20020a056602274800b00704c2fed923mr1466535ioe.2.1675339763002;
+        Thu, 02 Feb 2023 04:09:23 -0800 (PST)
+Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
+        by smtp.googlemail.com with ESMTPSA id o17-20020a056602125100b0071b3d353401sm3894809iou.33.2023.02.02.04.09.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 04:09:22 -0800 (PST)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+To:     edumazet@google.com
+Cc:     benquike@gmail.com, davem@davemloft.net, daveti@purdue.edu,
+        happiness.sung.woo@gmail.com, iam@sung-woo.kim,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, wuruoyu@me.com
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free
+Date:   Thu,  2 Feb 2023 07:09:02 -0500
+Message-Id: <20230202120902.2827191-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CANn89i+hAht=g1F6kjPfq8eO4j6-2WEE+CNtRtq1S4UnwXEQaw@mail.gmail.com>
+References: <CANn89i+hAht=g1F6kjPfq8eO4j6-2WEE+CNtRtq1S4UnwXEQaw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.21.132.123]
-X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
- RTEXMBS03.realtek.com.tw (172.21.6.96)
-X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/02/2023 11:14:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?utf-8?B?Q2xlYW4sIGJhc2VzOiAyMDIzLzIvMiDkuIrljYggMDk6MzM6MDA=?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+On Thu, Feb 2, 2023 at 4:26 AM Eric Dumazet <edumazet@google.com> wrote:
+>
+> On Thu, Feb 2, 2023 at 10:07 AM Sungwoo Kim <iam@sung-woo.kim> wrote:
+> >
+> > Due to the race condition between l2cap_sock_cleanup_listen and
+> > l2cap_sock_close_cb, l2cap_sock_kill can receive already freed sk,
+> > resulting in use-after-free inside l2cap_sock_kill.
+> > This patch prevent this by adding a null check in l2cap_sock_kill.
+> >
+> > Context 1:
+> > l2cap_sock_cleanup_listen();
+> >   // context switched
+> >   l2cap_chan_lock(chan);
+> >   l2cap_sock_kill(sk); // <-- sk is already freed below
+>
+> But sk is used in l2cap_sock_cleanup_listen()
+> and should not be NULL...
+>
+> while ((sk = bt_accept_dequeue(parent, NULL))) {
+>   ...
+>   l2cap_sock_kill(sk);
+>   ..
+> }
+>
+> It would help if you send us a stack trace ...
 
-Realtek changes the format for the firmware file as v2. The driver
-should implement the patch to extract the firmware data from the
-firmware file.
-It's compatible with the both previous format(v1) and v2.
+Here is the stack trace and l2cap_sock.c:
+https://gist.github.com/swkim101/5c3b8cb7c7d7172aef23810c9412f323
 
-Signed-off-by: Allen Chen <allen_chen@realsil.com.cn>
-Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
-Tested-by: Hilda Wu <hildawu@realtek.com>
-Signed-off-by: Max Chou <max.chou@realtek.com>
+==================================================================
+BUG: KASAN: use-after-free in l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1281) 
+Read of size 8 at addr ffff88800f7f4060 by task l2cap-server/1764
+CPU: 0 PID: 1764 Comm: l2cap-server Not tainted 6.1.0-rc2 #129
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+Call Trace:
+ <TASK>
+dump_stack_lvl (/v6.1-rc2/lib/dump_stack.c:105) 
+print_address_description+0x7e/0x360 
+print_report (/v6.1-rc2/mm/kasan/report.c:187 /v6.1-rc2/mm/kasan/report.c:389) 
+? __virt_addr_valid (/v6.1-rc2/./include/linux/mmzone.h:1855 /v6.1-rc2/arch/x86/mm/physaddr.c:65) 
+? kasan_complete_mode_report_info (/v6.1-rc2/mm/kasan/report_generic.c:104 /v6.1-rc2/mm/kasan/report_generic.c:127 /v6.1-rc2/mm/kasan/report_generic.c:136) 
+? l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1281) 
+kasan_report (/v6.1-rc2/mm/kasan/report.c:? /v6.1-rc2/mm/kasan/report.c:484) 
+? l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1281) 
+kasan_check_range (/v6.1-rc2/mm/kasan/generic.c:85 /v6.1-rc2/mm/kasan/generic.c:115 /v6.1-rc2/mm/kasan/generic.c:128 /v6.1-rc2/mm/kasan/generic.c:159 /v6.1-rc2/mm/kasan/generic.c:180 /v6.1-rc2/mm/kasan/generic.c:189) 
+__kasan_check_read (/v6.1-rc2/mm/kasan/shadow.c:31) 
+l2cap_sock_kill (/v6.1-rc2/./include/net/sock.h:986 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1281) 
+l2cap_sock_teardown_cb (/v6.1-rc2/./include/net/bluetooth/bluetooth.h:304 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1475 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1612) 
+l2cap_chan_close (/v6.1-rc2/net/bluetooth/l2cap_core.c:885) 
+? __kasan_check_write (/v6.1-rc2/mm/kasan/shadow.c:37) 
+l2cap_sock_shutdown (/v6.1-rc2/./include/linux/kcsan-checks.h:231 /v6.1-rc2/./include/net/sock.h:2470 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1321 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1377) 
+? _raw_write_unlock (/v6.1-rc2/./include/asm-generic/qrwlock.h:122 /v6.1-rc2/./include/linux/rwlock_api_smp.h:225 /v6.1-rc2/kernel/locking/spinlock.c:342) 
+l2cap_sock_release (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1453) 
+sock_close (/v6.1-rc2/net/socket.c:1382) 
+? sock_mmap (/v6.1-rc2/net/socket.c:?) 
+__fput (/v6.1-rc2/./include/linux/fsnotify.h:? /v6.1-rc2/./include/linux/fsnotify.h:99 /v6.1-rc2/./include/linux/fsnotify.h:341 /v6.1-rc2/fs/file_table.c:306) 
+____fput (/v6.1-rc2/fs/file_table.c:348) 
+task_work_run (/v6.1-rc2/kernel/task_work.c:165) 
+do_exit (/v6.1-rc2/kernel/exit.c:?) 
+do_group_exit (/v6.1-rc2/kernel/exit.c:943) 
+? __kasan_check_write (/v6.1-rc2/mm/kasan/shadow.c:37) 
+get_signal (/v6.1-rc2/kernel/signal.c:2863) 
+? _raw_spin_unlock (/v6.1-rc2/./include/linux/spinlock_api_smp.h:142 /v6.1-rc2/kernel/locking/spinlock.c:186) 
+? finish_task_switch (/v6.1-rc2/./arch/x86/include/asm/current.h:15 /v6.1-rc2/kernel/sched/core.c:5065) 
+arch_do_signal_or_restart (/v6.1-rc2/arch/x86/kernel/signal.c:869) 
+exit_to_user_mode_prepare (/v6.1-rc2/kernel/entry/common.c:383) 
+syscall_exit_to_user_mode (/v6.1-rc2/./arch/x86/include/asm/current.h:15 /v6.1-rc2/kernel/entry/common.c:261 /v6.1-rc2/kernel/entry/common.c:283 /v6.1-rc2/kernel/entry/common.c:296) 
+do_syscall_64 (/v6.1-rc2/arch/x86/entry/common.c:50 /v6.1-rc2/arch/x86/entry/common.c:80) 
+? sysvec_apic_timer_interrupt (/v6.1-rc2/arch/x86/kernel/apic/apic.c:1107) 
+entry_SYSCALL_64_after_hwframe (/v6.1-rc2/arch/x86/entry/entry_64.S:120) 
+RIP: 0033:0x7f66c14db970
+Code: Unable to access opcode bytes at 0x7f66c14db946.
 
----
-Changes in v2:
-- Use iovec pull data function as rtl_iov_pull_data() to parse data.
+Code starting with the faulting instruction
+===========================================
+RSP: 002b:00007ffe166a5508 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: 0000000000000013 RBX: 0000000000000013 RCX: 00007f66c14db970
+RDX: 0000000000000013 RSI: 00007ffe166a56d0 RDI: 0000000000000002
+RBP: 00007ffe166a56d0 R08: 00007f66c1a28440 R09: 0000000000000013
+R10: 0000000000000078 R11: 0000000000000246 R12: 0000000000000013
+R13: 0000000000000001 R14: 00007f66c179a520 R15: 0000000000000013
+ </TASK>
+Allocated by task 77:
+kasan_set_track (/v6.1-rc2/mm/kasan/common.c:51) 
+kasan_save_alloc_info (/v6.1-rc2/mm/kasan/generic.c:432 /v6.1-rc2/mm/kasan/generic.c:498) 
+__kasan_kmalloc (/v6.1-rc2/mm/kasan/common.c:356) 
+__kmalloc (/v6.1-rc2/mm/slab_common.c:943 /v6.1-rc2/mm/slab_common.c:968) 
+sk_prot_alloc (/v6.1-rc2/net/core/sock.c:2028) 
+sk_alloc (/v6.1-rc2/net/core/sock.c:2083) 
+l2cap_sock_alloc (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1903) 
+l2cap_sock_new_connection_cb (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1504) 
+l2cap_connect (/v6.1-rc2/net/bluetooth/l2cap_core.c:102 /v6.1-rc2/net/bluetooth/l2cap_core.c:4277) 
+l2cap_bredr_sig_cmd (/v6.1-rc2/net/bluetooth/l2cap_core.c:5634 /v6.1-rc2/net/bluetooth/l2cap_core.c:5927) 
+l2cap_recv_frame (/v6.1-rc2/net/bluetooth/l2cap_core.c:7851 /v6.1-rc2/net/bluetooth/l2cap_core.c:7919) 
+l2cap_recv_acldata (/v6.1-rc2/net/bluetooth/l2cap_core.c:8601 /v6.1-rc2/net/bluetooth/l2cap_core.c:8631) 
+hci_rx_work (/v6.1-rc2/./include/net/bluetooth/hci_core.h:1121 /v6.1-rc2/net/bluetooth/hci_core.c:3937 /v6.1-rc2/net/bluetooth/hci_core.c:4189) 
+process_one_work (/v6.1-rc2/kernel/workqueue.c:2225) 
+worker_thread (/v6.1-rc2/kernel/workqueue.c:816 /v6.1-rc2/kernel/workqueue.c:2107 /v6.1-rc2/kernel/workqueue.c:2159 /v6.1-rc2/kernel/workqueue.c:2408) 
+kthread (/v6.1-rc2/kernel/kthread.c:361) 
+ret_from_fork (/v6.1-rc2/arch/x86/entry/entry_64.S:306) 
+Freed by task 52:
+kasan_set_track (/v6.1-rc2/mm/kasan/common.c:51) 
+kasan_save_free_info (/v6.1-rc2/mm/kasan/generic.c:508) 
+____kasan_slab_free (/v6.1-rc2/./include/linux/slub_def.h:164 /v6.1-rc2/mm/kasan/common.c:214) 
+__kasan_slab_free (/v6.1-rc2/mm/kasan/common.c:244) 
+slab_free_freelist_hook (/v6.1-rc2/mm/slub.c:381 /v6.1-rc2/mm/slub.c:1747) 
+__kmem_cache_free (/v6.1-rc2/mm/slub.c:3656 /v6.1-rc2/mm/slub.c:3674) 
+kfree (/v6.1-rc2/mm/slab_common.c:1007) 
+__sk_destruct (/v6.1-rc2/./include/linux/cred.h:288 /v6.1-rc2/net/core/sock.c:2147) 
+__sk_free (/v6.1-rc2/./include/linux/sock_diag.h:87 /v6.1-rc2/net/core/sock.c:2175) 
+sk_free (/v6.1-rc2/./include/linux/instrumented.h:? /v6.1-rc2/./include/linux/atomic/atomic-instrumented.h:176 /v6.1-rc2/./include/linux/refcount.h:272 /v6.1-rc2/./include/linux/refcount.h:315 /v6.1-rc2/./include/linux/refcount.h:333 /v6.1-rc2/net/core/sock.c:2188) 
+l2cap_sock_kill (/v6.1-rc2/./include/net/bluetooth/bluetooth.h:286 /v6.1-rc2/net/bluetooth/l2cap_sock.c:1284) 
+l2cap_sock_close_cb (/v6.1-rc2/net/bluetooth/l2cap_sock.c:1576) 
+l2cap_chan_timeout (/v6.1-rc2/./include/net/bluetooth/bluetooth.h:296 /v6.1-rc2/net/bluetooth/l2cap_core.c:462) 
+process_one_work (/v6.1-rc2/kernel/workqueue.c:2225) 
+worker_thread (/v6.1-rc2/kernel/workqueue.c:816 /v6.1-rc2/kernel/workqueue.c:2107 /v6.1-rc2/kernel/workqueue.c:2159 /v6.1-rc2/kernel/workqueue.c:2408) 
+kthread (/v6.1-rc2/kernel/kthread.c:361) 
+ret_from_fork (/v6.1-rc2/arch/x86/entry/entry_64.S:306) 
+The buggy address belongs to the object at ffff88800f7f4000
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 96 bytes inside of
+ 1024-byte region [ffff88800f7f4000, ffff88800f7f4400)
+The buggy address belongs to the physical page:
+page:00000000b8d65c1d refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88800f7f6800 pfn:0xf7f4
+head:00000000b8d65c1d order:2 compound_mapcount:0 compound_pincount:0
+flags: 0xfffffc0010200(slab|head|node=0|zone=1|lastcpupid=0x1fffff)
+raw: 000fffffc0010200 ffffea0000993408 ffffea0000991308 ffff888005841dc0
+raw: ffff88800f7f6800 0000000000080002 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+Memory state around the buggy address:
+ ffff88800f7f3f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff88800f7f3f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff88800f7f4000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                       ^
+ ffff88800f7f4080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88800f7f4100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
----
+> >
+> > Context 2:
+> > l2cap_chan_timeout();
+> >   l2cap_chan_lock(chan);
+> >   chan->ops->close(chan);
+> >     l2cap_sock_close_cb()
+> >     l2cap_sock_kill(sk); // <-- sk is freed here
+> >   l2cap_chan_unlock(chan);
+> >
+>
+> Please add a Fixes: tag
 
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Sent: Friday, January 20, 2023 3:55 AM
-
-> I rather use an skb for parsing the data instead of parsing via pointer directly,
-> that way you can use the likes of skb_pull_data which makes the code a lot
-> simpler to follow and less prone to mistakes accessing data outside the buffer
-> area.
-
-It’s more complex for data parsing to use an skb.
-If so, it will add alloc skbs for the each sections, hence adding memcpy()
-and the management for the each skbs are necessary.
-In the v2 patch, use iovec pull data function to parse data.
-It's referred by util_iov_pull() from Bluez.
----
- drivers/bluetooth/btrtl.c | 353 +++++++++++++++++++++++++++++++++-----
- drivers/bluetooth/btrtl.h |  51 ++++++
- 2 files changed, 364 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 69c3fe649ca7..8adb1d115435 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -18,6 +18,7 @@
- #define VERSION "0.1"
- 
- #define RTL_EPATCH_SIGNATURE	"Realtech"
-+#define RTL_EPATCH_SIGNATURE_V2	"RTBTCore"
- #define RTL_ROM_LMP_8723A	0x1200
- #define RTL_ROM_LMP_8723B	0x8723
- #define RTL_ROM_LMP_8821A	0x8821
-@@ -38,6 +39,14 @@
- 	.hci_ver = (hciv), \
- 	.hci_bus = (bus)
- 
-+#define	RTL_CHIP_SUBVER (&(struct rtl_vendor_cmd) {{0x10, 0x38, 0x04, 0x28, 0x80}})
-+#define	RTL_CHIP_REV    (&(struct rtl_vendor_cmd) {{0x10, 0x3A, 0x04, 0x28, 0x80}})
-+#define	RTL_SEC_PROJ    (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0x0D, 0x00, 0xb0}})
-+
-+#define RTL_PATCH_SNIPPETS		0x01
-+#define RTL_PATCH_DUMMY_HEADER		0x02
-+#define RTL_PATCH_SECURITY_HEADER	0x03
-+
- enum btrtl_chip_id {
- 	CHIP_ID_8723A,
- 	CHIP_ID_8723B,
-@@ -75,6 +84,9 @@ struct btrtl_device_info {
- 	int cfg_len;
- 	bool drop_fw;
- 	int project_id;
-+
-+	u8 key_id;
-+	struct list_head patch_subsecs;
- };
- 
- static const struct id_table ic_id_table[] = {
-@@ -284,6 +296,230 @@ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
- 	return 0;
- }
- 
-+
-+static int btrtl_vendor_read_reg16(struct hci_dev *hdev,
-+				   struct rtl_vendor_cmd *cmd, u8 *rp)
-+{
-+	struct sk_buff *skb;
-+	int err = 0;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc61, sizeof(*cmd), cmd,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		rtl_dev_err(hdev, "RTL: Read reg16 failed (%d)", err);
-+		return err;
-+	}
-+
-+	if (skb->len != 3 || skb->data[0]) {
-+		bt_dev_err(hdev, "RTL: Read reg16 length mismatch");
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	if (rp)
-+		memcpy(rp, skb->data + 1, 2);
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
-+static void *rtl_iov_pull_data(struct rtl_iovec *iov, u32 len)
-+{
-+	void *data = iov->data;
-+
-+	if (iov->len < len)
-+		return NULL;
-+
-+	iov->data += len;
-+	iov->len  -= len;
-+
-+	return data;
-+}
-+
-+static void btrtl_insert_ordered_subsec(struct rtl_subsection *node,
-+					struct btrtl_device_info *btrtl_dev)
-+{
-+	struct list_head *pos;
-+	struct list_head *next;
-+	struct rtl_subsection *subsec;
-+
-+	list_for_each_safe(pos, next, &btrtl_dev->patch_subsecs) {
-+		subsec = list_entry(pos, struct rtl_subsection, list);
-+		if (subsec->prio >= node->prio)
-+			break;
-+	}
-+	__list_add(&node->list, pos->prev, pos);
-+}
-+
-+static int btrtl_parse_section(struct hci_dev *hdev,
-+			       struct btrtl_device_info *btrtl_dev, u32 opcode,
-+			       u8 *data, u32 len)
-+{
-+	struct rtl_section_hdr *hdr;
-+	struct rtl_subsection *subsec;
-+	struct rtl_common_subsec *common_subsec;
-+	struct rtl_sec_hdr *sec_hdr;
-+	int i;
-+	u8 *ptr;
-+	u16 num_subsecs;
-+	u32 subsec_len;
-+	int rc = 0;
-+	struct rtl_iovec iov = {
-+		.data = data,
-+		.len  = len,
-+	};
-+
-+	hdr = rtl_iov_pull_data(&iov, sizeof(*hdr));
-+	if (!hdr)
-+		return -EINVAL;
-+	num_subsecs = le16_to_cpu(hdr->num);
-+
-+	for (i = 0; i < num_subsecs; i++) {
-+		common_subsec = rtl_iov_pull_data(&iov, sizeof(*common_subsec));
-+		if (!common_subsec)
-+			break;
-+		subsec_len = le32_to_cpu(common_subsec->len);
-+
-+		rtl_dev_dbg(hdev, "subsec, eco 0x%02x, len %08x",
-+			    common_subsec->eco, subsec_len);
-+
-+		ptr = rtl_iov_pull_data(&iov, subsec_len);
-+		if (!ptr)
-+			break;
-+
-+		if (common_subsec->eco != btrtl_dev->rom_version + 1)
-+			continue;
-+
-+		switch (opcode) {
-+		case RTL_PATCH_SECURITY_HEADER:
-+			sec_hdr = (void *)common_subsec;
-+			if (sec_hdr->key_id != btrtl_dev->key_id)
-+				continue;
-+			break;
-+		}
-+
-+		subsec = kzalloc(sizeof(*subsec), GFP_KERNEL);
-+		if (!subsec)
-+			return -ENOMEM;
-+		subsec->opcode = opcode;
-+		subsec->prio = common_subsec->prio;
-+		subsec->len  = subsec_len;
-+		subsec->data = ptr;
-+		btrtl_insert_ordered_subsec(subsec, btrtl_dev);
-+		rc  += subsec_len;
-+	}
-+
-+	return rc;
-+}
-+
-+static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
-+				   struct btrtl_device_info *btrtl_dev,
-+				   unsigned char **_buf)
-+{
-+	struct rtl_epatch_header_v2 *hdr;
-+	int rc;
-+	u8 reg_val[2];
-+	u8 key_id;
-+	u32 num_sections;
-+	struct rtl_section *section;
-+	struct rtl_subsection *entry, *tmp;
-+	u32 section_len;
-+	u32 opcode;
-+	int len = 0;
-+	int i;
-+	u8 *ptr;
-+	struct rtl_iovec iov = {
-+		.data = btrtl_dev->fw_data,
-+		.len  = btrtl_dev->fw_len - 7, /* Cut the tail */
-+	};
-+
-+	rc = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
-+	if (rc < 0)
-+		return -EIO;
-+	key_id = reg_val[0];
-+
-+	rtl_dev_dbg(hdev, "%s: key id %u", __func__, key_id);
-+
-+	btrtl_dev->key_id = key_id;
-+
-+	hdr = rtl_iov_pull_data(&iov, sizeof(*hdr));
-+	if (!hdr)
-+		return -EINVAL;
-+	num_sections = le32_to_cpu(hdr->num_sections);
-+
-+	rtl_dev_dbg(hdev, "FW version %08x-%08x", *((u32 *)hdr->fw_version),
-+		    *((u32 *)(hdr->fw_version + 4)));
-+
-+	for (i = 0; i < num_sections; i++) {
-+		section = rtl_iov_pull_data(&iov, sizeof(*section));
-+		if (!section)
-+			break;
-+		section_len = le32_to_cpu(section->len);
-+		opcode      = le32_to_cpu(section->opcode);
-+
-+		rtl_dev_dbg(hdev, "opcode 0x%04x", section->opcode);
-+
-+		ptr = rtl_iov_pull_data(&iov, section_len);
-+		if (!ptr)
-+			break;
-+
-+		switch (opcode) {
-+		case RTL_PATCH_SNIPPETS:
-+			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
-+						 ptr, section_len);
-+			break;
-+		case RTL_PATCH_SECURITY_HEADER:
-+			/* If key_id from chip is zero, ignore all security
-+			 * headers.
-+			 */
-+			if (!key_id)
-+				break;
-+			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
-+						 ptr, section_len);
-+			break;
-+		case RTL_PATCH_DUMMY_HEADER:
-+			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
-+						 ptr, section_len);
-+			break;
-+		default:
-+			rc = 0;
-+			break;
-+		}
-+		if (rc < 0) {
-+			rtl_dev_err(hdev, "RTL: Parse section (%u) err %d",
-+				    opcode, rc);
-+			return rc;
-+		}
-+		len += rc;
-+	}
-+
-+	if (!len)
-+		return -ENODATA;
-+
-+	/* Allocate mem and copy all found subsecs. */
-+	ptr = kvmalloc(len, GFP_KERNEL);
-+	if (!ptr)
-+		return -ENOMEM;
-+
-+	len = 0;
-+	list_for_each_entry_safe(entry, tmp, &btrtl_dev->patch_subsecs, list) {
-+		rtl_dev_dbg(hdev, "RTL: opcode %08x, addr %p, len 0x%x",
-+			    entry->opcode, entry->data, entry->len);
-+		memcpy(ptr + len, entry->data, entry->len);
-+		len += entry->len;
-+	}
-+
-+	bt_dev_info(hdev, "RTL: Patch (len %d) found", len);
-+
-+	if (!len)
-+		return -EPERM;
-+
-+	*_buf = ptr;
-+	return len;
-+}
-+
- static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 				struct btrtl_device_info *btrtl_dev,
- 				unsigned char **_buf)
-@@ -317,7 +553,18 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
- 	};
- 
--	min_size = sizeof(struct rtl_epatch_header) + sizeof(extension_sig) + 3;
-+	if (btrtl_dev->fw_len <= 8)
-+		return -EINVAL;
-+
-+	if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE, 8))
-+		min_size = sizeof(struct rtl_epatch_header) +
-+				sizeof(extension_sig) + 3;
-+	else if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE_V2, 8))
-+		min_size = sizeof(struct rtl_epatch_header_v2) +
-+				sizeof(extension_sig) + 3;
-+	else
-+		return -EINVAL;
-+
- 	if (btrtl_dev->fw_len < min_size)
- 		return -EINVAL;
- 
-@@ -382,12 +629,14 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 		return -EINVAL;
- 	}
- 
--	epatch_info = (struct rtl_epatch_header *)btrtl_dev->fw_data;
--	if (memcmp(epatch_info->signature, RTL_EPATCH_SIGNATURE, 8) != 0) {
-+	if (memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE, 8) != 0) {
-+		if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE_V2, 8))
-+			return rtlbt_parse_firmware_v2(hdev, btrtl_dev, _buf);
- 		rtl_dev_err(hdev, "bad EPATCH signature");
- 		return -EINVAL;
- 	}
- 
-+	epatch_info = (struct rtl_epatch_header *)btrtl_dev->fw_data;
- 	num_patches = le16_to_cpu(epatch_info->num_patches);
- 	BT_DBG("fw_version=%x, num_patches=%d",
- 	       le32_to_cpu(epatch_info->fw_version), num_patches);
-@@ -451,6 +700,7 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	int frag_len = RTL_FRAG_LEN;
- 	int ret = 0;
- 	int i;
-+	int j = 0;
- 	struct sk_buff *skb;
- 	struct hci_rp_read_local_version *rp;
- 
-@@ -461,17 +711,16 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	for (i = 0; i < frag_num; i++) {
- 		struct sk_buff *skb;
- 
--		BT_DBG("download fw (%d/%d)", i, frag_num);
--
--		if (i > 0x7f)
--			dl_cmd->index = (i & 0x7f) + 1;
--		else
--			dl_cmd->index = i;
-+		dl_cmd->index = j++;
-+		if (dl_cmd->index == 0x7f)
-+			j = 1;
- 
- 		if (i == (frag_num - 1)) {
- 			dl_cmd->index |= 0x80; /* data end */
- 			frag_len = fw_len % RTL_FRAG_LEN;
- 		}
-+		rtl_dev_dbg(hdev, "download fw (%d/%d). index = %d", i,
-+				frag_num, dl_cmd->index);
- 		memcpy(dl_cmd->data, data, frag_len);
- 
- 		/* Send download command */
-@@ -589,8 +838,16 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
- 
- void btrtl_free(struct btrtl_device_info *btrtl_dev)
- {
-+	struct rtl_subsection *entry, *tmp;
-+
- 	kvfree(btrtl_dev->fw_data);
- 	kvfree(btrtl_dev->cfg_data);
-+
-+	list_for_each_entry_safe(entry, tmp, &btrtl_dev->patch_subsecs, list) {
-+		list_del(&entry->list);
-+		kfree(entry);
-+	}
-+
- 	kfree(btrtl_dev);
- }
- EXPORT_SYMBOL_GPL(btrtl_free);
-@@ -604,9 +861,11 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 	char cfg_name[40];
- 	u16 hci_rev, lmp_subver;
- 	u8 hci_ver;
-+	u8 lmp_ver;
- 	int ret;
- 	u16 opcode;
- 	u8 cmd[2];
-+	u8 reg_val[2];
- 
- 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
- 	if (!btrtl_dev) {
-@@ -614,26 +873,56 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 		goto err_alloc;
- 	}
- 
-+	INIT_LIST_HEAD(&btrtl_dev->patch_subsecs);
-+
-+check_version:
-+	ret = btrtl_vendor_read_reg16(hdev, RTL_CHIP_SUBVER, reg_val);
-+	if (ret < 0)
-+		goto err_free;
-+	lmp_subver = le16_to_cpu(*((u16 *)reg_val));
-+
-+	if (lmp_subver == RTL_ROM_LMP_8822B) {
-+		ret = btrtl_vendor_read_reg16(hdev, RTL_CHIP_REV, reg_val);
-+		if (ret < 0)
-+			goto err_free;
-+		hci_rev = le16_to_cpu(*((u16 *)reg_val));
-+
-+		/* 8822E */
-+		if (hci_rev == 0x000e) {
-+			hci_ver = 0x0c;
-+			lmp_ver = 0x0c;
-+			btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev,
-+							    hci_ver, hdev->bus);
-+			goto next;
-+		}
-+	}
-+
- 	skb = btrtl_read_local_version(hdev);
- 	if (IS_ERR(skb)) {
- 		ret = PTR_ERR(skb);
- 		goto err_free;
- 	}
--
- 	resp = (struct hci_rp_read_local_version *)skb->data;
--	rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
--		     resp->hci_ver, resp->hci_rev,
--		     resp->lmp_ver, resp->lmp_subver);
- 
--	hci_ver = resp->hci_ver;
--	hci_rev = le16_to_cpu(resp->hci_rev);
-+	hci_ver    = resp->hci_ver;
-+	hci_rev    = le16_to_cpu(resp->hci_rev);
-+	lmp_ver    = resp->lmp_ver;
- 	lmp_subver = le16_to_cpu(resp->lmp_subver);
- 
-+	kfree_skb(skb);
-+
- 	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
- 					    hdev->bus);
- 
--	if (!btrtl_dev->ic_info)
-+next:
-+	rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
-+		     hci_ver, hci_rev,
-+		     lmp_ver, lmp_subver);
-+
-+	if (!btrtl_dev->ic_info && !btrtl_dev->drop_fw)
- 		btrtl_dev->drop_fw = true;
-+	else
-+		btrtl_dev->drop_fw = false;
- 
- 	if (btrtl_dev->drop_fw) {
- 		opcode = hci_opcode_pack(0x3f, 0x66);
-@@ -642,41 +931,25 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 
- 		skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
- 		if (!skb)
--			goto out_free;
-+			goto err_free;
- 
- 		skb_put_data(skb, cmd, sizeof(cmd));
- 		hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
- 
--		hdev->send(hdev, skb);
-+		ret = hdev->send(hdev, skb);
-+		if (ret < 0) {
-+			bt_dev_err(hdev, "sending frame failed (%d)", ret);
-+			kfree_skb(skb);
-+			goto err_free;
-+		}
- 
- 		/* Ensure the above vendor command is sent to controller and
- 		 * process has done.
- 		 */
- 		msleep(200);
- 
--		/* Read the local version again. Expect to have the vanilla
--		 * version as cold boot.
--		 */
--		skb = btrtl_read_local_version(hdev);
--		if (IS_ERR(skb)) {
--			ret = PTR_ERR(skb);
--			goto err_free;
--		}
--
--		resp = (struct hci_rp_read_local_version *)skb->data;
--		rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
--			     resp->hci_ver, resp->hci_rev,
--			     resp->lmp_ver, resp->lmp_subver);
--
--		hci_ver = resp->hci_ver;
--		hci_rev = le16_to_cpu(resp->hci_rev);
--		lmp_subver = le16_to_cpu(resp->lmp_subver);
--
--		btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
--						    hdev->bus);
-+		goto check_version;
- 	}
--out_free:
--	kfree_skb(skb);
- 
- 	if (!btrtl_dev->ic_info) {
- 		rtl_dev_info(hdev, "unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
-diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-index ebf0101c959b..3a5bd317e706 100644
---- a/drivers/bluetooth/btrtl.h
-+++ b/drivers/bluetooth/btrtl.h
-@@ -47,6 +47,57 @@ struct rtl_vendor_config {
- 	struct rtl_vendor_config_entry entry[];
- } __packed;
- 
-+struct rtl_epatch_header_v2 {
-+	__u8   signature[8];
-+	__u8   fw_version[8];
-+	__le32 num_sections;
-+} __packed;
-+
-+struct rtl_section {
-+	__le32 opcode;
-+	__le32 len;
-+	u8     data[];
-+} __packed;
-+
-+struct rtl_section_hdr {
-+	__le16 num;
-+	__le16 reserved;
-+} __packed;
-+
-+struct rtl_common_subsec {
-+	__u8   eco;
-+	__u8   prio;
-+	__u8   cb[2];
-+	__le32 len;
-+	__u8   data[];
-+};
-+
-+struct rtl_sec_hdr {
-+	__u8   eco;
-+	__u8   prio;
-+	__u8   key_id;
-+	__u8   reserved;
-+	__le32 len;
-+	__u8   data[];
-+} __packed;
-+
-+struct rtl_subsection {
-+	struct list_head list;
-+	u32 opcode;
-+	u32 len;
-+	u8 prio;
-+	u8 *data;
-+};
-+
-+struct rtl_iovec {
-+	u8  *data;
-+	u32 len;
-+};
-+
-+struct rtl_vendor_cmd {
-+	__u8 param[5];
-+} __packed;
-+
- enum {
- 	REALTEK_ALT6_CONTINUOUS_TX_CHIP,
- 
--- 
-2.34.1
-
+Fixes: 6c08fc896b60 ("Bluetooth: Fix refcount use-after-free issue")
+> > Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> > ---
+> >  net/bluetooth/l2cap_sock.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index ca8f07f35..657704059 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -1245,7 +1245,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+> >   */
+> >  static void l2cap_sock_kill(struct sock *sk)
+> >  {
+> > -       if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+> > +       if (!sk || !sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+> >                 return;
+> >
+> >         BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+> > --
+> > 2.25.1
+> >
