@@ -2,124 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94C70C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 09:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB7B4C63797
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 09:34:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231207AbjBBJ0h (ORCPT
+        id S232365AbjBBJeD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Feb 2023 04:26:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        Thu, 2 Feb 2023 04:34:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbjBBJ0f (ORCPT
+        with ESMTP id S232096AbjBBJd6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Feb 2023 04:26:35 -0500
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152D1474CC
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 01:26:34 -0800 (PST)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-501c3a414acso18301987b3.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 01:26:34 -0800 (PST)
+        Thu, 2 Feb 2023 04:33:58 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 504ED8A7F
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 01:33:39 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id a23so865573pga.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 01:33:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yMJLDKfiAh5d4q1e+8BHnfDMo0mUiYMeMc9aD1SEa10=;
-        b=fzeQZSHyw47SxC8Rtj+m5yBF+0xwnHJBbuQKxaz0Iac7/qtsy9fHhvgm89w6nwL6C2
-         w/4hH5m23kzrn5ChiLw1DtIeK9vkEqavU9lWOIfZbVp5g7FegM2+H3wdLVbMp6aTqXc0
-         WCILhVZe/eFsMU1Thw4veNWUgxMeVUW/ZIXLkHXiPBXsKPJkVsZqGLF0Ehlv3D022i++
-         FxV+9bkXjvpHaRNUCAraNsXt9ZhJ0E+HN24IoruY5J7mFvyDF2lgreSyJtqD0BZg8X5C
-         izALpjgrgmEu7FQsQ+w/LyRQ/Nsu6w/KxDM+YhzFB2MGOLHYm6ldNxd2kQ2k0Zb8Nf2U
-         dZPg==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1/rViS2PySHA2FfFOpX46EGOSH684t6/0QTU5SbX3FM=;
+        b=hR3Lo8/PVIkGtgyxXXSICUcGSsrnWtP/rvBOXDPKyKRQqMrARsEBZ1w3QNL3X7t/3N
+         DcnmUNv4tDWzqUzYJS2PVx7jryDcsZRSyeoR0tUxfBSe4qbpviiFQi5DuYLDq1PEvXKV
+         VTVhQ3eLB9axSt6aS38dmqDWbilrVf0qdzqMXOTKUdmz3eMqteuXS81IEqe6nwhYvqW4
+         hxeXjbXXs3eRQ5yIPXxqYQpwiImaSFlqiW30rsel5rnR3LdBGzJhT02o7D/RfhhcHOY3
+         8cgMndx3UknKTRsZCyG6xoF4CKNawv21qXtbAHeOxCziFzMTt5L+BLJGiQmr9vXeejN0
+         lRjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yMJLDKfiAh5d4q1e+8BHnfDMo0mUiYMeMc9aD1SEa10=;
-        b=MYBnE6fcESMLYqBeCxmPugr7ah247MzG8rkyWySAyegQ1A53CwvSdISxXsu1RIr8kF
-         Y8ea+ngHGZttGraI6ABpDxV7DUqGGaLGe0/U137aLyTx5UcqQdmMm3Awj9zbacRhr4ZJ
-         FlR89UyGtS1O4VfR+hvs9aO/eY1ZkCgYl6G0Jy9hrkJNZQ3vJE1of4AoaLcH4yBp9g2Z
-         HZvxnS022RosFAntZd78zUkHVdTkJyrIsio6WDwsia15+JRrp72vPP/OPWuulPbhZo+b
-         aXBc4o2/UTKDQZlUaIYAtoEAH6lGBZ2qt4ODLhIVzkT7D8dlDFgFa0//JY6eYSF9zTRH
-         Rd9w==
-X-Gm-Message-State: AO0yUKV7hb8sYrKoriMGjdHRVjKkyMkhJlc4HH5Mo++cAP/uuTyMkAlY
-        L/cCg/63CXDfTRUtirmqmxz5vUn6QG7BzrIHuZf3eA==
-X-Google-Smtp-Source: AK7set8aXMGpKuLxzy9fQl+dGgdEeWWeapuh8k4nJ6zlAccjUYwWS0b7tuE6Jv3NgHgtrKXm51wDkn85QhM/rxFquZE=
-X-Received: by 2002:a05:690c:b82:b0:500:ac2c:80fb with SMTP id
- ck2-20020a05690c0b8200b00500ac2c80fbmr617309ywb.90.1675329992984; Thu, 02 Feb
- 2023 01:26:32 -0800 (PST)
+        bh=1/rViS2PySHA2FfFOpX46EGOSH684t6/0QTU5SbX3FM=;
+        b=j59pK8Za+XHUv0mykut7eRrqXOGzV4Dq/DKGRKDm2ALUU8hDn0gYuc7Rtoiegnghcg
+         ITitYlBPaTlZwybUuLHwGjA9q1Pm0uxbqGarAh7RbhjJvn2FJpLQSI0DnVgUV/Yq0xae
+         F5FclYdQd4qYE3iMdHX5mT+bUb+emePFxhBr5eTQjA//q34Tdfw9NezuT+Q9jCiUX2pk
+         lvlsI8TYkyy6aGOVGwdDGDPgW5niJi9JEyvuX9ImaVFTwOVwpmdCma8v0I8NSElRnwsG
+         i3MVeasUIjHp3b36M9xiaWFBkG6aCp7tOujX0j6QIW7l8f4WvcIT4UmiPP4ELbbVV8Yd
+         R7Yw==
+X-Gm-Message-State: AO0yUKVx28zeOzrUdwINkK2Fmn4m3ZYQf6ldSPRzKLlRjGtwALPS+uAC
+        RVVN4CcCwBI3BV/DsCxRnYJLNWaDNoo=
+X-Google-Smtp-Source: AK7set80jFijUJiV9k+BdprvVgwVGK7uxwWOluzAP8onN9Y1MupLinV0X83HFT81ZKckv+cZm0HRVA==
+X-Received: by 2002:a05:6a00:882:b0:58d:987b:2e9 with SMTP id q2-20020a056a00088200b0058d987b02e9mr7642823pfj.24.1675330418636;
+        Thu, 02 Feb 2023 01:33:38 -0800 (PST)
+Received: from [172.17.0.2] ([4.227.0.67])
+        by smtp.gmail.com with ESMTPSA id g20-20020a056a001a1400b0058bc60dd98dsm5908469pfv.23.2023.02.02.01.33.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 01:33:38 -0800 (PST)
+Message-ID: <63db8372.050a0220.a0193.bfd4@mx.google.com>
+Date:   Thu, 02 Feb 2023 01:33:38 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0367738397906029550=="
 MIME-Version: 1.0
-References: <20230123091708.4112735-1-git@sung-woo.kim> <20230202090509.2774062-1-iam@sung-woo.kim>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
+Subject: RE: Bluetooth: L2CAP: Fix use-after-free
 In-Reply-To: <20230202090509.2774062-1-iam@sung-woo.kim>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Thu, 2 Feb 2023 10:26:21 +0100
-Message-ID: <CANn89i+hAht=g1F6kjPfq8eO4j6-2WEE+CNtRtq1S4UnwXEQaw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free
-To:     Sungwoo Kim <iam@sung-woo.kim>
-Cc:     happiness.sung.woo@gmail.com, benquike@gmail.com,
-        davem@davemloft.net, daveti@purdue.edu, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        wuruoyu@me.com
-Content-Type: text/plain; charset="UTF-8"
+References: <20230202090509.2774062-1-iam@sung-woo.kim>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Feb 2, 2023 at 10:07 AM Sungwoo Kim <iam@sung-woo.kim> wrote:
->
-> Due to the race condition between l2cap_sock_cleanup_listen and
-> l2cap_sock_close_cb, l2cap_sock_kill can receive already freed sk,
-> resulting in use-after-free inside l2cap_sock_kill.
-> This patch prevent this by adding a null check in l2cap_sock_kill.
->
-> Context 1:
-> l2cap_sock_cleanup_listen();
->   // context switched
->   l2cap_chan_lock(chan);
->   l2cap_sock_kill(sk); // <-- sk is already freed below
+--===============0367738397906029550==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-But sk is used in l2cap_sock_cleanup_listen()
-and should not be NULL...
+This is automated email and please do not reply to this email!
 
-while ((sk = bt_accept_dequeue(parent, NULL))) {
-  ...
-  l2cap_sock_kill(sk);
-  ..
-}
+Dear submitter,
 
-It would help if you send us a stack trace ...
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=718047
 
->
-> Context 2:
-> l2cap_chan_timeout();
->   l2cap_chan_lock(chan);
->   chan->ops->close(chan);
->     l2cap_sock_close_cb()
->     l2cap_sock_kill(sk); // <-- sk is freed here
->   l2cap_chan_unlock(chan);
->
+---Test result---
 
-Please add a Fixes: tag
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.24 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      31.44 seconds
+CheckAllWarning               PASS      33.94 seconds
+CheckSparse                   PASS      38.44 seconds
+CheckSmatch                   PASS      106.53 seconds
+BuildKernel32                 PASS      29.79 seconds
+TestRunnerSetup               PASS      433.73 seconds
+TestRunner_l2cap-tester       PASS      16.20 seconds
+TestRunner_iso-tester         PASS      16.63 seconds
+TestRunner_bnep-tester        PASS      5.44 seconds
+TestRunner_mgmt-tester        PASS      108.30 seconds
+TestRunner_rfcomm-tester      PASS      8.67 seconds
+TestRunner_sco-tester         PASS      8.01 seconds
+TestRunner_ioctl-tester       PASS      9.31 seconds
+TestRunner_mesh-tester        PASS      6.86 seconds
+TestRunner_smp-tester         PASS      7.90 seconds
+TestRunner_userchan-tester    PASS      5.67 seconds
+IncrementalBuild              PASS      27.87 seconds
 
-> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
-> ---
->  net/bluetooth/l2cap_sock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index ca8f07f35..657704059 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -1245,7 +1245,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
->   */
->  static void l2cap_sock_kill(struct sock *sk)
->  {
-> -       if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
-> +       if (!sk || !sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
->                 return;
->
->         BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
-> --
-> 2.25.1
->
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0367738397906029550==--
