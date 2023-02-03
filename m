@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 900FFC636CC
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Feb 2023 09:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F986C6379F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Feb 2023 09:40:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232315AbjBCJbM (ORCPT
+        id S232421AbjBCJkQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Feb 2023 04:31:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48832 "EHLO
+        Fri, 3 Feb 2023 04:40:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232287AbjBCJbK (ORCPT
+        with ESMTP id S232634AbjBCJjs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Feb 2023 04:31:10 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9566E10A8C
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Feb 2023 01:31:01 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id a4-20020a5b0004000000b006fdc6aaec4fso4321041ybp.20
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Feb 2023 01:31:01 -0800 (PST)
+        Fri, 3 Feb 2023 04:39:48 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0585925BAB
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Feb 2023 01:39:42 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-509ab88f98fso46293277b3.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Feb 2023 01:39:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=sRTbWykUitHgvhIuijlROFHq2rLMmEeBT0jym/fZRho=;
-        b=ZxWqHCLVjngGEk4ipClqZnRBMhXs5pSp6EiXtCoAYhRe2gcqC2BVj53CiBoI039z8x
-         eU7DUl5OyCx6/wcW7k0VZA8iV3j3OcEBzrHOhIZQyXiRuqib7fGkhKrCjUzCHFoMOs16
-         +yWvyt+MXChCX+qNjXpNBuJy6m0hOQmvvEVb0zBnDwD2OlV3lTM7aI8lCJS/KeURGuSr
-         M3z0oA81BT5p2MGj4XGc2hnjal4j0I4xLfdDM6ybou9L2AOCN7pUZMnKlLIYDnkCN1To
-         BtHJojOUK7tZw9t2g3IgkHUZUgvdWQ/pAPsTcm6q1BwooCkviCjPqE/Ge89CRtch43zU
-         TWWA==
+        bh=QN14ziO4JxILP7mp40ANOysEeXcgBUkL5cm+RkfL8ZI=;
+        b=ALQj60Z8rE+o1jswa2sIaTx9ItPQ/H6fcei4FBro1MVoWPnvBFJmIRPFr3A5je5c+/
+         XXcuJ5tLa0Iu4OvJYbcRxIRzENg+rRn8Y19EEwtQXH3D4sE+UOgMF12sDkCo80rYqtwo
+         YiD4S0CqHRfYLQQGF+iZ+sH1mmhzL/ujWr2AoiBZTRi62GjDS3inDI9mbBcG9YoOYsk+
+         vbq15f4bmy1zPTWlVHdvFNH7HWSPhf8Zy0ekRbboT+LJ5SvX3cQAOmpdRh6oeRbg9NZh
+         sJhvGWAa9fI0MXDId99AiT9ATmaoarGE7RwdXyOhuelp1HzXWVfS9VFMERg60w0+5ueD
+         we5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=sRTbWykUitHgvhIuijlROFHq2rLMmEeBT0jym/fZRho=;
-        b=2MZumJhZHAfWAAT6RlKKPIBixxOKM3nUe+yQFKJ26uhIBnpGXlgzv/o0ZXvmWGGn1L
-         ekXLmOP3ZNFX0F4RXH0GTHPImIIoyk4sr3C8rMN2xnKISN9zKGdGtsPbFRUGSioPwLt+
-         8z8DufxBRCpXVuwxZQG1BN/O+j3wM3o0aqvzTK/MdYZoy0VPPxiKDcdHImuHgTfo/STC
-         M5IoT9i4F8N00XKNoHzwbOJxo0fomAmiyi5CPTDcwZiZZ+hy8mN1DITf29ss0uoG9nHu
-         8ueWQBjZcmUof78rgxyjtqaedVhwcVziY13Yu8ZkxjbwseKGvI5vbze3MaRLZ+16EDIj
-         UVOg==
-X-Gm-Message-State: AO0yUKWQRsX5aofwo9IqM+hxgSMCrcSlX0zy27yiF+SoEIlcMYqRnOwb
-        tFvshUYJnPhg8zVnZxK+7Ln9KgmFJ/G3RidWcPmo762f9/6dJNx83efSRsgFH/l1mAD/uFseK3v
-        GlONeVD4ojmKi7R/yR0rDu75hgEqnivQlMHYN6ZrIW0rcJ4uv7CKyrmeNFOq7NfTlSqTo0H5Mus
-        yf
-X-Google-Smtp-Source: AK7set93uK0vjiKvgKPCxErhx5wSC107Pw7JjXaebDJDuLrkzVIe9hoW7AcJu1HsNKq+FLpnrjagECO5pnxG
+        bh=QN14ziO4JxILP7mp40ANOysEeXcgBUkL5cm+RkfL8ZI=;
+        b=kTY7ULKK7UWMQt9HeW9PYTmwpFWmLy1flYFcc2isg+nzERFmytYibQCih97B+19dov
+         dIuxJE1pt46KzOleOOivJtbOGF1VCn9yuAx8qLZckjdmAXPzVzv0PelOqXU7JULQ83O4
+         81o8cEFRwI0w5CSqcBw7aY5UqYBcP+4dqZmzsEC3iJfASuF38QN7NYdlfdbVEpAwX2rN
+         obLpc8j2waeMWpdUy1R35Qyt5sqAbNni0SjZsyhBtU4vP6H6gXkBzd42v8GHgFOPx4DX
+         NF6qmBFVXc5CVybG7lC+BxvfcKvxBjSFH7SDJ0dgH867cRs4UY9yro4oIIZPe0JNWZai
+         VDvA==
+X-Gm-Message-State: AO0yUKUMkLOteqAMNXwbsbUZW9b5PYBtKUqsQKUY4ZZ8qkdWuqts2xko
+        nu+8h9/VcbvLSdv4xJOCFgd0eGMhIaKt7KrgxExqqVhCgqo93INYEkHy3sOjC9omzDkwxqis3rm
+        lDXD4iFC2KxDrzwyEViVMRk7MMQdVLlbvFfJm0LLGKpioXCGqdIDGQFUshLbW9WW2M2ET9HpeQK
+        Re
+X-Google-Smtp-Source: AK7set/E9XfPkDUc7TDF1CbiQthpXU/qBRltk6TmvylDtTmU566EojX9yMs6MRHtiyH8PAMAq8X0TmpCgD0I
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:dc12:2976:77a:8cb7])
- (user=apusaka job=sendgmr) by 2002:a25:d215:0:b0:863:a092:156d with SMTP id
- j21-20020a25d215000000b00863a092156dmr249062ybg.23.1675416660756; Fri, 03 Feb
- 2023 01:31:00 -0800 (PST)
-Date:   Fri,  3 Feb 2023 17:30:55 +0800
+ (user=apusaka job=sendgmr) by 2002:a81:ac4d:0:b0:507:739d:e0ca with SMTP id
+ z13-20020a81ac4d000000b00507739de0camr1073769ywj.495.1675417181195; Fri, 03
+ Feb 2023 01:39:41 -0800 (PST)
+Date:   Fri,  3 Feb 2023 17:39:36 +0800
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230203173024.1.Ieb6662276f3bd3d79e9134ab04523d584c300c45@changeid>
-Subject: [PATCH] Bluetooth: Free potentially unfreed SCO connection
+Message-ID: <20230203173900.1.I9ca803e2f809e339da43c103860118e7381e4871@changeid>
+Subject: [PATCH] Bluetooth: Make sure LE create conn cancel is sent when timeout
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -74,49 +74,43 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-It is possible to initiate a SCO connection while deleting the
-corresponding ACL connection, e.g. in below scenario:
+When sending LE create conn command, we set a timer with a duration of
+HCI_LE_CONN_TIMEOUT before timing out and calling
+create_le_conn_complete. Additionally, when receiving the command
+complete, we also set a timer with the same duration to call
+le_conn_timeout.
 
-(1) < hci setup sync connect command
-(2) > hci disconn complete event (for the acl connection)
-(3) > hci command complete event (for(1), failure)
+Usually the latter will be triggered first, which then sends a LE
+create conn cancel command. However, due to the nature of racing, it
+is possible for the former to be called first, thereby calling the
+chain hci_conn_failed -> hci_conn_del -> cancel_delayed_work, thereby
+preventing LE create conn cancel to be sent. In this situation, the
+controller will be stuck in trying the LE connection.
 
-When it happens, hci_cs_setup_sync_conn won't be able to obtain the
-reference to the SCO connection, so it will be stuck and potentially
-hinder subsequent connections to the same device.
-
-This patch prevents that by also deleting the SCO connection if it is
-still not established when the corresponding ACL connection is deleted.
+This patch flushes le_conn_timeout on create_le_conn_complete to make
+sure we always send LE create connection cancel, if necessary.
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 Reviewed-by: Ying Hsu <yinghsu@chromium.org>
 
 ---
 
- net/bluetooth/hci_conn.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_conn.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 61a34801e61e..838f51c272a6 100644
+index 61a34801e61e..f2c7edaa7145 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1061,8 +1061,15 @@ int hci_conn_del(struct hci_conn *conn)
+@@ -1243,6 +1243,8 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+ 	if (conn != hci_lookup_le_connect(hdev))
+ 		goto done;
  
- 	if (conn->type == ACL_LINK) {
- 		struct hci_conn *sco = conn->link;
--		if (sco)
-+		if (sco) {
- 			sco->link = NULL;
-+			/* Due to race, SCO connection might be not established
-+			 * yet at this point. Delete it now, otherwise it is
-+			 * possible for it to be stuck and can't be deleted.
-+			 */
-+			if (sco->handle == HCI_CONN_HANDLE_UNSET)
-+				hci_conn_del(sco);
-+		}
++	/* Flush to make sure we send create conn cancel command if needed */
++	flush_delayed_work(&conn->le_conn_timeout);
+ 	hci_conn_failed(conn, bt_status(err));
  
- 		/* Unacked frames */
- 		hdev->acl_cnt += conn->sent;
+ done:
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
