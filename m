@@ -2,142 +2,151 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EF2C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Feb 2023 16:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD8DC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Feb 2023 20:12:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232409AbjBCQKN (ORCPT
+        id S232871AbjBCUMW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Feb 2023 11:10:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40682 "EHLO
+        Fri, 3 Feb 2023 15:12:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231302AbjBCQKM (ORCPT
+        with ESMTP id S229853AbjBCUMV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Feb 2023 11:10:12 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED8A7A91
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Feb 2023 08:10:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675440612; x=1706976612;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=GcQtf5LoWnWuuAgyAnZSpqdhRFAVp/4vuMtDHLoHo1Q=;
-  b=hDsoSvHVe1Qmc0NTGIcebLxOZCMDVMSAR1c/Ydz/pbIxdwhVE1+Np+PJ
-   N+1nCGz1QtMN2Fp0HqbNfMNJVj5grcx6Ny8mnvkXm+sZ33ieuUYushDrl
-   qGo+mqjPBqF9urFAWD1vuDhtjsRbHjN1L/+/ybyd2Kx/yh3Pm1M6Dp8DB
-   Xk8y1MQc16qWO8hcyS+Qn2Q8cNlDw4Vr2bRk8025VYpQuBtAOzS0d8sTK
-   hCoN//LFxyaHsxL6ohWzxTFX/+VYHf3hb/Sf+jAGao4WNcJ0MpUpQFayY
-   GjnJQq88W8cekjlxQl2tfmbx35xmHO6qfjz6O59QymND/dNtoD3uZzke/
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="393372273"
-X-IronPort-AV: E=Sophos;i="5.97,270,1669104000"; 
-   d="scan'208";a="393372273"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 08:10:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10610"; a="994562977"
-X-IronPort-AV: E=Sophos;i="5.97,270,1669104000"; 
-   d="scan'208";a="994562977"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Feb 2023 08:10:08 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pNydb-0000cW-2F;
-        Fri, 03 Feb 2023 16:10:07 +0000
-Date:   Sat, 04 Feb 2023 00:09:11 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 3d29daf4b155dbb4c834186f46c0877a1ebb3607
-Message-ID: <63dd31a7.SDaG3h6Ug1NCDcUF%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 3 Feb 2023 15:12:21 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964FFA8406;
+        Fri,  3 Feb 2023 12:12:19 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id w11so9354404lfu.11;
+        Fri, 03 Feb 2023 12:12:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMFQuyDg7tzX9gWE8PkvqDa2BwLHKqigIWrByTh8BSQ=;
+        b=LFTRXggel9ZZC0labNf019of7WFJApVT4MNwQ9heLNLFnbftDdcBTZDTR0/6cd6NKG
+         E93QlMno29mNd0kaZi3n14LXkPWwy6hN+AFUri1mrApaoOIhQZGAp/pE8aJ9Qy94nZNZ
+         md9Y7PYFbMydk/LvLlTpWix6tokVhzoeiRCoHU/ovhH6QTjipchlPX0fm9/NFTs6ZBQH
+         5WyKkamEQmsRuqVZF8F9Xq0oM2lbOH+2WqnNx2F+RsvMXvWSrhmpLvd2Yo3TNSajf53P
+         AaHSZCLrKl34IIrgAqGCRHSoqXD6SPSkgGP3W8d8Kvw/SJXs58X77LpQ5Olztr8qCnK/
+         j5OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fMFQuyDg7tzX9gWE8PkvqDa2BwLHKqigIWrByTh8BSQ=;
+        b=Th8O+tw6w22V9i91o1wSBZKJA6GkLxcwJ7HBsp2oanPoPbi9t0YV1nAoucMmwj5qGC
+         43AoGbpCHYWVPpdJkoa5GfoVREwd+ZU7mx5i6eiYvKWWrsCJIiCahFcaJZm0szCWUyLZ
+         0E1mJlxRsiX9/XVXdIKX+5pBqFHW8CBHQgTR7L+N/kztoZSzR5whSbmW+tblYPhJILOE
+         Q10d5gSkL2KbovBlKQjtZp2Y0Qt0v/uBC53QW5uXNLJTWGy57IweCdxZLjDFZoBi1/Zx
+         k7/sqk6MTva7F5tk6Eh8eUWeGLTc5sbo63UdQGqDqIx0F2zJf9Q+NWA5Cs2Cr0a1g8ko
+         sRFg==
+X-Gm-Message-State: AO0yUKXteMp5iIzik5IrGUwGhyfPyurYq5OhW/cg6agJOcQmGh+888JE
+        WN/2oQE3W6EkwNnqxtwqbDQ9EFvbLN2NqRp7MEc=
+X-Google-Smtp-Source: AK7set980B/SyaxkQ4aequbMQN+w2UzmzAl2fl4+/i5eO8RMGJ/dkHt8aBuu4Sr9iTH2xmZ1SsP1U5uuT/L1DyJdN+w=
+X-Received: by 2002:a05:6512:3190:b0:4b5:b87a:3271 with SMTP id
+ i16-20020a056512319000b004b5b87a3271mr2198518lfe.18.1675455137699; Fri, 03
+ Feb 2023 12:12:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <c515aae3-88e4-948c-a856-7b45dd2caed9@linaro.org> <20230201031349.56405-1-steev@kali.org>
+In-Reply-To: <20230201031349.56405-1-steev@kali.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 3 Feb 2023 12:12:06 -0800
+Message-ID: <CABBYNZJPZChB0eOn05oFd2mknzOmr1RJRW3LFf3jbq_jpQ1UGA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/4] arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 3d29daf4b155dbb4c834186f46c0877a1ebb3607  Bluetooth: hci_qca: get wakeup status from serdev device handle
+Hi Steev,
 
-elapsed time: 1086m
+On Tue, Jan 31, 2023 at 7:13 PM Steev Klimaszewski <steev@kali.org> wrote:
+>
+> >On 31/01/2023 05:38, Steev Klimaszewski wrote:
+> >> Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> >> ---
+> >>  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
+> >>  1 file changed, 68 insertions(+)
+> >>
+> >> diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> >> index f936b020a71d..951438ac5946 100644
+> >> --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> >> +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> >> @@ -24,6 +24,8 @@ / {
+> >>      aliases {
+> >>              i2c4 = &i2c4;
+> >>              i2c21 = &i2c21;
+> >> +            serial0 = &uart17;
+> >> +            serial1 = &uart2;
+> >>      };
+> >>
+> >>      wcd938x: audio-codec {
+> >> @@ -712,6 +714,32 @@ &qup0 {
+> >>      status = "okay";
+> >>  };
+> >>
+> >> +&uart2 {
+> >> +    status = "okay";
+> >> +
+> >> +    pinctrl-names = "default";
+> >> +    pinctrl-0 = <&uart2_state>;
+> >> +
+> >> +    bluetooth {
+> >> +            compatible = "qcom,wcn6855-bt";
+> >> +
+> >> +/*
+>
+> > Why dead code should be in the kernel?
+>
+> As mentioned in the cover letter, this is a bit closer to an RFC than ready to
+> go in, and I do apologize that it wasn't clear enough.  I do not have access to
+> the schematics, and based on my reading of the schema for bluetooth, these
+> entries are supposed to be required, however, like the wcn6750, I have dummy
+> data entered into the qca_soc_data_wcn6855 struct.  I know that these should be
+> there, I just do not have access to the correct information to put, if that
+> makes sense?
 
-configs tested: 64
-configs skipped: 2
+Well you don't have the RFC set in the subject which is probably why
+people are reviewing it like it is supposed to be merged, that said I
+do wonder if there is to indicate these entries are to be considered
+sort of experimental so we don't end up enabling it by default?
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+>
+> <snip>
+>
+> >Does not look like you tested the DTS against bindings. Please run `make
+> >dtbs_check` (see Documentation/devicetree/bindings/writing-schema.rst
+> >for instructions).
+>
+> Correct I had not, but I have now, and will make the corrections test and they
+> will be included in v3.
+>
+> >Best regards,
+> >Krzysztof
+>
+> I appreciate the guidance for what I was doing incorrectly.
+>
+> -- steev
 
-gcc tested configs:
-x86_64                            allnoconfig
-arc                                 defconfig
-alpha                               defconfig
-s390                             allmodconfig
-s390                                defconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-um                             i386_defconfig
-arc                              allyesconfig
-um                           x86_64_defconfig
-alpha                            allyesconfig
-powerpc                           allnoconfig
-ia64                             allmodconfig
-s390                             allyesconfig
-x86_64                        randconfig-a002
-x86_64                        randconfig-a004
-sh                               allmodconfig
-mips                             allyesconfig
-x86_64                        randconfig-a006
-powerpc                          allmodconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                           allyesconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-i386                          randconfig-a005
-x86_64                           rhel-8.3-syz
-x86_64                           rhel-8.3-kvm
-x86_64                           rhel-8.3-bpf
-x86_64                         rhel-8.3-kunit
-riscv                randconfig-r042-20230202
-s390                 randconfig-r044-20230202
-arc                  randconfig-r043-20230202
-x86_64                          rhel-8.3-func
-x86_64                    rhel-8.3-kselftests
-i386                             allyesconfig
-i386                                defconfig
-powerpc                     stx_gp3_defconfig
-xtensa                  cadence_csp_defconfig
-powerpc                      mgcoge_defconfig
-sh                            migor_defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-riscv                             allnoconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-arm64                            allyesconfig
-arm                                 defconfig
-arm                              allyesconfig
 
-clang tested configs:
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-i386                          randconfig-a002
-i386                          randconfig-a004
-i386                          randconfig-a006
-arm                  randconfig-r046-20230202
-hexagon              randconfig-r045-20230202
-hexagon              randconfig-r041-20230202
-x86_64                          rhel-8.3-rust
-x86_64                        randconfig-k001
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Luiz Augusto von Dentz
