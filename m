@@ -2,147 +2,277 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EA8C05027
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Feb 2023 22:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 719CBC636CC
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Feb 2023 09:24:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232919AbjBBWEE (ORCPT
+        id S231836AbjBCJYN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Feb 2023 17:04:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33728 "EHLO
+        Fri, 3 Feb 2023 04:24:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233306AbjBBWDu (ORCPT
+        with ESMTP id S232066AbjBCJXk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Feb 2023 17:03:50 -0500
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1633CC1B
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Feb 2023 14:03:27 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id x29so3449149ljq.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Feb 2023 14:03:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+7HIgKSzGY6hN/gxH2GZLyCwiAJwn8d8Lo20rXEtTLg=;
-        b=p/HIc7RsAvkHmpBMwgF4b4ymcxWU/1cH5JZjNp8jw3FPwPuutY8f5l7RyiYt14Dbqm
-         BhwWpmG+jWx/7bYxzpmm1Nn6EgAxBYWc+umswz+cCD/Us8J7MqcPrlqWHNUVS8HssGLA
-         X1gV41uOgzJK8qYrsYF3xkwaFdPzPz+UYqpr4Lb208iHLE7wfivu5EAY2adx9fAvqBwm
-         /LT/h23NmDzdn0zV1sAmTRUQxbvgolLXqa7i6KV6xDDusI6RlgW3tIp6t+mBYQ8bdKrR
-         2BzDsqakP5AgCRwIT3yPxwEGSPFQcns+4bbjxjVbL5eTD2kdEG8w9jqv5XXoLT6qDt1h
-         G9jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+7HIgKSzGY6hN/gxH2GZLyCwiAJwn8d8Lo20rXEtTLg=;
-        b=vI+00b24NZSXScEiGrIz24nNhpp/kx9GkmuLyStLt6woVqq6eVI2+tIirIugrFW8FX
-         8SRdk4WDI8DhMzkqYJdh8Xh88A+GA5pFBTZ3LsW4aWjv60YrZsS08Zi1MxAhKPGwirgb
-         qFH0W14M9WMazcxyiEbqIREWHlpX/I44aCqzjmILmHMiSaSSaQ+RwS8LFN6+Z06p13WR
-         KzDzV0iFb1nFLDEF8Oek7GQc1i9WVwmSAHc+IG6LKIXdVG6EvMHj1v4hhW8Fa5sSZUou
-         JbS3s7SY5SDeEUtWbz/IKUnpz9fjpcU3O2e6uAi4gkgTeZBp8TPpDNwrK87y7ECmrhrL
-         +Pdw==
-X-Gm-Message-State: AO0yUKVf4KdhBKxRI83OMTK49SVuLH8/SbgASdkT98/N+2hIxvoNGPEH
-        5ajgr0SDZteM71h4jrzhjYRN6Lda3zouDQ9Skyz2e2aXwYs=
-X-Google-Smtp-Source: AK7set+InkVOLjUvxcuz6PUCwZIUKeE0tHBYfy0kUgNPBP07NM1PwnVQVYCuT0EuFpHSuhNeD8/d5uh1ubGQfxX+C2c=
-X-Received: by 2002:a2e:a4c8:0:b0:28b:78f0:e658 with SMTP id
- p8-20020a2ea4c8000000b0028b78f0e658mr1095316ljm.9.1675375405217; Thu, 02 Feb
- 2023 14:03:25 -0800 (PST)
-MIME-Version: 1.0
-References: <20230202114614.53907-1-max.chou@realtek.com> <63dbaf9b.c80a0220.30d2e.7d9c@mx.google.com>
-In-Reply-To: <63dbaf9b.c80a0220.30d2e.7d9c@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 2 Feb 2023 14:03:13 -0800
-Message-ID: <CABBYNZLf6NhA9TGASAh0NH0LMU0DSPGb-UCSU0oBdN3N6=k7LA@mail.gmail.com>
-Subject: Re: [v2] Bluetooth: btrtl: Firmware format v2 support
+        Fri, 3 Feb 2023 04:23:40 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1CB122DC3
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Feb 2023 01:23:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675416208; x=1706952208;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GwVbe4QItZ8/4x8Pw5eHWJF/Uw+5z74a976TXVlmRmk=;
+  b=G/OioPZCey1Dl9SnXmnMfL1PTe18X/ASbGBw5VLcX7yaIC5iPz5cAlSK
+   WS2YDHrpQU/IjYqLw4JdTU6YQ9nCCorLEedOXocHcVstHDtEKUzT/FJtI
+   RtcyGj6Y56sz+3yvQ/XDakx4lJBiCoKNhdzXJtxzn3sdgyee5h5Egflvo
+   sTNp1HPnQQuiRYdSsPE6OMXdBvRr8aqRX3zGMFUHD6drs0EtHNSAXay7C
+   7okRm2uGNFv2IX1jXBPtxFmTaqnC1XxQ5ZDSnYRy6hQoo8C2NpKZfb6ik
+   3aMy3Z5iaMAP03HRRU7FoRTc9iOlqBFWkCnrQXZtpDpUWZtVmdQZsvxbn
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="330833436"
+X-IronPort-AV: E=Sophos;i="5.97,270,1669104000"; 
+   d="scan'208";a="330833436"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2023 01:23:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="698010516"
+X-IronPort-AV: E=Sophos;i="5.97,270,1669104000"; 
+   d="scan'208";a="698010516"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orsmga001.jf.intel.com with ESMTP; 03 Feb 2023 01:23:26 -0800
+From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     max.chou@realtek.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     ravishankar.srivatsa@intel.com, lokendra.singh@intel.com,
+        chethan.tumkur.narayan@intel.com,
+        Seema Sreemantha <seema.sreemantha@intel.com>,
+        Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG)
+Date:   Fri,  3 Feb 2023 15:03:32 +0530
+Message-Id: <20230203093332.4736-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
+From: Seema Sreemantha <seema.sreemantha@intel.com>
 
-On Thu, Feb 2, 2023 at 4:44 AM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D718=
-117
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.47 seconds
-> GitLint                       FAIL      0.59 seconds
-> SubjectPrefix                 PASS      0.12 seconds
-> BuildKernel                   PASS      32.41 seconds
-> CheckAllWarning               PASS      34.42 seconds
-> CheckSparse                   WARNING   39.28 seconds
-> CheckSmatch                   WARNING   107.00 seconds
-> BuildKernel32                 PASS      30.51 seconds
-> TestRunnerSetup               PASS      438.93 seconds
-> TestRunner_l2cap-tester       PASS      16.68 seconds
-> TestRunner_iso-tester         PASS      17.51 seconds
-> TestRunner_bnep-tester        PASS      5.83 seconds
-> TestRunner_mgmt-tester        PASS      113.14 seconds
-> TestRunner_rfcomm-tester      PASS      9.24 seconds
-> TestRunner_sco-tester         PASS      8.45 seconds
-> TestRunner_ioctl-tester       PASS      9.90 seconds
-> TestRunner_mesh-tester        PASS      7.34 seconds
-> TestRunner_smp-tester         PASS      8.30 seconds
-> TestRunner_userchan-tester    PASS      6.11 seconds
-> IncrementalBuild              PASS      28.50 seconds
->
-> Details
-> ##############################
-> Test: GitLint - FAIL
-> Desc: Run gitlint
-> Output:
-> [v2] Bluetooth: btrtl: Firmware format v2 support
->
-> WARNING: I3 - ignore-body-lines: gitlint will be switching from using Pyt=
-hon regex 'match' (match beginning) to 'search' (match anywhere) semantics.=
- Please review your ignore-body-lines.regex option accordingly. To remove t=
-his warning, set general.regex-style-search=3DTrue. More details: https://j=
-orisroovers.github.io/gitlint/configuration/#regex-style-search
-> 24: B1 Line exceeds max length (83>80): "> I rather use an skb for parsin=
-g the data instead of parsing via pointer directly,"
-> ##############################
-> Test: CheckSparse - WARNING
-> Desc: Run sparse tool with linux kernel
-> Output:
-> drivers/bluetooth/btrtl.c:882:22: warning: cast to restricted __le16drive=
-rs/bluetooth/btrtl.c:888:27: warning: cast to restricted __le16drivers/blue=
-tooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warn=
-ing: array of flexible structures
-> ##############################
-> Test: CheckSmatch - WARNING
-> Desc: Run smatch tool with source
-> Output:
-> drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl=
-.h:47:45: warning: array of flexible structures
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+Antenna gain is defined as the antenna’s ability to
+increase the Tx power in a given direction. Intel
+is certifying its products with fixed reference
+antenna peak gain values (3/5dBi). The feature takes
+into account the actual antenna gain, and increases
+output power values, which results in a performance
+improvement.
 
-Id give a look at:
+After firmware download is completed, driver reads from
+ACPI table and configures PPAG as required. ACPI table
+entry for PPAG is defined as below.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/tree/Documentation/driver-api/firmware/fw_upload.rst
+Name (PPAG, Package (0x02)
+{
+    0x00000001,
+    Package (0x02)
+    {
+        0x00000012, /* Bluetooth Domain */
+        0x00000001  /* 1 - Enable PPAG, 0 - Disable PPAG */
+    }
+})
 
-There are not so many drivers since it was introduced last year but
-from the looks of it it has a nice abstraction for handling firmware
-uploads.
+btmon log:
 
+< HCI Command: Vendor (0x3f|0x0219) plen 12
+    00 00 00 00 00 00 00 00 00 00 00 00
+> HCI Event: Command Complete (0x0e) plen 4
+    Vendor (0x3f|0x0219) ncmd 1
+    Status: Success (0x00)
 
---=20
-Luiz Augusto von Dentz
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Seema Sreemantha <seema.sreemantha@intel.com>
+---
+ drivers/bluetooth/btintel.c | 114 ++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  13 ++++
+ 2 files changed, 127 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index d4e2cb9a4eb4..4d6d0dc10caa 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -9,6 +9,7 @@
+ #include <linux/module.h>
+ #include <linux/firmware.h>
+ #include <linux/regmap.h>
++#include <linux/acpi.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -24,6 +25,9 @@
+ #define ECDSA_OFFSET		644
+ #define ECDSA_HEADER_LEN	320
+ 
++#define BTINTEL_PPAG_NAME   "PPAG"
++#define BTINTEL_PPAG_PREFIX "\\_SB_.PCI0.XHCI.RHUB"
++
+ #define CMD_WRITE_BOOT_PARAMS	0xfc0e
+ struct cmd_write_boot_params {
+ 	__le32 boot_addr;
+@@ -1278,6 +1282,63 @@ static int btintel_read_debug_features(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++static acpi_status btintel_ppag_callback(acpi_handle handle, u32 lvl, void *data,
++					 void **ret)
++{
++	acpi_status status;
++	size_t len;
++	struct btintel_ppag *ppag;
++	union acpi_object *p, *elements;
++	struct acpi_buffer string = {ACPI_ALLOCATE_BUFFER, NULL};
++	struct acpi_buffer buffer = {ACPI_ALLOCATE_BUFFER, NULL};
++	struct hci_dev *hdev = ((struct btintel_ppag *)data)->hdev;
++
++	status = acpi_get_name(handle, ACPI_FULL_PATHNAME, &string);
++	if (ACPI_FAILURE(status)) {
++		bt_dev_warn(hdev, "ACPI Failure: %s", acpi_format_exception(status));
++		return status;
++	}
++
++	if (strncmp(BTINTEL_PPAG_PREFIX, string.pointer,
++		    strlen(BTINTEL_PPAG_PREFIX))) {
++		kfree(string.pointer);
++		return AE_OK;
++	}
++
++	len = strlen(string.pointer);
++	if (strncmp((char *)string.pointer + len - 4, BTINTEL_PPAG_NAME, 4)) {
++		kfree(string.pointer);
++		return AE_OK;
++	}
++	kfree(string.pointer);
++
++	status = acpi_evaluate_object(handle, NULL, NULL, &buffer);
++	if (ACPI_FAILURE(status)) {
++		bt_dev_warn(hdev, "ACPI Failure: %s", acpi_format_exception(status));
++		return status;
++	}
++
++	p = buffer.pointer;
++	ppag = (struct btintel_ppag *)data;
++
++	if (p->type != ACPI_TYPE_PACKAGE || p->package.count != 2) {
++		kfree(buffer.pointer);
++		bt_dev_warn(hdev, "Invalid object type: %d or package count: %d",
++			    p->type, p->package.count);
++		return AE_ERROR;
++	}
++
++	elements = p->package.elements;
++
++	/* PPAG table is located at element[1] */
++	p = &elements[1];
++
++	ppag->domain = (u32)p->package.elements[0].integer.value;
++	ppag->mode = (u32)p->package.elements[1].integer.value;
++	kfree(buffer.pointer);
++	return AE_CTRL_TERMINATE;
++}
++
+ static int btintel_set_debug_features(struct hci_dev *hdev,
+ 			       const struct intel_debug_features *features)
+ {
+@@ -2251,6 +2312,56 @@ static int btintel_configure_offload(struct hci_dev *hdev)
+ 	return err;
+ }
+ 
++static int btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver)
++{
++	acpi_status status;
++	struct btintel_ppag ppag;
++	struct sk_buff *skb;
++	struct btintel_loc_aware_reg ppag_cmd;
++
++    /* PPAG is not supported if CRF is HrP2, Jfp2, JfP1 */
++	switch (ver->cnvr_top & 0xFFF) {
++	case 0x504:     /* Hrp2 */
++	case 0x202:     /* Jfp2 */
++	case 0x201:     /* Jfp1 */
++		return 0;
++	}
++
++	memset(&ppag, 0, sizeof(ppag));
++
++	ppag.hdev = hdev;
++	status = acpi_walk_namespace(ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
++				     ACPI_UINT32_MAX, NULL,
++				     btintel_ppag_callback, &ppag, NULL);
++
++	if (ACPI_FAILURE(status)) {
++		bt_dev_warn(hdev, "PPAG: ACPI Failure: %s", acpi_format_exception(status));
++		return -1;
++	}
++
++	if (ppag.domain != 0x12) {
++		bt_dev_warn(hdev, "PPAG-BT Domain disabled");
++		return -1;
++	}
++
++	/* PPAG mode, BIT0 = 0 Disabled, BIT0 = 1 Enabled */
++	if (!(ppag.mode & BIT(0))) {
++		bt_dev_dbg(hdev, "PPAG disabled");
++		return 0;
++	}
++
++	ppag_cmd.mcc = 0;
++	ppag_cmd.sel = 0; /* 0 - Operational, 1 - Disable, 2 - Testing mode */
++	ppag_cmd.delta = 0;
++	skb = __hci_cmd_sync(hdev, 0xfe19, sizeof(ppag_cmd), &ppag_cmd, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_warn(hdev, "Failed to send PPAG Enable (%ld)", PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++	return 0;
++}
++
+ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 					struct intel_version_tlv *ver)
+ {
+@@ -2297,6 +2408,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 
+ 	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+ 
++	/* Set PPAG feature */
++	btintel_set_ppag(hdev, ver);
++
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version_tlv(hdev, &new_ver);
+ 	if (err)
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index e0060e58573c..af508a0e0c42 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -137,6 +137,19 @@ struct intel_offload_use_cases {
+ 	__u8	preset[8];
+ } __packed;
+ 
++/* structure to store the PPAG data read from ACPI table */
++struct btintel_ppag {
++	u32	domain;
++	u32     mode;
++	struct hci_dev *hdev;
++};
++
++struct btintel_loc_aware_reg {
++	u32 mcc;
++	u32 sel;
++	s32 delta;
++};
++
+ #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
+ #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
+ #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
+-- 
+2.17.1
+
