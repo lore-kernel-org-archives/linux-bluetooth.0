@@ -2,98 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA6EC636CD
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 16:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 718E1C636CD
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 18:13:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbjBEQrd (ORCPT
+        id S229525AbjBESNg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Feb 2023 11:47:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33914 "EHLO
+        Sun, 5 Feb 2023 13:13:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbjBEQrd (ORCPT
+        with ESMTP id S229481AbjBESNf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Feb 2023 11:47:33 -0500
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8768A12F2F
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 08:47:31 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id D94982400CD
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 17:47:29 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4P8wKs070hz6tmK;
-        Sun,  5 Feb 2023 17:47:28 +0100 (CET)
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ] shared/bap: fix crash unregistering media endpoint while streaming
-Date:   Sun,  5 Feb 2023 16:47:26 +0000
-Message-Id: <7fb15c0b34a29d0b85568ce8dcc9969771f498c0.1675615318.git.pav@iki.fi>
+        Sun, 5 Feb 2023 13:13:35 -0500
+Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90131196A2
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 10:13:32 -0800 (PST)
+Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1442977d77dso12760004fac.6
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 10:13:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=H24wrjKwatIcEVst0EG2mNAFQqij+g2HBfZ1qvIHuyw=;
+        b=MXqsokNL0xqWhXiGTe0kcY9H8bYU2FhztX4IiJ8AHwjnqIjag6Ngd7LGzwrkjVEVCr
+         wYYVKCYIin4GVfC9mPecKYJRodkaNXJO8cQ2souwKCe2yKe5KrDKEoZ8tAOfX72liuEa
+         KH7NZUvg7GHj0xbIecp4UN2oU9LVZLYD5fnLlPNjUEkLEVavkiRXSspxMJ7Ne0rbqLIH
+         I4YE7EkjbtiDpF4RaJvCXxyQbnPBsenOK2/kZZtvb3XOPOL2aoVpFqQcBYT+Z5G9EpkX
+         Eljvfu2r86eDmpbF2vwXNZeeCLDPDaQMiPp03aFbdanS8ZyltAcV3S0qVyIBYmG74vLE
+         3Blw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H24wrjKwatIcEVst0EG2mNAFQqij+g2HBfZ1qvIHuyw=;
+        b=UIVtwZswrES7F2YTU0986QYzBQYbYHJC6sq4WroFkbVe9KAdxzI+bghyzNImi1foOn
+         oJC/VGBxnVn8dLAcgWqW75MA0fwKvAOcl++5eNEwnTTJa/csWiQwpdpkeY3gsLV5+c57
+         LS3ZHYLT8a7NH3zHAhbKg4zbIQxGH5KBGzATwo73cKYnNTzFGlUFiBCqlr7NYa8Xd+Mr
+         8H99bAyU0sOcmBmQSA4Fs2epMP0pa1XjOc2enVH4np3uN/GmRJ+EHe0VFqjagB8V1YC0
+         RzaV4prn7kB7V+Z2zh5rWJ1ZxQut8kMwVidiVrN1eUx/q3tWZDyO20GXZ6g02zKYYP7v
+         8SSw==
+X-Gm-Message-State: AO0yUKUUCLhUcmq+18Eg95DOdLgsRxMy0+me8+O/cs3RFz1dwsD1uzyk
+        AaZ+we1a573oEl1W0tPCz5T+XnxtW+8=
+X-Google-Smtp-Source: AK7set842/tGzqeHYOlDF1Y0i2xCUTsC8RsX9o2Rr0litbI9SmfXO6XThG3Vf27HKEB5om3H+u3k4Q==
+X-Received: by 2002:a05:6870:b6a7:b0:163:30c7:c821 with SMTP id cy39-20020a056870b6a700b0016330c7c821mr9724151oab.42.1675620811019;
+        Sun, 05 Feb 2023 10:13:31 -0800 (PST)
+Received: from [172.17.0.2] ([104.44.128.240])
+        by smtp.gmail.com with ESMTPSA id v16-20020a056820101000b004fc4000ae48sm3518451oor.15.2023.02.05.10.13.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Feb 2023 10:13:30 -0800 (PST)
+Message-ID: <63dff1ca.050a0220.3d527.cd96@mx.google.com>
+Date:   Sun, 05 Feb 2023 10:13:30 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6532994841556693110=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ] shared/bap: fix crash unregistering media endpoint while streaming
+In-Reply-To: <7fb15c0b34a29d0b85568ce8dcc9969771f498c0.1675615318.git.pav@iki.fi>
+References: <7fb15c0b34a29d0b85568ce8dcc9969771f498c0.1675615318.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following ASAN crash is observed when media endpoint is unregistered
-(stopping sound server) while streaming from remote BAP client:
+--===============6532994841556693110==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ERROR: AddressSanitizer: heap-use-after-free on address 0x60b0000474d8
-READ of size 8 at 0x60b0000474d8 thread T0
-    #0 0x7a27c6 in stream_set_state src/shared/bap.c:1227
-    #1 0x7aff61 in remove_streams src/shared/bap.c:2483
-    #2 0x71d2d0 in queue_foreach src/shared/queue.c:207
-    #3 0x7b0152 in bt_bap_remove_pac src/shared/bap.c:2501
-    #4 0x463cda in media_endpoint_destroy profiles/audio/media.c:179
-    ...
-0x60b0000474d8 is located 8 bytes inside of 112-byte region
-freed by thread T0 here:
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=718927
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.89 seconds
+GitLint                       PASS      0.27 seconds
+BuildEll                      PASS      26.96 seconds
+BluezMake                     PASS      950.69 seconds
+MakeCheck                     PASS      11.26 seconds
+MakeDistcheck                 PASS      148.56 seconds
+CheckValgrind                 PASS      243.93 seconds
+CheckSmatch                   PASS      324.61 seconds
+bluezmakeextell               PASS      96.97 seconds
+IncrementalBuild              PASS      809.84 seconds
+ScanBuild                     PASS      1007.16 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] shared/bap: fix crash unregistering media endpoint while streaming
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#60: 
     #0 0x7f93b12b9388 in __interceptor_free.part.0 (/lib64/libasan.so.8+0xb9388)
-    #1 0x7a0504 in bap_stream_free src/shared/bap.c:972
-    #2 0x7a0800 in bap_stream_detach src/shared/bap.c:989
-    #3 0x7a26d1 in bap_stream_state_changed src/shared/bap.c:1208
-    #4 0x7a2ab4 in stream_set_state src/shared/bap.c:1252
-    #5 0x7ab18a in stream_release src/shared/bap.c:1985
-    #6 0x7c6919 in bt_bap_stream_release src/shared/bap.c:4572
-    #7 0x7aff50 in remove_streams src/shared/bap.c:2482
-    ...
-previously allocated by thread T0 here:
-    #0 0x7f93b12ba6af in __interceptor_malloc (/lib64/libasan.so.8+0xba6af)
-    #1 0x71e9ae in util_malloc src/shared/util.c:43
-    #2 0x79c2f5 in bap_stream_new src/shared/bap.c:766
-    #3 0x7a4863 in ep_config src/shared/bap.c:1446
-    #4 0x7a4f22 in ascs_config src/shared/bap.c:1481
-    ...
 
-When stream->client is false, bt_bap_stream_release already sets the
-stream to idle and frees it.
+/github/workspace/src/src/13129108.patch total: 0 errors, 1 warnings, 12 lines checked
 
-Fix the crash by not setting the state to idle for the second time,
-in this case.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13129108.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    Crash seen when testing BlueZ at commit 67395a3b357d.
 
- src/shared/bap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 22f2e6714..812fba4c8 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2479,8 +2479,11 @@ static void remove_streams(void *data, void *user_data)
- 
- 	stream = queue_remove_if(bap->streams, match_stream_lpac, pac);
- 	if (stream) {
-+		bool client = stream->client;
-+
- 		bt_bap_stream_release(stream, NULL, NULL);
--		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
-+		if (client)
-+			stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
- 	}
- }
- 
--- 
-2.39.1
-
+--===============6532994841556693110==--
