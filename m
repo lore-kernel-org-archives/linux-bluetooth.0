@@ -2,124 +2,149 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 718E1C636CD
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 18:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208A7C636D3
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 21:17:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbjBESNg (ORCPT
+        id S229522AbjBEVRS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Feb 2023 13:13:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48960 "EHLO
+        Sun, 5 Feb 2023 16:17:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjBESNf (ORCPT
+        with ESMTP id S229496AbjBEVRR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Feb 2023 13:13:35 -0500
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90131196A2
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 10:13:32 -0800 (PST)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1442977d77dso12760004fac.6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 10:13:32 -0800 (PST)
+        Sun, 5 Feb 2023 16:17:17 -0500
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FEE216AE1
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 13:17:15 -0800 (PST)
+Received: by mail-qv1-xf32.google.com with SMTP id mm5so1724996qvb.12
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 13:17:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=H24wrjKwatIcEVst0EG2mNAFQqij+g2HBfZ1qvIHuyw=;
-        b=MXqsokNL0xqWhXiGTe0kcY9H8bYU2FhztX4IiJ8AHwjnqIjag6Ngd7LGzwrkjVEVCr
-         wYYVKCYIin4GVfC9mPecKYJRodkaNXJO8cQ2souwKCe2yKe5KrDKEoZ8tAOfX72liuEa
-         KH7NZUvg7GHj0xbIecp4UN2oU9LVZLYD5fnLlPNjUEkLEVavkiRXSspxMJ7Ne0rbqLIH
-         I4YE7EkjbtiDpF4RaJvCXxyQbnPBsenOK2/kZZtvb3XOPOL2aoVpFqQcBYT+Z5G9EpkX
-         Eljvfu2r86eDmpbF2vwXNZeeCLDPDaQMiPp03aFbdanS8ZyltAcV3S0qVyIBYmG74vLE
-         3Blw==
+        d=kali.org; s=google;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sQpfxqbj8W16EcaK4RqVCodrekeKSrjK/jm5qyTP/Lw=;
+        b=o49zfJQTX1TVubYCthchKrDz11Sc8q44WgHx+9GehoCmw1a/UUOBGtSbW8mJtT9Nhe
+         OYPaFlhphng5zEAm1oRYXUhSPkEDQXbVKeTR6LdFNSWHMnv0GOmElv4bpNRmXmgpkcs4
+         h5VwkMGb0cH7EL2rAuGhV/dYkMMdCMQ/8YKu1Oe7yUHn3rFflfF/S4DEC6ja8bEhXDDZ
+         +YeLcpEFmwZjfjFYTC5EUCSHN7pDsNUBsJctDr4yg3GVmC8m7f8SBPCZiad651ZM6SUj
+         R2Hrj+QbGTCZxNs8Ch6c0TYt4mcPKpuTPEP888KxqtXHcxfkgHwsZcWEBs081QhT22Kd
+         7A8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=H24wrjKwatIcEVst0EG2mNAFQqij+g2HBfZ1qvIHuyw=;
-        b=UIVtwZswrES7F2YTU0986QYzBQYbYHJC6sq4WroFkbVe9KAdxzI+bghyzNImi1foOn
-         oJC/VGBxnVn8dLAcgWqW75MA0fwKvAOcl++5eNEwnTTJa/csWiQwpdpkeY3gsLV5+c57
-         LS3ZHYLT8a7NH3zHAhbKg4zbIQxGH5KBGzATwo73cKYnNTzFGlUFiBCqlr7NYa8Xd+Mr
-         8H99bAyU0sOcmBmQSA4Fs2epMP0pa1XjOc2enVH4np3uN/GmRJ+EHe0VFqjagB8V1YC0
-         RzaV4prn7kB7V+Z2zh5rWJ1ZxQut8kMwVidiVrN1eUx/q3tWZDyO20GXZ6g02zKYYP7v
-         8SSw==
-X-Gm-Message-State: AO0yUKUUCLhUcmq+18Eg95DOdLgsRxMy0+me8+O/cs3RFz1dwsD1uzyk
-        AaZ+we1a573oEl1W0tPCz5T+XnxtW+8=
-X-Google-Smtp-Source: AK7set842/tGzqeHYOlDF1Y0i2xCUTsC8RsX9o2Rr0litbI9SmfXO6XThG3Vf27HKEB5om3H+u3k4Q==
-X-Received: by 2002:a05:6870:b6a7:b0:163:30c7:c821 with SMTP id cy39-20020a056870b6a700b0016330c7c821mr9724151oab.42.1675620811019;
-        Sun, 05 Feb 2023 10:13:31 -0800 (PST)
-Received: from [172.17.0.2] ([104.44.128.240])
-        by smtp.gmail.com with ESMTPSA id v16-20020a056820101000b004fc4000ae48sm3518451oor.15.2023.02.05.10.13.30
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sQpfxqbj8W16EcaK4RqVCodrekeKSrjK/jm5qyTP/Lw=;
+        b=iQObSL0Bf22jEuoEbkS4rICSSnV8UMuF0+tSoKfJDczqJ37nTLEToc5ImHw1FyPkLq
+         nlacyZU+vB+zDEcrRm92RjNQkiCkAjXhGM0Vyb6GmEC9jN1ElUTQ6iT7h83nktasOZpu
+         h9c8A169a57m+DBKOJ/6VnisFmVvTaMY8hMGf2uYuOlo35k4k8iC8QM4VusRK4PfvVmv
+         jMerjX2Jw/2QtQ3+kISNrVH9gT7AtrXpBjVllbBNrrAKzUDxFS1DTwFCAG/zJ71JmF9r
+         prc8aWc19PPCtIsHLqf1mcMYfTRAz79TYpVJBjP3htq/cScbz0bXzkwo+3DEw4Sq3GjT
+         mf3A==
+X-Gm-Message-State: AO0yUKWhp+rh3JDhO+fEbQ5lWPR5k3CK9vTD84uhqrbPMj5smzofU0r/
+        CJ20K4S95/qnZp3MWcRHwIgagg==
+X-Google-Smtp-Source: AK7set+SbqcAB7CSGrzF8/8vOEuKkbVHEowhg2nRY4TOn6pW9Wya4yVk0B/Rwf7K0CZjvcRRvCAHtA==
+X-Received: by 2002:a05:6214:2582:b0:56b:eb9d:4342 with SMTP id fq2-20020a056214258200b0056beb9d4342mr11420162qvb.49.1675631834415;
+        Sun, 05 Feb 2023 13:17:14 -0800 (PST)
+Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
+        by smtp.gmail.com with ESMTPSA id k1-20020a05620a414100b007112aa42c4fsm6196519qko.135.2023.02.05.13.17.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Feb 2023 10:13:30 -0800 (PST)
-Message-ID: <63dff1ca.050a0220.3d527.cd96@mx.google.com>
-Date:   Sun, 05 Feb 2023 10:13:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6532994841556693110=="
+        Sun, 05 Feb 2023 13:17:13 -0800 (PST)
+From:   Steev Klimaszewski <steev@kali.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: Re: [PATCH v2 4/4] arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+Date:   Sun,  5 Feb 2023 15:17:11 -0600
+Message-Id: <20230205211712.48001-1-steev@kali.org>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <CABBYNZJPZChB0eOn05oFd2mknzOmr1RJRW3LFf3jbq_jpQ1UGA@mail.gmail.com>
+References: <CABBYNZJPZChB0eOn05oFd2mknzOmr1RJRW3LFf3jbq_jpQ1UGA@mail.gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] shared/bap: fix crash unregistering media endpoint while streaming
-In-Reply-To: <7fb15c0b34a29d0b85568ce8dcc9969771f498c0.1675615318.git.pav@iki.fi>
-References: <7fb15c0b34a29d0b85568ce8dcc9969771f498c0.1675615318.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6532994841556693110==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+>Hi Steev,
 
-Dear submitter,
+>On Tue, Jan 31, 2023 at 7:13 PM Steev Klimaszewski <steev@kali.org> wrote:
+>>
+>> >On 31/01/2023 05:38, Steev Klimaszewski wrote:
+>> >> Signed-off-by: Steev Klimaszewski <steev@kali.org>
+>> >> ---
+>> >>  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
+>> >>  1 file changed, 68 insertions(+)
+>> >>
+>> >> diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+>> >> index f936b020a71d..951438ac5946 100644
+>> >> --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+>> >> +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+>> >> @@ -24,6 +24,8 @@ / {
+>> >>      aliases {
+>> >>              i2c4 = &i2c4;
+>> >>              i2c21 = &i2c21;
+>> >> +            serial0 = &uart17;
+>> >> +            serial1 = &uart2;
+>> >>      };
+>> >>
+>> >>      wcd938x: audio-codec {
+>> >> @@ -712,6 +714,32 @@ &qup0 {
+>> >>      status = "okay";
+>> >>  };
+>> >>
+>> >> +&uart2 {
+>> >> +    status = "okay";
+>> >> +
+>> >> +    pinctrl-names = "default";
+>> >> +    pinctrl-0 = <&uart2_state>;
+>> >> +
+>> >> +    bluetooth {
+>> >> +            compatible = "qcom,wcn6855-bt";
+>> >> +
+>> >> +/*
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=718927
+>> > Why dead code should be in the kernel?
 
----Test result---
+>> As mentioned in the cover letter, this is a bit closer to an RFC than ready to
+>> go in, and I do apologize that it wasn't clear enough.  I do not have access to
+>> the schematics, and based on my reading of the schema for bluetooth, these
+>> entries are supposed to be required, however, like the wcn6750, I have dummy
+>> data entered into the qca_soc_data_wcn6855 struct.  I know that these should be
+>> there, I just do not have access to the correct information to put, if that
+>> makes sense?
 
-Test Summary:
-CheckPatch                    FAIL      0.89 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      26.96 seconds
-BluezMake                     PASS      950.69 seconds
-MakeCheck                     PASS      11.26 seconds
-MakeDistcheck                 PASS      148.56 seconds
-CheckValgrind                 PASS      243.93 seconds
-CheckSmatch                   PASS      324.61 seconds
-bluezmakeextell               PASS      96.97 seconds
-IncrementalBuild              PASS      809.84 seconds
-ScanBuild                     PASS      1007.16 seconds
+>Well you don't have the RFC set in the subject which is probably why
+>people are reviewing it like it is supposed to be merged, that said I
+>do wonder if there is to indicate these entries are to be considered
+>sort of experimental so we don't end up enabling it by default?
+>
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ] shared/bap: fix crash unregistering media endpoint while streaming
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#60: 
-    #0 0x7f93b12b9388 in __interceptor_free.part.0 (/lib64/libasan.so.8+0xb9388)
+Initially, it was meant to be more of an RFC/RFT, but as it turns out it works
+pretty good with the defaults in the bluetooth driver, so I've made a change in
+v3 to just make a note that it's a TODO? I'm not sure if that's okay or not, but
+I'm sure people will let me know :)
 
-/github/workspace/src/src/13129108.patch total: 0 errors, 1 warnings, 12 lines checked
+>>
+>> <snip>
+>>
+>> -- steev
+>--
+>Luiz Agusto von Dentz
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13129108.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6532994841556693110==--
