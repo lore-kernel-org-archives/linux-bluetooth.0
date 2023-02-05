@@ -2,138 +2,98 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30726C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 00:34:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA6EC636CD
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 16:47:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231160AbjBEAeF (ORCPT
+        id S229547AbjBEQrd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Feb 2023 19:34:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48422 "EHLO
+        Sun, 5 Feb 2023 11:47:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbjBEAeE (ORCPT
+        with ESMTP id S229475AbjBEQrd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Feb 2023 19:34:04 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD6221A2A
-        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Feb 2023 16:34:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675557243; x=1707093243;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=X9DUrk3Rd1kWGKexIf3F14Yct0gZCX2hdPYWrY4pwU8=;
-  b=dW84YhI4PZTfJOqacEtfcagSiAx48zAiHEGGaaKAKe1t95tuoSsHLGOL
-   0fhCuNAtwT7zQisDVEX25d9aRr993PP5h9U7nG49iJ9/3ZNKeVln6mlH4
-   aZjvwGOvkFl2aLfAuSp3djt1gwc6J6ILw5kdvADLSr6vskRS0HR0TqM8b
-   uqdRN1SY+CRZyn41rgV+5LBjaZRt8gK8Kb6osAq3zGy8DxM7ma3A9SCjM
-   uHUvx7+ACvYUz3w57ncvbnIKrAkE4Pp4kXiz/0HG3OZs7pTE+r8K11PkT
-   BTpNXQqrVj+tzgKqIzoyM1HvO7vBTAViMxt7wqh5TMqGMik0oOYTwhzeG
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10611"; a="326698072"
-X-IronPort-AV: E=Sophos;i="5.97,274,1669104000"; 
-   d="scan'208";a="326698072"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2023 16:34:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10611"; a="774756028"
-X-IronPort-AV: E=Sophos;i="5.97,274,1669104000"; 
-   d="scan'208";a="774756028"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 04 Feb 2023 16:34:01 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pOSyn-0001bc-0o;
-        Sun, 05 Feb 2023 00:34:01 +0000
-Date:   Sun, 05 Feb 2023 08:33:43 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- edda34a2348f22bed62e2c2f72cd5e2a3c5a5e8d
-Message-ID: <63def967.HOT/w1wbOw7F7vc7%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sun, 5 Feb 2023 11:47:33 -0500
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8768A12F2F
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 08:47:31 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id D94982400CD
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 17:47:29 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4P8wKs070hz6tmK;
+        Sun,  5 Feb 2023 17:47:28 +0100 (CET)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] shared/bap: fix crash unregistering media endpoint while streaming
+Date:   Sun,  5 Feb 2023 16:47:26 +0000
+Message-Id: <7fb15c0b34a29d0b85568ce8dcc9969771f498c0.1675615318.git.pav@iki.fi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: edda34a2348f22bed62e2c2f72cd5e2a3c5a5e8d  Bluetooth: Make sure LE create conn cancel is sent when timeout
+The following ASAN crash is observed when media endpoint is unregistered
+(stopping sound server) while streaming from remote BAP client:
 
-elapsed time: 1680m
+ERROR: AddressSanitizer: heap-use-after-free on address 0x60b0000474d8
+READ of size 8 at 0x60b0000474d8 thread T0
+    #0 0x7a27c6 in stream_set_state src/shared/bap.c:1227
+    #1 0x7aff61 in remove_streams src/shared/bap.c:2483
+    #2 0x71d2d0 in queue_foreach src/shared/queue.c:207
+    #3 0x7b0152 in bt_bap_remove_pac src/shared/bap.c:2501
+    #4 0x463cda in media_endpoint_destroy profiles/audio/media.c:179
+    ...
+0x60b0000474d8 is located 8 bytes inside of 112-byte region
+freed by thread T0 here:
+    #0 0x7f93b12b9388 in __interceptor_free.part.0 (/lib64/libasan.so.8+0xb9388)
+    #1 0x7a0504 in bap_stream_free src/shared/bap.c:972
+    #2 0x7a0800 in bap_stream_detach src/shared/bap.c:989
+    #3 0x7a26d1 in bap_stream_state_changed src/shared/bap.c:1208
+    #4 0x7a2ab4 in stream_set_state src/shared/bap.c:1252
+    #5 0x7ab18a in stream_release src/shared/bap.c:1985
+    #6 0x7c6919 in bt_bap_stream_release src/shared/bap.c:4572
+    #7 0x7aff50 in remove_streams src/shared/bap.c:2482
+    ...
+previously allocated by thread T0 here:
+    #0 0x7f93b12ba6af in __interceptor_malloc (/lib64/libasan.so.8+0xba6af)
+    #1 0x71e9ae in util_malloc src/shared/util.c:43
+    #2 0x79c2f5 in bap_stream_new src/shared/bap.c:766
+    #3 0x7a4863 in ep_config src/shared/bap.c:1446
+    #4 0x7a4f22 in ascs_config src/shared/bap.c:1481
+    ...
 
-configs tested: 60
-configs skipped: 2
+When stream->client is false, bt_bap_stream_release already sets the
+stream to idle and frees it.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Fix the crash by not setting the state to idle for the second time,
+in this case.
+---
 
-gcc tested configs:
-x86_64                            allnoconfig
-arc                                 defconfig
-s390                             allmodconfig
-alpha                               defconfig
-s390                                defconfig
-s390                             allyesconfig
-um                             i386_defconfig
-um                           x86_64_defconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-ia64                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a006
-powerpc                           allnoconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-sh                               allmodconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                           allyesconfig
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-kvm
-x86_64                           rhel-8.3-bpf
-riscv                randconfig-r042-20230204
-arc                  randconfig-r043-20230204
-s390                 randconfig-r044-20230204
-x86_64                    rhel-8.3-kselftests
-x86_64                          rhel-8.3-func
-i386                          randconfig-a001
-i386                          randconfig-a003
-i386                          randconfig-a005
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                        randconfig-a015
-i386                                defconfig
-i386                             allyesconfig
-i386                          randconfig-a014
-i386                          randconfig-a012
-i386                          randconfig-a016
-arm                                 defconfig
+Notes:
+    Crash seen when testing BlueZ at commit 67395a3b357d.
 
-clang tested configs:
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-hexagon              randconfig-r041-20230204
-arm                  randconfig-r046-20230204
-hexagon              randconfig-r045-20230204
-x86_64                          rhel-8.3-rust
-i386                          randconfig-a002
-i386                          randconfig-a004
-i386                          randconfig-a006
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-i386                          randconfig-a013
-i386                          randconfig-a011
-i386                          randconfig-a015
+ src/shared/bap.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 22f2e6714..812fba4c8 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2479,8 +2479,11 @@ static void remove_streams(void *data, void *user_data)
+ 
+ 	stream = queue_remove_if(bap->streams, match_stream_lpac, pac);
+ 	if (stream) {
++		bool client = stream->client;
++
+ 		bt_bap_stream_release(stream, NULL, NULL);
+-		stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
++		if (client)
++			stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
+ 	}
+ }
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.39.1
+
