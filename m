@@ -2,309 +2,275 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73867C05027
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 06:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99733C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 06:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229478AbjBFGKV (ORCPT
+        id S229490AbjBFGNC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 01:10:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58790 "EHLO
+        Mon, 6 Feb 2023 01:13:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjBFGKU (ORCPT
+        with ESMTP id S229478AbjBFGNA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 01:10:20 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D7BC65E
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 22:10:02 -0800 (PST)
+        Mon, 6 Feb 2023 01:13:00 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE98C10ABC
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 22:12:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1675663802; x=1707199802;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=MIXTGDU0lrc8Pp6JUmiQKq7XlXSlYhCJZvepESzM67M=;
-  b=deUQen5PkliH4mEMJ2Ocx7R0BZAj07R/H1wzjOoaX6rSdE5SD+gprVPE
-   +FBMXWnT9Whu+a8A04ER/DIu6Mr/HfYWuySrGBY8wwTACIgQONOY+UiOg
-   vpBJDKisUi7cvdJjAWiDBqlYO19+Zjd3QleTiAXli+z9O3fx5NS2Uptnd
-   Gjcg2/1ySO2M+d261jPwBxnOVWdt45m+V0vkIaWS0lCywegLOs2DrdoML
-   /dLm9skkbC6JSPY+vgyVDyTXZIWCG5dougum8BBI4DWxbY/h4KdT+cmbz
-   BgvFGfeXFQh1woBxxz1JO3cFNu7DmVNE6gVlLnTIdbBTvd23OU0hpHJuy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="356493412"
+  t=1675663978; x=1707199978;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gJXhc/FqP+LAu+OqQSzl1YQHpFggTNCmQPaLqmTRbjA=;
+  b=hLFKup15gtGUN0s+i3hLF7DI5E/KxHcjqFExJqrUS/8UWnIVx0tb/bxN
+   GHUSm1d5MI6Vf3o6vEm/j9fYLejpkFiwU659Bf5WoAWVXd4/Nkr6hYs+N
+   TUMx32PD4fd5fq5jvzXx/MFGgeQRnpnf4hp9DqJR+7gsm7ULAqmoz2/NK
+   FoXwv0+aijFF2g+6EK7YGyE9J8bcQJdeyrklULhLJqJQGK1ukaVy4SvyY
+   tshcs9/dlcyj7e5sBUNI/9ogw0FnYdDUmvgTDwFoiDIPD+SPZtaIX4mUf
+   +vk224wW0iyG1namemd1QFnCYgLJCjl3D7laugZI/BzoOk+LeYIoBfCQH
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="330430346"
 X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
-   d="scan'208";a="356493412"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2023 22:10:02 -0800
+   d="scan'208";a="330430346"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2023 22:12:58 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="911819436"
+X-IronPort-AV: E=McAfee;i="6500,9779,10612"; a="995170198"
 X-IronPort-AV: E=Sophos;i="5.97,276,1669104000"; 
-   d="scan'208";a="911819436"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga006.fm.intel.com with ESMTP; 05 Feb 2023 22:10:02 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Sun, 5 Feb 2023 22:10:02 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Sun, 5 Feb 2023 22:10:02 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Sun, 5 Feb 2023 22:10:02 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AGxgPiHtXYc38X1eLiZYc3hLSjLA6ocW+Qc/3YSvMGZOl01OGkfPMMu1nxMlSSKz4UwU8cdC5WRTyIhYYpECYclznLHdsVyUkP8covoyJ+m9kMT5ndYH1ZOJghwUsPt3w13GzIdLzIHq6R6iIoW23r1tznR+pWPuErU85WXwIL4Iwjb+ZRM/uBVxZmVLgavs2aW4SkLqz9jQhj7QrcZtWlOGUhMv+uK+06EocA2rfMb7A1gxGCzSZRYUhUZxlPOZDrMU9jQEu03UjAkAgImyvgYsOJcNTMbCxpzUW8PB7alYjx8lrCDrMOWWbBYLZ2f9/iV5qaQ/10l+/cHWqZiDGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MIXTGDU0lrc8Pp6JUmiQKq7XlXSlYhCJZvepESzM67M=;
- b=jr+ZpRQ2muheVNWwPy+8A2RmIc5u8zjrD4v2DOuoBpCspxa3vvXmyLs6n7Od+r1VVyEmhbVgv/87jkikcORXUUbCPDNkAcis/hiw2T1m7ZAOpMKguZ/uCbVBa7z4JiCqA3YRaSPEJHu0rP5OJH9C6S5loAU9JvvucKyAB3O/6clBpvRegQuUCTVYh2EeivSX02mtLJyuut6tesxzTxmx1RGvfpDtsKBv6sitsb9J0YrX+bkQHdFk6uNwFIQfIyz0xSo8yEe3DSJ3e26A8BcCqAGmQfiXCgko0NTa0smOCwnAud3Lbp3hejaGjXA+6+abVYXoVONDDawC0lUerwhLdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY4PR11MB1829.namprd11.prod.outlook.com (2603:10b6:903:124::11)
- by DS7PR11MB7689.namprd11.prod.outlook.com (2603:10b6:8:e6::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.32; Mon, 6 Feb
- 2023 06:10:00 +0000
-Received: from CY4PR11MB1829.namprd11.prod.outlook.com
- ([fe80::1b:afe7:5bf8:fda3]) by CY4PR11MB1829.namprd11.prod.outlook.com
- ([fe80::1b:afe7:5bf8:fda3%8]) with mapi id 15.20.6064.034; Mon, 6 Feb 2023
- 06:10:00 +0000
-From:   "K, Kiran" <kiran.k@intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Singh, Lokendra" <lokendra.singh@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-        "Sreemantha, Seema" <seema.sreemantha@intel.com>
-Subject: RE: [PATCH v1] Bluetooth: btintel: Set Per Platform Antenna
- Gain(PPAG)
-Thread-Topic: [PATCH v1] Bluetooth: btintel: Set Per Platform Antenna
- Gain(PPAG)
-Thread-Index: AQHZN7EyljQEvcNam0aXqpprqxean669t9eAgAO7b2A=
-Date:   Mon, 6 Feb 2023 06:09:59 +0000
-Message-ID: <CY4PR11MB1829A0504335A93C63B74C5BF5DA9@CY4PR11MB1829.namprd11.prod.outlook.com>
-References: <20230203093332.4736-1-kiran.k@intel.com>
- <CABBYNZK+nFom8DVXabKMgzSockktY4tcTPD+A-RWSw-3PVAQRw@mail.gmail.com>
-In-Reply-To: <CABBYNZK+nFom8DVXabKMgzSockktY4tcTPD+A-RWSw-3PVAQRw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY4PR11MB1829:EE_|DS7PR11MB7689:EE_
-x-ms-office365-filtering-correlation-id: 7571e21c-d6ee-4e2e-fd3d-08db0808c756
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: SfpGuLWHso5jcoeoQSWkqdKYfV+phoDWIQBm/1L6R1u64R6ZyIO/gyLDXxRovM4SXKS3gKE5mIGhk6Vfl0iNtAKd/immfB4xulRD2fbFlx5SgwMhe2zeXLqN3yXQ156ApfqJipNBvnXbXCwbhi0JOY8hCx6vgpq2X3Q+6fAjZmKhA/P2lZ5J95vrOMTEGyLe82STcyHiQ3aziXX+zh3o+rFOsmA42rO4vMkU0rZ+OE5Gx1LJ3NL3Ce6Z6UrbLqILQxxl9FLmr9b3Dbp/01NhkN0FwFAfSPdmbQr41v/ua9CCqQq3WhFHVDCCHPLefiJxiah9wuCAM32gEhLNDNfAsEkNUm9tXkhiyUok2xqukppBPpQZL3O5T0WPRDTzGZbp2S3ivCg+EdyEkV9Bq0I6HuF1lyVl8INzYB0Lu6rsa1W+9aMLCEuZY2K4g0OXOb1PfxEO/NbimglyWG7SojJh4zoqcBu/zzRKSEh7NPfA7mVd7PkTGkOWkZlaH/ZdrNtrt9IIVMOCEFRCGSbn8+e7u3RxEekQjSgEETW37D5TKgf7j+7hwYjVy5fsrvpqFsEpev6BtlV1vYoLZjP9sMQVMihmhTg03b9q0uAhX0RdNYgEZ8PiXQ6RB97zXGV8BRTAo/JZBZ579hErpetBhjw0zofnBn9KEIFmcg4pFn5mAOcbFx4p/l3Dg5Aqcx0BYAClc5Zv8hNQqqtbRy5z/D2F96ZEdzjKaofEbPfQibl9WN0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR11MB1829.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(376002)(396003)(39860400002)(136003)(346002)(366004)(451199018)(54906003)(52536014)(316002)(82960400001)(86362001)(107886003)(71200400001)(33656002)(7696005)(122000001)(38100700002)(186003)(53546011)(9686003)(6506007)(26005)(478600001)(38070700005)(5660300002)(83380400001)(2906002)(55016003)(76116006)(66946007)(8936002)(4326008)(41300700001)(66446008)(66476007)(6916009)(8676002)(66556008)(64756008)(505234007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Nm4vUDlNOVVySTFRc0M2VXRDbEttNW9jVllvTDF2SnV6a09vZGIvRms4V25x?=
- =?utf-8?B?cHZIR3VPc254enYwT1J0dVhqd2Zweld0T3BXNDhVNXdUQTZXa0NCVU9TM01l?=
- =?utf-8?B?aVZRNkVCdUg1cGN0YzVEVjJDZUQ2K0x2QTE3bkY2UlpMKzVIRDNjWVBuNVZq?=
- =?utf-8?B?a2llQ05VaHlFNURwb1V3K3BLelJ6M29LVkMxeWQ0dUJxREdzNDlwaUVBQzBx?=
- =?utf-8?B?MDg1cW1ISVl2NEkydEdWYStKNDZCWnA1aVV1N0tYcjUvajdKa0czb3RxdTVz?=
- =?utf-8?B?S01LQzl5WFhMbFBaU3dPMUF0dklyVDdLQzNlZ0RjOFBEclRNdEFhWjltTzIz?=
- =?utf-8?B?b2xMaFEwRmlENFVYK215TTl2V05mdkF0TTBaV1ZmOG1XZHRrWXlzTjg5WHow?=
- =?utf-8?B?WmY2b3BBMXhaTE4zSENiVmMrT2VQbVZLQUlFUk1WeGxKWmFoYVhIL2c5c0VQ?=
- =?utf-8?B?ZEVZRXBncFhjcXRtLzExYko5aEdkLzQ0Q3N6ODY5a1l5WTFPbktKaGpTZTR6?=
- =?utf-8?B?aEEvdVY1ZEx0dW82VnRuOFJoV0xsejY0UWhSN1pQcGw4SUZWd2lsZzN3UHVQ?=
- =?utf-8?B?bVEzWmpJQWlWaHdQVlg3VE94Wk92eXh3ZFNsdjFTNnRJOXh5VWVtMlI5a1lW?=
- =?utf-8?B?TFhGRWp4cmw2Z082VjVNUjB2OTU1NWtwSlhLaUFiUTQ1eVBGZDMrcG1BMklt?=
- =?utf-8?B?Uk5wTnNJRWZWS2pEY2xnT3NFQTdEWUNvN3ZoWEFtNEpHalN3TjYrbk1PeGZr?=
- =?utf-8?B?dGVwMGU4MTRyRWlxeS9hTDB1anNqY1ZTU2QvbmVMTXNyZUpJQ3BrUlJoNThu?=
- =?utf-8?B?V09QMTIzTHowUmUwWm85b2MzYnRhbi9IWUVORHphL1ZYR3c5MEdLOEZGZkZz?=
- =?utf-8?B?RlEyRWdjRkVBZ0d4cVhjMlRKZlY5MEJhYmdiVDIwYXdSSm1jaXNJV1FpSkQ0?=
- =?utf-8?B?cHVQTkFBQkJpOWJ2WkFLRDBEZzJONlVLbTJWUmpJR05Na0VnVVdwZ2NuNFNC?=
- =?utf-8?B?RlZLak05OXROck5YSUw2V0IrUTc4NG9IZXNKZmlvVERzUTkxSzFyS3NRTFMx?=
- =?utf-8?B?NFVlMTd0YU9LN2ExZDZVWDE4b3NBOFFGeUJkcGhUUDV2ZGV0VEVRNWRuZXVn?=
- =?utf-8?B?N3NEL1FUNHpZYXJ4OG41K042ZXJzRjhWU2pWbGl4eFNROUQ0QUpwS3ZiOHdp?=
- =?utf-8?B?aEI0KzdSZlEyNWpBb3pHSDdXRlljT0wyMkwvd0FxenJNcHVGMmpic1JEaUhT?=
- =?utf-8?B?WFViZkxaTVM0dFlYREd3MmUzeVRoNWhJb3Fua0taVW1aQThVdjRwVWRpMDhw?=
- =?utf-8?B?U2pRZVBQMUdJRlV1NEljTmprRUJCTWp2MDNpWGVQWlNxUE5FaHhocHY3ZUtU?=
- =?utf-8?B?OHRFUWY3Y21YZno2NUdNM0dnZ01MR1VKVVMzV3oxZUJTcklxendRcVIyZG8w?=
- =?utf-8?B?bHQvc1FnNHFsUnhpU3JoS1kzdEQ3eXJJMmFLcEdTbmM3b1gvVnVLQkd2ODFt?=
- =?utf-8?B?eXJYenk4dGJWNlJMeEJ4M21oekNkUXg3VXFvWEh3aTZ6dWpCNVBjT3IxdjRy?=
- =?utf-8?B?Z1c1eWtuN1VzamJXdHF4SENxVFIzZ3ZQK3BIYUFwQ2o1VFJKdWo3VTBHSTk5?=
- =?utf-8?B?eFQ3N3cvNEM3SDVsV1IyaGYweFk2eWt4blVUaEI2SFhZNkpLQ2UxM3MzRGpP?=
- =?utf-8?B?RW9vN2hNRExURXZYc3JWQkdST3BRYlU2ZzhSRmtrYTlQY21WZjZvRXJkbG1s?=
- =?utf-8?B?Mm5PVU9mYTRTV1dEYjQxeGN3Wk9xRnVmVytyOXNwUU9EQUVVRHJIa3VvamlQ?=
- =?utf-8?B?Q2IxRmR1VllHVlYvY1pLNytkWGZBWFhUNHJPWmcvb2VLSlJJeVlJYnBodGht?=
- =?utf-8?B?Q3RjOXNYRHpuTURpUU93Mk1ZLys3ODQzcERKS21qdTgzVE5aY0xRR3BQaUhF?=
- =?utf-8?B?MzIvNVI5WGNhOEtaNExjWDJDZFRTeGtRcjRZZDk1SWVvVnU4TFY3ckozZEo1?=
- =?utf-8?B?OG0xZmFJbmVKbGVremxrWGpoaU9IbWt0VHhpM2h5a0VlbWtMUWdUUk1wUUI3?=
- =?utf-8?B?K0hzaHZWNENrT2lMemJuMVZlcUczSnBra0FxZG1tVzRsSVRqTzJUa2ZjV0lO?=
- =?utf-8?Q?Gu6E=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="995170198"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga005.fm.intel.com with ESMTP; 05 Feb 2023 22:12:56 -0800
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, lokendra.singh@intel.com,
+        chethan.tumkur.narayan@intel.com,
+        Seema Sreemantha <seema.sreemantha@intel.com>,
+        Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG)
+Date:   Mon,  6 Feb 2023 11:53:05 +0530
+Message-Id: <20230206062305.6340-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR11MB1829.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7571e21c-d6ee-4e2e-fd3d-08db0808c756
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2023 06:09:59.9872
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: r2W+hbI9rFA+WfoMgzEaFzkuiAuoQyhUT+zLPkH4AyX/b9OKBB+URI0eA3LrUmYIna432ys8KJiDM1qBl53bsA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7689
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTHVpeiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMdWl6IEF1
-Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gU2VudDogU2F0dXJkYXks
-IEZlYnJ1YXJ5IDQsIDIwMjMgMjozOCBBTQ0KPiBUbzogSywgS2lyYW4gPGtpcmFuLmtAaW50ZWwu
-Y29tPg0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgU3JpdmF0c2EsIFJh
-dmlzaGFua2FyDQo+IDxyYXZpc2hhbmthci5zcml2YXRzYUBpbnRlbC5jb20+OyBTaW5naCwgTG9r
-ZW5kcmENCj4gPGxva2VuZHJhLnNpbmdoQGludGVsLmNvbT47IFR1bWt1ciBOYXJheWFuLCBDaGV0
-aGFuDQo+IDxjaGV0aGFuLnR1bWt1ci5uYXJheWFuQGludGVsLmNvbT47IFNyZWVtYW50aGEsIFNl
-ZW1hDQo+IDxzZWVtYS5zcmVlbWFudGhhQGludGVsLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRD
-SCB2MV0gQmx1ZXRvb3RoOiBidGludGVsOiBTZXQgUGVyIFBsYXRmb3JtIEFudGVubmENCj4gR2Fp
-bihQUEFHKQ0KPiANCj4gSGkgS2lyYW4sIFNlZW1hLA0KPiANCj4gT24gRnJpLCBGZWIgMywgMjAy
-MyBhdCAxOjI4IEFNIEtpcmFuIEsgPGtpcmFuLmtAaW50ZWwuY29tPiB3cm90ZToNCj4gPg0KPiA+
-IEZyb206IFNlZW1hIFNyZWVtYW50aGEgPHNlZW1hLnNyZWVtYW50aGFAaW50ZWwuY29tPg0KPiA+
-DQo+ID4gQW50ZW5uYSBnYWluIGlzIGRlZmluZWQgYXMgdGhlIGFudGVubmHigJlzIGFiaWxpdHkg
-dG8gaW5jcmVhc2UgdGhlIFR4DQo+ID4gcG93ZXIgaW4gYSBnaXZlbiBkaXJlY3Rpb24uIEludGVs
-IGlzIGNlcnRpZnlpbmcgaXRzIHByb2R1Y3RzIHdpdGgNCj4gPiBmaXhlZCByZWZlcmVuY2UgYW50
-ZW5uYSBwZWFrIGdhaW4gdmFsdWVzICgzLzVkQmkpLiBUaGUgZmVhdHVyZSB0YWtlcw0KPiA+IGlu
-dG8gYWNjb3VudCB0aGUgYWN0dWFsIGFudGVubmEgZ2FpbiwgYW5kIGluY3JlYXNlcyBvdXRwdXQg
-cG93ZXINCj4gPiB2YWx1ZXMsIHdoaWNoIHJlc3VsdHMgaW4gYSBwZXJmb3JtYW5jZSBpbXByb3Zl
-bWVudC4NCj4gPg0KPiA+IEFmdGVyIGZpcm13YXJlIGRvd25sb2FkIGlzIGNvbXBsZXRlZCwgZHJp
-dmVyIHJlYWRzIGZyb20gQUNQSSB0YWJsZSBhbmQNCj4gPiBjb25maWd1cmVzIFBQQUcgYXMgcmVx
-dWlyZWQuIEFDUEkgdGFibGUgZW50cnkgZm9yIFBQQUcgaXMgZGVmaW5lZCBhcw0KPiA+IGJlbG93
-Lg0KPiA+DQo+ID4gTmFtZSAoUFBBRywgUGFja2FnZSAoMHgwMikNCj4gPiB7DQo+ID4gICAgIDB4
-MDAwMDAwMDEsDQo+ID4gICAgIFBhY2thZ2UgKDB4MDIpDQo+ID4gICAgIHsNCj4gPiAgICAgICAg
-IDB4MDAwMDAwMTIsIC8qIEJsdWV0b290aCBEb21haW4gKi8NCj4gPiAgICAgICAgIDB4MDAwMDAw
-MDEgIC8qIDEgLSBFbmFibGUgUFBBRywgMCAtIERpc2FibGUgUFBBRyAqLw0KPiA+ICAgICB9DQo+
-ID4gfSkNCj4gPg0KPiA+IGJ0bW9uIGxvZzoNCj4gPg0KPiA+IDwgSENJIENvbW1hbmQ6IFZlbmRv
-ciAoMHgzZnwweDAyMTkpIHBsZW4gMTINCj4gPiAgICAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAg
-MDAgMDAgMDAgMDANCj4gPiA+IEhDSSBFdmVudDogQ29tbWFuZCBDb21wbGV0ZSAoMHgwZSkgcGxl
-biA0DQo+ID4gICAgIFZlbmRvciAoMHgzZnwweDAyMTkpIG5jbWQgMQ0KPiA+ICAgICBTdGF0dXM6
-IFN1Y2Nlc3MgKDB4MDApDQo+IA0KPiBJdCB3b3VsZCBoYXZlIGJlZW4gYmV0dGVyIGlmIHlvdSBn
-dXlzIGhhZCBhZGRlZCBhIGRlY29kZXIgZm9yIGl0Lg0KDQpBY2suIEkgd2lsbCBwdWJsaXNoIHRo
-ZSBwYXRjaCBmb3IgdGhlIHNhbWUuIA0KPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBLaXJhbiBLIDxr
-aXJhbi5rQGludGVsLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBTZWVtYSBTcmVlbWFudGhhIDxz
-ZWVtYS5zcmVlbWFudGhhQGludGVsLmNvbT4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9ibHVldG9v
-dGgvYnRpbnRlbC5jIHwgMTE0DQo+ID4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrDQo+ID4gIGRyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuaCB8ICAxMyArKysrDQo+ID4gIDIg
-ZmlsZXMgY2hhbmdlZCwgMTI3IGluc2VydGlvbnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9k
-cml2ZXJzL2JsdWV0b290aC9idGludGVsLmMgYi9kcml2ZXJzL2JsdWV0b290aC9idGludGVsLmMN
-Cj4gPiBpbmRleCBkNGUyY2I5YTRlYjQuLjRkNmQwZGMxMGNhYSAxMDA2NDQNCj4gPiAtLS0gYS9k
-cml2ZXJzL2JsdWV0b290aC9idGludGVsLmMNCj4gPiArKysgYi9kcml2ZXJzL2JsdWV0b290aC9i
-dGludGVsLmMNCj4gPiBAQCAtOSw2ICs5LDcgQEANCj4gPiAgI2luY2x1ZGUgPGxpbnV4L21vZHVs
-ZS5oPg0KPiA+ICAjaW5jbHVkZSA8bGludXgvZmlybXdhcmUuaD4NCj4gPiAgI2luY2x1ZGUgPGxp
-bnV4L3JlZ21hcC5oPg0KPiA+ICsjaW5jbHVkZSA8bGludXgvYWNwaS5oPg0KPiA+ICAjaW5jbHVk
-ZSA8YXNtL3VuYWxpZ25lZC5oPg0KPiA+DQo+ID4gICNpbmNsdWRlIDxuZXQvYmx1ZXRvb3RoL2Js
-dWV0b290aC5oPg0KPiA+IEBAIC0yNCw2ICsyNSw5IEBADQo+ID4gICNkZWZpbmUgRUNEU0FfT0ZG
-U0VUICAgICAgICAgICA2NDQNCj4gPiAgI2RlZmluZSBFQ0RTQV9IRUFERVJfTEVOICAgICAgIDMy
-MA0KPiA+DQo+ID4gKyNkZWZpbmUgQlRJTlRFTF9QUEFHX05BTUUgICAiUFBBRyINCj4gPiArI2Rl
-ZmluZSBCVElOVEVMX1BQQUdfUFJFRklYICJcXF9TQl8uUENJMC5YSENJLlJIVUIiDQo+ID4gKw0K
-PiA+ICAjZGVmaW5lIENNRF9XUklURV9CT09UX1BBUkFNUyAgMHhmYzBlICBzdHJ1Y3QNCj4gY21k
-X3dyaXRlX2Jvb3RfcGFyYW1zIHsNCj4gPiAgICAgICAgIF9fbGUzMiBib290X2FkZHI7DQo+ID4g
-QEAgLTEyNzgsNiArMTI4Miw2MyBAQCBzdGF0aWMgaW50IGJ0aW50ZWxfcmVhZF9kZWJ1Z19mZWF0
-dXJlcyhzdHJ1Y3QNCj4gaGNpX2RldiAqaGRldiwNCj4gPiAgICAgICAgIHJldHVybiAwOw0KPiA+
-ICB9DQo+ID4NCj4gPiArc3RhdGljIGFjcGlfc3RhdHVzIGJ0aW50ZWxfcHBhZ19jYWxsYmFjayhh
-Y3BpX2hhbmRsZSBoYW5kbGUsIHUzMiBsdmwsIHZvaWQNCj4gKmRhdGEsDQo+ID4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB2b2lkICoqcmV0KSB7DQo+ID4gKyAgICAg
-ICBhY3BpX3N0YXR1cyBzdGF0dXM7DQo+ID4gKyAgICAgICBzaXplX3QgbGVuOw0KPiA+ICsgICAg
-ICAgc3RydWN0IGJ0aW50ZWxfcHBhZyAqcHBhZzsNCj4gDQo+IFlvdSBjYW4gcHJvYmFibHkganVz
-dCBhc3NpZ24gcHBhZyA9IGRhdGEgYWJvdmU7DQo+IA0KPiA+ICsgICAgICAgdW5pb24gYWNwaV9v
-YmplY3QgKnAsICplbGVtZW50czsNCj4gPiArICAgICAgIHN0cnVjdCBhY3BpX2J1ZmZlciBzdHJp
-bmcgPSB7QUNQSV9BTExPQ0FURV9CVUZGRVIsIE5VTEx9Ow0KPiA+ICsgICAgICAgc3RydWN0IGFj
-cGlfYnVmZmVyIGJ1ZmZlciA9IHtBQ1BJX0FMTE9DQVRFX0JVRkZFUiwgTlVMTH07DQo+ID4gKyAg
-ICAgICBzdHJ1Y3QgaGNpX2RldiAqaGRldiA9ICgoc3RydWN0IGJ0aW50ZWxfcHBhZyAqKWRhdGEp
-LT5oZGV2Ow0KPiANCj4gVGhlbiB1c2UgaGRldiA9IHBwZ2EtPmhkZXYNCj4gDQpBY2suDQoNCj4g
-PiArDQo+ID4gKyAgICAgICBzdGF0dXMgPSBhY3BpX2dldF9uYW1lKGhhbmRsZSwgQUNQSV9GVUxM
-X1BBVEhOQU1FLCAmc3RyaW5nKTsNCj4gPiArICAgICAgIGlmIChBQ1BJX0ZBSUxVUkUoc3RhdHVz
-KSkgew0KPiA+ICsgICAgICAgICAgICAgICBidF9kZXZfd2FybihoZGV2LCAiQUNQSSBGYWlsdXJl
-OiAlcyIsDQo+IGFjcGlfZm9ybWF0X2V4Y2VwdGlvbihzdGF0dXMpKTsNCj4gPiArICAgICAgICAg
-ICAgICAgcmV0dXJuIHN0YXR1czsNCj4gPiArICAgICAgIH0NCj4gPiArDQo+ID4gKyAgICAgICBp
-ZiAoc3RybmNtcChCVElOVEVMX1BQQUdfUFJFRklYLCBzdHJpbmcucG9pbnRlciwNCj4gPiArICAg
-ICAgICAgICAgICAgICAgIHN0cmxlbihCVElOVEVMX1BQQUdfUFJFRklYKSkpIHsNCj4gPiArICAg
-ICAgICAgICAgICAga2ZyZWUoc3RyaW5nLnBvaW50ZXIpOw0KPiA+ICsgICAgICAgICAgICAgICBy
-ZXR1cm4gQUVfT0s7DQo+ID4gKyAgICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAgbGVuID0gc3Ry
-bGVuKHN0cmluZy5wb2ludGVyKTsNCj4gPiArICAgICAgIGlmIChzdHJuY21wKChjaGFyICopc3Ry
-aW5nLnBvaW50ZXIgKyBsZW4gLSA0LCBCVElOVEVMX1BQQUdfTkFNRSwgNCkpIHsNCj4gPiArICAg
-ICAgICAgICAgICAga2ZyZWUoc3RyaW5nLnBvaW50ZXIpOw0KPiA+ICsgICAgICAgICAgICAgICBy
-ZXR1cm4gQUVfT0s7DQo+ID4gKyAgICAgICB9DQo+ID4gKyAgICAgICBrZnJlZShzdHJpbmcucG9p
-bnRlcik7DQo+ID4gKw0KPiA+ICsgICAgICAgc3RhdHVzID0gYWNwaV9ldmFsdWF0ZV9vYmplY3Qo
-aGFuZGxlLCBOVUxMLCBOVUxMLCAmYnVmZmVyKTsNCj4gPiArICAgICAgIGlmIChBQ1BJX0ZBSUxV
-UkUoc3RhdHVzKSkgew0KPiA+ICsgICAgICAgICAgICAgICBidF9kZXZfd2FybihoZGV2LCAiQUNQ
-SSBGYWlsdXJlOiAlcyIsDQo+IGFjcGlfZm9ybWF0X2V4Y2VwdGlvbihzdGF0dXMpKTsNCj4gPiAr
-ICAgICAgICAgICAgICAgcmV0dXJuIHN0YXR1czsNCj4gPiArICAgICAgIH0NCj4gPiArDQo+ID4g
-KyAgICAgICBwID0gYnVmZmVyLnBvaW50ZXI7DQo+ID4gKyAgICAgICBwcGFnID0gKHN0cnVjdCBi
-dGludGVsX3BwYWcgKilkYXRhOw0KPiA+ICsNCj4gPiArICAgICAgIGlmIChwLT50eXBlICE9IEFD
-UElfVFlQRV9QQUNLQUdFIHx8IHAtPnBhY2thZ2UuY291bnQgIT0gMikgew0KPiA+ICsgICAgICAg
-ICAgICAgICBrZnJlZShidWZmZXIucG9pbnRlcik7DQo+ID4gKyAgICAgICAgICAgICAgIGJ0X2Rl
-dl93YXJuKGhkZXYsICJJbnZhbGlkIG9iamVjdCB0eXBlOiAlZCBvciBwYWNrYWdlIGNvdW50Og0K
-PiAlZCIsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgIHAtPnR5cGUsIHAtPnBhY2th
-Z2UuY291bnQpOw0KPiA+ICsgICAgICAgICAgICAgICByZXR1cm4gQUVfRVJST1I7DQo+ID4gKyAg
-ICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAgZWxlbWVudHMgPSBwLT5wYWNrYWdlLmVsZW1lbnRz
-Ow0KPiA+ICsNCj4gPiArICAgICAgIC8qIFBQQUcgdGFibGUgaXMgbG9jYXRlZCBhdCBlbGVtZW50
-WzFdICovDQo+ID4gKyAgICAgICBwID0gJmVsZW1lbnRzWzFdOw0KPiA+ICsNCj4gPiArICAgICAg
-IHBwYWctPmRvbWFpbiA9ICh1MzIpcC0+cGFja2FnZS5lbGVtZW50c1swXS5pbnRlZ2VyLnZhbHVl
-Ow0KPiA+ICsgICAgICAgcHBhZy0+bW9kZSA9ICh1MzIpcC0+cGFja2FnZS5lbGVtZW50c1sxXS5p
-bnRlZ2VyLnZhbHVlOw0KPiA+ICsgICAgICAga2ZyZWUoYnVmZmVyLnBvaW50ZXIpOw0KPiA+ICsg
-ICAgICAgcmV0dXJuIEFFX0NUUkxfVEVSTUlOQVRFOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICBzdGF0
-aWMgaW50IGJ0aW50ZWxfc2V0X2RlYnVnX2ZlYXR1cmVzKHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0K
-PiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb25zdCBzdHJ1Y3QgaW50ZWxfZGVi
-dWdfZmVhdHVyZXMNCj4gPiAqZmVhdHVyZXMpICB7IEBAIC0yMjUxLDYgKzIzMTIsNTYgQEAgc3Rh
-dGljIGludA0KPiA+IGJ0aW50ZWxfY29uZmlndXJlX29mZmxvYWQoc3RydWN0IGhjaV9kZXYgKmhk
-ZXYpDQo+ID4gICAgICAgICByZXR1cm4gZXJyOw0KPiA+ICB9DQo+ID4NCj4gPiArc3RhdGljIGlu
-dCBidGludGVsX3NldF9wcGFnKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3QNCj4gPiAraW50
-ZWxfdmVyc2lvbl90bHYgKnZlcikgew0KPiA+ICsgICAgICAgYWNwaV9zdGF0dXMgc3RhdHVzOw0K
-PiA+ICsgICAgICAgc3RydWN0IGJ0aW50ZWxfcHBhZyBwcGFnOw0KPiA+ICsgICAgICAgc3RydWN0
-IHNrX2J1ZmYgKnNrYjsNCj4gPiArICAgICAgIHN0cnVjdCBidGludGVsX2xvY19hd2FyZV9yZWcg
-cHBhZ19jbWQ7DQo+ID4gKw0KPiA+ICsgICAgLyogUFBBRyBpcyBub3Qgc3VwcG9ydGVkIGlmIENS
-RiBpcyBIclAyLCBKZnAyLCBKZlAxICovDQo+ID4gKyAgICAgICBzd2l0Y2ggKHZlci0+Y252cl90
-b3AgJiAweEZGRikgew0KPiA+ICsgICAgICAgY2FzZSAweDUwNDogICAgIC8qIEhycDIgKi8NCj4g
-PiArICAgICAgIGNhc2UgMHgyMDI6ICAgICAvKiBKZnAyICovDQo+ID4gKyAgICAgICBjYXNlIDB4
-MjAxOiAgICAgLyogSmZwMSAqLw0KPiA+ICsgICAgICAgICAgICAgICByZXR1cm4gMDsNCj4gPiAr
-ICAgICAgIH0NCj4gPiArDQo+ID4gKyAgICAgICBtZW1zZXQoJnBwYWcsIDAsIHNpemVvZihwcGFn
-KSk7DQo+ID4gKw0KPiA+ICsgICAgICAgcHBhZy5oZGV2ID0gaGRldjsNCj4gPiArICAgICAgIHN0
-YXR1cyA9IGFjcGlfd2Fsa19uYW1lc3BhY2UoQUNQSV9UWVBFX0FOWSwgQUNQSV9ST09UX09CSkVD
-VCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQUNQSV9VSU5UMzJf
-TUFYLCBOVUxMLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBidGlu
-dGVsX3BwYWdfY2FsbGJhY2ssICZwcGFnLA0KPiA+ICsgTlVMTCk7DQo+ID4gKw0KPiA+ICsgICAg
-ICAgaWYgKEFDUElfRkFJTFVSRShzdGF0dXMpKSB7DQo+ID4gKyAgICAgICAgICAgICAgIGJ0X2Rl
-dl93YXJuKGhkZXYsICJQUEFHOiBBQ1BJIEZhaWx1cmU6ICVzIiwNCj4gPiArIGFjcGlfZm9ybWF0
-X2V4Y2VwdGlvbihzdGF0dXMpKTsNCj4gDQo+IFNob3VsZG4ndCB3ZSBjb25zaWRlciBpdCBvayBp
-ZiB0aGUgQUNQSSBkb2Vzbid0IGhhdmUgYW4gZW50cnk/IEkgbWVhbiBpdA0KPiBzaG91bGQgYmUg
-cG9zc2libGUgdG8gcGx1ZyBhIG5ldyBjb250cm9sbGVyIGluIGFuIG9sZCBsYXB0b3AgdGhhdCBw
-b3NzaWJseQ0KPiBkb2Vzbid0IGhhdmUgdGhpcyBlbnRyeSwgcmlnaHQ/DQo+IA0KQWNrLiBPbGRl
-ciBwbGF0Zm9ybSB3b24ndCBzdXBwb3J0IHRoaXMgZmVhdHVyZS4NCj4gPiArICAgICAgICAgICAg
-ICAgcmV0dXJuIC0xOw0KPiA+ICsgICAgICAgfQ0KPiA+ICsNCj4gPiArICAgICAgIGlmIChwcGFn
-LmRvbWFpbiAhPSAweDEyKSB7DQo+ID4gKyAgICAgICAgICAgICAgIGJ0X2Rldl93YXJuKGhkZXYs
-ICJQUEFHLUJUIERvbWFpbiBkaXNhYmxlZCIpOw0KPiA+ICsgICAgICAgICAgICAgICByZXR1cm4g
-LTE7DQo+ID4gKyAgICAgICB9DQo+ID4gKw0KPiA+ICsgICAgICAgLyogUFBBRyBtb2RlLCBCSVQw
-ID0gMCBEaXNhYmxlZCwgQklUMCA9IDEgRW5hYmxlZCAqLw0KPiA+ICsgICAgICAgaWYgKCEocHBh
-Zy5tb2RlICYgQklUKDApKSkgew0KPiA+ICsgICAgICAgICAgICAgICBidF9kZXZfZGJnKGhkZXYs
-ICJQUEFHIGRpc2FibGVkIik7DQo+ID4gKyAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiA+ICsg
-ICAgICAgfQ0KPiA+ICsNCj4gPiArICAgICAgIHBwYWdfY21kLm1jYyA9IDA7DQo+ID4gKyAgICAg
-ICBwcGFnX2NtZC5zZWwgPSAwOyAvKiAwIC0gT3BlcmF0aW9uYWwsIDEgLSBEaXNhYmxlLCAyIC0g
-VGVzdGluZyBtb2RlICovDQo+ID4gKyAgICAgICBwcGFnX2NtZC5kZWx0YSA9IDA7DQo+ID4gKyAg
-ICAgICBza2IgPSBfX2hjaV9jbWRfc3luYyhoZGV2LCAweGZlMTksIHNpemVvZihwcGFnX2NtZCks
-ICZwcGFnX2NtZCwNCj4gSENJX0NNRF9USU1FT1VUKTsNCj4gPiArICAgICAgIGlmIChJU19FUlIo
-c2tiKSkgew0KPiA+ICsgICAgICAgICAgICAgICBidF9kZXZfd2FybihoZGV2LCAiRmFpbGVkIHRv
-IHNlbmQgUFBBRyBFbmFibGUgKCVsZCkiLA0KPiBQVFJfRVJSKHNrYikpOw0KPiA+ICsgICAgICAg
-ICAgICAgICByZXR1cm4gUFRSX0VSUihza2IpOw0KPiA+ICsgICAgICAgfQ0KPiA+ICsgICAgICAg
-a2ZyZWVfc2tiKHNrYik7DQo+ID4gKyAgICAgICByZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4g
-PiAgc3RhdGljIGludCBidGludGVsX2Jvb3Rsb2FkZXJfc2V0dXBfdGx2KHN0cnVjdCBoY2lfZGV2
-ICpoZGV2LA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1
-Y3QgaW50ZWxfdmVyc2lvbl90bHYgKnZlcikNCj4gPiB7IEBAIC0yMjk3LDYgKzI0MDgsOSBAQCBz
-dGF0aWMgaW50IGJ0aW50ZWxfYm9vdGxvYWRlcl9zZXR1cF90bHYoc3RydWN0DQo+ID4gaGNpX2Rl
-diAqaGRldiwNCj4gPg0KPiA+ICAgICAgICAgaGNpX2Rldl9jbGVhcl9mbGFnKGhkZXYsIEhDSV9R
-VUFMSVRZX1JFUE9SVCk7DQo+ID4NCj4gPiArICAgICAgIC8qIFNldCBQUEFHIGZlYXR1cmUgKi8N
-Cj4gPiArICAgICAgIGJ0aW50ZWxfc2V0X3BwYWcoaGRldiwgdmVyKTsNCj4gDQo+IExvb2tzIGxp
-a2UgeW91IGFyZSBub3QgdXNpbmcgdGhlIHJldHVybiBhYm92ZSB3aGljaCBJIGd1ZXNzIGlzIGZp
-bmUgc2luY2UgdGhpcw0KPiBzdGVwIGNhbiBiZSBjb25zaWRlcmVkIG9wdGlvbmFsIGJ1dCBJJ2Qg
-ZG9jdW1lbnQgaXQgYXMgc3VjaCBhbmQgcHJvYmFibHkNCj4gbWFrZSBidGludGVsX3NldF9wcGFn
-IHJldHVybiB2b2lkIGFzIGl0IHNob3VsZG4ndCBiZSBjb25zaWRlcmVkIGFzIGFuIGVycm9yIGlm
-DQo+IGl0IGZhaWxzLg0KQWNrLiANCj4gDQo+ID4gKw0KLi4uLg0KDQpUaGFua3MsDQpLaXJhbg0K
-DQo=
+From: Seema Sreemantha <seema.sreemantha@intel.com>
+
+Antenna gain is defined as the antenna’s ability to
+increase the Tx power in a given direction. Intel
+is certifying its products with fixed reference
+antenna peak gain values (3/5dBi). The feature takes
+into account the actual antenna gain, and increases
+output power values, which results in a performance
+improvement.
+
+After firmware download is completed, driver reads from
+ACPI table and configures PPAG as required. ACPI table
+entry for PPAG is defined as below.
+
+Name (PPAG, Package (0x02)
+{
+    0x00000001,
+    Package (0x02)
+    {
+        0x00000012, /* Bluetooth Domain */
+        0x00000001  /* 1 - Enable PPAG, 0 - Disable PPAG */
+    }
+})
+
+btmon log:
+< HCI Command: Intel Configure Per Platform Antenna Gain (0x3f|0x0219) plen 12
+        Mcc: 0x00000000
+        Selector: Enable
+        Delta: 0x00000000
+> HCI Event: Command Complete (0x0e) plen 4
+      Intel Configure Per Platform Antenna Gain (0x3f|0x0219) ncmd 1
+        Status: Success (0x00)
+
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Seema Sreemantha <seema.sreemantha@intel.com>
+---
+changes in v2:
+- Address review comments
+
+ drivers/bluetooth/btintel.c | 115 ++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  13 ++++
+ 2 files changed, 128 insertions(+)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index d4e2cb9a4eb4..608fa1e59e89 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -24,6 +24,9 @@
+ #define ECDSA_OFFSET		644
+ #define ECDSA_HEADER_LEN	320
+ 
++#define BTINTEL_PPAG_NAME   "PPAG"
++#define BTINTEL_PPAG_PREFIX "\\_SB_.PCI0.XHCI.RHUB"
++
+ #define CMD_WRITE_BOOT_PARAMS	0xfc0e
+ struct cmd_write_boot_params {
+ 	__le32 boot_addr;
+@@ -1278,6 +1281,63 @@ static int btintel_read_debug_features(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++static acpi_status btintel_ppag_callback(acpi_handle handle, u32 lvl, void *data,
++					 void **ret)
++{
++	acpi_status status;
++	size_t len;
++	struct btintel_ppag *ppag = data;
++	union acpi_object *p, *elements;
++	struct acpi_buffer string = {ACPI_ALLOCATE_BUFFER, NULL};
++	struct acpi_buffer buffer = {ACPI_ALLOCATE_BUFFER, NULL};
++	struct hci_dev *hdev = ppag->hdev;
++
++	status = acpi_get_name(handle, ACPI_FULL_PATHNAME, &string);
++	if (ACPI_FAILURE(status)) {
++		bt_dev_warn(hdev, "ACPI Failure: %s", acpi_format_exception(status));
++		return status;
++	}
++
++	if (strncmp(BTINTEL_PPAG_PREFIX, string.pointer,
++		    strlen(BTINTEL_PPAG_PREFIX))) {
++		kfree(string.pointer);
++		return AE_OK;
++	}
++
++	len = strlen(string.pointer);
++	if (strncmp((char *)string.pointer + len - 4, BTINTEL_PPAG_NAME, 4)) {
++		kfree(string.pointer);
++		return AE_OK;
++	}
++	kfree(string.pointer);
++
++	status = acpi_evaluate_object(handle, NULL, NULL, &buffer);
++	if (ACPI_FAILURE(status)) {
++		bt_dev_warn(hdev, "ACPI Failure: %s", acpi_format_exception(status));
++		return status;
++	}
++
++	p = buffer.pointer;
++	ppag = (struct btintel_ppag *)data;
++
++	if (p->type != ACPI_TYPE_PACKAGE || p->package.count != 2) {
++		kfree(buffer.pointer);
++		bt_dev_warn(hdev, "Invalid object type: %d or package count: %d",
++			    p->type, p->package.count);
++		return AE_ERROR;
++	}
++
++	elements = p->package.elements;
++
++	/* PPAG table is located at element[1] */
++	p = &elements[1];
++
++	ppag->domain = (u32)p->package.elements[0].integer.value;
++	ppag->mode = (u32)p->package.elements[1].integer.value;
++	kfree(buffer.pointer);
++	return AE_CTRL_TERMINATE;
++}
++
+ static int btintel_set_debug_features(struct hci_dev *hdev,
+ 			       const struct intel_debug_features *features)
+ {
+@@ -2251,6 +2311,58 @@ static int btintel_configure_offload(struct hci_dev *hdev)
+ 	return err;
+ }
+ 
++static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver)
++{
++	acpi_status status;
++	struct btintel_ppag ppag;
++	struct sk_buff *skb;
++	struct btintel_loc_aware_reg ppag_cmd;
++
++    /* PPAG is not supported if CRF is HrP2, Jfp2, JfP1 */
++	switch (ver->cnvr_top & 0xFFF) {
++	case 0x504:     /* Hrp2 */
++	case 0x202:     /* Jfp2 */
++	case 0x201:     /* Jfp1 */
++		return;
++	}
++
++	memset(&ppag, 0, sizeof(ppag));
++
++	ppag.hdev = hdev;
++	status = acpi_walk_namespace(ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
++				     ACPI_UINT32_MAX, NULL,
++				     btintel_ppag_callback, &ppag, NULL);
++
++	if (ACPI_FAILURE(status)) {
++		/* Do not log warning message if ACPI entry is not found */
++		if (status == AE_NOT_FOUND)
++			return;
++		bt_dev_warn(hdev, "PPAG: ACPI Failure: %s", acpi_format_exception(status));
++		return;
++	}
++
++	if (ppag.domain != 0x12) {
++		bt_dev_warn(hdev, "PPAG-BT Domain disabled");
++		return;
++	}
++
++	/* PPAG mode, BIT0 = 0 Disabled, BIT0 = 1 Enabled */
++	if (!(ppag.mode & BIT(0))) {
++		bt_dev_dbg(hdev, "PPAG disabled");
++		return;
++	}
++
++	ppag_cmd.mcc = cpu_to_le32(0);
++	ppag_cmd.sel = cpu_to_le32(0); /* 0 - Enable , 1 - Disable, 2 - Testing mode */
++	ppag_cmd.delta = cpu_to_le32(0);
++	skb = __hci_cmd_sync(hdev, 0xfe19, sizeof(ppag_cmd), &ppag_cmd, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_warn(hdev, "Failed to send PPAG Enable (%ld)", PTR_ERR(skb));
++		return;
++	}
++	kfree_skb(skb);
++}
++
+ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 					struct intel_version_tlv *ver)
+ {
+@@ -2297,6 +2409,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 
+ 	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+ 
++	/* Set PPAG feature */
++	btintel_set_ppag(hdev, ver);
++
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version_tlv(hdev, &new_ver);
+ 	if (err)
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index e0060e58573c..8e7da877efae 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -137,6 +137,19 @@ struct intel_offload_use_cases {
+ 	__u8	preset[8];
+ } __packed;
+ 
++/* structure to store the PPAG data read from ACPI table */
++struct btintel_ppag {
++	u32	domain;
++	u32     mode;
++	struct hci_dev *hdev;
++};
++
++struct btintel_loc_aware_reg {
++	__le32 mcc;
++	__le32 sel;
++	__le32 delta;
++} __packed;
++
+ #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
+ #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
+ #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
+-- 
+2.17.1
+
