@@ -2,27 +2,27 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA80EC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 12:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEA2C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 12:03:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229899AbjBFMDU (ORCPT
+        id S229909AbjBFMDa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 07:03:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
+        Mon, 6 Feb 2023 07:03:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbjBFMDT (ORCPT
+        with ESMTP id S229884AbjBFMD2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 07:03:19 -0500
+        Mon, 6 Feb 2023 07:03:28 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6E51631E
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 04:03:17 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02BDE1630F
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 04:03:24 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOydp-007ziH-Oe; Mon, 06 Feb 2023 18:22:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:29 +0800
+        id 1pOydy-007zjk-6G; Mon, 06 Feb 2023 18:22:39 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:38 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:29 +0800
-Subject: [PATCH 9/17] KEYS: DH: Use crypto_wait_req
+Date:   Mon, 06 Feb 2023 18:22:38 +0800
+Subject: [PATCH 13/17] net: ipv4: Remove completion function scaffolding
 References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
@@ -43,80 +43,103 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOydp-007ziH-Oe@formenos.hmeau.com>
+Message-Id: <E1pOydy-007zjk-6G@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch replaces the custom crypto completion function with
-crypto_req_done.
+This patch removes the temporary scaffolding now that the comletion
+function signature has been converted.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- security/keys/dh.c |   30 +++++-------------------------
- 1 file changed, 5 insertions(+), 25 deletions(-)
+ net/ipv4/ah4.c  |    8 ++++----
+ net/ipv4/esp4.c |   16 ++++++++--------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/security/keys/dh.c b/security/keys/dh.c
-index b339760a31dd..da64c358474b 100644
---- a/security/keys/dh.c
-+++ b/security/keys/dh.c
-@@ -64,22 +64,6 @@ static void dh_free_data(struct dh *dh)
- 	kfree_sensitive(dh->g);
+diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
+index 1fc0231eb1ee..015c0f4ec5ba 100644
+--- a/net/ipv4/ah4.c
++++ b/net/ipv4/ah4.c
+@@ -117,11 +117,11 @@ static int ip_clear_mutable_options(const struct iphdr *iph, __be32 *daddr)
+ 	return 0;
  }
  
--struct dh_completion {
--	struct completion completion;
--	int err;
--};
--
--static void dh_crypto_done(struct crypto_async_request *req, int err)
--{
--	struct dh_completion *compl = req->data;
--
--	if (err == -EINPROGRESS)
--		return;
--
--	compl->err = err;
--	complete(&compl->completion);
--}
--
- static int kdf_alloc(struct crypto_shash **hash, char *hashname)
+-static void ah_output_done(crypto_completion_data_t *data, int err)
++static void ah_output_done(void *data, int err)
  {
- 	struct crypto_shash *tfm;
-@@ -146,7 +130,7 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
- 	struct keyctl_dh_params pcopy;
- 	struct dh dh_inputs;
- 	struct scatterlist outsg;
--	struct dh_completion compl;
-+	DECLARE_CRYPTO_WAIT(compl);
- 	struct crypto_kpp *tfm;
- 	struct kpp_request *req;
- 	uint8_t *secret;
-@@ -266,22 +250,18 @@ long __keyctl_dh_compute(struct keyctl_dh_params __user *params,
+ 	u8 *icv;
+ 	struct iphdr *iph;
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct xfrm_state *x = skb_dst(skb)->xfrm;
+ 	struct ah_data *ahp = x->data;
+ 	struct iphdr *top_iph = ip_hdr(skb);
+@@ -262,12 +262,12 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
+ 	return err;
+ }
  
- 	kpp_request_set_input(req, NULL, 0);
- 	kpp_request_set_output(req, &outsg, outlen);
--	init_completion(&compl.completion);
- 	kpp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
- 				 CRYPTO_TFM_REQ_MAY_SLEEP,
--				 dh_crypto_done, &compl);
-+				 crypto_req_done, &compl);
+-static void ah_input_done(crypto_completion_data_t *data, int err)
++static void ah_input_done(void *data, int err)
+ {
+ 	u8 *auth_data;
+ 	u8 *icv;
+ 	struct iphdr *work_iph;
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct xfrm_state *x = xfrm_input_state(skb);
+ 	struct ah_data *ahp = x->data;
+ 	struct ip_auth_hdr *ah = ip_auth_hdr(skb);
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 8abe07c1ff28..ba06ed42e428 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -244,9 +244,9 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
+ }
+ #endif
  
- 	/*
- 	 * For DH, generate_public_key and generate_shared_secret are
- 	 * the same calculation
- 	 */
- 	ret = crypto_kpp_generate_public_key(req);
--	if (ret == -EINPROGRESS) {
--		wait_for_completion(&compl.completion);
--		ret = compl.err;
--		if (ret)
--			goto out6;
--	}
-+	ret = crypto_wait_req(ret, &compl);
-+	if (ret)
-+		goto out6;
+-static void esp_output_done(crypto_completion_data_t *data, int err)
++static void esp_output_done(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 	struct xfrm_offload *xo = xfrm_offload(skb);
+ 	void *tmp;
+ 	struct xfrm_state *x;
+@@ -332,9 +332,9 @@ static struct ip_esp_hdr *esp_output_set_extra(struct sk_buff *skb,
+ 	return esph;
+ }
  
- 	if (kdfcopy) {
- 		/*
+-static void esp_output_done_esn(crypto_completion_data_t *data, int err)
++static void esp_output_done_esn(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 
+ 	esp_output_restore_header(skb);
+ 	esp_output_done(data, err);
+@@ -830,9 +830,9 @@ int esp_input_done2(struct sk_buff *skb, int err)
+ }
+ EXPORT_SYMBOL_GPL(esp_input_done2);
+ 
+-static void esp_input_done(crypto_completion_data_t *data, int err)
++static void esp_input_done(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 
+ 	xfrm_input_resume(skb, esp_input_done2(skb, err));
+ }
+@@ -860,9 +860,9 @@ static void esp_input_set_header(struct sk_buff *skb, __be32 *seqhi)
+ 	}
+ }
+ 
+-static void esp_input_done_esn(crypto_completion_data_t *data, int err)
++static void esp_input_done_esn(void *data, int err)
+ {
+-	struct sk_buff *skb = crypto_get_completion_data(data);
++	struct sk_buff *skb = data;
+ 
+ 	esp_input_restore_header(skb);
+ 	esp_input_done(data, err);
