@@ -2,57 +2,56 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208A7C636D3
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Feb 2023 21:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 702B3C636D4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 00:13:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229522AbjBEVRS (ORCPT
+        id S229567AbjBFANg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Feb 2023 16:17:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35048 "EHLO
+        Sun, 5 Feb 2023 19:13:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjBEVRR (ORCPT
+        with ESMTP id S229564AbjBFANe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Feb 2023 16:17:17 -0500
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FEE216AE1
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 13:17:15 -0800 (PST)
-Received: by mail-qv1-xf32.google.com with SMTP id mm5so1724996qvb.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 13:17:15 -0800 (PST)
+        Sun, 5 Feb 2023 19:13:34 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B351ADF9
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 16:13:26 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id w3so11249388qts.7
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 16:13:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kali.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sQpfxqbj8W16EcaK4RqVCodrekeKSrjK/jm5qyTP/Lw=;
-        b=o49zfJQTX1TVubYCthchKrDz11Sc8q44WgHx+9GehoCmw1a/UUOBGtSbW8mJtT9Nhe
-         OYPaFlhphng5zEAm1oRYXUhSPkEDQXbVKeTR6LdFNSWHMnv0GOmElv4bpNRmXmgpkcs4
-         h5VwkMGb0cH7EL2rAuGhV/dYkMMdCMQ/8YKu1Oe7yUHn3rFflfF/S4DEC6ja8bEhXDDZ
-         +YeLcpEFmwZjfjFYTC5EUCSHN7pDsNUBsJctDr4yg3GVmC8m7f8SBPCZiad651ZM6SUj
-         R2Hrj+QbGTCZxNs8Ch6c0TYt4mcPKpuTPEP888KxqtXHcxfkgHwsZcWEBs081QhT22Kd
-         7A8Q==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmeAe5uno9wGc5xLwGkJf0jMDPKBNskya1KsnB3Qcn8=;
+        b=WevXsNaV17F5m0//FDGunyGk4JMhe3+jEFZ/RrqrYl3Yoaj5I7Do7vr2dl9yXwm/5r
+         gCDmqR5ktL44Z9SHBO33I3jODB2vS2nralihRBqwymZ9RwlAtjnGavgUMRGnJTboGFIu
+         wf5FZzee6YCgu3V61dnzqGayLJJc7g5ZEvzlOis8rOJLlc9Z97dkILg2YDgXZHqh3oMO
+         ivMydusYX1u3VMgmJriIUTKh88VoNVZ9X9/Loaxl8pslkllXOwZ4LtI1J9byBstD6nB7
+         OyDkqny4e0FQh+08oaeAQAgrZRY8aEQPrCeLQqFvrnZRHFJqN5fJRYyEVmTs1Re3xj4g
+         HDiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sQpfxqbj8W16EcaK4RqVCodrekeKSrjK/jm5qyTP/Lw=;
-        b=iQObSL0Bf22jEuoEbkS4rICSSnV8UMuF0+tSoKfJDczqJ37nTLEToc5ImHw1FyPkLq
-         nlacyZU+vB+zDEcrRm92RjNQkiCkAjXhGM0Vyb6GmEC9jN1ElUTQ6iT7h83nktasOZpu
-         h9c8A169a57m+DBKOJ/6VnisFmVvTaMY8hMGf2uYuOlo35k4k8iC8QM4VusRK4PfvVmv
-         jMerjX2Jw/2QtQ3+kISNrVH9gT7AtrXpBjVllbBNrrAKzUDxFS1DTwFCAG/zJ71JmF9r
-         prc8aWc19PPCtIsHLqf1mcMYfTRAz79TYpVJBjP3htq/cScbz0bXzkwo+3DEw4Sq3GjT
-         mf3A==
-X-Gm-Message-State: AO0yUKWhp+rh3JDhO+fEbQ5lWPR5k3CK9vTD84uhqrbPMj5smzofU0r/
-        CJ20K4S95/qnZp3MWcRHwIgagg==
-X-Google-Smtp-Source: AK7set+SbqcAB7CSGrzF8/8vOEuKkbVHEowhg2nRY4TOn6pW9Wya4yVk0B/Rwf7K0CZjvcRRvCAHtA==
-X-Received: by 2002:a05:6214:2582:b0:56b:eb9d:4342 with SMTP id fq2-20020a056214258200b0056beb9d4342mr11420162qvb.49.1675631834415;
-        Sun, 05 Feb 2023 13:17:14 -0800 (PST)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MmeAe5uno9wGc5xLwGkJf0jMDPKBNskya1KsnB3Qcn8=;
+        b=ZWTgf5suzD13EM2agECRpzA85I7zLfYd+POGPtwkRMsKeB1x4z+RJo44V166ccmr9t
+         7E8/Q995XL51AuOhiet3xE3PLKvGnyrL75JvbjVfXFMCKnR6q+QHQMz3pxKAlRNZ1Aky
+         SY86277BDv7em3i9EXW1VhKAVOAsoeb50kfDlmDqjyzAyYrXNEIcfDFeUYjVrv9s5Dvz
+         BsEidCZecbeSKJ/JxsvKwF1nQectTpYRjBgo8pl93mIhN0/Y16GRB6ILz21PebFfFVBf
+         6l2KY2swSTXJ24bTTyzGQ0O2BYgGWgg3/WOHsqhC7ZPHvyZQfhB+0U0PrkodhBUAqUWu
+         Trxw==
+X-Gm-Message-State: AO0yUKVdHjJbOsX6wvmi7HbZreVsX8fhPCFLBKgEJb9hAz4zv5NMG6qN
+        5UvDC5Lt5euaZzy+7zrCS0KOlw==
+X-Google-Smtp-Source: AK7set8BJRNvbZw5UsDww2zQ2b3xNBVHvDL+phKNASwdNnWujugsUHYTuY15uIuJoGM1rKVTZN1HnA==
+X-Received: by 2002:ac8:5f88:0:b0:3b9:b497:109e with SMTP id j8-20020ac85f88000000b003b9b497109emr18259071qta.18.1675642405870;
+        Sun, 05 Feb 2023 16:13:25 -0800 (PST)
 Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
-        by smtp.gmail.com with ESMTPSA id k1-20020a05620a414100b007112aa42c4fsm6196519qko.135.2023.02.05.13.17.13
+        by smtp.gmail.com with ESMTPSA id fz14-20020a05622a5a8e00b003b9e1d3a502sm6177249qtb.54.2023.02.05.16.13.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Feb 2023 13:17:13 -0800 (PST)
+        Sun, 05 Feb 2023 16:13:25 -0800 (PST)
 From:   Steev Klimaszewski <steev@kali.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     Steev Klimaszewski <steev@kali.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -64,87 +63,122 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Konrad Dybcio <konrad.dybcio@linaro.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Mark Pearson <markpearson@lenovo.com>
-Subject: Re: [PATCH v2 4/4] arm64: dts: qcom: thinkpad-x13s: Add bluetooth
-Date:   Sun,  5 Feb 2023 15:17:11 -0600
-Message-Id: <20230205211712.48001-1-steev@kali.org>
+Subject: [PATCH v3 0/4] Attempt at adding WCN6855 BT support
+Date:   Sun,  5 Feb 2023 18:13:19 -0600
+Message-Id: <20230206001323.2466-1-steev@kali.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <CABBYNZJPZChB0eOn05oFd2mknzOmr1RJRW3LFf3jbq_jpQ1UGA@mail.gmail.com>
-References: <CABBYNZJPZChB0eOn05oFd2mknzOmr1RJRW3LFf3jbq_jpQ1UGA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+This v3 of the patchset is somewhat of an RFC/RFT, and also just something to
+get this out there.
 
->Hi Steev,
+First things first, I do not have access to the specs nor the schematics, so a
+lot of this was done via guess work, looking at the acpi tables, and looking at
+how a similar device (wcn6750) was added.
 
->On Tue, Jan 31, 2023 at 7:13 PM Steev Klimaszewski <steev@kali.org> wrote:
->>
->> >On 31/01/2023 05:38, Steev Klimaszewski wrote:
->> >> Signed-off-by: Steev Klimaszewski <steev@kali.org>
->> >> ---
->> >>  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 68 +++++++++++++++++++
->> >>  1 file changed, 68 insertions(+)
->> >>
->> >> diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
->> >> index f936b020a71d..951438ac5946 100644
->> >> --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
->> >> +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
->> >> @@ -24,6 +24,8 @@ / {
->> >>      aliases {
->> >>              i2c4 = &i2c4;
->> >>              i2c21 = &i2c21;
->> >> +            serial0 = &uart17;
->> >> +            serial1 = &uart2;
->> >>      };
->> >>
->> >>      wcd938x: audio-codec {
->> >> @@ -712,6 +714,32 @@ &qup0 {
->> >>      status = "okay";
->> >>  };
->> >>
->> >> +&uart2 {
->> >> +    status = "okay";
->> >> +
->> >> +    pinctrl-names = "default";
->> >> +    pinctrl-0 = <&uart2_state>;
->> >> +
->> >> +    bluetooth {
->> >> +            compatible = "qcom,wcn6855-bt";
->> >> +
->> >> +/*
+There are possibly checkpatch warnings, and I do apologize to those who won't
+review things until there are no warnings for wasting your time, I did try to
+correct the ones I came across and seemed to be needed.
 
->> > Why dead code should be in the kernel?
+One example is that I have the vregs commented out, the dt-bindings say that
+they are required since it's based on the wcn6750 work but also like the 6750,
+I've added defaults into the driver, and those seem to work, at least for the
+initial testing.
 
->> As mentioned in the cover letter, this is a bit closer to an RFC than ready to
->> go in, and I do apologize that it wasn't clear enough.  I do not have access to
->> the schematics, and based on my reading of the schema for bluetooth, these
->> entries are supposed to be required, however, like the wcn6750, I have dummy
->> data entered into the qca_soc_data_wcn6855 struct.  I know that these should be
->> there, I just do not have access to the correct information to put, if that
->> makes sense?
+The end result is that we do have a working device, but not entirely reliable.
 
->Well you don't have the RFC set in the subject which is probably why
->people are reviewing it like it is supposed to be merged, that said I
->do wonder if there is to indicate these entries are to be considered
->sort of experimental so we don't end up enabling it by default?
->
+Hopefully by getting this out there, people who do have access to the specs or
+schematics can see where the improvements or fixes need to come.
 
-Initially, it was meant to be more of an RFC/RFT, but as it turns out it works
-pretty good with the defaults in the bluetooth driver, so I've made a change in
-v3 to just make a note that it's a TODO? I'm not sure if that's okay or not, but
-I'm sure people will let me know :)
+There are a few things that I am not sure why they happen, and don't have the
+knowledge level to figure out why they happen or debugging it.
 
->>
->> <snip>
->>
->> -- steev
->--
->Luiz Agusto von Dentz
+Bluetooth: hci0: setting up wcn6855
+Bluetooth: hci0: Frame reassembly failed (-84)
+Bluetooth: hci0: QCA Product ID   :0x00000013
+Bluetooth: hci0: QCA SOC Version  :0x400c0210
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x000038e6
+Bluetooth: hci0: QCA controller version 0x02100201
+Bluetooth: hci0: unexpected event for opcode 0xfc48
+Bluetooth: hci0: Sending QCA Patch config failed (-110)
+Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
+Bluetooth: hci0: QCA setup on UART is completed
+
+I do not know why the Frame assembly failed, nor the unexpected event.
+
+Likewise, I'm not entirely sure why it says the patch config send times out, and
+*then* seems to send it?
+
+The BD Address also seems to be incorrect, and I'm not sure what is going on
+there either.
+
+Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+well as connecting to and using an H2GO bluetooth speaker and playing audio out
+via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+
+The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+"A2DP Sink, codec SBC" would provide audio output, and while I could see that
+data was being sent to the speaker, it wasn't always outputting, and going >
+4ft. away, would often disconnect.
+
+steev@wintermute:~$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+        UP RUNNING PSCAN
+        RX bytes:1492 acl:0 sco:0 events:126 errors:0
+        TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'wintermute'
+        Class: 0x0c010c
+        Service Classes: Rendering, Capturing
+        Device Class: Computer, Laptop
+        HCI Version:  (0xc)  Revision: 0x0
+        LMP Version:  (0xc)  Subversion: 0x46f7
+        Manufacturer: Qualcomm (29)
+
+steev@wintermute:~$ dmesg | grep Razer
+[ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+[ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+steev@wintermute:~$ dmesg | grep H2GO
+[ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
+
+Changes since v2:
+ - Drop unnecessary commit info from patch 2
+ - Remove dead code in patch 4, add TODO note.
+ - Make dtbs_check happy with the pin definitions
+
+Bjorn Andersson (1):
+  arm64: dts: qcom: sc8280xp: Define uart2
+
+Steev Klimaszewski (3):
+  dt-bindings: net: Add WCN6855 Bluetooth
+  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+  arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     |  2 +
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 63 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 +++++
+ drivers/bluetooth/btqca.c                     | 24 ++++++-
+ drivers/bluetooth/btqca.h                     | 10 +++
+ drivers/bluetooth/hci_qca.c                   | 59 +++++++++++++----
+ 6 files changed, 157 insertions(+), 15 deletions(-)
+
+
+base-commit: 4fafd96910add124586b549ad005dcd179de8a18
+-- 
+2.39.0
 
