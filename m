@@ -2,54 +2,54 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702B3C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 00:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05176C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 00:16:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbjBFANg (ORCPT
+        id S229567AbjBFAQl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Feb 2023 19:13:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40908 "EHLO
+        Sun, 5 Feb 2023 19:16:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbjBFANe (ORCPT
+        with ESMTP id S229516AbjBFAQi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Feb 2023 19:13:34 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B351ADF9
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 16:13:26 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id w3so11249388qts.7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 16:13:26 -0800 (PST)
+        Sun, 5 Feb 2023 19:16:38 -0500
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E79B18A89
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 16:16:36 -0800 (PST)
+Received: by mail-ot1-x334.google.com with SMTP id p24-20020a056830131800b0068d4b30536aso2810369otq.9
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 16:16:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kali.org; s=google;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
         bh=MmeAe5uno9wGc5xLwGkJf0jMDPKBNskya1KsnB3Qcn8=;
-        b=WevXsNaV17F5m0//FDGunyGk4JMhe3+jEFZ/RrqrYl3Yoaj5I7Do7vr2dl9yXwm/5r
-         gCDmqR5ktL44Z9SHBO33I3jODB2vS2nralihRBqwymZ9RwlAtjnGavgUMRGnJTboGFIu
-         wf5FZzee6YCgu3V61dnzqGayLJJc7g5ZEvzlOis8rOJLlc9Z97dkILg2YDgXZHqh3oMO
-         ivMydusYX1u3VMgmJriIUTKh88VoNVZ9X9/Loaxl8pslkllXOwZ4LtI1J9byBstD6nB7
-         OyDkqny4e0FQh+08oaeAQAgrZRY8aEQPrCeLQqFvrnZRHFJqN5fJRYyEVmTs1Re3xj4g
-         HDiQ==
+        b=nmxVrTU06l2M/djDE2YDTrs35DySHC3Tsv5VlNKrP62dldyMJrLCAsMCiySFaodZx+
+         364U3vVEvCIe3/sYHv1kSMi+CdFZSiGNXe64ECAOUW3c/yh7Q1f6QCxjJPY/yGHHb4NQ
+         ycVCgWw+b0mepyoVpPNoDJl1/UvN88qViMkcXjL27OJ9SDd9tpsQNG3yitAlcKbe1hii
+         /ztaKDBpWzYkPgORFvey/VwXcAxWEbTZEzu5XXRLfHuMYGD6dHT+AF+pp/s76mhI4oDX
+         1nfDuXg9WUW00rJFDIc10gwlepBgom8XOmH/lKsllGjPvtLv0/VO7GJk6cRXUYW5HUcx
+         YzLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
         bh=MmeAe5uno9wGc5xLwGkJf0jMDPKBNskya1KsnB3Qcn8=;
-        b=ZWTgf5suzD13EM2agECRpzA85I7zLfYd+POGPtwkRMsKeB1x4z+RJo44V166ccmr9t
-         7E8/Q995XL51AuOhiet3xE3PLKvGnyrL75JvbjVfXFMCKnR6q+QHQMz3pxKAlRNZ1Aky
-         SY86277BDv7em3i9EXW1VhKAVOAsoeb50kfDlmDqjyzAyYrXNEIcfDFeUYjVrv9s5Dvz
-         BsEidCZecbeSKJ/JxsvKwF1nQectTpYRjBgo8pl93mIhN0/Y16GRB6ILz21PebFfFVBf
-         6l2KY2swSTXJ24bTTyzGQ0O2BYgGWgg3/WOHsqhC7ZPHvyZQfhB+0U0PrkodhBUAqUWu
-         Trxw==
-X-Gm-Message-State: AO0yUKVdHjJbOsX6wvmi7HbZreVsX8fhPCFLBKgEJb9hAz4zv5NMG6qN
-        5UvDC5Lt5euaZzy+7zrCS0KOlw==
-X-Google-Smtp-Source: AK7set8BJRNvbZw5UsDww2zQ2b3xNBVHvDL+phKNASwdNnWujugsUHYTuY15uIuJoGM1rKVTZN1HnA==
-X-Received: by 2002:ac8:5f88:0:b0:3b9:b497:109e with SMTP id j8-20020ac85f88000000b003b9b497109emr18259071qta.18.1675642405870;
-        Sun, 05 Feb 2023 16:13:25 -0800 (PST)
+        b=ssJ7gpON6pLVXUbMb4YZW8SOh0Gi5OH2Xv2wY2VnSBN98ct2+NSwFXgf9EHJe1nzzH
+         fjHkK+w0zkvlhMQyFhxW3b4bdFfa5T8BGX5jdSGgE6ZNuH7xkiWbuB8ffbeqrj/ve96B
+         Z5cg4CpaJLA04rilX5zYA4AvIDR6JCFoisV32GAKibK3/H17nU+2tFk0N6ks9O7ECGtY
+         MtL1X+qV0ZSK/IXw/LGdgvjz0TGkmza7idmm1tXNqx+U6wesQclwx1nwfTY2XbAyr4Tp
+         fOt80QWOkB/RWaqn52OBsTHUL86uoRq5xcg4cvfyTKv7HXp9CuFbnVR+cHnypBu8dMRq
+         xrIg==
+X-Gm-Message-State: AO0yUKWpp4Fvw9dio0fb6ClNZ3DDTDqQ00KGowlYhyjsMbpZqh0DQoyj
+        LjenYqzv2t8/lGX4KcZ30OgZTg==
+X-Google-Smtp-Source: AK7set/LgIhfUdDLaNleFxtlKj56XwhYe/J1OAF3fBc8+c3YOgzReXStF2cRvElYL385psnepzuG/A==
+X-Received: by 2002:a9d:7092:0:b0:68b:c42c:700e with SMTP id l18-20020a9d7092000000b0068bc42c700emr8749124otj.4.1675642595651;
+        Sun, 05 Feb 2023 16:16:35 -0800 (PST)
 Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
-        by smtp.gmail.com with ESMTPSA id fz14-20020a05622a5a8e00b003b9e1d3a502sm6177249qtb.54.2023.02.05.16.13.24
+        by smtp.gmail.com with ESMTPSA id c5-20020a9d4805000000b0068bdca29f97sm4094265otf.52.2023.02.05.16.16.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Feb 2023 16:13:25 -0800 (PST)
+        Sun, 05 Feb 2023 16:16:35 -0800 (PST)
 From:   Steev Klimaszewski <steev@kali.org>
 To:     Steev Klimaszewski <steev@kali.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -68,9 +68,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Mark Pearson <markpearson@lenovo.com>
-Subject: [PATCH v3 0/4] Attempt at adding WCN6855 BT support
-Date:   Sun,  5 Feb 2023 18:13:19 -0600
-Message-Id: <20230206001323.2466-1-steev@kali.org>
+Subject: [RESEND PATCH v3 0/4] Attempt at adding WCN6855 BT support
+Date:   Sun,  5 Feb 2023 18:16:30 -0600
+Message-Id: <20230206001634.2566-1-steev@kali.org>
 X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
