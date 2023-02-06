@@ -2,125 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF12FC63797
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 00:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85219C636CD
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 00:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbjBFAQv (ORCPT
+        id S229525AbjBFAyM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Feb 2023 19:16:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41858 "EHLO
+        Sun, 5 Feb 2023 19:54:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbjBFAQo (ORCPT
+        with ESMTP id S229521AbjBFAyL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Feb 2023 19:16:44 -0500
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4D919F1E
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 16:16:41 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id bj22so8495474oib.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 16:16:41 -0800 (PST)
+        Sun, 5 Feb 2023 19:54:11 -0500
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930E313DFA
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Feb 2023 16:54:10 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id h24so11278095qta.12
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Feb 2023 16:54:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Vf1rdFY0mBBSEcQfkZO+NJqi84L+MOrWCpzsYM4y6TE=;
-        b=iyBWvsOrErhEQUMtqXF272zLpX4yEkJVfWQ7N6WVPaFKMTRTzabrICeelj5RpPCiwm
-         5VK4Dri/KQ/h/e3DXChm6EneGGmEd8cDO4hdOzPKsxD0OAq/v+TARDfq+aT2tHB/gYy6
-         F7a45tIp9I9MEqej+T54q6NJSKKDY/78cBTo/ApN+QfNlheQU6FkDiGIeUlthnZ3lzcq
-         HF/BNH8zNAhUQiC5ejL37WKYMUMq7AFoSLnaDtLKzWCuupEk82eW1dD3GdexMqC8htWr
-         P4audA/EKQ7OzZO+R0VwlsxiEvX8GMtSalhKb8t7Efxbw9Ac8xY2SPb4a3+2VSR56Ndk
-         MtAw==
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cnf84Gx87hqq0g6YozW4yuxzu+j4qVN9BY9niDBm9RY=;
+        b=jDOrOj+p75TsKEa69FT/KlSZA0nGXclk7uiUxaZnfbxoP/fVANII0zpZgXfHtmz5c/
+         U2cdP62aIBMpSruD0bP9gX3xlxlu30hFGNkoRbuNITYmHN1MQ3YNgv3DP7yXLy08M41c
+         gepz7s6UDKD/uWuLJpx41RMHOXXWKcExWiyfvl3vAIWVnEJ18vny/RYputTEmXO89cqq
+         GEFG/lBUILKgApjGiJFpB+ikekWnYDjKpiccwuCz04rQQ3q8YZcDDSr1OBxBiXAUJGbc
+         GVNFRs67KlEr7y1vkp6NXuv38sUy2oF0GdwBzf29H/A/Q14Hx4wDbzhIZpu/0ZzZqLjo
+         9Yew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Vf1rdFY0mBBSEcQfkZO+NJqi84L+MOrWCpzsYM4y6TE=;
-        b=MKsVX+fAb3poFDXTWqjO5FQSZGUHBAFtSW3XoQjnNseMaUq7rPlei1CVARYziBdXmp
-         gGuFqVa39fBYUfptt/CLvXqfVJ9oy5xTpbzSM9vjSEDrrXVkcDSg83tN3uAkiAgwWey/
-         Ucu1O7i9wF2Alh0Okdz1HLZtVXTBtNAGFjt7N6VdLHEqWGBJjMJfugwX54YlOk7LruS5
-         JvK0D6JdYvH9N898xfo54J7FxNXjEB+GEGIN6y0BjlaiyVNtApwd7FMyVZ6T4cx7kXqG
-         9fdWbJO6KXEa1Z0F1gq0CF9ZaxLdwwLtIbQBPt83w/KwfdewMJOL7aTdIxhbF1DH6NV8
-         pH2w==
-X-Gm-Message-State: AO0yUKWALL3Crfno1mVSdSkAGPX/UBGztH/Oe8KwipPrTZ34embp0anq
-        LaKVJEbTPtvYulb4pomOLCfWig==
-X-Google-Smtp-Source: AK7set8LmIs/PnalDUCkOyLjtJZK0PbhxJCqCQ/RD5qyU4Tks3YUyAJYaa9EovbhNT5BzE+Lca8e4Q==
-X-Received: by 2002:a05:6808:2890:b0:378:2279:9f43 with SMTP id eu16-20020a056808289000b0037822799f43mr8147330oib.29.1675642601130;
-        Sun, 05 Feb 2023 16:16:41 -0800 (PST)
-Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
-        by smtp.gmail.com with ESMTPSA id o63-20020aca5a42000000b003780facc45esm3417461oib.50.2023.02.05.16.16.40
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cnf84Gx87hqq0g6YozW4yuxzu+j4qVN9BY9niDBm9RY=;
+        b=W5NWGtoJsA8vHHGf0QvtlPDSqdpBY+TwGCCpIAE3o0fLlNbKR0SXTzqUPYnLGVsttW
+         eIvMkoXiJuIn4wQvGpyS49oK1B2EvusGMMXKHJcLkXlP5bcSrA5P1lxskXZQitf2Ks9t
+         xjyHKV08PE+yWPqhXqpJsDzRChdXxGCMqUiC297pXuZ147RHgQ68jSa1yulWi4CFs29H
+         +Q8dC9ZXkVOVB1r1/TN6lRsvAddtwXy8je3uqQx3srDBeyoGAPVATpE1SwQlnW4UKLwH
+         3/9I/SOTtz2mtSzfeSmNa2u45NsNF+hdcAjT3BgzgajH8bQjHKDwjccXsGMw+/Ehby6b
+         p1GQ==
+X-Gm-Message-State: AO0yUKWzafbZQbXtET45ripu5kE9iFm3JyLUheC4K3/qcnWMirafSXCW
+        gJQ8M35GlEfDhMg+wtn9X9WQELrT+J8=
+X-Google-Smtp-Source: AK7set8bKb/3k5MJW6nSHr1LN2IRGaF3Iv37v2NNtHZX1lP6UHgeLTuZDcf/HYiKqht0g+i4awkucA==
+X-Received: by 2002:a05:622a:100b:b0:3b9:a441:37f3 with SMTP id d11-20020a05622a100b00b003b9a44137f3mr32647908qte.64.1675644849379;
+        Sun, 05 Feb 2023 16:54:09 -0800 (PST)
+Received: from [172.17.0.2] ([172.176.163.144])
+        by smtp.gmail.com with ESMTPSA id s25-20020a05620a16b900b0072ed644bb0dsm5601159qkj.97.2023.02.05.16.54.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Feb 2023 16:16:40 -0800 (PST)
-From:   Steev Klimaszewski <steev@kali.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Brian Masney <bmasney@redhat.com>
-Subject: [RESEND PATCH v3 3/4] arm64: dts: qcom: sc8280xp: Define uart2
-Date:   Sun,  5 Feb 2023 18:16:33 -0600
-Message-Id: <20230206001634.2566-4-steev@kali.org>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230206001634.2566-1-steev@kali.org>
-References: <20230206001634.2566-1-steev@kali.org>
+        Sun, 05 Feb 2023 16:54:09 -0800 (PST)
+Message-ID: <63e04fb1.050a0220.a02fa.e6b6@mx.google.com>
+Date:   Sun, 05 Feb 2023 16:54:09 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2899784114507301041=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, steev@kali.org
+Subject: RE: Attempt at adding WCN6855 BT support
+In-Reply-To: <20230206001634.2566-2-steev@kali.org>
+References: <20230206001634.2566-2-steev@kali.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
+--===============2899784114507301041==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: arch/arm64/boot/dts/qcom/sc8280xp.dtsi:1207
+error: arch/arm64/boot/dts/qcom/sc8280xp.dtsi: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
 
 ---
-- v3 No changes since v2
-- v2 change subject line, move node, and add my s-o-b
+Regards,
+Linux Bluetooth
 
-Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
-Signed-off-by: Steev Klimaszewski <steev@kali.org>
-Reviewed-by: Brian Masney <bmasney@redhat.com>
----
- arch/arm64/boot/dts/qcom/sc8280xp.dtsi | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-index fa2d0d7d1367..eab54aab3b76 100644
---- a/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sc8280xp.dtsi
-@@ -1207,6 +1207,20 @@ spi2: spi@988000 {
- 				status = "disabled";
- 			};
- 
-+			uart2: serial@988000 {
-+				compatible = "qcom,geni-uart";
-+				reg = <0 0x00988000 0 0x4000>;
-+				clocks = <&gcc GCC_QUPV3_WRAP0_S2_CLK>;
-+				clock-names = "se";
-+				interrupts = <GIC_SPI 603 IRQ_TYPE_LEVEL_HIGH>;
-+				operating-points-v2 = <&qup_opp_table_100mhz>;
-+				power-domains = <&rpmhpd SC8280XP_CX>;
-+				interconnects = <&clk_virt MASTER_QUP_CORE_0 0 &clk_virt SLAVE_QUP_CORE_0 0>,
-+						<&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_QUP_0 0>;
-+				interconnect-names = "qup-core", "qup-config";
-+				status = "disabled";
-+			};
-+
- 			i2c3: i2c@98c000 {
- 				compatible = "qcom,geni-i2c";
- 				reg = <0 0x0098c000 0 0x4000>;
--- 
-2.39.0
-
+--===============2899784114507301041==--
