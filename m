@@ -2,82 +2,106 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E9DC05027
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 22:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77B6C05027
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 23:39:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbjBFWA0 (ORCPT
+        id S229741AbjBFXji (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 17:00:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60894 "EHLO
+        Mon, 6 Feb 2023 18:39:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbjBFWAZ (ORCPT
+        with ESMTP id S229617AbjBFXjh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 17:00:25 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A98010A8C
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 14:00:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C33EBB8162C
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 22:00:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 55AFCC4339B;
-        Mon,  6 Feb 2023 22:00:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675720817;
-        bh=T4Y8Br+tYD77OX04//otarMe6GdAakY+syQFMBbXfrM=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=JLOWTzz7EUttRNuV7Tdxj3uki0q6n3nrCQCPrejaEO+KfEl0c6MB1vkwP+wCRmIki
-         xXyK9T9fHVE9QoHEtVIZnepapBR5d/6JpSvUPLvmimCFD7aKPyuGt5TLe0YxBL6V2x
-         T9YeFAZEkjec+DB58o3B9eCXA51TYaIf8Oo/a31KF+Lfc+VX918cBwlQASd6odh06H
-         ojriBghEN6IZSaiS2k/wsae9K1Eo8+CJi1qmfJORdEWTIIjpFlzV7aZanQjTBD9keL
-         11iG+ECu/+KOfsHMzCgkExiqQjpeFZh1JxRBxgaCtgApyqPSorIXZ+nHXPpccN4hpP
-         zdL/iiBwn0qvw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 28CF0E55EFC;
-        Mon,  6 Feb 2023 22:00:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 6 Feb 2023 18:39:37 -0500
+Received: from stravinsky.debian.org (stravinsky.debian.org [IPv6:2001:41b8:202:deb::311:108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5E5923C4E;
+        Mon,  6 Feb 2023 15:39:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+        s=smtpauto.stravinsky; h=X-Debian-User:Content-Transfer-Encoding:MIME-Version
+        :References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=d2aAI7nq5qjPdi4iyodyYV5YWQahnsSAlmEeUrEnhGQ=; b=CkJ2/sNnuduAI7IgD9RMXvl+wy
+        8lpmCIXqdrHxKPe1u6iI8SAunPN82zw2RKIKz6F43nR6w8L+YspK4XtLCnIJ05Df9TlHMugrTYyYW
+        8hENvdJLmTpwFhW8qF37/IxNfmu3zMl7HzOJp/LmPwNogqNHoPqRydksFFJ+rsLuijVUGaXGGLhKQ
+        HsVAWlSWkpvXQaDc7EAeClqMTc5jdYO579lVzg4NQlU+8R+K8oy0Orz/pEMZH2nlIrTCsQ5jvqGtK
+        ERz5savZSehOsCmuCH+bHe08ItUNPNqPIbcTyUfwEQoPBt16rQ1dPZMaCX4Jl64K4F6RIf3wuNfNs
+        yA30kUtg==;
+Received: from authenticated user
+        by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.94.2)
+        (envelope-from <bage@debian.org>)
+        id 1pPB53-00CT8W-Kq; Mon, 06 Feb 2023 23:39:25 +0000
+From:   Bastian Germann <bage@debian.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Vasily Khoruzhick <anarsoul@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, Bastian Germann <bage@debian.org>
+Subject: [PATCH v3 1/2] Bluetooth: Add new quirk for broken local ext features page 2
+Date:   Tue,  7 Feb 2023 00:39:10 +0100
+Message-Id: <20230206233912.9410-2-bage@debian.org>
+X-Mailer: git-send-email 2.39.1
+In-Reply-To: <20230206233912.9410-1-bage@debian.org>
+References: <20230206233912.9410-1-bage@debian.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG)
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167572081715.28546.15309782433795616620.git-patchwork-notify@kernel.org>
-Date:   Mon, 06 Feb 2023 22:00:17 +0000
-References: <20230206065144.28322-1-kiran.k@intel.com>
-In-Reply-To: <20230206065144.28322-1-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
-        lokendra.singh@intel.com, chethan.tumkur.narayan@intel.com,
-        seema.sreemantha@intel.com
+X-Debian-User: bage
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Vasily Khoruzhick <anarsoul@gmail.com>
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Some adapters (e.g. RTL8723CS) advertise that they have more than
+2 pages for local ext features, but they don't support any features
+declared in these pages. RTL8723CS reports max_page = 2 and declares
+support for sync train and secure connection, but it responds with
+either garbage or with error in status on corresponding commands.
 
-On Mon,  6 Feb 2023 12:21:44 +0530 you wrote:
-> From: Seema Sreemantha <seema.sreemantha@intel.com>
-> 
-> Antenna gain is defined as the antenna’s ability to
-> increase the Tx power in a given direction. Intel
-> is certifying its products with fixed reference
-> antenna peak gain values (3/5dBi). The feature takes
-> into account the actual antenna gain, and increases
-> output power values, which results in a performance
-> improvement.
-> 
-> [...]
+Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+Signed-off-by: Bastian Germann <bage@debian.org>
+---
+ include/net/bluetooth/hci.h | 7 +++++++
+ net/bluetooth/hci_event.c   | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [v3] Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG)
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b8ad6dcdc651
-
-You are awesome, thank you!
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 8d773b042c85..7127313140cf 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -294,6 +294,13 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
++
++	/* When this quirk is set, max_page for local extended features
++	 * is set to 1, even if controller reports higher number. Some
++	 * controllers (e.g. RTL8723CS) report more pages, but they
++	 * don't actually support features declared there.
++	 */
++	HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
+ };
+ 
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ad92a4be5851..83ebc8e65b42 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -886,7 +886,9 @@ static u8 hci_cc_read_local_ext_features(struct hci_dev *hdev, void *data,
+ 	if (rp->status)
+ 		return rp->status;
+ 
+-	if (hdev->max_page < rp->max_page)
++	if (!test_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
++		      &hdev->quirks) &&
++	    hdev->max_page < rp->max_page)
+ 		hdev->max_page = rp->max_page;
+ 
+ 	if (rp->page < HCI_MAX_PAGES)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.1
 
