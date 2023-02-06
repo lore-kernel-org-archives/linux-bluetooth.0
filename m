@@ -2,127 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE1FC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 12:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B1E1C05027
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 12:23:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230060AbjBFMHH (ORCPT
+        id S229731AbjBFMXP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 07:07:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42154 "EHLO
+        Mon, 6 Feb 2023 07:23:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbjBFMHG (ORCPT
+        with ESMTP id S229514AbjBFMXO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 07:07:06 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555EC16305
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 04:07:05 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOydd-007zgo-4c; Mon, 06 Feb 2023 18:22:18 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:17 +0800
-From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:17 +0800
-Subject: [PATCH 3/17] fs: ecryptfs: Use crypto_wait_req
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOydd-007zgo-4c@formenos.hmeau.com>
+        Mon, 6 Feb 2023 07:23:14 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D756E1EFC6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 04:23:13 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id r18so8032821pgr.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 04:23:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=x4Z8Nh5mfuU/GM361yF+gHZlhOAVpoj9bNTaeW2aOTQ=;
+        b=kvuzqHwks3NtQKvzoDZ+0ywbh/gprkhC8MhrsDacDgzF11tLabZ1CXdgEB8lehx8d7
+         +GZtjfDbKie6D912KqfA5Z4eM70NJLtXOmQurva7xDvTsf716BHQaQ5n+YHUZ+dZfgBd
+         2Z6pn9PnJyjK1+Qagc7fvoxv+V9aCkd1YlAMEIi19yXzncRFRsF6KHee0MpQwqhB1NtQ
+         ApLUXZUmViW7FWxLIYgVPNFZzCGRpl2ft70oleuvIKVD8wX/keE6mKmy1Uxt+smVPret
+         b1tWBto4gfwt2L8hTikJHUTvECsm97dhayNeoJreMdvB33CBhL37XVLv4WlpllGW6kPZ
+         5PkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=x4Z8Nh5mfuU/GM361yF+gHZlhOAVpoj9bNTaeW2aOTQ=;
+        b=hNP19uo5G6jWNh4iATVbFrsX1NtwXLY41lNfxKE5TUvv5T4WJ4wrIZA90k+RGN2LK8
+         1Ge3coyJDaZlf2lE0VLZ+AChsOWme42jFml+RqPxAxkUamfItW54TX/KCVOhDsxo/cvX
+         /aWqgo7D/Xlf/9+BsuMiXaF65s3OqrOU3u3EoB074gC0ppZ3Q0fgWCazkqkwq1iBxWez
+         zqfvyLJiYgpLiUBMRR16R20qCZh4jyieUnQPj/jzOxVrN6opkZDNAZrzEtRTht99Z8N3
+         NahbwVwPwUrC2x8LsK2Guu80bo1MxQQ2Njf4nAa/8cjVoGdVvWYs74k+fWCLINjdJOvV
+         OSvQ==
+X-Gm-Message-State: AO0yUKWwFDGXdiat8aUc98M3MfiBpVuFaHBZ26LrouAoVmgYV2PXgCox
+        mjuZbFYYpcmY/NGjf/b5efs9eR8VgEY=
+X-Google-Smtp-Source: AK7set82jTNiBCyvdmwY3986XXjYJeGHXtvaNQbPdCiO2/CXueUnaAmm/h/XS+rkB3zz51bYBKrbdQ==
+X-Received: by 2002:a62:db41:0:b0:592:613d:ef17 with SMTP id f62-20020a62db41000000b00592613def17mr10460210pfg.30.1675686193075;
+        Mon, 06 Feb 2023 04:23:13 -0800 (PST)
+Received: from [172.17.0.2] ([20.171.107.96])
+        by smtp.gmail.com with ESMTPSA id h11-20020a056a00230b00b0058837da69edsm6981211pfh.128.2023.02.06.04.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 04:23:12 -0800 (PST)
+Message-ID: <63e0f130.050a0220.b32f6.b3f3@mx.google.com>
+Date:   Mon, 06 Feb 2023 04:23:12 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1935066599592307111=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: RE: crypto: api - Change completion callback argument to void star
+In-Reply-To: <E1pOydY-007zgU-U2@formenos.hmeau.com>
+References: <E1pOydY-007zgU-U2@formenos.hmeau.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch replaces the custom crypto completion function with
-crypto_req_done.
+--===============1935066599592307111==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: crypto/ahash.c:240
+error: crypto/ahash.c: patch does not apply
+error: patch failed: crypto/cryptd.c:281
+error: crypto/cryptd.c: patch does not apply
+error: patch failed: crypto/essiv.c:166
+error: crypto/essiv.c: patch does not apply
+error: patch failed: crypto/rsa-pkcs1pad.c:210
+error: crypto/rsa-pkcs1pad.c: patch does not apply
+error: patch failed: include/linux/crypto.h:176
+error: include/linux/crypto.h: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
+Regards,
+Linux Bluetooth
 
- fs/ecryptfs/crypto.c |   30 +++---------------------------
- 1 file changed, 3 insertions(+), 27 deletions(-)
 
-diff --git a/fs/ecryptfs/crypto.c b/fs/ecryptfs/crypto.c
-index e3f5d7f3c8a0..c3057539f088 100644
---- a/fs/ecryptfs/crypto.c
-+++ b/fs/ecryptfs/crypto.c
-@@ -260,22 +260,6 @@ int virt_to_scatterlist(const void *addr, int size, struct scatterlist *sg,
- 	return i;
- }
- 
--struct extent_crypt_result {
--	struct completion completion;
--	int rc;
--};
--
--static void extent_crypt_complete(struct crypto_async_request *req, int rc)
--{
--	struct extent_crypt_result *ecr = req->data;
--
--	if (rc == -EINPROGRESS)
--		return;
--
--	ecr->rc = rc;
--	complete(&ecr->completion);
--}
--
- /**
-  * crypt_scatterlist
-  * @crypt_stat: Pointer to the crypt_stat struct to initialize.
-@@ -293,7 +277,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
- 			     unsigned char *iv, int op)
- {
- 	struct skcipher_request *req = NULL;
--	struct extent_crypt_result ecr;
-+	DECLARE_CRYPTO_WAIT(ecr);
- 	int rc = 0;
- 
- 	if (unlikely(ecryptfs_verbosity > 0)) {
-@@ -303,8 +287,6 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
- 				  crypt_stat->key_size);
- 	}
- 
--	init_completion(&ecr.completion);
--
- 	mutex_lock(&crypt_stat->cs_tfm_mutex);
- 	req = skcipher_request_alloc(crypt_stat->tfm, GFP_NOFS);
- 	if (!req) {
-@@ -315,7 +297,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
- 
- 	skcipher_request_set_callback(req,
- 			CRYPTO_TFM_REQ_MAY_BACKLOG | CRYPTO_TFM_REQ_MAY_SLEEP,
--			extent_crypt_complete, &ecr);
-+			crypto_req_done, &ecr);
- 	/* Consider doing this once, when the file is opened */
- 	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET)) {
- 		rc = crypto_skcipher_setkey(crypt_stat->tfm, crypt_stat->key,
-@@ -334,13 +316,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
- 	skcipher_request_set_crypt(req, src_sg, dst_sg, size, iv);
- 	rc = op == ENCRYPT ? crypto_skcipher_encrypt(req) :
- 			     crypto_skcipher_decrypt(req);
--	if (rc == -EINPROGRESS || rc == -EBUSY) {
--		struct extent_crypt_result *ecr = req->base.data;
--
--		wait_for_completion(&ecr->completion);
--		rc = ecr->rc;
--		reinit_completion(&ecr->completion);
--	}
-+	rc = crypto_wait_req(rc, &ecr);
- out:
- 	skcipher_request_free(req);
- 	return rc;
+--===============1935066599592307111==--
