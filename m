@@ -2,82 +2,200 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518B8C05027
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 17:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB278C64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 21:15:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230327AbjBFRa5 (ORCPT
+        id S230204AbjBFVPK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 12:30:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37040 "EHLO
+        Mon, 6 Feb 2023 16:15:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229756AbjBFRak (ORCPT
+        with ESMTP id S229951AbjBFVPF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 12:30:40 -0500
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE67C16A
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 09:29:40 -0800 (PST)
-Received: by mail-qt1-f177.google.com with SMTP id v17so13669928qto.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 09:29:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w/LaKIf+3pRA4MyQMhbr3PlVOqptn/pf/udFxon0+9Y=;
-        b=f/zPVvxgvXxK0hkHhT/HSBYb/CW8C+VI5oZGFfqSEEGpM7NV+2TAFXUlNk95iFNbtp
-         FDGEQmOruqeJIf8gnp6Nn+hnKFG8vOhC1BB6K6eK6S8QnRcVSImKwc6TenkzDgRrnUIb
-         7+H/v/sOLjpmaiwamxs3pVDQXiFqxwaBeksWKCzyANRAOX+ftCwhW3Cxm79NazVHFJUN
-         VFCxMJxYDBxnUcZBTToUt+/wfjSvqYsF86jrikdx4Rpe7ydR969M9qwgGGNSf+tUrTG5
-         0zYepMrQ5BY2Ug20WOE5g+G1KPJk9rJBswdssHsT1bS1lAxtDPgJyQGsK1qCTxhv8rT4
-         dJQQ==
-X-Gm-Message-State: AO0yUKVbtLy6MHGZ7Da8TooDGySg4PqOSyvCrK8+Z5E9RQzI07vSywbE
-        eXtgenVRkDPZiOmBDopu+4D+
-X-Google-Smtp-Source: AK7set/ae55jb9i/baaW/xLk4b7RJtQzOV+41D/ChSc6zOFdBQ9usaCQZSB0nyipHZthrt6kgVy39g==
-X-Received: by 2002:a05:622a:c7:b0:3ba:1398:c68d with SMTP id p7-20020a05622a00c700b003ba1398c68dmr150769qtw.16.1675704579799;
-        Mon, 06 Feb 2023 09:29:39 -0800 (PST)
-Received: from localhost (pool-68-160-166-30.bstnma.fios.verizon.net. [68.160.166.30])
-        by smtp.gmail.com with ESMTPSA id b13-20020ac844cd000000b003ba1ccba523sm3956815qto.93.2023.02.06.09.29.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Feb 2023 09:29:39 -0800 (PST)
-Date:   Mon, 6 Feb 2023 12:29:38 -0500
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
+        Mon, 6 Feb 2023 16:15:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C26D12855;
+        Mon,  6 Feb 2023 13:15:04 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 06E0DB8161D;
+        Mon,  6 Feb 2023 21:15:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59CC4C433EF;
+        Mon,  6 Feb 2023 21:15:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675718101;
+        bh=Zhq6cVTt3n8+InQ7RYqBYg1fjFMtOoVV/gNHrgePxXg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hTSHEm0nu/OAsNocJefNNsobCR+E7mCmUe9rAgIctEitW3fJaF8ynQEXqxASrLi8a
+         nLm/hGr0dc1/k53Ap/6pkyUec/pi/xrJTbceCMXB64PjjRvOfrZzpv+UC3/AXnRYwL
+         Cjh+vCk88bB1dZq5HVGEHSZM8Y0OT8G8WpFqfoRn0kT3J3HcpcxhLmMnVZIoXk58Yb
+         V059hporQxkHZ9orhBzLPSbdVZwYQ6NjjK8ifkwOnZr8/Ex6yC7nNBjY27WiaRgP/H
+         f4xsGfGwH5j+fgqJj2698QmoP385ahxKnWKdlNedwX3v26zij1aZLM1JdCxwySbW3U
+         hWChwpmRDUOSA==
+Date:   Mon, 6 Feb 2023 13:17:15 -0800
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Subject: Re: [PATCH 11/17] dm: Remove completion function scaffolding
-Message-ID: <Y+E5AkiVTbjgXWjs@redhat.com>
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
- <E1pOydu-007zio-0W@formenos.hmeau.com>
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: Re: [RESEND PATCH v3 4/4] arm64: dts: qcom: thinkpad-x13s: Add
+ bluetooth
+Message-ID: <20230206211715.sp4kxqzql45m7bbc@ripper>
+References: <20230206001634.2566-1-steev@kali.org>
+ <20230206001634.2566-5-steev@kali.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1pOydu-007zio-0W@formenos.hmeau.com>
+In-Reply-To: <20230206001634.2566-5-steev@kali.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Feb 06 2023 at  5:22P -0500,
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Sun, Feb 05, 2023 at 06:16:34PM -0600, Steev Klimaszewski wrote:
+> ---
 
-> This patch removes the temporary scaffolding now that the comletion
-> function signature has been converted.
+This marks the end of the commit message, as such your S-o-b is
+"missing". Move it above the "---" line.
+
+
+It's also recommended to include some body in your commit message.
+Perhaps just "The ... has a WCN6855 Bluetooth controller on uart2, add
+this".
+
+> Changes since v2:
+
+And keep the change log here.
+
+>  - Remove dead code and add TODO comment
+>  - Make dtbs_check happy with the pin definitions
 > 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> ---
+>  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 63 +++++++++++++++++++
+>  1 file changed, 63 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> index f936b020a71d..d351411d3504 100644
+> --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> @@ -24,6 +24,8 @@ / {
+>  	aliases {
+>  		i2c4 = &i2c4;
+>  		i2c21 = &i2c21;
+> +		serial0 = &uart17;
+> +		serial1 = &uart2;
+>  	};
+>  
+>  	wcd938x: audio-codec {
+> @@ -712,6 +714,27 @@ &qup0 {
+>  	status = "okay";
+>  };
+>  
+> +&uart2 {
+> +	status = "okay";
+> +
+> +	pinctrl-names = "default";
+> +	pinctrl-0 = <&uart2_state>;
+> +
+> +	bluetooth {
+> +		compatible = "qcom,wcn6855-bt";
+> +
+> +		/* TODO: define regulators */
 
-Acked-by: Mike Snitzer <snitzer@kernel.org>
+You have the list of regulators in the driver, and there are people with
+the schematics. You should be able to fill this list out.
+
+Regards,
+Bjorn
+
+> +
+> +		max-speed = <3200000>;
+> +
+> +		enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
+> +		swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
+> +
+> +		pinctrl-names = "default";
+> +		pinctrl-0 = <&bt_en>;
+> +	};
+> +};
+> +
+>  &qup1 {
+>  	status = "okay";
+>  };
+> @@ -720,6 +743,12 @@ &qup2 {
+>  	status = "okay";
+>  };
+>  
+> +&uart17 {
+> +	compatible = "qcom,geni-debug-uart";
+> +
+> +	status = "okay";
+> +};
+> +
+>  &remoteproc_adsp {
+>  	firmware-name = "qcom/sc8280xp/LENOVO/21BX/qcadsp8280.mbn";
+>  
+> @@ -980,6 +1009,19 @@ hastings_reg_en: hastings-reg-en-state {
+>  &tlmm {
+>  	gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
+>  
+> +	bt_en: bt-en-state {
+> +		hstp-sw-ctrl-pins {
+> +			pins = "gpio132";
+> +			function = "gpio";
+> +		};
+> +
+> +		hstp-bt-en-pins {
+> +			pins = "gpio133";
+> +			function = "gpio";
+> +			drive-strength = <16>;
+> +		};
+> +	};
+> +
+>  	edp_reg_en: edp-reg-en-state {
+>  		pins = "gpio25";
+>  		function = "gpio";
+> @@ -1001,6 +1043,27 @@ i2c4_default: i2c4-default-state {
+>  		bias-disable;
+>  	};
+>  
+> +	uart2_state: uart2-state {
+> +		cts-pins {
+> +			pins = "gpio122";
+> +			function = "qup2";
+> +			bias-disable;
+> +		};
+> +
+> +		rts-tx-pins {
+> +			pins = "gpio122", "gpio123";
+> +			function = "qup2";
+> +			drive-strength = <2>;
+> +			bias-disable;
+> +		};
+> +
+> +		rx-pins {
+> +			pins = "gpio124";
+> +			function = "qup2";
+> +			bias-pull-up;
+> +		};
+> +	};
+> +
+>  	i2c21_default: i2c21-default-state {
+>  		pins = "gpio81", "gpio82";
+>  		function = "qup21";
+> -- 
+> 2.39.0
+> 
