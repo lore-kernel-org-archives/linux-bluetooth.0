@@ -2,27 +2,27 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEA2C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 12:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF49C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Feb 2023 12:03:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjBFMDa (ORCPT
+        id S229910AbjBFMDh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 07:03:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39806 "EHLO
+        Mon, 6 Feb 2023 07:03:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjBFMD2 (ORCPT
+        with ESMTP id S229887AbjBFMDf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 07:03:28 -0500
+        Mon, 6 Feb 2023 07:03:35 -0500
 Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02BDE1630F
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 04:03:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACDDC1422B
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 04:03:33 -0800 (PST)
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
         by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pOydy-007zjk-6G; Mon, 06 Feb 2023 18:22:39 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:38 +0800
+        id 1pOye2-007zkJ-CU; Mon, 06 Feb 2023 18:22:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 06 Feb 2023 18:22:42 +0800
 From:   "Herbert Xu" <herbert@gondor.apana.org.au>
-Date:   Mon, 06 Feb 2023 18:22:38 +0800
-Subject: [PATCH 13/17] net: ipv4: Remove completion function scaffolding
+Date:   Mon, 06 Feb 2023 18:22:42 +0800
+Subject: [PATCH 15/17] tipc: Remove completion function scaffolding
 References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
 To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Alasdair Kergon <agk@redhat.com>,
@@ -43,7 +43,7 @@ To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         John Fastabend <john.fastabend@gmail.com>,
         David Howells <dhowells@redhat.com>,
         Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Message-Id: <E1pOydy-007zjk-6G@formenos.hmeau.com>
+Message-Id: <E1pOye2-007zkJ-CU@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -54,92 +54,47 @@ function signature has been converted.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- net/ipv4/ah4.c  |    8 ++++----
- net/ipv4/esp4.c |   16 ++++++++--------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ net/tipc/crypto.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv4/ah4.c b/net/ipv4/ah4.c
-index 1fc0231eb1ee..015c0f4ec5ba 100644
---- a/net/ipv4/ah4.c
-+++ b/net/ipv4/ah4.c
-@@ -117,11 +117,11 @@ static int ip_clear_mutable_options(const struct iphdr *iph, __be32 *daddr)
- 	return 0;
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index ab356e7a3870..577fa5af33ec 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -267,10 +267,10 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
+ 			     struct tipc_bearer *b,
+ 			     struct tipc_media_addr *dst,
+ 			     struct tipc_node *__dnode);
+-static void tipc_aead_encrypt_done(crypto_completion_data_t *data, int err);
++static void tipc_aead_encrypt_done(void *data, int err);
+ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
+ 			     struct sk_buff *skb, struct tipc_bearer *b);
+-static void tipc_aead_decrypt_done(crypto_completion_data_t *data, int err);
++static void tipc_aead_decrypt_done(void *data, int err);
+ static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr);
+ static int tipc_ehdr_build(struct net *net, struct tipc_aead *aead,
+ 			   u8 tx_key, struct sk_buff *skb,
+@@ -830,9 +830,9 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
+ 	return rc;
  }
  
--static void ah_output_done(crypto_completion_data_t *data, int err)
-+static void ah_output_done(void *data, int err)
- {
- 	u8 *icv;
- 	struct iphdr *iph;
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 	struct xfrm_state *x = skb_dst(skb)->xfrm;
- 	struct ah_data *ahp = x->data;
- 	struct iphdr *top_iph = ip_hdr(skb);
-@@ -262,12 +262,12 @@ static int ah_output(struct xfrm_state *x, struct sk_buff *skb)
- 	return err;
- }
- 
--static void ah_input_done(crypto_completion_data_t *data, int err)
-+static void ah_input_done(void *data, int err)
- {
- 	u8 *auth_data;
- 	u8 *icv;
- 	struct iphdr *work_iph;
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 	struct xfrm_state *x = xfrm_input_state(skb);
- 	struct ah_data *ahp = x->data;
- 	struct ip_auth_hdr *ah = ip_auth_hdr(skb);
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 8abe07c1ff28..ba06ed42e428 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -244,9 +244,9 @@ static int esp_output_tail_tcp(struct xfrm_state *x, struct sk_buff *skb)
- }
- #endif
- 
--static void esp_output_done(crypto_completion_data_t *data, int err)
-+static void esp_output_done(void *data, int err)
+-static void tipc_aead_encrypt_done(crypto_completion_data_t *data, int err)
++static void tipc_aead_encrypt_done(void *data, int err)
  {
 -	struct sk_buff *skb = crypto_get_completion_data(data);
 +	struct sk_buff *skb = data;
- 	struct xfrm_offload *xo = xfrm_offload(skb);
- 	void *tmp;
- 	struct xfrm_state *x;
-@@ -332,9 +332,9 @@ static struct ip_esp_hdr *esp_output_set_extra(struct sk_buff *skb,
- 	return esph;
+ 	struct tipc_crypto_tx_ctx *tx_ctx = TIPC_SKB_CB(skb)->crypto_ctx;
+ 	struct tipc_bearer *b = tx_ctx->bearer;
+ 	struct tipc_aead *aead = tx_ctx->aead;
+@@ -954,9 +954,9 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
+ 	return rc;
  }
  
--static void esp_output_done_esn(crypto_completion_data_t *data, int err)
-+static void esp_output_done_esn(void *data, int err)
+-static void tipc_aead_decrypt_done(crypto_completion_data_t *data, int err)
++static void tipc_aead_decrypt_done(void *data, int err)
  {
 -	struct sk_buff *skb = crypto_get_completion_data(data);
 +	struct sk_buff *skb = data;
- 
- 	esp_output_restore_header(skb);
- 	esp_output_done(data, err);
-@@ -830,9 +830,9 @@ int esp_input_done2(struct sk_buff *skb, int err)
- }
- EXPORT_SYMBOL_GPL(esp_input_done2);
- 
--static void esp_input_done(crypto_completion_data_t *data, int err)
-+static void esp_input_done(void *data, int err)
- {
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 
- 	xfrm_input_resume(skb, esp_input_done2(skb, err));
- }
-@@ -860,9 +860,9 @@ static void esp_input_set_header(struct sk_buff *skb, __be32 *seqhi)
- 	}
- }
- 
--static void esp_input_done_esn(crypto_completion_data_t *data, int err)
-+static void esp_input_done_esn(void *data, int err)
- {
--	struct sk_buff *skb = crypto_get_completion_data(data);
-+	struct sk_buff *skb = data;
- 
- 	esp_input_restore_header(skb);
- 	esp_input_done(data, err);
+ 	struct tipc_crypto_rx_ctx *rx_ctx = TIPC_SKB_CB(skb)->crypto_ctx;
+ 	struct tipc_bearer *b = rx_ctx->bearer;
+ 	struct tipc_aead *aead = rx_ctx->aead;
