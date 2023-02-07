@@ -2,110 +2,84 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97866C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 12:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A9A5C636D4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 18:50:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231562AbjBGMmw (ORCPT
+        id S232450AbjBGSul (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Feb 2023 07:42:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35304 "EHLO
+        Tue, 7 Feb 2023 13:50:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231890AbjBGMmo (ORCPT
+        with ESMTP id S232354AbjBGSuk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Feb 2023 07:42:44 -0500
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C727710AB3
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Feb 2023 04:42:36 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id g7so16402678qto.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Feb 2023 04:42:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7bYBKDyVXQuLqXKjLqHUvpYDoKtjEc8P3cVJiWDmAY=;
-        b=CnDvBTn1UtxfDPpXLTR1UzJlh2U/vgS1d85pXsrCbIn6Kts/Qz5HGgfBXm7JxtQZix
-         FGboHnu7LvsS48N2+KHNX/tWQa9Cfi6DPm4nWJ/+ibTWiwZP6GGlJ+jdJjex2G2Y0gTF
-         pnT8HRXLHuSTUdreYmdoLSd8ypnPuCG/7L/vXre1J9TBcv2AF8PntM58JhCyYtOSg8ZP
-         JFwdrU5Qa0k15maSqwdaZv8MsAqeSTU+8BdhNi6MOAsT6ho7gAdOBWE3AhG33M9lZxkx
-         R4nMAqqoGQaMaeTOa0u20x+wVHDtdvicm7JnVBLz0SIV+Xv7UVqU8ka0su7At6igvEqV
-         ujtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C7bYBKDyVXQuLqXKjLqHUvpYDoKtjEc8P3cVJiWDmAY=;
-        b=lQtknOwOWn15368OeR1QGrD09mefnSvF/y7aB795OTc8nz1zrgrLEqOIooo4KVuRzo
-         7EesOSWjOxPbxnFhn/RmhpzTmmLqSuYVPB/eXx1u6mmqdt+5wUf0j6vhx3nKD3S/wgGw
-         M0iFzzdSqwNcAI2l+uRW2jDk9JF8rnrgSyKz4QV/7gsVUbqbCfnHPdSlgF/biQHk5hPE
-         YjrSAvq/aWoByW5wpZoGhRWihzBPI/4xYxg5qIqKLILqvpGRcN+JhfO+YEBGqbV6UU08
-         ZwfsgzcmDggXIvdkxeHq5qz6CjIlUNxdYtn29Ms+YIO8wKLva4mRpxESuxXtDc5wJlBY
-         rTEA==
-X-Gm-Message-State: AO0yUKX7bwj/ICBFSYmKXb/VF5sTTSX0IX1xVhlPBfXnIhVHY0FFISep
-        FrijyjrKn5+2tAkIU53WiRlmbd5luZ7kDg==
-X-Google-Smtp-Source: AK7set8CIy0dPL6nMvCy9H7QoHuE97bddrxXHjG8A2O74XWmpkyGuGV8uZBqkMZGzgEBGHsZWKoHAQ==
-X-Received: by 2002:ac8:5acb:0:b0:3b8:6b6b:28c2 with SMTP id d11-20020ac85acb000000b003b86b6b28c2mr5261038qtd.68.1675773755777;
-        Tue, 07 Feb 2023 04:42:35 -0800 (PST)
-Received: from [172.17.0.2] ([172.177.36.112])
-        by smtp.gmail.com with ESMTPSA id v25-20020ae9e319000000b00720f61af739sm9227076qkf.115.2023.02.07.04.42.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Feb 2023 04:42:35 -0800 (PST)
-Message-ID: <63e2473b.e90a0220.c4c35.a81c@mx.google.com>
-Date:   Tue, 07 Feb 2023 04:42:35 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8915317333204268993=="
+        Tue, 7 Feb 2023 13:50:40 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B316103;
+        Tue,  7 Feb 2023 10:50:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2BFD760F98;
+        Tue,  7 Feb 2023 18:50:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A34E9C433D2;
+        Tue,  7 Feb 2023 18:50:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675795838;
+        bh=ODzdhcFGiquws7826KpX34sqDv+PisvGBzStMDRRjKw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=cNUixezJ+SvECnDWIb0o+0ZGpKA6jtC9wof+gC/BVeo/ol+r7bfxNHk1F2Ix+MJDx
+         hK4gApF9EDiramc3YenC0mrcepi+C9HK4XfsTQG3cOpUQfbrk5D1IlNIIDBWBR9O01
+         wbatX0e0R0rhUfmR/i8dP7sKVxD+QpZlKBijrAWnifidRRQ6DOO0uCc70tAP9aSBVJ
+         XmbqC4s7swInfITIY2nLOlx20L+yEevCnwcFQK2hNlIKOlNoR8iX8W0Xvxyks9/em1
+         j8I1KovQ1AhmcdBi4eUrb0WmyKAUt0yP97XI/M7Wu6jWju4KG2r6aYaDnHgwqTdJKH
+         PZAniAEs/+NxA==
+Date:   Tue, 7 Feb 2023 10:50:36 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
+Subject: Re: [PATCH] tls: Pass rec instead of aead_req into tls_encrypt_done
+Message-ID: <20230207105036.76b30090@kernel.org>
+In-Reply-To: <Y+IJXEYPuaQWjfR5@gondor.apana.org.au>
+References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
+        <E1pOydn-007zi3-LG@formenos.hmeau.com>
+        <20230206231521.712f53e5@kernel.org>
+        <Y+IJXEYPuaQWjfR5@gondor.apana.org.au>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tomasz.mon@nordicsemi.no
-Subject: RE: Bluetooth: btusb: Do not require hardcoded interface numbers
-In-Reply-To: <20230207115741.122854-1-tomasz.mon@nordicsemi.no>
-References: <20230207115741.122854-1-tomasz.mon@nordicsemi.no>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8915317333204268993==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 7 Feb 2023 16:18:36 +0800 Herbert Xu wrote:
+> > >  	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > > -				  tls_encrypt_done, sk);
+> > > +				  tls_encrypt_done, aead_req);  
+> > 
+> > ... let's just pass rec instead of aead_req here, then?  
+> 
+> Good point.  Could we do this as a follow-up patch? Reposting
+> the whole series would disturb a lot of people.  Of course if
+> other major issues crop up I can fold this into the existing
+> patch.
 
-This is automated email and please do not reply to this email!
+Whatever works best!
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=719475
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.92 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      30.90 seconds
-CheckAllWarning               PASS      33.91 seconds
-CheckSparse                   PASS      38.08 seconds
-CheckSmatch                   PASS      106.45 seconds
-BuildKernel32                 PASS      29.68 seconds
-TestRunnerSetup               PASS      428.94 seconds
-TestRunner_l2cap-tester       PASS      15.94 seconds
-TestRunner_iso-tester         PASS      16.64 seconds
-TestRunner_bnep-tester        PASS      5.43 seconds
-TestRunner_mgmt-tester        PASS      108.68 seconds
-TestRunner_rfcomm-tester      PASS      8.69 seconds
-TestRunner_sco-tester         PASS      7.99 seconds
-TestRunner_ioctl-tester       PASS      9.37 seconds
-TestRunner_mesh-tester        PASS      6.89 seconds
-TestRunner_smp-tester         PASS      7.89 seconds
-TestRunner_userchan-tester    PASS      5.68 seconds
-IncrementalBuild              PASS      27.68 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8915317333204268993==--
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
