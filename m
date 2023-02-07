@@ -2,182 +2,173 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82469C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 01:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C49CEC636CD
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 05:28:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbjBGB2H (ORCPT
+        id S229992AbjBGF2e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 20:28:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36038 "EHLO
+        Tue, 7 Feb 2023 00:28:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229545AbjBGB2F (ORCPT
+        with ESMTP id S229508AbjBGF2d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 20:28:05 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55CA12C640
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 17:28:04 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id h24so20305197lfv.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 17:28:04 -0800 (PST)
+        Tue, 7 Feb 2023 00:28:33 -0500
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02E7711664
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 21:28:32 -0800 (PST)
+Received: by mail-ot1-x32c.google.com with SMTP id x26-20020a056830115a00b0068bbc0ee3eeso3892463otq.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 21:28:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=etRg2es5YcQvfpAUqfJ4d11wf4/wyrHxBOp8wk3//AA=;
-        b=QWJDQ7rtGe91sh+PfRKaDN2DkpKmdg5shNmv7WlQf64gPMqV91JuxcKxwj/pXaDSeb
-         SwHYRpGZ0xgdtYjJlPDelCAJWqtLGQMzF5HP75VJPlQXIFSKu3AdhAdh3hjKJvfeBC8I
-         LOn24HHsnPWxPheCmhyrQ34P/ci/0O+X71ixsq+YgSBS4O3VWNoDnFcHW3mw6lr8vy8J
-         c9eLhUyb78TABWsV4mdN7+/Am2nljPP79jjzajYaGkH9kj+LYBQNFYXYeMGAxhToTOZS
-         6sRmshBzui5HyQAdQWw7n7X15PLVxiTOwAl6tTTfVTgNhYVw3Ev2fF2g1F0ZTLmwjgGC
-         UPuA==
+        d=kali.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=028twQfcsplClvNNc3RuH8Q5nGWJWletJfgBcjEP3NQ=;
+        b=RfxgHjmYeXckjS1ROENzYGfG9Ik3cObOtGfDH70PTDEXuGWRnDYpHsubV/Vjhtat5n
+         TIuUed6oErfKJBCSD8JFBj+wwueYbRLEkQ9nv3Kj0YnTbxoaqbkbC6a9kAfTJb6GKhlv
+         hwVMik4pudhYfS/UhAlvRKXbpjTUdFEuZO0YbcY2QFIwsKwWV64ywM/C4Le1AEYCXzBn
+         W5DuvLCE7jA2uiSrk0rA3iMBPehd6ApWV878WABfKm4yYofy0cX1V1VJ9mtgzqZi/edL
+         44eJR7nsf7XcnTddhHdQ+jrp8ZRl1t+vkJQBAxzz9sFxIwb4fKu+HKscn/6IQnx8YpTT
+         IdFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=etRg2es5YcQvfpAUqfJ4d11wf4/wyrHxBOp8wk3//AA=;
-        b=gWinzMstkXpwtV0QqAmKOEBArKYDU4rcxQ4Im3UNWojnsFAHqmpT1ts5U87qoVXg6q
-         8g9mGnCHeFejAVUWJ7rrU2kDh4pIynCN2CyP6bVb2fnpvvxnGF3WOdoS/BpjiA5qaMqA
-         YQTxW8DA/9vxrSDSp78UqBSX/7xeev7n0yPtScTx7nsF4EwQYxOEgMu2cxENkGN/jmcn
-         BNw4c0ABt52bJe/Bqi299il/ilvDzVAEWFr1FcpHfH0AiWhqTFv0RaoUskLZtSOoeXGE
-         TGvgeiVtKWyumsWUcboFvMJJAx6jBctG4XkNuUpe9Wyq0KVW5rnXAA3mhTTsNbx7vMsN
-         hC9g==
-X-Gm-Message-State: AO0yUKWXVvM211itS0rrclIrkrLWiIHGY6PwNrDIy468z+OTv1ikEr5y
-        CJjFCjqidl3wgbeUviOYSuLc3cd8Mg8gGJG1z12tn1FF
-X-Google-Smtp-Source: AK7set9jaB2dEU4mi/lmYnFx0jxipS53CBv6xN9a+cHmtVCkvnTLqGug+fNxRQJMwP+dLS2Dl9GbmfWi3j0r2fy6KdE=
-X-Received: by 2002:a05:6512:40d:b0:4d8:5137:a89d with SMTP id
- u13-20020a056512040d00b004d85137a89dmr163420lfk.176.1675733282591; Mon, 06
- Feb 2023 17:28:02 -0800 (PST)
+        bh=028twQfcsplClvNNc3RuH8Q5nGWJWletJfgBcjEP3NQ=;
+        b=QyvjNWy51H+6dQNOv6V4WEZTnwsMpTjBHr5yXBBg7e9ZIJzluvSx3Bl5l/wV8nRtL0
+         /Ss3GJcOu9Ojl5RVWtAu6FsgAI/Xu0fBb4iA9quHZNxE8lki7kkIkfIBYEyafTMFKabY
+         1Il6wUaKTT4jk27uuBBgwPhnVGa3v02WV4fl2MVZjEAP8PLaBhJMvZesIgnJRhwaPoE2
+         ZuY4KaD/exGaz40Te/TMqTigttCSqRS8mBekKz9PT+fjn4M4e1RglSuJxyxuCXb0Z2os
+         +lUViiplspOfdx7HV9G+Qg046ATEbu06GN2Cvb9KpA7VCLjmM338Doe7kLQ+QGNNxf/A
+         iliw==
+X-Gm-Message-State: AO0yUKWIsmolzTYeylNsylblCDwAhbyZ2ZaX0imDCdg+R2/QevsDc/+u
+        Yu7wGMkYHSywk7X5jRTS/EjHhw==
+X-Google-Smtp-Source: AK7set/GW2JRPFAN4v2V3DrzNDL0f3V7xH20Km2bQyEmpyWVoqb/1RV5bXLKMrwOe1fa43pLVFwhcg==
+X-Received: by 2002:a05:6830:601a:b0:684:e788:eca9 with SMTP id bx26-20020a056830601a00b00684e788eca9mr1324760otb.17.1675747711283;
+        Mon, 06 Feb 2023 21:28:31 -0800 (PST)
+Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
+        by smtp.gmail.com with ESMTPSA id do20-20020a0568300e1400b0068bce6239a3sm1965887otb.38.2023.02.06.21.28.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 21:28:30 -0800 (PST)
+From:   Steev Klimaszewski <steev@kali.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: [PATCH v4 0/4] Add WCN6855 Bluetooth support
+Date:   Mon,  6 Feb 2023 23:28:25 -0600
+Message-Id: <20230207052829.3996-1-steev@kali.org>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-References: <20230127205205.20235-1-pav@iki.fi> <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
- <89c50cadaefa56c85346ad7f2cd86eab756f3987.1675103676.git.pav@iki.fi>
-In-Reply-To: <89c50cadaefa56c85346ad7f2cd86eab756f3987.1675103676.git.pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 6 Feb 2023 17:27:51 -0800
-Message-ID: <CABBYNZ+VXvRHP1h9W6_EhdVOx+He+=yCdoTC2619q74+Uvn8vA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 8/8] bap: handle adapters that are not CIS Central /
- Peripheral capable
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+This is the 4th version of the patchset, which started out as a bit of an
+RFC/RFT but has actually worked so, I think this 4th revision is in a pretty
+decent spot, at least in terms of the code itself... that said...
 
-On Mon, Jan 30, 2023 at 11:06 AM Pauli Virtanen <pav@iki.fi> wrote:
->
-> When BT adapter is not CIS Peripheral capable, use the shared/bap code
-> in its central-only mode, and don't register anything in the local GATT
-> database.
->
-> When BT adapter is not CIS Central capable, ignore the remote device
-> GATT database, so that we work purely in peripheral mode.
->
-> If BT adapter supports neither feature, don't do anything with BAP.
-> ---
->  profiles/audio/bap.c   | 18 ++++++++++++++++--
->  profiles/audio/media.c | 11 ++++++-----
->  2 files changed, 22 insertions(+), 7 deletions(-)
->
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index e5ffb7230..28c0d139a 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -1254,6 +1254,8 @@ static int bap_probe(struct btd_service *service)
->         struct btd_adapter *adapter = device_get_adapter(device);
->         struct btd_gatt_database *database = btd_adapter_get_database(adapter);
->         struct bap_data *data = btd_service_get_user_data(service);
-> +       struct bt_bap_db *ldb;
-> +       struct gatt_db *device_db;
->         char addr[18];
->
->         ba2str(device_get_address(device), addr);
-> @@ -1264,17 +1266,29 @@ static int bap_probe(struct btd_service *service)
->                 return -ENOTSUP;
->         }
->
-> +       if (!btd_adapter_cis_central_capable(adapter) &&
-> +           !btd_adapter_cis_peripheral_capable(adapter)) {
-> +               DBG("BAP requires CIS features, unsupported by adapter");
-> +               return -ENOTSUP;
-> +       }
-> +
->         /* Ignore, if we were probed for this device already */
->         if (data) {
->                 error("Profile probed twice for the same device!");
->                 return -EINVAL;
->         }
->
-> +       if (btd_adapter_cis_central_capable(adapter))
-> +               device_db = btd_device_get_gatt_db(device);
-> +       else
-> +               device_db = NULL;
-> +
->         data = bap_data_new(device);
->         data->service = service;
->
-> -       data->bap = bt_bap_new(btd_gatt_database_get_db(database),
-> -                                       btd_device_get_gatt_db(device));
-> +       ldb = bt_bap_get_local_db(btd_gatt_database_get_db(database),
-> +                               btd_adapter_cis_peripheral_capable(adapter));
+First things first, I do not have access to the specs nor the schematics, so a
+lot of this was done via guess work, looking at the acpi tables, and looking at
+how a similar device (wcn6750) was added.
 
-Don't really like the idea of having an API to access the bt_bap_db,
-can we just pass NULL to ldb as before? We can work out internally in
-bap.c to handle this properly.
+This 4th revision does have the regulators added, which were pulled from the
+bsrc_bt.bin file from the Windows partition.
 
-> +       data->bap = bt_bap_new(ldb, device_db);
->         if (!data->bap) {
->                 error("Unable to create BAP instance");
->                 free(data);
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index d68085514..6f83b03b5 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -1105,8 +1105,9 @@ static void bap_debug(const char *str, void *user_data)
->  static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
->                                                                 int *err)
->  {
-> +       struct btd_adapter *adapter = endpoint->adapter->btd_adapter;
->         struct btd_gatt_database *database;
-> -       struct gatt_db *db;
-> +       struct bt_bap_db *ldb;
->         struct iovec data;
->         char *name;
->
-> @@ -1116,7 +1117,7 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
->                 return false;
->         }
->
-> -       database = btd_adapter_get_database(endpoint->adapter->btd_adapter);
-> +       database = btd_adapter_get_database(adapter);
->         if (!database) {
->                 error("Adapter database not found");
->                 return false;
-> @@ -1128,8 +1129,6 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
->                 return false;
->         }
->
-> -       db = btd_gatt_database_get_db(database);
-> -
->         data.iov_base = endpoint->capabilities;
->         data.iov_len = endpoint->size;
->
-> @@ -1141,7 +1140,9 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
->                 return false;
->         }
->
-> -       endpoint->pac = bt_bap_add_pac(db, name, type, endpoint->codec,
-> +       ldb = bt_bap_get_local_db(btd_gatt_database_get_db(database),
-> +                               btd_adapter_cis_peripheral_capable(adapter));
-> +       endpoint->pac = bt_bap_add_pac(ldb, name, type, endpoint->codec,
->                                         &endpoint->qos, &data, NULL);
->         if (!endpoint->pac) {
->                 error("Unable to create PAC");
-> --
-> 2.39.1
->
+The end result is that we do have a working device, but not entirely reliable.
+
+Hopefully by getting this out there, people who do have access to the specs or
+schematics can see where the improvements or fixes need to come.
+
+There are a few things that I am not sure why they happen, and don't have the
+knowledge level to figure out why they happen or debugging it.
+
+Bluetooth: hci0: setting up wcn6855
+Bluetooth: hci0: Frame reassembly failed (-84)
+Bluetooth: hci0: QCA Product ID   :0x00000013
+Bluetooth: hci0: QCA SOC Version  :0x400c0210
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x000038e6
+Bluetooth: hci0: QCA controller version 0x02100201
+Bluetooth: hci0: unexpected event for opcode 0xfc48
+Bluetooth: hci0: Sending QCA Patch config failed (-110)
+Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
+Bluetooth: hci0: QCA setup on UART is completed
+
+I do not know why the Frame assembly failed, nor the unexpected event.
+
+Likewise, I'm not entirely sure why it says the patch config send times out, and
+*then* seems to send it?
+
+The BD Address also seems to be incorrect, and I'm not sure what is going on
+there either.
+
+Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+well as connecting to and using an H2GO bluetooth speaker and playing audio out
+via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+
+The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+"A2DP Sink, codec SBC" would provide audio output, and while I could see that
+data was being sent to the speaker, it wasn't always outputting, and going >
+4ft. away, would often disconnect.
+
+steev@wintermute:~$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+        UP RUNNING PSCAN
+        RX bytes:1492 acl:0 sco:0 events:126 errors:0
+        TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'wintermute'
+        Class: 0x0c010c
+        Service Classes: Rendering, Capturing
+        Device Class: Computer, Laptop
+        HCI Version:  (0xc)  Revision: 0x0
+        LMP Version:  (0xc)  Subversion: 0x46f7
+        Manufacturer: Qualcomm (29)
+
+steev@wintermute:~$ dmesg | grep Razer
+[ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+[ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+steev@wintermute:~$ dmesg | grep H2GO
+[ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
+
+Bjorn Andersson (1):
+  arm64: dts: qcom: sc8280xp: Define uart2
+
+Steev Klimaszewski (3):
+  dt-bindings: net: Add WCN6855 Bluetooth
+  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+  arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     | 17 +++++
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 76 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+ drivers/bluetooth/btqca.c                     | 24 +++++-
+ drivers/bluetooth/btqca.h                     | 10 +++
+ drivers/bluetooth/hci_qca.c                   | 56 ++++++++++----
+ 6 files changed, 182 insertions(+), 15 deletions(-)
 
 
+base-commit: 4fafd96910add124586b549ad005dcd179de8a18
 -- 
-Luiz Augusto von Dentz
+2.39.0
+
