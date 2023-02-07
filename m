@@ -2,94 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5058CC05027
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 01:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E47C05027
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 01:15:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbjBGBOv (ORCPT
+        id S230093AbjBGBP4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 20:14:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55906 "EHLO
+        Mon, 6 Feb 2023 20:15:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbjBGBOu (ORCPT
+        with ESMTP id S229839AbjBGBP4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 20:14:50 -0500
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C16639752
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 17:14:49 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id y19so13963144ljq.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 17:14:49 -0800 (PST)
+        Mon, 6 Feb 2023 20:15:56 -0500
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E873D9752
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 17:15:54 -0800 (PST)
+Received: by mail-qv1-xf30.google.com with SMTP id z6so4301110qvp.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 17:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2zVFc0gtX0DVia7k+DIEh8rTRm+7+yVjP/SXuAy64PA=;
-        b=oRwHYVneo76D7Wm3qZob062Q5vgd5RtaOPKqJ3LcDI+LLa/N5nNOcrAiBs7jxmmUfF
-         4BaNZJZPFy6Msi3BC55oqi+zY24OrFRWW4iHVGkIF0jLCYFYR97eldAfPne9FaHmK5n5
-         bzrc/S07zvNTtQlLcEy8ujL1q6SzWokX/EX9md/8U+4WITO3n4fjr08EXuSly/vcfFjU
-         I4/caTCxCQ6RhGNYoKumwbBeuKt00Lp/TAerSLJke5ZvYzzTGbYKZZw8bUDfro/bNBlB
-         bXOcvFCyZO8nKxVvRCtawvqr/ia1RPhj14w4ctKPyO/6FfzSZYa82QG2+HPYgDesS8MW
-         wUkA==
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oj35lx1M9RxRHoqfIQNZncHXjB683F8IGdiNs+Cc9j4=;
+        b=N1VClMQUbV+V5FhXOoQyFjA0Xaau1E3ZZUDJoUnEsrpEWUHWAUcOjgeNO1aXZQiYfQ
+         pwJr5aY+aONZDqeXi0WXJMy00aUoSK7fCC/2GBzpMP8AU8xBA5Ao6j2RM4tvxjug4dwE
+         CQzolR9phlihV/cmw1sZRP1Dz71lrPmvTJOZBDWMzZm8+sDfHXeXeFz9yIdcMSRGLvKn
+         YN0ABgm2KpyRlD0ON9YnC2sxWcRpHyynQVeYSyUyrVz/deSCcBee+PWkuLFS/0IJbHo3
+         zTVlFO1A5SN+TIboEw7aHPsG9xz7v3BR673s975zZ0MH63AFnxBiAOpdhrM3uL4H1LsI
+         It7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2zVFc0gtX0DVia7k+DIEh8rTRm+7+yVjP/SXuAy64PA=;
-        b=O9fzF7vQrA4tbPlLs7tYC2DcSqtz28zFR6PkcL+3l8iqFbLjYBeXHamyc6XhwlvD+C
-         qkTQY0yZb+75u9AqK2nUl5jhwWUGog9Yo1T4yE5DxHn99q/xMUdGUzPAB9vhTQqh2sAF
-         E3irHm0WVL/+2Goq8vZaVGA5amMBSg4hdKEYX5WpikcPNEZ9LboTE3OefF2ZzpZu6FDx
-         y7rQppa/BNa9yGeKZTjM57Kr31thBDXuYEHaKbHvwKC8bzWiJVMq3WvGsXTp7zHonZ+P
-         hmIDA+c6dcOAvH2jSa/IEV/u1Ad75dYs/IFlmeaJe2+LwJcGTh09Y84YOWqNRW2WE9zh
-         Unxg==
-X-Gm-Message-State: AO0yUKXnSf4btdJ6SmDn3MNHiSM2rI4IuZlCv3YPSDZiBzFYKy1f0i+1
-        sggBXcRj8Jd56bGXPxumZ6wj+HlwFGd/8zK42nCEObin
-X-Google-Smtp-Source: AK7set9cVAmxp4j6RAKH40LyZRVbYyBMwKuwgVx1sunOYDHEERM4DkgmUH/w1vENoUtaQksEYCXibR/nQE/D8/mvO1c=
-X-Received: by 2002:a05:651c:2325:b0:290:6ee9:f774 with SMTP id
- bi37-20020a05651c232500b002906ee9f774mr155552ljb.43.1675732488107; Mon, 06
- Feb 2023 17:14:48 -0800 (PST)
+        bh=oj35lx1M9RxRHoqfIQNZncHXjB683F8IGdiNs+Cc9j4=;
+        b=4wrG53EHaAQXrLkG9ZuPVW0noBw2Gnqf/cmJpWjAF6QS2XgjD8+LW4ylPrVxhojuPT
+         DltV2eV3b7+YyoYC/ogFNt+VvZbPs60NBNplc1uqFZPpdJOhN5kTt1ipQX3MSLHTLePo
+         WwafssZBTHurtgiu4XVmFw6T9SNws4CSLuODk1O+9xjtlRpxDVBPTeMy9Huj+ssxLQv0
+         OWTFEzytkkXl/6rMAtsD+sBupYRvfZ2lcXYnjwtXoTJBMG1P0QI1dgYPbT5I2rtYFkSm
+         xXTt3fXOrJkBocvovVnnU29hwqaMtqIMqHL8QzTGbRYz19LwwfTuRrev/qFOnV5tQuiX
+         7urw==
+X-Gm-Message-State: AO0yUKVnhMscjYOzWIAfyI0ZqAyTevwW1WWsnivnh130VZtUMDopcwoV
+        RerHVtdL/sS0c94KJWFfWY19ezjnKAU=
+X-Google-Smtp-Source: AK7set/GQQfQ1N6dH1aUpKxAtWrDU7A1ufsYTzjDeeXeupXg/VuSP9yf7SYKcYig888oryF7z7M+4Q==
+X-Received: by 2002:a05:6214:d43:b0:56b:f097:a34b with SMTP id 3-20020a0562140d4300b0056bf097a34bmr2021955qvr.3.1675732553927;
+        Mon, 06 Feb 2023 17:15:53 -0800 (PST)
+Received: from [172.17.0.2] ([104.45.204.224])
+        by smtp.gmail.com with ESMTPSA id j6-20020a05620a410600b0070383f1b6f1sm8319679qko.31.2023.02.06.17.15.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Feb 2023 17:15:53 -0800 (PST)
+Message-ID: <63e1a649.050a0220.1a683.8d32@mx.google.com>
+Date:   Mon, 06 Feb 2023 17:15:53 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3522974288386159238=="
 MIME-Version: 1.0
-References: <20230127205205.20235-1-pav@iki.fi> <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
- <b98624eb045141f941c3855631e266c93203bf91.1675103676.git.pav@iki.fi>
-In-Reply-To: <b98624eb045141f941c3855631e266c93203bf91.1675103676.git.pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 6 Feb 2023 17:14:36 -0800
-Message-ID: <CABBYNZ+gUW-wQ1_UPBFmzhDCDzOi-7yjmuLenHg8pHOJa839ew@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/8] tools/btmgmt: add names for MGMT setting bits
- for CIS feature support
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, bage@debian.org
+Subject: RE: Bluetooth: btrtl: add support for the RTL8723CS
+In-Reply-To: <20230206233912.9410-2-bage@debian.org>
+References: <20230206233912.9410-2-bage@debian.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============3522974288386159238==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 30, 2023 at 10:50 AM Pauli Virtanen <pav@iki.fi> wrote:
+This is automated email and please do not reply to this email!
 
-Add the btmgmt output as a description showing the result of these changes.
+Dear submitter,
 
-> ---
->  tools/btmgmt.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index 29f86091f..323c26712 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -353,6 +353,8 @@ static const char *settings_str[] = {
->                                 "static-addr",
->                                 "phy-configuration",
->                                 "wide-band-speech",
-> +                               "cis-central",
-> +                               "cis-peripheral",
->  };
->
->  static const char *settings2str(uint32_t settings)
-> --
-> 2.39.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=719291
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.18 seconds
+GitLint                       PASS      0.73 seconds
+SubjectPrefix                 PASS      0.25 seconds
+BuildKernel                   PASS      31.21 seconds
+CheckAllWarning               PASS      34.24 seconds
+CheckSparse                   WARNING   38.42 seconds
+CheckSmatch                   WARNING   107.48 seconds
+BuildKernel32                 PASS      29.86 seconds
+TestRunnerSetup               PASS      430.17 seconds
+TestRunner_l2cap-tester       PASS      16.19 seconds
+TestRunner_iso-tester         PASS      16.39 seconds
+TestRunner_bnep-tester        PASS      5.42 seconds
+TestRunner_mgmt-tester        PASS      108.87 seconds
+TestRunner_rfcomm-tester      PASS      8.57 seconds
+TestRunner_sco-tester         PASS      7.96 seconds
+TestRunner_ioctl-tester       PASS      9.31 seconds
+TestRunner_mesh-tester        PASS      6.93 seconds
+TestRunner_smp-tester         PASS      7.82 seconds
+TestRunner_userchan-tester    PASS      5.75 seconds
+IncrementalBuild              PASS      33.40 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:52:45: warning: array of flexible structures
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:52:45: warning: array of flexible structures
 
 
--- 
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3522974288386159238==--
