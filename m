@@ -2,115 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0459C6379F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 08:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E40FCC636CD
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 08:41:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230450AbjBGITM (ORCPT
+        id S231223AbjBGIly (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Feb 2023 03:19:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51930 "EHLO
+        Tue, 7 Feb 2023 03:41:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbjBGITL (ORCPT
+        with ESMTP id S231218AbjBGIlw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Feb 2023 03:19:11 -0500
-Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB701C315;
-        Tue,  7 Feb 2023 00:19:08 -0800 (PST)
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-        id 1pPJBU-008OYZ-Tl; Tue, 07 Feb 2023 16:18:38 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 07 Feb 2023 16:18:36 +0800
-Date:   Tue, 7 Feb 2023 16:18:36 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Jon Maloy <jmaloy@redhat.com>,
-        Ying Xue <ying.xue@windriver.com>,
-        Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
-Subject: [PATCH] tls: Pass rec instead of aead_req into tls_encrypt_done
-Message-ID: <Y+IJXEYPuaQWjfR5@gondor.apana.org.au>
-References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
- <E1pOydn-007zi3-LG@formenos.hmeau.com>
- <20230206231521.712f53e5@kernel.org>
+        Tue, 7 Feb 2023 03:41:52 -0500
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4ECF4203
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Feb 2023 00:41:50 -0800 (PST)
+Received: by mail-oi1-x22e.google.com with SMTP id bd6so3021018oib.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Feb 2023 00:41:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=r9v49Vo65PBkNR7woe40E1N8MMOoH+A7xNRAus3Bzow=;
+        b=l7woEKEyG7w5ChTzG9rbLDt/AXds2KWYOv+awzliNG9U8PPZ8Z5KutAatIi9pBoTSp
+         f00dkOSotkNQSSaKSVnknb940hhlRlNc66B2KJU1FEo2IKDXt7uYGHJVXJuuOvxceiXq
+         v8vpWnNSTx9nGmYJrVpHTmEEo+jk7ybHzrrdrx3TRe4kNbL5xmzaNx9xbXIseJf3TaI+
+         vGr2sIPBOcaFbqQ+jPicCBP4oJ5mHTbWTDewahBqzePUKwk01NmUvHjM84D777iJSPzi
+         jQOCwJ2t80i2nlZTJRgXRR1/0/DIUWLgw4D+gGiXEqMWPPsjm1A6Hm2V9ATLXy49mXaV
+         KLoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r9v49Vo65PBkNR7woe40E1N8MMOoH+A7xNRAus3Bzow=;
+        b=XNj/hxbXEpilPWesVWHpv6qGTPtCLJDXmyhVew22kZfaGCUOuYXXkZZaK73+c3VsBT
+         TrRjQDJrssj7x6sVAyIodUf1bqMXVMqT9PbKbtRJyIc8URvQpx4zOCVhVXflxHjuYK6P
+         NsIZvrFK4mkPEnNGT5VzW35V/L7gt1EnM1fAFG2QGbaCOMf3NdXubVaYQewi/e08rveU
+         uKD70ypSrZiqgCSzqKSSDZlYTNfexlYPkOP0ohud/NtbMRqBX1J2TgMbxOILvMoeP89C
+         bwfZ75Ga/1n+VTiIZAkUVfpn9KOi0vl01sYz8Aw+lcO2hErIqzbgVhXvWzqzMvT6H6Zm
+         zkzg==
+X-Gm-Message-State: AO0yUKXwQ+BqhJ6O7PHJAXuYwfED2xNXfCkaw0GgyI8BbUSc6MjqkwEL
+        SD5AWDQiAZHUut5YEj7QmBt3Shtk9Y8=
+X-Google-Smtp-Source: AK7set9aVwlStw9vEXy/I2LvFqY0lURe4Ni8sgyRf3hgwiwqxiwW1WOE/De2QOlWMuh0CxDdaR6IbQ==
+X-Received: by 2002:a05:6808:2a01:b0:374:3688:36ee with SMTP id ez1-20020a0568082a0100b00374368836eemr784034oib.54.1675759310069;
+        Tue, 07 Feb 2023 00:41:50 -0800 (PST)
+Received: from [172.17.0.2] ([40.84.170.1])
+        by smtp.gmail.com with ESMTPSA id s26-20020a056808209a00b0035aa617156bsm5313340oiw.17.2023.02.07.00.41.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Feb 2023 00:41:49 -0800 (PST)
+Message-ID: <63e20ecd.050a0220.25d83.24f2@mx.google.com>
+Date:   Tue, 07 Feb 2023 00:41:49 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6141329854920421113=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230206231521.712f53e5@kernel.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: RE: tls: Pass rec instead of aead_req into tls_encrypt_done
+In-Reply-To: <Y+IJXEYPuaQWjfR5@gondor.apana.org.au>
+References: <Y+IJXEYPuaQWjfR5@gondor.apana.org.au>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Feb 06, 2023 at 11:15:21PM -0800, Jakub Kicinski wrote:
->
-> >  	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> > -				  tls_encrypt_done, sk);
-> > +				  tls_encrypt_done, aead_req);
-> 
-> ... let's just pass rec instead of aead_req here, then?
+--===============6141329854920421113==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Good point.  Could we do this as a follow-up patch? Reposting
-the whole series would disturb a lot of people.  Of course if
-other major issues crop up I can fold this into the existing
-patch.
+This is an automated email and please do not reply to this email.
 
-Thanks!
+Dear Submitter,
 
----8<---
-The function tls_encrypt_done only uses aead_req to get ahold of
-the tls_rec object.  So we could pass that in instead of aead_req
-to simplify the code.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+----- Output -----
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 0515cda32fe2..6dfec2e8fdfa 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -430,18 +430,16 @@ int tls_tx_records(struct sock *sk, int flags)
- 
- static void tls_encrypt_done(void *data, int err)
- {
--	struct aead_request *aead_req = data;
- 	struct tls_sw_context_tx *ctx;
- 	struct tls_context *tls_ctx;
- 	struct tls_prot_info *prot;
-+	struct tls_rec *rec = data;
- 	struct scatterlist *sge;
- 	struct sk_msg *msg_en;
--	struct tls_rec *rec;
- 	bool ready = false;
- 	struct sock *sk;
- 	int pending;
- 
--	rec = container_of(aead_req, struct tls_rec, aead_req);
- 	msg_en = &rec->msg_encrypted;
- 
- 	sk = rec->sk;
-@@ -536,7 +534,7 @@ static int tls_do_encryption(struct sock *sk,
- 			       data_len, rec->iv_data);
- 
- 	aead_request_set_callback(aead_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
--				  tls_encrypt_done, aead_req);
-+				  tls_encrypt_done, rec);
- 
- 	/* Add the record in tx_list */
- 	list_add_tail((struct list_head *)&rec->list, &ctx->tx_list);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+error: patch failed: net/tls/tls_sw.c:430
+error: net/tls/tls_sw.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6141329854920421113==--
