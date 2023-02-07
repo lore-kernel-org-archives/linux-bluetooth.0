@@ -2,59 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA140C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 01:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3BB5C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Feb 2023 01:12:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229796AbjBGBKg (ORCPT
+        id S229796AbjBGBMX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Feb 2023 20:10:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53570 "EHLO
+        Mon, 6 Feb 2023 20:12:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjBGBKf (ORCPT
+        with ESMTP id S230025AbjBGBMW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Feb 2023 20:10:35 -0500
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C71333444
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 17:10:33 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id o5so1900991ljp.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 17:10:33 -0800 (PST)
+        Mon, 6 Feb 2023 20:12:22 -0500
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98D901287B
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Feb 2023 17:12:15 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id y19so13957772ljq.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Feb 2023 17:12:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=muc9uTjTDSVAOqnuZqHfoitLXerQp/KIyRguS3Ueeis=;
-        b=Qdmvxpz8nWVsR9gLrZXYMOBSwVZzEVwFMZalHIauQLGBkzxz1ev0IFyF8+O3SnjSJG
-         o3whOsRjrhWsTHxIXgnvIG4L6ALDpKJ1lAtE45wpmQ+9Ru7bpm1VF5m4Gprd4ffJBYGS
-         TnA26wVT0moDrjcvDfJi/GbD1Y1CUSVamahV2onIOLdcIACSLFaepvc4ekjxCjzMi2Sd
-         fzYorFWg3n6q0OdMYr3mlNXenrssYnI/DqpTwrZtclMNr9SkggSj3ohOdXo7gaPpVzRl
-         baGg6Tk9P5JtMFmguS4AEsfBDeqE+NpdL93ezPmf/n1h4vNcWGDPY+LPNTN0DKPNWgE6
-         1qEA==
+        bh=XVl4dxs1qgZyrHoPZPbZlUO/4Uup0PsXEgiDlFzM1zA=;
+        b=inw0wWR2MmrlJvvxPes78/5uMhSQrIDBYJX6KbeXVYN2HX5LqbrwBsLcMBFGKMNo9y
+         7kYWQt3v3vIZm9k0cN/iqjMYt344oRL7L0/qH+uY/qunGzNKVa9y9QcBj4yFcLFGamPC
+         Z15cmOwnj+0hk1uqUgJMgcMlYm1vZY2MfKPLUUSl1FNZ7ZgEnfcRYcZmPSuZZIUjGXMe
+         ELb1hKX1XhR7RmfTh1CPbwkLYNCUeEtmG8cU/ij9zzFlJMHqo2UU+8T+3PrTniH/dLhx
+         x4frack1WXG2AY24Zc0/KBNkso62rjMPoftG4PdcpCqjgVk1ER9JJPKpGIQhBd1QvZlS
+         wERQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=muc9uTjTDSVAOqnuZqHfoitLXerQp/KIyRguS3Ueeis=;
-        b=mAjJzpjG+F4nbj62WgEmFC3eHYMu5Fg6Cd6dzoKQ2ODjIVyxzYMkiRBbTcZnQb69Ox
-         NNoJvMmMvgFqUqFOXNS+UpnmYyQNqu3eqCZX8+JqTN3FQF0xHxUJIqGc/VcB4fiNamE3
-         AZy6TPR1sEwF9qEcT1jUIona3LhiuK4WouS21UktEPBRvwLxsySB3iBP8AueVzH/Ti/r
-         wqsL3prtk5RA4kazTkHciEZ3v8Ypujpjay701yexnDBGIfo782h/xTqXq2Q4+tF9GfeG
-         ZgGy6J/C/XaMU5123ctneJ3/wFb/vGZQvIndipje2L1HFCEgDg54VeeQ/hwGEbjNC07T
-         DSUg==
-X-Gm-Message-State: AO0yUKV2Rmel0j48msKw5fjwAvfL2ko0KFMoR2Uet1nVCmBvrzyl/a8Y
-        yn8dzaD9Cn2Lt+sLJU0oL6uXA2qkzlSut+AylpY=
-X-Google-Smtp-Source: AK7set+BkKaXDeuuUd34ze2Ka/3s3lwEW6KQ6cDUL0U4c/kYQLlVC5XNn0h2UmrucDTZb3fDNUD+ImBEX5k06ojdIrM=
-X-Received: by 2002:a05:651c:2325:b0:290:6ee9:f774 with SMTP id
- bi37-20020a05651c232500b002906ee9f774mr154183ljb.43.1675732231517; Mon, 06
- Feb 2023 17:10:31 -0800 (PST)
+        bh=XVl4dxs1qgZyrHoPZPbZlUO/4Uup0PsXEgiDlFzM1zA=;
+        b=RBk4cGnOdOGrKeebv1E2D73j6RicsAmph2Z3KH/TFB6Jf2XAszs7ECLODYWmFpx9Lf
+         fuFBf28/Q0Fm0h+Y0UCutzOvtlpcfgewyd5+T/IuryudlZNvSKqophSu5+ka/HXN9Cdi
+         ZvtoYqvOSSQKC1jtgIvkV8eK/AsR1hxKvMLCC0TGqGGRIjBzlHZ6AG9I1i/VKcZ/yvbQ
+         FbqT0w4vJFeN1d4zrlbHjoBhXUlyeA5HtyyqwkDzzwM/dH4qyWxjQScHqOArdrneJmWf
+         UKT7M3KOfvn99qclQx9tucGZUw1gZmLZty2O9XCenBu6vzNsMJXz/gLEHSuOd7qo7PdG
+         y/Eg==
+X-Gm-Message-State: AO0yUKVnz3uMSHmCn6tkk7ntaJxQ9xW0p7r6FY1r5CSxOuYdK+pt9WmQ
+        oyFS4zdfTK+z9vPQ+Lm3Nqj2kowwmod70Pbv9qAC09YM
+X-Google-Smtp-Source: AK7set/7bkNBK1l9Tj1w48YEnFZAtqkM36NOMvF/b31/o/YtNKtJHxcCn/MCkQ6P9CUT66Pa07enE3coq03jPbQNeAo=
+X-Received: by 2002:a2e:8410:0:b0:290:5166:7c37 with SMTP id
+ z16-20020a2e8410000000b0029051667c37mr209744ljg.191.1675732333920; Mon, 06
+ Feb 2023 17:12:13 -0800 (PST)
 MIME-Version: 1.0
 References: <20230127205205.20235-1-pav@iki.fi> <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
- <32554e8adb382a7e5051f09cd06ca4e0dfe1f86b.1675103676.git.pav@iki.fi>
-In-Reply-To: <32554e8adb382a7e5051f09cd06ca4e0dfe1f86b.1675103676.git.pav@iki.fi>
+ <6752660792aa222640025a08ba9d95bcf9cf70b6.1675103676.git.pav@iki.fi>
+In-Reply-To: <6752660792aa222640025a08ba9d95bcf9cf70b6.1675103676.git.pav@iki.fi>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 6 Feb 2023 17:10:20 -0800
-Message-ID: <CABBYNZK-YM5LJbYzcFq161C5UCuXQxzbf2gFaWF2Qd7yFbP_7A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/8] adapter: add functions indicating adapter CIS capability
+Date:   Mon, 6 Feb 2023 17:12:02 -0800
+Message-ID: <CABBYNZJKZ_=xqODdgY0B=TDDP4mm63s_DwgTgoE0bEceaneFjQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/8] monitor: add names for MGMT setting bits for
+ CIS feature support
 To:     Pauli Virtanen <pav@iki.fi>
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -64,57 +65,28 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Pauli,
 
-On Mon, Jan 30, 2023 at 10:58 AM Pauli Virtanen <pav@iki.fi> wrote:
->
+On Mon, Jan 30, 2023 at 10:48 AM Pauli Virtanen <pav@iki.fi> wrote:
+
+Let's have the btmon output in the description to make it easier to
+visualize how this changes affect it.
+
 > ---
->  src/adapter.c | 16 ++++++++++++++++
->  src/adapter.h |  3 +++
->  2 files changed, 19 insertions(+)
+>  monitor/packet.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index aadad4016..4f06bce53 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -9033,6 +9033,22 @@ bool btd_adapter_ssp_enabled(struct btd_adapter *adapter)
->         return false;
->  }
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index 44f1941bd..d9e8abf41 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -12649,6 +12649,8 @@ static const struct bitfield_data mgmt_settings_table[] = {
+>         { 15, "Static Address"          },
+>         { 16, "PHY Configuration"       },
+>         { 17, "Wideband Speech"         },
+> +       { 18, "CIS Central"             },
+> +       { 19, "CIS Peripheral"          },
+>         { }
+>  };
 >
-> +bool btd_adapter_cis_central_capable(struct btd_adapter *adapter)
-> +{
-> +       if (adapter->current_settings & MGMT_SETTING_CIS_CENTRAL)
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
-> +bool btd_adapter_cis_peripheral_capable(struct btd_adapter *adapter)
-> +{
-> +       if (adapter->current_settings & MGMT_SETTING_CIS_PERIPHERAL)
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
->  void btd_adapter_set_oob_handler(struct btd_adapter *adapter,
->                                                 struct oob_handler *handler)
->  {
-> diff --git a/src/adapter.h b/src/adapter.h
-> index 78eb069ae..3fcee30bc 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -226,6 +226,9 @@ void btd_adapter_gatt_server_stop(struct btd_adapter *adapter);
->
->  bool btd_adapter_ssp_enabled(struct btd_adapter *adapter);
->
-> +bool btd_adapter_cis_central_capable(struct btd_adapter *adapter);
-> +bool btd_adapter_cis_peripheral_capable(struct btd_adapter *adapter);
-
-Lets just have btd_adapter_capable(struct btd_adapter *adapter, int
-flags) to make it simple to check multiple flags if needed.
-
->  int adapter_connect_list_add(struct btd_adapter *adapter,
->                                         struct btd_device *device);
->  void adapter_connect_list_remove(struct btd_adapter *adapter,
 > --
 > 2.39.1
 >
