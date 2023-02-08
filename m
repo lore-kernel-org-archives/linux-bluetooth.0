@@ -2,61 +2,112 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECBBEC05027
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 09:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF81C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 10:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbjBHJ4U (ORCPT
+        id S230447AbjBHKTJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Feb 2023 04:56:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44860 "EHLO
+        Wed, 8 Feb 2023 05:19:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbjBHJ4S (ORCPT
+        with ESMTP id S231340AbjBHKS5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Feb 2023 04:56:18 -0500
-X-Greylist: delayed 89030 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Feb 2023 01:56:17 PST
-Received: from mail.crawnon.pl (mail.crawnon.pl [51.68.198.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381C519F24
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 01:56:17 -0800 (PST)
-Received: by mail.crawnon.pl (Postfix, from userid 1002)
-        id 59617A2678; Tue,  7 Feb 2023 09:11:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=crawnon.pl; s=mail;
-        t=1675761123; bh=C5hX24svv/9/TME4wPCHfYjl17BCtmuxEd1i9B4zdYs=;
-        h=Date:From:To:Subject:From;
-        b=rsnbbbQiHvS9swOZMNLU+YMWV7EhGNQdSz5WkMxBf7Of5pqalmlJeHNFEVhyDbSdu
-         jdml04ofyNO+ViHia4RiY61cENgbde/m6Gf0O3qusmLdmcIYY/SQHcudtNw/L3gQFo
-         d+u1Be4RWymfvMM4ZeGf0ritv272r5WS/66lxxSJAadaAwv4C0vymxejJjfI2C6u5y
-         mcYZor6ITpvKLJYEc78KRerUhmQlHKrrVS/LREoKBmoLJHfFjXUObUF4Bk1CQa0h0W
-         FhN9k+cWNpQCRXKQZHTn4SxLbx2ZQ8oMK+gJ9gwWs/3kHLs/YomSSMKmPKJ87qwdDE
-         3TFnSx4uNNJ4A==
-Received: by mail.crawnon.pl for <linux-bluetooth@vger.kernel.org>; Tue,  7 Feb 2023 09:10:31 GMT
-Message-ID: <20230207074500-0.1.90.hvez.0.2k896er5g5@crawnon.pl>
-Date:   Tue,  7 Feb 2023 09:10:31 GMT
-From:   =?UTF-8?Q? "Miko=C5=82aj_Fiodorczyk" ?= 
-        <mikolaj.fiodorczyk@crawnon.pl>
-To:     <linux-bluetooth@vger.kernel.org>
-Subject: Fotowoltaika - nowe warunki
-X-Mailer: mail.crawnon.pl
+        Wed, 8 Feb 2023 05:18:57 -0500
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6C01BF8
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 02:18:23 -0800 (PST)
+Received: from [192.168.0.4] (ip5f5aea6d.dynamic.kabel-deutschland.de [95.90.234.109])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id F2B1361CC457B;
+        Wed,  8 Feb 2023 11:17:48 +0100 (CET)
+Message-ID: <b7874cdd-5066-8bf2-02b2-2443d68a238c@molgen.mpg.de>
+Date:   Wed, 8 Feb 2023 11:17:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: hci0: Malformed MSFT vendor event: 0x02
+Content-Language: en-US
+To:     Arda Demir <ddmirarda@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <CALDHRCt5KUezfEZCOWK+zYPM1hP32qwZqcoKw09ZjNw=oQoWKg@mail.gmail.com>
+ <ecc41929af982862720209eacfa935178a8e0a1b.camel@sipsolutions.net>
+ <CALDHRCuuZdqVorNzF+DFU8kAUU4eiuCHJgtV3Gtbvwr9mVow9Q@mail.gmail.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CALDHRCuuZdqVorNzF+DFU8kAUU4eiuCHJgtV3Gtbvwr9mVow9Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dzie=C5=84 dobry,
-
-chcia=C5=82bym poinformowa=C4=87, i=C5=BC mog=C4=85 Pa=C5=84stwo uzyska=C4=
-=87 dofinansowanie na systemy fotowoltaiczne w ramach nowej edycji progra=
-mu M=C3=B3j Pr=C4=85d.
-
-Program zapewnia 6000 z=C5=82 dofinansowania na instalacj=C4=99 paneli i =
-16 000 z=C5=82 na magazyn energii, ni=C5=BCsze cen pr=C4=85du i mo=C5=BCl=
-iwo=C5=9B=C4=87 odliczenia koszt=C3=B3w zwi=C4=85zanych z instalacj=C4=85=
- fotowoltaiki w ramach rozliczenia PIT (tzw. ulga termomodernizacyjna).
-
-Czy s=C4=85 Pa=C5=84stwo otwarci na wst=C4=99pn=C4=85 rozmow=C4=99 w tym =
-temacie?
+Dear Arda,
 
 
-Pozdrawiam,
-Miko=C5=82aj Fiodorczyk
+Please use interleaved style when replying.
+
+Am 08.02.23 um 10:54 schrieb Arda Demir:
+> I don't think the device is broken since bluetooth + wi-fi is fully
+> functional and i also read on arch linux forum people get the same
+> message on tty with the same hardware. (AX200)
+> 
+> https://bbs.archlinux.org/viewtopic.php?id=276815
+> 
+> On Wed, Feb 8, 2023 at 12:29 PM Johannes Berg <johannes@sipsolutions.net> wrote:
+>>
+>> On Wed, 2023-02-08 at 12:21 +0300, Arda Demir wrote:
+>>> Hello,
+>>>
+>>> First of all, my bluetooth adapter is;
+>>> 04:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
+>>
+>> You've reached the Wi-Fi team here though - adding the BT list.
+>>
+>>> I see the following message everytime when i boot the pc on tty.
+>>>
+>>> "Bluetooth: hci0: Malformed MSFT vendor event: 0x02"
+>>>
+>>> But bluetooth works well. If it is not critical it shouldn't print on
+>>> tty, right?
+>>
+>> That's generic from net/bluetooth/hci_event.c, not related to the device
+>> (apart from the fact that the device might be broken if it's sending
+>> this?)
+
+The message seems to originate from `net/bluetooth/msft.c`:
+
+```
+static void *msft_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
+                            u8 ev, size_t len)
+{
+         void *data;
+
+         data = skb_pull_data(skb, len);
+         if (!data)
+                 bt_dev_err(hdev, "Malformed MSFT vendor event: 0x%02x", 
+ev);
+
+         return data;
+}
+```
+
+I recommend to create a bug report at the Linux kernel Bugzilla [1], 
+where you attach the output of `dmesg`.
+
+Additionally, I suggest to not load the Bluetooth modules like btusb 
+during startup, and only later load it with `btmon` running.
+
+Please reply with the bug report number/URL, if you created the bug report.
+
+
+Kind regards,
+
+Paul
+
+
+[1]: https://bugzilla.kernel.org/
