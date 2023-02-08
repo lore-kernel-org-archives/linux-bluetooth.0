@@ -2,100 +2,89 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 213C4C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 15:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEEDCC05027
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 15:52:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231679AbjBHPbE (ORCPT
+        id S231175AbjBHPwj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Feb 2023 10:31:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55294 "EHLO
+        Wed, 8 Feb 2023 10:52:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231636AbjBHPbC (ORCPT
+        with ESMTP id S229724AbjBHPwi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Feb 2023 10:31:02 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 334972B288
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 07:31:02 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E4D3EB81E65
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 15:31:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7ED47C4339C
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 15:30:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675870259;
-        bh=8l5o0Yk8If96eHpGrdZ8rC8RoydzvmwhhXlNMPazZv4=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=d/TJ9e4ACLXSddF3UgUa3X9NEbuGR4behuJ7UyWVJm0KEHnVSQYq7c2anetYMO9Zl
-         E7hviOTPQb6kVtBTojBhM2JasifHo4b10L64FqSPEllnLyrviCSQEzMx0f9R98CdHp
-         HQKZXRybyK6TWonqObsL9wBXx4JKzqEw+VDR9WjoVn+G20qb+DsA/NGJY94ZFPtDWu
-         Ke9U+Gdl7IQ8k2/RIWxGp8tIKcCL+RkrQofKWsYI8wgTTKajp7tS2REaYlXQz9Osjk
-         BS/ryOkjSxZASAHVWP/I9HaQFeSrrBJoYKSAw3r/7dKr/U3IaEPgGkbNzS9fQC75Ao
-         xHsOjd5oZs19w==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 715D2C43142; Wed,  8 Feb 2023 15:30:59 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 08 Feb 2023 15:30:55 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jhonatan@justin.com.br
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-FJj0Om4jKT@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 8 Feb 2023 10:52:38 -0500
+Received: from stravinsky.debian.org (stravinsky.debian.org [IPv6:2001:41b8:202:deb::311:108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58AC423C5A;
+        Wed,  8 Feb 2023 07:52:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+        s=smtpauto.stravinsky; h=X-Debian-User:Content-Transfer-Encoding:MIME-Version
+        :Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=HdLc279IoOTbR2U4yoZcdEiF8TRE9BmS0RHirhtN2ng=; b=a8PvWWZObboKV3ZpTy7lDN/fOp
+        jJy7MMkZ34zg+eU0+VIac8YbzRODq6yD3c7bxyAJOrwcAqGmPX83nYFSZETVi5Z7d8kv4g419Hqic
+        FvfxIl5bRw0DyMAAF+Fg0OLXhEsq07zWGlhLnZjvK9dSWSFnMnC84ROTeF3tVHYbFPK7nZAcE2lUY
+        Xl2e/WVGpSDZ2xsJrGTi/ZvIzkJ+YB9DR3uc7TVf2p1TFTaO8iDgEzL3ySSehU/FCdduDjCQHDiQB
+        osA1L2TYATvf/5zU+Wouw/bf24sJcXXEfwig0QXPI3Cvmkq5PUqdVNITJRmUN/rTIL0A2mIGQsDZj
+        m7mB3JLA==;
+Received: from authenticated user
+        by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.94.2)
+        (envelope-from <bage@debian.org>)
+        id 1pPmkD-00DxsN-9E; Wed, 08 Feb 2023 15:52:25 +0000
+From:   Bastian Germann <bage@debian.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Bastian Germann <bage@debian.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH v4 0/2] Bluetooth: btrtl: add support for the RTL8723CS
+Date:   Wed,  8 Feb 2023 16:52:17 +0100
+Message-Id: <20230208155220.1640-1-bage@debian.org>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Debian-User: bage
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+Pinebook uses RTL8723CS for WiFi and bluetooth. Unfortunately, RTL8723CS
+has broken BT-4.1 support, so it requires a quirk.
 
-jhonatan@justin.com.br changed:
+Add a quirk and wire up 8723CS support in btrtl.
+I was asked for a btmon output without the quirk;
+however, using the chip without the quirk ends up in a bad state with
+"Opcode 0x c77 failed: -56" (HCI_OP_READ_SYNC_TRAIN_PARAMS) on training.
+A btmon output with the quirk active was already sent by Vasily.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |jhonatan@justin.com.br
+v1 of this series was sent in July 2020 by Vasily Khoruzhick.
+I have tested it to work on the Pinebook.
 
---- Comment #266 from jhonatan@justin.com.br ---
-Having precisely the same issue as mentioned in previous commment by
-guimarcalsilva@gmail.com
+Changelog:
+v2:
+   * Rebase
+   * Add uart-has-rtscts to device tree as requested by reviewer
+v3:
+   * Drop the device tree as it was split out and is already integrated.
+   * Rename the quirk as requested by reviewer Marcel Holtmann
+v4:
+   * Use skb_pull_data as requested by reviewer Luiz Augusto von Dentz
 
-logs:
+Vasily Khoruzhick (2):
+  Bluetooth: Add new quirk for broken local ext features page 2
+  Bluetooth: btrtl: add support for the RTL8723CS
 
-> Feb 08 12:25:27 jho kernel: Bluetooth: hci0: CSR: Couldn't suspend the de=
-vice
-> for our Barrot 8041a02 receive-issue workaround
-> Feb 08 12:25:27 jho kernel: Bluetooth: hci0: HCI Delete Stored Link Key
-> command is advertised, but not supported.
-> Feb 08 12:25:27 jho kernel: Bluetooth: hci0: HCI Read Default Erroneous D=
-ata
-> Reporting command is advertised, but not supported.
-> Feb 08 12:25:27 jho kernel: Bluetooth: hci0: HCI Set Event Filter command=
- not
-> supported.
-> Feb 08 12:25:29 jho kernel: Bluetooth: hci0: Opcode 0x c03 failed: -110
+ drivers/bluetooth/btrtl.c   | 120 ++++++++++++++++++++++++++++++++++--
+ drivers/bluetooth/btrtl.h   |   5 ++
+ drivers/bluetooth/hci_h5.c  |   4 ++
+ include/net/bluetooth/hci.h |   7 +++
+ net/bluetooth/hci_event.c   |   4 +-
+ 5 files changed, 135 insertions(+), 5 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+-- 
+2.39.1
 
-You are receiving this mail because:
-You are the assignee for the bug.=
