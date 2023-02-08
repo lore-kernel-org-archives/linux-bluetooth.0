@@ -2,112 +2,138 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAF81C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 10:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4455DC05027
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 10:36:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230447AbjBHKTJ (ORCPT
+        id S231435AbjBHKgM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Feb 2023 05:19:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59296 "EHLO
+        Wed, 8 Feb 2023 05:36:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbjBHKS5 (ORCPT
+        with ESMTP id S231417AbjBHKgI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Feb 2023 05:18:57 -0500
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F6C01BF8
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 02:18:23 -0800 (PST)
-Received: from [192.168.0.4] (ip5f5aea6d.dynamic.kabel-deutschland.de [95.90.234.109])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id F2B1361CC457B;
-        Wed,  8 Feb 2023 11:17:48 +0100 (CET)
-Message-ID: <b7874cdd-5066-8bf2-02b2-2443d68a238c@molgen.mpg.de>
-Date:   Wed, 8 Feb 2023 11:17:48 +0100
+        Wed, 8 Feb 2023 05:36:08 -0500
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 248DA4859E
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 02:35:46 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id e204so6779287iof.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Feb 2023 02:35:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nPWVcGLa3bZxE+lw7mX9Kj5qHbydwbWOrF8CCuHrVuo=;
+        b=TWL5evY03XbfjrQUXUA7S/VXmzyYLJjX9PFrrHOqVCzZXFhqhs/R6t7VrOhNKR/7CX
+         1/1lj4JRVuF6YvkHui5C8aew3tOGncE41fkXMVcq1IHFzlsVWhSZ7NmsSfpPZCehFcAG
+         YUYLkONd4kNtQ/JQ0tV1PCSXnr6Kfpq9TzoFFfrTrt7vzpydldrQp0NI4tdHyRMoMYLn
+         z4DkORVZ4aa0of1qRFMNEelOejx72VBpDkJ0XyGxO037bEFJ6+0XNgbzcRNW6ibzYL+K
+         aRBavgScZz+9ozSvMZnA+aslY7OhxJqRJJ/TTK9XeG7RX0uyEELwGG5m9g1Bj89A0fLY
+         v3mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nPWVcGLa3bZxE+lw7mX9Kj5qHbydwbWOrF8CCuHrVuo=;
+        b=j9oGKlQ94F8G+L7HQJuzMutW/GXRa+Lj8CGi6wuOopVg1qXhauES77QgmnqH1y4jH8
+         uIiNjk6rh2vRbFBiAVt5LLLvpDox2IYIjEbB8z4zvGFXuOi6qqTqYluLupbSCfI6ocoe
+         pAr2STdVOOSrF0yefIlaEtBS8mSUeIGqKQGyKWavQ92fsK3H6uDLt2erRCYYFAw5rz04
+         LfR4qe8z6pJc3X330X/JMmzOmVs3rVA4GPYtnBAg9xunclwkIEh5U/PYwIOd3lHL3YPZ
+         /63vYgsfcwk9jUSp3HYk/0pwmyPBcP8/l69qcRN33D5K+znw1/TBPXHu3ei1YSuFvU5G
+         wRLQ==
+X-Gm-Message-State: AO0yUKW6f/TSyAB/hJtSxp917tSUqqLtfD4lh5E1CA2dykwQ9+G9rfdt
+        eARpH2TQspTdaTyiTpDSppOItaiGlZ4=
+X-Google-Smtp-Source: AK7set8mqFie0aHo1Br/4mIhPpg8/4f46S4QG2DQlAWFoT5F1Gw+S7yTvBpd6GOqgJxG5+4AOXZlYg==
+X-Received: by 2002:a05:6602:3292:b0:6e5:25a2:c63d with SMTP id d18-20020a056602329200b006e525a2c63dmr5230443ioz.21.1675852545047;
+        Wed, 08 Feb 2023 02:35:45 -0800 (PST)
+Received: from [172.17.0.2] ([40.77.92.115])
+        by smtp.gmail.com with ESMTPSA id y14-20020a05663824ce00b003b443977af0sm5241779jat.7.2023.02.08.02.35.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Feb 2023 02:35:44 -0800 (PST)
+Message-ID: <63e37b00.050a0220.29677.c489@mx.google.com>
+Date:   Wed, 08 Feb 2023 02:35:44 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1561465228630630147=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: hci0: Malformed MSFT vendor event: 0x02
-Content-Language: en-US
-To:     Arda Demir <ddmirarda@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <CALDHRCt5KUezfEZCOWK+zYPM1hP32qwZqcoKw09ZjNw=oQoWKg@mail.gmail.com>
- <ecc41929af982862720209eacfa935178a8e0a1b.camel@sipsolutions.net>
- <CALDHRCuuZdqVorNzF+DFU8kAUU4eiuCHJgtV3Gtbvwr9mVow9Q@mail.gmail.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CALDHRCuuZdqVorNzF+DFU8kAUU4eiuCHJgtV3Gtbvwr9mVow9Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_tjiang@quicinc.com
+Subject: RE: [v1] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+In-Reply-To: <20230208094038.13670-1-quic_tjiang@quicinc.com>
+References: <20230208094038.13670-1-quic_tjiang@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Arda,
+--===============1561465228630630147==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=719878
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.55 seconds
+GitLint                       PASS      0.27 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      31.36 seconds
+CheckAllWarning               PASS      34.50 seconds
+CheckSparse                   WARNING   38.42 seconds
+CheckSmatch                   PASS      107.08 seconds
+BuildKernel32                 PASS      29.93 seconds
+TestRunnerSetup               PASS      433.09 seconds
+TestRunner_l2cap-tester       PASS      16.29 seconds
+TestRunner_iso-tester         PASS      16.63 seconds
+TestRunner_bnep-tester        PASS      5.41 seconds
+TestRunner_mgmt-tester        PASS      109.34 seconds
+TestRunner_rfcomm-tester      PASS      8.78 seconds
+TestRunner_sco-tester         PASS      8.01 seconds
+TestRunner_ioctl-tester       PASS      9.36 seconds
+TestRunner_mesh-tester        PASS      6.88 seconds
+TestRunner_smp-tester         PASS      7.94 seconds
+TestRunner_userchan-tester    PASS      5.67 seconds
+IncrementalBuild              PASS      28.19 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v1] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+WARNING: DT compatible string "qcom,qca2066-bt" appears un-documented -- check ./Documentation/devicetree/bindings/
+#271: FILE: drivers/bluetooth/hci_qca.c:2324:
++	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
+
+total: 0 errors, 1 warnings, 153 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13132788.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-Please use interleaved style when replying.
-
-Am 08.02.23 um 10:54 schrieb Arda Demir:
-> I don't think the device is broken since bluetooth + wi-fi is fully
-> functional and i also read on arch linux forum people get the same
-> message on tty with the same hardware. (AX200)
-> 
-> https://bbs.archlinux.org/viewtopic.php?id=276815
-> 
-> On Wed, Feb 8, 2023 at 12:29 PM Johannes Berg <johannes@sipsolutions.net> wrote:
->>
->> On Wed, 2023-02-08 at 12:21 +0300, Arda Demir wrote:
->>> Hello,
->>>
->>> First of all, my bluetooth adapter is;
->>> 04:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
->>
->> You've reached the Wi-Fi team here though - adding the BT list.
->>
->>> I see the following message everytime when i boot the pc on tty.
->>>
->>> "Bluetooth: hci0: Malformed MSFT vendor event: 0x02"
->>>
->>> But bluetooth works well. If it is not critical it shouldn't print on
->>> tty, right?
->>
->> That's generic from net/bluetooth/hci_event.c, not related to the device
->> (apart from the fact that the device might be broken if it's sending
->> this?)
-
-The message seems to originate from `net/bluetooth/msft.c`:
-
-```
-static void *msft_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
-                            u8 ev, size_t len)
-{
-         void *data;
-
-         data = skb_pull_data(skb, len);
-         if (!data)
-                 bt_dev_err(hdev, "Malformed MSFT vendor event: 0x%02x", 
-ev);
-
-         return data;
-}
-```
-
-I recommend to create a bug report at the Linux kernel Bugzilla [1], 
-where you attach the output of `dmesg`.
-
-Additionally, I suggest to not load the Bluetooth modules like btusb 
-during startup, and only later load it with `btmon` running.
-
-Please reply with the bug report number/URL, if you created the bug report.
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btqca.c:637:17: warning: restricted __le32 degrades to integerdrivers/bluetooth/btqca.c:720:24: warning: restricted __le32 degrades to integer
 
 
-Kind regards,
+---
+Regards,
+Linux Bluetooth
 
-Paul
 
-
-[1]: https://bugzilla.kernel.org/
+--===============1561465228630630147==--
