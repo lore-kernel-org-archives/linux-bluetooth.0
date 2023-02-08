@@ -2,630 +2,985 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB78C636CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 05:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31067C636D3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 05:59:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbjBHFt0 (ORCPT
+        id S230078AbjBHF7d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Feb 2023 00:49:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40038 "EHLO
+        Wed, 8 Feb 2023 00:59:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229706AbjBHFtZ (ORCPT
+        with ESMTP id S229530AbjBHF7b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Feb 2023 00:49:25 -0500
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E87611EAF;
-        Tue,  7 Feb 2023 21:49:23 -0800 (PST)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3185n8snD022899, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3185n8snD022899
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
-        Wed, 8 Feb 2023 13:49:08 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.9; Wed, 8 Feb 2023 13:49:15 +0800
-Received: from localhost (172.21.132.123) by RTEXMBS03.realtek.com.tw
- (172.21.6.96) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Wed, 8 Feb 2023
- 13:49:15 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <alex_lu@realsil.com.cn>, <allen_chen@realsil.com.cn>,
-        <hildawu@realtek.com>, <max.chou@realtek.com>
-Subject: [PATCH v3] Bluetooth: btrtl: Firmware format v2 support
-Date:   Wed, 8 Feb 2023 13:49:08 +0800
-Message-ID: <20230208054908.116502-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 8 Feb 2023 00:59:31 -0500
+Received: from formenos.hmeau.com (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC34CB47C;
+        Tue,  7 Feb 2023 21:59:27 -0800 (PST)
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+        by formenos.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+        id 1pPdTg-008l4u-Fv; Wed, 08 Feb 2023 13:58:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 08 Feb 2023 13:58:44 +0800
+Date:   Wed, 8 Feb 2023 13:58:44 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko@kernel.org>, keyrings@vger.kernel.org
+Subject: [v2 PATCH 10/17] crypto: api - Use data directly in completion
+ function
+Message-ID: <Y+M6FDVFcXRNQtwi@gondor.apana.org.au>
+References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
+ <E1pOydr-007ziX-T2@formenos.hmeau.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [172.21.132.123]
-X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
- RTEXMBS03.realtek.com.tw (172.21.6.96)
-X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/08/2023 05:23:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIzLzIvOCCkV6TIIDAxOjM2OjAw?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1pOydr-007ziX-T2@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+v2 adds the actual algapi conversion which went missing.
 
-Realtek changes the format for the firmware file as v2. The driver
-should implement the patch to extract the firmware data from the
-firmware file. The future chips must apply this patch for firmware loading.
-This patch is compatible with the both previous format and v2 as well.
+---8<---
+This patch does the final flag day conversion of all completion
+functions which are now all contained in the Crypto API.
 
-Signed-off-by: Allen Chen <allen_chen@realsil.com.cn>
-Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
-Tested-by: Hilda Wu <hildawu@realtek.com>
-Signed-off-by: Max Chou <max.chou@realtek.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
-Changes in v3:
-- Fix sparse check
-- Edit commit log
-Changes in v2:
-- Use iovec pull data function as rtl_iov_pull_data() to parse data.
----
- drivers/bluetooth/btrtl.c | 353 +++++++++++++++++++++++++++++++++-----
- drivers/bluetooth/btrtl.h |  53 +++++-
- 2 files changed, 365 insertions(+), 41 deletions(-)
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 69c3fe649ca7..7e19dbb2b42e 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -18,6 +18,7 @@
- #define VERSION "0.1"
- 
- #define RTL_EPATCH_SIGNATURE	"Realtech"
-+#define RTL_EPATCH_SIGNATURE_V2	"RTBTCore"
- #define RTL_ROM_LMP_8723A	0x1200
- #define RTL_ROM_LMP_8723B	0x8723
- #define RTL_ROM_LMP_8821A	0x8821
-@@ -38,6 +39,14 @@
- 	.hci_ver = (hciv), \
- 	.hci_bus = (bus)
- 
-+#define	RTL_CHIP_SUBVER (&(struct rtl_vendor_cmd) {{0x10, 0x38, 0x04, 0x28, 0x80}})
-+#define	RTL_CHIP_REV    (&(struct rtl_vendor_cmd) {{0x10, 0x3A, 0x04, 0x28, 0x80}})
-+#define	RTL_SEC_PROJ    (&(struct rtl_vendor_cmd) {{0x10, 0xA4, 0x0D, 0x00, 0xb0}})
-+
-+#define RTL_PATCH_SNIPPETS		0x01
-+#define RTL_PATCH_DUMMY_HEADER		0x02
-+#define RTL_PATCH_SECURITY_HEADER	0x03
-+
- enum btrtl_chip_id {
- 	CHIP_ID_8723A,
- 	CHIP_ID_8723B,
-@@ -75,6 +84,9 @@ struct btrtl_device_info {
- 	int cfg_len;
- 	bool drop_fw;
- 	int project_id;
-+
-+	u8 key_id;
-+	struct list_head patch_subsecs;
- };
- 
- static const struct id_table ic_id_table[] = {
-@@ -284,6 +296,230 @@ static int rtl_read_rom_version(struct hci_dev *hdev, u8 *version)
+ crypto/adiantum.c          |    5 +---
+ crypto/af_alg.c            |    6 ++---
+ crypto/ahash.c             |   12 +++++-----
+ crypto/api.c               |    4 +--
+ crypto/authenc.c           |   14 +++++-------
+ crypto/authencesn.c        |   15 +++++-------
+ crypto/ccm.c               |    9 +++----
+ crypto/chacha20poly1305.c  |   40 +++++++++++++++++-----------------
+ crypto/cryptd.c            |   52 ++++++++++++++++++++++-----------------------
+ crypto/cts.c               |   12 +++++-----
+ crypto/dh.c                |    5 +---
+ crypto/essiv.c             |    8 +++---
+ crypto/gcm.c               |   36 ++++++++++++++-----------------
+ crypto/hctr2.c             |    5 +---
+ crypto/lrw.c               |    4 +--
+ crypto/pcrypt.c            |    4 +--
+ crypto/rsa-pkcs1pad.c      |   15 +++++-------
+ crypto/seqiv.c             |    5 +---
+ crypto/xts.c               |   12 +++++-----
+ drivers/crypto/atmel-sha.c |    5 +---
+ include/crypto/algapi.h    |    3 --
+ include/crypto/if_alg.h    |    4 ---
+ include/linux/crypto.h     |   10 ++++----
+ 23 files changed, 133 insertions(+), 152 deletions(-)
+
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index 84450130cb6b..c33ba22a6638 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -308,10 +308,9 @@ static int adiantum_finish(struct skcipher_request *req)
  	return 0;
  }
  
-+
-+static int btrtl_vendor_read_reg16(struct hci_dev *hdev,
-+				   struct rtl_vendor_cmd *cmd, u8 *rp)
-+{
-+	struct sk_buff *skb;
-+	int err = 0;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc61, sizeof(*cmd), cmd,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		rtl_dev_err(hdev, "RTL: Read reg16 failed (%d)", err);
-+		return err;
-+	}
-+
-+	if (skb->len != 3 || skb->data[0]) {
-+		bt_dev_err(hdev, "RTL: Read reg16 length mismatch");
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	if (rp)
-+		memcpy(rp, skb->data + 1, 2);
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
-+static void *rtl_iov_pull_data(struct rtl_iovec *iov, u32 len)
-+{
-+	void *data = iov->data;
-+
-+	if (iov->len < len)
-+		return NULL;
-+
-+	iov->data += len;
-+	iov->len  -= len;
-+
-+	return data;
-+}
-+
-+static void btrtl_insert_ordered_subsec(struct rtl_subsection *node,
-+					struct btrtl_device_info *btrtl_dev)
-+{
-+	struct list_head *pos;
-+	struct list_head *next;
-+	struct rtl_subsection *subsec;
-+
-+	list_for_each_safe(pos, next, &btrtl_dev->patch_subsecs) {
-+		subsec = list_entry(pos, struct rtl_subsection, list);
-+		if (subsec->prio >= node->prio)
-+			break;
-+	}
-+	__list_add(&node->list, pos->prev, pos);
-+}
-+
-+static int btrtl_parse_section(struct hci_dev *hdev,
-+			       struct btrtl_device_info *btrtl_dev, u32 opcode,
-+			       u8 *data, u32 len)
-+{
-+	struct rtl_section_hdr *hdr;
-+	struct rtl_subsection *subsec;
-+	struct rtl_common_subsec *common_subsec;
-+	struct rtl_sec_hdr *sec_hdr;
-+	int i;
-+	u8 *ptr;
-+	u16 num_subsecs;
-+	u32 subsec_len;
-+	int rc = 0;
-+	struct rtl_iovec iov = {
-+		.data = data,
-+		.len  = len,
-+	};
-+
-+	hdr = rtl_iov_pull_data(&iov, sizeof(*hdr));
-+	if (!hdr)
-+		return -EINVAL;
-+	num_subsecs = le16_to_cpu(hdr->num);
-+
-+	for (i = 0; i < num_subsecs; i++) {
-+		common_subsec = rtl_iov_pull_data(&iov, sizeof(*common_subsec));
-+		if (!common_subsec)
-+			break;
-+		subsec_len = le32_to_cpu(common_subsec->len);
-+
-+		rtl_dev_dbg(hdev, "subsec, eco 0x%02x, len %08x",
-+			    common_subsec->eco, subsec_len);
-+
-+		ptr = rtl_iov_pull_data(&iov, subsec_len);
-+		if (!ptr)
-+			break;
-+
-+		if (common_subsec->eco != btrtl_dev->rom_version + 1)
-+			continue;
-+
-+		switch (opcode) {
-+		case RTL_PATCH_SECURITY_HEADER:
-+			sec_hdr = (void *)common_subsec;
-+			if (sec_hdr->key_id != btrtl_dev->key_id)
-+				continue;
-+			break;
-+		}
-+
-+		subsec = kzalloc(sizeof(*subsec), GFP_KERNEL);
-+		if (!subsec)
-+			return -ENOMEM;
-+		subsec->opcode = opcode;
-+		subsec->prio = common_subsec->prio;
-+		subsec->len  = subsec_len;
-+		subsec->data = ptr;
-+		btrtl_insert_ordered_subsec(subsec, btrtl_dev);
-+		rc  += subsec_len;
-+	}
-+
-+	return rc;
-+}
-+
-+static int rtlbt_parse_firmware_v2(struct hci_dev *hdev,
-+				   struct btrtl_device_info *btrtl_dev,
-+				   unsigned char **_buf)
-+{
-+	struct rtl_epatch_header_v2 *hdr;
-+	int rc;
-+	u8 reg_val[2];
-+	u8 key_id;
-+	u32 num_sections;
-+	struct rtl_section *section;
-+	struct rtl_subsection *entry, *tmp;
-+	u32 section_len;
-+	u32 opcode;
-+	int len = 0;
-+	int i;
-+	u8 *ptr;
-+	struct rtl_iovec iov = {
-+		.data = btrtl_dev->fw_data,
-+		.len  = btrtl_dev->fw_len - 7, /* Cut the tail */
-+	};
-+
-+	rc = btrtl_vendor_read_reg16(hdev, RTL_SEC_PROJ, reg_val);
-+	if (rc < 0)
-+		return -EIO;
-+	key_id = reg_val[0];
-+
-+	rtl_dev_dbg(hdev, "%s: key id %u", __func__, key_id);
-+
-+	btrtl_dev->key_id = key_id;
-+
-+	hdr = rtl_iov_pull_data(&iov, sizeof(*hdr));
-+	if (!hdr)
-+		return -EINVAL;
-+	num_sections = le32_to_cpu(hdr->num_sections);
-+
-+	rtl_dev_dbg(hdev, "FW version %08x-%08x", *((u32 *)hdr->fw_version),
-+		    *((u32 *)(hdr->fw_version + 4)));
-+
-+	for (i = 0; i < num_sections; i++) {
-+		section = rtl_iov_pull_data(&iov, sizeof(*section));
-+		if (!section)
-+			break;
-+		section_len = le32_to_cpu(section->len);
-+		opcode      = le32_to_cpu(section->opcode);
-+
-+		rtl_dev_dbg(hdev, "opcode 0x%04x", section->opcode);
-+
-+		ptr = rtl_iov_pull_data(&iov, section_len);
-+		if (!ptr)
-+			break;
-+
-+		switch (opcode) {
-+		case RTL_PATCH_SNIPPETS:
-+			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
-+						 ptr, section_len);
-+			break;
-+		case RTL_PATCH_SECURITY_HEADER:
-+			/* If key_id from chip is zero, ignore all security
-+			 * headers.
-+			 */
-+			if (!key_id)
-+				break;
-+			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
-+						 ptr, section_len);
-+			break;
-+		case RTL_PATCH_DUMMY_HEADER:
-+			rc = btrtl_parse_section(hdev, btrtl_dev, opcode,
-+						 ptr, section_len);
-+			break;
-+		default:
-+			rc = 0;
-+			break;
-+		}
-+		if (rc < 0) {
-+			rtl_dev_err(hdev, "RTL: Parse section (%u) err %d",
-+				    opcode, rc);
-+			return rc;
-+		}
-+		len += rc;
-+	}
-+
-+	if (!len)
-+		return -ENODATA;
-+
-+	/* Allocate mem and copy all found subsecs. */
-+	ptr = kvmalloc(len, GFP_KERNEL);
-+	if (!ptr)
-+		return -ENOMEM;
-+
-+	len = 0;
-+	list_for_each_entry_safe(entry, tmp, &btrtl_dev->patch_subsecs, list) {
-+		rtl_dev_dbg(hdev, "RTL: opcode %08x, addr %p, len 0x%x",
-+			    entry->opcode, entry->data, entry->len);
-+		memcpy(ptr + len, entry->data, entry->len);
-+		len += entry->len;
-+	}
-+
-+	bt_dev_info(hdev, "RTL: Patch (len %d) found", len);
-+
-+	if (!len)
-+		return -EPERM;
-+
-+	*_buf = ptr;
-+	return len;
-+}
-+
- static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 				struct btrtl_device_info *btrtl_dev,
- 				unsigned char **_buf)
-@@ -317,7 +553,18 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
- 	};
- 
--	min_size = sizeof(struct rtl_epatch_header) + sizeof(extension_sig) + 3;
-+	if (btrtl_dev->fw_len <= 8)
-+		return -EINVAL;
-+
-+	if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE, 8))
-+		min_size = sizeof(struct rtl_epatch_header) +
-+				sizeof(extension_sig) + 3;
-+	else if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE_V2, 8))
-+		min_size = sizeof(struct rtl_epatch_header_v2) +
-+				sizeof(extension_sig) + 3;
-+	else
-+		return -EINVAL;
-+
- 	if (btrtl_dev->fw_len < min_size)
- 		return -EINVAL;
- 
-@@ -382,12 +629,14 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 		return -EINVAL;
- 	}
- 
--	epatch_info = (struct rtl_epatch_header *)btrtl_dev->fw_data;
--	if (memcmp(epatch_info->signature, RTL_EPATCH_SIGNATURE, 8) != 0) {
-+	if (memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE, 8) != 0) {
-+		if (!memcmp(btrtl_dev->fw_data, RTL_EPATCH_SIGNATURE_V2, 8))
-+			return rtlbt_parse_firmware_v2(hdev, btrtl_dev, _buf);
- 		rtl_dev_err(hdev, "bad EPATCH signature");
- 		return -EINVAL;
- 	}
- 
-+	epatch_info = (struct rtl_epatch_header *)btrtl_dev->fw_data;
- 	num_patches = le16_to_cpu(epatch_info->num_patches);
- 	BT_DBG("fw_version=%x, num_patches=%d",
- 	       le32_to_cpu(epatch_info->fw_version), num_patches);
-@@ -451,6 +700,7 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	int frag_len = RTL_FRAG_LEN;
- 	int ret = 0;
- 	int i;
-+	int j = 0;
- 	struct sk_buff *skb;
- 	struct hci_rp_read_local_version *rp;
- 
-@@ -461,17 +711,16 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	for (i = 0; i < frag_num; i++) {
- 		struct sk_buff *skb;
- 
--		BT_DBG("download fw (%d/%d)", i, frag_num);
--
--		if (i > 0x7f)
--			dl_cmd->index = (i & 0x7f) + 1;
--		else
--			dl_cmd->index = i;
-+		dl_cmd->index = j++;
-+		if (dl_cmd->index == 0x7f)
-+			j = 1;
- 
- 		if (i == (frag_num - 1)) {
- 			dl_cmd->index |= 0x80; /* data end */
- 			frag_len = fw_len % RTL_FRAG_LEN;
- 		}
-+		rtl_dev_dbg(hdev, "download fw (%d/%d). index = %d", i,
-+				frag_num, dl_cmd->index);
- 		memcpy(dl_cmd->data, data, frag_len);
- 
- 		/* Send download command */
-@@ -589,8 +838,16 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
- 
- void btrtl_free(struct btrtl_device_info *btrtl_dev)
+-static void adiantum_streamcipher_done(struct crypto_async_request *areq,
+-				       int err)
++static void adiantum_streamcipher_done(void *data, int err)
  {
-+	struct rtl_subsection *entry, *tmp;
-+
- 	kvfree(btrtl_dev->fw_data);
- 	kvfree(btrtl_dev->cfg_data);
-+
-+	list_for_each_entry_safe(entry, tmp, &btrtl_dev->patch_subsecs, list) {
-+		list_del(&entry->list);
-+		kfree(entry);
-+	}
-+
- 	kfree(btrtl_dev);
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (!err)
+ 		err = adiantum_finish(req);
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 0a4fa2a429e2..5f7252a5b7b4 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1186,7 +1186,7 @@ EXPORT_SYMBOL_GPL(af_alg_free_resources);
+ 
+ /**
+  * af_alg_async_cb - AIO callback handler
+- * @_req: async request info
++ * @data: async request completion data
+  * @err: if non-zero, error result to be returned via ki_complete();
+  *       otherwise return the AIO output length via ki_complete().
+  *
+@@ -1196,9 +1196,9 @@ EXPORT_SYMBOL_GPL(af_alg_free_resources);
+  * The number of bytes to be generated with the AIO operation must be set
+  * in areq->outlen before the AIO callback handler is invoked.
+  */
+-void af_alg_async_cb(struct crypto_async_request *_req, int err)
++void af_alg_async_cb(void *data, int err)
+ {
+-	struct af_alg_async_req *areq = _req->data;
++	struct af_alg_async_req *areq = data;
+ 	struct sock *sk = areq->sk;
+ 	struct kiocb *iocb = areq->iocb;
+ 	unsigned int resultlen;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 369447e483cd..5a0f21cb2059 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -240,9 +240,9 @@ static void ahash_restore_req(struct ahash_request *req, int err)
+ 	kfree_sensitive(subreq);
  }
- EXPORT_SYMBOL_GPL(btrtl_free);
-@@ -604,9 +861,11 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 	char cfg_name[40];
- 	u16 hci_rev, lmp_subver;
- 	u8 hci_ver;
-+	u8 lmp_ver;
- 	int ret;
- 	u16 opcode;
- 	u8 cmd[2];
-+	u8 reg_val[2];
  
- 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
- 	if (!btrtl_dev) {
-@@ -614,26 +873,56 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 		goto err_alloc;
- 	}
+-static void ahash_op_unaligned_done(struct crypto_async_request *req, int err)
++static void ahash_op_unaligned_done(void *data, int err)
+ {
+-	struct ahash_request *areq = req->data;
++	struct ahash_request *areq = data;
  
-+	INIT_LIST_HEAD(&btrtl_dev->patch_subsecs);
-+
-+check_version:
-+	ret = btrtl_vendor_read_reg16(hdev, RTL_CHIP_SUBVER, reg_val);
-+	if (ret < 0)
-+		goto err_free;
-+	lmp_subver = get_unaligned_le16(reg_val);
-+
-+	if (lmp_subver == RTL_ROM_LMP_8822B) {
-+		ret = btrtl_vendor_read_reg16(hdev, RTL_CHIP_REV, reg_val);
-+		if (ret < 0)
-+			goto err_free;
-+		hci_rev = get_unaligned_le16(reg_val);
-+
-+		/* 8822E */
-+		if (hci_rev == 0x000e) {
-+			hci_ver = 0x0c;
-+			lmp_ver = 0x0c;
-+			btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev,
-+							    hci_ver, hdev->bus);
-+			goto next;
-+		}
-+	}
-+
- 	skb = btrtl_read_local_version(hdev);
- 	if (IS_ERR(skb)) {
- 		ret = PTR_ERR(skb);
- 		goto err_free;
- 	}
+ 	if (err == -EINPROGRESS)
+ 		goto out;
+@@ -330,9 +330,9 @@ int crypto_ahash_digest(struct ahash_request *req)
+ }
+ EXPORT_SYMBOL_GPL(crypto_ahash_digest);
+ 
+-static void ahash_def_finup_done2(struct crypto_async_request *req, int err)
++static void ahash_def_finup_done2(void *data, int err)
+ {
+-	struct ahash_request *areq = req->data;
++	struct ahash_request *areq = data;
+ 
+ 	if (err == -EINPROGRESS)
+ 		return;
+@@ -360,9 +360,9 @@ static int ahash_def_finup_finish1(struct ahash_request *req, int err)
+ 	return err;
+ }
+ 
+-static void ahash_def_finup_done1(struct crypto_async_request *req, int err)
++static void ahash_def_finup_done1(void *data, int err)
+ {
+-	struct ahash_request *areq = req->data;
++	struct ahash_request *areq = data;
+ 	struct ahash_request *subreq;
+ 
+ 	if (err == -EINPROGRESS)
+diff --git a/crypto/api.c b/crypto/api.c
+index b022702f6436..e67cc63368ed 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -643,9 +643,9 @@ int crypto_has_alg(const char *name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_has_alg);
+ 
+-void crypto_req_done(struct crypto_async_request *req, int err)
++void crypto_req_done(void *data, int err)
+ {
+-	struct crypto_wait *wait = req->data;
++	struct crypto_wait *wait = data;
+ 
+ 	if (err == -EINPROGRESS)
+ 		return;
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 17f674a7cdff..3326c7343e86 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -109,9 +109,9 @@ static int crypto_authenc_setkey(struct crypto_aead *authenc, const u8 *key,
+ 	return err;
+ }
+ 
+-static void authenc_geniv_ahash_done(struct crypto_async_request *areq, int err)
++static void authenc_geniv_ahash_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	struct aead_instance *inst = aead_alg_instance(authenc);
+ 	struct authenc_instance_ctx *ictx = aead_instance_ctx(inst);
+@@ -160,10 +160,9 @@ static int crypto_authenc_genicv(struct aead_request *req, unsigned int flags)
+ 	return 0;
+ }
+ 
+-static void crypto_authenc_encrypt_done(struct crypto_async_request *req,
+-					int err)
++static void crypto_authenc_encrypt_done(void *data, int err)
+ {
+-	struct aead_request *areq = req->data;
++	struct aead_request *areq = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -261,10 +260,9 @@ static int crypto_authenc_decrypt_tail(struct aead_request *req,
+ 	return crypto_skcipher_decrypt(skreq);
+ }
+ 
+-static void authenc_verify_ahash_done(struct crypto_async_request *areq,
+-				      int err)
++static void authenc_verify_ahash_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index b60e61b1904c..91424e791d5c 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -107,10 +107,9 @@ static int crypto_authenc_esn_genicv_tail(struct aead_request *req,
+ 	return 0;
+ }
+ 
+-static void authenc_esn_geniv_ahash_done(struct crypto_async_request *areq,
+-					 int err)
++static void authenc_esn_geniv_ahash_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	err = err ?: crypto_authenc_esn_genicv_tail(req, 0);
+ 	aead_request_complete(req, err);
+@@ -153,10 +152,9 @@ static int crypto_authenc_esn_genicv(struct aead_request *req,
+ }
+ 
+ 
+-static void crypto_authenc_esn_encrypt_done(struct crypto_async_request *req,
+-					    int err)
++static void crypto_authenc_esn_encrypt_done(void *data, int err)
+ {
+-	struct aead_request *areq = req->data;
++	struct aead_request *areq = data;
+ 
+ 	if (!err)
+ 		err = crypto_authenc_esn_genicv(areq, 0);
+@@ -258,10 +256,9 @@ static int crypto_authenc_esn_decrypt_tail(struct aead_request *req,
+ 	return crypto_skcipher_decrypt(skreq);
+ }
+ 
+-static void authenc_esn_verify_ahash_done(struct crypto_async_request *areq,
+-					  int err)
++static void authenc_esn_verify_ahash_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	err = err ?: crypto_authenc_esn_decrypt_tail(req, 0);
+ 	authenc_esn_request_complete(req, err);
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 30dbae72728f..a9453129c51c 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -224,9 +224,9 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
+ 	return err;
+ }
+ 
+-static void crypto_ccm_encrypt_done(struct crypto_async_request *areq, int err)
++static void crypto_ccm_encrypt_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
+ 	u8 *odata = pctx->odata;
+@@ -320,10 +320,9 @@ static int crypto_ccm_encrypt(struct aead_request *req)
+ 	return err;
+ }
+ 
+-static void crypto_ccm_decrypt_done(struct crypto_async_request *areq,
+-				   int err)
++static void crypto_ccm_decrypt_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 	struct crypto_ccm_req_priv_ctx *pctx = crypto_ccm_reqctx(req);
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	unsigned int authsize = crypto_aead_authsize(aead);
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 97bbb135e9a6..3a905c5d8f53 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -115,9 +115,9 @@ static int poly_copy_tag(struct aead_request *req)
+ 	return 0;
+ }
+ 
+-static void chacha_decrypt_done(struct crypto_async_request *areq, int err)
++static void chacha_decrypt_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_verify_tag);
++	async_done_continue(data, err, poly_verify_tag);
+ }
+ 
+ static int chacha_decrypt(struct aead_request *req)
+@@ -161,9 +161,9 @@ static int poly_tail_continue(struct aead_request *req)
+ 	return chacha_decrypt(req);
+ }
+ 
+-static void poly_tail_done(struct crypto_async_request *areq, int err)
++static void poly_tail_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_tail_continue);
++	async_done_continue(data, err, poly_tail_continue);
+ }
+ 
+ static int poly_tail(struct aead_request *req)
+@@ -191,9 +191,9 @@ static int poly_tail(struct aead_request *req)
+ 	return poly_tail_continue(req);
+ }
+ 
+-static void poly_cipherpad_done(struct crypto_async_request *areq, int err)
++static void poly_cipherpad_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_tail);
++	async_done_continue(data, err, poly_tail);
+ }
+ 
+ static int poly_cipherpad(struct aead_request *req)
+@@ -220,9 +220,9 @@ static int poly_cipherpad(struct aead_request *req)
+ 	return poly_tail(req);
+ }
+ 
+-static void poly_cipher_done(struct crypto_async_request *areq, int err)
++static void poly_cipher_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_cipherpad);
++	async_done_continue(data, err, poly_cipherpad);
+ }
+ 
+ static int poly_cipher(struct aead_request *req)
+@@ -250,9 +250,9 @@ static int poly_cipher(struct aead_request *req)
+ 	return poly_cipherpad(req);
+ }
+ 
+-static void poly_adpad_done(struct crypto_async_request *areq, int err)
++static void poly_adpad_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_cipher);
++	async_done_continue(data, err, poly_cipher);
+ }
+ 
+ static int poly_adpad(struct aead_request *req)
+@@ -279,9 +279,9 @@ static int poly_adpad(struct aead_request *req)
+ 	return poly_cipher(req);
+ }
+ 
+-static void poly_ad_done(struct crypto_async_request *areq, int err)
++static void poly_ad_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_adpad);
++	async_done_continue(data, err, poly_adpad);
+ }
+ 
+ static int poly_ad(struct aead_request *req)
+@@ -303,9 +303,9 @@ static int poly_ad(struct aead_request *req)
+ 	return poly_adpad(req);
+ }
+ 
+-static void poly_setkey_done(struct crypto_async_request *areq, int err)
++static void poly_setkey_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_ad);
++	async_done_continue(data, err, poly_ad);
+ }
+ 
+ static int poly_setkey(struct aead_request *req)
+@@ -329,9 +329,9 @@ static int poly_setkey(struct aead_request *req)
+ 	return poly_ad(req);
+ }
+ 
+-static void poly_init_done(struct crypto_async_request *areq, int err)
++static void poly_init_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_setkey);
++	async_done_continue(data, err, poly_setkey);
+ }
+ 
+ static int poly_init(struct aead_request *req)
+@@ -352,9 +352,9 @@ static int poly_init(struct aead_request *req)
+ 	return poly_setkey(req);
+ }
+ 
+-static void poly_genkey_done(struct crypto_async_request *areq, int err)
++static void poly_genkey_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_init);
++	async_done_continue(data, err, poly_init);
+ }
+ 
+ static int poly_genkey(struct aead_request *req)
+@@ -391,9 +391,9 @@ static int poly_genkey(struct aead_request *req)
+ 	return poly_init(req);
+ }
+ 
+-static void chacha_encrypt_done(struct crypto_async_request *areq, int err)
++static void chacha_encrypt_done(void *data, int err)
+ {
+-	async_done_continue(areq->data, err, poly_genkey);
++	async_done_continue(data, err, poly_genkey);
+ }
+ 
+ static int chacha_encrypt(struct aead_request *req)
+diff --git a/crypto/cryptd.c b/crypto/cryptd.c
+index 29890fc0eab7..37365ed30b38 100644
+--- a/crypto/cryptd.c
++++ b/crypto/cryptd.c
+@@ -285,10 +285,9 @@ static void cryptd_skcipher_complete(struct skcipher_request *req, int err,
+ 		crypto_free_skcipher(tfm);
+ }
+ 
+-static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
+-				    int err)
++static void cryptd_skcipher_encrypt(void *data, int err)
+ {
+-	struct skcipher_request *req = skcipher_request_cast(base);
++	struct skcipher_request *req = data;
+ 	struct skcipher_request *subreq;
+ 
+ 	subreq = cryptd_skcipher_prepare(req, err);
+@@ -298,10 +297,9 @@ static void cryptd_skcipher_encrypt(struct crypto_async_request *base,
+ 	cryptd_skcipher_complete(req, err, cryptd_skcipher_encrypt);
+ }
+ 
+-static void cryptd_skcipher_decrypt(struct crypto_async_request *base,
+-				    int err)
++static void cryptd_skcipher_decrypt(void *data, int err)
+ {
+-	struct skcipher_request *req = skcipher_request_cast(base);
++	struct skcipher_request *req = data;
+ 	struct skcipher_request *subreq;
+ 
+ 	subreq = cryptd_skcipher_prepare(req, err);
+@@ -515,9 +513,9 @@ static void cryptd_hash_complete(struct ahash_request *req, int err,
+ 		crypto_free_ahash(tfm);
+ }
+ 
+-static void cryptd_hash_init(struct crypto_async_request *req_async, int err)
++static void cryptd_hash_init(void *data, int err)
+ {
+-	struct ahash_request *req = ahash_request_cast(req_async);
++	struct ahash_request *req = data;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct crypto_shash *child = ctx->child;
+@@ -540,9 +538,9 @@ static int cryptd_hash_init_enqueue(struct ahash_request *req)
+ 	return cryptd_hash_enqueue(req, cryptd_hash_init);
+ }
+ 
+-static void cryptd_hash_update(struct crypto_async_request *req_async, int err)
++static void cryptd_hash_update(void *data, int err)
+ {
+-	struct ahash_request *req = ahash_request_cast(req_async);
++	struct ahash_request *req = data;
+ 	struct shash_desc *desc;
+ 
+ 	desc = cryptd_hash_prepare(req, err);
+@@ -557,9 +555,9 @@ static int cryptd_hash_update_enqueue(struct ahash_request *req)
+ 	return cryptd_hash_enqueue(req, cryptd_hash_update);
+ }
+ 
+-static void cryptd_hash_final(struct crypto_async_request *req_async, int err)
++static void cryptd_hash_final(void *data, int err)
+ {
+-	struct ahash_request *req = ahash_request_cast(req_async);
++	struct ahash_request *req = data;
+ 	struct shash_desc *desc;
+ 
+ 	desc = cryptd_hash_prepare(req, err);
+@@ -574,9 +572,9 @@ static int cryptd_hash_final_enqueue(struct ahash_request *req)
+ 	return cryptd_hash_enqueue(req, cryptd_hash_final);
+ }
+ 
+-static void cryptd_hash_finup(struct crypto_async_request *req_async, int err)
++static void cryptd_hash_finup(void *data, int err)
+ {
+-	struct ahash_request *req = ahash_request_cast(req_async);
++	struct ahash_request *req = data;
+ 	struct shash_desc *desc;
+ 
+ 	desc = cryptd_hash_prepare(req, err);
+@@ -591,9 +589,9 @@ static int cryptd_hash_finup_enqueue(struct ahash_request *req)
+ 	return cryptd_hash_enqueue(req, cryptd_hash_finup);
+ }
+ 
+-static void cryptd_hash_digest(struct crypto_async_request *req_async, int err)
++static void cryptd_hash_digest(void *data, int err)
+ {
+-	struct ahash_request *req = ahash_request_cast(req_async);
++	struct ahash_request *req = data;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct cryptd_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct crypto_shash *child = ctx->child;
+@@ -767,24 +765,26 @@ static void cryptd_aead_crypt(struct aead_request *req,
+ 		crypto_free_aead(tfm);
+ }
+ 
+-static void cryptd_aead_encrypt(struct crypto_async_request *areq, int err)
++static void cryptd_aead_encrypt(void *data, int err)
+ {
+-	struct cryptd_aead_ctx *ctx = crypto_tfm_ctx(areq->tfm);
+-	struct crypto_aead *child = ctx->child;
+-	struct aead_request *req;
++	struct aead_request *req = data;
++	struct cryptd_aead_ctx *ctx;
++	struct crypto_aead *child;
+ 
+-	req = container_of(areq, struct aead_request, base);
++	ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
++	child = ctx->child;
+ 	cryptd_aead_crypt(req, child, err, crypto_aead_alg(child)->encrypt,
+ 			  cryptd_aead_encrypt);
+ }
+ 
+-static void cryptd_aead_decrypt(struct crypto_async_request *areq, int err)
++static void cryptd_aead_decrypt(void *data, int err)
+ {
+-	struct cryptd_aead_ctx *ctx = crypto_tfm_ctx(areq->tfm);
+-	struct crypto_aead *child = ctx->child;
+-	struct aead_request *req;
++	struct aead_request *req = data;
++	struct cryptd_aead_ctx *ctx;
++	struct crypto_aead *child;
+ 
+-	req = container_of(areq, struct aead_request, base);
++	ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
++	child = ctx->child;
+ 	cryptd_aead_crypt(req, child, err, crypto_aead_alg(child)->decrypt,
+ 			  cryptd_aead_decrypt);
+ }
+diff --git a/crypto/cts.c b/crypto/cts.c
+index 3766d47ebcc0..8f604f6554b1 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -85,9 +85,9 @@ static int crypto_cts_setkey(struct crypto_skcipher *parent, const u8 *key,
+ 	return crypto_skcipher_setkey(child, key, keylen);
+ }
+ 
+-static void cts_cbc_crypt_done(struct crypto_async_request *areq, int err)
++static void cts_cbc_crypt_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (err == -EINPROGRESS)
+ 		return;
+@@ -125,9 +125,9 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
+ 	return crypto_skcipher_encrypt(subreq);
+ }
+ 
+-static void crypto_cts_encrypt_done(struct crypto_async_request *areq, int err)
++static void crypto_cts_encrypt_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -219,9 +219,9 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
+ 	return crypto_skcipher_decrypt(subreq);
+ }
+ 
+-static void crypto_cts_decrypt_done(struct crypto_async_request *areq, int err)
++static void crypto_cts_decrypt_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+diff --git a/crypto/dh.c b/crypto/dh.c
+index e39c1bde1ac0..0fcad279e6fe 100644
+--- a/crypto/dh.c
++++ b/crypto/dh.c
+@@ -503,10 +503,9 @@ static int dh_safe_prime_set_secret(struct crypto_kpp *tfm, const void *buffer,
+ 	return err;
+ }
+ 
+-static void dh_safe_prime_complete_req(struct crypto_async_request *dh_req,
+-				       int err)
++static void dh_safe_prime_complete_req(void *data, int err)
+ {
+-	struct kpp_request *req = dh_req->data;
++	struct kpp_request *req = data;
+ 
+ 	kpp_request_complete(req, err);
+ }
+diff --git a/crypto/essiv.c b/crypto/essiv.c
+index 307eba74b901..f7d4ef4837e5 100644
+--- a/crypto/essiv.c
++++ b/crypto/essiv.c
+@@ -131,9 +131,9 @@ static int essiv_aead_setauthsize(struct crypto_aead *tfm,
+ 	return crypto_aead_setauthsize(tctx->u.aead, authsize);
+ }
+ 
+-static void essiv_skcipher_done(struct crypto_async_request *areq, int err)
++static void essiv_skcipher_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	skcipher_request_complete(req, err);
+ }
+@@ -166,9 +166,9 @@ static int essiv_skcipher_decrypt(struct skcipher_request *req)
+ 	return essiv_skcipher_crypt(req, false);
+ }
+ 
+-static void essiv_aead_done(struct crypto_async_request *areq, int err)
++static void essiv_aead_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 	struct essiv_aead_request_ctx *rctx = aead_request_ctx(req);
+ 
+ 	if (err == -EINPROGRESS)
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index 338ee0769747..4ba624450c3f 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -197,7 +197,7 @@ static inline unsigned int gcm_remain(unsigned int len)
+ 	return len ? 16 - len : 0;
+ }
+ 
+-static void gcm_hash_len_done(struct crypto_async_request *areq, int err);
++static void gcm_hash_len_done(void *data, int err);
+ 
+ static int gcm_hash_update(struct aead_request *req,
+ 			   crypto_completion_t compl,
+@@ -246,9 +246,9 @@ static int gcm_hash_len_continue(struct aead_request *req, u32 flags)
+ 	return gctx->complete(req, flags);
+ }
+ 
+-static void gcm_hash_len_done(struct crypto_async_request *areq, int err)
++static void gcm_hash_len_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -267,10 +267,9 @@ static int gcm_hash_crypt_remain_continue(struct aead_request *req, u32 flags)
+ 	       gcm_hash_len_continue(req, flags);
+ }
+ 
+-static void gcm_hash_crypt_remain_done(struct crypto_async_request *areq,
+-				       int err)
++static void gcm_hash_crypt_remain_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -298,9 +297,9 @@ static int gcm_hash_crypt_continue(struct aead_request *req, u32 flags)
+ 	return gcm_hash_crypt_remain_continue(req, flags);
+ }
+ 
+-static void gcm_hash_crypt_done(struct crypto_async_request *areq, int err)
++static void gcm_hash_crypt_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -326,10 +325,9 @@ static int gcm_hash_assoc_remain_continue(struct aead_request *req, u32 flags)
+ 	return gcm_hash_crypt_remain_continue(req, flags);
+ }
+ 
+-static void gcm_hash_assoc_remain_done(struct crypto_async_request *areq,
+-				       int err)
++static void gcm_hash_assoc_remain_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -355,9 +353,9 @@ static int gcm_hash_assoc_continue(struct aead_request *req, u32 flags)
+ 	return gcm_hash_assoc_remain_continue(req, flags);
+ }
+ 
+-static void gcm_hash_assoc_done(struct crypto_async_request *areq, int err)
++static void gcm_hash_assoc_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -380,9 +378,9 @@ static int gcm_hash_init_continue(struct aead_request *req, u32 flags)
+ 	return gcm_hash_assoc_remain_continue(req, flags);
+ }
+ 
+-static void gcm_hash_init_done(struct crypto_async_request *areq, int err)
++static void gcm_hash_init_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -433,9 +431,9 @@ static int gcm_encrypt_continue(struct aead_request *req, u32 flags)
+ 	return gcm_hash(req, flags);
+ }
+ 
+-static void gcm_encrypt_done(struct crypto_async_request *areq, int err)
++static void gcm_encrypt_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (err)
+ 		goto out;
+@@ -477,9 +475,9 @@ static int crypto_gcm_verify(struct aead_request *req)
+ 	return crypto_memneq(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
+ }
+ 
+-static void gcm_decrypt_done(struct crypto_async_request *areq, int err)
++static void gcm_decrypt_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 
+ 	if (!err)
+ 		err = crypto_gcm_verify(req);
+diff --git a/crypto/hctr2.c b/crypto/hctr2.c
+index 7d00a3bcb667..6f4c1884d0e9 100644
+--- a/crypto/hctr2.c
++++ b/crypto/hctr2.c
+@@ -252,10 +252,9 @@ static int hctr2_finish(struct skcipher_request *req)
+ 	return 0;
+ }
+ 
+-static void hctr2_xctr_done(struct crypto_async_request *areq,
+-				    int err)
++static void hctr2_xctr_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (!err)
+ 		err = hctr2_finish(req);
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index 8d59a66b6525..1b0f76ba3eb5 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -205,9 +205,9 @@ static int lrw_xor_tweak_post(struct skcipher_request *req)
+ 	return lrw_xor_tweak(req, true);
+ }
+ 
+-static void lrw_crypt_done(struct crypto_async_request *areq, int err)
++static void lrw_crypt_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (!err) {
+ 		struct lrw_request_ctx *rctx = skcipher_request_ctx(req);
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 9d10b846ccf7..8c1d0ca41213 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -63,9 +63,9 @@ static void pcrypt_aead_serial(struct padata_priv *padata)
+ 	aead_request_complete(req->base.data, padata->info);
+ }
+ 
+-static void pcrypt_aead_done(struct crypto_async_request *areq, int err)
++static void pcrypt_aead_done(void *data, int err)
+ {
+-	struct aead_request *req = areq->data;
++	struct aead_request *req = data;
+ 	struct pcrypt_request *preq = aead_request_ctx(req);
+ 	struct padata_priv *padata = pcrypt_request_padata(preq);
+ 
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 02028670331d..d2e5e104f8cf 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -210,10 +210,9 @@ static int pkcs1pad_encrypt_sign_complete(struct akcipher_request *req, int err)
+ 	return err;
+ }
+ 
+-static void pkcs1pad_encrypt_sign_complete_cb(
+-		struct crypto_async_request *child_async_req, int err)
++static void pkcs1pad_encrypt_sign_complete_cb(void *data, int err)
+ {
+-	struct akcipher_request *req = child_async_req->data;
++	struct akcipher_request *req = data;
+ 
+ 	if (err == -EINPROGRESS)
+ 		goto out;
+@@ -326,10 +325,9 @@ static int pkcs1pad_decrypt_complete(struct akcipher_request *req, int err)
+ 	return err;
+ }
+ 
+-static void pkcs1pad_decrypt_complete_cb(
+-		struct crypto_async_request *child_async_req, int err)
++static void pkcs1pad_decrypt_complete_cb(void *data, int err)
+ {
+-	struct akcipher_request *req = child_async_req->data;
++	struct akcipher_request *req = data;
+ 
+ 	if (err == -EINPROGRESS)
+ 		goto out;
+@@ -506,10 +504,9 @@ static int pkcs1pad_verify_complete(struct akcipher_request *req, int err)
+ 	return err;
+ }
+ 
+-static void pkcs1pad_verify_complete_cb(
+-		struct crypto_async_request *child_async_req, int err)
++static void pkcs1pad_verify_complete_cb(void *data, int err)
+ {
+-	struct akcipher_request *req = child_async_req->data;
++	struct akcipher_request *req = data;
+ 
+ 	if (err == -EINPROGRESS)
+ 		goto out;
+diff --git a/crypto/seqiv.c b/crypto/seqiv.c
+index b1bcfe537daf..17e11d51ddc3 100644
+--- a/crypto/seqiv.c
++++ b/crypto/seqiv.c
+@@ -36,10 +36,9 @@ static void seqiv_aead_encrypt_complete2(struct aead_request *req, int err)
+ 	kfree_sensitive(subreq->iv);
+ }
+ 
+-static void seqiv_aead_encrypt_complete(struct crypto_async_request *base,
+-					int err)
++static void seqiv_aead_encrypt_complete(void *data, int err)
+ {
+-	struct aead_request *req = base->data;
++	struct aead_request *req = data;
+ 
+ 	seqiv_aead_encrypt_complete2(req, err);
+ 	aead_request_complete(req, err);
+diff --git a/crypto/xts.c b/crypto/xts.c
+index de6cbcf69bbd..09be909a6a1a 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -140,9 +140,9 @@ static int xts_xor_tweak_post(struct skcipher_request *req, bool enc)
+ 	return xts_xor_tweak(req, true, enc);
+ }
+ 
+-static void xts_cts_done(struct crypto_async_request *areq, int err)
++static void xts_cts_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 	le128 b;
+ 
+ 	if (!err) {
+@@ -196,9 +196,9 @@ static int xts_cts_final(struct skcipher_request *req,
+ 	return 0;
+ }
+ 
+-static void xts_encrypt_done(struct crypto_async_request *areq, int err)
++static void xts_encrypt_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (!err) {
+ 		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
+@@ -216,9 +216,9 @@ static void xts_encrypt_done(struct crypto_async_request *areq, int err)
+ 	skcipher_request_complete(req, err);
+ }
+ 
+-static void xts_decrypt_done(struct crypto_async_request *areq, int err)
++static void xts_decrypt_done(void *data, int err)
+ {
+-	struct skcipher_request *req = areq->data;
++	struct skcipher_request *req = data;
+ 
+ 	if (!err) {
+ 		struct xts_request_ctx *rctx = skcipher_request_ctx(req);
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index a77cf0da0816..e7c1db2739ec 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2099,10 +2099,9 @@ struct atmel_sha_authenc_reqctx {
+ 	unsigned int		digestlen;
+ };
+ 
+-static void atmel_sha_authenc_complete(struct crypto_async_request *areq,
+-				       int err)
++static void atmel_sha_authenc_complete(void *data, int err)
+ {
+-	struct ahash_request *req = areq->data;
++	struct ahash_request *req = data;
+ 	struct atmel_sha_authenc_reqctx *authctx  = ahash_request_ctx(req);
+ 
+ 	authctx->cb(authctx->aes_dev, err, authctx->base.dd->is_async);
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 1fd81e74a174..fede394ae2ab 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -305,8 +305,7 @@ enum {
+ static inline void crypto_request_complete(struct crypto_async_request *req,
+ 					   int err)
+ {
+-	crypto_completion_t complete = req->complete;
+-	complete(req, err);
++	req->complete(req->data, err);
+ }
+ 
+ #endif	/* _CRYPTO_ALGAPI_H */
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index a5db86670bdf..7e76623f9ec3 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -21,8 +21,6 @@
+ 
+ #define ALG_MAX_PAGES			16
+ 
+-struct crypto_async_request;
 -
- 	resp = (struct hci_rp_read_local_version *)skb->data;
--	rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
--		     resp->hci_ver, resp->hci_rev,
--		     resp->lmp_ver, resp->lmp_subver);
+ struct alg_sock {
+ 	/* struct sock must be the first member of struct alg_sock */
+ 	struct sock sk;
+@@ -235,7 +233,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
+ 			int offset, size_t size, int flags);
+ void af_alg_free_resources(struct af_alg_async_req *areq);
+-void af_alg_async_cb(struct crypto_async_request *_req, int err);
++void af_alg_async_cb(void *data, int err);
+ __poll_t af_alg_poll(struct file *file, struct socket *sock,
+ 			 poll_table *wait);
+ struct af_alg_async_req *af_alg_alloc_areq(struct sock *sk,
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index b18f6e669fb1..80f6350fb588 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -176,8 +176,8 @@ struct crypto_async_request;
+ struct crypto_tfm;
+ struct crypto_type;
  
--	hci_ver = resp->hci_ver;
--	hci_rev = le16_to_cpu(resp->hci_rev);
-+	hci_ver    = resp->hci_ver;
-+	hci_rev    = le16_to_cpu(resp->hci_rev);
-+	lmp_ver    = resp->lmp_ver;
- 	lmp_subver = le16_to_cpu(resp->lmp_subver);
+-typedef struct crypto_async_request crypto_completion_data_t;
+-typedef void (*crypto_completion_t)(struct crypto_async_request *req, int err);
++typedef void crypto_completion_data_t;
++typedef void (*crypto_completion_t)(void *req, int err);
  
-+	kfree_skb(skb);
-+
- 	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
- 					    hdev->bus);
+ /**
+  * DOC: Block Cipher Context Data Structures
+@@ -596,12 +596,12 @@ struct crypto_wait {
+ /*
+  * Async ops completion helper functioons
+  */
+-static inline void *crypto_get_completion_data(crypto_completion_data_t *req)
++static inline void *crypto_get_completion_data(void *data)
+ {
+-	return req->data;
++	return data;
+ }
  
--	if (!btrtl_dev->ic_info)
-+next:
-+	rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
-+		     hci_ver, hci_rev,
-+		     lmp_ver, lmp_subver);
-+
-+	if (!btrtl_dev->ic_info && !btrtl_dev->drop_fw)
- 		btrtl_dev->drop_fw = true;
-+	else
-+		btrtl_dev->drop_fw = false;
+-void crypto_req_done(struct crypto_async_request *req, int err);
++void crypto_req_done(void *req, int err);
  
- 	if (btrtl_dev->drop_fw) {
- 		opcode = hci_opcode_pack(0x3f, 0x66);
-@@ -642,41 +931,25 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 
- 		skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
- 		if (!skb)
--			goto out_free;
-+			goto err_free;
- 
- 		skb_put_data(skb, cmd, sizeof(cmd));
- 		hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
- 
--		hdev->send(hdev, skb);
-+		ret = hdev->send(hdev, skb);
-+		if (ret < 0) {
-+			bt_dev_err(hdev, "sending frame failed (%d)", ret);
-+			kfree_skb(skb);
-+			goto err_free;
-+		}
- 
- 		/* Ensure the above vendor command is sent to controller and
- 		 * process has done.
- 		 */
- 		msleep(200);
- 
--		/* Read the local version again. Expect to have the vanilla
--		 * version as cold boot.
--		 */
--		skb = btrtl_read_local_version(hdev);
--		if (IS_ERR(skb)) {
--			ret = PTR_ERR(skb);
--			goto err_free;
--		}
--
--		resp = (struct hci_rp_read_local_version *)skb->data;
--		rtl_dev_info(hdev, "examining hci_ver=%02x hci_rev=%04x lmp_ver=%02x lmp_subver=%04x",
--			     resp->hci_ver, resp->hci_rev,
--			     resp->lmp_ver, resp->lmp_subver);
--
--		hci_ver = resp->hci_ver;
--		hci_rev = le16_to_cpu(resp->hci_rev);
--		lmp_subver = le16_to_cpu(resp->lmp_subver);
--
--		btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
--						    hdev->bus);
-+		goto check_version;
- 	}
--out_free:
--	kfree_skb(skb);
- 
- 	if (!btrtl_dev->ic_info) {
- 		rtl_dev_info(hdev, "unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
-diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-index ebf0101c959b..f5902ee2d0c7 100644
---- a/drivers/bluetooth/btrtl.h
-+++ b/drivers/bluetooth/btrtl.h
-@@ -44,7 +44,58 @@ struct rtl_vendor_config_entry {
- struct rtl_vendor_config {
- 	__le32 signature;
- 	__le16 total_len;
--	struct rtl_vendor_config_entry entry[];
-+	__u8 entry[];
-+} __packed;
-+
-+struct rtl_epatch_header_v2 {
-+	__u8   signature[8];
-+	__u8   fw_version[8];
-+	__le32 num_sections;
-+} __packed;
-+
-+struct rtl_section {
-+	__le32 opcode;
-+	__le32 len;
-+	u8     data[];
-+} __packed;
-+
-+struct rtl_section_hdr {
-+	__le16 num;
-+	__le16 reserved;
-+} __packed;
-+
-+struct rtl_common_subsec {
-+	__u8   eco;
-+	__u8   prio;
-+	__u8   cb[2];
-+	__le32 len;
-+	__u8   data[];
-+};
-+
-+struct rtl_sec_hdr {
-+	__u8   eco;
-+	__u8   prio;
-+	__u8   key_id;
-+	__u8   reserved;
-+	__le32 len;
-+	__u8   data[];
-+} __packed;
-+
-+struct rtl_subsection {
-+	struct list_head list;
-+	u32 opcode;
-+	u32 len;
-+	u8 prio;
-+	u8 *data;
-+};
-+
-+struct rtl_iovec {
-+	u8  *data;
-+	u32 len;
-+};
-+
-+struct rtl_vendor_cmd {
-+	__u8 param[5];
- } __packed;
- 
- enum {
+ static inline int crypto_wait_req(int err, struct crypto_wait *wait)
+ {
 -- 
-2.34.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
