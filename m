@@ -2,375 +2,270 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3E9C636D3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 19:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44D8FC636D6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Feb 2023 21:18:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231909AbjBHThn (ORCPT
+        id S230507AbjBHVSI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Feb 2023 14:37:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47380 "EHLO
+        Wed, 8 Feb 2023 16:18:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231636AbjBHThm (ORCPT
+        with ESMTP id S229512AbjBHVSH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Feb 2023 14:37:42 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F074C6C8;
-        Wed,  8 Feb 2023 11:37:38 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id b3so24990lfv.2;
-        Wed, 08 Feb 2023 11:37:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yej4ubD+zR4b0JBLCMl41J8qANwbhdTI+UjkqrfXTOU=;
-        b=SzJP05QV5xYul9Hw1vjFwT9zngYTSr+QTrnjlnYiHRKmSqfXJRGPgXX+XO6TFtc3Pt
-         P7azXFZ+xKcEQYbyAEsUfa7MmXy9AW3cUIMwuFhmVDtU3m0QBprGsjbNi5t9cnMmeTqF
-         pqk6VbQiOaJUQgoz6g0ZpBf+wRum/tpvX0z78U5V4DKKoXeVbzJOXMslIlWbJ9+Eeq38
-         ZnYPb+shwaprs7TnsmpI+EnNWWnwJmJlxCVVbSoWrxzBQleJDXzPJ7Og/UdBvzxZKoy5
-         xYc3rQFCkHvOr/+7x5aImlRISkw/yZ26De0AGr1U2c3/XfMHJRkkczt0t2ZWAfBNyVVG
-         2Flg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Yej4ubD+zR4b0JBLCMl41J8qANwbhdTI+UjkqrfXTOU=;
-        b=f+fk1+2aUSO/KelPixSwXctZKTIt3q5EK1HE4AUvuo5BKpIUA6VKTAc13OxsWFKpYH
-         IqI4puf18MQbWIH1trY6utw8/EyZKkF48ubJWHl+/UfzDp//Wvn5OoEjLYNxMq87YBna
-         M9H7AVRIWpQHpbxDYN6UroA2EGS3hV5rHKizhSwZ9nHz3Vn35l2GLhVZ2hOMUCsnc42I
-         qYLQnoqlIo+Hvd9FFxE7q81j6/7rBx8g/87YjW/AdvAdaSV/gHTV+ny8/rWwi+7jq3Oq
-         ukY/GAzegKg3BSTYJdy5cmbKh7WThl19AHEP2KZG6wooC/lcTJEJWhjJExpdCiQfaQTU
-         cLmw==
-X-Gm-Message-State: AO0yUKVBaliFq0CNe1OtIEyF9lO6i0KzRXuVICjnGNITkHFubpZyifNg
-        cPiWCue2ucVrpbhp2Y2C/v8P4/a8kE5SymOk9/0=
-X-Google-Smtp-Source: AK7set/VvIEYjUdsEkCKiy9FTuPl7TARNWNrRO3vGjMa1ei6SAIdG/JGJlU0R342VB4V5f/2RA6u334zRk67Y1Ouy/M=
-X-Received: by 2002:a05:6512:374d:b0:4b5:7d38:a636 with SMTP id
- a13-20020a056512374d00b004b57d38a636mr1290083lfs.109.1675885057025; Wed, 08
- Feb 2023 11:37:37 -0800 (PST)
+        Wed, 8 Feb 2023 16:18:07 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40CF9126C5;
+        Wed,  8 Feb 2023 13:18:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 92036B81F03;
+        Wed,  8 Feb 2023 21:18:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 863A3C433D2;
+        Wed,  8 Feb 2023 21:18:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675891083;
+        bh=E9pZ20y6nxjUAdEDmzrCEjQTqE2cOMP7oInfuah3gNU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=CE8aDZQbQF3wnwpTEwtbXQ/oUXxPw1ZTgo3uZ/TctFhDPZ7cUwgu5C7gd80XyDlHr
+         DeWJ5uo2MXo2k8B7AUVq5jPjg7xfJH+o3LBxYqWXQfp7zflEP2na5oW18W2tkPWq7f
+         4KFZkIU+gXjQArrZNkMxUwXyJaDQCgc/hsr3q/Bi7lMdhfzYB3g1jgjQidsl3YyuNL
+         2hapsERx768w5Z06wxjktdG7AIPkugTW1tcP2pJ3JkMCSMbWev1PpI2XeVygZiR+OK
+         U+YrxxSz+xTlU7e7enh015nIDzh/QNjXiHDoHDA4itqOlrxtAxF4A87/R7iDApYVRt
+         roEeytSIzrNCA==
+Date:   Wed, 8 Feb 2023 13:20:14 -0800
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Tim Jiang <quic_tjiang@quicinc.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
+        quic_hbandi@quicinc.com, quic_hemantg@quicinc.com, mka@chromium.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA2066
+Message-ID: <20230208212014.gz3zxhysas23mxwg@ripper>
+References: <20230208094038.13670-1-quic_tjiang@quicinc.com>
 MIME-Version: 1.0
-References: <20230208155220.1640-1-bage@debian.org> <20230208155220.1640-3-bage@debian.org>
-In-Reply-To: <20230208155220.1640-3-bage@debian.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 8 Feb 2023 11:37:25 -0800
-Message-ID: <CABBYNZKnt5=dar6Rmav=Tv3QH1ghSUV2osZPnp7OQLcANp_1Tw@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] Bluetooth: btrtl: add support for the RTL8723CS
-To:     Bastian Germann <bage@debian.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Vasily Khoruzhick <anarsoul@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230208094038.13670-1-quic_tjiang@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+On Wed, Feb 08, 2023 at 05:40:38PM +0800, Tim Jiang wrote:
+> This patch adds support for QCA2066, including the devicetree
 
-On Wed, Feb 8, 2023 at 7:52 AM Bastian Germann <bage@debian.org> wrote:
->
-> From: Vasily Khoruzhick <anarsoul@gmail.com>
->
-> The Realtek RTL8723CS is a SDIO WiFi chip. It also contains a Bluetooth
-> module which is connected via UART to the host.
->
-> It shares lmp subversion with 8703B, so Realtek's userspace
-> initialization tool (rtk_hciattach) differentiates varieties of RTL8723CS
-> (CG, VF, XX) with RTL8703B using vendor's command to read the chip type.
+What do you mean with "devicetree downloading"?
 
-Don't remember anything called rtk_hciattach, besides if that is based
-on hciattach that is already deprecated in favor of btattach.
-
-> Also this chip declares support for some features it doesn't support
-> so add a quirk to indicate that these features are broken.
->
-> Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-> Signed-off-by: Bastian Germann <bage@debian.org>
+> and patch/nvm downloading.
+> 
+> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
 > ---
->  drivers/bluetooth/btrtl.c  | 120 +++++++++++++++++++++++++++++++++++--
->  drivers/bluetooth/btrtl.h  |   5 ++
->  drivers/bluetooth/hci_h5.c |   4 ++
->  3 files changed, 125 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 69c3fe649ca7..272ea1e99637 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -17,7 +17,11 @@
->
->  #define VERSION "0.1"
->
-> +#define RTL_CHIP_8723CS_CG     3
-> +#define RTL_CHIP_8723CS_VF     4
-> +#define RTL_CHIP_8723CS_XX     5
->  #define RTL_EPATCH_SIGNATURE   "Realtech"
-> +#define RTL_ROM_LMP_8703B      0x8703
->  #define RTL_ROM_LMP_8723A      0x1200
->  #define RTL_ROM_LMP_8723B      0x8723
->  #define RTL_ROM_LMP_8821A      0x8821
-> @@ -30,6 +34,7 @@
->  #define IC_MATCH_FL_HCIREV     (1 << 1)
->  #define IC_MATCH_FL_HCIVER     (1 << 2)
->  #define IC_MATCH_FL_HCIBUS     (1 << 3)
-> +#define IC_MATCH_FL_CHIP_TYPE  (1 << 4)
->  #define IC_INFO(lmps, hcir, hciv, bus) \
->         .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV | \
->                        IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS, \
-> @@ -59,6 +64,7 @@ struct id_table {
->         __u16 hci_rev;
->         __u8 hci_ver;
->         __u8 hci_bus;
-> +       __u8 chip_type;
->         bool config_needed;
->         bool has_rom_version;
->         bool has_msft_ext;
-> @@ -99,6 +105,39 @@ static const struct id_table ic_id_table[] = {
->           .fw_name  = "rtl_bt/rtl8723b_fw.bin",
->           .cfg_name = "rtl_bt/rtl8723b_config" },
->
-> +       /* 8723CS-CG */
-> +       { .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE |
-> +                        IC_MATCH_FL_HCIBUS,
-> +         .lmp_subver = RTL_ROM_LMP_8703B,
-> +         .chip_type = RTL_CHIP_8723CS_CG,
-> +         .hci_bus = HCI_UART,
-> +         .config_needed = true,
-> +         .has_rom_version = true,
-> +         .fw_name  = "rtl_bt/rtl8723cs_cg_fw.bin",
-> +         .cfg_name = "rtl_bt/rtl8723cs_cg_config" },
-> +
-> +       /* 8723CS-VF */
-> +       { .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE |
-> +                        IC_MATCH_FL_HCIBUS,
-> +         .lmp_subver = RTL_ROM_LMP_8703B,
-> +         .chip_type = RTL_CHIP_8723CS_VF,
-> +         .hci_bus = HCI_UART,
-> +         .config_needed = true,
-> +         .has_rom_version = true,
-> +         .fw_name  = "rtl_bt/rtl8723cs_vf_fw.bin",
-> +         .cfg_name = "rtl_bt/rtl8723cs_vf_config" },
-> +
-> +       /* 8723CS-XX */
-> +       { .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE |
-> +                        IC_MATCH_FL_HCIBUS,
-> +         .lmp_subver = RTL_ROM_LMP_8703B,
-> +         .chip_type = RTL_CHIP_8723CS_XX,
-> +         .hci_bus = HCI_UART,
-> +         .config_needed = true,
-> +         .has_rom_version = true,
-> +         .fw_name  = "rtl_bt/rtl8723cs_xx_fw.bin",
-> +         .cfg_name = "rtl_bt/rtl8723cs_xx_config" },
-> +
->         /* 8723D */
->         { IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
->           .config_needed = true,
-> @@ -208,7 +247,8 @@ static const struct id_table ic_id_table[] = {
->         };
->
->  static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
-> -                                            u8 hci_ver, u8 hci_bus)
-> +                                            u8 hci_ver, u8 hci_bus,
-> +                                            u8 chip_type)
->  {
->         int i;
->
-> @@ -225,6 +265,9 @@ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
->                 if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIBUS) &&
->                     (ic_id_table[i].hci_bus != hci_bus))
->                         continue;
-> +               if ((ic_id_table[i].match_flags & IC_MATCH_FL_CHIP_TYPE) &&
-> +                   (ic_id_table[i].chip_type != chip_type))
-> +                       continue;
->
->                 break;
->         }
-> @@ -307,6 +350,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
->                 { RTL_ROM_LMP_8723B, 1 },
->                 { RTL_ROM_LMP_8821A, 2 },
->                 { RTL_ROM_LMP_8761A, 3 },
-> +               { RTL_ROM_LMP_8703B, 7 },
->                 { RTL_ROM_LMP_8822B, 8 },
->                 { RTL_ROM_LMP_8723B, 9 },       /* 8723D */
->                 { RTL_ROM_LMP_8821A, 10 },      /* 8821C */
-> @@ -587,6 +631,48 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
->         return ret;
+>  drivers/bluetooth/btqca.c   | 85 +++++++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/btqca.h   |  2 +
+>  drivers/bluetooth/hci_qca.c |  6 +++
+>  3 files changed, 93 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index c9064d34d830..7d00df3a1d61 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -205,6 +205,55 @@ static int qca_send_reset(struct hci_dev *hdev)
+>  	return 0;
 >  }
->
-> +static bool rtl_has_chip_type(u16 lmp_subver)
+>  
+> +static int qca_read_fw_board_id(struct hci_dev *hdev, u8 *bid)
 > +{
-> +       switch (lmp_subver) {
-> +       case RTL_ROM_LMP_8703B:
-> +               return true;
-> +       default:
-> +               break;
-> +       }
+> +	u8 cmd;
+> +	struct sk_buff *skb;
+> +	struct edl_event_hdr *edl;
+> +	int err;
+> +	int bid_len;
 > +
-> +       return  false;
+> +	bt_dev_dbg(hdev, "QCA read board ID");
+> +
+> +	cmd = EDL_GET_BID_REQ_CMD;
+> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
+> +				&cmd, 0, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "Reading QCA board ID failed (%d)",
+> +			   err);
+> +		return err;
+> +	}
+> +
+> +	edl = (struct edl_event_hdr *)(skb->data);
+> +	if (!edl) {
+> +		bt_dev_err(hdev, "QCA read board ID with no header");
+> +		err = -EILSEQ;
+> +		goto out;
+> +	}
+> +
+> +	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+> +	    edl->rtype != EDL_GET_BID_REQ_CMD) {
+> +		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
+> +			   edl->rtype);
+> +		err = -EIO;
+> +		goto out;
+> +	}
+> +
+> +	bid_len = edl->data[0];
+> +	bid[0] = edl->data[1];
+> +	bid[1] = edl->data[2];
+> +	bt_dev_info(hdev, "QCA board ID len %d,id = %x %x", bid_len, bid[0], bid[1]);
+> +
+> +
+
+Please clean up the double empty lines..
+
+> +	err = 0;
+
+Why not zero-initialize err from the start?
+
+> +
+> +out:
+> +	kfree_skb(skb);
+> +	return err;
 > +}
 > +
-> +static int rtl_read_chip_type(struct hci_dev *hdev, u8 *type)
+> +
+>  int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+>  {
+>  	struct sk_buff *skb;
+> @@ -574,6 +623,32 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>  }
+>  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>  
+> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
+> +		   size_t max_size, struct qca_btsoc_version ver, u8 *bid)
 > +{
-> +       struct rtl_chip_type_evt *chip_type;
-> +       struct sk_buff *skb;
-> +       const unsigned char cmd_buf[] = {0x00, 0x94, 0xa0, 0x00, 0xb0};
+> +	u8 rom_ver = 0;
+> +	u32 soc_ver;
+> +	const char *variant;
 > +
-> +       /* Read RTL chip type command */
-> +       skb = __hci_cmd_sync(hdev, 0xfc61, 5, cmd_buf, HCI_INIT_TIMEOUT);
-> +       if (IS_ERR(skb)) {
-> +               rtl_dev_err(hdev, "Read chip type failed (%ld)",
-> +                           PTR_ERR(skb));
-> +               return PTR_ERR(skb);
-> +       }
-> +
-> +       if (skb->len != sizeof(*chip_type)) {
-> +               rtl_dev_err(hdev, "RTL chip type event length mismatch");
-> +               kfree_skb(skb);
-> +               return -EIO;
-> +       }
-> +
-> +       chip_type = skb_pull_data(skb, sizeof(*chip_type));
+> +	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
+> +	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+> +	bt_dev_info(hdev, "bid == 0x%02x 0x%02x", bid[0], bid[1]);
 
-skb_pull_data does already check for skb->len so you can do something like:
+Is this really useful information to put in the log every time the
+device comes up?
 
-chip_type = skb_pull_data(skb, sizeof(*chip_type));
-if (!chip_type) {
-               rtl_dev_err(hdev, "RTL chip type event length mismatch");
-               kfree_skb(skb);
-               return -EIO;
-}...
+> +
+> +	if ((ver.soc_id & 0x0000ff00) == 0x1200) /*hsp gf chip*/
+> +		variant = "g";
+> +	else
+> +		variant = "";
+> +
+> +	if (bid[0] == 0 && bid[1] == 0) {
+> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
+> +	} else {
+> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x%02x",
+> +			rom_ver, variant, bid[0], bid[1]);
+> +	}
+> +	bt_dev_info(hdev, "%s:  %s", __func__, fwname);
 
-> +       rtl_dev_info(hdev, "chip_type status=%x type=%x",
-> +                    chip_type->status, chip_type->type);
+Please write proper and useful informational prints in the log.
+
 > +
-> +       *type = chip_type->type & 0x0f;
-> +
-> +       kfree_skb(skb);
-> +       return 0;
 > +}
 > +
->  void btrtl_free(struct btrtl_device_info *btrtl_dev)
->  {
->         kvfree(btrtl_dev->fw_data);
-> @@ -603,7 +689,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
->         struct hci_rp_read_local_version *resp;
->         char cfg_name[40];
->         u16 hci_rev, lmp_subver;
-> -       u8 hci_ver;
-> +       u8 hci_ver, chip_type = 0;
->         int ret;
->         u16 opcode;
->         u8 cmd[2];
-> @@ -629,8 +715,14 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
->         hci_rev = le16_to_cpu(resp->hci_rev);
->         lmp_subver = le16_to_cpu(resp->lmp_subver);
->
-> +       if (rtl_has_chip_type(lmp_subver)) {
-> +               ret = rtl_read_chip_type(hdev, &chip_type);
-> +               if (ret)
-> +                       goto err_free;
-> +       }
-> +
->         btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
-> -                                           hdev->bus);
-> +                                           hdev->bus, chip_type);
->
->         if (!btrtl_dev->ic_info)
->                 btrtl_dev->drop_fw = true;
-> @@ -673,7 +765,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
->                 lmp_subver = le16_to_cpu(resp->lmp_subver);
->
->                 btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
-> -                                                   hdev->bus);
-> +                                                   hdev->bus, chip_type);
->         }
->  out_free:
->         kfree_skb(skb);
-> @@ -755,6 +847,7 @@ int btrtl_download_firmware(struct hci_dev *hdev,
->         case RTL_ROM_LMP_8761A:
->         case RTL_ROM_LMP_8822B:
->         case RTL_ROM_LMP_8852A:
-> +       case RTL_ROM_LMP_8703B:
->                 return btrtl_setup_rtl8723b(hdev, btrtl_dev);
->         default:
->                 rtl_dev_info(hdev, "assuming no firmware upload needed");
-> @@ -795,6 +888,19 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
->                 rtl_dev_dbg(hdev, "WBS supported not enabled.");
->                 break;
->         }
-> +
-> +       switch (btrtl_dev->ic_info->lmp_subver) {
-> +       case RTL_ROM_LMP_8703B:
-> +               /* 8723CS reports two pages for local ext features,
-> +                * but it doesn't support any features from page 2 -
-> +                * it either responds with garbage or with error status
-> +                */
-> +               set_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
-> +                       &hdev->quirks);
-> +               break;
-> +       default:
-> +               break;
-> +       }
->  }
->  EXPORT_SYMBOL_GPL(btrtl_set_quirks);
->
-> @@ -953,6 +1059,12 @@ MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723cs_cg_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723cs_cg_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_config.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
-> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-> index ebf0101c959b..349d72ee571b 100644
-> --- a/drivers/bluetooth/btrtl.h
-> +++ b/drivers/bluetooth/btrtl.h
-> @@ -14,6 +14,11 @@
->
->  struct btrtl_device_info;
->
-> +struct rtl_chip_type_evt {
-> +       __u8 status;
-> +       __u8 type;
-> +} __packed;
-> +
->  struct rtl_download_cmd {
->         __u8 index;
->         __u8 data[RTL_FRAG_LEN];
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 6455bc4fb5bb..e90670955df2 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -936,6 +936,8 @@ static int h5_btrtl_setup(struct h5 *h5)
->         err = btrtl_download_firmware(h5->hu->hdev, btrtl_dev);
->         /* Give the device some time before the hci-core sends it a reset */
->         usleep_range(10000, 20000);
-> +       if (err)
-> +               goto out_free;
->
->         btrtl_set_quirks(h5->hu->hdev, btrtl_dev);
->
-> @@ -1100,6 +1102,8 @@ static const struct of_device_id rtl_bluetooth_of_match[] = {
->           .data = (const void *)&h5_data_rtl8822cs },
->         { .compatible = "realtek,rtl8723bs-bt",
->           .data = (const void *)&h5_data_rtl8723bs },
-> +       { .compatible = "realtek,rtl8723cs-bt",
-> +         .data = (const void *)&h5_data_rtl8723bs },
->         { .compatible = "realtek,rtl8723ds-bt",
->           .data = (const void *)&h5_data_rtl8723bs },
->  #endif
-> --
-> 2.39.1
->
+>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+>  		   const char *firmware_name)
+> @@ -582,6 +657,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  	int err;
+>  	u8 rom_ver = 0;
+>  	u32 soc_ver;
+> +	u8 bid[2] = {0};
 
+Seems that storing this as a u16 would make the patch cleaner.
 
--- 
-Luiz Augusto von Dentz
+>  
+>  	bt_dev_dbg(hdev, "QCA setup on UART");
+>  
+> @@ -607,6 +683,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  	} else if (soc_type == QCA_QCA6390) {
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/htbtfw%02x.tlv", rom_ver);
+> +	} else if (soc_type == QCA_QCA2066) {
+> +		snprintf(config.fwname, sizeof(config.fwname),
+> +			 "qca/hpbtfw%02x.tlv", rom_ver);
+>  	} else if (soc_type == QCA_WCN6750) {
+>  		/* Choose mbn file by default.If mbn file is not found
+>  		 * then choose tlv file
+> @@ -628,6 +707,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  	/* Give the controller some time to get ready to receive the NVM */
+>  	msleep(10);
+>  
+> +	if (soc_type == QCA_QCA2066)
+> +		qca_read_fw_board_id(hdev, bid);
+> +
+> +
+
+Double empty lines...
+
+>  	/* Download NVM configuration */
+>  	config.type = TLV_TYPE_NVM;
+>  	if (firmware_name)
+> @@ -645,6 +728,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  	else if (soc_type == QCA_QCA6390)
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/htnv%02x.bin", rom_ver);
+> +	else if (soc_type == QCA_QCA2066)
+> +		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname), ver, bid);
+>  	else if (soc_type == QCA_WCN6750)
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/msnv%02x.bin", rom_ver);
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index 61e9a50e66ae..e762c403284a 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -13,6 +13,7 @@
+>  #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+>  #define EDL_GET_BUILD_INFO_CMD		(0x20)
+>  #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+> +#define EDL_GET_BID_REQ_CMD		(0x23)
+>  #define EDL_PATCH_CONFIG_CMD		(0x28)
+>  #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+>  #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+> @@ -147,6 +148,7 @@ enum qca_btsoc_type {
+>  	QCA_WCN3991,
+>  	QCA_QCA6390,
+>  	QCA_WCN6750,
+> +	QCA_QCA2066,
+>  };
+>  
+>  #if IS_ENABLED(CONFIG_BT_QCA)
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 3df9e692756a..596f730ff375 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1859,6 +1859,11 @@ static const struct qca_device_data qca_soc_data_qca6390 = {
+>  	.num_vregs = 0,
+>  };
+>  
+> +static const struct qca_device_data qca_soc_data_qca2066 = {
+> +	.soc_type = QCA_QCA2066,
+> +	.num_vregs = 0,
+> +};
+> +
+>  static const struct qca_device_data qca_soc_data_wcn6750 = {
+>  	.soc_type = QCA_WCN6750,
+>  	.vregs = (struct qca_vreg []) {
+> @@ -2316,6 +2321,7 @@ static SIMPLE_DEV_PM_OPS(qca_pm_ops, qca_suspend, qca_resume);
+>  static const struct of_device_id qca_bluetooth_of_match[] = {
+>  	{ .compatible = "qcom,qca6174-bt" },
+>  	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
+> +	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
+
+These entries seems alphabetically sorted, please maintain that.
+
+Regards,
+Bjorn
+
+>  	{ .compatible = "qcom,qca9377-bt" },
+>  	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
+>  	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
+> -- 
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+> 
