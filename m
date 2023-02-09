@@ -2,118 +2,128 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20072C636D3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 21:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A808C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 23:49:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230310AbjBIVdD (ORCPT
+        id S229766AbjBIXt0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Feb 2023 16:33:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39268 "EHLO
+        Thu, 9 Feb 2023 18:49:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbjBIVdC (ORCPT
+        with ESMTP id S229483AbjBIXtZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Feb 2023 16:33:02 -0500
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5467B9EC4
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Feb 2023 13:33:01 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id o5so3711322ljj.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Feb 2023 13:33:01 -0800 (PST)
+        Thu, 9 Feb 2023 18:49:25 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9323B392BC;
+        Thu,  9 Feb 2023 15:49:24 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id u9so4713383plr.9;
+        Thu, 09 Feb 2023 15:49:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4MPwh1HcaeT6tE9wnbZohfEmsUMom8zqRLt0WHd7j6w=;
-        b=JmzGRG2VsmwlpHwlnpPIcysvJiENqlm0X6/EUqyw7VYAK1290NzStD2uebkSdyMkzM
-         KpSw06JNGVmtqjpgRBehcvyhCuc4JEWp+cOTZt2ydOkvIB9Hd97kyXJ07FJeL6HHkM3c
-         eSn4E1kDlVCORQGq9EJVw5nAhZtTc2OEicNubnjpftmYPWG3+kxEtbcLfNRBNF5mSl5B
-         MlFSieEnlht1tZm19ckGPC2hKxGWaJC67rxVOwiOXYExKkk4ngSUrHD2XwY9zBekUVf8
-         NpAH8mRKewYbJ2VsJcF6cb1NFEY9UQla5LP0Bt/Bfc/AiTHiMu3Cn/lN+Vds8drzW9Y6
-         JCSQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OTry8m2lgEYJMqD8o2IL6haCJmivlF+7KsiMT4rNYK8=;
+        b=C5wXWaxBRNgT7M58w4SUH4jYhUucKLPjJEGq3ex+5TmZ+D6c4pQC1xpm6xkdbgHC/k
+         BoAzzSZqG03Z8hHX6i08DYA34uHcLLBJ3DXJdJDzYAE+2KkiU0vNhw98hRSjrrjr5fnh
+         IyK0Q9ZWQ2RJpezLuFtn6iduWdaRnTk3kCIDHrR+86S0jkWvvlefccJ59eNz8PoParMl
+         QGG3AGGLyC+ir+Dw/eDcUsoCwtcHAfwfBEvqxcQY4T+HqkB5TmmNuhuDw2m27pdN88Do
+         9UnlVrVfQ8zhWPiZuVN4WK9hRpJ0uyFGbinPI8AmhmgEyydnenMh0o0Ld5TjOShAf5Sl
+         jsIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4MPwh1HcaeT6tE9wnbZohfEmsUMom8zqRLt0WHd7j6w=;
-        b=Dd8vYogtMjsrIL0wSsLKowgy/sLhXU7lBcxHlM57kgGUyfddh9HP7P1rfaaYYQZ9Kh
-         MFfzLQnMtcz35GhnhGxoQIGWj6w1W5F88lyL0+XwLDoF7lI7CAoNMsaGOnVHxm+t8A1i
-         oN//b42TjdoiZ18CsOI+++Oj81V5S9BTda9l9Nj6A7HMaRl70DB9avCmb2f+69oDUySx
-         mbIzEgZfsxANcmyd46UtsSpFMsTe0prTvdWMcnJWjpkGgKi4I01kRcKOPdz3hIkAJJN1
-         3O8By0IO8xRBHVy+FM3l3C/1T4TYIv4BchW38GgZ8xMaU/+x7QGuQXc/sQG6ldHabjNL
-         wCGQ==
-X-Gm-Message-State: AO0yUKXU/5RoSfw0PZxMdwPgehw3MIlSChXj20RR8EQg36wEheTSzZta
-        cBxL/8BT4JZAK+DuYhzlTE4zrGXXP8/SOyvQnfw=
-X-Google-Smtp-Source: AK7set94s0AriNdQmqXGxp4kwUf6Dl1NqbvenPSP9NQYdzPmrC0Heue2FtS25m6a+8p+i8dF1JggdWCSYaiKa9rLAFA=
-X-Received: by 2002:a2e:9193:0:b0:293:2d78:ec11 with SMTP id
- f19-20020a2e9193000000b002932d78ec11mr933914ljg.177.1675978379517; Thu, 09
- Feb 2023 13:32:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20230207115741.122854-1-tomasz.mon@nordicsemi.no>
-In-Reply-To: <20230207115741.122854-1-tomasz.mon@nordicsemi.no>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OTry8m2lgEYJMqD8o2IL6haCJmivlF+7KsiMT4rNYK8=;
+        b=VE2gbH1iUZuCgbqLFqd90K2m6Qcz2KdAe/Ev8XS/UOs+fmO91aJoyMK+TKTk7YGlxq
+         Dkl411WxLcGPbNSYArPCYJh307EKtKe+Vj4WbdxcdglJcMLzbwAvExpd2T6arQPyxeqX
+         Orhvq41ch7/+lLD88LMC5Wcaj8Hv/1mESTT7ydvTRYrhJEahR9J9LtB+IRvptpCgMLnQ
+         7l3+3s9IlS8J0jlz7wc6jvGqxgeGQs0WPAGer+R7+3p0wFY6uyMDdkNZEI4u0vci6wDw
+         4/1aBEOJbkZ6lTYxkkqEBl7JeDDqOlznctBgqAkIkwhD6VdXDP+RfmdA023N9MOlfvmm
+         PFDQ==
+X-Gm-Message-State: AO0yUKXq3eTLowyE13VYk9xfCNOsu+p9/2Wx8/TJ/+LhbfxxuOBqAZ2C
+        yGSNKCG2kO4Oc3lGBehf6j+8uAADjV4eiA==
+X-Google-Smtp-Source: AK7set8S2RvgOIXOtxna+yzcD4OAOGO4liQ4FrUxyfl/F5WDxPSMK11CkD7Nu9W3az2otclrxcKmJw==
+X-Received: by 2002:a17:903:110e:b0:19a:7217:32a9 with SMTP id n14-20020a170903110e00b0019a721732a9mr172252plh.26.1675986563905;
+        Thu, 09 Feb 2023 15:49:23 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id jk23-20020a170903331700b001926392adf9sm2057507plb.271.2023.02.09.15.49.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Feb 2023 15:49:23 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 9 Feb 2023 13:32:47 -0800
-Message-ID: <CABBYNZJY97dFQ9cdZR+JimNN+N=cyQ3yohZQW30bM1fQUuY2pQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Do not require hardcoded interface numbers
-To:     =?UTF-8?Q?Tomasz_Mo=C5=84?= <tomasz.mon@nordicsemi.no>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?UTF-8?B?Q2FybGVzIEN1ZsOt?= <carles.cufi@nordicsemi.no>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2023-02-09
+Date:   Thu,  9 Feb 2023 15:49:22 -0800
+Message-Id: <20230209234922.3756173-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tomasz,
+The following changes since commit 8697a258ae24703267d2a37d91ab757c91ef027e:
 
-On Tue, Feb 7, 2023 at 3:58 AM Tomasz Mo=C5=84 <tomasz.mon@nordicsemi.no> w=
-rote:
->
-> Remove hardcoded interface number check because Bluetooth specification
-> since version 4.0 only recommends and no longer requires specific
-> interface numbers.
->
-> While earlier Bluetooth versions, i.e. 2.1 + EDR and 3.0 + HS, contain
-> required configuration table in Volume 4 - Host Controller Interface
-> Part B - USB Transport Layer, Bluetooth Core Specification Addendum 2
-> changes the table from required to recommended configuration.
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-02-09 12:25:40 -0800)
 
-Can you give it a little more context, is this supposed to be the case
-for LE only controllers? I assume this shouldn't cause any regressions
-for other controllers right?
+are available in the Git repository at:
 
-> Signed-off-by: Tomasz Mo=C5=84 <tomasz.mon@nordicsemi.no>
-> ---
->  drivers/bluetooth/btusb.c | 10 +++-------
->  1 file changed, 3 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 2ad4efdd9e40..5110d26cff7a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3830,13 +3830,9 @@ static int btusb_probe(struct usb_interface *intf,
->
->         BT_DBG("intf %p id %p", intf, id);
->
-> -       /* interface numbers are hardcoded in the spec */
-> -       if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) {
-> -               if (!(id->driver_info & BTUSB_IFNUM_2))
-> -                       return -ENODEV;
-> -               if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2)
-> -                       return -ENODEV;
-> -       }
-> +       if ((id->driver_info & BTUSB_IFNUM_2) &&
-> +           (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
-> +               return -ENODEV;
->
->         ifnum_base =3D intf->cur_altsetting->desc.bInterfaceNumber;
->
-> --
-> 2.39.1
->
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-02-09
 
+for you to fetch changes up to c585a92b2f9c624b0b62b2af1eb0ea6d11cb5cac:
 
---=20
-Luiz Augusto von Dentz
+  Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG) (2023-02-09 14:20:04 -0800)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add new PID/VID 0489:e0f2 for MT7921
+ - Add VID:PID 13d3:3529 for Realtek RTL8821CE
+ - Add CIS feature bits to controller information
+ - Set Per Platform Antenna Gain(PPAG) for Intel controllers
+
+----------------------------------------------------------------
+Archie Pusaka (2):
+      Bluetooth: Free potentially unfreed SCO connection
+      Bluetooth: Make sure LE create conn cancel is sent when timeout
+
+Gustavo A. R. Silva (1):
+      Bluetooth: HCI: Replace zero-length arrays with flexible-array members
+
+Kees Cook (1):
+      Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: qca: Fix sparse warnings
+      Bluetooth: L2CAP: Fix potential user-after-free
+
+Marcel Holtmann (1):
+      Bluetooth: Fix issue with Actions Semi ATS2851 based devices
+
+Mario Limonciello (1):
+      Bluetooth: btusb: Add new PID/VID 0489:e0f2 for MT7921
+
+Moises Cardona (1):
+      Bluetooth: btusb: Add VID:PID 13d3:3529 for Realtek RTL8821CE
+
+Pauli Virtanen (1):
+      Bluetooth: MGMT: add CIS feature bits to controller information
+
+Seema Sreemantha (1):
+      Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG)
+
+Zhengping Jiang (1):
+      Bluetooth: hci_qca: get wakeup status from serdev device handle
+
+ drivers/bluetooth/btintel.c  | 116 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h  |  13 +++++
+ drivers/bluetooth/btusb.c    |  16 ++++++
+ drivers/bluetooth/hci_qca.c  |  11 ++--
+ include/net/bluetooth/hci.h  |   4 +-
+ include/net/bluetooth/mgmt.h |   2 +
+ net/bluetooth/hci_conn.c     |  23 +++++----
+ net/bluetooth/l2cap_core.c   |  24 ---------
+ net/bluetooth/l2cap_sock.c   |   8 +++
+ net/bluetooth/mgmt.c         |  12 +++++
+ 10 files changed, 188 insertions(+), 41 deletions(-)
