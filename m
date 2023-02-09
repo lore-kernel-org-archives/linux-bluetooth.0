@@ -2,92 +2,73 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C639BC636CC
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 02:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAFFC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 06:34:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231828AbjBICWZ (ORCPT
+        id S229705AbjBIGeI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Feb 2023 21:22:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52826 "EHLO
+        Thu, 9 Feb 2023 01:34:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231838AbjBICWY (ORCPT
+        with ESMTP id S229498AbjBIGeI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Feb 2023 21:22:24 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42C728209
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Feb 2023 18:22:21 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id 144so397375pfv.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Feb 2023 18:22:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=t4EnEtV3R67I2kTgpQFTrd6dPUEf7OAxVKXNovecEaA=;
-        b=cGgrdCD5iWbodWI1zMiTdQqoMXLS03Bq/VCoB54XyLpvCysjvEP2sZ5GTJgHterxne
-         toJ8hhjWb9lj5QcvLEoNrRHe7C3YMzsktGa6tRZGbvimcOWMCxp9+GDtzvqg6S69Q3q0
-         z4Lzu/F51BEU+c3rwwN45D88W5nRdqszh4zctQSiUyuaIYRxa80pNNFppMan6n9dJQmq
-         zFmfP+xUOMY6OjH0yj7JWWij3PiCWuqvO6TcvKqzvVq8HfJJFsfGH8SDFuseu2A5Yz8c
-         WbncIR9mlRth5RlqA63mukLeE0N44bZJAxUNTdPOgERixNgjMdfDoE5OV8RUZlQ9ih+z
-         7+YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t4EnEtV3R67I2kTgpQFTrd6dPUEf7OAxVKXNovecEaA=;
-        b=3qVWIp3BM60w7vmLGOjHz8MV17szxOdqgEAzVZJOMG2FV5ah6diR9h+XJ64wfIy1pv
-         PWioOsbrVI1Or7uI4nCRE4NvGLEyqE21ZXp/jjPbx63nZw9AwglYxCZB2TlDVvNnyMRv
-         HCp+RHG6XHu9OiQZ7Mb5GAhjXLqgx1VJb/BOnZDyP8uVIe03SCJQanI+S6+B0tOxOZqT
-         1hjZfcOlEo+DdqNRuW/cHUe7DYXtRbzJoOQEgySBZQET/3gWbosuoPTipmmtNuqTp4gg
-         QfEYQB2yoy06jN1BftgX6+UKcw1OY04HrTEMdkf3DkIS5CouJqdug/udl3Nzh63PD1B6
-         6HRA==
-X-Gm-Message-State: AO0yUKWltaQU/Drx9/BiYVxd8wsQBMeLW7pitgJQDQO0Kz/Parnr2wvI
-        mmMah2ssGshT7Z6+Wmui2chHnJFn4As=
-X-Google-Smtp-Source: AK7set+MpOQwFpYZqWBhq0GodXuJGkJaMYUsagIBM2LjR9qyYpceoN3w5N1pO+iGOqr52Fx2shIapw==
-X-Received: by 2002:a62:6488:0:b0:578:ac9f:79a9 with SMTP id y130-20020a626488000000b00578ac9f79a9mr6913434pfb.15.1675909340916;
-        Wed, 08 Feb 2023 18:22:20 -0800 (PST)
-Received: from [172.17.0.2] ([13.91.161.16])
-        by smtp.gmail.com with ESMTPSA id c3-20020aa78803000000b005a8577f193esm130355pfo.68.2023.02.08.18.22.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Feb 2023 18:22:20 -0800 (PST)
-Message-ID: <63e458dc.a70a0220.1b8bb.053a@mx.google.com>
-Date:   Wed, 08 Feb 2023 18:22:20 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4864038124014705236=="
+        Thu, 9 Feb 2023 01:34:08 -0500
+Received: from out28-193.mail.aliyun.com (out28-193.mail.aliyun.com [115.124.28.193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0CA82ED7C;
+        Wed,  8 Feb 2023 22:34:02 -0800 (PST)
+X-Alimail-AntiSpam: AC=CONTINUE;BC=0.4417745|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.0415084-0.000958596-0.957533;FP=0|0|0|0|0|-1|-1|-1;HT=ay29a033018047190;MF=victor@allwinnertech.com;NM=1;PH=DS;RN=5;RT=5;SR=0;TI=SMTPD_---.RGXpcYO_1675924439;
+Received: from SunxiBot.allwinnertech.com(mailfrom:victor@allwinnertech.com fp:SMTPD_---.RGXpcYO_1675924439)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Feb 2023 14:34:00 +0800
+From:   Victor Hassan <victor@allwinnertech.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btrtl: Add support for RTL8852BS
+Date:   Thu,  9 Feb 2023 14:34:38 +0800
+Message-Id: <20230209063438.49788-1-victor@allwinnertech.com>
+X-Mailer: git-send-email 2.29.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, steev@kali.org
-Subject: RE: Add WCN6855 Bluetooth support
-In-Reply-To: <20230209020916.6475-2-steev@kali.org>
-References: <20230209020916.6475-2-steev@kali.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4864038124014705236==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add the support for RTL8852BS BT controller on UART interface.
+The necessary firmware file will be submitted to linux-firmware.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: arch/arm64/boot/dts/qcom/sc8280xp.dtsi:1207
-error: arch/arm64/boot/dts/qcom/sc8280xp.dtsi: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Victor Hassan <victor@allwinnertech.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btrtl.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 69c3fe649ca7..aee75f278e60 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -190,6 +190,14 @@ static const struct id_table ic_id_table[] = {
+ 	  .fw_name  = "rtl_bt/rtl8852au_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8852au_config" },
+ 
++	/* 8852B with UART interface */
++	{ IC_INFO(RTL_ROM_LMP_8852A, 0xb, 0xb, HCI_UART),
++	  .config_needed = true,
++	  .has_rom_version = true,
++	  .has_msft_ext = true,
++	  .fw_name  = "rtl_bt/rtl8852bs_fw.bin",
++	  .cfg_name = "rtl_bt/rtl8852bs_config" },
++
+ 	/* 8852B */
+ 	{ IC_INFO(RTL_ROM_LMP_8852A, 0xb, 0xb, HCI_USB),
+ 	  .config_needed = false,
+@@ -963,6 +971,8 @@ MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8852bs_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
+-- 
+2.29.0
 
---===============4864038124014705236==--
