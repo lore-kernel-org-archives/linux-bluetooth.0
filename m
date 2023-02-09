@@ -2,101 +2,127 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 850C3C05027
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 07:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FE1C05027
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 09:19:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbjBIHQx (ORCPT
+        id S229606AbjBIJTI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Feb 2023 02:16:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
+        Thu, 9 Feb 2023 04:19:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbjBIHQi (ORCPT
+        with ESMTP id S230044AbjBIJSn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Feb 2023 02:16:38 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5F445F71;
-        Wed,  8 Feb 2023 23:15:00 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id d14so773807wrr.9;
-        Wed, 08 Feb 2023 23:15:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rY1g9O1yCevGy6KnVm3nx+WrQfWq2/pjsLaafFIUf5g=;
-        b=bRKbS66duCfoAC0id9taxO8QTkz+/itawKKzKDIZAEGZZcpFjeUAufTI3JKzfYzkYc
-         +8u7HL2Q8pAN/g8ymoiZ8NxRJ/8qE7PTxTN2rdurWDqDxoyQ0lJxlPXugvKkTlRJSExm
-         +eH/enxHCzdA2ODgnQl688PA6nFhvA8XZsfIeM+11mAmyopKfVEdvt2RwWtrvn/xRgax
-         JskC7v7BdpNPKWzdO6cXJWbRqluw6fJ7C118pyHzQs+08xUEROCwo5BTQuSpn8xFtLoD
-         pFfgehFS2O/BAIde3PprypiZywdFm5XVm3tFXcOaO2iyvsLFfT9T12+gNhPpBR4AoPzb
-         v3NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rY1g9O1yCevGy6KnVm3nx+WrQfWq2/pjsLaafFIUf5g=;
-        b=nU9jFr8wiubjKbeP+ZMlfrcpsKbtBveN3ETC510P+VLF7BgLa6kDmHqZbZZghCHy37
-         yCr+6qxApR/dcHdxpoY6T8aUtrVjDUu4SDkGmDM/lu8N45oLL9u83MOPjvl6Vd3NRZ4E
-         vYw+EMAwRndVPY8XA8nM5WyXj23c6wWktFpQBYNA0o7ZMNd/3GzCC29HmCXUUXrB5DBZ
-         /1MhPCxr/WKtce+j8J3lPEMtwzz5ThOOaRkRz8t29k61bmLwYCKd2/k4ooewjFhD7FAY
-         QS/u+be6m7b8F4yPNs3lORoCMf6zlh37O31Qii53x/z//wqnkZNfmY8R9ater8oKWFmZ
-         MUAA==
-X-Gm-Message-State: AO0yUKXWItQhyHjx9SRazh3gbbk/TJ5bMhYAvMFz/x3+7+CVanPTECAK
-        JzgKEZgXHsyaDdp7/BXubGWcEFFTz4GywNqwyWE=
-X-Google-Smtp-Source: AK7set9clA7Kg3f7TW7pZW9B5Jd3ydM5J5Ps5HM7l+0Z7qDb18CNyWOZf2nTDMKpIE+5ZDLoT3zPRfgNJRz7vWNy3w8=
-X-Received: by 2002:a5d:6946:0:b0:2c4:538:a491 with SMTP id
- r6-20020a5d6946000000b002c40538a491mr160688wrw.475.1675926885862; Wed, 08 Feb
- 2023 23:14:45 -0800 (PST)
+        Thu, 9 Feb 2023 04:18:43 -0500
+Received: from mout-b-110.mailbox.org (mout-b-110.mailbox.org [195.10.208.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FBB5EF98
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Feb 2023 01:18:23 -0800 (PST)
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-b-110.mailbox.org (Postfix) with ESMTPS id 4PCB9j0cfgz9tKX;
+        Thu,  9 Feb 2023 10:18:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tavla.de; s=MBO0001;
+        t=1675934297;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z3kNtBr2+7P3W6f3QhKbTd11dg1g/UYenh/8en8Ee4g=;
+        b=aiPG6PLnTAiAscwAEgVCxLzNBnoaU00RtXnr/6LRazGahajF6E1SK21u2YeqK+6Mha82EN
+        tEIBsuswI/qYppsFSR83ItFNYEfvTq4hELNG//sVEjXZJdA6n/kSP5CyJBmgyothztGYgv
+        HSv3KkQSjAvq9CF7TmNJ8Z1fm2ap1UKJoDzEoy/y0+AkSWhqJNHXDiNGUXxbTGJvVrdhJZ
+        G7GRqy8aAb8u0aB+7naykwA+/LxoJRvux8PryG9c2vtSsiKiQhsMt5iyg6jxAYYUd+lcsS
+        R5P+GS+nSFM125VWDqBxNtNsBQsJVcR53Yl9Tgxcay3bh2SFNRX+uv56CPAAuA==
+Message-ID: <56921851-be55-1380-2185-111335edaeb0@tavla.de>
+Date:   Thu, 9 Feb 2023 10:18:15 +0100
 MIME-Version: 1.0
-References: <20230208155220.1640-1-bage@debian.org> <20230208155220.1640-3-bage@debian.org>
- <CABBYNZKnt5=dar6Rmav=Tv3QH1ghSUV2osZPnp7OQLcANp_1Tw@mail.gmail.com> <0B0EFD39-825F-4635-A7F3-CA96BCFED9A2@holtmann.org>
-In-Reply-To: <0B0EFD39-825F-4635-A7F3-CA96BCFED9A2@holtmann.org>
-From:   Vasily Khoruzhick <anarsoul@gmail.com>
-Date:   Wed, 8 Feb 2023 23:14:19 -0800
-Message-ID: <CA+E=qVdLhyJYj-53+OSgpLQcTXY=H4TsVb-UFQYhMSkHZJj4hA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] Bluetooth: btrtl: add support for the RTL8723CS
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bastian Germann <bage@debian.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: How to Automatically Re-Connect Bluetooth HID over GATT (HOG)
+ Device when BlueZ Plugin "hog" is Disabled
+Content-Language: en-GB
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+References: <6950dd49-7436-ebef-eb88-940597472ce1@tavla.de>
+ <CABBYNZJMcEX6-9nQgoYccc7W=yEetNjjCMXSzP=Aa-4r4X_puw@mail.gmail.com>
+From:   Martin Petzold <martin.petzold@tavla.de>
+Organization: TAVLA Technology GmbH
+In-Reply-To: <CABBYNZJMcEX6-9nQgoYccc7W=yEetNjjCMXSzP=Aa-4r4X_puw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Feb 8, 2023 at 11:02 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi Luiz,
 
-Hi Marcel,
+Am 01.02.23 um 22:37 schrieb Luiz Augusto von Dentz:
+> Hi Martin,
+>
+> On Wed, Feb 1, 2023 at 1:25 PM Martin Petzold <martin.petzold@tavla.de> wrote:
+>> Hi,
+>>
+>> Linux 5.10, BlueZ 5.55
+>>
+>> I have a remote control which implements Bluetooth LE. If I use the
+>> default Bluetooth daemon, I am able to pair and trust using
+>> bluetoothctl. If the connection is lost after a while (or days) and a
+>> button on the remote control is pressed, the daemon re-connects
+>> automatically (because the device is paired). This is basically what I need.
+>>
+>> But, I would also like to manually set notifying for characteristics
+>> (Report) on the HID service within my application (Java via d-bus). This
+>> is not possible anymore (also not via bluetoothctl) because the "hog"
+>> (or "input") plugin manages the input device and the related HID
+>> services are now hidden.
+>>
+>> I then added "--noplugin=input,hog" to my Bluetooth daemon. Which is
+>> okay, because I don't need this support for Kernel HID. Great, now the
+>> HID services are available (also using bluetoothctl), but the peripheral
+>> does not re-connect automatically any more. I always have to connect
+>> manually first. I also have no signal on the d-bus when I press the
+>> button of the remote control, when it is disconnected.
+>>
+>> How can I enable automatic re-connect for devices, when these plugins
+>> are disabled?
+>>
+>> The only other way I was thinking of is to leave the "hog" plugin
+>> enabled and use the operating system HID interface. However, my
+>> application runs as non-root which makes it complicated and also I would
+>> like to have direct connection and control to my device.
+> https://github.com/bluez/bluez/blob/master/doc/gatt-api.txt#L390
+>
+Thanks, I have implemented and registered the HID profile using 
+org.bluez.GattProfile1 and now the device (remote control) re-connects 
+automatically.
 
-> Hi Luiz,
->
-> >> The Realtek RTL8723CS is a SDIO WiFi chip. It also contains a Bluetooth
-> >> module which is connected via UART to the host.
-> >>
-> >> It shares lmp subversion with 8703B, so Realtek's userspace
-> >> initialization tool (rtk_hciattach) differentiates varieties of RTL8723CS
-> >> (CG, VF, XX) with RTL8703B using vendor's command to read the chip type.
-> >
-> > Don't remember anything called rtk_hciattach, besides if that is based
-> > on hciattach that is already deprecated in favor of btattach.
->
-> and btattach is also deprecated. Write a proper serdev based driver.
+However, when I enable notifying on the Report characteristics of the 
+HID service after I received the first device properties update (with 
+services resolved), I miss the first Report event. If I press a button, 
+the remote re-connects and dbus events for device properties updated are 
+fine, but I don't have a Report event. If I then press again, I do get a 
+Report event, because I set notifying on the Report characteristics. 
+Setting notify seems to be too late.
 
-It is already a proper serdev based driver. rtk_hciattach is only
-mentioned to explain how differentiating the chips was implemented
-prior to this driver.
+What is the trick to get also the first button pressed as a Report 
+characteristic event?
 
-Regards,
-Vasily
+At the moment I only have the HID service 
+(00001812-0000-1000-8000-00805f9b34fb) in the properties map of the 
+org.bluez.GattProfile1.
 
-> The hci_ldisc line discipline crap needs to be removed.
->
-> Regards
->
-> Marcel
->
+Thanks,
+
+Martin
+
+-- 
+Martin Petzold (Inhaber & Geschäftsführer)
+
+TAVLA Technology GmbH
+Im Dau 14
+50678 Köln
+Deutschland
+
+Telefon: +49 (0)221 / 3466 0885
+Mobil: +49 (0)179 / 9220154
+E-Mail: martin.petzold@tavla.de
+
