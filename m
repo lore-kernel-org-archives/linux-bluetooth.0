@@ -2,38 +2,38 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF67C636D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 17:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62146C636D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 17:08:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232921AbjBJRDZ (ORCPT
+        id S233013AbjBJRIK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Feb 2023 12:03:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43656 "EHLO
+        Fri, 10 Feb 2023 12:08:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232761AbjBJRDX (ORCPT
+        with ESMTP id S232842AbjBJRIJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Feb 2023 12:03:23 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 621271A669;
-        Fri, 10 Feb 2023 09:03:20 -0800 (PST)
+        Fri, 10 Feb 2023 12:08:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D715661D24;
+        Fri, 10 Feb 2023 09:07:50 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D75B0B8259E;
-        Fri, 10 Feb 2023 17:03:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1ED31C433EF;
-        Fri, 10 Feb 2023 17:03:16 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6DFAD61E3E;
+        Fri, 10 Feb 2023 17:07:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 707F2C4339E;
+        Fri, 10 Feb 2023 17:07:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676048597;
-        bh=AjSM3C6aZzYAhkvK63grG8Pd0sT1wZgWOzj7P0TeGTU=;
+        s=k20201202; t=1676048869;
+        bh=d+NdOA9/0tO3K8kBzBxjygHIYoB+DElDtix6qSenTjE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=h6qcIvIxiQor1ryISgGIRggXzzmKdOV2PZEpPjBulozeci2tKw9BPNECT+/uAJkA5
-         5BIo8AC/963YjURfV1Mxs2Mh2z3hE/JR8mry0BXM6RiPw20jmYWsWbVrXRwdDhS5Za
-         t5LMu+pYm3rA6JPJr3VSTWiMXKRj3Zc6jwuV3PPux6EY10ugybcoJCAfH1xJWjrmvj
-         UIidCoioMFKDMUqod/T5rvtXzQSLbvCItHlzhGZ6zd9GKznZVPQvyRkEhlkstS9b1W
-         21HMzy9wKtg1XC0xILFlZgn040c3UvixA9UMl+0p7yBzAb6a3M8wFucTtt8BPhRiaM
-         4T98SRCytyIgA==
-Date:   Fri, 10 Feb 2023 09:05:26 -0800
+        b=O6g5VXeAAsrz08mTl6VK6RK2jBcANxBltL8iEu5JDUxOrNZfgAGvCEDmnj5wk+j35
+         oHFpn4HN/mMffegb98/IR6gtoyxSXpZyUU0XqQW/BFSeInWV21ttgf0GbH6t+H/nRx
+         EwcQoT2a5juaO4VBx3tY1lQXvMCWaLQtaFluHO59eC/woyCiFwQf/zEdwGcmBg8XwL
+         mhJK//ZkwIoOIWtc/GBgTmTsWeTbD/dHFYoyEO64qDUWmRZu0BTNWyylcXq4oITJot
+         xrN/C0mVvGlb1zXeZKGfwg9VF94F5USQ+cmYokoqaZjSNi/j/C0+GIXN/wx9b43+AO
+         p3jIRr4gwaphg==
+Date:   Fri, 10 Feb 2023 09:09:58 -0800
 From:   Bjorn Andersson <andersson@kernel.org>
 To:     Steev Klimaszewski <steev@kali.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -52,270 +52,118 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Mark Pearson <markpearson@lenovo.com>,
         Tim Jiang <quic_tjiang@quicinc.com>
-Subject: Re: [PATCH v5 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-Message-ID: <20230210170526.k7bid3r2hmc4yh2a@ripper>
+Subject: Re: [PATCH v5 0/4] Add WCN6855 Bluetooth support
+Message-ID: <20230210170958.qpzvcrkum7eehdcx@ripper>
 References: <20230209020916.6475-1-steev@kali.org>
- <20230209020916.6475-3-steev@kali.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230209020916.6475-3-steev@kali.org>
+In-Reply-To: <20230209020916.6475-1-steev@kali.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Feb 08, 2023 at 08:09:14PM -0600, Steev Klimaszewski wrote:
-> Added regulators,GPIOs and changes required to power on/off wcn6855.
-> Added support for firmware download for wcn6855.
+On Wed, Feb 08, 2023 at 08:09:12PM -0600, Steev Klimaszewski wrote:
+> First things first, I do not have access to the specs nor the schematics, so a
+> lot of this was done via guess work, looking at the acpi tables, and looking at
+> how a similar device (wcn6750) was added.
 > 
-> Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> The 5th revision addresses comments from Luiz about the Bluetooth driver, as
+> well as Konrad's comments on the dts file.
+> 
+> The end result is that we do have a working device, but not entirely reliable.
+> 
 
-Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+Except for the one warning/error about frame assembly I've not seen any
+reliability issues with this series.
+
+> Hopefully by getting this out there, people who do have access to the specs or
+> schematics can see where the improvements or fixes need to come.
+> 
+> There are a few things that I am not sure why they happen, and don't have the
+> knowledge level to figure out why they happen or debugging it.
+> 
+> Bluetooth: hci0: setting up wcn6855
+> Bluetooth: hci0: Frame reassembly failed (-84)
+> Bluetooth: hci0: QCA Product ID   :0x00000013
+> Bluetooth: hci0: QCA SOC Version  :0x400c0210
+> Bluetooth: hci0: QCA ROM Version  :0x00000201
+> Bluetooth: hci0: QCA Patch Version:0x000038e6
+> Bluetooth: hci0: QCA controller version 0x02100201
+> Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+> Bluetooth: hci0: QCA Downloading qca/hpnv21.bin
+> Bluetooth: hci0: QCA setup on UART is completed
+> 
+> I do not know why the Frame assembly failed, and modprobe -r hci_uart and then
+> modprobe hci_uart does not show the same Frame assembly failed.
+> 
+> The BD Address also seems to be incorrect, and I'm not sure what is going on
+> there either.
+> 
+
+Changing the public-addr after the fact works...
+
+> Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+> well as connecting to and using an H2GO bluetooth speaker and playing audio out
+> via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+> 
+> The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+> "A2DP Sink, codec SBC" would provide audio output, and while I could see that
+> data was being sent to the speaker, it wasn't always outputting, and going >
+> 4ft. away, would often disconnect.
+> 
+
+With the interference from WiFi removed I have very positive results
+with this, been listening to music using this for a week now without any
+concerns.
+
 Tested-by: Bjorn Andersson <andersson@kernel.org>
 
 Regards,
 Bjorn
 
-> ---
-> Changes since v4:
->  * Remove unused firmware check because we don't have mbn firmware.
->  * Set qcadev->init_speed if it hasn't been set.
+> steev@wintermute:~$ hciconfig -a
+> hci0:   Type: Primary  Bus: UART
+>         BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+>         UP RUNNING PSCAN
+>         RX bytes:1492 acl:0 sco:0 events:126 errors:0
+>         TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+>         Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+>         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+>         Link policy: RSWITCH HOLD SNIFF
+>         Link mode: PERIPHERAL ACCEPT
+>         Name: 'wintermute'
+>         Class: 0x0c010c
+>         Service Classes: Rendering, Capturing
+>         Device Class: Computer, Laptop
+>         HCI Version:  (0xc)  Revision: 0x0
+>         LMP Version:  (0xc)  Subversion: 0x46f7
+>         Manufacturer: Qualcomm (29)
 > 
-> Changes since v3:
->  * drop unused regulators
+> steev@wintermute:~$ dmesg | grep Razer
+> [ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+> [ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+> steev@wintermute:~$ dmesg | grep H2GO
+> [ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
 > 
-> Changes since v2:
->  * drop unnecessary commit info
+> Bjorn Andersson (1):
+>   arm64: dts: qcom: sc8280xp: Define uart2
 > 
-> Changes since v1:
->  * None
+> Steev Klimaszewski (3):
+>   dt-bindings: net: Add WCN6855 Bluetooth
+>   Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+>   arm64: dts: qcom: thinkpad-x13s: Add bluetooth
 > 
->  drivers/bluetooth/btqca.c   |  9 ++++++-
->  drivers/bluetooth/btqca.h   | 10 ++++++++
->  drivers/bluetooth/hci_qca.c | 50 ++++++++++++++++++++++++++++---------
->  3 files changed, 56 insertions(+), 13 deletions(-)
+>  .../net/bluetooth/qualcomm-bluetooth.yaml     | 17 +++++
+>  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 76 +++++++++++++++++++
+>  arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+>  drivers/bluetooth/btqca.c                     |  9 ++-
+>  drivers/bluetooth/btqca.h                     | 10 +++
+>  drivers/bluetooth/hci_qca.c                   | 50 +++++++++---
+>  6 files changed, 163 insertions(+), 13 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index c9064d34d830..2f9d8bd27c38 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -614,6 +614,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  		config.type = ELF_TYPE_PATCH;
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/msbtfw%02x.mbn", rom_ver);
-> +	} else if (soc_type == QCA_WCN6855) {
-> +		snprintf(config.fwname, sizeof(config.fwname),
-> +			 "qca/hpbtfw%02x.tlv", rom_ver);
->  	} else {
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/rampatch_%08x.bin", soc_ver);
-> @@ -648,6 +651,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  	else if (soc_type == QCA_WCN6750)
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/msnv%02x.bin", rom_ver);
-> +	else if (soc_type == QCA_WCN6855)
-> +		snprintf(config.fwname, sizeof(config.fwname),
-> +			 "qca/hpnv%02x.bin", rom_ver);
->  	else
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/nvm_%08x.bin", soc_ver);
-> @@ -672,6 +678,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  	case QCA_WCN3991:
->  	case QCA_WCN3998:
->  	case QCA_WCN6750:
-> +	case QCA_WCN6855:
->  		hci_set_msft_opcode(hdev, 0xFD70);
->  		break;
->  	default:
-> @@ -685,7 +692,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  		return err;
->  	}
->  
-> -	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
-> +	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750 || soc_type == QCA_WCN6855) {
->  		/* get fw build info */
->  		err = qca_read_fw_build_info(hdev);
->  		if (err < 0)
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 61e9a50e66ae..b884095bcd9d 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -147,6 +147,7 @@ enum qca_btsoc_type {
->  	QCA_WCN3991,
->  	QCA_QCA6390,
->  	QCA_WCN6750,
-> +	QCA_WCN6855,
->  };
->  
->  #if IS_ENABLED(CONFIG_BT_QCA)
-> @@ -168,6 +169,10 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
->  {
->  	return soc_type == QCA_WCN6750;
->  }
-> +static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
-> +{
-> +	return soc_type == QCA_WCN6855;
-> +}
->  
->  #else
->  
-> @@ -206,6 +211,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
->  	return false;
->  }
->  
-> +static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
-> +{
-> +	return false;
-> +}
-> +
->  static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->  {
->  	return -EOPNOTSUPP;
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 3df8c3606e93..efc1c0306b4e 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -605,8 +605,7 @@ static int qca_open(struct hci_uart *hu)
->  	if (hu->serdev) {
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
->  
-> -		if (qca_is_wcn399x(qcadev->btsoc_type) ||
-> -		    qca_is_wcn6750(qcadev->btsoc_type))
-> +		if (!(qcadev->init_speed))
->  			hu->init_speed = qcadev->init_speed;
->  
->  		if (qcadev->oper_speed)
-> @@ -1317,7 +1316,8 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  
->  	/* Give the controller time to process the request */
->  	if (qca_is_wcn399x(qca_soc_type(hu)) ||
-> -	    qca_is_wcn6750(qca_soc_type(hu)))
-> +	    qca_is_wcn6750(qca_soc_type(hu)) ||
-> +	    qca_is_wcn6855(qca_soc_type(hu)))
->  		usleep_range(1000, 10000);
->  	else
->  		msleep(300);
-> @@ -1394,7 +1394,8 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
->  static int qca_check_speeds(struct hci_uart *hu)
->  {
->  	if (qca_is_wcn399x(qca_soc_type(hu)) ||
-> -	    qca_is_wcn6750(qca_soc_type(hu))) {
-> +	    qca_is_wcn6750(qca_soc_type(hu)) ||
-> +	    qca_is_wcn6855(qca_soc_type(hu))) {
->  		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
->  		    !qca_get_speed(hu, QCA_OPER_SPEED))
->  			return -EINVAL;
-> @@ -1682,7 +1683,8 @@ static int qca_power_on(struct hci_dev *hdev)
->  		return 0;
->  
->  	if (qca_is_wcn399x(soc_type) ||
-> -	    qca_is_wcn6750(soc_type)) {
-> +	    qca_is_wcn6750(soc_type) ||
-> +	    qca_is_wcn6855(soc_type)) {
->  		ret = qca_regulator_init(hu);
->  	} else {
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
-> @@ -1723,7 +1725,8 @@ static int qca_setup(struct hci_uart *hu)
->  
->  	bt_dev_info(hdev, "setting up %s",
->  		qca_is_wcn399x(soc_type) ? "wcn399x" :
-> -		(soc_type == QCA_WCN6750) ? "wcn6750" : "ROME/QCA6390");
-> +		(soc_type == QCA_WCN6750) ? "wcn6750" :
-> +		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
->  
->  	qca->memdump_state = QCA_MEMDUMP_IDLE;
->  
-> @@ -1735,7 +1738,8 @@ static int qca_setup(struct hci_uart *hu)
->  	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
->  
->  	if (qca_is_wcn399x(soc_type) ||
-> -	    qca_is_wcn6750(soc_type)) {
-> +	    qca_is_wcn6750(soc_type) ||
-> +	    qca_is_wcn6855(soc_type)) {
->  		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
->  		hci_set_aosp_capable(hdev);
->  
-> @@ -1757,7 +1761,8 @@ static int qca_setup(struct hci_uart *hu)
->  	}
->  
->  	if (!(qca_is_wcn399x(soc_type) ||
-> -	     qca_is_wcn6750(soc_type))) {
-> +	     qca_is_wcn6750(soc_type) ||
-> +	     qca_is_wcn6855(soc_type))) {
->  		/* Get QCA version information */
->  		ret = qca_read_soc_version(hdev, &ver, soc_type);
->  		if (ret)
-> @@ -1883,6 +1888,20 @@ static const struct qca_device_data qca_soc_data_wcn6750 = {
->  	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
->  };
->  
-> +static const struct qca_device_data qca_soc_data_wcn6855 = {
-> +	.soc_type = QCA_WCN6855,
-> +	.vregs = (struct qca_vreg []) {
-> +		{ "vddio", 5000 },
-> +		{ "vddbtcxmx", 126000 },
-> +		{ "vddrfacmn", 12500 },
-> +		{ "vddrfa0p8", 102000 },
-> +		{ "vddrfa1p7", 302000 },
-> +		{ "vddrfa1p2", 257000 },
-> +	},
-> +	.num_vregs = 6,
-> +	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
-> +};
-> +
->  static void qca_power_shutdown(struct hci_uart *hu)
->  {
->  	struct qca_serdev *qcadev;
-> @@ -2047,7 +2066,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  
->  	if (data &&
->  	    (qca_is_wcn399x(data->soc_type) ||
-> -	    qca_is_wcn6750(data->soc_type))) {
-> +	    qca_is_wcn6750(data->soc_type) ||
-> +	    qca_is_wcn6855(data->soc_type))) {
->  		qcadev->btsoc_type = data->soc_type;
->  		qcadev->bt_power = devm_kzalloc(&serdev->dev,
->  						sizeof(struct qca_power),
-> @@ -2067,14 +2087,18 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  
->  		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
->  					       GPIOD_OUT_LOW);
-> -		if (IS_ERR_OR_NULL(qcadev->bt_en) && data->soc_type == QCA_WCN6750) {
-> +		if (IS_ERR_OR_NULL(qcadev->bt_en)
-> +		    && (data->soc_type == QCA_WCN6750 ||
-> +			data->soc_type == QCA_WCN6855)) {
->  			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
->  			power_ctrl_enabled = false;
->  		}
->  
->  		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
->  					       GPIOD_IN);
-> -		if (IS_ERR_OR_NULL(qcadev->sw_ctrl) && data->soc_type == QCA_WCN6750)
-> +		if (IS_ERR_OR_NULL(qcadev->sw_ctrl)
-> +		    && (data->soc_type == QCA_WCN6750 ||
-> +			data->soc_type == QCA_WCN6855))
->  			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
->  
->  		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
-> @@ -2150,7 +2174,8 @@ static void qca_serdev_remove(struct serdev_device *serdev)
->  	struct qca_power *power = qcadev->bt_power;
->  
->  	if ((qca_is_wcn399x(qcadev->btsoc_type) ||
-> -	     qca_is_wcn6750(qcadev->btsoc_type)) &&
-> +	     qca_is_wcn6750(qcadev->btsoc_type) ||
-> +	     qca_is_wcn6855(qcadev->btsoc_type)) &&
->  	     power->vregs_on)
->  		qca_power_shutdown(&qcadev->serdev_hu);
->  	else if (qcadev->susclk)
-> @@ -2335,6 +2360,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
->  	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
->  	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
->  	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
-> +	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
->  	{ /* sentinel */ }
->  };
->  MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+> 
+> base-commit: 4fafd96910add124586b549ad005dcd179de8a18
 > -- 
 > 2.39.1
 > 
