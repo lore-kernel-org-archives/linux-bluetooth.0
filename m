@@ -2,106 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9B11C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 19:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F696C05027
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 20:07:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233442AbjBJTxk (ORCPT
+        id S233252AbjBJUHa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Feb 2023 14:53:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36434 "EHLO
+        Fri, 10 Feb 2023 15:07:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232495AbjBJTxh (ORCPT
+        with ESMTP id S232938AbjBJUH3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Feb 2023 14:53:37 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFD03A90;
-        Fri, 10 Feb 2023 11:53:36 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id u27so7475499ljo.12;
-        Fri, 10 Feb 2023 11:53:36 -0800 (PST)
+        Fri, 10 Feb 2023 15:07:29 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3ABF74990
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Feb 2023 12:07:28 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id br9so10009013lfb.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Feb 2023 12:07:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=6vpHTSsq3RuT3ZTbVZIw1FmvwScMrvkNjzVV5l91taQ=;
-        b=RTYrGbtU3etE5hJdPLvvyJrgFyHgxb3oOWgcnCkfYu6txjHu0fKfpcxJwSY1njE7vq
-         IfO484zScE0QgNzcNYMRzUOL62TltnTBAhQs0+OrcEX8VFkJvW2JB7oMhdaaWbImMU1E
-         5z8HqOdL3iPc9sIZjeHdB4lK3lDaMYdDyxSS46DfQY+vohkAXHadyW74yh7IfOK6HQ2U
-         7BgP0jR7ZK4BzirqjoDZnx5tvmCsJWtUyCUgereqK17xZcIRG+e4SqKYX6gh+IBTMJq7
-         sl4x09Cvs32E36mc1GGc2JTlmNAxrWOerqYAK1DtystlFaJ9g+5Qwaj8C07MxrCtXGlB
-         ZXVA==
+        bh=Bt7Bpcpkf0OLnw3d3NWkNkvghIo3oJeJMA55iCEvmp4=;
+        b=U5wd1HIhdan6w+RJH40ycyZthodabXXipzdb5JexVCmpOgkkmi2zz5y/MXscIS0r2K
+         Z491jrhpPIK75bHQbMILxfDQlQxiot8qzPIB9gD+Fkw6BKE+9sXVrQLmJK9cyI27HWiD
+         IOgwb2Vo9Kk2/bEMqeYNC5brU28wzR1rWawx6Oj2O3HPS8TpG6s5KpbLQILJ8W4bWt9M
+         ATqlT5MSRBLFdv8P7BRzDAmT5ScDKSEI2wGMQ7UvVzd3ncINFaM6UqdcDbQF4jV+D/fR
+         LnAApw10eMjx8PaGeR2oDrVXgIDgKCFrWjJFCnwct0oOsYJNXj18M1H2GpKfNMqNYdgV
+         QX5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6vpHTSsq3RuT3ZTbVZIw1FmvwScMrvkNjzVV5l91taQ=;
-        b=VdZZwE23CS/uF90wjrbGAQYM1akysE5K5npiVmEVpXhVulMNhwKnbjiQKt3+mHoRiQ
-         EoDWs57SC72RvwCWE/YLuJsJvKMQHgvxkgAOi7Tj4F5a5JLhqyDSepN6cZwwWZp/Dwd7
-         pijV62aXFmfO/ChEUFQynwzijSnthRNk28/QTWdnFfFs0PBrjTdoEVvEAB1ojqUrArJ1
-         ApZvMOGVQ5lzhCby8of4aC3Phw16x7yK2q1zCIhmE1FhOOqz80fwBqdpQS0TJMHa2NFR
-         jeBu/p8c40rueRcNMJrD7+P/gxqJgH8Ub6pz+FWHVUCGlf5c95PX+YbwnqtahqlvzL4g
-         oEYg==
-X-Gm-Message-State: AO0yUKW4ye+NUI4h/Dzr0YuUzT5Gz2dUx7p/KvLU5Iz0twKtdu4bxLjb
-        j064Ug6F+2BxNiSr7XtT0wborR7g/DRka7iabuI=
-X-Google-Smtp-Source: AK7set9VxYinyOMzIxrzSekHnF65lzsk7aEnU8u6+pBnNfqPVN6bXPPXRIgcPLxBqkAhGhgebIawVIX3zk+f3YnIXU8=
-X-Received: by 2002:a2e:a0c7:0:b0:28b:795c:51f8 with SMTP id
- f7-20020a2ea0c7000000b0028b795c51f8mr2722196ljm.98.1676058814784; Fri, 10 Feb
- 2023 11:53:34 -0800 (PST)
+        bh=Bt7Bpcpkf0OLnw3d3NWkNkvghIo3oJeJMA55iCEvmp4=;
+        b=5/IuTjjrcQzFDxOslKdobMb5YoFv4aMd9RulA0ZCjxEM8t3VFqswiTPiBkgr3HMCGy
+         DCmu755MGC2Zxuj/bCztpjSI9Xks5eVqpjYeAmpDYOSuh7YAyH+00g9/ULrZP/+IcErJ
+         FW2bS/BKQchEYzMzNFHiEo8Yrz9BIz6jCyLDzwWlJSD8kqibX+7llncPjdmtYhBxi9Ng
+         xwNJk6fBcTIF5aC7rgcPvV5VwSSbjHRLZ7fkWWsF1/vVFJ0wBFA1xpyh4yBMPppWstPq
+         3ZKRcsEBtd3ECLHjz4HvdKffdumADOgtvgwq61mxzIbHCUl21ouXIspVasf9zb4H6/Kb
+         OgIg==
+X-Gm-Message-State: AO0yUKUTRWVXAjS6Vn3hW5tmo4hnvn5Nwm/ha1c7JNIrQXA6HeX9rtUJ
+        nE9GA4K/ySov8Kww9NoHXnVR99J8Xc9hl8PxhtuIqBxOWlw=
+X-Google-Smtp-Source: AK7set8aJMg6aKE5+1THtDYEEz7ySWeZJewRkohTB9XEl5B8N/l5iovUaVV1F2mvwkrtugY+wFaJ+uZaoAz5h16OtlQ=
+X-Received: by 2002:a19:c51a:0:b0:4cc:84da:1ef6 with SMTP id
+ w26-20020a19c51a000000b004cc84da1ef6mr2474132lfe.262.1676059647085; Fri, 10
+ Feb 2023 12:07:27 -0800 (PST)
 MIME-Version: 1.0
-References: <20230210041030.865478-1-zyytlz.wz@163.com>
-In-Reply-To: <20230210041030.865478-1-zyytlz.wz@163.com>
+References: <a8aedc0f9a4c1e21d61694589c5b7a9f31cbedc1.1675103676.git.pav@iki.fi>
+ <CABBYNZLWt6y7beYF8-62G018LY+8yHSOhQAdvVKFbWn1YDzKQQ@mail.gmail.com>
+In-Reply-To: <CABBYNZLWt6y7beYF8-62G018LY+8yHSOhQAdvVKFbWn1YDzKQQ@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 10 Feb 2023 11:53:23 -0800
-Message-ID: <CABBYNZL_gZ+kr_OEqjYgMmt+=91=jC88g310F-ScMC=kLh0xdw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_core: Fix poential Use-after-Free bug in hci_remove_adv_monitor
-To:     Zheng Wang <zyytlz.wz@163.com>
-Cc:     marcel@holtmann.org, hackerzheng666@gmail.com,
-        alex000young@gmail.com, johan.hedberg@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Fri, 10 Feb 2023 12:07:15 -0800
+Message-ID: <CABBYNZL3mhOkiNgxG50ZgWNwKHVMXdKVkDgDBsXvviu+Ds3h3Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/8] doc: add MGMT setting for CIS features, remove
+ Quality Report
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zheng,
+Hi Pauli,
 
-On Thu, Feb 9, 2023 at 8:11 PM Zheng Wang <zyytlz.wz@163.com> wrote:
+On Mon, Feb 6, 2023 at 5:08 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> In hci_remove_adv_monitor, if it gets into HCI_ADV_MONITOR_EXT_MSFT case,
-> the function will free the monitor and print its handle after that.
+> Hi Pauli,
 >
-> Fix it by switch the order.
+> On Mon, Jan 30, 2023 at 10:43 AM Pauli Virtanen <pav@iki.fi> wrote:
+> >
+> > Add definitions for new MGMT Controller Information settings bits,
+> > indicating adapter Connected Isochronous Stream - Central/Peripheral
+> > feature support.
+> >
+> > The Set Quality Report command was removed in
+> > commit 0454e2d09570 ("mgmt: Add support for Mesh in the kernel"),
+> > but the settings bit was not removed. It's also not implemented on
+> > kernel side, so remove it now.
 >
-> Fixes: 7cf5c2978f23 ("Bluetooth: hci_sync: Refactor remove Adv Monitor")
-> Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
-> ---
->  net/bluetooth/hci_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b65c3aabcd53..db3352c60de6 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1980,9 +1980,9 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
->                 goto free_monitor;
->
->         case HCI_ADV_MONITOR_EXT_MSFT:
-> -               status = msft_remove_monitor(hdev, monitor);
->                 bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
->                            hdev->name, monitor->handle, status);
-> +               status = msft_remove_monitor(hdev, monitor);
+> Let's split this into 2 patches, one removing Quality Report, since it
+> was never implemented, and then another including the new flags.
 
-I wonder if it is not a good idea to move the logging inside
-msft_remove_monitor?
+Are you still planning on updating this set?
 
->                 break;
->         }
+> > ---
+> >
+> > Notes:
+> >     Was the quality report setting bit reserved on purpose?
+> >
+> >     From the commit log it looks like it was forgotten to remove from the
+> >     docs, but this is not clear.
+> >
+> >  doc/mgmt-api.txt | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index 90d612ed8..58395dc90 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -332,7 +332,8 @@ Read Controller Information Command
+> >                 15      Static Address
+> >                 16      PHY Configuration
+> >                 17      Wideband Speech
+> > -               18      Quality Report
+> > +               18      Connected Isochronous Stream - Central
+> > +               19      Connected Isochronous Stream - Peripheral
+> >
+> >         This command generates a Command Complete event on success or
+> >         a Command Status event on failure.
+> > @@ -2925,7 +2926,8 @@ Read Extended Controller Information Command
+> >                 15      Static Address
+> >                 16      PHY Configuration
+> >                 17      Wideband Speech
+> > -               18      Quality Report
+> > +               18      Connected Isochronous Stream - Central
+> > +               19      Connected Isochronous Stream - Peripheral
+> >
+> >         The EIR_Data field contains information about class of device,
+> >         local name and other values. Not all of them might be present. For
+> > --
+> > 2.39.1
+> >
+>
 >
 > --
-> 2.25.1
->
+> Luiz Augusto von Dentz
+
 
 
 -- 
