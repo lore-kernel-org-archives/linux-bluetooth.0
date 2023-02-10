@@ -2,128 +2,154 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A808C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Feb 2023 23:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDD7C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 00:43:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229766AbjBIXt0 (ORCPT
+        id S230106AbjBJAnA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Feb 2023 18:49:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60870 "EHLO
+        Thu, 9 Feb 2023 19:43:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229483AbjBIXtZ (ORCPT
+        with ESMTP id S229674AbjBJAm7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Feb 2023 18:49:25 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9323B392BC;
-        Thu,  9 Feb 2023 15:49:24 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id u9so4713383plr.9;
-        Thu, 09 Feb 2023 15:49:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OTry8m2lgEYJMqD8o2IL6haCJmivlF+7KsiMT4rNYK8=;
-        b=C5wXWaxBRNgT7M58w4SUH4jYhUucKLPjJEGq3ex+5TmZ+D6c4pQC1xpm6xkdbgHC/k
-         BoAzzSZqG03Z8hHX6i08DYA34uHcLLBJ3DXJdJDzYAE+2KkiU0vNhw98hRSjrrjr5fnh
-         IyK0Q9ZWQ2RJpezLuFtn6iduWdaRnTk3kCIDHrR+86S0jkWvvlefccJ59eNz8PoParMl
-         QGG3AGGLyC+ir+Dw/eDcUsoCwtcHAfwfBEvqxcQY4T+HqkB5TmmNuhuDw2m27pdN88Do
-         9UnlVrVfQ8zhWPiZuVN4WK9hRpJ0uyFGbinPI8AmhmgEyydnenMh0o0Ld5TjOShAf5Sl
-         jsIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OTry8m2lgEYJMqD8o2IL6haCJmivlF+7KsiMT4rNYK8=;
-        b=VE2gbH1iUZuCgbqLFqd90K2m6Qcz2KdAe/Ev8XS/UOs+fmO91aJoyMK+TKTk7YGlxq
-         Dkl411WxLcGPbNSYArPCYJh307EKtKe+Vj4WbdxcdglJcMLzbwAvExpd2T6arQPyxeqX
-         Orhvq41ch7/+lLD88LMC5Wcaj8Hv/1mESTT7ydvTRYrhJEahR9J9LtB+IRvptpCgMLnQ
-         7l3+3s9IlS8J0jlz7wc6jvGqxgeGQs0WPAGer+R7+3p0wFY6uyMDdkNZEI4u0vci6wDw
-         4/1aBEOJbkZ6lTYxkkqEBl7JeDDqOlznctBgqAkIkwhD6VdXDP+RfmdA023N9MOlfvmm
-         PFDQ==
-X-Gm-Message-State: AO0yUKXq3eTLowyE13VYk9xfCNOsu+p9/2Wx8/TJ/+LhbfxxuOBqAZ2C
-        yGSNKCG2kO4Oc3lGBehf6j+8uAADjV4eiA==
-X-Google-Smtp-Source: AK7set8S2RvgOIXOtxna+yzcD4OAOGO4liQ4FrUxyfl/F5WDxPSMK11CkD7Nu9W3az2otclrxcKmJw==
-X-Received: by 2002:a17:903:110e:b0:19a:7217:32a9 with SMTP id n14-20020a170903110e00b0019a721732a9mr172252plh.26.1675986563905;
-        Thu, 09 Feb 2023 15:49:23 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id jk23-20020a170903331700b001926392adf9sm2057507plb.271.2023.02.09.15.49.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Feb 2023 15:49:23 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2023-02-09
-Date:   Thu,  9 Feb 2023 15:49:22 -0800
-Message-Id: <20230209234922.3756173-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        Thu, 9 Feb 2023 19:42:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CE01714;
+        Thu,  9 Feb 2023 16:42:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 325B661C3F;
+        Fri, 10 Feb 2023 00:42:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EFAFC433D2;
+        Fri, 10 Feb 2023 00:42:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675989777;
+        bh=DrfroG57bw7I/Hug/gFPWI+CVSjf/sAQ4JTQKG9YKdk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FxAt3XYXezGq3GrfQSXOup2s6vNnERStSQDTnfQZyX4on/gXFNhFER5/5HrNFwMML
+         Rfc6VgRaVFBE+amuE8DG0QaNIv/dcRfvu8l5Jrd1pV6Zz5wSoLXcLWARbZAbdoTFu+
+         3pdZn7Io6lKK4WmwoFP2m6rs0MhEhwN2Ipy49jO8G+u3NUV1yN3gOHlncZThFr82ZL
+         oIDC978IoCKLGDahrAxTF85NCREfWYYVSh8jX0OIF+bPQhuAk/B0BajtFyTCTwX6Q+
+         +H9HxL9nR6VHjYNcVSc1Y/+x1sGRShZrjGTtmQyQyiTGqQnOWe0npksVs+Dfp5PScM
+         wEUai/C8opP7A==
+Date:   Fri, 10 Feb 2023 02:42:55 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        Tyler Hicks <code@tyhicks.com>, ecryptfs@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Jon Maloy <jmaloy@redhat.com>,
+        Ying Xue <ying.xue@windriver.com>,
+        Boris Pismenny <borisp@nvidia.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
+Subject: Re: [PATCH 3/17] fs: ecryptfs: Use crypto_wait_req
+Message-ID: <Y+WTD3TrxaJOPdRg@kernel.org>
+References: <Y+DUkqe1sagWaErA@gondor.apana.org.au>
+ <E1pOydd-007zgo-4c@formenos.hmeau.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1pOydd-007zgo-4c@formenos.hmeau.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 8697a258ae24703267d2a37d91ab757c91ef027e:
+On Mon, Feb 06, 2023 at 06:22:17PM +0800, Herbert Xu wrote:
+> This patch replaces the custom crypto completion function with
+> crypto_req_done.
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-02-09 12:25:40 -0800)
+nit: "Replace the custom crypto ..."
 
-are available in the Git repository at:
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+> 
+>  fs/ecryptfs/crypto.c |   30 +++---------------------------
+>  1 file changed, 3 insertions(+), 27 deletions(-)
+> 
+> diff --git a/fs/ecryptfs/crypto.c b/fs/ecryptfs/crypto.c
+> index e3f5d7f3c8a0..c3057539f088 100644
+> --- a/fs/ecryptfs/crypto.c
+> +++ b/fs/ecryptfs/crypto.c
+> @@ -260,22 +260,6 @@ int virt_to_scatterlist(const void *addr, int size, struct scatterlist *sg,
+>  	return i;
+>  }
+>  
+> -struct extent_crypt_result {
+> -	struct completion completion;
+> -	int rc;
+> -};
+> -
+> -static void extent_crypt_complete(struct crypto_async_request *req, int rc)
+> -{
+> -	struct extent_crypt_result *ecr = req->data;
+> -
+> -	if (rc == -EINPROGRESS)
+> -		return;
+> -
+> -	ecr->rc = rc;
+> -	complete(&ecr->completion);
+> -}
+> -
+>  /**
+>   * crypt_scatterlist
+>   * @crypt_stat: Pointer to the crypt_stat struct to initialize.
+> @@ -293,7 +277,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
+>  			     unsigned char *iv, int op)
+>  {
+>  	struct skcipher_request *req = NULL;
+> -	struct extent_crypt_result ecr;
+> +	DECLARE_CRYPTO_WAIT(ecr);
+>  	int rc = 0;
+>  
+>  	if (unlikely(ecryptfs_verbosity > 0)) {
+> @@ -303,8 +287,6 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
+>  				  crypt_stat->key_size);
+>  	}
+>  
+> -	init_completion(&ecr.completion);
+> -
+>  	mutex_lock(&crypt_stat->cs_tfm_mutex);
+>  	req = skcipher_request_alloc(crypt_stat->tfm, GFP_NOFS);
+>  	if (!req) {
+> @@ -315,7 +297,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
+>  
+>  	skcipher_request_set_callback(req,
+>  			CRYPTO_TFM_REQ_MAY_BACKLOG | CRYPTO_TFM_REQ_MAY_SLEEP,
+> -			extent_crypt_complete, &ecr);
+> +			crypto_req_done, &ecr);
+>  	/* Consider doing this once, when the file is opened */
+>  	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET)) {
+>  		rc = crypto_skcipher_setkey(crypt_stat->tfm, crypt_stat->key,
+> @@ -334,13 +316,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
+>  	skcipher_request_set_crypt(req, src_sg, dst_sg, size, iv);
+>  	rc = op == ENCRYPT ? crypto_skcipher_encrypt(req) :
+>  			     crypto_skcipher_decrypt(req);
+> -	if (rc == -EINPROGRESS || rc == -EBUSY) {
+> -		struct extent_crypt_result *ecr = req->base.data;
+> -
+> -		wait_for_completion(&ecr->completion);
+> -		rc = ecr->rc;
+> -		reinit_completion(&ecr->completion);
+> -	}
+> +	rc = crypto_wait_req(rc, &ecr);
+>  out:
+>  	skcipher_request_free(req);
+>  	return rc;
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-02-09
 
-for you to fetch changes up to c585a92b2f9c624b0b62b2af1eb0ea6d11cb5cac:
+Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-  Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG) (2023-02-09 14:20:04 -0800)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add new PID/VID 0489:e0f2 for MT7921
- - Add VID:PID 13d3:3529 for Realtek RTL8821CE
- - Add CIS feature bits to controller information
- - Set Per Platform Antenna Gain(PPAG) for Intel controllers
-
-----------------------------------------------------------------
-Archie Pusaka (2):
-      Bluetooth: Free potentially unfreed SCO connection
-      Bluetooth: Make sure LE create conn cancel is sent when timeout
-
-Gustavo A. R. Silva (1):
-      Bluetooth: HCI: Replace zero-length arrays with flexible-array members
-
-Kees Cook (1):
-      Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: qca: Fix sparse warnings
-      Bluetooth: L2CAP: Fix potential user-after-free
-
-Marcel Holtmann (1):
-      Bluetooth: Fix issue with Actions Semi ATS2851 based devices
-
-Mario Limonciello (1):
-      Bluetooth: btusb: Add new PID/VID 0489:e0f2 for MT7921
-
-Moises Cardona (1):
-      Bluetooth: btusb: Add VID:PID 13d3:3529 for Realtek RTL8821CE
-
-Pauli Virtanen (1):
-      Bluetooth: MGMT: add CIS feature bits to controller information
-
-Seema Sreemantha (1):
-      Bluetooth: btintel: Set Per Platform Antenna Gain(PPAG)
-
-Zhengping Jiang (1):
-      Bluetooth: hci_qca: get wakeup status from serdev device handle
-
- drivers/bluetooth/btintel.c  | 116 +++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h  |  13 +++++
- drivers/bluetooth/btusb.c    |  16 ++++++
- drivers/bluetooth/hci_qca.c  |  11 ++--
- include/net/bluetooth/hci.h  |   4 +-
- include/net/bluetooth/mgmt.h |   2 +
- net/bluetooth/hci_conn.c     |  23 +++++----
- net/bluetooth/l2cap_core.c   |  24 ---------
- net/bluetooth/l2cap_sock.c   |   8 +++
- net/bluetooth/mgmt.c         |  12 +++++
- 10 files changed, 188 insertions(+), 41 deletions(-)
+BR, Jarkko
