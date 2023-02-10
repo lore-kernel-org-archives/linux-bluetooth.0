@@ -2,41 +2,62 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E19C636D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 19:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B250AC636D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Feb 2023 19:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233212AbjBJTFB (ORCPT
+        id S233120AbjBJTbV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Feb 2023 14:05:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
+        Fri, 10 Feb 2023 14:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232530AbjBJTFA (ORCPT
+        with ESMTP id S233147AbjBJTbD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Feb 2023 14:05:00 -0500
-Received: from smtp-out-07.comm2000.it (smtp-out-07.comm2000.it [212.97.32.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B83D7D885;
-        Fri, 10 Feb 2023 11:04:39 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-07.comm2000.it (Postfix) with ESMTPSA id E6A623C90D9;
-        Fri, 10 Feb 2023 20:04:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1676055877;
-        bh=1MDK5XVzuRboLUULPNbkMtdO3ShFDxOiAcQb2GE0aO0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=r0+Q0enEMtciMFlKwAsHSJz0C9ASbEnj2iQ1jNT0w5pHY4nAFIFzaarQsbj2PZo8j
-         3lMbt4Dyh0NQBDmm3tDZbsfO5CJZoM0iF21ZIDw7Og8MIp5v+ZmYvexrzH/AuNTUPa
-         krHbMjF7Dcc3EVupy+3ewC8ntMZjG6S5zg+parP3OiHKfN6liYCFGZCjNhcgWJJBCy
-         jp5nD0d8f0VnCAsUXeP+KlT/R9PPtvwnnZBE+npJv4I9Lq+9gS8m8WTcwpp66ruMII
-         S6NWm/7Wi3LHcGfnsqv4Ljj4RzYnGFTBLEl3VUAXyOAunFMuLoCKYuEomtL5SHW/jg
-         yWzK6R2p2ZtNQ==
-Date:   Fri, 10 Feb 2023 20:04:35 +0100
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Francesco Dolcini <francesco@dolcini.it>,
-        linux-bluetooth@vger.kernel.org,
+        Fri, 10 Feb 2023 14:31:03 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F5363109;
+        Fri, 10 Feb 2023 11:31:02 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id w11so9820900lfu.11;
+        Fri, 10 Feb 2023 11:31:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5C6jWSG7hq9AtkVnw1BXnvg3J5xq2JBvsoPY4R7oHXU=;
+        b=gMD70Aegzbk2FJrljWXL8n4WR1uQDyrvje9tkioETRW4JCRv90x2oO94HOHIvu2Z06
+         o0MxG2ilUecybWXHL+d+Xmdmxyv0+QD9yQhz1v5xPMHA85aAlTx6+tfw068ixvNHRSoX
+         qOca5+cXa9PT1aSDbwEPLvzjt66wedkDcpBuRfdHAnkCGxmUAOWGqPdf5AdjaiSsOeO8
+         dTcPkkAMCjvcfkJoeGBkXHoIer2FQcsX8bMFHhHRRImaEAczYswqnA6QKDYom8ymjhjB
+         aIMZQn3gJ4fRvnYMxTKydVhHZC0yeQ3NJEauTuVmMnb+DfkAR/3avFCOIfQ9qWbWhHmR
+         IhIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5C6jWSG7hq9AtkVnw1BXnvg3J5xq2JBvsoPY4R7oHXU=;
+        b=SJL/E5LXBL5zm1Ze0ULeU5acgUQDuFrZsvW8zehci/ho0Bk5NWe2F3uTu8xcTLmUAj
+         pC0Y5k/pSPgrGLbvvqQ9tTzqoxTX7Sd7UfuJjbhv7ee0NIBeThjM2Fvw99JO1pKV9xu4
+         IP7q6SIptK90pqgWFghXzMcmo0bwuC7jZqTIh9bkkpPuMzwp9la2wiQ1tWpNdXxqkYPh
+         O/IO0R5tehjLs1CpAZR+oqAuDnkZ+7BtQeytogTBkNFh706ZabXoJ9gLR2Cz9qwtHRys
+         Yj7BC2fym/rXTozN1G+mUiS+ZAATC/S2lbtUG2l2ZGD+Jt7wxjvfti8QLFDJcTDltwws
+         z8VQ==
+X-Gm-Message-State: AO0yUKUlg6dryrgg9al4MLU4CfjqoLm2fcQpVog+ifpckQtTO9zM+azC
+        ckfCE6IEeHc2Bm8mtbhBUKtO+CcQTOukLudfsYA=
+X-Google-Smtp-Source: AK7set/RRDSxCD8sl/9EyIJIc1+A4typ3xxXNp0BZ0jWrR//ggp3m+w5watXBqKJ/AgEOq7rY/x0crMIEI2RldJOeXA=
+X-Received: by 2002:ac2:54af:0:b0:4bb:35c9:dfb5 with SMTP id
+ w15-20020ac254af000000b004bb35c9dfb5mr2670374lfk.13.1676057460316; Fri, 10
+ Feb 2023 11:31:00 -0800 (PST)
+MIME-Version: 1.0
+References: <20230126074356.431306-1-francesco@dolcini.it> <Y+YC3Pka42SmtyvI@francesco-nb.int.toradex.com>
+ <CABBYNZLNFFUeZ1cb9xABhaymWnSiZjazwVT9N12qHyc7e0L6QQ@mail.gmail.com> <Y+aVQ38sJvuUd4HM@francesco-nb.int.toradex.com>
+In-Reply-To: <Y+aVQ38sJvuUd4HM@francesco-nb.int.toradex.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 10 Feb 2023 11:30:48 -0800
+Message-ID: <CABBYNZL7aD51jW=UxvcMBvfxbgFZ17H5nhfQ174JJNWDSdWe2A@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+To:     Francesco Dolcini <francesco@dolcini.it>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         netdev@vger.kernel.org, devicetree@vger.kernel.org,
@@ -52,50 +73,52 @@ Cc:     Francesco Dolcini <francesco@dolcini.it>,
         Shawn Guo <shawnguo@kernel.org>,
         Pengutronix Kernel Team <kernel@pengutronix.de>,
         Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH v2 0/5] Bluetooth: hci_mrvl: Add serdev support for
- 88W8997
-Message-ID: <Y+aVQ38sJvuUd4HM@francesco-nb.int.toradex.com>
-References: <20230126074356.431306-1-francesco@dolcini.it>
- <Y+YC3Pka42SmtyvI@francesco-nb.int.toradex.com>
- <CABBYNZLNFFUeZ1cb9xABhaymWnSiZjazwVT9N12qHyc7e0L6QQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZLNFFUeZ1cb9xABhaymWnSiZjazwVT9N12qHyc7e0L6QQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Feb 10, 2023 at 10:52:43AM -0800, Luiz Augusto von Dentz wrote:
-> Hi Francesco,
-> 
-> On Fri, Feb 10, 2023 at 12:40 AM Francesco Dolcini <francesco@dolcini.it> wrote:
+Hi Francesco,
+
+On Fri, Feb 10, 2023 at 11:04 AM Francesco Dolcini <francesco@dolcini.it> wrote:
+>
+> On Fri, Feb 10, 2023 at 10:52:43AM -0800, Luiz Augusto von Dentz wrote:
+> > Hi Francesco,
 > >
-> > Hello all,
-> >
-> > On Thu, Jan 26, 2023 at 08:43:51AM +0100, Francesco Dolcini wrote:
-> > > From: Francesco Dolcini <francesco.dolcini@toradex.com>
+> > On Fri, Feb 10, 2023 at 12:40 AM Francesco Dolcini <francesco@dolcini.it> wrote:
 > > >
-> > > Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
-> > > support for changing the baud rate. The command to change the baud rate is
-> > > taken from the user manual UM11483 Rev. 9 in section 7 (Bring-up of Bluetooth
-> > > interfaces) from NXP.
+> > > Hello all,
+> > >
+> > > On Thu, Jan 26, 2023 at 08:43:51AM +0100, Francesco Dolcini wrote:
+> > > > From: Francesco Dolcini <francesco.dolcini@toradex.com>
+> > > >
+> > > > Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
+> > > > support for changing the baud rate. The command to change the baud rate is
+> > > > taken from the user manual UM11483 Rev. 9 in section 7 (Bring-up of Bluetooth
+> > > > interfaces) from NXP.
+> > >
+> > > Just a gently ping on this series, patches 1,2 with DT binding changes
+> > > are reviewed/acked, patch 5 with the DTS change should just be on hold
+> > > till patches 1-4 are merged.
+> > >
+> > > No feedback on patches 4 (and 3), with the BT serdev driver code
+> > > changes, any plan on those?
 > >
-> > Just a gently ping on this series, patches 1,2 with DT binding changes
-> > are reviewed/acked, patch 5 with the DTS change should just be on hold
-> > till patches 1-4 are merged.
-> >
-> > No feedback on patches 4 (and 3), with the BT serdev driver code
-> > changes, any plan on those?
-> 
-> bots have detected errors on these changes
+> > bots have detected errors on these changes
+>
+> From what I can understand from this point of view v2 is fine, the error
+> was in v1, if I'm wrong just let me know.
+>
+> Said that I'll do the change you asked regarding __hci_cmd_sync_status
+> and send a v3.
 
-From what I can understand from this point of view v2 is fine, the error
-was in v1, if I'm wrong just let me know.
+Great, for some reason your set is not being tested by our CI though,
+@Tedd Ho-Jeong An do you know why?
 
-Said that I'll do the change you asked regarding __hci_cmd_sync_status
-and send a v3.
+> Thanks,
+> Francesco
+>
 
-Thanks,
-Francesco
 
+-- 
+Luiz Augusto von Dentz
