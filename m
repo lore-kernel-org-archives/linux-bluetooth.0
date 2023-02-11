@@ -2,109 +2,164 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1ABCC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Feb 2023 11:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DCCC636CC
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Feb 2023 11:48:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbjBKL1c (ORCPT
+        id S229916AbjBKLsY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Feb 2023 06:27:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46846 "EHLO
+        Sat, 11 Feb 2023 06:48:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjBKL1b (ORCPT
+        with ESMTP id S229532AbjBKLsX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Feb 2023 06:27:31 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B59E1E1C4
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 03:27:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CC45960BFB
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 11:27:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 340FBC433D2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 11:27:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676114849;
-        bh=hQJyJTIn5tE5oN+dJsvF8DeIVzoi0ayAyKghGINfXjs=;
-        h=From:To:Subject:Date:From;
-        b=vNJeKEVav7oxAADXbMgtHbr+1ff5ua7fEjUxZY73lHtbHu0k29OYlWNrwvORI3Ty5
-         +oNvFJDnA8bfEuKumI2IBM7zqAiyxZ+iFy67V/3k7V1rvzL7F1sQLKFWQntHofVzy3
-         vh0ln/JznaVqBbLYSXBqYgcdF+hMEQHK/l2c8tpgV8g/CxxZv0e3mPSTTJ6dLyhOKV
-         S8nnZ4P87ue4nPKLT59no8Tpg6gIjY5PRGz+OnbkKS5lhL+v3L7yKIi11b3H/o+sqI
-         tyVBgLO3CUAKMeuH45x/3Pj0e3M1fqH5Nj0a/H+LbUuphBWNDZTUTS7So/dcVk+Oka
-         pr1ABe2zK8hLg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 15F47C43142; Sat, 11 Feb 2023 11:27:29 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217023] New: [Intel AX200] hci0: Malformed MSFT vendor event:
- 0x02
-Date:   Sat, 11 Feb 2023 11:27:28 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ddmirarda@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-217023-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Sat, 11 Feb 2023 06:48:23 -0500
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF71D12F27
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 03:48:21 -0800 (PST)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-4a263c4ddbaso103588567b3.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 03:48:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RplhYttQn543lg35l6s/uN2FX8iALrjEvhaFw3RQVtM=;
+        b=WpGtLMe4MogDNXhsq+qShAO47lmK5vtijRivL/pCcjt/abDBtSZStDdsaEqCSBmI44
+         UuwDyFt6uNHCN3e6YrnU26t+6LV/TwrrZAyYeSwLXkKPssqU+vKFkKZJrByvn/y/a+v1
+         hsd3Jo580aaaGI7pGKNlbPTqJnOkXLFU1THN8fNOSzU9SNjHx1dYR8p4adJcc0iVbh4S
+         Ab+2s/wVdZn93MLkaW8s+ovVY+b4feyzr/hMf5dwTi47Yh7TdV8niqw6kePGh61+ay1a
+         sZtctoKBT0/W0MiRNhglBmPGlMRj/B4DUcnf3E9HmZLLirW1zwLEGVuQx/iLFnAJMC/V
+         j7KQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RplhYttQn543lg35l6s/uN2FX8iALrjEvhaFw3RQVtM=;
+        b=fE37aQyNkJAsiaA9U478Z/WsMthR29CyOv73OUsCJiK+/39ufQqr3VzBnUdYz7IO7H
+         oHJ9o3/Cb9jP5KMhAT/Zq7Z2IBYVHny2UKeyTyaW9Tbt5XvTcRucJ/j65tnHrbDREwfU
+         GWxeuzpHk0W/uW+gshJ98JaHDQkTt+QNvHX83vX2CQGIUMtrdc2MXBgI2NkLDd8SSPxt
+         e/By26GRF9PNIa7LMIvjad/DozQ06PFrEj7ghBYzbIpz0yeDVYWRDgAGWGQryJlNtT1w
+         9mcvSo0s7cNxzdzUyKurjcXKuPFwaASsBO+BVbBvVs94GeJHKb53J4Y3AKEe5WZ7giN4
+         zRDA==
+X-Gm-Message-State: AO0yUKXT2bdK1AhSdnXlZXZsNorBISZuSDGMeSkEClPDB6x3tV/R8XhQ
+        wa7aGmfhXy817PIyuWcYBk5QpwBWnnRf/R/AdedzmtNJnw==
+X-Google-Smtp-Source: AK7set+WK+2uP0mRVEUBpAIrmkOGLcSNq4vlOBPVF3ubEhz9RU9pW/YtjA696nB1C0F7jHxFnLMQtqYga6ORZ1HjoYM=
+X-Received: by 2002:a0d:f603:0:b0:517:b161:1f4d with SMTP id
+ g3-20020a0df603000000b00517b1611f4dmr1761371ywf.399.1676116101012; Sat, 11
+ Feb 2023 03:48:21 -0800 (PST)
 MIME-Version: 1.0
+References: <CALDHRCt5KUezfEZCOWK+zYPM1hP32qwZqcoKw09ZjNw=oQoWKg@mail.gmail.com>
+ <ecc41929af982862720209eacfa935178a8e0a1b.camel@sipsolutions.net>
+ <CALDHRCuuZdqVorNzF+DFU8kAUU4eiuCHJgtV3Gtbvwr9mVow9Q@mail.gmail.com> <CABBYNZ+iz-NihAPaDCSW2TLodoH3ThDWhZdTPvQtbyx_jnMyhg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+iz-NihAPaDCSW2TLodoH3ThDWhZdTPvQtbyx_jnMyhg@mail.gmail.com>
+From:   Arda Demir <ddmirarda@gmail.com>
+Date:   Sat, 11 Feb 2023 14:48:08 +0300
+Message-ID: <CALDHRCt4cpbpCLyd4g+2+Lh2H8WikJMXUBv6GfEcjz6Vi12yig@mail.gmail.com>
+Subject: Re: hci0: Malformed MSFT vendor event: 0x02
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     pmenzel@molgen.mpg.de, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
+On Wed, 2023-02-08 at 12:21 +0300, Arda Demir wrote:
+> Hello,
+>
+> First of all, my bluetooth adapter is;
+> 04:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
+>
+> I see the following message everytime when i boot the pc on tty.
+>
+> "Bluetooth: hci0: Malformed MSFT vendor event: 0x02"
+>
+> But bluetooth works well. If it is not critical it shouldn't print on
+> tty, right?
 
-            Bug ID: 217023
-           Summary: [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 6.1.10_1
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: ddmirarda@gmail.com
-        Regression: No
+On Wed, Feb 8, 2023 at 12:29 PM Johannes Berg <johannes@sipsolutions.net> wrote:
+>
+> On Wed, 2023-02-08 at 12:21 +0300, Arda Demir wrote:
+> > Hello,
+> >
+> > First of all, my bluetooth adapter is;
+> > 04:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
+>
+> You've reached the Wi-Fi team here though - adding the BT list.
+>
+> > I see the following message everytime when i boot the pc on tty.
+> >
+> > "Bluetooth: hci0: Malformed MSFT vendor event: 0x02"
+> >
+> > But bluetooth works well. If it is not critical it shouldn't print on
+> > tty, right?
+>
+> That's generic from net/bluetooth/hci_event.c, not related to the device
+> (apart from the fact that the device might be broken if it's sending
+> this?)
+>
+> johannes
+>
 
-Created attachment 303714
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303714&action=3Dedit
-dmesg
+On Wed, Feb 8, 2023 at 2:00 AM Arda Demir <ddmirarda@gmail.com> wrote:
+>
+> I don't think the device is broken since bluetooth + wi-fi is fully
+> functional and i also read on arch linux forum people get the same
+> message on tty with the same hardware. (AX200)
+>
+> https://bbs.archlinux.org/viewtopic.php?id=276815
 
-Hello,
+On Wed, Feb 8, 2023 at 1:17 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> The message seems to originate from `net/bluetooth/msft.c`:
+>
+> ...
+>
+> ```
+> static void *msft_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
+>                             u8 ev, size_t len)
+> {
+>          void *data;
+>
+>          data = skb_pull_data(skb, len);
+>          if (!data)
+>                  bt_dev_err(hdev, "Malformed MSFT vendor event: 0x%02x",
+> ev);
+>
+>          return data;
+> }
+> ```
+>
+> I recommend to create a bug report at the Linux kernel Bugzilla [1],
+> where you attach the output of `dmesg`.
+>
+> Additionally, I suggest to not load the Bluetooth modules like btusb
+> during startup, and only later load it with `btmon` running.
+>
+> Please reply with the bug report number/URL, if you created the bug report.
+>
+>
+> Kind regards,
+>
+> Paul
+>
+>
+> [1]: https://bugzilla.kernel.org/
 
-First of all, my bluetooth adapter is;
-04:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
+On Thu, Feb 9, 2023 at 2:43 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Arda,
+>
+> On Wed, Feb 8, 2023 at 2:00 AM Arda Demir <ddmirarda@gmail.com> wrote:
+> > I don't think the device is broken since bluetooth + wi-fi is fully
+> > functional and i also read on arch linux forum people get the same
+> > message on tty with the same hardware. (AX200)
+> >
+> > https://bbs.archlinux.org/viewtopic.php?id=276815
+>
+> I suspect it is some vendor event other than MSFT that we are trying
+> to parse as MSFT, this normally can be ignored silently when not
+> understood, but I will check internally what we can do about it.
 
-I see the following message everytime on tty when i boot the pc.
-
-"Bluetooth: hci0: Malformed MSFT vendor event: 0x02"
-
-But bluetooth + wi-fi is fully functional. And it seems to be a common issue
-with users who have the same hardware (Intel AX200).
-
-https://bbs.archlinux.org/viewtopic.php?id=3D276815
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+I've created a bug report about this:
+https://bugzilla.kernel.org/show_bug.cgi?id=217023
