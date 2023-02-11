@@ -2,79 +2,70 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD8FC05027
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Feb 2023 03:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4EAC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Feb 2023 10:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbjBKDKZ (ORCPT
+        id S229972AbjBKK5L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Feb 2023 22:10:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57058 "EHLO
+        Sat, 11 Feb 2023 05:57:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjBKDKX (ORCPT
+        with ESMTP id S229498AbjBKK5J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Feb 2023 22:10:23 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A47348A25;
-        Fri, 10 Feb 2023 19:10:21 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3354CB82683;
-        Sat, 11 Feb 2023 03:10:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DCFA6C4339C;
-        Sat, 11 Feb 2023 03:10:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676085018;
-        bh=cBejn06qRQOtVQcUYiftkCpqHPejhJ6akSojdxItpsY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jSwS4nFWk3/KDTYe9vKdxHcm5rJ8gk5mBx/DnWK3u0rBEMtVSPr17oXoKwk3ww31B
-         USzlE+DNVQqHCRvXEZRg4trWEDjfBcUse2sw3RBEg5Lfm2rroQxZKHBcmSfbJiNeNV
-         ux34OvM+nLBnOmXh/Xshuu3n3KhLEd9sxcgHtPHs7tl/4DrXyNM5YQZYWBxJSu+kvQ
-         6YJnMKxAn+4Mpmu25LpTzqmt3NtPNGXtEzuRM3fjp67e9lF+5Gdlfnx847DfCqqGco
-         icvwr1f1kqTPmS/lP4qWfLH/qcDZ1CKKmt591NW9A1OqMoTeZ2WIMGEezB2CsVfreo
-         AvXoSUx90hbxA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C27F0E21EC7;
-        Sat, 11 Feb 2023 03:10:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Sat, 11 Feb 2023 05:57:09 -0500
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6712230D7
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 02:57:08 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id EFB03240769
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Feb 2023 11:57:06 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PDSGp2QjJz9rxM;
+        Sat, 11 Feb 2023 11:57:06 +0100 (CET)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2 1/9] doc: remove unimplemented Quality Report from MGMT settings
+Date:   Sat, 11 Feb 2023 10:53:45 +0000
+Message-Id: <3df45c4a6737b249b519d4c6128e2eb783198abc.1676112710.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth-next 2023-02-09
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <167608501879.9768.615911961609409706.git-patchwork-notify@kernel.org>
-Date:   Sat, 11 Feb 2023 03:10:18 +0000
-References: <20230209234922.3756173-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230209234922.3756173-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+The Set Quality Report command was removed in
+commit 0454e2d09570 ("mgmt: Add support for Mesh in the kernel"),
+but the settings bit was not removed. It's also not implemented on
+kernel side, so remove it now.
+---
 
-This pull request was applied to netdev/net-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+Notes:
+    v2: split to two commits
 
-On Thu,  9 Feb 2023 15:49:22 -0800 you wrote:
-> The following changes since commit 8697a258ae24703267d2a37d91ab757c91ef027e:
-> 
->   Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-02-09 12:25:40 -0800)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-02-09
-> 
-> [...]
+ doc/mgmt-api.txt | 2 --
+ 1 file changed, 2 deletions(-)
 
-Here is the summary with links:
-  - pull request: bluetooth-next 2023-02-09
-    https://git.kernel.org/netdev/net-next/c/ee7e1788ae3d
-
-You are awesome, thank you!
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 90d612ed8..0e0b4fdf0 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -332,7 +332,6 @@ Read Controller Information Command
+ 		15	Static Address
+ 		16	PHY Configuration
+ 		17	Wideband Speech
+-		18	Quality Report
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -2925,7 +2924,6 @@ Read Extended Controller Information Command
+ 		15	Static Address
+ 		16	PHY Configuration
+ 		17	Wideband Speech
+-		18	Quality Report
+ 
+ 	The EIR_Data field contains information about class of device,
+ 	local name and other values. Not all of them might be present. For
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.1
 
