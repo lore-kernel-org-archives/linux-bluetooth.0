@@ -2,149 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85970C636D7
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Feb 2023 14:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73CBEC636D3
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Feb 2023 15:21:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229545AbjBLOAu (ORCPT
+        id S229631AbjBLPVS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 12 Feb 2023 09:00:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38790 "EHLO
+        Sun, 12 Feb 2023 10:21:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjBLOAt (ORCPT
+        with ESMTP id S229484AbjBLPVR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 12 Feb 2023 09:00:49 -0500
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CA9359B
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Feb 2023 06:00:47 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 28F6924005D
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Feb 2023 15:00:46 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4PF8JF4XRWz9rxD;
-        Sun, 12 Feb 2023 15:00:45 +0100 (CET)
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3] media: clear the right transport when clearing BAP endpoint
-Date:   Sun, 12 Feb 2023 14:00:43 +0000
-Message-Id: <e15e60d7941eba174cf306b45c80bc53435554b0.1676210275.git.pav@iki.fi>
-In-Reply-To: <f93d483b5deb1628ba822ab752767b17e946d9c8.1676145318.git.pav@iki.fi>
-References: <f93d483b5deb1628ba822ab752767b17e946d9c8.1676145318.git.pav@iki.fi>
+        Sun, 12 Feb 2023 10:21:17 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E29A113F4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Feb 2023 07:21:15 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id bh15so8357812oib.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Feb 2023 07:21:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WDmiL188WR7cv5RYe8Iy28P2Orb8kDTaEWk0V/rjOPA=;
+        b=WTpflivdTPfVPefj4+l3Vzd+8MMrbYh8rFFKWuBF5L5RxROageQDDqzzzt+1hvST0i
+         pneyxJrYyeU+rg8IpekSGy4dP1gA/1ctcmfaM0S9fhDrWrIi7WXHxO6K6icmwTOvyJss
+         /+fimts/ajx5pb4WJz+nHCIhyZEchUuc0KUV/5VFCFAWxBRdUEHZNo1T3KIFvcMWWdIh
+         WvT8oV+jmtNX6bcuCnJ0+473c4QcUkw8/+Yx0dhxAtbFKXKD6vBz8TGPGxD22kygjKVb
+         ZG/V5xg1IDERDubA8hA5/8D7ok4OyPn9l4mMJPD4pYjjI3RbyKUT8A2piU9c4OsTNpa+
+         kgKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WDmiL188WR7cv5RYe8Iy28P2Orb8kDTaEWk0V/rjOPA=;
+        b=WMFNCnqMo68skFHnVwB4SS3MAcCnirnEx1tWdqTs9anEW5p2fPJcMh27plv1BWozCI
+         /xRgzZZj+S9II2UqMkUFmu6ay4I7bDZnH7vEaJmWxzLOrsBKbMDIPIFCZgGkAeS3M7aN
+         rw9VDcXO8DUNK/b7tKv9XOmHJu7FNzI+eINPeLsUXUH9JK7JXVq/kGw5P3ChgTbJGMig
+         TtjgOFzmST90NDQKwcwF7DGYmDmoGFrnqhwq8LSePJL/luU1UN9Coom6IxT49TTL0Xup
+         fwlYB5qci6afqkKIwI6mAjdXTdmMy9ht/4BV9vNGmsWYYiYZRPua9fhqSsEAyhrj/vhF
+         PkhA==
+X-Gm-Message-State: AO0yUKXr33aAxqZJXPwosoMGR0hIj2ggQTgJNBODFoxOWpe/O/v+q324
+        Qe12O3+B96Lt5wp73emMLXUI4xfdANM=
+X-Google-Smtp-Source: AK7set+mlImUhXbynCbe6TDOzP5t9iqqFQ7QSNzoT7D4AxXskblTr5uEEPr+Mq4gs00FHMbZ5oNjGA==
+X-Received: by 2002:a05:6808:8cb:b0:364:d523:e138 with SMTP id k11-20020a05680808cb00b00364d523e138mr9384295oij.32.1676215274745;
+        Sun, 12 Feb 2023 07:21:14 -0800 (PST)
+Received: from [172.17.0.2] ([40.84.170.65])
+        by smtp.gmail.com with ESMTPSA id q185-20020acac0c2000000b0035a9003b8edsm4127673oif.40.2023.02.12.07.21.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Feb 2023 07:21:14 -0800 (PST)
+Message-ID: <63e903ea.ca0a0220.3083.0a33@mx.google.com>
+Date:   Sun, 12 Feb 2023 07:21:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7848267044373812359=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,v3] media: clear the right transport when clearing BAP endpoint
+In-Reply-To: <e15e60d7941eba174cf306b45c80bc53435554b0.1676210275.git.pav@iki.fi>
+References: <e15e60d7941eba174cf306b45c80bc53435554b0.1676210275.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Each configured BAP stream is associated with a transport, and only that
-transport should be cleared when the stream's configuration is cleared.
+--===============7848267044373812359==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This is required for multiple BAP clients to use the same Media1
-endpoint, which is what we should aim for to follow the spirit in which
-the endpoints work in ASCS.  Sound servers generally can handle this,
-since the *Configuration calls provide the transport paths, and for
-different clients they are associated with different devices.
----
+This is automated email and please do not reply to this email!
 
-Notes:
-    v3:
-    * Match transports based on stream, not path.
-    
-      The path in bt_bap_stream user data is set to endpoint path on
-      config, and may be freed too early, if endpoint is freed before
-      clearing the PAC, as happens in bap.c:bap_disconnect
-    
-    In principle multiple clients should work, but I don't have equipment
-    right now to test streaming for more than one client.
+Dear submitter,
 
- profiles/audio/media.c     | 20 +++++++++++++-------
- profiles/audio/transport.c | 13 +++++++++++++
- profiles/audio/transport.h |  1 +
- 3 files changed, 27 insertions(+), 7 deletions(-)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=721072
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 505c4b3a6..8728b69e0 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -86,7 +86,6 @@ struct endpoint_request {
- struct media_endpoint {
- 	struct a2dp_sep		*sep;
- 	struct bt_bap_pac	*pac;
--	void			*stream;
- 	char			*sender;	/* Endpoint DBus bus id */
- 	char			*path;		/* Endpoint object path */
- 	char			*uuid;		/* Endpoint property UUID */
-@@ -1007,9 +1006,6 @@ static void pac_config_cb(struct media_endpoint *endpoint, void *ret, int size,
- 	struct pac_config_data *data = user_data;
- 	gboolean *ret_value = ret;
- 
--	if (ret_value)
--		endpoint->stream = data->stream;
--
- 	data->cb(data->stream, ret_value ? 0 : -EINVAL);
- }
- 
-@@ -1089,11 +1085,21 @@ static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
- static void pac_clear(struct bt_bap_stream *stream, void *user_data)
- {
- 	struct media_endpoint *endpoint = user_data;
-+	GSList *item;
- 
--	endpoint->stream = NULL;
-+	DBG("endpoint %p stream %p", endpoint, stream);
- 
--	while (endpoint->transports != NULL)
--		clear_configuration(endpoint, endpoint->transports->data);
-+	item = endpoint->transports;
-+	while (item) {
-+		struct media_transport *transport = item->data;
-+
-+		if (media_transport_get_stream(transport) == stream) {
-+			clear_configuration(endpoint, transport);
-+			item = endpoint->transports;
-+		} else {
-+			item = item->next;
-+		}
-+	}
- }
- 
- static struct bt_bap_pac_ops pac_ops = {
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5e057e2a5..b7aa5107b 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -1483,6 +1483,19 @@ const char *media_transport_get_path(struct media_transport *transport)
- 	return transport->path;
- }
- 
-+void *media_transport_get_stream(struct media_transport *transport)
-+{
-+	struct bap_transport *bap;
-+	const char *uuid;
-+
-+	uuid = media_endpoint_get_uuid(transport->endpoint);
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.76 seconds
+GitLint                       FAIL      0.55 seconds
+BuildEll                      PASS      32.68 seconds
+BluezMake                     PASS      985.96 seconds
+MakeCheck                     PASS      12.57 seconds
+MakeDistcheck                 PASS      181.92 seconds
+CheckValgrind                 PASS      297.79 seconds
+CheckSmatch                   PASS      393.37 seconds
+bluezmakeextell               PASS      119.15 seconds
+IncrementalBuild              PASS      797.55 seconds
+ScanBuild                     PASS      1244.97 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v3] media: clear the right transport when clearing BAP endpoint
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#138: FILE: profiles/audio/transport.c:1492:
 +	if (strcasecmp(uuid, PAC_SINK_UUID) && strcasecmp(uuid, PAC_SOURCE_UUID))
-+		return NULL;
-+
-+	bap = transport->data;
-+	return bap->stream;
-+}
-+
- void media_transport_update_delay(struct media_transport *transport,
- 							uint16_t delay)
- {
-diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
-index 102fc3cf1..5ca9b8f9e 100644
---- a/profiles/audio/transport.h
-+++ b/profiles/audio/transport.h
-@@ -19,6 +19,7 @@ struct media_transport *media_transport_create(struct btd_device *device,
- 
- void media_transport_destroy(struct media_transport *transport);
- const char *media_transport_get_path(struct media_transport *transport);
-+void *media_transport_get_stream(struct media_transport *transport);
- struct btd_device *media_transport_get_dev(struct media_transport *transport);
- int8_t media_transport_get_volume(struct media_transport *transport);
- void media_transport_update_delay(struct media_transport *transport,
--- 
-2.39.1
 
+/github/workspace/src/src/13137447.patch total: 0 errors, 1 warnings, 66 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13137447.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v3] media: clear the right transport when clearing BAP endpoint
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+16: B2 Line has trailing whitespace: "    "
+20: B2 Line has trailing whitespace: "    "
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7848267044373812359==--
