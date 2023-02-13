@@ -2,251 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5026DC636CC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Feb 2023 12:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CBC7C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Feb 2023 12:43:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231191AbjBMMM6 (ORCPT
+        id S230127AbjBMMn0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Feb 2023 07:12:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
+        Mon, 13 Feb 2023 07:43:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230180AbjBMMMf (ORCPT
+        with ESMTP id S229664AbjBMMn0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Feb 2023 07:12:35 -0500
-Received: from smtp-out-12.comm2000.it (smtp-out-12.comm2000.it [212.97.32.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33011B57C;
-        Mon, 13 Feb 2023 04:11:39 -0800 (PST)
-Received: from francesco-nb.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-12.comm2000.it (Postfix) with ESMTPSA id BF370BA18C1;
-        Mon, 13 Feb 2023 13:09:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1676290174;
-        bh=YgXe/MvmOjDr+arNFK+ExgUEcK38ebeIBX/GvSFUpak=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=LRskN2GfmWs8HIa9ZilaKMKFu952h7x8+xklUkKqxUsiO6RI1004XVRzxrlXGyg42
-         XYEoRwlZK7PXV6Be553qe3iyexBq93rbMMB9cnpPeChN6NVxTBM70z44SyPwmZ8qaF
-         B7KA3+znI7XyWy5dUz4g3SJxZ96xkT4hp2S+RO+Ba6mK8WyQB/yJGoK78YG7h1JXL2
-         pIm0obI5iPch2ZxXjcok8BoDf+ay/SxfF2CPu4L2l6wXmrhb2wKW3OZ7dzeWI1P2e0
-         o1nAajcC9VrOWlDuuI33fQ7aZW60nRXgYVviG//hsz2sf6mB31RJMjV9UrsJIFW49N
-         P7ebGnw/GC55w==
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Stefan Eichenberger <stefan.eichenberger@toradex.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Francesco Dolcini <francesco.dolcini@toradex.com>
-Subject: [PATCH v3 4/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
-Date:   Mon, 13 Feb 2023 13:09:25 +0100
-Message-Id: <20230213120926.8166-5-francesco@dolcini.it>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230213120926.8166-1-francesco@dolcini.it>
-References: <20230213120926.8166-1-francesco@dolcini.it>
+        Mon, 13 Feb 2023 07:43:26 -0500
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25EC046A3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Feb 2023 04:43:25 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id q13so13512137qtx.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Feb 2023 04:43:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wYvt2lwZfas0BcXO0bcFeuOAVbTtgzGm3ZAG5BxBXhc=;
+        b=qe8cfVftLcMFN4GeiTB5uNHg9nClf022cRZOGQWuFzwPxduxDDxwRWQ0IlSaYxAEdb
+         BA8330eZYigS8yRX/SF6A9oNmzusjA/Ea5U0Gxkobt0JAkZd1EVSm3nkk8KgCl6kCK2M
+         Kb1J9phzMH5PO8mm8oJDUVa4wrQojm32EHJB5E4L9IjlQqKM4m0gdqq/ARUNKdB0lnqA
+         ZNLjUWONAS5gq/BvJvvktgs4c4rKW4A61s1RvWVQvrx3l6ZsTt4mCPMhIhMMZJCVj3iX
+         LwVriKc1zNXQ8+mCy+0RnU2SHIQoMcKnlJ8NsPiy22vxEEEdceQ1Aw4o9uHkmYQnAAKD
+         KyDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wYvt2lwZfas0BcXO0bcFeuOAVbTtgzGm3ZAG5BxBXhc=;
+        b=xy6JFVQ6VJSLVP1JdGk7vuZ6LHG85mC39jT5Rf5Iq7EYRwMWvuQP2JBpbpNWtZp8iJ
+         mQaetcQUtGgpWPn7JBx6avtHa2FNcNfxsmPAfPQvMkXJYpIlaVMuhMijmvLwsBcEmn3A
+         jxqCjXwE7Jj6UqMir48/tYNfgblopXRqpzUTPgssb6WdhT7ELDfx0i7B+e1YpcbjqP8d
+         +ufnFeOqCBEBeXLfW9NDymCeAuQiT+OicWVdJjQrFlgxJtoE/q8A3f9+i2+mpVKSJgJY
+         4VfB/60OZBe+08seUcWCduvBcPsB6k4hPnj3ou5alVpigoahSsCFBWjwATJMxq2hQBwP
+         Eggg==
+X-Gm-Message-State: AO0yUKUweEFRqPT9ttab1+tFemBCpoF0sZNkyJX59HtM0V4hamnaYqAk
+        ZhqaAKzvqSas7ZtiSf0wF4gVpaOu7Y8=
+X-Google-Smtp-Source: AK7set8JWHHjUck6tqh3iIs9Xc5yM0+aWUINfK/HbG1chkXdfqNwd0DeTHams75QTprl/6fxqNkuXw==
+X-Received: by 2002:ac8:5f8b:0:b0:3b9:e4cf:ce2d with SMTP id j11-20020ac85f8b000000b003b9e4cfce2dmr29936622qta.16.1676292204144;
+        Mon, 13 Feb 2023 04:43:24 -0800 (PST)
+Received: from [172.17.0.2] ([172.177.255.82])
+        by smtp.gmail.com with ESMTPSA id k9-20020ac84789000000b003b2d890752dsm9114931qtq.88.2023.02.13.04.43.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Feb 2023 04:43:23 -0800 (PST)
+Message-ID: <63ea306b.c80a0220.353fb.83dc@mx.google.com>
+Date:   Mon, 13 Feb 2023 04:43:23 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3570506606243273608=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, francesco@dolcini.it
+Subject: RE: Bluetooth: hci_mrvl: Add serdev support for 88W8997
+In-Reply-To: <20230213120926.8166-2-francesco@dolcini.it>
+References: <20230213120926.8166-2-francesco@dolcini.it>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+--===============3570506606243273608==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add serdev support for the 88W8997 from NXP (previously Marvell). It
-includes support for changing the baud rate. The command to change the
-baud rate is taken from the user manual UM11483 Rev. 9 in section 7
-(Bring-up of Bluetooth interfaces) from NXP.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=721269
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.69 seconds
+GitLint                       PASS      1.29 seconds
+SubjectPrefix                 FAIL      0.80 seconds
+BuildKernel                   PASS      31.32 seconds
+CheckAllWarning               PASS      34.87 seconds
+CheckSparse                   WARNING   39.45 seconds
+CheckSmatch                   PASS      108.71 seconds
+BuildKernel32                 PASS      30.45 seconds
+TestRunnerSetup               PASS      436.43 seconds
+TestRunner_l2cap-tester       PASS      15.89 seconds
+TestRunner_iso-tester         PASS      16.65 seconds
+TestRunner_bnep-tester        PASS      5.40 seconds
+TestRunner_mgmt-tester        PASS      108.06 seconds
+TestRunner_rfcomm-tester      PASS      8.60 seconds
+TestRunner_sco-tester         PASS      7.90 seconds
+TestRunner_ioctl-tester       PASS      9.22 seconds
+TestRunner_mesh-tester        PASS      6.85 seconds
+TestRunner_smp-tester         PASS      7.91 seconds
+TestRunner_userchan-tester    PASS      5.64 seconds
+IncrementalBuild              PASS      42.02 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/hci_mrvl.c:170:23: warning: restricted __le16 degrades to integerdrivers/bluetooth/hci_mrvl.c:203:23: warning: restricted __le16 degrades to integerdrivers/bluetooth/hci_mrvl.c:170:23: warning: restricted __le16 degrades to integerdrivers/bluetooth/hci_mrvl.c:203:23: warning: restricted __le16 degrades to integer
+
+
 ---
-v3: use __hci_cmd_sync_status instead of __hci_cmd_sync
-v2: no changes
----
- drivers/bluetooth/hci_mrvl.c | 86 +++++++++++++++++++++++++++++++++---
- 1 file changed, 79 insertions(+), 7 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-index eaa9c51cacfa..e08222395772 100644
---- a/drivers/bluetooth/hci_mrvl.c
-+++ b/drivers/bluetooth/hci_mrvl.c
-@@ -27,10 +27,12 @@
- #define MRVL_ACK 0x5A
- #define MRVL_NAK 0xBF
- #define MRVL_RAW_DATA 0x1F
-+#define MRVL_SET_BAUDRATE 0xFC09
- 
- enum {
- 	STATE_CHIP_VER_PENDING,
- 	STATE_FW_REQ_PENDING,
-+	STATE_FW_LOADED,
- };
- 
- struct mrvl_data {
-@@ -254,6 +256,14 @@ static int mrvl_recv(struct hci_uart *hu, const void *data, int count)
- 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
- 		return -EUNATCH;
- 
-+	/* We might receive some noise when there is no firmware loaded. Therefore,
-+	 * we drop data if the firmware is not loaded yet and if there is no fw load
-+	 * request pending.
-+	 */
-+	if (!test_bit(STATE_FW_REQ_PENDING, &mrvl->flags) &&
-+				!test_bit(STATE_FW_LOADED, &mrvl->flags))
-+		return count;
-+
- 	mrvl->rx_skb = h4_recv_buf(hu->hdev, mrvl->rx_skb, data, count,
- 				    mrvl_recv_pkts,
- 				    ARRAY_SIZE(mrvl_recv_pkts));
-@@ -354,6 +364,7 @@ static int mrvl_load_firmware(struct hci_dev *hdev, const char *name)
- static int mrvl_setup(struct hci_uart *hu)
- {
- 	int err;
-+	struct mrvl_data *mrvl = hu->priv;
- 
- 	hci_uart_set_flow_control(hu, true);
- 
-@@ -367,9 +378,9 @@ static int mrvl_setup(struct hci_uart *hu)
- 	hci_uart_wait_until_sent(hu);
- 
- 	if (hu->serdev)
--		serdev_device_set_baudrate(hu->serdev, 3000000);
-+		serdev_device_set_baudrate(hu->serdev, hu->oper_speed);
- 	else
--		hci_uart_set_baudrate(hu, 3000000);
-+		hci_uart_set_baudrate(hu, hu->oper_speed);
- 
- 	hci_uart_set_flow_control(hu, false);
- 
-@@ -377,13 +388,54 @@ static int mrvl_setup(struct hci_uart *hu)
- 	if (err)
- 		return err;
- 
-+	set_bit(STATE_FW_LOADED, &mrvl->flags);
-+
-+	return 0;
-+}
-+
-+static int mrvl_set_baudrate(struct hci_uart *hu, unsigned int speed)
-+{
-+	int err;
-+	struct mrvl_data *mrvl = hu->priv;
-+	__le32 speed_le = cpu_to_le32(speed);
-+
-+	/* The firmware might be loaded by the Wifi driver over SDIO. We wait
-+	 * up to 10s for the CTS to go up. Afterward, we know that the firmware
-+	 * is ready.
-+	 */
-+	err = serdev_device_wait_for_cts(hu->serdev, true, 10000);
-+	if (err) {
-+		bt_dev_err(hu->hdev, "Wait for CTS failed with %d\n", err);
-+		return err;
-+	}
-+
-+	set_bit(STATE_FW_LOADED, &mrvl->flags);
-+
-+	err = __hci_cmd_sync_status(hu->hdev, MRVL_SET_BAUDRATE,
-+				    sizeof(speed_le), &speed_le,
-+				    HCI_INIT_TIMEOUT);
-+	if (err) {
-+		bt_dev_err(hu->hdev, "send command failed: %d", err);
-+		return err;
-+	}
-+
-+	serdev_device_set_baudrate(hu->serdev, speed);
-+
-+	/* We forcefully have to send a command to the bluetooth module so that
-+	 * the driver detects it after a baudrate change. This is foreseen by
-+	 * hci_serdev by setting HCI_UART_VND_DETECT which then causes a dummy
-+	 * local version read.
-+	 */
-+	set_bit(HCI_UART_VND_DETECT, &hu->hdev_flags);
-+
- 	return 0;
- }
- 
--static const struct hci_uart_proto mrvl_proto = {
-+static const struct hci_uart_proto mrvl_proto_8897 = {
- 	.id		= HCI_UART_MRVL,
- 	.name		= "Marvell",
- 	.init_speed	= 115200,
-+	.oper_speed	= 3000000,
- 	.open		= mrvl_open,
- 	.close		= mrvl_close,
- 	.flush		= mrvl_flush,
-@@ -393,18 +445,37 @@ static const struct hci_uart_proto mrvl_proto = {
- 	.dequeue	= mrvl_dequeue,
- };
- 
-+static const struct hci_uart_proto mrvl_proto_8997 = {
-+	.id		= HCI_UART_MRVL,
-+	.name		= "Marvell 8997",
-+	.init_speed	= 115200,
-+	.oper_speed	= 3000000,
-+	.open		= mrvl_open,
-+	.close		= mrvl_close,
-+	.flush		= mrvl_flush,
-+	.set_baudrate   = mrvl_set_baudrate,
-+	.recv		= mrvl_recv,
-+	.enqueue	= mrvl_enqueue,
-+	.dequeue	= mrvl_dequeue,
-+};
-+
- static int mrvl_serdev_probe(struct serdev_device *serdev)
- {
- 	struct mrvl_serdev *mrvldev;
-+	const struct hci_uart_proto *mrvl_proto = device_get_match_data(&serdev->dev);
- 
- 	mrvldev = devm_kzalloc(&serdev->dev, sizeof(*mrvldev), GFP_KERNEL);
- 	if (!mrvldev)
- 		return -ENOMEM;
- 
-+	mrvldev->hu.oper_speed = mrvl_proto->oper_speed;
-+	if (mrvl_proto->set_baudrate)
-+		of_property_read_u32(serdev->dev.of_node, "max-speed", &mrvldev->hu.oper_speed);
-+
- 	mrvldev->hu.serdev = serdev;
- 	serdev_device_set_drvdata(serdev, mrvldev);
- 
--	return hci_uart_register_device(&mrvldev->hu, &mrvl_proto);
-+	return hci_uart_register_device(&mrvldev->hu, mrvl_proto);
- }
- 
- static void mrvl_serdev_remove(struct serdev_device *serdev)
-@@ -415,7 +486,8 @@ static void mrvl_serdev_remove(struct serdev_device *serdev)
- }
- 
- static const struct of_device_id __maybe_unused mrvl_bluetooth_of_match[] = {
--	{ .compatible = "mrvl,88w8897" },
-+	{ .compatible = "mrvl,88w8897", .data = &mrvl_proto_8897},
-+	{ .compatible = "mrvl,88w8997", .data = &mrvl_proto_8997},
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, mrvl_bluetooth_of_match);
-@@ -433,12 +505,12 @@ int __init mrvl_init(void)
- {
- 	serdev_device_driver_register(&mrvl_serdev_driver);
- 
--	return hci_uart_register_proto(&mrvl_proto);
-+	return hci_uart_register_proto(&mrvl_proto_8897);
- }
- 
- int __exit mrvl_deinit(void)
- {
- 	serdev_device_driver_unregister(&mrvl_serdev_driver);
- 
--	return hci_uart_unregister_proto(&mrvl_proto);
-+	return hci_uart_unregister_proto(&mrvl_proto_8897);
- }
--- 
-2.25.1
 
+--===============3570506606243273608==--
