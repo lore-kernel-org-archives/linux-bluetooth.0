@@ -2,95 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 959C0C636D4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Feb 2023 08:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0870CC64ED6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Feb 2023 08:28:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbjBMIWS (ORCPT
+        id S229991AbjBMI2a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Feb 2023 03:22:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35200 "EHLO
+        Mon, 13 Feb 2023 03:28:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbjBMIWR (ORCPT
+        with ESMTP id S229918AbjBMI22 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Feb 2023 03:22:17 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD2D1285D;
-        Mon, 13 Feb 2023 00:22:11 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id k13so12793938plg.0;
-        Mon, 13 Feb 2023 00:22:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Cc8oF+7BeFkTvl0tiR5ilyaJsXX8cQAcNRTUnSXCuQ=;
-        b=VAptGiqps+dmcLjKqESSax0nsydlcGffI+aeuewHs7zeVP8k792ryUoTO/lifmMFHG
-         6+khFc3eFXA7ip8sGiWRHW7Dm5Hr/9kWqTGRqEd7yquopVGS3/kg/SgEY+aQrvZ52rtv
-         tQsMZ191fqzbgsi++mUddK+fI0sKdyyO+RlyJd5qR8JO5bNwfPXrDB493zUOctLZvDYh
-         2rq5GxVzq7SUWH9twM5e4V2xgCpDCC8REg1C3Abu5yzYy/NuW5ajMCczxfFZqvRzL2B5
-         wiTDjTlvk12G1tI7/2/izzh8N65JAOdzOePjPG+QPRnFK7wKJ/8gBgdBvIdvzytxIwbN
-         k+EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8Cc8oF+7BeFkTvl0tiR5ilyaJsXX8cQAcNRTUnSXCuQ=;
-        b=Iv0Iz7fD1c6PXxMbGxBrcHb7FlW80ShoR0sN2GHyZfWQFQKYEj8ix7tHxRdymB53Ak
-         ACSdKmc9V92GcB6qqaPwc1zC8wEJVgL88TNFiJfr5fHydlguKMuMndUH4XrTXEdK0zKZ
-         28n5Bj2bxgTCDG93FB9r2Wk3TIvCti+dYaIvQZzSHLdioEMd45pJq7AVUru++cd2iT7/
-         fVmwvlVQL26AxIYVNxOQkuIl8oJqSeqt2B137qbxy8+sZLmUhmJjaHf74bJ/uSv/4fIi
-         O3DWOjcEtc/d/NmjR/LuOvqtI8e7lDjqS9gPbCRTnoPSdrbLvuWl0JwlvkS+n3YU900X
-         NK3Q==
-X-Gm-Message-State: AO0yUKWv+KVpR0BnbcAwEvHrZfqmxc5iuaSDFz+t1yWHYZxp8jY/V1qo
-        EqYBO78yNaw9CSTtVSc3eLlVbXeWWAFt8ZBIeKB1G9P0LsuHvA==
-X-Google-Smtp-Source: AK7set+4dh1XshE8gce5zGUW9rPYY15T59wx4nemxaVNdbh+uY9RR+5EIHm0X46Dws3T8NdcyNTKIxuPr5MFua5vTC8=
-X-Received: by 2002:a17:902:c40c:b0:198:f92d:9a2c with SMTP id
- k12-20020a170902c40c00b00198f92d9a2cmr5586324plk.2.1676276530208; Mon, 13 Feb
- 2023 00:22:10 -0800 (PST)
+        Mon, 13 Feb 2023 03:28:28 -0500
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA149022;
+        Mon, 13 Feb 2023 00:28:17 -0800 (PST)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31D8B9Fa017455;
+        Mon, 13 Feb 2023 08:27:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=qcppdkim1;
+ bh=0fP5Zve1TkQ+xhcs43Crfwo1mV/wQUPyJ4Wqi7N4/JU=;
+ b=S1mLpx9ULtToTmI7Os7yDSY/vMM5+fg8SWSqpL5zNpqOT9+/8ocK/q6koZIGIt+erGOF
+ +tZQN3Bcj3Zjz+f9NKNqyD2I2q9Iu5wYi2Y9iwjanR6VMGc21LtYWLi/VGiPc5jwR+/O
+ i51wCwD5HGv/DoUiyK7k2j61KZ8lRJ5eOQBvo7t3wBNJC97K+8fmQwqDbN7k89n5J29m
+ oS4LxVzLnZdE1mLwhal6n7en9IUbWw/396s+uWt4alleNfRNAktwKx7NALnK+FuwfiuU
+ OQBfxVP/LStDiWXAStwUKggyuDxBGR1RCs2Mm+jfNM0fQPyF8s0ILjlzX9ydcuVt9kxi Kw== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3np0cw3uu3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Feb 2023 08:27:59 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 31D8RvKt003230
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Feb 2023 08:27:57 GMT
+Received: from nalasex01b.na.qualcomm.com (10.47.209.197) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.36; Mon, 13 Feb 2023 00:27:57 -0800
+Received: from nalasex01b.na.qualcomm.com ([fe80::22fd:4ef9:dc45:1a47]) by
+ nalasex01b.na.qualcomm.com ([fe80::22fd:4ef9:dc45:1a47%12]) with mapi id
+ 15.02.0986.036; Mon, 13 Feb 2023 00:27:57 -0800
+From:   "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     Steev Klimaszewski <steev@kali.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        "Bjorn Andersson" <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: RE: [PATCH v4 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
+ chip wcn6855
+Thread-Topic: [PATCH v4 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
+ chip wcn6855
+Thread-Index: AQHZPCHQDIGeCQOJhkSL2tGUe91V0K7GTOXggAFeeICABODlAA==
+Date:   Mon, 13 Feb 2023 08:27:57 +0000
+Message-ID: <3b468450c72441efb1935ea27f79ff96@quicinc.com>
+References: <CABBYNZLaOcYU-2HsSuJy4E6-OyfffmZdfK5mxWY=Wto4G84ySA@mail.gmail.com>
+ <20230209005932.4351-1-steev@kali.org>
+ <d9a93aae154243baac83b15c8f7ef0ee@quicinc.com>
+ <CABBYNZLi7U21s0ZY8jPvpXs8wbnjrVHtJpdKv6fykoGRD0fjOA@mail.gmail.com>
+In-Reply-To: <CABBYNZLi7U21s0ZY8jPvpXs8wbnjrVHtJpdKv6fykoGRD0fjOA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.253.79.68]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230210041030.865478-1-zyytlz.wz@163.com> <868017d2-c85f-20a1-292f-0b97ab8bf752@molgen.mpg.de>
-In-Reply-To: <868017d2-c85f-20a1-292f-0b97ab8bf752@molgen.mpg.de>
-From:   Zheng Hacker <hackerzheng666@gmail.com>
-Date:   Mon, 13 Feb 2023 16:21:58 +0800
-Message-ID: <CAJedcCx9Ur4a7isrEEDRaCThq2T=3=Z9b1dmfjUNh5qABkdBqg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_core: Fix poential Use-after-Free bug in hci_remove_adv_monitor
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Zheng Wang <zyytlz.wz@163.com>, marcel@holtmann.org,
-        alex000young@gmail.com, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: pNDQeCNUpAhfBfLSbgGN8podlJwWFawd
+X-Proofpoint-ORIG-GUID: pNDQeCNUpAhfBfLSbgGN8podlJwWFawd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-13_04,2023-02-09_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 priorityscore=1501 adultscore=0 phishscore=0
+ mlxlogscore=722 clxscore=1011 suspectscore=0 mlxscore=0 impostorscore=0
+ malwarescore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302130075
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Paul Menzel <pmenzel@molgen.mpg.de> =E4=BA=8E2023=E5=B9=B42=E6=9C=8813=E6=
-=97=A5=E5=91=A8=E4=B8=80 16:19=E5=86=99=E9=81=93=EF=BC=9A
->
-> Dear Zheng,
->
->
-> Thank you for your patch.
->
-> Am 10.02.23 um 05:10 schrieb Zheng Wang:
-> > In hci_remove_adv_monitor, if it gets into HCI_ADV_MONITOR_EXT_MSFT cas=
-e,
-> > the function will free the monitor and print its handle after that.
-> >
-> > Fix it by switch the order.
->
-> =E2=80=A6 by switch*ing* =E2=80=A6
->
-> There is a small typo in the commit message summary/title: po*t*ential
->
-Hi Paul,
-
-Thanks for pointing that out ^^. Will correct it in the next version of pat=
-ch.
-
-Best regards,
-Zheng Wang
+SGkgTHVpeiBhbmQgYWxsOg0KICBJIGFtIFFDIGJ0IGhvc3QgZ3V5cywgIHRvZGF5IEkgc3luYyB1
+cCB3aXRoIHFjIGJ0ZncgdGVhbSBhbmQgY29uY2x1ZGUgZm9sbG93aW5nIHJlc3VsdDoNCjE6IGFz
+IEkgbWVudGlvbmVkIGJlZm9yZSwgcWNhMjA2NiBhbmQgd2NuNjg1NSBhcmUgdGhlIHNhbWUgY2hp
+cCBmYW1pbHksIGFuZCB0aGV5IGNhbiBzaGFyZSB0aGUgc2FtZSBidGZ3IHBhdGNoLCBhbmQgZGlz
+dGluZ3Vpc2ggYnkgdXNpbmcgZGlmZmVyZW50IG52bSBiYXNlZCBvbiBib2FyZCBpZC4NCjI6IEkg
+dXBsb2FkIHRoZSBidGZ3IHByZXZpb3VzbHkgZm9yIHFjYTIwNjYgLCB5b3UgY2FuIHJlZmVyIHRv
+IGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L2Zpcm13YXJl
+L2xpbnV4LWZpcm13YXJlLmdpdC9jb21taXQvP2lkPTJiYTFiZWFhZTBjNjQ5Y2U4YTUwYmFlY2M4
+ZGY5ZTgxY2Q1MjRlNjUgLCBhbmQgYWxzbyB3Y242ODU1IGNhbiBzaGFyZSB0byB1c2UgYnRmdyBw
+YXRjaCBhbmQgbnZtIHdpdGggcWNhMjA2Ni4NCg0KMzpzdGVldiBwYXRjaCBkb2VzIG5vdCBpbmNs
+dWRlIHJlYWQgYm9hcmQgaWQgcGFydCBsb2dpY2FsICwgSSB0aGluayBpdCBpcyBiZXR0ZXIgY29t
+YmluZSB0aGUgc3RlZXYgIHBhdGNoIGFuZCBteSBwYXRjaCBpbnRvIG9uZS4NCg0KUmVnYXJkcy4N
+ClRpbQ0KIA0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTHVpeiBBdWd1c3Rv
+IHZvbiBEZW50eiA8bHVpei5kZW50ekBnbWFpbC5jb20+IA0KU2VudDogRnJpZGF5LCBGZWJydWFy
+eSAxMCwgMjAyMyA1OjM4IEFNDQpUbzogVGltIEppYW5nIChRVUlDKSA8cXVpY190amlhbmdAcXVp
+Y2luYy5jb20+DQpDYzogU3RlZXYgS2xpbWFzemV3c2tpIDxzdGVldkBrYWxpLm9yZz4NClN1Ympl
+Y3Q6IFJlOiBbUEFUQ0ggdjQgMi80XSBCbHVldG9vdGg6IGhjaV9xY2E6IEFkZCBzdXBwb3J0IGZv
+ciBRVEkgQmx1ZXRvb3RoIGNoaXAgd2NuNjg1NQ0KDQpIaSBUaW0sDQoNCk9uIFRodSwgRmViIDks
+IDIwMjMgYXQgMTI6NDUgQU0gVGltIEppYW5nIChRVUlDKSA8cXVpY190amlhbmdAcXVpY2luYy5j
+b20+IHdyb3RlOg0KPg0KPiBIaSBzdGVldjoNCj4NCj4gNjg1NSBhbmQgMjA2NiBhcmUgdGhlIHNh
+bWUgY2hpcCwgdGhlIGRpZmZlcmVuY2UgaXMgNjg1NSB1c2UgMiBBTlQgYW5kIDIwNjYgdXNlIDMg
+QU5UICwgYnV0IHdlIGhhdmUgbWFueSBudm0gY29uZmlncyBmb3IgMjA2NiBhbmQgNjg1NSAsIHRo
+YXQgaXMgdGhlIHNhbWUgLCB5b3UgY2FuIHJlZmVyIHRvIEkgZXZlciBhZGQgc3VwcG9ydCBmb3Ig
+Njg1NSB1c2IgLg0KDQpDb3VsZCB5b3UgcGxlYXNlIHJldmlldyBTdGVldiBjaGFuZ2VzLCBhbHNv
+IGlmIHlvdSBjb3VsZCBwbGVhc2UgcmVmYWN0b3IgdGhlIGNvZGUgcmVnYXJkaW5nIHRoZSBzb2Nf
+dHlwZSwgbWFraW5nIHRoZSBuZWNlc3NhcnkgZmllbGQgYXMgcGFydCBvZiB0aGUgZGF0YSBzdHJ1
+Y3R1cmUgc2hvdWxkIG1ha2UgaXQgYSBsb3QgZWFzaWVyIHRvIGFkZCBzdXBwb3J0IGZvciBuZXcg
+Y29uZmlndXJhdGlvbnMgd2l0aG91dCBoYXZpbmcgdG8gY2hhbmdlIHRoZSBjb2RlIGluIG11bHRp
+cGxlIHBsYWNlcy4NCg0KPiBSZWdhcmRzLg0KPiBUaW0NCj4NCj4NCg0KDQotLQ0KTHVpeiBBdWd1
+c3RvIHZvbiBEZW50eg0K
