@@ -2,112 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22FCCC05027
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Feb 2023 16:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E525EC05027
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Feb 2023 20:40:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231944AbjBNQMx (ORCPT
+        id S230162AbjBNUkV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Feb 2023 11:12:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54620 "EHLO
+        Tue, 14 Feb 2023 15:40:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231701AbjBNQMw (ORCPT
+        with ESMTP id S229563AbjBNUkT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Feb 2023 11:12:52 -0500
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605252C643;
-        Tue, 14 Feb 2023 08:12:37 -0800 (PST)
-Received: by mail-il1-f175.google.com with SMTP id h5so595545ilq.6;
-        Tue, 14 Feb 2023 08:12:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=t8LghQUZ4VYOI6+8MHgB96YfD7xfMJYsYr1SqpZhU7o=;
-        b=Y/D6RPNFoPQBrg7DUhCk+5QStUEqEiZyRmnk7OvS/19e5PpacrqMfoto+ZmG+yqG4P
-         ZeOXuA7BoiihAp8s+U7laPjjO0DkdTmg+KQeQcANvHd5Fa8UfhRBeeuBzLkt99htDwiv
-         R4m6NJ6AG+vXkQT2dV98sNrKbiIheKfboAa6+aRZFopHjWjy686RHld8oS7KLd0B+sRw
-         L5L72tud2uUW9aQIY9R9Mzufn+KpTWq2GtOXTsN2RHRjQdwGn7VfeYDCKRERBhbZhvjb
-         IAQMskJNts7DqMfqlXCUPuJh67ct6LpH180Y/sCVXMjwFn+GrTLWN5Rf9TMIh2GM/HgZ
-         F2GQ==
-X-Gm-Message-State: AO0yUKVQo38b47ES9C+yGiRQ9zsw7qzcWooDyEX1VJZKUpidGRf4ODbV
-        gkHYh6rLenkGjkNHH9mLPA==
-X-Google-Smtp-Source: AK7set9P06VBvJOV/3HQy92KwaaH93I7FfQX7zsyhx026ziuRyyeCZabJOgdFFLebGu0c07o5vc65g==
-X-Received: by 2002:a05:6e02:20ef:b0:315:3252:655f with SMTP id q15-20020a056e0220ef00b003153252655fmr3373501ilv.21.1676391156308;
-        Tue, 14 Feb 2023 08:12:36 -0800 (PST)
-Received: from robh_at_kernel.org (c-73-14-99-67.hsd1.co.comcast.net. [73.14.99.67])
-        by smtp.gmail.com with ESMTPSA id r13-20020a92d44d000000b0031550a3dc7esm1306185ilm.32.2023.02.14.08.12.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Feb 2023 08:12:35 -0800 (PST)
-Received: (nullmailer pid 76705 invoked by uid 1000);
-        Tue, 14 Feb 2023 16:12:34 -0000
+        Tue, 14 Feb 2023 15:40:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A7B08A47
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 12:40:18 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B0B9E618A8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 20:40:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0EAE2C433EF;
+        Tue, 14 Feb 2023 20:40:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676407217;
+        bh=CFN2vxFgKlzfnqzO2r9uPv+lYbNEh/oFqKWrHjlMcbA=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Q9d01T9eKBeKvLEzbAjA8R96VvzUeVP2pzovmJMZqdLhpODObs8w/bDFeckJQ3/oA
+         BRmn/nzi2jqrhRkR+mU5sxoGCryHW4hhxsJc2PT36PE5fir7IC3hmn7h1vaMu2uP+M
+         2SB1gMMSfeR4IyOYbXlEtr6k9qE9IhqOGytg8cJYx9hqjY1TCnPBA3GiRVLkrIKNIg
+         ZisJ6+VtHZljW2F/ZV+JGwSqG4xWCTOyb5dpUT+myt/XnmcCbugrwWwt1dUmg2wohS
+         wb/gX4C3kirkUDmAHjrk9SqYKD4MBHXqgOXxJxITrHqh9Wqmrf076muYK/QehXrA3P
+         mfKqnVehWZHJg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EAB2DE45098;
+        Tue, 14 Feb 2023 20:40:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
-From:   Rob Herring <robh@kernel.org>
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc:     ilpo.jarvinen@linux.intel.com, johan.hedberg@gmail.com,
-        amitkumar.karwar@nxp.com, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        luiz.dentz@gmail.com, hdanton@sina.com, alok.a.tiwari@oracle.com,
-        gregkh@linuxfoundation.org, netdev@vger.kernel.org,
-        edumazet@google.com, jirislaby@kernel.org,
-        linux-kernel@vger.kernel.org, kuba@kernel.org, sherry.sun@nxp.com,
-        pabeni@redhat.com, leon@kernel.org, davem@davemloft.net,
-        marcel@holtmann.org, rohit.fule@nxp.com
-In-Reply-To: <20230213145432.1192911-3-neeraj.sanjaykale@nxp.com>
-References: <20230213145432.1192911-1-neeraj.sanjaykale@nxp.com>
- <20230213145432.1192911-3-neeraj.sanjaykale@nxp.com>
-Message-Id: <167638943735.3594.3469258159164603021.robh@kernel.org>
-Subject: Re: [PATCH v3 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth
- support
-Date:   Tue, 14 Feb 2023 10:12:34 -0600
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: MGMT: Use BIT macro when defining bitfields
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167640721695.14815.1854565862440161963.git-patchwork-notify@kernel.org>
+Date:   Tue, 14 Feb 2023 20:40:16 +0000
+References: <20230213223042.575952-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230213223042.575952-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello:
 
-On Mon, 13 Feb 2023 20:24:31 +0530, Neeraj Sanjay Kale wrote:
-> Add binding document for NXP bluetooth chipsets attached
-> over UART.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 13 Feb 2023 14:30:42 -0800 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
-> v2: Resolved dt_binding_check errors. (Rob Herring)
-> v2: Modified description, added specific compatibility devices, corrected indentations. (Krzysztof Kozlowski)
-> v3: Modified description, renamed file (Krzysztof Kozlowski)
-> ---
->  .../bindings/net/bluetooth/nxp,w8xxx-bt.yaml  | 44 +++++++++++++++++++
->  MAINTAINERS                                   |  7 +++
->  2 files changed, 51 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,w8xxx-bt.yaml
+> This makes use of BIT macro when defining bitfields which makes it
+> clearer what bit it is toggling.
 > 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Here is the summary with links:
+  - Bluetooth: MGMT: Use BIT macro when defining bitfields
+    https://git.kernel.org/bluetooth/bluetooth-next/c/08529d9c72d0
 
-yamllint warnings/errors:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-dtschema/dtc warnings/errors:
-./Documentation/devicetree/bindings/net/bluetooth/nxp,w8xxx-bt.yaml: $id: relative path/filename doesn't match actual path or filename
-	expected: http://devicetree.org/schemas/net/bluetooth/nxp,w8xxx-bt.yaml#
-
-doc reference errors (make refcheckdocs):
-MAINTAINERS: Documentation/devicetree/bindings/net/bluetooth/nxp-bluetooth.yaml
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230213145432.1192911-3-neeraj.sanjaykale@nxp.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
 
