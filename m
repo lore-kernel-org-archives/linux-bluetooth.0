@@ -2,96 +2,170 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C93BC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Feb 2023 06:23:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 431EAC6379F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Feb 2023 08:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230199AbjBNGXb (ORCPT
+        id S232030AbjBNIdy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Feb 2023 01:23:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
+        Tue, 14 Feb 2023 03:33:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229581AbjBNGX3 (ORCPT
+        with ESMTP id S229618AbjBNIdw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Feb 2023 01:23:29 -0500
-Received: from out28-170.mail.aliyun.com (out28-170.mail.aliyun.com [115.124.28.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E152213DFB;
-        Mon, 13 Feb 2023 22:23:27 -0800 (PST)
-X-Alimail-AntiSpam: AC=CONTINUE;BC=0.179232|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_enroll_verification|0.213737-0.00173606-0.784527;FP=0|0|0|0|0|-1|-1|-1;HT=ay29a033018047188;MF=victor@allwinnertech.com;NM=1;PH=DS;RN=6;RT=6;SR=0;TI=SMTPD_---.RLc3oUz_1676355804;
-Received: from 192.168.220.144(mailfrom:victor@allwinnertech.com fp:SMTPD_---.RLc3oUz_1676355804)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Feb 2023 14:23:25 +0800
-Message-ID: <0e5db8d4-9d33-0c26-cc39-0b43770901fe@allwinnertech.com>
-Date:   Tue, 14 Feb 2023 14:23:24 +0800
+        Tue, 14 Feb 2023 03:33:52 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C99E07A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 00:33:46 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id l37-20020a05600c1d2500b003dfe46a9801so10964855wms.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 00:33:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ejEtMeBPAExp6t+VkmV02BN0b+eFcA/gZrz9wzLiQ7o=;
+        b=n8HQN19AxeMJEOJUepEp44f87OkEuIvnINHRadawoYB7AXncgM0A42B4HxFHpaH28C
+         InHrWqqU1ElMciZp3kyyl4rRVOP8otaTP9Yeisv9bQGrDAKOxfzt/b8riA3jk1B7fF1Z
+         UKZks+QEBoMVvAsCRtEvPzUgWQWQSQkufNeN1YJdz4dHEqCe6I9d8kf8R/7sRU557gvU
+         CHPlu2DBdmgFeMU+42kK8Xrw4T9cS9HNBiVeQoc+Np9fg2qEFs59vvid8ioYYm6aPVAo
+         Zxq06nv14MCT19FHta3cqoqdkwZlnh3AqtsHFdyl56yPCByq4oVvErXI1Y+D9WTDLt0V
+         Rw4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ejEtMeBPAExp6t+VkmV02BN0b+eFcA/gZrz9wzLiQ7o=;
+        b=moh0+VLXyms6VM03ONIAmeLVphtcT/+c9fwZshmF2sLxM3IMWgTMcnbqyzPmC2QIWH
+         13zhlIuqIeQyMd050qBj7tgScrHY0jEfTbslUaVGdJgFzP02t+GNsVKMG4y+SV95b7Qg
+         md5C0/z7tq9dKUM+SCxPPT4pBsc9n0DrwMD8bab9YnVMwMFPAqeGwd2H7CdlltaA6pna
+         WwauurhO7laD1v2QhXrXr0h47ktf5RlvWIY4ejBAZUc3Fr/HsT2CXkCSOrAFsJOFS6Pq
+         jxHdceexBCiNYI1TgI2AJv5iWsqDLdEvFjSYYPVnJjNPMDCE8w6f3oskLS9ShGjpmipn
+         q8Pw==
+X-Gm-Message-State: AO0yUKUSO4uYWEAJeg0XZ+ilRDUNf536GDZQwfjdJy4kX7MKZ0OCBXhm
+        EDWCNPslru87NXK3oTx6XvxMGA==
+X-Google-Smtp-Source: AK7set+A1fCoRJwiI7MCWml+SDJKG30LEP0RsDV/PHSNGYnlMV3CnQPGLlHbZbY8mBInF6MAprhLEQ==
+X-Received: by 2002:a7b:c3d7:0:b0:3df:ef18:b0a1 with SMTP id t23-20020a7bc3d7000000b003dfef18b0a1mr1225722wmj.12.1676363625117;
+        Tue, 14 Feb 2023 00:33:45 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id d1-20020adff841000000b002c5640f9bf9sm1106229wrq.85.2023.02.14.00.33.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Feb 2023 00:33:44 -0800 (PST)
+Message-ID: <60928656-c565-773d-52e6-2142e997eee4@linaro.org>
+Date:   Tue, 14 Feb 2023 09:33:41 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [RESEND] Bluetooth: btrtl: Add support for RTL8852BS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v3 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth
+ support
 Content-Language: en-US
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230206063334.45861-1-victor@allwinnertech.com>
- <5c249a19-f79b-346d-2fb1-cdfc05324909@molgen.mpg.de>
-From:   Victor Hassan <victor@allwinnertech.com>
-In-Reply-To: <5c249a19-f79b-346d-2fb1-cdfc05324909@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org,
+        alok.a.tiwari@oracle.com, hdanton@sina.com,
+        ilpo.jarvinen@linux.intel.com, leon@kernel.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com
+References: <20230213145432.1192911-1-neeraj.sanjaykale@nxp.com>
+ <20230213145432.1192911-3-neeraj.sanjaykale@nxp.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230213145432.1192911-3-neeraj.sanjaykale@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Paul:
-   Thank you for your advises. I had send PATCH-v2 to fix it. Can you 
-give me more advises?
+On 13/02/2023 15:54, Neeraj Sanjay Kale wrote:
+> Add binding document for NXP bluetooth chipsets attached
+> over UART.
+> 
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> ---
+> v2: Resolved dt_binding_check errors. (Rob Herring)
+> v2: Modified description, added specific compatibility devices, corrected indentations. (Krzysztof Kozlowski)
+> v3: Modified description, renamed file (Krzysztof Kozlowski)
+> ---
+>  .../bindings/net/bluetooth/nxp,w8xxx-bt.yaml  | 44 +++++++++++++++++++
 
-On 2023/2/6 18:03, Paul Menzel wrote:
-> Dear Victor,
+I don't think I proposed such filename.
+
+>  MAINTAINERS                                   |  7 +++
+>  2 files changed, 51 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,w8xxx-bt.yaml
 > 
-> 
-> Thank you for your patch.
-> 
-> Am 06.02.23 um 07:33 schrieb Victor Hassan:
->> Add the support for RTL8852BS BT controller on UART interface.
->> The necessary firmware file will be submitted to linux-firmware.
->>
->> Signed-off-by: Victor Hassan <victor@allwinnertech.com>
->> ---
->>   drivers/bluetooth/btrtl.c | 10 ++++++++++
->>   1 file changed, 10 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
->> index 69c3fe649ca7..36c3a23324f8 100644
->> --- a/drivers/bluetooth/btrtl.c
->> +++ b/drivers/bluetooth/btrtl.c
->> @@ -198,6 +198,14 @@ static const struct id_table ic_id_table[] = {
->>         .fw_name  = "rtl_bt/rtl8852bu_fw.bin",
->>         .cfg_name = "rtl_bt/rtl8852bu_config" },
->> +    /* 8852B with UART interface */
->> +    { IC_INFO(RTL_ROM_LMP_8852A, 0xb, 0xb, HCI_UART),
->> +      .config_needed = true,
->> +      .has_rom_version = true,
->> +      .has_msft_ext = true,
->> +      .fw_name  = "rtl_bt/rtl8852bs_fw.bin",
->> +      .cfg_name = "rtl_bt/rtl8852bs_config" },
->> +
-> 
-> I’d sort *bs* before *bu*.
-> 
->>       /* 8852C */
->>       { IC_INFO(RTL_ROM_LMP_8852A, 0xc, 0xc, HCI_USB),
->>         .config_needed = false,
->> @@ -965,5 +973,7 @@ MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
->>   MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
->>   MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
->>   MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
->> +MODULE_FIRMWARE("rtl_bt/rtl8852bs_fw.bin");
->> +MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
->>   MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
->>   MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
-> 
-> Ditto.
-> 
-> 
-> Kind regards,
-> 
-> Paul
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,w8xxx-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,w8xxx-bt.yaml
+> new file mode 100644
+> index 000000000000..2685f6d5904f
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,w8xxx-bt.yaml
+> @@ -0,0 +1,44 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/bluetooth/nxp-bluetooth.yaml#
+
+Does not look like you tested the bindings. Please run `make
+dt_binding_check` (see
+Documentation/devicetree/bindings/writing-schema.rst for instructions).
+
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NXP Bluetooth chips
+> +
+> +description:
+> +  This binding describes UART-attached NXP bluetooth chips.
+> +  These chips are dual-radio chips supporting WiFi and Bluetooth,
+> +  except for iw612, which is a tri-radio chip supporting 15.4
+> +  as well.
+> +  The bluetooth works on standard H4 protocol over 4-wire UART.
+> +  The RTS and CTS lines are used during FW download.
+> +  To enable power save mode, the host asserts break signal
+> +  over UART-TX line to put the chip into power save state.
+> +  De-asserting break wakes-up the BT chip.
+> +
+> +maintainers:
+> +  - Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - nxp,88w8987-bt
+> +      - nxp,88w8997-bt
+> +      - nxp,88w9098-bt
+> +      - nxp,iw416-bt
+> +      - nxp,iw612-bt
+> +
+> +required:
+> +  - compatible
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    uart2 {
+
+This is a friendly reminder during the review process.
+
+It seems my previous comments were not fully addressed. Maybe my
+feedback got lost between the quotes, maybe you just forgot to apply it.
+Please go back to the previous discussion and either implement all
+requested changes or keep discussing them.
+
+Thank you.
+
+> +        uart-has-rtscts;
+> +        bluetooth {
+> +          compatible = "nxp,iw416-bt";
+
+Wrong indentation. Use 4 spaces for example indentation.
+
+
+Best regards,
+Krzysztof
+
