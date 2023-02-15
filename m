@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E7BC64EC7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 21:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAB9C64ED8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 21:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbjBOVUZ (ORCPT
+        id S230022AbjBOVUZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 15 Feb 2023 16:20:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53254 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbjBOVUY (ORCPT
+        with ESMTP id S229461AbjBOVUY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 15 Feb 2023 16:20:24 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4396226879;
-        Wed, 15 Feb 2023 13:20:21 -0800 (PST)
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B61F3392AA;
+        Wed, 15 Feb 2023 13:20:22 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D11C461C40;
-        Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 300ACC433A0;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6ADE1B823D9;
+        Wed, 15 Feb 2023 21:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20110C4339C;
         Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1676496020;
-        bh=XLI3+MkI4Fb5n5qhwX0Y7+IOf0TYe32DqmDGxmr7L78=;
+        bh=KhznJ5MqsWCGU5jiXt79rHN7OFi4bXjp4btJ5yN1aMY=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Fpv1c46bC7D/JDlgR8AIKkJmw6NkHwJzdJccN3Hoiifo8DmStHnTryPtTuaTj46Uj
-         DNTWW/AV/96ZNAsYQVdB0vvPjP6P+lb+tUzz/5TUwxlD219tIazabvqGknxNLc/km0
-         DjoTDRV6QjwFgilW/SFk3Es7SvZ9GbK71JBHLsMolTBT/92Fu78UpglGUbtkE2bNHr
-         qzKwNCm+7tPmcDQboXqxXHW0APR5KM2j8qB0/fTAphVoVeeHu5/5VDDAmsn0R+Nx7o
-         4iGZXr4kjzOF/fVnmpVERTUIvdDT4dSVBFa0Jk/rCFgqDkvFpmMi6Ung8G5bSnPzQX
-         G4NlCaB8BP2CA==
+        b=G322UuEEln5uUQOP8JcW+0cqbah88Aqvs8NAHoDBKrjD7hn1AHFLt749Eehj5zZ9X
+         sgEzSGGV/xiFYWGlfA2NGsVxRzlptitnbt6/2whR5O7NXP+kzyR5cZDnNFFBT8flBo
+         42QStP6rUpCT+h9vt9LAoMn7JL94ITs3Gmuhp2jSy/UOSfSIqHR4SAEkKip79zpPdX
+         fJ6OUkgp23Fc6fOuJWPLU6w1mv39qDWxSXTzacuQBTqFatRMmSVOzXAAIiU+12vJY2
+         PDfEm9STgiHp5F0sFWWyPBx3V+CZEyaC8/0NRQc9uz7HXcKYBCO9lHvBGd7iYP/lP1
+         PtRaKOGQLNrXA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 11644E270C2;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07E15C4166F;
         Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+Subject: Re: [PATCH v2 0/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167649602006.21327.2804578434988521190.git-patchwork-notify@kernel.org>
+Message-Id: <167649602001.21327.9252864686596807637.git-patchwork-notify@kernel.org>
 Date:   Wed, 15 Feb 2023 21:20:20 +0000
-References: <20230213120926.8166-1-francesco@dolcini.it>
-In-Reply-To: <20230213120926.8166-1-francesco@dolcini.it>
+References: <20230126074356.431306-1-francesco@dolcini.it>
+In-Reply-To: <20230126074356.431306-1-francesco@dolcini.it>
 To:     Francesco Dolcini <francesco@dolcini.it>
 Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
@@ -64,7 +64,7 @@ Hello:
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 13 Feb 2023 13:09:21 +0100 you wrote:
+On Thu, 26 Jan 2023 08:43:51 +0100 you wrote:
 > From: Francesco Dolcini <francesco.dolcini@toradex.com>
 > 
 > Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
@@ -75,14 +75,16 @@ On Mon, 13 Feb 2023 13:09:21 +0100 you wrote:
 > [...]
 
 Here is the summary with links:
-  - [v3,1/5] dt-bindings: bluetooth: marvell: add 88W8997
+  - [v2,1/5] dt-bindings: bluetooth: marvell: add 88W8997
     https://git.kernel.org/bluetooth/bluetooth-next/c/f48823aa0c4f
-  - [v3,2/5] dt-bindings: bluetooth: marvell: add max-speed property
+  - [v2,2/5] dt-bindings: bluetooth: marvell: add max-speed property
     https://git.kernel.org/bluetooth/bluetooth-next/c/d7303dce9fcb
-  - [v3,3/5] Bluetooth: hci_mrvl: use maybe_unused macro for device tree ids
+  - [v2,3/5] Bluetooth: hci_mrvl: use maybe_unused macro for device tree ids
     https://git.kernel.org/bluetooth/bluetooth-next/c/e275614465ec
-  - [v3,4/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
-    https://git.kernel.org/bluetooth/bluetooth-next/c/58c6156a4d4b
+  - [v2,4/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+    (no matching commit)
+  - [v2,5/5] arm64: dts: imx8mp-verdin: add 88W8997 serdev to uart4
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
