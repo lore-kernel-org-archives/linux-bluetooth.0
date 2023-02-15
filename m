@@ -2,169 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F05AC636CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 09:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C0F9C636D4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 20:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234033AbjBOJrI (ORCPT
+        id S229770AbjBOUgt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Feb 2023 04:47:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52618 "EHLO
+        Wed, 15 Feb 2023 15:36:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234115AbjBOJrE (ORCPT
+        with ESMTP id S229489AbjBOUgs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Feb 2023 04:47:04 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F84336695
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 01:46:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1676454419; x=1707990419;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=i9iLAV5lRPcGzG1ES7f2+HQH7iJn9TaP/9ivry6FwNA=;
-  b=ZIj8NpzAkjcg9B9xFiQZ2jhXjQlRJ+8iPFMh7l9sLiDtJanuHNgelE6h
-   6YFuXvcLh03FeWXUcyDgonf4+rIxFSR4t9WMleJY08OtbxIwU6s8C+Tbs
-   zDXI+nPtseqs1CcFPr63akc6eJSPt3pZ7EDja92Z+3IKfMpWVgoEJ44qR
-   ks9f8Eh4nsZ95vbzWq2CX68BTbZ3Q2LXMWaEWtmpaNzzW/+zPjgY9E00d
-   mJPvRHZA40PzCAKYhKc+6RV9grpU8KNgRWG8dcrpTs+qQ81ZODLaIWuXX
-   uc/hdaV+RrlBlwyxmekZcpQvNfZNgwlyzmaEcYWYLDrk30tkugq+fhu56
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10621"; a="417606191"
-X-IronPort-AV: E=Sophos;i="5.97,299,1669104000"; 
-   d="scan'208";a="417606191"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2023 01:46:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10621"; a="662861354"
-X-IronPort-AV: E=Sophos;i="5.97,299,1669104000"; 
-   d="scan'208";a="662861354"
-Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 15 Feb 2023 01:46:42 -0800
-Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pSEN7-0009Ff-1O;
-        Wed, 15 Feb 2023 09:46:41 +0000
-Date:   Wed, 15 Feb 2023 17:46:22 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- dbf27f4a6adb530999726340bd133a22f57779c9
-Message-ID: <63eca9ee.7tPuo2VX2wPyeV5u%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 15 Feb 2023 15:36:48 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A46EE3B3C4;
+        Wed, 15 Feb 2023 12:36:47 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id m10so23570950ljp.3;
+        Wed, 15 Feb 2023 12:36:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=E5V1ZdTdvcE7drkxcFR/cP3t+37fXHswTkqQ+7j3RCA=;
+        b=ddce220YJIYbkdz1ID8+Z6NSXl8zDp1BJAgxC3+54RkwSQ/Fld8XCsxuy6yCULD3Un
+         KzvFoGDf41/j4yyeGdZ8IfnAQmSi3lBEq1pG+0knDHUnUdXhhBvYNldyKjovvYpgoAe/
+         GCQJjKAnVjSEl8ISCsisSZxLmIQDB5jzxu0JHMXrSJQKJFJLLDP3BQATyO3ukiqbCJ7b
+         sP/6sqy7mxFZZfTqxIQtUqhzU/jAUs1f9Ki3GDtDO2NE11Tihsy9eSF9QHzGZS8NJJV3
+         NqiwoWAlt6D7ytcsDQE3XeC2xg+cKqqZTJHN5OAXqWQK8FoGo6YvPgGsUh/Wro6fEQDv
+         aZCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E5V1ZdTdvcE7drkxcFR/cP3t+37fXHswTkqQ+7j3RCA=;
+        b=T+ct5YP//Y2uGncQGp4fOk/WSRxK/ev1T5vl+RUS/Wle8LF0tO3WkjcXMdog6JZ5O5
+         I3j2rL4Hucl7AehNunr69k8lR2DCqfw9Os/KtFolM2Sl1TKES/fpIzHaPFJ12GmuY6An
+         zn/N3lou5g/0xZUg698NSZ0KsCjM2HhBAFsoPbji0hu3Fz+LflZ4TjPpu8RBWZ90iGac
+         DlzwXnqJfsHz1x8dedJVGLOS3Kw/hUIWXXnr/PRNi3+JYxmGKEFMxVE3Vqm/hi14sSOP
+         vB1z33Q/PMUNOp4WZJxPfZTCYhewPTJAOVES+DF7WEa0w9WlZRjeJfVCnnmlARYKriXD
+         sw5g==
+X-Gm-Message-State: AO0yUKVBN9czLez1qaQT+oLNTDnZQML8HDVwYgzNPSyMqp+JWxZkSfft
+        +9pRwf1sBV4/9gL2LlVGdMJ0dK/NrwsNnM4hjJ0=
+X-Google-Smtp-Source: AK7set95pVLcVG5npoPY1aY8WLoZDkMtgDrncHbyQguMuWq7gDe08kZ5qkJWk+GGUPSBrCTMEbx02OGoGFdZN95Ajhs=
+X-Received: by 2002:a2e:8e21:0:b0:293:603a:7631 with SMTP id
+ r1-20020a2e8e21000000b00293603a7631mr983840ljk.9.1676493405842; Wed, 15 Feb
+ 2023 12:36:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <20230213120926.8166-1-francesco@dolcini.it>
+In-Reply-To: <20230213120926.8166-1-francesco@dolcini.it>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 15 Feb 2023 12:36:34 -0800
+Message-ID: <CABBYNZ+y2jDi=0FFx31oB86skpDFTm5n+fDd5LBmvdxzOhqoSA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+To:     Francesco Dolcini <francesco@dolcini.it>
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Francesco Dolcini <francesco.dolcini@toradex.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: dbf27f4a6adb530999726340bd133a22f57779c9  Bluetooth: btusb: Do not require hardcoded interface numbers
+Hi Francesco,
 
-elapsed time: 725m
+On Mon, Feb 13, 2023 at 4:09 AM Francesco Dolcini <francesco@dolcini.it> wrote:
+>
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
+>
+> Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
+> support for changing the baud rate. The command to change the baud rate is
+> taken from the user manual UM11483 Rev. 9 in section 7 (Bring-up of Bluetooth
+> interfaces) from NXP.
+>
+> v3:
+>  - Use __hci_cmd_sync_status instead of __hci_cmd_sync
+>
+> v2:
+>  - Fix the subject as pointed out by Krzysztof. Thanks!
+>  - Fix indentation in marvell-bluetooth.yaml
+>  - Fix compiler warning for kernel builds without CONFIG_OF enabled
+>
+> Stefan Eichenberger (5):
+>   dt-bindings: bluetooth: marvell: add 88W8997
+>   dt-bindings: bluetooth: marvell: add max-speed property
+>   Bluetooth: hci_mrvl: use maybe_unused macro for device tree ids
+>   Bluetooth: hci_mrvl: Add serdev support for 88W8997
+>   arm64: dts: imx8mp-verdin: add 88W8997 serdev to uart4
+>
+>  .../bindings/net/marvell-bluetooth.yaml       | 20 ++++-
+>  .../dts/freescale/imx8mp-verdin-wifi.dtsi     |  5 ++
+>  drivers/bluetooth/hci_mrvl.c                  | 90 ++++++++++++++++---
+>  3 files changed, 104 insertions(+), 11 deletions(-)
+>
+> --
+> 2.25.1
 
-configs tested: 91
-configs skipped: 3
+There seems to be missing one patch 5/5:
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+https://patchwork.kernel.org/project/bluetooth/list/?series=721269
 
-gcc tested configs:
-alpha                            allyesconfig
-alpha                               defconfig
-arc                              allyesconfig
-arc                                 defconfig
-arc                  randconfig-r043-20230212
-arc                  randconfig-r043-20230213
-arm                              allmodconfig
-arm                              allyesconfig
-arm                                 defconfig
-arm                      footbridge_defconfig
-arm                          iop32x_defconfig
-arm                  randconfig-r046-20230212
-arm                            zeus_defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-csky                                defconfig
-i386                             allyesconfig
-i386                              debian-10.3
-i386                                defconfig
-i386                 randconfig-a011-20230213
-i386                 randconfig-a012-20230213
-i386                 randconfig-a013-20230213
-i386                 randconfig-a014-20230213
-i386                 randconfig-a015-20230213
-i386                 randconfig-a016-20230213
-ia64                             allmodconfig
-ia64                                defconfig
-loongarch                        allmodconfig
-loongarch                         allnoconfig
-loongarch                           defconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                        mvme147_defconfig
-mips                             allmodconfig
-mips                             allyesconfig
-mips                 decstation_r4k_defconfig
-mips                           gcw0_defconfig
-nios2                               defconfig
-parisc                           alldefconfig
-parisc                              defconfig
-parisc64                            defconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-riscv                            allmodconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                randconfig-r042-20230213
-riscv                          rv32_defconfig
-s390                             allmodconfig
-s390                             allyesconfig
-s390                                defconfig
-s390                 randconfig-r044-20230213
-sh                               allmodconfig
-sh                          rsk7264_defconfig
-sh                           se7712_defconfig
-sparc                               defconfig
-um                             i386_defconfig
-um                           x86_64_defconfig
-x86_64                            allnoconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                                  kexec
-x86_64               randconfig-a011-20230213
-x86_64               randconfig-a012-20230213
-x86_64               randconfig-a013-20230213
-x86_64               randconfig-a014-20230213
-x86_64               randconfig-a015-20230213
-x86_64               randconfig-a016-20230213
-x86_64                               rhel-8.3
+Other than that the Bluetooth parts seem fine, and perhaps can be
+merged if the patch above is not really required.
 
-clang tested configs:
-arm                  randconfig-r046-20230213
-arm                           spitz_defconfig
-hexagon              randconfig-r041-20230212
-hexagon              randconfig-r041-20230213
-hexagon              randconfig-r045-20230212
-hexagon              randconfig-r045-20230213
-i386                 randconfig-a001-20230213
-i386                 randconfig-a002-20230213
-i386                 randconfig-a003-20230213
-i386                 randconfig-a004-20230213
-i386                 randconfig-a005-20230213
-i386                 randconfig-a006-20230213
-powerpc                 mpc8313_rdb_defconfig
-powerpc                      obs600_defconfig
-riscv                randconfig-r042-20230212
-s390                 randconfig-r044-20230212
-x86_64               randconfig-a001-20230213
-x86_64               randconfig-a002-20230213
-x86_64               randconfig-a003-20230213
-x86_64               randconfig-a004-20230213
-x86_64               randconfig-a005-20230213
-x86_64               randconfig-a006-20230213
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Luiz Augusto von Dentz
