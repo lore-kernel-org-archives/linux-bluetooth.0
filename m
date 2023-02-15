@@ -2,95 +2,75 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B407C636D6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 22:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62264C636D6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 23:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229651AbjBOW0K (ORCPT
+        id S229593AbjBOXuV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Feb 2023 17:26:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59030 "EHLO
+        Wed, 15 Feb 2023 18:50:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjBOW0J (ORCPT
+        with ESMTP id S229551AbjBOXuU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Feb 2023 17:26:09 -0500
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745DC3864F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 14:26:06 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 2B5A82403B8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 23:26:05 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4PHCMw4Wxyz9rxG;
-        Wed, 15 Feb 2023 23:26:04 +0100 (CET)
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 3/3] media: fix ASAN crash in pac_config_cb
-Date:   Wed, 15 Feb 2023 22:26:02 +0000
-Message-Id: <be8d0573d2fb7f326439c79e4bc07b7bb30cc9f7.1676499415.git.pav@iki.fi>
-In-Reply-To: <f973ae1e4b2c07902f98a6e7776b44bef25670be.1676499415.git.pav@iki.fi>
-References: <f973ae1e4b2c07902f98a6e7776b44bef25670be.1676499415.git.pav@iki.fi>
+        Wed, 15 Feb 2023 18:50:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE3992ED45
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 15:50:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5318361E00
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 23:50:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6EB6C433AC;
+        Wed, 15 Feb 2023 23:50:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676505018;
+        bh=tYlLNiq3DkNVCUajoLQtyKsMYoL22COtEJOUWLcTaj0=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=EATG8BtbFuQJu+3MdgXQBvfk4XKXRGMtSSdfWYIwqoHU0FVsw6Bbyi/JxEvo+HOaK
+         aSN2zRsmI6Vkbo+SVyGAdMzym6UHZhXpit4WEkfUQk8GBvQfjqP8+nSQPU1TVfGvt3
+         rLA5a0ft/P+ue+DV51ASvgpdLA5/VUvi+Yw8/EO2Y13O/lCHEhJu2duh19mmkpa1pN
+         OsBph4BUoGizncb8i9VC1sRwmhD2e5v4khhjNa3Sehf+wvVJjbLicrQa6IsKQaw2I/
+         IyaXF3ywOoj7kBIgRqf5I9PQUfuexVE5Oxk0gTmn37+AGJOO/Y5ejvwfWfZDsqDqji
+         8T5Q/H2h8R2OQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A154EC41676;
+        Wed, 15 Feb 2023 23:50:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] monitor/att: Fix ASE frequency values
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167650501865.26864.3762769850143596859.git-patchwork-notify@kernel.org>
+Date:   Wed, 15 Feb 2023 23:50:18 +0000
+References: <20230215005629.990585-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230215005629.990585-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Don't call configuration callback if stream's transport was cleared in
-the meantime.  The clear callback is called just before the stream is
-freed.
+Hello:
 
-Fixes ASAN crash on disconnect while waiting for SetConfiguration DBus
-reply:
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-ERROR: AddressSanitizer: heap-use-after-free on address 0x60b00002eb90
-READ of size 8 at 0x60b00002eb90 thread T0
-    #0 0x7a4892 in bap_stream_config_cfm_cb src/shared/bap.c:3201
-    #1 0x4688fb in pac_config_cb profiles/audio/media.c:1010
-    #2 0x462164 in media_endpoint_cancel profiles/audio/media.c:157
-    #3 0x462243 in media_endpoint_cancel_all profiles/audio/media.c:165
-    #4 0x46365b in clear_endpoint profiles/audio/media.c:297
-    #5 0x463a21 in endpoint_reply profiles/audio/media.c:325
-...
-freed by thread T0 here:
-    #0 0x7eff644b9388 in __interceptor_free.part.0 (/lib64/libasan.so.8+0xb9388)
-    #1 0x78d8cc in bap_stream_free src/shared/bap.c:974
-    #2 0x78dbc8 in bap_stream_detach src/shared/bap.c:991
-    #3 0x78fa43 in bap_stream_state_changed src/shared/bap.c:1210
-    #4 0x78fe26 in stream_set_state src/shared/bap.c:1254
-    #5 0x7ab5ce in stream_foreach_detach src/shared/bap.c:3820
-    #6 0x70ce06 in queue_foreach src/shared/queue.c:207
-    #7 0x7ab942 in bt_bap_detach src/shared/bap.c:3836
-    #8 0x51da7a in bap_disconnect profiles/audio/bap.c:1342
-    #9 0x626e57 in btd_service_disconnect src/service.c:305
----
+On Tue, 14 Feb 2023 16:56:29 -0800 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes the printed hex value of some of the frequencies.
+> ---
+>  monitor/att.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 
-Notes:
-    Reproducer:
-    
-    Make sound server delay its SetConfiguration response, and disconnect
-    device before DBus timeout is reached.
+Here is the summary with links:
+  - [BlueZ] monitor/att: Fix ASE frequency values
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa50506c9f40
 
- profiles/audio/media.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index b722278ba..326e50a09 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1003,6 +1003,12 @@ static void pac_config_cb(struct media_endpoint *endpoint, void *ret, int size,
- {
- 	struct pac_config_data *data = user_data;
- 	gboolean *ret_value = ret;
-+	struct media_transport *transport;
-+
-+	/* If transport was cleared, configuration was cancelled */
-+	transport = find_transport(endpoint, data->stream);
-+	if (!transport)
-+		return;
- 
- 	data->cb(data->stream, ret_value ? 0 : -EINVAL);
- }
+You are awesome, thank you!
 -- 
-2.39.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
