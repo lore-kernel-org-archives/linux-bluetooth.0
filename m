@@ -2,191 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39741C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 00:28:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DCA5C05027
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 00:45:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232035AbjBOA2Y (ORCPT
+        id S229527AbjBOApJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Feb 2023 19:28:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32946 "EHLO
+        Tue, 14 Feb 2023 19:45:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjBOA2X (ORCPT
+        with ESMTP id S229496AbjBOApI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Feb 2023 19:28:23 -0500
-Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D7AD234E9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 16:28:22 -0800 (PST)
-Received: by mail-oi1-x22c.google.com with SMTP id r28so14500676oiw.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 16:28:22 -0800 (PST)
+        Tue, 14 Feb 2023 19:45:08 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 157D810CD
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 16:45:07 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id v17so25725418lfd.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Feb 2023 16:45:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sp80czwOhma7dov00LFmjFY+/xV7ov2dV4s/yjc86+M=;
-        b=UQrOimRQ30iWMdLTqmrdd83TI0YqAiGR+5ghO80v/HfGuyq+LLp1EC9K8C6a8MqV8u
-         LK+E7ZcIyw/wJjn8mxxD4t/qtX96LpAs18md0goD/adKLlUIwahMn9JC73J/bq1qbv26
-         kbiIEZI3A2xx/aGoTZAN3l6S2X7vj/e3x4AIFGHAcVBOvRsTt+HV4Muaqsuq3Aq0NxoJ
-         Irx5hOX0ION3aSBTve65s04H9bcKW9aLFLexs4/oyV0wUjy/sXf7Y9I5cJk0o3UgO0oT
-         CQ3TVOnqdXtdslGz/3QIxGjdGSjc3lElHyjgKm7Hu83JCDD7yy8GQnEMxfiQhmxJKz/e
-         7TpA==
+        d=matician-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GuO4KzjqzOsPm95Uf3DpX3EnhkcH5s2FZAMXMS/dM/Q=;
+        b=vs5rLTyh+PwCGkh5/LZnPwDy+T9kg8PYvaBNpDk3X85IMJW9EIsKrtrMfuzgL3PiKp
+         C4t/upRKTLfjataYXbeiDSczMn242G/7JZ9gGvPKLYt+us6q0vIT2p+4VF9lKILvWAVG
+         31v7Vv3PCLI74Di9IFOG91Pv4W+uYRQ6nlWjuhSsjxUtRp/a2RjxX+ykWvNbc/3Hhekt
+         2l4n9P5xVPW66qLE5XNjHvgtu5o6RJyjjAK4m4e8OdYFCkSqzlBOiANI9k4w7QSZt4u1
+         fKyglthJfswtkzV9Jd3NUrjPsEXFAW2Kv1rK7YkHVk+aJ7cbnj3TsVt1s9IPlDcNZuLz
+         cERQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sp80czwOhma7dov00LFmjFY+/xV7ov2dV4s/yjc86+M=;
-        b=f43uypde1Uyn62W7OfybWHSK/FDhHw/moazhNtPW7+3wEYjvZJQqKyGiMsiDUlv7UA
-         BCBTW1C6th1XOCqqJcLprqKiqn3AMqXjFuVSuKewWrsW9ZDEcpO3QuVxT5Oh9hJVlA/p
-         5w+SJcypuuqNTwbmZa+ZajF3AwxFCpDN6kXRxNLEon9Nf7KtVQhBZ5n/DOLjBXkfpNS0
-         cLITKvr5blsStUV5mw9xfBCHB9dQ3o8ha7SsNXBTSe7lTO0rzEP77qvO8YdvC6O717xF
-         nM4sCgD5jT8CK8CmKfe7iokRp1zUtipdSfC+mIRe37ARraNhzrGqu++H0NAGzNlljq2p
-         3Zcg==
-X-Gm-Message-State: AO0yUKUDyvgCMa1RAcgf1OOu/n2Li7rcrK274D55sQ8R8dF0Jh9nx+lt
-        HtKMuNOqK/x640l9Rd7o+ffglLyXW6HQYLZGzOdCHg==
-X-Google-Smtp-Source: AK7set8X/RBY86D7efIziwS+i2S491zUsQBQ1hSzpuZBLKL2OhWjJkpHLCG0igAEouDOJ7ypWcguu0TCCtKDOvbn6Us=
-X-Received: by 2002:aca:3d56:0:b0:378:5f47:6cbf with SMTP id
- k83-20020aca3d56000000b003785f476cbfmr120530oia.44.1676420901527; Tue, 14 Feb
- 2023 16:28:21 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GuO4KzjqzOsPm95Uf3DpX3EnhkcH5s2FZAMXMS/dM/Q=;
+        b=RF6OlLE0uf3Yd9u3PfPV5WIgFQsgMV8U5pvflPS2mWF8tOGFzcSLbbn2sP53jbGjaX
+         YtC+ZaOqcqFAkmb4crUufiIY17rwz4mtbuCMFSUKdN7mqwkAelCoNahLL32glx5CTNLc
+         CNrqUnimOmM5Eu9XVzhrKs12wQn5YArVQ+ERlzC4enZgLF7EWulev5xKEZhGm53GM1dn
+         EIseDENR0825Htx75ZT14iFZ+qZLYcYBkOzsJ/S1wKp2nkMxHMQz2z74OZuBSaIalSop
+         rdHyUZSrlpI/v9ao/IIyIyrEg0yiyUi5PontiK52blm7I0O+85TR2gDu+sDaOfIef4K7
+         vlnA==
+X-Gm-Message-State: AO0yUKV9IJo0w9y3/0uy9QtbFnwSInDGREh8eyUVMWcWLX3Php3c+uFD
+        NIK7vrkCtX2UhhLVN03Y35albBF2l6SWAynG3uTMlg==
+X-Google-Smtp-Source: AK7set/stKalvFD21HFDnJjI+Cud7ud5Ndwbslm68xTF840FPBs1oCOVlMTHOwCgkVeBmCppriSNgodyRlj5DjB7AVA=
+X-Received: by 2002:ac2:5bc5:0:b0:4db:19cf:5212 with SMTP id
+ u5-20020ac25bc5000000b004db19cf5212mr574751lfn.1.1676421905345; Tue, 14 Feb
+ 2023 16:45:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20230214145609.kernel.v1.1.Ibe4d3a42683381c1e78b8c3aa67b53fc74437ae9@changeid>
- <CABBYNZKVVo4T_pbEdozhNvgiykC7NiLQKEnJi3q5gZpHunGrbA@mail.gmail.com>
-In-Reply-To: <CABBYNZKVVo4T_pbEdozhNvgiykC7NiLQKEnJi3q5gZpHunGrbA@mail.gmail.com>
-From:   Zhengping Jiang <jiangzp@google.com>
-Date:   Tue, 14 Feb 2023 16:28:09 -0800
-Message-ID: <CAB4PzUo+EuapOr+O7eWZH2xiVVAUd98m_DmEK-337=CvfUDeoA@mail.gmail.com>
-Subject: Re: [kernel PATCH v1] Bluetooth: hci_sync: Resume adv with no RPA
- when active scan
+References: <20230201220704.1543663-1-luiz.dentz@gmail.com>
+ <63dae95a.370a0220.25d9.c141@mx.google.com> <CABBYNZKHRbx-uCBQs1kRnbjLETLZ3+_if_68UBq9VzMfHxBbww@mail.gmail.com>
+In-Reply-To: <CABBYNZKHRbx-uCBQs1kRnbjLETLZ3+_if_68UBq9VzMfHxBbww@mail.gmail.com>
+From:   Alexander Coffin <alex.coffin@matician.com>
+Date:   Tue, 14 Feb 2023 16:44:49 -0800
+Message-ID: <CA+hUFcu_E_ixNUbYGOyVKJJ79DX_H2TPaBZDp2uaokLu3WGaBw@mail.gmail.com>
+Subject: Re: Bluetooth: L2CAP: Fix potential user-after-free
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-Thanks for the comment. I will submit a new patch to address that.
+Sorry about the very slow response, but I just wanted to make sure
+that it worked well on our robots for a while (the crashes were
+sporadic before) before I confirmed that this patch seemed good. We
+have seen no issues with your proposed patch, and I would be happy to
+sign off on it if that matters (I don't do much kernel contribution so
+I don't really know if my sign off means anything).
 
-I notice in the spec, it is mentioned
-> Note: This command does not affect the generation of Resolvable Private A=
-ddresses.
-How should I understand this note? Does it mean even if the address
-resolution is disabled, the controller can still generate RPA for
-advertising?  Does it mean the advertising can always be resumed
-during active scan?
+Regards,
+Alexander Coffin
 
-Thanks,
-Zhengping
 
-On Tue, Feb 14, 2023 at 4:09 PM Luiz Augusto von Dentz
+On Wed, Feb 1, 2023 at 3:47 PM Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
-> Hi Zhengping,
+> Hi Alex,
 >
-> On Tue, Feb 14, 2023 at 2:56 PM Zhengping Jiang <jiangzp@google.com> wrot=
-e:
+> On Wed, Feb 1, 2023 at 2:36 PM <bluez.test.bot@gmail.com> wrote:
 > >
-> > The address resolution should be disabled during the active scan,
-> > so all the advertisements can reach the host. The advertising
-> > has to be paused before disabling the address resolution,
-> > because the advertising will prevent any changes to the resolving
-> > list and the address resolution status. Skipping this will cause
-> > the hci error and the discovery failure.
->
-> It is probably a good idea to quote the spec saying:
->
-> 7.8.44 LE Set Address Resolution Enable command
->
-> This command shall not be used when:
-> =E2=80=A2 Advertising (other than periodic advertising) is enabled,
->
-> > If the host is using RPA, the controller needs to generate RPA for
-> > the advertising, so the advertising must remain paused during the
-> > active scan.
+> > This is automated email and please do not reply to this email!
 > >
-> > If the host is not using RPA, the advertising can be resumed after
-> > disabling the address resolution.
+> > Dear submitter,
 > >
-> > Fixes: 9afc675edeeb ("Bluetooth: hci_sync: allow advertise when scan wi=
-thout RPA")
-> > Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+> > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > This is a CI test results with your patch series:
+> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=717902
+> >
+> > ---Test result---
+> >
+> > Test Summary:
+> > CheckPatch                    PASS      1.17 seconds
+> > GitLint                       PASS      0.36 seconds
+> > SubjectPrefix                 PASS      0.13 seconds
+> > BuildKernel                   PASS      37.93 seconds
+> > CheckAllWarning               PASS      41.71 seconds
+> > CheckSparse                   PASS      46.75 seconds
+> > CheckSmatch                   PASS      126.54 seconds
+> > BuildKernel32                 PASS      36.61 seconds
+> > TestRunnerSetup               PASS      525.34 seconds
+> > TestRunner_l2cap-tester       PASS      18.69 seconds
+> > TestRunner_iso-tester         PASS      20.41 seconds
+> > TestRunner_bnep-tester        PASS      6.76 seconds
+> > TestRunner_mgmt-tester        PASS      129.22 seconds
+> > TestRunner_rfcomm-tester      PASS      10.65 seconds
+> > TestRunner_sco-tester         PASS      9.84 seconds
+> > TestRunner_ioctl-tester       PASS      11.64 seconds
+> > TestRunner_mesh-tester        PASS      8.60 seconds
+> > TestRunner_smp-tester         PASS      9.80 seconds
+> > TestRunner_userchan-tester    PASS      7.09 seconds
+> > IncrementalBuild              PASS      34.40 seconds
+>
+> Looks like it is good with our tests in CI, that said I do wonder if
+> you guys could enable it to run tests that may trigger these problems,
+> since they normally are not found by normal tests.
+>
+> >
+> >
 > > ---
+> > Regards,
+> > Linux Bluetooth
 > >
-> > Changes in v1:
-> > - Always pause advertising when active scan, but resume the advertising=
- if the host is not using RPA
-> >
-> >  net/bluetooth/hci_sync.c | 8 ++++++--
-> >  1 file changed, 6 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index 117eedb6f709..edbf9faf7fa1 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -2402,7 +2402,7 @@ static u8 hci_update_accept_list_sync(struct hci_=
-dev *hdev)
-> >         u8 filter_policy;
-> >         int err;
-> >
-> > -       /* Pause advertising if resolving list can be used as controlle=
-rs are
-> > +       /* Pause advertising if resolving list can be used as controlle=
-rs
-> >          * cannot accept resolving list modifications while advertising=
-.
-> >          */
-> >         if (use_ll_privacy(hdev)) {
-> > @@ -5397,7 +5397,7 @@ static int hci_active_scan_sync(struct hci_dev *h=
-dev, uint16_t interval)
-> >         /* Pause advertising since active scanning disables address res=
-olution
-> >          * which advertising depend on in order to generate its RPAs.
-> >          */
-> > -       if (use_ll_privacy(hdev) && hci_dev_test_flag(hdev, HCI_PRIVACY=
-)) {
-> > +       if (use_ll_privacy(hdev)) {
-> >                 err =3D hci_pause_advertising_sync(hdev);
-> >                 if (err) {
-> >                         bt_dev_err(hdev, "pause advertising failed: %d"=
-, err);
-> > @@ -5416,6 +5416,10 @@ static int hci_active_scan_sync(struct hci_dev *=
-hdev, uint16_t interval)
-> >                 goto failed;
-> >         }
-> >
-> > +       // Resume paused advertising if the host is not using RPA
-> > +       if (use_ll_privacy(hdev) && !hci_dev_test_flag(hdev, HCI_PRIVAC=
-Y))
-> > +               hci_resume_advertising_sync(hdev);
-> > +
-> >         /* All active scans will be done with either a resolvable priva=
-te
-> >          * address (when privacy feature has been enabled) or non-resol=
-vable
-> >          * private address.
-> > --
-> > 2.39.1.581.gbfd45094c4-goog
 >
-> I think it is better that we add something like
-> hci_pause_addr_resolution so we can make it check all the conditions,
-> such as pausing advertising and resuming if needed. Btw, we do seem to
-> have proper checks for these conditions on the emulator:
->
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/emulator/btdev.c#=
-n4090
->
-> But perhaps there is no test which attempts to enable LL Privacy
-> without enabling Local Privacy, so it would be great if you could
-> update mgmt-tester adding a test that emulates such behavior.
 >
 > --
 > Luiz Augusto von Dentz
