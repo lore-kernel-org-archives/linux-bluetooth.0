@@ -2,93 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAB9C64ED8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 21:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8686AC636CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 22:26:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230022AbjBOVUZ (ORCPT
+        id S229643AbjBOW0J (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Feb 2023 16:20:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
+        Wed, 15 Feb 2023 17:26:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjBOVUY (ORCPT
+        with ESMTP id S229574AbjBOW0J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Feb 2023 16:20:24 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B61F3392AA;
-        Wed, 15 Feb 2023 13:20:22 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6ADE1B823D9;
-        Wed, 15 Feb 2023 21:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20110C4339C;
-        Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1676496020;
-        bh=KhznJ5MqsWCGU5jiXt79rHN7OFi4bXjp4btJ5yN1aMY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=G322UuEEln5uUQOP8JcW+0cqbah88Aqvs8NAHoDBKrjD7hn1AHFLt749Eehj5zZ9X
-         sgEzSGGV/xiFYWGlfA2NGsVxRzlptitnbt6/2whR5O7NXP+kzyR5cZDnNFFBT8flBo
-         42QStP6rUpCT+h9vt9LAoMn7JL94ITs3Gmuhp2jSy/UOSfSIqHR4SAEkKip79zpPdX
-         fJ6OUkgp23Fc6fOuJWPLU6w1mv39qDWxSXTzacuQBTqFatRMmSVOzXAAIiU+12vJY2
-         PDfEm9STgiHp5F0sFWWyPBx3V+CZEyaC8/0NRQc9uz7HXcKYBCO9lHvBGd7iYP/lP1
-         PtRaKOGQLNrXA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07E15C4166F;
-        Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 15 Feb 2023 17:26:09 -0500
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7DB2A153
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 14:26:05 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 6A20B2403B8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Feb 2023 23:26:04 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PHCMv5VTFz9rxG;
+        Wed, 15 Feb 2023 23:26:03 +0100 (CET)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2 1/3] audio/transport: add media_transport_get_stream method for transports
+Date:   Wed, 15 Feb 2023 22:26:00 +0000
+Message-Id: <f973ae1e4b2c07902f98a6e7776b44bef25670be.1676499415.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167649602001.21327.9252864686596807637.git-patchwork-notify@kernel.org>
-Date:   Wed, 15 Feb 2023 21:20:20 +0000
-References: <20230126074356.431306-1-francesco@dolcini.it>
-In-Reply-To: <20230126074356.431306-1-francesco@dolcini.it>
-To:     Francesco Dolcini <francesco@dolcini.it>
-Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        marcel@holtmann.org, luiz.dentz@gmail.com,
-        linux-arm-kernel@lists.infradead.org,
-        francesco.dolcini@toradex.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        johan.hedberg@gmail.com, s.hauer@pengutronix.de,
-        shawnguo@kernel.org, kernel@pengutronix.de, festevam@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Add a method for getting the audio stream associated with a media
+transport.
+---
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Notes:
+    v2: make generic and split out to separate patch
 
-On Thu, 26 Jan 2023 08:43:51 +0100 you wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> 
-> Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
-> support for changing the baud rate. The command to change the baud rate is
-> taken from the user manual UM11483 Rev. 9 in section 7 (Bring-up of Bluetooth
-> interfaces) from NXP.
-> 
-> [...]
+ profiles/audio/transport.c | 18 ++++++++++++++++++
+ profiles/audio/transport.h |  1 +
+ 2 files changed, 19 insertions(+)
 
-Here is the summary with links:
-  - [v2,1/5] dt-bindings: bluetooth: marvell: add 88W8997
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f48823aa0c4f
-  - [v2,2/5] dt-bindings: bluetooth: marvell: add max-speed property
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d7303dce9fcb
-  - [v2,3/5] Bluetooth: hci_mrvl: use maybe_unused macro for device tree ids
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e275614465ec
-  - [v2,4/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
-    (no matching commit)
-  - [v2,5/5] arm64: dts: imx8mp-verdin: add 88W8997 serdev to uart4
-    (no matching commit)
-
-You are awesome, thank you!
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 5e057e2a5..912f404e8 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -116,6 +116,8 @@ struct media_transport {
+ 								guint id);
+ 	void			(*set_state) (struct media_transport *transport,
+ 						transport_state_t state);
++	void			*(*get_stream)
++					(struct media_transport *transport);
+ 	GDestroyNotify		destroy;
+ 	void			*data;
+ };
+@@ -1380,6 +1382,13 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
+ 	bap_update_links(transport);
+ }
+ 
++static void *get_stream_bap(struct media_transport *transport)
++{
++	struct bap_transport *bap = transport->data;
++
++	return bap->stream;
++}
++
+ static void free_bap(void *data)
+ {
+ 	struct bap_transport *bap = data;
+@@ -1415,6 +1424,7 @@ static int media_transport_init_bap(struct media_transport *transport,
+ 	transport->suspend = suspend_bap;
+ 	transport->cancel = cancel_bap;
+ 	transport->set_state = set_state_bap;
++	transport->get_stream = get_stream_bap;
+ 	transport->destroy = free_bap;
+ 
+ 	return 0;
+@@ -1483,6 +1493,14 @@ const char *media_transport_get_path(struct media_transport *transport)
+ 	return transport->path;
+ }
+ 
++void *media_transport_get_stream(struct media_transport *transport)
++{
++	if (transport->get_stream)
++		return transport->get_stream(transport);
++
++	return NULL;
++}
++
+ void media_transport_update_delay(struct media_transport *transport,
+ 							uint16_t delay)
+ {
+diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
+index 102fc3cf1..5ca9b8f9e 100644
+--- a/profiles/audio/transport.h
++++ b/profiles/audio/transport.h
+@@ -19,6 +19,7 @@ struct media_transport *media_transport_create(struct btd_device *device,
+ 
+ void media_transport_destroy(struct media_transport *transport);
+ const char *media_transport_get_path(struct media_transport *transport);
++void *media_transport_get_stream(struct media_transport *transport);
+ struct btd_device *media_transport_get_dev(struct media_transport *transport);
+ int8_t media_transport_get_volume(struct media_transport *transport);
+ void media_transport_update_delay(struct media_transport *transport,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.1
 
