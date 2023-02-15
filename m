@@ -2,117 +2,91 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB0BC636D4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 20:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E7BC64EC7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Feb 2023 21:20:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229532AbjBOUlP (ORCPT
+        id S229982AbjBOVUZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Feb 2023 15:41:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56904 "EHLO
+        Wed, 15 Feb 2023 16:20:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbjBOUlO (ORCPT
+        with ESMTP id S229783AbjBOVUY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Feb 2023 15:41:14 -0500
-Received: from smtp-out-12.comm2000.it (smtp-out-12.comm2000.it [212.97.32.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83411C2;
-        Wed, 15 Feb 2023 12:41:10 -0800 (PST)
-Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+        Wed, 15 Feb 2023 16:20:24 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4396226879;
+        Wed, 15 Feb 2023 13:20:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: francesco@dolcini.it)
-        by smtp-out-12.comm2000.it (Postfix) with ESMTPSA id E958BBA23DF;
-        Wed, 15 Feb 2023 21:41:03 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailserver.it;
-        s=mailsrv; t=1676493667;
-        bh=T/wW1BXFaoL18LTTv9PWoNYAoa7ftFqNWIodY0zZaNg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=cXDNsUJ5DJSvq2DO855rsTs4YmNTnKmKg4m1D7Gi43muwlOu7xkHNoVEl4uIxJ6us
-         emEu9mDfvViF9oU41HDEasHWoPEyuNuLN4o2aD5QU7+RQNRICV7L0AVcthQGMSyl4g
-         OrqeZ3laKf9/RslPSZtJxSonCOTXLUatZt3xxGhtLR5XD43ohgOgRMpdr7mB6WEp5t
-         iraOOncnVV5JumVx8T0EbloqgTrB6ll6PTZOdq22WvdNHaDnnFsVal5nI+GoiQwHBI
-         A/5Eiq3BSnchUzXIHeI3AEtpICabEbjGzoa0Ut55a2Qn4gFsr2vC736VbBSF8Tm7jj
-         dlibyhKSEV5Ag==
-Date:   Wed, 15 Feb 2023 21:41:00 +0100
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Francesco Dolcini <francesco@dolcini.it>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-arm-kernel@lists.infradead.org,
-        Francesco Dolcini <francesco.dolcini@toradex.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>
-Subject: Re: [PATCH v3 0/5] Bluetooth: hci_mrvl: Add serdev support for
- 88W8997
-Message-ID: <Y+1DXHtznirsCyLI@francesco-nb.int.toradex.com>
-References: <20230213120926.8166-1-francesco@dolcini.it>
- <CABBYNZ+y2jDi=0FFx31oB86skpDFTm5n+fDd5LBmvdxzOhqoSA@mail.gmail.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D11C461C40;
+        Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 300ACC433A0;
+        Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1676496020;
+        bh=XLI3+MkI4Fb5n5qhwX0Y7+IOf0TYe32DqmDGxmr7L78=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Fpv1c46bC7D/JDlgR8AIKkJmw6NkHwJzdJccN3Hoiifo8DmStHnTryPtTuaTj46Uj
+         DNTWW/AV/96ZNAsYQVdB0vvPjP6P+lb+tUzz/5TUwxlD219tIazabvqGknxNLc/km0
+         DjoTDRV6QjwFgilW/SFk3Es7SvZ9GbK71JBHLsMolTBT/92Fu78UpglGUbtkE2bNHr
+         qzKwNCm+7tPmcDQboXqxXHW0APR5KM2j8qB0/fTAphVoVeeHu5/5VDDAmsn0R+Nx7o
+         4iGZXr4kjzOF/fVnmpVERTUIvdDT4dSVBFa0Jk/rCFgqDkvFpmMi6Ung8G5bSnPzQX
+         G4NlCaB8BP2CA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 11644E270C2;
+        Wed, 15 Feb 2023 21:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZ+y2jDi=0FFx31oB86skpDFTm5n+fDd5LBmvdxzOhqoSA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 0/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167649602006.21327.2804578434988521190.git-patchwork-notify@kernel.org>
+Date:   Wed, 15 Feb 2023 21:20:20 +0000
+References: <20230213120926.8166-1-francesco@dolcini.it>
+In-Reply-To: <20230213120926.8166-1-francesco@dolcini.it>
+To:     Francesco Dolcini <francesco@dolcini.it>
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        marcel@holtmann.org, luiz.dentz@gmail.com,
+        linux-arm-kernel@lists.infradead.org,
+        francesco.dolcini@toradex.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        johan.hedberg@gmail.com, s.hauer@pengutronix.de,
+        shawnguo@kernel.org, kernel@pengutronix.de, festevam@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Luiz
+Hello:
 
-On Wed, Feb 15, 2023 at 12:36:34PM -0800, Luiz Augusto von Dentz wrote:
-> On Mon, Feb 13, 2023 at 4:09 AM Francesco Dolcini <francesco@dolcini.it> wrote:
-> >
-> > From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> >
-> > Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
-> > support for changing the baud rate. The command to change the baud rate is
-> > taken from the user manual UM11483 Rev. 9 in section 7 (Bring-up of Bluetooth
-> > interfaces) from NXP.
-> >
-> > v3:
-> >  - Use __hci_cmd_sync_status instead of __hci_cmd_sync
-> >
-> > v2:
-> >  - Fix the subject as pointed out by Krzysztof. Thanks!
-> >  - Fix indentation in marvell-bluetooth.yaml
-> >  - Fix compiler warning for kernel builds without CONFIG_OF enabled
-> >
-> > Stefan Eichenberger (5):
-> >   dt-bindings: bluetooth: marvell: add 88W8997
-> >   dt-bindings: bluetooth: marvell: add max-speed property
-> >   Bluetooth: hci_mrvl: use maybe_unused macro for device tree ids
-> >   Bluetooth: hci_mrvl: Add serdev support for 88W8997
-> >   arm64: dts: imx8mp-verdin: add 88W8997 serdev to uart4
-> >
-> >  .../bindings/net/marvell-bluetooth.yaml       | 20 ++++-
-> >  .../dts/freescale/imx8mp-verdin-wifi.dtsi     |  5 ++
-> >  drivers/bluetooth/hci_mrvl.c                  | 90 ++++++++++++++++---
-> >  3 files changed, 104 insertions(+), 11 deletions(-)
-> >
-> > --
-> > 2.25.1
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 13 Feb 2023 13:09:21 +0100 you wrote:
+> From: Francesco Dolcini <francesco.dolcini@toradex.com>
 > 
-> There seems to be missing one patch 5/5:
+> Add serdev support for the 88W8997 from NXP (previously Marvell). It includes
+> support for changing the baud rate. The command to change the baud rate is
+> taken from the user manual UM11483 Rev. 9 in section 7 (Bring-up of Bluetooth
+> interfaces) from NXP.
 > 
-> https://patchwork.kernel.org/project/bluetooth/list/?series=721269
-> 
-> Other than that the Bluetooth parts seem fine, and perhaps can be
-> merged if the patch above is not really required.
+> [...]
 
-In v3 I decided to not send it to the BT mailing list, since this is
-supposed to go through Shawn and the iMX/SOC tree.
+Here is the summary with links:
+  - [v3,1/5] dt-bindings: bluetooth: marvell: add 88W8997
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f48823aa0c4f
+  - [v3,2/5] dt-bindings: bluetooth: marvell: add max-speed property
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d7303dce9fcb
+  - [v3,3/5] Bluetooth: hci_mrvl: use maybe_unused macro for device tree ids
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e275614465ec
+  - [v3,4/5] Bluetooth: hci_mrvl: Add serdev support for 88W8997
+    https://git.kernel.org/bluetooth/bluetooth-next/c/58c6156a4d4b
 
-Given that it would be great if you could apply patches 1-4.
-
-Thanks,
-Francesco
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
