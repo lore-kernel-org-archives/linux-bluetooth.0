@@ -2,271 +2,157 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C25C636D6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Feb 2023 11:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F867C636CC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Feb 2023 14:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbjBPLiH (ORCPT
+        id S229920AbjBPO7c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Feb 2023 06:38:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55870 "EHLO
+        Thu, 16 Feb 2023 09:59:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbjBPLiG (ORCPT
+        with ESMTP id S229752AbjBPO7b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Feb 2023 06:38:06 -0500
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B467A1A4B3;
-        Thu, 16 Feb 2023 03:37:52 -0800 (PST)
-Received: from [141.14.13.65] (g320.RadioFreeInternet.molgen.mpg.de [141.14.13.65])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id B8E7060027FD7;
-        Thu, 16 Feb 2023 12:37:43 +0100 (CET)
-Message-ID: <44ac5699-c42f-bb22-b92d-c0d0a54cced4@molgen.mpg.de>
-Date:   Thu, 16 Feb 2023 12:37:43 +0100
+        Thu, 16 Feb 2023 09:59:31 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F958131
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Feb 2023 06:59:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1676559570; x=1708095570;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=n2B0GmUUo++D0ZudZQFRDcxImjpXS1QTc21oWszUo4w=;
+  b=TuHXtG2dX/afJWWXacBPHldgqAG9I63BYxbwBpwfWRo0GLQwJ4c1hPfd
+   VDF3nuyvawM/XqDBdNDKuf0h31+9E+z3Ss3pyfLAgmw8bqqJlLNHrx8M4
+   KFHZRw3/CU02g+a3HwRHJ0YtGqfcuJjoP9ur9clI9692oj0D+EVVF7lU7
+   SLReBJ1d7+IFol7P9/fONS4Tfs3w6ba2/5YngYgv4dZsbBBnEjZUFTscb
+   WqUXhEqNbK+fwbileGxwzgf98NNQav4DIzTQHuC1e5GeTq+nFtdZblaQw
+   3qbxnj43RMwgTwCdFzTqdhKTWUQDlkMpHk0nDG3F1rzOanOuwrWOBxCse
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="331731059"
+X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
+   d="scan'208";a="331731059"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2023 06:59:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10623"; a="672176632"
+X-IronPort-AV: E=Sophos;i="5.97,302,1669104000"; 
+   d="scan'208";a="672176632"
+Received: from lkp-server01.sh.intel.com (HELO 4455601a8d94) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 16 Feb 2023 06:59:29 -0800
+Received: from kbuild by 4455601a8d94 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pSfjM-000AIz-17;
+        Thu, 16 Feb 2023 14:59:28 +0000
+Date:   Thu, 16 Feb 2023 22:58:35 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 58c6156a4d4bdf011a061ab814920e7e59f68328
+Message-ID: <63ee449b.YEF+WyNrZMPF6U6k%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.2
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- SoC QCA2066
-Content-Language: en-US
-To:     Tim Jiang <quic_tjiang@quicinc.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
-        quic_hbandi@quicinc.com, quic_hemantg@quicinc.com, mka@chromium.org
-References: <20230216092236.26720-1-quic_tjiang@quicinc.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230216092236.26720-1-quic_tjiang@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Tim,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 58c6156a4d4bdf011a061ab814920e7e59f68328  Bluetooth: hci_mrvl: Add serdev support for 88W8997
 
+elapsed time: 1028m
 
-Thank you for the patch.
+configs tested: 79
+configs skipped: 3
 
-Am 16.02.23 um 10:22 schrieb Tim Jiang:
-> This patch adds support for QCA2066 firmware patch and nvm downloading.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-(Nit: Imperative mood with *Add support …* would make it shorter, and is 
-recommended.)
+gcc tested configs:
+alpha                            allyesconfig
+alpha                               defconfig
+arc                              allyesconfig
+arc                                 defconfig
+arc                  randconfig-r043-20230212
+arc                  randconfig-r043-20230213
+arm                              allmodconfig
+arm                              allyesconfig
+arm                                 defconfig
+arm                  randconfig-r046-20230212
+arm64                            allyesconfig
+arm64                               defconfig
+csky                                defconfig
+i386                             allyesconfig
+i386                              debian-10.3
+i386                                defconfig
+i386                 randconfig-a011-20230213
+i386                 randconfig-a012-20230213
+i386                 randconfig-a013-20230213
+i386                 randconfig-a014-20230213
+i386                 randconfig-a015-20230213
+i386                 randconfig-a016-20230213
+ia64                             allmodconfig
+ia64                                defconfig
+loongarch                        allmodconfig
+loongarch                         allnoconfig
+loongarch                           defconfig
+m68k                             allmodconfig
+m68k                                defconfig
+mips                             allmodconfig
+mips                             allyesconfig
+nios2                               defconfig
+parisc                              defconfig
+parisc64                            defconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+riscv                            allmodconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                randconfig-r042-20230213
+riscv                          rv32_defconfig
+s390                             allmodconfig
+s390                             allyesconfig
+s390                                defconfig
+s390                 randconfig-r044-20230213
+sh                               allmodconfig
+sparc                               defconfig
+um                             i386_defconfig
+um                           x86_64_defconfig
+x86_64                            allnoconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                                  kexec
+x86_64               randconfig-a011-20230213
+x86_64               randconfig-a012-20230213
+x86_64               randconfig-a013-20230213
+x86_64               randconfig-a014-20230213
+x86_64               randconfig-a015-20230213
+x86_64               randconfig-a016-20230213
+x86_64                               rhel-8.3
 
-Please elaborate a little. Please mention the datasheet name and 
-revision, and how it was tested.
+clang tested configs:
+arm                  randconfig-r046-20230213
+hexagon              randconfig-r041-20230212
+hexagon              randconfig-r041-20230213
+hexagon              randconfig-r045-20230212
+hexagon              randconfig-r045-20230213
+i386                 randconfig-a001-20230213
+i386                 randconfig-a002-20230213
+i386                 randconfig-a003-20230213
+i386                 randconfig-a004-20230213
+i386                 randconfig-a005-20230213
+i386                 randconfig-a006-20230213
+riscv                randconfig-r042-20230212
+s390                 randconfig-r044-20230212
+x86_64               randconfig-a001-20230213
+x86_64               randconfig-a002-20230213
+x86_64               randconfig-a003-20230213
+x86_64               randconfig-a004-20230213
+x86_64               randconfig-a005-20230213
+x86_64               randconfig-a006-20230213
 
-> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
-> ---
->   drivers/bluetooth/btqca.c   | 78 +++++++++++++++++++++++++++++++++++++
->   drivers/bluetooth/btqca.h   |  2 +
->   drivers/bluetooth/hci_qca.c |  6 +++
->   3 files changed, 86 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index c9064d34d830..e1127532c5a8 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -205,6 +205,50 @@ static int qca_send_reset(struct hci_dev *hdev)
->   	return 0;
->   }
->   
-> +static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid)
-> +{
-> +	u8 cmd;
-> +	struct sk_buff *skb;
-> +	struct edl_event_hdr *edl;
-> +	int err = 0;
-> +	int bid_len;
-> +
-> +	bt_dev_dbg(hdev, "QCA read board ID");
-> +
-> +	cmd = EDL_GET_BID_REQ_CMD;
-> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
-> +				&cmd, 0, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		err = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "Reading QCA board ID failed (%d)",
-> +			   err);
-
-Should fit in one line?
-
-> +		return err;
-> +	}
-> +
-> +	edl = skb_pull_data(skb, sizeof(*edl));
-> +	if (!edl) {
-> +		bt_dev_err(hdev, "QCA read board ID with no header");
-
-Please phrase these errors more user understandable. Maybe even with a 
-suggestion, how to fix it.
-
-> +		err = -EILSEQ;
-> +		goto out;
-> +	}
-> +
-> +	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
-> +	    edl->rtype != EDL_GET_BID_REQ_CMD) {
-> +		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
-> +			   edl->rtype);
-
-Same.
-
-> +		err = -EIO;
-> +		goto out;
-> +	}
-> +
-> +	bid_len = edl->data[0];
-> +	*bid = (edl->data[1] << 8) + edl->data[2];
-> +	bt_dev_info(hdev, "%s: bid len = %x, bid = %x", __func__, bid_len, *bid);
-> +
-> +out:
-> +	kfree_skb(skb);
-> +	return err;
-> +}
-> +
->   int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->   {
->   	struct sk_buff *skb;
-> @@ -574,6 +618,31 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
->   }
->   EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
->   
-> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
-> +		   size_t max_size, struct qca_btsoc_version ver, u16 bid)
-> +{
-> +	u8 rom_ver = 0;
-> +	u32 soc_ver;
-> +	const char *variant;
-> +
-> +	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
-> +	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> +
-> +	if ((ver.soc_id & 0x0000ff00) == 0x1200) /*hsp gf chip*/
-
-Missing spaces in the comment. Can macros/enums be used?
-
-> +		variant = "g";
-> +	else
-> +		variant = "";
-> +
-> +	if (bid == 0x0) {
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
-> +	} else {
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x",
-> +			rom_ver, variant, bid);
-> +	}
-
-The coding style requires no spaces for oneline bodies.
-
-> +
-> +	bt_dev_info(hdev, "%s: nvm name is %s", __func__, fwname);
-> +}
-> +
->   int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
->   		   const char *firmware_name)
-> @@ -582,6 +651,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	int err;
->   	u8 rom_ver = 0;
->   	u32 soc_ver;
-> +	u16 bid = 0;
-
-Use boardid as name?
-
->   
->   	bt_dev_dbg(hdev, "QCA setup on UART");
->   
-> @@ -607,6 +677,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	} else if (soc_type == QCA_QCA6390) {
->   		snprintf(config.fwname, sizeof(config.fwname),
->   			 "qca/htbtfw%02x.tlv", rom_ver);
-> +	} else if (soc_type == QCA_QCA2066) {
-> +		snprintf(config.fwname, sizeof(config.fwname),
-> +			 "qca/hpbtfw%02x.tlv", rom_ver);
->   	} else if (soc_type == QCA_WCN6750) {
->   		/* Choose mbn file by default.If mbn file is not found
-
-Missing space after dot/period.
-
->   		 * then choose tlv file
-> @@ -628,6 +701,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	/* Give the controller some time to get ready to receive the NVM */
->   	msleep(10);
->   
-> +	if (soc_type == QCA_QCA2066)
-> +		qca_read_fw_board_id(hdev, &bid);
-> +
->   	/* Download NVM configuration */
->   	config.type = TLV_TYPE_NVM;
->   	if (firmware_name)
-> @@ -645,6 +721,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	else if (soc_type == QCA_QCA6390)
->   		snprintf(config.fwname, sizeof(config.fwname),
->   			 "qca/htnv%02x.bin", rom_ver);
-> +	else if (soc_type == QCA_QCA2066)
-> +		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname), ver, bid);
-
-Sort the branches lexicographically?
-
->   	else if (soc_type == QCA_WCN6750)
->   		snprintf(config.fwname, sizeof(config.fwname),
->   			 "qca/msnv%02x.bin", rom_ver);
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 61e9a50e66ae..e762c403284a 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -13,6 +13,7 @@
->   #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
->   #define EDL_GET_BUILD_INFO_CMD		(0x20)
->   #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
-> +#define EDL_GET_BID_REQ_CMD		(0x23)
->   #define EDL_PATCH_CONFIG_CMD		(0x28)
->   #define MAX_SIZE_PER_TLV_SEGMENT	(243)
->   #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
-> @@ -147,6 +148,7 @@ enum qca_btsoc_type {
->   	QCA_WCN3991,
->   	QCA_QCA6390,
->   	QCA_WCN6750,
-> +	QCA_QCA2066,
-
-Sort it?
-
->   };
->   
->   #if IS_ENABLED(CONFIG_BT_QCA)
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 3df8c3606e93..84769089ddff 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1866,6 +1866,11 @@ static const struct qca_device_data qca_soc_data_qca6390 = {
->   	.num_vregs = 0,
->   };
->   
-> +static const struct qca_device_data qca_soc_data_qca2066 = {
-> +	.soc_type = QCA_QCA2066,
-> +	.num_vregs = 0,
-> +};
-> +
->   static const struct qca_device_data qca_soc_data_wcn6750 = {
->   	.soc_type = QCA_WCN6750,
->   	.vregs = (struct qca_vreg []) {
-> @@ -2335,6 +2340,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
->   	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
->   	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
->   	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
-> +	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
-
-Sort it?
-
->   	{ /* sentinel */ }
->   };
->   MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
-
-
-Kind regards,
-
-Paul
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
