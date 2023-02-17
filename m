@@ -2,127 +2,180 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D83C05027
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Feb 2023 18:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2AD9C64ED8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Feb 2023 19:38:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229509AbjBQSIy (ORCPT
+        id S229870AbjBQTiq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Feb 2023 13:08:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59206 "EHLO
+        Fri, 17 Feb 2023 14:38:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbjBQSIx (ORCPT
+        with ESMTP id S229849AbjBQTio (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Feb 2023 13:08:53 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9524A5CF16
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Feb 2023 10:08:51 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id bx7so807331iob.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Feb 2023 10:08:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=lRlyYR2LyekMYoUtM5RmaSIa4c1FQUAkOXOiiAF25lk=;
-        b=A6JzsV/lIXliaryDrfeaA/yW/bcaRyXvKzFlF/PyrbkaRfwNgDSvBTCdqYiiUFjUhA
-         G2JWuevKPEhoEA8aiQzncfjfUZzApIL1U0M/rzTXJQQXnnHnc9IrvfUV4GJ5lNQNqK7K
-         hx+yzsd1GWaf5L+QWA+dW1mq1Ehqd3JkaDYz142fsSIEx3zQryI8TBw1uvbBKuZXkgqN
-         /V9Gdf7sBVvUjhxDfNRDVI0EluA/v4eWy1cJ9+OHJaH9p8YzWn10dP/RGRmGU8lvfDIQ
-         ut1s32nwwjrWttjSmCAZ5cmZTQ4siLLFvSvcoHaVZp45AOSbDQlxBi3jm872xb9MtzV/
-         Nymw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lRlyYR2LyekMYoUtM5RmaSIa4c1FQUAkOXOiiAF25lk=;
-        b=m2smhfo7STuX2UuHApyNVvvfvVopN13s0so4xtKP2BogiSTlm89WD1MKiX/tPiIL+5
-         +2JMiwhgVcV/Fl3Ats+2V6z5kW4O6NTSSy0pW1nneaANx0nq3+QTa+H/ea8M2sUG4dHI
-         UmO2h9wiFn4KxIpp1x7POUkM8uL9ceLq0a++W3Ynh1nLfS53MCUNL7tn0jp+VWwzTQxI
-         6oPwesxKvTBVgfGXVQvw8sAGPP1xyhwr6MTkxpwH6hXiaIHpZYrfuV2HWWTu98eHS7mc
-         +8Rd55IKNlyBKxMDraWiNL4ejZyaAmkfMAWSsxd0sSBOIwHyNt6bl9Q5S1MRDmNqufQV
-         Xweg==
-X-Gm-Message-State: AO0yUKWxaq2uisL3d7hICkYNG5ApAlysLBPPnfAnNmKuMT8Z6kzfb/O/
-        LzsguR/6H0kyw/gsIqfjc1aC4toE1bRLhAoIPOWZab/q
-X-Google-Smtp-Source: AK7set8WU1wGo1TvH202c5TQV4mZvYvHCj2chrtJ3vLReKYwkKLVrkarTfQfG1C20HL+1Z0cH0re0rojGctVJ7S8kcg=
-X-Received: by 2002:a5d:970d:0:b0:734:11db:e655 with SMTP id
- h13-20020a5d970d000000b0073411dbe655mr3433202iol.45.1676657330910; Fri, 17
- Feb 2023 10:08:50 -0800 (PST)
+        Fri, 17 Feb 2023 14:38:44 -0500
+X-Greylist: delayed 385 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 17 Feb 2023 11:38:37 PST
+Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 621025CF05
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Feb 2023 11:38:37 -0800 (PST)
+Received: (wp-smtpd smtp.tlen.pl 3647 invoked from network); 17 Feb 2023 20:31:54 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
+          t=1676662314; bh=NeTY7K463bS1HXo6rBORUcYtIDgVg1kEicOY8i9MBK0=;
+          h=From:To:Cc:Subject;
+          b=tAhhTWIPIs9pbNtQKVt+dluNPwGloWMrjUmwHsqlxPSFQJiWl0rUKrUvq62xkkBRB
+           jpgfpOmXdzIqRonD/6FzTtVqcv/R86pVTlW0uuf0O9ufoO3CSN5OPi2zMxszp469d3
+           4XHDd4PGNxwBjP4wfEMx4q7qbiiXeW+PN+QtHpzk=
+Received: from aafq148.neoplus.adsl.tpnet.pl (HELO localhost.localdomain) (mat.jonczyk@o2.pl@[83.4.146.148])
+          (envelope-sender <mat.jonczyk@o2.pl>)
+          by smtp.tlen.pl (WP-SMTPD) with SMTP
+          for <brian.gix@intel.com>; 17 Feb 2023 20:31:54 +0100
+From:   =?UTF-8?q?Mateusz=20Jo=C5=84czyk?= <mat.jonczyk@o2.pl>
+To:     brian.gix@intel.com, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?Mateusz=20Jo=C5=84czyk?= <mat.jonczyk@o2.pl>,
+        Luiz Von Dentz <luiz.von.dentz@intel.com>
+Subject: Re: [PATCH 1/1] Bluetooth: Convert MSFT filter HCI cmd to hci_sync
+Date:   Fri, 17 Feb 2023 20:31:42 +0100
+Message-Id: <20230217193142.6954-1-mat.jonczyk@o2.pl>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <8ca5bf9ce1f544096a3ff88b743381bc9e60a76d.camel@intel.com>
+References: <8ca5bf9ce1f544096a3ff88b743381bc9e60a76d.camel@intel.com>
 MIME-Version: 1.0
-References: <CADBWZmXM7NO_mbw-ka9WYg2fMVhxD2ByFR1PJBDVc2e1yf_8Tw@mail.gmail.com>
- <CABBYNZK_O5bnmE4ONOQiB-RgUjWwqvQrD8euNqpKAOcUSzER5A@mail.gmail.com>
-In-Reply-To: <CABBYNZK_O5bnmE4ONOQiB-RgUjWwqvQrD8euNqpKAOcUSzER5A@mail.gmail.com>
-From:   Neacsu Cristian <neacsu.cristianstefan@gmail.com>
-Date:   Fri, 17 Feb 2023 20:08:38 +0200
-Message-ID: <CADBWZmUBKdVf9M3G5s6KW-4spXidQxiE0KRwytsdS+xrvk0t-Q@mail.gmail.com>
-Subject: Re: Need a BLE socket to connect to a nRF52832 Nordic (Low energy BT 5)
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: 7baa9ff0d548701b2bfad603fab9ea5f
+X-WP-AV: skaner antywirusowy Poczty o2
+X-WP-SPAM: NO 0000000 [4cNl]                               
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+W dniu 21.11.2022 o 19:48, Gix, Brian pisze:
+> Hi Mateusz,
+>
+> On Sat, 2022-11-19 at 19:26 +0100, Mateusz Jończyk wrote:
+>> W dniu 2.11.2022 o 18:59, Brian Gix pisze:
+>>> The msft_set_filter_enable() command was using the deprecated
+>>> hci_request mechanism rather than hci_sync. This caused the warning
+>>> error:
+>>> hci0: HCI_REQ-0xfcf0
+>>>
+>>> Signed-off-by: Brian Gix <brian.gix@intel.com>
+>>> ---
+>>>  net/bluetooth/msft.c | 36 +++++++++++-------------------------
+>>>  1 file changed, 11 insertions(+), 25 deletions(-)
+>>
+>> Hello,
+>>
+>> On the first time I was testing this patch, I was heavily testing
+>> various Bluetooth functionality. Eventually, something stopped
+>> working
+>> and I was no longer able to establish a Bluetooth connection between
+>> my mobile phone and my laptop. To try to resolve this issue, I tried
+>> suspending
+>> my laptop, but after resume, I got a kernel panic (dmesg attached
+>> below, I may
+>> provide journal extracts on request).
+
 Hello,
 
-Thank you for your reply. Yes gatt is the way to go. I tried in
-bluetoothctl using gatt.list_attributes gatt.select_attribute,
-selecting the tx uuid and the send some bytes. Exactly what I need.
-But that is directly in bluetootctl. I don't want to do that by doing
-a wrapper around it. How can I implement it directly in C?
-Do you have a scenario for a gatt connection in C?
+I have to apologize for the delay.
 
-Cristian-Stefan
+This kernel panic happened to me again, without this patch so now I can
+say that it is unrelated. I have again tested the patch you provided and
+Bluetooth with it appeared to be working correctly. I have even tested
+with a mobile app called "Beacon Simulator" [1] and the beacon was
+successfully found on my laptop.
 
+I have tested this on top of 6.2.0-rc8.
 
-Cristian-Stefan
+Additionally, to see how it worked, I tested it with some debugging
+printks and additional calls to
+	msft_set_filter_enable(hdev, X);
+(patch attached below) and the code appears to do as it is intended, but
+when I combined two 
+	msft_set_filter_enable(hdev, true);
+calls one after the other, I got something like this:
 
+	Bluetooth: hci0: BEGIN msft_set_filter_enable(hdev, 1)
+	Bluetooth: hci0: BEGIN msft_le_set_advertisement_filter_enable_cb(hdev, user_data, 0)
+	Bluetooth: hci0: END msft_set_filter_enable(hdev, 1), err = 0
+	Bluetooth: hci0: BEGIN msft_set_filter_enable(hdev, 1)
+	Bluetooth: hci0: Opcode 0xfcf0 failed: -16
+	Bluetooth: hci0: BEGIN msft_le_set_advertisement_filter_enable_cb(hdev, user_data, f0)
+	Bluetooth: hci0: END msft_set_filter_enable(hdev, 1), err = -16
 
+instead of the error code 0x0C as is described in a comment in
+msft_le_set_advertisement_filter_enable_cb() and the Microsoft
+specification. Is this expected?
 
+In msft_set_filter_enable() your patch also casts err from int to u8
+while calling msft_le_set_advertisement_filter_enable_cb() without
+checking its sign.
 
-On Thu, Feb 16, 2023 at 11:04 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Neacsu,
->
-> On Thu, Feb 16, 2023 at 11:20 AM Neacsu Cristian
-> <neacsu.cristianstefan@gmail.com> wrote:
-> >
-> > Hello,
-> >
-> >     Long story short, I am trying to connect with a linux PC using a
-> > Bluetooth 5 universal adapter (Asus USB-BT500) to a Bluetooth 5 module
-> > PCB, called BT832X which is using a Bluetooth Low Energy Technology
-> > that is using a chip Nordic nRF52832 (see url for the module
-> > documentation https://static1.squarespace.com/static/561459a2e4b0b39f5cefa12e/t/63de8b578e4d7813cde64445/1675529048975/BT832X-p+Product+Specifications.pdf).
-> >     Therefore I tried everything, reading docs, sniffing through the
-> > bluetoothctl sources, gatttools sources, and I am not able to open and
-> > connect on a socket on my PC to connect properly.
-> > Usually for legacy Bluetooth stuff, I create a RF_COMM socket, and the
-> > magic is done by itself. No biggie.
-> >     Here I tried an L2CAP approach (not sure if I had a proper
-> > configuration), I tried to use the gatttool as it is, without success.
-> > I feel a bit lost.
-> >     The remote device is working properly, because using the Nordic
-> > demo Android app (downloadable from Google Play Store), I am able to
-> > communicate with the PCB and exchange packages.
-> >     Do you have a functional, very simple sample, or suggestion,
-> > preferably in C, to help me to open a socket and send a data package?
-> > I mean, you have a BLE module, you want to connect with it using
-> > BlueZ, how do you open a socket, how do you configure it, connect to
-> > it and send a byte through it?
-> >     Let's keep in mind that I am already able to scan for the
-> > destination address (I created a custom agent in bluetoothctl that is
-> > fishing data using the "scan on" command), so the address that I'm
-> > connecting to is already known.
-> >
-> > Thank you and I'm really really looking forward to your reply.
->
-> I guess for LE what you really want is to use GATT procedures, which
-> are available via bluetoothctl> menu gatt
->
-> > Cristian-Stefan
->
->
->
-> --
-> Luiz Augusto von Dentz
+Greetings,
+
+Mateusz
+
+[1] https://play.google.com/store/apps/details?id=net.alea.beaconsimulator
+
+Cc: Luiz Von Dentz <luiz.von.dentz@intel.com>
+
+---
+ net/bluetooth/msft.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index bf5cee48916c..a6f594bd0722 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -6,6 +6,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/mgmt.h>
++#include <linux/delay.h>
+ 
+ #include "hci_request.h"
+ #include "mgmt_util.h"
+@@ -527,6 +528,12 @@ void msft_do_open(struct hci_dev *hdev)
+ 	if (msft_monitor_supported(hdev)) {
+ 		msft->resuming = true;
+ 		msft_set_filter_enable(hdev, true);
++		mdelay(1);
++		msft_set_filter_enable(hdev, false);
++		mdelay(1);
++		msft_set_filter_enable(hdev, true);
++		mdelay(1);
++		msft_set_filter_enable(hdev, true);
+ 		/* Monitors get removed on power off, so we need to explicitly
+ 		 * tell the controller to re-monitor.
+ 		 */
+@@ -749,6 +756,8 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
+ 	struct msft_cp_le_set_advertisement_filter_enable *cp = user_data;
+ 	struct msft_data *msft = hdev->msft_data;
+ 
++	bt_dev_warn(hdev, "BEGIN msft_le_set_advertisement_filter_enable_cb(hdev, user_data, %x)", (unsigned) status);
++
+ 	/* Error 0x0C would be returned if the filter enabled status is
+ 	 * already set to whatever we were trying to set.
+ 	 * Although the default state should be disabled, some controller set
+@@ -804,6 +813,8 @@ int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+ 	struct msft_data *msft = hdev->msft_data;
+ 	int err;
+ 
++	bt_dev_warn(hdev, "BEGIN msft_set_filter_enable(hdev, %d)", (int) enable);
++
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
+ 
+@@ -814,6 +825,8 @@ int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+ 
+ 	msft_le_set_advertisement_filter_enable_cb(hdev, &cp, err);
+ 
++	bt_dev_warn(hdev, "END msft_set_filter_enable(hdev, %d), err = %d", (int) enable, err);
++
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
+
