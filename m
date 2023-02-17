@@ -2,106 +2,94 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE87C636D6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Feb 2023 21:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D3CC636D4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Feb 2023 10:05:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbjBPVE0 (ORCPT
+        id S229866AbjBQKE7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Feb 2023 16:04:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39854 "EHLO
+        Fri, 17 Feb 2023 05:04:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230022AbjBPVEZ (ORCPT
+        with ESMTP id S229826AbjBQKEu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Feb 2023 16:04:25 -0500
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F037505D3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Feb 2023 13:04:24 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id f34so4346132lfv.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Feb 2023 13:04:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eIeU9ZMoRh18beZ88mIVfQBocKS7mUhsKJyVztE4Qkk=;
-        b=nKRu36MtAziI9tKIWK+vArhBU+1aMoKRCFcrzKg/yOWaA0Qt57oXgoQ7D3f03AjlZK
-         VidXIYLW7gjDPF9K1A9m10yJeN1vcCNXHnZTw+HQhLrfpnYFa9U6Jcb0M1sI/V5PWkh4
-         Bt78YrMsStVP/X3jp0HfUri4lKtAGv77V/Qqf+YFHHYrQ//cGKMZt8qiZimFZBaO+5Go
-         6eQfozuZ6QgHg2HIPDMUS0whzRAf6jtv7piwSa/uLeAnNyago+ZFUp3I9Tq/UD6QHrl4
-         dVssfXgMcpZPaGVl1hkuJE+/1jeMeFBOMfryyeYK1+7CtwxXqe3DicXo3z6M1xpGz0TQ
-         pj9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eIeU9ZMoRh18beZ88mIVfQBocKS7mUhsKJyVztE4Qkk=;
-        b=jqWMXb21LJdd0RrlskqukbVTYV4i/+cYJ02Jc7AV3pUm6tlrmNLWO+Y0gpoilqzP1r
-         M1lPrRQIjUvBDG5OkoMp79W9dBtJuEA3U9pAyb8H9QamiDudmRIVcYd6DSNiaj2JQr6Y
-         owJqe7BU3jEDdsYFuDxDw7GBdMxEFivXodMreCAOfluMPCOKczjFGxVf5kWdH9FE1wS6
-         SgJw2w0H/N6QvqQmOxy1FLMe42ly05DAK4IWDrtGVTwEdwYmg39T7G10LZJj7//gCZVI
-         zIW4kVTS/VgUVui/i0MOBLNCeZRjNqpzku0OtJXszhRbAJB0/kHmpexLTNQBfUhNNjH1
-         Z4eA==
-X-Gm-Message-State: AO0yUKVQ9cxJGw1hqIf0k42sGGKzWa+c0lv1VZ5Ob+kPSsAs0woqKWUh
-        B4fC6Jv6hOluOghrZFLy5xV0aNJ2YfnaA8c99GUAb3Q9
-X-Google-Smtp-Source: AK7set8/elg49oyJvtj92U3T+GSBsloGmbXJuq9kpSXNoUJpNhylM8/v1x+48ry2rpSztF4s/b57Tg/WSgawCZj0Ztw=
-X-Received: by 2002:ac2:5296:0:b0:4db:173e:812a with SMTP id
- q22-20020ac25296000000b004db173e812amr2043627lfm.8.1676581462606; Thu, 16 Feb
- 2023 13:04:22 -0800 (PST)
+        Fri, 17 Feb 2023 05:04:50 -0500
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 899635D3F6;
+        Fri, 17 Feb 2023 02:04:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=ZBdy2
+        Nmsi/nHTRTs/Crmb7sXfqr4oP2fZCHYUPlE0fE=; b=jpqmdvt3VRjTBFF+F1o2/
+        ETijjOy1/NtIbri5pGeailC3GPWj1GMVzRdzwnY5O+yyUhfus5MJCMAMzet19JT0
+        Jcmdke172WyFBBYQcpQXfWU8anHOXcl7M4QSMO5BQ2lSp6kzdrZCE08OHVf7HhTc
+        OcGZv9LjgDO4l8dKr1RJDo=
+Received: from leanderwang-LC2.localdomain (unknown [111.206.145.21])
+        by zwqz-smtp-mta-g4-4 (Coremail) with SMTP id _____wA3b7+xUO9jalZ3AA--.3246S2;
+        Fri, 17 Feb 2023 18:02:25 +0800 (CST)
+From:   Zheng Wang <zyytlz.wz@163.com>
+To:     marcel@holtmann.org
+Cc:     hackerzheng666@gmail.com, alex000young@gmail.com,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de,
+        Zheng Wang <zyytlz.wz@163.com>
+Subject: [PATCH v2] Bluetooth: hci_core: Fix poential Use-after-Free bug in  hci_remove_adv_monitor
+Date:   Fri, 17 Feb 2023 18:02:23 +0800
+Message-Id: <20230217100223.702330-1-zyytlz.wz@163.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <CADBWZmXM7NO_mbw-ka9WYg2fMVhxD2ByFR1PJBDVc2e1yf_8Tw@mail.gmail.com>
-In-Reply-To: <CADBWZmXM7NO_mbw-ka9WYg2fMVhxD2ByFR1PJBDVc2e1yf_8Tw@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 16 Feb 2023 13:04:11 -0800
-Message-ID: <CABBYNZK_O5bnmE4ONOQiB-RgUjWwqvQrD8euNqpKAOcUSzER5A@mail.gmail.com>
-Subject: Re: Need a BLE socket to connect to a nRF52832 Nordic (Low energy BT 5)
-To:     Neacsu Cristian <neacsu.cristianstefan@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _____wA3b7+xUO9jalZ3AA--.3246S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7urWUArW8Cw4fKr15GF47XFb_yoW8XFyxpF
+        W5JF1Y9rW8tr17XF1xAa1fWFyUJw4YgFZ7Cr98A34fJwsxt3yktw18Ga4qqFyfuFZ5tF42
+        vF1ktrs8WayDWFUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0ziX_-dUUUUU=
+X-Originating-IP: [111.206.145.21]
+X-CM-SenderInfo: h2113zf2oz6qqrwthudrp/1tbiXAQZU1Xl5pZyywABsq
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Neacsu,
+In hci_remove_adv_monitor, if it gets into HCI_ADV_MONITOR_EXT_MSFT case,
+the function will free the monitor and print its handle after that.
+Fix it by removing the logging into msft_le_cancel_monitor_advertisement_cb
+before calling hci_free_adv_monitor.
 
-On Thu, Feb 16, 2023 at 11:20 AM Neacsu Cristian
-<neacsu.cristianstefan@gmail.com> wrote:
->
-> Hello,
->
->     Long story short, I am trying to connect with a linux PC using a
-> Bluetooth 5 universal adapter (Asus USB-BT500) to a Bluetooth 5 module
-> PCB, called BT832X which is using a Bluetooth Low Energy Technology
-> that is using a chip Nordic nRF52832 (see url for the module
-> documentation https://static1.squarespace.com/static/561459a2e4b0b39f5cefa12e/t/63de8b578e4d7813cde64445/1675529048975/BT832X-p+Product+Specifications.pdf).
->     Therefore I tried everything, reading docs, sniffing through the
-> bluetoothctl sources, gatttools sources, and I am not able to open and
-> connect on a socket on my PC to connect properly.
-> Usually for legacy Bluetooth stuff, I create a RF_COMM socket, and the
-> magic is done by itself. No biggie.
->     Here I tried an L2CAP approach (not sure if I had a proper
-> configuration), I tried to use the gatttool as it is, without success.
-> I feel a bit lost.
->     The remote device is working properly, because using the Nordic
-> demo Android app (downloadable from Google Play Store), I am able to
-> communicate with the PCB and exchange packages.
->     Do you have a functional, very simple sample, or suggestion,
-> preferably in C, to help me to open a socket and send a data package?
-> I mean, you have a BLE module, you want to connect with it using
-> BlueZ, how do you open a socket, how do you configure it, connect to
-> it and send a byte through it?
->     Let's keep in mind that I am already able to scan for the
-> destination address (I created a custom agent in bluetoothctl that is
-> fishing data using the "scan on" command), so the address that I'm
-> connecting to is already known.
->
-> Thank you and I'm really really looking forward to your reply.
+Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+---
+v2:
+- move the logging inside msft_remove_monitor suggested by Luiz
+---
+ net/bluetooth/hci_core.c | 2 --
+ net/bluetooth/msft.c     | 2 ++
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-I guess for LE what you really want is to use GATT procedures, which
-are available via bluetoothctl> menu gatt
-
-> Cristian-Stefan
-
-
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b65c3aabcd53..69b82c2907ff 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1981,8 +1981,6 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
+ 
+ 	case HCI_ADV_MONITOR_EXT_MSFT:
+ 		status = msft_remove_monitor(hdev, monitor);
+-		bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
+-			   hdev->name, monitor->handle, status);
+ 		break;
+ 	}
+ 
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index bee6a4c656be..4b35f0ed1360 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -286,6 +286,8 @@ static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
+ 		 * suspend. It will be re-monitored on resume.
+ 		 */
+ 		if (!msft->suspending) {
++			bt_dev_dbg(hdev, "%s remove monitor %d status %d", hdev->name,
++				   monitor->handle, status);
+ 			hci_free_adv_monitor(hdev, monitor);
+ 
+ 			/* Clear any monitored devices by this Adv Monitor */
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
