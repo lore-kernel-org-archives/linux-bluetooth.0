@@ -2,172 +2,154 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC15C64EC7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Feb 2023 06:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31ACCC61DA3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Feb 2023 07:13:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233336AbjBUGva (ORCPT
+        id S233504AbjBUHNn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Feb 2023 01:51:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56694 "EHLO
+        Tue, 21 Feb 2023 02:13:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233319AbjBUGv3 (ORCPT
+        with ESMTP id S233502AbjBUHNm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Feb 2023 01:51:29 -0500
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B659E23117;
-        Mon, 20 Feb 2023 22:51:27 -0800 (PST)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31L2atWw029898;
-        Tue, 21 Feb 2023 06:49:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=qcppdkim1;
- bh=rYjT1VPCrDbOXAoWaWzQslbAY+4S4TBlb0O4SpceqL0=;
- b=IgoDGMe3P9ZZWtn9gd+iBVdOmHB1kpUJ+/k7PWXwqVB2vqDli5Lh0svb+NZcn9Pty8it
- 3hUl9bC4A7muYTFd75HNjiNdkJl5Ntkwmrc2nKnr+CqD4vkrYMbeJVljbDWUMFw6xLWs
- C0sQNQBZjxqubFOx9klnIZ4bgobpRRel8CYkN0/o7fST/yKxEweJxlvLwWgnP7vzr0T9
- VcZdQe9siakXAaolPvv/aDA9zL+/yvsthD3KEGsDQdzui65na/PIjsxNxmwATkyO0AWH
- kHLA6aYYOA6vUKdq9Ma3za8K5olrkEVRaMLkQH8b+wv9thiF9b/+wuBJzp5cawzYN2ch Eg== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3nubb1w08a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 06:49:21 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 31L6nLEv004488
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 21 Feb 2023 06:49:21 GMT
-Received: from nalasex01b.na.qualcomm.com (10.47.209.197) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Mon, 20 Feb 2023 22:49:20 -0800
-Received: from nalasex01b.na.qualcomm.com ([fe80::5e14:2d59:8da8:b152]) by
- nalasex01b.na.qualcomm.com ([fe80::5e14:2d59:8da8:b152%12]) with mapi id
- 15.02.0986.041; Mon, 20 Feb 2023 22:49:20 -0800
-From:   "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
-To:     Steev Klimaszewski <steev@kali.org>
-CC:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "mka@chromium.org" <mka@chromium.org>,
-        "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>,
-        "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>,
-        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>,
-        "quic_saluvala@quinc.com" <quic_saluvala@quinc.com>
-Subject: RE: [PATCH v2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- SoC QCA2066
-Thread-Topic: [PATCH v2] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth SoC QCA2066
-Thread-Index: AQHZQeg+G1wnKRsWA0alDqcMCYIjUK7UG4eAgANTyyCAAf18gP//iffw
-Date:   Tue, 21 Feb 2023 06:49:20 +0000
-Message-ID: <e2026b606ae14ff6a793d45723b13a1e@quicinc.com>
-References: <20230216092236.26720-1-quic_tjiang@quicinc.com>
- <20230218041545.3801-1-steev@kali.org>
- <DM5PR02MB36863752A525F50AC05662B0EDA49@DM5PR02MB3686.namprd02.prod.outlook.com>
- <CAKXuJqigh=5LMei4ym5s4vKCxkMR5vfM++k7Jk7C4Ge-GRVK6A@mail.gmail.com>
-In-Reply-To: <CAKXuJqigh=5LMei4ym5s4vKCxkMR5vfM++k7Jk7C4Ge-GRVK6A@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.253.32.31]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: w5dVPHrD6aH24QMkZndHUNlrk_Jp7jTT
-X-Proofpoint-GUID: w5dVPHrD6aH24QMkZndHUNlrk_Jp7jTT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
- definitions=2023-02-21_03,2023-02-20_02,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- suspectscore=0 adultscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 priorityscore=1501 mlxscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2302210059
+        Tue, 21 Feb 2023 02:13:42 -0500
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8096322DC0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Feb 2023 23:13:34 -0800 (PST)
+Received: by mail-vk1-xa2e.google.com with SMTP id 26so2056305vkn.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Feb 2023 23:13:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:cc:date:message-id:subject:mime-version
+         :content-transfer-encoding:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3q2pzU9Qz6VR/qGmSVfVV1MeAe6CaEVEzfExBv8Dc1s=;
+        b=iXgKBYy5yxtPqzbtlPjctm5jlsHcZc6U/v2vDahSMUzTUm9mIpm4MjWcMXW0754LnE
+         BCmA8xw5HjIijZDtesveZTYnbKqhX8xxrdlS5HXnviSn6nFDZJ8KHwMWyCUe/hZbK5HN
+         jNpwsqyH/qeYAEWInjeW8IEO1H5tVanYJ2tK1NO7v+040vYA8YhqXp8ElLfiXGt5A8wl
+         ASz8nQJj3hA5BGB3gNV8bHBJPnP1bIy8/yVRxPQEDqfleRb79X+dEPCfWWkbttkNnTAq
+         YFLDTItkeZhS4v11mtQCz0CFGd32fL2jdHSb8CX4Dg28rS2pIwhPxHqjED1TgvcYJR5x
+         nIZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:cc:date:message-id:subject:mime-version
+         :content-transfer-encoding:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3q2pzU9Qz6VR/qGmSVfVV1MeAe6CaEVEzfExBv8Dc1s=;
+        b=ot4bt7zD2t8RiSauY0mDRzev71191JIem+F7VV6h2sPzx51VTKHZwN6HKs4iVQI10I
+         rSX6aAFlCBOpc70IwbMGDz0IORnRfPJPzz6xg3zQJ9Jk8070FF6tu4naJsHXGO9QkwUg
+         je85G19WQZkDB5ED049DuWld7FhYVDVWnpb2Vzt/nRe6p7rD31RCA1tZ9+1LrkjM4eGM
+         utkfLz1B3FS1lq+Xnih/aheE6lBE6jb4oAWAQPPJjEG/HOOaL11AWG8f19dBPdmqDW05
+         qAM8vsIfPsdtssco0aELtHSNEAU7llIqUCz9MDRv2GEVCO/6vUDXVwm2VNyesAxaff2J
+         T4nA==
+X-Gm-Message-State: AO0yUKUMxMIbEpsc/NvGi6wikymr3T+vBlx7LJZ43cC9/NSCWajcCqpd
+        1ZWLCzXOPnItdzI2hACZOY0=
+X-Google-Smtp-Source: AK7set+loPpTa9ITQdtl4VtkX5HEBpkGoTEXNHeupxdN4rap1aqxF1m21V30bvjHsYuJWupQFkl4qQ==
+X-Received: by 2002:a1f:a08e:0:b0:400:fe65:477e with SMTP id j136-20020a1fa08e000000b00400fe65477emr3288251vke.9.1676963613527;
+        Mon, 20 Feb 2023 23:13:33 -0800 (PST)
+Received: from smtpclient.apple ([167.99.200.149])
+        by smtp.gmail.com with ESMTPSA id d189-20020a1f9bc6000000b003c115870e46sm615400vke.7.2023.02.20.23.13.31
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 Feb 2023 23:13:33 -0800 (PST)
+From:   Christian Hewitt <christianshewitt@gmail.com>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
+Subject: Bug/Problem with rtl_bt/rtl8822cs_config.bin
+Message-Id: <3B9D4DB2-D2CD-44FE-817A-F6EA8A0AD734@gmail.com>
+Date:   Tue, 21 Feb 2023 11:13:28 +0400
+Cc:     Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Vyacheslav <adeep@lexina.in>
+To:     Hilda Wu <hildawu@realtek.com>, Josh Boyer <jwboyer@kernel.org>,
+        Linux Firmware <linux-firmware@kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+X-Mailer: Apple Mail (2.3696.120.41.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-U3RlZXYgLCBpbmxpbmUgY29tbWVudHMhDQoNCj4gPlRoaXMgcGF0Y2ggYWRkcyBzdXBwb3J0IGZv
-ciBRQ0EyMDY2IGZpcm13YXJlIHBhdGNoIGFuZCBudm0gZG93bmxvYWRpbmcuDQo+DQo+IElzIHRo
-aXMgYWN0dWFsbHkgY29ycmVjdD8gIEkgYXNrIGJlY2F1c2UgaGVyZSBJIGhhdmUgdGhlIFdDTjY4
-NTUgaW4gdGhlIExlbm92byBUaGlua3BhZCBYMTNzLCBhbmQgd2hlbiBhdHRlbXB0aW5nIHRvIHVz
-ZSB0aGlzIGRyaXZlciwgSSBlbmQgdXAgd2l0aCBhIGJvYXJkIGlkIG9mIDA4YywgYW5kIGFjY29y
-ZGluZyB0byB0aGUgZmlybXdhcmUsIHdlIHNob3VsZCBoYXZlIGEgYm9hcmQgaWQgb2YgYjhjLg0K
-Pg0KPiBbVGltXSBjb3JyZWN0LCBJIGRvZXMgbm90IGtub3cgd2hlcmUgeW91IGdldCB0aGUgV0NO
-Njg1NSBmaXJtd2FyZSwgZm9yIG91ciBzaWRlLCB3ZSB3aWxsIHVzZSBkaWZmZXJlbnQgbmFtZSBy
-dWxlIGZvciBhbmRyb2lkIGFuZCBsaW51eCAsIGZvciBhbmRyb2lkICwgd2Ugd2lsbCBhZGQgImIi
-IGluIHRoZSBmcm9udCBvZiBib2FyZCBpZCwgZm9yIGxpbnV4IHdlIHdpbGwgbm90IGFkZCB0aGlz
-IGJpdC4NCg0KU28sIHRoZSBUaGlua3BhZCBYMTNzIGlzLi4uIHdlbGwsIGl0J3MgYSBUaGlua3Bh
-ZCwgYW5kIGl0IGNvbWVzIHdpdGggV2luZG93cy4gIFNvIHRoZSBmaXJtd2FyZSB0aGF0IHdlIGhh
-dmUsIGNvbWVzIGZyb20uLi4uIHRoZW0/IHFjPw0KW1RpbV0geWVhaCAsIGZvciB3b3MgLCBidGZ3
-IG5hbWUgc2VlbXMgYWxzbyB0aGUgc2FtZSB3aXRoIGFuZHJvaWQuIEkgdGhpbmsgY29tZSBmcm9t
-IHFjIA0KSSBob25lc3RseSBkb24ndCBrbm93IHRoZSBwcm92ZW5hbmNlIG9mIGl0LCBqdXN0IHRo
-YXQgSSBncmFiYmVkIHRoZSBmaWxlcyBmcm9tIHRoZSBXaW5kb3dzIHBhcnRpdGlvbjoNCg0KU28s
-IGFsbCBvZiB0aGUgbnZtIHBhdGNoZXMgdGhhdCBhcmUgcHJvdmlkZWQgYnkgdGhlbSB3aXRoIHRo
-ZSB3aW5kb3dzIGRyaXZlciwgYWxsIHN0YXJ0IHdpdGggJ2InLg0KDQo+IEknbSBub3Qgc3VyZSBo
-b3cgdG8gcGhyYXNlIHRoaXMsIGFuZCBqdXN0IHRoaW5raW5nIG91dCBsb3VkIC0gaWYgdGhlIHFj
-YTIwNjYgaXMgdGhlIHNhbWUgYXMgdGhlIHdjbjY4NTUsIGp1c3Qgd2l0aCBhbiBhZGRpdGlvbmFs
-IGFudGVubmEsIHBlcmhhcHMgdGhlcmUgc2hvdWxkIGJlIHNvbWUgd2F5IHRvIGluZGljYXRlIGl0
-PyAgSW4gbXkgcGF0Y2hzZXQsIEkgaGFkIGEgcHJpbnQgb2YgdGhlIG5hbWUgIlNldHRpbmcgdXAg
-d2NuNjg1NSIgYW5kIGxvY2FsbHksIEkgY29tYmluZWQgeW91ciBwYXRjaCB3aXRoIG1pbmUsIGFs
-dGhvdWdoIGRyb3BwaW5nIHRoZSBhYm92ZSBxY2EyMDY2IGh1bmtzIGluIGZhdm9yIG9mIG15IGFs
-cmVhZHkgd3JpdHRlbiB3Y242ODU1IGh1bmtzLCBhbmQgdGhlbiBjb21iaW5lZCB0aGUgdHdvIGlu
-IHRoZSBwcmludCBzbyBpdCBzYXlzICJTZXR0aW5nIHVwIHFjYTIwNjYvd2NuNjg1NSIgLSBpcyB0
-aGVyZSBhbnkgd2F5IHRvIGRpZmZlcmVudGlhdGUgYmV0d2VlbiB3aGF0IHF0aSBjb25zaWRlcnMg
-YSBxY2EyMDY2IGFuZCB3aGF0IGlzIGNvbnNpZGVyZWQgdGhlIHdjbjY4NTU/DQo+IFtUaW1dIHN0
-ZXZlICxhcyBJIG1lbnRpb25lZCBwcmV2aW91c2x5LCB3ZSBoYXZlIGRpZmZlcmVudCBib2FyZCBp
-ZCAgZm9yIHFjYTIwNjYgYW5kIHdjbjY4NTUgLCBhbmQgdGhlbiB3aGljaCB3aWxsIHVzZSBkaWZm
-ZXJlbnQgbnZtIGNvbmZpZyBmaWxlcyBiYXNlZCBvbiBib2FyZCBpZC4NCj4NCkkgZ2V0IHRoYXQ7
-IEknbSB0aGlua2luZyBvZiBlbmQgdXNlcnMsIHdobyBtYXkga25vdyB0aGF0IHRoZXkgaGF2ZSBh
-IHdjbjY4NTUsIGJ1dCBpZiB0aGUgbWVzc2FnZXMgYXJlIHFjYTIwNjYsIHRoZXkgbWF5IG5vdCB1
-bmRlcnN0YW5kIHRoYXQgaXQncyB0aGUgc2FtZSBjaGlwLg0KW1RpbV0gSSBzZWUsICB3Y242ODU1
-IGFuZCBxY2EyMDY2IGlzIGJlbG9uZyB0byAiaHNwIiBidGNoaXAgZmFtaWx5ICwgc28gbWF5YmUg
-d2UgY2FuIHVzZSAiaHNwIiB0byBpbnN0ZWFkLg0KDQo+IEJlbG93IGlzIGRtZXNnIG91dHB1dCwg
-YW5kIHNvIGlmIHdlIGdvIGJ5IHRoZSB3aWZpIGRldmljZSBjaGVjaywgd2UgDQo+IGVuZCB1cCBz
-ZWVpbmcgdGhhdCB3ZSBnZXQNCj4NCj4gY2hpcF9pZCAweDINCj4gY2hpcF9mYW1pbHkgMHhiDQo+
-IGJvYXJkX2lkIDB4OGMNCj4gc29jX2lkIDB4NDAwYzAyMTANCj4NCj4NCj4gQnV0IHdpdGggeW91
-ciBkcml2ZXIgKG1pbmUgdG9vIGZvciB0aGF0IG1hdHRlciwgYnV0IHRoZW4gaXQncyBqdXN0IGRv
-aW5nIHRoZSBzYW1lIGJpZCBiaXRzKS4uLg0KPg0KPiBbICAgIDkuMDgxMDAzXSBCbHVldG9vdGg6
-IGhjaTA6IEZyYW1lIHJlYXNzZW1ibHkgZmFpbGVkICgtODQpDQo+IFsgICAgOS4xNDE5OTJdIEJs
-dWV0b290aDogaGNpMDogUUNBIFByb2R1Y3QgSUQgICA6MHgwMDAwMDAxMw0KPiBbICAgIDkuMTQx
-OTk5XSBCbHVldG9vdGg6IGhjaTA6IFFDQSBTT0MgVmVyc2lvbiAgOjB4NDAwYzAyMTANCj4gWyAg
-ICA5LjE0MjAwM10gQmx1ZXRvb3RoOiBoY2kwOiBRQ0EgUk9NIFZlcnNpb24gIDoweDAwMDAwMjAx
-DQo+IFsgICAgOS4xNDIwMDddIEJsdWV0b290aDogaGNpMDogUUNBIFBhdGNoIFZlcnNpb246MHgw
-MDAwMzhlNg0KPiBbICAgIDkuMTcwNjEyXSBCbHVldG9vdGg6IGhjaTA6IFFDQSBjb250cm9sbGVy
-IHZlcnNpb24gMHgwMjEwMDIwMQ0KPiBbICAgIDkuMTcwNjIwXSBCbHVldG9vdGg6IGhjaTA6IFFD
-QSBEb3dubG9hZGluZyBxY2EvaHBidGZ3MjEudGx2DQo+DQo+DQo+IFsgICAgOS43NjA1MzddIEJs
-dWV0b290aDogaGNpMDogUUNBIGJvYXJkIElEIGxlbiAyLGlkID0gMCA4Yw0KPiBbICAgIDkuNzYw
-NTQ3XSBCbHVldG9vdGg6IGhjaTA6IFFDQSBEb3dubG9hZGluZyBxY2EvaHBudjIxLjA4Yw0KPiBb
-ICAgIDkuNzYwNjM4XSBibHVldG9vdGggaGNpMDogRGlyZWN0IGZpcm13YXJlIGxvYWQgZm9yIHFj
-YS9ocG52MjEuMDhjIGZhaWxlZCB3aXRoIGVycm9yIC0yDQo+IFsgICAgOS43NjA2NDBdIEJsdWV0
-b290aDogaGNpMDogUUNBIEZhaWxlZCB0byByZXF1ZXN0IGZpbGU6IHFjYS9ocG52MjEuMDhjICgt
-MikNCj4gWyAgICA5Ljc2MDY0M10gQmx1ZXRvb3RoOiBoY2kwOiBRQ0EgRmFpbGVkIHRvIGRvd25s
-b2FkIE5WTSAoLTIpDQo+DQo+IElzIHRoZXJlIGFub3RoZXIgd2F5IHRvIGNoZWNrIHRoZSBib2Fy
-ZCBpZCBvciBib2FyZCBmYW1pbHk/ICBCZWNhdXNlIGl0J3Mgbm90IGNvbWluZyB1cCB3aXRoIHRo
-ZSBjb3JyZWN0IG9uZSBoZXJlLg0KPiBbVGltXSBhcyBteSBjb21tZW50cyBhYm92ZSwgdGhlIHJl
-YWQgYm9hcmQgaWQgd2F5IGlzIGNvcnJlY3QsIG9ubHkgd2UgaGF2ZSBkaWZmZXJlbnQgbmFtZSBy
-dWxlIGZvciBhbmRyb2lkIGFuZCBsaW51eCAuDQoNClJpZ2h0LCBJIGdldCB0aGF0IHJlYWRpbmcg
-dGhlIGJvYXJkIGlkIGlzIHRoZSByaWdodCB3YXkgLSBhbmQgaWYgeW91IHNlZSBpbiBteSBXaW5k
-b3dzIGZpcm13YXJlIGFib3ZlICh0aGUgZmlybXdhcmUgc3VibWl0dGVkIHRvIGxpbnV4LWZpcm13
-YXJlIGJ5IHlvdSBvbmx5IHNlZW1zIHRvIGhhdmUgbnZtIHBhdGNoZXMgdGhhdCBzdGFydCB3aXRo
-ICczJywgYW5kIG5vIG90aGVycy4uKSAgSSdtIHNheWluZywgc2hvdWxkIHdlIGFsc28gcmVhZCB0
-aGUgY2hpcF9mYW1pbHkgc29tZWhvdywgc2luY2UgdGhlIFdpRmkgZmlybXdhcmUgc2VlbXMgdG8g
-cHJvcGVybHkgbm90aWNlIHRoYXQgd2UgYXJlIGNoaXBfZmFtaWx5IDB4YiwgaG93ZXZlciwgdGhl
-IGJsdWV0b290aCBkcml2ZXIganVzdCByZXR1cm5zICcwJy4gIEFuZCBuZWl0aGVyIHRoZSBzdWJt
-aXR0ZWQgZmlybXdhcmUsIG5vciB0aGUgZmlybXdhcmUgdGhhdCBMZW5vdm8vUXVhbGNvbW0gc2hp
-cCB0byBXaW5kb3dzIHVzZXJzLCBoYXZlIG52bSBwYXRjaGVzIHRoYXQgc3RhcnQgd2l0aCAwLg0K
-DQpbVGltXSAgd2UgZGV0ZWN0IHRoZSBjaGlwX2ZhbWlseSBieSBkZXRlY3QgcHJvZHVjdF9pZCBh
-bmQgc29jX2lkICwgc3VjaCBhcyBmb3IgImhzcCIgY2hpcCBmYW1pbHksIGlmIHByb2R1Y3QgaWQg
-ZXF1YWwgMHgxMyAsYW5kIHNvY19pZCAmIDB4ZmZmZjAwMDAgPT0gMHg0MDBjICwgd2UgYXNzdW1l
-IHRoaXMgY2hpcCBpcyAiaHNwIi4gWW91IGNhbiByZWZlciB0aGUgbG9nIGFzIGFib3ZlLg0KDQpB
-biBhZGRpdGlvbmFsIG5vdGUsIG5laXRoZXIgbXkgZHJpdmVyLCBub3IgeW91cnMsIHNlZW1zIHRv
-IHdvcmsgd2l0aCBCTEUuICBJIGNhbm5vdCBjb25uZWN0IGEgcGFpciBvZiBBaXJQb2RzIHRvIG15
-IFRoaW5rcGFkIGluIExpbnV4LCBidXQgSSBhbSBhYmxlIHRvIGRvIGp1c3QgZmluZSBpbiB0aGUg
-V2luZG93cyBpbnN0YWxsYXRpb24uICBJJ20gbm90IHN1cmUgaWYgdGhpcyBpcyBhIGtub3duIGxp
-bWl0YXRpb24gYWxyZWFkeSBpbiBsaW51eCBvciBub3QuDQpbVGltXSBJIGFtIG5vdCBzdXJlLCBt
-YXliZSBoYXZlIElPVCBpc3N1ZSwgbmVlZCB0byBjaGVjayBpdCBjYXNlIGJ5IGNhc2UuDQoNCj4N
-Cj4gLS1zdGVldg0K
+I=E2=80=99m working with the RTL8822CS WiFi/BT mezzanine for BananaPi =
+M2S/M5 boards.
+
+SDIO WiFi works fine. The BT side fails to load firmware:
+
+[    7.413297] Bluetooth: hci0: RTL: examining hci_ver=3D0a hci_rev=3D000c=
+ lmp_ver=3D0a lmp_subver=3D8822
+[    7.416873] Bluetooth: hci0: RTL: rom_version status=3D0 version=3D3
+[    7.416892] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_fw.bin
+[    7.418200] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_config.bin
+[    7.453778] Bluetooth: hci0: RTL: cfg_sz 33, total sz 36529
+[    9.469947] Bluetooth: hci0: command 0xfc20 tx timeout
+[   17.629661] Bluetooth: hci0: RTL: download fw command failed (-110)
+
+The same is also observed on an Amlogic Android box with 08 silicon:
+
+[    3.950116] Bluetooth: hci0: RTL: examining hci_ver=3D08 hci_rev=3D000c=
+ lmp_ver=3D08 lmp_subver=3D8822
+[    3.963304] Bluetooth: hci0: RTL: rom_version status=3D0 version=3D3
+[    3.969522] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_fw.bin
+[    3.969556] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_config.bin
+[    4.026336] Bluetooth: hci0: RTL: cfg_sz 33, total sz 36529
+[    6.086301] Bluetooth: hci0: command 0xfc20 tx timeout
+[   14.566290] Bluetooth: hci0: RTL: download fw command failed (-110)
+
+The device is working in Armbian who bundle an older firmware:
+
+[    7.319820] Bluetooth: hci0: RTL: examining hci_ver=3D0a hci_rev=3D000c=
+ lmp_ver=3D0a lmp_subver=3D8822
+[    7.323114] Bluetooth: hci0: RTL: rom_version status=3D0 version=3D3
+[    7.323150] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_fw.bin
+[    7.325103] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_config.bin
+[    7.348972] Bluetooth: hci0: RTL: cfg_sz 73, total sz 40777
+[    7.699139] Bluetooth: hci0: RTL: fw version 0x05a91a4a
+
+However it=E2=80=99s not a regression in firmware. Further testing =
+pinpointed the
+rtl8822cs_config.bin file. I can use the latest firmware (FFB8_ABD6) =
+with
+the config file bundled with Armbian:
+
+[    7.504405] Bluetooth: hci0: RTL: examining hci_ver=3D0a hci_rev=3D000c=
+ lmp_ver=3D0a lmp_subver=3D8822
+[    7.507827] Bluetooth: hci0: RTL: rom_version status=3D0 version=3D3
+[    7.507850] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_fw.bin
+[    7.509158] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_config.bin
+[    7.529486] Bluetooth: hci0: RTL: cfg_sz 73, total sz 36569
+[    7.850914] Bluetooth: hci0: RTL: fw version 0xffb8abd6
+
+I can also use the oldest upstream firmware with the Armbian config:
+
+[    7.315358] Bluetooth: hci0: RTL: examining hci_ver=3D0a hci_rev=3D000c=
+ lmp_ver=3D0a lmp_subver=3D8822
+[    7.318754] Bluetooth: hci0: RTL: rom_version status=3D0 version=3D3
+[    7.318772] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_fw.bin
+[    7.319680] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_config.bin
+[    7.341340] Bluetooth: hci0: RTL: cfg_sz 73, total sz 30817
+[    7.612533] Bluetooth: hci0: RTL: fw version 0x05990d54
+
+The config file Armbian are using [0] is sourced from an Amlogic =
+(Android) BSP
+repo shared to manufacturer Jethome (Vyacheslav on CC). There is no =
+obvious
+version info. There are newer (more recently committed) config files =
+available
+in updates to the Amlogic repo (alongside older 0599_0D54 firmware) and =
+all work
+with any upstream firmware file.
+
+I=E2=80=99m happy to apply test patches to get more output and I can =
+provide remote
+access to the board or arrange hardware to be shipped if that helps at =
+all.
+
+Hopefully RTL folks can spot whether this is a driver issue or something =
+not
+present in the upstream config?
+
+Christian
+
+[0] =
+https://github.com/armbian/firmware/blob/master/rtl_bt/rtl8822cs_config.bi=
+n
+
