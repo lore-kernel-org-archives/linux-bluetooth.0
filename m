@@ -2,63 +2,50 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DDFC61DA3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Feb 2023 05:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC15C64EC7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Feb 2023 06:51:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233252AbjBUF2P (ORCPT
+        id S233336AbjBUGva (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Feb 2023 00:28:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44502 "EHLO
+        Tue, 21 Feb 2023 01:51:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233239AbjBUF2N (ORCPT
+        with ESMTP id S233319AbjBUGv3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Feb 2023 00:28:13 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2775A257
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Feb 2023 21:28:10 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id cy6so6986885edb.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Feb 2023 21:28:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3lSksC8fsXMKoURwVyXHoZg6ZiRAH8wXHUe/MOqa9l0=;
-        b=KgzsXP/uLCotz14QrXSx9HGgAAwq+EX1iCA0khBMMYYZ4bpp19cmcKb+PvLCubWlUR
-         L0PyVKke1NoF93sTmBRx1gZq1sxFHIYNyFNUDys7r8hw+F8kvjs3+zQ6IdvWkgP4rKaF
-         OKRg/wlB+Ns2Q1SuVRevuPq3Vlsk8ARftOOfNgSRagXT77pd5Q5PZo5ZOvAm8XQaB08o
-         qzlSJE2K3oP0G+twaGkjWT2+1aU8RWOHzTbbwUv8rYEOXPkp+vOkkSY7yVnkDGpII3gY
-         SSaWBzjmIqFZejF2r0vJWgUddc1mFcaDQpM8cxSfhBJucd4o4rT4Noo8xY2bPCUzoPcy
-         NN9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3lSksC8fsXMKoURwVyXHoZg6ZiRAH8wXHUe/MOqa9l0=;
-        b=GOIk1zYfWGkdGM1BLXDHVue4jcQjTuD5gdbdCjYc65aJZa1Z0HbPVktyrMlhL+d+/x
-         jVe3IWy6FNGFVj1CSMDfOKwvC7Q5ipY/kN2aZRPSbfJ2MgeAH7oKBPr8bogU16pO0SEz
-         xVPPD1Ub8fchJJSthjPyRJBTPp6W3OwVo5eui1ThRBJXuANU8DUWK8xVPzkkW/uYESDr
-         WM2nX7xoDgZIlBkCZg2+39x8N1+H08GT6l2e08lGXaWZJ+VGB6qefti70JQhasQFU841
-         Q3VAwZzk82drIHzzsEBRtJmRgrjVs2Ae2tcVh+Z+IatmsIs+9nPeuG2rOG7oVqui7h7c
-         SBiA==
-X-Gm-Message-State: AO0yUKW/MWys6oESzJF7g2aW1szFy+Ut8+R2X9/RbQVujAveLJoJdndy
-        7z1fzrShYCbfiUDjjZky3rIkwMWjcdIaniq6qAO8Fw==
-X-Google-Smtp-Source: AK7set+j3EAMYoASgPes70zdAtHz5d7vB7lxtsyL/bL08jysUR8+oBSACyTLLBr3ntjp4P4/wn/ov/ari59sXlr14bk=
-X-Received: by 2002:a17:906:e217:b0:8b1:38d6:9853 with SMTP id
- gf23-20020a170906e21700b008b138d69853mr5118964ejb.2.1676957289130; Mon, 20
- Feb 2023 21:28:09 -0800 (PST)
-MIME-Version: 1.0
-References: <20230216092236.26720-1-quic_tjiang@quicinc.com>
- <20230218041545.3801-1-steev@kali.org> <DM5PR02MB36863752A525F50AC05662B0EDA49@DM5PR02MB3686.namprd02.prod.outlook.com>
-In-Reply-To: <DM5PR02MB36863752A525F50AC05662B0EDA49@DM5PR02MB3686.namprd02.prod.outlook.com>
-From:   Steev Klimaszewski <steev@kali.org>
-Date:   Mon, 20 Feb 2023 23:27:57 -0600
-Message-ID: <CAKXuJqigh=5LMei4ym5s4vKCxkMR5vfM++k7Jk7C4Ge-GRVK6A@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- SoC QCA2066
-To:     "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
-Cc:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        Tue, 21 Feb 2023 01:51:29 -0500
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B659E23117;
+        Mon, 20 Feb 2023 22:51:27 -0800 (PST)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 31L2atWw029898;
+        Tue, 21 Feb 2023 06:49:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=qcppdkim1;
+ bh=rYjT1VPCrDbOXAoWaWzQslbAY+4S4TBlb0O4SpceqL0=;
+ b=IgoDGMe3P9ZZWtn9gd+iBVdOmHB1kpUJ+/k7PWXwqVB2vqDli5Lh0svb+NZcn9Pty8it
+ 3hUl9bC4A7muYTFd75HNjiNdkJl5Ntkwmrc2nKnr+CqD4vkrYMbeJVljbDWUMFw6xLWs
+ C0sQNQBZjxqubFOx9klnIZ4bgobpRRel8CYkN0/o7fST/yKxEweJxlvLwWgnP7vzr0T9
+ VcZdQe9siakXAaolPvv/aDA9zL+/yvsthD3KEGsDQdzui65na/PIjsxNxmwATkyO0AWH
+ kHLA6aYYOA6vUKdq9Ma3za8K5olrkEVRaMLkQH8b+wv9thiF9b/+wuBJzp5cawzYN2ch Eg== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3nubb1w08a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Feb 2023 06:49:21 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 31L6nLEv004488
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 21 Feb 2023 06:49:21 GMT
+Received: from nalasex01b.na.qualcomm.com (10.47.209.197) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Mon, 20 Feb 2023 22:49:20 -0800
+Received: from nalasex01b.na.qualcomm.com ([fe80::5e14:2d59:8da8:b152]) by
+ nalasex01b.na.qualcomm.com ([fe80::5e14:2d59:8da8:b152%12]) with mapi id
+ 15.02.0986.041; Mon, 20 Feb 2023 22:49:20 -0800
+From:   "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
+To:     Steev Klimaszewski <steev@kali.org>
+CC:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
         "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
@@ -66,138 +53,121 @@ Cc:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
         "mka@chromium.org" <mka@chromium.org>,
         "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>,
         "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>,
-        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>,
+        "quic_saluvala@quinc.com" <quic_saluvala@quinc.com>
+Subject: RE: [PATCH v2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
+ SoC QCA2066
+Thread-Topic: [PATCH v2] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA2066
+Thread-Index: AQHZQeg+G1wnKRsWA0alDqcMCYIjUK7UG4eAgANTyyCAAf18gP//iffw
+Date:   Tue, 21 Feb 2023 06:49:20 +0000
+Message-ID: <e2026b606ae14ff6a793d45723b13a1e@quicinc.com>
+References: <20230216092236.26720-1-quic_tjiang@quicinc.com>
+ <20230218041545.3801-1-steev@kali.org>
+ <DM5PR02MB36863752A525F50AC05662B0EDA49@DM5PR02MB3686.namprd02.prod.outlook.com>
+ <CAKXuJqigh=5LMei4ym5s4vKCxkMR5vfM++k7Jk7C4Ge-GRVK6A@mail.gmail.com>
+In-Reply-To: <CAKXuJqigh=5LMei4ym5s4vKCxkMR5vfM++k7Jk7C4Ge-GRVK6A@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.253.32.31]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: w5dVPHrD6aH24QMkZndHUNlrk_Jp7jTT
+X-Proofpoint-GUID: w5dVPHrD6aH24QMkZndHUNlrk_Jp7jTT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.170.22
+ definitions=2023-02-21_03,2023-02-20_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ suspectscore=0 adultscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ mlxlogscore=999 malwarescore=0 priorityscore=1501 mlxscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302210059
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tim,
-
-On Mon, Feb 20, 2023 at 1:04 AM Tim Jiang (QUIC)
-<quic_tjiang@quicinc.com> wrote:
->
-> Steve, sorry I does not know why I can not send out the email as have som=
-e warning  , so I removed the code part, you can refer to my inline comment=
-s.
->
-
-No worries, I understand!
-
-> Regards.
-> Tim
->
-> >This patch adds support for QCA2066 firmware patch and nvm downloading.
->
-> Is this actually correct?  I ask because here I have the WCN6855 in the L=
-enovo Thinkpad X13s, and when attempting to use this driver, I end up with =
-a board id of 08c, and according to the firmware, we should have a board id=
- of b8c.
->
-> [Tim] correct, I does not know where you get the WCN6855 firmware, for ou=
-r side, we will use different name rule for android and linux , for android=
- , we will add "b" in the front of board id, for linux we will not add this=
- bit.
-
-So, the Thinkpad X13s is... well, it's a Thinkpad, and it comes with
-Windows.  So the firmware that we have, comes from.... them? qualcomm?
-I honestly don't know the provenance of it, just that I grabbed the
-files from the Windows partition:
-
-steev@wintermute:~/firmware/new/qcbtfmuart_hsp8280.inf_arm64_69bd85311531b3=
-4a$
-ls
-bsrc_bt.bin hpnv10.b03 hpnv20.b80 hpnv20.b8f hpnv21.ba2 hpnv21g.b9f
-hpnv21g.bb8 hpbtfw10.tlv hpnv10.b04 hpnv20.b82 hpnv20.bin hpnv21.ba3
-hpnv21g.ba0 hpnv21g.bin hpbtfw10.ver hpnv10.b06 hpnv20.b84 hpnv21.b8c
-hpnv21.ba4 hpnv21g.ba1 qcbtfmuart_hsp8280.cat hpbtfw20.tlv hpnv10.b07
-hpnv20.b85 hpnv21.b9f hpnv21.bb8 hpnv21g.ba2 qcbtfmuart_hsp8280.inf
-hpbtfw20.ver hpnv10.b08 hpnv20.b8c hpnv21.ba0 hpnv21.bin hpnv21g.ba3
-qcbtfmuart_hsp8280.PNF hpbtfw21.tlv hpnv10.bin hpnv20.b8e hpnv21.ba1
-hpnv21g.b8c hpnv21g.ba4 qcbtfmuart_hsp8280.sys
-
-So, all of the nvm patches that are provided by them with the windows
-driver, all start with 'b'.
-
-> I'm not sure how to phrase this, and just thinking out loud - if the qca2=
-066 is the same as the wcn6855, just with an additional antenna, perhaps th=
-ere should be some way to indicate it?  In my patchset, I had a print of th=
-e name "Setting up wcn6855" and locally, I combined your patch with mine, a=
-lthough dropping the above qca2066 hunks in favor of my already written wcn=
-6855 hunks, and then combined the two in the print so it says "Setting up q=
-ca2066/wcn6855" - is there any way to differentiate between what qti consid=
-ers a qca2066 and what is considered the wcn6855?
-> [Tim] steve ,as I mentioned previously, we have different board id  for q=
-ca2066 and wcn6855 , and then which will use different nvm config files bas=
-ed on board id.
->
-I get that; I'm thinking of end users, who may know that they have a
-wcn6855, but if the messages are qca2066, they may not understand that
-it's the same chip.
-
-> Below is dmesg output, and so if we go by the wifi device check, we end u=
-p seeing that we get
->
-> chip_id 0x2
-> chip_family 0xb
-> board_id 0x8c
-> soc_id 0x400c0210
->
-> [    9.724834] ath11k_pci 0006:01:00.0: chip_id 0x2 chip_family 0xb board=
-_id 0x8c soc_id 0x400c0210
-> [    9.724850] ath11k_pci 0006:01:00.0: fw_version 0x110b196e fw_build_ti=
-mestamp 2022-12-22 12:54 fw_build_id WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SI=
-LICONZ_LITE-3.6510.23
-> [    9.742346] ath11k_pci 0006:01:00.0: failed to fetch board data for bu=
-s=3Dpci,vendor=3D17cb,device=3D1103,subsystem-vendor=3D17cb,subsystem-devic=
-e=3D0108,qmi-chip-id=3D2,qmi-board-id=3D140 from ath11k/WCN6855/hw2.1/board=
--2.bin
-> [    9.742358] ath11k_pci 0006:01:00.0: failed to fetch board.bin from WC=
-N6855/hw2.1
-> [    9.742361] ath11k_pci 0006:01:00.0: qmi failed to fetch board file: -=
-2
-> [    9.742363] ath11k_pci 0006:01:00.0: failed to load board data file: -=
-2
->
-> But with your driver (mine too for that matter, but then it's just doing =
-the same bid bits)...
->
-> [    9.081003] Bluetooth: hci0: Frame reassembly failed (-84)
-> [    9.141992] Bluetooth: hci0: QCA Product ID   :0x00000013
-> [    9.141999] Bluetooth: hci0: QCA SOC Version  :0x400c0210
-> [    9.142003] Bluetooth: hci0: QCA ROM Version  :0x00000201
-> [    9.142007] Bluetooth: hci0: QCA Patch Version:0x000038e6
-> [    9.170612] Bluetooth: hci0: QCA controller version 0x02100201
-> [    9.170620] Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
->
->
-> [    9.760537] Bluetooth: hci0: QCA board ID len 2,id =3D 0 8c
-> [    9.760547] Bluetooth: hci0: QCA Downloading qca/hpnv21.08c
-> [    9.760638] bluetooth hci0: Direct firmware load for qca/hpnv21.08c fa=
-iled with error -2
-> [    9.760640] Bluetooth: hci0: QCA Failed to request file: qca/hpnv21.08=
-c (-2)
-> [    9.760643] Bluetooth: hci0: QCA Failed to download NVM (-2)
->
-> Is there another way to check the board id or board family?  Because it's=
- not coming up with the correct one here.
-> [Tim] as my comments above, the read board id way is correct, only we hav=
-e different name rule for android and linux .
-
-Right, I get that reading the board id is the right way - and if you
-see in my Windows firmware above (the firmware submitted to
-linux-firmware by you only seems to have nvm patches that start with
-'3', and no others..)  I'm saying, should we also read the chip_family
-somehow, since the WiFi firmware seems to properly notice that we are
-chip_family 0xb, however, the bluetooth driver just returns '0'.  And
-neither the submitted firmware, nor the firmware that Lenovo/Qualcomm
-ship to Windows users, have nvm patches that start with 0.
-
-An additional note, neither my driver, nor yours, seems to work with
-BLE.  I cannot connect a pair of AirPods to my Thinkpad in Linux, but
-I am able to do just fine in the Windows installation.  I'm not sure
-if this is a known limitation already in linux or not.
-
->
-> --steev
+U3RlZXYgLCBpbmxpbmUgY29tbWVudHMhDQoNCj4gPlRoaXMgcGF0Y2ggYWRkcyBzdXBwb3J0IGZv
+ciBRQ0EyMDY2IGZpcm13YXJlIHBhdGNoIGFuZCBudm0gZG93bmxvYWRpbmcuDQo+DQo+IElzIHRo
+aXMgYWN0dWFsbHkgY29ycmVjdD8gIEkgYXNrIGJlY2F1c2UgaGVyZSBJIGhhdmUgdGhlIFdDTjY4
+NTUgaW4gdGhlIExlbm92byBUaGlua3BhZCBYMTNzLCBhbmQgd2hlbiBhdHRlbXB0aW5nIHRvIHVz
+ZSB0aGlzIGRyaXZlciwgSSBlbmQgdXAgd2l0aCBhIGJvYXJkIGlkIG9mIDA4YywgYW5kIGFjY29y
+ZGluZyB0byB0aGUgZmlybXdhcmUsIHdlIHNob3VsZCBoYXZlIGEgYm9hcmQgaWQgb2YgYjhjLg0K
+Pg0KPiBbVGltXSBjb3JyZWN0LCBJIGRvZXMgbm90IGtub3cgd2hlcmUgeW91IGdldCB0aGUgV0NO
+Njg1NSBmaXJtd2FyZSwgZm9yIG91ciBzaWRlLCB3ZSB3aWxsIHVzZSBkaWZmZXJlbnQgbmFtZSBy
+dWxlIGZvciBhbmRyb2lkIGFuZCBsaW51eCAsIGZvciBhbmRyb2lkICwgd2Ugd2lsbCBhZGQgImIi
+IGluIHRoZSBmcm9udCBvZiBib2FyZCBpZCwgZm9yIGxpbnV4IHdlIHdpbGwgbm90IGFkZCB0aGlz
+IGJpdC4NCg0KU28sIHRoZSBUaGlua3BhZCBYMTNzIGlzLi4uIHdlbGwsIGl0J3MgYSBUaGlua3Bh
+ZCwgYW5kIGl0IGNvbWVzIHdpdGggV2luZG93cy4gIFNvIHRoZSBmaXJtd2FyZSB0aGF0IHdlIGhh
+dmUsIGNvbWVzIGZyb20uLi4uIHRoZW0/IHFjPw0KW1RpbV0geWVhaCAsIGZvciB3b3MgLCBidGZ3
+IG5hbWUgc2VlbXMgYWxzbyB0aGUgc2FtZSB3aXRoIGFuZHJvaWQuIEkgdGhpbmsgY29tZSBmcm9t
+IHFjIA0KSSBob25lc3RseSBkb24ndCBrbm93IHRoZSBwcm92ZW5hbmNlIG9mIGl0LCBqdXN0IHRo
+YXQgSSBncmFiYmVkIHRoZSBmaWxlcyBmcm9tIHRoZSBXaW5kb3dzIHBhcnRpdGlvbjoNCg0KU28s
+IGFsbCBvZiB0aGUgbnZtIHBhdGNoZXMgdGhhdCBhcmUgcHJvdmlkZWQgYnkgdGhlbSB3aXRoIHRo
+ZSB3aW5kb3dzIGRyaXZlciwgYWxsIHN0YXJ0IHdpdGggJ2InLg0KDQo+IEknbSBub3Qgc3VyZSBo
+b3cgdG8gcGhyYXNlIHRoaXMsIGFuZCBqdXN0IHRoaW5raW5nIG91dCBsb3VkIC0gaWYgdGhlIHFj
+YTIwNjYgaXMgdGhlIHNhbWUgYXMgdGhlIHdjbjY4NTUsIGp1c3Qgd2l0aCBhbiBhZGRpdGlvbmFs
+IGFudGVubmEsIHBlcmhhcHMgdGhlcmUgc2hvdWxkIGJlIHNvbWUgd2F5IHRvIGluZGljYXRlIGl0
+PyAgSW4gbXkgcGF0Y2hzZXQsIEkgaGFkIGEgcHJpbnQgb2YgdGhlIG5hbWUgIlNldHRpbmcgdXAg
+d2NuNjg1NSIgYW5kIGxvY2FsbHksIEkgY29tYmluZWQgeW91ciBwYXRjaCB3aXRoIG1pbmUsIGFs
+dGhvdWdoIGRyb3BwaW5nIHRoZSBhYm92ZSBxY2EyMDY2IGh1bmtzIGluIGZhdm9yIG9mIG15IGFs
+cmVhZHkgd3JpdHRlbiB3Y242ODU1IGh1bmtzLCBhbmQgdGhlbiBjb21iaW5lZCB0aGUgdHdvIGlu
+IHRoZSBwcmludCBzbyBpdCBzYXlzICJTZXR0aW5nIHVwIHFjYTIwNjYvd2NuNjg1NSIgLSBpcyB0
+aGVyZSBhbnkgd2F5IHRvIGRpZmZlcmVudGlhdGUgYmV0d2VlbiB3aGF0IHF0aSBjb25zaWRlcnMg
+YSBxY2EyMDY2IGFuZCB3aGF0IGlzIGNvbnNpZGVyZWQgdGhlIHdjbjY4NTU/DQo+IFtUaW1dIHN0
+ZXZlICxhcyBJIG1lbnRpb25lZCBwcmV2aW91c2x5LCB3ZSBoYXZlIGRpZmZlcmVudCBib2FyZCBp
+ZCAgZm9yIHFjYTIwNjYgYW5kIHdjbjY4NTUgLCBhbmQgdGhlbiB3aGljaCB3aWxsIHVzZSBkaWZm
+ZXJlbnQgbnZtIGNvbmZpZyBmaWxlcyBiYXNlZCBvbiBib2FyZCBpZC4NCj4NCkkgZ2V0IHRoYXQ7
+IEknbSB0aGlua2luZyBvZiBlbmQgdXNlcnMsIHdobyBtYXkga25vdyB0aGF0IHRoZXkgaGF2ZSBh
+IHdjbjY4NTUsIGJ1dCBpZiB0aGUgbWVzc2FnZXMgYXJlIHFjYTIwNjYsIHRoZXkgbWF5IG5vdCB1
+bmRlcnN0YW5kIHRoYXQgaXQncyB0aGUgc2FtZSBjaGlwLg0KW1RpbV0gSSBzZWUsICB3Y242ODU1
+IGFuZCBxY2EyMDY2IGlzIGJlbG9uZyB0byAiaHNwIiBidGNoaXAgZmFtaWx5ICwgc28gbWF5YmUg
+d2UgY2FuIHVzZSAiaHNwIiB0byBpbnN0ZWFkLg0KDQo+IEJlbG93IGlzIGRtZXNnIG91dHB1dCwg
+YW5kIHNvIGlmIHdlIGdvIGJ5IHRoZSB3aWZpIGRldmljZSBjaGVjaywgd2UgDQo+IGVuZCB1cCBz
+ZWVpbmcgdGhhdCB3ZSBnZXQNCj4NCj4gY2hpcF9pZCAweDINCj4gY2hpcF9mYW1pbHkgMHhiDQo+
+IGJvYXJkX2lkIDB4OGMNCj4gc29jX2lkIDB4NDAwYzAyMTANCj4NCj4NCj4gQnV0IHdpdGggeW91
+ciBkcml2ZXIgKG1pbmUgdG9vIGZvciB0aGF0IG1hdHRlciwgYnV0IHRoZW4gaXQncyBqdXN0IGRv
+aW5nIHRoZSBzYW1lIGJpZCBiaXRzKS4uLg0KPg0KPiBbICAgIDkuMDgxMDAzXSBCbHVldG9vdGg6
+IGhjaTA6IEZyYW1lIHJlYXNzZW1ibHkgZmFpbGVkICgtODQpDQo+IFsgICAgOS4xNDE5OTJdIEJs
+dWV0b290aDogaGNpMDogUUNBIFByb2R1Y3QgSUQgICA6MHgwMDAwMDAxMw0KPiBbICAgIDkuMTQx
+OTk5XSBCbHVldG9vdGg6IGhjaTA6IFFDQSBTT0MgVmVyc2lvbiAgOjB4NDAwYzAyMTANCj4gWyAg
+ICA5LjE0MjAwM10gQmx1ZXRvb3RoOiBoY2kwOiBRQ0EgUk9NIFZlcnNpb24gIDoweDAwMDAwMjAx
+DQo+IFsgICAgOS4xNDIwMDddIEJsdWV0b290aDogaGNpMDogUUNBIFBhdGNoIFZlcnNpb246MHgw
+MDAwMzhlNg0KPiBbICAgIDkuMTcwNjEyXSBCbHVldG9vdGg6IGhjaTA6IFFDQSBjb250cm9sbGVy
+IHZlcnNpb24gMHgwMjEwMDIwMQ0KPiBbICAgIDkuMTcwNjIwXSBCbHVldG9vdGg6IGhjaTA6IFFD
+QSBEb3dubG9hZGluZyBxY2EvaHBidGZ3MjEudGx2DQo+DQo+DQo+IFsgICAgOS43NjA1MzddIEJs
+dWV0b290aDogaGNpMDogUUNBIGJvYXJkIElEIGxlbiAyLGlkID0gMCA4Yw0KPiBbICAgIDkuNzYw
+NTQ3XSBCbHVldG9vdGg6IGhjaTA6IFFDQSBEb3dubG9hZGluZyBxY2EvaHBudjIxLjA4Yw0KPiBb
+ICAgIDkuNzYwNjM4XSBibHVldG9vdGggaGNpMDogRGlyZWN0IGZpcm13YXJlIGxvYWQgZm9yIHFj
+YS9ocG52MjEuMDhjIGZhaWxlZCB3aXRoIGVycm9yIC0yDQo+IFsgICAgOS43NjA2NDBdIEJsdWV0
+b290aDogaGNpMDogUUNBIEZhaWxlZCB0byByZXF1ZXN0IGZpbGU6IHFjYS9ocG52MjEuMDhjICgt
+MikNCj4gWyAgICA5Ljc2MDY0M10gQmx1ZXRvb3RoOiBoY2kwOiBRQ0EgRmFpbGVkIHRvIGRvd25s
+b2FkIE5WTSAoLTIpDQo+DQo+IElzIHRoZXJlIGFub3RoZXIgd2F5IHRvIGNoZWNrIHRoZSBib2Fy
+ZCBpZCBvciBib2FyZCBmYW1pbHk/ICBCZWNhdXNlIGl0J3Mgbm90IGNvbWluZyB1cCB3aXRoIHRo
+ZSBjb3JyZWN0IG9uZSBoZXJlLg0KPiBbVGltXSBhcyBteSBjb21tZW50cyBhYm92ZSwgdGhlIHJl
+YWQgYm9hcmQgaWQgd2F5IGlzIGNvcnJlY3QsIG9ubHkgd2UgaGF2ZSBkaWZmZXJlbnQgbmFtZSBy
+dWxlIGZvciBhbmRyb2lkIGFuZCBsaW51eCAuDQoNClJpZ2h0LCBJIGdldCB0aGF0IHJlYWRpbmcg
+dGhlIGJvYXJkIGlkIGlzIHRoZSByaWdodCB3YXkgLSBhbmQgaWYgeW91IHNlZSBpbiBteSBXaW5k
+b3dzIGZpcm13YXJlIGFib3ZlICh0aGUgZmlybXdhcmUgc3VibWl0dGVkIHRvIGxpbnV4LWZpcm13
+YXJlIGJ5IHlvdSBvbmx5IHNlZW1zIHRvIGhhdmUgbnZtIHBhdGNoZXMgdGhhdCBzdGFydCB3aXRo
+ICczJywgYW5kIG5vIG90aGVycy4uKSAgSSdtIHNheWluZywgc2hvdWxkIHdlIGFsc28gcmVhZCB0
+aGUgY2hpcF9mYW1pbHkgc29tZWhvdywgc2luY2UgdGhlIFdpRmkgZmlybXdhcmUgc2VlbXMgdG8g
+cHJvcGVybHkgbm90aWNlIHRoYXQgd2UgYXJlIGNoaXBfZmFtaWx5IDB4YiwgaG93ZXZlciwgdGhl
+IGJsdWV0b290aCBkcml2ZXIganVzdCByZXR1cm5zICcwJy4gIEFuZCBuZWl0aGVyIHRoZSBzdWJt
+aXR0ZWQgZmlybXdhcmUsIG5vciB0aGUgZmlybXdhcmUgdGhhdCBMZW5vdm8vUXVhbGNvbW0gc2hp
+cCB0byBXaW5kb3dzIHVzZXJzLCBoYXZlIG52bSBwYXRjaGVzIHRoYXQgc3RhcnQgd2l0aCAwLg0K
+DQpbVGltXSAgd2UgZGV0ZWN0IHRoZSBjaGlwX2ZhbWlseSBieSBkZXRlY3QgcHJvZHVjdF9pZCBh
+bmQgc29jX2lkICwgc3VjaCBhcyBmb3IgImhzcCIgY2hpcCBmYW1pbHksIGlmIHByb2R1Y3QgaWQg
+ZXF1YWwgMHgxMyAsYW5kIHNvY19pZCAmIDB4ZmZmZjAwMDAgPT0gMHg0MDBjICwgd2UgYXNzdW1l
+IHRoaXMgY2hpcCBpcyAiaHNwIi4gWW91IGNhbiByZWZlciB0aGUgbG9nIGFzIGFib3ZlLg0KDQpB
+biBhZGRpdGlvbmFsIG5vdGUsIG5laXRoZXIgbXkgZHJpdmVyLCBub3IgeW91cnMsIHNlZW1zIHRv
+IHdvcmsgd2l0aCBCTEUuICBJIGNhbm5vdCBjb25uZWN0IGEgcGFpciBvZiBBaXJQb2RzIHRvIG15
+IFRoaW5rcGFkIGluIExpbnV4LCBidXQgSSBhbSBhYmxlIHRvIGRvIGp1c3QgZmluZSBpbiB0aGUg
+V2luZG93cyBpbnN0YWxsYXRpb24uICBJJ20gbm90IHN1cmUgaWYgdGhpcyBpcyBhIGtub3duIGxp
+bWl0YXRpb24gYWxyZWFkeSBpbiBsaW51eCBvciBub3QuDQpbVGltXSBJIGFtIG5vdCBzdXJlLCBt
+YXliZSBoYXZlIElPVCBpc3N1ZSwgbmVlZCB0byBjaGVjayBpdCBjYXNlIGJ5IGNhc2UuDQoNCj4N
+Cj4gLS1zdGVldg0K
