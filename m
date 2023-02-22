@@ -2,132 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6489DC64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Feb 2023 08:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C74FC64ED6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Feb 2023 08:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231301AbjBVIEA (ORCPT
+        id S231282AbjBVIgB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Feb 2023 03:04:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53626 "EHLO
+        Wed, 22 Feb 2023 03:36:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229557AbjBVID7 (ORCPT
+        with ESMTP id S230511AbjBVIf6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Feb 2023 03:03:59 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F4B1EBD0;
-        Wed, 22 Feb 2023 00:03:56 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4E02EB811D5;
-        Wed, 22 Feb 2023 08:03:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5DF3C433D2;
-        Wed, 22 Feb 2023 08:03:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677053034;
-        bh=2dFmx76LSc1nkfQUy0U1ICQ491CjQLf/H4jR4PZN1eQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WOM8cH+ZIsNbVpT5XGPUoqNzs/hB/34MhPqlRByLZFALd/Z9NPEtETfhD2lBdADBj
-         BojqeVcZiTTkM643cBAtmBM/ekbxsQwWNPXxZr7MKiXuCfewg1pBOybKOEm6ZmMyt5
-         Biago2NtVOxAcCFFxIQGuvDBRLb87vJo9toRL+AyChzTZ66xfk6E+yyOlAolWfFYd5
-         4DgTZ63aKsSe4N27hviWZETKouwwMCSi1kVggJTDZufMTkvtktw1q+39MANOd+yZZb
-         4Al8n5mtgaEPlOkM1rYtnD6N2O9LLQm/w0CAySmGKcoxONs+zPmHkJhLhwql4bZhHd
-         15b3enz3cM9wg==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1pUk6Y-0003hx-LJ; Wed, 22 Feb 2023 09:03:58 +0100
-Date:   Wed, 22 Feb 2023 09:03:58 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Tim Jiang <quic_tjiang@quicinc.com>
-Subject: Re: [PATCH v5 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-Message-ID: <Y/XMbhIgF8veIIdl@hovoldconsulting.com>
-References: <20230209020916.6475-1-steev@kali.org>
- <20230209020916.6475-3-steev@kali.org>
+        Wed, 22 Feb 2023 03:35:58 -0500
+Received: from mail.crawnon.pl (mail.crawnon.pl [51.68.198.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC1C830EB1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Feb 2023 00:35:43 -0800 (PST)
+Received: by mail.crawnon.pl (Postfix, from userid 1002)
+        id B2853A475C; Wed, 22 Feb 2023 08:35:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=crawnon.pl; s=mail;
+        t=1677054942; bh=C5hX24svv/9/TME4wPCHfYjl17BCtmuxEd1i9B4zdYs=;
+        h=Date:From:To:Subject:From;
+        b=k5guO+zIw3P70s+0xyK59ZSwIVqos+vx7sm5Ng0x/q1Fu/GHBQ1wnMY6SExM4UE+d
+         NlwrEDA5+6ehh/iPdU6AV1DvMv9KNUFHrUfxOMs3OphDUJjOpjTtYV0KmDsIQD7169
+         NDlOuI95fa+G09vTeeQC5EXcuiPWNS2v97fds4sjIN0sljK/r6aZqCPZU6qghm8fPD
+         VaMAFW6+DrnDjrui9QBWhK9CfItZR2YafauBdejWEno248u6TtHiQoCjaTktfjxl7G
+         0W9whhlUmG0BrYNGM81tZXCfbnj6oprA+O9Sm9WdwW3YrJ2VlJiVCP2+MqRIwURhxj
+         rFf0pOA0zA0wQ==
+Received: by mail.crawnon.pl for <linux-bluetooth@vger.kernel.org>; Wed, 22 Feb 2023 08:34:35 GMT
+Message-ID: <20230222073001-0.1.9b.lvoz.0.13jz2bdbry@crawnon.pl>
+Date:   Wed, 22 Feb 2023 08:34:35 GMT
+From:   =?UTF-8?Q? "Miko=C5=82aj_Fiodorczyk" ?= 
+        <mikolaj.fiodorczyk@crawnon.pl>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: Fotowoltaika - nowe warunki
+X-Mailer: mail.crawnon.pl
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230209020916.6475-3-steev@kali.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Feb 08, 2023 at 08:09:14PM -0600, Steev Klimaszewski wrote:
-> Added regulators,GPIOs and changes required to power on/off wcn6855.
-> Added support for firmware download for wcn6855.
-> 
-> Signed-off-by: Steev Klimaszewski <steev@kali.org>
-> ---
+Dzie=C5=84 dobry,
 
->  drivers/bluetooth/btqca.c   |  9 ++++++-
->  drivers/bluetooth/btqca.h   | 10 ++++++++
->  drivers/bluetooth/hci_qca.c | 50 ++++++++++++++++++++++++++++---------
->  3 files changed, 56 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index c9064d34d830..2f9d8bd27c38 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
- 
-> +static const struct qca_device_data qca_soc_data_wcn6855 = {
-> +	.soc_type = QCA_WCN6855,
-> +	.vregs = (struct qca_vreg []) {
-> +		{ "vddio", 5000 },
-> +		{ "vddbtcxmx", 126000 },
-> +		{ "vddrfacmn", 12500 },
-> +		{ "vddrfa0p8", 102000 },
-> +		{ "vddrfa1p7", 302000 },
-> +		{ "vddrfa1p2", 257000 },
-> +	},
-> +	.num_vregs = 6,
-> +	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
-> +};
-> +
->  static void qca_power_shutdown(struct hci_uart *hu)
->  {
->  	struct qca_serdev *qcadev;
+chcia=C5=82bym poinformowa=C4=87, i=C5=BC mog=C4=85 Pa=C5=84stwo uzyska=C4=
+=87 dofinansowanie na systemy fotowoltaiczne w ramach nowej edycji progra=
+mu M=C3=B3j Pr=C4=85d.
 
-As I just mentioned IRC, you forgot to update qca_power_shutdown() here
-so the regulators are currently never disabled (e.g. when closing the
-device or on module unload).
+Program zapewnia 6000 z=C5=82 dofinansowania na instalacj=C4=99 paneli i =
+16 000 z=C5=82 na magazyn energii, ni=C5=BCsze cen pr=C4=85du i mo=C5=BCl=
+iwo=C5=9B=C4=87 odliczenia koszt=C3=B3w zwi=C4=85zanych z instalacj=C4=85=
+ fotowoltaiki w ramach rozliczenia PIT (tzw. ulga termomodernizacyjna).
 
-> @@ -2047,7 +2066,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  
->  	if (data &&
->  	    (qca_is_wcn399x(data->soc_type) ||
-> -	    qca_is_wcn6750(data->soc_type))) {
-> +	    qca_is_wcn6750(data->soc_type) ||
-> +	    qca_is_wcn6855(data->soc_type))) {
->  		qcadev->btsoc_type = data->soc_type;
->  		qcadev->bt_power = devm_kzalloc(&serdev->dev,
->  						sizeof(struct qca_power),
+Czy s=C4=85 Pa=C5=84stwo otwarci na wst=C4=99pn=C4=85 rozmow=C4=99 w tym =
+temacie?
 
-> @@ -2150,7 +2174,8 @@ static void qca_serdev_remove(struct serdev_device *serdev)
->  	struct qca_power *power = qcadev->bt_power;
->  
->  	if ((qca_is_wcn399x(qcadev->btsoc_type) ||
-> -	     qca_is_wcn6750(qcadev->btsoc_type)) &&
-> +	     qca_is_wcn6750(qcadev->btsoc_type) ||
-> +	     qca_is_wcn6855(qcadev->btsoc_type)) &&
->  	     power->vregs_on)
->  		qca_power_shutdown(&qcadev->serdev_hu);
->  	else if (qcadev->susclk)
 
-Johan
+Pozdrawiam,
+Miko=C5=82aj Fiodorczyk
