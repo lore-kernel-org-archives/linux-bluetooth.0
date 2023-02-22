@@ -2,113 +2,75 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A69FAC636D6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Feb 2023 18:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93222C6379F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Feb 2023 22:45:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232644AbjBVSqW (ORCPT
+        id S231726AbjBVWpK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Feb 2023 13:46:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52552 "EHLO
+        Wed, 22 Feb 2023 17:45:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231691AbjBVSqU (ORCPT
+        with ESMTP id S229446AbjBVWpJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Feb 2023 13:46:20 -0500
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D10541B45
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Feb 2023 10:45:37 -0800 (PST)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-17264e9b575so1977078fac.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Feb 2023 10:45:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uMFWkfYuZ+XsQ/RW5Q/H+9yxE1eeW1/UMaA6UQW9FRk=;
-        b=WJ9WcTYPOd+/YeHTdtphgt2Fo5wduO3XThXUr0ynUiXiQDBlgJXEo5rb0RATPLhVFm
-         XDJNDdkbHYZ04SqqggIuEfL2+AzrA8s1WxYVcGN8Z6J8ZFCL3JYWZlnCUsdnflLe9PVG
-         S7ij9ehPkZeo4VB6KJ5f2iLkY5MpCOWNvj0szuUjKHlKaEL7jPNpU09v8EiGXgKyBsKq
-         xEDRp3dF/dFVZF2BPTR/W2hzhqTZAZirARjNytlcjdenUF1JqCA8YvG9Qxha5uqxNMvC
-         Es8FdlVJ9/f03HQDrqvuDKl/z7zpuieSwCKZjw3ldALPLznfE6UGP94uooIO7ovyL4Ko
-         S76w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uMFWkfYuZ+XsQ/RW5Q/H+9yxE1eeW1/UMaA6UQW9FRk=;
-        b=RdscYluRB4vy/+fUb57nFSHdGCIWAHJQ1LWcJPvoBCqYKi3lafWZx2oDGko15AuQHO
-         B3Q7wqBS3zAVcs5dbZxE0eo3V3+WOJ6FHWIV7V9lCZyaE5+3lfSRd3iaaqt2o8D31sLb
-         ZWl9UmYQ64spgB1JeVeWiOlXP8aTOvImh5OPBsDdH8MF5cLSyHFwDgjkWhBM1i1GCMVQ
-         DYxso3/eXLQT2bD6ACP0+dLxbc6BYEabgS1BTTJS7EUXj6sgKV7A6A3ykcNm3yDnzYiq
-         M45ilScn0XBgCtnsJILvKe8BTloBQi1FuOr9oDDhYT7BJCd2mw6qKy9Xei5Eo2nreTv9
-         cNLA==
-X-Gm-Message-State: AO0yUKUfHTzzfcwBRt9+q9oqAQu9cElnzDqKu85mJ3j/yxnQZMvXQ1PD
-        UFboRITySXbshKagoVkkLNaCveiT7bw11PCyI0SQAxr4u1G8ovAx
-X-Google-Smtp-Source: AK7set8APk8r2qxx34EP7woOLA19L1Dvu/KebzEGebLqWzFbjDFzsgcGUif9arfZslcjcNAPC5kKBx3Rt+ZhzO2A58U=
-X-Received: by 2002:a05:6870:14d2:b0:16e:30ac:b7a1 with SMTP id
- l18-20020a05687014d200b0016e30acb7a1mr1456284oab.44.1677091460998; Wed, 22
- Feb 2023 10:44:20 -0800 (PST)
+        Wed, 22 Feb 2023 17:45:09 -0500
+Received: from stravinsky.debian.org (stravinsky.debian.org [IPv6:2001:41b8:202:deb::311:108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F022F10F4;
+        Wed, 22 Feb 2023 14:45:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+        s=smtpauto.stravinsky; h=X-Debian-User:Content-Transfer-Encoding:Content-Type
+        :In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
+        Reply-To:Content-ID:Content-Description;
+        bh=9rb+kGPcrAD1VHbJnFkQ6wqykf5BJOE05IV8W1ATD8Y=; b=Gf1ZBTpU6d/YTGZrOomXNuzx5a
+        cEWhjZT0pyw3KvkQGMtAdZEJywO8Fh47i2cOJrFax2Xot/gY9tWK+D25RKfLsxN8cIFVHMWKjuXef
+        9U+PGgMBs/YHC6Tnc7RHV7nM2ji/3oM4rloCvbC0hB/5exWkgC95S/7swAlg2D6zl7PUi4eu/pt5r
+        Go3S/OVsFi2WLzGs3LBPoM63RQzOWJinfN3KH4K7u5gxMnedzDhU9QrdaUQuhTzlC19YKXH7Jee1d
+        mPScDILcpwXwIiQEuf4rEbLRvvFhcnOsN/E6S8o7RcUklSjjAMEPmK9yJzFSouRjv0Mmh3TgLsl/f
+        pfm8Ki9w==;
+Received: from authenticated user
+        by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
+        (Exim 4.94.2)
+        (envelope-from <bage@debian.org>)
+        id 1pUxrA-008z2d-Bi; Wed, 22 Feb 2023 22:45:00 +0000
+Message-ID: <b8dd4590-92d5-efcb-d8cf-d15e0e1f9547@debian.org>
+Date:   Wed, 22 Feb 2023 23:44:59 +0100
 MIME-Version: 1.0
-References: <20230222000915.2843208-1-jiangzp@google.com> <20230221160910.kernel.v1.1.If0578b001c1f12567f2ebcac5856507f1adee745@changeid>
-In-Reply-To: <20230221160910.kernel.v1.1.If0578b001c1f12567f2ebcac5856507f1adee745@changeid>
-From:   Zhengping Jiang <jiangzp@google.com>
-Date:   Wed, 22 Feb 2023 10:44:09 -0800
-Message-ID: <CAB4PzUp327-efiARXhsE6Ep+1Lf2T501CexBqhWAhPzMQiEYVQ@mail.gmail.com>
-Subject: Re: [kernel PATCH v1 1/1] Bluetooth: hci_sync: clear workqueue before
- clear mgmt cmd
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org, mmandlik@google.com,
-        "David S. Miller" <davem@davemloft.net>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.2
+Subject: Re: [PATCH v5 0/2] Bluetooth: btrtl: add support for the RTL8723CS
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20230212124153.2415-1-bage@debian.org>
+Content-Language: de-DE-frami
+From:   Bastian Germann <bage@debian.org>
+In-Reply-To: <20230212124153.2415-1-bage@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Debian-User: bage
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Am 12.02.23 um 13:41 schrieb Bastian Germann:
+> v1 of this series was sent in July 2020 by Vasily Khoruzhick.
+> I have tested it to work on the Pinebook.
+> 
+> Changelog:
+> v2:
+>     * Rebase
+>     * Add uart-has-rtscts to device tree as requested by reviewer
+> v3:
+>     * Drop the device tree as it was split out and is already integrated.
+>     * Rename the quirk as requested by reviewer Marcel Holtmann
+> v4:
+>     * Use skb_pull_data as requested by reviewer Luiz Augusto von Dentz
+> v5:
+>     * Make use of skb_pull_data's length check
 
-We need to revise this patch after a local test failure. I will update
-after finding the cause.
-
-Thanks,
-Zhengping
-
-On Tue, Feb 21, 2023 at 4:09 PM Zhengping Jiang <jiangzp@google.com> wrote:
->
-> Clear cmd_sync_work queue before clearing the mgmt cmd list to avoid
-> racing conditions which cause use-after-free.
->
-> When powering off the adapter, the mgmt cmd list will be cleared. If a
-> work is queued in the cmd_sync_work queue at the same time, it will
-> cause the risk of use-after-free, as the cmd pointer is not checked
-> before use.
->
-> Signed-off-by: Zhengping Jiang <jiangzp@google.com>
-> ---
->
-> Changes in v1:
-> - Clear cmd_sync_work queue before clearing the mgmt cmd list
->
->  net/bluetooth/hci_sync.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 117eedb6f709..6609434e3125 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -4840,6 +4840,8 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->
->         auto_off = hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF);
->
-> +       hci_cmd_sync_clear(hdev);
-> +
->         if (!auto_off && hdev->dev_type == HCI_PRIMARY &&
->             !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
->             hci_dev_test_flag(hdev, HCI_MGMT))
-> --
-> 2.39.2.637.g21b0678d19-goog
->
+I have addressed every comment.
+Would you please consider integrating this 2.5 years old series?
