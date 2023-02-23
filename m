@@ -2,163 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD315C64ED8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Feb 2023 11:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 836AAC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Feb 2023 11:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233767AbjBWLAg (ORCPT
+        id S233851AbjBWLBU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Feb 2023 06:00:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37380 "EHLO
+        Thu, 23 Feb 2023 06:01:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjBWLAe (ORCPT
+        with ESMTP id S233884AbjBWLBR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Feb 2023 06:00:34 -0500
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2044.outbound.protection.outlook.com [40.107.7.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D980F52DE8;
-        Thu, 23 Feb 2023 03:00:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bqt4vn9fWKHj44FweVLGtyGldPI3POUPRmdmxxCSppIDvAqdthg4eUMcSyZKCGSN3vf7Bn081gd3aaFR7CE3fI2J7TqYOEPJOq6pVLxVnLcbwdX+1W4Wtvj9JyckqzDGpbkVIFImU8DCxmD1jZ4m4LSVoolU2e7eOom6Bppg/Eo2BAEbEA9eJz3UosiMjin2uyAq8+MSKxnwaJY27b2Y2xjcePXNs+DKAXx2qyScnow6JsTzwxtFnDqmLU0/RVDcirUvVjBcPc9yP2ZWN5SHVXs8XdvUXzg0cTuM/UB8gC9Wk/D9sl7Kse8MgWX3LtjmJXafWLKJjq+rZDxs6ptZ2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SNx9OEPJZeS7/UbORf4IqDnYFFtv2haRDKc5PGTDB1Q=;
- b=l6PgiO0x+kXOP8GtoOUE5nTBKaQtJ41Dlr+l9oeeCj0IcKb4Ft7uCXhwVCK8JLsI911JgEbSyM+GKd23c6oOtNPkO3jft6XDyBb3AYgjTdlRwgXbYB+K6hZO3vMxzMSZzZUWH4iWEHo0WS98qIevbyDfGfL1uW4wwQoS+FVCZ6Y+qL20fjzdSn/yCBd43a6/k/fUn2L1kHzTWWniLbeniBXz3zOqL98vYmQiCAjqHuBgW5zSN3/gEWmT2qIskI7slG/bv0YMUk9HpGoQQ51AWPdmi1gNPmISIeCh49u9LDCdfqquimM3MigcKrQTkRMxLnHqM/VM3GdJB8GiIpGIRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SNx9OEPJZeS7/UbORf4IqDnYFFtv2haRDKc5PGTDB1Q=;
- b=sNFDnyv8LvrRc5t/0Ev+r9CjoWtDwwtBuOsSgXw3dYGYTY+LFdz+1sudbrUL3RrCtNXPpLgGS62sAh7QlWEE7kYjHOb+YD9lssNLjg9v7hf36eg3xHraBHJrORa8pprc5C4yHHXTKsmr3k5OiTdom+LNxeZAiEwugojuMaOaK/8=
-Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
- by AM9PR04MB8793.eurprd04.prod.outlook.com (2603:10a6:20b:408::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6134.21; Thu, 23 Feb
- 2023 11:00:30 +0000
-Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
- ([fe80::f8fe:ab7c:ef5d:9189]) by AM9PR04MB8603.eurprd04.prod.outlook.com
- ([fe80::f8fe:ab7c:ef5d:9189%9]) with mapi id 15.20.6134.021; Thu, 23 Feb 2023
- 11:00:30 +0000
-From:   Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "jirislaby@kernel.org" <jirislaby@kernel.org>,
-        "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
-        "hdanton@sina.com" <hdanton@sina.com>,
-        "ilpo.jarvinen@linux.intel.com" <ilpo.jarvinen@linux.intel.com>,
-        "leon@kernel.org" <leon@kernel.org>
-CC:     "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>
-Subject: Re: [PATCH v4 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth
- support
-Thread-Topic: [PATCH v4 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth
- support
-Thread-Index: AQHZR3YLu/OL7KREHk+ciGqO0e7Ycw==
-Date:   Thu, 23 Feb 2023 11:00:30 +0000
-Message-ID: <AM9PR04MB86032C020C9C7DCB5D84B6E7E7AB9@AM9PR04MB8603.eurprd04.prod.outlook.com>
-References: <20230221162541.3039992-1-neeraj.sanjaykale@nxp.com>
- <20230221162541.3039992-3-neeraj.sanjaykale@nxp.com>
- <ef019382-61a8-c663-773b-21791413889d@linaro.org>
-In-Reply-To: <ef019382-61a8-c663-773b-21791413889d@linaro.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8603:EE_|AM9PR04MB8793:EE_
-x-ms-office365-filtering-correlation-id: d3350c04-6c68-4442-1e95-08db158d2d94
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HSPpNxXVy/OMVO5HzHikVoeOvmfTx+Wav+LVtc0mhjnzyIocYoR0IP/ZAOmH9gbJZl2QLSd2bTCXQFK29lfWG07Tl0sp6GqAZbK2oY2RUjQIc3EAysp9tW2D3qQyWaG/ObvjTpl9jVwrmY33sV5S0Pu+81qb6TPg613QYvr5WyAJXV6YybxwwXEHMN8lRbV+rNNJE1pIwE8XpG8Y2Yr7N+jla+Gs8AKEyU4UkrEjtyJSOhC3qJUb5z9TFbxxWbkwwN+/Tu3wRetQwwDw9Y/lSXUxblZjVRAOXvCZcKhs1QVUoqNm8AwiffyyYVGiT6iB2vzPhOYb4aJuaQrsMbParBFFVmfOIGb5d+excovqplXpMTqWeDy7YwyM/ZB2oac0KOf4Xuko39MCvZCxd9y1KkRxlfB7+/zjucZbBgQ86UZslQOiKaB4ot3/na4ODgUafWY5AYBaQW8LeKDiV9FFcmYaFiFmmmypE1B16PvQZbW5KpWcNn99G9c0sP0zReNP7OsP0v7k0PTYNWELL0N/+AgsbZeQAu4G/E/153fXSSIPiERChXI6ivsflvTfAYeNe5rdXkEpbJEKqbhTEj/FPkCMTvaEEC1LYdWqOABQypBhU575Eng4GABqsv4e1xpy041ZkYfTSUMav4vmfAT3ju58VEG29VBhLBVIRtsZmsLFvyrHvBgSrFMPMHGgDcqWd7IjOifphE2FXJooJjNMfW7RzcXtImalgRwg/9PSnls=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(39860400002)(366004)(396003)(136003)(346002)(451199018)(921005)(478600001)(7696005)(54906003)(316002)(71200400001)(86362001)(33656002)(122000001)(38100700002)(38070700005)(110136005)(6506007)(2906002)(66446008)(66476007)(4326008)(76116006)(41300700001)(8676002)(66946007)(64756008)(55016003)(66556008)(52536014)(8936002)(26005)(4744005)(7416002)(5660300002)(9686003)(186003)(83380400001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3waX7u1Qbi+s40F8uy9w29qqhYkzTIuD2o4sIAHjwKBVLPCRKeg/V8biPYsQ?=
- =?us-ascii?Q?o+9F9iId3HDxbI2WZdGrmvaC8IQPLVoPXmKt7KnMSd3lLBhJBh094J9EE0Dv?=
- =?us-ascii?Q?LRM4MRN/yU+oTdfeZfmHI3kjAhafkDSjNeKGdxv6j0G9gz13tZVy3KzOfvJe?=
- =?us-ascii?Q?TcsI9ZV7NuAMIJJ/wgXF05fUK3TuSNhwvJBjWCBiaWkVoOeV6XRK/SzPAqv3?=
- =?us-ascii?Q?ubRFHNMj3alf8Pt+2M0tHZo14HMBm4HRPSvjWM9TwQoR22hEdW19JXS1n1k5?=
- =?us-ascii?Q?BfafuP2RREIZz4TWcWzsrv+P05h2ayOl88YpdMwvD6C11SlC1xJCiP1LCbNS?=
- =?us-ascii?Q?r47MSZjY7BGpFXCml4othXXfKTHB337cPwHuaLnkxxIocuPuVLH1y9F6yB7A?=
- =?us-ascii?Q?8XLhJ4SDm6iTuCn7BjD/G2nbnJC5e0hEaAydWklhgsx0hkp3EDGCSkZBNQli?=
- =?us-ascii?Q?+kjxF+bcmY84vSyrPz41NJm+LLmWMRCm4iX/GsK/ZQ0QmljR0D6qgDFEfqbe?=
- =?us-ascii?Q?alwkgcl5XG4li2z3FZFgWlPOrq9hr2BKOhbmR3pYZguva/ZXvx/hXemaCi84?=
- =?us-ascii?Q?NjJVDL6A4as+yGVcWVewM4OsdtO9RvhSM+MpvBszWUe2tPgAHQT8OYHMw8f0?=
- =?us-ascii?Q?tgt3o6DQzQ0ZDF4y70mYfbepXAKV9r+bLpnw6hxrYMBTPde13I5iQyyy90yA?=
- =?us-ascii?Q?aoiGQY9EvKQEHmF7QcEouq5Vzb+stoeHOjxDDJNYA1eOwRKLcB31P9Y6ZUW6?=
- =?us-ascii?Q?tIrT1rj+T79/37u4FhUxfFBV2YZbLIgetXG/RVHrBF+k+k3h1BTuDMmA/RWA?=
- =?us-ascii?Q?b46OtBTxUIiyPr5y9XuVdb5FnrLh1Ce9W7U15PDEZ5oz+B2arV4yvFeHBLo+?=
- =?us-ascii?Q?DFSoaqt2XkM+8/Di8Q7znyodMkjjc9orEYoW6GiMtRac9GQEolF9eNxl8iyC?=
- =?us-ascii?Q?F4HuNQm4UOxcTSnAbsl3p+Q0tWvEYrgsF/P/ihONYgLUyrylV5jVGNF0E9CW?=
- =?us-ascii?Q?8sH8GHnE9l6HZtGKtLpZauhlkDSV+XfDgpY9GJ8AQtzI6tCLbi+tTi5FxlIO?=
- =?us-ascii?Q?KJl11Bjo+LrUcIwOgp87iGB6IpVH6xkB/wWhR1h1YPOBK50lsyMBCqR2L9qQ?=
- =?us-ascii?Q?ow4vWVh8LjzdCq/usrnyFKirvBrIZFwJxHbXhIhDRV+ey1JOoe4neoJScwGl?=
- =?us-ascii?Q?LhkVUVm8tYuNF1rlhQ6xq54wgtsco/qyGXC4zCpA/L6lYyTNKWxQZMGjYqrd?=
- =?us-ascii?Q?VmaQaWvHnaWOFe9CWcTAkAWpoWYhfFBza0OQlFQVWlupb2rYy9F5RQmdzUwe?=
- =?us-ascii?Q?fPdc0ss4xVCd2TcA4RLFaH4+oMhA3eGubnLLU0XtUDrCOfjt7hMUBcaSx/qF?=
- =?us-ascii?Q?6Gsy1xZwXcpcB8phFXIRq/W3mMhE4SW9bqwWT3SuIKWNHZc6Aa8DnvdfN5b+?=
- =?us-ascii?Q?+pJfjs5UTOaEr9G6NtL/anUD1I0mE4WKcP0jte3u8tF+U8H193K2NfKhqsAq?=
- =?us-ascii?Q?hcyZDYKa2gnOSzI+RRAS23mi1C85jtpjD4qhvWXJidqoOCeejAHLYJprrrvR?=
- =?us-ascii?Q?fqdHvgD2mUH2HYzpIWYKZmTwUz2J2ILfYSEWRGY9U26azcSLR0IQYO7XYgNf?=
- =?us-ascii?Q?Sw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 23 Feb 2023 06:01:17 -0500
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E965B52DEE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 03:01:05 -0800 (PST)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-17264e9b575so5773219fac.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 03:01:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rHvMEyjrnA6A6pKTNC3riMYfvJV6hfwaRFlMs5txz9A=;
+        b=b85hcjFijuJAy5Oh6bS+HRvK2hzgTWqdK4QkLGX4j5g7eSIdzPJyxzfb7T717i7PCc
+         IwXhwSshgTVsmYWOJ800d2Bzkygqyuc7tZxA0LJ0xaOlrJpYcE9YaENBFdP1LM+FuMyM
+         Pazj/GEByvNQRyxlS9Ek9gm/GfqQft+ZcYZer8Y7HFGi76Rj2nqEIIPWfLrEkcml59MU
+         eGEODK+GHgKpC5DZlGI7lMyvXA2QfCMcotHwwyngROEy8aBMLhgbg8Cr5BAV8vL7ps+J
+         55vil4z3Z8Vq6I+hpQfwXIbWKEUlH2WriajXMrgHaD1CmDYTrHcA4RPksDG2vYBns0At
+         gSeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rHvMEyjrnA6A6pKTNC3riMYfvJV6hfwaRFlMs5txz9A=;
+        b=zPod/Te9V0ze8HmrbdO0iysTast7LB7aMJ5VKaRLfFmLHJprl1OZTPtEo9vza0iwtK
+         E+YgTCVKjOI7hIzEF2aLZJ51nzrI49mc0wkyfLfh5qA+cmwr1KrinAbtFlj7HsrI55Dz
+         3zK7WrVIosWOoQUZD0/X0ZYlm+K77bLWyq80qmv1uR8DW6i0QSGuYrYJZCyb6rAE2E5d
+         VqdjTyG8JUCNdJvhMFsnft4ZNDZOWgsCspCZ9ARJxHrMLEy7KcLcZFCspsoS0TSTSrHd
+         PHJK0iVbO9hf79p8zNBYIGOvYh9Jb3q3z8cV2V9OVNHZgapgBxqnwQUuoT1j/NYj2SH9
+         F+qg==
+X-Gm-Message-State: AO0yUKUMqtMx+ZhQr5qu+bE0SEnq5k3IOaPBt0his49OFL+7gQ5JcnqW
+        Wtd9zx9Pq/VuAnAv+ZrQV/i1r8W8ENo=
+X-Google-Smtp-Source: AK7set9Z6VzkloOQK67arGWE4BiqQgMyyw3aNxRtUZAijqa0j3JCb8uYSB1BCDSQDr9RUCDImYeDfA==
+X-Received: by 2002:a05:6870:170e:b0:16e:116e:1c36 with SMTP id h14-20020a056870170e00b0016e116e1c36mr10544476oae.3.1677150064832;
+        Thu, 23 Feb 2023 03:01:04 -0800 (PST)
+Received: from [172.17.0.2] ([40.84.170.68])
+        by smtp.gmail.com with ESMTPSA id x8-20020a4a6208000000b00524f381f681sm2890874ooc.27.2023.02.23.03.01.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Feb 2023 03:01:04 -0800 (PST)
+Message-ID: <63f74770.4a0a0220.16b18.d666@mx.google.com>
+Date:   Thu, 23 Feb 2023 03:01:04 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3468526835409048084=="
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3350c04-6c68-4442-1e95-08db158d2d94
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2023 11:00:30.1686
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: z/MawPt1QrdSii77vyFIWvOjsmiMJjg4UJdrsZH/I42cD4F04AJ3Bk7AV8TCtOaU6iwNbEKZusKJH8NRHMHnCzZayHLXnci/sATqb6PwABU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8793
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: Add support for NXP bluetooth chipsets
+In-Reply-To: <20230223103614.4137309-2-neeraj.sanjaykale@nxp.com>
+References: <20230223103614.4137309-2-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Krzysztof,
+--===============3468526835409048084==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thank you for reviewing this patch.
+This is automated email and please do not reply to this email!
 
->=20
-> I think list of compatibles changed... now they are nxp,88w8987-bt, so
-> shouldn't the filename be "nxp,88w8987-bt.yaml"?
-Updated file name.
+Dear submitter,
 
-> > +examples:
-> > +  - |
-> > +    uart2 {
->=20
-> This is a friendly reminder during the review process.
->=20
-> It seems my previous comments were not fully addressed. Maybe my
-> feedback got lost between the quotes, maybe you just forgot to apply it.
-> Please go back to the previous discussion and either implement all reques=
-ted
-> changes or keep discussing them.
->=20
-Changed "uart2" to "serial" in v5 patch.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=724310
 
-Thanks,
-Neeraj
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.75 seconds
+GitLint                       FAIL      0.90 seconds
+SubjectPrefix                 FAIL      0.60 seconds
+BuildKernel                   PASS      31.48 seconds
+CheckAllWarning               PASS      35.04 seconds
+CheckSparse                   PASS      39.71 seconds
+CheckSmatch                   PASS      107.50 seconds
+BuildKernel32                 PASS      30.82 seconds
+TestRunnerSetup               PASS      441.27 seconds
+TestRunner_l2cap-tester       PASS      16.52 seconds
+TestRunner_iso-tester         PASS      17.22 seconds
+TestRunner_bnep-tester        PASS      5.70 seconds
+TestRunner_mgmt-tester        PASS      112.84 seconds
+TestRunner_rfcomm-tester      PASS      9.16 seconds
+TestRunner_sco-tester         PASS      8.41 seconds
+TestRunner_ioctl-tester       PASS      9.76 seconds
+TestRunner_mesh-tester        PASS      7.23 seconds
+TestRunner_smp-tester         PASS      8.24 seconds
+TestRunner_userchan-tester    PASS      6.02 seconds
+IncrementalBuild              PASS      32.75 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v5,2/3] dt-bindings: net: Bluetooth: Add NXP bluetooth support
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+18: B1 Line exceeds max length (87>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3468526835409048084==--
