@@ -2,118 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E7A5C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Feb 2023 21:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F21C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Feb 2023 21:11:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229557AbjBWVAi (ORCPT
+        id S229561AbjBWVLJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Feb 2023 16:00:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
+        Thu, 23 Feb 2023 16:11:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229477AbjBWVAh (ORCPT
+        with ESMTP id S229535AbjBWVLE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Feb 2023 16:00:37 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08055DCE8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 13:00:21 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id i34so21759817eda.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 13:00:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZEJmwoeHBaDnkt9DK/t5JUB9F2Etnru1h6EpHkG56A=;
-        b=HGpDWnWLnB/qiTUHcKqAO9w3xAo13SA3wqWPUDHHuEucYhUUIS8s2SDKsqshogc7Hp
-         wuEE2qAJixZvh43IbODDFjgg7LwvKXhbWkKX4caFVBj/M7jGNDRtDBwGWMFVDOa+d1B6
-         pbn7eVFGCjSSWCCQmpJPS4c2q5VI/5kpRA3K1R6DSHPte7UHMl+Xy9FRYeTGc1kWklkf
-         JuLMy82G4J3Av2zwxWg/4UOlqKo75KHtr+NTDcz+SBybrA04atzLAHPJJhX5zj9OZeXf
-         37Iyd0cT4HknBzbAOl3QT9s77Z7UANBJ0z/BUU8bxQa3khauS4ce3fyWFJUA5JiipR3l
-         Zgww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IZEJmwoeHBaDnkt9DK/t5JUB9F2Etnru1h6EpHkG56A=;
-        b=KfyIjbp5g7GwukymH/ikFxONFn5ITkOJEtFPSJrryiFz6Hns3SSlXFcel4SYlChkC8
-         YqqN7IDjaggM2cOcPILhUgdRwfZzk8AZelwUfL3/HJqxMpnioIkYhZcG6NtesfZTJP37
-         xWojnIvlyahGMm3qBzVlsxcIMYk6u+NRb3lXH4dAxHN8Dy/c8gkXuEEgG6MxBTUq6B3I
-         DA8zpoXgXcQf7ECMGYvPhKHeZfAi/zh0Ukuh6XjGIxaul++0Noub0aQYYyixBKXV98xg
-         ulk8Th+psHjn8i5Nafa2jZ5qDWYY9+3KkkBHHyL6rHKRZmluhKTFzIfWgBbgaflGqanF
-         LHOQ==
-X-Gm-Message-State: AO0yUKVsgnhNPCyXxyyMiF+izN1mzop2rjtioIZ1EOvInwjRnv+4aoLh
-        rw14KVObl/wvij0fOsoMbrt/hOu16tf6UiBYL+4=
-X-Google-Smtp-Source: AK7set/rbJjZ7n4/Qs7cZ044K+isfW1N6nJu2HVaa/sP6x4zWmdWYmhM5CLNVK875PIFr68NfyAfnT4wlf87AuY1zVc=
-X-Received: by 2002:a17:906:8295:b0:8b1:3357:b16b with SMTP id
- h21-20020a170906829500b008b13357b16bmr9765097ejx.4.1677186019991; Thu, 23 Feb
- 2023 13:00:19 -0800 (PST)
+        Thu, 23 Feb 2023 16:11:04 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF7C761ED8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 13:10:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 00642B81AB4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 21:10:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A3A89C433D2;
+        Thu, 23 Feb 2023 21:10:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677186617;
+        bh=dm6T759o6F1YYnDwCLzrczUTnXxwCBX1BxBosreL/L8=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=PjMKdWsiWgvpYqjKmPMi5jcpq2sAHjYJjPaq5kWAljFffzbsJiwKCmCZBEhIb5G8Z
+         WiDRJ2zsUN6+3IMLqW8SGIA0NckhxnywRc1tJSjrVF3Xq4MuitShFka6MqkgE6SBWU
+         P/O6i4SeJCxPLwILct8EtlV1rZisw+OZD59x6ryNvqveR6TtqEyVE20EghASaxG+IF
+         qunu9rWfrXApOQMqPjoJmZL9sdq5KLCuCDzN4fqoNB9dptwCMknDNFM9z2ftWaA5/R
+         gf476YiFy0n8nTcRmvxs4NjyoP/xs5A/NfGNk3W8Mr7GXZEHdw+gJkQdz2YQc8xHdw
+         fXnePkVasMNxQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8CBF0E68D32;
+        Thu, 23 Feb 2023 21:10:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <3B9D4DB2-D2CD-44FE-817A-F6EA8A0AD734@gmail.com>
- <CAFBinCBWyiObgbyuT2Xc=FnoTTTUBu3sePpybdrocVZr7SVDWw@mail.gmail.com>
- <7df7bdcad3474791ae69f73f8a761173@realtek.com> <9E1F8017-3F54-416D-9BD3-DF2F1C625094@gmail.com>
- <e4404fcb-69f6-b4c0-7683-69101bbeaa96@lexina.in>
-In-Reply-To: <e4404fcb-69f6-b4c0-7683-69101bbeaa96@lexina.in>
-From:   Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Date:   Thu, 23 Feb 2023 22:00:08 +0100
-Message-ID: <CAFBinCDFDv3RJQnydU8_ryFwzT2bevQsciGTsvotjsft4fVmXg@mail.gmail.com>
-Subject: Re: Bug/Problem with rtl_bt/rtl8822cs_config.bin
-To:     Vyacheslav <adeep@lexina.in>
-Cc:     Christian Hewitt <christianshewitt@gmail.com>,
-        Max Chou <max.chou@realtek.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        Josh Boyer <jwboyer@kernel.org>,
-        Linux Firmware <linux-firmware@kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] device: wait GATT client ready before service accept()
+ if no cache
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167718661757.25712.16626081241891993566.git-patchwork-notify@kernel.org>
+Date:   Thu, 23 Feb 2023 21:10:17 +0000
+References: <6387d20af8252ea1198c81afe728a9f67cd6bf77.1677179059.git.pav@iki.fi>
+In-Reply-To: <6387d20af8252ea1198c81afe728a9f67cd6bf77.1677179059.git.pav@iki.fi>
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Vyacheslav,
+Hello:
 
-On Thu, Feb 23, 2023 at 3:14 PM Vyacheslav <adeep@lexina.in> wrote:
-[...]
-> > The bug report stimulated Martin=E2=80=99s maintainer memory over unfin=
-ished improvements
-> > to the Amlogic UART used in the g12a and newer SoC families (we are tes=
-ting with
-> > g12b and sm1 devices) resulting in this series being submitted last nig=
-ht:
-> >
-> > https://patchwork.kernel.org/project/linux-amlogic/list/?series=3D72417=
-2
->
-> However, this does not fix the problem with rtl8822cs BT on gxl/axg chips=
-ets
-My understanding is that Meson GXBB and newer can also use XTAL along
-with the UART controller's internal divider - without any additional
-pre-divider like "XTAL divided by 2" or "XTAL divided by 3".
-Using XTAL directly (24MHz) also makes it possible to achieve 1500000
-baud without any jitter.
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-The problem with the Meson UART driver however is that using XTAL
-directly is not implemented.
-Yu Tu from Amlogic worked on patches last year. v6 of his series made
-it into -next briefly, but got reverted due to issues. v7 then
-stalled: [0] and only the bare minimum (enabling "XTAL divided by 2")
-for the S4 SoC made it upstream in the end.
+On Thu, 23 Feb 2023 19:14:44 +0000 you wrote:
+> On device ATT attach, do not immediately call accept() for profiles, if
+> there is no cached data in GATT database. Instead, wait for service
+> resolution to complete, as likely accept() cannot succeed before that.
+> 
+> Several profiles (bap, vcp, midi, deviceinfo) assume that GATT
+> attributes are available when their accept() is called, returning
+> success even if not.  In this case, the services never find the remote
+> attributes and are not operable.  Other profiles (hog, batt, ...) fail
+> their accept which prompts core to retry after discovery, and work
+> correctly also in this case.
+> 
+> [...]
 
-My suggestion is:
-- let's get my small patchset upstreamed which at least fixes the
-1500000 baud rate on G12A (and newer) SoCs
-- then work on resurrecting Yu Tu's patchset and implement "XTAL
-without any pre-dividers" support on top of that. Common Clock
-Framework will then choose the correct parent depending on the SoC
-generation, hopefully allowing arbitrary baud rates in the end - with
-no jitter/as little jitter as possible.
+Here is the summary with links:
+  - [BlueZ] device: wait GATT client ready before service accept() if no cache
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=46a5d2beccb2
 
-What do you think?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Best regards,
-Martin
-
-
-[0] https://lore.kernel.org/all/20220225073922.3947-1-yu.tu@amlogic.com/
