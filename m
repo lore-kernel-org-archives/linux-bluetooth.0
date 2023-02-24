@@ -2,92 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72566C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 02:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E681FC64ED8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 08:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbjBXCgc (ORCPT
+        id S229693AbjBXIky (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Feb 2023 21:36:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51068 "EHLO
+        Fri, 24 Feb 2023 03:40:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjBXCg3 (ORCPT
+        with ESMTP id S229468AbjBXIkw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Feb 2023 21:36:29 -0500
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8205EED5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 18:36:27 -0800 (PST)
-Received: by mail-il1-x12d.google.com with SMTP id i12so834358ila.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Feb 2023 18:36:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677206187;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oB8xdr7icY42r8TnbkuIB2v05lXIjQHJlVisWSlJ33k=;
-        b=QkIbz9AtmsckSmJ32HLWmN1NiPZC6GYGVm8Hb3scgtV2fKKK87rLz8LTxLS9Jwp4it
-         SN0bWe0YQcK5ugU4Mf3GS8UCgDucX4L8Vu5ypJYEh6JJ4MLEaDFm8WOqpcL0ObMYOl7P
-         T+PW8fGEzxm6JjQmpLs1DkeRUx+75xf8WeqVNq9RcSlNI1ocnU/99wEun/yja/JbBZto
-         yLxv7urggIV1slKMIA6wEBHxDzXh0B/46kqfVEMVm8Lqv8Jye7U5/0MGVhA/zfrf6I/c
-         6funUivkaG8yINOtcReHPNCf6zEgvQj58pZUCNsrpqW/Jh4c2++sAk2FkLax86nOdNjw
-         dzvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677206187;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oB8xdr7icY42r8TnbkuIB2v05lXIjQHJlVisWSlJ33k=;
-        b=tTpirUssJQaLvadRJGgRbCDIv6TJ7J7Q2bNviPf+4PZEMXlic7beIFkOERSLWiumkc
-         JY25M3vUDxqm9uZaQyyXn4PPdCaaFRAnTpTEs1eF/9VL/U3rRoHOJXz8CXipy4Qye5cP
-         rUe185zwuXZG4Eq25n/lnDdo8qKgwaKsXrk2BJL4CNJV2tgjBQaBmmF/7bgfAI74PLuo
-         p9/FbdAuMq/JXbhdskGhN7BIQ0M1WillBb9Y1UM8UOeYuZWj7/7T/jTSz+OwvBUkT8Ec
-         pHcR5jXvmZLEfqLZGue6EwSp22BdOSUPRqtLvVnSXPgfc2hihT47/jzrhXX+lJPj7oy8
-         aw1A==
-X-Gm-Message-State: AO0yUKUP7r/y4BGeOxJLvh42KTO1ZaCVXXENSeDO9iYJ/iUr+JdtF5xq
-        Tj+Ie53MrIde5FIz0qCZwGKqjzYhToA=
-X-Google-Smtp-Source: AK7set+Mvw3L6WF7HLy0SlKhTkCXt+ueK1fRjqi06mG+eNn/4xz62Pgq9NVdbGLxB4ltUGP49kP8ZQ==
-X-Received: by 2002:a05:6e02:20ef:b0:311:e5:5d11 with SMTP id q15-20020a056e0220ef00b0031100e55d11mr15083505ilv.9.1677206187185;
-        Thu, 23 Feb 2023 18:36:27 -0800 (PST)
-Received: from [172.17.0.2] ([13.86.65.48])
-        by smtp.gmail.com with ESMTPSA id m5-20020a924b05000000b00316ecc80a61sm1811556ilg.11.2023.02.23.18.36.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Feb 2023 18:36:26 -0800 (PST)
-Message-ID: <63f822aa.920a0220.569fc.3d66@mx.google.com>
-Date:   Thu, 23 Feb 2023 18:36:26 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7735406106136704647=="
+        Fri, 24 Feb 2023 03:40:52 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DDC763DF0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 00:40:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677228051; x=1708764051;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Da+2eeJT7SYtlD5TZUkqV2dfnOZB+m/HVBZ9p/CnuAQ=;
+  b=n7vf7TDs4Dnbx4BLcDJayc9Q7u8qWFMaB7dIw+E4JlmWCLlCDfXm1NsQ
+   2NzLM/KxZQKoSf9Cs7hUuL9BSml6RXTZn6onsnNzDjXsQC1AnoClNMuIW
+   9BK5NSr86qm47CQdw+HgjanrAucXL4V8hNLaHk10MKeIQHUIw6wqli9jZ
+   WlwkMOs5BQZRiRP5ldXS1bFM7CIzFryuITaJTMy8OaY622Cs10LK846s/
+   hAEGFvj5Lyzbj71fdGgixVxgVmkVC+bZCaonY50paPkhDQHJwfwUQ5QtT
+   dg6jQRu7PgUj1B0BAHRSrswVRXcMYvO1O5mpKVsGfPHMPOactORKKFtyj
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="395939517"
+X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
+   d="scan'208";a="395939517"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 00:40:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="918362188"
+X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
+   d="scan'208";a="918362188"
+Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 24 Feb 2023 00:40:43 -0800
+Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pVTdC-0002G9-34;
+        Fri, 24 Feb 2023 08:40:42 +0000
+Date:   Fri, 24 Feb 2023 16:40:23 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 1fb7281c62c944405960a52a70b20a3bdb1a024a
+Message-ID: <63f877f7.7UDHIFLwx4BQKK5n%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] monitor/att: Fix ASE frequency values
-In-Reply-To: <20230224015136.3445113-1-luiz.dentz@gmail.com>
-References: <20230224015136.3445113-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7735406106136704647==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 1fb7281c62c944405960a52a70b20a3bdb1a024a  Bluetooth: btrtl: Add support for RTL8852BS
 
-This is an automated email and please do not reply to this email.
+elapsed time: 725m
 
-Dear Submitter,
+configs tested: 19
+configs skipped: 3
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
------ Output -----
+tested configs:
+clang                                   alpha   defconfig
+gcc                                       arc   defconfig
+gcc                                       arm   defconfig
+gcc                                     arm64   defconfig
+gcc                                      csky   defconfig
+gcc                                      i386   defconfig
+gcc                                      ia64   defconfig
+gcc                                 loongarch   defconfig
+gcc                                      m68k   defconfig
+gcc                                     nios2   defconfig
+gcc                                    parisc   defconfig
+gcc                                  parisc64   defconfig
+gcc                                     riscv   defconfig
+gcc                                     riscv   rv32_defconfig
+gcc                                      s390   defconfig
+gcc                                     sparc   defconfig
+gcc                                        um   i386_defconfig
+gcc                                        um   x86_64_defconfig
+gcc                                    x86_64   defconfig
+gcc                                                  
 
-error: patch failed: monitor/att.c:890
-error: monitor/att.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7735406106136704647==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
