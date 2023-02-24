@@ -2,134 +2,177 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E38F1C6FA8E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 19:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D0A4C6FA8E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 19:53:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbjBXTLR (ORCPT
+        id S229580AbjBXTxC convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Feb 2023 14:11:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39564 "EHLO
+        Fri, 24 Feb 2023 14:53:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjBXTLQ (ORCPT
+        with ESMTP id S229464AbjBXTxB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Feb 2023 14:11:16 -0500
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1680C1ACDB
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 11:11:14 -0800 (PST)
-Received: by mail-qt1-x82e.google.com with SMTP id z6so575744qtv.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 11:11:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677265873;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BMeIUtqLYhJGxHw6eVteXkl/4I6lACayN/oOMU4jEZw=;
-        b=W67LtgU93YfTkmlDbcfozWBA4EPQSu2aKSspK1PL7J2xIeuh1TkbJbv6q1RxbF+5WS
-         Btd57c5o0MXY0bomme49kmuxb0Z6CG9CEvVnHUwqToL+/skLi6BUMvXhs/ZfpizTZbwK
-         Gb0IEgOs+JW+5r90Yk/1aSaaVCOj4g3ArnQpM//2r0GKee+SoXsc6dGtbLQUgQFqQC/8
-         kaWD3dqZRM45oIWd8vM8Ej0sIij6iRKVgVH2wShqtU1mtmIrX/+P5RfNkeTYFZ4KGQi/
-         MwQYDHWi0m7l+rj1HgUhnXB8YnBvLK440/PcR/QQs2/isYKwT/dD3xzlflTXZKVQPjXe
-         TXVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677265873;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BMeIUtqLYhJGxHw6eVteXkl/4I6lACayN/oOMU4jEZw=;
-        b=MujFzlMb854E4/XRNB8Hl53TAM15JjpVluclbhMNnN9KRc7lUuOCo8Yj2SfLs3Cj6U
-         WQv+gtHuhtuO63vypIyTH6ArFZwO0eQDNfnkBUslW4GuhN2fse2cfLMvYNgtPYMffUi7
-         srJUHtAEbySItbcpZVxu3BaNuwfYulcbxpwgj8G4TxIhBKynco8cHjTrlYSIzdIhcT1g
-         rAnBfiD0mKoV4OT2Ic2NuyfmN7KZiHBxsNuqe2aIaTEcZ/lY8c+R9ci4SVMBOKAP2kjZ
-         l+oIRtczrPuOoqpSrHQJklV88bOW8fUgp+qsk2hr5fB/UGAB9HQE1kg5/2pC1CvZXltY
-         Eoxw==
-X-Gm-Message-State: AO0yUKUjOXuCwD+NELQqGKyic3n4s/bIQssaug7CEu85ffIoopnLCOpf
-        6J7brelhdfxRhQXSkB5d4PLK9yzyc+M=
-X-Google-Smtp-Source: AK7set+7A3LArdDGJFMxKBBlGWAMM9vdy+ifzKQ5NXcF/3HcIIJECiYstSmHXG0TMM2xqRYaJPHu5Q==
-X-Received: by 2002:a05:622a:170b:b0:3b8:1723:6d15 with SMTP id h11-20020a05622a170b00b003b817236d15mr26231645qtk.58.1677265872958;
-        Fri, 24 Feb 2023 11:11:12 -0800 (PST)
-Received: from [172.17.0.2] ([172.177.213.80])
-        by smtp.gmail.com with ESMTPSA id i25-20020ac84899000000b003b9a6d54b6csm26707qtq.59.2023.02.24.11.11.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 11:11:12 -0800 (PST)
-Message-ID: <63f90bd0.c80a0220.c4fe.02ff@mx.google.com>
-Date:   Fri, 24 Feb 2023 11:11:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0203942512464143442=="
+        Fri, 24 Feb 2023 14:53:01 -0500
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585FA15CB7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 11:52:59 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id A5E9E2404A7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 20:52:57 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PNgY50w2Pz9rxK;
+        Fri, 24 Feb 2023 20:52:57 +0100 (CET)
+Message-ID: <cb4b657b13f21bd9f164a0c205e31e3a2184c6c8.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: ISO: fix timestamped HCI ISO data packet
+ parsing
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Fri, 24 Feb 2023 19:52:56 +0000
+In-Reply-To: <CABBYNZ+kGVtCXN1X7ZOG64mLfWfXBah_Qo5+cy2dGWQMbNidoA@mail.gmail.com>
+References: <1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi>
+         <CABBYNZ+kGVtCXN1X7ZOG64mLfWfXBah_Qo5+cy2dGWQMbNidoA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,v2] shared/bap: fix crash unregistering media endpoint while streaming
-In-Reply-To: <fe1bf6efbd6bdfc8507e13559bb3852b23446f2f.1677261870.git.pav@iki.fi>
-References: <fe1bf6efbd6bdfc8507e13559bb3852b23446f2f.1677261870.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0203942512464143442==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+ti, 2023-02-21 kello 14:08 -0800, Luiz Augusto von Dentz kirjoitti:
+> > Hi Pauli,
+> > 
+> > On Mon, Feb 20, 2023 at 11:42 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > > > 
+> > > > Use correct HCI ISO data packet header struct when the packet has
+> > > > timestamp. The timestamp, when present, goes before the other fields
+> > > > (Core v5.3 4E 5.4.5), so the structs are not compatible.
+> > > > 
+> > > > Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+> > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > > ---
+> > > > 
+> > > > Notes:
+> > > >     My hardware doesn't seem to produce timestamped packets, so this is not
+> > > >     properly tested, except to the extent that it doesn't break the
+> > > >     non-timestamped code path.
+> > > > 
+> > > >     Regardless, the current state of things looks wrong, so sending this to
+> > > >     the list in any case.
+> > 
+> > Perhaps we should first attempt to enable this in the emulator, Id use
+> > BT_HCI_CMD_LE_READ_ISO_TX_SYNC as hint that the host is interested in
+> > knowing the timestamp:
+> > 
+> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/emulator/btdev.c#n5752
 
-Dear submitter,
+Yes, it probably would be best, and probably not too complicated to do
+at least if we are happy with not per spec timestamps.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=724727
+> > > >  net/bluetooth/iso.c | 9 +++++++--
+> > > >  1 file changed, 7 insertions(+), 2 deletions(-)
+> > > > 
+> > > > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> > > > index 2dabef488eaa..cb959e8eac18 100644
+> > > > --- a/net/bluetooth/iso.c
+> > > > +++ b/net/bluetooth/iso.c
+> > > > @@ -1621,7 +1621,6 @@ static void iso_disconn_cfm(struct
+> > > > hci_conn *hcon, __u8 reason)
+> > > >  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16
+> > > > flags)
+> > > >  {
+> > > >         struct iso_conn *conn = hcon->iso_data;
+> > > > -       struct hci_iso_data_hdr *hdr;
+> > > >         __u16 pb, ts, len;
+> > > > 
+> > > >         if (!conn)
+> > > > @@ -1643,6 +1642,8 @@ void iso_recv(struct hci_conn *hcon,
+> > > > struct sk_buff *skb, u16 flags)
+> > > >                 }
+> > > > 
+> > > >                 if (ts) {
+> > > > +                       struct hci_iso_ts_data_hdr *hdr;
+> > > > +
+> > > >                         /* TODO: add timestamp to the packet?
+> > > > */
+> > 
+> > Perhaps we should use skb_set_delivery_time to set the timestamp as
+> > received by the controller? That said I don't know if the unit
+> > would
+> > be compatible.
 
----Test result---
+The userspace I think is interested also in the sequence number and
+packet status flags (if controller knows data is corrupted, that should
+be indicated to userspace, similarly for missed packets). Would e.g.
+putting all these into some custom cmsg struct be better here?
 
-Test Summary:
-CheckPatch                    FAIL      0.96 seconds
-GitLint                       FAIL      0.63 seconds
-BuildEll                      PASS      26.04 seconds
-BluezMake                     PASS      738.47 seconds
-MakeCheck                     PASS      11.00 seconds
-MakeDistcheck                 PASS      146.15 seconds
-CheckValgrind                 PASS      238.35 seconds
-CheckSmatch                   PASS      319.64 seconds
-bluezmakeextell               PASS      95.26 seconds
-IncrementalBuild              PASS      597.16 seconds
-ScanBuild                     PASS      935.23 seconds
+This timestamp is also based on controller clock. Not sure if
+delivery_time is supposed to be in system clock not some unrelated
+hardware clock.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v2] shared/bap: fix crash unregistering media endpoint while streaming
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#68: 
-    #0 0x7f93b12b9388 in __interceptor_free.part.0 (/lib64/libasan.so.8+0xb9388)
+Userspace may also want to set the packet sequence numbers and
+timestamps itself when sending, to indicate in which interval it wanted
+things to come out.
 
-/github/workspace/src/src/13151651.patch total: 0 errors, 1 warnings, 36 lines checked
+On systems where synchronization to Controller ISO clock is not
+available (it IIUC cannot really be done via HCI and so this is likely
+the situation on desktop/laptop machines), userspace needs some other
+tool to keep its SDU timing in sync with the controller, and for e.g.
+keeping a fixed number of packets queued to have some buffer for missed
+deadlines, and making sure there is no timing offset between eg. left
+and right earpieces of TWS headset.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+This probably means things like information on the timing of the latest
+Number of Completed Packets event for the handle, the number of
+currently queued ISO packets on the controller, and the sequence number
+of the latest packet queued on controller (to know how much is still in
+socket buffer). Probably also LE Read TX Sync information to know
+controller timestamp on a sent packet...
 
-/github/workspace/src/src/13151651.patch has style problems, please review.
+Does this go via some new ioctls? Or send empty packets with some cmsg
+(so userspace can just poll until it needs to do something)?
 
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+It should also be decided how much the kernel is going to be involved
+in getting the SDU timing, sequence numbers, etc. right, or whether
+it's just left to the userspace.
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2] shared/bap: fix crash unregistering media endpoint while streaming
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-40: B2 Line has trailing whitespace: "    "
-42: B2 Line has trailing whitespace: "    "
-45: B2 Line has trailing whitespace: "    "
+Before trying to propose something here, I think I'd need to first make
+some prototypes so that it becomes clearer how it would best work.
 
 
----
-Regards,
-Linux Bluetooth
+> > > >                         hdr = skb_pull_data(skb,
+> > > > HCI_ISO_TS_DATA_HDR_SIZE);
+> > > >                         if (!hdr) {
+> > > > @@ -1650,15 +1651,19 @@ void iso_recv(struct hci_conn *hcon,
+> > > > struct sk_buff *skb, u16 flags)
+> > > >                                 goto drop;
+> > > >                         }
+> > > > 
+> > > > +                       len = __le16_to_cpu(hdr->slen);
+> > > >                 } else {
+> > > > +                       struct hci_iso_data_hdr *hdr;
+> > > > +
+> > > >                         hdr = skb_pull_data(skb,
+> > > > HCI_ISO_DATA_HDR_SIZE);
+> > > >                         if (!hdr) {
+> > > >                                 BT_ERR("Frame is too short (len
+> > > > %d)", skb->len);
+> > > >                                 goto drop;
+> > > >                         }
+> > > > +
+> > > > +                       len = __le16_to_cpu(hdr->slen);
+> > > >                 }
+> > > > 
+> > > > -               len    = __le16_to_cpu(hdr->slen);
+> > > >                 flags  = hci_iso_data_flags(len);
+> > > >                 len    = hci_iso_data_len(len);
+> > > > 
+> > > > --
+> > > > 2.39.2
+> > > > 
+> > 
+> > 
 
 
---===============0203942512464143442==--
