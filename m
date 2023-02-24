@@ -2,94 +2,103 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2C3C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 11:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B702C61DA3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 11:59:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbjBXLUn (ORCPT
+        id S229458AbjBXL7r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Feb 2023 06:20:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58340 "EHLO
+        Fri, 24 Feb 2023 06:59:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbjBXLUl (ORCPT
+        with ESMTP id S229864AbjBXL7q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Feb 2023 06:20:41 -0500
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8FE63DF8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 03:20:38 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id ec43so52949069edb.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 03:20:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v3hEGyCucdzbqe3LrutT0J4NZq9m5aBL5wEqBphvaXQ=;
-        b=jbUpwEFLdpLKVZ953n8tg2+JdWrD2rrbXAVTkJRRzca1k45TyM00PvwsLpS0vJGFrc
-         RwMLvwKwI8TwqNYj21oQJA/ud3Unyv4HVPhUVAe50anXgbAQmTwr0li8Xf+i6ZZHJ1im
-         UCc0uoXxnARYlaoAX8eqvTYwDn1zSGFZ0u+N72c6LQ1VYgNk/JFUQCb3OJzvoyUEzoaD
-         cRxSDJWSpmiEb7qYa/k0szyVNZ3gEQ8vnk08SvSP65B4jXmH6bf4LXWGRZq+aBwve8de
-         ehfwXeVca7WeyRLbqMBhfzNx+pPeQzprzUc5xdj0xZTzxwdu5Xtitvmrwzt4Es8uGUnn
-         khOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v3hEGyCucdzbqe3LrutT0J4NZq9m5aBL5wEqBphvaXQ=;
-        b=v227Nc8zMlS/J9Zn788Sc7GrqLYuobaw7D5JbS770ni5QqS33uc4FLoX+KI1jLPCHF
-         BcalIMn38p52h4WNkSOx3pbgJGBS4WH1LBU1z4h/VAD8aU4F/yeXDu+4OUTeEi03cMOA
-         lUzvu9yB7DJxLie/HeLgD41y61iCn1MY1NsqGMSXuVZmhKWFLBYJ2Us+PLEV6LgdlgLF
-         FyE5am6dc6fwaTqtSbBdtrP48hagSmqdI4F99+RX8ZYhNJAa+itZv+YvmTob6z3i9iRO
-         /bCl0WusU4XlJ/oGubEbjU5b8pkSKyswZNHMfdfy3j9rmsNu9h9FrPErTJMTLvFcC2NK
-         ClIA==
-X-Gm-Message-State: AO0yUKVNFtiqJMt/CC2oPSegsZwozcjy0S1u8AdTrt4iDBLBeO1Yetwq
-        IEKE9fbDvlJgvEYoPeYVGoqv2w==
-X-Google-Smtp-Source: AK7set98CJO+wXTLM4UFAXnn0d/1LPj+v6ZqaACgh7v/kaIs6ZoV7T9E/BJ/U9Ahs/LjexIsQttccg==
-X-Received: by 2002:a17:906:1093:b0:8b1:75a0:e5c6 with SMTP id u19-20020a170906109300b008b175a0e5c6mr26507949eju.18.1677237636530;
-        Fri, 24 Feb 2023 03:20:36 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.216.144])
-        by smtp.gmail.com with ESMTPSA id kv7-20020a17090778c700b008e53874f8d8sm3436088ejc.180.2023.02.24.03.20.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Feb 2023 03:20:36 -0800 (PST)
-Message-ID: <1cda61a7-91cd-6f47-619b-e38a5131d182@linaro.org>
-Date:   Fri, 24 Feb 2023 12:20:33 +0100
+        Fri, 24 Feb 2023 06:59:46 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FBED16AC9;
+        Fri, 24 Feb 2023 03:59:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C7920B81C60;
+        Fri, 24 Feb 2023 11:59:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F9C5C433EF;
+        Fri, 24 Feb 2023 11:59:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677239982;
+        bh=MBsYfjfwW/rmvE0gLI4/NSeVvvOwKkEYquLXFvYR9d4=;
+        h=From:Date:Subject:To:Cc:Reply-To:From;
+        b=hEkrV8GB0nqtZxNInYSLUkdoapoIDBvBWbWIf1LZwAEiLgp5UKJWgu5e+gsQM9l2F
+         7KdQQygYRLw2vj3iQB0iS+r/F+JE54zXaxuM2oT/WfM3nyIK9XWTcRKWsfNAbf8HBl
+         QoDzV9upnKpAFkJZkYIGPOEdUoMM54SkvUBn+m2TNf6+/o/K109VXmYms9iIMvAFq/
+         UxyKwddlpyAsvp1wD4VQDK0512lMhK6btqZenQCahcPzA5Ni4JvetPukD6dT9Ct0ot
+         dJYsEGl7P1mDfAOeJrzmP19caRbZGBaNWDJxPQ86wI0UVboO7FtNkjBICQuX0citwz
+         Wf8PnTulRQnvQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.lore.kernel.org (Postfix) with ESMTP id 4233EC61DA3;
+        Fri, 24 Feb 2023 11:59:42 +0000 (UTC)
+From:   Sasha Finkelstein via B4 Relay 
+        <devnull+fnkl.kernel.gmail.com@kernel.org>
+Date:   Fri, 24 Feb 2023 12:59:31 +0100
+Subject: [PATCH] bluetooth: btbcm: Fix logic error in forming the board
+ name.
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v5 2/3] dt-bindings: net: Bluetooth: Add NXP bluetooth
- support
-Content-Language: en-US
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        gregkh@linuxfoundation.org, jirislaby@kernel.org,
-        alok.a.tiwari@oracle.com, hdanton@sina.com,
-        ilpo.jarvinen@linux.intel.com, leon@kernel.org
-Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
-        rohit.fule@nxp.com, sherry.sun@nxp.com
-References: <20230223103614.4137309-1-neeraj.sanjaykale@nxp.com>
- <20230223103614.4137309-3-neeraj.sanjaykale@nxp.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230223103614.4137309-3-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20230224-btbcm-wtf-v1-1-be717d728e56@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAKKm+GMC/x2NQQ7CMAwEv1L5jKXg9AJfQRyS1G59aEB2BJWq/
+ p2U42hnNTs4m7LDfdjB+KOur9rhehmgLKnOjDp1BgoUA9GIueWy4rcJikQSniLfYoDu5+SM2VI
+ ty/lYkze2c3gbi27/yON5HD9e6z/4dAAAAA==
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sasha Finkelstein <fnkl.kernel@gmail.com>
+X-Mailer: b4 0.12.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1677239981; l=1021;
+ i=fnkl.kernel@gmail.com; s=20230213; h=from:subject:message-id;
+ bh=liXj6eso7YibAPpq3C6GEb2euORWvG95T35Md9MPiuM=;
+ b=Fk8BUaDW2JcDWQIOtNnG7UY8stvFMte2f8CocTlQj9cWdcvSB9Q9Rq5Ltk3Y+zJDD4RD4ZG8d
+ ZoqwvFk4SQCDcUwZhfNQp87ASdy5EqrY3VRFNyE2mtnVRXwFN7LgshB
+X-Developer-Key: i=fnkl.kernel@gmail.com; a=ed25519;
+ pk=7LFSAJtxIWAs9LzCIyX0sSvCZy2wQTyEIu1zch6o804=
+X-Endpoint-Received: by B4 Relay for fnkl.kernel@gmail.com/20230213 with auth_id=28
+X-Original-From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+Reply-To: <fnkl.kernel@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 23/02/2023 11:36, Neeraj Sanjay Kale wrote:
-> Add binding document for NXP bluetooth chipsets attached over UART.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
+From: Sasha Finkelstein <fnkl.kernel@gmail.com>
 
+This patch fixes an incorrect loop exit condition in code that replaces
+'/' symbols in the board name. There might also be a memory corruption
+issue here, but it is unlikely to be a real problem.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
+---
+ drivers/bluetooth/btbcm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 3006e2a0f37e..43e98a598bd9 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -511,7 +511,7 @@ static const char *btbcm_get_board_name(struct device *dev)
+ 	len = strlen(tmp) + 1;
+ 	board_type = devm_kzalloc(dev, len, GFP_KERNEL);
+ 	strscpy(board_type, tmp, len);
+-	for (i = 0; i < board_type[i]; i++) {
++	for (i = 0; i < len; i++) {
+ 		if (board_type[i] == '/')
+ 			board_type[i] = '-';
+ 	}
+
+---
+base-commit: c9c3395d5e3dcc6daee66c6908354d47bf98cb0c
+change-id: 20230224-btbcm-wtf-ff32fed3e930
 
 Best regards,
-Krzysztof
+-- 
+Sasha Finkelstein <fnkl.kernel@gmail.com>
 
