@@ -2,96 +2,187 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E681FC64ED8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 08:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2AE1C677F1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 08:42:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbjBXIky (ORCPT
+        id S229810AbjBXIl7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Feb 2023 03:40:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54202 "EHLO
+        Fri, 24 Feb 2023 03:41:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbjBXIkw (ORCPT
+        with ESMTP id S229697AbjBXIl6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Feb 2023 03:40:52 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DDC763DF0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 00:40:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677228051; x=1708764051;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Da+2eeJT7SYtlD5TZUkqV2dfnOZB+m/HVBZ9p/CnuAQ=;
-  b=n7vf7TDs4Dnbx4BLcDJayc9Q7u8qWFMaB7dIw+E4JlmWCLlCDfXm1NsQ
-   2NzLM/KxZQKoSf9Cs7hUuL9BSml6RXTZn6onsnNzDjXsQC1AnoClNMuIW
-   9BK5NSr86qm47CQdw+HgjanrAucXL4V8hNLaHk10MKeIQHUIw6wqli9jZ
-   WlwkMOs5BQZRiRP5ldXS1bFM7CIzFryuITaJTMy8OaY622Cs10LK846s/
-   hAEGFvj5Lyzbj71fdGgixVxgVmkVC+bZCaonY50paPkhDQHJwfwUQ5QtT
-   dg6jQRu7PgUj1B0BAHRSrswVRXcMYvO1O5mpKVsGfPHMPOactORKKFtyj
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="395939517"
-X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
-   d="scan'208";a="395939517"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2023 00:40:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10630"; a="918362188"
-X-IronPort-AV: E=Sophos;i="5.97,324,1669104000"; 
-   d="scan'208";a="918362188"
-Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 24 Feb 2023 00:40:43 -0800
-Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pVTdC-0002G9-34;
-        Fri, 24 Feb 2023 08:40:42 +0000
-Date:   Fri, 24 Feb 2023 16:40:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 1fb7281c62c944405960a52a70b20a3bdb1a024a
-Message-ID: <63f877f7.7UDHIFLwx4BQKK5n%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 24 Feb 2023 03:41:58 -0500
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D246531A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 00:41:55 -0800 (PST)
+Received: by mail-il1-f207.google.com with SMTP id d6-20020a92d786000000b00316f1737173so4070181iln.16
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 00:41:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=42+zxhcIjqurH9yXr4q9+c6saZmwCPNHoGRo8tm+Di8=;
+        b=VePLDktUotzggQi5C8kjGKCnNUylk88b/AfEZHpnCrOdpnS/L/5bGokge2pnSvK3yn
+         KVztZt72d8vJv4wbOd1ujW28+cMKz5FyKhU3PdRrrNoaiFkf3vo6cq84xBeiumCTjL4K
+         UKpSI3phnVNplg391vKhGfnDWWAEEExmyjAeHCc/KAVaU7d74Ms5beako3RnSkfAU99U
+         hSA1lM6JB6FC5fJKKLs4moDipelEe9uYPpT3nGsHMTm0WVtFqpfEGpA2sYO9xAwCC0/T
+         LVip0Kg1no7VeJOCifIRVUD8Px08FR/6y7CqXKNKIbU+D7eRHxzMnLzWfNURaCKfZkyY
+         q+LQ==
+X-Gm-Message-State: AO0yUKX8tw+wocTBUhTrDjxcWOkoiOHQwj2bedurbBgYmAnoQ3WMtQa+
+        0FQMgDCU1mgV7Qp1nIA98st3yj2Lij7G7Yv9qgaZF+df66Z0
+X-Google-Smtp-Source: AK7set+PaRgEGpIHwroObi54hVEeSixkpRiJ7SEjhm+E7z/Sl9b6Qd6b5GqfFv3eBI5LI8Ys12bUivmnpZU2ybnCFe6FZYEKxtk4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:22ac:b0:3a7:e46f:2a32 with SMTP id
+ z12-20020a05663822ac00b003a7e46f2a32mr5400439jas.6.1677228114827; Fri, 24 Feb
+ 2023 00:41:54 -0800 (PST)
+Date:   Fri, 24 Feb 2023 00:41:54 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000fddea605f56e19b5@google.com>
+Subject: [syzbot] linux-next test error: possible deadlock in hci_cmd_sync_clear
+From:   syzbot <syzbot+0dc69aab0bf17cdd4092@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, sfr@canb.auug.org.au,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 1fb7281c62c944405960a52a70b20a3bdb1a024a  Bluetooth: btrtl: Add support for RTL8852BS
+Hello,
 
-elapsed time: 725m
+syzbot found the following issue on:
 
-configs tested: 19
-configs skipped: 3
+HEAD commit:    4d6d7ce9baaf Add linux-next specific files for 20230224
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=159b1e44c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4fe68735401a6111
+dashboard link: https://syzkaller.appspot.com/bug?extid=0dc69aab0bf17cdd4092
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f73e26755a73/disk-4d6d7ce9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e8a9e1fdaa91/vmlinux-4d6d7ce9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ad213a829368/bzImage-4d6d7ce9.xz
 
-tested configs:
-clang                                   alpha   defconfig
-gcc                                       arc   defconfig
-gcc                                       arm   defconfig
-gcc                                     arm64   defconfig
-gcc                                      csky   defconfig
-gcc                                      i386   defconfig
-gcc                                      ia64   defconfig
-gcc                                 loongarch   defconfig
-gcc                                      m68k   defconfig
-gcc                                     nios2   defconfig
-gcc                                    parisc   defconfig
-gcc                                  parisc64   defconfig
-gcc                                     riscv   defconfig
-gcc                                     riscv   rv32_defconfig
-gcc                                      s390   defconfig
-gcc                                     sparc   defconfig
-gcc                                        um   i386_defconfig
-gcc                                        um   x86_64_defconfig
-gcc                                    x86_64   defconfig
-gcc                                                  
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0dc69aab0bf17cdd4092@syzkaller.appspotmail.com
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+======================================================
+WARNING: possible circular locking dependency detected
+6.2.0-next-20230224-syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor.0/5079 is trying to acquire lock:
+ffff888022388880 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: __flush_work+0xdd/0xb60 kernel/workqueue.c:3167
+
+but task is already holding lock:
+ffff888022388920 (&hdev->cmd_sync_work_lock){+.+.}-{3:3}, at: hci_cmd_sync_clear+0x3c/0x2a0 net/bluetooth/hci_sync.c:653
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&hdev->cmd_sync_work_lock){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
+       hci_cmd_sync_work+0x26f/0x450 net/bluetooth/hci_sync.c:287
+       process_one_work+0x9bf/0x1820 kernel/workqueue.c:2390
+       worker_thread+0x669/0x1090 kernel/workqueue.c:2537
+       kthread+0x2e8/0x3a0 kernel/kthread.c:376
+       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+
+-> #0 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3098 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3217 [inline]
+       validate_chain kernel/locking/lockdep.c:3832 [inline]
+       __lock_acquire+0x2ec7/0x5d40 kernel/locking/lockdep.c:5056
+       lock_acquire.part.0+0x11a/0x370 kernel/locking/lockdep.c:5669
+       __flush_work+0x109/0xb60 kernel/workqueue.c:3170
+       __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3261
+       hci_cmd_sync_clear+0x48/0x2a0 net/bluetooth/hci_sync.c:654
+       hci_unregister_dev+0x16b/0x580 net/bluetooth/hci_core.c:2696
+       vhci_release+0x80/0xf0 drivers/bluetooth/hci_vhci.c:568
+       __fput+0x27c/0xa90 fs/file_table.c:321
+       task_work_run+0x16f/0x270 kernel/task_work.c:179
+       exit_task_work include/linux/task_work.h:38 [inline]
+       do_exit+0xb42/0x2b60 kernel/exit.c:869
+       do_group_exit+0xd4/0x2a0 kernel/exit.c:1019
+       get_signal+0x2315/0x25b0 kernel/signal.c:2859
+       arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+       exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+       exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+       __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+       syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+       do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&hdev->cmd_sync_work_lock);
+                               lock((work_completion)(&hdev->cmd_sync_work));
+                               lock(&hdev->cmd_sync_work_lock);
+  lock((work_completion)(&hdev->cmd_sync_work));
+
+ *** DEADLOCK ***
+
+1 lock held by syz-executor.0/5079:
+ #0: ffff888022388920 (&hdev->cmd_sync_work_lock){+.+.}-{3:3}, at: hci_cmd_sync_clear+0x3c/0x2a0 net/bluetooth/hci_sync.c:653
+
+stack backtrace:
+CPU: 0 PID: 5079 Comm: syz-executor.0 Not tainted 6.2.0-next-20230224-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2178
+ check_prev_add kernel/locking/lockdep.c:3098 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3217 [inline]
+ validate_chain kernel/locking/lockdep.c:3832 [inline]
+ __lock_acquire+0x2ec7/0x5d40 kernel/locking/lockdep.c:5056
+ lock_acquire.part.0+0x11a/0x370 kernel/locking/lockdep.c:5669
+ __flush_work+0x109/0xb60 kernel/workqueue.c:3170
+ __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3261
+ hci_cmd_sync_clear+0x48/0x2a0 net/bluetooth/hci_sync.c:654
+ hci_unregister_dev+0x16b/0x580 net/bluetooth/hci_core.c:2696
+ vhci_release+0x80/0xf0 drivers/bluetooth/hci_vhci.c:568
+ __fput+0x27c/0xa90 fs/file_table.c:321
+ task_work_run+0x16f/0x270 kernel/task_work.c:179
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xb42/0x2b60 kernel/exit.c:869
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1019
+ get_signal+0x2315/0x25b0 kernel/signal.c:2859
+ arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+ exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+ exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+ syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
+ do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7ff20608d567
+Code: Unable to access opcode bytes at 0x7ff20608d53d.
+RSP: 002b:00007fffc36b4528 EFLAGS: 00000246 ORIG_RAX: 00000000000000a6
+RAX: fffffffffffffffe RBX: 0000000000000003 RCX: 00007ff20608d567
+RDX: 00007fffc36b45fc RSI: 000000000000000a RDI: 00007fffc36b45f0
+RBP: 00007fffc36b45f0 R08: 00000000ffffffff R09: 00007fffc36b43c0
+R10: 0000555555e77853 R11: 0000000000000246 R12: 00007ff2060e6b24
+R13: 00007fffc36b56b0 R14: 0000555555e77810 R15: 00007fffc36b56f0
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
