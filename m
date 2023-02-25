@@ -2,96 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F7CC7EE2D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 09:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B8FC64EC7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 14:40:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbjBYJR2 (ORCPT
+        id S229516AbjBYOkA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Feb 2023 04:17:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33722 "EHLO
+        Sat, 25 Feb 2023 09:40:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjBYJR1 (ORCPT
+        with ESMTP id S229445AbjBYOj7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Feb 2023 04:17:27 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBB412F21
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 01:17:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677316647; x=1708852647;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=/yErBe6D0uKw6yjMZBPgOO3WtzKg78Xvh6f5T9JK4M0=;
-  b=d1H0+57ijt59xDMoVFadri/joU/+33cbkJXOmw73hdYm44JHXdggUqiD
-   4gg+o0Nhlby8b22OkDbFqW020gxuxSZadgI/GSmMhMUH6CDWF7miBg++x
-   wy08RP71rTeLrc4DWD1Q0HK21lPUZt0xVf1H38A3wxHmEa8DX5uwU/qE6
-   n558PbEqBN1IIaVr2RS9W6/dlP+eJwQrm0TpBHA5cK7etNXj5gO8R59KB
-   XnUwI+HhESJaQHp2V/6NETQqPrhgfhRhw+4kmJfb8AbGwRbh5QEi2Cgjh
-   A5SQgmZbVP2j8dql/cj6ABY0qvt+AN2uhmpDQeKYGaMQOsLl8bcV2dJSS
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="361159775"
-X-IronPort-AV: E=Sophos;i="5.97,327,1669104000"; 
-   d="scan'208";a="361159775"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2023 01:17:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="673160305"
-X-IronPort-AV: E=Sophos;i="5.97,327,1669104000"; 
-   d="scan'208";a="673160305"
-Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 25 Feb 2023 01:17:25 -0800
-Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pVqgG-00035D-2t;
-        Sat, 25 Feb 2023 09:17:24 +0000
-Date:   Sat, 25 Feb 2023 17:16:41 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- fbfd2d6d43f8e701f89692e05fcb34e904b087b4
-Message-ID: <63f9d1f9.BwZ1OCUMmJ6SnjIk%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 25 Feb 2023 09:39:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901AD12BE4
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 06:39:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1677335951;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EgVx5zjCl/pDiYGE9sx9GvME48f6cIrJ7yIXuQ2Paus=;
+        b=SR268dj0D3NBfO+g6hqvJuVaefob3Wf4K/pPddPBzh1cZN0dJvBIEgQvulnthEDQdhrKOG
+        GlAC0vYL9hSB62KyoP+vekfQdv4C2ONqkf0ASgTX5ZEVoNb0w+DaL9epj49qrcbV+/8lmL
+        WHKwo+Nh3Ox9qujowjKivnhWWONhadk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-402-NB3lm_5CMaaQYty-NFIDTg-1; Sat, 25 Feb 2023 09:39:07 -0500
+X-MC-Unique: NB3lm_5CMaaQYty-NFIDTg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC6F3811E6E;
+        Sat, 25 Feb 2023 14:39:06 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.39.192.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 124CB440DC;
+        Sat, 25 Feb 2023 14:39:05 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_bcm: Add Lenovo Yoga Tablet 2 830 / 1050 to the bcm_broken_irq_dmi_table
+Date:   Sat, 25 Feb 2023 15:39:00 +0100
+Message-Id: <20230225143900.47158-1-hdegoede@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: fbfd2d6d43f8e701f89692e05fcb34e904b087b4  Bluetooth: btrtl: Add support for RTL8852BS
+The DSDT for the Lenovo Yoga Tablet 2 830 / 1050 models (which share
+the same mainboard) specifies a IOAPIC IRQ for the HCI -> host IRQ but
+this is not correct.
 
-elapsed time: 723m
+Like the Asus TF103C these tablets use pin 17 of the INT33FC:02 GPIO
+controller for the IRQ and this pin is _not_ configured in direct IRQ
+mode by the firmware.
 
-configs tested: 19
-configs skipped: 3
+Add a DMI match for this, re-using the Asus TF103C gpiod_lookup_table,
+to fix bluetooth not working on these tablets.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/hci_bcm.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-tested configs:
-clang                                   alpha   defconfig
-gcc                                       arc   defconfig
-gcc                                       arm   defconfig
-gcc                                     arm64   defconfig
-gcc                                      csky   defconfig
-gcc                                      i386   defconfig
-gcc                                      ia64   defconfig
-gcc                                 loongarch   defconfig
-gcc                                      m68k   defconfig
-gcc                                     nios2   defconfig
-gcc                                    parisc   defconfig
-gcc                                  parisc64   defconfig
-gcc                                     riscv   defconfig
-gcc                                     riscv   rv32_defconfig
-gcc                                      s390   defconfig
-gcc                                     sparc   defconfig
-gcc                                        um   i386_defconfig
-gcc                                        um   x86_64_defconfig
-gcc                                    x86_64   defconfig
-gcc                                                  
-
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 2b6c0e1922cb..227c4da3ba4d 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -888,7 +888,7 @@ static int bcm_resume(struct device *dev)
+ #endif
+ 
+ /* Some firmware reports an IRQ which does not work (wrong pin in fw table?) */
+-static struct gpiod_lookup_table asus_tf103c_irq_gpios = {
++static struct gpiod_lookup_table irq_on_int33fc02_pin17_gpios = {
+ 	.dev_id = "serial0-0",
+ 	.table = {
+ 		GPIO_LOOKUP("INT33FC:02", 17, "host-wakeup-alt", GPIO_ACTIVE_HIGH),
+@@ -903,7 +903,18 @@ static const struct dmi_system_id bcm_broken_irq_dmi_table[] = {
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "TF103C"),
+ 		},
+-		.driver_data = &asus_tf103c_irq_gpios,
++		.driver_data = &irq_on_int33fc02_pin17_gpios,
++	},
++	{
++		.ident = "Lenovo Yoga Tablet 2 830F/L / 1050F/L",
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "Intel Corp."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "VALLEYVIEW C0 PLATFORM"),
++			DMI_MATCH(DMI_BOARD_NAME, "BYT-T FFD8"),
++			/* Partial match on beginning of BIOS version */
++			DMI_MATCH(DMI_BIOS_VERSION, "BLADE_21"),
++		},
++		.driver_data = &irq_on_int33fc02_pin17_gpios,
+ 	},
+ 	{
+ 		.ident = "Meegopad T08",
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.39.1
+
