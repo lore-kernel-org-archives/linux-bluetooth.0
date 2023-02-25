@@ -2,191 +2,80 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EBBC7EE2F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 17:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B36C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 20:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbjBYRLo (ORCPT
+        id S229554AbjBYU5y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Feb 2023 12:11:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48276 "EHLO
+        Sat, 25 Feb 2023 15:57:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbjBYRLn (ORCPT
+        with ESMTP id S229510AbjBYU5w (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Feb 2023 12:11:43 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5551042E;
-        Sat, 25 Feb 2023 09:11:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1677345102; x=1708881102;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=/wmzhNxDeMcFcsLck+WoGXoesP55t1mLA577Oo+iWV8=;
-  b=Zqi74QDS720c77fRW5MRilYBviP9dNeN7+dfD9QSVgvYcpe+TMBj2DmO
-   2G0ZNMQldVj981zyneHEwmbd/Y1mah3hHUAZ8kMbLrtuiqrLgl3NWqEGU
-   sXLlsp7/x/Q8dTCGj5wQ8M7SIvHaC7sP/q5ecyYO/lCn2RCWjJeQUnLTm
-   lhP+xsGztWi8iAKTetB1kU+16q86eQV+LPk/OkRYw+DdqVQB5QQUixrDo
-   abWbP7H7tgl3eT3Zpi+vr9XmFNk+AVyRcJWZzd1emYTL84g6/cC/vwT1s
-   ZnfduqCUswBSAhj0bUFG4KFC/CVYDFuUYYChcAlPbrTX9K6ihgnd/q+kG
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="332369633"
-X-IronPort-AV: E=Sophos;i="5.97,328,1669104000"; 
-   d="scan'208";a="332369633"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2023 09:11:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="673233092"
-X-IronPort-AV: E=Sophos;i="5.97,328,1669104000"; 
-   d="scan'208";a="673233092"
-Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 25 Feb 2023 09:11:39 -0800
-Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pVy5C-0003KB-0e;
-        Sat, 25 Feb 2023 17:11:38 +0000
-Date:   Sun, 26 Feb 2023 01:10:55 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     linux-usb@vger.kernel.org, linux-mm@kvack.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-        io-uring@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        amd-gfx@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD REGRESSION
- 8232539f864ca60474e38eb42d451f5c26415856
-Message-ID: <63fa411f.ZvVOisJt5OlLzGYF%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 25 Feb 2023 15:57:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9305610F2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 12:57:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4298560B85
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 20:57:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A9F6C4339E
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 20:57:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677358669;
+        bh=j/Rb9U+hbQxNu2CTcupmlzovA7nhzEgWj3BqtvtMl3o=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=BW/u517ehLMcMzaJp+O9NPiocxteftz/kMe/esIL5YyyghI6qJzRXLwwRAHT52/mb
+         6QMFdAxW3SEMhMmIJfP9Tr63fZ4UHE41TEVDhpxhwhs7836oWXoCRDSpYaREOCuzSa
+         j3Sg4MWUzh4T82X8moYdXPuJ+EvdIpsyNOAWrHopFBqbNxeOgsUGxkw1EsAuP0c3gK
+         ENE9u2iQN6rt3XGrp1eckHEBmgFL4pYymlQl5Ep756viEGoa1vmivGF2H2OCi8TUy6
+         bm0ef0kVhbx6JhoRm7zhamNEQOqnZxFMMbromabzjhK/5ep7YO3iiu2/mwgQEpxbNb
+         ioqb3NXpmjB3w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 8A48CC43141; Sat, 25 Feb 2023 20:57:49 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Sat, 25 Feb 2023 20:57:48 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: oleksandr@natalenko.name
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215167-62941-fYVzQywyMR@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 8232539f864ca60474e38eb42d451f5c26415856  Add linux-next specific files for 20230225
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-Error/Warning reports:
+--- Comment #45 from Oleksandr Natalenko (oleksandr@natalenko.name) ---
+I can confirm this behaviour on v6.2 and AX200. The BT is unusable because =
+the
+FW doesn't get loaded. Reloading `btusb` module several times makes it work=
+ing.
 
-https://lore.kernel.org/oe-kbuild-all/202302040652.zkUBTjyo-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202302111601.jtY4lKrA-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202302112104.g75cGHZd-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202302210350.lynWcL4t-lkp@intel.com
+--=20
+You may reply to this email to add a comment.
 
-Error/Warning: (recently discovered and may have been fixed)
-
-FAILED: load BTF from vmlinux: No data available
-drivers/gpu/drm/amd/amdgpu/../display/dc/dcn30/dcn30_optc.c:294:6: warning: no previous prototype for 'optc3_wait_drr_doublebuffer_pending_clear' [-Wmissing-prototypes]
-drivers/pcmcia/pxa2xx_sharpsl.c:206:5: warning: no previous prototype for function 'pcmcia_collie_init' [-Wmissing-prototypes]
-include/asm-generic/div64.h:238:36: error: passing argument 1 of '__div64_32' from incompatible pointer type [-Werror=incompatible-pointer-types]
-
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-drivers/usb/gadget/composite.c:2082:33: sparse: sparse: restricted __le16 degrades to integer
-io_uring/rsrc.c:1262 io_sqe_buffer_register() error: uninitialized symbol 'folio'.
-mm/page_alloc.c:257:1: sparse: sparse: symbol 'check_pages_enabled' was not declared. Should it be static?
-net/bluetooth/hci_sync.c:2403 hci_pause_addr_resolution() warn: missing error code? 'err'
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- alpha-randconfig-s041-20230222
-|   `-- mm-page_alloc.c:sparse:sparse:symbol-check_pages_enabled-was-not-declared.-Should-it-be-static
-|-- arc-allyesconfig
-|   `-- include-asm-generic-div64.h:error:passing-argument-of-__div64_32-from-incompatible-pointer-type
-|-- arm-allmodconfig
-|   `-- include-asm-generic-div64.h:error:passing-argument-of-__div64_32-from-incompatible-pointer-type
-|-- arm-allyesconfig
-|   `-- include-asm-generic-div64.h:error:passing-argument-of-__div64_32-from-incompatible-pointer-type
-|-- arm-randconfig-s051-20230222
-|   `-- drivers-usb-gadget-composite.c:sparse:sparse:restricted-__le16-degrades-to-integer
-|-- arm64-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn30-dcn30_optc.c:warning:no-previous-prototype-for-optc3_wait_drr_doublebuffer_pending_clear
-|-- i386-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn30-dcn30_optc.c:warning:no-previous-prototype-for-optc3_wait_drr_doublebuffer_pending_clear
-|-- i386-randconfig-s001
-|   |-- drivers-gpu-drm-i915-gem-i915_gem_ttm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-restricted-vm_fault_t-assigned-usertype-ret-got-int
-|   `-- drivers-usb-gadget-composite.c:sparse:sparse:restricted-__le16-degrades-to-integer
-|-- i386-randconfig-s002
-|   `-- drivers-gpu-drm-i915-gem-i915_gem_ttm.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-restricted-vm_fault_t-assigned-usertype-ret-got-int
-|-- i386-randconfig-s003
-|   `-- drivers-usb-gadget-composite.c:sparse:sparse:restricted-__le16-degrades-to-integer
-|-- loongarch-randconfig-m041-20230225
-|   `-- io_uring-rsrc.c-io_sqe_buffer_register()-error:uninitialized-symbol-folio-.
-|-- openrisc-randconfig-r014-20230225
-|   `-- FAILED:load-BTF-from-vmlinux:No-data-available
-|-- openrisc-randconfig-s052-20230222
-|   `-- drivers-usb-gadget-composite.c:sparse:sparse:restricted-__le16-degrades-to-integer
-|-- parisc-randconfig-m031-20230223
-|   `-- net-bluetooth-hci_sync.c-hci_pause_addr_resolution()-warn:missing-error-code-err
-|-- powerpc-allmodconfig
-|   `-- include-asm-generic-div64.h:error:passing-argument-of-__div64_32-from-incompatible-pointer-type
-|-- x86_64-allnoconfig
-|   `-- Warning:Documentation-devicetree-bindings-usb-rockchip-dwc3.yaml-references-a-file-that-doesn-t-exist:Documentation-devicetree-bindings-phy-phy-rockchip-inno-usb2.yaml
-|-- x86_64-allyesconfig
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-dcn30-dcn30_optc.c:warning:no-previous-prototype-for-optc3_wait_drr_doublebuffer_pending_clear
-|-- x86_64-randconfig-m001
-|   `-- io_uring-rsrc.c-io_sqe_buffer_register()-error:uninitialized-symbol-folio-.
-`-- x86_64-randconfig-s021
-    `-- drivers-usb-gadget-composite.c:sparse:sparse:restricted-__le16-degrades-to-integer
-clang_recent_errors
-`-- arm-collie_defconfig
-    `-- drivers-pcmcia-pxa2xx_sharpsl.c:warning:no-previous-prototype-for-function-pcmcia_collie_init
-
-elapsed time: 730m
-
-configs tested: 46
-configs skipped: 5
-
-tested configs:
-alpha                               defconfig   gcc  
-arc                          axs103_defconfig   gcc  
-arc                                 defconfig   gcc  
-arm                          collie_defconfig   clang
-arm                                 defconfig   gcc  
-arm                      jornada720_defconfig   gcc  
-arm64                               defconfig   gcc  
-csky                                defconfig   gcc  
-i386                                defconfig   gcc  
-ia64                                defconfig   gcc  
-loongarch                           defconfig   gcc  
-m68k                         amcore_defconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                        bcm47xx_defconfig   gcc  
-mips                       lemote2f_defconfig   clang
-mips                     loongson1c_defconfig   clang
-mips                     loongson2k_defconfig   clang
-mips                           mtx1_defconfig   clang
-mips                      pic32mzda_defconfig   clang
-mips                        qi_lb60_defconfig   clang
-mips                          rm200_defconfig   clang
-nios2                               defconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                    klondike_defconfig   gcc  
-powerpc                  mpc885_ads_defconfig   clang
-powerpc                      pasemi_defconfig   gcc  
-powerpc                     skiroot_defconfig   clang
-riscv                               defconfig   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                                defconfig   gcc  
-sh                         apsh4a3a_defconfig   gcc  
-sh                        dreamcast_defconfig   gcc  
-sh                          landisk_defconfig   gcc  
-sh                          polaris_defconfig   gcc  
-sh                           se7343_defconfig   gcc  
-sparc                            alldefconfig   gcc  
-sparc                               defconfig   gcc  
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                              defconfig   gcc  
-xtensa                  cadence_csp_defconfig   gcc  
-xtensa                       common_defconfig   gcc  
-xtensa                generic_kc705_defconfig   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+You are receiving this mail because:
+You are the assignee for the bug.=
