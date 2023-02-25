@@ -2,193 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5228C64EC7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 21:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E96F4C64EC7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 23:31:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbjBYVm5 (ORCPT
+        id S229520AbjBYXb7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Feb 2023 16:42:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50008 "EHLO
+        Sat, 25 Feb 2023 18:31:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229485AbjBYVm5 (ORCPT
+        with ESMTP id S229485AbjBYXb6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Feb 2023 16:42:57 -0500
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F03FA5E8
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 13:42:55 -0800 (PST)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 35FBD240174
-        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 22:42:53 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4PPKxS58TDz9rxB;
-        Sat, 25 Feb 2023 22:42:52 +0100 (CET)
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/2] bthost: Allow sending ISO packets with sequence number and timestamp
-Date:   Sat, 25 Feb 2023 21:42:50 +0000
-Message-Id: <b071b484b1b199ad69412ca0b2610c9c75fe7181.1677361002.git.pav@iki.fi>
+        Sat, 25 Feb 2023 18:31:58 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CE5516893
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 15:31:57 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id n6so1841453plf.5
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 15:31:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677367916;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sy92vwD4lBjK1sF//341s6b/f+QPbs3O1iYrf21UBtM=;
+        b=lED12jXhD49ATx3PjAGxtoVnrT8nqbkn7QVEQ7oV7iu2bXxfUdfkVDp+EuzwXEK0FO
+         azG7kaHmEdzEakJR0UT7IBfSUaxkVC530+oYfZa1VdPXKqdxFYbNauK4OWsGz1gZZhZW
+         msSvhNcopw2CqoT6SrmeCSn9563ONk6IGr0XOkF32FJ4DzkbMbb6X2aqKFTWePEK5V81
+         Nokhc8lqUCPLoBeWIDDkgBpW2N6KzZ2XIvtUgEZz/eSuXQTLbA1pUvGcK6qsjQxISKSQ
+         tBbUod3WyGICQ2vqc2p9LxHj0GSIYRV7tFXbGZ0yq4AHI7+MtYVPTulrnYBWq4OTOjfW
+         LV5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1677367916;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sy92vwD4lBjK1sF//341s6b/f+QPbs3O1iYrf21UBtM=;
+        b=VxxlJsrLukAsgoAtXkA2vj7UcDx4MQOLQ3wKR2WkO8owZkNhC76wv+q7xcAMvYUNls
+         2ARJgJhzg0p94yDbzSOQREdpPUuq0onzpANdywHqTWY9U+IrB7fvGObAM5jkPL+5PYK3
+         08k1joF6S+H4YikdKX1f4vf9venuVAZdUt+6ulL13rtiOKaYpEgKJLpKfFM+pGOx+xG7
+         4vgB+M4RfRFJij6/PMCE0eMH+PSoywha8uueoY7NV2XCQb/1sYQT/t5bkE+KTP1u5M/+
+         BaoYtYpM/QfhjyjFj+Zr66HUj32UBysMFztLYsVUVFcQ8X4gOLKhKM04LQeF2aEgFUmb
+         RcVw==
+X-Gm-Message-State: AO0yUKVRcxBDuWDQSwDR+dVDvoxNzRWBrMwW/QSHvk8LL+L/se7LAali
+        oJQpYABgtGQqFbOZIJaZCm02/C/o++E=
+X-Google-Smtp-Source: AK7set8vRHO/flG/uO36mQyBMoFJBAf+BQjPyo5fACxGBIOPwNbd3d13E0y2sKN/VZGFHTiZCw/ZRA==
+X-Received: by 2002:a17:90a:ea05:b0:237:91df:9fcd with SMTP id w5-20020a17090aea0500b0023791df9fcdmr7421961pjy.48.1677367916276;
+        Sat, 25 Feb 2023 15:31:56 -0800 (PST)
+Received: from [172.17.0.2] ([13.73.50.81])
+        by smtp.gmail.com with ESMTPSA id p2-20020a17090a348200b00233567a978csm3575713pjb.42.2023.02.25.15.31.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Feb 2023 15:31:55 -0800 (PST)
+Message-ID: <63fa9a6b.170a0220.18ec4.747d@mx.google.com>
+Date:   Sat, 25 Feb 2023 15:31:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3545130371954229979=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/2] bthost: Allow sending ISO packets with sequence number and timestamp
+In-Reply-To: <b071b484b1b199ad69412ca0b2610c9c75fe7181.1677361002.git.pav@iki.fi>
+References: <b071b484b1b199ad69412ca0b2610c9c75fe7181.1677361002.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Change bthost_send_iso to take packet sequence number and timestamp, and
-allow it to send timestamped HCI ISO data packets.
+--===============3545130371954229979==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Currently, btdev passes through ISO packets, so this can also be used to
-test RX timestamping.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=724874
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.72 seconds
+GitLint                       FAIL      0.81 seconds
+BuildEll                      PASS      30.91 seconds
+BluezMake                     PASS      956.76 seconds
+MakeCheck                     PASS      12.69 seconds
+MakeDistcheck                 PASS      169.88 seconds
+CheckValgrind                 PASS      281.35 seconds
+CheckSmatch                   WARNING   371.67 seconds
+bluezmakeextell               PASS      112.03 seconds
+IncrementalBuild              PASS      1553.96 seconds
+ScanBuild                     PASS      1146.92 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,1/2] bthost: Allow sending ISO packets with sequence number and timestamp
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+12: B2 Line has trailing whitespace: "    "
+13: B1 Line exceeds max length (111>80): "    https://lore.kernel.org/linux-bluetooth/1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi/"
+14: B2 Line has trailing whitespace: "    "
+19: B2 Line has trailing whitespace: "    "
+[BlueZ,2/2] iso-tester: Add test for central receiving timestamped ISO packet
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+8: B1 Line exceeds max length (113>80): "Link: https://lore.kernel.org/linux-bluetooth/1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi/"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/bthost.c:583:28: warning: Variable length array is used.emulator/bthost.c:740:28: warning: Variable length array is used.
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    This series adds a test case for
-    
-    https://lore.kernel.org/linux-bluetooth/1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi/
-    
-    Here, it seems simplest if btdev simply passes through the timestamps
-    and sequence numbers it receives, instead of modifying them.  One side
-    of the "connection" generally is bthost, and it is easier for writing
-    tests if nothing modifies the values in between.
-    
-    Also if dummy ISOAL like timestamping is added to the emulator later, we
-    can still consider timestamped input packet as the trigger for enabling
-    RX timestamping, or add something like
-    hciemu_set_central_iso_timestamping(bool).
 
- emulator/bthost.c  | 45 ++++++++++++++++++++++++++++++++-------------
- emulator/bthost.h  |  3 ++-
- tools/iso-tester.c |  3 ++-
- 3 files changed, 36 insertions(+), 15 deletions(-)
-
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 3cce4666c..4671fe17d 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -38,6 +38,8 @@
- #define acl_flags(h)		(h >> 12)
- 
- #define iso_flags_pb(f)		(f & 0x0003)
-+#define iso_flags_ts(f)		((f >> 2) & 0x0001)
-+#define iso_flags_pack(pb, ts)	(((pb) & 0x03) | (((ts) & 0x01) << 2))
- #define iso_data_len_pack(h, f)	((uint16_t) ((h) | ((f) << 14)))
- 
- #define L2CAP_FEAT_FIXED_CHAN	0x00000080
-@@ -728,41 +730,58 @@ void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 	send_iov(bthost, handle, cid, iov, iovcnt);
- }
- 
--static void send_iso(struct bthost *bthost, uint16_t handle,
-+static void send_iso(struct bthost *bthost, uint16_t handle, bool ts,
-+					uint16_t sn, uint32_t timestamp,
- 					const struct iovec *iov, int iovcnt)
- {
- 	struct bt_hci_iso_hdr iso_hdr;
- 	struct bt_hci_iso_data_start data_hdr;
- 	uint8_t pkt = BT_H4_ISO_PKT;
--	struct iovec pdu[3 + iovcnt];
-+	struct iovec pdu[4 + iovcnt];
-+	uint16_t flags, dlen;
- 	int i, len = 0;
--	static uint16_t sn;
- 
- 	for (i = 0; i < iovcnt; i++) {
--		pdu[3 + i].iov_base = iov[i].iov_base;
--		pdu[3 + i].iov_len = iov[i].iov_len;
-+		pdu[4 + i].iov_base = iov[i].iov_base;
-+		pdu[4 + i].iov_len = iov[i].iov_len;
- 		len += iov[i].iov_len;
- 	}
- 
- 	pdu[0].iov_base = &pkt;
- 	pdu[0].iov_len = sizeof(pkt);
- 
--	iso_hdr.handle = acl_handle_pack(handle, 0x02);
--	iso_hdr.dlen = cpu_to_le16(len + sizeof(data_hdr));
-+	flags = iso_flags_pack(0x02, ts);
-+	dlen = len + sizeof(data_hdr);
-+	if (ts)
-+		dlen += sizeof(timestamp);
-+
-+	iso_hdr.handle = acl_handle_pack(handle, flags);
-+	iso_hdr.dlen = cpu_to_le16(dlen);
- 
- 	pdu[1].iov_base = &iso_hdr;
- 	pdu[1].iov_len = sizeof(iso_hdr);
- 
--	data_hdr.sn = cpu_to_le16(sn++);
-+	if (ts) {
-+		timestamp = cpu_to_le32(timestamp);
-+
-+		pdu[2].iov_base = &timestamp;
-+		pdu[2].iov_len = sizeof(timestamp);
-+	} else {
-+		pdu[2].iov_base = NULL;
-+		pdu[2].iov_len = 0;
-+	}
-+
-+	data_hdr.sn = cpu_to_le16(sn);
- 	data_hdr.slen = cpu_to_le16(iso_data_len_pack(len, 0));
- 
--	pdu[2].iov_base = &data_hdr;
--	pdu[2].iov_len = sizeof(data_hdr);
-+	pdu[3].iov_base = &data_hdr;
-+	pdu[3].iov_len = sizeof(data_hdr);
- 
--	send_packet(bthost, pdu, 3 + iovcnt);
-+	send_packet(bthost, pdu, 4 + iovcnt);
- }
- 
--void bthost_send_iso(struct bthost *bthost, uint16_t handle,
-+void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
-+					uint16_t sn, uint32_t timestamp,
- 					const struct iovec *iov, int iovcnt)
- {
- 	struct btconn *conn;
-@@ -771,7 +790,7 @@ void bthost_send_iso(struct bthost *bthost, uint16_t handle,
- 	if (!conn)
- 		return;
- 
--	send_iso(bthost, handle, iov, iovcnt);
-+	send_iso(bthost, handle, ts, sn, timestamp, iov, iovcnt);
- }
- 
- bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t code,
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index c42444476..92182687f 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -79,7 +79,8 @@ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 					const void *data, uint16_t len);
- void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 					const struct iovec *iov, int iovcnt);
--void bthost_send_iso(struct bthost *bthost, uint16_t handle,
-+void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
-+					uint16_t sn, uint32_t timestamp,
- 					const struct iovec *iov, int iovcnt);
- 
- typedef void (*bthost_l2cap_rsp_cb) (uint8_t code, const void *data,
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index d790b1556..dcfd6a045 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -1146,6 +1146,7 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- {
- 	const struct iso_client_data *isodata = data->test_data;
- 	struct bthost *host;
-+	static uint16_t sn;
- 
- 	tester_print("Receive %zu bytes of data", isodata->recv->iov_len);
- 
-@@ -1156,7 +1157,7 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- 	}
- 
- 	host = hciemu_client_get_host(data->hciemu);
--	bthost_send_iso(host, data->handle, isodata->recv, 1);
-+	bthost_send_iso(host, data->handle, false, sn++, 0, isodata->recv, 1);
- 
- 	data->io_id[0] = g_io_add_watch(io, G_IO_IN, iso_recv_data, data);
- }
--- 
-2.39.2
-
+--===============3545130371954229979==--
