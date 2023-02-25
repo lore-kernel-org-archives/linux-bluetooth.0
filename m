@@ -2,139 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13DD3C64ED8
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 01:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F7CC7EE2D
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 09:17:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjBYBTm (ORCPT
+        id S229510AbjBYJR2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Feb 2023 20:19:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
+        Sat, 25 Feb 2023 04:17:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229700AbjBYBRl (ORCPT
+        with ESMTP id S229379AbjBYJR1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Feb 2023 20:17:41 -0500
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D7C2069C
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 17:17:32 -0800 (PST)
-Received: by mail-il1-x12c.google.com with SMTP id b12so822161ils.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 17:17:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677287852;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gWR1bIRdn53sjt6AJIoPK9LKx+6zpBwtLeQFPmE2N1Y=;
-        b=kurEygrgJpf+a7jn8tr9bEHgPlfsTFE7su4nPogpmSJF96eE/fT8BFfwdUMNNMz2j5
-         8KFvakLwSuTMBKYW7oi1aRtTv6vdPJ3Y7llc0nswZfdKK7KiEq3WdrF+lqn08lVTWXi+
-         xSFFatuH81NfLaJaFudd8hcsWW7/htcIASciCtmjSgam9GVSqQfQayRMZRR6Rcy6Nhta
-         4Wy/azQCgthzemMktZ09U9dDrUHkXU5qFhJ1eyOj2oYRWBeuyBAXs739NSTsKCJHf2Ie
-         g7MRlVTyK49FVmWW9j94TDBZB3yc2DOQFha3m14DsEYPKkcwJtctBqpWcZeJknervuy+
-         RAWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677287852;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gWR1bIRdn53sjt6AJIoPK9LKx+6zpBwtLeQFPmE2N1Y=;
-        b=2nfKIeR19JioktLH1wFNYUOvm4NmBgvbMQg89ufvkPqaMu0KzdT9Y8Ecox4AFMCxEO
-         v7UqyjH2BjHgNUohd6bnZNMeR/NfTBKQxFRNSogM0B2hrYZVsmGK8wiQHxXBUs3//DPD
-         5v1qsZtGHmLDKDNdzrk9IGhd87qLVIu2XLn/+/SDUObMm0pk4XYtDMF1ER6O711jigbl
-         u2NkirRgAZu7OWSEdFllo+aIl6EB/oaXCbYMCHJ9mrt/W4/fF8aFpJSTpze6vOVWjveP
-         22aBIc817/9iVmaZiM4Kv7O0fgS9LNWRkYYlwZ/UpzMwVY4tox8UYJtMjcE//Yn8azSe
-         nGUg==
-X-Gm-Message-State: AO0yUKU58gvTw7QQM+mxilSOVlPura5kzyxx+k9oCQreLWtPRC5RpPzE
-        zNP0y96OFxKHYogmxi+kG1ieLrWDwR4=
-X-Google-Smtp-Source: AK7set/0bP/FXKJicqy3NR2YI3PDvgSBZnQE62nYRSfetyvsng6wqh/mL+SnJHmmNP5Kjkk9MyOilA==
-X-Received: by 2002:a05:6e02:1c25:b0:316:ecbf:5573 with SMTP id m5-20020a056e021c2500b00316ecbf5573mr9793856ilh.12.1677287851778;
-        Fri, 24 Feb 2023 17:17:31 -0800 (PST)
-Received: from [172.17.0.2] ([40.77.93.35])
-        by smtp.gmail.com with ESMTPSA id m16-20020a92cad0000000b00314007fdbc2sm180746ilq.62.2023.02.24.17.17.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 17:17:31 -0800 (PST)
-Message-ID: <63f961ab.920a0220.c41fc.052d@mx.google.com>
-Date:   Fri, 24 Feb 2023 17:17:31 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7182551188788600555=="
+        Sat, 25 Feb 2023 04:17:27 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBB412F21
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 01:17:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1677316647; x=1708852647;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/yErBe6D0uKw6yjMZBPgOO3WtzKg78Xvh6f5T9JK4M0=;
+  b=d1H0+57ijt59xDMoVFadri/joU/+33cbkJXOmw73hdYm44JHXdggUqiD
+   4gg+o0Nhlby8b22OkDbFqW020gxuxSZadgI/GSmMhMUH6CDWF7miBg++x
+   wy08RP71rTeLrc4DWD1Q0HK21lPUZt0xVf1H38A3wxHmEa8DX5uwU/qE6
+   n558PbEqBN1IIaVr2RS9W6/dlP+eJwQrm0TpBHA5cK7etNXj5gO8R59KB
+   XnUwI+HhESJaQHp2V/6NETQqPrhgfhRhw+4kmJfb8AbGwRbh5QEi2Cgjh
+   A5SQgmZbVP2j8dql/cj6ABY0qvt+AN2uhmpDQeKYGaMQOsLl8bcV2dJSS
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="361159775"
+X-IronPort-AV: E=Sophos;i="5.97,327,1669104000"; 
+   d="scan'208";a="361159775"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2023 01:17:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10631"; a="673160305"
+X-IronPort-AV: E=Sophos;i="5.97,327,1669104000"; 
+   d="scan'208";a="673160305"
+Received: from lkp-server01.sh.intel.com (HELO 3895f5c55ead) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 25 Feb 2023 01:17:25 -0800
+Received: from kbuild by 3895f5c55ead with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pVqgG-00035D-2t;
+        Sat, 25 Feb 2023 09:17:24 +0000
+Date:   Sat, 25 Feb 2023 17:16:41 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ fbfd2d6d43f8e701f89692e05fcb34e904b087b4
+Message-ID: <63f9d1f9.BwZ1OCUMmJ6SnjIk%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [1/3] Bluetooth: hci_core: Make hci_conn_hash_add append to the list
-In-Reply-To: <20230225002052.3866357-1-luiz.dentz@gmail.com>
-References: <20230225002052.3866357-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7182551188788600555==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: fbfd2d6d43f8e701f89692e05fcb34e904b087b4  Bluetooth: btrtl: Add support for RTL8852BS
 
-This is automated email and please do not reply to this email!
+elapsed time: 723m
 
-Dear submitter,
+configs tested: 19
+configs skipped: 3
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=724805
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+tested configs:
+clang                                   alpha   defconfig
+gcc                                       arc   defconfig
+gcc                                       arm   defconfig
+gcc                                     arm64   defconfig
+gcc                                      csky   defconfig
+gcc                                      i386   defconfig
+gcc                                      ia64   defconfig
+gcc                                 loongarch   defconfig
+gcc                                      m68k   defconfig
+gcc                                     nios2   defconfig
+gcc                                    parisc   defconfig
+gcc                                  parisc64   defconfig
+gcc                                     riscv   defconfig
+gcc                                     riscv   rv32_defconfig
+gcc                                      s390   defconfig
+gcc                                     sparc   defconfig
+gcc                                        um   i386_defconfig
+gcc                                        um   x86_64_defconfig
+gcc                                    x86_64   defconfig
+gcc                                                  
 
-Test Summary:
-CheckPatch                    FAIL      1.96 seconds
-GitLint                       PASS      0.79 seconds
-SubjectPrefix                 PASS      0.26 seconds
-BuildKernel                   PASS      31.97 seconds
-CheckAllWarning               PASS      34.63 seconds
-CheckSparse                   PASS      39.41 seconds
-CheckSmatch                   PASS      109.16 seconds
-BuildKernel32                 PASS      30.46 seconds
-TestRunnerSetup               PASS      439.59 seconds
-TestRunner_l2cap-tester       PASS      15.85 seconds
-TestRunner_iso-tester         PASS      16.80 seconds
-TestRunner_bnep-tester        PASS      5.43 seconds
-TestRunner_mgmt-tester        PASS      108.45 seconds
-TestRunner_rfcomm-tester      PASS      8.63 seconds
-TestRunner_sco-tester         PASS      7.96 seconds
-TestRunner_ioctl-tester       PASS      9.26 seconds
-TestRunner_mesh-tester        PASS      6.87 seconds
-TestRunner_smp-tester         PASS      7.79 seconds
-TestRunner_userchan-tester    PASS      5.65 seconds
-IncrementalBuild              PASS      38.78 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/3] Bluetooth: hci_core: Make hci_conn_hash_add append to the list
-WARNING: Use a single space after To:
-#98: 
-To:
-
-ERROR: Unrecognized email address: ''
-#98: 
-To:
-
-ERROR: Missing Signed-off-by: line by nominal patch author ''
-
-total: 2 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13151871.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7182551188788600555==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
