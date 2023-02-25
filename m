@@ -2,127 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B357CC64ED8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Feb 2023 23:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B8A5C64ED8
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 00:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbjBXX5g (ORCPT
+        id S229558AbjBYAVE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Feb 2023 18:57:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52870 "EHLO
+        Fri, 24 Feb 2023 19:21:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229454AbjBXX5f (ORCPT
+        with ESMTP id S229454AbjBYAVD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Feb 2023 18:57:35 -0500
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EDE86F436
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 15:57:29 -0800 (PST)
-Received: by mail-qv1-xf2a.google.com with SMTP id ev13so597226qvb.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 15:57:29 -0800 (PST)
+        Fri, 24 Feb 2023 19:21:03 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 678797038F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 16:20:55 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id h17-20020a17090aea9100b0023739b10792so926789pjz.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Feb 2023 16:20:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677283048;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CqFO7wkAa+4QaLdhVlO8WoTjSgzaw5q7g9xN2PEQy2I=;
-        b=SLk06My+0p/ShXQyD3CYDQedTOJnfp+Ajze9LPeekpEldxoA0RZe5IBmktZm4nVZrK
-         3yhN0kFa9UcUsVxBFiAkXpDEpFcqcsbeGFQy0GPkyz4dJ6CJw0Eyhkty76POWrtg4M2H
-         u3T1nbFgAVFg79qiNQITRAPFtt5Cnog0kJKt0X09dZgLZO7VjiPLZpx7/gyXUh20Wvg/
-         iSwIjuf7mmQV3E0F35oAPtCqRuoGVLYp9lBTO9+eVnlixWIkH++A2in5s7nplykILz3i
-         U2i3oJweVjPEWeP02Omk8JOOM7PiBAhnGlIo6Qy4iJ1CEDzUgfW8RjEyXsHorTjsxD6e
-         hc6Q==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QS+t43GmTGiabhyga4ShoD477QWkItKNnqQI5YOqHXA=;
+        b=oFcQtVuqVpbXtC3tOkcr1BT57OV1LA9tt83ItBcmWxRTzsATlSUlArOvcmPa1LHPrp
+         6grqDuo+BQvgVySddfpKc9sISkYcdhXduu0lyoAIYDKomjgW6eB1KJ6kfaegQV87/hAQ
+         nOBiAb5bYiQShpaNmNPXPXv490Ovgdpy93rHjUDStbexPqk6ipLfXP8kXHBfwLhe1w8c
+         kE7Zgr0prFLZZRSOiGoxtKsh4uGVvecJwcXaSk9riMfi4V4nIW2JFiJKLcJIs9VYytrn
+         xo8GWMIhYphZ5PdYeu3fhQxH1o3I4iqVMpqWNFq53wpjLnynW/rFjw0LApHvuP09fECb
+         TNBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677283048;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CqFO7wkAa+4QaLdhVlO8WoTjSgzaw5q7g9xN2PEQy2I=;
-        b=DzFAh+JSF4UEvaQpvjSi01zeZ5rsfsMitd6S0p33dIEUv5b6xKEJQyRxWjehPbcDgo
-         kazILI8u8KMgSQN7Ihuw41dpSvuuZ/BZONsF2JoQTfg+vP15iThZ84t8lX53neafaLaH
-         cKatH3wSmeZRDgjbYCDYtIg1PjJxObKaQIYEe8nN2SbTWmTlo1EhPcXnw/ZjGuNpk87w
-         ju6TPWgfHEjpG4atm+CN1VHM75zS/gA2Xy7+/Zok2z2tC+pB/jwHsERmpoceCO8TyGOM
-         EwcuTfvXxbuxFvLYYalP2Jg8ny5EqDD1Eq+KkfqGbBVTZomh4bKmUq2bpsHVJSs/i8Bv
-         HS/w==
-X-Gm-Message-State: AO0yUKVR17b2ltN5D/g2OA8d64WEJdn3jj9wCXzxCTkmG8diS9ObyTg/
-        NUDQ0WfW/mG6KbFSKk19qFgsMElZKEw=
-X-Google-Smtp-Source: AK7set8n0zT8J1pgU3S+zms1KSoqzG77mpVQkjw4Rck7VvucX1jYH4vlMMMIi6scGNdUkMDkH/fb9A==
-X-Received: by 2002:ad4:5aa8:0:b0:557:a5c5:7e01 with SMTP id u8-20020ad45aa8000000b00557a5c57e01mr2623863qvg.25.1677283048364;
-        Fri, 24 Feb 2023 15:57:28 -0800 (PST)
-Received: from [172.17.0.2] ([172.177.65.64])
-        by smtp.gmail.com with ESMTPSA id g128-20020a37b686000000b007419f1561fesm220428qkf.112.2023.02.24.15.57.28
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QS+t43GmTGiabhyga4ShoD477QWkItKNnqQI5YOqHXA=;
+        b=0aodUbEQRP+ZGFFhyjtPJqLjBY9h1ATSTesvsy/LflJzE5R57ktWKR1tcnl3qnZVYo
+         PFlddJfzbtynQ3o0Z1sY3cc51f1sTuyH4dkjwhhQ1LKbL26vOHQRsnRJN4nx7hUK5YNB
+         EHsthszBfoa/Dbvia7y3ic6TY0Smp+OdaVVHq4OK8CqmOAsP17IuPTpPMtJVfU6bCV9N
+         NO6MFyL/E6qHh6NWqCPZdBItCgr/ndrF1+ufMZqNSLQ5frbPXD3gcSnoa1I9U2yWfj/V
+         xN/tLspJqRT0APlSTCUAmZK7YlBusK9ainsXSgVKkft1sKlYrdVjfjZzgo9SFusrAIMj
+         Z5Mg==
+X-Gm-Message-State: AO0yUKXUifAnoqG6/LpEuGcQw9IcqEHPP/83NxrWWsoGYmZxNMqs+B4f
+        Qm9ory5j5xKms1ygpVv5RCExVaau2tY=
+X-Google-Smtp-Source: AK7set8YYHcWUWh0aITg/R7yAz+fDWmoPqJY4nJycAnzsWhpYpAjJUi8i3qr0G0qV2weUNv88P0Isw==
+X-Received: by 2002:a17:902:d486:b0:19a:c009:8512 with SMTP id c6-20020a170902d48600b0019ac0098512mr1770180plg.6.1677284454195;
+        Fri, 24 Feb 2023 16:20:54 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id ja17-20020a170902efd100b00196025a34b9sm75008plb.159.2023.02.24.16.20.53
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Feb 2023 15:57:28 -0800 (PST)
-Message-ID: <63f94ee8.370a0220.3ad3a.0a37@mx.google.com>
-Date:   Fri, 24 Feb 2023 15:57:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3920041022407085821=="
+        Fri, 24 Feb 2023 16:20:53 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: hci_core: Make hci_conn_hash_add append to the list
+Date:   Fri, 24 Feb 2023 16:20:50 -0800
+Message-Id: <20230225002052.3866357-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, macroalpha82@gmail.com
-Subject: RE: Bluetooth: Add support for RTL8821CS
-In-Reply-To: <20230224232339.124969-2-macroalpha82@gmail.com>
-References: <20230224232339.124969-2-macroalpha82@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3920041022407085821==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This makes hci_conn_hash_add append to the tail of the conn_hash so it
+matches the order they are created, this is required if the controller
+attempts to match the order of ACL with CIS which uses append logic
+when programming the CIS ids on the CIG.
 
-Dear submitter,
+The result of this change affects Create CIS:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=724799
+From:
 
----Test result---
+< HCI Command: LE Create Connected Isochronous Stream (0x08|0x0064) plen 9
+        Number of CIS: 2
+        CIS Handle: 2560
+        ACL Handle: 3586
+        CIS Handle: 2561
+        ACL Handle: 3585
 
-Test Summary:
-CheckPatch                    PASS      1.97 seconds
-GitLint                       PASS      1.02 seconds
-SubjectPrefix                 FAIL      0.62 seconds
-BuildKernel                   PASS      31.79 seconds
-CheckAllWarning               PASS      34.69 seconds
-CheckSparse                   WARNING   39.58 seconds
-CheckSmatch                   WARNING   109.23 seconds
-BuildKernel32                 PASS      30.47 seconds
-TestRunnerSetup               PASS      438.75 seconds
-TestRunner_l2cap-tester       PASS      15.89 seconds
-TestRunner_iso-tester         PASS      16.25 seconds
-TestRunner_bnep-tester        PASS      5.38 seconds
-TestRunner_mgmt-tester        PASS      108.41 seconds
-TestRunner_rfcomm-tester      PASS      8.57 seconds
-TestRunner_sco-tester         PASS      7.85 seconds
-TestRunner_ioctl-tester       PASS      9.13 seconds
-TestRunner_mesh-tester        PASS      6.81 seconds
-TestRunner_smp-tester         PASS      7.81 seconds
-TestRunner_userchan-tester    PASS      5.56 seconds
-IncrementalBuild              PASS      36.88 seconds
+To:
 
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warning: array of flexible structures
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-drivers/bluetooth/btrtl.c: note: in included file:drivers/bluetooth/btrtl.h:47:45: warning: array of flexible structures
+< HCI Command: LE Create Connected Isochronous Stream (0x08|0x0064) plen 9
+        Number of CIS: 2
+        CIS Handle: 2560
+        ACL Handle: 3585
+        CIS Handle: 2561
+        ACL Handle: 3586
 
-
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 7254edfba4c9..9488671c1219 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -978,7 +978,7 @@ static inline bool hci_conn_sc_enabled(struct hci_conn *conn)
+ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+-	list_add_rcu(&c->list, &h->list);
++	list_add_tail_rcu(&c->list, &h->list);
+ 	switch (c->type) {
+ 	case ACL_LINK:
+ 		h->acl_num++;
+-- 
+2.37.3
 
---===============3920041022407085821==--
