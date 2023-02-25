@@ -2,76 +2,98 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D8EC7EE2E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 21:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2402FC7EE2E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Feb 2023 21:42:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbjBYVCq (ORCPT
+        id S229485AbjBYVm6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Feb 2023 16:02:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
+        Sat, 25 Feb 2023 16:42:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbjBYVCp (ORCPT
+        with ESMTP id S229558AbjBYVm5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Feb 2023 16:02:45 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336AE14E90;
-        Sat, 25 Feb 2023 13:02:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8C253B80B32;
-        Sat, 25 Feb 2023 21:02:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E37C433D2;
-        Sat, 25 Feb 2023 21:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1677358961;
-        bh=dAdczosGMLE3reQ+yfqGchmgVwzqD0s258AHR5QDBk8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=alNPgnU7am/djLnV5nPooemcTFnojh9BxoSgHaOyQ1zVw/FmC9FHnkLEdsZbYmyo1
-         myAxBpFmRRNHwYDF/RDFqVU53010sqZCOx0YG4deO0d5f7R/9zChC/0WdjTHh8h6rS
-         9ad9+j7MEIPfQW8G40OfvZyJ7mjkjFPib3GnbAUc=
-Date:   Sat, 25 Feb 2023 13:02:39 -0800
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     kernel test robot <lkp@intel.com>
-Cc:     linux-usb@vger.kernel.org, linux-mm@kvack.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
-        io-uring@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        amd-gfx@lists.freedesktop.org, Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 8232539f864ca60474e38eb42d451f5c26415856
-Message-Id: <20230225130239.d25f657955d3c4462c80d128@linux-foundation.org>
-In-Reply-To: <63fa411f.ZvVOisJt5OlLzGYF%lkp@intel.com>
-References: <63fa411f.ZvVOisJt5OlLzGYF%lkp@intel.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Sat, 25 Feb 2023 16:42:57 -0500
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EDC1A5CD
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 13:42:54 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 6A2D3240174
+        for <linux-bluetooth@vger.kernel.org>; Sat, 25 Feb 2023 22:42:53 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PPKxT07cPz9rxF;
+        Sat, 25 Feb 2023 22:42:52 +0100 (CET)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 2/2] iso-tester: Add test for central receiving timestamped ISO packet
+Date:   Sat, 25 Feb 2023 21:42:51 +0000
+Message-Id: <b0e2347cc5092c800c083c20b29cd6bbce9295d5.1677361002.git.pav@iki.fi>
+In-Reply-To: <b071b484b1b199ad69412ca0b2610c9c75fe7181.1677361002.git.pav@iki.fi>
+References: <b071b484b1b199ad69412ca0b2610c9c75fe7181.1677361002.git.pav@iki.fi>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, 26 Feb 2023 01:10:55 +0800 kernel test robot <lkp@intel.com> wrote:
+This attempts to receive a timestamped HCI ISO data packet on central.
 
-> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> branch HEAD: 8232539f864ca60474e38eb42d451f5c26415856  Add linux-next specific files for 20230225
-> 
-> Error/Warning reports:
-> 
-> mm/page_alloc.c:257:1: sparse: sparse: symbol 'check_pages_enabled' was not declared. Should it be static?
+With kernel 6.2 HCI ISO packet parsing this test fails with
+Bluetooth: Frame malformed (len 40, expected len 0)
 
-It should!
+Link: https://lore.kernel.org/linux-bluetooth/1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi/
+---
+ tools/iso-tester.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
---- a/mm/page_alloc.c~mm-page_alloc-reduce-page-alloc-free-sanity-checks-fix
-+++ b/mm/page_alloc.c
-@@ -254,7 +254,7 @@ DEFINE_STATIC_KEY_MAYBE(CONFIG_INIT_ON_FREE_DEFAULT_ON, init_on_free);
- EXPORT_SYMBOL(init_on_free);
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index dcfd6a045..7bcb1b3ca 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -149,6 +149,7 @@ struct iso_client_data {
+ 	bool bcast;
+ 	bool defer;
+ 	bool disconnect;
++	bool ts;
+ };
  
- /* perform sanity checks on struct pages being allocated or freed */
--DEFINE_STATIC_KEY_MAYBE(CONFIG_DEBUG_VM, check_pages_enabled);
-+static DEFINE_STATIC_KEY_MAYBE(CONFIG_DEBUG_VM, check_pages_enabled);
+ static void mgmt_debug(const char *str, void *user_data)
+@@ -572,6 +573,14 @@ static const struct iso_client_data listen_16_2_1_recv = {
+ 	.server = true,
+ };
  
- static bool _init_on_alloc_enabled_early __read_mostly
- 				= IS_ENABLED(CONFIG_INIT_ON_ALLOC_DEFAULT_ON);
-_
++static const struct iso_client_data listen_16_2_1_recv_ts = {
++	.qos = QOS_16_2_1,
++	.expect_err = 0,
++	.recv = &send_16_2_1,
++	.server = true,
++	.ts = true,
++};
++
+ static const struct iso_client_data defer_16_2_1 = {
+ 	.qos = QOS_16_2_1,
+ 	.expect_err = 0,
+@@ -1157,7 +1166,8 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
+ 	}
+ 
+ 	host = hciemu_client_get_host(data->hciemu);
+-	bthost_send_iso(host, data->handle, false, sn++, 0, isodata->recv, 1);
++	bthost_send_iso(host, data->handle, isodata->ts, sn++, 0,
++							isodata->recv, 1);
+ 
+ 	data->io_id[0] = g_io_add_watch(io, G_IO_IN, iso_recv_data, data);
+ }
+@@ -1809,6 +1819,10 @@ int main(int argc, char *argv[])
+ 	test_iso("ISO Receive - Success", &listen_16_2_1_recv, setup_powered,
+ 							test_listen);
+ 
++	test_iso("ISO Receive Timestamped - Success", &listen_16_2_1_recv_ts,
++							setup_powered,
++							test_listen);
++
+ 	test_iso("ISO Defer - Success", &defer_16_2_1, setup_powered,
+ 							test_defer);
+ 
+-- 
+2.39.2
 
