@@ -2,50 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 624B7C64ED6
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 15:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DAFCC6FA8E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 15:28:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231148AbjBZP0X (ORCPT
+        id S229763AbjBZP2w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Feb 2023 10:26:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56704 "EHLO
+        Sun, 26 Feb 2023 10:28:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjBZP0G (ORCPT
+        with ESMTP id S229696AbjBZP2j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Feb 2023 10:26:06 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64AFE244A7;
-        Sun, 26 Feb 2023 07:20:03 -0800 (PST)
+        Sun, 26 Feb 2023 10:28:39 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402FE1815D;
+        Sun, 26 Feb 2023 07:24:16 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 880EFCE0D9A;
-        Sun, 26 Feb 2023 14:51:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D1DFC4339C;
-        Sun, 26 Feb 2023 14:51:15 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 5B756CE0AEF;
+        Sun, 26 Feb 2023 14:48:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3E9EC4339C;
+        Sun, 26 Feb 2023 14:48:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677423077;
-        bh=OUfzbm2wyeEKNfikQ07On7FMcNZTWvGRY3r1fQBWe/o=;
+        s=k20201202; t=1677422902;
+        bh=j5TjbHk8IGBd/OlcWidCvHDMd0C+TOHNWut+I4tiGh8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=o1+2nX9KRQXd8hBYPeWE/omassky9EkuhWo2I7qBxQTWKQurnSdgfWc5QSmlnY22U
-         prpHeK7fw/BNavNISNgQjzKC9dnZCHRp0SNTVUaDw4Ob8N7g9R0DgGvcwsn0Lx6vVl
-         OynnoBKrvhy5GC16ZTcJK6Rh6t2GJ0gcNkNM1CR6N0EXpaUjGb4itATFBRou1lNdlB
-         bKzNIy23pgIWwWwreoUTCA8rxz3nHJHxSTBIfnhgeE+wn5LT/u8JGL8YjJvb8lmfMu
-         FjbOHPF1LYR19YUtWqvAx3M3KMDLn1uvxNlPlNC2MNrx2XKhA/kRD01KIz20RHQWVb
-         HYSr/lyNkbgRQ==
+        b=qV5wRki56NRQB7cGF+Tm5EuvoT1JPYm4Tf344fZmTWsSg4b2gscgxEkqiWE+2t5OC
+         CPkcmW5fTDj5jMuv8r7RvFfwD1U4h2ObsTN25YscCuPZJ++YlmJIA5vMLq6D8TboCh
+         y5TUFHaaMOU5kofIOO3KjrRPrI/M4cYm36E5NQNgBfEO9AR02TixYo9MvgEBgsRtij
+         Hl23fCvKwMCyKVAf3ZcYbICPcLcq/loFNQwJTeXgb2IS5IUoatBvBU3JX1YNEz6Moy
+         XhyhVsiKDSWwzPPX1p0apvZcrPFxPrDMkcDxQrTJgFLfjwwX7VIvjEcmuRPs4yP1GW
+         CMqcyC/LtLsXw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Moises Cardona <moisesmcardona@gmail.com>,
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 26/27] Bluetooth: btusb: Add VID:PID 13d3:3529 for Realtek RTL8821CE
-Date:   Sun, 26 Feb 2023 09:50:13 -0500
-Message-Id: <20230226145014.828855-26-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 41/49] Bluetooth: Fix issue with Actions Semi ATS2851 based devices
+Date:   Sun, 26 Feb 2023 09:46:41 -0500
+Message-Id: <20230226144650.826470-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226145014.828855-1-sashal@kernel.org>
-References: <20230226145014.828855-1-sashal@kernel.org>
+In-Reply-To: <20230226144650.826470-1-sashal@kernel.org>
+References: <20230226144650.826470-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,68 +53,90 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Moises Cardona <moisesmcardona@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 
-[ Upstream commit 1eec3b95b5ce7fb2cdd273ac4f8b24b1ed6776a1 ]
+[ Upstream commit 5d44f76fab0839799b19cbc88d13575da968dc08 ]
 
-This patch adds VID:PID 13d3:3529 to the btusb.c file.
+Their devices claim to support the erroneous data reporting, but don't
+actually support the required commands. So blacklist them and add a
+quirk.
 
-This VID:PID is found in the Realtek RTL8821CE module
-(M.2 module AW-CB304NF on an ASUS E210MA laptop)
+  < HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0
+  > HCI Event: Command Status (0x0f) plen 4
+        Read Default Erroneous Data Reporting (0x03|0x005a) ncmd 1
+          Status: Unknown HCI Command (0x01)
 
-Output of /sys/kernel/debug/usb/devices:
-
-T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3529 Rev= 1.10
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+T:  Bus=02 Lev=02 Prnt=08 Port=02 Cnt=01 Dev#= 10 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=10d7 ProdID=b012 Rev=88.91
+S:  Manufacturer=Actions
+S:  Product=general adapter
+S:  SerialNumber=ACTIONS1234
+C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
 I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
 E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
 E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
 I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=01(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
 I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=01(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
 I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=01(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
 I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=01(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
 I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=01(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
 I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=01(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Signed-off-by: Moises Cardona <moisesmcardona@gmail.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/bluetooth/btusb.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3d905fda9b29a..2695ece47eb0e 100644
+index 6beafd62d7226..aebb98e1fcd64 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -393,6 +393,10 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
- 	  .driver_info = BTUSB_IGNORE },
+@@ -63,6 +63,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	BIT(24)
+ #define BTUSB_INTEL_BROKEN_INITIAL_NCMD BIT(25)
+ #define BTUSB_INTEL_NO_WBS_SUPPORT	BIT(26)
++#define BTUSB_ACTIONS_SEMI		BIT(27)
  
-+	/* Realtek 8821CE Bluetooth devices */
-+	{ USB_DEVICE(0x13d3, 0x3529), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
-+
- 	/* Realtek 8822CE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -579,6 +580,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK |
  						     BTUSB_WIDEBAND_SPEECH },
+ 
++	/* Actions Semiconductor ATS2851 based devices */
++	{ USB_DEVICE(0x10d7, 0xb012), .driver_info = BTUSB_ACTIONS_SEMI },
++
+ 	/* Silicon Wave based devices */
+ 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
+ 
+@@ -3928,6 +3932,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags);
+ 	}
+ 
++	if (id->driver_info & BTUSB_ACTIONS_SEMI) {
++		/* Support is advertised, but not implemented */
++		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
++	}
++
+ 	if (!reset)
+ 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+ 
 -- 
 2.39.0
 
