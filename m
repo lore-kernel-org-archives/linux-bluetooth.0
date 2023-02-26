@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B50C87FDD
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 14:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B316C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 15:09:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbjBZO4G (ORCPT
+        id S231699AbjBZPJD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Feb 2023 09:56:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55634 "EHLO
+        Sun, 26 Feb 2023 10:09:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231175AbjBZOzD (ORCPT
+        with ESMTP id S231712AbjBZPIp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Feb 2023 09:55:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6BD1B552;
-        Sun, 26 Feb 2023 06:50:43 -0800 (PST)
+        Sun, 26 Feb 2023 10:08:45 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F2F818B14;
+        Sun, 26 Feb 2023 06:59:02 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 06B65B80C7E;
-        Sun, 26 Feb 2023 14:50:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C371CC4339C;
-        Sun, 26 Feb 2023 14:50:03 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 9B596CE0E82;
+        Sun, 26 Feb 2023 14:48:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04CF6C4339C;
+        Sun, 26 Feb 2023 14:48:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677423004;
-        bh=vIlpCplRoVFyVyVmGlaVWwbuKGza0NwLT8zaWl7+TuE=;
+        s=k20201202; t=1677422905;
+        bh=kl5y+mPshwiUBzW2cPHvaeP+jj264aDOdoKKEQahzi8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=bmQ2vA/wyViL7Z4e19EqdCXxr5DGGVQAPVyoyYUw7m2B//qNTVGwBZwnvG5wUVr4Q
-         kNJRNFliFkadCjZPGC9xGY+Kc+ikNgHMUICy0bkm6fTRn/KRfjuoBxQ9N05J10Vv3h
-         5IuZMbAT1/bPfAial0DDSSxRtgrXdtvI/jokmqFAC0E89HNpuUnD0MnyHGFmvbS7pe
-         hj08X54vK+mbIaQyjW6Ei/1Cz4LAekA2JeNGeyipcc9GFmHq9oyGR06JHh4hFFrLzE
-         HfPQ/wRTFj20DOyDokhouad8iiU3xWJFGALBTCT8BX8p5e2SFrg+I+Xwu/TKPEtDd3
-         r3o/sR4ChpOxQ==
+        b=A7t1TgbusWvr1S4klPdiXlajMA1GSEgR5YbrdmQxmNJZ1XfQ92dn+P8dwCCiXz24K
+         mrDrrQ+76eTmZm7KpiXqPO9NEXJ5YjuFD1G9aY9kjN9KmR4Muc3jw5QM4ly0gUH07R
+         /4EzeIhi89lzbapG06VNS95EP5Cv36SB4DTyd/787nXgdEv/JTlR8YZqOivY6XgBYm
+         8RIqjSWrUoCL3Om8E8SOSTRn900JPSwW9XoWsBRyn+3phuhY7soqDPVYCBUtejk7rZ
+         mcWpLDNUDoOcyRHeAyK8FUpLYIHOvD1ef7nS5iVLmTBdaI44Rxx8FwVffLDfi8rbvH
+         AYpGSwxLTmJRA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Moises Cardona <moisesmcardona@gmail.com>,
@@ -40,12 +40,12 @@ Cc:     Moises Cardona <moisesmcardona@gmail.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 33/36] Bluetooth: btusb: Add VID:PID 13d3:3529 for Realtek RTL8821CE
-Date:   Sun, 26 Feb 2023 09:48:41 -0500
-Message-Id: <20230226144845.827893-33-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 43/49] Bluetooth: btusb: Add VID:PID 13d3:3529 for Realtek RTL8821CE
+Date:   Sun, 26 Feb 2023 09:46:43 -0500
+Message-Id: <20230226144650.826470-43-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226144845.827893-1-sashal@kernel.org>
-References: <20230226144845.827893-1-sashal@kernel.org>
+In-Reply-To: <20230226144650.826470-1-sashal@kernel.org>
+References: <20230226144650.826470-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -102,10 +102,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9c32263f872b9..9eb2267bd3a02 100644
+index d367289f6263d..c8015ba778ab1 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -400,6 +400,10 @@ static const struct usb_device_id blacklist_table[] = {
+@@ -408,6 +408,10 @@ static const struct usb_device_id blacklist_table[] = {
  	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
  	  .driver_info = BTUSB_IGNORE },
  
