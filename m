@@ -2,94 +2,120 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D44C64ED6
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 09:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 032EBC7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 14:48:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbjBZJ3y (ORCPT
+        id S229894AbjBZOsE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Feb 2023 04:29:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51066 "EHLO
+        Sun, 26 Feb 2023 09:48:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjBZJ3x (ORCPT
+        with ESMTP id S229893AbjBZOrn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Feb 2023 04:29:53 -0500
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C55E06C
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 01:29:51 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id r27so4732192lfe.10
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 01:29:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=D152ygR3xR80qmN1uh9yD1DJWUhblEUYmvnj/OBmDu8=;
-        b=BO5dsrBdHtMpj1bpKbbpqcXs9IkuRHhaprldWL50I91vniBrK7Ce4Yppa2xwp0Y00r
-         ++ZYXa1jMrFicqUGUH4TQG2WPMEUSuU4uDIeA1IvXM+1+5SBuRVSUzbyrz1V9JzzdpuK
-         6BsNob5+Fc9mPu9jx9RWz7FVvvvCbvHwCgF2oE0ia97y9AJr1EjprtIaAwOLIsLAHFw3
-         LJg5Jiimjp3zfhiQJ6cPDa0smtWXAH4Uf4XzyeyS4ek6lKMNFJFVWR569F+D81JXM8E7
-         OcuuxbFD6JbI0QQgwc4Bicoi62ahlxz8BODV5wZETuJgapSSfSb4ExybtUbhg8VOPaNb
-         lpjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=D152ygR3xR80qmN1uh9yD1DJWUhblEUYmvnj/OBmDu8=;
-        b=tJERfqvstBUTV2TGw13QtmN+E3iVWYEIKe/ctR0gksJ2Va9zcGZURD+tXT3eoLMX3e
-         IKEDFJ+X1jM4eAp2m7ccnnzpP1VNNTJ+ntRvHF0iaVY4MiilIM0OiBJigjG0m7Cx5rk1
-         6llpbOpdpbxOBnJ7Z4X5mRh58RGIWd2k9Sp7T2ycgmPfLCotpgS1VjmGbUD2SDfNDmx3
-         iw4mr1lKpH4bCzFCGq4xDIQztoiuc1Vj5ZmOyhLZLgBLRVqTTSAMzUxDnQOF3otLIm2R
-         scaS9Hmveh6liuvl3fM6a1j1y2N72DaHNJYmYpFrJd7sxNdb6zl/SN73/+ExCZqajN3D
-         YCfA==
-X-Gm-Message-State: AO0yUKWPMBwZIdo6WJb1jZixif1yHdWQ08uYU+GF+1+4zR+qG0Bybpqr
-        6d783hpwpJChjfLprvDd2g06IHNYsDYjTUC0woEr+t4b8rE=
-X-Google-Smtp-Source: AK7set/VH8dtUqW5VYcZLWZfwioZIidLc2j+72Gm7dzZpFWMI0P/DhwRhCzcG127f1xOl8iotZnODKrjnDcIp4pwm+g=
-X-Received: by 2002:a19:c209:0:b0:4db:3873:fac1 with SMTP id
- l9-20020a19c209000000b004db3873fac1mr6426060lfc.9.1677403789297; Sun, 26 Feb
- 2023 01:29:49 -0800 (PST)
+        Sun, 26 Feb 2023 09:47:43 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 775F213D4E;
+        Sun, 26 Feb 2023 06:47:09 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id B814BCE0E82;
+        Sun, 26 Feb 2023 14:46:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72381C4339E;
+        Sun, 26 Feb 2023 14:46:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1677422794;
+        bh=dc75FmXKDS28urCUwfH+TcCg+xBsttQBFaLhkA5Q+i4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SjhTPCDsFFU2foxcmSzRtGRrs/CremZJZZJr95vvI/otlL+gELg/IPtLJce8PCdET
+         vTR4YNlS2CJCSScT2Q3zYEfaGYzMk3j9TYQLSV9NGLZo5fjk45vZvsGV2md9KfLp3d
+         eJz7/e3QkAR5+roSsvRUDc0FmK1eneHK4EnYMfE1WUf4O0xs3Fdd1zvsrNtJTy9Lfh
+         96puOIDUcSK6P45t4CFbJDSp1TWzSqjzrGsTHMcMsoJstGU4il0tqqPYIAWp5Hniy6
+         XjYg7cEvzx7f2Yfh33kaH57HpChYehJ7rLFcZVnO2jruLyxrsGbXlLqpnT+RFwlsRm
+         PQibDpsk7a3aw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Moises Cardona <moisesmcardona@gmail.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.2 47/53] Bluetooth: btusb: Add VID:PID 13d3:3529 for Realtek RTL8821CE
+Date:   Sun, 26 Feb 2023 09:44:39 -0500
+Message-Id: <20230226144446.824580-47-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.0
+In-Reply-To: <20230226144446.824580-1-sashal@kernel.org>
+References: <20230226144446.824580-1-sashal@kernel.org>
 MIME-Version: 1.0
-From:   Roman Elshin <roman.elshin@gmail.com>
-Date:   Sun, 26 Feb 2023 12:29:38 +0300
-Message-ID: <CAB83zogXRLwJSKORH9Aa42U8+V+_n+n6Ham=E1AmzHkgjw4zxg@mail.gmail.com>
-Subject: btmksdio mt7668 questions
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I have an amlogic s905x2 based board (a95x max v81 board) equipped
-with mt7668rsn
-sdio wifi/bt module.
+From: Moises Cardona <moisesmcardona@gmail.com>
 
-btmtksdio kernels driver claim to support mt7668 sdio bluetooth, and
-trying to start
-automatically, but it fails as __hci_cmd_send()
-call produces non 32bit aligned transfer, which seems to be rejected
-by meson-gx-mmc
-in meson_mmc_validate_dram_access().
+[ Upstream commit 1eec3b95b5ce7fb2cdd273ac4f8b24b1ed6776a1 ]
 
-There are modified driver from android
-https://coral.googlesource.com/mt7668-bluetooth-mod (require mt7668 FW
-from android)
-with some trivial changes in btmtk_sdio.c (file_operations to proc_ops
-replacement and removing unused timeval var)
-it can be compiled with a recent kernel (tested with 6.1.13),
-but it fails to start at 0x2031 command.
-By modifying hci_le_set_default_phy_sync (in
-linux/net/bluetooth/hci_sync.c) to only
-return 0 (function do nothing now), makes it work, at least with a2dp
-headphones.
+This patch adds VID:PID 13d3:3529 to the btusb.c file.
 
-Looking at drivers code, it seems to me that both intended to work
-with different chips, as the wmt header format is completely
-different.
+This VID:PID is found in the Realtek RTL8821CE module
+(M.2 module AW-CB304NF on an ASUS E210MA laptop)
 
-So questions:
-1. Are there different mt7668 bluetooth sdio chips with same id,
- or btmtksdio claims support for mt7668 by mistake?
- or, hopehely, I am wrong here and btmtksdio should work with mt7668rsn after
-fixing alignment issues?
+Output of /sys/kernel/debug/usb/devices:
 
-2. Is there an easy way from the bluetooth driver to tell the host to
-not send the 0x2031 command? (to not breaking other drivers for
-mt7668-bluetooth-mod)
+T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3529 Rev= 1.10
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Moises Cardona <moisesmcardona@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index acfd40f1cc75c..18bc947187115 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -493,6 +493,10 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x8087, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_IGNORE },
+ 
++	/* Realtek 8821CE Bluetooth devices */
++	{ USB_DEVICE(0x13d3, 0x3529), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++
+ 	/* Realtek 8822CE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+-- 
+2.39.0
+
