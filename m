@@ -2,141 +2,157 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DAFCC6FA8E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 15:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6C0C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 23:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229763AbjBZP2w (ORCPT
+        id S229702AbjBZXOG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Feb 2023 10:28:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58802 "EHLO
+        Sun, 26 Feb 2023 18:14:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229696AbjBZP2j (ORCPT
+        with ESMTP id S229657AbjBZXOF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Feb 2023 10:28:39 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402FE1815D;
-        Sun, 26 Feb 2023 07:24:16 -0800 (PST)
+        Sun, 26 Feb 2023 18:14:05 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B73FD325
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 15:14:04 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 5B756CE0AEF;
-        Sun, 26 Feb 2023 14:48:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3E9EC4339C;
-        Sun, 26 Feb 2023 14:48:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2694A60C8C
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 23:14:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84674C43446
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 23:14:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677422902;
-        bh=j5TjbHk8IGBd/OlcWidCvHDMd0C+TOHNWut+I4tiGh8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qV5wRki56NRQB7cGF+Tm5EuvoT1JPYm4Tf344fZmTWsSg4b2gscgxEkqiWE+2t5OC
-         CPkcmW5fTDj5jMuv8r7RvFfwD1U4h2ObsTN25YscCuPZJ++YlmJIA5vMLq6D8TboCh
-         y5TUFHaaMOU5kofIOO3KjrRPrI/M4cYm36E5NQNgBfEO9AR02TixYo9MvgEBgsRtij
-         Hl23fCvKwMCyKVAf3ZcYbICPcLcq/loFNQwJTeXgb2IS5IUoatBvBU3JX1YNEz6Moy
-         XhyhVsiKDSWwzPPX1p0apvZcrPFxPrDMkcDxQrTJgFLfjwwX7VIvjEcmuRPs4yP1GW
-         CMqcyC/LtLsXw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 41/49] Bluetooth: Fix issue with Actions Semi ATS2851 based devices
-Date:   Sun, 26 Feb 2023 09:46:41 -0500
-Message-Id: <20230226144650.826470-41-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226144650.826470-1-sashal@kernel.org>
-References: <20230226144650.826470-1-sashal@kernel.org>
+        s=k20201202; t=1677453243;
+        bh=IRDcjAd+JyPqEhOR16L1CxsJP+lULG5CY87XTFR++lg=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=lijszr92TJoEqxSvabC/rFjOMOVLdDKKnjYjh9kWquiljskjX62tsxpVMdmBvMU23
+         LC9KpJRc7trCi9MQFB+hLbh+rjhLSs4hOL2/8XPNxWdtbFvy35K3geMPbTbrK0JTup
+         ynHJCkKaA9mfT1d9RXW/wvRE00kzUrFhj4k69a64AhC6Va3Iz8EbzfAZU5/XUwtuJ3
+         EW3bliUcJlEM+UH9uUJV+T+txpaFAVhF4TM6zbAYyfCCcfULbPDjMga6njfGrp1nHS
+         LGW9/Rjaj3Ei99Ei1RX4bKb7wK8jJJ/ch1F74RLU7RjVcfOn+F3wau3JkVtbAPfnvB
+         k25TD36jzblbw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 75C5EC43165; Sun, 26 Feb 2023 23:14:03 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Sun, 26 Feb 2023 23:14:02 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: chaimeliyah@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215167-62941-EyAkxZgeKU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Marcel Holtmann <marcel@holtmann.org>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-[ Upstream commit 5d44f76fab0839799b19cbc88d13575da968dc08 ]
+Chaim Eliyah (chaimeliyah@gmail.com) changed:
 
-Their devices claim to support the erroneous data reporting, but don't
-actually support the required commands. So blacklist them and add a
-quirk.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |chaimeliyah@gmail.com
 
-  < HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0
-  > HCI Event: Command Status (0x0f) plen 4
-        Read Default Erroneous Data Reporting (0x03|0x005a) ncmd 1
-          Status: Unknown HCI Command (0x01)
+--- Comment #46 from Chaim Eliyah (chaimeliyah@gmail.com) ---
++1 AX200=20
 
-T:  Bus=02 Lev=02 Prnt=08 Port=02 Cnt=01 Dev#= 10 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=10d7 ProdID=b012 Rev=88.91
-S:  Manufacturer=Actions
-S:  Product=general adapter
-S:  SerialNumber=ACTIONS1234
-C:* #Ifs= 2 Cfg#= 1 Atr=c0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=01(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+```
+07:00.0 Network controller [0280]: Intel Corporation Wi-Fi 6 AX200 [8086:27=
+23]
+(rev 1a)
+        Subsystem: Intel Corporation Wi-Fi 6 AX200NGW [8086:0084]
+        Kernel driver in use: iwlwifi
+        Kernel modules: iwlwifi
+```
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/bluetooth/btusb.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+```
+[   25.711840] Bluetooth: Core ver 2.22
+[   25.711860] NET: Registered PF_BLUETOOTH protocol family
+[   25.711861] Bluetooth: HCI device and connection manager initialized
+[   25.711864] Bluetooth: HCI socket layer initialized
+[   25.711866] Bluetooth: L2CAP socket layer initialized
+[   25.711869] Bluetooth: SCO socket layer initialized
+[   25.788390] iwlwifi 0000:07:00.0: loaded firmware version 66.f1c864e0.0
+cc-a0-66.ucode op_mode iwlmvm
+[   27.783372] Bluetooth: hci0: command 0xfc05 tx timeout
+[   27.783378] Bluetooth: hci0: Reading Intel version command failed (-110)
+[   28.785728] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   28.785731] Bluetooth: BNEP filters: protocol multicast
+[   28.785733] Bluetooth: BNEP socket layer initialized
+```
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6beafd62d7226..aebb98e1fcd64 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -63,6 +63,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	BIT(24)
- #define BTUSB_INTEL_BROKEN_INITIAL_NCMD BIT(25)
- #define BTUSB_INTEL_NO_WBS_SUPPORT	BIT(26)
-+#define BTUSB_ACTIONS_SEMI		BIT(27)
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -579,6 +580,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
-+	/* Actions Semiconductor ATS2851 based devices */
-+	{ USB_DEVICE(0x10d7, 0xb012), .driver_info = BTUSB_ACTIONS_SEMI },
-+
- 	/* Silicon Wave based devices */
- 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
- 
-@@ -3928,6 +3932,11 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags);
- 	}
- 
-+	if (id->driver_info & BTUSB_ACTIONS_SEMI) {
-+		/* Support is advertised, but not implemented */
-+		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
-+	}
-+
- 	if (!reset)
- 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 
--- 
-2.39.0
+```
+celiyah@darkunicorn:~$ sudo systemctl status bluetooth
+=E2=97=8F bluetooth.service - Bluetooth service
+     Loaded: loaded (/lib/systemd/system/bluetooth.service; enabled; vendor
+preset: enabled)
+     Active: active (running) since Sun 2023-02-26 16:43:43 CST; 12min ago
+       Docs: man:bluetoothd(8)
+   Main PID: 28973 (bluetoothd)
+     Status: "Running"
+      Tasks: 1 (limit: 76959)
+     Memory: 668.0K
+        CPU: 38ms
+     CGroup: /system.slice/bluetooth.service
+             =E2=94=94=E2=94=8028973 /usr/lib/bluetooth/bluetoothd
 
+```
+
+```
+celiyah@darkunicorn:~$ bluetoothctl=20
+Agent registered
+[bluetooth]# scan on
+No default controller available
+quitetooth]#=20
+```
+
+It's popping up in Ubuntu forums e.g.=20
+https://askubuntu.com/questions/1448731/bluetooth-not-working-no-controller=
+-available
+
+| Reloading `btusb` module several times makes it working.
+
+Any specific steps for this? I have not been able to get it to work. Issue
+persists despite reboots incl. hard power off/on. This happened suddenly.
+
+```
+celiyah@darkunicorn:~$ uname -a
+Linux darkunicorn 5.15.0-56-lowlatency #62-Ubuntu SMP PREEMPT Wed Nov 23
+09:50:07 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+celiyah@darkunicorn:~$ lsmod | grep bt
+btusb                  61440  0
+btrtl                  24576  1 btusb
+btbcm                  24576  1 btusb
+btintel                40960  1 btusb
+bluetooth             708608  12 btrtl,btintel,btbcm,bnep,btusb
+```
+
+(I believe the bleeding cutting edge 23.04.1 is the only available bunty
+release with a 6 kernel line. Could be wrong.)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
