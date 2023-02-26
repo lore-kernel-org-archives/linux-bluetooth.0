@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4CFC7EE32
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 14:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27211C6FA8E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Feb 2023 14:54:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229983AbjBZOsN (ORCPT
+        id S230416AbjBZOyF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Feb 2023 09:48:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44750 "EHLO
+        Sun, 26 Feb 2023 09:54:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbjBZOsD (ORCPT
+        with ESMTP id S230345AbjBZOxV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Feb 2023 09:48:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 011E91352D;
-        Sun, 26 Feb 2023 06:47:23 -0800 (PST)
+        Sun, 26 Feb 2023 09:53:21 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39AF21A676;
+        Sun, 26 Feb 2023 06:49:56 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 53F2EB80BA7;
-        Sun, 26 Feb 2023 14:46:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B67BC4339B;
-        Sun, 26 Feb 2023 14:46:31 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 28A9E60C76;
+        Sun, 26 Feb 2023 14:48:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E2DEC4339E;
+        Sun, 26 Feb 2023 14:48:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677422793;
-        bh=i+fdipJ0Web+0CarVXGoatLl7+3hFfmAieXTSFSwacQ=;
+        s=k20201202; t=1677422904;
+        bh=VLP8i6ArIREcf/Bv1wZoro/Xr+7GsOM0vD3GLkKGeZM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=neqVAwHBHfhC73KCPpzA47QGCwCxwCvi0jGPAhzLTFrtym4h2V1JzbS8Cr6ca9WMo
-         ID+LXEpTTwt+p5DofDr61aBJLhOE4JhF8kvOKUPwZ3vg2cv/tcZqasp4+W0YlRb7G6
-         9Yn1geoOi5FW70LOCPe5V81RzGbhYoO8XbS5wW7cMLC+ESC+DRWM/t5c6kO+TmPm5d
-         A19Gugadug08OoCpmaNHnQvbigIWeDJ24qjui8NZA/AiKLqpa6yTgE6KTc0fz678sX
-         rPVtQB5HLtL0g9KtmSligjiISFJr6n08QzU/1WAxpgEt/HW2nLcb7RwrKrl9rzrd2L
-         90J5v8I/fwVdQ==
+        b=M8Zv3c+xbocG+HQrfisWnCmWEcr/8RNe0twm/5do0NCM21flHzgSlWpCXotWaQyqe
+         l/Bc0jd74yQQ3wQIfdykMIgK2CtHqWUwIqUBvFquf28LMGNBfUqg7/WiMtEm3NwoqL
+         Vbc+wC2tXn8nU4SrpR0uTIz4y/2lm92yrQZZjaSLqmshJSg0qMjBPJ/tDVqY6nyJEP
+         SFR9GDFerbCYsBVu2T+WFCUh4QCokmyJFTQ3J/xWIZOLWusJX4PcRgIvYD8G5tC2mZ
+         Obl6bhfxv5DTnH83PVsX4aJUbP7xX6yh0DJcPms2/I4vMp5mg+sHYVqqwgchgfBMUb
+         M1boQs13nUc1w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Mario Limonciello <mario.limonciello@amd.com>,
@@ -44,12 +44,12 @@ Cc:     Mario Limonciello <mario.limonciello@amd.com>,
         matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.2 46/53] Bluetooth: btusb: Add new PID/VID 0489:e0f2 for MT7921
-Date:   Sun, 26 Feb 2023 09:44:38 -0500
-Message-Id: <20230226144446.824580-46-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 42/49] Bluetooth: btusb: Add new PID/VID 0489:e0f2 for MT7921
+Date:   Sun, 26 Feb 2023 09:46:42 -0500
+Message-Id: <20230226144650.826470-42-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230226144446.824580-1-sashal@kernel.org>
-References: <20230226144446.824580-1-sashal@kernel.org>
+In-Reply-To: <20230226144650.826470-1-sashal@kernel.org>
+References: <20230226144650.826470-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -117,10 +117,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index afd2f08ffe30f..acfd40f1cc75c 100644
+index aebb98e1fcd64..d367289f6263d 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -567,6 +567,9 @@ static const struct usb_device_id blacklist_table[] = {
+@@ -474,6 +474,9 @@ static const struct usb_device_id blacklist_table[] = {
  	{ USB_DEVICE(0x0489, 0xe0e0), .driver_info = BTUSB_MEDIATEK |
  						     BTUSB_WIDEBAND_SPEECH |
  						     BTUSB_VALID_LE_STATES },
