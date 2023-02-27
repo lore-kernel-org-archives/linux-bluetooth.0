@@ -2,49 +2,50 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0698C64ED9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Feb 2023 21:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E60C64ED6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Feb 2023 21:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbjB0VkX (ORCPT
+        id S230101AbjB0Vk3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Feb 2023 16:40:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48118 "EHLO
+        Mon, 27 Feb 2023 16:40:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230015AbjB0VkW (ORCPT
+        with ESMTP id S230015AbjB0VkY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Feb 2023 16:40:22 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93EC1BAEE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Feb 2023 13:40:18 -0800 (PST)
+        Mon, 27 Feb 2023 16:40:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A391C305
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Feb 2023 13:40:21 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 60E1660F44
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Feb 2023 21:40:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C58E4C433EF;
-        Mon, 27 Feb 2023 21:40:17 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 857F5B80DC7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Feb 2023 21:40:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 45C4DC433A1;
+        Mon, 27 Feb 2023 21:40:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1677534017;
-        bh=IX6TDUjioNZ1FC0LBgnkzOSHc2i5jFmKUfcI/zm7ulo=;
+        s=k20201202; t=1677534018;
+        bh=Gr3J5EKr0Kvl50vhRx+Mua+nBos2kuX28NupB/frB6c=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=MwT/k52l4iwbBjuPo94tXYx3SBc+emW4D4iyGt6Snsh2JskPPnS2FbCPzI4PbihjG
-         1G9MHTFwAT0ZH1AZRRchUeA2RJrmgO6o1TlS/9FRm60ApowU38JfNeOqHMprkEfoK/
-         YrYwvdbV/4tGfjjAEK8pBpjhqvMhSNAncAWQtwa9WiU7Zbm3WNfs2eCD6YsM6vc1x0
-         EktiZ85Xba9/xCjxCA8VTKh5KdCzS9vFM9JE56+EhSYIxFCXOIT5RHY4uWvLbCe+HE
-         PHXwLeM41/G9wfXGYXqmejgK4KZpawuzbNtaTmOacEJknKpfOx8btCm0+biHe9kZJD
-         lbQM0MKKFRUeA==
+        b=jFdH26jLzgyBibu9It4C5VVdkx1uGPTdkd9X6nYT2I3o44eCAr4ywITY8tHHbFyLi
+         e+mf1AX18BxgBFXqeTJTZlk22aSxfmErk0SNqbnZoYiSd9NdLoR2XkNzwSH5F0P0QP
+         8w6OwPsizylAWWH6E/Shr7mlgpnw1ycnhvkmqLbY7hORt49DBx8kxJdKeOOrMQsZxp
+         zRq+9Y91ovVAIyYgbxXH9hRvJuVHJstghvtB9s2ynluXdDD8yF/cxDYxhDCftfvjzM
+         R4xURHy1dcqsI/ncyV7NL5N28ODCeVF52DDT32GfNYDXlbllHWgpsUXuudidmbaNDC
+         idLREtL6Q7Dsw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ACB63E68D2D;
-        Mon, 27 Feb 2023 21:40:17 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 325F6E50D60;
+        Mon, 27 Feb 2023 21:40:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: ISO: fix timestamped HCI ISO data packet parsing
+Subject: Re: [PATCH BlueZ v2] shared/bap: fix crash unregistering media endpoint
+ while streaming
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167753401770.12319.7774586415718578417.git-patchwork-notify@kernel.org>
-Date:   Mon, 27 Feb 2023 21:40:17 +0000
-References: <1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi>
-In-Reply-To: <1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi>
+Message-Id: <167753401820.12319.8127078407084755990.git-patchwork-notify@kernel.org>
+Date:   Mon, 27 Feb 2023 21:40:18 +0000
+References: <fe1bf6efbd6bdfc8507e13559bb3852b23446f2f.1677261870.git.pav@iki.fi>
+In-Reply-To: <fe1bf6efbd6bdfc8507e13559bb3852b23446f2f.1677261870.git.pav@iki.fi>
 To:     Pauli Virtanen <pav@iki.fi>
 Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
@@ -53,22 +54,22 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 20 Feb 2023 19:38:24 +0000 you wrote:
-> Use correct HCI ISO data packet header struct when the packet has
-> timestamp. The timestamp, when present, goes before the other fields
-> (Core v5.3 4E 5.4.5), so the structs are not compatible.
+On Fri, 24 Feb 2023 18:09:46 +0000 you wrote:
+> Always free BAP stream in bt_bap_stream_release if it is not attached to
+> a client session, simplifying the cleanup.
 > 
-> Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> Fixes the following ASAN crash is observed when media endpoint is
+> unregistered (stopping sound server) while streaming from remote BAP
+> client:
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: ISO: fix timestamped HCI ISO data packet parsing
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e16f2ec5cf3a
+  - [BlueZ,v2] shared/bap: fix crash unregistering media endpoint while streaming
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fcdd38acf6b2
 
 You are awesome, thank you!
 -- 
