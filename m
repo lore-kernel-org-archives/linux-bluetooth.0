@@ -2,153 +2,199 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5925C7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Feb 2023 04:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A8DC64ED8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Feb 2023 07:18:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbjB0Etm (ORCPT
+        id S229960AbjB0HSt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Feb 2023 23:49:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
+        Mon, 27 Feb 2023 02:18:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbjB0Etl (ORCPT
+        with ESMTP id S229451AbjB0HSr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Feb 2023 23:49:41 -0500
-Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F525FF31;
-        Sun, 26 Feb 2023 20:49:25 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.west.internal (Postfix) with ESMTP id 6ED8032001C6;
-        Sun, 26 Feb 2023 23:49:22 -0500 (EST)
-Received: from imap43 ([10.202.2.93])
-  by compute5.internal (MEProxy); Sun, 26 Feb 2023 23:49:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1677473362; x=1677559762; bh=4d
-        +M82rxS2ilvQGtMbSyOF3k0B4HgMWmUhmiwlaDXqU=; b=kXR6sS98fTXBb5o8t4
-        nkK3s4aXdFsVDwtN/OZuJVfMtyPMULkf/u3PY4jS70u/Q8k4zZzQJ+AvD5ubRsm9
-        yQj0fbPV42wCi5nvnwKW5JmzJgt7TmVInwlOY3N/Yhnq7o7J6IC6X656RpiVCEIy
-        iwE8PCG6+YpZARF1bpLLXFmZZHIwNZzmZSj0HydWaqna0vK7O2gQ86w3rrloELFG
-        Aplky0EUpHUozb/6pJ7esAbg4Ybm9scQVSZLOnnDveO2qryWS0D8S71dwL24nFy3
-        nWkhQ5ZJoNt3yOVXOZYkugb9P7z6ir5ojQk259NpoptBGgVjJHu4MnPm4RssOkxW
-        TxIw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm1; t=1677473362; x=1677559762; bh=4d+M82rxS2ilvQGtMbSyOF3k0B4H
-        gMWmUhmiwlaDXqU=; b=TCeG7wVvTlycIr/eNuzR2hc3bdetnoeAIDvwKPU8pp7Q
-        2T13wEb1AB4UOC1EsP4FekqucjHu/7O7NfCkrXBBMyYkuqINqOTpeXAe1IH9A3Ih
-        Tj80b/rLzXkIUfikfzUn37xr/SHQVFWRA7bQHH/LuPLg/MdD4pO8PNP51qs4aTgF
-        CGGce8FJuFMU0j89iqXCtfofERdeosLzh5QrxueDuMLb7tC5oXd6mlS5fOCROE8a
-        oRk3L/DSE+gbWiibg8H8Kwzi2aPmo2xXWuB7xo63NjJ6zoDhY5j7hD2R0cKxgmEA
-        gvg8JBhyuvRyKZQ5yI03mUTrFjlP90Hrkjhc2VxKOQ==
-X-ME-Sender: <xms:UTb8Y2sbaXD1Xwx6fzxcvxj3jlcl_oXGYdycdhk9HvfX1QsunBkMZw>
-    <xme:UTb8Y7fq_KOk9dK7KgA4yaubgCRd31DZCeDt8ll7NDLmqUjM4PXIcRbztZmcG_wBr
-    OpebFa9pW2Czj05uFc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrudekledgjedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpeetlhhi
-    shhtrghirhcuoegrlhhishhtrghirhesrghlihhsthgrihhrvdefrdhmvgeqnecuggftrf
-    grthhtvghrnhepudejjeeltdfgjedtieeileduhfeftdfhhefhffehiefhtdeiuddtvdek
-    keejfffhnecuffhomhgrihhnpeguvghvihgtvghtrhgvvgdrohhrghenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishhtrghirhesrghl
-    ihhsthgrihhrvdefrdhmvg
-X-ME-Proxy: <xmx:UTb8YxyypBeBPhlg2Gkm_90bIOqaOdT-KQ85aqCZlt-UGyWyvjiz7w>
-    <xmx:UTb8YxNq2Mc4LscAwktSsbeYzJQWRTl_BPvAfU2bAQJxR5Z15sORfg>
-    <xmx:UTb8Y28AOgbgxWjvOv-NWpMZxbSr2EDWYHnhIx0W-B9cXovdGh0Kuw>
-    <xmx:Ujb8Y5Y1eLzCmdqkGFXtygDIgpdmxTEV3cGIgUYjfX11mnKqGc_HQg>
-Feedback-ID: ifd214418:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 6946A2D40074; Sun, 26 Feb 2023 23:49:21 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-172-g9a2dae1853-fm-20230213.001-g9a2dae18
-Mime-Version: 1.0
-Message-Id: <ce2df843-dc68-49af-9551-48769c26871a@app.fastmail.com>
-In-Reply-To: <20230224232339.124969-2-macroalpha82@gmail.com>
-References: <20230224232339.124969-1-macroalpha82@gmail.com>
- <20230224232339.124969-2-macroalpha82@gmail.com>
-Date:   Mon, 27 Feb 2023 14:49:01 +1000
-From:   Alistair <alistair@alistair23.me>
-To:     "Chris Morgan" <macroalpha82@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        "Vasily Khoruzhick" <anarsoul@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Marcel Holtmann" <marcel@holtmann.org>,
-        "Heiko Stuebner" <heiko@sntech.de>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        "Chris Morgan" <macromorgan@hotmail.com>
-Subject: Re: [PATCH 1/3 V2] dt-bindings: net: realtek-bluetooth: Add RTL8821CS
-Content-Type: text/plain
+        Mon, 27 Feb 2023 02:18:47 -0500
+Received: from mail-oo1-xc33.google.com (mail-oo1-xc33.google.com [IPv6:2607:f8b0:4864:20::c33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94146974B
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 23:18:46 -0800 (PST)
+Received: by mail-oo1-xc33.google.com with SMTP id p8-20020a4a3c48000000b0052527a9d5f0so858536oof.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Feb 2023 23:18:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AV+BUrqsjS8wgrqlLbYQIjVBrtakZzEzQXRY/JnkoOE=;
+        b=s5wFvNf/cESyyJoHCBYL7vja74vNUnHe4673jYexMz0cSgnD/8E/cJYARF93FyMSz9
+         L1uSVa6tenaLNQuIiePz1xMoPn6/DI2/8Pj7FdnV8EKiF3LNtcM7G0uZJUKG9CwWvE1h
+         RnCpTO/yevwPKl9pp7bSyr8jr6u0ygzzOsrur8ydr4Y+nVRSKOGSImpaqKakMmgYneVl
+         4IiD7gMLcsyZldXY4YT6UkyEfaQmBS/GFy51+vNKgXB2yc8pW8jhA818iy9A8ddGhBBS
+         vpRcv0gnCalPdMPykXljdVLdylWrZVghCLB8fHdiK7XRjTngPX8JXD425gXzZzC1r0Rr
+         2qhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AV+BUrqsjS8wgrqlLbYQIjVBrtakZzEzQXRY/JnkoOE=;
+        b=rpQRV7Y0r1O5xSWHzrKOiT1OUB3MLBqSfjiY1IMqm9lDn2VwYS+QbUd9+qHKgHBrjr
+         /DgQLc/1r+6ZrAnMs0FBQkVwbfGO4xN8c5OPY9QJqswjzCL1cEGVpuAUl4Vm4BQXRsE/
+         Xie3MmGBKtt/xDzQ7YIs8Pls1vuAg/eS3xRM956ic4duAO2JQvC+4cXoYFrR6aIAEs1k
+         ooH1CQdvU0bN/hWjV6CGly3d6aDhrmTOLkiZokeygE6dC+ZZX0SxY+Y9m6FNNO2cDWlk
+         ssQrHJ5ZaoAFoTvuzHJ0YzfJ07mrpHHdhuhxJduLbBAb3BeKBbL+bP9Z2DMIgOdjXf86
+         dB1Q==
+X-Gm-Message-State: AO0yUKWahptKq41Dkob/M0iUFrfmXwES0OSJU6MrljlsV0CrFK96QL9Z
+        8+NeKg9W4G8NjynKN3yUZyy0C29BlUbsW5KKLDibSA==
+X-Google-Smtp-Source: AK7set9/v6iYV6pbVgTZkdgLBEJbfS32Dhr+ap8s410dZZc/crOH2vqfCxMZEcuLD2H4hXYLTUT1qD13nshtkxSnQ44=
+X-Received: by 2002:a4a:e914:0:b0:525:3b4f:ee88 with SMTP id
+ bx20-20020a4ae914000000b005253b4fee88mr3337346oob.0.1677482325637; Sun, 26
+ Feb 2023 23:18:45 -0800 (PST)
+MIME-Version: 1.0
+References: <20230224195313.1877313-1-jiangzp@google.com> <20230224115310.kernel.v2.1.If0578b001c1f12567f2ebcac5856507f1adee745@changeid>
+ <CABBYNZ+yVWssa09NB+ahp-N87sLXRqYF58-GJK-Vx8jn-Sa5Uw@mail.gmail.com> <CAB4PzUrO32Z1AF-3UJviYqTr3YvachGgJ7NiqkNW46ioWigtfw@mail.gmail.com>
+In-Reply-To: <CAB4PzUrO32Z1AF-3UJviYqTr3YvachGgJ7NiqkNW46ioWigtfw@mail.gmail.com>
+From:   Zhengping Jiang <jiangzp@google.com>
+Date:   Sun, 26 Feb 2023 23:18:34 -0800
+Message-ID: <CAB4PzUoErDkUzyj6sFQc_CSa7hibucX42yY+oVGw7C4DcJdQFA@mail.gmail.com>
+Subject: Re: [kernel PATCH v2 1/1] Bluetooth: hci_sync: clear workqueue before
+ clear mgmt cmd
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        mmandlik@google.com, chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, 25 Feb 2023, at 9:23 AM, Chris Morgan wrote:
-> From: Chris Morgan <macromorgan@hotmail.com>
-> 
-> Add compatible string for RTL8821CS for existing Realtek Bluetooth
-> driver.
-> 
-> Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+Hi Luiz,
 
-Reviewed-by: Alistair Francis <alistair@alistair23.me>
+I have a question. Given that each command in the cmd_sync queue
+should clean up the memory in a callback function. I was wondering if
+the call to cmd_complete_rsp in __mgmt_power_off function is still
+necessary? Will this always risk a race condition that cmd has been
+released when the complete callback or _sync function is run?
 
-Alistair
+Thanks,
+Zhengping
 
-> ---
-> .../bindings/net/realtek-bluetooth.yaml       | 23 +++++++++++--------
-> 1 file changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-> index 143b5667abad..f91d06d629b9 100644
-> --- a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-> @@ -4,24 +4,29 @@
-> $id: http://devicetree.org/schemas/net/realtek-bluetooth.yaml#
-> $schema: http://devicetree.org/meta-schemas/core.yaml#
->  
-> -title: RTL8723BS/RTL8723CS/RTL8822CS Bluetooth
-> +title: RTL8723BS/RTL8723CS/RTL8821CS/RTL8822CS Bluetooth
->  
-> maintainers:
->    - Vasily Khoruzhick <anarsoul@gmail.com>
->    - Alistair Francis <alistair@alistair23.me>
->  
-> description:
-> -  RTL8723CS/RTL8723CS/RTL8822CS is WiFi + BT chip. WiFi part is connected over
-> -  SDIO, while BT is connected over serial. It speaks H5 protocol with few
-> -  extra commands to upload firmware and change module speed.
-> +  RTL8723CS/RTL8723CS/RTL8821CS/RTL8822CS is a WiFi + BT chip. WiFi part
-> +  is connected over SDIO, while BT is connected over serial. It speaks
-> +  H5 protocol with few extra commands to upload firmware and change
-> +  module speed.
->  
-> properties:
->    compatible:
-> -    enum:
-> -      - realtek,rtl8723bs-bt
-> -      - realtek,rtl8723cs-bt
-> -      - realtek,rtl8723ds-bt
-> -      - realtek,rtl8822cs-bt
-> +    oneOf:
-> +      - const: realtek,rtl8723bs-bt
-> +      - const: realtek,rtl8723cs-bt
-> +      - const: realtek,rtl8723ds-bt
-> +      - const: realtek,rtl8822cs-bt
-> +      - items:
-> +          - enum:
-> +              - realtek,rtl8821cs-bt
-> +          - const: realtek,rtl8822cs-bt
->  
->    device-wake-gpios:
->      maxItems: 1
-> -- 
-> 2.34.1
-> 
-> 
+On Fri, Feb 24, 2023 at 2:37=E2=80=AFPM Zhengping Jiang <jiangzp@google.com=
+> wrote:
+>
+> Hi Luiz,
+>
+> > Any particular reason why you are not using hci_cmd_sync_clear
+> > instead?
+>
+> That is a good question and we used hci_cmd_sync_clear in the first
+> version, but it will clear the queue and also close the timer. As a
+> result, when the adapter is turned on again, the timer will not
+> schedule any new jobs. So the option is to use hci_cmd_sync_clear and
+> re-initiate the queue or to write a new function which only clears the
+> queue.
+>
+> > We also may want to move the clearing logic to
+> > hci_dev_close_sync since it should be equivalent to
+> > hci_request_cancel_all.
+>
+> I actually have a question here. I saw
+> "drain_workqueue(hdev->workqueue)" in hci_dev_close_sync and thought
+> it should force clearing the cmd_sync queue. But it seems cannot
+> prevent the use-after-free situation.
+>
+> Any suggestions to improve the solution?
+>
+> Thanks,
+> Zhengping
+>
+>
+> On Fri, Feb 24, 2023 at 1:02 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Zhengping,
+> >
+> > On Fri, Feb 24, 2023 at 11:53 AM Zhengping Jiang <jiangzp@google.com> w=
+rote:
+> > >
+> > > Clear cmd_sync_work queue before clearing the mgmt cmd list to avoid
+> > > racing conditions which cause use-after-free.
+> > >
+> > > When powering off the adapter, the mgmt cmd list will be cleared. If =
+a
+> > > work is queued in the cmd_sync_work queue at the same time, it will
+> > > cause the risk of use-after-free, as the cmd pointer is not checked
+> > > before use.
+> > >
+> > > Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+> > > ---
+> > >
+> > > Changes in v2:
+> > > - Add function to clear the queue without stop the timer
+> > >
+> > > Changes in v1:
+> > > - Clear cmd_sync_work queue before clearing the mgmt cmd list
+> > >
+> > >  net/bluetooth/hci_sync.c | 21 ++++++++++++++++++++-
+> > >  1 file changed, 20 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > > index 117eedb6f709..b70365dfff0c 100644
+> > > --- a/net/bluetooth/hci_sync.c
+> > > +++ b/net/bluetooth/hci_sync.c
+> > > @@ -636,6 +636,23 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
+> > >         INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_exp=
+ire);
+> > >  }
+> > >
+> > > +static void hci_pend_cmd_sync_clear(struct hci_dev *hdev)
+> > > +{
+> > > +       struct hci_cmd_sync_work_entry *entry, *tmp;
+> > > +
+> > > +       mutex_lock(&hdev->cmd_sync_work_lock);
+> > > +       list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_lis=
+t, list) {
+> > > +               if (entry->destroy) {
+> > > +                       hci_req_sync_lock(hdev);
+> > > +                       entry->destroy(hdev, entry->data, -ECANCELED)=
+;
+> > > +                       hci_req_sync_unlock(hdev);
+> > > +               }
+> > > +               list_del(&entry->list);
+> > > +               kfree(entry);
+> > > +       }
+> > > +       mutex_unlock(&hdev->cmd_sync_work_lock);
+> > > +}
+> > > +
+> > >  void hci_cmd_sync_clear(struct hci_dev *hdev)
+> > >  {
+> > >         struct hci_cmd_sync_work_entry *entry, *tmp;
+> > > @@ -4842,8 +4859,10 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+> > >
+> > >         if (!auto_off && hdev->dev_type =3D=3D HCI_PRIMARY &&
+> > >             !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> > > -           hci_dev_test_flag(hdev, HCI_MGMT))
+> > > +           hci_dev_test_flag(hdev, HCI_MGMT)) {
+> > > +               hci_pend_cmd_sync_clear(hdev);
+> >
+> > Any particular reason why you are not using hci_cmd_sync_clear
+> > instead? We also may want to move the clearing logic to
+> > hci_dev_close_sync since it should be equivalent to
+> > hci_request_cancel_all.
+> >
+> > >                 __mgmt_power_off(hdev);
+> > > +       }
+> > >
+> > >         hci_inquiry_cache_flush(hdev);
+> > >         hci_pend_le_actions_clear(hdev);
+> > > --
+> > > 2.39.2.722.g9855ee24e9-goog
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
