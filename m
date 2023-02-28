@@ -2,133 +2,109 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A58AC7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Feb 2023 01:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D24B7C64ED6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Feb 2023 05:16:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229549AbjB1BRU (ORCPT
+        id S229821AbjB1FQO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Feb 2023 20:17:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57980 "EHLO
+        Tue, 28 Feb 2023 00:16:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbjB1BRT (ORCPT
+        with ESMTP id S229486AbjB1FQN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Feb 2023 20:17:19 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6487B244A6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Feb 2023 17:17:18 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id u5so5389222plq.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Feb 2023 17:17:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677547038;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gYQilNlZ+rLZ59kLhEpxWUJ/Kiy/3TgghOm0h5oCPUo=;
-        b=B9DNFOH6yq5rMZ2PRnvxffbK63a7DyA+25q2vlx5VlPYZMhnnMldzMQ+NHnLIfYL+7
-         kAWonegnQ5FfVw/yskZshAnqwUk9qds5oe54aBNGPNzQ6Q5un/C/NlUBIjKOmxNDdYTb
-         Vl1adNdxIkcxbiCQ6RN5NLV1X1WYoRRv76eC70vvWguHG8Iyr8h7qvRyDJdMkbmqYNkB
-         DHqQSY0ws+L7tDSg1ZvzQ18ksIlMcyaU+FvTufzAj0RT74jpQyMDX2gs/CdRObopWaCb
-         eBnBKswpvb1Psr93y+VcgQlwQs5w9MvSVoPDBf6KxedqcJu9wno3dXMM9bTh6GNdm+nb
-         GB4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677547038;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gYQilNlZ+rLZ59kLhEpxWUJ/Kiy/3TgghOm0h5oCPUo=;
-        b=lQvMnaJoBPWRFQR8x2TQbM+3HduhhNg++xtAlxJqF9qB2ZXiHpBpdHrF7IMS5p6wZh
-         mGikC2m4BzC30dOobcJnDRFfcYkK/j64eXEnyCD1mxZlgNMVIsqNezeEissxTJLhaYpO
-         vAbJOJ0tbe4GaczIQGaGXMllcmyB/nJauroZsopJCVAxJeMHdPEKbs9UozlEDPA4SVYH
-         xDEO5iNDJuxj5/7SM3xDiWj+J6JrvZgCWWbkiHjGULNJ1IGr0HSERqfdAdTXWdd0n73j
-         Se0q9fQUrtIdF9+tGnhalNTaWVlQrrRbpzEUH1ruV/6NlL33ITxpnPT1GLOjNikvB/8F
-         n7Xg==
-X-Gm-Message-State: AO0yUKWHG5nvAdod2GzOvKiSH34p3KQMqU98UmdD6W2tVqwb5l0dCh2X
-        TY5I+bNqaRuLj6rWf6uyPP95cJQeqD4=
-X-Google-Smtp-Source: AK7set/HfDqJn/nmyJYREKIiTXlEFYQK6Z4xDtwTGXV87ITui1ZRE4PMPXLqJ0E1Rr2rUSnuC/srDg==
-X-Received: by 2002:a05:6a20:29a9:b0:cd:87ef:3f1a with SMTP id f41-20020a056a2029a900b000cd87ef3f1amr1253872pzh.3.1677547037689;
-        Mon, 27 Feb 2023 17:17:17 -0800 (PST)
-Received: from [172.17.0.2] ([20.171.107.98])
-        by smtp.gmail.com with ESMTPSA id m3-20020aa78a03000000b005e06234e70esm4797037pfa.59.2023.02.27.17.17.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Feb 2023 17:17:17 -0800 (PST)
-Message-ID: <63fd561d.a70a0220.d7361.832f@mx.google.com>
-Date:   Mon, 27 Feb 2023 17:17:17 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0647485325948907015=="
+        Tue, 28 Feb 2023 00:16:13 -0500
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A7B1E9C3;
+        Mon, 27 Feb 2023 21:16:11 -0800 (PST)
+X-QQ-mid: bizesmtp75t1677561361t4micyop
+Received: from localhost.localdomain ( [58.240.82.166])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Tue, 28 Feb 2023 13:15:55 +0800 (CST)
+X-QQ-SSF: 01400000002000I0Z000B00A0000000
+X-QQ-FEAT: 3M0okmaRx3jV0YJeRXFg7tveFENEasdvz+tx9uy4jal0LTPWXIjT1BHnPp22N
+        u5s5s7T9ZjDRqylCcPkGGE6tFDZOinKDG3kWd9MXNYlK4BXLhXmZxXIUxw7Kg+wPBAWv0Zt
+        rnhr8TDzjCYxByN0+8xozhjAg6s0/H6JNVnukntbzkJ5NJHKxYE5ZU56mQEBe5XW99JHKW7
+        Wl5C33eKPdeegxzLeCibA2DMkCypHrMQvNj6BhUXAWwqv2dUisTgALwHd/KyLPlvhIM+ggJ
+        e3VLHhe9UZLepJU4am1iB/9BHxoOWgwVp1RBOZ04vrwTYlIJB4YoYhx6fIWpzHWZHykvUxM
+        CioFVRrqBBsZtGCiQJXvplKkSNixXNwhWJh0Zk8GOKm8gDFH3D4zMV2FACuJTIGSpAH5QNZ
+X-QQ-GoodBg: 2
+From:   Meng Tang <tangmeng@uniontech.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, zhuweijun@uniontech.com,
+        Meng Tang <tangmeng@uniontech.com>
+Subject: [PATCH 1/2] Bluetooth: btusb: Add new PID/VID 04ca:3801 for MT7633
+Date:   Tue, 28 Feb 2023 13:15:53 +0800
+Message-Id: <20230228051554.13501-1-tangmeng@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: hci_sync: Fix smatch warning
-In-Reply-To: <20230227235255.266852-1-luiz.dentz@gmail.com>
-References: <20230227235255.266852-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvr:qybglogicsvr7
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0647485325948907015==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This bluetooth device is found in a combo WLAN/BT card
+for a MediaTek 7633.
 
-This is automated email and please do not reply to this email!
+Tested on Acer Aspire A315-24P Notebook
 
-Dear submitter,
+The device information:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=725355
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3801 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.82 seconds
-GitLint                       PASS      0.24 seconds
-SubjectPrefix                 PASS      0.08 seconds
-BuildKernel                   PASS      32.28 seconds
-CheckAllWarning               PASS      34.37 seconds
-CheckSparse                   PASS      38.71 seconds
-CheckSmatch                   PASS      108.28 seconds
-BuildKernel32                 PASS      30.33 seconds
-TestRunnerSetup               PASS      438.50 seconds
-TestRunner_l2cap-tester       PASS      15.83 seconds
-TestRunner_iso-tester         PASS      16.59 seconds
-TestRunner_bnep-tester        PASS      5.31 seconds
-TestRunner_mgmt-tester        PASS      107.67 seconds
-TestRunner_rfcomm-tester      PASS      8.70 seconds
-TestRunner_sco-tester         PASS      7.87 seconds
-TestRunner_ioctl-tester       PASS      9.24 seconds
-TestRunner_mesh-tester        PASS      6.70 seconds
-TestRunner_smp-tester         PASS      7.82 seconds
-TestRunner_userchan-tester    PASS      5.65 seconds
-IncrementalBuild              PASS      28.83 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: hci_sync: Fix smatch warning
-WARNING: A patch subject line should describe the change not the tool that found it
-#69: 
-Subject: [PATCH] Bluetooth: hci_sync: Fix smatch warning
-
-total: 0 errors, 1 warnings, 0 checks, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13154313.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Meng Tang <tangmeng@uniontech.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 6273a93defd2..5272eef576ed 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -558,6 +558,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x043e, 0x310c), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3801), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Additional MediaTek MT7668 Bluetooth devices */
+ 	{ USB_DEVICE(0x043e, 0x3109), .driver_info = BTUSB_MEDIATEK |
+-- 
+2.20.1
 
---===============0647485325948907015==--
