@@ -2,142 +2,192 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A10C64ED6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Mar 2023 06:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCE4C7EE32
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Mar 2023 08:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbjCAGNP (ORCPT
+        id S229906AbjCAISL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Mar 2023 01:13:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47010 "EHLO
+        Wed, 1 Mar 2023 03:18:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbjCAGNN (ORCPT
+        with ESMTP id S229916AbjCAISE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Mar 2023 01:13:13 -0500
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16BC9752
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Feb 2023 22:13:11 -0800 (PST)
-Received: by mail-qv1-xf32.google.com with SMTP id nf5so8574126qvb.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Feb 2023 22:13:11 -0800 (PST)
+        Wed, 1 Mar 2023 03:18:04 -0500
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E6910DE;
+        Wed,  1 Mar 2023 00:17:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677651190;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZLIYU62qkGF2/g5npUNVfLDvBa0iOXwn24evCTUMbEE=;
-        b=bzneHm2W49wdtpcb4Fh/FV2zunQFG9tIwDsKkQftSDeM2wCdydy0HTj2u8lAwAYT5L
-         S5nixvmGE5KGaXqG2X1qUdzesP8zkbWsjdphmYeKHT6Htli2vieTJjz8lq95SjiPP136
-         V1mYNnoXENbpfAfQUHLRrg1esI3RN5WnWcHrw/F64FOd0J3UOlsZGzR6Gf7gxG/AnqHt
-         YxQKvLr+jr2+ZBG7TdLW4+wSqPmAHPZuz0DT4HtMsnqSVq+UC7khyzoivii5kg5ucSIb
-         DxC0g2w9vWGvHWKIZk4AOYu0ZnudnIbK76XpNoCPp+/3vl740gaocdFaD7qJxsyPT5bn
-         +2XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677651190;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZLIYU62qkGF2/g5npUNVfLDvBa0iOXwn24evCTUMbEE=;
-        b=fF1R90cZNKg2EdqEpgt234JTAjZ1qGgSSExOzo+9esrk1ITGOjYR7zwiFO7t5O6E6v
-         MjfNofxE07ZfvI0ssuO0aqUTLZxB0PlgEODNeVnaqqJzfgh6xZT8uAd2wmDn1rbDa9gg
-         f+JvMDt69eDdKdHns7N+02kj2268S1CbEG8w7aPXhfwtI+7lAEeeAkkoNJhBkqfM1qMN
-         GALKPKItiB7l9bzyaJpcfzf2KcyB+OTH/M9orxDyZO7bbnuVtu8qfYo5TFCtux18n1dJ
-         56DL8ytmCzg7KieC/aMUHtvpUiUxsUL6fCdoGP7F67+C+y86my3ec8TZDwtY4BV3I/wd
-         8SDA==
-X-Gm-Message-State: AO0yUKV9Qv/soAQSrkEnneVAVVCiR8ITzY1OuHkhCzXznatHkE8N87Q7
-        QIL2tUgJnHsR0hgpYKHa0s/5ZFe4TXg=
-X-Google-Smtp-Source: AK7set9XfFQhUsH50AvlsRQszgpiVHTdbsEs8koyUyjg5q72+NdwzZj0xA6ltQZ+aow0OxWgQvozXg==
-X-Received: by 2002:ad4:5f0f:0:b0:56e:b7a1:c9e with SMTP id fo15-20020ad45f0f000000b0056eb7a10c9emr10909583qvb.15.1677651190577;
-        Tue, 28 Feb 2023 22:13:10 -0800 (PST)
-Received: from [172.17.0.2] ([52.226.113.32])
-        by smtp.gmail.com with ESMTPSA id t64-20020ae9df43000000b0074231ac1723sm8279529qkf.28.2023.02.28.22.13.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Feb 2023 22:13:10 -0800 (PST)
-Message-ID: <63feecf6.e90a0220.f7abe.ba24@mx.google.com>
-Date:   Tue, 28 Feb 2023 22:13:10 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0788728424211280287=="
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1677658678; x=1709194678;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FWeHY8fcd0cSFhXWZizDGcsqg2Tv5UalzCBsb0/6y80=;
+  b=NjYiJEGH2EwIOuEEKLYwlK4fXIor2PFjGvhCxDx3evc9grlKOfwb2QxQ
+   G9xbzOIk56AoWO+FiRzNbZ33wNMeMBf84/02x22PJV+/McCPHWz7I/yzw
+   +9FExOJQVrQm5TLEyHo0NfBX+ByKIlsYy58y8cP29mpeAhWmtqnSkssT7
+   Xsk7gsqaLDBos7qQ+KhcSvP/Vd+/jYJgIeZIIutDmDfHR22Gej96pnRXw
+   /793XMR1T4ywQFqlVl2HUQmY7iirW3PDpCUZUA5YPlzqgW264nRNUhrny
+   UfU8jWJ1tW843LZZK6lLKfC88sSd8P0LZ34l6jX+fVNqiIznY5bBmND28
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.98,224,1673910000"; 
+   d="scan'208";a="29386920"
+Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
+  by mx1-pgp.tq-group.com with ESMTP; 01 Mar 2023 09:17:53 +0100
+Received: from mx1.tq-group.com ([192.168.6.7])
+  by tq-pgp-pr1.tq-net.de (PGP Universal service);
+  Wed, 01 Mar 2023 09:17:53 +0100
+X-PGP-Universal: processed;
+        by tq-pgp-pr1.tq-net.de on Wed, 01 Mar 2023 09:17:53 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1677658673; x=1709194673;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FWeHY8fcd0cSFhXWZizDGcsqg2Tv5UalzCBsb0/6y80=;
+  b=kZhKxr2QOBN2csBA+goakWFRKF/A9T46K1hKy1/8Z0U0/u6xAh8UfOcB
+   I2WNX/82iVZcqbMnj12R84pirzVH5PPJE0jYTrBRD0mFuv/RDoAQwNR7S
+   c0djQ+XxTvuQt+U6mzoZjohZNAt5f/79wNE68DzEhlvgn2j6Ii5GBNEi9
+   8U3mGLUQWPSWf7OfKms7Nbtw+kQDJeTlXAzQj4HgVmC50kwehLjcXm5wI
+   NOCVjNWBLyl9cGSnFhhe9mOlRkLmx4nc8LAQ9mXsJh0V7POvXZ6b+iptq
+   1zyD10DyKpsKigiEcznoQwcZ9vFYCtPAuYrE861Pmk/+m85hzqmwe82fu
+   A==;
+X-IronPort-AV: E=Sophos;i="5.98,224,1673910000"; 
+   d="scan'208";a="29386919"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 01 Mar 2023 09:17:52 +0100
+Received: from steina-w.localnet (unknown [10.123.53.21])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (No client certificate requested)
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 6BDB8280056;
+        Wed,  1 Mar 2023 09:17:52 +0100 (CET)
+From:   Alexander Stein <alexander.stein@ew.tq-group.com>
+To:     Matthias Kaehlcke <mka@chromium.org>,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanimir Varbanov <svarbanov@mm-sol.com>,
+        linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v1 00/15] create power sequencing subsystem
+Date:   Wed, 01 Mar 2023 09:17:50 +0100
+Message-ID: <10237323.nUPlyArG6x@steina-w>
+Organization: TQ-Systems GmbH
+In-Reply-To: <CAA8EJppuGbDGb1D-yf2WL77U1bqx1QQStQeDArWmGFCUiOtnww@mail.gmail.com>
+References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org> <Y0hr9XTGAg8Q6K6y@google.com> <CAA8EJppuGbDGb1D-yf2WL77U1bqx1QQStQeDArWmGFCUiOtnww@mail.gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, eatabakhsh04@gmail.com
-Subject: RE: obexd: launch obexd directly from dbus service
-In-Reply-To: <20230301050242.47225-1-eatabakhsh04@gmail.com>
-References: <20230301050242.47225-1-eatabakhsh04@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0788728424211280287==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+sorry for being late to the party.
 
-Dear submitter,
+Am Mittwoch, 19. Oktober 2022, 08:03:22 CET schrieb Dmitry Baryshkov:
+> Ho,
+>=20
+> On Thu, 13 Oct 2022 at 22:50, Matthias Kaehlcke <mka@chromium.org> wrote:
+> > Do you still plan to refresh this series?
+> >=20
+> > I know there have been multiple attempts to get something similar
+> > landed in the past 10 year or so. Your series didn't seem to get
+> > much pushback from maintainers, might be worth sending a refresh :)
+>=20
+> Yes, I hope to return to it eventually. I just had no time for it lately.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=725708
+I just found this thread while searching for power sequencing devices in=20
+Linux. From what I understand this is transforming the existing mmc pwrseq=
+=20
+drivers into generic ones. What is the intention of this new subsystem? Wha=
+t=20
+is it supposed to address?
+In my case I have an LTE module attached via USB, but in order to use it I=
+=20
+need to perform several steps:
+1. apply power supply
+2. Issue a reset pulse(!), the length actually defines whether its a reset =
+or=20
+poweroff/on
+3a. wait for a GPIO to toggle
+3b. wait a minimum time
+4a. device will enumerate on USB
+4b. device can be access using UART
 
----Test result---
+This is something required to actually see/detect the device in the first=20
+place, thus it cannot be part of the device driver side.
+Is this something pwrseq is supposed to address?
 
-Test Summary:
-CheckPatch                    FAIL      0.72 seconds
-GitLint                       FAIL      0.52 seconds
-BuildEll                      PASS      27.14 seconds
-BluezMake                     PASS      859.79 seconds
-MakeCheck                     PASS      11.92 seconds
-MakeDistcheck                 PASS      150.99 seconds
-CheckValgrind                 PASS      244.70 seconds
-CheckSmatch                   PASS      331.61 seconds
-bluezmakeextell               PASS      98.85 seconds
-IncrementalBuild              PASS      715.91 seconds
-ScanBuild                     PASS      1021.10 seconds
+Best regards,
+Alexander
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-obexd: launch obexd directly from dbus service
-WARNING:TYPO_SPELLING: 'Whenver' may be misspelled - perhaps 'Whenever'?
-#80: 
-Whenver obexd is summoned via dbus with the systemdservice file, the
-^^^^^^^
-
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#81: 
-daemon exits with the following error: Failed to start org.bluez.obex service: Process org.bluez.obex exite.
-
-WARNING:TYPO_SPELLING: 'whenver' may be misspelled - perhaps 'whenever'?
-#83: 
-whenver an app calls for obexd via dbus, it seems like it forces to use
-^^^^^^^
-
-/github/workspace/src/src/13155603.patch total: 0 errors, 3 warnings, 5 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13155603.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-obexd: launch obexd directly from dbus service
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-4: B1 Line exceeds max length (108>80): "daemon exits with the following error: Failed to start org.bluez.obex service: Process org.bluez.obex exite."
-
-
----
-Regards,
-Linux Bluetooth
+> > On Wed, Oct 06, 2021 at 06:53:52AM +0300, Dmitry Baryshkov wrote:
+> > > This is a proposed power sequencer subsystem. This is a
+> > > generification of the MMC pwrseq code. The subsystem tries to abstract
+> > > the idea of complex power-up/power-down/reset of the devices.
+> > >=20
+> > > The primary set of devices that promted me to create this patchset is
+> > > the Qualcomm BT+WiFi family of chips. They reside on serial+platform
+> > > or serial + SDIO interfaces (older generations) or on serial+PCIe (ne=
+wer
+> > > generations).  They require a set of external voltage regulators to be
+> > > powered on and (some of them) have separate WiFi and Bluetooth enable
+> > > GPIOs.
+> > >=20
+> > > The major drawback for now is the lack of proper PCIe integration
+> > > At this moment support for PCIe is hacked up to be able to test the
+> > > PCIe part of qca6390. Proper PCIe support would require automatically
+> > > powering up the devices before the scan basing on the proper device
+> > > structure in the device tree. This two last patches are noted as WIP =
+and
+> > > are included into the patchset for the purpose of testing WiFi on new=
+er
+> > > chips (like qca6390/qca6391).
+> > >=20
+> > > Changes since RFC v2:
+> > >  - Add documentation for the pwrseq code. Document data structures,
+> > > =20
+> > >    macros and exported functions.
+> > > =20
+> > >  - Export of_pwrseq_xlate_onecell()
+> > >  - Add separate pwrseq_set_drvdata() function to follow the typical A=
+PI
+> > > =20
+> > >    design
+> > > =20
+> > >  - Remove pwrseq_get_optional()/devm_pwrseq_get_optional()
+> > >  - Moved code to handle old mmc-pwrseq binding to the MMC patch
+> > >  - Split of_pwrseq_xlate_onecell() support to a separate patch
+> > >=20
+> > > Changes since RFC v1:
+> > >  - Provider pwrseq fallback support
+> > >  - Implement fallback support in pwrseq_qca.
+> > >  - Mmove susclk handling to pwrseq_qca.
+> > >  - Significantly simplify hci_qca.c changes, by dropping all legacy
+> > > =20
+> > >    code. Now hci_qca uses only pwrseq calls to power up/down bluetooth
+> > >    parts of the chip.
+> > >=20
+> > > _______________________________________________
+> > > ath10k mailing list
+> > > ath10k@lists.infradead.org
+> > > http://lists.infradead.org/mailman/listinfo/ath10k
 
 
---===============0788728424211280287==--
+=2D-=20
+TQ-Systems GmbH | M=FChlstra=DFe 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht M=FCnchen, HRB 105018
+Gesch=E4ftsf=FChrer: Detlef Schneider, R=FCdiger Stahl, Stefan Schneider
+http://www.tq-group.com/
+
+
