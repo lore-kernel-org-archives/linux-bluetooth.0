@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A133C678D4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Mar 2023 01:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9861BC6FA8E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Mar 2023 01:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjCCB1q (ORCPT
+        id S229591AbjCCB1s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Mar 2023 20:27:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34678 "EHLO
+        Thu, 2 Mar 2023 20:27:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCCB1q (ORCPT
+        with ESMTP id S229538AbjCCB1r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Mar 2023 20:27:46 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57101557C
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Mar 2023 17:27:44 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id z2so1134231plf.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Mar 2023 17:27:44 -0800 (PST)
+        Thu, 2 Mar 2023 20:27:47 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B78C276A5
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Mar 2023 17:27:45 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id n6so1179288plf.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Mar 2023 17:27:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2fMO3DDvUJJeV0Q226fQtHUTjSXAJS4amcasCJTxOgo=;
-        b=RRQknOM9/ZUGOM8aWVJSJIU0DoP1hU9vT7tnaCQDJtPJe+6farCIf8yUmpoNE7cST7
-         BN/v6vEKUs3kdktk4NIo8MTG35VUpB9xCbfEZKaLgAIN/QV+FYXOjUksyzLSPlluu2LU
-         s1CHu2rRTtrUGEwFj3vG9Kbpe1DWysC2AWCp7d2M3lXUS1uUSguWZC15xJJTEUxcU1JM
-         IFkyrBNObDnpNtNxxs42WVLPv7xZw1KvUcwcR5WAQdF153/h9MrZ0FEOZ9VMvikyrdi8
-         ROkMLDreajLM1yPMwvkhKp9F5ap3vaybmXXYR6fHMXnvvWKaKCB224yFjQJD8xKVH7nk
-         m9GQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FhvXbrbfD2QqHIchqkMG4mmNdrbycE8pNBVZPDJ9Syc=;
+        b=kp6dGRlXAzl35+v2taIxeVjj15Yh3cVl4HktYg4IllHkkl03Y16Cm0KGqZsJ8b/d/E
+         JdBo2AgeeTUTlsiWRj7VzmMmUfAk391Ul7yshN2sBcDd2s9g4PSkOc+aJ2i92eyWc41b
+         yaLZGjHsOWD30zCW0VFDAhAUyUunqZYWlcxoAzpC+fc5vTIo8581q83Ab575W81v9T1Q
+         HYd9m3jj8a7Zvuq+U130dtYfosnxeSoP1ZIwfAnGpO6YSq1STlhZyuekBm+85vK+4AnT
+         x5Sf0N7Gymyavl90R0gE8FnW6er9e6A6rh6p8cXGH8y4DgROQF3L0Y1aJHFkKbxKQTZf
+         /JHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2fMO3DDvUJJeV0Q226fQtHUTjSXAJS4amcasCJTxOgo=;
-        b=NaZ1/0uvAB9fAR4y1R6ngtjm5wj76kkWvozQK9xZ5QR0IiF+NHzItRpzp3DI9qFG0Z
-         PWp/PWZ38rjTjxiZ99c4DoK0CgljYjygFz5xRVEvMMLHijKh+4QZn272hDlWxoAdiPqz
-         jpwtzUrSd9xwzKmpuruCteD6JCR6aPl5r3ON3js91vf7+tAev1LQ53jXBxAAiAxX+OhL
-         bs/WrNp62TDo29FG+0+BRI5zfHXhBgaCZri+eYsAdZUseFPQLEn8fXJMojn/7ZoVg1Pm
-         O58mFgV7oYXtKBZCHegf/1U5Eu5CD0GG9WOUlXVRkTyhs7X6I3+TJJgm5pASSZNU50CG
-         R+GA==
-X-Gm-Message-State: AO0yUKXWxXVwweEHw87bfn1Q3qpTUWkU3UcJQIyKX6LKUs2gTj69Afj4
-        XyKR7UOr9OL/qsNR2nywatWXWmGC320=
-X-Google-Smtp-Source: AK7set+4q4haMHBa6lcrNeHiuvqZSa2yZMf7bZP715uuBulO6c44ZDNkuKdMXPtR7NyfvPiwEQh0Pw==
-X-Received: by 2002:a17:903:22cc:b0:19c:ff35:35d1 with SMTP id y12-20020a17090322cc00b0019cff3535d1mr351265plg.6.1677806863599;
-        Thu, 02 Mar 2023 17:27:43 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FhvXbrbfD2QqHIchqkMG4mmNdrbycE8pNBVZPDJ9Syc=;
+        b=MdQW/4km/5ejNsXEARkka9AF9v3AGjIcg14fEhxXt9KNnijG1UZv6UCTiM+y7FSzvm
+         4ItySE+vSLAghFP4icVI13S+oial4O0gwMvqkCdUEEIuflmNL6fs6RcTjC8JtlexHeng
+         JLkLPPcqUw8CBgyDBgE/5Q9/52KUHnzMp6sR9gt31RIdwSITsQgRRAFPsl/pK9cG3o1G
+         cfu6fHiGacsYrHfFphTXSsyVOrIzMn/Gjm12kxgZ2B9VA2h4s4PjhMmrDntH9vgQBRnX
+         M0GtbRQgeEmpRnuaBo15hGjC+TWCSwxsODAWSzHWJ0qO9VQAUXVKO1ie9mLFPSwz9AIr
+         MZHg==
+X-Gm-Message-State: AO0yUKUTp/+vNJS8dvqL/u5TS3uvLpjHKsUYpYZ4N1rUr7ECztIQDzEq
+        p+9S/4xrJX+D/HdBUjaUraEnsugpU4A=
+X-Google-Smtp-Source: AK7set/Z+L/TNinsHXCnHV5SK4A4UgRa/VryTShSAMhRv3NXptq3HNBpdCF0yngrjwZobup5drB5WQ==
+X-Received: by 2002:a17:903:1245:b0:19b:fed:2257 with SMTP id u5-20020a170903124500b0019b0fed2257mr317952plh.26.1677806864771;
+        Thu, 02 Mar 2023 17:27:44 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id kd3-20020a17090313c300b0019a6d3851afsm284622plb.141.2023.03.02.17.27.42
+        by smtp.gmail.com with ESMTPSA id kd3-20020a17090313c300b0019a6d3851afsm284622plb.141.2023.03.02.17.27.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 17:27:43 -0800 (PST)
+        Thu, 02 Mar 2023 17:27:44 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC 1/9] shared/crypto: Add bt_crypto_sirk
-Date:   Thu,  2 Mar 2023 17:27:34 -0800
-Message-Id: <20230303012742.1386291-1-luiz.dentz@gmail.com>
+Subject: [RFC 2/9] shared/ad: Add RSI data type
+Date:   Thu,  2 Mar 2023 17:27:35 -0800
+Message-Id: <20230303012742.1386291-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230303012742.1386291-1-luiz.dentz@gmail.com>
+References: <20230303012742.1386291-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,76 +68,23 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_crypto_sirk which attempts to generate a unique SIRK using
-the following steps:
-
- - Generate a hash (k) using the str as input
- - Generate a hash (sirk) using vendor, product, version and source as input
- - Encrypt sirk using k as LTK with sef function.
+This adds BT_AD_CSIP_RSI advertising data type.
 ---
- src/shared/crypto.c | 40 ++++++++++++++++++++++++++++++++++++++++
- src/shared/crypto.h |  3 +++
- 2 files changed, 43 insertions(+)
+ src/shared/ad.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index 4cb2ea857ea8..5449621b55ea 100644
---- a/src/shared/crypto.c
-+++ b/src/shared/crypto.c
-@@ -926,3 +926,43 @@ bool bt_crypto_sef(struct bt_crypto *crypto, const uint8_t k[16],
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+index feb712f508cf..b100a6796109 100644
+--- a/src/shared/ad.h
++++ b/src/shared/ad.h
+@@ -57,6 +57,7 @@
+ #define BT_AD_MESH_PROV			0x29
+ #define BT_AD_MESH_DATA			0x2a
+ #define BT_AD_MESH_BEACON		0x2b
++#define BT_AD_CSIP_RSI			0x2e
+ #define BT_AD_3D_INFO_DATA		0x3d
+ #define BT_AD_MANUFACTURER_DATA		0xff
  
- 	return true;
- }
-+
-+/* Generates a SIRK from a string using the following steps:
-+ *  - Generate a hash (k) using the str as input
-+ *  - Generate a hash (sirk) using vendor, product, version and source as input
-+ *  - Encrypt sirk using k as LTK with sef function.
-+ */
-+bool bt_crypto_sirk(struct bt_crypto *crypto, const char *str, uint16_t vendor,
-+			uint16_t product, uint16_t version, uint16_t source,
-+			uint8_t sirk[16])
-+{
-+	struct iovec iov[4];
-+	uint8_t k[16];
-+	uint8_t sirk_plaintext[16];
-+
-+	if (!crypto)
-+		return false;
-+
-+	iov[0].iov_base = (void *)str;
-+	iov[0].iov_len = strlen(str);
-+
-+	/* Generate a k using the str as input */
-+	if (!bt_crypto_gatt_hash(crypto, iov, 1, k))
-+		return false;
-+
-+	iov[0].iov_base = &vendor;
-+	iov[0].iov_len = sizeof(vendor);
-+	iov[1].iov_base = &product;
-+	iov[1].iov_len = sizeof(product);
-+	iov[2].iov_base = &version;
-+	iov[2].iov_len = sizeof(version);
-+	iov[3].iov_base = &source;
-+	iov[3].iov_len = sizeof(source);
-+
-+	/* Generate a sirk using vendor, product, version and source as input */
-+	if (!bt_crypto_gatt_hash(crypto, iov, 4, sirk_plaintext))
-+		return false;
-+
-+	/* Encrypt sirk using k as LTK with sef function */
-+	return bt_crypto_sef(crypto, k, sirk_plaintext, sirk);
-+}
-diff --git a/src/shared/crypto.h b/src/shared/crypto.h
-index fc1ba0c4feeb..d45308abf90a 100644
---- a/src/shared/crypto.h
-+++ b/src/shared/crypto.h
-@@ -57,3 +57,6 @@ bool bt_crypto_sef(struct bt_crypto *crypto, const uint8_t k[16],
- 			const uint8_t sirk[16], uint8_t out[16]);
- bool bt_crypto_sih(struct bt_crypto *crypto, const uint8_t k[16],
- 					const uint8_t r[3], uint8_t hash[3]);
-+bool bt_crypto_sirk(struct bt_crypto *crypto, const char *str, uint16_t vendor,
-+			uint16_t product, uint16_t version, uint16_t source,
-+			uint8_t sirk[16]);
 -- 
 2.39.2
 
