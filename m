@@ -2,165 +2,293 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644C7C64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Mar 2023 04:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE285C7EE32
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Mar 2023 05:34:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbjCCEa2 (ORCPT
+        id S229651AbjCCFeI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Mar 2023 23:30:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51778 "EHLO
+        Fri, 3 Mar 2023 00:34:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbjCCEa1 (ORCPT
+        with ESMTP id S229506AbjCCFeH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Mar 2023 23:30:27 -0500
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9F1C22006
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Mar 2023 20:30:25 -0800 (PST)
-Received: by mail-il1-x136.google.com with SMTP id l2so1003226ilg.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Mar 2023 20:30:25 -0800 (PST)
+        Fri, 3 Mar 2023 00:34:07 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BCF976B
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Mar 2023 21:34:05 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id h3so1194190lja.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Mar 2023 21:34:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1677817825;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3X3sv3cwtIPTn5FjGFBJtbBbEJdDmOJ6aIEGyQFTR+M=;
-        b=KDquQM3wo33PmMRF/t/YujzhcrjaYrt3khg3BG2S0J0gCuYDyXKJZS70cDsiWxo6x3
-         UqihcMWoWgPubSh9mlLWOjE6NAIRIZaN+UnAnO4omhjsnPy36KttMQiM0cIXJNVz2fBP
-         6H8cBMJRyLc2esfzvDGrr2oQ/vjQFDwVhDXGFG0v/MPmv+eTC/Y9tRZjnesqguffM07M
-         K67z8mJHBiTTtfHSTLPPm+v7rE3cIeaQjp8dOQpicax2uvq/PGvvfcBu/x0FDGlCID+d
-         XzasC0jUQQgSnXDPz8t114uMtiamjuXTPqZwlsUEvZEqn5/KCJ2KazEYtIgJtPMFV3Df
-         VxEQ==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J8kx+4RDaTM8iOHE5Xvj0WZgHMWsSn2e14La0mXAFQM=;
+        b=cuKN4TZyelwBKjdE+ljDNEktePIcKSyLJ7FRdP3feVfGH4KTHvod3FXdpJN5gqKqX6
+         TzNFn4ab4svZO27tWllquvX50wlaVGarqysHu3pzRQiCVPol9GlrdpAyvA9u3TqNrAPV
+         xmqcVjIg/mzmrGqiEq6G5PLKEgn11CDxeRjjTjF2G7hETYo1SFkUdplD7war01qRcfDB
+         B94xVYMQdDEbberGNMmxu5UGaapxV0/Cz7smT1+wsfmhRJLI8worKVcpyQt64s0PmoDf
+         mL0kAeFcultEfxcKoRiuXuuqJw4WRxq/vc8T6ffNVq+GOm7K3RLheZ1vGr6l2wU31evJ
+         wwaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1677817825;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3X3sv3cwtIPTn5FjGFBJtbBbEJdDmOJ6aIEGyQFTR+M=;
-        b=XoPnjICcl+X1z6f/OziqqakNMiyvn0XWaLDQk5ThQ3wUTusUZ53lKUwYbo/FsqYKzY
-         xnYgvkevx6jsbUxqVfx6v0D9d0b1rCmGwylFEhQN3On03ujJ05vPJO4tir9DKI/F5m/S
-         gtNLq4kq8l7mFCWBgP3BFQU2YaoIp+i80yitubir55LgecW3IM2UEM3Ea42ztAzY2fpb
-         E4Iq6pQ89b4dSzIgNEwc0CY0ElLBI6W8OxwKxs0VsMI9cLkt35EpAjQRbuYFxVgLzk1o
-         KARZYcb4S3/rboXjfFJmvD6gs2tca1n+zv3m1aQQ/zwmqrg/PFatNnIRDoKHJAJnT8Ek
-         TkWQ==
-X-Gm-Message-State: AO0yUKW597ExG/xUV+RUlsh57xO+cmuvnDKU50YVbSJHnHLVTgBSbz6r
-        m6h25azrLfZljNEH2QG3thogCoe8MUU=
-X-Google-Smtp-Source: AK7set/jqpuvjbeFE5jt1zVqCV3Blo7oJBxuP3YxCbGCaR5IOfd974RuKQOobQ2QpM44lMdsRa/uEw==
-X-Received: by 2002:a05:6e02:1e06:b0:315:5467:4a3f with SMTP id g6-20020a056e021e0600b0031554674a3fmr730362ila.30.1677817824713;
-        Thu, 02 Mar 2023 20:30:24 -0800 (PST)
-Received: from [172.17.0.2] ([40.86.28.132])
-        by smtp.gmail.com with ESMTPSA id t12-20020a056e02010c00b00317a2fed5b6sm330941ilm.45.2023.03.02.20.30.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Mar 2023 20:30:24 -0800 (PST)
-Message-ID: <640177e0.050a0220.237b8.0bdd@mx.google.com>
-Date:   Thu, 02 Mar 2023 20:30:24 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4682311922190521327=="
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J8kx+4RDaTM8iOHE5Xvj0WZgHMWsSn2e14La0mXAFQM=;
+        b=utmJwgQ0CDaWBVoPZuHWRwbGFHq67AO70vy7Mh+8A73aH0yttN/l/4oWGxiYoOMGie
+         sKmCYjoFGUeBRd+3KYhNlQfDCOzSUaw87eSrXwp22mFZ2S3BSiq45SRb1JtvrzCX589h
+         5U+XZSDs2W6lMMgQxoJBNCw35o72ZTvtMKZvIjVGDXYsIuPVJ1YFYgw5rBhKQFp5Z1iz
+         LGhaCuwZyeC7fAH/PDfHeaBOmmS1IS6YTNfSncRJZiZtdvWcoP0fs9RHym12t/xLF1ex
+         LL4cis65QUTgWuo5c8R8vTLIFMYckWvB4cAQoTp9IdFJbDS70jfAgCYU8u9EBzaMyO71
+         hIXA==
+X-Gm-Message-State: AO0yUKVGPSxulrVNdHFUIlE4QS9YMQ6SNMs2VL4QiWfca7qEeM5BDFZ1
+        yY4lP56Ap6kI0hOcPD4UBkopl9Sli45JpCysNqNhLI+6wNI=
+X-Google-Smtp-Source: AK7set/w8mbZwVcipyz/hEm1WcaRUlx/jjbac0ls4MXKADFcL1LXY6ZZgTHQ4uR/+ynmSPGg1hVvw2RPk41+HjOJKSw=
+X-Received: by 2002:a2e:b5a9:0:b0:295:ab47:1196 with SMTP id
+ f9-20020a2eb5a9000000b00295ab471196mr146545ljn.9.1677821643145; Thu, 02 Mar
+ 2023 21:34:03 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC,1/9] shared/crypto: Add bt_crypto_sirk
-In-Reply-To: <20230303012742.1386291-1-luiz.dentz@gmail.com>
-References: <20230303012742.1386291-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <1fd2d4523c139deda93aab2c31f1508d79c32472.1676921889.git.pav@iki.fi>
+ <CABBYNZ+kGVtCXN1X7ZOG64mLfWfXBah_Qo5+cy2dGWQMbNidoA@mail.gmail.com>
+ <cb4b657b13f21bd9f164a0c205e31e3a2184c6c8.camel@iki.fi> <CABBYNZ+CTfOTh8KVo6r8o6wzAny+wB9=VnzWb=8+_39F-CMRRg@mail.gmail.com>
+ <b5e773ad0fc2a710356638d30ba7d3037948ad8c.camel@iki.fi>
+In-Reply-To: <b5e773ad0fc2a710356638d30ba7d3037948ad8c.camel@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 2 Mar 2023 21:33:51 -0800
+Message-ID: <CABBYNZL4B36SVrtm=nJ51nyeugSAzz0wvgZv+-OQ803R8BK6Cw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: ISO: fix timestamped HCI ISO data packet parsing
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4682311922190521327==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+On Fri, Feb 24, 2023 at 2:55=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Hi Luiz,
+>
+> pe, 2023-02-24 kello 12:41 -0800, Luiz Augusto von Dentz kirjoitti:
+> > On Fri, Feb 24, 2023 at 11:52 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > > ti, 2023-02-21 kello 14:08 -0800, Luiz Augusto von Dentz kirjoitti:
+> > > > > Hi Pauli,
+> > > > >
+> > > > > On Mon, Feb 20, 2023 at 11:42 AM Pauli Virtanen <pav@iki.fi> wrot=
+e:
+> > > > > > >
+> > > > > > > Use correct HCI ISO data packet header struct when the packet=
+ has
+> > > > > > > timestamp. The timestamp, when present, goes before the other=
+ fields
+> > > > > > > (Core v5.3 4E 5.4.5), so the structs are not compatible.
+> > > > > > >
+> > > > > > > Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type"=
+)
+> > > > > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > > > > > > ---
+> > > > > > >
+> > > > > > > Notes:
+> > > > > > >     My hardware doesn't seem to produce timestamped packets, =
+so this is not
+> > > > > > >     properly tested, except to the extent that it doesn't bre=
+ak the
+> > > > > > >     non-timestamped code path.
+> > > > > > >
+> > > > > > >     Regardless, the current state of things looks wrong, so s=
+ending this to
+> > > > > > >     the list in any case.
+> > > > >
+> > > > > Perhaps we should first attempt to enable this in the emulator, I=
+d use
+> > > > > BT_HCI_CMD_LE_READ_ISO_TX_SYNC as hint that the host is intereste=
+d in
+> > > > > knowing the timestamp:
+> > > > >
+> > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/emulator/=
+btdev.c#n5752
+> > >
+> > > Yes, it probably would be best, and probably not too complicated to d=
+o
+> > > at least if we are happy with not per spec timestamps.
+> > >
+> > > > > > >  net/bluetooth/iso.c | 9 +++++++--
+> > > > > > >  1 file changed, 7 insertions(+), 2 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> > > > > > > index 2dabef488eaa..cb959e8eac18 100644
+> > > > > > > --- a/net/bluetooth/iso.c
+> > > > > > > +++ b/net/bluetooth/iso.c
+> > > > > > > @@ -1621,7 +1621,6 @@ static void iso_disconn_cfm(struct
+> > > > > > > hci_conn *hcon, __u8 reason)
+> > > > > > >  void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u1=
+6
+> > > > > > > flags)
+> > > > > > >  {
+> > > > > > >         struct iso_conn *conn =3D hcon->iso_data;
+> > > > > > > -       struct hci_iso_data_hdr *hdr;
+> > > > > > >         __u16 pb, ts, len;
+> > > > > > >
+> > > > > > >         if (!conn)
+> > > > > > > @@ -1643,6 +1642,8 @@ void iso_recv(struct hci_conn *hcon,
+> > > > > > > struct sk_buff *skb, u16 flags)
+> > > > > > >                 }
+> > > > > > >
+> > > > > > >                 if (ts) {
+> > > > > > > +                       struct hci_iso_ts_data_hdr *hdr;
+> > > > > > > +
+> > > > > > >                         /* TODO: add timestamp to the packet?
+> > > > > > > */
+> > > > >
+> > > > > Perhaps we should use skb_set_delivery_time to set the timestamp =
+as
+> > > > > received by the controller? That said I don't know if the unit
+> > > > > would
+> > > > > be compatible.
+> > >
+> > > The userspace I think is interested also in the sequence number and
+> > > packet status flags (if controller knows data is corrupted, that shou=
+ld
+> > > be indicated to userspace, similarly for missed packets). Would e.g.
+> > > putting all these into some custom cmsg struct be better here?
+> > >
+> > > This timestamp is also based on controller clock. Not sure if
+> > > delivery_time is supposed to be in system clock not some unrelated
+> > > hardware clock.
+> > >
+> > > Userspace may also want to set the packet sequence numbers and
+> > > timestamps itself when sending, to indicate in which interval it want=
+ed
+> > > things to come out.
+> > >
+> > > On systems where synchronization to Controller ISO clock is not
+> > > available (it IIUC cannot really be done via HCI and so this is likel=
+y
+> > > the situation on desktop/laptop machines), userspace needs some other
+> > > tool to keep its SDU timing in sync with the controller, and for e.g.
+> > > keeping a fixed number of packets queued to have some buffer for miss=
+ed
+> > > deadlines, and making sure there is no timing offset between eg. left
+> > > and right earpieces of TWS headset.
+> >
+> > Yeah, btw I will be posting the patches for CSIP soon and I wonder if
+> > you could check with this headset of yours, in fact we probably need
+> > some changes to the likes of pipewire to detect the presence of
+> > DeviceSet object and split the left and right streams.
+>
+> I'll test the CSIP patchset with the Samsung TWS headset I have. I'm
+> also going to make the necessary changes to Pipewire, to see how it
+> works from our side.
 
-Dear submitter,
+I just posted an RFC set:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=726293
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D726293
 
----Test result---
+Make sure you also have the set bellow, apparently this was the cause
+of transport not showing up since bap_ready callback was called to
+early before we had subscribed for notifications, etc:
 
-Test Summary:
-CheckPatch                    FAIL      5.05 seconds
-GitLint                       PASS      2.30 seconds
-BuildEll                      PASS      26.19 seconds
-BluezMake                     PASS      751.94 seconds
-MakeCheck                     PASS      11.07 seconds
-MakeDistcheck                 PASS      147.73 seconds
-CheckValgrind                 PASS      240.16 seconds
-CheckSmatch                   WARNING   321.92 seconds
-bluezmakeextell               PASS      97.20 seconds
-IncrementalBuild              PASS      5482.90 seconds
-ScanBuild                     PASS      953.10 seconds
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D726232
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[RFC,1/9] shared/crypto: Add bt_crypto_sirk
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#84: 
- - Generate a hash (sirk) using vendor, product, version and source as input
+> FWIW, right now, there are issues in getting reliable BAP audio on this
+> TWS headset device (with one earbud only currently) --- I'm sending
+> unframed LC3 packets to the ISO socket with sub-ms timing accuracy (err
+> ~ 0.2ms max, 50us std) and there are still frequent pops in sine wave.
+> Stuffing extra 2-4 packets to the socket at the start of playback seems
+> to reduce the problem, so maybe the tx sync issue is suspect.
 
-/github/workspace/src/src/13158198.patch total: 0 errors, 1 warnings, 49 lines checked
+Yeah, Im afraid the headset might be trying to minimize using a jitter
+buffer so if we miss any internal it will cause such problem, the
+other problem is that the controller may not be reporting the Number
+of Packets Complete one by one, which cause us to send packets in
+batches which end up removing the timing accuracy of the socket since
+we have to wait the controller to acknowledge the packets previously
+sent, perhaps we could try detecting this behavior and disable Number
+of Packets Complete flow control, so we send based on the configured
+interval no matter if we think there is a buffer available in the
+controller or not.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+> However, no such problem with nrf5430 or ax210+bluez+pipewire as
+> receiver, so not really yet clear.
+>
+> > > This probably means things like information on the timing of the late=
+st
+> > > Number of Completed Packets event for the handle, the number of
+> > > currently queued ISO packets on the controller, and the sequence numb=
+er
+> > > of the latest packet queued on controller (to know how much is still =
+in
+> > > socket buffer). Probably also LE Read TX Sync information to know
+> > > controller timestamp on a sent packet...
+> > >
+> > > Does this go via some new ioctls? Or send empty packets with some cms=
+g
+> > > (so userspace can just poll until it needs to do something)?
+> > >
+> > > It should also be decided how much the kernel is going to be involved
+> > > in getting the SDU timing, sequence numbers, etc. right, or whether
+> > > it's just left to the userspace.
+> > >
+> > > Before trying to propose something here, I think I'd need to first ma=
+ke
+> > > some prototypes so that it becomes clearer how it would best work.
+> >
+> > I think we might want to use BT_PKT_STATUS, like is done for SCO, to
+> > carry information such as controller timestamp, etc, have a look at
+> > it:
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
+t.git/tree/net/bluetooth/sco.c#n450
+>
+>
+> Yes, for RX that's probably what it should be.
+>
+> > >
+> > > > > > >                         hdr =3D skb_pull_data(skb,
+> > > > > > > HCI_ISO_TS_DATA_HDR_SIZE);
+> > > > > > >                         if (!hdr) {
+> > > > > > > @@ -1650,15 +1651,19 @@ void iso_recv(struct hci_conn *hcon,
+> > > > > > > struct sk_buff *skb, u16 flags)
+> > > > > > >                                 goto drop;
+> > > > > > >                         }
+> > > > > > >
+> > > > > > > +                       len =3D __le16_to_cpu(hdr->slen);
+> > > > > > >                 } else {
+> > > > > > > +                       struct hci_iso_data_hdr *hdr;
+> > > > > > > +
+> > > > > > >                         hdr =3D skb_pull_data(skb,
+> > > > > > > HCI_ISO_DATA_HDR_SIZE);
+> > > > > > >                         if (!hdr) {
+> > > > > > >                                 BT_ERR("Frame is too short (l=
+en
+> > > > > > > %d)", skb->len);
+> > > > > > >                                 goto drop;
+> > > > > > >                         }
+> > > > > > > +
+> > > > > > > +                       len =3D __le16_to_cpu(hdr->slen);
+> > > > > > >                 }
+> > > > > > >
+> > > > > > > -               len    =3D __le16_to_cpu(hdr->slen);
+> > > > > > >                 flags  =3D hci_iso_data_flags(len);
+> > > > > > >                 len    =3D hci_iso_data_len(len);
+> > > > > > >
+> > > > > > > --
+> > > > > > > 2.39.2
+> > > > > > >
+> > > > >
+> > > > >
+> > >
+> > >
+> >
+> >
+>
+> --
+> Pauli Virtanen
 
-/github/workspace/src/src/13158198.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-[RFC,6/9] main.conf: Add CSIP profile configurable options
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#145: FILE: src/main.c:153:
-+static const char *csip_options[] = {
-
-/github/workspace/src/src/13158203.patch total: 0 errors, 1 warnings, 217 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13158203.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[RFC,7/9] shared/csip: Add initial code for handling CSIP
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#998: FILE: src/shared/csip.h:16:
-+#define __packed __attribute__((packed))
-
-/github/workspace/src/src/13158205.patch total: 0 errors, 1 warnings, 940 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13158205.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.src/shared/crypto.c:271:21: warning: Variable length array is used.src/shared/crypto.c:272:23: warning: Variable length array is used.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4682311922190521327==--
+--=20
+Luiz Augusto von Dentz
