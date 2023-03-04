@@ -2,256 +2,163 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67995C6FA8E
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Mar 2023 06:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56108C64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Mar 2023 13:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbjCDG0z (ORCPT
+        id S229453AbjCDNur (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Mar 2023 01:26:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
+        Sat, 4 Mar 2023 08:50:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjCDG0y (ORCPT
+        with ESMTP id S229437AbjCDNuq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Mar 2023 01:26:54 -0500
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6F325B9A
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Mar 2023 22:26:51 -0800 (PST)
-Received: by mail-io1-f72.google.com with SMTP id n42-20020a056602342a00b0074cde755b99so2589619ioz.16
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Mar 2023 22:26:51 -0800 (PST)
+        Sat, 4 Mar 2023 08:50:46 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40F03EB58;
+        Sat,  4 Mar 2023 05:50:45 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id a2so5595653plm.4;
+        Sat, 04 Mar 2023 05:50:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1677937845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=55fX7XmVrjOhmxNsuhTqY9HmQVxMxyykjJcmJvuidsU=;
+        b=OmtbjRr+nsnQBjrXWIYmJvZQS+3fz+Cg/MG8pJ83B4OHnWKzOj49OfozXhhgIqvWGu
+         bqQFq1Y1JZ53ctY0IIijMjIVjftHzltd5FTjFkJ88gkzsqxSr/AJ7gfZO0TjskluRInJ
+         piNSHLhNv4Tv23j1SXyeG5hc+GxZNFU++vaCtzbaDi6NPEEU8t0VlURNzeusZF4HoHWt
+         q1+qr8ZmHK54pJUPXIlabiJ1Bm08qyizU7BH6p6ihRCOLDChzBnlsxxKmGuGIz8Rjce2
+         5QIa8bm8nmucxZ9AUjY0OWr9vVU5ve87Ab11Khce9jcMGmmmVbxEPeWWdA+oPhuYNVUM
+         pxaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8b1/t8Nqjt+49ocjKAgJWd+UAu49XM23tOZbPtJ+WS4=;
-        b=vjCc5ERZUG8ZPyba1VaMPZkiAQtpOoWatJptgSega9gCiR1JuG8QDJRwH7+46jKl6M
-         bMRPfn/ojBh6bArKZjyV8Jx32jg2obM/XoVdQdC6+sAFHTgbuSkm6pzlHPMcNCYVaE4Z
-         xppV/9/68KUByLA0XkNVlPYj7yOMcIXUqnQgUJoMFasZDEZAqxmncyRIj+dSjjZjYAfd
-         1BYwipWA/VwxCs8Ke9S6R3XXenkxsU5gJaGcpaxwnQvUmbx/mx6P66rqnGKn/vKXzmGX
-         XtRWo6rZgb4rtwiJ2GuMInT24lJZt9IZiZtCDjVTKt+x+Tn599Zl8v3oot5WruWeYwob
-         o7Tw==
-X-Gm-Message-State: AO0yUKXQQIXUkRAVxcCF14F5HsgjtpIwzcXYpocWOjW7bNcA6hjEQDu4
-        ZJzC3hi3ndLmoCxtxTcQSAwl7NJgGeCISPeL98Io0yL12hvR
-X-Google-Smtp-Source: AK7set9CQ8z4oNv4G2Y3ici09DGsJT+UCgWrGetPv+TmPhKS/WqfKnJqBzmuJaUF3KlckmLLFPxuiGgUbbtIpDiu8yOqvqOxKxae
+        d=1e100.net; s=20210112; t=1677937845;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=55fX7XmVrjOhmxNsuhTqY9HmQVxMxyykjJcmJvuidsU=;
+        b=6WefFp6eItilQ9S/TSkSkX9pEvMI1+dFkltgPTukZB2MBou7TdBG7UCpcmugVx+E1X
+         U67GlaNmBvMfomSxTJ2eVLu3DmDHhAHMG0m2RuH5IGTRmnsBLJgwZm8kadZrd0wDPY0X
+         hXTqffqqtBjlRYLlRXD0SCVwOcEQ1OQEi7f/2ykXUPtsmx6xX33WbaGkUG4hXEsi4WnM
+         2DJRo2Y7+hKiMiMkyGCCHY4r+imi+uNf6gxOUYApNBVbvikICfm77DLEujUfXVPUsJiL
+         T8+ai+JPpXlfX+j1K61EVFJFM3IPAF1CYE6d3C2flubOBqOi0/6ZV+35xN0r7QHShTNz
+         Dy6Q==
+X-Gm-Message-State: AO0yUKXgYMIUa3IO7vCe5qAH33dIldb08afiz6BL3S1qQzu/Wc2rp0eQ
+        oI8zKaGYQ1Q8lpF95EDq4GE=
+X-Google-Smtp-Source: AK7set9L78JEUAdTmlSpluFThbWCI/GGjtWZpfaHfq7WEBm11psjgDhJ4tgHe5P7kNGDjW80IhW+wg==
+X-Received: by 2002:a17:903:234a:b0:19a:b1ac:45d4 with SMTP id c10-20020a170903234a00b0019ab1ac45d4mr6025132plh.3.1677937844732;
+        Sat, 04 Mar 2023 05:50:44 -0800 (PST)
+Received: from ubuntu.localdomain ([112.10.230.37])
+        by smtp.gmail.com with ESMTPSA id 4-20020a170902e9c400b0019c61616f82sm3362161plk.230.2023.03.04.05.50.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Mar 2023 05:50:44 -0800 (PST)
+From:   Min Li <lm0963hack@gmail.com>
+To:     luiz.dentz@gmail.com
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jkosina@suse.cz, hdegoede@redhat.com, david.rheinsberg@gmail.com,
+        wsa+renesas@sang-engineering.com, linux@weissschuh.net,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/1] Bluetooth: fix race condition in hci_cmd_sync_clear
+Date:   Sat,  4 Mar 2023 21:50:35 +0800
+Message-Id: <20230304135035.6232-1-lm0963hack@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:36ea:b0:3ec:46d4:e15 with SMTP id
- t42-20020a05663836ea00b003ec46d40e15mr3356235jau.3.1677911210494; Fri, 03 Mar
- 2023 22:26:50 -0800 (PST)
-Date:   Fri, 03 Mar 2023 22:26:50 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000aa920505f60d25ad@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in hci_conn_hash_flush
-From:   syzbot <syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+There is a potential race condition in hci_cmd_sync_work and
+hci_cmd_sync_clear, and could lead to use-after-free. For instance,
+hci_cmd_sync_work is added to the 'req_workqueue' after cancel_work_sync
+The entry of 'cmd_sync_work_list' may be freed in hci_cmd_sync_clear, and
+causing kernel panic when it is used in 'hci_cmd_sync_work'.
 
-syzbot found the following issue on:
+Here's the call trace:
 
-HEAD commit:    1acf39ef8f14 Add linux-next specific files for 20230303
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=115b8e38c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e4da7f0aef5d2eb8
-dashboard link: https://syzkaller.appspot.com/bug?extid=8bb72f86fc823817bc5d
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+dump_stack_lvl+0x49/0x63
+print_report.cold+0x5e/0x5d3
+? hci_cmd_sync_work+0x282/0x320
+kasan_report+0xaa/0x120
+? hci_cmd_sync_work+0x282/0x320
+__asan_report_load8_noabort+0x14/0x20
+hci_cmd_sync_work+0x282/0x320
+process_one_work+0x77b/0x11c0
+? _raw_spin_lock_irq+0x8e/0xf0
+worker_thread+0x544/0x1180
+? poll_idle+0x1e0/0x1e0
+kthread+0x285/0x320
+? process_one_work+0x11c0/0x11c0
+? kthread_complete_and_exit+0x30/0x30
+ret_from_fork+0x22/0x30
+</TASK>
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Allocated by task 266:
+kasan_save_stack+0x26/0x50
+__kasan_kmalloc+0xae/0xe0
+kmem_cache_alloc_trace+0x191/0x350
+hci_cmd_sync_queue+0x97/0x2b0
+hci_update_passive_scan+0x176/0x1d0
+le_conn_complete_evt+0x1b5/0x1a00
+hci_le_conn_complete_evt+0x234/0x340
+hci_le_meta_evt+0x231/0x4e0
+hci_event_packet+0x4c5/0xf00
+hci_rx_work+0x37d/0x880
+process_one_work+0x77b/0x11c0
+worker_thread+0x544/0x1180
+kthread+0x285/0x320
+ret_from_fork+0x22/0x30
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/721c5c42a073/disk-1acf39ef.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c5ca5353e61a/vmlinux-1acf39ef.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/29f477775fe9/bzImage-1acf39ef.xz
+Freed by task 269:
+kasan_save_stack+0x26/0x50
+kasan_set_track+0x25/0x40
+kasan_set_free_info+0x24/0x40
+____kasan_slab_free+0x176/0x1c0
+__kasan_slab_free+0x12/0x20
+slab_free_freelist_hook+0x95/0x1a0
+kfree+0xba/0x2f0
+hci_cmd_sync_clear+0x14c/0x210
+hci_unregister_dev+0xff/0x440
+vhci_release+0x7b/0xf0
+__fput+0x1f3/0x970
+____fput+0xe/0x20
+task_work_run+0xd4/0x160
+do_exit+0x8b0/0x22a0
+do_group_exit+0xba/0x2a0
+get_signal+0x1e4a/0x25b0
+arch_do_signal_or_restart+0x93/0x1f80
+exit_to_user_mode_prepare+0xf5/0x1a0
+syscall_exit_to_user_mode+0x26/0x50
+ret_from_fork+0x15/0x30
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com
+v2:
+  - Fixed code style issues
 
-==================================================================
-BUG: KASAN: slab-use-after-free in hci_conn_hash_flush+0x23c/0x260 net/bluetooth/hci_conn.c:2437
-Read of size 8 at addr ffff88808d354000 by task syz-executor.1/6401
-
-CPU: 1 PID: 6401 Comm: syz-executor.1 Not tainted 6.2.0-next-20230303-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
- print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:319
- print_report mm/kasan/report.c:430 [inline]
- kasan_report+0x11c/0x130 mm/kasan/report.c:536
- hci_conn_hash_flush+0x23c/0x260 net/bluetooth/hci_conn.c:2437
- hci_dev_close_sync+0x5fb/0x1200 net/bluetooth/hci_sync.c:4889
- hci_dev_do_close+0x31/0x70 net/bluetooth/hci_core.c:554
- hci_unregister_dev+0x1ce/0x580 net/bluetooth/hci_core.c:2702
- vhci_release+0x80/0xf0 drivers/bluetooth/hci_vhci.c:568
- __fput+0x27c/0xa90 fs/file_table.c:321
- task_work_run+0x16f/0x270 kernel/task_work.c:179
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xb42/0x2b60 kernel/exit.c:869
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1019
- __do_sys_exit_group kernel/exit.c:1030 [inline]
- __se_sys_exit_group kernel/exit.c:1028 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1028
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fea0308c0f9
-Code: Unable to access opcode bytes at 0x7fea0308c0cf.
-RSP: 002b:00007fff14dbd268 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 00007fff14dbd410 RCX: 00007fea0308c0f9
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000043
-RBP: 0000000000000000 R08: 0000000000000025 R09: 00007fff14dbd410
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fea030e7aba
-R13: 000000000000001c R14: 000000000000000f R15: 00007fff14dbd450
- </TASK>
-
-Allocated by task 6988:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- ____kasan_kmalloc mm/kasan/common.c:333 [inline]
- __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
- kmalloc include/linux/slab.h:580 [inline]
- kzalloc include/linux/slab.h:720 [inline]
- hci_conn_add+0xb8/0x15c0 net/bluetooth/hci_conn.c:962
- hci_connect_sco+0x42c/0xac0 net/bluetooth/hci_conn.c:1607
- sco_connect net/bluetooth/sco.c:255 [inline]
- sco_sock_connect+0x350/0xa60 net/bluetooth/sco.c:598
- __sys_connect_file+0x153/0x1a0 net/socket.c:2004
- __sys_connect+0x165/0x1a0 net/socket.c:2021
- __do_sys_connect net/socket.c:2031 [inline]
- __se_sys_connect net/socket.c:2028 [inline]
- __x64_sys_connect+0x73/0xb0 net/socket.c:2028
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Freed by task 6401:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- kasan_save_free_info+0x2e/0x40 mm/kasan/generic.c:521
- ____kasan_slab_free mm/kasan/common.c:236 [inline]
- ____kasan_slab_free+0x160/0x1c0 mm/kasan/common.c:200
- kasan_slab_free include/linux/kasan.h:162 [inline]
- slab_free_hook mm/slub.c:1781 [inline]
- slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1807
- slab_free mm/slub.c:3787 [inline]
- __kmem_cache_free+0xaf/0x2d0 mm/slub.c:3800
- device_release+0xa3/0x240 drivers/base/core.c:2436
- kobject_cleanup lib/kobject.c:681 [inline]
- kobject_release lib/kobject.c:712 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c2/0x4d0 lib/kobject.c:729
- put_device+0x1f/0x30 drivers/base/core.c:3697
- hci_conn_del+0x212/0xa70 net/bluetooth/hci_conn.c:1112
- hci_conn_del+0x7df/0xa70 net/bluetooth/hci_conn.c:1071
- hci_conn_hash_flush+0x19b/0x260 net/bluetooth/hci_conn.c:2441
- hci_dev_close_sync+0x5fb/0x1200 net/bluetooth/hci_sync.c:4889
- hci_dev_do_close+0x31/0x70 net/bluetooth/hci_core.c:554
- hci_unregister_dev+0x1ce/0x580 net/bluetooth/hci_core.c:2702
- vhci_release+0x80/0xf0 drivers/bluetooth/hci_vhci.c:568
- __fput+0x27c/0xa90 fs/file_table.c:321
- task_work_run+0x16f/0x270 kernel/task_work.c:179
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xb42/0x2b60 kernel/exit.c:869
- do_group_exit+0xd4/0x2a0 kernel/exit.c:1019
- __do_sys_exit_group kernel/exit.c:1030 [inline]
- __se_sys_exit_group kernel/exit.c:1028 [inline]
- __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1028
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Last potentially related work creation:
- kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
- __kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:491
- insert_work+0x48/0x350 kernel/workqueue.c:1361
- __queue_work+0x5fd/0x1170 kernel/workqueue.c:1524
- __queue_delayed_work+0x1c8/0x270 kernel/workqueue.c:1672
- queue_delayed_work_on+0x109/0x120 kernel/workqueue.c:1708
- queue_delayed_work include/linux/workqueue.h:519 [inline]
- hci_conn_drop include/net/bluetooth/hci_core.h:1417 [inline]
- hci_conn_drop include/net/bluetooth/hci_core.h:1387 [inline]
- sco_chan_del+0x1f8/0x4f0 net/bluetooth/sco.c:169
- __sco_sock_close+0x178/0x740 net/bluetooth/sco.c:431
- sco_sock_close net/bluetooth/sco.c:446 [inline]
- sco_sock_release+0x81/0x360 net/bluetooth/sco.c:1254
- __sock_release+0xcd/0x290 net/socket.c:651
- sock_close+0x1c/0x20 net/socket.c:1393
- __fput+0x27c/0xa90 fs/file_table.c:321
- task_work_run+0x16f/0x270 kernel/task_work.c:179
- get_signal+0x1c7/0x25b0 kernel/signal.c:2635
- arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
- exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
- exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:203
- __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
- syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
- do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-The buggy address belongs to the object at ffff88808d354000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 0 bytes inside of
- freed 4096-byte region [ffff88808d354000, ffff88808d355000)
-
-The buggy address belongs to the physical page:
-page:ffffea000234d400 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x8d350
-head:ffffea000234d400 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000010200 ffff888012442140 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 5125, tgid 5125 (syz-executor.2), ts 331563645285, free_ts 0
- prep_new_page mm/page_alloc.c:2492 [inline]
- get_page_from_freelist+0xf75/0x2ad0 mm/page_alloc.c:4256
- __alloc_pages+0x1cb/0x5c0 mm/page_alloc.c:5522
- alloc_pages+0x1aa/0x270 mm/mempolicy.c:2283
- alloc_slab_page mm/slub.c:1851 [inline]
- allocate_slab+0x28e/0x380 mm/slub.c:1998
- new_slab mm/slub.c:2051 [inline]
- ___slab_alloc+0xa91/0x1400 mm/slub.c:3193
- __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3292
- __slab_alloc_node mm/slub.c:3345 [inline]
- slab_alloc_node mm/slub.c:3442 [inline]
- __kmem_cache_alloc_node+0x136/0x320 mm/slub.c:3491
- __do_kmalloc_node mm/slab_common.c:966 [inline]
- __kmalloc+0x4a/0xd0 mm/slab_common.c:980
- kmalloc include/linux/slab.h:584 [inline]
- tomoyo_realpath_from_path+0xc3/0x600 security/tomoyo/realpath.c:251
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_path_perm+0x22d/0x430 security/tomoyo/file.c:822
- security_inode_getattr+0xd3/0x140 security/security.c:1375
- vfs_getattr fs/stat.c:167 [inline]
- vfs_fstat+0x47/0xb0 fs/stat.c:192
- __do_sys_newfstat+0x7a/0xf0 fs/stat.c:456
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88808d353f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88808d353f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88808d354000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                   ^
- ffff88808d354080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88808d354100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
+Signed-off-by: Min Li <lm0963hack@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/bluetooth/hci_sync.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 117eedb6f709..3103daf49d63 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -643,6 +643,7 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
+ 	cancel_work_sync(&hdev->cmd_sync_work);
+ 	cancel_work_sync(&hdev->reenable_adv_work);
+ 
++	mutex_lock(&hdev->cmd_sync_work_lock);
+ 	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
+ 		if (entry->destroy)
+ 			entry->destroy(hdev, entry->data, -ECANCELED);
+@@ -650,6 +651,7 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
+ 		list_del(&entry->list);
+ 		kfree(entry);
+ 	}
++	mutex_unlock(&hdev->cmd_sync_work_lock);
+ }
+ 
+ void __hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
+-- 
+2.25.1
+
