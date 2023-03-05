@@ -2,108 +2,125 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 651D5C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Mar 2023 17:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 188F2C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Mar 2023 18:07:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229509AbjCERGc (ORCPT
+        id S229556AbjCESH1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Mar 2023 12:06:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51038 "EHLO
+        Sun, 5 Mar 2023 13:07:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbjCERGb (ORCPT
+        with ESMTP id S229485AbjCESH0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Mar 2023 12:06:31 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F27A5F1
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Mar 2023 09:06:29 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id da10so29515189edb.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Mar 2023 09:06:29 -0800 (PST)
+        Sun, 5 Mar 2023 13:07:26 -0500
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A74AE05F
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Mar 2023 10:07:24 -0800 (PST)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-17638494edbso9059566fac.10
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Mar 2023 10:07:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b376BcmY8KNmZgL5zpNc/POWdTvwm0NJfZvaKwsdKN0=;
-        b=Ri5zj+N3Pkl4IEKn1I2vgYwrnyNhxyOmDKgvk+LyCniwh9Sf3aMh0LoMlMXuw+xX7n
-         lVxnsPyJik3kanAExPddM4qOzMERFPmAa/hjpwMkusOOzTQnl0Mruwrr4I11p+2rYC+H
-         y1prlBQTtZ6cKLvt/Gk1G4l0T+RwYFsOCczzmvfzuesqgOo6gS/XkjnK+Rv3Ep3xgjyM
-         AFyH+cQFgXrPiOVD5WQFn2qoXvyWzmoD0SLFdH+Viop4bk8f149KfwftFQbBt7Mxxgfl
-         Wak8J5xWacUEK0WRRIIrtoUa9nV4xqg2gFl5fo3omw5PlJuFCtzH2SONEvHDNj3Spumc
-         z6yQ==
+        d=gmail.com; s=20210112; t=1678039644;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=swUDSaOLnSvGvFkUhSa0vlK+6aXpUeGsayijGiqQF5s=;
+        b=GYQWX/z8OwRa2+2coBnrSc6MxunO2dFA9847KxYl9va7HgQ4V/Y126I5yNr8HNytKV
+         hiev3OGrH6JBvTeOfYzlF0wllTzior4sAf3ixzkzBEoAvg5hizuNnCzaQAGZDjTWgaE0
+         lt/CsJg0AZCY7pF54w7uhD6nZKEOzRit7LS37NrVWC0z4sstUsI/XBFYEPIcDqXjdnZN
+         o2HCxv2aC7XT1jCpG3RXUAAirbd/SMQH5RgsgqOMXHYcJnIWAZiR0pBOOHMJ5aUrVu5m
+         cjVSk5/s5hRotyM4lRITyY/7IGWz+/sve0y+oW+Anz1jgz8oFLV9Vw9XOZ8dgYQLNujJ
+         CcYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1678039644;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=b376BcmY8KNmZgL5zpNc/POWdTvwm0NJfZvaKwsdKN0=;
-        b=pzJUdT7NlFe0e3zB2sNOtj4jCt6HXYrp3sfiijvdObWnwY+3Wj6Bu8o2ue8KrTIS8G
-         Wc6M6c1U66LRFcdlhMSLxqcO/dlfWr5KpsClmHhgfdyubVaefJa5bQ+8A5aPmx4OkI21
-         95wdhAIbQS2jUiJmd3aDUj8VLVHZCYkAoUdQT5baUs/+mBumoe/MgrNhuJIpU6AyLk+A
-         z/2vQgYrzMNmlXlm74MdKhe+wzwXD+Qb3ATFTaMDAv3tZEJMkrG1SswTsT9TFNax14pL
-         ygpIxZjKLqiFzUi9dsfDU7BQpchBiv40eOpGkTrKcNerRyT7NegOGNplfCfHg590ndce
-         FAyQ==
-X-Gm-Message-State: AO0yUKV/Qn+NxRU0+NYp2uvNPUn+aQccOGTQ3Gi3UHPF7kh4TswsCpOk
-        WDd0tZK3oQ1b8kUp8a5V8CTpHeY2hH78PA==
-X-Google-Smtp-Source: AK7set/N/Mbq5Nc2f7D4FgofrySxDFnul1f9ESfrdZhCfka5X4M0H8772vjwKzCN/ThUSgsW05yOBA==
-X-Received: by 2002:aa7:d60b:0:b0:4bd:94b9:b8a8 with SMTP id c11-20020aa7d60b000000b004bd94b9b8a8mr7207309edr.26.1678035987941;
-        Sun, 05 Mar 2023 09:06:27 -0800 (PST)
-Received: from localhost.localdomain ([2a01:4f8:1c1c:178b:22ae:1142:5121:aced])
-        by smtp.gmail.com with ESMTPSA id p7-20020a50cd87000000b004aef147add6sm3910057edi.47.2023.03.05.09.06.24
+        bh=swUDSaOLnSvGvFkUhSa0vlK+6aXpUeGsayijGiqQF5s=;
+        b=p6tXdwCNwMH0IhNZd1VJpu5qpBhPbsOwN2vg10yxMeyXW/iPtKA2AP5AqwB/MkjCAa
+         DvO11/naBV7FVVgiGVaSd0HF3/i9z2RAoa6fiwV5e6z3KAdOcWKyxy0KvTi0mNyHykKM
+         2t8pMRJDo0yG2NvJZX2Z4LpvW4QDIIognWISFbrw8weE0/qoZzSFzzHi5uXpGO7P33/o
+         smzjFhJd4Zqla8PL3cLu1Qexki7mYxsbjnP4jojoU0s2TzDHS0IZVJwvERg7SkZbIJ1w
+         LsNHBW624ZrCy2vzT7rdpn6PFLSnywk25EyCPEsD5vMiqUmLkTglFW10QXgnWuUsfpDZ
+         UnUg==
+X-Gm-Message-State: AO0yUKXs137eCCIR7VqgN4QtQqqaDgQht8xlIejGC5b3ba2awh5mw0A/
+        FJgQbbshYD2TYIQY87nhl83H1W48pf0=
+X-Google-Smtp-Source: AK7set8MH/GporQSYT3ZcbGp02CkDdMDsaazRB1RiE9hqN4+PYA9ycKhw9RSmyawQbY/K20mM5AiLA==
+X-Received: by 2002:a05:6870:fb8c:b0:176:39b1:51c6 with SMTP id kv12-20020a056870fb8c00b0017639b151c6mr5250003oab.5.1678039643727;
+        Sun, 05 Mar 2023 10:07:23 -0800 (PST)
+Received: from [172.17.0.2] ([52.248.87.128])
+        by smtp.gmail.com with ESMTPSA id z21-20020a056870739500b0017697dfc20fsm1552050oam.12.2023.03.05.10.07.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Mar 2023 09:06:27 -0800 (PST)
-From:   Fushan Wen <qydwhotmail@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Fushan Wen <qydwhotmail@gmail.com>
-Subject: [PATCH BlueZ] Fix missing required properties in MPRIS
-Date:   Mon,  6 Mar 2023 01:05:51 +0800
-Message-Id: <20230305170551.2572-1-qydwhotmail@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Sun, 05 Mar 2023 10:07:23 -0800 (PST)
+Message-ID: <6404da5b.050a0220.3dd38.4d37@mx.google.com>
+Date:   Sun, 05 Mar 2023 10:07:23 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4578713277595138085=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, qydwhotmail@gmail.com
+Subject: RE: [BlueZ] Fix missing required properties in MPRIS
+In-Reply-To: <20230305170551.2572-1-qydwhotmail@gmail.com>
+References: <20230305170551.2572-1-qydwhotmail@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--===============4578713277595138085==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=726694
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.66 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      26.58 seconds
+BluezMake                     PASS      774.54 seconds
+MakeCheck                     PASS      10.78 seconds
+MakeDistcheck                 PASS      150.29 seconds
+CheckValgrind                 PASS      241.45 seconds
+CheckSmatch                   PASS      322.65 seconds
+bluezmakeextell               PASS      97.04 seconds
+IncrementalBuild              PASS      620.01 seconds
+ScanBuild                     PASS      981.51 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] Fix missing required properties in MPRIS
+WARNING:TYPO_SPELLING: 'requried' may be misspelled - perhaps 'required'?
+#79: 
 "SupportedUriSchemes" and "SupportedMimeTypes" are requried properties
-in org.mpris.MediaPlayer2. Some MPRIS clients will ignore an MPRIS
-interface if the two properties do not exist.
+                                                   ^^^^^^^^
 
-This helps fix https://bugs.kde.org/show_bug.cgi?id=466288
+/github/workspace/src/src/13160178.patch total: 0 errors, 1 warnings, 26 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13160178.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- tools/mpris-proxy.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mpris-proxy.c b/tools/mpris-proxy.c
-index e5fc91f..a69b872 100644
---- a/tools/mpris-proxy.c
-+++ b/tools/mpris-proxy.c
-@@ -1401,6 +1401,18 @@ static gboolean get_tracklist(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean get_emptylist(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	DBusMessageIter array_iter;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+			DBUS_TYPE_STRING_AS_STRING, &array_iter);
-+	dbus_message_iter_close_container(iter, &array_iter);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable mpris_properties[] = {
- 	{ "CanQuit", "b", get_disable, NULL, NULL },
- 	{ "Fullscreen", "b", get_disable, NULL, NULL },
-@@ -1408,6 +1420,8 @@ static const GDBusPropertyTable mpris_properties[] = {
- 	{ "CanRaise", "b", get_disable, NULL, NULL },
- 	{ "HasTrackList", "b", get_tracklist, NULL, NULL },
- 	{ "Identity", "s", get_name, NULL, NULL },
-+	{ "SupportedUriSchemes", "as", get_emptylist, NULL, NULL },
-+	{ "SupportedMimeTypes", "as", get_emptylist, NULL, NULL },
- 	{ }
- };
- 
--- 
-2.39.2
 
+--===============4578713277595138085==--
