@@ -2,118 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FCAC678D4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 09:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A97BC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 09:36:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229638AbjCFJHm (ORCPT
+        id S230075AbjCFJgG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Mar 2023 04:07:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42198 "EHLO
+        Mon, 6 Mar 2023 04:36:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229885AbjCFJHh (ORCPT
+        with ESMTP id S230089AbjCFJgB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Mar 2023 04:07:37 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342A222A13
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 01:07:36 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id a10-20020a056a000c8a00b005fc6b117942so5139786pfv.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Mar 2023 01:07:36 -0800 (PST)
+        Mon, 6 Mar 2023 04:36:01 -0500
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27218233ED
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 01:35:48 -0800 (PST)
+Received: by mail-qt1-x82a.google.com with SMTP id c3so9790922qtc.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Mar 2023 01:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678093655;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4A46wKTC+CcMedW/G9j+SuC/vj+S0/LGxEORBPUqymI=;
-        b=jkvSAN8NSy+uLMta6N+AwFqfJL62XqCwN2Bvyh1/a4/UbQHwRL3F/PnRe/nQwArwp+
-         pOFb3Q5ynk4fHladF23EbePCt7qkXIXnZz31qzXoKEcyttpIsLznMvMwOYwFrIAZzTaa
-         JQ6HYh6KSSQtTZAjFvWY2qaQCCyGsnsU+sQGrAVrIEJMzbMjsSKERgSuP8SFd1AhIIXQ
-         nzs4sYU43IKvUecajKYsdYNRSr2m4gS6DyRR2g0M8z4QOplfdoba7KAt0mdbmpReptu/
-         kHiIF4rCYUdxPJkcT1kxuhqhIf3ofnBN6ZJjhZayUrHE/t/M+5gSPyyhK14GKyXbNDzB
-         lsGg==
+        d=gmail.com; s=20210112; t=1678095347;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xVpqh/Acx+iZGUKBTpLjCzL2Uz3jjtgTP6VHMRFYONQ=;
+        b=Pt+mPF1fqXylTYMjLXlV+uAAhieKLBErlfmlikn6Z3M+aOJ9O/WWdTwxWcN6cEelJY
+         YbcB9qIyRrLXVPtk/AP7PDxQ9DZCrlqlDLpwn/JJCZM4cqUR3RKogyea1nt8SP8sVX6E
+         MkttKCQa++z9Cag0DTCPD+IRs3vHQbZVntnkGQJ6lIwdu6BD+nRIqHQNlq68d5iCUltv
+         CEtGLu9xRwCYCQ5sP9EEUIn5zGLl5nE3txgtBOGLigZv4131FdirOJUBz+ttSkXXbkDc
+         lT4yBiAFMDCgJpYCWfyDHhlTPu7DiycASfIQyhdrqA0nN189UMO32rv75F+SfqX0RzXC
+         X4Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678093655;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4A46wKTC+CcMedW/G9j+SuC/vj+S0/LGxEORBPUqymI=;
-        b=3NTurkynaFc9x9zc7B23gCPQiAWvPPqr9mE7m5Ibxt6ltI29C2XVGbPkv7BBYKyxbX
-         ncQsbMksfJ/yWd2w1C4AcV0BVznNUkBgke+ufLNzZHbm19lVVzQMQFdtelBIQh0zl9F0
-         htjVZ/DAoMa7hoJLWnO7Efc5erMXnfFOPqOWVQ9e1JnVTTKpPTisCTLbiFRYpabtjJRy
-         gzLLxAkJMloTsVzYRSztbBVtgTWrksbI/3TosGFFYo9WGZPfs3pubrYnLPQ+bxASFx1n
-         zvzdfilloPOrE7ZteT1OKc1okAjF36hmnZyAOopNQoKVPXViF0f8a+YO40flyNJhsv8n
-         ++Dw==
-X-Gm-Message-State: AO0yUKXdK7yuTDaClEiwczgGasOG5XrHfdg3rl2ymPzwKuQtEZwLGj2C
-        cLBUjCPi6lOzqWZ3S5WF+ypC/FRcdrdkxXG74KqSXIDcttteOE6iza+JzqiIbQn5g7clCcQmn19
-        dFOlT1u5Mu5P0n8pasmOpxnD/Upc0Ur4MopGCm81n7aWF50MOBD+2epdKSXZPeRpua4FHaCQ4QP
-        AM
-X-Google-Smtp-Source: AK7set/jjFYkNXqa31b0x4vkHuOnIhd4oQL+wq7Pm60LeC6WBNHSXLU9Hyr58Rwz92XV5T/MwzVUExwVqHoS
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:d5f3:860e:1224:5e0a])
- (user=apusaka job=sendgmr) by 2002:a62:ce43:0:b0:593:dc61:2161 with SMTP id
- y64-20020a62ce43000000b00593dc612161mr4272494pfg.2.1678093655488; Mon, 06 Mar
- 2023 01:07:35 -0800 (PST)
-Date:   Mon,  6 Mar 2023 17:07:07 +0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc0.216.gc4246ad0f0-goog
-Message-ID: <20230306170628.1.I8d0612b2968dd4740a4ceaf42f329fb59d5b9324@changeid>
-Subject: [PATCH] Bluetooth: hci_sync: Don't wait peer's reply when powering off
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20210112; t=1678095347;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xVpqh/Acx+iZGUKBTpLjCzL2Uz3jjtgTP6VHMRFYONQ=;
+        b=jTE55HAXf8JDuM8AEwVE95GPyV/A7Ee0KEsr3sWbsMlWBti+KSOpTJA5k8PW7/mKdG
+         Q2KlGg1n61+8vAeHfMmp1GnF0ANcyxkcJKVOXhM3i18DYTTl3cdVzZXvfu/CAk4PY3e4
+         ofW7q6wSORuZWtTOGr8yJez+hXjzy1hJzDoLRq+jOXVPL3b0jXLJSHNkdMeL+1GovNC6
+         EqxFWQ1baUEAMoE3VSw+Br8/lMZUviVkkE+VvnY+ak1AsxdO4lEOB9Jo7Ng6aepnbrfa
+         1xy/N+i1gth+MXuarP3kN/S8vv1M1n2GTqeZynkiMy8fNYSkiaSJQO5rixsjKN7C1Rfl
+         QCsA==
+X-Gm-Message-State: AO0yUKUofIHSxuRwUBLbGrAAWfQ8G6orDUEeqGYYPhI4Q/r6Jr5co+6d
+        IQKZLaJk/2/MmGgYHAqi8ix1AngVzVg=
+X-Google-Smtp-Source: AK7set8gc3NTCTR3iISmznQa4KGJ1GElvff/tKi8FyoPjzctw/MsTUlJi8vx36yx/y+9wC4RHYRgqA==
+X-Received: by 2002:ac8:7d13:0:b0:3bf:dd45:ed68 with SMTP id g19-20020ac87d13000000b003bfdd45ed68mr16920628qtb.47.1678095347082;
+        Mon, 06 Mar 2023 01:35:47 -0800 (PST)
+Received: from [172.17.0.2] ([172.176.229.23])
+        by smtp.gmail.com with ESMTPSA id l11-20020a37f90b000000b0071ddbe8fe23sm7065289qkj.24.2023.03.06.01.35.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Mar 2023 01:35:46 -0800 (PST)
+Message-ID: <6405b3f2.370a0220.cb3ba.4861@mx.google.com>
+Date:   Mon, 06 Mar 2023 01:35:46 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0066982757305344303=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: Bluetooth: hci_sync: Don't wait peer's reply when powering off
+In-Reply-To: <20230306170628.1.I8d0612b2968dd4740a4ceaf42f329fb59d5b9324@changeid>
+References: <20230306170628.1.I8d0612b2968dd4740a4ceaf42f329fb59d5b9324@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============0066982757305344303==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Currently, when we initiate disconnection, we will wait for the peer's
-reply unless when we are suspending, where we fire and forget the
-disconnect request.
+This is automated email and please do not reply to this email!
 
-A similar case is when adapter is powering off. However, we still wait
-for the peer's reply in this case. Therefore, if the peer is
-unresponsive, the command will time out and the power off sequence
-will fail, causing "bluetooth powered on by itself" to users.
+Dear submitter,
 
-This patch makes the host doesn't wait for the peer's reply when the
-disconnection reason is powering off.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=726802
 
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.76 seconds
+GitLint                       PASS      0.38 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      34.50 seconds
+CheckAllWarning               PASS      37.61 seconds
+CheckSparse                   PASS      43.06 seconds
+CheckSmatch                   PASS      113.89 seconds
+BuildKernel32                 PASS      33.61 seconds
+TestRunnerSetup               PASS      479.47 seconds
+TestRunner_l2cap-tester       PASS      17.60 seconds
+TestRunner_iso-tester         PASS      19.19 seconds
+TestRunner_bnep-tester        PASS      6.15 seconds
+TestRunner_mgmt-tester        PASS      117.87 seconds
+TestRunner_rfcomm-tester      PASS      9.63 seconds
+TestRunner_sco-tester         PASS      8.56 seconds
+TestRunner_ioctl-tester       PASS      10.02 seconds
+TestRunner_mesh-tester        PASS      7.34 seconds
+TestRunner_smp-tester         PASS      8.42 seconds
+TestRunner_userchan-tester    PASS      6.11 seconds
+IncrementalBuild              PASS      30.68 seconds
+
+
 
 ---
+Regards,
+Linux Bluetooth
 
- net/bluetooth/hci_sync.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 561a519a11bd6..a6cea389b675f 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5103,10 +5103,12 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 	cp.handle = cpu_to_le16(conn->handle);
- 	cp.reason = reason;
- 
--	/* Wait for HCI_EV_DISCONN_COMPLETE not HCI_EV_CMD_STATUS when not
--	 * suspending.
-+	/* Wait for HCI_EV_DISCONN_COMPLETE, not HCI_EV_CMD_STATUS, when the
-+	 * reason is anything but HCI_ERROR_REMOTE_POWER_OFF. This reason is
-+	 * used when suspending or powering off, where we don't want to wait
-+	 * for the peer's response.
- 	 */
--	if (!hdev->suspended)
-+	if (reason != HCI_ERROR_REMOTE_POWER_OFF)
- 		return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
- 						sizeof(cp), &cp,
- 						HCI_EV_DISCONN_COMPLETE,
--- 
-2.40.0.rc0.216.gc4246ad0f0-goog
-
+--===============0066982757305344303==--
