@@ -2,80 +2,97 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 763F3C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 19:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFF0C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 22:32:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229705AbjCFToW (ORCPT
+        id S230042AbjCFWcn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Mar 2023 14:44:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45816 "EHLO
+        Mon, 6 Mar 2023 17:32:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbjCFToJ (ORCPT
+        with ESMTP id S229995AbjCFWck (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Mar 2023 14:44:09 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5337EE0
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 11:44:00 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 84A7DB8108B
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 19:43:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24E54C4339B
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 19:43:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678131838;
-        bh=wYCCzZa12jWrgFKQ/rgXM0DJSO2s0w3q091e/fgT760=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qUfxdF437TK4Sa1eHve9ssdxfjJE+Gi/49UHHkuxWyqHxbObTBEC2k91iHKG6PKLD
-         zmltEwj6+l2xo8seYEdejNTRKLM6wEro53ewy9Xp0o6IG+Tzv8fx2D827vm9AEBnVT
-         p+maU3i3IH5xPCkldslnD5IR1eBwI8F1IFcnPhdKaEHTMDNcKGvZMkQY1ZX5qcN6pH
-         syoei2+E34JsD+pUtlqUl1ygBGaQNfUhf7dm9KyFLkeewEjPlvr9Y/K+DqYcqpb2Td
-         uT/O2svKTH55oKkMhwicRxH7aBBRX8dTshJzNtl8iHfbhodFkxOXl6K2dIFmhh93tz
-         nL42ESmunTLCg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 0B756C43141; Mon,  6 Mar 2023 19:43:58 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Mon, 6 Mar 2023 17:32:40 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E506F636
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 14:32:39 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id b20so6889610pfo.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Mar 2023 14:32:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678141958;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qb8xtFrMji0ZrxEhtXoqfUaad86MGatiZYZtMFjD6Rk=;
+        b=bY4tGiBmYQetGMrq6PEnb2eMmBH4LizLMvE2BfxIf7wtdJDN0c1BepA2RHf7eRRjbP
+         FCthFJEvd0tlFghZw6yxrXjtPSJrzuTqEFZPpFx1KU6aTigqOi4bfOrWDdHzI2rslspN
+         2ssap4wbfLogF4IjU5OdK4WXMQJXfJBoiGh+bYC/0vbcJyXZNI8lf6Lxp9a2XpWQqS3h
+         VM3EltigNgma4UGTEsYMfSGP51b1tKk7ax+bzhfo/6X53Hq0qi44HgWeh1gPh3f09lm3
+         THMfi5+E66mis8HQSS5YlBpp//c+VCIuFLORbBce0CDNSQA3qjowM4ZfMkiF4Jsm/MzO
+         z2qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678141958;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qb8xtFrMji0ZrxEhtXoqfUaad86MGatiZYZtMFjD6Rk=;
+        b=fN1vqWoarxLz+iSYR0zyFhXSmp5E1WzLlHd6ehWkB5dAJrFF63hscxmrNNbEikM8KP
+         8mNr5Grp5Q8UO4WWNH40YG6PEbXtVsZ7vWN4X2C759rim+QRr422z2b1j/Q0oGK5zNOe
+         pnVFdb7bo17Us8Tlg49gGrWQq7gVQp6kvO92bq306bTsu5Ge+Bjt3Ze4DAbc9FvF8kG4
+         e2Gz24U9VJ08OB9Zu3GeLlvOtfAkD/ywyFG+ZxV23AeXXdwgsZf8AhTrpoaaP0UkisTH
+         p6LG/Bmwgt2FwONCaDFwgijCuXqufQ/+pc0qBHkDOtzgL/k/sFOH9PWnvNSpNUuqUdwC
+         DfGw==
+X-Gm-Message-State: AO0yUKXkGSaNejI6K4TqO+QD0YoSv+v3Bud9FNS+EbGQ1kYHH0gnh6Si
+        jxH7D0zHFbzulgxgZc8CBDdTq7uJoe0=
+X-Google-Smtp-Source: AK7set+WInOkeplnCaCfUp37H/dqoUte22sdA7xQ4Mhg7PcPyXFi6rbo2wS476TGG0S/zanwzuVpFg==
+X-Received: by 2002:a62:5401:0:b0:5e2:da34:4aaf with SMTP id i1-20020a625401000000b005e2da344aafmr9599452pfb.4.1678141957772;
+        Mon, 06 Mar 2023 14:32:37 -0800 (PST)
+Received: from zbook.. (97-113-12-200.tukw.qwest.net. [97.113.12.200])
+        by smtp.gmail.com with ESMTPSA id j7-20020aa78007000000b005e0699464e3sm6704009pfi.206.2023.03.06.14.32.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Mar 2023 14:32:36 -0800 (PST)
+From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217150] Bluetooth USB Adapter that comes with Xbox One Wireless
- Controller stopped working on 6.3 rc1
-Date:   Mon, 06 Mar 2023 19:43:57 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: cmarobnjak@cock.email
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-217150-62941-iFU9FwehXP@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217150-62941@https.bugzilla.kernel.org/>
-References: <bug-217150-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     brian.gix@intel.com, luiz.dentz@gmail.com,
+        luiz.von.dentz@intel.com, Brian Gix <brian.gix@gmail.com>
+Subject: [PATCH] Bluetooth: Remove "Power-on" check from Mesh feature
+Date:   Mon,  6 Mar 2023 14:32:21 -0800
+Message-Id: <20230306223221.536377-1-brian.gix@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217150
+The Bluetooth mesh experimental feature enable was requiring the
+controller to be powered off in order for the Enable to work. Mesh is
+supposed to be enablable regardless of the controller state, and created
+an unintended requirement that the mesh daemon be started before the
+classic bluetoothd daemon.
 
---- Comment #1 from Smokus (cmarobnjak@cock.email) ---
-Created attachment 303886
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303886&action=3Dedit
-6.3 rc1 output of lsusb -t
+Fixes: Unintended Bluetooth startup order dependancy
+Signed-off-by: Brian Gix <brian.gix@gmail.com>
+---
+ net/bluetooth/mgmt.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0dd30a3beb77..7576db8eb83e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4627,12 +4627,6 @@ static int set_mgmt_mesh_func(struct sock *sk, struct hci_dev *hdev,
+ 				       MGMT_OP_SET_EXP_FEATURE,
+ 				       MGMT_STATUS_INVALID_INDEX);
+ 
+-	/* Changes can only be made when controller is powered down */
+-	if (hdev_is_powered(hdev))
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_REJECTED);
+-
+ 	/* Parameters are limited to a single octet */
+ 	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
+ 		return mgmt_cmd_status(sk, hdev->id,
+-- 
+2.39.2
 
-You are receiving this mail because:
-You are the assignee for the bug.=
