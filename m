@@ -2,123 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B319C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 14:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DC2C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 15:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230423AbjCFOww (ORCPT
+        id S230407AbjCFPFY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Mar 2023 09:52:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58128 "EHLO
+        Mon, 6 Mar 2023 10:05:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjCFOwk (ORCPT
+        with ESMTP id S229892AbjCFPFX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Mar 2023 09:52:40 -0500
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3778630199
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 06:52:25 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id bx12so9071603wrb.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Mar 2023 06:52:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20210112.gappssmtp.com; s=20210112; t=1678114343;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=COiTwkqS4MwGXLAg4AUzZXR93+vUEBpyC8bkm7sltAM=;
-        b=KoFr+MAT8/QRevkko2/tk0k8QdBF1ogAaoIPdg9zPjmZPOjYfp2LCPd9pVdB7Rel/G
-         TO8UEAK8od/9musKMPrIn/vV2y2nO8uZEIh2ktdjC3RJUlgRPNFNqJCVD+wgd9lY1Z1f
-         cQhHgQcLZiX6r4Sw8uDpPK92UpeXh72t6myvmOL5aU2i0O7IFYGO4dI2fUMip2olLD4f
-         i5AZ0yHThazKZKUomL/zVL3NkyukyQTg5J4dVMsIsrANZtO2fkN01y1rAS1s+2emCiK0
-         T20p21ScmdgqVXQY/ipH8tnfhpp+3BBkPt/vEbhTsT5na04Cxt2LDNH/N3pQ2Wq5cmn2
-         qs0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678114343;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=COiTwkqS4MwGXLAg4AUzZXR93+vUEBpyC8bkm7sltAM=;
-        b=irsA/7iupCMZ1xRsUZHUQs8lYT3wYBNU1TI89uJKEeE0N2qSbPMAgjK5u6z8iJBmo4
-         i+uBYczrz8UZcBgMIh1oepFxmq29RLPTTFGzR6VBx6tkJgLPE8xflSprWISIbkb1bOZK
-         NRmaBvazuNJnnApyppicv9vT6bk8uNd9Rz0O/sde2iies9egCuWcKk/F1/3aIO7Q6IH0
-         5EsKq5ozj6IhWBJwUW1j/iTtf0wAUSQcvhqHHs3X8o0MmVMLN+cPf0doa7f6RJihH0gl
-         DQ+J7hLCPQo7a3vCevbZr4WT5JTXg18lkTibstivndZ/NpGEyULDp4/QArIzWiAHZ2tj
-         N+dQ==
-X-Gm-Message-State: AO0yUKUclvRf/opBjjC50SBICX4s4dHgTegxaEhz763EEVKiiPz3IVlT
-        kEeDWrnIe7AU60T6I+3sAsLJX5JRpARW8QFZZdPXBA==
-X-Google-Smtp-Source: AK7set/a8+ezEBXrbKI2H8+XkvHS6Rj3zfmOZDFnWxWaznjEuQ/PTslu5qpB3J2/05OY7S8kIxBZag==
-X-Received: by 2002:a5d:6512:0:b0:2c6:85ef:4086 with SMTP id x18-20020a5d6512000000b002c685ef4086mr6587059wru.32.1678114343263;
-        Mon, 06 Mar 2023 06:52:23 -0800 (PST)
-Received: from rymek.. ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id q16-20020adfea10000000b002c559def236sm10013786wrm.57.2023.03.06.06.52.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Mar 2023 06:52:23 -0800 (PST)
-From:   =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
-        <lukasz.rymanowski@codecoup.pl>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
-        <lukasz.rymanowski@codecoup.pl>
-Subject: [PATCH BlueZ] btmon: Fix decoding truncated data
-Date:   Mon,  6 Mar 2023 15:52:17 +0100
-Message-Id: <20230306145217.7662-1-lukasz.rymanowski@codecoup.pl>
-X-Mailer: git-send-email 2.34.1
+        Mon, 6 Mar 2023 10:05:23 -0500
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 578272596D;
+        Mon,  6 Mar 2023 07:05:18 -0800 (PST)
+Received: from francesco-nb.int.toradex.com (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+        by mail11.truemail.it (Postfix) with ESMTPA id 093F921E2C;
+        Mon,  6 Mar 2023 15:56:33 +0100 (CET)
+Date:   Mon, 6 Mar 2023 15:56:28 +0100
+From:   Francesco Dolcini <francesco@dolcini.it>
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org,
+        alok.a.tiwari@oracle.com, hdanton@sina.com,
+        ilpo.jarvinen@linux.intel.com, leon@kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com
+Subject: Re: [PATCH v6 3/3] Bluetooth: NXP: Add protocol support for NXP
+ Bluetooth chipsets
+Message-ID: <ZAX/HHyy2yL76N0K@francesco-nb.int.toradex.com>
+References: <20230301154514.3292154-1-neeraj.sanjaykale@nxp.com>
+ <20230301154514.3292154-4-neeraj.sanjaykale@nxp.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230301154514.3292154-4-neeraj.sanjaykale@nxp.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some platforms use different filtering and for this purpose,
-some of the ACL/SCO/ISO/SDP data are truncated.
+On Wed, Mar 01, 2023 at 09:15:14PM +0530, Neeraj Sanjay Kale wrote:
+> This adds a driver based on serdev driver for the NXP BT serial protocol
+> based on running H:4, which can enable the built-in Bluetooth device
+> inside an NXP BT chip.
+> 
+> This driver has Power Save feature that will put the chip into sleep state
+> whenever there is no activity for 2000ms, and will be woken up when any
+> activity is to be initiated over UART.
+> 
+> This driver enables the power save feature by default by sending the vendor
+> specific commands to the chip during setup.
+> 
+> During setup, the driver checks if a FW is already running on the chip
+> by waiting for the bootloader signature, and downloads device specific FW
+> file into the chip over UART if bootloader signature is received..
+> 
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 
-In such a case, included lenght is smaller the original size.
-Without this fix, btmon stops working after first truncated packet.
----
- src/shared/btsnoop.c | 2 +-
- tools/btsnoop.c      | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+<snip>
 
-diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
-index 0a68282bc..8b93203b3 100644
---- a/src/shared/btsnoop.c
-+++ b/src/shared/btsnoop.c
-@@ -513,7 +513,7 @@ bool btsnoop_read_hci(struct btsnoop *btsnoop, struct timeval *tv,
- 		return false;
- 	}
- 
--	toread = be32toh(pkt.size);
-+	toread = be32toh(pkt.len);
- 	if (toread > BTSNOOP_MAX_PACKET_SIZE) {
- 		btsnoop->aborted = true;
- 		return false;
-diff --git a/tools/btsnoop.c b/tools/btsnoop.c
-index a0d6cf356..efaa45db4 100644
---- a/tools/btsnoop.c
-+++ b/tools/btsnoop.c
-@@ -283,7 +283,7 @@ next_packet:
- 	if (len < 0 || len != BTSNOOP_PKT_SIZE)
- 		goto close_input;
- 
--	toread = be32toh(pkt.size);
-+	toread = be32toh(pkt.len);
- 	flags = be32toh(pkt.flags);
- 
- 	opcode = flags & 0x00ff;
-@@ -356,7 +356,7 @@ next_packet:
- 	if (len < 0 || len != BTSNOOP_PKT_SIZE)
- 		goto close_input;
- 
--	toread = be32toh(pkt.size);
-+	toread = be32toh(pkt.len);
- 	flags = be32toh(pkt.flags);
- 
- 	opcode = flags & 0x00ff;
-@@ -433,7 +433,7 @@ next_packet:
- 	if (len < 0 || len != BTSNOOP_PKT_SIZE)
- 		goto close_input;
- 
--	toread = be32toh(pkt.size);
-+	toread = be32toh(pkt.len);
- 
- 	len = read(fd, buf, toread);
- 	if (len < 0 || len != (ssize_t) toread) {
--- 
-2.34.1
+> +#define FIRMWARE_W8987	"nxp/uartuart8987_bt.bin"
+> +#define FIRMWARE_W8997	"nxp/uartuart8997_bt_v4.bin"
+> +#define FIRMWARE_W9098	"nxp/uartuart9098_bt_v1.bin"
+> +#define FIRMWARE_IW416	"nxp/uartiw416_bt_v0.bin"
+> +#define FIRMWARE_IW612	"nxp/uartspi_n61x_v1.bin.se"
+
+Where are this files coming from? Where can I download those?
+Is loading a combo firmware from the mwifiex driver supported? 
+
+> +#define HCI_NXP_PRI_BAUDRATE	115200
+> +#define HCI_NXP_SEC_BAUDRATE	3000000
+
+What if the UART device does not support 3000000 baudrate (think at
+limitation on the clock source/divider of the UART)? Shouldn't this be
+configurable?
+
+> +#define NXP_V1_FW_REQ_PKT	0xa5
+> +#define NXP_V1_CHIP_VER_PKT	0xaa
+> +#define NXP_V3_FW_REQ_PKT	0xa7
+> +#define NXP_V3_CHIP_VER_PKT	0xab
+> +
+> +#define NXP_ACK_V1		0x5a
+> +#define NXP_NAK_V1		0xbf
+> +#define NXP_ACK_V3		0x7a
+> +#define NXP_NAK_V3		0x7b
+> +#define NXP_CRC_ERROR_V3	0x7c
+
+I assume this was already discussed, but the *_V1 looks just like the
+existing Marvell protocol, is it really worth a new driver? I did not check all
+the details here, so maybe the answer is just yes.
+
+Francesco
 
