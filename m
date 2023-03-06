@@ -2,46 +2,46 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96CF1C64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 19:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 763F3C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 19:44:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229663AbjCFTj6 (ORCPT
+        id S229705AbjCFToW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Mar 2023 14:39:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
+        Mon, 6 Mar 2023 14:44:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjCFTj5 (ORCPT
+        with ESMTP id S230203AbjCFToJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Mar 2023 14:39:57 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C4FC37B50
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 11:39:54 -0800 (PST)
+        Mon, 6 Mar 2023 14:44:09 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC5337EE0
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 11:44:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 62AAC61122
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 19:39:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BBE09C433D2
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 19:39:53 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 84A7DB8108B
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 19:43:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 24E54C4339B
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Mar 2023 19:43:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678131593;
-        bh=m+rAHGPaCEIjg0+88JNTWdzVJonbSgP8trzaVOjud8w=;
-        h=From:To:Subject:Date:From;
-        b=DMttKcLiDZ/RWaJRMf9llgBG6rTxDqzCGKRVP34C2q3QQftmkffOkd6l5O5Wiv+CJ
-         9GYBPG24y2dU5n0WbsmeUomiHSfGm8btlMtZy18nFQASgzTVaBc0lhK46cjlqpqqtv
-         4GJjDz81sDAJ6fUQ2ZvZ36A+vWOqvI57eT19tK1cHVowJ1w3RpzIDj3tkN32O/Ji4l
-         nsJA16tmPkKDiQpHxK03waa3VF9nSR0A8HOixbCF7z9itzY6jLkvlYFuUzlqVIjT9Y
-         P00NXBAJNhdbHd3nCFPCf03USOFiFAgFkwjEihpE4HeKpXXXoyqrG8qWrM1XnzqkNN
-         6iR+kbDPUP82A==
+        s=k20201202; t=1678131838;
+        bh=wYCCzZa12jWrgFKQ/rgXM0DJSO2s0w3q091e/fgT760=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=qUfxdF437TK4Sa1eHve9ssdxfjJE+Gi/49UHHkuxWyqHxbObTBEC2k91iHKG6PKLD
+         zmltEwj6+l2xo8seYEdejNTRKLM6wEro53ewy9Xp0o6IG+Tzv8fx2D827vm9AEBnVT
+         p+maU3i3IH5xPCkldslnD5IR1eBwI8F1IFcnPhdKaEHTMDNcKGvZMkQY1ZX5qcN6pH
+         syoei2+E34JsD+pUtlqUl1ygBGaQNfUhf7dm9KyFLkeewEjPlvr9Y/K+DqYcqpb2Td
+         uT/O2svKTH55oKkMhwicRxH7aBBRX8dTshJzNtl8iHfbhodFkxOXl6K2dIFmhh93tz
+         nL42ESmunTLCg==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 9EF5BC43142; Mon,  6 Mar 2023 19:39:53 +0000 (UTC)
+        id 0B756C43141; Mon,  6 Mar 2023 19:43:58 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217150] New: Bluetooth USB Adapter that comes with Xbox One
- Wireless Controller stopped working on 6.3 rc1
-Date:   Mon, 06 Mar 2023 19:39:53 +0000
+Subject: [Bug 217150] Bluetooth USB Adapter that comes with Xbox One Wireless
+ Controller stopped working on 6.3 rc1
+Date:   Mon, 06 Mar 2023 19:43:57 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -54,10 +54,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-217150-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-217150-62941-iFU9FwehXP@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217150-62941@https.bugzilla.kernel.org/>
+References: <bug-217150-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -69,44 +69,10 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D217150
 
-            Bug ID: 217150
-           Summary: Bluetooth USB Adapter that comes with Xbox One
-                    Wireless Controller stopped working on 6.3 rc1
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 6.3 rc1
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: cmarobnjak@cock.email
-        Regression: No
-
-Created attachment 303885
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303885&action=3Dedit
-6.3 rc1 output of sudo journalctl -p err -b 0
-
-Bluetooth USB Adapter that comes with Xbox One Wireless Controller stopped
-working on 6.3 rc1.
-
-It has worked and still works on 6.2.2 stable.
-
-I have tested it multiple times, and every time the outcome was the same:
-
-6.3 rc1 --> USB adapter doesn't work (it doesn't flash -> pairing with the
-controller not possible).
-
-6.2.2 --> USB adapter works (it flashes -> pairing with the controller poss=
-ible
-and successful).
-
-I've attached the output of "sudo journalctl -p err -b 0" command in the
-report.
-The log is exactly the same on 6.2.2 and 6.3 rc1.
+--- Comment #1 from Smokus (cmarobnjak@cock.email) ---
+Created attachment 303886
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303886&action=3Dedit
+6.3 rc1 output of lsusb -t
 
 --=20
 You may reply to this email to add a comment.
