@@ -2,112 +2,89 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EA9C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 01:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B3FC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Mar 2023 02:37:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229539AbjCFBpp (ORCPT
+        id S229613AbjCFChp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Mar 2023 20:45:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36632 "EHLO
+        Sun, 5 Mar 2023 21:37:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjCFBpn (ORCPT
+        with ESMTP id S229478AbjCFCho (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Mar 2023 20:45:43 -0500
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0055010AA0;
-        Sun,  5 Mar 2023 17:45:38 -0800 (PST)
-X-QQ-mid: bizesmtp67t1678067106tf8szd7k
-Received: from localhost.localdomain ( [58.240.82.166])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Mon, 06 Mar 2023 09:45:00 +0800 (CST)
-X-QQ-SSF: 01400000000000I0Z000000A0000000
-X-QQ-FEAT: 3M0okmaRx3hGLLbyuvswhxaPXmqKj5Us9hhiqzRpHOXpzhFciG8Kcfuqt3EkD
-        VJ5ECR2Bir2UCawLtnhxTKPnOME5Q9kzXppQVbKXXh73Pt7YuTKGkh8BI8ClY1RUlMqLSZ3
-        q8WjT66WZvrKscvlr5F96I/1mY7Qd8QnB1DnfoUbFSSJxY83h07mTmOaykyy+b7oXd49l05
-        bK92y727C7NWFJBnSXPSBiDkkIhWORRilxVAdco+MmV+BEpq9BcOezykiwwPNdGL+4f6myW
-        /Q+Kotrw7caLp9DQ9AOEYBk1piB3GuzKOJojjgXYRhAvUcj5Xfzsl9xmymwuKMeY68/7/mL
-        ooIvTs5b6TYwOs7wNBDRLk7NVZwVyOeXBL2Pll7JqQ6+7z3C3S1tcnNusesNSYtY0rFJmF/
-X-QQ-GoodBg: 1
-From:   Meng Tang <tangmeng@uniontech.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, zhuweijun@uniontech.com,
-        Meng Tang <tangmeng@uniontech.com>
-Subject: [PATCH] Bluetooth: Add VID/PID 0489/e0e4 for MediaTek MT7922
-Date:   Mon,  6 Mar 2023 09:44:59 +0800
-Message-Id: <20230306014459.25023-1-tangmeng@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Sun, 5 Mar 2023 21:37:44 -0500
+X-Greylist: delayed 4139 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 05 Mar 2023 18:37:43 PST
+Received: from server139-1.web-hosting.com (server139-1.web-hosting.com [104.219.248.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA461EF8E
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Mar 2023 18:37:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=gentil.com;
+        s=default; h=Content-Transfer-Encoding:Content-Type:Subject:From:To:
+        MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=x1kviJplXpdMBSf6VtRiJNwchP2OXNavqOyQUVVXDvA=; b=nJTBsA18F7aPrKuQERQcfwfcMD
+        WFMnhepDMk3ZGXbSwAe7QQtmLPLJq92GOvD7NcAsoQzWh6uxk9J/xY5+5uWxZldPuBmLVUZloEX0g
+        1lr0QCa9/+H7bY4G/5f871F98SM0r8qtWSQVGqVxRrmfMcMubCAOb6T6b8MUuMu+64Q1Pj2VkpRmP
+        IM2g0IG1Jfrq0irA7sZUaOfjcwLaw0HEJEP3eEePj9jVejWbH9aEkXACi1sZsW2Y+TEN//s55ScFN
+        sMYamAH3Tra75JTybm9g2p7kKOOHbTzHnNrGNhC4yr+65aaMY3XkL49DA9OJnAk72CdfGiOkiDuex
+        l4MWeGuw==;
+Received: from c-73-162-57-209.hsd1.ca.comcast.net ([73.162.57.209]:55902 helo=[192.168.10.21])
+        by server139.web-hosting.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.95)
+        (envelope-from <gregoire@gentil.com>)
+        id 1pYzeY-002Bbh-Jt
+        for linux-bluetooth@vger.kernel.org;
+        Sun, 05 Mar 2023 20:28:43 -0500
+Message-ID: <bc5ba838-ecf6-f5c8-e6bf-312ce7077911@gentil.com>
+Date:   Sun, 5 Mar 2023 17:28:38 -0800
 MIME-Version: 1.0
+Content-Language: en-US
+To:     linux-bluetooth@vger.kernel.org
+From:   Gregoire Gentil <gregoire@gentil.com>
+Subject: How can I change the supervision timeout of BLE peripheral?
+Organization: Gregoire Gentil
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvr:qybglogicsvr7
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server139.web-hosting.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - gentil.com
+X-Get-Message-Sender-Via: server139.web-hosting.com: authenticated_id: gregoire@gentil.com
+X-Authenticated-Sender: server139.web-hosting.com: gregoire@gentil.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-From-Rewrite: unmodified, already matched
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Tested on Acer Nitro AN515-47 Notebook
+Hello,
 
-output from /sys/kernel/debug/usb/devices:
+I have a pure C application running on a BLE peripheral and it uses 
+bluez code especially the code base of hcitool.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  2 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0e4 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+In le_set_advertising_parameters_cp, I see min_interval and max_interval 
+but I don't see any supervision timeout field. Is there another 
+advertising parameters (extended???) that features supervision timeout?
 
-Signed-off-by: Meng Tang <tangmeng@uniontech.com>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+I'm aware of the following code in hcitool:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5272eef576ed..5809fd2d143e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -615,6 +615,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0e2), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0e4), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
--- 
-2.20.1
+hci_write_link_supervision_timeout(device_handle, 
+htobs(cr->conn_info->handle), timeout, 1000);
 
+But in my own code, I don't manage to get the handle of the central 
+device once the connection has been established - I'm also wondering 
+whether if it's not too late to change supevision timeout after the 
+connection. "ioctl(device_handle, HCIGETCONNINFO, (unsigned long) cr);" 
+fails with a "no such file or directory" error though I'm sure that the 
+central device is connected.
+
+
+How can I change from user-space the supervision timeout?
+
+Thank you in advance,
+
+Grégoire
