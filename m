@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A21C742A7
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E664BC678D5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:26:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230221AbjCGW0G (ORCPT
+        id S230228AbjCGW0H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 17:26:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54386 "EHLO
+        Tue, 7 Mar 2023 17:26:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230182AbjCGWZo (ORCPT
+        with ESMTP id S230240AbjCGWZq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 17:25:44 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42E4CB04A9
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:25:08 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id y2so14722017pjg.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Mar 2023 14:25:08 -0800 (PST)
+        Tue, 7 Mar 2023 17:25:46 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB71B06DD
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:25:10 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id m20-20020a17090ab79400b00239d8e182efso187752pjr.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Mar 2023 14:25:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678227876;
+        d=gmail.com; s=20210112; t=1678227878;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IQZKy3IHJaNGPM4dHl2hvvgbBOAHVYSI4LpSoo6O9E0=;
-        b=FnpjHpyyIRq3F4KyNRd/2J+m4oGYuozWR7AClty5ijloHgMJO3Qr2xKKAz1MZORlfJ
-         Ho2MdN+9hRBHOtVXysD4FEvMYNWR9nsH/FOGWEAeSkPDPoCI2NCB7798RPFSVYjE30Kk
-         hNx2HNH/mFmrf7qxW1ydNCITDT5Btuh/t+69UFXc/j1bY/bhQlcasyUWefuexmcjaMAf
-         OSNiao1CxkLN0E118kLXzKwYhf06dEAovWbWj4vkgmA7oxrr2gUbHc5RQIog974QwfIv
-         Wng/4kzQ/DkMXSjHrlNm4eAlOiv5Wv41x9mIvAJ99a3NuUM8Wgd35nnc6qQfZbKm4nYW
-         8M8w==
+        bh=Z1IU8LiWwZeoZ/1lc6uZFO7QKOeog+W2EZMCDjvEpLE=;
+        b=gSq9C3z3ElE7vwAVygN50LcQN0FYB+pGpPYfTeHN3/UJCAzfFYxNdZrGYsYASnNblL
+         5sI6W6Rzrq/zzo52klf2HPvCXoSWDFcORmnQPiNjxI1VfRpgRFepHiKYvT4kpvKmNmM1
+         9i0damE7357bmEPiczd0V4XJOG5il4lmepG1Q33b7DtAPBeSKjxoAXicbdwogKPitaa0
+         StLuMLAPKtHAAfOFS2I2tPMUEPaXUgcz+e1e2X/myZSObdvo8iiwY743CfeErKfl3S9W
+         9BnBu7JgcAMVrfHOca7U9sXdqFeC5vMMYJICs+VXZjkG+VV8dQKZSkmInW0iy5V8vM/S
+         LHQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678227876;
+        d=1e100.net; s=20210112; t=1678227878;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IQZKy3IHJaNGPM4dHl2hvvgbBOAHVYSI4LpSoo6O9E0=;
-        b=7cNFx/ew3w5wecdcltl6Oyob/TTbGmu89Tv8ysmAxRviEFc7Yl4yu/d11R7y7mKvPK
-         gLaOxqkystf++a5OyyFgXpExJRUqlsskIDgwmGRsOn6xkdh/pgZw6S6eWwU3BDOHifCd
-         JiX1I4YpIf0TzWJGonZlDwxCs557YzQhX9rWihyQRMP5fRVzJtgD+wQaY6oPwASplE/g
-         8O3vP4LWVthPbYUlPVGwcnMyU0oMC0wIz60PBMReZt4fWey9cv3hjiEkcArw6tD+ydCh
-         rXGpYO66xtimU03M5MVj8yHnTK5L4rwoS58N1fi0pcYklIN0iqid9ZOBD9ahYXMbstCW
-         arMw==
-X-Gm-Message-State: AO0yUKUJqoNKZl15LHX9fXFpV1t2/Cz9w3raGCUWXwe4OSuM7lbgpM6W
-        t5W9nFqn3KxIdi9kc2OP25Ou3bePcOM=
-X-Google-Smtp-Source: AK7set80WKNLeAac59Q/5LcJvqTEcS34ZMtaujZZTw/mCPe9/U5yAcWfQuJ+aHfEqXdYfpjgpi+TPg==
-X-Received: by 2002:a17:903:2450:b0:19c:e484:b45 with SMTP id l16-20020a170903245000b0019ce4840b45mr18269930pls.27.1678227876133;
-        Tue, 07 Mar 2023 14:24:36 -0800 (PST)
+        bh=Z1IU8LiWwZeoZ/1lc6uZFO7QKOeog+W2EZMCDjvEpLE=;
+        b=JetJfRgcHK1bj43Xy7GzxOL8fzWJ7w3VqsMEAOFMU1LLGn0Fhqu05OCtKzJy/9IXrY
+         +uM6b+C8dH9RaRs5lW8LrWtKPuL7Y13P2t9k6Yd9KFvZDg1emUsYEeylExRllr3jA6mb
+         gsI8PkcdGp9izmmBDjId3GqujYToOr2UjiwWM5R+N36fqB1/goQRohkfs3AiBfsneNp1
+         GtQC4I+tgTM72GjQSsIJSnZyV9GdAwPCAYyWyJmGjZyuQSMAUKqVu64lBQ6OJXFoBM0M
+         szle2PCOR1Ib4lKna0LK4TjjYKz5KCiC9WBfkY+2vlj8mLxPmtk99pCJ0BKHDu0puGg5
+         bkJg==
+X-Gm-Message-State: AO0yUKWvDnPpAXaivb6OdglJ/p5YdpQN9+YizDZgXBgQ2oTejucQpp6J
+        IIx5iCPHFnRkkG1va8WdyysmN7g8tEQ=
+X-Google-Smtp-Source: AK7set/9eNQAfULKWfO1B3cLnisHqMRtar3Kt0GSm+tu9pS9BEPQ1fFI50buDouk/XrqtPA7ZANQBg==
+X-Received: by 2002:a17:903:22c1:b0:19e:ba2c:27ec with SMTP id y1-20020a17090322c100b0019eba2c27ecmr12638088plg.11.1678227878532;
+        Tue, 07 Mar 2023 14:24:38 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id d18-20020a170902729200b0019c901b35ecsm8814392pll.106.2023.03.07.14.24.35
+        by smtp.gmail.com with ESMTPSA id d18-20020a170902729200b0019c901b35ecsm8814392pll.106.2023.03.07.14.24.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 14:24:35 -0800 (PST)
+        Tue, 07 Mar 2023 14:24:38 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 10/12] tools: Add support to generate RSI using SIRK
-Date:   Tue,  7 Mar 2023 14:24:20 -0800
-Message-Id: <20230307222422.2608483-10-luiz.dentz@gmail.com>
+Subject: [RFC v2 12/12] client: Use AdvertisingFlags when available
+Date:   Tue,  7 Mar 2023 14:24:22 -0800
+Message-Id: <20230307222422.2608483-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230307222422.2608483-1-luiz.dentz@gmail.com>
 References: <20230307222422.2608483-1-luiz.dentz@gmail.com>
@@ -66,154 +66,130 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sathish Narasimman <sathish.narasimman@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The patch helps to generate Resolvable set identifier adv data.
-which can be used as ADV data during advertisement.
-It will be used to identify the device as part of setmember for
-Coordinated set identification profile.
-Example:
-$<path to advtest/>advtest -i "761FAE703ED681F0C50B34155B6434FB"
-SIRK: 761FAE703ED681F0C50B34155B6434FB
-  RSI:  0x71 0xcb 0xbc 0x7e 0x01 0x84
-    Random: bccb71
-    Hash:   84017e
+This prints devices not discoverable in grey so the user are able to
+distict when for example set members are actually visible.
 ---
- tools/advtest.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 78 insertions(+), 2 deletions(-)
+ client/main.c | 79 +++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 55 insertions(+), 24 deletions(-)
 
-diff --git a/tools/advtest.c b/tools/advtest.c
-index de036e783325..9ef69ed5124a 100644
---- a/tools/advtest.c
-+++ b/tools/advtest.c
-@@ -13,6 +13,13 @@
- #include <config.h>
- #endif
+diff --git a/client/main.c b/client/main.c
+index e4a39896b2c6..79895015d6a6 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -24,6 +24,7 @@
  
-+#include <stdlib.h>
-+
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+
- #include <getopt.h>
+ #include "src/shared/shell.h"
+ #include "src/shared/util.h"
++#include "src/shared/ad.h"
+ #include "gdbus/gdbus.h"
+ #include "print.h"
+ #include "agent.h"
+@@ -143,10 +144,32 @@ static void print_adapter(GDBusProxy *proxy, const char *description)
  
- #include "lib/bluetooth.h"
-@@ -32,6 +39,9 @@
- 			"\xe1\x23\x99\xc1\xca\x9a\xc3\x31"
- #define SCAN_IRK	"\xfa\x73\x09\x11\x3f\x03\x37\x0f" \
- 			"\xf4\xf9\x93\x1e\xf9\xa3\x63\xa6"
-+#ifndef MIN
-+#define MIN(x, y) ((x) < (y) ? (x) : (y))
-+#endif
- 
- static struct mgmt *mgmt;
- static uint16_t index1 = MGMT_INDEX_NONE;
-@@ -43,13 +53,73 @@ static struct bt_hci *scan_dev;
- 
- static void print_rpa(const uint8_t addr[6])
- {
--	printf("  Address:  %02x:%02x:%02x:%02x:%02x:%02x\n",
-+	printf("  RSI:\t0x%02x 0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n",
- 					addr[5], addr[4], addr[3],
- 					addr[2], addr[1], addr[0]);
- 	printf("    Random: %02x%02x%02x\n", addr[3], addr[4], addr[5]);
- 	printf("    Hash:   %02x%02x%02x\n", addr[0], addr[1], addr[2]);
  }
  
-+static size_t hex2bin(const char *hexstr, uint8_t *buf, size_t buflen)
-+{
-+	size_t i, len;
++#define	DISTANCE_VAL_INVALID	0x7FFF
 +
-+	len = MIN((strlen(hexstr) / 2), buflen);
-+	memset(buf, 0, len);
++static struct set_discovery_filter_args {
++	char *transport;
++	char *pattern;
++	dbus_uint16_t rssi;
++	dbus_int16_t pathloss;
++	char **uuids;
++	size_t uuids_len;
++	dbus_bool_t duplicate;
++	dbus_bool_t discoverable;
++	bool set;
++	bool active;
++	unsigned int timeout;
++} filter = {
++	.rssi = DISTANCE_VAL_INVALID,
++	.pathloss = DISTANCE_VAL_INVALID,
++	.set = true,
++};
 +
-+	for (i = 0; i < len; i++)
-+		if (sscanf(hexstr + (i * 2), "%02hhX", &buf[i]) != 1)
-+			continue;
+ static void print_device(GDBusProxy *proxy, const char *description)
+ {
+ 	DBusMessageIter iter;
+ 	const char *address, *name;
++	uint8_t *flags;
++	int flags_len = 0;
+ 
+ 	if (g_dbus_proxy_get_property(proxy, "Address", &iter) == FALSE)
+ 		return;
+@@ -158,11 +181,39 @@ static void print_device(GDBusProxy *proxy, const char *description)
+ 	else
+ 		name = "<unknown>";
+ 
++	if (g_dbus_proxy_get_property(proxy, "AdvertisingFlags", &iter)) {
++		DBusMessageIter array;
 +
++		dbus_message_iter_recurse(&iter, &array);
++		dbus_message_iter_get_fixed_array(&array, &flags, &flags_len);
++	}
 +
-+	return len;
-+}
++	if (!flags_len)
++		goto done;
 +
-+static bool get_random_bytes(void *buf, size_t num_bytes)
-+{
-+	ssize_t len;
-+	int fd;
++	if (!(flags[0] & (BT_AD_FLAG_LIMITED | BT_AD_FLAG_GENERAL))) {
++		/* Only print hidden/non-discoverable if filter.discoverable is
++		 * not set.
++		 */
++		if (filter.discoverable)
++			return;
 +
-+	fd = open("/dev/urandom", O_RDONLY);
-+	if (fd < 0)
-+		return false;
++		bt_shell_printf("%s%s%s" COLOR_BOLDGRAY "Device %s %s"
++					COLOR_OFF "\n",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					address, name);
 +
-+	len = read(fd, buf, num_bytes);
-+
-+	close(fd);
-+
-+	if (len < 0)
-+		return false;
-+
-+	return true;
-+}
-+
-+static void generate_rsi(char *val)
-+{
-+	uint8_t sirk[16], hash[3];
-+	uint8_t  rsi[6] = {0};
-+
-+	hex2bin(val, sirk, sizeof(sirk));
-+
-+	get_random_bytes(&rsi[3], 3);
-+
-+	rsi[5] &= 0x3f; /* Clear 2 msb */
-+	rsi[5] |= 0x40; /* Set 2nd msb */
-+
-+	crypto = bt_crypto_new();
-+	if (!crypto) {
-+		fprintf(stderr, "Failed to open crypto interface\n");
-+		mainloop_exit_failure();
 +		return;
 +	}
 +
-+	bt_crypto_ah(crypto, sirk, rsi + 3, hash);
-+	memcpy(rsi, hash, 3);
-+
-+	print_rpa(rsi);
-+}
-+
-+
- static void scan_le_adv_report(const void *data, uint8_t size,
- 							void *user_data)
- {
-@@ -351,9 +421,11 @@ static void usage(void)
- 	printf("\tadvtest [options]\n");
- 	printf("options:\n"
- 		"\t-h, --help             Show help options\n");
-+	printf(" \t-i  <128bit SIRK>,     Generate RSI ADV Data\n");
++done:
+ 	bt_shell_printf("%s%s%sDevice %s %s\n",
+-				description ? "[" : "",
+-				description ? : "",
+-				description ? "] " : "",
+-				address, name);
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					address, name);
  }
  
- static const struct option main_options[] = {
-+	{ "hash",   no_argument,       NULL, 'i' },
- 	{ "version",   no_argument,       NULL, 'v' },
- 	{ "help",      no_argument,       NULL, 'h' },
- 	{ }
-@@ -366,11 +438,15 @@ int main(int argc ,char *argv[])
- 	for (;;) {
- 		int opt;
+ static void print_uuid(const char *label, const char *uuid)
+@@ -1133,26 +1184,6 @@ static void cmd_default_agent(int argc, char *argv[])
+ 	agent_default(dbus_conn, agent_manager);
+ }
  
--		opt = getopt_long(argc, argv, "vh", main_options, NULL);
-+		opt = getopt_long(argc, argv, "i:vh", main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
- 		switch (opt) {
-+		case 'i':
-+			printf("SIRK: %s\n", optarg);
-+			generate_rsi(optarg);
-+			return EXIT_SUCCESS;
- 		case 'v':
- 			printf("%s\n", VERSION);
- 			return EXIT_SUCCESS;
+-#define	DISTANCE_VAL_INVALID	0x7FFF
+-
+-static struct set_discovery_filter_args {
+-	char *transport;
+-	char *pattern;
+-	dbus_uint16_t rssi;
+-	dbus_int16_t pathloss;
+-	char **uuids;
+-	size_t uuids_len;
+-	dbus_bool_t duplicate;
+-	dbus_bool_t discoverable;
+-	bool set;
+-	bool active;
+-	unsigned int timeout;
+-} filter = {
+-	.rssi = DISTANCE_VAL_INVALID,
+-	.pathloss = DISTANCE_VAL_INVALID,
+-	.set = true,
+-};
+-
+ static void start_discovery_reply(DBusMessage *message, void *user_data)
+ {
+ 	dbus_bool_t enable = GPOINTER_TO_UINT(user_data);
 -- 
 2.39.2
 
