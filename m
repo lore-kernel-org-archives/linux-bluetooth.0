@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18917C678D5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E02DC6FD1E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:25:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231320AbjCGWZ0 (ORCPT
+        id S231453AbjCGWZ2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 17:25:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53556 "EHLO
+        Tue, 7 Mar 2023 17:25:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231766AbjCGWZE (ORCPT
+        with ESMTP id S231782AbjCGWZJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 17:25:04 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40EE9662A
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:24:31 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id q31-20020a17090a17a200b0023750b69614so146408pja.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Mar 2023 14:24:31 -0800 (PST)
+        Tue, 7 Mar 2023 17:25:09 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF8E96603
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:24:37 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id m8-20020a17090a4d8800b002377bced051so251130pjh.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Mar 2023 14:24:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678227867;
+        d=gmail.com; s=20210112; t=1678227868;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=GMJPH4LKfsC1gbsemoIowAUoRkGzTRKYvd8HxwE27iI=;
-        b=oVmz0OhGsIGBeMNscSZe+bnkuE7yuxo0GgC1uJRoIUf8nO6x+bF9TBmqlk1i2Ntkin
-         aHdTn5c+6QbulVd+CQk9KPkGpYZeMewYZeOd34RByEJNDUo9Wj0kUKSYiAuC682eX2HV
-         dK6dyEj+oCvwvpXqaEQbD6hqNoadCrsUrLaM1KtSi3PfLmDiof4kNVBIXbbNFb6qt/Dm
-         zuy+QiVuaDtb9YVo9/udPATtQDsWaH5KDqVcYr7etosCJf33q8Tv+oYl9dWNha+sGB6q
-         te6K/7RKYRCtk0m2gc0D3fQneQZQoUFGnEkOeiChadqvPgd8xUVvkUS5SUE8ZMgcMe/V
-         3xIA==
+        bh=tYyQX+0EeYSzuu9TE8HE0kzl55hbyMad+FvqeBkBoGw=;
+        b=pUUsAISzCtO5/2EELpsd0yxFt2nDnEzA5udrrV79QAbcpvilmvaYEYoCdIYQW/d9zs
+         gFSL1YIl6eFqN/8nq9kbExF6opAV64sNug5oPRqWqayXmLf/u58aLPwr3G7hYWeEYYAI
+         fkTCD7pFaUq2whZalz18fMrgYIqsfphfs14zV2qi4TsU6g/dywM58wvYRKJREUOmlI56
+         XfDYlEGWQ4TFjktCbuxJF+VTAlseWP1BdnhrkYgASiK1vzqwOKB9u3qfaVC4fLQMS1hP
+         eIPVbz3uwMkydZ7wBhIMNrkPRJwhenxqQC1AJ8hYMvGsNZaujO0e2rkWWXogVutozIUN
+         WbAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678227867;
+        d=1e100.net; s=20210112; t=1678227868;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GMJPH4LKfsC1gbsemoIowAUoRkGzTRKYvd8HxwE27iI=;
-        b=EXOdQ5lK3M5OeAgJDGtLThQjO9lC7vVO9nLFhoOcQeMZYGF21ZtkwLyn4G/G5qi5jJ
-         M1NF/Mo3PuxRUzuOucPrCvUfrzomNpGcZqp2EbEw0na3+WTUHOYWerE3lfVoQJSTO4f0
-         pd954BDGYu0E0F+VUfRZbkFitK/BSg+hFkhGdFVfdu+5tq9cFy6acyrwp0QCpruHVvl4
-         pH8KxN/I1a99hlttjqoW9nuSlN3CmmPXwvrs3ZqxwwQzubMjITmVNrjqaWvJOBNxIpkc
-         Wcav9B6Xdh0mm8M/NW5EmDrdzKjy9ppqf20UkxvKPRaWBgzo/xdLBRtYXQAkdWYZlApN
-         id0Q==
-X-Gm-Message-State: AO0yUKWGr0TRyue2Dhud9h7d3o1jzk1dI2KDIRCiAb2V5s/1Fq0seJC5
-        DXzxfN226bLP7oRPvrw0O2l75AhfzjE=
-X-Google-Smtp-Source: AK7set8Fcpc1PWnax/xBF0IqR1FsKpkyWyy6uO5zYtzG/mvfqo4dU8NydZGyap6tu8wEWd4vU4NaEA==
-X-Received: by 2002:a17:902:9b84:b0:19e:7d66:ff29 with SMTP id y4-20020a1709029b8400b0019e7d66ff29mr13250691plp.61.1678227866912;
-        Tue, 07 Mar 2023 14:24:26 -0800 (PST)
+        bh=tYyQX+0EeYSzuu9TE8HE0kzl55hbyMad+FvqeBkBoGw=;
+        b=I+KVlSD1rMKMF5jUR9Ifd8MfjWeLVw/z43AnwqAa650klU2+jWPxTiszj7kJPKOh5x
+         6M4LCBl0EKuhkG9mgvHOuCJb1NDQdz5AqJL0ry+0FLHqh/bVctNQ56KvEuNEH3dhmtUg
+         YecaJzoh4gCoZ+ix92ZjELezuAnSs07Ozju6mg5rBd6Xr8uVedzFcHD6pOPn0uoLmwUZ
+         mOjHtMQjJps1M1a/LZhVqA/so5rbyCKaMsBn7Gvoi79V7v74rE5jzYwhcw2uQMt6M250
+         pVGpc2lTHWi/Bg7NZpCVZTzWVmro1poku0SjCGxvbl/wXq5fEDg5MUcUn2x5LZovmnGv
+         c24g==
+X-Gm-Message-State: AO0yUKWVxrMDynLDRg58IDcA6zDqJ4GRT7kJwBQLGJ2kOqrhtYqRYiPV
+        jeift9BUW268QCnMJmPpt667WX1AQgA=
+X-Google-Smtp-Source: AK7set8euEc4jQ4QskJkpyVCz6Sq+AKquYtw8zbnHNhxIuYJjZwNnjbNN9Upkkzvw6HvFGDPUvtUFw==
+X-Received: by 2002:a17:903:40c4:b0:19d:74c:78e5 with SMTP id t4-20020a17090340c400b0019d074c78e5mr15311201pld.50.1678227868012;
+        Tue, 07 Mar 2023 14:24:28 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id d18-20020a170902729200b0019c901b35ecsm8814392pll.106.2023.03.07.14.24.25
+        by smtp.gmail.com with ESMTPSA id d18-20020a170902729200b0019c901b35ecsm8814392pll.106.2023.03.07.14.24.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 14:24:26 -0800 (PST)
+        Tue, 07 Mar 2023 14:24:27 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC v2 03/12] doc: Add set-api
-Date:   Tue,  7 Mar 2023 14:24:13 -0800
-Message-Id: <20230307222422.2608483-3-luiz.dentz@gmail.com>
+Subject: [RFC v2 04/12] device-api: Add Set property
+Date:   Tue,  7 Mar 2023 14:24:14 -0800
+Message-Id: <20230307222422.2608483-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230307222422.2608483-1-luiz.dentz@gmail.com>
 References: <20230307222422.2608483-1-luiz.dentz@gmail.com>
@@ -68,71 +68,30 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds set-api.rst which documents DeviceSet interface.
+This adds Set property so clients are able to identify when a device
+belongs to a set.
 ---
- doc/set-api.rst | 53 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
- create mode 100644 doc/set-api.rst
+ doc/device-api.txt | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/doc/set-api.rst b/doc/set-api.rst
-new file mode 100644
-index 000000000000..c49be1ae0514
---- /dev/null
-+++ b/doc/set-api.rst
-@@ -0,0 +1,53 @@
-+=====================================
-+BlueZ D-Bus DeviceSet API description
-+=====================================
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 628accb8a572..e4a8d3c5af33 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -281,3 +281,13 @@ Properties	string Address [readonly]
+ 			Example:
+ 				<Transport Discovery> <Organization Flags...>
+ 				0x26                   0x01         0x01...
 +
++		array{object, dict} Sets [readonly, experimental]
 +
-+DeviceSet interface
-+===================
++			The object paths of the sets the device belongs to
++			followed by a dictionary which can contain the
++			following:
 +
-+Service		org.bluez
-+Interface	org.bluez.DeviceSet1
-+Object path	[variable prefix]/{hci0,hci1,...}/set_{sirk}
++				byte Rank:
 +
-+Methods
-+=======
-+
-+**void Connect() [experimental]**
-+
-+	Connects all **devices** members of the set, each member is
-+	connected in sequence as they were added/loaded following the
-+	same proceedure as described in **Device1.Connect**.
-+
-+	Possible errors: org.bluez.Error.NotReady
-+			 org.bluez.Error.Failed
-+			 org.bluez.Error.InProgress
-+			 org.bluez.Error.AlreadyConnected
-+
-+**void Disconnect() [experimental]**
-+
-+	Disconnects all **devices** members of the set, each member is
-+	disconnected in sequence as they were connected following the
-+	same proceedure as described in **Device1.Disconnect**.
-+
-+	Possible errors: org.bluez.Error.NotConnected
-+
-+Properties
-+==========
-+
-+**object Adapter [readonly]**
-+
-+	The object path of the adapter the set belongs to.
-+
-+**bool AutoConnect [read-write, experimental]**
-+
-+	Indicates if the **devices** members of the set shall be automatically
-+	connected once any of its members is connected.
-+
-+**array(object) Devices [ready-only, experimental]**
-+
-+	List of devices objects that are members of the set.
-+
-+**byte Size [read-only, experimental]**
-+
-+	Set members size.
++					Rank of the device in the Set.
 -- 
 2.39.2
 
