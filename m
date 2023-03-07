@@ -2,111 +2,138 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE8AFC742A7
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E2B1C6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:25:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230285AbjCGWRx (ORCPT
+        id S231139AbjCGWZY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 17:17:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40154 "EHLO
+        Tue, 7 Mar 2023 17:25:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230172AbjCGWRv (ORCPT
+        with ESMTP id S231755AbjCGWZB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 17:17:51 -0500
-Received: from stravinsky.debian.org (stravinsky.debian.org [IPv6:2001:41b8:202:deb::311:108])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 281A3ABB1B;
-        Tue,  7 Mar 2023 14:17:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-        s=smtpauto.stravinsky; h=X-Debian-User:Content-Transfer-Encoding:MIME-Version
-        :References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=JItJ57Z4GpJWKFyTqaNeN7pdg1hN+SPB7i8JZUMvOd4=; b=QY7Yq9K3qNpO7SGW1sUxlH1gjc
-        9qShVzOsGwVtmZH38w2uQzFcOwkybsMwQjV1HUwopPaqAtXL6V9elOmSnH7nFqmn+fvc/lwlkSuv1
-        NqTLMYI32Ggqw+LCecW/2sMcBOcth9e8j9VVHY1egSMi7fGWdP3uDUpkPVeEV+SrDr2dmtvyYafR7
-        HC8P0n+b/A3299HQZHohgx9k+QHAdHpTw0wtiaSkrhenYWp+lG/Qr83BWR1zjIobEZcuJOgTQ3M82
-        +JmLQ+j39Q1D7W5nS/YyYMy3lV9YeRADVX/vgmotlBl/O8xYP6YmTCy2VLNoKi1bySJU/YJh2GHpr
-        y+TsCz+w==;
-Received: from authenticated user
-        by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.94.2)
-        (envelope-from <bage@debian.org>)
-        id 1pZfcq-0034fC-RY; Tue, 07 Mar 2023 22:17:40 +0000
-From:   Bastian Germann <bage@debian.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Vasily Khoruzhick <anarsoul@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Bastian Germann <bage@debian.org>
-Subject: [PATCH v6 1/2] Bluetooth: Add new quirk for broken local ext features page 2
-Date:   Tue,  7 Mar 2023 23:17:30 +0100
-Message-Id: <20230307221732.3391-2-bage@debian.org>
+        Tue, 7 Mar 2023 17:25:01 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58F0D90095
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:24:31 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id ky4so15768407plb.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Mar 2023 14:24:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678227864;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2fMO3DDvUJJeV0Q226fQtHUTjSXAJS4amcasCJTxOgo=;
+        b=baut4pRknQmtSOiNrFOvRC5T+hL1Xi+k4T3XKC71MGFyHEwhwPJNwBWUF6p5EUkRkz
+         NlY7R9ukJzhOrfBT9owOMnnrNCMWvNBxAEpK/4ofTKJFlVJf9kdt3K3YGL5RJOrK72p2
+         9dHefnfUiu8vkFS4oQGHXkVakK8c0pdzf6D5CHA8O0quBqA6tSj4Ed1Tdq16q4o529yw
+         iPf6JS7sKO7SzXmVF8UoD0dwY3K5SJxf/3VSTgVOgvPEAdQdeqwbmOaSJKASyhEbI2/P
+         SdiMSIYWlVyfikai3wcYH6Hz/SMyTOGt8tiADr+zWUI/ChDWLa03O6EGoNWXhOwqMU9K
+         pcig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678227864;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2fMO3DDvUJJeV0Q226fQtHUTjSXAJS4amcasCJTxOgo=;
+        b=dCgIKo5XbzlUA71Hpbc5QNEOeN7uGtXzNMV5PJoZnUuZZyWSfGhcIi9a0dB5/zBo9Q
+         VXVARpqLt+9OVdcRwLKiE9J9/QUczj8D/yCtJqdyMPDTxhJP4Lj2uyPWQIfiCEz20xTj
+         P9+25U6A9sPSgVngAvCcPY2eN2Z/44VnQuHlhU6bSx/DsulLHkQ5EkkfT/jmSo6AviGr
+         pfTAeX2UhLwdl/Xm3cX7bQZgHFE5trdyo0aUocQULBtrq3O7cVTG29hq/FzwsjBfhJcS
+         Hu7/znTKYO3zX6+s8+G4mmL4cbs32CMbfOXXoZPCtC56BIse6xT4CJEo0plA+BrJZHnW
+         0QYA==
+X-Gm-Message-State: AO0yUKVGLVY9J8fKLwmDWy4AIolEbk4ouZDkAQ5QBjWrDgNwHs0ukR1z
+        BkxJ8WENoR4KfiQjd0q9PrtpJXI36PA=
+X-Google-Smtp-Source: AK7set9j79BlJ1H7xhvzqvNuittwP8TVj37nhEKqt9SDKwCzRF5NJST2f3KF3IAxMWCl3TiMunh3rw==
+X-Received: by 2002:a17:902:ab0c:b0:19b:c491:21be with SMTP id ik12-20020a170902ab0c00b0019bc49121bemr14787919plb.64.1678227864305;
+        Tue, 07 Mar 2023 14:24:24 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id d18-20020a170902729200b0019c901b35ecsm8814392pll.106.2023.03.07.14.24.23
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Mar 2023 14:24:23 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC v2 01/12] shared/crypto: Add bt_crypto_sirk
+Date:   Tue,  7 Mar 2023 14:24:11 -0800
+Message-Id: <20230307222422.2608483-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230307221732.3391-1-bage@debian.org>
-References: <20230307221732.3391-1-bage@debian.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Debian-User: bage
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Vasily Khoruzhick <anarsoul@gmail.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Some adapters (e.g. RTL8723CS) advertise that they have more than
-2 pages for local ext features, but they don't support any features
-declared in these pages. RTL8723CS reports max_page = 2 and declares
-support for sync train and secure connection, but it responds with
-either garbage or with error in status on corresponding commands.
+This adds bt_crypto_sirk which attempts to generate a unique SIRK using
+the following steps:
 
-Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-Signed-off-by: Bastian Germann <bage@debian.org>
+ - Generate a hash (k) using the str as input
+ - Generate a hash (sirk) using vendor, product, version and source as input
+ - Encrypt sirk using k as LTK with sef function.
 ---
- include/net/bluetooth/hci.h | 7 +++++++
- net/bluetooth/hci_event.c   | 9 +++++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ src/shared/crypto.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ src/shared/crypto.h |  3 +++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 400f8a7d0c3f..997107bfc0b1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -294,6 +294,13 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index 4cb2ea857ea8..5449621b55ea 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -926,3 +926,43 @@ bool bt_crypto_sef(struct bt_crypto *crypto, const uint8_t k[16],
+ 
+ 	return true;
+ }
 +
-+	/* When this quirk is set, max_page for local extended features
-+	 * is set to 1, even if controller reports higher number. Some
-+	 * controllers (e.g. RTL8723CS) report more pages, but they
-+	 * don't actually support features declared there.
-+	 */
-+	HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
- };
- 
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ad92a4be5851..8d8547fa9032 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -886,8 +886,13 @@ static u8 hci_cc_read_local_ext_features(struct hci_dev *hdev, void *data,
- 	if (rp->status)
- 		return rp->status;
- 
--	if (hdev->max_page < rp->max_page)
--		hdev->max_page = rp->max_page;
-+	if (hdev->max_page < rp->max_page) {
-+		if (test_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
-+			     &hdev->quirks))
-+			bt_dev_warn(hdev, "broken local ext features page 2");
-+		else
-+			hdev->max_page = rp->max_page;
-+	}
- 
- 	if (rp->page < HCI_MAX_PAGES)
- 		memcpy(hdev->features[rp->page], rp->features, 8);
++/* Generates a SIRK from a string using the following steps:
++ *  - Generate a hash (k) using the str as input
++ *  - Generate a hash (sirk) using vendor, product, version and source as input
++ *  - Encrypt sirk using k as LTK with sef function.
++ */
++bool bt_crypto_sirk(struct bt_crypto *crypto, const char *str, uint16_t vendor,
++			uint16_t product, uint16_t version, uint16_t source,
++			uint8_t sirk[16])
++{
++	struct iovec iov[4];
++	uint8_t k[16];
++	uint8_t sirk_plaintext[16];
++
++	if (!crypto)
++		return false;
++
++	iov[0].iov_base = (void *)str;
++	iov[0].iov_len = strlen(str);
++
++	/* Generate a k using the str as input */
++	if (!bt_crypto_gatt_hash(crypto, iov, 1, k))
++		return false;
++
++	iov[0].iov_base = &vendor;
++	iov[0].iov_len = sizeof(vendor);
++	iov[1].iov_base = &product;
++	iov[1].iov_len = sizeof(product);
++	iov[2].iov_base = &version;
++	iov[2].iov_len = sizeof(version);
++	iov[3].iov_base = &source;
++	iov[3].iov_len = sizeof(source);
++
++	/* Generate a sirk using vendor, product, version and source as input */
++	if (!bt_crypto_gatt_hash(crypto, iov, 4, sirk_plaintext))
++		return false;
++
++	/* Encrypt sirk using k as LTK with sef function */
++	return bt_crypto_sef(crypto, k, sirk_plaintext, sirk);
++}
+diff --git a/src/shared/crypto.h b/src/shared/crypto.h
+index fc1ba0c4feeb..d45308abf90a 100644
+--- a/src/shared/crypto.h
++++ b/src/shared/crypto.h
+@@ -57,3 +57,6 @@ bool bt_crypto_sef(struct bt_crypto *crypto, const uint8_t k[16],
+ 			const uint8_t sirk[16], uint8_t out[16]);
+ bool bt_crypto_sih(struct bt_crypto *crypto, const uint8_t k[16],
+ 					const uint8_t r[3], uint8_t hash[3]);
++bool bt_crypto_sirk(struct bt_crypto *crypto, const char *str, uint16_t vendor,
++			uint16_t product, uint16_t version, uint16_t source,
++			uint8_t sirk[16]);
 -- 
 2.39.2
 
