@@ -2,79 +2,93 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91747C6FA99
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFE8C6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229927AbjCGWOG (ORCPT
+        id S230151AbjCGWRv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 17:14:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
+        Tue, 7 Mar 2023 17:17:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbjCGWN7 (ORCPT
+        with ESMTP id S230082AbjCGWRu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 17:13:59 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0C225E39
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:13:56 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EC88961590
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 22:13:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5830EC4339B
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 22:13:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678227235;
-        bh=3aHhe66+0rJ5D1OhN3470hnAo2UuL/AmLuv5jUKBOnE=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=HfJs16BigAz3JSz80OFdxoYuXSG+zys/BO+6Lojvq0WkMwqrqFwdpM6jhMpQI/kyk
-         9UE/yxRQCnJ5HRsmS4fWxkhEfcihozQqqL+Om0aOQnOcPfOEetgNNMse+N714jV2qc
-         sqSMSQCYgxBVb9SOZuMoIsMv8xGNTRpXt81CDxC0lMVYHVDn1DWbbiDtGgUpS6VvVf
-         X1NYnFkz1z+vZ6vuxfjGiCN7Es49axHwUVCwRyra2zKox97ahJw7QLzwH4tRvLTnpZ
-         oGvtpGMNS+t2YYFFiSawsFsNhWN5icZ/zVwbGOE1vhpKWKTCIBpyVh2z9wVuBOCOg8
-         Bc5BCnMlIFWOw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 3A7F1C43143; Tue,  7 Mar 2023 22:13:55 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217150] Bluetooth USB Adapter that comes with Xbox One Wireless
- Controller stopped working on 6.3 rc1
-Date:   Tue, 07 Mar 2023 22:13:55 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: cmarobnjak@cock.email
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217150-62941-xHlzCzGhiR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217150-62941@https.bugzilla.kernel.org/>
-References: <bug-217150-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 7 Mar 2023 17:17:50 -0500
+Received: from stravinsky.debian.org (stravinsky.debian.org [IPv6:2001:41b8:202:deb::311:108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2836DABB23;
+        Tue,  7 Mar 2023 14:17:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+        s=smtpauto.stravinsky; h=X-Debian-User:Content-Transfer-Encoding:MIME-Version
+        :Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=8rjXBuE+gHixTw4Z4jUm3aIm4vdeoaR8G/ycbzRuTz4=; b=a/kvWzbde+BQp3M0cSltAqAOKh
+        yxmQljXZatg73eCssyfN7JPGbB+e0J9ZKDK7EjDknacFeKpB4ZlkLUgztE6f+/GW8uf6qWdl9SA89
+        oLdiKX3LqFzKtNpyN8AhZt0RBeL+jL3pSnvymlpPP0/95hDZ3FTRHiZl4hEa/VGy2pym8+X7VDSzq
+        WbPA8hNrliNEk4LPq+kWVZaG/DCWaFZl9kWJGby6Poj3jBFMW9udOokGYam93c5vXjwJiGZbIwPsK
+        f1ih8qzTBx2T5pPoNSWShv92InejXU0MSm0LWcN+Ll3m9wyVbVxmGoW2PrVWpe1qka/WCUVgh42lu
+        HD1OUjrg==;
+Received: from authenticated user
+        by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.94.2)
+        (envelope-from <bage@debian.org>)
+        id 1pZfcq-0034fC-Gf; Tue, 07 Mar 2023 22:17:40 +0000
+From:   Bastian Germann <bage@debian.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Bastian Germann <bage@debian.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH v6 0/2] Bluetooth: btrtl: add support for the RTL8723CS
+Date:   Tue,  7 Mar 2023 23:17:29 +0100
+Message-Id: <20230307221732.3391-1-bage@debian.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Debian-User: bage
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217150
+Pinebook uses RTL8723CS for WiFi and bluetooth. Unfortunately, RTL8723CS
+has broken BT-4.1 support, so it requires a quirk.
 
---- Comment #10 from Smokus (cmarobnjak@cock.email) ---
-Thanks for replying and explaining.
-Sorry for confusion.
+Add a quirk and wire up 8723CS support in btrtl.
+I was asked for a btmon output without the quirk;
+however, using the chip without the quirk ends up in a bad state with
+"Opcode 0x c77 failed: -56" (HCI_OP_READ_SYNC_TRAIN_PARAMS) on training.
+A btmon output with the quirk active was already sent by Vasily.
 
---=20
-You may reply to this email to add a comment.
+v1 of this series was sent in July 2020 by Vasily Khoruzhick.
+I have tested it to work on the Pinebook.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Changelog:
+v2:
+   * Rebase
+   * Add uart-has-rtscts to device tree as requested by reviewer
+v3:
+   * Drop the device tree as it was split out and is already integrated.
+   * Rename the quirk as requested by reviewer Marcel Holtmann
+v4:
+   * Use skb_pull_data as requested by reviewer Luiz Augusto von Dentz
+v5:
+   * Make use of skb_pull_data's length check
+v6:
+   * Warn on active quirk
+
+Vasily Khoruzhick (2):
+  Bluetooth: Add new quirk for broken local ext features page 2
+  Bluetooth: btrtl: add support for the RTL8723CS
+
+ drivers/bluetooth/btrtl.c   | 120 ++++++++++++++++++++++++++++++++++--
+ drivers/bluetooth/btrtl.h   |   5 ++
+ drivers/bluetooth/hci_h5.c  |   4 ++
+ include/net/bluetooth/hci.h |   7 +++
+ net/bluetooth/hci_event.c   |   9 ++-
+ 5 files changed, 139 insertions(+), 6 deletions(-)
+
+-- 
+2.39.2
+
