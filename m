@@ -2,81 +2,138 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06B73C678DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 18:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9B1C678D5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 18:15:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230221AbjCGSGv (ORCPT
+        id S232585AbjCGSPx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 13:06:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38042 "EHLO
+        Tue, 7 Mar 2023 13:15:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231140AbjCGSGb (ORCPT
+        with ESMTP id S232580AbjCGSOw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 13:06:31 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917FDACBB7
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 09:59:22 -0800 (PST)
+        Tue, 7 Mar 2023 13:14:52 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796A6A400D;
+        Tue,  7 Mar 2023 10:10:27 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DA53BB819C1
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 17:59:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A758FC433D2
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 17:59:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678211944;
-        bh=ng1TW4qXHSn2AZH+dGTPoXkcpYRxEKkHZv3adxtXops=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ApmZzVOl5SsF7lQIzN17E0BNGL0X+W8wR+aExWPvK/bI8/uB3lY8+0MPGcAnZcClm
-         4D5Z8UiBlwUtJPlGXsUtjFkN8PZ0ksEvouVxeQHVzRtbspm2wFpE38Uc0QeNX/6Yxt
-         g1c4n3fqLvq0zEPJM1845l+1UOMltQx92+utXQSXTq0IOaxVnghW/CUJGAoU3YrnkN
-         HwidZRDshhOGQhEuPx+Ggrmi7B9cURibo3dYOPxMRye3LlX+tW6hHVtmn2sAOAHhZO
-         6xCTmSrtNeumpC1afcmli6TTx4KrJxB9ATuqIIMyLg468M/eGKXbrkNd/p8TI0v8Ru
-         PGnRHoWk/TmLg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 83ADEC43141; Tue,  7 Mar 2023 17:59:04 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217150] Bluetooth USB Adapter that comes with Xbox One Wireless
- Controller stopped working on 6.3 rc1
-Date:   Tue, 07 Mar 2023 17:59:04 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: cmarobnjak@cock.email
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217150-62941-rb1GZfx0Eh@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217150-62941@https.bugzilla.kernel.org/>
-References: <bug-217150-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        by sin.source.kernel.org (Postfix) with ESMTPS id 7B0AECE1C6A;
+        Tue,  7 Mar 2023 18:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CF2C433EF;
+        Tue,  7 Mar 2023 18:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1678212623;
+        bh=Vv+iVSSOi8Umlt3lBcorE0IUmeDtulkHvsT93WekQvk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XtKE3wyF+RdxuNbcJi7CYQjbuz9oiY1Bj6sBA5hIivzSpyPgb6iQoYlXzSNmktc26
+         x6+B//SEw8zDgjMiii0hHawxwqW/J6GIQuvL31oX2v/XhhoJBESv/FCvku9YztDlOb
+         uFko4lFoGvqxCiVdHiP3OqHQAKlHt3+dpwCmkYK4=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     stable@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        patches@lists.linux.dev,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        Kees Cook <keescook@chromium.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 6.1 213/885] Bluetooth: hci_conn: Refactor hci_bind_bis() since it always succeeds
+Date:   Tue,  7 Mar 2023 17:52:27 +0100
+Message-Id: <20230307170011.338040639@linuxfoundation.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230307170001.594919529@linuxfoundation.org>
+References: <20230307170001.594919529@linuxfoundation.org>
+User-Agent: quilt/0.67
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217150
+From: Kees Cook <keescook@chromium.org>
 
---- Comment #7 from Smokus (cmarobnjak@cock.email) ---
-I am sorry, but I am not sure that I understand what you mean.
-I'm doing my best to comprehend all this, but I'm not that knowledgeable.
+[ Upstream commit a00a29b0eeea6caaaf9edc3dd284f81b072ee343 ]
 
-Have I done something wrong, or was it never supposed to work on 6.3?
+The compiler thinks "conn" might be NULL after a call to hci_bind_bis(),
+which cannot happen. Avoid any confusion by just making it not return a
+value since it cannot fail. Fixes the warnings seen with GCC 13:
 
---=20
-You may reply to this email to add a comment.
+In function 'arch_atomic_dec_and_test',
+    inlined from 'atomic_dec_and_test' at ../include/linux/atomic/atomic-instrumented.h:576:9,
+    inlined from 'hci_conn_drop' at ../include/net/bluetooth/hci_core.h:1391:6,
+    inlined from 'hci_connect_bis' at ../net/bluetooth/hci_conn.c:2124:3:
+../arch/x86/include/asm/rmwcc.h:37:9: warning: array subscript 0 is outside array bounds of 'atomic_t[0]' [-Warray-bounds=]
+   37 |         asm volatile (fullop CC_SET(cc) \
+      |         ^~~
+...
+In function 'hci_connect_bis':
+cc1: note: source object is likely at address zero
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Fixes: eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections")
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/bluetooth/hci_conn.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 3c3b79f2e4c03..09e7f841f149d 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1983,16 +1983,14 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
+ 		qos->latency = conn->le_conn_latency;
+ }
+ 
+-static struct hci_conn *hci_bind_bis(struct hci_conn *conn,
+-				     struct bt_iso_qos *qos)
++static void hci_bind_bis(struct hci_conn *conn,
++			 struct bt_iso_qos *qos)
+ {
+ 	/* Update LINK PHYs according to QoS preference */
+ 	conn->le_tx_phy = qos->out.phy;
+ 	conn->le_tx_phy = qos->out.phy;
+ 	conn->iso_qos = *qos;
+ 	conn->state = BT_BOUND;
+-
+-	return conn;
+ }
+ 
+ static int create_big_sync(struct hci_dev *hdev, void *data)
+@@ -2128,11 +2126,7 @@ struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (IS_ERR(conn))
+ 		return conn;
+ 
+-	conn = hci_bind_bis(conn, qos);
+-	if (!conn) {
+-		hci_conn_drop(conn);
+-		return ERR_PTR(-ENOMEM);
+-	}
++	hci_bind_bis(conn, qos);
+ 
+ 	/* Add Basic Announcement into Peridic Adv Data if BASE is set */
+ 	if (base_len && base) {
+-- 
+2.39.2
+
+
+
