@@ -2,108 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D187C678D5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 21:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91747C6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 22:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231594AbjCGV5M (ORCPT
+        id S229927AbjCGWOG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 16:57:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40980 "EHLO
+        Tue, 7 Mar 2023 17:14:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229819AbjCGV5K (ORCPT
+        with ESMTP id S229925AbjCGWN7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 16:57:10 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A83AFAD02F;
-        Tue,  7 Mar 2023 13:57:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678226228; x=1709762228;
-  h=from:to:cc:subject:date:message-id:mime-version:reply-to:
-   content-transfer-encoding;
-  bh=8vgY/QVBJu+X9HRFZSvBWKypnSnfRJHbl/eOU7wG2o4=;
-  b=SgSDl/8dCMoCFnDaMC14DGdjo5SGSgtd+eK55VAdU4UN7VJvr8mUDqy7
-   ttXQoCvybknpF2JXQUvHEHSL5QHvQoF84fM6RC2Gr+CCL+n7ocBMkkwWJ
-   qi4pUGct+GwyWcKV66DhV80evm+uHKg688r0AhdbDNqxnDMkIO2mzC8DU
-   luol4ridf32lOWvCVRAQ9wJlo7B8IdjT6b4G4WtVWhuYT7AZeyYcXaYRu
-   x3w9q1qRUzd+wk0Iahkm5Q4iky0BxAoNrjqjfY8qDzqg5Tp0M2BAfxBzY
-   mJBOxla+ZHMjXUhr57KFV6BZHa+80P8Xdz1GqnVrqTwrxDkS0dQNdS3ih
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="400810562"
-X-IronPort-AV: E=Sophos;i="5.98,242,1673942400"; 
-   d="scan'208";a="400810562"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 13:57:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="786853606"
-X-IronPort-AV: E=Sophos;i="5.98,242,1673942400"; 
-   d="scan'208";a="786853606"
-Received: from kmdehmer-mobl1.amr.corp.intel.com (HELO lenb-mobl1.amr.corp.intel.com) ([10.212.14.112])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 13:57:06 -0800
-From:   Len Brown <len.brown@intel.com>
-To:     rafael@kernel.org
-Cc:     linux-pm@vger.kernel.org, Len Brown <len.brown@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] hci_qca: do not interfere with system suspend
-Date:   Tue,  7 Mar 2023 15:56:06 -0600
-Message-Id: <7687c4239424f2a49c6c596d19eea8dd7ebe8a30.1678226070.git.len.brown@intel.com>
-X-Mailer: git-send-email 2.37.2
+        Tue, 7 Mar 2023 17:13:59 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0C225E39
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 14:13:56 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EC88961590
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 22:13:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5830EC4339B
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 22:13:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678227235;
+        bh=3aHhe66+0rJ5D1OhN3470hnAo2UuL/AmLuv5jUKBOnE=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=HfJs16BigAz3JSz80OFdxoYuXSG+zys/BO+6Lojvq0WkMwqrqFwdpM6jhMpQI/kyk
+         9UE/yxRQCnJ5HRsmS4fWxkhEfcihozQqqL+Om0aOQnOcPfOEetgNNMse+N714jV2qc
+         sqSMSQCYgxBVb9SOZuMoIsMv8xGNTRpXt81CDxC0lMVYHVDn1DWbbiDtGgUpS6VvVf
+         X1NYnFkz1z+vZ6vuxfjGiCN7Es49axHwUVCwRyra2zKox97ahJw7QLzwH4tRvLTnpZ
+         oGvtpGMNS+t2YYFFiSawsFsNhWN5icZ/zVwbGOE1vhpKWKTCIBpyVh2z9wVuBOCOg8
+         Bc5BCnMlIFWOw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3A7F1C43143; Tue,  7 Mar 2023 22:13:55 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217150] Bluetooth USB Adapter that comes with Xbox One Wireless
+ Controller stopped working on 6.3 rc1
+Date:   Tue, 07 Mar 2023 22:13:55 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: cmarobnjak@cock.email
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-217150-62941-xHlzCzGhiR@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217150-62941@https.bugzilla.kernel.org/>
+References: <bug-217150-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Reply-To: Len Brown <lenb@kernel.org>
-Organization: Intel Open Source Technology Center
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When hci_qca returns an error to its pm_ops.suspend routine,
-the PM subsystem will terminate the system wide suspend.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217150
 
-It is extremely unlikely that there will ever be a justification
-for hci_qca, no matter what its internal malfunction, should
-cause system-wide suspend to terminate.
+--- Comment #10 from Smokus (cmarobnjak@cock.email) ---
+Thanks for replying and explaining.
+Sorry for confusion.
 
-Doing so, could result in the scenario where a laptop lid is closed,
-suspend termnates, the user places the running laptop into a breifcase,
-not expecting it to be overheating or draining its battery...
+--=20
+You may reply to this email to add a comment.
 
-This is not a theoretical issue.
-The 6.3-rc1 currently fails this way on the Dell XPS-13-9310:
-
-Bluetooth: hci0: SSR or FW download time out
-hci_uart_qca serial0-0: PM: dpm_run_callback(): acpi_subsys_suspend+0x0/0x70 returns -110
-hci_uart_qca serial0-0: PM: failed to suspend: error -110
-PM: suspend of devices aborted after 3218.724 msecs
-PM: start suspend of devices aborted after 3246.859 msecs
-PM: Some devices failed to suspend, or early wake event detected
-PM: resume of devices complete after 84.988 msecs
-
-Signed-off-by: Len Brown <len.brown@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- drivers/bluetooth/hci_qca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 3df8c3606e93..1795cc527b88 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2309,7 +2309,7 @@ static int __maybe_unused qca_suspend(struct device *dev)
- error:
- 	clear_bit(QCA_SUSPENDING, &qca->flags);
- 
--	return ret;
-+	return 0;
- }
- 
- static int __maybe_unused qca_resume(struct device *dev)
--- 
-2.37.2
-
+You are receiving this mail because:
+You are the assignee for the bug.=
