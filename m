@@ -2,77 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F71FC678DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 18:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A203C678D4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Mar 2023 18:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233384AbjCGSwW (ORCPT
+        id S233270AbjCGSwX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 13:52:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53642 "EHLO
+        Tue, 7 Mar 2023 13:52:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233315AbjCGSwF (ORCPT
+        with ESMTP id S231359AbjCGSwG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 13:52:05 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C9C3ABB05;
-        Tue,  7 Mar 2023 10:40:28 -0800 (PST)
+        Tue, 7 Mar 2023 13:52:06 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96071ABB0F;
+        Tue,  7 Mar 2023 10:40:29 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5CEEB6154D;
-        Tue,  7 Mar 2023 18:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C1B45C4339E;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2CC6BB819CC;
+        Tue,  7 Mar 2023 18:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BC57CC4339C;
         Tue,  7 Mar 2023 18:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1678214422;
-        bh=0Km3cU2M71bUNgN4deuOVVicUmYwuXX7+MzpAI8YyRA=;
+        bh=iIj+KJVJvP+2p1SBvnFT8/Ub+i++GGMY0Mem0dbIzqY=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=IxtG0Hc0Ma8jZduCGVu0ababp6DD824SeUrXR1fSW6AkjHfb2GgGlJkmzfEPXA1f3
-         1zDVLFHzbLrzTras0bffQxg17G+WdHlio7vpV8AeICJUQn5kvf64QKi/oQjFoiS8VJ
-         AxEps4KThLh9vXTjpWFtcf3ZN0BxTKhpFjRnZ1zKcmuREIQtzKihxjnFPMLK6ljvn5
-         J9JqI4TWQlVXWkFprZ/jPr40HuS5XY+sa8OsEPj6zcmbkfSK2nC2vVO7b6oM7amORH
-         CV5rc+JxQEHh1eIsjmtvzIQF67HGO+6eykMabYywL06NhOKHMtE80FnjVYyuAAEUxM
-         /Jq6rKJ1DsWYg==
+        b=HuVuAf1h9KSuk8dejsvl1Updr+QlpxusrT4Bg06Jf4RyuMjM9eZOfe0qp3H86oWL+
+         Z5pXI/+hNY3LGTClUpiNdLt/vNWIhiNjNz/QBObkIGbtJEkhnrWy/DSgF/Ptaj4qqp
+         B8AQlCdeVV8OjuJbU20o1h/cMwXzXlx5Z/YYgyp+Nj8MuxxVOmQb2UHuOda5MF8st1
+         EneD9I5Iy9RtOpCCKfiLbDUDMrDXwtF/qHW+2QwYuqjTkh972FCZfvUlVV1XbEt+7K
+         VBg4kAzddwJ/nIiBR9Ex/Bo6RSyXFcCaTLkT3ZYRJTHfTdmpnnSRSXqKpWxsnzfHqD
+         9MWpcLu+dcTSw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A1AE3E61B66;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 96588E61B67;
         Tue,  7 Mar 2023 18:40:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] Bluetooth: btusb: Add new PID/VID 04ca:3801 for MT7633
+Subject: Re: [PATCH] Bluetooth: hci_sync: Don't wait peer's reply when powering
+ off
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167821442265.6197.1268673976982343328.git-patchwork-notify@kernel.org>
+Message-Id: <167821442261.6197.2161849719064064403.git-patchwork-notify@kernel.org>
 Date:   Tue, 07 Mar 2023 18:40:22 +0000
-References: <20230228051554.13501-1-tangmeng@uniontech.com>
-In-Reply-To: <20230228051554.13501-1-tangmeng@uniontech.com>
-To:     Meng Tang <tangmeng@uniontech.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhuweijun@uniontech.com
+References: <20230306170628.1.I8d0612b2968dd4740a4ceaf42f329fb59d5b9324@changeid>
+In-Reply-To: <20230306170628.1.I8d0612b2968dd4740a4ceaf42f329fb59d5b9324@changeid>
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, chromeos-bluetooth-upstreaming@chromium.org,
+        apusaka@chromium.org, abhishekpandit@google.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        johan.hedberg@gmail.com, pabeni@redhat.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 28 Feb 2023 13:15:53 +0800 you wrote:
-> This bluetooth device is found in a combo WLAN/BT card
-> for a MediaTek 7633.
+On Mon,  6 Mar 2023 17:07:07 +0800 you wrote:
+> From: Archie Pusaka <apusaka@chromium.org>
 > 
-> Tested on Acer Aspire A315-24P Notebook
+> Currently, when we initiate disconnection, we will wait for the peer's
+> reply unless when we are suspending, where we fire and forget the
+> disconnect request.
 > 
-> The device information:
+> A similar case is when adapter is powering off. However, we still wait
+> for the peer's reply in this case. Therefore, if the peer is
+> unresponsive, the command will time out and the power off sequence
+> will fail, causing "bluetooth powered on by itself" to users.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] Bluetooth: btusb: Add new PID/VID 04ca:3801 for MT7633
-    (no matching commit)
-  - [2/2] Bluetooth: Add VID/PID 0489/e0e4 for MediaTek MT7922
-    https://git.kernel.org/bluetooth/bluetooth-next/c/46c62fe67690
+  - Bluetooth: hci_sync: Don't wait peer's reply when powering off
+    https://git.kernel.org/bluetooth/bluetooth-next/c/bc044bb47d5a
 
 You are awesome, thank you!
 -- 
