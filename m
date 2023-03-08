@@ -2,142 +2,130 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9D3C64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Mar 2023 08:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29B76C64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Mar 2023 14:16:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229999AbjCHIlR (ORCPT
+        id S230297AbjCHOQS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Mar 2023 03:41:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47540 "EHLO
+        Wed, 8 Mar 2023 09:16:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbjCHIlN (ORCPT
+        with ESMTP id S230182AbjCHOP6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Mar 2023 03:41:13 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC8B85B0B
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Mar 2023 00:40:50 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id qa18-20020a17090b4fd200b0023750b675f5so1536293pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Mar 2023 00:40:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678264850;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jl8NTj9wIGC2Z7HcWr2/Ogfq0j02FPacbdp0Z3PuKcI=;
-        b=Z/uIM623xq62ohuHiBlMQ8XdNUfFQcqoSmXMHVXyXyV5FZzHe5dPK5EqHdw+QHq8eW
-         1yjgH35jilB1jiPHIrlxBAf/2cE3k3nSaQagN9h2R8WoOpJ8GfNKDmkr6b0IpqRYiPAE
-         3LEBojcdq355p33bsTImNvzZ+F3/NS/26wr8MoNRRGgkY0+pecjeh3GaJL82sme564UF
-         JGFMirZ+xt6RZ6yv/OjxSkKNr6781f/kQesIwWh4hOww5qlXBl/hGXrbK9/H0qMZmLF7
-         vdgcDgdMZ3gWqNpJJYYp/bxVyMr4IMlHQ4nDvzSgBI01BDm4/291uZelVFYmqoe7LDfq
-         A0OA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678264850;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jl8NTj9wIGC2Z7HcWr2/Ogfq0j02FPacbdp0Z3PuKcI=;
-        b=FsNpFfB5SmV2Mds1VA8OU/xkc1K10ncDcFgYgTZXAmzQRAN19+lhiccGn8K9aBZmTC
-         GGYwnFDfe5bh1EYIKUhlbcDPUXIhPAH9mPHApJQS+aY7C2oySRBaq0u7LfupKxi7dzW5
-         BKhBjFfeZ9bbHgkiLrcaTIb7uI82Tw+i05NdVn0ntT37B6D+Ez0h3RT69/C2qj/jAyVH
-         81gaR+DGBkxyb94ZNVb3O79Cnn9PAOcIt4DGZBpPA+rnD+LISypvWG6ZwZB2iBe7eDPN
-         /yAPARmRyWjgm6V35XpTIhqFkojl437RQg0gissXB/2EalIKud7ACS9ziAtvhh5WvDRW
-         nLWg==
-X-Gm-Message-State: AO0yUKUSCtr+hT5LR3iIr20gC/iKdLmAhJ9I4UAIShs5T7M7FtLrAOwA
-        TVotafxu5B7bAUMRgf+ubjQK0l1wX6U65w==
-X-Google-Smtp-Source: AK7set/6TQTGpfHgxDBOsHUtt0iBFzZha1yb+ReA3E4w7JBXPiw6vhgTWQPDBzDsJHxiIvlMq7++1g==
-X-Received: by 2002:a05:6a20:9305:b0:cb:e98e:d1eb with SMTP id r5-20020a056a20930500b000cbe98ed1ebmr15717820pzh.29.1678264849907;
-        Wed, 08 Mar 2023 00:40:49 -0800 (PST)
-Received: from [172.17.0.2] ([13.88.59.99])
-        by smtp.gmail.com with ESMTPSA id g3-20020a635203000000b005035f5e1f9csm8827767pgb.2.2023.03.08.00.40.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Mar 2023 00:40:49 -0800 (PST)
-Message-ID: <64084a11.630a0220.bb3c.0e5c@mx.google.com>
-Date:   Wed, 08 Mar 2023 00:40:49 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============9112618336926817450=="
+        Wed, 8 Mar 2023 09:15:58 -0500
+X-Greylist: delayed 2540 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Mar 2023 06:15:13 PST
+Received: from mx.kernkonzept.com (serv1.kernkonzept.com [IPv6:2a01:4f8:1c1c:b490::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB61E1284F;
+        Wed,  8 Mar 2023 06:15:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=kernkonzept.com; s=mx1; h=Content-Transfer-Encoding:MIME-Version:Message-Id
+        :Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=QrZYVvSNtxaKT8D9lbTOaDhKkhtey9lBp94YC1HyUr0=; b=N8NiX025ifePgw8eArmbWvwwmK
+        eDcOuuqS+x4p4/X0DxHFkJoSo9iFmdrgAtRfouWj2HdOwLyDHh4NBmrrKlfSeoQ6Mq/sX63PEk/IS
+        Ibnf53ymxIZjO5de2P+uQvQbrPA2+uQq3pj33ovjq8S6s3MHA0sxYxhq2rTewdFs9vR/fPClJTcZq
+        n0QxNQfjBFsPzOqHlUv/xNbjgvUrJaHzVDvb0X+UFCT8STmCg+fy572EbJjCWKaQXfnPftr+jzqyk
+        wBkS3ykUi13QIqHtP2P1mMiYbrjvFfUvlDYhQlE48gRwFM9DriaokSNHpc3KNmNgqZf8X27w4ooHt
+        8IezIz2Q==;
+Received: from [10.22.3.24] (helo=kernkonzept.com)
+        by mx.kernkonzept.com with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim 4.94.2)
+        id 1pZtuO-00FDSF-20; Wed, 08 Mar 2023 14:32:44 +0100
+From:   Stephan Gerhold <stephan.gerhold@kernkonzept.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Stephan Gerhold <stephan@gerhold.net>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Stephan Gerhold <stephan.gerhold@kernkonzept.com>
+Subject: [PATCH v2 RESEND] Bluetooth: btqcomsmd: Fix command timeout after setting BD address
+Date:   Wed,  8 Mar 2023 14:31:55 +0100
+Message-Id: <20230308133155.165537-1-stephan.gerhold@kernkonzept.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v1] Bluetooth: btinel: Check ACPI handle for NULL before accessing
-In-Reply-To: <20230308075837.5559-1-kiran.k@intel.com>
-References: <20230308075837.5559-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============9112618336926817450==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On most devices using the btqcomsmd driver (e.g. the DragonBoard 410c
+and other devices based on the Qualcomm MSM8916/MSM8909/... SoCs)
+the Bluetooth firmware seems to become unresponsive for a while after
+setting the BD address. On recent kernel versions (at least 5.17+)
+this often causes timeouts for subsequent commands, e.g. the HCI reset
+sent by the Bluetooth core during initialization:
 
-This is automated email and please do not reply to this email!
+    Bluetooth: hci0: Opcode 0x c03 failed: -110
 
-Dear submitter,
+Unfortunately this behavior does not seem to be documented anywhere.
+Experimentation suggests that the minimum necessary delay to avoid
+the problem is ~150us. However, to be sure add a sleep for > 1ms
+in case it is a bit longer on other firmware versions.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=727769
+Older kernel versions are likely also affected, although perhaps with
+slightly different errors or less probability. Side effects can easily
+hide the issue in most cases, e.g. unrelated incoming interrupts that
+cause the necessary delay.
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.09 seconds
-GitLint                       FAIL      0.68 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      39.89 seconds
-CheckAllWarning               PASS      43.61 seconds
-CheckSparse                   PASS      48.66 seconds
-CheckSmatch                   PASS      132.79 seconds
-BuildKernel32                 PASS      37.94 seconds
-TestRunnerSetup               PASS      553.43 seconds
-TestRunner_l2cap-tester       PASS      18.92 seconds
-TestRunner_iso-tester         PASS      21.80 seconds
-TestRunner_bnep-tester        PASS      6.97 seconds
-TestRunner_mgmt-tester        PASS      132.20 seconds
-TestRunner_rfcomm-tester      PASS      10.79 seconds
-TestRunner_sco-tester         PASS      9.90 seconds
-TestRunner_ioctl-tester       PASS      12.01 seconds
-TestRunner_mesh-tester        PASS      8.58 seconds
-TestRunner_smp-tester         PASS      9.87 seconds
-TestRunner_userchan-tester    PASS      7.17 seconds
-IncrementalBuild              PASS      35.82 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v1] Bluetooth: btinel: Check ACPI handle for NULL before accessing
-WARNING: Possible repeated word: 'Simics'
-#77: 
-Hardware name: Simics Simics, BIOS Simics 01/01/2011
-
-total: 0 errors, 1 warnings, 27 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13165350.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v1] Bluetooth: btinel: Check ACPI handle for NULL before accessing
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-13: B1 Line exceeds max length (381>80): "Modules linked in: bnep intel_powerclamp coretemp kvm_intel kvm irqbypass intel_cstate input_leds joydev serio_raw mac_hid btusb(OE) btintel(OE) bluetooth(OE) lpc_ich compat(OE) ecdh_generic i7core_edac i5500_temp shpchp binfmt_misc sch_fq_codel parport_pc ppdev lp parport ip_tables x_tables autofs4 hid_generic usbhid hid e1000e psmouse ahci pata_acpi libahci ptp pps_core floppy"
-14: B1 Line exceeds max length (91>80): "CPU: 0 PID: 35 Comm: kworker/u3:0 Tainted: G           OE    4.15.0-140-generic #144-Ubuntu"
-
-
+Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
+Signed-off-by: Stephan Gerhold <stephan.gerhold@kernkonzept.com>
 ---
-Regards,
-Linux Bluetooth
+Unmodified third(!) resend of the v2 I sent back in June last year, and
+again in October and January. Any kind of feedback would be much
+appreciated. This is an important bug fix! Please do let me know if I'm
+sending this patch incorrectly or am doing something else wrong. :)
 
+I originally tested this using a script that reboots repeatedly and
+checks for the error. With this patch, BT shows up successfully for 100+
+consecutive boots. Without this patch it usually fails after 1-5 boots
+(or even always on some boards).
 
---===============9112618336926817450==--
+Changes in v2:
+  - Clarify commit message: Add affected devices and kernel versions
+---
+ drivers/bluetooth/btqcomsmd.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+index 2acb719e596f..11c7e04bf394 100644
+--- a/drivers/bluetooth/btqcomsmd.c
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -122,6 +122,21 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int btqcomsmd_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	int ret;
++
++	ret = qca_set_bdaddr_rome(hdev, bdaddr);
++	if (ret)
++		return ret;
++
++	/* The firmware stops responding for a while after setting the bdaddr,
++	 * causing timeouts for subsequent commands. Sleep a bit to avoid this.
++	 */
++	usleep_range(1000, 10000);
++	return 0;
++}
++
+ static int btqcomsmd_probe(struct platform_device *pdev)
+ {
+ 	struct btqcomsmd *btq;
+@@ -162,7 +177,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+ 	hdev->close = btqcomsmd_close;
+ 	hdev->send = btqcomsmd_send;
+ 	hdev->setup = btqcomsmd_setup;
+-	hdev->set_bdaddr = qca_set_bdaddr_rome;
++	hdev->set_bdaddr = btqcomsmd_set_bdaddr;
+ 
+ 	ret = hci_register_dev(hdev);
+ 	if (ret < 0)
+-- 
+2.30.2
+
