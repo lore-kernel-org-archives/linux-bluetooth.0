@@ -2,111 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 476CFC678D5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Mar 2023 02:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B082CC678D5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Mar 2023 07:48:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229750AbjCHCTM (ORCPT
+        id S229685AbjCHHsJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Mar 2023 21:19:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42104 "EHLO
+        Wed, 8 Mar 2023 02:48:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229840AbjCHCTI (ORCPT
+        with ESMTP id S229634AbjCHHsH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Mar 2023 21:19:08 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7875A592E
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 18:19:06 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id ky4so16348462plb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Mar 2023 18:19:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678241946;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXIFFHx9XvIwm3UV1q/zohN3vUA1jd0v99HTvuJjsvM=;
-        b=V7Tv/uiluYCasG/z7sGfZTq4i0bwnq5/TWp+4VaUdR1hSNw0qjoiprfdmMGxzGUKj0
-         aa79O6Ojhc8sZJSim2cQzeVR3r4b/OhsOoOzXa5ksF8AfInSwGR8cbNTERFajiLkHJOZ
-         deNc8FPUh/rtAbJ+WA1x0Y1G/q8WxYFo4tV4S6uXnXqcnbtEr8viP+9klGBnF3c4eoqd
-         tlCAdkpypnH5K9CgrCJSaPRjPCSxnNBE5mePWYnoba2EOf4UgYWVW9UIyl2X9Vm5raui
-         1p0T8FgxpFH7rtvZjBrh7wPKhuOAijTvT2ZNNpP7j+eb4kDdesbP6BS/J5KQcU5x+J6a
-         waJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678241946;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rXIFFHx9XvIwm3UV1q/zohN3vUA1jd0v99HTvuJjsvM=;
-        b=JzLmjYVVewNg3S4NsPTxS3XvagCly5Nf6Cw+XMnHeo+Ya7IzdU4rS5XzhRQr/l3hfz
-         +w3pm9W2/uBQX7w8BgkjmslsNqmset4A2sg12iZKpAxTBut/SH8HQYBeXD0fxbr3myFX
-         frVRXEShLvIfiucSWt+nOhLGQAFDAWVK45I78Z+MB+Fn2lQNwuRURX0dqyakinynV/sE
-         dWvE6oCWhVfo1x09QQIvTXoOcdQ5SgACpmHRT8Ihejicpp/0mh5Tb23VGtZcN6tYMnyM
-         hW8qu4yHAyjO6ViRb9e4rDsAjjNFQLran8b6T6JEcM3XnA4vWD7gpx1MSUGHePGIpPqN
-         IzPg==
-X-Gm-Message-State: AO0yUKU1z9z5okfWKBFl5M5LWXi01v1/ypILaIjE7M9+UZtAgt5QCDHO
-        XOaUnLNyHy4OGIl81e23t1rp+e96fYg=
-X-Google-Smtp-Source: AK7set8o1SGavLGZ2n2wvi5Ix4p6UjBkT9qAgikL86IEcYpKVfEnb3Bo3ss2KeEgE1jV14qpf3WjEA==
-X-Received: by 2002:a17:90b:1d12:b0:234:e3f:f53b with SMTP id on18-20020a17090b1d1200b002340e3ff53bmr17432724pjb.21.1678241945935;
-        Tue, 07 Mar 2023 18:19:05 -0800 (PST)
-Received: from [172.17.0.2] ([20.171.102.112])
-        by smtp.gmail.com with ESMTPSA id y20-20020a17090aca9400b0023317104415sm9838169pjt.17.2023.03.07.18.19.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Mar 2023 18:19:05 -0800 (PST)
-Message-ID: <6407f099.170a0220.47f45.2cc0@mx.google.com>
-Date:   Tue, 07 Mar 2023 18:19:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3295788535551704058=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] device: Fix not always storing device info
-In-Reply-To: <20230308005158.2661414-1-luiz.dentz@gmail.com>
-References: <20230308005158.2661414-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+        Wed, 8 Mar 2023 02:48:07 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D67B17CCF
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Mar 2023 23:48:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678261685; x=1709797685;
+  h=from:to:cc:subject:date:message-id;
+  bh=RtZ5oIEUSoLHwRJW+yI4U0mCO+6mM7MVUFD0dEPLXOs=;
+  b=LPvhyebfYiTFcUxjqOdlMiDmI+vH3lbFT8HUpCzaNKLBUT8FKnhIIZuk
+   6yaRc7eKHCP/cx8HjHt2gY7RPzbAuLEnQez5FuwJzHWkMqtJpi3/zJ0WO
+   jBDTQfuK9KSrqaSaVc2dDvH72rA2W2hoTkd5H747ia9xD0CEH6VRgq/sX
+   rSQdn2DbrkGbGFyYkG7hCiiEXqdIfz6vdb67HGvaDVbeLbCWehh2Tif8N
+   K8HBGTze87zUGN6Gj6ckohwxQlohdeBOljY952d33Ai1Bk91XNKcZtWsg
+   0/QrB9cTGa2aEcmXBRjXJ3q4GKYtG7+SvCsT1HNwZWlaVaE79ePFG89gJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="319921287"
+X-IronPort-AV: E=Sophos;i="5.98,243,1673942400"; 
+   d="scan'208";a="319921287"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2023 23:48:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10642"; a="679249755"
+X-IronPort-AV: E=Sophos;i="5.98,243,1673942400"; 
+   d="scan'208";a="679249755"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga007.fm.intel.com with ESMTP; 07 Mar 2023 23:48:02 -0800
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, lokendra.singh@intel.com,
+        chethan.tumkur.narayan@intel.com, Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btinel: Check ACPI handle for NULL before accessing
+Date:   Wed,  8 Mar 2023 13:28:37 +0530
+Message-Id: <20230308075837.5559-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3295788535551704058==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Older platforms and Virtual platforms which doesn't have support for
+bluetooth device in ACPI firmware will not have valid ACPI handle. Check
+for validity of handle before accessing.
 
-This is automated email and please do not reply to this email!
+dmesg log from simics environment (virtual platform):
 
-Dear submitter,
+BUG: unable to handle kernel NULL pointer dereference at 0000000000000018
+IP: acpi_ns_walk_namespace+0x5c/0x278
+PGD 0 P4D 0
+Oops: 0000 [#1] SMP PTI
+Modules linked in: bnep intel_powerclamp coretemp kvm_intel kvm irqbypass intel_cstate input_leds joydev serio_raw mac_hid btusb(OE) btintel(OE) bluetooth(OE) lpc_ich compat(OE) ecdh_generic i7core_edac i5500_temp shpchp binfmt_misc sch_fq_codel parport_pc ppdev lp parport ip_tables x_tables autofs4 hid_generic usbhid hid e1000e psmouse ahci pata_acpi libahci ptp pps_core floppy
+CPU: 0 PID: 35 Comm: kworker/u3:0 Tainted: G           OE    4.15.0-140-generic #144-Ubuntu
+Hardware name: Simics Simics, BIOS Simics 01/01/2011
+Workqueue: hci0 hci_power_on [bluetooth]
+RIP: 0010:acpi_ns_walk_namespace+0x5c/0x278
+RSP: 0000:ffffaa9c0049bba8 EFLAGS: 00010246
+RAX: 0000000000000001 RBX: 0000000000001001 RCX: 0000000000000010
+RDX: ffffffff92ea7e27 RSI: ffffffff92ea7e10 RDI: 00000000000000c8
+RBP: ffffaa9c0049bbf8 R08: 0000000000000000 R09: ffffffffc05b39d0
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000001
+R13: 0000000000000000 R14: ffffffffc05b39d0 R15: ffffaa9c0049bc70
+FS:  0000000000000000(0000) GS:ffff8be73fc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000018 CR3: 0000000075f0e000 CR4: 00000000000006f0
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=727684
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.71 seconds
-GitLint                       PASS      0.49 seconds
-BuildEll                      PASS      26.25 seconds
-BluezMake                     PASS      763.65 seconds
-MakeCheck                     PASS      11.06 seconds
-MakeDistcheck                 PASS      154.66 seconds
-CheckValgrind                 PASS      241.74 seconds
-CheckSmatch                   PASS      323.62 seconds
-bluezmakeextell               PASS      97.21 seconds
-IncrementalBuild              PASS      1235.69 seconds
-ScanBuild                     WARNING   983.36 seconds
-
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/gatt-database.c:1152:10: warning: Value stored to 'bits' during its initialization is never read
-        uint8_t bits[] = { BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING,
-                ^~~~     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-
-
-
+Fixes: ee9b749cb9ad ("Bluetooth: btintel: Iterate only bluetooth device ACPI entries")
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index e8d4b59e89c5..af774688f1c0 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2326,6 +2326,7 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 	struct btintel_ppag ppag;
+ 	struct sk_buff *skb;
+ 	struct btintel_loc_aware_reg ppag_cmd;
++	acpi_handle handle;
+ 
+ 	/* PPAG is not supported if CRF is HrP2, Jfp2, JfP1 */
+ 	switch (ver->cnvr_top & 0xFFF) {
+@@ -2335,12 +2336,18 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 		return;
+ 	}
+ 
++	handle = ACPI_HANDLE(GET_HCIDEV_DEV(hdev));
++	if (!handle) {
++		bt_dev_info(hdev, "No support for BT device in ACPI firmware");
++		return;
++	}
++
+ 	memset(&ppag, 0, sizeof(ppag));
+ 
+ 	ppag.hdev = hdev;
+ 	ppag.status = AE_NOT_FOUND;
+-	acpi_walk_namespace(ACPI_TYPE_PACKAGE, ACPI_HANDLE(GET_HCIDEV_DEV(hdev)),
+-			    1, NULL, btintel_ppag_callback, &ppag, NULL);
++	acpi_walk_namespace(ACPI_TYPE_PACKAGE, handle, 1, NULL,
++			    btintel_ppag_callback, &ppag, NULL);
+ 
+ 	if (ACPI_FAILURE(ppag.status)) {
+ 		if (ppag.status == AE_NOT_FOUND) {
+-- 
+2.17.1
 
---===============3295788535551704058==--
