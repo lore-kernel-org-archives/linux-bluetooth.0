@@ -2,118 +2,136 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5416C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 09:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1145C64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 10:02:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbjCIJfR (ORCPT
+        id S231313AbjCIKCW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 04:35:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49030 "EHLO
+        Thu, 9 Mar 2023 05:02:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230131AbjCIJfP (ORCPT
+        with ESMTP id S231190AbjCIKCM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 04:35:15 -0500
-Received: from mail-pl1-x641.google.com (mail-pl1-x641.google.com [IPv6:2607:f8b0:4864:20::641])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52B6FC8881
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 01:35:14 -0800 (PST)
-Received: by mail-pl1-x641.google.com with SMTP id h8so1333630plf.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 01:35:14 -0800 (PST)
+        Thu, 9 Mar 2023 05:02:12 -0500
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5298ECB661
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 02:02:11 -0800 (PST)
+Received: by mail-qv1-xf2c.google.com with SMTP id ne1so1033197qvb.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 02:02:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678354513;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hH6w8aDTHHGmr5ss4kp7zLJEI+UrSruaARLEvYxT/Ns=;
-        b=WuKJHElAnv28wPvaveH+UDDboXCr6pi8mcUMNaoiI29lMnv8Dl861Ptw8ulzGyQW1K
-         lfx4Sc5+8RhTycwpIwE43UqRY2rTzhA7mT/kdxEguGbZAnlXWeXQcZWSKbUtSQ4c7RvN
-         8OBCFvcydnI1w2pFwjnJ7gXs+bx3b7os8ptn388AMIjZ2DmLQbKuQjqvuwqvMvb5iE8s
-         AuyDgX9Vl+GMvgVxVDjhzo6QRcHsBG6jIsma7stlzsAFZt/fVpdEf6qO+2sBi7SVbc5L
-         lLzYpbA9Je5/WsUNjq8ny+six8/EBRUbZKC7lNxML2cmDq6iiT3vvgMbxfSUhZuq8+XR
-         S/QA==
+        d=gmail.com; s=20210112; t=1678356130;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Apyq7JUpKvglJaTYHduVqSQM1WLkaW9bjLJFKMScdGE=;
+        b=k+B2Sl4zHvbKe4HtbRdrxO0riNydRRhlsGa9Pn+Lp/GXzQxizHbA+LOl7DJdTNUdwV
+         PIFakNr8EqMzFNdo70CZQzpo/gbpvy8/h4fz5wnMRFVJkSD5GtVvuLp7TzGTDx0X0z23
+         qp83TD8WX4YahnqwjT9k2Ov42UbyxVF00jDdJ4eXfnjIYZsz28ezbx4UQ/TMxvGLRJTV
+         UYwUihvJbFZd1eq9xZTGBUJCEeQbuyzW9vKoLzpXY1YYpFcR5xCHEmkG21lwZ03UAHnf
+         Nb7zYTIpXcTOh35La24iT/Mc/ko3QDwuD/85GlLOrkan1p5ajvwUBiXkrllVMFl1kyU/
+         Up2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678354513;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1678356130;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hH6w8aDTHHGmr5ss4kp7zLJEI+UrSruaARLEvYxT/Ns=;
-        b=M6+nU2vpa3lyGmFOEc9rZDUZ7vZAMCXXnpCHaavwexTFnhKkVFLE8x3MbreVeJgy3r
-         sXpIkDGi0qTMTX6hk6Pgyq+ksHYMZS2FA4TIY5kT5j81UlkNg54mQ52xywmvhhwl3ZCh
-         Rk8CR/beLkQO3sPD73exFeFeFhIphV+/Dta4B/RWfg5y2DlvbL11ruIBf49PMu83be6w
-         E0fcjBJqla6u/qxhFs8mebmBc8OrxHLRxZBTCbgQWsdiiJLS6mlmCOt/SgLUJ73tQUgm
-         C/V0yFbSvIFGC/xZIBdOw8vNYPZkaMWPXT5e07NhJ6bArQA1HhGiKRFB54ZbOetHf1C6
-         DsEQ==
-X-Gm-Message-State: AO0yUKW2OGoOPNwA1QPcuLO8O6krs5bxwpYaEV/r8BskxAZLDDVyXoJG
-        aVdC6yr1x6qrphk1Oi5hdUL9Ng4vWYA88oLGdY72TA==
-X-Google-Smtp-Source: AK7set8RjCBq3K551HPm3a9UFJX/QCX6Z33YM9lYfSEEcwUHVSXzWzj3m7h2kj7kXYxJPBKnY0f0LQ==
-X-Received: by 2002:a17:902:c948:b0:19a:a4f3:6d4c with SMTP id i8-20020a170902c94800b0019aa4f36d4cmr25144186pla.67.1678354513556;
-        Thu, 09 Mar 2023 01:35:13 -0800 (PST)
-Received: from ideal-drum-1.localdomain (23.105.204.76.16clouds.com. [23.105.204.76])
-        by smtp.gmail.com with ESMTPSA id e4-20020a17090301c400b001898ee9f723sm11302564plh.2.2023.03.09.01.34.57
+        bh=Apyq7JUpKvglJaTYHduVqSQM1WLkaW9bjLJFKMScdGE=;
+        b=fxv2JkUmt1Lcqeg9LtiJx9K+nbYKpGqhENtHwEaZbRvlWpF6mOwWQs0IFEZilcrG7g
+         zXlz2shErkDlyr6e/atIIx8O0obkLvcJDXH3eBx3qZPDGclVjG1iV44VxpI3KU+kwxLS
+         tCksQF/LcQ0FvH1+u+Xkb/RzL6Mou3OfEBaIxu41P0dfNPa/i09Hz8XpU2LvksBC2TYy
+         NpYJNzmDFSlc+MTfxHMkrnXpHwU7unXQzUo5uLW+/ExpWhEAXhFR0p/YwnMgJQlY3ypE
+         TNNxWdbdM5avrTbl91C91yJi0WHSx6c8QyynA6GHZTk19KtLKuAIAGA2FVOJjAfeHtkC
+         QbvQ==
+X-Gm-Message-State: AO0yUKUv+gqDDQCkylGFBpeUdOUyfQ78XkgBuvnbK56JOHcmY0dOhwqq
+        WPfuIqePKVHcHYISr5nRQMgA1WdPuvU=
+X-Google-Smtp-Source: AK7set/ERB3K+a11yZzwe9t70HLBbfZpjuAxVS6TjzxDxeclPK2NCYQYO8raRrdJf91bf5FoSeiXsA==
+X-Received: by 2002:a05:6214:405:b0:56e:bb5b:3dfc with SMTP id z5-20020a056214040500b0056ebb5b3dfcmr39063203qvx.38.1678356130264;
+        Thu, 09 Mar 2023 02:02:10 -0800 (PST)
+Received: from [172.17.0.2] ([20.185.156.80])
+        by smtp.gmail.com with ESMTPSA id c26-20020a05620a0cfa00b0073b81e888bfsm12775280qkj.56.2023.03.09.02.02.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 01:35:12 -0800 (PST)
-From:   ZhengHan Wang <wzhmmmmm@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ZhengHan Wang <wzhmmmmm@gmail.com>
-Subject: [PATCH] Bluetooth: Fix double free in hci_conn_cleanup
-Date:   Thu,  9 Mar 2023 17:34:42 +0800
-Message-Id: <20230309093442.74618-1-wzhmmmmm@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 09 Mar 2023 02:02:10 -0800 (PST)
+Message-ID: <6409aea2.050a0220.6601f.8ca4@mx.google.com>
+Date:   Thu, 09 Mar 2023 02:02:10 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0851564141515445869=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wzhmmmmm@gmail.com
+Subject: RE: Bluetooth: Fix double free in hci_conn_cleanup
+In-Reply-To: <20230309093442.74618-1-wzhmmmmm@gmail.com>
+References: <20230309093442.74618-1-wzhmmmmm@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
-After releasing an object using hci_conn_del_sysfs in the
-hci_conn_cleanup function, releasing the same object again
-using the hci_dev_put and hci_conn_put functions causes a double free.
-Here's a simplified flow:
+--===============0851564141515445869==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-hci_conn_del_sysfs:
-  hci_dev_put
-    put_device
-      kobject_put
-        kref_put
-          kobject_release
-            kobject_cleanup
-              kfree_const
-                kfree(name)
+This is automated email and please do not reply to this email!
 
-hci_dev_put:
-  ...
-    kfree(name)
+Dear submitter,
 
-hci_conn_put:
-  put_device
-    ...
-      kfree(name)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=728193
 
-This patch drop the hci_dev_put and hci_conn_put function
-call in hci_conn_cleanup function, because the object is
-freed in hci_conn_del_sysfs function.
+---Test result---
 
-Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
+Test Summary:
+CheckPatch                    PASS      0.76 seconds
+GitLint                       FAIL      0.76 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      39.46 seconds
+CheckAllWarning               PASS      43.50 seconds
+CheckSparse                   PASS      48.67 seconds
+CheckSmatch                   PASS      129.92 seconds
+BuildKernel32                 PASS      39.50 seconds
+TestRunnerSetup               PASS      543.39 seconds
+TestRunner_l2cap-tester       PASS      18.91 seconds
+TestRunner_iso-tester         PASS      24.66 seconds
+TestRunner_bnep-tester        PASS      7.19 seconds
+TestRunner_mgmt-tester        FAIL      130.80 seconds
+TestRunner_rfcomm-tester      PASS      10.79 seconds
+TestRunner_sco-tester         PASS      10.10 seconds
+TestRunner_ioctl-tester       FAIL      12.00 seconds
+TestRunner_mesh-tester        PASS      9.13 seconds
+TestRunner_smp-tester         PASS      9.75 seconds
+TestRunner_userchan-tester    PASS      7.58 seconds
+IncrementalBuild              PASS      36.34 seconds
 
-Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: Fix double free in hci_conn_cleanup
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+32: B1 Line exceeds max length (87>80): "Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]"
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 494, Passed: 489 (99.0%), Failed: 5, Not Run: 0
+
+Failed Test Cases
+Read Ext Controller Info 1                           Failed       0.144 seconds
+Read Ext Controller Info 2                           Failed       0.176 seconds
+Read Ext Controller Info 3                           Failed       0.148 seconds
+Read Ext Controller Info 4                           Failed       0.144 seconds
+Read Ext Controller Info 5                           Failed       0.180 seconds
+##############################
+Test: TestRunner_ioctl-tester - FAIL
+Desc: Run ioctl-tester with test-runner
+Output:
+No test result found
+
+
 ---
- net/bluetooth/hci_conn.c | 4 ----
- 1 file changed, 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index acf563fbdfd9..a0ccbef34bc2 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -152,10 +152,6 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 	hci_conn_del_sysfs(conn);
- 
- 	debugfs_remove_recursive(conn->debugfs);
--
--	hci_dev_put(hdev);
--
--	hci_conn_put(conn);
- }
- 
- static void le_scan_cleanup(struct work_struct *work)
--- 
-2.25.1
 
+--===============0851564141515445869==--
