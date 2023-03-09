@@ -2,119 +2,76 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE59C64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 07:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9984AC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 08:07:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230299AbjCIHtf (ORCPT
+        id S229892AbjCIIHz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 02:49:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47388 "EHLO
+        Thu, 9 Mar 2023 03:07:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbjCIHtR (ORCPT
+        with ESMTP id S229875AbjCIIHw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 02:49:17 -0500
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C475E1924;
-        Wed,  8 Mar 2023 23:47:11 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id n5so910135pfv.11;
-        Wed, 08 Mar 2023 23:47:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678348025;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hH6w8aDTHHGmr5ss4kp7zLJEI+UrSruaARLEvYxT/Ns=;
-        b=Jfga99as4sUZR/5nJLi8Hpi0rii77ylY8BNny0flNexzyRRyO4UnXfrNEVZApU5Idd
-         B+Fxqu4doFJ0O5wOQJ0XLh6GarSAG58Zwd+psBzECkBN9Goz9KAR0wk/+rkCrp7dhjiB
-         A7joRRdhqlGx8Ovxz3Vfcp/rc0o+jOW+z4Nt9K/7EM3A5O3vKXJNttCoIZg8FFcK7pZF
-         6W0kOnEsrfmR9RcFkVzBB9ML71NAQIA0WLl5czheQ4ntu8k/akv+rto6GAG7muX9EYiz
-         Zmvq3yUOPmtUGMmh5IiGOhYcTSXrzkDW8FIiI97bU49OQk56Y/AEavbKVLOCefx87r2e
-         JuiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678348025;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hH6w8aDTHHGmr5ss4kp7zLJEI+UrSruaARLEvYxT/Ns=;
-        b=8DXC7g5SwuvxA65oUukS1fvU/gg9xEgMUgdQw2ozZTWDmIJtJJGBN+RqjPZAinJ+tc
-         HDWplQuniOio42CK60yHY6Nj2+ZhRvSs73mhi3KNcu0G67ExGz/+nQ0JPlFcoDXZjCY0
-         NakqZb8WLHvxKHWsVlMdtvzB6VXu4qhNhgNXwXahj/ye9b3+wywYF7p/Y2PCG3jbuBrb
-         s28to0bE+N1Gve6JiZUvaDTaORGnSGhse4rC8CBlGvhdW0H6k31AumY9v657BPCHyB8O
-         VrXwVLci8DPb5YoZhalcFKjZZOKNN0rLcPWJOho6lRZxgEq5PDtW9x6j6pVt9PDnkCLB
-         xXXg==
-X-Gm-Message-State: AO0yUKWiNI9w6NXiR0FUQUyxg4VsXg5p2lmpTPwdEhYoKpkMOHzMAyXg
-        Awgi5YVPDSJKX4OjVV/kdBU=
-X-Google-Smtp-Source: AK7set/JBnA6LgCAcvKXuufNL0rSbzmQOkVhyz5GG+65MEN9oD7bnQ18Tcfq4FFWFJGIydTzhwolRg==
-X-Received: by 2002:a62:3142:0:b0:5dc:e543:c62d with SMTP id x63-20020a623142000000b005dce543c62dmr15211058pfx.23.1678348025584;
-        Wed, 08 Mar 2023 23:47:05 -0800 (PST)
-Received: from ideal-drum-1.localdomain (23.105.204.76.16clouds.com. [23.105.204.76])
-        by smtp.gmail.com with ESMTPSA id c5-20020a62e805000000b005a7f8a326a3sm10537800pfi.50.2023.03.08.23.47.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Mar 2023 23:47:05 -0800 (PST)
-From:   ZhengHan Wang <wzhmmmmm@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ZhengHan Wang <wzhmmmmm@gmail.com>
-Subject: [PATCH] Bluetooth: Fix double free in hci_conn_cleanup
-Date:   Thu,  9 Mar 2023 15:46:45 +0800
-Message-Id: <20230309074645.74309-1-wzhmmmmm@gmail.com>
+        Thu, 9 Mar 2023 03:07:52 -0500
+Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.214])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1893560AA6;
+        Thu,  9 Mar 2023 00:07:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GBhsZ
+        n4FOlfbUQ/o+x7Y5z0f+XdjB+IJXqUnC3AEJ0c=; b=kDXK5W+/uqDgszSXdY2Bv
+        uHFmyJKBAZ0nZtmCUha6dUUxl+7OI6y5VNllmhatkvWE5MT2X3f/r7/wxnktP09h
+        LJD1IlXf3Qjlfc4/LzQsiAUj1GIi7b8YChd58v+BjfRX4jArxTtBo/KGKCivjxEG
+        GGDwiCe+oay8DHYn7p8NPY=
+Received: from leanderwang-LC2.localdomain (unknown [111.206.145.21])
+        by zwqz-smtp-mta-g0-4 (Coremail) with SMTP id _____wAXH1_NkwlkiA3MCg--.23314S2;
+        Thu, 09 Mar 2023 16:07:41 +0800 (CST)
+From:   Zheng Wang <zyytlz.wz@163.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        hackerzheng666@gmail.com, 1395428693sheep@gmail.com,
+        alex000young@gmail.com, Zheng Wang <zyytlz.wz@163.com>
+Subject: [PATCH] Bluetooth: btsdio: fix use after free bug in btsdio_remove due to unfinished work
+Date:   Thu,  9 Mar 2023 16:07:39 +0800
+Message-Id: <20230309080739.3714610-1-zyytlz.wz@163.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: _____wAXH1_NkwlkiA3MCg--.23314S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrurW3trWkGFy3uw4DAryUAwb_yoW3Cwb_ua
+        48ZryxCFWUGF1IyF15KF4rZrW8Kw1rXws2qFnaqF93X3sruFsFg34jvrZ8Jw1xWr1UtF9x
+        Aw4fXayrJr48XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRK9NVJUUUUU==
+X-Originating-IP: [111.206.145.21]
+X-CM-SenderInfo: h2113zf2oz6qqrwthudrp/1tbiGhYtU1aEEgvXMQABse
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
-After releasing an object using hci_conn_del_sysfs in the 
-hci_conn_cleanup function, releasing the same object again 
-using the hci_dev_put and hci_conn_put functions causes a double free.
-Here's a simplified flow:
+In btsdio_probe, &data->work was bound with btsdio_work.In
+btsdio_send_frame, it was started by schedule_work.
 
-hci_conn_del_sysfs:
-  hci_dev_put
-    put_device
-      kobject_put
-        kref_put
-          kobject_release
-            kobject_cleanup
-              kfree_const
-                kfree(name)
+If we call btsdio_remove with an unfinished job, there may
+be a race condition and cause UAF bug on hdev.
 
-hci_dev_put:
-  ...
-    kfree(name)
-
-hci_conn_put:
-  put_device
-    ...
-      kfree(name)
-
-This patch drop the hci_dev_put and hci_conn_put function 
-call in hci_conn_cleanup function, because the object is 
-freed in hci_conn_del_sysfs function.
-
-Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
-
-Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
+Fixes: ddbaf13e3609 ("[Bluetooth] Add generic driver for Bluetooth SDIO devices")
+Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
 ---
- net/bluetooth/hci_conn.c | 4 ----
- 1 file changed, 4 deletions(-)
+ drivers/bluetooth/btsdio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index acf563fbdfd9..a0ccbef34bc2 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -152,10 +152,6 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 	hci_conn_del_sysfs(conn);
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 795be33f2892..02893600db39 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -354,6 +354,7 @@ static void btsdio_remove(struct sdio_func *func)
  
- 	debugfs_remove_recursive(conn->debugfs);
--
--	hci_dev_put(hdev);
--
--	hci_conn_put(conn);
- }
+ 	BT_DBG("func %p", func);
  
- static void le_scan_cleanup(struct work_struct *work)
++	cancel_work_sync(&data->work);
+ 	if (!data)
+ 		return;
+ 
 -- 
 2.25.1
 
