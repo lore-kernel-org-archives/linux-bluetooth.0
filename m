@@ -2,76 +2,103 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9984AC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 08:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AF9C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 08:23:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229892AbjCIIHz (ORCPT
+        id S230274AbjCIIXM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 03:07:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52320 "EHLO
+        Thu, 9 Mar 2023 03:23:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229875AbjCIIHw (ORCPT
+        with ESMTP id S230139AbjCIIWo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 03:07:52 -0500
-Received: from m12.mail.163.com (m12.mail.163.com [220.181.12.214])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1893560AA6;
-        Thu,  9 Mar 2023 00:07:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GBhsZ
-        n4FOlfbUQ/o+x7Y5z0f+XdjB+IJXqUnC3AEJ0c=; b=kDXK5W+/uqDgszSXdY2Bv
-        uHFmyJKBAZ0nZtmCUha6dUUxl+7OI6y5VNllmhatkvWE5MT2X3f/r7/wxnktP09h
-        LJD1IlXf3Qjlfc4/LzQsiAUj1GIi7b8YChd58v+BjfRX4jArxTtBo/KGKCivjxEG
-        GGDwiCe+oay8DHYn7p8NPY=
-Received: from leanderwang-LC2.localdomain (unknown [111.206.145.21])
-        by zwqz-smtp-mta-g0-4 (Coremail) with SMTP id _____wAXH1_NkwlkiA3MCg--.23314S2;
-        Thu, 09 Mar 2023 16:07:41 +0800 (CST)
-From:   Zheng Wang <zyytlz.wz@163.com>
-To:     marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hackerzheng666@gmail.com, 1395428693sheep@gmail.com,
-        alex000young@gmail.com, Zheng Wang <zyytlz.wz@163.com>
-Subject: [PATCH] Bluetooth: btsdio: fix use after free bug in btsdio_remove due to unfinished work
-Date:   Thu,  9 Mar 2023 16:07:39 +0800
-Message-Id: <20230309080739.3714610-1-zyytlz.wz@163.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 9 Mar 2023 03:22:44 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C7CC666;
+        Thu,  9 Mar 2023 00:21:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678350079; x=1709886079;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=NVk2Uwml/dLcUozFXuj/Wgf+vlU8vTU7nn1wZsqKalg=;
+  b=YxAzWDqat2FJf+b5kIueKO0FBplLrOtYCkTudjvCHuZtihtcNn9sY5yb
+   fh2hamzNRkG09Ta1CcrVFUEA+Htsh680pv4Mcrrn90xaqAXsiF+jA5Eo2
+   0qrhKBU3lRaRrI2Fkznq00XScR61dA237AH/vgnNxpyarjW6ekPyHKAkl
+   dXXpDp+rF+blMscLwIAFo2mIEnstZ3kPWiX4c1ibOD6xHqzL9QltCHhWZ
+   +AmD9zgU5HHfFD0zAz+e3Yt1stq1Gsl1yYsla1F1M2LrnAZaHYwQdOMOu
+   bsVuvEkAvr2qRe4piCOvJGfxdwMl/FfYRbe6IsOZ0C6jE4xH4IuKHfQ/M
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="364025823"
+X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
+   d="scan'208";a="364025823"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 00:21:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="787473870"
+X-IronPort-AV: E=Sophos;i="5.98,245,1673942400"; 
+   d="scan'208";a="787473870"
+Received: from unknown (HELO ijarvine-MOBL2.mshome.net) ([10.237.66.35])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2023 00:21:01 -0800
+From:   =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     linux-serial@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH 3/8] Bluetooth: hci_ldisc: Fix tty_set_termios() return value assumptions
+Date:   Thu,  9 Mar 2023 10:20:30 +0200
+Message-Id: <20230309082035.14880-4-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230309082035.14880-1-ilpo.jarvinen@linux.intel.com>
+References: <20230309082035.14880-1-ilpo.jarvinen@linux.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: _____wAXH1_NkwlkiA3MCg--.23314S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrurW3trWkGFy3uw4DAryUAwb_yoW3Cwb_ua
-        48ZryxCFWUGF1IyF15KF4rZrW8Kw1rXws2qFnaqF93X3sruFsFg34jvrZ8Jw1xWr1UtF9x
-        Aw4fXayrJr48XjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRK9NVJUUUUU==
-X-Originating-IP: [111.206.145.21]
-X-CM-SenderInfo: h2113zf2oz6qqrwthudrp/1tbiGhYtU1aEEgvXMQABse
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In btsdio_probe, &data->work was bound with btsdio_work.In
-btsdio_send_frame, it was started by schedule_work.
+tty_set_termios() never returns anything else than 0. Make the debug
+prints to look directly into the new termios instead to check CRTSCTS
+state.
 
-If we call btsdio_remove with an unfinished job, there may
-be a race condition and cause UAF bug on hdev.
-
-Fixes: ddbaf13e3609 ("[Bluetooth] Add generic driver for Bluetooth SDIO devices")
-Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
- drivers/bluetooth/btsdio.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bluetooth/hci_ldisc.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-index 795be33f2892..02893600db39 100644
---- a/drivers/bluetooth/btsdio.c
-+++ b/drivers/bluetooth/btsdio.c
-@@ -354,6 +354,7 @@ static void btsdio_remove(struct sdio_func *func)
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index 865112e96ff9..efdda2c3fce8 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -323,9 +323,9 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+ 		/* Disable hardware flow control */
+ 		ktermios = tty->termios;
+ 		ktermios.c_cflag &= ~CRTSCTS;
+-		status = tty_set_termios(tty, &ktermios);
++		tty_set_termios(tty, &ktermios);
+ 		BT_DBG("Disabling hardware flow control: %s",
+-		       status ? "failed" : "success");
++		       (tty->termios.c_cflag & CRTSCTS) ? "failed" : "success");
  
- 	BT_DBG("func %p", func);
- 
-+	cancel_work_sync(&data->work);
- 	if (!data)
- 		return;
+ 		/* Clear RTS to prevent the device from sending */
+ 		/* Most UARTs need OUT2 to enable interrupts */
+@@ -357,9 +357,9 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+ 		/* Re-enable hardware flow control */
+ 		ktermios = tty->termios;
+ 		ktermios.c_cflag |= CRTSCTS;
+-		status = tty_set_termios(tty, &ktermios);
++		tty_set_termios(tty, &ktermios);
+ 		BT_DBG("Enabling hardware flow control: %s",
+-		       status ? "failed" : "success");
++		       !(tty->termios.c_cflag & CRTSCTS) ? "failed" : "success");
+ 	}
+ }
  
 -- 
-2.25.1
+2.30.2
 
