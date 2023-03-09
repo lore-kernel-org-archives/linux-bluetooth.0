@@ -2,174 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87865C64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Mar 2023 22:36:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE59C64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 07:49:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbjCHWgF (ORCPT
+        id S230299AbjCIHtf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Mar 2023 17:36:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59180 "EHLO
+        Thu, 9 Mar 2023 02:49:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbjCHWgE (ORCPT
+        with ESMTP id S230287AbjCIHtR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Mar 2023 17:36:04 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F4C065135
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Mar 2023 14:36:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678314963; x=1709850963;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Z+mRmcdu4owuAxyEKDP0l6LB5uFH9k0ozK/EBhHmYDc=;
-  b=GanKLcqMPG6hgLBL3ZGhmHZixy2B5ZmnRPzrSefX8bs1HA7UZCm+BITU
-   x1McDzdo4cjN1JxG65MQatZ7jndCJ9m29CF9cZ9WCHeWJT5S7yDKbt4o4
-   1vS8RfawSXyU3tdkYph6aHEegEpaPZOcqZrePUx2qVNdd4UA8ZJJ6Raxv
-   i8g3tP0blUIhNtlRu3U02PikPPd3gpzE1RW3vtlhsQYuvMFXXh6RYK05C
-   An7+iP7exlHv0Pxrwb14ipvcDuflsLwCNsqYkMH8UTZ4QU0rUnrdE3A68
-   66NWvtsgBo0HRPl1hNRXNzmBro6DHmLLItrSMZ1ZeYrHREVPAfypEH2NY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="336307171"
-X-IronPort-AV: E=Sophos;i="5.98,244,1673942400"; 
-   d="scan'208";a="336307171"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2023 14:36:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10643"; a="851294099"
-X-IronPort-AV: E=Sophos;i="5.98,244,1673942400"; 
-   d="scan'208";a="851294099"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 08 Mar 2023 14:36:01 -0800
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pa2O8-0002Rw-2S;
-        Wed, 08 Mar 2023 22:36:00 +0000
-Date:   Thu, 09 Mar 2023 06:35:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 0e21956501c0d8a15f9fc4164b2eb7769dff7700
-Message-ID: <64090dc6.7RL5PJFKuICjtQRy%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Thu, 9 Mar 2023 02:49:17 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C475E1924;
+        Wed,  8 Mar 2023 23:47:11 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id n5so910135pfv.11;
+        Wed, 08 Mar 2023 23:47:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678348025;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hH6w8aDTHHGmr5ss4kp7zLJEI+UrSruaARLEvYxT/Ns=;
+        b=Jfga99as4sUZR/5nJLi8Hpi0rii77ylY8BNny0flNexzyRRyO4UnXfrNEVZApU5Idd
+         B+Fxqu4doFJ0O5wOQJ0XLh6GarSAG58Zwd+psBzECkBN9Goz9KAR0wk/+rkCrp7dhjiB
+         A7joRRdhqlGx8Ovxz3Vfcp/rc0o+jOW+z4Nt9K/7EM3A5O3vKXJNttCoIZg8FFcK7pZF
+         6W0kOnEsrfmR9RcFkVzBB9ML71NAQIA0WLl5czheQ4ntu8k/akv+rto6GAG7muX9EYiz
+         Zmvq3yUOPmtUGMmh5IiGOhYcTSXrzkDW8FIiI97bU49OQk56Y/AEavbKVLOCefx87r2e
+         JuiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678348025;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hH6w8aDTHHGmr5ss4kp7zLJEI+UrSruaARLEvYxT/Ns=;
+        b=8DXC7g5SwuvxA65oUukS1fvU/gg9xEgMUgdQw2ozZTWDmIJtJJGBN+RqjPZAinJ+tc
+         HDWplQuniOio42CK60yHY6Nj2+ZhRvSs73mhi3KNcu0G67ExGz/+nQ0JPlFcoDXZjCY0
+         NakqZb8WLHvxKHWsVlMdtvzB6VXu4qhNhgNXwXahj/ye9b3+wywYF7p/Y2PCG3jbuBrb
+         s28to0bE+N1Gve6JiZUvaDTaORGnSGhse4rC8CBlGvhdW0H6k31AumY9v657BPCHyB8O
+         VrXwVLci8DPb5YoZhalcFKjZZOKNN0rLcPWJOho6lRZxgEq5PDtW9x6j6pVt9PDnkCLB
+         xXXg==
+X-Gm-Message-State: AO0yUKWiNI9w6NXiR0FUQUyxg4VsXg5p2lmpTPwdEhYoKpkMOHzMAyXg
+        Awgi5YVPDSJKX4OjVV/kdBU=
+X-Google-Smtp-Source: AK7set/JBnA6LgCAcvKXuufNL0rSbzmQOkVhyz5GG+65MEN9oD7bnQ18Tcfq4FFWFJGIydTzhwolRg==
+X-Received: by 2002:a62:3142:0:b0:5dc:e543:c62d with SMTP id x63-20020a623142000000b005dce543c62dmr15211058pfx.23.1678348025584;
+        Wed, 08 Mar 2023 23:47:05 -0800 (PST)
+Received: from ideal-drum-1.localdomain (23.105.204.76.16clouds.com. [23.105.204.76])
+        by smtp.gmail.com with ESMTPSA id c5-20020a62e805000000b005a7f8a326a3sm10537800pfi.50.2023.03.08.23.47.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Mar 2023 23:47:05 -0800 (PST)
+From:   ZhengHan Wang <wzhmmmmm@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ZhengHan Wang <wzhmmmmm@gmail.com>
+Subject: [PATCH] Bluetooth: Fix double free in hci_conn_cleanup
+Date:   Thu,  9 Mar 2023 15:46:45 +0800
+Message-Id: <20230309074645.74309-1-wzhmmmmm@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 0e21956501c0d8a15f9fc4164b2eb7769dff7700  Bluetooth: Convert MSFT filter HCI cmd to hci_sync
+syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
+After releasing an object using hci_conn_del_sysfs in the 
+hci_conn_cleanup function, releasing the same object again 
+using the hci_dev_put and hci_conn_put functions causes a double free.
+Here's a simplified flow:
 
-elapsed time: 1445m
+hci_conn_del_sysfs:
+  hci_dev_put
+    put_device
+      kobject_put
+        kref_put
+          kobject_release
+            kobject_cleanup
+              kfree_const
+                kfree(name)
 
-configs tested: 98
-configs skipped: 14
+hci_dev_put:
+  ...
+    kfree(name)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+hci_conn_put:
+  put_device
+    ...
+      kfree(name)
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r032-20230305   gcc  
-arc                              allyesconfig   gcc  
-arc          buildonly-randconfig-r002-20230305   gcc  
-arc          buildonly-randconfig-r006-20230306   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r002-20230305   gcc  
-arc                  randconfig-r034-20230305   gcc  
-arc                  randconfig-r043-20230306   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r001-20230306   clang
-arm                  randconfig-r005-20230306   clang
-arm                  randconfig-r015-20230305   clang
-arm                  randconfig-r036-20230305   gcc  
-arm                  randconfig-r046-20230306   gcc  
-arm64                            allyesconfig   gcc  
-arm64        buildonly-randconfig-r003-20230306   gcc  
-arm64        buildonly-randconfig-r005-20230305   clang
-arm64        buildonly-randconfig-r006-20230305   clang
-arm64                               defconfig   gcc  
-arm64                randconfig-r021-20230305   gcc  
-arm64                randconfig-r026-20230306   clang
-csky         buildonly-randconfig-r004-20230306   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r025-20230306   gcc  
-csky                 randconfig-r035-20230305   gcc  
-csky                 randconfig-r036-20230306   gcc  
-hexagon              randconfig-r013-20230305   clang
-hexagon              randconfig-r014-20230306   clang
-hexagon              randconfig-r023-20230305   clang
-hexagon              randconfig-r041-20230306   clang
-hexagon              randconfig-r045-20230306   clang
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-a006-20230306   gcc  
-ia64                             allmodconfig   gcc  
-ia64                                defconfig   gcc  
-ia64                 randconfig-r012-20230305   gcc  
-ia64                 randconfig-r021-20230306   gcc  
-ia64                 randconfig-r022-20230306   gcc  
-ia64                 randconfig-r033-20230306   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r013-20230306   gcc  
-loongarch            randconfig-r031-20230306   gcc  
-m68k                             allmodconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r035-20230306   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 randconfig-r022-20230305   clang
-nios2                               defconfig   gcc  
-nios2                randconfig-r002-20230306   gcc  
-nios2                randconfig-r016-20230306   gcc  
-openrisc     buildonly-randconfig-r001-20230306   gcc  
-openrisc             randconfig-r014-20230305   gcc  
-parisc       buildonly-randconfig-r002-20230306   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc      buildonly-randconfig-r004-20230305   gcc  
-powerpc              randconfig-r004-20230306   gcc  
-powerpc              randconfig-r016-20230305   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r024-20230305   gcc  
-riscv                randconfig-r042-20230306   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r044-20230306   clang
-sh                               allmodconfig   gcc  
-sh                   randconfig-r001-20230305   gcc  
-sh                   randconfig-r012-20230306   gcc  
-sparc        buildonly-randconfig-r003-20230305   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r003-20230306   gcc  
-sparc                randconfig-r011-20230306   gcc  
-sparc                randconfig-r023-20230306   gcc  
-sparc64              randconfig-r004-20230305   gcc  
-sparc64              randconfig-r006-20230305   gcc  
-sparc64              randconfig-r024-20230306   gcc  
-sparc64              randconfig-r034-20230306   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64                               rhel-8.3   gcc  
-xtensa       buildonly-randconfig-r005-20230306   gcc  
+This patch drop the hci_dev_put and hci_conn_put function 
+call in hci_conn_cleanup function, because the object is 
+freed in hci_conn_del_sysfs function.
 
+Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
+
+Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
+---
+ net/bluetooth/hci_conn.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index acf563fbdfd9..a0ccbef34bc2 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -152,10 +152,6 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 	hci_conn_del_sysfs(conn);
+ 
+ 	debugfs_remove_recursive(conn->debugfs);
+-
+-	hci_dev_put(hdev);
+-
+-	hci_conn_put(conn);
+ }
+ 
+ static void le_scan_cleanup(struct work_struct *work)
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.25.1
+
