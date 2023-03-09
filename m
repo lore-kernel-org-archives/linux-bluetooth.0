@@ -2,92 +2,292 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE61BC64EC4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 18:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C568DC74A44
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 20:08:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229742AbjCISnF (ORCPT
+        id S230281AbjCIUIR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 13:43:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48370 "EHLO
+        Thu, 9 Mar 2023 15:08:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbjCISnD (ORCPT
+        with ESMTP id S230236AbjCIUIO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 13:43:03 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A06C12594
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 10:42:59 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id cp7-20020a17090afb8700b0023756229427so7191278pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 10:42:59 -0800 (PST)
+        Thu, 9 Mar 2023 15:08:14 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4496C31E04
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 12:08:11 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id u9so11822329edd.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 12:08:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678387378;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6VvVBIIyFOGeeiEhdFGBuZNx8V3KDmSqGMkkojeF6RE=;
-        b=EjXI4VK/kqnDyT/I46aeUmFN1umWnfwgch5PQ4Fb8ZmSSc0p1l34Uot3M8J2jG6xvY
-         JVP/aqYj3ze5t+3LqXOaf5w/bNZ+qe7Ct3VaFCGnad2MvlHQMaSzlJGXSA028u3AgDX1
-         EqmBDDH0IuZmebEUDbGtN0rvIQ6Kf5mlIi73eBZBNpv/PTDOeCZL0vV/w7zOWmelosy9
-         X22Jr3e0cLj4zcg+O3Q7JFtPGVh9B7aqbDJRRofTPihtceBabmmITQgRw/T41KODFJNk
-         pAdi9eBxzRd22QUsqQjm4y8dntVS0r/JnpDXB8gplMYF2ghBIzxEA0WfEiaOepYaby6h
-         050Q==
+        d=kali.org; s=google; t=1678392490;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rkdqh8Mn4yYVcJRbj0k73VKeCBqKduyHj6J+C4uNHbk=;
+        b=GHJNSGs0ozGdUpE1NfeN06yA+sKV9j8iM4T3MaizrYC8y3Xkguqdvt9CGLF+wVxabQ
+         GjHtzIdzGaMVhs5kRs0zcAZigoMTMgRR3rL/Un1Kdj9TWTmskh7OXWXP7oEMC1d+Gaxe
+         t/J+tUlSjq7iO4QQtq3+CIcOZzkezl1W3+2ugK7blV0TOX4eWV+IWwKc6zwt7uqdFCaM
+         iElGs/PMnlpE3t3Y/qyPUXjTpFM9GYMwcEAn/LZBqxW9FxupcNIsq5o1jzifC4uMTivz
+         UA8uNSGT+x0gFE+bF+Hw5dOyKAhBM6CGLvIFEaBLVfQV1uT2DWqpO8z3uPf9wyUfgvK0
+         ykrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678387378;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6VvVBIIyFOGeeiEhdFGBuZNx8V3KDmSqGMkkojeF6RE=;
-        b=xkvqimAsWRzLJxwmCZtAgOTzNLOVvMbd9O5pfDxqJl/Y+VpR/zWU1q9hm2+jGU6XOx
-         uGkOBg6vwHSrRDwa/ieS5ppyOgNvKDK7kn3W4V8nROFQm4SafFwqfxLxHgLkS7grETfK
-         eqIiI4/Mu0DhGI5GHR9m7fC3x0VHGz+Up2SQ85ZoJyAHpUtrYsriwPABIyLJwfM/d2Og
-         gJqy0AihDR8GRpqsOU/GV95Qqboq97p/OAhk7OuupO0LA/C94NB91jnEuaWHZOVnmH3U
-         d7lr1hqWpsu1FPxHJJa9mSiZNL2LvMJAbhKk9PyKNbGvMXGKbBiFFvSz1FCVNAJo5Snq
-         MVLQ==
-X-Gm-Message-State: AO0yUKXaEvnesbgKrhyU3zLRHb9uBkSA35nV6cwjyI8aYX3vd06kzERV
-        kXKBTUOHU7PriRweEHNId/bdjIjTuSk=
-X-Google-Smtp-Source: AK7set910pRxfpYLCo7CF8jNkg886HzsHSed8qDf3Tk0G9Lx6Op9Zxi+8Ry83wh6Ei/UoPA3zlYHow==
-X-Received: by 2002:a17:902:b614:b0:19e:8c78:8cf6 with SMTP id b20-20020a170902b61400b0019e8c788cf6mr19695660pls.62.1678387378600;
-        Thu, 09 Mar 2023 10:42:58 -0800 (PST)
-Received: from [172.17.0.2] ([13.73.36.80])
-        by smtp.gmail.com with ESMTPSA id i6-20020a1709026ac600b001991e59fde6sm11847352plt.216.2023.03.09.10.42.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Mar 2023 10:42:58 -0800 (PST)
-Message-ID: <640a28b2.170a0220.c16f0.62f1@mx.google.com>
-Date:   Thu, 09 Mar 2023 10:42:58 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1977878487130986510=="
+        d=1e100.net; s=20210112; t=1678392490;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rkdqh8Mn4yYVcJRbj0k73VKeCBqKduyHj6J+C4uNHbk=;
+        b=b8GFCGnhTQBj3cRJBIwkrw4zxYNJhY1t1tnKkwrDEhFl0MvVD2owbkSmgz6iqTubCR
+         Ya9hdDhLy/0wr8XILhSyhto7gBvaod5bGnkuFHTyJ9xhSTZz4PuDHqFT9SoCNVa0kixB
+         IPUtl0qxEf/QQFxtbMwgMIPRNOXzX1RLAOrtemJBFl4fVrg7BsXpfkw/pindRLCSm+49
+         igMRNEMBhd8W7zR4tbOJ9ZVs5xRi4WDEOC80zd9EGWBMgv69r03IC/h3JKzohfRFZAP9
+         F4MpFAPacoCb9eVNg8QGmqDMVNgktoD7RGhX3Oc/Z5C3zNNssRTSd9sZhQxj19nwXvsE
+         Zw5A==
+X-Gm-Message-State: AO0yUKWi6OJjdKE2v64DHSTg+oGDfqo+1QxVLICSCKW6MnZR6ESGfPd4
+        6xKzV2NFtSBA+ot9jkUaq32Mm50+lZ+D0F5zJxGzQg==
+X-Google-Smtp-Source: AK7set9FtsMby2FguByeoNJEQBInZqMAF0hTx+q7tMBEgbEGSz6VyxVYUtlDhjCvaUHueJ7BNK9KTXJ/2uQvQ7QqWB8=
+X-Received: by 2002:a17:906:310d:b0:87b:d50f:6981 with SMTP id
+ 13-20020a170906310d00b0087bd50f6981mr10758001ejx.14.1678392489733; Thu, 09
+ Mar 2023 12:08:09 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pchelkin@ispras.ru
-Subject: RE: Bluetooth: hci_sock: purge socket queues in the destruct() callback
-In-Reply-To: <20230309181251.479447-2-pchelkin@ispras.ru>
-References: <20230309181251.479447-2-pchelkin@ispras.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230209020916.6475-1-steev@kali.org> <20230209020916.6475-5-steev@kali.org>
+ <ZAoWdR7mppnWclFr@hovoldconsulting.com>
+In-Reply-To: <ZAoWdR7mppnWclFr@hovoldconsulting.com>
+From:   Steev Klimaszewski <steev@kali.org>
+Date:   Thu, 9 Mar 2023 14:07:58 -0600
+Message-ID: <CAKXuJqgAbdALaRdcoSV+sXbGzwm6h54hZtG2rBobcGA9vyu50g@mail.gmail.com>
+Subject: Re: [PATCH v5 4/4] arm64: dts: qcom: thinkpad-x13s: Add bluetooth
+To:     Johan Hovold <johan@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1977878487130986510==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Mar 9, 2023 at 11:24=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
+te:
+>
+> On Wed, Feb 08, 2023 at 08:09:16PM -0600, Steev Klimaszewski wrote:
+> > The Lenovo Thinkpad X13s has a WCN6855 Bluetooth controller on uart2,
+> > add this.
+> >
+> > Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> > Link: https://lore.kernel.org/r/20230207052829.3996-5-steev@kali.org
+>
+> This link should not be needed.
+>
+> Also, please update the patch Subject to use the following prefix:
+>
+>         arm64: dts: qcom: sc8280xp-x13s: ...
+>
 
-This is an automated email and please do not reply to this email.
+Yeah, that was me screwing up my  patch, will make those changes for v6
 
-Dear Submitter,
+> > ---
+> > Changes since v4:
+> >  * Address Konrad's review comments.
+> >
+> > Changes since v3:
+> >  * Add vreg_s1c
+> >  * Add regulators and not dead code
+> >  * Fix commit message changelog
+> >
+> > Changes since v2:
+> >  * Remove dead code and add TODO comment
+> >  * Make dtbs_check happy with the pin definitions
+> >  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 76 +++++++++++++++++++
+> >  1 file changed, 76 insertions(+)
+> >
+> > diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts=
+ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> > index f936b020a71d..ad20cfb3a830 100644
+> > --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> > +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+> > @@ -24,6 +24,8 @@ / {
+> >       aliases {
+> >               i2c4 =3D &i2c4;
+> >               i2c21 =3D &i2c21;
+> > +             serial0 =3D &uart17;
+>
+> This is an unrelated change that does not belong in this patch.
+>
+> > +             serial1 =3D &uart2;
+> >       };
+> >
+> >       wcd938x: audio-codec {
+> > @@ -297,6 +299,15 @@ pmc8280c-rpmh-regulators {
+> >               qcom,pmic-id =3D "c";
+> >               vdd-bob-supply =3D <&vreg_vph_pwr>;
+> >
+> > +             vreg_s1c: smps1 {
+> > +                     regulator-name =3D "vreg_s1c";
+> > +                     regulator-min-microvolt =3D <1880000>;
+> > +                     regulator-max-microvolt =3D <1900000>;
+> > +                     regulator-allowed-modes =3D <RPMH_REGULATOR_MODE_=
+AUTO>,
+> > +                                               <RPMH_REGULATOR_MODE_RE=
+T>;
+> > +                     regulator-allow-set-load;
+>
+> Don't you need to specify initial-mode as well?
+>
+> > +             };
+> > +
+> >               vreg_l1c: ldo1 {
+> >                       regulator-name =3D "vreg_l1c";
+> >                       regulator-min-microvolt =3D <1800000>;
+> > @@ -712,6 +723,32 @@ &qup0 {
+> >       status =3D "okay";
+> >  };
+> >
+> > +&uart2 {
+> > +     pinctrl-0 =3D <&uart2_state>;
+> > +     pinctrl-names =3D "default";
+> > +
+> > +     status =3D "okay";
+> > +
+> > +     bluetooth {
+> > +             compatible =3D "qcom,wcn6855-bt";
+> > +
+> > +             vddio-supply =3D <&vreg_s10b>;
+> > +             vddbtcxmx-supply =3D <&vreg_s12b>;
+> > +             vddrfacmn-supply =3D <&vreg_s12b>;
+> > +             vddrfa0p8-supply =3D <&vreg_s12b>;
+> > +             vddrfa1p2-supply =3D <&vreg_s11b>;
+> > +             vddrfa1p7-supply =3D <&vreg_s1c>;
+> > +
+> > +             max-speed =3D <3200000>;
+> > +
+> > +             enable-gpios =3D <&tlmm 133 GPIO_ACTIVE_HIGH>;
+> > +             swctrl-gpios =3D <&tlmm 132 GPIO_ACTIVE_HIGH>;
+> > +
+> > +             pinctrl-0 =3D <&bt_en>;
+> > +             pinctrl-names =3D "default";
+> > +     };
+> > +};
+> > +
+> >  &qup1 {
+> >       status =3D "okay";
+> >  };
+> > @@ -720,6 +757,11 @@ &qup2 {
+> >       status =3D "okay";
+> >  };
+> >
+> > +&uart17 {
+> > +     compatible =3D "qcom,geni-debug-uart";
+> > +     status =3D "okay";
+> > +};
+>
+> This bit does not belong here either. We don't have any means of
+> accessing the debug uart on the X13s so we should probably just leave it
+> disabled.
+>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Will drop it (and the above one as well)
 
------ Output -----
+> > +
+> >  &remoteproc_adsp {
+> >       firmware-name =3D "qcom/sc8280xp/LENOVO/21BX/qcadsp8280.mbn";
+> >
+> > @@ -980,6 +1022,19 @@ hastings_reg_en: hastings-reg-en-state {
+> >  &tlmm {
+> >       gpio-reserved-ranges =3D <70 2>, <74 6>, <83 4>, <125 2>, <128 2>=
+, <154 7>;
+> >
+> > +     bt_en: bt-en-state {
+>
+> As you are configuring more than one pin, please rename this as:
+>
+>         bt_default: bt-default-state
+>
+> > +             hstp-sw-ctrl-pins {
+> > +                     pins =3D "gpio132";
+> > +                     function =3D "gpio";
+>
+> You should define the bias configuration as well. I guess we need to
+> keep the default pull-down enabled.
+>
+> > +             };
+> > +
+> > +             hstp-bt-en-pins {
+> > +                     pins =3D "gpio133";
+> > +                     function =3D "gpio";
+> > +                     drive-strength =3D <16>;
+>
+> bias-disable?
+>
+> > +             };
+> > +     };
+> > +
+> >       edp_reg_en: edp-reg-en-state {
+> >               pins =3D "gpio25";
+> >               function =3D "gpio";
+> > @@ -1001,6 +1056,27 @@ i2c4_default: i2c4-default-state {
+> >               bias-disable;
+> >       };
+> >
+> > +     uart2_state: uart2-state {
+>
+> Rename this one too:
+>
+>         uart2_default: uart2-default-state
+>
+> > +             cts-pins {
+> > +                     pins =3D "gpio122";
+>
+> This should be gpio121 (gpio122 is rts).
+>
 
-error: patch failed: net/bluetooth/hci_sock.c:888
-error: net/bluetooth/hci_sock.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+You are right that it should be... however... if I actually set it to
+be 121.... bluetooth doesn't actually come up/work?
 
-Please resolve the issue and submit the patches again.
+> > +                     function =3D "qup2";
+> > +                     bias-disable;
+>
+> Don't we need a pull-down on this one to avoid a floating input when the
+> module is powered down?
+>
+Maybe?  I don't have access to the schematics or anything so I was
+going with the best guess based on what worked by poking and prodding.
+Will try this.
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============1977878487130986510==--
+> > +             };
+> > +
+> > +             rts-tx-pins {
+>
+> Please split this in two nodes.
+>
+> > +                     pins =3D "gpio122", "gpio123";
+> > +                     function =3D "qup2";
+> > +                     drive-strength =3D <2>;
+> > +                     bias-disable;
+> > +             };
+> > +
+> > +             rx-pins {
+> > +                     pins =3D "gpio124";
+> > +                     function =3D "qup2";
+> > +                     bias-pull-up;
+> > +             };
+> > +     };
+> > +
+> >       i2c21_default: i2c21-default-state {
+> >               pins =3D "gpio81", "gpio82";
+> >               function =3D "qup21";
+>
+> Johan
