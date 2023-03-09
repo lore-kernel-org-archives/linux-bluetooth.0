@@ -2,110 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC18C742A7
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 18:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE61BC64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 18:43:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230303AbjCISNU (ORCPT
+        id S229742AbjCISnF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 13:13:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60682 "EHLO
+        Thu, 9 Mar 2023 13:43:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229825AbjCISNR (ORCPT
+        with ESMTP id S229804AbjCISnD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 13:13:17 -0500
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FE13755E;
-        Thu,  9 Mar 2023 10:13:15 -0800 (PST)
-Received: from fpc.intra.ispras.ru (unknown [10.10.165.5])
-        by mail.ispras.ru (Postfix) with ESMTPSA id A9A3B4077AEF;
-        Thu,  9 Mar 2023 18:13:13 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru A9A3B4077AEF
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-        s=default; t=1678385593;
-        bh=Pt4ZvSVepTY4Qap6N4dhqvj205nwIIhb0xhp8AbBKag=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JjyX6FZGRXfAV1eJ7w2xkT1M7eVutjP0juq8E83h/RKgXRajAquMlxAE5WJaPuTZX
-         zrOWplieWwRHjjNBGi7akWI60MLLavNT7Q2lqzz4qZkKJlXInlwRZ5aFWbxIRlwrDk
-         owqavSuUHRgs6gN+quTzlCRgdIjVFtxQwvf5bOdo=
-From:   Fedor Pchelkin <pchelkin@ispras.ru>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org
-Cc:     Fedor Pchelkin <pchelkin@ispras.ru>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Nguyen Dinh Phi <phind.uet@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alexey Khoroshilov <khoroshilov@ispras.ru>,
-        lvc-project@linuxtesting.org,
-        syzbot+4c4ffd1e1094dae61035@syzkaller.appspotmail.com
-Subject: [PATCH 4.14/4.19/5.4/5.10/5.15 1/1] Bluetooth: hci_sock: purge socket queues in the destruct() callback
-Date:   Thu,  9 Mar 2023 21:12:51 +0300
-Message-Id: <20230309181251.479447-2-pchelkin@ispras.ru>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230309181251.479447-1-pchelkin@ispras.ru>
-References: <20230309181251.479447-1-pchelkin@ispras.ru>
+        Thu, 9 Mar 2023 13:43:03 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A06C12594
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 10:42:59 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id cp7-20020a17090afb8700b0023756229427so7191278pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 10:42:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678387378;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6VvVBIIyFOGeeiEhdFGBuZNx8V3KDmSqGMkkojeF6RE=;
+        b=EjXI4VK/kqnDyT/I46aeUmFN1umWnfwgch5PQ4Fb8ZmSSc0p1l34Uot3M8J2jG6xvY
+         JVP/aqYj3ze5t+3LqXOaf5w/bNZ+qe7Ct3VaFCGnad2MvlHQMaSzlJGXSA028u3AgDX1
+         EqmBDDH0IuZmebEUDbGtN0rvIQ6Kf5mlIi73eBZBNpv/PTDOeCZL0vV/w7zOWmelosy9
+         X22Jr3e0cLj4zcg+O3Q7JFtPGVh9B7aqbDJRRofTPihtceBabmmITQgRw/T41KODFJNk
+         pAdi9eBxzRd22QUsqQjm4y8dntVS0r/JnpDXB8gplMYF2ghBIzxEA0WfEiaOepYaby6h
+         050Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678387378;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6VvVBIIyFOGeeiEhdFGBuZNx8V3KDmSqGMkkojeF6RE=;
+        b=xkvqimAsWRzLJxwmCZtAgOTzNLOVvMbd9O5pfDxqJl/Y+VpR/zWU1q9hm2+jGU6XOx
+         uGkOBg6vwHSrRDwa/ieS5ppyOgNvKDK7kn3W4V8nROFQm4SafFwqfxLxHgLkS7grETfK
+         eqIiI4/Mu0DhGI5GHR9m7fC3x0VHGz+Up2SQ85ZoJyAHpUtrYsriwPABIyLJwfM/d2Og
+         gJqy0AihDR8GRpqsOU/GV95Qqboq97p/OAhk7OuupO0LA/C94NB91jnEuaWHZOVnmH3U
+         d7lr1hqWpsu1FPxHJJa9mSiZNL2LvMJAbhKk9PyKNbGvMXGKbBiFFvSz1FCVNAJo5Snq
+         MVLQ==
+X-Gm-Message-State: AO0yUKXaEvnesbgKrhyU3zLRHb9uBkSA35nV6cwjyI8aYX3vd06kzERV
+        kXKBTUOHU7PriRweEHNId/bdjIjTuSk=
+X-Google-Smtp-Source: AK7set910pRxfpYLCo7CF8jNkg886HzsHSed8qDf3Tk0G9Lx6Op9Zxi+8Ry83wh6Ei/UoPA3zlYHow==
+X-Received: by 2002:a17:902:b614:b0:19e:8c78:8cf6 with SMTP id b20-20020a170902b61400b0019e8c788cf6mr19695660pls.62.1678387378600;
+        Thu, 09 Mar 2023 10:42:58 -0800 (PST)
+Received: from [172.17.0.2] ([13.73.36.80])
+        by smtp.gmail.com with ESMTPSA id i6-20020a1709026ac600b001991e59fde6sm11847352plt.216.2023.03.09.10.42.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Mar 2023 10:42:58 -0800 (PST)
+Message-ID: <640a28b2.170a0220.c16f0.62f1@mx.google.com>
+Date:   Thu, 09 Mar 2023 10:42:58 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1977878487130986510=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pchelkin@ispras.ru
+Subject: RE: Bluetooth: hci_sock: purge socket queues in the destruct() callback
+In-Reply-To: <20230309181251.479447-2-pchelkin@ispras.ru>
+References: <20230309181251.479447-2-pchelkin@ispras.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Nguyen Dinh Phi <phind.uet@gmail.com>
+--===============1977878487130986510==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-commit 709fca500067524381e28a5f481882930eebac88 upstream.
+This is an automated email and please do not reply to this email.
 
-The receive path may take the socket right before hci_sock_release(),
-but it may enqueue the packets to the socket queues after the call to
-skb_queue_purge(), therefore the socket can be destroyed without clear
-its queues completely.
+Dear Submitter,
 
-Moving these skb_queue_purge() to the hci_sock_destruct() will fix this
-issue, because nothing is referencing the socket at this point.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
-Reported-by: syzbot+4c4ffd1e1094dae61035@syzkaller.appspotmail.com
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+----- Output -----
+
+error: patch failed: net/bluetooth/hci_sock.c:888
+error: net/bluetooth/hci_sock.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- net/bluetooth/hci_sock.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index f1128c2134f0..3f92a21cabe8 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -888,10 +888,6 @@ static int hci_sock_release(struct socket *sock)
- 	}
- 
- 	sock_orphan(sk);
--
--	skb_queue_purge(&sk->sk_receive_queue);
--	skb_queue_purge(&sk->sk_write_queue);
--
- 	release_sock(sk);
- 	sock_put(sk);
- 	return 0;
-@@ -2012,6 +2008,12 @@ static int hci_sock_getsockopt(struct socket *sock, int level, int optname,
- 	return err;
- }
- 
-+static void hci_sock_destruct(struct sock *sk)
-+{
-+	skb_queue_purge(&sk->sk_receive_queue);
-+	skb_queue_purge(&sk->sk_write_queue);
-+}
-+
- static const struct proto_ops hci_sock_ops = {
- 	.family		= PF_BLUETOOTH,
- 	.owner		= THIS_MODULE,
-@@ -2065,6 +2067,7 @@ static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
- 
- 	sock->state = SS_UNCONNECTED;
- 	sk->sk_state = BT_OPEN;
-+	sk->sk_destruct = hci_sock_destruct;
- 
- 	bt_sock_link(&hci_sk_list, sk);
- 	return 0;
--- 
-2.34.1
 
+--===============1977878487130986510==--
