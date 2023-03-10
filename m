@@ -2,117 +2,150 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 733C4C74A4B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 16:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 151DFC742A7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 18:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231761AbjCJQ3g (ORCPT
+        id S231336AbjCJSUK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 11:29:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47966 "EHLO
+        Fri, 10 Mar 2023 13:20:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbjCJQ3S (ORCPT
+        with ESMTP id S229708AbjCJSUH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 11:29:18 -0500
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7852A12C0D5;
-        Fri, 10 Mar 2023 08:25:53 -0800 (PST)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1755e639b65so6417133fac.3;
-        Fri, 10 Mar 2023 08:25:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678465552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J2PgjZ/8V+cl158bxCaGpHbEL4XOy790DRH6Lk1TPsw=;
-        b=Xxw16YGU5lxrcjb5M6HshOp/QA5ymHzLVHjdQZtkgIjUGbYt2QchROnfQhAo7Lm6uI
-         leE6pxcrAaHKTwovkDDHUzAz8WGRrZ+6EjucH2MxbLxgrALXjPsiiVe2kQTM4s6MM7k7
-         vYdi5XVp4bVXirH0sDVistEAYELS062s4havTYcEPZhGNItohNt6+x5x4gVNKQ4x9/4r
-         vQHyjqYwRCZTuRU4LZeCerajPNsHpOMtB4td29wJjeMMbCLGleTmYuuw974i5rGWXGz3
-         gpCQ/ihsXu/XHFwL9W7N/4O5RXnWUBn7L1r188DmAFjYMkm3a3X6nyoJUbBcVdm21uyT
-         lyNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678465552;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J2PgjZ/8V+cl158bxCaGpHbEL4XOy790DRH6Lk1TPsw=;
-        b=gxe4c2KBvf/Hfj81xBb8RLYuzAjTU0hLev16ejp63U4G/3V1U00j12v0GhHECvry8/
-         Rs26XRjSBtA6UpQRAvnqpOgks5V7UVltIAMJaQpoZ+KY0hoswxGeEh3XV8Zb7KgE/FqC
-         MlMEQ6znBwMwYl38spgLuNKQIXV6xibLWZcHzORGWDqoLnmVKCv13ePe6jbEcESqOgMv
-         SM7h0gdqbVojUPR142trZq/dpw7j/q+XpuWQ5PqdUHR296gD4ZY/2rX1/slHngTe4TW9
-         h+YSHJnUbXEm69eRYqHzAaprjICjNNHwwx11N0p7V2e8D/mH1fI66kd/b2DdU5y5Wwz1
-         fANw==
-X-Gm-Message-State: AO0yUKXS5DQHV9beMSRXM9FkemYc8A6URnDMZRs1w2NW9XbzTMrvbeVV
-        bjCjw3zl3WxNNJa4JB+jOlbh8rVuOm9/W7J8gU/1/OjKDS0=
-X-Google-Smtp-Source: AK7set8oNerOfLCLDaZ3iQ7XsqoUVqgWXVGvLlrdF8Cd7tCykN6/WBCkpJzhIUKJp6K6SkElX7hOPSaujWIfJvliH58=
-X-Received: by 2002:a05:6870:8c28:b0:16d:fb8e:3ba with SMTP id
- ec40-20020a0568708c2800b0016dfb8e03bamr8932410oab.0.1678465552612; Fri, 10
- Mar 2023 08:25:52 -0800 (PST)
+        Fri, 10 Mar 2023 13:20:07 -0500
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2043.outbound.protection.outlook.com [40.107.241.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA17310284F;
+        Fri, 10 Mar 2023 10:20:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n6/kpIApRABpnu5L6mDF1YxCB+Yts6izOG6epOrgT49OMyivm1jYeQFIHEicT/G3fXdPo20soYIkWN9pHf01Sdo4BQxVCqAsuUehB5YEfrbYfVoI1HUKVy8oktSN0F5i+Umgqyc8qBiUNNZ/ideo44kDburO+590eBLnW7Q9Fhle3UViJMAJdVv4QdRINDZ31NTGWajKsKI54ba3xEY6CyTDIurX1RY/279AEmWt8GhIAS/mB+BbpiEN1kE07QqFzhcVjb1/EPssm945yHrkXjqtG52rOF9A4kS4lpLF1eU26MGiFlIhBF7dynEF6v7Ww7fk5+E9tYO43R1OdHf+Gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sr6KC+yyaQtkygcR2njzgAGJY3nOTwLhdjUm2Cl0IKw=;
+ b=K3V4CwMmf3DvA78jHKlr6ddj6rIRbrbvs05ypneDJ90IXm509oMnHyPnIpd35YqkuNL/bF2apHqjvUNYYzU9cSPnrWUA8NK2Csl+rGngbBQ782A9VJ1Z7kO3qINYEGxuFUcO8VXdYnj0oXT75TAQ5zDBzLoAXzwiFYmo4LNju9aG9OAcGJ81MZ9At1qa0KiNNud2agBIwi4BYC56D2fkffqW/2GNql+jvF0eaWQfHavlUsXBOnUQ2sjXTRBLlkx+difc6jCoZjYHsEtv34X6pRx71QUuvBBj8hgaGIO/d2Opgo8d+DbGbO5cubW4VXpw7i03jFeb7zaY6oZ/kDYftQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sr6KC+yyaQtkygcR2njzgAGJY3nOTwLhdjUm2Cl0IKw=;
+ b=S/2raSl5WsNsnZ5+8CejLihcOwngG3LogcGuLWvW/GuuyuNK2kJqWoEl4lJ2AzRtKV0l0SlT/NqtSt6kizLqiAXnFHI0Yq0T6I7swO5Iql41nkgT9jlnWPTMyHA5vdTMDppDzeEoDMj9T4LX3PjcW8pobVE+V5X+oEtE7zR3v0k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
+ by DB9PR04MB9704.eurprd04.prod.outlook.com (2603:10a6:10:303::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.16; Fri, 10 Mar
+ 2023 18:20:01 +0000
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::45d2:ce51:a1c4:8762]) by AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::45d2:ce51:a1c4:8762%5]) with mapi id 15.20.6178.019; Fri, 10 Mar 2023
+ 18:20:01 +0000
+From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org,
+        alok.a.tiwari@oracle.com, hdanton@sina.com,
+        ilpo.jarvinen@linux.intel.com, leon@kernel.org
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
+        rohit.fule@nxp.com, sherry.sun@nxp.com, neeraj.sanjaykale@nxp.com
+Subject: [PATCH v8 0/3] Add support for NXP bluetooth chipsets
+Date:   Fri, 10 Mar 2023 23:49:18 +0530
+Message-Id: <20230310181921.1437890-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR04CA0195.apcprd04.prod.outlook.com
+ (2603:1096:4:14::33) To AM9PR04MB8603.eurprd04.prod.outlook.com
+ (2603:10a6:20b:43a::10)
 MIME-Version: 1.0
-References: <20230228152205.133582-1-macroalpha82@gmail.com> <20230228152205.133582-3-macroalpha82@gmail.com>
-In-Reply-To: <20230228152205.133582-3-macroalpha82@gmail.com>
-From:   Chris Morgan <macroalpha82@gmail.com>
-Date:   Fri, 10 Mar 2023 10:25:41 -0600
-Message-ID: <CADcbR4+Onb6RM7grPrqRL8Rth0mbFXykRmPq8R1QxYRGaHQHtA@mail.gmail.com>
-Subject: Re: [PATCH 2/3 V4] Bluetooth: hci_h5: btrtl: Add support for RTL8821CS
-To:     linux-bluetooth@vger.kernel.org
-Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        alistair@alistair23.me, anarsoul@gmail.com, luiz.dentz@gmail.com,
-        johan.hedberg@gmail.com, marcel@holtmann.org, heiko@sntech.de,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        Chris Morgan <macromorgan@hotmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8603:EE_|DB9PR04MB9704:EE_
+X-MS-Office365-Filtering-Correlation-Id: 504f06c0-740c-4cd0-6732-08db21940fef
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uo+AFwO/zNXdcWRjuX+my7lPpZtUgPzibPSDhjniYTlgTGo+Uhy7CRbXRdq6zFRkoHj4AX6MMt3wga5Lmh+3ZGaX92gPL/7pWOhnjRXsXbFVm2Bsq0hNwXgdLmQAmAF4yJvY8hU37iMq2Ni5ZDjLl892PmfGEw9KSQA5Q6ns/jLln3e99H72nrBWY6z/x6hOsOQSCVkqqX62i/7EVAluT/JixrENeAmg3TBEpP0cWlbzL131JGmwUhjujgYKfF8IU4Ymur6r0k23xI6JBZubnBB62qGwtcJAXcG7XBxZGmekSTk8mfe3uGwd6CKICQi98gtD9h27TOq4c3Q4V0R9dqO7cCEk/FVeSADCwFVlUoXkq6os7fTBJ+IYeUiGqmkP0sXmWDEetluoGg8EEUFLDnhyw7+yg5JQSpsmTQMaZtanVoIOrmjcSLU0JzzJOfpBqMiNy/rHoMswRe/lMOoDVeOPReW3juIh/N2ZXXUfk/KwuBF4oy06sxUokidh4HNX1uh6J0QpntMG+l2k2vdtugIqMM96jxzz7PlVfaZonXuyYLWRewPFcSJ4NpXdkeClipWHzjzd2+9fOlxB5EYHTxIR/u98L8k7zZYjCxPTLKCckHX5l7S7wapiJWqB+TsG0cXdcsKCJRs3W1zRKjdA9yOWCIX53H/NqvHBZZmuXlX+/6z2aZxSsnmhlPdP70ZK/YdjIvg9t5Bj3WEKZUMhEdd8gbFHAWWQSDu4rNdayO8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(346002)(136003)(396003)(366004)(39860400002)(376002)(451199018)(66946007)(66476007)(66556008)(1076003)(6512007)(6506007)(316002)(38100700002)(26005)(8676002)(36756003)(7416002)(478600001)(6666004)(8936002)(2906002)(5660300002)(6486002)(921005)(52116002)(86362001)(83380400001)(4326008)(2616005)(38350700002)(41300700001)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Xl2+xHfJ+mpgccVizYuT8IMOvDv9px6c8g7Wd8mqJ5G1EG9ClgTku64encEG?=
+ =?us-ascii?Q?M8akua5/cMIXd2ebC2WIOTQ675C4yR0PHSWJEAGDEZJQRDrK5pjYYx229ZgQ?=
+ =?us-ascii?Q?cv8/8cSCcFOqDrV6Xe1lSCgvVZOclGYe6/p6Ru4nnJNz5BGHlh85BbYjnbEm?=
+ =?us-ascii?Q?xlGvcSLTgdlOlINPUzEtjbnF+AZTian9v9Ilgx12Yew+xTt1xYFtlhrIU15J?=
+ =?us-ascii?Q?QB29WhMbLOkB9q+jU5AsjEKoraYDBMsEpCFRAXXaRbCMZAUOd30y3IFCcc4x?=
+ =?us-ascii?Q?f27javeidULQZhL9pCtd7h+dq9Pb4b5PmJ4FuKdKyHjRmGb5pAiRpX69oOXk?=
+ =?us-ascii?Q?jmESCZBEik1NxX6+g6fXq4qWfKtGRD5r/6DMs07cCx0Gsh8+sO/u+3GebF3r?=
+ =?us-ascii?Q?lxS23ID1gQDpext1Vp0FDkj4o4KaV/gxhIHpBrqSn3J9OrNeBv1UPMiSAl2F?=
+ =?us-ascii?Q?5zI8mDWqkce+p8S8jQW7LEJ1OHTN/Q54gsFHkGyxCqIEG7xgDAshMXEjEPOE?=
+ =?us-ascii?Q?LRDRnzqiMoTK4RV5nuMl+WcF2WCOoEBqE7LC3MKWqxgt4YHlY+mTN/hmct3+?=
+ =?us-ascii?Q?ohYmRUA6SDtHgXM9d6/D3CLL0xStCMz7cCGIsbSTlNsmNM1iSr2CM3LeqAyE?=
+ =?us-ascii?Q?SZCVuee8wbgwvaneTBIqtpLAK97+u72Ccvy1d/KQkIyz8vwkMUa8Tzg5YznD?=
+ =?us-ascii?Q?JT+cgSzGozG3gjkvVthsAy9hdnu0MBlmaxc/ijew/zMdxkczrcXUUI1qQZJS?=
+ =?us-ascii?Q?IUfI+zJ/kr/xSfdPLhxTXjYjnxRf3anHIwMgcCjHAZKrwkAhU2/+SVWW7I5j?=
+ =?us-ascii?Q?lTOSjOKcaWgwh0QiH7LG69Y5gvJUb1w8bPNLp/meZuKta6ikJTsqqdH1SOMf?=
+ =?us-ascii?Q?VFUdEpglGjWkaHTQ3AB/9SIp5sRmT4e+Dwt1Cb2JFDOc2/R4nBTw8r2D7GkF?=
+ =?us-ascii?Q?TxNV7QqmEnkVsKri9V2U3VDOjbbtOiXgoXInmRzPm3aVnSJq+WCBqjqA1F68?=
+ =?us-ascii?Q?xn8LcKW9WbmdH9g5Mi46wpkkYhvcvuIayzl0DYcrJ9zUcpfwWDl3BSX7uhHh?=
+ =?us-ascii?Q?XVZUVmLtxnHoJlicyOi10HVK3HLiKkwsEaFF8GR/X83Ee5WgUFwO7VZkpwbx?=
+ =?us-ascii?Q?t5yjM9UCbi2nkLJwyNTqTF+LljH7CcnJpSu+2/KWTGKq0sUHAwJBEliG4Dto?=
+ =?us-ascii?Q?Km4IRoUpf+ejlpi4ZOgnNj4CI7tFgqU7kKWk+ufLvZxib4ENhpA3onnZ5D5B?=
+ =?us-ascii?Q?3iyDgR59pRNApH8trwBk6HthVrdgVLhGNzFoOXw3VW9jSqLt5vBQ0enlqUJA?=
+ =?us-ascii?Q?obODGTFNQ6XE7e2NUh8T/bHe9Kykg3w0PVfbjhMrY96wOE2/S1CGtqt+bNPf?=
+ =?us-ascii?Q?pYtCqnqBH7QbJyKuYOfRYVtm92Opq9jgNz2t4PR/OeQBagCG6soqQYNWVbxP?=
+ =?us-ascii?Q?7F+q65GQWFrw8myyeiB5Yu0wQgY3OD31WikMtadD4pQ/4OPAy61BCUsneV+4?=
+ =?us-ascii?Q?XOM2YxCjhHnR6tAMOv1Obfjr6m9AHoxdcy+DGR+lK4ZLeecUKb3xKxKCxAfb?=
+ =?us-ascii?Q?qJNITUuTuhnI/kZ4Miv2q04cfycO9dCkEMF7IY07rVu4IdREqBrzBw4VSLA0?=
+ =?us-ascii?Q?ew=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 504f06c0-740c-4cd0-6732-08db21940fef
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Mar 2023 18:20:01.1624
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q0C7AvIy81k8GbRGKuTjraJ3Q9m1jmy2OSgZiB4yayo7qeYOCnkdH9WbmsXkFMnwXqbmV3t/ODAEcjlwFWA48Yvdsg+tOKpSRzqb9kYO0W8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9704
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I shudder to bring this up now, but I'm encountering a new bug and
-might have to withdraw this.
+This patch adds a driver for NXP bluetooth chipsets.
 
-I'm receiving errors in dmesg of the following, and I can't seem to
-figure out the root cause:
-Bluetooth: hci0: Out-of-order packet arrived
+The driver is based on H4 protocol, and uses serdev APIs. It supports host
+to chip power save feature, which is signalled by the host by asserting
+break over UART TX lines, to put the chip into sleep state.
 
-Any thoughts on what might cause it?
-Thank you.
+To support this feature, break_ctl has also been added to serdev-tty along
+with a new serdev API serdev_device_break_ctl().
 
-On Tue, Feb 28, 2023 at 9:22=E2=80=AFAM Chris Morgan <macroalpha82@gmail.co=
-m> wrote:
->
-> From: Chris Morgan <macromorgan@hotmail.com>
->
-> RTL8821CS is a WiFi + Bluetooth combo chip from Realtek that provides
-> WiFi A/B/G/N/AC over an SDIO interface and Bluetooth 4.2 over a UART
-> interface.
->
-> Note that the firmware this was tested with was firmware version
-> 0x75b8f098.
->
-> Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
-> ---
->  drivers/bluetooth/btrtl.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index 69c3fe649ca7..72947d319fa6 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -128,6 +128,14 @@ static const struct id_table ic_id_table[] =3D {
->           .fw_name  =3D "rtl_bt/rtl8821c_fw.bin",
->           .cfg_name =3D "rtl_bt/rtl8821c_config" },
->
-> +       /* 8821CS */
-> +       { IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_UART),
-> +         .config_needed =3D true,
-> +         .has_rom_version =3D true,
-> +         .has_msft_ext =3D true,
-> +         .fw_name  =3D "rtl_bt/rtl8821cs_fw.bin",
-> +         .cfg_name =3D "rtl_bt/rtl8821cs_config" },
-> +
->         /* 8761A */
->         { IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
->           .config_needed =3D false,
-> --
-> 2.34.1
->
+This driver is capable of downloading firmware into the chip over UART.
+
+The document specifying device tree bindings for this driver is also
+included in this patch series.
+
+Neeraj Sanjay Kale (3):
+  serdev: Add method to assert break signal over tty UART port
+  dt-bindings: net: bluetooth: Add NXP bluetooth support
+  Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets
+
+ .../net/bluetooth/nxp,88w8987-bt.yaml         |   46 +
+ MAINTAINERS                                   |    7 +
+ drivers/bluetooth/Kconfig                     |   11 +
+ drivers/bluetooth/Makefile                    |    1 +
+ drivers/bluetooth/btnxpuart.c                 | 1293 +++++++++++++++++
+ drivers/tty/serdev/core.c                     |   11 +
+ drivers/tty/serdev/serdev-ttyport.c           |   12 +
+ include/linux/serdev.h                        |    6 +
+ 8 files changed, 1387 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+ create mode 100644 drivers/bluetooth/btnxpuart.c
+
+-- 
+2.34.1
+
