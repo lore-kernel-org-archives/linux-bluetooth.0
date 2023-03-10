@@ -2,105 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A24C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 15:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2234C6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 16:05:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234286AbjCJP0X (ORCPT
+        id S230164AbjCJQFl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 10:26:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34016 "EHLO
+        Fri, 10 Mar 2023 11:05:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233062AbjCJPZ5 (ORCPT
+        with ESMTP id S231423AbjCJQFH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 10:25:57 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E882C141609
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 07:15:18 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id m6-20020a056902118600b00aeb1e3dbd1bso6024723ybu.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 07:15:18 -0800 (PST)
+        Fri, 10 Mar 2023 11:05:07 -0500
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5B0E192
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 08:02:27 -0800 (PST)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1763e201bb4so6355674fac.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 08:02:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678461273;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0ZxFQ1lCgbN700UyOUwQnE48bNFXti2FaZcvjdkd2/o=;
-        b=DoeuEloTalasZej4IniSK91oO+mjn0TQylvFzkGG2ME+OjwanTIQ1mqeS4SCaBK9Wj
-         jQmok9pVcrQbI//48zw31sLlM+Bt6sGnxYNXO5GuciWwmNTkoj8KjoMdvOvJ2nIO30f4
-         etX514o8mStNGvouQmVs7VOP7fSFj5wKDjHYwfhuBl6b1LpXt8CSw+L3fusqws7xaRS/
-         eR+MN3SqIJoO5vbttct5BPEode0OwbFOcSb3X/iDxRvl9t5MWRYdKnHTzHZZ5jPAzMqO
-         qOM1Wc2R0TfmitAs8Qcm5JJ/WmPxH8R5FDGVeJCcZZGmSLgUF5s3HjdtzRAhFJpEiSHw
-         x3Dg==
+        d=gmail.com; s=20210112; t=1678464147;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HzziJ/PVNHgZZQB/W6ji6ko1ENDqfgs7eo2hcHpnqKQ=;
+        b=Ko1WxnqHFF5ASUBI2kY0ql8TWtU6rtMs4RPECXBiHzzTuRKr0ZfvEIoAJbwJn12Ncr
+         UZYN7/HXtX6V3ikflC1bd8kr1IAn20qTKTFDc2crN9CiLpysz3FZidCfk1rqZRifFV9y
+         tEfg66bslVXYuNNkBLzj5NZewBfII6SnhgT7+nBOjnxykpKCTvds50Lf7PjUyim8xdUA
+         ZKdJXjTuwugkhdi2xneGxzwBgnZYGVuwdBNmTygQe0B5wb4wsOwoDrqQJxDZZhGWSSue
+         lW/TLgWE46VfT7EOH9QRlbpQYilPlKNWrF6cfKcDTpRJ6mdJA/nIrN4ReRQLC89QLnvl
+         pCSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678461273;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0ZxFQ1lCgbN700UyOUwQnE48bNFXti2FaZcvjdkd2/o=;
-        b=p4rEOp8uo13HvD5FixGgqTXja3XGE3aO+EAsw+E+pVZZhgeiVOEyzPjf1wGL5PTNrj
-         dOVWV6RnRpbjY6bAuHYxOc2yzpWsKVrr2KUSX+D0lYQW1ObapEhmD3IVAVrY67qdAIUM
-         cn4diDgEkzf2TBQRe53mfpWmFhEv+LrtuX2QcMnzYQJ4mudN+MwJH/qi0hfY65Nq7i4r
-         /z69+QnlKRnsdlUnw5rSJKXorQGZbM5iS3sX6nWXV2D0E3NoMe85Gp9VqF8Ne/YWdJP/
-         Zctc1KCtN60VHCa9DgpyXf4Yu1JRWSVnWlDYGYthae/M5hJa7vXBlcPU+u2jJBdCz1Rp
-         WHVA==
-X-Gm-Message-State: AO0yUKXLtLxuHBOxGmDggMQdPy+H/Wv93rceTSUQ86+3Gf9/SFJSSNr4
-        QqFrpcyB9CiW1tGHlxARHp2irVqIUGe3MRf6P16lrtGX+NxPD1FPJz9vPXuLeiYZ3flcA7b8yxm
-        y5eu1ypkrGwXNT9P0VhDPDPh3EKsPxOviyJus/+AdVAMXIIW558H8lahjC3vHwNy8jyF8j4+AOQ
-        KIM0lr3C4GyDc=
-X-Google-Smtp-Source: AK7set9tt7CUK2UnASqnCB5Nh+1Un8yEY56uVij2WwgjgXM+zIZM86yJ8o6mXmjQzixEveuTFiFym18iqj4YT8ygew==
-X-Received: from rcheleguini-vm3.c.googlers.com ([fda3:e722:ac3:cc00:52:384b:c0a8:ef])
- (user=rcheleguini job=sendgmr) by 2002:a81:6ed5:0:b0:52e:db9c:9ef2 with SMTP
- id j204-20020a816ed5000000b0052edb9c9ef2mr4ywc.269.1678461273214; Fri, 10 Mar
- 2023 07:14:33 -0800 (PST)
-Date:   Fri, 10 Mar 2023 15:14:10 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc1.284.g88254d51c5-goog
-Message-ID: <20230310151410.2686458-1-rcheleguini@google.com>
-Subject: [PATCH] Bluetooth: Improve support for Actions Semi ATS2851 based devices
-From:   Raul Cheleguini <rcheleguini@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, Raul Cheleguini <rcheleguini@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20210112; t=1678464147;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HzziJ/PVNHgZZQB/W6ji6ko1ENDqfgs7eo2hcHpnqKQ=;
+        b=1GUaVzN5NfAnJ/Kr3bFNhL1ue87klREn6Fpep7+VygSuurPFv/87vC0Wfp+jYBpFZZ
+         +ol4xhkqixpM7DKGOtVivwijBgQnpt0WVDxsyLmYTCXt8kjmbp1WGRF5tkaUl+xdMNFS
+         VMaKbyYRCL4rPaPAgSXnmvsoTzFwQw5+80jl2Lw/sB9r6ywwv3xrmvrApudCbizeIPz4
+         YiKZlUO172DhGusyxGBiPivO6jrge6v2UUWYr/y132B5TO+dtNuxTbYPFOQRJI55sy5C
+         11D0mo6NpG0EP2DdcSXt7zNrVoRoqycrCAPOgPuB5GouQmVfMXxFLQeU69Gr+uZntYc1
+         V14w==
+X-Gm-Message-State: AO0yUKXaqiZY+1BN8Xv6WMbPFmPKQ8mhijECFMYM+0qExYb3IgAG/Ifq
+        En8fzJN8fSkOyyetOaKCtk/qwFkeDso=
+X-Google-Smtp-Source: AK7set8e65d/Ln345tGNwgRxQI4kuy944rU/4VN5nm1dUPuqrfQ5Z3NfHqpIej/KX6J1dKxY0GHXTg==
+X-Received: by 2002:a05:6870:a40d:b0:176:3bf5:79b8 with SMTP id m13-20020a056870a40d00b001763bf579b8mr15281144oal.8.1678464147067;
+        Fri, 10 Mar 2023 08:02:27 -0800 (PST)
+Received: from [172.17.0.2] ([104.45.204.118])
+        by smtp.gmail.com with ESMTPSA id 14-20020a05620a040e00b0074233b15a72sm1503482qkp.116.2023.03.10.08.02.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Mar 2023 08:02:26 -0800 (PST)
+Message-ID: <640b5492.050a0220.7c5f8.5c4a@mx.google.com>
+Date:   Fri, 10 Mar 2023 08:02:26 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0068482189773465662=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, rcheleguini@google.com
+Subject: RE: Bluetooth: Improve support for Actions Semi ATS2851 based devices
+In-Reply-To: <20230310151410.2686458-1-rcheleguini@google.com>
+References: <20230310151410.2686458-1-rcheleguini@google.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add two more quirks to resume the device initialization and basic
-operation as the device seems not to support "Read Transmit Power"
-and "Set Extended Scan Parameters".
+--===============0068482189773465662==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-< HCI Command: LE Read Transmit Power (0x08|0x004b) plen 0
-> HCI Event: Command Status (0x0f) plen 4
-      LE Read Transmit Power (0x08|0x004b) ncmd 1
-        Status: Unknown HCI Command (0x01)
+This is automated email and please do not reply to this email!
 
-< HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 8
-        Own address type: Random (0x01)
-        Filter policy: Accept all advertisement (0x00)
-        PHYs: 0x01
-        Entry 0: LE 1M
-          Type: Active (0x01)
-          Interval: 11.250 msec (0x0012)
-          Window: 11.250 msec (0x0012)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
-        Status: Unknown HCI Command (0x01)
+Dear submitter,
 
-Signed-off-by: Raul Cheleguini <rcheleguini@google.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=728739
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+GitLint                       PASS      0.38 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      38.06 seconds
+CheckAllWarning               PASS      41.85 seconds
+CheckSparse                   PASS      47.12 seconds
+CheckSmatch                   PASS      127.42 seconds
+BuildKernel32                 PASS      36.93 seconds
+TestRunnerSetup               PASS      530.68 seconds
+TestRunner_l2cap-tester       PASS      18.78 seconds
+TestRunner_iso-tester         PASS      21.25 seconds
+TestRunner_bnep-tester        PASS      6.89 seconds
+TestRunner_mgmt-tester        PASS      128.22 seconds
+TestRunner_rfcomm-tester      PASS      10.63 seconds
+TestRunner_sco-tester         PASS      9.82 seconds
+TestRunner_ioctl-tester       PASS      11.58 seconds
+TestRunner_mesh-tester        PASS      8.66 seconds
+TestRunner_smp-tester         PASS      9.69 seconds
+TestRunner_userchan-tester    PASS      7.21 seconds
+IncrementalBuild              PASS      34.36 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 0c94cd7f4af3..7382b021f3df 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4104,6 +4104,8 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_ACTIONS_SEMI) {
- 		/* Support is advertised, but not implemented */
- 		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
- 	}
- 
- 	if (!reset)
--- 
-2.40.0.rc1.284.g88254d51c5-goog
 
+--===============0068482189773465662==--
