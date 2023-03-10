@@ -2,443 +2,445 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD38C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Mar 2023 20:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE41DC64EC4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 00:00:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231147AbjCIUZc (ORCPT
+        id S230422AbjCJAA4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 15:25:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53246 "EHLO
+        Thu, 9 Mar 2023 19:00:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbjCIUZ3 (ORCPT
+        with ESMTP id S229874AbjCJAAz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 15:25:29 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 272B2F8654
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 12:25:10 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id x3so11877410edb.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 12:25:10 -0800 (PST)
+        Thu, 9 Mar 2023 19:00:55 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91123E63D2
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 16:00:53 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id m22so1401928ioy.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 16:00:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1678393508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G+BklEzWVltOR1hJvkNkXfkrfxPiDjF0+O+EA7XHv/4=;
-        b=TpjTcTG89eVAWMsGE1cmuq97VbZqB66knbilw8sax5Cv+BzMBUv7Y0z3XYJnKUd2gA
-         73u8YU3OJxPBN9UgE3Edk/K1fBICUyIFRwv7xHy2JqtLRVV9gusQKnMCREzxVQHUisYb
-         RskiwQG/+LF3/fI4AaS4agkY6XcBoEQwr+Xn4iETmLTex/JWpeyvnJeIBfItukuillRz
-         pk+hyW7BHiz3tVQ1uxfXDiDj/8Rp4Ao+ThtHiV6OAhYyO041NZeENtqyHJBz9Ndi/0Wg
-         bO8Ks0u9ZBMr+DayjzQf/p3MdEBwM3kVWqWybjHi3rlz6zKqhegW98CDBfPJmHp/MCAg
-         Cazw==
+        d=gmail.com; s=20210112; t=1678406452;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwwuvN2/fd3CFPcyFytkM67OmDcpA3Bq2U3hx1hICuM=;
+        b=h5x2lS772DdPFHJeaPHBmALND5dQ+KUvsqeaZHaXKwPqfVMra/BwkHoyExk4IcPXDL
+         4St68ZKITsEs2QzqJ4C2XGgHHQ2HMgJO5xd4Zza/hX2pzkqg8ex8uJOjWJHIRXJn1SZN
+         JaPYYB2R9Bl2jDaQFkKOfvZcdlialoS6lewV+u4Tb9IlrssLRuMyVCQhaO0gKDgd33iZ
+         Fogzip2FiFoKhyBeWEKajbgX8rxsQ5vtJ6ACdYbhStxz9FADP3HRl2/zdxR9PSAHgzun
+         3G02tUA3vsE3wF5yTa2lf7hRQ4CZ/S7soJyB6aFT1kGQiGXUQr7wxhn8IqoozpjNxVHH
+         gseA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678393508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G+BklEzWVltOR1hJvkNkXfkrfxPiDjF0+O+EA7XHv/4=;
-        b=UMVENVcZKFmgewsvosOo1mqT/5nokBDtnHIjYtcgBEShOEugR2sCTf+SO2DwyG0S86
-         nb7Yl9jsiA3EyQsV0bl0OfMdkq3hIQ4s+kfAL+E4HiOuXpXtrSrqu5ORcYpznyhOhIF5
-         EB3QXEzKgJGRJT+4R0uK5LjH674xxjcTXsJTEM0e/SZtarI+jUr+BItj/qAiVLbWjXQC
-         tM09ZTdvMBtDkGdoqez6RUWha3YVC5qL7R1g5t5W01yz8gOZtxBsF2pv2t9iJhspPLn8
-         +Gyyc4/Mnc51YIlY7tZd9FSbmKMsoatZAiKr4mj5WKx2zHEeU2L85K8bRU7b4+GT4X3i
-         Ysyw==
-X-Gm-Message-State: AO0yUKUiKihaHZNih6Rk/9ZiP+8qYn10wpTGDakFYNdkSOe4qxrtqQWU
-        UizZitSsbZFdTLEFVMJZZI3HMt0tmAKobxthcGef7g==
-X-Google-Smtp-Source: AK7set9EN3dy7vGdMfeh3rglPNG/kYWEw6r8ijSWoyhGmr7zPcrla0Uj/AALoQlb/9C1PliGkSkkSJWouA4rgr00T24=
-X-Received: by 2002:a17:906:4997:b0:8ee:babc:d3f8 with SMTP id
- p23-20020a170906499700b008eebabcd3f8mr11823640eju.3.1678393508590; Thu, 09
- Mar 2023 12:25:08 -0800 (PST)
+        d=1e100.net; s=20210112; t=1678406452;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwwuvN2/fd3CFPcyFytkM67OmDcpA3Bq2U3hx1hICuM=;
+        b=Bcz5dA/Ho6cBFkVFxmeHYYXUxzBox0LJ0WDNiyMlqHMTh7DZ3rN3qPjOoxnyW5QKUj
+         VUJ0Fd/fcONz00FEJa3iqV4Zk4LLIFL3uuUpUXGjXhkSv4YTeP1aLW4o9S0okS6kdUvD
+         I/rkkHbsIOE6wFsnGOGsO6xyltVIrFluQvXVhN1tLl+v1StsJsOjY1PsFunvqt8RHPv9
+         Ss1+Xy+PhNLiWuSRGgk9GQKo4dx7v5CsxvLJiGFmoxCh8tqB2eUsJ0SB/aQRf/GkruNa
+         TV/B2KOSV4Alv1EGc9LBQ/fkmV7NcY9S+XI/ccQvCOmXaaNrfNORLzTGC2sAVLACjuk7
+         MLMg==
+X-Gm-Message-State: AO0yUKVC32LaZrsRn3/XY1WLHlXe3W4ySBdVmAbh4191FkgaQeUjX1pe
+        AdhYTaRPYd3ks5c8dtDRiu+itVlTEy0=
+X-Google-Smtp-Source: AK7set/OQpZKCW3SPBmwIW6E25tlekgjA+Iu8odgpSdf4j/52LOPmKcZ8T+ueLeIBsmc/DeVpx4s1w==
+X-Received: by 2002:a5d:8554:0:b0:744:b4c2:30fa with SMTP id b20-20020a5d8554000000b00744b4c230famr14428129ios.18.1678406452287;
+        Thu, 09 Mar 2023 16:00:52 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id w9-20020a927b09000000b00318ab825bb2sm185247ilc.35.2023.03.09.16.00.51
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Mar 2023 16:00:51 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] l2cap-tester: Add server tests for Ext-Flowctl
+Date:   Thu,  9 Mar 2023 16:00:49 -0800
+Message-Id: <20230310000049.3395992-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <20230209020916.6475-1-steev@kali.org> <20230209020916.6475-3-steev@kali.org>
- <ZAoS1T9m1lI21Cvn@hovoldconsulting.com>
-In-Reply-To: <ZAoS1T9m1lI21Cvn@hovoldconsulting.com>
-From:   Steev Klimaszewski <steev@kali.org>
-Date:   Thu, 9 Mar 2023 14:24:57 -0600
-Message-ID: <CAKXuJqhEKB7cuVhEzObbFyYHyKj87M8iWVaoz7gkhS2OQ9tTBA@mail.gmail.com>
-Subject: Re: [PATCH v5 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-To:     Johan Hovold <johan@kernel.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Tim Jiang <quic_tjiang@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 9, 2023 at 11:08=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
-te:
->
-> On Wed, Feb 08, 2023 at 08:09:14PM -0600, Steev Klimaszewski wrote:
-> > Added regulators,GPIOs and changes required to power on/off wcn6855.
-> > Added support for firmware download for wcn6855.
-> >
-> > Signed-off-by: Steev Klimaszewski <steev@kali.org>
-> > ---
-> > Changes since v4:
-> >  * Remove unused firmware check because we don't have mbn firmware.
-> >  * Set qcadev->init_speed if it hasn't been set.
-> >
-> > Changes since v3:
-> >  * drop unused regulators
-> >
-> > Changes since v2:
-> >  * drop unnecessary commit info
-> >
-> > Changes since v1:
-> >  * None
-> >
-> >  drivers/bluetooth/btqca.c   |  9 ++++++-
-> >  drivers/bluetooth/btqca.h   | 10 ++++++++
-> >  drivers/bluetooth/hci_qca.c | 50 ++++++++++++++++++++++++++++---------
-> >  3 files changed, 56 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> > index c9064d34d830..2f9d8bd27c38 100644
-> > --- a/drivers/bluetooth/btqca.c
-> > +++ b/drivers/bluetooth/btqca.c
-> > @@ -614,6 +614,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t ba=
-udrate,
-> >               config.type =3D ELF_TYPE_PATCH;
-> >               snprintf(config.fwname, sizeof(config.fwname),
-> >                        "qca/msbtfw%02x.mbn", rom_ver);
-> > +     } else if (soc_type =3D=3D QCA_WCN6855) {
-> > +             snprintf(config.fwname, sizeof(config.fwname),
-> > +                      "qca/hpbtfw%02x.tlv", rom_ver);
-> >       } else {
-> >               snprintf(config.fwname, sizeof(config.fwname),
-> >                        "qca/rampatch_%08x.bin", soc_ver);
-> > @@ -648,6 +651,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t ba=
-udrate,
-> >       else if (soc_type =3D=3D QCA_WCN6750)
-> >               snprintf(config.fwname, sizeof(config.fwname),
-> >                        "qca/msnv%02x.bin", rom_ver);
-> > +     else if (soc_type =3D=3D QCA_WCN6855)
-> > +             snprintf(config.fwname, sizeof(config.fwname),
-> > +                      "qca/hpnv%02x.bin", rom_ver);
-> >       else
-> >               snprintf(config.fwname, sizeof(config.fwname),
-> >                        "qca/nvm_%08x.bin", soc_ver);
-> > @@ -672,6 +678,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t ba=
-udrate,
-> >       case QCA_WCN3991:
-> >       case QCA_WCN3998:
-> >       case QCA_WCN6750:
-> > +     case QCA_WCN6855:
->
-> Did you actually verify the microsoft extensions need this, or you are
-> assuming it works as 6750?
->
-It was 100% an assumption that since the 6750 does it, the 6855 does
-too.  I should know better than to assume since I used to work at a
-device manufacturer but high hopes things have changed a bit in the
-past 12 years ;)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> >               hci_set_msft_opcode(hdev, 0xFD70);
-> >               break;
-> >       default:
-> > @@ -685,7 +692,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t ba=
-udrate,
-> >               return err;
-> >       }
-> >
-> > -     if (soc_type =3D=3D QCA_WCN3991 || soc_type =3D=3D QCA_WCN6750) {
-> > +     if (soc_type =3D=3D QCA_WCN3991 || soc_type =3D=3D QCA_WCN6750 ||=
- soc_type =3D=3D QCA_WCN6855) {
->
-> Line is now over 80 columns which is still the preferred limit.
->
-> Perhaps this should now be a switch statement instead?
->
-switch statement might work, I'll give it a shot here.
+This adds the following tests:
 
-> >               /* get fw build info */
-> >               err =3D qca_read_fw_build_info(hdev);
-> >               if (err < 0)
-> > diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> > index 61e9a50e66ae..b884095bcd9d 100644
-> > --- a/drivers/bluetooth/btqca.h
-> > +++ b/drivers/bluetooth/btqca.h
-> > @@ -147,6 +147,7 @@ enum qca_btsoc_type {
-> >       QCA_WCN3991,
-> >       QCA_QCA6390,
-> >       QCA_WCN6750,
-> > +     QCA_WCN6855,
-> >  };
-> >
-> >  #if IS_ENABLED(CONFIG_BT_QCA)
-> > @@ -168,6 +169,10 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_t=
-ype soc_type)
-> >  {
-> >       return soc_type =3D=3D QCA_WCN6750;
-> >  }
-> > +static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
-> > +{
-> > +     return soc_type =3D=3D QCA_WCN6855;
-> > +}
-> >
-> >  #else
-> >
-> > @@ -206,6 +211,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_t=
-ype soc_type)
-> >       return false;
-> >  }
-> >
-> > +static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
-> > +{
-> > +     return false;
-> > +}
-> > +
-> >  static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
-> >  {
-> >       return -EOPNOTSUPP;
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index 3df8c3606e93..efc1c0306b4e 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -605,8 +605,7 @@ static int qca_open(struct hci_uart *hu)
-> >       if (hu->serdev) {
-> >               qcadev =3D serdev_device_get_drvdata(hu->serdev);
-> >
-> > -             if (qca_is_wcn399x(qcadev->btsoc_type) ||
-> > -                 qca_is_wcn6750(qcadev->btsoc_type))
-> > +             if (!(qcadev->init_speed))
-> >                       hu->init_speed =3D qcadev->init_speed;
->
-> This change makes no sense.
->
-> In fact, it seems the driver never sets init_speed anywhere.
->
-> Either way, it should not be needed for wcn6855.
->
+L2CAP Ext-Flowctl Server - Success
+L2CAP Ext-Flowctl Server - Nval SCID
+L2CAP LE EATT Client - Success
+L2CAP LE EATT Server - Success
+L2CAP LE EATT Server - Reject
+---
+ tools/l2cap-tester.c | 287 ++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 246 insertions(+), 41 deletions(-)
 
-So, that was a request from an earlier review, but if it's not needed
-for 6855, I'll just drop it, and then I don't need to do any of those
-changes :D
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 3f04640131fa..922533f34133 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -15,6 +15,7 @@
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <errno.h>
++#include <poll.h>
+ #include <stdbool.h>
+ 
+ #include <glib.h>
+@@ -81,6 +82,7 @@ struct l2cap_data {
+ 	bool server_not_advertising;
+ 	bool direct_advertising;
+ 	bool close_1;
++	bool defer;
+ 
+ 	bool shut_sock_wr;
+ };
+@@ -540,6 +542,64 @@ static const struct l2cap_data le_server_nval_scid_test = {
+ 	.expect_cmd_len = sizeof(nval_le_connect_rsp),
+ };
+ 
++static const uint8_t ecred_connect_req[] = {	0x80, 0x00, /* PSM */
++						0x40, 0x00, /* MTU */
++						0x40, 0x00, /* MPS */
++						0x05, 0x00, /* Credits */
++						0x41, 0x00, /* SCID #1 */
++						0x42, 0x00, /* SCID #2 */
++						0x43, 0x00, /* SCID #3 */
++						0x44, 0x00, /* SCID #4 */
++						0x45, 0x00, /* SCID #5 */
++};
++
++static const uint8_t ecred_connect_rsp[] = {	0xa0, 0x02, /* MTU */
++						0xbc, 0x00, /* MPS */
++						0x04, 0x00, /* Credits */
++						0x00, 0x00, /* Result */
++						0x40, 0x00, /* DCID #1 */
++						0x41, 0x00, /* DCID #2 */
++						0x42, 0x00, /* DCID #3 */
++						0x43, 0x00, /* DCID #4 */
++						0x44, 0x00, /* DCID #5 */
++};
++
++static const struct l2cap_data ext_flowctl_server_success_test = {
++	.server_psm = 0x0080,
++	.send_cmd_code = BT_L2CAP_PDU_ECRED_CONN_REQ,
++	.send_cmd = ecred_connect_req,
++	.send_cmd_len = sizeof(ecred_connect_req),
++	.expect_cmd_code = BT_L2CAP_PDU_ECRED_CONN_RSP,
++	.expect_cmd = ecred_connect_rsp,
++	.expect_cmd_len = sizeof(ecred_connect_rsp),
++};
++
++static const uint8_t nval_ecred_connect_req[] = {
++						0x80, 0x00, /* PSM */
++						0x40, 0x00, /* MTU */
++						0x40, 0x00, /* MPS */
++						0x05, 0x00, /* Credits */
++						0x01, 0x00, /* SCID #1 */
++};
++
++static const uint8_t nval_ecred_connect_rsp[] = {
++						0x00, 0x00, /* MTU */
++						0x00, 0x00, /* MPS */
++						0x00, 0x00, /* Credits */
++						0x09, 0x00, /* Result */
++						0x00, 0x00, /* DCID #1 */
++};
++
++static const struct l2cap_data ext_flowctl_server_nval_scid_test = {
++	.server_psm = 0x0080,
++	.send_cmd_code = BT_L2CAP_PDU_ECRED_CONN_REQ,
++	.send_cmd = nval_ecred_connect_req,
++	.send_cmd_len = sizeof(nval_ecred_connect_req),
++	.expect_cmd_code = BT_L2CAP_PDU_ECRED_CONN_RSP,
++	.expect_cmd = nval_ecred_connect_rsp,
++	.expect_cmd_len = sizeof(nval_ecred_connect_rsp),
++};
++
+ static const struct l2cap_data le_att_client_connect_success_test_1 = {
+ 	.cid = 0x0004,
+ 	.sec_level = BT_SECURITY_LOW,
+@@ -549,6 +609,69 @@ static const struct l2cap_data le_att_server_success_test_1 = {
+ 	.cid = 0x0004,
+ };
+ 
++static const struct l2cap_data le_eatt_client_connect_success_test_1 = {
++	.client_psm = 0x0027,
++	.server_psm = 0x0027,
++	.mode = BT_MODE_EXT_FLOWCTL,
++	.sec_level = BT_SECURITY_LOW,
++};
++
++static const uint8_t eatt_connect_req[] = {	0x27, 0x00, /* PSM */
++						0x40, 0x00, /* MTU */
++						0x40, 0x00, /* MPS */
++						0x05, 0x00, /* Credits */
++						0x41, 0x00, /* SCID #1 */
++};
++
++static const uint8_t eatt_connect_rsp[] = {	0xa0, 0x02, /* MTU */
++						0xbc, 0x00, /* MPS */
++						0x04, 0x00, /* Credits */
++						0x00, 0x00, /* Result */
++						0x40, 0x00, /* DCID #1 */
++};
++
++static const struct l2cap_data le_eatt_server_success_test_1 = {
++	.server_psm = 0x0027,
++	.mode = BT_MODE_EXT_FLOWCTL,
++	.send_cmd_code = BT_L2CAP_PDU_ECRED_CONN_REQ,
++	.send_cmd = eatt_connect_req,
++	.send_cmd_len = sizeof(eatt_connect_req),
++	.expect_cmd_code = BT_L2CAP_PDU_ECRED_CONN_RSP,
++	.expect_cmd = eatt_connect_rsp,
++	.expect_cmd_len = sizeof(eatt_connect_rsp),
++	.defer = true,
++};
++
++static const uint8_t eatt_reject_req[] = {	0x27, 0x00, /* PSM */
++						0x40, 0x00, /* MTU */
++						0x40, 0x00, /* MPS */
++						0x05, 0x00, /* Credits */
++						0x41, 0x00, /* SCID #1 */
++						0x42, 0x00, /* SCID #2 */
++						0x43, 0x00, /* SCID #3 */
++						0x44, 0x00, /* SCID #4 */
++						0x45, 0x00, /* SCID #5 */
++};
++
++static const uint8_t eatt_reject_rsp[] = {	0xa0, 0x02, /* MTU */
++						0xbc, 0x00, /* MPS */
++						0x04, 0x00, /* Credits */
++						0x06, 0x00, /* Result */
++};
++
++static const struct l2cap_data le_eatt_server_reject_test_1 = {
++	.server_psm = 0x0027,
++	.mode = BT_MODE_EXT_FLOWCTL,
++	.send_cmd_code = BT_L2CAP_PDU_ECRED_CONN_REQ,
++	.send_cmd = eatt_reject_req,
++	.send_cmd_len = sizeof(eatt_reject_req),
++	.expect_cmd_code = BT_L2CAP_PDU_ECRED_CONN_RSP,
++	.expect_cmd = eatt_reject_rsp,
++	.expect_cmd_len = sizeof(eatt_reject_rsp),
++	.defer = true,
++	.expect_err = -1,
++};
++
+ static const struct l2cap_data ext_flowctl_client_connect_success_test_1 = {
+ 	.client_psm = 0x0080,
+ 	.server_psm = 0x0080,
+@@ -1689,6 +1812,89 @@ static void test_connect_2(const void *test_data)
+ 								defer);
+ }
+ 
++static gboolean l2cap_accept_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct l2cap_data *l2data = data->test_data;
++	int sk;
++
++	sk = g_io_channel_unix_get_fd(io);
++
++	if (!check_mtu(data, sk)) {
++		tester_test_failed();
++		return FALSE;
++	}
++
++	if (l2data->read_data) {
++		struct bthost *bthost;
++
++		bthost = hciemu_client_get_host(data->hciemu);
++		g_io_add_watch(io, G_IO_IN, server_received_data, NULL);
++		bthost_send_cid(bthost, data->handle, data->dcid,
++					l2data->read_data, l2data->data_len);
++
++		g_io_channel_unref(io);
++
++		return FALSE;
++	} else if (l2data->write_data) {
++		struct bthost *bthost;
++		ssize_t ret;
++
++		bthost = hciemu_client_get_host(data->hciemu);
++		bthost_add_cid_hook(bthost, data->handle, data->scid,
++					server_bthost_received_data, NULL);
++
++		ret = write(sk, l2data->write_data, l2data->data_len);
++
++		if (ret != l2data->data_len) {
++			tester_warn("Unable to write all data");
++			tester_test_failed();
++		}
++
++		return FALSE;
++	}
++
++	tester_print("Successfully connected");
++
++	tester_test_passed();
++
++	return FALSE;
++}
++
++static bool defer_accept(struct test_data *data, GIOChannel *io)
++{
++	int sk;
++	char c;
++	struct pollfd pfd;
++
++	sk = g_io_channel_unix_get_fd(io);
++
++	memset(&pfd, 0, sizeof(pfd));
++	pfd.fd = sk;
++	pfd.events = POLLOUT;
++
++	if (poll(&pfd, 1, 0) < 0) {
++		tester_warn("poll: %s (%d)", strerror(errno), errno);
++		return false;
++	}
++
++	if (!(pfd.revents & POLLOUT)) {
++		if (read(sk, &c, 1) < 0) {
++			tester_warn("read: %s (%d)", strerror(errno), errno);
++			return false;
++		}
++	}
++
++	data->io_id = g_io_add_watch(io, G_IO_OUT, l2cap_accept_cb, NULL);
++
++	g_io_channel_unref(io);
++
++	tester_print("Accept deferred setup");
++
++	return true;
++}
++
+ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -1707,53 +1913,24 @@ static gboolean l2cap_listen_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
+-	if (!check_mtu(data, new_sk)) {
+-		tester_test_failed();
+-		close(new_sk);
+-		return FALSE;
+-	}
++	io = g_io_channel_unix_new(new_sk);
++	g_io_channel_set_close_on_unref(io, TRUE);
+ 
+-	if (l2data->read_data) {
+-		struct bthost *bthost;
+-		GIOChannel *new_io;
+-
+-		new_io = g_io_channel_unix_new(new_sk);
+-		g_io_channel_set_close_on_unref(new_io, TRUE);
+-
+-		bthost = hciemu_client_get_host(data->hciemu);
+-		g_io_add_watch(new_io, G_IO_IN, server_received_data, NULL);
+-		bthost_send_cid(bthost, data->handle, data->dcid,
+-					l2data->read_data, l2data->data_len);
+-
+-		g_io_channel_unref(new_io);
+-
+-		return FALSE;
+-	} else if (l2data->write_data) {
+-		struct bthost *bthost;
+-		ssize_t ret;
+-
+-		bthost = hciemu_client_get_host(data->hciemu);
+-		bthost_add_cid_hook(bthost, data->handle, data->scid,
+-					server_bthost_received_data, NULL);
+-
+-		ret = write(new_sk, l2data->write_data, l2data->data_len);
+-		close(new_sk);
+-
+-		if (ret != l2data->data_len) {
+-			tester_warn("Unable to write all data");
+-			tester_test_failed();
++	if (l2data->defer) {
++		if (l2data->expect_err < 0) {
++			g_io_channel_unref(io);
++			tester_test_passed();
++			return FALSE;
+ 		}
+ 
++		if (!defer_accept(data, io)) {
++			tester_warn("Unable to accept deferred setup");
++			tester_test_failed();
++		}
+ 		return FALSE;
+ 	}
+ 
+-	tester_print("Successfully connected");
+-
+-	close(new_sk);
+-
+-	tester_test_passed();
+-
+-	return FALSE;
++	return l2cap_accept_cb(io, cond, user_data);
+ }
+ 
+ static void client_l2cap_rsp(uint8_t code, const void *data, uint16_t len,
+@@ -1844,6 +2021,8 @@ static void test_server(const void *test_data)
+ 	int sk;
+ 
+ 	if (l2data->server_psm || l2data->cid) {
++		int opt = 1;
++
+ 		sk = create_l2cap_sock(data, l2data->server_psm,
+ 					l2data->cid, l2data->sec_level,
+ 					l2data->mode);
+@@ -1852,6 +2031,15 @@ static void test_server(const void *test_data)
+ 			return;
+ 		}
+ 
++		if (l2data->defer && setsockopt(sk, SOL_BLUETOOTH,
++				BT_DEFER_SETUP, &opt, sizeof(opt)) < 0) {
++			tester_warn("Can't enable deferred setup: %s (%d)",
++						strerror(errno), errno);
++			tester_test_failed();
++			close(sk);
++			return;
++		}
++
+ 		if (listen(sk, 5) < 0) {
+ 			tester_warn("listening on socket failed: %s (%u)",
+ 					strerror(errno), errno);
+@@ -2066,6 +2254,13 @@ int main(int argc, char *argv[])
+ 				setup_powered_client,
+ 				test_connect_2);
+ 
++	test_l2cap_le("L2CAP Ext-Flowctl Server - Success",
++				&ext_flowctl_server_success_test,
++				setup_powered_server, test_server);
++	test_l2cap_le("L2CAP Ext-Flowctl Server - Nval SCID",
++				&ext_flowctl_server_nval_scid_test,
++				setup_powered_server, test_server);
++
+ 	test_l2cap_le("L2CAP LE ATT Client - Success",
+ 				&le_att_client_connect_success_test_1,
+ 				setup_powered_client, test_connect);
+@@ -2073,5 +2268,15 @@ int main(int argc, char *argv[])
+ 				&le_att_server_success_test_1,
+ 				setup_powered_server, test_server);
+ 
++	test_l2cap_le("L2CAP LE EATT Client - Success",
++				&le_eatt_client_connect_success_test_1,
++				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE EATT Server - Success",
++				&le_eatt_server_success_test_1,
++				setup_powered_server, test_server);
++	test_l2cap_le("L2CAP LE EATT Server - Reject",
++				&le_eatt_server_reject_test_1,
++				setup_powered_server, test_server);
++
+ 	return tester_run();
+ }
+-- 
+2.39.2
 
-> >
-> >               if (qcadev->oper_speed)
-> > @@ -1317,7 +1316,8 @@ static int qca_set_baudrate(struct hci_dev *hdev,=
- uint8_t baudrate)
-> >
-> >       /* Give the controller time to process the request */
-> >       if (qca_is_wcn399x(qca_soc_type(hu)) ||
-> > -         qca_is_wcn6750(qca_soc_type(hu)))
-> > +         qca_is_wcn6750(qca_soc_type(hu)) ||
-> > +         qca_is_wcn6855(qca_soc_type(hu)))
-> >               usleep_range(1000, 10000);
-> >       else
-> >               msleep(300);
-> > @@ -1394,7 +1394,8 @@ static unsigned int qca_get_speed(struct hci_uart=
- *hu,
-> >  static int qca_check_speeds(struct hci_uart *hu)
-> >  {
-> >       if (qca_is_wcn399x(qca_soc_type(hu)) ||
-> > -         qca_is_wcn6750(qca_soc_type(hu))) {
-> > +         qca_is_wcn6750(qca_soc_type(hu)) ||
-> > +         qca_is_wcn6855(qca_soc_type(hu))) {
-> >               if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-> >                   !qca_get_speed(hu, QCA_OPER_SPEED))
-> >                       return -EINVAL;
-> > @@ -1682,7 +1683,8 @@ static int qca_power_on(struct hci_dev *hdev)
-> >               return 0;
-> >
-> >       if (qca_is_wcn399x(soc_type) ||
-> > -         qca_is_wcn6750(soc_type)) {
-> > +         qca_is_wcn6750(soc_type) ||
-> > +         qca_is_wcn6855(soc_type)) {
-> >               ret =3D qca_regulator_init(hu);
-> >       } else {
-> >               qcadev =3D serdev_device_get_drvdata(hu->serdev);
-> > @@ -1723,7 +1725,8 @@ static int qca_setup(struct hci_uart *hu)
-> >
-> >       bt_dev_info(hdev, "setting up %s",
-> >               qca_is_wcn399x(soc_type) ? "wcn399x" :
-> > -             (soc_type =3D=3D QCA_WCN6750) ? "wcn6750" : "ROME/QCA6390=
-");
-> > +             (soc_type =3D=3D QCA_WCN6750) ? "wcn6750" :
-> > +             (soc_type =3D=3D QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390=
-");
->
-> This is hideous, but not your fault...
->
-It is, and, I'm not entirely sure we need it? I mean, it's nice to
-show that it's now starting to set up, but it isn't particularly
-helpful for end users or making sure things are working?
-
-> >
-> >       qca->memdump_state =3D QCA_MEMDUMP_IDLE;
-> >
-> > @@ -1735,7 +1738,8 @@ static int qca_setup(struct hci_uart *hu)
-> >       clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
-> >
-> >       if (qca_is_wcn399x(soc_type) ||
-> > -         qca_is_wcn6750(soc_type)) {
-> > +         qca_is_wcn6750(soc_type) ||
-> > +         qca_is_wcn6855(soc_type)) {
-> >               set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-> >               hci_set_aosp_capable(hdev);
-> >
-> > @@ -1757,7 +1761,8 @@ static int qca_setup(struct hci_uart *hu)
-> >       }
-> >
-> >       if (!(qca_is_wcn399x(soc_type) ||
-> > -          qca_is_wcn6750(soc_type))) {
-> > +          qca_is_wcn6750(soc_type) ||
-> > +          qca_is_wcn6855(soc_type))) {
->
-> Perhaps you can add a leading space while changing this so that the
-> open-parenthesis alignment makes sense.
->
-> >               /* Get QCA version information */
-> >               ret =3D qca_read_soc_version(hdev, &ver, soc_type);
-> >               if (ret)
-> > @@ -1883,6 +1888,20 @@ static const struct qca_device_data qca_soc_data=
-_wcn6750 =3D {
-> >       .capabilities =3D QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STAT=
-ES,
-> >  };
-> >
-> > +static const struct qca_device_data qca_soc_data_wcn6855 =3D {
-> > +     .soc_type =3D QCA_WCN6855,
-> > +     .vregs =3D (struct qca_vreg []) {
-> > +             { "vddio", 5000 },
-> > +             { "vddbtcxmx", 126000 },
-> > +             { "vddrfacmn", 12500 },
-> > +             { "vddrfa0p8", 102000 },
-> > +             { "vddrfa1p7", 302000 },
-> > +             { "vddrfa1p2", 257000 },
->
-> Hmm. More random regulator load values. I really think we should get rid
-> of this but that's a separate discussion.
->
-Bjorn specifically requested that he wanted me to leave them in.  I'm
-not married to them, and don't care one way or the other, I just
-wanted working bluetooth since audio wasn't quite ready yet :)
-
-> > +     },
-> > +     .num_vregs =3D 6,
-> > +     .capabilities =3D QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STAT=
-ES,
-> > +};
-> > +
-> >  static void qca_power_shutdown(struct hci_uart *hu)
-> >  {
-> >       struct qca_serdev *qcadev;
->
-> As I mentioned elsewhere, you need to update also this function so that
-> wcn6855 can be powered down.
-
-Sorry, I do have that locally, I just haven't pushed a v6 as I was
-looking at Tim's v2 of the qca2066 and was wondering if I should or
-shouldn't continue working on my version of the driver?
-
->
-> > @@ -2047,7 +2066,8 @@ static int qca_serdev_probe(struct serdev_device =
-*serdev)
-> >
-> >       if (data &&
-> >           (qca_is_wcn399x(data->soc_type) ||
-> > -         qca_is_wcn6750(data->soc_type))) {
-> > +         qca_is_wcn6750(data->soc_type) ||
-> > +         qca_is_wcn6855(data->soc_type))) {
->
-> Perhaps you fix the alignment here too.
->
-> >               qcadev->btsoc_type =3D data->soc_type;
-> >               qcadev->bt_power =3D devm_kzalloc(&serdev->dev,
-> >                                               sizeof(struct qca_power),
-> > @@ -2067,14 +2087,18 @@ static int qca_serdev_probe(struct serdev_devic=
-e *serdev)
-> >
-> >               qcadev->bt_en =3D devm_gpiod_get_optional(&serdev->dev, "=
-enable",
-> >                                              GPIOD_OUT_LOW);
-> > -             if (IS_ERR_OR_NULL(qcadev->bt_en) && data->soc_type =3D=
-=3D QCA_WCN6750) {
-> > +             if (IS_ERR_OR_NULL(qcadev->bt_en)
-> > +                 && (data->soc_type =3D=3D QCA_WCN6750 ||
->
-> && operator should go on the previous line before the line break.
->
-> > +                     data->soc_type =3D=3D QCA_WCN6855)) {
-> >                       dev_err(&serdev->dev, "failed to acquire BT_EN gp=
-io\n");
-> >                       power_ctrl_enabled =3D false;
-> >               }
-> >
-> >               qcadev->sw_ctrl =3D devm_gpiod_get_optional(&serdev->dev,=
- "swctrl",
-> >                                              GPIOD_IN);
-> > -             if (IS_ERR_OR_NULL(qcadev->sw_ctrl) && data->soc_type =3D=
-=3D QCA_WCN6750)
-> > +             if (IS_ERR_OR_NULL(qcadev->sw_ctrl)
-> > +                 && (data->soc_type =3D=3D QCA_WCN6750 ||
->
-> Same here.
->
-> > +                     data->soc_type =3D=3D QCA_WCN6855))
-> >                       dev_warn(&serdev->dev, "failed to acquire SW_CTRL=
- gpio\n");
-> >
-> >               qcadev->susclk =3D devm_clk_get_optional(&serdev->dev, NU=
-LL);
-> > @@ -2150,7 +2174,8 @@ static void qca_serdev_remove(struct serdev_devic=
-e *serdev)
-> >       struct qca_power *power =3D qcadev->bt_power;
-> >
-> >       if ((qca_is_wcn399x(qcadev->btsoc_type) ||
-> > -          qca_is_wcn6750(qcadev->btsoc_type)) &&
-> > +          qca_is_wcn6750(qcadev->btsoc_type) ||
-> > +          qca_is_wcn6855(qcadev->btsoc_type)) &&
-> >            power->vregs_on)
-> >               qca_power_shutdown(&qcadev->serdev_hu);
-> >       else if (qcadev->susclk)
-> > @@ -2335,6 +2360,7 @@ static const struct of_device_id qca_bluetooth_of=
-_match[] =3D {
-> >       { .compatible =3D "qcom,wcn3991-bt", .data =3D &qca_soc_data_wcn3=
-991},
-> >       { .compatible =3D "qcom,wcn3998-bt", .data =3D &qca_soc_data_wcn3=
-998},
-> >       { .compatible =3D "qcom,wcn6750-bt", .data =3D &qca_soc_data_wcn6=
-750},
-> > +     { .compatible =3D "qcom,wcn6855-bt", .data =3D &qca_soc_data_wcn6=
-855},
-> >       { /* sentinel */ }
-> >  };
-> >  MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
->
-> With power-off handling fixed, this seems to work as quite well on my
-> X13s with 6.3-rc1. Nice job!
->
-> Btw, apart from the frame reassembly error, I'm also seeing:
->
->         Bluetooth: Received HCI_IBS_WAKE_ACK in tx state 0
->
-> during probe.
->
-I'm still not sure where the frame reassembly error comes from, and I
-don't know how to get more info to figure it out either, if anyone
-happens to have any guidance for that, I would love some.
-Additionally, it doesn't always happen.  It seems to happen on the
-first load of the module, however, running modprobe -r && modprobe in
-a loop (with the powerdown properly modified so the log isn't full of
-splats),  it doesn't seem to occur every time. Likewise for the
-WAKE_ACK.
-
-> Johan
