@@ -2,223 +2,127 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAA41C6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 07:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE55C6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 07:27:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbjCJH1N (ORCPT
+        id S230190AbjCJH15 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 02:27:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39718 "EHLO
+        Fri, 10 Mar 2023 02:27:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbjCJH1L (ORCPT
+        with ESMTP id S230186AbjCJH1x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 02:27:11 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DFF3107D65;
-        Thu,  9 Mar 2023 23:27:10 -0800 (PST)
+        Fri, 10 Mar 2023 02:27:53 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444E9107D66
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 23:27:44 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id D1487CE26C7;
-        Fri, 10 Mar 2023 07:27:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38DA8C433EF;
-        Fri, 10 Mar 2023 07:27:06 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CB87660DC4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 07:27:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 419F5C4339C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 07:27:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678433226;
-        bh=EObO0GfPUqc7ltHIHmh0Y8AYbHGRqd53SM8I+etahGs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QxBJZgOR8AgQHVEpqjww/B1p0OEp9XJ4oxivJuy2Q8khNR7rg9Sy23IUYzUf1idd0
-         IAxRsYiaIHCl+qK+NISI1Pja2JbhZRIV1/Vx8PrGrsVo6dQJRdFazcYA8HohU/dOin
-         zS7H5A5vAOyy2Vhzwn8S1m8c4/G1ilAfWWVByqkyC6QSzJbb7DtANEE4e92Eds5cIm
-         ihdyI3X5GI4JtqRYYJlZoA2mp//SRt65DGpZt0OkgjWEr7OFn7+g1yjBRO7No2QcOs
-         uY7Yg5aODv2W5iI5xLQ2RWcPq6QoP7jen0UEx0k/wmNDWFHSclWpOF52fvInV1/kO3
-         xeFMU/SdG6TVw==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1paXAT-0007rL-HG; Fri, 10 Mar 2023 08:27:57 +0100
-Date:   Fri, 10 Mar 2023 08:27:57 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Tim Jiang <quic_tjiang@quicinc.com>
-Subject: Re: [PATCH v5 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-Message-ID: <ZArb/ZQEmfGDjYyc@hovoldconsulting.com>
-References: <20230209020916.6475-1-steev@kali.org>
- <20230209020916.6475-3-steev@kali.org>
- <ZAoS1T9m1lI21Cvn@hovoldconsulting.com>
- <CAKXuJqhEKB7cuVhEzObbFyYHyKj87M8iWVaoz7gkhS2OQ9tTBA@mail.gmail.com>
+        s=k20201202; t=1678433263;
+        bh=HZRVMP83yS/DwAnI7aYEaFbU7xTA7RURySN2bUiWl2U=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=UI1oT/Rpsb7glRVTzJx2J2giTlrIDtJv3AjNEN3UUBUYe4lrZnPKtunSspfLVthkl
+         7zyuv4NweucPpqa+hRxxNxrntHXxrL3H3NXX6tV5Qx5tp6m4Doh8eVOIJJSjDkJ0HP
+         aQOkyImErtSRZZgg7rWXAE3bdojGtXqJJ4vkJwbc5qhszrUohTUcllRtvaEZHTtFdP
+         MYUYsagABr5k6tW/ZGhJ/yVs10o+wbQxsrmbus7CWyX+ynbGA2gzWqvZawKZ6llLA1
+         RhQ8FFlwONCiqDVtvlr9PGCvg+vtDCxrxSFpb0pMrBKKh+RgsV3RYZsZpcWuOaw3X8
+         EKDq5KCiV+29w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 1EBC6C43144; Fri, 10 Mar 2023 07:27:43 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
+Date:   Fri, 10 Mar 2023 07:27:42 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: bavay@slf.ch
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-217023-62941-j2S6p6Tj97@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
+References: <bug-217023-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKXuJqhEKB7cuVhEzObbFyYHyKj87M8iWVaoz7gkhS2OQ9tTBA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 09, 2023 at 02:24:57PM -0600, Steev Klimaszewski wrote:
-> On Thu, Mar 9, 2023 at 11:08 AM Johan Hovold <johan@kernel.org> wrote:
-> > On Wed, Feb 08, 2023 at 08:09:14PM -0600, Steev Klimaszewski wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
 
-> > > @@ -672,6 +678,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> > >       case QCA_WCN3991:
-> > >       case QCA_WCN3998:
-> > >       case QCA_WCN6750:
-> > > +     case QCA_WCN6855:
-> >
-> > Did you actually verify the microsoft extensions need this, or you are
-> > assuming it works as 6750?
-> >
-> It was 100% an assumption that since the 6750 does it, the 6855 does
-> too.  I should know better than to assume since I used to work at a
-> device manufacturer but high hopes things have changed a bit in the
-> past 12 years ;)
+Mathias Bavay (bavay@slf.ch) changed:
 
-Heh. Thanks for confirming. :)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |bavay@slf.ch
 
-> > >               hci_set_msft_opcode(hdev, 0xFD70);
-> > >               break;
-> > >       default:
+--- Comment #2 from Mathias Bavay (bavay@slf.ch) ---
+Same error on newer Intel hardware (AX210), since I've started using kernel
+5.19.x (compiled by Ubuntu). My bluetooth keyboard and mouse also now need =
+~1
+second when the desktop is loaded before being usable. With my previous ker=
+nel
+(5.15.x), this error message did not appear and I could use the keyboard ri=
+ght
+away, without the small lag that I now experience.
 
-> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > > index 3df8c3606e93..efc1c0306b4e 100644
-> > > --- a/drivers/bluetooth/hci_qca.c
-> > > +++ b/drivers/bluetooth/hci_qca.c
-> > > @@ -605,8 +605,7 @@ static int qca_open(struct hci_uart *hu)
-> > >       if (hu->serdev) {
-> > >               qcadev = serdev_device_get_drvdata(hu->serdev);
-> > >
-> > > -             if (qca_is_wcn399x(qcadev->btsoc_type) ||
-> > > -                 qca_is_wcn6750(qcadev->btsoc_type))
-> > > +             if (!(qcadev->init_speed))
-> > >                       hu->init_speed = qcadev->init_speed;
-> >
-> > This change makes no sense.
-> >
-> > In fact, it seems the driver never sets init_speed anywhere.
-> >
-> > Either way, it should not be needed for wcn6855.
-> 
-> So, that was a request from an earlier review, but if it's not needed
-> for 6855, I'll just drop it, and then I don't need to do any of those
-> changes :D
+$ lsusb | grep Bluetooth
+Bus 001 Device 002: ID 8087:0032 Intel Corp. AX210 Bluetooth
 
-Note that with the above, init_speed is only is set if qcadev->init_speed
-is *not* set, so if this was needed the test would need to be negated.
+$ dmesg | grep hci0
+[   18.025550] Bluetooth: hci0: Device revision is 0
+[   18.025553] Bluetooth: hci0: Secure boot is enabled
+[   18.025554] Bluetooth: hci0: OTP lock is enabled
+[   18.025555] Bluetooth: hci0: API lock is enabled
+[   18.025556] Bluetooth: hci0: Debug lock is disabled
+[   18.025557] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+[   18.025558] Bluetooth: hci0: Bootloader timestamp 2019.40 buildtype 1 bu=
+ild
+38
+[   18.026909] Bluetooth: hci0: Found device firmware: intel/ibt-0041-0041.=
+sfi
+[   18.026936] Bluetooth: hci0: Boot Address: 0x100800
+[   18.026938] Bluetooth: hci0: Firmware Version: 132-5.22
+[   19.585644] Bluetooth: hci0: Waiting for firmware download to complete
+[   19.585655] Bluetooth: hci0: Firmware loaded in 1522209 usecs
+[   19.585821] Bluetooth: hci0: Waiting for device to boot
+[   19.612549] Bluetooth: hci0: Device booted in 26194 usecs
+[   19.612617] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[   19.613943] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-0041-0041.ddc
+[   19.615693] Bluetooth: hci0: Applying Intel DDC parameters completed
+[   19.618707] Bluetooth: hci0: Firmware timestamp 2022.5 buildtype 1 build
+38020
+[   19.865890] Bluetooth: hci0: Bad flag given (0x1) vs supported (0x0)
+[   19.866093] Bluetooth: hci0: Bad flag given (0x1) vs supported (0x0)
 
-But as I mentioned above, this also looks broken as qcadev->init_speed
-is never set anywhere.
+$ uname -a
+Linux 5.19.0-35-generic #36~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Feb 17
+15:17:25 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
 
-You could investigate and clean up this code before or after adding
-support for wcn6855, but the above really doesn't look right and would
-at least need to go in a separate patch with a proper explanation.
+$ lscpu
+Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
 
-> > >
-> > >               if (qcadev->oper_speed)
+--=20
+You may reply to this email to add a comment.
 
-> > > @@ -1723,7 +1725,8 @@ static int qca_setup(struct hci_uart *hu)
-> > >
-> > >       bt_dev_info(hdev, "setting up %s",
-> > >               qca_is_wcn399x(soc_type) ? "wcn399x" :
-> > > -             (soc_type == QCA_WCN6750) ? "wcn6750" : "ROME/QCA6390");
-> > > +             (soc_type == QCA_WCN6750) ? "wcn6750" :
-> > > +             (soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
-> >
-> > This is hideous, but not your fault...
-> >
-> It is, and, I'm not entirely sure we need it? I mean, it's nice to
-> show that it's now starting to set up, but it isn't particularly
-> helpful for end users or making sure things are working?
-
-This is driver is already spamming the logs, while generally we should
-only be logging when things go wrong. Those info messages can probably
-be changed to dev_dbg(), but that's a separate issue and not something
-that's needed to add support for wcn6855.
-
-And same here, you can keep the above as is, but it seems like someone
-will soon need to clean up the type handling as all these conditionals
-are getting a bit unwieldy.
-
-> > > @@ -1883,6 +1888,20 @@ static const struct qca_device_data qca_soc_data_wcn6750 = {
-> > >       .capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
-> > >  };
-> > >
-> > > +static const struct qca_device_data qca_soc_data_wcn6855 = {
-> > > +     .soc_type = QCA_WCN6855,
-> > > +     .vregs = (struct qca_vreg []) {
-> > > +             { "vddio", 5000 },
-> > > +             { "vddbtcxmx", 126000 },
-> > > +             { "vddrfacmn", 12500 },
-> > > +             { "vddrfa0p8", 102000 },
-> > > +             { "vddrfa1p7", 302000 },
-> > > +             { "vddrfa1p2", 257000 },
-> >
-> > Hmm. More random regulator load values. I really think we should get rid
-> > of this but that's a separate discussion.
-> >
-> Bjorn specifically requested that he wanted me to leave them in.  I'm
-> not married to them, and don't care one way or the other, I just
-> wanted working bluetooth since audio wasn't quite ready yet :)
-
-You can them in for now, but we had a discussion last fall about whether
-these made up numbers really belong in the kernel.
-
-> > > +     },
-> > > +     .num_vregs = 6,
-> > > +     .capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
-> > > +};
-> > > +
-> > >  static void qca_power_shutdown(struct hci_uart *hu)
-> > >  {
-> > >       struct qca_serdev *qcadev;
-> >
-> > As I mentioned elsewhere, you need to update also this function so that
-> > wcn6855 can be powered down.
-> 
-> Sorry, I do have that locally, I just haven't pushed a v6 as I was
-> looking at Tim's v2 of the qca2066 and was wondering if I should or
-> shouldn't continue working on my version of the driver?
-
-I only skimmed that patch a while ago, but that ones not strictly needed
-for wcn6855, right? Things seems to work well here with just this series
-applied.
-
-> > With power-off handling fixed, this seems to work as quite well on my
-> > X13s with 6.3-rc1. Nice job!
-> >
-> > Btw, apart from the frame reassembly error, I'm also seeing:
-> >
-> >         Bluetooth: Received HCI_IBS_WAKE_ACK in tx state 0
-> >
-> > during probe.
-> >
-> I'm still not sure where the frame reassembly error comes from, and I
-> don't know how to get more info to figure it out either, if anyone
-> happens to have any guidance for that, I would love some.
-> Additionally, it doesn't always happen.  It seems to happen on the
-> first load of the module, however, running modprobe -r && modprobe in
-> a loop (with the powerdown properly modified so the log isn't full of
-> splats),  it doesn't seem to occur every time. Likewise for the
-> WAKE_ACK.
-
-Ok. Looks like the Chromium team tried to suppress these errors when
-switching line speed by toggling rts, but the frame-assembly error I get
-appears to happen before that.
-
-Johan
+You are receiving this mail because:
+You are the assignee for the bug.=
