@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EC1C6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 21:27:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC598C6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 21:27:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231703AbjCJV1G (ORCPT
+        id S231178AbjCJV1H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 16:27:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59614 "EHLO
+        Fri, 10 Mar 2023 16:27:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230430AbjCJV1F (ORCPT
+        with ESMTP id S231614AbjCJV1G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 16:27:05 -0500
+        Fri, 10 Mar 2023 16:27:06 -0500
 Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB236AD25
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 13:27:03 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id u3-20020a17090a450300b00239db6d7d47so6358497pjg.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 13:27:03 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8BEB515EC
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 13:27:04 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id ce8-20020a17090aff0800b0023a61cff2c6so8908712pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 13:27:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678483623;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nm+yAeti/T6dgIN/DJnSxJY7OY7ks8esKVqfBJHGwaw=;
-        b=gTylIuiImi6Ys3ZfEILsWv7+dB0GYB8cuk+Bc+TMM8XgcBf7UJVrjnfY3hQTloSj6Y
-         VI9SQywcysLrkQQ3F/d71jPn4r9kETWjTD2P3WvfpyAsvOp2uP96CzCJGRQwXU1iN+ZX
-         uEjMYP+BtaDREmK0umFsM1LFe5gD/36C9qVSJWSIh1Szuo03mMU51wInY4ar9mnG9U5c
-         17m9ur/Cci2+rRtzqWf4DL/dp5ZarXvBI0Xeau292MzYE/5Z0SaB2BRguLMFbjMyYcKS
-         k23AxDchrZu2bF2Xx51EyRj8qP/I6awUaeAxxMuY7mbJbLb2ML17gLlY+PBPZCzYk+Oe
-         EOEQ==
+        d=gmail.com; s=20210112; t=1678483624;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k+jGBUV0OLqMity8mIbzv5oDPNzPDQ4MewWZ8hXiWrQ=;
+        b=eorSD/2l4bcHHIZ0N9W92OyChHYiltb6hOSE0B+r5k1mw/zP3KIe19Jbk5wXsNu1dg
+         BP+VLd0YsKCUpmBAhGZLdqzhYo6LP4f16Ea3z2P+nF9diuoEUw6rWM8Gd9AK6HiK5Z3z
+         WP9Sfpf1j5eVitg6MrsRaTOjT3m/PiGksA83eahoTb1AUd4IM9uLMWBUhCTxJSgetOEH
+         uDJONJW7MQkNNzmiKAakczDmmwuz9K3de+WhFXM1h2aw7TiaxN7h4F0sXmrj7x/2XZbn
+         rUR5Pe12Lp4EwyF45V5wHfLq/9gP6xPE83Y9enP42KfMdtgO/i+ObVUJoPJiV8FY5W4Q
+         KsqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678483623;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nm+yAeti/T6dgIN/DJnSxJY7OY7ks8esKVqfBJHGwaw=;
-        b=0ice6RDtk8Wzw96MYoc1T76SUpE6g705+2cCsRRHTLgYDjnexqdzjTsKl3rVOSsGAy
-         Whvb+yTh+21BKFUNlqgmjWg0CoDnIH17Hs2kRgsG042CfXKd8cD4JgzmZhjsiVSe89Xi
-         iKOMqI5yrZo+/MjHrH0i/66BDl1iW4SYxrxw33Wh8SWkEGtVYB7pNxcZGvnxVJMf7HgU
-         tN1FvBAr2H8YFiX1haQvaRluFa/+4CbVCWhF+nhM9uwQJEuQ9OyTb526MBOyckp7KRCo
-         E2LP4dQAh3zh7bKqNiq2Tc//VneTwvivDT8ggkdDit2Fww8Cge7lTPZ/VXTcRzSu+Nkv
-         mQYA==
-X-Gm-Message-State: AO0yUKVBZ6SlacJRl1pb4El5awn/ia5o/0EBX6Etvo9xP6Y4aQ1BeWy9
-        p0sj+QblsdaH8Yn9ygfKzMQ6E26qOY4=
-X-Google-Smtp-Source: AK7set9q9Gie2bf4HqfHAGJ7X7gAENvU7VIoV8VG8tq2oXBkkus7+GeOU5B6+P4B33Z7rAi0GRQBTg==
-X-Received: by 2002:a17:902:f693:b0:19d:5fd:11fb with SMTP id l19-20020a170902f69300b0019d05fd11fbmr31903750plg.23.1678483622701;
-        Fri, 10 Mar 2023 13:27:02 -0800 (PST)
+        d=1e100.net; s=20210112; t=1678483624;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k+jGBUV0OLqMity8mIbzv5oDPNzPDQ4MewWZ8hXiWrQ=;
+        b=5CtkkVYWJzpsLThemNbaDJ6eoZuLv58iIPQuY35/a1qbunnCmvLyUITh8u1697IRYK
+         +X1/shHYg/jeTPF/Hn6nHQ1Gth4AxFydw3WshUfKeKQ2fj9DvoXEfi4jgGaMc1cL9TyQ
+         g0O8MbiAr47zBPAongGUoYS3sHN9Duf2BtUUyPcGlQkLo4mvTOwfdzbAzap24w9FDFMB
+         DdVPPqbK6MdgoC4xc+zfzVWNu9uYDIosiUuFP7kLZXDTwAPQEjEE/5//nxVlUihz9pwv
+         JFDcD/UHUe1LXaCrgE7HBYymD6mCiChBW4KqX+K7Wr8oa6zba3JBkj8MkMCLsJu0aMoe
+         FFbA==
+X-Gm-Message-State: AO0yUKU4vT54sGIEdmo6IPRjcBhvYL9uhM8wyQVak2+JhYq7/I1VzVU3
+        jKboWxeFN1ovW0ysx/5XYJXBUgFZNPI=
+X-Google-Smtp-Source: AK7set9oEIGi53mV98a4Itz9vVLOBT4OwFLHq9zrSx5xmFAPJZukH/wJvgeOILvDfQ6pqJ8kRy74Ug==
+X-Received: by 2002:a17:902:e748:b0:19e:d89a:cf41 with SMTP id p8-20020a170902e74800b0019ed89acf41mr18722926plf.64.1678483623837;
+        Fri, 10 Mar 2023 13:27:03 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id p16-20020a170902ebd000b001994e74c094sm377781plg.275.2023.03.10.13.27.01
+        by smtp.gmail.com with ESMTPSA id p16-20020a170902ebd000b001994e74c094sm377781plg.275.2023.03.10.13.27.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 13:27:01 -0800 (PST)
+        Fri, 10 Mar 2023 13:27:03 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] iso-tester: Update High Reliability presets
-Date:   Fri, 10 Mar 2023 13:26:59 -0800
-Message-Id: <20230310212700.3873714-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] client/player: Update High Reliability presets
+Date:   Fri, 10 Mar 2023 13:27:00 -0800
+Message-Id: <20230310212700.3873714-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230310212700.3873714-1-luiz.dentz@gmail.com>
+References: <20230310212700.3873714-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -68,52 +72,76 @@ This updates High Reliability presets as published in BAP 1.0.1:
 
 https://www.bluetooth.com/specifications/bap-1-0-1/
 ---
- tools/iso-tester.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ client/player.c | 40 ++++++++++++++++++++++++++++++++--------
+ 1 file changed, 32 insertions(+), 8 deletions(-)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index f3515f450503..3b115976a44d 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -108,22 +108,22 @@
- #define QOS_48_3_gr QOS(7500, 15, 90, 0x02, 2)
- #define QOS_48_4_gr QOS(10000, 20, 120, 0x02, 2)
- /* QoS Configuration settings for high reliability audio data */
--#define QOS_8_1_2 QOS(7500, 45, 26, 0x02, 41)
--#define QOS_8_2_2 QOS(10000, 60, 30, 0x02, 53)
--#define QOS_16_1_2 QOS(7500, 45, 30, 0x02, 41)
--#define QOS_16_2_2 QOS(10000, 60, 40, 0x02, 47)
--#define QOS_24_1_2 QOS(7500, 45, 45, 0x02, 35)
--#define QOS_24_2_2 QOS(10000, 60, 60, 0x02, 41)
--#define QOS_32_1_2 QOS(7500, 45, 60, 0x02, 29)
--#define QOS_32_2_2 QOS(10000, 60, 80, 0x02, 35)
--#define QOS_44_1_2 QOS_OUT(8163, 54, 98, 0x02, 23)
--#define QOS_44_2_2 QOS_OUT(10884, 71, 130, 0x02, 23)
--#define QOS_48_1_2 QOS_OUT(7500, 45, 75, 0x02, 23)
--#define QOS_48_2_2 QOS_OUT(10000, 60, 100, 0x02, 23)
--#define QOS_48_3_2 QOS_OUT(7500, 45, 90, 0x02, 23)
--#define QOS_48_4_2 QOS_OUT(10000, 60, 120, 0x02, 23)
--#define QOS_48_5_2 QOS_OUT(7500, 45, 117, 0x02, 23)
--#define QOS_48_6_2 QOS_OUT(10000, 60, 155, 0x02, 23)
-+#define QOS_8_1_2 QOS(7500, 75, 26, 0x02, 13)
-+#define QOS_8_2_2 QOS(10000, 95, 30, 0x02, 13)
-+#define QOS_16_1_2 QOS(7500, 75, 30, 0x02, 13)
-+#define QOS_16_2_2 QOS(10000, 95, 40, 0x02, 13)
-+#define QOS_24_1_2 QOS(7500, 75, 45, 0x02, 13)
-+#define QOS_24_2_2 QOS(10000, 95, 60, 0x02, 13)
-+#define QOS_32_1_2 QOS(7500, 65, 60, 0x02, 13)
-+#define QOS_32_2_2 QOS(10000, 95, 80, 0x02, 13)
-+#define QOS_44_1_2 QOS_OUT(8163, 80, 98, 0x02, 13)
-+#define QOS_44_2_2 QOS_OUT(10884, 85, 130, 0x02, 13)
-+#define QOS_48_1_2 QOS_OUT(7500, 75, 75, 0x02, 13)
-+#define QOS_48_2_2 QOS_OUT(10000, 95, 100, 0x02, 13)
-+#define QOS_48_3_2 QOS_OUT(7500, 75, 90, 0x02, 13)
-+#define QOS_48_4_2 QOS_OUT(10000, 100, 120, 0x02, 13)
-+#define QOS_48_5_2 QOS_OUT(7500, 75, 117, 0x02, 13)
-+#define QOS_48_6_2 QOS_OUT(10000, 100, 155, 0x02, 13)
- 
- #define QOS_OUT_16_2_1 QOS_OUT(10000, 10, 40, 0x02, 2)
- #define QOS_OUT_1_16_2_1 QOS_OUT_1(10000, 10, 40, 0x02, 2)
+diff --git a/client/player.c b/client/player.c
+index 79b93cc0fe53..57f85d4edcf2 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1360,30 +1360,54 @@ static struct codec_preset lc3_presets[] = {
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
+ 			LC3_10_UNFRAMED(155u, 5u, 20u, 40000u)),
+ 	/* QoS Configuration settings for high reliability audio data */
++	LC3_PRESET_HR("8_1_2",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
++			LC3_7_5_UNFRAMED(26u, 13u, 75u, 40000u)),
++	LC3_PRESET_HR("8_2_2",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_10, 30u),
++			LC3_10_UNFRAMED(30u, 13u, 95u, 40000u)),
++	LC3_PRESET_HR("16_1_2",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_7_5, 30u),
++			LC3_7_5_UNFRAMED(30u, 13u, 75u, 40000u)),
++	LC3_PRESET_HR("16_2_2",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_10, 40u),
++			LC3_10_UNFRAMED(40u, 13u, 95u, 40000u)),
++	LC3_PRESET_HR("24_1_2",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_7_5, 45u),
++			LC3_7_5_UNFRAMED(45u, 13u, 75u, 40000u)),
++	LC3_PRESET_HR("24_2_2",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_10, 60u),
++			LC3_10_UNFRAMED(60u, 13u, 95u, 40000u)),
++	LC3_PRESET_HR("32_1_2",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
++			LC3_7_5_UNFRAMED(60u, 13u, 75u, 40000u)),
++	LC3_PRESET_HR("32_2_2",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_10, 80u),
++			LC3_10_UNFRAMED(80u, 13u, 95u, 40000u)),
+ 	LC3_PRESET_HR("44_1_2",
+ 			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
+-			QOS_FRAMED_2M(8163u, 98u, 23u, 54u, 40000u)),
++			QOS_FRAMED_2M(8163u, 98u, 13u, 80u, 40000u)),
+ 	LC3_PRESET_HR("44_2_2",
+ 			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
+-			QOS_FRAMED_2M(10884u, 130u, 23u, 71u, 40000u)),
++			QOS_FRAMED_2M(10884u, 130u, 13u, 85u, 40000u)),
+ 	LC3_PRESET_HR("48_1_2",
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
+-			LC3_7_5_UNFRAMED(75u, 23u, 45u, 40000u)),
++			LC3_7_5_UNFRAMED(75u, 13u, 75u, 40000u)),
+ 	LC3_PRESET_HR("48_2_2",
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
+-			LC3_10_UNFRAMED(100u, 23u, 60u, 40000u)),
++			LC3_10_UNFRAMED(100u, 13u, 95u, 40000u)),
+ 	LC3_PRESET_HR("48_3_2",
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
+-			LC3_7_5_UNFRAMED(90u, 23u, 45u, 40000u)),
++			LC3_7_5_UNFRAMED(90u, 13u, 75u, 40000u)),
+ 	LC3_PRESET_HR("48_4_2",
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
+-			LC3_10_UNFRAMED(120u, 23u, 60u, 40000u)),
++			LC3_10_UNFRAMED(120u, 13u, 100u, 40000u)),
+ 	LC3_PRESET_HR("48_5_2",
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
+-			LC3_7_5_UNFRAMED(117u, 23u, 45u, 40000u)),
++			LC3_7_5_UNFRAMED(117u, 13u, 75u, 40000u)),
+ 	LC3_PRESET_HR("48_6_2",
+ 			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
+-			LC3_10_UNFRAMED(155u, 23u, 60u, 40000u)),
++			LC3_10_UNFRAMED(155u, 13u, 100u, 40000u)),
+ 	/* QoS configuration support setting requirements for the UGG and UGT */
+ 	LC3_PRESET("32_1_gs",
+ 			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
 -- 
 2.39.2
 
