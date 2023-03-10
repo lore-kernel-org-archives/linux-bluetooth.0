@@ -2,81 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 817EAC74A44
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 00:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D49AC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 01:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231450AbjCJAUZ (ORCPT
+        id S229522AbjCJBNR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 19:20:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39818 "EHLO
+        Thu, 9 Mar 2023 20:13:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbjCJAUW (ORCPT
+        with ESMTP id S229721AbjCJBNP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 19:20:22 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53CAF4D93;
-        Thu,  9 Mar 2023 16:20:20 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7ED7BB8214D;
-        Fri, 10 Mar 2023 00:20:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0E7A8C4339E;
-        Fri, 10 Mar 2023 00:20:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678407618;
-        bh=29AmesE7AXdHqjf2NOMeUWHAZIhTTbKWYLKdnfX/+Lc=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LBwsAx2GKM9dh9Nd0UNGal5z7ZdmpvkCMdCWwHCrIA3ILNiI/DbtsjAWEC7uu2nJy
-         rkhsDlCToQVvW3RqCO90nudzSEPQK0QRKRgaHXKA9Mv243j0AF1UOo/D9TQ/Owk4uM
-         czZrnM3yqpwZeq21KX7LYWpal/cSGybemVZNddSKUoUgUqmI3+GNNAnAt03becoJ7B
-         sqqGYZ26uKIDMtUp8WP8wBrbDPSJMwIolyj207Ti2tVBf84tmpcmlsbctx6IaCUzqL
-         /961u1oplueRzELsqntOGtBC14xm2WA8tqLIA2M7TZXU276k07MAEIuen79wkS7oz6
-         KoAvWtvSb8yIw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7C84E55F00;
-        Fri, 10 Mar 2023 00:20:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Thu, 9 Mar 2023 20:13:15 -0500
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86D2D2211F
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 17:13:14 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id c18so4229118qte.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 17:13:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678410793;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8gifrjivOz1kauind9PJPbcNtjivpnyteOhFE6A060o=;
+        b=fHc78ZL0qPcce+/jZ1ickWxidrvx/NFQ/w1252HZTt1pqskBAZypWfXT1cqTLagu30
+         LmBdtfBN2+sMYMYOZK/F1DFVx8VUKHxHnu2uEA7NpOVHCFDJQEr1WDd99Z5MtMrimtTp
+         scByIxKG8GwpVsVI8Jvzq4z+dbHupFBdDDeUkee/gu+YB4coQMLw1CTqbaFps27T4vET
+         doZyJ5tuKdRBlQPamBfYLBlt/JwwoVsfYDPK7k4/9PLhtSRC16xWNRpdQLoyk0KH4rLc
+         ynfDNG16A6IYIGDlnQirJCmwsCwfLeXfADghYK5wg0C6REULMy0TuGcMfuoPvUWZbsN6
+         aDlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678410793;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8gifrjivOz1kauind9PJPbcNtjivpnyteOhFE6A060o=;
+        b=3i4z6NLC2KgDLDgBcwz/74czprI5iqUAB3U0cfFbKFzB8Z9xB0DPVPpyDiRsyK3LAZ
+         HTNh4NmkGICS2CnGL4Vr8xdjgaXUlpsr6bmK57EJ6q8uA45skVgkrEyyQJBlL01D5ZiJ
+         x7S5+gQPu9SRLQ5HQ4LxAAchWR9rkAnRCAiGveFpxMxFW2t2zlIr/4Tu5X99cCtg/4ZF
+         CLyYPBqKHiyR4mViWLxjOpllHMFB5t4orGRDjWSPmG9oNaNzvTlLKJkJWbZX+JaUp/HF
+         d80xRzszQWRJ4ls52T34pbx5fWaR23BLVWsaOeaRhpscEzvW8IOGPVS8y353w2mNo7mS
+         RVyw==
+X-Gm-Message-State: AO0yUKX3dGcP1smqY2NulSVnXCCYVWOVsl6w29YPJIkrBXnCWspgTp3/
+        4t7goaNncgK6fN3ZMH8Fa312w5mJ/mU=
+X-Google-Smtp-Source: AK7set/BkJhlaSz/bnjdiEgfhgMV26RybTxjp+CVOY01Tc67QXoaE/IMAhFkEX9IqCoHeEWWTIqSJw==
+X-Received: by 2002:a05:622a:24a:b0:3bf:d00e:9908 with SMTP id c10-20020a05622a024a00b003bfd00e9908mr42741051qtx.44.1678410793615;
+        Thu, 09 Mar 2023 17:13:13 -0800 (PST)
+Received: from [172.17.0.2] ([172.177.213.89])
+        by smtp.gmail.com with ESMTPSA id o22-20020ac85556000000b003bfbf3afe51sm372560qtr.93.2023.03.09.17.13.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Mar 2023 17:13:13 -0800 (PST)
+Message-ID: <640a8429.c80a0220.66b0b.1748@mx.google.com>
+Date:   Thu, 09 Mar 2023 17:13:13 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5130612191388546692=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 RESEND] Bluetooth: btqcomsmd: Fix command timeout after
- setting BD address
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167840761794.25154.15476663413483482390.git-patchwork-notify@kernel.org>
-Date:   Fri, 10 Mar 2023 00:20:17 +0000
-References: <20230308133155.165537-1-stephan.gerhold@kernkonzept.com>
-In-Reply-To: <20230308133155.165537-1-stephan.gerhold@kernkonzept.com>
-To:     Stephan Gerhold <stephan.gerhold@kernkonzept.com>
-Cc:     luiz.dentz@gmail.com, marcel@holtmann.org, johan.hedberg@gmail.com,
-        agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        stephan@gerhold.net, pmenzel@molgen.mpg.de
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] main: Disable EATT by default
+In-Reply-To: <20230310000354.3404030-1-luiz.dentz@gmail.com>
+References: <20230310000354.3404030-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============5130612191388546692==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is an automated email and please do not reply to this email.
 
-On Wed,  8 Mar 2023 14:31:55 +0100 you wrote:
-> On most devices using the btqcomsmd driver (e.g. the DragonBoard 410c
-> and other devices based on the Qualcomm MSM8916/MSM8909/... SoCs)
-> the Bluetooth firmware seems to become unresponsive for a while after
-> setting the BD address. On recent kernel versions (at least 5.17+)
-> this often causes timeouts for subsequent commands, e.g. the HCI reset
-> sent by the Bluetooth core during initialization:
-> 
-> [...]
+Dear Submitter,
 
-Here is the summary with links:
-  - [v2,RESEND] Bluetooth: btqcomsmd: Fix command timeout after setting BD address
-    https://git.kernel.org/bluetooth/bluetooth-next/c/048379740637
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+----- Output -----
+
+error: patch failed: src/main.conf:255
+error: src/main.conf: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5130612191388546692==--
