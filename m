@@ -2,169 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBD7C6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 07:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A75D1C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 08:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230062AbjCJH46 (ORCPT
+        id S230321AbjCJIIe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 02:56:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36624 "EHLO
+        Fri, 10 Mar 2023 03:08:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229770AbjCJH45 (ORCPT
+        with ESMTP id S230036AbjCJIIY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 02:56:57 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B59FDD597
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 23:56:53 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id x3so16943351edb.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Mar 2023 23:56:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1678435011;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Na4vhlLIT8h87R1c4saJtnoc0rpStTN6SAaJv5Ui0DU=;
-        b=f/cdum7O6TN5gJ9ROGgx6QjE0oljMSgdfelOxJDv/A44aZ7Mm1unTj43LMrAl8qXD3
-         sHI50PXnWoUWOCaGf+Lw7NcDVU4NiPijijYupEKrMb/i7yVzAFSIs2Sdxro3W9NWDoHv
-         l0FZKC3iXGb6IU9h1xEP+L1xj0TStwEsdmZgH7BeJN1yxjzdFSB6oJFobXTUS45dVs0M
-         ULQH07khMas1d0aBIt/OjZLOHVTDe9lhbsnUreYNdh+WszcP/mDLVMMeWmaL4KFGK0LG
-         +5HnCCB4hC8JohJPmZdM8SSKIi+lKSrrSUXogyHzjsDGs1U97Mara0hXF/7LevUFdWY9
-         OvCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678435011;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Na4vhlLIT8h87R1c4saJtnoc0rpStTN6SAaJv5Ui0DU=;
-        b=ioNMpU4gDb6NkioIXSHbjq6IcnsEM1ZVpUXkBdaWaJ+Ka7c0Q2vIN8a//0dXXq0zQH
-         nWh1BsVE9Z2IwFaYfIQWsPh3Fn365S5hsqjLdnvpUZ2yE99VCx5VELoXmh/O2SPUvV/4
-         /wPO959fof/FRETgBVhVVtrQHZfuOMqdxMbizN/JSC2Hapjt4n6lHFX7Sm7O2KWbzHKp
-         dzmHy9kYVr+tz8TFafdT6URMavwdgDoxhToBvZoL25rGKyOmnG8+jfz4kEVUgkB16glA
-         YphH1KF3E+WDldPIFBgZj57ghbBVOtp7PVBHY8HcJTyIQfqmgVXFvVzhousEO8xQhVMB
-         p6iw==
-X-Gm-Message-State: AO0yUKWlq2nJY5ywv3uDpqdFIrljwoJeHKvYHuJ64/PI7s+RGu/0z1ro
-        RJ7/X3USJ6mKwzVl43aTjrPU5Q==
-X-Google-Smtp-Source: AK7set83ouw7MBm0jqo5iH57IkMFwoOVUzIry7zQggJ4hxcJBeN03UC69xrHLWNGpiqGw+nvqtrohA==
-X-Received: by 2002:a17:906:eecc:b0:90b:167e:3050 with SMTP id wu12-20020a170906eecc00b0090b167e3050mr30865633ejb.36.1678435011591;
-        Thu, 09 Mar 2023 23:56:51 -0800 (PST)
-Received: from [192.168.1.195] ([5.133.47.210])
-        by smtp.googlemail.com with ESMTPSA id ox11-20020a170907100b00b008cf6f8798e1sm641097ejb.54.2023.03.09.23.56.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Mar 2023 23:56:50 -0800 (PST)
-Message-ID: <6108c68b-e38b-3060-f6fa-53be79a795d7@linaro.org>
-Date:   Fri, 10 Mar 2023 07:56:49 +0000
+        Fri, 10 Mar 2023 03:08:24 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A1C9F4B79;
+        Fri, 10 Mar 2023 00:07:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F325060F5D;
+        Fri, 10 Mar 2023 08:07:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 66A1DC433EF;
+        Fri, 10 Mar 2023 08:07:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678435656;
+        bh=MBsYfjfwW/rmvE0gLI4/NSeVvvOwKkEYquLXFvYR9d4=;
+        h=From:Date:Subject:To:Cc:Reply-To:From;
+        b=tR27wX7rP+axAePuvF5YfZvXyV8GK0gd4g9XBi5fG9lmjK+2mZR/j67UjvuBhnluN
+         ko976C3omeUDXl7C8Y4R1m6qSvTn3N0M75I8pj71mi1oLc7T/n72NzspfbRrmMyBS6
+         KghudbAhQ51/ne3baCEmVRYIWJGrrvnE3hABp4mu0Tb+SM9SVRz4eHbMxxIiazwBPy
+         nvrqjYx3xqfTYDNZxXq+hrzpnmMMEiJ3/1lwzHQZNL2J/hm8wfNyms9LPlRI6pJNy5
+         NSw5TMLmGS9YGGKO3NqRJCMWIgXBTmK9L94u1yQP7EbPzEOgdrpbP0/vKOrKlQzM98
+         ZU0gT9xvNHtAA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.lore.kernel.org (Postfix) with ESMTP id 33654C64EC4;
+        Fri, 10 Mar 2023 08:07:36 +0000 (UTC)
+From:   Sasha Finkelstein via B4 Relay 
+        <devnull+fnkl.kernel.gmail.com@kernel.org>
+Date:   Fri, 10 Mar 2023 09:07:33 +0100
+Subject: [PATCH RESEND] bluetooth: btbcm: Fix logic error in forming the
+ board name.
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH v1 01/15] dt-bindings: add pwrseq device tree bindings
-Content-Language: en-US
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Rob Herring <robh@kernel.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        ath10k@lists.infradead.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>, Abel Vesa <abel.vesa@linaro.org>
-References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
- <20211006035407.1147909-2-dmitry.baryshkov@linaro.org>
- <YXf6TbV2IpPbB/0Y@robh.at.kernel.org>
- <37b26090-945f-1e17-f6ab-52552a4b6d89@linaro.org>
- <CAL_JsqLAnJqZ95_bf6_fFmPJFMjuy43UfP2UxzEmFMNnG_t-Ug@mail.gmail.com>
- <31792ef1-20b0-b801-23b7-29f303b91def@linaro.org>
-From:   Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-In-Reply-To: <31792ef1-20b0-b801-23b7-29f303b91def@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20230224-btbcm-wtf-v1-1-d2dbd7ca7ae4@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Sasha Finkelstein <fnkl.kernel@gmail.com>
+X-Mailer: b4 0.12.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1678435655; l=1021;
+ i=fnkl.kernel@gmail.com; s=20230213; h=from:subject:message-id;
+ bh=liXj6eso7YibAPpq3C6GEb2euORWvG95T35Md9MPiuM=;
+ b=7R+3sE6FGxSwElKG3xR8d3Up8y0qyG/1zw2uAQP/cLjg7ciqcMZgxV9f0J8QrL5vV3dZTV0jx
+ P9vQM/QPcioCqEvgyVVluZl7j4scNKItXuj362r+Tg6W/sJ1nOVL13D
+X-Developer-Key: i=fnkl.kernel@gmail.com; a=ed25519;
+ pk=7LFSAJtxIWAs9LzCIyX0sSvCZy2wQTyEIu1zch6o804=
+X-Endpoint-Received: by B4 Relay for fnkl.kernel@gmail.com/20230213 with auth_id=28
+X-Original-From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+Reply-To: <fnkl.kernel@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Sasha Finkelstein <fnkl.kernel@gmail.com>
 
+This patch fixes an incorrect loop exit condition in code that replaces
+'/' symbols in the board name. There might also be a memory corruption
+issue here, but it is unlikely to be a real problem.
 
-On 02/11/2021 15:26, Dmitry Baryshkov wrote:
-> On 28/10/2021 00:53, Rob Herring wrote:
->> On Tue, Oct 26, 2021 at 9:42 AM Dmitry Baryshkov
->> <dmitry.baryshkov@linaro.org> wrote:
->>>
->>> On 26/10/2021 15:53, Rob Herring wrote:
->>>> On Wed, Oct 06, 2021 at 06:53:53AM +0300, Dmitry Baryshkov wrote:
->>>>> Add device tree bindings for the new power sequencer subsystem.
->>>>> Consumers would reference pwrseq nodes using "foo-pwrseq" properties.
->>>>> Providers would use '#pwrseq-cells' property to declare the amount of
->>>>> cells in the pwrseq specifier.
->>>>
->>>> Please use get_maintainers.pl.
->>>>
->>>> This is not a pattern I want to encourage, so NAK on a common binding.
->>>
->>>
->>> Could you please spend a few more words, describing what is not
->>> encouraged? The whole foo-subsys/#subsys-cells structure?
->>
->> No, that's generally how common provider/consumer style bindings work.
->>
->>> Or just specifying the common binding?
->>
->> If we could do it again, I would not have mmc pwrseq binding. The
->> properties belong in the device's node. So don't generalize the mmc
->> pwrseq binding.
->>
->> It's a kernel problem if the firmware says there's a device on a
->> 'discoverable' bus and the kernel can't discover it. I know you have
->> the added complication of a device with 2 interfaces, but please,
->> let's solve one problem at a time.
+Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
+---
+ drivers/bluetooth/btbcm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Just to keep this topic updated with some pointers [1] to changes done 
-to solve same problem in USB Hub. These patches 
-(drivers/usb/misc/onboard_usb_hub*) have been merged since last year July.
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 3006e2a0f37e..43e98a598bd9 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -511,7 +511,7 @@ static const char *btbcm_get_board_name(struct device *dev)
+ 	len = strlen(tmp) + 1;
+ 	board_type = devm_kzalloc(dev, len, GFP_KERNEL);
+ 	strscpy(board_type, tmp, len);
+-	for (i = 0; i < board_type[i]; i++) {
++	for (i = 0; i < len; i++) {
+ 		if (board_type[i] == '/')
+ 			board_type[i] = '-';
+ 	}
 
-It looks like we can take some inspiration from this to address PCIE Bus 
-issue aswell.
+---
+base-commit: c9c3395d5e3dcc6daee66c6908354d47bf98cb0c
+change-id: 20230224-btbcm-wtf-ff32fed3e930
 
-Thanks to Neil to point this.
+Best regards,
+-- 
+Sasha Finkelstein <fnkl.kernel@gmail.com>
 
-[1] 
-https://lore.kernel.org/lkml/20220630193530.2608178-1-mka@chromium.org/T/
-
-
---srini
-> 
-> The PCI bus handling is a separate topic for now (as you have seen from 
-> the clearly WIP patches targeting just testing of qca6390's wifi part).
-> 
-> For me there are three parts of the device:
-> - power regulator / device embedded power domain.
-> - WiFi
-> - Bluetooth
-> 
-> With the power regulator being a complex and a bit nasty beast. It has 
-> several regulators beneath, which have to be powered up in a proper way.
-> Next platforms might bring additional requirements common to both WiFi 
-> and BT parts (like having additional clocks, etc). It is externally 
-> controlled (after providing power to it you have to tell, which part of 
-> the chip is required by pulling up the WiFi and/or BT enable GPIOs.
-> 
-> Having to duplicate this information in BT and WiFi cases results in 
-> non-aligned bindings (with WiFi and BT parts using different set of 
-> properties and different property names) and non-algined drivers (so the 
-> result of the powerup would depend on the order of drivers probing).
-> 
-> So far I still suppose that having a single separate entity controlling 
-> the powerup of such chips is the right thing to do.
-> 
-> I'd prefer to use the power-domain bindings (as the idea seems to be 
-> aligned here), but as the power-domain is used for the in-chip power 
-> domains, we had to invent the pwrseq name.
-> 
