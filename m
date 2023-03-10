@@ -2,55 +2,51 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C0CDC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 00:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DC26C74A44
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 00:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231192AbjCJAUU (ORCPT
+        id S231443AbjCJAUW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Mar 2023 19:20:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39748 "EHLO
+        Thu, 9 Mar 2023 19:20:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbjCJAUT (ORCPT
+        with ESMTP id S231438AbjCJAUV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Mar 2023 19:20:19 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9ADFF4B65;
-        Thu,  9 Mar 2023 16:20:18 -0800 (PST)
+        Thu, 9 Mar 2023 19:20:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94342F4B70
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Mar 2023 16:20:20 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8288F61D14;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5451FB82149
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 00:20:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 014EAC4339C;
         Fri, 10 Mar 2023 00:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E57C6C4339B;
-        Fri, 10 Mar 2023 00:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678407617;
-        bh=1erPvfc/QLqM7MHKi9s/IDbH6aDGxqpQ3SXGGXtIkzY=;
+        s=k20201202; t=1678407618;
+        bh=ylYE4zuN9++Nv/rLFd/QXrmcltLQLsbpazoAcyyDCOE=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=DTCdywgRUvz7XUGCHBe8YJgPy2QXRtbI1vOZHhAmRfb/p3OlKxdjSa8jgyIt5Xq1+
-         XgbV7lEhpTVkdKvbdxZdFwEenTY9uNeFwCkldMxcH9vIHndvsD3Bz2YwVU9jmnlg/E
-         SMtHsoqeVp/mPa6jw6eUCaEUnKAPIwLA642AsovmN+TcOm4ZpD+/sPlNlIdbFeAHeI
-         lLpr4N7KC53te9bOwRhu6Tw3ExZASm72RWESy3ALxMF02vpu6cNXzCIqmtK1uuo9aj
-         Ol0rv704p76UT5Nw1PgScUU0rpZ7ZLob1IAm34vmO1U+A1VJRH/nyfWS7LajdWlsno
-         Fwfd9xilNbi7w==
+        b=Ra7ouEopFsh371QMwgiUkqMnSiLTWnr17CCSnKZOz5kTtM0EQQqR58FBKfIY6qfJ+
+         t7yXuI3boK0UWaRxNAW2eBdyxb+N27JMnwGcYa2EIm2UFLKcAIbN4ia+jIXLYaygG4
+         6k2JY+BDEtkOGIUJaKumjXT5JpMq2OoiHP7BI7eySs/hn8y09nGWxxytXLfmNngIMJ
+         Yn+KwKHE9p/CGGVQZDPPCbiWlS4velZuLLwdnrvHqNBT1ZanLBEThwoWD8UqL7yTH2
+         z5dwVbQDdFUsyVQ7jpfalK1D43ak9esP6ee27Dma/EdBSjumZojaD/yoTEXkHgQlDM
+         7IfcP1K5kaSdg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA70BE61B60;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDEFDE61B6E;
         Fri, 10 Mar 2023 00:20:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btsdio:  fix use after free bug in btsdio_remove
- due to race condition
+Subject: Re: [PATCH] Bluetooth: hci_sync: Remove duplicate statement
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167840761782.25154.7899078093044397807.git-patchwork-notify@kernel.org>
+Message-Id: <167840761790.25154.15771619907903459554.git-patchwork-notify@kernel.org>
 Date:   Fri, 10 Mar 2023 00:20:17 +0000
-References: <20230308164501.2734985-1-zyytlz.wz@163.com>
-In-Reply-To: <20230308164501.2734985-1-zyytlz.wz@163.com>
-To:     Zheng Wang <zyytlz.wz@163.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hackerzheng666@gmail.com, 1395428693sheep@gmail.com,
-        alex000young@gmail.com
+References: <20230308183235.326109-1-inga.stotland@intel.com>
+In-Reply-To: <20230308183235.326109-1-inga.stotland@intel.com>
+To:     Inga Stotland <inga.stotland@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -60,19 +56,19 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  9 Mar 2023 00:45:01 +0800 you wrote:
-> In btsdio_probe, the data->work is bound with btsdio_work. It will be
-> started in btsdio_send_frame.
+On Wed,  8 Mar 2023 10:32:35 -0800 you wrote:
+> This removes the following duplicate statement in
+> hci_le_ext_directed_advertising_sync():
+> cp.own_addr_type = own_addr_type;
 > 
-> If the btsdio_remove runs with a unfinished work, there may be a race
-> condition that hdev is freed but used in btsdio_work. Fix it by
-> canceling the work before do cleanup in btsdio_remove.
-> 
-> [...]
+> Signed-off-by: Inga Stotland <inga.stotland@intel.com>
+> ---
+>  net/bluetooth/hci_sync.c | 1 -
+>  1 file changed, 1 deletion(-)
 
 Here is the summary with links:
-  - Bluetooth: btsdio: fix use after free bug in btsdio_remove due to race condition
-    https://git.kernel.org/bluetooth/bluetooth-next/c/61115bb7574e
+  - Bluetooth: hci_sync: Remove duplicate statement
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f959b6b32769
 
 You are awesome, thank you!
 -- 
