@@ -2,125 +2,118 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CD2C6FA99
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 19:03:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EC1C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 21:27:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230168AbjCJTDZ (ORCPT
+        id S231703AbjCJV1G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 14:03:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58510 "EHLO
+        Fri, 10 Mar 2023 16:27:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbjCJTDX (ORCPT
+        with ESMTP id S230430AbjCJV1F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 14:03:23 -0500
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 257171167F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 11:03:20 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id c18so6869733qte.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 11:03:20 -0800 (PST)
+        Fri, 10 Mar 2023 16:27:05 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB236AD25
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 13:27:03 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id u3-20020a17090a450300b00239db6d7d47so6358497pjg.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 13:27:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678474999;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0iW9sQDhI9S5zn4IUOlnHVsFhdVMHSnvP7KURqpcNjc=;
-        b=MQX/dROJ2PqRDDsViIBCxCmVsQPPwMfSsmS53zyUU7e4hQks0fazSJPDeVjRTWeO/J
-         /20j+lwLQW3JQDt3Qq7XGm51dK0Z3RNAxAeJQA4gIRThgdiKMPFj9ESw0l6Sl4l8LX38
-         iBTs5WIOpSk7GjoUJo43/GPH9lLOJo6zCgf9EjVPDKG9C/V1z64QYNoOLHs19zmRTDd/
-         Y1LzqxxRvluwqLQnNQ3mKG04miQuP7UjJLoJBZmH/SzGtfb8Xwe4b/iEaPRysAS3tLaJ
-         KECEmNPkiOjDsAFhWNo/kDPRdTMRWTAEi9R0G9sVdG8fhP1D7a8WtGenCZyudq71M3o2
-         kbTQ==
+        d=gmail.com; s=20210112; t=1678483623;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nm+yAeti/T6dgIN/DJnSxJY7OY7ks8esKVqfBJHGwaw=;
+        b=gTylIuiImi6Ys3ZfEILsWv7+dB0GYB8cuk+Bc+TMM8XgcBf7UJVrjnfY3hQTloSj6Y
+         VI9SQywcysLrkQQ3F/d71jPn4r9kETWjTD2P3WvfpyAsvOp2uP96CzCJGRQwXU1iN+ZX
+         uEjMYP+BtaDREmK0umFsM1LFe5gD/36C9qVSJWSIh1Szuo03mMU51wInY4ar9mnG9U5c
+         17m9ur/Cci2+rRtzqWf4DL/dp5ZarXvBI0Xeau292MzYE/5Z0SaB2BRguLMFbjMyYcKS
+         k23AxDchrZu2bF2Xx51EyRj8qP/I6awUaeAxxMuY7mbJbLb2ML17gLlY+PBPZCzYk+Oe
+         EOEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678474999;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0iW9sQDhI9S5zn4IUOlnHVsFhdVMHSnvP7KURqpcNjc=;
-        b=ygVFVE3h0p87dLdcaOqDc+KcmhBY/D6pLSL5Y2jJuflDz4lXVpjlCU3vpff4Q5xkFN
-         xZNT5M+8hRXvOrzP9aX0AE+A5DnZyQwWWJLELabnL95d6HDfmDNZDgoF9OLhCfzIOUmU
-         O+x7AoMt1pLjYF6fR0T7z9CFv6m0OQj7D0Wyx6s8qLbRc5cwgH70iRflDdth4dJyMiK0
-         F6TLVXY9YY5O3UZ9dTaHFfHZ1gU4f3JQU6X0IELHNZYGFujvxAWdC8eVw/SqeHBMWcsz
-         j+A4GPb6JEk+sMtWZyPhQ03V/+eAcN07A7e9+T2TWJAJa15K0LNlKOS+2dG4C3yTEB/R
-         tDCw==
-X-Gm-Message-State: AO0yUKXjBW35AEfm3ac3EVhbo3Koe0f23DPDRGFr4Oa6CBjAL/56q3RX
-        FiivK6bChVP+Y7UYJOz7i4vjSBXLrQo=
-X-Google-Smtp-Source: AK7set/zOW8O6A+chlgiCyq0zTNKq3OSZXr8PmJmfqtXdu2VHAa3LGw+T9bPIgBakmO53qvwC/ZuCA==
-X-Received: by 2002:ac8:7f16:0:b0:3bf:d0b1:433d with SMTP id f22-20020ac87f16000000b003bfd0b1433dmr48573913qtk.60.1678474999554;
-        Fri, 10 Mar 2023 11:03:19 -0800 (PST)
-Received: from [172.17.0.2] ([104.45.205.16])
-        by smtp.gmail.com with ESMTPSA id ef14-20020a05620a808e00b0074357a6529asm286367qkb.105.2023.03.10.11.03.19
+        d=1e100.net; s=20210112; t=1678483623;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nm+yAeti/T6dgIN/DJnSxJY7OY7ks8esKVqfBJHGwaw=;
+        b=0ice6RDtk8Wzw96MYoc1T76SUpE6g705+2cCsRRHTLgYDjnexqdzjTsKl3rVOSsGAy
+         Whvb+yTh+21BKFUNlqgmjWg0CoDnIH17Hs2kRgsG042CfXKd8cD4JgzmZhjsiVSe89Xi
+         iKOMqI5yrZo+/MjHrH0i/66BDl1iW4SYxrxw33Wh8SWkEGtVYB7pNxcZGvnxVJMf7HgU
+         tN1FvBAr2H8YFiX1haQvaRluFa/+4CbVCWhF+nhM9uwQJEuQ9OyTb526MBOyckp7KRCo
+         E2LP4dQAh3zh7bKqNiq2Tc//VneTwvivDT8ggkdDit2Fww8Cge7lTPZ/VXTcRzSu+Nkv
+         mQYA==
+X-Gm-Message-State: AO0yUKVBZ6SlacJRl1pb4El5awn/ia5o/0EBX6Etvo9xP6Y4aQ1BeWy9
+        p0sj+QblsdaH8Yn9ygfKzMQ6E26qOY4=
+X-Google-Smtp-Source: AK7set9q9Gie2bf4HqfHAGJ7X7gAENvU7VIoV8VG8tq2oXBkkus7+GeOU5B6+P4B33Z7rAi0GRQBTg==
+X-Received: by 2002:a17:902:f693:b0:19d:5fd:11fb with SMTP id l19-20020a170902f69300b0019d05fd11fbmr31903750plg.23.1678483622701;
+        Fri, 10 Mar 2023 13:27:02 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id p16-20020a170902ebd000b001994e74c094sm377781plg.275.2023.03.10.13.27.01
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 11:03:19 -0800 (PST)
-Message-ID: <640b7ef7.050a0220.3789f.1c73@mx.google.com>
-Date:   Fri, 10 Mar 2023 11:03:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3276173923934508136=="
+        Fri, 10 Mar 2023 13:27:01 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] iso-tester: Update High Reliability presets
+Date:   Fri, 10 Mar 2023 13:26:59 -0800
+Message-Id: <20230310212700.3873714-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: Add support for NXP bluetooth chipsets
-In-Reply-To: <20230310181921.1437890-2-neeraj.sanjaykale@nxp.com>
-References: <20230310181921.1437890-2-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3276173923934508136==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This updates High Reliability presets as published in BAP 1.0.1:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=728841
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      5.02 seconds
-GitLint                       FAIL      1.42 seconds
-SubjectPrefix                 FAIL      0.64 seconds
-BuildKernel                   PASS      37.65 seconds
-CheckAllWarning               PASS      41.25 seconds
-CheckSparse                   PASS      46.81 seconds
-CheckSmatch                   PASS      126.67 seconds
-BuildKernel32                 PASS      36.91 seconds
-TestRunnerSetup               PASS      523.67 seconds
-TestRunner_l2cap-tester       PASS      19.02 seconds
-TestRunner_iso-tester         PASS      21.05 seconds
-TestRunner_bnep-tester        PASS      6.76 seconds
-TestRunner_mgmt-tester        PASS      127.35 seconds
-TestRunner_rfcomm-tester      PASS      10.91 seconds
-TestRunner_sco-tester         PASS      10.12 seconds
-TestRunner_ioctl-tester       PASS      11.74 seconds
-TestRunner_mesh-tester        PASS      8.86 seconds
-TestRunner_smp-tester         PASS      9.65 seconds
-TestRunner_userchan-tester    PASS      7.19 seconds
-IncrementalBuild              PASS      45.82 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v8,2/3] dt-bindings: net: bluetooth: Add NXP bluetooth support
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-19: B1 Line exceeds max length (87>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
+https://www.bluetooth.com/specifications/bap-1-0-1/
 ---
-Regards,
-Linux Bluetooth
+ tools/iso-tester.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index f3515f450503..3b115976a44d 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -108,22 +108,22 @@
+ #define QOS_48_3_gr QOS(7500, 15, 90, 0x02, 2)
+ #define QOS_48_4_gr QOS(10000, 20, 120, 0x02, 2)
+ /* QoS Configuration settings for high reliability audio data */
+-#define QOS_8_1_2 QOS(7500, 45, 26, 0x02, 41)
+-#define QOS_8_2_2 QOS(10000, 60, 30, 0x02, 53)
+-#define QOS_16_1_2 QOS(7500, 45, 30, 0x02, 41)
+-#define QOS_16_2_2 QOS(10000, 60, 40, 0x02, 47)
+-#define QOS_24_1_2 QOS(7500, 45, 45, 0x02, 35)
+-#define QOS_24_2_2 QOS(10000, 60, 60, 0x02, 41)
+-#define QOS_32_1_2 QOS(7500, 45, 60, 0x02, 29)
+-#define QOS_32_2_2 QOS(10000, 60, 80, 0x02, 35)
+-#define QOS_44_1_2 QOS_OUT(8163, 54, 98, 0x02, 23)
+-#define QOS_44_2_2 QOS_OUT(10884, 71, 130, 0x02, 23)
+-#define QOS_48_1_2 QOS_OUT(7500, 45, 75, 0x02, 23)
+-#define QOS_48_2_2 QOS_OUT(10000, 60, 100, 0x02, 23)
+-#define QOS_48_3_2 QOS_OUT(7500, 45, 90, 0x02, 23)
+-#define QOS_48_4_2 QOS_OUT(10000, 60, 120, 0x02, 23)
+-#define QOS_48_5_2 QOS_OUT(7500, 45, 117, 0x02, 23)
+-#define QOS_48_6_2 QOS_OUT(10000, 60, 155, 0x02, 23)
++#define QOS_8_1_2 QOS(7500, 75, 26, 0x02, 13)
++#define QOS_8_2_2 QOS(10000, 95, 30, 0x02, 13)
++#define QOS_16_1_2 QOS(7500, 75, 30, 0x02, 13)
++#define QOS_16_2_2 QOS(10000, 95, 40, 0x02, 13)
++#define QOS_24_1_2 QOS(7500, 75, 45, 0x02, 13)
++#define QOS_24_2_2 QOS(10000, 95, 60, 0x02, 13)
++#define QOS_32_1_2 QOS(7500, 65, 60, 0x02, 13)
++#define QOS_32_2_2 QOS(10000, 95, 80, 0x02, 13)
++#define QOS_44_1_2 QOS_OUT(8163, 80, 98, 0x02, 13)
++#define QOS_44_2_2 QOS_OUT(10884, 85, 130, 0x02, 13)
++#define QOS_48_1_2 QOS_OUT(7500, 75, 75, 0x02, 13)
++#define QOS_48_2_2 QOS_OUT(10000, 95, 100, 0x02, 13)
++#define QOS_48_3_2 QOS_OUT(7500, 75, 90, 0x02, 13)
++#define QOS_48_4_2 QOS_OUT(10000, 100, 120, 0x02, 13)
++#define QOS_48_5_2 QOS_OUT(7500, 75, 117, 0x02, 13)
++#define QOS_48_6_2 QOS_OUT(10000, 100, 155, 0x02, 13)
+ 
+ #define QOS_OUT_16_2_1 QOS_OUT(10000, 10, 40, 0x02, 2)
+ #define QOS_OUT_1_16_2_1 QOS_OUT_1(10000, 10, 40, 0x02, 2)
+-- 
+2.39.2
 
---===============3276173923934508136==--
