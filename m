@@ -2,159 +2,176 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE33CC6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 12:34:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F2EC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 13:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbjCKMeX (ORCPT
+        id S229655AbjCKN3z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Mar 2023 07:34:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44024 "EHLO
+        Sat, 11 Mar 2023 08:29:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbjCKMeR (ORCPT
+        with ESMTP id S229541AbjCKN3y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Mar 2023 07:34:17 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on20729.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eaa::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 485FE118810;
-        Sat, 11 Mar 2023 04:33:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YDhs4wCHE0Tx+yJ1gcEEy2E2Oy9Ppb1xe/odNACPvm6hVI7xSSUsswuq4KOsuadwHWT60kR5kChYZ2L1CGkt3GAqBOFvpLM3yy/4KiXLXK91lckOrkS4SE9294XU+sMhOL3jl1KIupVPPRgWZkc+TOghQptD9GgMDS7Oill9uD/Lcln+z7KNrB2drpQIwjuQf/twz+FuOClUwIITvgsj/xXgsIz9J2RGAatwf5ez4bdHwNNLK5KnEuyPiDbLWjoffRYx+ifg+q5mv91BaRFRAnNA4x8C/620zs0S6dAixYUmiUVGEVCikzgU70BdIyJpYndKm+0hzxKekRLTOGOFhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=243o76Sa2ZSJysL8qAgKomHSEQI3g8nsUtlHT8xXwF4=;
- b=h+jmZWRLnW06IVhDWK6Kwv3VJWGMyGDOc+qeivG5WSs3eUewcPXus1q0o8izE/sA+cBJdUWgXWz6xqfyzNe+yIQP8CjkHpSfik0dtyFdz5lFmHusMqZF0F76MbkJzBsznazFgop6pvL4SVYeZYrSJzGNDlEHluP08qzDKa99FVN+fhtOemS7q9PUujRk4wXw61R1DdHtXWFS+EtAgd5UHXAFVnBPpxsV3vwR25Jpwj54yt8HJD0/xE1WcXINoQdnPd6QPM/wN/FTsZ9PS6PBNO33hSMjFtbQ8PV3dZ/q30h1Z/7Kad5yeDZ3DQkP0RJ4CwOUSwrNbjT+lcuFTushiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=243o76Sa2ZSJysL8qAgKomHSEQI3g8nsUtlHT8xXwF4=;
- b=OJqfhFqNiYdYLjCAhucQMAv4KKFx94sunWnCK7kb2M//6W4cb5xOpZKhvMoeIYvXE/i/lbb/9Hx/gLyi7KZwnrF2okt5fY4kd6VvRUwjyn8nIBQX4vhWNS4pKHsM0dOCu2x5+GhTbykgPpK3qOxlRnyyoJBo8XnjVY28wCVSYOw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by DS7PR13MB4766.namprd13.prod.outlook.com (2603:10b6:5:38c::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.22; Sat, 11 Mar
- 2023 12:33:49 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6178.020; Sat, 11 Mar 2023
- 12:33:49 +0000
-Date:   Sat, 11 Mar 2023 13:33:40 +0100
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        gregkh@linuxfoundation.org, jirislaby@kernel.org,
-        alok.a.tiwari@oracle.com, hdanton@sina.com,
-        ilpo.jarvinen@linux.intel.com, leon@kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
-        rohit.fule@nxp.com, sherry.sun@nxp.com
-Subject: Re: [PATCH v8 1/3] serdev: Add method to assert break signal over
- tty UART port
-Message-ID: <ZAx1JOvjgOOYCNY9@corigine.com>
-References: <20230310181921.1437890-1-neeraj.sanjaykale@nxp.com>
- <20230310181921.1437890-2-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230310181921.1437890-2-neeraj.sanjaykale@nxp.com>
-X-ClientProxiedBy: AM3PR03CA0053.eurprd03.prod.outlook.com
- (2603:10a6:207:5::11) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        Sat, 11 Mar 2023 08:29:54 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E29C42D16E
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Mar 2023 05:29:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1678541393; x=1710077393;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5Lk6XXr5r3vVqls5DQfifl/210X9/9UoSfh4M9ydNdg=;
+  b=J5KwWZ9uin0Ce/5ooqwjqF4yklZ/VNNN7OnkenPVLwc4jdA1kAhwwSTR
+   FwdXfecE6zgwe8jU9D9P5u4sIP+9KlFI+cYKMlQWNatpWk54IKvy/mLPw
+   dc34yRsrvpy667XCpgRYLnXSskAK4hVJ53mg+pQ7+nSxFGLlaJ3Jl+qrc
+   JGZAAxpknaLBHnx+N7Yga7VkjG34C5srBm6VrHtUDDqOOxYAnJGeqrZjn
+   AbntIwH7ds1jm3v4ZslS9bNpkf05llFJleCRhIqfI+LUltGB4VuN3D20T
+   JP0trabRxk6RJC5wiH/v/8W7TRNzQR+4Ngmpb+DYWMVk0vUyaUZRWDWSs
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="316548702"
+X-IronPort-AV: E=Sophos;i="5.98,252,1673942400"; 
+   d="scan'208";a="316548702"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2023 05:29:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10646"; a="747057610"
+X-IronPort-AV: E=Sophos;i="5.98,252,1673942400"; 
+   d="scan'208";a="747057610"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 11 Mar 2023 05:29:52 -0800
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pazIF-0004ad-24;
+        Sat, 11 Mar 2023 13:29:51 +0000
+Date:   Sat, 11 Mar 2023 21:29:38 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 1c991f006035c5db11b62f8f327eb683e949431e
+Message-ID: <640c8242.iqwiCayxS7V/0PUx%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|DS7PR13MB4766:EE_
-X-MS-Office365-Filtering-Correlation-Id: c3e35043-6505-405b-f741-08db222cdd6e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rAkfuQ346nGdjw9pVPVyTjaejWgkbR5wjRCUeUBbMLA170BRM86d++4NZ5Gt0HGs8YIMBN9lEmeS6ZSKFciARXFAkvsgXtkOjtRIcVxSy5dudV7YDQlD8K5/oiRuRJEp5dpUeMTFczaPZ7p2g7oi/iaprxuAjqUuLfKZ4phl/61ccZrUEs8I3gYOIztEGdxNuHtXKWgtABanG7nav1PKK1DFc664gEwfgQoLmCmOut7598dwNQc0xw1ZpSuv8wJGOffVvIF6HHYdBiwVitDKrZ1JDz7Fb31zzbVOzkLajTqexKTMaLPbk6YR4a5h1Fow06ri4DEl3E/nInh3xdZ4nQQu6VgOsh9mA4da7IwliMIRZwzsN1yziMT/RCkrimUK4P3AlaxwaJcK/6L2dNP+lWctSbSzAoSXAMUaHTgA/S1TjDSsCFLHw4uuguIlpeiicfrfbziDwY7MsPdVsTTxdp9UsgrFbeYurzJJUxDt/UbNJIf3wK2QZcMXc+K+a2BO4ivXt8cpz27yeOVl3CQojGn00suH7tKEjMyUPQo+gJ9iozYTBgH6X/q0WzemcjKls0DUfDRwJUuEe9Vvmd1zhS+NoBwNhJ8WlQt+bV5SHViMGwhr4nhP2eSdhFEvdp6jORWBbaWqN2ck6upYqPG+9TaokmvRX67dwCR5yUfOrpXU+HTySAvm/I8worlfC0Gj
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(376002)(366004)(346002)(396003)(39830400003)(136003)(451199018)(8936002)(7416002)(41300700001)(5660300002)(2906002)(44832011)(86362001)(36756003)(38100700002)(478600001)(4326008)(8676002)(6916009)(66946007)(6486002)(66476007)(66556008)(2616005)(6666004)(316002)(186003)(6512007)(6506007)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NY1TizAzkW9O+hugywvI/0VyG+LHP7amy5VBHLroVuumqgeyWrMl/PaHGn50?=
- =?us-ascii?Q?hiqVanscinR2uNY1qdL/33kGOzuK+OVjKo4XL7HodDDRBtYky4fdkwUjM024?=
- =?us-ascii?Q?JkIQDlc7Bv8AdsDns5z2vRsgnT6KWOcNngfcqaC9uXcx2YTRtHJdxEz7N8Kv?=
- =?us-ascii?Q?XJ98iC8R3h7hVZCtcdXgd0WQsr5dy44Ea8Ox1yYqUK1n3iOCWdN6TsBiyyVe?=
- =?us-ascii?Q?8hd5ifAFl2ljX6LyEEEmUcOc01+5/EX1bIbgM25XNf7U13JEE6Nzao8TR15y?=
- =?us-ascii?Q?vIjNjP3SqHx97nXeTOx4E0U0flypIqYjE7VYzhYmEMMNEVOzp0w3vnUQxcpd?=
- =?us-ascii?Q?Wl+AkxeZ7xtnce6sttiNHULcAWwbGP3aLvdW6yDe+SCQAZUqVC69et8MULjX?=
- =?us-ascii?Q?kDYBYDDnVdxzsPcssb3BKYH0b6KoU3JCYUPgKAT32DzwQsxq1nthPKiF4EY4?=
- =?us-ascii?Q?OQxJjH1UfqF6K1LjGLx/3TVArIib9VuUV92ysSF7ZsL3S432UgZLjELw9gmD?=
- =?us-ascii?Q?/3IMpt2Ka7TMw/rJWuXoQCi1WrYSF+MqOXuijTd0kk6RUUHd8PVbm/KDqRri?=
- =?us-ascii?Q?Oxvmxp6TukgSTniDB/Qt0K4o55//HnWi4lQA52chzhPXW1FI+IBjbeqsIMOM?=
- =?us-ascii?Q?GdFNCk0qrYW6AjW3AGzLb/AkIFeCELOFe5pRKjaQsmwGiVVU3lHgN03L0j4I?=
- =?us-ascii?Q?sDHfDfph+rxrqaB0OPXHtKcZu7gpy3YFhpW8Dbwj9dSry/xoYZxAxD313Jhu?=
- =?us-ascii?Q?cAFXcWXbS1xih1JWawYSH/sjc6c+leKIuv1VXwnFoW1TIhBr43Ce2rJhkxWc?=
- =?us-ascii?Q?KMZbr4ZhTiMi7Tbujbg60OBZ2yhXwopUwLjyYMPb6D9XOsui8JaHXGso4enn?=
- =?us-ascii?Q?bfscplVuYkgoRuTTM4QUCLXccrcwNbbE3shNnnFtcsByPRBQJCcA7PJbUVgZ?=
- =?us-ascii?Q?CGa/RFQPQyhjMoNTtDnSfRlCZhuQu8xOvXuH6S/8PiKjxigiY8fL5vd+dDrv?=
- =?us-ascii?Q?iAfXaji6NZsi9qmx3PH+yWBRmC23E2O2vc7Am+s6Ppr9kO6PAF10xG4Rb8nS?=
- =?us-ascii?Q?GcsJItOxPyTYc6wDY/8/uU1AATfQvUMOm7tM+E2MrVcAHtXVkCL3LzZVvT1s?=
- =?us-ascii?Q?mBv1ZQjW7Gf3U1lQxrAKVgtw0GXfFoXe+bGQuHf/j3eQ7Xo9xkZ4NDP25Q5u?=
- =?us-ascii?Q?/x1i2jRTs4ufEmzQXmcYVsyoIpAK3lLSorxgW6CX9L1UZflRfS03ECvbD+RL?=
- =?us-ascii?Q?8yhdUDizipV+Gmd6cYBd4i6LLVn+Xst1KhyUSrJrTjfLAdTrAK4JjehxZeKZ?=
- =?us-ascii?Q?jkD10M8l3RvYZ0yF7A7KgKQke1QNKwG4QVKHwwm0nw7E+8NJ9WXYR0T45/7w?=
- =?us-ascii?Q?OQJiiS33XLXUHb5FxlhzzP7nvKk7/EbVLoRhb9rIde6LatwrdGdHjn354iYa?=
- =?us-ascii?Q?16WiLw+GITshQU4ioFRKACoYiUXh1JktG40fDs+5Qk7BPrwp6WOz9eS/g+jh?=
- =?us-ascii?Q?jsqAYdb6MjnmbGVski/uOMZA2CPi0t9KLZkaU3otx+VYCcWyIfsquVcWV0F/?=
- =?us-ascii?Q?LHuVPgew38/9XGOa2m2s56g24xMU4hORII5NMtb/VC9N34a5hGGunVLzPhGh?=
- =?us-ascii?Q?FboV4WOJlWKjeXPVSvFQrUlMWjZJVfDptDIzp9BHqdheBjlqFT1TQC6ZUIxY?=
- =?us-ascii?Q?AiiP0w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3e35043-6505-405b-f741-08db222cdd6e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2023 12:33:49.5905
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ynIZBydM4dnQMZS/lZxilEt8oIX/MVMXUfFP4pOeN6i7wl7nHc/A/3AwgMYEV2oAoZLByvm/2QpM0YtyX7heWFmJtRdaBUU5qw6yaRwjf8M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR13MB4766
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Mar 10, 2023 at 11:49:19PM +0530, Neeraj Sanjay Kale wrote:
-> Adds serdev_device_break_ctl() and an implementation for ttyport.
-> This function simply calls the break_ctl in tty layer, which can
-> assert a break signal over UART-TX line, if the tty and the
-> underlying platform and UART peripheral supports this operation.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
-> v3: Add details to the commit message. (Greg KH)
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 1c991f006035c5db11b62f8f327eb683e949431e  Bluetooth: L2CAP: Delay identity address updates
 
-...
+elapsed time: 724m
 
-> diff --git a/include/linux/serdev.h b/include/linux/serdev.h
-> index 66f624fc618c..c065ef1c82f1 100644
-> --- a/include/linux/serdev.h
-> +++ b/include/linux/serdev.h
+configs tested: 100
+configs skipped: 6
 
-...
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-> @@ -255,6 +257,10 @@ static inline int serdev_device_set_tiocm(struct serdev_device *serdev, int set,
->  {
->  	return -ENOTSUPP;
->  }
-> +static inline int serdev_device_break_ctl(struct serdev_device *serdev, int break_state)
-> +{
-> +	return -EOPNOTSUPP;
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha        buildonly-randconfig-r005-20230310   gcc  
+alpha                               defconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r023-20230310   gcc  
+arc                  randconfig-r043-20230310   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230310   clang
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r022-20230310   gcc  
+csky                 randconfig-r025-20230310   gcc  
+hexagon              randconfig-r003-20230310   clang
+hexagon              randconfig-r004-20230310   clang
+hexagon              randconfig-r041-20230310   clang
+hexagon              randconfig-r045-20230310   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                          randconfig-a001   gcc  
+i386                          randconfig-a002   clang
+i386                          randconfig-a003   gcc  
+i386                          randconfig-a004   clang
+i386                          randconfig-a005   gcc  
+i386                          randconfig-a006   clang
+i386                          randconfig-a011   clang
+i386                          randconfig-a012   gcc  
+i386                          randconfig-a013   clang
+i386                          randconfig-a014   gcc  
+i386                          randconfig-a015   clang
+i386                          randconfig-a016   gcc  
+ia64                             allmodconfig   gcc  
+ia64                                defconfig   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r015-20230310   gcc  
+loongarch            randconfig-r032-20230311   gcc  
+loongarch            randconfig-r033-20230311   gcc  
+m68k                             allmodconfig   gcc  
+m68k         buildonly-randconfig-r004-20230310   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r001-20230310   gcc  
+m68k                 randconfig-r016-20230310   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r006-20230310   gcc  
+nios2        buildonly-randconfig-r003-20230310   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r021-20230310   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r011-20230310   gcc  
+parisc               randconfig-r024-20230310   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc              randconfig-r002-20230310   clang
+powerpc              randconfig-r005-20230310   clang
+powerpc              randconfig-r012-20230310   gcc  
+powerpc              randconfig-r031-20230311   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r036-20230311   gcc  
+riscv                randconfig-r042-20230310   gcc  
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390         buildonly-randconfig-r001-20230310   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r044-20230310   gcc  
+sh                               allmodconfig   gcc  
+sh                   randconfig-r013-20230310   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r034-20230311   gcc  
+sparc64      buildonly-randconfig-r006-20230310   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64                        randconfig-a001   clang
+x86_64                        randconfig-a002   gcc  
+x86_64                        randconfig-a003   clang
+x86_64                        randconfig-a004   gcc  
+x86_64                        randconfig-a005   clang
+x86_64                        randconfig-a006   gcc  
+x86_64                        randconfig-a011   gcc  
+x86_64                        randconfig-a012   clang
+x86_64                        randconfig-a013   gcc  
+x86_64                        randconfig-a014   clang
+x86_64                        randconfig-a015   gcc  
+x86_64                        randconfig-a016   clang
+x86_64                               rhel-8.3   gcc  
+xtensa               randconfig-r026-20230310   gcc  
 
-Is the use of -EOPNOTSUPP intentional here?
-I see -ENOTSUPP is used elsewhere in this file.
-
-> +}
->  static inline int serdev_device_write(struct serdev_device *sdev, const unsigned char *buf,
->  				      size_t count, unsigned long timeout)
->  {
-> -- 
-> 2.34.1
-> 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
