@@ -2,175 +2,149 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8899C74A4B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E758CC6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:50:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229737AbjCKAoj (ORCPT
+        id S231260AbjCKAuQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 19:44:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34966 "EHLO
+        Fri, 10 Mar 2023 19:50:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbjCKAof (ORCPT
+        with ESMTP id S231586AbjCKAtz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:44:35 -0500
-X-Greylist: delayed 330 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 10 Mar 2023 16:44:32 PST
-Received: from m-r1.th.seeweb.it (m-r1.th.seeweb.it [5.144.164.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17E3110CEAF
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:44:32 -0800 (PST)
-Received: from localhost.localdomain (94-211-6-86.cable.dynamic.v4.ziggo.nl [94.211.6.86])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id 8D1E22008F;
-        Sat, 11 Mar 2023 01:39:00 +0100 (CET)
-From:   Marijn Suijten <marijn.suijten@somainline.org>
+        Fri, 10 Mar 2023 19:49:55 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6770114EE7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:48:11 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id x20-20020a17090a8a9400b00233ba727724so8880996pjn.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:48:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678495642;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GcnDg8Z7WGEEH1ZaQ3pRyfxNZF7233jBeqjI2RRVg4w=;
+        b=bEqaUDaqheuApggrq6k9gP6A3jEvnGhORzL33SvYd+I0sZGMaCXnmb6JkVNk4nKKw7
+         8vAbffguZw6Y9voSNWbXvkH9I894Avy8/upTWsi5Z+UJgF1Okh2/AexWkhpV++FdgCoI
+         cs9WK5ydYZvgJD10eeE/WkztiZLWQ/8tGHnCowQ0/uVPXKwfNwPoHfotPeCaMRvjtnlv
+         75FRAFUQ16NYIT+Blj6dfnW/GW4pqGT8cMXDAqye6MCljQvxBcxjwkRqad5Nznb3BreI
+         Vz7awypPQdFwd5b81pySAVkBxrXAMCC8BPJJxrdkdw/UMV87hjfxPUFVQkD/HAhQsieX
+         JtsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678495642;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GcnDg8Z7WGEEH1ZaQ3pRyfxNZF7233jBeqjI2RRVg4w=;
+        b=ijOFF/yHGPBvAzq9fwg+kSmWYBYfD2qX3gv3sv5mMiQ71VETxNLtKYKv/FAwMvfYql
+         DmWgm1IqFu9CWsZIuM7scOGT2sePruMgUC+wqenJNe5sgMqeCMAjxeY47hAYhnCd8Q68
+         iRdUlfDq0AG2qWNGBj7ftBH7WejGEK0rDfN7xRnVZZrur5cim7RMzOVlZo6oD3YK81nj
+         H8Obx0Z6I2nRZrA8P8RdxdZbqk3cIeHXqbTXm3ZNSrMA8dDcaHBIdLQ7dkSEX/590whQ
+         uAaQWD45VfTnidx8r4qTXwetZfDhy9mE7itNDqPmEvR45oaPtLOISJeWMunTHFVih9Uu
+         U4Ng==
+X-Gm-Message-State: AO0yUKVNaqOD0HRRGwHiWq3NTkCeb/P+xzm9Pg2ASODLRp9MXDVW14p3
+        /6H4ojM5KG7/pkIURW+QngbXdVSBBxA=
+X-Google-Smtp-Source: AK7set/AaBAsuGCYxc8qv7fN3dK9ZJSazwWswmQ7C+epEx77nr62lMMpHadMNEanP092Cvrtn+AfuA==
+X-Received: by 2002:a17:902:e80d:b0:19c:cb64:dacc with SMTP id u13-20020a170902e80d00b0019ccb64daccmr32657725plg.61.1678495642342;
+        Fri, 10 Mar 2023 16:47:22 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id kh12-20020a170903064c00b0019f0f670c00sm508826plb.225.2023.03.10.16.47.21
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Mar 2023 16:47:21 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Marijn Suijten <marijn.suijten@somainline.org>,
-        Yu Liu <yudiliu@google.com>,
-        Bartosz Fabianowski <bartosz@fabianowski.eu>,
-        Pauli Virtanen <pav@iki.fi>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marek Czerski <ma.czerski@gmail.com>
-Subject: [PATCH BlueZ v3 3/3] audio/avrcp: Determine Absolute Volume support from feature category 2
-Date:   Sat, 11 Mar 2023 01:38:26 +0100
-Message-Id: <20230311003826.454858-4-marijn.suijten@somainline.org>
+Subject: [PATCH BlueZ] shared/att: Use a short timeout for EATT bearer
+Date:   Fri, 10 Mar 2023 16:47:20 -0800
+Message-Id: <20230311004720.4017529-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230311003826.454858-1-marijn.suijten@somainline.org>
-References: <20230311003826.454858-1-marijn.suijten@somainline.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The AVRCP spec (1.6.2) does not mention anything about a version
-requirement for Absolute Volume, despite this feature only existing
-since spec version 1.4.  Android reports a version of 1.3 [1] for its
-"AVRCP remote" (CT) service and mentions in the comment above it itself
-relies on feature bits rather than the exposed version.  As it stands
-BlueZ requires at least version 1.4 making it unable to communicate
-absolute volume levels with even the most recent Android phones running
-Fluoride (have not checked the version on Gabeldorsche).
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The spec states that supporting SetAbsoluteVolume and
-EVENT_VOLUME_CHANGED are mandatory when feature level 2 is declared,
-excluded otherwise.  This feature bit is set on Android and, when used
-by this patch, allows for successfully communicating volume back and
-forth despite the version theoretically being too low.
-
-In order to not affect spec tests too much (which I doubt would catch
-this, and should have otherwise pointed out that Android itself is out
-of spec) this behaviour is guarded behind a config option in main.conf,
-as discussed in [2].
-
-[1]: https://android.googlesource.com/platform/system/bt/+/android-11.0.0_r28/bta/av/bta_av_main.cc#761
-[2]: https://marc.info/?l=linux-bluetooth&m=163463497503113&w=2
+This uses 5 seconds timeout for EATT bearers since it maybe possible
+that other channels can be used so the operation can be resend.
 ---
- profiles/audio/avrcp.c | 16 ++++++++++------
- src/btd.h              |  1 +
- src/main.c             |  8 ++++++++
- src/main.conf          |  6 ++++++
- 4 files changed, 25 insertions(+), 6 deletions(-)
+ src/shared/att.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index c16f9cfef..11f18f25d 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1761,7 +1761,8 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
- 	 * The controller on the remote end is only allowed to call SetAbsoluteVolume
- 	 * on our target if it's at least version 1.4 and a category-2 device.
- 	 */
--	if (!session->target || session->target->version < 0x0104 ||
-+	if (!session->target ||
-+			(session->target->version < 0x0104 && !btd_opts.avrcp.allow_volume_changed_on_pre_1_4_ct) ||
- 			!(session->target->features & AVRCP_FEATURE_CATEGORY_2)) {
- 		error("Remote SetAbsoluteVolume rejected from non-category-2 peer");
- 		goto err;
-@@ -4171,13 +4172,15 @@ static void target_init(struct avrcp *session)
- 				(1 << AVRCP_EVENT_TRACK_REACHED_END) |
- 				(1 << AVRCP_EVENT_SETTINGS_CHANGED);
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 85feead77d0f..b8fc44b16b20 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -30,6 +30,7 @@
+ #define ATT_OP_CMD_MASK			0x40
+ #define ATT_OP_SIGNED_MASK		0x80
+ #define ATT_TIMEOUT_INTERVAL		30000  /* 30000 ms */
++#define EATT_TIMEOUT_INTERVAL		5000  /* 5000 ms */
  
--	if (target->version < 0x0104)
--		return;
--
--	if (target->features & AVRCP_FEATURE_CATEGORY_2)
-+	/* Remote device supports receiving volume notifications */
-+	if ((target->version >= 0x0104 || btd_opts.avrcp.allow_volume_changed_on_pre_1_4_ct) &&
-+			target->features & AVRCP_FEATURE_CATEGORY_2)
- 		session->supported_events |=
- 				(1 << AVRCP_EVENT_VOLUME_CHANGED);
+ /* Length of signature in write signed packet */
+ #define BT_ATT_SIGNATURE_LEN		12
+@@ -42,6 +43,7 @@ struct bt_att_chan {
+ 	struct io *io;
+ 	uint8_t type;
+ 	int sec_level;			/* Only used for non-L2CAP */
++	int timeout;
  
-+	if (target->version < 0x0104)
-+		return;
-+
- 	session->supported_events |=
- 				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
- 				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
-@@ -4595,7 +4598,8 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
- 		return -ENOTCONN;
+ 	struct queue *queue;		/* Channel dedicated queue */
  
- 	if (notify) {
--		if (!session->target || session->target->version < 0x0104 ||
-+		if (!session->target ||
-+				(session->target->version < 0x0104 && !btd_opts.avrcp.allow_volume_changed_on_pre_1_4_ct) ||
- 				!(session->target->features & AVRCP_FEATURE_CATEGORY_2)) {
- 			error("Can't send EVENT_VOLUME_CHANGED to non-category-2 peer");
- 			return -ENOTSUP;
-diff --git a/src/btd.h b/src/btd.h
-index 31c04a990..07d1d961f 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -99,6 +99,7 @@ struct btd_avdtp_opts {
- 
- struct btd_avrcp_opts {
- 	gboolean set_absolute_volume_without_target;
-+	gboolean allow_volume_changed_on_pre_1_4_ct;
+@@ -470,6 +472,8 @@ struct timeout_data {
+ 	unsigned int id;
  };
  
- struct btd_advmon_opts {
-diff --git a/src/main.c b/src/main.c
-index 92f74e381..a2b81f940 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -154,6 +154,7 @@ static const char *avdtp_options[] = {
- 
- static const char *avrcp_options[] = {
- 	"SetAbsoluteVolumeWithoutTarget",
-+	"AllowVolumeChangedOnPre1_4Controller",
- 	NULL
- };
- 
-@@ -988,6 +989,13 @@ static void parse_config(GKeyFile *config)
- 	else
- 		btd_opts.avrcp.set_absolute_volume_without_target = boolean;
- 
-+	boolean = g_key_file_get_boolean(config, "AVRCP",
-+						"AllowVolumeChangedOnPre1_4Controller", &err);
-+	if (err)
-+		g_clear_error(&err);
-+	else
-+		btd_opts.avrcp.allow_volume_changed_on_pre_1_4_ct = boolean;
++static void wakeup_writer(struct bt_att *att);
 +
- 	val = g_key_file_get_integer(config, "AdvMon", "RSSISamplingPeriod",
- 									&err);
- 	if (err) {
-diff --git a/src/main.conf b/src/main.conf
-index ca00ed03e..286d092bf 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -277,6 +277,12 @@
- # profile.
- #SetAbsoluteVolumeWithoutTarget = false
+ static bool timeout_cb(void *user_data)
+ {
+ 	struct timeout_data *timeout = user_data;
+@@ -495,7 +499,16 @@ static bool timeout_cb(void *user_data)
+ 		att->timeout_callback(op->id, op->opcode, att->timeout_data);
  
-+# Allow peer AVRCP controller with version 1.3 access to category-2 (absolute volume) features.
-+# This is common for AOSP to not signal the desired minimum version of 1.4 while still supporting
-+# absolute volume based on the feature category bit, as mentioned in the comment:
-+# https://android.googlesource.com/platform/system/bt/+/android-12.0.0_r1/bta/av/bta_av_main.cc#621
-+AllowVolumeChangedOnPre1_4Controller = true
+ 	op->timeout_id = 0;
+-	disc_att_send_op(op);
 +
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
++	/* Resend op if it is using EATT bearer and there are more channels
++	 * left that could be used since there maybe a problem with the channel
++	 * e.g. not enough credits to send the entire packet.
++	 */
++	if (chan->type == BT_ATT_EATT && queue_length(att->chans) > 1) {
++		queue_push_tail(att->req_queue, op);
++		wakeup_writer(att);
++	} else
++		disc_att_send_op(op);
+ 
+ 	/*
+ 	 * Directly terminate the connection as required by the ATT protocol.
+@@ -585,8 +598,7 @@ static bool can_write_data(struct io *io, void *user_data)
+ 	timeout = new0(struct timeout_data, 1);
+ 	timeout->chan = chan;
+ 	timeout->id = op->id;
+-	op->timeout_id = timeout_add(ATT_TIMEOUT_INTERVAL, timeout_cb,
+-								timeout, free);
++	op->timeout_id = timeout_add(chan->timeout, timeout_cb, timeout, free);
+ 
+ 	/* Return true as there may be more operations ready to write. */
+ 	return true;
+@@ -1204,9 +1216,16 @@ static struct bt_att_chan *bt_att_chan_new(int fd, uint8_t type)
+ 		/* fall through */
+ 	case BT_ATT_LE:
+ 		chan->mtu = BT_ATT_DEFAULT_LE_MTU;
++		chan->timeout = ATT_TIMEOUT_INTERVAL;
+ 		break;
+-	default:
++	case BT_ATT_BREDR:
+ 		chan->mtu = io_get_mtu(chan->fd);
++		chan->timeout = ATT_TIMEOUT_INTERVAL;
++		break;
++	case BT_ATT_EATT:
++		chan->mtu = io_get_mtu(chan->fd);
++		chan->timeout = EATT_TIMEOUT_INTERVAL;
++		break;
+ 	}
+ 
+ 	if (chan->mtu < BT_ATT_DEFAULT_LE_MTU)
 -- 
 2.39.2
 
