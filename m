@@ -2,101 +2,173 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 210C0C6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2BEC6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:44:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231175AbjCKAlg (ORCPT
+        id S229697AbjCKAog (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 19:41:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54116 "EHLO
+        Fri, 10 Mar 2023 19:44:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230389AbjCKAlH (ORCPT
+        with ESMTP id S229469AbjCKAof (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 19:41:07 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353AB139072
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:40:32 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 10 Mar 2023 19:44:35 -0500
+Received: from m-r1.th.seeweb.it (m-r1.th.seeweb.it [5.144.164.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C534134AE0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:44:32 -0800 (PST)
+Received: from localhost.localdomain (94-211-6-86.cable.dynamic.v4.ziggo.nl [94.211.6.86])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 303BCB82473
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Mar 2023 00:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CCA71C4339C;
-        Sat, 11 Mar 2023 00:40:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678495220;
-        bh=9POsjiQfg3M3sEKMv2PJWbmr4dbQHjFLZs31jyFHjOs=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=stdaCtdFdpgINmExiyZWV7z+cINBEZ7QvaHix5iwPcHY1moT3borWt0XlqbfDW3pK
-         5ZKyya3GAWMXJNmB8pitF89yTOlUONHwi4QBDq5O2rKzrMArC9yK8EcTQJ7flLjgIZ
-         OUMovENnjCa/TPype7X/fMvhjX/MMKLsl37TmiGXgkurE6K8isES5RVRf/IToihKsQ
-         BqYu6JFySTxkVAHgQY5Tl55F6C1mmAQimoAjQXgXRpkJ0KQblaPiZvhXpPeHf7hAfZ
-         HZ/sovg08Qy3nRdsHZxxemu41OyUbyDVpwR2BX+in+Poju06ys0fwfHqTFGa7Kj3LI
-         dYxkUf4p+7VWg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AE3E4E21EEA;
-        Sat, 11 Mar 2023 00:40:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id DA57A20084;
+        Sat, 11 Mar 2023 01:38:59 +0100 (CET)
+From:   Marijn Suijten <marijn.suijten@somainline.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marijn Suijten <marijn.suijten@somainline.org>,
+        Yu Liu <yudiliu@google.com>,
+        Bartosz Fabianowski <bartosz@fabianowski.eu>,
+        Pauli Virtanen <pav@iki.fi>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marek Czerski <ma.czerski@gmail.com>
+Subject: [PATCH BlueZ v3 1/3] audio/avrcp: Guard SetAbsoluteVolume without target behind config value
+Date:   Sat, 11 Mar 2023 01:38:24 +0100
+Message-Id: <20230311003826.454858-2-marijn.suijten@somainline.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230311003826.454858-1-marijn.suijten@somainline.org>
+References: <20230311003826.454858-1-marijn.suijten@somainline.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [RFC v2 01/12] shared/crypto: Add bt_crypto_sirk
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167849522070.21816.4954897604805294201.git-patchwork-notify@kernel.org>
-Date:   Sat, 11 Mar 2023 00:40:20 +0000
-References: <20230307222422.2608483-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230307222422.2608483-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Commit 179ccb936 ("avrcp: Set volume if volume changed event is
+registered") introduced a catch that allows SetAbsoluteVolume to be sent
+to a remote device that does _not_ implement the AVRCP TG profile.  This
+is strange as the TG role is required to be able to send commands to the
+peer, but the commit must have been applied to the tree for a reason.
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+We discussed in [1] that workarounds for dubious peers and software
+stacks should be guarded behind a config entry in main.conf, so this
+starts out by introducing a new [AVRCP] category to to it that will
+later be extended with other workarounds.
 
-On Tue,  7 Mar 2023 14:24:11 -0800 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds bt_crypto_sirk which attempts to generate a unique SIRK using
-> the following steps:
-> 
->  - Generate a hash (k) using the str as input
->  - Generate a hash (sirk) using vendor, product, version and source as input
->  - Encrypt sirk using k as LTK with sef function.
-> 
-> [...]
+[1]: https://marc.info/?l=linux-bluetooth&m=163519566912788&w=2
+---
+ profiles/audio/avrcp.c | 12 +++++++++---
+ src/btd.h              |  5 +++++
+ src/main.c             | 13 +++++++++++++
+ src/main.conf          |  6 ++++++
+ 4 files changed, 33 insertions(+), 3 deletions(-)
 
-Here is the summary with links:
-  - [RFC,v2,01/12] shared/crypto: Add bt_crypto_sirk
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c1dd94cc7f81
-  - [RFC,v2,02/12] shared/ad: Add RSI data type
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c2e99aefd337
-  - [RFC,v2,03/12] doc: Add set-api
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6477522e92e3
-  - [RFC,v2,04/12] device-api: Add Set property
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5bac4cddb191
-  - [RFC,v2,05/12] core: Add initial implementation of DeviceSet interface
-    (no matching commit)
-  - [RFC,v2,06/12] core: Check if device has RSI
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f95ffcc8b1fe
-  - [RFC,v2,07/12] main.conf: Add CSIP profile configurable options
-    (no matching commit)
-  - [RFC,v2,08/12] shared/csip: Add initial code for handling CSIP
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d297a03b7a61
-  - [RFC,v2,09/12] profiles: Add initial code for csip plugin
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9e1eb0a62b3f
-  - [RFC,v2,10/12] tools: Add support to generate RSI using SIRK
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c446a64d461b
-  - [RFC,v2,11/12] client: Add support for DeviceSet proxy
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=373bafc34ce6
-  - [RFC,v2,12/12] client: Use AdvertisingFlags when available
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=815f779aa8e4
-
-You are awesome, thank you!
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 80f34c7a7..5e6322916 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -48,6 +48,7 @@
+ #include "src/dbus-common.h"
+ #include "src/shared/timeout.h"
+ #include "src/shared/util.h"
++#include "src/btd.h"
+ 
+ #include "avctp.h"
+ #include "avrcp.h"
+@@ -4577,9 +4578,14 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+ 								&volume);
+ 	}
+ 
+-	if (!session->controller && !avrcp_event_registered(session,
+-					AVRCP_EVENT_VOLUME_CHANGED))
+-		return -ENOTSUP;
++	if (btd_opts.avrcp.set_absolute_volume_without_target) {
++		if (!session->controller && !avrcp_event_registered(session,
++						AVRCP_EVENT_VOLUME_CHANGED))
++			return -ENOTSUP;
++	} else {
++		if (!session->controller || session->controller->version < 0x0104)
++			return -ENOTSUP;
++	}
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+diff --git a/src/btd.h b/src/btd.h
+index 42cffcde4..31c04a990 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -97,6 +97,10 @@ struct btd_avdtp_opts {
+ 	uint8_t  stream_mode;
+ };
+ 
++struct btd_avrcp_opts {
++	gboolean set_absolute_volume_without_target;
++};
++
+ struct btd_advmon_opts {
+ 	uint8_t		rssi_sampling_period;
+ };
+@@ -136,6 +140,7 @@ struct btd_opts {
+ 	enum mps_mode_t	mps;
+ 
+ 	struct btd_avdtp_opts avdtp;
++	struct btd_avrcp_opts avrcp;
+ 
+ 	uint8_t		key_size;
+ 
+diff --git a/src/main.c b/src/main.c
+index 99d9c508f..92f74e381 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -152,6 +152,11 @@ static const char *avdtp_options[] = {
+ 	NULL
+ };
+ 
++static const char *avrcp_options[] = {
++	"SetAbsoluteVolumeWithoutTarget",
++	NULL
++};
++
+ static const char *advmon_options[] = {
+ 	"RSSISamplingPeriod",
+ 	NULL
+@@ -167,6 +172,7 @@ static const struct group_table {
+ 	{ "Policy",	policy_options },
+ 	{ "GATT",	gatt_options },
+ 	{ "AVDTP",	avdtp_options },
++	{ "AVRCP",	avrcp_options },
+ 	{ "AdvMon",	advmon_options },
+ 	{ }
+ };
+@@ -975,6 +981,13 @@ static void parse_config(GKeyFile *config)
+ 		g_free(str);
+ 	}
+ 
++	boolean = g_key_file_get_boolean(config, "AVRCP",
++						"SetAbsoluteVolumeWithoutTarget", &err);
++	if (err)
++		g_clear_error(&err);
++	else
++		btd_opts.avrcp.set_absolute_volume_without_target = boolean;
++
+ 	val = g_key_file_get_integer(config, "AdvMon", "RSSISamplingPeriod",
+ 									&err);
+ 	if (err) {
+diff --git a/src/main.conf b/src/main.conf
+index f187c9aaa..ca00ed03e 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -271,6 +271,12 @@
+ # streaming: Use L2CAP Streaming Mode
+ #StreamMode = basic
+ 
++[AVRCP]
++# Allow SetAbsoluteVolume calls to a peer device that
++# does not advertise the AVRCP remote control target
++# profile.
++#SetAbsoluteVolumeWithoutTarget = false
++
+ [Policy]
+ #
+ # The ReconnectUUIDs defines the set of remote services that should try
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.39.2
 
