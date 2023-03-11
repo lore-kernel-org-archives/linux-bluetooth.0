@@ -2,26 +2,27 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2BEC6FA99
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 087CAC6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229697AbjCKAog (ORCPT
+        id S229708AbjCKAoi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 19:44:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34936 "EHLO
+        Fri, 10 Mar 2023 19:44:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjCKAof (ORCPT
+        with ESMTP id S229577AbjCKAof (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 10 Mar 2023 19:44:35 -0500
-Received: from m-r1.th.seeweb.it (m-r1.th.seeweb.it [5.144.164.170])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C534134AE0
+X-Greylist: delayed 333 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 10 Mar 2023 16:44:33 PST
+Received: from relay01.th.seeweb.it (relay01.th.seeweb.it [IPv6:2001:4b7a:2000:18::162])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C319134AD7
         for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:44:32 -0800 (PST)
 Received: from localhost.localdomain (94-211-6-86.cable.dynamic.v4.ziggo.nl [94.211.6.86])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id DA57A20084;
-        Sat, 11 Mar 2023 01:38:59 +0100 (CET)
+        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id 3994C2008D;
+        Sat, 11 Mar 2023 01:39:00 +0100 (CET)
 From:   Marijn Suijten <marijn.suijten@somainline.org>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Marijn Suijten <marijn.suijten@somainline.org>,
@@ -30,9 +31,9 @@ Cc:     Marijn Suijten <marijn.suijten@somainline.org>,
         Pauli Virtanen <pav@iki.fi>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Marek Czerski <ma.czerski@gmail.com>
-Subject: [PATCH BlueZ v3 1/3] audio/avrcp: Guard SetAbsoluteVolume without target behind config value
-Date:   Sat, 11 Mar 2023 01:38:24 +0100
-Message-Id: <20230311003826.454858-2-marijn.suijten@somainline.org>
+Subject: [PATCH BlueZ v3 2/3] audio/avrcp: Only allow absolute volume call/event on category-2 peers
+Date:   Sat, 11 Mar 2023 01:38:25 +0100
+Message-Id: <20230311003826.454858-3-marijn.suijten@somainline.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230311003826.454858-1-marijn.suijten@somainline.org>
 References: <20230311003826.454858-1-marijn.suijten@somainline.org>
@@ -42,133 +43,102 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 179ccb936 ("avrcp: Set volume if volume changed event is
-registered") introduced a catch that allows SetAbsoluteVolume to be sent
-to a remote device that does _not_ implement the AVRCP TG profile.  This
-is strange as the TG role is required to be able to send commands to the
-peer, but the commit must have been applied to the tree for a reason.
-
-We discussed in [1] that workarounds for dubious peers and software
-stacks should be guarded behind a config entry in main.conf, so this
-starts out by introducing a new [AVRCP] category to to it that will
-later be extended with other workarounds.
-
-[1]: https://marc.info/?l=linux-bluetooth&m=163519566912788&w=2
+Restrict the use of SetAbsoluteVolume and EVENT_VOLUME_CHANGED to peers
+with at least AVRCP version 1.4 and AVRCP_FEATURE_CATEGORY_2 on their
+respective target or controller profiles.
 ---
- profiles/audio/avrcp.c | 12 +++++++++---
- src/btd.h              |  5 +++++
- src/main.c             | 13 +++++++++++++
- src/main.conf          |  6 ++++++
- 4 files changed, 33 insertions(+), 3 deletions(-)
+ profiles/audio/avrcp.c | 39 ++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 34 insertions(+), 5 deletions(-)
 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 80f34c7a7..5e6322916 100644
+index 5e6322916..c16f9cfef 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -48,6 +48,7 @@
- #include "src/dbus-common.h"
- #include "src/shared/timeout.h"
- #include "src/shared/util.h"
-+#include "src/btd.h"
+@@ -1757,6 +1757,16 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
+ 	if (len != 1)
+ 		goto err;
  
- #include "avctp.h"
- #include "avrcp.h"
-@@ -4577,9 +4578,14 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
++	/**
++	 * The controller on the remote end is only allowed to call SetAbsoluteVolume
++	 * on our target if it's at least version 1.4 and a category-2 device.
++	 */
++	if (!session->target || session->target->version < 0x0104 ||
++			!(session->target->features & AVRCP_FEATURE_CATEGORY_2)) {
++		error("Remote SetAbsoluteVolume rejected from non-category-2 peer");
++		goto err;
++	}
++
+ 	volume = pdu->params[0] & 0x7F;
+ 
+ 	media_transport_update_device_volume(session->dev, volume);
+@@ -3728,6 +3738,16 @@ static void avrcp_volume_changed(struct avrcp *session,
+ 	struct avrcp_player *player = target_get_player(session);
+ 	int8_t volume;
+ 
++	/**
++	 * The target on the remote end is only allowed to reply to EVENT_VOLUME_CHANGED
++	 * on our controller if it's at least version 1.4 and a category-2 device.
++	 */
++	if (!session->controller || session->controller->version < 0x0104 ||
++			!(session->controller->features & AVRCP_FEATURE_CATEGORY_2)) {
++		error("Remote EVENT_VOLUME_CHANGED rejected from non-category-2 peer");
++		return;
++	}
++
+ 	volume = pdu->params[1] & 0x7F;
+ 
+ 	/* Always attempt to update the transport volume */
+@@ -3981,7 +4001,7 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
+ 		case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+ 		case AVRCP_EVENT_UIDS_CHANGED:
+ 		case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+-			/* These events above requires a player */
++			/* These events above require a player */
+ 			if (!session->controller ||
+ 						!session->controller->player)
+ 				break;
+@@ -4154,10 +4174,13 @@ static void target_init(struct avrcp *session)
+ 	if (target->version < 0x0104)
+ 		return;
+ 
++	if (target->features & AVRCP_FEATURE_CATEGORY_2)
++		session->supported_events |=
++				(1 << AVRCP_EVENT_VOLUME_CHANGED);
++
+ 	session->supported_events |=
+ 				(1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED) |
+-				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED) |
+-				(1 << AVRCP_EVENT_VOLUME_CHANGED);
++				(1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED);
+ 
+ 	/* Only check capabilities if controller is not supported */
+ 	if (session->controller == NULL)
+@@ -4572,8 +4595,11 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+ 		return -ENOTCONN;
+ 
+ 	if (notify) {
+-		if (!session->target)
++		if (!session->target || session->target->version < 0x0104 ||
++				!(session->target->features & AVRCP_FEATURE_CATEGORY_2)) {
++			error("Can't send EVENT_VOLUME_CHANGED to non-category-2 peer");
+ 			return -ENOTSUP;
++		}
+ 		return avrcp_event(session, AVRCP_EVENT_VOLUME_CHANGED,
  								&volume);
  	}
- 
--	if (!session->controller && !avrcp_event_registered(session,
--					AVRCP_EVENT_VOLUME_CHANGED))
--		return -ENOTSUP;
-+	if (btd_opts.avrcp.set_absolute_volume_without_target) {
-+		if (!session->controller && !avrcp_event_registered(session,
-+						AVRCP_EVENT_VOLUME_CHANGED))
-+			return -ENOTSUP;
-+	} else {
-+		if (!session->controller || session->controller->version < 0x0104)
-+			return -ENOTSUP;
-+	}
- 
- 	memset(buf, 0, sizeof(buf));
- 
-diff --git a/src/btd.h b/src/btd.h
-index 42cffcde4..31c04a990 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -97,6 +97,10 @@ struct btd_avdtp_opts {
- 	uint8_t  stream_mode;
- };
- 
-+struct btd_avrcp_opts {
-+	gboolean set_absolute_volume_without_target;
-+};
-+
- struct btd_advmon_opts {
- 	uint8_t		rssi_sampling_period;
- };
-@@ -136,6 +140,7 @@ struct btd_opts {
- 	enum mps_mode_t	mps;
- 
- 	struct btd_avdtp_opts avdtp;
-+	struct btd_avrcp_opts avrcp;
- 
- 	uint8_t		key_size;
- 
-diff --git a/src/main.c b/src/main.c
-index 99d9c508f..92f74e381 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -152,6 +152,11 @@ static const char *avdtp_options[] = {
- 	NULL
- };
- 
-+static const char *avrcp_options[] = {
-+	"SetAbsoluteVolumeWithoutTarget",
-+	NULL
-+};
-+
- static const char *advmon_options[] = {
- 	"RSSISamplingPeriod",
- 	NULL
-@@ -167,6 +172,7 @@ static const struct group_table {
- 	{ "Policy",	policy_options },
- 	{ "GATT",	gatt_options },
- 	{ "AVDTP",	avdtp_options },
-+	{ "AVRCP",	avrcp_options },
- 	{ "AdvMon",	advmon_options },
- 	{ }
- };
-@@ -975,6 +981,13 @@ static void parse_config(GKeyFile *config)
- 		g_free(str);
+@@ -4583,8 +4609,11 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+ 						AVRCP_EVENT_VOLUME_CHANGED))
+ 			return -ENOTSUP;
+ 	} else {
+-		if (!session->controller || session->controller->version < 0x0104)
++		if (!session->controller || session->controller->version < 0x0104 ||
++				!(session->controller->features & AVRCP_FEATURE_CATEGORY_2)) {
++			error("Can't send SetAbsoluteVolume to non-category-2 peer");
+ 			return -ENOTSUP;
++		}
  	}
  
-+	boolean = g_key_file_get_boolean(config, "AVRCP",
-+						"SetAbsoluteVolumeWithoutTarget", &err);
-+	if (err)
-+		g_clear_error(&err);
-+	else
-+		btd_opts.avrcp.set_absolute_volume_without_target = boolean;
-+
- 	val = g_key_file_get_integer(config, "AdvMon", "RSSISamplingPeriod",
- 									&err);
- 	if (err) {
-diff --git a/src/main.conf b/src/main.conf
-index f187c9aaa..ca00ed03e 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -271,6 +271,12 @@
- # streaming: Use L2CAP Streaming Mode
- #StreamMode = basic
- 
-+[AVRCP]
-+# Allow SetAbsoluteVolume calls to a peer device that
-+# does not advertise the AVRCP remote control target
-+# profile.
-+#SetAbsoluteVolumeWithoutTarget = false
-+
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
+ 	memset(buf, 0, sizeof(buf));
 -- 
 2.39.2
 
