@@ -2,101 +2,72 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF49C6FA99
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Mar 2023 23:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250EBC6FA99
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Mar 2023 00:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231997AbjCJXUB (ORCPT
+        id S229764AbjCKAjQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Mar 2023 18:20:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46286 "EHLO
+        Fri, 10 Mar 2023 19:39:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231794AbjCJXTk (ORCPT
+        with ESMTP id S229757AbjCKAjI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Mar 2023 18:19:40 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCCFDDB2E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 15:19:20 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id bf15so2679608iob.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 15:19:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678490359;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VgxGDKytYB5TEBnrfThGNFSsD57P3bRpHMy2unjDeY8=;
-        b=OUukDHPscub9iIjaLPSMCNWtqeKYvrBNIaUkKFUoEftvOGfn13QCg0agNjQw9WE4g5
-         xAZfGjzUNX4Q6lBGHJsd1vb1ijMwVaPiw6Hv9uSS3Kizebx6zb+B5Qm39LUQ6Hu2gtHv
-         wUZIgLcSoEExe0KI72c7LWy/5Q89SpfUQ6VfTyvnsf616sV0zZAmJZLgcQzeyTuSx0/z
-         jEI2yUG0G5rK7VDcJGEopgrYgGQtrDyg4IP3QzRiy1r/jI7Hd2tr1k7hk8XCHrl7KOFs
-         +zjHxFVITac7FPM23aRF8NlpIqeT/mcr8PWogaMt5sNLKhKKwrY4sgUvunt9+wvZUCKf
-         1WPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678490359;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VgxGDKytYB5TEBnrfThGNFSsD57P3bRpHMy2unjDeY8=;
-        b=x2GTiuvdPWLOWQ2KiG+F+5DBNDKP0n9SjioVbiPeCcJZWtP9grl1L6pbjWg13wfyUB
-         KzvWop1ycDBCN6ZKcd7WpOp4iqwHvJHI02QTINZLOvy6JH4Oe4fJNp47gfjEf6fgk/GQ
-         wloU7i7dSHUczgiOsyDIgNw9FDswyMcAT9pCnL/qWMjIz51cVB6XsLuT5RsH67ffZ63g
-         lYM8RmhS3fBCkzPu1lmsOgDRp7o2q30aEi0/HHCEP42m2zdRl9AthORcnj6oHkRhYafS
-         qg4cq6cyi8tnfOuCTzEeqtp4wzU/5KJYWs44+A+0628QRTFeB5yF0hBQCXU/xGblaQWG
-         1x4g==
-X-Gm-Message-State: AO0yUKUe6W9RbTQlvjDxjDrS4ebHrX4qxLzEGOf/mXYnol/nxm/zjTrk
-        Uo0F1Pd41LnA3qtRHyaKmHiPSKwEekU=
-X-Google-Smtp-Source: AK7set8TNNhzE61AJNLghwMS66VX6KGwz6O2U2EtCMImxenxJntwniTyNXwAQwlEHHFysU3nH/1XaQ==
-X-Received: by 2002:a5e:dd48:0:b0:74c:923c:7d84 with SMTP id u8-20020a5edd48000000b0074c923c7d84mr16345647iop.7.1678490359261;
-        Fri, 10 Mar 2023 15:19:19 -0800 (PST)
-Received: from [172.17.0.2] ([40.77.125.166])
-        by smtp.gmail.com with ESMTPSA id a14-20020a6b660e000000b0073fe9d412fasm296548ioc.33.2023.03.10.15.19.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Mar 2023 15:19:18 -0800 (PST)
-Message-ID: <640bbaf6.6b0a0220.c9fb6.09b8@mx.google.com>
-Date:   Fri, 10 Mar 2023 15:19:18 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6520139949669049708=="
+        Fri, 10 Mar 2023 19:39:08 -0500
+Received: from relay02.th.seeweb.it (relay02.th.seeweb.it [5.144.164.163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C4D91135CE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Mar 2023 16:39:01 -0800 (PST)
+Received: from localhost.localdomain (94-211-6-86.cable.dynamic.v4.ziggo.nl [94.211.6.86])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id DDBFF20081;
+        Sat, 11 Mar 2023 01:38:55 +0100 (CET)
+From:   Marijn Suijten <marijn.suijten@somainline.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marijn Suijten <marijn.suijten@somainline.org>,
+        Yu Liu <yudiliu@google.com>,
+        Bartosz Fabianowski <bartosz@fabianowski.eu>,
+        Pauli Virtanen <pav@iki.fi>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marek Czerski <ma.czerski@gmail.com>
+Subject: [PATCH BlueZ v3 0/3] audio/avrcp: Determine Absolute Volume support from feature category 2
+Date:   Sat, 11 Mar 2023 01:38:23 +0100
+Message-Id: <20230311003826.454858-1-marijn.suijten@somainline.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/2] iso-tester: Update High Reliability presets
-In-Reply-To: <20230310214001.3891437-1-luiz.dentz@gmail.com>
-References: <20230310214001.3891437-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6520139949669049708==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Changes since v2:
 
-This is automated email and please do not reply to this email!
+- New patch to guard target-less SetAbsoluteVolume calls with main.conf
+  config;
+- New patch to more strictly require category-2 _and_ peer CT/TG 1.4;
+- Use main.conf to relax 1.4 version constraint for TGs registering
+  AbsVol notifications;
 
-Dear submitter,
+v2: https://marc.info/?l=linux-bluetooth&m=163519566912788&w=2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=728899
+I'd rather revert 179ccb936 ("avrcp: Set volume if volume changed event
+is registered") entirely, paired with additional checks in common
+codepaths for controller and target not being NULL when sending and
+receiving control messages respectively (which then don't need to be
+double-checked in the AbsVol codepaths for example).
 
----Test result---
+Marijn Suijten (3):
+  audio/avrcp: Guard SetAbsoluteVolume without target behind config
+    value
+  audio/avrcp: Only allow absolute volume call/event on category-2 peers
+  audio/avrcp: Determine Absolute Volume support from feature category 2
 
-Test Summary:
-CheckPatch                    PASS      0.81 seconds
-GitLint                       PASS      0.55 seconds
-BuildEll                      PASS      26.66 seconds
-BluezMake                     PASS      776.84 seconds
-MakeCheck                     PASS      10.77 seconds
-MakeDistcheck                 PASS      151.48 seconds
-CheckValgrind                 PASS      242.28 seconds
-CheckSmatch                   PASS      322.44 seconds
-bluezmakeextell               PASS      96.77 seconds
-IncrementalBuild              PASS      1246.78 seconds
-ScanBuild                     PASS      988.68 seconds
+ profiles/audio/avrcp.c | 53 ++++++++++++++++++++++++++++++++++++------
+ src/btd.h              |  6 +++++
+ src/main.c             | 21 +++++++++++++++++
+ src/main.conf          | 12 ++++++++++
+ 4 files changed, 85 insertions(+), 7 deletions(-)
 
+--
+2.39.2
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6520139949669049708==--
