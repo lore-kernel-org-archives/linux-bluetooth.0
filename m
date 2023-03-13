@@ -2,125 +2,128 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CBAC6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Mar 2023 15:33:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D212C74A4B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Mar 2023 18:13:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229797AbjCMPdm (ORCPT
+        id S229608AbjCMSNE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Mar 2023 11:33:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48690 "EHLO
+        Mon, 13 Mar 2023 14:13:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230221AbjCMPdl (ORCPT
+        with ESMTP id S229791AbjCMSM7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Mar 2023 11:33:41 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD971A48F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 08:33:40 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id q6so5164339iot.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 08:33:40 -0700 (PDT)
+        Mon, 13 Mar 2023 14:12:59 -0400
+Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F8787B9AC;
+        Mon, 13 Mar 2023 11:12:54 -0700 (PDT)
+Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-17711f56136so14639040fac.12;
+        Mon, 13 Mar 2023 11:12:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678721619;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=WSGualRuVLvvbdGlMyPwJmtghXKtFI9+f6GE52zX2Nk=;
-        b=EH+XobiXiSnvvTCI86kGzzovcknwHG4B8B5mPJvfXR1+BY0zbtWN+YesQC5Fv3IetD
-         D3MwfxPZxJlMVF+WaSm8C609O04RM1bQ6oIrqfgAMLxhykYc8LzsL5VqV85Sl5FpozX+
-         UEDRvtg38hNk/cLcWqeSh8+uUg8oM1U2eN9XcpdXz9cSXN4B9s2fQ/yP2jBPdTXKHXzG
-         /CDKfGHyO0VJoVzejeKBIOzxWmvts2facau2iTZ3f0d0ZUyH3BB2Xku7mwOBW4djIKJH
-         X1VBb9ZY2dpDvms/hAJ1UZrJgS4/dsqH8w8tWtdqznNSCDdHnrLZCzx2CNsgIl2xcm+U
-         YAfQ==
+        d=gmail.com; s=20210112; t=1678731173;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WGtf6SIwprkjjvb6epaITev79WRWoV5Y4O2K1yfDb1g=;
+        b=qMqZVk3pLC3xbzWkPm4wfcJhhQHPdRhZi/P062twH/OW5f2XPAj4jkyFv381Zi/SVS
+         srkmVayQYr959ujuB0Qvu2D7/iE43qCy9kLlWpiZvguS9Wt7Eb2bJm2Q1jDOjmZC1DkJ
+         31SaMVh56/QZmRqdJuv+ebT2K64l5MH0OMxnrY4XGWi5k9ee/js33P0G13YYGqgb51zJ
+         miLeh4cMguKjBWs5goeTReFPfLnHBWqJyVjPFOLUQe3Oqeku3OAvtvYI0CY0etC724Gv
+         IpGDkMnzYSM/z+Twv6lgJhHIm2BzWl9weHJNOomYKl+CBCCPbtHf3qlV2XS4pJv0bQuq
+         bSyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678721619;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WSGualRuVLvvbdGlMyPwJmtghXKtFI9+f6GE52zX2Nk=;
-        b=ut0+6eCaVAsnUJ7odG2Z+xleJqCKjDtgscNz8ZPzKFN5z4qNeKdXJ2er3yCuevnPvD
-         ESf/eCZHfUQPP16EZnJHWEEzJg050eYqpdvxT8SQxccBHlW8SJfmP4uwQawYhWKrwNIr
-         pVUwutPUT1Mfv1i2JjDFd0kO290T1FmioOTFyumqIX98dcsZwbSU8QZ/MxQSEGA64RW8
-         FqWpQU1zaYr72GKMZvSWr6LE4OCgMsa7mDC6aiAib57UgxRc83U3HwgWqlmk26AmCHmm
-         q8+Nn9TU3zoyDOLwoB2FJzGfho/ghtfvmdMBX01edKWzSG4xuCbUTSrcsS3nKV3p/KsG
-         o6xw==
-X-Gm-Message-State: AO0yUKV0hULLE4gTUwpWC7LBi3tcI7dPSBGnMUj7dJBSPs1Rtt/grAxC
-        CDjAplWr8bnERrGPtMTE+b3Aw63mVOg=
-X-Google-Smtp-Source: AK7set/UROGHimONjiOUyzcY2s97TJu0BiXEhk3F7RyX2g4saphRfFO2l96tjxrazCHoqi/H85RqRg==
-X-Received: by 2002:a5d:898a:0:b0:74c:aa1d:c1a1 with SMTP id m10-20020a5d898a000000b0074caa1dc1a1mr19880410iol.3.1678721619571;
-        Mon, 13 Mar 2023 08:33:39 -0700 (PDT)
-Received: from [172.17.0.2] ([40.77.92.117])
-        by smtp.gmail.com with ESMTPSA id y2-20020a02c002000000b0036cc14af7adsm2587674jai.149.2023.03.13.08.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 08:33:39 -0700 (PDT)
-Message-ID: <640f4253.020a0220.c5c16.3306@mx.google.com>
-Date:   Mon, 13 Mar 2023 08:33:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4922004137457062156=="
+        d=1e100.net; s=20210112; t=1678731173;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WGtf6SIwprkjjvb6epaITev79WRWoV5Y4O2K1yfDb1g=;
+        b=YQG4P98LYZAeoPVaqwc5TQS592y3vZLsd90bpD02pPlYABdvtS8kXd0uWdmNV+L8Ww
+         4FWJjv5FYlu7w6xEI+S5Tbv2wkMSpX2fXVYal645mDnDHvJpgQpRslrlXLtBrAsdeTxb
+         SU0yXhT4jilV2hcc4LkFfjcI34YYkBrQ8xxyL9aGwOJRLZXkk6qIyoPqULeEn1HJGGWh
+         +Hva7+EDed9AX7SZLaw1PEUGlYj6AB5uFNoxayAYRvp4++bmyG2P++cln9OUPigb2XRz
+         1aUt6OWlTg1LNoamUP+kSoR0ktQLoVjz3gvEFkkjDS3HA795bOCVeNKFbo1vIHLh7eKy
+         JqyA==
+X-Gm-Message-State: AO0yUKXzjOyI2dXwZO5B1ickowWk94GpUYumQ+OIqzLvPl7yWfsNxT3A
+        dFDKk/qjuNK54RgX8Iky1K+z9qZA6ewiVWeQJatFd3CAuIs=
+X-Google-Smtp-Source: AK7set/m+WIBlxqTBPAs2AyFRkV53zHJpk20UMpb6nDf28b6xYjPLegqpDGBwah+5gYtE/nCTO+FsRO9TFQoxsfBd6o=
+X-Received: by 2002:a05:6870:d20d:b0:172:39d6:edc7 with SMTP id
+ g13-20020a056870d20d00b0017239d6edc7mr5178902oac.4.1678731173552; Mon, 13 Mar
+ 2023 11:12:53 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: Add support for NXP bluetooth chipsets
-In-Reply-To: <20230313144028.3156825-2-neeraj.sanjaykale@nxp.com>
-References: <20230313144028.3156825-2-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230228152205.133582-1-macroalpha82@gmail.com>
+ <20230228152205.133582-3-macroalpha82@gmail.com> <CADcbR4+Onb6RM7grPrqRL8Rth0mbFXykRmPq8R1QxYRGaHQHtA@mail.gmail.com>
+In-Reply-To: <CADcbR4+Onb6RM7grPrqRL8Rth0mbFXykRmPq8R1QxYRGaHQHtA@mail.gmail.com>
+From:   Chris Morgan <macroalpha82@gmail.com>
+Date:   Mon, 13 Mar 2023 13:12:42 -0500
+Message-ID: <CADcbR4L6b9D1FJx9u1jFvZ6jhixNs3_Ky+Mu0rHwtXZ6ATO-Eg@mail.gmail.com>
+Subject: Re: [PATCH 2/3 V4] Bluetooth: hci_h5: btrtl: Add support for RTL8821CS
+To:     linux-bluetooth@vger.kernel.org
+Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        alistair@alistair23.me, anarsoul@gmail.com, luiz.dentz@gmail.com,
+        johan.hedberg@gmail.com, marcel@holtmann.org, heiko@sntech.de,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+        Chris Morgan <macromorgan@hotmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4922004137457062156==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+I found the fix, simply put changing the compatible from
+realtek,rtl8822cs-bt to realtek,rtl8732bs-bt fixes it (because it sets
+the "H5_INFO_WAKEUP_DISABLE" flag). Is it too late for a V5, or should
+I submit this as a fix to the devicetree and devicetree documentation?
 
-This is automated email and please do not reply to this email!
+Thank you.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=729478
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.08 seconds
-GitLint                       FAIL      1.13 seconds
-SubjectPrefix                 FAIL      0.57 seconds
-BuildKernel                   PASS      32.11 seconds
-CheckAllWarning               PASS      35.46 seconds
-CheckSparse                   PASS      40.17 seconds
-CheckSmatch                   PASS      108.38 seconds
-BuildKernel32                 PASS      31.69 seconds
-TestRunnerSetup               PASS      447.01 seconds
-TestRunner_l2cap-tester       PASS      17.47 seconds
-TestRunner_iso-tester         PASS      17.68 seconds
-TestRunner_bnep-tester        PASS      5.80 seconds
-TestRunner_mgmt-tester        PASS      113.07 seconds
-TestRunner_rfcomm-tester      PASS      9.23 seconds
-TestRunner_sco-tester         PASS      8.41 seconds
-TestRunner_ioctl-tester       PASS      9.93 seconds
-TestRunner_mesh-tester        PASS      7.26 seconds
-TestRunner_smp-tester         PASS      8.25 seconds
-TestRunner_userchan-tester    PASS      5.99 seconds
-IncrementalBuild              PASS      37.51 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v10,2/3] dt-bindings: net: bluetooth: Add NXP bluetooth support
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-19: B1 Line exceeds max length (87>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4922004137457062156==--
+On Fri, Mar 10, 2023 at 10:25=E2=80=AFAM Chris Morgan <macroalpha82@gmail.c=
+om> wrote:
+>
+> I shudder to bring this up now, but I'm encountering a new bug and
+> might have to withdraw this.
+>
+> I'm receiving errors in dmesg of the following, and I can't seem to
+> figure out the root cause:
+> Bluetooth: hci0: Out-of-order packet arrived
+>
+> Any thoughts on what might cause it?
+> Thank you.
+>
+> On Tue, Feb 28, 2023 at 9:22=E2=80=AFAM Chris Morgan <macroalpha82@gmail.=
+com> wrote:
+> >
+> > From: Chris Morgan <macromorgan@hotmail.com>
+> >
+> > RTL8821CS is a WiFi + Bluetooth combo chip from Realtek that provides
+> > WiFi A/B/G/N/AC over an SDIO interface and Bluetooth 4.2 over a UART
+> > interface.
+> >
+> > Note that the firmware this was tested with was firmware version
+> > 0x75b8f098.
+> >
+> > Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+> > ---
+> >  drivers/bluetooth/btrtl.c | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> > index 69c3fe649ca7..72947d319fa6 100644
+> > --- a/drivers/bluetooth/btrtl.c
+> > +++ b/drivers/bluetooth/btrtl.c
+> > @@ -128,6 +128,14 @@ static const struct id_table ic_id_table[] =3D {
+> >           .fw_name  =3D "rtl_bt/rtl8821c_fw.bin",
+> >           .cfg_name =3D "rtl_bt/rtl8821c_config" },
+> >
+> > +       /* 8821CS */
+> > +       { IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_UART),
+> > +         .config_needed =3D true,
+> > +         .has_rom_version =3D true,
+> > +         .has_msft_ext =3D true,
+> > +         .fw_name  =3D "rtl_bt/rtl8821cs_fw.bin",
+> > +         .cfg_name =3D "rtl_bt/rtl8821cs_config" },
+> > +
+> >         /* 8761A */
+> >         { IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
+> >           .config_needed =3D false,
+> > --
+> > 2.34.1
+> >
