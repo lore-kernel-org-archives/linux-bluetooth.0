@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB613C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Mar 2023 22:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59185C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Mar 2023 22:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbjCMWwp (ORCPT
+        id S230221AbjCMWwr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Mar 2023 18:52:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57856 "EHLO
+        Mon, 13 Mar 2023 18:52:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjCMWwZ (ORCPT
+        with ESMTP id S230212AbjCMWwZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 13 Mar 2023 18:52:25 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840028ABC4
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A71C89F2E
         for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 15:51:59 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id b5so5691292iow.0
+Received: by mail-il1-x12f.google.com with SMTP id s7so133074ilv.12
         for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 15:51:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678747916;
+        d=gmail.com; s=20210112; t=1678747915;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=DVhH1FenjO23iPOz9PWDVrqP8gmDYaGiFkkC/dXtHy8=;
-        b=KquCkPJDlsj/WXmzP7jhpIGYp/8/L9yMbjBDbiFcghKR7/DDOA5v2HTXT+MGVFSktF
-         vFIDJMLQkMXzHEYODZt7WcV871KQeE6ApdZ68J3Eu4SvsAaoJ/rkOqGyEPlbP6pSPAfD
-         ORSzcuwgu2mn8MDeOZ/ihGSX5cBwTwxPVSLkeaSUMHIKA2wTKje8eolzjk8fbrDRqk/G
-         8xaNmaoSKPnHJoHvVyk3VKVB9lIIoXU2dlbM1KcW+fEsSaHPeK2MxMk3V/XnkhuIIxUG
-         UTud0o53VZs4lGO4cALUt5mPLr9XHTHTHUxAz8rDeyvKXtTFOPGnceR3qdSTvx2AtK0q
-         zw1w==
+        bh=XdgRFSjXa7KRG/J3C+fPqpfYBSI858tA40zw81foPy4=;
+        b=PtNFsRhI9oi8NkmtZNJ82TqT9dJMrzspGo/JxpHBenJJUU5e04DxeYR2fThSFjAOxW
+         hc/vMQRP0gtZcsVExFdZjpE8XO17yzfw2xAjY7JrNXkqeeHEadFvEwJEwO1y2x0rJvV3
+         35utswWsfyDxVGa3tID1L/VC/QkWw+O0tsb0vwmfAePUlBHJm8YngrvhekloI3dLm3YO
+         lob41y7cchQrYzu7PveaygAPtSCOi2f8Jq2+aOABx63GHSbLfqEBNC8I2cwfCvXcfvAy
+         aaxEyFM1+40+rOI4cTs5r7G20XLYXdswGZScYeNwfDzAstA7eiP0iRY8DCV53JiDYKam
+         3Lsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678747916;
+        d=1e100.net; s=20210112; t=1678747915;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DVhH1FenjO23iPOz9PWDVrqP8gmDYaGiFkkC/dXtHy8=;
-        b=t3Ws7RST31ZwJldJ4KgX9WULhb0E5Tkj2YAf77OSR9AXKuC+KxReT6YePeTOB/rp23
-         a5QvXxqkmyaXak7qeftX8v7U9FnXQaNXOny69N9K4FjdzpMXhJBP8pHEy92sMy7KYimU
-         2uzafTsENTnYzDZUJxSYDMbYHQGjlvxO3ZZcGQ0tulbPt5QCJERPFyPIycl8Jwjk0bwf
-         XLvFsZ+vyW3P6NTd1SyEBC1GpDazg+4PbEpPrxJxy1JMsobGyUI8Fw/TH917dC0VXptZ
-         T5HDIljumm0D8dVGuMH5G+RrJ0rx0z6X7/GbJ3pNPXWQjs9k1uhCuRJoRrgVuRq5UJD4
-         WI8Q==
-X-Gm-Message-State: AO0yUKWOUylE1vbN6NA0tzkGMGN84Vxcj7ziTHJLbekOCYXjC26gWZtM
-        Sfxx4ZcXwAVr+KiD/jrHUqCYIJMMo6M=
-X-Google-Smtp-Source: AK7set+jlnOXigurCT1Pbsxl+6n373Ovol4FGrnl6vuaLoBEp2eG5GS1sY+EPnLE7OFU6CUMGxGQUQ==
-X-Received: by 2002:a5d:889a:0:b0:713:7b7c:46d7 with SMTP id d26-20020a5d889a000000b007137b7c46d7mr10208556ioo.21.1678747916388;
-        Mon, 13 Mar 2023 15:51:56 -0700 (PDT)
+        bh=XdgRFSjXa7KRG/J3C+fPqpfYBSI858tA40zw81foPy4=;
+        b=ddCBqrUYonNHSyFE40JUohsAk5F68N5OxwLN5pC5DFbFEkN4rPIAEJenXoCCValZIn
+         1jn0SkbIocDImEtTzu0MWDoYAxEqpEFHlr3QOoydlHX3BoetI67W1Aqxe108Fq7kEciz
+         XEZCBJUd5sKec+hHEDQpxJepUF6a9KON5rhSDHJQ+kojcIlsu2AasbL3yAjMIMSnhdas
+         mB8YLUOcMByo00jau36epznERPNJ40eSLmgYbJWIA108M/ROrYAjr7xf05POSYKJ+G7u
+         MURmnsJTUcjAmsyfXrb0GPd+pLxs03G+Lz4TlvBsGriELrhPtZy/KxG8DHh1IcfCgEco
+         KYrg==
+X-Gm-Message-State: AO0yUKWYQzwVC4PO5ERRHkO5APOXanekhajkh2hJdfsDpqbhKU6DdQSD
+        nCWeWUBu4UZT1OfHSCd3g1c40iTrglo=
+X-Google-Smtp-Source: AK7set9gXH5EXUtT+qYyXgq1RSzwuZdX8lP8ONLvwvyt9Rz2unmTh4GY0My0lLe7TXmV3w693HEWWQ==
+X-Received: by 2002:a05:6e02:551:b0:316:f71f:fa9b with SMTP id i17-20020a056e02055100b00316f71ffa9bmr1029356ils.16.1678747915181;
+        Mon, 13 Mar 2023 15:51:55 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id m17-20020a02cdd1000000b003c4d71489aasm278318jap.6.2023.03.13.15.51.55
+        by smtp.gmail.com with ESMTPSA id m17-20020a02cdd1000000b003c4d71489aasm278318jap.6.2023.03.13.15.51.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 15:51:55 -0700 (PDT)
+        Mon, 13 Mar 2023 15:51:54 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] shared/csip: Fix crash on bt_csip_get_sirk
-Date:   Mon, 13 Mar 2023 15:51:50 -0700
-Message-Id: <20230313225150.267896-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] shared/gatt-client: Introduce bt_gatt_client_ref_safe
+Date:   Mon, 13 Mar 2023 15:51:49 -0700
+Message-Id: <20230313225150.267896-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230313225150.267896-1-luiz.dentz@gmail.com>
 References: <20230313225150.267896-1-luiz.dentz@gmail.com>
@@ -68,43 +68,62 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following trace:
-
-Invalid read of size 1
-   at 0x1F4282: bt_csip_get_sirk (csip.c:812)
-   by 0x176B21: csip_ready (csip.c:259)
-   by 0x1F3C74: csip_notify_ready (csip.c:578)
-   by 0x1F3C74: csip_idle (csip.c:659)
-   by 0x1DCDCC: idle_notify (gatt-client.c:171)
-   by 0x1D579A: queue_remove_if (queue.c:279)
-   by 0x1D584F: queue_remove_all (queue.c:321)
-   by 0x1E036F: notify_client_idle (gatt-client.c:180)
-   by 0x1E036F: request_unref (gatt-client.c:199)
-   by 0x1DC60D: destroy_att_send_op (att.c:211)
-   by 0x1DC60D: handle_rsp (att.c:874)
-   by 0x1DC60D: can_read_data (att.c:1064)
-   by 0x1F43F4: watch_callback (io-glib.c:157)
-   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x4912117: ??? (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x48BB24E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.7400.6)
- Address 0x0 is not stack'd, malloc'd or (recently) free'd
+This introduces bt_gatt_client_ref_save which ensures the instaces
+which are being destroyed, e.g. ref_count = 0, do not attempt to reach
+callbacks.
 ---
- src/shared/csip.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/shared/gatt-client.c | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/src/shared/csip.c b/src/shared/csip.c
-index 094f448a3532..7e90a3c97614 100644
---- a/src/shared/csip.c
-+++ b/src/shared/csip.c
-@@ -810,6 +810,9 @@ bool bt_csip_get_sirk(struct bt_csip *csip, uint8_t *type,
- 	if (!csis)
- 		return false;
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index f885076913dc..3a29f807fc85 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -173,9 +173,20 @@ static bool idle_notify(const void *data, const void *user_data)
+ 	return true;
+ }
  
-+	if (!csis->sirk_val)
-+		return false;
++static struct bt_gatt_client *
++bt_gatt_client_ref_safe(struct bt_gatt_client *client)
++{
++	if (!client && !client->ref_count)
++		return NULL;
 +
- 	if (type)
- 		*type = csis->sirk_val->type;
++	return bt_gatt_client_ref(client);
++}
++
+ static void notify_client_idle(struct bt_gatt_client *client)
+ {
+-	bt_gatt_client_ref(client);
++	client = bt_gatt_client_ref_safe(client);
++	if (!client)
++		return;
+ 
+ 	queue_remove_all(client->idle_cbs, idle_notify, NULL, idle_destroy);
+ 
+@@ -1360,10 +1371,13 @@ static void notify_client_ready(struct bt_gatt_client *client, bool success,
+ {
+ 	const struct queue_entry *entry;
+ 
+-	if (client->ready)
++	client = bt_gatt_client_ref_safe(client);
++	if (!client)
+ 		return;
+ 
+-	bt_gatt_client_ref(client);
++	if (client->ready)
++		goto done;
++
+ 	client->ready = success;
+ 
+ 	if (client->parent)
+@@ -1386,6 +1400,7 @@ static void notify_client_ready(struct bt_gatt_client *client, bool success,
+ 		notify_client_ready(clone, success, att_ecode);
+ 	}
+ 
++done:
+ 	bt_gatt_client_unref(client);
+ }
  
 -- 
 2.39.2
