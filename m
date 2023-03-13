@@ -2,138 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644CEC74A4B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Mar 2023 09:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 417F1C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Mar 2023 09:11:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbjCMJKC (ORCPT
+        id S230238AbjCMJLo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Mar 2023 05:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35906 "EHLO
+        Mon, 13 Mar 2023 05:11:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230479AbjCMJJr (ORCPT
+        with ESMTP id S230229AbjCMJLW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Mar 2023 05:09:47 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16D156159;
-        Mon, 13 Mar 2023 02:08:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678698521; x=1710234521;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=cq6QdrMcR3tA5ptzjJyzksVlZ4tZ93rLnwQheu8e54Q=;
-  b=Ulprt4xM1tdMpTmsVc/JhnJCDDu7xcaQMYLK1tFy8h5QObEKk8Lxi81d
-   ZDEZ6fkxzRuarFY14o47BFptora5h9+uCnjKRcYSMXrecuyY9eKqEma0a
-   hNapvJEs6r2nzS8tLtDENtOkS0qHPk1KQoNX3/qBxL6IOuSrDGIEWXxro
-   lph5kq0QGotjl8zs/2JmnMUrdnxzERCPjxILAMGLjvnf4Wa8p281ksCjj
-   /DnX/56pB5fmD7vvvu/R/jjjs8kxtTczOUBWssSl4VszH4AHWN93cCuIq
-   f8R7TLuusmleCJikVnQNq53Kg0JDdoCu6UlzaZPzAa+J1aQiP5l7Y6FDE
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="423363959"
-X-IronPort-AV: E=Sophos;i="5.98,256,1673942400"; 
-   d="scan'208";a="423363959"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 02:08:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10647"; a="680950602"
-X-IronPort-AV: E=Sophos;i="5.98,256,1673942400"; 
-   d="scan'208";a="680950602"
-Received: from etsykuno-mobl2.ccr.corp.intel.com ([10.252.47.211])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2023 02:08:35 -0700
-Date:   Mon, 13 Mar 2023 11:08:33 +0200 (EET)
-From:   =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-cc:     "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
-        "hdanton@sina.com" <hdanton@sina.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        linux-serial <linux-serial@vger.kernel.org>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>
-Subject: Re: [PATCH v6 3/3] Bluetooth: NXP: Add protocol support for NXP
- Bluetooth chipsets
-In-Reply-To: <AM9PR04MB8603D2F3E3CDC714BDACECC0E7BA9@AM9PR04MB8603.eurprd04.prod.outlook.com>
-Message-ID: <11c7e098-19c8-6961-5369-214bc948bc37@linux.intel.com>
-References: <20230301154514.3292154-1-neeraj.sanjaykale@nxp.com> <20230301154514.3292154-4-neeraj.sanjaykale@nxp.com> <73527cb7-6546-6c47-768c-5f4648b6d477@linux.intel.com> <AM9PR04MB86037CDF6A032963405AF0CEE7B69@AM9PR04MB8603.eurprd04.prod.outlook.com>
- <48e776a1-7526-5b77-568b-322d4555a138@linux.intel.com> <AM9PR04MB8603D2F3E3CDC714BDACECC0E7BA9@AM9PR04MB8603.eurprd04.prod.outlook.com>
+        Mon, 13 Mar 2023 05:11:22 -0400
+X-Greylist: delayed 401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 13 Mar 2023 02:10:56 PDT
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BB2B6EB8;
+        Mon, 13 Mar 2023 02:10:55 -0700 (PDT)
+Received: from localhost.localdomain (unknown [124.16.138.125])
+        by APP-03 (Coremail) with SMTP id rQCowACXnx_95g5kIV2jDg--.57156S2;
+        Mon, 13 Mar 2023 17:03:57 +0800 (CST)
+From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: [PATCH] Bluetooth: 6LoWPAN: Add missing check for skb_clone
+Date:   Mon, 13 Mar 2023 17:03:46 +0800
+Message-Id: <20230313090346.48778-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: rQCowACXnx_95g5kIV2jDg--.57156S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1kWryUJrW5CFWfWrWDtwb_yoW3urX_GF
+        97Z3yUuw1jyFyxtFsFka1Skr9xAwn3XFyxWwsaqFW5X34DGayxur1vvr15Jr4IgasFgr17
+        ZF90ya4kuw4xCjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbV8FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+        Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+        0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+        n2IY04v7MxkIecxEwVAFwVW8uwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJV
+        W8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF
+        1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6x
+        IIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvE
+        x4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvj
+        DU0xZFpf9x0JUDkucUUUUU=
+X-Originating-IP: [124.16.138.125]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, 10 Mar 2023, Neeraj sanjay kale wrote:
+Add the check for the return value of skb_clone since it may return NULL
+pointer and cause NULL pointer dereference in send_pkt.
 
-> Hi Ilpo,
-> 
-> I have resolved most of your comments in v8 patch, and I have few things to discuss regarding the v6 patch.
-> 
-> > > > > +static bool nxp_fw_change_baudrate(struct hci_dev *hdev, u16
-> > > > > +req_len) {
-> > > > > +     struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-> > > > > +     struct nxp_bootloader_cmd nxp_cmd5;
-> > > > > +     struct uart_config uart_config;
-> > > > > +
-> > > > > +     if (req_len == sizeof(nxp_cmd5)) {
-> > > > > +             nxp_cmd5.header = __cpu_to_le32(5);
-> > > > > +             nxp_cmd5.arg = 0;
-> > > > > +             nxp_cmd5.payload_len = __cpu_to_le32(sizeof(uart_config));
-> > > > > +             nxp_cmd5.crc = swab32(crc32_be(0UL, (char *)&nxp_cmd5,
-> > > > > +                                            sizeof(nxp_cmd5) -
-> > > > > + 4));
-> > > >
-> > > > swab32(crc32_be(...)) seems and odd construct instead of
-> > __cpu_to_le32().
-> > > Earlier I had tried using __cpu_to_le32() but that did not work. The
-> > > FW expects a swapped CRC value for it's header and payload data.
-> > 
-> > So the .crc member should be __be32 then?
-> > 
-> I disagree with using __be32.
-> I have simplified this part of the code in v8 patch, please do check it out.
-> So the CRC part of the data structure will remain __le32, and will be sent over UART to the chip in Little Endian format.
-> It's just that the FW expects the CRC to be byte-swapped. 
-> Technically it is big endian format, but you may think of it as a "+1 level" of encryption (although it isn't).
-> So defining this structure member as __be32 can create more questions 
-> than answers, leading to more confusion. 
-> If it helps, I have also added a small comment in there to signify that 
-> the FW  expects CRC in byte swapped method.
+Fixes: 18722c247023 ("Bluetooth: Enable 6LoWPAN support for BT LE devices")
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+---
+ net/bluetooth/6lowpan.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-I'd have still put the member as __be32 and commented the swap expectation 
-there. But it's not an end of the world even in the current form.
-
-> > > > > +     serdev_device_write_buf(nxpdev->serdev, (u8 *)&nxp_cmd7,
-> > > > > + req_len);
-> > > >
-> > > > Is it safe to assume req_len is small enough to not leak stack content?
-> > > The chip requests chunk of FW data which is never more than 2048 bytes
-> > > at a time.
-> > 
-> > Eh, sizeof(*nxp_cmd7) is 16 bytes!?! Are you sure that req_len given to
-> > serdev_device_write_buf() is not larger than 16 bytes?
-> > 
-> I have now replaced req_len with sizeof(<struct>).
-> There is also a check in the beginning of the function to return if req_len is not 16 bytes.
-
-Ah, I'd missed that check for some reason.
-
-
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4eb1b3ced0d2..bf42a0b03e20 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -477,6 +477,10 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
+ 			int ret;
+ 
+ 			local_skb = skb_clone(skb, GFP_ATOMIC);
++			if (!local_skb) {
++				rcu_read_unlock();
++				return -ENOMEM;
++			}
+ 
+ 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
+ 			       netdev->name,
 -- 
- i.
+2.25.1
 
