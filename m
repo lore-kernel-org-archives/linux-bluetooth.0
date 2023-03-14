@@ -2,47 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD5DC6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 15:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08876C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 15:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231503AbjCNPG0 (ORCPT
+        id S230301AbjCNPW4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 11:06:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
+        Tue, 14 Mar 2023 11:22:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbjCNPGY (ORCPT
+        with ESMTP id S229558AbjCNPWy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 11:06:24 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2112.outbound.protection.outlook.com [40.107.94.112])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2F1DACE21;
-        Tue, 14 Mar 2023 08:06:22 -0700 (PDT)
+        Tue, 14 Mar 2023 11:22:54 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2120.outbound.protection.outlook.com [40.107.93.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B882295E29;
+        Tue, 14 Mar 2023 08:22:53 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AOw4pfLzbNsDwL9CUJQPHKTRLpXz88jFxX+aq/mLLqyAXeso/KZ/D4bZmOCB/CqtOYoRYHJyEcsQOXC2Psa02raWRj3l391NQhidtK/zJpASOTxk2YYAloJzigqWjugXIpkqeHAJO+zuNnUKarBPwAbfLPt2lwlRjhXxXdFrlOJuETCtO+Lcrsrhu4lqa9ACtgXy3IeWh9Ox2nBLAfaYyp/f0f/MK62GS3w7QVidH/6B/ICwDkkH8VQWEbe0lYhYusccL/yo4X8tUVJ4tSAOjyUVmktr0X9X3P+kK4rTGETDBM0un3aFz8dmwUvw7lGCcdy+JO5c7LkQUWsKsVaszA==
+ b=GbjF+XhU5eRwfcW4PdxKLblRzSYqV9vhZN0+CJgiCWNAoD7pR903D2Fr5qE9EgJWD4RUPP93xjejVuTpE+/po1Uv2gZFIXhRmbQ42w1zjUvU3zr8vKuGsssLJMmQ/w5chBissuqtQ9i1zCbnZtZlTZNKwghFCgnrfma9FRCdwgeRn8Qv+K26Zkq+BxUa5bBzqNlcXjyS+u96S8hDqtZEQoNpfEGF3371Azih6OtNxLpns651c3zRHGdPzjh3xs7AzlCB+uz6kAUgU1NztxmPwqhuLRNbTsdY7+arjfUfStS1BPnJHvgM9dUCwj5EV+rywgbFnva37uONfGUdzGzbCA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UOgIskxvFGCilz86xUbm4fpfoWfJf92i9whjeVn6VVA=;
- b=B/DopJMfaQtW2ID0sQ/6yfFkwLVLm+nR8oXk+uSQRmsi6znGp90ZsMtQ3k8Q6C9LaZau0LFurxdTFR4JJUZ/JO7UXwQl4amb1G4dXnLgTy2F9mHF5/RI/TSJo/PXRXVeQIUCi62PFK21AHHJZvHmhrJi452wxFxvqksFcNrQKuyCYPWsI93y3OCNFQ1eFyB7tXGK4OLPCkNBY9pthWQC3pC3zejRp0SotwyAdDTqbiCgVimXpYAKXfWIC0Fu9+ebttIndoRreO3Npe8aVd6Ayw3Z8q7/C+URIz6XWPOtzr82gCYhuyYuMYHg1TtiPNJC+jQF+c/GEurz1xmMgd7PtQ==
+ bh=wx0Xxnc8DCQb1kEE7w8GrBPPxDJXVdkNs3ZJP0ZkhYw=;
+ b=h0ARgErlW7BKHwttrS1Wc0mhgVQ5+Vat3Vz7GM9y8m4KYKeHQyUU8fFpSfd0/tjbz6hxwpo10EUykqEYLltqSCWtAquTuZibqVOEG9BRzbOVy/2y4IsTCOVABBQdB+3x/gh05W3A7pJwpvywSbfixE7bzbDXNu9SA/JkNxULnNJwyBJ6x64gDNxZlvhE+uEXPIq4OkBFkeC18TUCrnJmT+kpYTf7U6SkObxQ2aSx9Lnyidh+c2bSRyJotRGwMFdnhLKoDf0DBHEoGIbjlqcLc2bkqHUyDNDVTTs14q3bYi+3EP1UtMy2QZ2t1AiRuk4Co931XvDlxoe8A7PNzutqnw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UOgIskxvFGCilz86xUbm4fpfoWfJf92i9whjeVn6VVA=;
- b=SYQqgHlMEB1E6e5EitdB6ukbMonKi3ui94S44jZvMqBh9O/X24f9svZj4yQT2EnOu+b6u4IcTJMDtJlKZgu7EoMy7+hMHeM3xlCVS5X+jd+Jx6H2Dg+3Vig16R1QWc0TFaOHViY7qmobUIziUDSnHzH/FTEkcVVHL8zmzSlb1V0=
+ bh=wx0Xxnc8DCQb1kEE7w8GrBPPxDJXVdkNs3ZJP0ZkhYw=;
+ b=AfoEGX6oydlRqdunGplP8QMnIqcugpwEC2hHBs9APv09cQG6bGESBffAiDy70HT/FEPR3rX21raKAiEUs3wb/8EWM0ye2pSNRJT72o9hhb+lX7q9J8a3bvTtlEzp7N4hYSzXXHxc+h60RZIRjHb1Lo8e1iSKnJOX5H6gm2tGTSM=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MW3PR13MB4010.namprd13.prod.outlook.com (2603:10b6:303:54::17) with
+ by SJ2PR13MB6168.namprd13.prod.outlook.com (2603:10b6:a03:4fa::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.24; Tue, 14 Mar
- 2023 15:06:19 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.26; Tue, 14 Mar
+ 2023 15:22:51 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6178.026; Tue, 14 Mar 2023
- 15:06:18 +0000
-Date:   Tue, 14 Mar 2023 16:06:11 +0100
+ 15:22:51 +0000
+Date:   Tue, 14 Mar 2023 16:22:44 +0100
 From:   Simon Horman <simon.horman@corigine.com>
 To:     Zheng Hacker <hackerzheng666@gmail.com>
 Cc:     Zheng Wang <zyytlz.wz@163.com>, marcel@holtmann.org,
@@ -53,130 +53,140 @@ Cc:     Zheng Wang <zyytlz.wz@163.com>, marcel@holtmann.org,
         linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de
 Subject: Re: [PATCH v2] Bluetooth: hci_core: Fix poential Use-after-Free bug
  in hci_remove_adv_monitor
-Message-ID: <ZBCNY8NoNkrA2nyN@corigine.com>
+Message-ID: <ZBCRRL8+EtTBH2tl@corigine.com>
 References: <20230217100223.702330-1-zyytlz.wz@163.com>
  <CAJedcCxUNBWOpkcaN2aLbwNs_xvqi=LC8mhFWh-jWeh6q-cBCQ@mail.gmail.com>
+ <ZBCNY8NoNkrA2nyN@corigine.com>
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJedcCxUNBWOpkcaN2aLbwNs_xvqi=LC8mhFWh-jWeh6q-cBCQ@mail.gmail.com>
-X-ClientProxiedBy: AS4P192CA0006.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:20b:5da::7) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <ZBCNY8NoNkrA2nyN@corigine.com>
+X-ClientProxiedBy: AS4PR09CA0012.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::15) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW3PR13MB4010:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9feb88b-2420-4dac-c706-08db249da9d9
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ2PR13MB6168:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69f50bbf-d424-42f3-2d85-08db249ff9c4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ZoHhbrnnijZgUlGI1PNTzuhtCqpR68wCNOu5d9dqOzg0hiEjxVaawbpczVSZ4+rv6tOM+/nNIIG0xbHYHvIXBFtimg/wkyIoAklvp1v5BzNBzYX/hhCb6Fmnwz7tLH/BuRSGBKqxKk/bRZNKZ3260jMH5KTCqNnMom0bTdjiB5gxUlFz5j/m2010vmKLqn1Ayp9av1/9VX2cqeF6aOBSF7sOdpGjbUWOcKKvqC6P9GPGRsphYALdFebx5n4TIM/UlVMcP2kD1J19T1biAYZBzNrjUXajT4YBsRQxwSyZIH3i7a1sQwCkViSOjZGIlATLloMGp3RJJNUF9PSgCz/GT0m+72MxaU21GwoyHeUu9DOUfXws0sibVUcGhDemt1E0PWL4rjOg4a0AjLR53Ia8BspaWu8K5XTskI29bhGOqr1/q6jRhAqUlcP4kzx2+iu1hQvSmyleqIESjHM3RBNiJtgnF+odhWFI1rZ2AOXuwJSbTfHNjpjZyyfknmV2EPx8lJP5Vr1dOS3/21RgX5BXveGtU3OYe5DDsW2AGm6XCH/gRBN+fKed2K6XWxBgQTB/r0EAGPdf9SvD5tqZ0sm0pPNk7Y9sg1wcK9EsZD3gzGvfgTmdW4NjSTbAdYZOIxpjEw4AfNudjENk1OIsi7JJuA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(376002)(396003)(39840400004)(136003)(346002)(451199018)(2906002)(41300700001)(8676002)(66556008)(4326008)(36756003)(478600001)(66476007)(316002)(6916009)(86362001)(66946007)(38100700002)(6486002)(5660300002)(44832011)(6506007)(6512007)(2616005)(186003)(7416002)(6666004)(8936002)(83380400001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: 5KrFLXBlZ2Fgl4D4A28ktdWWMURSfq5yU1qUNu/r+PDneExDNj1qY0vSAQo1AWibRq+guU8XUAGNBu7PqlGaMjQcx7zgYFhHbQ6s3tTMjZn5lqwhSObMneuGuh0+2W1cnt+izwWs/RWu3M6CCk+W+Cdb3gYgYQIeaPxG6/wJFwrUbbApXNlbQvc5NBJD7tdgmPU2G97pqp7LPYFuc/BtHvkfPcDjCiCspFNrW/6Bnrz18rWJhqX2Qx5SEbqqVrY8tEn8HuPlrtjDQ8uL0FQl1oqUDSBjmu8kO6eYjeM8yYoIcryg2yk36XpbmMW/vPLEzkmcNUAziUjfEOCMEvWjbBzNcf8dzssO+s+oOiA5PJtDZb7Q8/NsdUNqYwVIYhf7F5y7AjGzpchETpGRzG1TMATz1j5u5bBPa5HcBL+zKODKcKzCzS338MBCVE9TpqkT+jBgqlgyovmBtmQdVnd0K7vFMKBJPCbSaeplsM/Q8Ire+RNlAlDkCNtI1gw8HqKY442fjPP8Pbj6ClhpbGp+D1k2LaoAfbbgYikTNbnd/BxOZP8QPF8rnsK4SG5PDx5Ppt02jMhTfcQBrUAxk7Au05P0GtTzD8JxYrxLpolHIJGkpSL9bO8jHs3h8vk9d8W2NJmb4HoJjoJ+xY4VjkZkGsF/voP4lQYGD70UV4p/CDLjZkAorH6UoZtXmfRbJKy5eiOcCQIxjb9Ow9K33C9EfNPu5kTd8rzGgRAQGdxsdpA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(39840400004)(396003)(136003)(376002)(346002)(451199018)(36756003)(86362001)(38100700002)(2906002)(44832011)(41300700001)(7416002)(8936002)(5660300002)(4326008)(6512007)(2616005)(6506007)(186003)(83380400001)(316002)(8676002)(66476007)(66556008)(6916009)(6666004)(6486002)(966005)(478600001)(66946007)(67856001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NXpTeHlJS1ZnbVhyc1JpL2VuY0JhRUdwcXd5bkZ0cTI5MGQ1QWdWOURKT081?=
- =?utf-8?B?aDgwTVJrMmo1REtrVTZjZ3k5eFI0MXhqNGFNYkNPQml5Y0dXNFNMeHlmbzlj?=
- =?utf-8?B?a1B2aG5pV1NaaGdTTEg3aUdoWVFDaHJNcE03c09zc25tVFJLb1Q3TEtkcXlI?=
- =?utf-8?B?R1R0Zm1pYi9remxTR2wxbkdCdHJBMStKaHkrMTJ3Y0lFMFQxaEF2bkx2S2x3?=
- =?utf-8?B?TUJCR0lFdHJBcjB6WG1BMjlTNDdrOXVUVStXWnJrL3RKK0ZtSWYyVXBMdHBm?=
- =?utf-8?B?bi9DUktPV2IwWmRydDhKVWpBMG10dUFTRlpQVFZvdU5GMHE3ZDNhWExOb3Vv?=
- =?utf-8?B?ZExkaDF4N2ZPTFcvOTZRL1dhSGtRRmk5b0E2Wk96NUpsY1JRVWk3eVBDdnNI?=
- =?utf-8?B?OS9LZW9obXV1WENpZXlsWEJxejVYR1ZlRzZiL0FoeW9NRWkzWDNOQms0OWNG?=
- =?utf-8?B?dmM3bHVrdGlKZGliaXYyTzhUMHlvZWxHWHlPUnlGVkpPTURwZWNpWjMyVjh2?=
- =?utf-8?B?K1N2eElPTHhDL2tSYThPUDl2ZCtyQ2IwakQrT3VYcDAvQldDUzZNcjdla3Vt?=
- =?utf-8?B?Vk1qcFJwaS9wQ3U2SGFTLzZJbDJTK3FVeno5S0RJWlUvdmFJc1BuU1BseG90?=
- =?utf-8?B?b3pUbWFFQVRYS0JaZHRTaXdjQnFab3psU3VGanU4cUtLM2cyd1A4V0xGb2VT?=
- =?utf-8?B?cmljOGtRaUxOT2lUQnNyRlpQSlp1MzRQZ0FFK0duL1FUdXo2TDBFTHZiejRq?=
- =?utf-8?B?ZjU3bUZmY0RERDVBekUrT0xhaGxuRDF3a0docGJoYnRpMDloYVFUODQ1ajJB?=
- =?utf-8?B?ZGQwWElmNFpzVXl2eTQvcnR6RUtaTG5nRUNObVNQK1FQUzlZMGpOMnlIQmk2?=
- =?utf-8?B?bjVwSXJ0cEhER3E1RHF5czFMSXVhbTZFeVhJU2FtY0prUEMxcFNsYXJiQ2JX?=
- =?utf-8?B?OWtwRGNiVjhUMjlMNGtzM2hiTWdNY3gxdjNhL0ZyMGhEMHBBQUlzQTgwak5o?=
- =?utf-8?B?NFMyaW1oOVJHUDlWVFZmcGczMGhDUzJNbmlDMjRmVTBkNmRKcXprS0hGeEE2?=
- =?utf-8?B?V2tYWVVNc3VCMXNxM3MvcHRac1dTZXJJR3hST0h0QmZEN20zMEQrWnNWOFdu?=
- =?utf-8?B?ZTJ1R2FlWTBhZVFra1FRclpQSEp0NFl4UllxOGhYekg1bzY1cEMyUmpuOGNx?=
- =?utf-8?B?Q0Iwa09qRlRzY3RVWVUyeHMzT3BsLzl1SEYzelpYUjJXVm1xREUwYTZkVXl2?=
- =?utf-8?B?azFjODJyWnpFa0dpeXhyaGxHVnNjcERiR3NyVkpkV1JRUWtQSzF5eDZhd3lh?=
- =?utf-8?B?eW43ejdjelhRZUo3bGNjaHNwYmhaMndXMW5PdElOZkdRSllPN1RyTGMwMHdy?=
- =?utf-8?B?UVB4cVlkWW1WSnZxZXlhWWprZFBlSW5EN0lIaU0rWjJndVpJallEc2lHQnQ5?=
- =?utf-8?B?MU9KeS9KOFlYYkJ6clVZUC9pcjlBemxtQktWdTJqS2c5elZYMGRsckhHZzlP?=
- =?utf-8?B?ZWFJUjRxSUFNRER0MGxWQ0xjMW85Y0N1TURwMVdwZGp5QUdyNzRyS1BpTXJs?=
- =?utf-8?B?OXU1ek9UTEdqM2QraXZvblFEaXIxUzU0bFE2M2p5MXVMUDhtdlBIUzA4MVR3?=
- =?utf-8?B?YmNnUVljUnRaemxNN29CVkNHdWRIa2JMV3RpM05Pc1FPL3NEb1Rod0hONGFC?=
- =?utf-8?B?UVBkc2hVZzBSM0hpb2M4alBlc1o5d0ZHTFBOVkxaMStVeTBBWTBKRFZkUEJh?=
- =?utf-8?B?ZUpFK0IvVUJvT2FMTnVaOHZnOWRGL1gwU1Q4V2Q1Q1BHTlRweUoxZm8yRFc2?=
- =?utf-8?B?YXZMM2p3enhDeDRiVHZUYzVvMnQ5dFdkQit3WllqbVpXYjZDb2x6S29iQmFT?=
- =?utf-8?B?TzB2NnFVOUtySHVLU0dXV2h0T0lWS2sxS0NNbnlSNGFheUF2L2NUeW9uZ1B4?=
- =?utf-8?B?NnhSNHAxbUZtNTV6Tm9YRHd5a2MxSlVNYVpSd2RvVHZ3TzNsOHV3eXRQVEFi?=
- =?utf-8?B?eUhLS1g3RDB5Zk9qdlZHTk8vYVBGUnkvWStsUCtmSVBZdVc2M3R1OFp0cXJt?=
- =?utf-8?B?VGwweWVQYnQwNGJiT2w3YU56VnY0d3ZQbWk0WFhLSHRYRGtlVzZ4QmhERDZW?=
- =?utf-8?B?ck1kVW15TjNGY1VrYUptYmV2TjV5bXptaTFpRGdudWJSNU1hNVF5N0NueVlP?=
- =?utf-8?B?L1psS28xSktIR01DMHZGdnhkRzhTUXNmUnpMZFdjckZVZzV4TGdMTEt6UHlv?=
- =?utf-8?B?ZlpsRWlZQXFLY09rVU41TEdZSjRnPT0=?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RG1uVTRQbWd4WDdNY0psVWVNbndGYWs1MWM3VWVFZjVLd25hWnBSQm1wYnpC?=
+ =?utf-8?B?WWpMUG5QNG5PZjlncGZiamFGUzRib3hyaHVDQXRzTTB3UWJwRGQ3eG5sZU5u?=
+ =?utf-8?B?TlhuSG1qZ3dlcGJoZ0o0UnNJR2lVYXdmV3NhcGhLcmFsc1ZaWVRyQk9QR1lN?=
+ =?utf-8?B?SXlweWp4c1A5MEhSa2V1VkxZZEtDaGUxZm5aNVBXOGVCTmJjWFNKNnR2L294?=
+ =?utf-8?B?clMxRGRkTnByb1FhdDZmNFBGWTBnT2xUeWhSZE8rUWVEUU1XM1l6bW4zNnRT?=
+ =?utf-8?B?TmtnTWVRWXlFK0EwRkpSWHVkdHVqMGFxZUdYVGhON0NWQTEyc1R1d0xyNUpl?=
+ =?utf-8?B?em9MTUg4TmtBemhuaHgvUHVqV014U1ExeXFhM3F3ODBYU1VvTkZxSjM3d3pz?=
+ =?utf-8?B?NmxldGJnU2huK2t1YU5GRzdFdklqUU9aSUdmZXh5WEdSbTNvL1dGeEZ3UEpK?=
+ =?utf-8?B?YTJCMEVKNU5FNHIvRmo5TjVPZ21CZk1BNUFBZkwwak95NmY3aThoOU5sdEhI?=
+ =?utf-8?B?ZFZpYXZsczEzV3oyYi8wRFBlZXc3MnJRRERwZk5TbjI4a000emwyc2dYbUVh?=
+ =?utf-8?B?K1N3RU1HZUVSRnkrVWpCZ3dwQXprS3NGRDRHNWlFM2QzZ0dPTEhqOXhtb045?=
+ =?utf-8?B?MXowV294WmRVVzF1RVhQQlRZQjVzcnlrSXhkNEZQUm83WVRtdEc0Z1ZhTWlh?=
+ =?utf-8?B?bE9xMFdmVXBFUXRCbjd4OXNCamRqenp4MllSbFNpZ3hsblp0ZEJyWEVpMkxT?=
+ =?utf-8?B?Q1RGUkF1ZzcvT25pUk1FOG9WVFhMaGhUdTRORVB0d09aZHY5d1FxQWNUMnJh?=
+ =?utf-8?B?aGl0UTJmNERSVTZFY053akNlVlQ4SWpRb1MwM3pPUW53MEY3eUdMRDdUeTNu?=
+ =?utf-8?B?Mm8yanlSYWdEUUJzUmRDVDdLa3pUUmxRZmFvQzFwanJmeFpaVVRvQkVXNFVG?=
+ =?utf-8?B?VWN5V1FlcWxvc21zanpDMUFxbFJhNmVPZWxRMmV1OVZBZU5pNWMybXZ4Mzc3?=
+ =?utf-8?B?emFmYkFsK2VxdzJKR05UUk1sUzhDc3J0aVNUZkJUbGplczlxYXY1YzNmRElZ?=
+ =?utf-8?B?bkdCRjlmZitJWFNPT2pTcW9WVGZTV3EzM2syL3NnSzFybExEZWE5Ky9leFNU?=
+ =?utf-8?B?d1krbHBtMG9IdVVKQWpiSjZBOUZYSUhNTEpBMXlkSHVROWZLRk9xNHp4TFpt?=
+ =?utf-8?B?bTYvUVJJb29XTEdsdzZBSlNLSmJMWTZycmZaWnpkdkR4dVdsaE11TVVUWGZD?=
+ =?utf-8?B?UGtrKy9oK0ZlRFVLMHFnNVFYTXZWUitPMG03OVRkZnZieiswSzlBM0dyeUcz?=
+ =?utf-8?B?RGR3QkFIek00MmthSDVQZXJTNVk1L0swL1VkT3NpdVJYb00yVlZPQTMxcmdw?=
+ =?utf-8?B?YThUeW54Rkk4NFB1L3FtelZkbHBsRUUvR3pOaVJneFhCNS9uajF4aEE2bXRH?=
+ =?utf-8?B?aUpXOHp2SlNMcnRESUN0d2s2a3hVam52T3FrNmNSM1RDVTdJUWJmS1JJYmpK?=
+ =?utf-8?B?NlNHeWZOV1NDVEsyS1k5R0xnaXNaV255MGJBVWw0em1vTEpDbElXK25hVktP?=
+ =?utf-8?B?UUQvRHlzUi9FODVuVWY1T3V0cGM1b2NLU1hnR1NMN0lwZUhBREhwWW1yd29O?=
+ =?utf-8?B?R0JXSURGakFzcWoxQkh4YmNsWmJSS1EwWHNBTGoyb2NyYWJXOEJtdnl1bDdF?=
+ =?utf-8?B?aG5UQ3I2V3V4V2RmckE2b3NkQlpONDBXUno5RTNxc0pHWlkzamUxWVcyLzJY?=
+ =?utf-8?B?Z2V1QS9uMFFzVmtxbkhyTnRLa0hXTE9nK1ZneWVvZ1JtcXpRUmhIeXU3bDJq?=
+ =?utf-8?B?ZXNlalNOTzVPZ1pDSll1SEs3MXgrUHJnMGJhWllaTnUvc1Roc3VJUGlteXhX?=
+ =?utf-8?B?YmZydUw1WnNKbXJvd3pWUlBPRVU0Ym5pSnZ4Q3V5UWRKNytSSnpsNHhyemhh?=
+ =?utf-8?B?MGx4YnhTOTBjcUx1QlRJaGk5NHMyTnJWVHVtOGkrNlZ6RlhKUVA5MlJ1QkNB?=
+ =?utf-8?B?cUQ1S3QyNGhQem4ya1lLNFlLdFRteUJYNXh1d1F6bnkvdzludWFIb3k4WElQ?=
+ =?utf-8?B?Mk05Y1ZTaERZY1Z0TDdNV3Q4anRCN0tQQjBWYnQ4QjFzdHJueEFEdTNDMFFY?=
+ =?utf-8?B?aXhiQVZkbXM4WXhCTktPNnhwOXRvRW9GTEJrZ3lRK25BZC85S05rOFBXc29p?=
+ =?utf-8?B?cVJ6ZVR5ZE5wNnpXMTZ1aFllOUVrVTNJdG1BYnZwQUx5blRtdHhFU3hVSUpv?=
+ =?utf-8?B?U3o0bi85RmwvQk1peHBRQ2xOQVV3PT0=?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9feb88b-2420-4dac-c706-08db249da9d9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69f50bbf-d424-42f3-2d85-08db249ff9c4
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2023 15:06:18.7200
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2023 15:22:51.3402
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Soq4UkfHvJsG7cHpWz0BlIkYze5jLnSpNFbllcPnQ1s0ztVL0hykvwOmjyvZjIVvTufhN9sR+8+/44aQde/glln0Ps+sIygWBiRC1NxlcNo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR13MB4010
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8JWrBG8HOrZN+Tl7DJRp/6w7YbEGKxxgq22mf4n2xuTTy7+CM+MsD6lsaYkO1ssJ68YwdPwOAUg7CviDCB89LmKwLCCuLU/8zJ2MKrZ3NnI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR13MB6168
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Mar 13, 2023 at 05:55:35PM +0800, Zheng Hacker wrote:
-> friendly ping
+On Tue, Mar 14, 2023 at 04:06:11PM +0100, Simon Horman wrote:
+> On Mon, Mar 13, 2023 at 05:55:35PM +0800, Zheng Hacker wrote:
+> > friendly ping
+> > 
+> > Zheng Wang <zyytlz.wz@163.com> 于2023年2月17日周五 18:05写道：
+> > >
+> > > In hci_remove_adv_monitor, if it gets into HCI_ADV_MONITOR_EXT_MSFT case,
+> > > the function will free the monitor and print its handle after that.
+> > > Fix it by removing the logging into msft_le_cancel_monitor_advertisement_cb
+> > > before calling hci_free_adv_monitor.
+> > >
+> > > Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+> > > ---
+> > > v2:
+> > > - move the logging inside msft_remove_monitor suggested by Luiz
+> > > ---
+> > >  net/bluetooth/hci_core.c | 2 --
+> > >  net/bluetooth/msft.c     | 2 ++
+> > >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > index b65c3aabcd53..69b82c2907ff 100644
+> > > --- a/net/bluetooth/hci_core.c
+> > > +++ b/net/bluetooth/hci_core.c
+> > > @@ -1981,8 +1981,6 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
+> > >
+> > >         case HCI_ADV_MONITOR_EXT_MSFT:
+> > >                 status = msft_remove_monitor(hdev, monitor);
+> > > -               bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
+> > > -                          hdev->name, monitor->handle, status);
+> > >                 break;
 > 
-> Zheng Wang <zyytlz.wz@163.com> 于2023年2月17日周五 18:05写道：
-> >
-> > In hci_remove_adv_monitor, if it gets into HCI_ADV_MONITOR_EXT_MSFT case,
-> > the function will free the monitor and print its handle after that.
-> > Fix it by removing the logging into msft_le_cancel_monitor_advertisement_cb
-> > before calling hci_free_adv_monitor.
-> >
-> > Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
-> > ---
-> > v2:
-> > - move the logging inside msft_remove_monitor suggested by Luiz
-> > ---
-> >  net/bluetooth/hci_core.c | 2 --
-> >  net/bluetooth/msft.c     | 2 ++
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index b65c3aabcd53..69b82c2907ff 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -1981,8 +1981,6 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
-> >
-> >         case HCI_ADV_MONITOR_EXT_MSFT:
-> >                 status = msft_remove_monitor(hdev, monitor);
-> > -               bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
-> > -                          hdev->name, monitor->handle, status);
-> >                 break;
+> I'm probably missing something obvious.
+> But from my perspective a simpler fix would be to
+> move the msft_remove_monitor() call to below the bt_dev_dbg() call.
 
-I'm probably missing something obvious.
-But from my perspective a simpler fix would be to
-move the msft_remove_monitor() call to below the bt_dev_dbg() call.
+The obvious thing I was missing is that was what was done in v1
+but Luiz suggested moving the logging to
+msft_le_cancel_monitor_advertisement_cb().
+Sorry for the noise.
 
-> >         }
-> >
-> > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-> > index bee6a4c656be..4b35f0ed1360 100644
-> > --- a/net/bluetooth/msft.c
-> > +++ b/net/bluetooth/msft.c
-> > @@ -286,6 +286,8 @@ static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
-> >                  * suspend. It will be re-monitored on resume.
-> >                  */
-> >                 if (!msft->suspending) {
-> > +                       bt_dev_dbg(hdev, "%s remove monitor %d status %d", hdev->name,
-> > +                                  monitor->handle, status);
-> >                         hci_free_adv_monitor(hdev, monitor);
-> >
-> >                         /* Clear any monitored devices by this Adv Monitor */
-> > --
-> > 2.25.1
-> >
+Link: https://lore.kernel.org/all/CABBYNZL_gZ+kr_OEqjYgMmt+=91=jC88g310F-ScMC=kLh0xdw@mail.gmail.com/
+
 > 
+> > >         }
+> > >
+> > > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> > > index bee6a4c656be..4b35f0ed1360 100644
+> > > --- a/net/bluetooth/msft.c
+> > > +++ b/net/bluetooth/msft.c
+> > > @@ -286,6 +286,8 @@ static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
+> > >                  * suspend. It will be re-monitored on resume.
+> > >                  */
+> > >                 if (!msft->suspending) {
+> > > +                       bt_dev_dbg(hdev, "%s remove monitor %d status %d", hdev->name,
+> > > +                                  monitor->handle, status);
+> > >                         hci_free_adv_monitor(hdev, monitor);
+> > >
+> > >                         /* Clear any monitored devices by this Adv Monitor */
+> > > --
+> > > 2.25.1
+> > >
+> > 
