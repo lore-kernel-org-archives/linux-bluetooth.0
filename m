@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC54DC6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 505D2C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:10:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231274AbjCNXK2 (ORCPT
+        id S230101AbjCNXKa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 19:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47952 "EHLO
+        Tue, 14 Mar 2023 19:10:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230190AbjCNXKY (ORCPT
+        with ESMTP id S231144AbjCNXKY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 14 Mar 2023 19:10:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A030D37702;
-        Tue, 14 Mar 2023 16:10:22 -0700 (PDT)
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD39A2A6C2;
+        Tue, 14 Mar 2023 16:10:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 350CA61A87;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 70514B81C1E;
         Tue, 14 Mar 2023 23:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20E87C433A4;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 154D7C433A1;
         Tue, 14 Mar 2023 23:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1678835421;
-        bh=Y0PSkm58IIOZziuW7EzUa97Zrez1ej5mXtPbTp0dJLc=;
+        bh=Y1jhSl5t1yRVm3V2cFgzlR2isIydaRbBCbb6BWOJaAo=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Q5xN8aIwFXeW7MGimKYbTxfDB9RfS9bSDiVu7XA1MUDUslUdTFpH/1SLEM623NKnN
-         EfoTRLfqzbjLcSkgBhm2/3TsRFj79sI6P0JHaohg3xV7p/0/ObB5hFaftP+9eHCJzu
-         DkJVMTAdh8ZcIKzRAO2Euk3JuOK2aMo56PRao7PoedDMQGw9Xfd5VY4vJf6CmxbaL6
-         ubo9mvkfVLsyjP9/yC2WxJABGueMCiG3hbCyfgMGOd9CC8L45EcL8gQfNduA2iTQ70
-         /gqlpGPb9v1aJ72qQvuIVUP+W20YB6KzV+ufY6kcZbJa81G3UoPvrGQWIITEaxWiWb
-         0G19sPzRP+4/Q==
+        b=iOM6W9t6T47DsH4QzF3dwMVb8wxdToWbGDk+1cIhSwCHTUZFut+TnglodwUcg4Aaj
+         y+28DddIDd0YQpFTfo9GlfNHkVmlp33gyQrS4pev5V+7n2ZQxjhtXRLEfwqU8G8Hz/
+         0HSDERZNBUvLRWhblWEGH8Xqr3QNW0OQigd2BhnoEfNQjBaBHStxhz9OtAaYZmHnbp
+         +BoNIQNmp0zfls7xjfnzGUHIyEr3DNno2fCOJ5tss6CXUECG6+CpgLTnwCDQy9tEBX
+         9Ivx1txiDyzmcrjZvjzm5nqEa9PKAhgw8at5uACM3Eg48R2HQlJ/Bepj0OYuWJulwb
+         rvQrUB42CXZaw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08D05E52507;
-        Tue, 14 Mar 2023 23:10:21 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F36B8E524FE;
+        Tue, 14 Mar 2023 23:10:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH RESEND] bluetooth: btbcm: Fix logic error in forming the
- board name.
+Subject: Re: [PATCH 3/8] Bluetooth: hci_ldisc: Fix tty_set_termios() return value
+ assumptions
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167883542103.4543.14888292350332012679.git-patchwork-notify@kernel.org>
-Date:   Tue, 14 Mar 2023 23:10:21 +0000
-References: <20230224-btbcm-wtf-v1-1-98b56133a5b7@gmail.com>
-In-Reply-To: <20230224-btbcm-wtf-v1-1-98b56133a5b7@gmail.com>
-To:     Sasha Finkelstein via B4 Relay 
-        <devnull+fnkl.kernel.gmail.com@kernel.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, fnkl.kernel@gmail.com
+Message-Id: <167883542099.4543.9923542324087254222.git-patchwork-notify@kernel.org>
+Date:   Tue, 14 Mar 2023 23:10:20 +0000
+References: <20230309082035.14880-4-ilpo.jarvinen@linux.intel.com>
+In-Reply-To: <20230309082035.14880-4-ilpo.jarvinen@linux.intel.com>
+To:     =?utf-8?q?Ilpo_J=C3=A4rvinen_=3Cilpo=2Ejarvinen=40linux=2Eintel=2Ecom=3E?=@ci.codeaurora.org
+Cc:     linux-serial@vger.kernel.org, gregkh@linuxfoundation.org,
+        jirislaby@kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -60,21 +60,19 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 10 Mar 2023 11:28:42 +0100 you wrote:
-> From: Sasha Finkelstein <fnkl.kernel@gmail.com>
+On Thu,  9 Mar 2023 10:20:30 +0200 you wrote:
+> tty_set_termios() never returns anything else than 0. Make the debug
+> prints to look directly into the new termios instead to check CRTSCTS
+> state.
 > 
-> This patch fixes an incorrect loop exit condition in code that replaces
-> '/' symbols in the board name. There might also be a memory corruption
-> issue here, but it is unlikely to be a real problem.
-> 
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Sasha Finkelstein <fnkl.kernel@gmail.com>
-> 
-> [...]
+> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+> ---
+>  drivers/bluetooth/hci_ldisc.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
 Here is the summary with links:
-  - [RESEND] bluetooth: btbcm: Fix logic error in forming the board name.
-    https://git.kernel.org/bluetooth/bluetooth-next/c/3629e1ce7721
+  - [3/8] Bluetooth: hci_ldisc: Fix tty_set_termios() return value assumptions
+    https://git.kernel.org/bluetooth/bluetooth-next/c/dd41882582a9
 
 You are awesome, thank you!
 -- 
