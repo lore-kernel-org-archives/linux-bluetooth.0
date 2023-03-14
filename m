@@ -2,211 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DC5CC6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 20:24:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 740A7C6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 20:32:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbjCNUYT (ORCPT
+        id S229911AbjCNUcS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 16:24:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43700 "EHLO
+        Tue, 14 Mar 2023 16:32:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbjCNUYQ (ORCPT
+        with ESMTP id S229588AbjCNUcR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 16:24:16 -0400
-X-Greylist: delayed 142988 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Mar 2023 13:24:09 PDT
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D102CC77
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 13:24:09 -0700 (PDT)
-Received: from github.com (hubbernetes-node-99477de.ac4-iad.github.net [10.52.222.32])
-        by smtp.github.com (Postfix) with ESMTPA id 9295F721FAC
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 13:24:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1678825448;
-        bh=/kmBhFtAqosTOb0JZtzkjcmeg7+n6hzqHeM+6iY8I7c=;
-        h=Date:From:To:Subject:From;
-        b=h0Av+XrnT4VRWQp+x2XuzLvSeS0xTOfWWO50E8IF+NOERIjyvnt7MeDUIW1GEozvu
-         Q431YD0hhJ59lPVNwmaWiAvKDa4BBQ903iMTMGIzc/ZYYY+LHiZvZp3r/oM5FR25Ai
-         UaRCrODt/C09qJ2r86RYRzSX4WrEtDT3tczFVdTA=
-Date:   Tue, 14 Mar 2023 13:24:08 -0700
-From:   =?UTF-8?B?xYF1a2FzeiBSeW1hbm93c2tp?= <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/40576a-6ae44c@github.com>
-Subject: [bluez/bluez] 932b90: shared/bap: Fix not unregistering idle callback
- on...
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Tue, 14 Mar 2023 16:32:17 -0400
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CAB51F8F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 13:32:16 -0700 (PDT)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-176b90e14a9so18717733fac.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 13:32:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678825934;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mfw9cT7SIQhWP6RJdrtm/3jW1mMw+s2bOWun7o8BVPo=;
+        b=A+emvUsRBUIG7wHEvURWykaPQY720usGsZ/RIcnilMrnzTS8e2MwBJocjiYw9LSyP/
+         8SNN+9QtvedZN2Zwc2nC+ZYrWrf69andi6sdaoWTBH2AcFexpCGk36707uaKBltKMWNM
+         eBfcrr1w+JVeL6phEdcGAXiTUc8DXeOcn+8S5Kp8WVRhVYwmkooauTn4h2yNivs2vWrJ
+         mYfgRmndGn7rldjDNrNzKFafS67KIF1/HWzlDIbakQFxdo6GJzXFRx9okH9oxdYteEx+
+         Rhon9+etvr8yHH3CV2nr+6yyOZtns3XqFDLtsm0G2T+AQogm2xO+c2STteMTBFO4imIW
+         UVGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678825934;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mfw9cT7SIQhWP6RJdrtm/3jW1mMw+s2bOWun7o8BVPo=;
+        b=JaYkkRCvMEbFMLoCqiP19KYXMF3xvkpPv3HLL27ugh+qzpSU6BuMFwFENWZYvJ8P+P
+         h9kv8e+mpLHkABUoE334FAstAEQ0wIPz7AXs+eUsE7SYI/IKxPliTusOiaId547iSrMP
+         d2Dt5vJ+wvTBuKr/YqkT2qeoVyJVN8gVAGNQh8nDVJX1fpSocmwSZwBxSWa7v2hNcez7
+         GNByWAMiZm0AK+ZcgRbOemEhjwjiAZI7tpThPsuOEDoXTwtkVxHjpCeVJfUDcyLLMiGq
+         kwachsUb3gt3vqTUdywPNdN2vp7I6FxdSoooM63HvwG8k06iLDOHm/gYvNdKfxl9JGlg
+         VuZg==
+X-Gm-Message-State: AO0yUKUvY+RIVEorGKP3/cn1BLTtWLEp3gl3sjdixe6/9Lj7z3Ji/zyw
+        oGpIQe36jTjV9WY2B76WA1KQFQVEV8Q=
+X-Google-Smtp-Source: AK7set8sNQTN6OPHZeirZ+9+xVEcbd9Wv6mJVtvCmLxpNo8wmucNVZsU5TnlW3HhkV1IYUDHRP5Ccg==
+X-Received: by 2002:a05:6870:50:b0:177:c8dc:501f with SMTP id 16-20020a056870005000b00177c8dc501fmr2996103oaz.29.1678825934638;
+        Tue, 14 Mar 2023 13:32:14 -0700 (PDT)
+Received: from [172.17.0.2] ([104.210.132.87])
+        by smtp.gmail.com with ESMTPSA id c5-20020a05687035c500b00172428894e0sm1507316oak.28.2023.03.14.13.32.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Mar 2023 13:32:14 -0700 (PDT)
+Message-ID: <6410d9ce.050a0220.1e400.7fc5@mx.google.com>
+Date:   Tue, 14 Mar 2023 13:32:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6865216162000439484=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] shared/gatt-client: Fix crash on bt_gatt_client_idle_unregister
+In-Reply-To: <20230314192325.464661-1-luiz.dentz@gmail.com>
+References: <20230314192325.464661-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 932b90f6c33e8f428bbfd1d761ff966e7d258c7f
-      https://github.com/bluez/bluez/commit/932b90f6c33e8f428bbfd1d761ff9=
-66e7d258c7f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
+--===============6865216162000439484==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M src/shared/bap.c
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  shared/bap: Fix not unregistering idle callback on detach
+Dear submitter,
 
-This make sure idle callback is unregistered before bt_gatt_client is
-unref.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730060
 
+---Test result---
 
-  Commit: 605ee768b789602f59f298423dfbad780deeeb8c
-      https://github.com/bluez/bluez/commit/605ee768b789602f59f298423dfba=
-d780deeeb8c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
+Test Summary:
+CheckPatch                    FAIL      0.83 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      26.48 seconds
+BluezMake                     PASS      751.63 seconds
+MakeCheck                     PASS      10.76 seconds
+MakeDistcheck                 PASS      148.57 seconds
+CheckValgrind                 PASS      240.05 seconds
+CheckSmatch                   PASS      322.03 seconds
+bluezmakeextell               PASS      97.02 seconds
+IncrementalBuild              PASS      627.67 seconds
+ScanBuild                     PASS      968.28 seconds
 
-  Changed paths:
-    M src/shared/csip.c
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] shared/gatt-client: Fix crash on bt_gatt_client_idle_unregister
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#90: 
+   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.7400.6)
 
-  Log Message:
-  -----------
-  shared/csip: Fix not unregistering idle callback on detach
+/github/workspace/src/src/13174960.patch total: 0 errors, 1 warnings, 9 lines checked
 
-This make sure idle callback is unregistered before bt_gatt_client is
-unref.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
+/github/workspace/src/src/13174960.patch has style problems, please review.
 
-  Commit: 4b704fb45a69ed6e745c5d01cca9622ede4bf522
-      https://github.com/bluez/bluez/commit/4b704fb45a69ed6e745c5d01cca96=
-22ede4bf522
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-  Changed paths:
-    M src/shared/gatt-client.c
-
-  Log Message:
-  -----------
-  shared/gatt-client: Introduce bt_gatt_client_ref_safe
-
-This introduces bt_gatt_client_ref_save which ensures the instaces
-which are being destroyed, e.g. ref_count =3D 0, do not attempt to reach
-callbacks.
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-  Commit: e040109302d841750b767e88c26a48e6f832edf3
-      https://github.com/bluez/bluez/commit/e040109302d841750b767e88c26a4=
-8e6f832edf3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
-
-  Changed paths:
-    M src/shared/csip.c
-
-  Log Message:
-  -----------
-  shared/csip: Fix crash on bt_csip_get_sirk
-
-This fixes the following trace:
-
-Invalid read of size 1
-   at 0x1F4282: bt_csip_get_sirk (csip.c:812)
-   by 0x176B21: csip_ready (csip.c:259)
-   by 0x1F3C74: csip_notify_ready (csip.c:578)
-   by 0x1F3C74: csip_idle (csip.c:659)
-   by 0x1DCDCC: idle_notify (gatt-client.c:171)
-   by 0x1D579A: queue_remove_if (queue.c:279)
-   by 0x1D584F: queue_remove_all (queue.c:321)
-   by 0x1E036F: notify_client_idle (gatt-client.c:180)
-   by 0x1E036F: request_unref (gatt-client.c:199)
-   by 0x1DC60D: destroy_att_send_op (att.c:211)
-   by 0x1DC60D: handle_rsp (att.c:874)
-   by 0x1DC60D: can_read_data (att.c:1064)
-   by 0x1F43F4: watch_callback (io-glib.c:157)
-   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.=
-7400.6)
-   by 0x4912117: ??? (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x48BB24E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.7400.6)
- Address 0x0 is not stack'd, malloc'd or (recently) free'd
 
 
-  Commit: 2762129212f1c4045c2ca3628cb49f42cb024689
-      https://github.com/bluez/bluez/commit/2762129212f1c4045c2ca3628cb49=
-f42cb024689
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Fix crash attempting to read Sets property
-
-The following set can be observed when a sirk is exists but it is
-encrypted leading to info->set to not be set:
-
-Invalid read of size 8
-   at 0x1ACDF0: append_set (device.c:1662)
-   by 0x1FFEFFF7DF: ???
-   by 0x1D4461: queue_foreach (queue.c:207)
-   by 0x1AC8DE: dev_property_get_set (device.c:1700)
-   by 0x1CF3E2: append_property (object.c:498)
-   by 0x1CFA91: append_properties (object.c:527)
-   by 0x1CFAFD: append_interface (object.c:542)
-   by 0x48D7CEF: g_slist_foreach (gslist.c:887)
-   by 0x1CF5A7: append_interfaces (object.c:1104)
-   by 0x1CF5A7: append_object (object.c:1119)
-   by 0x48D7CEF: g_slist_foreach (gslist.c:887)
-   by 0x1CF5D0: append_object (object.c:1122)
-   by 0x48D7CEF: g_slist_foreach (gslist.c:887)
- Address 0x8 is not stack'd, malloc'd or (recently) free'd
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 7b654b16fb04431178c13f96ec163779e3cfd752
-      https://github.com/bluez/bluez/commit/7b654b16fb04431178c13f96ec163=
-779e3cfd752
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: fix Locations, Context to be PACS not PAC properties
-
-Audio Locations and Contexts are properties of the PACS service, not of
-individual PAC, as these are device-wide bitmaps and a single
-characteristic may exist on PACS server (PACS v1.0 Sec 3).
-
-Move the attributes out from bt_bap_pac to bt_bap_pacs, and actually
-keep track of the values.
-
-
-  Commit: 6ae44c74aaf93468ddc626a02b8f0420a808b13e
-      https://github.com/bluez/bluez/commit/6ae44c74aaf93468ddc626a02b8f0=
-420a808b13e
-  Author: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-  Date:   2023-03-14 (Tue, 14 Mar 2023)
-
-  Changed paths:
-    M src/shared/btsnoop.c
-    M tools/btsnoop.c
-
-  Log Message:
-  -----------
-  btmon: Fix decoding truncated data
-
-Some platforms use different filtering and for this purpose,
-some of the ACL/SCO/ISO/SDP data is truncated.
-
-In such a case, included length is smaller than the original size.
-Without this fix, btmon stops working after first truncated packet.
-
-
-Compare: https://github.com/bluez/bluez/compare/40576ac1badf...6ae44c74aa=
-f9
+--===============6865216162000439484==--
