@@ -2,101 +2,102 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B94AEC7618B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 19:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5A4C6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 19:23:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjCNTRG (ORCPT
+        id S229783AbjCNTXa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 15:17:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
+        Tue, 14 Mar 2023 15:23:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230092AbjCNTRF (ORCPT
+        with ESMTP id S229754AbjCNTX3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 15:17:05 -0400
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A75DE3B679
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:17:04 -0700 (PDT)
-Received: by mail-io1-xd36.google.com with SMTP id b5so6877589iow.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:17:04 -0700 (PDT)
+        Tue, 14 Mar 2023 15:23:29 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0517523122
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:23:28 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id y2so16433910pjg.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:23:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678821424;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UpU0RljPfIU6YKBYFl774ZiVUhVlWzs5/BN78MZfLZQ=;
-        b=ftRH3TIM4Lsr/K75zxuVtnlesR4je0i2Qc+eWSD7Yb875r9kfd8TbQKDSOVTlsnAn2
-         fKidMwOq5fM0Gq3HN3rjVOv4hhqEVs2w4BqwCZfjE3ZSjcZA2MsXi0jpHC3YfTNZjSi/
-         VcACe6TxguRbHs6PXuYMmsPVnjVQc9SP8bsJzwnY7ZvQ/dQtp3+0dhugfvlf6VOJnb7d
-         ZOM51LTSapNSvwK3zYvPqVcFOPmDL5mSWK3i0USBCs3PwFB+dZAVvLkVD75x/AvdQqqd
-         JBQw7xpx+hOmpyDnT7TdITdvty0Za3tCWS/1/dYe1nJDlw/cW/V1DdtpkVa+2hPcrfLr
-         ixSA==
+        d=gmail.com; s=20210112; t=1678821807;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nghr0MKmyjAv9f0/j7BN2Ovq2gZbb5qtMttnjL62jd4=;
+        b=bAMRB+lcdI0YStSj0DlSGYUvfl89QUXX7TV0Q1rZPLiGNTAVpvkoE/fK6KxRI2FBWD
+         jNEylPJ8Gpj/Bcgn5TvGZVkjzH80ACChqqehPRSSvd7zR4SyiJPyvXq2ne8rwu66xgxM
+         r8sTH7x2sZF2EE+qimTeB241Bf+S85g9eWyli/hk+RI3QLEvGLFqbB4GusIwyc9gIBHG
+         RmxVCCkMXMRDDf9gHaSvRc/FKbWpvHio6WCanWQ9zP0MLIYxLNTsrwOHCo7VSdYx6jyH
+         G6Ix5YMRdri8h8jvOGo18U55PJ+wJg4kdg41tezxY0y3LzLWtrXths5vh5OJkYa6gYvq
+         CYLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678821424;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UpU0RljPfIU6YKBYFl774ZiVUhVlWzs5/BN78MZfLZQ=;
-        b=t80R91Fl+SzYZqOWwtfobcXDAl5x52s3YPwPAiScUxundx5jZAcqJuYiHgCVaaT6Fw
-         VJhuQBo8rX5GBfC1DeLISGV8w6jJSKBd30GGPH4NYAth8+MoU5wmdYeuqALt9zdwpbmM
-         EI28xMMEJ/zN00Dmfq2xkoszt4kw3VM58TF78y2XOVozdrhNZj+mVlwdcXx3KoEJowmK
-         ZTFImRjieKe5gllaHMPF/sH6ubEAqTquXA69AGG1rmPTxBnQhZoYPEPMsMlJ4tGZ7jCy
-         uqf6U3kz14R15r5siQPGTDunPa2M7XKHCU8xKyTjWssWjNFDbv29PfsZ+fPs9e6CTeDr
-         ynCg==
-X-Gm-Message-State: AO0yUKUhm94VR3FWywF0iBawjmbfsXA9g9Q//AyoejtmZqdF6NPgvPkw
-        XFL31tRmzF4ynodkBHAjC0bC8EqTRa8=
-X-Google-Smtp-Source: AK7set/v2LmKa7VIn3unucPWp9mJcm3nADU8YoF5J9iZbZH6K6hLEpuL/IdyNZaaZuI90HzfWI0S2A==
-X-Received: by 2002:a05:6602:2159:b0:74d:46eb:6a57 with SMTP id y25-20020a056602215900b0074d46eb6a57mr28749167ioy.20.1678821423877;
-        Tue, 14 Mar 2023 12:17:03 -0700 (PDT)
-Received: from [172.17.0.2] ([40.77.93.2])
-        by smtp.gmail.com with ESMTPSA id m6-20020a056602314600b0073fe9d412fasm1046804ioy.33.2023.03.14.12.17.03
+        d=1e100.net; s=20210112; t=1678821807;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nghr0MKmyjAv9f0/j7BN2Ovq2gZbb5qtMttnjL62jd4=;
+        b=m9IahTr2WVsKPvZogTJSsWBnsQCCmdyvPENQAz0uqHwWuxQb5KeWP6xyFtmzpR4Cb8
+         ZEsigjJDQ7yIUzs9/R4m8U8J/2o6hIa0yAK7gTrwvMALYahFgmGMwQcQsG4H8IS4dF93
+         lfs/XSVMPclfGM/NpKp/uB+Jzq88ob3ifYmFpSOScNGlsguYjN9rgKw1IuSIgXb8IGew
+         XlYxfW7661JoGfZ+M2VqEZtV1fm1mywu0voLb/7B5RtSybv/AUjULrs0pIX3bKn7Lv38
+         V6Lvxig8yYreGLGQI+bZZnrH/domgS2+XJjseGNexolvjtXPGULACJ15oHzYRInV96Lq
+         8+XQ==
+X-Gm-Message-State: AO0yUKVy25z841Lfib/B4s6kIB9nhncFaNQiufH5+9kkDMgSob/ax7Ya
+        8LpLVKnTcawcWGQIBaoXiBf2ekCcACk=
+X-Google-Smtp-Source: AK7set8aIiU2zmVxXzzUtNTcjQA5UV1htoREE+mEzqYe4EUb5sCS7/HbLMkMoKw/JIV/UVaCj6xJgw==
+X-Received: by 2002:a17:90a:aa8a:b0:23d:31c3:c98d with SMTP id l10-20020a17090aaa8a00b0023d31c3c98dmr4156220pjq.15.1678821806947;
+        Tue, 14 Mar 2023 12:23:26 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id r15-20020a63204f000000b0050bcf117643sm1454763pgm.17.2023.03.14.12.23.26
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Mar 2023 12:17:03 -0700 (PDT)
-Message-ID: <6410c82f.050a0220.e3e55.288b@mx.google.com>
-Date:   Tue, 14 Mar 2023 12:17:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0221021770811960098=="
+        Tue, 14 Mar 2023 12:23:26 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-client: Fix crash on bt_gatt_client_idle_unregister
+Date:   Tue, 14 Mar 2023 12:23:25 -0700
+Message-Id: <20230314192325.464661-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] shared/bap: fix Locations, Context to be PACS not PAC properties
-In-Reply-To: <3eff7be0f5f2cd5df7585ed2a2dc82bc84ff7f38.1678816865.git.pav@iki.fi>
-References: <3eff7be0f5f2cd5df7585ed2a2dc82bc84ff7f38.1678816865.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0221021770811960098==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This fixes the following crash:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730031
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.29 seconds
-BuildEll                      PASS      26.85 seconds
-BluezMake                     PASS      781.36 seconds
-MakeCheck                     PASS      10.99 seconds
-MakeDistcheck                 PASS      153.30 seconds
-CheckValgrind                 PASS      247.99 seconds
-CheckSmatch                   PASS      331.01 seconds
-bluezmakeextell               PASS      97.69 seconds
-IncrementalBuild              PASS      623.45 seconds
-ScanBuild                     PASS      1010.53 seconds
-
-
-
+Invalid read of size 8
+   at 0x1E1E0B: bt_gatt_client_idle_unregister (gatt-client.c:3812)
+   by 0x1EB6BD: bt_bap_detach (bap.c:3821)
+   by 0x1EB6BD: bt_bap_detach (bap.c:3808)
+   by 0x1D5631: queue_foreach (queue.c:207)
+   by 0x1DCAA3: disconnect_cb (att.c:713)
+   by 0x1F4404: watch_callback (io-glib.c:157)
+   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.7400.6)
+   by 0x4912117: ??? (in /usr/lib64/libglib-2.0.so.0.7400.6)
+   by 0x48BB24E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.7400.6)
+   by 0x1F4A54: mainloop_run (mainloop-glib.c:66)
+   by 0x1F4E21: mainloop_run_with_signal (mainloop-notify.c:188)
+   by 0x1304B4: main (main.c:1428)
+ Address 0x28 is not stack'd, malloc'd or (recently) free'd
 ---
-Regards,
-Linux Bluetooth
+ src/shared/gatt-client.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 3a29f807fc85..d28f5b3670f6 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -3809,6 +3809,9 @@ bool bt_gatt_client_idle_unregister(struct bt_gatt_client *client,
+ {
+ 	struct idle_cb *idle = UINT_TO_PTR(id);
+ 
++	if (!client || !id)
++		return false;
++
+ 	if (queue_remove(client->idle_cbs, idle)) {
+ 		idle_destroy(idle);
+ 		return true;
+-- 
+2.39.2
 
---===============0221021770811960098==--
