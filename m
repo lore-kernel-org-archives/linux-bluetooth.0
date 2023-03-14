@@ -2,169 +2,194 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F592C6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 00:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB5BC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 00:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbjCNAtD (ORCPT
+        id S229854AbjCNA5N convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Mar 2023 20:49:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
+        Mon, 13 Mar 2023 20:57:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229820AbjCNAtA (ORCPT
+        with ESMTP id S229537AbjCNA5M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Mar 2023 20:49:00 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C8B5D249
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:48:45 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id r16so15202326qtx.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:48:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678754925;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=34UTjE1VUixFaNDmYjJFcrN66ELET5rwNQwjvqDR6wk=;
-        b=ivRuLKIDx7BXYfA2y1A3PzGAsPXzbWw5rmut42s9aysOiOOL6EV3En1CR8yLcycqRF
-         ldI+h8cnOQcBfD/XzSsP0yACI9/NYJ+b91vbjWk5OKD6riio2AZvu4ZyzJCbFj6y1QYc
-         kAZxedP4nOuCzUiC3qJ8yuMhDXoc6gwPEreQBB9d8t2pCq32zikRCOxPPGh4dKu2y+NG
-         8LO2yXb/fs1cCWLFI30cvHqpK8s/iSqo7+xmJmrmMDXaZJnYewNmA0f7WXyhmLCP7y+n
-         ZYQ4+yB/nbGKSpzqObYK4/z/vbKjDzborTH8LvyXfLU9tq4aDoxxxRHVXmvDEP8I/nWG
-         UVsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678754925;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=34UTjE1VUixFaNDmYjJFcrN66ELET5rwNQwjvqDR6wk=;
-        b=tK28IuvmKtNsiykk0YJKaZJUAyuakis0VpBdWd/lhMKPeIj20XX2PkIeyEhwYKwZyr
-         n8E3caOScbQQY7PEXxgygR+1ZZIM0i3xz6n9yCoNBewlS8XQYfZZJxStBBxWtFKd32vy
-         BaSz3hqagNKaQRhwD8sIu7W2ktQC40Q8oNdoceZr325MJrXpvbhu9oIQ/KWaCfGP1+JO
-         jsYbS0YnHgPiVZpbXT5HDucSVM+H5FvojJkq39dtlYchOrv6p5z01Og+XM23bRAU4vjn
-         +Mnw1Uk4WPy+icIMNwnOAaNd96pN6mMQ6fDaULIokORdNRoHgmi3/Gswmg8NL1olOmyf
-         MDaA==
-X-Gm-Message-State: AO0yUKXB16eNiaAuTmDn8eo5mt9Jc1WleHq851jF4+1E36fF37qlUN0H
-        X0AigpDBbenC6vnM0CTFZo1pBP0vWno=
-X-Google-Smtp-Source: AK7set8i5+/SZmuUq4AR4IW0EunXHlZTdmcX+Dhgt7HunAd5wa0r8DV0jOEqtOvZDYTDTUuG2wTpfw==
-X-Received: by 2002:a05:622a:5d2:b0:3b9:a5d8:2c50 with SMTP id d18-20020a05622a05d200b003b9a5d82c50mr25051690qtb.38.1678754924902;
-        Mon, 13 Mar 2023 17:48:44 -0700 (PDT)
-Received: from [172.17.0.2] ([104.45.200.40])
-        by smtp.gmail.com with ESMTPSA id z18-20020ac83e12000000b003bfbf16ad08sm796851qtf.74.2023.03.13.17.48.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Mar 2023 17:48:44 -0700 (PDT)
-Message-ID: <640fc46c.c80a0220.261e3.4889@mx.google.com>
-Date:   Mon, 13 Mar 2023 17:48:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0902888453141970176=="
+        Mon, 13 Mar 2023 20:57:12 -0400
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 796128C957
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:57:09 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id BAA5C24075D
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 01:57:07 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PbFVB5Rx9z6trY;
+        Tue, 14 Mar 2023 01:57:06 +0100 (CET)
+Date:   Tue, 14 Mar 2023 00:57:04 +0000
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     linux-bluetooth@vger.kernel.org,
+        =?ISO-8859-1?Q?Fr=E9d=E9ric_Danis?= <frederic.danis@collabora.com>
+Subject: Re: [RFC v2 01/12] shared/crypto: Add bt_crypto_sirk
+In-Reply-To: <CABBYNZKv68ybD3YVKFtHUARh6H+TVY=2_P9TdNWEbZ4FbTX31w@mail.gmail.com>
+References: <20230307222422.2608483-1-luiz.dentz@gmail.com> <167849522070.21816.4954897604805294201.git-patchwork-notify@kernel.org> <CABBYNZJ8GbCic4+dAz-04vji3xgtqYnXRUjTuWHSk3oGjXxA=Q@mail.gmail.com> <f86f2896be923a9caa5625457fea46d1c32b3114.camel@iki.fi> <CABBYNZKv68ybD3YVKFtHUARh6H+TVY=2_P9TdNWEbZ4FbTX31w@mail.gmail.com>
+Message-ID: <A02E43E3-63E3-4F75-AB99-FB355180DD2B@iki.fi>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/4] shared/bap: Fix not unregistering idle callback on detach
-In-Reply-To: <20230313225150.267896-1-luiz.dentz@gmail.com>
-References: <20230313225150.267896-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0902888453141970176==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+14. maaliskuuta 2023 2.18.21 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com> kirjoitti:
+>Hi Pauli,
+>
+>On Mon, Mar 13, 2023 at 4:30 PM Pauli Virtanen <pav@iki.fi> wrote:
+>>
+>> Hi,
+>>
+>> su, 2023-03-12 kello 22:36 -0700, Luiz Augusto von Dentz kirjoitti:
+>> > Hi Pauli, Frederic,
+>> >
+>> > On Fri, Mar 10, 2023 at 4:40 PM <patchwork-bot+bluetooth@kernel.org> wrote:
+>> > >
+>> > > Hello:
+>> > >
+>> > > This series was applied to bluetooth/bluez.git (master)
+>> > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>> > >
+>> > > On Tue,  7 Mar 2023 14:24:11 -0800 you wrote:
+>> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> > > >
+>> > > > This adds bt_crypto_sirk which attempts to generate a unique SIRK using
+>> > > > the following steps:
+>> > > >
+>> > > >  - Generate a hash (k) using the str as input
+>> > > >  - Generate a hash (sirk) using vendor, product, version and source as input
+>> > > >  - Encrypt sirk using k as LTK with sef function.
+>> > > >
+>> > > > [...]
+>> > >
+>> > > Here is the summary with links:
+>> > >   - [RFC,v2,01/12] shared/crypto: Add bt_crypto_sirk
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c1dd94cc7f81
+>> > >   - [RFC,v2,02/12] shared/ad: Add RSI data type
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c2e99aefd337
+>> > >   - [RFC,v2,03/12] doc: Add set-api
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6477522e92e3
+>> > >   - [RFC,v2,04/12] device-api: Add Set property
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5bac4cddb191
+>> > >   - [RFC,v2,05/12] core: Add initial implementation of DeviceSet interface
+>> > >     (no matching commit)
+>> > >   - [RFC,v2,06/12] core: Check if device has RSI
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f95ffcc8b1fe
+>> > >   - [RFC,v2,07/12] main.conf: Add CSIP profile configurable options
+>> > >     (no matching commit)
+>> > >   - [RFC,v2,08/12] shared/csip: Add initial code for handling CSIP
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d297a03b7a61
+>> > >   - [RFC,v2,09/12] profiles: Add initial code for csip plugin
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9e1eb0a62b3f
+>> > >   - [RFC,v2,10/12] tools: Add support to generate RSI using SIRK
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c446a64d461b
+>> > >   - [RFC,v2,11/12] client: Add support for DeviceSet proxy
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=373bafc34ce6
+>> > >   - [RFC,v2,12/12] client: Use AdvertisingFlags when available
+>> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=815f779aa8e4
+>> > >
+>> > > You are awesome, thank you!
+>> > > --
+>> > > Deet-doot-dot, I am a bot.
+>> > > https://korg.docs.kernel.org/patchwork/pwbot.html
+>> >
+>> > Let me know if you guys are happy with this interface to detect
+>> > Coordinated Sets, it still experimental so we can experiment with it
+>> > until we think it is stable, regarding the implementation of the
+>> > transports one major difference here is that we will need to encode
+>> > left and right separately, not sure how hard it is to do that in
+>> > pipewire?
+>>
+>> As far as the device set DBus interface is concerned, it seems to work
+>> fine for me currently (in wip implementation for PW [0]). Don't right
+>> now see something that would need to be added/changed in it.
+>>
+>> Channel splitting/merging is generally easy in PW. How the playback
+>> synchronization is going to work on socket level may determine a bit at
+>> what level in PW it is convenient to do though.
+>>
+>>
+>> ---
+>>
+>> Laundry list for PW related to this:
+>>
+>> * How to do TX syncronization properly with the ISO sockets needs still
+>> some thinking. I have some wip patches [2] that add the timestamps and
+>> other socket API that provide timing information to allow
+>> synchronization to the Number of Completed packets events.
+>> Corresponding Pipewire implementation [3] rate matches to keep the time
+>> difference between those events and our audio reference time fixed at
+>> e.g. 25ms (2 packets in controller). Not really clear yet if this is a
+>> right thing to do to help the controller send packets at the right
+>> time.
+>
+>I have to check with our controller folks, I do recall someone saying
+>that perhaps we should use framed instead of unframed so the
+>controller can better keep up with timings, but it is not yet clear
+>why.
+>
+>> Here I see LE Read ISO TX Sync with Intel AX210 returning only zero
+>> values in Command Complete in btmon for running CIS, so that command
+>> doesn't seem to help here.
+>
+>Yeah, I don't think it is implemented yet.
+>
+>> * BlueZ doesn't seem to pass on the PAC audio location it reads via
+>> read_sink/source_pac_loc, probably very easy to fix.
+>
+>Will take a look, afaik we fixed something like this not long ago but
+>perhaps you are talking about something different.
+>
+>> * The CIS in a CIG cannot be started one by one, or connected to same
+>> destination. The kernel appears to wait until all CIS sockets in same
+>> CIG go to connect state before proceeding to create CIS. The spec does
+>> not seem to require this (I have some pre-rfc patches to make it more
+>> flexible [1].)
+>
+>It used to be like that but I actually have to fix it because the
+>controller don't accept multiple CreateCIS in parallel:
+>
+>https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_conn.c#n1907
+>
+>And it would actually create a relatively big window if we queue and
+>wait for CIS established, because then the controller may set up its
+>scheduling without taking into account the second CIS which will then
+>fail when it comes to its setup, so I think it is better to program
+>them together to avoid having only one side working.
 
-This is automated email and please do not reply to this email!
+Hmm, I made it queue and wait for the previous Create CIS to fully complete before emitting the next one, and that did seem to also work (also with TWS playback to the Samsung device).
+However did not extensively test, so even if allowed by spec risks running to controller issues?
 
-Dear submitter,
+The problem here is that the second CIS is not necessarily going to come, as it may be unrelated device put to same CIG since controller doesn't support multiple CIG.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=729652
+In principle sound server can acquire always all CIS, but then we should expose also the cig/cis properties on transports so they know which ones are needed.
 
----Test result---
+It could also make sense for BlueZ do it, when any cis in cig is started.
 
-Test Summary:
-CheckPatch                    FAIL      2.24 seconds
-GitLint                       PASS      1.38 seconds
-BuildEll                      PASS      27.19 seconds
-BluezMake                     PASS      847.95 seconds
-MakeCheck                     PASS      11.14 seconds
-MakeDistcheck                 PASS      149.61 seconds
-CheckValgrind                 PASS      244.58 seconds
-CheckSmatch                   PASS      328.42 seconds
-bluezmakeextell               PASS      99.01 seconds
-IncrementalBuild              PASS      2848.45 seconds
-ScanBuild                     WARNING   1027.16 seconds
+>Btw, take a look at how it was done with bluetoothctl>
+>transport.acquire <transport_left> <transport_right>, we have been
+>able to use it to acquire both left/right earbuds and then send
+>pre-encoded files.
+>
+>> * PW currently does transport acquires synchronously and fails because
+>> of that with multiple CIS, but it probably should do them async.
+>>
+>>
+>> [0] https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/1564
+>> [1] https://github.com/pv/linux/commits/iso-fix-multicis
+>> [2] https://github.com/pv/linux/commits/iso-timestamp
+>> [3] https://gitlab.freedesktop.org/pvir/pipewire/-/commits/iso-timestamp-test
+>>
+>> --
+>> Pauli Virtanen
+>
+>
+>
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,4/4] shared/csip: Fix crash on bt_csip_get_sirk
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#100: 
-   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.7400.6)
-
-/github/workspace/src/src/13173430.patch total: 0 errors, 1 warnings, 9 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13173430.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/gatt-client.c:179:18: warning: Access to field 'ref_count' results in a dereference of a null pointer (loaded from variable 'client')
-        if (!client && !client->ref_count)
-                        ^~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:451:21: warning: Use of memory after it is freed
-        gatt_db_unregister(op->client->db, op->db_id);
-                           ^~~~~~~~~~
-src/shared/gatt-client.c:696:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, false, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:993:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1099:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1291:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1356:2: warning: Use of memory after it is freed
-        discovery_op_complete(op, success, att_ecode);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1631:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:1636:2: warning: Use of memory after it is freed
-        discover_all(op);
-        ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2142:6: warning: Use of memory after it is freed
-        if (read_db_hash(op)) {
-            ^~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:2150:8: warning: Use of memory after it is freed
-                                                        discovery_op_ref(op),
-                                                        ^~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3238:2: warning: Use of memory after it is freed
-        complete_write_long_op(req, success, 0, false);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-src/shared/gatt-client.c:3260:2: warning: Use of memory after it is freed
-        request_unref(req);
-        ^~~~~~~~~~~~~~~~~~
-13 warnings generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0902888453141970176==--
+Hi,
