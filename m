@@ -2,188 +2,237 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3B4C7618B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 16:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D20C05027
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 18:04:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbjCNQeh (ORCPT
+        id S230087AbjCNSEe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 12:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56616 "EHLO
+        Tue, 14 Mar 2023 14:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbjCNQeg (ORCPT
+        with ESMTP id S229665AbjCNSEd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 12:34:36 -0400
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2070f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e83::70f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C879A2C2E;
-        Tue, 14 Mar 2023 09:34:11 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ecMFa5c0kAupOxFbOSB8EMTscxS/Wvs0Iv+BVVT0JwXLR9jxTLjLLHQWaKmsVjIiaqvYd8EacSD83UMIcQVu2bsL9WFE/ftr7Pr3eBZdL7p1B0Glmjd/SkfwSRuHlcCBnLk+ZYPwVKCsYpTbxeYCbSHvBzLp5M1ujzWKnjmHtXJrrH3xWlDGQYxaguHhqzIGkt80vs08wXh0GBeseS6BCYu0NdwG1BroRxoCwZrLjJ59hdRTWvTGhV6KA6aIH+K6idROKH1AvbQ66qQDN7iq4qS+T7xLSwK/MKOqwzTK3FvOIb7sqKBeYrAGXitLUmJgPlmmpONQUohRp0WTXWsOgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mrKn5aGROGOID2IiNHgBMWDyOJatysnoEKt2I96HMNs=;
- b=Zm0CWN3Inl7FdfdPRA7kTxTRn+J1jhV0bEow0Bvx9MfJmGG15gggHj/mWGN1SwTYlAMaFuuv+O2dRm9qi4/idLl/Y26UwjSY1nWBLiW5znYybsc6G/wyd1nZ11ak8/dSNvXIhwn579WjQXoYxvn4P0OCL36jdEbF7R8TfCkzD33m33WhTblMRDS0CmhWjsJf44wSxdq/J4xOVowV/qfO6Fjon0Zp4QeUfOE4x8eb8QOzt10DEnPeWksuaMFOO4OC8EZNJzioymsa9DiEOJyzcEhq4oqLP5p1fohWtn72uM+mHUDQgvc2poOns34h8ASeDNGarJzSf8QDepAeCqW4wQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mrKn5aGROGOID2IiNHgBMWDyOJatysnoEKt2I96HMNs=;
- b=AAC1Q+IDbvYNGyJw/XAxlb7VFQB0Y7z/2ccDLcArlD2poTrog8mz3GijSWcOkpzS1NxU1yoVVi4c0xkLo3fNOPO0BpUni1l8IRF0fJCAuMcYJl9MHBFoQRhQsB7zGwlCGT9DqFAr3PelkVXFs0VnlxhWHKzznieVQMKWD2bKcfc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MN2PR13MB3957.namprd13.prod.outlook.com (2603:10b6:208:263::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.26; Tue, 14 Mar
- 2023 16:34:08 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6178.026; Tue, 14 Mar 2023
- 16:34:08 +0000
-Date:   Tue, 14 Mar 2023 17:33:59 +0100
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-Cc:     "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "jirislaby@kernel.org" <jirislaby@kernel.org>,
-        "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
-        "hdanton@sina.com" <hdanton@sina.com>,
-        "ilpo.jarvinen@linux.intel.com" <ilpo.jarvinen@linux.intel.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>
-Subject: Re: [PATCH v10 3/3] Bluetooth: NXP: Add protocol support for NXP
- Bluetooth chipsets
-Message-ID: <ZBCh98lGvhlMKQQp@corigine.com>
-References: <20230313144028.3156825-1-neeraj.sanjaykale@nxp.com>
- <20230313144028.3156825-4-neeraj.sanjaykale@nxp.com>
- <ZBBUYDhrnn/udT+Z@corigine.com>
- <AM9PR04MB8603E3F3900DB13502CFCB8DE7BE9@AM9PR04MB8603.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM9PR04MB8603E3F3900DB13502CFCB8DE7BE9@AM9PR04MB8603.eurprd04.prod.outlook.com>
-X-ClientProxiedBy: AM3PR04CA0140.eurprd04.prod.outlook.com (2603:10a6:207::24)
- To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+        Tue, 14 Mar 2023 14:04:33 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 804F39EF45
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 11:04:31 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 065A6240685
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 19:04:29 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PbhHd2SDHz6tns;
+        Tue, 14 Mar 2023 19:04:29 +0100 (CET)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] shared/bap: fix Locations, Context to be PACS not PAC properties
+Date:   Tue, 14 Mar 2023 18:04:27 +0000
+Message-Id: <3eff7be0f5f2cd5df7585ed2a2dc82bc84ff7f38.1678816865.git.pav@iki.fi>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3957:EE_
-X-MS-Office365-Filtering-Correlation-Id: aff92754-da93-4fb2-1809-08db24a9eede
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8My7SARv5O1sHSoxU6wIy/JJx9vfyhQr1FFdbeEGlnrpR9HT7ifRTZKMMtSV74xRM2wSbSnoVFvPpaloIbPVh69hxNop9dyt92cedBjqTDKd4lZfeGjhxnC+DDo9enaKqae8c9PzlHX4driRiT41pJQarOUGpmxvUugqtb/omAIRWiS0nqzccHVsFTgHPHTRRZUkZnqP98K2pWFzD5sM+ZUbC0UWTonIMN3H6kAXq5cXWZt1WNwKRNWHCkmSw0r9XqC80wToKZP5LYcMvhVy+Qle58ocTcBj5H3eX64AmSSvZFFcRMmHPmYfSMp/wxhxf8C6d83BM5dCDm0GHXJcU3CiOSvA7ghwwUAnGFHPxW2djLl4kdKjYFYrwHbqo/yTvZE8uJQdeGls8JnwiBJqv0F+JAbeJh8iEvrnea/DCNDKBEJDA5VEFT7+M5Y8nODoeUOjvKWFwXIhs+5pFnAyc6LtEwaR2jGZL+UcEiAE5R2387xc28qZkOimZRoXlkk52fSsWusIQHpPTii0l9nK66mee6VcKde+XjWZq6s0nQ+e72TS7XNvykkiG+1gvrmj5+VBnEJ/QhbiFgaIG2k6FKs8JKjQiA/YLJIhi9wqy+tOAEXMOKz/RCQYySdaf5pCiYUj12phnFomugFrIJJeNw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(366004)(376002)(136003)(39840400004)(451199018)(86362001)(36756003)(38100700002)(8936002)(41300700001)(2906002)(44832011)(7416002)(5660300002)(4326008)(6916009)(6512007)(2616005)(186003)(6506007)(83380400001)(54906003)(316002)(66946007)(66556008)(66476007)(6666004)(6486002)(478600001)(8676002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hZOmY02ePl13XyutcQGyciJcajIULofEGKW7bS+ZvGkE3I7r2v+rLkQxKf28?=
- =?us-ascii?Q?ADUcQhytOp6RfBXTtHBhoBs8PLRZeZ0ZXYoJo0uPcZKqzWGhzpwU5u+ako7R?=
- =?us-ascii?Q?lNyvLnGvRGzMMLlgGNYbmtT4bILjSwUUBY9biVjlFs6pAFjvn+IFZ944eGN8?=
- =?us-ascii?Q?AFPfsWNz4nue7r22askICyGgMXfS/1wyWyVm4HXHy8b/E6YXvUzYjq0zwtu1?=
- =?us-ascii?Q?+HnHdsMi2TsOdkFJJN41DVm5dbzZ2ZnyC2zyvedtBDC5VZwPx3r/9razRaB+?=
- =?us-ascii?Q?vFw8eO6ThldrzF+uXkV8OxZ20BnZ2VfF+AmGXDBIWqSU4JEsLk4M5nbG268g?=
- =?us-ascii?Q?lTbHNgu+2UZoTXgdRThPII5JCVdTv8CUIBHZ4xVKnjKe9cBhuMzAfWIiT/VO?=
- =?us-ascii?Q?/Y1CnZpxfniKr2xzm1MO6yDiBsma+hdHiuIvTkzOdfH7dTB3lGUC/PUBP1yQ?=
- =?us-ascii?Q?JPUoxSR5XUfqBOTw55jeMj/X1BnlY7viE7rtTDTIe2slN6ibFIzHNP9gNOLq?=
- =?us-ascii?Q?5AQldmcMm4DAVDBo0jay/E36ERS2zUhMZQIWetAx9fa2RO/kQDyBO8+m8WJg?=
- =?us-ascii?Q?sMVvnUBPuf95XsyAsP46Fipj10OvzM9K/IX3/2/Y6gkjb2eZyYrmLS78B3+h?=
- =?us-ascii?Q?1QSwU6cmXRxe6xkcmom5F1CSWighgeyyL/5OG3ZtrWkHOPJFwxrRlqOafmXD?=
- =?us-ascii?Q?jmeuC6XGGAeyHbH+EDJG724V4qqRQwARNZQFTmdOZcOzZ5mXTSq4ypoNnM43?=
- =?us-ascii?Q?l/SyOsB9p2Em2sBc45xihyqBbnGcG2O2CWHQxsFMmPsjLaKCi88+Ksi7HnRU?=
- =?us-ascii?Q?IOJw+OkSO5pEsTLtUJCjBsjldwk/DNrnxGYi62aOCJh4yT1yIOQb2THesp3z?=
- =?us-ascii?Q?Sd6NJZTRmvmxwV6u1D82/3saKO7lW422XHvi4XfmkqIwcKUhewXIjpUb0dzc?=
- =?us-ascii?Q?fCDk1Tq+F29rdT78lYYmPVDbFBnlG2GBLl0sEt4LjiXI99rVfX1nCjoV4AvL?=
- =?us-ascii?Q?+ncXy3LlDrjNGIVA4Yc4QwXO/PF3PPZZvSVUro5gERCB5qPCxUD+2TgJL/I4?=
- =?us-ascii?Q?RHpTA9O8zFMlJwTz8aviZzgTqKu/XRL6q0+Od54PkVA+v+0m+hliSMbgP4hY?=
- =?us-ascii?Q?nMlmf8KAwCwxyIH5Faq57NqXE/Fs80UGIPGp2rUBhSFJR/tmSKHS5WJzekSd?=
- =?us-ascii?Q?HIcmrLA+VVW46afW+q1XjNL8zcNEVi+VkL56Sq0ecEkrKmZpPCxj0QY1eOWA?=
- =?us-ascii?Q?B6LoAqzfUbxgtuZltUTsXQOrnluiBSrSbbxl+l2tl5QXU5x5sH2bOAF9XVpG?=
- =?us-ascii?Q?ANP0vJqqSg4JbQdSKSgrjdZ2WgmMxnAfENshCVp4gyGBZq0UnhQ7BpeQPrJs?=
- =?us-ascii?Q?i/9u901cyrUZJolqg/AjOruDJUQZmNIJ6DB85aDUaSU7RlV/NXgH++aTV1FT?=
- =?us-ascii?Q?E+9UdpdNmDCei+Z1hEhoeGaP2mZ+eM7ERtbEgLkqJw1sO+29DyC6CyXi8u+T?=
- =?us-ascii?Q?/ke736Mjjbm/lLQvOfZXP48DC5/ZMbJod6ce6FZQcQ0Hdv9ubcq91aWWqwq6?=
- =?us-ascii?Q?oLx1c9CPniFTPnle2RsKHxUxMh4NCrlINWkwZiVUmrskPytdJHdA7CgrqLtG?=
- =?us-ascii?Q?n4uGL4g3sXp5RqgmRM0y4B1eSRY8iZBKFX6Ro1zW3cUy7gH8WWl0mN4vyu35?=
- =?us-ascii?Q?KqBLsQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aff92754-da93-4fb2-1809-08db24a9eede
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2023 16:34:08.0068
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3wzO6CVuOwaD6JKO/qIok7SmO0WTieZ899ZH5fL1nSdhiV/8DV0X6gU9z/cS/7DMtv3SurUJWZ+uwQEu40J55DMHUR4OBCaziugHjgPsJHc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3957
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 03:40:34PM +0000, Neeraj sanjay kale wrote:
-> Hi Simon
-> 
-> Thank you for reviewing the patch. I have a comment below:
-> 
-> > 
-> > > +send_skb:
-> > > +     /* Prepend skb with frame type */
-> > > +     memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-> > > +     skb_queue_tail(&nxpdev->txq, skb);
-> > > +
-> > > +     btnxpuart_tx_wakeup(nxpdev);
-> > > +ret:
-> > > +     return 0;
-> > > +
-> > > +free_skb:
-> > > +     kfree_skb(skb);
-> > > +     goto ret;
-> > 
-> > nit: I think it would be nicer to simply return 0 here.
-> >      And remove the ret label entirely.
-> > 
-> > > +}
-> > 
-> We need to return from this function without clearing the skbs, unless "goto free_skb" is called.
-> If I remove the ret label and return after kfree_skb() it causes a kernel crash.
-> Keeping this change as it is.
-> 
-> Please let me know if you have any further review comments on the v11 patch.
+Audio Locations and Contexts are properties of the PACS service, not of
+individual PAC, as these are device-wide bitmaps and a single
+characteristic may exist on PACS server (PACS v1.0 Sec 3).
 
-I'll look over v11.
+Move the attributes out from bt_bap_pac to bt_bap_pacs, and actually
+keep track of the values.
+---
+ src/shared/bap.c | 74 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 62 insertions(+), 12 deletions(-)
 
-But for the record, I meant something like this:
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 952b7be26..13189aab4 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -91,6 +91,12 @@ struct bt_pacs {
+ 	struct gatt_db_attribute *context_ccc;
+ 	struct gatt_db_attribute *supported_context;
+ 	struct gatt_db_attribute *supported_context_ccc;
++	uint32_t source_loc_value;
++	uint32_t sink_loc_value;
++	uint16_t source_context_value;
++	uint16_t sink_context_value;
++	uint16_t supported_source_context_value;
++	uint16_t supported_sink_context_value;
+ };
+ 
+ struct bt_ase {
+@@ -171,8 +177,6 @@ struct bt_bap_pac {
+ 	struct bt_bap_db *bdb;
+ 	char *name;
+ 	uint8_t type;
+-	uint32_t locations;
+-	uint16_t contexts;
+ 	struct bt_bap_codec codec;
+ 	struct bt_bap_pac_qos qos;
+ 	struct iovec *data;
+@@ -203,7 +207,6 @@ struct bt_bap_stream_io {
+ struct bt_bap_stream {
+ 	struct bt_bap *bap;
+ 	struct bt_bap_endpoint *ep;
+-	struct queue *pacs;
+ 	struct bt_bap_pac *lpac;
+ 	struct bt_bap_pac *rpac;
+ 	struct iovec *cc;
+@@ -380,7 +383,8 @@ static void pacs_sink_loc_read(struct gatt_db_attribute *attrib,
+ 				uint8_t opcode, struct bt_att *att,
+ 				void *user_data)
+ {
+-	uint32_t value = 0x00000003;
++	struct bt_pacs *pacs = user_data;
++	uint32_t value = cpu_to_le32(pacs->sink_loc_value);
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
+ 							sizeof(value));
+@@ -412,7 +416,8 @@ static void pacs_source_loc_read(struct gatt_db_attribute *attrib,
+ 				uint8_t opcode, struct bt_att *att,
+ 				void *user_data)
+ {
+-	uint32_t value = 0x00000001;
++	struct bt_pacs *pacs = user_data;
++	uint32_t value = cpu_to_le32(pacs->source_loc_value);
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &value,
+ 							sizeof(value));
+@@ -423,9 +428,10 @@ static void pacs_context_read(struct gatt_db_attribute *attrib,
+ 				uint8_t opcode, struct bt_att *att,
+ 				void *user_data)
+ {
++	struct bt_pacs *pacs = user_data;
+ 	struct bt_pacs_context ctx = {
+-		.snk = 0x0fff,
+-		.src = 0x000e
++		.snk = cpu_to_le16(pacs->sink_context_value),
++		.src = cpu_to_le16(pacs->source_context_value)
+ 	};
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &ctx,
+@@ -437,9 +443,10 @@ static void pacs_supported_context_read(struct gatt_db_attribute *attrib,
+ 					uint8_t opcode, struct bt_att *att,
+ 					void *user_data)
+ {
++	struct bt_pacs *pacs = user_data;
+ 	struct bt_pacs_context ctx = {
+-		.snk = 0x0fff,
+-		.src = 0x000e
++		.snk = cpu_to_le16(pacs->supported_sink_context_value),
++		.src = cpu_to_le16(pacs->supported_source_context_value)
+ 	};
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, (void *) &ctx,
+@@ -456,6 +463,14 @@ static struct bt_pacs *pacs_new(struct gatt_db *db)
+ 
+ 	pacs = new0(struct bt_pacs, 1);
+ 
++	/* Set default values */
++	pacs->sink_loc_value = 0x00000003;
++	pacs->source_loc_value = 0x00000001;
++	pacs->sink_context_value = 0x0fff;
++	pacs->source_context_value = 0x000e;
++	pacs->supported_sink_context_value = 0x0fff;
++	pacs->supported_source_context_value = 0x000e;
++
+ 	/* Populate DB with PACS attributes */
+ 	bt_uuid16_create(&uuid, PACS_UUID);
+ 	pacs->service = gatt_db_add_service(db, &uuid, true, 19);
+@@ -2862,6 +2877,13 @@ static void read_source_pac_loc(bool success, uint8_t att_ecode,
+ 		return;
+ 	}
+ 
++	if (length != sizeof(uint32_t)) {
++		DBG(bap, "Invalid Source PAC Location size: %d", length);
++		return;
++	}
++
++	pacs->source_loc_value = get_le32(value);
++
+ 	gatt_db_attribute_write(pacs->source_loc, 0, value, length, 0, NULL,
+ 							NULL, NULL);
+ 
+@@ -2891,6 +2913,13 @@ static void read_sink_pac_loc(bool success, uint8_t att_ecode,
+ 		return;
+ 	}
+ 
++	if (length != sizeof(uint32_t)) {
++		DBG(bap, "Invalid Sink PAC Location size: %d", length);
++		return;
++	}
++
++	pacs->sink_loc_value = get_le32(value);
++
+ 	gatt_db_attribute_write(pacs->sink_loc, 0, value, length, 0, NULL,
+ 							NULL, NULL);
+ 
+@@ -2913,12 +2942,21 @@ static void read_pac_context(bool success, uint8_t att_ecode,
+ {
+ 	struct bt_bap *bap = user_data;
+ 	struct bt_pacs *pacs = bap_get_pacs(bap);
++	const struct bt_pacs_context *ctx = (void *)value;
+ 
+ 	if (!success) {
+ 		DBG(bap, "Unable to read PAC Context: error 0x%02x", att_ecode);
+ 		return;
+ 	}
+ 
++	if (length != sizeof(*ctx)) {
++		DBG(bap, "Invalid PAC Context size: %d", length);
++		return;
++	}
++
++	pacs->sink_context_value = le16_to_cpu(ctx->snk);
++	pacs->source_context_value = le16_to_cpu(ctx->src);
++
+ 	gatt_db_attribute_write(pacs->context, 0, value, length, 0, NULL,
+ 							NULL, NULL);
+ }
+@@ -2929,6 +2967,7 @@ static void read_pac_supported_context(bool success, uint8_t att_ecode,
+ {
+ 	struct bt_bap *bap = user_data;
+ 	struct bt_pacs *pacs = bap_get_pacs(bap);
++	const struct bt_pacs_context *ctx = (void *)value;
+ 
+ 	if (!success) {
+ 		DBG(bap, "Unable to read PAC Supproted Context: error 0x%02x",
+@@ -2936,6 +2975,14 @@ static void read_pac_supported_context(bool success, uint8_t att_ecode,
+ 		return;
+ 	}
+ 
++	if (length != sizeof(*ctx)) {
++		DBG(bap, "Invalid PAC Supported Context size: %d", length);
++		return;
++	}
++
++	pacs->supported_sink_context_value = le16_to_cpu(ctx->snk);
++	pacs->supported_source_context_value = le16_to_cpu(ctx->src);
++
+ 	gatt_db_attribute_write(pacs->supported_context, 0, value, length, 0,
+ 							NULL, NULL, NULL);
+ }
+@@ -4594,14 +4641,17 @@ uint8_t bt_bap_stream_get_dir(struct bt_bap_stream *stream)
+ 
+ uint32_t bt_bap_stream_get_location(struct bt_bap_stream *stream)
+ {
+-	struct bt_bap_pac *pac;
++	struct bt_pacs *pacs;
+ 
+ 	if (!stream)
+ 		return 0x00000000;
+ 
+-	pac = stream->rpac ? stream->rpac : stream->lpac;
++	pacs = stream->client ? stream->bap->rdb->pacs : stream->bap->ldb->pacs;
+ 
+-	return pac->locations;
++	if (stream->ep->dir == BT_BAP_SOURCE)
++		return pacs->source_loc_value;
++	else
++		return pacs->sink_loc_value;
+ }
+ 
+ struct iovec *bt_bap_stream_get_config(struct bt_bap_stream *stream)
+-- 
+2.39.2
 
-send_skb:
-     /* Prepend skb with frame type */
-     memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-     skb_queue_tail(&nxpdev->txq, skb);
-
-     btnxpuart_tx_wakeup(nxpdev);
-     return 0;
-
-free_skb:
-     kfree_skb(skb);
-     return 0;
-}
-
-> We need to return from this function without clearing the skbs, unless "goto free_skb" is called.
-> If I remove the ret label and return after kfree_skb() it causes a kernel crash.
-> Keeping this change as it is.
-> 
-> Please let me know if you have any further review comments on the v11 patch.
