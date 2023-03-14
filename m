@@ -2,104 +2,152 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 617EBC6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 13:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E40DC7618A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 13:45:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231644AbjCNNTP (ORCPT
+        id S232376AbjCNNpp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 09:19:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52772 "EHLO
+        Tue, 14 Mar 2023 09:45:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231944AbjCNNSk (ORCPT
+        with ESMTP id S232695AbjCNNpS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 09:18:40 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FF519000;
-        Tue, 14 Mar 2023 06:15:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 14 Mar 2023 09:45:18 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6813E8480E;
+        Tue, 14 Mar 2023 06:42:22 -0700 (PDT)
+Received: from [192.168.0.2] (ip5f5aeb5a.dynamic.kabel-deutschland.de [95.90.235.90])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A30C961773;
-        Tue, 14 Mar 2023 13:14:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0021FC433EF;
-        Tue, 14 Mar 2023 13:14:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678799698;
-        bh=d77Zybmz4sMXlH9Uze1IGl0BLqEQ0muIDiBx2/KvyFw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=s3P9qxlj3N/eljo6oOWlngBZnv9pJ0zX3qrjpuGGatfcUK7gG6TVlKD3w/sUeEHy6
-         a9o7KvJvc9k2AZywk6SYJl3TurpHS+NtbNIF8RFpd2bDUPB4Fy90E6NblP0cyiVdH2
-         up5o+6+m2lwHPFPr26CZSEjmq5yoDDM7v2mZ8Q4qrvvAUi6PGNIx5ss5usxFk+fp44
-         4N2RdZxMTPRGzaUS9e5Xr17UJ3maWlhFYaSPkjKBoqkFE7z5c9NqgKI64wua62D/SJ
-         dbx+X2mTP1qazBFTO+hi48ZyGeSIQmOzGluViHzmarrvjEJKO2+0uEcF2aAnmvAVVF
-         neqpIOyXd3n2g==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1pc4VU-0007QP-Ei; Tue, 14 Mar 2023 14:16:01 +0100
-Date:   Tue, 14 Mar 2023 14:16:00 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Tim Jiang <quic_tjiang@quicinc.com>
-Subject: Re: [PATCH v5 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-Message-ID: <ZBBzkMd0hHYOz8Vd@hovoldconsulting.com>
-References: <20230209020916.6475-1-steev@kali.org>
- <20230209020916.6475-3-steev@kali.org>
- <ZAoS1T9m1lI21Cvn@hovoldconsulting.com>
- <CAKXuJqhEKB7cuVhEzObbFyYHyKj87M8iWVaoz7gkhS2OQ9tTBA@mail.gmail.com>
- <ZArb/ZQEmfGDjYyc@hovoldconsulting.com>
- <CAKXuJqhe3z0XrLCMZ3vc3+Ug-rMjayNuMAvh+ucuUkZQpQdb2A@mail.gmail.com>
- <ZBBP/S8OM0t6p57E@hovoldconsulting.com>
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3796961CC457B;
+        Tue, 14 Mar 2023 13:03:54 +0100 (CET)
+Message-ID: <e1b0452c-4068-deba-4773-14006fd32c2a@molgen.mpg.de>
+Date:   Tue, 14 Mar 2023 13:03:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZBBP/S8OM0t6p57E@hovoldconsulting.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: [PATCH v10 2/3] dt-bindings: net: bluetooth: Add NXP bluetooth
+ support
+Content-Language: en-US
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org,
+        alok.a.tiwari@oracle.com, hdanton@sina.com,
+        ilpo.jarvinen@linux.intel.com, leon@kernel.org,
+        simon.horman@corigine.com, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
+References: <20230313144028.3156825-1-neeraj.sanjaykale@nxp.com>
+ <20230313144028.3156825-3-neeraj.sanjaykale@nxp.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20230313144028.3156825-3-neeraj.sanjaykale@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 11:44:14AM +0100, Johan Hovold wrote:
-> On Sun, Mar 12, 2023 at 10:18:48PM -0500, Steev Klimaszewski wrote:
+Dear Neeraj,
 
-> > Works, but, not quite well, and with the nvm bits from Tim's patch, we
-> > end up getting closer?  I think that is the best way to put it.  With
-> > what we currently have, we end up loading hpnv21.bin for our nvm patch
-> > file, however, we actually want (at least on my Thinkpad X13s) the
-> > .b8c file from the Windows partition for our nvm patch; With the b8c
-> > file symlinked to .bin with just my patch set, I am able to connect a
-> > pair of Air Pods Gen1 to the ThinkPad and play back audio, as well as
-> > use them for input.  With the .bin file that comes from
-> > linux-firmware, they will still connect, however, they will randomly
-> > disconnect, as well as the audio output is all garbled.
+
+Thank you for your patch.
+
+Am 13.03.23 um 15:40 schrieb Neeraj Sanjay Kale:
+> Add binding document for NXP bluetooth chipsets attached over UART.
 > 
-> Hmm. Ok, but then we need to ask Lenovo and Qualcomm to release the
-> firmware files we need for the X13s. Until then using your patch and
-> "hpnv21.bin" at least works to some extent.
+> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+> v2: Resolved dt_binding_check errors. (Rob Herring)
+> v2: Modified description, added specific compatibility devices, corrected
+> indentations. (Krzysztof Kozlowski)
+> v3: Modified description, renamed file (Krzysztof Kozlowski)
+> v4: Resolved dt_binding_check errors, corrected indentation.
+> (Rob Herring, Krzysztof Kozlowski)
+> v5: Corrected serial device name in example. (Krzysztof Kozlowski)
+> ---
+>   .../net/bluetooth/nxp,88w8987-bt.yaml         | 46 +++++++++++++++++++
+>   MAINTAINERS                                   |  6 +++
+>   2 files changed, 52 insertions(+)
+>   create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
 > 
-> I could connect to one bluetooth speaker without noticing any problems,
-> but I did indeed get some garbled output when connecting to another. I
-> have not tried the .b8c file yet though, so this could possibly be some
-> other incompatibility issue.
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> new file mode 100644
+> index 000000000000..b913ca59b489
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> @@ -0,0 +1,46 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/bluetooth/nxp,88w8987-bt.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NXP Bluetooth chips
+> +
+> +description:
+> +  This binding describes UART-attached NXP bluetooth chips.
+> +  These chips are dual-radio chips supporting WiFi and Bluetooth.
+> +  The bluetooth works on standard H4 protocol over 4-wire UART.
+> +  The RTS and CTS lines are used during FW download.
+> +  To enable power save mode, the host asserts break signal
+> +  over UART-TX line to put the chip into power save state.
+> +  De-asserting break wakes-up the BT chip.
 
-I just tried with the hpnv21.b8c from the (somewhat old) windows
-installation on my x13s, but the bluetooth speaker that produced garbled
-output with the firmware from linux-firmware still does so with the
-windows file.
+The verb is spelled with a space: wakes up the BT chip.
 
-Johan
+You seem to break the line whenever a sentence ends. Is that intentional?
+
+> +
+> +maintainers:
+> +  - Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - nxp,88w8987-bt
+> +      - nxp,88w8997-bt
+> +
+> +  fw-init-baudrate:
+> +    description:
+> +      Chip baudrate after FW is downloaded and initialized.
+> +      This property depends on the module vendor's
+> +      configuration. If this property is not specified,
+> +      115200 is set as default.
+> +
+> +required:
+> +  - compatible
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    serial {
+> +        bluetooth {
+> +            compatible = "nxp,88w8987-bt";
+> +            fw-init-baudrate = <3000000>;
+> +        };
+> +    };
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 32dd41574930..030ec6fe89df 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -22835,6 +22835,12 @@ L:	linux-mm@kvack.org
+>   S:	Maintained
+>   F:	mm/zswap.c
+>   
+> +NXP BLUETOOTH WIRELESS DRIVERS
+> +M:	Amitkumar Karwar <amitkumar.karwar@nxp.com>
+> +M:	Neeraj Kale <neeraj.sanjaykale@nxp.com>
+> +S:	Maintained
+> +F:	Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> +
+>   THE REST
+>   M:	Linus Torvalds <torvalds@linux-foundation.org>
+>   L:	linux-kernel@vger.kernel.org
