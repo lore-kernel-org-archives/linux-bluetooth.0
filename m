@@ -2,163 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A67C05027
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 19:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C539C6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 19:40:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjCNTa6 (ORCPT
+        id S229778AbjCNTkW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 15:30:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43222 "EHLO
+        Tue, 14 Mar 2023 15:40:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230372AbjCNTa2 (ORCPT
+        with ESMTP id S229475AbjCNTkV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 15:30:28 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF17B29E1B;
-        Tue, 14 Mar 2023 12:30:09 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id h9so17144394ljq.2;
-        Tue, 14 Mar 2023 12:30:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678822207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dqgms4mBVohNM7iW30qEDQ+lDG4KIARpTXgSHSORq30=;
-        b=F3bvLAaOVnkJ4xkEZeYyInmloRQNEHJEFV/EjiGaMY54T1YvbiYXjUCin9X7zg00z7
-         Qzq1RUZF6PZb0RqEIJN6q+2jGgRuZyle2FVmH3gRugOUlf56BSUBDE69GWEgm5capqEp
-         0moRLYqoLZ/aV2Iz4vJGXyPYXA94iXPBsqu6gdRduNibfPB+QSE12YFmIzkIWXM2T1IF
-         PAMcGk2EB6XPRVS+hIo3/LQuouSPqgx37meIYtMbly2DZoZsJwUgcTgcm1sghOgDBgHZ
-         E+1Cap+9AYlQuXNsdJtWncpPSYPCeVUqYHuOzb+n7kr1BfJg5hFfFc81ZYwe+wIp8QvW
-         uuag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678822207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Dqgms4mBVohNM7iW30qEDQ+lDG4KIARpTXgSHSORq30=;
-        b=M9Jba3PzpEN5rmiu+F9Tyu7wvdyJ0f1lU3Sqttsie535zBoUXWv0Jtxs3GbmxHr6lL
-         nOzfgxyq0V9QaDC5kjii0PHAmhQeI5QumVjTYn8cvjlp1IJtGZAsQ9uhMd+vchplecv9
-         XtSlGYmvT9K3qOJ78MnBuaeiXH8Ni6PETs0jQbsx2Z6UD+c4LR2uLI3LmRaEv2R91o1B
-         u+cDQ7MTEZ2B75i9b12YHGTDgBrQU7eKR4+KYUJM9voOd1YrkC2bzs7un0SdKD+BcNlS
-         PLPflQE2NYYs++p1UldGgAc67hqhrWN7I+vhwtiwwCMytS6rimKk9wX34jc97Zi3+dZo
-         QirQ==
-X-Gm-Message-State: AO0yUKV843dpBJu8kZ3atGo4IvJzv6ttgUtZhWmRpFplQVSjnQjPnZ0k
-        lYPr1BiRwNkIsL3GwrxrfKCmB8irM3zO79xyxUY=
-X-Google-Smtp-Source: AK7set+SM7jX1PJsr5O6/4TOBKUpUU46b1xy5TdJHkG86pFItAWyRncMY0cFbgoZ/JH8OMB04G/rLYtXA9opsMA4DS8=
-X-Received: by 2002:a2e:b81a:0:b0:295:a96a:2ea1 with SMTP id
- u26-20020a2eb81a000000b00295a96a2ea1mr93979ljo.0.1678822207382; Tue, 14 Mar
- 2023 12:30:07 -0700 (PDT)
+        Tue, 14 Mar 2023 15:40:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91521C313
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:40:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 62E3361961
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 19:40:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B98C3C433EF;
+        Tue, 14 Mar 2023 19:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678822818;
+        bh=qhB3sb8ZJnYq/D794Q6xrsVFEYFcyWY202G1mDC7Nwg=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ivRQ+SxopvHjkjdEj5J5kaBbJs3fgjd85EIfy31cR/grh+Z35vtEIzfdms8YhlRO0
+         ldDTDihZ2sNOy66WkN4suFy2c8SVq/iA4qtXjIuj5xBj/eSmnkj0qvFX4SjOlh31zK
+         IU1eQPRZYZOOU6jzIaBtYRnNwow+HgJA2kUu0f6683RZEHBZNcUMPw3sZkX0NpK+qT
+         lLZVQR4kyeStDfwoWw4VGaHL6eJrpMt44GShSL7wUjv7fn/xR2RccEvRPPFZY8YMbV
+         hvaBm9PLAHKdYtJqlQgpKNto5uML2+NeN9QMjUzO8xtJeL2OJa3dUF/sRrvu8GV/Oa
+         1xBYFsUim1a9w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9A008E50D65;
+        Tue, 14 Mar 2023 19:40:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20230313144028.3156825-1-neeraj.sanjaykale@nxp.com>
- <20230313144028.3156825-4-neeraj.sanjaykale@nxp.com> <ZBBUYDhrnn/udT+Z@corigine.com>
- <AM9PR04MB8603E3F3900DB13502CFCB8DE7BE9@AM9PR04MB8603.eurprd04.prod.outlook.com>
- <ZBCh98lGvhlMKQQp@corigine.com>
-In-Reply-To: <ZBCh98lGvhlMKQQp@corigine.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 14 Mar 2023 12:29:55 -0700
-Message-ID: <CABBYNZ+Zx8r-yJD9qq6B0oiDKTjzrvRa2Je0=C1hBjKvMyjmgA@mail.gmail.com>
-Subject: Re: [PATCH v10 3/3] Bluetooth: NXP: Add protocol support for NXP
- Bluetooth chipsets
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "krzysztof.kozlowski+dt@linaro.org" 
-        <krzysztof.kozlowski+dt@linaro.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "jirislaby@kernel.org" <jirislaby@kernel.org>,
-        "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
-        "hdanton@sina.com" <hdanton@sina.com>,
-        "ilpo.jarvinen@linux.intel.com" <ilpo.jarvinen@linux.intel.com>,
-        "leon@kernel.org" <leon@kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/4] shared/bap: Fix not unregistering idle callback on
+ detach
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167882281862.1169.3288278075595209173.git-patchwork-notify@kernel.org>
+Date:   Tue, 14 Mar 2023 19:40:18 +0000
+References: <20230313225150.267896-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230313225150.267896-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hello:
 
-On Tue, Mar 14, 2023 at 9:34=E2=80=AFAM Simon Horman <simon.horman@corigine=
-.com> wrote:
->
-> On Tue, Mar 14, 2023 at 03:40:34PM +0000, Neeraj sanjay kale wrote:
-> > Hi Simon
-> >
-> > Thank you for reviewing the patch. I have a comment below:
-> >
-> > >
-> > > > +send_skb:
-> > > > +     /* Prepend skb with frame type */
-> > > > +     memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-> > > > +     skb_queue_tail(&nxpdev->txq, skb);
-> > > > +
-> > > > +     btnxpuart_tx_wakeup(nxpdev);
-> > > > +ret:
-> > > > +     return 0;
-> > > > +
-> > > > +free_skb:
-> > > > +     kfree_skb(skb);
-> > > > +     goto ret;
-> > >
-> > > nit: I think it would be nicer to simply return 0 here.
-> > >      And remove the ret label entirely.
-> > >
-> > > > +}
-> > >
-> > We need to return from this function without clearing the skbs, unless =
-"goto free_skb" is called.
-> > If I remove the ret label and return after kfree_skb() it causes a kern=
-el crash.
-> > Keeping this change as it is.
-> >
-> > Please let me know if you have any further review comments on the v11 p=
-atch.
->
-> I'll look over v11.
->
-> But for the record, I meant something like this:
->
-> send_skb:
->      /* Prepend skb with frame type */
->      memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
->      skb_queue_tail(&nxpdev->txq, skb);
->
->      btnxpuart_tx_wakeup(nxpdev);
->      return 0;
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-+1, perhaps it wouldn't be a bad idea to have the code above in a
-separate function e.g. btnxpuart_queue_skb since this code might be
-common.
+On Mon, 13 Mar 2023 15:51:47 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This make sure idle callback is unregistered before bt_gatt_client is
+> unref.
+> ---
+>  src/shared/bap.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-> free_skb:
->      kfree_skb(skb);
->      return 0;
-> }
->
-> > We need to return from this function without clearing the skbs, unless =
-"goto free_skb" is called.
-> > If I remove the ret label and return after kfree_skb() it causes a kern=
-el crash.
-> > Keeping this change as it is.
-> >
-> > Please let me know if you have any further review comments on the v11 p=
-atch.
+Here is the summary with links:
+  - [BlueZ,1/4] shared/bap: Fix not unregistering idle callback on detach
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=932b90f6c33e
+  - [BlueZ,2/4] shared/csip: Fix not unregistering idle callback on detach
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=605ee768b789
+  - [BlueZ,3/4] shared/gatt-client: Introduce bt_gatt_client_ref_safe
+    (no matching commit)
+  - [BlueZ,4/4] shared/csip: Fix crash on bt_csip_get_sirk
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e040109302d8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
---=20
-Luiz Augusto von Dentz
