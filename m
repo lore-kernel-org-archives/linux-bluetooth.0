@@ -2,102 +2,163 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5A4C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 19:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4A67C05027
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 19:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbjCNTXa (ORCPT
+        id S229820AbjCNTa6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 15:23:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
+        Tue, 14 Mar 2023 15:30:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjCNTX3 (ORCPT
+        with ESMTP id S230372AbjCNTa2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 15:23:29 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0517523122
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:23:28 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id y2so16433910pjg.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 12:23:28 -0700 (PDT)
+        Tue, 14 Mar 2023 15:30:28 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF17B29E1B;
+        Tue, 14 Mar 2023 12:30:09 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id h9so17144394ljq.2;
+        Tue, 14 Mar 2023 12:30:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678821807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=nghr0MKmyjAv9f0/j7BN2Ovq2gZbb5qtMttnjL62jd4=;
-        b=bAMRB+lcdI0YStSj0DlSGYUvfl89QUXX7TV0Q1rZPLiGNTAVpvkoE/fK6KxRI2FBWD
-         jNEylPJ8Gpj/Bcgn5TvGZVkjzH80ACChqqehPRSSvd7zR4SyiJPyvXq2ne8rwu66xgxM
-         r8sTH7x2sZF2EE+qimTeB241Bf+S85g9eWyli/hk+RI3QLEvGLFqbB4GusIwyc9gIBHG
-         RmxVCCkMXMRDDf9gHaSvRc/FKbWpvHio6WCanWQ9zP0MLIYxLNTsrwOHCo7VSdYx6jyH
-         G6Ix5YMRdri8h8jvOGo18U55PJ+wJg4kdg41tezxY0y3LzLWtrXths5vh5OJkYa6gYvq
-         CYLg==
+        d=gmail.com; s=20210112; t=1678822207;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dqgms4mBVohNM7iW30qEDQ+lDG4KIARpTXgSHSORq30=;
+        b=F3bvLAaOVnkJ4xkEZeYyInmloRQNEHJEFV/EjiGaMY54T1YvbiYXjUCin9X7zg00z7
+         Qzq1RUZF6PZb0RqEIJN6q+2jGgRuZyle2FVmH3gRugOUlf56BSUBDE69GWEgm5capqEp
+         0moRLYqoLZ/aV2Iz4vJGXyPYXA94iXPBsqu6gdRduNibfPB+QSE12YFmIzkIWXM2T1IF
+         PAMcGk2EB6XPRVS+hIo3/LQuouSPqgx37meIYtMbly2DZoZsJwUgcTgcm1sghOgDBgHZ
+         E+1Cap+9AYlQuXNsdJtWncpPSYPCeVUqYHuOzb+n7kr1BfJg5hFfFc81ZYwe+wIp8QvW
+         uuag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678821807;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nghr0MKmyjAv9f0/j7BN2Ovq2gZbb5qtMttnjL62jd4=;
-        b=m9IahTr2WVsKPvZogTJSsWBnsQCCmdyvPENQAz0uqHwWuxQb5KeWP6xyFtmzpR4Cb8
-         ZEsigjJDQ7yIUzs9/R4m8U8J/2o6hIa0yAK7gTrwvMALYahFgmGMwQcQsG4H8IS4dF93
-         lfs/XSVMPclfGM/NpKp/uB+Jzq88ob3ifYmFpSOScNGlsguYjN9rgKw1IuSIgXb8IGew
-         XlYxfW7661JoGfZ+M2VqEZtV1fm1mywu0voLb/7B5RtSybv/AUjULrs0pIX3bKn7Lv38
-         V6Lvxig8yYreGLGQI+bZZnrH/domgS2+XJjseGNexolvjtXPGULACJ15oHzYRInV96Lq
-         8+XQ==
-X-Gm-Message-State: AO0yUKVy25z841Lfib/B4s6kIB9nhncFaNQiufH5+9kkDMgSob/ax7Ya
-        8LpLVKnTcawcWGQIBaoXiBf2ekCcACk=
-X-Google-Smtp-Source: AK7set8aIiU2zmVxXzzUtNTcjQA5UV1htoREE+mEzqYe4EUb5sCS7/HbLMkMoKw/JIV/UVaCj6xJgw==
-X-Received: by 2002:a17:90a:aa8a:b0:23d:31c3:c98d with SMTP id l10-20020a17090aaa8a00b0023d31c3c98dmr4156220pjq.15.1678821806947;
-        Tue, 14 Mar 2023 12:23:26 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id r15-20020a63204f000000b0050bcf117643sm1454763pgm.17.2023.03.14.12.23.26
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Mar 2023 12:23:26 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-client: Fix crash on bt_gatt_client_idle_unregister
-Date:   Tue, 14 Mar 2023 12:23:25 -0700
-Message-Id: <20230314192325.464661-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20210112; t=1678822207;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dqgms4mBVohNM7iW30qEDQ+lDG4KIARpTXgSHSORq30=;
+        b=M9Jba3PzpEN5rmiu+F9Tyu7wvdyJ0f1lU3Sqttsie535zBoUXWv0Jtxs3GbmxHr6lL
+         nOzfgxyq0V9QaDC5kjii0PHAmhQeI5QumVjTYn8cvjlp1IJtGZAsQ9uhMd+vchplecv9
+         XtSlGYmvT9K3qOJ78MnBuaeiXH8Ni6PETs0jQbsx2Z6UD+c4LR2uLI3LmRaEv2R91o1B
+         u+cDQ7MTEZ2B75i9b12YHGTDgBrQU7eKR4+KYUJM9voOd1YrkC2bzs7un0SdKD+BcNlS
+         PLPflQE2NYYs++p1UldGgAc67hqhrWN7I+vhwtiwwCMytS6rimKk9wX34jc97Zi3+dZo
+         QirQ==
+X-Gm-Message-State: AO0yUKV843dpBJu8kZ3atGo4IvJzv6ttgUtZhWmRpFplQVSjnQjPnZ0k
+        lYPr1BiRwNkIsL3GwrxrfKCmB8irM3zO79xyxUY=
+X-Google-Smtp-Source: AK7set+SM7jX1PJsr5O6/4TOBKUpUU46b1xy5TdJHkG86pFItAWyRncMY0cFbgoZ/JH8OMB04G/rLYtXA9opsMA4DS8=
+X-Received: by 2002:a2e:b81a:0:b0:295:a96a:2ea1 with SMTP id
+ u26-20020a2eb81a000000b00295a96a2ea1mr93979ljo.0.1678822207382; Tue, 14 Mar
+ 2023 12:30:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230313144028.3156825-1-neeraj.sanjaykale@nxp.com>
+ <20230313144028.3156825-4-neeraj.sanjaykale@nxp.com> <ZBBUYDhrnn/udT+Z@corigine.com>
+ <AM9PR04MB8603E3F3900DB13502CFCB8DE7BE9@AM9PR04MB8603.eurprd04.prod.outlook.com>
+ <ZBCh98lGvhlMKQQp@corigine.com>
+In-Reply-To: <ZBCh98lGvhlMKQQp@corigine.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 14 Mar 2023 12:29:55 -0700
+Message-ID: <CABBYNZ+Zx8r-yJD9qq6B0oiDKTjzrvRa2Je0=C1hBjKvMyjmgA@mail.gmail.com>
+Subject: Re: [PATCH v10 3/3] Bluetooth: NXP: Add protocol support for NXP
+ Bluetooth chipsets
+To:     Simon Horman <simon.horman@corigine.com>
+Cc:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "jirislaby@kernel.org" <jirislaby@kernel.org>,
+        "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+        "hdanton@sina.com" <hdanton@sina.com>,
+        "ilpo.jarvinen@linux.intel.com" <ilpo.jarvinen@linux.intel.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+        Rohit Fule <rohit.fule@nxp.com>,
+        Sherry Sun <sherry.sun@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This fixes the following crash:
+On Tue, Mar 14, 2023 at 9:34=E2=80=AFAM Simon Horman <simon.horman@corigine=
+.com> wrote:
+>
+> On Tue, Mar 14, 2023 at 03:40:34PM +0000, Neeraj sanjay kale wrote:
+> > Hi Simon
+> >
+> > Thank you for reviewing the patch. I have a comment below:
+> >
+> > >
+> > > > +send_skb:
+> > > > +     /* Prepend skb with frame type */
+> > > > +     memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+> > > > +     skb_queue_tail(&nxpdev->txq, skb);
+> > > > +
+> > > > +     btnxpuart_tx_wakeup(nxpdev);
+> > > > +ret:
+> > > > +     return 0;
+> > > > +
+> > > > +free_skb:
+> > > > +     kfree_skb(skb);
+> > > > +     goto ret;
+> > >
+> > > nit: I think it would be nicer to simply return 0 here.
+> > >      And remove the ret label entirely.
+> > >
+> > > > +}
+> > >
+> > We need to return from this function without clearing the skbs, unless =
+"goto free_skb" is called.
+> > If I remove the ret label and return after kfree_skb() it causes a kern=
+el crash.
+> > Keeping this change as it is.
+> >
+> > Please let me know if you have any further review comments on the v11 p=
+atch.
+>
+> I'll look over v11.
+>
+> But for the record, I meant something like this:
+>
+> send_skb:
+>      /* Prepend skb with frame type */
+>      memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+>      skb_queue_tail(&nxpdev->txq, skb);
+>
+>      btnxpuart_tx_wakeup(nxpdev);
+>      return 0;
 
-Invalid read of size 8
-   at 0x1E1E0B: bt_gatt_client_idle_unregister (gatt-client.c:3812)
-   by 0x1EB6BD: bt_bap_detach (bap.c:3821)
-   by 0x1EB6BD: bt_bap_detach (bap.c:3808)
-   by 0x1D5631: queue_foreach (queue.c:207)
-   by 0x1DCAA3: disconnect_cb (att.c:713)
-   by 0x1F4404: watch_callback (io-glib.c:157)
-   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x4912117: ??? (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x48BB24E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x1F4A54: mainloop_run (mainloop-glib.c:66)
-   by 0x1F4E21: mainloop_run_with_signal (mainloop-notify.c:188)
-   by 0x1304B4: main (main.c:1428)
- Address 0x28 is not stack'd, malloc'd or (recently) free'd
----
- src/shared/gatt-client.c | 3 +++
- 1 file changed, 3 insertions(+)
++1, perhaps it wouldn't be a bad idea to have the code above in a
+separate function e.g. btnxpuart_queue_skb since this code might be
+common.
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 3a29f807fc85..d28f5b3670f6 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -3809,6 +3809,9 @@ bool bt_gatt_client_idle_unregister(struct bt_gatt_client *client,
- {
- 	struct idle_cb *idle = UINT_TO_PTR(id);
- 
-+	if (!client || !id)
-+		return false;
-+
- 	if (queue_remove(client->idle_cbs, idle)) {
- 		idle_destroy(idle);
- 		return true;
--- 
-2.39.2
+> free_skb:
+>      kfree_skb(skb);
+>      return 0;
+> }
+>
+> > We need to return from this function without clearing the skbs, unless =
+"goto free_skb" is called.
+> > If I remove the ret label and return after kfree_skb() it causes a kern=
+el crash.
+> > Keeping this change as it is.
+> >
+> > Please let me know if you have any further review comments on the v11 p=
+atch.
 
+
+
+--=20
+Luiz Augusto von Dentz
