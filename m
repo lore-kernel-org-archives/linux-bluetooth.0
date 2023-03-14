@@ -2,126 +2,188 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAC5C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 16:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3B4C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 16:34:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbjCNQEX (ORCPT
+        id S230038AbjCNQeh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 12:04:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
+        Tue, 14 Mar 2023 12:34:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231523AbjCNQD5 (ORCPT
+        with ESMTP id S229656AbjCNQeg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 12:03:57 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DB9B480F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 09:03:40 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id ne1so11725074qvb.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 09:03:40 -0700 (PDT)
+        Tue, 14 Mar 2023 12:34:36 -0400
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2070f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e83::70f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C879A2C2E;
+        Tue, 14 Mar 2023 09:34:11 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ecMFa5c0kAupOxFbOSB8EMTscxS/Wvs0Iv+BVVT0JwXLR9jxTLjLLHQWaKmsVjIiaqvYd8EacSD83UMIcQVu2bsL9WFE/ftr7Pr3eBZdL7p1B0Glmjd/SkfwSRuHlcCBnLk+ZYPwVKCsYpTbxeYCbSHvBzLp5M1ujzWKnjmHtXJrrH3xWlDGQYxaguHhqzIGkt80vs08wXh0GBeseS6BCYu0NdwG1BroRxoCwZrLjJ59hdRTWvTGhV6KA6aIH+K6idROKH1AvbQ66qQDN7iq4qS+T7xLSwK/MKOqwzTK3FvOIb7sqKBeYrAGXitLUmJgPlmmpONQUohRp0WTXWsOgA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mrKn5aGROGOID2IiNHgBMWDyOJatysnoEKt2I96HMNs=;
+ b=Zm0CWN3Inl7FdfdPRA7kTxTRn+J1jhV0bEow0Bvx9MfJmGG15gggHj/mWGN1SwTYlAMaFuuv+O2dRm9qi4/idLl/Y26UwjSY1nWBLiW5znYybsc6G/wyd1nZ11ak8/dSNvXIhwn579WjQXoYxvn4P0OCL36jdEbF7R8TfCkzD33m33WhTblMRDS0CmhWjsJf44wSxdq/J4xOVowV/qfO6Fjon0Zp4QeUfOE4x8eb8QOzt10DEnPeWksuaMFOO4OC8EZNJzioymsa9DiEOJyzcEhq4oqLP5p1fohWtn72uM+mHUDQgvc2poOns34h8ASeDNGarJzSf8QDepAeCqW4wQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678809819;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EuAW/+RqBRdvA94bVDREoYr/osRD/NHjss1cEeWA0tA=;
-        b=dFMSUobEE7AfvZtWaGELq9R4DFQcI+1GhJ/DvWkZIOydi1mB+DdBrUTShYD96u+5ha
-         EsWJlg5kA6vKuvVLPqlj6UM8pfrqeiVkTPj3gWPiZENM3yyqwHkq6N9tGe08FgZ874m5
-         d0DqpNpHk2r3ZQFg8h1/OSw5PwE2aPpExgusgDbBPjzocle1gTxWtgZfotxzcGuA1x83
-         fguNoCDjIc1Bi1ILi6w9phNenpHLDZwVOI8gGXf01khsEyzi73RB9sYOLqS8KXdwTzVO
-         hxKMuA5SdgvxIJ9E2Uf3RVpISKVtTCh5A3BcGgiGkjle3K3t5cXZUfJWgakXlDQSk9Kw
-         Pd8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678809819;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EuAW/+RqBRdvA94bVDREoYr/osRD/NHjss1cEeWA0tA=;
-        b=1B+p33qOCFxf+bbAbHndtqGVLsG9zQXShpROvkj9g+rWfNcBdbP4TfNv+HjP9qvs7u
-         zTUWW2t+VKzul8GBYQaNVMyB+NeLrsIDeKzKmJnmjN2Rt2grNyn3JnO6nxcX4cGuVI7p
-         G800ZDsxwukhOo41iyimmVp9+lwzPvVjCq84gB/gus+dtTYeChhlRZY9AHz6jjTiMvi4
-         CPP8tjmWawAKcIkYYVM0EPZjsaJ73FNprMM8oxdJjoE973tS2kNCGrm+0yc4+BG1kvDe
-         atnpL8hFqabAACGtMeci+434YFp2C3TIVFYbAcWgXkeO3Rnr/ff4AYM/cnthoBCjzYh9
-         xT2g==
-X-Gm-Message-State: AO0yUKXMyuDuOP6gCVzO+xx6c0DoCRVavQhgkFot4knBK/gWMoWQ2O+/
-        HrhJPy3fdCRf7k2rSEukg55mTKPc9tc0HQ==
-X-Google-Smtp-Source: AK7set96zoFRTvMtOSewpFtAhXAw/d6lDhMMv/H56NVuW6iinqxWlYBiPXmgTKGOMiskvnxsvG+Tvw==
-X-Received: by 2002:a05:6214:124b:b0:5a1:d44:79a7 with SMTP id r11-20020a056214124b00b005a10d4479a7mr22548925qvv.20.1678809819425;
-        Tue, 14 Mar 2023 09:03:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.214.56])
-        by smtp.gmail.com with ESMTPSA id ef14-20020a05620a808e00b0073b967b9b35sm1957411qkb.106.2023.03.14.09.03.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Mar 2023 09:03:39 -0700 (PDT)
-Message-ID: <64109adb.050a0220.32ba2.7ed1@mx.google.com>
-Date:   Tue, 14 Mar 2023 09:03:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0328224477739934607=="
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mrKn5aGROGOID2IiNHgBMWDyOJatysnoEKt2I96HMNs=;
+ b=AAC1Q+IDbvYNGyJw/XAxlb7VFQB0Y7z/2ccDLcArlD2poTrog8mz3GijSWcOkpzS1NxU1yoVVi4c0xkLo3fNOPO0BpUni1l8IRF0fJCAuMcYJl9MHBFoQRhQsB7zGwlCGT9DqFAr3PelkVXFs0VnlxhWHKzznieVQMKWD2bKcfc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MN2PR13MB3957.namprd13.prod.outlook.com (2603:10b6:208:263::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.26; Tue, 14 Mar
+ 2023 16:34:08 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6178.026; Tue, 14 Mar 2023
+ 16:34:08 +0000
+Date:   Tue, 14 Mar 2023 17:33:59 +0100
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
+Cc:     "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org" 
+        <krzysztof.kozlowski+dt@linaro.org>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "jirislaby@kernel.org" <jirislaby@kernel.org>,
+        "alok.a.tiwari@oracle.com" <alok.a.tiwari@oracle.com>,
+        "hdanton@sina.com" <hdanton@sina.com>,
+        "ilpo.jarvinen@linux.intel.com" <ilpo.jarvinen@linux.intel.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>,
+        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+        Rohit Fule <rohit.fule@nxp.com>,
+        Sherry Sun <sherry.sun@nxp.com>
+Subject: Re: [PATCH v10 3/3] Bluetooth: NXP: Add protocol support for NXP
+ Bluetooth chipsets
+Message-ID: <ZBCh98lGvhlMKQQp@corigine.com>
+References: <20230313144028.3156825-1-neeraj.sanjaykale@nxp.com>
+ <20230313144028.3156825-4-neeraj.sanjaykale@nxp.com>
+ <ZBBUYDhrnn/udT+Z@corigine.com>
+ <AM9PR04MB8603E3F3900DB13502CFCB8DE7BE9@AM9PR04MB8603.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM9PR04MB8603E3F3900DB13502CFCB8DE7BE9@AM9PR04MB8603.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: AM3PR04CA0140.eurprd04.prod.outlook.com (2603:10a6:207::24)
+ To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: Add support for NXP bluetooth chipsets
-In-Reply-To: <20230314153213.170045-2-neeraj.sanjaykale@nxp.com>
-References: <20230314153213.170045-2-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3957:EE_
+X-MS-Office365-Filtering-Correlation-Id: aff92754-da93-4fb2-1809-08db24a9eede
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8My7SARv5O1sHSoxU6wIy/JJx9vfyhQr1FFdbeEGlnrpR9HT7ifRTZKMMtSV74xRM2wSbSnoVFvPpaloIbPVh69hxNop9dyt92cedBjqTDKd4lZfeGjhxnC+DDo9enaKqae8c9PzlHX4driRiT41pJQarOUGpmxvUugqtb/omAIRWiS0nqzccHVsFTgHPHTRRZUkZnqP98K2pWFzD5sM+ZUbC0UWTonIMN3H6kAXq5cXWZt1WNwKRNWHCkmSw0r9XqC80wToKZP5LYcMvhVy+Qle58ocTcBj5H3eX64AmSSvZFFcRMmHPmYfSMp/wxhxf8C6d83BM5dCDm0GHXJcU3CiOSvA7ghwwUAnGFHPxW2djLl4kdKjYFYrwHbqo/yTvZE8uJQdeGls8JnwiBJqv0F+JAbeJh8iEvrnea/DCNDKBEJDA5VEFT7+M5Y8nODoeUOjvKWFwXIhs+5pFnAyc6LtEwaR2jGZL+UcEiAE5R2387xc28qZkOimZRoXlkk52fSsWusIQHpPTii0l9nK66mee6VcKde+XjWZq6s0nQ+e72TS7XNvykkiG+1gvrmj5+VBnEJ/QhbiFgaIG2k6FKs8JKjQiA/YLJIhi9wqy+tOAEXMOKz/RCQYySdaf5pCiYUj12phnFomugFrIJJeNw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(366004)(376002)(136003)(39840400004)(451199018)(86362001)(36756003)(38100700002)(8936002)(41300700001)(2906002)(44832011)(7416002)(5660300002)(4326008)(6916009)(6512007)(2616005)(186003)(6506007)(83380400001)(54906003)(316002)(66946007)(66556008)(66476007)(6666004)(6486002)(478600001)(8676002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?hZOmY02ePl13XyutcQGyciJcajIULofEGKW7bS+ZvGkE3I7r2v+rLkQxKf28?=
+ =?us-ascii?Q?ADUcQhytOp6RfBXTtHBhoBs8PLRZeZ0ZXYoJo0uPcZKqzWGhzpwU5u+ako7R?=
+ =?us-ascii?Q?lNyvLnGvRGzMMLlgGNYbmtT4bILjSwUUBY9biVjlFs6pAFjvn+IFZ944eGN8?=
+ =?us-ascii?Q?AFPfsWNz4nue7r22askICyGgMXfS/1wyWyVm4HXHy8b/E6YXvUzYjq0zwtu1?=
+ =?us-ascii?Q?+HnHdsMi2TsOdkFJJN41DVm5dbzZ2ZnyC2zyvedtBDC5VZwPx3r/9razRaB+?=
+ =?us-ascii?Q?vFw8eO6ThldrzF+uXkV8OxZ20BnZ2VfF+AmGXDBIWqSU4JEsLk4M5nbG268g?=
+ =?us-ascii?Q?lTbHNgu+2UZoTXgdRThPII5JCVdTv8CUIBHZ4xVKnjKe9cBhuMzAfWIiT/VO?=
+ =?us-ascii?Q?/Y1CnZpxfniKr2xzm1MO6yDiBsma+hdHiuIvTkzOdfH7dTB3lGUC/PUBP1yQ?=
+ =?us-ascii?Q?JPUoxSR5XUfqBOTw55jeMj/X1BnlY7viE7rtTDTIe2slN6ibFIzHNP9gNOLq?=
+ =?us-ascii?Q?5AQldmcMm4DAVDBo0jay/E36ERS2zUhMZQIWetAx9fa2RO/kQDyBO8+m8WJg?=
+ =?us-ascii?Q?sMVvnUBPuf95XsyAsP46Fipj10OvzM9K/IX3/2/Y6gkjb2eZyYrmLS78B3+h?=
+ =?us-ascii?Q?1QSwU6cmXRxe6xkcmom5F1CSWighgeyyL/5OG3ZtrWkHOPJFwxrRlqOafmXD?=
+ =?us-ascii?Q?jmeuC6XGGAeyHbH+EDJG724V4qqRQwARNZQFTmdOZcOzZ5mXTSq4ypoNnM43?=
+ =?us-ascii?Q?l/SyOsB9p2Em2sBc45xihyqBbnGcG2O2CWHQxsFMmPsjLaKCi88+Ksi7HnRU?=
+ =?us-ascii?Q?IOJw+OkSO5pEsTLtUJCjBsjldwk/DNrnxGYi62aOCJh4yT1yIOQb2THesp3z?=
+ =?us-ascii?Q?Sd6NJZTRmvmxwV6u1D82/3saKO7lW422XHvi4XfmkqIwcKUhewXIjpUb0dzc?=
+ =?us-ascii?Q?fCDk1Tq+F29rdT78lYYmPVDbFBnlG2GBLl0sEt4LjiXI99rVfX1nCjoV4AvL?=
+ =?us-ascii?Q?+ncXy3LlDrjNGIVA4Yc4QwXO/PF3PPZZvSVUro5gERCB5qPCxUD+2TgJL/I4?=
+ =?us-ascii?Q?RHpTA9O8zFMlJwTz8aviZzgTqKu/XRL6q0+Od54PkVA+v+0m+hliSMbgP4hY?=
+ =?us-ascii?Q?nMlmf8KAwCwxyIH5Faq57NqXE/Fs80UGIPGp2rUBhSFJR/tmSKHS5WJzekSd?=
+ =?us-ascii?Q?HIcmrLA+VVW46afW+q1XjNL8zcNEVi+VkL56Sq0ecEkrKmZpPCxj0QY1eOWA?=
+ =?us-ascii?Q?B6LoAqzfUbxgtuZltUTsXQOrnluiBSrSbbxl+l2tl5QXU5x5sH2bOAF9XVpG?=
+ =?us-ascii?Q?ANP0vJqqSg4JbQdSKSgrjdZ2WgmMxnAfENshCVp4gyGBZq0UnhQ7BpeQPrJs?=
+ =?us-ascii?Q?i/9u901cyrUZJolqg/AjOruDJUQZmNIJ6DB85aDUaSU7RlV/NXgH++aTV1FT?=
+ =?us-ascii?Q?E+9UdpdNmDCei+Z1hEhoeGaP2mZ+eM7ERtbEgLkqJw1sO+29DyC6CyXi8u+T?=
+ =?us-ascii?Q?/ke736Mjjbm/lLQvOfZXP48DC5/ZMbJod6ce6FZQcQ0Hdv9ubcq91aWWqwq6?=
+ =?us-ascii?Q?oLx1c9CPniFTPnle2RsKHxUxMh4NCrlINWkwZiVUmrskPytdJHdA7CgrqLtG?=
+ =?us-ascii?Q?n4uGL4g3sXp5RqgmRM0y4B1eSRY8iZBKFX6Ro1zW3cUy7gH8WWl0mN4vyu35?=
+ =?us-ascii?Q?KqBLsQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aff92754-da93-4fb2-1809-08db24a9eede
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2023 16:34:08.0068
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3wzO6CVuOwaD6JKO/qIok7SmO0WTieZ899ZH5fL1nSdhiV/8DV0X6gU9z/cS/7DMtv3SurUJWZ+uwQEu40J55DMHUR4OBCaziugHjgPsJHc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3957
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0328224477739934607==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Mar 14, 2023 at 03:40:34PM +0000, Neeraj sanjay kale wrote:
+> Hi Simon
+> 
+> Thank you for reviewing the patch. I have a comment below:
+> 
+> > 
+> > > +send_skb:
+> > > +     /* Prepend skb with frame type */
+> > > +     memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+> > > +     skb_queue_tail(&nxpdev->txq, skb);
+> > > +
+> > > +     btnxpuart_tx_wakeup(nxpdev);
+> > > +ret:
+> > > +     return 0;
+> > > +
+> > > +free_skb:
+> > > +     kfree_skb(skb);
+> > > +     goto ret;
+> > 
+> > nit: I think it would be nicer to simply return 0 here.
+> >      And remove the ret label entirely.
+> > 
+> > > +}
+> > 
+> We need to return from this function without clearing the skbs, unless "goto free_skb" is called.
+> If I remove the ret label and return after kfree_skb() it causes a kernel crash.
+> Keeping this change as it is.
+> 
+> Please let me know if you have any further review comments on the v11 patch.
 
-This is automated email and please do not reply to this email!
+I'll look over v11.
 
-Dear submitter,
+But for the record, I meant something like this:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=729973
+send_skb:
+     /* Prepend skb with frame type */
+     memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+     skb_queue_tail(&nxpdev->txq, skb);
 
----Test result---
+     btnxpuart_tx_wakeup(nxpdev);
+     return 0;
 
-Test Summary:
-CheckPatch                    PASS      5.29 seconds
-GitLint                       FAIL      1.65 seconds
-SubjectPrefix                 FAIL      0.86 seconds
-BuildKernel                   PASS      31.68 seconds
-CheckAllWarning               PASS      34.57 seconds
-CheckSparse                   PASS      39.40 seconds
-CheckSmatch                   PASS      108.93 seconds
-BuildKernel32                 PASS      30.27 seconds
-TestRunnerSetup               PASS      437.21 seconds
-TestRunner_l2cap-tester       PASS      16.54 seconds
-TestRunner_iso-tester         PASS      16.72 seconds
-TestRunner_bnep-tester        PASS      5.43 seconds
-TestRunner_mgmt-tester        PASS      107.75 seconds
-TestRunner_rfcomm-tester      PASS      8.61 seconds
-TestRunner_sco-tester         PASS      7.95 seconds
-TestRunner_ioctl-tester       PASS      9.23 seconds
-TestRunner_mesh-tester        PASS      6.86 seconds
-TestRunner_smp-tester         PASS      7.86 seconds
-TestRunner_userchan-tester    PASS      5.66 seconds
-IncrementalBuild              PASS      43.44 seconds
+free_skb:
+     kfree_skb(skb);
+     return 0;
+}
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v11,3/4] dt-bindings: net: bluetooth: Add NXP bluetooth support
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-20: B1 Line exceeds max length (87>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0328224477739934607==--
+> We need to return from this function without clearing the skbs, unless "goto free_skb" is called.
+> If I remove the ret label and return after kfree_skb() it causes a kernel crash.
+> Keeping this change as it is.
+> 
+> Please let me know if you have any further review comments on the v11 patch.
