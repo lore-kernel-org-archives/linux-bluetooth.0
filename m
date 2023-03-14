@@ -2,228 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFCAC6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 00:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B1BC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 00:19:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230231AbjCNASh (ORCPT
+        id S230250AbjCNATU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Mar 2023 20:18:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55356 "EHLO
+        Mon, 13 Mar 2023 20:19:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbjCNASg (ORCPT
+        with ESMTP id S229656AbjCNATS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Mar 2023 20:18:36 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EAA964B00
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:18:34 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id g18so14415430ljl.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:18:34 -0700 (PDT)
+        Mon, 13 Mar 2023 20:19:18 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994721A947
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:19:11 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id z6so15250936qtv.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Mar 2023 17:19:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678753113;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sj1ijZsR/Ykp50q0Ewqp6ELcgHUPxs6tBIWIzF0TXvA=;
-        b=j6L0m7OUKH1OvLLzjO8HwNR8tbfrYybx4eWt8p6mqzkJkqMUwgUXA0AD+Csa1aWbVc
-         JV67lIXIofaNJvl40xZvN2su+3KzagBy/9zgj9ki+WiEhlqjy1nImMOQCpENM2jMk5Ym
-         i6xWvy3+X/b9qOXrF5JOAKfycDmSYF8wW8+ubPfXxVr0mSFEVJH1DdJPovdi/1QL681L
-         3xunqzRBPt6FzAY8oldtrru1Nk8FCgccrXnOt5pqpAuOunBHeL80lCL1tlPWujms67TT
-         MOMdOCmZo1qcZppaU7ehMV+fNPYyTi4I5AY1k9re0b5sS2lLGjS0TfLjYTMeXhAzM4LU
-         +Hgw==
+        d=gmail.com; s=20210112; t=1678753150;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=mGtZ8OuGeeLzch0j/v5L5bkgs0pmIjaG0+IwoFelo3c=;
+        b=OCE0RNA9VoOIdtWJgayOOTpKl97miHZkMPe9cGGrOsFfprHD/0KlMsjNGtz5ckMjoK
+         h6O+HBTW6UEqY1SkPqjtkFsehle1ku5MUwVkZi0KK/StjBITyySa8YCGH31rcjjSKmcj
+         kl8QI3yFvsYhagGJmAISY3IQJEiQfVsK9jDXqU5FhBwH2ev2sdm6B8Cvh2wc0wad4MpO
+         Dxxp9JTCNdikTi8pKl1iVvU3PbLdLrbgpbYSmTanJ3qnrzvmSF8YfBdc+3KW8EnhFL16
+         gfKEq6HYEsMoKhxgeHAJ1ZZ3qI2NBz9KCmzwsr80Pth0/ODW//bHA9+s1DOojHAWDoKV
+         5TPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678753113;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sj1ijZsR/Ykp50q0Ewqp6ELcgHUPxs6tBIWIzF0TXvA=;
-        b=mfHvQzkvawWV3I/Zumy3aI/I7gjkXmytYuNjRkUAyF2j6Q2QH7SahxNqvaNYqqYPu0
-         cPDlS0ByrL81xecXzYy+Zz3vCO0VvuY+dr/JhYoCIVG8td8UbSnBXccXG4OiORdcCoH3
-         XyoL9f2rAW1IAGvCV+qwNG+8OhRUdRZE6zAPqH/78NDRzJAgPKIaf3Vo8J7lq8YnmSd0
-         W3zlz8JR3nHs89WPGF/QtminMcmHxYofFlsiVyNOAy+hW/EHmkUG6Tg82yQtpUYmQku1
-         eYKYOj6JTJiiWoZqytBLcZ+JHaj5eRDxBF5Vj5Mjxf3xQSF61Vkbdiyym/ZvVHJPVIPm
-         GGKA==
-X-Gm-Message-State: AO0yUKV41tA9kgnijPNnr73bjLVenmz4UIzMtB1Vz+wR6100en7QFnig
-        IRX6lHH7sUjvZ+UdjdRlreP2k2boYVlFIVk/tLgGj4WhyOs=
-X-Google-Smtp-Source: AK7set8Glp6bE4Rt5HREmKkRwjjpphRXo9MKOZszjQpyftgZfCCWa/9oPoM+fh1kWWx4I2sC08ygxgsYl8qC3+pygjc=
-X-Received: by 2002:a05:651c:1725:b0:295:a96a:2ea1 with SMTP id
- be37-20020a05651c172500b00295a96a2ea1mr11027026ljb.0.1678753112529; Mon, 13
- Mar 2023 17:18:32 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1678753150;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mGtZ8OuGeeLzch0j/v5L5bkgs0pmIjaG0+IwoFelo3c=;
+        b=48K/eO2f5Q5a6pxLPEogZq+y5ArwptLvJztMTh1jDPeeMDooz9SDVuElVY/q0pGTFi
+         Enn3Vc5Bjh/toPJpmYBoidfvdvkLDy027VULH34lCjUpg/WQJlnrXyOLRPfodnJazcJC
+         BwMd6H/ZI0agwgHdQQV3eLH+MWFK0XWhQxavil+jLYc8qXhdIXut7WhKBh/k6xZbrknK
+         aWH8RgiGmBhPKlNHRiRb38bzJJhod9c7o3d0EuDZExhw8cj5PuxpGb1fdZxjUqFVSzjI
+         v97N9lHYhABhAxNqk35i9wEyOcNynRE/uZJUMZKn2MmLZjh5z9Nbx+sjPaemybupwlw/
+         mG1w==
+X-Gm-Message-State: AO0yUKVqv3iW1ApsTOc8U8spARpObRpoYOl25k3tru27qb9KDF8dDEqF
+        g3HTonB7AbfB4HNa7+XsA6IqzFWrBSk=
+X-Google-Smtp-Source: AK7set8sfJxbr9Mgi0EwVxnHbV3Qh8BsF8KCu7WDIz1+KWlLszCswPVvxILuG3NjnjusloSRbRlf7Q==
+X-Received: by 2002:ac8:5903:0:b0:3b9:b817:e9a8 with SMTP id 3-20020ac85903000000b003b9b817e9a8mr63903736qty.27.1678753150562;
+        Mon, 13 Mar 2023 17:19:10 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.98.54])
+        by smtp.gmail.com with ESMTPSA id n67-20020a37bd46000000b0073b99d515e2sm684164qkf.44.2023.03.13.17.19.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Mar 2023 17:19:10 -0700 (PDT)
+Message-ID: <640fbd7e.370a0220.2be8c.3758@mx.google.com>
+Date:   Mon, 13 Mar 2023 17:19:10 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0924697557996635609=="
 MIME-Version: 1.0
-References: <20230307222422.2608483-1-luiz.dentz@gmail.com>
- <167849522070.21816.4954897604805294201.git-patchwork-notify@kernel.org>
- <CABBYNZJ8GbCic4+dAz-04vji3xgtqYnXRUjTuWHSk3oGjXxA=Q@mail.gmail.com> <f86f2896be923a9caa5625457fea46d1c32b3114.camel@iki.fi>
-In-Reply-To: <f86f2896be923a9caa5625457fea46d1c32b3114.camel@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 13 Mar 2023 17:18:21 -0700
-Message-ID: <CABBYNZKv68ybD3YVKFtHUARh6H+TVY=2_P9TdNWEbZ4FbTX31w@mail.gmail.com>
-Subject: Re: [RFC v2 01/12] shared/crypto: Add bt_crypto_sirk
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org,
-        =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@gmail.com
+Subject: RE: [BlueZ,v3,1/2] mesh: Fix uninitialized memory usage
+In-Reply-To: <20230313231152.59147-1-brian.gix@gmail.com>
+References: <20230313231152.59147-1-brian.gix@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============0924697557996635609==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 13, 2023 at 4:30=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi,
->
-> su, 2023-03-12 kello 22:36 -0700, Luiz Augusto von Dentz kirjoitti:
-> > Hi Pauli, Frederic,
-> >
-> > On Fri, Mar 10, 2023 at 4:40=E2=80=AFPM <patchwork-bot+bluetooth@kernel=
-.org> wrote:
-> > >
-> > > Hello:
-> > >
-> > > This series was applied to bluetooth/bluez.git (master)
-> > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> > >
-> > > On Tue,  7 Mar 2023 14:24:11 -0800 you wrote:
-> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > >
-> > > > This adds bt_crypto_sirk which attempts to generate a unique SIRK u=
-sing
-> > > > the following steps:
-> > > >
-> > > >  - Generate a hash (k) using the str as input
-> > > >  - Generate a hash (sirk) using vendor, product, version and source=
- as input
-> > > >  - Encrypt sirk using k as LTK with sef function.
-> > > >
-> > > > [...]
-> > >
-> > > Here is the summary with links:
-> > >   - [RFC,v2,01/12] shared/crypto: Add bt_crypto_sirk
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc1dd94cc=
-7f81
-> > >   - [RFC,v2,02/12] shared/ad: Add RSI data type
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc2e99aef=
-d337
-> > >   - [RFC,v2,03/12] doc: Add set-api
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D6477522e=
-92e3
-> > >   - [RFC,v2,04/12] device-api: Add Set property
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D5bac4cdd=
-b191
-> > >   - [RFC,v2,05/12] core: Add initial implementation of DeviceSet inte=
-rface
-> > >     (no matching commit)
-> > >   - [RFC,v2,06/12] core: Check if device has RSI
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Df95ffcc8=
-b1fe
-> > >   - [RFC,v2,07/12] main.conf: Add CSIP profile configurable options
-> > >     (no matching commit)
-> > >   - [RFC,v2,08/12] shared/csip: Add initial code for handling CSIP
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd297a03b=
-7a61
-> > >   - [RFC,v2,09/12] profiles: Add initial code for csip plugin
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D9e1eb0a6=
-2b3f
-> > >   - [RFC,v2,10/12] tools: Add support to generate RSI using SIRK
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc446a64d=
-461b
-> > >   - [RFC,v2,11/12] client: Add support for DeviceSet proxy
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D373bafc3=
-4ce6
-> > >   - [RFC,v2,12/12] client: Use AdvertisingFlags when available
-> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D815f779a=
-a8e4
-> > >
-> > > You are awesome, thank you!
-> > > --
-> > > Deet-doot-dot, I am a bot.
-> > > https://korg.docs.kernel.org/patchwork/pwbot.html
-> >
-> > Let me know if you guys are happy with this interface to detect
-> > Coordinated Sets, it still experimental so we can experiment with it
-> > until we think it is stable, regarding the implementation of the
-> > transports one major difference here is that we will need to encode
-> > left and right separately, not sure how hard it is to do that in
-> > pipewire?
->
-> As far as the device set DBus interface is concerned, it seems to work
-> fine for me currently (in wip implementation for PW [0]). Don't right
-> now see something that would need to be added/changed in it.
->
-> Channel splitting/merging is generally easy in PW. How the playback
-> synchronization is going to work on socket level may determine a bit at
-> what level in PW it is convenient to do though.
->
->
-> ---
->
-> Laundry list for PW related to this:
->
-> * How to do TX syncronization properly with the ISO sockets needs still
-> some thinking. I have some wip patches [2] that add the timestamps and
-> other socket API that provide timing information to allow
-> synchronization to the Number of Completed packets events.
-> Corresponding Pipewire implementation [3] rate matches to keep the time
-> difference between those events and our audio reference time fixed at
-> e.g. 25ms (2 packets in controller). Not really clear yet if this is a
-> right thing to do to help the controller send packets at the right
-> time.
+This is automated email and please do not reply to this email!
 
-I have to check with our controller folks, I do recall someone saying
-that perhaps we should use framed instead of unframed so the
-controller can better keep up with timings, but it is not yet clear
-why.
+Dear submitter,
 
-> Here I see LE Read ISO TX Sync with Intel AX210 returning only zero
-> values in Command Complete in btmon for running CIS, so that command
-> doesn't seem to help here.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=729657
 
-Yeah, I don't think it is implemented yet.
+---Test result---
 
-> * BlueZ doesn't seem to pass on the PAC audio location it reads via
-> read_sink/source_pac_loc, probably very easy to fix.
-
-Will take a look, afaik we fixed something like this not long ago but
-perhaps you are talking about something different.
-
-> * The CIS in a CIG cannot be started one by one, or connected to same
-> destination. The kernel appears to wait until all CIS sockets in same
-> CIG go to connect state before proceeding to create CIS. The spec does
-> not seem to require this (I have some pre-rfc patches to make it more
-> flexible [1].)
-
-It used to be like that but I actually have to fix it because the
-controller don't accept multiple CreateCIS in parallel:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/tree/net/bluetooth/hci_conn.c#n1907
-
-And it would actually create a relatively big window if we queue and
-wait for CIS established, because then the controller may set up its
-scheduling without taking into account the second CIS which will then
-fail when it comes to its setup, so I think it is better to program
-them together to avoid having only one side working.
-
-Btw, take a look at how it was done with bluetoothctl>
-transport.acquire <transport_left> <transport_right>, we have been
-able to use it to acquire both left/right earbuds and then send
-pre-encoded files.
-
-> * PW currently does transport acquires synchronously and fails because
-> of that with multiple CIS, but it probably should do them async.
->
->
-> [0] https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/156=
-4
-> [1] https://github.com/pv/linux/commits/iso-fix-multicis
-> [2] https://github.com/pv/linux/commits/iso-timestamp
-> [3] https://gitlab.freedesktop.org/pvir/pipewire/-/commits/iso-timestamp-=
-test
->
-> --
-> Pauli Virtanen
+Test Summary:
+CheckPatch                    PASS      1.05 seconds
+GitLint                       PASS      0.69 seconds
+BuildEll                      PASS      26.54 seconds
+BluezMake                     PASS      759.22 seconds
+MakeCheck                     PASS      11.27 seconds
+MakeDistcheck                 PASS      150.04 seconds
+CheckValgrind                 PASS      240.84 seconds
+CheckSmatch                   PASS      321.44 seconds
+bluezmakeextell               PASS      97.21 seconds
+IncrementalBuild              PASS      1224.68 seconds
+ScanBuild                     PASS      977.66 seconds
 
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0924697557996635609==--
