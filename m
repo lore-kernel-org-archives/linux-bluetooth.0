@@ -2,60 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4ED8C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:17:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E07C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229918AbjCNXRM (ORCPT
+        id S229778AbjCNX0o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 19:17:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56962 "EHLO
+        Tue, 14 Mar 2023 19:26:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbjCNXRK (ORCPT
+        with ESMTP id S229456AbjCNX0n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 19:17:10 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7C7E50F85
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 16:17:08 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id i20so17641076lja.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 16:17:08 -0700 (PDT)
+        Tue, 14 Mar 2023 19:26:43 -0400
+Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E0184D29B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 16:26:42 -0700 (PDT)
+Received: by mail-ua1-x929.google.com with SMTP id g23so8121207uak.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 16:26:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678835827;
+        d=gmail.com; s=20210112; t=1678836401;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a3S7IfrDNccnAtwdiDbVDpRr7gkj7HphOwFijbk7fXc=;
-        b=cWgQ9qYgIosJSy5VQTOmbjLt4de1Z4JF42SnkrzFUiZOX4+GeVCuoPMiKVj4NmLiqf
-         3iunsXR2N6aMG44um6e5D2yJ8Tf9ShMMB1MUaVqKH+3m+ZJ1SNquOr0s3w6Kw4QSUYS0
-         qdrSr4NbDqurn+IrINeTq7CLj2sxnYLw+mlziW0qC3B5IUVqYe0NE9fDSE7TXBbG5pGa
-         CW4BjFeeRHSz8EVjirIzQXk5UeGkHS+VgKFgwyF9Juy0bdLb//VaJogtElmvdtYXGtdC
-         qubzxdoCPNx0bG0PsPI1bwqVdyIT2DRQoWpEz4BKDm0JA3C8yA7mRNG3HQaFb6WBs/5D
-         +xpg==
+        bh=WVZyqyIUuqy3BgFaOemNwDo6SIPH8FXD2W5bfLNvuHU=;
+        b=XuNc2vdBfMbScXsOEiDbD+qpzJGEH5jFdLlVIJnwrsqkuEMkUKSvVWkGKwfNzdbwiE
+         KKtkiY8fSQgoAK75f9kW8rPi5ZBsg1fsGQyJvEHJWS2hTOwZg+tLpSpLvJBbYXvqoJoW
+         60Dgd98GNMAIFHXHdeV22c3LZrjxq5gpCep3qowoXuzSUp1uaM/EDBvIKFoSMKeuu/Ke
+         2bvN4dxuD5xRH1D8bBPqXJsBWiJBNder/ss093Ou1Msq/QuXb2b/FE5Rpf++9u0b4m0m
+         c6cVHgJH1wmY0h7JwUm0btaKGmP6xxLdkiLwtgYxt1m1O1ICDtIFrVINlFr+0XILiX6x
+         pKBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678835827;
+        d=1e100.net; s=20210112; t=1678836401;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a3S7IfrDNccnAtwdiDbVDpRr7gkj7HphOwFijbk7fXc=;
-        b=v1xtJIhssVF3QxQWm4XvI9W/iZOA1uHTvyGX0iN74cyJ5FpfiqVC0BJMUwegi9Fx8r
-         vRL79jjjuMq1ImKpDKW7UslYJdnKpJzghecpuQWEuKMh5vAO2xGw+XpeZ1OhZlWSpEfr
-         WBd9d1IezE+5/T+t/iQM2dI3aLaXkmeFkqiD8DwEAOCn8kTUtQH6kscIJR9wldiStVzx
-         0by4CxtNpXRJk4uZmpUtlf6exy4DiDA5GV+a6ZOjrmjKnT7kVOr3nxlUWps3YouhCzk6
-         bPEM1NtvPHDVxgHxx17cVClR7k7qG4blYrPCmOIuoDpS6/QJVwwSAlMInKG0PDft5yC/
-         nTaA==
-X-Gm-Message-State: AO0yUKUFa5RrCtZQyT3TSYMQMT7wFKPOW2N08fCK/c9dGT9oiZQt9gL+
-        892E2TaY/jTWHKTfumdzPfc8WLp0hUMyen8KB04=
-X-Google-Smtp-Source: AK7set9YU0NbngIAJzhW7gPdcdAfxrKJtffZYzk003tiSA3CTMnw1sfLzkrkmeldQvGxSTybsI0JGs0U9sE+21AG1oc=
-X-Received: by 2002:a2e:b4a4:0:b0:295:897c:6f7a with SMTP id
- q4-20020a2eb4a4000000b00295897c6f7amr265202ljm.0.1678835826718; Tue, 14 Mar
- 2023 16:17:06 -0700 (PDT)
+        bh=WVZyqyIUuqy3BgFaOemNwDo6SIPH8FXD2W5bfLNvuHU=;
+        b=VO8yBiulo2H4sabVB0gWNO6gmMeutop8unLuV0AyJlhRTLXm26dTtWEZqnnEtzjfly
+         LHWQEFEgCGQqwPbJSQWeUQEeij82c2R9y4FsWj8Mq48n5UEYb/1L2kolOvRgVuNV0G3x
+         xlIQLzTnJ/TitMFfiBhrDsjA2Fdm/XBtTij2tHQsWi1G7K9St+rHBDRBjgreIx9SdnU8
+         R9Cj4O2WaPLA2CHgRnwv2qnmrGa1rnRiJ6DehQjfaz1ll/JRszEuTZVrwSokio/iXkx9
+         pHD/fsqz5EJybnJYJKC+cmtk8h8W9xe0BylLzHuZofN40ctxysq8f9UPKB5Ff13Rqh/F
+         F9Xw==
+X-Gm-Message-State: AO0yUKX/PPv3iBfIWGRcrgtfZeJzxt4U9ICPw/4kWz74ajwG63pKSq7j
+        jCELbdUfj+FDf9CFHBipupFDqqivmYrpTDfR3Pg=
+X-Google-Smtp-Source: AK7set8UFjo0PXgaBB5ONXY2OSRSgO5Kociy7QI7Q7gmlHF/Z6SsZ0GK5MWSNPx0ayWLXHZO5TdrOptO6PL2ASPktRk=
+X-Received: by 2002:a1f:38d6:0:b0:401:a4bf:210d with SMTP id
+ f205-20020a1f38d6000000b00401a4bf210dmr23872263vka.1.1678836401307; Tue, 14
+ Mar 2023 16:26:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230311003826.454858-1-marijn.suijten@somainline.org> <20230311003826.454858-2-marijn.suijten@somainline.org>
-In-Reply-To: <20230311003826.454858-2-marijn.suijten@somainline.org>
+References: <20230311003826.454858-1-marijn.suijten@somainline.org> <20230311003826.454858-3-marijn.suijten@somainline.org>
+In-Reply-To: <20230311003826.454858-3-marijn.suijten@somainline.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 14 Mar 2023 16:16:55 -0700
-Message-ID: <CABBYNZJimKVz46=6b=B4M9O=FW7hXJZBaRSM50U47oWtxcj0rQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 1/3] audio/avrcp: Guard SetAbsoluteVolume without
- target behind config value
+Date:   Tue, 14 Mar 2023 16:26:28 -0700
+Message-ID: <CABBYNZ+aVLVCVS8=gNfFL_nneJzQWSSZHNCk9NxOU-3mYRBTwA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 2/3] audio/avrcp: Only allow absolute volume
+ call/event on category-2 peers
 To:     Marijn Suijten <marijn.suijten@somainline.org>
 Cc:     linux-bluetooth@vger.kernel.org, Yu Liu <yudiliu@google.com>,
         Bartosz Fabianowski <bartosz@fabianowski.eu>,
@@ -72,145 +72,136 @@ Hi Marijn,
 On Fri, Mar 10, 2023 at 4:39=E2=80=AFPM Marijn Suijten
 <marijn.suijten@somainline.org> wrote:
 >
-> Commit 179ccb936 ("avrcp: Set volume if volume changed event is
-> registered") introduced a catch that allows SetAbsoluteVolume to be sent
-> to a remote device that does _not_ implement the AVRCP TG profile.  This
-> is strange as the TG role is required to be able to send commands to the
-> peer, but the commit must have been applied to the tree for a reason.
->
-> We discussed in [1] that workarounds for dubious peers and software
-> stacks should be guarded behind a config entry in main.conf, so this
-> starts out by introducing a new [AVRCP] category to to it that will
-> later be extended with other workarounds.
->
-> [1]: https://marc.info/?l=3Dlinux-bluetooth&m=3D163519566912788&w=3D2
+> Restrict the use of SetAbsoluteVolume and EVENT_VOLUME_CHANGED to peers
+> with at least AVRCP version 1.4 and AVRCP_FEATURE_CATEGORY_2 on their
+> respective target or controller profiles.
+
+Hmm, couldn't this actually make things even worse since we now are
+checking the category as well? I know this is by the spec but as we
+already are experiencing some stacks tend to deviate a lot from the
+spec, perhaps it would have been better to introduce another config
+option e.g. VolumeCategory =3D true so people can roll back to the old
+behavior if their devices don't work well with this changes.
+
 > ---
->  profiles/audio/avrcp.c | 12 +++++++++---
->  src/btd.h              |  5 +++++
->  src/main.c             | 13 +++++++++++++
->  src/main.conf          |  6 ++++++
->  4 files changed, 33 insertions(+), 3 deletions(-)
+>  profiles/audio/avrcp.c | 39 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
 >
 > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 80f34c7a7..5e6322916 100644
+> index 5e6322916..c16f9cfef 100644
 > --- a/profiles/audio/avrcp.c
 > +++ b/profiles/audio/avrcp.c
-> @@ -48,6 +48,7 @@
->  #include "src/dbus-common.h"
->  #include "src/shared/timeout.h"
->  #include "src/shared/util.h"
-> +#include "src/btd.h"
+> @@ -1757,6 +1757,16 @@ static uint8_t avrcp_handle_set_absolute_volume(st=
+ruct avrcp *session,
+>         if (len !=3D 1)
+>                 goto err;
 >
->  #include "avctp.h"
->  #include "avrcp.h"
-> @@ -4577,9 +4578,14 @@ int avrcp_set_volume(struct btd_device *dev, int8_=
+> +       /**
+> +        * The controller on the remote end is only allowed to call SetAb=
+soluteVolume
+> +        * on our target if it's at least version 1.4 and a category-2 de=
+vice.
+> +        */
+> +       if (!session->target || session->target->version < 0x0104 ||
+> +                       !(session->target->features & AVRCP_FEATURE_CATEG=
+ORY_2)) {
+> +               error("Remote SetAbsoluteVolume rejected from non-categor=
+y-2 peer");
+> +               goto err;
+> +       }
+> +
+>         volume =3D pdu->params[0] & 0x7F;
+>
+>         media_transport_update_device_volume(session->dev, volume);
+> @@ -3728,6 +3738,16 @@ static void avrcp_volume_changed(struct avrcp *ses=
+sion,
+>         struct avrcp_player *player =3D target_get_player(session);
+>         int8_t volume;
+>
+> +       /**
+> +        * The target on the remote end is only allowed to reply to EVENT=
+_VOLUME_CHANGED
+> +        * on our controller if it's at least version 1.4 and a category-=
+2 device.
+> +        */
+> +       if (!session->controller || session->controller->version < 0x0104=
+ ||
+> +                       !(session->controller->features & AVRCP_FEATURE_C=
+ATEGORY_2)) {
+> +               error("Remote EVENT_VOLUME_CHANGED rejected from non-cate=
+gory-2 peer");
+> +               return;
+> +       }
+> +
+>         volume =3D pdu->params[1] & 0x7F;
+>
+>         /* Always attempt to update the transport volume */
+> @@ -3981,7 +4001,7 @@ static gboolean avrcp_get_capabilities_resp(struct =
+avctp *conn, uint8_t code,
+>                 case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
+>                 case AVRCP_EVENT_UIDS_CHANGED:
+>                 case AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED:
+> -                       /* These events above requires a player */
+> +                       /* These events above require a player */
+>                         if (!session->controller ||
+>                                                 !session->controller->pla=
+yer)
+>                                 break;
+> @@ -4154,10 +4174,13 @@ static void target_init(struct avrcp *session)
+>         if (target->version < 0x0104)
+>                 return;
+>
+> +       if (target->features & AVRCP_FEATURE_CATEGORY_2)
+> +               session->supported_events |=3D
+> +                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
+> +
+>         session->supported_events |=3D
+>                                 (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGE=
+D) |
+> -                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANG=
+ED) |
+> -                               (1 << AVRCP_EVENT_VOLUME_CHANGED);
+> +                               (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANG=
+ED);
+>
+>         /* Only check capabilities if controller is not supported */
+>         if (session->controller =3D=3D NULL)
+> @@ -4572,8 +4595,11 @@ int avrcp_set_volume(struct btd_device *dev, int8_=
 t volume, bool notify)
+>                 return -ENOTCONN;
+>
+>         if (notify) {
+> -               if (!session->target)
+> +               if (!session->target || session->target->version < 0x0104=
+ ||
+> +                               !(session->target->features & AVRCP_FEATU=
+RE_CATEGORY_2)) {
+> +                       error("Can't send EVENT_VOLUME_CHANGED to non-cat=
+egory-2 peer");
+>                         return -ENOTSUP;
+> +               }
+>                 return avrcp_event(session, AVRCP_EVENT_VOLUME_CHANGED,
 >                                                                 &volume);
 >         }
->
-> -       if (!session->controller && !avrcp_event_registered(session,
-> -                                       AVRCP_EVENT_VOLUME_CHANGED))
-> -               return -ENOTSUP;
-> +       if (btd_opts.avrcp.set_absolute_volume_without_target) {
-> +               if (!session->controller && !avrcp_event_registered(sessi=
-on,
-> +                                               AVRCP_EVENT_VOLUME_CHANGE=
+> @@ -4583,8 +4609,11 @@ int avrcp_set_volume(struct btd_device *dev, int8_=
+t volume, bool notify)
+>                                                 AVRCP_EVENT_VOLUME_CHANGE=
 D))
-> +                       return -ENOTSUP;
-> +       } else {
-> +               if (!session->controller || session->controller->version =
+>                         return -ENOTSUP;
+>         } else {
+> -               if (!session->controller || session->controller->version =
 < 0x0104)
-> +                       return -ENOTSUP;
-> +       }
->
->         memset(buf, 0, sizeof(buf));
->
-> diff --git a/src/btd.h b/src/btd.h
-> index 42cffcde4..31c04a990 100644
-> --- a/src/btd.h
-> +++ b/src/btd.h
-> @@ -97,6 +97,10 @@ struct btd_avdtp_opts {
->         uint8_t  stream_mode;
->  };
->
-> +struct btd_avrcp_opts {
-> +       gboolean set_absolute_volume_without_target;
-> +};
-> +
->  struct btd_advmon_opts {
->         uint8_t         rssi_sampling_period;
->  };
-> @@ -136,6 +140,7 @@ struct btd_opts {
->         enum mps_mode_t mps;
->
->         struct btd_avdtp_opts avdtp;
-> +       struct btd_avrcp_opts avrcp;
->
->         uint8_t         key_size;
->
-> diff --git a/src/main.c b/src/main.c
-> index 99d9c508f..92f74e381 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -152,6 +152,11 @@ static const char *avdtp_options[] =3D {
->         NULL
->  };
->
-> +static const char *avrcp_options[] =3D {
-> +       "SetAbsoluteVolumeWithoutTarget",
-> +       NULL
-> +};
-> +
->  static const char *advmon_options[] =3D {
->         "RSSISamplingPeriod",
->         NULL
-> @@ -167,6 +172,7 @@ static const struct group_table {
->         { "Policy",     policy_options },
->         { "GATT",       gatt_options },
->         { "AVDTP",      avdtp_options },
-> +       { "AVRCP",      avrcp_options },
->         { "AdvMon",     advmon_options },
->         { }
->  };
-> @@ -975,6 +981,13 @@ static void parse_config(GKeyFile *config)
->                 g_free(str);
+> +               if (!session->controller || session->controller->version =
+< 0x0104 ||
+> +                               !(session->controller->features & AVRCP_F=
+EATURE_CATEGORY_2)) {
+> +                       error("Can't send SetAbsoluteVolume to non-catego=
+ry-2 peer");
+>                         return -ENOTSUP;
+> +               }
 >         }
 >
-> +       boolean =3D g_key_file_get_boolean(config, "AVRCP",
-> +                                               "SetAbsoluteVolumeWithout=
-Target", &err);
-> +       if (err)
-> +               g_clear_error(&err);
-> +       else
-> +               btd_opts.avrcp.set_absolute_volume_without_target =3D boo=
-lean;
-> +
->         val =3D g_key_file_get_integer(config, "AdvMon", "RSSISamplingPer=
-iod",
->                                                                         &=
-err);
->         if (err) {
-> diff --git a/src/main.conf b/src/main.conf
-> index f187c9aaa..ca00ed03e 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -271,6 +271,12 @@
->  # streaming: Use L2CAP Streaming Mode
->  #StreamMode =3D basic
->
-> +[AVRCP]
-> +# Allow SetAbsoluteVolume calls to a peer device that
-> +# does not advertise the AVRCP remote control target
-> +# profile.
-> +#SetAbsoluteVolumeWithoutTarget =3D false
-
-Let's do just VolumeWithoutTarget and we should probably mention that
-it would ignore the version as well.
-
-> +
->  [Policy]
->  #
->  # The ReconnectUUIDs defines the set of remote services that should try
+>         memset(buf, 0, sizeof(buf));
 > --
 > 2.39.2
 >
