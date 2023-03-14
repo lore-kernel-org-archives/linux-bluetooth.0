@@ -2,36 +2,35 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6FF6C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 21:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F08C7618B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 21:38:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbjCNVPy (ORCPT
+        id S229690AbjCNViA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 17:15:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
+        Tue, 14 Mar 2023 17:38:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230077AbjCNVPx (ORCPT
+        with ESMTP id S230380AbjCNVh7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 17:15:53 -0400
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD7053BDA8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 14:15:52 -0700 (PDT)
-Received: from github.com (hubbernetes-node-26ca32b.va3-iad.github.net [10.48.144.25])
-        by smtp.github.com (Postfix) with ESMTPA id 07218E0368
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 14:15:52 -0700 (PDT)
+        Tue, 14 Mar 2023 17:37:59 -0400
+Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 743BA55060
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 14:37:53 -0700 (PDT)
+Received: from github.com (hubbernetes-node-d1109c9.ash1-iad.github.net [10.56.206.57])
+        by smtp.github.com (Postfix) with ESMTPA id CFA125E0383
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 14:37:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1678828552;
-        bh=RLpCkoKbtzSHPsRpZ4U5RLea8kqQSWnjHJD/lpSanl4=;
+        s=pf2014; t=1678829872;
+        bh=w1rVoSN1TMdN+l7FwKqBzz68vzSe6uVM5imDCzx1xRk=;
         h=Date:From:To:Subject:From;
-        b=bYIUroC2BK0yKk/a81NWgTbVaAZQR3K897v/qKDZVLsnDXX0+jPm2Db4Mx3Jjm4Ei
-         U91bja4oymlBkVxuaO9QfH4rw6q3o2SBRB3QceHR1hJRVSnzjjoNiFYVR91RtTyUzw
-         A3obSiRRjCasaI94LTKuvsPtI/uc7mhs2c5tuym0=
-Date:   Tue, 14 Mar 2023 14:15:52 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
+        b=vg6QJrIbueeED5ehzpoNhh0FmUxCQ8p4ZDT22gydvDuMhPbuEz/KcmZFH0GeKO2kl
+         dO6y5VtOjD4a8v63ZwO608oqbLdIMexhKnn4zTNx5FIvFnO+MjjyHZNs4h3nEPWSo7
+         J0CX/OQZg/yP0C0j0gV7XkeWwlZY0QbgaskZJ9pc=
+Date:   Tue, 14 Mar 2023 14:37:52 -0700
+From:   Brian Gix <noreply@github.com>
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/6ae44c-857d9b@github.com>
-Subject: [bluez/bluez] 857d9b: shared/gatt-client: Fix crash on
- bt_gatt_client_id...
+Message-ID: <bluez/bluez/push/refs/heads/master/857d9b-7c0fb2@github.com>
+Subject: [bluez/bluez] 5934f1: mesh: Fix uninitialized memory usage
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=UTF-8
@@ -44,33 +43,42 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
   Branch: refs/heads/master
   Home:   https://github.com/bluez/bluez
-  Commit: 857d9b96b38401ce5666172ddea115d37ad6af70
-      https://github.com/bluez/bluez/commit/857d9b96b38401ce5666172ddea115d37ad6af70
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Commit: 5934f133d44aeda4e682bd15daf2dc93bb7d355f
+      https://github.com/bluez/bluez/commit/5934f133d44aeda4e682bd15daf2dc93bb7d355f
+  Author: Brian Gix <brian.gix@gmail.com>
   Date:   2023-03-14 (Tue, 14 Mar 2023)
 
   Changed paths:
-    M src/shared/gatt-client.c
+    M mesh/manager.c
 
   Log Message:
   -----------
-  shared/gatt-client: Fix crash on bt_gatt_client_idle_unregister
+  mesh: Fix uninitialized memory usage
 
-This fixes the following crash:
-
-Invalid read of size 8
-   at 0x1E1E0B: bt_gatt_client_idle_unregister (gatt-client.c:3812)
-   by 0x1EB6BD: bt_bap_detach (bap.c:3821)
-   by 0x1EB6BD: bt_bap_detach (bap.c:3808)
-   by 0x1D5631: queue_foreach (queue.c:207)
-   by 0x1DCAA3: disconnect_cb (att.c:713)
-   by 0x1F4404: watch_callback (io-glib.c:157)
-   by 0x48BBC7E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x4912117: ??? (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x48BB24E: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.7400.6)
-   by 0x1F4A54: mainloop_run (mainloop-glib.c:66)
-   by 0x1F4E21: mainloop_run_with_signal (mainloop-notify.c:188)
-   by 0x1304B4: main (main.c:1428)
- Address 0x28 is not stack'd, malloc'd or (recently) free'd
+When attempting to cancel an unknown Scan request structure must be
+NULL initialized.
 
 
+  Commit: 7c0fb2fefb6a121f1ac56e39212ce4d64307eeff
+      https://github.com/bluez/bluez/commit/7c0fb2fefb6a121f1ac56e39212ce4d64307eeff
+  Author: Brian Gix <brian.gix@gmail.com>
+  Date:   2023-03-14 (Tue, 14 Mar 2023)
+
+  Changed paths:
+    M mesh/mesh-io.c
+    M mesh/remprv-server.c
+
+  Log Message:
+  -----------
+  mesh: Loopback unprovisioned beacons
+
+Because the daemon explicitly supports multiple nodes, we need
+local Config Clients to be able to see local unprovisioned devices.
+
+This loops the unprovisioned beacon, so that local Provisioning servers
+can see it.
+
+Fixes Issue: https://github.com/bluez/bluez/issues/341
+
+
+Compare: https://github.com/bluez/bluez/compare/857d9b96b384...7c0fb2fefb6a
