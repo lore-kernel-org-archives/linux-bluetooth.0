@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 505D2C7618B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B687DC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:10:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230101AbjCNXKa (ORCPT
+        id S229730AbjCNXKi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 19:10:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47954 "EHLO
+        Tue, 14 Mar 2023 19:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231144AbjCNXKY (ORCPT
+        with ESMTP id S229690AbjCNXK1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 19:10:24 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD39A2A6C2;
-        Tue, 14 Mar 2023 16:10:23 -0700 (PDT)
+        Tue, 14 Mar 2023 19:10:27 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D67F460AD;
+        Tue, 14 Mar 2023 16:10:26 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 70514B81C1E;
+        by sin.source.kernel.org (Postfix) with ESMTPS id EA81BCE17BB;
         Tue, 14 Mar 2023 23:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 154D7C433A1;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 12013C4339E;
         Tue, 14 Mar 2023 23:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1678835421;
-        bh=Y1jhSl5t1yRVm3V2cFgzlR2isIydaRbBCbb6BWOJaAo=;
+        bh=he9+eX/qxlOVc5NLfphaepMaTzE+siMIMb5ZhSybN3U=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=iOM6W9t6T47DsH4QzF3dwMVb8wxdToWbGDk+1cIhSwCHTUZFut+TnglodwUcg4Aaj
-         y+28DddIDd0YQpFTfo9GlfNHkVmlp33gyQrS4pev5V+7n2ZQxjhtXRLEfwqU8G8Hz/
-         0HSDERZNBUvLRWhblWEGH8Xqr3QNW0OQigd2BhnoEfNQjBaBHStxhz9OtAaYZmHnbp
-         +BoNIQNmp0zfls7xjfnzGUHIyEr3DNno2fCOJ5tss6CXUECG6+CpgLTnwCDQy9tEBX
-         9Ivx1txiDyzmcrjZvjzm5nqEa9PKAhgw8at5uACM3Eg48R2HQlJ/Bepj0OYuWJulwb
-         rvQrUB42CXZaw==
+        b=eShUVvEjx9pzxhAFgf7uqPLbKQ2BoGzMZYdN2oTD4B1+g9wKnyGzK1eOAXopgPtcW
+         Wk6/TxWtgDvBP58ivKzDNQ2HvMYSmduY/SdgaW7fxd3276pxDiWNw8tth9sWzUML7n
+         3sAbSNekKxUapDGfQqQpRX5KAJ1TC77wJU9g6CkakhQy47v3AN/fOjQGfvko7eIn25
+         KsOOC+kl0c3ilKMFAuCXS62SOCq5i4iqmC9HdZxmf13oI14RcRtAk6c3/QqFYll+31
+         5TYj40ujrgUD/vDaPcj1kRlmnXCzAXp+uy10vQBFp+FqNVamwQ4n4aPSHn5vnr+2VF
+         pABGIzgswHbTg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F36B8E524FE;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EA155E524FF;
         Tue, 14 Mar 2023 23:10:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 3/8] Bluetooth: hci_ldisc: Fix tty_set_termios() return value
- assumptions
+Subject: Re: [PATCH] Bluetooth: btsdio: fix use after free bug in btsdio_remove
+ due to unfinished work
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167883542099.4543.9923542324087254222.git-patchwork-notify@kernel.org>
+Message-Id: <167883542095.4543.7797236411801708072.git-patchwork-notify@kernel.org>
 Date:   Tue, 14 Mar 2023 23:10:20 +0000
-References: <20230309082035.14880-4-ilpo.jarvinen@linux.intel.com>
-In-Reply-To: <20230309082035.14880-4-ilpo.jarvinen@linux.intel.com>
-To:     =?utf-8?q?Ilpo_J=C3=A4rvinen_=3Cilpo=2Ejarvinen=40linux=2Eintel=2Ecom=3E?=@ci.codeaurora.org
-Cc:     linux-serial@vger.kernel.org, gregkh@linuxfoundation.org,
-        jirislaby@kernel.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+References: <20230309080739.3714610-1-zyytlz.wz@163.com>
+In-Reply-To: <20230309080739.3714610-1-zyytlz.wz@163.com>
+To:     Zheng Wang <zyytlz.wz@163.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        hackerzheng666@gmail.com, 1395428693sheep@gmail.com,
+        alex000young@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -60,19 +60,21 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  9 Mar 2023 10:20:30 +0200 you wrote:
-> tty_set_termios() never returns anything else than 0. Make the debug
-> prints to look directly into the new termios instead to check CRTSCTS
-> state.
+On Thu,  9 Mar 2023 16:07:39 +0800 you wrote:
+> In btsdio_probe, &data->work was bound with btsdio_work.In
+> btsdio_send_frame, it was started by schedule_work.
 > 
-> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-> ---
->  drivers/bluetooth/hci_ldisc.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> If we call btsdio_remove with an unfinished job, there may
+> be a race condition and cause UAF bug on hdev.
+> 
+> Fixes: ddbaf13e3609 ("[Bluetooth] Add generic driver for Bluetooth SDIO devices")
+> Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+> 
+> [...]
 
 Here is the summary with links:
-  - [3/8] Bluetooth: hci_ldisc: Fix tty_set_termios() return value assumptions
-    https://git.kernel.org/bluetooth/bluetooth-next/c/dd41882582a9
+  - Bluetooth: btsdio: fix use after free bug in btsdio_remove due to unfinished work
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f132c2d13088
 
 You are awesome, thank you!
 -- 
