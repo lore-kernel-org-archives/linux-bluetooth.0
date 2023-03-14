@@ -2,73 +2,80 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA305C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 21:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E02C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbjCNVkd (ORCPT
+        id S231154AbjCNXKY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 17:40:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58404 "EHLO
+        Tue, 14 Mar 2023 19:10:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjCNVkc (ORCPT
+        with ESMTP id S229473AbjCNXKX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 17:40:32 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32F8610AAA
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 14:40:24 -0700 (PDT)
+        Tue, 14 Mar 2023 19:10:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0904B2A6C2;
+        Tue, 14 Mar 2023 16:10:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 08E13CE177D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 21:40:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 33840C4339B;
-        Tue, 14 Mar 2023 21:40:18 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9912361A78;
+        Tue, 14 Mar 2023 23:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB92AC4339C;
+        Tue, 14 Mar 2023 23:10:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1678830018;
-        bh=cf5J49+3VRik6lh01z7+LTqXMwSelfyxSCXPdFpwgt8=;
+        s=k20201202; t=1678835421;
+        bh=kB8a3qZCzeTV9mlSrGZPYlM2gQxAiW5kAVrDhaJqMZY=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=qOePswve9Gtfie8GMPwuq8GNCJktHAWXZq41Zhm8ABgVcFVVutuP9sS8dOLowmyXW
-         yhHuwKeeh9q7W0WnHMrI8tblkB4Vh6b3Rp+tPrYgSh2lsNoRSapdkykfQJtd4nsNpJ
-         U6fJEuc4PSSUwma3unMKTttp8RG2cfmrG66VKgpCDa/WGB9Y5MNFcTGr5PVuvHvjRw
-         MFeewMMF6AbtfXGgwgRcQTaFzgfInsCW16O4jiM11ZfMjY0vc6rKu2hSx4+RGrSg5E
-         v/gTY8QlgJ44hTwExpkoQQhI8aRalkEV+nQsM0Pwna2pe+4QBR30VjlLO1TCMgx+zA
-         HpEEKDM/zfV2g==
+        b=lUnH5dsjIdlLiWDbRQwFhditOe7D7T+Ya3D8lvRYLZBfAtHaI195cZC4Zrkz50kHu
+         rs+yZw6ixMYHMjjt+PQ+JUVZi5oY5NMtm5QTYJSqLzi/oF9aqgtonfuB4+kRZxRHFP
+         TBjtbWm9Qh4MeiSIT0mcli30FXGyLeSbVygFu+Gr3jLfgLwgUhKAu/oK8RRfcH4F9T
+         2YlL+12Ar8I3NnihkukkR7lmqbhbXfvkGNYLicD3Sp3JduHbGdpiE3JoMw0efIxTaq
+         3/QjDG65UoWHE6VdkS+VEkHDyF3YnApo2H4FrISJUehMMVDUfViq1HLoZiJUx3mPZA
+         aB0z+9u/Jf9tQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1122AE66CBC;
-        Tue, 14 Mar 2023 21:40:18 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE6EBE66CBA;
+        Tue, 14 Mar 2023 23:10:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 1/2] mesh: Fix uninitialized memory usage
+Subject: Re: [PATCH v6 0/2] Bluetooth: btrtl: add support for the RTL8723CS
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167883001806.25944.4701946410337864742.git-patchwork-notify@kernel.org>
-Date:   Tue, 14 Mar 2023 21:40:18 +0000
-References: <20230313231152.59147-1-brian.gix@gmail.com>
-In-Reply-To: <20230313231152.59147-1-brian.gix@gmail.com>
-To:     Brian Gix <brian.gix@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
-        inga.stotland@intel.com
+Message-Id: <167883542083.4543.5507901905040064892.git-patchwork-notify@kernel.org>
+Date:   Tue, 14 Mar 2023 23:10:20 +0000
+References: <20230307221732.3391-1-bage@debian.org>
+In-Reply-To: <20230307221732.3391-1-bage@debian.org>
+To:     Bastian Germann <bage@debian.org>
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
-by Brian Gix <brian.gix@gmail.com>:
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 13 Mar 2023 16:11:51 -0700 you wrote:
-> When attempting to cancel an unknown Scan request structure must be
-> NULL initialized.
-> ---
->  mesh/manager.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue,  7 Mar 2023 23:17:29 +0100 you wrote:
+> Pinebook uses RTL8723CS for WiFi and bluetooth. Unfortunately, RTL8723CS
+> has broken BT-4.1 support, so it requires a quirk.
+> 
+> Add a quirk and wire up 8723CS support in btrtl.
+> I was asked for a btmon output without the quirk;
+> however, using the chip without the quirk ends up in a bad state with
+> "Opcode 0x c77 failed: -56" (HCI_OP_READ_SYNC_TRAIN_PARAMS) on training.
+> A btmon output with the quirk active was already sent by Vasily.
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,1/2] mesh: Fix uninitialized memory usage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5934f133d44a
-  - [BlueZ,v3,2/2] mesh: Loopback unprovisioned beacons
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7c0fb2fefb6a
+  - [v6,1/2] Bluetooth: Add new quirk for broken local ext features page 2
+    https://git.kernel.org/bluetooth/bluetooth-next/c/000b57d5c009
+  - [v6,2/2] Bluetooth: btrtl: add support for the RTL8723CS
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b8e482d02513
 
 You are awesome, thank you!
 -- 
