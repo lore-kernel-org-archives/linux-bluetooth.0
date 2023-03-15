@@ -2,86 +2,154 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11303C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 08:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E395CC6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 09:02:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231370AbjCOIyz (ORCPT
+        id S231575AbjCOJCU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 04:54:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35268 "EHLO
+        Wed, 15 Mar 2023 05:02:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231352AbjCOIys (ORCPT
+        with ESMTP id S231716AbjCOJCB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 04:54:48 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4EF1E29F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 01:54:46 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id u5so19273150plq.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 01:54:46 -0700 (PDT)
+        Wed, 15 Mar 2023 05:02:01 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 753B273AF6;
+        Wed, 15 Mar 2023 02:01:52 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id fd25so11272873pfb.1;
+        Wed, 15 Mar 2023 02:01:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1678870486;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YdpqTn64MNL9cV6/4Hyrbo7QXnfjJy9cXDR3qkRym/0=;
-        b=h9DnbXG4nXyAlFTheFkr79+tj1382ggPRVISYd7fA9jkBgizZ5G/ZQ0pq85nNpInpQ
-         deHPRhXYkZXYFmAYQIRYRCt4qOTWaIowsazBJ9XUvo+QOJDNjDFN+qJvJgsgQrFLMVHj
-         BzgGZZj4rKYFZvGamc9Nu1IDRj+hgArEF2OPpxto673EOxPIFa4zQxrVv7b0VjgDjCUk
-         OTL83tP6HBIqQd+pogRiLuoq5/qUBFIrA3LIz1Ch3tXnGRXTro+TRGydQ6zMswZ9zVSF
-         06z9A1XefqAUkUDmJJ0cbrwksWKzN1dNhv6hyJw8zixF8PGnz08KGeNiO6YN0C+e8hPf
-         EtkA==
+        d=gmail.com; s=20210112; t=1678870912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=edwNrUkG8Z1dURZMltw+SGhc2MepuRLhhGK+wNS8X9M=;
+        b=TwGV/nwTo3AMauBgkhh2TtKZO6uFMJopYrPuVM33BSLkCBFxxhG2OE3hvjKgRTulMf
+         0ThDJ4rTYrxPEYQLgYxf6K8JcF0GMBd8kP+Tmb8CugJYEvFm9+Wjz5hPVHMoklQ746J5
+         JCL/GNOd0saqdG2TYkdyYFYgdc1bScXe1oI1EPuNuWHmf5qEA+778LJJt+pEVf1wzKLd
+         fBFxc60OeNYCLK4Yi0G5ZkXa5feE0vJn2d7stuSgITw1UJy9QDg94D35RHvSaYu9x272
+         9vFY9sGKERRLo691UsAI/FVctyo/BzIa2Am931iLRjXkyqBSuRhhIFfwbPd5Tk06lDiT
+         z5OA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678870486;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YdpqTn64MNL9cV6/4Hyrbo7QXnfjJy9cXDR3qkRym/0=;
-        b=6gaQHrnxZdjesCXsNAxUnVIMB/Klk8Cv/qqvgv+6Ei806iv3GLRx1aJIiZOaXVWOC0
-         FA//HEF13zXVQP0fIUoE8aQs+ALhhB4GddOamj06G1sQRirT2wZjs1Prm7RrdJIXQE4i
-         7HjakpoSeOQE52Mrw+LLBRauhG2FOBuDRDM2OG2fajdSivy8vJiAIwHen1xcPx2AcXcp
-         kDuiYhmYydASHWd5D7r9z3j2oaizpbErIZdJZ3T+J9pnhSp6qUdRBMBTGb6rhNNd0kHl
-         BfKLmzo7hbXyICISwVlFXH1a/IFNdnFuofXILhqtva8nX8KIvIF+b193udTwjjcYdJjb
-         W8Ow==
-X-Gm-Message-State: AO0yUKVSu3NMAQYTCS9GiDDR+ub6Mxl0vkX+xtzjLMRon/w3I5zohPLf
-        XzRJBx0tHIaHo2g1viL9kKskHA==
-X-Google-Smtp-Source: AK7set/NSFFB7DJnVrlYB/D9HDAZxyNFP3dh4EWz3psJLHsAul4Dddwjpk5PekShMOlT23uQbJ1wBw==
-X-Received: by 2002:a05:6a20:e688:b0:d5:9da4:6db2 with SMTP id mz8-20020a056a20e68800b000d59da46db2mr3691340pzb.62.1678870485951;
-        Wed, 15 Mar 2023 01:54:45 -0700 (PDT)
-Received: from [192.168.1.148] ([113.161.36.151])
-        by smtp.gmail.com with ESMTPSA id x21-20020aa784d5000000b0062485a1675bsm2979875pfn.137.2023.03.15.01.54.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Mar 2023 01:54:45 -0700 (PDT)
-Message-ID: <b997c6b7-6997-0634-dcb2-bcf6df21c82d@kali.org>
-Date:   Wed, 15 Mar 2023 15:54:41 +0700
+        d=1e100.net; s=20210112; t=1678870912;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=edwNrUkG8Z1dURZMltw+SGhc2MepuRLhhGK+wNS8X9M=;
+        b=wilCDSdQHnhtRpisKIf1eKoFCtfEP8KEyLyIBziEZfam+wgm38yTuwsfCtl0IzCXWs
+         XKPVRHCGJV8Swn8Kk1DJ4LD30sbtclQ+ceFzOSNYvXWtMGAIHRfHcxV9qDoS/fMMYObM
+         sT81rDQv4X5oNcJ6lYkC7d01KhSXXHFDTOmUfThAsvrUXgGP3kNeZ2dDJxtNAFnimOi0
+         8VgaJ/dWJbdaTHKmYbGQyokXhG4ftjRjIYwqa8vRTczUP5uQS3aVcFRKqRxNr+e9Kp92
+         PAZKzon9JH9qHCYjbAZNCSz0R6QP6+A6ODcAxWMSFFdLr2ID1k448O6TTaxYxMVLVdAT
+         Stng==
+X-Gm-Message-State: AO0yUKVZhp/YMkiJXRNdfysl6TaFvMGK8mW2SnEGU783qNxNYpotOQow
+        E+1jmLIa7Ibp2gTPFdm5hkrXQ0RnNEGRMb+p/3c=
+X-Google-Smtp-Source: AK7set8vtgeDhDK48IZ7Wz2S0KcvCOk/TZaGPh5G5qO7pV2iRCi75BDYPBeUAi7AQLFzoIN6WLjQQazbM9GnhAVdVlY=
+X-Received: by 2002:a63:9f09:0:b0:50b:18ac:fbea with SMTP id
+ g9-20020a639f09000000b0050b18acfbeamr3345941pge.9.1678870911853; Wed, 15 Mar
+ 2023 02:01:51 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: RTL8761B BT USB has been broken for a while (mismatched
- firmware?)
-Content-Language: en-US
-To:     Hilda Wu <hildawu@realtek.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "steev@kali.org" <steev@kali.org>, Max Chou <max.chou@realtek.com>
-References: <af4f9118-a189-e353-8cf6-65cabceff3e0@kali.org>
- <1c2ec3d103444a778ddffabaac22206b@realtek.com>
-From:   Arnaud Rebillout <arnaudr@kali.org>
-In-Reply-To: <1c2ec3d103444a778ddffabaac22206b@realtek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230217100223.702330-1-zyytlz.wz@163.com> <CAJedcCxUNBWOpkcaN2aLbwNs_xvqi=LC8mhFWh-jWeh6q-cBCQ@mail.gmail.com>
+ <ZBCNY8NoNkrA2nyN@corigine.com> <ZBCRRL8+EtTBH2tl@corigine.com>
+In-Reply-To: <ZBCRRL8+EtTBH2tl@corigine.com>
+From:   Zheng Hacker <hackerzheng666@gmail.com>
+Date:   Wed, 15 Mar 2023 17:01:40 +0800
+Message-ID: <CAJedcCxuaoB8gA5eEnmEdFcxnc4ObrMhvPzu0Ki0SumqrDLz7w@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_core: Fix poential Use-after-Free bug
+ in hci_remove_adv_monitor
+To:     Simon Horman <simon.horman@corigine.com>
+Cc:     Zheng Wang <zyytlz.wz@163.com>, marcel@holtmann.org,
+        alex000young@gmail.com, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pmenzel@molgen.mpg.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hilda,
+Simon Horman <simon.horman@corigine.com> =E4=BA=8E2023=E5=B9=B43=E6=9C=8814=
+=E6=97=A5=E5=91=A8=E4=BA=8C 23:22=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Tue, Mar 14, 2023 at 04:06:11PM +0100, Simon Horman wrote:
+> > On Mon, Mar 13, 2023 at 05:55:35PM +0800, Zheng Hacker wrote:
+> > > friendly ping
+> > >
+> > > Zheng Wang <zyytlz.wz@163.com> =E4=BA=8E2023=E5=B9=B42=E6=9C=8817=E6=
+=97=A5=E5=91=A8=E4=BA=94 18:05=E5=86=99=E9=81=93=EF=BC=9A
+> > > >
+> > > > In hci_remove_adv_monitor, if it gets into HCI_ADV_MONITOR_EXT_MSFT=
+ case,
+> > > > the function will free the monitor and print its handle after that.
+> > > > Fix it by removing the logging into msft_le_cancel_monitor_advertis=
+ement_cb
+> > > > before calling hci_free_adv_monitor.
+> > > >
+> > > > Signed-off-by: Zheng Wang <zyytlz.wz@163.com>
+> > > > ---
+> > > > v2:
+> > > > - move the logging inside msft_remove_monitor suggested by Luiz
+> > > > ---
+> > > >  net/bluetooth/hci_core.c | 2 --
+> > > >  net/bluetooth/msft.c     | 2 ++
+> > > >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > > index b65c3aabcd53..69b82c2907ff 100644
+> > > > --- a/net/bluetooth/hci_core.c
+> > > > +++ b/net/bluetooth/hci_core.c
+> > > > @@ -1981,8 +1981,6 @@ static int hci_remove_adv_monitor(struct hci_=
+dev *hdev,
+> > > >
+> > > >         case HCI_ADV_MONITOR_EXT_MSFT:
+> > > >                 status =3D msft_remove_monitor(hdev, monitor);
+> > > > -               bt_dev_dbg(hdev, "%s remove monitor %d msft status =
+%d",
+> > > > -                          hdev->name, monitor->handle, status);
+> > > >                 break;
+> >
+> > I'm probably missing something obvious.
+> > But from my perspective a simpler fix would be to
+> > move the msft_remove_monitor() call to below the bt_dev_dbg() call.
+>
+> The obvious thing I was missing is that was what was done in v1
+> but Luiz suggested moving the logging to
+> msft_le_cancel_monitor_advertisement_cb().
+> Sorry for the noise.
 
-On 15/03/2023 12:36, Hilda Wu wrote:
-> Considering the FW was submitted two years ago, Realtek plans to release a new version to Upstream.
-> We will verify the behavior on Linux PC. Expect it can resolve the issue.
+Hi Simon,
 
-Ack, I'll keep an eye on this issue, and ask the bug reporter to test 
-again as soon as an updated firmware reaches Kali Linux.
+Thanks for your reply and detailed review :)
 
-Thanks for your quick reply, have a nice day,
+Best regards,
+Zheng
 
-Arnaud
-
+>
+> Link: https://lore.kernel.org/all/CABBYNZL_gZ+kr_OEqjYgMmt+=3D91=3DjC88g3=
+10F-ScMC=3DkLh0xdw@mail.gmail.com/
+>
+> >
+> > > >         }
+> > > >
+> > > > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> > > > index bee6a4c656be..4b35f0ed1360 100644
+> > > > --- a/net/bluetooth/msft.c
+> > > > +++ b/net/bluetooth/msft.c
+> > > > @@ -286,6 +286,8 @@ static int msft_le_cancel_monitor_advertisement=
+_cb(struct hci_dev *hdev,
+> > > >                  * suspend. It will be re-monitored on resume.
+> > > >                  */
+> > > >                 if (!msft->suspending) {
+> > > > +                       bt_dev_dbg(hdev, "%s remove monitor %d stat=
+us %d", hdev->name,
+> > > > +                                  monitor->handle, status);
+> > > >                         hci_free_adv_monitor(hdev, monitor);
+> > > >
+> > > >                         /* Clear any monitored devices by this Adv =
+Monitor */
+> > > > --
+> > > > 2.25.1
+> > > >
+> > >
