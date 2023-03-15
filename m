@@ -2,107 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B48C7619A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 17:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C84C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 17:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232417AbjCORhL (ORCPT
+        id S230176AbjCORjM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 13:37:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44728 "EHLO
+        Wed, 15 Mar 2023 13:39:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231613AbjCORhH (ORCPT
+        with ESMTP id S230044AbjCORjL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:37:07 -0400
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 856ED233F3;
-        Wed, 15 Mar 2023 10:37:06 -0700 (PDT)
-Received: by mail-ot1-x330.google.com with SMTP id d22-20020a9d5e16000000b0069b5252ced7so828318oti.13;
-        Wed, 15 Mar 2023 10:37:06 -0700 (PDT)
+        Wed, 15 Mar 2023 13:39:11 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E32F77E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:39:10 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id mg14so1410229qvb.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:39:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678901825;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pi5SJcEKPHpeQOw0+UlGmmDXXROx+75oT2f8FTNnNag=;
-        b=qPC4gZYCxPAdomO7x2ePq6XD9csKWTlB7N6G/jLz48l0dY4EJY8cSHrew/nHQHFt40
-         WxIAs1WMQ3LsOsd+WLyQ4m1haS+rq0layySkB2ZmI+mAfzdTFLPdkmN7+VJ4TcESvbMt
-         VPWTRSzaz8A3/IXPSfMeEq/9RgOjgaW05hiO9P7Us2Lc0r7arNW50xQrHt2uhhCcY0fN
-         XvTMsl7KPWZQemToXDQ/5d1mRlUcwsKXkIHbv9Yfq9NUdbSAGe9MStCwuqc1XYXDPVcN
-         SdYzo931LEEBV1Z6Ru04Im76Bd6t1dovo/7mhJDZnUEIAMj7PMpZRbomrecoAup09/cF
-         RFVA==
+        d=gmail.com; s=20210112; t=1678901949;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7kDJ0p1+zvLZZGBnKdQfVT3HU6zIXUVLonk33LEctJ0=;
+        b=WfCOwb/J5R0v9f9hGev+t/3MFXqFlLMiVsjg9BAxCkbOiuDFe9WC58+MC8OcaKmTB8
+         fHA77SnQqQ9c50n2UmgXsWyQqFTm/JHaYZPn2EjFlslQbjjZJGKa0hxux5HBs0NXrAuO
+         S8vQWpr+iBjvar3P14bvRSBXEUqddgUmcxlDyd9gXDDWzxUejsJ8idS7Fr+DWvb7pLOZ
+         uJeb7tW7GG1fxUnLLKMK8L4ovdW3udIUoyZzKgIcs2sCpyfAZ/kNB3oP7/azJ1X5gB92
+         Buy85KBq4kfrf7LkMT85sN7xcG+Lf7ArKMWaXtlfGGM/WyKahWHIZ+NmzO5NlDgMNG8L
+         zDDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678901825;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pi5SJcEKPHpeQOw0+UlGmmDXXROx+75oT2f8FTNnNag=;
-        b=YhjvtguBqH/vob4ILfZ51smzR5O57DfnjK/vNeVS8182325TaXFvPQ8tKRPA1tLoio
-         P8rBEIgmiQiwggOoYmyCv2FPg1E2eFKA48+sHomC6AH98ghVNzfC3Y8xhCn2E/WTWDkc
-         mD8ImLmN608MK23/qTheoeWms1gr2af2Uc532qG2lAUO07+Xpq+5ovgGyBbPX/Eka3BW
-         +fTY6CsgcuXjtqqz/kZaELOiGhYRVp/fB8Q69ZjTycy6yQE2Yb6kfR2fS8XUXmPbStPO
-         8OnjkyU/JQoGGCcbRS+CA8mfgnQrbhEXFAEa3W7Dc1Lf4jOryyiHsVj7Hyea1gbPSfFK
-         QABA==
-X-Gm-Message-State: AO0yUKXde+C0IQhJ58VIcaXMJEIk05uRhTEpcQHkI0ORDgSIWeAibkv5
-        4gwn8glHLsY+FWOzDYKZGnxOzdMNq3Q=
-X-Google-Smtp-Source: AK7set+sx5nxxFxUnhUxX2uYiMEekshtg15WzBs5KwTRHPbKUletwNKGwb4nm2kN6q4jEk2xLohDmA==
-X-Received: by 2002:a9d:19c2:0:b0:694:7e44:d4b1 with SMTP id k60-20020a9d19c2000000b006947e44d4b1mr17560353otk.9.1678901824877;
-        Wed, 15 Mar 2023 10:37:04 -0700 (PDT)
-Received: from localhost.localdomain (76-244-6-13.lightspeed.rcsntx.sbcglobal.net. [76.244.6.13])
-        by smtp.gmail.com with ESMTPSA id a23-20020a9d3e17000000b0068abc8e786fsm2562044otd.10.2023.03.15.10.37.04
+        d=1e100.net; s=20210112; t=1678901949;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7kDJ0p1+zvLZZGBnKdQfVT3HU6zIXUVLonk33LEctJ0=;
+        b=pQYEv0Zfo2dh7evDws9tkWBS5ufXNFXU+xTS52rZoMSEy20dguZCcafypSuxy06E5d
+         khrKsEGb1o37cclXjt0jcexi+vLYJlSleyyi/jUcC5w+f83WPSBTKC0XAJoxdYwh+ImM
+         h9acm5uSJDoZqGLhFQILA4ALJnnienl0+9Fjiny4LnHrT1ZxlVB4q3A6tpmJ+DdrINet
+         HMy5JtsxXKMK2e6knKJmtahAXOdhTDtctcn8nBUn8lEB/PHussiXnmD5S3hqF96+9XKb
+         0mbM338M2U3f/19lqFo87kG/Um+1JcvqImNlAK3vRJVezlmLYsiNwlwOwfnwVpWJzMbK
+         Lprg==
+X-Gm-Message-State: AO0yUKX9BTklW5fR3qb1Xrfl16cLcfboms77WGF5yH8erg4rx+K2c9GA
+        ITLgbrLFzGvQptJJNhGAke0KOnMrAgs=
+X-Google-Smtp-Source: AK7set8XwBipkuOnpGutk94M0SBizy6jNRVms6QR4bvS2dLG29dvimfjDOcuPODsEw4I1mVSY7PRNA==
+X-Received: by 2002:ad4:5dca:0:b0:5ad:45f2:4307 with SMTP id m10-20020ad45dca000000b005ad45f24307mr8430378qvh.11.1678901949563;
+        Wed, 15 Mar 2023 10:39:09 -0700 (PDT)
+Received: from [172.17.0.2] ([172.176.196.114])
+        by smtp.gmail.com with ESMTPSA id c1-20020ae9ed01000000b007461fe6d6e3sm196653qkg.49.2023.03.15.10.39.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:37:04 -0700 (PDT)
-From:   Chris Morgan <macroalpha82@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        alistair@alistair23.me, anarsoul@gmail.com, luiz.dentz@gmail.com,
-        johan.hedberg@gmail.com, marcel@holtmann.org, heiko@sntech.de,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        Chris Morgan <macromorgan@hotmail.com>
-Subject: [PATCH 2/3 V5] Bluetooth: hci_h5: btrtl: Add support for RTL8821CS
-Date:   Wed, 15 Mar 2023 12:36:56 -0500
-Message-Id: <20230315173657.28692-3-macroalpha82@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230315173657.28692-1-macroalpha82@gmail.com>
-References: <20230315173657.28692-1-macroalpha82@gmail.com>
+        Wed, 15 Mar 2023 10:39:09 -0700 (PDT)
+Message-ID: <641202bd.e90a0220.2584e.1754@mx.google.com>
+Date:   Wed, 15 Mar 2023 10:39:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5727514709459218068=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, macroalpha82@gmail.com
+Subject: RE: Bluetooth: Add support for RTL8821CS
+In-Reply-To: <20230315173657.28692-2-macroalpha82@gmail.com>
+References: <20230315173657.28692-2-macroalpha82@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chris Morgan <macromorgan@hotmail.com>
+--===============5727514709459218068==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-RTL8821CS is a WiFi + Bluetooth combo chip from Realtek that provides
-WiFi A/B/G/N/AC over an SDIO interface and Bluetooth 4.2 over a UART
-interface.
+This is an automated email and please do not reply to this email.
 
-Note that the firmware this was tested with was firmware version
-0x75b8f098.
+Dear Submitter,
 
-Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: Documentation/devicetree/bindings/net/realtek-bluetooth.yaml:4
+error: Documentation/devicetree/bindings/net/realtek-bluetooth.yaml: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btrtl.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 69c3fe649ca7..72947d319fa6 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -128,6 +128,14 @@ static const struct id_table ic_id_table[] = {
- 	  .fw_name  = "rtl_bt/rtl8821c_fw.bin",
- 	  .cfg_name = "rtl_bt/rtl8821c_config" },
- 
-+	/* 8821CS */
-+	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_UART),
-+	  .config_needed = true,
-+	  .has_rom_version = true,
-+	  .has_msft_ext = true,
-+	  .fw_name  = "rtl_bt/rtl8821cs_fw.bin",
-+	  .cfg_name = "rtl_bt/rtl8821cs_config" },
-+
- 	/* 8761A */
- 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
- 	  .config_needed = false,
--- 
-2.34.1
 
+--===============5727514709459218068==--
