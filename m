@@ -2,156 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B82C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 22:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BAEC6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 23:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232468AbjCOWQ7 (ORCPT
+        id S232895AbjCOXmG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 18:16:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57366 "EHLO
+        Wed, 15 Mar 2023 19:42:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232223AbjCOWQv (ORCPT
+        with ESMTP id S233013AbjCOXlt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 18:16:51 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22BCA2CFD2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 15:16:42 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id E17CA240487
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 23:16:40 +0100 (CET)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4PcPr830mBz6tnL;
-        Wed, 15 Mar 2023 23:16:40 +0100 (CET)
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 1/2] transport: add CIG/CIS/PHY properties, don't show unset QoS properties
-Date:   Wed, 15 Mar 2023 22:16:38 +0000
-Message-Id: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678918574.git.pav@iki.fi>
+        Wed, 15 Mar 2023 19:41:49 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 663B427492
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 16:40:26 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id k2so13948488pll.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 16:40:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678923541;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FKqRh7O3d9EXWk4dS+J4pzEgVEY+UZzZqriHwfGuMp4=;
+        b=aViycjnqjqW96JjVIO7peRN8ftxfrFB8IriDaZyZfvJHTbAP9bpAbyfCovtx9t58mS
+         u5Lkigv4S7qy9gtl1waBR8d6ofdpKPppV8i3ch8xJRMMdNHyoM08rUYvmeFfd1NWbsuD
+         ZAKmbtiZc/+hKMkuoeuicqgGxuKJU+glCnB14bOGCxbefPUYDZxP9kI0inREkM/ZYn1M
+         mzH2tFRgZFupO4tWVcwxlVUNsI6ZbvYs6ctzHdWXs/HCQa+3H8stmj9L8oSGokGTiJDs
+         tbgE9p+uKDHdlR2jiq/OJi37ZAL3iJKYBNgbQfkpMalGhWG1MW6SlwCJU3fpkThG0PKC
+         gCuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678923541;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FKqRh7O3d9EXWk4dS+J4pzEgVEY+UZzZqriHwfGuMp4=;
+        b=1JqHjV234JKeF6zX8/6hFDIy9jGhY7XJAuVWzvxx31se1zH/39sAj41jtUlpzVpGaP
+         l6lNu2QhsJeUDC82nAYbv+aqX1WwJplWZhaT4NTMjnxjsvXod66+m3WRXnqXe9ZRjj6R
+         gR+r17Q8WS6b2XZTDCZBgwktn2Qv63sV6RX3xSOTNet16gvyuX+USc9LWtpbbBStVuBp
+         XgNWjPASQ2Q+TOdboZNmhlh5j8/a/r7j1TraOcWSMEsuY/8R3I1toiY9PIGjeizdXDsU
+         qjtTJiqvWmkuoWGCmyXLPWlaqC/XkV6IZRTNap8SN4KU04V20ax46Ljvq45MG+XjT/Rk
+         cxkQ==
+X-Gm-Message-State: AO0yUKX1zedxWI9YnA94ECQtlwz0V8/nWQ+Xi5up3gaU93Clm86EJjW0
+        1itBRGbpMKQ43rEZ7ZvttVQwM5m4z74=
+X-Google-Smtp-Source: AK7set/K+mZB4BYJ+K/X1sJT8exv0HmtV7114x9jYsbK/qqdy1x8r6O5+sImi3CxYUNUdZIOHUKO9w==
+X-Received: by 2002:a05:6a20:b28a:b0:d6:da7f:a1bb with SMTP id ei10-20020a056a20b28a00b000d6da7fa1bbmr369873pzb.55.1678923541446;
+        Wed, 15 Mar 2023 16:39:01 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.44.55])
+        by smtp.gmail.com with ESMTPSA id h17-20020aa786d1000000b005a9cb8edee3sm4050294pfo.85.2023.03.15.16.39.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 16:39:01 -0700 (PDT)
+Message-ID: <64125715.a70a0220.a5ee1.a02a@mx.google.com>
+Date:   Wed, 15 Mar 2023 16:39:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7137365938261064212=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,v2,1/2] transport: add CIG/CIS/PHY properties, don't show unset QoS properties
+In-Reply-To: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678918574.git.pav@iki.fi>
+References: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678918574.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add CIG, CIS, and PHY properties to BAP transport.  The other QoS
-properties are there, and these may also be useful to clients, e.g.  to
-manage CIG/CIS allocation as client.
+--===============7137365938261064212==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Hide transport QoS properties when they are not configured.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730524
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.75 seconds
+GitLint                       FAIL      0.76 seconds
+BuildEll                      PASS      26.01 seconds
+BluezMake                     PASS      736.33 seconds
+MakeCheck                     PASS      10.85 seconds
+MakeDistcheck                 PASS      146.21 seconds
+CheckValgrind                 PASS      238.48 seconds
+CheckSmatch                   PASS      318.73 seconds
+bluezmakeextell               PASS      95.66 seconds
+IncrementalBuild              PASS      1200.09 seconds
+ScanBuild                     PASS      935.85 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,1/2] transport: add CIG/CIS/PHY properties, don't show unset QoS properties
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (85>80): "[BlueZ,v2,1/2] transport: add CIG/CIS/PHY properties, don't show unset QoS properties"
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v2: no change
 
- profiles/audio/transport.c | 67 ++++++++++++++++++++++++++++++++++----
- 1 file changed, 61 insertions(+), 6 deletions(-)
-
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 457590746..53bf13175 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -811,6 +811,38 @@ static const GDBusPropertyTable a2dp_properties[] = {
- 	{ }
- };
- 
-+static gboolean qos_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	return bap->qos.phy != 0x00;
-+}
-+
-+static gboolean get_cig(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
-+							&bap->qos.cig_id);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_cis(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
-+							&bap->qos.cis_id);
-+
-+	return TRUE;
-+}
-+
- static gboolean get_interval(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -835,6 +867,17 @@ static gboolean get_framing(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean get_phy(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &bap->qos.phy);
-+
-+	return TRUE;
-+}
-+
- static gboolean get_sdu(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -962,12 +1005,15 @@ static const GDBusPropertyTable bap_properties[] = {
- 	{ "Codec", "y", get_codec },
- 	{ "Configuration", "ay", get_configuration },
- 	{ "State", "s", get_state },
--	{ "Interval", "u", get_interval },
--	{ "Framing", "b", get_framing },
--	{ "SDU", "q", get_sdu },
--	{ "Retransmissions", "y", get_retransmissions },
--	{ "Latency", "q", get_latency },
--	{ "Delay", "u", get_delay },
-+	{ "CIG", "y", get_cig, NULL, qos_exists },
-+	{ "CIS", "y", get_cis, NULL, qos_exists },
-+	{ "Interval", "u", get_interval, NULL, qos_exists },
-+	{ "Framing", "b", get_framing, NULL, qos_exists },
-+	{ "PHY", "y", get_phy, NULL, qos_exists },
-+	{ "SDU", "q", get_sdu, NULL, qos_exists },
-+	{ "Retransmissions", "y", get_retransmissions, NULL, qos_exists },
-+	{ "Latency", "q", get_latency, NULL, qos_exists },
-+	{ "Delay", "u", get_delay, NULL, qos_exists },
- 	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
- 	{ "Location", "u", get_location },
- 	{ "Metadata", "ay", get_metadata },
-@@ -1191,12 +1237,21 @@ static void bap_update_qos(const struct media_transport *transport)
- 
- 	bap->qos = *qos;
- 
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+			transport->path, MEDIA_TRANSPORT_INTERFACE,
-+			"CIG");
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+			transport->path, MEDIA_TRANSPORT_INTERFACE,
-+			"CIS");
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 			transport->path, MEDIA_TRANSPORT_INTERFACE,
- 			"Interval");
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 			transport->path, MEDIA_TRANSPORT_INTERFACE,
- 			"Framing");
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+			transport->path, MEDIA_TRANSPORT_INTERFACE,
-+			"PHY");
- 	g_dbus_emit_property_changed(btd_get_dbus_connection(),
- 			transport->path, MEDIA_TRANSPORT_INTERFACE,
- 			"SDU");
--- 
-2.39.2
-
+--===============7137365938261064212==--
