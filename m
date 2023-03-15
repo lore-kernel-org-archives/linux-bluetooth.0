@@ -2,23 +2,23 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA488C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 07:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF21C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 07:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbjCOHDP (ORCPT
+        id S230259AbjCOHGp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 03:03:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59210 "EHLO
+        Wed, 15 Mar 2023 03:06:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbjCOHDN (ORCPT
+        with ESMTP id S230091AbjCOHGn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 03:03:13 -0400
+        Wed, 15 Mar 2023 03:06:43 -0400
 Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2961A26CF6;
-        Wed, 15 Mar 2023 00:03:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 29C9ACA21;
+        Wed, 15 Mar 2023 00:06:37 -0700 (PDT)
 Received: from localhost.localdomain (unknown [124.16.138.125])
-        by APP-03 (Coremail) with SMTP id rQCowADX3gqdaRFkK73DDw--.42013S2;
-        Wed, 15 Mar 2023 14:45:50 +0800 (CST)
+        by APP-03 (Coremail) with SMTP id rQCowADn7wtubhFkAbDFDw--.8018S2;
+        Wed, 15 Mar 2023 15:06:22 +0800 (CST)
 From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
 To:     simon.horman@corigine.com
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
@@ -26,71 +26,83 @@ Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
         netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jiasheng Jiang <jiasheng@iscas.ac.cn>
-Subject: Re: Re: [PATCH] Bluetooth: 6LoWPAN: Add missing check for skb_clone
-Date:   Wed, 15 Mar 2023 14:45:48 +0800
-Message-Id: <20230315064548.48951-1-jiasheng@iscas.ac.cn>
+Subject: [PATCH v2] Bluetooth: 6LoWPAN: Add missing check for skb_clone
+Date:   Wed, 15 Mar 2023 15:06:21 +0800
+Message-Id: <20230315070621.447-1-jiasheng@iscas.ac.cn>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: rQCowADX3gqdaRFkK73DDw--.42013S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7XrW5ZFW7KF15Wry3uF4Uurg_yoW8JF1Dpr
-        45GF98GF4kG3W7Cr1Iva1ruFy0vr1q9ry3Gr4v934fXr98Kr93CrW5K345Wr18CrZru340
-        yF4rW3ZxKF95CFJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-        1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-        6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-        0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-        8cxan2IY04v7MxkIecxEwVAFwVW8AwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbV
-        WUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF
-        67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42
-        IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF
-        0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxh
-        VjvjDU0xZFpf9x0JU-J5rUUUUU=
+X-CM-TRANSID: rQCowADn7wtubhFkAbDFDw--.8018S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZw1kWryUJrW5CFWfWrWDtwb_yoWkZFc_Cr
+        y8Z3y5Cw4UAFWxAFsrtayrur9xAwn3XF1xGwsaqFWUJF98GayUWr1vvry5Xr4xWa92gr47
+        AF9xAa4kXw4xujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbVxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+        Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJV
+        W0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+        n2kIc2xKxwCY02Avz4vE14v_GF4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+        0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+        17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+        C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+        6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+        73UjIFyTuYvjfUYMKZDUUUU
 X-Originating-IP: [124.16.138.125]
 X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 14, 2023 at 10:58:23PM +0800, Simon Horman wrote:
->On Mon, Mar 13, 2023 at 05:03:46PM +0800, Jiasheng Jiang wrote:
->> Add the check for the return value of skb_clone since it may return NULL
->> pointer and cause NULL pointer dereference in send_pkt.
->> 
->> Fixes: 18722c247023 ("Bluetooth: Enable 6LoWPAN support for BT LE devices")
->> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
->> ---
->>  net/bluetooth/6lowpan.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->> 
->> diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
->> index 4eb1b3ced0d2..bf42a0b03e20 100644
->> --- a/net/bluetooth/6lowpan.c
->> +++ b/net/bluetooth/6lowpan.c
->> @@ -477,6 +477,10 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
->>  			int ret;
->>  
->>  			local_skb = skb_clone(skb, GFP_ATOMIC);
->> +			if (!local_skb) {
->> +				rcu_read_unlock();
->> +				return -ENOMEM;
->> +			}
-> 
-> Further down in this loop an error is handled as follows,
-> I wonder if that pattern is appropriate here too.
-> 
-> 			ret = send_pkt(pentry->chan, local_skb, netdev);
-> 			if (ret < 0)
-> 				err = ret;
-> 
+Add the check for the return value of skb_clone since it may return NULL
+pointer and cause NULL pointer dereference in send_pkt.
 
-I think it should be better to return error here in order to avoid the
-error being overwritten.
-I will submit a v2 to modify the error handling here.
+Fixes: 18722c247023 ("Bluetooth: Enable 6LoWPAN support for BT LE devices")
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+---
+Changelog:
 
-Thanks,
-Jiang
+v1 -> v2:
+
+1. Modify the error handling in the loop.
+---
+ net/bluetooth/6lowpan.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 4eb1b3ced0d2..55ae2ff40efb 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -477,19 +477,25 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
+ 			int ret;
+ 
+ 			local_skb = skb_clone(skb, GFP_ATOMIC);
++			if (!local_skb) {
++				err = -ENOMEM;
++				goto out;
++			}
+ 
+ 			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
+ 			       netdev->name,
+ 			       &pentry->chan->dst, pentry->chan->dst_type,
+ 			       &pentry->peer_addr, pentry->chan);
+ 			ret = send_pkt(pentry->chan, local_skb, netdev);
+-			if (ret < 0)
+-				err = ret;
+-
+ 			kfree_skb(local_skb);
++			if (ret < 0) {
++				err = ret;
++				goto out;
++			}
+ 		}
+ 	}
+ 
++out:
+ 	rcu_read_unlock();
+ 
+ 	return err;
+-- 
+2.25.1
 
