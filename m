@@ -2,194 +2,207 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF735C61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 16:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B4BFC6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 17:26:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232815AbjCOQQo (ORCPT
+        id S231802AbjCOR0V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 12:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57626 "EHLO
+        Wed, 15 Mar 2023 13:26:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232038AbjCOQQ1 (ORCPT
+        with ESMTP id S232234AbjCOR0T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 12:16:27 -0400
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2101.outbound.protection.outlook.com [40.107.101.101])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C37D8A59;
-        Wed, 15 Mar 2023 09:15:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NFf1JuP2HOLGHRy0iw9lgUwHlO2ZYUVtk5XPyok4w7NNuIFG2B3OgDRlVAGjKMbHJ6ndyD/AxpAY5qdZA53U3tGn+t64Qpiin45FGEoDPZPlm1PgaQmgktrf+Jju5jpWqv7VUC3eoWhMf72YQfeG2Pc9PVL9j59gROG37kQcQyupWn9aL8j0RFA+VBG6ETehZ8Qrur9rAZoNBbgw8V8ZPn4DGANsGqGG++Wn3zLUxnr3a62EcF7eXrM77MxTC7P3NPW3JFG5OTSF7ufODm74lI231SqSmYD/JrESfFnanG4DTOtfrrY0NxMmaDJudSG3xbzr3K9Tt7rATHb1MSwXlA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Go0x0mwOrYlxCrufRMJArOGjf0UHvvML4m4oSUoKrrU=;
- b=HJmEWKWQtLoY+tRH+iBsbqSgSiM3kWdLhw5o81jhslngYhSa5Rqt3eUFOuP9pR6iiR0iA9KMt1oV+O4TGRd6ymueHIfKwg7igw7XVb4G4IpaVOKLtT0gu2bjj+8KDg0Qxv2WCXs/lMTgNnwrWRe/6i7oRdItDGbu8SdI6eXCD1p/mAqG3XdeekIpoHKYOsYxUJUo4hQi/6rYdoGl6gdOQOs9a30/1rQa1UvZ+7ovLjJzji7Jsboq6S090S8ZKAytT4dC1OX6aTNLoWHmePoXnKpMBq81TFrJNKthKnOY1XYKPZhfCYNZeGhp/WGFIDnXYKH7wqRzcilEfDuKm2xqgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+        Wed, 15 Mar 2023 13:26:19 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC72126846
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:26:14 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id ja10so11172998plb.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Go0x0mwOrYlxCrufRMJArOGjf0UHvvML4m4oSUoKrrU=;
- b=AurZJzIx7i14CC5SfJn8DBRq3i7VjAASjGqIDsQYtXd37CowRpeeIpiIoglepCb/BCNTIsCPvFjYNoYWc6gqOzWzcr+XeNSg5Z/N9MFCTh0aZwjgAFgQVq/pRM+8zOg4bAYCVaj/KzCyVjByZlnW5mFYf3lUAshuxhVkCfvQnQg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH7PR13MB5453.namprd13.prod.outlook.com (2603:10b6:510:138::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.26; Wed, 15 Mar
- 2023 16:15:32 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6178.030; Wed, 15 Mar 2023
- 16:15:32 +0000
-Date:   Wed, 15 Mar 2023 17:15:23 +0100
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        gregkh@linuxfoundation.org, jirislaby@kernel.org,
-        alok.a.tiwari@oracle.com, hdanton@sina.com,
-        ilpo.jarvinen@linux.intel.com, leon@kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
-        rohit.fule@nxp.com, sherry.sun@nxp.com
-Subject: Re: [PATCH v12 4/4] Bluetooth: NXP: Add protocol support for NXP
- Bluetooth chipsets
-Message-ID: <ZBHvG9Nh1n+xp59X@corigine.com>
-References: <20230315120327.958413-1-neeraj.sanjaykale@nxp.com>
- <20230315120327.958413-5-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230315120327.958413-5-neeraj.sanjaykale@nxp.com>
-X-ClientProxiedBy: AS4P189CA0025.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:5db::15) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=gmail.com; s=20210112; t=1678901174;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=94yMlbDzjaMILVDL5DimGkuhCNlfrbJ5xFedRs1rvno=;
+        b=goUzuvNN8QWPYwjxOr0KlFfKPI36ttqfefrtIse9vCxFMJntQwUtpa98RKgQAGELOE
+         Znd4v+86BgOwvb6c61+5lWsqaNTdSQEmyHNJQ9GSoDJvU6MVEkskZBsVnva8DDhqqzBa
+         oOhn+QzNeMY+fhZMFPLXgIXS1Hzy8nUEKobcbwhoNfTjpMFgn2V8vUdPEeatAthxhvDM
+         XMIg8yEbOHN8S6DcFPkEnJyRlnL/+wzbVBg+sQ5HuOFaSBAcDdPezcYW34lU+7pvRgXX
+         uYEHl4MhQae9DpZP6Qf9NLexvLQ6XSDESqwCKgwyMZh7dkJcSxvWX7fujIILx35Wu/UP
+         Lrog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678901174;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=94yMlbDzjaMILVDL5DimGkuhCNlfrbJ5xFedRs1rvno=;
+        b=dHaKg3aIMhgdZQ3CqXfnhZVhllZYaYq2ENGI2+iqjaLaNFW0IjmpFRA8mbYvr6tIQq
+         muWyZ9GbzdU88clcB21X7JXVfr5y6IWJMkEfPrzlT5T85X84F7nna7MFRkW7JgyXzlgt
+         4m2MhIOv96D+Nk/MAdDjnR1oOI54tNQiX40I0LBd1U+HcpaFysbI0/joWFPtIos6I74p
+         f+3OKDZRCaPxF1kUUb68tyE6qtMcqN0nh5VrOUvEjtjnXexdjcsXe+hsOBZHpnwQEzTE
+         Vd9F8rA3cpz6PmpU6OpuNqJvdhQpVS/U/qsSMWig85E/2QW6caVAaPaF/G4Gx/49ebEF
+         ns9A==
+X-Gm-Message-State: AO0yUKW9Yea+3i9NEB+qKjHIfaySy0MR5CJtSmcOO5+hgcRS4fqZie8v
+        l7HCImxFs2OzaHuFn88x0pUCVcmLKCY=
+X-Google-Smtp-Source: AK7set9wjy3LxmWOwrNnaqM/L6e4JUfAspt1xj62i7qWSZPAor96uINiISeL+5rj/SniiOVMxrVBgg==
+X-Received: by 2002:a05:6a20:12c6:b0:d4:686:4a92 with SMTP id v6-20020a056a2012c600b000d406864a92mr550317pzg.34.1678901173457;
+        Wed, 15 Mar 2023 10:26:13 -0700 (PDT)
+Received: from zbook.. (97-113-12-200.tukw.qwest.net. [97.113.12.200])
+        by smtp.gmail.com with ESMTPSA id g24-20020aa78198000000b00592417157f2sm3930971pfi.148.2023.03.15.10.26.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 10:26:13 -0700 (PDT)
+From:   Brian Gix <brian.gix@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, brian.gix@gmail.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ 1/2] mesh: Filter originated Provisioning Data packets
+Date:   Wed, 15 Mar 2023 10:26:09 -0700
+Message-Id: <20230315172610.13796-1-brian.gix@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB5453:EE_
-X-MS-Office365-Filtering-Correlation-Id: cc78e66b-3452-4705-075e-08db25707fdd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lf89f0uOkRo2HMzoJn/pREePYcu7xq6/sW43AhZJdEOhYLRMFcOd9zgMQLjqgse7a37+md1SpwFHIGIsux7t3aG1izGD6sEAYvJuAbpbnrzWoqOJOiiFE73LqU1QP3q4LPCCOIlnGLkKHl110KdHS93Gf6lAo+2cYJleA8SOpMmvRBqW6nWfs5PwyP1smIIUiL9oVHkTKlNPGAVEYQKovRBhzBTUwOxrTrjd5XrqFBvn2NWA3czy05FDSROEhd0aF2uGJ+iFw1dQjh7UK3qyRVCJ9GQ6pUon5dVi6X6f0CHhAPa2eMS3sf7UrZYcu5xgDAkKPSZl/yjrQn8Emwu4FLKd7IAnTbuZG3bki1jq623YmLtWVviEFfDxrsC1M/APZTs9zqlWeGQuXAvnQcbxS1AU3ek1HjW8WoszP3AsdNsKem5JKZrPE2wBlrYQwA/AWcRa/FC1BpfcFZTzqZN5PvYh98pOhM6ybxpZf9wMoRycFeVXGPJEd6pX6wZoNgkUxurjFCbnkMRBb0aq/SCTkLvy6LbfkRd/hV2RSkWwpXI/LRG0GRXvDJXUA7i0/yPaX9EWBoj+mtGJLs2Y4HzjudN5G+CZnVbXsAWaDLswsOdyMTDs2zvbrPihqsiQ7EIpVtTyj46sJB/yFsBkjT2+8qX/1cjbrs6+Jt4YFdg23tPn8ZjfPXetVVyz1UFpXe3F
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(346002)(39840400004)(366004)(136003)(451199018)(36756003)(6506007)(316002)(6486002)(478600001)(2906002)(7416002)(5660300002)(66946007)(44832011)(6916009)(8676002)(66476007)(4326008)(8936002)(66556008)(41300700001)(86362001)(38100700002)(2616005)(6512007)(186003)(83380400001)(6666004)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SnlVdEdtUVpPam5XQlhLQ3JrK2JCS0xLeFZRZFh5TzFIenZlK09DMlNaSGcx?=
- =?utf-8?B?ai9reFQxeGtUQytHMUNiUldQTVhVa2NmK1NOTTFKeUJIamFuKzI5d2l6QnNk?=
- =?utf-8?B?S1RxUmhxNU8yeVpUclJLczdZM0lJZ1FvRFQ3dkZDeGozVnNzZWtadUpuY0Vw?=
- =?utf-8?B?SmZ3VjBJaVQ2Vm0za3lhNUc3elRTTytGcUc3dXZuRlhLUHpTRGV2V3AvZXZz?=
- =?utf-8?B?WXNVcUpOdGdZVzcwWk50ZkJ6cXRPUWF6bmxxOVNrSW9wakU3ZDd4cC9tcHlE?=
- =?utf-8?B?U0ZuRkhIekwxQjVoQmlVcGJlV2xkV0s1RjVyUE1STE5relFvL1AvSmpEVFZt?=
- =?utf-8?B?OEZRN0F1djRBSnRRTElBTDV1cWVnb296R3ZlWThIMXhJakx5RGxSQXFBSzJQ?=
- =?utf-8?B?WnNXbGZoTmhQQ0ZMTFJLTnB0dTNjYklsYTZzWDA1d1B3aU16K0U5R0NpZEdY?=
- =?utf-8?B?WmJlZTdIdVBZc2dYT1ZZSzZzaGlESjN6djVjMkJIR3hKVzkxcGM3VmRKSzEz?=
- =?utf-8?B?QXYxNTk3ZHhMTUVHMkFMZmVUYU9aclluVUlrZ2hpNU9JNXdZNXFUZnBuck94?=
- =?utf-8?B?aVRNaVlyUXUvR282allyZlFaWm9WbDhla1EvdGdvakN2UmdGeHR5cWJFd1RZ?=
- =?utf-8?B?SlNiZGpWWTdHbzMyR1luVjR5dWpKL1UrREJSZzlsaXNQY0NRbXlSWVRmMnQr?=
- =?utf-8?B?SWdKZ3cxMHM2L1Nja2xsbzlNaktlZWFITEMxV2FGNUxpRVhpQi9tSVZsM1pP?=
- =?utf-8?B?U28vV29Bb2gwUklzUS91Y2ZMSEtZNXMrNlpNNiswZWQrS01PSUE3WjgzZVB5?=
- =?utf-8?B?V20vQ0lFRTdxbysvanh4VGx0OFR6NUhNNEdHa05xTW5Rb1ptaHJRbU1aZHR6?=
- =?utf-8?B?bW5RWm1wdHdCbHFWN3FCMDNUZjBQaVlBUFJuUmJYRG83NnR1VVRnNUhxR0pB?=
- =?utf-8?B?QmZMb0ZvZERYNDlEYnFkR0tWRzZUUmJFNnFlS0xNL0NibDNuOUUwbWhmcjh4?=
- =?utf-8?B?bXBBSlh3QnptbnNrMWtDdGRBOUxEeWd5UEZaSklIVHc5ZnNiZXhwdGpudklz?=
- =?utf-8?B?UDlwb2o3NldINHFlb0ZLcUdJSUsvWWVuR05SM3FLMGY0ZWNlaFdhRWJFQ2VK?=
- =?utf-8?B?MG5idDhYMkdZYlpCN0NaeEdOalB1czNzSGFZYnN3dlI1Z2pwQ20yaVdrYTkw?=
- =?utf-8?B?T2RkRzZUODhqNndTNG5pTUtFYVhUbU1yU29xelQxTlFlWUs1aWo3a3h3R3Ex?=
- =?utf-8?B?TkxGdVhkYVV1YnhqYWxqcnR5OVU1cWMvc3lqQU4zeUpTaEFLMGh4QTZkcWpK?=
- =?utf-8?B?U0tZN3pPMElqODFTZDFJUzBzVWQ0VjdyMjJ1ZTJSaVFQOUtIZ3JuQWhJWkI2?=
- =?utf-8?B?Y2VaQWhRU0hOcmtod2VkV09rZFFkS3RXS0JPQ0tFbDRBTDlEUjJ4bmFWTVNm?=
- =?utf-8?B?OFBwVEJ4aUlnM0ZQb1NxQnhKNWp3dE1EOUtrOUxyTkxGd2hRSGhYRHIxa0ty?=
- =?utf-8?B?eWF5NFpJQ09SZHpENHpDMmxtbUdZNnlyQThNTHU5UDhDaTYzVEZOS3NKdCtQ?=
- =?utf-8?B?bmtydVRhOWpUcUh4blI3U1duMmZLSlhPeFhYRzBZTHJwbkVNOVIyb2ZBUXov?=
- =?utf-8?B?MVR0WkhIUFFncmtNZjBWcmh5RzJFQUhOR28xWlJEelVpTzZCRy82RW9FS1NZ?=
- =?utf-8?B?blh1SGN3VGdIbE9PUzRzUHc3QnRseE9XOW5sVGZScHBEemdXVlhnQzN3NEc2?=
- =?utf-8?B?R1VwcWRXUXpJR1I5K01QWlg0SDlHRkx3dmxxQjVJQ2FLYXFpRU1FU2V5VFdS?=
- =?utf-8?B?YytibFlBZnpmK3c3aVJsTzNuWCtoTDZkQllENnZIbm1NM0FORlRhbDJSNEtv?=
- =?utf-8?B?UDY3ZUVnTnMrazhxeVAzc1d6VlhHRDIwYzU5bzczY2xNNWhrVEN6N242ckVB?=
- =?utf-8?B?Um56a0NvSmlRN1d1MWZ2cG14aGU0Vll4RnowMjhVRDVCV3J5N0cvWHc1c3U3?=
- =?utf-8?B?TEkzb3liRVNDOFhURUlHRGt3dnoxb0o2S3NKeWNXNlM2eDVDL2NqTWJLRTll?=
- =?utf-8?B?T0l1Q0FmSVVMNVJMVHV2RGVCSklsaFhFRXk5QlpUUGp2dzJVbWxYZHJwR0xi?=
- =?utf-8?B?dWhidStWMGV1UCtHWjlnaDNCMVhocGNlM1BYNzRvZWlEZFB1WXI5SWFKcm0w?=
- =?utf-8?B?ZjZXOGl5d3VZNmFhTXc4K2NpVEc4M1ZHZlZwR1E1ZGg5Q1RSRE1MT2RZdEtT?=
- =?utf-8?B?MDRvRFB1L1BtMko2M0xWbFdlU3l3PT0=?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cc78e66b-3452-4705-075e-08db25707fdd
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2023 16:15:31.9181
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pXnNMrbct82mjc7jhcICqr4h8mCIyJ/J0/p5hAptW1UFfooim09iXz9f5ObDflwIBrHh2w2ePWVtdeL5uKBgHpW93FzlG0Cl9b2fRMcGM0I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB5453
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Mar 15, 2023 at 05:33:26PM +0530, Neeraj Sanjay Kale wrote:
-> This adds a driver based on serdev driver for the NXP BT serial protocol
-> based on running H:4, which can enable the built-in Bluetooth device
-> inside an NXP BT chip.
-> 
-> This driver has Power Save feature that will put the chip into sleep state
-> whenever there is no activity for 2000ms, and will be woken up when any
-> activity is to be initiated over UART.
-> 
-> This driver enables the power save feature by default by sending the vendor
-> specific commands to the chip during setup.
-> 
-> During setup, the driver checks if a FW is already running on the chip
-> by waiting for the bootloader signature, and downloads device specific FW
-> file into the chip over UART if bootloader signature is received..
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> Reviewed-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+The mesh daemon can process incoming mesh packets on more than one
+controller, but if a Provisioning data packet that originated from the
+local daemon is received by a different controller, it must be filtered
+and disregarded, or it will break the provisioning protocol.
+---
+ mesh/mesh-io-mgmt.c | 58 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 47 insertions(+), 11 deletions(-)
 
-...
+diff --git a/mesh/mesh-io-mgmt.c b/mesh/mesh-io-mgmt.c
+index 9ae1af05a..65994f058 100644
+--- a/mesh/mesh-io-mgmt.c
++++ b/mesh/mesh-io-mgmt.c
+@@ -82,6 +82,8 @@ struct dup_filter {
+ 	uint8_t addr[6];
+ } __packed;
+ 
++static const uint8_t zero_addr[] = {0, 0, 0, 0, 0, 0};
++
+ static struct mesh_io_private *pvt;
+ 
+ static uint32_t get_instant(void)
+@@ -110,6 +112,14 @@ static bool find_by_addr(const void *a, const void *b)
+ 	return !memcmp(filter->addr, b, 6);
+ }
+ 
++static bool find_by_adv(const void *a, const void *b)
++{
++	const struct dup_filter *filter = a;
++	uint64_t data = l_get_be64(b);
++
++	return !memcmp(filter->addr, zero_addr, 6) && filter->data == data;
++}
++
+ static void filter_timeout(struct l_timeout *timeout, void *user_data)
+ {
+ 	struct dup_filter *filter;
+@@ -146,7 +156,22 @@ static bool filter_dups(const uint8_t *addr, const uint8_t *adv,
+ 	uint32_t instant_delta;
+ 	uint64_t data = l_get_be64(adv);
+ 
+-	filter = l_queue_remove_if(pvt->dup_filters, find_by_addr, addr);
++	if (!addr)
++		addr = zero_addr;
++
++	if (adv[1] == MESH_AD_TYPE_PROVISION) {
++		filter = l_queue_find(pvt->dup_filters, find_by_adv, adv);
++
++		if (!filter && addr != zero_addr)
++			return false;
++
++		l_queue_remove(pvt->dup_filters, filter);
++
++	} else {
++		filter = l_queue_remove_if(pvt->dup_filters, find_by_addr,
++									addr);
++	}
++
+ 	if (!filter) {
+ 		filter = l_new(struct dup_filter, 1);
+ 		memcpy(filter->addr, addr, 6);
+@@ -177,7 +202,7 @@ static void process_rx_callbacks(void *v_reg, void *v_rx)
+ 		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
+ }
+ 
+-static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
++static void process_rx(uint16_t index, struct mesh_io_private *pvt, int8_t rssi,
+ 					uint32_t instant, const uint8_t *addr,
+ 					const uint8_t *data, uint8_t len)
+ {
+@@ -191,6 +216,10 @@ static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
+ 		.info.rssi = rssi,
+ 	};
+ 
++	/* Accept all traffic except beacons from any controller */
++	if (index != pvt->send_idx && data[0] == MESH_AD_TYPE_BEACON)
++		return;
++
+ 	print_packet("RX", data, len);
+ 	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
+ }
+@@ -205,7 +234,7 @@ static void event_device_found(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+ 	const struct mgmt_ev_mesh_device_found *ev = param;
+-	struct mesh_io *io = user_data;
++	struct mesh_io_private *pvt = user_data;
+ 	const uint8_t *adv;
+ 	const uint8_t *addr;
+ 	uint32_t instant;
+@@ -236,9 +265,10 @@ static void event_device_found(uint16_t index, uint16_t length,
+ 		if (len > adv_len)
+ 			break;
+ 
+-		if (adv[1] >= 0x29 && adv[1] <= 0x2B)
+-			process_rx(io->pvt, ev->rssi, instant, addr, adv + 1,
+-								adv[0]);
++		if (adv[1] >= MESH_AD_TYPE_PROVISION &&
++					adv[1] <= MESH_AD_TYPE_BEACON)
++			process_rx(index, pvt, ev->rssi, instant, addr,
++							adv + 1, adv[0]);
+ 
+ 		adv += field_len + 1;
+ 	}
+@@ -320,6 +350,12 @@ static void ctl_up(uint8_t status, uint16_t length,
+ 	mesh->num_ad_types = sizeof(mesh_ad_types);
+ 	memcpy(mesh->ad_types, mesh_ad_types, sizeof(mesh_ad_types));
+ 
++	pvt->rx_id = mesh_mgmt_register(MGMT_EV_MESH_DEVICE_FOUND,
++				MGMT_INDEX_NONE, event_device_found, pvt,
++				NULL);
++	pvt->tx_id = mesh_mgmt_register(MGMT_EV_MESH_PACKET_CMPLT,
++					index, send_cmplt, pvt, NULL);
++
+ 	mesh_mgmt_send(MGMT_OP_SET_MESH_RECEIVER, index, len, mesh,
+ 			mesh_up, L_UINT_TO_PTR(index), NULL);
+ 	l_debug("done %d mesh startup", index);
+@@ -407,11 +443,6 @@ static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
+ 	mesh_mgmt_send(MGMT_OP_READ_INFO, index, 0, NULL,
+ 				read_info_cb, L_UINT_TO_PTR(index), NULL);
+ 
+-	pvt->rx_id = mesh_mgmt_register(MGMT_EV_MESH_DEVICE_FOUND,
+-				MGMT_INDEX_NONE, event_device_found, io, NULL);
+-	pvt->tx_id = mesh_mgmt_register(MGMT_EV_MESH_PACKET_CMPLT,
+-					MGMT_INDEX_NONE, send_cmplt, io, NULL);
+-
+ 	pvt->dup_filters = l_queue_new();
+ 	pvt->rx_regs = l_queue_new();
+ 	pvt->tx_pkts = l_queue_new();
+@@ -522,6 +553,11 @@ static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
+ 	send->adv_data_len = tx->len + 1;
+ 	send->adv_data[0] = tx->len;
+ 	memcpy(send->adv_data + 1, tx->pkt, tx->len);
++
++	/* Filter looped back Provision packets */
++	if (tx->pkt[0] == MESH_AD_TYPE_PROVISION)
++		filter_dups(NULL, send->adv_data, get_instant());
++
+ 	mesh_mgmt_send(MGMT_OP_MESH_SEND, index,
+ 			len, send, send_queued, tx, NULL);
+ 	print_packet("Mesh Send Start", tx->pkt, tx->len);
+-- 
+2.39.2
 
-> +static int nxp_set_ind_reset(struct hci_dev *hdev, void *data)
-> +{
-> +	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-> +	struct sk_buff *skb;
-> +	u8 *status;
-> +	u8 pcmd = 0;
-> +	int err = 0;
-> +
-> +	skb = nxp_drv_send_cmd(hdev, HCI_NXP_IND_RESET, 1, &pcmd);
-> +	if (IS_ERR(skb))
-> +		return PTR_ERR(skb);
-> +
-> +	status = skb_pull_data(skb, 1);
-> +	if (status) {
-> +		if (*status == 0) {
-> +			set_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
-
-nit: perhaps this can be written more idiomatically as:
-
-	if (!status || *status)
-		goto free_skb;
-
-	set_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
-	...
-
-> +			err = nxp_download_firmware(hdev);
-> +			if (err < 0)
-> +				goto free_skb;
-> +			serdev_device_set_baudrate(nxpdev->serdev, nxpdev->fw_init_baudrate);
-> +			nxpdev->current_baudrate = nxpdev->fw_init_baudrate;
-> +			hci_cmd_sync_queue(hdev, send_wakeup_method_cmd, NULL, NULL);
-> +			hci_cmd_sync_queue(hdev, send_ps_cmd, NULL, NULL);
-> +		}
-> +	}
-> +
-> +free_skb:
-> +	kfree_skb(skb);
-> +	return err;
-> +}
-
-...
