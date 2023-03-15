@@ -2,92 +2,109 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C84C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 17:39:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91783C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 17:54:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230176AbjCORjM (ORCPT
+        id S232602AbjCORyH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 13:39:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47634 "EHLO
+        Wed, 15 Mar 2023 13:54:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230044AbjCORjL (ORCPT
+        with ESMTP id S232056AbjCORyC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 13:39:11 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E32F77E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:39:10 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id mg14so1410229qvb.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:39:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678901949;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kDJ0p1+zvLZZGBnKdQfVT3HU6zIXUVLonk33LEctJ0=;
-        b=WfCOwb/J5R0v9f9hGev+t/3MFXqFlLMiVsjg9BAxCkbOiuDFe9WC58+MC8OcaKmTB8
-         fHA77SnQqQ9c50n2UmgXsWyQqFTm/JHaYZPn2EjFlslQbjjZJGKa0hxux5HBs0NXrAuO
-         S8vQWpr+iBjvar3P14bvRSBXEUqddgUmcxlDyd9gXDDWzxUejsJ8idS7Fr+DWvb7pLOZ
-         uJeb7tW7GG1fxUnLLKMK8L4ovdW3udIUoyZzKgIcs2sCpyfAZ/kNB3oP7/azJ1X5gB92
-         Buy85KBq4kfrf7LkMT85sN7xcG+Lf7ArKMWaXtlfGGM/WyKahWHIZ+NmzO5NlDgMNG8L
-         zDDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678901949;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7kDJ0p1+zvLZZGBnKdQfVT3HU6zIXUVLonk33LEctJ0=;
-        b=pQYEv0Zfo2dh7evDws9tkWBS5ufXNFXU+xTS52rZoMSEy20dguZCcafypSuxy06E5d
-         khrKsEGb1o37cclXjt0jcexi+vLYJlSleyyi/jUcC5w+f83WPSBTKC0XAJoxdYwh+ImM
-         h9acm5uSJDoZqGLhFQILA4ALJnnienl0+9Fjiny4LnHrT1ZxlVB4q3A6tpmJ+DdrINet
-         HMy5JtsxXKMK2e6knKJmtahAXOdhTDtctcn8nBUn8lEB/PHussiXnmD5S3hqF96+9XKb
-         0mbM338M2U3f/19lqFo87kG/Um+1JcvqImNlAK3vRJVezlmLYsiNwlwOwfnwVpWJzMbK
-         Lprg==
-X-Gm-Message-State: AO0yUKX9BTklW5fR3qb1Xrfl16cLcfboms77WGF5yH8erg4rx+K2c9GA
-        ITLgbrLFzGvQptJJNhGAke0KOnMrAgs=
-X-Google-Smtp-Source: AK7set8XwBipkuOnpGutk94M0SBizy6jNRVms6QR4bvS2dLG29dvimfjDOcuPODsEw4I1mVSY7PRNA==
-X-Received: by 2002:ad4:5dca:0:b0:5ad:45f2:4307 with SMTP id m10-20020ad45dca000000b005ad45f24307mr8430378qvh.11.1678901949563;
-        Wed, 15 Mar 2023 10:39:09 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.196.114])
-        by smtp.gmail.com with ESMTPSA id c1-20020ae9ed01000000b007461fe6d6e3sm196653qkg.49.2023.03.15.10.39.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 10:39:09 -0700 (PDT)
-Message-ID: <641202bd.e90a0220.2584e.1754@mx.google.com>
-Date:   Wed, 15 Mar 2023 10:39:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5727514709459218068=="
+        Wed, 15 Mar 2023 13:54:02 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4930A23678
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 10:53:57 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 89A9524003C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 18:53:55 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PcJ0z0Bnpz6tql;
+        Wed, 15 Mar 2023 18:53:54 +0100 (CET)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 2/2] doc: update ISO Transport properties to match implementation
+Date:   Wed, 15 Mar 2023 17:53:52 +0000
+Message-Id: <d33ba431a0b89d8dc80b0da984316d9936be54f4.1678902782.git.pav@iki.fi>
+In-Reply-To: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678902782.git.pav@iki.fi>
+References: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678902782.git.pav@iki.fi>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, macroalpha82@gmail.com
-Subject: RE: Bluetooth: Add support for RTL8821CS
-In-Reply-To: <20230315173657.28692-2-macroalpha82@gmail.com>
-References: <20230315173657.28692-2-macroalpha82@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5727514709459218068==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: Documentation/devicetree/bindings/net/realtek-bluetooth.yaml:4
-error: Documentation/devicetree/bindings/net/realtek-bluetooth.yaml: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Document the transport QoS properties. Fix documentation of Delay, it's
+microseconds for ISO.
 ---
-Regards,
-Linux Bluetooth
+ doc/media-api.txt | 44 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
 
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 281f72c1e..eac7f081c 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -773,12 +773,17 @@ Properties	object Device [readonly]
+ 				"pending": streaming but not acquired
+ 				"active": streaming and acquired
+ 
+-		uint16 Delay [readwrite]
++		uint16 Delay [A2DP only, readwrite, optional]
+ 
+-			Optional. Transport delay in 1/10 of millisecond, this
++			For A2DP: transport delay in 1/10 of millisecond. This
+ 			property is only writeable when the transport was
+ 			acquired by the sender.
+ 
++		uint32 Delay [ISO only, optional]
++
++			For ISO, presentation delay in microseconds.
++			Note the value type is different for ISO and A2DP.
++
+ 		uint16 Volume [readwrite]
+ 
+ 			Optional. Indicates volume level of the transport,
+@@ -804,3 +809,38 @@ Properties	object Device [readonly]
+ 
+ 			Linked transport objects which the transport is
+ 			associated with.
++
++		byte CIG [ISO only, optional, experimental]
++
++			Indicates configured QoS CIG.
++			Only present when QoS is configured.
++
++		byte CIS [ISO only, optional, experimental]
++
++			Indicates configured QoS CIS.
++			Only present when QoS is configured.
++
++		byte Interval [ISO only, optional, experimental]
++
++			Indicates configured QoS interval.
++			Only present when QoS is configured.
++
++		byte Framing [ISO only, optional, experimental]
++
++			Indicates configured QoS framing.
++			Only present when QoS is configured.
++
++		byte PHY [ISO only, optional, experimental]
++
++			Indicates configured QoS PHY.
++			Only present when QoS is configured.
++
++		uint32 Retransmissions [ISO only, optional, experimental]
++
++			Indicates configured QoS retransmissions.
++			Only present when QoS is configured.
++
++		uint32 Latency [ISO only, optional, experimental]
++
++			Indicates configured QoS latency.
++			Only present when QoS is configured.
+-- 
+2.39.2
 
---===============5727514709459218068==--
