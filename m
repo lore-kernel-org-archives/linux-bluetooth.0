@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBDDC61DA4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 09:30:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E91EC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 10:06:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232022AbjCOJa5 (ORCPT
+        id S231981AbjCOKGL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 05:30:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36450 "EHLO
+        Wed, 15 Mar 2023 06:06:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232043AbjCOJaw (ORCPT
+        with ESMTP id S232000AbjCOKFm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 05:30:52 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9487DD0F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 02:30:48 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id d13so8098017pjh.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 02:30:48 -0700 (PDT)
+        Wed, 15 Mar 2023 06:05:42 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40AC24C05
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 03:05:01 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id v21so9327622ple.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 03:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678872647;
+        d=gmail.com; s=20210112; t=1678874700;
         h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
         bh=Z4yuN2Vf6XahCUJDWAPD54smLN5lAj0NCkXCw7WtJWg=;
-        b=XteK0tKCVs3fpmvvwstUUZPxuKV7Co0WcpofFlM0bfESZSiMRSAuKKSQbT5dj84hSu
-         M5b4oWSR472duIQM0+bbv1zk6xCdTDjOiVnhq9GyJfmpFoPumo69A6w4zaIwee+5c8oj
-         mYiuu08uSk2hSrY+FJHRrjb76I9Hmz9B5a8+8wheZnPO2ZLr/sVXe0LgohIsutfkbQ06
-         U1fw0T01Z+2map8URvcaUrFqIQngzBQxBzw4KsG/75lB8quDv2eY/GnxBEXvKEHrPIFY
-         9jHHhKGw8RlTcLM+RJ8qsCvX1oYyYyQXGrTXjmxiujbxb0cFPqOP85atQalUJfKphYnb
-         yRTg==
+        b=PpH47yL8gc+iGjYyemPIM6eXifZ0A1QDIUL4Z1DQZZ2mHhgcf+ya1YvaIeY31I6ljj
+         CSCiVcwDLYLMVg+F5F/sLjfi95RvzoK4JAgeHfBoBTyLCeMu090Nz6WWZqrcWm8Ra/j7
+         k74BGxVKsRqEwpA8bZqCpgHJvw40Ac2aFY79EsjtwIjgSCfruC+hFJWvhzTsTE9YGhZn
+         WthaS9X2EHIeuv++ZlDhdE5KOvWQ7B1yVDfD1ZyUMvx3VKCyYuyNko9gR+1IX81RgTXe
+         KjmyGNmwCXBkdRrT6/xOBxuhl2BTDO50plIH7AYpQFi0vTQpLUKw/KGK6vVbOggIAQvf
+         IxqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678872647;
+        d=1e100.net; s=20210112; t=1678874700;
         h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
         bh=Z4yuN2Vf6XahCUJDWAPD54smLN5lAj0NCkXCw7WtJWg=;
-        b=bTwuZR0cloyzQS0GUvkQrtNDaUhaXPUAv6KGAjPHtJArA8inTLVO47oEtCPCcea2C9
-         Bd88KvwPNzBV0LHerFVZF2hV7YBYSr/M4i8PTRb4aidEP35N5/LEi343Dwmdi4RgxTvx
-         bVciOkFYwVx/nZEXOWe84Aej0ASP9m0ISyTgB4DvSu7qp6nft8IbojCD/tlXlIAORYRA
-         61g9Mxw3woh0/UNUId5QbOaOTMHgEYypGgvBTd3FaDIjM47s4Z+FKb9Wy64hbARt0FnG
-         HgnCenFtUcQM8yvsKE5sCrVag/1PrnmZr47oqwoMDexadj3tOEngXyEsL0J+MQ4F87X3
-         a88A==
-X-Gm-Message-State: AO0yUKVdANOSL5x0s1TtqFTU/fDytEFihoYaxtPTJVu5sUI/LBTvEFBf
-        XwUiPNjqPzbAusWGtXFEXHqmvLzjrSd7gCmrz8E=
-X-Google-Smtp-Source: AK7set8B2rJxVLMufZuhT2OkpdoGqPKRgPaquGj/Viw1m3sQNywA8wQoA3SKoLkIA2MreL+RuOVnDg==
-X-Received: by 2002:a05:6a20:6715:b0:d4:9b95:bdf2 with SMTP id q21-20020a056a20671500b000d49b95bdf2mr8018253pzh.32.1678872647651;
-        Wed, 15 Mar 2023 02:30:47 -0700 (PDT)
+        b=jhdBwHNSvGtwO13Yy+BRBSLGvG3sfWOeT3T0nbwcGgry0mYOz2uOUqku0Z6syyzUc+
+         prlcAv1WmZmRYe5duJg1/v9uF8vK+KSiyadNbGCbSLI+V4vuAR+JCDB3yskTWC/0jxuL
+         hmrovfIDOlgAZztQtCObgtSDEopQURW+7Uz/Gy6tbpO8JBbKfqU7PbHp78JFsRsoXX8G
+         ZwdGGXs6x/0TzYVxNLfGip0AqoWTLwrs+hR1AIYLOk63OkLEpshEsgXJqi5yNLWme+Pm
+         uNTYh13aUNt5Sh86KuHXXJA9ZzOli+7/egzb3FAKuSG5EQoN8Vj9OVrvxK88os6V8NOI
+         9Ndg==
+X-Gm-Message-State: AO0yUKW3NY2c5OrxCY2nCXcVYaoVFiciY7206LKhdaAPCmHYBJcEq1yb
+        42OE0XMuGVbcEyHtuqMOHjTjmLIrDmzc5v3A2QI=
+X-Google-Smtp-Source: AK7set9qRTLKG1Cex9kS409ydb4w4CH8lq2x+O4X8wn52Y0ntvBdrdqE39AIto5vecBSvExcnHw0ig==
+X-Received: by 2002:a05:6a20:65a9:b0:d3:f695:1cd9 with SMTP id p41-20020a056a2065a900b000d3f6951cd9mr12045126pzh.58.1678874700133;
+        Wed, 15 Mar 2023 03:05:00 -0700 (PDT)
 Received: from AndroidSev.unication.com.cn ([183.63.252.58])
-        by smtp.gmail.com with ESMTPSA id f3-20020a63f103000000b004eecc3080f8sm2988590pgi.29.2023.03.15.02.30.46
+        by smtp.gmail.com with ESMTPSA id v2-20020aa78502000000b0060c55143fdesm3144857pfn.68.2023.03.15.03.04.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 Mar 2023 02:30:47 -0700 (PDT)
+        Wed, 15 Mar 2023 03:04:59 -0700 (PDT)
 From:   Aaron_shen <aarongt.shen@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Aaron_shen <aarongt.shen@gmail.com>
-Subject: [PATCH] obexd: reject to accept file when replying reject message
-Date:   Wed, 15 Mar 2023 17:29:54 +0800
-Message-Id: <20230315092954.4182-1-aarongt.shen@gmail.com>
+Subject: [PATCH BlueZ] obexd: reject to accept file when replying reject message
+Date:   Wed, 15 Mar 2023 18:04:35 +0800
+Message-Id: <20230315100435.5424-1-aarongt.shen@gmail.com>
 X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
