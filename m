@@ -2,162 +2,188 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A81EFC6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 18:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C793EC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 18:49:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230467AbjCOScY (ORCPT
+        id S232503AbjCOStc convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 14:32:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44576 "EHLO
+        Wed, 15 Mar 2023 14:49:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbjCOScW (ORCPT
+        with ESMTP id S232262AbjCOStb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 14:32:22 -0400
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D028B8F53A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 11:32:16 -0700 (PDT)
-Received: by mail-ua1-x931.google.com with SMTP id 89so6516813uao.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 11:32:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678905135;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QKhUAmHOEanNqoxa8DwVH8mGkWsm17ddlQ4pTLKkNNA=;
-        b=ECKBj6fKINoZEcUHmhvITRahQArZUmwQOu55ZP3xV34wKHWHX2QuiHuCdIaklrgTW3
-         nRx/KnuES5s4SV01Ei9gtTO9NRDa7zb4hI7rQpTJ8N2ZSvqgHXT4cvS7kM4ejCAxb05Z
-         eX6EShl6BTu4wp8SmxecPd+jPk4KYRWNruK/8wchOQDCmC5993HkJ/jJF9SaQbcMGtQe
-         UnZZhrOqoe4+EQqA//du/roQyW8mNoC6yGlfzQ+aSyRtj1aeXsuPvnaWRc4WppuvQ5DT
-         EKDoiXXIkKDfEKtLPKZnKl40e7+PLyKit3QxGbF0LRPlJ5h5MHrCh4g8bF+IfOy73g29
-         GF2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678905135;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QKhUAmHOEanNqoxa8DwVH8mGkWsm17ddlQ4pTLKkNNA=;
-        b=IXV+ZA/pHliDlHT3TnBDf+bF3IpYs0uR9SrHKSgpVmMt1zkxFh+Ur9yGP8eo+60Zu9
-         wyt8krkbwm3bB/NCJmlK+d/LggqzR1N/dwszDLuo3ScYxuwnjbs+Z1Tnub+vo8jKKX8+
-         M7NAGQCSgppRozvCy583iocedqDG8w6XzzqmsboiEX7JgE+aaCXbLkuoyOrHe4ekRGlJ
-         8k4R1m/Ls0YBZyHR1Dasp2TYzUVsHngc4Vfdp2wQUHeiPVx+CxPb08h9/tBJcDF8Uidm
-         n8kOB8jp1d/nWTpH0XP926T4/qUdE965HkWH1fo4ba1uKJiBHTLEFI+ewj03IAm/yCx4
-         0trQ==
-X-Gm-Message-State: AO0yUKWKboVEm2+Iah/EBMiZy4mIEqVcrbqFArt4tjSUA0y/571ChhKP
-        zjAyiFdu/0PC46ePh7v1ZkDUAJQRgIer4wsa0h7G0ye7xZk=
-X-Google-Smtp-Source: AK7set9yWYipuh2osY81xfMZijo1vEUuBvwvlGCUWEkdN70qgHh4fx71uVaGy/ZXgx3BHmnoclfXFTaInTBBfOAu1J0=
-X-Received: by 2002:a1f:4a81:0:b0:410:4a2c:1e9a with SMTP id
- x123-20020a1f4a81000000b004104a2c1e9amr23880156vka.1.1678905135638; Wed, 15
- Mar 2023 11:32:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678902782.git.pav@iki.fi>
- <d33ba431a0b89d8dc80b0da984316d9936be54f4.1678902782.git.pav@iki.fi>
-In-Reply-To: <d33ba431a0b89d8dc80b0da984316d9936be54f4.1678902782.git.pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 15 Mar 2023 11:32:02 -0700
-Message-ID: <CABBYNZKDfGozd=Ud1_GSN821t2=dqtNYTiQ5Z89TfNQ2aF9N3Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] doc: update ISO Transport properties to match implementation
-To:     Pauli Virtanen <pav@iki.fi>
+        Wed, 15 Mar 2023 14:49:31 -0400
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85381FD9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 11:49:06 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id 4D2372406B7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 19:49:05 +0100 (CET)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PcKDc4zfcz9rxV;
+        Wed, 15 Mar 2023 19:49:04 +0100 (CET)
+Message-ID: <54ad88223b5af198d9bee0ef582458a6df379c10.camel@iki.fi>
+Subject: Re: [PATCH BlueZ 1/2] transport: add CIG/CIS/PHY properties, don't
+ show unset QoS properties
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org
+Date:   Wed, 15 Mar 2023 18:49:04 +0000
+In-Reply-To: <CABBYNZJeJkR18gAdy9bLW0aCkj9t3eAQ_Vpvz7whnjeaeY+2cw@mail.gmail.com>
+References: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678902782.git.pav@iki.fi>
+         <CABBYNZJeJkR18gAdy9bLW0aCkj9t3eAQ_Vpvz7whnjeaeY+2cw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-HI Pauli,
+Hi Luiz,
 
-On Wed, Mar 15, 2023 at 10:54=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Document the transport QoS properties. Fix documentation of Delay, it's
-> microseconds for ISO.
-> ---
->  doc/media-api.txt | 44 ++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 42 insertions(+), 2 deletions(-)
->
-> diff --git a/doc/media-api.txt b/doc/media-api.txt
-> index 281f72c1e..eac7f081c 100644
-> --- a/doc/media-api.txt
-> +++ b/doc/media-api.txt
-> @@ -773,12 +773,17 @@ Properties        object Device [readonly]
->                                 "pending": streaming but not acquired
->                                 "active": streaming and acquired
->
-> -               uint16 Delay [readwrite]
-> +               uint16 Delay [A2DP only, readwrite, optional]
->
-> -                       Optional. Transport delay in 1/10 of millisecond,=
- this
-> +                       For A2DP: transport delay in 1/10 of millisecond.=
- This
->                         property is only writeable when the transport was
->                         acquired by the sender.
->
-> +               uint32 Delay [ISO only, optional]
-> +
-> +                       For ISO, presentation delay in microseconds.
-> +                       Note the value type is different for ISO and A2DP=
-.
-> +
+ke, 2023-03-15 kello 11:19 -0700, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+> 
+> On Wed, Mar 15, 2023 at 10:54 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Add CIG, CIS, and PHY properties to BAP transport.  The other QoS
+> > properties are there, and these may also be useful to clients, e.g.  to
+> > manage CIG/CIS allocation as client.
+> > 
+> > Hide transport QoS properties when they are not configured.
+> > ---
+> >  profiles/audio/transport.c | 67 ++++++++++++++++++++++++++++++++++----
+> >  1 file changed, 61 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> > index 457590746..53bf13175 100644
+> > --- a/profiles/audio/transport.c
+> > +++ b/profiles/audio/transport.c
+> > @@ -811,6 +811,38 @@ static const GDBusPropertyTable a2dp_properties[] = {
+> >         { }
+> >  };
+> > 
+> > +static gboolean qos_exists(const GDBusPropertyTable *property, void *data)
+> > +{
+> > +       struct media_transport *transport = data;
+> > +       struct bap_transport *bap = transport->data;
+> > +
+> > +       return bap->qos.phy != 0x00;
+> > +}
+> > +
+> > +static gboolean get_cig(const GDBusPropertyTable *property,
+> > +                                       DBusMessageIter *iter, void *data)
+> > +{
+> > +       struct media_transport *transport = data;
+> > +       struct bap_transport *bap = transport->data;
+> > +
+> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> > +                                                       &bap->qos.cig_id);
+> > +
+> > +       return TRUE;
+> > +}
+> > +
+> > +static gboolean get_cis(const GDBusPropertyTable *property,
+> > +                                       DBusMessageIter *iter, void *data)
+> > +{
+> > +       struct media_transport *transport = data;
+> > +       struct bap_transport *bap = transport->data;
+> > +
+> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> > +                                                       &bap->qos.cis_id);
+> > +
+> > +       return TRUE;
+> > +}
+> > +
+> >  static gboolean get_interval(const GDBusPropertyTable *property,
+> >                                         DBusMessageIter *iter, void *data)
+> >  {
+> > @@ -835,6 +867,17 @@ static gboolean get_framing(const GDBusPropertyTable *property,
+> >         return TRUE;
+> >  }
+> > 
+> > +static gboolean get_phy(const GDBusPropertyTable *property,
+> > +                                       DBusMessageIter *iter, void *data)
+> > +{
+> > +       struct media_transport *transport = data;
+> > +       struct bap_transport *bap = transport->data;
+> > +
+> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &bap->qos.phy);
+> > +
+> > +       return TRUE;
+> > +}
+> > +
+> >  static gboolean get_sdu(const GDBusPropertyTable *property,
+> >                                         DBusMessageIter *iter, void *data)
+> >  {
+> > @@ -962,12 +1005,15 @@ static const GDBusPropertyTable bap_properties[] = {
+> >         { "Codec", "y", get_codec },
+> >         { "Configuration", "ay", get_configuration },
+> >         { "State", "s", get_state },
+> > -       { "Interval", "u", get_interval },
+> > -       { "Framing", "b", get_framing },
+> > -       { "SDU", "q", get_sdu },
+> > -       { "Retransmissions", "y", get_retransmissions },
+> > -       { "Latency", "q", get_latency },
+> > -       { "Delay", "u", get_delay },
+> > +       { "CIG", "y", get_cig, NULL, qos_exists },
+> > +       { "CIS", "y", get_cis, NULL, qos_exists },
+> > +       { "Interval", "u", get_interval, NULL, qos_exists },
+> > +       { "Framing", "b", get_framing, NULL, qos_exists },
+> > +       { "PHY", "y", get_phy, NULL, qos_exists },
+> > +       { "SDU", "q", get_sdu, NULL, qos_exists },
+> > +       { "Retransmissions", "y", get_retransmissions, NULL, qos_exists },
+> > +       { "Latency", "q", get_latency, NULL, qos_exists },
+> > +       { "Delay", "u", get_delay, NULL, qos_exists },
+> >         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
+> >         { "Location", "u", get_location },
+> >         { "Metadata", "ay", get_metadata },
+> > @@ -1191,12 +1237,21 @@ static void bap_update_qos(const struct media_transport *transport)
+> > 
+> >         bap->qos = *qos;
+> > 
+> > +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> > +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> > +                       "CIG");
+> > +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> > +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> > +                       "CIS");
+> >         g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> >                         transport->path, MEDIA_TRANSPORT_INTERFACE,
+> >                         "Interval");
+> >         g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> >                         transport->path, MEDIA_TRANSPORT_INTERFACE,
+> >                         "Framing");
+> > +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> > +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> > +                       "PHY");
+> >         g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> >                         transport->path, MEDIA_TRANSPORT_INTERFACE,
+> >                         "SDU");
+> > --
+> > 2.39.2
+> 
+> I'm fine adding these but you could also have used BT_ISO_QOS
+> socketopt to read it directly from the socket in case you want to use
+> it on pipewire.
 
-I don't think D-Bus introspection allows polymorphism of properties,
-so either we just use uint16 and limit the maximum delay to 65K or we
-have say it is in milliseconds given that in most cases the presets
-have the Presentation Delay as a round number.
+Yes, we can do that once we have the fd.
 
->                 uint16 Volume [readwrite]
->
->                         Optional. Indicates volume level of the transport=
-,
-> @@ -804,3 +809,38 @@ Properties object Device [readonly]
->
->                         Linked transport objects which the transport is
->                         associated with.
-> +
-> +               byte CIG [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS CIG.
-> +                       Only present when QoS is configured.
-> +
-> +               byte CIS [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS CIS.
-> +                       Only present when QoS is configured.
-> +
-> +               byte Interval [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS interval.
-> +                       Only present when QoS is configured.
+But if client wants to do CIG+CIS allocation in its SelectProperties,
+it needs to know already reserved CIG+CIS. Acquiring the fd moves ASEs
+out from qos state, which is not wanted for this.
 
-This should be uint32
+Also, no Acquire call will return until all CIS in the same CIG have
+been connected. To acquire the right transports (only those in the same
+CIG), we need to know CIGs of all transports before starting to acquire
+any. So we don't have any fds at that point.
 
-> +               byte Framing [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS framing.
-> +                       Only present when QoS is configured.
-> +
-> +               byte PHY [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS PHY.
-> +                       Only present when QoS is configured.
-> +
-> +               uint32 Retransmissions [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS retransmissions.
-> +                       Only present when QoS is configured.
+Managing that probably should be responsibility of BlueZ, it could
+connect all CIS in the same CIG when one of the transports is acquired.
+Or, try address it in kernel but maybe that has more constraints.
 
-And this should be byte
+But I think these properties can be added regardless of the above,
+given that they have some uses also otherwise.
 
-> +               uint32 Latency [ISO only, optional, experimental]
-> +
-> +                       Indicates configured QoS latency.
-> +                       Only present when QoS is configured.
-
-uint16
-
-> --
-> 2.39.2
->
-
-
---=20
-Luiz Augusto von Dentz
+-- 
+Pauli Virtanen
