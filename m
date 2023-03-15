@@ -2,235 +2,141 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C68C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Mar 2023 23:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 250DCC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 05:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229850AbjCNXl5 (ORCPT
+        id S229549AbjCOFyv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Mar 2023 19:41:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55816 "EHLO
+        Wed, 15 Mar 2023 01:54:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjCNXl4 (ORCPT
+        with ESMTP id S231289AbjCOFys (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Mar 2023 19:41:56 -0400
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573003D0BD
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 16:41:54 -0700 (PDT)
-Received: by mail-ua1-x930.google.com with SMTP id n17so4779377uaj.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 16:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678837313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/7u2UoFEleKTHFjM/LoaPFEaAQRIlqZsn3+EJyaN6Ig=;
-        b=K+zm8NsO94HaE0zJdZ+ula1tzQ8PDrPrBOU5DBRKtmixneAgHv4Lje7KTJSBb1kGRj
-         Ln9B4LQEcLIYiWhf1TeXzjueyirvKcOq0v7kmynMIzoEifO6AVB2tCTkjJ3JJ3dSZLFE
-         aeuAYdW/MPh5UDMgB4si2DU3eUcDImVkzOMwppmV1cHEGgDW1TW7v8f2+1ZP7fKn5cvS
-         4Xig5CUUsO1QNt4WV5j0Ysz/AjDDIcY8zYrVFFRh+ljwgIyTNTFJHHLoVtCHshx/icC+
-         7cqr1LiYw/19Q07/Irhkes+IDLO4seF5CxYx8Q1sGtXj7qNVjQV7Nmglul1r1+5FH8LI
-         Icgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678837313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/7u2UoFEleKTHFjM/LoaPFEaAQRIlqZsn3+EJyaN6Ig=;
-        b=jDO69KpOQomzpnQPZTMdIcKK0DBLvNej/MnBUBV8xdw/JeliLAzxKm8JjCBd5RAEa1
-         dzggBCVQykRR/48Hp7qGZ8TRhVzfzm/a/MvpqeOzjlsw1kMe/uHywfxLijtkOTKa9juc
-         ztg4KyR7yvQBWvaJojmwI5ODOZdMSnlu2A01hAeOS1aCQcd6ulURrYZHRb+OMXlvv4nw
-         ZJH/YZaTCu2FBukEtFnFe2kYiDrHf2xlavlPlrWQrUtc2PmMptST5JsFm1oARE9T/m5G
-         MdmEruOahD8jTI61OKRXSKEAW4MTUPdDw9uFBaqB2RgrYNeLLlehNyHiuscb44f/rEmM
-         PKNQ==
-X-Gm-Message-State: AO0yUKWBbntM1bsH9XGZNcorS13pxJHbvGdBIiPgzD/ZSXL5K6bz6mti
-        4OM1La3KkYosajoUWWD/ZuBk3qYa5aBBG1suM3I=
-X-Google-Smtp-Source: AK7set/TbnWcxh1v/n+w57elpIAE4xsO0V+hQk+R/RTsr0dS4h7MOtqo7x2dSxBmEzNHGAWqve5eXtwGnpsZcuMN/zc=
-X-Received: by 2002:ab0:544e:0:b0:68a:5c52:7f2b with SMTP id
- o14-20020ab0544e000000b0068a5c527f2bmr24694038uaa.1.1678837313353; Tue, 14
- Mar 2023 16:41:53 -0700 (PDT)
+        Wed, 15 Mar 2023 01:54:48 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9262710
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Mar 2023 22:54:46 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 32F5aI3M1013431, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 32F5aI3M1013431
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
+        Wed, 15 Mar 2023 13:36:18 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Wed, 15 Mar 2023 13:36:22 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 15 Mar 2023 13:36:22 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::b4a2:2bcc:48d1:8b02]) by
+ RTEXMBS04.realtek.com.tw ([fe80::b4a2:2bcc:48d1:8b02%5]) with mapi id
+ 15.01.2375.007; Wed, 15 Mar 2023 13:36:22 +0800
+From:   Hilda Wu <hildawu@realtek.com>
+To:     Arnaud Rebillout <arnaudr@kali.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "steev@kali.org" <steev@kali.org>, Max Chou <max.chou@realtek.com>
+Subject: RE: RTL8761B BT USB has been broken for a while (mismatched firmware?)
+Thread-Topic: RTL8761B BT USB has been broken for a while (mismatched
+ firmware?)
+Thread-Index: AQHZVhvubalhn2hI80mhao7Iwd4w+67512xg
+Date:   Wed, 15 Mar 2023 05:36:22 +0000
+Message-ID: <1c2ec3d103444a778ddffabaac22206b@realtek.com>
+References: <af4f9118-a189-e353-8cf6-65cabceff3e0@kali.org>
+In-Reply-To: <af4f9118-a189-e353-8cf6-65cabceff3e0@kali.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.21.132.182]
+x-kse-serverinfo: RTEXMBS03.realtek.com.tw, 9
+x-kse-attachmentfiltering-interceptor-info: no applicable attachment filtering
+ rules found
+x-kse-antivirus-interceptor-info: scan successful
+x-kse-antivirus-info: =?utf-8?B?Q2xlYW4sIGJhc2VzOiAyMDIzLzMvMTUg5LiK5Y2IIDEyOjM4OjAw?=
+x-kse-bulkmessagesfiltering-scan-result: protection disabled
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230311003826.454858-1-marijn.suijten@somainline.org> <20230311003826.454858-4-marijn.suijten@somainline.org>
-In-Reply-To: <20230311003826.454858-4-marijn.suijten@somainline.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 14 Mar 2023 16:41:40 -0700
-Message-ID: <CABBYNZLif_vF7NrbK=a1TuHRdeZcrDFbykj1jPoL3pCtbLZJXg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 3/3] audio/avrcp: Determine Absolute Volume
- support from feature category 2
-To:     Marijn Suijten <marijn.suijten@somainline.org>
-Cc:     linux-bluetooth@vger.kernel.org, Yu Liu <yudiliu@google.com>,
-        Bartosz Fabianowski <bartosz@fabianowski.eu>,
-        Pauli Virtanen <pav@iki.fi>,
-        Marek Czerski <ma.czerski@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marijn,
-
-On Fri, Mar 10, 2023 at 4:39=E2=80=AFPM Marijn Suijten
-<marijn.suijten@somainline.org> wrote:
->
-> The AVRCP spec (1.6.2) does not mention anything about a version
-> requirement for Absolute Volume, despite this feature only existing
-> since spec version 1.4.  Android reports a version of 1.3 [1] for its
-> "AVRCP remote" (CT) service and mentions in the comment above it itself
-> relies on feature bits rather than the exposed version.  As it stands
-> BlueZ requires at least version 1.4 making it unable to communicate
-> absolute volume levels with even the most recent Android phones running
-> Fluoride (have not checked the version on Gabeldorsche).
->
-> The spec states that supporting SetAbsoluteVolume and
-> EVENT_VOLUME_CHANGED are mandatory when feature level 2 is declared,
-> excluded otherwise.  This feature bit is set on Android and, when used
-> by this patch, allows for successfully communicating volume back and
-> forth despite the version theoretically being too low.
->
-> In order to not affect spec tests too much (which I doubt would catch
-> this, and should have otherwise pointed out that Android itself is out
-> of spec) this behaviour is guarded behind a config option in main.conf,
-> as discussed in [2].
->
-> [1]: https://android.googlesource.com/platform/system/bt/+/android-11.0.0=
-_r28/bta/av/bta_av_main.cc#761
-> [2]: https://marc.info/?l=3Dlinux-bluetooth&m=3D163463497503113&w=3D2
-> ---
->  profiles/audio/avrcp.c | 16 ++++++++++------
->  src/btd.h              |  1 +
->  src/main.c             |  8 ++++++++
->  src/main.conf          |  6 ++++++
->  4 files changed, 25 insertions(+), 6 deletions(-)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index c16f9cfef..11f18f25d 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -1761,7 +1761,8 @@ static uint8_t avrcp_handle_set_absolute_volume(str=
-uct avrcp *session,
->          * The controller on the remote end is only allowed to call SetAb=
-soluteVolume
->          * on our target if it's at least version 1.4 and a category-2 de=
-vice.
->          */
-> -       if (!session->target || session->target->version < 0x0104 ||
-> +       if (!session->target ||
-> +                       (session->target->version < 0x0104 && !btd_opts.a=
-vrcp.allow_volume_changed_on_pre_1_4_ct) ||
->                         !(session->target->features & AVRCP_FEATURE_CATEG=
-ORY_2)) {
->                 error("Remote SetAbsoluteVolume rejected from non-categor=
-y-2 peer");
->                 goto err;
-> @@ -4171,13 +4172,15 @@ static void target_init(struct avrcp *session)
->                                 (1 << AVRCP_EVENT_TRACK_REACHED_END) |
->                                 (1 << AVRCP_EVENT_SETTINGS_CHANGED);
->
-> -       if (target->version < 0x0104)
-> -               return;
-> -
-> -       if (target->features & AVRCP_FEATURE_CATEGORY_2)
-> +       /* Remote device supports receiving volume notifications */
-> +       if ((target->version >=3D 0x0104 || btd_opts.avrcp.allow_volume_c=
-hanged_on_pre_1_4_ct) &&
-> +                       target->features & AVRCP_FEATURE_CATEGORY_2)
->                 session->supported_events |=3D
->                                 (1 << AVRCP_EVENT_VOLUME_CHANGED);
->
-> +       if (target->version < 0x0104)
-> +               return;
-> +
->         session->supported_events |=3D
->                                 (1 << AVRCP_EVENT_ADDRESSED_PLAYER_CHANGE=
-D) |
->                                 (1 << AVRCP_EVENT_AVAILABLE_PLAYERS_CHANG=
-ED);
-> @@ -4595,7 +4598,8 @@ int avrcp_set_volume(struct btd_device *dev, int8_t=
- volume, bool notify)
->                 return -ENOTCONN;
->
->         if (notify) {
-> -               if (!session->target || session->target->version < 0x0104=
- ||
-> +               if (!session->target ||
-> +                               (session->target->version < 0x0104 && !bt=
-d_opts.avrcp.allow_volume_changed_on_pre_1_4_ct) ||
->                                 !(session->target->features & AVRCP_FEATU=
-RE_CATEGORY_2)) {
->                         error("Can't send EVENT_VOLUME_CHANGED to non-cat=
-egory-2 peer");
->                         return -ENOTSUP;
-> diff --git a/src/btd.h b/src/btd.h
-> index 31c04a990..07d1d961f 100644
-> --- a/src/btd.h
-> +++ b/src/btd.h
-> @@ -99,6 +99,7 @@ struct btd_avdtp_opts {
->
->  struct btd_avrcp_opts {
->         gboolean set_absolute_volume_without_target;
-> +       gboolean allow_volume_changed_on_pre_1_4_ct;
->  };
->
->  struct btd_advmon_opts {
-> diff --git a/src/main.c b/src/main.c
-> index 92f74e381..a2b81f940 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -154,6 +154,7 @@ static const char *avdtp_options[] =3D {
->
->  static const char *avrcp_options[] =3D {
->         "SetAbsoluteVolumeWithoutTarget",
-> +       "AllowVolumeChangedOnPre1_4Controller",
->         NULL
->  };
->
-> @@ -988,6 +989,13 @@ static void parse_config(GKeyFile *config)
->         else
->                 btd_opts.avrcp.set_absolute_volume_without_target =3D boo=
-lean;
->
-> +       boolean =3D g_key_file_get_boolean(config, "AVRCP",
-> +                                               "AllowVolumeChangedOnPre1=
-_4Controller", &err);
-> +       if (err)
-> +               g_clear_error(&err);
-> +       else
-> +               btd_opts.avrcp.allow_volume_changed_on_pre_1_4_ct =3D boo=
-lean;
-> +
->         val =3D g_key_file_get_integer(config, "AdvMon", "RSSISamplingPer=
-iod",
->                                                                         &=
-err);
->         if (err) {
-> diff --git a/src/main.conf b/src/main.conf
-> index ca00ed03e..286d092bf 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -277,6 +277,12 @@
->  # profile.
->  #SetAbsoluteVolumeWithoutTarget =3D false
->
-> +# Allow peer AVRCP controller with version 1.3 access to category-2 (abs=
-olute volume) features.
-> +# This is common for AOSP to not signal the desired minimum version of 1=
-.4 while still supporting
-> +# absolute volume based on the feature category bit, as mentioned in the=
- comment:
-> +# https://android.googlesource.com/platform/system/bt/+/android-12.0.0_r=
-1/bta/av/bta_av_main.cc#621
-> +AllowVolumeChangedOnPre1_4Controller =3D true
-
-This is too long to my liking, perhaps have VolumeVersion instead and
-if it is configured as false we just check the category.
-
->  [Policy]
->  #
->  # The ReconnectUUIDs defines the set of remote services that should try
-> --
-> 2.39.2
->
-
-
---=20
-Luiz Augusto von Dentz
+SGkgQXJuYXVkLA0KDQpCZWZvcmUgdGhlIDlmZDJlMjk0IGNvbW1pdCwgdGhlIGJ0cnRsIGRyaXZl
+ciBsb2FkcyBydGxfYnQvcnRsODc2MWJfZncuYmluIGZvciBSVEw4NzYxQiBVU0Igb25seS4NCkFm
+dGVyIHRoZSA5ZmQyZTI5NCBjb21taXQsIHRoZSBidHJ0bCBkcml2ZXIgbG9hZHMgcnRsX2J0L3J0
+bDg3NjFiX2Z3LmJpbiBmb3IgUlRMODc2MUIgVUFSVCwgYW5kIGxvYWRzIHJ0bF9idC9ydGw4NzYx
+YnVfZncuYmluIGZvciBSVEw4NzYxQiBVU0IuDQoNCk1heWJlIHJlbmFtaW5nIHRoZSBVU0IgZncg
+dG8gcnRsX2J0L3J0bDg3NjFidV9mdy5iaW4sIHRoZSBVQVJUIGZ3IHRvIHJ0bF9idC9ydGw4NzYx
+YnRfZncuYmluIGNhbiBhdm9pZCBjb25mdXNpb24uDQoNClRoZSBjb21taXQgIjlmZDJlMjk0OWI0
+MyBCbHVldG9vdGg6IGJ0cnRsOiByZW5hbWUgVVNCIGZ3IGZvciBSVEw4NzYxIiBzaG91bGQgYmUg
+d29yayB3aXRoIHRoZSBjb21taXQgIjY0ZjAyYTIgcnRsX2J0OiBBZGQgcnRsODc2MWJ1IGZpcm13
+YXJlIG9mIGxpbnV4LWZpcm13YXJlLiIgZm9yIFJUTDg3NjFCIEJsdWV0b290aCBVU0IgY29udHJv
+bGxlci4NCg0KQ29uc2lkZXJpbmcgdGhlIEZXIHdhcyBzdWJtaXR0ZWQgdHdvIHllYXJzIGFnbywg
+UmVhbHRlayBwbGFucyB0byByZWxlYXNlIGEgbmV3IHZlcnNpb24gdG8gVXBzdHJlYW0uDQpXZSB3
+aWxsIHZlcmlmeSB0aGUgYmVoYXZpb3Igb24gTGludXggUEMuIEV4cGVjdCBpdCBjYW4gcmVzb2x2
+ZSB0aGUgaXNzdWUuDQpUaGFua3MuDQoNClJlZ2FyZHMsDQpIaWxkYQ0KDQotLS0tLU9yaWdpbmFs
+IE1lc3NhZ2UtLS0tLQ0KRnJvbTogQXJuYXVkIFJlYmlsbG91dCA8YXJuYXVkckBrYWxpLm9yZz4g
+DQpTZW50OiBUdWVzZGF5LCBNYXJjaCAxNCwgMjAyMyAxMDoyMyBBTQ0KVG86IGxpbnV4LWJsdWV0
+b290aEB2Z2VyLmtlcm5lbC5vcmcNCkNjOiBIaWxkYSBXdSA8aGlsZGF3dUByZWFsdGVrLmNvbT47
+IHN0ZWV2QGthbGkub3JnDQpTdWJqZWN0OiBSVEw4NzYxQiBCVCBVU0IgaGFzIGJlZW4gYnJva2Vu
+IGZvciBhIHdoaWxlIChtaXNtYXRjaGVkIGZpcm13YXJlPykNCg0KDQpFeHRlcm5hbCBtYWlsLg0K
+DQoNCg0KSGVsbG8sDQoNCmxldCBtZSBmb3J3YXJkIGFuIGlzc3VlIHRoYXQgd2FzIHJlcG9ydGVk
+IG9uIHRoZSBLYWxpIExpbnV4IGJ1Z3RyYWNrZXIgYSBzaG9ydCB3aGlsZSBhZ28uIEl0J3MgYWJv
+dXQgYSBVU0IgYmx1ZXRvb3RoIDUuMCBkb25nbGUgd2hpY2ggdXNlcyBSZWFsdGVrIFJUTDg3NjFC
+IGNoaXAuIFdoZW4gdGhlIGRvbmdsZSBpcyBwbHVnZ2VkIGluLCBldmVyeXRoaW5nIGxvb2tzIGdv
+b2QgaW4gdGhlIGtlcm5lbCBsb2dzLCBob3dldmVyIHRoZSBkb25nbGUgaXMgbm90IGZ1bmN0aW9u
+YWwgYXQgYWxsLg0KDQpTZXZlcmFsIHVzZXJzIHJlcG9ydGVkIHRoZSBpc3N1ZSBvbiB2YXJpb3Vz
+IGJ1ZyB0cmFja2VyczoNCi0gMjAyMS0wOTogaHR0cHM6Ly9idWd6aWxsYS5rZXJuZWwub3JnL3No
+b3dfYnVnLmNnaT9pZD0yMTQyODcNCi0gMjAyMi0wNDoNCmh0dHBzOi8vYnVncy5sYXVuY2hwYWQu
+bmV0L3VidW50dS8rc291cmNlL2xpbnV4LWZpcm13YXJlLytidWcvMTk2ODYwNA0KLSAyMDIzLTAz
+OiBodHRwczovL2J1Z3Mua2FsaS5vcmcvdmlldy5waHA/aWQ9ODIxNg0KDQpBbGwgb2YgdGhlbSBj
+b25maXJtIHRoYXQgdGhlIHdyb25nIGZpcm13YXJlIGlzIGxvYWRlZC4gTGV0IG1lIGV4cGxhaW4u
+DQoNClNvIHRoZXJlIGFyZSB0d28gZmlybXdhcmUgZm9yIHRoaXMgY2hpcDogcnRsODc2MWIgYW5k
+IHJ0bDg3NjFidS4gVGhleSB3ZXJlIGFkZGVkIHRvIGxpbnV4LWZpcm13YXJlIGJhY2sgaW4gMjAy
+MS0wNi0wOSwgYXMgY2FuIGJlIHNlZW4gd2l0aDoNCg0KICAgY2QgbGludXgtZmlybXdhcmUNCiAg
+IGdpdGsgLS0gJ3J0bF9idC9ydGw4NzYxYionICYNCg0KSG93ZXZlciBhdCB0aGUgdGltZSwgb25s
+eSB0aGUgZmlybXdhcmUgcnRsODc2MWIgd2FzIGluIHVzZS4gQnV0IGl0IHdvcmtlZC4NClRoZW4g
+b24gMjAyMS0wNi0yNiwgYSBjaGFuZ2UgbWFkZSBpdCBzbyB0aGF0IHRoZSBmaXJtd2FyZSBydGw4
+NzYxYiBpcyB1c2VkIG9ubHkgZm9yIFVBUlQsIGFuZCBydGw4NzYxYnUgaXMgdXNlZCBmb3IgVVNC
+LiBDZjoNCg0KaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xpbnV4L2tlcm5lbC9naXQv
+dG9ydmFsZHMvbGludXguZ2l0L2NvbW1pdC8/aWQ9OWZkMmUyOTQNCg0KQW5kIHNpbmNlIHRoZW4s
+IHdlIGhhdmUgdGhlIGJ1ZyByZXBvcnRzIGFib3ZlLiBVc2VycyBhbGwgYWdyZWUgdGhhdCBpdCBk
+b2Vzbid0IHdvcmssIGJ1dCB0aGVyZSBpcyBhIHdvcmthcm91bmQ6IGlmIHRoZXkgdXNlIHRoZSBm
+aXJtd2FyZSBydGw4NzYxYiAoaW5zdGVhZCBvZiBydGw4NzYxYnUpLCBpdCB3b3Jrcy4NCg0KU28g
+SSB3b25kZXIgaWYgdGhlIHR3byBmaXJtd2FyZSBhcmUganVzdCByZXZlcnNlZC4gQWZ0ZXIgYWxs
+LCB0aGUgc3VmZml4ICd1Jw0Kd2FzIG1heWJlIG1lYW50IGZvciAnVUFSVCcgYW5kIG5vdCAnVVNC
+JywgdGhlcmUncyByb29tIGZvciBjb25mdXNpb24uDQoNCkknbSBDQy1pbmcgSGlsZGEgV3UgYXMg
+dGhleSBhcmUgdGhlIGxhc3QgcGVyc29uIHdobyB1cGRhdGVkIHRob3NlIGZpcm13YXJlLCBhbmQg
+Z2l2ZW4gdGhlaXIgZW1haWwgYWRkcmVzcyAoJ0ByZWFsdGVrLmNvbScpLCB0aGV5IHByb2JhYmx5
+IGFyZSBpbiBhIGdvb2QgcG9zaXRpb24gdG8gZ2l2ZSBpdCBhIHF1aWNrIGNoZWNrLg0KDQpGb3Ig
+Y29tcGxldGVuZXNzLCBoZXJlIGFyZSB0aGUga2VybmVsIGxvZ3MgdGhhdCBzaG93IHVwIHdoZW4g
+dGhlIGRvbmdsZSBpcyBwbHVnZ2VkIGluICh0YWtlbiBmcm9tIHRoZSBLYWxpIExpbnV4IGJ1ZyBy
+ZXBvcnQpOg0KDQogICBbODE0MzUuMDE3NjUzXSB1c2IgMi01OiBuZXcgZnVsbC1zcGVlZCBVU0Ig
+ZGV2aWNlIG51bWJlciAxNCB1c2luZyBvaGNpLXBjaQ0KICAgWzgxNDM1LjI1NzI0Nl0gdXNiIDIt
+NTogTmV3IFVTQiBkZXZpY2UgZm91bmQsIGlkVmVuZG9yPTBiZGEsIGlkUHJvZHVjdD04NzcxLCBi
+Y2REZXZpY2U9IDIuMDANCiAgIFs4MTQzNS4yNTcyNjRdIHVzYiAyLTU6IE5ldyBVU0IgZGV2aWNl
+IHN0cmluZ3M6IE1mcj0xLCBQcm9kdWN0PTIsDQpTZXJpYWxOdW1iZXI9Mw0KICAgWzgxNDM1LjI1
+NzI3Ml0gdXNiIDItNTogUHJvZHVjdDogQmx1ZXRvb3RoIFJhZGlvDQogICBbODE0MzUuMjU3Mjc4
+XSB1c2IgMi01OiBNYW51ZmFjdHVyZXI6IFJlYWx0ZWsNCiAgIFs4MTQzNS4yNTcyODNdIHVzYiAy
+LTU6IFNlcmlhbE51bWJlcjogMDBFMDRDMjM5OTg3DQogICBbODE0MzUuMjY3MjYzXSBCbHVldG9v
+dGg6IGhjaTA6IFJUTDogZXhhbWluaW5nIGhjaV92ZXI9MGEgaGNpX3Jldj0wMDBiIGxtcF92ZXI9
+MGEgbG1wX3N1YnZlcj04NzYxDQogICBbODE0MzUuMjcwMjQxXSBCbHVldG9vdGg6IGhjaTA6IFJU
+TDogcm9tX3ZlcnNpb24gc3RhdHVzPTAgdmVyc2lvbj0xDQogICBbODE0MzUuMjcwMjUzXSBCbHVl
+dG9vdGg6IGhjaTA6IFJUTDogbG9hZGluZyBydGxfYnQvcnRsODc2MWJ1X2Z3LmJpbg0KICAgWzgx
+NDM1LjI3MDM5MV0gYmx1ZXRvb3RoIGhjaTA6IGZpcm13YXJlOiBkaXJlY3QtbG9hZGluZyBmaXJt
+d2FyZSBydGxfYnQvcnRsODc2MWJ1X2Z3LmJpbg0KICAgWzgxNDM1LjI3MDQ1OV0gQmx1ZXRvb3Ro
+OiBoY2kwOiBSVEw6IGxvYWRpbmcgcnRsX2J0L3J0bDg3NjFidV9jb25maWcuYmluDQogICBbODE0
+MzUuMjcwNTA5XSBibHVldG9vdGggaGNpMDogZmlybXdhcmU6IGRpcmVjdC1sb2FkaW5nIGZpcm13
+YXJlIHJ0bF9idC9ydGw4NzYxYnVfY29uZmlnLmJpbg0KICAgWzgxNDM1LjI3MDU2N10gQmx1ZXRv
+b3RoOiBoY2kwOiBSVEw6IGNmZ19zeiAyNSwgdG90YWwgc3ogMjk5NDkNCiAgIFs4MTQzNS42NTYy
+OTVdIEJsdWV0b290aDogaGNpMDogUlRMOiBmdyB2ZXJzaW9uIDB4MGNhOThhNmINCiAgIFs4MTQz
+NS43OTU3MTNdIEJsdWV0b290aDogTUdNVCB2ZXIgMS4yMg0KDQpUaGFua3MgZm9yIHlvdXIgYXR0
+ZW50aW9uLCBwbGVhc2UgQ0MgbWUgYXMgSSdtIG5vdCBzdWJzY3JpYmVkIHRvIHRoaXMgbGlzdC4N
+Cg0KDQotLQ0KQXJuYXVkIFJlYmlsbG91dCAvIE9mZmVuc2l2ZSBTZWN1cml0eSAvIEthbGkgTGlu
+dXggRGV2ZWxvcGVyDQoNCi0tLS0tLVBsZWFzZSBjb25zaWRlciB0aGUgZW52aXJvbm1lbnQgYmVm
+b3JlIHByaW50aW5nIHRoaXMgZS1tYWlsLg0K
