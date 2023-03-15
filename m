@@ -2,110 +2,86 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CEEC6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 07:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11303C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 08:54:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231755AbjCOHgG (ORCPT
+        id S231370AbjCOIyz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 03:36:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49090 "EHLO
+        Wed, 15 Mar 2023 04:54:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231751AbjCOHfr (ORCPT
+        with ESMTP id S231352AbjCOIys (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 03:35:47 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA29F78CBB
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 00:32:34 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id be16so13586245oib.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 00:32:34 -0700 (PDT)
+        Wed, 15 Mar 2023 04:54:48 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4EF1E29F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 01:54:46 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id u5so19273150plq.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 01:54:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678865553;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=z5O53QFRn9R4MM96/CqSjFFyIIirK9vjrTEujzuK2+M=;
-        b=JHH0nnij4zEOQUHdTve2yZ0B17G8e4xn8eS6xDLFGnT2WHAaQw1hmoWQl/TyZXIVz2
-         juwWu9EDCaBa3m2TkauDuPewd9Meh/l6I/drVq7RiNIH6arvjf+/ephbD3dcLgkX01vY
-         iLqOtL9IDeffIvys2eilMl7E9X+hEa6xbOHE6PlE9Z4/qR3ee42iYGa9M2UuY5V6pknV
-         rWNxP8A4Ilm7EOEHpJprWwMxxEHwFsnByga+98m7ScznovT28iPpLBs+mhXAPPl2FkA7
-         xf8QIeFnMQU8imk0G6ZC4fowk0uAugXsMoy199hbJr004LA8/r4a79ehKbESZLF/A8UQ
-         LZMw==
+        d=kali.org; s=google; t=1678870486;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YdpqTn64MNL9cV6/4Hyrbo7QXnfjJy9cXDR3qkRym/0=;
+        b=h9DnbXG4nXyAlFTheFkr79+tj1382ggPRVISYd7fA9jkBgizZ5G/ZQ0pq85nNpInpQ
+         deHPRhXYkZXYFmAYQIRYRCt4qOTWaIowsazBJ9XUvo+QOJDNjDFN+qJvJgsgQrFLMVHj
+         BzgGZZj4rKYFZvGamc9Nu1IDRj+hgArEF2OPpxto673EOxPIFa4zQxrVv7b0VjgDjCUk
+         OTL83tP6HBIqQd+pogRiLuoq5/qUBFIrA3LIz1Ch3tXnGRXTro+TRGydQ6zMswZ9zVSF
+         06z9A1XefqAUkUDmJJ0cbrwksWKzN1dNhv6hyJw8zixF8PGnz08KGeNiO6YN0C+e8hPf
+         EtkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678865553;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z5O53QFRn9R4MM96/CqSjFFyIIirK9vjrTEujzuK2+M=;
-        b=HVwtv+vX6YLXn2F4+T7zcye8iJ2et+mLYR37lloMMZBltNJ83CeYP552zi9Adjqpxn
-         /ymvBQhKumPMKzWDto4ReJsK5IoYBh1q4PbrML3h3fV3F3TeGhtphJ6rXlgztZ1fHHIk
-         9nXp3izOSd9wsSjtw+kwe4yiXVdAg7zSpLwYtwaNfu3oZwrU2DNabnhsEyboUjVv4/zx
-         SvJ68GfaL8CDWoSnhSwlVU9JoUxsodlcben8y9I6RjjEkJ5+KbzkB5cvW9QztBdDbCLF
-         MZ1Px3v7HR8ODjSc20/d8vT9/VVWKLAq0dtJ/c2lwWGMRBHeeB2HipRiCNnFtb4yjAGl
-         nrAQ==
-X-Gm-Message-State: AO0yUKWfUz/jRls64i9CRqTzGvOJ6CY5Oi/sgO97waXGZaErKSKSlY8P
-        CP10vVHLCg1Pepm9At0bFc02N8keEWI=
-X-Google-Smtp-Source: AK7set83EOI25zHJmGFE7LozpxHtEN48xzoUUIr1nayqXEKXSkrH410NqLl2EdsBkCGbHRnq4vBurw==
-X-Received: by 2002:a05:6808:1703:b0:37a:f0b5:d5cd with SMTP id bc3-20020a056808170300b0037af0b5d5cdmr711747oib.13.1678865553621;
-        Wed, 15 Mar 2023 00:32:33 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.182.71])
-        by smtp.gmail.com with ESMTPSA id v17-20020a056870955100b0016e9308e17bsm1962403oal.52.2023.03.15.00.32.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 00:32:33 -0700 (PDT)
-Message-ID: <64117491.050a0220.36348.9dca@mx.google.com>
-Date:   Wed, 15 Mar 2023 00:32:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8199117539654579160=="
+        d=1e100.net; s=20210112; t=1678870486;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdpqTn64MNL9cV6/4Hyrbo7QXnfjJy9cXDR3qkRym/0=;
+        b=6gaQHrnxZdjesCXsNAxUnVIMB/Klk8Cv/qqvgv+6Ei806iv3GLRx1aJIiZOaXVWOC0
+         FA//HEF13zXVQP0fIUoE8aQs+ALhhB4GddOamj06G1sQRirT2wZjs1Prm7RrdJIXQE4i
+         7HjakpoSeOQE52Mrw+LLBRauhG2FOBuDRDM2OG2fajdSivy8vJiAIwHen1xcPx2AcXcp
+         kDuiYhmYydASHWd5D7r9z3j2oaizpbErIZdJZ3T+J9pnhSp6qUdRBMBTGb6rhNNd0kHl
+         BfKLmzo7hbXyICISwVlFXH1a/IFNdnFuofXILhqtva8nX8KIvIF+b193udTwjjcYdJjb
+         W8Ow==
+X-Gm-Message-State: AO0yUKVSu3NMAQYTCS9GiDDR+ub6Mxl0vkX+xtzjLMRon/w3I5zohPLf
+        XzRJBx0tHIaHo2g1viL9kKskHA==
+X-Google-Smtp-Source: AK7set/NSFFB7DJnVrlYB/D9HDAZxyNFP3dh4EWz3psJLHsAul4Dddwjpk5PekShMOlT23uQbJ1wBw==
+X-Received: by 2002:a05:6a20:e688:b0:d5:9da4:6db2 with SMTP id mz8-20020a056a20e68800b000d59da46db2mr3691340pzb.62.1678870485951;
+        Wed, 15 Mar 2023 01:54:45 -0700 (PDT)
+Received: from [192.168.1.148] ([113.161.36.151])
+        by smtp.gmail.com with ESMTPSA id x21-20020aa784d5000000b0062485a1675bsm2979875pfn.137.2023.03.15.01.54.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Mar 2023 01:54:45 -0700 (PDT)
+Message-ID: <b997c6b7-6997-0634-dcb2-bcf6df21c82d@kali.org>
+Date:   Wed, 15 Mar 2023 15:54:41 +0700
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jiasheng@iscas.ac.cn
-Subject: RE: [v2] Bluetooth: 6LoWPAN: Add missing check for skb_clone
-In-Reply-To: <20230315070621.447-1-jiasheng@iscas.ac.cn>
-References: <20230315070621.447-1-jiasheng@iscas.ac.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.8.0
+Subject: Re: RTL8761B BT USB has been broken for a while (mismatched
+ firmware?)
+Content-Language: en-US
+To:     Hilda Wu <hildawu@realtek.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     "steev@kali.org" <steev@kali.org>, Max Chou <max.chou@realtek.com>
+References: <af4f9118-a189-e353-8cf6-65cabceff3e0@kali.org>
+ <1c2ec3d103444a778ddffabaac22206b@realtek.com>
+From:   Arnaud Rebillout <arnaudr@kali.org>
+In-Reply-To: <1c2ec3d103444a778ddffabaac22206b@realtek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8199117539654579160==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Hilda,
 
-This is automated email and please do not reply to this email!
+On 15/03/2023 12:36, Hilda Wu wrote:
+> Considering the FW was submitted two years ago, Realtek plans to release a new version to Upstream.
+> We will verify the behavior on Linux PC. Expect it can resolve the issue.
 
-Dear submitter,
+Ack, I'll keep an eye on this issue, and ask the bug reporter to test 
+again as soon as an updated firmware reaches Kali Linux.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730201
+Thanks for your quick reply, have a nice day,
 
----Test result---
+Arnaud
 
-Test Summary:
-CheckPatch                    PASS      0.59 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      31.44 seconds
-CheckAllWarning               PASS      34.16 seconds
-CheckSparse                   PASS      38.67 seconds
-CheckSmatch                   PASS      107.42 seconds
-BuildKernel32                 PASS      30.11 seconds
-TestRunnerSetup               PASS      434.79 seconds
-TestRunner_l2cap-tester       PASS      16.46 seconds
-TestRunner_iso-tester         PASS      16.46 seconds
-TestRunner_bnep-tester        PASS      5.35 seconds
-TestRunner_mgmt-tester        PASS      107.71 seconds
-TestRunner_rfcomm-tester      PASS      8.61 seconds
-TestRunner_sco-tester         PASS      7.87 seconds
-TestRunner_ioctl-tester       PASS      9.34 seconds
-TestRunner_mesh-tester        PASS      6.74 seconds
-TestRunner_smp-tester         PASS      7.82 seconds
-TestRunner_userchan-tester    PASS      5.62 seconds
-IncrementalBuild              PASS      28.71 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8199117539654579160==--
