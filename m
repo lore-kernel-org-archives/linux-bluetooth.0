@@ -2,320 +2,126 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCD8C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 12:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E3B1C61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Mar 2023 12:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232234AbjCOMVy (ORCPT
+        id S233126AbjCOMoP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 08:21:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46302 "EHLO
+        Wed, 15 Mar 2023 08:44:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232102AbjCOMVb (ORCPT
+        with ESMTP id S232887AbjCOMn4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 08:21:31 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D8A96094
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 05:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678882853; x=1710418853;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Ol40k0kHvO66bYK69B2QZt/o/ksIrFXFiK0K102P1i0=;
-  b=akMmWtOCqQCLGCoM5wQJjtU/VwhSCpxn/gbwdn1S2Rc22VKO9VOoyNPi
-   e62/YzY0StNbSRbrgnj/OqfOVMW4PfwKKQhPWmOmbeTND+8Snuq9JGUTK
-   YjGk7QPvOZFnb1nniBe2lrmddDgYEqEiP3mcsZn4BXQXjssyVylB5+4MT
-   zgj5Wng0KstHxzMXlFUs/7LHm7yfRt6SDqjn8eZeWO+yOk2BX9buey2gB
-   IahKkxQ6V/tK+TWo/6IbGtQxjNLlkg970+uMfh9aDI+ILwjyPw6Sy9yXd
-   FvCGRIFHIFXJXIWs4R8+s9cn/ICRLKjUJ4RvXOfger4OvxPlhBunSqdlp
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="317338978"
-X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="317338978"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 05:20:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10649"; a="629441432"
-X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="629441432"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 15 Mar 2023 05:20:51 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pcQ7Z-0007ex-0V;
-        Wed, 15 Mar 2023 12:20:45 +0000
-Date:   Wed, 15 Mar 2023 20:20:27 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- dd41882582a9ab19938598179386b81b793b4a5c
-Message-ID: <6411b80b.5mqhWVMAzsflStyN%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 15 Mar 2023 08:43:56 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8493AA4B3A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 05:42:40 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id bf15so7740885iob.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 05:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678884159;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nZOUTD9Zuse0d8AK/dVtdm56PC4Xr5c+DibW7hr5KC0=;
+        b=F3AD8vSpxTJBBjFMKNo91J9qFzsQu/xRQKH0UTJ0sVQJ52uX0OD8KrAwoT91/hAGbM
+         WZfl/49RRg9kqcXFzWQuvS884ZWkr5Pg7DSdC+c00j1uFo2e/N23lkGjHOfuTu+Q0kO5
+         ZeGQYY4bjtOlXAYy7fXF8nbhfYCu5Mosm0UuYn16ygCTL1DUB6OPpgcBe5LZz2+9douL
+         vifzHlOUA+BQGOs4PIZq/Bjep99WXGqLhXd76jkUerrv1wUJZPXdhbqYYkX1SFaS2lhD
+         U7YnLjpnXMi8xS50BqEsIAC3l56hT7MljAwTsbYnbP+rY6KdF3/AdrX21mYxEeXXmMQM
+         LT1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678884159;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nZOUTD9Zuse0d8AK/dVtdm56PC4Xr5c+DibW7hr5KC0=;
+        b=WNAQ5LEBqn4O8FLC5i4To0HFUXMX3GnGIRr3goZ1w60bQHfxU1uXvQugG1RRUuKOjX
+         LrEo4dhdi+99HtVtctGHQe5lqgNfWw8aAtPTFsmrrbuqDgTEs3+PdnKwige3oPeXAXrM
+         4CdD3kZOKPqbCd6ZBgWjTtEDECjQ7eKUNzNQmqzKcfEqXnpBSY7GqrcbBtrv2SgyZ31w
+         kFDgXKkDv3WzCsdreO0GyTnM+iHHtxCZ2XY2xas9PrNHAmRpjG9jY5XDLd4JwbVkrRtl
+         ZnhfDrPaTzp/+w9klFqlKpbR1qmYRiMLVs8y04vY0Q2s+1o4ZrQdy98+FrwCVVv4pqAJ
+         vDzA==
+X-Gm-Message-State: AO0yUKWvqk56zAqB5lgSiMhead87E6cE4K3EZG3907TT5u/e3GUw20wK
+        vL8Im8eSpS629ud6yI/fXpeRHPu4ziI=
+X-Google-Smtp-Source: AK7set/KGGtWX9kzBTersc5wx7nuVnoorqBL434ABTLSVFH6VQS6/VPdxN8OiXdm1u0qEB6sO9JdCw==
+X-Received: by 2002:a6b:6e06:0:b0:752:f671:c0cf with SMTP id d6-20020a6b6e06000000b00752f671c0cfmr1211526ioh.10.1678884159556;
+        Wed, 15 Mar 2023 05:42:39 -0700 (PDT)
+Received: from [172.17.0.2] ([40.77.125.163])
+        by smtp.gmail.com with ESMTPSA id c23-20020a5d9757000000b00746041ecbf9sm1669735ioo.39.2023.03.15.05.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 05:42:39 -0700 (PDT)
+Message-ID: <6411bd3f.5d0a0220.feb73.3d4a@mx.google.com>
+Date:   Wed, 15 Mar 2023 05:42:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3310978799317873308=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: Add support for NXP bluetooth chipsets
+In-Reply-To: <20230315120327.958413-2-neeraj.sanjaykale@nxp.com>
+References: <20230315120327.958413-2-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: dd41882582a9ab19938598179386b81b793b4a5c  Bluetooth: hci_ldisc: Fix tty_set_termios() return value assumptions
+--===============3310978799317873308==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-elapsed time: 724m
+This is automated email and please do not reply to this email!
 
-configs tested: 244
-configs skipped: 19
+Dear submitter,
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730293
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha        buildonly-randconfig-r001-20230313   gcc  
-alpha        buildonly-randconfig-r002-20230313   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r002-20230313   gcc  
-alpha                randconfig-r016-20230312   gcc  
-alpha                randconfig-r026-20230313   gcc  
-alpha                randconfig-r031-20230313   gcc  
-alpha                randconfig-r032-20230312   gcc  
-arc                              allyesconfig   gcc  
-arc                      axs103_smp_defconfig   gcc  
-arc          buildonly-randconfig-r004-20230312   gcc  
-arc          buildonly-randconfig-r005-20230313   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r004-20230312   gcc  
-arc                  randconfig-r013-20230313   gcc  
-arc                  randconfig-r023-20230313   gcc  
-arc                  randconfig-r024-20230313   gcc  
-arc                  randconfig-r031-20230312   gcc  
-arc                  randconfig-r031-20230313   gcc  
-arc                  randconfig-r033-20230312   gcc  
-arc                  randconfig-r036-20230312   gcc  
-arc                  randconfig-r043-20230312   gcc  
-arc                  randconfig-r043-20230313   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm          buildonly-randconfig-r003-20230313   gcc  
-arm          buildonly-randconfig-r004-20230313   gcc  
-arm                     davinci_all_defconfig   clang
-arm                                 defconfig   gcc  
-arm                          moxart_defconfig   clang
-arm                        multi_v7_defconfig   gcc  
-arm                  randconfig-r001-20230312   gcc  
-arm                  randconfig-r013-20230312   clang
-arm                  randconfig-r016-20230313   gcc  
-arm                  randconfig-r024-20230312   clang
-arm                  randconfig-r033-20230313   clang
-arm                  randconfig-r046-20230312   clang
-arm                  randconfig-r046-20230313   gcc  
-arm                           spitz_defconfig   clang
-arm64                            allyesconfig   gcc  
-arm64        buildonly-randconfig-r004-20230313   gcc  
-arm64        buildonly-randconfig-r006-20230313   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r002-20230313   gcc  
-arm64                randconfig-r011-20230312   gcc  
-arm64                randconfig-r012-20230313   clang
-arm64                randconfig-r032-20230313   gcc  
-arm64                randconfig-r034-20230312   clang
-arm64                randconfig-r034-20230313   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r003-20230312   gcc  
-csky                 randconfig-r013-20230312   gcc  
-csky                 randconfig-r022-20230313   gcc  
-csky                 randconfig-r023-20230312   gcc  
-csky                 randconfig-r025-20230312   gcc  
-csky                 randconfig-r025-20230313   gcc  
-csky                 randconfig-r031-20230313   gcc  
-csky                 randconfig-r032-20230313   gcc  
-hexagon      buildonly-randconfig-r004-20230312   clang
-hexagon      buildonly-randconfig-r005-20230313   clang
-hexagon              randconfig-r004-20230312   clang
-hexagon              randconfig-r016-20230313   clang
-hexagon              randconfig-r041-20230312   clang
-hexagon              randconfig-r041-20230313   clang
-hexagon              randconfig-r045-20230312   clang
-hexagon              randconfig-r045-20230313   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r002-20230313   gcc  
-i386                         debian-10.3-func   gcc  
-i386                   debian-10.3-kselftests   gcc  
-i386                        debian-10.3-kunit   gcc  
-i386                          debian-10.3-kvm   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-a001-20230313   gcc  
-i386                 randconfig-a002-20230313   gcc  
-i386                 randconfig-a003-20230313   gcc  
-i386                 randconfig-a004-20230313   gcc  
-i386                 randconfig-a005-20230313   gcc  
-i386                 randconfig-a006-20230313   gcc  
-i386                 randconfig-a011-20230313   clang
-i386                 randconfig-a012-20230313   clang
-i386                 randconfig-a013-20230313   clang
-i386                 randconfig-a014-20230313   clang
-i386                 randconfig-a015-20230313   clang
-i386                 randconfig-a016-20230313   clang
-i386                          randconfig-c001   gcc  
-i386                 randconfig-r014-20230313   clang
-i386                 randconfig-r023-20230313   clang
-i386                 randconfig-r032-20230313   gcc  
-ia64                             allmodconfig   gcc  
-ia64         buildonly-randconfig-r002-20230312   gcc  
-ia64                                defconfig   gcc  
-ia64                 randconfig-r006-20230313   gcc  
-ia64                 randconfig-r011-20230312   gcc  
-ia64                 randconfig-r012-20230312   gcc  
-ia64                 randconfig-r016-20230312   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch    buildonly-randconfig-r002-20230313   gcc  
-loongarch    buildonly-randconfig-r005-20230312   gcc  
-loongarch                           defconfig   gcc  
-loongarch                 loongson3_defconfig   gcc  
-loongarch            randconfig-r004-20230313   gcc  
-loongarch            randconfig-r013-20230313   gcc  
-loongarch            randconfig-r033-20230313   gcc  
-m68k                             allmodconfig   gcc  
-m68k         buildonly-randconfig-r006-20230313   gcc  
-m68k                                defconfig   gcc  
-m68k                            q40_defconfig   gcc  
-m68k                 randconfig-r003-20230313   gcc  
-m68k                 randconfig-r011-20230312   gcc  
-m68k                 randconfig-r011-20230313   gcc  
-m68k                 randconfig-r012-20230312   gcc  
-m68k                 randconfig-r016-20230313   gcc  
-m68k                 randconfig-r035-20230313   gcc  
-m68k                          sun3x_defconfig   gcc  
-microblaze   buildonly-randconfig-r002-20230312   gcc  
-microblaze   buildonly-randconfig-r002-20230313   gcc  
-microblaze   buildonly-randconfig-r003-20230312   gcc  
-microblaze   buildonly-randconfig-r006-20230312   gcc  
-microblaze           randconfig-r003-20230312   gcc  
-microblaze           randconfig-r005-20230312   gcc  
-microblaze           randconfig-r023-20230312   gcc  
-microblaze           randconfig-r035-20230313   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                         cobalt_defconfig   gcc  
-mips                         db1xxx_defconfig   gcc  
-nios2        buildonly-randconfig-r001-20230313   gcc  
-nios2        buildonly-randconfig-r003-20230312   gcc  
-nios2        buildonly-randconfig-r005-20230313   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r003-20230313   gcc  
-nios2                randconfig-r012-20230313   gcc  
-nios2                randconfig-r015-20230313   gcc  
-nios2                randconfig-r016-20230313   gcc  
-nios2                randconfig-r036-20230313   gcc  
-openrisc     buildonly-randconfig-r001-20230312   gcc  
-openrisc     buildonly-randconfig-r003-20230312   gcc  
-openrisc     buildonly-randconfig-r005-20230313   gcc  
-openrisc     buildonly-randconfig-r006-20230312   gcc  
-openrisc             randconfig-r012-20230313   gcc  
-openrisc             randconfig-r014-20230313   gcc  
-openrisc             randconfig-r035-20230312   gcc  
-parisc       buildonly-randconfig-r006-20230313   gcc  
-parisc                              defconfig   gcc  
-parisc                generic-32bit_defconfig   gcc  
-parisc               randconfig-r002-20230312   gcc  
-parisc               randconfig-r005-20230312   gcc  
-parisc               randconfig-r013-20230312   gcc  
-parisc               randconfig-r014-20230312   gcc  
-parisc               randconfig-r021-20230313   gcc  
-parisc               randconfig-r036-20230313   gcc  
-parisc64                            defconfig   gcc  
-powerpc                    adder875_defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc      buildonly-randconfig-r001-20230313   clang
-powerpc      buildonly-randconfig-r004-20230313   clang
-powerpc                 mpc85xx_cds_defconfig   gcc  
-powerpc                     rainier_defconfig   gcc  
-powerpc                      tqm8xx_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv        buildonly-randconfig-r001-20230312   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r005-20230313   gcc  
-riscv                randconfig-r011-20230313   clang
-riscv                randconfig-r012-20230312   gcc  
-riscv                randconfig-r014-20230312   gcc  
-riscv                randconfig-r042-20230312   gcc  
-riscv                randconfig-r042-20230313   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r001-20230313   gcc  
-s390                 randconfig-r013-20230313   clang
-s390                 randconfig-r025-20230313   clang
-s390                 randconfig-r031-20230313   gcc  
-s390                 randconfig-r044-20230312   gcc  
-s390                 randconfig-r044-20230313   clang
-sh                               allmodconfig   gcc  
-sh           buildonly-randconfig-r005-20230312   gcc  
-sh                            hp6xx_defconfig   gcc  
-sh                   randconfig-r015-20230312   gcc  
-sh                   randconfig-r016-20230312   gcc  
-sh                   randconfig-r022-20230312   gcc  
-sh                   randconfig-r022-20230313   gcc  
-sh                   randconfig-r024-20230313   gcc  
-sh                   randconfig-r034-20230312   gcc  
-sh                   randconfig-r036-20230312   gcc  
-sh                           se7721_defconfig   gcc  
-sh                        sh7763rdp_defconfig   gcc  
-sh                          urquell_defconfig   gcc  
-sparc        buildonly-randconfig-r003-20230313   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r015-20230312   gcc  
-sparc                randconfig-r033-20230313   gcc  
-sparc                randconfig-r034-20230313   gcc  
-sparc                randconfig-r035-20230312   gcc  
-sparc                randconfig-r035-20230313   gcc  
-sparc64      buildonly-randconfig-r001-20230312   gcc  
-sparc64      buildonly-randconfig-r003-20230312   gcc  
-sparc64              randconfig-r001-20230313   gcc  
-sparc64              randconfig-r004-20230313   gcc  
-sparc64              randconfig-r015-20230312   gcc  
-sparc64              randconfig-r021-20230312   gcc  
-sparc64              randconfig-r021-20230313   gcc  
-sparc64              randconfig-r026-20230312   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230313   gcc  
-x86_64                        randconfig-a001   clang
-x86_64               randconfig-a002-20230313   gcc  
-x86_64               randconfig-a003-20230313   gcc  
-x86_64                        randconfig-a003   clang
-x86_64               randconfig-a004-20230313   gcc  
-x86_64               randconfig-a005-20230313   gcc  
-x86_64                        randconfig-a005   clang
-x86_64               randconfig-a006-20230313   gcc  
-x86_64               randconfig-a011-20230313   clang
-x86_64                        randconfig-a011   gcc  
-x86_64               randconfig-a012-20230313   clang
-x86_64               randconfig-a013-20230313   clang
-x86_64                        randconfig-a013   gcc  
-x86_64               randconfig-a014-20230313   clang
-x86_64               randconfig-a015-20230313   clang
-x86_64                        randconfig-a015   gcc  
-x86_64               randconfig-a016-20230313   clang
-x86_64                        randconfig-k001   clang
-x86_64               randconfig-r035-20230313   gcc  
-x86_64                               rhel-8.3   gcc  
-xtensa                           alldefconfig   gcc  
-xtensa       buildonly-randconfig-r001-20230312   gcc  
-xtensa       buildonly-randconfig-r004-20230312   gcc  
-xtensa               randconfig-r015-20230312   gcc  
-xtensa               randconfig-r031-20230312   gcc  
+---Test result---
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Test Summary:
+CheckPatch                    PASS      4.91 seconds
+GitLint                       FAIL      1.44 seconds
+SubjectPrefix                 FAIL      0.65 seconds
+BuildKernel                   PASS      31.18 seconds
+CheckAllWarning               PASS      34.17 seconds
+CheckSparse                   PASS      38.80 seconds
+CheckSmatch                   PASS      108.13 seconds
+BuildKernel32                 PASS      30.18 seconds
+TestRunnerSetup               PASS      436.06 seconds
+TestRunner_l2cap-tester       PASS      16.78 seconds
+TestRunner_iso-tester         PASS      16.88 seconds
+TestRunner_bnep-tester        PASS      5.33 seconds
+TestRunner_mgmt-tester        PASS      108.04 seconds
+TestRunner_rfcomm-tester      PASS      8.62 seconds
+TestRunner_sco-tester         PASS      7.86 seconds
+TestRunner_ioctl-tester       PASS      9.18 seconds
+TestRunner_mesh-tester        PASS      6.72 seconds
+TestRunner_smp-tester         PASS      7.78 seconds
+TestRunner_userchan-tester    PASS      5.59 seconds
+IncrementalBuild              PASS      43.18 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v12,3/4] dt-bindings: net: bluetooth: Add NXP bluetooth support
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+20: B1 Line exceeds max length (87>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3310978799317873308==--
