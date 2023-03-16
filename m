@@ -2,96 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9D1C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 05:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2B0C6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 05:40:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229669AbjCPFhf (ORCPT
+        id S229669AbjCPFkV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 01:37:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
+        Thu, 16 Mar 2023 01:40:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjCPFhe (ORCPT
+        with ESMTP id S229487AbjCPFkT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 01:37:34 -0400
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 064A83A858
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 22:37:32 -0700 (PDT)
-Received: from github.com (hubbernetes-node-84ff6e5.va3-iad.github.net [10.48.138.19])
-        by smtp.github.com (Postfix) with ESMTPA id CBB595C0388
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 22:37:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1678945051;
-        bh=08SWhqkT72E/b0EJchuH3s87CixFYu1pN4At3MjZ3Xc=;
-        h=Date:From:To:Subject:From;
-        b=OKJbisQpAm9BqWbe1cldZRt0ZjbhtmR8x+QXomZA4v/kSgp7eS6960PiReQX9vitU
-         1W5+ARJaKoO+IDJ0c5/Fpb+ah1M4uXk1Tv727UT0YgRPPEFlhgwzPRHr8KqPokAhgu
-         ZIn0n4f8W37MVUk89QQub6/x0yukD66mkYTLmPk4=
-Date:   Wed, 15 Mar 2023 22:37:31 -0700
-From:   Brian Gix <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7c0fb2-806230@github.com>
-Subject: [bluez/bluez] a5998b: mesh: Filter originated Provisioning Data
+        Thu, 16 Mar 2023 01:40:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D4455A1B1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 22:40:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D5FD61F24
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 05:40:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0AAC4C433EF;
+        Thu, 16 Mar 2023 05:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678945218;
+        bh=3iaULba7j1eaUamCtz5rnGf6PwbjSXGFksUqJhF2gQM=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=L3+4aC7zSB2Wj9GZRP4QIC0KSyHf/dhIQyfPlAroZLKOI20n9qBL/1qMDkv5dK2Ur
+         spxScXzQQMKanFDsIvjVT+Za4ujFZUwfeGNL1hzHj9aEqDWmobixENk7oT2ITAhvO4
+         xcjLmZ25peyzhMx+zooAXaeS6BFsmDu+wP0J1KRHe7TFDU+NY6YbzFHSijAIdrt3bg
+         SS+fOhTeRN5N8DqcaT4nQsNz0dSu5k3ivr3C2QCRrUR9bViKSkn4mPLGIGW9dN2NHs
+         XuaRHhvmRvpK8sJAchzZSFV7OJATLCaF5DJP0JIfbM2kZFLl74i4ECjfdkJt8+zzvi
+         6Z9DQS4swKvWQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DEC7CE66CBF;
+        Thu, 16 Mar 2023 05:40:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/3] mesh: Filter originated Provisioning Data
  packets
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167894521790.26854.12733815964151398643.git-patchwork-notify@kernel.org>
+Date:   Thu, 16 Mar 2023 05:40:17 +0000
+References: <20230316011627.27322-1-brian.gix@gmail.com>
+In-Reply-To: <20230316011627.27322-1-brian.gix@gmail.com>
+To:     Brian Gix <brian.gix@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com,
+        inga.stotland@intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a5998b588c8646fb7709bbacad1cf872a94cc032
-      https://github.com/bluez/bluez/commit/a5998b588c8646fb7709bbacad1cf872a94cc032
-  Author: Brian Gix <brian.gix@gmail.com>
-  Date:   2023-03-15 (Wed, 15 Mar 2023)
+Hello:
 
-  Changed paths:
-    M mesh/mesh-io-mgmt.c
+This series was applied to bluetooth/bluez.git (master)
+by Brian Gix <brian.gix@gmail.com>:
 
-  Log Message:
-  -----------
-  mesh: Filter originated Provisioning Data packets
+On Wed, 15 Mar 2023 18:16:25 -0700 you wrote:
+> The mesh daemon can process incoming mesh packets on more than one
+> controller, but if a Provisioning data packet that originated from the
+> local daemon is received by a different controller, it must be filtered
+> and disregarded, or it will break the provisioning protocol.
+> ---
+>  mesh/mesh-io-mgmt.c | 58 ++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 47 insertions(+), 11 deletions(-)
 
-The mesh daemon can process incoming mesh packets on more than one
-controller, but if a Provisioning data packet that originated from the
-local daemon is received by a different controller, it must be filtered
-and disregarded, or it will break the provisioning protocol.
+Here is the summary with links:
+  - [BlueZ,v2,1/3] mesh: Filter originated Provisioning Data packets
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a5998b588c86
+  - [BlueZ,v2,2/3] mesh: Make MGMT mesh-io less noisy
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c1f7aed635f3
+  - [BlueZ,v2,3/3] mesh: Don't send Prov Failed on non-existant links
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=806230e4fda7
 
-
-  Commit: c1f7aed635f39578cdb4a1870413278d29a081c5
-      https://github.com/bluez/bluez/commit/c1f7aed635f39578cdb4a1870413278d29a081c5
-  Author: Brian Gix <brian.gix@gmail.com>
-  Date:   2023-03-15 (Wed, 15 Mar 2023)
-
-  Changed paths:
-    M mesh/mesh-io-mgmt.c
-
-  Log Message:
-  -----------
-  mesh: Make MGMT mesh-io less noisy
-
-Remove excessive logging traffic
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 806230e4fda7a2fafeb7f1da3d2f17a1bafb25f8
-      https://github.com/bluez/bluez/commit/806230e4fda7a2fafeb7f1da3d2f17a1bafb25f8
-  Author: Brian Gix <brian.gix@gmail.com>
-  Date:   2023-03-15 (Wed, 15 Mar 2023)
-
-  Changed paths:
-    M mesh/remprv-server.c
-
-  Log Message:
-  -----------
-  mesh: Don't send Prov Failed on non-existant links
-
-If remote device does not respond to a Prov Link Open request, then the
-callbacks do not get established, and attempting to send Failure
-messages on the non-existent link rersult in seg fault.
-
-
-Compare: https://github.com/bluez/bluez/compare/7c0fb2fefb6a...806230e4fda7
