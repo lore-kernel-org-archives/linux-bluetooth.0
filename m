@@ -2,167 +2,144 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74082C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 21:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC82AC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 21:33:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbjCPVdw (ORCPT
+        id S229863AbjCPVd5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 17:33:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35400 "EHLO
+        Thu, 16 Mar 2023 17:33:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbjCPVdv (ORCPT
+        with ESMTP id S229534AbjCPVd4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 17:33:51 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A7D522110
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 14:33:49 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id bc12so2627968plb.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 14:33:49 -0700 (PDT)
+        Thu, 16 Mar 2023 17:33:56 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4016A28201
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 14:33:54 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id y2so3030732pjg.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 14:33:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679002429;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=csyHtbmv3B6fRpTZjS5Iu22tgwlPlwtuJTzvRjWon20=;
-        b=WryxhSgVZpFAxSlnAqkXiOh436VWxcnuwivUtVpfBY/wNQPAU3LMoacE8chRBb102y
-         mi3OQKahk8lBtd08G/Lf98+/BLoGuTs7kZOgRZwYzt70CcFgpBL6TMdNpIFIsvBuF1mR
-         qwhyBvGI5gxSGtbx8mXI8hqu0XiwC0hgsuk1FKyhOLFsfZ/LO74m816e0fzBjvkGY1lS
-         KxEGoMDeWv0qMvrG71bu3nJ0YqOyZ/A+dyUq91G076xEl6Ez8uKtWTNWiJ73GUjyPXs1
-         HpWelvnZEEw5LhbfvL3T7p83jc/31yW/BL0XVFzHGemubEGbX3B4c3oo73npWF9blOz0
-         QWew==
+        d=gmail.com; s=20210112; t=1679002433;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=gkf8E2a1FwUr+ZRwdrXOmo14cK1nzu1COc1w5/ALe48=;
+        b=CZcv4Q8Drwz5vSUi3OWxOuKw35BHeCKmA0EWRSfGtscEg+dYJgnbhq5j6yTKB0VvSx
+         gS/sOCe7zAVJaaYvXrMVBmJdgkBH+70jqJRnA8Uo3Hz1J90tByzYHCwcp4TadhLQW44U
+         FTotSpO4NTqPohnzdrMNBsnyvoz6/j/NzQhvF0f8fjIR7u8D33ROpAb5jv9Q6CkiWgVx
+         3kX2zCJRXp/DZaXlSLua4LmxgnlyNAzGqJnpQ89t2XSWzCLqcN/B+Wv+TUFOe+i5Xj5x
+         wYigXB8MJ//Z/vIs/YRvf2SPdWwS6Z0flXcKnMpkgJeXa7jCe752zGdN3Ck0RaWLIP8Q
+         SdWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679002429;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=csyHtbmv3B6fRpTZjS5Iu22tgwlPlwtuJTzvRjWon20=;
-        b=M0+49rJ1wMYJJl5yZC+PhSI9xIZ9rTxBri+H76BI6uJAlnoHvbmDNVB4WObryoENE0
-         y6ZijkWOLUv7SG6QemQ5soI+Yx6fZgCUPJJnBwwmPVXX+WDrVR2QharLUxO1jP1aeRYh
-         SHX2pJy0HQbRC6sKCoy0pT1IxvHFmh2OEkul9yhxQs9uwZCrKVrgdBab/7JlNxI4CtQi
-         TM+/jP1O6+xVrTz0Cg8NjG9or8QMs9ifEO7VZGH0cE536h2KCRLpVWKlnYnZx6UMGdXJ
-         ZbYbok5riOhT01W4K1qIjL0Dz5PvJuZ8bvhLNniztbV0z+TfRKHtP7EGS4qNdOSx8VMc
-         XgwA==
-X-Gm-Message-State: AO0yUKV3nD3upabUOnHqaJwg6rE4euPT270VJ9Jtu6HXbq6eFTdjg7mM
-        M9jfDfVAkSeDmPSUQlDFZcJ1XHWhOHWPuiP/
-X-Google-Smtp-Source: AK7set8WifRRstMOUbBixOXH89x5qSD02JK66ga0bvsv986xEejLL9xLwEc6k8fLzrD4k2hFLa1gIg==
-X-Received: by 2002:a05:6a20:1d58:b0:d3:aba7:807c with SMTP id cs24-20020a056a201d5800b000d3aba7807cmr3882891pzb.34.1679002428832;
-        Thu, 16 Mar 2023 14:33:48 -0700 (PDT)
-Received: from fedora.. (c-67-170-58-107.hsd1.wa.comcast.net. [67.170.58.107])
-        by smtp.googlemail.com with ESMTPSA id k17-20020a63d111000000b004fbb4a55b64sm95195pgg.86.2023.03.16.14.33.48
+        d=1e100.net; s=20210112; t=1679002433;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gkf8E2a1FwUr+ZRwdrXOmo14cK1nzu1COc1w5/ALe48=;
+        b=8B/nugJ1hXXxCFE7bMqUrvc/cMEVl0qM5ZKagCV6tR8/o7qyHx82lvRLKbhCwvCQFE
+         eBCPnLze+PG9U+/3hNVqprmBuTyF6IQYmFLhZFncPhitqSkacwukbW9qIftrJDZNKAcn
+         E4j9TcEfPaC3pJ4llf1R7/uYMarH9VZUXKjB4ej4g3w5ogvE0kc7zC7AAjJugC5F8pgm
+         mWhgZD0k/yRt0tjHVtKJWQp0ptn3TX05n3C3/K0n0DOHc27IkIYpnM/knulW4Lf1KsKX
+         BjJ6zZ6AHIhkZVuqLT9776NWl9K1mXJcTfT8RaOt7UnJLThczMrFaXnW5ead4oIVyf1g
+         gPxA==
+X-Gm-Message-State: AO0yUKWLhK0vukv46UyZtXI3hL4hV1qiUUoG8gqF4a/zkcOi9PvABwNR
+        VtjLr7ETH1KjrcyZ/uYoIIGPHrTXnzU=
+X-Google-Smtp-Source: AK7set+q5yCBhiPtT1/bJwesJl36bHQiWMbLPZFPRxNVaQNBXKxHEbQA3SwXpNjhqVL8lRPtHPT3lw==
+X-Received: by 2002:a17:903:2341:b0:19e:2495:20e0 with SMTP id c1-20020a170903234100b0019e249520e0mr850416plh.21.1679002433401;
+        Thu, 16 Mar 2023 14:33:53 -0700 (PDT)
+Received: from [172.17.0.2] ([4.154.90.99])
+        by smtp.gmail.com with ESMTPSA id je19-20020a170903265300b0019f3e339fb4sm146694plb.187.2023.03.16.14.33.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 14:33:48 -0700 (PDT)
-From:   Inga Stotland <inga.stotland@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@gmail.com, brian.gix@intel.com,
-        Inga Stotland <inga.stotland@gmail.com>
-Subject: [PATCH BlueZ v2 2/2] tools/mesh-cfgclient: Auto request own composition data
-Date:   Thu, 16 Mar 2023 14:33:12 -0700
-Message-Id: <20230316213312.159370-2-inga.stotland@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230316213312.159370-1-inga.stotland@gmail.com>
-References: <20230316213312.159370-1-inga.stotland@gmail.com>
+        Thu, 16 Mar 2023 14:33:53 -0700 (PDT)
+Message-ID: <64138b41.170a0220.6696.077f@mx.google.com>
+Date:   Thu, 16 Mar 2023 14:33:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3467370190086467585=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] shared/gatt-client: Fix not creating a request for notifications
+In-Reply-To: <20230316193634.1195948-1-luiz.dentz@gmail.com>
+References: <20230316193634.1195948-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When attaching a local provisioner node, always request own
-composition data to accommodate functional consolidation of
-regular and remote provisioning mechanisms.
-The knowledge of the own node composition is necessary for
-provisioning initiation and self configuration.
+--===============3467370190086467585==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730956
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.39 seconds
+GitLint                       PASS      0.24 seconds
+BuildEll                      PASS      34.11 seconds
+BluezMake                     PASS      1172.60 seconds
+MakeCheck                     PASS      13.10 seconds
+MakeDistcheck                 PASS      192.25 seconds
+CheckValgrind                 PASS      314.31 seconds
+CheckSmatch                   PASS      428.40 seconds
+bluezmakeextell               PASS      127.66 seconds
+IncrementalBuild              PASS      967.69 seconds
+ScanBuild                     WARNING   1390.19 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/gatt-client.c:451:21: warning: Use of memory after it is freed
+        gatt_db_unregister(op->client->db, op->db_id);
+                           ^~~~~~~~~~
+src/shared/gatt-client.c:696:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, false, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:993:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1099:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1291:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1356:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1631:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1636:2: warning: Use of memory after it is freed
+        discover_all(op);
+        ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2140:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2148:8: warning: Use of memory after it is freed
+                                                        discovery_op_ref(op),
+                                                        ^~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3236:2: warning: Use of memory after it is freed
+        complete_write_long_op(req, success, 0, false);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3258:2: warning: Use of memory after it is freed
+        request_unref(req);
+        ^~~~~~~~~~~~~~~~~~
+12 warnings generated.
+
+
+
 ---
- tools/mesh-cfgclient.c |  9 +++++++--
- tools/mesh/cfgcli.c    | 15 +++++++++++++++
- tools/mesh/cfgcli.h    |  2 ++
- tools/mesh/util.c      |  2 ++
- 4 files changed, 26 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index 50be82bcf..6d2d34409 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -43,7 +43,8 @@
- 
- #define CFG_SRV_MODEL	0x0000
- #define CFG_CLI_MODEL	0x0001
--#define RPR_SVR_MODEL	0xFFFF0004
-+#define RPR_SVR_MODEL	0x0004
-+#define RPR_CLI_MODEL	0x0005
- #define PRV_BEACON_SVR	0x0008
- #define PRV_BEACON_CLI	0x0009
- 
-@@ -775,6 +776,10 @@ static void attach_node_reply(struct l_dbus_proxy *proxy,
- 		remote_clear_rejected_addresses(ivi);
- 	}
- 
-+	/* Read own node composition */
-+	if (!cfgcli_get_comp(0x0001, 128))
-+		l_error("Failed to read own composition");
-+
- 	return;
- 
- fail:
-@@ -863,7 +868,7 @@ static void scan_start(void *user_data, uint16_t dst, uint32_t model)
- {
- 	struct scan_data *data;
- 
--	if (model != RPR_SVR_MODEL)
-+	if (model != (0xffff0000 | RPR_SVR_MODEL))
- 		return;
- 
- 	data = l_malloc(sizeof(struct scan_data));
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index 4f6248e48..1a404af38 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -1081,6 +1081,21 @@ static void cmd_default(uint32_t opcode)
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+
-+bool cfgcli_get_comp(uint16_t unicast, uint8_t page)
-+{
-+	uint16_t n;
-+	uint8_t msg[32];
-+
-+	n = mesh_opcode_set(OP_DEV_COMP_GET, msg);
-+
-+	msg[n++] = page;
-+
-+	target = unicast;
-+
-+	return config_send(msg, n, OP_DEV_COMP_GET);
-+}
-+
- static void cmd_composition_get(int argc, char *argv[])
- {
- 	uint16_t n;
-diff --git a/tools/mesh/cfgcli.h b/tools/mesh/cfgcli.h
-index 7281caa46..621dd0259 100644
---- a/tools/mesh/cfgcli.h
-+++ b/tools/mesh/cfgcli.h
-@@ -19,4 +19,6 @@ typedef void (*delete_remote_func_t) (uint16_t primary, uint8_t ele_cnt);
- 
- struct model_info *cfgcli_init(key_send_func_t key_func,
- 				delete_remote_func_t del_node, void *user_data);
-+
-+bool cfgcli_get_comp(uint16_t unicast, uint8_t page);
- void cfgcli_cleanup(void);
-diff --git a/tools/mesh/util.c b/tools/mesh/util.c
-index d8c47c0e9..dea496dbe 100644
---- a/tools/mesh/util.c
-+++ b/tools/mesh/util.c
-@@ -138,6 +138,8 @@ const char *sig_model_string(uint16_t sig_model_id)
- 	case 0x0001: return "Configuration Client";
- 	case 0x0002: return "Health Server";
- 	case 0x0003: return "Health Client";
-+	case 0x0004: return "Remote Provisioning Server";
-+	case 0x0005: return "Remote Provisioning Client";
- 	case 0x0008: return "Private Beacon Server";
- 	case 0x0009: return "Private Beacon Client";
- 	case 0x1000: return "Generic OnOff Server";
--- 
-2.39.2
 
+--===============3467370190086467585==--
