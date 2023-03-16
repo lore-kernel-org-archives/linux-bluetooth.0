@@ -2,45 +2,45 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88470C6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 17:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D968C761A6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 17:23:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229794AbjCPRX2 (ORCPT
+        id S229530AbjCPRX3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 13:23:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34640 "EHLO
+        Thu, 16 Mar 2023 13:23:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbjCPRXR (ORCPT
+        with ESMTP id S229793AbjCPRWz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 13:23:17 -0400
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2054.outbound.protection.outlook.com [40.107.21.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 768B54233;
-        Thu, 16 Mar 2023 10:23:04 -0700 (PDT)
+        Thu, 16 Mar 2023 13:22:55 -0400
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2083.outbound.protection.outlook.com [40.107.21.83])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63096B856E;
+        Thu, 16 Mar 2023 10:22:52 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f1ghbZ4gfvpIt01d70RPguuCdbeE07ddC9WfUL2GaMLgHGZ1C/eOVap9cG0JnsZNksQvkJbpL8WpbyZOHU3hn8n31TUMdpJSmRYxQVYHjRBrzJVvO2X01mSgGjvaoKgAcT0TYIPu6dtpofULo83KL9CDSHY8TI4LuoI9VZVe8zvC4+PoGXjCrmehfKK/6weP8bVmVmVK7aGxAF+AUdB9VOePpoXVms/9YJcRSf6FwRwZs4zDqAGkhEFS9j7p0FdEP8VrC9xRkAPkLUAqRpKtGOYF5E7qOhjOiyCFzS8OPUVtHXOIJNHcSzwEZtR+RoFi9mycD3BhKJsJlmfDCDJiog==
+ b=TnOGuC4c44MX9aaUwl02Ji+wY0C0LEEgaKQddIcKn+MEh4NIcit9j3ophB3ub0Y7RD/oJsR0WHNiXXu7ralorcw9AROxlu4pqai4z8NCuPb5NGUFctafhwJXdI3ywn4wBUGy+f7jurIPNfljIbn2GgQDAhc6BdUSSRKIPuV/kCaY7ERbtDQ8tKyqjPMLLnSI03w0s0oNG4Jsu0M0P8wbAq+Mii0QuyJH1eXMytaQIZsJ0NI4X/xJUZzm1m8Z+6Lm99hzqkzS/tgKrLX/3TCK3bhHKC24IYqfRKzAxoyOlYA/OqMcNg0HWyAw1aAOni6pPwDrijW5MTnkrXJ3+YmC7w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pE/kksZ9/izowAg1GSlXNRb2ouOGLUVelluEjwyW+P4=;
- b=Ftb1aoVc5Yvk/LOZp936VUX4wrsdKdAxEy0MdG/iCQFwbrlc2ep/D0RcgV5ZPPhMcG0YNtHnQiKU5Tvy4Q4oFkUyqWfnmi1sm4ymRJH5dt8ldwlY/+anjVyX+zIP0TbagoTrAjgYKQg9uI/EOLfzoB2b2NydkO7gprQZPHw+bHkkTeyOlrGYfxXSJuKCZhdkfaKa/xscgnEJoYuG24Uy9j1isAom/8mTh5dO2GDLpzH65NKW12zyFpVE6S/WxlEY85F0UvdDzRL6euBw1Vr4McDHY/oEt4yGjp8t3IxnmTZyXt+5MzqDH5SrY64cbqRosyIR5lX5IW48Sam+pjcxaQ==
+ bh=TaPSKGt9hUBQ0i7lstGETu/vw3C1OXKaJa9nti1zass=;
+ b=fD4sF0lJ0TySgbrEHFIz/UmHIQ+AmNeiMulAn/eDhF2Y0gSRSzJXuU2qsLsjXhNGCmD1iO60crkBwNuYvUWKkagE+pfKmkeyuMlAPGu+fBvGVj0vRWWRcZmWinAXmoHiBHuwmqY1xB8qKGgefIQFULI7hGsFuxVIIOhBit3H3sbJyN+swpeFvisyLjltGLRmgR8vyjB7Gibc5L0E0E/MIkeZuM4J3/EQlbIvjuBD4+3i9U6jVCcaVZ6LBP6BVEXVVOFsv7lbrFn37e7Au2zg0e0mgbLjkfXHfe69Op0trU7n1ifrShThL/P+a+oJMOk4sIdODGSzPvfwSLKMH/uhGg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pE/kksZ9/izowAg1GSlXNRb2ouOGLUVelluEjwyW+P4=;
- b=m9nkFHL5u/RFkgweiAdHwz9fbP7J0eMe3YpFQ+xjMbdVgAKVvGwVPi4m+d1AGylT6d6dkNPNCulvRZ158fUlXFLS8aFwCuVS7UhNJ3y5mYGsMI8jhHE8vV5PW2hUPO9zgZPhTLAw0iExEoZJyR9w0D4zD5vwq4SuC1ZWPVXjjlw=
+ bh=TaPSKGt9hUBQ0i7lstGETu/vw3C1OXKaJa9nti1zass=;
+ b=HF4Ko6SZcmy0aYjWCJZDWm2b/AKlxAI2PxzZBWh/ei47y1A97Qww2Nlph+tW7cGaXnhx+538iUWS44/W1xXjIZ0xg0UnoXmoc+H/ab8sWfVENKjE/AUOJEExmR21fUnXiqjPutM8fvwTvYZGkY8z5W+toVAoSfRtZQUvfc37pFI=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from DU2PR04MB8600.eurprd04.prod.outlook.com (2603:10a6:10:2db::12)
  by PA4PR04MB9293.eurprd04.prod.outlook.com (2603:10a6:102:2a4::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.26; Thu, 16 Mar
- 2023 17:23:03 +0000
+ 2023 17:22:49 +0000
 Received: from DU2PR04MB8600.eurprd04.prod.outlook.com
  ([fe80::d590:6d9a:9f14:95b9]) by DU2PR04MB8600.eurprd04.prod.outlook.com
  ([fe80::d590:6d9a:9f14:95b9%8]) with mapi id 15.20.6178.031; Thu, 16 Mar 2023
- 17:23:03 +0000
+ 17:22:49 +0000
 From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 To:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
         pabeni@redhat.com, robh+dt@kernel.org,
@@ -54,9 +54,9 @@ Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-serial@vger.kernel.org, amitkumar.karwar@nxp.com,
         rohit.fule@nxp.com, sherry.sun@nxp.com, neeraj.sanjaykale@nxp.com
-Subject: [PATCH v13 3/4] dt-bindings: net: bluetooth: Add NXP bluetooth support
-Date:   Thu, 16 Mar 2023 22:52:13 +0530
-Message-Id: <20230316172214.3899786-4-neeraj.sanjaykale@nxp.com>
+Subject: [PATCH v13 1/4] serdev: Replace all instances of ENOTSUPP with EOPNOTSUPP
+Date:   Thu, 16 Mar 2023 22:52:11 +0530
+Message-Id: <20230316172214.3899786-2-neeraj.sanjaykale@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230316172214.3899786-1-neeraj.sanjaykale@nxp.com>
 References: <20230316172214.3899786-1-neeraj.sanjaykale@nxp.com>
@@ -67,143 +67,141 @@ X-ClientProxiedBy: SG3P274CA0007.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::19)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DU2PR04MB8600:EE_|PA4PR04MB9293:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39359446-c541-439a-2fae-08db26431919
+X-MS-Office365-Filtering-Correlation-Id: 520ed011-a2e1-4caf-82c2-08db264310f9
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: pRBauS8SU9hPQlP9lmdqOKLQsWZSzcTeIxInr8eBPjfxCmzanxDCDYL8horUlVUACsGLS3yGHf/hZ6EYW+wRHbwl5ulOdjqPQoFnyN3XBN0CtJOAYAwDEWd2KGI0yzWFw2dOVbwRAi6K85DYBbbGEnugBYfhutJkTe2iN9z97NzAl/XylC3dglCO4uKw83E4KwhV4EbsbPxepMuCa8zUwdF7e6ePR4D6+IlLfJRX9djXtKFk2STgIZuO3jskzQJyn3oJnC8Rv+DRqZb8TG7TsI9qddFz4rVl1TNalthyC9lchACaag3/VS6NxliXi7cCYmz9sVo9w/VmDviZOR6wC3EEeohaOyR2U1r6cB05cgisyYjTytbNETwi8sYGlr4nfHxwGBXOHqvFOZklH5N1bN4qNHWRCg/dkKpDDj71t7KQAu7XSBnJU3MY9z8o0glRhxCREPNXtkUEYYAyBKkUkzsztNLnmQ0H4cLkFCl36asgz+hwdwDw+S0u6tDW2jYubrbpDadp7hoBUqI+2yhnYo/52EhQBAb01aRo0ueZ6q/nkj+5dQhQ9rwXzTGq4RNmUZjGS5ehdtYxiXn32/LW3vIRw7iqoZk/eTMFZmtTVzVit8CLf5IqrKLhbPKUoJoWLiGhLQvtmN5Z0pLwNsnWBmK+0FcY7m/PqjhDKYJBzoB+s/jtkmcrbKp5wWIiLeNLlX+RG7Sk/QimKZsXO6lZJ9C2VG8+6zCBWudRs1Lb3fCIaLs9EN09hIJ+VNv3RcIn
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8600.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(39860400002)(366004)(376002)(136003)(451199018)(6486002)(52116002)(966005)(6512007)(6506007)(1076003)(478600001)(26005)(83380400001)(2616005)(6666004)(66476007)(66946007)(316002)(186003)(66556008)(2906002)(41300700001)(4326008)(8936002)(5660300002)(8676002)(7416002)(38350700002)(38100700002)(921005)(36756003)(86362001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: PktzsulSS1/fUtWVtxy37mocmB0foHx8H2cOPfvdYGzZ3keEYDWvuwIOXoSEMdPFd6azeUhQNf2rjSDx6Y9ojp8cN0GCOul1jE1hNE8s+1zrJHQsHrK6OWTmphJjzEvU/yNzOGssHO9jrf474l/rnnWlfD/R38aFXmVpziLtoN0QMt6jq01innY+kUXqrRftGgthLztO24EQDMzLTAq9/EDnv3gwdIo5zObbZeOG0727j0MyAswQZo5+ptfpz7tMNiP4HfdUnjVcWU9t7Rkn0/ebiaH02xv/YG4ptS/1JF/olp/ETtkCHUqvXRv3P2HI1ba+RAwQ7bcFbJyH2unZ53eheZ9L2S0D5APnUCjnz9Ej2bCq6D0/AqL+kXxe1NWxNNn3IWJBJpaEC13N8UzW5P7oQwqtkGuwhhwOdm5rlnt8/Mxual8IDnvs1nI6W/daaxIkwPnzcnsRX2sDZgiZCQdlvUgwUV6CvoL0zecSSFRFBDxjPZT5s8SF01C5qtJl+WoTQDqdwh4nmZydSL+NeR+Mm6ddNz88sOnme3ylIdUbveW5PvbiZM3kRoVDeFhNmi9PPxn3gd8BtR3ppX2q5xaw52I+9fKpPxgZKaLhsduYmCKGaUQQr1KEYaAsnXqotdYibQND34zrgpoOvl7t0QvuS/VBxcEYFP1H5+NJQtiHp951t5hTxlH4us/ZKI9roWms0K1QNT7kds0JVEVZ9cxD1of9AQdpW0JfHCJI9Io=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8600.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(346002)(39860400002)(366004)(376002)(136003)(451199018)(6486002)(52116002)(6512007)(6506007)(1076003)(478600001)(26005)(83380400001)(2616005)(6666004)(66476007)(66946007)(316002)(186003)(66556008)(2906002)(41300700001)(4326008)(8936002)(5660300002)(8676002)(7416002)(38350700002)(38100700002)(921005)(36756003)(86362001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0NOcqTV61Ew74lYtN5Rnw16ajUGbqcNh96L6S5M6f0DCAAKO2hRDLQB/hP3Z?=
- =?us-ascii?Q?BhzI+QLDFZZEULO2+Oy67HEMolnTNd7HCJw7YXbWXqlQto1fDgQJPR3/6bgh?=
- =?us-ascii?Q?Ck7afg0bQKBxvso9HA/bXFMC9IkqoKkVwIyI0nud/oyLA9CdOXPBgY9W0kok?=
- =?us-ascii?Q?c+wKk6hu/nhTz8hrQV4LBeoSp15vpKJCfREvbB+1PvBWQH4IxZ+NR9LdmhBS?=
- =?us-ascii?Q?hwFn1t5cEJnTUSiyCDivYJ0euttT5oK/ddVmjFIMkS29LKF/ow+mCYKagGBn?=
- =?us-ascii?Q?3T9WfiIODSLuyrHo/0aKCFnNS+jtX6Gg/4cWdp2Ti6wEOZdc+cSsSlze4FpI?=
- =?us-ascii?Q?SjG/MucVCR4FUQqMTqCyJv0gWOKJOBjMk7BV/p2o5MsQcFbrqNzf/AFasQQT?=
- =?us-ascii?Q?fqsgI4GtZqbvgYpZSS6/oFhXADPlVf+N5hD5jEkCEvK55n/Ocno4e/o2y056?=
- =?us-ascii?Q?NGFo8UwUJoa15oTrrfV0uR09+c7WEwoqLqsCEiMFj/BgT+iGzf9otgXxwyp7?=
- =?us-ascii?Q?w9YjyT2nDRpFuKF8DkFeACRBM/KjGt5/g13GISuJwhL3UQ/W4idM31fXkSA6?=
- =?us-ascii?Q?yWouhp2gQ0sa2A+vCmCVniNSAqmUVv7TwpGoij0GBQf7PvR7vcl8eJBcID/j?=
- =?us-ascii?Q?3pHkQe42SsKjn7ZlO2ZBMW4Fa0OWPKZ9I2ojTR4QYE+UMHhXvWD9HzFVwXv7?=
- =?us-ascii?Q?gZDggrBqwd1P1APMuDFkZqqlQ7/EyrOie4LJleJSRs8fz0LGreL4vl1tsybj?=
- =?us-ascii?Q?A6rKAXQifVbEYfYbKOD8SXPPfG5H2tv3CQA7kHttqLms9IokyCovJ7fSKl22?=
- =?us-ascii?Q?iy3aJvlcKeX2NkZVv6/sTc3U5yR/CZl7gmLrTW3ehUCHLRgnF2QTz7es9zkV?=
- =?us-ascii?Q?RQ6qDPcy5AB9qdOjaYFTxh4lGn2pbb6Mz8vDX42xg0RYQ63I+nbW8h0dfqEu?=
- =?us-ascii?Q?CM8l9auP6y1ebJfD0DrIttF7RkFMB0uTxFOEszJUtHXCQaNFumCG+MJ3eISx?=
- =?us-ascii?Q?HLUhNhXScpOrgwXGQ6Wkeez+f7Stm5BKvpql/qVuuCd9kaSCzs8Rd35v+HCe?=
- =?us-ascii?Q?9OjRY38VKAaSt2Tas6vI7m6K4kWopJZU/9IXSMl+BXYUVbL1un/PtkQy55n0?=
- =?us-ascii?Q?t+BCfVHiEVuRC05/uSCyoybYUfqpo2Omb41M1dBjellu/rpFT61OquZmQFez?=
- =?us-ascii?Q?juB3SrjnaIsvIxVVQj//g4PVQZYKk+WVT66/dIJWImUB2qW1hUbue6FnHA3Y?=
- =?us-ascii?Q?3S4E1Tq0ek7QSLOwMcVCqhuBZA/M/ZbMi70jZmTaC6EfhNZkCE510rkNUbko?=
- =?us-ascii?Q?vNmkuZ0A4yNQhnSuC7/8SPNwu+EfC3319xHuE9po+XQOMXZmCF++rzTZQClL?=
- =?us-ascii?Q?UIv7nZQUbTPN2MOLg0Gk1PJLgdfI+8H9RJuIVeotbukafVlqJJggnlKdhJOv?=
- =?us-ascii?Q?O9LeR5lpkgsAVhSTodJK78qGMA08/kS4lbF1Fn6LZAIqSgy2C4fkFKB21WA9?=
- =?us-ascii?Q?kMf70Na+LnZjDnPcJMPnQWE84P4FPmZoB6IN7+XQPoFWtplhYs5P44+Y5Yit?=
- =?us-ascii?Q?JrKQhM4A7PTH/ZDDw8kawvDOjZ0PvdHzwqnAH9loXLougNi+Bzo+XPeTU5Q8?=
- =?us-ascii?Q?Cg=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oNdupXC/Dq295GFhMnIlPVKjRYxjyLdUcSXE1dGXZrDTvEPKQW5hWbKiY+Jb?=
+ =?us-ascii?Q?Tqpcw7basO0Wges8Jo8sytKMQV8AC8+pWtdn1ITNKzvJmIhrYQrvwkm1Xx/G?=
+ =?us-ascii?Q?rcwQ5QYKQM4Wxi0ZHMAkWIP2Q2InZ41V/svnMQa4t58xd7Oh7MhVgnrnmJgi?=
+ =?us-ascii?Q?fmm5ElrW+II/X7AOGPQeiqC6BgmMEGh62UG/cKrmgasUujTuxZs6o8958XS1?=
+ =?us-ascii?Q?DfzTg2BdI0wXNsyopfpHoyWGPa65gWqDXCTLZE8q728nnXv+i1nD3nFvmKzi?=
+ =?us-ascii?Q?WvBbNraYg387cRv1xySdG3vwWI8WsB5jfKMjUbuKq3DPKJKgiL2npuARcMrW?=
+ =?us-ascii?Q?1SvbGhzDe4nKcD0tryxktjU0XN19qeCr03kq2VwIhj72h/7O8y6Uk8qEB+3+?=
+ =?us-ascii?Q?HzyZuQlEb5IGGxXCdIImTK42EyuyGPi0lQbRQ8Y7TGPdU+OXWFUUE9wH64lo?=
+ =?us-ascii?Q?xX+H/7KMpAwT6LdtnT9uil7mPDqcy9JVgmpFFWQy5jsW3sCjq5OeI7KOz2YY?=
+ =?us-ascii?Q?9qKd84Lw+vCqYR+xyNL/eZ7+jShbUk1wwNFdka7KuNJY31hv/Ms1WL1gEpbt?=
+ =?us-ascii?Q?wT4hLE6yuZ0T3DsgLQZ+yJDahd/95FGSAeWeZKNKpgttOrLvPunFLabIfVG7?=
+ =?us-ascii?Q?dFr4eT61DgQKa9QVMGr3FCbyiHSwZYzwhw4hhZYPwBs+/XQlecHkjhG9CStq?=
+ =?us-ascii?Q?dUckwDfK7r1fltU6m3Aw7+R8jQeNwY/o3lMIQyrVm59g1eQamNSKJjpVI+k1?=
+ =?us-ascii?Q?w30kna5knxQRHNisfc+ed4vsPiBSpjD7HhHcKVV2VzwZF2KVKO/DVI/WRjsc?=
+ =?us-ascii?Q?r2clncnW9daSHwlyD+UaHb3esmFPY+HOZGV0FjR9MmmBk7DytN/BmTif4qq7?=
+ =?us-ascii?Q?Ma5p9+O1AA6Rr9Nvj8noOlRDGetE1DFywvP8eGKnUYJYb33sRWfvqh5egDTn?=
+ =?us-ascii?Q?c+hIahVgFWRs5A+DRB9TOpkARRR0v6M+QJddwk8P01cRK2RhME/qz8fCnuWL?=
+ =?us-ascii?Q?Y5p6+c22gjK0HtXeQkdhq541RvV7abhjG/hpXAv1S4e/VLnvPvbsbl/5bdKJ?=
+ =?us-ascii?Q?fTKE485OxfArVmKA/JCFULFNcQKgxFanJhZmoSqm7dfr6jD/O7isPsnjH5nV?=
+ =?us-ascii?Q?88KVry9Pq2Sd65MbBgujx424XnPT4BoXiOFd+aLOcgCYV8bXbXbdO9QzSAv6?=
+ =?us-ascii?Q?VC3Bqd6zOLPfpnYGvMhwhGOw97dpfbE8ZWh6szkjyMrdndSy7DunR742rKmP?=
+ =?us-ascii?Q?b/XYSYJzFE1g7BusNMrQ764iBpSKlkUSz/G1eRhJ/Wvc0BlFqS3m0sa4NvIw?=
+ =?us-ascii?Q?1OuXTAxrOcEBx3s+QG0dcZiNhYgw5NVV+GSq03SdfZ+V2QU/He9XVBBQBbtd?=
+ =?us-ascii?Q?yDy7Ul2ZzuO/+F/0LkQ6b3f7OW/IMhtbD0LgMhH79Ufa7jzb/3tqakcZNFXY?=
+ =?us-ascii?Q?Lxd0F2hZg0eFaAhES3UI6gBoVSdD7YRon6jFmj2d4OprILfzQllRqncdFwkC?=
+ =?us-ascii?Q?sV0S5h2urGF2XS58ahW7dETaF0IN0c40EecNpajND0w0a5dVg1nFMEgmnzBV?=
+ =?us-ascii?Q?r1rxF/g/flZszrGZlRVRfF10JZrbE48IGb86SVXD8wTQpo6AzJ1+SvifhytN?=
+ =?us-ascii?Q?bA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39359446-c541-439a-2fae-08db26431919
+X-MS-Exchange-CrossTenant-Network-Message-Id: 520ed011-a2e1-4caf-82c2-08db264310f9
 X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8600.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Mar 2023 17:23:03.0520
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Mar 2023 17:22:49.5789
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Im+zVKXyvmg92ajkysKkJiJwVj8g7ccP7YmHvn0dkMpBMRx564KfKVfT7ArO7E7HY6hAAoCsv2jQjWyBtPBWWI0aXt8tXwttlLqRBILPtvY=
+X-MS-Exchange-CrossTenant-UserPrincipalName: ksvMqyCSIrujsNOQe4FwGlDceck7356z9cWugch2A0C38pVK7V+i2zTv9vf9ftd4nkP7MOxpoUeiKBTVdIQpjM176P5BPCB1MtJ9p3Blk3c=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9293
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add binding document for NXP bluetooth chipsets attached over UART.
+This replaces all instances of ENOTSUPP with EOPNOTSUPP since ENOTSUPP
+is not a standard error code. This will help maintain consistency in
+error codes when new serdev API's are added.
 
 Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 ---
-v2: Resolved dt_binding_check errors. (Rob Herring)
-v2: Modified description, added specific compatibility devices, corrected
-indentations. (Krzysztof Kozlowski)
-v3: Modified description, renamed file (Krzysztof Kozlowski)
-v4: Resolved dt_binding_check errors, corrected indentation.
-(Rob Herring, Krzysztof Kozlowski)
-v5: Corrected serial device name in example. (Krzysztof Kozlowski)
-v11: Corrected grammatical errors in description. (Paul Menzel)
+v11: Replace all instances of ENOTSUPP with EOPNOTSUPP. (Simon Horman)
 ---
- .../net/bluetooth/nxp,88w8987-bt.yaml         | 45 +++++++++++++++++++
- MAINTAINERS                                   |  6 +++
- 2 files changed, 51 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+ drivers/tty/serdev/core.c           | 6 +++---
+ drivers/tty/serdev/serdev-ttyport.c | 4 ++--
+ include/linux/serdev.h              | 4 ++--
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-new file mode 100644
-index 000000000000..57e4c87cb00b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-@@ -0,0 +1,45 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/bluetooth/nxp,88w8987-bt.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: NXP Bluetooth chips
-+
-+description:
-+  This binding describes UART-attached NXP bluetooth chips. These chips
-+  are dual-radio chips supporting WiFi and Bluetooth. The bluetooth
-+  works on standard H4 protocol over 4-wire UART. The RTS and CTS lines
-+  are used during FW download. To enable power save mode, the host
-+  asserts break signal over UART-TX line to put the chip into power save
-+  state. De-asserting break wakes up the BT chip.
-+
-+maintainers:
-+  - Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - nxp,88w8987-bt
-+      - nxp,88w8997-bt
-+
-+  fw-init-baudrate:
-+    description:
-+      Chip baudrate after FW is downloaded and initialized.
-+      This property depends on the module vendor's
-+      configuration. If this property is not specified,
-+      115200 is set as default.
-+
-+required:
-+  - compatible
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    serial {
-+        bluetooth {
-+            compatible = "nxp,88w8987-bt";
-+            fw-init-baudrate = <3000000>;
-+        };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 32dd41574930..030ec6fe89df 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -22835,6 +22835,12 @@ L:	linux-mm@kvack.org
- S:	Maintained
- F:	mm/zswap.c
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index 0180e1e4e75d..d43aabd0cb76 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -366,7 +366,7 @@ int serdev_device_set_parity(struct serdev_device *serdev,
+ 	struct serdev_controller *ctrl = serdev->ctrl;
  
-+NXP BLUETOOTH WIRELESS DRIVERS
-+M:	Amitkumar Karwar <amitkumar.karwar@nxp.com>
-+M:	Neeraj Kale <neeraj.sanjaykale@nxp.com>
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-+
- THE REST
- M:	Linus Torvalds <torvalds@linux-foundation.org>
- L:	linux-kernel@vger.kernel.org
+ 	if (!ctrl || !ctrl->ops->set_parity)
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	return ctrl->ops->set_parity(ctrl, parity);
+ }
+@@ -388,7 +388,7 @@ int serdev_device_get_tiocm(struct serdev_device *serdev)
+ 	struct serdev_controller *ctrl = serdev->ctrl;
+ 
+ 	if (!ctrl || !ctrl->ops->get_tiocm)
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	return ctrl->ops->get_tiocm(ctrl);
+ }
+@@ -399,7 +399,7 @@ int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
+ 	struct serdev_controller *ctrl = serdev->ctrl;
+ 
+ 	if (!ctrl || !ctrl->ops->set_tiocm)
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	return ctrl->ops->set_tiocm(ctrl, set, clear);
+ }
+diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+index d367803e2044..f26ff82723f1 100644
+--- a/drivers/tty/serdev/serdev-ttyport.c
++++ b/drivers/tty/serdev/serdev-ttyport.c
+@@ -231,7 +231,7 @@ static int ttyport_get_tiocm(struct serdev_controller *ctrl)
+ 	struct tty_struct *tty = serport->tty;
+ 
+ 	if (!tty->ops->tiocmget)
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	return tty->ops->tiocmget(tty);
+ }
+@@ -242,7 +242,7 @@ static int ttyport_set_tiocm(struct serdev_controller *ctrl, unsigned int set, u
+ 	struct tty_struct *tty = serport->tty;
+ 
+ 	if (!tty->ops->tiocmset)
+-		return -ENOTSUPP;
++		return -EOPNOTSUPP;
+ 
+ 	return tty->ops->tiocmset(tty, set, clear);
+ }
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index 66f624fc618c..89b0a5af9be2 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -249,11 +249,11 @@ static inline int serdev_device_write_buf(struct serdev_device *serdev,
+ static inline void serdev_device_wait_until_sent(struct serdev_device *sdev, long timeout) {}
+ static inline int serdev_device_get_tiocm(struct serdev_device *serdev)
+ {
+-	return -ENOTSUPP;
++	return -EOPNOTSUPP;
+ }
+ static inline int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
+ {
+-	return -ENOTSUPP;
++	return -EOPNOTSUPP;
+ }
+ static inline int serdev_device_write(struct serdev_device *sdev, const unsigned char *buf,
+ 				      size_t count, unsigned long timeout)
 -- 
 2.34.1
 
