@@ -2,126 +2,131 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8716EC6FD19
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 18:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7211CC6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 18:57:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbjCPSgY (ORCPT
+        id S229770AbjCPS5a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 14:36:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37870 "EHLO
+        Thu, 16 Mar 2023 14:57:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjCPSgX (ORCPT
+        with ESMTP id S229909AbjCPS5Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 14:36:23 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A588AAFBA1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 11:36:22 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id i5so2758625pla.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 11:36:22 -0700 (PDT)
+        Thu, 16 Mar 2023 14:57:16 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A1FDCA63
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 11:57:11 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id o12so11491313edb.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 11:57:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678991782;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=p8hVVCbpl+MhQUe0P4IWqjtdM7bJ/rtk8BXU6oKRlX4=;
-        b=Cx7fSJ5+AM8mGTlW/7556STdsCa54dE37YYroghjE1JvRqe79dRB9ao6bgAqp1NP1z
-         9pSx8BNh3w4wxzz38ZC8uDuIoV/8LWA7meuaY3z0FWWvcp227kWjDQgZpUjSoYSFlZX0
-         j4PqUigMP/LzOcWGSv6wnCDApzIbmwx95SX9IwkgUthRChSbeQfRccDN5tvA5SQUGsMZ
-         VebCOX1ih0uKQYOIIASSuc3DJF7Hp9DJO6mR6ABFCZFee98W2doimLEfEnA3qdaypRVr
-         FGLFQGadxWB7CJsQkbce9E/c04LuWGZgxDPkBCLLjjLJENVPIB1KFr+wF49ipDHOKxz+
-         sLTw==
+        d=kali.org; s=google; t=1678993030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ISoDwGmCZfIt1++Qrq4EaM3UW6i2EJ00oUlk42ZAa4k=;
+        b=V34nuHzb1E1n6ArHtHa/MyOWRtt1PmPMxzBmbNZ70ayTY98fyYvgyrBPtlxZTjt10O
+         lcuHVx7snGom/yUxsRx5nKqnb/yl03a4EWJTrGqyjjo68Aqsy/DQRWfmH0L322qjXkGZ
+         YjDrMlA56pufnTtXHbENe3k35Br34XL7XIt6c+nHVpCgUU+HYpwxYx0CnXzmoW4cVZew
+         oKJl3xnnxfcomJvZQc3MUZDsx7bqVXIanxILdL7nKWbL6VJfpIGqwQRmRtHzNy+ayTDD
+         NehCB+jT9oMLIKdvSeqa2/tp5E0ZbFN4UP3ZoIzXLCtYfzk8Cs2RRd3Pi3Fcz52Be0Ry
+         JcpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678991782;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p8hVVCbpl+MhQUe0P4IWqjtdM7bJ/rtk8BXU6oKRlX4=;
-        b=w1juKzAaURO1QJCQbkvSthT0HW3TncdkAVigN5lr6WkuqhP+JCsHowvYUyEQ9Yf6E2
-         jYZJyNnT0RXYYVLBqOaTPg1SsRBfdDEfENpfkvY7yp/h65ohCmxaVnjSGrUbTc0KMehR
-         SGWQXfjSIvZi4aW+3gjsonu8rhseAWq9PKgeUH3yIQEJK7j8mbI516TbxP7klkYRO6wE
-         tmBATbjsqKwJ+nJwLj5vAbttsJTqfzDGHfP+Da+BEepU3vZ3HN5W0vxnY0g4P068bvWZ
-         /SJT3pMgGZvZxPtRK3VPb692th43Js01grQ9YCqhE6bMdVBA9CnWa7vLOkbNR/TFaM08
-         ZQvw==
-X-Gm-Message-State: AO0yUKX4caI6x+7mIml3d/2vV/QGxjlV4t23JPXPoT9yFigan2wDm0p2
-        0OljMU2uT/BJF8XZj8cBIc6rBYt4V+w=
-X-Google-Smtp-Source: AK7set9L6odw1eeuwFMAc+us27oOkgg4hGdy7SvOk8f3sDrZit3RC9UMC1yWeQ5L/Z9JufBPI23Xfg==
-X-Received: by 2002:a17:902:c711:b0:1a1:85d4:a773 with SMTP id p17-20020a170902c71100b001a185d4a773mr2972826plp.69.1678991781900;
-        Thu, 16 Mar 2023 11:36:21 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.19.52])
-        by smtp.gmail.com with ESMTPSA id u4-20020a170902b28400b001a19d4592e1sm9188plr.282.2023.03.16.11.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 11:36:21 -0700 (PDT)
-Message-ID: <641361a5.170a0220.596d0.0079@mx.google.com>
-Date:   Thu, 16 Mar 2023 11:36:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8099517483561396776=="
+        d=1e100.net; s=20210112; t=1678993030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ISoDwGmCZfIt1++Qrq4EaM3UW6i2EJ00oUlk42ZAa4k=;
+        b=3PZZBsqQc6sUGmTBtmDU7EHXWy+JsRw5pX5AZloDrITeMPvAxqwvpf7kF1jmzYU5f3
+         jyq/Uc4Nv2hB8QIzKL8949zzLITovU2lI2C6kkUWT99OTcleszDE5Z/lSa0a8B6xKvI/
+         M2LV6Qq8sAIGGf2vzJa5VRTwxlcMIXIK3C9lV/w3BpwpvdeFcHRjfNCt2bw6Qxn5rumO
+         IKENulYu0U/xLNuJNwP0CLbDoAys+pZKpElwwes+aopmV+H7eEp6aJ173HO1kgBqlaD4
+         fm5hB9N0cZ8F5Sg+b72lYW72UYNSz2GkxjMbXEM3fL+FJCDy7GSufVFnnKL+ABuQYHJ1
+         KXPQ==
+X-Gm-Message-State: AO0yUKXz2i5OTtF6aS1gAmAuj57+ntivy8kFwV69i2Q68cZw+duRB0GF
+        kg2my/pYoYckYZLIKMnfiIoF5c7j4rIkA/MmRObThQ==
+X-Google-Smtp-Source: AK7set8R6MPvl1jYDipFYGi3DvPwtseUsQ8EVHZ1VfSLTTmEQjtyKWaAM4IDrmaaOglEDFXN0af7mz8G306mXMeEY84=
+X-Received: by 2002:a50:f683:0:b0:4fc:473d:3308 with SMTP id
+ d3-20020a50f683000000b004fc473d3308mr360427edn.8.1678993030292; Thu, 16 Mar
+ 2023 11:57:10 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: Add support for NXP bluetooth chipsets
-In-Reply-To: <20230316172214.3899786-2-neeraj.sanjaykale@nxp.com>
-References: <20230316172214.3899786-2-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230316034759.73489-1-steev@kali.org> <20230316034759.73489-3-steev@kali.org>
+ <f7be8db9-0bdd-644d-c7a0-4321041c5028@molgen.mpg.de>
+In-Reply-To: <f7be8db9-0bdd-644d-c7a0-4321041c5028@molgen.mpg.de>
+From:   Steev Klimaszewski <steev@kali.org>
+Date:   Thu, 16 Mar 2023 13:56:59 -0500
+Message-ID: <CAKXuJqiPKJ_Jus2gwA94gQAb-7-PBAZL4CSaFcxpx3+UXBYS-A@mail.gmail.com>
+Subject: Re: [PATCH v6 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
+ chip wcn6855
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>,
+        Tim Jiang <quic_tjiang@quicinc.com>,
+        Johan Hovold <johan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8099517483561396776==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Mar 16, 2023 at 4:58=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> Dear Steev,
+>
+>
+> Thank you for your patch. Some nits.
+>
+> Am 16.03.23 um 04:47 schrieb Steev Klimaszewski:
+> > Added regulators,GPIOs and changes required to power on/off wcn6855.
+>
+> Please add a space after the comma.
+>
+Good catch, sorry about that, will do in v7!
 
-This is automated email and please do not reply to this email!
+> > Added support for firmware download for wcn6855.
+>
+> You might want to use imperative mood (Add =E2=80=A6).
+>
+Bah, I'd seen others mention this, and still did it in mine :/
 
-Dear submitter,
+> How did you test this? What firmware files did you use?
+>
+> Maybe mention, that the assumption is, that it=E2=80=99s identical to WCN=
+6750?
+>
+Are you wanting the firmware used in the commit message?  I think I've
+seen similar in e.g. ath11k patches like:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730917
+"Tested-on: WCN6750 hw1.0 AHB WLAN.MSL.1.0.1-00887-QCAMSLSWPLZ-1"
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.76 seconds
-GitLint                       FAIL      1.37 seconds
-SubjectPrefix                 FAIL      0.69 seconds
-BuildKernel                   PASS      32.32 seconds
-CheckAllWarning               PASS      34.53 seconds
-CheckSparse                   PASS      38.93 seconds
-CheckSmatch                   PASS      108.72 seconds
-BuildKernel32                 PASS      30.64 seconds
-TestRunnerSetup               PASS      435.92 seconds
-TestRunner_l2cap-tester       PASS      16.51 seconds
-TestRunner_iso-tester         PASS      16.51 seconds
-TestRunner_bnep-tester        PASS      5.41 seconds
-TestRunner_mgmt-tester        PASS      107.20 seconds
-TestRunner_rfcomm-tester      PASS      8.60 seconds
-TestRunner_sco-tester         PASS      7.85 seconds
-TestRunner_ioctl-tester       PASS      9.17 seconds
-TestRunner_mesh-tester        PASS      6.77 seconds
-TestRunner_smp-tester         PASS      7.76 seconds
-TestRunner_userchan-tester    PASS      5.58 seconds
-IncrementalBuild              PASS      43.53 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v13,3/4] dt-bindings: net: bluetooth: Add NXP bluetooth support
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-20: B1 Line exceeds max length (87>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
+something like that?  The firmware itself is already in
+linux-firmware.  I figured it wasn't imperative to the patch and it's
+in the cover letter but I can definitely throw it in the commit
+message!
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============8099517483561396776==--
+> > Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> > Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+> > Tested-by: Bjorn Andersson <andersson@kernel.org>
+> > ---
+>
+> [=E2=80=A6]
+>
+>
+> Kind regards,
+>
+> Paul
