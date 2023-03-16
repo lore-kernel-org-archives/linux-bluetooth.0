@@ -2,110 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51833C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 10:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCE8C7618A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 11:05:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229631AbjCPKek (ORCPT
+        id S230040AbjCPLFp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 06:34:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45762 "EHLO
+        Thu, 16 Mar 2023 07:05:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjCPKej (ORCPT
+        with ESMTP id S230023AbjCPLFn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 06:34:39 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AACD64EC6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 03:34:38 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id c18so1126375qte.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 03:34:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678962878;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxjGoaDURQedpHdW8SjAi+7INxvUfbbv1AUD1CBtZG8=;
-        b=ddOJJiKfwOpS0hMJPtC5ggnuLOSzPv1c24bPSQ6oDW/x14KOCcJBz6LqR+nitJqxEx
-         dn6qvxgfRyHeva1vIzqYk/7h780jZPtPb03FvleqR76KvQcem1Jy2b6L03bwT+zKx+YW
-         R/Jhs2fr28m4HhDJOKDhs/UhtK6+APNX6wa83VcVWlRjzOJS3HJSf5Kn+LSO8ONm2GHO
-         mi3twrBPNBosi6SGQ6gubgiu9AjxSYUM8OkvvaOZ+HjYD+RFCYuSe8X2LSFnnVcBUWkt
-         2ve+igu1qhTQBShv6ZjHCSJ0vbMSSXvUIsixK6bWfvdun9KuRTXWV4H4k3hIhefDPrSb
-         bWOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678962878;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wxjGoaDURQedpHdW8SjAi+7INxvUfbbv1AUD1CBtZG8=;
-        b=ZIg55clWy+SJNBYcGHmZEQ6jf33dM8jdnnPF9QF2/HLjcEyA2dM6cmR4Baz3z8IFMN
-         ZFY7efvHF5x/41Xlw5JFsNLlatm/RhAZKAzGG/zA3lpHgDHeaV4rQnj6f+EwAOspXKDj
-         RWopU9GJoINCuGKJD1wjYFD7XfvGV/sKq3Hznu/f8UTubcDr6pQtXZOpG/sRgHTdjtAi
-         zaR9LGwjbeQegx715rloLqnf0nDIswDh9TAiFCxp95wsAkVjuf1e3i2ZiE+Q6lUwXkQC
-         54gonoEpJhW5+0F4l8UunOOSDrDmlungZs467H/hQ/YSu2szh5Bd+YZTTYbk1Xy5EBSL
-         3sIA==
-X-Gm-Message-State: AO0yUKVvnYikV21OYkUt93McpAPnQL/plKEh8Fzt36mr8F8gKcMmOln6
-        mB9oQcs/MsE32GXYWvyO7ZLK26pmG+A=
-X-Google-Smtp-Source: AK7set/pHxNt8PjrsPuxXVL0HkTgLNG027Vx+6r2gNfFCjjiKEsy17MzG9Lm5SDVFrliPE2ctbsung==
-X-Received: by 2002:a05:622a:89:b0:3bf:cfa6:55a1 with SMTP id o9-20020a05622a008900b003bfcfa655a1mr5743522qtw.12.1678962877744;
-        Thu, 16 Mar 2023 03:34:37 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.137.185])
-        by smtp.gmail.com with ESMTPSA id s15-20020ac85ccf000000b003b0b903720esm5510115qta.13.2023.03.16.03.34.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Mar 2023 03:34:37 -0700 (PDT)
-Message-ID: <6412f0bd.c80a0220.478d1.758b@mx.google.com>
-Date:   Thu, 16 Mar 2023 03:34:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5884442773002452277=="
+        Thu, 16 Mar 2023 07:05:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA1C76C884;
+        Thu, 16 Mar 2023 04:05:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A11A61FDB;
+        Thu, 16 Mar 2023 11:05:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B8E6C433A0;
+        Thu, 16 Mar 2023 11:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678964733;
+        bh=jwdsqFj42Pawn1NF91CaXMc12zQ2/CQZq6KOHz+TFDk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AOvS2dgIC9QgqUFLjiIKRrVFOe987AJjXYAqBEzcaczX3b9qM1h505TNB8EK3PpEZ
+         aHI49DbigXKkh+7n+9NBHP4PffBoOZvLHKe6r994l6kwB5gASJpP/K4L6mn1zf8QAo
+         SFl+jX3sqpHD3IMOFrRSbFyTA2xuOsvhosCQ+udQwC1YwEh1815+j0pcEMuEjPhcen
+         th63Onh11g+ZA6l8b2cGUviZgUxJgSi9tapL7TXBRRS5CL0yIcGK9oCZ+bt2EgncEf
+         fO1EnwZgLYy0YQLFzmoriiW0KlGZxVudHk2wui9bf47bIPTE7b0nD2NLZa7Z1yiHxY
+         +hnKqaTAmNmRg==
+Received: from johan by xi.lan with local (Exim 4.94.2)
+        (envelope-from <johan@kernel.org>)
+        id 1pclRS-0004wx-Gp; Thu, 16 Mar 2023 12:06:42 +0100
+Date:   Thu, 16 Mar 2023 12:06:42 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Steev Klimaszewski <steev@kali.org>,
+        Bjorn Andersson <andersson@kernel.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: Re: [PATCH v6 4/4] arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
+Message-ID: <ZBL4Qrp9Lr+aOyXr@hovoldconsulting.com>
+References: <20230316034759.73489-1-steev@kali.org>
+ <20230316034759.73489-5-steev@kali.org>
+ <ZBLuxFxFvCY+0XHG@hovoldconsulting.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [v2] Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
-In-Reply-To: <20230316175301.v2.1.I9113bb4f444afc2c5cb19d1e96569e01ddbd8939@changeid>
-References: <20230316175301.v2.1.I9113bb4f444afc2c5cb19d1e96569e01ddbd8939@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZBLuxFxFvCY+0XHG@hovoldconsulting.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5884442773002452277==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Mar 16, 2023 at 11:26:12AM +0100, Johan Hovold wrote:
+> On Wed, Mar 15, 2023 at 10:47:58PM -0500, Steev Klimaszewski wrote:
+> > The Lenovo Thinkpad X13s has a WCN6855 Bluetooth controller on uart2,
+> > add this.
+> > 
+> > Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> > ---
+ 
+> > +		vreg_s1c: smps1 {
+> > +			regulator-name = "vreg_s1c";
+> > +			regulator-min-microvolt = <1880000>;
+> > +			regulator-max-microvolt = <1900000>;
+> > +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
+> > +			regulator-allowed-modes = <RPMH_REGULATOR_MODE_AUTO>,
+> > +						  <RPMH_REGULATOR_MODE_RET>;
+> > +			regulator-allow-set-load;
+> 
+> So this does not look quite right still as you're specifying an initial
+> mode which is not listed as allowed.
+> 
+> Also there are no other in-tree users of RPMH_REGULATOR_MODE_RET and
+> AUTO is used to switch mode automatically which seems odd to use with
+> allow-set-load.
+> 
+> This regulator is in fact also used by the wifi part of the chip and as
+> that driver does not set any loads so we may end up with a regulator in
+> retention mode while wifi is in use.
+> 
+> Perhaps Bjorn can enlighten us, but my guess is that this should just be
+> "intial-mode = AUTO" (or even HPM, but I have no idea where this came
+> from originally).
 
-This is automated email and please do not reply to this email!
+This one probably also needs to be marked as always-on as we don't
+currently describe the fact that the wifi part also uses s1c.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730700
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.74 seconds
-GitLint                       PASS      0.36 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      32.75 seconds
-CheckAllWarning               PASS      35.33 seconds
-CheckSparse                   PASS      40.09 seconds
-CheckSmatch                   PASS      108.18 seconds
-BuildKernel32                 PASS      31.15 seconds
-TestRunnerSetup               PASS      451.98 seconds
-TestRunner_l2cap-tester       PASS      17.22 seconds
-TestRunner_iso-tester         PASS      17.74 seconds
-TestRunner_bnep-tester        PASS      5.73 seconds
-TestRunner_mgmt-tester        PASS      113.90 seconds
-TestRunner_rfcomm-tester      PASS      9.10 seconds
-TestRunner_sco-tester         PASS      8.43 seconds
-TestRunner_ioctl-tester       PASS      9.85 seconds
-TestRunner_mesh-tester        PASS      7.24 seconds
-TestRunner_smp-tester         PASS      8.34 seconds
-TestRunner_userchan-tester    PASS      6.09 seconds
-IncrementalBuild              PASS      29.70 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5884442773002452277==--
+Johan
