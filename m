@@ -2,235 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52464C7618D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 03:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60161C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 03:50:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbjCPDs3 (ORCPT
+        id S229480AbjCPDuG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 23:48:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39782 "EHLO
+        Wed, 15 Mar 2023 23:50:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229682AbjCPDsM (ORCPT
+        with ESMTP id S229796AbjCPDt3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 23:48:12 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567AA9DE0E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 20:48:10 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id bd3-20020a4aee03000000b00517affa07c0so53550oob.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 20:48:10 -0700 (PDT)
+        Wed, 15 Mar 2023 23:49:29 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 202E1AA25B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 20:48:46 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id qe8-20020a17090b4f8800b0023f07253a2cso288801pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 20:48:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1678938489;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MviEEWSTJxxSnXQ8MTU0qt5CxziP8W4MnnoSp2fynjs=;
-        b=XWl8vLRg8SWI+k7I74n/oowWqeKyPcjyMWA1lH1QzC2rDjJLZXfwRheUyKbLXuiN2e
-         /iOUiLF7OQcqv2an0KOFsoh5jUVWiJMRSlcNzV/sWLhjc00F8twiykhe4mncckWWyMBU
-         bikDI/5mXlnBz+Cmbrh3a5W56A6f5R1OEr/xF8nDQ8U4rSd68bwvWiGhloB/4PILWup9
-         ylD8uXJk2lvidmyjGn9YfGsAiKF/flB8o1QWdaHka8hyOhL9zjBgi7FO48x6Z5KRn1ec
-         y2ybe9MSGq91TQKPuqIw3+4H6spkIvl/fEtetMp2I0GRsE5HlTy+PXmtd/aGptkV+aiW
-         o0Cg==
+        d=gmail.com; s=20210112; t=1678938517;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y3ioDdsASKRhf94b/TiX1RYr9dEBLlZeU7U1NKOQ/AI=;
+        b=V9hPvrZikKBel8CWr2MVYf1j8yLskpBAo0ZOAprzrb8urWQowA54nAeZUt7ViJ0f1P
+         zidS+I0/tB3LEanUwzs/Hu3NW7pAOlrvBSLZxxuX2AnPMgb3TCQHIemzautuHpsXjFMo
+         ROygGY92YAt7h1cVY63/9tl/Xo77Ynex8ZptqAQh8cgoqjp7SKV9Lrh4ZXsojs42VfBU
+         B1XSV4djYg+M4zNX7Ez1rklc/Zw4e0kLixvK4dQAT/TO1P707UaLCEQEOBixQO72cnHz
+         aq4YdEvmbZCfo/P6Cp/Bs1qwh00ZZxtkFMrMU3H+5wsIocBr9V1Z7ZMdakdBgPI3HAEf
+         1m3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678938489;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MviEEWSTJxxSnXQ8MTU0qt5CxziP8W4MnnoSp2fynjs=;
-        b=B6JepFHsaDPGKVOUEuMkpRZZUAPuovDHVaq6gn1ao1nBG9cbVjQJcdPzYtSkOeJf1f
-         NKdTPStr2ZXWr8g4wdwC6dKCLAaFTJFsb2nGKUE6SAm/0u4G+lrq4U69DNdlq3lysjWI
-         sjbaCJiHIYTk3JUIJ+97sxJ4zljbFZzzcp2HKHKYoJD5Yl+vbLAXdPycWa5/i17i8PR4
-         aNmA0f7QFHOQVoslUHNSrTvbD8SvAO4YYuM6KOHcURn07P7hbRB7Tss5um2Bve8fQgjJ
-         BCeCIGbuwyTOLHKyC90LgV6Me46JNA4sxvyBoj7MnMFOI8BEEbz8Vs+/A5Sfh39bAFmV
-         4UCQ==
-X-Gm-Message-State: AO0yUKWc1z2ynZYgovUjzozpSHUP5liFjSj5drP+ljyp0lS0dgt79MjN
-        7o6CdLtin7hQJIUNMrj0uW35UA==
-X-Google-Smtp-Source: AK7set+5yVTtbc+9dBUUCDW5xTHgd8ufHL8cPwAZ0n2vsAuStk3stYLCvHf+RRuXDZIsnLHWOvywQA==
-X-Received: by 2002:a4a:d286:0:b0:525:3dc9:c39b with SMTP id h6-20020a4ad286000000b005253dc9c39bmr11389658oos.0.1678938489411;
-        Wed, 15 Mar 2023 20:48:09 -0700 (PDT)
-Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
-        by smtp.gmail.com with ESMTPSA id b3-20020a9d4783000000b0068bc48c61a5sm3054659otf.19.2023.03.15.20.48.08
+        d=1e100.net; s=20210112; t=1678938517;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y3ioDdsASKRhf94b/TiX1RYr9dEBLlZeU7U1NKOQ/AI=;
+        b=DsxUsg93IgdG61XfSofqzrciaagAo8vxV9qoPXI7dYKJWhysL2/1afF1AAgDfdzL2d
+         hJnvebFQD6mOH9VQ05nM7YkyrmUSmFibyKTx5HL+m8aoY3wpWWbUo0XmyaMIHhvA2GEn
+         IXkr/t1B1oMZVj3TOBZ8zjmzliCGdo6GGfCESfVlY3/GaGVeLbbmjc9EmCrrvdWNQOvo
+         7OhafWjn6qJYpPtXVtvAbCs+mNvQSYSqwBoVmK2bSMSUhBj4Rko4YKbkMGZ3HOpe7RTN
+         SWpJ+lfrBkHsQ0Y2SYA2D0Mdm+ch40On+gINALkKMulnkg2NS4cqTC/l2wErdV+Tb1//
+         ChrA==
+X-Gm-Message-State: AO0yUKVx69QPEeJGYLqznH5LyXIdozeyM+2FzBpld39fgtdQ/CsR84rB
+        9v9+Nf+S89I4G2KRX9wdiLTP49U+jPM=
+X-Google-Smtp-Source: AK7set+uzVos/uLrMsw8dIGhaWbFmQGwupNy02KbvhilF8HU1f7obdVRS8MiwWbtDnZ6BQtd7WhJPQ==
+X-Received: by 2002:a17:902:e749:b0:19f:3d59:e0ac with SMTP id p9-20020a170902e74900b0019f3d59e0acmr2019258plf.44.1678938517444;
+        Wed, 15 Mar 2023 20:48:37 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.59.208])
+        by smtp.gmail.com with ESMTPSA id kf16-20020a17090305d000b0019309be03e7sm4388379plb.66.2023.03.15.20.48.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 20:48:09 -0700 (PDT)
-From:   Steev Klimaszewski <steev@kali.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Johan Hovold <johan@kernel.org>
-Subject: [PATCH v6 4/4] arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
-Date:   Wed, 15 Mar 2023 22:47:58 -0500
-Message-Id: <20230316034759.73489-5-steev@kali.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230316034759.73489-1-steev@kali.org>
-References: <20230316034759.73489-1-steev@kali.org>
+        Wed, 15 Mar 2023 20:48:37 -0700 (PDT)
+Message-ID: <64129195.170a0220.93594.a590@mx.google.com>
+Date:   Wed, 15 Mar 2023 20:48:37 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0523974768575949572=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@gmail.com
+Subject: RE: [BlueZ,v2,1/3] mesh: Filter originated Provisioning Data packets
+In-Reply-To: <20230316011627.27322-1-brian.gix@gmail.com>
+References: <20230316011627.27322-1-brian.gix@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Lenovo Thinkpad X13s has a WCN6855 Bluetooth controller on uart2,
-add this.
+--===============0523974768575949572==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Steev Klimaszewski <steev@kali.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730563
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.14 seconds
+GitLint                       PASS      0.76 seconds
+BuildEll                      PASS      27.50 seconds
+BluezMake                     PASS      838.66 seconds
+MakeCheck                     PASS      11.01 seconds
+MakeDistcheck                 PASS      152.90 seconds
+CheckValgrind                 PASS      244.64 seconds
+CheckSmatch                   WARNING   320.77 seconds
+bluezmakeextell               PASS      99.34 seconds
+IncrementalBuild              PASS      1957.65 seconds
+ScanBuild                     PASS      1036.46 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+mesh/mesh-io-mgmt.c:537:67: warning: Variable length array is used.mesh/mesh-io-mgmt.c:537:67: warning: Variable length array is used.
+
+
 ---
-Changes since v5:
- * Update patch subject
- * Specify initial mode (via guess) for vreg_s1c
- * Drop uart17 definition
- * Rename bt_en to bt_default because configuring more than one pin
- * Correct (maybe) bias configurations
- * Correct cts gpio
- * Split rts-tx into two nodes
- * Drop incorrect link in the commit message
+Regards,
+Linux Bluetooth
 
-Changes since v4:
- * Address Konrad's review comments.
 
-Changes since v3:
- * Add vreg_s1c
- * Add regulators and not dead code
- * Fix commit message changelog
-
-Changes since v2:
- * Remove dead code and add TODO comment
- * Make dtbs_check happy with the pin definitions
-
- .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 80 +++++++++++++++++++
- 1 file changed, 80 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-index 53ae75fb52ed..b3221c27903a 100644
---- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-+++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-@@ -24,6 +24,7 @@ / {
- 	aliases {
- 		i2c4 = &i2c4;
- 		i2c21 = &i2c21;
-+		serial1 = &uart2;
- 	};
- 
- 	wcd938x: audio-codec {
-@@ -431,6 +432,16 @@ regulators-1 {
- 		qcom,pmic-id = "c";
- 		vdd-bob-supply = <&vreg_vph_pwr>;
- 
-+		vreg_s1c: smps1 {
-+			regulator-name = "vreg_s1c";
-+			regulator-min-microvolt = <1880000>;
-+			regulator-max-microvolt = <1900000>;
-+			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-+			regulator-allowed-modes = <RPMH_REGULATOR_MODE_AUTO>,
-+						  <RPMH_REGULATOR_MODE_RET>;
-+			regulator-allow-set-load;
-+		};
-+
- 		vreg_l1c: ldo1 {
- 			regulator-name = "vreg_l1c";
- 			regulator-min-microvolt = <1800000>;
-@@ -901,6 +912,32 @@ &qup0 {
- 	status = "okay";
- };
- 
-+&uart2 {
-+	pinctrl-0 = <&uart2_default>;
-+	pinctrl-names = "default";
-+
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "qcom,wcn6855-bt";
-+
-+		vddio-supply = <&vreg_s10b>;
-+		vddbtcxmx-supply = <&vreg_s12b>;
-+		vddrfacmn-supply = <&vreg_s12b>;
-+		vddrfa0p8-supply = <&vreg_s12b>;
-+		vddrfa1p2-supply = <&vreg_s11b>;
-+		vddrfa1p7-supply = <&vreg_s1c>;
-+
-+		max-speed = <3200000>;
-+
-+		enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
-+		swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
-+
-+		pinctrl-0 = <&bt_default>;
-+		pinctrl-names = "default";
-+	};
-+};
-+
- &qup1 {
- 	status = "okay";
- };
-@@ -1175,6 +1212,21 @@ hastings_reg_en: hastings-reg-en-state {
- &tlmm {
- 	gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
- 
-+	bt_default: bt-default-state {
-+		hstp-sw-ctrl-pins {
-+			pins = "gpio132";
-+			function = "gpio";
-+			bias-pull-down;
-+		};
-+
-+		hstp-bt-en-pins {
-+			pins = "gpio133";
-+			function = "gpio";
-+			drive-strength = <16>;
-+			bias-disable;
-+		};
-+	};
-+
- 	edp_reg_en: edp-reg-en-state {
- 		pins = "gpio25";
- 		function = "gpio";
-@@ -1196,6 +1248,34 @@ i2c4_default: i2c4-default-state {
- 		bias-disable;
- 	};
- 
-+	uart2_default: uart2-default-state {
-+		cts-pins {
-+			pins = "gpio121";
-+			function = "qup2";
-+			bias-pull-down;
-+		};
-+
-+		rts-pins {
-+			pins = "gpio122";
-+			function = "qup2";
-+			drive-strength = <2>;
-+			bias-disable;
-+		};
-+
-+		tx-pins {
-+			pins = "gpio123";
-+			function = "qup2";
-+			drive-strength = <2>;
-+			bias-disable;
-+		};
-+
-+		rx-pins {
-+			pins = "gpio124";
-+			function = "qup2";
-+			bias-pull-up;
-+		};
-+	};
-+
- 	i2c21_default: i2c21-default-state {
- 		pins = "gpio81", "gpio82";
- 		function = "qup21";
--- 
-2.39.2
-
+--===============0523974768575949572==--
