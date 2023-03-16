@@ -2,62 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24764C7618A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 09:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50367C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 09:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230370AbjCPJyB (ORCPT
+        id S230447AbjCPJz2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 05:54:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58408 "EHLO
+        Thu, 16 Mar 2023 05:55:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbjCPJxz (ORCPT
+        with ESMTP id S230504AbjCPJzZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 05:53:55 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0C523877
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 02:53:42 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5416d3a321eso10268507b3.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 02:53:42 -0700 (PDT)
+        Thu, 16 Mar 2023 05:55:25 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E234196B4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 02:54:54 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id v2-20020a056830090200b0069c6952f4d3so624382ott.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Mar 2023 02:54:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1678960421;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bjCe153iOuNj7g9n3mLBj55RjFaeThMhRha+2CIjg58=;
-        b=L7iARbpeymUmXnXEVJnpiIISKCTwltbBWMk3ulSbqZ/u5i0TyVIsc3laU9TZh1/3b1
-         nRidTjd8bBWgCFIKjvPJEMagfspUnA8tbwm3VRdUHSnr3WHA54FnmJeouZHR43RSDnN3
-         UN0x+72VuKPYp8IRg375AkaqqeKs2B2HGin4Mn72jWS4muzY7rNO2xmzDkuyjxk5M/qA
-         Aeu0XkMfsYkH/hbMLA4j3+Ov9WESa17YXouMYVeMaeXCYkKd9+Fh/oPT5D3JVNcMXCaq
-         7o1Q//TD/Cc51GcMe/tw/jAV+vgVfU5lIgSQFdd0IsOV3+VNoWP0RGw/0mwvd0zVIWEP
-         uoCQ==
+        d=google.com; s=20210112; t=1678960489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VyPonuJpZPidvHoqyiiruN24ythJvcvhCRR+oFRBUQo=;
+        b=WyWOmRYmWcARaQCKIPx+a6QDZPLHID9oiKEAMY+tiT94N8XaE2hCNwpz6cthuoqsIC
+         ZAktAfvp1rs4auNQ3CUVx1jJm4azn+SV6VKXrpqxM0kO/Xm/msc058zKrLNtBeuB8Sme
+         fkhw0vzc3NE3W/dene1RTv5OEQgLg0EV9JiPBCNC2pNg9Klwf2bDAdeCWeSraWx8dJ23
+         cSjTxL7kDc4N80/SrzIuSVD48LcyzpRDkGvOUNCm2/Uul7QVm3K+G4LkVBn7K7uo23ay
+         f6Rrf/77JRtZ/vH2zoQRyr4Fm9wYGEqByxWv8Ux+L80WogoaxMQ2cuwGSLsWw0lIZoYF
+         BF9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678960421;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bjCe153iOuNj7g9n3mLBj55RjFaeThMhRha+2CIjg58=;
-        b=xsPZYbntSyI/z1maQYjGmJl+21bx0NqwjcvQDqEbPsV2ZoVVeYRk3dp0oLB8OfJIG8
-         0ljVpH+lHLiYelnh90WlEB5z1umTcaAs9MqkHccjnG+YQfS2+iNTeXiY7VwwT3Q68KGe
-         RFOvN7QbR/xENyTYUWzvVEXNKKyLfmlB3oCww1uJPdvaYTB4fYqfJTWOOJ/xG74AknPV
-         i/dh0XpQDbx+5nurlNlMXi64xA577wpsLOSB158+xHZUzCbQ5qFQBsCw/jJrup1TZ8Ln
-         tnd+CI/lajRhSscHU382T34pLsnFN1j3C+e9/GcyL5+U0Mxo3db5mxUrZelGTjQ+Kusd
-         nS0w==
-X-Gm-Message-State: AO0yUKVSo7rZQs9pi5wuvvmGNX/+7Ag8NGRdDWnOOka9Cg5uKhRb7Qv1
-        RjB+0jaBqBsOUcbRENiM7jAx++wA2oqjZxyyF7OKsAbR1VGHWVazeS76/GAmAE81gEd8TzcEqqU
-        iYB3K+oL+Lik23zJvm6Nki2HdXOEpPz3nPknzbNLfSxAC6er4GaFe0AnjjaiMUmFEUloe196KtJ
-        FF225/YJsysYk=
-X-Google-Smtp-Source: AK7set8U9fdSS0J6aEPlJSn52VEtURjLi4jl0gbvhvaIIY02Wezvxl9WieMrcZN1zyljlXe/d5HiawIQq4/fbfrduw==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:17:5470:81fd:9c7f:513a])
- (user=howardchung job=sendgmr) by 2002:a81:4005:0:b0:544:6455:e023 with SMTP
- id l5-20020a814005000000b005446455e023mr1753029ywn.10.1678960421286; Thu, 16
- Mar 2023 02:53:41 -0700 (PDT)
-Date:   Thu, 16 Mar 2023 17:53:33 +0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.0.rc2.332.ga46443480c-goog
-Message-ID: <20230316175301.v2.1.I9113bb4f444afc2c5cb19d1e96569e01ddbd8939@changeid>
-Subject: [PATCH v2] Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Howard Chung <howardchung@google.com>,
+        d=1e100.net; s=20210112; t=1678960489;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VyPonuJpZPidvHoqyiiruN24ythJvcvhCRR+oFRBUQo=;
+        b=Xzy9WjyRUjEwFHJTxXfv2iS9g/imkOmD6xvRmyHF9ELYGvwDGnbBh6mLO5k7t2Qo6s
+         xflHed2CbAjQzB+Ol5u0w75z6pVvme+cgP8iYAbr5EWl43RJxiCIIqe6/t+snnqboNir
+         s7m7Cib0NHqhFNoRd3F6vLemYuzN2SqVQlw+6Md5lGOb4EDNTnFUL/mvDkCsZ3dyJgoJ
+         tAn1b3+H7mOI6lLeROGHWV9LVuu2o6ZE2FkCR+j3UtbRxX0gCGp1AvD06o1JozqdXyWG
+         YmfaDvMC7FhvbRUTEV/dai8IiBvV0SsjhQSaeahETO5pjh/MEFcKioYf5dZsmKx+ZMzM
+         x1nQ==
+X-Gm-Message-State: AO0yUKXYsE6B3EP9yo5X8D2J2vTYtHDF+r4QDhXO0tCxri1bHQvIApkT
+        cYXgasCzSr2SrFKgU50MrKNW0Aei1BgcbBpon3SMkQ==
+X-Google-Smtp-Source: AK7set8ESZuKFscSM5ferhiXnh130+wa+CzR5SXyFtwgeeEzFZ+4AkmMqxD1bMJYgiKOMVTt9xBpvcWhDnsBF8JYhpU=
+X-Received: by 2002:a9d:12e9:0:b0:698:f988:7c37 with SMTP id
+ g96-20020a9d12e9000000b00698f9887c37mr2280261otg.3.1678960488957; Thu, 16 Mar
+ 2023 02:54:48 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230316151018.v1.1.I9113bb4f444afc2c5cb19d1e96569e01ddbd8939@changeid>
+ <116b1db5-bf75-9fbf-c37b-2fe1028ddaeb@molgen.mpg.de>
+In-Reply-To: <116b1db5-bf75-9fbf-c37b-2fe1028ddaeb@molgen.mpg.de>
+From:   Yun-hao Chung <howardchung@google.com>
+Date:   Thu, 16 Mar 2023 17:54:37 +0800
+Message-ID: <CAPHZWUffEUY_OpW+zzpGWe7L5GfOgfgpOqHrJ8Ov2jhBum9ceg@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
         Archie Pusaka <apusaka@chromium.org>,
         Brian Gix <brian.gix@intel.com>,
         "David S. Miller" <davem@davemloft.net>,
@@ -68,44 +69,72 @@ Cc:     chromeos-bluetooth-upstreaming@chromium.org,
         Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The MGMT command: MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI uses variable
-length argumenent. This patch adds right the field.
+Thanks for the reply!
+A new patch has been sent.
+Please take a look when available.
 
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-Signed-off-by: Howard Chung <howardchung@google.com>
----
-Hi upstream maintainers,
-Host is not able to register advmon with rssi due to the bug.
-This patch has been locally tested by adding monitor with rssi via
-btmgmt on a kernel 6.1 machine.
-Thanks
+Thanks,
+Howard
 
-Changes in v2:
-- Fixed git user name
-- Included commit notes for the test step.
 
- net/bluetooth/mgmt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 39589f864ea7..249dc6777fb4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -9357,7 +9357,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ add_ext_adv_data,        MGMT_ADD_EXT_ADV_DATA_SIZE,
- 						HCI_MGMT_VAR_LEN },
- 	{ add_adv_patterns_monitor_rssi,
--				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE },
-+				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE,
-+						HCI_MGMT_VAR_LEN },
- 	{ set_mesh,                MGMT_SET_MESH_RECEIVER_SIZE,
- 						HCI_MGMT_VAR_LEN },
- 	{ mesh_features,           MGMT_MESH_READ_FEATURES_SIZE },
--- 
-2.40.0.rc2.332.ga46443480c-goog
-
+On Thu, Mar 16, 2023 at 5:47=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> Dear Howard,
+>
+>
+> Thank you for your patch.
+>
+> Am 16.03.23 um 08:10 schrieb Howard Chung:
+> > From: howardchung <howardchung@google.com>
+>
+> Please configure your full name:
+>
+>      git config --global user.name "Howard Chung"
+>      git commit -s --amend --author=3D"Howard Chung <howardchung@google.c=
+om>"
+>
+> > The MGMT command: MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI uses variable
+> > length argumenent. This patch adds right the field.
+>
+> argument
+>
+> Were you seeing actual problems? If so, please describe the test setup.
+>
+> > Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> > Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
+> > Signed-off-by: howardchung <howardchung@google.com>
+> > ---
+> >
+> >   net/bluetooth/mgmt.c | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 39589f864ea7..249dc6777fb4 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -9357,7 +9357,8 @@ static const struct hci_mgmt_handler mgmt_handler=
+s[] =3D {
+> >       { add_ext_adv_data,        MGMT_ADD_EXT_ADV_DATA_SIZE,
+> >                                               HCI_MGMT_VAR_LEN },
+> >       { add_adv_patterns_monitor_rssi,
+> > -                                MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZ=
+E },
+> > +                                MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZ=
+E,
+> > +                                             HCI_MGMT_VAR_LEN },
+> >       { set_mesh,                MGMT_SET_MESH_RECEIVER_SIZE,
+> >                                               HCI_MGMT_VAR_LEN },
+> >       { mesh_features,           MGMT_MESH_READ_FEATURES_SIZE },
+>
+> Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
+>
+>
+> Kind regards,
+>
+> Paul
