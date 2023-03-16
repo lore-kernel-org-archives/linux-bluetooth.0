@@ -2,129 +2,166 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35028C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 01:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFD9C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 03:48:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjCPBSl (ORCPT
+        id S229820AbjCPDsK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 21:18:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57830 "EHLO
+        Wed, 15 Mar 2023 23:48:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbjCPBSj (ORCPT
+        with ESMTP id S229682AbjCPDsH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 21:18:39 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECCDD5FA58
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 18:18:18 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id bp11so191009ilb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 18:18:18 -0700 (PDT)
+        Wed, 15 Mar 2023 23:48:07 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1529495E18
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 20:48:03 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id bk32so475711oib.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 20:48:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678929498;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=//xQ5WXhbr4hgnLJ7nPEcHxxSpL/e3fssu+toGgNxU8=;
-        b=Ak7GCIGJvCt73qTKM9Lt/60B7GQogUgTlD2k8/xb9bMyOUWZcBPCuiManndS9E7N7C
-         /j7qgA+0XCMaWoGo0z61A9kmpG+ve69HWLxUziF8e0Jf/TL2FJYGz35brE/OcN3CRMOk
-         k7xXNtQLaoJJi8NQrzvsznsb6skwJpCSCPf1OUsGlVBg1QJfxmlDXLuyfq0TwrLVNbuf
-         eZPbKeidJHCLf95hovwuJiN2LSUFyiuIhWV2H1WGwbmZXO3bkcIdoJaRabb+9g8bTu8y
-         SAAMt8PYHIH7EKT3ShvqWK++rdxAZHXIV56cNrfscInqiVxR8xnUjKMeEDalCqzW74IZ
-         85Ow==
+        d=kali.org; s=google; t=1678938482;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u56PSDBVBRdGmgzPnFNjq+MAakeLoiPcG+8JP+F1je8=;
+        b=BWjCm+uHiJ/MLb750Pwv0bMKJWHLAkIxzYRojBUYK5bE2GZeb5+5gQRrf6sPblWTdG
+         DEFcNHCm+4yNKvFoZWl3yATmgSFt4Lxw3rQBuTUTzg6sSE8OoqclLBXM7wDbSmPd+IWp
+         uSPAhkYVypDJlFsaauE7tbUjIwwoW00rd0yrX/j9v2K8V4GZFu1bL5t1jc5ld5ok5o3A
+         ldxO6i2dvU2njc07l65W/KwXGLC7/EmOowxNhYhRWzMjq4ZhCiWga5hzbqzt2OfQnPvT
+         ND0kBeyMjWguIcPcQmfq/A199Y39XUwSEW48zVl7mXu42Y7EQyQPbXKMDL5T8zokO9TH
+         h89g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678929498;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1678938482;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=//xQ5WXhbr4hgnLJ7nPEcHxxSpL/e3fssu+toGgNxU8=;
-        b=QRA9HYN5hsER5KwJeXpt0ZwxA1At3PdrwE4E/xgAoE8jHG60KdADGAkN3V4q6HtCVp
-         kOW9u64paTSbj6j08c71n/04REURSPOq5Q40vhKyVhkWoqDE6Lykd+XWCzpvgsdjzxry
-         XUF12Dd614SSBmh2dpw8kjKfz1NfdgTdkxdAy0UcajYmNrjYCHwULotzVC27zjCfY04g
-         BBsbx+OHyzVq/kykOy35C7Ggqs2iNJAiOxu49y0W5WXH/QODufb4eFpcRWbJB2lpbCHL
-         r4zckxDslFl5CMtMQce5qaB8GIx+X6g4+HlQHc8R6FVSOKk1A0luN2zzskgfNUGQUIYA
-         /Wvg==
-X-Gm-Message-State: AO0yUKW6UrXSLUAGqhW2YZZylW4oYgN10FdXVKN1yLzbJ3Yi7gOE6trT
-        s8ifdi0WwgSsBmw9Mll8UYfjyB/U/hGl4g==
-X-Google-Smtp-Source: AK7set9yEwysboUZ4n89DbU0gRC70dbHGl18AwO0bB2xX7eFTEqS3bSws6/kwVa10Ea9Rd/I8MNaaw==
-X-Received: by 2002:a92:c943:0:b0:317:994e:5988 with SMTP id i3-20020a92c943000000b00317994e5988mr5592523ilq.11.1678929497955;
-        Wed, 15 Mar 2023 18:18:17 -0700 (PDT)
-Received: from [172.17.0.2] ([40.83.43.48])
-        by smtp.gmail.com with ESMTPSA id y34-20020a029525000000b003b331f0bbdfsm296770jah.97.2023.03.15.18.18.17
+        bh=u56PSDBVBRdGmgzPnFNjq+MAakeLoiPcG+8JP+F1je8=;
+        b=QmntDAX2C5DzP5Nuif52CDFvvqsNJ9cx6/A8SeggTaNQnOFOJDvilPPs5cB5g2v3Hy
+         Mjt3Vsa+RKCjQFz+2DUp5xa3QDMYuqcZf9/KZUU7GZa9ig4NE6FlYcMmBK4IjwdFO2Ej
+         DtFiHNndDnT49gji3RowlTJlSc4HNBqbL9gRJ8fTjOauTmHuFQJz0ZdKDQk5W3std58W
+         wiwgFEKAGTlAxspDldYkJnePXW0kGPhw8mX+k/BH6s4Ih6u0aSnWe5VBrg1dZ73iC0h9
+         HKpGQpSyF2b09WpB+cjArXPd3IuTuS6YWR4T/1GSecW5ziBL2i7XO0O+2fX+WWvAQs6v
+         1E3g==
+X-Gm-Message-State: AO0yUKUU60F4R+bGU76HD44RqYi6QXTgLronZ/7niK8PY6/YAz2NIRVx
+        fp8S0hs/1XOmmCiHwNSJvWFqnA==
+X-Google-Smtp-Source: AK7set9INRbDX7OaeK+UUirQaFsWXxgs663ufS10ohEGq4s3votRB0Ode0K2oek+wsduN+W25TpMEQ==
+X-Received: by 2002:a05:6808:2c3:b0:384:232:2a4f with SMTP id a3-20020a05680802c300b0038402322a4fmr2317395oid.4.1678938482324;
+        Wed, 15 Mar 2023 20:48:02 -0700 (PDT)
+Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
+        by smtp.gmail.com with ESMTPSA id j6-20020a056870020600b001762d1bf6a9sm3003826oad.45.2023.03.15.20.48.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 18:18:17 -0700 (PDT)
-Message-ID: <64126e59.020a0220.da5de.0d54@mx.google.com>
-Date:   Wed, 15 Mar 2023 18:18:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1707891006620049230=="
+        Wed, 15 Mar 2023 20:48:01 -0700 (PDT)
+From:   Steev Klimaszewski <steev@kali.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>,
+        Tim Jiang <quic_tjiang@quicinc.com>,
+        Johan Hovold <johan@kernel.org>
+Subject: [PATCH v6 0/4] Add WCN6855 Bluetooth support
+Date:   Wed, 15 Mar 2023 22:47:54 -0500
+Message-Id: <20230316034759.73489-1-steev@kali.org>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2,1/2] Bluetooth: btintel: Add support to reset bluetooth via ACPI DSM
-In-Reply-To: <20230316002559.32562-1-kiran.k@intel.com>
-References: <20230316002559.32562-1-kiran.k@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1707891006620049230==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+First things first, I do not have access to the specs nor the schematics, so a
+lot of this was done via guess work, looking at the acpi tables, and looking at
+how a similar device (wcn6750) was added.
 
-This is automated email and please do not reply to this email!
+The 6th revision addresses comments from Johan to the driver itself, which
+include adding poweroff support so we no longer splat when we modprobe -r or
+power off the device.
 
-Dear submitter,
+The 5th revision can be found at
+https://lore.kernel.org/all/20230209020916.6475-1-steev@kali.org/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=730552
+The end result is that we do have a working device, but not entirely reliable.
 
----Test result---
+There are a few things that I am not sure why they happen, and don't have the
+knowledge level to figure out why they happen or debugging it.
 
-Test Summary:
-CheckPatch                    PASS      1.70 seconds
-GitLint                       FAIL      0.87 seconds
-SubjectPrefix                 FAIL      0.68 seconds
-BuildKernel                   PASS      32.89 seconds
-CheckAllWarning               PASS      35.15 seconds
-CheckSparse                   PASS      40.32 seconds
-CheckSmatch                   PASS      108.87 seconds
-BuildKernel32                 PASS      31.38 seconds
-TestRunnerSetup               PASS      451.42 seconds
-TestRunner_l2cap-tester       PASS      17.34 seconds
-TestRunner_iso-tester         PASS      17.89 seconds
-TestRunner_bnep-tester        PASS      5.66 seconds
-TestRunner_mgmt-tester        PASS      113.92 seconds
-TestRunner_rfcomm-tester      PASS      9.12 seconds
-TestRunner_sco-tester         PASS      8.46 seconds
-TestRunner_ioctl-tester       PASS      9.87 seconds
-TestRunner_mesh-tester        PASS      7.34 seconds
-TestRunner_smp-tester         PASS      8.30 seconds
-TestRunner_userchan-tester    PASS      6.07 seconds
-IncrementalBuild              PASS      35.80 seconds
+Bluetooth: hci0: setting up wcn6855
+Bluetooth: hci0: Frame reassembly failed (-84)
+Bluetooth: hci0: QCA Product ID   :0x00000013
+Bluetooth: hci0: QCA SOC Version  :0x400c0210
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x000038e6
+Bluetooth: hci0: QCA controller version 0x02100201
+Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+Bluetooth: hci0: QCA Downloading qca/hpnv21.bin
+Bluetooth: hci0: QCA setup on UART is completed
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,1/2] Bluetooth: btintel: Add support to reset bluetooth via ACPI DSM
+I do not know why the Frame assembly failed, and modprobe -r hci_uart and then
+modprobe hci_uart does not show the same Frame assembly failed.
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-25: B1 Line exceeds max length (94>80): "https://patchwork.kernel.org/project/bluetooth/patch/20230313151549.15791-1-kiran.k@intel.com/"
-[v2,2/2] ACPI: utils: acpi_evaluate_dsm_typed - fix redefinition error
+The BD Address also seems to be incorrect, and I'm not sure what is going on
+there either.
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-7: B1 Line exceeds max length (81>80): "../include/acpi/acpi_bus.h:57:1: error: redefinition of 'acpi_evaluate_dsm_typed'"
-25: B1 Line exceeds max length (94>80): "https://patchwork.kernel.org/project/bluetooth/patch/20230313151549.15791-1-kiran.k@intel.com/"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
+Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+well as connecting to and using an H2GO bluetooth speaker and playing audio out
+via canberra-gtk-play as well as a couple of YouTube videos in a browser.
 
+The mouse only seems to work when < 2 ft. from the laptop, and for the speaker, only
+"A2DP Sink, codec SBC" would provide audio output, and while I could see that
+data was being sent to the speaker, it wasn't always outputting, and going >
+4ft. away, would often disconnect.
 
----
-Regards,
-Linux Bluetooth
+steev@wintermute:~$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+        UP RUNNING PSCAN
+        RX bytes:1492 acl:0 sco:0 events:126 errors:0
+        TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'wintermute'
+        Class: 0x0c010c
+        Service Classes: Rendering, Capturing
+        Device Class: Computer, Laptop
+        HCI Version:  (0xc)  Revision: 0x0
+        LMP Version:  (0xc)  Subversion: 0x46f7
+        Manufacturer: Qualcomm (29)
 
+steev@wintermute:~$ dmesg | grep Razer
+[ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+[ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+steev@wintermute:~$ dmesg | grep H2GO
+[ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
 
---===============1707891006620049230==--
+Bjorn Andersson (1):
+  arm64: dts: qcom: sc8280xp: Define uart2
+
+Steev Klimaszewski (3):
+  dt-bindings: net: Add WCN6855 Bluetooth
+  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+  arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     | 17 ++++
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 80 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+ drivers/bluetooth/btqca.c                     | 14 +++-
+ drivers/bluetooth/btqca.h                     | 10 +++
+ drivers/bluetooth/hci_qca.c                   | 57 +++++++++----
+ 6 files changed, 177 insertions(+), 15 deletions(-)
+
+-- 
+2.39.2
+
