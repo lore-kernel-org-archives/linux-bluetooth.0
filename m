@@ -2,92 +2,138 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4587C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 04:16:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A1BC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 05:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbjCPEQn (ORCPT
+        id S229480AbjCPFW0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 00:16:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44454 "EHLO
+        Thu, 16 Mar 2023 01:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjCPEQl (ORCPT
+        with ESMTP id S229644AbjCPFWZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 00:16:41 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54388448C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 21:16:36 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id s12so504866qtq.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 21:16:36 -0700 (PDT)
+        Thu, 16 Mar 2023 01:22:25 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 952EEA9082
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 22:22:14 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id s22so842095lfi.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 22:22:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1678940195;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6JN88kkdSkdozEcTNjhU9vgdl/91eFsqXte21+lZB1M=;
-        b=pr/dsgERxJbEJTmvXsmWkQn2xjyf5iiNsBEduJjIZKdv06VozTad0HMCBGx4MRQBH5
-         dfAcsdTC+7XJAJOKQyhX9Fi3u4imYnm9PqPjBsNS2asMOGIQO2zDw9c1Iyvx11Ls5oar
-         oM4QzGgtIOrycCH2oiphYU9e16mAFTdWRVbwiA6lUp1LPDiCHg57sGTlAEjZI4tVhotF
-         BrMrxg3xCIBskdgIeQZNZX+vGPTiwOI/LaBcREoBCQ+FZzxNjJXIkXJVjHENzh+cV81l
-         sy/LSYmpXlmpqTyQEs13K7/ZOs8LoDzLRIzn+Ogtv1e2y0dLPblLebmuKjY3Ug9jiQwx
-         Rblg==
+        d=gmail.com; s=20210112; t=1678944132;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+NeO8IdNmPVErzQdQOF62aNodvdOmC4sm0sEBiq6epU=;
+        b=JAFDcCaiSv146AdL3zy/hCxJwpjCvnCtAX6KYaGrRk5DVbHy02ws0E/MJRY7kVvVJt
+         zLbgo3gkdwexq2Aj5MLzogDHiRE2mlFhAL+bopCY09zTZ69/MbGiT64tEmuA/igZ6s2/
+         JqOyez63JPKAlAxsXxa92SwMGlCCM1Pkvz6TPUQWmNsujroKWDKI+u9g8BkI50DQMypr
+         1YLGOcvdCQoC11CeP5knk83p4UvcNQ+u6F8iWqFk+WPx9EWsxXY/qZzcEIEILMzgocyZ
+         tjWraPR7Sv0fwU+KEDHwhdrDI2bjgDr3udt6FTnpJk2/9XmPL3TBZkFyTRsQJQSd7gj3
+         uZIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1678940195;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6JN88kkdSkdozEcTNjhU9vgdl/91eFsqXte21+lZB1M=;
-        b=kvUtUWC/3P7O4PZGn77u9W/DRn8sJ32YjCO88UhbUCqiMzMXBC+ZjhUDdVIRzfFNAe
-         rMvPh7TKd+YujR7k4+rnlq2t5rPE/k+wRhH4IIelynNwb7a6awM4IWW1/IT/9uIBJovp
-         1P6JZV4zFe6Z4sozwu7IP6LX3BPFQ7v3H6GVWvKr0jT1/TSSy3Y3GpnKZGnpg0Eq/hGn
-         eS0hf+NuZeh4PZlyv/gicBY9Ik9Obf+c+m0MrmaG0R00yxVmw8PT1OSEtv5QROziKqNu
-         kYmJcOnsjsMoURmJDfugBENOL3qmzaQZjKjoiTdwz7xNTe4hvuwiMPapO+IoE7kHY1+1
-         gdrw==
-X-Gm-Message-State: AO0yUKXRYKNVtQT3SLZZVqQ+8AqfKG4uFJzWvJuaQnfojsrTiYL415Kw
-        3Cm4tmHHYN5uPu1AHkAviDwcuf+DQFo=
-X-Google-Smtp-Source: AK7set848gLhpYJeRIPtwt+p/HGvMBxwU58KitYPBEIwV234dL+laQTm8kw3oqfJoYV0iXOVTpNx2Q==
-X-Received: by 2002:a05:622a:54:b0:3bf:a335:6a82 with SMTP id y20-20020a05622a005400b003bfa3356a82mr3472446qtw.28.1678940195041;
-        Wed, 15 Mar 2023 21:16:35 -0700 (PDT)
-Received: from [172.17.0.2] ([40.75.74.33])
-        by smtp.gmail.com with ESMTPSA id x4-20020ac84a04000000b003b82489d8acsm4987473qtq.21.2023.03.15.21.16.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Mar 2023 21:16:34 -0700 (PDT)
-Message-ID: <64129822.c80a0220.edc3.51fb@mx.google.com>
-Date:   Wed, 15 Mar 2023 21:16:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7048024028787565634=="
+        d=1e100.net; s=20210112; t=1678944132;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+NeO8IdNmPVErzQdQOF62aNodvdOmC4sm0sEBiq6epU=;
+        b=LMRuUzBR6iq+K3S9SjVNa4cMymf81QXPm9uthNPRoYnyO8XuWoC9AIv+wDv2m7bEPI
+         JCrYiPswhYqiJTiH6isiY2L8TyrZ8csRo3VMlkcFCR0bEilM9cmHUuHIRHDl+vPNl25p
+         UaDdrgM04m6FThlNxy8iQsIpLeNc/N8TIHiTEvijHe2A1lqXX2EgifOPGt7TXLq5vY63
+         O1OMeBwu9SauJXkJMSDo6A0STyYUY5vN+laErsHNhmy6l4bC1Q03Dfl3BqEnH8FZ+GpZ
+         C4HDIBKBHQnVnWTh+s9KGGB/6r8/5T2wjUWw/8TKphyf+R29w1Gf/AMUZ/GFV7+VVMZI
+         WLeQ==
+X-Gm-Message-State: AO0yUKWc2L+sQqMBwUYeAfMXSxtdIeVi37uqMJAJV6Q3AM61LS5jrPhM
+        YK0LJ2q2xw8QNqBSeHrt4KgAFZl5aZ3dO/C5pWTwUiER
+X-Google-Smtp-Source: AK7set8oJ/TalXJUZJCpWSVV4EO4S1BF7YRc6mz+rhHR67X2U5i/X2gpFBLErx5dBtXbedf+8AeIAe46hZHUX94RerY=
+X-Received: by 2002:ac2:5446:0:b0:4d5:ca43:7047 with SMTP id
+ d6-20020ac25446000000b004d5ca437047mr2738829lfn.10.1678944131867; Wed, 15 Mar
+ 2023 22:22:11 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, steev@kali.org
-Subject: RE: Add WCN6855 Bluetooth support
-In-Reply-To: <20230316034759.73489-2-steev@kali.org>
-References: <20230316034759.73489-2-steev@kali.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230316002559.32562-1-kiran.k@intel.com> <20230316002559.32562-2-kiran.k@intel.com>
+In-Reply-To: <20230316002559.32562-2-kiran.k@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 15 Mar 2023 22:22:00 -0700
+Message-ID: <CABBYNZKbPqR8W8M8gjSdC2C=QL+A8Xs5w9jOzw=Z3O3R6r4jng@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] ACPI: utils: acpi_evaluate_dsm_typed - fix
+ redefinition error
+To:     Kiran K <kiran.k@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7048024028787565634==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Kiran,
 
-This is an automated email and please do not reply to this email.
+On Wed, Mar 15, 2023 at 5:32=E2=80=AFPM Kiran K <kiran.k@intel.com> wrote:
+>
+> acpi_evaluate_dsm_typed function needs to be gaurded with CONFIG_ACPI to
+> avoid redefintion error when stub is also enabled.
+>
+> In file included from ../drivers/bluetooth/btintel.c:13:
+> ../include/acpi/acpi_bus.h:57:1: error: redefinition of 'acpi_evaluate_ds=
+m_typed'
+>    57 | acpi_evaluate_dsm_typed(acpi_handle handle, const guid_t *guid,..
+>       | ^~~~~~~~~~~~~~~~~~~~~~~
+> In file included from ../drivers/bluetooth/btintel.c:12:
+> ../include/linux/acpi.h:967:34: note: previous definition of
+> 'acpi_evaluate_dsm_typed' with type 'union acpi_object *(void *,
+> const guid_t *, u64,  u64,  union acpi_object *, acpi_object_type)'
+> {aka 'union acpi_object *(void *, const guid_t *, long long unsigned int,
+> long long unsigned int,  union acpi_object *, unsigned int)'}
+>   967 | static inline union acpi_object
+> *acpi_evaluate_dsm_typed(acpi_handle handle,
+>
+> Fixes: 1b94ad7ccc21 ("ACPI: utils: Add acpi_evaluate_dsm_typed() and acpi=
+_check_dsm() stubs")
 
-Dear Submitter,
+This should probably be sent to the ACPI list/maintainer, but first
+make sure there isn't already a fix which would mean we have to update
+bluetooth-next to stop this kind of error.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>
+> changes:
+> Fix compilation error when compiled for ARCH=3Darc
+> Details here:
+> https://patchwork.kernel.org/project/bluetooth/patch/20230313151549.15791=
+-1-kiran.k@intel.com/
+>
+>
+>  include/acpi/acpi_bus.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/acpi/acpi_bus.h b/include/acpi/acpi_bus.h
+> index e44be31115a6..fc131b4aee4e 100644
+> --- a/include/acpi/acpi_bus.h
+> +++ b/include/acpi/acpi_bus.h
+> @@ -52,7 +52,7 @@ bool acpi_dock_match(acpi_handle handle);
+>  bool acpi_check_dsm(acpi_handle handle, const guid_t *guid, u64 rev, u64=
+ funcs);
+>  union acpi_object *acpi_evaluate_dsm(acpi_handle handle, const guid_t *g=
+uid,
+>                         u64 rev, u64 func, union acpi_object *argv4);
+> -
+> +#ifdef CONFIG_ACPI
+>  static inline union acpi_object *
+>  acpi_evaluate_dsm_typed(acpi_handle handle, const guid_t *guid, u64 rev,
+>                         u64 func, union acpi_object *argv4,
+> @@ -68,6 +68,7 @@ acpi_evaluate_dsm_typed(acpi_handle handle, const guid_=
+t *guid, u64 rev,
+>
+>         return obj;
+>  }
+> +#endif
+>
+>  #define        ACPI_INIT_DSM_ARGV4(cnt, eles)                  \
+>         {                                               \
+> --
+> 2.17.1
+>
 
------ Output -----
 
-error: patch failed: arch/arm64/boot/dts/qcom/sc8280xp.dtsi:1209
-error: arch/arm64/boot/dts/qcom/sc8280xp.dtsi: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7048024028787565634==--
+--=20
+Luiz Augusto von Dentz
