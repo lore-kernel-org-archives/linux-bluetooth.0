@@ -2,101 +2,91 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 935B0C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 09:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7A1C6FD19
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 09:50:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbjCPJr1 (ORCPT
+        id S230030AbjCPJuQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Mar 2023 05:47:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47944 "EHLO
+        Thu, 16 Mar 2023 05:50:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbjCPJr1 (ORCPT
+        with ESMTP id S229800AbjCPJuM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Mar 2023 05:47:27 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7703B19C41;
-        Thu, 16 Mar 2023 02:47:25 -0700 (PDT)
-Received: from [192.168.0.2] (ip5f5aede0.dynamic.kabel-deutschland.de [95.90.237.224])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        Thu, 16 Mar 2023 05:50:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580E14B834;
+        Thu, 16 Mar 2023 02:50:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 475B961CC457B;
-        Thu, 16 Mar 2023 10:47:22 +0100 (CET)
-Message-ID: <116b1db5-bf75-9fbf-c37b-2fe1028ddaeb@molgen.mpg.de>
-Date:   Thu, 16 Mar 2023 10:47:21 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Subject: Re: [PATCH v1] Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
-Content-Language: en-US
-To:     Howard Chung <howardchung@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Archie Pusaka <apusaka@chromium.org>,
-        Brian Gix <brian.gix@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EA1E361FB3;
+        Thu, 16 Mar 2023 09:50:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36FA0C433EF;
+        Thu, 16 Mar 2023 09:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1678960210;
+        bh=m5l503BDISnSlGXob2+iTWGt3YzL3096qBVoJwwdfjI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=r7FhgHEBmsMDP0TdNomSVKGzaeuzOjXZZ/glqFDQ0ijDERI9m/9eivHnEpSCPOaUN
+         W5MpcpWHrlo18deKhSHH45jruRmfd/P+ZhtSiBMaL3LQOrAEEfV1Cqi9EQpQyn7VZb
+         xuNFOYpfxau/QQLbTKwRN5moxu+Y4n6JVbi/1JSZTO6wRMmAQdM4+XiJq0YVKlaBZl
+         b+GyzG57mGXR5/E58YJZryUs+6K3Pt1ysSiST9ar2CQMMu5R2wzxdgSOPYQtBy4mux
+         v2S0yfY5LZd2sax1RxvtmJAt6nR5b2Y5NYAQPh8XsG84qxBK9pO5WlHTxezx0xeX8/
+         e47hzSj7D7ovQ==
+Received: from johan by xi.lan with local (Exim 4.94.2)
+        (envelope-from <johan@kernel.org>)
+        id 1pckGU-0000N7-Tq; Thu, 16 Mar 2023 10:51:18 +0100
+Date:   Thu, 16 Mar 2023 10:51:18 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20230316151018.v1.1.I9113bb4f444afc2c5cb19d1e96569e01ddbd8939@changeid>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230316151018.v1.1.I9113bb4f444afc2c5cb19d1e96569e01ddbd8939@changeid>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>,
+        Tim Jiang <quic_tjiang@quicinc.com>
+Subject: Re: [PATCH v6 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
+ chip wcn6855
+Message-ID: <ZBLmlgpTPd2ZzMo+@hovoldconsulting.com>
+References: <20230316034759.73489-1-steev@kali.org>
+ <20230316034759.73489-3-steev@kali.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230316034759.73489-3-steev@kali.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Howard,
-
-
-Thank you for your patch.
-
-Am 16.03.23 um 08:10 schrieb Howard Chung:
-> From: howardchung <howardchung@google.com>
-
-Please configure your full name:
-
-     git config --global user.name "Howard Chung"
-     git commit -s --amend --author="Howard Chung <howardchung@google.com>"
-
-> The MGMT command: MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI uses variable
-> length argumenent. This patch adds right the field.
-
-argument
-
-Were you seeing actual problems? If so, please describe the test setup.
-
-> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-> Fixes: b338d91703fa ("Bluetooth: Implement support for Mesh")
-> Signed-off-by: howardchung <howardchung@google.com>
+On Wed, Mar 15, 2023 at 10:47:56PM -0500, Steev Klimaszewski wrote:
+> Added regulators,GPIOs and changes required to power on/off wcn6855.
+> Added support for firmware download for wcn6855.
+> 
+> Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+> Tested-by: Bjorn Andersson <andersson@kernel.org>
 > ---
-> 
->   net/bluetooth/mgmt.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 39589f864ea7..249dc6777fb4 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -9357,7 +9357,8 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
->   	{ add_ext_adv_data,        MGMT_ADD_EXT_ADV_DATA_SIZE,
->   						HCI_MGMT_VAR_LEN },
->   	{ add_adv_patterns_monitor_rssi,
-> -				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE },
-> +				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE,
-> +						HCI_MGMT_VAR_LEN },
->   	{ set_mesh,                MGMT_SET_MESH_RECEIVER_SIZE,
->   						HCI_MGMT_VAR_LEN },
->   	{ mesh_features,           MGMT_MESH_READ_FEATURES_SIZE },
+> Changes since v5:
+>  * Revert Set qcadev->initspeed since 6855 doesn't use it, don't touch.
+>  * Convert get_fw_build_info to a switch statement
+>  * Add poweroff handling
+>  * Fix up line alignments
+>  * Drop from microsoft extensions check since I don't actually know if we need
 
-Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Thanks for the update.
 
+Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+Tested-by: Johan Hovold <johan+linaro@kernel.org>
 
-Kind regards,
-
-Paul
+Johan
