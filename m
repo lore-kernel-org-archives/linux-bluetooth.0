@@ -2,108 +2,207 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CA1C7618D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 00:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97FFEC61DA4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Mar 2023 01:16:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbjCPAPe (ORCPT
+        id S229617AbjCPBQg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Mar 2023 20:15:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41292 "EHLO
+        Wed, 15 Mar 2023 21:16:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232056AbjCPAPc (ORCPT
+        with ESMTP id S229436AbjCPBQf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Mar 2023 20:15:32 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 881DD76164
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 17:15:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1678925727; x=1710461727;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=mB/7JQG5ZEOogGz7UF6AXmvX0g47eY48njIDQRTB9xE=;
-  b=B/BG8E0gV/s7hGC/gtmpnLHYCuR6DPeVQcMLtHQZt8UZZ4J6ZSxuPgTg
-   Jfc45x714RXxlWVSebkMssNFRbdUeSf8xY1FNoli7Fy8aA+8r9jdhsOfY
-   bC3NJooXgXE9e+XpE2wWv2v6vgBk3s3IXogeFcabf/NuDUZonT+YQhQ9l
-   yhOn0AHWszhnCw0JUle9K9QhfaKszEn6vwvDx/sxgBlfG2ZYT6gdEpL+W
-   DE2xFlF6H7YaSDbUfR7aMWVssgNyWkSyhdiJouS/KSLoy5uUmgBzoL5HC
-   fKujaewtMJPDgrlaYz1a05JnR4bmBdnKd/l1Ub1ESP0Yxesl/C6u6t7M/
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="318245181"
-X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="318245181"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2023 17:15:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10650"; a="672928229"
-X-IronPort-AV: E=Sophos;i="5.98,262,1673942400"; 
-   d="scan'208";a="672928229"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga007.jf.intel.com with ESMTP; 15 Mar 2023 17:15:25 -0700
-From:   Kiran K <kiran.k@intel.com>
+        Wed, 15 Mar 2023 21:16:35 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6FF337F11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 18:16:31 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id o11so147486ple.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Mar 2023 18:16:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1678929391;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=94yMlbDzjaMILVDL5DimGkuhCNlfrbJ5xFedRs1rvno=;
+        b=mnixd8rSXI/g02gzXyySMm6FrKypmeExczKlSMaX7UDPDfjuCLQo0ayrpGuwP/5qUR
+         bVTqgVlxxaHOpxHKbW2ksO5kuLeNne7bjhhHrLmWm0iGgv5CufFjqI2QUO1+0VsUSIvu
+         BeKgq764JE2Hp4AvnJcyeVfJBvyMG0YmtsDDs8BXYZdKlT9amghw/mQdvdECiPTPm/AY
+         QOovnFX9c0vmF3Z6lyfowgK5pmE/pm1A3JhYBhQYM1NrpSbtWqaBfB09txCHoTZ6cMcm
+         u3bwK2Ru8McA0wxB/KluzkHu41cnJbGit7idNJRvuNNywDRDIJOUlVkVEb8Ww1JzJ11h
+         i+XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1678929391;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=94yMlbDzjaMILVDL5DimGkuhCNlfrbJ5xFedRs1rvno=;
+        b=MvnXVDDt86ALbgNXA7lVJO4du1G7zu5Bg5jXRtFx4wbXxkjugaLKshLi9buKVwfIpX
+         uO22cvKRsvvxOgaN5hmNfoKAD2fMPudVLkr1n0rcOKqRxvLnXMuLqGD6/qPBsxlDE7Ua
+         VujzGL0pL+a5hZMqp++PMoYDx3Ne/IolcBe1GZ0no1va4h0kOZ0f8TnTz2ds5QQytqeR
+         ZMjgI02IE886hLkOykhpj46ylFF0Ei73/0N2wcNll6nb7hQWggQTeCq6ml2F3rMTBUEI
+         8yTSGAPu1Q3HNFwylYwRWBySnXFd2gBvMaEn6DCjDoa4ph+4qPIRGrIWesq2ZgWsLQ7n
+         g5NQ==
+X-Gm-Message-State: AO0yUKXwYdaW/Du8fboXJNrhaYfF0NEr5RBMU9IyqN4pi+GyAKa2qeuK
+        aRQZmgvM3Smsa7Rt1U2CVSsyB2l2n5o=
+X-Google-Smtp-Source: AK7set9lJSRr9HvOPnpshCf7zL+/FaoZVyK7R40kqT0vZSC5n4yP1xkEvD1XhKho5CbOnpXyjXxPaw==
+X-Received: by 2002:a05:6a20:b054:b0:cc:63c6:8d3a with SMTP id dx20-20020a056a20b05400b000cc63c68d3amr1491315pzb.41.1678929390552;
+        Wed, 15 Mar 2023 18:16:30 -0700 (PDT)
+Received: from zbook.. (97-113-12-200.tukw.qwest.net. [97.113.12.200])
+        by smtp.gmail.com with ESMTPSA id g3-20020a631103000000b00502ecb91940sm3914328pgl.55.2023.03.15.18.16.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Mar 2023 18:16:30 -0700 (PDT)
+From:   Brian Gix <brian.gix@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 2/2] ACPI: utils: acpi_evaluate_dsm_typed - fix redefinition error
-Date:   Thu, 16 Mar 2023 05:55:59 +0530
-Message-Id: <20230316002559.32562-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230316002559.32562-1-kiran.k@intel.com>
-References: <20230316002559.32562-1-kiran.k@intel.com>
+Cc:     brian.gix@intel.com, brian.gix@gmail.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ v2 1/3] mesh: Filter originated Provisioning Data packets
+Date:   Wed, 15 Mar 2023 18:16:25 -0700
+Message-Id: <20230316011627.27322-1-brian.gix@gmail.com>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-acpi_evaluate_dsm_typed function needs to be gaurded with CONFIG_ACPI to
-avoid redefintion error when stub is also enabled.
-
-In file included from ../drivers/bluetooth/btintel.c:13:
-../include/acpi/acpi_bus.h:57:1: error: redefinition of 'acpi_evaluate_dsm_typed'
-   57 | acpi_evaluate_dsm_typed(acpi_handle handle, const guid_t *guid,..
-      | ^~~~~~~~~~~~~~~~~~~~~~~
-In file included from ../drivers/bluetooth/btintel.c:12:
-../include/linux/acpi.h:967:34: note: previous definition of
-'acpi_evaluate_dsm_typed' with type 'union acpi_object *(void *,
-const guid_t *, u64,  u64,  union acpi_object *, acpi_object_type)'
-{aka 'union acpi_object *(void *, const guid_t *, long long unsigned int,
-long long unsigned int,  union acpi_object *, unsigned int)'}
-  967 | static inline union acpi_object
-*acpi_evaluate_dsm_typed(acpi_handle handle,
-
-Fixes: 1b94ad7ccc21 ("ACPI: utils: Add acpi_evaluate_dsm_typed() and acpi_check_dsm() stubs")
-Signed-off-by: Kiran K <kiran.k@intel.com>
+The mesh daemon can process incoming mesh packets on more than one
+controller, but if a Provisioning data packet that originated from the
+local daemon is received by a different controller, it must be filtered
+and disregarded, or it will break the provisioning protocol.
 ---
+ mesh/mesh-io-mgmt.c | 58 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 47 insertions(+), 11 deletions(-)
 
-changes:
-Fix compilation error when compiled for ARCH=arc
-Details here:
-https://patchwork.kernel.org/project/bluetooth/patch/20230313151549.15791-1-kiran.k@intel.com/
-
-
- include/acpi/acpi_bus.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/include/acpi/acpi_bus.h b/include/acpi/acpi_bus.h
-index e44be31115a6..fc131b4aee4e 100644
---- a/include/acpi/acpi_bus.h
-+++ b/include/acpi/acpi_bus.h
-@@ -52,7 +52,7 @@ bool acpi_dock_match(acpi_handle handle);
- bool acpi_check_dsm(acpi_handle handle, const guid_t *guid, u64 rev, u64 funcs);
- union acpi_object *acpi_evaluate_dsm(acpi_handle handle, const guid_t *guid,
- 			u64 rev, u64 func, union acpi_object *argv4);
--
-+#ifdef CONFIG_ACPI
- static inline union acpi_object *
- acpi_evaluate_dsm_typed(acpi_handle handle, const guid_t *guid, u64 rev,
- 			u64 func, union acpi_object *argv4,
-@@ -68,6 +68,7 @@ acpi_evaluate_dsm_typed(acpi_handle handle, const guid_t *guid, u64 rev,
+diff --git a/mesh/mesh-io-mgmt.c b/mesh/mesh-io-mgmt.c
+index 9ae1af05a..65994f058 100644
+--- a/mesh/mesh-io-mgmt.c
++++ b/mesh/mesh-io-mgmt.c
+@@ -82,6 +82,8 @@ struct dup_filter {
+ 	uint8_t addr[6];
+ } __packed;
  
- 	return obj;
++static const uint8_t zero_addr[] = {0, 0, 0, 0, 0, 0};
++
+ static struct mesh_io_private *pvt;
+ 
+ static uint32_t get_instant(void)
+@@ -110,6 +112,14 @@ static bool find_by_addr(const void *a, const void *b)
+ 	return !memcmp(filter->addr, b, 6);
  }
-+#endif
  
- #define	ACPI_INIT_DSM_ARGV4(cnt, eles)			\
- 	{						\
++static bool find_by_adv(const void *a, const void *b)
++{
++	const struct dup_filter *filter = a;
++	uint64_t data = l_get_be64(b);
++
++	return !memcmp(filter->addr, zero_addr, 6) && filter->data == data;
++}
++
+ static void filter_timeout(struct l_timeout *timeout, void *user_data)
+ {
+ 	struct dup_filter *filter;
+@@ -146,7 +156,22 @@ static bool filter_dups(const uint8_t *addr, const uint8_t *adv,
+ 	uint32_t instant_delta;
+ 	uint64_t data = l_get_be64(adv);
+ 
+-	filter = l_queue_remove_if(pvt->dup_filters, find_by_addr, addr);
++	if (!addr)
++		addr = zero_addr;
++
++	if (adv[1] == MESH_AD_TYPE_PROVISION) {
++		filter = l_queue_find(pvt->dup_filters, find_by_adv, adv);
++
++		if (!filter && addr != zero_addr)
++			return false;
++
++		l_queue_remove(pvt->dup_filters, filter);
++
++	} else {
++		filter = l_queue_remove_if(pvt->dup_filters, find_by_addr,
++									addr);
++	}
++
+ 	if (!filter) {
+ 		filter = l_new(struct dup_filter, 1);
+ 		memcpy(filter->addr, addr, 6);
+@@ -177,7 +202,7 @@ static void process_rx_callbacks(void *v_reg, void *v_rx)
+ 		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
+ }
+ 
+-static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
++static void process_rx(uint16_t index, struct mesh_io_private *pvt, int8_t rssi,
+ 					uint32_t instant, const uint8_t *addr,
+ 					const uint8_t *data, uint8_t len)
+ {
+@@ -191,6 +216,10 @@ static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
+ 		.info.rssi = rssi,
+ 	};
+ 
++	/* Accept all traffic except beacons from any controller */
++	if (index != pvt->send_idx && data[0] == MESH_AD_TYPE_BEACON)
++		return;
++
+ 	print_packet("RX", data, len);
+ 	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
+ }
+@@ -205,7 +234,7 @@ static void event_device_found(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+ 	const struct mgmt_ev_mesh_device_found *ev = param;
+-	struct mesh_io *io = user_data;
++	struct mesh_io_private *pvt = user_data;
+ 	const uint8_t *adv;
+ 	const uint8_t *addr;
+ 	uint32_t instant;
+@@ -236,9 +265,10 @@ static void event_device_found(uint16_t index, uint16_t length,
+ 		if (len > adv_len)
+ 			break;
+ 
+-		if (adv[1] >= 0x29 && adv[1] <= 0x2B)
+-			process_rx(io->pvt, ev->rssi, instant, addr, adv + 1,
+-								adv[0]);
++		if (adv[1] >= MESH_AD_TYPE_PROVISION &&
++					adv[1] <= MESH_AD_TYPE_BEACON)
++			process_rx(index, pvt, ev->rssi, instant, addr,
++							adv + 1, adv[0]);
+ 
+ 		adv += field_len + 1;
+ 	}
+@@ -320,6 +350,12 @@ static void ctl_up(uint8_t status, uint16_t length,
+ 	mesh->num_ad_types = sizeof(mesh_ad_types);
+ 	memcpy(mesh->ad_types, mesh_ad_types, sizeof(mesh_ad_types));
+ 
++	pvt->rx_id = mesh_mgmt_register(MGMT_EV_MESH_DEVICE_FOUND,
++				MGMT_INDEX_NONE, event_device_found, pvt,
++				NULL);
++	pvt->tx_id = mesh_mgmt_register(MGMT_EV_MESH_PACKET_CMPLT,
++					index, send_cmplt, pvt, NULL);
++
+ 	mesh_mgmt_send(MGMT_OP_SET_MESH_RECEIVER, index, len, mesh,
+ 			mesh_up, L_UINT_TO_PTR(index), NULL);
+ 	l_debug("done %d mesh startup", index);
+@@ -407,11 +443,6 @@ static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
+ 	mesh_mgmt_send(MGMT_OP_READ_INFO, index, 0, NULL,
+ 				read_info_cb, L_UINT_TO_PTR(index), NULL);
+ 
+-	pvt->rx_id = mesh_mgmt_register(MGMT_EV_MESH_DEVICE_FOUND,
+-				MGMT_INDEX_NONE, event_device_found, io, NULL);
+-	pvt->tx_id = mesh_mgmt_register(MGMT_EV_MESH_PACKET_CMPLT,
+-					MGMT_INDEX_NONE, send_cmplt, io, NULL);
+-
+ 	pvt->dup_filters = l_queue_new();
+ 	pvt->rx_regs = l_queue_new();
+ 	pvt->tx_pkts = l_queue_new();
+@@ -522,6 +553,11 @@ static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
+ 	send->adv_data_len = tx->len + 1;
+ 	send->adv_data[0] = tx->len;
+ 	memcpy(send->adv_data + 1, tx->pkt, tx->len);
++
++	/* Filter looped back Provision packets */
++	if (tx->pkt[0] == MESH_AD_TYPE_PROVISION)
++		filter_dups(NULL, send->adv_data, get_instant());
++
+ 	mesh_mgmt_send(MGMT_OP_MESH_SEND, index,
+ 			len, send, send_queued, tx, NULL);
+ 	print_packet("Mesh Send Start", tx->pkt, tx->len);
 -- 
-2.17.1
+2.39.2
 
