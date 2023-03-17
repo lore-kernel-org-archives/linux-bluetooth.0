@@ -2,80 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E38BDC7618A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Mar 2023 16:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17397C7619A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Mar 2023 16:46:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjCQQkY (ORCPT
+        id S229981AbjCQQqD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Mar 2023 12:40:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36514 "EHLO
+        Fri, 17 Mar 2023 12:46:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbjCQQkX (ORCPT
+        with ESMTP id S230131AbjCQQpl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Mar 2023 12:40:23 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F9816AE0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 09:40:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0D92FB8264D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 16:40:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BCB8AC433D2;
-        Fri, 17 Mar 2023 16:40:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679071218;
-        bh=eMha2w8ls1pZ+TIxzwUoQabAWO3mkiHHwy7SqBSloKg=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=opxphAzda79e+epQcS0A2S/L8auZUelYOht470Q9fCKIsmR8JSMQFnYSsa04lvuih
-         oUlyFbMnPfee4MAV1yhfJDnb8ijzfJwJkphn0/kwF859z+ZEyPodlXJ5NdtLCn5EHB
-         tZn5MMutN+oMcxaWjp1TGn73Wh8ZA43nwEJxXrGAoW6QqaziFEYR7tC5fTLrJm8/Gs
-         3MUF95GHSMgzFvCrxZ/Drc8g1iWZONMX66hVEHE/H5QQuLR/jo+1ZVzyzxbGHOwuSC
-         eyg55k15aw6K8wpjwMP0vhtxd7Pa8jIzToRHxBswksZeJGYMfvKGQ5GYosON9CrSFr
-         ufQpJou6iPtNw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A696EE21EE6;
-        Fri, 17 Mar 2023 16:40:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/2] transport: add CIG/CIS/PHY properties,
- don't show unset QoS properties
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167907121867.10682.235943421192331669.git-patchwork-notify@kernel.org>
-Date:   Fri, 17 Mar 2023 16:40:18 +0000
-References: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678918574.git.pav@iki.fi>
-In-Reply-To: <e856ad3174024bb61113217cb889005a0bf0ad1c.1678918574.git.pav@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
+        Fri, 17 Mar 2023 12:45:41 -0400
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5483D09B
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 09:45:38 -0700 (PDT)
+Received: from github.com (hubbernetes-node-b43ed3a.va3-iad.github.net [10.48.201.107])
+        by smtp.github.com (Postfix) with ESMTPA id EC01DE173A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 09:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1679071538;
+        bh=RLE1Bdx1f0tIKVg7FWwTqH0ymzhWPP+idOdIZwJ0xdg=;
+        h=Date:From:To:Subject:From;
+        b=ns1u7Vv+htZ/GtDBsoVJnbER8EjYx7FBs79p2aaas9Yqr9esxWkOPaLlED95WLn7C
+         akUOY6vhat5Sk91WYLIJ00CfpmmAdfUkSzhR/mbtMtBCznkJvRhZ51mEd3SGA+Otjx
+         tkXN19eCpYO3Z5cF0ZwzC7p70XZvvO3HPDCUtvTw=
+Date:   Fri, 17 Mar 2023 09:45:37 -0700
+From:   Pauli Virtanen <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/806230-39260c@github.com>
+Subject: [bluez/bluez] 306a80: shared/gatt-client: Fix not creating a request
+ for...
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 306a8083ad19459136cb46b7ec7fb27b070fb118
+      https://github.com/bluez/bluez/commit/306a8083ad19459136cb46b7ec7fb27b070fb118
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-17 (Fri, 17 Mar 2023)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/gatt-client.c
 
-On Wed, 15 Mar 2023 22:16:38 +0000 you wrote:
-> Add CIG, CIS, and PHY properties to BAP transport.  The other QoS
-> properties are there, and these may also be useful to clients, e.g.  to
-> manage CIG/CIS allocation as client.
-> 
-> Hide transport QoS properties when they are not configured.
-> ---
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/gatt-client: Fix not creating a request for notifications
 
-Here is the summary with links:
-  - [BlueZ,v2,1/2] transport: add CIG/CIS/PHY properties, don't show unset QoS properties
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=28422cd23119
-  - [BlueZ,v2,2/2] doc: describe new ISO Transport properties
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=39260c3cfa05
+Notifications were using bt_att_send directly instead of
+bt_gatt_client_write_value thus it wouldn't create a request which
+causes the instance to not be able to track it which in turn may cause
+the client to trigger its idle callback too early.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/490
 
 
+  Commit: 28422cd231196037ae7d52f8803ff282482c607e
+      https://github.com/bluez/bluez/commit/28422cd231196037ae7d52f8803ff282482c607e
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2023-03-17 (Fri, 17 Mar 2023)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: add CIG/CIS/PHY properties, don't show unset QoS properties
+
+Add CIG, CIS, and PHY properties to BAP transport.  The other QoS
+properties are there, and these may also be useful to clients, e.g.  to
+manage CIG/CIS allocation as client.
+
+Hide transport QoS properties when they are not configured.
+
+
+  Commit: 39260c3cfa056321feaf1d49fe8db92e17b386f0
+      https://github.com/bluez/bluez/commit/39260c3cfa056321feaf1d49fe8db92e17b386f0
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2023-03-17 (Fri, 17 Mar 2023)
+
+  Changed paths:
+    M doc/media-api.txt
+
+  Log Message:
+  -----------
+  doc: describe new ISO Transport properties
+
+Document the currently undocumented transport QoS properties.
+
+
+Compare: https://github.com/bluez/bluez/compare/806230e4fda7...39260c3cfa05
