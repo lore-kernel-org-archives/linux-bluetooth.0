@@ -2,107 +2,95 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E21C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Mar 2023 22:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C456C76195
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Mar 2023 23:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229872AbjCQWGW (ORCPT
+        id S229987AbjCQXvK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Mar 2023 18:06:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50370 "EHLO
+        Fri, 17 Mar 2023 19:51:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbjCQWGV (ORCPT
+        with ESMTP id S229902AbjCQXvJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Mar 2023 18:06:21 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B1F035EF0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 15:06:20 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id o11so6765337ple.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 15:06:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679090779;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VyyxF3qd7P+7xH+chlpS9OwF+Po8SUKENrLFc8SUn1U=;
-        b=n00tijxFVyqd9ye6eUDdrHD/8kDzYnZuJmIntBz4KOPNATbsRvD3lJkhLsYr6b7Mid
-         n9VqFHMUjUiSx46gHxYvBKQiWULHf468Uw0FKC7HJerhui1ICFsQguw0/FPTbAdHdCR4
-         cphAtxyVgV/2QN5/0ugbxODMIKA5SIxSbLJ34wu5jHNT4ll9oLsKZzGgbsfGSh1nesZK
-         D/5w4FZiAneLBWMMfZc5aLXnfr/jAyxSPPcwQSu9akTtThz941zBQwHI82BkkZWRDT/J
-         Pk5uh/vNVz/wcbUrZcKrvFD24+DgDkCGnPkUmJm6MqD5T6UwY0Y+D2VMza+oD/wyiDiz
-         MDxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679090779;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VyyxF3qd7P+7xH+chlpS9OwF+Po8SUKENrLFc8SUn1U=;
-        b=yQYCDWQcweBZeBWjyaOSr9M5gmV3wwUmURkB8K+OGB/uaCoDMWxFOAh5v/dLo2h0qk
-         QjnR/XLpTNE1meNeHURl0yBUwa/nLJxsuB7nA7QOA2tXcuLUGWd/QZHDAEOw5xIRmrad
-         /DKbZ4xHLbvD/NBwwsrkhcANo6foy4nxdaHs7SJ7LAyIrLttmeC4SE3t1HNifk/Z0Jcw
-         Yg+ZXydV5TOjt+qKFZGxLSCoFU8oEGWP6S8LlembO1Rr/tOuJH5lADb8hrCAN+3Un8KK
-         XRP1CgCN/YV4Wj4aHP46rfMLhxFsvbEPbONyYmm4vOyGSKF2OX8DRffwC0PNKreskANA
-         zrcw==
-X-Gm-Message-State: AO0yUKUHsUYn9bPUAMiLM6ysJp7e3+pHqbxAPXpnom+7FGKSGAWyNKg2
-        emaC90vGXXK9zzgdrbeuiegVu4uo3JY=
-X-Google-Smtp-Source: AK7set8Nwvtsft6pwe60tChapgRzKfxwsGt/kzOpmyd8UhpaZWXsedlZqGbNMmIjus5f3xA5qKlV+Q==
-X-Received: by 2002:a17:90a:342:b0:237:e1d2:c65e with SMTP id 2-20020a17090a034200b00237e1d2c65emr9970893pjf.4.1679090779476;
-        Fri, 17 Mar 2023 15:06:19 -0700 (PDT)
-Received: from [172.17.0.2] ([20.168.48.2])
-        by smtp.gmail.com with ESMTPSA id c3-20020a17090a4d0300b00219752c8ea5sm1822345pjg.37.2023.03.17.15.06.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Mar 2023 15:06:19 -0700 (PDT)
-Message-ID: <6414e45b.170a0220.dac04.3c26@mx.google.com>
-Date:   Fri, 17 Mar 2023 15:06:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4472320833735839097=="
+        Fri, 17 Mar 2023 19:51:09 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A3EE3B23E;
+        Fri, 17 Mar 2023 16:50:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5502BB82741;
+        Fri, 17 Mar 2023 23:50:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB6A8C433D2;
+        Fri, 17 Mar 2023 23:50:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679097056;
+        bh=WR+tqewczy5kh9G0x5J34eXgDDCY5t9xJhykv7aIXN4=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ptxVKc0dN/q8hYKuRw3Ps+YJg5t6XwIU6VqruWwjxVhouF71Kc/eeYZ21fCk8Dsk7
+         QcVbB6EJPmY0asHTvd7uiPP7LNnHL50Ag34RpRpO0jV3SKCVxtCN7HoFtRTwzNObxd
+         D649t4FFcAFzy1rPMsEHsjInuNuBuf2isyWfxs30brJZcIoHGv3nJBPXZkg60jmFQf
+         7viIGijL/yij7Imw0csg5gJwKflshfD7mIXP3Wa78rWtm/S5g9pZKB06Amn2n+C8Aw
+         E/SyzdqzRPBoWLjrL66URd29BM+cw9u4HYO1fap6iO7rWNdV7BO2tVR1R2PMlVRgMc
+         9S3vqVi6mlfOQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C744EE66CBF;
+        Fri, 17 Mar 2023 23:50:55 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@gmail.com
-Subject: RE: [BlueZ] mesh: Tighten IO and fix out-of-bounds array access
-In-Reply-To: <20230317201741.203098-1-inga.stotland@gmail.com>
-References: <20230317201741.203098-1-inga.stotland@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v13 0/4] Add support for NXP bluetooth chipsets
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167909705581.28336.12052092434994272835.git-patchwork-notify@kernel.org>
+Date:   Fri, 17 Mar 2023 23:50:55 +0000
+References: <20230316172214.3899786-1-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20230316172214.3899786-1-neeraj.sanjaykale@nxp.com>
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        gregkh@linuxfoundation.org, jirislaby@kernel.org,
+        alok.a.tiwari@oracle.com, hdanton@sina.com,
+        ilpo.jarvinen@linux.intel.com, leon@kernel.org,
+        simon.horman@corigine.com, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4472320833735839097==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Thu, 16 Mar 2023 22:52:10 +0530 you wrote:
+> This patch adds a driver for NXP bluetooth chipsets.
+> 
+> The driver is based on H4 protocol, and uses serdev APIs. It supports host
+> to chip power save feature, which is signalled by the host by asserting
+> break over UART TX lines, to put the chip into sleep state.
+> 
+> To support this feature, break_ctl has also been added to serdev-tty along
+> with a new serdev API serdev_device_break_ctl().
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=731303
+Here is the summary with links:
+  - [v13,1/4] serdev: Replace all instances of ENOTSUPP with EOPNOTSUPP
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d227f286d259
+  - [v13,2/4] serdev: Add method to assert break signal over tty UART port
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5ea260df53c2
+  - [v13,3/4] dt-bindings: net: bluetooth: Add NXP bluetooth support
+    https://git.kernel.org/bluetooth/bluetooth-next/c/02986ce4a4fe
+  - [v13,4/4] Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3e662aa4453a
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.43 seconds
-GitLint                       PASS      0.25 seconds
-BuildEll                      PASS      26.20 seconds
-BluezMake                     PASS      746.54 seconds
-MakeCheck                     PASS      11.33 seconds
-MakeDistcheck                 PASS      147.81 seconds
-CheckValgrind                 PASS      240.02 seconds
-CheckSmatch                   WARNING   319.77 seconds
-bluezmakeextell               PASS      96.35 seconds
-IncrementalBuild              PASS      602.64 seconds
-ScanBuild                     PASS      958.13 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-mesh/mesh-io-mgmt.c:519:67: warning: Variable length array is used.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============4472320833735839097==--
