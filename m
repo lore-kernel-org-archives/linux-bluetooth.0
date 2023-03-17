@@ -2,93 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC38EC7618A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Mar 2023 08:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 106A7C76196
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Mar 2023 16:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231615AbjCQIdf (ORCPT
+        id S230196AbjCQQkY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Mar 2023 04:33:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43544 "EHLO
+        Fri, 17 Mar 2023 12:40:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231542AbjCQIdK (ORCPT
+        with ESMTP id S230123AbjCQQkX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Mar 2023 04:33:10 -0400
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B203DC096
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 01:31:56 -0700 (PDT)
-Received: by mail-ed1-f41.google.com with SMTP id w9so17385028edc.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 01:31:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1679041561;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HMtLSDM2IpcbrZYXetfebgedF+TZqbOtztzNmGwB5dg=;
-        b=xNllU9x8j042ml+H77bhJMLbAZm/wDqztms6ARNM/UBOwP/3sBmjX4gAploxexEUve
-         +bFJEiXaRBZfSo7ac37NHA6XU1MGfIpk4ctudTT40enYtG9VmyVnCjTmuDAYRGbi+Qxx
-         488pWaIR39lMNK5g08vChO81pZVys635EQyxFcIs8rTTVAevI5qPxHVU9vV7kHjI4Fdc
-         fB0ddsE65sIxlUFutxo94A2dGNg1kTvJX/t5odR5i+2mnW9GEN8FoHKbaX/BtlHRv1kH
-         q81Bqe4ZHhDkMonv1DFAAeDkvcfjzc0vaT85Tx9mSXvpgObwoP0R8skRwAOxW5RRWcMU
-         kxRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679041561;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HMtLSDM2IpcbrZYXetfebgedF+TZqbOtztzNmGwB5dg=;
-        b=2JSXZzn+tWJcpEHnoOkJg5dP2jFWLovYydrOXp8MTr7hUaQ8WOCkVCwcLL0XqsQRuN
-         cRBws8GHLEEluNZUCl7eyvCWOkEmHrpSxZqy0YO8i5vWaoMkmDqZjIcbPoue4VKEeUNs
-         8A5bEdT8vhtSW35ZXOJXz1/5s4IpIAGmaRpEx6HwPhYQyWpPUMtHZiDteqrVfbk7JsC+
-         mUDNuBugmKbA04ZB6rWJ0aGWBTZvMnqk2dFt75+k7s8QejLo1HoQdqVN4xExzMwlpY6d
-         e8g0Uxa/yAl5Jr79SB/bAEG3dON+Y5bKBqqvJ5HiSQxaOi4YbFGgvuqiHdBZJjIPfs36
-         Fgew==
-X-Gm-Message-State: AO0yUKVxf+73yjnPSDhbHu7K2zOy8EOyg+xCkM7UV+LnPkW5jSCQBPcH
-        L0iL2QUlbUTClYyiMjYHr9D2/xxC4G87zJQXk4k=
-X-Google-Smtp-Source: AK7set9U+jKH5QZ3dnCfo6p1cM7zkAUSBIUFa3e0ySbP7S+RFF8CHkYY/up8+gxdnycP2TQP8pxpyw==
-X-Received: by 2002:a17:906:9f0a:b0:8b1:7fa:6588 with SMTP id fy10-20020a1709069f0a00b008b107fa6588mr14042511ejc.12.1679041561663;
-        Fri, 17 Mar 2023 01:26:01 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:848a:1971:93e0:b465? ([2a02:810d:15c0:828:848a:1971:93e0:b465])
-        by smtp.gmail.com with ESMTPSA id h24-20020a1709062dd800b008db605598b9sm689819eji.67.2023.03.17.01.26.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Mar 2023 01:26:01 -0700 (PDT)
-Message-ID: <68f6c2f3-298d-156d-b336-b5ae957358bc@linaro.org>
-Date:   Fri, 17 Mar 2023 09:26:00 +0100
+        Fri, 17 Mar 2023 12:40:23 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B1316ACA
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 09:40:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1F54CB8264E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Mar 2023 16:40:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D2EFCC433EF;
+        Fri, 17 Mar 2023 16:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679071218;
+        bh=gkrOy6KNBDUaVxvNOIsbrw5r2oDFc1zScUm1m2aLdIo=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=onZ4Fi2wVNdAYU82PQhrID8ISbTwtpENJHaGI+qhVpEQJ9JWFtdpXC93Bt2Nv7Tas
+         7qftvSpPQxCmaUAK8KDeRgXT6+OCCcNVYL681zoCjV7r+IXZnb1yEDSnal+v5a925R
+         hGdb5OxHQ05VpLBKi9mjY6UrL2E+EFhkws5FFGW7fvTzZs3c4pvNuEMpHqfDXgxhGc
+         SFStUdmwJ0zr0XwEYLL2k79vQYG7Oprl7ZMnb3NBe4pbhSxGIGh1m0ZNRR1qCrXy1p
+         gmXFfxEgRQcBKWKs75L8xB0X3+YUfZD6hX9FsawBDCZr/88xsCuU6MTN/LN6pSaMMR
+         EBIu2xBls9E4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AEA31E66CBF;
+        Fri, 17 Mar 2023 16:40:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH 1/3 V5] dt-bindings: net: realtek-bluetooth: Add RTL8821CS
-Content-Language: en-US
-To:     Chris Morgan <macroalpha82@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
-        alistair@alistair23.me, anarsoul@gmail.com, luiz.dentz@gmail.com,
-        johan.hedberg@gmail.com, marcel@holtmann.org, heiko@sntech.de,
-        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
-        Chris Morgan <macromorgan@hotmail.com>
-References: <20230315173657.28692-1-macroalpha82@gmail.com>
- <20230315173657.28692-2-macroalpha82@gmail.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230315173657.28692-2-macroalpha82@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] shared/gatt-client: Fix not creating a request for
+ notifications
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167907121871.10682.14358175544691498884.git-patchwork-notify@kernel.org>
+Date:   Fri, 17 Mar 2023 16:40:18 +0000
+References: <20230316193634.1195948-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230316193634.1195948-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 15/03/2023 18:36, Chris Morgan wrote:
-> From: Chris Morgan <macromorgan@hotmail.com>
+Hello:
+
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu, 16 Mar 2023 12:36:34 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Add compatible string for RTL8821CS for existing Realtek Bluetooth
-> driver.
+> Notifications were using bt_att_send directly instead of
+> bt_gatt_client_write_value thus it wouldn't create a request which
+> causes the instance to not be able to track it which in turn may cause
+> the client to trigger its idle callback too early.
 > 
-> Signed-off-by: Chris Morgan <macromorgan@hotmail.com>
-> ---
->  .../bindings/net/realtek-bluetooth.yaml       | 24 ++++++++++++-------
->  1 file changed, 15 insertions(+), 9 deletions(-)
+> [...]
 
+Here is the summary with links:
+  - [BlueZ] shared/gatt-client: Fix not creating a request for notifications
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=306a8083ad19
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Best regards,
-Krzysztof
 
