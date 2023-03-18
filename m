@@ -2,473 +2,449 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35214C74A5B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Mar 2023 13:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7DBC74A5B
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Mar 2023 14:22:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbjCRNhu (ORCPT
+        id S229799AbjCROWb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 18 Mar 2023 09:37:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58186 "EHLO
+        Sat, 18 Mar 2023 10:22:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjCRNht (ORCPT
+        with ESMTP id S229478AbjCROW3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 18 Mar 2023 09:37:49 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD12233E3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Mar 2023 06:37:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679146667; x=1710682667;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Fxy5XRZQ1lff0+nJJl/2oQ98zWO+X1aHh8j9CmindZo=;
-  b=UCo3IUlSPOvfU7ZxTHNSa0hd2iFjJfzXFylCD/knxEmW+GUwrlED+bZ5
-   ZXpGOXa2WqRHd/bGpFsBj2dUJPnzykEQefUrgsQD7ZV62EQMchZdWVkBt
-   eK0UKZGL34M8M0GKu7oi5fFlvFqY1z9zz4Yqrds10iQeyHaTZNrpJpK8U
-   XNMgrBwsrP8Ho/Uk4lKrcu7WUuRWtL84T6Ge5PYb1scSwc/JXzVWRcgwO
-   idOOVd2zM+uVtxdik5LdaOygjkNMxGz3n0s3otR+dbceUL/Xi4XhbRios
-   r9m3hC9L8B9PLMZwdGwW9LdMAd27r+IUtTXkFg8mi6PoCdKTFLz31yRyN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="318834787"
-X-IronPort-AV: E=Sophos;i="5.98,271,1673942400"; 
-   d="scan'208";a="318834787"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2023 06:37:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10652"; a="710806854"
-X-IronPort-AV: E=Sophos;i="5.98,271,1673942400"; 
-   d="scan'208";a="710806854"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 18 Mar 2023 06:37:45 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pdWki-000A5q-1K;
-        Sat, 18 Mar 2023 13:37:44 +0000
-Date:   Sat, 18 Mar 2023 21:37:43 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 3e662aa4453a38568731c6319319a3a85e2f2f96
-Message-ID: <6415bea7.cEes8s0ZsCSHFPq5%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
+        Sat, 18 Mar 2023 10:22:29 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2099.outbound.protection.outlook.com [40.107.223.99])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B5E530E83;
+        Sat, 18 Mar 2023 07:22:27 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CMZUUcNpIWx2J0YLKZL8MoKcbRJQnpop4jN2k4cK3x64K1HgTz4QLVTJISDFvGL2zJmK2MEUlHcQ31FwOQkiXrBfNdxMKN0EqSHHw/j2JKlpaG6K+ctx7lA15tF6GCpHxAkKKSLq+z0piBC45rF6CB1kRGK/+lsYirDVrSNa8JQ62JpK+JRWivpuRnE061D8rb9nYkyFV18xKKG0bLsL78PEfYi40hS6nJFQZoQLMvlRL0lwBuTbj1oSpHhWBlnnp+Rdk7yvMkBdrCd2F12hmiHZgUqDFbwVOWN6rPFztFN8jDZ31U9+1mahJdDCZmMp/VXvyux7wnCWNLZlHEbahA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JRmNoAdGvRIgrJH1ttgwqwFJU+9/xp0IOSEJ3n3Hf2c=;
+ b=AgqD6BfsUMBYMwkuSonoiLUjTGhxFP/QBzHjf1C2UbXzXOOK3LvqmDEkvlhYIzBmviqCAKDKVt8sBYGHP3m/1yosmZLh12tgipRtah+qmd78vtyhm9EF/WszlHlATohgcCLvn40M6VW+hK4a22yuiPz66r9Wk1N44ppJBMCdo9Tfabtz9cDNd+XVRnqFsRe53Yw8KSGZiBtyDMrXHNJPglsXVH9MiJBi688H2teHwyuCN9ItjG4Zc1L5sPhGlc1XY5nLMmCwn+NSMMo4J5Ba+ao1G0hkNDTjXp2xS4mlZxNfwGQ73pJdPccDotof2O/NbZ2mufzFb++uZcg0eJ5COg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JRmNoAdGvRIgrJH1ttgwqwFJU+9/xp0IOSEJ3n3Hf2c=;
+ b=kvNQEHTHI4KxowF1CoXmAcrKG85Fr/gG18yu2zQiPuTBsMN2vpx5b7OhTkubR8ekUW5wH6oSPp8KjkjdidPhTh50aB+JMSaFWym9Oh5wBgMtPlT3o/ZU6eRiV0WFQQiLiF0Y5BDHyR3HcB4N+6+HceA71EXgMwj+zi9JZL/lL5g=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MN2PR13MB3854.namprd13.prod.outlook.com (2603:10b6:208:19e::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.36; Sat, 18 Mar
+ 2023 14:22:25 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::85f5:bdb:fb9e:294c]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::85f5:bdb:fb9e:294c%2]) with mapi id 15.20.6178.036; Sat, 18 Mar 2023
+ 14:22:25 +0000
+Date:   Sat, 18 Mar 2023 15:22:17 +0100
+From:   Simon Horman <simon.horman@corigine.com>
+To:     hildawu@realtek.com
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        apusaka@chromium.org, mmandlik@google.com, yinghsu@chromium.org,
+        max.chou@realtek.com, alex_lu@realsil.com.cn, kidman@realtek.com
+Subject: Re: [PATCH] Bluetooth: msft: Extended monitor tracking by address
+ filter
+Message-ID: <ZBXJGQF0IR3udmdQ@corigine.com>
+References: <20230316090729.14572-1-hildawu@realtek.com>
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20230316090729.14572-1-hildawu@realtek.com>
+Organisation: Horms Solutions BV
+X-ClientProxiedBy: AM4PR0302CA0007.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::20) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3854:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0a8f11b-f9c4-41e5-2fcb-08db27bc31bf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Bd4Tv1MvxX1ch5HImXCXrhM5P8Imfkx3mSvjKdJnj+ZhiA5FeZE7pg53gnYymLqaEMcfluDqk5ni6ZehG5Fuo6wuz00BHSsxewsEI75v415rOE7lBMnMqr34e04k7f1OyWogP2TYjoPZYVGbZ5HRGyAVFuUEYXLtjJtU5N5d4CpFVGxfCTCd0tYzkbtYlVQ0ymKc4TEIBu+KfApvk43DlawZrK/TRvtw35mIwyoJu70NinBqlKmwP1fKACNiGV2NlC3pTDzVG3c/ct51HHfDOz6F3akUegIwUc0Er+uMc4C10hqqUp8vEN7GLXauanYd7SNyISzX2AG4MkcHAFKASQMocf1xWFti+a/tk4Nv7g0ltdq+N2pKbFsb4VAZpp+J1goLU3YPSxT1QL/KNc3/BHs4Uujb3csrzXxlXbNfqn5i0gbzIaWXsT9TxJWoDb8ew0FZGkldWz6SZOiIwIFC7g95U1KDACbt0vLhOE80GyohYkav5EVFLmNxdr3JiejeIaijdf8dfNt40Q5hmXdjLoeVd1vmOn5gUPTrTOmwZ9cTA7rvgGU9nxgK5IS3bg2BmAQO3OqLW1X3q4kbaZfiG/ApiCD5sVWxeF6Ju+/OggCC0FGBXZWkMfJhHYjhIdYkIZ/O4Zf3qx7G9YEpTvwMNCKWAyA9RzKvgS7UdvF7BgJdLdcYmVf4/GzN6pTait19Ie3mX7K6oCKRTPi/fjUzrJ/1UvbmyyOcF7x0qLSVRkU=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(39840400004)(366004)(376002)(346002)(136003)(451199018)(86362001)(36756003)(41300700001)(6916009)(4326008)(8676002)(44832011)(8936002)(5660300002)(7416002)(478600001)(66946007)(66556008)(66476007)(316002)(2906002)(83380400001)(38100700002)(6666004)(6512007)(6506007)(6486002)(966005)(186003)(2616005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?P5ywae9I90Iu0L//ryOPOuWCG6YT8EW6g3Okw9RoZo5nWuTprb77OS6KnGYG?=
+ =?us-ascii?Q?E02RJZoleB2CD64KNj5QU4/gpaJxvSou6oKEWeEQkgwUnoRdnaTxyyvS6yl4?=
+ =?us-ascii?Q?pQxdVjqT5NXLg7TNLtwSNm7MGR8xX14sgp5yLIUmmnWiNr84ZuLpbes2i7w1?=
+ =?us-ascii?Q?B4TfZNmogosMV0Lb1ljAftRgBXqQpJ39TsG9MZfx7tzig4kceXerM9sZBODQ?=
+ =?us-ascii?Q?A5bfOTeoBcrqxTCa3B6kXhw7sYAM0UqLqjtbm/PwOb7iw2Sh0nugsR/VBrRr?=
+ =?us-ascii?Q?KjKw26qpH5RHpAK6JrHkQlfXb7hXmQy1XoydHzxy8Ez/OTOISX+mMkHVxg15?=
+ =?us-ascii?Q?lDLkpBc7ldgzLPIZbLn9UZgEh5ydpSlA7Cp4PPkITVH2rMRqP4QmEhveVys+?=
+ =?us-ascii?Q?26QlwxyqGar3DEr2kmBIMcmeig9GqotICTW4+zHxaB8AS0jN3sqCn8KDrIt2?=
+ =?us-ascii?Q?aHysKGdpFep9ddmhzxaLsVBSqBbvEi+e2iJhEeNoXibF2JL/TCN+WaVqohvH?=
+ =?us-ascii?Q?YEJoutDFiiBNevUleUymWUuc7p3nC0lLVumerXBIT1KyQz5d0diDM4RYXDEY?=
+ =?us-ascii?Q?w397LckvGkMQ4ykFHsXQWLk6F1qKbPOSB2lAFJmXtIQjQVuKo8s8kLUt3uAr?=
+ =?us-ascii?Q?t0rUZZlf37eHcTPSn+N8YrOR0WR98KUKJbFvcil4NUji1afFvjPV1OBNC2K7?=
+ =?us-ascii?Q?cJMuOgACCmaGCzPYt8Kdtnn0eKJ9jRw466sBG84XMiZN0mNKE2ZiFK0dRC+H?=
+ =?us-ascii?Q?W+3KoyB68bRgxznwUIYaVYpEM4vi9S/ebhB5yCsDeR5evUo8Gnqfmc0Whge/?=
+ =?us-ascii?Q?ztOWd9kNLIvW8DNFlWHyS70zV/Y50LOZnBApZyf9L+1JnXxE6SU4sKRTXCoe?=
+ =?us-ascii?Q?pO11PgyINlanbZLNvSeZFLtATu6ICyc/Z6UE/CUuC3cJx3tZBuauUDdhfq2l?=
+ =?us-ascii?Q?yl7o/bTdYbX9ngHxLsycOiBTEd1I7GUKtPMqDI/XcUrf54+MLtNFfgADbWVj?=
+ =?us-ascii?Q?JQbgpKcXIp+TyNICC395yxs4Vp3NYlYYd1QLwlF8XF2rpvzPtQrdSOPGhOBM?=
+ =?us-ascii?Q?K7ttktxZvuyz/K2JWPty+XtuFrg1NnjDTg5RpsBZ9fNr+b+fMnZY/TRXDocf?=
+ =?us-ascii?Q?wnyJHs93uPJJ+yEu8bw+b5PofCqvOIAYSOks0GuuWfCMQGGWcwBP+5m+XLS+?=
+ =?us-ascii?Q?SbOaxa2GsJLcjv5FFfuCaoVzJkLBXQVPc0D60PDmEEyMA9CcuNkSQ33tviOP?=
+ =?us-ascii?Q?LEUl2YRd+5GGLseCO6CRKMFDPFgZcpxbKFApfB+XCS2y7USqno3kydyyKEI1?=
+ =?us-ascii?Q?JPG+w2Cpn9k3qE4E5MP+015OIVMN+Irvs20zKmLxpqRZRS8rBxYHpKneJzs/?=
+ =?us-ascii?Q?t4/laT6VFQdj8XNp70NwgV2s4epAQk6pSV3Z4vEsR/mYYwATVe/6N2OKfM7M?=
+ =?us-ascii?Q?Mzp7TWeU+t+JNK8kG3Ejlq6TohEjayxAiSMBgalU9f32VobJRFAOLPejyMR1?=
+ =?us-ascii?Q?qlrPVxIFR//enQtM3KVIxHx6qvXnwnp1HyVIUrGJopVwDEyNXDLK4oMVTNm2?=
+ =?us-ascii?Q?Ymgc/EvIImNhX91UZFzFVdqmWR3//jESVFSFMMQqMS5W4h1Ql7mC9TCpJ8EZ?=
+ =?us-ascii?Q?Eq7KaaIJ0ounRMCYRU1SmnZzuE2uMdsqDcnZKPiET9Dp/v28/7mq+5yANh1l?=
+ =?us-ascii?Q?qRl83g=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0a8f11b-f9c4-41e5-2fcb-08db27bc31bf
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2023 14:22:24.9705
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NF2ANu93B4LyBe8Fgld3F7NZfsqhMddNWO1lDiVeRYlMJKgAPKlQ4HYYW9qx9AM7MjYTuCHMOpbg6OImWmCRuhpTCTP7oFsfYUcmJk4+9Ks=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3854
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 3e662aa4453a38568731c6319319a3a85e2f2f96  Bluetooth: NXP: Add protocol support for NXP Bluetooth chipsets
+On Thu, Mar 16, 2023 at 05:07:29PM +0800, hildawu@realtek.com wrote:
+> From: Hilda Wu <hildawu@realtek.com>
+> 
+> Since limited tracking device per condition, this feature is to support
+> tracking multiple devices concurrently.
+> When a pattern monitor detects the device, this feature issues an address
+> monitor for tracking that device. Let pattern monitor can keep monitor
+> new devices.
+> This feature adds an address filter when receiving a LE monitor device
+> event which monitor handle is for a pattern, and the controller started
+> monitoring the device. And this feature also has cancelled the monitor
+> advertisement from address filters when receiving a LE monitor device
+> event when the controller stopped monitoring the device specified by an
+> address and monitor handle.
+> 
+> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+> Signed-off-by: Hilda Wu <hildawu@realtek.com>
+> ---
+>  net/bluetooth/msft.c | 538 +++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 524 insertions(+), 14 deletions(-)
+> 
+> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
 
-elapsed time: 797m
+...
 
-configs tested: 397
-configs skipped: 41
+> @@ -254,6 +305,64 @@ static int msft_le_monitor_advertisement_cb(struct hci_dev *hdev, u16 opcode,
+>  	return status;
+>  }
+>  
+> +/* This function requires the caller holds hci_req_sync_lock */
+> +static int msft_remove_addr_filters_sync(struct hci_dev *hdev, u8 handle)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+This function always returns 0.
+And the caller ignores the return value.
+So I think it's return type can be changed to void.
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha        buildonly-randconfig-r001-20230313   gcc  
-alpha        buildonly-randconfig-r002-20230313   gcc  
-alpha        buildonly-randconfig-r004-20230313   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r001-20230313   gcc  
-alpha                randconfig-r002-20230313   gcc  
-alpha                randconfig-r016-20230312   gcc  
-alpha                randconfig-r021-20230312   gcc  
-alpha                randconfig-r024-20230312   gcc  
-alpha                randconfig-r025-20230312   gcc  
-alpha                randconfig-r026-20230313   gcc  
-alpha                randconfig-r034-20230313   gcc  
-alpha                randconfig-r035-20230313   gcc  
-arc                              allyesconfig   gcc  
-arc          buildonly-randconfig-r002-20230313   gcc  
-arc          buildonly-randconfig-r004-20230312   gcc  
-arc          buildonly-randconfig-r005-20230313   gcc  
-arc          buildonly-randconfig-r006-20230313   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r004-20230312   gcc  
-arc                  randconfig-r006-20230313   gcc  
-arc                  randconfig-r011-20230313   gcc  
-arc                  randconfig-r012-20230312   gcc  
-arc                  randconfig-r013-20230313   gcc  
-arc                  randconfig-r015-20230312   gcc  
-arc                  randconfig-r022-20230313   gcc  
-arc                  randconfig-r023-20230313   gcc  
-arc                  randconfig-r026-20230312   gcc  
-arc                  randconfig-r031-20230312   gcc  
-arc                  randconfig-r031-20230313   gcc  
-arc                  randconfig-r032-20230312   gcc  
-arc                  randconfig-r032-20230318   gcc  
-arc                  randconfig-r034-20230312   gcc  
-arc                  randconfig-r043-20230312   gcc  
-arc                  randconfig-r043-20230313   gcc  
-arc                  randconfig-r043-20230318   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                         bcm2835_defconfig   clang
-arm          buildonly-randconfig-r001-20230313   gcc  
-arm          buildonly-randconfig-r004-20230313   gcc  
-arm          buildonly-randconfig-r005-20230313   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r003-20230313   clang
-arm                  randconfig-r004-20230312   gcc  
-arm                  randconfig-r004-20230313   clang
-arm                  randconfig-r005-20230312   gcc  
-arm                  randconfig-r006-20230313   clang
-arm                  randconfig-r011-20230313   gcc  
-arm                  randconfig-r013-20230313   gcc  
-arm                  randconfig-r021-20230313   gcc  
-arm                  randconfig-r024-20230313   gcc  
-arm                  randconfig-r025-20230313   gcc  
-arm                  randconfig-r026-20230313   gcc  
-arm                  randconfig-r035-20230312   gcc  
-arm                  randconfig-r036-20230312   gcc  
-arm                  randconfig-r046-20230312   clang
-arm                  randconfig-r046-20230313   gcc  
-arm                       spear13xx_defconfig   clang
-arm                           stm32_defconfig   gcc  
-arm                         vf610m4_defconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64        buildonly-randconfig-r004-20230313   gcc  
-arm64        buildonly-randconfig-r006-20230313   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r001-20230312   clang
-arm64                randconfig-r004-20230312   clang
-arm64                randconfig-r005-20230312   clang
-arm64                randconfig-r005-20230313   gcc  
-arm64                randconfig-r006-20230312   clang
-arm64                randconfig-r011-20230312   gcc  
-arm64                randconfig-r012-20230313   clang
-arm64                randconfig-r013-20230312   gcc  
-arm64                randconfig-r015-20230312   gcc  
-arm64                randconfig-r021-20230312   gcc  
-arm64                randconfig-r023-20230313   clang
-arm64                randconfig-r034-20230312   clang
-arm64                randconfig-r034-20230313   gcc  
-csky         buildonly-randconfig-r004-20230312   gcc  
-csky         buildonly-randconfig-r005-20230313   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r002-20230312   gcc  
-csky                 randconfig-r002-20230313   gcc  
-csky                 randconfig-r003-20230312   gcc  
-csky                 randconfig-r014-20230313   gcc  
-csky                 randconfig-r022-20230313   gcc  
-csky                 randconfig-r023-20230312   gcc  
-csky                 randconfig-r025-20230313   gcc  
-csky                 randconfig-r026-20230312   gcc  
-csky                 randconfig-r033-20230313   gcc  
-csky                 randconfig-r035-20230312   gcc  
-csky                 randconfig-r036-20230312   gcc  
-hexagon              randconfig-r001-20230313   clang
-hexagon              randconfig-r015-20230312   clang
-hexagon              randconfig-r016-20230313   clang
-hexagon              randconfig-r031-20230313   clang
-hexagon              randconfig-r041-20230312   clang
-hexagon              randconfig-r041-20230313   clang
-hexagon              randconfig-r045-20230312   clang
-hexagon              randconfig-r045-20230313   clang
-i386                             alldefconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r002-20230313   gcc  
-i386         buildonly-randconfig-r003-20230313   gcc  
-i386         buildonly-randconfig-r006-20230313   gcc  
-i386                         debian-10.3-func   gcc  
-i386                   debian-10.3-kselftests   gcc  
-i386                        debian-10.3-kunit   gcc  
-i386                          debian-10.3-kvm   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-a001-20230313   gcc  
-i386                 randconfig-a002-20230313   gcc  
-i386                 randconfig-a003-20230313   gcc  
-i386                 randconfig-a004-20230313   gcc  
-i386                 randconfig-a005-20230313   gcc  
-i386                 randconfig-a006-20230313   gcc  
-i386                 randconfig-a011-20230313   clang
-i386                 randconfig-a012-20230313   clang
-i386                 randconfig-a013-20230313   clang
-i386                 randconfig-a014-20230313   clang
-i386                 randconfig-a015-20230313   clang
-i386                 randconfig-a016-20230313   clang
-i386                          randconfig-c001   gcc  
-i386                 randconfig-r002-20230313   gcc  
-i386                 randconfig-r004-20230313   gcc  
-i386                 randconfig-r005-20230313   gcc  
-i386                 randconfig-r032-20230313   gcc  
-i386                 randconfig-r035-20230313   gcc  
-ia64                             allmodconfig   gcc  
-ia64         buildonly-randconfig-r002-20230312   gcc  
-ia64         buildonly-randconfig-r005-20230312   gcc  
-ia64                                defconfig   gcc  
-ia64                 randconfig-r001-20230313   gcc  
-ia64                 randconfig-r002-20230313   gcc  
-ia64                 randconfig-r003-20230313   gcc  
-ia64                 randconfig-r005-20230313   gcc  
-ia64                 randconfig-r006-20230313   gcc  
-ia64                 randconfig-r011-20230312   gcc  
-ia64                 randconfig-r012-20230312   gcc  
-ia64                 randconfig-r015-20230315   gcc  
-ia64                 randconfig-r016-20230312   gcc  
-ia64                 randconfig-r022-20230313   gcc  
-ia64                 randconfig-r023-20230313   gcc  
-ia64                 randconfig-r025-20230313   gcc  
-ia64                 randconfig-r031-20230312   gcc  
-ia64                 randconfig-r032-20230313   gcc  
-ia64                 randconfig-r036-20230313   gcc  
-ia64                 randconfig-r036-20230318   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch    buildonly-randconfig-r001-20230313   gcc  
-loongarch    buildonly-randconfig-r002-20230313   gcc  
-loongarch    buildonly-randconfig-r005-20230312   gcc  
-loongarch    buildonly-randconfig-r006-20230313   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r013-20230313   gcc  
-loongarch            randconfig-r016-20230312   gcc  
-loongarch            randconfig-r021-20230312   gcc  
-loongarch            randconfig-r022-20230312   gcc  
-loongarch            randconfig-r026-20230312   gcc  
-loongarch            randconfig-r031-20230313   gcc  
-loongarch            randconfig-r036-20230313   gcc  
-m68k                             allmodconfig   gcc  
-m68k         buildonly-randconfig-r002-20230313   gcc  
-m68k         buildonly-randconfig-r004-20230313   gcc  
-m68k         buildonly-randconfig-r006-20230313   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r002-20230312   gcc  
-m68k                 randconfig-r003-20230312   gcc  
-m68k                 randconfig-r003-20230313   gcc  
-m68k                 randconfig-r004-20230312   gcc  
-m68k                 randconfig-r004-20230313   gcc  
-m68k                 randconfig-r005-20230312   gcc  
-m68k                 randconfig-r011-20230312   gcc  
-m68k                 randconfig-r011-20230313   gcc  
-m68k                 randconfig-r012-20230312   gcc  
-m68k                 randconfig-r013-20230312   gcc  
-m68k                 randconfig-r014-20230313   gcc  
-m68k                 randconfig-r014-20230315   gcc  
-m68k                 randconfig-r016-20230313   gcc  
-m68k                 randconfig-r025-20230313   gcc  
-m68k                 randconfig-r031-20230313   gcc  
-m68k                 randconfig-r032-20230312   gcc  
-m68k                 randconfig-r033-20230313   gcc  
-m68k                 randconfig-r033-20230318   gcc  
-m68k                 randconfig-r034-20230313   gcc  
-m68k                 randconfig-r035-20230318   gcc  
-microblaze   buildonly-randconfig-r002-20230312   gcc  
-microblaze   buildonly-randconfig-r002-20230313   gcc  
-microblaze   buildonly-randconfig-r006-20230312   gcc  
-microblaze           randconfig-r001-20230312   gcc  
-microblaze           randconfig-r001-20230313   gcc  
-microblaze           randconfig-r006-20230312   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips         buildonly-randconfig-r002-20230312   gcc  
-mips         buildonly-randconfig-r004-20230313   clang
-mips         buildonly-randconfig-r006-20230313   clang
-mips                     decstation_defconfig   gcc  
-mips                 randconfig-r001-20230312   gcc  
-mips                 randconfig-r003-20230312   gcc  
-mips                 randconfig-r013-20230312   clang
-mips                 randconfig-r015-20230313   gcc  
-mips                 randconfig-r033-20230312   gcc  
-mips                 randconfig-r034-20230313   clang
-nios2        buildonly-randconfig-r001-20230313   gcc  
-nios2        buildonly-randconfig-r003-20230312   gcc  
-nios2        buildonly-randconfig-r005-20230313   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r003-20230312   gcc  
-nios2                randconfig-r005-20230312   gcc  
-nios2                randconfig-r006-20230312   gcc  
-nios2                randconfig-r012-20230312   gcc  
-nios2                randconfig-r012-20230313   gcc  
-nios2                randconfig-r014-20230312   gcc  
-nios2                randconfig-r015-20230313   gcc  
-nios2                randconfig-r016-20230313   gcc  
-nios2                randconfig-r021-20230313   gcc  
-nios2                randconfig-r023-20230313   gcc  
-nios2                randconfig-r025-20230312   gcc  
-nios2                randconfig-r026-20230312   gcc  
-nios2                randconfig-r032-20230312   gcc  
-openrisc     buildonly-randconfig-r001-20230312   gcc  
-openrisc     buildonly-randconfig-r003-20230312   gcc  
-openrisc     buildonly-randconfig-r005-20230313   gcc  
-openrisc                  or1klitex_defconfig   gcc  
-openrisc             randconfig-r012-20230313   gcc  
-openrisc             randconfig-r014-20230312   gcc  
-openrisc             randconfig-r021-20230313   gcc  
-openrisc             randconfig-r023-20230312   gcc  
-openrisc             randconfig-r032-20230312   gcc  
-openrisc             randconfig-r035-20230313   gcc  
-openrisc             randconfig-r036-20230312   gcc  
-parisc       buildonly-randconfig-r006-20230312   gcc  
-parisc       buildonly-randconfig-r006-20230313   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r004-20230313   gcc  
-parisc               randconfig-r005-20230312   gcc  
-parisc               randconfig-r005-20230313   gcc  
-parisc               randconfig-r011-20230312   gcc  
-parisc               randconfig-r014-20230313   gcc  
-parisc               randconfig-r021-20230313   gcc  
-parisc               randconfig-r023-20230313   gcc  
-parisc               randconfig-r026-20230313   gcc  
-parisc               randconfig-r033-20230312   gcc  
-parisc               randconfig-r033-20230313   gcc  
-parisc               randconfig-r034-20230312   gcc  
-parisc               randconfig-r034-20230313   gcc  
-parisc               randconfig-r035-20230312   gcc  
-parisc               randconfig-r036-20230313   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc      buildonly-randconfig-r001-20230312   gcc  
-powerpc      buildonly-randconfig-r005-20230312   gcc  
-powerpc      buildonly-randconfig-r006-20230312   gcc  
-powerpc                      pasemi_defconfig   gcc  
-powerpc              randconfig-c003-20230312   gcc  
-powerpc              randconfig-r003-20230313   gcc  
-powerpc              randconfig-r011-20230312   gcc  
-powerpc              randconfig-r012-20230312   gcc  
-powerpc              randconfig-r014-20230312   gcc  
-powerpc              randconfig-r015-20230313   clang
-powerpc              randconfig-r016-20230312   gcc  
-powerpc              randconfig-r026-20230312   gcc  
-powerpc              randconfig-r036-20230313   gcc  
-powerpc                        warp_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv        buildonly-randconfig-r001-20230312   gcc  
-riscv        buildonly-randconfig-r002-20230313   clang
-riscv        buildonly-randconfig-r004-20230312   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r002-20230312   clang
-riscv                randconfig-r003-20230313   gcc  
-riscv                randconfig-r004-20230313   gcc  
-riscv                randconfig-r005-20230318   clang
-riscv                randconfig-r006-20230312   clang
-riscv                randconfig-r011-20230313   clang
-riscv                randconfig-r014-20230312   gcc  
-riscv                randconfig-r024-20230312   gcc  
-riscv                randconfig-r031-20230313   gcc  
-riscv                randconfig-r033-20230312   clang
-riscv                randconfig-r042-20230312   gcc  
-riscv                randconfig-r042-20230313   clang
-riscv                randconfig-r042-20230318   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390         buildonly-randconfig-r006-20230312   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r006-20230313   gcc  
-s390                 randconfig-r013-20230312   gcc  
-s390                 randconfig-r013-20230313   clang
-s390                 randconfig-r016-20230312   gcc  
-s390                 randconfig-r021-20230312   gcc  
-s390                 randconfig-r023-20230312   gcc  
-s390                 randconfig-r025-20230312   gcc  
-s390                 randconfig-r032-20230312   clang
-s390                 randconfig-r044-20230312   gcc  
-s390                 randconfig-r044-20230313   clang
-s390                 randconfig-r044-20230318   gcc  
-sh                               allmodconfig   gcc  
-sh           buildonly-randconfig-r002-20230313   gcc  
-sh           buildonly-randconfig-r005-20230312   gcc  
-sh           buildonly-randconfig-r006-20230313   gcc  
-sh                        edosk7760_defconfig   gcc  
-sh                         microdev_defconfig   gcc  
-sh                   randconfig-r021-20230313   gcc  
-sh                   randconfig-r023-20230313   gcc  
-sh                   randconfig-r024-20230312   gcc  
-sh                   randconfig-r024-20230313   gcc  
-sh                   randconfig-r035-20230312   gcc  
-sh                           se7206_defconfig   gcc  
-sh                        sh7757lcr_defconfig   gcc  
-sh                   sh7770_generic_defconfig   gcc  
-sparc        buildonly-randconfig-r003-20230313   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r002-20230313   gcc  
-sparc                randconfig-r005-20230312   gcc  
-sparc                randconfig-r014-20230313   gcc  
-sparc                randconfig-r015-20230313   gcc  
-sparc                randconfig-r016-20230313   gcc  
-sparc                randconfig-r021-20230312   gcc  
-sparc                randconfig-r022-20230312   gcc  
-sparc                randconfig-r023-20230312   gcc  
-sparc                randconfig-r024-20230312   gcc  
-sparc                randconfig-r032-20230313   gcc  
-sparc                randconfig-r034-20230312   gcc  
-sparc                randconfig-r035-20230313   gcc  
-sparc                randconfig-r036-20230313   gcc  
-sparc64      buildonly-randconfig-r001-20230312   gcc  
-sparc64      buildonly-randconfig-r003-20230312   gcc  
-sparc64      buildonly-randconfig-r003-20230313   gcc  
-sparc64              randconfig-r001-20230313   gcc  
-sparc64              randconfig-r002-20230312   gcc  
-sparc64              randconfig-r004-20230312   gcc  
-sparc64              randconfig-r004-20230313   gcc  
-sparc64              randconfig-r006-20230313   gcc  
-sparc64              randconfig-r012-20230313   gcc  
-sparc64              randconfig-r013-20230312   gcc  
-sparc64              randconfig-r014-20230312   gcc  
-sparc64              randconfig-r014-20230313   gcc  
-sparc64              randconfig-r015-20230312   gcc  
-sparc64              randconfig-r021-20230312   gcc  
-sparc64              randconfig-r021-20230313   gcc  
-sparc64              randconfig-r022-20230312   gcc  
-sparc64              randconfig-r024-20230312   gcc  
-sparc64              randconfig-r024-20230313   gcc  
-sparc64              randconfig-r025-20230313   gcc  
-sparc64              randconfig-r026-20230312   gcc  
-sparc64              randconfig-r034-20230312   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                            allnoconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r004-20230313   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230313   gcc  
-x86_64               randconfig-a002-20230313   gcc  
-x86_64               randconfig-a003-20230313   gcc  
-x86_64               randconfig-a004-20230313   gcc  
-x86_64               randconfig-a005-20230313   gcc  
-x86_64               randconfig-a006-20230313   gcc  
-x86_64               randconfig-a011-20230313   clang
-x86_64               randconfig-a012-20230313   clang
-x86_64               randconfig-a013-20230313   clang
-x86_64               randconfig-a014-20230313   clang
-x86_64               randconfig-a015-20230313   clang
-x86_64               randconfig-a016-20230313   clang
-x86_64               randconfig-k001-20230313   clang
-x86_64                        randconfig-k001   clang
-x86_64               randconfig-r002-20230313   gcc  
-x86_64               randconfig-r016-20230313   clang
-x86_64               randconfig-r025-20230313   clang
-x86_64               randconfig-r033-20230313   gcc  
-x86_64                               rhel-8.3   gcc  
-xtensa       buildonly-randconfig-r001-20230312   gcc  
-xtensa       buildonly-randconfig-r004-20230312   gcc  
-xtensa       buildonly-randconfig-r005-20230312   gcc  
-xtensa       buildonly-randconfig-r006-20230312   gcc  
-xtensa               randconfig-r001-20230312   gcc  
-xtensa               randconfig-r001-20230313   gcc  
-xtensa               randconfig-r003-20230312   gcc  
-xtensa               randconfig-r005-20230312   gcc  
-xtensa               randconfig-r015-20230312   gcc  
-xtensa               randconfig-r015-20230313   gcc  
-xtensa               randconfig-r016-20230312   gcc  
-xtensa               randconfig-r023-20230312   gcc  
-xtensa               randconfig-r024-20230313   gcc  
-xtensa               randconfig-r032-20230313   gcc  
-xtensa               randconfig-r033-20230312   gcc  
-xtensa               randconfig-r034-20230312   gcc  
-xtensa               randconfig-r034-20230318   gcc  
+> +{
+> +	struct msft_monitor_addr_filter_data *address_filter, *n;
+> +	struct msft_data *msft = hdev->msft_data;
+> +	struct msft_cp_le_cancel_monitor_advertisement cp;
+> +	struct sk_buff *skb;
+> +	struct list_head head;
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Suggestion:
+
+I assume that it is not standard practice for bluetooth code.
+But, FWIIW, I do find it significantly easier to read code that
+uses reverse xmas tree - longest line to shortest - for local
+variable declarations.
+
+In this case, that would be:
+
+	struct msft_monitor_addr_filter_data *address_filter, *n;
+	struct msft_cp_le_cancel_monitor_advertisement cp;
+	struct msft_data *msft = hdev->msft_data;
+	struct list_head head;
+	struct sk_buff *skb;
+
+...
+
+> @@ -400,6 +516,9 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
+>  	ptrdiff_t offset = 0;
+>  	u8 pattern_count = 0;
+>  	struct sk_buff *skb;
+> +	int err;
+> +	struct msft_monitor_advertisement_handle_data *handle_data;
+> +	struct msft_rp_le_monitor_advertisement *rp;
+
+As per the build bot, rp is set but not the value is not used.
+I guess rp can be removed entirely.
+
+Link: https://lore.kernel.org/netdev/202303161807.AcfCGsAP-lkp@intel.com/
+Link: https://lore.kernel.org/netdev/202303170056.UsZ6RDV4-lkp@intel.com/
+
+>  
+>  	if (!msft_monitor_pattern_valid(monitor))
+>  		return -EINVAL;
+> @@ -436,16 +555,30 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
+>  
+>  	skb = __hci_cmd_sync(hdev, hdev->msft_opcode, total_size, cp,
+>  			     HCI_CMD_TIMEOUT);
+> -	kfree(cp);
+>  
+>  	if (IS_ERR_OR_NULL(skb)) {
+> -		if (!skb)
+> -			return -EIO;
+> +		kfree(cp);
+>  		return PTR_ERR(skb);
+>  	}
+>  
+> -	return msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode,
+> -						monitor, skb);
+> +	err = msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode,
+> +					       monitor, skb);
+> +	if (!err) {
+> +		rp = (struct msft_rp_le_monitor_advertisement *)skb->data;
+> +		handle_data = msft_find_handle_data(hdev, monitor->handle,
+> +						    true);
+> +		if (handle_data) {
+> +			handle_data->rssi_high   = cp->rssi_high;
+> +			handle_data->rssi_low    = cp->rssi_low;
+> +			handle_data->rssi_low_interval    =
+> +						cp->rssi_low_interval;
+> +			handle_data->rssi_sampling_period =
+> +						cp->rssi_sampling_period;
+> +		}
+> +	}
+> +	kfree(cp);
+> +
+> +	return err;
+
+I think it would be more idiomatic to write the above something like this.
+(* completely untested! *)
+
+	err = msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode,
+					       monitor, skb);
+	if (err)
+		goto out_free;
+
+	handle_data = msft_find_handle_data(hdev, monitor->handle, true);
+	if (!handle_data)
+		goto out_free;
+
+	handle_data->rssi_high = cp->rssi_high;
+	handle_data->rssi_low = cp->rssi_low;
+	handle_data->rssi_low_interval = cp->rssi_low_interval;
+	handle_data->rssi_sampling_period = cp->rssi_sampling_period;
+
+out_free:
+	kfree(cp);
+	return err;
+
+>  }
+>  
+>  /* This function requires the caller holds hci_req_sync_lock */
+> @@ -497,6 +630,41 @@ int msft_resume_sync(struct hci_dev *hdev)
+>  	return 0;
+>  }
+>  
+> +/* This function requires the caller holds hci_req_sync_lock */
+> +static bool msft_address_monitor_assist_realtek(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +	struct {
+> +		__u8   status;
+> +		__u8   chip_id;
+> +	} *rp;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc6f, 0, NULL, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR_OR_NULL(skb)) {
+> +		bt_dev_err(hdev, "MSFT: Failed to send the cmd 0xfc6f");
+> +		return false;
+
+This seems like an error case that should propagate.
+
+> +	}
+> +
+> +	rp = (void *)skb->data;
+> +	if (skb->len < sizeof(*rp) || rp->status) {
+> +		kfree_skb(skb);
+> +		return false;
+
+Ditto.
+
+Also, probably this warrant's a cleanup path.
+
+	if (cond) {
+		err = -EINVAL;
+		goto out_free;
+	}
+	...
+
+out_free:
+	kfree(cp);
+	return err;
+
+
+> +	}
+> +
+> +	/* RTL8822C chip id: 13
+> +	 * RTL8852A chip id: 18
+> +	 * RTL8852C chip id: 25
+> +	 */
+> +	if (rp->chip_id == 13 || rp->chip_id == 18 || rp->chip_id == 25) {
+> +		kfree_skb(skb);
+> +		return true;
+
+This could also leverage a label such as 'out_free'.
+
+> +	}
+> +
+> +	kfree_skb(skb);
+> +
+> +	return false;
+> +}
+> +
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  void msft_do_open(struct hci_dev *hdev)
+>  {
+> @@ -518,6 +686,10 @@ void msft_do_open(struct hci_dev *hdev)
+>  	msft->evt_prefix_len = 0;
+>  	msft->features = 0;
+>  
+> +	if (hdev->manufacturer == 0x005d)
+
+Perhaps 0x005d could be a #define to make it clearer what it means.
+
+> +		msft->addr_monitor_assist =
+> +			msft_address_monitor_assist_realtek(hdev);
+> +
+>  	if (!read_supported_features(hdev, msft)) {
+>  		hdev->msft_data = NULL;
+>  		kfree(msft);
+
+...
+
+> @@ -645,12 +881,237 @@ static void *msft_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
+>  	return data;
+>  }
+>  
+> +static int msft_add_address_filter_sync(struct hci_dev *hdev, void *data)
+> +{
+> +	struct sk_buff *skb = data;
+> +	struct msft_monitor_addr_filter_data *address_filter = NULL;
+> +	struct sk_buff *nskb;
+> +	struct msft_rp_le_monitor_advertisement *rp;
+> +	bool remove = false;
+> +	struct msft_data *msft = hdev->msft_data;
+> +	int err;
+> +
+> +	if (!msft) {
+> +		bt_dev_err(hdev, "MSFT: msft data is freed");
+> +		err = -EINVAL;
+> +		goto error;
+> +	}
+> +
+> +	mutex_lock(&msft->filter_lock);
+> +
+> +	address_filter = msft_find_address_data(hdev,
+> +						addr_filter_cb(skb)->addr_type,
+> +						&addr_filter_cb(skb)->bdaddr,
+> +						addr_filter_cb(skb)->pattern_handle);
+
+nit: mutex_unlock() could go here, to avoid duplicating it below.
+
+> +	if (!address_filter) {
+> +		bt_dev_warn(hdev, "MSFT: No address (%pMR) filter to enable",
+> +			    &addr_filter_cb(skb)->bdaddr);
+> +		mutex_unlock(&msft->filter_lock);
+> +		err = -ENODEV;
+> +		goto error;
+> +	}
+> +
+> +	mutex_unlock(&msft->filter_lock);
+
+...
+
+> +/* This function requires the caller holds msft->filter_lock */
+> +static struct msft_monitor_addr_filter_data *msft_add_address_filter
+> +		(struct hci_dev *hdev, u8 addr_type, bdaddr_t *bdaddr,
+> +		 struct msft_monitor_advertisement_handle_data *handle_data)
+> +{
+> +	struct sk_buff *skb;
+> +	struct msft_cp_le_monitor_advertisement *cp;
+> +	struct msft_monitor_addr_filter_data *address_filter = NULL;
+> +	size_t size;
+> +	struct msft_data *msft = hdev->msft_data;
+> +	int err;
+> +
+> +	size = sizeof(*cp) + sizeof(addr_type) + sizeof(*bdaddr);
+> +	skb = alloc_skb(size, GFP_KERNEL);
+> +	if (!skb) {
+> +		bt_dev_err(hdev, "MSFT: alloc skb err in device evt");
+> +		return NULL;
+> +	}
+> +
+> +	cp = skb_put(skb, sizeof(*cp));
+> +	cp->sub_opcode	    = MSFT_OP_LE_MONITOR_ADVERTISEMENT;
+> +	cp->rssi_high	    = handle_data->rssi_high;
+> +	cp->rssi_low	    = handle_data->rssi_low;
+> +	cp->rssi_low_interval    = handle_data->rssi_low_interval;
+> +	cp->rssi_sampling_period = handle_data->rssi_sampling_period;
+> +	cp->cond_type	    = MSFT_MONITOR_ADVERTISEMENT_TYPE_ADDR;
+> +	skb_put_u8(skb, addr_type);
+> +	skb_put_data(skb, bdaddr, sizeof(*bdaddr));
+> +
+> +	address_filter = kzalloc(sizeof(*address_filter), GFP_KERNEL);
+> +	if (!address_filter) {
+> +		kfree_skb(skb);
+> +		return NULL;
+> +	}
+> +
+> +	address_filter->active		     = false;
+> +	address_filter->msft_handle	     = 0xff;
+> +	address_filter->pattern_handle	     = handle_data->msft_handle;
+> +	address_filter->mgmt_handle	     = handle_data->mgmt_handle;
+> +	address_filter->rssi_high	     = cp->rssi_high;
+> +	address_filter->rssi_low	     = cp->rssi_low;
+> +	address_filter->rssi_low_interval    = cp->rssi_low_interval;
+> +	address_filter->rssi_sampling_period = cp->rssi_sampling_period;
+> +	address_filter->addr_type	     = addr_type;
+> +	bacpy(&address_filter->bdaddr, bdaddr);
+> +	list_add_tail(&address_filter->list, &msft->address_filters);
+> +
+> +	addr_filter_cb(skb)->pattern_handle = address_filter->pattern_handle;
+> +	addr_filter_cb(skb)->addr_type = addr_type;
+> +	bacpy(&addr_filter_cb(skb)->bdaddr, bdaddr);
+> +
+> +	err = hci_cmd_sync_queue(hdev, msft_add_address_filter_sync, skb, NULL);
+> +	if (err < 0) {
+> +		bt_dev_err(hdev, "MSFT: Add address %pMR filter err", bdaddr);
+> +		list_del(&address_filter->list);
+> +		kfree(address_filter);
+> +		kfree_skb(skb);
+> +		return NULL;
+> +	}
+> +
+> +	bt_dev_info(hdev, "MSFT: Add device %pMR address filter",
+> +		    &address_filter->bdaddr);
+> +
+> +	return address_filter;
+
+I think it would be more idiomatic to handle duplicated cleanup on error
+using a label, something like this:
+
+err_skb:
+	kfree(skb);
+	return NULL;
+
+> +}
+
+...
