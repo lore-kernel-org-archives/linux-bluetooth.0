@@ -2,51 +2,51 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B02C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Mar 2023 14:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90565C7618A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Mar 2023 14:40:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231873AbjCTOjn (ORCPT
+        id S231862AbjCTOkG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Mar 2023 10:39:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43720 "EHLO
+        Mon, 20 Mar 2023 10:40:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231892AbjCTOjX (ORCPT
+        with ESMTP id S231834AbjCTOjc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Mar 2023 10:39:23 -0400
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2057.outbound.protection.outlook.com [40.107.21.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5F64EC7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 07:38:59 -0700 (PDT)
+        Mon, 20 Mar 2023 10:39:32 -0400
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2049.outbound.protection.outlook.com [40.107.21.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF38252A6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 07:39:07 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lmKIEzV0yRWkB2+lr24416MZFV3imWuAuRg9qgRckmJvmGvYI94WdiYqZYVnQZ0HJl7YyNpchsAW8sA210WTc58BU4da0Ik1aYi08zA0A/EC7JGk+QefWHsGlY63a4NoYwghApAqt9fnjzbyK9l7FpuHLhR7uw1ULmLR3F4TDimSsGwDMhPQihGyxkcaPHGyoe4yj5NTzuDK9Q1xFB8SvbXk7oI6GMEnRnrfmtoQufNyRiZU5KfY9o7McrDMQL+zu8uLYsKLXWpYgqvV1Z6PyHMttT1vJLFI+8tVe8hlm7lvBOX9IqhyBVfBKSWyq2qktSjwf7lg08vC7CN3fj5RdQ==
+ b=XFGz/nk4ZXFJlpPXm/7yeyWxdXyJFmCUWWwcqVk+VKAfTOXWZeo3tlOnd1L4AeXsn2g98bDjEnj+e4isc2eJVlvPE+jvW+ldKgCMHDMMUznH7dbyhQNwP2BNi9ECbhPI1pDBLwDR8UElCgQIN+AE0zjz80CwtKIa1kSr+HLt9ZpDIzaeB2jLF7NsrBd+m59pAc+B8zKiEV1hAEQsSpHweMKFlhgyAW/pbyq74VZGBTzZiRG21/3sbvCfvUn1InKgTFTCVJzAXWDtE4qceHB9MTBjEOp7VV485U9h/wYT6re08oElZ685TFrmY9ZLMgTLN3Og/7wh5fIE5NGqeutKIQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pOevsh3RkaSlqyb3JVWJIle7kUDvz3eog+zy+sAEO4w=;
- b=Ay0v25jw890XUmczfNqX5+KfFM7KrFT96FKslL8Ose9qA/1Z+ztNIXJW+QYa9Wid2DOpnyI6eYGGHLXDwiXqsavJmwXKMdg00Pz5CuqUnACbN+7UNgw1sw3JzJq8+Rt1Oy7Dil36lAR5FJSmhHMKVBc70mupKXeg0VJdmqCXkQYMflT0pK8cRT3HUD1QIA0NMfuvq1V2k0eUWpbovyKIZv8tKEXfrAuOPP0p2QGMJK5CCeU4JSG1tl9yeljah/vV1uTzIvp5/1qCUbPP0xN1ov+ZBH0ZFX9bactN20r4d28LfTXw6FLk93RXLX3REShKQjI+lhnfiG5vMbe1Fkt/mg==
+ bh=NwO7QxuEMM0nKL0CNUeTZsGstAyZ++3JC0cSHXNsZfc=;
+ b=AFacp/PtJQocSflJxYHzGpN8Jm8N52tnLEf6ql7tZ/Sk5A1w2q359UzMoMkEn0fWeKTLD1bbaJcRMnNnMyfFW0Tq968Y6PESfdYHzQY51LFRa0EHFAVWBU/GTcN75KS07Xejpf4IHibhT11lrPSfbwFudiYXuXzlwuJmcICPjqUzKufSvPBSzQ4I1E7WhDUFIwjLzCJ0JY2aLM8ULfmiB+zQDpvHC1BEbh1g7kZHALxFsQOvyFAcdcj/UAwMwtMgCnmDlgohaYpimt39vrwny1uAraZDUSMiN/gtOz41agU5K2BKOBTmoiklrIeZgKGvmSdQ3b2tTh3ttWmv3b5knA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pOevsh3RkaSlqyb3JVWJIle7kUDvz3eog+zy+sAEO4w=;
- b=MwcfoQZ/YV8stcYGW0WH5vjlAGyiJX5M/vmBoNT9Pkaxb/P+1XViGavEBU1YyazTBU/cqASpuARcZBGe4G34BbHInRiewfHzVPBm1xXqC40/WvXtuOK2hj6z8Dm/4UenVCo/tFHuJ0ou/22e2uBCGklfPraPlGEcZlC0tAKYZkM=
+ bh=NwO7QxuEMM0nKL0CNUeTZsGstAyZ++3JC0cSHXNsZfc=;
+ b=ZOIvnkTZr0AVbvkeEYhkpe9hpT+scLtTxpf7AxzUlSHDOjoXtPd407d7kqGhkfY7167/Y7udmnVJPZMkeJNouqoTx0fd0ZrxDt3ertXh0W4Y2XSTpuuxX1h+zeVsogl4zQPKWlcV1W2Pm8pg57JUbFXTmuVGNMVEJKeGIJEeDnw=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by VE1PR04MB7231.eurprd04.prod.outlook.com (2603:10a6:800:1a9::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6178.37; Mon, 20 Mar
- 2023 14:37:42 +0000
+ 2023 14:37:44 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::e463:bd8b:f1cf:9a98]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::e463:bd8b:f1cf:9a98%8]) with mapi id 15.20.6178.037; Mon, 20 Mar 2023
- 14:37:42 +0000
+ 14:37:44 +0000
 From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 7/8] tools/isotest: Use dedicated ISO QoS options for unicast and broadcast
-Date:   Mon, 20 Mar 2023 16:37:12 +0200
-Message-Id: <20230320143713.25449-8-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 8/8] tools/iso-tester: Use dedicated ISO QoS options for unicast and broadcast
+Date:   Mon, 20 Mar 2023 16:37:13 +0200
+Message-Id: <20230320143713.25449-9-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230320143713.25449-1-iulia.tanasescu@nxp.com>
 References: <20230320143713.25449-1-iulia.tanasescu@nxp.com>
@@ -58,51 +58,51 @@ X-ClientProxiedBy: AM3PR07CA0147.eurprd07.prod.outlook.com
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|VE1PR04MB7231:EE_
-X-MS-Office365-Filtering-Correlation-Id: d2b7113f-59a0-4341-18c8-08db2950a994
+X-MS-Office365-Filtering-Correlation-Id: 1cc8f048-71bb-4087-c136-08db2950aa95
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tWBLeDsgsDwywdnQ89oPOqboiFizin6bQWW0g1QNoZkAd+El8exa7yt54kkqVUc/8euL0VhSsRHXFT/xT12YSfhRCXSx0vQM9KlYA8UYeWO4VdXD8lm91n9BDJqjJaXbx70xkBk0msALc0wBQOX0wknX1TH44+dDyDB0T8JgfxT5gysshjdd3AtriiUm4K0m0pm6OzjlbeQxgOxhTHH46riXJuoQjjBTH64M4HdSgK6DiWgNrVsfIORysZLXQojgo/BMWVOZJggSqjp24rbZFhmtgLvoMWsuHqRLm41iblw0V7dCmcS96Ips3y7FbdkBbh2D7K1P4pFecH7t7D1/XvZzWrhpkkUOAyFn8Dj4qtye8p0wxgnjPjNETDA5tSvxXnNKXaezM8UI0ClkSNGHq4swSy798MD0zTC9eKVlSm3keH+FH4yHdTxWpbJXMgJJqKTXsoSwxtu3EDtLv7YjnoUo5w4WfPD44EfAdPoqgK0ULaskJ5K5aA7tVBZYT6aUscs9iHQRQ3ulwsy0YjTpdeuUm9JO6eEva+ch8PfEuz8vV7Euepz1cByq9S0/H8KJM0B346/L/ytkAPwrCqe43THjAk0KZJ+6EO6PDzETRY0zX0lgWgoRNvgLlHwTRV440HqQxXjQitP6SBPcQN2c0mcQUBwJ2LQnqUZr7PIJ5wl6JOeDcxo88AwO2puu2Nw+0yaqF2msG13FX7aw5mNlAQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(396003)(366004)(136003)(376002)(346002)(451199018)(6506007)(2616005)(1076003)(55236004)(26005)(6512007)(6666004)(6486002)(8676002)(4326008)(83380400001)(52116002)(316002)(186003)(66476007)(478600001)(66946007)(6916009)(8936002)(5660300002)(44832011)(2906002)(41300700001)(38100700002)(38350700002)(86362001)(66556008)(36756003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: lQ55kL9QuuxP+uVicrUQ4mozEj+uuoJvgKm0QKbdJO9oyu2y1Nso7cDbvOH0ZEKZxAAt+7f8ZEqLs97hfyFXlNES12j7q5CWiyrFcriSkK3olbiZ72lesaQ19BPlMCkZe+al3+CRmp3ma+ytRQfP16oBDnOiRLkUv+rWHP8rJcQ3lIFJ7VMTF5VUX6n9wxKvd3KzvOwa7CepwoFuAEU3W3kFEHxJcrHGOhOSafTwIF8Na5tu9wRQjbNy0MIub6lh0f1TrccZq06gezOuxVo7+J6ZEOEj3JBMM/9a64vprSFoto/4l7GLin+BZ8iNmIEq9scuQ+LaHzT3TP6XABH9H+SpsGz0Rc1DIA93BKYUUHpdHwNYEfZBxGZJu0HQOVQKpIroAJmDy3zUwz1PRTfTSNr9xsIz2dV0CiueaiRzrPm6Lu8jVIbyBpglt7cmKSSFNPzq8OrDNMRej5j+Qt/YN6sr+akA5ua8KDxrxger+YVTkeYRbtbL3VIVcCHSr8lDL/PsNktJ5lVJVBPYZJKQfoZp1eI+K37iDxQkJSbT07OTNQ+asJWRazzyWdgKJhGCcM8KLzz0TIX/VBa3yHa2aQazeydMKW8fyPBcAQSSC/MKes9GJnrrWDtYjpVe/0ErcT0vlOjpx7nmJEUzScF4D3TyVpRrlMliR+SAFj/xAbJ823vO1A8X32uR0HB01YT7
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(396003)(366004)(136003)(376002)(346002)(451199018)(6506007)(2616005)(1076003)(55236004)(26005)(6512007)(6666004)(6486002)(8676002)(4326008)(83380400001)(52116002)(316002)(186003)(66476007)(478600001)(66946007)(6916009)(30864003)(8936002)(5660300002)(44832011)(2906002)(41300700001)(38100700002)(38350700002)(86362001)(66556008)(36756003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cU6NTS2IaLuw3TbyW1ytvkIKOb4KpZT/BuVdkHg2bs9ZDFHhZCX7h0cWApD8?=
- =?us-ascii?Q?bgfai0dZ/n0UJ9bYPC6SSvnMNU050Z5vTpiOwHIK3rABEasOsI7Hgtkot4vs?=
- =?us-ascii?Q?mIrOQms/Updw0hbbgzVhxLPcQz+eZugYHYpWD2YyaIgSx1gLAp5pP1UAMxLj?=
- =?us-ascii?Q?Tn6oUlJjA5ZrLEblnzDUdLJV6R+Z8qDnh4WoFlc1GOyL+AAXDPDzq0Uz1KZp?=
- =?us-ascii?Q?Y7tgpeRb76QQm0+bkfcjhUaNOVpQWStlqqtxYQNCZuKNkEk9UFHyoDURjM4q?=
- =?us-ascii?Q?x9nrMinEttpCnBFhzOw+GEaSOVaq6quAPEXDRzW/xevkpt2vmEm2c23ybn4u?=
- =?us-ascii?Q?n6uodecHJBIy3jORI7o7YhFZOy8oqETeXG9GaltYbFNoMkWEkvsrZxXMQ4/1?=
- =?us-ascii?Q?xcRUELflHZ1chmUob2TszIWXbfsoJCUwlgj2dci6Xtc5k96Orl0Jahdzce58?=
- =?us-ascii?Q?dlMf+QkM4ZBxm+OReZnpsBfPWS5SW6V3Smz0vPikh0B1Z0x4EyrACi1qmC86?=
- =?us-ascii?Q?S8WcF88QaZm+71lEzICMW4RXTmui5BLF3ZOPz3n/vmPK26omxmlHnsjZzmDa?=
- =?us-ascii?Q?Rjg2ZntLxSQOjo2n4KZKRhE3E35u9ItcWiKvLJTQWeW302WTkeHK876ZdXoh?=
- =?us-ascii?Q?MDbQaWAxIHr8GUjKiebCqDmyjnWpk7TDis+/6jFI3H1eeuujOqaH5c8JGFok?=
- =?us-ascii?Q?m8708UQKlqHcBW86mP58FQE5OMmyUR7xog/OIk9t7+NKG+oXDkE7nGKIrvQR?=
- =?us-ascii?Q?AZ4WsFN0dhwPf/NoVBUglAENvOJQ39ysSQP0vlKCsKxPipqoF6GGVRtx9kFr?=
- =?us-ascii?Q?QDaIZzQcUx2cjXX12wZ9T39uysC9tkNUryLhNjM1ICcC0rAsxXpwjMAIaR5M?=
- =?us-ascii?Q?EKcx4vQJ4X1ouewotSSnykMQ2xv1tT+pTCFKbbI4SaRi5lyPK6roBZd6EEYy?=
- =?us-ascii?Q?bFW8mGqzdFExJNRNUAEO+XVdC9Jh3haup9CyipVQSKDNJnvZ3sH695zXAntk?=
- =?us-ascii?Q?zjf+miNf3Wgoh8byl1GwMQggIYBVELDANvAbFoeBOdNGX/hGoQDdnNQJwtsL?=
- =?us-ascii?Q?bGp9MwvaLRGaYmst8q9jHavqfSdv9YZARMIhHapXALUl6rx0ANzYlzv5qTNJ?=
- =?us-ascii?Q?w4SoEDPlBiNxVZ8UBVKv+zzig7QZzJASYg6HtGZyXqa/8+kkuPbefbONxUbl?=
- =?us-ascii?Q?dF89gnBOqM778GpZEcCcI9O4RpKfFlosNtvUn4VnenZ6EZqupl38sR+//rzv?=
- =?us-ascii?Q?lYtX4vIrCrxukk3xru/ts8YjAmEev1tAFxgG/jKYQuDnOzL8eqeVD6lERxDf?=
- =?us-ascii?Q?6MGef0nthUOX59FnVxUL2RZ3pfbCjFkO51Svwi3amXJNBsX/L57JdXgrLoyB?=
- =?us-ascii?Q?J9tbk9Divcw16KO9yYLJZfdW2x8GlkhkDv2bbPfr3iw967A3Tk5Bs+b3RQ1W?=
- =?us-ascii?Q?M90Lw41UbY/9KI8oyzuWmN7Vvc3uSz8uyLlLmyBaGphVSBS6GOMQG8BhnK/A?=
- =?us-ascii?Q?F7GU/yyacM0Joi6kHumTNLbR6WQc8j3jaQJOpT9qawc86AA+kHTLHNMeT8JE?=
- =?us-ascii?Q?4LpFz2UbtShpQ+EHf3o0Qx9Tfvu2re4+tjEw7ipBNDLPti/VCdyBCvljWtxC?=
- =?us-ascii?Q?8w=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JnrWBu8Eq5yXl6Tk1lFERv/oTTO5htaWdxUwQYSuRRuwqrkZMO10iM3Kdt1h?=
+ =?us-ascii?Q?vKY6yguMzSD7nz/CmCKfaPAczK+4QE8yCbR372/GPZrxkDXf9/o54mz7i5pY?=
+ =?us-ascii?Q?8vtq/HV/F7OxnQ0r42UJQKSvW6UPrV1sAKhuWAXmUHqgWjxjXkxH4HjUVdCC?=
+ =?us-ascii?Q?EVC6A4DPDFzzXGs7CVPkS/ZCDf6i8FHTdikYzzYJ0+hv+/aBqlhGkEpck3tX?=
+ =?us-ascii?Q?9bgZPyGFTLxsrY+8OmyEdUtwx39dhMc5a54PWilL+XHe8ACNPGO2YneVZZJI?=
+ =?us-ascii?Q?6YHa/lU7N7IiWqyjdTzBoOHPx1oeWyqrHhxhPkmGfLAfwDhIX8eyEh6U/csT?=
+ =?us-ascii?Q?pPu2XsTDJMtzJ9iSZELoJbSUCbV8sk4tenRvvkMQDXoo0vZ0lyA04frBS4LP?=
+ =?us-ascii?Q?ADalI0HJWqqbTOqd4cbZG/Kxw3lbHJ6aiIH6ZUrrxEztesO6Fl834zRTYPyi?=
+ =?us-ascii?Q?Faj1J8VWXG3ph2Bn78yBdKqW7+ipc61aAL/+R3gC3LY8eWvf423s0Fxd4uhV?=
+ =?us-ascii?Q?uCWq0W8GpJXpdItee85Enq5awS40VsOpNAkcwXNs9P3ym8Wek1C4qf699j1D?=
+ =?us-ascii?Q?toTOTqF1zxzahEZdd8rqZFmbthPutCZGw2tJqpeV9W/DXFMfRt2e3NqXKs3N?=
+ =?us-ascii?Q?O4cRgNKJ9SkVt1D2Hn0OptQyovxIv0rLQPwr6+DtjNUkqh2OOTMD5856z8zW?=
+ =?us-ascii?Q?pXahQMOLHRkSK9FKMDQI/DSRUS5PY16FOhhZ8Modek+RryLnn1PLUuFJ7xRB?=
+ =?us-ascii?Q?/dJw07M0pHzFAVnuk8wv6ZHGaq4tS7UE1stzbEamnlhWLySgHCiDmml+J1FG?=
+ =?us-ascii?Q?7ugO7ssP0r/lrePW3rNE8CPHInTlHXM3qx9Ia1Vwo5W5XMoxu9i1uLKTc9pe?=
+ =?us-ascii?Q?menbqnZ8eRNA1R9MfABBIZdQ/LwZQs9Fz4ghyBF1GqXk2zGWeFUdFsBV6Sy4?=
+ =?us-ascii?Q?F+f/iKmDAovm+AjpOLNtJlzY1dsH7ckxPy1pXI0ankN6jzBuUuqvrBbPy+Cp?=
+ =?us-ascii?Q?atbhmZPke4ExYMdWigd/bRKclGjVtG3dl03cVtvTNLJzz0eOphJ2kU5jlwb/?=
+ =?us-ascii?Q?vEkozRaCadKgD1nlm4E0I2kPrkc1ffPCy7CGVdT9DWEv5HoDtT47ji3AP3MQ?=
+ =?us-ascii?Q?scEXszL0GluA8v2AKjau9ahhKYUSc63V3P2zrHOdgiagzl4KivLGPSojaKWB?=
+ =?us-ascii?Q?CXX4LFAuR62aurskMYgJjJzLGwvaWoBqLpFgkvQs3ZS4liQUnme1sJLgTIC9?=
+ =?us-ascii?Q?p6+uvjXN5Cwaaiz9mNRH1/hysYnRpinAk8ERNKHpjPuFnnZxCMu3RsOPIg1U?=
+ =?us-ascii?Q?jx5esz4Y8JapSHa3TGzEEVWW7ShFwdM1j6y1JcDOrtroAu+QiVERrBYz2l69?=
+ =?us-ascii?Q?p0tJ3Rig1IDefnkZ4KjoI7W4i2FMUF+9MUVV6ZDVJQw9IEY5Kp+6N6ETYMQX?=
+ =?us-ascii?Q?RftykF/x5GnB0LgSGe0yWIHCO9KLcDqNIUciK5mT2ePB40g1PD8YPGF+jzWB?=
+ =?us-ascii?Q?arCIMqs9R81yBkijJWq9KwTP7ltICegn6x66Z1BVcr7OeIrzl/43ZdFjeAIu?=
+ =?us-ascii?Q?2Oi/UqyUhdzkWsKNoHu8Xa0bYw7+IkR8mtaZxZjFSBEETB3iNpMNtxsID2NT?=
+ =?us-ascii?Q?og=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d2b7113f-59a0-4341-18c8-08db2950a994
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1cc8f048-71bb-4087-c136-08db2950aa95
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 14:37:42.3327
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2023 14:37:44.0682
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ykFgArHRnnel35s9lT16fnDgdfMG2Nj163M9+cGw59FKyf/RNmHPdtRUht++5jj09IbU4LKEZsHG5RRcf8Lb9Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3CwSVdHgTDMUu1mXReqHzu+G8CRCusN2rIBweTHU1olZwe9L0G3MJ4zuMF5+g5k6zUPRdfat4pMTHmJoqjKr4A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7231
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -112,13 +112,13 @@ Convert the generic bt_iso_qos structure into dedicated ISO QoS structures
 for unicast or broadcast.
 
 ---
- tools/isotest.c | 159 +++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 125 insertions(+), 34 deletions(-)
+ tools/iso-tester.c | 270 +++++++++++++++++++++++++++++++++------------
+ 1 file changed, 200 insertions(+), 70 deletions(-)
 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index 2b5f164de..f12658812 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index e4582573a..a763c6a09 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
 @@ -4,6 +4,7 @@
   *  BlueZ - Bluetooth protocol stack for Linux
   *
@@ -127,290 +127,619 @@ index 2b5f164de..f12658812 100644
   *
   */
  
-@@ -68,7 +69,7 @@ static int sndbuf;
- static struct timeval sndto;
- static bool quiet;
+@@ -119,10 +120,52 @@
+ #define QOS_48_5_2 QOS_OUT(7500, 75, 117, 0x02, 13)
+ #define QOS_48_6_2 QOS_OUT(10000, 100, 155, 0x02, 13)
  
--struct bt_iso_qos *iso_qos;
-+struct bt_iso_unicast_qos *iso_qos;
- static bool inout;
+-#define QOS_OUT_16_2_1 QOS_OUT(10000, 10, 40, 0x02, 2)
+-#define QOS_OUT_1_16_2_1 QOS_OUT_1(10000, 10, 40, 0x02, 2)
+-#define QOS_OUT_1_1_16_2_1 QOS_OUT_1_1(10000, 10, 40, 0x02, 2)
+-#define QOS_IN_16_2_1 QOS_IN(10000, 10, 40, 0x02, 2)
++#define QOS_SINK_FULL(_big, _in) \
++{ \
++	.options = 0x00, \
++	.skip = 0x0000, \
++	.sync_timeout = 0x4000, \
++	.sync_cte_type = 0x00, \
++	.big = _big, \
++	.encryption = 0x00, \
++	.bcode = {0}, \
++	.mse = 0x00, \
++	.timeout = 0x4000, \
++	.in = _in, \
++}
++
++#define QOS_SOURCE_FULL(_big, _bis, _out) \
++{ \
++	.sync_interval = 0x07, \
++	.big = _big, \
++	.bis = _bis, \
++	.packing = 0x00, \
++	.framing = 0x00, \
++	.encryption = 0x00, \
++	.bcode = {0}, \
++	.out = _out, \
++}
++
++#define BCAST_QOS_OUT(_interval, _latency, _sdu, _phy, _rtn) \
++	QOS_SOURCE_FULL(BT_ISO_QOS_BIG_UNSET, BT_ISO_QOS_BIS_UNSET, \
++		QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
++
++#define BCAST_QOS_OUT_1(_interval, _latency, _sdu, _phy, _rtn) \
++	QOS_SOURCE_FULL(0x01, BT_ISO_QOS_BIS_UNSET, \
++		QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
++
++#define BCAST_QOS_OUT_1_1(_interval, _latency, _sdu, _phy, _rtn) \
++	QOS_SOURCE_FULL(0x01, 0x01, \
++		QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
++
++#define BCAST_QOS_IN(_interval, _latency, _sdu, _phy, _rtn) \
++	QOS_SINK_FULL(BT_ISO_QOS_BIG_UNSET, \
++		QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
++
++#define QOS_OUT_16_2_1 BCAST_QOS_OUT(10000, 10, 40, 0x02, 2)
++#define QOS_OUT_1_16_2_1 BCAST_QOS_OUT_1(10000, 10, 40, 0x02, 2)
++#define QOS_OUT_1_1_16_2_1 BCAST_QOS_OUT_1_1(10000, 10, 40, 0x02, 2)
++#define QOS_IN_16_2_1 BCAST_QOS_IN(10000, 10, 40, 0x02, 2)
  
- struct lookup_table {
-@@ -239,38 +240,94 @@ fail:
- 	return err < 0 ? err : 0;
- }
+ struct test_data {
+ 	const void *test_data;
+@@ -141,7 +184,9 @@ struct test_data {
+ };
  
--static void print_qos(int sk, struct sockaddr_iso *addr)
-+static void print_unicast_qos(int sk)
+ struct iso_client_data {
+-	struct bt_iso_qos qos;
++	struct bt_iso_unicast_qos unicast_qos;
++	struct bt_iso_bcast_sink_qos sink_qos;
++	struct bt_iso_bcast_source_qos source_qos;
+ 	int expect_err;
+ 	const struct iovec *send;
+ 	const struct iovec *recv;
+@@ -369,182 +414,182 @@ static void test_data_free(void *test_data)
+ 	test_iso_full(name, data, setup, func, 1, reason)
+ 
+ static const struct iso_client_data connect_8_1_1 = {
+-	.qos = QOS_8_1_1,
++	.unicast_qos = QOS_8_1_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_8_2_1 = {
+-	.qos = QOS_8_2_1,
++	.unicast_qos = QOS_8_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_16_1_1 = {
+-	.qos = QOS_16_1_1,
++	.unicast_qos = QOS_16_1_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_16_2_1 = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_1_16_2_1 = {
+-	.qos = QOS_1_16_2_1,
++	.unicast_qos = QOS_1_16_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_1_1_16_2_1 = {
+-	.qos = QOS_1_1_16_2_1,
++	.unicast_qos = QOS_1_1_16_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_24_1_1 = {
+-	.qos = QOS_24_1_1,
++	.unicast_qos = QOS_24_1_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_24_2_1 = {
+-	.qos = QOS_24_2_1,
++	.unicast_qos = QOS_24_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_32_1_1 = {
+-	.qos = QOS_32_1_1,
++	.unicast_qos = QOS_32_1_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_32_2_1 = {
+-	.qos = QOS_32_2_1,
++	.unicast_qos = QOS_32_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_44_1_1 = {
+-	.qos = QOS_44_1_1,
++	.unicast_qos = QOS_44_1_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_44_2_1 = {
+-	.qos = QOS_44_2_1,
++	.unicast_qos = QOS_44_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_1_1 = {
+-	.qos = QOS_48_1_1,
++	.unicast_qos = QOS_48_1_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_2_1 = {
+-	.qos = QOS_48_2_1,
++	.unicast_qos = QOS_48_2_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_3_1 = {
+-	.qos = QOS_48_3_1,
++	.unicast_qos = QOS_48_3_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_4_1 = {
+-	.qos = QOS_48_4_1,
++	.unicast_qos = QOS_48_4_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_5_1 = {
+-	.qos = QOS_48_5_1,
++	.unicast_qos = QOS_48_5_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_6_1 = {
+-	.qos = QOS_48_6_1,
++	.unicast_qos = QOS_48_6_1,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_8_1_2 = {
+-	.qos = QOS_8_1_2,
++	.unicast_qos = QOS_8_1_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_8_2_2 = {
+-	.qos = QOS_8_2_2,
++	.unicast_qos = QOS_8_2_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_16_1_2 = {
+-	.qos = QOS_16_1_2,
++	.unicast_qos = QOS_16_1_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_16_2_2 = {
+-	.qos = QOS_16_2_2,
++	.unicast_qos = QOS_16_2_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_24_1_2 = {
+-	.qos = QOS_24_1_2,
++	.unicast_qos = QOS_24_1_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_24_2_2 = {
+-	.qos = QOS_24_2_2,
++	.unicast_qos = QOS_24_2_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_32_1_2 = {
+-	.qos = QOS_32_1_2,
++	.unicast_qos = QOS_32_1_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_32_2_2 = {
+-	.qos = QOS_32_2_2,
++	.unicast_qos = QOS_32_2_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_44_1_2 = {
+-	.qos = QOS_44_1_2,
++	.unicast_qos = QOS_44_1_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_44_2_2 = {
+-	.qos = QOS_44_2_2,
++	.unicast_qos = QOS_44_2_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_1_2 = {
+-	.qos = QOS_48_1_2,
++	.unicast_qos = QOS_48_1_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_2_2 = {
+-	.qos = QOS_48_2_2,
++	.unicast_qos = QOS_48_2_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_3_2 = {
+-	.qos = QOS_48_3_2,
++	.unicast_qos = QOS_48_3_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_4_2 = {
+-	.qos = QOS_48_4_2,
++	.unicast_qos = QOS_48_4_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_5_2 = {
+-	.qos = QOS_48_5_2,
++	.unicast_qos = QOS_48_5_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_48_6_2 = {
+-	.qos = QOS_48_6_2,
++	.unicast_qos = QOS_48_6_2,
+ 	.expect_err = 0
+ };
+ 
+ static const struct iso_client_data connect_invalid = {
+-	.qos = QOS(0, 0, 0, 0, 0),
++	.unicast_qos = QOS(0, 0, 0, 0, 0),
+ 	.expect_err = -EINVAL
+ };
+ 
+ static const struct iso_client_data connect_reject = {
+-	.qos = QOS_16_1_2,
++	.unicast_qos = QOS_16_1_2,
+ 	.expect_err = -ENOSYS
+ };
+ 
+@@ -561,20 +606,20 @@ static const struct iovec send_48_2_1 = {
+ };
+ 
+ static const struct iso_client_data connect_16_2_1_send = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ };
+ 
+ static const struct iso_client_data listen_16_2_1_recv = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.recv = &send_16_2_1,
+ 	.server = true,
+ };
+ 
+ static const struct iso_client_data listen_16_2_1_recv_ts = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.recv = &send_16_2_1,
+ 	.server = true,
+@@ -582,27 +627,27 @@ static const struct iso_client_data listen_16_2_1_recv_ts = {
+ };
+ 
+ static const struct iso_client_data defer_16_2_1 = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_16_2_1_defer_send = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ 	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_48_2_1_defer_send = {
+-	.qos = QOS_48_2_1,
++	.unicast_qos = QOS_48_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ 	.defer = true,
+ };
+ 
+ static const struct iso_client_data listen_16_2_1_defer_recv = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.recv = &send_16_2_1,
+ 	.server = true,
+@@ -610,7 +655,7 @@ static const struct iso_client_data listen_16_2_1_defer_recv = {
+ };
+ 
+ static const struct iso_client_data listen_48_2_1_defer_recv = {
+-	.qos = QOS_48_2_1,
++	.unicast_qos = QOS_48_2_1,
+ 	.expect_err = 0,
+ 	.recv = &send_48_2_1,
+ 	.server = true,
+@@ -618,7 +663,7 @@ static const struct iso_client_data listen_48_2_1_defer_recv = {
+ };
+ 
+ static const struct iso_client_data listen_16_2_1_defer_reject = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = -1,
+ 	.recv = &send_16_2_1,
+ 	.server = true,
+@@ -626,50 +671,51 @@ static const struct iso_client_data listen_16_2_1_defer_reject = {
+ };
+ 
+ static const struct iso_client_data connect_16_2_1_send_recv = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ 	.recv = &send_16_2_1,
+ };
+ 
+ static const struct iso_client_data disconnect_16_2_1 = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.disconnect = true,
+ };
+ 
+ static const struct iso_client_data reconnect_16_2_1 = {
+-	.qos = QOS_16_2_1,
++	.unicast_qos = QOS_16_2_1,
+ 	.expect_err = 0,
+ 	.disconnect = true,
+ };
+ 
+ static const struct iso_client_data bcast_16_2_1_send = {
+-	.qos = QOS_OUT_16_2_1,
++	.source_qos = QOS_OUT_16_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ 	.bcast = true,
+ };
+ 
+ static const struct iso_client_data bcast_1_16_2_1_send = {
+-	.qos = QOS_OUT_1_16_2_1,
++	.source_qos = QOS_OUT_1_16_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ 	.bcast = true,
+ };
+ 
+ static const struct iso_client_data bcast_1_1_16_2_1_send = {
+-	.qos = QOS_OUT_1_1_16_2_1,
++	.source_qos = QOS_OUT_1_1_16_2_1,
+ 	.expect_err = 0,
+ 	.send = &send_16_2_1,
+ 	.bcast = true,
+ };
+ 
+ static const struct iso_client_data bcast_16_2_1_recv = {
+-	.qos = QOS_IN_16_2_1,
++	.sink_qos = QOS_IN_16_2_1,
+ 	.expect_err = 0,
+ 	.recv = &send_16_2_1,
+ 	.bcast = true,
++	.server = true,
+ };
+ 
+ static void client_connectable_complete(uint16_t opcode, uint8_t status,
+@@ -854,7 +900,7 @@ static void test_getsockopt(const void *test_data)
  {
+ 	int sk, err;
+ 	socklen_t len;
 -	struct bt_iso_qos qos;
 +	struct bt_iso_unicast_qos qos;
- 	socklen_t len;
  
- 	/* Read Out QOS */
- 	memset(&qos, 0, sizeof(qos));
+ 	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_ISO);
+ 	if (sk < 0) {
+@@ -867,7 +913,7 @@ static void test_getsockopt(const void *test_data)
  	len = sizeof(qos);
+ 	memset(&qos, 0, len);
  
--	if (getsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len) < 0) {
-+	if (getsockopt(sk, SOL_BLUETOOTH, BT_ISO_UNICAST_QOS, &qos, &len) < 0) {
- 		syslog(LOG_ERR, "Can't get QoS socket option: %s (%d)",
- 				strerror(errno), errno);
- 		return;
+-	err = getsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len);
++	err = getsockopt(sk, SOL_BLUETOOTH, BT_ISO_UNICAST_QOS, &qos, &len);
+ 	if (err < 0) {
+ 		tester_warn("Can't get socket option : %s (%d)",
+ 							strerror(errno), errno);
+@@ -885,7 +931,7 @@ static void test_setsockopt(const void *test_data)
+ {
+ 	int sk, err;
+ 	socklen_t len;
+-	struct bt_iso_qos qos = QOS_16_1_2;
++	struct bt_iso_unicast_qos qos = QOS_16_1_2;
+ 
+ 	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_ISO);
+ 	if (sk < 0) {
+@@ -895,7 +941,8 @@ static void test_setsockopt(const void *test_data)
+ 		goto end;
  	}
  
--	if (!bacmp(&addr->iso_bdaddr, BDADDR_ANY)) {
--		syslog(LOG_INFO, "QoS BIG 0x%02x BIS 0x%02x Packing 0x%02x "
--			"Framing 0x%02x]", qos.big, qos.bis, qos.packing,
--			qos.framing);
--	} else {
--		syslog(LOG_INFO, "QoS CIG 0x%02x CIS 0x%02x Packing 0x%02x "
--			"Framing 0x%02x]", qos.cig, qos.cis, qos.packing,
--			qos.framing);
--		syslog(LOG_INFO, "Input QoS [Interval %u us Latency %u "
--			"ms SDU %u PHY 0x%02x RTN %u]", qos.in.interval,
--			qos.in.latency, qos.in.sdu, qos.in.phy, qos.in.rtn);
-+	syslog(LOG_INFO, "QoS CIG 0x%02x CIS 0x%02x Packing 0x%02x "
-+		"Framing 0x%02x]", qos.cig, qos.cis, qos.packing,
-+		qos.framing);
-+	syslog(LOG_INFO, "Input QoS [Interval %u us Latency %u "
-+		"ms SDU %u PHY 0x%02x RTN %u]", qos.in.interval,
-+		qos.in.latency, qos.in.sdu, qos.in.phy, qos.in.rtn);
-+
-+	syslog(LOG_INFO, "Output QoS [Interval %u us Latency %u "
-+		"ms SDU %u PHY 0x%02x RTN %u]", qos.out.interval,
-+		qos.out.latency, qos.out.sdu, qos.out.phy, qos.out.rtn);
-+}
-+
-+static void print_bcast_source_qos(int sk)
-+{
-+	struct bt_iso_bcast_source_qos qos;
-+	socklen_t len;
-+
-+	/* Read Out QOS */
-+	memset(&qos, 0, sizeof(qos));
-+	len = sizeof(qos);
-+
-+	if (getsockopt(sk, SOL_BLUETOOTH, BT_ISO_BCAST_SOURCE_QOS,
-+						&qos, &len) < 0) {
-+		syslog(LOG_ERR, "Can't get QoS socket option: %s (%d)",
-+				strerror(errno), errno);
-+		return;
- 	}
-+
-+	syslog(LOG_INFO, "QoS BIG 0x%02x BIS 0x%02x Packing 0x%02x "
-+		"Framing 0x%02x]", qos.big, qos.bis, qos.packing,
-+		qos.framing);
-+
- 	syslog(LOG_INFO, "Output QoS [Interval %u us Latency %u "
- 		"ms SDU %u PHY 0x%02x RTN %u]", qos.out.interval,
- 		qos.out.latency, qos.out.sdu, qos.out.phy, qos.out.rtn);
- }
+-	err = setsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos, sizeof(qos));
++	err = setsockopt(sk, SOL_BLUETOOTH, BT_ISO_UNICAST_QOS,
++						&qos, sizeof(qos));
+ 	if (err < 0) {
+ 		tester_warn("Can't set socket option : %s (%d)",
+ 							strerror(errno), errno);
+@@ -906,7 +953,7 @@ static void test_setsockopt(const void *test_data)
+ 	len = sizeof(qos);
+ 	memset(&qos, 0, len);
  
-+static void print_bcast_sink_qos(int sk)
-+{
-+	struct bt_iso_bcast_sink_qos qos;
-+	socklen_t len;
-+
-+	/* Read Out QOS */
-+	memset(&qos, 0, sizeof(qos));
-+	len = sizeof(qos);
-+
-+	if (getsockopt(sk, SOL_BLUETOOTH, BT_ISO_BCAST_SINK_QOS,
-+						&qos, &len) < 0) {
-+		syslog(LOG_ERR, "Can't get QoS socket option: %s (%d)",
-+				strerror(errno), errno);
-+		return;
+-	err = getsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len);
++	err = getsockopt(sk, SOL_BLUETOOTH, BT_ISO_UNICAST_QOS, &qos, &len);
+ 	if (err < 0) {
+ 		tester_warn("Can't get socket option : %s (%d)",
+ 							strerror(errno), errno);
+@@ -1004,8 +1051,14 @@ static int connect_iso_sock(struct test_data *data, uint8_t num, int sk)
+ 		}
+ 	}
+ 
+-	err = setsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &isodata->qos,
+-						sizeof(isodata->qos));
++	if (!isodata->bcast)
++		err = setsockopt(sk, SOL_BLUETOOTH, BT_ISO_UNICAST_QOS,
++			&isodata->unicast_qos, sizeof(isodata->unicast_qos));
++	else {
++		err = setsockopt(sk, SOL_BLUETOOTH, BT_ISO_BCAST_SOURCE_QOS,
++			&isodata->source_qos, sizeof(isodata->source_qos));
 +	}
 +
-+	syslog(LOG_INFO, "QoS BIG 0x%02x", qos.big);
-+
-+	syslog(LOG_INFO, "Input QoS [Interval %u us Latency %u "
-+		"ms SDU %u PHY 0x%02x RTN %u]", qos.in.interval,
-+		qos.in.latency, qos.in.sdu, qos.in.phy, qos.in.rtn);
-+}
-+
-+static void unicast_qos_to_bcast_source(struct bt_iso_unicast_qos *unicast_qos,
-+				struct bt_iso_bcast_source_qos *source_qos)
+ 	if (err < 0) {
+ 		tester_warn("Can't set socket BT_ISO_QOS option : %s (%d)",
+ 							strerror(errno), errno);
+@@ -1080,8 +1133,8 @@ static bool check_io_qos(const struct bt_iso_io_qos *io1,
+ 	return true;
+ }
+ 
+-static bool check_qos(const struct bt_iso_qos *qos1,
+-				const struct bt_iso_qos *qos2)
++static bool check_unicast_qos(const struct bt_iso_unicast_qos *qos1,
++				const struct bt_iso_unicast_qos *qos2)
+ {
+ 	if (qos1->cig != BT_ISO_QOS_CIG_UNSET &&
+ 			qos2->cig != BT_ISO_QOS_CIG_UNSET &&
+@@ -1124,6 +1177,62 @@ static bool check_qos(const struct bt_iso_qos *qos1,
+ 	return true;
+ }
+ 
++static bool check_bcast_source_qos(const struct bt_iso_bcast_source_qos *qos1,
++				const struct bt_iso_bcast_source_qos *qos2)
 +{
-+	memset(source_qos, 0, sizeof(*source_qos));
++	if (qos1->sync_interval != qos2->sync_interval) {
++		tester_warn("Unexpected QoS sync interval: 0x%02x != 0x%02x",
++				qos1->sync_interval, qos2->sync_interval);
++		return false;
++	}
 +
-+	source_qos->sync_interval = unicast_qos->sca;
-+	source_qos->big = unicast_qos->cig;
-+	source_qos->bis = unicast_qos->cis;
-+	source_qos->packing = unicast_qos->packing;
-+	source_qos->framing = unicast_qos->framing;
-+	source_qos->out = unicast_qos->out;
++	if (qos1->big != BT_ISO_QOS_BIG_UNSET &&
++			qos2->big != BT_ISO_QOS_BIG_UNSET &&
++			qos1->big != qos2->big) {
++		tester_warn("Unexpected BIG ID: 0x%02x != 0x%02x",
++				qos1->big, qos2->big);
++		return false;
++	}
++
++	if (qos1->bis != BT_ISO_QOS_BIS_UNSET &&
++			qos2->bis != BT_ISO_QOS_BIS_UNSET &&
++			qos1->bis != qos2->bis) {
++		tester_warn("Unexpected BIS ID: 0x%02x != 0x%02x",
++				qos1->bis, qos2->bis);
++		return false;
++	}
++
++	if (qos1->packing != qos2->packing) {
++		tester_warn("Unexpected QoS packing: 0x%02x != 0x%02x",
++				qos1->packing, qos2->packing);
++		return false;
++	}
++
++	if (qos1->framing != qos2->framing) {
++		tester_warn("Unexpected QoS framing: 0x%02x != 0x%02x",
++				qos1->framing, qos2->framing);
++		return false;
++	}
++
++	if (qos1->encryption != qos2->encryption) {
++		tester_warn("Unexpected QoS encryption: 0x%02x != 0x%02x",
++				qos1->encryption, qos2->encryption);
++		return false;
++	}
++
++	if (memcmp(qos1->bcode, qos2->bcode, sizeof(qos1->bcode))) {
++		tester_warn("Unexpected QoS Broadcast Code");
++		return false;
++	}
++
++	if (!check_io_qos(&qos1->out, &qos2->out)) {
++		tester_warn("Unexpected Output QoS");
++		return false;
++	}
++
++	return true;
 +}
 +
- static int do_connect(char *peer)
+ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
  {
- 	struct sockaddr_iso addr;
-@@ -306,11 +363,25 @@ static int do_connect(char *peer)
- 			iso_qos->in.sdu = 0;
- 		}
- 
--		if (setsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, iso_qos,
--					sizeof(*iso_qos)) < 0) {
--			syslog(LOG_ERR, "Can't set QoS socket option: "
-+		if (!strcmp(peer, "00:00:00:00:00:00")) {
-+			struct bt_iso_bcast_source_qos source_qos;
-+
-+			unicast_qos_to_bcast_source(iso_qos, &source_qos);
-+
-+			if (setsockopt(sk, SOL_BLUETOOTH,
-+					BT_ISO_BCAST_SOURCE_QOS, &source_qos,
-+					sizeof(source_qos)) < 0) {
-+				syslog(LOG_ERR, "Can't set QoS socket option: "
- 					"%s (%d)", strerror(errno), errno);
--			goto error;
-+				goto error;
-+			}
-+		} else {
-+			if (setsockopt(sk, SOL_BLUETOOTH, BT_ISO_UNICAST_QOS,
-+					iso_qos, sizeof(*iso_qos)) < 0) {
-+				syslog(LOG_ERR, "Can't set QoS socket option: "
-+					"%s (%d)", strerror(errno), errno);
-+				goto error;
-+			}
- 		}
- 	}
- 
-@@ -338,7 +409,10 @@ static int do_connect(char *peer)
- 
- 	syslog(LOG_INFO, "Connected [%s]", peer);
- 
--	print_qos(sk, &addr);
-+	if (!strcmp(peer, "00:00:00:00:00:00"))
-+		print_bcast_source_qos(sk);
-+	else
-+		print_unicast_qos(sk);
- 
- 	return sk;
- 
-@@ -441,7 +515,10 @@ static void do_listen(char *filename, void (*handler)(int fd, int sk),
- 		ba2str(&addr->iso_bdaddr, ba);
- 		syslog(LOG_INFO, "Connected [%s]", ba);
- 
--		print_qos(nsk, addr);
-+		if (peer)
-+			print_bcast_sink_qos(nsk);
-+		else
-+			print_unicast_qos(nsk);
- 
- 		/* Handle deferred setup */
- 		if (defer_setup) {
-@@ -648,7 +725,7 @@ static int read_file(int fd, ssize_t count, bool rewind)
- 	return len;
- }
- 
--static void do_send(int sk, int fd, struct bt_iso_qos *qos, uint32_t num,
-+static void do_send(int sk, int fd, struct bt_iso_io_qos *out, uint32_t num,
- 		    bool repeat)
- {
- 	uint32_t seq;
-@@ -662,14 +739,14 @@ static void do_send(int sk, int fd, struct bt_iso_qos *qos, uint32_t num,
- 
- 	for (seq = 0; ; seq++) {
- 		if (fd >= 0) {
--			len = read_file(fd, qos->out.sdu, repeat);
-+			len = read_file(fd, out->sdu, repeat);
- 			if (len < 0) {
- 				syslog(LOG_ERR, "read failed: %s (%d)",
- 						strerror(-len), -len);
- 				exit(1);
- 			}
- 		} else
--			len = qos->out.sdu;
-+			len = out->sdu;
- 
- 		len = send(sk, buf, len, 0);
- 		if (len <= 0) {
-@@ -686,16 +763,22 @@ static void do_send(int sk, int fd, struct bt_iso_qos *qos, uint32_t num,
- 				seq, len, used / len, used);
- 
- 		if (seq && !((seq + 1) % num))
--			send_wait(&t_start, num * qos->out.interval);
-+			send_wait(&t_start, num * out->interval);
- 	}
- }
- 
- static void send_mode(char *filename, char *peer, int i, bool repeat)
- {
--	struct bt_iso_qos qos;
-+	struct bt_iso_io_qos *out;
+@@ -1249,14 +1358,28 @@ static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
+ 	const struct iso_client_data *isodata = data->test_data;
+ 	int err, sk_err, sk;
  	socklen_t len;
- 	int sk, fd = -1;
- 	uint32_t num;
+-	struct bt_iso_qos qos;
 +	int optname;
++	bool ret = true;
 +
 +	union {
-+		struct bt_iso_bcast_source_qos source_qos;
 +		struct bt_iso_unicast_qos unicast_qos;
++		struct bt_iso_bcast_sink_qos sink_qos;
++		struct bt_iso_bcast_source_qos source_qos;
 +	} qos;
  
- 	if (filename) {
- 		char altername[PATH_MAX];
-@@ -728,16 +811,24 @@ static void send_mode(char *filename, char *peer, int i, bool repeat)
- 	syslog(LOG_INFO, "Sending ...");
+ 	sk = g_io_channel_unix_get_fd(io);
  
- 	/* Read QoS */
-+	if (!strcmp(peer, "00:00:00:00:00:00")) {
-+		optname = BT_ISO_BCAST_SOURCE_QOS;
-+		out = &qos.source_qos.out;
-+	} else {
++	if (!isodata->bcast)
 +		optname = BT_ISO_UNICAST_QOS;
-+		out = &qos.unicast_qos.out;
-+	}
++	else if (isodata->server)
++		optname = BT_ISO_BCAST_SINK_QOS;
++	else
++		optname = BT_ISO_BCAST_SOURCE_QOS;
 +
- 	memset(&qos, 0, sizeof(qos));
  	len = sizeof(qos);
--	if (getsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len) < 0) {
-+	if (getsockopt(sk, SOL_BLUETOOTH, optname, &qos, &len) < 0) {
- 		syslog(LOG_ERR, "Can't get Output QoS socket option: %s (%d)",
- 				strerror(errno), errno);
--		qos.out.sdu = ISO_DEFAULT_MTU;
-+		out->sdu = ISO_DEFAULT_MTU;
+ 	memset(&qos, 0, len);
+ 
+-	err = getsockopt(sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len);
++	err = getsockopt(sk, SOL_BLUETOOTH, optname, &qos, &len);
+ 	if (err < 0) {
+ 		tester_warn("Can't get socket option : %s (%d)",
+ 							strerror(errno), errno);
+@@ -1264,7 +1387,14 @@ static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
  	}
  
- 	/* num of packets = latency (ms) / interval (us) */
--	num = (qos.out.latency * 1000 / qos.out.interval);
-+	num = (out->latency * 1000 / out->interval);
+-	if (!check_qos(&qos, &isodata->qos)) {
++	if (!isodata->bcast)
++		ret = check_unicast_qos(&qos.unicast_qos,
++					&isodata->unicast_qos);
++	else if (!isodata->server)
++		ret = check_bcast_source_qos(&qos.source_qos,
++					&isodata->source_qos);
++
++	if (!ret) {
+ 		tester_warn("Unexpected QoS parameter");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1579,7 +1709,7 @@ static void setup_listen(struct test_data *data, uint8_t num, GIOFunc func)
+ 		client = hciemu_get_client(data->hciemu, 0);
+ 		host = hciemu_client_host(client);
  
- 	syslog(LOG_INFO, "Number of packets: %d", num);
- 
-@@ -746,8 +837,8 @@ static void send_mode(char *filename, char *peer, int i, bool repeat)
- 		 * latency:
- 		 * jitter buffer = 2 * (SDU * subevents)
- 		 */
--		sndbuf = 2 * ((qos.out.latency * 1000 / qos.out.interval) *
--							qos.out.sdu);
-+		sndbuf = 2 * ((out->latency * 1000 / out->interval) *
-+							out->sdu);
- 
- 	len = sizeof(sndbuf);
- 	if (setsockopt(sk, SOL_SOCKET, SO_SNDBUF, &sndbuf, len) < 0) {
-@@ -768,10 +859,10 @@ static void send_mode(char *filename, char *peer, int i, bool repeat)
- 		}
+-		bthost_set_cig_params(host, 0x01, 0x01, &isodata->qos);
++		bthost_set_cig_params(host, 0x01, 0x01, &isodata->unicast_qos);
+ 		bthost_create_cis(host, 257, data->acl_handle);
  	}
- 
--	for (i = 6; i < qos.out.sdu; i++)
-+	for (i = 6; i < out->sdu; i++)
- 		buf[i] = 0x7f;
- 
--	do_send(sk, fd, &qos, num, repeat);
-+	do_send(sk, fd, out, num, repeat);
  }
- 
- static void reconnect_mode(char *peer)
-@@ -844,7 +935,7 @@ static void multy_connect_mode(char *peer)
- static struct qos_preset {
- 	const char *name;
- 	bool inout;
--	struct bt_iso_qos qos;
-+	struct bt_iso_unicast_qos qos;
- } presets[] = {
- 	/* QoS Configuration settings for low latency audio data */
- 	QOS_PRESET("8_1_1", true, 7500, 8, 26, 0x02, 2),
 -- 
 2.34.1
 
