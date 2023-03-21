@@ -2,302 +2,408 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43020C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Mar 2023 22:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF17C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Mar 2023 01:04:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229700AbjCTWuG (ORCPT
+        id S229902AbjCUBEe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Mar 2023 18:50:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54904 "EHLO
+        Mon, 20 Mar 2023 21:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbjCTWuF (ORCPT
+        with ESMTP id S229999AbjCUBER (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Mar 2023 18:50:05 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32B6223649
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 15:50:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1679352603; x=1710888603;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JgQS1F3wYa0FlxJrgU1mmVVbhshy8+BlyBvEm4DNbws=;
-  b=FtYUHWGPmSpjrdlbZxTif47AAI3Shh2c5tb4YRdAM22+plRZpR7m1rR6
-   wO1Y5zfDnR8TrIu2zsL5NYmen6DI7gcjg34cMjANNBtdyeA9y6AMAydUC
-   +sd86piAu0mExTWDmh3iTONE1QREUCAxThh4W6doIJQgNBIKt/Fc/gVfj
-   J3lfAyN+2LVGUbLYoGOLuNaU8GJlgRb32GC/Zo909Uzcp1jjSAxN9ylRr
-   YHRxx3BxsJSr8L6dO28TiQJ7sA0naB3PqG2/Rw+6lNPv49WdPstYqxxl7
-   ftGs8Ckc+xux0X6w6it7OfQSguDkZEhTL91IyhuJHOdM6sa/dK3O/gwQa
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10655"; a="341156046"
-X-IronPort-AV: E=Sophos;i="5.98,277,1673942400"; 
-   d="scan'208";a="341156046"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2023 15:50:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10655"; a="770380696"
-X-IronPort-AV: E=Sophos;i="5.98,277,1673942400"; 
-   d="scan'208";a="770380696"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 20 Mar 2023 15:50:00 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1peOKF-000BNK-2J;
-        Mon, 20 Mar 2023 22:49:59 +0000
-Date:   Tue, 21 Mar 2023 06:49:22 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: Re: [PATCH 1/1] Bluetooth: Split bt_iso_qos into dedicated structures
-Message-ID: <202303210652.rxBfO9uo-lkp@intel.com>
-References: <20230320143608.25399-2-iulia.tanasescu@nxp.com>
+        Mon, 20 Mar 2023 21:04:17 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4766D37F1B
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 18:03:38 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id y2so14015441pjg.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 18:03:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679360615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hcly6uuIuDwgtZPqf7oitKPFtiG3urSGrcWCeUaYFUc=;
+        b=E2KnwQ/hzFedGxbS30JeZg0zPPS3ehr1BRrmQP9KME9xr04dPBc29y4UU5xkRXBPYq
+         zOqU4SKNEDOh62YGOytgpB+SEU8BMG8UczmyHaNVwNbxR0ieN2DFv9ZUJr9bd29jRg1t
+         sP1KCd8+bWXPjXOytSi9H/gW9lRoPNdoPCfqK4SIWqXdlKD8xyyfWVjfOrEXnlD5qcjb
+         i5cAPcFlxoDdGEALraO3QMmrPhCAKn/uQaPodfNhngLtQT0DIKUZ7KP7cSXv/3iQL2H0
+         i71rb3SHm8c7CbOhR+/c+ux8eYGunw6JJg2HvNFHGdjCAoherTW8JjyhX9DZ7dinVUBm
+         SVvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679360615;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hcly6uuIuDwgtZPqf7oitKPFtiG3urSGrcWCeUaYFUc=;
+        b=sElzAK9CmJunEOg9M9LhSk8yZn6/IvGiI/xYfXS5yFkW1h4FqwIqzP25zjgbd73kRw
+         +vr57mm4CpTApmtsxa/9t6DjkZXBkMZMcVz7A3t0i/YsJ6HsCwZ4wS78d/lbRD6K6eDr
+         unNShntsZgYSVPQVgJD5bxodKTTXiOFrh14hpR+x7996rt6VDYRhgpmkSqnwO4Z7KDZC
+         hT1IIxAjTAZwNkOxjU0DkCABnmlFilueWnuUOzNqwwtc8qOt/K3cnrQjlxIB/YkO8/l2
+         xIIVzwRAb4JOYVNzaE51f8gSVfGFAblhNvJTguEToQV++Mjsgr9DO6wQT1VKneN8lmiV
+         7Xhg==
+X-Gm-Message-State: AO0yUKVZNlqi3CaXRLQpV97xxobsO64MFdd4UVON2HfgSW9Y8u3kF1rh
+        1JErujMCST2SFqAXeReA1jghOWVQndo=
+X-Google-Smtp-Source: AK7set9drG9tJCdpPOA/TTqArTR7rQ+ALQs9ltNIcljZBGwJSTjvTrQpFAXckiOG91BmLXONvNhKcg==
+X-Received: by 2002:a17:902:fb86:b0:1a0:6eb4:3871 with SMTP id lg6-20020a170902fb8600b001a06eb43871mr397073plb.20.1679360614822;
+        Mon, 20 Mar 2023 18:03:34 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id jc7-20020a17090325c700b001a0667822c8sm7323648plb.94.2023.03.20.18.03.33
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Mar 2023 18:03:34 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] shared/shell: Add support for -i/--init-script
+Date:   Mon, 20 Mar 2023 18:03:32 -0700
+Message-Id: <20230321010333.2361384-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230320143608.25399-2-iulia.tanasescu@nxp.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Iulia,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thank you for the patch! Yet something to improve:
+This adds support for -i/--init-script which can be used to provide a
+file with commands to be initialized, the commands are then run in
+sequence after completing:
 
-[auto build test ERROR on dd41882582a9ab19938598179386b81b793b4a5c]
+client/bluetoothctl -i client/power-on-off.bt
+Agent registered
+Changing power on succeeded
+[CHG] Controller A8:7E:EA:56:87:D5 Pairable: yes
+[CHG] Controller 98:8D:46:EE:6D:16 Pairable: yes
+[CHG] Controller 98:8D:46:EE:6D:16 PowerState: on-disabling
+AdvertisementMonitor path registered
+---
+ src/shared/shell.c | 163 ++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 145 insertions(+), 18 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Iulia-Tanasescu/Bluetooth-Split-bt_iso_qos-into-dedicated-structures/20230320-223805
-base:   dd41882582a9ab19938598179386b81b793b4a5c
-patch link:    https://lore.kernel.org/r/20230320143608.25399-2-iulia.tanasescu%40nxp.com
-patch subject: [PATCH 1/1] Bluetooth: Split bt_iso_qos into dedicated structures
-config: x86_64-randconfig-a005-20230320 (https://download.01.org/0day-ci/archive/20230321/202303210652.rxBfO9uo-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/656a3f84716d5b683951fe8c2cdc3fd17a09950c
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Iulia-Tanasescu/Bluetooth-Split-bt_iso_qos-into-dedicated-structures/20230320-223805
-        git checkout 656a3f84716d5b683951fe8c2cdc3fd17a09950c
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202303210652.rxBfO9uo-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/bluetooth/iso.c:1306:3: error: expected expression
-                   struct bt_iso_unicast_qos unicast_qos;
-                   ^
->> net/bluetooth/iso.c:1314:36: error: use of undeclared identifier 'unicast_qos'
-                   len = min_t(unsigned int, sizeof(unicast_qos), optlen);
-                                                    ^
->> net/bluetooth/iso.c:1314:36: error: use of undeclared identifier 'unicast_qos'
-   net/bluetooth/iso.c:1315:21: error: use of undeclared identifier 'unicast_qos'
-                   if (len != sizeof(unicast_qos)) {
-                                     ^
-   net/bluetooth/iso.c:1320:34: error: use of undeclared identifier 'unicast_qos'
-                   memset(&unicast_qos, 0, sizeof(unicast_qos));
-                                                  ^
-   net/bluetooth/iso.c:1320:11: error: use of undeclared identifier 'unicast_qos'
-                   memset(&unicast_qos, 0, sizeof(unicast_qos));
-                           ^
-   net/bluetooth/iso.c:1320:11: error: use of undeclared identifier 'unicast_qos'
-   net/bluetooth/iso.c:1320:11: error: use of undeclared identifier 'unicast_qos'
-   net/bluetooth/iso.c:1322:26: error: use of undeclared identifier 'unicast_qos'
-                   if (copy_from_sockptr(&unicast_qos, optval, len)) {
-                                          ^
-   net/bluetooth/iso.c:1327:27: error: use of undeclared identifier 'unicast_qos'
-                   if (!check_unicast_qos(&unicast_qos)) {
-                                           ^
-   net/bluetooth/iso.c:1332:29: error: use of undeclared identifier 'unicast_qos'
-                   iso_pi(sk)->unicast_qos = unicast_qos;
-                                             ^
-   net/bluetooth/iso.c:1337:3: error: expected expression
-                   struct bt_iso_bcast_sink_qos sink_qos;
-                   ^
->> net/bluetooth/iso.c:1345:36: error: use of undeclared identifier 'sink_qos'
-                   len = min_t(unsigned int, sizeof(sink_qos), optlen);
-                                                    ^
->> net/bluetooth/iso.c:1345:36: error: use of undeclared identifier 'sink_qos'
-   net/bluetooth/iso.c:1346:21: error: use of undeclared identifier 'sink_qos'
-                   if (len != sizeof(sink_qos)) {
-                                     ^
-   net/bluetooth/iso.c:1351:31: error: use of undeclared identifier 'sink_qos'
-                   memset(&sink_qos, 0, sizeof(sink_qos));
-                                               ^
-   net/bluetooth/iso.c:1351:11: error: use of undeclared identifier 'sink_qos'
-                   memset(&sink_qos, 0, sizeof(sink_qos));
-                           ^
-   net/bluetooth/iso.c:1351:11: error: use of undeclared identifier 'sink_qos'
-   net/bluetooth/iso.c:1351:11: error: use of undeclared identifier 'sink_qos'
-   fatal error: too many errors emitted, stopping now [-ferror-limit=]
-   20 errors generated.
-
-
-vim +1306 net/bluetooth/iso.c
-
-  1275	
-  1276	static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
-  1277				       sockptr_t optval, unsigned int optlen)
-  1278	{
-  1279		struct sock *sk = sock->sk;
-  1280		int len, err = 0;
-  1281		u32 opt;
-  1282	
-  1283		BT_DBG("sk %p", sk);
-  1284	
-  1285		lock_sock(sk);
-  1286	
-  1287		switch (optname) {
-  1288		case BT_DEFER_SETUP:
-  1289			if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
-  1290				err = -EINVAL;
-  1291				break;
-  1292			}
-  1293	
-  1294			if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
-  1295				err = -EFAULT;
-  1296				break;
-  1297			}
-  1298	
-  1299			if (opt)
-  1300				set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-  1301			else
-  1302				clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-  1303			break;
-  1304	
-  1305		case BT_ISO_UNICAST_QOS:
-> 1306			struct bt_iso_unicast_qos unicast_qos;
-  1307	
-  1308			if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
-  1309			    sk->sk_state != BT_CONNECT2) {
-  1310				err = -EINVAL;
-  1311				break;
-  1312			}
-  1313	
-> 1314			len = min_t(unsigned int, sizeof(unicast_qos), optlen);
-  1315			if (len != sizeof(unicast_qos)) {
-  1316				err = -EINVAL;
-  1317				break;
-  1318			}
-  1319	
-  1320			memset(&unicast_qos, 0, sizeof(unicast_qos));
-  1321	
-  1322			if (copy_from_sockptr(&unicast_qos, optval, len)) {
-  1323				err = -EFAULT;
-  1324				break;
-  1325			}
-  1326	
-  1327			if (!check_unicast_qos(&unicast_qos)) {
-  1328				err = -EINVAL;
-  1329				break;
-  1330			}
-  1331	
-  1332			iso_pi(sk)->unicast_qos = unicast_qos;
-  1333	
-  1334			break;
-  1335	
-  1336		case BT_ISO_BCAST_SINK_QOS:
-  1337			struct bt_iso_bcast_sink_qos sink_qos;
-  1338	
-  1339			if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
-  1340			    sk->sk_state != BT_CONNECT2) {
-  1341				err = -EINVAL;
-  1342				break;
-  1343			}
-  1344	
-> 1345			len = min_t(unsigned int, sizeof(sink_qos), optlen);
-  1346			if (len != sizeof(sink_qos)) {
-  1347				err = -EINVAL;
-  1348				break;
-  1349			}
-  1350	
-  1351			memset(&sink_qos, 0, sizeof(sink_qos));
-  1352	
-  1353			if (copy_from_sockptr(&sink_qos, optval, len)) {
-  1354				err = -EFAULT;
-  1355				break;
-  1356			}
-  1357	
-  1358			if (!check_bcast_sink_qos(&sink_qos)) {
-  1359				err = -EINVAL;
-  1360				break;
-  1361			}
-  1362	
-  1363			iso_pi(sk)->sink_qos = sink_qos;
-  1364	
-  1365			break;
-  1366	
-  1367		case BT_ISO_BCAST_SOURCE_QOS:
-  1368			struct bt_iso_bcast_source_qos source_qos;
-  1369	
-  1370			if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
-  1371			    sk->sk_state != BT_CONNECT2) {
-  1372				err = -EINVAL;
-  1373				break;
-  1374			}
-  1375	
-  1376			len = min_t(unsigned int, sizeof(source_qos), optlen);
-  1377			if (len != sizeof(source_qos)) {
-  1378				err = -EINVAL;
-  1379				break;
-  1380			}
-  1381	
-  1382			memset(&source_qos, 0, sizeof(source_qos));
-  1383	
-  1384			if (copy_from_sockptr(&source_qos, optval, len)) {
-  1385				err = -EFAULT;
-  1386				break;
-  1387			}
-  1388	
-  1389			if (!check_bcast_source_qos(&source_qos)) {
-  1390				err = -EINVAL;
-  1391				break;
-  1392			}
-  1393	
-  1394			iso_pi(sk)->source_qos = source_qos;
-  1395	
-  1396			break;
-  1397	
-  1398		case BT_ISO_BASE:
-  1399			if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
-  1400			    sk->sk_state != BT_CONNECT2) {
-  1401				err = -EINVAL;
-  1402				break;
-  1403			}
-  1404	
-  1405			if (optlen > sizeof(iso_pi(sk)->base)) {
-  1406				err = -EOVERFLOW;
-  1407				break;
-  1408			}
-  1409	
-  1410			len = min_t(unsigned int, sizeof(iso_pi(sk)->base), optlen);
-  1411	
-  1412			if (copy_from_sockptr(iso_pi(sk)->base, optval, len)) {
-  1413				err = -EFAULT;
-  1414				break;
-  1415			}
-  1416	
-  1417			iso_pi(sk)->base_len = len;
-  1418	
-  1419			break;
-  1420	
-  1421		default:
-  1422			err = -ENOPROTOOPT;
-  1423			break;
-  1424		}
-  1425	
-  1426		release_sock(sk);
-  1427		return err;
-  1428	}
-  1429	
-
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 3358b383e9e4..58906870f152 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -24,6 +24,7 @@
+ #include <sys/signalfd.h>
+ #include <wordexp.h>
+ #include <getopt.h>
++#include <fcntl.h>
+ 
+ #include <readline/readline.h>
+ #include <readline/history.h>
+@@ -69,7 +70,12 @@ static struct {
+ 	bool zsh;
+ 	bool monitor;
+ 	int timeout;
+-	struct io *input;
++	int init_fd;
++	FILE *f;
++	struct queue *inputs;
++
++	wordexp_t *w;
++	struct queue *queue;
+ 
+ 	bool saved_prompt;
+ 	bt_shell_prompt_input_func saved_func;
+@@ -535,7 +541,7 @@ void bt_shell_printf(const char *fmt, ...)
+ 	char *saved_line;
+ 	int saved_point;
+ 
+-	if (!data.input)
++	if (queue_isempty(data.inputs))
+ 		return;
+ 
+ 	if (data.mode) {
+@@ -988,6 +994,11 @@ static char **shell_completion(const char *text, int start, int end)
+ 
+ static bool io_hup(struct io *io, void *user_data)
+ {
++	if (queue_remove(data.inputs, io)) {
++		if (!queue_isempty(data.inputs))
++			return false;
++	}
++
+ 	mainloop_quit();
+ 
+ 	return false;
+@@ -999,7 +1010,7 @@ static void signal_callback(int signum, void *user_data)
+ 
+ 	switch (signum) {
+ 	case SIGINT:
+-		if (data.input && !data.mode) {
++		if (!queue_isempty(data.inputs) && !data.mode) {
+ 			rl_replace_line("", 0);
+ 			rl_crlf();
+ 			rl_on_new_line();
+@@ -1091,6 +1102,7 @@ static void rl_init(void)
+ static const struct option main_options[] = {
+ 	{ "version",	no_argument, 0, 'v' },
+ 	{ "help",	no_argument, 0, 'h' },
++	{ "init-script",required_argument, 0, 'i' },
+ 	{ "timeout",	required_argument, 0, 't' },
+ 	{ "monitor",	no_argument, 0, 'm' },
+ 	{ "zsh-complete",	no_argument, 0, 'z' },
+@@ -1112,6 +1124,7 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	printf("\t--monitor \tEnable monitor output\n"
+ 		"\t--timeout \tTimeout in seconds for non-interactive mode\n"
+ 		"\t--version \tDisplay version\n"
++		"\t--init-script \tInit script file\n"
+ 		"\t--help \t\tDisplay help\n");
+ }
+ 
+@@ -1130,9 +1143,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	if (opt) {
+ 		memcpy(options + offset, opt->options,
+ 				sizeof(struct option) * opt->optno);
+-		snprintf(optstr, sizeof(optstr), "+mhvt:%s", opt->optstr);
++		snprintf(optstr, sizeof(optstr), "+mhvi:t:%s", opt->optstr);
+ 	} else
+-		snprintf(optstr, sizeof(optstr), "+mhvt:");
++		snprintf(optstr, sizeof(optstr), "+mhvi:t:");
+ 
+ 	data.name = strrchr(argv[0], '/');
+ 	if (!data.name)
+@@ -1140,6 +1153,8 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	else
+ 		data.name = strdup(++data.name);
+ 
++	data.init_fd = -1;
++
+ 	while ((c = getopt_long(argc, argv, optstr, options, &index)) != -1) {
+ 		switch (c) {
+ 		case 'v':
+@@ -1152,6 +1167,12 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 			data.argv = &cmplt;
+ 			data.mode = 1;
+ 			goto done;
++		case 'i':
++			data.init_fd = open(optarg, O_RDONLY);
++			if (data.init_fd < 0)
++				printf("Unable to open %s: %s (%d)\n", optarg,
++						strerror(errno), errno);
++			break;
+ 		case 't':
+ 			if (optarg)
+ 				data.timeout = strtol(optarg, &endptr, 0);
+@@ -1205,6 +1226,8 @@ done:
+ 	rl_init();
+ 
+ 	data.init = true;
++	data.inputs = queue_new();
++	data.queue = queue_new();
+ 	data.prompts = queue_new();
+ }
+ 
+@@ -1239,6 +1262,23 @@ int bt_shell_run(void)
+ 	return status;
+ }
+ 
++static int shell_queue(const wordexp_t *w)
++{
++	int err;
++
++	/* Queue if already executing */
++	if (data.w) {
++		queue_push_tail(data.queue, util_memdup(w, sizeof(*w)));
++		return 0;
++	}
++
++	err = shell_exec(w->we_wordc, w->we_wordv);
++	if (!err)
++		data.w = util_memdup(w, sizeof(*w));
++
++	return err;
++}
++
+ int bt_shell_exec(const char *input)
+ {
+ 	wordexp_t w;
+@@ -1247,21 +1287,44 @@ int bt_shell_exec(const char *input)
+ 	if (!input)
+ 		return 0;
+ 
+-	if (wordexp(input, &w, WRDE_NOCMD))
+-		return -ENOEXEC;
++	err = wordexp(input, &w, WRDE_NOCMD);
++	switch (err) {
++	case WRDE_BADCHAR:
++		return -EBADMSG;
++	case WRDE_BADVAL:
++	case WRDE_SYNTAX:
++		return -EINVAL;
++	case WRDE_NOSPACE:
++		return -ENOMEM;
++	case WRDE_CMDSUB:
++		if (wordexp(input, &w, 0))
++			return -ENOEXEC;
++		break;
++	};
+ 
+ 	if (w.we_wordc == 0) {
+ 		wordfree(&w);
+ 		return -ENOEXEC;
+ 	}
+ 
+-	err = shell_exec(w.we_wordc, w.we_wordv);
++	if (data.f) {
++		err = shell_queue(&w);
++		if (!err)
++			return 0;
++	} else
++		err = shell_exec(w.we_wordc, w.we_wordv);
+ 
+ 	wordfree(&w);
+ 
+ 	return err;
+ }
+ 
++static void shell_word_free(void *data)
++{
++	wordfree(data);
++	free(data);
++}
++
+ void bt_shell_cleanup(void)
+ {
+ 	bt_shell_release_prompt("");
+@@ -1277,6 +1340,8 @@ void bt_shell_cleanup(void)
+ 
+ 	rl_cleanup();
+ 
++	queue_destroy(data.inputs, NULL);
++	queue_destroy(data.queue, shell_word_free);
+ 	queue_destroy(data.prompts, prompt_free);
+ 	data.prompts = NULL;
+ 
+@@ -1292,10 +1357,31 @@ void bt_shell_quit(int status)
+ 		mainloop_exit_failure();
+ }
+ 
++static void shell_dequeue(void)
++{
++	int err;
++
++	if (!data.w)
++		return;
++
++	shell_word_free(data.w);
++	data.w = NULL;
++
++	data.w = queue_pop_head(data.queue);
++	if (!data.w)
++		return;
++
++	err = shell_exec(data.w->we_wordc, data.w->we_wordv);
++	if (err)
++		shell_dequeue();
++}
++
+ void bt_shell_noninteractive_quit(int status)
+ {
+-	if (!data.mode || data.timeout)
++	if (!data.mode || data.timeout) {
++		shell_dequeue();
+ 		return;
++	}
+ 
+ 	bt_shell_quit(status);
+ }
+@@ -1340,7 +1426,44 @@ void bt_shell_set_prompt(const char *string)
+ 
+ static bool input_read(struct io *io, void *user_data)
+ {
+-	rl_callback_read_char();
++	int fd;
++	char *line = NULL;
++	size_t len = 0;
++	ssize_t nread;
++
++	fd = io_get_fd(io);
++
++	if (fd == STDIN_FILENO) {
++		rl_callback_read_char();
++		return true;
++	}
++
++	if (!data.f) {
++		data.f = fdopen(fd, "r");
++		if (!data.f) {
++			printf("fdopen: %s (%d)\n", strerror(errno), errno);
++			return false;
++		}
++	}
++
++	nread = getline(&line, &len, data.f);
++	if (nread > 0) {
++		int err;
++
++		if (line[nread - 1] == '\n')
++			line[nread - 1] = '\0';
++
++		err = bt_shell_exec(line);
++		if (err < 0)
++			printf("%s: %s (%d)\n", line, strerror(-err), -err);
++
++	} else {
++		fclose(data.f);
++		data.f = NULL;
++	}
++
++	free(line);
++
+ 	return true;
+ }
+ 
+@@ -1355,18 +1478,16 @@ bool bt_shell_attach(int fd)
+ {
+ 	struct io *io;
+ 
+-	/* TODO: Allow more than one input? */
+-	if (data.input)
+-		return false;
+-
+ 	io = io_new(fd);
++	if (!io)
++		return false;
+ 
+ 	if (!data.mode) {
+ 		io_set_read_handler(io, input_read, NULL, NULL);
+ 		io_set_disconnect_handler(io, io_hup, NULL, NULL);
+ 	}
+ 
+-	data.input = io;
++	queue_push_tail(data.inputs, io);
+ 
+ 	if (data.mode) {
+ 		if (shell_exec(data.argc, data.argv) < 0) {
+@@ -1377,6 +1498,12 @@ bool bt_shell_attach(int fd)
+ 		if (data.timeout)
+ 			timeout_add(data.timeout * 1000, shell_quit, NULL,
+ 								NULL);
++	} else if (data.init_fd >= 0) {
++		int fd = data.init_fd;
++
++		data.init_fd = -1;
++		if (!bt_shell_attach(fd))
++			return false;
+ 	}
+ 
+ 	return true;
+@@ -1384,11 +1511,11 @@ bool bt_shell_attach(int fd)
+ 
+ bool bt_shell_detach(void)
+ {
+-	if (!data.input)
++	if (queue_isempty(data.inputs))
+ 		return false;
+ 
+-	io_destroy(data.input);
+-	data.input = NULL;
++	queue_remove_all(data.inputs, NULL, NULL,
++					(queue_destroy_func_t) io_destroy);
+ 
+ 	return true;
+ }
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+2.39.2
+
