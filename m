@@ -2,148 +2,206 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE27CC6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Mar 2023 01:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71ED3C6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Mar 2023 02:24:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbjCUBu2 (ORCPT
+        id S229877AbjCUCYd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Mar 2023 21:50:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
+        Mon, 20 Mar 2023 22:24:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjCUBu1 (ORCPT
+        with ESMTP id S229896AbjCUCYa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Mar 2023 21:50:27 -0400
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D18A1B2C6;
-        Mon, 20 Mar 2023 18:50:25 -0700 (PDT)
-Received: by mail-qt1-f172.google.com with SMTP id x1so16323063qtr.7;
-        Mon, 20 Mar 2023 18:50:25 -0700 (PDT)
+        Mon, 20 Mar 2023 22:24:30 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7FCA38B51
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 19:24:24 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-17997ccf711so15042656fac.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 19:24:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679365463;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YCv0qGYNUWTsjW07s+rwarUoRrHbdJOKYXfR1l6jwv0=;
+        b=fhBof1aO/QSfGF3ByBVBGWLZISGOH0XOkNzFH086szDfpvIVz8mfzxWmj4o0cbTnzh
+         6hPvUWuVUVeI2xPJXmw023nBtHw/NFDaxAXHbI17HLwrDhqx1anLo/dVkdTbG7oYDk0R
+         N3sQLtuPNa+C/kvatGySGA/NzAQRHJideQlMlFq48ju/knLiMw4PjxC7vuPpeo8S3Q15
+         FBcn4gIpiMh3p4T7DPOz8cYC+Iri076/YiV8islfFrZ0NGc2zpM8ZUJ0D0ihiq+vM89l
+         4YQuuxErgF4NjkJteAzGXxz+joSMDWmhPfvZWgV3LJtQ4BfPLsU9D39HzOIv2EtwXFYY
+         dNyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679363424;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1679365463;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tkDUehbZ8CJ16R96/Odi5kD4jkkJgB1ss6Vv7vcxDhA=;
-        b=zeeHS/3jtM/2+FJvuE9p7CZr5q4meh2ERTHMHlcC7NFY4MramIDfDplwpqDByk6G1q
-         Jf88YiDUbc+HFzyaovQEB5PANiznKAyIvrUvZT15TGvjYFxJ9NPpv3vX5VmyNltTh6/3
-         Rw6jkHh3jtZTjB1sHR8gZcaiU8Ig6v4Kti5qw9vkioxFHNaZeT7BjUAZ6/LAf0zs4LcE
-         W60sTir9sZvYiqA7qTe+8f49E1cCipXJNNJ93mTZNPG6Nyv0if87EuqH7FeAOtix3GTT
-         HwnXBqIPowAyvSzKUM+oDLHIvnoJG4A2K/wJ+JHYFiqMDW6UL3XUb+zcrKb2vWHMNbA4
-         7lwA==
-X-Gm-Message-State: AO0yUKUUR58FM8YPCy3cODJqdl/RcgXenRK7vECzrEQHC/5cdLcHHpRd
-        RXbJ6KSMyBOsUOROwov7qD8=
-X-Google-Smtp-Source: AK7set+s5R1Hg6hFBgiRMY4hDDixRAPO2xWLXQHx1Qg3kUpTeNOQ262ozOCW01yOUpH3VklFpeRRWA==
-X-Received: by 2002:a05:622a:55:b0:3b8:4adb:c604 with SMTP id y21-20020a05622a005500b003b84adbc604mr2000749qtw.14.1679363424002;
-        Mon, 20 Mar 2023 18:50:24 -0700 (PDT)
-Received: from tofu.cs.purdue.edu ([128.210.0.165])
-        by smtp.gmail.com with ESMTPSA id j13-20020ac8550d000000b003b82489d8acsm7621219qtq.21.2023.03.20.18.50.22
+        bh=YCv0qGYNUWTsjW07s+rwarUoRrHbdJOKYXfR1l6jwv0=;
+        b=GqatvaljEO1MwltVqvIegWbew6QBI7KPJTDtmrXC0lhCB/j5bF/3n5ZlWL+gbMzpCH
+         JNJSjIGxa8NJxj/Es5//Rm5jXkSaxVsDqK/aO7XQzWVU9qiSJPkLXriE+1WJYSO3X48Y
+         +tCr838Y52wXh3Km8iruERfRDz/mWQBCdTVqRwwPAkrsEqNdJWOQWNo0a00kX577jyN7
+         e1SzEIypOTFDhsKu2eHhb6ICpAk68sOjzQYXebp39gRb/n29C1rGRZWRWvOTCz5vTmRK
+         BAFP0HGZ35ZC1GqPshYKF/8g2VvjjI2xh4xvX2M6WkCnhUkUSAV2q/KGwtGvLQiu+XXg
+         in8g==
+X-Gm-Message-State: AO0yUKXrXPFEqUs/Yqc8b0fJaOjhXBIR7x+w/n/NerjjshtUPaivMO7Y
+        FHqWp+tH16rMsnD4lGeVnwpflW4JXxI=
+X-Google-Smtp-Source: AK7set8QntbE6t7C8VkpipaqMtBvDkjshIw+dvg/dxlO7kLrrqSnRal69aVAjK2VF1ZyCCuVoSXlTg==
+X-Received: by 2002:a05:6871:70a:b0:178:9bb0:4c8e with SMTP id f10-20020a056871070a00b001789bb04c8emr290240oap.48.1679365463491;
+        Mon, 20 Mar 2023 19:24:23 -0700 (PDT)
+Received: from [172.17.0.2] ([13.65.246.130])
+        by smtp.gmail.com with ESMTPSA id ya9-20020a0568714cc900b001723a2e84b6sm3853715oab.6.2023.03.20.19.24.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Mar 2023 18:50:23 -0700 (PDT)
-From:   Sungwoo Kim <iam@sung-woo.kim>
-Cc:     wuruoyu@me.com, benquike@gmail.com, daveti@purdue.edu,
-        Sungwoo Kim <iam@sung-woo.kim>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: HCI: Fix global-out-of-bounds
-Date:   Mon, 20 Mar 2023 21:50:18 -0400
-Message-Id: <20230321015018.1759683-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.34.1
+        Mon, 20 Mar 2023 19:24:23 -0700 (PDT)
+Message-ID: <64191557.050a0220.bb25d.18c7@mx.google.com>
+Date:   Mon, 20 Mar 2023 19:24:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7506548738622238753=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
+Subject: RE: Bluetooth: HCI: Fix global-out-of-bounds
+In-Reply-To: <20230321015018.1759683-1-iam@sung-woo.kim>
+References: <20230321015018.1759683-1-iam@sung-woo.kim>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-To loop a variable-length array, hci_init_stage_sync(stage) considers
-that stage[i] is valid as long as stage[i-1].func is valid.
-Thus, the last element of stage[].func should be intentionally invalid
-as hci_init0[], le_init2[], and others did.
-However, amp_init1[] and amp_init2[] have no invalid element, letting
-hci_init_stage_sync() keep accessing amp_init1[] over its valid range.
-This patch fixes this by adding {} in the last of amp_init1[] and
-amp_init2[].
+--===============7506548738622238753==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-==================================================================
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=732139
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.92 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      33.54 seconds
+CheckAllWarning               PASS      36.63 seconds
+CheckSparse                   PASS      41.32 seconds
+CheckSmatch                   PASS      109.88 seconds
+BuildKernel32                 PASS      30.92 seconds
+TestRunnerSetup               PASS      442.73 seconds
+TestRunner_l2cap-tester       PASS      16.53 seconds
+TestRunner_iso-tester         PASS      16.56 seconds
+TestRunner_bnep-tester        PASS      5.37 seconds
+TestRunner_mgmt-tester        PASS      107.29 seconds
+TestRunner_rfcomm-tester      PASS      8.55 seconds
+TestRunner_sco-tester         PASS      7.84 seconds
+TestRunner_ioctl-tester       PASS      9.22 seconds
+TestRunner_mesh-tester        PASS      6.72 seconds
+TestRunner_smp-tester         PASS      7.80 seconds
+TestRunner_userchan-tester    PASS      5.60 seconds
+IncrementalBuild              PASS      28.55 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: HCI: Fix global-out-of-bounds
+WARNING: use relative pathname instead of absolute in changelog text
+#85: 
 BUG: KASAN: global-out-of-bounds in hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
-Read of size 8 at addr ffffffffaed1ab70 by task kworker/u5:0/1032
-CPU: 0 PID: 1032 Comm: kworker/u5:0 Not tainted 6.2.0 #3
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04
-Workqueue: hci1 hci_power_on
-Call Trace:
- <TASK>
-dump_stack_lvl (/v6.2-bzimage/lib/dump_stack.c:107 (discriminator 1))
-print_report (/v6.2-bzimage/mm/kasan/report.c:307 /v6.2-bzimage/mm/kasan/report.c:417)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#85: 
+BUG: KASAN: global-out-of-bounds in hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#85: 
+BUG: KASAN: global-out-of-bounds in hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#94: 
 ? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
-kasan_report (/v6.2-bzimage/mm/kasan/report.c:184 /v6.2-bzimage/mm/kasan/report.c:519)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#94: 
 ? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#94: 
+? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#96: 
+? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#96: 
+? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#96: 
+? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#97: 
 hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
-? __pfx_hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:4635)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#97: 
+hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#97: 
+hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+
+WARNING: use relative pathname instead of absolute in changelog text
+#99: 
 ? mutex_lock (/v6.2-bzimage/./arch/x86/include/asm/atomic64_64.h:190 /v6.2-bzimage/./include/linux/atomic/atomic-long.h:443 /v6.2-bzimage/./include/linux/atomic/atomic-instrumented.h:1781 /v6.2-bzimage/kernel/locking/mutex.c:171 /v6.2-bzimage/kernel/locking/mutex.c:285)
-? __pfx_mutex_lock (/v6.2-bzimage/kernel/locking/mutex.c:282)
-hci_power_on (/v6.2-bzimage/net/bluetooth/hci_core.c:485 /v6.2-bzimage/net/bluetooth/hci_core.c:984)
-? __pfx_hci_power_on (/v6.2-bzimage/net/bluetooth/hci_core.c:969)
-? read_word_at_a_time (/v6.2-bzimage/./include/asm-generic/rwonce.h:85)
-? strscpy (/v6.2-bzimage/./arch/x86/include/asm/word-at-a-time.h:62 /v6.2-bzimage/lib/string.c:161)
-process_one_work (/v6.2-bzimage/kernel/workqueue.c:2294)
-worker_thread (/v6.2-bzimage/./include/linux/list.h:292 /v6.2-bzimage/kernel/workqueue.c:2437)
-? __pfx_worker_thread (/v6.2-bzimage/kernel/workqueue.c:2379)
-kthread (/v6.2-bzimage/kernel/kthread.c:376)
-? __pfx_kthread (/v6.2-bzimage/kernel/kthread.c:331)
-ret_from_fork (/v6.2-bzimage/arch/x86/entry/entry_64.S:314)
- </TASK>
-The buggy address belongs to the variable:
-amp_init1+0x30/0x60
-The buggy address belongs to the physical page:
-page:000000003a157ec6 refcount:1 mapcount:0 mapping:0000000000000000 ia
-flags: 0x200000000001000(reserved|node=0|zone=2)
-raw: 0200000000001000 ffffea0005054688 ffffea0005054688 000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff 000000000000000
-page dumped because: kasan: bad access detected
-Memory state around the buggy address:
- ffffffffaed1aa00: f9 f9 f9 f9 00 00 00 00 f9 f9 f9 f9 00 00 00 00
- ffffffffaed1aa80: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
->ffffffffaed1ab00: 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00 00 00 f9 f9
-                                                             ^
- ffffffffaed1ab80: f9 f9 f9 f9 00 00 00 00 f9 f9 f9 f9 00 00 00 f9
- ffffffffaed1ac00: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 00 02 f9
 
-This bug is found by FuzzBT, a modified version of Syzkaller.
-Other contributors for this bug are Ruoyu Wu and Peng Hui.
+WARNING: use relative pathname instead of absolute in changelog text
+#99: 
+? mutex_lock (/v6.2-bzimage/./arch/x86/include/asm/atomic64_64.h:190 /v6.2-bzimage/./include/linux/atomic/atomic-long.h:443 /v6.2-bzimage/./include/linux/atomic/atomic-instrumented.h:1781 /v6.2-bzimage/kernel/locking/mutex.c:171 /v6.2-bzimage/kernel/locking/mutex.c:285)
 
-Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+WARNING: use relative pathname instead of absolute in changelog text
+#99: 
+? mutex_lock (/v6.2-bzimage/./arch/x86/include/asm/atomic64_64.h:190 /v6.2-bzimage/./include/linux/atomic/atomic-long.h:443 /v6.2-bzimage/./include/linux/atomic/atomic-instrumented.h:1781 /v6.2-bzimage/kernel/locking/mutex.c:171 /v6.2-bzimage/kernel/locking/mutex.c:285)
+
+total: 0 errors, 15 warnings, 0 checks, 14 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13182133.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: HCI: Fix global-out-of-bounds
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+13: B1 Line exceeds max length (275>80): "BUG: KASAN: global-out-of-bounds in hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)"
+21: B1 Line exceeds max length (86>80): "print_report (/v6.2-bzimage/mm/kasan/report.c:307 /v6.2-bzimage/mm/kasan/report.c:417)"
+22: B1 Line exceeds max length (241>80): "? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)"
+23: B1 Line exceeds max length (86>80): "kasan_report (/v6.2-bzimage/mm/kasan/report.c:184 /v6.2-bzimage/mm/kasan/report.c:519)"
+24: B1 Line exceeds max length (241>80): "? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)"
+25: B1 Line exceeds max length (239>80): "hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)"
+27: B1 Line exceeds max length (270>80): "? mutex_lock (/v6.2-bzimage/./arch/x86/include/asm/atomic64_64.h:190 /v6.2-bzimage/./include/linux/atomic/atomic-long.h:443 /v6.2-bzimage/./include/linux/atomic/atomic-instrumented.h:1781 /v6.2-bzimage/kernel/locking/mutex.c:171 /v6.2-bzimage/kernel/locking/mutex.c:285)"
+29: B1 Line exceeds max length (100>80): "hci_power_on (/v6.2-bzimage/net/bluetooth/hci_core.c:485 /v6.2-bzimage/net/bluetooth/hci_core.c:984)"
+32: B1 Line exceeds max length (99>80): "? strscpy (/v6.2-bzimage/./arch/x86/include/asm/word-at-a-time.h:62 /v6.2-bzimage/lib/string.c:161)"
+34: B1 Line exceeds max length (94>80): "worker_thread (/v6.2-bzimage/./include/linux/list.h:292 /v6.2-bzimage/kernel/workqueue.c:2437)"
+
+
 ---
- net/bluetooth/hci_sync.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 117eedb6f..49e692d73 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3319,6 +3319,7 @@ static const struct hci_init_stage amp_init1[] = {
- 	HCI_INIT(hci_read_flow_control_mode_sync),
- 	/* HCI_OP_READ_LOCATION_DATA */
- 	HCI_INIT(hci_read_location_data_sync),
-+	{}
- };
- 
- static int hci_init1_sync(struct hci_dev *hdev)
-@@ -3353,6 +3354,7 @@ static int hci_init1_sync(struct hci_dev *hdev)
- static const struct hci_init_stage amp_init2[] = {
- 	/* HCI_OP_READ_LOCAL_FEATURES */
- 	HCI_INIT(hci_read_local_features_sync),
-+	{}
- };
- 
- /* Read Buffer Size (ACL mtu, max pkt, etc.) */
--- 
-2.34.1
 
+--===============7506548738622238753==--
