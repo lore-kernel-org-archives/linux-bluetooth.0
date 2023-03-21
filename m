@@ -2,171 +2,148 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2D1C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Mar 2023 01:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE27CC6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Mar 2023 01:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229998AbjCUBEf (ORCPT
+        id S229685AbjCUBu2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Mar 2023 21:04:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48460 "EHLO
+        Mon, 20 Mar 2023 21:50:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbjCUBES (ORCPT
+        with ESMTP id S229449AbjCUBu1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Mar 2023 21:04:18 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10A3537B6A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 18:03:40 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id o6-20020a17090a9f8600b0023f32869993so14545799pjp.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Mar 2023 18:03:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679360616;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pCpEw1yrd9anE4HOhk7GJqOyKjxAmMFg+sSOWaKZJqc=;
-        b=mQWnHEHem4ZlLNQ4iOGc9AgWLVNuO9iB2I5LQfSH8bz6nDseANb0QBeEmSEG8jg/tN
-         /3WXZXws5YXfgsH/i5l7VSpNLpJZMJYWZRGI/WW73QhEFtCYp2DQZIzadJp7JCFAVLl4
-         jYqMRA0foUCNO/yI9ia8qyNzD72GtMoHrL5B6d41noJiPj1jrOyH/kQTrGxVsi04gpIs
-         bAr79dhk3eGuhi43LMaQDYu9OpqofFai+Ru20wR+TuxqR4oUi701FoWTi3gnEhj5kHRh
-         xYLWMXm52AZ5i9N9jltRrJYmB2gW46BDTNZEz+M9k7cu+T0AP8hHvGdmxsYTdbu2JuyD
-         fNTg==
+        Mon, 20 Mar 2023 21:50:27 -0400
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D18A1B2C6;
+        Mon, 20 Mar 2023 18:50:25 -0700 (PDT)
+Received: by mail-qt1-f172.google.com with SMTP id x1so16323063qtr.7;
+        Mon, 20 Mar 2023 18:50:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679360616;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pCpEw1yrd9anE4HOhk7GJqOyKjxAmMFg+sSOWaKZJqc=;
-        b=yCxXkJTdZ0KTzFDDim4AHgsIgMM1uSF4SLlRpwijNwFvBKNYfiena/TpznKjYcwprO
-         AzhkNxP7I78dCGMlEAuTYvrbmCj3WkkFlXisL8p5MaGC7jLcL9n9fiHyVaJp4j7uH3UX
-         mNdv3YT5E/Xg9POBi95G/my/43WZcU9oCexDRGc5Pi4OnYR6C4/Y6RsHg2vAdRiX4GEp
-         61shFYJkQ9FVk58O7Hm4TYvrMq5HnHZcu9Ae7uS5Q5FEvZOHgRVNThA7fVMMeKYRBH+o
-         +mAmyXpTFCe76J+RZGyeDbhax+5/0xVaWXh8EsjZqRb5pOuV+cabTwfzAnY/zza6E5HD
-         T78w==
-X-Gm-Message-State: AO0yUKXl85yCOvSp/unoAwnzX+FH8PR9Z/sS0q34H3rdTCBIHUSQ1BiW
-        U40lavmTS3iTzHedTVVT8xIrrQ63qAk=
-X-Google-Smtp-Source: AK7set+o5NIs5bpwLWslKGETB/SRENMPBC6/a6XdhGGVcmMIIszubFl5pFSA9eUWd8yXcjmz78uWeQ==
-X-Received: by 2002:a17:902:f54c:b0:1a1:b8cc:59da with SMTP id h12-20020a170902f54c00b001a1b8cc59damr489334plf.33.1679360616158;
-        Mon, 20 Mar 2023 18:03:36 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id jc7-20020a17090325c700b001a0667822c8sm7323648plb.94.2023.03.20.18.03.35
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20210112; t=1679363424;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tkDUehbZ8CJ16R96/Odi5kD4jkkJgB1ss6Vv7vcxDhA=;
+        b=zeeHS/3jtM/2+FJvuE9p7CZr5q4meh2ERTHMHlcC7NFY4MramIDfDplwpqDByk6G1q
+         Jf88YiDUbc+HFzyaovQEB5PANiznKAyIvrUvZT15TGvjYFxJ9NPpv3vX5VmyNltTh6/3
+         Rw6jkHh3jtZTjB1sHR8gZcaiU8Ig6v4Kti5qw9vkioxFHNaZeT7BjUAZ6/LAf0zs4LcE
+         W60sTir9sZvYiqA7qTe+8f49E1cCipXJNNJ93mTZNPG6Nyv0if87EuqH7FeAOtix3GTT
+         HwnXBqIPowAyvSzKUM+oDLHIvnoJG4A2K/wJ+JHYFiqMDW6UL3XUb+zcrKb2vWHMNbA4
+         7lwA==
+X-Gm-Message-State: AO0yUKUUR58FM8YPCy3cODJqdl/RcgXenRK7vECzrEQHC/5cdLcHHpRd
+        RXbJ6KSMyBOsUOROwov7qD8=
+X-Google-Smtp-Source: AK7set+s5R1Hg6hFBgiRMY4hDDixRAPO2xWLXQHx1Qg3kUpTeNOQ262ozOCW01yOUpH3VklFpeRRWA==
+X-Received: by 2002:a05:622a:55:b0:3b8:4adb:c604 with SMTP id y21-20020a05622a005500b003b84adbc604mr2000749qtw.14.1679363424002;
+        Mon, 20 Mar 2023 18:50:24 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id j13-20020ac8550d000000b003b82489d8acsm7621219qtq.21.2023.03.20.18.50.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Mar 2023 18:03:35 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] client: Add samples init scripts
-Date:   Mon, 20 Mar 2023 18:03:33 -0700
-Message-Id: <20230321010333.2361384-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230321010333.2361384-1-luiz.dentz@gmail.com>
-References: <20230321010333.2361384-1-luiz.dentz@gmail.com>
+        Mon, 20 Mar 2023 18:50:23 -0700 (PDT)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+Cc:     wuruoyu@me.com, benquike@gmail.com, daveti@purdue.edu,
+        Sungwoo Kim <iam@sung-woo.kim>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: HCI: Fix global-out-of-bounds
+Date:   Mon, 20 Mar 2023 21:50:18 -0400
+Message-Id: <20230321015018.1759683-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+To loop a variable-length array, hci_init_stage_sync(stage) considers
+that stage[i] is valid as long as stage[i-1].func is valid.
+Thus, the last element of stage[].func should be intentionally invalid
+as hci_init0[], le_init2[], and others did.
+However, amp_init1[] and amp_init2[] have no invalid element, letting
+hci_init_stage_sync() keep accessing amp_init1[] over its valid range.
+This patch fixes this by adding {} in the last of amp_init1[] and
+amp_init2[].
 
-This adds sample init scripts that can be passed to bluetoothctl for
-testing.
+==================================================================
+BUG: KASAN: global-out-of-bounds in hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+Read of size 8 at addr ffffffffaed1ab70 by task kworker/u5:0/1032
+CPU: 0 PID: 1032 Comm: kworker/u5:0 Not tainted 6.2.0 #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04
+Workqueue: hci1 hci_power_on
+Call Trace:
+ <TASK>
+dump_stack_lvl (/v6.2-bzimage/lib/dump_stack.c:107 (discriminator 1))
+print_report (/v6.2-bzimage/mm/kasan/report.c:307 /v6.2-bzimage/mm/kasan/report.c:417)
+? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+kasan_report (/v6.2-bzimage/mm/kasan/report.c:184 /v6.2-bzimage/mm/kasan/report.c:519)
+? hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:3154 /v6.2-bzimage/net/bluetooth/hci_sync.c:3343 /v6.2-bzimage/net/bluetooth/hci_sync.c:4418 /v6.2-bzimage/net/bluetooth/hci_sync.c:4609 /v6.2-bzimage/net/bluetooth/hci_sync.c:4689)
+? __pfx_hci_dev_open_sync (/v6.2-bzimage/net/bluetooth/hci_sync.c:4635)
+? mutex_lock (/v6.2-bzimage/./arch/x86/include/asm/atomic64_64.h:190 /v6.2-bzimage/./include/linux/atomic/atomic-long.h:443 /v6.2-bzimage/./include/linux/atomic/atomic-instrumented.h:1781 /v6.2-bzimage/kernel/locking/mutex.c:171 /v6.2-bzimage/kernel/locking/mutex.c:285)
+? __pfx_mutex_lock (/v6.2-bzimage/kernel/locking/mutex.c:282)
+hci_power_on (/v6.2-bzimage/net/bluetooth/hci_core.c:485 /v6.2-bzimage/net/bluetooth/hci_core.c:984)
+? __pfx_hci_power_on (/v6.2-bzimage/net/bluetooth/hci_core.c:969)
+? read_word_at_a_time (/v6.2-bzimage/./include/asm-generic/rwonce.h:85)
+? strscpy (/v6.2-bzimage/./arch/x86/include/asm/word-at-a-time.h:62 /v6.2-bzimage/lib/string.c:161)
+process_one_work (/v6.2-bzimage/kernel/workqueue.c:2294)
+worker_thread (/v6.2-bzimage/./include/linux/list.h:292 /v6.2-bzimage/kernel/workqueue.c:2437)
+? __pfx_worker_thread (/v6.2-bzimage/kernel/workqueue.c:2379)
+kthread (/v6.2-bzimage/kernel/kthread.c:376)
+? __pfx_kthread (/v6.2-bzimage/kernel/kthread.c:331)
+ret_from_fork (/v6.2-bzimage/arch/x86/entry/entry_64.S:314)
+ </TASK>
+The buggy address belongs to the variable:
+amp_init1+0x30/0x60
+The buggy address belongs to the physical page:
+page:000000003a157ec6 refcount:1 mapcount:0 mapping:0000000000000000 ia
+flags: 0x200000000001000(reserved|node=0|zone=2)
+raw: 0200000000001000 ffffea0005054688 ffffea0005054688 000000000000000
+raw: 0000000000000000 0000000000000000 00000001ffffffff 000000000000000
+page dumped because: kasan: bad access detected
+Memory state around the buggy address:
+ ffffffffaed1aa00: f9 f9 f9 f9 00 00 00 00 f9 f9 f9 f9 00 00 00 00
+ ffffffffaed1aa80: 00 00 00 00 f9 f9 f9 f9 00 00 00 00 00 00 00 00
+>ffffffffaed1ab00: 00 f9 f9 f9 f9 f9 f9 f9 00 00 00 00 00 00 f9 f9
+                                                             ^
+ ffffffffaed1ab80: f9 f9 f9 f9 00 00 00 00 f9 f9 f9 f9 00 00 00 f9
+ ffffffffaed1ac00: f9 f9 f9 f9 00 06 f9 f9 f9 f9 f9 f9 00 00 02 f9
+
+This bug is found by FuzzBT, a modified version of Syzkaller.
+Other contributors for this bug are Ruoyu Wu and Peng Hui.
+
+Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 ---
- client/advertise-broadcast.bt  | 2 ++
- client/advertise-on.bt         | 2 ++
- client/advertise-peripheral.bt | 2 ++
- client/power-on-off.bt         | 3 +++
- client/power-on.bt             | 3 +++
- client/scan-bredr.bt           | 2 ++
- client/scan-le.bt              | 2 ++
- client/scan-on-off.bt          | 4 ++++
- client/scan-on.bt              | 2 ++
- 9 files changed, 22 insertions(+)
- create mode 100644 client/advertise-broadcast.bt
- create mode 100644 client/advertise-on.bt
- create mode 100644 client/advertise-peripheral.bt
- create mode 100644 client/power-on-off.bt
- create mode 100644 client/power-on.bt
- create mode 100644 client/scan-bredr.bt
- create mode 100644 client/scan-le.bt
- create mode 100644 client/scan-on-off.bt
- create mode 100644 client/scan-on.bt
+ net/bluetooth/hci_sync.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/client/advertise-broadcast.bt b/client/advertise-broadcast.bt
-new file mode 100644
-index 000000000000..476559d219c2
---- /dev/null
-+++ b/client/advertise-broadcast.bt
-@@ -0,0 +1,2 @@
-+power on
-+advertise broadcast
-diff --git a/client/advertise-on.bt b/client/advertise-on.bt
-new file mode 100644
-index 000000000000..4a227e03986d
---- /dev/null
-+++ b/client/advertise-on.bt
-@@ -0,0 +1,2 @@
-+power on
-+advertise on
-diff --git a/client/advertise-peripheral.bt b/client/advertise-peripheral.bt
-new file mode 100644
-index 000000000000..5e81c135faad
---- /dev/null
-+++ b/client/advertise-peripheral.bt
-@@ -0,0 +1,2 @@
-+power on
-+advertise peripheral
-diff --git a/client/power-on-off.bt b/client/power-on-off.bt
-new file mode 100644
-index 000000000000..c7e150448a35
---- /dev/null
-+++ b/client/power-on-off.bt
-@@ -0,0 +1,3 @@
-+power on
-+power off
-+quit
-diff --git a/client/power-on.bt b/client/power-on.bt
-new file mode 100644
-index 000000000000..0ba686f4fdda
---- /dev/null
-+++ b/client/power-on.bt
-@@ -0,0 +1,3 @@
-+power on
-+show
-+quit
-diff --git a/client/scan-bredr.bt b/client/scan-bredr.bt
-new file mode 100644
-index 000000000000..291a3eedbf6c
---- /dev/null
-+++ b/client/scan-bredr.bt
-@@ -0,0 +1,2 @@
-+power on
-+scan bredr
-diff --git a/client/scan-le.bt b/client/scan-le.bt
-new file mode 100644
-index 000000000000..4a529b964723
---- /dev/null
-+++ b/client/scan-le.bt
-@@ -0,0 +1,2 @@
-+power on
-+scan le
-diff --git a/client/scan-on-off.bt b/client/scan-on-off.bt
-new file mode 100644
-index 000000000000..ffa6c8181533
---- /dev/null
-+++ b/client/scan-on-off.bt
-@@ -0,0 +1,4 @@
-+scan on
-+show
-+scan off
-+quit
-diff --git a/client/scan-on.bt b/client/scan-on.bt
-new file mode 100644
-index 000000000000..767cefc16382
---- /dev/null
-+++ b/client/scan-on.bt
-@@ -0,0 +1,2 @@
-+power on
-+scan on
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 117eedb6f..49e692d73 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3319,6 +3319,7 @@ static const struct hci_init_stage amp_init1[] = {
+ 	HCI_INIT(hci_read_flow_control_mode_sync),
+ 	/* HCI_OP_READ_LOCATION_DATA */
+ 	HCI_INIT(hci_read_location_data_sync),
++	{}
+ };
+ 
+ static int hci_init1_sync(struct hci_dev *hdev)
+@@ -3353,6 +3354,7 @@ static int hci_init1_sync(struct hci_dev *hdev)
+ static const struct hci_init_stage amp_init2[] = {
+ 	/* HCI_OP_READ_LOCAL_FEATURES */
+ 	HCI_INIT(hci_read_local_features_sync),
++	{}
+ };
+ 
+ /* Read Buffer Size (ACL mtu, max pkt, etc.) */
 -- 
-2.39.2
+2.34.1
 
