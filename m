@@ -2,100 +2,211 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C386C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 14:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BA9C76196
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 15:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229555AbjCVONo (ORCPT
+        id S230356AbjCVPIb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Mar 2023 10:13:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43874 "EHLO
+        Wed, 22 Mar 2023 11:08:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231350AbjCVONk (ORCPT
+        with ESMTP id S230093AbjCVPIa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Mar 2023 10:13:40 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD4A5FEBC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 07:13:39 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id a5so1079810qto.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 07:13:39 -0700 (PDT)
+        Wed, 22 Mar 2023 11:08:30 -0400
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8758DD30B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 08:08:29 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id p20-20020a056830319400b0069f914e5c74so2261009ots.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 08:08:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679494418;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z0gOsqLtDbEmigJ3EC1RWtG3hqdgj+dqkkXfINa6dc8=;
-        b=R7BXqJWPzwxULxl9D4nNPOrLNa3l3leZIekYJVwPxaeNR1FFnZQD7ElANJwnkgYTxo
-         FEkbJcFkT+Rf83CJSozd3Q1NPJi6Eu37DDliSevFCGufvw3RKDtxx/L6od1bREASCIMe
-         cZI5yFlL1bTH0xlyzZT83yMkWO1Qy7OWkijHb6y+uojNWIQiG7ZGjitJsYU/k5v+rNIJ
-         vdyE/NbIphnIziXAsbNf6w9IiekwJa1L5UXxRrL1+SIoVx+BNGQGSHD0Mg6ll4pK5JmJ
-         O1KdC2Ynl9aKFxLDBen8dffPfOOTTuLoa75uvbkPB+ffdYXU1JiPzRWm0oj2FNNCtK8l
-         LfEA==
+        d=gmail.com; s=20210112; t=1679497708;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dlxq1tmznHFpoGh2GYKjdlf/7+Mh7HZywHWx+7ARsp4=;
+        b=CiQ17xVeCqAXgZ00g4DLB5qVDr7nzPFUjoqdQVOm7DYTI9xcnRNZBQugqEQuk6pjOK
+         HDLLV9rwY/X31ZylP5kELDtcTXlu2Car6F8iRNdCYC6VTOZ/s6+6CtbJzeciaG4Jm1R+
+         UznuDyxY+66Euds5gl98wk8PBRLOt6JC8yG7gO5Yi1blgHRGrO3n3d8pMbjrBmdP6DJ+
+         TfEzzqy3v5jM9ZpOV4Ga+zUPjKxhaiXooLNs4pP83yD1LBqJpj29lNk37KjpUxGVoqtD
+         MyabZPjcCT6Dd65z3oj3WoBDKxbjSViwUTJ2TPDPtn9SxTkCsG9hpD/+mN6Dbj80nhIC
+         gePw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679494418;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z0gOsqLtDbEmigJ3EC1RWtG3hqdgj+dqkkXfINa6dc8=;
-        b=5B06UhA379e2ib332RPVXtGoM0a4+2ducXBqS+kVyyMxcbbqVCYaATVx8M81215RyV
-         OUPDHcIR3zG3HztJAY1ID1l4h9+zuSDKfzECbWYNsTZ3Sg8Zf8BkRHYK+Zbqf73QAO6Q
-         p75POA6iiCf5QlfgF0Naam2yEpYMw8s87cstvMNW8z4rd87H7Lqu+7tc0u01bk2CURWw
-         YAeih0MtQ/2QuqHUJxCtFgMsZ/lI/sbxefP1bckHp0uzg/TG+yS/E25ZO9IeTd/sPhe6
-         FOH1gtzeMyDBDTt2hg5lyQ8HNz1j3UIUQH/by1AJT0nXLMO2kc3bNw/dMyHnfs9oaOel
-         5eOw==
-X-Gm-Message-State: AO0yUKVZsVWHgmoUkuzHqzXgU5xQ+HYMeAGGXCEM9gC8yWVfd04WZkJM
-        7846sBvqZuqrGY+un2+q5N/J3dN+l1M=
-X-Google-Smtp-Source: AK7set/JIFwjMvJGuFWbtL3tgUShyG5m+jreCDZ4ifFahKPwbbFSuPVwpu5ABG/i1c8lK9lk8U+QGg==
-X-Received: by 2002:ac8:570e:0:b0:3e1:7bb5:f0c1 with SMTP id 14-20020ac8570e000000b003e17bb5f0c1mr6618140qtw.4.1679494418744;
-        Wed, 22 Mar 2023 07:13:38 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.156.91])
-        by smtp.gmail.com with ESMTPSA id r9-20020a37a809000000b007463509f94asm7525381qke.55.2023.03.22.07.13.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 07:13:38 -0700 (PDT)
-Message-ID: <641b0d12.370a0220.58a5b.a2fb@mx.google.com>
-Date:   Wed, 22 Mar 2023 07:13:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8031494243607578676=="
+        d=1e100.net; s=20210112; t=1679497708;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dlxq1tmznHFpoGh2GYKjdlf/7+Mh7HZywHWx+7ARsp4=;
+        b=sCvL3X0apiR15wvz+rUSqs+T7cU3CMQ+bOF+Dz0k2la6hO0ewjUBLsIaHOpNg9EeQc
+         YnH7nNWI/UxOcWtkXYJ1U+ijpg4MwzZGbVBubSDd3WbuNXWzC8jq3FESdJmX6jhFFSn7
+         bBmYZWVY7iQJRSUd8lseko+4NztqPFZbnoIXOCf+kfQVeimcS7AJ9oM1QDonUVj95Vnl
+         2BWpphDRXD0vYsEt7uUz/KEYXC/RMfjB3f/xBoWIbsvyaf8NyK30fwOvFZs+lpR6ERLv
+         lnLIt7EgH/ogvAkrfmNVTGDygs9FfNjr3BQKmEmp1gnaAUVmfVaKv4PbQkcdwHwqOuKQ
+         /ONA==
+X-Gm-Message-State: AO0yUKX2a/b5xNuGvK/LGU9UmTGQjW44Rxfp2mY7MPKJEiHdgZJbk+bU
+        /htoJNXwQkJFFB208cHvzAedLZJxHOpF1QBTx5w=
+X-Google-Smtp-Source: AK7set/CIrWdOogpsKpNVZ1N7RYGw3uk0ponfm1hA8mSIWTaF5LSL2yKJupRAIzLMn+vu7VBfycWPZ/z/AaN1b9Apr8=
+X-Received: by 2002:a05:6830:1198:b0:690:eb8c:bae0 with SMTP id
+ u24-20020a056830119800b00690eb8cbae0mr1199238otq.6.1679497708539; Wed, 22 Mar
+ 2023 08:08:28 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dhowells@redhat.com
-Subject: RE: [RFC,1/3] net: Drop the size argument from ->sendmsg()
-In-Reply-To: <20230322135612.3265850-2-dhowells@redhat.com>
-References: <20230322135612.3265850-2-dhowells@redhat.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230322012428.2662664-1-raul.cheleguini@gmail.com> <b48ef5be-a64e-48a1-2b43-6e72cc3a0f9f@molgen.mpg.de>
+In-Reply-To: <b48ef5be-a64e-48a1-2b43-6e72cc3a0f9f@molgen.mpg.de>
+From:   Raul Cheleguini <raul.cheleguini@gmail.com>
+Date:   Wed, 22 Mar 2023 12:07:52 -0300
+Message-ID: <CACk7upz0sLrCeb8sm04PD8F0wxXm8yfBfpaXkRae=55F16EMig@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Partial support for Actions Semi ATS2851
+ based devices
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8031494243607578676==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Paul,
 
-This is an automated email and please do not reply to this email.
+On Wed, Mar 22, 2023 at 5:00=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> Dear Raul,
+>
+>
+> Thank you for your patch. You could make the summary a statement by
+> adding a verb (in imperative mood):
+>
+> Add partial support for Actions Semi ATS2851 based devices
+>
 
-Dear Submitter,
+Thanks Paul, noted it.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+> Am 22.03.23 um 02:24 schrieb Raul Cheleguini:
+> > The ATS2851 advertises support for commands "Set Random Private Address
+> > Timeout" and "Extended Create Connection" but does not actually impleme=
+nt
+> > them and reply with unknown HCI command.
+> >
+> > The failed first command blocks the device initialization, and the fail=
+ed
+> > second command blocks the start of the pairing process.
+> >
+> > Add these two quirks to unblock the device initialization and to skip
+> > the extended create connection command when start pairing.
+>
+> =E2=80=A6 when start*ing* pairing.
 
------ Output -----
+Thanks Paul, noted it too.
 
-error: patch failed: drivers/xen/pvcalls-back.c:200
-error: drivers/xen/pvcalls-back.c: patch does not apply
-error: patch failed: net/rxrpc/rxperf.c:507
-error: net/rxrpc/rxperf.c: patch does not apply
-error: patch failed: net/smc/af_smc.c:2653
-error: net/smc/af_smc.c: patch does not apply
-error: patch failed: net/tipc/socket.c:2781
-error: net/tipc/socket.c: patch does not apply
-error: patch failed: net/xdp/xsk.c:629
-error: net/xdp/xsk.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+>
+> > v2: Move the extended create connection quirk to use_ext_conn, edit com=
+mit
+> > description and add btmon logs.
+> >
+> > < HCI Command: LE Set Resolvable Private... (0x08|0x002e) plen 2
+> >          Timeout: 900 seconds
+> >> HCI Event: Command Status (0x0f) plen 4
+> >        LE Set Resolvable Private Address Timeout (0x08|0x002e) ncmd 1
+> >          Status: Unknown HCI Command (0x01)
+> >
+> > < HCI Command: LE Extended Create Conn.. (0x08|0x0043) plen 26
+> >          Filter policy: Accept list is not used (0x00)
+> >          Own address type: Public (0x00)
+> >          Peer address type: Random (0x01)
+> >          Peer address: DD:5E:B9:FE:49:3D (Static)
+> >          Initiating PHYs: 0x01
+> >          Entry 0: LE 1M
+> >            Scan interval: 60.000 msec (0x0060)
+> >            Scan window: 60.000 msec (0x0060)
+> >            Min connection interval: 30.00 msec (0x0018)
+> >            Max connection interval: 50.00 msec (0x0028)
+> >            Connection latency: 0 (0x0000)
+> >            Supervision timeout: 420 msec (0x002a)
+> >            Min connection length: 0.000 msec (0x0000)
+> >            Max connection length: 0.000 msec (0x0000)
+> >> HCI Event: Command Status (0x0f) plen 4
+> >        LE Extended Create Connection (0x08|0x0043) ncmd 1
+> >          Status: Unknown HCI Command (0x01)
+>
+> The commit message summary/title says =E2=80=9Cpartial support=E2=80=9D. =
+What is not
+> working?
 
-Please resolve the issue and submit the patches again.
+The pairing process is not working yet. There is some problem, related
+to SMP I believe, that results in disconnection when pairing in Linux.
 
+To give context, after I altered part of SMP code I managed to get my mouse
+paired in Linux, but it needs more work to understand and isolate the probl=
+em.
+I plan to gather more details and start a new thread about it.
 
----
-Regards,
-Linux Bluetooth
+I chose to mark it as partial support to inform the readers that it is
+work in progress, but at the same time leave the device support in a little
+better state than before. Is it acceptable?
 
+> I=E2=80=99d also split this commit into two. One for each quirk.
 
---===============8031494243607578676==--
+Thanks for suggesting this and reviewing everything else Paul.
+I will split it in two and improve the commit messages.
+
+> > Signed-off-by: Raul Cheleguini <raul.cheleguini@gmail.com>
+> > ---
+> >   drivers/bluetooth/btusb.c        |  2 ++
+> >   include/net/bluetooth/hci.h      | 14 ++++++++++++++
+> >   include/net/bluetooth/hci_core.h |  3 ++-
+> >   net/bluetooth/hci_sync.c         | 10 +++++++++-
+> >   4 files changed, 27 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 7382b021f3df..8656ac491f13 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -4105,7 +4105,9 @@ static int btusb_probe(struct usb_interface *intf=
+,
+> >               /* Support is advertised, but not implemented */
+> >               set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirk=
+s);
+> >               set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quir=
+ks);
+> > +             set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
+> >               set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
+> > +             set_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &hdev->quirks);
+> >       }
+> >
+> >       if (!reset)
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 997107bfc0b1..3ff1681fd2b8 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -301,6 +301,20 @@ enum {
+> >        * don't actually support features declared there.
+> >        */
+> >       HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
+> > +
+> > +     /*
+> > +      * When this quirk is set, the HCI_OP_LE_SET_RPA_TIMEOUT command =
+is
+> > +      * disabled. This is required for the Actions Semiconductor ATS28=
+51
+> > +      * controller, which erroneously claim to support it.
+>
+> controller*s* or claim*s*
+
+Thanks Paul.
+
+>
+> > +      */
+> > +     HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
+> > +
+> > +     /*
+> > +      * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command =
+is
+> > +      * disabled. This is required for the Actions Semiconductor ATS28=
+51
+> > +      * controller, which erroneously claim to support it.
+> > +      */
+> > +     HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
+>
+> Ditto.
+
+Thanks Paul.
