@@ -2,397 +2,168 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F0A4C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 01:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49440C6FD20
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 01:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbjCVBNz (ORCPT
+        id S229904AbjCVBOs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Mar 2023 21:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49894 "EHLO
+        Tue, 21 Mar 2023 21:14:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjCVBNy (ORCPT
+        with ESMTP id S229937AbjCVBOr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Mar 2023 21:13:54 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC114FABB
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Mar 2023 18:13:52 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id c18so17876559ple.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Mar 2023 18:13:52 -0700 (PDT)
+        Tue, 21 Mar 2023 21:14:47 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47E1451FA0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Mar 2023 18:14:45 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-17671fb717cso18051613fac.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Mar 2023 18:14:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679447632;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GfMSXoLPK1i/zfpwk5vhXtK+ce/U14w+ObxW5GLjoCM=;
-        b=jT8yY4rNAntDSynsovb9TnwkgOpTvaNTpSfGW5//u+XNoLCR2F+d2C1y5RC7gn3NGV
-         1StJV27GJcYnb0WdWj867BZmvhqkNyiTsqDMjFMWaycRiyLDfbdDukigLbU08y3HovEi
-         Nx7futLMc/UYlp/bcFfzpzTwwRgTvrH7iP9rdDmwcdM7/CUfoSeqVKzKv5SYLROTJ7mt
-         H8pkepJ28EizULEySRS45tjjSE1aX+DYR/fKlwz3k6C9p/utNR4q1T9hIr46KEh1VX0n
-         SbTADet5v2tuY7SYGgG9ESJ72d7YphbqkOeFUf5V6zHMsKZCVoDLwhQqoh0gfvgNXDn1
-         gquw==
+        d=kali.org; s=google; t=1679447684;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlSUN2wZYTEOgt9J14JNZCw4zLCT6q6O5ss5D6gIjf0=;
+        b=HDZ2R5RP427bFYGVsGeYZEE/bYSq4q4pBEGo9athBCMKeOI0xlhP1ORNFxH30pDZPw
+         VaMQGlxn1NwmyZvENCuYYtprYjm64Hol4xoPykXIQsul3QkhmhUyv21YW8fTs0/w1JQT
+         q9DzJl//GQwL9aYbysI5jnyOPLKVRSer348QMfDvogjpO9VN4DAc+esGOQsTs4txesqp
+         6hN0R80FyIiTqGIGZE/yl4wrLDgiepvWic6OHjMlBGx17FB9+LMOFlMnn3FRxKPVXT8p
+         3c4Fi4p/ktJVYqjNzFrKoeRu61m+fE+PEGb4ZINCLEGn5b/ElglHfkRIA24PWsVUh1Ug
+         V6MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679447632;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GfMSXoLPK1i/zfpwk5vhXtK+ce/U14w+ObxW5GLjoCM=;
-        b=d0K433/T1A+p+QFoS/RZuPK2EZSEkvgZM+g4vx/1GUn2vfBPdaWN3YpRpYECedll7L
-         od+tDViihpSl9JRLSb7B07G3/tFnQDQcX0ykKwclgS3ZgVThU1D55AJ0AXCM6eL3mxsS
-         3tcFIAmP1dE8kHXJXU3yAU7uCDS/MnIhxOgSQ7hSycxgTIbJPkKDFfJILYQDsWEEsWbr
-         9YpweC6kn7qYkXrrMHSQFRSSDBTT0Jy84sXM+yadgujccvOI5ieFRfqCMdU+GQxHX4jB
-         RzXnpx3xMS0sAeP8OdFuzepQ+G1E4tRaulbo6luNp+srDYvRPqv4t3zvUdszXow29guL
-         sqeA==
-X-Gm-Message-State: AO0yUKWxMmOZ4unXOCXA9bO4IoCAAcKHhYdDQtlPJLR4+tZFi3AkU3oK
-        iWz35xyj7xhP0jKoiha2k7NBibnrHQk=
-X-Google-Smtp-Source: AK7set8Qtv5IivzOuniNQg3+MzrZa/FTamOEqX9IPBewdFxw9YEoFP9HfM1L72Vrlg0UwvQnkfng9w==
-X-Received: by 2002:a17:90b:4a46:b0:237:d2d8:3256 with SMTP id lb6-20020a17090b4a4600b00237d2d83256mr1641551pjb.20.1679447631525;
-        Tue, 21 Mar 2023 18:13:51 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id 17-20020a170902c11100b0019ee045a2b3sm9315720pli.308.2023.03.21.18.13.50
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20210112; t=1679447684;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BlSUN2wZYTEOgt9J14JNZCw4zLCT6q6O5ss5D6gIjf0=;
+        b=T5xFLz4VnUITCKBUKWu+hPjeyz2aKV2Klgb31heX5iPwUPA8gzF9ZaAZ3YFST3/2yM
+         GoBVqmj4lHV8Q6bwJ6mXA6anQcUDVq0yuU+j8GcYHBSz9B0W6KE5f45yqFdJ6Ogpg320
+         JONjPSbK6c6J05Np4pes1Jub9L4iifse50K7G6QcQS7A1faSirZrEsSsDiGzzxVvVs+n
+         KXxT1f2fCdWklQd5ys6LWNkO9lDcik9nKZedy3ozmZwBSPqKHAbHUrh/S0fcLqRY8vyV
+         cTAXkK2SSOhz7uq524XGfgORbZL9d8NUCaAQ4wNomav8AV/jJzEFgQL3b7aEjvifOFj9
+         UOHA==
+X-Gm-Message-State: AO0yUKU0qd1hpbBCaJbR9Ah+I/ufBxNUAHQ0NPGnE2Se3qvp/pHTAmMV
+        Vx3ORe1cJ2DOSJZWcB1pNfPQJw==
+X-Google-Smtp-Source: AK7set8wF5RckXOZbDxt0S8uH8SUI2HOJmxyduS8hpsH1nJuMaMMQkDtO5febM76mSa13LquWxVpeQ==
+X-Received: by 2002:a05:6870:17a8:b0:177:956c:36c3 with SMTP id r40-20020a05687017a800b00177956c36c3mr507922oae.36.1679447684178;
+        Tue, 21 Mar 2023 18:14:44 -0700 (PDT)
+Received: from localhost (23-118-233-243.lightspeed.snantx.sbcglobal.net. [23.118.233.243])
+        by smtp.gmail.com with ESMTPSA id o9-20020a9d7649000000b00697be532609sm5688980otl.73.2023.03.21.18.14.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Mar 2023 18:13:50 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] shared/shell: Add support for -i/--init-script
-Date:   Tue, 21 Mar 2023 18:13:48 -0700
-Message-Id: <20230322011349.2763404-1-luiz.dentz@gmail.com>
+        Tue, 21 Mar 2023 18:14:43 -0700 (PDT)
+From:   Steev Klimaszewski <steev@kali.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>,
+        Tim Jiang <quic_tjiang@quicinc.com>,
+        Johan Hovold <johan@kernel.org>
+Subject: [PATCH v7 0/4] Add WCN6855 Bluetooth support
+Date:   Tue, 21 Mar 2023 20:14:38 -0500
+Message-Id: <20230322011442.34475-1-steev@kali.org>
 X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+First things first, I do not have access to the specs nor the schematics, so a
+lot of this was done via guess work, looking at the acpi tables, and looking at
+how a similar device (wcn6750) was added.
 
-This adds support for -i/--init-script which can be used to provide a
-file with commands to be initialized, the commands are then run in
-sequence after completing:
+The end result is that we do have a working device, using the firmware files
+that are found in the linux-firmware git repository already.
 
-client/bluetoothctl -i client/power-on-off.bt
-Agent registered
-Changing power on succeeded
-[CHG] Controller A8:7E:EA:56:87:D5 Pairable: yes
-[CHG] Controller 98:8D:46:EE:6D:16 Pairable: yes
-[CHG] Controller 98:8D:46:EE:6D:16 PowerState: on-disabling
-AdvertisementMonitor path registered
----
- src/shared/shell.c | 159 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 142 insertions(+), 17 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 3358b383e9e4..8ea4cb355f63 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -24,6 +24,7 @@
- #include <sys/signalfd.h>
- #include <wordexp.h>
- #include <getopt.h>
-+#include <fcntl.h>
- 
- #include <readline/readline.h>
- #include <readline/history.h>
-@@ -69,7 +70,12 @@ static struct {
- 	bool zsh;
- 	bool monitor;
- 	int timeout;
--	struct io *input;
-+	int init_fd;
-+	FILE *f;
-+	struct queue *inputs;
-+
-+	char *line;
-+	struct queue *queue;
- 
- 	bool saved_prompt;
- 	bt_shell_prompt_input_func saved_func;
-@@ -535,7 +541,7 @@ void bt_shell_printf(const char *fmt, ...)
- 	char *saved_line;
- 	int saved_point;
- 
--	if (!data.input)
-+	if (queue_isempty(data.inputs))
- 		return;
- 
- 	if (data.mode) {
-@@ -615,6 +621,32 @@ void bt_shell_usage()
- 					data.exec->arg ? data.exec->arg : "");
- }
- 
-+static void bt_shell_dequeue_exec(void)
-+{
-+	int err;
-+
-+	if (!data.line)
-+		return;
-+
-+	free(data.line);
-+	data.line = NULL;
-+
-+	data.line = queue_pop_head(data.queue);
-+	if (!data.line)
-+		return;
-+
-+	bt_shell_printf("%s\n", data.line);
-+
-+	if (!bt_shell_release_prompt(data.line)) {
-+		bt_shell_dequeue_exec();
-+		return;
-+	}
-+
-+	err = bt_shell_exec(data.line);
-+	if (err)
-+		bt_shell_dequeue_exec();
-+}
-+
- static void prompt_input(const char *str, bt_shell_prompt_input_func func,
- 							void *user_data)
- {
-@@ -988,6 +1020,11 @@ static char **shell_completion(const char *text, int start, int end)
- 
- static bool io_hup(struct io *io, void *user_data)
- {
-+	if (queue_remove(data.inputs, io)) {
-+		if (!queue_isempty(data.inputs))
-+			return false;
-+	}
-+
- 	mainloop_quit();
- 
- 	return false;
-@@ -999,7 +1036,7 @@ static void signal_callback(int signum, void *user_data)
- 
- 	switch (signum) {
- 	case SIGINT:
--		if (data.input && !data.mode) {
-+		if (!queue_isempty(data.inputs) && !data.mode) {
- 			rl_replace_line("", 0);
- 			rl_crlf();
- 			rl_on_new_line();
-@@ -1091,6 +1128,7 @@ static void rl_init(void)
- static const struct option main_options[] = {
- 	{ "version",	no_argument, 0, 'v' },
- 	{ "help",	no_argument, 0, 'h' },
-+	{ "init-script",required_argument, 0, 'i' },
- 	{ "timeout",	required_argument, 0, 't' },
- 	{ "monitor",	no_argument, 0, 'm' },
- 	{ "zsh-complete",	no_argument, 0, 'z' },
-@@ -1112,6 +1150,7 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
- 	printf("\t--monitor \tEnable monitor output\n"
- 		"\t--timeout \tTimeout in seconds for non-interactive mode\n"
- 		"\t--version \tDisplay version\n"
-+		"\t--init-script \tInit script file\n"
- 		"\t--help \t\tDisplay help\n");
- }
- 
-@@ -1130,9 +1169,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	if (opt) {
- 		memcpy(options + offset, opt->options,
- 				sizeof(struct option) * opt->optno);
--		snprintf(optstr, sizeof(optstr), "+mhvt:%s", opt->optstr);
-+		snprintf(optstr, sizeof(optstr), "+mhvi:t:%s", opt->optstr);
- 	} else
--		snprintf(optstr, sizeof(optstr), "+mhvt:");
-+		snprintf(optstr, sizeof(optstr), "+mhvi:t:");
- 
- 	data.name = strrchr(argv[0], '/');
- 	if (!data.name)
-@@ -1140,6 +1179,8 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	else
- 		data.name = strdup(++data.name);
- 
-+	data.init_fd = -1;
-+
- 	while ((c = getopt_long(argc, argv, optstr, options, &index)) != -1) {
- 		switch (c) {
- 		case 'v':
-@@ -1152,6 +1193,13 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 			data.argv = &cmplt;
- 			data.mode = 1;
- 			goto done;
-+		case 'i':
-+			if (optarg)
-+				data.init_fd = open(optarg, O_RDONLY);
-+			if (data.init_fd < 0)
-+				printf("Unable to open %s: %s (%d)\n", optarg,
-+						strerror(errno), errno);
-+			break;
- 		case 't':
- 			if (optarg)
- 				data.timeout = strtol(optarg, &endptr, 0);
-@@ -1205,6 +1253,8 @@ done:
- 	rl_init();
- 
- 	data.init = true;
-+	data.inputs = queue_new();
-+	data.queue = queue_new();
- 	data.prompts = queue_new();
- }
- 
-@@ -1239,6 +1289,25 @@ int bt_shell_run(void)
- 	return status;
- }
- 
-+static int bt_shell_queue_exec(char *line)
-+{
-+	int err;
-+
-+	/* Queue if already executing */
-+	if (data.line) {
-+		queue_push_tail(data.queue, strdup(line));
-+		return 0;
-+	}
-+
-+	bt_shell_printf("%s\n", line);
-+
-+	err = bt_shell_exec(line);
-+	if (!err)
-+		data.line = strdup(line);
-+
-+	return err;
-+}
-+
- int bt_shell_exec(const char *input)
- {
- 	wordexp_t w;
-@@ -1247,8 +1316,20 @@ int bt_shell_exec(const char *input)
- 	if (!input)
- 		return 0;
- 
--	if (wordexp(input, &w, WRDE_NOCMD))
--		return -ENOEXEC;
-+	err = wordexp(input, &w, WRDE_NOCMD);
-+	switch (err) {
-+	case WRDE_BADCHAR:
-+		return -EBADMSG;
-+	case WRDE_BADVAL:
-+	case WRDE_SYNTAX:
-+		return -EINVAL;
-+	case WRDE_NOSPACE:
-+		return -ENOMEM;
-+	case WRDE_CMDSUB:
-+		if (wordexp(input, &w, 0))
-+			return -ENOEXEC;
-+		break;
-+	};
- 
- 	if (w.we_wordc == 0) {
- 		wordfree(&w);
-@@ -1277,6 +1358,8 @@ void bt_shell_cleanup(void)
- 
- 	rl_cleanup();
- 
-+	queue_destroy(data.inputs, NULL);
-+	queue_destroy(data.queue, free);
- 	queue_destroy(data.prompts, prompt_free);
- 	data.prompts = NULL;
- 
-@@ -1294,8 +1377,10 @@ void bt_shell_quit(int status)
- 
- void bt_shell_noninteractive_quit(int status)
- {
--	if (!data.mode || data.timeout)
-+	if (!data.mode || data.timeout) {
-+		bt_shell_dequeue_exec();
- 		return;
-+	}
- 
- 	bt_shell_quit(status);
- }
-@@ -1340,7 +1425,43 @@ void bt_shell_set_prompt(const char *string)
- 
- static bool input_read(struct io *io, void *user_data)
- {
--	rl_callback_read_char();
-+	int fd;
-+	char *line = NULL;
-+	size_t len = 0;
-+	ssize_t nread;
-+
-+	fd = io_get_fd(io);
-+
-+	if (fd == STDIN_FILENO) {
-+		rl_callback_read_char();
-+		return true;
-+	}
-+
-+	if (!data.f) {
-+		data.f = fdopen(fd, "r");
-+		if (!data.f) {
-+			printf("fdopen: %s (%d)\n", strerror(errno), errno);
-+			return false;
-+		}
-+	}
-+
-+	nread = getline(&line, &len, data.f);
-+	if (nread > 0) {
-+		int err;
-+
-+		if (line[nread - 1] == '\n')
-+			line[nread - 1] = '\0';
-+
-+		err = bt_shell_queue_exec(line);
-+		if (err < 0)
-+			printf("%s: %s (%d)\n", line, strerror(-err), -err);
-+	} else {
-+		fclose(data.f);
-+		data.f = NULL;
-+	}
-+
-+	free(line);
-+
- 	return true;
- }
- 
-@@ -1355,18 +1476,16 @@ bool bt_shell_attach(int fd)
- {
- 	struct io *io;
- 
--	/* TODO: Allow more than one input? */
--	if (data.input)
--		return false;
--
- 	io = io_new(fd);
-+	if (!io)
-+		return false;
- 
- 	if (!data.mode) {
- 		io_set_read_handler(io, input_read, NULL, NULL);
- 		io_set_disconnect_handler(io, io_hup, NULL, NULL);
- 	}
- 
--	data.input = io;
-+	queue_push_tail(data.inputs, io);
- 
- 	if (data.mode) {
- 		if (shell_exec(data.argc, data.argv) < 0) {
-@@ -1377,6 +1496,12 @@ bool bt_shell_attach(int fd)
- 		if (data.timeout)
- 			timeout_add(data.timeout * 1000, shell_quit, NULL,
- 								NULL);
-+	} else if (data.init_fd >= 0) {
-+		int fd = data.init_fd;
-+
-+		data.init_fd = -1;
-+		if (!bt_shell_attach(fd))
-+			return false;
- 	}
- 
- 	return true;
-@@ -1384,11 +1509,11 @@ bool bt_shell_attach(int fd)
- 
- bool bt_shell_detach(void)
- {
--	if (!data.input)
-+	if (queue_isempty(data.inputs))
- 		return false;
- 
--	io_destroy(data.input);
--	data.input = NULL;
-+	queue_remove_all(data.inputs, NULL, NULL,
-+					(queue_destroy_func_t) io_destroy);
- 
- 	return true;
- }
+Bluetooth: hci0: setting up wcn6855
+Bluetooth: hci0: Frame reassembly failed (-84)
+Bluetooth: hci0: QCA Product ID   :0x00000013
+Bluetooth: hci0: QCA SOC Version  :0x400c0210
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x000038e6
+Bluetooth: hci0: QCA controller version 0x02100201
+Bluetooth: hci0: QCA Downloading qca/hpbtfw21.tlv
+Bluetooth: hci0: QCA Downloading qca/hpnv21.bin
+Bluetooth: hci0: QCA setup on UART is completed
+
+There are a few things that I am not sure why they happen, and don't have the
+knowledge level to figure out why they happen or debugging it.
+
+I do not know why the Frame assembly failed, and modprobe -r hci_uart and then
+modprobe hci_uart does not always show the same Frame assembly failed.
+
+The BD Address also seems to be incorrect, and I'm not sure what is going on
+there either.
+
+Testing was done by connecting a Razer Orochi bluetooth mouse, and using it, as
+well as connecting to and using an H2GO bluetooth speaker and playing audio out
+via canberra-gtk-play as well as a couple of YouTube videos in a browser.
+Additionally, a huddle was done in Slack on Chromium with a pair of Gen1 Apple
+AirPods as well as a hangout in Discord on Firefox ESR.
+
+steev@wintermute:~$ hciconfig -a
+hci0:   Type: Primary  Bus: UART
+        BD Address: 00:00:00:00:5A:AD  ACL MTU: 1024:8  SCO MTU: 240:4
+        UP RUNNING PSCAN
+        RX bytes:1492 acl:0 sco:0 events:126 errors:0
+        TX bytes:128743 acl:0 sco:0 commands:597 errors:0
+        Features: 0xff 0xfe 0x8f 0xfe 0xd8 0x3f 0x5b 0x87
+        Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+        Link policy: RSWITCH HOLD SNIFF
+        Link mode: PERIPHERAL ACCEPT
+        Name: 'wintermute'
+        Class: 0x0c010c
+        Service Classes: Rendering, Capturing
+        Device Class: Computer, Laptop
+        HCI Version:  (0xc)  Revision: 0x0
+        LMP Version:  (0xc)  Subversion: 0x46f7
+        Manufacturer: Qualcomm (29)
+
+steev@wintermute:~$ dmesg | grep Razer
+[ 3089.235440] input: Razer Orochi as /devices/virtual/misc/uhid/0005:1532:0056.0003/input/input11
+[ 3089.238580] hid-generic 0005:1532:0056.0003: input,hidraw2: BLUETOOTH HID v0.01 Mouse [Razer Orochi] on 00:00:00:00:5a:ad
+steev@wintermute:~$ dmesg | grep H2GO
+[ 3140.959947] input: H2GO Speaker (AVRCP) as /devices/virtual/input/input12
+steev@wintermute:~$ dmesg | grep AirPod
+[  853.742619] input: Steev’s AirPods (AVRCP) as /devices/virtual/input/input14
+
+v7 Addresses commit message review nits by Paul, as  well as dts
+changes requested by Johan. Additionally, the dt bindings now rely on
+https://lore.kernel.org/lkml/20230316105800.18751-1-johan+linaro@kernel.org/ for
+the bias-bus-hold option on sc8280xp.
+
+v6 can be found at https://lore.kernel.org/all/20230316034759.73489-1-steev@kali.org/
+
+Bjorn Andersson (1):
+  arm64: dts: qcom: sc8280xp: Define uart2
+
+Steev Klimaszewski (3):
+  dt-bindings: net: Add WCN6855 Bluetooth
+  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
+  arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     | 17 ++++
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 78 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc8280xp.dtsi        | 14 ++++
+ drivers/bluetooth/btqca.c                     | 14 +++-
+ drivers/bluetooth/btqca.h                     | 10 +++
+ drivers/bluetooth/hci_qca.c                   | 57 ++++++++++----
+ 6 files changed, 175 insertions(+), 15 deletions(-)
+
 -- 
 2.39.2
 
