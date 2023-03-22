@@ -2,228 +2,139 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C9EC761A6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 02:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A424CC6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 03:38:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbjCVCiA (ORCPT
+        id S229832AbjCVDiY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Mar 2023 22:38:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56894 "EHLO
+        Tue, 21 Mar 2023 23:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229922AbjCVCh7 (ORCPT
+        with ESMTP id S229672AbjCVDiW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Mar 2023 22:37:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B7059436;
-        Tue, 21 Mar 2023 19:37:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B51D461F25;
-        Wed, 22 Mar 2023 02:37:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B62DDC433EF;
-        Wed, 22 Mar 2023 02:37:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679452671;
-        bh=ahMSQCrkvdtTzmw3vLAN58JOl0U83Mm+lJR6IhMp+pY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MnnyXCLlmTGLJb511gFy7XMUwbkT8RPYP3iaZ5+i+qV2cl2AiULWTUZHu/f9JuHBA
-         zVX0koAWRxjsQggOkbpjK6iOrP05QAOR+uOhXgrqOTucdYja/1wYYBNDxPP7HhTjAC
-         ErltnuvPPketKfZoed+UixkwMfFqXZUynFQM9cCg85R28OkMoeQOcmlemJNOCDqX4a
-         Sr7+hVU+zE1r5tfgmgLddo/db1AMbqamnNnxKnPttMMQacRmjk8Hg3J0du5bdAzwi0
-         Pb0gNa5R1NL2B4GuLBMkOqUvHVVO6n1+2S+CmRk79ATw8+CT7YWL+Gswvq9e538lmx
-         4IPIntVLXG7eg==
-Date:   Tue, 21 Mar 2023 19:41:03 -0700
-From:   Bjorn Andersson <andersson@kernel.org>
-To:     Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Johan Hovold <johan@kernel.org>
-Subject: Re: [PATCH v7 4/4] arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
-Message-ID: <20230322024103.fxht7qgaan4m2z5b@ripper>
-References: <20230322011442.34475-1-steev@kali.org>
- <20230322011442.34475-5-steev@kali.org>
+        Tue, 21 Mar 2023 23:38:22 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06F793EE
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Mar 2023 20:38:20 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id hf2so17085475qtb.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Mar 2023 20:38:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1679456300;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NInRew1FujOmuF/AvcMLTxWdgz9e0tRtGDq6A51e6SI=;
+        b=H/XX1uCMDOWR2C7vjLXHwz4/JXRcjnjUW63zU2/5Crbkjlf3EX6LpRoxuTys7BKlNd
+         0wVbNGqW8r6M3nfAAZanrszndjfEN2AanLg3jPkVgZkvs4fN+V3kiY9AuXmBM30LpRIL
+         erE4uTcKAleyRmCTslzyUTCuIqTsbWXxBZY38Zec5ZzJRKsZ5kJWzJN6rGodeZWA/+9E
+         W3/9H9Xt1WPGRBDc3u+/A2yqz6LQQKzUDIcDkX6Dv++2CP45CPDzUoUSJcYH+w/9SMAF
+         LpRivw859BVk/HM80taIXHWSa4d2hXeO0h2IAD5z+npGn7SSOHZ1Jo4KtFmPSJIWt/bD
+         UTAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1679456300;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NInRew1FujOmuF/AvcMLTxWdgz9e0tRtGDq6A51e6SI=;
+        b=UrxAQPLgfSFI89WIsM1TmfcWLBZckjYt3rTjPwLXI+7Em5FWyYIs3XmOsG08KDNO3b
+         c1aj65jwWHdgMdknmwAO6CCO6GneFng2x7+BHV64GI5sYMwhEqJam/mHOXhMKVpp6fI9
+         HkStGqOP2ubDwQ1K3ouVr/qRz/0ubBNVWwsMu9BqNgNiSrANEExYNBs0tmUlqvc/WSmn
+         1gHdGPmmkdjjCZs6k5uhHw37eL7UHBUxUkZmQCzeH31jePfqvSaQ7i3CNfjB9oTf/t3s
+         mlFxlgClj/kMoAuEX1niFCYTF85FcEjXgyrhMvvnE0E0BdwQrILyh8FvxT5XMw/AOCOu
+         9jiA==
+X-Gm-Message-State: AO0yUKVZ1QDd4gipG05AkWkq85jVMHfvh2IzDPN+baJS9+AuhG2KgyLZ
+        KHxJycCe99hQCRtlZiXxVutDsEzrupbrxg==
+X-Google-Smtp-Source: AK7set+JYRB/+E/saFuKpIcHII/DdkoiTzVMwe929NWhFqMvTqJvEcoDRdvxlTpyQYywjcCIDWc9uw==
+X-Received: by 2002:a05:622a:188b:b0:3c0:40c1:8408 with SMTP id v11-20020a05622a188b00b003c040c18408mr2902222qtc.63.1679456299895;
+        Tue, 21 Mar 2023 20:38:19 -0700 (PDT)
+Received: from [172.17.0.2] ([52.150.24.72])
+        by smtp.gmail.com with ESMTPSA id s188-20020ae9dec5000000b00742a23cada8sm10418277qkf.131.2023.03.21.20.38.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Mar 2023 20:38:19 -0700 (PDT)
+Message-ID: <641a782b.e90a0220.e1bc0.500e@mx.google.com>
+Date:   Tue, 21 Mar 2023 20:38:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8193119170162264472=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230322011442.34475-5-steev@kali.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,1/2] shared/shell: Add support for -i/--init-script
+In-Reply-To: <20230322011349.2763404-1-luiz.dentz@gmail.com>
+References: <20230322011349.2763404-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 08:14:42PM -0500, Steev Klimaszewski wrote:
-> The Lenovo Thinkpad X13s has a WCN6855 Bluetooth controller on uart2,
-> add this.
-> 
-> Signed-off-by: Steev Klimaszewski <steev@kali.org>
+--===============8193119170162264472==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+This is automated email and please do not reply to this email!
 
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=732537
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.39 seconds
+GitLint                       PASS      0.70 seconds
+BuildEll                      PASS      27.31 seconds
+BluezMake                     PASS      969.44 seconds
+MakeCheck                     PASS      11.74 seconds
+MakeDistcheck                 PASS      150.88 seconds
+CheckValgrind                 PASS      249.36 seconds
+CheckSmatch                   WARNING   331.54 seconds
+bluezmakeextell               PASS      99.48 seconds
+IncrementalBuild              PASS      1621.23 seconds
+ScanBuild                     WARNING   1047.57 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2,1/2] shared/shell: Add support for -i/--init-script
+ERROR:SPACING: space required after that ',' (ctx:VxV)
+#188: FILE: src/shared/shell.c:1131:
++	{ "init-script",required_argument, 0, 'i' },
+ 	               ^
+
+/github/workspace/src/src/13183442.patch total: 1 errors, 0 warnings, 290 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13183442.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c:615:21: warning: non-ANSI function declaration of function 'bt_shell_usage'src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c:615:21: warning: non-ANSI function declaration of function 'bt_shell_usage'src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c:615:21: warning: non-ANSI function declaration of function 'bt_shell_usage'
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/shell.c:1228:13: warning: Access to field 'options' results in a dereference of a null pointer (loaded from variable 'opt')
+                        if (c != opt->options[index - offset].val) {
+                                 ^~~~~~~~~~~~
+1 warning generated.
+
+
+
+---
 Regards,
-Bjorn
+Linux Bluetooth
 
-> ---
-> Changes since v6:
->  * Remove allowed-modes as they aren't needed
->  * Remove regulator-allow-set-load
->  * Set regulator-always-on because the wifi chip also uses the regulator
->  * cts pin uses bias-bus-hold
->  * Alphabetize uart2 pins
-> 
-> Changes since v5:
->  * Update patch subject
->  * Specify initial mode (via guess) for vreg_s1c
->  * Drop uart17 definition
->  * Rename bt_en to bt_default because configuring more than one pin
->  * Correct (maybe) bias configurations
->  * Correct cts gpio
->  * Split rts-tx into two nodes
->  * Drop incorrect link in the commit message
-> 
-> Changes since v4:
->  * Address Konrad's review comments.
-> 
-> Changes since v3:
->  * Add vreg_s1c
->  * Add regulators and not dead code
->  * Fix commit message changelog
-> 
-> Changes since v2:
->  * Remove dead code and add TODO comment
->  * Make dtbs_check happy with the pin definitions
->  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 78 +++++++++++++++++++
->  1 file changed, 78 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-> index 92d365519546..05e66505e5cc 100644
-> --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-> +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
-> @@ -24,6 +24,7 @@ / {
->  	aliases {
->  		i2c4 = &i2c4;
->  		i2c21 = &i2c21;
-> +		serial1 = &uart2;
->  	};
->  
->  	wcd938x: audio-codec {
-> @@ -431,6 +432,14 @@ regulators-1 {
->  		qcom,pmic-id = "c";
->  		vdd-bob-supply = <&vreg_vph_pwr>;
->  
-> +		vreg_s1c: smps1 {
-> +			regulator-name = "vreg_s1c";
-> +			regulator-min-microvolt = <1880000>;
-> +			regulator-max-microvolt = <1900000>;
-> +			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
-> +			regulator-always-on;
-> +		};
-> +
->  		vreg_l1c: ldo1 {
->  			regulator-name = "vreg_l1c";
->  			regulator-min-microvolt = <1800000>;
-> @@ -918,6 +927,32 @@ &qup0 {
->  	status = "okay";
->  };
->  
-> +&uart2 {
-> +	pinctrl-0 = <&uart2_default>;
-> +	pinctrl-names = "default";
-> +
-> +	status = "okay";
-> +
-> +	bluetooth {
-> +		compatible = "qcom,wcn6855-bt";
-> +
-> +		vddio-supply = <&vreg_s10b>;
-> +		vddbtcxmx-supply = <&vreg_s12b>;
-> +		vddrfacmn-supply = <&vreg_s12b>;
-> +		vddrfa0p8-supply = <&vreg_s12b>;
-> +		vddrfa1p2-supply = <&vreg_s11b>;
-> +		vddrfa1p7-supply = <&vreg_s1c>;
-> +
-> +		max-speed = <3200000>;
-> +
-> +		enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
-> +		swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
-> +
-> +		pinctrl-0 = <&bt_default>;
-> +		pinctrl-names = "default";
-> +	};
-> +};
-> +
->  &qup1 {
->  	status = "okay";
->  };
-> @@ -1192,6 +1227,21 @@ hastings_reg_en: hastings-reg-en-state {
->  &tlmm {
->  	gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
->  
-> +	bt_default: bt-default-state {
-> +		hstp-sw-ctrl-pins {
-> +			pins = "gpio132";
-> +			function = "gpio";
-> +			bias-pull-down;
-> +		};
-> +
-> +		hstp-bt-en-pins {
-> +			pins = "gpio133";
-> +			function = "gpio";
-> +			drive-strength = <16>;
-> +			bias-disable;
-> +		};
-> +	};
-> +
->  	edp_reg_en: edp-reg-en-state {
->  		pins = "gpio25";
->  		function = "gpio";
-> @@ -1213,6 +1263,34 @@ i2c4_default: i2c4-default-state {
->  		bias-disable;
->  	};
->  
-> +	uart2_default: uart2-default-state {
-> +		cts-pins {
-> +			pins = "gpio121";
-> +			function = "qup2";
-> +			bias-bus-hold;
-> +		};
-> +
-> +		rts-pins {
-> +			pins = "gpio122";
-> +			function = "qup2";
-> +			drive-strength = <2>;
-> +			bias-disable;
-> +		};
-> +
-> +		rx-pins {
-> +			pins = "gpio124";
-> +			function = "qup2";
-> +			bias-pull-up;
-> +		};
-> +
-> +		tx-pins {
-> +			pins = "gpio123";
-> +			function = "qup2";
-> +			drive-strength = <2>;
-> +			bias-disable;
-> +		};
-> +	};
-> +
->  	i2c21_default: i2c21-default-state {
->  		pins = "gpio81", "gpio82";
->  		function = "qup21";
-> -- 
-> 2.39.2
-> 
+
+--===============8193119170162264472==--
