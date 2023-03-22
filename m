@@ -2,132 +2,87 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4883C6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 23:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FE9C74A5B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Mar 2023 23:45:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229923AbjCVXZt (ORCPT
+        id S230451AbjCVXpU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Mar 2023 19:25:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38110 "EHLO
+        Wed, 22 Mar 2023 19:45:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbjCVXZs (ORCPT
+        with ESMTP id S230385AbjCVXpF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Mar 2023 19:25:48 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28EB81BEC;
-        Wed, 22 Mar 2023 16:25:47 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id qh28so13206096qvb.7;
-        Wed, 22 Mar 2023 16:25:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679527546;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=514CEmmrey20BbSdy5jRIw8n1wj/BRirLWozPNOMpUo=;
-        b=UBqaO9OEWOKRzrmwRhFTCMhWsSKgU9IUOg9aWZJXBTJ9zIDvWslrAugLurPr6Dpv9k
-         AsL7gKWyhw8oZG5ZxFH8cydgsNBcsTuDT43quobMSAPYMGDsMFxWuwwpZSY+QGJRRK71
-         JyGlV+d/T71DPmFs+1G9JRnTY1CSA3pGPTaB+0HtMertJM+7gFg078NVdxO8IWZzzlve
-         1Cp04XLtjaiYxvKqb32FSvCXkZTJ6p7Z3cNtk7poaeW4KyHu4sIkqhAJawEA6vbsrZQG
-         PWAwKg32b30sCiRYP41mVzwubLwXjQerHXcv/Eb7qz+h64F91KPUWfleX6Cp44HeIHUi
-         qDCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679527546;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=514CEmmrey20BbSdy5jRIw8n1wj/BRirLWozPNOMpUo=;
-        b=8BhwD4MOdfE/gKSMdaASMI/asv4kwf6Fl6rzmQ+xco1p/K6+tg0a51TszuAPxMRRqh
-         WqlvNbv1eLIKDKy3tS6HJX8L4u81Rq6UXIT/uSeK4cbh+Xi01J62cy0Wxj283VtEBPvx
-         GbLnrGXGrCE9sGBEWBNsI+HvgVABwaPPhGf3JtmjzMp4ldSRoKPetS9VTynnSYd/RvXU
-         z5DWdk5t7FB8p+0myRJfNbwvhlnureLmuuI3TNgb+EFAWQVMH/Src1hjCZ1ZvjGN82xh
-         3gXLWSNCv3cXiLAc3c0qdYveCGSNLZ1cfo1fZarHlbLWAlaN/zx3sLckJXxsA9qbQRNX
-         pJIQ==
-X-Gm-Message-State: AO0yUKVQibUj9EdsAnVAlBknFTybxpjx+PhX4m5YVi9JuHHDfUi/91sj
-        uJbdZBZW8WRkiRBkF7usqKfSZIxnMIo=
-X-Google-Smtp-Source: AK7set/MIlNF7z5CUuaFfZ4gn7pYffxcL5dCZArMV669cUpnZujFNEri42n/JjgqI43iP/EXRQ9GEw==
-X-Received: by 2002:ad4:5d62:0:b0:5c8:ad0d:3b82 with SMTP id fn2-20020ad45d62000000b005c8ad0d3b82mr10528633qvb.29.1679527546267;
-        Wed, 22 Mar 2023 16:25:46 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id d124-20020ae9ef82000000b007469587115dsm5284240qkg.19.2023.03.22.16.25.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 16:25:45 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2023-03-22
-Date:   Wed, 22 Mar 2023 16:25:43 -0700
-Message-Id: <20230322232543.3079578-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Wed, 22 Mar 2023 19:45:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7B732CE4;
+        Wed, 22 Mar 2023 16:44:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B6AD46234E;
+        Wed, 22 Mar 2023 23:44:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 156F3C433EF;
+        Wed, 22 Mar 2023 23:44:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679528675;
+        bh=X0T3MzV72DC3xsS/BzUx423vl2zXQuHSu+yzIyuL82w=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=RCHAuZ8+cJJARHXGI+dpKAFV4q2baBzE328b7YD0UOY02PVuvIv88UlBwT4HK5I26
+         peLgac+q269msGYmbjkf+GtqnpMTffG/r0BEaEWxaeTazk92R3iKeSs94NTCiAMXtl
+         2FVj+ySE9KjU9zc1cggLf2IPUy5SO/S1lsqnb20P4tKFfCDbBA1vx5tl0a2fKdijP+
+         B9I2tDXy+lihutNwcOsMd/9Gksqb4u+vpFzJ+cJ37yqmmL7n9LTnIHuGU3gTrSCAXK
+         fGFLEuPDE+9S5YcV/ZOYOu5N/4Udyo5+y9ve8xruxqw0GSSk6zOec5vl/7+4U8eCj3
+         KPA77uIfH1cCA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED14FE52513;
+        Wed, 22 Mar 2023 23:44:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/3 V5] Bluetooth: Add support for RTL8821CS
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167952867496.26660.4065106798245519325.git-patchwork-notify@kernel.org>
+Date:   Wed, 22 Mar 2023 23:44:34 +0000
+References: <20230315173657.28692-1-macroalpha82@gmail.com>
+In-Reply-To: <20230315173657.28692-1-macroalpha82@gmail.com>
+To:     Chris Morgan <macroalpha82@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        linux-rockchip@lists.infradead.org, devicetree@vger.kernel.org,
+        alistair@alistair23.me, anarsoul@gmail.com, luiz.dentz@gmail.com,
+        johan.hedberg@gmail.com, marcel@holtmann.org, heiko@sntech.de,
+        krzysztof.kozlowski+dt@linaro.org, robh+dt@kernel.org,
+        macromorgan@hotmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit bb765a743377d46d8da8e7f7e5128022504741b9:
+Hello:
 
-  mlxsw: spectrum_fid: Fix incorrect local port type (2023-03-22 15:50:32 +0100)
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-are available in the Git repository at:
+On Wed, 15 Mar 2023 12:36:54 -0500 you wrote:
+> From: Chris Morgan <macromorgan@hotmail.com>
+> 
+> This patch series is to add support for the RTL8821CS Bluetooth
+> controller found on the RTL8821CS WiFi/Bluetooth combo chip.
+> 
+> This has been tested with firmware version 0x75b8f098 which has been
+> submitted by Realtek for inclusion in linux-firmware.
+> 
+> [...]
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-03-22
+Here is the summary with links:
+  - [1/3,V5] dt-bindings: net: realtek-bluetooth: Add RTL8821CS
+    (no matching commit)
+  - [2/3,V5] Bluetooth: hci_h5: btrtl: Add support for RTL8821CS
+    https://git.kernel.org/bluetooth/bluetooth-next/c/60f8c67d065a
+  - [3/3,V5] arm64: dts: rockchip: Update compatible for bluetooth
+    (no matching commit)
 
-for you to fetch changes up to 3c8c5eef8bfcd3ab012a295e5550312152315a0e:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Bluetooth: HCI: Fix global-out-of-bounds (2023-03-22 16:05:56 -0700)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix MGMT add advmon with RSSI command
- - L2CAP: Fix responding with wrong PDU type
- - Fix race condition in hci_cmd_sync_clear
- - ISO: Fix timestamped HCI ISO data packet parsing
- - HCI: Fix global-out-of-bounds
- - hci_sync: Resume adv with no RPA when active scan
-
-----------------------------------------------------------------
-Brian Gix (1):
-      Bluetooth: Remove "Power-on" check from Mesh feature
-
-Howard Chung (1):
-      Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
-
-Kiran K (2):
-      Bluetooth: btintel: Iterate only bluetooth device ACPI entries
-      Bluetooth: btinel: Check ACPI handle for NULL before accessing
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: hci_core: Detect if an ACL packet is in fact an ISO packet
-      Bluetooth: btusb: Remove detection of ISO packets over bulk
-      Bluetooth: L2CAP: Fix responding with wrong PDU type
-
-Min Li (1):
-      Bluetooth: Fix race condition in hci_cmd_sync_clear
-
-Pauli Virtanen (1):
-      Bluetooth: ISO: fix timestamped HCI ISO data packet parsing
-
-Stephan Gerhold (1):
-      Bluetooth: btqcomsmd: Fix command timeout after setting BD address
-
-Sungwoo Kim (1):
-      Bluetooth: HCI: Fix global-out-of-bounds
-
-Zheng Wang (1):
-      Bluetooth: btsdio: fix use after free bug in btsdio_remove due to unfinished work
-
-Zhengping Jiang (1):
-      Bluetooth: hci_sync: Resume adv with no RPA when active scan
-
- drivers/bluetooth/btintel.c      |  51 +++++++++++------
- drivers/bluetooth/btintel.h      |   7 ---
- drivers/bluetooth/btqcomsmd.c    |  17 +++++-
- drivers/bluetooth/btsdio.c       |   1 +
- drivers/bluetooth/btusb.c        |  10 ----
- include/net/bluetooth/hci_core.h |   1 +
- net/bluetooth/hci_core.c         |  23 ++++++--
- net/bluetooth/hci_sync.c         |  68 ++++++++++++++++-------
- net/bluetooth/iso.c              |   9 ++-
- net/bluetooth/l2cap_core.c       | 117 ++++++++++++++++++++++++++-------------
- net/bluetooth/mgmt.c             |   9 +--
- 11 files changed, 206 insertions(+), 107 deletions(-)
