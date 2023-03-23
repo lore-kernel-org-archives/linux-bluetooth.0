@@ -2,366 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02838C761AF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 21:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECF0C6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 21:13:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231438AbjCWVKe (ORCPT
+        id S231161AbjCWVNA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 17:10:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37746 "EHLO
+        Thu, 23 Mar 2023 17:13:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231445AbjCWVKc (ORCPT
+        with ESMTP id S230418AbjCWVMw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 17:10:32 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A28EB25941
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 14:10:30 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-54574d6204aso54494957b3.15
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 14:10:30 -0700 (PDT)
+        Thu, 23 Mar 2023 17:12:52 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DD225B8F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 14:12:35 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so3368256pjl.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 14:12:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1679605830;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ytdhHuX3jMSfEHqF2ahkw52uQtlQQOw46P7+8SNYBo=;
-        b=sJlmMKKE+019KNGJPJE0CPHOFuHiucoKH7zkYMt2fHUfWEB+NHCOkIQ/FCIy1jPGtQ
-         utPnfKi4rOQHpYoBD0KCD4qMOmn0wQ9Og6v/LHRL4l9dSnsCrQTRgms4aXcaEJjOxHJp
-         H3i4j6HoQr+vA8Dvdn6XoZYq9pvmA/TKpIH+jVVwBb8lxGAGmlBQ22C2VjnolsyVXLts
-         xDrbpNh2Q67K5Kled/huzz0C9qhYNL99ntDNaImHpxN4P8wspMxlgSUCk26bRBmKkJit
-         w6n/YkyUexg+86V4x4NW7cxkf9Fld8u6I6FYYDJGvYpYpR3nvJ5q+H4gW3q3+/Ue9ZTF
-         MNlw==
+        d=gmail.com; s=20210112; t=1679605954;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=w+d5wC9oxknSIhHIewZ8wc40sxEWTLaSTCpcHLTET/c=;
+        b=MFLGtzIE32SQWo+r8nkXb6+zIyWPZzpihz+CwP7i2ZS/rr2JQlm+7KXnAQ56Tn3SIB
+         YJyoz9esk3TGywl7+2LPaDtLzlNrelL91e7o0EJJVp1pkxSuACFvl8P2b+BqYwMLJ7ux
+         CCUxzodtriUqraUUE+tn40NsVyDg7mSFi7Mcm75nSiAMNfTlqzqmS0bPRnZKzOYH95mf
+         RDFl8NPF/GSQ6IttXNmqZYJBR46zzAHAisKxZZqueVJsZ6oGTCt2BLwe6Nxlj1cvYtet
+         wLCjfkzH5J1Cr0RxhoMRwzJc5j2xQTscRmUtQa2POG8/1sc5Y1w1tGRTvCAJmSBmdE/F
+         1MaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679605830;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ytdhHuX3jMSfEHqF2ahkw52uQtlQQOw46P7+8SNYBo=;
-        b=drcnvZUwbSi9bhdT1mJHTdGe5iJnCA5faurWgJN2BxIO/M8XW+RVo32UQEvg+b4IBC
-         L3APJcE449teC6CJB4Hl/qiD9bHmyY3JaGjW0+Y+RvqzQsCtfBXI1fIdUEPTOmm9nmwZ
-         22BA3h29NKhOLxe7H9313/m+Bf50fnn9QG56gy5IN/kf2e/X5ZhChwAKieWG03mp0JRa
-         DAxWjKhWAdFtbD+PWuhIdWRHswdF81tk45luvUPrqzO4A+wkdu6Ki4n3zHVWFJ0hAC1R
-         4XXiGDaC+F2J2Sb7IQkSwaeSTiqLHfxJ8eJVEvMvhZh4KarxVEKkNGutwb5FS4mk5QPG
-         cftQ==
-X-Gm-Message-State: AAQBX9crlIHmOreNk0RUun9Q/tQ311LjwIknmq6a85XkEg1MyfPQKFEq
-        tQ0yw133mjiqp6VFrq7i/4ko6UU93pvvug==
-X-Google-Smtp-Source: AKy350Y8qL5seVLBau9tywz4DS26PRzHT3s/1G+XbNC/MtywM1v+IPI4NMFDr0OBE3ERdvQFkL3uarl3lTv9Xw==
-X-Received: from mmandlik-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:2893])
- (user=mmandlik job=sendgmr) by 2002:a05:6902:1108:b0:b6d:fc53:c5c0 with SMTP
- id o8-20020a056902110800b00b6dfc53c5c0mr452432ybu.1.1679605829933; Thu, 23
- Mar 2023 14:10:29 -0700 (PDT)
-Date:   Thu, 23 Mar 2023 14:10:18 -0700
-In-Reply-To: <20230323140942.v8.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
-Mime-Version: 1.0
-References: <20230323140942.v8.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
-X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230323140942.v8.4.I8ac78c64382c66cdb49076a2053ef9c44ebf1ea3@changeid>
-Subject: [PATCH v8 4/4] Bluetooth: btintel: Add Intel devcoredump support
-From:   Manish Mandlik <mmandlik@google.com>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20210112; t=1679605954;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w+d5wC9oxknSIhHIewZ8wc40sxEWTLaSTCpcHLTET/c=;
+        b=4Fq7lPTB8ofYfCDpPW9EQf6HnBKVYXTyDCNH+lxDH7EeYM9dYmQZfQXfm5VUXklked
+         DsMwUyB+mKKlse4GxQRiLt6nHz2fK7wRTzzC/BRQTPNu88vtYSJ3elIAfHBPOhYpuJGL
+         qP3Ri9OiU5bB/gddHOrGwVpFq6jhhErhy5rUts06PeFNJAEVR/wXDpp4bBntYtMa1aHl
+         0udm4SdINkn2HRusboHOIBHLGg5WTo55voX+5U7jape9RtGGFsREZ+XETkyrT5Uj22ou
+         xQDcy0MDaANBBWg/DpVhUE7n6S8sDnS0mR9K5VndyKBJwtyIY2P5h1Ku9liBdZEzxgsb
+         eFhw==
+X-Gm-Message-State: AO0yUKWUBlcxRoSIAyiosuIahKOiDpET+oDq2dtWC12vUi945c6pOFZ9
+        eRYB8s7OqfNImtA+nm2af8dDkhsUPjE=
+X-Google-Smtp-Source: AK7set+pd2/TktUbq4GTwhBLQmMoeRXqjq3v9Mm46GEP0GY9qwH2d3IYfROEAEUlDioIF28bWEWXFA==
+X-Received: by 2002:a05:6a20:9305:b0:d8:cfcc:555d with SMTP id r5-20020a056a20930500b000d8cfcc555dmr790772pzh.17.1679605954300;
+        Thu, 23 Mar 2023 14:12:34 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.45.233])
+        by smtp.gmail.com with ESMTPSA id i10-20020aa78d8a000000b006281bc04392sm4787074pfr.191.2023.03.23.14.12.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 14:12:33 -0700 (PDT)
+Message-ID: <641cc0c1.a70a0220.1df3d.97e5@mx.google.com>
+Date:   Thu, 23 Mar 2023 14:12:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0357253700048326638=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jay.foster@systech.com
+Subject: RE: [BlueZ] btmgmt: Fix typo in command help text
+In-Reply-To: <e74f4f62-ff59-b2a3-47d9-2b3edad9265f@systech.com>
+References: <e74f4f62-ff59-b2a3-47d9-2b3edad9265f@systech.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+--===============0357253700048326638==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Intercept debug exception events from the controller and put them into
-a devcoredump using hci devcoredump APIs. The debug exception contains
-data in a TLV format and it will be parsed in userspace.
+This is an automated email and please do not reply to this email.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: tools/btmgmt.c:5897
+error: tools/btmgmt.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes in v8:
-- Update btintel_dmp_hdr() to use skb
-- Use driver name reference instead of copying it
 
-Changes in v7:
-- Update btintel_coredump() and btusb_intel_diagnostics()
-
-Changes in v6:
-- Implement btintel_coredump()
-
-Changes in v4:
-- Add btintel_coredump() placeholder
-
-Changes in v2:
-- Create a local struct to store coredump_info in btintel.c
-- Call btintel_register_devcoredump_support() from btintel.c
-- Fix strncpy() destination bound warning
-
- drivers/bluetooth/btintel.c | 72 ++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h | 12 +++++--
- drivers/bluetooth/btusb.c   | 54 ++++++++++++++++++++++++----
- 3 files changed, 128 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index bede8b005594..cb84524bbacd 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -36,6 +36,12 @@ struct cmd_write_boot_params {
- 	u8  fw_build_yy;
- } __packed;
- 
-+static struct {
-+	const char *driver_name;
-+	u8         hw_variant;
-+	u32        fw_build_num;
-+} coredump_info;
-+
- int btintel_check_bdaddr(struct hci_dev *hdev)
- {
- 	struct hci_rp_read_bd_addr *bda;
-@@ -308,6 +314,9 @@ int btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
- 		return -EINVAL;
- 	}
- 
-+	coredump_info.hw_variant = ver->hw_variant;
-+	coredump_info.fw_build_num = ver->fw_build_num;
-+
- 	bt_dev_info(hdev, "%s revision %u.%u build %u week %u %u",
- 		    variant, ver->fw_revision >> 4, ver->fw_revision & 0x0f,
- 		    ver->fw_build_num, ver->fw_build_ww,
-@@ -502,6 +511,9 @@ static int btintel_version_info_tlv(struct hci_dev *hdev,
- 		return -EINVAL;
- 	}
- 
-+	coredump_info.hw_variant = INTEL_HW_VARIANT(version->cnvi_bt);
-+	coredump_info.fw_build_num = version->build_num;
-+
- 	bt_dev_info(hdev, "%s timestamp %u.%u buildtype %u build %u", variant,
- 		    2000 + (version->timestamp >> 8), version->timestamp & 0xff,
- 		    version->build_type, version->build_num);
-@@ -1453,6 +1465,59 @@ int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
- }
- EXPORT_SYMBOL_GPL(btintel_set_quality_report);
- 
-+static void btintel_coredump(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc4e, 0, NULL, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Coredump failed (%ld)", PTR_ERR(skb));
-+		return;
-+	}
-+
-+	kfree_skb(skb);
-+}
-+
-+static void btintel_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	char buf[80];
-+
-+	snprintf(buf, sizeof(buf), "Controller Name: 0x%X\n",
-+		 coredump_info.hw_variant);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Firmware Version: 0x%X\n",
-+		 coredump_info.fw_build_num);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Driver: %s\n", coredump_info.driver_name);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Vendor: Intel\n");
-+	skb_put_data(skb, buf, strlen(buf));
-+}
-+
-+static int btintel_register_devcoredump_support(struct hci_dev *hdev)
-+{
-+	struct intel_debug_features features;
-+	int err;
-+
-+	err = btintel_read_debug_features(hdev, &features);
-+	if (err) {
-+		bt_dev_info(hdev, "Error reading debug features");
-+		return err;
-+	}
-+
-+	if (!(features.page1[0] & 0x3f)) {
-+		bt_dev_dbg(hdev, "Telemetry exception format not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	hci_devcoredump_register(hdev, btintel_coredump, btintel_dmp_hdr, NULL);
-+
-+	return err;
-+}
-+
- static const struct firmware *btintel_legacy_rom_get_fw(struct hci_dev *hdev,
- 					       struct intel_version *ver)
- {
-@@ -2582,6 +2647,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 			btintel_set_msft_opcode(hdev, ver.hw_variant);
- 
- 			err = btintel_bootloader_setup(hdev, &ver);
-+			btintel_register_devcoredump_support(hdev);
- 			break;
- 		default:
- 			bt_dev_err(hdev, "Unsupported Intel hw variant (%u)",
-@@ -2655,6 +2721,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		btintel_set_msft_opcode(hdev, ver.hw_variant);
- 
- 		err = btintel_bootloader_setup(hdev, &ver);
-+		btintel_register_devcoredump_support(hdev);
- 		break;
- 	case 0x17:
- 	case 0x18:
-@@ -2678,6 +2745,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 					INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
- 
- 		err = btintel_bootloader_setup_tlv(hdev, &ver_tlv);
-+		btintel_register_devcoredump_support(hdev);
- 		break;
- 	default:
- 		bt_dev_err(hdev, "Unsupported Intel hw variant (%u)",
-@@ -2727,7 +2795,7 @@ static int btintel_shutdown_combined(struct hci_dev *hdev)
- 	return 0;
- }
- 
--int btintel_configure_setup(struct hci_dev *hdev)
-+int btintel_configure_setup(struct hci_dev *hdev, const char *driver_name)
- {
- 	hdev->manufacturer = 2;
- 	hdev->setup = btintel_setup_combined;
-@@ -2736,6 +2804,8 @@ int btintel_configure_setup(struct hci_dev *hdev)
- 	hdev->set_diag = btintel_set_diag_combined;
- 	hdev->set_bdaddr = btintel_set_bdaddr;
- 
-+	coredump_info.driver_name = driver_name;
-+
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btintel_configure_setup);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 8e7da877efae..c34553fef3b0 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -150,6 +150,13 @@ struct btintel_loc_aware_reg {
- 	__le32 delta;
- } __packed;
- 
-+#define INTEL_TLV_TYPE_ID		0x01
-+
-+#define INTEL_TLV_SYSTEM_EXCEPTION	0x00
-+#define INTEL_TLV_FATAL_EXCEPTION	0x01
-+#define INTEL_TLV_DEBUG_EXCEPTION	0x02
-+#define INTEL_TLV_TEST_EXCEPTION	0xDE
-+
- #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
- #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
- #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
-@@ -219,7 +226,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
- 			     struct intel_boot_params *params);
- int btintel_download_firmware(struct hci_dev *dev, struct intel_version *ver,
- 			      const struct firmware *fw, u32 *boot_param);
--int btintel_configure_setup(struct hci_dev *hdev);
-+int btintel_configure_setup(struct hci_dev *hdev, const char *driver_name);
- void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
- void btintel_secure_send_result(struct hci_dev *hdev,
- 				const void *ptr, unsigned int len);
-@@ -300,7 +307,8 @@ static inline int btintel_download_firmware(struct hci_dev *dev,
- 	return -EOPNOTSUPP;
- }
- 
--static inline int btintel_configure_setup(struct hci_dev *hdev)
-+static inline int btintel_configure_setup(struct hci_dev *hdev,
-+					  const char *driver_name)
- {
- 	return -ENODEV;
- }
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9c9f7bf1375a..4f7aa32696f4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2376,16 +2376,47 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
- 	return btusb_recv_bulk(data, buffer, count);
- }
- 
-+static int btusb_intel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct intel_tlv *tlv = (void *)&skb->data[5];
-+
-+	/* The first event is always an event type TLV */
-+	if (tlv->type != INTEL_TLV_TYPE_ID)
-+		goto recv_frame;
-+
-+	switch (tlv->val[0]) {
-+	case INTEL_TLV_SYSTEM_EXCEPTION:
-+	case INTEL_TLV_FATAL_EXCEPTION:
-+	case INTEL_TLV_DEBUG_EXCEPTION:
-+	case INTEL_TLV_TEST_EXCEPTION:
-+		/* Generate devcoredump from exception */
-+		if (!hci_devcoredump_init(hdev, skb->len)) {
-+			hci_devcoredump_append(hdev, skb);
-+			hci_devcoredump_complete(hdev);
-+		} else {
-+			bt_dev_err(hdev, "Failed to generate devcoredump");
-+			kfree_skb(skb);
-+		}
-+		return 0;
-+	default:
-+		bt_dev_err(hdev, "Invalid exception type %02X", tlv->val[0]);
-+	}
-+
-+recv_frame:
-+	return hci_recv_frame(hdev, skb);
-+}
-+
- static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
--		struct hci_event_hdr *hdr = (void *)skb->data;
-+	struct hci_event_hdr *hdr = (void *)skb->data;
-+	const char diagnostics_hdr[] = { 0x87, 0x80, 0x03 };
- 
--		if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
--		    hdr->plen > 0) {
--			const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
--			unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
-+	if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
-+	    hdr->plen > 0) {
-+		const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
-+		unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
- 
-+		if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
- 			switch (skb->data[2]) {
- 			case 0x02:
- 				/* When switching to the operational firmware
-@@ -2404,6 +2435,15 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 				break;
- 			}
- 		}
-+
-+		/* Handle all diagnostics events separately. May still call
-+		 * hci_recv_frame.
-+		 */
-+		if (len >= sizeof(diagnostics_hdr) &&
-+		    memcmp(&skb->data[2], diagnostics_hdr,
-+			   sizeof(diagnostics_hdr)) == 0) {
-+			return btusb_intel_diagnostics(hdev, skb);
-+		}
- 	}
- 
- 	return hci_recv_frame(hdev, skb);
-@@ -4008,7 +4048,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	/* Combined Intel Device setup to support multiple setup routine */
- 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
--		err = btintel_configure_setup(hdev);
-+		err = btintel_configure_setup(hdev, btusb_driver.name);
- 		if (err)
- 			goto out_free_dev;
- 
--- 
-2.40.0.348.gf938b09366-goog
-
+--===============0357253700048326638==--
