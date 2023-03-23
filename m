@@ -2,77 +2,84 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A82A4C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 10:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D2AC76195
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 10:32:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231530AbjCWKci (ORCPT
+        id S231538AbjCWKcj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 06:32:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46076 "EHLO
+        Thu, 23 Mar 2023 06:32:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231500AbjCWKcK (ORCPT
+        with ESMTP id S229379AbjCWKcK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 23 Mar 2023 06:32:10 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0598D1C31C
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4B61C33D
         for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:29:03 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id o12so84265617edb.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:29:02 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id x3so84234603edb.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1679567341;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=36/uaXy9d/2Hy3Md3LDwKTljrKto/ponzkSPHd4rOaE=;
-        b=iZvs5harFcb1MesyYLpJtqE3/mROhj9KA5fn0SMGFywesSqCvWchUu8oT2lu8tiU2B
-         Or0J7ACkjWvEsWSBjVJ/31cQZxvru0Ny16jTI2/eblnyQ1Q5fHRB+z0WOCoNScuD6FPH
-         eeCEnl1dEJ13/Aw8J62G3nVECA3iX8fKtR4GE=
+        d=streamunlimited.com; s=google; t=1679567342;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qTSY9/BynlPk9okaQr3cojHCjORIEnPdMAyqjbbvnLc=;
+        b=fkSCbJva1GaZJmiNgJ0kvCGAv6wE/Wg1lnoSWvOJ80W3xefSas8xemgAzpdorMc18z
+         C5HcXZH1SOW7W4cbOZcj1fPAIkJ/e/FVkew4QARI6ReWKW0cq3jg62yFmSq/78qHjmY1
+         WSrpggz0UZE+nEptQHAzjx5jvhcRlTDtuNm3A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679567341;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=36/uaXy9d/2Hy3Md3LDwKTljrKto/ponzkSPHd4rOaE=;
-        b=GBeli6HCreVrVXoXpBPUp1EGroWG/qsJag1H2J33CWQ/CHhLFyL6XUQMz5znZdyiA0
-         ACNlapBxEVYvN3r5v9wporfPUJ4t7EbsDCfBk49Dir0iN5mvB5DX+HMfAYQ8zgkOuntU
-         I3qH/e5mBX6cCozQmhs32AoUAm08Ifu0Ksknx03EBt0NUCnIGA7yNSKE5NOp/BJyYpLV
-         VMEIT3aHbVkEO2hc8QYmLLs15w8wKgk2pF+MPmyZDK2rzmR2Jy2v8ruNz8H0A5ENan1Z
-         Sn3rhtHaNghtUJHMCKOLz1Qv5XS53yKg9LBUvP6Z8GrInY+aT4GurscXnUDr8oSRlALl
-         5Elg==
-X-Gm-Message-State: AO0yUKWh37pPe/sgqy89ZYt5ke4tOU1zUIgbIBDWz6eic3rRI4Y9Tj+6
-        iXNFIVi8Mw5CVS33RMO77H0F2XhnLJOg+gIUj/E=
-X-Google-Smtp-Source: AK7set+aa4yxXKsubGQ85cSQMC9rzL/03/yFGR66/c4X2hMekDIEUNjUQj5IKtM/ryPz0aoRpsx82A==
-X-Received: by 2002:a17:906:1345:b0:92e:b1dd:cff2 with SMTP id x5-20020a170906134500b0092eb1ddcff2mr9623143ejb.28.1679567341273;
+        d=1e100.net; s=20210112; t=1679567342;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qTSY9/BynlPk9okaQr3cojHCjORIEnPdMAyqjbbvnLc=;
+        b=WJRMNMsZ0tIDy1aXYkukBsz5GKp2NwL3G0GEulyugKQXxpnkKhtFNhtwYlliZnntqE
+         u3xzqjkqnPgKAHRc1+lefdI8AV6Z1BeJNUajeSA1CqacPiwGwB3pihgL8gXNa+ard/BE
+         xhorKdb/XD99eJ6DrtNnqJZlPuS6ukMEX2PuVDT6gzkjG2dNBFFh/pd1DdwkJN65agOU
+         +FOn9TmA771Ar9HGhaN6TGgqCVgLpZvXQvcael6/eGF0JIkhGywJNINYdd9LBXqivxc4
+         pUpd4QYdLYyDskC7VH1ubNlwJLtRQ++E0z5N82iVL9FUBKQIGzrJsT11vZWxXnkKKVqf
+         ebeA==
+X-Gm-Message-State: AO0yUKX1RynhuCygKwY7vPFGjcxo8GDEMiLoTeGl4dSeuplVoCJLeZS9
+        MdVktjf88oLAxQITTExKUsBQWOdRhBzGhqGbuWo=
+X-Google-Smtp-Source: AK7set8WymEerOf731K331yxh8MFe5uGd66viSn8vn3aeFXRM5D8mkqCta2U+eyRhT2SiyKo5OKL2w==
+X-Received: by 2002:a17:906:ce23:b0:932:7f5c:4bb2 with SMTP id sd3-20020a170906ce2300b009327f5c4bb2mr10019155ejb.75.1679567341835;
         Thu, 23 Mar 2023 03:29:01 -0700 (PDT)
 Received: from smi-ubuntu.sueba ([2a01:390:0:101:4f8c:7da4:48b2:8bd2])
-        by smtp.gmail.com with ESMTPSA id s9-20020a170906454900b008f89953b761sm8459883ejq.3.2023.03.23.03.29.00
+        by smtp.gmail.com with ESMTPSA id s9-20020a170906454900b008f89953b761sm8459883ejq.3.2023.03.23.03.29.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 23 Mar 2023 03:29:01 -0700 (PDT)
 From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 0/2] monitor
-Date:   Thu, 23 Mar 2023 11:28:56 +0100
-Message-Id: <20230323102858.566934-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 1/2] monitor: Fix crash when there is no write handler
+Date:   Thu, 23 Mar 2023 11:28:57 +0100
+Message-Id: <20230323102858.566934-2-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230323102858.566934-1-simon.mikuda@streamunlimited.com>
+References: <20230323102858.566934-1-simon.mikuda@streamunlimited.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello!
+---
+ monitor/att.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm sending some fixes to btmon.
-
-Best regards.
-
-Simon Mikuda (2):
-  monitor: Fix crash when there is no write handler
-  monitor: Fix printing Signed Write Command
-
- monitor/att.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
+diff --git a/monitor/att.c b/monitor/att.c
+index f9643b333..d3b82074f 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -2946,7 +2946,7 @@ static void print_write(const struct l2cap_frame *frame, uint16_t handle,
+ 		return;
+ 
+ 	handler = get_handler(attr);
+-	if (!handler)
++	if (!handler || !handler->write)
+ 		return;
+ 
+ 	handler->write(frame);
 -- 
 2.34.1
 
