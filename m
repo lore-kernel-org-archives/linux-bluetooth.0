@@ -2,101 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD62BC6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 17:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5510DC6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 17:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230471AbjCWRUk (ORCPT
+        id S230259AbjCWRqL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 13:20:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52026 "EHLO
+        Thu, 23 Mar 2023 13:46:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjCWRUj (ORCPT
+        with ESMTP id S230216AbjCWRqK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 13:20:39 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22A52686C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 10:20:38 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id g17so28804239lfv.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 10:20:38 -0700 (PDT)
+        Thu, 23 Mar 2023 13:46:10 -0400
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D11B19113
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 10:46:04 -0700 (PDT)
+Received: by mail-oi1-x22c.google.com with SMTP id w133so16806039oib.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 10:46:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679592037;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=noADxvVZGzG524wNY29+MYK3uk/CTEYh2NGgaqzuY0c=;
-        b=ZH6QgJrsK2p4uhc1RT2lrj52S5l5JnKSM59OtxJh7H6gsvLzKi9VTLiHM8t/1pFsj8
-         tL5FgJhzjHdUfU6xBl3QAJi6kNXenqhTYLsbKhmOR/OWbnFt6twYWNsCObbOjvpwzHs8
-         2+I+pwTbj64P0l5Sw8YukHSrXie8pofZo54ADSRKz/GSu3SPt3ADcBsm/Goo5xmI5EhO
-         TIX+vDfb5ynq5ZVmvr43VI/cZxkWnnIz3RKuXr6REicrvL9hbjvyKGQDLoFl3AxEPyW8
-         IsuDLBjgQLBC7+/dz3194nb7kZoWgmQfAyZdKfvWV1ydlPZJ2WCPlgUoteM5PR2O+up6
-         FRIg==
+        d=gmail.com; s=20210112; t=1679593564;
+        h=content-transfer-encoding:mime-version:sender:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEbtOJ1VUpo5V1mpFZIjlZzDtTsZU410Rq6CZAN85JU=;
+        b=n7slsuHnn6gYYqOgkztxitKyX7DCWW2JscOh6AXXAhUD2Bd1J9C3xIArSUKQKyZTGk
+         ObUrvL2isRMR7GppwIv1PdsfBmj6HIINlkWLrfsI5lFxxQ8SggJ42Xu4azAkg/U2b61m
+         YF4QI2M8vwgMqhgDU+8XUtWp/UEl61amrhH7g+2YcMNu4PZE12tY3rfj+PNqwgYSiDT+
+         JP3wTMOmcbr6ayskq+2F5YuHErAjThwCrTE2/Ci2I1u2i/ytW+IUXZu++JFLvfWZxRMf
+         UXpGss8aF4eOQPmJLPpReGASD+qPL9n2Upy4sTy892h0IhyDeqznBcivVj8COATclQuW
+         fvDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679592037;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=noADxvVZGzG524wNY29+MYK3uk/CTEYh2NGgaqzuY0c=;
-        b=Z4QjQ32AUFK3Y2BWr/0gVS6Z9Pp+xdvpR+EFNsCeuSVjLemsPC66h56TRnPMnC/JbQ
-         NmB/rTz3EnJHJUuDoT0wwdMMYAruQobIBB+Bk6WFt2f9FdVO/q8bcXjH7msXRH8JOw4f
-         CnkUh4GJ92iQaKFMRE/t0NQ4qUUurp69N7jGHKJIEEOHgpsMP/C2slIY1rpnQ5MTKQSz
-         ZJ1C39ThmICjysyE891zsp7hnMUp4ffJ7ESRHbfYA0KlcwDfPB4+lVKOUgmSAkB4aEmn
-         XXWMmi21uADD8oJJ7y50nO7M8IasFb7JKVJhgW1cUUqgkb93XyoBhgDuTWJBZ12A8yTA
-         QPCg==
-X-Gm-Message-State: AO0yUKXglzpQtsal4sntDubH5T3LmFKctL/QEUiDo//Ig4xnM14LWgM9
-        xGna9L1xV1Js3grq8HzHUiIanwis72hX4knlQXuolQs2KMA=
-X-Google-Smtp-Source: AK7set9bgWVtn1ktHE1s5599OZOZ5Ks94RrsAH4aqcBisrx1d39f96/hcRjA7UgGHhIjqt3LZLGIg7iAjFE9EMUSS70=
-X-Received: by 2002:ac2:44c1:0:b0:4db:b4:c8d7 with SMTP id d1-20020ac244c1000000b004db00b4c8d7mr2045336lfm.2.1679592036868;
- Thu, 23 Mar 2023 10:20:36 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679593564;
+        h=content-transfer-encoding:mime-version:sender:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wEbtOJ1VUpo5V1mpFZIjlZzDtTsZU410Rq6CZAN85JU=;
+        b=PvFek035B5M90VM4te4hFQXarR1WOj7L/7LQ4WihU/UoCRBiNK9ECxOZq9uWnzVmmB
+         nQygFIF38NdwUtqCAh07qZBizEo4XeOvcnptyEDHPDf3xG3NtClYx1bFIQU4IAoh6tZs
+         THPi45vd9p6teTJcsgiScqvdOfQ3eiwmImq9WC9jne1UCtbXYNIF1DSnwqzwUopgRbdz
+         /f3dtThuCeVTrQUj3VhYOHxAWEVGN2OfS7i3FPaSTszBEHe5NWy96G0l00USXYRbGY79
+         67Npi4rDeTPzWtsKsjqvVOKeMtar5LTmnUaiZllQtYuvJc6Qe68Vtz7HXcXW6R222Fwv
+         pdsQ==
+X-Gm-Message-State: AO0yUKVaRautkXTEmrZUtpcbHvZnBvSL7+T5CZXdQOPvbp+boZZfiBbN
+        /2l1MePOb/MNZG6Sbzu61zw=
+X-Google-Smtp-Source: AK7set/nwEk5nkFVBcrAKN9qJ5ofhN6iI8OlLphFGjUOmrzePP7WmrRo1hqbYLVDnSsjQ/NQDzv5NQ==
+X-Received: by 2002:a54:4792:0:b0:384:23f0:21b7 with SMTP id o18-20020a544792000000b0038423f021b7mr3164916oic.14.1679593563909;
+        Thu, 23 Mar 2023 10:46:03 -0700 (PDT)
+Received: from localhost.localdomain ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id i7-20020a4a8d87000000b0052a77e38722sm7520924ook.26.2023.03.23.10.46.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 10:46:03 -0700 (PDT)
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
+        Larry Finger <Larry.Finger@lwfinger.net>
+Subject: [PATCH v2 0/2] Bluetooth: Two additional devices
+Date:   Thu, 23 Mar 2023 12:45:45 -0500
+Message-ID: <20230323005203.19749-1-Larry.Finger@lwfinger.net>
+X-Mailer: git-send-email 2.40.0
+X-Account-Key: account11
+X-UIDL: GmailId1870bf3ac2d5b23a
+X-Mozilla-Status: 0001
+Received: from localhost.localdomain ([216.130.59.33])
+ by smtp.gmail.com with ESMTPSA id n7-20020a9d7407000000b0069b193c5d7esm6922702otk.38.2023.03.22.17.52.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 22 Mar 2023 17:52:11 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-References: <20230323102732.566440-1-simon.mikuda@streamunlimited.com> <20230323102732.566440-2-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20230323102732.566440-2-simon.mikuda@streamunlimited.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 23 Mar 2023 10:20:25 -0700
-Message-ID: <CABBYNZLyQkvU1uzV8WF9n54FC43OvFzNne6XJcAUj2yCB8dVbw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] l2test: Enable hex input for PSM
-To:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
+Message-ID: <20230323174545.D9J_fEdnuyybo37adqoTzDYapRZW3YbUV7SHgCKrYDY@z>
 
-Hi Simon,
-
-On Thu, Mar 23, 2023 at 3:39=E2=80=AFAM Simon Mikuda
-<simon.mikuda@streamunlimited.com> wrote:
->
-> ---
->  tools/l2test.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/l2test.c b/tools/l2test.c
-> index 5aae4b687..595f1dab2 100644
-> --- a/tools/l2test.c
-> +++ b/tools/l2test.c
-> @@ -1416,7 +1416,10 @@ int main(int argc, char *argv[])
->                         break;
->
->                 case 'P':
-> -                       psm =3D atoi(optarg);
-> +                       if (!strncasecmp(optarg, "0x", 2))
-> +                               psm =3D strtoul(&optarg[2], NULL, 16);
-
-strtoul should be able to autodetect the base and parse 0x if you give
-0 as base:
-
-https://linux.die.net/man/3/strtoul
-
-> +                       else
-> +                               psm =3D atoi(optarg);
->                         break;
->
->                 case 'I':
-> --
-> 2.34.1
->
-
-
---=20
-Luiz Augusto von Dentz
+Two additional Bluetiith parts attached to Realtek RTW8852BE devices=0D
+have been reported.=0D
+=0D
+V2 - Correct some problems found by the automated front end=0D
+=0D
+Larry Finger (2):=0D
+  bluetooth: Add device 0bda:887b to device tables=0D
+  bluetooth: Add device 13d3:3571 to device tables=0D
+=0D
+ drivers/bluetooth/btusb.c | 4 ++++=0D
+ 1 file changed, 4 insertions(+)=0D
+=0D
+-- =0D
+2.40.0=0D
+=0D
