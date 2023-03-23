@@ -2,94 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA77C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 20:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2060FC76196
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 20:23:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbjCWUHG (ORCPT
+        id S229913AbjCWUXl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 16:07:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46376 "EHLO
+        Thu, 23 Mar 2023 16:23:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231478AbjCWUHD (ORCPT
+        with ESMTP id S229502AbjCWUXk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 16:07:03 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0465E28E8B;
-        Thu, 23 Mar 2023 13:07:02 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id y20so29350527lfj.2;
-        Thu, 23 Mar 2023 13:07:01 -0700 (PDT)
+        Thu, 23 Mar 2023 16:23:40 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3FA1E9F1;
+        Thu, 23 Mar 2023 13:23:38 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id fy10-20020a17090b020a00b0023b4bcf0727so3276246pjb.0;
+        Thu, 23 Mar 2023 13:23:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679602020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6dx0LNrSnDNSxghRtdZKIgvcKSai0Xv19sa2pKVBtm0=;
-        b=PtHSPpgV3RWyesi9nMsqNsp5f+gP7vlw/NInZXvqLdqOaCrTUhSRqXJHuw0a+h6np4
-         XsmOlw0hcSSclkJme5yM1+36sK2kpfa/Ig2R0yN/21fSwVHfpgTf0rZmONLEANeWXoXu
-         B63lmGeK3K5a3Pd8H+DwbQxT47zg8gfVIZ8JOEMcELj+9D9bvMK+yqmaHDEIy/xm/T9H
-         8LuyCyR8rPdTHJKc4KpTP3NFc4tU7XTwItQjnHuHPc3gYwvPNE50ordCIgXQlftScW5V
-         J9CgGhccQOBbrpio7S68rBjk0PvsJkNz36fxIrYQz27LMQaInhfkqxP/n7zSq6YispzI
-         gx1g==
+        d=gmail.com; s=20210112; t=1679603017;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4subVKgPXkKfzo/vmEBk9Q9vczgkdwx4inemRKlfvp4=;
+        b=jmhMp73fB3C5vPmHUFJe1aAgbVDQvPER+I5RbVKE1PtK6yhA6SNTIjeS4aehdWDM6/
+         nV8Ro0WHYLrdpamYWD9wWQUISL9PtjoS/AwOxaGPFmHODOv/hAzbbDGZk/sU767pUoGL
+         D4MteYqnYz2BjaYnO6F/matRJhshitB14YGGI1i9Dm03IEqoa0cuZ76aHO8J3eFxTl9L
+         oWaJumeoAIzj62Qb2IQGqUN0t+tsFJ6a/12wl1kbuehhbGK8lAq7kUPCncXIAbETZCzO
+         ctsWCTQH5bH4b7F752bAP84N0rC64wguqkWPbxegBpRcu8aHQqoKxY2D0a34cp6fZ3dE
+         giNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679602020;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6dx0LNrSnDNSxghRtdZKIgvcKSai0Xv19sa2pKVBtm0=;
-        b=VYNnKwW22Gxk6BJhoh47f01BEmQvk2WEHCnerdABnB2+pKI1GJjkyNokM7JTfjyNs4
-         QXWhKJojg/rER5AoO9Y0IwfDMWEvd+q5kFCKJCLap0kmu7yWYpcKu1CsuhMIYsveK/up
-         HRWA6Jaw5UTH9v7c/h4MNyHXdVSRK3uAo5jH38m6OJUM7lXociqRPHIRuiCU/cdJOF1G
-         FyylU7gmr/wIci0Fv14oq6ZsBH11UKSLtn8uF8cElwmRU7zhX/0rpQ7zdlbLs/LAdFxP
-         geHGu0hWzwPLrp91jVF0EdX9M49da36ShStHRCx50ncZLaCAenmSB3c2H6++Ebso3SIi
-         STAA==
-X-Gm-Message-State: AO0yUKU4WBI5Y/VnL4I3Dt4drOL5lhWW727T5G2UNol/li/a1PpRTt3Y
-        Nx0g/adhSenVHHRsWD0uUGpN4YynXMoEHhW44scZ3i2X
-X-Google-Smtp-Source: AK7set/o3pCVnKMNC2+I4YvRtdLo7f8opwJWz17r7RNwCnow/FuynAlZYxD2/SaMUr99oy4jTP4B16qAluL/zbly8o0=
-X-Received: by 2002:ac2:5ddb:0:b0:4d5:ca32:6aea with SMTP id
- x27-20020ac25ddb000000b004d5ca326aeamr3450794lfq.10.1679602019726; Thu, 23
- Mar 2023 13:06:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230322232543.3079578-1-luiz.dentz@gmail.com>
- <20230322214614.0e70a4a0@kernel.org> <20230323104639.05b3674b@kernel.org>
-In-Reply-To: <20230323104639.05b3674b@kernel.org>
+        d=1e100.net; s=20210112; t=1679603017;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4subVKgPXkKfzo/vmEBk9Q9vczgkdwx4inemRKlfvp4=;
+        b=fPGexKfoypUntBlP+r5p4azg2ZCuGSnH5PrYlGOP6oZp308IBzS+TMgIhzBFiJt9ai
+         ivZXATCILVNDppuC8tXXeYy6tF0MD0//e30QupakQw9TObjFAxBFA5woCekyLbHzRazM
+         cvRyXXd3Iwr2x82ATYY1WckhjwOBBHH2YiqhbiiepfdMkxs5MsaU7KguV8T6G/gDOKkJ
+         Q1uiMfctyF4ZTahyOiO78wSukCft2pYy3+2Sp1+37Ed/IWHNrksmzBHwKaA+cQ3Obljk
+         3EEyqOcvYeDzjIrSfGqb8ySEc+sDMdmijv0hB3W2fY74RNO6mTzfsWrf4ksvkgDeud6w
+         0Qfw==
+X-Gm-Message-State: AO0yUKV5vGrnxyEHITcheAW9e7FLKFHzWVBS0U5/JggdFzfxT8GnfeMf
+        1dP7/P/m9wNMCMBv63aSQNyMj1OiGmo=
+X-Google-Smtp-Source: AK7set8Opev8Ne0BBATRKDzR22cX3a1vtfg16iJ0HIGKjwFMIO3e2psoGkoZGHgmlZdnSj3Gi6kROA==
+X-Received: by 2002:a05:6a20:c426:b0:d5:e640:15ec with SMTP id en38-20020a056a20c42600b000d5e64015ecmr596515pzb.29.1679603017292;
+        Thu, 23 Mar 2023 13:23:37 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id x5-20020aa79185000000b0062612b97cfdsm12315581pfa.123.2023.03.23.13.23.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Mar 2023 13:23:36 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 23 Mar 2023 13:06:48 -0700
-Message-ID: <CABBYNZKwhUnNQ9nz0kUbUS5auAjriyfQia36p_kYM2=mCq50gQ@mail.gmail.com>
-Subject: Re: pull-request: bluetooth 2023-03-22
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull-request: bluetooth 2023-03-23
+Date:   Thu, 23 Mar 2023 13:23:35 -0700
+Message-Id: <20230323202335.3380841-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+The following changes since commit bb765a743377d46d8da8e7f7e5128022504741b9:
 
-On Thu, Mar 23, 2023 at 10:46=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Wed, 22 Mar 2023 21:46:14 -0700 Jakub Kicinski wrote:
-> > On Wed, 22 Mar 2023 16:25:43 -0700 Luiz Augusto von Dentz wrote:
-> > > The following changes since commit bb765a743377d46d8da8e7f7e512802250=
-4741b9:
-> > >
-> > >   mlxsw: spectrum_fid: Fix incorrect local port type (2023-03-22 15:5=
-0:32 +0100)
-> >
-> > Did you rebase? Do you still have the old head?
-> > Because this fixes tag is now incorrect:
-> >
-> > Fixes: ee9b749cb9ad ("Bluetooth: btintel: Iterate only bluetooth device=
- ACPI entries")
-> > Has these problem(s):
-> >       - Target SHA1 does not exist
->
-> Hi, any chance of getting fix fixed in the next hour or so?
-> It can still make today's PR..
+  mlxsw: spectrum_fid: Fix incorrect local port type (2023-03-22 15:50:32 +0100)
 
-Sorry about the delay, Im on it should be able to send an update shortly.
+are available in the Git repository at:
 
---=20
-Luiz Augusto von Dentz
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-03-23
+
+for you to fetch changes up to bce56405201111807cc8e4f47c6de3e10b17c1ac:
+
+  Bluetooth: HCI: Fix global-out-of-bounds (2023-03-23 13:09:38 -0700)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fix MGMT add advmon with RSSI command
+ - L2CAP: Fix responding with wrong PDU type
+ - Fix race condition in hci_cmd_sync_clear
+ - ISO: Fix timestamped HCI ISO data packet parsing
+ - HCI: Fix global-out-of-bounds
+ - hci_sync: Resume adv with no RPA when active scan
+
+----------------------------------------------------------------
+Brian Gix (1):
+      Bluetooth: Remove "Power-on" check from Mesh feature
+
+Howard Chung (1):
+      Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
+
+Kiran K (2):
+      Bluetooth: btintel: Iterate only bluetooth device ACPI entries
+      Bluetooth: btinel: Check ACPI handle for NULL before accessing
+
+Luiz Augusto von Dentz (3):
+      Bluetooth: hci_core: Detect if an ACL packet is in fact an ISO packet
+      Bluetooth: btusb: Remove detection of ISO packets over bulk
+      Bluetooth: L2CAP: Fix responding with wrong PDU type
+
+Min Li (1):
+      Bluetooth: Fix race condition in hci_cmd_sync_clear
+
+Pauli Virtanen (1):
+      Bluetooth: ISO: fix timestamped HCI ISO data packet parsing
+
+Stephan Gerhold (1):
+      Bluetooth: btqcomsmd: Fix command timeout after setting BD address
+
+Sungwoo Kim (1):
+      Bluetooth: HCI: Fix global-out-of-bounds
+
+Zheng Wang (1):
+      Bluetooth: btsdio: fix use after free bug in btsdio_remove due to unfinished work
+
+Zhengping Jiang (1):
+      Bluetooth: hci_sync: Resume adv with no RPA when active scan
+
+ drivers/bluetooth/btintel.c      |  51 +++++++++++------
+ drivers/bluetooth/btintel.h      |   7 ---
+ drivers/bluetooth/btqcomsmd.c    |  17 +++++-
+ drivers/bluetooth/btsdio.c       |   1 +
+ drivers/bluetooth/btusb.c        |  10 ----
+ include/net/bluetooth/hci_core.h |   1 +
+ net/bluetooth/hci_core.c         |  23 ++++++--
+ net/bluetooth/hci_sync.c         |  68 ++++++++++++++++-------
+ net/bluetooth/iso.c              |   9 ++-
+ net/bluetooth/l2cap_core.c       | 117 ++++++++++++++++++++++++++-------------
+ net/bluetooth/mgmt.c             |   9 +--
+ 11 files changed, 206 insertions(+), 107 deletions(-)
