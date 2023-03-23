@@ -2,171 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C60C8C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 13:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BABD6C6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 14:13:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbjCWN67 (ORCPT
+        id S230517AbjCWONs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 09:58:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51900 "EHLO
+        Thu, 23 Mar 2023 10:13:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231984AbjCWN6l (ORCPT
+        with ESMTP id S229682AbjCWONr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 09:58:41 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F3012A6E3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 06:58:30 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id f17so2019413oiw.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 06:58:30 -0700 (PDT)
+        Thu, 23 Mar 2023 10:13:47 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4C89233CC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 07:13:46 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id a16so17238544pjs.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 07:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679579909;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y6ibXONHpucNxyhy2Ilp3DbNlBIYpvHVq3ulmz4QUwg=;
-        b=YXru3eNal+bjY5HzICfn+LACv+bH2kDFBUI1ObfT4oQ7HFqGBbmr4/jQPFFTp+Ha50
-         pE9LSNt6n5pcj9UA6HSj928sH59HU1hQbzWco5wJN2gRx/uIvukBNbgjBqQHggi7/AmO
-         JPRftSBz9CI2DDg38uXSEvdUEK0Bv+KvcMqVl8iJGVfv5dov/7r+2vDGxMgomtKLC40I
-         cdTNtOD3UslSte8u6qNTyo+RE7eX3zw7/N41tZCVDu4MNAbyBW6WZcIAc4WCD72Zwkiy
-         NdB1mW6FHBfjFMXbOYKocpaboaoe6L1XzcWvg+Y2WWhDIdNFQtOV67O5PP59+mmV7uzy
-         3w9Q==
+        d=gmail.com; s=20210112; t=1679580826;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OsXQYIOxmRIdZhbjrmdQf8k5g0I5D1+lOILcfqJwwSU=;
+        b=IWPww3+teAl30tzYFgTrVPCRh0e19XQ69crCPb/XJ1b1H+p+ELp9pav0Hz3TlZ/Ka6
+         fM7x0yEUcNkkrALM1Xs+6fBqj+FuxFmTclimwr+DnoN1UxFhNUW2j4PBI4KJ2NnyWR4j
+         Yc7UZaYfUH0OPAxakoSn4XWpd3XtVZUi3BNNK5GWgSisSTsaOcPTrqi8VgOzU0MorVcB
+         63AaSpJa+fYkNxYBeqn/krRfRbf+TAUA/aM7vB19SjpqJroIznWbHRsf0NZFEDK+SzFS
+         bwebX3m5aohyqs9r7gAeo/QZqvFTqf2x8h5/xf641mw6g+rN7XSWFDWflTmLGhvu1HjO
+         jR4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679579909;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1679580826;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Y6ibXONHpucNxyhy2Ilp3DbNlBIYpvHVq3ulmz4QUwg=;
-        b=HsyGTLmCTHyR/d41HUul7lBzIfA2TeXP4de/SwRhS7rreCnJMWF93cEOuflZsyozG2
-         NgcbQRKOAaw41d8AF1UEXKizhviPOlR2BsQt7ri76LP4NqxMquXrxcYjSVDKnNEawC0D
-         vHGBQZV/bvkwNf1U/nPiCQJZ7xEgH21Z7gmNQqcaf5H/+AjCEQMaW+PdWA5X2O0IskZo
-         t9H7F9xW3XA3X8cBitxZsaFVuLkXtd5F2FF7t95a24p0Ajhbf9V8+hqzaRhJH20uqUOP
-         2Z/xL+EuStFQvbiFj7WGzFFDz6jazRcBrDx3ubWsLvatxwNNgc/kZ4TNPdzWwGekYluW
-         DvVw==
-X-Gm-Message-State: AO0yUKWrHdSRvNc+n8lTQJOIm9dofPee8DrcK8gEmgfet4uZNVrfSZ8R
-        Ai9ZamOW2AfaMfbEcSppdEzy/nSQMYHK5chu
-X-Google-Smtp-Source: AK7set/B6cdm8ZR4a9Yh+RDA3iiIaI+CtqQkbij1GTngf0M8PLEHolPURnj2NpKzpL8KmbGWtaT37Q==
-X-Received: by 2002:a05:6808:250:b0:387:1dee:823e with SMTP id m16-20020a056808025000b003871dee823emr2874539oie.54.1679579909370;
-        Thu, 23 Mar 2023 06:58:29 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:f429:2d04:9d9f:c9a0:8ef:bc50])
-        by smtp.gmail.com with ESMTPSA id 4-20020a4a1704000000b00524faf3d2d7sm7247968ooe.41.2023.03.23.06.58.27
+        bh=OsXQYIOxmRIdZhbjrmdQf8k5g0I5D1+lOILcfqJwwSU=;
+        b=iB+MKTE2x+QiEdRIc7l50uU3BE1JPhxPiES8vJ23y0gWRb51H+803CFb3lmuz/jGZn
+         1eVfsYrOY0TaQGSuLw8w96EZsh0Hl+uHxqtF/bvAeZCAmmA3MBYVV771V396x+v3payM
+         Q8V60OtuD2EAltBF/ssJsvOYOBHopcoA0vz8AAI7MjMn7t7dUgC35VJ8fkEJ9jPsVfc9
+         gZoDCLdTAUuFLxgevHfqctgzmCeKfgmOBLifg5dC9V1CF3oyzjo0dS8FO8tUsQjtqOIX
+         a/MMGDP1OVUEcUtqG2tq0sY9jGI51oRDjQwsdBPwEFQti631oWwBB9YQ8w8gI+mCiN8V
+         I8QQ==
+X-Gm-Message-State: AO0yUKUPRuqaMvSQEy1zdGXDujKmp9czPlBK5EzjZNsba4jwcmQAypQy
+        WrXqb38LJ8oXeb1uBYOKQkpN42jMnkY=
+X-Google-Smtp-Source: AK7set8tdgUqNcVQcFuqlw5jJ2xnISmDvxV7gUYraNc/lf1xEVbmC1DNmCdxX8pKEr+M+eX1k9rf4w==
+X-Received: by 2002:a17:903:288c:b0:19e:8bfe:7d70 with SMTP id ku12-20020a170903288c00b0019e8bfe7d70mr5751180plb.52.1679580825698;
+        Thu, 23 Mar 2023 07:13:45 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.19.56])
+        by smtp.gmail.com with ESMTPSA id v9-20020a1709028d8900b001964c8164aasm12347036plo.129.2023.03.23.07.13.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 06:58:29 -0700 (PDT)
-From:   Raul Cheleguini <raul.cheleguini@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        Raul Cheleguini <raul.cheleguini@gmail.com>
-Subject: [PATCH] Bluetooth: Add new quirk for broken extended create connection for ATS2851
-Date:   Thu, 23 Mar 2023 10:58:04 -0300
-Message-Id: <20230323135804.3962783-1-raul.cheleguini@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Thu, 23 Mar 2023 07:13:45 -0700 (PDT)
+Message-ID: <641c5e99.170a0220.fc144.6d04@mx.google.com>
+Date:   Thu, 23 Mar 2023 07:13:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1460903819382400527=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, raul.cheleguini@gmail.com
+Subject: RE: Bluetooth: Add new quirk for broken extended create connection for ATS2851
+In-Reply-To: <20230323135804.3962783-1-raul.cheleguini@gmail.com>
+References: <20230323135804.3962783-1-raul.cheleguini@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The ATS2851 based controller advertises support for command "LE Extended
-Create Connection" but does not actually implement it, impeding the
-pairing process to begin.
+--===============1460903819382400527==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add the quirk HCI_QUIRK_BROKEN_EXT_CREATE_CONN to avoid the broken command
-and send a regular "LE Create Connection" instead.
+This is an automated email and please do not reply to this email.
 
-< HCI Command: LE Extended Create Conn.. (0x08|0x0043) plen 26
-        Filter policy: Accept list is not used (0x00)
-        Own address type: Public (0x00)
-        Peer address type: Random (0x01)
-        Peer address: DD:5E:B9:FE:49:3D (Static)
-        Initiating PHYs: 0x01
-        Entry 0: LE 1M
-          Scan interval: 60.000 msec (0x0060)
-          Scan window: 60.000 msec (0x0060)
-          Min connection interval: 30.00 msec (0x0018)
-          Max connection interval: 50.00 msec (0x0028)
-          Connection latency: 0 (0x0000)
-          Supervision timeout: 420 msec (0x002a)
-          Min connection length: 0.000 msec (0x0000)
-          Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Extended Create Connection (0x08|0x0043) ncmd 1
-        Status: Unknown HCI Command (0x01)
+Dear Submitter,
 
-Signed-off-by: Raul Cheleguini <raul.cheleguini@gmail.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btusb.c:4107
+error: drivers/bluetooth/btusb.c: patch does not apply
+error: patch failed: include/net/bluetooth/hci.h:309
+error: include/net/bluetooth/hci.h: patch does not apply
+error: patch failed: net/bluetooth/hci_sync.c:4534
+error: net/bluetooth/hci_sync.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-- Note that this patch depends on the RPA timeout quirk sent via [1].
-  [1]. https://marc.info/?l=linux-bluetooth&m=167957918920723&w=2
-  
- drivers/bluetooth/btusb.c        | 1 +
- include/net/bluetooth/hci.h      | 7 +++++++
- include/net/bluetooth/hci_core.h | 3 ++-
- net/bluetooth/hci_sync.c         | 4 ++++
- 4 files changed, 14 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3a3a966419af..8656ac491f13 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4107,6 +4107,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &hdev->quirks);
- 	}
- 
- 	if (!reset)
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 07df96c47ef4..d5d0e44bf0b6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -309,6 +309,13 @@ enum {
- 	 * to support it.
- 	 */
- 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
-+
-+	/*
-+	 * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command is
-+	 * disabled. This is required for the Actions Semiconductor ATS2851
-+	 * based controllers, which erroneously claims to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
- };
- 
- /* HCI device flags */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 53d3328c2b8b..952b0021dc25 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1695,7 +1695,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- 			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
- 
- /* Use ext create connection if command is supported */
--#define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
-+#define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
-+			   !test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &(dev)->quirks))
- 
- /* Extended advertising support */
- #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 003ec0e34fcc..d49cfd1ea418 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4534,6 +4534,9 @@ static const struct {
- 			 "advertised, but not supported."),
- 	HCI_QUIRK_BROKEN(SET_RPA_TIMEOUT,
- 			 "HCI LE Set Random Private Address Timeout command is "
-+			 "advertised, but not supported."),
-+	HCI_QUIRK_BROKEN(EXT_CREATE_CONN,
-+			 "HCI LE Extended Create Connection command is "
- 			 "advertised, but not supported.")
- };
- 
-@@ -6071,6 +6074,7 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	if (err)
- 		goto done;
- 
-+	/* Send command LE Extended Create Connection if supported */
- 	if (use_ext_conn(hdev)) {
- 		err = hci_le_ext_create_conn_sync(hdev, conn, own_addr_type);
- 		goto done;
--- 
-2.39.2
 
+--===============1460903819382400527==--
