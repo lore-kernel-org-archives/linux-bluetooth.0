@@ -2,89 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57980C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 22:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5754C74A5B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 23:10:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229770AbjCWWgV (ORCPT
+        id S230098AbjCWXKV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 18:36:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52968 "EHLO
+        Thu, 23 Mar 2023 19:10:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229681AbjCWWgU (ORCPT
+        with ESMTP id S229529AbjCWXKU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 18:36:20 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5357627D68
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 15:36:19 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id l7so547743qvh.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 15:36:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679610978;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xwdl7jVI+duMok/1FLFXeX11Lbl29g9D9qeDWD1bMjc=;
-        b=hq8ChdRVRIiA/kQ17DVNEH3UeYCS0N9nGEDlmqjFPhvwkrj0Nf+8CsRb54DMUmp1j6
-         tFrua31AbuhvS9v5XrJCSAWlQEVKTIP5P3G1jMavThqhrk4XiZSaCnbRQ7ncwBfs7ZoS
-         J+1HMt0mTTSIiILlknPOqnqna7VziCnZTf6rLpcSbS+W7pYQxRHtkVUlex5i1PcqKYy1
-         +sKwEIwt9AInAJbOPMq87TmbYkHzdjoaCNYRgMN+mUwmiCykaMtIagFqgpdITiEL64y5
-         PeJAL2bUrmPwBDJbQnPBviWx54iIWnMcxsqsdx+hSdtLEAD/Knyx+jM7DfweZd00C1cw
-         lR2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679610978;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xwdl7jVI+duMok/1FLFXeX11Lbl29g9D9qeDWD1bMjc=;
-        b=1KqeOTij+WTbSkUn6dF3tBXZ2HT/Ozi0HWDQINK7GP/S5oMAv0a/xPT/l+DPxWvvhD
-         hkDJ1tixWiy+zpdsMkmaSJrmCzMJg/npdtsfYTtDNa9e682E59dgmAfNeGZkbpRwhBnu
-         ga4c+vwVG2Q0EuxYZc7qdZzxWd92+Nk17+rvJxvyXcHjlZH4gyUV1EcLqdpgPLULtgRX
-         O3B/mYsSvwhholb2sYX8o4RgjmQFZZmximJ2BbadSlR3hMLINIC1OdKfEB9WaFYTBSE+
-         iEjz1TgKQfSwnkTTedxow1xJ0VYgkmYrJgHwEsNdww/bAJM/rvZDH+kjcDetthsK+Fk3
-         J25g==
-X-Gm-Message-State: AAQBX9cWeQgUNh6odRfCPxIR8TTBn+o3JyuZyyU/gI6jz5clhNDSF65N
-        WqgaT7p9LExWsUNNewNWI8+lRjTIew4=
-X-Google-Smtp-Source: AKy350bVh6DCztwtyaX6rGDkbNJxKF0Hn7L+KeiTwOuTrt0gp2hTfwb5kJ/8NzgxEJKrcxrSigHvAw==
-X-Received: by 2002:a05:6214:c25:b0:5d9:a36d:3ed1 with SMTP id a5-20020a0562140c2500b005d9a36d3ed1mr823421qvd.39.1679610978222;
-        Thu, 23 Mar 2023 15:36:18 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.193.177])
-        by smtp.gmail.com with ESMTPSA id eh13-20020a056214186d00b005dd8b9345fasm201941qvb.146.2023.03.23.15.36.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 15:36:17 -0700 (PDT)
-Message-ID: <641cd461.050a0220.c4c4.1137@mx.google.com>
-Date:   Thu, 23 Mar 2023 15:36:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7779825648020031325=="
+        Thu, 23 Mar 2023 19:10:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B99EF970;
+        Thu, 23 Mar 2023 16:10:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AAE28628EF;
+        Thu, 23 Mar 2023 23:10:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 087D7C4339B;
+        Thu, 23 Mar 2023 23:10:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679613019;
+        bh=RpKZl9cfpDDFRTiw5ECB24P6zez4Y7DT5psVlUPERBk=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=XkzGv6Tt4a8ZBg1vlKNYrTfmxY+YdyY5YEwucu+QSAkinlHHhxayznohZs96sYIex
+         xzIf2I335eQLE6hBs6AaBU5rkQS4XqwVh1vfJKccswOvJPx7plaG+I4cI5qEbCoCgJ
+         I2S8jMcs+/qeR4ZkyPCrx4iiN8borES+ttNPvOzRK0347Dw3idmPMPYf5mKM3nmi/G
+         jQtd7WjyYd6C4mxOmTcYBZhWzDPX1tf+K7Y+oBvlyNZ0djdKVP5SL3EazVCTgO8koU
+         qJjhQ6dx3Ete1wjdJuAMFBsm5/jqVrNl77crcsPRDItzgdTvlWvbi2n7EOpX5D82Zz
+         O3N5Q7eKCX5Tg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DEC59E4F0D7;
+        Thu, 23 Mar 2023 23:10:18 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jay.foster@systech.com
-Subject: RE: [BlueZ] btmgmt: Fix typo in command help text
-In-Reply-To: <cdb725d7-57e3-1759-6a4a-53a01dc8cd8b@systech.com>
-References: <cdb725d7-57e3-1759-6a4a-53a01dc8cd8b@systech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bluetooth 2023-03-23
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <167961301890.6837.12837135622614371884.git-patchwork-notify@kernel.org>
+Date:   Thu, 23 Mar 2023 23:10:18 +0000
+References: <20230323202335.3380841-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230323202335.3380841-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7779825648020031325==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is an automated email and please do not reply to this email.
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Dear Submitter,
+On Thu, 23 Mar 2023 13:23:35 -0700 you wrote:
+> The following changes since commit bb765a743377d46d8da8e7f7e5128022504741b9:
+> 
+>   mlxsw: spectrum_fid: Fix incorrect local port type (2023-03-22 15:50:32 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-03-23
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Here is the summary with links:
+  - pull-request: bluetooth 2023-03-23
+    https://git.kernel.org/netdev/net/c/2e63a2dfe73f
 
------ Output -----
-
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---===============7779825648020031325==--
