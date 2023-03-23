@@ -2,139 +2,128 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7594DC6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 02:31:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A702CC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 03:22:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbjCWCbH (ORCPT
+        id S229928AbjCWDWw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Mar 2023 22:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37128 "EHLO
+        Wed, 22 Mar 2023 23:22:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbjCWCbG (ORCPT
+        with ESMTP id S229885AbjCWDWt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Mar 2023 22:31:06 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C08FB29171
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 19:31:00 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id bo10so15194684oib.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 19:31:00 -0700 (PDT)
+        Wed, 22 Mar 2023 23:22:49 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56F94EC70
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 20:22:48 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id w4so13033894plg.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 20:22:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679538660;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uEtVai+kZPJoHonWEbZOMcXezyW2R5l9jqjdo8M5vAc=;
-        b=aPBba51gO3suAJIRRsyN2lPoxDYdd6h7LGcPc9XU3Z5YLVUfbn5Rinf5JOdvDceg37
-         tlxJgE79CCjtXv3hLVxFW59lDCVfTbGOpzpYx/9iPX1aSMFHOiB6szHnmvrRiPkMqYsk
-         D64Ne03f3z5dxtOu7eGOQ3O1jdr/6Su1F8jnT8J+KTUZ8a3LtgkLdMlLwcMHRzT2NhIK
-         vE06VooDIUZqj4Egh9Bxiew3W3dkrjZGXiu0zzzeal0NxQRGA9VARZJuBLeZBfa2dBif
-         Dp7X07+kjzxgj1m76Ri1Skv5a2iDwqGZwv8UbGAUvWW5WBs5CEFHr14F7RbI3BgPMaug
-         AR8Q==
+        d=gmail.com; s=20210112; t=1679541767;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jM6KSwm2K8MuGU+51W5Gxb2R0oj9TXBUe4nd6RdIHEg=;
+        b=nxnNbI3zjYhl80hgEF6lF0w0XsDHw9JYEqgIwf3UBJ90jAMdmG0UGjedYkRTUDfYuY
+         DL5au1Bk9237+xtYs+7gUbgEVX3/01dypZnK29DRC9/YwjFDl9oML863ylY/Od2u8Wkc
+         aFFVK068HPSFd+FfUUScun2LZsOsiqyFcEfjHOXR1SzvaGBA/RO4hA+FfGbpBSaQ/a4u
+         /W8qqkLpu1vVLuriye5HjiPyXQW56Gmy42RwuBWMJjLzGbsVvGGJTWHlaDo1Il6ocuVy
+         SxpvX3F2lrNzo9rtQ/XF3quqyQg/Bjiwum6GoAihry305Ta5iI5eSfEGpY4drpBHTx5f
+         ehnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679538660;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uEtVai+kZPJoHonWEbZOMcXezyW2R5l9jqjdo8M5vAc=;
-        b=qbM461+b65WHAjgnxnK5uIZXNUxyZnvXNyC2gW6hdQdM2+Q/CkH6oY5MdknxmmWyWy
-         YIj8eiTNXzWZmSLW1/2uvOTw24ykWVhk2Fvp+krmNPwzmlB3HVwWXoY8x6DFl4KqATTf
-         PFO5D85ldCimjQXswfazkcJwGDaZAqBcV2WSI3v7PGAkPZYGOvzk6otlIX5s/oW1fK39
-         mkAD5avb6G3rr4e0la8LrIbumXzi9+SKDKXNcjr5+10L4lvsPZZTPaug/cVM2QPSgccY
-         JarknDmlGoq/pxjr/7sR+xSiKMdEm16MaFA8JtiTi2SU9HgeYfPUZDrzRdxIBcfwUV6G
-         p4oQ==
-X-Gm-Message-State: AO0yUKU8D3t/UcNK1TUVDpGaGurI/rGyGS+z0PFFy0oKmpjVOTrhfGwH
-        0awhrzR7/71kV9ms3NekeYUBlCxt+O4=
-X-Google-Smtp-Source: AK7set8Lydjwn4Y+SLXFesOV3uM2nq9856AfFs2q5bFw5l2oKw+sweNXciCXFyhq9MaeghalOv2wYw==
-X-Received: by 2002:a05:6808:a10:b0:387:1e1e:bd2c with SMTP id n16-20020a0568080a1000b003871e1ebd2cmr2265555oij.48.1679538658645;
-        Wed, 22 Mar 2023 19:30:58 -0700 (PDT)
-Received: from [172.17.0.2] ([65.52.35.23])
-        by smtp.gmail.com with ESMTPSA id vh22-20020a0568710d1600b00177c21c3ae1sm5789448oab.54.2023.03.22.19.30.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 19:30:58 -0700 (PDT)
-Message-ID: <641bb9e2.050a0220.4989d.b63d@mx.google.com>
-Date:   Wed, 22 Mar 2023 19:30:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3183625871149866985=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, Larry.Finger@lwfinger.net
-Subject: RE: Bluetooth: Two additional devices
-In-Reply-To: <20230323005203.19749-2-Larry.Finger@lwfinger.net>
-References: <20230323005203.19749-2-Larry.Finger@lwfinger.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+        d=1e100.net; s=20210112; t=1679541767;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jM6KSwm2K8MuGU+51W5Gxb2R0oj9TXBUe4nd6RdIHEg=;
+        b=wowJn+DiQzCgEhnuMGo2+Xp/LUxihHfrPWvwOXssn8hA3nC6YBaIdwMTQu+a2WtNiL
+         kffLRnQaT+vtcwBS/QulaDziDjRqZ7QrjU8Fl1rB6PrrzrFoMJTWxe5nYkwsPfXJ6hNi
+         TEgcGNIontFI73v+nhTfysqQ3Ac8ZITw+XFiainyFBny1ucxB/YluwksI5nO5Owkywl7
+         mdmyeI/8G9E6ztC/uGXuwfreEwZVd399vjooPF23DH8R5L++37CyBB7iflMUaqfZa0ZO
+         DAkybrdgzpfguN0LWxEJIMpZSiyM90uyhkS+7vH47uglnQpFuaPxPyklC1SblFCKLuus
+         UY/Q==
+X-Gm-Message-State: AO0yUKWkwoAdlDfFnxX2AxyHh3EQBhrQGyJgIPI3OuKLDx2xdXYsBuKq
+        CbJWNmkVsvyu8QmvX/ncq9dCa+jE9s6i3g==
+X-Google-Smtp-Source: AK7set+5gAQEKbBudhOic0jcmH7y9AGTCw2EXtspf2ORRhiC8T+aR+eb8KglXMJs7ujHBeUpjIXHpg==
+X-Received: by 2002:a17:902:f1c2:b0:19e:6bc5:8769 with SMTP id e2-20020a170902f1c200b0019e6bc58769mr3643936plc.69.1679541767370;
+        Wed, 22 Mar 2023 20:22:47 -0700 (PDT)
+Received: from AndroidSev.unication.com.cn ([183.63.252.58])
+        by smtp.gmail.com with ESMTPSA id x13-20020a1709027c0d00b001a06677948dsm11231145pll.293.2023.03.22.20.22.45
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 22 Mar 2023 20:22:46 -0700 (PDT)
+From:   Aaron_shen <aarongt.shen@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Aaron_shen <aarongt.shen@gmail.com>
+Subject: [PATCH BlueZ] obexd: support to reply folder name to store file
+Date:   Thu, 23 Mar 2023 11:22:36 +0800
+Message-Id: <20230323032236.17706-1-aarongt.shen@gmail.com>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3183625871149866985==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=732932
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.81 seconds
-GitLint                       PASS      0.64 seconds
-SubjectPrefix                 FAIL      0.47 seconds
-BuildKernel                   PASS      41.73 seconds
-CheckAllWarning               PASS      46.79 seconds
-CheckSparse                   PASS      51.99 seconds
-CheckSmatch                   PASS      137.37 seconds
-BuildKernel32                 PASS      41.32 seconds
-TestRunnerSetup               PASS      577.92 seconds
-TestRunner_l2cap-tester       PASS      20.25 seconds
-TestRunner_iso-tester         PASS      21.83 seconds
-TestRunner_bnep-tester        PASS      7.02 seconds
-TestRunner_mgmt-tester        PASS      132.10 seconds
-TestRunner_rfcomm-tester      PASS      11.65 seconds
-TestRunner_sco-tester         PASS      10.87 seconds
-TestRunner_ioctl-tester       PASS      11.96 seconds
-TestRunner_mesh-tester        PASS      8.82 seconds
-TestRunner_smp-tester         PASS      9.52 seconds
-TestRunner_userchan-tester    PASS      6.91 seconds
-IncrementalBuild              PASS      45.16 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[2/2] bluetooth: Add device 13d3:3571 to device tables
-WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#86: 
-This device is part of a Realtek RTW8852BE chip. The device table is as follows:
-
-total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13184800.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
+It is more convenient that agent reply the message with
+folder name instead of the full new filename to be store.
+Because the opp_chkput() will use the remote device filename
+if the new filename is NULL.
 ---
-Regards,
-Linux Bluetooth
+ doc/obex-agent-api.txt |  9 +++++----
+ obexd/src/manager.c    | 10 ++++++----
+ 2 files changed, 11 insertions(+), 8 deletions(-)
 
+diff --git a/doc/obex-agent-api.txt b/doc/obex-agent-api.txt
+index 3923da6df..4e6d493d3 100644
+--- a/doc/obex-agent-api.txt
++++ b/doc/obex-agent-api.txt
+@@ -46,10 +46,11 @@ Methods		void Release()
+ 			This method gets called when the service daemon
+ 			needs to accept/reject a Bluetooth object push request.
+ 
+-			Returns the full path (including the filename) where
+-			the object shall be stored. The tranfer object will
+-			contain a Filename property that contains the default
+-			location and name that can be returned.
++			Returns the full path (including the filename) or
++			directory name suffixed with '\' where the object
++			shall be stored. The transfer object will contain a
++			Filename property that contains the default location
++			and name that can be returned.
+ 
+ 			Possible errors: org.bluez.obex.Error.Rejected
+ 			                 org.bluez.obex.Error.Canceled
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 849928603..73fd6b9af 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -632,8 +632,7 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
+ 
+ 		if (dbus_error_has_name(&derr, DBUS_ERROR_NO_REPLY))
+ 			agent_cancel();
+-
+-		if (dbus_error_has_name(&derr, OBEX_ERROR_REJECT))
++		else if (dbus_error_has_name(&derr, OBEX_ERROR_REJECT))
+ 			agent->auth_reject = TRUE;
+ 
+ 		dbus_error_free(&derr);
+@@ -651,7 +650,10 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
+ 			agent->new_name = g_strdup(name);
+ 			agent->new_folder = NULL;
+ 		} else {
+-			agent->new_name = g_strdup(slash + 1);
++			if (strlen(slash) == 1)
++				agent->new_name = NULL;
++			else
++				agent->new_name = g_strdup(slash + 1);
+ 			agent->new_folder = g_strndup(name, slash - name);
+ 		}
+ 	}
+@@ -722,7 +724,7 @@ int manager_request_authorization(struct obex_transfer *transfer,
+ 
+ 	dbus_pending_call_unref(call);
+ 
+-	if (!agent || !agent->new_name || agent->auth_reject)
++	if (!agent || agent->auth_reject)
+ 		return -EPERM;
+ 
+ 	*new_folder = agent->new_folder;
+-- 
+2.11.0
 
---===============3183625871149866985==--
