@@ -2,101 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC2DC6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 05:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBA2C6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 10:31:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbjCWFJs (ORCPT
+        id S231521AbjCWKbf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 01:09:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59698 "EHLO
+        Thu, 23 Mar 2023 06:31:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjCWFJr (ORCPT
+        with ESMTP id S229379AbjCWKae (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 01:09:47 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F3FA1CF79
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 22:09:46 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id z1so212798iot.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 22:09:46 -0700 (PDT)
+        Thu, 23 Mar 2023 06:30:34 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A6C4212AB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:27:36 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id b20so51319396edd.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679548185;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qomjr4Kia1Fn4xlANgTX9Qk0uoo1j+hBWFrVKNU7I40=;
-        b=khJZw9F1yiVh+UEaXGe+wrBKL94R0pA9aZlWZNIbNd1itmptWUyGtSo1RYVevFjEtp
-         W2WfDzpbLS62oJK6ZpYA39mMh1M5C8qacBy1eMOrpDF1UpzS129tjhkxuejBoNNhubtr
-         l/3/7uwByNfIPdGCvJPxrBaXjP6/L8ttqledaFPoF9Cw+gANeS/JsUjDjIgwB+f3qIFm
-         3cD2Oh1Gx8i4bcxWGYHBKXsGdKlII7Mu5tgnIA/0iJVGE7dAEaazKzrbXbslMQbMwXGl
-         gKG/+b2rhGmHYq7Egj8lnyJAuwn7fi49seesQRrHOsrVJUYaL1lbNcmx2PqI/9O8grXi
-         4Eug==
+        d=streamunlimited.com; s=google; t=1679567254;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B0vh56DrwmiOLKSzQrJTF6Mh2GigCOXzXUVM8dmQKc0=;
+        b=cjewgcdT5HvjlsquzxUgBC8i/rFbXuYsuPP6VUqsZqeMzPtVTNGBt5TSHurQiKMwNJ
+         lJAXSWWZjgeivpAd3PSaEC2vwa3mDuyMujuwNSeQ+5/jYn3XNtO3zcl8qbMDehMm1FO5
+         NQOcllFufy9rm6kbHLy7h/3CybdqPrHjHwZAc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679548185;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20210112; t=1679567254;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Qomjr4Kia1Fn4xlANgTX9Qk0uoo1j+hBWFrVKNU7I40=;
-        b=BZ4QKnDmNkOmicRNk/51FMv72+e2XjDQ1xqQk43PS0ulWqsQC7dmLVaw+wO8WNOW3m
-         2Up4b4QG6O8WNZVMHpfB2gL4A8m5/++98gl98wxtvg1MhX11mebWf18O6seqBBXUvLIn
-         QGSXgtsDgxtYtRVJZVOckR9eB83s1iHhDlEt8/DkZTx6YuGauAOeUITbPr73pALwcSjn
-         LbVijDNUyiHcxpc0dtU7PjMaGkIyyxtHSRqunCGG8Ne8LdRaHftmYgZFSLjteer7Sf96
-         JXqPzAEBO2mEvzd/gYd2CjV3RbuyOiOH/bezKvXLgt9BrcUcPzeEAODw6j+sd7+Is9ZP
-         6PMQ==
-X-Gm-Message-State: AO0yUKXcSp0YZRYQln+wIpL7gMU/zBNsMZHm59aH/13Kiw6HO9QZJW0e
-        J0Dxh2BBa2rEohufKmG8UHSpIDzriS4=
-X-Google-Smtp-Source: AK7set/w41RQsQIh4fsuiNKP578DiIrzmaJ5vgIJnUsoAWb6chi9ChjT68lQxSZuLpv00Q/RKDjhMw==
-X-Received: by 2002:a5e:8b01:0:b0:74c:a578:e3a0 with SMTP id g1-20020a5e8b01000000b0074ca578e3a0mr6014223iok.5.1679548185323;
-        Wed, 22 Mar 2023 22:09:45 -0700 (PDT)
-Received: from [172.17.0.2] ([13.86.22.97])
-        by smtp.gmail.com with ESMTPSA id r20-20020a6bd914000000b0075342150fa8sm4997008ioc.40.2023.03.22.22.09.44
+        bh=B0vh56DrwmiOLKSzQrJTF6Mh2GigCOXzXUVM8dmQKc0=;
+        b=uNKFf+gB7bjcvJFxG2m9wRz8VdGPH2uTWgf+gijPo2nC58ztSuSXPH+O+lCK1im9cA
+         fLNkocsTV9w9zBEMKmAbRnoom4bso93I3Jfo4z9RFo0Xewz/viRHE3cNa+snN/wdQJiK
+         0hdts/gZdLkoSTW3LesHhi4RCCzd0DKb2CcDCpXy6/bCrZnnFnR5AA0oZSefd7xTR+Iq
+         og2bGAh2Zt2acjsQVyo1XooZuD0wm29D/hUhSyVNMkruR+YJnY6oteiTZCBGQrxHDGnG
+         kPqItPPd00WoiBJGnoYft5lxy51M8v3qppvoFu1Co6YJIPz07pHUs3fGNvHaQCfH7NZK
+         RvNg==
+X-Gm-Message-State: AO0yUKULC6V96LzywvYDI3gWTJLQPmILyRBBMT7M96LVvaP9mLqzJnU8
+        APIsnY/rfV1Cw92ZEjE08MNJoAn03YyO9rHJ09c=
+X-Google-Smtp-Source: AK7set90G17z9ISbuA2kXUKUdyT69V1PXsekw+ISJnvLajuJNMwYbAdcee0L+hKAGV2lUmNfXaYt2w==
+X-Received: by 2002:a17:906:e296:b0:92f:48f0:736d with SMTP id gg22-20020a170906e29600b0092f48f0736dmr10193684ejb.62.1679567254492;
+        Thu, 23 Mar 2023 03:27:34 -0700 (PDT)
+Received: from smi-ubuntu.sueba ([2a01:390:0:101:4f8c:7da4:48b2:8bd2])
+        by smtp.gmail.com with ESMTPSA id u25-20020a50c2d9000000b004faf34064c8sm8880564edf.62.2023.03.23.03.27.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 22:09:45 -0700 (PDT)
-Message-ID: <641bdf19.6b0a0220.70982.aa74@mx.google.com>
-Date:   Wed, 22 Mar 2023 22:09:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6097590539277307557=="
+        Thu, 23 Mar 2023 03:27:34 -0700 (PDT)
+From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 0/2] l2test fix+feature
+Date:   Thu, 23 Mar 2023 11:27:30 +0100
+Message-Id: <20230323102732.566440-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, aarongt.shen@gmail.com
-Subject: RE: [BlueZ] obexd: support to reply folder name to store file
-In-Reply-To: <20230323034805.18946-1-aarongt.shen@gmail.com>
-References: <20230323034805.18946-1-aarongt.shen@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6097590539277307557==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello!
 
-This is automated email and please do not reply to this email!
+Added fix setting socket BT_MODE
+Also added minor feature enabling hex input to PSM (e.g. 0x1001)
 
-Dear submitter,
+Best regards.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=732965
+Simon Mikuda (2):
+  l2test: Enable hex input for PSM
+  l2test: Fix setting mode for BR/EDR l2cap socket
 
----Test result---
+ lib/l2cap.h    |  2 ++
+ tools/l2test.c | 27 +++++++++++++++++++++++++--
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-Test Summary:
-CheckPatch                    PASS      0.41 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      26.01 seconds
-BluezMake                     PASS      739.19 seconds
-MakeCheck                     PASS      11.07 seconds
-MakeDistcheck                 PASS      147.25 seconds
-CheckValgrind                 PASS      239.63 seconds
-CheckSmatch                   PASS      318.79 seconds
-bluezmakeextell               PASS      96.17 seconds
-IncrementalBuild              PASS      599.97 seconds
-ScanBuild                     PASS      947.07 seconds
+-- 
+2.34.1
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6097590539277307557==--
