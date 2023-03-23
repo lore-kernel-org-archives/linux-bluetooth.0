@@ -2,132 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2060FC76196
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 20:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54CC2C6FD1C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 20:50:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229913AbjCWUXl (ORCPT
+        id S230011AbjCWUug (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 16:23:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41964 "EHLO
+        Thu, 23 Mar 2023 16:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjCWUXk (ORCPT
+        with ESMTP id S229954AbjCWUue (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 16:23:40 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3FA1E9F1;
-        Thu, 23 Mar 2023 13:23:38 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id fy10-20020a17090b020a00b0023b4bcf0727so3276246pjb.0;
-        Thu, 23 Mar 2023 13:23:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679603017;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4subVKgPXkKfzo/vmEBk9Q9vczgkdwx4inemRKlfvp4=;
-        b=jmhMp73fB3C5vPmHUFJe1aAgbVDQvPER+I5RbVKE1PtK6yhA6SNTIjeS4aehdWDM6/
-         nV8Ro0WHYLrdpamYWD9wWQUISL9PtjoS/AwOxaGPFmHODOv/hAzbbDGZk/sU767pUoGL
-         D4MteYqnYz2BjaYnO6F/matRJhshitB14YGGI1i9Dm03IEqoa0cuZ76aHO8J3eFxTl9L
-         oWaJumeoAIzj62Qb2IQGqUN0t+tsFJ6a/12wl1kbuehhbGK8lAq7kUPCncXIAbETZCzO
-         ctsWCTQH5bH4b7F752bAP84N0rC64wguqkWPbxegBpRcu8aHQqoKxY2D0a34cp6fZ3dE
-         giNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679603017;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4subVKgPXkKfzo/vmEBk9Q9vczgkdwx4inemRKlfvp4=;
-        b=fPGexKfoypUntBlP+r5p4azg2ZCuGSnH5PrYlGOP6oZp308IBzS+TMgIhzBFiJt9ai
-         ivZXATCILVNDppuC8tXXeYy6tF0MD0//e30QupakQw9TObjFAxBFA5woCekyLbHzRazM
-         cvRyXXd3Iwr2x82ATYY1WckhjwOBBHH2YiqhbiiepfdMkxs5MsaU7KguV8T6G/gDOKkJ
-         Q1uiMfctyF4ZTahyOiO78wSukCft2pYy3+2Sp1+37Ed/IWHNrksmzBHwKaA+cQ3Obljk
-         3EEyqOcvYeDzjIrSfGqb8ySEc+sDMdmijv0hB3W2fY74RNO6mTzfsWrf4ksvkgDeud6w
-         0Qfw==
-X-Gm-Message-State: AO0yUKV5vGrnxyEHITcheAW9e7FLKFHzWVBS0U5/JggdFzfxT8GnfeMf
-        1dP7/P/m9wNMCMBv63aSQNyMj1OiGmo=
-X-Google-Smtp-Source: AK7set8Opev8Ne0BBATRKDzR22cX3a1vtfg16iJ0HIGKjwFMIO3e2psoGkoZGHgmlZdnSj3Gi6kROA==
-X-Received: by 2002:a05:6a20:c426:b0:d5:e640:15ec with SMTP id en38-20020a056a20c42600b000d5e64015ecmr596515pzb.29.1679603017292;
-        Thu, 23 Mar 2023 13:23:37 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id x5-20020aa79185000000b0062612b97cfdsm12315581pfa.123.2023.03.23.13.23.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Mar 2023 13:23:36 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2023-03-23
-Date:   Thu, 23 Mar 2023 13:23:35 -0700
-Message-Id: <20230323202335.3380841-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Thu, 23 Mar 2023 16:50:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4501271F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 13:50:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A3793B8224C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 20:50:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 50C10C4339C;
+        Thu, 23 Mar 2023 20:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1679604619;
+        bh=NB4ktg1nSCGTbqKCPepzSVYcTEHDuzCJfIsWM134+4A=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=lnKMcknhXoAu3OvEVLOmArAn9vIIMRilM9YUxr/1kHLx4piMadbJpDjawA4Kr/t8A
+         mcX+9Du/z/PsogghmTvH08OBhZd1DoXEZuIcs2FaAXEdgQH1Y907LAnxmgk8Y2uk8F
+         I9FPeC8XdsxH4N38NDVp7Wc5H2z8KJiVrSIpu3+b9pKymJ27haV2rICxqg3KxzwH0V
+         s3tUu1TFbQIqBRVcwOVxP9BZmDz7gALfy0pmw/IZbaYslE9jHB8S3ocqD5TOsOZLi6
+         UCY18Afu6iYF5rI6QkbXf15AWXWZ2mCu4Ev2wdU891MhFNAvAa/7R1B8FmOjoE16up
+         L9zC0cdlTsiOg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30251E52505;
+        Thu, 23 Mar 2023 20:50:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/2] monitor
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <167960461919.6047.7144371011985032771.git-patchwork-notify@kernel.org>
+Date:   Thu, 23 Mar 2023 20:50:19 +0000
+References: <20230323102858.566934-1-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20230323102858.566934-1-simon.mikuda@streamunlimited.com>
+To:     Simon Mikuda <simon.mikuda@streamunlimited.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit bb765a743377d46d8da8e7f7e5128022504741b9:
+Hello:
 
-  mlxsw: spectrum_fid: Fix incorrect local port type (2023-03-22 15:50:32 +0100)
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-are available in the Git repository at:
+On Thu, 23 Mar 2023 11:28:56 +0100 you wrote:
+> Hello!
+> 
+> I'm sending some fixes to btmon.
+> 
+> Best regards.
+> 
+> Simon Mikuda (2):
+>   monitor: Fix crash when there is no write handler
+>   monitor: Fix printing Signed Write Command
+> 
+> [...]
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-03-23
+Here is the summary with links:
+  - [BlueZ,1/2] monitor: Fix crash when there is no write handler
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=446e13360dba
+  - [BlueZ,2/2] monitor: Fix printing Signed Write Command
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=648b4362521b
 
-for you to fetch changes up to bce56405201111807cc8e4f47c6de3e10b17c1ac:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Bluetooth: HCI: Fix global-out-of-bounds (2023-03-23 13:09:38 -0700)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix MGMT add advmon with RSSI command
- - L2CAP: Fix responding with wrong PDU type
- - Fix race condition in hci_cmd_sync_clear
- - ISO: Fix timestamped HCI ISO data packet parsing
- - HCI: Fix global-out-of-bounds
- - hci_sync: Resume adv with no RPA when active scan
-
-----------------------------------------------------------------
-Brian Gix (1):
-      Bluetooth: Remove "Power-on" check from Mesh feature
-
-Howard Chung (1):
-      Bluetooth: mgmt: Fix MGMT add advmon with RSSI command
-
-Kiran K (2):
-      Bluetooth: btintel: Iterate only bluetooth device ACPI entries
-      Bluetooth: btinel: Check ACPI handle for NULL before accessing
-
-Luiz Augusto von Dentz (3):
-      Bluetooth: hci_core: Detect if an ACL packet is in fact an ISO packet
-      Bluetooth: btusb: Remove detection of ISO packets over bulk
-      Bluetooth: L2CAP: Fix responding with wrong PDU type
-
-Min Li (1):
-      Bluetooth: Fix race condition in hci_cmd_sync_clear
-
-Pauli Virtanen (1):
-      Bluetooth: ISO: fix timestamped HCI ISO data packet parsing
-
-Stephan Gerhold (1):
-      Bluetooth: btqcomsmd: Fix command timeout after setting BD address
-
-Sungwoo Kim (1):
-      Bluetooth: HCI: Fix global-out-of-bounds
-
-Zheng Wang (1):
-      Bluetooth: btsdio: fix use after free bug in btsdio_remove due to unfinished work
-
-Zhengping Jiang (1):
-      Bluetooth: hci_sync: Resume adv with no RPA when active scan
-
- drivers/bluetooth/btintel.c      |  51 +++++++++++------
- drivers/bluetooth/btintel.h      |   7 ---
- drivers/bluetooth/btqcomsmd.c    |  17 +++++-
- drivers/bluetooth/btsdio.c       |   1 +
- drivers/bluetooth/btusb.c        |  10 ----
- include/net/bluetooth/hci_core.h |   1 +
- net/bluetooth/hci_core.c         |  23 ++++++--
- net/bluetooth/hci_sync.c         |  68 ++++++++++++++++-------
- net/bluetooth/iso.c              |   9 ++-
- net/bluetooth/l2cap_core.c       | 117 ++++++++++++++++++++++++++-------------
- net/bluetooth/mgmt.c             |   9 +--
- 11 files changed, 206 insertions(+), 107 deletions(-)
