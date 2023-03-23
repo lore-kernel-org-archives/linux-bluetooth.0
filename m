@@ -2,124 +2,156 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D5CC6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 00:52:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6774DC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 01:11:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjCWAwV (ORCPT
+        id S229796AbjCWBLb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Mar 2023 20:52:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44706 "EHLO
+        Wed, 22 Mar 2023 21:11:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbjCWAwT (ORCPT
+        with ESMTP id S229522AbjCWBL3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Mar 2023 20:52:19 -0400
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88B22366C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 17:52:18 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id m20-20020a9d6094000000b0069caf591747so11378237otj.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 17:52:18 -0700 (PDT)
+        Wed, 22 Mar 2023 21:11:29 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E03E35AA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 18:11:28 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id p3-20020a17090a74c300b0023f69bc7a68so417463pjl.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 18:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679532738;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x4s7O2psfaoTqClXZN2llqI098Vp1Cd0S3s/1TmJkhE=;
-        b=fmIbk1Q/05sdqDyXObLYpPng+pUPe4uWg+DZcRoj7qBtRTOW3kyO6VsiqKtdq+iqfp
-         gyIKxKCDK7ZCsffanaHhQyrHPaxretcCsByFV9wcfoiXlZzzPctVMAInLvNjLPVLkuYq
-         a/8k9Q9MkA7llSZa9SacV2RVGsR+jSRCUW3qgqXKHgJJfNYDFSsFCVjdJOEOEJe6olLq
-         UdjyrK4d3WJS5Zy121XS651Ff+aK3K7t+gyZEkQqKwnK4K7sYjj5mwKzE/cqbJkWo00Q
-         YFhfwBs09BRSal5xdbI5UHyuvP+n1s5Ocud6wpVjPeFkGlG2hnCipTGn9h0XEvnbdL+b
-         q76g==
+        d=gmail.com; s=20210112; t=1679533887;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sG3deX9mcFL/ZJhfF3phQ1ubNpRD7jPNCl9oOnV0kB8=;
+        b=iciSykKh0R4VPfjxqhAZqG+3nMHx5wp6J1LS4ZYnfknlqxz2V18W3CVGjhdekCFRDP
+         cIMERer1Of3MI8leKYZRGNkqOtwbpC2ULxDgY0/y+1ccj7vZbIdjfF8M440xmyPpm3ow
+         zCMpBPHVqX2/xUEiAVJKgiNWLeAP2oSyp84oeezhKhvbIfwRZGXUS4tG7Bva7bRhvH6r
+         55Jjto+fH5pxLCQ7R/ISTvB994jTuX+OkZQaBAzT0TnlTpEI1wIT+u3U9axJlPdVLEEi
+         qtCQhBsrYiMvVuRaRAhANPwNy2Y63qcDVjN9Qe+FQxI+RtpQT3neLwIfy7r69e0u8khA
+         4G+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679532738;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=x4s7O2psfaoTqClXZN2llqI098Vp1Cd0S3s/1TmJkhE=;
-        b=PIHZEsTdhiNIqQcKz/IVwHI1tCJUgdq/qFgG0zmjJHg9IchW5teiMI/WJFFpd+MBOv
-         IIveMBWTyeihqt5DDVnUUBR/YvEqHicHzXwu4OcmdB6K3dsm7v/hNNjzriWs8oR4rmLE
-         gIlt5k0GEo59obvjTl0sXF3be8+No8DN1rtE9/ztWn0eG0MAOLR9KkgnL7yto/5HkEWv
-         56G3HpyvDvvyNhd0AFv/mCAtHHYIL19/iXflw3KIb7HPlEK6SxziUesMoUM/BE3iKc8j
-         JGIK4Q7a2v0IXaUJ/e4ZeWIxlQ4T0goHiZ4PWzlT7opE5IHJYOyo6OeBOEr7mKakFcXl
-         cX2Q==
-X-Gm-Message-State: AO0yUKUM9dJ1AI5GrTLsZi6feSN//I5ULi5T0dLn4sZjq8gjUW+Pcrn+
-        pQxIFeHKJz5gD1T+t3P+JA1qA8qM7+E=
-X-Google-Smtp-Source: AK7set+GMCQ6Biv8pAWWvYT2u1+8Cqn+8wv7z50xnsgRZ0IGWNVBvLEOhblZlIlczxIcOPsLuaSvDg==
-X-Received: by 2002:a05:6830:478e:b0:699:2dfb:e70d with SMTP id df14-20020a056830478e00b006992dfbe70dmr2104655otb.6.1679532738118;
-        Wed, 22 Mar 2023 17:52:18 -0700 (PDT)
-Received: from localhost.localdomain ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id n7-20020a9d7407000000b0069b193c5d7esm6922702otk.38.2023.03.22.17.52.17
+        d=1e100.net; s=20210112; t=1679533887;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sG3deX9mcFL/ZJhfF3phQ1ubNpRD7jPNCl9oOnV0kB8=;
+        b=h8rhMEvFQ/PgdLTwKrslIwSj9viO2fUNFI8LGgnL3oLcJ0wViLuafcvyHGD0DiBeVo
+         heSXvThiNb2faDB88YS0dc+4Cu47oiYUdk/mvVuFL/JDJ6oOqyxYrNvuYkk+HHNWpOlE
+         AtwkdpqACbhqQQYu1yt48YBXazk/3tK/b/C3djuqhXJtJnodNAU65a0YIfCyYaI4MUm/
+         qCTxPHZzSebBr1WaBrI/4TzsDoxZ455dAEnjA7WGY4UVzX/S+i5kaBJd8CYr/gOQLjas
+         OsmHzRoIYzYNP0Kmapn/whK8OyRpV3VrkTSsUdEyCQD14oRA6lOO9poTNVhwzcqn9iHz
+         9kKw==
+X-Gm-Message-State: AO0yUKWqnA2TNF0gMPDp5hwPnm53wnri7uESduy2WXU73ERzbSudkVKP
+        7IvGgoUvgv0HScNikPk7ZzifEVbSpJc=
+X-Google-Smtp-Source: AK7set89IzvPfhs65a/JOmhuOCSDzunk97rPAtYkJbrJEN1qRaPZ60rVrJ6SmN71OW4lNYGOLbIzpw==
+X-Received: by 2002:a17:902:e2d3:b0:1a1:b238:d1a5 with SMTP id l19-20020a170902e2d300b001a1b238d1a5mr3486239plc.4.1679533887469;
+        Wed, 22 Mar 2023 18:11:27 -0700 (PDT)
+Received: from [172.17.0.2] ([20.168.48.2])
+        by smtp.gmail.com with ESMTPSA id y6-20020a170902b48600b001a1ea1d6d6esm3001308plr.290.2023.03.22.18.11.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 17:52:17 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-From:   Larry Finger <Larry.Finger@lwfinger.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>
-Subject: [PATCH 2/2] bluetooth: Add device 13d3:3571 to device tables
-Date:   Wed, 22 Mar 2023 19:52:03 -0500
-Message-Id: <20230323005203.19749-3-Larry.Finger@lwfinger.net>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230323005203.19749-1-Larry.Finger@lwfinger.net>
-References: <20230323005203.19749-1-Larry.Finger@lwfinger.net>
+        Wed, 22 Mar 2023 18:11:27 -0700 (PDT)
+Message-ID: <641ba73f.170a0220.ebdc2.62e2@mx.google.com>
+Date:   Wed, 22 Mar 2023 18:11:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3423123535607556674=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, dhowells@redhat.com
+Subject: RE: [RFC,1/3] net: Drop the size argument from ->sendmsg()
+In-Reply-To: <20230322135612.3265850-2-dhowells@redhat.com>
+References: <20230322135612.3265850-2-dhowells@redhat.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This device is part of a Realtek RTW8852BE chip. The device table is as follows:
+--===============3423123535607556674==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3571 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=732753
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      18.11 seconds
+GitLint                       PASS      0.26 seconds
+SubjectPrefix                 FAIL      0.40 seconds
+BuildKernel                   PASS      31.50 seconds
+CheckAllWarning               PASS      34.46 seconds
+CheckSparse                   WARNING   39.28 seconds
+CheckSmatch                   WARNING   108.13 seconds
+BuildKernel32                 PASS      30.32 seconds
+TestRunnerSetup               PASS      433.80 seconds
+TestRunner_l2cap-tester       PASS      15.85 seconds
+TestRunner_iso-tester         PASS      15.61 seconds
+TestRunner_bnep-tester        PASS      5.07 seconds
+TestRunner_mgmt-tester        PASS      103.41 seconds
+TestRunner_rfcomm-tester      PASS      8.14 seconds
+TestRunner_sco-tester         PASS      7.43 seconds
+TestRunner_ioctl-tester       PASS      8.59 seconds
+TestRunner_mesh-tester        PASS      6.36 seconds
+TestRunner_smp-tester         PASS      7.37 seconds
+TestRunner_userchan-tester    PASS      5.26 seconds
+IncrementalBuild              PASS      28.86 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[RFC,1/3] net: Drop the size argument from ->sendmsg()
+WARNING: Unnecessary space before function pointer arguments
+#729: FILE: include/linux/net.h:195:
++	int		(*sendmsg)   (struct socket *sock, struct msghdr *m);
+
+WARNING: function definition argument 'struct rxrpc_sock *' should also have an identifier name
+#2195: FILE: net/rxrpc/ar-internal.h:1224:
++int rxrpc_do_sendmsg(struct rxrpc_sock *, struct msghdr *);
+
+WARNING: function definition argument 'struct msghdr *' should also have an identifier name
+#2195: FILE: net/rxrpc/ar-internal.h:1224:
++int rxrpc_do_sendmsg(struct rxrpc_sock *, struct msghdr *);
+
+total: 0 errors, 3 warnings, 2169 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13184097.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:148:35: warning: array of flexible structures
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:148:35: warning: array of flexible structures
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 964aa5577c79..39ea0e007038 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -542,6 +542,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3571), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Realtek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
--- 
-2.40.0
 
+--===============3423123535607556674==--
