@@ -2,47 +2,48 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBA2C6FD1C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 10:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 885E9C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 10:31:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbjCWKbf (ORCPT
+        id S231527AbjCWKbg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Mar 2023 06:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43268 "EHLO
+        Thu, 23 Mar 2023 06:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjCWKae (ORCPT
+        with ESMTP id S230375AbjCWKaf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Mar 2023 06:30:34 -0400
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A6C4212AB
+        Thu, 23 Mar 2023 06:30:35 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C699322785
         for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:27:36 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id b20so51319396edd.1
+Received: by mail-ed1-x534.google.com with SMTP id o12so84251745edb.9
         for <linux-bluetooth@vger.kernel.org>; Thu, 23 Mar 2023 03:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1679567254;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B0vh56DrwmiOLKSzQrJTF6Mh2GigCOXzXUVM8dmQKc0=;
-        b=cjewgcdT5HvjlsquzxUgBC8i/rFbXuYsuPP6VUqsZqeMzPtVTNGBt5TSHurQiKMwNJ
-         lJAXSWWZjgeivpAd3PSaEC2vwa3mDuyMujuwNSeQ+5/jYn3XNtO3zcl8qbMDehMm1FO5
-         NQOcllFufy9rm6kbHLy7h/3CybdqPrHjHwZAc=
+        d=streamunlimited.com; s=google; t=1679567255;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E2M8ZS5DPkk4FU2yyrryJViRll0PsOCpoJq9idZw+8k=;
+        b=imxOblQRax6ZLDwSqD8m0eEsfv1gdywb1j5TUTYQLZIgNWMjONsDEUMzSK6lbXBnRJ
+         AAhiUJxypCdpMdmYprgBvvuUY+jDnW1GaQWsibvtaqPoXrVuli/3Eq2O8WYH46P7nUfl
+         uft5CrdsZC6Y5ZeeF+XlTV0hpBJBGaQDelQPQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679567254;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B0vh56DrwmiOLKSzQrJTF6Mh2GigCOXzXUVM8dmQKc0=;
-        b=uNKFf+gB7bjcvJFxG2m9wRz8VdGPH2uTWgf+gijPo2nC58ztSuSXPH+O+lCK1im9cA
-         fLNkocsTV9w9zBEMKmAbRnoom4bso93I3Jfo4z9RFo0Xewz/viRHE3cNa+snN/wdQJiK
-         0hdts/gZdLkoSTW3LesHhi4RCCzd0DKb2CcDCpXy6/bCrZnnFnR5AA0oZSefd7xTR+Iq
-         og2bGAh2Zt2acjsQVyo1XooZuD0wm29D/hUhSyVNMkruR+YJnY6oteiTZCBGQrxHDGnG
-         kPqItPPd00WoiBJGnoYft5lxy51M8v3qppvoFu1Co6YJIPz07pHUs3fGNvHaQCfH7NZK
-         RvNg==
-X-Gm-Message-State: AO0yUKULC6V96LzywvYDI3gWTJLQPmILyRBBMT7M96LVvaP9mLqzJnU8
-        APIsnY/rfV1Cw92ZEjE08MNJoAn03YyO9rHJ09c=
-X-Google-Smtp-Source: AK7set90G17z9ISbuA2kXUKUdyT69V1PXsekw+ISJnvLajuJNMwYbAdcee0L+hKAGV2lUmNfXaYt2w==
-X-Received: by 2002:a17:906:e296:b0:92f:48f0:736d with SMTP id gg22-20020a170906e29600b0092f48f0736dmr10193684ejb.62.1679567254492;
-        Thu, 23 Mar 2023 03:27:34 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1679567255;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E2M8ZS5DPkk4FU2yyrryJViRll0PsOCpoJq9idZw+8k=;
+        b=hBqvgkp5PnkYYaADrZov628N2xAw8RU6AesdxQ3ZkYIyrpIGa+rPbu2sIw1hvH3iYy
+         Vu9Rqss6eFTyFic/T/Zj9DHVov6iISiTms+zaY6fFPiFMTN+ZVqoxHXpG1OnGjD/qs16
+         zWMbj4qsMW8T+31PkCqWvvIQbAVizTHVtxxWdLO2U2mSQ5yjytlzUHxUk6jVHZhwDKu2
+         5aAQjX2cqqD30GfHujBPbouu+xWKdZ5cmLq/VI03rsT2BtSNGg2RfrMeIoZe05XTG0am
+         gozy5391e+b3jAlLEeMYRVQveOB/vrogQf9PqhCgwNCZKfLC/uTKWzFbMMKxR690uwHd
+         VHxg==
+X-Gm-Message-State: AO0yUKVddZrvfurupVmMUDL9fcoMvdClrvu4ifA3mkZLWhBca56a2yVI
+        TKeX9GzK+D/fPyN/G5UsGa8WBNloym2rZs3/iM8=
+X-Google-Smtp-Source: AK7set8DmZkjArYMAGIFMsY67TDlk1JsONDwqlsu4/ST5uw9mfmlxwn4DTeMuCo0bWRyPMsuI68w6A==
+X-Received: by 2002:a17:906:3999:b0:933:3705:a9f0 with SMTP id h25-20020a170906399900b009333705a9f0mr10810374eje.19.1679567255178;
+        Thu, 23 Mar 2023 03:27:35 -0700 (PDT)
 Received: from smi-ubuntu.sueba ([2a01:390:0:101:4f8c:7da4:48b2:8bd2])
         by smtp.gmail.com with ESMTPSA id u25-20020a50c2d9000000b004faf34064c8sm8880564edf.62.2023.03.23.03.27.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
@@ -50,31 +51,38 @@ Received: from smi-ubuntu.sueba ([2a01:390:0:101:4f8c:7da4:48b2:8bd2])
 From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 0/2] l2test fix+feature
-Date:   Thu, 23 Mar 2023 11:27:30 +0100
-Message-Id: <20230323102732.566440-1-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 1/2] l2test: Enable hex input for PSM
+Date:   Thu, 23 Mar 2023 11:27:31 +0100
+Message-Id: <20230323102732.566440-2-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230323102732.566440-1-simon.mikuda@streamunlimited.com>
+References: <20230323102732.566440-1-simon.mikuda@streamunlimited.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello!
+---
+ tools/l2test.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Added fix setting socket BT_MODE
-Also added minor feature enabling hex input to PSM (e.g. 0x1001)
-
-Best regards.
-
-Simon Mikuda (2):
-  l2test: Enable hex input for PSM
-  l2test: Fix setting mode for BR/EDR l2cap socket
-
- lib/l2cap.h    |  2 ++
- tools/l2test.c | 27 +++++++++++++++++++++++++--
- 2 files changed, 27 insertions(+), 2 deletions(-)
-
+diff --git a/tools/l2test.c b/tools/l2test.c
+index 5aae4b687..595f1dab2 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -1416,7 +1416,10 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'P':
+-			psm = atoi(optarg);
++			if (!strncasecmp(optarg, "0x", 2))
++				psm = strtoul(&optarg[2], NULL, 16);
++			else
++				psm = atoi(optarg);
+ 			break;
+ 
+ 		case 'I':
 -- 
 2.34.1
 
