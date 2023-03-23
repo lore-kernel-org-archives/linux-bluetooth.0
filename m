@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A1AC6FD1F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 00:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D5CC6FD1F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Mar 2023 00:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbjCWAwR (ORCPT
+        id S229820AbjCWAwV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Mar 2023 20:52:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44622 "EHLO
+        Wed, 22 Mar 2023 20:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbjCWAwQ (ORCPT
+        with ESMTP id S229672AbjCWAwT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Mar 2023 20:52:16 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BAE03ABC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 17:52:16 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id p20-20020a056830319400b0069f914e5c74so3098526ots.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 17:52:16 -0700 (PDT)
+        Wed, 22 Mar 2023 20:52:19 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88B22366C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 17:52:18 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id m20-20020a9d6094000000b0069caf591747so11378237otj.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Mar 2023 17:52:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679532735;
+        d=gmail.com; s=20210112; t=1679532738;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DbOCChFqSyDttqjdNnyRt4WP+ei45Hgcyz0FmScqYJQ=;
-        b=Z4Fhuj522/thvBc9Qnpt9sGreJw3mkNuILASSmOb0hwIXqExqXB++aaKOfLOJe7L4h
-         DIz9zI7ATzf+bPEwtan689h6mKAFzXT3VbcCcJbf1SLtS9plTHiuHoqFMB6+Asdc2B9M
-         Tht2hVB5AJjK6DdnsmsZlhaZAfSIoOpoQYGKLac7a38HBDyp3HpXqsSK4A50b0P2x/Gi
-         qwOqqua81dz8wUDcU6L/Xg6kU0HGSs6azf5sYvIZaqqdX9Rw7cx2jUcrnMJ4QaEH3SU2
-         YaI3w0tRq6fyUXEbUC2OFC+IbIKt1AexbIDObT3k9KeeLRyAorvIcOHbcVSxDXMyN/5l
-         XFsA==
+        bh=x4s7O2psfaoTqClXZN2llqI098Vp1Cd0S3s/1TmJkhE=;
+        b=fmIbk1Q/05sdqDyXObLYpPng+pUPe4uWg+DZcRoj7qBtRTOW3kyO6VsiqKtdq+iqfp
+         gyIKxKCDK7ZCsffanaHhQyrHPaxretcCsByFV9wcfoiXlZzzPctVMAInLvNjLPVLkuYq
+         a/8k9Q9MkA7llSZa9SacV2RVGsR+jSRCUW3qgqXKHgJJfNYDFSsFCVjdJOEOEJe6olLq
+         UdjyrK4d3WJS5Zy121XS651Ff+aK3K7t+gyZEkQqKwnK4K7sYjj5mwKzE/cqbJkWo00Q
+         YFhfwBs09BRSal5xdbI5UHyuvP+n1s5Ocud6wpVjPeFkGlG2hnCipTGn9h0XEvnbdL+b
+         q76g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679532735;
+        d=1e100.net; s=20210112; t=1679532738;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=DbOCChFqSyDttqjdNnyRt4WP+ei45Hgcyz0FmScqYJQ=;
-        b=KEgLiSe6266gVegSE/OBf+tyMSJ8EagPTTGt8OH7iPxlCRSQGHNGEa4ttchF+gieme
-         M0CDxolkylaqKBiiFznp1VEWTaIVSBG87YJGUYpyj7UknNIUCvHpvMaP/slMOV7C85+S
-         pd2av9EZDl3dHN/wywkSGTkklVeUiH/fJGaTOBJ+yFoDGAnwPqZuTcbaZRclEmaZwdJP
-         w2NZXmkEiENGbEkyuSiyI0NWqsfrY0T3q6Z5zNP1D/NagUtV1B8Rx9R7wiSTZmNQyuns
-         BP6ZPPQTIWXSwvVguiJ18nsyu9dM5wqJzxCv6GzTqnrn8NZzDWIAlUHwrdeRwXR2LkSX
-         OzTA==
-X-Gm-Message-State: AO0yUKWaCWJwoJLs/s3XhC/PdaUvmkhw4BoKuZ+HU6gQzmud1qUueYFh
-        CQ1FBZpQeSyN4TsCCI5bRlMZy/P6EwQ=
-X-Google-Smtp-Source: AK7set9El+GyBeJ6ykplNwSgW0BzTAfPtSCsbJakfsEOBButoPMK3q9hF0qTBDB+ZcXcpynVXo/Bmw==
-X-Received: by 2002:a05:6830:309c:b0:693:d999:431a with SMTP id g28-20020a056830309c00b00693d999431amr2224860ots.13.1679532735492;
-        Wed, 22 Mar 2023 17:52:15 -0700 (PDT)
+        bh=x4s7O2psfaoTqClXZN2llqI098Vp1Cd0S3s/1TmJkhE=;
+        b=PIHZEsTdhiNIqQcKz/IVwHI1tCJUgdq/qFgG0zmjJHg9IchW5teiMI/WJFFpd+MBOv
+         IIveMBWTyeihqt5DDVnUUBR/YvEqHicHzXwu4OcmdB6K3dsm7v/hNNjzriWs8oR4rmLE
+         gIlt5k0GEo59obvjTl0sXF3be8+No8DN1rtE9/ztWn0eG0MAOLR9KkgnL7yto/5HkEWv
+         56G3HpyvDvvyNhd0AFv/mCAtHHYIL19/iXflw3KIb7HPlEK6SxziUesMoUM/BE3iKc8j
+         JGIK4Q7a2v0IXaUJ/e4ZeWIxlQ4T0goHiZ4PWzlT7opE5IHJYOyo6OeBOEr7mKakFcXl
+         cX2Q==
+X-Gm-Message-State: AO0yUKUM9dJ1AI5GrTLsZi6feSN//I5ULi5T0dLn4sZjq8gjUW+Pcrn+
+        pQxIFeHKJz5gD1T+t3P+JA1qA8qM7+E=
+X-Google-Smtp-Source: AK7set+GMCQ6Biv8pAWWvYT2u1+8Cqn+8wv7z50xnsgRZ0IGWNVBvLEOhblZlIlczxIcOPsLuaSvDg==
+X-Received: by 2002:a05:6830:478e:b0:699:2dfb:e70d with SMTP id df14-20020a056830478e00b006992dfbe70dmr2104655otb.6.1679532738118;
+        Wed, 22 Mar 2023 17:52:18 -0700 (PDT)
 Received: from localhost.localdomain ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id n7-20020a9d7407000000b0069b193c5d7esm6922702otk.38.2023.03.22.17.52.14
+        by smtp.gmail.com with ESMTPSA id n7-20020a9d7407000000b0069b193c5d7esm6922702otk.38.2023.03.22.17.52.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Mar 2023 17:52:15 -0700 (PDT)
+        Wed, 22 Mar 2023 17:52:17 -0700 (PDT)
 Sender: Larry Finger <larry.finger@gmail.com>
 From:   Larry Finger <Larry.Finger@lwfinger.net>
 To:     Marcel Holtmann <marcel@holtmann.org>,
@@ -58,9 +58,9 @@ To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
         Larry Finger <Larry.Finger@lwfinger.net>
-Subject: [PATCH 1/2] bluetooth: Add device 0bda:887b to device tables
-Date:   Wed, 22 Mar 2023 19:52:02 -0500
-Message-Id: <20230323005203.19749-2-Larry.Finger@lwfinger.net>
+Subject: [PATCH 2/2] bluetooth: Add device 13d3:3571 to device tables
+Date:   Wed, 22 Mar 2023 19:52:03 -0500
+Message-Id: <20230323005203.19749-3-Larry.Finger@lwfinger.net>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230323005203.19749-1-Larry.Finger@lwfinger.net>
 References: <20230323005203.19749-1-Larry.Finger@lwfinger.net>
@@ -70,13 +70,11 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This device is part of a Realtek RTW8852BE chip.
+This device is part of a Realtek RTW8852BE chip. The device table is as follows:
 
-The device table entry is as follows:
-
-T:  Bus=03 Lev=01 Prnt=01 Port=12 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+T:  Bus=03 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
 D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0bda ProdID=887b Rev= 0.00
+P:  Vendor=13d3 ProdID=3571 Rev= 0.00
 S:  Manufacturer=Realtek
 S:  Product=Bluetooth Radio
 S:  SerialNumber=00e04c000001
@@ -110,14 +108,14 @@ Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 18bc94718711..964aa5577c79 100644
+index 964aa5577c79..39ea0e007038 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -540,6 +540,8 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Realtek 8852BE Bluetooth devices */
- 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
+@@ -542,6 +542,8 @@ static const struct usb_device_id blacklist_table[] = {
  						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
+ 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3571), .driver_info = BTUSB_REALTEK |
 +						     BTUSB_WIDEBAND_SPEECH },
  
  	/* Realtek Bluetooth devices */
