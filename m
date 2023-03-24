@@ -2,121 +2,125 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A65F7C6FD20
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Mar 2023 21:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C868C76195
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Mar 2023 23:39:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231789AbjCXVia (ORCPT
+        id S231922AbjCXXjB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Mar 2023 17:38:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43550 "EHLO
+        Fri, 24 Mar 2023 19:39:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231477AbjCXVi3 (ORCPT
+        with ESMTP id S231929AbjCXXjA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Mar 2023 17:38:29 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B99F3C0B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Mar 2023 14:38:28 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id qh28so2560229qvb.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Mar 2023 14:38:28 -0700 (PDT)
+        Fri, 24 Mar 2023 19:39:00 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEB9158AB
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Mar 2023 16:38:59 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id mp3-20020a17090b190300b0023fcc8ce113so6536937pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Mar 2023 16:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679693907;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NRYiEuCufBCl7qehY78aU7pl1dvqyHxFrmo+xAca9VM=;
-        b=d56IeGYpHB1dKlnoWkJ+RrMinhBqFjApGs0h7trqXgi7Of4/b4ajscemKqj7pD/v3P
-         5cjkaXGlFp/ZyVf8yRcDH17x93SgRDGdLUgEQYx8jDOlA5tn99QE1r+reiKNwK4F7KdY
-         z0yyg0eIn+RjaIW5ye+73ZGxxUYgEISYPVyKR1mrHUsxWTPq01BwfXLvoDSaiPdBjTuY
-         wPo2MqUmmsB8/bkW0TgMgWGezb+jyaBU+7oH6lGOwRJ7w8CP0S5tOaPUPIaM5UJa+EZa
-         08jV8QrcGkxn5BE/OWfWGlOn2Y4mSsMNDw5fkB32GBmv4AV0nT0du7b1ySf9Aec41S5+
-         m5Ew==
+        d=gmail.com; s=20210112; t=1679701138;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=t80pHO+36rMIEHfz7QCiKbhx6ropjLKoecM2a23jtnk=;
+        b=UCfO7MSR56AWTRTK+rh/Y/Opw49BVmDJXxNBPR6L6sAoCjS2tMcgB1hjs0seG8jorm
+         oWnM7UzsjkoNI6imVQiFElEJkIcSLx9hCazuU6pa1J6oIQ6ssakOQEYtH3fP4PhOsip3
+         1QNjZ07ahTq9frP8Y+W0K8+veSwao0xF7WVIO+eG2vrQt6tXaCjz5bmURA2J1wa3RYgp
+         WfASRDfq7oC3f9+SVY1pRrm9r//h3t2B38uuOIbttTnJ8nqVR2+hA6OlBUkWJg1Qoq7w
+         +IH775gW6ukPL3pu3H6SL+HNRZNX6DJJoHTUwUe7cspp+dl4BKpaeCjuBprKlnUb9HSn
+         eWoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679693907;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NRYiEuCufBCl7qehY78aU7pl1dvqyHxFrmo+xAca9VM=;
-        b=UIhyxybdC2HdmE8tUQZ21ki1NioAM1sZ8m7rz/VpmW0leZzh2YvSa3o6ChFScMl5IM
-         zhwsIT7c6vq0tUarI2FC1Mjq1Y+o3RohfRhWRc7cNCRUOLS5bdM1Zl3F/VrUnaEDS1/w
-         a1x7mSETthyJSDtGBhl2UoxEYlncqedfhuuY45aqRDIdME0L/GGOvT5PQKolWtrw0Ns9
-         K5Z3ructOfdXIkPLd6SX/UzR0XjXSiOjLU1gekjV7tjNUGOyLTm5VAFNDjK2TwmCMgs6
-         f21jEfvOpmPOHT3Yu+EATL4C6mVuXgwAKcRxEuMu0SBeRW3FPpbgdx/9ZHn7ctx/oCGN
-         Mryg==
-X-Gm-Message-State: AAQBX9dyXAmfUTaqwNA9Rr7HrHtBRQaIXfuXj906b9tDhi36bp+sMI1m
-        1z7TLa4RgiMNgllq4eW+4a8/QB4gFNA=
-X-Google-Smtp-Source: AKy350YdVP3loYvr7vWNidWHgF4B6sJL7Wnov54OTzix2BhmBQSSmDzXzzJa3StM9JwGawduopWkdQ==
-X-Received: by 2002:a05:6214:1c81:b0:5cc:97fa:eec9 with SMTP id ib1-20020a0562141c8100b005cc97faeec9mr6616510qvb.25.1679693907054;
-        Fri, 24 Mar 2023 14:38:27 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.13.24])
-        by smtp.gmail.com with ESMTPSA id do8-20020a056214096800b005dd8b9345dasm996774qvb.114.2023.03.24.14.38.26
+        d=1e100.net; s=20210112; t=1679701138;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t80pHO+36rMIEHfz7QCiKbhx6ropjLKoecM2a23jtnk=;
+        b=voeLm4k/oUAkcD6INy4kkLpBDsMisEdbt3BvQvRnFRF1InVoS7+KfKyYgZ78xtsP4N
+         O+EzR4wWt1JZGwmos49k/nmadU88+AwGrTJzmL53A4JakAOAUcJgC5/mX2X5DGy/jzAt
+         oVBrHPaMKlYyEH5aleSug8K5KOxv1xtQj/ez9psXK/6Bx2p/UBfkLFstbix7HueAoyq2
+         PhhBnq0pJ8q6fPU5cdpiQYX8PJqcGrHfv5gkEm7jPbw6GkR0d1B7xem2VMMK9L3ShrNv
+         2RItRSNRV0/nk2HxrpXRDecyku6AyCncPemS6xxwzGXLvf6jb0GAbXRVf7KQaLkV/lVH
+         9d5g==
+X-Gm-Message-State: AAQBX9fPKLs1nUYDqXcUGMggpaFGiKiO6jf57teljw6NQLceCLA1ry7n
+        XnPbm0QTjc+U+FBO/gz2sroic5O53CQ=
+X-Google-Smtp-Source: AKy350Z2+/sDvSHwYbUa84jbJyZjx9I/HGzLjZCn3Q29EEQyNVJcL7BRZnn15o/eZL2EYHReSeHurw==
+X-Received: by 2002:a17:902:c941:b0:19c:e405:4446 with SMTP id i1-20020a170902c94100b0019ce4054446mr4385078pla.30.1679701138365;
+        Fri, 24 Mar 2023 16:38:58 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id d18-20020a170902aa9200b001a1add0d616sm13666771plr.161.2023.03.24.16.38.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Mar 2023 14:38:26 -0700 (PDT)
-Message-ID: <641e1852.050a0220.7005f.4da5@mx.google.com>
-Date:   Fri, 24 Mar 2023 14:38:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7194111756637748026=="
+        Fri, 24 Mar 2023 16:38:57 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/4] shared/gatt-db: Make gatt_db_attribute_get_value public
+Date:   Fri, 24 Mar 2023 16:38:53 -0700
+Message-Id: <20230324233856.3693370-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [1/2] Bluetooth: hci_conn: Fix not cleaning up on LE Connection failure
-In-Reply-To: <20230324204525.3630188-1-luiz.dentz@gmail.com>
-References: <20230324204525.3630188-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7194111756637748026==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=733699
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.34 seconds
-GitLint                       PASS      0.77 seconds
-SubjectPrefix                 PASS      0.28 seconds
-BuildKernel                   PASS      44.46 seconds
-CheckAllWarning               PASS      48.86 seconds
-CheckSparse                   WARNING   55.16 seconds
-CheckSmatch                   WARNING   146.37 seconds
-BuildKernel32                 PASS      43.09 seconds
-TestRunnerSetup               PASS      612.31 seconds
-TestRunner_l2cap-tester       PASS      20.91 seconds
-TestRunner_iso-tester         PASS      22.25 seconds
-TestRunner_bnep-tester        PASS      7.47 seconds
-TestRunner_mgmt-tester        PASS      136.93 seconds
-TestRunner_rfcomm-tester      PASS      11.60 seconds
-TestRunner_sco-tester         PASS      10.57 seconds
-TestRunner_ioctl-tester       PASS      12.56 seconds
-TestRunner_mesh-tester        PASS      9.31 seconds
-TestRunner_smp-tester         PASS      10.44 seconds
-TestRunner_userchan-tester    PASS      7.80 seconds
-IncrementalBuild              PASS      76.85 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
+This makes gatt_db_attribute_get_value public so it can be used by the
+likes of btmon.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/gatt-db.c | 12 ++++++------
+ src/shared/gatt-db.h |  2 ++
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index b696fe33da93..676f963eca94 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -1549,7 +1549,7 @@ static int gatt_db_attribute_get_index(const struct gatt_db_attribute *attrib)
+ 	return -1;
+ }
+ 
+-static struct gatt_db_attribute *
++struct gatt_db_attribute *
+ gatt_db_attribute_get_value(struct gatt_db_attribute *attrib)
+ {
+ 	struct gatt_db_service *service;
+@@ -1559,18 +1559,18 @@ gatt_db_attribute_get_value(struct gatt_db_attribute *attrib)
+ 		return NULL;
+ 
+ 	index = gatt_db_attribute_get_index(attrib);
+-	if (index < 0)
++	if (index <= 0)
+ 		return NULL;
+ 
+ 	service = attrib->service;
+ 
+ 	if (!bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
+-		index++;
+-	else if (bt_uuid_cmp(&characteristic_uuid,
++		return service->attributes[index + 1];
++	else if (!bt_uuid_cmp(&characteristic_uuid,
+ 				&service->attributes[index - 1]->uuid))
+-		return NULL;
++		return service->attributes[index];
+ 
+-	return service->attributes[index];
++	return gatt_db_attribute_get_value(service->attributes[index - 1]);
+ }
+ 
+ void gatt_db_service_foreach_desc(struct gatt_db_attribute *attrib,
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 163a981df233..fb939e40d40e 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -284,6 +284,8 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ bool gatt_db_attribute_write_result(struct gatt_db_attribute *attrib,
+ 						unsigned int id, int err);
+ 
++struct gatt_db_attribute *
++gatt_db_attribute_get_value(struct gatt_db_attribute *attrib);
+ struct gatt_db_attribute *
+ gatt_db_attribute_get_ccc(struct gatt_db_attribute *attrib);
+ 
+-- 
+2.39.2
 
---===============7194111756637748026==--
