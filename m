@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A336C77B62
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Mar 2023 23:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97AD2C74A5B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Mar 2023 23:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231968AbjCZXih (ORCPT
+        id S231979AbjCZXij (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Mar 2023 19:38:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56976 "EHLO
+        Sun, 26 Mar 2023 19:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231706AbjCZXiW (ORCPT
+        with ESMTP id S231717AbjCZXiW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 26 Mar 2023 19:38:22 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF09B524C
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Mar 2023 16:38:19 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-17e140619fdso7532946fac.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Mar 2023 16:38:19 -0700 (PDT)
+Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E9259E5
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Mar 2023 16:38:20 -0700 (PDT)
+Received: by mail-oo1-xc29.google.com with SMTP id v14-20020a4ae6ce000000b0053b91ae6552so1079259oot.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Mar 2023 16:38:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1679873897;
+        d=kali.org; s=google; t=1679873900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F2+Fw7YRmyaV2oeYEGroUW/UzjQGm5MBPAIdb+lRLbo=;
-        b=gxCkwH9253QdIyowDJJta5EobXIvQDTWdf7O0p65IoEq4h0u+ZTWo/lEASYm8iofkz
-         CbsY5eQP8KYoEGidz4UyGTb9TyALDsLjaHfGSGNAiazbvwB8Hl18mAGyw2XH1Iv5NUsA
-         Ywv5oQjifm5xXECTd0QEUwbDja5vEpsHPxnbIHpYYpIpefPp8VbCbtMHSFwCSpdWp0/4
-         tZD7f6rmqooaaYHfLB/hYQ0kIbNr/WSFAAGPERVTanRTyRtBxhsXCqjwunY5iEJXC9v5
-         cYyhaLsI3jzUZKZ6kKLT297VCyWcH1eZf0G+accw8rdkVwWid9svhXwT+yuImAKspWU6
-         yNgw==
+        bh=fOYoXNhDxV9KBWMQ/yrHmx0omzhnX0saDndzajAssSo=;
+        b=Jx8g1FahvAgWj0s4SjnHbHJ5VXxWsidBMCMCDDRv7MnqDrKoxIwFIGQ7FmWaLvI3rS
+         N+Obso/VAq/qnUmxO85G9PYdCLmH/BLapIUIUnq5EGdzlbIef+XwZ5iDalmI0vpC9mki
+         SkDiR+F38QjBI+Ni4dG25qL1JXFOK3+OfXXGmC8ArCGKUrXf7jOU5lMK5HlkULLSIFNE
+         gjNsHlaAiIe/vLV5i4q8KMJ2T6bk4k5ub1lFqMP2e/NPjWFDSWCBvgtqsOrZcuFTP0fM
+         j5k2ns338T7mohj204OzxGsu623ZRSkHhfy9iT99S4xFhRUgCusw99PjHJeIExXv6MAK
+         hNBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679873897;
+        d=1e100.net; s=20210112; t=1679873900;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=F2+Fw7YRmyaV2oeYEGroUW/UzjQGm5MBPAIdb+lRLbo=;
-        b=1CLVdGsTRTe26tFU6zyhQLMYwbxrPht+oZg9XLv3p7k1D7sEM5D2nRfNezGU04Tj1p
-         hraYvdRdRxc89YD0imRkpogW32ZZd51DVYhxYn6OfHK9KFRV/J2ywq/XWC73QPFgKJL1
-         Gg4+HxkO6q14pZK10nRpdvqPAuq+r1/zKwdnKWHnC95nHhNulSc2rR4Xdop7RW33Fkm9
-         AoaWzOtHVbDCq+Z7TWA3OL2HSGsUpaDTvX7vJosHKgIYVPSfNdHCcdOYkSFgo+CDc4K+
-         HZ2yb8deZ3pxlOsYsi13Zj15NwYCi6QGxk68UOokaoYz/sfsX3FroCpmzCeMRcrT90yq
-         jFFQ==
-X-Gm-Message-State: AAQBX9czg6pIFuHyjAtqvyABoCocJ3649pASsLLCD9X+fNuHDcTFcVnY
-        zrXwpG0/bW4no+IlW7AE+uChSA==
-X-Google-Smtp-Source: AK7set9Yo5bVc8yC0+vftC/q7dDdHAOW01gAtPZ/t4TV7ylYCoje01pj0Aat1+1hGAbcE/Qs/xi+lg==
-X-Received: by 2002:a05:6870:c22c:b0:177:81bb:1b1b with SMTP id z44-20020a056870c22c00b0017781bb1b1bmr6160708oae.40.1679873897400;
-        Sun, 26 Mar 2023 16:38:17 -0700 (PDT)
+        bh=fOYoXNhDxV9KBWMQ/yrHmx0omzhnX0saDndzajAssSo=;
+        b=kM0E4lnBzZ2lJau1WUlf32G8PT0XKW3u3SdbPLqQbbmdRjfCZcK/dtOLI5qi9x7D3M
+         GLRecK9hTlr2z0j2fedK5fZJ2Hs2oHVqmOVPoKBF66d5v9XPnV3pxiJ2Tb2CVvEMoLlt
+         WA37KTaoEeiKQHzodz3uAXtcs8q+5Vcu+nx1chmRU5s/lNyiA9Mq8Tm2YUCXw12pNvkP
+         cnWo04y+BFmUVG0am6L7ayPtjIXsCl3pYwDv7EWmBERMkxDhWjtgKOSZIVnp0zpqOC4P
+         JolmxmejgQ90VbHt8jc/JCi7rLZSGFbSLl36YNM4ZoURWPaoPlY+0TUU3R7Jbd9XJGVS
+         t5iw==
+X-Gm-Message-State: AO0yUKWQ7vCyo2IRPCJ3QAhYrJc8CL8p0YrIDzsQw2sHwW5PziL2nubY
+        mKeFhyXZhQOz+cNSk/kd8cD3nQ==
+X-Google-Smtp-Source: AK7set8CEFURxAGBWTFm/sFlXJrqCOCtWNlhaQN+tN+9K24M2OPU8Vuy99/AVu9gavTy8v+bi+nBJg==
+X-Received: by 2002:a4a:4111:0:b0:517:4020:60b6 with SMTP id x17-20020a4a4111000000b00517402060b6mr4949987ooa.8.1679873900279;
+        Sun, 26 Mar 2023 16:38:20 -0700 (PDT)
 Received: from localhost ([2600:1700:eb1:c450::35])
-        by smtp.gmail.com with ESMTPSA id yt10-20020a05687c220a00b001726cfeea97sm9264942oab.29.2023.03.26.16.38.16
+        by smtp.gmail.com with ESMTPSA id u63-20020a4a5742000000b0051aa196ac82sm10921355ooa.14.2023.03.26.16.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Mar 2023 16:38:16 -0700 (PDT)
+        Sun, 26 Mar 2023 16:38:19 -0700 (PDT)
 From:   Steev Klimaszewski <steev@kali.org>
 To:     Steev Klimaszewski <steev@kali.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -69,11 +69,10 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Mark Pearson <markpearson@lenovo.com>,
-        Tim Jiang <quic_tjiang@quicinc.com>,
         Johan Hovold <johan@kernel.org>
-Subject: [PATCH v8 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855
-Date:   Sun, 26 Mar 2023 18:38:10 -0500
-Message-Id: <20230326233812.28058-3-steev@kali.org>
+Subject: [PATCH v8 4/4] arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
+Date:   Sun, 26 Mar 2023 18:38:12 -0500
+Message-Id: <20230326233812.28058-5-steev@kali.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230326233812.28058-1-steev@kali.org>
 References: <20230326233812.28058-1-steev@kali.org>
@@ -83,293 +82,149 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add regulators, GPIOs and changes required to power on/off wcn6855.
-Add support for firmware download for wcn6855 which is in the
-linux-firmware repository as hpbtfw21.tlv and hpnv21.bin.
-
-Based on the assumption that this is similar to the wcn6750
-
-Tested-on: BTFW.HSP.2.1.0-00538-VER_PATCHZ-1
+The Lenovo Thinkpad X13s has a WCN6855 Bluetooth controller on uart2,
+add this.
 
 Signed-off-by: Steev Klimaszewski <steev@kali.org>
-Reviewed-by: Bjorn Andersson <andersson@kernel.org>
-Tested-by: Bjorn Andersson <andersson@kernel.org>
 ---
 Changes since v7:
- * None
+ * Drop regulator now in a different patchset from Johan
+ * Fix alphabetization
 
 Changes since v6:
- * Update commit message.
- * Add Johan's R-b and T-b.
+ * Remove allowed-modes as they aren't needed
+ * Remove regulator-allow-set-load
+ * Set regulator-always-on because the wifi chip also uses the regulator
+ * cts pin uses bias-bus-hold
+ * Alphabetize uart2 pins
 
 Changes since v5:
- * Revert Set qcadev->initspeed since 6855 doesn't use it, don't touch.
- * Convert get_fw_build_info to a switch statement
- * Add poweroff handling
- * Fix up line alignments
- * Drop from microsoft extensions check since I don't actually know if we need
+ * Update patch subject
+ * Specify initial mode (via guess) for vreg_s1c
+ * Drop uart17 definition
+ * Rename bt_en to bt_default because configuring more than one pin
+ * Correct (maybe) bias configurations
+ * Correct cts gpio
+ * Split rts-tx into two nodes
+ * Drop incorrect link in the commit message
 
 Changes since v4:
- * Remove unused firmware check because we don't have mbn firmware.
- * Set qcadev->init_speed if it hasn't been set.
+ * Address Konrad's review comments.
 
 Changes since v3:
- * drop unused regulators
+ * Add vreg_s1c
+ * Add regulators and not dead code
+ * Fix commit message changelog
 
 Changes since v2:
- * drop unnecessary commit info
+ * Remove dead code and add TODO comment
+ * Make dtbs_check happy with the pin definitions
 
-Changes since v1:
- * None
+ .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 70 +++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
- drivers/bluetooth/btqca.c   | 14 ++++++++-
- drivers/bluetooth/btqca.h   | 10 +++++++
- drivers/bluetooth/hci_qca.c | 57 ++++++++++++++++++++++++++++---------
- 3 files changed, 66 insertions(+), 15 deletions(-)
-
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index c9064d34d830..fd0941fe8608 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -614,6 +614,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		config.type = ELF_TYPE_PATCH;
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/msbtfw%02x.mbn", rom_ver);
-+	} else if (soc_type == QCA_WCN6855) {
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/hpbtfw%02x.tlv", rom_ver);
- 	} else {
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/rampatch_%08x.bin", soc_ver);
-@@ -648,6 +651,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	else if (soc_type == QCA_WCN6750)
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/msnv%02x.bin", rom_ver);
-+	else if (soc_type == QCA_WCN6855)
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/hpnv%02x.bin", rom_ver);
- 	else
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/nvm_%08x.bin", soc_ver);
-@@ -685,11 +691,17 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		return err;
- 	}
+diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+index da79b5465a1b..129c5f9a2a61 100644
+--- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
++++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+@@ -24,6 +24,7 @@ / {
+ 	aliases {
+ 		i2c4 = &i2c4;
+ 		i2c21 = &i2c21;
++		serial1 = &uart2;
+ 	};
  
--	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
-+	switch (soc_type) {
-+	case QCA_WCN3991:
-+	case QCA_WCN6750:
-+	case QCA_WCN6855:
- 		/* get fw build info */
- 		err = qca_read_fw_build_info(hdev);
- 		if (err < 0)
- 			return err;
-+		break;
-+	default:
-+		break;
- 	}
- 
- 	bt_dev_info(hdev, "QCA setup on UART is completed");
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 61e9a50e66ae..b884095bcd9d 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -147,6 +147,7 @@ enum qca_btsoc_type {
- 	QCA_WCN3991,
- 	QCA_QCA6390,
- 	QCA_WCN6750,
-+	QCA_WCN6855,
+ 	wcd938x: audio-codec {
+@@ -1102,6 +1103,32 @@ &txmacro {
+ 	status = "okay";
  };
  
- #if IS_ENABLED(CONFIG_BT_QCA)
-@@ -168,6 +169,10 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
- {
- 	return soc_type == QCA_WCN6750;
- }
-+static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
-+{
-+	return soc_type == QCA_WCN6855;
-+}
- 
- #else
- 
-@@ -206,6 +211,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
- 	return false;
- }
- 
-+static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
-+{
-+	return false;
-+}
++&uart2 {
++	pinctrl-0 = <&uart2_default>;
++	pinctrl-names = "default";
 +
- static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
- {
- 	return -EOPNOTSUPP;
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 3df8c3606e93..38ff962662ff 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1317,7 +1317,8 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 
- 	/* Give the controller time to process the request */
- 	if (qca_is_wcn399x(qca_soc_type(hu)) ||
--	    qca_is_wcn6750(qca_soc_type(hu)))
-+	    qca_is_wcn6750(qca_soc_type(hu)) ||
-+	    qca_is_wcn6855(qca_soc_type(hu)))
- 		usleep_range(1000, 10000);
- 	else
- 		msleep(300);
-@@ -1394,7 +1395,8 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
- static int qca_check_speeds(struct hci_uart *hu)
- {
- 	if (qca_is_wcn399x(qca_soc_type(hu)) ||
--	    qca_is_wcn6750(qca_soc_type(hu))) {
-+	    qca_is_wcn6750(qca_soc_type(hu)) ||
-+	    qca_is_wcn6855(qca_soc_type(hu))) {
- 		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
- 		    !qca_get_speed(hu, QCA_OPER_SPEED))
- 			return -EINVAL;
-@@ -1428,7 +1430,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 		 * changing the baudrate of chip and host.
- 		 */
- 		if (qca_is_wcn399x(soc_type) ||
--		    qca_is_wcn6750(soc_type))
-+		    qca_is_wcn6750(soc_type) ||
-+		    qca_is_wcn6855(soc_type))
- 			hci_uart_set_flow_control(hu, true);
- 
- 		if (soc_type == QCA_WCN3990) {
-@@ -1446,7 +1449,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 
- error:
- 		if (qca_is_wcn399x(soc_type) ||
--		    qca_is_wcn6750(soc_type))
-+		    qca_is_wcn6750(soc_type) ||
-+		    qca_is_wcn6855(soc_type))
- 			hci_uart_set_flow_control(hu, false);
- 
- 		if (soc_type == QCA_WCN3990) {
-@@ -1682,7 +1686,8 @@ static int qca_power_on(struct hci_dev *hdev)
- 		return 0;
- 
- 	if (qca_is_wcn399x(soc_type) ||
--	    qca_is_wcn6750(soc_type)) {
-+	    qca_is_wcn6750(soc_type) ||
-+	    qca_is_wcn6855(soc_type)) {
- 		ret = qca_regulator_init(hu);
- 	} else {
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
-@@ -1723,7 +1728,8 @@ static int qca_setup(struct hci_uart *hu)
- 
- 	bt_dev_info(hdev, "setting up %s",
- 		qca_is_wcn399x(soc_type) ? "wcn399x" :
--		(soc_type == QCA_WCN6750) ? "wcn6750" : "ROME/QCA6390");
-+		(soc_type == QCA_WCN6750) ? "wcn6750" :
-+		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
- 
- 	qca->memdump_state = QCA_MEMDUMP_IDLE;
- 
-@@ -1735,7 +1741,8 @@ static int qca_setup(struct hci_uart *hu)
- 	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
- 
- 	if (qca_is_wcn399x(soc_type) ||
--	    qca_is_wcn6750(soc_type)) {
-+	    qca_is_wcn6750(soc_type) ||
-+	    qca_is_wcn6855(soc_type)) {
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
- 		hci_set_aosp_capable(hdev);
- 
-@@ -1757,7 +1764,8 @@ static int qca_setup(struct hci_uart *hu)
- 	}
- 
- 	if (!(qca_is_wcn399x(soc_type) ||
--	     qca_is_wcn6750(soc_type))) {
-+	      qca_is_wcn6750(soc_type) ||
-+	      qca_is_wcn6855(soc_type))) {
- 		/* Get QCA version information */
- 		ret = qca_read_soc_version(hdev, &ver, soc_type);
- 		if (ret)
-@@ -1883,6 +1891,20 @@ static const struct qca_device_data qca_soc_data_wcn6750 = {
- 	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
- };
- 
-+static const struct qca_device_data qca_soc_data_wcn6855 = {
-+	.soc_type = QCA_WCN6855,
-+	.vregs = (struct qca_vreg []) {
-+		{ "vddio", 5000 },
-+		{ "vddbtcxmx", 126000 },
-+		{ "vddrfacmn", 12500 },
-+		{ "vddrfa0p8", 102000 },
-+		{ "vddrfa1p7", 302000 },
-+		{ "vddrfa1p2", 257000 },
-+	},
-+	.num_vregs = 6,
-+	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
++	status = "okay";
++
++	bluetooth {
++		compatible = "qcom,wcn6855-bt";
++
++		vddio-supply = <&vreg_s10b>;
++		vddbtcxmx-supply = <&vreg_s12b>;
++		vddrfacmn-supply = <&vreg_s12b>;
++		vddrfa0p8-supply = <&vreg_s12b>;
++		vddrfa1p2-supply = <&vreg_s11b>;
++		vddrfa1p7-supply = <&vreg_s1c>;
++
++		max-speed = <3200000>;
++
++		enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
++		swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
++
++		pinctrl-0 = <&bt_default>;
++		pinctrl-names = "default";
++	};
 +};
 +
- static void qca_power_shutdown(struct hci_uart *hu)
- {
- 	struct qca_serdev *qcadev;
-@@ -1912,7 +1934,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 		host_set_baudrate(hu, 2400);
- 		qca_send_power_pulse(hu, false);
- 		qca_regulator_disable(qcadev);
--	} else if (soc_type == QCA_WCN6750) {
-+	} else if (soc_type == QCA_WCN6750 || soc_type == QCA_WCN6855) {
- 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
- 		msleep(100);
- 		qca_regulator_disable(qcadev);
-@@ -2047,7 +2069,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 
- 	if (data &&
- 	    (qca_is_wcn399x(data->soc_type) ||
--	    qca_is_wcn6750(data->soc_type))) {
-+	     qca_is_wcn6750(data->soc_type) ||
-+	     qca_is_wcn6855(data->soc_type))) {
- 		qcadev->btsoc_type = data->soc_type;
- 		qcadev->bt_power = devm_kzalloc(&serdev->dev,
- 						sizeof(struct qca_power),
-@@ -2067,14 +2090,18 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 
- 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
- 					       GPIOD_OUT_LOW);
--		if (IS_ERR_OR_NULL(qcadev->bt_en) && data->soc_type == QCA_WCN6750) {
-+		if (IS_ERR_OR_NULL(qcadev->bt_en) &&
-+		    (data->soc_type == QCA_WCN6750 ||
-+		     data->soc_type == QCA_WCN6855)) {
- 			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
- 			power_ctrl_enabled = false;
- 		}
- 
- 		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
- 					       GPIOD_IN);
--		if (IS_ERR_OR_NULL(qcadev->sw_ctrl) && data->soc_type == QCA_WCN6750)
-+		if (IS_ERR_OR_NULL(qcadev->sw_ctrl) &&
-+		    (data->soc_type == QCA_WCN6750 ||
-+		     data->soc_type == QCA_WCN6855))
- 			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
- 
- 		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
-@@ -2150,8 +2177,9 @@ static void qca_serdev_remove(struct serdev_device *serdev)
- 	struct qca_power *power = qcadev->bt_power;
- 
- 	if ((qca_is_wcn399x(qcadev->btsoc_type) ||
--	     qca_is_wcn6750(qcadev->btsoc_type)) &&
--	     power->vregs_on)
-+	     qca_is_wcn6750(qcadev->btsoc_type) ||
-+	     qca_is_wcn6855(qcadev->btsoc_type)) &&
-+	    power->vregs_on)
- 		qca_power_shutdown(&qcadev->serdev_hu);
- 	else if (qcadev->susclk)
- 		clk_disable_unprepare(qcadev->susclk);
-@@ -2335,6 +2363,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
- 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
- 	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
-+	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
- 	{ /* sentinel */ }
+ &usb_0 {
+ 	status = "okay";
  };
- MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+@@ -1222,6 +1249,21 @@ hastings_reg_en: hastings-reg-en-state {
+ &tlmm {
+ 	gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
+ 
++	bt_default: bt-default-state {
++		hstp-bt-en-pins {
++			pins = "gpio133";
++			function = "gpio";
++			drive-strength = <16>;
++			bias-disable;
++		};
++
++		hstp-sw-ctrl-pins {
++			pins = "gpio132";
++			function = "gpio";
++			bias-pull-down;
++		};
++	};
++
+ 	edp_reg_en: edp-reg-en-state {
+ 		pins = "gpio25";
+ 		function = "gpio";
+@@ -1389,6 +1431,34 @@ reset-n-pins {
+ 		};
+ 	};
+ 
++	uart2_default: uart2-default-state {
++		cts-pins {
++			pins = "gpio121";
++			function = "qup2";
++			bias-bus-hold;
++		};
++
++		rts-pins {
++			pins = "gpio122";
++			function = "qup2";
++			drive-strength = <2>;
++			bias-disable;
++		};
++
++		rx-pins {
++			pins = "gpio124";
++			function = "qup2";
++			bias-pull-up;
++		};
++
++		tx-pins {
++			pins = "gpio123";
++			function = "qup2";
++			drive-strength = <2>;
++			bias-disable;
++		};
++	};
++
+ 	usb0_sbu_default: usb0-sbu-state {
+ 		oe-n-pins {
+ 			pins = "gpio101";
 -- 
 2.39.2
 
