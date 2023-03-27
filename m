@@ -2,84 +2,123 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B94C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Mar 2023 21:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17D5C76195
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Mar 2023 21:37:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229598AbjC0VUY (ORCPT
+        id S229934AbjC0Vhc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Mar 2023 17:20:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38648 "EHLO
+        Mon, 27 Mar 2023 17:37:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjC0VUX (ORCPT
+        with ESMTP id S229789AbjC0Vhb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Mar 2023 17:20:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6210D1737
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 14:20:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E72F56131C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 21:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D4E7C433A0;
-        Mon, 27 Mar 2023 21:20:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1679952018;
-        bh=IqnNRsyB20m+4Yt5G1otvie4KdRLm1gAMc72QPkHBs0=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=I3oT5DxkLMseu1RmgbuLr3d54cIvJk9/TvBOh/pVjXFWSiDPCTFkkIQBSccYoe68J
-         ejfQV5ZPl4529ELjU+XbctcMgRT3x0ocuYvcoIvtgENyAXFcm3EnMoUv2rpaOGOQhz
-         Ir/t+CQy+xHEs3Rz1FX2pBU50eq1CAkwdyO/e6Z/6I44DsFEnLdodU/rf9xhW0yW19
-         Zoo6Bswjp9ciVtnLfvrJ/PHdeR6VahuCKq6DZ9EVmmcg1GWXV0pqTg11tpQds2+vUB
-         smLgbN9pgKXS9ViByQ7ZPcEHOudv57Vy93KIsIL4qrPDkQ6At0TiX+wYAcH/X15Vc8
-         eSaIvSi+cCNTw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 369ECC41612;
-        Mon, 27 Mar 2023 21:20:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/4] shared/gatt-db: Make gatt_db_attribute_get_value
- public
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <167995201821.593.16909761387613996594.git-patchwork-notify@kernel.org>
-Date:   Mon, 27 Mar 2023 21:20:18 +0000
-References: <20230324233856.3693370-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230324233856.3693370-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Mon, 27 Mar 2023 17:37:31 -0400
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDD0926B1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 14:37:30 -0700 (PDT)
+Received: from github.com (hubbernetes-node-5c9502f.ac4-iad.github.net [10.52.208.87])
+        by smtp.github.com (Postfix) with ESMTPA id 149005201F9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 14:37:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1679953050;
+        bh=bnPM8YNtzPBQgNS+m9OBiY7JWjLJ2pj+nvwo6m7PToo=;
+        h=Date:From:To:Subject:From;
+        b=R5sZT/q/KISo3PjmgeAbVN9ttWjMA8TE1xNhmj5Qm/fdjCRex37md5klXRyO8mOps
+         L5LTqpJplYM7FQ7DoWbKowQLDhReqNTZcZCroF6tLn4BxG0IoklQ+KNp9Wqvp/bI0d
+         54sLlNSWt8FQUCBlIJcFv2aF3e/UTTzs9zN9Xqe4=
+Date:   Mon, 27 Mar 2023 14:37:30 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/fb1c69-011e56@github.com>
+Subject: [bluez/bluez] 7610b9: shared/gatt-db: Make
+ gatt_db_attribute_get_value p...
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 7610b9264147c387e0c12d17221ae83f97add776
+      https://github.com/bluez/bluez/commit/7610b9264147c387e0c12d17221ae83f97add776
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-27 (Mon, 27 Mar 2023)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/gatt-db.c
+    M src/shared/gatt-db.h
 
-On Fri, 24 Mar 2023 16:38:53 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This makes gatt_db_attribute_get_value public so it can be used by the
-> likes of btmon.
-> ---
->  src/shared/gatt-db.c | 12 ++++++------
->  src/shared/gatt-db.h |  2 ++
->  2 files changed, 8 insertions(+), 6 deletions(-)
+  Log Message:
+  -----------
+  shared/gatt-db: Make gatt_db_attribute_get_value public
 
-Here is the summary with links:
-  - [BlueZ,1/4] shared/gatt-db: Make gatt_db_attribute_get_value public
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7610b9264147
-  - [BlueZ,2/4] monitor/att: Print value when printing descriptors
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cf7242815668
-  - [BlueZ,3/4] monitor/att: Fix not loading gatt_db for devices using RPA
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2719bb5aaf6d
-  - [BlueZ,4/4] monitor: Cache IRK being parsed
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=011e562a98a8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This makes gatt_db_attribute_get_value public so it can be used by the
+likes of btmon.
 
 
+  Commit: cf72428156689a7bf2e2c6013788fedca08c6ff7
+      https://github.com/bluez/bluez/commit/cf72428156689a7bf2e2c6013788fedca08c6ff7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-27 (Mon, 27 Mar 2023)
+
+  Changed paths:
+    M monitor/att.c
+
+  Log Message:
+  -----------
+  monitor/att: Print value when printing descriptors
+
+This prints the value attribute information when print attribute
+descriptors:
+
+< ACL Data TX: Handle 3585 flags 0x00 dlen 9
+      ATT: Write Request (0x12) len 4
+        Handle: 0x002c Type: Client Characteristic Configuration (0x2902)
+        Value Handle: 0x002b Type: Battery Level (0x2a19)
+          Data: 0100
+            Notification (0x01)
+
+
+  Commit: 2719bb5aaf6df77edb4bf7c2654c178836300c73
+      https://github.com/bluez/bluez/commit/2719bb5aaf6df77edb4bf7c2654c178836300c73
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-27 (Mon, 27 Mar 2023)
+
+  Changed paths:
+    M monitor/att.c
+
+  Log Message:
+  -----------
+  monitor/att: Fix not loading gatt_db for devices using RPA
+
+Device using RPA have its storage using its identity address so this
+uses keys_resolve_identity to attempt to resolve the destination
+address instead of always using the connection address.
+
+
+  Commit: 011e562a98a8b8c278391bc64d9dc2c8df0a5585
+      https://github.com/bluez/bluez/commit/011e562a98a8b8c278391bc64d9dc2c8df0a5585
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-27 (Mon, 27 Mar 2023)
+
+  Changed paths:
+    M monitor/keys.c
+    M monitor/keys.h
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Cache IRK being parsed
+
+This caches any IRK being parsed so they can be used to resolve
+addresses later which fixes the problem of only being able to resolve
+addresses if the monitor happens to be active while SMP exchange the
+keys.
+
+
+Compare: https://github.com/bluez/bluez/compare/fb1c694100b2...011e562a98a8
