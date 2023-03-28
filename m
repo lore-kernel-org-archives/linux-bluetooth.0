@@ -2,130 +2,135 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A3DC76195
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 05:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F14FC76195
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 06:57:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbjC1F11 (ORCPT
+        id S229967AbjC1G5H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Mar 2023 01:27:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
+        Tue, 28 Mar 2023 02:57:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbjC1F10 (ORCPT
+        with ESMTP id S229497AbjC1G5G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Mar 2023 01:27:26 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD259268A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 22:27:25 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id ew6so44771679edb.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 22:27:25 -0700 (PDT)
+        Tue, 28 Mar 2023 02:57:06 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3B51BE8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 23:57:05 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id cu4so8600628qvb.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 23:57:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1679981244;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SmpttvszH23PKP6qf48ggrRNacQmH9loXc/WEU8w3DY=;
-        b=QEL9SIu02CNFqfO3H3OE0L78sFxXO+YuIBeezQEfuwt1O1hI1y7R1xFnqyHStpS5BJ
-         lMzEG5XACaiZfjtgRkcj2b7hRgtECOUVpNYAA8duSPNf3C0ZTT0b94GtuxeyJ9C+EjgZ
-         EksPyWjFCHnHdxAA+PrnMi6ns+26Mb2VQATPo=
+        d=gmail.com; s=20210112; t=1679986624;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hq9qsm/zojurLKObrtoPuYHrNO3g7j7OAr6txrXVpEE=;
+        b=jYa0+qrKxT2lQFhg0phiXRv5q8gROMhqpjuv/C9/qUkY5tyhSK9herUZeHpCjzIm7s
+         hHxuLAElt35a2NqcC6TlU9MhG1pwNbW/B8XTsex8wM31KBYyzij7vrdDt/vHsPYEsQ5e
+         bvT5prpyjr6xHaeV90jg12Pbl7axmVbHudlhKnX7Jo3pZpYkHHeCSGlxGyN3TAtf9BRX
+         5E43c+UCMXNDkhjg7axpFyR8qU20wJvxYYH/1Vm+gzn3C8HXBwTx7vLrKGxYzDneB8Gp
+         7/TBTaJxQXGpfmb6FYNHGr2+ql2xGpcRXEuxw7Ton9XbWbQvjHadSRnUO6LWa9ECyh8L
+         vMpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679981244;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SmpttvszH23PKP6qf48ggrRNacQmH9loXc/WEU8w3DY=;
-        b=uuPSCqvuYBnkrYNa4TiK/TSM6AsYlMudM0lPAR30inTSuAIGmiBOxaeDUsxgtEA+MF
-         vjMQIJBJrUEYrVLf7wnuwH/7tUARZjkaPewxrJ52pVY2MN28b5Aj5AiAPGMJlBeHOthX
-         lEquMDiodyfExoCm9079PzgERWV9Z81l7cEbBv2lfoKYb5PZ2b5frNuhL9GUmhRxxgMH
-         xu8JotQeqTZ+JScFYpQNjS5qYe02khUOsQ9SLt7xjBM25EQaUiejG9SDSqNRta+vGCAi
-         x/Cgi16ArnWen4QqwEXnQnbVBokV4o6VBqDzXUHUZ7MeSEIuNy/W3aCZ3q7kyL3FkHmN
-         87eA==
-X-Gm-Message-State: AAQBX9ddpQJtReMVcJ1QqThzlC4hCnD1h2PS8oRqeTpFHMMKw1T7ihHE
-        fAqRSi0gWm5UO7MpchsT+5nZsKjpaw7iBGdj0To=
-X-Google-Smtp-Source: AKy350bLw2fjspfiP3BzIFa2+BVN4VwGeI7OBQ7D1MTZalTB71E/KbsyGeuIT6f2uXrsjA5pWfga5w==
-X-Received: by 2002:aa7:d314:0:b0:502:62:7c with SMTP id p20-20020aa7d314000000b005020062007cmr13405049edq.24.1679981244080;
-        Mon, 27 Mar 2023 22:27:24 -0700 (PDT)
-Received: from smi-ubuntu.sueba ([2a01:390:0:101:1167:5b7f:c0f0:e6ec])
-        by smtp.gmail.com with ESMTPSA id b44-20020a509f2f000000b004c09527d62dsm15427109edf.30.2023.03.27.22.27.23
+        d=1e100.net; s=20210112; t=1679986624;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Hq9qsm/zojurLKObrtoPuYHrNO3g7j7OAr6txrXVpEE=;
+        b=VtVMiLR2rUYKvRbvRvpma9num8nWS9Gr21JmyWq9erR8vyAEVW3zpU5tMxSEQFZVpn
+         aDhtbEol5vtcE83G8rFFScANAnTtJp61FR8siKxoOvobmf9BhZIr3PhhcFFIAuHIxNYQ
+         ETwRUZ54Pj7pWQqGvYWNTjz+qZ4cyH7Kr/aHm5KrORuOMTyO+A8/iiToEHb57H+U+7BR
+         8TOLQFqk+ifBdbqiZu+9dTl8MJF4BiDwcTuzvMRd2dILc6VUxqEnl2yWZCaSVBzr83+Z
+         ghlHz3yLgy5Q2kzDrdsJEhiJRGl+qF/IbudPteqXTysi13/oxjAXLKiauqDyy09mvwsr
+         S1bQ==
+X-Gm-Message-State: AAQBX9ceez4FurcfK3VF58R/neC8lxcT4iZoyh44WTHIxF0iUFi3djoT
+        KXGs02I9ZkaDpRA5DRjaO9FQRpH3NlI=
+X-Google-Smtp-Source: AKy350Z0zAxwHcBRFJ+jS63RMwIgM8e5z0Gq0/TZGCWYSgHEnGVoxqAnMLWu6d3Pj5WWDgDcdK3DmA==
+X-Received: by 2002:a05:6214:761:b0:5ce:7b40:89bd with SMTP id f1-20020a056214076100b005ce7b4089bdmr23079232qvz.18.1679986624298;
+        Mon, 27 Mar 2023 23:57:04 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.36.124])
+        by smtp.gmail.com with ESMTPSA id q2-20020ad44342000000b005dd8b9345acsm3527508qvs.68.2023.03.27.23.57.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 22:27:23 -0700 (PDT)
-From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ v2 2/2] l2test: Fix setting mode for BR/EDR l2cap socket
-Date:   Tue, 28 Mar 2023 07:26:19 +0200
-Message-Id: <20230328052619.1357253-3-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230328052619.1357253-1-simon.mikuda@streamunlimited.com>
-References: <CABBYNZLyQkvU1uzV8WF9n54FC43OvFzNne6XJcAUj2yCB8dVbw@mail.gmail.com>
- <20230328052619.1357253-1-simon.mikuda@streamunlimited.com>
+        Mon, 27 Mar 2023 23:57:04 -0700 (PDT)
+Message-ID: <64228fc0.d40a0220.43ef1.c3fa@mx.google.com>
+Date:   Mon, 27 Mar 2023 23:57:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5198064046316477830=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
+Subject: RE: l2test: Enable hex input for PSM
+In-Reply-To: <20230328052619.1357253-2-simon.mikuda@streamunlimited.com>
+References: <20230328052619.1357253-2-simon.mikuda@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-BT_MODE_* enums are used only for socket SOL_BLUETOOTH, option BT_MODE
-Otherwise we should use L2CAP_MODE_* enums.
----
- lib/l2cap.h    |  2 ++
- tools/l2test.c | 22 +++++++++++++++++++++-
- 2 files changed, 23 insertions(+), 1 deletion(-)
+--===============5198064046316477830==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-diff --git a/lib/l2cap.h b/lib/l2cap.h
-index 9197800df..62cc04b57 100644
---- a/lib/l2cap.h
-+++ b/lib/l2cap.h
-@@ -184,6 +184,8 @@ typedef struct {
- #define L2CAP_MODE_FLOWCTL	0x02
- #define L2CAP_MODE_ERTM		0x03
- #define L2CAP_MODE_STREAMING	0x04
-+#define L2CAP_MODE_LE_FLOWCTL	0x80
-+#define L2CAP_MODE_ECRED		0x81
- 
- #define L2CAP_SERVTYPE_NOTRAFFIC	0x00
- #define L2CAP_SERVTYPE_BESTEFFORT	0x01
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 232247b78..e86ac917c 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -155,6 +155,24 @@ static struct lookup_table bdaddr_types[] = {
- 	{ NULL,		0			},
- };
- 
-+static int bt_mode_to_l2cap_mode(int mode)
-+{
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=734449
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.32 seconds
+GitLint                       PASS      0.68 seconds
+BuildEll                      PASS      27.26 seconds
+BluezMake                     PASS      1033.05 seconds
+MakeCheck                     PASS      11.60 seconds
+MakeDistcheck                 PASS      153.92 seconds
+CheckValgrind                 PASS      251.46 seconds
+CheckSmatch                   PASS      335.56 seconds
+bluezmakeextell               PASS      101.56 seconds
+IncrementalBuild              PASS      1774.04 seconds
+ScanBuild                     PASS      1067.84 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v2,2/2] l2test: Fix setting mode for BR/EDR l2cap socket
+ERROR:SWITCH_CASE_INDENT_LEVEL: switch and case should be at the same indent
+#110: FILE: tools/l2test.c:160:
 +	switch (mode) {
 +		case BT_MODE_BASIC:
-+			return L2CAP_MODE_BASIC;
+[...]
 +		case BT_MODE_ERTM:
-+			return L2CAP_MODE_ERTM;
+[...]
 +		case BT_MODE_STREAMING:
-+			return L2CAP_MODE_STREAMING;
+[...]
 +		case BT_MODE_LE_FLOWCTL:
-+			return L2CAP_MODE_LE_FLOWCTL;
+[...]
 +		case BT_MODE_EXT_FLOWCTL:
-+			return L2CAP_MODE_FLOWCTL;
+[...]
 +		default:
-+			return mode;
-+	}
-+}
-+
- static int get_lookup_flag(struct lookup_table *table, char *name)
- {
- 	int i;
-@@ -287,9 +305,11 @@ static int getopts(int sk, struct l2cap_options *opts, bool connected)
- 
- static int setopts(int sk, struct l2cap_options *opts)
- {
--	if (bdaddr_type == BDADDR_BREDR)
-+	if (bdaddr_type == BDADDR_BREDR) {
-+		opts->mode = bt_mode_to_l2cap_mode(opts->mode);
- 		return setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts,
- 								sizeof(*opts));
-+	}
- 
- 	if (opts->mode) {
- 		if (setsockopt(sk, SOL_BLUETOOTH, BT_MODE, &opts->mode,
--- 
-2.34.1
 
+/github/workspace/src/src/13190513.patch total: 1 errors, 0 warnings, 44 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13190513.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5198064046316477830==--
