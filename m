@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C2DC77B6D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 16:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5751C77B61
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 16:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233300AbjC1Qam (ORCPT
+        id S229866AbjC1Qmv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Mar 2023 12:30:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39748 "EHLO
+        Tue, 28 Mar 2023 12:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233262AbjC1Qa3 (ORCPT
+        with ESMTP id S229752AbjC1Qms (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Mar 2023 12:30:29 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1ADCB446
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 09:30:28 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 8-20020a250508000000b00b7c653a0a4aso4605742ybf.23
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 09:30:28 -0700 (PDT)
+        Tue, 28 Mar 2023 12:42:48 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 152043C1D
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 09:42:47 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-536cb268ab8so126654757b3.17
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 09:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680021028;
+        d=google.com; s=20210112; t=1680021766;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
         bh=3IPXOF71xhyJEtqQ3Z98VllJlolVRDwWUwDqo2jNXHo=;
-        b=iHSKdWsbQy/GeVzBB8qj+guo53lEw4PtllPBGrE0VU/M2dkD23/QOZGGuR0wKM1woY
-         xoRId10Gu9qAKC5ovRdE30LmAdcD4GA4VgwOvURL5CKioWDBdCPVcAgPqKSm/GnRBLC6
-         Wr1asA9XzPKSlnb3CkPAvOeE1DSAsxamg7910KDePodfi8AFZRY98KL1TEJ0DhKqnY9i
-         Ff4neDE62XKXPZQYmz8aDY8qlxjyhhLp9tWIv3nrlugxV+bmhh+Xng2r74fru7LZ/LPQ
-         jsNBwK15z+3dffzyJ4LfvNokbOI11Gq4phqSvLhgy0v7wXktgPHVTH0LyaUBlCRQ1y46
-         hZig==
+        b=akG81if4jTiA5YzyK2S4GHzKQoAhTTq+47u+UaQ/VHIofm3zkprIOu6B7rYPy0tSyl
+         UGUGltoHlgfE+76EaGusuobGe+lom/TQ52hOMw/twnoJxK9R3Yk/6h0k5KShhzn3To8f
+         gYW0DhK35mOjv7aS7au1ZBOmUGhsI6ryXgzUQYQSSm2PKV33DE23sYJc2rioXGa0MsUY
+         f/EJgHP565/cUHbq1M1UoGXALU239pGH/qxEiGJK7Z/1A+/+hbZwROBWpoYZqp3UBI9A
+         T7Drp3G2KX0M/LyhaAJvdq2xc5i4v2uGrjOj3YHmEBie7OApXYb1qHy/IfIxxHduKF8+
+         EmfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680021028;
+        d=1e100.net; s=20210112; t=1680021766;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=3IPXOF71xhyJEtqQ3Z98VllJlolVRDwWUwDqo2jNXHo=;
-        b=8Id0m1Xjk9tj5AYtqlc0Ov9zcSbQG6kDTdcfYnQU6PBC7fbEbhWogI4JuuUn9pDi1P
-         aiPwQ/3EmX04RqYjRxoW2+jCI0v8EhY8l35fr4ZHvD8fu9jbbBgkfm/LdxuGThpeusYz
-         MJ+Qr3KDjXsC+VOg45so9D0GH3SjAPkN4Fp22WeiilBro2bplEEfOWzDjmyyC/BEc+xG
-         Kpwn56t/cn6Efz51SM0PGGFVDySEls/qGNNWFbujDDGlephyb33IyuW+WhuztMJSRXPE
-         fabNKOiAR++2Y/C8K4MObraJ6m8kLQRaxV6La8rMp5EQfr3W0kVcGf43gjGH33TCiHnQ
-         55Og==
-X-Gm-Message-State: AAQBX9eXZ0tzWJk5VgcRYZsWFx1os9LnfzW4ydy4a5MbuDhaHC1jLtGH
-        fFt9kPpXQdpnEn1MdyDG5gMHFEUV1tiXkA==
-X-Google-Smtp-Source: AKy350Y+wvZPoh9LYygwBjPZLYtS2gxTdz4mEbJFt4wl+JyIyElkUuBFLZepi30FgdKKeHfY3LJ+7SitnobFzw==
+        b=nATuSCqOcgupJmPJPk6+sQFiEHxTMKokrJ1716azQgmfWfgTdb07Gza2fLhqGUkdPp
+         yglj+qnIRTk1zuIVT56nxcHP0xsuRclguYZSTpDNvL6RCgZs5PL9FIqocX3Qb8MQ++cf
+         gGbdQQpOPX2S4fk7JNfhNQsjMRgZ9Kne1pVjaxMHS7KneLZHVuW25SkXP4Zrj6Lw5JML
+         /XkpmPrpDmiiwbr6C2j+emdckeIDyMHoVKYiY2+OGMojpADgpecQqBHUM1oAmjKx8jCC
+         A87e1GpJr3oHjF6R6qHlhT0tHnREIVfBElcM3K7jVbTEktfTHbaJfJHW4YV4vHOpwA/N
+         qvuw==
+X-Gm-Message-State: AAQBX9edf9aC68WHh0etT7j6dD6oddAhcZgj452zWs6MJUxIhhPNfRT6
+        AF5yYPQOgZvDN42UXhjNT2r+QgQTLmtpPw==
+X-Google-Smtp-Source: AKy350bR6rJxmGAjFwURfQiBKLRMeY2B+66CwIhzIMLLr9+9B8WExIll1C/vuZ6mOLKs6yawoneAG/tQ3CHasw==
 X-Received: from mmandlik-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:2893])
- (user=mmandlik job=sendgmr) by 2002:a05:6902:154e:b0:b77:d2db:5f8f with SMTP
- id r14-20020a056902154e00b00b77d2db5f8fmr10015853ybu.12.1680021027873; Tue,
- 28 Mar 2023 09:30:27 -0700 (PDT)
-Date:   Tue, 28 Mar 2023 09:30:18 -0700
-In-Reply-To: <20230328093000.v10.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
+ (user=mmandlik job=sendgmr) by 2002:a81:ac46:0:b0:533:9185:fc2c with SMTP id
+ z6-20020a81ac46000000b005339185fc2cmr7783218ywj.7.1680021766358; Tue, 28 Mar
+ 2023 09:42:46 -0700 (PDT)
+Date:   Tue, 28 Mar 2023 09:42:39 -0700
+In-Reply-To: <20230328094207.v11.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
 Mime-Version: 1.0
-References: <20230328093000.v10.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
+References: <20230328094207.v11.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230328093000.v10.3.I8cd97c192e8268567b6f467ccd993ec71897318e@changeid>
-Subject: [PATCH v10 3/4] Bluetooth: btusb: Add btusb devcoredump support
+Message-ID: <20230328094207.v11.3.I8cd97c192e8268567b6f467ccd993ec71897318e@changeid>
+Subject: [PATCH v11 3/4] Bluetooth: btusb: Add btusb devcoredump support
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
