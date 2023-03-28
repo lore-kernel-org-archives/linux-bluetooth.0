@@ -2,137 +2,226 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8980C76195
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 02:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB92C76196
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 03:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232259AbjC1CgJ (ORCPT
+        id S232019AbjC1Drx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Mar 2023 22:36:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38930 "EHLO
+        Mon, 27 Mar 2023 23:47:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229606AbjC1CgI (ORCPT
+        with ESMTP id S229647AbjC1Drw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Mar 2023 22:36:08 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60558DB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 19:36:07 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id x15so9540005pjk.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Mar 2023 19:36:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679970967;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aUsGizuUAN+57fTrEDVyn6/nU+P7BmlOX8bcqdEG8KA=;
-        b=CZb3+rEIRjV9In+pEZm1jTDR+xBVJfYGit/V1x+qz9Tk/RTeJq1jWtrp1Y3xiC0Drv
-         1+AqaKcZOtlQqp9WLUDOmJ97QXfUvh5WbNRwMo9T/HbrGer+LFKHM/J64r9XRiRv44RQ
-         yA+58CYKC3bXIl/u7RSKEw0qT+wxdNEeqho6cGMoQgauwDL996H7L3BklIYOS0LUib1Y
-         4/s08fUkwz9D3/wfB7MYT9HTQh/pMk1ZIexNDIDEAwbAthxmLFdYmj2Covf5SvTjdx07
-         OXB5sw7o8EMbKbMGaG6jHEc2Yl5wmkWnViI71HW6zsZpOmGAkb1dh0zX1KiTQXOgWt3p
-         Z0yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679970967;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aUsGizuUAN+57fTrEDVyn6/nU+P7BmlOX8bcqdEG8KA=;
-        b=z10uLmCkWgCQALLMBHrmYjcE0K4pJ/fZYXSxp5MRmR95sySHsw2f6hQs6m7CHf/5M9
-         RVsnFfGgPn+/Bs8BnAlfzdyF/1mG4W/BN/ILnUdg9gFvAxRcyJA1nVJeRoco6Cko+WiW
-         5HJv2L7EygP5De5QCLPUT0r9u2Orjnr6XEugJkVFTuhC/6O2/LaQ/crJI/k1dBDqD2Uw
-         hmEjtmc5t70TeflWaim7SQJpr90MmCTlXetlUswFTdUeP7kahS1p9MSxuk0OuM1KcuS0
-         1D9S9LSnlhX0vDpfN5xBdelvfxo8ca2PEsH/RfXkHz2Mvl9o8zyP+0OiljP1i3HgvwIZ
-         ajWw==
-X-Gm-Message-State: AAQBX9cVCtvOU4tM7s1iWbUT640XecD9eTec1bMptHwYbmszKKKrdJlY
-        Ks53fJYG/KHe4oFIShsi39zw1KbV6b0=
-X-Google-Smtp-Source: AKy350Y1pJq7cxDsnV79SRGAL22Qoqtn6ZVMdLsIsimextjdQ/5jqLsRgf8tE5CYToJvmwP86Hc0yQ==
-X-Received: by 2002:a17:902:d04b:b0:1a1:dd05:39fa with SMTP id l11-20020a170902d04b00b001a1dd0539famr10197741pll.48.1679970966682;
-        Mon, 27 Mar 2023 19:36:06 -0700 (PDT)
-Received: from [172.17.0.2] ([13.73.36.86])
-        by smtp.gmail.com with ESMTPSA id r11-20020a170902be0b00b0019edc1b9eb2sm19854476pls.238.2023.03.27.19.36.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Mar 2023 19:36:06 -0700 (PDT)
-Message-ID: <64225296.170a0220.58d09.5093@mx.google.com>
-Date:   Mon, 27 Mar 2023 19:36:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0172393072885205300=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mmandlik@google.com
-Subject: RE: [v9,1/4] Bluetooth: Add support for hci devcoredump
-In-Reply-To: <20230327181825.v9.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
+        Mon, 27 Mar 2023 23:47:52 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033ABB5;
+        Mon, 27 Mar 2023 20:47:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1679975271; x=1711511271;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=laGA85k+Kf/WqioNRDgrAcWIOYhv10Jf0ZFrkxiLn5c=;
+  b=KUy1UVTVS4zvVHQx48Qg4uSMZ9+IeMLP553SLpn7W1FX+XHOPjG/jdF0
+   n/7gWKTHJBqUQhSAe+2q7fY+cUf7oOTCY6izPFt3XlmdeEp3CjlZULITb
+   PyrD+WgZLp1KKaHZFEipgS+Q3SdDtwsEF5c2SY+2gcodOLmoMne+Ig37n
+   bUWpabVNJSKtS+5IVemVrucyjwYUwOT+FQeP6zM8I5Hy4FFbaduoBH8Qy
+   CdBu6jsPxQVKClrYXbPJ5qeRu2cxOiYZgHzZfsqnRIgZej1LwRTLJGhTY
+   tXdGze6TNv1mL1hFuRha3Swmv82WUPev5v5T08sKWQN6d/gbYSfNUbUP0
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="339185961"
+X-IronPort-AV: E=Sophos;i="5.98,296,1673942400"; 
+   d="scan'208";a="339185961"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Mar 2023 20:47:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10662"; a="772976612"
+X-IronPort-AV: E=Sophos;i="5.98,296,1673942400"; 
+   d="scan'208";a="772976612"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by FMSMGA003.fm.intel.com with ESMTP; 27 Mar 2023 20:47:47 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1ph0JG-000IFw-30;
+        Tue, 28 Mar 2023 03:47:46 +0000
+Date:   Tue, 28 Mar 2023 11:46:56 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     oe-kbuild-all@lists.linux.dev,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Manish Mandlik <mmandlik@google.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v9 1/4] Bluetooth: Add support for hci devcoredump
+Message-ID: <202303281102.Wu5F8pYw-lkp@intel.com>
 References: <20230327181825.v9.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230327181825.v9.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0172393072885205300==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Manish,
 
-This is automated email and please do not reply to this email!
+Thank you for the patch! Perhaps something to improve:
 
-Dear submitter,
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v6.3-rc4 next-20230327]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=734379
+url:    https://github.com/intel-lab-lkp/linux/commits/Manish-Mandlik/Bluetooth-Add-vhci-devcoredump-support/20230328-092008
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/20230327181825.v9.1.I9b4e4818bab450657b19cda3497d363c9baa616e%40changeid
+patch subject: [PATCH v9 1/4] Bluetooth: Add support for hci devcoredump
+config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20230328/202303281102.Wu5F8pYw-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/40f9e7a85c5d41006c8a1b416c6e283ba4035aeb
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Manish-Mandlik/Bluetooth-Add-vhci-devcoredump-support/20230328-092008
+        git checkout 40f9e7a85c5d41006c8a1b416c6e283ba4035aeb
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=loongarch SHELL=/bin/bash net/bluetooth/
 
----Test result---
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202303281102.Wu5F8pYw-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    FAIL      5.80 seconds
-GitLint                       PASS      1.06 seconds
-SubjectPrefix                 PASS      0.28 seconds
-BuildKernel                   PASS      45.13 seconds
-CheckAllWarning               PASS      48.90 seconds
-CheckSparse                   PASS      54.74 seconds
-CheckSmatch                   PASS      148.18 seconds
-BuildKernel32                 PASS      43.41 seconds
-TestRunnerSetup               PASS      620.49 seconds
-TestRunner_l2cap-tester       PASS      20.48 seconds
-TestRunner_iso-tester         PASS      22.12 seconds
-TestRunner_bnep-tester        PASS      7.39 seconds
-TestRunner_mgmt-tester        PASS      135.86 seconds
-TestRunner_rfcomm-tester      PASS      11.46 seconds
-TestRunner_sco-tester         PASS      10.39 seconds
-TestRunner_ioctl-tester       PASS      12.27 seconds
-TestRunner_mesh-tester        PASS      9.33 seconds
-TestRunner_smp-tester         PASS      10.20 seconds
-TestRunner_userchan-tester    PASS      7.51 seconds
-IncrementalBuild              PASS      61.97 seconds
+All warnings (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v9,1/4] Bluetooth: Add support for hci devcoredump
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#156: 
-new file mode 100644
-
-WARNING: Statements terminations use 1 semicolon
-#566: FILE: net/bluetooth/coredump.c:236:
-+	pattern = skb_pull_data(skb, sizeof(*pattern));;
-
-total: 0 errors, 2 warnings, 0 checks, 689 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13190276.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>> net/bluetooth/coredump.c:181:6: warning: no previous prototype for 'hci_devcd_handle_pkt_init' [-Wmissing-prototypes]
+     181 | void hci_devcd_handle_pkt_init(struct hci_dev *hdev, struct sk_buff *skb)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> net/bluetooth/coredump.c:211:6: warning: no previous prototype for 'hci_devcd_handle_pkt_skb' [-Wmissing-prototypes]
+     211 | void hci_devcd_handle_pkt_skb(struct hci_dev *hdev, struct sk_buff *skb)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~
+>> net/bluetooth/coredump.c:222:6: warning: no previous prototype for 'hci_devcd_handle_pkt_pattern' [-Wmissing-prototypes]
+     222 | void hci_devcd_handle_pkt_pattern(struct hci_dev *hdev, struct sk_buff *skb)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> net/bluetooth/coredump.c:242:6: warning: no previous prototype for 'hci_devcd_handle_pkt_complete' [-Wmissing-prototypes]
+     242 | void hci_devcd_handle_pkt_complete(struct hci_dev *hdev, struct sk_buff *skb)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>> net/bluetooth/coredump.c:260:6: warning: no previous prototype for 'hci_devcd_handle_pkt_abort' [-Wmissing-prototypes]
+     260 | void hci_devcd_handle_pkt_abort(struct hci_dev *hdev, struct sk_buff *skb)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+vim +/hci_devcd_handle_pkt_init +181 net/bluetooth/coredump.c
 
+   180	
+ > 181	void hci_devcd_handle_pkt_init(struct hci_dev *hdev, struct sk_buff *skb)
+   182	{
+   183		u32 *dump_size;
+   184	
+   185		if (hdev->dump.state != HCI_DEVCOREDUMP_IDLE) {
+   186			DBG_UNEXPECTED_STATE();
+   187			return;
+   188		}
+   189	
+   190		if (skb->len != sizeof(*dump_size)) {
+   191			bt_dev_dbg(hdev, "Invalid dump init pkt");
+   192			return;
+   193		}
+   194	
+   195		dump_size = skb_pull_data(skb, sizeof(*dump_size));
+   196		if (!*dump_size) {
+   197			bt_dev_err(hdev, "Zero size dump init pkt");
+   198			return;
+   199		}
+   200	
+   201		if (hci_devcd_prepare(hdev, *dump_size)) {
+   202			bt_dev_err(hdev, "Failed to prepare for dump");
+   203			return;
+   204		}
+   205	
+   206		hci_devcd_update_state(hdev, HCI_DEVCOREDUMP_ACTIVE);
+   207		queue_delayed_work(hdev->workqueue, &hdev->dump.dump_timeout,
+   208				   DEVCOREDUMP_TIMEOUT);
+   209	}
+   210	
+ > 211	void hci_devcd_handle_pkt_skb(struct hci_dev *hdev, struct sk_buff *skb)
+   212	{
+   213		if (hdev->dump.state != HCI_DEVCOREDUMP_ACTIVE) {
+   214			DBG_UNEXPECTED_STATE();
+   215			return;
+   216		}
+   217	
+   218		if (!hci_devcd_copy(hdev, skb->data, skb->len))
+   219			bt_dev_dbg(hdev, "Failed to insert skb");
+   220	}
+   221	
+ > 222	void hci_devcd_handle_pkt_pattern(struct hci_dev *hdev, struct sk_buff *skb)
+   223	{
+   224		struct hci_devcoredump_skb_pattern *pattern;
+   225	
+   226		if (hdev->dump.state != HCI_DEVCOREDUMP_ACTIVE) {
+   227			DBG_UNEXPECTED_STATE();
+   228			return;
+   229		}
+   230	
+   231		if (skb->len != sizeof(*pattern)) {
+   232			bt_dev_dbg(hdev, "Invalid pattern skb");
+   233			return;
+   234		}
+   235	
+   236		pattern = skb_pull_data(skb, sizeof(*pattern));;
+   237	
+   238		if (!hci_devcd_memset(hdev, pattern->pattern, pattern->len))
+   239			bt_dev_dbg(hdev, "Failed to set pattern");
+   240	}
+   241	
+ > 242	void hci_devcd_handle_pkt_complete(struct hci_dev *hdev, struct sk_buff *skb)
+   243	{
+   244		u32 dump_size;
+   245	
+   246		if (hdev->dump.state != HCI_DEVCOREDUMP_ACTIVE) {
+   247			DBG_UNEXPECTED_STATE();
+   248			return;
+   249		}
+   250	
+   251		hci_devcd_update_state(hdev, HCI_DEVCOREDUMP_DONE);
+   252		dump_size = hdev->dump.tail - hdev->dump.head;
+   253	
+   254		bt_dev_info(hdev, "Devcoredump complete with size %u (expect %zu)",
+   255			    dump_size, hdev->dump.alloc_size);
+   256	
+   257		dev_coredumpv(&hdev->dev, hdev->dump.head, dump_size, GFP_KERNEL);
+   258	}
+   259	
+ > 260	void hci_devcd_handle_pkt_abort(struct hci_dev *hdev, struct sk_buff *skb)
+   261	{
+   262		u32 dump_size;
+   263	
+   264		if (hdev->dump.state != HCI_DEVCOREDUMP_ACTIVE) {
+   265			DBG_UNEXPECTED_STATE();
+   266			return;
+   267		}
+   268	
+   269		hci_devcd_update_state(hdev, HCI_DEVCOREDUMP_ABORT);
+   270		dump_size = hdev->dump.tail - hdev->dump.head;
+   271	
+   272		bt_dev_info(hdev, "Devcoredump aborted with size %u (expect %zu)",
+   273			    dump_size, hdev->dump.alloc_size);
+   274	
+   275		/* Emit a devcoredump with the available data */
+   276		dev_coredumpv(&hdev->dev, hdev->dump.head, dump_size, GFP_KERNEL);
+   277	}
+   278	
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0172393072885205300==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
