@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A32A0C76196
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 08:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD8D2C76196
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Mar 2023 08:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbjC1IDR (ORCPT
+        id S231934AbjC1IqN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Mar 2023 04:03:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55458 "EHLO
+        Tue, 28 Mar 2023 04:46:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjC1IDN (ORCPT
+        with ESMTP id S231174AbjC1IqH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Mar 2023 04:03:13 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2437712F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 01:03:12 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id r7-20020a17090b050700b002404be7920aso10303923pjz.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 01:03:12 -0700 (PDT)
+        Tue, 28 Mar 2023 04:46:07 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EF35242
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 01:46:04 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id o11so10996223ple.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 01:46:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1679990591;
+        d=gmail.com; s=20210112; t=1679993163;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=t9AWndJuDUyq8684oVVE0Rtuc9rmSh5UDqidImVRw3o=;
-        b=G+zDuHNZp8vC6CDfWaf6+CPqW5FMxfJpPaoOnXEhEqcPyXlMckvnTgMmuE8w7fPSEf
-         YDLlc5sp9vwaRGLNr3OhTGpGq9d5NgDnydwRttneML3DWxu7qAnr0X7dcOjwc27CzKDz
-         H/jlcxxyrft+URzzJo13z7XfGXlHvalRugOkSiLBVtjPkMZXHHHqZMqU984abQmyBMWE
-         vd34PfCyDjwElkAJZz1nWuXVc56BhniEoGYONgxYgFmZ8+fx63gmEvwWsRgNfKRE35gZ
-         owhq7jIDuKv/+8L6Rt+UXVohdv41mN1iEMQHVYz9PhouXU+xBzkRqxfkw9zksTDdJeq0
-         sgnA==
+        bh=gyWFqV/eJJlh6YtYUi3GlFnCYTEUxaEFhQ6OjOWTpRE=;
+        b=NE+44sr0tqZSx1xY2mrPUn12BuXB0l7ufpuln68Zx6/QMvYnY/+wC1Mp+O5NKQDvTq
+         DhGyIBUIE/Y5YOfO65guG/ErG797tM2ay7wjZfenenSlOxN6HwXLgqakZQoORImxtqGQ
+         g722AqQUjLYA2SDs2PpmTg79MD5WSKiq9L/W5ZqFCu2M7xkOYSWVJ1vP/O9k45eG2aFp
+         mWdqyg8iiRDuuufRn8/F+iiCxDVkwXi5K7e5qIZ2C0Tx5v29QxPyOMtNRR5GC+gBgY2w
+         be6O+MVXsSDlasbuIIrEAnIR4RIhHIrCY2ERpHRj92zrCCWEE/1AXYYEt5NPMcscLiHB
+         bYJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1679990591;
+        d=1e100.net; s=20210112; t=1679993163;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=t9AWndJuDUyq8684oVVE0Rtuc9rmSh5UDqidImVRw3o=;
-        b=K443hK04sU0SsKb34MY5pjMLJ7l4d0OTmvrVGeHk3DXkNcrRXD9V9DIymSwXuNfCLe
-         e6RBD6dJyTDrI9NIHH4/HtXj1syIzBftSQtZogoeY3qx8K7detoz4FKHyDo0zHgZAixW
-         FqILnThOQ6G5S+wxBj4DcX1J7JJq7wzKDaksUJAVIxWiakUm95tGlA4YBPTVjYJdC2Kk
-         usJwGoGwxiq+V+6qDUrNmlbluzVLxGHdWH18wHmppjX+OuO3m/5/79Ppu5Nm+7pBo+R/
-         uE62qBEa9bCGY8wMLAvV0RlmW+o/55/zNlVggEnhxQjiZnOwV9RGLc7a81nOhQd6uFpZ
-         VlVQ==
-X-Gm-Message-State: AO0yUKX1dcwGcG8QF2DnckSvm3Vz20onRIj26uP108KSkeuhpIOqSjTK
-        SKRrQ0TjAEB5EyMDMRD4MdkHz4kF+2g=
-X-Google-Smtp-Source: AK7set8CYbrA/TMu260nQRHzVlOUU7xeU1GtIescFfzcP6FcWIhPzKsUtDdLdwh3Bi7E6sepftDkeA==
-X-Received: by 2002:a05:6a20:4b10:b0:cc:50de:a2be with SMTP id fp16-20020a056a204b1000b000cc50dea2bemr12829671pzb.14.1679990591337;
-        Tue, 28 Mar 2023 01:03:11 -0700 (PDT)
-Received: from [172.17.0.2] ([4.154.90.102])
-        by smtp.gmail.com with ESMTPSA id a22-20020aa78656000000b005cc52ea452csm13522773pfo.100.2023.03.28.01.03.10
+        bh=gyWFqV/eJJlh6YtYUi3GlFnCYTEUxaEFhQ6OjOWTpRE=;
+        b=B5Wa2dvBryiloEy+ntvYpOfX4q4gkJrm8nnN3vk5x33fiwHxOc6baJpfZJfxUMCL5Y
+         GtxGByz+f/O1jEnu61Er5auLGj1b9YZ/kJfg55OHzyFDAsU+zAedXc7Sv7oJtPH6dInd
+         CmVcfGsRz3Yl4XkoxMcpRdofnJ3wv7q0SLquig/BaqD75NMOQU4ttdTNfNL/vzbGaHZP
+         NOKkMBu1fDsr3qkQmOBxP/kV3kFdhM0EyZLnPr2cUetmGZwxtaxN/UTV+M2hA3sKEYz8
+         /piAJg5RIA1FobtKDAvIgjocoWmEP/2OOV2PTF/xOqCkah1QkE/rUqXyN2T1Ba2ASMLR
+         qlog==
+X-Gm-Message-State: AO0yUKWpE/6Qysb6DrznrXR8nXhL/wRxswkgZ3mK8URP+jWibZ2j4up9
+        8U52onPX1uhEDiMvIRS571YH5GNyefM=
+X-Google-Smtp-Source: AK7set9ZBU/3hKsM6JCRJscg1PYgRV/1g381DPwz+Yc4Tg2lyEZ1iL9/0p7NEJf+PvSna1+q0Hmb/Q==
+X-Received: by 2002:a05:6a20:a891:b0:de:5082:c9ec with SMTP id ca17-20020a056a20a89100b000de5082c9ecmr12172396pzb.2.1679993163117;
+        Tue, 28 Mar 2023 01:46:03 -0700 (PDT)
+Received: from [172.17.0.2] ([13.88.61.216])
+        by smtp.gmail.com with ESMTPSA id v20-20020aa78094000000b006089fb79f1esm21007195pff.96.2023.03.28.01.46.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Mar 2023 01:03:11 -0700 (PDT)
-Message-ID: <64229f3f.a70a0220.65aba.9911@mx.google.com>
-Date:   Tue, 28 Mar 2023 01:03:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5157485225101380392=="
+        Tue, 28 Mar 2023 01:46:02 -0700 (PDT)
+Message-ID: <6422a94a.a70a0220.281c2.5cc9@mx.google.com>
+Date:   Tue, 28 Mar 2023 01:46:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7412452733680473868=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: Bluetooth: Split bt_iso_qos into dedicated structures
-In-Reply-To: <20230328072545.16876-2-iulia.tanasescu@nxp.com>
-References: <20230328072545.16876-2-iulia.tanasescu@nxp.com>
+Subject: RE: Split bt_iso_qos into dedicated structures
+In-Reply-To: <20230328072622.16896-2-iulia.tanasescu@nxp.com>
+References: <20230328072622.16896-2-iulia.tanasescu@nxp.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5157485225101380392==
+--===============7412452733680473868==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,97 +75,29 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=734491
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=734492
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      1.94 seconds
-GitLint                       PASS      0.24 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      44.08 seconds
-CheckAllWarning               PASS      48.31 seconds
-CheckSparse                   WARNING   53.70 seconds
-CheckSmatch                   WARNING   144.02 seconds
-BuildKernel32                 PASS      42.76 seconds
-TestRunnerSetup               PASS      607.28 seconds
-TestRunner_l2cap-tester       PASS      20.13 seconds
-TestRunner_iso-tester         FAIL      19.69 seconds
-TestRunner_bnep-tester        PASS      7.10 seconds
-TestRunner_mgmt-tester        PASS      132.33 seconds
-TestRunner_rfcomm-tester      PASS      11.07 seconds
-TestRunner_sco-tester         PASS      10.00 seconds
-TestRunner_ioctl-tester       PASS      11.91 seconds
-TestRunner_mesh-tester        PASS      8.81 seconds
-TestRunner_smp-tester         PASS      9.92 seconds
-TestRunner_userchan-tester    PASS      7.40 seconds
-IncrementalBuild              PASS      39.77 seconds
+CheckPatch                    PASS      0.81 seconds
+GitLint                       PASS      0.26 seconds
+BuildEll                      PASS      32.97 seconds
+BluezMake                     PASS      1004.38 seconds
+MakeCheck                     PASS      12.64 seconds
+MakeDistcheck                 PASS      182.43 seconds
+CheckValgrind                 PASS      296.33 seconds
+CheckSmatch                   WARNING   392.58 seconds
+bluezmakeextell               PASS      118.78 seconds
+IncrementalBuild              PASS      815.07 seconds
+ScanBuild                     PASS      1224.98 seconds
 
 Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_conn.c:2095:18: warning: incorrect type in assignment (different base types)net/bluetooth/hci_conn.c:2095:18:    expected restricted __le16 [usertype] skipnet/bluetooth/hci_conn.c:2095:18:    got unsigned short [usertype] skipnet/bluetooth/hci_conn.c:2096:26: warning: incorrect type in assignment (different base types)net/bluetooth/hci_conn.c:2096:26:    expected restricted __le16 [usertype] sync_timeoutnet/bluetooth/hci_conn.c:2096:26:    got unsigned short [usertype] sync_timeoutnet/bluetooth/hci_conn.c:2126:24: warning: incorrect type in assignment (different base types)net/bluetooth/hci_conn.c:2126:24:    expected restricted __le16 [addressable] [assigned] [usertype] timeoutnet/bluetooth/hci_conn.c:2126:24:    got unsigned short [usertype] timeoutnet/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
 ##############################
 Test: CheckSmatch - WARNING
 Desc: Run smatch tool with source
 Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 57, Passed: 10 (17.5%), Failed: 47, Not Run: 0
-
-Failed Test Cases
-Basic ISO Set Socket Option - Success                Failed       0.184 seconds
-ISO QoS 8_1_1 - Success                              Failed       0.188 seconds
-ISO QoS 8_2_1 - Success                              Failed       0.176 seconds
-ISO QoS 16_1_1 - Success                             Failed       0.184 seconds
-ISO QoS 16_2_1 - Success                             Failed       0.184 seconds
-ISO QoS 16_2_1 CIG 0x01 - Success                    Failed       0.192 seconds
-ISO QoS 16_2_1 CIG 0x01 CIS 0x01 - Success           Failed       0.184 seconds
-ISO QoS 24_1_1 - Success                             Failed       0.196 seconds
-ISO QoS 24_2_1 - Success                             Failed       0.180 seconds
-ISO QoS 32_1_1 - Success                             Failed       0.176 seconds
-ISO QoS 32_2_1 - Success                             Failed       0.188 seconds
-ISO QoS 44_1_1 - Success                             Failed       0.188 seconds
-ISO QoS 44_2_1 - Success                             Failed       0.184 seconds
-ISO QoS 48_1_1 - Success                             Failed       0.184 seconds
-ISO QoS 48_2_1 - Success                             Failed       0.180 seconds
-ISO QoS 48_3_1 - Success                             Failed       0.176 seconds
-ISO QoS 48_4_1 - Success                             Failed       0.184 seconds
-ISO QoS 48_5_1 - Success                             Failed       0.184 seconds
-ISO QoS 48_6_1 - Success                             Failed       0.200 seconds
-ISO QoS 8_1_2 - Success                              Failed       0.192 seconds
-ISO QoS 8_2_2 - Success                              Failed       0.184 seconds
-ISO QoS 16_1_2 - Success                             Failed       0.176 seconds
-ISO QoS 16_2_2 - Success                             Failed       0.188 seconds
-ISO QoS 24_1_2 - Success                             Failed       0.176 seconds
-ISO QoS 24_2_2 - Success                             Failed       0.192 seconds
-ISO QoS 32_1_2 - Success                             Failed       0.184 seconds
-ISO QoS 32_2_2 - Success                             Failed       0.188 seconds
-ISO QoS 44_1_2 - Success                             Failed       0.184 seconds
-ISO QoS 44_2_2 - Success                             Failed       0.184 seconds
-ISO QoS 48_1_2 - Success                             Failed       0.192 seconds
-ISO QoS 48_2_2 - Success                             Failed       0.188 seconds
-ISO QoS 48_3_2 - Success                             Failed       0.188 seconds
-ISO QoS 48_4_2 - Success                             Failed       0.176 seconds
-ISO QoS 48_5_2 - Success                             Failed       0.192 seconds
-ISO QoS 48_6_2 - Success                             Failed       0.180 seconds
-ISO Connect - Reject                                 Failed       0.180 seconds
-ISO Connect2 CIG 0x01 - Success                      Failed       0.188 seconds
-ISO Send - Success                                   Failed       0.176 seconds
-ISO Defer - Success                                  Failed       0.180 seconds
-ISO Defer Send - Success                             Failed       0.184 seconds
-ISO 48_2_1 Defer Send - Success                      Failed       0.188 seconds
-ISO Send and Receive - Success                       Failed       0.176 seconds
-ISO Disconnect - Success                             Failed       0.172 seconds
-ISO Reconnect - Success                              Failed       0.172 seconds
-ISO Broadcaster - Success                            Failed       0.180 seconds
-ISO Broadcaster BIG 0x01 - Success                   Failed       0.184 seconds
-ISO Broadcaster BIG 0x01 BIS 0x01 - Success          Failed       0.188 seconds
+emulator/bthost.c:584:28: warning: Variable length array is used.emulator/bthost.c:741:28: warning: Variable length array is used.
 
 
 ---
@@ -173,4 +105,4 @@ Regards,
 Linux Bluetooth
 
 
---===============5157485225101380392==--
+--===============7412452733680473868==--
