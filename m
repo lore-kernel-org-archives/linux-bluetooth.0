@@ -2,87 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1A0C76196
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Mar 2023 02:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 722DDC761AF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Mar 2023 05:07:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjC2CJL (ORCPT
+        id S229704AbjC2FHv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Mar 2023 22:09:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59768 "EHLO
+        Wed, 29 Mar 2023 01:07:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbjC2CJK (ORCPT
+        with ESMTP id S229529AbjC2FHu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Mar 2023 22:09:10 -0400
-Received: from cstnet.cn (smtp80.cstnet.cn [159.226.251.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E43FF10F3;
-        Tue, 28 Mar 2023 19:09:08 -0700 (PDT)
-Received: from localhost.localdomain (unknown [124.16.138.125])
-        by APP-01 (Coremail) with SMTP id qwCowAAnLkq+nSNkVe5rGA--.3137S2;
-        Wed, 29 Mar 2023 10:09:02 +0800 (CST)
-From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
-To:     simon.horman@corigine.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiasheng Jiang <jiasheng@iscas.ac.cn>
-Subject: Re: Re: [PATCH 1/2] Bluetooth: 6LoWPAN: Modify the error handling in the loop
-Date:   Wed, 29 Mar 2023 10:09:00 +0800
-Message-Id: <20230329020900.33013-1-jiasheng@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: qwCowAAnLkq+nSNkVe5rGA--.3137S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kw17ZFyruFW8Cw1DJFWDJwb_yoW8JF4xpr
-        4xGa4vy3Z8XF18Grs2y3s7Wa4rC395Kr15XrZY9w10kw1avr1Iyr4rta4ruFyIkr1ku3yY
-        vrsY9F1kCw1DZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-        1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-        6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
-        1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-        7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-        1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
-        628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gr1l42xK82IYc2Ij64
-        vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUFxhLDUUUU
-X-Originating-IP: [124.16.138.125]
-X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
+        Wed, 29 Mar 2023 01:07:50 -0400
+Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1031E2723
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 22:07:48 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id 93EE95C00CC;
+        Wed, 29 Mar 2023 01:07:46 -0400 (EDT)
+Received: from imap44 ([10.202.2.94])
+  by compute5.internal (MEProxy); Wed, 29 Mar 2023 01:07:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kode54.net; h=cc
+        :content-type:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1680066466; x=1680152866; bh=sG
+        j7/h1KgDuHErGJCYCCanLYWpci9os4n+1e6QdFqeQ=; b=4ELB2St/S4JU8yxDzh
+        G0WmvUJhBhD4LZB3zgP7DIdvlbTV/lTQFWU6amlTGKKeUGDLtPV6ONyae7VgUdGh
+        NxLcqnWKo0BPMG59wQq5Im/OJQR1vYrvM04ox1bTSfp2KFxWh1aeQwwnp0umPPX0
+        p2D05gW4tIX/PtGEEvSahaZplgMlwydbTqvrFZHBCI3RXDAZPN7qjojlRfY9VG4i
+        Wkb7n2do0rTa/RJWVSeS9xLVIWTQGrBTICj8YgsTMaXXKmgHZVp5ZtOWN31A2bKR
+        6Q8QHYDcfzWv9HrsoETC0w/UtQMi4MMopc1WdxgnF0YrB/qYk1jl9a+k3+I9BYE9
+        iJpg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:content-type:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1680066466; x=1680152866; bh=sGj7/h1KgDuHE
+        rGJCYCCanLYWpci9os4n+1e6QdFqeQ=; b=KR9ZgaHpfm0x4usISttjyWmH8xtQJ
+        eJ7TQtbd/TgykwXoC9kZkkQku8ODtRqEVYYxBYyeoUxVVCG7bUXv3qp3Tvw1hjAh
+        JhqnIFzxBcIbyHoHg2Q94TEWRp5jfMpzOwb5ncQ9mGKLanIauUZwrvba36xyFsd0
+        9BqxrAqQN3fW+ieSWXXyn3ZMKi6RaWBDNFhKZv1FmafXm0xvFw54afova2yVaW/Z
+        L8IRuJEpQHN0yLZ6xT7puSdNBzuX3MgKT6pyKzvibtdY/qe6eAzbTJiP851s1RS0
+        aL0lNh6CE/BzGGe+NykOU/9nXId92HbUVNgCPAmoFCi58K5fpy/iGW7Iw==
+X-ME-Sender: <xms:oscjZJCz7wIxQ6Pk8dIEM0KZOHm7MPy31OQ7gRzKzqBRs0slWQehoQ>
+    <xme:oscjZHjwGEzmswc3yV6hYbHpVsw12XnupxQDIzbthsDA18fzH2ICxSM8dFXgzorFU
+    hlfZFn9QlY5Iqd-3JY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdehhedgledvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvffutgesthdtredtreertdenucfhrhhomhepfdevhhhr
+    ihhsthhophhhvghrucfunhhofihhihhllhdfuceotghhrhhisheskhhouggvheegrdhnvg
+    htqeenucggtffrrghtthgvrhhnpeefteevuedtkeevjeejhffgudehheeiheegteektdef
+    gefgfeejkefhleejkeeuveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpegthhhrihhssehkohguvgehgedrnhgvth
+X-ME-Proxy: <xmx:oscjZEmLqoTZg-zYJDwNu3Iq4KrJj5xEzZd91MBB7NvE5XcVmAuckg>
+    <xmx:oscjZDxQ8K8ROoxJi41UJaRzGNSz00nKT7lUDsRuWIyvCv5wjvkQAw>
+    <xmx:oscjZOTV-wy32zBzxR3y_m70RCzV8l8V40P7L-lBn2vlDZhhR3l-Aw>
+    <xmx:oscjZH5oWKeUY0e1y_F9CbbLPdmSllCQwH3LgLa24QCfv6N1aUcRPw>
+Feedback-ID: i01794759:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 40ED136A0082; Wed, 29 Mar 2023 01:07:46 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-237-g62623e8e3f-fm-20230327.001-g62623e8e
+Mime-Version: 1.0
+Message-Id: <dbe9e5b0-951d-446a-8476-f1cd92631704@app.fastmail.com>
+In-Reply-To: <20221216201247.297210-1-marcel@holtmann.org>
+References: <20221216201247.297210-1-marcel@holtmann.org>
+Date:   Tue, 28 Mar 2023 22:07:07 -0700
+From:   "Christopher Snowhill" <chris@kode54.net>
+To:     "Marcel Holtmann" <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org,
+        "Andrew McNaughton" <andrewmcnaughton@me.com>
+Subject: Re: [PATCH] Bluetooth: Fix issue with Actions Semi ATS2851 based devices
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Mar 21, 2023 at 00:09:11AM +0800, Simon Horman wrote:
->On Mon, Mar 20, 2023 at 02:31:55PM +0800, Jiasheng Jiang wrote:
->> Return the error when send_pkt fails in order to avoid the error being
->> overwritten.
->> Moreover, remove the redundant 'ret'.
->> 
->> Fixes: 9c238ca8ec79 ("Bluetooth: 6lowpan: Check transmit errors for multicast packets")
->> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
-> 
-> I see that the error handling is imperfect - only the most recent
-> error value is returned.
-> 
-> But I think this patch introduces a behavioural change: if
-> an error occurs then no attempt is made to send the
-> multicast packet to devices that follow in the list of peers.
-> 
-> If so, I'd want to be sure that behaviour is desirable.
+On Fri, Dec 16, 2022, at 12:12 PM, Marcel Holtmann wrote:
+> Their devices claim to support the erroneous data reporting, but don't
+> actually support the required commands. So blacklist them and add a
+> quirk.
 
-I think it's a matter of trade-offs.
-The original error handling can complete the remaining correct tasks.
-However, my patch can avoid resource waste, because if the an
-error occurs, the rest is likely to go wrong.
-For example, if a memory allocation fails because of the insufficient
-memory, the next memory allocation will likely fails too.
-Maybe it is better to use different error handlings depending on the
-type of errors:
-Immediately return "ENOMEM" errors and continue execute if the other errors occur.
+This device appears to not support HCI_OP_LE_READ_TRANSMIT_POWER,
+either. I get this with the above patch applied:
 
-Thanks,
-Jiang
+> Bluetooth: hci0: Opcode 0x204b failed: -56
 
+Then it fails to register as a functioning interface, and bluez thinks
+bluetooth is turned off.
+
+In my case, it's a Techkey long range adapter, which is probably a similar
+model to the above mentioned Ugreen device, except that it also has a
+detachable pole antenna.
