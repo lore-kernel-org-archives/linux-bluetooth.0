@@ -2,249 +2,87 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C742EC76196
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Mar 2023 00:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF99C6FD18
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Mar 2023 02:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbjC2Ai0 (ORCPT
+        id S229738AbjC2CI2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Mar 2023 20:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38550 "EHLO
+        Tue, 28 Mar 2023 22:08:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbjC2AiZ (ORCPT
+        with ESMTP id S229544AbjC2CI1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Mar 2023 20:38:25 -0400
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B9241FDA
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 17:38:24 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id j11so18031573lfg.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Mar 2023 17:38:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1680050302;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Dvzs0kpo0/PAizdops3QccpQcKA0hqjc3QEnrtXa61o=;
-        b=d8cCB8tXKIOHo4KQObZdLZJ+57ilMp8eG6c96ursn1OHz5tfmDZcbncqlKfSQyI23F
-         UQO7ijEef9D/LhjOlsh58NCKVVRQrWzk1OoCkrtQboZ1YI0ityHDImIIlnXvmDSy7jk3
-         OEnWJ/xvNS5iFgLCZs0gdgssMGF4pjXb9CcFI9n9fOZZPusODnzo3VKZakJrvfyCyha+
-         kgQgx8CzbRQB4qgr3F+LPGsoZJiEXAW+dNOgs6ezZ6FCtMzeKUK8PxkB703P92wHUqJl
-         XsDEqSxER10z45YpG5aLqkplsQi7PQ+xbQ0D2sICQ35PTwKgoDAMd4s08Ms7KtLkyt2Q
-         RoIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680050302;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dvzs0kpo0/PAizdops3QccpQcKA0hqjc3QEnrtXa61o=;
-        b=Y8B0zd1mePBiof6Mh94iHgqi804MifHlndh+lNsWSwL0dvoZWXepY6Z/kxVy/bNnUd
-         Xv0OKGx0jrEnQ6pwU0Tgp2r6jFVF2DItcxUnc9M7YR1vcWR47R0C3jkzZzJHyZ6yddmi
-         DEtjjejHIvxySzv2DE5ZLDJVERbGmmg7AGoNFrMyfwNxvSmAcFN9OBJGjMKl+cpXj/eC
-         yncW/CzI5VXaO9mIWvkvb+7K9rWL/PlCQMP4DTa+XiLsaKw8FWvbO4phnUHlfTCP6qqY
-         ruOoPRDAOOlJnlEpommC+fk3gIws8Yn0TFks0wKYx5Sjzohu5k8XTe4VmeUeid1I0vQe
-         ZAoQ==
-X-Gm-Message-State: AAQBX9drEt3OAnjyUfGKCp9VY0gTFl2IgNsjr/84ofvj2/Mq6jZ1u/QT
-        cibvY/j8T4KAy8gAXIsznxD+fQ==
-X-Google-Smtp-Source: AKy350ZZ6F0C87mmgmaDWhAn3/3AksFtTn60Kkv2AXombH9SF9GZimwQLrCm/8iiArekJXWhpF3W7w==
-X-Received: by 2002:ac2:52bb:0:b0:4b5:9b8f:cc82 with SMTP id r27-20020ac252bb000000b004b59b8fcc82mr5163830lfm.0.1680050302347;
-        Tue, 28 Mar 2023 17:38:22 -0700 (PDT)
-Received: from [192.168.1.101] (abxj225.neoplus.adsl.tpnet.pl. [83.9.3.225])
-        by smtp.gmail.com with ESMTPSA id c18-20020ac25312000000b004eaec70c68esm3407759lfh.294.2023.03.28.17.38.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Mar 2023 17:38:21 -0700 (PDT)
-Message-ID: <38784d53-3198-3f27-06c3-6a9772cdc998@linaro.org>
-Date:   Wed, 29 Mar 2023 02:38:20 +0200
+        Tue, 28 Mar 2023 22:08:27 -0400
+Received: from cstnet.cn (smtp80.cstnet.cn [159.226.251.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A52D22111;
+        Tue, 28 Mar 2023 19:08:24 -0700 (PDT)
+Received: from localhost.localdomain (unknown [124.16.138.125])
+        by APP-01 (Coremail) with SMTP id qwCowABXXkqLnSNk49xrGA--.2241S2;
+        Wed, 29 Mar 2023 10:08:12 +0800 (CST)
+From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To:     simon.horman@corigine.com
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: Re: Re: [PATCH v2] Bluetooth: 6LoWPAN: Add missing check for skb_clone
+Date:   Wed, 29 Mar 2023 10:08:10 +0800
+Message-Id: <20230329020810.32959-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.0
-Subject: Re: [PATCH v8 4/4] arm64: dts: qcom: sc8280xp-x13s: Add bluetooth
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Steev Klimaszewski <steev@kali.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Johan Hovold <johan@kernel.org>
-References: <20230326233812.28058-1-steev@kali.org>
- <20230326233812.28058-5-steev@kali.org>
- <CABBYNZLh2_dKm1ePH3jMY8=EzsbG1TWkTLsgqY1KyFopLNHN6A@mail.gmail.com>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <CABBYNZLh2_dKm1ePH3jMY8=EzsbG1TWkTLsgqY1KyFopLNHN6A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: qwCowABXXkqLnSNk49xrGA--.2241S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kw17ZFyruFW8Cw1DJFWDJwb_yoW8JF4xpr
+        4xGa4vy3Z8XF18Grs2y3s7Wa4rC395Kr15XrZY9w10kw1avr1Iyr4rta4ruFyIkr1ku3yY
+        vrsY9F1kCw1DZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+        rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+        1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+        6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr
+        1j6F4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+        7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
+        1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+        628vn2kIc2xKxwCY02Avz4vE14v_Gr1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+        v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+        1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+        AIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+        42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
+        evJa73UjIFyTuYvjfUO_MaUUUUU
+X-Originating-IP: [124.16.138.125]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Tue, Mar 21, 2023 at 00:09:11AM +0800, Simon Horman wrote:
+>On Mon, Mar 20, 2023 at 02:31:55PM +0800, Jiasheng Jiang wrote:
+>> Return the error when send_pkt fails in order to avoid the error being
+>> overwritten.
+>> Moreover, remove the redundant 'ret'.
+>> 
+>> Fixes: 9c238ca8ec79 ("Bluetooth: 6lowpan: Check transmit errors for multicast packets")
+>> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+> 
+> I see that the error handling is imperfect - only the most recent
+> error value is returned.
+> 
+> But I think this patch introduces a behavioural change: if
+> an error occurs then no attempt is made to send the
+> multicast packet to devices that follow in the list of peers.
+> 
+> If so, I'd want to be sure that behaviour is desirable.
 
+I think it's a matter of trade-offs.
+The original error handling can complete the remaining correct tasks.
+However, my patch can avoid resource waste, because if the an
+error occurs, the rest is likely to go wrong.
+For example, if a memory allocation fails because of the insufficient
+memory, the next memory allocation will likely fails too.
+Maybe it is better to use different error handlings depending on the
+type of errors:
+Immediately return "ENOMEM" errors and continue execute if the other errors occur.
 
-On 29.03.2023 00:24, Luiz Augusto von Dentz wrote:
-> Hi Steev,
-> 
-> On Sun, Mar 26, 2023 at 4:38 PM Steev Klimaszewski <steev@kali.org> wrote:
->>
->> The Lenovo Thinkpad X13s has a WCN6855 Bluetooth controller on uart2,
->> add this.
->>
->> Signed-off-by: Steev Klimaszewski <steev@kali.org>
-> 
-> I would like to merge this set but this one still doesn't have any
-> Signed-off-by other than yours.
-> 
->> ---
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+Thanks,
+Jiang
 
-Konrad
->> Changes since v7:
->>  * Drop regulator now in a different patchset from Johan
->>  * Fix alphabetization
->>
->> Changes since v6:
->>  * Remove allowed-modes as they aren't needed
->>  * Remove regulator-allow-set-load
->>  * Set regulator-always-on because the wifi chip also uses the regulator
->>  * cts pin uses bias-bus-hold
->>  * Alphabetize uart2 pins
->>
->> Changes since v5:
->>  * Update patch subject
->>  * Specify initial mode (via guess) for vreg_s1c
->>  * Drop uart17 definition
->>  * Rename bt_en to bt_default because configuring more than one pin
->>  * Correct (maybe) bias configurations
->>  * Correct cts gpio
->>  * Split rts-tx into two nodes
->>  * Drop incorrect link in the commit message
->>
->> Changes since v4:
->>  * Address Konrad's review comments.
->>
->> Changes since v3:
->>  * Add vreg_s1c
->>  * Add regulators and not dead code
->>  * Fix commit message changelog
->>
->> Changes since v2:
->>  * Remove dead code and add TODO comment
->>  * Make dtbs_check happy with the pin definitions
->>
->>  .../qcom/sc8280xp-lenovo-thinkpad-x13s.dts    | 70 +++++++++++++++++++
->>  1 file changed, 70 insertions(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
->> index da79b5465a1b..129c5f9a2a61 100644
->> --- a/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
->> +++ b/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
->> @@ -24,6 +24,7 @@ / {
->>         aliases {
->>                 i2c4 = &i2c4;
->>                 i2c21 = &i2c21;
->> +               serial1 = &uart2;
->>         };
->>
->>         wcd938x: audio-codec {
->> @@ -1102,6 +1103,32 @@ &txmacro {
->>         status = "okay";
->>  };
->>
->> +&uart2 {
->> +       pinctrl-0 = <&uart2_default>;
->> +       pinctrl-names = "default";
->> +
->> +       status = "okay";
->> +
->> +       bluetooth {
->> +               compatible = "qcom,wcn6855-bt";
->> +
->> +               vddio-supply = <&vreg_s10b>;
->> +               vddbtcxmx-supply = <&vreg_s12b>;
->> +               vddrfacmn-supply = <&vreg_s12b>;
->> +               vddrfa0p8-supply = <&vreg_s12b>;
->> +               vddrfa1p2-supply = <&vreg_s11b>;
->> +               vddrfa1p7-supply = <&vreg_s1c>;
->> +
->> +               max-speed = <3200000>;
->> +
->> +               enable-gpios = <&tlmm 133 GPIO_ACTIVE_HIGH>;
->> +               swctrl-gpios = <&tlmm 132 GPIO_ACTIVE_HIGH>;
->> +
->> +               pinctrl-0 = <&bt_default>;
->> +               pinctrl-names = "default";
->> +       };
->> +};
->> +
->>  &usb_0 {
->>         status = "okay";
->>  };
->> @@ -1222,6 +1249,21 @@ hastings_reg_en: hastings-reg-en-state {
->>  &tlmm {
->>         gpio-reserved-ranges = <70 2>, <74 6>, <83 4>, <125 2>, <128 2>, <154 7>;
->>
->> +       bt_default: bt-default-state {
->> +               hstp-bt-en-pins {
->> +                       pins = "gpio133";
->> +                       function = "gpio";
->> +                       drive-strength = <16>;
->> +                       bias-disable;
->> +               };
->> +
->> +               hstp-sw-ctrl-pins {
->> +                       pins = "gpio132";
->> +                       function = "gpio";
->> +                       bias-pull-down;
->> +               };
->> +       };
->> +
->>         edp_reg_en: edp-reg-en-state {
->>                 pins = "gpio25";
->>                 function = "gpio";
->> @@ -1389,6 +1431,34 @@ reset-n-pins {
->>                 };
->>         };
->>
->> +       uart2_default: uart2-default-state {
->> +               cts-pins {
->> +                       pins = "gpio121";
->> +                       function = "qup2";
->> +                       bias-bus-hold;
->> +               };
->> +
->> +               rts-pins {
->> +                       pins = "gpio122";
->> +                       function = "qup2";
->> +                       drive-strength = <2>;
->> +                       bias-disable;
->> +               };
->> +
->> +               rx-pins {
->> +                       pins = "gpio124";
->> +                       function = "qup2";
->> +                       bias-pull-up;
->> +               };
->> +
->> +               tx-pins {
->> +                       pins = "gpio123";
->> +                       function = "qup2";
->> +                       drive-strength = <2>;
->> +                       bias-disable;
->> +               };
->> +       };
->> +
->>         usb0_sbu_default: usb0-sbu-state {
->>                 oe-n-pins {
->>                         pins = "gpio101";
->> --
->> 2.39.2
->>
-> 
-> 
