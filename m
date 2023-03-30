@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C56DEC6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30ACBC6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230339AbjC3WcI (ORCPT
+        id S230353AbjC3WcZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 18:32:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55676 "EHLO
+        Thu, 30 Mar 2023 18:32:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230350AbjC3WcH (ORCPT
+        with ESMTP id S230350AbjC3WcY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:32:07 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA42E2108
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:32:05 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id h11so10607957ild.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:32:05 -0700 (PDT)
+        Thu, 30 Mar 2023 18:32:24 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FDDE1BE1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:32:23 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 31so15314879qvc.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:32:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680215525;
+        d=gmail.com; s=20210112; t=1680215542;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jN/ppVRRzt+sNUAUeuZfuhvopK5X7HhRbgEkjREG7wY=;
-        b=S0FZS4LqoVZuO3YbGek3Im/+VY+xuIftPLAnYZDYbBdHDSj9H77yRABVSDnG1jmqNy
-         b4Ob1EyclUzfvTK7Jizi6ywVe+BdPqFy3D8rYHIxJb5K1ojG2BeHK/TRg4jhgTlo0/8A
-         56JuGJFlJNT+9pKkPgpV/W59aCxFOz9h5uGLP13pthhjS51BXKMUJYs+yJ7wE/eWR0Ka
-         0Q0zh5vVu/fWCfc9CWj4+rVNwRg+aZ5PbkwPB0JvbsKhe9O+NiU7zubSnJ/fQpx4VsjS
-         MHJ45Bo69E3pcfhLFbVvXWSLRL9e7F1EPToojiFa23a8/Qz0ryH5V0jCr1Zvj11nytE/
-         nEXQ==
+        bh=Bh0D3nJUSyyLy4AKNr74El1poklH37HZcnSVFwA27SY=;
+        b=XUgzfZDOraIp0buwtVFCGvp4R/Cx91FtAyWF78QBV87eFCpCcxtxrHDMkpJHoxhTsw
+         nbRPueRXnhuZHFbMOPrViCWSloBQp6QW43L6l5lRLXVwECJr5XZkemfcWfMKjS3diED5
+         kB2s+fB4Yg7P1OPpWCgndH5N7mu3/YgdUV/KkOLqfG5yuqW5Uzx8TXzXkdiaQqHUGjV+
+         EWNdNrYMvFUxmtHrv6DTSB3bAD/cb3TRUPwtSXn9wsaanUXYdequHmpLRTuSrh8d4iTk
+         siJRQXb7xJJ/tf+NJeKYKtNDIuDtRthYXwWkO5Zq4E8gv5kuFhkKcelzQagF0L2L32xS
+         LmKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680215525;
+        d=1e100.net; s=20210112; t=1680215542;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jN/ppVRRzt+sNUAUeuZfuhvopK5X7HhRbgEkjREG7wY=;
-        b=VpV/64K+1D7DhV+Z8/m+OoM9QrVTqMPUeGLnb73SJHa56+fxi3ldnWDoUkx9HdF2AL
-         ZcgGVb60FgwJCumjGr9HRfkodYeNEkpn8B6YtzMKo7ZTJFSoQyBpn2vrn80dmDJs1CG8
-         4wrD6a6SsBa5zR350gdbGLh0wAdAo/cDlX2RbECEOC9axKe9oc6DuL/LQyavvqlzWShp
-         w/DWo4m5ipHXurPgb1YiO8BJiHgPs1Rnd/Bem+NSso8wXjQGvVZ/gNFR2vFwt0Q/p1K5
-         IbWKyvg2BZVs5BMFKJwzMbWhwpFK/t7hn7jnEPRHqyWHZvxQNMYGpE6YKoNOxG5rAL+2
-         OYew==
-X-Gm-Message-State: AAQBX9cRGqdcxpfATGlJFw1y9aWAKg3rxB6EoDZsEW6D8d+LYrEyOUwo
-        P/i6vd7QahhF0133L2EHedFmUuMtsgk=
-X-Google-Smtp-Source: AKy350bmhorV7Muxnq/fcyaxXTha1GltHqVe3vi3Vc+unXyC7fSn7i8FZYystNdKNioWIJ9VjSeJRg==
-X-Received: by 2002:a05:6e02:218f:b0:326:1d7e:1238 with SMTP id j15-20020a056e02218f00b003261d7e1238mr5548128ila.16.1680215525083;
-        Thu, 30 Mar 2023 15:32:05 -0700 (PDT)
-Received: from [172.17.0.2] ([40.77.92.211])
-        by smtp.gmail.com with ESMTPSA id ay42-20020a056638412a00b00406192f7335sm205827jab.98.2023.03.30.15.32.04
+        bh=Bh0D3nJUSyyLy4AKNr74El1poklH37HZcnSVFwA27SY=;
+        b=kP38R3ZlQ5m1LclRgt5IsAeD9Pb6nMFrGoZcgEYUyjEwzr4DL89uVRQXbiuHZPN7KM
+         j0neasvukv03six+mxIibZj/DBoAk2r6FC25p2r7Xz3zdab/QXXPSgcP4NUeEAocsz3g
+         sczWdDKIZ1s7FceCCh1o2mYb+XIgP6aBv67Fls/WBmUQvo9qUcBIdugMOQTayrLcB+eu
+         uhFPDpXWL6FuKAkMILJ0oT6ARRmR9f2pLsYoKcYQi8r6+2swDczKj6tdw0oO03Mvhhwa
+         0wC7RNAqOKr+78XRMSTY/DWpq5zr5Xl6tV8tdveEDKuGEX/pcnAIjfBNL88cQpPucxIr
+         bQnQ==
+X-Gm-Message-State: AAQBX9cJE/xxriM07e9K7/Ns0OhS63JDd9DyipVrZ0gytYJ7wKrMV4uv
+        g2FU7RQ5k+5+JRZHrTvGPLdHGVH39x0=
+X-Google-Smtp-Source: AKy350awtJXQMhFXfzUYG0Ry7QSQ68WXWEYOCCAOTv019Xfwiw7R61rPkgMlXATtXYxJHNwVvFNUzw==
+X-Received: by 2002:ad4:5de8:0:b0:5c5:95db:859c with SMTP id jn8-20020ad45de8000000b005c595db859cmr39546209qvb.33.1680215542489;
+        Thu, 30 Mar 2023 15:32:22 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.255.82])
+        by smtp.gmail.com with ESMTPSA id f8-20020a05620a280800b0074269db4699sm201882qkp.46.2023.03.30.15.32.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 15:32:04 -0700 (PDT)
-Message-ID: <64260de4.050a0220.1ee4.05ed@mx.google.com>
-Date:   Thu, 30 Mar 2023 15:32:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4088740035254744143=="
+        Thu, 30 Mar 2023 15:32:22 -0700 (PDT)
+Message-ID: <64260df6.050a0220.1b610.173b@mx.google.com>
+Date:   Thu, 30 Mar 2023 15:32:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4425224271472779781=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hdegoede@redhat.com
-Subject: RE: [BlueZ] adapter: Use regular discovery for filters which only have discoverable set
-In-Reply-To: <20230330211855.102798-1-hdegoede@redhat.com>
-References: <20230330211855.102798-1-hdegoede@redhat.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: Fix double free in hci_conn_cleanup
+In-Reply-To: <20230330220332.1035910-1-luiz.dentz@gmail.com>
+References: <20230330220332.1035910-1-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4088740035254744143==
+--===============4425224271472779781==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,61 +75,55 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=735586
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=735599
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.42 seconds
-GitLint                       FAIL      0.51 seconds
-BuildEll                      PASS      26.36 seconds
-BluezMake                     PASS      778.89 seconds
-MakeCheck                     PASS      11.29 seconds
-MakeDistcheck                 PASS      151.60 seconds
-CheckValgrind                 PASS      243.65 seconds
-CheckSmatch                   PASS      326.73 seconds
-bluezmakeextell               PASS      97.95 seconds
-IncrementalBuild              PASS      624.12 seconds
-ScanBuild                     PASS      988.96 seconds
+CheckPatch                    PASS      1.52 seconds
+GitLint                       FAIL      0.92 seconds
+SubjectPrefix                 PASS      0.25 seconds
+BuildKernel                   PASS      31.54 seconds
+CheckAllWarning               PASS      34.24 seconds
+CheckSparse                   WARNING   38.81 seconds
+CheckSmatch                   WARNING   108.45 seconds
+BuildKernel32                 PASS      30.22 seconds
+TestRunnerSetup               PASS      432.40 seconds
+TestRunner_l2cap-tester       PASS      15.85 seconds
+TestRunner_iso-tester         PASS      15.51 seconds
+TestRunner_bnep-tester        PASS      5.08 seconds
+TestRunner_mgmt-tester        PASS      107.05 seconds
+TestRunner_rfcomm-tester      PASS      8.07 seconds
+TestRunner_sco-tester         PASS      7.52 seconds
+TestRunner_ioctl-tester       PASS      8.65 seconds
+TestRunner_mesh-tester        PASS      6.45 seconds
+TestRunner_smp-tester         PASS      7.39 seconds
+TestRunner_userchan-tester    PASS      5.30 seconds
+IncrementalBuild              PASS      33.27 seconds
 
 Details
 ##############################
 Test: GitLint - FAIL
 Desc: Run gitlint
 Output:
-[BlueZ] adapter: Use regular discovery for filters which only have discoverable set
+Bluetooth: Fix double free in hci_conn_cleanup
 
 WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (83>80): "[BlueZ] adapter: Use regular discovery for filters which only have discoverable set"
-27: B3 Line contains hard tab characters (\t): "	Name: Bluetooth 3.0 Keyboard"
-28: B3 Line contains hard tab characters (\t): "	Alias: Bluetooth 3.0 Keyboard"
-29: B3 Line contains hard tab characters (\t): "	Class: 0x00000540"
-30: B3 Line contains hard tab characters (\t): "	Icon: input-keyboard"
-31: B3 Line contains hard tab characters (\t): "	Paired: yes"
-32: B3 Line contains hard tab characters (\t): "	Bonded: yes"
-33: B3 Line contains hard tab characters (\t): "	Trusted: yes"
-34: B3 Line contains hard tab characters (\t): "	Blocked: no"
-35: B3 Line contains hard tab characters (\t): "	Connected: yes"
-36: B3 Line contains hard tab characters (\t): "	WakeAllowed: yes"
-37: B3 Line contains hard tab characters (\t): "	LegacyPairing: yes"
-38: B3 Line contains hard tab characters (\t): "	UUID: Service Discovery Serve.. (00001000-0000-1000-8000-00805f9b34fb)"
-39: B3 Line contains hard tab characters (\t): "	UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)"
-40: B3 Line contains hard tab characters (\t): "	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)"
-41: B3 Line contains hard tab characters (\t): "	Modalias: bluetooth:v05ACp022Cd011B"
-44: B3 Line contains hard tab characters (\t): "	Name: Bluetooth Mouse"
-45: B3 Line contains hard tab characters (\t): "	Alias: Bluetooth Mouse"
-46: B3 Line contains hard tab characters (\t): "	Class: 0x00002580"
-47: B3 Line contains hard tab characters (\t): "	Icon: input-mouse"
-48: B3 Line contains hard tab characters (\t): "	Paired: yes"
-49: B3 Line contains hard tab characters (\t): "	Bonded: yes"
-50: B3 Line contains hard tab characters (\t): "	Trusted: yes"
-51: B3 Line contains hard tab characters (\t): "	Blocked: no"
-52: B3 Line contains hard tab characters (\t): "	Connected: yes"
-53: B3 Line contains hard tab characters (\t): "	WakeAllowed: yes"
-54: B3 Line contains hard tab characters (\t): "	LegacyPairing: no"
-55: B3 Line contains hard tab characters (\t): "	UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)"
-56: B3 Line contains hard tab characters (\t): "	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)"
-57: B3 Line contains hard tab characters (\t): "	Modalias: usb:v0103p0204d001E"
+34: B1 Line exceeds max length (87>80): "Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]"
+[2/2] Bluetooth: SCO: Fix possible circular locking dependency sco_sock_getsockopt
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (82>80): "[2/2] Bluetooth: SCO: Fix possible circular locking dependency sco_sock_getsockopt"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:149:35: warning: array of flexible structures
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:149:35: warning: array of flexible structures
 
 
 ---
@@ -137,4 +131,4 @@ Regards,
 Linux Bluetooth
 
 
---===============4088740035254744143==--
+--===============4425224271472779781==--
