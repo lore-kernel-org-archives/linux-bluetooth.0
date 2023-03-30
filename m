@@ -2,152 +2,188 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A92C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C6FC7619A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:07:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230303AbjC3WG4 (ORCPT
+        id S229695AbjC3WHc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 18:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41544 "EHLO
+        Thu, 30 Mar 2023 18:07:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230307AbjC3WGR (ORCPT
+        with ESMTP id S229992AbjC3WGW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:06:17 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB313113C2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:23 -0700 (PDT)
-Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id D138460003;
-        Thu, 30 Mar 2023 22:03:21 +0000 (UTC)
-Message-ID: <39877b39f5575cbfc89e567cb082741b47d02654.camel@hadess.net>
-Subject: Re: [PATCH] adapter: Use regular discovery for filters which only
- have discoverable set
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org
-Date:   Fri, 31 Mar 2023 00:03:21 +0200
-In-Reply-To: <20230330211233.102136-1-hdegoede@redhat.com>
-References: <20230330211233.102136-1-hdegoede@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Thu, 30 Mar 2023 18:06:22 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4375C11668
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:35 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id h14so12263765pgj.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680213814;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6F8FLEVXSII2jTBWg/LdI/5vXy8cfsxjGzqk1m7Dz5Y=;
+        b=oxQYhYMhMaTmvXP8m+Cqy88oo/TiHLG08MdlUcgwcmOMq4A13iaC5i/6TPdc+J4FDl
+         thXVdKDcdT54MgQ8Cn7wXthhbIvzELUQVKmjOAgXhNTe2sZSwtNtmBUUuuAvHcyEoh8/
+         71WOF5Wjr7QqSoiTCK3I5HreJ0gu3j9Fj3GZ50Dqb4fz63esMzMGJ0YopyeiLReY16ry
+         pkJdJtJWk+4IuAf+g/zxB0UimZBMN9/O9tbTpgMlA/rhG9j2VeoCbKpHIWMe6P9urjcI
+         9feiOjne0DyN39tB2bamld8amGMeTRCWZJ2HLwVUpxBDrkvZo+EDRJVUVyKa4J8d1ng6
+         yg3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680213814;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6F8FLEVXSII2jTBWg/LdI/5vXy8cfsxjGzqk1m7Dz5Y=;
+        b=rDQlcBj+BQcHckokjn31ZVKtO3lfzvZwRPHh2BvHKs4dnIglQrVUibG66wgpGIn3Bd
+         /9Tpi8w8+l3N1N5V+hOSrCWUcknRVs/nASd0DxdOFWGi1GKspSIqvHSjE0uowfSk4LYV
+         T7yz+/z6lAEiemucNFLNQBlPvxOYfB/4Q7zQf8eALdBLw7DFZBLFKyzA7RQdncijuoUM
+         bGwC6wCQQc+8aU6tfOBOgUmBhYwyAbLuG7W3ZGhlrOkr5JuxVDxv5mdvRNTJ+Ky8I1Xo
+         lYopNUUttyqzX5mrOZXNzVD01Jm+32GSoAmQiNwLYE5kGM77S/ZczuUTycofiarOmBEW
+         kO1g==
+X-Gm-Message-State: AAQBX9c/Y6iur93vZIq6njbMpbF2vwD7YVq0xah6YBnjPTJRCW+yVnkn
+        VhatLfOg2rrZZoJeB0rRmbDvV2mLGu0=
+X-Google-Smtp-Source: AKy350ZFiKU579bTHFGAKyu1CrsML7Rs7pxvdJFVQnUXCNxLFdFKc7Ops/eJIoyO49zqoywlnEZvrg==
+X-Received: by 2002:a62:1a53:0:b0:622:ec07:c6bc with SMTP id a80-20020a621a53000000b00622ec07c6bcmr22065788pfa.15.1680213814140;
+        Thu, 30 Mar 2023 15:03:34 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id z14-20020aa791ce000000b00571cdbd0771sm333790pfa.102.2023.03.30.15.03.33
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Mar 2023 15:03:33 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix double free in hci_conn_cleanup
+Date:   Thu, 30 Mar 2023 15:03:30 -0700
+Message-Id: <20230330220332.1035910-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-VG9wIHBvc3RpbmcgdG8gY29tbWVudCBvbiB0aGUgc3ViamVjdC4gSXQgc2hvdWxkIGhhdmUgIltC
-bHVlWiBQQVRDSF0iCmFzIHRoZSBwcmVmaXggc28gdGhhdCB0aGUgdXNlci1zcGFjZSBDSSBydW5z
-IG9uIGl0LgoKT24gVGh1LCAyMDIzLTAzLTMwIGF0IDIzOjEyICswMjAwLCBIYW5zIGRlIEdvZWRl
-IHdyb3RlOgo+IGRpc2NvdmVyeV9maWx0ZXJfdG9fbWdtdF9jcCgpIGRvZXMgbm90IGFkZAo+IGRp
-c2NvdmVyeV9maWx0ZXIuZGlzY292ZXJhYmxlCj4gdG8gdGhlIGNyZWF0ZWQgbWdtdF9jcF9zdGFy
-dF9zZXJ2aWNlX2Rpc2NvdmVyeSBzdHJ1Y3QuCj4gCj4gSW5zdGVhZCB1cGRhdGVfZGlzY292ZXJ5
-X2ZpbHRlcigpIHNlcHJhdGVseSBjaGVja3MKPiBjbGllbnQtPmRpc2NvdmVyeV9maWx0ZXItPmRp
-c2NvdmVyYWJsZSBmb3IgYWxsIGNsaWVudHMuCgoic2VwYXJhdGVseSIuCgo+IFRoaXMgbWVhbnMg
-dGhhdCBmb3IgZGlzY292ZXJ5LWZpbHRlcnMgd2hpY2ggb25seSBoYXZlIHRoZQo+IGRpc2NvdmVy
-YWJsZQo+IGZsYWcgc2V0LCB0byBwdXQgdGhlIGFkYXB0ZXIgaW4gZGlzY292ZXJhYmxlIG1vZGUg
-d2hpbGUgZGlzY292ZXJpbmcsCj4gdGhlIGNyZWF0ZWQgbWdtdF9jcF9zdGFydF9zZXJ2aWNlX2Rp
-c2NvdmVyeSBzdHJ1Y3QgaXMgZW1wdHkuCj4gCj4gVGhpcyBlbXB0eSBtZ210X2NwX3N0YXJ0X3Nl
-cnZpY2VfZGlzY292ZXJ5IHN0cnVjdCB0aGVuIGdldHMgc2VuZAoKInNlbnQiCgo+IHRvIHRoZSBr
-ZXJuZWwgYXMgcGFydCBvZiBhIE1HTVRfT1BfU1RBUlRfU0VSVklDRV9ESVNDT1ZFUlkgbXNnCj4g
-Ynkgc3RhcnRfZGlzY292ZXJ5X3RpbWVvdXQoKS4KPiAKPiBUaGlzIHVzZSBvZiBhbiBlbXB0eSBm
-aWx0ZXIgd2l0aCBNR01UX09QX1NUQVJUX1NFUlZJQ0VfRElTQ09WRVJZCj4gY2F1c2VzIHNvbWUg
-Ymx1ZXRvb3RoIGRldmljZXMgdG8gbm90IGdldCBzZWVuIHdpdGggc29tZSAobW9zdD8pCj4gQnJv
-YWRjb20gYmx1ZXRvb3RoIGFkYXB0ZXJzLiBUaGlzIHByb2JsZW0gaGFzIGJlZW4gb2JzZXJ2ZWQg
-d2l0aAo+IHRoZSBmb2xsb3dpbmcgQnJvYWRjb20gbW9kZWxzOiBCQ000MzQzQTAsIEJDTTQzNDMw
-QTEsIEJDTTQzMzQxQjAgLgo+IAo+IE9uIHRoZXNlIG1vZGVscyB0aGUgZm9sbG93aW5nIDIgZGV2
-aWNlcyB3ZXJlIG5vdCBiZWluZyBkaXNjb3ZlcmVkCj4gd2hlbiBzdGFydGluZyBhIHNjYW4gd2l0
-aCBhIGZpbHRlciB3aXRoIGp1c3QgZGlzY292ZXJhYmxlIHNldAo+IGluIHRoZSBmaWx0ZXIgKGFz
-IGdub21lLWJsdWV0b290aCBkb2VzKToKPiAKPiBEZXZpY2UgMDk6MDI6MDE6MDM6MEY6ODcgKHB1
-YmxpYykKPiDCoMKgwqDCoMKgwqDCoMKgTmFtZTogQmx1ZXRvb3RoIDMuMCBLZXlib2FyZAo+IMKg
-wqDCoMKgwqDCoMKgwqBBbGlhczogQmx1ZXRvb3RoIDMuMCBLZXlib2FyZAo+IMKgwqDCoMKgwqDC
-oMKgwqBDbGFzczogMHgwMDAwMDU0MAo+IMKgwqDCoMKgwqDCoMKgwqBJY29uOiBpbnB1dC1rZXli
-b2FyZAo+IMKgwqDCoMKgwqDCoMKgwqBQYWlyZWQ6IHllcwo+IMKgwqDCoMKgwqDCoMKgwqBCb25k
-ZWQ6IHllcwo+IMKgwqDCoMKgwqDCoMKgwqBUcnVzdGVkOiB5ZXMKPiDCoMKgwqDCoMKgwqDCoMKg
-QmxvY2tlZDogbm8KPiDCoMKgwqDCoMKgwqDCoMKgQ29ubmVjdGVkOiB5ZXMKPiDCoMKgwqDCoMKg
-wqDCoMKgV2FrZUFsbG93ZWQ6IHllcwo+IMKgwqDCoMKgwqDCoMKgwqBMZWdhY3lQYWlyaW5nOiB5
-ZXMKPiDCoMKgwqDCoMKgwqDCoMKgVVVJRDogU2VydmljZSBEaXNjb3ZlcnkgU2VydmUuLiAoMDAw
-MDEwMDAtMDAwMC0xMDAwLTgwMDAtCj4gMDA4MDVmOWIzNGZiKQo+IMKgwqDCoMKgwqDCoMKgwqBV
-VUlEOiBIdW1hbiBJbnRlcmZhY2UgRGV2aWNlLi4uICgwMDAwMTEyNC0wMDAwLTEwMDAtODAwMC0K
-PiAwMDgwNWY5YjM0ZmIpCj4gwqDCoMKgwqDCoMKgwqDCoFVVSUQ6IFBuUCBJbmZvcm1hdGlvbsKg
-wqDCoMKgwqDCoMKgwqDCoMKgICgwMDAwMTIwMC0wMDAwLTEwMDAtODAwMC0KPiAwMDgwNWY5YjM0
-ZmIpCj4gwqDCoMKgwqDCoMKgwqDCoE1vZGFsaWFzOiBibHVldG9vdGg6djA1QUNwMDIyQ2QwMTFC
-Cj4gCj4gRGV2aWNlIDAwOjYwOkQxOjAwOjAwOjM0IChwdWJsaWMpCj4gwqDCoMKgwqDCoMKgwqDC
-oE5hbWU6IEJsdWV0b290aCBNb3VzZQo+IMKgwqDCoMKgwqDCoMKgwqBBbGlhczogQmx1ZXRvb3Ro
-IE1vdXNlCj4gwqDCoMKgwqDCoMKgwqDCoENsYXNzOiAweDAwMDAyNTgwCj4gwqDCoMKgwqDCoMKg
-wqDCoEljb246IGlucHV0LW1vdXNlCj4gwqDCoMKgwqDCoMKgwqDCoFBhaXJlZDogeWVzCj4gwqDC
-oMKgwqDCoMKgwqDCoEJvbmRlZDogeWVzCj4gwqDCoMKgwqDCoMKgwqDCoFRydXN0ZWQ6IHllcwo+
-IMKgwqDCoMKgwqDCoMKgwqBCbG9ja2VkOiBubwo+IMKgwqDCoMKgwqDCoMKgwqBDb25uZWN0ZWQ6
-IHllcwo+IMKgwqDCoMKgwqDCoMKgwqBXYWtlQWxsb3dlZDogeWVzCj4gwqDCoMKgwqDCoMKgwqDC
-oExlZ2FjeVBhaXJpbmc6IG5vCj4gwqDCoMKgwqDCoMKgwqDCoFVVSUQ6IEh1bWFuIEludGVyZmFj
-ZSBEZXZpY2UuLi4gKDAwMDAxMTI0LTAwMDAtMTAwMC04MDAwLQo+IDAwODA1ZjliMzRmYikKPiDC
-oMKgwqDCoMKgwqDCoMKgVVVJRDogUG5QIEluZm9ybWF0aW9uwqDCoMKgwqDCoMKgwqDCoMKgwqAg
-KDAwMDAxMjAwLTAwMDAtMTAwMC04MDAwLQo+IDAwODA1ZjliMzRmYikKPiDCoMKgwqDCoMKgwqDC
-oMKgTW9kYWxpYXM6IHVzYjp2MDEwM3AwMjA0ZDAwMUUKPiAKPiBTaW5jZSBzZXR0aW5nIHRoZSBk
-aXNjb3ZlcmFibGUgZmxhZyBvbiBhIGZpbHRlciBvbmx5IGlzIGEgd2F5IHRvCj4gYXV0b21hdGlj
-YWxseSBwdXQgdGhlIGFkYXB0ZXIgaW4gZGlzY292ZXJhYmxlIG1vZGUgaXRzZWxmIHdoaWxlCj4g
-aXQgaXMgZGlzY292ZXJpbmc7IGFuZCBzaW5jZSB0aGlzIGRvZXMgbm90IGFueSBkZXZpY2UgZmls
-dGVyaW5nCj4gYXQgYWxsOyBtb2RpZnkgbWVyZ2VfZGlzY292ZXJ5X2ZpbHRlcnMoKSB0byB0cmVh
-dCBkaXNjb3Zlcnkgd2l0aAo+IHN1Y2ggZmlsdGVycyBhcyByZWd1bGFyIHVuZmlsdGVyZWQgZGlz
-Y292ZXJ5Lgo+IAo+IFRoaXMgcmVzdWx0cyBpbiBzdGFydF9kaXNjb3ZlcnlfdGltZW91dCgpIHN0
-YXJ0aW5nIHJlZ3VsYXIKPiBkaXNjb3ZlcnkgdGhyb3VnaCBhIE1HTVRfT1BfU1RBUlRfRElTQ09W
-RVJZIG1lc3NhZ2UgYW5kIHRoaXMKPiBmaXhlcyB0aGVzZSAyIGV4YW1wbGUgZGV2aWNlcyBub3Qg
-Z2V0dGluZyBkaXNjb3ZlcmVkIGJ5IHRoZQo+IG1lbnRpb25lZCBCcm9hZGNvbSBCVCBhZGFwdGVy
-IG1vZGVscy4KPiAKPiBMaW5rOgo+IGh0dHBzOi8vZ2l0bGFiLmdub21lLm9yZy9HTk9NRS9nbm9t
-ZS1ibHVldG9vdGgvLS9tZXJnZV9yZXF1ZXN0cy8xNjMKPiAtLS0KPiBOb3RlIHRoZSBzYW1lIGFy
-Z3VtZW50IGNhbiBiZSBtYWRlIGZvciB0aGUgcGF0dGVybiBhbmQgZHVwbGljYXRlIHBhcnQKPiBv
-Zgo+IHRoZSBmaWx0ZXJzIHdoaWNoIGFsc28gZ2V0IGhhbmRsZWQgb3V0c2lkZSBvZiB0aGUga2Vy
-bmVsIGZpbHRlci4KPiBCdXQgSSBwcmVmZXIgdG8ga2VlcCB0aGUgZmlyc3QgcGF0Y2ggc21hbGwg
-YW5kIHRhcmdldHRlZCBhdCBzb2x2aW5nCj4gdGhpbmdzCj4gbm90IHdvcmtpbmcgd2l0aCB0aGUg
-Z25vbWUtYmx1ZXRvb3RoIGZpbHRlciBzZXR0aW5ncy4KPiAKPiBBbHNvIEknbSBub3QgZmFtaWxp
-YXIgZW5vdWdoIHdpdGggdGhlIGNvZGUgdG8gc2F5IHdpdGggY2VydGFpbnR5IHRoYXQKPiBmaWx0
-ZXJzIHdpdGgganVzdCBhIHBhdHRlcm4gb3IgdGhlIGR1cGxpY2F0ZSBmbGFnIHNldCAob3IgYQo+
-IGNvbWJpbmF0aW9uKQo+IHNob3VsZCBhbHNvIGJlIHRyZWF0ZWQgYXMgdW5maWx0ZXJlZCBkaXNj
-b3ZlcnkuCj4gLS0tCj4gwqBzcmMvYWRhcHRlci5jIHwgMTcgKysrKysrKysrKysrKysrKy0KPiDC
-oDEgZmlsZSBjaGFuZ2VkLCAxNiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCj4gCj4gZGlm
-ZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jCj4gaW5kZXggNzk0NzE2MGE2
-Li5jYzdmODkxZDkgMTAwNjQ0Cj4gLS0tIGEvc3JjL2FkYXB0ZXIuYwo+ICsrKyBiL3NyYy9hZGFw
-dGVyLmMKPiBAQCAtMjE5Miw2ICsyMTkyLDcgQEAgc3RhdGljIGludCBtZXJnZV9kaXNjb3Zlcnlf
-ZmlsdGVycyhzdHJ1Y3QKPiBidGRfYWRhcHRlciAqYWRhcHRlciwgaW50ICpyc3NpLAo+IMKgwqDC
-oMKgwqDCoMKgwqBib29sIGVtcHR5X3V1aWQgPSBmYWxzZTsKPiDCoMKgwqDCoMKgwqDCoMKgYm9v
-bCBoYXNfcmVndWxhcl9kaXNjb3ZlcnkgPSBmYWxzZTsKPiDCoMKgwqDCoMKgwqDCoMKgYm9vbCBo
-YXNfZmlsdGVyZWRfZGlzY292ZXJ5ID0gZmFsc2U7Cj4gK8KgwqDCoMKgwqDCoMKgdWludDhfdCBh
-ZGFwdGVyX3NjYW5fdHlwZSA9IGdldF9zY2FuX3R5cGUoYWRhcHRlcik7Cj4gwqAKPiDCoMKgwqDC
-oMKgwqDCoMKgZm9yIChsID0gYWRhcHRlci0+ZGlzY292ZXJ5X2xpc3Q7IGwgIT0gTlVMTDsgbCA9
-Cj4gZ19zbGlzdF9uZXh0KGwpKSB7Cj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBz
-dHJ1Y3QgZGlzY292ZXJ5X2NsaWVudCAqY2xpZW50ID0gbC0+ZGF0YTsKPiBAQCAtMjIwMiw2ICsy
-MjAzLDIwIEBAIHN0YXRpYyBpbnQgbWVyZ2VfZGlzY292ZXJ5X2ZpbHRlcnMoc3RydWN0Cj4gYnRk
-X2FkYXB0ZXIgKmFkYXB0ZXIsIGludCAqcnNzaSwKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjb250aW51ZTsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoH0KPiDCoAo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAvKgo+ICvC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBEZXRlY3QgZW1wdHkgZmlsdGVyIHdpdGgg
-b25seSBkaXNjb3ZlcmFibGUKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogKHdo
-aWNoIGRvZXMgbm90IHJlcXVpcmUgYSBrZXJuZWwgZmlsdGVyKSBzZXQuCj4gK8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCAqLwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBp
-ZiAoaXRlbS0+dXVpZHMgPT0gTlVMTCAmJgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgaXRlbS0+cGF0aGxvc3MgPT0gRElTVEFOQ0VfVkFMX0lOVkFMSUQgJiYKPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGl0ZW0tPnJzc2kgPT0gRElTVEFOQ0Vf
-VkFMX0lOVkFMSUQgJiYKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGl0
-ZW0tPnR5cGUgPT0gYWRhcHRlcl9zY2FuX3R5cGUgJiYKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIGl0ZW0tPmR1cGxpY2F0ZSA9PSBmYWxzZSAmJgo+ICvCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaXRlbS0+cGF0dGVybiA9PSBOVUxMKSB7CgpJIHdv
-dWxkIGhhdmUgc3BsaXQgdGhpcyBjaHVua3kgImlmIiBpbnRvIGEgc2VwYXJhdGUgZnVuY3Rpb24s
-IGJ1dApvdGhlcndpc2UgdGhlIGxvZ2ljIGxvb2tzIGdvb2QuCgpSZXZpZXdlZC1ieTogQmFzdGll
-biBOb2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0PgoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGhhc19yZWd1bGFyX2Rpc2NvdmVyeSA9IHRydWU7Cj4gK8Kg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBjb250aW51ZTsKPiAr
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgfQo+ICsKPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoGhhc19maWx0ZXJlZF9kaXNjb3ZlcnkgPSB0cnVlOwo+IMKgCj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAqdHJhbnNwb3J0IHw9IGl0ZW0tPnR5cGU7Cj4gQEAg
-LTIyNTEsNyArMjI2Niw3IEBAIHN0YXRpYyBpbnQgbWVyZ2VfZGlzY292ZXJ5X2ZpbHRlcnMoc3Ry
-dWN0Cj4gYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsIGludCAqcnNzaSwKPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCAqIEl0IHRoZXJlIGlzIGJvdGggcmVndWxhciBhbmQgZmlsdGVyZWQg
-c2Nhbgo+IHJ1bm5pbmcsIHRoZW4KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAq
-IGNsZWFyIHdob2xlIGZpdGxlciB0byByZXBvcnQgYWxsIGRldmljZXMuCj4gwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-KnRyYW5zcG9ydCA9IGdldF9zY2FuX3R5cGUoYWRhcHRlcik7Cj4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCp0cmFuc3BvcnQgPSBhZGFwdGVyX3NjYW5fdHlwZTsKPiDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCpyc3NpID0gSENJX1JTU0lfSU5WQUxJRDsKPiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdfc2xpc3RfZnJlZSgqdXVpZHMpOwo+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgKnV1aWRzID0gTlVMTDsKCg==
+From: ZhengHan Wang <wzhmmmmm@gmail.com>
+
+syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
+After releasing an object using hci_conn_del_sysfs in the
+hci_conn_cleanup function, releasing the same object again
+using the hci_dev_put and hci_conn_put functions causes a double free.
+Here's a simplified flow:
+
+hci_conn_del_sysfs:
+  hci_dev_put
+    put_device
+      kobject_put
+        kref_put
+          kobject_release
+            kobject_cleanup
+              kfree_const
+                kfree(name)
+
+hci_dev_put:
+  ...
+    kfree(name)
+
+hci_conn_put:
+  put_device
+    ...
+      kfree(name)
+
+This patch drop the hci_dev_put and hci_conn_put function
+call in hci_conn_cleanup function, because the object is
+freed in hci_conn_del_sysfs function.
+
+Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
+
+Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_conn.c  |  6 ++----
+ net/bluetooth/hci_sysfs.c | 23 ++++++++++++-----------
+ 2 files changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index e4aee5950c36..00d1e7201a44 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -168,13 +168,11 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 			hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
+ 	}
+ 
+-	hci_conn_del_sysfs(conn);
+-
+ 	debugfs_remove_recursive(conn->debugfs);
+ 
+-	hci_dev_put(hdev);
++	hci_conn_del_sysfs(conn);
+ 
+-	hci_conn_put(conn);
++	hci_dev_put(hdev);
+ }
+ 
+ static void le_scan_cleanup(struct work_struct *work)
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 08542dfc2dc5..633b82d54272 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -33,7 +33,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("conn %p", conn);
++	bt_dev_dbg(hdev, "conn %p", conn);
+ 
+ 	conn->dev.type = &bt_link;
+ 	conn->dev.class = bt_class;
+@@ -46,27 +46,30 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("conn %p", conn);
++	bt_dev_dbg(hdev, "conn %p", conn);
+ 
+ 	if (device_is_registered(&conn->dev))
+ 		return;
+ 
+ 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ 
+-	if (device_add(&conn->dev) < 0) {
++	if (device_add(&conn->dev) < 0)
+ 		bt_dev_err(hdev, "failed to register connection device");
+-		return;
+-	}
+-
+-	hci_dev_hold(hdev);
+ }
+ 
+ void hci_conn_del_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	if (!device_is_registered(&conn->dev))
++	bt_dev_dbg(hdev, "conn %p", conn);
++
++	if (!device_is_registered(&conn->dev)) {
++		/* If device_add() has *not* succeeded, use *only* put_device()
++		 * to drop the reference count.
++		 */
++		put_device(&conn->dev);
+ 		return;
++	}
+ 
+ 	while (1) {
+ 		struct device *dev;
+@@ -78,9 +81,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
+ 		put_device(dev);
+ 	}
+ 
+-	device_del(&conn->dev);
+-
+-	hci_dev_put(hdev);
++	device_unregister(&conn->dev);
+ }
+ 
+ static void bt_host_release(struct device *dev)
+-- 
+2.39.2
 
