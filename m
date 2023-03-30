@@ -2,43 +2,62 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E87DC77B60
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 10:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B06DC6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 16:35:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbjC3KKr (ORCPT
+        id S231693AbjC3Qf0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 06:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51582 "EHLO
+        Thu, 30 Mar 2023 12:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231190AbjC3KKq (ORCPT
+        with ESMTP id S229967AbjC3QfY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 06:10:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518E27DB2;
-        Thu, 30 Mar 2023 03:10:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C8298B8258A;
-        Thu, 30 Mar 2023 10:10:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD83C433D2;
-        Thu, 30 Mar 2023 10:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680171040;
-        bh=NXNwGsAYLBsQY9dA06ZnOE2S68dF14Wy6ldja64Ce0w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=P8RuF43lX0HN67shTTXKZj0DzpruL+7nrAV5z1JxfN3TdehDEFeD/FFubfbzgAIMN
-         0CSG41hSJrtylhO0ylPmwChpwgZ/bYgPtIHg5JTzOeNmFzXug2qVqCMymMi7HVYQfn
-         WNwi6X1b07GeWa8wW3ckdJTxMB1CHYJPwXnt412g1H+I9k/pQlUz2uriJ7Sva+3/d5
-         /H1R1B3jxtHGoTksEpxFbnvMartPgwkxXuy/pLE0yih+nDS4o+0kGPnd+nlg7KoWia
-         w+ch6UaCfYtjygcofaFXx5BH0bAwdOiWcwbk3rc4SOeiHicb7OUPJCij8pp54JseeV
-         EdjwFWJsIES+w==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1phpFC-0005NY-Gj; Thu, 30 Mar 2023 12:10:58 +0200
-Date:   Thu, 30 Mar 2023 12:10:58 +0200
-From:   Johan Hovold <johan@kernel.org>
-To:     Steev Klimaszewski <steev@kali.org>
+        Thu, 30 Mar 2023 12:35:24 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE59EC16D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 09:35:23 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id ew6so78774093edb.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 09:35:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kali.org; s=google; t=1680194122;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2afhFpL4Acf26QforwyN/SKoshRKH28ySdYgRhAiXUQ=;
+        b=m9EbkV4Ikp57UTGtRPDa92b5AreZqnzqxROsPeI0DMDpZzWQO2G+Zoi/EKP5p4j0ek
+         xy1M+RYE1RzJ+INEKbv+8ePFicHFouy+1zKe6Jtp1nGoJsZaSzn6ShSqLi3ODdO8xmB6
+         pg2CN8ghHHLripQCP/UP+wjI/Ak5vTRT/YfZdmOdxju4ejfakkxQ1LGZ0dJsFw0a3CkV
+         oghCLR6M+wOARsyS43ykPSbIZVKCJAWelleyfBKeaJVtQAtVK/ryEiDMqFP+6U6jt2yl
+         crekKZ3+6BwvSgW2yqYtwaO2Vme9Nim7cHuln8k1u5Zdm0h5XOGvNDEnoN8yoC6nLMlY
+         M/1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680194122;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2afhFpL4Acf26QforwyN/SKoshRKH28ySdYgRhAiXUQ=;
+        b=lqeqpfdOhfK2bS1lkHJZfwVayMF4F1tCKR4xlaFLsp7gag7sEwMifLeWLpMBOW/Oog
+         uIBBC/ODz1MZocpB9kF/hVp54073UVGA/3dY+slBJRQF9WI7lbxHQxWeDiIdFvbXV94X
+         /s26b8ectH3Yk+gdBz6uA6LqUFF/FCD4VUK+kF0hPx+aokuxrQLnhD0oWml2Uab8uYu1
+         ++31EUD7mUJNx31ovwF7A9yt3GHTDM1V7hN9dGOEq58MDkVTUmd4s6+wIifNyrcwSnUN
+         a+jUEi9AVmJ+6uRm2Kc1MWooSIfeybpRnSFlZezzLynoFUjB4vTZ1cSytd30LQ/ijXCS
+         us2A==
+X-Gm-Message-State: AAQBX9dVDoBXZMEHErQLwqRgbdI3c6Y1tjAp0YKejnZqlUVO+Q5oDifg
+        lbNRegtqLLFXgTm0y46RxNBaOuALhS6BpcD/z9IdzQ==
+X-Google-Smtp-Source: AKy350aXiFqW8V2PTtFhJKzVi+bMGpPo+NgxY6yBV90NYIfNp+gCb26N5e2z695S5ywSjJTjE+jEoLTEEKT+eQ56plU=
+X-Received: by 2002:a17:906:7217:b0:932:6a2:ba19 with SMTP id
+ m23-20020a170906721700b0093206a2ba19mr12346955ejk.14.1680194122338; Thu, 30
+ Mar 2023 09:35:22 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230326233812.28058-1-steev@kali.org> <20230326233812.28058-3-steev@kali.org>
+ <ZCVgMuSdyMQhf/Ko@hovoldconsulting.com>
+In-Reply-To: <ZCVgMuSdyMQhf/Ko@hovoldconsulting.com>
+From:   Steev Klimaszewski <steev@kali.org>
+Date:   Thu, 30 Mar 2023 11:35:11 -0500
+Message-ID: <CAKXuJqjJjd6SY1g3JW8w53rEVCqgDkJXQ=1iA3qXcF+C9qv1SQ@mail.gmail.com>
+Subject: Re: [PATCH v8 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
+ chip wcn6855
+To:     Johan Hovold <johan@kernel.org>
 Cc:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -56,65 +75,42 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Mark Pearson <markpearson@lenovo.com>,
         Tim Jiang <quic_tjiang@quicinc.com>
-Subject: Re: [PATCH v8 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-Message-ID: <ZCVgMuSdyMQhf/Ko@hovoldconsulting.com>
-References: <20230326233812.28058-1-steev@kali.org>
- <20230326233812.28058-3-steev@kali.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230326233812.28058-3-steev@kali.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Mar 26, 2023 at 06:38:10PM -0500, Steev Klimaszewski wrote:
-> Add regulators, GPIOs and changes required to power on/off wcn6855.
-> Add support for firmware download for wcn6855 which is in the
-> linux-firmware repository as hpbtfw21.tlv and hpnv21.bin.
-> 
-> Based on the assumption that this is similar to the wcn6750
-> 
-> Tested-on: BTFW.HSP.2.1.0-00538-VER_PATCHZ-1
-> 
-> Signed-off-by: Steev Klimaszewski <steev@kali.org>
-> Reviewed-by: Bjorn Andersson <andersson@kernel.org>
-> Tested-by: Bjorn Andersson <andersson@kernel.org>
-> ---
-> Changes since v7:
->  * None
+Hi Johan,
 
-Only noticed now when Luiz applied the patches, but why did you drop my
-reviewed-by and tested-by tags from this patch when submitting v8?
-
-For the record:
-
-Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
-Tested-by: Johan Hovold <johan+linaro@kernel.org>
- 
-> Changes since v6:
->  * Update commit message.
->  * Add Johan's R-b and T-b.
-> 
-> Changes since v5:
->  * Revert Set qcadev->initspeed since 6855 doesn't use it, don't touch.
->  * Convert get_fw_build_info to a switch statement
->  * Add poweroff handling
->  * Fix up line alignments
->  * Drop from microsoft extensions check since I don't actually know if we need
-> 
-> Changes since v4:
->  * Remove unused firmware check because we don't have mbn firmware.
->  * Set qcadev->init_speed if it hasn't been set.
-> 
-> Changes since v3:
->  * drop unused regulators
-> 
-> Changes since v2:
->  * drop unnecessary commit info
-> 
-> Changes since v1:
->  * None
-
-Johan
+On Thu, Mar 30, 2023 at 5:10=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
+te:
+>
+> On Sun, Mar 26, 2023 at 06:38:10PM -0500, Steev Klimaszewski wrote:
+> > Add regulators, GPIOs and changes required to power on/off wcn6855.
+> > Add support for firmware download for wcn6855 which is in the
+> > linux-firmware repository as hpbtfw21.tlv and hpnv21.bin.
+> >
+> > Based on the assumption that this is similar to the wcn6750
+> >
+> > Tested-on: BTFW.HSP.2.1.0-00538-VER_PATCHZ-1
+> >
+> > Signed-off-by: Steev Klimaszewski <steev@kali.org>
+> > Reviewed-by: Bjorn Andersson <andersson@kernel.org>
+> > Tested-by: Bjorn Andersson <andersson@kernel.org>
+> > ---
+> > Changes since v7:
+> >  * None
+>
+> Only noticed now when Luiz applied the patches, but why did you drop my
+> reviewed-by and tested-by tags from this patch when submitting v8?
+>
+> For the record:
+>
+> Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+> Tested-by: Johan Hovold <johan+linaro@kernel.org>
+>
+Oops, that wasn't intentional! I only meant to drop it on the dts bits
+as that part I wanted to make sure I got right based on your comments,
+my apologies!
+--steev
