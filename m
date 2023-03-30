@@ -2,179 +2,188 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F68C7619A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 21:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B79E8C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:02:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229580AbjC3VTv (ORCPT
+        id S230288AbjC3WCl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 17:19:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47468 "EHLO
+        Thu, 30 Mar 2023 18:02:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230073AbjC3VTt (ORCPT
+        with ESMTP id S230283AbjC3WCj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 17:19:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56AD51727
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 14:19:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680211145;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RcrPVwDg/97w73aKgNFWb4wm6bfaFVu5K1IRiUnLjss=;
-        b=iDnqWeDUa2KEOTQH1+vdb90819uNTwv2vEEmX0viqCL3AvxtZEG+vN1QnCA+uc61pcsLxB
-        MsR+xSzfLfBvCNconJQL9HtnF8rH1k6K5Ee/MsQVRZjMnQW12np+t0gtYyVDK1kUGBPB+N
-        S0ZZwt4S2YavoQB+4wdwNXvdhuNs+Ng=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-602-x25vLb2YN2Od-sgdpijdOA-1; Thu, 30 Mar 2023 17:19:04 -0400
-X-MC-Unique: x25vLb2YN2Od-sgdpijdOA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D43FB1C08796;
-        Thu, 30 Mar 2023 21:19:03 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.39.192.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 45F69202701E;
-        Thu, 30 Mar 2023 21:19:03 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
+        Thu, 30 Mar 2023 18:02:39 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9CC59CD
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:02:38 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id o11so19492834ple.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:02:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680213757;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6F8FLEVXSII2jTBWg/LdI/5vXy8cfsxjGzqk1m7Dz5Y=;
+        b=KMC0l0YIYtsBPav69blxLsbFxUd4Rd9xDfKaFslDjEbB6rjuM32XsDk1r3nJzs5kLs
+         4nwC+ZjT6DrOAjtspf+6uHpGCKaGR0rr0X51C6qh0rd69lhhUNtkeZsspgS+Yd/zB2sV
+         QP9RZTIF0FIxkomU8ePwoN8xPTViN42Ta8elYFo0+MgAAvrDeHJdvzEeBJ+z6LsY6VpR
+         EzUvJHrZJa1uQ+AJlKRBc5YAXYP9w7XDjaNgmqO4G+0/bLBWfu+MprnpHfar4zsCUzjq
+         ijzaYlTZwX5vY93C2W6IksVkZvG7P8Ms7LjkvEb/9N0YsHloGy3Lw2xf7OnYWwxxLuXw
+         a10w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680213757;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6F8FLEVXSII2jTBWg/LdI/5vXy8cfsxjGzqk1m7Dz5Y=;
+        b=ZKD+QJXO6la8fxyiOliIPlnfDWSBTobvEo/GwCXTEK4XRFamkFAwMSLhFRyLynWOWB
+         Sxo/oxjhYqx2Z0xtTWG4jusGVzAn3pdIiReUcIgsuFYwUGHMZm95KrIpkxLBksa4rOlV
+         oUEHq9wqVDVXrSjRs5VLMP+7q5ptKZz6/K+asm/Ils36nc8Ja3fJwV4uvOT1A3gaCN79
+         wFux5UvW4pxRNo8MzqKi73LEAYqP4EDzFY0Mgmtl/sFI1DXGQmCNlvXlpWXfWGOl/r9s
+         Sbsi5KEx7ANpWYndGgi4V+hwLjaIeifYMSBGK3+5jPHOlnrc/CGgPHrEp4qThbwdpIi/
+         +Zaw==
+X-Gm-Message-State: AAQBX9eY/af/REfjA+TpVzOCCKp3fmUKt+gbuxLd9gPu2blYHumIDWUr
+        8uddvOSemRUzBnlTsnrNFDVoDOS/6uE=
+X-Google-Smtp-Source: AKy350aruBxyY0FtgROb6Qaud/7jrBRWX5Spi1oK5rDgxFnOR1iJ9QRKK36WdBPmvFEYjurThDCJmQ==
+X-Received: by 2002:a17:902:d411:b0:1a1:c8b3:3fe1 with SMTP id b17-20020a170902d41100b001a1c8b33fe1mr19035627ple.31.1680213757556;
+        Thu, 30 Mar 2023 15:02:37 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id o10-20020a1709026b0a00b001a21fceff33sm211903plk.48.2023.03.30.15.02.36
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Mar 2023 15:02:36 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Bastien Nocera <hadess@hadess.net>,
-        Hans de Goede <hdegoede@redhat.com>
-Subject: [PATCH BlueZ] adapter: Use regular discovery for filters which only have discoverable set
-Date:   Thu, 30 Mar 2023 23:18:55 +0200
-Message-Id: <20230330211855.102798-1-hdegoede@redhat.com>
+Subject: [PATCH] Bluetooth: Fix double free in hci_conn_cleanup
+Date:   Thu, 30 Mar 2023 15:02:33 -0700
+Message-Id: <20230330220235.1035456-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-discovery_filter_to_mgmt_cp() does not add discovery_filter.discoverable
-to the created mgmt_cp_start_service_discovery struct.
+From: ZhengHan Wang <wzhmmmmm@gmail.com>
 
-Instead update_discovery_filter() seprately checks
-client->discovery_filter->discoverable for all clients.
+syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
+After releasing an object using hci_conn_del_sysfs in the
+hci_conn_cleanup function, releasing the same object again
+using the hci_dev_put and hci_conn_put functions causes a double free.
+Here's a simplified flow:
 
-This means that for discovery-filters which only have the discoverable
-flag set, to put the adapter in discoverable mode while discovering,
-the created mgmt_cp_start_service_discovery struct is empty.
+hci_conn_del_sysfs:
+  hci_dev_put
+    put_device
+      kobject_put
+        kref_put
+          kobject_release
+            kobject_cleanup
+              kfree_const
+                kfree(name)
 
-This empty mgmt_cp_start_service_discovery struct then gets send
-to the kernel as part of a MGMT_OP_START_SERVICE_DISCOVERY msg
-by start_discovery_timeout().
+hci_dev_put:
+  ...
+    kfree(name)
 
-This use of an empty filter with MGMT_OP_START_SERVICE_DISCOVERY
-causes some bluetooth devices to not get seen with some (most?)
-Broadcom bluetooth adapters. This problem has been observed with
-the following Broadcom models: BCM4343A0, BCM43430A1, BCM43341B0 .
+hci_conn_put:
+  put_device
+    ...
+      kfree(name)
 
-On these models the following 2 devices were not being discovered
-when starting a scan with a filter with just discoverable set
-in the filter (as gnome-bluetooth does):
+This patch drop the hci_dev_put and hci_conn_put function
+call in hci_conn_cleanup function, because the object is
+freed in hci_conn_del_sysfs function.
 
-Device 09:02:01:03:0F:87 (public)
-	Name: Bluetooth 3.0 Keyboard
-	Alias: Bluetooth 3.0 Keyboard
-	Class: 0x00000540
-	Icon: input-keyboard
-	Paired: yes
-	Bonded: yes
-	Trusted: yes
-	Blocked: no
-	Connected: yes
-	WakeAllowed: yes
-	LegacyPairing: yes
-	UUID: Service Discovery Serve.. (00001000-0000-1000-8000-00805f9b34fb)
-	UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)
-	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-	Modalias: bluetooth:v05ACp022Cd011B
+Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
 
-Device 00:60:D1:00:00:34 (public)
-	Name: Bluetooth Mouse
-	Alias: Bluetooth Mouse
-	Class: 0x00002580
-	Icon: input-mouse
-	Paired: yes
-	Bonded: yes
-	Trusted: yes
-	Blocked: no
-	Connected: yes
-	WakeAllowed: yes
-	LegacyPairing: no
-	UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)
-	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-	Modalias: usb:v0103p0204d001E
-
-Since setting the discoverable flag on a filter only is a way to
-automatically put the adapter in discoverable mode itself while
-it is discovering; and since this does not any device filtering
-at all; modify merge_discovery_filters() to treat discovery with
-such filters as regular unfiltered discovery.
-
-This results in start_discovery_timeout() starting regular
-discovery through a MGMT_OP_START_DISCOVERY message and this
-fixes these 2 example devices not getting discovered by the
-mentioned Broadcom BT adapter models.
-
-Link: https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/merge_requests/163
+Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Note the same argument can be made for the pattern and duplicate part of
-the filters which also get handled outside of the kernel filter.
-But I prefer to keep the first patch small and targetted at solving things
-not working with the gnome-bluetooth filter settings.
+ net/bluetooth/hci_conn.c  |  6 ++----
+ net/bluetooth/hci_sysfs.c | 23 ++++++++++++-----------
+ 2 files changed, 14 insertions(+), 15 deletions(-)
 
-Also I'm not familiar enough with the code to say with certainty that
-filters with just a pattern or the duplicate flag set (or a combination)
-should also be treated as unfiltered discovery.
----
- src/adapter.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index 7947160a6..cc7f891d9 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2192,6 +2192,7 @@ static int merge_discovery_filters(struct btd_adapter *adapter, int *rssi,
- 	bool empty_uuid = false;
- 	bool has_regular_discovery = false;
- 	bool has_filtered_discovery = false;
-+	uint8_t adapter_scan_type = get_scan_type(adapter);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index e4aee5950c36..00d1e7201a44 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -168,13 +168,11 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 			hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
+ 	}
  
- 	for (l = adapter->discovery_list; l != NULL; l = g_slist_next(l)) {
- 		struct discovery_client *client = l->data;
-@@ -2202,6 +2203,20 @@ static int merge_discovery_filters(struct btd_adapter *adapter, int *rssi,
- 			continue;
- 		}
+-	hci_conn_del_sysfs(conn);
+-
+ 	debugfs_remove_recursive(conn->debugfs);
  
-+		/*
-+		 * Detect empty filter with only discoverable
-+		 * (which does not require a kernel filter) set.
-+		 */
-+		if (item->uuids == NULL &&
-+		    item->pathloss == DISTANCE_VAL_INVALID &&
-+		    item->rssi == DISTANCE_VAL_INVALID &&
-+		    item->type == adapter_scan_type &&
-+		    item->duplicate == false &&
-+		    item->pattern == NULL) {
-+			has_regular_discovery = true;
-+			continue;
-+		}
+-	hci_dev_put(hdev);
++	hci_conn_del_sysfs(conn);
+ 
+-	hci_conn_put(conn);
++	hci_dev_put(hdev);
+ }
+ 
+ static void le_scan_cleanup(struct work_struct *work)
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 08542dfc2dc5..633b82d54272 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -33,7 +33,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("conn %p", conn);
++	bt_dev_dbg(hdev, "conn %p", conn);
+ 
+ 	conn->dev.type = &bt_link;
+ 	conn->dev.class = bt_class;
+@@ -46,27 +46,30 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	BT_DBG("conn %p", conn);
++	bt_dev_dbg(hdev, "conn %p", conn);
+ 
+ 	if (device_is_registered(&conn->dev))
+ 		return;
+ 
+ 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ 
+-	if (device_add(&conn->dev) < 0) {
++	if (device_add(&conn->dev) < 0)
+ 		bt_dev_err(hdev, "failed to register connection device");
+-		return;
+-	}
+-
+-	hci_dev_hold(hdev);
+ }
+ 
+ void hci_conn_del_sysfs(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+-	if (!device_is_registered(&conn->dev))
++	bt_dev_dbg(hdev, "conn %p", conn);
 +
- 		has_filtered_discovery = true;
++	if (!device_is_registered(&conn->dev)) {
++		/* If device_add() has *not* succeeded, use *only* put_device()
++		 * to drop the reference count.
++		 */
++		put_device(&conn->dev);
+ 		return;
++	}
  
- 		*transport |= item->type;
-@@ -2251,7 +2266,7 @@ static int merge_discovery_filters(struct btd_adapter *adapter, int *rssi,
- 		 * It there is both regular and filtered scan running, then
- 		 * clear whole fitler to report all devices.
- 		 */
--		*transport = get_scan_type(adapter);
-+		*transport = adapter_scan_type;
- 		*rssi = HCI_RSSI_INVALID;
- 		g_slist_free(*uuids);
- 		*uuids = NULL;
+ 	while (1) {
+ 		struct device *dev;
+@@ -78,9 +81,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
+ 		put_device(dev);
+ 	}
+ 
+-	device_del(&conn->dev);
+-
+-	hci_dev_put(hdev);
++	device_unregister(&conn->dev);
+ }
+ 
+ static void bt_host_release(struct device *dev)
 -- 
-2.39.1
+2.39.2
 
