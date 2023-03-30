@@ -2,188 +2,196 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C6FC7619A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2417DC77B6D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:07:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229695AbjC3WHc (ORCPT
+        id S230293AbjC3WHe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 18:07:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41556 "EHLO
+        Thu, 30 Mar 2023 18:07:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbjC3WGW (ORCPT
+        with ESMTP id S229784AbjC3WGX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:06:22 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4375C11668
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:35 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id h14so12263765pgj.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:35 -0700 (PDT)
+        Thu, 30 Mar 2023 18:06:23 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BA61166B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:37 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id o2so19471675plg.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:03:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680213814;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6F8FLEVXSII2jTBWg/LdI/5vXy8cfsxjGzqk1m7Dz5Y=;
-        b=oxQYhYMhMaTmvXP8m+Cqy88oo/TiHLG08MdlUcgwcmOMq4A13iaC5i/6TPdc+J4FDl
-         thXVdKDcdT54MgQ8Cn7wXthhbIvzELUQVKmjOAgXhNTe2sZSwtNtmBUUuuAvHcyEoh8/
-         71WOF5Wjr7QqSoiTCK3I5HreJ0gu3j9Fj3GZ50Dqb4fz63esMzMGJ0YopyeiLReY16ry
-         pkJdJtJWk+4IuAf+g/zxB0UimZBMN9/O9tbTpgMlA/rhG9j2VeoCbKpHIWMe6P9urjcI
-         9feiOjne0DyN39tB2bamld8amGMeTRCWZJ2HLwVUpxBDrkvZo+EDRJVUVyKa4J8d1ng6
-         yg3g==
+        d=gmail.com; s=20210112; t=1680213816;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uepZg69M+ah19FAXIauFv/g+sr4j5xKx856LnLPgKrA=;
+        b=ea1jqo6xsATHtsewQK7n7LfEaCVorTpFPUhjBXiqFy8gmhqJ3hZQ5qwRPK30rL1i67
+         yXPe49LYGqLyHPSQmX0dxO0hvVFZDd2Y/QJw2sksVs0YbVPA4aLzuc1Hnt/Fz7o07caz
+         FdHmoDpmjKqbfzz1dkf4ViNmSrlHTdGC+y0lbNn8qdop8t6NFEQQD1f/HvF7HnM2c5p5
+         /zKfrezped3chRMRsQ8Uyx7lXo+asNsnbljVs5ihP+5PEt+iRO9WyFHKpEOiAGOqBU5M
+         rwrZKuHaWiO6KXLQv3H0qsp2jyiYNL/y8XM2BWTtAzDJdXzMi+Meef+KOoRddVTP4It8
+         pBgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680213814;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6F8FLEVXSII2jTBWg/LdI/5vXy8cfsxjGzqk1m7Dz5Y=;
-        b=rDQlcBj+BQcHckokjn31ZVKtO3lfzvZwRPHh2BvHKs4dnIglQrVUibG66wgpGIn3Bd
-         /9Tpi8w8+l3N1N5V+hOSrCWUcknRVs/nASd0DxdOFWGi1GKspSIqvHSjE0uowfSk4LYV
-         T7yz+/z6lAEiemucNFLNQBlPvxOYfB/4Q7zQf8eALdBLw7DFZBLFKyzA7RQdncijuoUM
-         bGwC6wCQQc+8aU6tfOBOgUmBhYwyAbLuG7W3ZGhlrOkr5JuxVDxv5mdvRNTJ+Ky8I1Xo
-         lYopNUUttyqzX5mrOZXNzVD01Jm+32GSoAmQiNwLYE5kGM77S/ZczuUTycofiarOmBEW
-         kO1g==
-X-Gm-Message-State: AAQBX9c/Y6iur93vZIq6njbMpbF2vwD7YVq0xah6YBnjPTJRCW+yVnkn
-        VhatLfOg2rrZZoJeB0rRmbDvV2mLGu0=
-X-Google-Smtp-Source: AKy350ZFiKU579bTHFGAKyu1CrsML7Rs7pxvdJFVQnUXCNxLFdFKc7Ops/eJIoyO49zqoywlnEZvrg==
-X-Received: by 2002:a62:1a53:0:b0:622:ec07:c6bc with SMTP id a80-20020a621a53000000b00622ec07c6bcmr22065788pfa.15.1680213814140;
-        Thu, 30 Mar 2023 15:03:34 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680213816;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uepZg69M+ah19FAXIauFv/g+sr4j5xKx856LnLPgKrA=;
+        b=Cp6gVx4JMSoOLXto+eVTyp/5V0qn0Xws3EeSYpK+ovoXtTh6bVXmd79PEGmt1CuoDG
+         fo0AFHxGQOXhQObhugk26f39jtMIJ2qyGbpKW3EksOIoxEjjDLQNWABrfy0wGV0iiIVa
+         8WuvfgiXokVHmcnpK6ayHhYU51nfpVuSukDSoQmqltoxTZGHn8M8+nJ5Fuz4UYRO07Dl
+         E7+AjFiDtSwRLmkmYfWBboBkWI8mCFJC0S2sKgWB4p4WD0AvME+CMViM0f/IgP0dK403
+         PAyYBs59LNKIrZXk2he/NftCR5DBVyEEa0SxUKYqSSnElEqMNjiqaXovgiOwGYtS731l
+         Bztw==
+X-Gm-Message-State: AO0yUKX9lZZb/ygj6Yotu50WX6J+oyD9e+q/aM2Z21dJLcSRSmU9f3la
+        xOyjrFyElh8IdXaiUSfPDzFFTBLMNzs=
+X-Google-Smtp-Source: AK7set/O02D5EP3rbxJINyu3donzXzOQIv5D+qZRj3iFTfrAnw8/creL8dFTke0+UVUtmPrFNWZXvA==
+X-Received: by 2002:a05:6a20:ba83:b0:db:b960:d319 with SMTP id fb3-20020a056a20ba8300b000dbb960d319mr23494432pzb.12.1680213816423;
+        Thu, 30 Mar 2023 15:03:36 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id z14-20020aa791ce000000b00571cdbd0771sm333790pfa.102.2023.03.30.15.03.33
+        by smtp.gmail.com with ESMTPSA id z14-20020aa791ce000000b00571cdbd0771sm333790pfa.102.2023.03.30.15.03.35
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 15:03:33 -0700 (PDT)
+        Thu, 30 Mar 2023 15:03:35 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix double free in hci_conn_cleanup
-Date:   Thu, 30 Mar 2023 15:03:30 -0700
-Message-Id: <20230330220332.1035910-1-luiz.dentz@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: SCO: Fix possible circular locking dependency sco_sock_getsockopt
+Date:   Thu, 30 Mar 2023 15:03:32 -0700
+Message-Id: <20230330220332.1035910-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230330220332.1035910-1-luiz.dentz@gmail.com>
+References: <20230330220332.1035910-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: ZhengHan Wang <wzhmmmmm@gmail.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-syzbot reports a slab use-after-free in hci_conn_hash_flush [1].
-After releasing an object using hci_conn_del_sysfs in the
-hci_conn_cleanup function, releasing the same object again
-using the hci_dev_put and hci_conn_put functions causes a double free.
-Here's a simplified flow:
+This attempts to fix the following trace:
 
-hci_conn_del_sysfs:
-  hci_dev_put
-    put_device
-      kobject_put
-        kref_put
-          kobject_release
-            kobject_cleanup
-              kfree_const
-                kfree(name)
+======================================================
+WARNING: possible circular locking dependency detected
+6.3.0-rc2-g68fcb3a7bf97 #4706 Not tainted
+------------------------------------------------------
+sco-tester/31 is trying to acquire lock:
+ffff8880025b8070 (&hdev->lock){+.+.}-{3:3}, at:
+sco_sock_getsockopt+0x1fc/0xa90
 
-hci_dev_put:
-  ...
-    kfree(name)
+but task is already holding lock:
+ffff888001eeb130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at:
+sco_sock_getsockopt+0x104/0xa90
 
-hci_conn_put:
-  put_device
-    ...
-      kfree(name)
+which lock already depends on the new lock.
 
-This patch drop the hci_dev_put and hci_conn_put function
-call in hci_conn_cleanup function, because the object is
-freed in hci_conn_del_sysfs function.
+the existing dependency chain (in reverse order) is:
 
-Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]
+-> #2 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
+       lock_sock_nested+0x32/0x80
+       sco_connect_cfm+0x118/0x4a0
+       hci_sync_conn_complete_evt+0x1e6/0x3d0
+       hci_event_packet+0x55c/0x7c0
+       hci_rx_work+0x34c/0xa00
+       process_one_work+0x575/0x910
+       worker_thread+0x89/0x6f0
+       kthread+0x14e/0x180
+       ret_from_fork+0x2b/0x50
 
-Signed-off-by: ZhengHan Wang <wzhmmmmm@gmail.com>
+-> #1 (hci_cb_list_lock){+.+.}-{3:3}:
+       __mutex_lock+0x13b/0xcc0
+       hci_sync_conn_complete_evt+0x1ad/0x3d0
+       hci_event_packet+0x55c/0x7c0
+       hci_rx_work+0x34c/0xa00
+       process_one_work+0x575/0x910
+       worker_thread+0x89/0x6f0
+       kthread+0x14e/0x180
+       ret_from_fork+0x2b/0x50
+
+-> #0 (&hdev->lock){+.+.}-{3:3}:
+       __lock_acquire+0x18cc/0x3740
+       lock_acquire+0x151/0x3a0
+       __mutex_lock+0x13b/0xcc0
+       sco_sock_getsockopt+0x1fc/0xa90
+       __sys_getsockopt+0xe9/0x190
+       __x64_sys_getsockopt+0x5b/0x70
+       do_syscall_64+0x42/0x90
+       entry_SYSCALL_64_after_hwframe+0x70/0xda
+
+other info that might help us debug this:
+
+Chain exists of:
+  &hdev->lock --> hci_cb_list_lock --> sk_lock-AF_BLUETOOTH-BTPROTO_SCO
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(sk_lock-AF_BLUETOOTH-BTPROTO_SCO);
+                               lock(hci_cb_list_lock);
+                               lock(sk_lock-AF_BLUETOOTH-BTPROTO_SCO);
+  lock(&hdev->lock);
+
+ *** DEADLOCK ***
+
+1 lock held by sco-tester/31:
+ #0: ffff888001eeb130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0},
+ at: sco_sock_getsockopt+0x104/0xa90
+
+Fixes: 248733e87d50 ("Bluetooth: Allow querying of supported offload codecs over SCO socket")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c  |  6 ++----
- net/bluetooth/hci_sysfs.c | 23 ++++++++++++-----------
- 2 files changed, 14 insertions(+), 15 deletions(-)
+ net/bluetooth/sco.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index e4aee5950c36..00d1e7201a44 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -168,13 +168,11 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 			hdev->notify(hdev, HCI_NOTIFY_CONN_DEL);
- 	}
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index f3a5ab9e4fa4..cd1a27ac555d 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1140,6 +1140,8 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
  
--	hci_conn_del_sysfs(conn);
--
- 	debugfs_remove_recursive(conn->debugfs);
- 
--	hci_dev_put(hdev);
-+	hci_conn_del_sysfs(conn);
- 
--	hci_conn_put(conn);
-+	hci_dev_put(hdev);
- }
- 
- static void le_scan_cleanup(struct work_struct *work)
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 08542dfc2dc5..633b82d54272 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -33,7 +33,7 @@ void hci_conn_init_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
--	BT_DBG("conn %p", conn);
-+	bt_dev_dbg(hdev, "conn %p", conn);
- 
- 	conn->dev.type = &bt_link;
- 	conn->dev.class = bt_class;
-@@ -46,27 +46,30 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
--	BT_DBG("conn %p", conn);
-+	bt_dev_dbg(hdev, "conn %p", conn);
- 
- 	if (device_is_registered(&conn->dev))
- 		return;
- 
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
- 
--	if (device_add(&conn->dev) < 0) {
-+	if (device_add(&conn->dev) < 0)
- 		bt_dev_err(hdev, "failed to register connection device");
--		return;
--	}
--
--	hci_dev_hold(hdev);
- }
- 
- void hci_conn_del_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 
--	if (!device_is_registered(&conn->dev))
-+	bt_dev_dbg(hdev, "conn %p", conn);
++		release_sock(sk);
 +
-+	if (!device_is_registered(&conn->dev)) {
-+		/* If device_add() has *not* succeeded, use *only* put_device()
-+		 * to drop the reference count.
-+		 */
-+		put_device(&conn->dev);
- 		return;
-+	}
+ 		/* find total buffer size required to copy codec + caps */
+ 		hci_dev_lock(hdev);
+ 		list_for_each_entry(c, &hdev->local_codecs, list) {
+@@ -1157,15 +1159,13 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		buf_len += sizeof(struct bt_codecs);
+ 		if (buf_len > len) {
+ 			hci_dev_put(hdev);
+-			err = -ENOBUFS;
+-			break;
++			return -ENOBUFS;
+ 		}
+ 		ptr = optval;
  
- 	while (1) {
- 		struct device *dev;
-@@ -78,9 +81,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
- 		put_device(dev);
- 	}
+ 		if (put_user(num_codecs, ptr)) {
+ 			hci_dev_put(hdev);
+-			err = -EFAULT;
+-			break;
++			return -EFAULT;
+ 		}
+ 		ptr += sizeof(num_codecs);
  
--	device_del(&conn->dev);
+@@ -1205,12 +1205,14 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			ptr += len;
+ 		}
+ 
+-		if (!err && put_user(buf_len, optlen))
+-			err = -EFAULT;
 -
--	hci_dev_put(hdev);
-+	device_unregister(&conn->dev);
- }
+ 		hci_dev_unlock(hdev);
+ 		hci_dev_put(hdev);
  
- static void bt_host_release(struct device *dev)
++		lock_sock(sk);
++
++		if (!err && put_user(buf_len, optlen))
++			err = -EFAULT;
++
+ 		break;
+ 
+ 	default:
 -- 
 2.39.2
 
