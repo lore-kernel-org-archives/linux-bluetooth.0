@@ -2,67 +2,65 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F2E4C6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 18:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFC4C761A6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 18:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbjC3SQm (ORCPT
+        id S229933AbjC3SSU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 14:16:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49130 "EHLO
+        Thu, 30 Mar 2023 14:18:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjC3SQk (ORCPT
+        with ESMTP id S230114AbjC3SSS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 14:16:40 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2287D306;
-        Thu, 30 Mar 2023 11:16:38 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id by14so1365476ljb.12;
-        Thu, 30 Mar 2023 11:16:38 -0700 (PDT)
+        Thu, 30 Mar 2023 14:18:18 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B22CC4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 11:18:17 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id br6so25624208lfb.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 11:18:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680200197;
+        d=gmail.com; s=20210112; t=1680200296;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D9h2GvUNNoLQAB8LDpXTAOuV+zteZS3OOQfkay6SCnQ=;
-        b=GVCrY1TUpJ9FmQOJgtwEpuW8SU3t65Qd7/THjNZ+CwyTKHuHSzz3Bpec41R4qLqSvQ
-         M3XurktFxv/n/JHFMsOE4zhzn5bzmkHup48j+jrb0ixvqh1bUnHeHO5hXqACzy6I6L80
-         b7F+/floOZbeFeCwUBllaojfIq/LHyb+FquDYWcFq8hCHf1wxOWInG6qv4OIvE3rFJM2
-         xRuAlWb+yXpGwIc063hC8uc8IGmhTB1KEBy/Y8CX4ueB91j8Fp+zBYmYwsy4a1TdKGFx
-         oXzUkPhp7uUivnKkAwn54MlntgNPY408GLY3VLrA6V5vXS+5u5Eb/DOpySvTATd6buT5
-         Vl6w==
+        bh=s9NZvxLNLeZMvl2FVsapioZoNbxyh1f4JpSQzwsntYM=;
+        b=pmhRLUU2WIBGM+TUkMTkUigQe8dVLeDsYrcFcsrI2ZPPgbGO0r2xtOyAkX/PGdqHIL
+         WZGea9twxShRczOp/ECy/Sr9gHhimJU0KkauMPe29w8VOnBUp21uuiuxUdz+SfNMfXVf
+         AlwqTXIzLdTsCVQLYHWn2H+P6auNaNOyolLCOzSzmJJRKxn3oMEIbYh6U0oljgS9q/7h
+         zSbwa2DdvGiJ0QYRLhj87ILD28xENNJozsdnpI2QHxonoFY+0l/AYYZi0r4YL1iu99tk
+         mllEel7EYXkLhZ3cgnyFTLdXEYkMVzw5CiaFTb6ZXIjTenUXSD4OiyqrOQoT/5UowTOH
+         VAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680200197;
+        d=1e100.net; s=20210112; t=1680200296;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D9h2GvUNNoLQAB8LDpXTAOuV+zteZS3OOQfkay6SCnQ=;
-        b=fTcL5eelOXOf1GXS/XefP67RSbyt5uE0wo4rvZUPHHOsOkn/bFUADbPq276vp3K62V
-         5oWA9z0liaAOI5u0Jk00ivrDdljBRK++hF6VONHrK+6DG6yDTNBjxXSYWW7oYjAc3PXz
-         7jaOAlrkf+GtYf0JqUdH+2LdSU20sV1Ct7RdsR/rvQ3qLVYw99tyZJW7iSAOj1ugOrQb
-         Arj3QL9ylqP38ZzLCozOMoy/HSLNaAzpc6E/vesL8yHH4c+PAGQrzkFc2U+Kid1tvXNG
-         DUZMiu2i8YrQYPMN6Ch9ji4T8OLO0HeSCfOQRRrghF51TZjzCKf0lHzJaVwb8xv6ZlSm
-         WaFA==
-X-Gm-Message-State: AAQBX9e/ZhjjoWHht7feg08gHAEG5Jt2ClHTKez5YP4EOhLjmH/c4jl4
-        HEvuG6EouJJUBOk+MGSCMDGL1zxkB8XGGoJzNmI=
-X-Google-Smtp-Source: AKy350Yqc4ilqAsTqUl0WSGgkMAXCRaM87jJ1cjkCjT4KKrGsB28GvRHHn4Khc1dR28W4j5uEReLow8XgRr0LXEcMug=
-X-Received: by 2002:a2e:8697:0:b0:295:acea:5875 with SMTP id
- l23-20020a2e8697000000b00295acea5875mr2300855lji.2.1680200196984; Thu, 30 Mar
- 2023 11:16:36 -0700 (PDT)
+        bh=s9NZvxLNLeZMvl2FVsapioZoNbxyh1f4JpSQzwsntYM=;
+        b=YNN1239eQf5pmbEZbtOJVDgyia/MW68Sqc/Amel7sPJVaEgltQyHxqD6F2r/hIwCo6
+         Ay6rTN2MOF9iTHMwVtQkE8hubPqEIZVP0ZxH4Z3L+DoSqnoaybqRWrERhFRO0jmutk4X
+         imoyLSJaUbmUrqq7Yl8KwIjdhu7BLwqtdn2BEw/39bzdb/cRYDz68tsOnFOKq0BkuIX9
+         spRuiD547MCoYTjNA8VnbW60utY1HoFHab2MABPpwXwigL369yys4kMG9fAu3DymwN6a
+         JOkbftxsjoInWv802O4REmkpQILSWmlZ55Zq4GtJC6xv5yT9A7cnlzrG5p7xAGi2dktF
+         L5ag==
+X-Gm-Message-State: AAQBX9ckJmoXoH2khperIfULCDqeRTo9QArO/By4UBgawutjfHkThV6I
+        9rUcgvZwetBMiRCbGDFWOs3dwultndEkhDX0CHQ=
+X-Google-Smtp-Source: AKy350Y9JmSp5JKIjs4a/IYV96ONfUvfu0C1aqJjYXg+o0VzQ57ROMIWwhrF7/zO00BVb30YHm7I+tOHTXgN/Ld3X1A=
+X-Received: by 2002:ac2:59c4:0:b0:4eb:d8d:6c17 with SMTP id
+ x4-20020ac259c4000000b004eb0d8d6c17mr4937489lfn.10.1680200295583; Thu, 30 Mar
+ 2023 11:18:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230330095714.v13.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
- <168019982448.20045.10207710004218277745.git-patchwork-notify@kernel.org>
-In-Reply-To: <168019982448.20045.10207710004218277745.git-patchwork-notify@kernel.org>
+References: <20230329230734.BlueZ.v5.1.I21ac5a143b0e42eef4ff71ef04ef0e53a294932a@changeid>
+ <168019982520.20045.11650139439500360979.git-patchwork-notify@kernel.org>
+In-Reply-To: <168019982520.20045.11650139439500360979.git-patchwork-notify@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 30 Mar 2023 11:16:25 -0700
-Message-ID: <CABBYNZLcS3uEkYgkokR5a0YHRfdJczm5XFbxXCEUfmrZg3ifnw@mail.gmail.com>
-Subject: Re: [PATCH v13 1/4] Bluetooth: Add support for hci devcoredump
+Date:   Thu, 30 Mar 2023 11:18:04 -0700
+Message-ID: <CABBYNZL5Q8cLwNYi_pqHaSSsEet9pLxnVwBh93UPoNUsHCjSwA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v5 1/2] vhci: Add support to trigger devcoredump and
+ read the dump file
 To:     patchwork-bot+bluetooth@kernel.org
 Cc:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org, abhishekpandit@chromium.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        johan.hedberg@gmail.com, pabeni@redhat.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -76,39 +74,31 @@ g> wrote:
 >
 > Hello:
 >
-> This series was applied to bluetooth/bluetooth-next.git (master)
+> This series was applied to bluetooth/bluez.git (master)
 > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 >
-> On Thu, 30 Mar 2023 09:58:23 -0700 you wrote:
-> > From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> On Wed, 29 Mar 2023 23:08:02 -0700 you wrote:
+> > Add vhci support to trigger the hci devcoredump by writing to
+> > force_devcoredump debugfs entry and read the generated devcoredump
+> > file.
 > >
-> > Add devcoredump APIs to hci core so that drivers only have to provide
-> > the dump skbs instead of managing the synchronization and timeouts.
+> > ---
 > >
-> > The devcoredump APIs should be used in the following manner:
-> >  - hci_devcoredump_init is called to allocate the dump.
-> >  - hci_devcoredump_append is called to append any skbs with dump data
-> >    OR hci_devcoredump_append_pattern is called to insert a pattern.
-> >  - hci_devcoredump_complete is called when all dump packets have been
-> >    sent OR hci_devcoredump_abort is called to indicate an error and
-> >    cancel an ongoing dump collection.
+> > Changes in v5:
+> > - Refactor vhci_read_devcd()
 > >
 > > [...]
 >
 > Here is the summary with links:
->   - [v13,1/4] Bluetooth: Add support for hci devcoredump
+>   - [BlueZ,v5,1/2] vhci: Add support to trigger devcoredump and read the =
+dump file
+>     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D8bd2f2961774
+>   - [BlueZ,v5,2/2] mgmt-tester: Add devcoredump tests
 >     (no matching commit)
 
-Note that I did a small change to convert from bt_dev_info to
-bt_dev_dbg that is why the no matching commit is shown above.
+Note that I did a small change to convert from tester_test_failed to
+tester_test_abort that is why the no matching commit is shown above.
 
->   - [v13,2/4] Bluetooth: Add vhci devcoredump support
->     https://git.kernel.org/bluetooth/bluetooth-next/c/d5d5df6da0aa
->   - [v13,3/4] Bluetooth: btusb: Add btusb devcoredump support
->     https://git.kernel.org/bluetooth/bluetooth-next/c/1078959dcb5c
->   - [v13,4/4] Bluetooth: btintel: Add Intel devcoredump support
->     https://git.kernel.org/bluetooth/bluetooth-next/c/0b93eeba4454
->
 > You are awesome, thank you!
 > --
 > Deet-doot-dot, I am a bot.
