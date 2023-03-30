@@ -2,48 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3210FC6FD1D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 21:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F68C7619A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 21:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjC3VN4 (ORCPT
+        id S229580AbjC3VTv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 17:13:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39906 "EHLO
+        Thu, 30 Mar 2023 17:19:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbjC3VNr (ORCPT
+        with ESMTP id S230073AbjC3VTt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 17:13:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43683EB59
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 14:12:45 -0700 (PDT)
+        Thu, 30 Mar 2023 17:19:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56AD51727
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 14:19:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1680210764;
+        s=mimecast20190719; t=1680211145;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
         bh=RcrPVwDg/97w73aKgNFWb4wm6bfaFVu5K1IRiUnLjss=;
-        b=hDBS4BSxsbsQnksDNGoBeGI6E+Q2zvsPduXRHpWA5QynLaoeEO3YyUcPcic3y3yVIxgOIX
-        2G7LKw7wT2R+t0+Sw/y3Q3Z1BelmF6IPUBYccnOoRYPQFIYCq6s3ocJrfcBQIryhslYFt1
-        ywhRzgCoD/qZlt+3J2rFS+1xxLdbgeM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        b=iDnqWeDUa2KEOTQH1+vdb90819uNTwv2vEEmX0viqCL3AvxtZEG+vN1QnCA+uc61pcsLxB
+        MsR+xSzfLfBvCNconJQL9HtnF8rH1k6K5Ee/MsQVRZjMnQW12np+t0gtYyVDK1kUGBPB+N
+        S0ZZwt4S2YavoQB+4wdwNXvdhuNs+Ng=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-325-uh7xB9rCOwKWOSYi2OMQGw-1; Thu, 30 Mar 2023 17:12:42 -0400
-X-MC-Unique: uh7xB9rCOwKWOSYi2OMQGw-1
+ us-mta-602-x25vLb2YN2Od-sgdpijdOA-1; Thu, 30 Mar 2023 17:19:04 -0400
+X-MC-Unique: x25vLb2YN2Od-sgdpijdOA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3D7E9101A54F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 21:12:42 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D43FB1C08796;
+        Thu, 30 Mar 2023 21:19:03 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.39.192.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C14D8202701E;
-        Thu, 30 Mar 2023 21:12:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 45F69202701E;
+        Thu, 30 Mar 2023 21:19:03 +0000 (UTC)
 From:   Hans de Goede <hdegoede@redhat.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Hans de Goede <hdegoede@redhat.com>
-Subject: [PATCH] adapter: Use regular discovery for filters which only have discoverable set
-Date:   Thu, 30 Mar 2023 23:12:33 +0200
-Message-Id: <20230330211233.102136-1-hdegoede@redhat.com>
+Cc:     Bastien Nocera <hadess@hadess.net>,
+        Hans de Goede <hdegoede@redhat.com>
+Subject: [PATCH BlueZ] adapter: Use regular discovery for filters which only have discoverable set
+Date:   Thu, 30 Mar 2023 23:18:55 +0200
+Message-Id: <20230330211855.102798-1-hdegoede@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
