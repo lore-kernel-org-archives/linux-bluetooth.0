@@ -2,110 +2,113 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFC4C761A6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 18:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03FDAC6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 18:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbjC3SSU (ORCPT
+        id S229585AbjC3STn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 14:18:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52440 "EHLO
+        Thu, 30 Mar 2023 14:19:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230114AbjC3SSS (ORCPT
+        with ESMTP id S229448AbjC3STm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 14:18:18 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B22CC4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 11:18:17 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id br6so25624208lfb.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 11:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680200296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9NZvxLNLeZMvl2FVsapioZoNbxyh1f4JpSQzwsntYM=;
-        b=pmhRLUU2WIBGM+TUkMTkUigQe8dVLeDsYrcFcsrI2ZPPgbGO0r2xtOyAkX/PGdqHIL
-         WZGea9twxShRczOp/ECy/Sr9gHhimJU0KkauMPe29w8VOnBUp21uuiuxUdz+SfNMfXVf
-         AlwqTXIzLdTsCVQLYHWn2H+P6auNaNOyolLCOzSzmJJRKxn3oMEIbYh6U0oljgS9q/7h
-         zSbwa2DdvGiJ0QYRLhj87ILD28xENNJozsdnpI2QHxonoFY+0l/AYYZi0r4YL1iu99tk
-         mllEel7EYXkLhZ3cgnyFTLdXEYkMVzw5CiaFTb6ZXIjTenUXSD4OiyqrOQoT/5UowTOH
-         VAoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680200296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s9NZvxLNLeZMvl2FVsapioZoNbxyh1f4JpSQzwsntYM=;
-        b=YNN1239eQf5pmbEZbtOJVDgyia/MW68Sqc/Amel7sPJVaEgltQyHxqD6F2r/hIwCo6
-         Ay6rTN2MOF9iTHMwVtQkE8hubPqEIZVP0ZxH4Z3L+DoSqnoaybqRWrERhFRO0jmutk4X
-         imoyLSJaUbmUrqq7Yl8KwIjdhu7BLwqtdn2BEw/39bzdb/cRYDz68tsOnFOKq0BkuIX9
-         spRuiD547MCoYTjNA8VnbW60utY1HoFHab2MABPpwXwigL369yys4kMG9fAu3DymwN6a
-         JOkbftxsjoInWv802O4REmkpQILSWmlZ55Zq4GtJC6xv5yT9A7cnlzrG5p7xAGi2dktF
-         L5ag==
-X-Gm-Message-State: AAQBX9ckJmoXoH2khperIfULCDqeRTo9QArO/By4UBgawutjfHkThV6I
-        9rUcgvZwetBMiRCbGDFWOs3dwultndEkhDX0CHQ=
-X-Google-Smtp-Source: AKy350Y9JmSp5JKIjs4a/IYV96ONfUvfu0C1aqJjYXg+o0VzQ57ROMIWwhrF7/zO00BVb30YHm7I+tOHTXgN/Ld3X1A=
-X-Received: by 2002:ac2:59c4:0:b0:4eb:d8d:6c17 with SMTP id
- x4-20020ac259c4000000b004eb0d8d6c17mr4937489lfn.10.1680200295583; Thu, 30 Mar
- 2023 11:18:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230329230734.BlueZ.v5.1.I21ac5a143b0e42eef4ff71ef04ef0e53a294932a@changeid>
- <168019982520.20045.11650139439500360979.git-patchwork-notify@kernel.org>
-In-Reply-To: <168019982520.20045.11650139439500360979.git-patchwork-notify@kernel.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 30 Mar 2023 11:18:04 -0700
-Message-ID: <CABBYNZL5Q8cLwNYi_pqHaSSsEet9pLxnVwBh93UPoNUsHCjSwA@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v5 1/2] vhci: Add support to trigger devcoredump and
- read the dump file
-To:     patchwork-bot+bluetooth@kernel.org
-Cc:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
-        linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 30 Mar 2023 14:19:42 -0400
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74318E3BD
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 11:19:41 -0700 (PDT)
+Received: from github.com (hubbernetes-node-50bb8f4.ac4-iad.github.net [10.52.138.36])
+        by smtp.github.com (Postfix) with ESMTPA id C0FEA520492
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 11:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1680200380;
+        bh=FdKKBjFPZRyWDq5kKJ54PF/63mmXi9mdd6dRO8QwkMk=;
+        h=Date:From:To:Subject:From;
+        b=FF76tiXJVV+Rq6+RMXQ4VDMYbQie0OmxL+5+8asqluE91qwJi1bWDKESxdQCuDwe6
+         WsjYPKUADWIXFCYmxOO0RYgW5GXnr/lUou54iK3wgXgThPorRH8GXJgfhcwBEmka59
+         nHwWuvyB/EQ+oR4ukTuALaDd5CM2aI8+siBJExA8=
+Date:   Thu, 30 Mar 2023 11:19:40 -0700
+From:   liveusr <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/54601c-5106fe@github.com>
+Subject: [bluez/bluez] ca07d1: bap: Mark devices to auto-connect
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: ca07d198f9c7d289e95091c30ed15bff2106a7db
+      https://github.com/bluez/bluez/commit/ca07d198f9c7d289e95091c30ed15bff2106a7db
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-29 (Wed, 29 Mar 2023)
 
-On Thu, Mar 30, 2023 at 11:10=E2=80=AFAM <patchwork-bot+bluetooth@kernel.or=
-g> wrote:
->
-> Hello:
->
-> This series was applied to bluetooth/bluez.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->
-> On Wed, 29 Mar 2023 23:08:02 -0700 you wrote:
-> > Add vhci support to trigger the hci devcoredump by writing to
-> > force_devcoredump debugfs entry and read the generated devcoredump
-> > file.
-> >
-> > ---
-> >
-> > Changes in v5:
-> > - Refactor vhci_read_devcd()
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [BlueZ,v5,1/2] vhci: Add support to trigger devcoredump and read the =
-dump file
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D8bd2f2961774
->   - [BlueZ,v5,2/2] mgmt-tester: Add devcoredump tests
->     (no matching commit)
+  Changed paths:
+    M profiles/audio/bap.c
 
-Note that I did a small change to convert from tester_test_failed to
-tester_test_abort that is why the no matching commit is shown above.
+  Log Message:
+  -----------
+  bap: Mark devices to auto-connect
 
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
->
+This makes devices with BAP support to auto-connect once they start
+advertising.
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: 2b022fa5297a56875f06c2b5612258cd99dcbe74
+      https://github.com/bluez/bluez/commit/2b022fa5297a56875f06c2b5612258cd99dcbe74
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-03-29 (Wed, 29 Mar 2023)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Fix not setting initiator flag when auto-connecting
+
+If the device is marked as auto-connect the kernel may initiate the
+connection spontaneously causing new connections to not have set the
+state->initiator flag properly.
+
+
+  Commit: 8bd2f29617743a5587ca9679957c2e4bf3b78aa9
+      https://github.com/bluez/bluez/commit/8bd2f29617743a5587ca9679957c2e4bf3b78aa9
+  Author: Manish Mandlik <mmandlik@google.com>
+  Date:   2023-03-30 (Thu, 30 Mar 2023)
+
+  Changed paths:
+    M emulator/vhci.c
+    M emulator/vhci.h
+
+  Log Message:
+  -----------
+  vhci: Add support to trigger devcoredump and read the dump file
+
+Add vhci support to trigger the hci devcoredump by writing to
+force_devcoredump debugfs entry and read the generated devcoredump
+file.
+
+
+  Commit: 5106fe8c868d5ec69af70f299eeedad42b900f69
+      https://github.com/bluez/bluez/commit/5106fe8c868d5ec69af70f299eeedad42b900f69
+  Author: Manish Mandlik <mmandlik@google.com>
+  Date:   2023-03-30 (Thu, 30 Mar 2023)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Add devcoredump tests
+
+Add mgmt-tester tests for hci devcoredump. These testa trigger the
+devcoredump with a test data and verifies the generated devcoredump
+file for the test data and correct devcoredump header fields.
+
+
+Compare: https://github.com/bluez/bluez/compare/54601cbcf283...5106fe8c868d
