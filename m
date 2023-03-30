@@ -2,64 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC015C77B6D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38CC4C761AF
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 06:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbjC3GFf (ORCPT
+        id S230054AbjC3GFd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 02:05:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60918 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230057AbjC3GFd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 30 Mar 2023 02:05:33 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36EB61BD6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Mar 2023 23:05:32 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-54574d6204aso177543587b3.15
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Mar 2023 23:05:32 -0700 (PDT)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60890 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229990AbjC3GFb (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 30 Mar 2023 02:05:31 -0400
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2EF211B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Mar 2023 23:05:30 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id e36-20020a631e24000000b0050f76fb84b6so4949012pge.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Mar 2023 23:05:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112; t=1680156331;
+        d=google.com; s=20210112; t=1680156329;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3IPXOF71xhyJEtqQ3Z98VllJlolVRDwWUwDqo2jNXHo=;
-        b=T2Xd/vq4QTC43NzxMiqSqBA8msNyNnHwNo6UYCR6DdjwKSdN7puBZQbpLOgxQylu5B
-         6MryFowxU9/CeP3PrNz+SadXmpimku7vRJFPmIOAC8YNblPOJSp8D77HXjV0tpgVLiVI
-         4N9IJgrdUVI0eYrleZN00+XjcsyauZiCpIOvxba7pJHKJ8UIiMTqNEqYHHJdJlrU36Jf
-         1UHQ85XZwKvyo5W1l8U1Y/vTNdvQ4/1V3Kab1d5t33t/oC2QF85nUUxF5svdiLJGLxAU
-         Nm64To0CMn9CYygJZW+ulUToZlW0X1dmq9+XUIH++wvAE4gbShgrsYTjPbJkv00R6QjC
-         SBow==
+        bh=TK8Pqe0H+wW+YnvKs1zy8YAiRGfAiSTpV51i3utUysc=;
+        b=h9lxmeemslc/r3j5gvXGGV9f8TmhgLBo5oI2zh7aWCaA57qPjSqnjvi5YsYXyeQCI5
+         9XAFo2V7zUVJ8tp9VRBUmPecgoizE23wvj5ZXqCMXrLK+cqkFr6Ir4/WHl9ZRz5P/EPp
+         zvI5+alEbzOjV2WARNb6Q/cehw4UXwTu5zvCO2Qs2hr8rJbe0rvIdHUHZVu5T5e1tdTc
+         /mL6K2/EHi9njWwBmLXWWF0CGqOYLehd+eym4guf1MjAADy2UocGylIGicIAWCfQQXHm
+         NJZrCXqYgolWqGi/D2UuC9nA7eV4hAIQWM99L0KAAkZ5/0MsCt02olwEV2RpD9IQYi/h
+         kqSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680156331;
+        d=1e100.net; s=20210112; t=1680156329;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3IPXOF71xhyJEtqQ3Z98VllJlolVRDwWUwDqo2jNXHo=;
-        b=srU9lTfCdOXeNdZxpfvaBjx73ApBASZ13yUEgOzTX64RDA6QCkmz9k/7U3QKoISp8o
-         W7JdL/r1GPffq1XGx0iPBCchqd0rHkeiqs7TbPAsM8tqjkDYAaiiOZpGhQzW9BLmZPx8
-         8V+Dyj7esCosrrh8SNcEJuCPKrvEcJtJr5wqJ3M4Gi+RWxiBWkI3X0q9Vyh30ueeXjxv
-         OgpqH7usaEekTfgk1y2tyNY0k63eG+gn+lfm9zGTm/loXKkmhfOVKB/ywUkVPds/2aVd
-         J40S3yO4PBwTHIJOzx5KyshY59gfO6oItgMEWcwGNx4J0Jbs3p9pSqLkY0pBSy4Zh0y+
-         pmKA==
-X-Gm-Message-State: AAQBX9fzmZCnd4/B4Uxs2behZ5rmN5jlesOZvg5zjXrZvuC5FPOKuoxK
-        woTrk88DEPCGCNYQerM+FzS3ldXLrhWA9g==
-X-Google-Smtp-Source: AKy350Ymcg4w/g2wSAcLxooGhAl1H3npi/oStK8CaFgkf+a/KCg3Ivngm5jyRNcMN8ZTdNEfsgXG2vqkJDuU+Q==
+        bh=TK8Pqe0H+wW+YnvKs1zy8YAiRGfAiSTpV51i3utUysc=;
+        b=fmXkuOv92G55fznvANnq8QNgtylFe7cegesX4dzNbg8VOBeX0ATndxLj2uj6SAL63v
+         wrXPpxNqxGW+2UXPu8TmGcB/m4jFb/X3uHnvuht4KR9RZsBq/oSa4bYydFaRIiiy8158
+         swR5AkCEC+uz8tNtC0DRAsGkN7Vm3VZLnAUF/+S5Rgr+yuf+2xrhneE51/4PzgSwJVPj
+         MN5D+I7j9SCWXJ5j3pAt53JgzyTeDahwyN5uMPIZqMYAq88V/sA8Sw9vF82zE20UbcNZ
+         9nRNNQmATBkMfIHegs8/66Amz0IQrK/X1ee/88FjSNd1PpX+DZRbefvMo9PZs/8s6ibV
+         WC+g==
+X-Gm-Message-State: AAQBX9fo5ITu0BESlvuVlHOz71fPbIJgYVkU4ZCawfoXzx5QCkfd8n3i
+        8FufsEl5zWI3v0+lzxnxTLCGW/fh95rG2Q==
+X-Google-Smtp-Source: AKy350YnWaimCIE2Mx4jWxiWQLtr5mH+8xCn8mMe0yJOvKHm6H7Mlqt6rlBVmVI2CSR1RraVtGW0Mt82HYmH3w==
 X-Received: from mmandlik-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:2893])
- (user=mmandlik job=sendgmr) by 2002:a25:e08a:0:b0:b72:fff0:2f7f with SMTP id
- x132-20020a25e08a000000b00b72fff02f7fmr3211068ybg.4.1680156331464; Wed, 29
- Mar 2023 23:05:31 -0700 (PDT)
-Date:   Wed, 29 Mar 2023 23:05:22 -0700
+ (user=mmandlik job=sendgmr) by 2002:a05:6a00:2d1d:b0:61c:67d2:a332 with SMTP
+ id fa29-20020a056a002d1d00b0061c67d2a332mr2559597pfb.3.1680156329537; Wed, 29
+ Mar 2023 23:05:29 -0700 (PDT)
+Date:   Wed, 29 Mar 2023 23:05:21 -0700
 In-Reply-To: <20230329230447.v12.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
 Mime-Version: 1.0
 References: <20230329230447.v12.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
 X-Mailer: git-send-email 2.40.0.348.gf938b09366-goog
-Message-ID: <20230329230447.v12.3.I8cd97c192e8268567b6f467ccd993ec71897318e@changeid>
-Subject: [PATCH v12 3/4] Bluetooth: btusb: Add btusb devcoredump support
+Message-ID: <20230329230447.v12.2.Ief9a81a3643d2291f6db2b3695c3a6e0159467dc@changeid>
+Subject: [PATCH v12 2/4] Bluetooth: Add vhci devcoredump support
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
         linux-bluetooth@vger.kernel.org,
         Manish Mandlik <mmandlik@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -67,62 +66,148 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch implements the btusb driver side .coredump() callback to
-trigger a devcoredump via sysfs.
+Add devcoredump support for vhci that creates forcce_devcoredump debugfs
+entry. This is used for mgmt-tester tests.
 
 Signed-off-by: Manish Mandlik <mmandlik@google.com>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 ---
 
-(no changes since v6)
+Changes in v12:
+- Rename force_devcoredump_write() to force_devcd_write()
+- Update force_devcd_write() to handle coredump state and timeout
 
-Changes in v6:
-- Remove dev->coredump_disabled check since the sysfs flag related
-  change has been abandoned
+Changes in v9:
+- Rename hci_devcoredump_*() to hci_devcd_*()
 
-Changes in v4:
+Changes in v8:
+- Update vhci_coredump_hdr() to use skb
+
+Changes in v7:
 - New patch in the series
 
- drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/bluetooth/Kconfig    |  1 +
+ drivers/bluetooth/hci_vhci.c | 89 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 90 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4ca91c033d2f..9c9f7bf1375a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4385,6 +4385,17 @@ static int btusb_resume(struct usb_interface *intf)
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 5a1a7bec3c42..7bc7a765ad69 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -363,6 +363,7 @@ config BT_HCIBLUECARD
+ 
+ config BT_HCIVHCI
+ 	tristate "HCI VHCI (Virtual HCI device) driver"
++	select WANT_DEV_COREDUMP
+ 	help
+ 	  Bluetooth Virtual HCI device driver.
+ 	  This driver is required if you want to use HCI Emulation software.
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index c443c3b0a4da..3aaf9a64ffe9 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -278,6 +278,92 @@ static int vhci_setup(struct hci_dev *hdev)
+ 	return 0;
  }
- #endif
  
-+#ifdef CONFIG_DEV_COREDUMP
-+static void btusb_coredump(struct device *dev)
++static void vhci_coredump(struct hci_dev *hdev)
 +{
-+	struct btusb_data *data = dev_get_drvdata(dev);
-+	struct hci_dev *hdev = data->hdev;
-+
-+	if (hdev->dump.coredump)
-+		hdev->dump.coredump(hdev);
++	/* No need to do anything */
 +}
-+#endif
 +
- static struct usb_driver btusb_driver = {
- 	.name		= "btusb",
- 	.probe		= btusb_probe,
-@@ -4396,6 +4407,14 @@ static struct usb_driver btusb_driver = {
- 	.id_table	= btusb_table,
- 	.supports_autosuspend = 1,
- 	.disable_hub_initiated_lpm = 1,
++static void vhci_coredump_hdr(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	char buf[80];
 +
-+#ifdef CONFIG_DEV_COREDUMP
-+	.drvwrap = {
-+		.driver = {
-+			.coredump = btusb_coredump,
-+		},
-+	},
-+#endif
- };
++	snprintf(buf, sizeof(buf), "Controller Name: vhci_ctrl\n");
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Firmware Version: vhci_fw\n");
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Driver: vhci_drv\n");
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Vendor: vhci\n");
++	skb_put_data(skb, buf, strlen(buf));
++}
++
++#define MAX_COREDUMP_LINE_LEN	40
++
++struct devcoredump_test_data {
++	enum devcoredump_state state;
++	unsigned int timeout;
++	char data[MAX_COREDUMP_LINE_LEN];
++};
++
++static ssize_t force_devcd_write(struct file *file, const char __user *user_buf,
++				 size_t count, loff_t *ppos)
++{
++	struct vhci_data *data = file->private_data;
++	struct hci_dev *hdev = data->hdev;
++	struct sk_buff *skb = NULL;
++	struct devcoredump_test_data dump_data;
++	int ret;
++
++	ret = simple_write_to_buffer(&dump_data, sizeof(dump_data), ppos,
++				     user_buf, count);
++	if (ret < count)
++		return ret;
++
++	skb = alloc_skb(sizeof(dump_data.data), GFP_ATOMIC);
++	if (!skb)
++		return -ENOMEM;
++	skb_put_data(skb, &dump_data.data, sizeof(dump_data.data));
++
++	hci_devcd_register(hdev, vhci_coredump, vhci_coredump_hdr, NULL);
++
++	/* Force the devcoredump timeout */
++	if (dump_data.timeout)
++		hdev->dump.timeout = msecs_to_jiffies(dump_data.timeout * 1000);
++
++	ret = hci_devcd_init(hdev, skb->len);
++	if (ret) {
++		BT_ERR("Failed to generate devcoredump");
++		kfree_skb(skb);
++		return ret;
++	}
++
++	hci_devcd_append(hdev, skb);
++
++	switch (dump_data.state) {
++	case HCI_DEVCOREDUMP_DONE:
++		hci_devcd_complete(hdev);
++		break;
++	case HCI_DEVCOREDUMP_ABORT:
++		hci_devcd_abort(hdev);
++		break;
++	case HCI_DEVCOREDUMP_TIMEOUT:
++		/* Do nothing */
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return count;
++}
++
++static const struct file_operations force_devcoredump_fops = {
++	.open		= simple_open,
++	.write		= force_devcd_write,
++};
++
+ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	struct hci_dev *hdev;
+@@ -355,6 +441,9 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
+ 				    &aosp_capable_fops);
  
- module_usb_driver(btusb_driver);
++	debugfs_create_file("force_devcoredump", 0644, hdev->debugfs, data,
++			    &force_devcoredump_fops);
++
+ 	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
+ 
+ 	skb_put_u8(skb, 0xff);
 -- 
 2.40.0.348.gf938b09366-goog
 
