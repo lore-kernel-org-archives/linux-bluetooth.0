@@ -2,133 +2,94 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD1CC761A6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 17:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0E5C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 18:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231984AbjC3RhT (ORCPT
+        id S231825AbjC3SK1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 13:37:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45080 "EHLO
+        Thu, 30 Mar 2023 14:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbjC3RhS (ORCPT
+        with ESMTP id S231591AbjC3SK0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 13:37:18 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051A06A47
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 10:37:16 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id o2so18780229plg.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 10:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680197835;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XKxR0ke/9a+HSZfus2glwVFIqwqQSdRmUgmFCpRJ4J8=;
-        b=cSrknreOdSz0G1J5dKnA3GOm2VpDcEyysbb6mZMgZhIArRaIZRBmn9ahpthQ0ZWjVV
-         hsPAu35iAeKwwb1Dtcnt/6JTkUWemKOWUwJ1YDE7eZAPsiruQH9BI5JyCg4Sdix2p14f
-         nojjjU205WVeA/dFmQCwiFAUd29MhWKcwYTrE9v4Lu49AIszvmEi0LYn5uqaIg6IBVCU
-         C2wtazSGbA2dZnsGyq1CNMIsLalnMKlfenrfspiEL8BHt3k8XhvlZflltdMAjfMYOeWT
-         baCnN0eprSJ2qrXlFHjtqRBTjvt55MzGOb6wyEOU1/Vbi+tRnRoQ0vy3GUZX4psr8rhP
-         2hlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680197835;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XKxR0ke/9a+HSZfus2glwVFIqwqQSdRmUgmFCpRJ4J8=;
-        b=HSvA1i4Nzpu4WbcLnyPOrKl7mMLboWKw9QdDtWtr3AGkYz82Jo083JhYS+tzlzzzOK
-         XdNol5GP00lNSpE2vmZFhMME+/yvPNwALbw0btBokYpz7ke9UUU/uUyETDMlV8H3ST3o
-         6Baq9fRsKv6SCyE8WKJdYBV8gtvb4dUYW1Jqel2PpHiAchekqIke1kqRC7MYDER99yhS
-         nu0iLXVztnJP97RVDC+C5bGKwDx1ufILXlEfyV4YY51PZDrRL66AagVnO/oC6y5ule25
-         7EsoxVpJzFmqMxagl7YsH2n0ib5X1JGvjGF0OTLofuDXtIhJEEAF75we9fbTq+SUFj/i
-         cZ2A==
-X-Gm-Message-State: AAQBX9emFPW9SMp0Qyj+hZQ05rv0IFWFMeAf5plYz+0XooPJVdbi/IBT
-        YviREx6N6FkwIXwLi7jCi0+lzFq3CJg=
-X-Google-Smtp-Source: AKy350ZtnQSIUoK2GMq+/+hYBYiEL1H5HglGYei9iCp9Er3dERMXxsqv63xDAxiXYg3ZQ0LuUaCt7w==
-X-Received: by 2002:a17:90b:3901:b0:23a:333c:6bab with SMTP id ob1-20020a17090b390100b0023a333c6babmr24814414pjb.23.1680197835126;
-        Thu, 30 Mar 2023 10:37:15 -0700 (PDT)
-Received: from [172.17.0.2] ([4.155.128.254])
-        by smtp.gmail.com with ESMTPSA id v8-20020a17090abb8800b002376d85844dsm3446332pjr.51.2023.03.30.10.37.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 10:37:14 -0700 (PDT)
-Message-ID: <6425c8ca.170a0220.b14ce.795e@mx.google.com>
-Date:   Thu, 30 Mar 2023 10:37:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2079418077757210386=="
+        Thu, 30 Mar 2023 14:10:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40FEEB6F;
+        Thu, 30 Mar 2023 11:10:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 446B16215E;
+        Thu, 30 Mar 2023 18:10:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 92F0EC433D2;
+        Thu, 30 Mar 2023 18:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680199824;
+        bh=DwOUP2sC5a3Y4i+2avGuq1jTgRQ93tyP+6+l0yyjMGQ=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=TS/hNse95qXp1BpIaZgmTsV36A/sDyd193Iup5fBfsBM7y27Yb48oCpRWuPZXo+Hj
+         xZWjCMNvgxBVViBn+e9AYfMdQ4b1zUmCiAgmratRyeX0qxDqSoyQbsUJuyXSW3B9TW
+         px4FCjGasOFGKHcLAGdtevEbRfiKWwcElEn/uh4pL2D4GFYWD9r19jab7fG/0Ie19g
+         oZ1kggYcxaCt2UMkFESG1yYC8u935PfPI6lW8w0mW/bYCwRiBrknGiUokAgwWbzKf4
+         Xnpe9ySB3sQPlwoVVXyhNtKRJCSS6bHp33HVuGzyBbAjkg3z+qcjfaXQKJ2mlPEE8y
+         ++e/ds7klCfnA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 781D6E2A037;
+        Thu, 30 Mar 2023 18:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mmandlik@google.com
-Subject: RE: [v13,1/4] Bluetooth: Add support for hci devcoredump
-In-Reply-To: <20230330095714.v13.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v13 1/4] Bluetooth: Add support for hci devcoredump
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <168019982448.20045.10207710004218277745.git-patchwork-notify@kernel.org>
+Date:   Thu, 30 Mar 2023 18:10:24 +0000
 References: <20230330095714.v13.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20230330095714.v13.1.I9b4e4818bab450657b19cda3497d363c9baa616e@changeid>
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org, abhishekpandit@chromium.org,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        johan.hedberg@gmail.com, pabeni@redhat.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2079418077757210386==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Thu, 30 Mar 2023 09:58:23 -0700 you wrote:
+> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> 
+> Add devcoredump APIs to hci core so that drivers only have to provide
+> the dump skbs instead of managing the synchronization and timeouts.
+> 
+> The devcoredump APIs should be used in the following manner:
+>  - hci_devcoredump_init is called to allocate the dump.
+>  - hci_devcoredump_append is called to append any skbs with dump data
+>    OR hci_devcoredump_append_pattern is called to insert a pattern.
+>  - hci_devcoredump_complete is called when all dump packets have been
+>    sent OR hci_devcoredump_abort is called to indicate an error and
+>    cancel an ongoing dump collection.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=735510
+Here is the summary with links:
+  - [v13,1/4] Bluetooth: Add support for hci devcoredump
+    (no matching commit)
+  - [v13,2/4] Bluetooth: Add vhci devcoredump support
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d5d5df6da0aa
+  - [v13,3/4] Bluetooth: btusb: Add btusb devcoredump support
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1078959dcb5c
+  - [v13,4/4] Bluetooth: btintel: Add Intel devcoredump support
+    https://git.kernel.org/bluetooth/bluetooth-next/c/0b93eeba4454
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      5.63 seconds
-GitLint                       PASS      0.95 seconds
-SubjectPrefix                 PASS      0.25 seconds
-BuildKernel                   PASS      42.58 seconds
-CheckAllWarning               PASS      45.59 seconds
-CheckSparse                   PASS      51.14 seconds
-CheckSmatch                   PASS      138.87 seconds
-BuildKernel32                 PASS      40.52 seconds
-TestRunnerSetup               PASS      567.89 seconds
-TestRunner_l2cap-tester       PASS      19.82 seconds
-TestRunner_iso-tester         PASS      21.31 seconds
-TestRunner_bnep-tester        PASS      6.96 seconds
-TestRunner_mgmt-tester        PASS      129.81 seconds
-TestRunner_rfcomm-tester      PASS      10.79 seconds
-TestRunner_sco-tester         PASS      9.99 seconds
-TestRunner_ioctl-tester       PASS      11.53 seconds
-TestRunner_mesh-tester        PASS      8.56 seconds
-TestRunner_smp-tester         PASS      9.61 seconds
-TestRunner_userchan-tester    PASS      7.10 seconds
-IncrementalBuild              PASS      57.88 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v13,1/4] Bluetooth: Add support for hci devcoredump
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#169: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 0 checks, 706 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13194617.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2079418077757210386==--
