@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9B7C761AF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9547C7619A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Mar 2023 22:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbjC3Wc0 (ORCPT
+        id S230248AbjC3WfT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Mar 2023 18:32:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55856 "EHLO
+        Thu, 30 Mar 2023 18:35:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230351AbjC3WcY (ORCPT
+        with ESMTP id S229914AbjC3WfS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Mar 2023 18:32:24 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E64FA1FE2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:32:23 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id h14so9259547ilj.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:32:23 -0700 (PDT)
+        Thu, 30 Mar 2023 18:35:18 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89139CC36
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:35:17 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id p13-20020a17090a284d00b0023d2e945aebso7328468pjf.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Mar 2023 15:35:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680215543;
+        d=gmail.com; s=20210112; t=1680215717;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=00bsa0r49DgCIT/+0ubVz+DWYGrxbpQAG5zM33RJn/4=;
-        b=GQCvmO/T9e/DHSfC3kSp5wX99ySErPjJXooizPkw2FeZP8FZgsAi2X5i2ufpeN7iss
-         5HBCoJDI0n5S+hzxDToc6BhQdVgiqLopRoBbkafRTQVs7kywE7Olp5RQkrVAh8yyJOJW
-         xGQIydU6WW5LQn0ObQX6IDQfk4Lgz1GaU5Wh1/sinnHEYAqf5+VMYUY5te69dvjbUxhi
-         FhsgutqEZg/5SxeQmgzfyUNS2NpEzMsDSF2uGK7QfyxUXq+6U5OHICHtAUnP3TKGLT67
-         KMi4ls02SYb52wODmcOF4HRJZXU+gJ/CHi1tqZ0GUdaBM3cbEM4/qgJ6Dko6DE4e+WVi
-         /GKA==
+        bh=kiqTa41MPraPy7GioPrXdcySruS43GWWP/WJhcbSPOY=;
+        b=fFVlH9kJJQbJ7rBJbMkhZo9jBJDsR/NmrIm+mtlgwymNnInKhcvPbKeVkS3wBRkIe+
+         8He35TSlp0vN5moMuOq8tbyLOYBJkgcWQV1pOjd6nQukFS8zF7OOuQtYj8u/kc2e7QYU
+         m21s14tnIGjGkL3cd4TrSP3m5jxUYdOVdIVnUUBRPPpMensfMxQaxHspP7+S+e9bcvCf
+         0OiaSdAIqXYABAkOYiwrVMs2kA1K+79Y0weOwA9JcW1ykkwoIxHJKSPDCdDvKAM1HqJk
+         1LVRI5YI5Y3mXbP1QYwVUUyM9IIm3AtjBks5Kw3NSXYfmip3PUUBS9AyBS7T/wJn4NLj
+         PG3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680215543;
+        d=1e100.net; s=20210112; t=1680215717;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=00bsa0r49DgCIT/+0ubVz+DWYGrxbpQAG5zM33RJn/4=;
-        b=jtzgfpRQPxsLK57qywowAjg+cQxaDLPXR+CeMBjGY85mhW5Lc1QMaqxBBv+hJH9k6P
-         hPSxtEePe4bCyL+HJz8NkiXFA/aTT0+0WbzaQiVnS1Nb+Tei8nOgybT779f/wMxRkHMQ
-         J/f2ubkso+ht5RToZCbFPCMDmi9lgy0Om7cvmZASI0i0gHVBsku/iQXqUVRHUgrD8sIR
-         dBnfjo4EcQFFnFSurZNQwnMRq5ihm3FsifFm2plJXLFzoXkHRaF4XelGjd0roMiQ3L6P
-         mBQJRVdjL9rR5Hi1hRqo0AHSKSZwKeRXChcX5yIiit4LDXMFUP8YrmYCbJJ/z7JA7VE2
-         Fpbg==
-X-Gm-Message-State: AAQBX9e5aN6f1lFnY03gz9sd6rUkEjF9jE4EDU39gX217+IqGUu7VAtl
-        to9HGYwpcIKKWp2mr6LCN4QKjRbhZso=
-X-Google-Smtp-Source: AKy350Z/5i7dhnbygkNxK9PctWlnz5/Q+n7dljPcfv7IizTODwe17PUDhMp4TqjwFtTv17IH5f873A==
-X-Received: by 2002:a05:6e02:4d0:b0:323:f2:920b with SMTP id f16-20020a056e0204d000b0032300f2920bmr9958552ils.31.1680215543122;
-        Thu, 30 Mar 2023 15:32:23 -0700 (PDT)
-Received: from [172.17.0.2] ([40.122.244.99])
-        by smtp.gmail.com with ESMTPSA id b21-20020a026f55000000b004061d6abcd2sm204376jae.146.2023.03.30.15.32.22
+        bh=kiqTa41MPraPy7GioPrXdcySruS43GWWP/WJhcbSPOY=;
+        b=O3afPZ91hChcdcv0XMBNX/0GtiU/yDQxXjvQQZxjb/ESBN1Dl5v1KCw/eIe0+Bbf3V
+         jSCicRluLHJfokk4ojqOf0dzv0A+WgibPg2uVldPAw8iE8SF0FgSCMQJEmo3ZBBda+lu
+         5zmCvN3xDziErEo4te9bbXaM+Qm2KuhKYmldK1OfXwMON0DsA81x/34GAYpdO/lFPug4
+         5J7YrAyT4lJBoKV9WvaW+MZYZy1kmkjZyGi++FZmmUx0EMxDOkoBYprt9D9XnaiLNt2Y
+         v3/srIjM2jGjYT8T3+k+lmcQtL9O3moYQM959Mh7O9M+rnzqlOhsyiYryo3XbAD9aTOE
+         qPxw==
+X-Gm-Message-State: AAQBX9cVBm0K39cT2cw84NlSrIOza2oFY4/2U8d3H1c9EQAX8U+/boLM
+        pQtvKOquEqnPEqZzfTP3UEglnfY7dew=
+X-Google-Smtp-Source: AKy350agrcXtjFpKB3ebuz7Rx6Kfj8YDSqhAqyyaA2cwT+r8Z1oWqV6dG0N7z0WRpiNh748W0af/fA==
+X-Received: by 2002:a17:903:6c4:b0:1a2:94bb:e104 with SMTP id kj4-20020a17090306c400b001a294bbe104mr2122253plb.39.1680215716773;
+        Thu, 30 Mar 2023 15:35:16 -0700 (PDT)
+Received: from [172.17.0.2] ([13.73.36.244])
+        by smtp.gmail.com with ESMTPSA id az3-20020a170902a58300b001a281063ab4sm194389plb.233.2023.03.30.15.35.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Mar 2023 15:32:22 -0700 (PDT)
-Message-ID: <64260df6.020a0220.97f0.05bb@mx.google.com>
-Date:   Thu, 30 Mar 2023 15:32:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4948436627167167686=="
+        Thu, 30 Mar 2023 15:35:16 -0700 (PDT)
+Message-ID: <64260ea4.170a0220.85086.0c37@mx.google.com>
+Date:   Thu, 30 Mar 2023 15:35:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7154400036246408784=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: Fix double free in hci_conn_cleanup
-In-Reply-To: <20230330220235.1035456-1-luiz.dentz@gmail.com>
-References: <20230330220235.1035456-1-luiz.dentz@gmail.com>
+Subject: RE: [1/2] Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm
+In-Reply-To: <20230330220332.1035910-2-luiz.dentz@gmail.com>
+References: <20230330220332.1035910-2-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4948436627167167686==
+--===============7154400036246408784==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,41 +75,51 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=735596
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=735600
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.75 seconds
-GitLint                       FAIL      0.53 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      31.29 seconds
-CheckAllWarning               PASS      34.91 seconds
-CheckSparse                   PASS      39.07 seconds
-CheckSmatch                   PASS      108.89 seconds
-BuildKernel32                 PASS      30.34 seconds
-TestRunnerSetup               PASS      435.71 seconds
-TestRunner_l2cap-tester       PASS      16.15 seconds
-TestRunner_iso-tester         PASS      15.63 seconds
-TestRunner_bnep-tester        PASS      5.10 seconds
-TestRunner_mgmt-tester        PASS      106.90 seconds
-TestRunner_rfcomm-tester      PASS      8.21 seconds
-TestRunner_sco-tester         PASS      7.51 seconds
-TestRunner_ioctl-tester       PASS      8.72 seconds
-TestRunner_mesh-tester        PASS      6.37 seconds
-TestRunner_smp-tester         PASS      7.38 seconds
-TestRunner_userchan-tester    PASS      5.29 seconds
-IncrementalBuild              PASS      28.65 seconds
+CheckPatch                    PASS      0.65 seconds
+GitLint                       FAIL      0.60 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      37.70 seconds
+CheckAllWarning               PASS      40.95 seconds
+CheckSparse                   WARNING   45.92 seconds
+CheckSmatch                   WARNING   125.20 seconds
+BuildKernel32                 PASS      36.44 seconds
+TestRunnerSetup               PASS      513.59 seconds
+TestRunner_l2cap-tester       PASS      17.98 seconds
+TestRunner_iso-tester         PASS      18.34 seconds
+TestRunner_bnep-tester        PASS      6.32 seconds
+TestRunner_mgmt-tester        PASS      121.86 seconds
+TestRunner_rfcomm-tester      PASS      9.78 seconds
+TestRunner_sco-tester         PASS      8.97 seconds
+TestRunner_ioctl-tester       PASS      10.44 seconds
+TestRunner_mesh-tester        PASS      7.75 seconds
+TestRunner_smp-tester         PASS      8.86 seconds
+TestRunner_userchan-tester    PASS      6.47 seconds
+IncrementalBuild              PASS      34.31 seconds
 
 Details
 ##############################
 Test: GitLint - FAIL
 Desc: Run gitlint
 Output:
-Bluetooth: Fix double free in hci_conn_cleanup
+[1/2] Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm
 
 WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-34: B1 Line exceeds max length (87>80): "Link: https://syzkaller.appspot.com/bug?id=1bb51491ca5df96a5f724899d1dbb87afda61419 [1]"
+1: T1 Title exceeds max length (81>80): "[1/2] Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm"
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:149:35: warning: array of flexible structures
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:149:35: warning: array of flexible structures
 
 
 ---
@@ -117,4 +127,4 @@ Regards,
 Linux Bluetooth
 
 
---===============4948436627167167686==--
+--===============7154400036246408784==--
