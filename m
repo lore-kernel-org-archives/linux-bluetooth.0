@@ -2,565 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A13EC76196
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Apr 2023 00:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3840C76196
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Apr 2023 02:15:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232712AbjDAARA (ORCPT
+        id S233368AbjDACPj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 31 Mar 2023 20:17:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47724 "EHLO
+        Fri, 31 Mar 2023 22:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbjDAAQ7 (ORCPT
+        with ESMTP id S232190AbjDACPi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 31 Mar 2023 20:16:59 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCCA418831
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Mar 2023 17:16:57 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id u10so22854358plz.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 Mar 2023 17:16:57 -0700 (PDT)
+        Fri, 31 Mar 2023 22:15:38 -0400
+Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7C2173F;
+        Fri, 31 Mar 2023 19:15:37 -0700 (PDT)
+Received: by mail-oo1-xc2a.google.com with SMTP id l7-20020a4abe07000000b0053e1205c84bso3442248oop.9;
+        Fri, 31 Mar 2023 19:15:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680308217;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=E4Np4iouivwzm0y/qWdmNxwHrYrzttupXKnEfFyspE8=;
-        b=kQ02HhrOgJ0R8awT4MyklivedIVGJokI/QoFAi1frZ1hi6E2jwLysmbNAJpt+gvseY
-         i2FdTU0WiPc6uBTfEiKeqM5kN16f17u0ytqrdYW8qBOYsxxTjxRtgzMYq4Eeg44VhdhB
-         0uWS8SYbY+EZlsgFUlAycXAdoEbhoO9et+D8D/BbkE2GPHR792wBF1vG0zQIuyuR0/Y7
-         wSGGSIR70EJGCP6xbZlO/ymyKP+6qTJHsvul7fh2qgY6SFEwUvG3uwaNLAgF6lOOjHfK
-         sHtUOdMu4ne5q6D9Fb2OeWOiwANligE6jF3Miw5ZA3Bvc2Ifpb2QAPidRIyqbtI40s2J
-         nfPA==
+        d=gmail.com; s=20210112; t=1680315336;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:sender:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=q/8ymO10OrcPxy/DHt31x8jIOet/Tm3AwxwojOGkYto=;
+        b=ph6ADDDnoaOjNUjFFidGxTStn8uMQf5BO3PYpXCo7BVeL0Uq+zdM81h6UqNEcQfnl4
+         9i8jzFXX05E6wj3bGVeUcg2SyFNXQSsfBrLEHwetQjTv2EJI4XZDRTKvFGqDVMRrJgTQ
+         +yLHpXMq6Wnwid5IDYaC1JoGSleN6d2MdCUA2giRUGRyVJ8hGV5xFivE2vC6JiClTZKf
+         2A4AozBA69I/SxzEPIaH3yTfq3MhpK4rDmx4FqK9aYRT5r881Cqezyb92IQBN9nRYxek
+         E9lBtofYFdrgWTdoe9hYM+0zF38ePlQX153l7+jBCrrsd2peJ7DWnoaOP1MYQKC7dcg/
+         TGXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680308217;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E4Np4iouivwzm0y/qWdmNxwHrYrzttupXKnEfFyspE8=;
-        b=zoTuV4XE22G8HeqYPZmYVk2cdJXFWPugeOYbO20RF2Gjcf34EurRo1l2k/kjd+BOMH
-         DPkI4E0dH0WoYPpEN2oJR3Z/0sY+ALaV3R5iT/jOgkl0eWVExx8xvJeLEDShIsqrq5lS
-         /ZY5qQc6eQWY9c6InEYeNuFz+fDd9a9w0zZlkpibJwzoRJoS5SvOCyFVwxToRyy4J1z7
-         zvsfuI3TyPuXcQzOZI0Mpus78U/B30ty/axJhRsZzSEGbwD33S9awUJpc0eKMwOWEVJx
-         Zd7MCjiw1jLSz5BTdFB0DO2VN/ELD+6yRDHYADBM/ZznROwNXRyYLNswa/g0aUxqFBdj
-         VczQ==
-X-Gm-Message-State: AAQBX9ekg9yRHzazX028ZM3ABleyzswLjT/tWx2x/qKT5BrkGbm6XHGv
-        pJcBw6e8khRbYPSWvW3QhN5Xnu83/cUzlcwW
-X-Google-Smtp-Source: AKy350aR0uFzIro2Dh4tFaZyu7e1VVXmB/rY8E8CujOKtbNVetN+g1uYEIf1eqOdDkG/MHebgfwbYg==
-X-Received: by 2002:a17:902:d2d2:b0:1a0:6ed9:f9d0 with SMTP id n18-20020a170902d2d200b001a06ed9f9d0mr36852479plc.68.1680308216958;
-        Fri, 31 Mar 2023 17:16:56 -0700 (PDT)
-Received: from fedora.. (c-67-170-58-107.hsd1.wa.comcast.net. [67.170.58.107])
-        by smtp.googlemail.com with ESMTPSA id f19-20020a170902e99300b0019acd3151d0sm2109677plb.114.2023.03.31.17.16.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Mar 2023 17:16:56 -0700 (PDT)
-From:   Inga Stotland <inga.stotland@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@gmail.com, Inga Stotland <inga.stotland@gmail.com>
-Subject: [PATCH BlueZ v2] mesh: Tighten IO and fix out-of-bounds array access
-Date:   Fri, 31 Mar 2023 17:16:02 -0700
-Message-Id: <20230401001602.4161-1-inga.stotland@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20210112; t=1680315336;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:sender:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q/8ymO10OrcPxy/DHt31x8jIOet/Tm3AwxwojOGkYto=;
+        b=hO9/mCl8AJRI1TmVYwaEBnwbMgYRRDV9tS8bA8MtZjRmB8WGO+AZzAp+fXEfh9KI+F
+         7IjdaF4YBA+tx7cvWIjGRGTGgPYWO8kxTfVPkaZcyFJwVF6wcgYlJpbDuCMj8eMnjPOw
+         CoYIpaQpJYbaC3SE1gQYsPpA60bT0Bnd0/O2YNcG6NfWz3A8Laz8WHbxovmrYQDDQvEm
+         iD+f/3nV35CqZVzx/io2x2Ylz1djKuDG+oYELSKrLHfTvFdJpHADZf0JFAtPfli5sKvw
+         Z0SrmqxB28IvqiwMV/OKOLj7zybp8votKX3a/LyjKpnpcX43p85t+hQln22nSM6xb35J
+         jsFw==
+X-Gm-Message-State: AO0yUKVuMMYX+A4b+kDVl+DoSinIdUKvPJIpIT4qiteqSw6d5gisY08M
+        ILqVqhMkTIGBVAdXH+fbDfw=
+X-Google-Smtp-Source: AK7set/3X0UzE4r/LU1M6wlPxrr/tc4E5y7l+AWtSHmUMu9/UvwZ5HyWLlFHItScb3EgBaGftdUmoA==
+X-Received: by 2002:a4a:498a:0:b0:525:129c:6165 with SMTP id z132-20020a4a498a000000b00525129c6165mr14533749ooa.6.1680315336770;
+        Fri, 31 Mar 2023 19:15:36 -0700 (PDT)
+Received: from [192.168.0.116] ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id v184-20020acadec1000000b003871471f894sm1612227oig.27.2023.03.31.19.15.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Mar 2023 19:15:36 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <3e3d0ea7-4c85-f432-6e34-1d90b991c53c@lwfinger.net>
+Date:   Fri, 31 Mar 2023 21:15:35 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.0
+Content-Language: en-US
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+Subject: Memory leaks in Bluetooth and btusb
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the out-of-bounds array access in mesh-io-mgmt.c caught
-by address sanitizer. Similar fixes were applied earlier to
-generic and unit IOs. With this patch, the common code is factored
-into a centralized location.
----
- mesh/mesh-io-api.h     |  7 +++++
- mesh/mesh-io-generic.c | 70 ++++++------------------------------------
- mesh/mesh-io-mgmt.c    | 56 ++++-----------------------------
- mesh/mesh-io-unit.c    | 30 ------------------
- mesh/mesh-io.c         | 45 ++++++++++++++++-----------
- mesh/mesh-io.h         |  2 --
- 6 files changed, 50 insertions(+), 160 deletions(-)
+Hi,
 
-diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
-index 21c505cd0..ae51cbc55 100644
---- a/mesh/mesh-io-api.h
-+++ b/mesh/mesh-io-api.h
-@@ -34,6 +34,13 @@ struct mesh_io_api {
- 	mesh_io_tx_cancel_t	cancel;
- };
- 
-+struct mesh_io_reg {
-+	mesh_io_recv_func_t cb;
-+	void *user_data;
-+	uint8_t len;
-+	uint8_t filter[];
-+};
-+
- struct mesh_io {
- 	int				index;
- 	int				favored_index;
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 827128ec8..93a56275b 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -33,7 +33,6 @@ struct mesh_io_private {
- 	struct mesh_io *io;
- 	struct bt_hci *hci;
- 	struct l_timeout *tx_timeout;
--	struct l_queue *rx_regs;
- 	struct l_queue *tx_pkts;
- 	struct tx_pkt *tx;
- 	uint16_t interval;
-@@ -41,13 +40,6 @@ struct mesh_io_private {
- 	bool active;
- };
- 
--struct pvt_rx_reg {
--	mesh_io_recv_func_t cb;
--	void *user_data;
--	uint8_t len;
--	uint8_t filter[0];
--};
--
- struct process_data {
- 	struct mesh_io_private		*pvt;
- 	const uint8_t			*data;
-@@ -87,7 +79,7 @@ static uint32_t instant_remaining_ms(uint32_t instant)
- 
- static void process_rx_callbacks(void *v_reg, void *v_rx)
- {
--	struct pvt_rx_reg *rx_reg = v_reg;
-+	struct mesh_io_reg *rx_reg = v_reg;
- 	struct process_data *rx = v_rx;
- 
- 	if (!memcmp(rx->data, rx_reg->filter, rx_reg->len))
-@@ -108,7 +100,7 @@ static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
- 		.info.rssi = rssi,
- 	};
- 
--	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
-+	l_queue_foreach(pvt->io->rx_regs, process_rx_callbacks, &rx);
- }
- 
- static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
-@@ -354,7 +346,7 @@ static bool find_by_pattern(const void *a, const void *b)
- 
- static bool find_active(const void *a, const void *b)
- {
--	const struct pvt_rx_reg *rx_reg = a;
-+	const struct mesh_io_reg *rx_reg = a;
- 
- 	/* Mesh specific AD types do *not* require active scanning,
- 	 * so do not turn on Active Scanning on their account.
-@@ -370,10 +362,10 @@ static void restart_scan(struct mesh_io_private *pvt)
- {
- 	struct bt_hci_cmd_le_set_scan_enable cmd;
- 
--	if (l_queue_isempty(pvt->rx_regs))
-+	if (l_queue_isempty(pvt->io->rx_regs))
- 		return;
- 
--	pvt->active = l_queue_find(pvt->rx_regs, find_active, NULL);
-+	pvt->active = l_queue_find(pvt->io->rx_regs, find_active, NULL);
- 	cmd.enable = 0x00;	/* Disable scanning */
- 	cmd.filter_dup = 0x00;	/* Report duplicates */
- 	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-@@ -417,7 +409,6 @@ static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
- 
- 	io->pvt = l_new(struct mesh_io_private, 1);
- 
--	io->pvt->rx_regs = l_queue_new();
- 	io->pvt->tx_pkts = l_queue_new();
- 
- 	io->pvt->io = io;
-@@ -436,7 +427,6 @@ static bool dev_destroy(struct mesh_io *io)
- 
- 	bt_hci_unref(pvt->hci);
- 	l_timeout_remove(pvt->tx_timeout);
--	l_queue_destroy(pvt->rx_regs, l_free);
- 	l_queue_remove_if(pvt->tx_pkts, simple_match, pvt->tx);
- 	l_queue_destroy(pvt->tx_pkts, l_free);
- 	l_free(pvt->tx);
-@@ -726,7 +716,7 @@ static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
- 		l_queue_push_tail(pvt->tx_pkts, tx);
- 	}
- 
--    /* If not already sending, schedule the tx worker */
-+	/* If not already sending, schedule the tx worker */
- 	if (!pvt->tx) {
- 		l_timeout_remove(pvt->tx_timeout);
- 		pvt->tx_timeout = NULL;
-@@ -780,46 +770,18 @@ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
- 	return true;
- }
- 
--static bool find_by_filter(const void *a, const void *b)
--{
--	const struct pvt_rx_reg *rx_reg_old = a;
--	const struct pvt_rx_reg *rx_reg = b;
--
--	if (rx_reg_old->len != rx_reg->len)
--		return false;
--
--	return !memcmp(rx_reg_old->filter, rx_reg->filter, rx_reg->len);
--}
--
- static bool recv_register(struct mesh_io *io, const uint8_t *filter,
- 			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
- {
- 	struct bt_hci_cmd_le_set_scan_enable cmd;
- 	struct mesh_io_private *pvt = io->pvt;
--	struct pvt_rx_reg *rx_reg, *rx_reg_old;
- 	bool already_scanning;
- 	bool active = false;
- 
--	if (!cb || !filter || !len)
--		return false;
--
--	rx_reg = l_malloc(sizeof(*rx_reg) + len);
--
--	memcpy(rx_reg->filter, filter, len);
--	rx_reg->len = len;
--	rx_reg->cb = cb;
--	rx_reg->user_data = user_data;
--
--	rx_reg_old = l_queue_remove_if(pvt->rx_regs, find_by_filter, rx_reg);
--
--	l_free(rx_reg_old);
--
--	already_scanning = !l_queue_isempty(pvt->rx_regs);
--
--	l_queue_push_head(pvt->rx_regs, rx_reg);
-+	already_scanning = !l_queue_isempty(io->rx_regs);
- 
- 	/* Look for any AD types requiring Active Scanning */
--	if (l_queue_find(pvt->rx_regs, find_active, NULL))
-+	if (l_queue_find(io->rx_regs, find_active, NULL))
- 		active = true;
- 
- 	if (!already_scanning || pvt->active != active) {
-@@ -839,25 +801,13 @@ static bool recv_deregister(struct mesh_io *io, const uint8_t *filter,
- {
- 	struct bt_hci_cmd_le_set_scan_enable cmd = {0, 0};
- 	struct mesh_io_private *pvt = io->pvt;
--	struct pvt_rx_reg *rx_reg, *rx_reg_tmp;
- 	bool active = false;
- 
--	rx_reg_tmp = l_malloc(sizeof(*rx_reg_tmp) + len);
--	memcpy(&rx_reg_tmp->filter, filter, len);
--	rx_reg_tmp->len = len;
--
--	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, rx_reg_tmp);
--
--	if (rx_reg)
--		l_free(rx_reg);
--
--	l_free(rx_reg_tmp);
--
- 	/* Look for any AD types requiring Active Scanning */
--	if (l_queue_find(pvt->rx_regs, find_active, NULL))
-+	if (l_queue_find(io->rx_regs, find_active, NULL))
- 		active = true;
- 
--	if (l_queue_isempty(pvt->rx_regs)) {
-+	if (l_queue_isempty(io->rx_regs)) {
- 		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
- 					&cmd, sizeof(cmd), NULL, NULL, NULL);
- 
-diff --git a/mesh/mesh-io-mgmt.c b/mesh/mesh-io-mgmt.c
-index 5f51f3a1f..5f0eb206b 100644
---- a/mesh/mesh-io-mgmt.c
-+++ b/mesh/mesh-io-mgmt.c
-@@ -37,7 +37,6 @@ struct mesh_io_private {
- 	struct l_timeout *tx_timeout;
- 	struct l_timeout *dup_timeout;
- 	struct l_queue *dup_filters;
--	struct l_queue *rx_regs;
- 	struct l_queue *tx_pkts;
- 	struct tx_pkt *tx;
- 	unsigned int tx_id;
-@@ -49,13 +48,6 @@ struct mesh_io_private {
- 	bool active;
- };
- 
--struct pvt_rx_reg {
--	mesh_io_recv_func_t cb;
--	void *user_data;
--	uint8_t len;
--	uint8_t filter[0];
--};
--
- struct process_data {
- 	struct mesh_io_private		*pvt;
- 	const uint8_t			*data;
-@@ -198,7 +190,7 @@ static bool filter_dups(const uint8_t *addr, const uint8_t *adv,
- 
- static void process_rx_callbacks(void *v_reg, void *v_rx)
- {
--	struct pvt_rx_reg *rx_reg = v_reg;
-+	struct mesh_io_reg *rx_reg = v_reg;
- 	struct process_data *rx = v_rx;
- 
- 	if (!memcmp(rx->data, rx_reg->filter, rx_reg->len))
-@@ -224,7 +216,7 @@ static void process_rx(uint16_t index, struct mesh_io_private *pvt, int8_t rssi,
- 		return;
- 
- 	print_packet("RX", data, len);
--	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
-+	l_queue_foreach(pvt->io->rx_regs, process_rx_callbacks, &rx);
- }
- 
- static void send_cmplt(uint16_t index, uint16_t length,
-@@ -303,7 +295,7 @@ static bool find_by_pattern(const void *a, const void *b)
- 
- static bool find_active(const void *a, const void *b)
- {
--	const struct pvt_rx_reg *rx_reg = a;
-+	const struct mesh_io_reg *rx_reg = a;
- 
- 	/* Mesh specific AD types do *not* require active scanning,
- 	 * so do not turn on Active Scanning on their account.
-@@ -447,7 +439,6 @@ static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
- 				read_info_cb, L_UINT_TO_PTR(index), NULL);
- 
- 	pvt->dup_filters = l_queue_new();
--	pvt->rx_regs = l_queue_new();
- 	pvt->tx_pkts = l_queue_new();
- 
- 	pvt->io = io;
-@@ -456,14 +447,6 @@ static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
- 	return true;
- }
- 
--static void free_rx_reg(void *user_data)
--{
--	struct pvt_rx_reg *rx_reg = user_data;
--
--	l_free(rx_reg);
--}
--
--
- static bool dev_destroy(struct mesh_io *io)
- {
- 	unsigned char param[] = { 0x00 };
-@@ -479,7 +462,6 @@ static bool dev_destroy(struct mesh_io *io)
- 	l_timeout_remove(pvt->tx_timeout);
- 	l_timeout_remove(pvt->dup_timeout);
- 	l_queue_destroy(pvt->dup_filters, l_free);
--	l_queue_destroy(pvt->rx_regs, free_rx_reg);
- 	l_queue_destroy(pvt->tx_pkts, l_free);
- 	io->pvt = NULL;
- 	l_free(pvt);
-@@ -751,37 +733,16 @@ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
- 	return true;
- }
- 
--static bool find_by_filter(const void *a, const void *b)
--{
--	const struct pvt_rx_reg *rx_reg = a;
--	const uint8_t *filter = b;
--
--	return !memcmp(rx_reg->filter, filter, rx_reg->len);
--}
--
- static bool recv_register(struct mesh_io *io, const uint8_t *filter,
- 			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
- {
--	struct pvt_rx_reg *rx_reg;
- 	bool active = false;
- 
--	if (!cb || !filter || !len || io->pvt != pvt)
-+	if (io->pvt != pvt)
- 		return false;
- 
--	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
--
--	free_rx_reg(rx_reg);
--	rx_reg = l_malloc(sizeof(*rx_reg) + len);
--
--	memcpy(rx_reg->filter, filter, len);
--	rx_reg->len = len;
--	rx_reg->cb = cb;
--	rx_reg->user_data = user_data;
--
--	l_queue_push_head(pvt->rx_regs, rx_reg);
--
- 	/* Look for any AD types requiring Active Scanning */
--	if (l_queue_find(pvt->rx_regs, find_active, NULL))
-+	if (l_queue_find(io->rx_regs, find_active, NULL))
- 		active = true;
- 
- 	if (pvt->active != active) {
-@@ -795,18 +756,13 @@ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
- static bool recv_deregister(struct mesh_io *io, const uint8_t *filter,
- 								uint8_t len)
- {
--	struct pvt_rx_reg *rx_reg;
- 	bool active = false;
- 
- 	if (io->pvt != pvt)
- 		return false;
- 
--	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
--
--	free_rx_reg(rx_reg);
--
- 	/* Look for any AD types requiring Active Scanning */
--	if (l_queue_find(pvt->rx_regs, find_active, NULL))
-+	if (l_queue_find(io->rx_regs, find_active, NULL))
- 		active = true;
- 
- 	if (active != pvt->active) {
-diff --git a/mesh/mesh-io-unit.c b/mesh/mesh-io-unit.c
-index f4f619803..a9fa53308 100644
---- a/mesh/mesh-io-unit.c
-+++ b/mesh/mesh-io-unit.c
-@@ -485,39 +485,9 @@ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
- 	return true;
- }
- 
--static bool find_by_filter(const void *a, const void *b)
--{
--	const struct pvt_rx_reg *rx_reg_old = a;
--	const struct pvt_rx_reg *rx_reg = b;
--
--	if (rx_reg_old->len != rx_reg->len)
--		return false;
--
--	return !memcmp(rx_reg_old->filter, rx_reg->filter, rx_reg->len);
--}
--
- static bool recv_register(struct mesh_io *io, const uint8_t *filter,
- 			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
- {
--	struct mesh_io_private *pvt = io->pvt;
--	struct pvt_rx_reg *rx_reg, *rx_reg_old;
--
--	if (!cb || !filter || !len)
--		return false;
--
--	rx_reg = l_malloc(sizeof(*rx_reg) + len);
--
--	memcpy(rx_reg->filter, filter, len);
--	rx_reg->len = len;
--	rx_reg->cb = cb;
--	rx_reg->user_data = user_data;
--
--	rx_reg_old = l_queue_remove_if(pvt->rx_regs, find_by_filter, rx_reg);
--
--	l_free(rx_reg_old);
--
--	l_queue_push_head(pvt->rx_regs, rx_reg);
--
- 	return true;
- }
- 
-diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
-index 3e68dc090..48e3f4226 100644
---- a/mesh/mesh-io.c
-+++ b/mesh/mesh-io.c
-@@ -28,13 +28,6 @@
- #include "mesh/mesh-io-generic.h"
- #include "mesh/mesh-io-unit.h"
- 
--struct mesh_io_reg {
--	mesh_io_recv_func_t cb;
--	void *user_data;
--	uint8_t len;
--	uint8_t filter[];
--} packed;
--
- struct loop_data {
- 	uint16_t len;
- 	uint8_t data[];
-@@ -104,7 +97,6 @@ static void ctl_alert(int index, bool up, bool pwr, bool mesh, void *user_data)
- 
- 	if (mesh && type != MESH_IO_TYPE_GENERIC)
- 		api = io_api(MESH_IO_TYPE_MGMT);
--
- 	else if (!pwr)
- 		api = io_api(MESH_IO_TYPE_GENERIC);
- 
-@@ -130,6 +122,23 @@ static void free_io(struct mesh_io *io)
- 	}
- }
- 
-+static struct mesh_io_reg *find_by_filter(struct l_queue *rx_regs,
-+					const uint8_t *filter, uint8_t len)
-+{
-+	const struct l_queue_entry *entry;
-+
-+	entry = l_queue_get_entries(rx_regs);
-+
-+	for (; entry; entry = entry->next) {
-+		struct mesh_io_reg *rx_reg = entry->data;
-+
-+		if (rx_reg->len == len && !memcmp(rx_reg->filter, filter, len))
-+			return rx_reg;
-+	}
-+
-+	return NULL;
-+}
-+
- struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
- 				mesh_io_ready_func_t cb, void *user_data)
- {
-@@ -194,14 +203,20 @@ bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 	if (io == NULL)
- 		io = default_io;
- 
--	if (io != default_io)
-+	if (io != default_io || !cb || !filter || !len)
- 		return false;
- 
-+	rx_reg = find_by_filter(io->rx_regs, filter, len);
-+
-+	l_free(rx_reg);
-+	l_queue_remove(io->rx_regs, rx_reg);
-+
- 	rx_reg = l_malloc(sizeof(struct mesh_io_reg) + len);
- 	rx_reg->cb = cb;
- 	rx_reg->len = len;
- 	rx_reg->user_data = user_data;
- 	memcpy(rx_reg->filter, filter, len);
-+
- 	l_queue_push_head(io->rx_regs, rx_reg);
- 
- 	if (io && io->api && io->api->reg)
-@@ -210,14 +225,6 @@ bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 	return false;
- }
- 
--static bool by_filter(const void *a, const void *b)
--{
--	const struct mesh_io_reg *rx_reg = a;
--	const uint8_t *filter = b;
--
--	return rx_reg->filter[0] == filter[0];
--}
--
- bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 								uint8_t len)
- {
-@@ -226,7 +233,9 @@ bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 	if (io != default_io)
- 		return false;
- 
--	rx_reg = l_queue_remove_if(io->rx_regs, by_filter, filter);
-+	rx_reg = find_by_filter(io->rx_regs,  filter, len);
-+
-+	l_queue_remove(io->rx_regs, rx_reg);
- 	l_free(rx_reg);
- 
- 	if (io && io->api && io->api->dereg)
-diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
-index 9dd946cdf..f7711e786 100644
---- a/mesh/mesh-io.h
-+++ b/mesh/mesh-io.h
-@@ -8,8 +8,6 @@
-  *
-  */
- 
--struct mesh_io;
--
- #define MESH_IO_TX_COUNT_UNLIMITED	0
- 
- enum mesh_io_type {
--- 
-2.39.2
+I am running kernel 6.3.0-rc4-00041-g45a74775bbcd, and noticed the following 
+memory leaks:
 
+unreferenced object 0xffff9c8157f32800 (size 640):
+   comm "softirq", pid 0, jiffies 4303340208 (age 1378.908s)
+   hex dump (first 32 bytes):
+     6c 69 62 75 64 65 76 00 0e 0c 02 01 10 00 08 6b  libudev........k
+     ab 08 5d 00 5c 70 00 00 05 77 c5 e5 b1 02 47 65  ..].\p...w....Ge
+   backtrace:
+     [<ffffffff90103df9>] kmalloc_reserve+0x89/0xf0
+     [<ffffffff90105a43>] __alloc_skb+0x83/0x190
+     [<ffffffffc11111d1>] btusb_recv_intr+0x131/0x190 [btusb]
+     [<ffffffffc11112ca>] btusb_intr_complete+0x9a/0x150 [btusb]
+     [<ffffffffc0325321>] __usb_hcd_giveback_urb+0x91/0x110 [usbcore]
+     [<ffffffffc03254f4>] usb_giveback_urb_bh+0x94/0x110 [usbcore]
+     [<ffffffff8f8a66e8>] tasklet_action_common.isra.0+0xb8/0x130
+     [<ffffffff90302721>] __do_softirq+0xc1/0x298
+unreferenced object 0xffff9c811cb9e800 (size 224):
+   comm "kworker/u9:1", pid 15177, jiffies 4303340208 (age 1378.908s)
+   hex dump (first 32 bytes):
+     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+   backtrace:
+     [<ffffffff90108da5>] skb_clone+0x55/0xd0
+     [<ffffffffc126978f>] hci_event_packet+0xcf/0x550 [bluetooth]
+     [<ffffffffc124e9e6>] hci_rx_work+0x2a6/0x570 [bluetooth]
+     [<ffffffff8f8bfdf1>] process_one_work+0x201/0x410
+     [<ffffffff8f8c004a>] worker_thread+0x4a/0x3b0
+     [<ffffffff8f8c8587>] kthread+0xd7/0x100
+     [<ffffffff8f802dbf>] ret_from_fork+0x1f/0x30
+
+The Bluetooth device in question is from Realtek, and is part of a Realtek 
+RTW8822BU wifi/BT combination device.
+
+Thanks,
+
+Larry
