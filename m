@@ -2,196 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F618C76196
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Apr 2023 22:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1571C76188
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Apr 2023 23:35:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233700AbjDCWw3 (ORCPT
+        id S233254AbjDCXf5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Apr 2023 18:52:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58572 "EHLO
+        Mon, 3 Apr 2023 19:35:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233775AbjDCWwZ (ORCPT
+        with ESMTP id S231246AbjDCXf4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Apr 2023 18:52:25 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32EF444B6
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Apr 2023 15:52:17 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id c29so40059700lfv.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Apr 2023 15:52:17 -0700 (PDT)
+        Mon, 3 Apr 2023 19:35:56 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E5E1BE4
+        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Apr 2023 16:35:55 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id w15-20020a056830410f00b006a386a0568dso1246748ott.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Apr 2023 16:35:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680562335;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=strz1h1gIkGDKf+pPaTRaOhTqMwADov+KszjF2zM7PA=;
-        b=OOrU7Z9vy/zU5ZX+2qlu53SgqPN6rxtOfQTY+cvEJsZ4KXs+8qon58WIOuOXl1CJp1
-         Xb17lFZjoy3y/snNddT7R4OZAlJZKq55Em6/et8SSi0EUp6A88HcK2fqL3rsj2+wvQ/x
-         MgedARvlg8c0nWnieVDhWs6LsQRjsGMP9jpzrMkkFUPSsnS4smCW39xAP1qdejHnClB1
-         hVSVwHuTnXw1pai3i7RO3O59m7FLjKK1oiZn/G9RrgN6+2Ch2WNgZvTRwCi62HhatGmH
-         KjXDhhQ8D+8ilDb40UmUxdLOHLh/f3Y84rL59iVpSs/HnopptamNXRxRbu3hjDqGPbG9
-         f8aw==
+        d=gmail.com; s=20210112; t=1680564954;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+2SwUwNMrwzATWpx0IObIc6o4NNW0TwYVffKH2s8rqQ=;
+        b=eGEtsWdAXFsBVmmg5xcTuE57FGrDKeAmqDchxi3X/Tfo9YjlkX8xdFN7y8tCqgiizK
+         MAlw5uyLmua7sWtS+GFBq5jAOwOlIkD/9JezfO0whuwK6cMjG/MmRHs5u4NOyNnxgWrE
+         1cAJaRHFACevXIh6NHoQsn+zvOQ9uKiI2zyq8rk39rfnatlbzyV9U+uc/Lp+iTyXp8A5
+         e+ZRYP8BQPFnO7wONzwRWjzxa6q9hO4BLMGXyaDBHGDjF1U+gFy/q0wN3wlErLgLZQuL
+         4nTCXZIZutTe7ULJJEnIfxSoLjPsJyoxrKlycmg+f4+nNePJYqhvzLAOQzP1EEDVkMD6
+         g3SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680562335;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=strz1h1gIkGDKf+pPaTRaOhTqMwADov+KszjF2zM7PA=;
-        b=sZgFyh47mHPtf30EpCFlDi3Ch2OGUWu8UOuzg8t3/J9dbiO7ZyHAMJ3laAjWuLgBrO
-         SxOcN8R30Qe7ZP3YSzg2kOmBeBAexsctyYkDQYTHbDokiyvcYIgD/nk+KtmKc0O3QXQe
-         hBvNWJojXORUPJkeDe7MTX19AE4StofBwn1RUZXMAUMNPgKdPe5/OgB65q/u/KILOyd3
-         +UFQ4ibiXoZHuzh2o5JxdjU4f2TZA3nXeXMqm+AUkdQIb8UD9tVv4IabyMLvVouTmVya
-         CLj5aGNwb5fN+xHGI7/YZy0xtpccwRy/cg/8VwhWo90HeBYTDTmQUwmx+PDWn7vy3NYC
-         en7Q==
-X-Gm-Message-State: AAQBX9ccb6Vl2gPzGhJsMIdAhUATopLJHml6a4lhdlf1u11NcfhK72rt
-        1lyq2smZB9mv4XUZME0ja1UEQCyAK+C8UIeCe0LyuUY+
-X-Google-Smtp-Source: AKy350avR7R/a24VB7+5DL59sLE5rnOWYhyd47AE4Al46Wc1vrfNCJn0a9i9TKnbsiwTFlkZ4nP8K5WBTJHPIA458LE=
-X-Received: by 2002:ac2:522c:0:b0:4ea:2dce:fa0a with SMTP id
- i12-20020ac2522c000000b004ea2dcefa0amr95155lfl.10.1680562334718; Mon, 03 Apr
- 2023 15:52:14 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680564954;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+2SwUwNMrwzATWpx0IObIc6o4NNW0TwYVffKH2s8rqQ=;
+        b=tcyBpw4djtc0l0Ez8b0r4zjUBMuT+2Cuo4UxBL363ReUo/vWlfbF1tcu4xzaR/IOrI
+         JVouQQ+F3WzP+5u6aNA4NfxhbJngb+AaCbvsY/ZdIcwptzd0SSwHOXJs+QyuLSJzFwtA
+         E+wOTaghKG7wJfAdXkLQi62+epOOeTFrPBkw5U+nxsStkQAv+nmS0U9JyGJF8r3cPnL8
+         xlDIIHh3nbLT1yRxAWgNgOY55DVdkcH1q/8c3Cv8t0q/vg4NFWzlhVTiyouSmY4/Z3Dj
+         mJb/9r4v6auKSBwIRko1hygcXKtx3pLBMdLdYu8Sz/tRKStMFpJoRy417QFyZkd4bIHs
+         DcDw==
+X-Gm-Message-State: AAQBX9eXykVQCH2gYtT4E2V+aLSn0tfz1RzjtncZ6N2HnXAg4/ktmNSO
+        mdldSIs3kH8KKyTWrt05dTT6UWpxXj8=
+X-Google-Smtp-Source: AKy350ai/TzVxGHrEev1s0POovCPoSSe862tFKwkfI/TE7MyKZ9VXLjcore1RT2wDRMb4QJz0/ubyA==
+X-Received: by 2002:a05:6830:e8a:b0:6a1:796e:c380 with SMTP id dp10-20020a0568300e8a00b006a1796ec380mr409791otb.6.1680564954684;
+        Mon, 03 Apr 2023 16:35:54 -0700 (PDT)
+Received: from [172.17.0.2] ([70.37.167.50])
+        by smtp.gmail.com with ESMTPSA id k21-20020a0568301bf500b006a17bffbc61sm4857527otb.38.2023.04.03.16.35.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 16:35:54 -0700 (PDT)
+Message-ID: <642b62da.050a0220.49f60.a71e@mx.google.com>
+Date:   Mon, 03 Apr 2023 16:35:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5243097980631607708=="
 MIME-Version: 1.0
-References: <20230403224412.2021594-1-luiz.dentz@gmail.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: hci_conn: Fix possible UAF
 In-Reply-To: <20230403224412.2021594-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 3 Apr 2023 15:52:02 -0700
-Message-ID: <CABBYNZK74Q6Hm=g0dnnP16tqcU9ObSk6Sj6+2uRf=4aFNmUaeQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_conn: Fix possible UAF
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20230403224412.2021594-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+--===============5243097980631607708==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 3, 2023 at 3:44=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This fixes the following trace:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: slab-use-after-free in hci_conn_del+0xba/0x3a0
-> Write of size 8 at addr ffff88800208e9c8 by task iso-tester/31
->
-> CPU: 0 PID: 31 Comm: iso-tester Not tainted 6.3.0-rc2-g991aa4a69a47
->  #4716
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.1-2.fc36
-> 04/01/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x1d/0x70
->  print_report+0xce/0x610
->  ? __virt_addr_valid+0xd4/0x150
->  ? hci_conn_del+0xba/0x3a0
->  kasan_report+0xdd/0x110
->  ? hci_conn_del+0xba/0x3a0
->  hci_conn_del+0xba/0x3a0
->  hci_conn_hash_flush+0xf2/0x120
->  hci_dev_close_sync+0x388/0x920
->  hci_unregister_dev+0x122/0x260
->  vhci_release+0x4f/0x90
->  __fput+0x102/0x430
->  task_work_run+0xf1/0x160
->  ? __pfx_task_work_run+0x10/0x10
->  ? mark_held_locks+0x24/0x90
->  exit_to_user_mode_prepare+0x170/0x180
->  syscall_exit_to_user_mode+0x19/0x50
->  do_syscall_64+0x4e/0x90
->  entry_SYSCALL_64_after_hwframe+0x70/0xda
->
-> Fixes: 0f00cd322d22 ("Bluetooth: Free potentially unfreed SCO connection"=
-)
-> Link: https://syzkaller.appspot.com/bug?extid=3D8bb72f86fc823817bc5d
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  net/bluetooth/hci_conn.c | 30 ++++++++++++++++++++++++------
->  1 file changed, 24 insertions(+), 6 deletions(-)
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index fe8d54f8f04f..5672b4924572 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -1069,6 +1069,17 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev=
-, int type, bdaddr_t *dst,
->         return conn;
->  }
->
-> +static bool hci_conn_unlink(struct hci_conn *conn)
-> +{
-> +       if (!conn->link)
-> +               return false;
-> +
-> +       conn->link->link =3D NULL;
-> +       conn->link =3D NULL;
-> +
-> +       return true;
-> +}
-> +
->  int hci_conn_del(struct hci_conn *conn)
->  {
->         struct hci_dev *hdev =3D conn->hdev;
-> @@ -1080,15 +1091,16 @@ int hci_conn_del(struct hci_conn *conn)
->         cancel_delayed_work_sync(&conn->idle_work);
->
->         if (conn->type =3D=3D ACL_LINK) {
-> -               struct hci_conn *sco =3D conn->link;
-> -               if (sco) {
-> -                       sco->link =3D NULL;
-> +               struct hci_conn *link =3D conn->link;
-> +
-> +               if (link) {
-> +                       hci_conn_unlink(conn);
->                         /* Due to race, SCO connection might be not estab=
-lished
->                          * yet at this point. Delete it now, otherwise it=
- is
->                          * possible for it to be stuck and can't be delet=
-ed.
->                          */
-> -                       if (sco->handle =3D=3D HCI_CONN_HANDLE_UNSET)
-> -                               hci_conn_del(sco);
-> +                       if (link->handle =3D=3D HCI_CONN_HANDLE_UNSET)
-> +                               hci_conn_del(link);
->                 }
->
->                 /* Unacked frames */
-> @@ -1104,7 +1116,7 @@ int hci_conn_del(struct hci_conn *conn)
->                 struct hci_conn *acl =3D conn->link;
->
->                 if (acl) {
-> -                       acl->link =3D NULL;
-> +                       hci_conn_unlink(conn);
->                         hci_conn_drop(acl);
->                 }
->
-> @@ -2444,6 +2456,12 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
->                 c->state =3D BT_CLOSED;
->
->                 hci_disconn_cfm(c, HCI_ERROR_LOCAL_HOST_TERM);
-> +
-> +               /* Unlink before deleting otherwise it is possible that
-> +                * hci_conn_del removes the link which may cause the list=
- to
-> +                * contain items already freed.
-> +                */
-> +               hci_conn_unlink(c);
->                 hci_conn_del(c);
->         }
->  }
-> --
-> 2.39.2
+This is automated email and please do not reply to this email!
 
-Can you give it a try if this doesn't break the existing problem you
-were trying to fix, anyway it is quite easy to reproduce with the
-likes of iso-tester and syzbot also seems to have bumped into it as
-well.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=736584
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.72 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      38.44 seconds
+CheckAllWarning               PASS      41.94 seconds
+CheckSparse                   PASS      47.49 seconds
+CheckSmatch                   PASS      128.77 seconds
+BuildKernel32                 PASS      37.21 seconds
+TestRunnerSetup               PASS      529.38 seconds
+TestRunner_l2cap-tester       PASS      18.42 seconds
+TestRunner_iso-tester         PASS      18.87 seconds
+TestRunner_bnep-tester        PASS      6.25 seconds
+TestRunner_mgmt-tester        PASS      123.34 seconds
+TestRunner_rfcomm-tester      PASS      9.76 seconds
+TestRunner_sco-tester         PASS      8.91 seconds
+TestRunner_ioctl-tester       PASS      10.46 seconds
+TestRunner_mesh-tester        PASS      7.89 seconds
+TestRunner_smp-tester         PASS      8.89 seconds
+TestRunner_userchan-tester    PASS      6.52 seconds
+IncrementalBuild              PASS      34.74 seconds
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5243097980631607708==--
