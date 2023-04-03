@@ -2,171 +2,281 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 104B5C76196
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Apr 2023 09:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9954BC761A6
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Apr 2023 12:25:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231804AbjDCJ5a (ORCPT
+        id S232042AbjDCMZV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Apr 2023 05:57:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44552 "EHLO
+        Mon, 3 Apr 2023 08:25:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231860AbjDCJ5B (ORCPT
+        with ESMTP id S229498AbjDCMZU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Apr 2023 05:57:01 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2099.outbound.protection.outlook.com [40.107.223.99])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE0916A76;
-        Mon,  3 Apr 2023 02:56:59 -0700 (PDT)
+        Mon, 3 Apr 2023 08:25:20 -0400
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2055.outbound.protection.outlook.com [40.107.249.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA33D30CF;
+        Mon,  3 Apr 2023 05:25:17 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BNRtdIHL2tt/wrgkyQVpXp857+bACeYOLAAraEJ3IdrC7rai5skRVF0wuyNfiecTU7RQKCseMoOconaFK55ncefYDOgZtRaeTjkzAOfeKGRymZG4mVCN7tOB54EbkrI09phO7PJb2mr2emS8vhGXPPp7MsUtl5HHNe+Rdevpn7gBppa8Ruu7wQhg0XPgj2vK78TUMR60yXdaVuXzGEAmOYgpkPsyetJ5t5wXBWsFloy9EMs5ocr7013a1+IbSczEDp3KY8HjkvWpVF9w+AacrPUzMY+SsheDmrvKTTz1QN6Z/5shomx/EWofd/Cnpfc582rC0e2Yz1VECAA1TqOlsw==
+ b=Bz5ZoitwuhqiADPQ7B7asny5vfxdW4pmIBkNP3xWQGBZsa2YJW24C37n4hB+es8tpl7SKCXbvOSxmH+1H9UxcSPw9xDG8T5T5N+c6jGol3lBuvwkAg6MMaOw6ub6ToCBYJesxs9cuU5ECswv3Ix9y4YwZkm5/w1lmgcpwm9hoo+Fay42ALMpnlmSPWsXnU0TO0I1nZPJnCBuxJ7SrtpociUsWxvF8KyJbkVCLLzOroVmyABM/RYkq7ywFqUD9HM856tJII9GyVDM3JLnBCTeZjANuiPWw+k2vVR/DZK+wZcst6N//iZzL7gT5tFJ0XwP0VQ2dZCocfeSL+0UnjStOw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5F7DgsuRfmLt20e8z0UD77HwvUdxFQxQ166dL+KN7cc=;
- b=d8BP0StcWj+LrhROSYbuXcX3pNbmltZ7Pvkej4Lsbj6fRsiPIqUX8DxOnqHjrxER+wtYZEUdf9CQ1w+fqnk3PE3ujb9OShB/H6CWF7440fggWmeG90bN4Nj/mbLA9UHPuBN1XAevD4THM+0Q9Jz58wWfT6SN07rvPCV6W9cIGdfuMyvtqyvNsADABAuSJTF/wQgwr3YyY1oqqTX3Pjc5Dikj8+o0QE6C6BR5b4DmwhqXVrfSJbzgX4k+N/wTdCDmjwByjUyulgPRRTKStmmuebAN2LpAuNXwqLsp9NyzZqlY5xSEwwEIQfiK4Hwt9BEd9NalVFtDloc/iFrvM3cLKg==
+ bh=RlKHR3B1mazWpCapi8kEX/Wwve2n+p4h9LL0XslDVks=;
+ b=R56JMNX9Ma+3CWvk81iZlHsF6AixyGgeA3nUlT2qZB23OwGPKtNaIOuxMt7fpYP3gQxK6PHXP1EXWn3YG2AkQ5aSVGdDXtsovqruaG1Phz76ZesaVk7pN9QTvyHWxRwM6lYuXfb3T/6uDJX19o6ac4GLXosVm5jLGpMJ6/27K+3SpTvZvSBxkt1Si9fNqmPJ/NrwRESQv4dPr8sL2fodIriqdYoxdfJBOTu1mHr9XJT2v/3AqCeRymOoWBt4NZWIF0XPQv2YBA25W1qatP329D4Ev/hu8Cle9OfccFOdZ9Rt+HP54neNAwJaAGjyhjfv0QkwOOg4GrbAxdzcuLtr3g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5F7DgsuRfmLt20e8z0UD77HwvUdxFQxQ166dL+KN7cc=;
- b=oGRPDZbLv3R2TGPD2TvB2cfPs6vuTMa9xbwQSBqgvW2iv8RzGSMyiQfgUth7npromJka1oGh6d+EfBMrJdTld2MO5RcUMGHogw3ZPfC4SdAfs00Io6ONmSEUPvhYiSewHKOXJ/ZRahCRCUiWXE1H/Wnlw7uecBM52euUQwz5Meg=
+ bh=RlKHR3B1mazWpCapi8kEX/Wwve2n+p4h9LL0XslDVks=;
+ b=Z7d2+Tmb9Yc8ozyLphbHKR84j2U2+RY5iXV+Dp/dIsTLYkjIgy+31NCG6VXewjr/GtKzMA04YVTR+b7927kJ0jVyLb78l8hChzrJC+vPASMdNQPz1UuH4/nCmAPYmgexNl3vy4Xj0NX3GUOy9jB+sKFqkcv9frh1OVZx4GtVSG0=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH0PR13MB4603.namprd13.prod.outlook.com (2603:10b6:610:c3::24) with
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com (2603:10a6:20b:43a::10)
+ by AS4PR04MB9690.eurprd04.prod.outlook.com (2603:10a6:20b:4fd::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.28; Mon, 3 Apr
- 2023 09:56:57 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::c506:5243:557e:82cb]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::c506:5243:557e:82cb%5]) with mapi id 15.20.6254.030; Mon, 3 Apr 2023
- 09:56:57 +0000
-Date:   Mon, 3 Apr 2023 11:56:50 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     michenyuan <michenyuan@huawei.com>
-Cc:     "isdn@linux-pingi.de" <isdn@linux-pingi.de>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] cmtp: fix argument error
-Message-ID: <ZCqi4laBvhCLrPhS@corigine.com>
-References: <9b58282ff4ed4d2daad72539466c685d@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b58282ff4ed4d2daad72539466c685d@huawei.com>
-X-ClientProxiedBy: AM0PR10CA0114.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:e6::31) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6254.30; Mon, 3 Apr
+ 2023 12:25:15 +0000
+Received: from AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::1013:5b17:fe68:d06b]) by AM9PR04MB8603.eurprd04.prod.outlook.com
+ ([fe80::1013:5b17:fe68:d06b%8]) with mapi id 15.20.6254.033; Mon, 3 Apr 2023
+ 12:25:15 +0000
+From:   Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com,
+        neeraj.sanjaykale@nxp.com
+Subject: [PATCH v1] Bluetooth: btnxpuart: Add support to download helper FW file for w8997
+Date:   Mon,  3 Apr 2023 17:54:27 +0530
+Message-Id: <20230403122430.1024235-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4PR09CA0015.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::20) To AM9PR04MB8603.eurprd04.prod.outlook.com
+ (2603:10a6:20b:43a::10)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH0PR13MB4603:EE_
-X-MS-Office365-Filtering-Correlation-Id: bc2f320b-4c39-4548-a4af-08db3429c30e
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8603:EE_|AS4PR04MB9690:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f2dbd42-200e-40ba-57db-08db343e7a7f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: er8xNb7XisAdXrc22t5MrqZ/tGUGwSPsBOsx8cGEdLscU4srZy+lg55lmNCn6Dh1x43SfsrXaywKOWRPdykj4xrqtyk5i2df+CRNMOvM89ZLXggiwcbiqrjlrDUmAUYmWi7YvnxyhXuq0xvtlcgXJ6NlwPMuWWq3xVynTr/PRcJ0/rKCUpSSNpEG+K7Nz+itXn/o0sIWSkkWtTvscsDmlkVszxWRZMumuVH2X2EaN5/7j1zLg4KG3sf6wQIz1JBb043Zsv54KkZ1GWAdzIfBZZSKdBsoOFjfnWmfbGcl/anxosxYr85dZIze9oqZIegBT1gQEKiReV9xvKo4TwzNp1rLA6lWpoFCeC73cTCMt1s78xkHLOl9hE4PufqcyscCY4BJQYLcv6lRSmDKKWo7A6q9c5mrVvVKGPMieVHsFtiHWTeRn0G9xX+iDzCbNKAQsTiDHQPLmwQ7YkEhSSY/7CNa2xutmlbSpqMG66gxJig7OzN4f6y6mqc55CbZGSBQmhoCzPJvtCpzMYa3+e/19i2otq0wYFzlLvKknf2yfrixbykVfJyZ8LTuowVT12LnNdsh2yXU3Y+H34jXeSD3nRyDv5K/kGpO5A6cYBrUmSA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(39840400004)(376002)(396003)(346002)(451199021)(2616005)(83380400001)(6666004)(6486002)(316002)(186003)(478600001)(6512007)(6506007)(2906002)(54906003)(5660300002)(7416002)(44832011)(36756003)(38100700002)(66556008)(86362001)(6916009)(4326008)(66476007)(41300700001)(8936002)(66946007)(8676002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: WQvGlRYkC0Qphz6yqHN7Up2rSwayVwwfIZY7W5VlGpjarJOPa4edS4MqJ6fEM66hSUmaqyvPQAsiBDtkccNS6gln2Y2qAYlDbPNPHUaDxQuJonGeUMHlgqvOuYDp7xWSoCQrU4dztz86nVMkJ/dFPEcJC9NFQAoXScEEBgvLSOUX2VTZ3H4ACKWdjH9yYzrw1gCWDAdJ1QzIwguOB8fI4kYuH+ZK/CbNSqPzNBokBJKK7h+ciZgUDlJsLl3nNgxTWIg2RznRol5eD/aGVjU05fsktN/0TxFmCdfrEh0NkkPoKb+AfkVAxp/AQV2YYizMPLNPB+Nkzwm7oz+s6Q8Jw5qQ/9kAUWR4VyVN66/O4O492sWDvm5EQ5uabZR7QFHXO/aovS8jCgb9cva4q56Rrzv0eiqYnM/vroUVhTe6tbOdH1k34G11Vlbi8oJUmTo+A420hhFGxb603zPPGw9s9XtmFXrg7B4iz5g8nPVE49SfzmiT/JaHIH0tQhA0wSw1565pcCPiO8p/ZECeR20R48nXLx8nvQ27lJVldTUsj4ZsRpGr6BbYE21piUrzm/IicKbmHUdyCBQ8/V5x+29Nx+gAVh1/PFAPq5sLEO45nbmxEWNITlYQSu20xZ0pkgKz
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8603.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(396003)(39860400002)(346002)(136003)(451199021)(8676002)(66476007)(66556008)(478600001)(8936002)(66946007)(41300700001)(5660300002)(316002)(186003)(6512007)(6486002)(4326008)(26005)(1076003)(6506007)(2906002)(83380400001)(2616005)(38100700002)(38350700002)(86362001)(36756003)(52116002)(6666004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BRmPKm0Tuo4ZSqPuXmgQoPpj+A4mcYRR4Ef9LH98vJH/osFnvFINqHIgF24T?=
- =?us-ascii?Q?zcQu2EKg+PIhLms/eFa9FeNI8kpIsc1z/K7tWbnlYuxLvpzjE2hYkIhSy8N4?=
- =?us-ascii?Q?WdKNWH9pTNHPrggiQLqLDDGC2e317ZGK/0N9f95WJ5HxUPrDTfGRYPwHI4yI?=
- =?us-ascii?Q?fk+PmCcDKcOfAVUDxMi+glK3Nv3lmxewAqwhAvxXe/Y1ldzwpZpxwx3Lgg38?=
- =?us-ascii?Q?VK7vQa8Wzykegup/mHlbudK5nUUgkHWpUmEGKMIC4Bo1CfTW19qr99sC5Oor?=
- =?us-ascii?Q?/gSSITOnJvAvQ5cThu7HzlkOUGAUSdB6oIKCJQ5QKDKK3imGOLZ253ckZC5W?=
- =?us-ascii?Q?N2Ru4s703LpCsTxIBrRyZNDHEmGwd/Ei2bpyTJaJVtUpGRge87Py7n5IrvV/?=
- =?us-ascii?Q?fJuYltWNY99r/C3zGRMlRFB6g6LFOnhIrBzGjniz1LsSj/K4DpDEYPve+Lys?=
- =?us-ascii?Q?Zrcrq08FKEeKTR7jtjG5qPX3Kj66MEe//ddVY3sSJ6pP9EmKz0DuyvVxI58s?=
- =?us-ascii?Q?y8JSvxko4w2+YcryEHV4LSo2VsMqYyKnyWitUVlCkGSLVj1eBs5hFuAq2fmJ?=
- =?us-ascii?Q?HcohfaZr9u33LPFEt7Gl9ncGyCOyLmWYvECkSZbYFvr7zIRKnHAJsUKae0/v?=
- =?us-ascii?Q?TkJ+c51zgDorBaxhXnED7yH94GfcLEhpcebcxxLFMEUr/DVkXaX79Wa4Eh+m?=
- =?us-ascii?Q?iDjwM324MjJW0ACMU/2V4SWCz5p+9unFSnCbwgjBSSG40d1Ec2vZm3HFGFqW?=
- =?us-ascii?Q?pDMgfVwBvJUUG2tLhqjyHAMYTUN8O1LjHcNbVWb72Ubj+9XnfxFz8owGbr7I?=
- =?us-ascii?Q?NZ+OSahmAF308c43x13qLT/98GGo6NPV/FzLc+mgwVOqBpCtw2sbz3uCcoWP?=
- =?us-ascii?Q?pVogM/wPKh7KaTDT+ExlasaaDO7f16IWBLMrJqUWsIxU/g7EL1ErkwOMxdFA?=
- =?us-ascii?Q?yXEAMb8nV90/x4h4+bC7o6HhJi+7Qrt6mMeAEjC08WAWvCTtCOl01WB2sIx4?=
- =?us-ascii?Q?nh7a86nOjoE+hmKHfFsBDxgq4w6pPm/fE9eW61/5ieniXFpylrvtKbbyZpBE?=
- =?us-ascii?Q?YlwCsR7vlBRXVx4BH0D2WxP+aBVzETbheqmYJ242V68gxTD7ccHCHUIMLkHQ?=
- =?us-ascii?Q?s0XtdrEonRmKRrADyGTXxhaV9LF5zVO2l+hJIzF2Ps2Wt52EvAHQ+Upw4lU6?=
- =?us-ascii?Q?bq/ZiADbt+GqXH0lj0SG0JkbjFuT/wRtvAMpWdlrBLRCpNEU3e0SoCG66H20?=
- =?us-ascii?Q?Gk/Zgj/myd5sS+AAeM6cKgv6aUQvdwxrfYDiDKvntuz3rOqvcWAXCm+qIRZ2?=
- =?us-ascii?Q?JoyEODckt3JYL3e9sBV3DMgMEtsvakRDLcF1pWoV7srAehPnE2XswIMhi/iD?=
- =?us-ascii?Q?6xV6NdEmwyisTxA5JtDTo1MGlZSAL8mhyWVDU1TiHLBbp4oxRgy5zke27wDS?=
- =?us-ascii?Q?ItV1B4R8eHS7mx/6gOB7Jq2vf/bhTZjg8Wi86p81Mp7hT1Dn30zf1+btMz54?=
- =?us-ascii?Q?zj2bjuKaqq6ccl6pGcmTlWKzXMBBiOmYqSMcohV7w9/0kPBbBbZc5AsCDzV5?=
- =?us-ascii?Q?v2dT2o78MHpub1OCuAQPZlcNuuCsc7p4jDtNborR3QGMY3UTp8gjF7LnF3SR?=
- =?us-ascii?Q?LloJ94DFZOBv17pJzx3zj6EmVbOVe5adJVfDnL5RGS8FnWfx3IiKb7NwMG/4?=
- =?us-ascii?Q?7oHaTg=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bc2f320b-4c39-4548-a4af-08db3429c30e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?D8ygd/w1U2HTQ3glWJezcXqem15d282uRdVN24kqI3F7W30oug3AoDutBJTr?=
+ =?us-ascii?Q?AfBWZUt4CI6Mm5pAlTrlTEx4EA88YIubgQjJmv35MRKsBMq9pylqxwGyO2iZ?=
+ =?us-ascii?Q?wy7l2Wy/7WVixT0LZIHAm6Gf9m31WyMleQ2f4PjK+fP+QUXzP+Wh7zZl89LE?=
+ =?us-ascii?Q?roDsw5LpLfgcTdgjkOGwOLRrFcgvJHgCzfE0bCFX46boUGIdCKBfMGHT2kec?=
+ =?us-ascii?Q?XbjNxCMXUMejUXsbvwdZ7smVFza8XpRBBAHkehYGCFx91QNDyZnXFKWxQqDt?=
+ =?us-ascii?Q?rJ+kOME8xUFgFbES+SfDQXZc9dwPJzVheCzEbZWXiYJ+12V/zPi9mVzR7Pkx?=
+ =?us-ascii?Q?AGl3KEQ/TbtkfUBSoedvag5TdLPrPdZGEM96L9gNVWgrRYa9AC7YJipGBljQ?=
+ =?us-ascii?Q?V7kNAvV1JK1y4DtTpIaVqJA2XkbnqaVrKbja41Sln2ojviaraKNbH1Vif6dp?=
+ =?us-ascii?Q?93ing4Rr73WXV4Ht2bhLjxSqGqDNhFD/J8uGSp/dkqsVUjhD/w9nFHD6ELW6?=
+ =?us-ascii?Q?MVVZYCSepK7zhQR/TpGpt8GyJCMKg8rAa6yskBETUFXnPtUxQyJjUamoF6e3?=
+ =?us-ascii?Q?b7ThSLebnKNKOaJfv4Q49U0I3mm+yrxEE/ZmM8knrh4DHXfaaTxjhGtVe9/f?=
+ =?us-ascii?Q?WInWx9ab6Uv0hgn/huQ3Zpglnhe4vrnJtyIEtFU8sFUhYKkkBMCwa4sY5eID?=
+ =?us-ascii?Q?hg6Zy9RxRz/CN+/fEMsyintxSNycL/2cjSWpJSo1C6VdfOw+RhNoZ7KmartS?=
+ =?us-ascii?Q?hIq8sbyvDSpeyftaRFdXMrHxjle9+tgL8XfskUNnGkaZtZs45/cbLUt41pR/?=
+ =?us-ascii?Q?GkWACtbirsyHv1yQw9r62YEtGcM9awxoFxg2BHLdO3m38/IIPIgjcss7YfFL?=
+ =?us-ascii?Q?tMXQGojEk0inZ54UzjmXOpEJXc9oFpJMYzQNMxhEzNJsWJOa5HQH/jAT/ymw?=
+ =?us-ascii?Q?jJNvfK2OJrq1J1ZiakCaZ9q0idOoBnhiAw78UvMFLg9dz/85B/2Z8cjEIPm0?=
+ =?us-ascii?Q?0pK/w3GGWiVXPcytwrUg02lgsrMIEVbyZFIrXXWCAOtzHQG/VkfEgMetDan8?=
+ =?us-ascii?Q?WlnuW/GO60No4tHsK5wAuoCSnbzB88cg396Uovnd2s+T20255APaEnhkaxDP?=
+ =?us-ascii?Q?POHeifQ0CbEQm2/oAIEU/L/GVVzm/I3S9vuUAuK8RPWX6RV6S03vX7CNIu8O?=
+ =?us-ascii?Q?7yk0YZ0Va0gTLsjMTu4Tu2cC/C7ydiOZL9cSRg9Px65WRARybbaWOH7a45DK?=
+ =?us-ascii?Q?vWUns3oM00NxgwPVGSVn91vOQP/mh1AOCXYEEZVFHtyMPPtbrDh59z4Jpii2?=
+ =?us-ascii?Q?1ZpXGNm75cLw9lCNvRWOG5JlVDrlO0ENYKILwBKBh3ptr3IVAimulrTSlj2x?=
+ =?us-ascii?Q?8OOxLdhUfZ9YHkSmPc8S72FqYIAZC/XDOfPV50AmSPWiCG3Ui1maFb9dppHz?=
+ =?us-ascii?Q?2Y5VdEOZ7eEuyIc6kw/X5VfiEplSxD9n3i3y/ae5F+qmtL9n9iY+s/nOhp2s?=
+ =?us-ascii?Q?vPS9FFJ+ngsd1LCiP5iTDsttDD3utf9hIXsnTAG4SfEc1LVQVM23IGbSfqzn?=
+ =?us-ascii?Q?sCNzJdA2KF1auDiqN3pSRwlPMmu8Q+SQBFKAHxVqikgC1Ob8gbqBtQtIcTzi?=
+ =?us-ascii?Q?FQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f2dbd42-200e-40ba-57db-08db343e7a7f
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8603.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2023 09:56:57.6076
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2023 12:25:15.3665
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: y+N2vxnK0f2mzZ3YhNNV9bmYih6raQ80IceRivr+++KY6U4IGamd2iWjeUuD9tIpkNJ2kiBpCViYCFRP2j5mpHnW/C4zdQF0oa6ls4g5BCQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB4603
+X-MS-Exchange-CrossTenant-UserPrincipalName: nNSP7f1Avf/QVrI5OYFkiGHYKst8nL30AtlEfuJxq9eYhqOPfkNo5PD9gKDM+hwwcPNnQeYz0r33lUOlXlnsh1PD+mX+XspSsHIiCDgUO2k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9690
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Apr 03, 2023 at 02:35:21AM +0000, michenyuan wrote:
-> Thank you for your suggestion.
-> 
-> This bug may not cause serious security problem. Function 'bt_sock_unregister' takes its parameter as an index and nulls the corresponding element of 'bt_proto' which is an array of pointers. When 'bt_proto' dereferences each element, it would check whether the element is empty or not. Therefore, the problem of null pointer deference does not occur.
-> 
-> This bug is observed by manually code review.
+This adds support to download helper FW file for the legacy NXP chipset
+88w8997 for the btnxpuart driver. This helper FW file is necessary to
+set the bootloader baudrate to 3000000 after which the actual BT FW file
+can be downloaded. This change helps bring the FW download time from
+around 10 sec to less than 2 sec for 88w8997 chip. For newer chipsets,
+both V1 and V3 bootloader, driver sends the cmd5 and cmd7 to the chip
+bootloader, and does not need a helper FW file.
 
-Thanks, could I suggest that you post a v2 that looks a bit like this:
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+---
+ drivers/bluetooth/btnxpuart.c | 67 ++++++++++++++++++++++++++++++-----
+ 1 file changed, 59 insertions(+), 8 deletions(-)
 
-Subject: Re: [PATCH v2 net-next] bluetooth: unregister correct BTPROTO for CMTP
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 7c22c1ac087a..34f44da9ef4d 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -34,6 +34,7 @@
+ #define FIRMWARE_W9098	"nxp/uartuart9098_bt_v1.bin"
+ #define FIRMWARE_IW416	"nxp/uartiw416_bt_v0.bin"
+ #define FIRMWARE_IW612	"nxp/uartspi_n61x_v1.bin.se"
++#define FIRMWARE_HELPER	"nxp/helper_uart_3000000.bin"
+ 
+ #define CHIP_ID_W9098		0x5c03
+ #define CHIP_ID_IW416		0x7201
+@@ -123,7 +124,7 @@ struct psmode_cmd_payload {
+ } __packed;
+ 
+ struct btnxpuart_data {
+-	bool fw_download_3M_baudrate;
++	const char *helper_fw_name;
+ 	const char *fw_name;
+ };
+ 
+@@ -150,6 +151,7 @@ struct btnxpuart_dev {
+ 	u32 fw_init_baudrate;
+ 	bool timeout_changed;
+ 	bool baudrate_changed;
++	bool helper_downloaded;
+ 
+ 	struct ps_data psdata;
+ 	struct btnxpuart_data *nxp_data;
+@@ -168,6 +170,13 @@ struct btnxpuart_dev {
+ 
+ #define HDR_LEN			16
+ 
++#define NXP_RECV_CHIP_VER_V1 \
++	.type = NXP_V1_CHIP_VER_PKT, \
++	.hlen = 4, \
++	.loff = 0, \
++	.lsize = 0, \
++	.maxlen = 4
++
+ #define NXP_RECV_FW_REQ_V1 \
+ 	.type = NXP_V1_FW_REQ_PKT, \
+ 	.hlen = 4, \
+@@ -194,6 +203,11 @@ struct v1_data_req {
+ 	__le16 len_comp;
+ } __packed;
+ 
++struct v1_start_ind {
++	__le16 chip_id;
++	__le16 chip_id_comp;
++} __packed;
++
+ struct v3_data_req {
+ 	__le16 len;
+ 	__le32 offset;
+@@ -518,6 +532,7 @@ static int nxp_download_firmware(struct hci_dev *hdev)
+ 	nxpdev->fw_v3_offset_correction = 0;
+ 	nxpdev->baudrate_changed = false;
+ 	nxpdev->timeout_changed = false;
++	nxpdev->helper_downloaded = false;
+ 
+ 	serdev_device_set_baudrate(nxpdev->serdev, HCI_NXP_PRI_BAUDRATE);
+ 	serdev_device_set_flow_control(nxpdev->serdev, 0);
+@@ -664,6 +679,29 @@ static int nxp_request_firmware(struct hci_dev *hdev, const char *fw_name)
+ }
+ 
+ /* for legacy chipsets with V1 bootloader */
++static int nxp_recv_chip_ver_v1(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
++	struct v1_start_ind *req;
++
++	req = (struct v1_start_ind *)skb_pull_data(skb, sizeof(struct v1_start_ind));
++	if (!req)
++		goto free_skb;
++
++	if ((req->chip_id ^ req->chip_id_comp) == 0xffff) {
++		nxpdev->fw_dnld_v1_offset = 0;
++		nxpdev->fw_v1_sent_bytes = 0;
++		nxpdev->fw_v1_expected_len = HDR_LEN;
++		release_firmware(nxpdev->fw);
++		memset(nxpdev->fw_name, 0, sizeof(nxpdev->fw_name));
++		nxp_send_ack(NXP_ACK_V1, hdev);
++	}
++
++free_skb:
++	kfree_skb(skb);
++	return 0;
++}
++
+ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+@@ -685,7 +723,7 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ 	nxp_send_ack(NXP_ACK_V1, hdev);
+ 
+-	if (nxp_data->fw_download_3M_baudrate) {
++	if (!nxp_data->helper_fw_name) {
+ 		if (!nxpdev->timeout_changed) {
+ 			nxpdev->timeout_changed = nxp_fw_change_timeout(hdev, req->len);
+ 			goto free_skb;
+@@ -702,14 +740,26 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
+ 		}
+ 	}
+ 
+-	if (nxp_request_firmware(hdev, nxp_data->fw_name))
+-		goto free_skb;
++	if (!nxp_data->helper_fw_name || nxpdev->helper_downloaded) {
++		if (nxp_request_firmware(hdev, nxp_data->fw_name))
++			goto free_skb;
++	} else if (nxp_data->helper_fw_name && !nxpdev->helper_downloaded) {
++		if (nxp_request_firmware(hdev, nxp_data->helper_fw_name))
++			goto free_skb;
++	}
+ 
+ 	requested_len = req->len;
+ 	if (requested_len == 0) {
+ 		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes", nxpdev->fw->size);
+-		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
+-		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
++		if (nxp_data->helper_fw_name && !nxpdev->helper_downloaded) {
++			nxpdev->helper_downloaded = true;
++			serdev_device_wait_until_sent(nxpdev->serdev, 0);
++			serdev_device_set_baudrate(nxpdev->serdev, HCI_NXP_SEC_BAUDRATE);
++			serdev_device_set_flow_control(nxpdev->serdev, 1);
++		} else {
++			clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
++			wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
++		}
+ 		goto free_skb;
+ 	}
+ 	if (requested_len & 0x01) {
+@@ -1142,6 +1192,7 @@ static const struct h4_recv_pkt nxp_recv_pkts[] = {
+ 	{ H4_RECV_ACL,          .recv = hci_recv_frame },
+ 	{ H4_RECV_SCO,          .recv = hci_recv_frame },
+ 	{ H4_RECV_EVENT,        .recv = hci_recv_frame },
++	{ NXP_RECV_CHIP_VER_V1, .recv = nxp_recv_chip_ver_v1 },
+ 	{ NXP_RECV_FW_REQ_V1,   .recv = nxp_recv_fw_req_v1 },
+ 	{ NXP_RECV_CHIP_VER_V3, .recv = nxp_recv_chip_ver_v3 },
+ 	{ NXP_RECV_FW_REQ_V3,   .recv = nxp_recv_fw_req_v3 },
+@@ -1252,12 +1303,12 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ }
+ 
+ static struct btnxpuart_data w8987_data = {
+-	.fw_download_3M_baudrate = true,
++	.helper_fw_name = NULL,
+ 	.fw_name = FIRMWARE_W8987,
+ };
+ 
+ static struct btnxpuart_data w8997_data = {
+-	.fw_download_3M_baudrate = false,
++	.helper_fw_name = FIRMWARE_HELPER,
+ 	.fw_name = FIRMWARE_W8997,
+ };
+ 
+-- 
+2.34.1
 
-On error unregister BTPROTO_CMTP to match the registration earlier
-in the same code-path. Without this change BTPROTO_HIDP is incorrectly
-unregistered.
-
-This bug does not appear to cause serious security problem.
-
-The function 'bt_sock_unregister' takes its parameter as an index and NULLs
-the corresponding element of 'bt_proto' which is an array of pointers. When
-'bt_proto' dereferences each element, it would check whether the element is
-empty or not. Therefore, the problem of null pointer deference does not
-occur.
-
-Found by inspection.
-
-Fixes: 8c8de589cedd ("Bluetooth: Added /proc/net/cmtp via bt_procfs_init()")
-Signed-off-by: ...
-
-...
-
-> > ---
-> >  net/bluetooth/cmtp/sock.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> Code change looks good.
-> 
-> > diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c 
-> > index 96d49d9fae96..cf4370055ce2 100644
-> > --- a/net/bluetooth/cmtp/sock.c
-> > +++ b/net/bluetooth/cmtp/sock.c
-> > @@ -250,7 +250,7 @@ int cmtp_init_sockets(void)
-> >  	err = bt_procfs_init(&init_net, "cmtp", &cmtp_sk_list, NULL);
-> >  	if (err < 0) {
-> >  		BT_ERR("Failed to create CMTP proc file");
-> > -		bt_sock_unregister(BTPROTO_HIDP);
-> > +		bt_sock_unregister(BTPROTO_CMTP);
-> >  		goto error;
-> >  	}
-> >  
-> > --
-> > 2.25.1
