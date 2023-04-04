@@ -2,37 +2,35 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F477C77B62
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 12:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D13C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 12:20:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234729AbjDDMTv (ORCPT
+        id S234474AbjDDMUa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Apr 2023 08:19:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
+        Tue, 4 Apr 2023 08:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234541AbjDDMTY (ORCPT
+        with ESMTP id S234695AbjDDMTe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Apr 2023 08:19:24 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379F73C1E
-        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Apr 2023 05:14:53 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1pjfYo-0007I6-JD; Tue, 04 Apr 2023 14:14:50 +0200
-Message-ID: <b06c1999-e6b9-877c-d51f-c3dac24746a2@leemhuis.info>
-Date:   Tue, 4 Apr 2023 14:14:50 +0200
+        Tue, 4 Apr 2023 08:19:34 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA90420C
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Apr 2023 05:17:44 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1pjfba-0004fD-3q; Tue, 04 Apr 2023 14:17:42 +0200
+Message-ID: <11b65b4e-1b2e-d5d8-9ab8-f7d7f5238157@pengutronix.de>
+Date:   Tue, 4 Apr 2023 14:17:39 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
+ Thunderbird/102.9.0
 Subject: Re: [BUG] BLE device unpairing triggers kernel panic
-Content-Language: en-US, de-DE
-From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+Content-Language: en-US
+To:     Linux regressions mailing list <regressions@lists.linux.dev>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
         Pengutronix Kernel Team <kernel@pengutronix.de>,
         Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
@@ -50,51 +48,73 @@ References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
  <b7b080ff-a5da-a10c-674b-c3bb653f0aeb@leemhuis.info>
  <577c7140-a30c-ca06-a81e-c791e44b1321@pengutronix.de>
  <12cafbc4-39a2-1bea-c1d1-2cad406c8b83@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <12cafbc4-39a2-1bea-c1d1-2cad406c8b83@leemhuis.info>
+ <b06c1999-e6b9-877c-d51f-c3dac24746a2@leemhuis.info>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <b06c1999-e6b9-877c-d51f-c3dac24746a2@leemhuis.info>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1680610493;53031b62;
-X-HE-SMSGID: 1pjfYo-0007I6-JD
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
+Hello Thorsten,
 
-On 17.08.22 12:24, Thorsten Leemhuis wrote:
-> On 07.07.22 07:45, Ahmad Fatoum wrote:
->> On 04.07.22 14:11, Thorsten Leemhuis wrote:
->>> Hi, this is your Linux kernel regression tracker. Top-posting for once,
->>> to make this easily accessible to everyone.
+On 04.04.23 14:14, Linux regression tracking #update (Thorsten Leemhuis) wrote:
+> [TLDR: This mail in primarily relevant for Linux kernel regression
+> tracking. See link in footer if these mails annoy you.]
+> 
+> On 17.08.22 12:24, Thorsten Leemhuis wrote:
+>> On 07.07.22 07:45, Ahmad Fatoum wrote:
+>>> On 04.07.22 14:11, Thorsten Leemhuis wrote:
+>>>> Hi, this is your Linux kernel regression tracker. Top-posting for once,
+>>>> to make this easily accessible to everyone.
+>>>>
+>>>> Looks like the discussions to fix this regression got stuck. What can be
+>>>> done to get thing rolling again? Or has progress been made and I just
+>>>> missed it? Ciao, Thorsten
 >>>
->>> Looks like the discussions to fix this regression got stuck. What can be
->>> done to get thing rolling again? Or has progress been made and I just
->>> missed it? Ciao, Thorsten
+>>> No progress has been made as far as I am aware. I am reverting the commit
+>>> introducing the regression on my systems and haven't yet had the time to
+>>> debug this further to help find an alternative solution.
 >>
->> No progress has been made as far as I am aware. I am reverting the commit
->> introducing the regression on my systems and haven't yet had the time to
->> debug this further to help find an alternative solution.
+>> Just wondering: still no progress I assume?
+>>
+>> Anyway: I'm putting it on the backburner to get it out of the
+>> spot-light, as this doesn't look urgent and things seems to progress
+>> very slowly.
+>>
+>> #regzbot backburner: debuging is slow this further
 > 
-> Just wondering: still no progress I assume?
+> Great, I see (from interpreting
+> https://lore.kernel.org/all/04377d2a-4d97-0345-18a1-1f18533436fe@pengutronix.de/
+> [thx!] and looking at the described errors) that this was finally addressed:
+
+No. It's still broken for me, but now the kernel warning that came
+along with it is gone. I am discussing this with Luiz still on Github,
+but this regression is _not_ resolved.
+
+Thanks,
+Ahmad
+
 > 
-> Anyway: I'm putting it on the backburner to get it out of the
-> spot-light, as this doesn't look urgent and things seems to progress
-> very slowly.
+> #regzbot fix: 2731e038a76d
+> #regzbot ignore-activity
 > 
-> #regzbot backburner: debuging is slow this further
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> That page also explains what to do if mails like this annoy you.
+> 
+> 
 
-Great, I see (from interpreting
-https://lore.kernel.org/all/04377d2a-4d97-0345-18a1-1f18533436fe@pengutronix.de/
-[thx!] and looking at the described errors) that this was finally addressed:
-
-#regzbot fix: 2731e038a76d
-#regzbot ignore-activity
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
