@@ -2,121 +2,160 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C12C761A6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 18:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91676C76188
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 21:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236471AbjDDS1l (ORCPT
+        id S236029AbjDDVGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Apr 2023 14:27:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50962 "EHLO
+        Tue, 4 Apr 2023 17:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbjDDS13 (ORCPT
+        with ESMTP id S236500AbjDDVGB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Apr 2023 14:27:29 -0400
-Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91BEF6EB2;
-        Tue,  4 Apr 2023 11:24:40 -0700 (PDT)
-Received: by mail-ua1-x92c.google.com with SMTP id ay14so23881048uab.13;
-        Tue, 04 Apr 2023 11:24:40 -0700 (PDT)
+        Tue, 4 Apr 2023 17:06:01 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A11594C31
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Apr 2023 14:05:39 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id c18so32515320ple.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Apr 2023 14:05:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680632679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TjqaR1zqDFifRyDd7iAhwy7vRQIXca8FdbAreZ2wO6E=;
-        b=C0Z2VcjozzMf+0vHaPNqjedcOIgyUQ8wYs4YQBtN7LPUJsWLUXJzWOap8LNnEerQv2
-         hJg+IbVogzrLeRrC4QqJSfCWuTkBkbnT/qh9CSiYOTQXRQcMnpt14haFQ2m/2YYPbQU2
-         k736gQ7EBmavmZfAgfsei0DY4VnBAMUBHi+HxqC2HShTBKmUy5PpsvXtYez2tGqtTg7f
-         jgfCzWvRGQ7Oxokgs2hJ6a24CLL+/nm/JvZ1UpZyBy0IDCzLFTOJ7aEIXeP4ZmOR2z+5
-         ZJKW3pz+7dUSi+6ZJyWyTCOC6VYzfYWwXTgq/jrmFwE9AuOvWt1w09F5kTzaqu28re76
-         PTOg==
+        d=gmail.com; s=20210112; t=1680642338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ueat7pcRE7iu3Qae8onTfdDFR9ZMM0KAVsgaM0Im+Mg=;
+        b=hTkDxcDvEMbSuJmsuPVgYM8GZLuwwmKXUnDlJ3G6DwSpNvPXI8vKAu3+03DVS36Jcn
+         kBjBVchpEFkzwqKbJu32uNx72X5tLyKSgIhU96Mnn1FSdAGKsHv5297Pab1DtI7eYJmi
+         gJfErnlugC9RHH4iTj13QnVeFjKJkuiuun3286s43gU5FIZTpKYyVTireCH/TjRqGdZG
+         9H9C3E4gdropER6YQ6WFqpHwzaWRWc0ZlpTtSTNdvHSR7Fex0ChrlXlXpSusD9ux02U+
+         T4bbbF0SoY3oDUFIe5RxWCwGlciXyUR0MV4Prq8enUO286Z0vKtq6yr61WyFUiFaoDh6
+         x8HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680632679;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TjqaR1zqDFifRyDd7iAhwy7vRQIXca8FdbAreZ2wO6E=;
-        b=dr4WV6Q+R1uOOXTk9n0Gzv3bEfZYL++ObVQUqFbFin/IqTjvPZb2n0BtRtPWGLm3Aj
-         49JvdEL6q5/TOPZwIMYpO8SkACFXZxyC19RRtuLDrUu77IZ8CuEMaNiM3IFeJLizClG/
-         3ePlYVsLs7W7STxmqCsFkZVPsywddKZ3jiDzRrRgIZWuRob8b7bUKbgNu+AVDlOmRo9M
-         U7y6DegWl2TVnoJUq+xXnI5KKaxix0q7Z7dnVIKL5za4nbB2evkcSV+IA2Eeg4SvXodu
-         J89+FiY4lhmpFAiOe+Jo5LgALT6p9dwk7oZsmw4tQ/UqHSAOu8ctR2I6tc5zhnct1ra9
-         7jrA==
-X-Gm-Message-State: AAQBX9dlu9II/Vj1gdDstFyCnrVJMU8mbFgqm80CLnwMdqDvJdlA8jq/
-        JTR97SjLF75Oh7cdb7JGPYjUJ1imndJAGodL1AU=
-X-Google-Smtp-Source: AKy350b0zfjfj/Z4ssrwH6P3mRWPznO/hUk1CJIzO8/kR81xItsmg2eWZZ9wm5aUA1sRlwnAvVuiK+qJf3hbdFzQzeA=
-X-Received: by 2002:a1f:2997:0:b0:42d:7181:7c63 with SMTP id
- p145-20020a1f2997000000b0042d71817c63mr2835745vkp.1.1680632677330; Tue, 04
- Apr 2023 11:24:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230404015258.1345774-1-michenyuan@huawei.com> <ZCxE2zHwezg5DyjX@corigine.com>
-In-Reply-To: <ZCxE2zHwezg5DyjX@corigine.com>
+        d=1e100.net; s=20210112; t=1680642338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ueat7pcRE7iu3Qae8onTfdDFR9ZMM0KAVsgaM0Im+Mg=;
+        b=1L5/2gKurpseyvd8tG3UlYLIwaGV+H2BCg07CBhgtlV7vs82hevOUwJaGMZKbK9KvL
+         uCQ75ggYVUauKG6KF1C510rF6kBL7a2bZYIGFlmYlMVxublvmxy7mniEw3btKkeAfvO8
+         Jvp56ZeoFYppy7jF2o4mMIkwfzP/GkWOL4nlD88Ep7CNOQiHhd6mNykCXd/uzCG91bRF
+         LHH4EI65s2FiEXc8l9Ep0RQqWCPKOMgpGN6rUv3on53H2hPz+mH84D71O0Wj+RaNYG4i
+         LVb28Q9c4LwXTnnZ+A/o3kpF1fnt2e3NQ32sGHGFE2hNvwtqmAdRvV4DFA8eYCyI/m/R
+         vhrQ==
+X-Gm-Message-State: AAQBX9dJeREI/mOKeO4bXNy3/wmGUbylQkRpE57KHupnQ+2H0NTkbv/j
+        zG/sLJbOOUU3SgU65EuACdCvP08axFU=
+X-Google-Smtp-Source: AKy350ZY1eI/VZutiaVMW6Ul2fsMTDcg/FGIIzf61eVl8f0o4xs9sxsZyeTlb9y2HIClAZIGp3yD6w==
+X-Received: by 2002:a17:90a:e7c1:b0:23a:340d:fa49 with SMTP id kb1-20020a17090ae7c100b0023a340dfa49mr4325927pjb.32.1680642338490;
+        Tue, 04 Apr 2023 14:05:38 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id v4-20020a17090a520400b0023670dbb82fsm15814pjh.25.2023.04.04.14.05.37
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Apr 2023 14:05:38 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 4 Apr 2023 11:24:20 -0700
-Message-ID: <CABBYNZJmUfCqyn_+12s8KA0rRE0g_cv=hSKfj7grP58-g99y3g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] bluetooth: unregister correct BTPROTO for CMTP
-To:     Simon Horman <simon.horman@corigine.com>
-Cc:     Chenyuan Mi <michenyuan@huawei.com>, isdn@linux-pingi.de,
-        marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RESEND] Bluetooth: Enable all supported LE PHY by default
+Date:   Tue,  4 Apr 2023 14:05:37 -0700
+Message-Id: <20230404210537.2329660-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Apr 4, 2023 at 8:40=E2=80=AFAM Simon Horman <simon.horman@corigine.=
-com> wrote:
->
-> On Tue, Apr 04, 2023 at 09:52:58AM +0800, Chenyuan Mi wrote:
-> > On error unregister BTPROTO_CMTP to match the registration earlier in
-> > the same code-path. Without this change BTPROTO_HIDP is incorrectly
-> > unregistered.
-> >
-> > This bug does not appear to cause serious security problem.
-> >
-> > The function 'bt_sock_unregister' takes its parameter as an index and
-> > NULLs the corresponding element of 'bt_proto' which is an array of
-> > pointers. When 'bt_proto' dereferences each element, it would check
-> > whether the element is empty or not. Therefore, the problem of null
-> > pointer deference does not occur.
-> >
-> > Found by inspection.
-> >
-> > Fixes: 8c8de589cedd ("Bluetooth: Added /proc/net/cmtp via bt_procfs_ini=
-t()")
-> > Signed-off-by: Chenyuan Mi <michenyuan@huawei.com>
->
-> Reviewed-by: Simon Horman <simon.horman@corigine.com>
->
-> > ---
-> >  net/bluetooth/cmtp/sock.c | 2 +-
-> >  1 files changed, 1 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/bluetooth/cmtp/sock.c b/net/bluetooth/cmtp/sock.c
-> > index 96d49d9fae96..cf4370055ce2 100644
-> > --- a/net/bluetooth/cmtp/sock.c
-> > +++ b/net/bluetooth/cmtp/sock.c
-> > @@ -250,7 +250,7 @@ int cmtp_init_sockets(void)
-> >       err =3D bt_procfs_init(&init_net, "cmtp", &cmtp_sk_list, NULL);
-> >       if (err < 0) {
-> >               BT_ERR("Failed to create CMTP proc file");
-> > -             bt_sock_unregister(BTPROTO_HIDP);
-> > +             bt_sock_unregister(BTPROTO_CMTP);
-> >               goto error;
-> >       }
-> >
-> > --
-> > 2.25.1
-> >
+This enables 2M and Coded PHY by default if they are marked as supported
+in the LE features bits.
 
-This one does not appear on pw for some reason, not sure if that was
-because of subject or what, so please resubmit it, don't forget to add
-Reviewed-by you got in this thread.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_sync.c         | 28 ++++++++++++++++++++++++----
+ net/bluetooth/mgmt.c             |  4 ++--
+ 3 files changed, 30 insertions(+), 6 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index f11689284112..827e67159523 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1683,9 +1683,13 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define scan_1m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_1M) || \
+ 		      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_1M))
+ 
++#define le_2m_capable(dev) (((dev)->le_features[1] & HCI_LE_PHY_2M))
++
+ #define scan_2m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_2M) || \
+ 		      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_2M))
+ 
++#define le_coded_capable(dev) (((dev)->le_features[1] & HCI_LE_PHY_CODED))
++
+ #define scan_coded(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_CODED) || \
+ 			 ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_CODED))
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index f21497ebc814..00017f75cd41 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4414,18 +4414,38 @@ static int hci_le_set_write_def_data_len_sync(struct hci_dev *hdev)
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
+-/* Set Default PHY parameters if command is supported */
++/* Set Default PHY parameters if command is supported, enables all supported
++ * PHYs according to the LE Features bits.
++ */
+ static int hci_le_set_default_phy_sync(struct hci_dev *hdev)
+ {
+ 	struct hci_cp_le_set_default_phy cp;
+ 
+-	if (!(hdev->commands[35] & 0x20))
++	if (!(hdev->commands[35] & 0x20)) {
++		/* If the command is not supported it means only 1M PHY is
++		 * supported.
++		 */
++		hdev->le_tx_def_phys = HCI_LE_SET_PHY_1M;
++		hdev->le_rx_def_phys = HCI_LE_SET_PHY_1M;
+ 		return 0;
++	}
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.all_phys = 0x00;
+-	cp.tx_phys = hdev->le_tx_def_phys;
+-	cp.rx_phys = hdev->le_rx_def_phys;
++	cp.tx_phys = HCI_LE_SET_PHY_1M;
++	cp.rx_phys = HCI_LE_SET_PHY_1M;
++
++	/* Enables 2M PHY if supported */
++	if (le_2m_capable(hdev)) {
++		cp.tx_phys |= HCI_LE_SET_PHY_2M;
++		cp.rx_phys |= HCI_LE_SET_PHY_2M;
++	}
++
++	/* Enables Coded PHY if supported */
++	if (le_coded_capable(hdev)) {
++		cp.tx_phys |= HCI_LE_SET_PHY_CODED;
++		cp.rx_phys |= HCI_LE_SET_PHY_CODED;
++	}
+ 
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_DEFAULT_PHY,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 249dc6777fb4..5f8c144c84b8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8393,10 +8393,10 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
+ 		flags |= MGMT_ADV_FLAG_HW_OFFLOAD;
+ 		flags |= MGMT_ADV_FLAG_CAN_SET_TX_POWER;
+ 
+-		if (hdev->le_features[1] & HCI_LE_PHY_2M)
++		if (le_2m_capable(hdev))
+ 			flags |= MGMT_ADV_FLAG_SEC_2M;
+ 
+-		if (hdev->le_features[1] & HCI_LE_PHY_CODED)
++		if (le_coded_capable(hdev))
+ 			flags |= MGMT_ADV_FLAG_SEC_CODED;
+ 	}
+ 
+-- 
+2.39.2
+
