@@ -2,89 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D602EC76196
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 02:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E805BC76196
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 03:06:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232267AbjDDC1y (ORCPT
+        id S230125AbjDDDGS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Apr 2023 22:27:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38396 "EHLO
+        Mon, 3 Apr 2023 23:06:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbjDDC1x (ORCPT
+        with ESMTP id S229654AbjDDDGQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Apr 2023 22:27:53 -0400
-Received: from mail-m11878.qiye.163.com (mail-m11878.qiye.163.com [115.236.118.78])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 300061BFA;
-        Mon,  3 Apr 2023 19:27:51 -0700 (PDT)
-Received: from localhost.localdomain (unknown [103.29.142.67])
-        by mail-m11878.qiye.163.com (Hmail) with ESMTPA id 98317740458;
-        Tue,  4 Apr 2023 10:27:47 +0800 (CST)
-From:   Qiqi Zhang <eddy.zhang@rock-chips.com>
-To:     eddy.zhang@rock-chips.com
-Cc:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org
-Subject: [PATCH v2] Bluetooth: hci_h5: Complements reliable packet processing logic
-Date:   Tue,  4 Apr 2023 10:27:11 +0800
-Message-Id: <20230404022711.86515-1-eddy.zhang@rock-chips.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230403162928.118172-1-eddy.zhang@rock-chips.com>
-References: <20230403162928.118172-1-eddy.zhang@rock-chips.com>
+        Mon, 3 Apr 2023 23:06:16 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D47134
+        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Apr 2023 20:06:13 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id on15so9359364qvb.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Apr 2023 20:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680577572;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pEhoq5DY9bttjaVmMv7slcWcrXqgGl9Ko4b4KnhFhBI=;
+        b=IjerFr9xSy9Z4zgVJNmqa8TKbBb1aOsk95q5b87j1FJ4n95Ax+muFYuhPn+duzGOSJ
+         ASC2+cbtXj1Dthcm09hUO5OBKaU7s3kGx7UTyj94X/OCJtXOGXpSQLp/W9c1SNtB/hS8
+         qanXQQVVUagoxesOVx940W/obGZ2m19ayNIY2O0fAe52xoCXwfrd/Nrpp0Ioti8tqPvu
+         6piG31qQU8jLZo2kUmpVYPfA5CSlt9ov7j3N2J17EK0OMnLqcu2Dh53J6kz7VTTCUgAI
+         Ekz1N9Xa3qFzT/S18lHfwAXYKuHJ4l3R17mR2rqQKEbJza+9DOyDbAXk62+toxgcZ3Qj
+         37Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680577572;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pEhoq5DY9bttjaVmMv7slcWcrXqgGl9Ko4b4KnhFhBI=;
+        b=f0WkdzIXfY/i7Wiv8J1HY2y/2KgvABPwrr0Qdk7bsUvo3C7ThJj3Z5vpidvmDRJDWO
+         xZyjJNZNHiscAEyDDmrqcU6rwHIt8MUAj7UE0ysVNsqlEWn1pAjg9kq0/7N6GGEzJTGX
+         ElNsa2k3z/N6fvI3C4TapEuJBM6y+NY1Zy8aMztA23lPh4dABmhRHOpQCUv2hxm7aFhS
+         kF/80e558vKpKpYfXqSTs3xxn8PKZahhD+FQwIOjKLU4F3ju4JyuikwOSsd2W8/5ssn/
+         30HFqNUvuEuNcBr0P+715ShO8Oj/6ebtqD9o+T29+jGu2DSskZo401IGccVznRspU3J4
+         /xpQ==
+X-Gm-Message-State: AAQBX9fO9Yj7KJef4NkXbO0S1UWz8fzXiHGX9UHil00j7WFq4MexVAeU
+        JRonFSqHQLNEzNrsfeO5JIGNqf3MCt0=
+X-Google-Smtp-Source: AKy350YBEPlN0HNsr3YRavt2MUM6tLEzN+buqD8XqbF0H1etwWyHH9P55ENHQNxH10ViBSk14UbTsg==
+X-Received: by 2002:a05:6214:e67:b0:5c5:c835:c8f1 with SMTP id jz7-20020a0562140e6700b005c5c835c8f1mr1189643qvb.22.1680577572633;
+        Mon, 03 Apr 2023 20:06:12 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.65.73])
+        by smtp.gmail.com with ESMTPSA id l8-20020a0cc208000000b005dd8b9345a2sm3098070qvh.58.2023.04.03.20.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Apr 2023 20:06:12 -0700 (PDT)
+Message-ID: <642b9424.0c0a0220.f143.e11a@mx.google.com>
+Date:   Mon, 03 Apr 2023 20:06:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7064092448371291333=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-        tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCS0pPVk4aHUhKSBkYGkwdSlUTARMWGhIXJBQOD1
-        lXWRgSC1lBWUpLSFVJQlVKT0lVTUxZV1kWGg8SFR0UWUFZT0tIVUpKS0hKQ1VKS0tVS1kG
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6PCI6Ihw5ET0cNDgoMQ01QxEy
-        KzEaFE9VSlVKTUNLTkxOSU1DTUpDVTMWGhIXVR4fHwJVARMaFRw7CRQYEFYYExILCFUYFBZFWVdZ
-        EgtZQVlKS0hVSUJVSk9JVU1MWVdZCAFZQUlNQko3Bg++
-X-HM-Tid: 0a874a17847d2eb4kusn98317740458
-X-HM-MType: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, eddy.zhang@rock-chips.com
+Subject: RE: [v2] Bluetooth: hci_h5: Complements reliable packet processing logic
+In-Reply-To: <20230404022711.86515-1-eddy.zhang@rock-chips.com>
+References: <20230404022711.86515-1-eddy.zhang@rock-chips.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-As shown in the schematic diagram below.There may be a critical
-scenario in the current code. If the device does not receive an
-pure ack sent by the host due to insufficient receive buffer or
-other reasons and triggers a retransmission, the host will always
-be in an 'out-of-order' state.The state machine will get stuck.
+--===============7064092448371291333==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-       host                 device
-     SEQ3,ACK4 --------->
-               <--------- SEQ4,ACK4
-     pure ACK  ---------> (not received)
-(out-of-order) <--------- SEQ4,ACK4(retransmission)
-                ........
-(out-of-order) <--------- SEQ4,ACK4(retransmission)
+This is automated email and please do not reply to this email!
 
-According to the description in the core specification: "whenever
-a reliable packet is received, an acknowledgment shall be generated."
-So set H5_TX_ACK_REQ bit to trigger retransmission of pure ack packet
-when "out-of-order" occurs.
+Dear submitter,
 
-Signed-off-by: Qiqi Zhang <eddy.zhang@rock-chips.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=736626
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      31.71 seconds
+CheckAllWarning               PASS      35.53 seconds
+CheckSparse                   PASS      40.03 seconds
+CheckSmatch                   PASS      108.41 seconds
+BuildKernel32                 PASS      30.93 seconds
+TestRunnerSetup               PASS      442.02 seconds
+TestRunner_l2cap-tester       PASS      16.15 seconds
+TestRunner_iso-tester         PASS      16.08 seconds
+TestRunner_bnep-tester        PASS      5.29 seconds
+TestRunner_mgmt-tester        PASS      108.93 seconds
+TestRunner_rfcomm-tester      PASS      8.43 seconds
+TestRunner_sco-tester         PASS      7.88 seconds
+TestRunner_ioctl-tester       PASS      9.12 seconds
+TestRunner_mesh-tester        PASS      6.71 seconds
+TestRunner_smp-tester         PASS      7.78 seconds
+TestRunner_userchan-tester    PASS      5.58 seconds
+IncrementalBuild              PASS      29.74 seconds
+
+
+
 ---
-Changes in v2:
-- Fixed build bot warning.
----
----
- drivers/bluetooth/hci_h5.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 6455bc4fb5bb..d05eaeaa4516 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -463,6 +463,8 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
- 	if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) != h5->tx_ack) {
- 		bt_dev_err(hu->hdev, "Out-of-order packet arrived (%u != %u)",
- 			   H5_HDR_SEQ(hdr), h5->tx_ack);
-+		set_bit(H5_TX_ACK_REQ, &h5->flags);
-+		hci_uart_tx_wakeup(hu);
- 		h5_reset_rx(h5);
- 		return 0;
- 	}
--- 
-2.25.1
 
+--===============7064092448371291333==--
