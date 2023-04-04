@@ -2,110 +2,99 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E805BC76196
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 03:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F477C77B62
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Apr 2023 12:19:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbjDDDGS (ORCPT
+        id S234729AbjDDMTv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Apr 2023 23:06:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56334 "EHLO
+        Tue, 4 Apr 2023 08:19:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbjDDDGQ (ORCPT
+        with ESMTP id S234541AbjDDMTY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Apr 2023 23:06:16 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D47134
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Apr 2023 20:06:13 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id on15so9359364qvb.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Apr 2023 20:06:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680577572;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pEhoq5DY9bttjaVmMv7slcWcrXqgGl9Ko4b4KnhFhBI=;
-        b=IjerFr9xSy9Z4zgVJNmqa8TKbBb1aOsk95q5b87j1FJ4n95Ax+muFYuhPn+duzGOSJ
-         ASC2+cbtXj1Dthcm09hUO5OBKaU7s3kGx7UTyj94X/OCJtXOGXpSQLp/W9c1SNtB/hS8
-         qanXQQVVUagoxesOVx940W/obGZ2m19ayNIY2O0fAe52xoCXwfrd/Nrpp0Ioti8tqPvu
-         6piG31qQU8jLZo2kUmpVYPfA5CSlt9ov7j3N2J17EK0OMnLqcu2Dh53J6kz7VTTCUgAI
-         Ekz1N9Xa3qFzT/S18lHfwAXYKuHJ4l3R17mR2rqQKEbJza+9DOyDbAXk62+toxgcZ3Qj
-         37Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680577572;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pEhoq5DY9bttjaVmMv7slcWcrXqgGl9Ko4b4KnhFhBI=;
-        b=f0WkdzIXfY/i7Wiv8J1HY2y/2KgvABPwrr0Qdk7bsUvo3C7ThJj3Z5vpidvmDRJDWO
-         xZyjJNZNHiscAEyDDmrqcU6rwHIt8MUAj7UE0ysVNsqlEWn1pAjg9kq0/7N6GGEzJTGX
-         ElNsa2k3z/N6fvI3C4TapEuJBM6y+NY1Zy8aMztA23lPh4dABmhRHOpQCUv2hxm7aFhS
-         kF/80e558vKpKpYfXqSTs3xxn8PKZahhD+FQwIOjKLU4F3ju4JyuikwOSsd2W8/5ssn/
-         30HFqNUvuEuNcBr0P+715ShO8Oj/6ebtqD9o+T29+jGu2DSskZo401IGccVznRspU3J4
-         /xpQ==
-X-Gm-Message-State: AAQBX9fO9Yj7KJef4NkXbO0S1UWz8fzXiHGX9UHil00j7WFq4MexVAeU
-        JRonFSqHQLNEzNrsfeO5JIGNqf3MCt0=
-X-Google-Smtp-Source: AKy350YBEPlN0HNsr3YRavt2MUM6tLEzN+buqD8XqbF0H1etwWyHH9P55ENHQNxH10ViBSk14UbTsg==
-X-Received: by 2002:a05:6214:e67:b0:5c5:c835:c8f1 with SMTP id jz7-20020a0562140e6700b005c5c835c8f1mr1189643qvb.22.1680577572633;
-        Mon, 03 Apr 2023 20:06:12 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.65.73])
-        by smtp.gmail.com with ESMTPSA id l8-20020a0cc208000000b005dd8b9345a2sm3098070qvh.58.2023.04.03.20.06.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Apr 2023 20:06:12 -0700 (PDT)
-Message-ID: <642b9424.0c0a0220.f143.e11a@mx.google.com>
-Date:   Mon, 03 Apr 2023 20:06:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7064092448371291333=="
+        Tue, 4 Apr 2023 08:19:24 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379F73C1E
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Apr 2023 05:14:53 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1pjfYo-0007I6-JD; Tue, 04 Apr 2023 14:14:50 +0200
+Message-ID: <b06c1999-e6b9-877c-d51f-c3dac24746a2@leemhuis.info>
+Date:   Tue, 4 Apr 2023 14:14:50 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, eddy.zhang@rock-chips.com
-Subject: RE: [v2] Bluetooth: hci_h5: Complements reliable packet processing logic
-In-Reply-To: <20230404022711.86515-1-eddy.zhang@rock-chips.com>
-References: <20230404022711.86515-1-eddy.zhang@rock-chips.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [BUG] BLE device unpairing triggers kernel panic
+Content-Language: en-US, de-DE
+From:   "Linux regression tracking #update (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
+ <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
+ <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
+ <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
+ <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
+ <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
+ <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
+ <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
+ <1d1b76cf-df6f-3935-5cd2-c45ea78f2c33@pengutronix.de>
+ <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
+ <1a5ec80d-690f-285c-3da8-ccdaf5516d85@pengutronix.de>
+ <CABBYNZJQKc9ozReXLeESWY8U648eQytKfGB4WmhZi4M+YOW7jw@mail.gmail.com>
+ <b7b080ff-a5da-a10c-674b-c3bb653f0aeb@leemhuis.info>
+ <577c7140-a30c-ca06-a81e-c791e44b1321@pengutronix.de>
+ <12cafbc4-39a2-1bea-c1d1-2cad406c8b83@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <12cafbc4-39a2-1bea-c1d1-2cad406c8b83@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1680610493;53031b62;
+X-HE-SMSGID: 1pjfYo-0007I6-JD
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7064092448371291333==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+[TLDR: This mail in primarily relevant for Linux kernel regression
+tracking. See link in footer if these mails annoy you.]
 
-This is automated email and please do not reply to this email!
+On 17.08.22 12:24, Thorsten Leemhuis wrote:
+> On 07.07.22 07:45, Ahmad Fatoum wrote:
+>> On 04.07.22 14:11, Thorsten Leemhuis wrote:
+>>> Hi, this is your Linux kernel regression tracker. Top-posting for once,
+>>> to make this easily accessible to everyone.
+>>>
+>>> Looks like the discussions to fix this regression got stuck. What can be
+>>> done to get thing rolling again? Or has progress been made and I just
+>>> missed it? Ciao, Thorsten
+>>
+>> No progress has been made as far as I am aware. I am reverting the commit
+>> introducing the regression on my systems and haven't yet had the time to
+>> debug this further to help find an alternative solution.
+> 
+> Just wondering: still no progress I assume?
+> 
+> Anyway: I'm putting it on the backburner to get it out of the
+> spot-light, as this doesn't look urgent and things seems to progress
+> very slowly.
+> 
+> #regzbot backburner: debuging is slow this further
 
-Dear submitter,
+Great, I see (from interpreting
+https://lore.kernel.org/all/04377d2a-4d97-0345-18a1-1f18533436fe@pengutronix.de/
+[thx!] and looking at the described errors) that this was finally addressed:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=736626
+#regzbot fix: 2731e038a76d
+#regzbot ignore-activity
 
----Test result---
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
 
-Test Summary:
-CheckPatch                    PASS      0.68 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      31.71 seconds
-CheckAllWarning               PASS      35.53 seconds
-CheckSparse                   PASS      40.03 seconds
-CheckSmatch                   PASS      108.41 seconds
-BuildKernel32                 PASS      30.93 seconds
-TestRunnerSetup               PASS      442.02 seconds
-TestRunner_l2cap-tester       PASS      16.15 seconds
-TestRunner_iso-tester         PASS      16.08 seconds
-TestRunner_bnep-tester        PASS      5.29 seconds
-TestRunner_mgmt-tester        PASS      108.93 seconds
-TestRunner_rfcomm-tester      PASS      8.43 seconds
-TestRunner_sco-tester         PASS      7.88 seconds
-TestRunner_ioctl-tester       PASS      9.12 seconds
-TestRunner_mesh-tester        PASS      6.71 seconds
-TestRunner_smp-tester         PASS      7.78 seconds
-TestRunner_userchan-tester    PASS      5.58 seconds
-IncrementalBuild              PASS      29.74 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7064092448371291333==--
