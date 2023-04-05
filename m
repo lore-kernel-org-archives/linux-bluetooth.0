@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEF2C76188
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 04:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70BCC77B62
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 04:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237006AbjDEEHx (ORCPT
+        id S237021AbjDEEII (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Apr 2023 00:07:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
+        Wed, 5 Apr 2023 00:08:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236935AbjDEEHM (ORCPT
+        with ESMTP id S236877AbjDEEHO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Apr 2023 00:07:12 -0400
+        Wed, 5 Apr 2023 00:07:14 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82475598;
-        Tue,  4 Apr 2023 21:06:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC705248;
+        Tue,  4 Apr 2023 21:06:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3FF0863AF6;
-        Wed,  5 Apr 2023 04:06:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56247C433EF;
-        Wed,  5 Apr 2023 04:06:35 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D3D6F63978;
+        Wed,  5 Apr 2023 04:06:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D74D4C433D2;
+        Wed,  5 Apr 2023 04:06:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680667596;
-        bh=z1edpR72+pNOINPLtRAsAhpnTIUMgiOahipQJ2kekxU=;
+        s=k20201202; t=1680667598;
+        bh=54g1GZ40q/MOoM4C5tZtiA8bbju9etErocbfMT+yLlQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Wpn4fe3lfjlqFtHjlsiaxpO95c8mn9XH039jhN5rhvVx3vIhi1CecCtNn24BV/AwO
-         27Mo4A6NW7QygNBI1Uz3yg1Po3lcvavfqstMjGNCTxebE4ld3PjCLpehJ7NUOUkBD2
-         Im6ViB+qJzR5g2JVXCb0p5QxxMAfyRghXokCnM4mnAR3ivMu6l/6K5iNvIODZ/edzf
-         tkfAjPd0Xs6J6jhMwTY2pibpMEyMOF996YXXx/ryYQuw//MQo12Xm6nsbEWpZ6m2B0
-         BeBgtd8/TnS7FBJ2GhSVb3VACos89nEax+BCICA5rLO4O3KYy6KdhwFzB/85rr/6Md
-         yEh58KwGFFKjw==
+        b=qeeiQlaNghYo7mMO7qSyTuFdJ5T6jq5c7+ppxFgplOAZwu3rSJkApnOPRQpBy6ZBc
+         qtbniycGB7tFHT5UVevgrzRX7q2UOY+bS8m9oYy0mwI1nkEfmt/SM7MG3Z2twc+4M/
+         OAcK+WKtx5B7n5ABKgjrkT1Cvv1Srt41z5pzeBZl+kE4zbg3QD9+JmN36NFbGXvvWZ
+         c98FsKbWnQlcg0YO1YyU1jgB3hqrhcN+ifnBtMDQRrTInW6WVRknuYGAe48LECqmGn
+         CcIm4s9MxvWU12sZqZAaNWxKmvSaXhrPmqBYJ6IYYroBOQqt23/1KIbAJolJybHjEP
+         eJVtlm6fr2+xQ==
 From:   Bjorn Andersson <andersson@kernel.org>
 To:     Steev Klimaszewski <steev@kali.org>
 Cc:     Sven Peter <sven@svenpeter.dev>, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Tim Jiang <quic_tjiang@quicinc.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-kernel@vger.kernel.org,
         Konrad Dybcio <konrad.dybcio@linaro.org>,
+        netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Mark Pearson <markpearson@lenovo.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH v2 0/4] Attempt at adding WCN6855 BT support
-Date:   Tue,  4 Apr 2023 21:09:07 -0700
-Message-Id: <168066774409.443656.13544084231334926154.b4-ty@kernel.org>
+        Marcel Holtmann <marcel@holtmann.org>,
+        devicetree@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Andy Gross <agross@kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        Mark Pearson <markpearson@lenovo.com>
+Subject: Re: [PATCH v5 0/4] Add WCN6855 Bluetooth support
+Date:   Tue,  4 Apr 2023 21:09:08 -0700
+Message-Id: <168066774410.443656.1184532467375073499.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230131043816.4525-1-steev@kali.org>
-References: <20230131043816.4525-1-steev@kali.org>
+In-Reply-To: <20230209020916.6475-1-steev@kali.org>
+References: <20230209020916.6475-1-steev@kali.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -63,13 +65,13 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 30 Jan 2023 22:38:12 -0600, Steev Klimaszewski wrote:
-> This v2 of the patchset is somewhat of an RFC/RFT, and also just something to
-> get this out there.
-> 
+On Wed, 8 Feb 2023 20:09:12 -0600, Steev Klimaszewski wrote:
 > First things first, I do not have access to the specs nor the schematics, so a
 > lot of this was done via guess work, looking at the acpi tables, and looking at
 > how a similar device (wcn6750) was added.
+> 
+> The 5th revision addresses comments from Luiz about the Bluetooth driver, as
+> well as Konrad's comments on the dts file.
 > 
 > [...]
 
