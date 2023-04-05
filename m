@@ -2,64 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE340C77B71
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 23:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABA3C7619A
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 23:11:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231664AbjDEXLU (ORCPT
+        id S229446AbjDEXLR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Apr 2023 19:11:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51440 "EHLO
+        Wed, 5 Apr 2023 19:11:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjDEXLT (ORCPT
+        with ESMTP id S229907AbjDEXLP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Apr 2023 19:11:19 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55C6A6E95
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 16:11:18 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id lr16-20020a17090b4b9000b0023f187954acso38850733pjb.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Apr 2023 16:11:18 -0700 (PDT)
+        Wed, 5 Apr 2023 19:11:15 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E826E95
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 16:11:14 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id n14so19994139plc.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Apr 2023 16:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680736277;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8ft6avUwxhvv7WofQyTMsrSxsU+FGAMzJcVueT+bAcA=;
-        b=INVwvdWjMQuR1t5qo6GIyNjOrplYzMeaCbQoiTAPNeGsqiVtsmZm3vV9xpLfBmKVc8
-         +4icseBYalUejNW/6ZXbPo3ZvFX/fJQsg0+QXIEwUtZO8rqgctKrVpzO6Gl8aI+Nq1uQ
-         /pb6/TO8Sf+XXgJ2D0XUjgUtGwOPGGKJaLTjUPBCCtLkWCcgfQkRaq5Z+MFQ+8l6URiQ
-         jV8cUgSMEnRSh3FUvys8lDWaOFycVhaacKp1maNlc19M1H2Hrla4F6zMM1wXkUXoJR/+
-         oFfzonPx5Tu28OGsEV4oxgI8QE6BxKBQXKF6+IfizKGhIsCHA6hZLKQbXHb0fcjQ3hs9
-         fC5A==
+        d=gmail.com; s=20210112; t=1680736273;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kaqayTVDIWTLTbDe2Uwv5TQo6TvQbsXcmK3rO09rfRg=;
+        b=WgJVoRMKzUUujDGslreTnEtrjY5PwyB9wHWL3kkNh59aDqexh7nJgj6Svh/nkXwT22
+         NHvXLghumYGGEqRf048eqSNmvT52cfjS81e1IJFbWh6YwDOcOUVQ3FopenZAS2Nu4ZAd
+         1bijlOoQ8c4ZHFuJ3Q2wzUeSTN4Uu69TpIfd+CfG31xjWVP1Qa5JBB/LmlWGkSrWWEEQ
+         Ijlal5LPgpZqFAjnausFjVb2giAZ73Uh4E2vyPSufsnV0FXzGi4EKRLkPILSZ5rU94+Q
+         /H8E4gOQIYFQnJemFfYiOdLSvRKkBVl36vBCXRK7Wb0BN7LiZyiNQkMq6YSwXHFWIwxG
+         MGJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680736277;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8ft6avUwxhvv7WofQyTMsrSxsU+FGAMzJcVueT+bAcA=;
-        b=cdcJRvfMBpMZGdF9DW7ROqZ+YYwMkEdMn1UgIE8Xm1NW/0hZB6btRS2E3lHzo1cqX4
-         xdlM+AZFgXyTHbkgNCdBwshtqMOdbe+n6SGmvIsAOlzypdnckQucmBYzbuJuDMMq5gxR
-         A2zRs92zksKpM++AxUawY9Vc5yRao3XRWGLdt57Of3UZ1sk/vsPcJNdx1hDBBV+WDxyP
-         YhBRuK7CbmdLqVEaUYeegJ6InQdY3N/8Wq+/M7gIHOCaeDIGxK3+oi5lVOQJmlTFRYzA
-         iT4o4nyBv4nEB3KEI4oPty2zs/qo8r/bXIuJPIpCK6V0PgBnxc+kU+6kPfDwM85lJK6c
-         ljrQ==
-X-Gm-Message-State: AAQBX9e8NNwQ/cD5GpE+hEkN8Pr5RMI9SX4OSVUe2G5jE5KvGaWuxEOr
-        +ZO98J1R/jg1xHd/mU24PO7aqMsCRLE=
-X-Google-Smtp-Source: AKy350ZySVxAf4bF43IiGOO1IPm/OkuwnQOUs2a5U0eFsrFnBChLOdPJFRgZeSyrhyIIvjAmcVxFag==
-X-Received: by 2002:a05:6a20:4da6:b0:d9:f69c:5349 with SMTP id gj38-20020a056a204da600b000d9f69c5349mr831788pzb.48.1680736277228;
-        Wed, 05 Apr 2023 16:11:17 -0700 (PDT)
+        d=1e100.net; s=20210112; t=1680736273;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kaqayTVDIWTLTbDe2Uwv5TQo6TvQbsXcmK3rO09rfRg=;
+        b=cspBbAN1fGaz+tW6UD8BSYwcf6Zs8kw0QuhrGOxXHBlE10axyLn0VF5EKrknlaxGaF
+         lzgflr2GjM/wIX7ApmWN7vBQyuLbYaAReVTyGEpUPjXsYXItI5J1/VfBwGN29Q8qi5ja
+         FZN+Mw/KnwIuMKs0UqhjKVCxSal9O56Bf/iE9gHnQ4OVzOoUhMTrJOxL5t/R7rnHe1qJ
+         XRqKaK/rz+pcm/GE/Td499YSvDyBpuCJTDpGDzjYKCxXnBRI4mT/alUvMpnQBg4CK10j
+         Aqeo/Z1iVTUkEQx6VbbgldlOmXVn3z5Uv8pNQs1cWbZkaLTwHUotJXkAcs5JyJgAPhSH
+         e/RA==
+X-Gm-Message-State: AAQBX9flPX8anwrzIgWTFbPJZ1mstJj8LJg0l0AJJxS3HdJeFYIP3/io
+        53BIgdBqKp+kPBF1jnlkqLuElAlZd94=
+X-Google-Smtp-Source: AKy350b/As0gdfXNcUN6CHdUzb9XIXVw2xmFti6BSeNFO7ENm8hUxB0qHwsfSwxFISpUFAkTL92xEA==
+X-Received: by 2002:a05:6a20:3b28:b0:de:6e42:e0e5 with SMTP id c40-20020a056a203b2800b000de6e42e0e5mr1001556pzh.13.1680736272833;
+        Wed, 05 Apr 2023 16:11:12 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id v12-20020aa7808c000000b006254794d5b2sm11537752pff.94.2023.04.05.16.11.16
+        by smtp.gmail.com with ESMTPSA id v12-20020aa7808c000000b006254794d5b2sm11537752pff.94.2023.04.05.16.11.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 16:11:16 -0700 (PDT)
+        Wed, 05 Apr 2023 16:11:12 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] advertising: Add support for rsi as Includes
-Date:   Wed,  5 Apr 2023 16:11:10 -0700
-Message-Id: <20230405231111.2636523-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/5] main.conf: Fix parsing of CSIS group
+Date:   Wed,  5 Apr 2023 16:11:07 -0700
+Message-Id: <20230405231111.2636523-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230405231111.2636523-1-luiz.dentz@gmail.com>
-References: <20230405231111.2636523-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -68,117 +64,60 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for "rsi" when a SIRK has been set on main.conf, the
-clients can then enable it via Includes property which will make the
-daemon to automatically generate an RSI (hash+random) and include it as
-part of the advertising data:
-
-< HCI Command: LE Set Extended Advertising Data (0x08|0x0037) plen 15
-        Handle: 0x01
-        Operation: Complete extended advertising data (0x03)
-        Fragment preference: Minimize fragmentation (0x01)
-        Data length: 0x0b
-        Resolvable Set Identifier: E2-4E-AA-1B-2B-61
-          Hash: 0x1b2b61
-          Random: 0xe24eaa
-        Flags: 0x06
-          LE General Discoverable Mode
-          BR/EDR Not Supported
+There was a typo in the group name using CSIP instead of CSIS.
 ---
- src/advertising.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 46 insertions(+), 1 deletion(-)
+ src/main.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index f9748b1328bc..0dceb14c3be4 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -29,11 +29,13 @@
- #include "error.h"
- #include "log.h"
- #include "eir.h"
-+#include "btd.h"
- #include "src/shared/ad.h"
- #include "src/shared/mgmt.h"
- #include "src/shared/queue.h"
- #include "src/shared/timeout.h"
- #include "src/shared/util.h"
-+#include "src/shared/crypto.h"
- #include "advertising.h"
- 
- #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
-@@ -459,13 +461,50 @@ fail:
- 	return false;
- }
- 
-+static bool set_rsi(struct btd_adv_client *client)
-+{
-+	struct bt_crypto *crypto;
-+	uint8_t zero[16] = {};
-+	struct bt_ad_data rsi = { .type = BT_AD_CSIP_RSI };
-+	uint8_t data[6];
-+	bool ret;
-+
-+	/* Check if a valid SIRK has been set */
-+	if (!memcmp(btd_opts.csis.sirk, zero, sizeof(zero)))
-+		return false;
-+
-+	/* Check if RSI needs to be set or data already contains RSI data */
-+	if (!client || bt_ad_has_data(client->data, &rsi))
-+		return true;
-+
-+	crypto = bt_crypto_new();
-+	if (!crypto)
-+		return false;
-+
-+	ret = bt_crypto_random_bytes(crypto, data + 3, sizeof(data) - 3);
-+	if (!ret)
-+		goto done;
-+
-+	ret = bt_crypto_sih(crypto, btd_opts.csis.sirk, data + 3, data);
-+	if (!ret)
-+		goto done;
-+
-+	ret = bt_ad_add_data(client->data, BT_AD_CSIP_RSI, data, sizeof(data));
-+
-+done:
-+	bt_crypto_unref(crypto);
-+	return ret;
-+}
-+
- static struct adv_include {
- 	uint8_t flag;
- 	const char *name;
-+	bool (*set)(struct btd_adv_client *client);
- } includes[] = {
- 	{ MGMT_ADV_FLAG_TX_POWER, "tx-power" },
- 	{ MGMT_ADV_FLAG_APPEARANCE, "appearance" },
- 	{ MGMT_ADV_FLAG_LOCAL_NAME, "local-name" },
-+	{ 0 , "rsi", set_rsi },
- 	{ },
- };
- 
-@@ -497,6 +536,11 @@ static bool parse_includes(DBusMessageIter *iter,
- 			if (strcmp(str, inc->name))
- 				continue;
- 
-+			if (inc->set && inc->set(client)) {
-+				DBG("Including Feature: %s", str);
-+				continue;
-+			}
-+
- 			if (!(client->manager->supported_flags & inc->flag))
- 				continue;
- 
-@@ -1644,7 +1688,8 @@ static void append_include(struct btd_adv_manager *manager,
- 	struct adv_include *inc;
- 
- 	for (inc = includes; inc && inc->name; inc++) {
--		if (manager->supported_flags & inc->flag)
-+		if ((inc->set && inc->set(NULL)) ||
-+				(manager->supported_flags & inc->flag))
- 			dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
- 								&inc->name);
+diff --git a/src/main.c b/src/main.c
+index 3198091fc12c..a64b833b58c1 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -177,7 +177,7 @@ static const struct group_table {
+ 	{ "LE",		le_options },
+ 	{ "Policy",	policy_options },
+ 	{ "GATT",	gatt_options },
+-	{ "CSIP",	csip_options },
++	{ "CSIS",	csip_options },
+ 	{ "AVDTP",	avdtp_options },
+ 	{ "AdvMon",	advmon_options },
+ 	{ }
+@@ -1015,7 +1015,7 @@ static void parse_config(GKeyFile *config)
+ 		btd_opts.gatt_channels = val;
  	}
+ 
+-	str = g_key_file_get_string(config, "CSIP", "SIRK", &err);
++	str = g_key_file_get_string(config, "CSIS", "SIRK", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+ 		g_clear_error(&err);
+@@ -1031,7 +1031,7 @@ static void parse_config(GKeyFile *config)
+ 		g_free(str);
+ 	}
+ 
+-	boolean = g_key_file_get_boolean(config, "CSIP", "SIRK", &err);
++	boolean = g_key_file_get_boolean(config, "CSIS", "Encryption", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+ 		g_clear_error(&err);
+@@ -1041,7 +1041,7 @@ static void parse_config(GKeyFile *config)
+ 		btd_opts.csis.encrypt = boolean;
+ 	}
+ 
+-	val = g_key_file_get_integer(config, "CSIP", "Size", &err);
++	val = g_key_file_get_integer(config, "CSIS", "Size", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+ 		g_clear_error(&err);
+@@ -1052,7 +1052,7 @@ static void parse_config(GKeyFile *config)
+ 		btd_opts.csis.size = val;
+ 	}
+ 
+-	val = g_key_file_get_integer(config, "CSIP", "Rank", &err);
++	val = g_key_file_get_integer(config, "CSIS", "Rank", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+ 		g_clear_error(&err);
 -- 
 2.39.2
 
