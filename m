@@ -2,115 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FFD5C7619A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 12:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 806A9C761AF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 19:51:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237684AbjDEMVJ (ORCPT
+        id S234262AbjDETu7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Apr 2023 08:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56854 "EHLO
+        Wed, 5 Apr 2023 15:50:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbjDEMVI (ORCPT
+        with ESMTP id S231799AbjDETuj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Apr 2023 08:21:08 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B57764EED
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 05:21:04 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id cu12so23524400pfb.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Apr 2023 05:21:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680697264;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=24y4xvuqm2QTtJeN4F6nnObiqeKpXBVzTchWqBmEtis=;
-        b=DkrNs6J1Dy2zq4ws7tYq3klj9iuxMhvDnnwzfcCizB+76EVcS+iJTaoZp/gb2ztZaM
-         1zLcq7b6pjTUWlrmPyqXMH/Q2lRi5iADR2Lh30sQ+PNXKTSnpjgGf/4Nb/6fjo9JoGDd
-         Q4eQvQtV1C2SIuMD8bZF9dYEELED65wxSl/kSeO3OCo0F5/dakVeZat6VS1APpOLXB7M
-         6MW11po39z51tHd8FWw1vKhtXCwZN/t0fmNopB6V9rgSn/jA6LY9BLu2uaN2mAB37aYp
-         NR6BcrmVaY9yHnxmFtzfO2qQhbaAtncVKV+SfHIUVVqBab6373cK13VsWVn9JAMHLO2w
-         BpdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680697264;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=24y4xvuqm2QTtJeN4F6nnObiqeKpXBVzTchWqBmEtis=;
-        b=sFnGkp9WAvXaj6dnkrIQuD+gGZJNkGA4DeTOyJJQM5EcliTR+96upggNtmV0uR3eab
-         GRdGiB+85GlK/ihkknGg6RGBrGXyvmb3PV5gavugZoyg/Ffi5cnKy71WWe6N3Z7wRS+g
-         TH9kyL+4w48UmTuufe/4PO5whG8wwgnlxGnZ0BdTKiOxx8+B7Fq1Cn91g/OPa5yXicib
-         hx/pEL0sUhImuYL18oRw2QnqaarhVqoIMLKAS2wmslV1cJTSSa6x/7j4tqMWpRVeYNj5
-         Gxir6bC0Clg/nXnLzoq9UqeGmRvkKRKrOmYm0PvbOx4QNUXwFYYYKiOai9yYhgaEcSdZ
-         ISqQ==
-X-Gm-Message-State: AAQBX9fiy7K+arCJkqTu28iNtqCK7hwxBxa7EcRh80V5pKYsGrNPagc/
-        f0xBaW6vAoXrRIZBIO5VjopMro6kdOs=
-X-Google-Smtp-Source: AKy350YYCLLkBF1flTMbJ9f9IAgMNFU4yUtW5Lm1w7otzqx5vIAAQ47jxp74h6dlmYfz7ETCDp/AgA==
-X-Received: by 2002:a62:1757:0:b0:625:13f3:9409 with SMTP id 84-20020a621757000000b0062513f39409mr4422621pfx.26.1680697263694;
-        Wed, 05 Apr 2023 05:21:03 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.61.32])
-        by smtp.gmail.com with ESMTPSA id r14-20020a632b0e000000b005030a00085asm9340120pgr.46.2023.04.05.05.21.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 05:21:03 -0700 (PDT)
-Message-ID: <642d67af.630a0220.e52ca.3609@mx.google.com>
-Date:   Wed, 05 Apr 2023 05:21:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3658167039473265271=="
+        Wed, 5 Apr 2023 15:50:39 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E287D8C
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 12:50:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7E177640FF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 19:50:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E8546C433D2;
+        Wed,  5 Apr 2023 19:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1680724219;
+        bh=N/ccQD1NYaj2cVJVaUVHa6puJrsKAIvY8kPeI/cA8Zg=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=e0g9Z22egXzsw58u9dYz+ELAE0iSqmIUgNE9BhrGAXQMT3kQZQBeOKCmBvCQQNzBx
+         QpKMYiaJ/1uafwvAzmh+158AbGfyF6U981ww8+3+jvX9YDohdWO7IM6WbMZ5/t+OvR
+         qxyUccbUSca8H8Hq1YNCRkLsxYGaam2LQrOoQyDhYNCxmqzE+awB9nQPZQbSxKSFZQ
+         YJEqoMCnjLamsJU8mxtay4aRkHvlZQnmg80p6xcmkYbvNgFWPQ/W1kFsgzHGy0PUOR
+         WtJh30a1rU/UGjhVDUH3KwVMid658Rd/dUqco/G21+ubKxa2LKGiBsJWIhNZ4pVfnc
+         AJN0BDJ6L4aLw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D64D1E29F4E;
+        Wed,  5 Apr 2023 19:50:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: monitor/att: Add decoding support for BASS
-In-Reply-To: <20230405105442.14281-2-iulia.tanasescu@nxp.com>
-References: <20230405105442.14281-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/1] monitor/att: Add decoding support for BASS
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <168072421987.28321.1878400837564538119.git-patchwork-notify@kernel.org>
+Date:   Wed, 05 Apr 2023 19:50:19 +0000
+References: <20230405105442.14281-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20230405105442.14281-1-iulia.tanasescu@nxp.com>
+To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3658167039473265271==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Wed,  5 Apr 2023 13:54:41 +0300 you wrote:
+> This patch adds decoding support for BASS attributes
+> 
+> Iulia Tanasescu (1):
+>   monitor/att: Add decoding support for BASS
+> 
+>  monitor/att.c | 464 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 462 insertions(+), 2 deletions(-)
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=737147
+Here is the summary with links:
+  - [BlueZ,v2,1/1] monitor/att: Add decoding support for BASS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=61971f026466
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.83 seconds
-GitLint                       FAIL      0.60 seconds
-BuildEll                      PASS      32.86 seconds
-BluezMake                     PASS      986.54 seconds
-MakeCheck                     PASS      12.82 seconds
-MakeDistcheck                 PASS      177.75 seconds
-CheckValgrind                 PASS      292.17 seconds
-CheckSmatch                   WARNING   388.45 seconds
-bluezmakeextell               PASS      115.23 seconds
-IncrementalBuild              PASS      809.55 seconds
-ScanBuild                     PASS      1209.26 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v2,1/1] monitor/att: Add decoding support for BASS
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-33: B2 Line has trailing whitespace: "        Value: "
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3658167039473265271==--
