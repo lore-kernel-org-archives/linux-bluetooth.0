@@ -2,122 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D804C7618D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Apr 2023 08:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A014C76196
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Apr 2023 09:33:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235393AbjDFIzc (ORCPT
+        id S236293AbjDFJdC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Apr 2023 04:55:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41464 "EHLO
+        Thu, 6 Apr 2023 05:33:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233973AbjDFIza (ORCPT
+        with ESMTP id S236314AbjDFJdB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Apr 2023 04:55:30 -0400
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A18946E89;
-        Thu,  6 Apr 2023 01:55:26 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id v14-20020a05600c470e00b003f06520825fso2485293wmo.0;
-        Thu, 06 Apr 2023 01:55:26 -0700 (PDT)
+        Thu, 6 Apr 2023 05:33:01 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6633A9E
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Apr 2023 02:32:52 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id y4so7461702qti.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Apr 2023 02:32:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680771325; x=1683363325;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UqB8C0YqtoCa+EUxHHyv/O6zFBSvw0sxqdv4bPbxOig=;
-        b=G1yXOIBuEuAVOqNviT5S8hhE4jK0rc4wJ3bPYeGNzmjIaRhX4T12pynavTz20lJy5V
-         54FRk6htMr1FgFLJnAXTYLHUPm7Gl9lA6Xm5ixnH0kt9PRGfkugwHkPeRYgfe9VmUetP
-         UNgP+LeodwQyjNHf9r72ZM5il8NsTWrWRgMLKDTSyWEuJLtFQrPVQrPWEUa4AEr3Pvih
-         VNQFAgNEANTp6JAgonIxpt7Id7kRF6TuD8UYzvmier5/2+5sPXKh7Vc7VzO6gtSFRYKk
-         9k3j5a6UH1LlYQuiBDybI7EtQzveNqQAXnPncqz7nXoFS/GOJ3NzE/nK4Z51EWR2u8ZL
-         I6zw==
+        d=gmail.com; s=20210112; t=1680773571;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=LySu8FhsFqYGB2q5Ms3jVNFkq2I0tBXM338DaQqatd0=;
+        b=YKHXyO8qum0i8GyVcPqeoBoTK8gsz2Q4ghDyQ3U6vQSQfNROc38bIjVMno/+6Ktz1Q
+         7zA7AMtlTMdaT2djoL7NAahNybq8XeKsozZGV4ySYq8WUtljmbmBxAbP6HKCWvR+bdOj
+         O9XCT773yW/5t9JfqtDTrI6FFF+B1VTad/1IdXUhdJ+KCmiDBNJG7CFtG/tWb0se984K
+         uJ6j/FmaxyhG5i3kOUTWGI9uGGIB2spf/id+05EpfqxsZzNxQ8xYF5nqJ6XmGqDI0U8f
+         qEQ+y4OtGY8KmUcmJ/pojV+YmfLMfitY5iHSZ04I5t+ECN5pNw3h6w+AEb45kiqmH5dg
+         L57g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680771325; x=1683363325;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqB8C0YqtoCa+EUxHHyv/O6zFBSvw0sxqdv4bPbxOig=;
-        b=FO0Ennt9G1MhSIU2r7NVpb/3ES7ezrd5HajC4ldj6hm5+SgoYOyt9Qsg9KfimJYpyQ
-         kJi3PuGztN57PqVbQHFYxBSRKv3qUe61EFFa65BW9BUW7BZ8lBGTMMp2SOwVFUJDE+jt
-         EFRrFPMDN70YuWZiCHksheL8yUIjADfTiUaRS7wjsZwCXMHjt2Bf4bSYWFYqX7Fk/oac
-         C6EBd1FOobl45eOnLB6JmkcDsxuYRZXwRHe2bnXu079KruCeMonrx1XYBSpnTDQz4v8i
-         Yz3nIxDns/rOuaizuZ2bQJfqr0u8Zaaeo5s9FAgIU+zmfmpudfAKciIHk0DYpFDU2bO+
-         OWUw==
-X-Gm-Message-State: AAQBX9cRqJSLDgnoxgpMhnPqkhVgffYP1Vs28tWjLD1SbjwLyZlXjyWQ
-        BfM2JEXUjm9v4NtO1qnMOLw=
-X-Google-Smtp-Source: AKy350Zbz2BUKlhacOhqgyI56Ve9un3X/wIjWsFI2VV09enV/V69+SK8lQU3AbN8HB0kBWTk73yXKA==
-X-Received: by 2002:a7b:c34a:0:b0:3ef:f26b:a187 with SMTP id l10-20020a7bc34a000000b003eff26ba187mr6630534wmj.0.1680771324947;
-        Thu, 06 Apr 2023 01:55:24 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id z3-20020a05600c0a0300b003ee6aa4e6a9sm4797532wmp.5.2023.04.06.01.55.23
+        d=1e100.net; s=20210112; t=1680773571;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LySu8FhsFqYGB2q5Ms3jVNFkq2I0tBXM338DaQqatd0=;
+        b=igRZgrwDbbEnXf0kdLmY2VjC/PyZoNbysQR9AYL5zSot9vSx11eZ/5SjQlgQqu0Zfa
+         VVIp7H4eJ05zMdboak62LfMB9VMqOPMZHN9lCpo1NCSzvKWNy+T5xexET3JXN5ie7nPH
+         JaQCrejqAzTrGfTLvVHBj+0zd2p0cIwRs0BjilOV7sATUUM2qdpNoOYsb+WEUMCfpoUB
+         MT3wFkbhHj8p83olUQOfmmiAUpRVKgLj3T+rRahOnGaLilVFOBO8OUI/LGSDpwN06UuF
+         eFFNqBGKBS9Dss3bq/mjIAukJCHmOGo8UsdtfiIYb/RaYk/eff18qyDj/anhW0UEftk1
+         XBsQ==
+X-Gm-Message-State: AAQBX9epoWd3ypBAtOYYqt9RcGE10LQYDkJUZZDa34wIKTJetDWSZItr
+        MKx7sTSWmGbLkmqAlU7pV16U4FXgzjk=
+X-Google-Smtp-Source: AKy350YTyyaGf+Bum2g97Jx8IHDJSh4EtUDQtFWRrpqmqtpQjMSqmyrsnBVBaHG1PboYWfC8NrvR+A==
+X-Received: by 2002:a05:622a:1890:b0:3bf:d35d:98bb with SMTP id v16-20020a05622a189000b003bfd35d98bbmr8828775qtc.56.1680773571102;
+        Thu, 06 Apr 2023 02:32:51 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.120.52])
+        by smtp.gmail.com with ESMTPSA id 13-20020a37080d000000b0074a3c282c7dsm337381qki.97.2023.04.06.02.32.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Apr 2023 01:55:24 -0700 (PDT)
-Date:   Thu, 6 Apr 2023 11:55:17 +0300
-From:   Dan Carpenter <error27@gmail.com>
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] Bluetooth: vhci: Fix info leak in force_devcd_write()
-Message-ID: <634ab328-3ef2-43b7-8f81-8a48c7661427@kili.mountain>
+        Thu, 06 Apr 2023 02:32:50 -0700 (PDT)
+Message-ID: <642e91c2.370a0220.a3318.0e13@mx.google.com>
+Date:   Thu, 06 Apr 2023 02:32:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9114459394749372134=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, error27@gmail.com
+Subject: RE: Bluetooth: vhci: Fix info leak in force_devcd_write()
+In-Reply-To: <634ab328-3ef2-43b7-8f81-8a48c7661427@kili.mountain>
+References: <634ab328-3ef2-43b7-8f81-8a48c7661427@kili.mountain>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There are a number of bugs here:
+--===============9114459394749372134==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-1) If "count" is less than sizeof(dump_data.data) then it copies
-   uninitialized data.
-2) If simple_write_to_buffer() returns -EFAULT then we run into a
-   problem "ret < count" comparison.  "count" is an unsigned long so the
-   comparison is type promoted to unsigned long and the negative returns
-   become high positive values.  That also results in copying
-   uninitialized data.
-3) If "*ppos" is non-zero then the first part of the dump_data
-   buffer is uninitialized.  Using copy_from_user() instead of
-   simple_write_to_buffer() is more appropriate here.
+This is automated email and please do not reply to this email!
 
-Fixes: d5d5df6da0aa ("Bluetooth: Add vhci devcoredump support")
-Signed-off-by: Dan Carpenter <error27@gmail.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=737502
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      31.67 seconds
+CheckAllWarning               PASS      35.20 seconds
+CheckSparse                   PASS      39.42 seconds
+CheckSmatch                   PASS      110.45 seconds
+BuildKernel32                 PASS      30.78 seconds
+TestRunnerSetup               PASS      438.26 seconds
+TestRunner_l2cap-tester       PASS      15.87 seconds
+TestRunner_iso-tester         PASS      15.60 seconds
+TestRunner_bnep-tester        PASS      5.10 seconds
+TestRunner_mgmt-tester        PASS      106.48 seconds
+TestRunner_rfcomm-tester      PASS      8.10 seconds
+TestRunner_sco-tester         PASS      7.45 seconds
+TestRunner_ioctl-tester       PASS      8.67 seconds
+TestRunner_mesh-tester        PASS      6.42 seconds
+TestRunner_smp-tester         PASS      7.40 seconds
+TestRunner_userchan-tester    PASS      5.32 seconds
+IncrementalBuild              PASS      28.53 seconds
+
+
+
 ---
-From static analysis.  Untested.
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/hci_vhci.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 691fe93b1976..40e2b9fa11a2 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -323,17 +323,21 @@ static ssize_t force_devcd_write(struct file *file, const char __user *user_buf,
- 	struct hci_dev *hdev = data->hdev;
- 	struct sk_buff *skb = NULL;
- 	struct devcoredump_test_data dump_data;
-+	size_t data_size;
- 	int ret;
- 
--	ret = simple_write_to_buffer(&dump_data, sizeof(dump_data), ppos,
--				     user_buf, count);
--	if (ret < count)
--		return ret;
-+	if (count < offsetof(struct devcoredump_test_data, data) ||
-+	    count > sizeof(dump_data))
-+		return -EINVAL;
-+
-+	if (copy_from_user(&dump_data, user_buf, count))
-+		return -EFAULT;
- 
--	skb = alloc_skb(sizeof(dump_data.data), GFP_ATOMIC);
-+	data_size = count - offsetof(struct devcoredump_test_data, data);
-+	skb = alloc_skb(data_size, GFP_ATOMIC);
- 	if (!skb)
- 		return -ENOMEM;
--	skb_put_data(skb, &dump_data.data, sizeof(dump_data.data));
-+	skb_put_data(skb, &dump_data.data, data_size);
- 
- 	hci_devcd_register(hdev, vhci_coredump, vhci_coredump_hdr, NULL);
- 
--- 
-2.39.1
-
+--===============9114459394749372134==--
