@@ -2,207 +2,266 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB60C761A6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Apr 2023 23:11:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 175C8C7618D
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Apr 2023 00:16:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232680AbjDEXLW (ORCPT
+        id S232797AbjDFAQk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Apr 2023 19:11:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51498 "EHLO
+        Wed, 5 Apr 2023 20:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjDEXLV (ORCPT
+        with ESMTP id S229631AbjDFAQi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Apr 2023 19:11:21 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 987077689
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 16:11:19 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id ja10so35860748plb.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Apr 2023 16:11:19 -0700 (PDT)
+        Wed, 5 Apr 2023 20:16:38 -0400
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3081D4C25
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Apr 2023 17:16:35 -0700 (PDT)
+Received: by mail-vs1-xe2d.google.com with SMTP id c1so33052920vsk.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Apr 2023 17:16:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680736278;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9h2LAyTEPFBx9MN8b1NweE/DCDt8zWMHpQDzmPvfrs8=;
-        b=iE0Eno4PAYMMTG/gXPaRkflofWfvgLwSQSuPoyZRFWT1cwPqGyQ2+D+rPHApTfVEA+
-         dKsXY7QPZbVQKegcV2dDq4n0y4kKUNx/oe7autKa1Py01eZMwU1Btvw1RT0Fq5qZ9PBB
-         4Mc+iDZODesje6Y+357JyJgJOcpVyz4FCTB+/OswRdbecXbKytZxoMU/6fhPlU7tJr5t
-         Kor/K9NxS4Ai1xSv1qwtM9XB/vj9iKBNK3atFIX8WaS74NOOiGMvq/A2gdVAnsfJs3LF
-         XpQ+426opYPnktetmfEVbtuLlTdjXVkXU+966RjLR8iZHEEoXaQthJYYGaeiYkhnEg0w
-         BAdA==
+        d=gmail.com; s=20210112; t=1680740194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SH8JVe28qc7rbYJKslaaieUhZT5v1CGguyrZS56xDNA=;
+        b=grzgMLBISaYrhQG4LWfipi1CFabwgjjouhnIN9FZ6FPZwB7BMFXfomGEpB1JD0+9aI
+         ElvwviHGj1NaSjnKuh/8WJ1d6D+p1XfVg7IIzp7EoJHX7Jwn7VsouUKDiwmLFsFqEDwH
+         C0Bkbo6BUTpzBOf9BfdTlGyHG7k7IgIyInGkg0VbK2CGFalADk/ahCYCZ7a2ExRwLt3B
+         vuJyHnejJYeKotOd9xzKUWbTFZZ4fqVybQHtbVfauk9hUPweBkCaDxMp5sMfGT1UiAYS
+         h7TCkktKiXkvePAR0wFzJJ48HFF4vr/kGref/uRg4DUVXYw1BWK3l+NzNBRChyQmm1Yp
+         1tpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680736278;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20210112; t=1680740194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9h2LAyTEPFBx9MN8b1NweE/DCDt8zWMHpQDzmPvfrs8=;
-        b=MnyxLPcp87TxHIb4M7eWuYIDeVhJo3TcmsbIqe3MtH5kSKXSbpgJOf31IvEnnzQ+L4
-         Jkt6Bwj74yzpLRY3BFZv0wfyDqBfQN3VaUoe5DFJ7kOQXU9Z0U6Yv6VAVjiotNZ7PppO
-         BA3j6FYb3QeOmfZOu7K5XXGH99dwL32Vp4EgwqZCgxQkFLjlj5OVKzD2XaYoqFvbDEt1
-         3Py8Xbpl4Df5iCVXLHi8z4yqstZ8xcSnm7pPS8ZNSE0YGTGDYG74l5bEg8M96g3qRKh3
-         u6j6AK0d7UEY19gv7fiubunnbwC0EQeZgZbNgxGJRywMpk7Z3mx5i7ZLDw3DToRoICXY
-         bk+Q==
-X-Gm-Message-State: AAQBX9ddCwOtBx8RhF/BNV076WMXBfXKUSWRelN+qDWirPu1gIFHQY0p
-        F7wXQE28QKDeM4avZqAMrLiFuc/4PkI=
-X-Google-Smtp-Source: AKy350brgp0sUKoPy0HTlooEXHSxZIc6ydBZQJdExOj06j1Pn16ptHz29bpYqNrwbZ/oKHOLZ/VrjA==
-X-Received: by 2002:a05:6a20:cc41:b0:db:314d:c19a with SMTP id hq1-20020a056a20cc4100b000db314dc19amr658492pzb.50.1680736278419;
-        Wed, 05 Apr 2023 16:11:18 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id v12-20020aa7808c000000b006254794d5b2sm11537752pff.94.2023.04.05.16.11.17
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Apr 2023 16:11:17 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5] client/advertising: Add support for advertise.rsi command
-Date:   Wed,  5 Apr 2023 16:11:11 -0700
-Message-Id: <20230405231111.2636523-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230405231111.2636523-1-luiz.dentz@gmail.com>
-References: <20230405231111.2636523-1-luiz.dentz@gmail.com>
+        bh=SH8JVe28qc7rbYJKslaaieUhZT5v1CGguyrZS56xDNA=;
+        b=CZGLNo4SnIOTwUbS60fAzViGtGAQk1TIRySvwlt3I44iN0gTlIAal9WQinuZQYotTa
+         zNhA/FLDrcFscDNvBsYe1e+gqDNLiaElvRbO+Rq8BCjqhjIO1G1YRukxHsutpxMKezqW
+         AAmkPAc4QSSa2mVafU+L4EmeVqDPXDKDa9d/c8kyQT12jEnZSJACpPl9dGNI94LDj29m
+         IGnSO9nwQrlM7wBZjlCqI5+SNIxHjasrmgM2Vx/LPYMisrbSqlxnvWjKdf8qVSdxW2Pe
+         8oS3YcFTCUOCYZquCZsQzPt+8wPEtTgRQiHzILIKKyfphe0gaS/CieIcavcV0o3y20sa
+         W7Og==
+X-Gm-Message-State: AAQBX9f6o6+qXAsYvx/QRV/c+WrL2i9p/xqGSEMCXJU4PWXrdek9WyjI
+        Ddh2uBQojska9plINyhAgahOfjixemhZ0X7TCns=
+X-Google-Smtp-Source: AKy350a8wrjKrvupv69E+G/T1s0+nhWhJMHRI4gzaImPh94KG2e0qGLcAUweXEQNpUy//55C+kFl7PwUFH5W2r6K5xg=
+X-Received: by 2002:a67:c285:0:b0:423:e1fd:c6e2 with SMTP id
+ k5-20020a67c285000000b00423e1fdc6e2mr6000204vsj.2.1680740194126; Wed, 05 Apr
+ 2023 17:16:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230307222422.2608483-1-luiz.dentz@gmail.com>
+ <167849522070.21816.4954897604805294201.git-patchwork-notify@kernel.org>
+ <CABBYNZJ8GbCic4+dAz-04vji3xgtqYnXRUjTuWHSk3oGjXxA=Q@mail.gmail.com>
+ <f86f2896be923a9caa5625457fea46d1c32b3114.camel@iki.fi> <CABBYNZKv68ybD3YVKFtHUARh6H+TVY=2_P9TdNWEbZ4FbTX31w@mail.gmail.com>
+ <A02E43E3-63E3-4F75-AB99-FB355180DD2B@iki.fi>
+In-Reply-To: <A02E43E3-63E3-4F75-AB99-FB355180DD2B@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 5 Apr 2023 17:16:21 -0700
+Message-ID: <CABBYNZJdjq2TZCpNVSC-za6e++GgeL2M3=G=11g7u33NDeEpgg@mail.gmail.com>
+Subject: Re: [RFC v2 01/12] shared/crypto: Add bt_crypto_sirk
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org,
+        =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pauli,
 
-This adds support for advertise.rsi command which can be used to request
-the generation of RSI and include it as part of advertising data:
+On Mon, Mar 13, 2023 at 6:05=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> 14. maaliskuuta 2023 2.18.21 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz=
+@gmail.com> kirjoitti:
+> >Hi Pauli,
+> >
+> >On Mon, Mar 13, 2023 at 4:30=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrot=
+e:
+> >>
+> >> Hi,
+> >>
+> >> su, 2023-03-12 kello 22:36 -0700, Luiz Augusto von Dentz kirjoitti:
+> >> > Hi Pauli, Frederic,
+> >> >
+> >> > On Fri, Mar 10, 2023 at 4:40=E2=80=AFPM <patchwork-bot+bluetooth@ker=
+nel.org> wrote:
+> >> > >
+> >> > > Hello:
+> >> > >
+> >> > > This series was applied to bluetooth/bluez.git (master)
+> >> > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> >> > >
+> >> > > On Tue,  7 Mar 2023 14:24:11 -0800 you wrote:
+> >> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >> > > >
+> >> > > > This adds bt_crypto_sirk which attempts to generate a unique SIR=
+K using
+> >> > > > the following steps:
+> >> > > >
+> >> > > >  - Generate a hash (k) using the str as input
+> >> > > >  - Generate a hash (sirk) using vendor, product, version and sou=
+rce as input
+> >> > > >  - Encrypt sirk using k as LTK with sef function.
+> >> > > >
+> >> > > > [...]
+> >> > >
+> >> > > Here is the summary with links:
+> >> > >   - [RFC,v2,01/12] shared/crypto: Add bt_crypto_sirk
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc1dd9=
+4cc7f81
+> >> > >   - [RFC,v2,02/12] shared/ad: Add RSI data type
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc2e99=
+aefd337
+> >> > >   - [RFC,v2,03/12] doc: Add set-api
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D64775=
+22e92e3
+> >> > >   - [RFC,v2,04/12] device-api: Add Set property
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D5bac4=
+cddb191
+> >> > >   - [RFC,v2,05/12] core: Add initial implementation of DeviceSet i=
+nterface
+> >> > >     (no matching commit)
+> >> > >   - [RFC,v2,06/12] core: Check if device has RSI
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Df95ff=
+cc8b1fe
+> >> > >   - [RFC,v2,07/12] main.conf: Add CSIP profile configurable option=
+s
+> >> > >     (no matching commit)
+> >> > >   - [RFC,v2,08/12] shared/csip: Add initial code for handling CSIP
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd297a=
+03b7a61
+> >> > >   - [RFC,v2,09/12] profiles: Add initial code for csip plugin
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D9e1eb=
+0a62b3f
+> >> > >   - [RFC,v2,10/12] tools: Add support to generate RSI using SIRK
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc446a=
+64d461b
+> >> > >   - [RFC,v2,11/12] client: Add support for DeviceSet proxy
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D373ba=
+fc34ce6
+> >> > >   - [RFC,v2,12/12] client: Use AdvertisingFlags when available
+> >> > >     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D815f7=
+79aa8e4
+> >> > >
+> >> > > You are awesome, thank you!
+> >> > > --
+> >> > > Deet-doot-dot, I am a bot.
+> >> > > https://korg.docs.kernel.org/patchwork/pwbot.html
+> >> >
+> >> > Let me know if you guys are happy with this interface to detect
+> >> > Coordinated Sets, it still experimental so we can experiment with it
+> >> > until we think it is stable, regarding the implementation of the
+> >> > transports one major difference here is that we will need to encode
+> >> > left and right separately, not sure how hard it is to do that in
+> >> > pipewire?
+> >>
+> >> As far as the device set DBus interface is concerned, it seems to work
+> >> fine for me currently (in wip implementation for PW [0]). Don't right
+> >> now see something that would need to be added/changed in it.
+> >>
+> >> Channel splitting/merging is generally easy in PW. How the playback
+> >> synchronization is going to work on socket level may determine a bit a=
+t
+> >> what level in PW it is convenient to do though.
+> >>
+> >>
+> >> ---
+> >>
+> >> Laundry list for PW related to this:
+> >>
+> >> * How to do TX syncronization properly with the ISO sockets needs stil=
+l
+> >> some thinking. I have some wip patches [2] that add the timestamps and
+> >> other socket API that provide timing information to allow
+> >> synchronization to the Number of Completed packets events.
+> >> Corresponding Pipewire implementation [3] rate matches to keep the tim=
+e
+> >> difference between those events and our audio reference time fixed at
+> >> e.g. 25ms (2 packets in controller). Not really clear yet if this is a
+> >> right thing to do to help the controller send packets at the right
+> >> time.
+> >
+> >I have to check with our controller folks, I do recall someone saying
+> >that perhaps we should use framed instead of unframed so the
+> >controller can better keep up with timings, but it is not yet clear
+> >why.
+> >
+> >> Here I see LE Read ISO TX Sync with Intel AX210 returning only zero
+> >> values in Command Complete in btmon for running CIS, so that command
+> >> doesn't seem to help here.
+> >
+> >Yeah, I don't think it is implemented yet.
+> >
+> >> * BlueZ doesn't seem to pass on the PAC audio location it reads via
+> >> read_sink/source_pac_loc, probably very easy to fix.
+> >
+> >Will take a look, afaik we fixed something like this not long ago but
+> >perhaps you are talking about something different.
+> >
+> >> * The CIS in a CIG cannot be started one by one, or connected to same
+> >> destination. The kernel appears to wait until all CIS sockets in same
+> >> CIG go to connect state before proceeding to create CIS. The spec does
+> >> not seem to require this (I have some pre-rfc patches to make it more
+> >> flexible [1].)
+> >
+> >It used to be like that but I actually have to fix it because the
+> >controller don't accept multiple CreateCIS in parallel:
+> >
+> >https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next=
+.git/tree/net/bluetooth/hci_conn.c#n1907
+> >
+> >And it would actually create a relatively big window if we queue and
+> >wait for CIS established, because then the controller may set up its
+> >scheduling without taking into account the second CIS which will then
+> >fail when it comes to its setup, so I think it is better to program
+> >them together to avoid having only one side working.
+>
+> Hmm, I made it queue and wait for the previous Create CIS to fully comple=
+te before emitting the next one, and that did seem to also work (also with =
+TWS playback to the Samsung device).
+> However did not extensively test, so even if allowed by spec risks runnin=
+g to controller issues?
+>
+> The problem here is that the second CIS is not necessarily going to come,=
+ as it may be unrelated device put to same CIG since controller doesn't sup=
+port multiple CIG.
+>
+> In principle sound server can acquire always all CIS, but then we should =
+expose also the cig/cis properties on transports so they know which ones ar=
+e needed.
+>
+> It could also make sense for BlueZ do it, when any cis in cig is started.
+>
+> >Btw, take a look at how it was done with bluetoothctl>
+> >transport.acquire <transport_left> <transport_right>, we have been
+> >able to use it to acquire both left/right earbuds and then send
+> >pre-encoded files.
+> >
+> >> * PW currently does transport acquires synchronously and fails because
+> >> of that with multiple CIS, but it probably should do them async.
+> >>
+> >>
+> >> [0] https://gitlab.freedesktop.org/pipewire/pipewire/-/merge_requests/=
+1564
 
-[bluetooth]# advertise.rsi --help
-Show/Enable/Disable RSI to be advertised
-Usage:
-	 rsi [on/off]
-[bluetooth]# advertise.rsi
-RSI: on
-[bluetooth]# advertise on
-...
-Advertising object registered
-Tx Power: off
-Name: off
-Appearance: off
-Discoverable: on
-RSI: on
-[bluetooth]#
----
- client/advertising.c | 28 +++++++++++++++++++++++++++-
- client/advertising.h |  1 +
- client/main.c        | 17 +++++++++++++++++
- 3 files changed, 45 insertions(+), 1 deletion(-)
+Did you make any progress on these changes above? Looks like the pull
+request is still open, I wonder if you hit some blocker?
 
-diff --git a/client/advertising.c b/client/advertising.c
-index fb9b049fde78..8b8e6d97ff80 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -67,9 +67,11 @@ static struct ad {
- 	bool tx_power;
- 	bool name;
- 	bool appearance;
-+	bool rsi;
- } ad = {
- 	.local_appearance = UINT16_MAX,
- 	.discoverable = true,
-+	.rsi = true,
- };
- 
- static void ad_release(DBusConnection *conn)
-@@ -176,6 +178,7 @@ static void print_ad(void)
- 					ad.appearance ? "on" : "off");
- 
- 	bt_shell_printf("Discoverable: %s\n", ad.discoverable ? "on": "off");
-+	bt_shell_printf("RSI: %s\n", ad.rsi ? "on": "off");
- 
- 	if (ad.duration)
- 		bt_shell_printf("Duration: %u sec\n", ad.duration);
-@@ -295,7 +298,7 @@ static gboolean get_manufacturer_data(const GDBusPropertyTable *property,
- 
- static gboolean includes_exists(const GDBusPropertyTable *property, void *data)
- {
--	return ad.tx_power || ad.name || ad.appearance;
-+	return ad.tx_power || ad.name || ad.appearance || ad.rsi;
- }
- 
- static gboolean get_includes(const GDBusPropertyTable *property,
-@@ -323,6 +326,12 @@ static gboolean get_includes(const GDBusPropertyTable *property,
- 		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &str);
- 	}
- 
-+	if (ad.rsi) {
-+		const char *str = "rsi";
-+
-+		dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING, &str);
-+	}
-+
- 	dbus_message_iter_close_container(iter, &array);
- 
- 
-@@ -1023,3 +1032,20 @@ void ad_advertise_interval(DBusConnection *conn, uint32_t *min, uint32_t *max)
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
-+
-+void ad_advertise_rsi(DBusConnection *conn, dbus_bool_t *value)
-+{
-+	if (!value) {
-+		bt_shell_printf("RSI: %s\n", ad.rsi ? "on" : "off");
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	if (ad.rsi == *value)
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+
-+	ad.rsi = *value;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Includes");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-diff --git a/client/advertising.h b/client/advertising.h
-index 472396efd381..145ac80452d2 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -30,3 +30,4 @@ void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value);
- void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *value);
- void ad_advertise_secondary(DBusConnection *conn, const char *value);
- void ad_advertise_interval(DBusConnection *conn, uint32_t *min, uint32_t *max);
-+void ad_advertise_rsi(DBusConnection *conn, dbus_bool_t *value);
-diff --git a/client/main.c b/client/main.c
-index 79895015d6a6..b433a22001a3 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2733,6 +2733,21 @@ static void cmd_advertise_interval(int argc, char *argv[])
- 	ad_advertise_interval(dbus_conn, &min, &max);
- }
- 
-+static void cmd_advertise_rsi(int argc, char *argv[])
-+{
-+	dbus_bool_t value;
-+
-+	if (argc < 2) {
-+		ad_advertise_rsi(dbus_conn, NULL);
-+		return;
-+	}
-+
-+	if (!parse_argument(argc, argv, NULL, NULL, &value, NULL))
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	ad_advertise_rsi(dbus_conn, &value);
-+}
-+
- static void ad_clear_uuids(void)
- {
- 	ad_disable_uuids(dbus_conn);
-@@ -2931,6 +2946,8 @@ static const struct bt_shell_menu advertise_menu = {
- 			"Set/Get advertise secondary channel" },
- 	{ "interval", "[min] [max] ", cmd_advertise_interval,
- 			"Set/Get advertise interval range" },
-+	{ "rsi", "[on/off]", cmd_advertise_rsi,
-+			"Show/Enable/Disable RSI to be advertised", NULL },
- 	{ "clear", "[uuids/service/manufacturer/config-name...]", cmd_ad_clear,
- 			"Clear advertise config" },
- 	{ } },
--- 
-2.39.2
+> >> [1] https://github.com/pv/linux/commits/iso-fix-multicis
+> >> [2] https://github.com/pv/linux/commits/iso-timestamp
+> >> [3] https://gitlab.freedesktop.org/pvir/pipewire/-/commits/iso-timesta=
+mp-test
+> >>
+> >> --
+> >> Pauli Virtanen
+> >
+> >
+> >
+>
+> Hi,
 
+
+
+--=20
+Luiz Augusto von Dentz
