@@ -2,51 +2,54 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B34EC77B6F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Apr 2023 21:00:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE49C77B6E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Apr 2023 21:00:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238887AbjDFVAZ (ORCPT
+        id S239954AbjDFVA0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Apr 2023 17:00:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57940 "EHLO
+        Thu, 6 Apr 2023 17:00:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230005AbjDFVAX (ORCPT
+        with ESMTP id S231665AbjDFVAX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 6 Apr 2023 17:00:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D57257695
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Apr 2023 14:00:21 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B447AA0;
+        Thu,  6 Apr 2023 14:00:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6318E64CA9
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Apr 2023 21:00:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C91E8C433A1;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 552CA64CA1;
+        Thu,  6 Apr 2023 21:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6B78C4339E;
         Thu,  6 Apr 2023 21:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1680814820;
-        bh=+jwGM4DKGW9rM/d2CG3JX9vju1BH+IPCgrmoDr6jHZs=;
+        bh=lxPVkhPmUYtm3jDwsxt8qNEdEZ0oXkG23WIBFwHOauI=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=SUov4R6Ufq0uNX52nH3hDd6G2nbXLYeVFzCi47ogtIiqqOXTFoTP1tLUz9un1zkDv
-         t8/blmPvuRB8f7Q78dqCWGAWaYf8iFC1la+sgNchM4Qx5dXrk9G+DE+XLakO3ixEFg
-         jPx+wSvbknb7xbOe66wWfxQYA+F74DKYTVwBeBqVlPM/71Gk+LeAVu2l6ZGXCNi5nQ
-         Fnex8LBND2Dkzbt14PSMLeh4U6qEtZoj3gUny/s5SLYhK4ZeaL0T/Oejnt7dfVqVky
-         npryfry1mhecBv15ZH9BOrQPyUP8ciEbc/s3meaNpTgBsRywXAlaDPOxsx5lu9roLZ
-         drM4yf7NKhc/A==
+        b=TXPl0+2Wnh3BPGasq4HB513RBatX1VFF60+2t9xCSQdsYoGtj1A37ODU3Nk3lTtl7
+         fVl2fDjTV357KTvSkODiijIfobNDxXf6l7GgUPtZF+dcH69Q98J2hdM7KR0PKGi5Zy
+         4xNPlpqX+Pzlk9aRcwUK2MYRezhPKHaKyONQkFW0h9gSbv8Kq9HaM6983coZU5p8qO
+         BQrYbw67t1u9fxoRLOIBA0mdDGJR0+iVodldq5j3TbO3BRb0kPHk24BCvjzvCLh+Tb
+         eqruqakdhFfpwEDQwzilm3zffqOOIbZFg/7O/l1Q0zSeC/63ejZmmqnjkkxhZl6SMs
+         yq/g8HwWYTLlw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B3084E4F158;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 97743E4F153;
         Thu,  6 Apr 2023 21:00:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/1] Set ISO Data Path on broadcast sink
+Subject: Re: [PATCH v1] Bluetooth: btnxpuart: No need to check the received
+ bootloader signature
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168081482072.2619.17846943875971851872.git-patchwork-notify@kernel.org>
+Message-Id: <168081482061.2619.11741204657524521970.git-patchwork-notify@kernel.org>
 Date:   Thu, 06 Apr 2023 21:00:20 +0000
-References: <20230405111918.4885-1-claudia.rosu@nxp.com>
-In-Reply-To: <20230405111918.4885-1-claudia.rosu@nxp.com>
-To:     Claudia Draghicescu <claudia.rosu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20230403122430.1024235-4-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20230403122430.1024235-4-neeraj.sanjaykale@nxp.com>
+To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -56,17 +59,24 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  5 Apr 2023 14:19:17 +0300 you wrote:
-> This patch enables ISO data rx on broadcast sink.
-> Claudia Draghicescu (1):
->   Set ISO Data Path on broadcast sink
+On Mon,  3 Apr 2023 17:54:30 +0530 you wrote:
+> We can never assume the uart will deliver a complete packet to the BT
+> layer at once, the expected packet may be divided into several parts by
+> uart as uart doesn't know the received packet size, the received data
+> count may mismatch with the expected packet size, so here
+> is_valid_bootloader_signature() check may always return false.
 > 
->  net/bluetooth/hci_event.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Even we remove the count check in is_valid_bootloader_signature(), then
+> the first part of the data which includes the packet type can pass the
+> is_valid_bootloader_signature() check, but the remaining parts don't
+> have the packet type data still cannot pass the check, here return
+> directly will cause the data loss.
+> 
+> [...]
 
 Here is the summary with links:
-  - [v2,1/1] Bluetooth: Set ISO Data Path on broadcast sink
-    https://git.kernel.org/bluetooth/bluetooth-next/c/32947ea30644
+  - [v1] Bluetooth: btnxpuart: No need to check the received bootloader signature
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b1ff41fd0ee6
 
 You are awesome, thank you!
 -- 
