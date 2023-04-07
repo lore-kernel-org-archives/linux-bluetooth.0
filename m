@@ -2,121 +2,182 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33D3C76196
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Apr 2023 18:35:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A88F7C6FD1D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Apr 2023 18:44:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230446AbjDGSfG (ORCPT
+        id S230007AbjDGSop (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Apr 2023 14:35:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49056 "EHLO
+        Fri, 7 Apr 2023 14:44:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230049AbjDGSfF (ORCPT
+        with ESMTP id S229523AbjDGSoo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Apr 2023 14:35:05 -0400
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52797BB98
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Apr 2023 11:34:45 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id ly9so3074305qvb.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Apr 2023 11:34:45 -0700 (PDT)
+        Fri, 7 Apr 2023 14:44:44 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE16FB456
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Apr 2023 11:44:43 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id q102so40392076pjq.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Apr 2023 11:44:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112; t=1680892482; x=1683484482;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jfNBAlm1kU01/HrJ2tbIEprpTIgLazb4JQl8sdcHS7E=;
-        b=X26i7+lCUfpl/v5EsOFMiz3eD0uTxwJ/FpSnct1WQUgnbXRMIWGGSp2DP34A7f36up
-         XNL81ISPwmoe/MHMx6wE4iQiyIjdOtWTHE1tpITAeo4pdEq65zeTkzlLAsTIKBEW7RDU
-         FxLQrvZKwgDy2VeCMLqMvFWhasc5bbJWBl6+hVioXNB8ckEbB1DhPBPDZqloeDTj9I4v
-         m6ZtzNK1QV16rouK2PNX5L0HdY5uQxkF+0Ebat6YwaALbB/YPKcajlmUT1iC+WEG9Ba6
-         jL97Pu+N26PKdjF7z8we9u1tgRUa+liCS7gOD0h4TtACg6OWaTIxuaYwQyuVEFmRAaf3
-         ecFA==
+        d=gmail.com; s=20210112; t=1680893082;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U4L+XKYDZ0CFKSgbxqd9uViWwXH3MnZou/RSC3/Bhic=;
+        b=KWww3lHnZgYtudoUbjOHgKCCzgGupfAsGwg2rahuv8UMxqeTE879jI6fVybq0MwOK4
+         d28G56A32FlfzNV8sFjP3v59oiPd+bUtGm4FBYOhtL6+3tKPftG9YiYGEp6GfoUQGWcS
+         Q6XqpkbdQo7W8b7jVNUBXlPMkt9lm/cNAI+zyZ8iNoI4JTXR6SsyWNbP/1O3OLClj8QH
+         xpKYwgHsn64qR4s2ZwgyRE3G/luiIwNNWnNfXQsFleH9gvrukTYl95Pc7CIPtLzLWXye
+         yN/rP0SFC4DNaIwXzzyPdjAjafHUYReF0AqrEh+c+bVCgIHWBGzZIW38ia0d9g/lIsRx
+         /phA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112; t=1680892482; x=1683484482;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jfNBAlm1kU01/HrJ2tbIEprpTIgLazb4JQl8sdcHS7E=;
-        b=dyLr++8bKsSUrhMkcHf6p3scLGIdI0cvNAIRIpxdXlgMH2Ko/MiZvltQ/8qskuoODZ
-         V7kX4gvRBxrKRM8BLil+MOkCkQ1swc2beRyNUYzasLMU9obn9xx6OdkEviznB7ck3kIR
-         CWJO/AK9+Q0YHL3u/6ENivsth1QUKzSmWzlDeBKz2+DXRunMmmso+Kvc/c39HGf8rL/6
-         adlTvWeM+QZ7sNi82qO0EhRMGqLDPBvOXlrDdmZ84JaNc4ihLwZAJSXGNjxNZcAC3GAk
-         FiemKNh9s4v1WxORBgmlDcPCJgGqYIN9qlvn7ZvpOVUJjFhP9g8egV+8gDaZ+zB9p1Y+
-         iIBA==
-X-Gm-Message-State: AAQBX9e31Iv6HtGNt3ONGNZjXCWhzF9ZbiesrJA+7ozwhs9MWIWWYSDO
-        Xhx9om6vzmxi6enJ+Iut7v1nsnEqyUk=
-X-Google-Smtp-Source: AKy350ZZj1fp/6J4m1aLn55gOhks9wjFP1SSnj5RdPT176p9IudcxP+yGq31KS3KB7JBvel4hwBo8A==
-X-Received: by 2002:a05:6214:cc2:b0:5e8:63ae:a9a9 with SMTP id 2-20020a0562140cc200b005e863aea9a9mr4976622qvx.47.1680892482728;
-        Fri, 07 Apr 2023 11:34:42 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.96.45])
-        by smtp.gmail.com with ESMTPSA id t9-20020a37ea09000000b006fcb77f3bd6sm1466630qkj.98.2023.04.07.11.34.41
+        d=1e100.net; s=20210112; t=1680893082;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U4L+XKYDZ0CFKSgbxqd9uViWwXH3MnZou/RSC3/Bhic=;
+        b=F5Nl0TH7e361alvFLX25i+9ML3qbkREawVOZjdnl+eSCjZaHSDmWfl3KIywV2NQWrw
+         1knu801D4RXbxNr9AQoNc4fljuP9iVzvI3l76iq/cU6ML56XCEnmLdzZN5Jc3kHousCg
+         VMCIAv59W+Tvj9X1LmmwclgmHRZlUrdtYRSEWr7NGR69U2tgIXBhwzSMTxX4FtUZ6AQb
+         DVXpBF6NLKiqCdnFmYlQJOT+1Fob77vONp2aTvrvzc9oC8xUmzYOFSMylLLnmHT9Ctdn
+         H0k44hVtf0xgXbM2Ei5uShewhkFJC/CbdDQ2KJ8JzheaubPCIENrc87LER4yMGNLzULJ
+         R03Q==
+X-Gm-Message-State: AAQBX9cwyEhrRVLmCJi/+kWn8VkM6MCIyPpp/GotjAPC83yNANViTSjY
+        ziW3tuE1Sc+7slzXB83wt8gYTPZLEBA=
+X-Google-Smtp-Source: AKy350ZwgSOvlhmxokpf8e2jQqEflWJ3sc1XoeAAA1L6z/zzcVn43Xo6z8A/fYyv9c3yYoEeipO65g==
+X-Received: by 2002:a17:90b:3e84:b0:23d:e2b:cf1f with SMTP id rj4-20020a17090b3e8400b0023d0e2bcf1fmr2843648pjb.16.1680893082404;
+        Fri, 07 Apr 2023 11:44:42 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id r23-20020a17090aa09700b00240dee12285sm3021393pjp.34.2023.04.07.11.44.41
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Apr 2023 11:34:42 -0700 (PDT)
-Message-ID: <64306242.370a0220.6d06e.66ff@mx.google.com>
-Date:   Fri, 07 Apr 2023 11:34:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5344620318833476369=="
+        Fri, 07 Apr 2023 11:44:41 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RESEND BlueZ] mgmt-tester: Fix Get/Set PHY tests
+Date:   Fri,  7 Apr 2023 11:44:40 -0700
+Message-Id: <20230407184440.3291592-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: L2CAP: Fix use-after-free in l2cap_disconnect_{req,rsp}
-In-Reply-To: <20230407180201.3229763-1-luiz.dentz@gmail.com>
-References: <20230407180201.3229763-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5344620318833476369==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This fixes the following tests now that all supported PHYs are enabled
+by default:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=738043
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      32.03 seconds
-CheckAllWarning               PASS      35.10 seconds
-CheckSparse                   PASS      40.39 seconds
-CheckSmatch                   PASS      108.24 seconds
-BuildKernel32                 PASS      31.21 seconds
-TestRunnerSetup               PASS      445.76 seconds
-TestRunner_l2cap-tester       PASS      16.46 seconds
-TestRunner_iso-tester         PASS      16.15 seconds
-TestRunner_bnep-tester        PASS      5.35 seconds
-TestRunner_mgmt-tester        FAIL      113.09 seconds
-TestRunner_rfcomm-tester      PASS      8.48 seconds
-TestRunner_sco-tester         PASS      7.78 seconds
-TestRunner_ioctl-tester       PASS      9.09 seconds
-TestRunner_mesh-tester        PASS      6.64 seconds
-TestRunner_smp-tester         PASS      7.67 seconds
-TestRunner_userchan-tester    PASS      5.58 seconds
-IncrementalBuild              PASS      29.77 seconds
-
-Details
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 494 (99.4%), Failed: 3, Not Run: 0
-
-Failed Test Cases
-Get PHY Success                                      Failed       0.127 seconds
-Set PHY 1m 2m coded Succcess                         Timed out    2.070 seconds
-Start Discovery LE - (Ext Scan Param)                Failed       0.121 seconds
-
-
+Start Discovery LE - (Ext Scan Param)   Failed
+Get PHY Success                         Failed
+Set PHY 1m 2m coded Succcess            Timed out
 ---
-Regards,
-Linux Bluetooth
+ tools/mgmt-tester.c | 49 ++++++++++++++++++---------------------------
+ 1 file changed, 19 insertions(+), 30 deletions(-)
 
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index c0784dab5b64..b819bccbc7c0 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -9445,7 +9445,7 @@ static const struct generic_data add_ext_advertising_conn_off_1m = {
+ static const uint8_t get_phy_param[] = {
+ 	0xff, 0x7f, 0x00, 0x00,	/* All PHYs */
+ 	0xfe, 0x79,	0x00, 0x00, /* All PHYs except BR 1M 1SLOT, LE 1M TX & LE 1M RX */
+-	0xff, 0x07, 0x00, 0x00, /* All BREDR PHYs and LE 1M TX & LE 1M RX */
++	0xff, 0x7f, 0x00, 0x00, /* All PHYs */
+ };
+ 
+ static const struct generic_data get_phy_success = {
+@@ -9508,26 +9508,6 @@ static const uint8_t set_phy_all_param[] = {
+ 	0xff, 0x7f,	0x00, 0x00	/* All PHYs */
+ };
+ 
+-static const uint8_t set_default_phy_all_param[] = {
+-	0x00, 		/* preference is there for tx and rx */
+-	0x07,		/* 1m 2m coded tx */
+-	0x07,		/* 1m 2m coded rx */
+-};
+-
+-static const struct generic_data set_phy_all_success = {
+-	.setup_settings = settings_powered_le,
+-	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
+-	.send_param = set_phy_all_param,
+-	.send_len = sizeof(set_phy_all_param),
+-	.expect_status = MGMT_STATUS_SUCCESS,
+-	.expect_hci_command = BT_HCI_CMD_LE_SET_DEFAULT_PHY,
+-	.expect_hci_param = set_default_phy_all_param,
+-	.expect_hci_len = sizeof(set_default_phy_all_param),
+-	.expect_alt_ev = MGMT_EV_PHY_CONFIGURATION_CHANGED,
+-	.expect_alt_ev_param = set_phy_all_param,
+-	.expect_alt_ev_len = sizeof(set_phy_all_param),
+-};
+-
+ static const uint8_t set_phy_2m_tx_param[] = {
+ 	0xff, 0x0f,	0x00, 0x00	/* 1mtxrx, 2m tx */
+ };
+@@ -9635,10 +9615,13 @@ static const struct generic_data start_discovery_le_ext_scan_enable = {
+ 	.expect_alt_ev_len = sizeof(start_discovery_le_evt),
+ };
+ 
+-static const char start_discovery_valid_ext_scan_param[] = {
++static const char start_discovery_ext_scan_param[] = {
+ 	0x01,			/* Own Addr type*/
+ 	0x00,			/* Scan filter policy*/
+-	0x01,			/*Phys - 1m */
++	0x05,			/* Phys - 1m and Coded*/
++	0x01,			/* Type */
++	0x12, 0x00,		/* Interval */
++	0x12, 0x00,		/* Window */
+ 	0x01,			/* Type */
+ 	0x12, 0x00,		/* Interval */
+ 	0x12, 0x00,		/* Window */
+@@ -9653,8 +9636,8 @@ static const struct generic_data start_discovery_le_ext_scan_param = {
+ 	.expect_param = start_discovery_le_param,
+ 	.expect_len = sizeof(start_discovery_le_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
+-	.expect_hci_param = start_discovery_valid_ext_scan_param,
+-	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_param),
++	.expect_hci_param = start_discovery_ext_scan_param,
++	.expect_hci_len = sizeof(start_discovery_ext_scan_param),
+ 	.expect_alt_ev = MGMT_EV_DISCOVERING,
+ 	.expect_alt_ev_param = start_discovery_le_evt,
+ 	.expect_alt_ev_len = sizeof(start_discovery_le_evt),
+@@ -9686,6 +9669,15 @@ static const struct generic_data stop_discovery_le_ext_scan_disable = {
+ 	.expect_alt_ev_len = sizeof(stop_discovery_evt),
+ };
+ 
++static const char start_discovery_2m_ext_scan_param[] = {
++	0x01,			/* Own Addr type*/
++	0x00,			/* Scan filter policy*/
++	0x01,			/* Phys - 1m and Coded*/
++	0x01,			/* Type */
++	0x12, 0x00,		/* Interval */
++	0x12, 0x00,		/* Window */
++};
++
+ static const struct generic_data start_discovery_le_2m_scan_param = {
+ 	.setup_settings = settings_powered_le,
+ 	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
+@@ -9698,8 +9690,8 @@ static const struct generic_data start_discovery_le_2m_scan_param = {
+ 	.expect_param = start_discovery_bredrle_param,
+ 	.expect_len = sizeof(start_discovery_bredrle_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
+-	.expect_hci_param = start_discovery_valid_ext_scan_param,
+-	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_param),
++	.expect_hci_param = start_discovery_2m_ext_scan_param,
++	.expect_hci_len = sizeof(start_discovery_2m_ext_scan_param),
+ 	.expect_alt_ev = MGMT_EV_DISCOVERING,
+ 	.expect_alt_ev_param = start_discovery_evt,
+ 	.expect_alt_ev_len = sizeof(start_discovery_evt),
+@@ -14167,9 +14159,6 @@ int main(int argc, char *argv[])
+ 	test_bredrle50("Set PHY coded Succcess", &set_phy_coded_success,
+ 					NULL, test_command_generic);
+ 
+-	test_bredrle50("Set PHY 1m 2m coded Succcess", &set_phy_all_success,
+-					NULL, test_command_generic);
+-
+ 	test_bredrle50("Set PHY 2m tx success", &set_phy_2m_tx_success,
+ 					NULL, test_command_generic);
+ 
+-- 
+2.39.2
 
---===============5344620318833476369==--
