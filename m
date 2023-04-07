@@ -2,357 +2,156 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E15C6C77B6F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Apr 2023 16:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 218D7C77B61
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Apr 2023 18:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230255AbjDGQKP (ORCPT
+        id S231883AbjDGSCe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Apr 2023 12:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48456 "EHLO
+        Fri, 7 Apr 2023 14:02:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230242AbjDGQKJ (ORCPT
+        with ESMTP id S231757AbjDGSC2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Apr 2023 12:10:09 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F3D10C1;
-        Fri,  7 Apr 2023 09:09:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0AF2A64F13;
-        Fri,  7 Apr 2023 16:09:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA3C5C433D2;
-        Fri,  7 Apr 2023 16:09:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1680883792;
-        bh=HmNQ9RlHMgSZYT5CKlY9VdPfprafu+PBbMSI+csJyZY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ify7NMubEUiq7okkL+7pscbemiPLigKHytqN2bcQVAUHMVhSyOjIpkeA7RqEaeUsr
-         k+eqwKqGJWiLDqfw17F9ekmOwzaQvCsBN8x/rKuMLHlzyYxFsxRWlpcNI94fAbWb37
-         gCKtKEWvQDKcdRjPJ3kU4KXWxwSqOn/vmMwkCp34cK3ZOJD5xBbK46lhKdsXSYBCFq
-         8OhqvEJSjiX7aEbqIQ/9rcJ7st426X9gilbiSUEbTETX9179BcZJSnV9INEXYgOlCN
-         vlLgttU9WESV6NKWljwa3yNpVYJpPWkuQPRMHUY/1bcJQZioelhUBxBI76GnhwrEi0
-         BBn1gEn1V3M2g==
-Date:   Fri, 7 Apr 2023 09:12:42 -0700
-From:   Bjorn Andersson <andersson@kernel.org>
-To:     Tim Jiang <quic_tjiang@quicinc.com>
-Cc:     marcel@holtmann.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        quic_bgodavar@quicinc.com, quic_hbandi@quicinc.com,
-        quic_hemantg@quicinc.com, mka@chromium.org
-Subject: Re: [PATCH v1] Bluetooth: btusb: Add WCN6855 devcoredump support
-Message-ID: <20230407161242.hydjluny5y6bttmh@ripper>
-References: <20230407032936.14799-1-quic_tjiang@quicinc.com>
+        Fri, 7 Apr 2023 14:02:28 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F7FAF0D
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Apr 2023 11:02:06 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id kq3so40546948plb.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Apr 2023 11:02:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112; t=1680890525;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vuQCtQA3zzbxQ/51A1Oi1S7Ut8EFYywvcTa4TksyED8=;
+        b=UtYZBxlWP851b84Yu7USaZwE510VKaAnuCQ4E+YZ5yOWntS5+e5D41BSGVqbURKklA
+         A1BqKRP9XyXZfmk6ZRbMDc8xRH2RtSfC+dD/4aqXXb7b4zmmsdFaBmA1HVM7QNBOHant
+         5CLheiilz2jjgmvaohIcTyA2VuGmd+KHRkMm3zyFF2rGip1Iiv7e/YeUzena2fOLg95a
+         HYxABECK57qiZEs3VQ30wjUoeWHdeLOFp7qt90qsG7wBXqYjAd1d0sHcKwivtpGq1Req
+         aPbiSulHhQQ1KMrkRESqdDmaEb7NrC59++UfMQm3hnRsH1E3pwAGSKriM9cywF9UEUDZ
+         zE+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112; t=1680890525;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vuQCtQA3zzbxQ/51A1Oi1S7Ut8EFYywvcTa4TksyED8=;
+        b=o4qLVGDenMBTarazw4h3t6T3ddiVxHt+yYEw2PcsFv22leouixNeWgi4HSHdlLtm3s
+         s2NWW/EIzm70ugRWZYiKsxB4Ym9XbP+9x89/RkHq4zHMLp08VHnEgQtRFxzUQvdwqwaA
+         R5AgSH0wae3G3v84oCjscWIyqkHPZph70QdEQDJPcIGqAttXgfHSVbOWs0nC7Ez0ddxz
+         ytMYVeeh7egfWpV1CL+odg3hhnZM0c8yg8ZQHGMAQyTNtFeiCJBrj/YasMqWRVmSGvD9
+         icgZEzJU7yBTgn11cfWE0DpwHeFdFOpd/HHErIRjgSpw89yyHyhKiI7zVxJlOW5eUHly
+         Vxsw==
+X-Gm-Message-State: AAQBX9fDjLbrw9xY6++TtkBLwevjdTpLn2aIyJzMv8LHgv/L2W0vZ20Y
+        2k7sKpDQd81T1YuKPHLAO88NNFi9lWY=
+X-Google-Smtp-Source: AKy350aWTLP4kaZOldTIHqYIdjYEQ48X15DzhKf/A6TIRHx865Bl6qU+A2zgVIAYCcKU5ZRcXYbDDA==
+X-Received: by 2002:a05:6a20:6d0f:b0:cc:63c6:8d3a with SMTP id fv15-20020a056a206d0f00b000cc63c68d3amr3384089pzb.41.1680890524505;
+        Fri, 07 Apr 2023 11:02:04 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id 186-20020a6304c3000000b004fbb4a55b64sm2985993pge.86.2023.04.07.11.02.02
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Apr 2023 11:02:02 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: Fix use-after-free in l2cap_disconnect_{req,rsp}
+Date:   Fri,  7 Apr 2023 11:02:01 -0700
+Message-Id: <20230407180201.3229763-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230407032936.14799-1-quic_tjiang@quicinc.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Apr 07, 2023 at 11:29:36AM +0800, Tim Jiang wrote:
-> WCN6855 will report memdump via ACL data or HCI event when
-> it get crashed, so we collect memdump to debug firmware.
-> 
-> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
-> ---
->  drivers/bluetooth/btusb.c | 221 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 221 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 2303b0a66323..ecc346d8b2ea 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -752,6 +752,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
->  #define BTUSB_WAKEUP_AUTOSUSPEND	14
->  #define BTUSB_USE_ALT3_FOR_WBS	15
->  #define BTUSB_ALT6_CONTINUOUS_TX	16
-> +#define BTUSB_HW_SSR_ACTIVE	17
->  
->  struct btusb_data {
->  	struct hci_dev       *hdev;
-> @@ -904,6 +905,11 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
->  	struct btusb_data *data = hci_get_drvdata(hdev);
->  	struct gpio_desc *reset_gpio = data->reset_gpio;
->  
-> +	if (test_bit(BTUSB_HW_SSR_ACTIVE, &data->flags)) {
-> +		bt_dev_info(hdev, "Defer cmd_timeout due to dump active");
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-"Ramdump in progress, defer cmd_timeout"
+Similar to commit d0be8347c623 ("Bluetooth: L2CAP: Fix use-after-free
+caused by l2cap_chan_put"), just use l2cap_chan_hold_unless_zero to
+prevent referencing a channel that is about to be destroyed.
 
-> +		return;
-> +	}
-> +
->  	if (++data->cmd_timeout_cnt < 5)
->  		return;
->  
-> @@ -3294,6 +3300,213 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
->  	return 0;
->  }
->  
-> +#define QCA_MEMDUMP_ACL_HANDLE 0x2EDD
-> +#define QCA_MEMDUMP_SIZE_MAX  0x100000
-> +#define QCA_MEMDUMP_VSE_CLASS 0x01
-> +#define QCA_MEMDUMP_MSG_TYPE 0x08
-> +struct qca_dump_hdr {
-> +	u8 vse_class;
-> +	u8 msg_type;
-> +	__le16 seqno;
-> +	u8 reserved;
-> +	union {
-> +		u8 data[0];
-> +		struct {
-> +			__le32 ram_dump_size;
-> +			u8 data0[0];
-> +		} __packed;
-> +	};
-> +} __packed;
-> +
-> +struct qca_dump_info {
-> +	/* fields for dump collection */
-> +	u16 id_vendor;
-> +	u16 id_product;
-> +	u32 fw_version;
-> +	u32 controller_id;
-> +	u32 ram_dump_size;
-> +	u32 ram_dump_offs;
-> +	u16 ram_dump_seqno;
-> +};
-> +
-> +static struct qca_dump_info qca_dump = {0};
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Min Li <lm0963hack@gmail.com>
+---
+ net/bluetooth/l2cap_core.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
-Do you really need to keep track of this across the individual packets?
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 8153293b9a45..5cc95fd17f7d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4651,33 +4651,27 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
+ 
+ 	BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
+ 
+-	mutex_lock(&conn->chan_lock);
+-
+-	chan = __l2cap_get_chan_by_scid(conn, dcid);
++	chan = l2cap_get_chan_by_scid(conn, dcid);
+ 	if (!chan) {
+-		mutex_unlock(&conn->chan_lock);
+ 		cmd_reject_invalid_cid(conn, cmd->ident, dcid, scid);
+ 		return 0;
+ 	}
+ 
+-	l2cap_chan_hold(chan);
+-	l2cap_chan_lock(chan);
+-
+ 	rsp.dcid = cpu_to_le16(chan->scid);
+ 	rsp.scid = cpu_to_le16(chan->dcid);
+ 	l2cap_send_cmd(conn, cmd->ident, L2CAP_DISCONN_RSP, sizeof(rsp), &rsp);
+ 
+ 	chan->ops->set_shutdown(chan);
+ 
++	mutex_lock(&conn->chan_lock);
+ 	l2cap_chan_del(chan, ECONNRESET);
++	mutex_unlock(&conn->chan_lock);
+ 
+ 	chan->ops->close(chan);
+ 
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_put(chan);
+ 
+-	mutex_unlock(&conn->chan_lock);
+-
+ 	return 0;
+ }
+ 
+@@ -4697,33 +4691,27 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
+ 
+ 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x", dcid, scid);
+ 
+-	mutex_lock(&conn->chan_lock);
+-
+-	chan = __l2cap_get_chan_by_scid(conn, scid);
++	chan = l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan) {
+ 		mutex_unlock(&conn->chan_lock);
+ 		return 0;
+ 	}
+ 
+-	l2cap_chan_hold(chan);
+-	l2cap_chan_lock(chan);
+-
+ 	if (chan->state != BT_DISCONN) {
+ 		l2cap_chan_unlock(chan);
+ 		l2cap_chan_put(chan);
+-		mutex_unlock(&conn->chan_lock);
+ 		return 0;
+ 	}
+ 
++	mutex_lock(&conn->chan_lock);
+ 	l2cap_chan_del(chan, 0);
++	mutex_unlock(&conn->chan_lock);
+ 
+ 	chan->ops->close(chan);
+ 
+ 	l2cap_chan_unlock(chan);
+ 	l2cap_chan_put(chan);
+ 
+-	mutex_unlock(&conn->chan_lock);
+-
+ 	return 0;
+ }
+ 
+-- 
+2.39.2
 
-What if I connect two btqca devices to my machine?
-
-> +
-> +static void btusb_dump_hdr_qca(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	char buf[128];
-> +
-> +	snprintf(buf, sizeof(buf), "Controller Name: 0x%x\n",
-> +			qca_dump.controller_id);
-> +	skb_put_data(skb, buf, strlen(buf));
-> +
-> +	snprintf(buf, sizeof(buf), "Firmware Version: 0x%x\n",
-> +			qca_dump.fw_version);
-> +	skb_put_data(skb, buf, strlen(buf));
-> +
-> +	snprintf(buf, sizeof(buf), "Driver: %s\nVendor: qca\n",
-> +			btusb_driver.name);
-> +	skb_put_data(skb, buf, strlen(buf));
-> +
-> +	snprintf(buf, sizeof(buf), "VID: 0x%x\nPID:0x%x\n",
-> +			qca_dump.id_vendor, qca_dump.id_product);
-> +	skb_put_data(skb, buf, strlen(buf));
-> +
-> +	snprintf(buf, sizeof(buf), "Lmp Subversion: 0x%x\n",
-> +			hdev->lmp_subver);
-> +	skb_put_data(skb, buf, strlen(buf));
-> +}
-> +
-> +static void btusb_coredump_qca(struct hci_dev *hdev)
-> +{
-> +	static const u8 param[] = { 0x26 };
-> +	struct sk_buff *skb;
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb))
-> +		bt_dev_err(hdev, "%s: triggle crash failed (%ld)", __func__, PTR_ERR(skb));
-> +	kfree_skb(skb);
-> +}
-> +
-> +/*
-> + * ==0: not a dump pkt.
-> + * < 0: fails to handle a dump pkt
-> + * > 0: otherwise.
-> + */
-> +static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	int ret = 0;
-> +	u8 pkt_type;
-> +	u8 *sk_ptr;
-> +	unsigned int sk_len;
-> +	u16 seqno;
-> +	u32 ram_dump_size;
-> +
-> +	struct hci_event_hdr *event_hdr;
-> +	struct hci_acl_hdr *acl_hdr;
-> +	struct qca_dump_hdr *dump_hdr;
-> +	struct btusb_data *btdata = hci_get_drvdata(hdev);
-> +	struct usb_device *udev = btdata->udev;
-> +
-> +	pkt_type = hci_skb_pkt_type(skb);
-> +	sk_ptr = skb->data;
-> +	sk_len = skb->len;
-> +
-> +	if (pkt_type == HCI_ACLDATA_PKT) {
-> +		acl_hdr = hci_acl_hdr(skb);
-> +		if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
-> +			return 0;
-> +		sk_ptr += HCI_ACL_HDR_SIZE;
-> +		sk_len -= HCI_ACL_HDR_SIZE;
-> +		event_hdr = (struct hci_event_hdr *)sk_ptr;
-> +	} else {
-> +		event_hdr = hci_event_hdr(skb);
-> +	}
-> +
-> +	if (event_hdr->evt != HCI_VENDOR_PKT)
-> +		return 0;
-> +	if (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE))
-> +		return 0;
-> +	sk_ptr += HCI_EVENT_HDR_SIZE;
-> +	sk_len -= HCI_EVENT_HDR_SIZE;
-> +
-> +	if (sk_len < offsetof(struct qca_dump_hdr, data))
-> +		return 0;
-> +	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
-> +	if ((dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
-> +	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-> +		return 0;
-> +
-> +	/*it is dump pkt now*/
-> +	ret = 1;
-
-Perhaps you can redesign this so that you don't need to set ret = 1 in
-multiple places?
-
-> +	seqno = le16_to_cpu(dump_hdr->seqno);
-> +	if (seqno == 0) {
-> +		set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
-> +		ram_dump_size = le32_to_cpu(dump_hdr->ram_dump_size);
-> +		if (!ram_dump_size || (ram_dump_size > QCA_MEMDUMP_SIZE_MAX)) {
-> +			ret = -EILSEQ;
-> +			bt_dev_err(hdev, "Invalid memdump size(%u)",
-> +				   ram_dump_size);
-> +			goto out;
-> +		}
-> +
-> +		ret = hci_devcd_init(hdev, ram_dump_size);
-> +		if (ret < 0) {
-> +			bt_dev_err(hdev, "memdump init error(%d)", ret);
-> +			goto out;
-> +		}
-> +		ret = 1;
-> +
-> +		qca_dump.ram_dump_size = ram_dump_size;
-> +		qca_dump.ram_dump_offs = 0;
-> +		qca_dump.ram_dump_seqno = 0;
-> +		sk_ptr += offsetof(struct qca_dump_hdr, data0);
-> +		sk_len -= offsetof(struct qca_dump_hdr, data0);
-> +
-> +		usb_disable_autosuspend(udev);
-> +		bt_dev_info(hdev, "%s memdump size(%u)\n",
-> +			    (pkt_type == HCI_ACLDATA_PKT) ? "ACL" : "event",
-> +			    ram_dump_size);
-> +	} else {
-> +		sk_ptr += offsetof(struct qca_dump_hdr, data);
-> +		sk_len -= offsetof(struct qca_dump_hdr, data);
-> +	}
-> +
-> +	if (!qca_dump.ram_dump_size) {
-> +		ret = -EINVAL;
-> +		bt_dev_err(hdev, "memdump is not active");
-> +		goto out;
-> +	}
-> +
-> +	if ((seqno != qca_dump.ram_dump_seqno) && (seqno != 0xFFFF)) {
-> +		ret = -EILSEQ;
-> +		bt_dev_err(hdev,
-> +			   "expected memdump seqno(%u) is not received(%u)\n",
-> +			   qca_dump.ram_dump_seqno, seqno);
-> +		hci_devcd_abort(hdev);
-> +		goto out;
-> +	}
-> +
-> +	skb_pull(skb, skb->len - sk_len);
-> +	hci_devcd_append(hdev, skb);
-> +	qca_dump.ram_dump_offs += sk_len;
-> +	qca_dump.ram_dump_seqno++;
-> +	if (seqno != 0xFFFF)
-> +		return ret;
-
-It wasn't immediately clear to me that this means "return OK, but we're
-waiting for more data".
-
-How about turning this the other way around?
-
-if (all_data_received) {
-	bt_dev_info("memdump done");
-	hci_devcd_complete();
-	...
-}
-
-...
-
-> +	hci_devcd_complete(hdev);
-> +
-> +out:
-> +	if (qca_dump.ram_dump_size) {
-
-So if I get seqno == 0, followed by seqno == 2 we will print memdump
-Done and return -EILSEQ?
-
-Regards,
-Bjorn
-
-> +		usb_enable_autosuspend(udev);
-> +		bt_dev_info(hdev,
-> +				"memdump Done: pkts(%u), dumped(%u)/total(%u)\n",
-> +				qca_dump.ram_dump_seqno, qca_dump.ram_dump_offs,
-> +				qca_dump.ram_dump_size);
-> +	}
-> +	qca_dump.ram_dump_size = 0;
-> +	qca_dump.ram_dump_offs = 0;
-> +	qca_dump.ram_dump_seqno = 0;
-> +	clear_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
-> +
-> +	if (ret < 0)
-> +		kfree_skb(skb);
-> +	return ret;
-> +}
-> +
-> +static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	if (handle_dump_pkt_qca(hdev, skb))
-> +		return 0;
-> +	return hci_recv_frame(hdev, skb);
-> +}
-> +
-> +static int btusb_recv_evt_qca(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	if (handle_dump_pkt_qca(hdev, skb))
-> +		return 0;
-> +	return hci_recv_frame(hdev, skb);
-> +}
-> +
-> +
->  #define QCA_DFU_PACKET_LEN	4096
->  
->  #define QCA_GET_TARGET_VERSION	0x09
-> @@ -3628,6 +3841,9 @@ static int btusb_setup_qca(struct hci_dev *hdev)
->  	if (err < 0)
->  		return err;
->  
-> +	qca_dump.fw_version = le32_to_cpu(ver.patch_version);
-> +	qca_dump.controller_id = le32_to_cpu(ver.rom_version);
-> +
->  	if (!(status & QCA_SYSCFG_UPDATED)) {
->  		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
->  		if (err < 0)
-> @@ -4117,6 +4333,11 @@ static int btusb_probe(struct usb_interface *intf,
->  	}
->  
->  	if (id->driver_info & BTUSB_QCA_WCN6855) {
-> +		qca_dump.id_vendor = id->idVendor;
-> +		qca_dump.id_product = id->idProduct;
-> +		data->recv_event = btusb_recv_evt_qca;
-> +		data->recv_acl = btusb_recv_acl_qca;
-> +		hci_devcd_register(hdev, btusb_coredump_qca, btusb_dump_hdr_qca, NULL);
->  		data->setup_on_usb = btusb_setup_qca;
->  		hdev->shutdown = btusb_shutdown_qca;
->  		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
-> -- 
-> 2.17.1
-> 
