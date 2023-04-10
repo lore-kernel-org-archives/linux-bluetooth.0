@@ -2,153 +2,358 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB8FCC76196
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Apr 2023 08:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567F8C77B71
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Apr 2023 09:55:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbjDJIDi (ORCPT
+        id S229735AbjDJJy3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Apr 2023 04:03:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
+        Mon, 10 Apr 2023 05:54:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbjDJIDg (ORCPT
+        with ESMTP id S229694AbjDJJyQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Apr 2023 04:03:36 -0400
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2136.outbound.protection.outlook.com [40.107.92.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA40540EA;
-        Mon, 10 Apr 2023 01:03:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ifN6FDdfR4DzqDCZ8Xf0kBOlCzBKTdw+l92MzXaot7ta+dI9ybdg4DstpzSD93BE4KNyRxJ2/bRQrJPvcj6s9dEwZGKtJDMdrM+ckasflaNZ6YBqi/FONuPqPmVNo0O8AB1w0DelXh3/tT4y5uU2KKDlQ3v7QbdbTrCw8lYDBGICc+lJZPIBHbF97jnJjXZzyLJmwZ6FhYPSa1LY81St4dLYUVujRSDUn6DbttL1Ah2bqBlfJPFWov8qw+BDunJH7RNQeLtvu4/3tCWEGjZSJkVa3lZYjSdsVMDuxROmwnngFat+DooK4p18pl+jNYLAYNIhtoXfU8UpjaFT4LAjcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3rzQaAz2nuTRW5MwOg4TLWMAOE8UpvF6OT+HcO+3dlo=;
- b=Qr4T8C/0pnKVuJWKVdnZ6+rGK3dvosrwJWJoDD1pSFN2ZVn+CNb28TiHgpy+/7Fmjhy+QiTgHk8o+1QNW66uy5VxOpFHF0XLmGlIGfPgmbXbjd72gsnBz6HqpT13cWkqmyB9k9xLmVJ7KDEH98wlS8+vP6lfBtPDB0Ey31BqccpUH5oH7wlPcanUxj1eE0MFF+zFQpuJ7IM37mgoewkETUkUhucvgef5yzUl6p9TYDP+YGT9BPa5wgGSQwYk2WpzzMDDuznFN/8I0UVHbplq34w2iJE+pPvRYZ043OW0KQW78FrV+m6fgdhZvn3L8UNG08z6JS0OAN38MMv/jXMz3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3rzQaAz2nuTRW5MwOg4TLWMAOE8UpvF6OT+HcO+3dlo=;
- b=gw48oIdSoGdG+LZmoxYI/L7XhQYa4qM66Oy/d5iWq7byHSs4qQnirRC0AGGvSIFHWRfavDucKMMEKYRStJ05FLjagZ2/CGP6C3nwzE5SStTOdS8vhV3n/joL8Z6n3e5c8txag+oeuZ+FKQQEDInIyx1EfLOsiZMSXTr0m5KDxlg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH0PR13MB5668.namprd13.prod.outlook.com (2603:10b6:510:113::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6277.35; Mon, 10 Apr
- 2023 08:03:32 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::89d1:63f2:2ed4:9169]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::89d1:63f2:2ed4:9169%5]) with mapi id 15.20.6277.038; Mon, 10 Apr 2023
- 08:03:32 +0000
-Date:   Mon, 10 Apr 2023 10:03:26 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Lanzhe Li <u202212060@hust.edu.cn>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: bluetooth: hci_debugfs: fix inconsistent indenting
-Message-ID: <ZDPCztXu+B8N6hqP@corigine.com>
-References: <20230408164542.2316-1-u202212060@hust.edu.cn>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230408164542.2316-1-u202212060@hust.edu.cn>
-X-ClientProxiedBy: AS4P189CA0031.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dd::11) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        Mon, 10 Apr 2023 05:54:16 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D166F270D;
+        Mon, 10 Apr 2023 02:54:14 -0700 (PDT)
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33A9Pfrx008806;
+        Mon, 10 Apr 2023 09:53:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=yRB7cciyRzcz8nkDBjPpG/bkD/w2lbThPBq1TXUWcrM=;
+ b=KRKZY7jcsg8kuryqAG6dv0YzLuMtuudMBzsx2/2fz2y9E8N2ZxcRUEfI2ZMsMAKa4BIJ
+ smNE8QMsKCMu66cZSZydBnbpOuwSeYuvMegtlTcnA+m53FcV/BYpYNwY/xRhifzxzcEF
+ Kr2eSBLn0ieaoamTdIbMsbmoWMfCb9K3LP95tpQy7ZyDxvGg1vFtr0eI5OSi5jgQxJVD
+ m8lXO7UBV6qfO0ecssAzvVQtrtXj3YpP7q0OBVuE6EYcCsRJU5yyviA4IChC7bwHHQKd
+ Hw6YQS44ytURM2tehSynOmfMgSIMLNQfFtWBdQIxy96dDIzxR+BxwWoAouv7ndC1+X6z MQ== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3pu0nejkyq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Apr 2023 09:53:40 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 33A9rdmM013200
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Apr 2023 09:53:39 GMT
+Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Mon, 10 Apr 2023 02:53:36 -0700
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+To:     <marcel@holtmann.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <tjiang@codeaurora.org>,
+        <bgodavar@codeaurora.org>, <c-hbandi@codeaurora.org>,
+        <hemantg@codeaurora.org>, <mka@chromium.org>,
+        Tim Jiang <quic_tjiang@quicinc.com>
+Subject: [PATCH v2] Bluetooth: btusb: Add WCN6855 devcoredump support
+Date:   Mon, 10 Apr 2023 17:53:24 +0800
+Message-ID: <20230410095324.11292-1-quic_tjiang@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5668:EE_
-X-MS-Office365-Filtering-Correlation-Id: e5e09a44-c32a-470a-5254-08db399a13fc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Pi1hkU3UH42BLU8Cl0IQ1N7TJUnSsi+V37G3D6MQGjJ8KGV3ve2N6dmrP7c44TcMAUG82LG2bc9y5DCiWG6QEBLJCuBo2DLEuRpyQnRg/f4FHlC9yYi5hYYqinmJ95DOEiuUVoe/Ul8cAa9QaAmPIH4JdlolRXBcUN+vHEYeJ1rwZj2/XKPV+BZiqG0HIa9NHDs8f1CBZD+5eUB2MD9f/5oJyYPTWG4AETNJA6iQ3f1XRQAFe+elOTdvxl2jYZ+HY849vOu7NmoNGkEMkDDTeBEmwUqDfQ7q+706sDAcDZwsfMOs2Zcj8YVfHUxqzTPYN3BoJGg9SNcuhnq3JpG4AV37dytLj2RRE7668dbsprzKtQIOQO6PlXbv9q87p7dyvWbe047c83BtQUFFpxXyVWAU9nRU49A57tgWpWsp0mhU4TADBa+LI6rvTbv9Xe3hyTJCcLJlnTJSr71b8+pPBz4sxHpbrE30wdpZTE6DJMChHQqZyYbKSugoevSBC9Gx0gxtp9CkRlrhFc00mGpDrLV5C+9UVCxBEl/+i9mCijkICLH+XjKkraL803yW+1iVKfvsJ0BuN9MEF8Qi28ea5oz9YOJsjJitjZoZNriyZc29nOjpKEKsP+P6jRCh9l8y47kpHaPKJ7EXnRReyyfwp4WI+vdRk9dueuqgOkbBJBM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39830400003)(366004)(346002)(396003)(376002)(136003)(451199021)(478600001)(86362001)(83380400001)(36756003)(38100700002)(2616005)(6666004)(6486002)(4744005)(2906002)(54906003)(316002)(186003)(6512007)(6506007)(44832011)(7416002)(66476007)(8676002)(66556008)(6916009)(41300700001)(8936002)(5660300002)(4326008)(66946007)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mYGQ+JgMxdvWRr1ZOZ2Fk7baNd/qEBRReUwv/YxEa3Px2NIE1sL/LZLer+e0?=
- =?us-ascii?Q?Qo4tjO243Z6+RJuhSfTe7LSByWfhhotaPG+m3EFpfu455urq8azkgPrLiVjz?=
- =?us-ascii?Q?JwPB5/KPoomgMwatXSzFQqUl72KgDylRs2aHLHCkn1Y7EhCBJuiFXtMz8+9f?=
- =?us-ascii?Q?7qNQPEj1JZNEh2lE2bipoVl4bRDWkma/T2EEpqH1NTXmBvG0//UvXr8KJEt6?=
- =?us-ascii?Q?sWTphvo6hOKEoCRiTtmS0Kp8yo1oXjTxEBzGs1/H7CrsCZ2wlRnhmW0CWy5s?=
- =?us-ascii?Q?IzUSpGlmWZHaSUElvQJOrHoI1xHidmuN4c9+k8YI98d4AQG9XYzCnmNs/iSP?=
- =?us-ascii?Q?Bu2b7M+5rt3toRF3Hb628srcs28fEncSx39SAPedfQRXGJlomEXLYSUapkgY?=
- =?us-ascii?Q?5GXhNRUJpJ9x8t9PgVbabxkQukepJR1YkRhRG0ajj9NWnolv+RmmGj9CWK7a?=
- =?us-ascii?Q?SKX8eVM1KaJp1pxddZxUa9bAFqeRKRZzMHj2fO+jEpFZT7Qjo7rs3AX/gbVC?=
- =?us-ascii?Q?FdQyzHkWdFtTQyEdP2SpZr5juGE+JX7XC5bjdYyR0mE9yXWHuXXIpb09mOEp?=
- =?us-ascii?Q?QGD6KIT4+cj3QBDLE7YVetMH5xUz10ktAlCVred0AEHvsN+cQS+N+cU0+sH+?=
- =?us-ascii?Q?qzBsl7DQhfGRXav+lx9u51LTqpmlOkm33DJyGTx/I0arI/b1x+q/70r3Vmf5?=
- =?us-ascii?Q?VVDpFwCldEFcoxSeDiZ/nwB7RfY+TZxpV0btB+9W7bbhae+jhRfTnD/QtFlQ?=
- =?us-ascii?Q?M6Jm3CgLQ5uQw0HNYXg80zkFXlmWLtoBl5OLNOd3ip2AHIblneD+X5oWCN72?=
- =?us-ascii?Q?KFIAkPKm8XOoxOugTT3dItuOOR6M1JmSj3KzelA98aash69tGhBzijblQ9cX?=
- =?us-ascii?Q?s++jyw7LCBjwdP//jyaTlpTCIlHOn/dXfPwfIbyIiUpQbzOpxUOaYX5SO3PA?=
- =?us-ascii?Q?arCFrVxEjpJ6lOMVFMVCNbcesYnhP8WE69H+Sf47zBPBVE8ScsAETmbSFV+K?=
- =?us-ascii?Q?Bi4kVOH0gAjwQt0kTJpsYjOnrb6UySYgBqf44NIZH2jqVWND77LMO/5FHk8G?=
- =?us-ascii?Q?3KhdIAyLl+TEX/vwnwXO67iXXvGjX5w+Gf5ZU6GKFeXAVIrL03FAe4dy5iWY?=
- =?us-ascii?Q?327RkagvQAaUhZ+wQw/00IJHq4kA2/Xb36aZdEFEUdabLsXdR72hQmrIlqHf?=
- =?us-ascii?Q?D/8WDW7ETcAYlOLEzhr8syGDewiOE23yWqEwKy69vlil+JazC4KMGEDUZxgA?=
- =?us-ascii?Q?rah0H32EljxD8WSiEkjO8hk7F6qCiwBXAO+i8XFOxl/tjc696QLc1qXEjSPE?=
- =?us-ascii?Q?FfASU5KeLSNDeuPkLZURPY9EQ3mYt7zQ6RXy+WGEPVtifxNT61x0Ok2RMCJX?=
- =?us-ascii?Q?L1UO69FJ6bhK2fDomnOYt4fCWAlmN6SMNp770Zb1rhKqK0G5KOreQRigoJeT?=
- =?us-ascii?Q?cQ5+a2igAP5IjiTCKTIqW8kZ66Ywji5opmycnaIr70wn455S4VtoPaa7Nkaw?=
- =?us-ascii?Q?0Hljp2DKETHd84NDTQ5arpILmXS2GM/DIfcgHnSzlLf7zkt9FPz7qxfKevIt?=
- =?us-ascii?Q?itE7ukjq6dKkHckTJlYoLRqu3dqrlkr2VLz7W2UmB5Ve3d1ZTJy/nqUIWfCk?=
- =?us-ascii?Q?U14j02W+POEKL2XImWLKxiF6qlpajCDIyrlwUtUQRMf2TIrhpfq2xHdNX8nV?=
- =?us-ascii?Q?ld4c+A=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e5e09a44-c32a-470a-5254-08db399a13fc
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2023 08:03:32.8439
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: O2Sw6mSYhvu3SxylidektMKxEFrrSztaZleLHRklF0tmP2paFGmQT02srNcr3PFZLEGh/veFosxydzxz3PE8Z3MSGNNy5/jDZMM9mEmTgHQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5668
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: bPXDkPsAI5VuoVNk2BHWWjCBiOtm_g5I
+X-Proofpoint-ORIG-GUID: bPXDkPsAI5VuoVNk2BHWWjCBiOtm_g5I
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-10_06,2023-04-06_03,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ lowpriorityscore=0 bulkscore=0 mlxlogscore=999 phishscore=0 clxscore=1011
+ malwarescore=0 suspectscore=0 priorityscore=1501 adultscore=0 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304100085
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Apr 09, 2023 at 12:45:42AM +0800, Lanzhe Li wrote:
-> From: markli <u202212060@hust.edu.cn>
-> 
-> Fixed a wrong indentation before "return".This line uses a 7 space
-> indent instead of a tab.
-> 
-> Signed-off-by: Lanzhe Li <u202212060@hust.edu.cn>
+WCN6855 will report memdump via ACL data or HCI event when
+it get crashed, so we collect memdump to debug firmware.
 
-Thanks,
+Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+---
+ drivers/bluetooth/btusb.c | 222 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 222 insertions(+)
 
-I checked and this seems to be the only instance of this type of problem
-in this file.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2303b0a66323..f045bbb0ee09 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -733,6 +733,16 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ 	{}
+ };
+ 
++struct qca_dump_info {
++	/* fields for dump collection */
++	u16 id_vendor;
++	u16 id_product;
++	u32 fw_version;
++	u32 controller_id;
++	u32 ram_dump_size;
++	u16 ram_dump_seqno;
++};
++
+ #define BTUSB_MAX_ISOC_FRAMES	10
+ 
+ #define BTUSB_INTR_RUNNING	0
+@@ -752,6 +762,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ #define BTUSB_WAKEUP_AUTOSUSPEND	14
+ #define BTUSB_USE_ALT3_FOR_WBS	15
+ #define BTUSB_ALT6_CONTINUOUS_TX	16
++#define BTUSB_HW_SSR_ACTIVE	17
+ 
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -814,6 +825,8 @@ struct btusb_data {
+ 
+ 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+ 	unsigned cmd_timeout_cnt;
++
++	struct qca_dump_info qca_dump;
+ };
+ 
+ static void btusb_reset(struct hci_dev *hdev)
+@@ -904,6 +917,11 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	struct gpio_desc *reset_gpio = data->reset_gpio;
+ 
++	if (test_bit(BTUSB_HW_SSR_ACTIVE, &data->flags)) {
++		bt_dev_info(hdev, "Ramdump in progress, defer cmd_timeout");
++		return;
++	}
++
+ 	if (++data->cmd_timeout_cnt < 5)
+ 		return;
+ 
+@@ -3294,6 +3312,202 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++#define QCA_MEMDUMP_ACL_HANDLE 0x2EDD
++#define QCA_MEMDUMP_SIZE_MAX  0x100000
++#define QCA_MEMDUMP_VSE_CLASS 0x01
++#define QCA_MEMDUMP_MSG_TYPE 0x08
++#define QCA_MEMDUMP_PKT_SIZE 248
++#define QCA_LAST_SEQUENCE_NUM 0xffff
++
++struct qca_dump_hdr {
++	u8 vse_class;
++	u8 msg_type;
++	__le16 seqno;
++	u8 reserved;
++	union {
++		u8 data[0];
++		struct {
++			__le32 ram_dump_size;
++			u8 data0[0];
++		} __packed;
++	};
++} __packed;
++
++
++static void btusb_dump_hdr_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	char buf[128];
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++
++	snprintf(buf, sizeof(buf), "Controller Name: 0x%x\n",
++			btdata->qca_dump.controller_id);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Firmware Version: 0x%x\n",
++			btdata->qca_dump.fw_version);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Driver: %s\nVendor: qca\n",
++			btusb_driver.name);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "VID: 0x%x\nPID:0x%x\n",
++			btdata->qca_dump.id_vendor, btdata->qca_dump.id_product);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Lmp Subversion: 0x%x\n",
++			hdev->lmp_subver);
++	skb_put_data(skb, buf, strlen(buf));
++}
++
++static void btusb_coredump_qca(struct hci_dev *hdev)
++{
++	static const u8 param[] = { 0x26 };
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb))
++		bt_dev_err(hdev, "%s: triggle crash failed (%ld)", __func__, PTR_ERR(skb));
++	kfree_skb(skb);
++}
++
++/*
++ * ==0: not a dump pkt.
++ * < 0: fails to handle a dump pkt
++ * > 0: otherwise.
++ */
++static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	int ret = 1;
++	u8 pkt_type;
++	u8 *sk_ptr;
++	unsigned int sk_len;
++	u16 seqno;
++	u32 dump_size;
++
++	struct hci_event_hdr *event_hdr;
++	struct hci_acl_hdr *acl_hdr;
++	struct qca_dump_hdr *dump_hdr;
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++	struct usb_device *udev = btdata->udev;
++
++	pkt_type = hci_skb_pkt_type(skb);
++	sk_ptr = skb->data;
++	sk_len = skb->len;
++
++	if (pkt_type == HCI_ACLDATA_PKT) {
++		acl_hdr = hci_acl_hdr(skb);
++		if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
++			return 0;
++		sk_ptr += HCI_ACL_HDR_SIZE;
++		sk_len -= HCI_ACL_HDR_SIZE;
++		event_hdr = (struct hci_event_hdr *)sk_ptr;
++	} else {
++		event_hdr = hci_event_hdr(skb);
++	}
++
++	if ((event_hdr->evt != HCI_VENDOR_PKT)
++		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
++		return 0;
++
++	sk_ptr += HCI_EVENT_HDR_SIZE;
++	sk_len -= HCI_EVENT_HDR_SIZE;
++
++	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
++	if ((sk_len < offsetof(struct qca_dump_hdr, data))
++		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
++	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
++		return 0;
++
++	/*it is dump pkt now*/
++	seqno = le16_to_cpu(dump_hdr->seqno);
++	if (seqno == 0) {
++		set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
++		dump_size = le32_to_cpu(dump_hdr->ram_dump_size);
++		if (!dump_size || (dump_size > QCA_MEMDUMP_SIZE_MAX)) {
++			ret = -EILSEQ;
++			bt_dev_err(hdev, "Invalid memdump size(%u)",
++				   dump_size);
++			goto out;
++		}
++
++		ret = hci_devcd_init(hdev, dump_size);
++		if (ret < 0) {
++			bt_dev_err(hdev, "memdump init error(%d)", ret);
++			goto out;
++		}
++
++		btdata->qca_dump.ram_dump_size = dump_size;
++		btdata->qca_dump.ram_dump_seqno = 0;
++		sk_ptr += offsetof(struct qca_dump_hdr, data0);
++		sk_len -= offsetof(struct qca_dump_hdr, data0);
++
++		usb_disable_autosuspend(udev);
++		bt_dev_info(hdev, "%s memdump size(%u)\n",
++			    (pkt_type == HCI_ACLDATA_PKT) ? "ACL" : "event",
++			    dump_size);
++	} else {
++		sk_ptr += offsetof(struct qca_dump_hdr, data);
++		sk_len -= offsetof(struct qca_dump_hdr, data);
++	}
++
++	if (!btdata->qca_dump.ram_dump_size) {
++		ret = -EINVAL;
++		bt_dev_err(hdev, "memdump is not active");
++		goto out;
++	}
++
++	if ((seqno > btdata->qca_dump.ram_dump_seqno + 1) && (seqno != QCA_LAST_SEQUENCE_NUM)) {
++		dump_size = QCA_MEMDUMP_PKT_SIZE * (seqno - btdata->qca_dump.ram_dump_seqno - 1);
++		hci_devcd_append_pattern(hdev, 0x0, dump_size);
++		bt_dev_err(hdev,
++			   "expected memdump seqno(%u) is not received(%u)\n",
++			   btdata->qca_dump.ram_dump_seqno, seqno);
++		btdata->qca_dump.ram_dump_seqno = seqno;
++		kfree_skb(skb);
++		return ret;
++	}
++
++	skb_pull(skb, skb->len - sk_len);
++	hci_devcd_append(hdev, skb);
++	btdata->qca_dump.ram_dump_seqno++;
++	if (seqno == QCA_LAST_SEQUENCE_NUM) {
++		bt_dev_info(hdev,
++				"memdump done: pkts(%u), total(%u)\n",
++				btdata->qca_dump.ram_dump_seqno, btdata->qca_dump.ram_dump_size);
++
++		hci_devcd_complete(hdev);
++		goto out;
++	}
++	return ret;
++
++out:
++	if (btdata->qca_dump.ram_dump_size)
++		usb_enable_autosuspend(udev);
++	btdata->qca_dump.ram_dump_size = 0;
++	btdata->qca_dump.ram_dump_seqno = 0;
++	clear_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
++
++	if (ret < 0)
++		kfree_skb(skb);
++	return ret;
++}
++
++static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	if (handle_dump_pkt_qca(hdev, skb))
++		return 0;
++	return hci_recv_frame(hdev, skb);
++}
++
++static int btusb_recv_evt_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	if (handle_dump_pkt_qca(hdev, skb))
++		return 0;
++	return hci_recv_frame(hdev, skb);
++}
++
++
+ #define QCA_DFU_PACKET_LEN	4096
+ 
+ #define QCA_GET_TARGET_VERSION	0x09
+@@ -3628,6 +3842,9 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
+ 
++	btdata->qca_dump.fw_version = le32_to_cpu(ver.patch_version);
++	btdata->qca_dump.controller_id = le32_to_cpu(ver.rom_version);
++
+ 	if (!(status & QCA_SYSCFG_UPDATED)) {
+ 		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
+ 		if (err < 0)
+@@ -4117,6 +4334,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 	}
+ 
+ 	if (id->driver_info & BTUSB_QCA_WCN6855) {
++		data->qca_dump.id_vendor = id->idVendor;
++		data->qca_dump.id_product = id->idProduct;
++		data->recv_event = btusb_recv_evt_qca;
++		data->recv_acl = btusb_recv_acl_qca;
++		hci_devcd_register(hdev, btusb_coredump_qca, btusb_dump_hdr_qca, NULL);
+ 		data->setup_on_usb = btusb_setup_qca;
+ 		hdev->shutdown = btusb_shutdown_qca;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
+-- 
+2.17.1
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-
-> ---
->  net/bluetooth/hci_debugfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index b7f682922a16..ec0df2f9188e 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -189,7 +189,7 @@ static int uuids_show(struct seq_file *f, void *p)
->  	}
->  	hci_dev_unlock(hdev);
->  
-> -       return 0;
-> +	return 0;
->  }
->  
->  DEFINE_SHOW_ATTRIBUTE(uuids);
-> -- 
-> 2.37.2
-> 
