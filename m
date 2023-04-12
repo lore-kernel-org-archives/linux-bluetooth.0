@@ -2,141 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE744C7619A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Apr 2023 23:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C31DC7619A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Apr 2023 23:58:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229804AbjDLXiw (ORCPT
+        id S229576AbjDLX6V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Apr 2023 19:38:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43050 "EHLO
+        Wed, 12 Apr 2023 19:58:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbjDLXiv (ORCPT
+        with ESMTP id S229526AbjDLX6U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Apr 2023 19:38:51 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5642C449C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 16:38:49 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-94a342f7c4cso305771566b.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 16:38:49 -0700 (PDT)
+        Wed, 12 Apr 2023 19:58:20 -0400
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486573C39
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 16:58:19 -0700 (PDT)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-184518754bfso12218100fac.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 16:58:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1681342727;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cqi3F2DLTaK1XRD+XBhKe6ot1+wzOmTh1thtCJqRlgA=;
-        b=VV/BN1szRArbtzTWiRfhFDCLoYJM3RKfVv+GHRmlXJ9owwqzHhiDB8wMf0nrMmomLI
-         cXNiOprrIBUP5BAIMj4cfU2KJwoDAVE2BM3MvNMWBiTBF+/xE1lHtyAV4BMhBSWerrYH
-         r+he4F8RCcFcLdN0Bb9F/lVurdNIjtoKlZt5Qc7molk5iWChp5uhQvemYzAXvuFrKEgC
-         y9A5KJ1bR0JXbXDNUjtJi2jocfJTWlW4Hia0hiyHKytihdazhl9ndLNBFVRavyHowkGT
-         a8/f+eO9NkoUKrdws6mvUKkT/1rAFhYVQPPHQI2U1vdgaDmiE2tWr2tu6V3617uV7tex
-         /j9g==
+        d=kali.org; s=google; t=1681343898;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h14IXfl6VI9SuhAposhxFPgNYy3NIZJ+euYHkvPtrS8=;
+        b=A9U2FcAH8vYTUo3Dr88BbCkEufDyB5gtC3uZKeNq9PGK7g1wgdn7LrGjnfqksodTF9
+         8lbW+CHd16ZJ22pv7xHNTBBHcWI2zBh1JNmJdtsOKqo/Zsg4vMq4+WLlqzUM2cOSfUhK
+         09EuRcDediQlJViX8u3LmpToPBXp3euHegDmjAyQkx7zYFg0ydGUcO1UA0Tjj8VydSqO
+         DAYDspbZfpse5Ku9yoWbEZV8rczUo0Yxi0EmkYWFO0NMurGDwgjOqGSnn5WFzX8+Bt8D
+         jiN1g6FpbiYZwClBA63aVN3LddnJ3NqBXMuZ11z9Nw9IpWK5vxFMJ4dz8XRSm15hOV5+
+         Po7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681342727;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cqi3F2DLTaK1XRD+XBhKe6ot1+wzOmTh1thtCJqRlgA=;
-        b=cfVuDNuYT9RDN4dZ/yqZ7+DYkXxUrVJCIOlYhmQhBD/5E3fSfyZqhhrWv4k0yYDxTg
-         +5s2DM2wiwNwhLt96svYGGAqi3bISOAug4fY8ETC/Il/XuSaYzIm0aC52WrQiL1Lcwcd
-         4bmVSSUcgMcv909OYyPoQJ+HBwlquhyCAwUjj0tytUKSoHVPv0GJKm9i8SMqOno8K3BS
-         pxiirPwO2v7coS6k8RqsaGOUIX5PyQh/ExJxufKY8M0gqKPFl9OHFGarqwn512tEv3JF
-         DF/ucecGZ4iUWD9Co5ahX/V6D1yM/cOeAvFkAt7kSc9Cm7JG7z+J7Nr95uoFxPss3ZS+
-         8xmA==
-X-Gm-Message-State: AAQBX9cGcoIaexH0pTPGRoQw1NrcSj8th+5sppeMYQ/T8BZnpbJqwo5W
-        4o/1vuwgsopTSGJMc5ufG8HOILkw589B3MUeE+YiEA==
-X-Google-Smtp-Source: AKy350Ylw76zATlXqd22goKD6jZ1DfF1RaS1ReYl4pCHK9HRFt/rpX4TdFDVfYAqLNPyVH8aVC/lYmaBfyGXOk10SPU=
-X-Received: by 2002:a50:aa84:0:b0:506:4139:541f with SMTP id
- q4-20020a50aa84000000b005064139541fmr190771edc.8.1681342727602; Wed, 12 Apr
- 2023 16:38:47 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230326233812.28058-1-steev@kali.org> <20230326233812.28058-3-steev@kali.org>
- <ZCVgMuSdyMQhf/Ko@hovoldconsulting.com> <CAKXuJqjJjd6SY1g3JW8w53rEVCqgDkJXQ=1iA3qXcF+C9qv1SQ@mail.gmail.com>
- <CABBYNZKX9bixyy8GZ0VDFaeNeY0_MSVDDNvcTqiAXEx8zFXfbA@mail.gmail.com>
-In-Reply-To: <CABBYNZKX9bixyy8GZ0VDFaeNeY0_MSVDDNvcTqiAXEx8zFXfbA@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1681343898;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h14IXfl6VI9SuhAposhxFPgNYy3NIZJ+euYHkvPtrS8=;
+        b=jqHqUfiz9gWgNPMaWAnkdHVV0Qu6xufpP2lGsdqRGviet9WDUgxAhA+2nn/gy7Jd00
+         1cL+DJYl7uh/p6SNENUuIoHXzHStRgIdoX5ixtNx+tPv4bt5JmUKsaaRbw93nAFRJFQh
+         fc5OkCAIrXcKfGBAptiOxPvzqMCuvMLlLRq218j+bWxN69syo2HDeqYGOW2m9ePh+5Id
+         njtG3asMt7nPJ2BFaWujDMnV7msw2wKfq0Z/Ut1mMgVLikWQXUOmUUQy6DSXKNGhLTVq
+         6ZrkwVRaU0baXbBjYP0QxVUVc1pyVBsPhhvflxrNLQw39oEIgoyO1wXvL3Tvw4YZWZYm
+         Dgwg==
+X-Gm-Message-State: AAQBX9cU0yD+SKQr0EpV7OgkryRyHn2g5ZlqybRNyA3clvENQq941+VH
+        dkOjOfaqKLYRhvZqW23D3YQ+mQ==
+X-Google-Smtp-Source: AKy350aTQ1AJ/VfRTneWmBCNG22VeJS1FeIAxR8JzxVmwLw9/RBWe8LeIkBS39U4GyXofj6zPC/lfg==
+X-Received: by 2002:a05:6870:73cd:b0:187:8ab7:c0f6 with SMTP id a13-20020a05687073cd00b001878ab7c0f6mr428264oan.9.1681343898677;
+        Wed, 12 Apr 2023 16:58:18 -0700 (PDT)
+Received: from localhost ([2600:1700:eb1:c450::35])
+        by smtp.gmail.com with ESMTPSA id b31-20020a4a98e2000000b0051a6cb524b6sm40178ooj.2.2023.04.12.16.58.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Apr 2023 16:58:18 -0700 (PDT)
 From:   Steev Klimaszewski <steev@kali.org>
-Date:   Wed, 12 Apr 2023 18:38:36 -0500
-Message-ID: <CAKXuJqiZ9iQESFpVs-b5YLEF5cuPQf7tNtBYGerUxfEp3sj19Q@mail.gmail.com>
-Subject: Re: [PATCH v8 2/4] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6855
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Johan Hovold <johan@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
+Date:   Wed, 12 Apr 2023 18:58:17 -0500
+Subject: [PATCH] Bluetooth: hci_qca: mark OF related data as maybe unused
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230412-bluetooth-v1-1-377b9bf7b08e@kali.org>
+X-B4-Tracking: v=1; b=H4sIAJhFN2QC/x2NQQqDMBBFryKzbiCOVmmvUrpI4mgGbFJm0lIQ7
+ 27s8vHf522gJEwK92YDoS8r51ShvTQQoksLGZ4qA1rsbN+i8euHSs4lmjBeb5bmAXHqoPreKRk
+ vLoV4Pl5OC8k5vIVm/v0jj+e+H8HlPEZ0AAAA
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Sven Peter <sven@svenpeter.dev>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Mark Pearson <markpearson@lenovo.com>,
-        Tim Jiang <quic_tjiang@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Steev Klimaszewski <steev@kali.org>
+X-Mailer: b4 0.12.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1250; i=steev@kali.org;
+ h=from:subject:message-id; bh=ympCbGntj3/wcMctjECb4BD9NMjn+TgpsO4HeYNDsEw=;
+ b=owGbwMvMwMUosahgcqykaSbjabUkhhRz15l69nasbDwvzmkXXV5rcP3pfLtQDf+6tO9JK/fNr
+ XrBfuNqJ+NkFgZGLoZaMUUW1nsa3q4fD1XO9Uh4AzOIlQlkSrxIAwMQ6DFoZBYXl6YW6aYVFDnk
+ 5ZcklmTm5xXr5Rek5hWkF+ilZaaVZGTkFxWn5ibm6eWllhiYurgaWZg4mZi6GTobmVtauphYmBm
+ 4OhtaOBqZG1gam7oYAgkzSwYuTgGYjb+i2H+zp257wcYgd9Hs0RTL2/u45K9PlvWRrlSVXbx6Je
+ vU9OsCk947bvh3XyLzlppn7hPHsCfbl/oYP+9YNrt6n1Xg+Q8Kay0uHvJ8Jh81d7PG1L9G5lITF
+ +qffJpXc3SmbknCPCE1tXuC2zOXcqYF9qyuV7xTfcu1IJxp0w0F5cXFsgKW/xamZwR0nPE6v639
+ WL6u6je+/MeThPa9SD28Wep49+XKV8ei8ia8MUuI3jeTc4F7dJjRdoaigl/b4k5u3iLpuqM3qIZ
+ 5hfONLQfvufr83jBp3aXYrQy+C1Iaf+rVrHIz+77Dc3fyrw3fyzon3TiczafBpXPS2Pi31aWmGs
+ fmiw2fL9/xtpD6o8bKpn8YAA==
+X-Developer-Key: i=steev@kali.org; a=openpgp;
+ fpr=70D5FB3206291ED5EC1FAC57FF5F35DF030F380E
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+The driver can be compile tested with !CONFIG_OF making certain data
+unused.
 
-On Wed, Apr 12, 2023 at 3:00=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Steev,
->
-> On Thu, Mar 30, 2023 at 9:35=E2=80=AFAM Steev Klimaszewski <steev@kali.or=
-g> wrote:
-> >
-> > Hi Johan,
-> >
-> > On Thu, Mar 30, 2023 at 5:10=E2=80=AFAM Johan Hovold <johan@kernel.org>=
- wrote:
-> > >
-> > > On Sun, Mar 26, 2023 at 06:38:10PM -0500, Steev Klimaszewski wrote:
-> > > > Add regulators, GPIOs and changes required to power on/off wcn6855.
-> > > > Add support for firmware download for wcn6855 which is in the
-> > > > linux-firmware repository as hpbtfw21.tlv and hpnv21.bin.
-> > > >
-> > > > Based on the assumption that this is similar to the wcn6750
-> > > >
-> > > > Tested-on: BTFW.HSP.2.1.0-00538-VER_PATCHZ-1
-> > > >
-> > > > Signed-off-by: Steev Klimaszewski <steev@kali.org>
-> > > > Reviewed-by: Bjorn Andersson <andersson@kernel.org>
-> > > > Tested-by: Bjorn Andersson <andersson@kernel.org>
-> > > > ---
-> > > > Changes since v7:
-> > > >  * None
-> > >
-> > > Only noticed now when Luiz applied the patches, but why did you drop =
-my
-> > > reviewed-by and tested-by tags from this patch when submitting v8?
-> > >
-> > > For the record:
-> > >
-> > > Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
-> > > Tested-by: Johan Hovold <johan+linaro@kernel.org>
-> > >
-> > Oops, that wasn't intentional! I only meant to drop it on the dts bits
-> > as that part I wanted to make sure I got right based on your comments,
-> > my apologies!
-> > --steev
->
-> This one seems to be causing a new warning:
->
-> drivers/bluetooth/hci_qca.c:18
-> 94:37: warning: unused variable 'qca_soc_data_wcn6855' [-Wunused-const-va=
-riable]
->
-I had seen this as well and I just noticed that the others were marked
-as __maybe_unused and I forgot to.  Will send a fix up for that!
+Signed-off-by: Steev Klimaszewski <steev@kali.org>
+---
+There was a patch to mark OF related data as maybe unused in flight when
+I was doing my bluetooth driver work and I didn't notice it.  Since I
+don't build on !CONFIG_OF systems, I hadn't seen the warning.  This
+patch simply marks our data as maybe unused as well.
+---
+ drivers/bluetooth/hci_qca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1597797ff169..1b064504b388 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1891,7 +1891,7 @@ static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
+ 	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
+ };
+ 
+-static const struct qca_device_data qca_soc_data_wcn6855 = {
++static const struct qca_device_data qca_soc_data_wcn6855 __maybe_unused = {
+ 	.soc_type = QCA_WCN6855,
+ 	.vregs = (struct qca_vreg []) {
+ 		{ "vddio", 5000 },
 
-> --
-> Luiz Augusto von Dentz
--- steev
+---
+base-commit: 7d8214bba44c1aa6a75921a09a691945d26a8d43
+change-id: 20230412-bluetooth-c7590ef622d3
+
+Best regards,
+-- 
+Steev Klimaszewski <steev@kali.org>
+
