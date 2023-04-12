@@ -2,79 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CEAC7619A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Apr 2023 04:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C854C77B6E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Apr 2023 07:51:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229626AbjDLEaW (ORCPT
+        id S229485AbjDLHvb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Apr 2023 00:30:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52394 "EHLO
+        Wed, 12 Apr 2023 03:51:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjDLEaV (ORCPT
+        with ESMTP id S229777AbjDLHv3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Apr 2023 00:30:21 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0744690;
-        Tue, 11 Apr 2023 21:30:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C861462DDF;
-        Wed, 12 Apr 2023 04:30:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 25F05C4339B;
-        Wed, 12 Apr 2023 04:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681273819;
-        bh=QznQgHQWqB9OE6OUu2uTp1NfY+mObvKx82/go7hdFFI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=CntLbe+LhKQI9eYsYtvmyPPNGXOBTI/39hXRjVw4F6mqk1gz7pFlTJ3fRKwlqAKxU
-         3hv0aKK5I1cZopakE81w7hhKeHZMarjLCmEOIPhayqB7Q8v8ArrQ1RL/3xVggQogoO
-         8op3iaakdUUA/yWPaBu038O/wj3Xk6iqSbLKc4ZY7588NQWFpt1cawUT6Wy773tY3v
-         GVF92enhNsmCBC3T2pj9hNufKUBK1hFH3ZQXl5x1I6GlRp0LL0004A/W4cAwTcKqUI
-         4i3QyNn1mXm9qNEhKSAx0vqqxqfzXzDdLSsOkZH3rG9AzTk+WOxh6Gc0BaTYPz6mbX
-         3ooZ748mbc1jw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 02F30C395C3;
-        Wed, 12 Apr 2023 04:30:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 12 Apr 2023 03:51:29 -0400
+Received: from mail.feshiecree.pl (mail.feshiecree.pl [89.40.114.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A74843ABC
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 00:51:28 -0700 (PDT)
+Received: by mail.feshiecree.pl (Postfix, from userid 1001)
+        id D44328404B; Wed, 12 Apr 2023 08:50:45 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=feshiecree.pl;
+        s=mail; t=1681285848;
+        bh=hFxZwVw4rIL+JwfEOGI47p+fdoVOAeqVswP6NWoHSHQ=;
+        h=Date:From:To:Subject:From;
+        b=VCfaDMI5FFueaUfzQ8xXb3MfzAyTUZjOGucrkF0qBQSHa3E0ZZVh1EjCawtgjK0IH
+         4TaSSWTYGmd1foxLg5uf1cZ1pAjx/aJ1t5LU8r4YsytfcUf3l2lGoCtJilh3QYdaDo
+         BcViG4vF1yu+f0N4WfWoQNdtRS6FERRoCJFUiKMhdHsAOd+Bs/kGMOhgGpWnP84MQq
+         F5vhshhD8g7DVcsUsaF99Sk/NxC0ugO/ecZu4eV12X8jP4FaFukhCbWsyEsVkOGEM1
+         nv0A1GUT4sN+CglddJJeRVvfC4HX8LP84UkBRd+qzA6RW/ESMhVM7Zvx7YOQZn+1tg
+         iqcS1rUW6iGRQ==
+Received: by mail.feshiecree.pl for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 07:50:38 GMT
+Message-ID: <20230412074502-0.1.1y.8ubr.0.iw8lerlnyk@feshiecree.pl>
+Date:   Wed, 12 Apr 2023 07:50:38 GMT
+From:   "Krystian Wieczorek" <krystian.wieczorek@feshiecree.pl>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: W sprawie samochodu
+X-Mailer: mail.feshiecree.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bluetooth 2023-04-10
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <168127381900.9603.16144066796062870419.git-patchwork-notify@kernel.org>
-Date:   Wed, 12 Apr 2023 04:30:19 +0000
-References: <20230410172718.4067798-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230410172718.4067798-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Dzie=C5=84 dobry,
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+chcieliby=C5=9Bmy zapewni=C4=87 Pa=C5=84stwu kompleksowe rozwi=C4=85zania=
+, je=C5=9Bli chodzi o system monitoringu GPS.
 
-On Mon, 10 Apr 2023 10:27:18 -0700 you wrote:
-> The following changes since commit b9881d9a761a7e078c394ff8e30e1659d74f898f:
-> 
->   Merge branch 'bonding-ns-validation-fixes' (2023-04-07 08:47:20 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-04-10
-> 
-> [...]
+Precyzyjne monitorowanie pojazd=C3=B3w na mapach cyfrowych, =C5=9Bledzeni=
+e ich parametr=C3=B3w eksploatacyjnych w czasie rzeczywistym oraz kontrol=
+a paliwa to kluczowe funkcjonalno=C5=9Bci naszego systemu.=20
 
-Here is the summary with links:
-  - pull-request: bluetooth 2023-04-10
-    https://git.kernel.org/netdev/net/c/160c13175e39
+Organizowanie pracy pracownik=C3=B3w jest dzi=C4=99ki temu prostsze i bar=
+dziej efektywne, a oszcz=C4=99dno=C5=9Bci i optymalizacja w zakresie pono=
+szonych koszt=C3=B3w, maj=C4=85 dla ka=C5=BCdego przedsi=C4=99biorcy ogro=
+mne znaczenie.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Dopasujemy nasz=C4=85 ofert=C4=99 do Pa=C5=84stwa oczekiwa=C5=84 i potrze=
+b organizacji. Czy mogliby=C5=9Bmy porozmawia=C4=87 o naszej propozycji?
 
 
+Pozdrawiam
+Krystian Wieczorek
