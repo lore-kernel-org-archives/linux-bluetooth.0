@@ -2,104 +2,115 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91CB5C77B61
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Apr 2023 13:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F42C77B6E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Apr 2023 18:15:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231454AbjDMNz1 (ORCPT
+        id S229593AbjDMSPe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Apr 2023 09:55:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57086 "EHLO
+        Thu, 13 Apr 2023 14:15:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230416AbjDMNz0 (ORCPT
+        with ESMTP id S229498AbjDMSPd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Apr 2023 09:55:26 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A4A19A1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Apr 2023 06:55:24 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id g26-20020a4adc9a000000b0053b9059edd5so2237896oou.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Apr 2023 06:55:24 -0700 (PDT)
+        Thu, 13 Apr 2023 14:15:33 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B624965A0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Apr 2023 11:15:31 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id d22-20020a17090a111600b0023d1b009f52so19057958pja.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Apr 2023 11:15:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681394123; x=1683986123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QFuIG0J+LneGq+4r0DiD7CEEt5f+B8fcONqdd9iEtqA=;
-        b=kY4FpfQwu2hqLLp9+YR4TGXWgYC0jn6v2x58o34K7W7T85eMTnTKmkU/Lt3l1FrOmn
-         0xdaqIhIXfuP5sk1s6o3ZxTLNwYCfdOWN0uiAsXPcsq0zMoqDXqMJthrPNVghGPYLj5u
-         FyAs8tN/OUX6+c3s9EQc5lrlyF2vZiSCSimvvXg5cQtJf/HrGc4ngfIl/sU0FW0yDBbW
-         wNyQty8AlgrgfLez57tnxwy364TW1bYIyCwgejLqSN5nDK57BYUyxB/+9QIYFlYTH+GN
-         bZyuEMwgjw/IIQO3UFvdXPFfmYQcgfpTBWyA20eWedDJOuxXkY80/8i7csAAq3q8bmNQ
-         FHHA==
+        d=gmail.com; s=20221208; t=1681409730; x=1684001730;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=358+heE2o6OcvH2wEQoFktPRTIdMyWSY6TmCjjXXmt8=;
+        b=qvTcQpNflbI+YEqIs6Y5OfmX0xpWoz7YH83rfiT4WSGEp2wf6aqdPvB5RF1RCS4Tx9
+         9vomEtLEwPqgKS9AIUx1jyDpAAwIns6jYKG924VofxLqMAVkQNdSzxBIOvZCbVZSjT47
+         lhwAb0iBGft49SId06Wh0EXF/mTQc8MHD6lzd84NbBNZnqnhQYh4eeIMNQAHmkE+2a+I
+         tnajSl9Jbvru1pdi5hjmLRVgqoUXlvFohasfEqUXnULPL6bK9qwjRDq20STOSuP/U8XB
+         Xit2QtOt9hzue4TqDALNk0XOwFCPTWkWguVmqm/oU+e9Cq2/uGkQdtCx3rmUz8upiFNd
+         HEpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681394123; x=1683986123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QFuIG0J+LneGq+4r0DiD7CEEt5f+B8fcONqdd9iEtqA=;
-        b=ZN6+pOBPwRem9TedBCu0G6a4lD3r/UDsVS8K3SiM1sIv6mnOX3HsLW12Fl8A9HkU1N
-         sGKfyV8oD0fsId3SP3Bcpgq1P4QtH3ItxBTJFayRmW+dEAASg5mtyQOUqlVNZj8kbYnM
-         AF2jmbbE2/e3sEhEdW0qjMk8vCoCpGnMdMur5/S5rz+RR1WaINyUPDQ0lsc7M34DV/4+
-         X6LjgDLliIQvgSZ6R/e7ldi5k8zRCWpJ/2jM3i8x3Ch6lSlwR6XsR/LGO5TKbkglfqYY
-         pt5WBP4FUGkB44419uTE8QlagPpMYFku2XSeCoS9v9f1DLIVQj2KwEUBSGzhJsopgH9G
-         82kg==
-X-Gm-Message-State: AAQBX9fAndaMxcK4ISysZBSN+5jw5od8sU1gTCWhxU+Fx5QQfFxVrBfT
-        GAvwdrNn2D9qnFHUDo7UdHXgVo82nJQrDwwoz/w=
-X-Google-Smtp-Source: AKy350Z0MGFbnLhpTAe0hSGPkjqKbS3HY+/+XaZAcLWhR2GXgR2a4DWxRVHvKBRe/eqUVPgRIbhRS6A+hYljuPgInhY=
-X-Received: by 2002:a4a:e691:0:b0:541:b832:6ce0 with SMTP id
- u17-20020a4ae691000000b00541b8326ce0mr624778oot.0.1681394123348; Thu, 13 Apr
- 2023 06:55:23 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1681409730; x=1684001730;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=358+heE2o6OcvH2wEQoFktPRTIdMyWSY6TmCjjXXmt8=;
+        b=Mgw20oQR65OmBhIYti8cme/vA27+Ww22bjA53+p665DogBHWH0BkCsDBHodSQXpUvp
+         42KtQoX12qylN0LWMbkophYDlTnJ+DLxx9Y1WCOe+VLG66+PWE+r5jPNR4zcpqWchqXt
+         B9+tqAROOGofF6I2G80uQkE+QxX1LiCgdjyYzIYQuPhIuH+smZ+ga+1km/anmWFfqsIj
+         SC5nvQ0RsNT2SZQcRp8OHMHBoIvGVgjmNeG4hUc0cMId8E5O5LUFMWrsOwA0wIw3IAHY
+         gZ922kxQ+4bvNYEDpqKaCpadAcJCBc//6arFWbuugowYP0hi/eXt8IaevPBj4NwvtRj1
+         DZtQ==
+X-Gm-Message-State: AAQBX9dkcO2d0mfkBWOVGk3NVaYqHNt+guluRjFgwpS0mGzeQQ//HMu8
+        AzpGFPFooYKRKpydgrHnaSLRnitAzeOsMg==
+X-Google-Smtp-Source: AKy350aL1EgF7ENgY52R8psH1CriMObw0/xo1YDScHMD93JetDTvP14LKbMYZuqPOXsUileLvixhGQ==
+X-Received: by 2002:a17:902:f90e:b0:1a1:b137:4975 with SMTP id kw14-20020a170902f90e00b001a1b1374975mr2628357plb.49.1681409730309;
+        Thu, 13 Apr 2023 11:15:30 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id jn15-20020a170903050f00b001a1a9a639c2sm151921plb.134.2023.04.13.11.15.29
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Apr 2023 11:15:29 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] btdev: Fix not setting CIS parameters properly
+Date:   Thu, 13 Apr 2023 11:15:27 -0700
+Message-Id: <20230413181528.860660-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-References: <CACk7upyDgd8kCY+8j+RMJz35GXrF=bwRzDNH76Oh8q4nB8i0KQ@mail.gmail.com>
- <126c5bce-6496-4744-9101-6a61f0fff106@app.fastmail.com>
-In-Reply-To: <126c5bce-6496-4744-9101-6a61f0fff106@app.fastmail.com>
-From:   Raul Cheleguini <raul.cheleguini@gmail.com>
-Date:   Thu, 13 Apr 2023 10:54:47 -0300
-Message-ID: <CACk7upyYLmiS9GMJVatjDz52Z4MEPRVAoHi_tSchHWjQfqo2sA@mail.gmail.com>
-Subject: Re: unexpected SMP command errors with controller ATS2851
-To:     Christopher Snowhill <chris@kode54.net>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Mar 31, 2023 at 2:50=E2=80=AFAM Christopher Snowhill <chris@kode54.=
-net> wrote:
->
-> Would some pcapng logs be useful? It appears this device flags some comma=
-nds as supported, while indicating their entire feature sets are not suppor=
-ted in the local supported features bitfields. Or that's as near as I can g=
-uess.
->
-> First is captured from a generic driver that works, the latter is capture=
-d from Linux 6.2.9. Included in the working capture is the beginning of an =
-exchange with my Sony headphones. The latter stops logging after the first =
-failed command.
->
-> https://f.losno.co/bluetooth_ats2851.pcapng.zst
-> https://f.losno.co/bluetooth_ats2851_broken.pcapng.zst
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Hi Christopher,
+The code was assuming only index 0 was to be used which doesn't work
+when there are multiple CIS being programmed with different parameters.
+---
+ emulator/btdev.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-Thank you for sharing the pcap files. Based on your comments from another
-thread regarding this adapter, I suggest that you apply the following patch=
-es:
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 549f93645684..a04f34d4bdb3 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -5885,6 +5885,7 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
+ 
+ 	if (!evt.status) {
+ 		struct btdev *remote = conn->link->dev;
++		int i = conn->handle - ISO_HANDLE;
+ 
+ 		/* TODO: Figure out if these values makes sense */
+ 		memcpy(evt.cig_sync_delay, remote->le_cig.params.c_interval,
+@@ -5895,15 +5896,15 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
+ 				sizeof(remote->le_cig.params.c_interval));
+ 		memcpy(evt.p_latency, &remote->le_cig.params.p_interval,
+ 				sizeof(remote->le_cig.params.p_interval));
+-		evt.c_phy = remote->le_cig.cis[0].c_phy;
+-		evt.p_phy = remote->le_cig.cis[0].p_phy;
++		evt.c_phy = remote->le_cig.cis[i].c_phy;
++		evt.p_phy = remote->le_cig.cis[i].p_phy;
+ 		evt.nse = 0x01;
+ 		evt.c_bn = 0x01;
+ 		evt.p_bn = 0x01;
+ 		evt.c_ft = 0x01;
+ 		evt.p_ft = 0x01;
+-		evt.c_mtu = remote->le_cig.cis[0].c_sdu;
+-		evt.p_mtu = remote->le_cig.cis[0].p_sdu;
++		evt.c_mtu = remote->le_cig.cis[i].c_sdu;
++		evt.p_mtu = remote->le_cig.cis[i].p_sdu;
+ 		evt.interval = remote->le_cig.params.c_latency;
+ 	}
+ 
+@@ -5948,7 +5949,7 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
+ 		evt.acl_handle = cpu_to_le16(acl->handle);
+ 		evt.cis_handle = cpu_to_le16(iso->handle);
+ 		evt.cig_id = iso->dev->le_cig.params.cig_id;
+-		evt.cis_id = iso->dev->le_cig.cis[0].cis_id;
++		evt.cis_id = iso->dev->le_cig.cis[i].cis_id;
+ 
+ 		le_meta_event(iso->link->dev, BT_HCI_EVT_LE_CIS_REQ, &evt,
+ 					sizeof(evt));
+-- 
+2.39.2
 
-[PATCH] Bluetooth: Improve support for Actions Semi ATS2851 based devices
-https://marc.info/?l=3Dlinux-bluetooth&m=3D167846197021176&w=3D2
-
-[PATCH] Bluetooth: Add new quirk for broken set random RPA timeout for ATS.=
-..
-https://marc.info/?l=3Dlinux-bluetooth&m=3D167957918920723&w=3D2
-
-[PATCH] Bluetooth: Add new quirk for broken extended create connection for.=
-..
-https://marc.info/?l=3Dlinux-bluetooth&m=3D167957998621276&w=3D2
-
-You would end up in the situation mentioned in this thread, and you could
-resume your tests from there. I haven't had the time to experiment with SMP=
- yet,
-so any assistance would be greatly appreciated.
