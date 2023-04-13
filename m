@@ -2,121 +2,114 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9119C7619A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Apr 2023 02:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AE6C77B61
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Apr 2023 05:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229659AbjDMC03 (ORCPT
+        id S229811AbjDMFj2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Apr 2023 22:26:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60082 "EHLO
+        Thu, 13 Apr 2023 01:39:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjDMC02 (ORCPT
+        with ESMTP id S229482AbjDMFj1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Apr 2023 22:26:28 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B828C2D43
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 19:26:27 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id cg4so5076847qtb.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 19:26:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681352787; x=1683944787;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1bQhNwcEQ6pFvx49TyRLWgwpe/F+6lBi0k/GezVVeP0=;
-        b=rKtTTsS7/LEnoNJBbZcYcntWm7lBXPaeuzCvDNxzo9o647zUxj2xSSDCjSfvSCQ4pc
-         lxaFwtxy6XjHGvE23YABwI8Y7ebO4/E9Pxy7pDI411mQ3MO/CVFPa7/7eRehmwA8HE6V
-         41gjJBtaIjvhEIJ441N2LkakHmPsWBzfln6yQmcYqRBEU8PBn4a7LqWmKT0voH2rIqll
-         mm9nz85wbAbZCYpOxcMV65c+VvcR3M6y8Y0uYPqLjl6XnqhFrClDGK4B1WPbpu+REg2K
-         zvKujtOa+F7+f/o6LrOGX+8VfCNqommaXTFYbNK7NDGK4UkSYpBb566ac9SSvOK3iB0e
-         YICA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681352787; x=1683944787;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1bQhNwcEQ6pFvx49TyRLWgwpe/F+6lBi0k/GezVVeP0=;
-        b=V9Mv7WGBOScbKk97c33XMnEQ00LwIHRd1dbEp6cGnuN9CJ+mUpkdx5yr8YRKrkdbCo
-         NFp35CbelFy/scIV75DXAaUL7Mf9utfbdXwvF5SR3aqsclRC72vUgcaheITaAbORlwwH
-         UXRuyzW4yZdMS2K4c2LNlww+LWfMq3PrZimyEBsrBgalf2Jt4s7EKpU2n/SRnH1Rauty
-         1HfU6z5FnDtsv4XP7Su73EzUwwEI/omMsRyKvSyxlGk7baXrlXuqfpMMgcSZ5u5WSBW/
-         LQ/b1vrZCg/1TpCJfpEQ7oilAlxkJOvRJm0wCrEmjhOhGsQbVM9TE5KguhCTnrr5mXYt
-         lzoQ==
-X-Gm-Message-State: AAQBX9e1zwchGsJ8L3hR0SZkycVsJtcrBxCEcJgeMsWAxIn2y7N1nBHA
-        vYL4cgJ/rqVLjFwd2lCa2KJx39P8oNI=
-X-Google-Smtp-Source: AKy350ZDjWM2Mt25syBBlDQANwDFs6Q1IBJeBKREfViMFwb3+OYBRNBSGvihfQBKjhpK+6C+9m9ipA==
-X-Received: by 2002:a05:622a:148e:b0:3e6:3c1d:a748 with SMTP id t14-20020a05622a148e00b003e63c1da748mr907757qtx.42.1681352786778;
-        Wed, 12 Apr 2023 19:26:26 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.246.180])
-        by smtp.gmail.com with ESMTPSA id do4-20020a05620a2b0400b0074ad04609f8sm123347qkb.117.2023.04.12.19.26.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 19:26:26 -0700 (PDT)
-Message-ID: <64376852.050a0220.5d021.05d3@mx.google.com>
-Date:   Wed, 12 Apr 2023 19:26:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5928893442766525415=="
+        Thu, 13 Apr 2023 01:39:27 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD584200;
+        Wed, 12 Apr 2023 22:39:24 -0700 (PDT)
+Received: from [192.168.0.2] (ip5f5aebdb.dynamic.kabel-deutschland.de [95.90.235.219])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6215E60027FE8;
+        Thu, 13 Apr 2023 07:39:21 +0200 (CEST)
+Message-ID: <dbbf4556-2719-5827-efbd-da9e87c0de40@molgen.mpg.de>
+Date:   Thu, 13 Apr 2023 07:39:20 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1,1/3] Bluetooth: hci_conn: Add support for linking multiple hcon
-In-Reply-To: <20230413005046.642682-1-luiz.dentz@gmail.com>
-References: <20230413005046.642682-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: btusb driver need to be unloaded and reloaded after boot & lag
+ issue
+To:     help.7ocym@8shield.net
+References: <168133719213.7.14774994518515251513.119182329@8shield.net>
+Content-Language: en-US
+Cc:     linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        regressions@lists.linux.dev
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <168133719213.7.14774994518515251513.119182329@8shield.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5928893442766525415==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+[Cc: +regressions@lists.linux.dev]
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=739317
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.52 seconds
-GitLint                       PASS      1.06 seconds
-SubjectPrefix                 PASS      0.37 seconds
-BuildKernel                   PASS      38.01 seconds
-CheckAllWarning               PASS      41.68 seconds
-CheckSparse                   WARNING   47.73 seconds
-CheckSmatch                   WARNING   123.69 seconds
-BuildKernel32                 PASS      37.14 seconds
-TestRunnerSetup               PASS      519.08 seconds
-TestRunner_l2cap-tester       PASS      18.08 seconds
-TestRunner_iso-tester         PASS      19.00 seconds
-TestRunner_bnep-tester        PASS      6.11 seconds
-TestRunner_mgmt-tester        PASS      125.24 seconds
-TestRunner_rfcomm-tester      PASS      10.05 seconds
-TestRunner_sco-tester         PASS      9.03 seconds
-TestRunner_ioctl-tester       PASS      10.53 seconds
-TestRunner_mesh-tester        PASS      7.74 seconds
-TestRunner_smp-tester         PASS      8.84 seconds
-TestRunner_userchan-tester    PASS      6.62 seconds
-IncrementalBuild              PASS      98.31 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+Dear JLM,
 
 
----
-Regards,
-Linux Bluetooth
+Am 13.04.23 um 00:06 schrieb help.7ocym@8shield.net:
+
+> sorry to address both list, but this issue seems related, without
+> knowing where lies the issue > my hardware : https://wiki.gentoo.org/wiki/Lenovo_Yoga_900
+> I use the pre-built gentoo linux kernel,
+> 6.2.8-gentoo-dist #1 SMP PREEMPT_DYNAMIC Wed Mar 22 17:15:39 -00 2023 x86_64 Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz GenuineIntel GNU/Linux
+> 
+> since a few update (sadly I didn't noted the latest kernel version
+> that didn't had the issue), after a boot, the bluetooth isn't
+> working, nothing bad in dmesg, I just have to unload btusb module and
+> modprobe it again to have bluetooth working again...
+> 
+> after a suspend to ram, I have to power off-power on the bluetooth to
+> have it work again (bluetoothctl power off; bluetoothctl power on)
+> 
+> bluetooth mouse can also be extremely laggy sometimes,but without
+> error message in dmesg, most of the time `bluetoothctl power` off-on
+> cycling do solve the issue....
+> 
+> I also included the usb mailing list because it might be related to
+> some behavior I noticed :
+> 
+> I have usb3.0 micro sd card reader (SanDisk MobileMate UHS-I microSD
+> Reader/Writer USB 3.0 Reader, Kingston MobileLite Plus (MLPM) microSD
+> Card Reader USB 3.1 microSDHC/SDXC UHS-II, for example) and some
+> extra fast micro sd cards (like sandisk extrem 512G), when
+> transferring data the read rate can be as high as 110Mo/s and write
+> 70Mo/s sustained, nothing impressive but when such rate is achieved
+> for a long time (big file transfer) either reading only access,
+> writing only access or read write, the usb bus become unusable, I
+> can't even use a usb mouse connected to it by wire... even if cpu
+> usage is really low (less than 10%) I don't have the issue if I
+> connect a M2 usb3 flash drive, with comparable transfert speed... so
+> not related to some bus over usage...
+> 
+> so I suspect that there is an issue with the usb driver, and that
+> maybe the bluetooth issue can be related to the usb issue, since the
+> bluetooth controller is on the usb bus on the laptop >
+> the transfer issue of usb is much more older than the bluetooth
+> issue, it's approximative, but : >   - the btusb boot issue is about 3 month old,
+>   - the suspend/resume issue of bluetooth is more than a year old
+>   - the usb transfer issue as more than a year...
+> 
+> I'll gladly provide any useful information, can also do patch tries...
+As you use Gentoo and are able to build your own Linux kernel, the 
+fastest way to get these issues addressed is to bisect them. To shorten 
+the test cycles, I recommend to try, if you can reproduce the issues in 
+QEMU and passing through the problematic devices to the VM [1][2].
+
+I also recommend to start a separate thread for each issue and, as these 
+seem to be regressions, also keep the regression folks in the loop [3].
 
 
---===============5928893442766525415==--
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/all/5891f0d5-8d51-9da5-7663-718f301490b1@molgen.mpg.de/
+      (The commands were working for after all, and the device didn’t 
+show up due to a (second) Linux kernel regression.)
+[2]: https://station.eciton.net/qemu-usb-host-device-pass-through.html
+[3]: 
+https://www.kernel.org/doc/html/latest/admin-guide/reporting-regressions.html
