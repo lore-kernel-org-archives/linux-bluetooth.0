@@ -2,119 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C31DC7619A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Apr 2023 23:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A35F0C77B6C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Apr 2023 00:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbjDLX6V (ORCPT
+        id S229661AbjDMAuy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Apr 2023 19:58:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53180 "EHLO
+        Wed, 12 Apr 2023 20:50:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbjDLX6U (ORCPT
+        with ESMTP id S229647AbjDMAux (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Apr 2023 19:58:20 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486573C39
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 16:58:19 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-184518754bfso12218100fac.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 16:58:19 -0700 (PDT)
+        Wed, 12 Apr 2023 20:50:53 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6B62717
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 17:50:52 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id g16so14751227iom.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Apr 2023 17:50:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1681343898;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=h14IXfl6VI9SuhAposhxFPgNYy3NIZJ+euYHkvPtrS8=;
-        b=A9U2FcAH8vYTUo3Dr88BbCkEufDyB5gtC3uZKeNq9PGK7g1wgdn7LrGjnfqksodTF9
-         8lbW+CHd16ZJ22pv7xHNTBBHcWI2zBh1JNmJdtsOKqo/Zsg4vMq4+WLlqzUM2cOSfUhK
-         09EuRcDediQlJViX8u3LmpToPBXp3euHegDmjAyQkx7zYFg0ydGUcO1UA0Tjj8VydSqO
-         DAYDspbZfpse5Ku9yoWbEZV8rczUo0Yxi0EmkYWFO0NMurGDwgjOqGSnn5WFzX8+Bt8D
-         jiN1g6FpbiYZwClBA63aVN3LddnJ3NqBXMuZ11z9Nw9IpWK5vxFMJ4dz8XRSm15hOV5+
-         Po7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681343898;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20221208; t=1681347051;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=h14IXfl6VI9SuhAposhxFPgNYy3NIZJ+euYHkvPtrS8=;
-        b=jqHqUfiz9gWgNPMaWAnkdHVV0Qu6xufpP2lGsdqRGviet9WDUgxAhA+2nn/gy7Jd00
-         1cL+DJYl7uh/p6SNENUuIoHXzHStRgIdoX5ixtNx+tPv4bt5JmUKsaaRbw93nAFRJFQh
-         fc5OkCAIrXcKfGBAptiOxPvzqMCuvMLlLRq218j+bWxN69syo2HDeqYGOW2m9ePh+5Id
-         njtG3asMt7nPJ2BFaWujDMnV7msw2wKfq0Z/Ut1mMgVLikWQXUOmUUQy6DSXKNGhLTVq
-         6ZrkwVRaU0baXbBjYP0QxVUVc1pyVBsPhhvflxrNLQw39oEIgoyO1wXvL3Tvw4YZWZYm
-         Dgwg==
-X-Gm-Message-State: AAQBX9cU0yD+SKQr0EpV7OgkryRyHn2g5ZlqybRNyA3clvENQq941+VH
-        dkOjOfaqKLYRhvZqW23D3YQ+mQ==
-X-Google-Smtp-Source: AKy350aTQ1AJ/VfRTneWmBCNG22VeJS1FeIAxR8JzxVmwLw9/RBWe8LeIkBS39U4GyXofj6zPC/lfg==
-X-Received: by 2002:a05:6870:73cd:b0:187:8ab7:c0f6 with SMTP id a13-20020a05687073cd00b001878ab7c0f6mr428264oan.9.1681343898677;
-        Wed, 12 Apr 2023 16:58:18 -0700 (PDT)
-Received: from localhost ([2600:1700:eb1:c450::35])
-        by smtp.gmail.com with ESMTPSA id b31-20020a4a98e2000000b0051a6cb524b6sm40178ooj.2.2023.04.12.16.58.18
+        bh=hWZGyUIe8vDHexeKos2oNQ+poJ0+KHtIaTu1usVgnDI=;
+        b=TZbCV4gKcHVXGO/KChtbomLXpjZn8qwZxeTC7y5hi/YLQIsgai75UdRk94RV4/syOD
+         M85ZDDOHG+MyDip2z/uNt3HzXPs1uHXPKUtJgG2m6IYlKHCxWEN/c+8FoWXLf48RFjl2
+         LEeutcGsr+P12xriQTxCMPOHW2RWmO/znVlLhHOWHVCtEOdArf5ECbCEow8rIQaPF8sl
+         TnUdQqpqrrV3daKIa1YtRcdFgPCVkPQj1iOo9Qxwgrr15lipdvS0SYmrtDEAJjk6r6F8
+         o5mYY4IAsjoKDxtJOEekJ+B3KXDPZ9tQ1fiTAODH1rY7qGXqcAGEghIHQfN2fkA1nJc8
+         2FmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681347051;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hWZGyUIe8vDHexeKos2oNQ+poJ0+KHtIaTu1usVgnDI=;
+        b=Mf8D9nZKQnxtlBqX9bSEuFYlTxRlHP24a2LsPWeUw/wrbk4Ad7g0D0zI2j0RG2RkFM
+         wX9TbcLJcmNOykKEbCRu1galF2qg3WmBVB1PtAcgTga/RfmmIOhWa/j4EoBkp/l4aUo3
+         OHhqyCpanoGgfN9RiXye+pglVzaiHgGp2rj1ArXtQH8oGuv1MpkNl5WYAhLrj6LcyITO
+         DpSrC8qsRrsrBQyaiYzeLt3lb3sb5wFspUEDhSjPLmIMHYTN6JtpW0Bjl/IeluRXYNyR
+         zmtGJGBuo463r0PB6tPmkjXA9ceIfVyMwkOzMSoslG2UQCRPNsNjGhhXn9/noLTr2WWU
+         K4uA==
+X-Gm-Message-State: AAQBX9dN/QTZhNMg4d5rv8Si15Cg0uRegLjbZDDlYHiCa+XmcZuEMYPv
+        LcijP57hwDo2Ca2iuNd8fkQ6LOZjvte/KQ==
+X-Google-Smtp-Source: AKy350ZPTXTefyxabgaf1ocYj2YO/jO0H8CwYyMY+Phqk4d6XbDPczSFAqAHcRY7EZ6r2Q5xOjjxkw==
+X-Received: by 2002:a6b:d918:0:b0:751:e48c:7eed with SMTP id r24-20020a6bd918000000b00751e48c7eedmr33938ioc.11.1681347051149;
+        Wed, 12 Apr 2023 17:50:51 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id r14-20020a6bd90e000000b00758facb11fdsm141717ioc.17.2023.04.12.17.50.49
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Apr 2023 16:58:18 -0700 (PDT)
-From:   Steev Klimaszewski <steev@kali.org>
-Date:   Wed, 12 Apr 2023 18:58:17 -0500
-Subject: [PATCH] Bluetooth: hci_qca: mark OF related data as maybe unused
+        Wed, 12 Apr 2023 17:50:50 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1 2/3] Bluetooth: hci_conn: Fix not matching by CIS ID
+Date:   Wed, 12 Apr 2023 17:50:45 -0700
+Message-Id: <20230413005046.642682-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230413005046.642682-1-luiz.dentz@gmail.com>
+References: <20230413005046.642682-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230412-bluetooth-v1-1-377b9bf7b08e@kali.org>
-X-B4-Tracking: v=1; b=H4sIAJhFN2QC/x2NQQqDMBBFryKzbiCOVmmvUrpI4mgGbFJm0lIQ7
- 27s8vHf522gJEwK92YDoS8r51ShvTQQoksLGZ4qA1rsbN+i8euHSs4lmjBeb5bmAXHqoPreKRk
- vLoV4Pl5OC8k5vIVm/v0jj+e+H8HlPEZ0AAAA
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Steev Klimaszewski <steev@kali.org>
-X-Mailer: b4 0.12.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1250; i=steev@kali.org;
- h=from:subject:message-id; bh=ympCbGntj3/wcMctjECb4BD9NMjn+TgpsO4HeYNDsEw=;
- b=owGbwMvMwMUosahgcqykaSbjabUkhhRz15l69nasbDwvzmkXXV5rcP3pfLtQDf+6tO9JK/fNr
- XrBfuNqJ+NkFgZGLoZaMUUW1nsa3q4fD1XO9Uh4AzOIlQlkSrxIAwMQ6DFoZBYXl6YW6aYVFDnk
- 5ZcklmTm5xXr5Rek5hWkF+ilZaaVZGTkFxWn5ibm6eWllhiYurgaWZg4mZi6GTobmVtauphYmBm
- 4OhtaOBqZG1gam7oYAgkzSwYuTgGYjb+i2H+zp257wcYgd9Hs0RTL2/u45K9PlvWRrlSVXbx6Je
- vU9OsCk947bvh3XyLzlppn7hPHsCfbl/oYP+9YNrt6n1Xg+Q8Kay0uHvJ8Jh81d7PG1L9G5lITF
- +qffJpXc3SmbknCPCE1tXuC2zOXcqYF9qyuV7xTfcu1IJxp0w0F5cXFsgKW/xamZwR0nPE6v639
- WL6u6je+/MeThPa9SD28Wep49+XKV8ei8ia8MUuI3jeTc4F7dJjRdoaigl/b4k5u3iLpuqM3qIZ
- 5hfONLQfvufr83jBp3aXYrQy+C1Iaf+rVrHIz+77Dc3fyrw3fyzon3TiczafBpXPS2Pi31aWmGs
- fmiw2fL9/xtpD6o8bKpn8YAA==
-X-Developer-Key: i=steev@kali.org; a=openpgp;
- fpr=70D5FB3206291ED5EC1FAC57FF5F35DF030F380E
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The driver can be compile tested with !CONFIG_OF making certain data
-unused.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Steev Klimaszewski <steev@kali.org>
----
-There was a patch to mark OF related data as maybe unused in flight when
-I was doing my bluetooth driver work and I didn't notice it.  Since I
-don't build on !CONFIG_OF systems, I hadn't seen the warning.  This
-patch simply marks our data as maybe unused as well.
----
- drivers/bluetooth/hci_qca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This fixes only matching CIS by address which prevents creating new hcon
+if upper layer is requesting a specific CIS ID.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 1597797ff169..1b064504b388 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1891,7 +1891,7 @@ static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
- 	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
- };
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 7 ++++++-
+ net/bluetooth/hci_conn.c         | 2 +-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4fe1e71cb9d8..6f5e8594ff2d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1180,7 +1180,8 @@ static inline struct hci_conn *hci_conn_hash_lookup_le(struct hci_dev *hdev,
  
--static const struct qca_device_data qca_soc_data_wcn6855 = {
-+static const struct qca_device_data qca_soc_data_wcn6855 __maybe_unused = {
- 	.soc_type = QCA_WCN6855,
- 	.vregs = (struct qca_vreg []) {
- 		{ "vddio", 5000 },
-
----
-base-commit: 7d8214bba44c1aa6a75921a09a691945d26a8d43
-change-id: 20230412-bluetooth-c7590ef622d3
-
-Best regards,
+ static inline struct hci_conn *hci_conn_hash_lookup_cis(struct hci_dev *hdev,
+ 							bdaddr_t *ba,
+-							__u8 ba_type)
++							__u8 ba_type,
++							__u8 id)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+ 	struct hci_conn  *c;
+@@ -1191,6 +1192,10 @@ static inline struct hci_conn *hci_conn_hash_lookup_cis(struct hci_dev *hdev,
+ 		if (c->type != ISO_LINK)
+ 			continue;
+ 
++		/* Match CIS ID if set */
++		if (id != BT_ISO_QOS_CIS_UNSET && id != c->iso_qos.ucast.cis)
++			continue;
++
+ 		if (ba_type == c->dst_type && !bacmp(&c->dst, ba)) {
+ 			rcu_read_unlock();
+ 			return c;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8b8ebd3e2585..5524f08b91ae 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1842,7 +1842,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ {
+ 	struct hci_conn *cis;
+ 
+-	cis = hci_conn_hash_lookup_cis(hdev, dst, dst_type);
++	cis = hci_conn_hash_lookup_cis(hdev, dst, dst_type, qos->ucast.cis);
+ 	if (!cis) {
+ 		cis = hci_conn_add(hdev, ISO_LINK, dst, HCI_ROLE_MASTER);
+ 		if (!cis)
 -- 
-Steev Klimaszewski <steev@kali.org>
+2.39.2
 
