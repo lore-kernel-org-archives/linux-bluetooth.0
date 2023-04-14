@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F49DC77B72
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Apr 2023 20:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A77C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Apr 2023 20:10:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbjDNUK2 (ORCPT
+        id S230054AbjDNUK3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Apr 2023 16:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60666 "EHLO
+        Fri, 14 Apr 2023 16:10:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229964AbjDNUKW (ORCPT
+        with ESMTP id S229965AbjDNUKW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 14 Apr 2023 16:10:22 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6283265BC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F7A65B8;
         Fri, 14 Apr 2023 13:10:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E71AC64A27;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E056C64A26;
         Fri, 14 Apr 2023 20:10:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 469E3C4339C;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 40E58C433A0;
         Fri, 14 Apr 2023 20:10:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1681503020;
-        bh=hQdeyryshxMX3gP79v9URObTlnSUTWPJeXG4jKAbYqE=;
+        bh=Mvyvuwtj/oRXkXPTS/Co4jsSYBGPv4LCGVF9JXluDUY=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Z6fH6CjrD61alup84nqkH5aYjDwi3VMTJd6ouBb2yTgVJJVe+k9l5bG72kYrXYYMt
-         8k6WI/KI2o31vJYydp9DXrLAGdVFv0s0ms8kf+LeJ40wBWudrOXfzXjIBeelsI1dSC
-         73umoMTIh85o2ZsVlBLE7jtLUqmBN5sXeUC9/oyWgqivDEYBUQXo5ghReRBGXtp/AY
-         JZUOVbMXP1DBNLjP3iM8PTDMhlFHSW0hSaJBkebYewxIemC+xjAKFjA16/hIjoS5oN
-         nZq52oVFqSm2nczRtg1LLauYXWLC3GNZGqyzjrISOe+O+pyrTnN8jQ6UV2rqSou6o3
-         BykntO7df/+cA==
+        b=XpSGiKFUcGwX9yKPxNsP0eXXIc+VwVoXFr0ef+rwUtKfWAaR8wnAjVY7n+Lt6/3sn
+         9VNffWlgQCdhUBbRBoMWEgdpU0PVSN09DNJngxEFBk3aW4phlZYOey3+pbV9lvl8nt
+         6H8ZlDE3ushFWARQxJFRCdHGjC3D8/7AeL3tkU+6JiHYqBtqK4aiBXTuM+FwhJd3UD
+         q5k7KW42GOk18zO6xk9mR02x8o/0+1tYyWAS0kTTM5CYk4Me6zp4oBtaLAEKrU9dxF
+         ZuDdg+g3oiR8i9r9ohlkyTO1MO1vOwhZ1mKsfNd6mcRO3x6MOl5CsMizNfoURAyLkf
+         7wfEicCuj8EIg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 32B68E52441;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2A3C2E4508F;
         Fri, 14 Apr 2023 20:10:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: fix inconsistent indenting
+Subject: Re: [PATCH] net: bluetooth: hci_debugfs: fix inconsistent indenting
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168150302020.15322.4989643441506620146.git-patchwork-notify@kernel.org>
+Message-Id: <168150302017.15322.3070073451036592572.git-patchwork-notify@kernel.org>
 Date:   Fri, 14 Apr 2023 20:10:20 +0000
-References: <20230409130229.2670-1-u202212060@hust.edu.cn>
-In-Reply-To: <20230409130229.2670-1-u202212060@hust.edu.cn>
+References: <20230408164542.2316-1-u202212060@hust.edu.cn>
+In-Reply-To: <20230408164542.2316-1-u202212060@hust.edu.cn>
 To:     Lanzhe Li <u202212060@hust.edu.cn>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -59,17 +59,18 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun,  9 Apr 2023 21:02:29 +0800 you wrote:
+On Sun,  9 Apr 2023 00:45:42 +0800 you wrote:
+> From: markli <u202212060@hust.edu.cn>
+> 
 > Fixed a wrong indentation before "return".This line uses a 7 space
 > indent instead of a tab.
 > 
 > Signed-off-by: Lanzhe Li <u202212060@hust.edu.cn>
-> ---
->  net/bluetooth/hci_debugfs.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> [...]
 
 Here is the summary with links:
-  - Bluetooth: fix inconsistent indenting
+  - net: bluetooth: hci_debugfs: fix inconsistent indenting
     https://git.kernel.org/bluetooth/bluetooth-next/c/2df7d630ef53
 
 You are awesome, thank you!
