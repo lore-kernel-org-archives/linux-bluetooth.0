@@ -2,101 +2,81 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11471C77B72
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Apr 2023 19:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8BCDC77B73
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Apr 2023 20:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbjDNTxn convert rfc822-to-8bit (ORCPT
+        id S229967AbjDNUKW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Apr 2023 15:53:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54768 "EHLO
+        Fri, 14 Apr 2023 16:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbjDNTxl (ORCPT
+        with ESMTP id S229491AbjDNUKV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Apr 2023 15:53:41 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 934A755A6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Apr 2023 12:53:39 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 1BC7E240290
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Apr 2023 21:53:37 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4PynFF38Cmz6txQ;
-        Fri, 14 Apr 2023 21:53:37 +0200 (CEST)
-Message-ID: <1ae133312ec9d702ebf18cbf3a2b106e8c27acd4.camel@iki.fi>
-Subject: Re: [PATCH v2 2/3] Bluetooth: hci_conn: Fix not matching by CIS ID
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date:   Fri, 14 Apr 2023 19:53:36 +0000
-In-Reply-To: <20230413183113.896669-2-luiz.dentz@gmail.com>
-References: <20230413183113.896669-1-luiz.dentz@gmail.com>
-         <20230413183113.896669-2-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Fri, 14 Apr 2023 16:10:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EC9519AA;
+        Fri, 14 Apr 2023 13:10:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF77464A1C;
+        Fri, 14 Apr 2023 20:10:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 23259C4339B;
+        Fri, 14 Apr 2023 20:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681503020;
+        bh=jx+5aFH+D1AaOqLb6zg5Z9VuHhLk8+ajilCemoTPDpc=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=j0TdiFzsNaa3rq243EyDH7scX2A39LaJG1xcRE1tkQAnbUOMwWIpLS8NCE/2qUVmE
+         AFCEjYHuGSioYS1celYYYD/kww4xemHJs4NSsWs//eBTieiVO2sgfRy4yENVfl9mEQ
+         8cBg6j+KfBtYJKifRdfCV9u/dwQessohrm9lvANlNePd5cSxqChtmmc6RYsYdBJcko
+         kpqIC6dkpRHQSE0ktrJbJRpFL7VzMeatcId+TKUUPtj34jPznwpXcWhRAzy9DTZ5KY
+         sO99sGnvt6aY67i/32ptZknrobEz4vibedNcXHdTAL9F4WqdzQ+mfkn7DJk+h7ewa7
+         1C0TBbayUSMrw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12E33E29F3B;
+        Fri, 14 Apr 2023 20:10:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: hci_qca: mark OF related data as maybe unused
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <168150302007.15322.13621162833443050946.git-patchwork-notify@kernel.org>
+Date:   Fri, 14 Apr 2023 20:10:20 +0000
+References: <20230412-bluetooth-v1-1-377b9bf7b08e@kali.org>
+In-Reply-To: <20230412-bluetooth-v1-1-377b9bf7b08e@kali.org>
+To:     Steev Klimaszewski <steev@kali.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello:
 
-to, 2023-04-13 kello 11:31 -0700, Luiz Augusto von Dentz kirjoitti:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed, 12 Apr 2023 18:58:17 -0500 you wrote:
+> The driver can be compile tested with !CONFIG_OF making certain data
+> unused.
 > 
-> This fixes only matching CIS by address which prevents creating new hcon
-> if upper layer is requesting a specific CIS ID.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Signed-off-by: Steev Klimaszewski <steev@kali.org>
 > ---
->  include/net/bluetooth/hci_core.h | 7 ++++++-
->  net/bluetooth/hci_conn.c         | 2 +-
->  2 files changed, 7 insertions(+), 2 deletions(-)
+> There was a patch to mark OF related data as maybe unused in flight when
+> I was doing my bluetooth driver work and I didn't notice it.  Since I
+> don't build on !CONFIG_OF systems, I hadn't seen the warning.  This
+> patch simply marks our data as maybe unused as well.
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 4fe1e71cb9d8..6f5e8594ff2d 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1180,7 +1180,8 @@ static inline struct hci_conn *hci_conn_hash_lookup_le(struct hci_dev *hdev,
->  
->  static inline struct hci_conn *hci_conn_hash_lookup_cis(struct hci_dev *hdev,
->  							bdaddr_t *ba,
-> -							__u8 ba_type)
-> +							__u8 ba_type,
-> +							__u8 id)
->  {
->  	struct hci_conn_hash *h = &hdev->conn_hash;
->  	struct hci_conn  *c;
-> @@ -1191,6 +1192,10 @@ static inline struct hci_conn *hci_conn_hash_lookup_cis(struct hci_dev *hdev,
->  		if (c->type != ISO_LINK)
->  			continue;
->  
-> +		/* Match CIS ID if set */
-> +		if (id != BT_ISO_QOS_CIS_UNSET && id != c->iso_qos.ucast.cis)
-> +			continue;
-> +
+> [...]
 
-Should this also check the CIG ID?
+Here is the summary with links:
+  - Bluetooth: hci_qca: mark OF related data as maybe unused
+    https://git.kernel.org/bluetooth/bluetooth-next/c/875d76c2f7c1
 
-Core v5.3 4.E Sec. 5.3: "The CIS_ID has a separate number space for
-each CIG_ID.", and I didn't manage to find restriction that you
-couldn't have the same peripheral in multiple CIG.
-
->  		if (ba_type == c->dst_type && !bacmp(&c->dst, ba)) {
->  			rcu_read_unlock();
->  			return c;
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 204164ee5f9a..b9ecfc782be9 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -1842,7 +1842,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
->  {
->  	struct hci_conn *cis;
->  
-> -	cis = hci_conn_hash_lookup_cis(hdev, dst, dst_type);
-> +	cis = hci_conn_hash_lookup_cis(hdev, dst, dst_type, qos->ucast.cis);
->  	if (!cis) {
->  		cis = hci_conn_add(hdev, ISO_LINK, dst, HCI_ROLE_MASTER);
->  		if (!cis)
-
+You are awesome, thank you!
 -- 
-Pauli Virtanen
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
