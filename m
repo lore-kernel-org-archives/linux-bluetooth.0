@@ -2,132 +2,390 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB4AC7619A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Apr 2023 12:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D0FC77B70
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Apr 2023 14:39:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbjDOMBz (ORCPT
+        id S229803AbjDOOjc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Apr 2023 08:01:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41910 "EHLO
+        Sat, 15 Apr 2023 10:39:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229830AbjDOMBy (ORCPT
+        with ESMTP id S229546AbjDOOjb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Apr 2023 08:01:54 -0400
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5FE559E
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Apr 2023 05:01:52 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailout.nyi.internal (Postfix) with ESMTP id A87115C0291;
-        Sat, 15 Apr 2023 08:01:48 -0400 (EDT)
-Received: from imap44 ([10.202.2.94])
-  by compute5.internal (MEProxy); Sat, 15 Apr 2023 08:01:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kode54.net; h=cc
-        :cc:content-transfer-encoding:content-type:content-type:date
-        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to; s=fm3; t=
-        1681560108; x=1681646508; bh=aB/73pdluWbwF4vxX0QpwG48rF9552YJ5ch
-        aGnLRWyM=; b=DRHNwyWEFfO9rqezVAYt7jMksUqjQQShnm7ZjYOT3yRI9ZBOnV0
-        AaY0+Mp29m6F75gNBrZfM2aIqJl42OlTftQtSn55Gvfl26Zj832Luy8QR9vFHzak
-        Esidb3STR6+uJaVJ5LnYSYU/HTumZUL75yCrWlyg8Lf1PHhwb6IkFaaaHQaD8rmQ
-        iY+Mf+IVCh3s2FjIYe/jRs7A5WBgeTqrKH7I3CzkMAvEnZ+WH2iGdm87ApjqNLhG
-        2hikis23W8JXaQbz1h7vq6d3iilnNktVKA65m/NQIbGM+3rn8VIqGlPyiKlCjdn+
-        eMWLLGFBuxGBLuEPXfSRDF1IusXsUdb/SXw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:content-type:date:date:feedback-id:feedback-id
-        :from:from:in-reply-to:in-reply-to:message-id:mime-version
-        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-        1681560108; x=1681646508; bh=aB/73pdluWbwF4vxX0QpwG48rF9552YJ5ch
-        aGnLRWyM=; b=Bc3OzphAw4kvjfxjPZRM5CyusG2l7M0X1759GvyhoC6pJRlD2u9
-        MZrvs2iOpA5tMlyP+GQJ1iQeWz2HGdhfXYudpTC+VCOmXF+IB/wuW3ptj9MFveIV
-        TJ/wt+uP5iKJ4X9KSX1f1W04OD0K0o62HzoGoeX1U7Eg2S9c627NMn6hd9rfHqqV
-        3oSiG9QRl+CP7cp5KRHyvwxFt8n0eWRg2f9AH/1BG4gpcVlPi0l5+/40SIc64ts9
-        W+si0L/BO56y0gvogtHqGbvdHxCQ4CdajuKKX+qD2j7wF1CxRmiytes7pjBNG4Ly
-        t5KF6gYN/uVYws/fzYeBINQyyDs+IMLBgAA==
-X-ME-Sender: <xms:LJI6ZCCEqQcBqsv00fCAaSpMLMPk5sOw3vIG319PdlXAgI46LvOT-w>
-    <xme:LJI6ZMgdWGXI5CXPS8EAsLXWK7RYb9sg9zRCo5d5r_BjalDdjEdjpPl_pv9p_tjA6
-    CN4_FHc_JoQa_7D3kU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdelvddggeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdev
-    hhhrihhsthhophhhvghrucfunhhofihhihhllhdfuceotghhrhhisheskhhouggvheegrd
-    hnvghtqeenucggtffrrghtthgvrhhnpeevffevfffgjeegieejteehheevtdeugfevudeu
-    tedvteeuffdvffdtudeuueffieenucffohhmrghinheplhhoshhnohdrtghopdhmrghrtg
-    drihhnfhhonecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
-    mheptghhrhhisheskhhouggvheegrdhnvght
-X-ME-Proxy: <xmx:LJI6ZFm2Bi0ijO0LkWNoPS0HRa5iUuo34wFj9M8gIwUFjzPhv5ZxwQ>
-    <xmx:LJI6ZAwGn8A8UGAHj2EbsMj_sDyzCqjeoIasDKpw2sA8o8GTJH5Vgw>
-    <xmx:LJI6ZHQfeBqz5AKHkxBE9cvrNt1gUv8oHk2R7Yis9aC4_3krm86uZw>
-    <xmx:LJI6ZCcnlFkS136mHmsgrcQOq1VoqNsdOgixToiuM95oVtxoX1ZzFg>
-Feedback-ID: i01794759:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id E9CF136A0073; Sat, 15 Apr 2023 08:01:47 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-334-g8c072af647-fm-20230330.001-g8c072af6
-Mime-Version: 1.0
-Message-Id: <06d8f66e-1a35-4f7e-8e35-00595c424542@app.fastmail.com>
-In-Reply-To: <CACk7upyYLmiS9GMJVatjDz52Z4MEPRVAoHi_tSchHWjQfqo2sA@mail.gmail.com>
-References: <CACk7upyDgd8kCY+8j+RMJz35GXrF=bwRzDNH76Oh8q4nB8i0KQ@mail.gmail.com>
- <126c5bce-6496-4744-9101-6a61f0fff106@app.fastmail.com>
- <CACk7upyYLmiS9GMJVatjDz52Z4MEPRVAoHi_tSchHWjQfqo2sA@mail.gmail.com>
-Date:   Sat, 15 Apr 2023 05:01:26 -0700
-From:   "Christopher Snowhill" <chris@kode54.net>
-To:     "Raul Cheleguini" <raul.cheleguini@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        "Marcel Holtmann" <marcel@holtmann.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com
-Subject: Re: unexpected SMP command errors with controller ATS2851
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        Sat, 15 Apr 2023 10:39:31 -0400
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45461FF7
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Apr 2023 07:39:29 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id 4C6DB2401ED
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Apr 2023 16:39:28 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4PzGDH5YxQz9rxG;
+        Sat, 15 Apr 2023 16:39:27 +0200 (CEST)
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] tools/test-runner: add option to start Pipewire inside the VM
+Date:   Sat, 15 Apr 2023 14:39:19 +0000
+Message-Id: <48701651ef435518ac8432d80dfdc2dfe80f3703.1681569400.git.pav@iki.fi>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Apr 13, 2023, at 6:54 AM, Raul Cheleguini wrote:
-> On Fri, Mar 31, 2023 at 2:50=E2=80=AFAM Christopher Snowhill <chris@ko=
-de54.net> wrote:
->>
->> Would some pcapng logs be useful? It appears this device flags some c=
-ommands as supported, while indicating their entire feature sets are not=
- supported in the local supported features bitfields. Or that's as near =
-as I can guess.
->>
->> First is captured from a generic driver that works, the latter is cap=
-tured from Linux 6.2.9. Included in the working capture is the beginning=
- of an exchange with my Sony headphones. The latter stops logging after =
-the first failed command.
->>
->> https://f.losno.co/bluetooth_ats2851.pcapng.zst
->> https://f.losno.co/bluetooth_ats2851_broken.pcapng.zst
->
-> Hi Christopher,
->
-> Thank you for sharing the pcap files. Based on your comments from anot=
-her
-> thread regarding this adapter, I suggest that you apply the following =
-patches:
->
-> [PATCH] Bluetooth: Improve support for Actions Semi ATS2851 based devi=
-ces
-> https://marc.info/?l=3Dlinux-bluetooth&m=3D167846197021176&w=3D2
->
-> [PATCH] Bluetooth: Add new quirk for broken set random RPA timeout for=
- ATS...
-> https://marc.info/?l=3Dlinux-bluetooth&m=3D167957918920723&w=3D2
->
-> [PATCH] Bluetooth: Add new quirk for broken extended create connection=
- for...
-> https://marc.info/?l=3Dlinux-bluetooth&m=3D167957998621276&w=3D2
->
-> You would end up in the situation mentioned in this thread, and you co=
-uld
-> resume your tests from there. I haven't had the time to experiment wit=
-h SMP yet,
-> so any assistance would be greatly appreciated.
+Add option for launching Pipewire inside the VM to serve Bluetooth
+endpoints, which can be used in tests.
 
-The above PCAP files from Linux were logged with those three patches alr=
-eady applied. It did not help my situation. And any further feedback on =
-this device will not be coming from me, as I already returned it and bou=
-ght a supported Realtek device instead.
+If daemon and emulator were also started, wait for the endpoints to
+appear.
+---
+
+Notes:
+    An example how you can launch Pipewire to serve Bluetooth endpoints.
+
+ tools/test-runner.c | 247 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 242 insertions(+), 5 deletions(-)
+
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 6660ea8de..d416f80ed 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -51,6 +51,7 @@ static bool start_dbus_session;
+ static bool start_daemon = false;
+ static bool start_emulator = false;
+ static bool start_monitor = false;
++static bool start_pipewire;
+ static int num_devs = 0;
+ static const char *qemu_binary = NULL;
+ static const char *kernel_image = NULL;
+@@ -252,13 +253,13 @@ static void start_qemu(void)
+ 				"acpi=off pci=noacpi noapic quiet ro init=%s "
+ 				"TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
+ 				"TESTDBUSSESSION=%u XDG_RUNTIME_DIR=/run/user/0 "
+-				"TESTAUDIO=%u "
++				"TESTAUDIO=%u TESTPIPEWIRE=%u "
+ 				"TESTMONITOR=%u TESTEMULATOR=%u TESTDEVS=%d "
+ 				"TESTAUTO=%u TESTARGS=\'%s\'",
+ 				initcmd, cwd, start_dbus, start_daemon,
+ 				start_dbus_session, audio_support,
+-				start_monitor, start_emulator, num_devs,
+-				run_auto, testargs);
++				start_pipewire, start_monitor, start_emulator,
++				num_devs, run_auto, testargs);
+ 
+ 	argv = alloca(sizeof(qemu_argv) +
+ 				(audio_support ? 4 : 0) +
+@@ -606,6 +607,207 @@ static pid_t start_bluetooth_daemon(const char *home)
+ 	return pid;
+ }
+ 
++static char *get_command_stdout(char *command, size_t *size)
++{
++	char *buf = NULL;
++	ssize_t nread = 0;
++	size_t allocated = 0;
++	int ret;
++	FILE *f;
++
++	f = popen(command, "re");
++	if (!f)
++		return NULL;
++
++	while (1) {
++		size_t res;
++		void *p;
++
++		if (nread + 256 > allocated) {
++			allocated += allocated + 256;
++			p = realloc(buf, allocated);
++			if (!p) {
++				nread = -1;
++				break;
++			}
++			buf = p;
++		}
++
++		res = fread(buf + nread, 1, allocated - nread - 1, f);
++		if (!res)
++			break;
++		nread += res;
++	}
++
++	ret = pclose(f);
++	if (ret < 0 || !WIFEXITED(ret) || WEXITSTATUS(ret) != 0) {
++		printf("%s failed\n", command);
++		nread = -1;
++	}
++
++	if (nread >= 0) {
++		buf[nread] = 0;
++		if (size)
++			*size = nread;
++	} else {
++		free(buf);
++		buf = NULL;
++	}
++
++	return buf;
++}
++
++static void start_pipewire_daemons(pid_t *pipewire_pid, pid_t *wireplumber_pid)
++{
++	static const char *const daemons[2] = {
++		"/usr/bin/pipewire",
++		"/usr/bin/wireplumber"
++	};
++	static const char *const dirs[] = {
++		"/run/pw",
++		"/run/pw/state",
++		"/run/pw/wireplumber",
++		"/run/pw/wireplumber/bluetooth.lua.d",
++		"/run/pw/wireplumber/main.lua.d",
++		NULL
++	};
++	FILE *f;
++	pid_t *pids[2] = {pipewire_pid, wireplumber_pid};
++	char *envp[5];
++	int i;
++
++	for (i = 0; dirs[i]; ++i) {
++		if (mkdir(dirs[i], 0755) < 0) {
++			perror("Failed to create directory");
++			return;
++		}
++	}
++
++	/* Enable only Bluetooth part, disable whatever requires user DBus */
++	f = fopen("/run/pw/wireplumber/main.lua.d/51-custom.lua", "w");
++	if (!f) {
++		perror("Failed to create Pipewire main config");
++		return;
++	}
++	fprintf(f, "alsa_monitor.enabled = false\n"
++		"v4l2_monitor.enabled = false\n"
++		"libcamera_monitor.enabled = false\n"
++		"default_access.properties[\"enable-flatpak-portal\"]"
++		" = false\n");
++	fclose(f);
++
++	f = fopen("/run/pw/wireplumber/bluetooth.lua.d/51-custom.lua", "w");
++	if (!f) {
++		perror("Failed to create Pipewire bluetooth config");
++		return;
++	}
++	fprintf(f, "bluez_monitor.properties[\"with-logind\"] = false\n"
++		"bluez_midi_monitor.enabled = false\n");
++	fclose(f);
++
++	/* Launch daemons */
++	for (i = 0; i < 2; ++i)
++		*pids[i] = -1;
++
++	envp[0] = "DBUS_SYSTEM_BUS_ADDRESS=unix:"
++		  "path=/run/dbus/system_bus_socket";
++	envp[1] = "XDG_STATE_HOME=/run/pw/state";
++	envp[2] = "XDG_CONFIG_HOME=/run/pw";
++	envp[3] = "XDG_RUNTIME_DIR=/run/pw";
++	envp[4] = NULL;
++
++	for (i = 0; i < 2; ++i) {
++		const char *daemon = daemons[i];
++		char *argv[2];
++		pid_t pid;
++
++		printf("Starting Pipewire daemon %s\n", daemon);
++
++		argv[0] = (char *) daemon;
++		argv[1] = NULL;
++
++		pid = fork();
++		if (pid < 0) {
++			perror("Failed to fork new process");
++			return;
++		}
++
++		if (pid == 0) {
++			execve(argv[0], argv, envp);
++			exit(EXIT_SUCCESS);
++		}
++
++		*pids[i] = pid;
++
++		printf("Pipewire daemon process %d created\n", pid);
++	}
++
++	/* Tell pipewire clients where the socket is */
++	setenv("PIPEWIRE_RUNTIME_DIR", "/run/pw", 1);
++
++	/* Wait until daemons completely started */
++	for (i = 0; i < 6; ++i) {
++		char *buf;
++
++		if (i > 0) {
++			printf("Wait for Pipewire ready...\n");
++			usleep(500000);
++		}
++
++		buf = get_command_stdout("/usr/bin/pw-dump", NULL);
++		if (!buf)
++			continue;
++
++		if (strstr(buf, "WirePlumber")) {
++			printf("Pipewire ready\n");
++			free(buf);
++			break;
++		}
++
++		free(buf);
++	}
++	if (i == 6)
++		goto fail;
++
++	if (!start_emulator || !start_daemon)
++		return;
++
++	/* Wait for Bluetooth endpoints */
++	for (i = 0; i < 6; ++i) {
++		char *buf;
++
++		if (i > 0) {
++			printf("Wait for endpoints...\n");
++			usleep(500000);
++		}
++
++		buf = get_command_stdout("/usr/bin/bluetoothctl show", NULL);
++		if (!buf)
++			continue;
++
++		if (strstr(buf, "0000110b-0000-1000-8000-00805f9b34fb") ||
++		    strstr(buf, "00001850-0000-1000-8000-00805f9b34fb")) {
++			printf("Pipewire endpoints ready\n");
++			free(buf);
++			break;
++		}
++
++		free(buf);
++	}
++	if (i == 6)
++		goto fail;
++
++	return;
++
++fail:
++	for (i = 0; i < 2; ++i)
++		if (*pids[i] > 0)
++			kill(*pids[i], SIGTERM);
++
++	printf("Pipewire daemons not running properly\n");
++	return;
++}
++
+ static const char *test_table[] = {
+ 	"mgmt-tester",
+ 	"smp-tester",
+@@ -807,7 +1009,7 @@ static void run_command(char *cmdname, char *home)
+ 	int pos = 0, idx = 0;
+ 	int serial_fd;
+ 	pid_t pid, dbus_pid, daemon_pid, monitor_pid, emulator_pid,
+-	      dbus_session_pid, udevd_pid;
++	      dbus_session_pid, udevd_pid, pw_pid, wp_pid;
+ 
+ 	if (!home) {
+ 		perror("Invalid parameter: TESTHOME");
+@@ -860,6 +1062,13 @@ static void run_command(char *cmdname, char *home)
+ 	else
+ 		emulator_pid = -1;
+ 
++	if (start_pipewire) {
++		start_pipewire_daemons(&pw_pid, &wp_pid);
++	} else {
++		pw_pid = -1;
++		wp_pid = -1;
++	}
++
+ start_next:
+ 	if (run_auto) {
+ 		if (chdir(home + 5) < 0) {
+@@ -966,6 +1175,16 @@ start_next:
+ 			udevd_pid = -1;
+ 		}
+ 
++		if (corpse == pw_pid) {
++			printf("pipewire terminated\n");
++			pw_pid = -1;
++		}
++
++		if (corpse == wp_pid) {
++			printf("wireplumber terminated\n");
++			wp_pid = -1;
++		}
++
+ 		if (corpse == pid)
+ 			break;
+ 	}
+@@ -975,6 +1194,12 @@ start_next:
+ 		goto start_next;
+ 	}
+ 
++	if (wp_pid > 0)
++		kill(wp_pid, SIGTERM);
++
++	if (pw_pid > 0)
++		kill(pw_pid, SIGTERM);
++
+ 	if (daemon_pid > 0)
+ 		kill(daemon_pid, SIGTERM);
+ 
+@@ -1079,6 +1304,12 @@ static void run_tests(void)
+ 		audio_support = true;
+ 	}
+ 
++	ptr = strstr(cmdline, "TESTPIPEWIRE=1");
++	if (ptr) {
++		printf("Pipewire requested\n");
++		start_pipewire = true;
++	}
++
+ 	ptr = strstr(cmdline, "TESTHOME=");
+ 	if (ptr) {
+ 		home = ptr + 4;
+@@ -1106,6 +1337,7 @@ static void usage(void)
+ 		"\t-q, --qemu <path>      QEMU binary\n"
+ 		"\t-k, --kernel <image>   Kernel image (bzImage)\n"
+ 		"\t-A, --audio            Add audio support\n"
++		"\t-P, --pipewire         Start pipewire\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+@@ -1121,6 +1353,7 @@ static const struct option main_options[] = {
+ 	{ "qemu",    required_argument, NULL, 'q' },
+ 	{ "kernel",  required_argument, NULL, 'k' },
+ 	{ "audio",   no_argument,       NULL, 'A' },
++	{ "pipewire", no_argument,      NULL, 'P' },
+ 	{ "version", no_argument,       NULL, 'v' },
+ 	{ "help",    no_argument,       NULL, 'h' },
+ 	{ }
+@@ -1140,7 +1373,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "aubdslmq:k:Avh", main_options,
++		opt = getopt_long(argc, argv, "aubdslmq:k:APvh", main_options,
+ 								NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -1177,6 +1410,10 @@ int main(int argc, char *argv[])
+ 		case 'A':
+ 			audio_support = true;
+ 			break;
++		case 'P':
++			start_dbus = true;
++			start_pipewire = true;
++			break;
+ 		case 'v':
+ 			printf("%s\n", VERSION);
+ 			return EXIT_SUCCESS;
+-- 
+2.39.2
+
