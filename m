@@ -2,127 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C939C77B71
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Apr 2023 11:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB4AC7619A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Apr 2023 12:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229945AbjDOLyp (ORCPT
+        id S229865AbjDOMBz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Apr 2023 07:54:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40700 "EHLO
+        Sat, 15 Apr 2023 08:01:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229853AbjDOLyo (ORCPT
+        with ESMTP id S229830AbjDOMBy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Apr 2023 07:54:44 -0400
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050EA4C26
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Apr 2023 04:54:43 -0700 (PDT)
-Received: by mail-il1-f206.google.com with SMTP id e2-20020a056e0204a200b0032a995cacf5so1639908ils.21
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Apr 2023 04:54:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681559682; x=1684151682;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gw1ZDETNNEoLC8bozAtBwMlkLf8dC7i6XTm43c0ZuwI=;
-        b=UEifUnI795TVChafcg5nBGAXyeMpxuOu5Ua3q+9Mm/BFNFsp7LwWFdzS6LzNfqHhvL
-         ZOELqpmWvTWet/YLlPjvwLRRvg6dT7UXxTB2ogqrks0lWy8OH7D+GLSt4MZ9FM6/qOyV
-         XKXRY11R+HwmCe3WOMBIsnLCrXl+p38gEQMWGhw75QJc3bol3CKUWlZMTAQKm/EpPcW5
-         2AZi4hWywl8SFjv7H6+fiLyDBY5BZP3rIGnHaQDIQdMtBDDIdq89PWEvja6sGrYMNom2
-         LP0diT40aTqeZ8wKJYP8tZLCjxluNkMLy8Agk2HUKUzWjzrakobmaO0eIAxtNY/073qJ
-         hjKw==
-X-Gm-Message-State: AAQBX9fBwt/A0QQ6GI3wS6/p38i2IXaPWrofalT82Sd68WWag3YR8saY
-        n3pFQ7XsQ4wQpPepH2PEfDsra7EsNLoWjFmjYRafG2U//epz
-X-Google-Smtp-Source: AKy350bDbTzx/11Az3isJV5odN7J+8AgnBvwtk/Sc0eb8+pAxMc9dIycTpADWvO2W6g1M//8RdgkPIPHaMJqWi4rLvOLO07tCA7f
-MIME-Version: 1.0
-X-Received: by 2002:a02:856f:0:b0:40b:c412:70a9 with SMTP id
- g102-20020a02856f000000b0040bc41270a9mr3337698jai.4.1681559682368; Sat, 15
- Apr 2023 04:54:42 -0700 (PDT)
-Date:   Sat, 15 Apr 2023 04:54:42 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000894f5f05f95e9f4d@google.com>
-Subject: [syzbot] [bluetooth?] WARNING: bad unlock balance in l2cap_recv_frame
-From:   syzbot <syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 15 Apr 2023 08:01:54 -0400
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5FE559E
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Apr 2023 05:01:52 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.nyi.internal (Postfix) with ESMTP id A87115C0291;
+        Sat, 15 Apr 2023 08:01:48 -0400 (EDT)
+Received: from imap44 ([10.202.2.94])
+  by compute5.internal (MEProxy); Sat, 15 Apr 2023 08:01:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kode54.net; h=cc
+        :cc:content-transfer-encoding:content-type:content-type:date
+        :date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to; s=fm3; t=
+        1681560108; x=1681646508; bh=aB/73pdluWbwF4vxX0QpwG48rF9552YJ5ch
+        aGnLRWyM=; b=DRHNwyWEFfO9rqezVAYt7jMksUqjQQShnm7ZjYOT3yRI9ZBOnV0
+        AaY0+Mp29m6F75gNBrZfM2aIqJl42OlTftQtSn55Gvfl26Zj832Luy8QR9vFHzak
+        Esidb3STR6+uJaVJ5LnYSYU/HTumZUL75yCrWlyg8Lf1PHhwb6IkFaaaHQaD8rmQ
+        iY+Mf+IVCh3s2FjIYe/jRs7A5WBgeTqrKH7I3CzkMAvEnZ+WH2iGdm87ApjqNLhG
+        2hikis23W8JXaQbz1h7vq6d3iilnNktVKA65m/NQIbGM+3rn8VIqGlPyiKlCjdn+
+        eMWLLGFBuxGBLuEPXfSRDF1IusXsUdb/SXw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding
+        :content-type:content-type:date:date:feedback-id:feedback-id
+        :from:from:in-reply-to:in-reply-to:message-id:mime-version
+        :references:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1681560108; x=1681646508; bh=aB/73pdluWbwF4vxX0QpwG48rF9552YJ5ch
+        aGnLRWyM=; b=Bc3OzphAw4kvjfxjPZRM5CyusG2l7M0X1759GvyhoC6pJRlD2u9
+        MZrvs2iOpA5tMlyP+GQJ1iQeWz2HGdhfXYudpTC+VCOmXF+IB/wuW3ptj9MFveIV
+        TJ/wt+uP5iKJ4X9KSX1f1W04OD0K0o62HzoGoeX1U7Eg2S9c627NMn6hd9rfHqqV
+        3oSiG9QRl+CP7cp5KRHyvwxFt8n0eWRg2f9AH/1BG4gpcVlPi0l5+/40SIc64ts9
+        W+si0L/BO56y0gvogtHqGbvdHxCQ4CdajuKKX+qD2j7wF1CxRmiytes7pjBNG4Ly
+        t5KF6gYN/uVYws/fzYeBINQyyDs+IMLBgAA==
+X-ME-Sender: <xms:LJI6ZCCEqQcBqsv00fCAaSpMLMPk5sOw3vIG319PdlXAgI46LvOT-w>
+    <xme:LJI6ZMgdWGXI5CXPS8EAsLXWK7RYb9sg9zRCo5d5r_BjalDdjEdjpPl_pv9p_tjA6
+    CN4_FHc_JoQa_7D3kU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrvdelvddggeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdev
+    hhhrihhsthhophhhvghrucfunhhofihhihhllhdfuceotghhrhhisheskhhouggvheegrd
+    hnvghtqeenucggtffrrghtthgvrhhnpeevffevfffgjeegieejteehheevtdeugfevudeu
+    tedvteeuffdvffdtudeuueffieenucffohhmrghinheplhhoshhnohdrtghopdhmrghrtg
+    drihhnfhhonecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhho
+    mheptghhrhhisheskhhouggvheegrdhnvght
+X-ME-Proxy: <xmx:LJI6ZFm2Bi0ijO0LkWNoPS0HRa5iUuo34wFj9M8gIwUFjzPhv5ZxwQ>
+    <xmx:LJI6ZAwGn8A8UGAHj2EbsMj_sDyzCqjeoIasDKpw2sA8o8GTJH5Vgw>
+    <xmx:LJI6ZHQfeBqz5AKHkxBE9cvrNt1gUv8oHk2R7Yis9aC4_3krm86uZw>
+    <xmx:LJI6ZCcnlFkS136mHmsgrcQOq1VoqNsdOgixToiuM95oVtxoX1ZzFg>
+Feedback-ID: i01794759:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id E9CF136A0073; Sat, 15 Apr 2023 08:01:47 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-334-g8c072af647-fm-20230330.001-g8c072af6
+Mime-Version: 1.0
+Message-Id: <06d8f66e-1a35-4f7e-8e35-00595c424542@app.fastmail.com>
+In-Reply-To: <CACk7upyYLmiS9GMJVatjDz52Z4MEPRVAoHi_tSchHWjQfqo2sA@mail.gmail.com>
+References: <CACk7upyDgd8kCY+8j+RMJz35GXrF=bwRzDNH76Oh8q4nB8i0KQ@mail.gmail.com>
+ <126c5bce-6496-4744-9101-6a61f0fff106@app.fastmail.com>
+ <CACk7upyYLmiS9GMJVatjDz52Z4MEPRVAoHi_tSchHWjQfqo2sA@mail.gmail.com>
+Date:   Sat, 15 Apr 2023 05:01:26 -0700
+From:   "Christopher Snowhill" <chris@kode54.net>
+To:     "Raul Cheleguini" <raul.cheleguini@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        "Marcel Holtmann" <marcel@holtmann.org>, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com
+Subject: Re: unexpected SMP command errors with controller ATS2851
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Thu, Apr 13, 2023, at 6:54 AM, Raul Cheleguini wrote:
+> On Fri, Mar 31, 2023 at 2:50=E2=80=AFAM Christopher Snowhill <chris@ko=
+de54.net> wrote:
+>>
+>> Would some pcapng logs be useful? It appears this device flags some c=
+ommands as supported, while indicating their entire feature sets are not=
+ supported in the local supported features bitfields. Or that's as near =
+as I can guess.
+>>
+>> First is captured from a generic driver that works, the latter is cap=
+tured from Linux 6.2.9. Included in the working capture is the beginning=
+ of an exchange with my Sony headphones. The latter stops logging after =
+the first failed command.
+>>
+>> https://f.losno.co/bluetooth_ats2851.pcapng.zst
+>> https://f.losno.co/bluetooth_ats2851_broken.pcapng.zst
+>
+> Hi Christopher,
+>
+> Thank you for sharing the pcap files. Based on your comments from anot=
+her
+> thread regarding this adapter, I suggest that you apply the following =
+patches:
+>
+> [PATCH] Bluetooth: Improve support for Actions Semi ATS2851 based devi=
+ces
+> https://marc.info/?l=3Dlinux-bluetooth&m=3D167846197021176&w=3D2
+>
+> [PATCH] Bluetooth: Add new quirk for broken set random RPA timeout for=
+ ATS...
+> https://marc.info/?l=3Dlinux-bluetooth&m=3D167957918920723&w=3D2
+>
+> [PATCH] Bluetooth: Add new quirk for broken extended create connection=
+ for...
+> https://marc.info/?l=3Dlinux-bluetooth&m=3D167957998621276&w=3D2
+>
+> You would end up in the situation mentioned in this thread, and you co=
+uld
+> resume your tests from there. I haven't had the time to experiment wit=
+h SMP yet,
+> so any assistance would be greatly appreciated.
 
-syzbot found the following issue on:
-
-HEAD commit:    95abc817ab3a Merge tag 'acpi-6.3-rc7' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13c85123c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c21559e740385326
-dashboard link: https://syzkaller.appspot.com/bug?extid=9519d6b5b79cf7787cf3
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/87e400f90ed9/disk-95abc817.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cf7aa6546e50/vmlinux-95abc817.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a44d83ac79a7/bzImage-95abc817.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com
-
-=====================================
-WARNING: bad unlock balance detected!
-6.3.0-rc6-syzkaller-00168-g95abc817ab3a #0 Not tainted
--------------------------------------
-kworker/u5:7/5124 is trying to release lock (&conn->chan_lock) at:
-[<ffffffff89148e14>] l2cap_disconnect_rsp net/bluetooth/l2cap_core.c:4697 [inline]
-[<ffffffff89148e14>] l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:6426 [inline]
-[<ffffffff89148e14>] l2cap_le_sig_channel net/bluetooth/l2cap_core.c:6464 [inline]
-[<ffffffff89148e14>] l2cap_recv_frame+0x85a4/0x9390 net/bluetooth/l2cap_core.c:7796
-but there are no more locks to release!
-
-other info that might help us debug this:
-2 locks held by kworker/u5:7/5124:
- #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:639 [inline]
- #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:666 [inline]
- #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: process_one_work+0x87a/0x15c0 kernel/workqueue.c:2361
- #1: ffffc9000468fda8 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x15c0 kernel/workqueue.c:2365
-
-stack backtrace:
-CPU: 1 PID: 5124 Comm: kworker/u5:7 Not tainted 6.3.0-rc6-syzkaller-00168-g95abc817ab3a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-Workqueue: hci1 hci_rx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
- __lock_release kernel/locking/lockdep.c:5346 [inline]
- lock_release+0x4f1/0x670 kernel/locking/lockdep.c:5689
- __mutex_unlock_slowpath+0x99/0x5e0 kernel/locking/mutex.c:907
- l2cap_disconnect_rsp net/bluetooth/l2cap_core.c:4697 [inline]
- l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:6426 [inline]
- l2cap_le_sig_channel net/bluetooth/l2cap_core.c:6464 [inline]
- l2cap_recv_frame+0x85a4/0x9390 net/bluetooth/l2cap_core.c:7796
- l2cap_recv_acldata+0xa80/0xbf0 net/bluetooth/l2cap_core.c:8504
- hci_acldata_packet net/bluetooth/hci_core.c:3828 [inline]
- hci_rx_work+0x709/0x1340 net/bluetooth/hci_core.c:4063
- process_one_work+0x991/0x15c0 kernel/workqueue.c:2390
- worker_thread+0x669/0x1090 kernel/workqueue.c:2537
- kthread+0x2e8/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+The above PCAP files from Linux were logged with those three patches alr=
+eady applied. It did not help my situation. And any further feedback on =
+this device will not be coming from me, as I already returned it and bou=
+ght a supported Realtek device instead.
