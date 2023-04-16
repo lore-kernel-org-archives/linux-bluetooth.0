@@ -2,106 +2,116 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E11AC77B72
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Apr 2023 08:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C52CBC77B61
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Apr 2023 08:34:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230121AbjDPIO1 (ORCPT
+        id S230211AbjDPIeS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Apr 2023 04:14:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
+        Sun, 16 Apr 2023 04:34:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbjDPIO0 (ORCPT
+        with ESMTP id S229532AbjDPIeR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Apr 2023 04:14:26 -0400
-X-Greylist: delayed 420 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 16 Apr 2023 01:14:23 PDT
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [207.46.229.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B3BF1FCC;
-        Sun, 16 Apr 2023 01:14:22 -0700 (PDT)
+        Sun, 16 Apr 2023 04:34:17 -0400
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0672D59
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Apr 2023 01:34:16 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id me15so2240866qvb.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Apr 2023 01:34:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pku.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
-        Message-Id:MIME-Version:Content-Transfer-Encoding; bh=1q0y+uK+PK
-        am5wXdZTymKic3XyLnYvqjw4Kuxn+7cVk=; b=RM9rjXyw/dQrij7m5AdIGiUSG2
-        0R7lHoKnhi7qpGvhecNJMQ6sV0dFVrfB/k3y99E9pQTCxw4Uuhjutn3Emkr5j/dn
-        I3mWX09ZyqqpQGw0NPh95r3+q2meEEW87bDhDROSLzp5rc9sH6yCP2LDWgcj2ZVA
-        Cqx9oKmbc0/b+vMhQ=
-Received: from localhost.localdomain (unknown [10.7.101.92])
-        by front01 (Coremail) with SMTP id 5oFpogA3pDxRrjtk2hfIDg--.8669S2;
-        Sun, 16 Apr 2023 16:14:11 +0800 (CST)
-From:   Ruihan Li <lrh2000@pku.edu.cn>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Ruihan Li <lrh2000@pku.edu.cn>, stable@vger.kernel.org
-Subject: [PATCH] bluetooth: Perform careful capability checks in hci_sock_ioctl()
-Date:   Sun, 16 Apr 2023 16:14:04 +0800
-Message-Id: <20230416081404.8227-1-lrh2000@pku.edu.cn>
-X-Mailer: git-send-email 2.40.0
+        d=gmail.com; s=20221208; t=1681634054; x=1684226054;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1CSwYu+j3LYZCcDm8X2h313HzAqWj+8673FM8aY31r4=;
+        b=C3uy05ywrOhBB2TtKuhz4A+plB0f6/JssNk2iZwcB/+O/JuldA3x3zo9+X33PwCGe3
+         +5DUxS8FjHZtQ6kbvY1fVBcr1BAVzVidI9EdXwFLzyg0OueHTN2LFmFSIw+X4mpCUkBw
+         Wcv0XAqwnBInHp6QxeDIC/GrZE+yCbcPYb61evB44xxXZpPmLGeem1FygZFKg6S8PJhT
+         X+pAG8ZHelx835zQAk+dxBct4QdqT2cR7DFJBHO1ODZT2xsiT8iVPeG4c5yXiZl8tfZY
+         iXrhBXGKTur4rX2E9IAaSfk7K0qTZNv+z/WfEQqWKCicy4SX7UU5mByQ8Acr4sjq6LhW
+         OKHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681634054; x=1684226054;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1CSwYu+j3LYZCcDm8X2h313HzAqWj+8673FM8aY31r4=;
+        b=asdf/PbvdhgOwfHjbm5OFIXMOE6pavAhSxy98VksPeviu20X7cD0LO2zlyTuuYJD7M
+         tXiBNS+yF7FTRh0KJAJgKL016GZqH7mygsiygWyo+m4gjNDFjvAo3fzP/qGgYR6ujYXg
+         VKrtYpjKu0ferdSxXiFQ16+BxfVYThEFiGfg+prIhJj8BHIfGVCFl3vvxMAjMVIqG22C
+         qf/SrxmrxV3/qj5PrBKQ8GAjVaDHlKbFfvLX4nYXo5bcRQqQEZFc+XKEyg6zELAO2eKV
+         GcpZJuRz7lUhi5p1fLV5bB0Bkr45ws4tqHE7y8cel+eL7FTX/0VG1gFOrHhFEjfX8AL7
+         +qIw==
+X-Gm-Message-State: AAQBX9ejLtgnkd/rGhUVW3xdV4nnohRaLjt/i6yDMdIJSY4hPV6Bhg83
+        Jiiiom6k+ibX+rLa2SEs6bscccHLfyWpPw==
+X-Google-Smtp-Source: AKy350Ycbpw4qbW2dC55GPxff1ry0qC6r5pc3ymcrYlJ5vdC91X3W7iqDDVF3Gv2F8qFjuDpA/8KWQ==
+X-Received: by 2002:a05:6214:1bcd:b0:5ef:423b:1f4c with SMTP id m13-20020a0562141bcd00b005ef423b1f4cmr11527323qvc.50.1681634054179;
+        Sun, 16 Apr 2023 01:34:14 -0700 (PDT)
+Received: from [172.17.0.2] ([52.184.138.32])
+        by smtp.gmail.com with ESMTPSA id pz25-20020ad45519000000b005e14936cb09sm2297621qvb.11.2023.04.16.01.34.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Apr 2023 01:34:14 -0700 (PDT)
+Message-ID: <643bb306.d40a0220.eb614.b115@mx.google.com>
+Date:   Sun, 16 Apr 2023 01:34:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6045630492672063779=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: 5oFpogA3pDxRrjtk2hfIDg--.8669S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww18ury8WFy5Kw4UGFWktFb_yoW8CF1kpF
-        ZakFn8trWkJF1IvwnrJa1fJFWUAa4vgrW7GFZrC3y5AwsxCa10g3yFkryUKanrArsrAF4S
-        vF129ryxKr1DJ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUB01xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
-        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
-        IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJr0_GcWl84ACjcxK6I8E
-        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1lnxkEFVAIw20F6c
-        xK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2Wl
-        Yx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbV
-        WUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AF
-        wI0_JF0_Jw1lc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Kr
-        1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-        jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
-        x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-        8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-        0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUO0PfDUUUU
-X-CM-SenderInfo: yssqiiarrvmko6sn3hxhgxhubq/1tbiAgEBBVPy77oXEgAKs8
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, lrh2000@pku.edu.cn
+Subject: RE: bluetooth: Add cmd validity checks at the start of hci_sock_ioctl()
+In-Reply-To: <20230416080251.7717-1-lrh2000@pku.edu.cn>
+References: <20230416080251.7717-1-lrh2000@pku.edu.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Previously, capability was checked using capable(), which verified that the
-caller of the ioctl system call had the required capability. In addition,
-the result of the check would be stored in the HCI_SOCK_TRUSTED flag,
-making it persistent for the socket.
+--===============6045630492672063779==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-However, malicious programs can abuse this approach by deliberately sharing
-an HCI socket with a privileged task. The HCI socket will be marked as
-trusted when the privileged task occasionally makes an ioctl call.
+This is automated email and please do not reply to this email!
 
-This problem can be solved by using sk_capable() to check capability, which
-ensures that not only the current task but also the socket opener has the
-specified capability, thus reducing the risk of privilege escalation
-through the previously identified vulnerability.
+Dear submitter,
 
-Cc: stable@vger.kernel.org
-Fixes: f81f5b2db869 ("Bluetooth: Send control open and close messages for HCI raw sockets")
-Signed-off-by: Ruihan Li <lrh2000@pku.edu.cn>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=740179
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 FAIL      0.37 seconds
+BuildKernel                   PASS      30.78 seconds
+CheckAllWarning               PASS      34.52 seconds
+CheckSparse                   PASS      38.40 seconds
+CheckSmatch                   PASS      108.39 seconds
+BuildKernel32                 PASS      29.87 seconds
+TestRunnerSetup               PASS      429.50 seconds
+TestRunner_l2cap-tester       PASS      16.30 seconds
+TestRunner_iso-tester         PASS      19.52 seconds
+TestRunner_bnep-tester        PASS      5.19 seconds
+TestRunner_mgmt-tester        PASS      109.79 seconds
+TestRunner_rfcomm-tester      PASS      8.44 seconds
+TestRunner_sco-tester         PASS      7.78 seconds
+TestRunner_ioctl-tester       PASS      8.91 seconds
+TestRunner_mesh-tester        PASS      6.58 seconds
+TestRunner_smp-tester         PASS      7.58 seconds
+TestRunner_userchan-tester    PASS      5.46 seconds
+IncrementalBuild              PASS      28.20 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+
+
 ---
- net/bluetooth/hci_sock.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 065812232..f597fe0db 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1003,7 +1003,14 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- 	if (hci_sock_gen_cookie(sk)) {
- 		struct sk_buff *skb;
- 
--		if (capable(CAP_NET_ADMIN))
-+		/* Perform careful checks before setting the HCI_SOCK_TRUSTED
-+		 * flag. Make sure that not only the current task but also
-+		 * the socket opener has the required capability, since
-+		 * privileged programs can be tricked into making ioctl calls
-+		 * on HCI sockets, and the socket should not be marked as
-+		 * trusted simply because the ioctl caller is privileged.
-+		 */
-+		if (sk_capable(sk, CAP_NET_ADMIN))
- 			hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
- 
- 		/* Send event to monitor */
--- 
-2.40.0
 
+--===============6045630492672063779==--
