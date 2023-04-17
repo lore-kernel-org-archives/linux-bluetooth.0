@@ -2,60 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D29C77B77
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Apr 2023 05:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27699C77B70
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Apr 2023 05:36:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230030AbjDQFfj (ORCPT
+        id S229498AbjDQFgf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Apr 2023 01:35:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56672 "EHLO
+        Mon, 17 Apr 2023 01:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbjDQFfi (ORCPT
+        with ESMTP id S229456AbjDQFge (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Apr 2023 01:35:38 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E898F3A80
-        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Apr 2023 22:35:17 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2a8bdcf87f4so6891441fa.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Apr 2023 22:35:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1681709712; x=1684301712;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zyyAvuW/pOY8jPhiXRm2ACIKthV+mmOLRNiYf8O659s=;
-        b=BvMcypFFc/03aEor9OrCqiJSdASWSsAckH7U4ze+vUSXdxzFbxXCl7ZURDS+RWv4/U
-         PYKlj+YfKjcByVj9P5XzkGwvTko7iYJGW7u8N/B92Yi9vKwNqOMP96h+bNb+xwPTK/E3
-         EDmPx/ib9LVKi2qX04V8sQz6w/DY2Fpa4fYmfu39LnirMRxEXGNIS9LG6kNp67PmcbuF
-         A+kj/4OU4JReYrHfpWmVYxGbUHfQ59M0v+gfkXV/oyzSZ8fBf/kU75rqgDxZXM5ZT9VB
-         aSbLgxsrOPJ5LtvtSclz5vXXql0Fb+JtjQD/qSjqZCC+tHF8G3aAGu8hWepFoFQrpbiX
-         YRBw==
+        Mon, 17 Apr 2023 01:36:34 -0400
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90984422F
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Apr 2023 22:35:53 -0700 (PDT)
+Received: by mail-il1-f205.google.com with SMTP id q17-20020a056e020c3100b003245df8be9fso12405461ilg.14
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Apr 2023 22:35:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681709712; x=1684301712;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zyyAvuW/pOY8jPhiXRm2ACIKthV+mmOLRNiYf8O659s=;
-        b=bpy2GEDTR9eNrjZ6W4JCvtlxg483sCQgyBhNTZRX/90S/uR20/dwDRutCmvWYcbIQB
-         Lbsy8CK0vwurRfM5PH1wYrKYbtMtFTNTDYAjhrLJeycTOMOEUj6pUnvbvZyhOJnXaUOe
-         yQ19r9+nS5s3OQdWNVeM6h1X2LwJcuCXt4dMwN6LFwRblSp0U59OydbkSfl7Oxx5brs4
-         vYfh3SGrJYQwPS14Z+YsTZeRKXUK+WuiOAioF8jTes6EH4+S3LtXKMa2oYkObI/HZD0s
-         c4SvnmOmO9GCSSVw+taNmfFil07CBN9ib2f0uBiFJQlkzFi4bRadbXj6ke2x7mAp7T5s
-         tIFA==
-X-Gm-Message-State: AAQBX9f6Vx8GcqB1kxZVHFkxwEegKHZUuf52tF69OkkMhz9MgwcD7LK4
-        kHYFBoYSpj5rNLh2rCOMhCPGzc10hibe0cyzGsI0nQ==
-X-Google-Smtp-Source: AKy350Z5ECMvRkWIvE7F95LlZtfJhA+x9x8GVV6fkpUC9OmmafnMj3yfsH4O3koHyJ4alQ+5IVMGwnwXntVRNMsSYoo=
-X-Received: by 2002:a05:6512:408:b0:4ec:90b2:b514 with SMTP id
- u8-20020a056512040800b004ec90b2b514mr1794111lfk.6.1681709711628; Sun, 16 Apr
- 2023 22:35:11 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1681709740; x=1684301740;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kwZCFvHqHpi36ZyUwte4FDMbaNXh4h+DCqvC+hQfIhk=;
+        b=hy7Qh8aCOdPDRC8wHrSR+ENkNC45ciookt3RNMihoboPX0sSVyAvgQcYgW0Vrd0StH
+         4Vc5PF2/qFeNn8M5fDgy4rXOoTXS4Ijo2o8gELO36vg1M7cVmPta5w/2ITLN3gQwm6Qr
+         Gf1R5f8Hd+SDV0VD1NBHBgkkW2h74nWU3DiqoPspD3h0Lbg35nu5ZYR0IP3ElOfxJGyz
+         7413lticy2INor/sr6Vl5xwYuZQ5VQEdhO3PWjN+Dr5YlA2cqJbuZLuOJgamA6ow5p4+
+         Ac25evRZsayNc5CCk+eBZrlulvwm/Rzbc8Lwxns3W4dNr3maWU+INVF7F0RCq/Y5r39i
+         ggZA==
+X-Gm-Message-State: AAQBX9e6evVmKOoUGHCYAQWQSHBl/NZj3iorArMrVllOkNsenf7B5jpM
+        93GoS/U7XyaCfrVqIABnUZQq+q/ziJ8OrLu9UiYr3BTGpCLv
+X-Google-Smtp-Source: AKy350YcRpw3cXCD1USzbe6yD2CiN0zufpsjUUa0IeA2ut5lmhIzIU4jNcpqFC1yOBQJp8ACcZVnvFKbhPTIeaWrJMSTCbTiEdJV
 MIME-Version: 1.0
-References: <000000000000894f5f05f95e9f4d@google.com>
-In-Reply-To: <000000000000894f5f05f95e9f4d@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 17 Apr 2023 07:34:59 +0200
-Message-ID: <CACT4Y+a9S4dwxAnD0AMcYDKfrZ7JxYcAaYM3QtccNGdpGd7g_Q@mail.gmail.com>
-Subject: Re: [syzbot] [bluetooth?] WARNING: bad unlock balance in l2cap_recv_frame
-To:     syzbot <syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com>
-Cc:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+X-Received: by 2002:a02:9623:0:b0:40f:8b7d:90db with SMTP id
+ c32-20020a029623000000b0040f8b7d90dbmr3604418jai.3.1681709740181; Sun, 16 Apr
+ 2023 22:35:40 -0700 (PDT)
+Date:   Sun, 16 Apr 2023 22:35:40 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000adcd3c05f9818f7f@google.com>
+Subject: [syzbot] [bluetooth?] WARNING: bad unlock balance in l2cap_bredr_sig_cmd
+From:   syzbot <syzbot+5067576ebe3f37f2cca4@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
         kuba@kernel.org, linux-bluetooth@vger.kernel.org,
         linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
         marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
@@ -65,85 +52,170 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, 15 Apr 2023 at 13:54, syzbot
-<syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com> wrote:
->
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    95abc817ab3a Merge tag 'acpi-6.3-rc7' of git://git.kernel...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=13c85123c80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=c21559e740385326
-> dashboard link: https://syzkaller.appspot.com/bug?extid=9519d6b5b79cf7787cf3
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/87e400f90ed9/disk-95abc817.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/cf7aa6546e50/vmlinux-95abc817.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a44d83ac79a7/bzImage-95abc817.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com
->
-> =====================================
-> WARNING: bad unlock balance detected!
-> 6.3.0-rc6-syzkaller-00168-g95abc817ab3a #0 Not tainted
-> -------------------------------------
-> kworker/u5:7/5124 is trying to release lock (&conn->chan_lock) at:
-> [<ffffffff89148e14>] l2cap_disconnect_rsp net/bluetooth/l2cap_core.c:4697 [inline]
-> [<ffffffff89148e14>] l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:6426 [inline]
-> [<ffffffff89148e14>] l2cap_le_sig_channel net/bluetooth/l2cap_core.c:6464 [inline]
-> [<ffffffff89148e14>] l2cap_recv_frame+0x85a4/0x9390 net/bluetooth/l2cap_core.c:7796
-> but there are no more locks to release!
->
-> other info that might help us debug this:
-> 2 locks held by kworker/u5:7/5124:
->  #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
->  #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
->  #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
->  #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:639 [inline]
->  #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:666 [inline]
->  #0: ffff88801ecca938 ((wq_completion)hci1#2){+.+.}-{0:0}, at: process_one_work+0x87a/0x15c0 kernel/workqueue.c:2361
->  #1: ffffc9000468fda8 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x15c0 kernel/workqueue.c:2365
->
-> stack backtrace:
-> CPU: 1 PID: 5124 Comm: kworker/u5:7 Not tainted 6.3.0-rc6-syzkaller-00168-g95abc817ab3a #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-> Workqueue: hci1 hci_rx_work
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
->  __lock_release kernel/locking/lockdep.c:5346 [inline]
->  lock_release+0x4f1/0x670 kernel/locking/lockdep.c:5689
->  __mutex_unlock_slowpath+0x99/0x5e0 kernel/locking/mutex.c:907
->  l2cap_disconnect_rsp net/bluetooth/l2cap_core.c:4697 [inline]
->  l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:6426 [inline]
->  l2cap_le_sig_channel net/bluetooth/l2cap_core.c:6464 [inline]
->  l2cap_recv_frame+0x85a4/0x9390 net/bluetooth/l2cap_core.c:7796
->  l2cap_recv_acldata+0xa80/0xbf0 net/bluetooth/l2cap_core.c:8504
->  hci_acldata_packet net/bluetooth/hci_core.c:3828 [inline]
->  hci_rx_work+0x709/0x1340 net/bluetooth/hci_core.c:4063
+Hello,
 
-/\/\/\/\/\/\/\/\
+syzbot found the following issue on:
 
-This is on the receiving path. Can this be triggered remotely?
+HEAD commit:    7a934f4bd7d6 Merge tag 'riscv-for-linus-6.3-rc7' of git://..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17444c3fc80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=759d5e665e47a55
+dashboard link: https://syzkaller.appspot.com/bug?extid=5067576ebe3f37f2cca4
+compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
 
->  process_one_work+0x991/0x15c0 kernel/workqueue.c:2390
->  worker_thread+0x669/0x1090 kernel/workqueue.c:2537
->  kthread+0x2e8/0x3a0 kernel/kthread.c:376
->  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
->  </TASK>
->
->
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
->
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/df89fd1d6599/disk-7a934f4b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e76edf369cbd/vmlinux-7a934f4b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/23ad78b092d3/bzImage-7a934f4b.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5067576ebe3f37f2cca4@syzkaller.appspotmail.com
+
+=====================================
+WARNING: bad unlock balance detected!
+6.3.0-rc6-syzkaller-00173-g7a934f4bd7d6 #0 Not tainted
+-------------------------------------
+kworker/u5:0/19118 is trying to release lock (&conn->chan_lock) at:
+[<ffffffff89aea4c5>] l2cap_bredr_sig_cmd+0x875/0x9cb0 net/bluetooth/l2cap_core.c:5748
+but there are no more locks to release!
+
+other info that might help us debug this:
+2 locks held by kworker/u5:0/19118:
+ #0: ffff88804175e938 ((wq_completion)hci2#2){+.+.}-{0:0}, at: process_one_work+0x77e/0x10e0 kernel/workqueue.c:2363
+ #1: ffffc90005077d20 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x7c8/0x10e0 kernel/workqueue.c:2365
+
+stack backtrace:
+CPU: 0 PID: 19118 Comm: kworker/u5:0 Not tainted 6.3.0-rc6-syzkaller-00173-g7a934f4bd7d6 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
+Workqueue: hci2 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
+ print_unlock_imbalance_bug+0x252/0x2c0 kernel/locking/lockdep.c:5109
+ __lock_release kernel/locking/lockdep.c:5346 [inline]
+ lock_release+0x59d/0x9d0 kernel/locking/lockdep.c:5689
+ __mutex_unlock_slowpath+0xe2/0x750 kernel/locking/mutex.c:907
+ l2cap_bredr_sig_cmd+0x875/0x9cb0 net/bluetooth/l2cap_core.c:5748
+ l2cap_sig_channel net/bluetooth/l2cap_core.c:6507 [inline]
+ l2cap_recv_frame+0xa5a/0x8990 net/bluetooth/l2cap_core.c:7786
+ hci_acldata_packet net/bluetooth/hci_core.c:3828 [inline]
+ hci_rx_work+0x58e/0xa90 net/bluetooth/hci_core.c:4063
+ process_one_work+0x8a0/0x10e0 kernel/workqueue.c:2390
+ worker_thread+0xa63/0x1210 kernel/workqueue.c:2537
+ kthread+0x270/0x300 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
+Bluetooth: hci2: ACL packet for unknown connection handle 173
+Bluetooth: hci2: ACL packet for unknown connection handle 173
+Bluetooth: Unexpected start frame (len 16)
+Bluetooth: Unexpected start frame (len 16)
+Bluetooth: Unexpected start frame (len 16)
+Bluetooth: hci4: Received unexpected HCI Event 0x00
+Bluetooth: hci4: Received unexpected HCI Event 0x00
+Bluetooth: hci4: Received unexpected HCI Event 0x00
+Bluetooth: Unexpected start frame (len 20)
+Bluetooth: Unexpected start frame (len 20)
+Bluetooth: Unexpected start frame (len 28)
+Bluetooth: hci1: Malformed Event: 0x02
+Bluetooth: Unexpected start frame (len 28)
+Bluetooth: Unexpected start frame (len 28)
+Bluetooth: Unexpected start frame (len 28)
+Bluetooth: Unexpected start frame (len 28)
+Bluetooth: hci2: command 0x0419 tx timeout
+Bluetooth: hci4: ACL packet for unknown connection handle 3017
+Bluetooth: hci4: ACL packet for unknown connection handle 3017
+Bluetooth: hci4: ACL packet for unknown connection handle 3017
+Bluetooth: hci4: ACL packet for unknown connection handle 2303
+Bluetooth: hci5: ACL packet for unknown connection handle 0
+Bluetooth: Frame is too long (len 78, expected len 4)
+Bluetooth: Frame is too long (len 78, expected len 4)
+Bluetooth: Frame is too long (len 78, expected len 4)
+Bluetooth: Frame is too long (len 78, expected len 4)
+Bluetooth: hci5: ACL packet for unknown connection handle 233
+Bluetooth: hci5: ACL packet for unknown connection handle 233
+Bluetooth: hci5: ACL packet for unknown connection handle 233
+Bluetooth: Unexpected continuation frame (len 28)
+Bluetooth: Unexpected continuation frame (len 28)
+Bluetooth: Unexpected start frame (len 16)
+Bluetooth: Unexpected start frame (len 16)
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci1: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci2: ACL packet for unknown connection handle 2048
+Bluetooth: hci0: command 0x0406 tx timeout
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
