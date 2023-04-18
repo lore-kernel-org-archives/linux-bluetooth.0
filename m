@@ -2,368 +2,286 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0061DC77B75
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Apr 2023 00:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D81A6C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Apr 2023 01:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbjDRAHM (ORCPT
+        id S229976AbjDRBCh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Apr 2023 20:07:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42284 "EHLO
+        Mon, 17 Apr 2023 21:02:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbjDRAHK (ORCPT
+        with ESMTP id S229510AbjDRBCg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Apr 2023 20:07:10 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 503F549DD
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Apr 2023 17:07:08 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id kh6so26096509plb.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Apr 2023 17:07:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681776427; x=1684368427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hN06mOj+6Ju1p/ECpY7+ZYHqkLkE2tfd+WKoVM5sPLE=;
-        b=ZamKaVsSTUxAHnHlXugFwY0uXE2hpe17q/tQVN3TErkI/IyDEmvGpiV7GB3ZYBEvyK
-         ailXdIC5dFSiXjT6UF4hjUPYo93L08KN6XoLRy0hkJBnOFZkXncEEfhBDdGZNZNOvj6L
-         VhrQQPqfE1elZn1X9F0ZDOuRp9uxi5PBwx6dEsQKd/cWMTMhqQ8Cf3B6BWWJtJ+Tt6aW
-         cqtTodK5A1+9bwEvItIBWZlod9ap75DHf7OIS4Q7GngF877xThNidQ0Nuo4mHoRin8zp
-         1WKajvRlxItNvwd8WCfuV+qFGGUnaH5CDOrl87nILEptDD6A8aN9GdGw7WldY6YSAlZC
-         uEAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681776427; x=1684368427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hN06mOj+6Ju1p/ECpY7+ZYHqkLkE2tfd+WKoVM5sPLE=;
-        b=GFH7MwKRIQf4BLGreLkr7rSB3h+9Ikk4lC7/1ggCg9jvyvmFg5cBc6xxrnAihD4p67
-         6lMNKbozXltuXcr5dlpTNw8Ury0GI7+VFyAHt7rpRnSlVGrCi/F7b9tOIdznYJmM0uce
-         tJ/vO+6JISZyIv/a9R+Xwivabs2SBY/ghTa0P7xEmRBWj0UmkuOSLeLJmoymibsuj+rT
-         mhdMAKiXCnO/wbZAMoxnqWV1PQHG2RGi1EcpdGkiFtnPhH8+XICrXp9DGnFGcMZEbhHi
-         eILdi3Eg6itvKIGW161HRuVkFzyQl9UzY8ksZY9p6fY7cqv/BPPAFl0Q4pZQG694217T
-         HOPw==
-X-Gm-Message-State: AAQBX9esTMwGTHHzhUG1QA/FpnmXZPJsPjHfcE8nFE0wQM5S9qfwE5EX
-        vbRjWqK8LjPFIoQOJetR4eUrcKWfeb0=
-X-Google-Smtp-Source: AKy350ZPSSpLrHP3x74azTJiyOB2eM/f7SqGIObEBLiclAWAxbj8bwKV+HranrETIjxN1hvwCXUzyg==
-X-Received: by 2002:a05:6a20:7fa6:b0:f0:718f:8ef0 with SMTP id d38-20020a056a207fa600b000f0718f8ef0mr1751610pzj.60.1681776426647;
-        Mon, 17 Apr 2023 17:07:06 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id p10-20020a62ab0a000000b0063b867a1959sm3729705pff.133.2023.04.17.17.07.05
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Apr 2023 17:07:05 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btnxpuart: Fix sparse warnings
-Date:   Mon, 17 Apr 2023 17:07:04 -0700
-Message-Id: <20230418000704.1937843-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Mon, 17 Apr 2023 21:02:36 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82927E65;
+        Mon, 17 Apr 2023 18:02:34 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33HNjEpG006432;
+        Tue, 18 Apr 2023 01:02:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=qcppdkim1;
+ bh=SH+qnY5wpcm3YrZK7WmT3cqmSCg9uZMwFdsMUhWVJqg=;
+ b=hMo+Jx9Mw/7eT3c8LMQtI6SkqNLLnkjieWTmoGtN9yNL7BNXfLJpNhomi2P1fTaP+TMO
+ qPIozo3ssZpGu8BzaV4uVkRU02tlhpoEuO9mvbps0aYXkdbxdyXwS0ZiEQkqu+mvOn5H
+ SrzmZYSUXIEUCR24Dtn+uZvpg98SUgdyIvRe8PbH6ro1+BpnoTRRJuhC7Bxxz408siLK
+ ZUpOadqyrUVILRCzhNtxulavzHqGLEvzd8wdY/6I3NsOtEErsvxwlz4Au5SmIFQPmzZt
+ 2+/VACBAKLWVwqmNi56rqMq1PW0FkV+DuYNG/zqqLnrW66f9d4nev6N8FHYPvBWlDLtI jw== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3q11era5yx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 01:02:31 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 33I12U2h023834
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 18 Apr 2023 01:02:30 GMT
+Received: from nalasex01b.na.qualcomm.com (10.47.209.197) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Mon, 17 Apr 2023 18:02:30 -0700
+Received: from nalasex01b.na.qualcomm.com ([fe80::27dd:ab4b:a3c:3d0a]) by
+ nalasex01b.na.qualcomm.com ([fe80::27dd:ab4b:a3c:3d0a%12]) with mapi id
+ 15.02.0986.042; Mon, 17 Apr 2023 18:02:30 -0700
+From:   "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
+To:     "marcel@holtmann.org" <marcel@holtmann.org>
+CC:     "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>,
+        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>,
+        "mka@chromium.org" <mka@chromium.org>
+Subject: RE: [PATCH v2] Bluetooth: btusb: Add WCN6855 devcoredump support
+Thread-Topic: [PATCH v2] Bluetooth: btusb: Add WCN6855 devcoredump support
+Thread-Index: AQHZbdNSzRZimAa7YESiLSr50VCixK8rwT+AgAMgYPA=
+Date:   Tue, 18 Apr 2023 01:02:30 +0000
+Message-ID: <821dba6ebdf7433bb2f229a37a6b6f72@quicinc.com>
+References: <20230413064344.18714-1-quic_tjiang@quicinc.com>
+ <CABBYNZJdWCCs+Z-Mvj47jrPHBaj-L7j2D6bJ+fShzPstMxkU3g@mail.gmail.com>
+In-Reply-To: <CABBYNZJdWCCs+Z-Mvj47jrPHBaj-L7j2D6bJ+fShzPstMxkU3g@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.253.79.29]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: DSs-kJ0MFTXo1nr8QTkgSX8qMhZlEWnb
+X-Proofpoint-ORIG-GUID: DSs-kJ0MFTXo1nr8QTkgSX8qMhZlEWnb
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-17_14,2023-04-17_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
+ suspectscore=0 priorityscore=1501 mlxscore=0 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2303200000
+ definitions=main-2304180007
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This fixes the following sparse warnings:
-
-   drivers/bluetooth/btnxpuart.c:681:23: sparse: sparse:
-   restricted __le16 degrades to integer
-   drivers/bluetooth/btnxpuart.c:690:82: sparse:
-   sparse: incorrect type in argument 2 (different base types)
-   @@     expected unsigned short [usertype] req_len
-   @@     got restricted __le16 [usertype] len @@
-   drivers/bluetooth/btnxpuart.c:690:82: sparse:
-   expected unsigned short [usertype] req_len
-   drivers/bluetooth/btnxpuart.c:690:82: sparse:
-   got restricted __le16 [usertype] len
-   drivers/bluetooth/btnxpuart.c:694:84: sparse:
-   sparse: incorrect type in argument 2 (different base types)
-   @@     expected unsigned short [usertype] req_len
-   @@     got restricted __le16 [usertype] len @@
-   drivers/bluetooth/btnxpuart.c:694:84: sparse:
-   expected unsigned short [usertype] req_len
-   drivers/bluetooth/btnxpuart.c:694:84: sparse:
-   got restricted __le16 [usertype] len
-   drivers/bluetooth/btnxpuart.c:708:23: sparse:
-   sparse: incorrect type in assignment (different base types)
-   @@     expected unsigned int [usertype] requested_len
-   @@     got restricted __le16 [usertype] len @@
-   drivers/bluetooth/btnxpuart.c:708:23: sparse:
-   expected unsigned int [usertype] requested_len
-   drivers/bluetooth/btnxpuart.c:708:23: sparse:
-   got restricted __le16 [usertype] len
-   drivers/bluetooth/btnxpuart.c:787:78: sparse:
-   sparse: incorrect type in argument 2 (different base types)
-   @@     expected unsigned short [usertype] chipid
-   @@     got restricted __le16 [usertype] chip_id @@
-   drivers/bluetooth/btnxpuart.c:787:78: sparse:
-   expected unsigned short [usertype] chipid
-   drivers/bluetooth/btnxpuart.c:787:78: sparse:
-   got restricted __le16 [usertype] chip_id
-   drivers/bluetooth/btnxpuart.c:810:74: sparse:
-   sparse: incorrect type in argument 2 (different base types)
-   @@     expected unsigned short [usertype] req_len
-   @@     got restricted __le16 [usertype] len @@
-   drivers/bluetooth/btnxpuart.c:810:74: sparse:
-   expected unsigned short [usertype] req_len
-   drivers/bluetooth/btnxpuart.c:810:74: sparse:
-   got restricted __le16 [usertype] len
-   drivers/bluetooth/btnxpuart.c:815:76: sparse:
-   sparse: incorrect type in argument 2 (different base types)
-   @@     expected unsigned short [usertype] req_len
-   @@     got restricted __le16 [usertype] len @@
-   drivers/bluetooth/btnxpuart.c:815:76: sparse:
-   expected unsigned short [usertype] req_len
-   drivers/bluetooth/btnxpuart.c:815:76: sparse:
-   got restricted __le16 [usertype] len
-   drivers/bluetooth/btnxpuart.c:834:16: sparse:
-   sparse: restricted __le32 degrades to integer
-   drivers/bluetooth/btnxpuart.c:843:55: sparse:
-   sparse: restricted __le32 degrades to integer
-   drivers/bluetooth/btnxpuart.c:844:36: sparse:
-   sparse: incorrect type in argument 3 (different base types)
-   @@     expected unsigned long [usertype]
-   @@     got restricted __le16 [usertype] len @@
-   drivers/bluetooth/btnxpuart.c:844:36: sparse:
-   expected unsigned long [usertype]
-   drivers/bluetooth/btnxpuart.c:844:36: sparse:
-   got restricted __le16 [usertype] len
-
-Reported-by: kernel test robot <lkp@intel.com>
-Link: https://lore.kernel.org/oe-kbuild-all/202304160736.Tsa0zTBU-lkp@intel.com/
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- drivers/bluetooth/Kconfig     |  2 +-
- drivers/bluetooth/btnxpuart.c | 85 +++++++++++++++++++++--------------
- 2 files changed, 52 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index bc211c324206..fcb4f5e5f30f 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -469,7 +469,7 @@ config BT_VIRTIO
- config BT_NXPUART
- 	tristate "NXP protocol support"
- 	depends on SERIAL_DEV_BUS
--	select CRC32
-+		select CRC32
- 	select CRC8
- 	help
- 	  NXP is serial driver required for NXP Bluetooth
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 93f3afc0c0c8..31046f26e712 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -683,12 +683,14 @@ static int nxp_recv_chip_ver_v1(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
- 	struct v1_start_ind *req;
-+	__u16 chip_id;
- 
--	req = (struct v1_start_ind *)skb_pull_data(skb, sizeof(struct v1_start_ind));
-+	req = skb_pull_data(skb, sizeof(*req));
- 	if (!req)
- 		goto free_skb;
- 
--	if ((req->chip_id ^ req->chip_id_comp) == 0xffff) {
-+	chip_id = le16_to_cpu(req->chip_id ^ req->chip_id_comp);
-+	if (chip_id == 0xffff) {
- 		nxpdev->fw_dnld_v1_offset = 0;
- 		nxpdev->fw_v1_sent_bytes = 0;
- 		nxpdev->fw_v1_expected_len = HDR_LEN;
-@@ -707,29 +709,34 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
- 	struct btnxpuart_data *nxp_data = nxpdev->nxp_data;
- 	struct v1_data_req *req;
--	u32 requested_len;
-+	__u16 len;
- 
- 	if (!process_boot_signature(nxpdev))
- 		goto free_skb;
- 
--	req = (struct v1_data_req *)skb_pull_data(skb, sizeof(struct v1_data_req));
-+	req = skb_pull_data(skb, sizeof(*req));
- 	if (!req)
- 		goto free_skb;
- 
--	if ((req->len ^ req->len_comp) != 0xffff) {
-+	len = __le16_to_cpu(req->len ^ req->len_comp);
-+	if (len != 0xffff) {
- 		bt_dev_dbg(hdev, "ERR: Send NAK");
- 		nxp_send_ack(NXP_NAK_V1, hdev);
- 		goto free_skb;
- 	}
- 	nxp_send_ack(NXP_ACK_V1, hdev);
- 
-+	len = __le16_to_cpu(req->len);
-+
- 	if (!nxp_data->helper_fw_name) {
- 		if (!nxpdev->timeout_changed) {
--			nxpdev->timeout_changed = nxp_fw_change_timeout(hdev, req->len);
-+			nxpdev->timeout_changed = nxp_fw_change_timeout(hdev,
-+									len);
- 			goto free_skb;
- 		}
- 		if (!nxpdev->baudrate_changed) {
--			nxpdev->baudrate_changed = nxp_fw_change_baudrate(hdev, req->len);
-+			nxpdev->baudrate_changed = nxp_fw_change_baudrate(hdev,
-+									  len);
- 			if (nxpdev->baudrate_changed) {
- 				serdev_device_set_baudrate(nxpdev->serdev,
- 							   HCI_NXP_SEC_BAUDRATE);
-@@ -748,13 +755,14 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 			goto free_skb;
- 	}
- 
--	requested_len = req->len;
--	if (requested_len == 0) {
--		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes", nxpdev->fw->size);
-+	if (!len) {
-+		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes",
-+			   nxpdev->fw->size);
- 		if (nxp_data->helper_fw_name && !nxpdev->helper_downloaded) {
- 			nxpdev->helper_downloaded = true;
- 			serdev_device_wait_until_sent(nxpdev->serdev, 0);
--			serdev_device_set_baudrate(nxpdev->serdev, HCI_NXP_SEC_BAUDRATE);
-+			serdev_device_set_baudrate(nxpdev->serdev,
-+						   HCI_NXP_SEC_BAUDRATE);
- 			serdev_device_set_flow_control(nxpdev->serdev, 1);
- 		} else {
- 			clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
-@@ -762,12 +770,12 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 		goto free_skb;
- 	}
--	if (requested_len & 0x01) {
-+	if (len & 0x01) {
- 		/* The CRC did not match at the other end.
- 		 * Simply send the same bytes again.
- 		 */
--		requested_len = nxpdev->fw_v1_sent_bytes;
--		bt_dev_dbg(hdev, "CRC error. Resend %d bytes of FW.", requested_len);
-+		len = nxpdev->fw_v1_sent_bytes;
-+		bt_dev_dbg(hdev, "CRC error. Resend %d bytes of FW.", len);
- 	} else {
- 		nxpdev->fw_dnld_v1_offset += nxpdev->fw_v1_sent_bytes;
- 
-@@ -781,24 +789,23 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 		 * mismatch, clearly the driver and FW are out of sync,
- 		 * and we need to re-send the previous header again.
- 		 */
--		if (requested_len == nxpdev->fw_v1_expected_len) {
--			if (requested_len == HDR_LEN)
-+		if (len == nxpdev->fw_v1_expected_len) {
-+			if (len == HDR_LEN)
- 				nxpdev->fw_v1_expected_len = nxp_get_data_len(nxpdev->fw->data +
- 									nxpdev->fw_dnld_v1_offset);
- 			else
- 				nxpdev->fw_v1_expected_len = HDR_LEN;
--		} else if (requested_len == HDR_LEN) {
-+		} else if (len == HDR_LEN) {
- 			/* FW download out of sync. Send previous chunk again */
- 			nxpdev->fw_dnld_v1_offset -= nxpdev->fw_v1_sent_bytes;
- 			nxpdev->fw_v1_expected_len = HDR_LEN;
- 		}
- 	}
- 
--	if (nxpdev->fw_dnld_v1_offset + requested_len <= nxpdev->fw->size)
--		serdev_device_write_buf(nxpdev->serdev,
--					nxpdev->fw->data + nxpdev->fw_dnld_v1_offset,
--					requested_len);
--	nxpdev->fw_v1_sent_bytes = requested_len;
-+	if (nxpdev->fw_dnld_v1_offset + len <= nxpdev->fw->size)
-+		serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data +
-+					nxpdev->fw_dnld_v1_offset, len);
-+	nxpdev->fw_v1_sent_bytes = len;
- 
- free_skb:
- 	kfree_skb(skb);
-@@ -828,13 +835,16 @@ static char *nxp_get_fw_name_from_chipid(struct hci_dev *hdev, u16 chipid)
- 
- static int nxp_recv_chip_ver_v3(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	struct v3_start_ind *req = skb_pull_data(skb, sizeof(struct v3_start_ind));
-+	struct v3_start_ind *req = skb_pull_data(skb, sizeof(*req));
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-+	u16 chip_id;
- 
- 	if (!process_boot_signature(nxpdev))
- 		goto free_skb;
- 
--	if (!nxp_request_firmware(hdev, nxp_get_fw_name_from_chipid(hdev, req->chip_id)))
-+	chip_id = le16_to_cpu(req->chip_id);
-+	if (!nxp_request_firmware(hdev, nxp_get_fw_name_from_chipid(hdev,
-+								    chip_id)))
- 		nxp_send_ack(NXP_ACK_V3, hdev);
- 
- free_skb:
-@@ -846,23 +856,27 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
- 	struct v3_data_req *req;
-+	__u16 len;
-+	__u32 offset;
- 
- 	if (!process_boot_signature(nxpdev))
- 		goto free_skb;
- 
--	req = (struct v3_data_req *)skb_pull_data(skb, sizeof(struct v3_data_req));
-+	req = skb_pull_data(skb, sizeof(*req));
- 	if (!req || !nxpdev->fw)
- 		goto free_skb;
- 
- 	nxp_send_ack(NXP_ACK_V3, hdev);
- 
-+	len = __le16_to_cpu(req->len);
-+
- 	if (!nxpdev->timeout_changed) {
--		nxpdev->timeout_changed = nxp_fw_change_timeout(hdev, req->len);
-+		nxpdev->timeout_changed = nxp_fw_change_timeout(hdev, len);
- 		goto free_skb;
- 	}
- 
- 	if (!nxpdev->baudrate_changed) {
--		nxpdev->baudrate_changed = nxp_fw_change_baudrate(hdev, req->len);
-+		nxpdev->baudrate_changed = nxp_fw_change_baudrate(hdev, len);
- 		if (nxpdev->baudrate_changed) {
- 			serdev_device_set_baudrate(nxpdev->serdev,
- 						   HCI_NXP_SEC_BAUDRATE);
-@@ -873,25 +887,28 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- 
- 	if (req->len == 0) {
--		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes", nxpdev->fw->size);
-+		bt_dev_dbg(hdev, "FW Downloaded Successfully: %zu bytes",
-+			   nxpdev->fw->size);
- 		clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
- 		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
- 		goto free_skb;
- 	}
- 	if (req->error)
--		bt_dev_dbg(hdev, "FW Download received err 0x%02x from chip", req->error);
-+		bt_dev_dbg(hdev, "FW Download received err 0x%02x from chip",
-+			   req->error);
- 
--	if (req->offset < nxpdev->fw_v3_offset_correction) {
-+	offset = __le32_to_cpu(req->offset);
-+	if (offset < nxpdev->fw_v3_offset_correction) {
- 		/* This scenario should ideally never occur. But if it ever does,
- 		 * FW is out of sync and needs a power cycle.
- 		 */
--		bt_dev_err(hdev, "Something went wrong during FW download. Please power cycle and try again");
-+		bt_dev_err(hdev, "Something went wrong during FW download");
-+		bt_dev_err(hdev, "Please power cycle and try again");
- 		goto free_skb;
- 	}
- 
--	serdev_device_write_buf(nxpdev->serdev,
--				nxpdev->fw->data + req->offset - nxpdev->fw_v3_offset_correction,
--				req->len);
-+	serdev_device_write_buf(nxpdev->serdev, nxpdev->fw->data + offset -
-+				nxpdev->fw_v3_offset_correction, len);
- 
- free_skb:
- 	kfree_skb(skb);
--- 
-2.39.2
-
+SGkgTHVpejoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEx1aXogQXVndXN0
+byB2b24gRGVudHogPGx1aXouZGVudHpAZ21haWwuY29tPiANClNlbnQ6IFNhdHVyZGF5LCBBcHJp
+bCAxNSwgMjAyMyA0OjU4IEFNDQpUbzogVGltIEppYW5nIChRVUlDKSA8cXVpY190amlhbmdAcXVp
+Y2luYy5jb20+DQpDYzogbWFyY2VsQGhvbHRtYW5uLm9yZzsgbGludXgta2VybmVsQHZnZXIua2Vy
+bmVsLm9yZzsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZzsgbGludXgtYXJtLW1zbUB2
+Z2VyLmtlcm5lbC5vcmc7IEJhbGFrcmlzaG5hIEdvZGF2YXJ0aGkgKFFVSUMpIDxxdWljX2Jnb2Rh
+dmFyQHF1aWNpbmMuY29tPjsgSGVtYW50IEd1cHRhIChRVUlDKSA8cXVpY19oZW1hbnRnQHF1aWNp
+bmMuY29tPjsgbWthQGNocm9taXVtLm9yZw0KU3ViamVjdDogUmU6IFtQQVRDSCB2Ml0gQmx1ZXRv
+b3RoOiBidHVzYjogQWRkIFdDTjY4NTUgZGV2Y29yZWR1bXAgc3VwcG9ydA0KDQpIaSBUaW0sDQoN
+Ck9uIFdlZCwgQXByIDEyLCAyMDIzIGF0IDExOjQ24oCvUE0gVGltIEppYW5nIDxxdWljX3RqaWFu
+Z0BxdWljaW5jLmNvbT4gd3JvdGU6DQo+DQo+IFdDTjY4NTUgd2lsbCByZXBvcnQgbWVtZHVtcCB2
+aWEgQUNMIGRhdGEgb3IgSENJIGV2ZW50IHdoZW4gaXQgZ2V0IA0KPiBjcmFzaGVkLCBzbyB3ZSBj
+b2xsZWN0IG1lbWR1bXAgdG8gZGVidWcgZmlybXdhcmUuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IFRp
+bSBKaWFuZyA8cXVpY190amlhbmdAcXVpY2luYy5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9ibHVl
+dG9vdGgvYnR1c2IuYyB8IDIyMiANCj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysNCj4gIDEgZmlsZSBjaGFuZ2VkLCAyMjIgaW5zZXJ0aW9ucygrKQ0KPg0KPiBkaWZmIC0t
+Z2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNi
+LmMgDQo+IGluZGV4IDIzMDNiMGE2NjMyMy4uZjA0NWJiYjBlZTA5IDEwMDY0NA0KPiAtLS0gYS9k
+cml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQo+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNi
+LmMNCj4gQEAgLTczMyw2ICs3MzMsMTYgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBkbWlfc3lzdGVt
+X2lkIGJ0dXNiX25lZWRzX3Jlc2V0X3Jlc3VtZV90YWJsZVtdID0gew0KPiAgICAgICAgIHt9DQo+
+ICB9Ow0KPg0KPiArc3RydWN0IHFjYV9kdW1wX2luZm8gew0KPiArICAgICAgIC8qIGZpZWxkcyBm
+b3IgZHVtcCBjb2xsZWN0aW9uICovDQo+ICsgICAgICAgdTE2IGlkX3ZlbmRvcjsNCj4gKyAgICAg
+ICB1MTYgaWRfcHJvZHVjdDsNCj4gKyAgICAgICB1MzIgZndfdmVyc2lvbjsNCj4gKyAgICAgICB1
+MzIgY29udHJvbGxlcl9pZDsNCj4gKyAgICAgICB1MzIgcmFtX2R1bXBfc2l6ZTsNCj4gKyAgICAg
+ICB1MTYgcmFtX2R1bXBfc2Vxbm87DQo+ICt9Ow0KPiArDQo+ICAjZGVmaW5lIEJUVVNCX01BWF9J
+U09DX0ZSQU1FUyAgMTANCj4NCj4gICNkZWZpbmUgQlRVU0JfSU5UUl9SVU5OSU5HICAgICAwDQo+
+IEBAIC03NTIsNiArNzYyLDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBkbWlfc3lzdGVtX2lkIGJ0
+dXNiX25lZWRzX3Jlc2V0X3Jlc3VtZV90YWJsZVtdID0gew0KPiAgI2RlZmluZSBCVFVTQl9XQUtF
+VVBfQVVUT1NVU1BFTkQgICAgICAgMTQNCj4gICNkZWZpbmUgQlRVU0JfVVNFX0FMVDNfRk9SX1dC
+UyAxNQ0KPiAgI2RlZmluZSBCVFVTQl9BTFQ2X0NPTlRJTlVPVVNfVFggICAgICAgMTYNCj4gKyNk
+ZWZpbmUgQlRVU0JfSFdfU1NSX0FDVElWRSAgICAxNw0KPg0KPiAgc3RydWN0IGJ0dXNiX2RhdGEg
+ew0KPiAgICAgICAgIHN0cnVjdCBoY2lfZGV2ICAgICAgICpoZGV2Ow0KPiBAQCAtODE0LDYgKzgy
+NSw4IEBAIHN0cnVjdCBidHVzYl9kYXRhIHsNCj4NCj4gICAgICAgICBpbnQgb29iX3dha2VfaXJx
+OyAgIC8qIGlycSBmb3Igb3V0LW9mLWJhbmQgd2FrZS1vbi1idCAqLw0KPiAgICAgICAgIHVuc2ln
+bmVkIGNtZF90aW1lb3V0X2NudDsNCj4gKw0KPiArICAgICAgIHN0cnVjdCBxY2FfZHVtcF9pbmZv
+IHFjYV9kdW1wOw0KPiAgfTsNCj4NCj4gIHN0YXRpYyB2b2lkIGJ0dXNiX3Jlc2V0KHN0cnVjdCBo
+Y2lfZGV2ICpoZGV2KSBAQCAtOTA0LDYgKzkxNywxMSBAQCANCj4gc3RhdGljIHZvaWQgYnR1c2Jf
+cWNhX2NtZF90aW1lb3V0KHN0cnVjdCBoY2lfZGV2ICpoZGV2KQ0KPiAgICAgICAgIHN0cnVjdCBi
+dHVzYl9kYXRhICpkYXRhID0gaGNpX2dldF9kcnZkYXRhKGhkZXYpOw0KPiAgICAgICAgIHN0cnVj
+dCBncGlvX2Rlc2MgKnJlc2V0X2dwaW8gPSBkYXRhLT5yZXNldF9ncGlvOw0KPg0KPiArICAgICAg
+IGlmICh0ZXN0X2JpdChCVFVTQl9IV19TU1JfQUNUSVZFLCAmZGF0YS0+ZmxhZ3MpKSB7DQo+ICsg
+ICAgICAgICAgICAgICBidF9kZXZfaW5mbyhoZGV2LCAiUmFtZHVtcCBpbiBwcm9ncmVzcywgZGVm
+ZXIgY21kX3RpbWVvdXQiKTsNCj4gKyAgICAgICAgICAgICAgIHJldHVybjsNCj4gKyAgICAgICB9
+DQo+ICsNCj4gICAgICAgICBpZiAoKytkYXRhLT5jbWRfdGltZW91dF9jbnQgPCA1KQ0KPiAgICAg
+ICAgICAgICAgICAgcmV0dXJuOw0KPg0KPiBAQCAtMzI5NCw2ICszMzEyLDIwMiBAQCBzdGF0aWMg
+aW50IGJ0dXNiX3NldF9iZGFkZHJfd2NuNjg1NShzdHJ1Y3QgaGNpX2RldiAqaGRldiwNCj4gICAg
+ICAgICByZXR1cm4gMDsNCj4gIH0NCj4NCj4gKyNkZWZpbmUgUUNBX01FTURVTVBfQUNMX0hBTkRM
+RSAweDJFREQgI2RlZmluZSBRQ0FfTUVNRFVNUF9TSVpFX01BWCAgDQo+ICsweDEwMDAwMCAjZGVm
+aW5lIFFDQV9NRU1EVU1QX1ZTRV9DTEFTUyAweDAxICNkZWZpbmUgDQo+ICtRQ0FfTUVNRFVNUF9N
+U0dfVFlQRSAweDA4ICNkZWZpbmUgUUNBX01FTURVTVBfUEtUX1NJWkUgMjQ4ICNkZWZpbmUgDQo+
+ICtRQ0FfTEFTVF9TRVFVRU5DRV9OVU0gMHhmZmZmDQo+ICsNCj4gK3N0cnVjdCBxY2FfZHVtcF9o
+ZHIgew0KPiArICAgICAgIHU4IHZzZV9jbGFzczsNCj4gKyAgICAgICB1OCBtc2dfdHlwZTsNCj4g
+KyAgICAgICBfX2xlMTYgc2Vxbm87DQo+ICsgICAgICAgdTggcmVzZXJ2ZWQ7DQo+ICsgICAgICAg
+dW5pb24gew0KPiArICAgICAgICAgICAgICAgdTggZGF0YVswXTsNCj4gKyAgICAgICAgICAgICAg
+IHN0cnVjdCB7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIF9fbGUzMiByYW1fZHVtcF9zaXpl
+Ow0KPiArICAgICAgICAgICAgICAgICAgICAgICB1OCBkYXRhMFswXTsNCj4gKyAgICAgICAgICAg
+ICAgIH0gX19wYWNrZWQ7DQo+ICsgICAgICAgfTsNCj4gK30gX19wYWNrZWQ7DQo+ICsNCj4gKw0K
+PiArc3RhdGljIHZvaWQgYnR1c2JfZHVtcF9oZHJfcWNhKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBz
+dHJ1Y3Qgc2tfYnVmZiANCj4gKypza2IpIHsNCj4gKyAgICAgICBjaGFyIGJ1ZlsxMjhdOw0KPiAr
+ICAgICAgIHN0cnVjdCBidHVzYl9kYXRhICpidGRhdGEgPSBoY2lfZ2V0X2RydmRhdGEoaGRldik7
+DQo+ICsNCj4gKyAgICAgICBzbnByaW50ZihidWYsIHNpemVvZihidWYpLCAiQ29udHJvbGxlciBO
+YW1lOiAweCV4XG4iLA0KPiArICAgICAgICAgICAgICAgICAgICAgICBidGRhdGEtPnFjYV9kdW1w
+LmNvbnRyb2xsZXJfaWQpOw0KPiArICAgICAgIHNrYl9wdXRfZGF0YShza2IsIGJ1Ziwgc3RybGVu
+KGJ1ZikpOw0KPiArDQo+ICsgICAgICAgc25wcmludGYoYnVmLCBzaXplb2YoYnVmKSwgIkZpcm13
+YXJlIFZlcnNpb246IDB4JXhcbiIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGJ0ZGF0YS0+
+cWNhX2R1bXAuZndfdmVyc2lvbik7DQo+ICsgICAgICAgc2tiX3B1dF9kYXRhKHNrYiwgYnVmLCBz
+dHJsZW4oYnVmKSk7DQo+ICsNCj4gKyAgICAgICBzbnByaW50ZihidWYsIHNpemVvZihidWYpLCAi
+RHJpdmVyOiAlc1xuVmVuZG9yOiBxY2FcbiIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGJ0
+dXNiX2RyaXZlci5uYW1lKTsNCj4gKyAgICAgICBza2JfcHV0X2RhdGEoc2tiLCBidWYsIHN0cmxl
+bihidWYpKTsNCj4gKw0KPiArICAgICAgIHNucHJpbnRmKGJ1Ziwgc2l6ZW9mKGJ1ZiksICJWSUQ6
+IDB4JXhcblBJRDoweCV4XG4iLA0KPiArICAgICAgICAgICAgICAgICAgICAgICBidGRhdGEtPnFj
+YV9kdW1wLmlkX3ZlbmRvciwgYnRkYXRhLT5xY2FfZHVtcC5pZF9wcm9kdWN0KTsNCj4gKyAgICAg
+ICBza2JfcHV0X2RhdGEoc2tiLCBidWYsIHN0cmxlbihidWYpKTsNCj4gKw0KPiArICAgICAgIHNu
+cHJpbnRmKGJ1Ziwgc2l6ZW9mKGJ1ZiksICJMbXAgU3VidmVyc2lvbjogMHgleFxuIiwNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgICAgaGRldi0+bG1wX3N1YnZlcik7DQo+ICsgICAgICAgc2tiX3B1
+dF9kYXRhKHNrYiwgYnVmLCBzdHJsZW4oYnVmKSk7IH0NCj4gKw0KPiArc3RhdGljIHZvaWQgYnR1
+c2JfY29yZWR1bXBfcWNhKHN0cnVjdCBoY2lfZGV2ICpoZGV2KSB7DQo+ICsgICAgICAgc3RhdGlj
+IGNvbnN0IHU4IHBhcmFtW10gPSB7IDB4MjYgfTsNCj4gKyAgICAgICBzdHJ1Y3Qgc2tfYnVmZiAq
+c2tiOw0KPiArDQo+ICsgICAgICAgc2tiID0gX19oY2lfY21kX3N5bmMoaGRldiwgMHhmYzBjLCAx
+LCBwYXJhbSwgSENJX0NNRF9USU1FT1VUKTsNCj4gKyAgICAgICBpZiAoSVNfRVJSKHNrYikpDQo+
+ICsgICAgICAgICAgICAgICBidF9kZXZfZXJyKGhkZXYsICIlczogdHJpZ2dsZSBjcmFzaCBmYWls
+ZWQgKCVsZCkiLCBfX2Z1bmNfXywgUFRSX0VSUihza2IpKTsNCj4gKyAgICAgICBrZnJlZV9za2Io
+c2tiKTsNCj4gK30NCj4gKw0KPiArLyoNCj4gKyAqID09MDogbm90IGEgZHVtcCBwa3QuDQo+ICsg
+KiA8IDA6IGZhaWxzIHRvIGhhbmRsZSBhIGR1bXAgcGt0DQo+ICsgKiA+IDA6IG90aGVyd2lzZS4N
+Cj4gKyAqLw0KPiArc3RhdGljIGludCBoYW5kbGVfZHVtcF9wa3RfcWNhKHN0cnVjdCBoY2lfZGV2
+ICpoZGV2LCBzdHJ1Y3Qgc2tfYnVmZiANCj4gKypza2IpIHsNCj4gKyAgICAgICBpbnQgcmV0ID0g
+MTsNCj4gKyAgICAgICB1OCBwa3RfdHlwZTsNCj4gKyAgICAgICB1OCAqc2tfcHRyOw0KPiArICAg
+ICAgIHVuc2lnbmVkIGludCBza19sZW47DQo+ICsgICAgICAgdTE2IHNlcW5vOw0KPiArICAgICAg
+IHUzMiBkdW1wX3NpemU7DQo+ICsNCj4gKyAgICAgICBzdHJ1Y3QgaGNpX2V2ZW50X2hkciAqZXZl
+bnRfaGRyOw0KPiArICAgICAgIHN0cnVjdCBoY2lfYWNsX2hkciAqYWNsX2hkcjsNCj4gKyAgICAg
+ICBzdHJ1Y3QgcWNhX2R1bXBfaGRyICpkdW1wX2hkcjsNCj4gKyAgICAgICBzdHJ1Y3QgYnR1c2Jf
+ZGF0YSAqYnRkYXRhID0gaGNpX2dldF9kcnZkYXRhKGhkZXYpOw0KPiArICAgICAgIHN0cnVjdCB1
+c2JfZGV2aWNlICp1ZGV2ID0gYnRkYXRhLT51ZGV2Ow0KPiArDQo+ICsgICAgICAgcGt0X3R5cGUg
+PSBoY2lfc2tiX3BrdF90eXBlKHNrYik7DQo+ICsgICAgICAgc2tfcHRyID0gc2tiLT5kYXRhOw0K
+PiArICAgICAgIHNrX2xlbiA9IHNrYi0+bGVuOw0KPiArDQo+ICsgICAgICAgaWYgKHBrdF90eXBl
+ID09IEhDSV9BQ0xEQVRBX1BLVCkgew0KPiArICAgICAgICAgICAgICAgYWNsX2hkciA9IGhjaV9h
+Y2xfaGRyKHNrYik7DQo+ICsgICAgICAgICAgICAgICBpZiAobGUxNl90b19jcHUoYWNsX2hkci0+
+aGFuZGxlKSAhPSBRQ0FfTUVNRFVNUF9BQ0xfSEFORExFKQ0KPiArICAgICAgICAgICAgICAgICAg
+ICAgICByZXR1cm4gMDsNCj4gKyAgICAgICAgICAgICAgIHNrX3B0ciArPSBIQ0lfQUNMX0hEUl9T
+SVpFOw0KPiArICAgICAgICAgICAgICAgc2tfbGVuIC09IEhDSV9BQ0xfSERSX1NJWkU7DQo+ICsg
+ICAgICAgICAgICAgICBldmVudF9oZHIgPSAoc3RydWN0IGhjaV9ldmVudF9oZHIgKilza19wdHI7
+DQo+ICsgICAgICAgfSBlbHNlIHsNCj4gKyAgICAgICAgICAgICAgIGV2ZW50X2hkciA9IGhjaV9l
+dmVudF9oZHIoc2tiKTsNCj4gKyAgICAgICB9DQo+ICsNCj4gKyAgICAgICBpZiAoKGV2ZW50X2hk
+ci0+ZXZ0ICE9IEhDSV9WRU5ET1JfUEtUKQ0KPiArICAgICAgICAgICAgICAgfHwgKGV2ZW50X2hk
+ci0+cGxlbiAhPSAoc2tfbGVuIC0gSENJX0VWRU5UX0hEUl9TSVpFKSkpDQo+ICsgICAgICAgICAg
+ICAgICByZXR1cm4gMDsNCj4gKw0KPiArICAgICAgIHNrX3B0ciArPSBIQ0lfRVZFTlRfSERSX1NJ
+WkU7DQo+ICsgICAgICAgc2tfbGVuIC09IEhDSV9FVkVOVF9IRFJfU0laRTsNCj4gKw0KPiArICAg
+ICAgIGR1bXBfaGRyID0gKHN0cnVjdCBxY2FfZHVtcF9oZHIgKilza19wdHI7DQo+ICsgICAgICAg
+aWYgKChza19sZW4gPCBvZmZzZXRvZihzdHJ1Y3QgcWNhX2R1bXBfaGRyLCBkYXRhKSkNCj4gKyAg
+ICAgICAgICAgICAgIHx8IChkdW1wX2hkci0+dnNlX2NsYXNzICE9IFFDQV9NRU1EVU1QX1ZTRV9D
+TEFTUykNCj4gKyAgICAgICAgICAgfHwgKGR1bXBfaGRyLT5tc2dfdHlwZSAhPSBRQ0FfTUVNRFVN
+UF9NU0dfVFlQRSkpDQo+ICsgICAgICAgICAgICAgICByZXR1cm4gMDsNCj4gKw0KPiArICAgICAg
+IC8qaXQgaXMgZHVtcCBwa3Qgbm93Ki8NCj4gKyAgICAgICBzZXFubyA9IGxlMTZfdG9fY3B1KGR1
+bXBfaGRyLT5zZXFubyk7DQo+ICsgICAgICAgaWYgKHNlcW5vID09IDApIHsNCj4gKyAgICAgICAg
+ICAgICAgIHNldF9iaXQoQlRVU0JfSFdfU1NSX0FDVElWRSwgJmJ0ZGF0YS0+ZmxhZ3MpOw0KPiAr
+ICAgICAgICAgICAgICAgZHVtcF9zaXplID0gbGUzMl90b19jcHUoZHVtcF9oZHItPnJhbV9kdW1w
+X3NpemUpOw0KPiArICAgICAgICAgICAgICAgaWYgKCFkdW1wX3NpemUgfHwgKGR1bXBfc2l6ZSA+
+IFFDQV9NRU1EVU1QX1NJWkVfTUFYKSkgew0KPiArICAgICAgICAgICAgICAgICAgICAgICByZXQg
+PSAtRUlMU0VROw0KPiArICAgICAgICAgICAgICAgICAgICAgICBidF9kZXZfZXJyKGhkZXYsICJJ
+bnZhbGlkIG1lbWR1bXAgc2l6ZSgldSkiLA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIGR1bXBfc2l6ZSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0K
+PiArICAgICAgICAgICAgICAgfQ0KPiArDQo+ICsgICAgICAgICAgICAgICByZXQgPSBoY2lfZGV2
+Y2RfaW5pdChoZGV2LCBkdW1wX3NpemUpOw0KPiArICAgICAgICAgICAgICAgaWYgKHJldCA8IDAp
+IHsNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgYnRfZGV2X2VycihoZGV2LCAibWVtZHVtcCBp
+bml0IGVycm9yKCVkKSIsIHJldCk7DQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gb3V0
+Ow0KPiArICAgICAgICAgICAgICAgfQ0KPiArDQo+ICsgICAgICAgICAgICAgICBidGRhdGEtPnFj
+YV9kdW1wLnJhbV9kdW1wX3NpemUgPSBkdW1wX3NpemU7DQo+ICsgICAgICAgICAgICAgICBidGRh
+dGEtPnFjYV9kdW1wLnJhbV9kdW1wX3NlcW5vID0gMDsNCj4gKyAgICAgICAgICAgICAgIHNrX3B0
+ciArPSBvZmZzZXRvZihzdHJ1Y3QgcWNhX2R1bXBfaGRyLCBkYXRhMCk7DQo+ICsgICAgICAgICAg
+ICAgICBza19sZW4gLT0gb2Zmc2V0b2Yoc3RydWN0IHFjYV9kdW1wX2hkciwgZGF0YTApOw0KPiAr
+DQo+ICsgICAgICAgICAgICAgICB1c2JfZGlzYWJsZV9hdXRvc3VzcGVuZCh1ZGV2KTsNCj4gKyAg
+ICAgICAgICAgICAgIGJ0X2Rldl9pbmZvKGhkZXYsICIlcyBtZW1kdW1wIHNpemUoJXUpXG4iLA0K
+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgKHBrdF90eXBlID09IEhDSV9BQ0xEQVRBX1BL
+VCkgPyAiQUNMIiA6ICJldmVudCIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICBkdW1w
+X3NpemUpOw0KDQpMZXRzIG5vdCB1c2UgYnRfZGV2X2luZm8gZm9yIGRldmNkIGNvZGUsIHNpbmNl
+IHRoZSBzeXN0ZW0gc2hvdWxkIGxvZyB0aGVzZSBldmVudHMgdmlhIGRldmNkIGludGVyZmFjZSwg
+c28gcGxlYXNlIGNvbnZlcnQgYW55IGluc3RhbmNlIG9mIGJ0X2Rldl9pbmZvIHRvIGJ0X2Rldl9k
+YmcuDQpbVGltXSBPayAsIHdpbGwgYWRkcmVzcyBpdCBpbiBWMyB2ZXJzaW9uLg0KDQo+ICsgICAg
+ICAgfSBlbHNlIHsNCj4gKyAgICAgICAgICAgICAgIHNrX3B0ciArPSBvZmZzZXRvZihzdHJ1Y3Qg
+cWNhX2R1bXBfaGRyLCBkYXRhKTsNCj4gKyAgICAgICAgICAgICAgIHNrX2xlbiAtPSBvZmZzZXRv
+ZihzdHJ1Y3QgcWNhX2R1bXBfaGRyLCBkYXRhKTsNCj4gKyAgICAgICB9DQo+ICsNCj4gKyAgICAg
+ICBpZiAoIWJ0ZGF0YS0+cWNhX2R1bXAucmFtX2R1bXBfc2l6ZSkgew0KPiArICAgICAgICAgICAg
+ICAgcmV0ID0gLUVJTlZBTDsNCj4gKyAgICAgICAgICAgICAgIGJ0X2Rldl9lcnIoaGRldiwgIm1l
+bWR1bXAgaXMgbm90IGFjdGl2ZSIpOw0KPiArICAgICAgICAgICAgICAgZ290byBvdXQ7DQo+ICsg
+ICAgICAgfQ0KPiArDQo+ICsgICAgICAgaWYgKChzZXFubyA+IGJ0ZGF0YS0+cWNhX2R1bXAucmFt
+X2R1bXBfc2Vxbm8gKyAxKSAmJiAoc2Vxbm8gIT0gUUNBX0xBU1RfU0VRVUVOQ0VfTlVNKSkgew0K
+PiArICAgICAgICAgICAgICAgZHVtcF9zaXplID0gUUNBX01FTURVTVBfUEtUX1NJWkUgKiAoc2Vx
+bm8gLSBidGRhdGEtPnFjYV9kdW1wLnJhbV9kdW1wX3NlcW5vIC0gMSk7DQo+ICsgICAgICAgICAg
+ICAgICBoY2lfZGV2Y2RfYXBwZW5kX3BhdHRlcm4oaGRldiwgMHgwLCBkdW1wX3NpemUpOw0KPiAr
+ICAgICAgICAgICAgICAgYnRfZGV2X2VycihoZGV2LA0KPiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAiZXhwZWN0ZWQgbWVtZHVtcCBzZXFubygldSkgaXMgbm90IHJlY2VpdmVkKCV1KVxuIiwN
+Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgYnRkYXRhLT5xY2FfZHVtcC5yYW1fZHVtcF9z
+ZXFubywgc2Vxbm8pOw0KPiArICAgICAgICAgICAgICAgYnRkYXRhLT5xY2FfZHVtcC5yYW1fZHVt
+cF9zZXFubyA9IHNlcW5vOw0KPiArICAgICAgICAgICAgICAga2ZyZWVfc2tiKHNrYik7DQo+ICsg
+ICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KPiArICAgICAgIH0NCj4gKw0KPiArICAgICAgIHNr
+Yl9wdWxsKHNrYiwgc2tiLT5sZW4gLSBza19sZW4pOw0KPiArICAgICAgIGhjaV9kZXZjZF9hcHBl
+bmQoaGRldiwgc2tiKTsNCj4gKyAgICAgICBidGRhdGEtPnFjYV9kdW1wLnJhbV9kdW1wX3NlcW5v
+Kys7DQo+ICsgICAgICAgaWYgKHNlcW5vID09IFFDQV9MQVNUX1NFUVVFTkNFX05VTSkgew0KPiAr
+ICAgICAgICAgICAgICAgYnRfZGV2X2luZm8oaGRldiwNCj4gKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAibWVtZHVtcCBkb25lOiBwa3RzKCV1KSwgdG90YWwoJXUpXG4iLA0KPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJ0ZGF0YS0+cWNhX2R1bXAucmFtX2R1bXBfc2Vx
+bm8sIA0KPiArIGJ0ZGF0YS0+cWNhX2R1bXAucmFtX2R1bXBfc2l6ZSk7DQoNCkRpdHRvLg0KW1Rp
+bV0gd2lsbCBhZGRyZXNzIGl0IGluIFYzIHZlcnNpb24NCg0KPiArICAgICAgICAgICAgICAgaGNp
+X2RldmNkX2NvbXBsZXRlKGhkZXYpOw0KPiArICAgICAgICAgICAgICAgZ290byBvdXQ7DQo+ICsg
+ICAgICAgfQ0KPiArICAgICAgIHJldHVybiByZXQ7DQo+ICsNCj4gK291dDoNCj4gKyAgICAgICBp
+ZiAoYnRkYXRhLT5xY2FfZHVtcC5yYW1fZHVtcF9zaXplKQ0KPiArICAgICAgICAgICAgICAgdXNi
+X2VuYWJsZV9hdXRvc3VzcGVuZCh1ZGV2KTsNCj4gKyAgICAgICBidGRhdGEtPnFjYV9kdW1wLnJh
+bV9kdW1wX3NpemUgPSAwOw0KPiArICAgICAgIGJ0ZGF0YS0+cWNhX2R1bXAucmFtX2R1bXBfc2Vx
+bm8gPSAwOw0KPiArICAgICAgIGNsZWFyX2JpdChCVFVTQl9IV19TU1JfQUNUSVZFLCAmYnRkYXRh
+LT5mbGFncyk7DQo+ICsNCj4gKyAgICAgICBpZiAocmV0IDwgMCkNCj4gKyAgICAgICAgICAgICAg
+IGtmcmVlX3NrYihza2IpOw0KPiArICAgICAgIHJldHVybiByZXQ7DQo+ICt9DQo+ICsNCj4gK3N0
+YXRpYyBpbnQgYnR1c2JfcmVjdl9hY2xfcWNhKHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBzdHJ1Y3Qg
+c2tfYnVmZiANCj4gKypza2IpIHsNCj4gKyAgICAgICBpZiAoaGFuZGxlX2R1bXBfcGt0X3FjYSho
+ZGV2LCBza2IpKQ0KPiArICAgICAgICAgICAgICAgcmV0dXJuIDA7DQo+ICsgICAgICAgcmV0dXJu
+IGhjaV9yZWN2X2ZyYW1lKGhkZXYsIHNrYik7IH0NCj4gKw0KPiArc3RhdGljIGludCBidHVzYl9y
+ZWN2X2V2dF9xY2Eoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVjdCBza19idWZmIA0KPiArKnNr
+Yikgew0KPiArICAgICAgIGlmIChoYW5kbGVfZHVtcF9wa3RfcWNhKGhkZXYsIHNrYikpDQo+ICsg
+ICAgICAgICAgICAgICByZXR1cm4gMDsNCj4gKyAgICAgICByZXR1cm4gaGNpX3JlY3ZfZnJhbWUo
+aGRldiwgc2tiKTsgfQ0KPiArDQo+ICsNCj4gICNkZWZpbmUgUUNBX0RGVV9QQUNLRVRfTEVOICAg
+ICA0MDk2DQo+DQo+ICAjZGVmaW5lIFFDQV9HRVRfVEFSR0VUX1ZFUlNJT04gMHgwOQ0KPiBAQCAt
+MzYyOCw2ICszODQyLDkgQEAgc3RhdGljIGludCBidHVzYl9zZXR1cF9xY2Eoc3RydWN0IGhjaV9k
+ZXYgKmhkZXYpDQo+ICAgICAgICAgaWYgKGVyciA8IDApDQo+ICAgICAgICAgICAgICAgICByZXR1
+cm4gZXJyOw0KPg0KPiArICAgICAgIGJ0ZGF0YS0+cWNhX2R1bXAuZndfdmVyc2lvbiA9IGxlMzJf
+dG9fY3B1KHZlci5wYXRjaF92ZXJzaW9uKTsNCj4gKyAgICAgICBidGRhdGEtPnFjYV9kdW1wLmNv
+bnRyb2xsZXJfaWQgPSBsZTMyX3RvX2NwdSh2ZXIucm9tX3ZlcnNpb24pOw0KPiArDQo+ICAgICAg
+ICAgaWYgKCEoc3RhdHVzICYgUUNBX1NZU0NGR19VUERBVEVEKSkgew0KPiAgICAgICAgICAgICAg
+ICAgZXJyID0gYnR1c2Jfc2V0dXBfcWNhX2xvYWRfbnZtKGhkZXYsICZ2ZXIsIGluZm8pOw0KPiAg
+ICAgICAgICAgICAgICAgaWYgKGVyciA8IDApDQo+IEBAIC00MTE3LDYgKzQzMzQsMTEgQEAgc3Rh
+dGljIGludCBidHVzYl9wcm9iZShzdHJ1Y3QgdXNiX2ludGVyZmFjZSAqaW50ZiwNCj4gICAgICAg
+ICB9DQo+DQo+ICAgICAgICAgaWYgKGlkLT5kcml2ZXJfaW5mbyAmIEJUVVNCX1FDQV9XQ042ODU1
+KSB7DQo+ICsgICAgICAgICAgICAgICBkYXRhLT5xY2FfZHVtcC5pZF92ZW5kb3IgPSBpZC0+aWRW
+ZW5kb3I7DQo+ICsgICAgICAgICAgICAgICBkYXRhLT5xY2FfZHVtcC5pZF9wcm9kdWN0ID0gaWQt
+PmlkUHJvZHVjdDsNCj4gKyAgICAgICAgICAgICAgIGRhdGEtPnJlY3ZfZXZlbnQgPSBidHVzYl9y
+ZWN2X2V2dF9xY2E7DQo+ICsgICAgICAgICAgICAgICBkYXRhLT5yZWN2X2FjbCA9IGJ0dXNiX3Jl
+Y3ZfYWNsX3FjYTsNCj4gKyAgICAgICAgICAgICAgIGhjaV9kZXZjZF9yZWdpc3RlcihoZGV2LCBi
+dHVzYl9jb3JlZHVtcF9xY2EsIA0KPiArIGJ0dXNiX2R1bXBfaGRyX3FjYSwgTlVMTCk7DQo+ICAg
+ICAgICAgICAgICAgICBkYXRhLT5zZXR1cF9vbl91c2IgPSBidHVzYl9zZXR1cF9xY2E7DQo+ICAg
+ICAgICAgICAgICAgICBoZGV2LT5zaHV0ZG93biA9IGJ0dXNiX3NodXRkb3duX3FjYTsNCj4gICAg
+ICAgICAgICAgICAgIGhkZXYtPnNldF9iZGFkZHIgPSBidHVzYl9zZXRfYmRhZGRyX3djbjY4NTU7
+DQo+IC0tDQo+IDIuMTcuMQ0KPg0KDQoNCi0tDQpMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo=
