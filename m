@@ -2,124 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB53C77B78
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Apr 2023 16:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D54C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Apr 2023 20:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231410AbjDRQ7v (ORCPT
+        id S232450AbjDRUBS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Apr 2023 12:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
+        Tue, 18 Apr 2023 16:01:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232346AbjDRQ7p (ORCPT
+        with ESMTP id S232315AbjDRUBQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Apr 2023 12:59:45 -0400
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CB1E93C1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Apr 2023 09:59:18 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-552ae3e2cbeso94278457b3.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Apr 2023 09:59:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1681837157; x=1684429157;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=I5BoHjzh5rBSSzb7StjjnexOes7wzu8euGACPMkr2GY=;
-        b=eqYD/URwhX35iRgJ4a3HVzl+qMfvJwvdjIneaPqGpXpDHjiknMlVgH+VtguSmUe5bJ
-         KO/Qbz9VpY2sgqP0kqRaeV23WiY7FAu+hw/w+x+GvzixUOLekfwDsQVsLLQF8rNK4eMy
-         7TpRROLXR4dOFkFUvVPeqRufzp8aHV8B+CV0C3Un0cIbvoTHDXqwCRmMXEQVMNRtBDXY
-         m1JZkfBLubEFxxIKibzPCJKJrqM0mE/5fpjRwXMb1fHyrfmtcrGydJzoXhSNkARvbMAv
-         VizaMBgmKG9bBtGG6iDQyAOtwO4WyIlfp6R+Xc/jPl8vkgFppk6AOcuR/3T8Km1QLU4z
-         pbMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681837157; x=1684429157;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I5BoHjzh5rBSSzb7StjjnexOes7wzu8euGACPMkr2GY=;
-        b=R2X/EW4PJ9ZGRYidIKCHwnkQEXleBJixr5JfbUpllj0puXt2bzxJK3XrLACFNDzgq+
-         1PAQEi7ats/ZT5yJ8/tK/7etdLaKLiJB2nWOm1Pyd99oKOxgDq+LpRDKTmXk1EQ1fH4p
-         YGe4y2c1sbjn1Y9O3Tenlyri6djB/cuflxSnH4sbsCkeSoThi2YjH+C0F2Wk2tCpkiy1
-         /whfFE8RYVlILYwNvvevI/wWiA60DuKZ7Bfoo4B4i5I9PQ/tIlnQdte8rVb9FtejFt/C
-         bPZiJFkKJKZaD6WtSN9pCwotREf/4S4eFYRV3cijb/j+R2tk4y3d3fKLZHCi0/7A8kop
-         XgTg==
-X-Gm-Message-State: AAQBX9fkjcTPKsBZpAV7dHV8qN8lP9+RYgifOofiUl1+iHT5yji8RlPr
-        ibMDbL/Gu4XsEypeEGjAmHTBHy3+6rVmMvahv7+c4A==
-X-Google-Smtp-Source: AKy350bzQ33cg8zJDJunRtI4zCoYkJITmUbI173QhQIbng9/cAwK0hVcTy57kk+qR5iL3unAXMdwlZ8T2DrdhrWHXjU=
-X-Received: by 2002:a81:83d2:0:b0:54f:6f65:f242 with SMTP id
- t201-20020a8183d2000000b0054f6f65f242mr635574ywf.13.1681837157452; Tue, 18
- Apr 2023 09:59:17 -0700 (PDT)
+        Tue, 18 Apr 2023 16:01:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72CFB768;
+        Tue, 18 Apr 2023 13:01:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 074E863898;
+        Tue, 18 Apr 2023 20:01:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 62094C433EF;
+        Tue, 18 Apr 2023 20:01:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1681848071;
+        bh=4yVirdppsgpFq7+RBk6cMfsujdtPlwmsdStMkcuRXIk=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ILq8QMx6D30x0JYiLiS0OAIwdYtpLMxkUvZolQQQSn9Q7ukxzchnDERqi+9dNAqQG
+         kGFtsF6t6pY46YixZPGir0hIfkgdl5C1+pqG5LS/fYGYPtiwALhVv5z8PL51vzrN9E
+         exAcmUGsDzWnk22xkQlczCdRIbJZ8Y2rpdIMETV2k7cmJslvWj8cKzAySDZA2bAu3t
+         DjeklqJknrq4HzFRimb1LnJk8erpP93kW8PUobf9SKylV3r6bZPGAyppO39AWWv8Cm
+         mYmvB0FJNCF61k7MrQaZEp04I2iKOS4SNvJoq+1MVSwNZjUpaCavFrKbQFa8OrmEIn
+         ImmQL2Iql+8xA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4CA20E330AB;
+        Tue, 18 Apr 2023 20:01:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20230413064344.18714-1-quic_tjiang@quicinc.com>
- <CAA8EJpoc4nn+Wr131-o=YQoDeL0t7aj9hC=8NNnJa3SeHwgJ-w@mail.gmail.com>
- <934c32ef9427464a9d0b898b843df6ab@quicinc.com> <CAA8EJpqz9o9CtAnXRE86kw-cfL=_d-c5BDAXwQLSJAyZRy_fEg@mail.gmail.com>
- <a908e04e9b7d4b97bc6b5ee3c713e71f@quicinc.com> <CAA8EJprztGdP0yqV=O6P2tn4i0+iQ4rfBVY2x-3_93o3C0c-Nw@mail.gmail.com>
- <11d65b0864b142ffb92255318ce70c45@quicinc.com>
-In-Reply-To: <11d65b0864b142ffb92255318ce70c45@quicinc.com>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date:   Tue, 18 Apr 2023 19:59:06 +0300
-Message-ID: <CAA8EJpog4Oqzz8MWvwwYAzH91zy=UwskhTjF7ZO5or3citA9kw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add WCN6855 devcoredump support
-To:     "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
-Cc:     "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>,
-        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>,
-        "mka@chromium.org" <mka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bluetooth 2023-04-10
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <168184807130.10886.15858478283038643567.git-patchwork-notify@kernel.org>
+Date:   Tue, 18 Apr 2023 20:01:11 +0000
+References: <20230410172718.4067798-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230410172718.4067798-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 18 Apr 2023 at 12:16, Tim Jiang (QUIC) <quic_tjiang@quicinc.com> wrote:
->
-> Hi Dmitry:
->
-> > > On Thu, 13 Apr 2023 at 09:44, Tim Jiang <quic_tjiang@quicinc.com> wrote:
-> > > >
-> > > > WCN6855 will report memdump via ACL data or HCI event when it get
-> > > > crashed, so we collect memdump to debug firmware.
-> > >
-> > > Is it applicable only to wcn6855 or to some of earlier chips too?
-> > >  [Tim]  Also applicable to earlier chips , but currently google only
-> > > require us to support wcn6855
-> >
-> > Since upstream is not a google kernel, please enable this feature for all relevant chipsets.
-> > [Tim] agreed , but the title of this gerrit unchanged,  I raise a new gerrit for other relevant chipsets , is OK?
->
-> There is no gerrit here.
->
-> Also, is there any chance you can fix your email client to stop putting old headers at the top of the email?
-> [Tim] sorry for confusion, I mean I will raise another new change for other relevant chipset, is OK ?
+Hello:
 
-I'd suggest using a single patch.
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
->  and I use office 365 to reply your email which will adding old headers automatically , unless I delete the old headers manually, thank you.
->
-> >
-> > >
-> > > >
-> > > > Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
-> > > > ---
-> > > >  drivers/bluetooth/btusb.c | 222
-> > > > ++++++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 222 insertions(+)
-> >
-> >
-> >
-> >
-> > --
-> > With best wishes
-> > Dmitry
->
->
->
-> --
-> With best wishes
-> Dmitry
+On Mon, 10 Apr 2023 10:27:18 -0700 you wrote:
+> The following changes since commit b9881d9a761a7e078c394ff8e30e1659d74f898f:
+> 
+>   Merge branch 'bonding-ns-validation-fixes' (2023-04-07 08:47:20 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-04-10
+> 
+> [...]
 
+Here is the summary with links:
+  - pull-request: bluetooth 2023-04-10
+    https://git.kernel.org/bluetooth/bluetooth-next/c/160c13175e39
 
-
+You are awesome, thank you!
 -- 
-With best wishes
-Dmitry
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
