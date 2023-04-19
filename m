@@ -2,200 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA9AC6FD18
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 08:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 762F1C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 09:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232785AbjDSIz2 (ORCPT
+        id S232854AbjDSJAH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Apr 2023 04:55:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60990 "EHLO
+        Wed, 19 Apr 2023 05:00:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232760AbjDSIzU (ORCPT
+        with ESMTP id S232802AbjDSJAF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Apr 2023 04:55:20 -0400
-X-Greylist: delayed 491 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 19 Apr 2023 01:55:05 PDT
-Received: from mail-200162.simplelogin.co (mail-200162.simplelogin.co [176.119.200.162])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C97A4C2C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 01:55:05 -0700 (PDT)
-Date:   Wed, 19 Apr 2023 08:46:42 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=8shield.net; s=dkim;
-        t=1681894012;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=svMD8qCdCdMeuX7byvejAfnFeoEkqnuCAiytCVsrX9I=;
-        b=BN91Nhk3WNk2wdWndHhRGlVATg8Gk5ZPGxw42M5y6/jyMpQNUePNX8WM5K58t1WBZzOTWe
-        5JwvONJVdlZTvvE5ClXvoJcR5oqWAijcLEg6Bn0t5YJriwoh0eQkFV4CiL54glBZe5iMzE
-        Ep+DYCoNI7BOrbb+34rIJHlnP5fpkU0=
-Subject: Re: btusb driver need to be unloaded and reloaded after boot & lag
- issue
-In-Reply-To: <dbbf4556-2719-5827-efbd-da9e87c0de40@molgen.mpg.de>
+        Wed, 19 Apr 2023 05:00:05 -0400
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFC8F40CD
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 01:59:58 -0700 (PDT)
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-329326caa4aso30916305ab.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 01:59:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681894798; x=1684486798;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MMkdzP0b48/FfooAPyZtmjuW8LPUSS+nUb/pxSQhWlg=;
+        b=P+tKbRDF/Uk7s7JcTdh3JET18OULlhE9/Owbe3XVruHtkXn8HmDVgJoOGHfF27JG3n
+         6abnRfeFZEEunJs22G3mn8AC+X/3cfap0Uh9ikpMUhsPq0s9p8zP8pjbbCrTgZvIPfeo
+         ALJcb7wIDI6YrBoPOTH2G6SGIVNHFb5w0o6Bx02NtGmtkQBOOujqLH0Eojmhee/+kgIV
+         d1ozDpF4EMnYwK9H5nN9Pgm0uTuPShucUFdzl82LiTFv4F7tcfYqOUaC5PHGFRnVkorJ
+         Xqh6f4fuGnpGLaRysJWhWlkaTrTdsehDxnFz6l1wWWvEHP/TCiCpr6tSFAQyt1hjUMDQ
+         /Xgw==
+X-Gm-Message-State: AAQBX9d1ox68BFMhwzEIGqlj15X463jBilrMRXDt/i4vqq1L/7PoaMIh
+        THZY9crcVoaRyVNin7oe85YcGSobHhVljqS6K4h+xa6d8rs5
+X-Google-Smtp-Source: AKy350YS7UotbFKDn4cXkfgdpzwLgB4VfRkMQdy69IH+g+usQkhflYv2ItYDgPF/EyaTfZTia01joq3s7l4rOq5j4NaAHLLgiYUH
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg=pgp-sha512;
- boundary="------58bb509cbf61eb58031cdc6e0e682bf96f7bc10ce8327a5812e43e037274263f";
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-From:   help.7ocym@8shield.net
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        regressions@lists.linux.dev
-Message-ID: <168189401011.9.1190609165422904967.121288919@8shield.net>
-References: <168133719213.7.14774994518515251513.119182329@8shield.net>
- <dbbf4556-2719-5827-efbd-da9e87c0de40@molgen.mpg.de>
-X-SimpleLogin-Type: Reply
-X-SimpleLogin-EmailLog-ID: 121288931
-X-SimpleLogin-Want-Signing: yes
+X-Received: by 2002:a92:cc05:0:b0:326:d02c:c756 with SMTP id
+ s5-20020a92cc05000000b00326d02cc756mr9976703ilp.4.1681894798045; Wed, 19 Apr
+ 2023 01:59:58 -0700 (PDT)
+Date:   Wed, 19 Apr 2023 01:59:58 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000fcbbf805f9aca52b@google.com>
+Subject: [syzbot] [bluetooth?] WARNING: bad unlock balance in l2cap_disconnect_rsp
+From:   syzbot <syzbot+180f35f8e76c7af067d2@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------58bb509cbf61eb58031cdc6e0e682bf96f7bc10ce8327a5812e43e037274263f
-Content-Type: multipart/mixed;boundary=---------------------d434d8696c798ef5f060dccd015a521b
+Hello,
 
------------------------d434d8696c798ef5f060dccd015a521b
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;charset=utf-8
+syzbot found the following issue on:
 
-Hi,
+HEAD commit:    327bf9bb94cf Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=107f83b7c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=64943844c9bf6c7e
+dashboard link: https://syzkaller.appspot.com/bug?extid=180f35f8e76c7af067d2
+compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+userspace arch: arm64
 
-------- Original Message -------
-On Thursday, April 13th, 2023 at 7:39 AM, Paul Menzel - pmenzel at molgen.=
-mpg.de <pmenzel_at_molgen_mpg_de_rislbjit@simplelogin.co> wrote:
+Unfortunately, I don't have any reproducer for this issue yet.
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/66410afe54f5/disk-327bf9bb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2757ce5e2a55/vmlinux-327bf9bb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7d54ee97c182/Image-327bf9bb.gz.xz
 
-> [Cc: +regressions@lists.linux.dev]
->
-> Dear JLM,
->
->
-> Am 13.04.23 um 00:06 schrieb help.7ocym@8shield.net:
->
-> > sorry to address both list, but this issue seems related, without
-> > knowing where lies the issue > my hardware : https://wiki.gentoo.org/w=
-iki/Lenovo_Yoga_900
-> > I use the pre-built gentoo linux kernel,
-> > 6.2.8-gentoo-dist #1 SMP PREEMPT_DYNAMIC Wed Mar 22 17:15:39 -00 2023 =
-x86_64 Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz GenuineIntel GNU/Linux
-> >
-> > since a few update (sadly I didn't noted the latest kernel version
-> > that didn't had the issue), after a boot, the bluetooth isn't
-> > working, nothing bad in dmesg, I just have to unload btusb module and
-> > modprobe it again to have bluetooth working again...
-> >
-> > after a suspend to ram, I have to power off-power on the bluetooth to
-> > have it work again (bluetoothctl power off; bluetoothctl power on)
-> >
-> > bluetooth mouse can also be extremely laggy sometimes,but without
-> > error message in dmesg, most of the time `bluetoothctl power` off-on
-> > cycling do solve the issue....
-> >
-> > I also included the usb mailing list because it might be related to
-> > some behavior I noticed :
-> >
-> > I have usb3.0 micro sd card reader (SanDisk MobileMate UHS-I microSD
-> > Reader/Writer USB 3.0 Reader, Kingston MobileLite Plus (MLPM) microSD
-> > Card Reader USB 3.1 microSDHC/SDXC UHS-II, for example) and some
-> > extra fast micro sd cards (like sandisk extrem 512G), when
-> > transferring data the read rate can be as high as 110Mo/s and write
-> > 70Mo/s sustained, nothing impressive but when such rate is achieved
-> > for a long time (big file transfer) either reading only access,
-> > writing only access or read write, the usb bus become unusable, I
-> > can't even use a usb mouse connected to it by wire... even if cpu
-> > usage is really low (less than 10%) I don't have the issue if I
-> > connect a M2 usb3 flash drive, with comparable transfert speed... so
-> > not related to some bus over usage...
-> >
-> > so I suspect that there is an issue with the usb driver, and that
-> > maybe the bluetooth issue can be related to the usb issue, since the
-> > bluetooth controller is on the usb bus on the laptop >
-> > the transfer issue of usb is much more older than the bluetooth
-> > issue, it's approximative, but : > - the btusb boot issue is about 3 m=
-onth old,
-> > - the suspend/resume issue of bluetooth is more than a year old
-> > - the usb transfer issue as more than a year...
-> >
-> > I'll gladly provide any useful information, can also do patch tries...
->
-> As you use Gentoo and are able to build your own Linux kernel, the
-> fastest way to get these issues addressed is to bisect them. To shorten
-> the test cycles, I recommend to try, if you can reproduce the issues in
-> QEMU and passing through the problematic devices to the VM [1][2].
->
-> I also recommend to start a separate thread for each issue and, as these
-> seem to be regressions, also keep the regression folks in the loop [3].
->
->
-> Kind regards,
->
-> Paul
->
->
-> [1]:
-> https://lore.kernel.org/all/5891f0d5-8d51-9da5-7663-718f301490b1@molgen.=
-mpg.de/
-> (The commands were working for after all, and the device didn=E2=80=99t
-> show up due to a (second) Linux kernel regression.)
-> [2]: https://station.eciton.net/qemu-usb-host-device-pass-through.html
-> [3]:
-> https://www.kernel.org/doc/html/latest/admin-guide/reporting-regressions=
-.html
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+180f35f8e76c7af067d2@syzkaller.appspotmail.com
 
-thanks for the reply,
-after upgrade to 6.2.11 version, =
+=====================================
+WARNING: bad unlock balance detected!
+6.3.0-rc7-syzkaller-g327bf9bb94cf #0 Not tainted
+-------------------------------------
+kworker/u5:3/6019 is trying to release lock (&conn->chan_lock) at:
+[<ffff80001157e164>] l2cap_disconnect_rsp+0x210/0x30c net/bluetooth/l2cap_core.c:4697
+but there are no more locks to release!
+
+other info that might help us debug this:
+2 locks held by kworker/u5:3/6019:
+ #0: ffff0000c0e30938 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x664/0x12d4 kernel/workqueue.c:2363
+ #1: ffff80001ea87c20 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x6a8/0x12d4 kernel/workqueue.c:2365
+
+stack backtrace:
+CPU: 1 PID: 6019 Comm: kworker/u5:3 Not tainted 6.3.0-rc7-syzkaller-g327bf9bb94cf #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
+Workqueue: hci0 hci_rx_work
+Call trace:
+ dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:233
+ show_stack+0x2c/0x44 arch/arm64/kernel/stacktrace.c:240
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
+ dump_stack+0x1c/0x28 lib/dump_stack.c:113
+ print_unlock_imbalance_bug+0x250/0x2a4 kernel/locking/lockdep.c:5109
+ lock_release+0x4ac/0x9ac kernel/locking/lockdep.c:5689
+ __mutex_unlock_slowpath+0xe0/0x6b4 kernel/locking/mutex.c:907
+ mutex_unlock+0x18/0x24 kernel/locking/mutex.c:543
+ l2cap_disconnect_rsp+0x210/0x30c net/bluetooth/l2cap_core.c:4697
+ l2cap_le_sig_cmd net/bluetooth/l2cap_core.c:6426 [inline]
+ l2cap_le_sig_channel net/bluetooth/l2cap_core.c:6464 [inline]
+ l2cap_recv_frame+0x18b4/0x6a14 net/bluetooth/l2cap_core.c:7796
+ l2cap_recv_acldata+0x4f4/0x163c net/bluetooth/l2cap_core.c:8504
+ hci_acldata_packet net/bluetooth/hci_core.c:3828 [inline]
+ hci_rx_work+0x2cc/0x8b8 net/bluetooth/hci_core.c:4063
+ process_one_work+0x788/0x12d4 kernel/workqueue.c:2390
+ worker_thread+0x8e0/0xfe8 kernel/workqueue.c:2537
+ kthread+0x24c/0x2d4 kernel/kthread.c:376
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:870
 
 
-- seems that the issue at boot of btusb module is gone... I don't have any=
-more to unload btusb module after a boot... so that's great news! =
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
-- the bluetooth resumes also after a suspend S3 (suspend to ram)! so great=
- news again! (I've to check for suspend to disk, but I'm confident about s=
-uccess)
-
-I still have to do some check with the micro usb readers to see if the bug=
- "bus monopolization" is still present, so far so good!
-
-
-
-Sent with Proton Mail secure email.
-
------------------------d434d8696c798ef5f060dccd015a521b
-Content-Type: application/pgp-keys; filename="publickey - jl.malet@protonmail.com - 0xA25F20CF.asc"; name="publickey - jl.malet@protonmail.com - 0xA25F20CF.asc"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - jl.malet@protonmail.com - 0xA25F20CF.asc"; name="publickey - jl.malet@protonmail.com - 0xA25F20CF.asc"
-
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCgp4ak1FWkRHNGx4WUpLd1lCQkFI
-YVJ3OEJBUWRBc0o4TVNPaVhCR2tKWnlzYm52cExJN3NXR0xHaXNXeDQKbmxlUkRiRlpiRy9OTVdw
-c0xtMWhiR1YwUUhCeWIzUnZibTFoYVd3dVkyOXRJRHhxYkM1dFlXeGxkRUJ3CmNtOTBiMjV0WVds
-c0xtTnZiVDdDakFRUUZnb0FQZ1dDWkRHNGx3UUxDUWNJQ1pEVy9aZ2x2N3RnQ2dNVgpDQW9FRmdB
-Q0FRSVpBUUtiQXdJZUFSWWhCS0pmSU05bm5OS2RzS2RMcnRiOW1DVy91MkFLQUFES3lnRUEKdlpr
-VjRWV3l4dXJxUWVOSDM2UmhncjR2QVdUQ1RRQjl6Z1ZrTXFFTHF5VUEvUk9UbFJOMnFVQjAzdE5r
-CmRwZXJPV0VQa3JvWG1XRHBYWU0rMldOWk1uWVB6amdFWkRHNGx4SUtLd1lCQkFHWFZRRUZBUUVI
-UURJWQpIOHpvdytIeFowSkUyeHJkcy96WlRIa3pZS2lmc0RUUXVRL2o0dEFKQXdFSUI4SjRCQmdX
-Q0FBcUJZSmsKTWJpWENaRFcvWmdsdjd0Z0NnS2JEQlloQktKZklNOW5uTktkc0tkTHJ0YjltQ1cv
-dTJBS0FBQmFqd0Q4CkM5VmNtRWVTWmpyNFNabWlOSFM2MUtqZlZlaEZJYkJmZnEzTUVCZGFxcHdB
-LzJHSTY4a010MzdOSkhTcAo1Q2Fid2UrZ05HZVg5S3RESUxjS2NUbVRjVmNECj04SW9hCi0tLS0t
-RU5EIFBHUCBQVUJMSUMgS0VZIEJMT0NLLS0tLS0K
------------------------d434d8696c798ef5f060dccd015a521b--
-
---------58bb509cbf61eb58031cdc6e0e682bf96f7bc10ce8327a5812e43e037274263f
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
-
-wnUEARYKACcFgmQ/qmIJkNb9mCW/u2AKFiEEol8gz2ec0p2wp0uu1v2YJb+7
-YAoAAK/OAP0XIqIp32TYnR4LaBq82EkLkqgQdADqzn2qFgOQuNb+kQEAgfZO
-/gl/jcYzocTpyJ/ew05D5D2OXkZoI4EhtqVKIgk=
-=ogYk
------END PGP SIGNATURE-----
-
-
---------58bb509cbf61eb58031cdc6e0e682bf96f7bc10ce8327a5812e43e037274263f--
-
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
