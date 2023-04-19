@@ -2,132 +2,357 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7A8C77B78
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 03:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F6CAC77B73
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 03:38:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231877AbjDSDIc (ORCPT
+        id S231297AbjDSDi1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Apr 2023 23:08:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44180 "EHLO
+        Tue, 18 Apr 2023 23:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231612AbjDSDIa (ORCPT
+        with ESMTP id S231153AbjDSDiX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Apr 2023 23:08:30 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31195582
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Apr 2023 20:08:24 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id p8so28310634plk.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Apr 2023 20:08:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1681873704; x=1684465704;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nqn40+KYtsbyL0nm/7BvwIk5576Ewf8b6sF0OxcTL/o=;
-        b=sBKVMlPOmoywyQmK46Tuua9vLPS1vEQ16J5hZ/wUabwGA7CVZMqLveTgvRmXAallyO
-         ApLh2V8tGRIECWpDcXmS+Htf3Dpc7Qn8v4P8JqEAxX0v+DRJR7mYr9G5wfbDW35tY+yj
-         6HuHYwJeHPKxY22+46SJmyPX7qTETiXJelN0swT3fmnkdm1ZZblRcFwDXbXmx0gGyelc
-         rX03IDnxa060+eJcBL0EJKeSoXolYHlza6jxPNXSx1+5f4qWVM/gqCAg8TiyaokMdDo1
-         ski4dizr2Jv8OZd3jdXk6vGXR4ryyfntwV90cVoozvMUyHqEwdjfutTRc5SsO6M/0sbB
-         wARw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1681873704; x=1684465704;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nqn40+KYtsbyL0nm/7BvwIk5576Ewf8b6sF0OxcTL/o=;
-        b=NlUpsVbLiSQmSlClVR23vNmKKRhDyvVvJKEW0pNupVXXJ62eWWFK9YSudhMKQAvrzA
-         bIAT7yk04xtEivY2MfQu32h7RUcFvbZiMs6do3G708gVr91XMMVQnA2UFSRA578WMDYF
-         wR4CvQyx1jI+ttPkZIzEyySmIiCukbMUKZUo8iAjB7mV++Tp141a4TqsvGSRJPbvlkEF
-         vrhGjJiyJ3Mco8ER3Bc0wXWdni2VX7o1cu+0or0x0ooy3oiSeh9AVncVKH1D9y8fT3Y0
-         DNqNYfGZDfxJc/SMxk3Ov0aZSbPTKrxFSW2W50aLKfRW8elkH9ajvLp2bIJvDxYMOFq/
-         hxzA==
-X-Gm-Message-State: AAQBX9dd6/hW44CpPepI7WX41KjwZYRIV2g0KksElj4jETe1IQPLVSIc
-        2kNARoezssiDYNFiB9ozNdVVzugotMzV6Q==
-X-Google-Smtp-Source: AKy350YPhMJWLopJj6N/3polWS7SjSS5Sxz2jzmSIHWrrIzFmpa+TV6YO+tTO7Y449/j7c44xV6vcA==
-X-Received: by 2002:a05:6a21:99a0:b0:da:c7e:6ec0 with SMTP id ve32-20020a056a2199a000b000da0c7e6ec0mr1979139pzb.25.1681873703957;
-        Tue, 18 Apr 2023 20:08:23 -0700 (PDT)
-Received: from aaron-shen.localdomain ([183.63.252.58])
-        by smtp.gmail.com with ESMTPSA id v11-20020a63f20b000000b00502f20aa4desm6780019pgh.70.2023.04.18.20.08.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Apr 2023 20:08:23 -0700 (PDT)
-From:   Aaron_shen <aarongt.shen@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Aaron_shen <aarongt.shen@gmail.com>
-Subject: [PATCH BlueZ v2] obexd: support to reply folder name to store file
-Date:   Wed, 19 Apr 2023 11:07:42 +0800
-Message-Id: <20230419030742.6123-1-aarongt.shen@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Tue, 18 Apr 2023 23:38:23 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8058540E8;
+        Tue, 18 Apr 2023 20:38:20 -0700 (PDT)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 33J2T86Q002612;
+        Wed, 19 Apr 2023 03:38:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=yRB7cciyRzcz8nkDBjPpG/bkD/w2lbThPBq1TXUWcrM=;
+ b=gdSuOZgyoA247jtdKsWZCbFH8s9LaHt+8vxJP0NdKnpmopIWsxwcxwwuEALwIn2buw3t
+ bg6WdFt+0ZTnONQpesrJ2+qqQOfl0md+bI6f2HPN3mtxZAkW7suex6V6Xu1YUHC0qO5e
+ Z21WrTH2eNkgmKwk3t8hs6RxZwIBcsRbKm+zfcBnJppCuq+PWcNvz0bfaS6uQENPqX6+
+ 4smUA+5WFsdUGo4oPa32kKWWjXxdHbvw9vS5FEbfiHDEisa2mx4NG9YHUnxDOVJBZOyv
+ EgwLg4MRTKGSZI6KOKAPqHbKyn0vGaqKhwNze59B5W0YRxVnOnsrvgI4tLjqJgBeyGmE 9Q== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3q1yhds7bg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 03:38:17 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 33J3cGdb022106
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 19 Apr 2023 03:38:16 GMT
+Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Tue, 18 Apr 2023 20:38:13 -0700
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+To:     <marcel@holtmann.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_tjiang@quicinc.com>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>,
+        <mka@chromium.org>
+Subject: [PATCH v3] Bluetooth: btusb: Add WCN6855 devcoredump support
+Date:   Wed, 19 Apr 2023 11:38:05 +0800
+Message-ID: <20230419033805.27356-1-quic_tjiang@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: NtZq1twrRJWLKiGjs5jx9p7UGekr5j7l
+X-Proofpoint-GUID: NtZq1twrRJWLKiGjs5jx9p7UGekr5j7l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-04-18_17,2023-04-18_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ phishscore=0 lowpriorityscore=0 spamscore=0 impostorscore=0
+ mlxlogscore=999 priorityscore=1501 adultscore=0 clxscore=1015 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2304190031
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The obex agent usually reply the filename by getting the default filename
-from the filename property of the transfer object which is not convenient.
-The patch helps that the obex agent can reply folder name or new filename
-or null which will use the default filename if new_name is NULL and the
-default folder if the new_folder is NULL in opp_chkput().
----
- doc/obex-agent-api.txt |  9 +++++----
- obexd/src/manager.c    | 10 ++++++----
- 2 files changed, 11 insertions(+), 8 deletions(-)
+WCN6855 will report memdump via ACL data or HCI event when
+it get crashed, so we collect memdump to debug firmware.
 
-diff --git a/doc/obex-agent-api.txt b/doc/obex-agent-api.txt
-index 3923da6df..322531009 100644
---- a/doc/obex-agent-api.txt
-+++ b/doc/obex-agent-api.txt
-@@ -46,10 +46,11 @@ Methods		void Release()
- 			This method gets called when the service daemon
- 			needs to accept/reject a Bluetooth object push request.
+Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+---
+ drivers/bluetooth/btusb.c | 222 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 222 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2303b0a66323..f045bbb0ee09 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -733,6 +733,16 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ 	{}
+ };
  
--			Returns the full path (including the filename) where
--			the object shall be stored. The tranfer object will
--			contain a Filename property that contains the default
--			location and name that can be returned.
-+			Returns the full path (including the filename) or
-+			folder name suffiexed with '/' where the object shall
-+			be stored. The transfer object will contain a Filename
-+			property that contains the default location and name
-+			that can be returned.
++struct qca_dump_info {
++	/* fields for dump collection */
++	u16 id_vendor;
++	u16 id_product;
++	u32 fw_version;
++	u32 controller_id;
++	u32 ram_dump_size;
++	u16 ram_dump_seqno;
++};
++
+ #define BTUSB_MAX_ISOC_FRAMES	10
  
- 			Possible errors: org.bluez.obex.Error.Rejected
- 			                 org.bluez.obex.Error.Canceled
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index 849928603..73fd6b9af 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -632,8 +632,7 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
+ #define BTUSB_INTR_RUNNING	0
+@@ -752,6 +762,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ #define BTUSB_WAKEUP_AUTOSUSPEND	14
+ #define BTUSB_USE_ALT3_FOR_WBS	15
+ #define BTUSB_ALT6_CONTINUOUS_TX	16
++#define BTUSB_HW_SSR_ACTIVE	17
  
- 		if (dbus_error_has_name(&derr, DBUS_ERROR_NO_REPLY))
- 			agent_cancel();
--
--		if (dbus_error_has_name(&derr, OBEX_ERROR_REJECT))
-+		else if (dbus_error_has_name(&derr, OBEX_ERROR_REJECT))
- 			agent->auth_reject = TRUE;
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -814,6 +825,8 @@ struct btusb_data {
  
- 		dbus_error_free(&derr);
-@@ -651,7 +650,10 @@ static void agent_reply(DBusPendingCall *call, void *user_data)
- 			agent->new_name = g_strdup(name);
- 			agent->new_folder = NULL;
- 		} else {
--			agent->new_name = g_strdup(slash + 1);
-+			if (strlen(slash) == 1)
-+				agent->new_name = NULL;
-+			else
-+				agent->new_name = g_strdup(slash + 1);
- 			agent->new_folder = g_strndup(name, slash - name);
- 		}
+ 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+ 	unsigned cmd_timeout_cnt;
++
++	struct qca_dump_info qca_dump;
+ };
+ 
+ static void btusb_reset(struct hci_dev *hdev)
+@@ -904,6 +917,11 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	struct gpio_desc *reset_gpio = data->reset_gpio;
+ 
++	if (test_bit(BTUSB_HW_SSR_ACTIVE, &data->flags)) {
++		bt_dev_info(hdev, "Ramdump in progress, defer cmd_timeout");
++		return;
++	}
++
+ 	if (++data->cmd_timeout_cnt < 5)
+ 		return;
+ 
+@@ -3294,6 +3312,202 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++#define QCA_MEMDUMP_ACL_HANDLE 0x2EDD
++#define QCA_MEMDUMP_SIZE_MAX  0x100000
++#define QCA_MEMDUMP_VSE_CLASS 0x01
++#define QCA_MEMDUMP_MSG_TYPE 0x08
++#define QCA_MEMDUMP_PKT_SIZE 248
++#define QCA_LAST_SEQUENCE_NUM 0xffff
++
++struct qca_dump_hdr {
++	u8 vse_class;
++	u8 msg_type;
++	__le16 seqno;
++	u8 reserved;
++	union {
++		u8 data[0];
++		struct {
++			__le32 ram_dump_size;
++			u8 data0[0];
++		} __packed;
++	};
++} __packed;
++
++
++static void btusb_dump_hdr_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	char buf[128];
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++
++	snprintf(buf, sizeof(buf), "Controller Name: 0x%x\n",
++			btdata->qca_dump.controller_id);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Firmware Version: 0x%x\n",
++			btdata->qca_dump.fw_version);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Driver: %s\nVendor: qca\n",
++			btusb_driver.name);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "VID: 0x%x\nPID:0x%x\n",
++			btdata->qca_dump.id_vendor, btdata->qca_dump.id_product);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Lmp Subversion: 0x%x\n",
++			hdev->lmp_subver);
++	skb_put_data(skb, buf, strlen(buf));
++}
++
++static void btusb_coredump_qca(struct hci_dev *hdev)
++{
++	static const u8 param[] = { 0x26 };
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb))
++		bt_dev_err(hdev, "%s: triggle crash failed (%ld)", __func__, PTR_ERR(skb));
++	kfree_skb(skb);
++}
++
++/*
++ * ==0: not a dump pkt.
++ * < 0: fails to handle a dump pkt
++ * > 0: otherwise.
++ */
++static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	int ret = 1;
++	u8 pkt_type;
++	u8 *sk_ptr;
++	unsigned int sk_len;
++	u16 seqno;
++	u32 dump_size;
++
++	struct hci_event_hdr *event_hdr;
++	struct hci_acl_hdr *acl_hdr;
++	struct qca_dump_hdr *dump_hdr;
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++	struct usb_device *udev = btdata->udev;
++
++	pkt_type = hci_skb_pkt_type(skb);
++	sk_ptr = skb->data;
++	sk_len = skb->len;
++
++	if (pkt_type == HCI_ACLDATA_PKT) {
++		acl_hdr = hci_acl_hdr(skb);
++		if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
++			return 0;
++		sk_ptr += HCI_ACL_HDR_SIZE;
++		sk_len -= HCI_ACL_HDR_SIZE;
++		event_hdr = (struct hci_event_hdr *)sk_ptr;
++	} else {
++		event_hdr = hci_event_hdr(skb);
++	}
++
++	if ((event_hdr->evt != HCI_VENDOR_PKT)
++		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
++		return 0;
++
++	sk_ptr += HCI_EVENT_HDR_SIZE;
++	sk_len -= HCI_EVENT_HDR_SIZE;
++
++	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
++	if ((sk_len < offsetof(struct qca_dump_hdr, data))
++		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
++	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
++		return 0;
++
++	/*it is dump pkt now*/
++	seqno = le16_to_cpu(dump_hdr->seqno);
++	if (seqno == 0) {
++		set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
++		dump_size = le32_to_cpu(dump_hdr->ram_dump_size);
++		if (!dump_size || (dump_size > QCA_MEMDUMP_SIZE_MAX)) {
++			ret = -EILSEQ;
++			bt_dev_err(hdev, "Invalid memdump size(%u)",
++				   dump_size);
++			goto out;
++		}
++
++		ret = hci_devcd_init(hdev, dump_size);
++		if (ret < 0) {
++			bt_dev_err(hdev, "memdump init error(%d)", ret);
++			goto out;
++		}
++
++		btdata->qca_dump.ram_dump_size = dump_size;
++		btdata->qca_dump.ram_dump_seqno = 0;
++		sk_ptr += offsetof(struct qca_dump_hdr, data0);
++		sk_len -= offsetof(struct qca_dump_hdr, data0);
++
++		usb_disable_autosuspend(udev);
++		bt_dev_info(hdev, "%s memdump size(%u)\n",
++			    (pkt_type == HCI_ACLDATA_PKT) ? "ACL" : "event",
++			    dump_size);
++	} else {
++		sk_ptr += offsetof(struct qca_dump_hdr, data);
++		sk_len -= offsetof(struct qca_dump_hdr, data);
++	}
++
++	if (!btdata->qca_dump.ram_dump_size) {
++		ret = -EINVAL;
++		bt_dev_err(hdev, "memdump is not active");
++		goto out;
++	}
++
++	if ((seqno > btdata->qca_dump.ram_dump_seqno + 1) && (seqno != QCA_LAST_SEQUENCE_NUM)) {
++		dump_size = QCA_MEMDUMP_PKT_SIZE * (seqno - btdata->qca_dump.ram_dump_seqno - 1);
++		hci_devcd_append_pattern(hdev, 0x0, dump_size);
++		bt_dev_err(hdev,
++			   "expected memdump seqno(%u) is not received(%u)\n",
++			   btdata->qca_dump.ram_dump_seqno, seqno);
++		btdata->qca_dump.ram_dump_seqno = seqno;
++		kfree_skb(skb);
++		return ret;
++	}
++
++	skb_pull(skb, skb->len - sk_len);
++	hci_devcd_append(hdev, skb);
++	btdata->qca_dump.ram_dump_seqno++;
++	if (seqno == QCA_LAST_SEQUENCE_NUM) {
++		bt_dev_info(hdev,
++				"memdump done: pkts(%u), total(%u)\n",
++				btdata->qca_dump.ram_dump_seqno, btdata->qca_dump.ram_dump_size);
++
++		hci_devcd_complete(hdev);
++		goto out;
++	}
++	return ret;
++
++out:
++	if (btdata->qca_dump.ram_dump_size)
++		usb_enable_autosuspend(udev);
++	btdata->qca_dump.ram_dump_size = 0;
++	btdata->qca_dump.ram_dump_seqno = 0;
++	clear_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
++
++	if (ret < 0)
++		kfree_skb(skb);
++	return ret;
++}
++
++static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	if (handle_dump_pkt_qca(hdev, skb))
++		return 0;
++	return hci_recv_frame(hdev, skb);
++}
++
++static int btusb_recv_evt_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	if (handle_dump_pkt_qca(hdev, skb))
++		return 0;
++	return hci_recv_frame(hdev, skb);
++}
++
++
+ #define QCA_DFU_PACKET_LEN	4096
+ 
+ #define QCA_GET_TARGET_VERSION	0x09
+@@ -3628,6 +3842,9 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
+ 
++	btdata->qca_dump.fw_version = le32_to_cpu(ver.patch_version);
++	btdata->qca_dump.controller_id = le32_to_cpu(ver.rom_version);
++
+ 	if (!(status & QCA_SYSCFG_UPDATED)) {
+ 		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
+ 		if (err < 0)
+@@ -4117,6 +4334,11 @@ static int btusb_probe(struct usb_interface *intf,
  	}
-@@ -722,7 +724,7 @@ int manager_request_authorization(struct obex_transfer *transfer,
  
- 	dbus_pending_call_unref(call);
- 
--	if (!agent || !agent->new_name || agent->auth_reject)
-+	if (!agent || agent->auth_reject)
- 		return -EPERM;
- 
- 	*new_folder = agent->new_folder;
+ 	if (id->driver_info & BTUSB_QCA_WCN6855) {
++		data->qca_dump.id_vendor = id->idVendor;
++		data->qca_dump.id_product = id->idProduct;
++		data->recv_event = btusb_recv_evt_qca;
++		data->recv_acl = btusb_recv_acl_qca;
++		hci_devcd_register(hdev, btusb_coredump_qca, btusb_dump_hdr_qca, NULL);
+ 		data->setup_on_usb = btusb_setup_qca;
+ 		hdev->shutdown = btusb_shutdown_qca;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
 -- 
-2.34.1
+2.17.1
 
