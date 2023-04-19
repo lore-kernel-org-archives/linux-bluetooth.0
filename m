@@ -2,99 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E680C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 10:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CFAC77B75
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 11:49:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232321AbjDSKdy (ORCPT
+        id S232997AbjDSLtU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Apr 2023 06:33:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43914 "EHLO
+        Wed, 19 Apr 2023 07:49:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232336AbjDSKdb (ORCPT
+        with ESMTP id S232971AbjDSLtU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Apr 2023 06:33:31 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A640ABB89;
-        Wed, 19 Apr 2023 03:33:29 -0700 (PDT)
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4989861E4052B;
-        Wed, 19 Apr 2023 12:33:28 +0200 (CEST)
-Message-ID: <8453180c-a223-1576-4016-b9a350ee6698@molgen.mpg.de>
-Date:   Wed, 19 Apr 2023 12:33:28 +0200
+        Wed, 19 Apr 2023 07:49:20 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA2D2D40
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 04:49:18 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1a6715ee82fso35379015ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 04:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1681904958; x=1684496958;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jkVY3fC+U2BKgKHM+dKgM93m8Sp/PCfZi6J89LstS2Y=;
+        b=OH1HSr7EUMnDpxYFy3RM/p6PiDVY2aiV0Sktlf6/Vi5UV+Q12jgLKF+SF7sLt70OD9
+         wKctE0MXD6yYWAk0b3+SEwIe61edn25nyNswcfKMEnCZr8EdDjB4zpsnFpmH4uOxpcoq
+         iN/5uolWXQYGgpA5mrI6+DJomIICmimhzw41X5sD3jqSyRXriagI6fJgFK/pGKiuHjXX
+         IsBEn4oczxQy0GyGJPwqJHFwJaRsrj8WQGedbzDWBKwkSKR7rt9hMpEB5POjn526euUz
+         U8mYimzp2H29/xgEdKIApivZbKWQDHgOasPT+/4wEuLMK4gz5oQxYGn4TAATvPrUzxgn
+         nNxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1681904958; x=1684496958;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jkVY3fC+U2BKgKHM+dKgM93m8Sp/PCfZi6J89LstS2Y=;
+        b=GcUUrt7tbFGeeMwQgFH/ZxLT/X6ltHOaX442FWEJdnw5D/dbJogMp1j8ITqwpFo0sN
+         U11ERw0Us5cf6Hejxhj3y0f+ESl423OoHA1TbkELAEI7TLiFKZzxVNuKalVGEHk+cr3n
+         qp9aGSjAjFcrXOAznLMANoLQYwsez/zJj92/SAgzMWgK+hxYmzfAoJ+MciJ/Em6/AYYZ
+         SWgwZTSY5HDodNzFp5gdFB2rK/X3UYlGDQ1ExsUIaehvDts9bxTesCnqwLc5Jh3tvk2u
+         8ssnPv5E+eqYrH0N2//akkzp/BTrSWxzABhY+MeSzqiqFepWuLHp6xumUKB8HMz1wC/E
+         20BA==
+X-Gm-Message-State: AAQBX9dcpEOyH/Ye1UDtFnijIkjcUKCYvuAmeaRJWeros1gj7Cij5ZS4
+        Erk6BSPcdSG59N/tvXVjczwmbngotnQ=
+X-Google-Smtp-Source: AKy350a2EpS89lHkmeT7CpXS7twL64/LENJjv+4K+ohIAiaf/Di0+Qv45HhFF+SttGITCXPchwNPnw==
+X-Received: by 2002:a17:903:847:b0:1a6:91f0:f7fd with SMTP id ks7-20020a170903084700b001a691f0f7fdmr4631409plb.60.1681904957895;
+        Wed, 19 Apr 2023 04:49:17 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.161.24])
+        by smtp.gmail.com with ESMTPSA id u3-20020a17090282c300b001a1c721f7f8sm11277428plz.267.2023.04.19.04.49.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Apr 2023 04:49:17 -0700 (PDT)
+Message-ID: <643fd53d.170a0220.fb797.90ee@mx.google.com>
+Date:   Wed, 19 Apr 2023 04:49:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6448157400858123204=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v1] Bluetooth: btnxpuart: Enable flow control before
- checking boot signature
-Content-Language: en-US
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com
-References: <20230419090346.1671130-1-neeraj.sanjaykale@nxp.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230419090346.1671130-1-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, aarongt.shen@gmail.com
+Subject: RE: [BlueZ,v3] obexd: support to reply folder name to store file
+In-Reply-To: <20230419101954.56002-1-aarongt.shen@gmail.com>
+References: <20230419101954.56002-1-aarongt.shen@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Neeraj,
+--===============6448157400858123204==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=741292
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.36 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      29.01 seconds
+BluezMake                     PASS      1118.82 seconds
+MakeCheck                     PASS      12.56 seconds
+MakeDistcheck                 PASS      169.21 seconds
+CheckValgrind                 PASS      270.73 seconds
+CheckSmatch                   PASS      384.56 seconds
+bluezmakeextell               PASS      116.09 seconds
+IncrementalBuild              PASS      945.71 seconds
+ScanBuild                     PASS      1236.59 seconds
 
 
-Thank you for your patch.
 
-Am 19.04.23 um 11:03 schrieb Neeraj Sanjay Kale:
-> This enables flow control before checking for bootloader signature and
-> deciding whether FW download is needed or not. In case of V1 bootloader
-> chips w8987 and w8997, it is observed that if WLAN FW is downloaded first
-> and power save is enabled in wlan core, bootloader signatures are not
-> emitted by the BT core when the chip is put to sleep. This results in BT
-> FW download timeout error.
-
-If there is a log message, maybe paste it.
-
-> By enabling the flow control, the host enables
-> its RTS pin, and an interrupt in chip's UART peripheral causes the
-> bootloader to wakeup, enabling the bootloader signatures, which then helps
-
-Nit: The verb wake up is spelled with a space.
-
-> in downloading the bluetooth FW file.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
->   drivers/bluetooth/btnxpuart.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-> index 93f3afc0c0c8..3ee41a0d45e7 100644
-> --- a/drivers/bluetooth/btnxpuart.c
-> +++ b/drivers/bluetooth/btnxpuart.c
-> @@ -967,7 +967,7 @@ static int nxp_set_ind_reset(struct hci_dev *hdev, void *data)
->   static int nxp_check_boot_sign(struct btnxpuart_dev *nxpdev)
->   {
->   	serdev_device_set_baudrate(nxpdev->serdev, HCI_NXP_PRI_BAUDRATE);
-> -	serdev_device_set_flow_control(nxpdev->serdev, 0);
-> +	serdev_device_set_flow_control(nxpdev->serdev, 1);
-
-It was explicitly disabled before. Is it on by default?
-
-Also, is there now a redundant line later in the flow enabling flow 
-control, or was it never enabled?
-
-Other place in the source code seem to use `true` or `false` instead of 1/0.
-
->   	set_bit(BTNXPUART_CHECK_BOOT_SIGNATURE, &nxpdev->tx_state);
->   
->   	return wait_event_interruptible_timeout(nxpdev->check_boot_sign_wait_q,
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============6448157400858123204==--
