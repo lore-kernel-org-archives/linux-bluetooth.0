@@ -2,79 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4FFC77B78
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Apr 2023 21:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE56C6FD18
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Apr 2023 00:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232608AbjDSVVq (ORCPT
+        id S231334AbjDTAAW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Apr 2023 17:21:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42324 "EHLO
+        Wed, 19 Apr 2023 20:00:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232677AbjDSVVc (ORCPT
+        with ESMTP id S229493AbjDTAAV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Apr 2023 17:21:32 -0400
+        Wed, 19 Apr 2023 20:00:21 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F71B83E2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 14:21:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B6634ED0;
+        Wed, 19 Apr 2023 17:00:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A769A642BC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Apr 2023 21:20:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1A465C4339B;
-        Wed, 19 Apr 2023 21:20:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E019642C7;
+        Thu, 20 Apr 2023 00:00:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 72740C4339E;
+        Thu, 20 Apr 2023 00:00:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1681939220;
-        bh=PjW6f744HGGYtAgi0s5j1Q60gI4+c7D8WZVZJv40eQs=;
+        s=k20201202; t=1681948819;
+        bh=uXqMIJfAnfiy4UDaL0GaTyMhYYQTl1rYstTqmzzjlV4=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=K/fHSPi0vIM3b8xnnCnfyl7r7nf3FoyZJAuw6t6tyRMM9CekJ/tmp2uTBdVMopaNc
-         qWAKYBSVwn1d1GEeAc/oXPI39HMqNtYzW2CZ8Fiqh1eQxUhcpQrszxsdSnBrMKM6zg
-         rhCnIs4DtypJ1OXEpLgg9k2aWswU9tRcE8p61KEltXxfIrgLuW9B7aXX5UdHI2XZRB
-         8GyM+JCtgZCTZ/ipwIQWH6tvjYRQ4PQC+Iwc5vPORtBKo/Zs3ti2aIJI+2Rzuo+orN
-         yk1B1ciIqxu2XV8GX3eY1hL8rTHorDN8CKj4YMJEYORpzPCB5akdUssGssmekZbhAi
-         qu1F7Gq5bWq7Q==
+        b=kidaKng70AQ5zG4vIfkyl8XQ1I/1X7Gn1g/9nS3r4mRngQldlbvsrC4DcyG89KAkj
+         DV6YucgM8VS3wyKyLvuujlZ3G250GdfCGrvbzF8S6FRLWk0HeSNsVcbq5RuAOJ9wtv
+         Lv2XIhZ4zs73E2fVKaIEPmmLqqTNbUFq47H6D7nr5Ks6+x9nquJTyfV0x3pRxMqYCy
+         0yrGslHk8i9qZs6wkHkR3Y/vmVhD8Y2u0I5iTxnD7wbimhljm4mcCwolQum1rs4qJ7
+         k9hh5TgCAx0yHWavBTWw+sJTK0apCUub+j81GB1Mp/e+Ws/Prt60iCXVsa6TRhajLD
+         UUsJjVlqQQ9+A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08F31E50D61;
-        Wed, 19 Apr 2023 21:20:20 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51B75C395EA;
+        Thu, 20 Apr 2023 00:00:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/3] Add additional Broadcast tests/options
+Subject: Re: [PATCH] Bluetooth: btrtl: Add the support for RTL8851B
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168193922003.10989.12119855597619141325.git-patchwork-notify@kernel.org>
-Date:   Wed, 19 Apr 2023 21:20:20 +0000
-References: <20230419134354.61950-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20230419134354.61950-1-iulia.tanasescu@nxp.com>
-To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org
+Message-Id: <168194881933.25355.385268394450950543.git-patchwork-notify@kernel.org>
+Date:   Thu, 20 Apr 2023 00:00:19 +0000
+References: <20230418054354.5452-1-max.chou@realtek.com>
+In-Reply-To: <20230418054354.5452-1-max.chou@realtek.com>
+To:     Max Chou <max.chou@realtek.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        alex_lu@realsil.com.cn, hildawu@realtek.com, karenhsu@realtek.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 19 Apr 2023 16:43:51 +0300 you wrote:
-> This patch series enhances the Broadcast tests/APIs available
-> in isotest.c and iso-tester.c, by making use of the
-> encryption and the bcode parameters of the broadcast
-> QoS structure.
+On Tue, 18 Apr 2023 13:43:54 +0800 you wrote:
+> From: Max Chou <max.chou@realtek.com>
 > 
-> For isotest.c, two additional command line options have been
-> added - the user will be able to specify the BIG encryption
-> value and to provide a broadcast code for the encrypted BIG.
+> Add the support for RTL8851B BT controller on USB interface.
+> The necessary firmware will be submitted to linux-firmware project.
+> 
+> Note that the Bluetooth devices WITH the VID=0x0bda would be set the
+> feature quirk in btrtl_setup_realtek(). It's able to ignore the
+> feature flag set for the specific VID and PID in blacklist_table[] of
+> btusb.c. (check [1])
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/3] monitor/packet: Fix BIG encryption decoding
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=180d1c9ad028
-  - [BlueZ,2/3] tools/isotest: Add BIG encryption options
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ce1eb5dd0a03
-  - [BlueZ,3/3] tools/iso-tester: Add Broadcast tests for encrypted BIG
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b56479f4f5a3
+  - Bluetooth: btrtl: Add the support for RTL8851B
+    https://git.kernel.org/bluetooth/bluetooth-next/c/9b4f511443f7
 
 You are awesome, thank you!
 -- 
