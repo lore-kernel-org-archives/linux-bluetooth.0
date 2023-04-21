@@ -2,89 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D587C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 09:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557C9C7618E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 09:32:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjDUJAO (ORCPT
+        id S231935AbjDUJcV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Apr 2023 05:00:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47968 "EHLO
+        Fri, 21 Apr 2023 05:32:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231682AbjDUJAB (ORCPT
+        with ESMTP id S231921AbjDUJcU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Apr 2023 05:00:01 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D553C0F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 02:00:00 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 68A9D64DFB
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 09:00:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D0EA3C433D2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 08:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682067599;
-        bh=X84MRdiaWv3YsiEEU26soHaVPBDOyK2xCdVSeUbn5gY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=fRyd/bHPP26C1EV8a5PdvTAsB5r1TEpSIl8svoKj4VThesQXOrsSgZTBj8L28NUj3
-         yDGDe+EiHFGwHSMO6xC3z62GXoQg7b8Q3htJqdzUC+rBC73SYau4IAMRitVlVMZfPk
-         rwnP7WvQFtCcvPbyeO33ZTRmkbMKszmz5iemI2LFZJILJQHNfgwM5KLMTvzv7ZuX61
-         PvHswJ9U7TNci3iy/8v+1YRMGf5BHKMb2HbLp5MoPWvkuqum0vqfgLBOhv4NZDlhdA
-         rIim7F304stFTjRIUkr5k4+ZFYEBlO9oc88Ze17wpYZZCZeKTPy6xKj3ofvwENTTyy
-         o+8NNMWT6yyCQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id AF5ACC43143; Fri, 21 Apr 2023 08:59:59 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217256] Bluetooth disappears after suspend
-Date:   Fri, 21 Apr 2023 08:59:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: regressions@leemhuis.info
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217256-62941-SmWDsmXFsk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217256-62941@https.bugzilla.kernel.org/>
-References: <bug-217256-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 21 Apr 2023 05:32:20 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156E28A7C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 02:32:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682069539; x=1713605539;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ruwpf5f6xO9bBZ1ZrPnnpwCXJS0qq7t6MOx5Bf6Bl+E=;
+  b=Xb8Cde1gFAPiuGWgZ4i7YGo+L5yoV9Jfe2WL7aWnBf6cX9Zahw8AchRC
+   1sXymOPT/a5BFuGO9HCyE/+9Vb66QyplFmkTWwN0DttlwkyazT3/yvTOf
+   MavFh/vevQhIjbNxKa8ZZx6YL7K8kRCDD/iCoRkhfzO88LpLohjD3Ahfb
+   9AImqIYjGiN7LpfKSIp6S9r8KI9yabJJzLb9nx+CP/TD/X4fMY7iEmB+3
+   F/w5YZLgmTZ2mIlcaCMLyfv6t+uuij3ZDLNpJaRAFjQRjCzlUyUlF9NfM
+   xJhZiMohWrlgBFNuyZPCnNTnnFHPwwGIv12l0ivOU7xyKvB1baEI9f+Yt
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="348748733"
+X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
+   d="scan'208";a="348748733"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2023 02:32:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10686"; a="724756063"
+X-IronPort-AV: E=Sophos;i="5.99,214,1677571200"; 
+   d="scan'208";a="724756063"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 21 Apr 2023 02:32:15 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1ppn7h-000gUA-1s;
+        Fri, 21 Apr 2023 09:32:09 +0000
+Date:   Fri, 21 Apr 2023 17:31:39 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 8c70acc21f6812e269d9ca2b8bfee9bdf5e4aa3d
+Message-ID: <644257fb.GuOwQFf8ACxPFpsH%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217256
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 8c70acc21f6812e269d9ca2b8bfee9bdf5e4aa3d  Bluetooth: btusb: Add WCN6855 devcoredump support
 
---- Comment #4 from The Linux kernel's regression tracker (Thorsten Leemhui=
-s) (regressions@leemhuis.info) ---
-FWIW, that's up to the bluetooth developers, as it's not a regression. Not =
-sure
-if they have seen it here. I think they sometimes are active in bugzilla, b=
-ut
-I'm not sure (participating is optional here, that's why
-https://docs.kernel.org/admin-guide/reporting-issues.html discourages the u=
-se,
-unless developers stated they participate). Using the mailing list would be=
- the
-saver bet. But if you do, you want to mentioned it here; and you want to ch=
-eck
-if that problem still happens in mainline.
+elapsed time: 721m
 
---=20
-You may reply to this email to add a comment.
+configs tested: 43
+configs skipped: 3
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+csky                                defconfig   gcc  
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+ia64                             allmodconfig   gcc  
+ia64                                defconfig   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                                defconfig   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+nios2                               defconfig   gcc  
+parisc                              defconfig   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+sh                               allmodconfig   gcc  
+sparc                               defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64                               rhel-8.3   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
