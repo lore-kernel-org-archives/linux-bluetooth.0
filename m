@@ -2,184 +2,153 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E93C77B7F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 14:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E333BC7618E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 14:58:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232587AbjDUOMA (ORCPT
+        id S233071AbjDUO6A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Apr 2023 10:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47984 "EHLO
+        Fri, 21 Apr 2023 10:58:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232555AbjDUOLv (ORCPT
+        with ESMTP id S232721AbjDUO5z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Apr 2023 10:11:51 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13F70125BA
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:11:46 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-953343581a4so234143166b.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:11:45 -0700 (PDT)
+        Fri, 21 Apr 2023 10:57:55 -0400
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F73B9EE0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:57:50 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-74d0dbd7c58so115349085a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:57:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1682086304; x=1684678304;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m46VLD2JzGlramKy/E9COqcajcCIODXlIHm11HTuzOE=;
-        b=zkCuK8CQwZrSK4X+CfJq5XsJyphe5C+bUQ0PXube+pfE42fImAdmk4sATOhnWhNqdA
-         f9dSC/KiADF8A/jn0l1ZrE1HWBxYtq/nvBWyJ+8+vhwlJOSIdkbYN/ekOMHwpsz2cG4e
-         lk72ujRuCwnV2bNcLwtXE02SR0hHQGRwkZIUqJAQBvkTvOeVD1EsH66dhGH1J+9ylKL6
-         pjmM4LjT7piQvr2hmuq6jPtpILy2WB2fq5BvhD5boYSxMJ3B9s30v4pyh9M/4VaO2mwe
-         bZMDwucBGAvgNj3qe+4l4P8MPclvP7pssxJKb5LtbRv8ZKt7qjAEt+ViLBL1MPlBkwJT
-         suDg==
+        d=gmail.com; s=20221208; t=1682089069; x=1684681069;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zxzfXiWcWm8SZaFpXIvLQ6xMxQ1FgJAxXWxFhYaobuU=;
+        b=cqwVgrKI96lW92UPGj+x7USU3BVvWoe8yvQXcTZnNywcp1C9ZnXFotcuTDVagHT52t
+         Jk6kggxpMFRnhu3ZkIwxYRa8emkYBpTi2q6p0/0XOvIlk8gjPFOrQzC1nyJPGfNF0Vwq
+         dKlS739k2h5pbK1nRhcgtaKTeBEurGLa1a/JsqbNlfqO/rPJ+k9WTUlTMlhJScZc6pOH
+         EJsIRnXOInogbmxjK0mtqouIqVskiOp5Rc1H6TY7QuwWo4NBY1+38S0twTW5nb8eTq0O
+         M0INKRQuBKbDEppw3YJpNZiky9rDFb4ad9m7IO4G5G+Dh7C7Eshw3IoAruxsq2mmRUQA
+         BnPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682086304; x=1684678304;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m46VLD2JzGlramKy/E9COqcajcCIODXlIHm11HTuzOE=;
-        b=NhymxzkQsMdWjDh/BWG1kBXjBf9nEL57lmI0bjTYkAZCJXOqkNl0Zc1E6ivHR9Wubv
-         zj/kV5vZhaVvvdkkBC7dkH5NyM6zW147ZiOgbIbus2wS6d4nbp79Mpku37KH9UwShTI2
-         sbwP1XhgkSp78uhZIIY98z6qNcuzc9iP1+HyJ1NnTpa8MYOKEvfWdo8MfREq/CEe+4Vr
-         kYkrNeZthQItOhvgVdEMuXTB7iRJkcIhqTBziYiOozwc1OF8aHsilB63pUDJFwvf8UMI
-         YuMBUg7eFEPGnFXuldZPPF+Tyf5FVoXsEE1gCxNeSl1x8xMB/035y/GcXqvcm8gkI79x
-         KdTg==
-X-Gm-Message-State: AAQBX9fQMRxgUZ6QEuWQtIWgdwZiyiWFe7K80HL12uvOmWW67yRd8bUh
-        10/t+heQ7VDQZOjGeogm9sHBDA==
-X-Google-Smtp-Source: AKy350ZfxB3umaKd0NpZrYC31H42nosmXh8NeMizQGxgz4awVYGG2fe6OEvQDPjdhBhb44RnANeVLQ==
-X-Received: by 2002:a17:907:7888:b0:94e:6f2d:d1c9 with SMTP id ku8-20020a170907788800b0094e6f2dd1c9mr2654828ejc.68.1682086304455;
-        Fri, 21 Apr 2023 07:11:44 -0700 (PDT)
-Received: from [172.16.220.31] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id mb20-20020a170906eb1400b0094f432f2429sm2104299ejb.109.2023.04.21.07.11.43
+        d=1e100.net; s=20221208; t=1682089069; x=1684681069;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zxzfXiWcWm8SZaFpXIvLQ6xMxQ1FgJAxXWxFhYaobuU=;
+        b=DTCTkkynkQxqSOPBzsdJPijyjP8KbDNDDJv0ikVw4KRHuXQ8RaS3Pn900Sqvph7c6Z
+         p+rbnmPOU6WgFbZWCkUNca989jS5SIuy/fIjAaC7mycEuxei6DKR69WzcwEaH/2utVqQ
+         Ylz97HbzlOYqbe6I1Gjy/QUh61fRx+pECMC8CClaLbaGE1N9N1eGBA7Fa6oTuPNqC+0n
+         WJzvW9xXsBZDvNpPaYo1vl02WSID+HyGfKQDoZIIv5vR8qJJnz/dIHFYIlUg4dMwuTr8
+         9F1OIKMXsnmLg6CAzQzqMAdomeszABiIZEfGo/sBXKVdlN2hgpS0NDBGjXYLL1FZocZS
+         dWag==
+X-Gm-Message-State: AAQBX9c6I37bhgXEV7xcyvpu22O+fjkQtTQM/tiDqX0hQVhL9l0yAfYe
+        2uNxIK530f1bP4+shKF9HoKCHtCIH0nQPw==
+X-Google-Smtp-Source: AKy350ZY13vjoguE57TCXgycKGYTW14iMblYPXWM2Qvuj8/dsAak912ksHYbMxPTSi0Q4FMLbVzhhA==
+X-Received: by 2002:a05:6214:20e2:b0:5f1:6892:7437 with SMTP id 2-20020a05621420e200b005f168927437mr6020303qvk.26.1682089069300;
+        Fri, 21 Apr 2023 07:57:49 -0700 (PDT)
+Received: from [172.17.0.2] ([40.75.96.212])
+        by smtp.gmail.com with ESMTPSA id d8-20020a0cfe88000000b005ff569bca72sm924167qvs.93.2023.04.21.07.57.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Apr 2023 07:11:44 -0700 (PDT)
-From:   Luca Weiss <luca.weiss@fairphone.com>
-Date:   Fri, 21 Apr 2023 16:11:40 +0200
-Subject: [PATCH RFC 3/4] arm64: dts: qcom: sm6350: add uart1 node
+        Fri, 21 Apr 2023 07:57:49 -0700 (PDT)
+Message-ID: <6442a46d.0c0a0220.b11b9.4aee@mx.google.com>
+Date:   Fri, 21 Apr 2023 07:57:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6423509529967983679=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230421-fp4-bluetooth-v1-3-0430e3a7e0a2@fairphone.com>
-References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
-In-Reply-To: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
-To:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        Luca Weiss <luca.weiss@fairphone.com>
-X-Mailer: b4 0.12.2
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luca.weiss@fairphone.com
+Subject: RE: Add WCN3988 Bluetooth support for Fairphone 4
+In-Reply-To: <20230421-fp4-bluetooth-v1-1-0430e3a7e0a2@fairphone.com>
+References: <20230421-fp4-bluetooth-v1-1-0430e3a7e0a2@fairphone.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add the node describing uart1 incl. opp table and pinctrl.
+--===============6423509529967983679==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
----
- arch/arm64/boot/dts/qcom/sm6350.dtsi | 63 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 63 insertions(+)
+This is automated email and please do not reply to this email!
 
-diff --git a/arch/arm64/boot/dts/qcom/sm6350.dtsi b/arch/arm64/boot/dts/qcom/sm6350.dtsi
-index 18c4616848ce..16c5e9a6c98a 100644
---- a/arch/arm64/boot/dts/qcom/sm6350.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm6350.dtsi
-@@ -378,6 +378,25 @@ opp-2073600000 {
- 		};
- 	};
- 
-+	qup_opp_table: opp-table-qup {
-+		compatible = "operating-points-v2";
-+
-+		opp-75000000 {
-+			opp-hz = /bits/ 64 <75000000>;
-+			required-opps = <&rpmhpd_opp_low_svs>;
-+		};
-+
-+		opp-100000000 {
-+			opp-hz = /bits/ 64 <100000000>;
-+			required-opps = <&rpmhpd_opp_svs>;
-+		};
-+
-+		opp-128000000 {
-+			opp-hz = /bits/ 64 <128000000>;
-+			required-opps = <&rpmhpd_opp_nom>;
-+		};
-+	};
-+
- 	pmu {
- 		compatible = "arm,armv8-pmuv3";
- 		interrupts = <GIC_PPI 5 IRQ_TYPE_LEVEL_LOW>;
-@@ -741,6 +760,22 @@ i2c0: i2c@880000 {
- 				status = "disabled";
- 			};
- 
-+			uart1: serial@884000 {
-+				compatible = "qcom,geni-uart";
-+				reg = <0 0x00884000 0 0x4000>;
-+				clock-names = "se";
-+				clocks = <&gcc GCC_QUPV3_WRAP0_S1_CLK>;
-+				pinctrl-names = "default";
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=742153
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      3.44 seconds
+GitLint                       PASS      1.39 seconds
+SubjectPrefix                 FAIL      0.72 seconds
+BuildKernel                   PASS      31.98 seconds
+CheckAllWarning               PASS      34.99 seconds
+CheckSparse                   WARNING   40.10 seconds
+CheckSmatch                   PASS      108.76 seconds
+BuildKernel32                 PASS      30.86 seconds
+TestRunnerSetup               PASS      437.84 seconds
+TestRunner_l2cap-tester       PASS      16.93 seconds
+TestRunner_iso-tester         PASS      20.79 seconds
+TestRunner_bnep-tester        PASS      5.51 seconds
+TestRunner_mgmt-tester        PASS      114.50 seconds
+TestRunner_rfcomm-tester      PASS      8.93 seconds
+TestRunner_sco-tester         PASS      8.29 seconds
+TestRunner_ioctl-tester       PASS      9.56 seconds
+TestRunner_mesh-tester        PASS      7.03 seconds
+TestRunner_smp-tester         PASS      8.02 seconds
+TestRunner_userchan-tester    PASS      5.85 seconds
+IncrementalBuild              PASS      42.88 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[RFC,3/4] arm64: dts: qcom: sm6350: add uart1 node
+WARNING: line length of 113 exceeds 100 columns
+#147: FILE: arch/arm64/boot/dts/qcom/sm6350.dtsi:769:
 +				pinctrl-0 = <&qup_uart1_cts>, <&qup_uart1_rts>, <&qup_uart1_tx>, <&qup_uart1_rx>;
-+				interrupts = <GIC_SPI 602 IRQ_TYPE_LEVEL_HIGH>;
-+				power-domains = <&rpmhpd SM6350_CX>;
-+				operating-points-v2 = <&qup_opp_table>;
+
+WARNING: line length of 109 exceeds 100 columns
+#151: FILE: arch/arm64/boot/dts/qcom/sm6350.dtsi:773:
 +				interconnects = <&clk_virt MASTER_QUP_CORE_0 0 &clk_virt SLAVE_QUP_CORE_0 0>,
+
+WARNING: line length of 103 exceeds 100 columns
+#152: FILE: arch/arm64/boot/dts/qcom/sm6350.dtsi:774:
 +						<&aggre1_noc MASTER_QUP_0 0 &clk_virt SLAVE_EBI_CH0 0>;
-+				interconnect-names = "qup-core", "qup-config";
-+				status = "disabled";
-+			};
-+
- 			i2c2: i2c@888000 {
- 				compatible = "qcom,geni-i2c";
- 				reg = <0 0x00888000 0 0x4000>;
-@@ -1726,6 +1761,34 @@ qup_i2c10_default: qup-i2c10-default-state {
- 				drive-strength = <2>;
- 				bias-pull-up;
- 			};
-+
-+			qup_uart1_cts: qup-uart1-cts-default-state {
-+				pins = "gpio61";
-+				function = "qup01";
-+				drive-strength = <2>;
-+				bias-disable;
-+			};
-+
-+			qup_uart1_rts: qup-uart1-rts-default-state {
-+				pins = "gpio62";
-+				function = "qup01";
-+				drive-strength = <2>;
-+				bias-pull-down;
-+			};
-+
-+			qup_uart1_tx: qup-uart1-tx-default-state {
-+				pins = "gpio63";
-+				function = "qup01";
-+				drive-strength = <2>;
-+				bias-pull-up;
-+			};
-+
-+			qup_uart1_rx: qup-uart1-rx-default-state {
-+				pins = "gpio64";
-+				function = "qup01";
-+				drive-strength = <2>;
-+				bias-disable;
-+			};
- 		};
- 
- 		apps_smmu: iommu@15000000 {
 
--- 
-2.40.0
+total: 0 errors, 3 warnings, 81 lines checked
 
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13220105.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+drivers/bluetooth/btqca.c:649:24: warning: restricted __le32 degrades to integer
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6423509529967983679==--
