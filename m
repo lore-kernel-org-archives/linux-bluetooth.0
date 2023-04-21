@@ -2,62 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EA2C77B7D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 14:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE32C7EE20
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 14:11:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232592AbjDUOLy (ORCPT
+        id S232606AbjDUOLz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Apr 2023 10:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47984 "EHLO
+        Fri, 21 Apr 2023 10:11:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232538AbjDUOLu (ORCPT
+        with ESMTP id S232570AbjDUOLw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Apr 2023 10:11:50 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4603E125A8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:11:45 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-5051abd03a7so2477022a12.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:11:45 -0700 (PDT)
+        Fri, 21 Apr 2023 10:11:52 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 104E67AA5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:11:47 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-506bdf29712so12634879a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 07:11:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1682086304; x=1684678304;
+        d=fairphone.com; s=fair; t=1682086305; x=1684678305;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L+ingdxVlBAhx25mIHmohRsrlSprqOSnQvcGnUxqFXU=;
-        b=K7QrebmCX4fOWCWQ+IN56eGYHw2eCyT52m+HN56/5dQf+TwupwcfBoj6ORZLog0nno
-         VlpAEcKOcF1iv0a8wW6mhOupvnSXzv4+/hLin/GL6MbhdD+9KfeIWrDD2zabw6Ewl4DC
-         lqpNJ3IWgWaxhH/QMqzKeB2+UsPhT00dLiBprlLlJqZelnD90pTg7yj7ibmB4ILLUkak
-         kzEFxMh6i8+xFZc9U/mQoACKz26bNYF/+0afIcGmc6ZNBigVYyM7/oxx79+uo2DfZl4z
-         VE1eMeY7FK57OQ7e6FDH2BMCP1+bUE7OsY07DfJeOPUFiqe9FlGJd+sbuN2/bQX8caW4
-         QasQ==
+        bh=5PDdlh4u/xfgKewafucHFDvnZU5PveoA4hr4MMyV4jk=;
+        b=VKgUTyESHEzEfyEpyia7JO5LA5ceaG6BIWK/+IcQyWsjEzQK2Z00VNu7eATdp1i1p8
+         hE12aSAUGs1tSXIPEvUOsBQ/40WfNJhTw24BlcGWAAJsctNYN/GxAmXCejz40UJsRaqV
+         WSOGYmhpdgyrHd9dBN78Cu336z+XJHJZlP/Cnw7yk3vozClDHUMDEgUT+dJ0TERGJqUK
+         OtPDfFtQv/5jhi1LakBn2lfrB9OChaoSzsKrosp+qo/f8eu1dE9Ay8fp545y+5OttAP9
+         xT+MR41xOhjOSoz5O1k13DNUM0eNAY1LFYkxdY4I1Z10xq+/l1f6304MbBx4kuL5gcrR
+         z/sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682086304; x=1684678304;
+        d=1e100.net; s=20221208; t=1682086305; x=1684678305;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=L+ingdxVlBAhx25mIHmohRsrlSprqOSnQvcGnUxqFXU=;
-        b=dHhoiXnq55bvDy0d3o5Mf8BeUA7UcdkmQgOdLKFmpVrfiaZeIzt/3NOu5XCITz281e
-         s+5BDPObxxwmN8AI1bSy1NbJ4gXbJqxvxqGz1d7BWozrVW6L9ukKZ3kpuSrD+DVVFk0q
-         NT7ruKCNIpBiZ2l8qNjEEwfIS7Wx3ImNbVXjAktcOmNBA6c+DQqFWBpe70IDiQP4AlUi
-         SJty1r+hP/iLFi0PHPiu9N5s8GDVKGZNiP3b1XhWHAxwckxvMkSOktitreCWueyLSbqt
-         SgZ8lIpz5j1R3U28xCK9UtRaW7wiaTjDyM1nKIg7pR3nBN/xrD61CQgz3y24hxm0lXTx
-         hKUw==
-X-Gm-Message-State: AAQBX9e/ZhygTO76HxOcs9+tQwvSb9jHA1bjcZ/XdzknwCV1pnEHId2O
-        XjR0mO7IUoKN9vT1E5dcL5kfgg==
-X-Google-Smtp-Source: AKy350ZMhAjwG0/5PIPQdKZP1jumJQjpX2ZmkNfhIe4mMn9XlNsi9Im7Q6HeruABSEm49XFegBm2NA==
-X-Received: by 2002:a17:906:7e45:b0:94f:5079:ade2 with SMTP id z5-20020a1709067e4500b0094f5079ade2mr2473933ejr.62.1682086303670;
-        Fri, 21 Apr 2023 07:11:43 -0700 (PDT)
+        bh=5PDdlh4u/xfgKewafucHFDvnZU5PveoA4hr4MMyV4jk=;
+        b=RXSS6xjUzzsnJq+BmkwAiY5t9LgxJLBeAb9sG77y2YqP3tczK1yLCzccKguON2zDwv
+         hx+Nbm2hJZFzfjy+Glrnz6bU75afigluJkYT+arjnPdevEXGDJ93wVmz5sjQHh/5jsgJ
+         lKIrlCSvE+O/zqRtbXe/ZYEbcjGTZaEB0Fe8X1YcSUUvBtmw5NVMfn8UH1zbim/w2oTO
+         JNnCztu68rryEwHOQt7O6gi4aszUZr+9u+pUdCPDTUQHWWB+AgiuDwuAEP7G7aII8wbV
+         AiwDxui25VvqO8eT8DuI9Sz5yAT9Qy5m3WxCp2Cp+WiYPSagxHUNHkSLBoSvBbI06UAQ
+         eq8g==
+X-Gm-Message-State: AAQBX9cV/k3VoChh1T9aE09EzdEIZCCFjf7KKCD16GhINCJJR5gSiKa0
+        Tk1Vz6HLD5BuZI7Uv3IZVGmqXA==
+X-Google-Smtp-Source: AKy350a6WSSMU8x/JexPNPLK6hMUDOgynyh3AXwaCi2WmvSTFJLri5mu4oCGicSJQakg73ri0S9OZg==
+X-Received: by 2002:a17:906:d14f:b0:94e:83d3:1b51 with SMTP id br15-20020a170906d14f00b0094e83d31b51mr2542062ejb.23.1682086305561;
+        Fri, 21 Apr 2023 07:11:45 -0700 (PDT)
 Received: from [172.16.220.31] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id mb20-20020a170906eb1400b0094f432f2429sm2104299ejb.109.2023.04.21.07.11.42
+        by smtp.gmail.com with ESMTPSA id mb20-20020a170906eb1400b0094f432f2429sm2104299ejb.109.2023.04.21.07.11.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Apr 2023 07:11:43 -0700 (PDT)
+        Fri, 21 Apr 2023 07:11:44 -0700 (PDT)
 From:   Luca Weiss <luca.weiss@fairphone.com>
-Date:   Fri, 21 Apr 2023 16:11:39 +0200
-Subject: [PATCH RFC 2/4] Bluetooth: btqca: Add WCN3988 support
+Date:   Fri, 21 Apr 2023 16:11:41 +0200
+Subject: [PATCH RFC 4/4] arm64: dts: qcom: sm7225-fairphone-fp4: Add
+ Bluetooth
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230421-fp4-bluetooth-v1-2-0430e3a7e0a2@fairphone.com>
+Message-Id: <20230421-fp4-bluetooth-v1-4-0430e3a7e0a2@fairphone.com>
 References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
 In-Reply-To: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
 To:     "David S. Miller" <davem@davemloft.net>,
@@ -84,118 +85,49 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for the Bluetooth chip codenamed APACHE which is part of
-WCN3988.
-
-The firmware for this chip has a slightly different naming scheme
-compared to most others. For ROM Version 0x0200 we need to use
-apbtfw10.tlv + apnv10.bin and for ROM version 0x201 apbtfw11.tlv +
-apnv11.bin
+The device has a WCN3988 chip for WiFi and Bluetooth. Configure the
+Bluetooth node and enable the UART it is connected to.
 
 Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 ---
- drivers/bluetooth/btqca.c   | 13 +++++++++++--
- drivers/bluetooth/btqca.h   | 12 ++++++++++--
- drivers/bluetooth/hci_qca.c | 12 ++++++++++++
- 3 files changed, 33 insertions(+), 4 deletions(-)
+ arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index fd0941fe8608..3ee1ef88a640 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -594,14 +594,20 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	/* Firmware files to download are based on ROM version.
- 	 * ROM version is derived from last two bytes of soc_ver.
- 	 */
--	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-+	if (soc_type == QCA_WCN3988)
-+		rom_ver = ((soc_ver & 0x00000f00) >> 0x05) | (soc_ver & 0x0000000f);
-+	else
-+		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+diff --git a/arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts b/arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts
+index 7ae6aba5d2ec..35e2889c5439 100644
+--- a/arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts
++++ b/arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts
+@@ -31,6 +31,7 @@ / {
  
- 	if (soc_type == QCA_WCN6750)
- 		qca_send_patch_config_cmd(hdev);
+ 	aliases {
+ 		serial0 = &uart9;
++		serial1 = &uart1;
+ 	};
  
- 	/* Download rampatch file */
- 	config.type = TLV_TYPE_PATCH;
--	if (qca_is_wcn399x(soc_type)) {
-+	if (soc_type == QCA_WCN3988) {
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/apbtfw%02x.tlv", rom_ver);
-+	} else if (qca_is_wcn399x(soc_type)) {
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/crbtfw%02x.tlv", rom_ver);
- 	} else if (soc_type == QCA_QCA6390) {
-@@ -636,6 +642,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	if (firmware_name)
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/%s", firmware_name);
-+	else if (soc_type == QCA_WCN3988)
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/apnv%02x.bin", rom_ver);
- 	else if (qca_is_wcn399x(soc_type)) {
- 		if (ver.soc_id == QCA_WCN3991_SOC_ID) {
- 			snprintf(config.fwname, sizeof(config.fwname),
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index b884095bcd9d..fc6cf314eb0e 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -142,6 +142,7 @@ enum qca_btsoc_type {
- 	QCA_INVALID = -1,
- 	QCA_AR3002,
- 	QCA_ROME,
-+	QCA_WCN3988,
- 	QCA_WCN3990,
- 	QCA_WCN3998,
- 	QCA_WCN3991,
-@@ -162,8 +163,15 @@ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
- static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
- {
--	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
--	       soc_type == QCA_WCN3998;
-+	switch (soc_type) {
-+	case QCA_WCN3988:
-+	case QCA_WCN3990:
-+	case QCA_WCN3991:
-+	case QCA_WCN3998:
-+		return true;
-+	default:
-+		return false;
-+	}
- }
- static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
- {
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 1597797ff169..96b837410a6b 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1835,6 +1835,17 @@ static const struct hci_uart_proto qca_proto = {
- 	.dequeue	= qca_dequeue,
+ 	chosen {
+@@ -563,6 +564,22 @@ &tlmm {
+ 	gpio-reserved-ranges = <13 4>, <56 2>;
  };
  
-+static const struct qca_device_data qca_soc_data_wcn3988 __maybe_unused = {
-+	.soc_type = QCA_WCN3988,
-+	.vregs = (struct qca_vreg []) {
-+		{ "vddio", 15000  },
-+		{ "vddxo", 80000  },
-+		{ "vddrf", 300000 },
-+		{ "vddch0", 450000 },
-+	},
-+	.num_vregs = 4,
++&uart1 {
++	status = "okay";
++
++	bluetooth {
++		compatible = "qcom,wcn3988-bt";
++
++		vddio-supply = <&vreg_l11a>;
++		vddxo-supply = <&vreg_l7a>;
++		vddrf-supply = <&vreg_l2e>;
++		vddch0-supply = <&vreg_l10e>;
++		swctrl-gpios = <&tlmm 69 GPIO_ACTIVE_HIGH>;
++
++		max-speed = <3200000>;
++	};
 +};
 +
- static const struct qca_device_data qca_soc_data_wcn3990 __maybe_unused = {
- 	.soc_type = QCA_WCN3990,
- 	.vregs = (struct qca_vreg []) {
-@@ -2359,6 +2370,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,qca6174-bt" },
- 	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
- 	{ .compatible = "qcom,qca9377-bt" },
-+	{ .compatible = "qcom,wcn3988-bt", .data = &qca_soc_data_wcn3988},
- 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
- 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
- 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+ &uart9 {
+ 	status = "okay";
+ };
 
 -- 
 2.40.0
