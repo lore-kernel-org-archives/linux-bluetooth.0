@@ -2,142 +2,445 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AE0C6FD18
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Apr 2023 12:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BE9C6FD18
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Apr 2023 12:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229757AbjDVMDk (ORCPT
+        id S229674AbjDVMLW convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 22 Apr 2023 08:03:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45850 "EHLO
+        Sat, 22 Apr 2023 08:11:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229632AbjDVMDj (ORCPT
+        with ESMTP id S229632AbjDVMLV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 22 Apr 2023 08:03:39 -0400
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B53BCE69
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 05:03:37 -0700 (PDT)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4edb9039a4cso2666539e87.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 05:03:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1682165016; x=1684757016;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GTXIba6kgfgnk6XMMPm6IqSpaTy13D9nbXjftZoHK38=;
-        b=GPuC2HOTbLafP1qatCOmNgcyDBTReKAPNo5aHGQ4ZHZB2PpLAM7ftc1KrLDydpuJa7
-         8LP0KnbHQYk5IdlDEyiGzJS+B9rz6VOWi1CxSu4hb4jkJqKChcWRHMGsPJKNEhRSD2wF
-         m2hUQCCKsdDFPDvUMSrYnwcyYXV3wf+hBt8xwtb5aLvC9PbotDn01SViambNGlAW0uIj
-         UOK4xbMlwqQSjRycWGDZ6nU4UqgqbR0aSikN3/6eiBeuxo13ELHpXbVakoYTWmCondvm
-         AoVz6iJUsbiqiXWjgjhLJpSm+aqZmvhxYjjhgKa5/lSIDqMiJLByibyI1qpl9Gmw7ZSx
-         g7jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682165016; x=1684757016;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GTXIba6kgfgnk6XMMPm6IqSpaTy13D9nbXjftZoHK38=;
-        b=mECoHD05AOBLTWGqcMwf82apb6MxoM/G/Z3iQsIzMo9l8ht/w/o91lgBs4Gs9WkTvk
-         2U3WyER9mhFPngZ8ngLpFvA39U7ofHbYacZ1ukGR436SxNJzPm76H53YKQLaiDAD6nlf
-         5rOykOHB4WQeOOo3w4keLmd3UpB/ZCPVV7a9BQVLSwjPNDYuS1oXoujw6X0zWMPjaKTw
-         DPePUF1yn1KRoUF810bgYJe0IRCSZLSRd0ZHYhOX2gD5CaPdLO2l/vEEYr4n8FvXWizP
-         sKvtDjdlHRoWlCk0+SxUhrAE1Ae8EGs9EdtLiImOnEUiWLPMxmJ6bQ6N4zsYjLI+AysB
-         eGYA==
-X-Gm-Message-State: AAQBX9esXB++NNk5JFqOz9V/zP2RwubO+IZyed+umuCyEu30Z0wn6nlB
-        k3tyq2g/a0I3EBtXJqqBtK0YHw==
-X-Google-Smtp-Source: AKy350ZSfGZXg/lW+W7YdjTftfPkbAG/5Xs05BCEMR1S/VVCsIkWnzZK2Qg0eD7kyb+fknQVOxyH/Q==
-X-Received: by 2002:ac2:5a46:0:b0:4e8:47cd:b4ba with SMTP id r6-20020ac25a46000000b004e847cdb4bamr2350700lfn.13.1682165015987;
-        Sat, 22 Apr 2023 05:03:35 -0700 (PDT)
-Received: from [192.168.1.101] (abyj144.neoplus.adsl.tpnet.pl. [83.9.29.144])
-        by smtp.gmail.com with ESMTPSA id b10-20020a056512024a00b004edc3bd7fa1sm872153lfo.201.2023.04.22.05.03.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 22 Apr 2023 05:03:35 -0700 (PDT)
-Message-ID: <0f2af683-07f9-7fc7-a043-ee55e41d65c3@linaro.org>
-Date:   Sat, 22 Apr 2023 14:03:33 +0200
+        Sat, 22 Apr 2023 08:11:21 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 630DC1FC8
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 05:11:19 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id DC757240166
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 14:11:17 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4Q3Vc51z5qz6twk;
+        Sat, 22 Apr 2023 14:11:17 +0200 (CEST)
+Message-ID: <1bc7d31d989fbdfb0d14897b6ca14a31310546f5.camel@iki.fi>
+Subject: Re: [PATCH BlueZ] tools/test-runner: add option to start Pipewire
+ inside the VM
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Sat, 22 Apr 2023 12:11:16 +0000
+In-Reply-To: <CABBYNZL9C1cF7vTLobVhZ3_HxhDv7zsobB5NcWonPOwz_Rz+jw@mail.gmail.com>
+References: <48701651ef435518ac8432d80dfdc2dfe80f3703.1681569400.git.pav@iki.fi>
+         <CABBYNZL9C1cF7vTLobVhZ3_HxhDv7zsobB5NcWonPOwz_Rz+jw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH RFC 0/4] Add WCN3988 Bluetooth support for Fairphone 4
-Content-Language: en-US
-To:     Luca Weiss <luca.weiss@fairphone.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>
-Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
-From:   Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Luiz,
 
+to, 2023-04-20 kello 12:49 -0700, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+> 
+> On Sat, Apr 15, 2023 at 7:44 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Add option for launching Pipewire inside the VM to serve Bluetooth
+> > endpoints, which can be used in tests.
+> > 
+> > If daemon and emulator were also started, wait for the endpoints to
+> > appear.
+> > ---
+> > 
+> > Notes:
+> >     An example how you can launch Pipewire to serve Bluetooth endpoints.
+> > 
+> >  tools/test-runner.c | 247 +++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 242 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/tools/test-runner.c b/tools/test-runner.c
+> > index 6660ea8de..d416f80ed 100644
+> > --- a/tools/test-runner.c
+> > +++ b/tools/test-runner.c
+> > @@ -51,6 +51,7 @@ static bool start_dbus_session;
+> >  static bool start_daemon = false;
+> >  static bool start_emulator = false;
+> >  static bool start_monitor = false;
+> > +static bool start_pipewire;
+> >  static int num_devs = 0;
+> >  static const char *qemu_binary = NULL;
+> >  static const char *kernel_image = NULL;
+> > @@ -252,13 +253,13 @@ static void start_qemu(void)
+> >                                 "acpi=off pci=noacpi noapic quiet ro init=%s "
+> >                                 "TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
+> >                                 "TESTDBUSSESSION=%u XDG_RUNTIME_DIR=/run/user/0 "
+> > -                               "TESTAUDIO=%u "
+> > +                               "TESTAUDIO=%u TESTPIPEWIRE=%u "
+> 
+> I'd just reuse TESTAUDIO instead of introducing yet another
+> environment variable, that should probably check if it shall run
+> pulseaudio or pipewire depending on what is available in the system.
 
-On 21.04.2023 16:11, Luca Weiss wrote:
-> Just to start with the important part why this is an RFC:
-> 
-> While Bluetooth chip init works totally fine and bluez seems to be
-> fairly happy with it, there's a (major) problem with scanning, as shown
-> with this bluetoothctl snippet and dmesg snippet:
-> 
->   [bluetooth]# scan on
->   Failed to start discovery: org.bluez.Error.InProgress
-> 
->   [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
-> 
-> This opcode should be the following:
-> 
->   include/net/bluetooth/hci.h:#define HCI_OP_LE_SET_SCAN_PARAM    0x200b
-Not a bluetooth expert or anything, but does that thing support
-bluetooth LE?
+TESTAUDIO also adds a virtual soundcard to the VM. Is this needed for
+something, if tests and the audio daemon runs inside the VM they should
+not need such access to soundcards outside the VM?
 
-Konrad
+The tester.config doesn't enable ALSA, so it won't do anything in that
+configuration. The VM also fails to boot for me with -A enabled for
+that kernel.
+
+IIUC, this and running udevd are not currently used for something, and
+if so I'll remove those.
+
 > 
-> Unfortunately trying various existing code branches in the Bluetooth
-> driver doesn't show any sign of making this work and I don't really know
-> where to look to debug this further.
+> >                                 "TESTMONITOR=%u TESTEMULATOR=%u TESTDEVS=%d "
+> >                                 "TESTAUTO=%u TESTARGS=\'%s\'",
+> >                                 initcmd, cwd, start_dbus, start_daemon,
+> >                                 start_dbus_session, audio_support,
+> > -                               start_monitor, start_emulator, num_devs,
+> > -                               run_auto, testargs);
+> > +                               start_pipewire, start_monitor, start_emulator,
+> > +                               num_devs, run_auto, testargs);
+> > 
+> >         argv = alloca(sizeof(qemu_argv) +
+> >                                 (audio_support ? 4 : 0) +
+> > @@ -606,6 +607,207 @@ static pid_t start_bluetooth_daemon(const char *home)
+> >         return pid;
+> >  }
+> > 
+> > +static char *get_command_stdout(char *command, size_t *size)
+> > +{
+> > +       char *buf = NULL;
+> > +       ssize_t nread = 0;
+> > +       size_t allocated = 0;
+> > +       int ret;
+> > +       FILE *f;
+> > +
+> > +       f = popen(command, "re");
+> > +       if (!f)
+> > +               return NULL;
+> > +
+> > +       while (1) {
+> > +               size_t res;
+> > +               void *p;
+> > +
+> > +               if (nread + 256 > allocated) {
+> > +                       allocated += allocated + 256;
+> > +                       p = realloc(buf, allocated);
+> > +                       if (!p) {
+> > +                               nread = -1;
+> > +                               break;
+> > +                       }
+> > +                       buf = p;
+> > +               }
+> > +
+> > +               res = fread(buf + nread, 1, allocated - nread - 1, f);
+> > +               if (!res)
+> > +                       break;
+> > +               nread += res;
+> > +       }
+> > +
+> > +       ret = pclose(f);
+> > +       if (ret < 0 || !WIFEXITED(ret) || WEXITSTATUS(ret) != 0) {
+> > +               printf("%s failed\n", command);
+> > +               nread = -1;
+> > +       }
+> > +
+> > +       if (nread >= 0) {
+> > +               buf[nread] = 0;
+> > +               if (size)
+> > +                       *size = nread;
+> > +       } else {
+> > +               free(buf);
+> > +               buf = NULL;
+> > +       }
+> > +
+> > +       return buf;
+> > +}
+> > +
+> > +static void start_pipewire_daemons(pid_t *pipewire_pid, pid_t *wireplumber_pid)
+> > +{
+> > +       static const char *const daemons[2] = {
+> > +               "/usr/bin/pipewire",
+> > +               "/usr/bin/wireplumber"
+> > +       };
+> > +       static const char *const dirs[] = {
+> > +               "/run/pw",
+> > +               "/run/pw/state",
+> > +               "/run/pw/wireplumber",
+> > +               "/run/pw/wireplumber/bluetooth.lua.d",
+> > +               "/run/pw/wireplumber/main.lua.d",
+> > +               NULL
+> > +       };
+> > +       FILE *f;
+> > +       pid_t *pids[2] = {pipewire_pid, wireplumber_pid};
+> > +       char *envp[5];
+> > +       int i;
+> > +
+> > +       for (i = 0; dirs[i]; ++i) {
+> > +               if (mkdir(dirs[i], 0755) < 0) {
+> > +                       perror("Failed to create directory");
+> > +                       return;
+> > +               }
+> > +       }
+> > +
+> > +       /* Enable only Bluetooth part, disable whatever requires user DBus */
+> > +       f = fopen("/run/pw/wireplumber/main.lua.d/51-custom.lua", "w");
+> > +       if (!f) {
+> > +               perror("Failed to create Pipewire main config");
+> > +               return;
+> > +       }
+> > +       fprintf(f, "alsa_monitor.enabled = false\n"
+> > +               "v4l2_monitor.enabled = false\n"
+> > +               "libcamera_monitor.enabled = false\n"
+> > +               "default_access.properties[\"enable-flatpak-portal\"]"
+> > +               " = false\n");
+> > +       fclose(f);
 > 
-> On the other hand "discoverable on" makes the device show up on other
-> devices during scanning , so the RF parts of the Bluetooth chip are
-> generally functional for sure.
+> I'd put this into its own function to make it clear that this is
+> setting up the configuration e.g.:
 > 
-> Any ideas are welcome.
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/test-runner.c#n450
 > 
-> @Bjorn: Patch "arm64: dts: qcom: sm6350: add uart1 node" should be fine
-> to take regardless the RFC status, I don't think the problem is caused
-> there.
+> > +       f = fopen("/run/pw/wireplumber/bluetooth.lua.d/51-custom.lua", "w");
+> > +       if (!f) {
+> > +               perror("Failed to create Pipewire bluetooth config");
+> > +               return;
+> > +       }
+> > +       fprintf(f, "bluez_monitor.properties[\"with-logind\"] = false\n"
+> > +               "bluez_midi_monitor.enabled = false\n");
+> > +       fclose(f);
+> > +
+> > +       /* Launch daemons */
+> > +       for (i = 0; i < 2; ++i)
+> > +               *pids[i] = -1;
+> > +
+> > +       envp[0] = "DBUS_SYSTEM_BUS_ADDRESS=unix:"
+> > +                 "path=/run/dbus/system_bus_socket";
+> > +       envp[1] = "XDG_STATE_HOME=/run/pw/state";
+> > +       envp[2] = "XDG_CONFIG_HOME=/run/pw";
+> > +       envp[3] = "XDG_RUNTIME_DIR=/run/pw";
+> > +       envp[4] = NULL;
+> > +
+> > +       for (i = 0; i < 2; ++i) {
+> > +               const char *daemon = daemons[i];
+> > +               char *argv[2];
+> > +               pid_t pid;
+> > +
+> > +               printf("Starting Pipewire daemon %s\n", daemon);
+> > +
+> > +               argv[0] = (char *) daemon;
+> > +               argv[1] = NULL;
+> > +
+> > +               pid = fork();
+> > +               if (pid < 0) {
+> > +                       perror("Failed to fork new process");
+> > +                       return;
+> > +               }
+> > +
+> > +               if (pid == 0) {
+> > +                       execve(argv[0], argv, envp);
+> > +                       exit(EXIT_SUCCESS);
+> > +               }
+> > +
+> > +               *pids[i] = pid;
+> > +
+> > +               printf("Pipewire daemon process %d created\n", pid);
+> > +       }
+> > +
+> > +       /* Tell pipewire clients where the socket is */
+> > +       setenv("PIPEWIRE_RUNTIME_DIR", "/run/pw", 1);
+> > +
+> > +       /* Wait until daemons completely started */
+> > +       for (i = 0; i < 6; ++i) {
+> > +               char *buf;
+> > +
+> > +               if (i > 0) {
+> > +                       printf("Wait for Pipewire ready...\n");
+> > +                       usleep(500000);
+> > +               }
+> > +
+> > +               buf = get_command_stdout("/usr/bin/pw-dump", NULL);
+> > +               if (!buf)
+> > +                       continue;
 > 
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> ---
-> Luca Weiss (4):
->       dt-bindings: net: qualcomm: Add WCN3988
->       Bluetooth: btqca: Add WCN3988 support
->       arm64: dts: qcom: sm6350: add uart1 node
->       arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
+> Don't we have a file or something similar to
+> /run/dbus/system_bus_socket that indicates pw is running? Checking
+> dump file seems a little overkill to me.
+
+You can stat for /run/pipewire-0
+
+The daemon running doesn't mean you have a sound devices yet, though,
+so if tests need them they need to wait for them themselves.
+
 > 
->  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  2 +
->  arch/arm64/boot/dts/qcom/sm6350.dtsi               | 63 ++++++++++++++++++++++
->  arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts  | 17 ++++++
->  drivers/bluetooth/btqca.c                          | 13 ++++-
->  drivers/bluetooth/btqca.h                          | 12 ++++-
->  drivers/bluetooth/hci_qca.c                        | 12 +++++
->  6 files changed, 115 insertions(+), 4 deletions(-)
-> ---
-> base-commit: cf4c0112a0350cfe8a63b5eb3377e2366f57545b
-> change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
+> > +
+> > +               if (strstr(buf, "WirePlumber")) {
+> > +                       printf("Pipewire ready\n");
+> > +                       free(buf);
+> > +                       break;
+> > +               }
+> > +
+> > +               free(buf);
+> > +       }
+> > +       if (i == 6)
+> > +               goto fail;
+> > +
+> > +       if (!start_emulator || !start_daemon)
+> > +               return;
+> > +
+> > +       /* Wait for Bluetooth endpoints */
+> > +       for (i = 0; i < 6; ++i) {
+> > +               char *buf;
+> > +
+> > +               if (i > 0) {
+> > +                       printf("Wait for endpoints...\n");
+> > +                       usleep(500000);
+> > +               }
+> > +
+> > +               buf = get_command_stdout("/usr/bin/bluetoothctl show", NULL);
+> > +               if (!buf)
+> > +                       continue;
+> > +
+> > +               if (strstr(buf, "0000110b-0000-1000-8000-00805f9b34fb") ||
+> > +                   strstr(buf, "00001850-0000-1000-8000-00805f9b34fb")) {
+> > +                       printf("Pipewire endpoints ready\n");
+> > +                       free(buf);
+> > +                       break;
+> > +               }
+> > +
+> > +               free(buf);
+> > +       }
+> > +       if (i == 6)
+> > +               goto fail;
 > 
-> Best regards,
+> Id skip this part, the endpoints registration depends on how
+> bluetoothd:main.conf  is configured so we shouldn't really expect
+> certain UUIDs like above.
+
+Ok, in principle the tests that need endpoints can wait for them.
+
+> 
+> > +       return;
+> > +
+> > +fail:
+> > +       for (i = 0; i < 2; ++i)
+> > +               if (*pids[i] > 0)
+> > +                       kill(*pids[i], SIGTERM);
+> > +
+> > +       printf("Pipewire daemons not running properly\n");
+> > +       return;
+> > +}
+> > +
+> >  static const char *test_table[] = {
+> >         "mgmt-tester",
+> >         "smp-tester",
+> > @@ -807,7 +1009,7 @@ static void run_command(char *cmdname, char *home)
+> >         int pos = 0, idx = 0;
+> >         int serial_fd;
+> >         pid_t pid, dbus_pid, daemon_pid, monitor_pid, emulator_pid,
+> > -             dbus_session_pid, udevd_pid;
+> > +             dbus_session_pid, udevd_pid, pw_pid, wp_pid;
+> > 
+> >         if (!home) {
+> >                 perror("Invalid parameter: TESTHOME");
+> > @@ -860,6 +1062,13 @@ static void run_command(char *cmdname, char *home)
+> >         else
+> >                 emulator_pid = -1;
+> > 
+> > +       if (start_pipewire) {
+> > +               start_pipewire_daemons(&pw_pid, &wp_pid);
+> > +       } else {
+> > +               pw_pid = -1;
+> > +               wp_pid = -1;
+> > +       }
+> > +
+> >  start_next:
+> >         if (run_auto) {
+> >                 if (chdir(home + 5) < 0) {
+> > @@ -966,6 +1175,16 @@ start_next:
+> >                         udevd_pid = -1;
+> >                 }
+> > 
+> > +               if (corpse == pw_pid) {
+> > +                       printf("pipewire terminated\n");
+> > +                       pw_pid = -1;
+> > +               }
+> > +
+> > +               if (corpse == wp_pid) {
+> > +                       printf("wireplumber terminated\n");
+> > +                       wp_pid = -1;
+> > +               }
+> > +
+> >                 if (corpse == pid)
+> >                         break;
+> >         }
+> > @@ -975,6 +1194,12 @@ start_next:
+> >                 goto start_next;
+> >         }
+> > 
+> > +       if (wp_pid > 0)
+> > +               kill(wp_pid, SIGTERM);
+> > +
+> > +       if (pw_pid > 0)
+> > +               kill(pw_pid, SIGTERM);
+> > +
+> >         if (daemon_pid > 0)
+> >                 kill(daemon_pid, SIGTERM);
+> > 
+> > @@ -1079,6 +1304,12 @@ static void run_tests(void)
+> >                 audio_support = true;
+> >         }
+> > 
+> > +       ptr = strstr(cmdline, "TESTPIPEWIRE=1");
+> > +       if (ptr) {
+> > +               printf("Pipewire requested\n");
+> > +               start_pipewire = true;
+> > +       }
+> > +
+> >         ptr = strstr(cmdline, "TESTHOME=");
+> >         if (ptr) {
+> >                 home = ptr + 4;
+> > @@ -1106,6 +1337,7 @@ static void usage(void)
+> >                 "\t-q, --qemu <path>      QEMU binary\n"
+> >                 "\t-k, --kernel <image>   Kernel image (bzImage)\n"
+> >                 "\t-A, --audio            Add audio support\n"
+> > +               "\t-P, --pipewire         Start pipewire\n"
+> >                 "\t-h, --help             Show help options\n");
+> >  }
+> > 
+> > @@ -1121,6 +1353,7 @@ static const struct option main_options[] = {
+> >         { "qemu",    required_argument, NULL, 'q' },
+> >         { "kernel",  required_argument, NULL, 'k' },
+> >         { "audio",   no_argument,       NULL, 'A' },
+> > +       { "pipewire", no_argument,      NULL, 'P' },
+> >         { "version", no_argument,       NULL, 'v' },
+> >         { "help",    no_argument,       NULL, 'h' },
+> >         { }
+> > @@ -1140,7 +1373,7 @@ int main(int argc, char *argv[])
+> >         for (;;) {
+> >                 int opt;
+> > 
+> > -               opt = getopt_long(argc, argv, "aubdslmq:k:Avh", main_options,
+> > +               opt = getopt_long(argc, argv, "aubdslmq:k:APvh", main_options,
+> >                                                                 NULL);
+> >                 if (opt < 0)
+> >                         break;
+> > @@ -1177,6 +1410,10 @@ int main(int argc, char *argv[])
+> >                 case 'A':
+> >                         audio_support = true;
+> >                         break;
+> > +               case 'P':
+> > +                       start_dbus = true;
+> > +                       start_pipewire = true;
+> > +                       break;
+> >                 case 'v':
+> >                         printf("%s\n", VERSION);
+> >                         return EXIT_SUCCESS;
+> > --
+> > 2.39.2
+> > 
+> 
+> 
+
