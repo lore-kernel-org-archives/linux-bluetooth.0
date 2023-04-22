@@ -2,122 +2,142 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B447C7618E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Apr 2023 23:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5AE0C6FD18
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Apr 2023 12:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233465AbjDUXo6 (ORCPT
+        id S229757AbjDVMDk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Apr 2023 19:44:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38270 "EHLO
+        Sat, 22 Apr 2023 08:03:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233260AbjDUXo5 (ORCPT
+        with ESMTP id S229632AbjDVMDj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Apr 2023 19:44:57 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6B11BD4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 16:44:54 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2a8bdcf87f4so20238671fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Apr 2023 16:44:54 -0700 (PDT)
+        Sat, 22 Apr 2023 08:03:39 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B53BCE69
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 05:03:37 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4edb9039a4cso2666539e87.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 05:03:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682120693; x=1684712693;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hixhMP6FNA3IBI/+W0OiYDt1RzdLUYjvt+1hvJF06Ls=;
-        b=BnNZR146Xyd3osyCJz6ZtkJ6VgCpsuCLd2Dih8y2uwtXxxtDkuzw0ukKlu/YKVKCAA
-         e5v5/dsZoprrwR+Um26urO4LUFedYXFhl9KdHFSCgTozVR2s72Y363d08cQEiSLP/Pbq
-         5GpdL4D+/5WJvWrETCzB9eqzUWaVQdxGzOYSqGGi4/Ws99PVsBvvZU8e+rYhZsTcvm06
-         Ix7strsuoPugj4rYrWmGXsk0R3Ujyiv+uQqlgVf67BPi30oPSR9dF/1f2u9bM00AyS+7
-         w0p9FRgN2qhuI4xOZD1VRxpQZ9r83k6JWm9ZQ/F/kYA6s9qrJcjyweM0+mfVg1OOKL0b
-         J7bw==
+        d=linaro.org; s=google; t=1682165016; x=1684757016;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GTXIba6kgfgnk6XMMPm6IqSpaTy13D9nbXjftZoHK38=;
+        b=GPuC2HOTbLafP1qatCOmNgcyDBTReKAPNo5aHGQ4ZHZB2PpLAM7ftc1KrLDydpuJa7
+         8LP0KnbHQYk5IdlDEyiGzJS+B9rz6VOWi1CxSu4hb4jkJqKChcWRHMGsPJKNEhRSD2wF
+         m2hUQCCKsdDFPDvUMSrYnwcyYXV3wf+hBt8xwtb5aLvC9PbotDn01SViambNGlAW0uIj
+         UOK4xbMlwqQSjRycWGDZ6nU4UqgqbR0aSikN3/6eiBeuxo13ELHpXbVakoYTWmCondvm
+         AoVz6iJUsbiqiXWjgjhLJpSm+aqZmvhxYjjhgKa5/lSIDqMiJLByibyI1qpl9Gmw7ZSx
+         g7jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682120693; x=1684712693;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hixhMP6FNA3IBI/+W0OiYDt1RzdLUYjvt+1hvJF06Ls=;
-        b=e8xPcjYC0KqG1fuBfwD8/rJdvXBoCw6d3t/4jG6AJ/+XCCEAgkl9S/q8b06zi2+bBb
-         QB2te4oKDkyqtimoZ4o5UTebaPYBLzf4hMN+TK5zZux3TH/xbssKuWiNiD5Uk2vJTI8s
-         X/dwfMBtvmYexHVg0hCuKnhvN06N1sSRrmDUYFmkqXBoHpiS2/ks4CJkd5h+Yc6dC9i6
-         D5tgqWoaxgatYtBLUm/C9aZ90fHBvrWygYYUgYRrw/FIKs46/ytiE9OgZhG1OWVq7z6q
-         SYZB/WX87LLtxXgvlS0Y00YpJYWJ5RaggF1P405W9VSJ24EuOSQU61sYcaAML2y5cUBB
-         Lecg==
-X-Gm-Message-State: AAQBX9fXRGJGg1CvXi10sWCXGH0EnIVAWjvUykDqpJ/xa3lpQH40C/cY
-        gvozODGvwA7/p6lShuIBHkZUtsFQ14aTP7c9rcqyqnqJ684=
-X-Google-Smtp-Source: AKy350bMp8rJUlgO0DgQHe4wrDavKBqPVCfirhiEoI+zuVOjszY2+4zZdS05MPs1tx7Fo/VpxgUfDWvZDl0NHD0F/ik=
-X-Received: by 2002:a2e:a0d4:0:b0:2a8:ba49:a811 with SMTP id
- f20-20020a2ea0d4000000b002a8ba49a811mr1157538ljm.25.1682120692905; Fri, 21
- Apr 2023 16:44:52 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682165016; x=1684757016;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GTXIba6kgfgnk6XMMPm6IqSpaTy13D9nbXjftZoHK38=;
+        b=mECoHD05AOBLTWGqcMwf82apb6MxoM/G/Z3iQsIzMo9l8ht/w/o91lgBs4Gs9WkTvk
+         2U3WyER9mhFPngZ8ngLpFvA39U7ofHbYacZ1ukGR436SxNJzPm76H53YKQLaiDAD6nlf
+         5rOykOHB4WQeOOo3w4keLmd3UpB/ZCPVV7a9BQVLSwjPNDYuS1oXoujw6X0zWMPjaKTw
+         DPePUF1yn1KRoUF810bgYJe0IRCSZLSRd0ZHYhOX2gD5CaPdLO2l/vEEYr4n8FvXWizP
+         sKvtDjdlHRoWlCk0+SxUhrAE1Ae8EGs9EdtLiImOnEUiWLPMxmJ6bQ6N4zsYjLI+AysB
+         eGYA==
+X-Gm-Message-State: AAQBX9esXB++NNk5JFqOz9V/zP2RwubO+IZyed+umuCyEu30Z0wn6nlB
+        k3tyq2g/a0I3EBtXJqqBtK0YHw==
+X-Google-Smtp-Source: AKy350ZSfGZXg/lW+W7YdjTftfPkbAG/5Xs05BCEMR1S/VVCsIkWnzZK2Qg0eD7kyb+fknQVOxyH/Q==
+X-Received: by 2002:ac2:5a46:0:b0:4e8:47cd:b4ba with SMTP id r6-20020ac25a46000000b004e847cdb4bamr2350700lfn.13.1682165015987;
+        Sat, 22 Apr 2023 05:03:35 -0700 (PDT)
+Received: from [192.168.1.101] (abyj144.neoplus.adsl.tpnet.pl. [83.9.29.144])
+        by smtp.gmail.com with ESMTPSA id b10-20020a056512024a00b004edc3bd7fa1sm872153lfo.201.2023.04.22.05.03.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 22 Apr 2023 05:03:35 -0700 (PDT)
+Message-ID: <0f2af683-07f9-7fc7-a043-ee55e41d65c3@linaro.org>
+Date:   Sat, 22 Apr 2023 14:03:33 +0200
 MIME-Version: 1.0
-References: <733a8933-008a-8394-4564-71e49c3a4059@braneaudio.com>
-In-Reply-To: <733a8933-008a-8394-4564-71e49c3a4059@braneaudio.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 21 Apr 2023 16:44:40 -0700
-Message-ID: <CABBYNZKHE8soV+5tOhMGQay7iSCJoOz6Eo4Cy5QEEmXAqXmw3w@mail.gmail.com>
-Subject: Re: Is AVCTP Version Really 1.3?
-To:     Richard Greer <rg@braneaudio.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH RFC 0/4] Add WCN3988 Bluetooth support for Fairphone 4
+Content-Language: en-US
+To:     Luca Weiss <luca.weiss@fairphone.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>
+Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
+From:   Konrad Dybcio <konrad.dybcio@linaro.org>
+In-Reply-To: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Richard,
-
-It is still marked as 1.3:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/profiles/audio/avrc=
-p.c#n409
-
-That said I don't think there is much difference, well we better check
-what was incorporated with these erratas:
-
-1.4 Bluetooth AVCTP Protocol Change History
-1.4.1 Changes from 1.3 to 1.4
-1.4.1.1 General Changes
-=EF=82=B7 Incorporation of adopted changes to correct various errata. Relev=
-ant
-errata are
-733, 2689.
-
-If Tizen qualified it for 1.4 it is most likely just a version change
-that needs to be made, from 0x0103 to 0x0104.
-
-On Fri, Apr 21, 2023 at 4:26=E2=80=AFPM Richard Greer <rg@braneaudio.com> w=
-rote:
->
-> Hi,
->
-> I will start by saying that I am not a Bluetooth expert, but just getting=
- started on Bluetooth development.
->
-> In looking at BlueZ 5.66, it seems that the version of AVCTP being report=
-ed is 1.3 (in avrcp_ct_record() in profiles/audio/avrcp.c) which correspond=
-ed with what is in doc/supported-features.txt (which looks like it was last=
- updated several years ago).
->
-> On the BlueZ website there is an entry from 21 Aug, 2014 titled "Bluetoot=
-h 4.1 qualification for Tizen BlueZ" that says it was using AVCTP 1.4.
->
-> AVCTP version 1.3 was deprecated in July, 2013 and officially withdrawn o=
-n 1 Feb, 2023.
->
-> If I were to start working on a product that was going to have Bluetooth =
-in it, I could not get it certified with AVCTP 1.3.  So, I was just sort of=
- hoping that it was a version reporting issue (due to the Tizen BlueZ state=
-ment above about it using 1.4 8+ years ago) and not something that still ne=
-eds to be developed.
->
-> Anyhow, if someone more familiar with Bluetooth on Linux can explain what=
- is up with the AVCTP version, that would be greatly appreciated.
->
->
-> Thanks in advance,
->
-> Richard Greer
 
 
+On 21.04.2023 16:11, Luca Weiss wrote:
+> Just to start with the important part why this is an RFC:
+> 
+> While Bluetooth chip init works totally fine and bluez seems to be
+> fairly happy with it, there's a (major) problem with scanning, as shown
+> with this bluetoothctl snippet and dmesg snippet:
+> 
+>   [bluetooth]# scan on
+>   Failed to start discovery: org.bluez.Error.InProgress
+> 
+>   [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
+> 
+> This opcode should be the following:
+> 
+>   include/net/bluetooth/hci.h:#define HCI_OP_LE_SET_SCAN_PARAM    0x200b
+Not a bluetooth expert or anything, but does that thing support
+bluetooth LE?
 
---=20
-Luiz Augusto von Dentz
+Konrad
+> 
+> Unfortunately trying various existing code branches in the Bluetooth
+> driver doesn't show any sign of making this work and I don't really know
+> where to look to debug this further.
+> 
+> On the other hand "discoverable on" makes the device show up on other
+> devices during scanning , so the RF parts of the Bluetooth chip are
+> generally functional for sure.
+> 
+> Any ideas are welcome.
+> 
+> @Bjorn: Patch "arm64: dts: qcom: sm6350: add uart1 node" should be fine
+> to take regardless the RFC status, I don't think the problem is caused
+> there.
+> 
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> ---
+> Luca Weiss (4):
+>       dt-bindings: net: qualcomm: Add WCN3988
+>       Bluetooth: btqca: Add WCN3988 support
+>       arm64: dts: qcom: sm6350: add uart1 node
+>       arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
+> 
+>  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  2 +
+>  arch/arm64/boot/dts/qcom/sm6350.dtsi               | 63 ++++++++++++++++++++++
+>  arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts  | 17 ++++++
+>  drivers/bluetooth/btqca.c                          | 13 ++++-
+>  drivers/bluetooth/btqca.h                          | 12 ++++-
+>  drivers/bluetooth/hci_qca.c                        | 12 +++++
+>  6 files changed, 115 insertions(+), 4 deletions(-)
+> ---
+> base-commit: cf4c0112a0350cfe8a63b5eb3377e2366f57545b
+> change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
+> 
+> Best regards,
