@@ -2,101 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC411C6FD18
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Apr 2023 18:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EE4C77B76
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Apr 2023 10:50:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229565AbjDVSaW (ORCPT
+        id S229657AbjDWKuG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 22 Apr 2023 14:30:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49680 "EHLO
+        Sun, 23 Apr 2023 06:50:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbjDVSaV (ORCPT
+        with ESMTP id S229529AbjDWKuF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 22 Apr 2023 14:30:21 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7D41726
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 11:30:17 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-74de9ce136cso154235685a.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Apr 2023 11:30:17 -0700 (PDT)
+        Sun, 23 Apr 2023 06:50:05 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524CF10D3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Apr 2023 03:50:04 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-94f910ea993so470392666b.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Apr 2023 03:50:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682188215; x=1684780215;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cV+EueSYRO3LilKf1yhpNiw81pJDdYdfqRSVESUvxO0=;
-        b=TZSb5sId3jEFbEuT2Cp3E1B20q4DghUh+dmsi/brlz/hG9xlS9Ym2jMQvjIvyIfCwK
-         T1Hu5KXlzeKEKgMkl/uARyHzzpylOzJEid2eZ1BON9bokiyAtFPlfmClcKIGU1EjQbhv
-         fpKe+fGt/UWXY0UxcdOyibXcgDGjx3KG3l/QknHeFENV3y8A3wAue1698/YmjiSkJxJZ
-         y5BrzSfk4tb4aqyguufABWuaZnk3/FRu56ei25V2O0oUQKAwnVs8DHfhk16PX2/vegHK
-         7J3/P+rc1J9gAGuIYWG5jCwSG92Z0njwJpGbMKXZ1tnpgQiHxzoWzJJdnDmW4OGvg78i
-         EFEA==
+        d=linaro.org; s=google; t=1682247003; x=1684839003;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2fzBmJ5IaxGOE/MKESUjcu15ne21K7ZWZXs93DssTIU=;
+        b=DVW+gq1t/Ga8g/padr1BQXIy9LolE6eOkEEqaXjDBMGvX6qCh08vb2eG4hWXN2TPQZ
+         sq0ECt7m9ObNHuM9X7OTK8FFlXVE2shzNZixNcHBIPWELAYCrL38QiF6zjQ7w+Tc9C8X
+         kWG6iMKlRRKNhu4j/AAcb27miqHERQWPzRiQUcSnSTNkoCYcn6N7O40EeDmwxY9MnF1V
+         NvtFn38PDRZ9frpXRHospVkRm+g8uwS7qZ8/zSZpNg7UbyE5MdbtN+LW5Pw/MAR1iWVQ
+         bsNN3bSrSuYTg2QB1+VDrKYo1qZ7N6GnlWnR7DmzLNVy/S6pzm1GHFUaY/BkYJiy4n0t
+         metA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682188215; x=1684780215;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cV+EueSYRO3LilKf1yhpNiw81pJDdYdfqRSVESUvxO0=;
-        b=aBJSB21ITIiEz/wzinJEhwj+M1isItf+8THA1yl5jFrhrZwRsO3/gmQSPnAlmMrJZv
-         tW6pV9rJKLM97BgK3zzXab4Pr4Vc1ey4S6IOna+NxtVAUFJYlUiusM9hw6q9kATgFDoD
-         OGA0Y60QZaNEY8nn83husH7AaX0D4MPngU7UyHbO7SdVUiWIp/1y2sbG9HglKqD30YFt
-         uJmIJeCmFuWTpt3TheROW8Nqxgat9ZsbgqIis6vFeu06cujSG/SX8vSOq8u9glKIOkld
-         MkwrQpyyuC5Q9gmsYZl3Wjv0QR4EHxdt4O2x8sM3fYOzxRyczsQ0j+T2ioDIm1PBx5BW
-         rWgw==
-X-Gm-Message-State: AAQBX9esNUjbhZrIC7nbEebaNf9HplIhfjChxKHViqeuwKx5dhlWXCvC
-        YJZpoYdYqg1Fa5BX1LyVU70YX8GwlPY=
-X-Google-Smtp-Source: AKy350Y1lHlM/b50VQk32MfheivYvV8UYl9RGeemWZ0Wj8wjfMRlHiNhnPc9LUbFHMtKf8W8fllEPQ==
-X-Received: by 2002:a05:6214:21cd:b0:5e6:1bf5:1ae0 with SMTP id d13-20020a05621421cd00b005e61bf51ae0mr16823928qvh.18.1682188215685;
-        Sat, 22 Apr 2023 11:30:15 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.209.218])
-        by smtp.gmail.com with ESMTPSA id b19-20020a05620a089300b0074de92520b1sm2276333qka.83.2023.04.22.11.30.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Apr 2023 11:30:15 -0700 (PDT)
-Message-ID: <644427b7.050a0220.e004e.8c9e@mx.google.com>
-Date:   Sat, 22 Apr 2023 11:30:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7265463807797241890=="
+        d=1e100.net; s=20221208; t=1682247003; x=1684839003;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2fzBmJ5IaxGOE/MKESUjcu15ne21K7ZWZXs93DssTIU=;
+        b=ME3qkvngytum27NAkpjzvYo9vNF9vs0Tyyt0g6pT7fk6E6vPQJUMBO2ppmTTfdiZbp
+         rGl18W+7OQnyzo4XTXtI0g9TwH2yBlzmuN4DJti3qpNDRuvfLNiYEt1mONGD94d+lUtz
+         W71ZhEfThxvYJoU5uDMAGWfp4rowoCvhmnRxDuKwJ41d6J7d5WKPv0ywwmqS2AIo4AVP
+         hexNtnrHNSgSNFOg83WLEufOzPYg5EyAfbotIscF/PiA71eLNO7CioaiYVOmGT5To4+E
+         9/4VcOdao/Jsnx/2Zu5XHRduMKspml6wTAhRC/uuQqZLjpLCJushT5diEOQdVeXily9K
+         08ng==
+X-Gm-Message-State: AAQBX9cFrB9y2SjxDC5/DqORKDGJEsQi8UyQaW3PrD367Q7YnLZ6OCGV
+        d+v78rRe2lONQrI2FtEjYrllHw==
+X-Google-Smtp-Source: AKy350b60kIZRrMx1GXtSvsinNr30+8WRngC0UTGZPlTUxTXeSBxDO9eTw6EyUvjVqflIa4JLohPqw==
+X-Received: by 2002:a17:907:9285:b0:959:8cbe:63a5 with SMTP id bw5-20020a170907928500b009598cbe63a5mr970045ejc.44.1682247002788;
+        Sun, 23 Apr 2023 03:50:02 -0700 (PDT)
+Received: from ?IPV6:2a02:810d:15c0:828:5d52:d466:d57f:118c? ([2a02:810d:15c0:828:5d52:d466:d57f:118c])
+        by smtp.gmail.com with ESMTPSA id li14-20020a170907198e00b009572db67bf2sm2703485ejc.89.2023.04.23.03.50.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 23 Apr 2023 03:50:02 -0700 (PDT)
+Message-ID: <47f4cf35-50a7-51a0-5df6-3fadc5fee4cb@linaro.org>
+Date:   Sun, 23 Apr 2023 12:49:59 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,1/2] shared/bap: add function to get location from PAC
-In-Reply-To: <3cc705b0fa000b4cfc5071ae13f4c0fcb31bfc25.1682182441.git.pav@iki.fi>
-References: <3cc705b0fa000b4cfc5071ae13f4c0fcb31bfc25.1682182441.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH RFC 1/4] dt-bindings: net: qualcomm: Add WCN3988
+Content-Language: en-US
+To:     Luca Weiss <luca.weiss@fairphone.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
+ <20230421-fp4-bluetooth-v1-1-0430e3a7e0a2@fairphone.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230421-fp4-bluetooth-v1-1-0430e3a7e0a2@fairphone.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7265463807797241890==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=742421
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.05 seconds
-GitLint                       PASS      0.69 seconds
-BuildEll                      PASS      27.20 seconds
-BluezMake                     PASS      988.66 seconds
-MakeCheck                     PASS      11.58 seconds
-MakeDistcheck                 PASS      152.08 seconds
-CheckValgrind                 PASS      248.73 seconds
-CheckSmatch                   PASS      336.25 seconds
-bluezmakeextell               PASS      99.69 seconds
-IncrementalBuild              PASS      1748.36 seconds
-ScanBuild                     PASS      1055.93 seconds
+On 21/04/2023 16:11, Luca Weiss wrote:
+> Add the compatible for the Bluetooth part of the Qualcomm WCN3988
+> chipset.
+> 
+> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> ---
 
 
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
----
-Regards,
-Linux Bluetooth
+Best regards,
+Krzysztof
 
-
---===============7265463807797241890==--
