@@ -2,101 +2,210 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A37ADC7618E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Apr 2023 17:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4E1C7618E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Apr 2023 21:08:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232032AbjDXRfQ (ORCPT
+        id S232071AbjDXVIE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Apr 2023 13:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56362 "EHLO
+        Mon, 24 Apr 2023 17:08:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231499AbjDXRfO (ORCPT
+        with ESMTP id S231351AbjDXVID (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Apr 2023 13:35:14 -0400
-X-Greylist: delayed 135 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 24 Apr 2023 10:35:11 PDT
-Received: from p3plsmtpa07-09.prod.phx3.secureserver.net (p3plsmtpa07-09.prod.phx3.secureserver.net [173.201.192.238])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4F55FF7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Apr 2023 10:35:11 -0700 (PDT)
-Received: from [192.168.0.58] ([70.112.164.231])
-        by :SMTPAUTH: with ESMTPSA
-        id r03apjSJZ9P9cr03bpFRKP; Mon, 24 Apr 2023 10:32:56 -0700
-X-CMAE-Analysis: v=2.4 cv=PeY5xAtd c=1 sm=1 tr=0 ts=6446bd48
- a=S3BSAMYkHO6g4MQ2VxJkNg==:117 a=S3BSAMYkHO6g4MQ2VxJkNg==:17
- a=IkcTkHD0fZMA:10 a=VwQbUJbxAAAA:8 a=EfASa0wiAAAA:8 a=B1eNfF2LPa5xGEud2G8A:9
- a=QEXdDO2ut3YA:10 a=AjGcO6oz07-iQ99wixmX:22 a=Ogh1Um8Ajkq3hpB3iR5s:22
-X-SECURESERVER-ACCT: rg@braneaudio.com
-Message-ID: <16ab6b45-caed-f5e1-450f-dba72321014a@braneaudio.com>
-Date:   Mon, 24 Apr 2023 12:32:54 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: Is AVCTP Version Really 1.3?
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Mon, 24 Apr 2023 17:08:03 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A5AC7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Apr 2023 14:08:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682370482; x=1713906482;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JaMbh54Tetw0s9AF32UlzkIKa1Hw4v2EKu5UGw9wg3Y=;
+  b=f1Xtpxp0keydRuEm4ddaI6KTfsWfulArJ/78iYCZUcl4yD45IJ0EVrbo
+   NLDnOmRnag9k0yCWRGFj2RJlNrLWUH3twDuoloOjS+dfNBGPcrcbkbx7c
+   oJRLAj/OgtiEVmzgFNy/3/6Xoy0AYAH8aW2WCjukfAd08aIn79uwpmssL
+   JVIhqDKst6WCDxFeHW5yh/J0yVfGsBNz1RFjZOJZ9xlNZsOP1dJQLOBxX
+   ysLNs/GxL7R4ixC/7ALkYhW09PJNI3m1bFNQw+o2mFVXtdqoZSHqwwedv
+   vW8L0U6m7s8lqnsUeUpql1wrdyj/XSNm8HfJLM2N0ftySzwmkTJUYARU6
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="345315431"
+X-IronPort-AV: E=Sophos;i="5.99,223,1677571200"; 
+   d="scan'208";a="345315431"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2023 14:08:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10690"; a="867624540"
+X-IronPort-AV: E=Sophos;i="5.99,223,1677571200"; 
+   d="scan'208";a="867624540"
+Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 24 Apr 2023 14:08:01 -0700
+Received: from kbuild by b613635ddfff with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pr3Pk-000iei-0X;
+        Mon, 24 Apr 2023 21:08:00 +0000
+Date:   Tue, 25 Apr 2023 05:07:20 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Cc:     linux-bluetooth@vger.kernel.org
-References: <733a8933-008a-8394-4564-71e49c3a4059@braneaudio.com>
- <CABBYNZKHE8soV+5tOhMGQay7iSCJoOz6Eo4Cy5QEEmXAqXmw3w@mail.gmail.com>
-Content-Language: en-US
-From:   Richard Greer <rg@braneaudio.com>
-In-Reply-To: <CABBYNZKHE8soV+5tOhMGQay7iSCJoOz6Eo4Cy5QEEmXAqXmw3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfEXenE4g6S4jWKBo+ASa2ur2YlRzAbKEFlIEHDdS4Y+3f331dkvBGCo/uSAFucXg0rUA0ujKHS1hvFEZlYjBk/Qj6I2/2L1/jnI/CjWJPCq5HziBj5Iw
- AXSK6NImCh+/ZacN3NbTyIQ9TygBhpnCKwRVAEzoOoGJ+9tx4H4xcMyAjLw+UOpy/98KZNmxW0qFGDHo206z/zEwK2XbzAIZFmRcBqgrqS+S3pmNkPCwlxbb
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ d883a4669a1def6d121ccf5e64ad28260d1c9531
+Message-ID: <6446ef88.q2PWb1wcKFqLDpJb%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: d883a4669a1def6d121ccf5e64ad28260d1c9531  Bluetooth: hci_sync: Only allow hci_cmd_sync_queue if running
 
-I have looked at the differences between the 1.3 and 1.4 specifications, and there is only one meaningful change in the document.
+elapsed time: 880m
 
-In Section 4.3 AVCTP Message Fragmentation, the following is added at the very end of the last paragraph:
-     "The interleaving of the fragments of different packets is not allowed."
+configs tested: 134
+configs skipped: 8
 
-Looking in profiles/audio/avctp.c, it appears that fragmented packets are not implemented.  That would imply that there cannot be any interleaving of fragments from different packets.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-So, I think that just a version change would work.
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha        buildonly-randconfig-r001-20230424   gcc  
+alpha        buildonly-randconfig-r002-20230423   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r013-20230424   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r016-20230424   gcc  
+arc                  randconfig-r021-20230423   gcc  
+arc                  randconfig-r043-20230423   gcc  
+arc                  randconfig-r043-20230424   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r033-20230424   gcc  
+arm                  randconfig-r046-20230423   gcc  
+arm                  randconfig-r046-20230424   clang
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r006-20230424   clang
+arm64                randconfig-r015-20230423   clang
+csky                                defconfig   gcc  
+csky                 randconfig-r004-20230423   gcc  
+csky                 randconfig-r005-20230423   gcc  
+csky                 randconfig-r026-20230424   gcc  
+csky                 randconfig-r035-20230424   gcc  
+csky                 randconfig-r036-20230424   gcc  
+hexagon              randconfig-r005-20230424   clang
+hexagon              randconfig-r032-20230424   clang
+hexagon              randconfig-r041-20230423   clang
+hexagon              randconfig-r041-20230424   clang
+hexagon              randconfig-r045-20230423   clang
+hexagon              randconfig-r045-20230424   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-a001-20230424   clang
+i386                 randconfig-a002-20230424   clang
+i386                 randconfig-a003-20230424   clang
+i386                 randconfig-a004-20230424   clang
+i386                 randconfig-a005-20230424   clang
+i386                 randconfig-a006-20230424   clang
+i386                 randconfig-a011-20230424   gcc  
+i386                 randconfig-a012-20230424   gcc  
+i386                 randconfig-a013-20230424   gcc  
+i386                 randconfig-a014-20230424   gcc  
+i386                 randconfig-a015-20230424   gcc  
+i386                 randconfig-a016-20230424   gcc  
+i386                 randconfig-r003-20230424   clang
+i386                 randconfig-r031-20230424   clang
+ia64                             allmodconfig   gcc  
+ia64         buildonly-randconfig-r004-20230424   gcc  
+ia64                                defconfig   gcc  
+ia64                 randconfig-r001-20230424   gcc  
+ia64                 randconfig-r014-20230423   gcc  
+ia64                 randconfig-r035-20230423   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch    buildonly-randconfig-r003-20230424   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r023-20230424   gcc  
+loongarch            randconfig-r031-20230423   gcc  
+loongarch            randconfig-r032-20230423   gcc  
+m68k                             allmodconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r004-20230424   gcc  
+m68k                 randconfig-r016-20230423   gcc  
+microblaze   buildonly-randconfig-r005-20230424   gcc  
+microblaze           randconfig-r002-20230423   gcc  
+microblaze           randconfig-r011-20230423   gcc  
+microblaze           randconfig-r011-20230424   gcc  
+microblaze           randconfig-r015-20230424   gcc  
+microblaze           randconfig-r024-20230424   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r003-20230423   clang
+mips                 randconfig-r033-20230423   clang
+nios2                               defconfig   gcc  
+nios2                randconfig-r025-20230423   gcc  
+nios2                randconfig-r034-20230424   gcc  
+openrisc     buildonly-randconfig-r005-20230423   gcc  
+openrisc             randconfig-r024-20230423   gcc  
+parisc       buildonly-randconfig-r006-20230423   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r012-20230423   gcc  
+parisc               randconfig-r025-20230424   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv        buildonly-randconfig-r004-20230423   clang
+riscv                               defconfig   gcc  
+riscv                randconfig-r001-20230423   gcc  
+riscv                randconfig-r026-20230423   clang
+riscv                randconfig-r042-20230423   clang
+riscv                randconfig-r042-20230424   gcc  
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r044-20230423   clang
+s390                 randconfig-r044-20230424   gcc  
+sh                               allmodconfig   gcc  
+sh           buildonly-randconfig-r001-20230423   gcc  
+sh                   randconfig-r012-20230424   gcc  
+sh                   randconfig-r021-20230424   gcc  
+sh                   randconfig-r034-20230423   gcc  
+sh                   randconfig-r036-20230423   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r022-20230423   gcc  
+sparc64      buildonly-randconfig-r002-20230424   gcc  
+sparc64              randconfig-r006-20230423   gcc  
+sparc64              randconfig-r013-20230423   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-a001-20230424   clang
+x86_64               randconfig-a002-20230424   clang
+x86_64               randconfig-a003-20230424   clang
+x86_64               randconfig-a004-20230424   clang
+x86_64               randconfig-a005-20230424   clang
+x86_64               randconfig-a006-20230424   clang
+x86_64               randconfig-a011-20230424   gcc  
+x86_64               randconfig-a012-20230424   gcc  
+x86_64               randconfig-a013-20230424   gcc  
+x86_64               randconfig-a014-20230424   gcc  
+x86_64               randconfig-a015-20230424   gcc  
+x86_64               randconfig-a016-20230424   gcc  
+x86_64                               rhel-8.3   gcc  
+xtensa       buildonly-randconfig-r003-20230423   gcc  
 
-On 4/21/23 18:44, Luiz Augusto von Dentz wrote:
-> Hi Richard,
-> 
-> It is still marked as 1.3:
-> 
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/profiles/audio/avrcp.c#n409
-> 
-> That said I don't think there is much difference, well we better check
-> what was incorporated with these erratas:
-> 
-> 1.4 Bluetooth AVCTP Protocol Change History
-> 1.4.1 Changes from 1.3 to 1.4
-> 1.4.1.1 General Changes
->  Incorporation of adopted changes to correct various errata. Relevant
-> errata are
-> 733, 2689.
-> 
-> If Tizen qualified it for 1.4 it is most likely just a version change
-> that needs to be made, from 0x0103 to 0x0104.
-> 
-> On Fri, Apr 21, 2023 at 4:26 PM Richard Greer <rg@braneaudio.com> wrote:
->>
->> Hi,
->>
->> I will start by saying that I am not a Bluetooth expert, but just getting started on Bluetooth development.
->>
->> In looking at BlueZ 5.66, it seems that the version of AVCTP being reported is 1.3 (in avrcp_ct_record() in profiles/audio/avrcp.c) which corresponded with what is in doc/supported-features.txt (which looks like it was last updated several years ago).
->>
->> On the BlueZ website there is an entry from 21 Aug, 2014 titled "Bluetooth 4.1 qualification for Tizen BlueZ" that says it was using AVCTP 1.4.
->>
->> AVCTP version 1.3 was deprecated in July, 2013 and officially withdrawn on 1 Feb, 2023.
->>
->> If I were to start working on a product that was going to have Bluetooth in it, I could not get it certified with AVCTP 1.3.  So, I was just sort of hoping that it was a version reporting issue (due to the Tizen BlueZ statement above about it using 1.4 8+ years ago) and not something that still needs to be developed.
->>
->> Anyhow, if someone more familiar with Bluetooth on Linux can explain what is up with the AVCTP version, that would be greatly appreciated.
->>
->>
->> Thanks in advance,
->>
->> Richard Greer
-> 
-> 
-> 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
