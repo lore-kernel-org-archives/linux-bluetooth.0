@@ -2,156 +2,174 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8EFC77B76
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 06:48:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26727C6FD18
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 16:31:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233542AbjDYGsg (ORCPT
+        id S234759AbjDYQbq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Apr 2023 02:48:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
+        Tue, 25 Apr 2023 12:31:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233528AbjDYGse (ORCPT
+        with ESMTP id S234377AbjDYQbp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Apr 2023 02:48:34 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D24BBB9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Apr 2023 23:48:12 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-94a34a14a54so992871866b.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Apr 2023 23:48:12 -0700 (PDT)
+        Tue, 25 Apr 2023 12:31:45 -0400
+Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7173D9022
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 09:31:44 -0700 (PDT)
+Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-187ec6a5504so4559994fac.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 09:31:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1682405291; x=1684997291;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M1ZE7zkQJkA5e8pU4DAT31Q8ZdOD3Fw5YHswnvzUZmg=;
-        b=olsY2tC3Gx43o+1zlMobkyWpvjqynYcSpBNJpha9GJ236pWS48I5T6fRMsjnEXvXW6
-         nPi0bqOs+1TlaWLvYdtK05Phwd64bnf8h8lpwCoavOQKecIrT39b+c9OXon5xQQ/G8v5
-         C9ljuQugTDRKMyiQ5qglbXWyDGR5BHf2xgBOnY4Ic4pvsZ2wdQd/paK4gDRXz5hVaFo1
-         4sGV2PZjTYKCVn15Pw/Akl3g3hkRNCNsRHG7vFd0Yq0YJiWgig0JZOf8yfF87vpttcMF
-         HG7HPRei4vraUYDcnXZreqsqGm02uputbga0Nei8umyDLFxVgq8OAfyloV/3rrSUMB2q
-         yv+g==
+        d=gmail.com; s=20221208; t=1682440303; x=1685032303;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XmXqyd0W5cmoGgju/nu079tCrUcRnNOWtvPWPXTiENA=;
+        b=dpCpAF5vR5wD9AgOzwe0yDdsZXoTdmYuiKw8OrPR6D9SCUprUOxJzO+iGgflp7brUu
+         +y18d/GvpXCah8HXBaH2opUHe/vvq2Fdz3G/ZwnAardzLn1th42tAdbU8isnf7l45W/c
+         awDdlJhJ8LsNzet415M+TARJx51gw2lo+Tj4P5kuDjGdCOoYPkLDce36flWQ0Pf8C9QL
+         VBzsAl4BadZ49os1EQT44JNq+u7EYo7tZ6Nmrz1DLTFYwcIBaUn0ECr72Z6Y+MM2BMd5
+         RuKUuojwmPoe2VsUE1WiobsejyYocFA67hk4PzTmNCoXsILmR9k9jNYwfkx8wl4WY+VQ
+         W8LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682405291; x=1684997291;
-        h=in-reply-to:references:cc:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=M1ZE7zkQJkA5e8pU4DAT31Q8ZdOD3Fw5YHswnvzUZmg=;
-        b=bS8yoDkD0QoAIWGuRUR/AwLJKY9f7prEypTwCcr8tTmwqmNzatg9hsXYt8HgFS8q8Q
-         z/7Arraw94XrSJ4NiTH28SevhoAQmF0/h/amjaqadqVTRQ6Y2O6GL9Z0ye5Z68eLX1Ho
-         csF8yI5V1TPbjjm7wnZR0iPvqgxJ/5mK8c7AW+y0vjJWZBkcSzKdpYVLOxx4kVxHWv3e
-         DAIlqZcEjL3WH7yy0ZlPoS9tc5lYSp3T1buM0Eb9qRnYId43J3Fgonk9XAihJrruobsr
-         gUlrCOY6vJktysAx0+Cjd5+YjY8Gfi57WTlkzgvgHB08tNJgchgNOhFGRLeRx2avY2ML
-         tw1w==
-X-Gm-Message-State: AAQBX9fgi4p0Dt2crlnkHf4yiYZsrdBoLeKLIW6GwuG3u/asm2hi0IDQ
-        e4rYA9P3dnGZvTVsVv8YddIBgQ==
-X-Google-Smtp-Source: AKy350Z1GFt6IUApk1g0YPdKIdF8wPBWzQ1iG4DdhA44udPMwwV1bqNKEmVs8J1NANW0v9bSPKkIgg==
-X-Received: by 2002:a17:907:38c:b0:94e:fdec:67e2 with SMTP id ss12-20020a170907038c00b0094efdec67e2mr12906256ejb.77.1682405291266;
-        Mon, 24 Apr 2023 23:48:11 -0700 (PDT)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id sd14-20020a170906ce2e00b0094f5d1bbb21sm6340135ejb.102.2023.04.24.23.48.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Apr 2023 23:48:10 -0700 (PDT)
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 25 Apr 2023 08:48:10 +0200
-Message-Id: <CS5MWGNURMH4.2VD8BIIJ3V3Q4@otso>
-Subject: Re: [PATCH RFC 0/4] Add WCN3988 Bluetooth support for Fairphone 4
-From:   "Luca Weiss" <luca.weiss@fairphone.com>
-To:     "Konrad Dybcio" <konrad.dybcio@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "Paolo Abeni" <pabeni@redhat.com>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        "Balakrishna Godavarthi" <bgodavar@codeaurora.org>,
-        "Rocky Liao" <rjliao@codeaurora.org>,
-        "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        "Andy Gross" <agross@kernel.org>,
-        "Bjorn Andersson" <andersson@kernel.org>
-Cc:     <~postmarketos/upstreaming@lists.sr.ht>,
-        <phone-devel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-X-Mailer: aerc 0.14.0
-References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
- <0f2af683-07f9-7fc7-a043-ee55e41d65c3@linaro.org>
-In-Reply-To: <0f2af683-07f9-7fc7-a043-ee55e41d65c3@linaro.org>
+        d=1e100.net; s=20221208; t=1682440303; x=1685032303;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XmXqyd0W5cmoGgju/nu079tCrUcRnNOWtvPWPXTiENA=;
+        b=bhb1LMfT3qjDzG3EV/P0oE3k3nTXuzkBlYnLA6pfraljddSDBjlqkIZYmg8VR4Vx55
+         T5b15CKub99exicnQoTv0W+s7Y9cMHuAkJkDIC02bNgQKEuGOdw91HK8rdtnR401ET8l
+         i/Ih7tJ1G6aeumycC7fDtdZKpXVR3vTgsaWcf8DTi57s3NQ0c53NAFHnoa9DT2wtkn+Q
+         gpPn0wUX+7kii7a0Hk8bHiQQX2AE9QLtAdpf7q5q3jcHJimI39GZB0qT/s5uaA+ItFVf
+         WXvZ9MLQXClqINUNvghhGh4bgfv8b8mWiUiIoiXSfiKnyc3aBfmbs+FfpzQq5V9rlFbP
+         V9gQ==
+X-Gm-Message-State: AAQBX9dZNwEa66Oib6N8al/SadwwOfPl3VezYiOBkFApWz3juL4nDzrU
+        P7rj9C2pwQ5wQSNFK5pjjIg+RfJYtOk0Txzz
+X-Google-Smtp-Source: AKy350bsU/qa4vMTC4nrWiLwbyCQLEdJvs7ksXxHF2ja1B0p1upchh44IloamOz06VBMRXv+5PtW3g==
+X-Received: by 2002:a05:6870:ac27:b0:177:cbb6:ba2 with SMTP id kw39-20020a056870ac2700b00177cbb60ba2mr12136714oab.53.1682440303502;
+        Tue, 25 Apr 2023 09:31:43 -0700 (PDT)
+Received: from localhost.localdomain ([2804:14c:f429:2d04:9d9f:c9a0:8ef:bc50])
+        by smtp.gmail.com with ESMTPSA id v6-20020a056870e28600b0017e0c13b29asm5709200oad.36.2023.04.25.09.31.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Apr 2023 09:31:43 -0700 (PDT)
+From:   Raul Cheleguini <raul.cheleguini@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Raul Cheleguini <raul.cheleguini@gmail.com>
+Subject: [PATCH v2] Bluetooth: Add new quirk for broken extended create connection for ATS2851
+Date:   Tue, 25 Apr 2023 13:31:20 -0300
+Message-Id: <20230425163120.1059724-1-raul.cheleguini@gmail.com>
+X-Mailer: git-send-email 2.39.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat Apr 22, 2023 at 2:03 PM CEST, Konrad Dybcio wrote:
->
->
-> On 21.04.2023 16:11, Luca Weiss wrote:
-> > Just to start with the important part why this is an RFC:
-> >=20
-> > While Bluetooth chip init works totally fine and bluez seems to be
-> > fairly happy with it, there's a (major) problem with scanning, as shown
-> > with this bluetoothctl snippet and dmesg snippet:
-> >=20
-> >   [bluetooth]# scan on
-> >   Failed to start discovery: org.bluez.Error.InProgress
-> >=20
-> >   [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
-> >=20
-> > This opcode should be the following:
-> >=20
-> >   include/net/bluetooth/hci.h:#define HCI_OP_LE_SET_SCAN_PARAM    0x200=
-b
-> Not a bluetooth expert or anything, but does that thing support
-> bluetooth LE?
+The controller based on ATS2851 advertises support for the "LE Extended
+Create Connection" command, but it does not actually implement it. This
+issue is blocking the pairing process from beginning.
 
-I don't know too much about Bluetooth details either, but hasn't
-Bluetooth LE been a consistently supported thing since like 10 years?
+To resolve this, add the quirk HCI_QUIRK_BROKEN_EXT_CREATE_CONN.
+This will avoid the unsupported command and instead send a regular "LE
+Create Connection" command.
 
-All the info I can easily find just states SM7225 SoC supports
-"Bluetooth 5.1".
+< HCI Command: LE Extended Create Conn.. (0x08|0x0043) plen 26
+        Filter policy: Accept list is not used (0x00)
+        Own address type: Public (0x00)
+        Peer address type: Random (0x01)
+        Peer address: DD:5E:B9:FE:49:3D (Static)
+        Initiating PHYs: 0x01
+        Entry 0: LE 1M
+          Scan interval: 60.000 msec (0x0060)
+          Scan window: 60.000 msec (0x0060)
+          Min connection interval: 30.00 msec (0x0018)
+          Max connection interval: 50.00 msec (0x0028)
+          Connection latency: 0 (0x0000)
+          Supervision timeout: 420 msec (0x002a)
+          Min connection length: 0.000 msec (0x0000)
+          Max connection length: 0.000 msec (0x0000)
+> HCI Event: Command Status (0x0f) plen 4
+      LE Extended Create Connection (0x08|0x0043) ncmd 1
+        Status: Unknown HCI Command (0x01)
 
-Regards
-Luca
+Signed-off-by: Raul Cheleguini <raul.cheleguini@gmail.com>
+---
+V1 -> V2: Grammar fix in commit message.
 
->
-> Konrad
-> >=20
-> > Unfortunately trying various existing code branches in the Bluetooth
-> > driver doesn't show any sign of making this work and I don't really kno=
-w
-> > where to look to debug this further.
-> >=20
-> > On the other hand "discoverable on" makes the device show up on other
-> > devices during scanning , so the RF parts of the Bluetooth chip are
-> > generally functional for sure.
-> >=20
-> > Any ideas are welcome.
-> >=20
-> > @Bjorn: Patch "arm64: dts: qcom: sm6350: add uart1 node" should be fine
-> > to take regardless the RFC status, I don't think the problem is caused
-> > there.
-> >=20
-> > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> > ---
-> > Luca Weiss (4):
-> >       dt-bindings: net: qualcomm: Add WCN3988
-> >       Bluetooth: btqca: Add WCN3988 support
-> >       arm64: dts: qcom: sm6350: add uart1 node
-> >       arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
-> >=20
-> >  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  2 +
-> >  arch/arm64/boot/dts/qcom/sm6350.dtsi               | 63 ++++++++++++++=
-++++++++
-> >  arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts  | 17 ++++++
-> >  drivers/bluetooth/btqca.c                          | 13 ++++-
-> >  drivers/bluetooth/btqca.h                          | 12 ++++-
-> >  drivers/bluetooth/hci_qca.c                        | 12 +++++
-> >  6 files changed, 115 insertions(+), 4 deletions(-)
-> > ---
-> > base-commit: cf4c0112a0350cfe8a63b5eb3377e2366f57545b
-> > change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
-> >=20
-> > Best regards,
+- Note that this patch depends on the RPA timeout quirk sent via [1].
+  [1]. https://marc.info/?l=linux-bluetooth&m=167957918920723&w=2
+  
+ drivers/bluetooth/btusb.c        | 1 +
+ include/net/bluetooth/hci.h      | 7 +++++++
+ include/net/bluetooth/hci_core.h | 3 ++-
+ net/bluetooth/hci_sync.c         | 4 ++++
+ 4 files changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3a3a966419af..8656ac491f13 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4107,6 +4107,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
++		set_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &hdev->quirks);
+ 	}
+ 
+ 	if (!reset)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 07df96c47ef4..d5d0e44bf0b6 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -309,6 +309,13 @@ enum {
+ 	 * to support it.
+ 	 */
+ 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
++
++	/*
++	 * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command is
++	 * disabled. This is required for the Actions Semiconductor ATS2851
++	 * based controllers, which erroneously claims to support it.
++	 */
++	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
+ };
+ 
+ /* HCI device flags */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 53d3328c2b8b..952b0021dc25 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1695,7 +1695,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ 			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
+ 
+ /* Use ext create connection if command is supported */
+-#define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
++#define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
++			   !test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &(dev)->quirks))
+ 
+ /* Extended advertising support */
+ #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 003ec0e34fcc..d49cfd1ea418 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4534,6 +4534,9 @@ static const struct {
+ 			 "advertised, but not supported."),
+ 	HCI_QUIRK_BROKEN(SET_RPA_TIMEOUT,
+ 			 "HCI LE Set Random Private Address Timeout command is "
++			 "advertised, but not supported."),
++	HCI_QUIRK_BROKEN(EXT_CREATE_CONN,
++			 "HCI LE Extended Create Connection command is "
+ 			 "advertised, but not supported.")
+ };
+ 
+@@ -6071,6 +6074,7 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ 	if (err)
+ 		goto done;
+ 
++	/* Send command LE Extended Create Connection if supported */
+ 	if (use_ext_conn(hdev)) {
+ 		err = hci_le_ext_create_conn_sync(hdev, conn, own_addr_type);
+ 		goto done;
+-- 
+2.39.2
 
