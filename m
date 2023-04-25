@@ -2,174 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26727C6FD18
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 16:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6949EC6FD18
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 17:02:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234759AbjDYQbq (ORCPT
+        id S234700AbjDYRCb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Apr 2023 12:31:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
+        Tue, 25 Apr 2023 13:02:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234377AbjDYQbp (ORCPT
+        with ESMTP id S234583AbjDYRCa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Apr 2023 12:31:45 -0400
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7173D9022
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 09:31:44 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-187ec6a5504so4559994fac.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 09:31:44 -0700 (PDT)
+        Tue, 25 Apr 2023 13:02:30 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 898CE59D0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 10:02:27 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id 46e09a7af769-6a5e8baad21so4560779a34.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 10:02:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682440303; x=1685032303;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XmXqyd0W5cmoGgju/nu079tCrUcRnNOWtvPWPXTiENA=;
-        b=dpCpAF5vR5wD9AgOzwe0yDdsZXoTdmYuiKw8OrPR6D9SCUprUOxJzO+iGgflp7brUu
-         +y18d/GvpXCah8HXBaH2opUHe/vvq2Fdz3G/ZwnAardzLn1th42tAdbU8isnf7l45W/c
-         awDdlJhJ8LsNzet415M+TARJx51gw2lo+Tj4P5kuDjGdCOoYPkLDce36flWQ0Pf8C9QL
-         VBzsAl4BadZ49os1EQT44JNq+u7EYo7tZ6Nmrz1DLTFYwcIBaUn0ECr72Z6Y+MM2BMd5
-         RuKUuojwmPoe2VsUE1WiobsejyYocFA67hk4PzTmNCoXsILmR9k9jNYwfkx8wl4WY+VQ
-         W8LQ==
+        d=gmail.com; s=20221208; t=1682442146; x=1685034146;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iXtc/vJhuVldcTbHh7DFIkr7bKNy/VoTQp8KS+alRgI=;
+        b=byzs9ougM0lJXdOmgY2Nf6IV4wFGFBy038nBoxne9ZUOYWvyY61n615h47eIu/gcj7
+         ZHJpyzrm07GNoxSPYLYuEIzq1+Ec0KqDcIkmvIR9eR2/UMNuF8kP2/aiEQlO4eAd6SE/
+         Wo3jb4dfzyYKSQxsiib+AxXicqVEeUW6EJ3yGYIlJpwiWudZ6KuMCzIhhaNYU2fr3aCV
+         VRpxz3gzb2o3x+F6GUDQeAON+aJqKxdDNFq56Mia7XeOTybbrwcyIocvdHk2kV7FAQEx
+         WdNmCFIMPe2CeAlOyJOE1sHsi/6XILD/ma7i+4rnqCAoQXolhw5Hg1xC71YJmhusZBtL
+         4v5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682440303; x=1685032303;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1682442146; x=1685034146;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XmXqyd0W5cmoGgju/nu079tCrUcRnNOWtvPWPXTiENA=;
-        b=bhb1LMfT3qjDzG3EV/P0oE3k3nTXuzkBlYnLA6pfraljddSDBjlqkIZYmg8VR4Vx55
-         T5b15CKub99exicnQoTv0W+s7Y9cMHuAkJkDIC02bNgQKEuGOdw91HK8rdtnR401ET8l
-         i/Ih7tJ1G6aeumycC7fDtdZKpXVR3vTgsaWcf8DTi57s3NQ0c53NAFHnoa9DT2wtkn+Q
-         gpPn0wUX+7kii7a0Hk8bHiQQX2AE9QLtAdpf7q5q3jcHJimI39GZB0qT/s5uaA+ItFVf
-         WXvZ9MLQXClqINUNvghhGh4bgfv8b8mWiUiIoiXSfiKnyc3aBfmbs+FfpzQq5V9rlFbP
-         V9gQ==
-X-Gm-Message-State: AAQBX9dZNwEa66Oib6N8al/SadwwOfPl3VezYiOBkFApWz3juL4nDzrU
-        P7rj9C2pwQ5wQSNFK5pjjIg+RfJYtOk0Txzz
-X-Google-Smtp-Source: AKy350bsU/qa4vMTC4nrWiLwbyCQLEdJvs7ksXxHF2ja1B0p1upchh44IloamOz06VBMRXv+5PtW3g==
-X-Received: by 2002:a05:6870:ac27:b0:177:cbb6:ba2 with SMTP id kw39-20020a056870ac2700b00177cbb60ba2mr12136714oab.53.1682440303502;
-        Tue, 25 Apr 2023 09:31:43 -0700 (PDT)
-Received: from localhost.localdomain ([2804:14c:f429:2d04:9d9f:c9a0:8ef:bc50])
-        by smtp.gmail.com with ESMTPSA id v6-20020a056870e28600b0017e0c13b29asm5709200oad.36.2023.04.25.09.31.41
+        bh=iXtc/vJhuVldcTbHh7DFIkr7bKNy/VoTQp8KS+alRgI=;
+        b=QSQyfd1FXF3w1YA9U4gcv/Jka5LROzXfywyR2sxLunRD/cVJ8FrUbGelgnDs4/v4eG
+         x5GQqb238el/+foxfCYP4MV/HTZd2ulocEeyRdxHK6luLq7rdES0+xwmDDqCsG1qMaFl
+         vRNl4jpzhIFnbQbyDHKvpRpbJTc1Ysmu+GfqzqbOMu1t/xDn2qg5qqHR4ebKy6eTOCAK
+         QjSiVXEA91R4LeNZqT7JWQiRocpeJ095e6lYh3VXCuta6Cn2SQeqQlXrJ4bfX7qYGHA2
+         URxtkl58EhyMyR/NQVgDoFh/nYf3d9qHTya64QCOP/wHDkI/QGmB9qD+PwLL5AFcnTpb
+         iiGA==
+X-Gm-Message-State: AAQBX9e5f7hJGkeVPaiY/uO9016BBdEOrk/znzrDkynWSH6I+RG0R9UO
+        ZC8vUodN0QEnlkc34MLw3ws0IG80pYE=
+X-Google-Smtp-Source: AKy350YoULSGbLDszXLqL6Vx/baThgfeewkxeVwRv3ElDEcz0n4Z7Zc2QltkH9XrEolAmCb6eWx0mA==
+X-Received: by 2002:a9d:4e82:0:b0:6a5:dae7:9c74 with SMTP id v2-20020a9d4e82000000b006a5dae79c74mr8050829otk.30.1682442146631;
+        Tue, 25 Apr 2023 10:02:26 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.170.196])
+        by smtp.gmail.com with ESMTPSA id h19-20020a9d6f93000000b006a62aac5736sm5512482otq.28.2023.04.25.10.02.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Apr 2023 09:31:43 -0700 (PDT)
-From:   Raul Cheleguini <raul.cheleguini@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        Raul Cheleguini <raul.cheleguini@gmail.com>
-Subject: [PATCH v2] Bluetooth: Add new quirk for broken extended create connection for ATS2851
-Date:   Tue, 25 Apr 2023 13:31:20 -0300
-Message-Id: <20230425163120.1059724-1-raul.cheleguini@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        Tue, 25 Apr 2023 10:02:26 -0700 (PDT)
+Message-ID: <644807a2.9d0a0220.db740.95ed@mx.google.com>
+Date:   Tue, 25 Apr 2023 10:02:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3330094289718348287=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, raul.cheleguini@gmail.com
+Subject: RE: [v2] Bluetooth: Add new quirk for broken extended create connection for ATS2851
+In-Reply-To: <20230425163120.1059724-1-raul.cheleguini@gmail.com>
+References: <20230425163120.1059724-1-raul.cheleguini@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The controller based on ATS2851 advertises support for the "LE Extended
-Create Connection" command, but it does not actually implement it. This
-issue is blocking the pairing process from beginning.
+--===============3330094289718348287==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-To resolve this, add the quirk HCI_QUIRK_BROKEN_EXT_CREATE_CONN.
-This will avoid the unsupported command and instead send a regular "LE
-Create Connection" command.
+This is automated email and please do not reply to this email!
 
-< HCI Command: LE Extended Create Conn.. (0x08|0x0043) plen 26
-        Filter policy: Accept list is not used (0x00)
-        Own address type: Public (0x00)
-        Peer address type: Random (0x01)
-        Peer address: DD:5E:B9:FE:49:3D (Static)
-        Initiating PHYs: 0x01
-        Entry 0: LE 1M
-          Scan interval: 60.000 msec (0x0060)
-          Scan window: 60.000 msec (0x0060)
-          Min connection interval: 30.00 msec (0x0018)
-          Max connection interval: 50.00 msec (0x0028)
-          Connection latency: 0 (0x0000)
-          Supervision timeout: 420 msec (0x002a)
-          Min connection length: 0.000 msec (0x0000)
-          Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Extended Create Connection (0x08|0x0043) ncmd 1
-        Status: Unknown HCI Command (0x01)
+Dear submitter,
 
-Signed-off-by: Raul Cheleguini <raul.cheleguini@gmail.com>
----
-V1 -> V2: Grammar fix in commit message.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=743095
 
-- Note that this patch depends on the RPA timeout quirk sent via [1].
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.44 seconds
+GitLint                       FAIL      0.56 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      32.96 seconds
+CheckAllWarning               PASS      36.71 seconds
+CheckSparse                   PASS      41.33 seconds
+CheckSmatch                   PASS      111.31 seconds
+BuildKernel32                 PASS      32.35 seconds
+TestRunnerSetup               PASS      455.78 seconds
+TestRunner_l2cap-tester       PASS      17.19 seconds
+TestRunner_iso-tester         PASS      21.70 seconds
+TestRunner_bnep-tester        PASS      5.64 seconds
+TestRunner_mgmt-tester        PASS      116.88 seconds
+TestRunner_rfcomm-tester      PASS      9.04 seconds
+TestRunner_sco-tester         PASS      8.31 seconds
+TestRunner_ioctl-tester       PASS      9.73 seconds
+TestRunner_mesh-tester        PASS      7.06 seconds
+TestRunner_smp-tester         PASS      8.29 seconds
+TestRunner_userchan-tester    PASS      6.00 seconds
+IncrementalBuild              PASS      29.70 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: Add new quirk for broken extended create connection for ATS2851
+WARNING: Use lore.kernel.org archive links when possible - see https://lore.kernel.org/lists.html
+#113: 
   [1]. https://marc.info/?l=linux-bluetooth&m=167957918920723&w=2
-  
- drivers/bluetooth/btusb.c        | 1 +
- include/net/bluetooth/hci.h      | 7 +++++++
- include/net/bluetooth/hci_core.h | 3 ++-
- net/bluetooth/hci_sync.c         | 4 ++++
- 4 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 3a3a966419af..8656ac491f13 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4107,6 +4107,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &hdev->quirks);
- 	}
- 
- 	if (!reset)
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 07df96c47ef4..d5d0e44bf0b6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -309,6 +309,13 @@ enum {
- 	 * to support it.
- 	 */
- 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
-+
-+	/*
-+	 * When this quirk is set, the HCI_OP_LE_EXT_CREATE_CONN command is
-+	 * disabled. This is required for the Actions Semiconductor ATS2851
-+	 * based controllers, which erroneously claims to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
- };
- 
- /* HCI device flags */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 53d3328c2b8b..952b0021dc25 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1695,7 +1695,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- 			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
- 
- /* Use ext create connection if command is supported */
--#define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
-+#define use_ext_conn(dev) (((dev)->commands[37] & 0x80) && \
-+			   !test_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &(dev)->quirks))
- 
- /* Extended advertising support */
- #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 003ec0e34fcc..d49cfd1ea418 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4534,6 +4534,9 @@ static const struct {
- 			 "advertised, but not supported."),
- 	HCI_QUIRK_BROKEN(SET_RPA_TIMEOUT,
+WARNING: quoted string split across lines
+#173: FILE: net/bluetooth/hci_sync.c:4537:
  			 "HCI LE Set Random Private Address Timeout command is "
 +			 "advertised, but not supported."),
-+	HCI_QUIRK_BROKEN(EXT_CREATE_CONN,
-+			 "HCI LE Extended Create Connection command is "
- 			 "advertised, but not supported.")
- };
- 
-@@ -6071,6 +6074,7 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	if (err)
- 		goto done;
- 
-+	/* Send command LE Extended Create Connection if supported */
- 	if (use_ext_conn(hdev)) {
- 		err = hci_le_ext_create_conn_sync(hdev, conn, own_addr_type);
- 		goto done;
--- 
-2.39.2
 
+total: 0 errors, 2 warnings, 0 checks, 45 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13223516.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2] Bluetooth: Add new quirk for broken extended create connection for ATS2851
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+36: B2 Line has trailing whitespace: "  "
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3330094289718348287==--
