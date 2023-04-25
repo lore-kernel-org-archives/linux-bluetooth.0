@@ -2,62 +2,156 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B749C77B61
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Apr 2023 22:35:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8EFC77B76
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 06:48:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232681AbjDXWfr (ORCPT
+        id S233542AbjDYGsg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Apr 2023 18:35:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51942 "EHLO
+        Tue, 25 Apr 2023 02:48:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232851AbjDXWfo (ORCPT
+        with ESMTP id S233528AbjDYGse (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Apr 2023 18:35:44 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02819109;
-        Mon, 24 Apr 2023 15:35:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F1F0629C7;
-        Mon, 24 Apr 2023 22:35:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF969C433EF;
-        Mon, 24 Apr 2023 22:35:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1682375743;
-        bh=QKeuUAG1J2pIGGhmD4cv5432uzStG6qjPWtpZa4nPrk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=jMC/h3MfbFXM7gm2nNinn7fEcTsJZqRpz2h0ch6cNllg9nAM/1w8k/NCG1KuWqGCN
-         9whwZ98Ru5US8y5faXiPmLkm8++IdCC/76/Oi8PdLwxnSfwT+yWpsBleIpmhUVXIzE
-         CMsAJ+ETVCgJjmUhQpwFWjkaQ+DNnXcSQz6c1VrMftmdgLU28GVSZBajNLYfMCrHUI
-         JOHXAHINGx9Q0tdotlOwLK6RobWEiLegUnXyee3ZkJcgjjNz6xGQRviaMZ8DG7TWL/
-         Hz/O0O+OOPT1qh9fab9bVIdXqFVw6NxjKhM+ZmUMCcT4Mbh58FRi0Vdxb2n4dU0kYm
-         x800M3lVPrYSA==
-Date:   Mon, 24 Apr 2023 15:35:41 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2023-04-23
-Message-ID: <20230424153541.74ee3619@kernel.org>
-In-Reply-To: <20230424052742.3423468-1-luiz.dentz@gmail.com>
-References: <20230424052742.3423468-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Tue, 25 Apr 2023 02:48:34 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8D24BBB9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Apr 2023 23:48:12 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-94a34a14a54so992871866b.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Apr 2023 23:48:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fairphone.com; s=fair; t=1682405291; x=1684997291;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M1ZE7zkQJkA5e8pU4DAT31Q8ZdOD3Fw5YHswnvzUZmg=;
+        b=olsY2tC3Gx43o+1zlMobkyWpvjqynYcSpBNJpha9GJ236pWS48I5T6fRMsjnEXvXW6
+         nPi0bqOs+1TlaWLvYdtK05Phwd64bnf8h8lpwCoavOQKecIrT39b+c9OXon5xQQ/G8v5
+         C9ljuQugTDRKMyiQ5qglbXWyDGR5BHf2xgBOnY4Ic4pvsZ2wdQd/paK4gDRXz5hVaFo1
+         4sGV2PZjTYKCVn15Pw/Akl3g3hkRNCNsRHG7vFd0Yq0YJiWgig0JZOf8yfF87vpttcMF
+         HG7HPRei4vraUYDcnXZreqsqGm02uputbga0Nei8umyDLFxVgq8OAfyloV/3rrSUMB2q
+         yv+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682405291; x=1684997291;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=M1ZE7zkQJkA5e8pU4DAT31Q8ZdOD3Fw5YHswnvzUZmg=;
+        b=bS8yoDkD0QoAIWGuRUR/AwLJKY9f7prEypTwCcr8tTmwqmNzatg9hsXYt8HgFS8q8Q
+         z/7Arraw94XrSJ4NiTH28SevhoAQmF0/h/amjaqadqVTRQ6Y2O6GL9Z0ye5Z68eLX1Ho
+         csF8yI5V1TPbjjm7wnZR0iPvqgxJ/5mK8c7AW+y0vjJWZBkcSzKdpYVLOxx4kVxHWv3e
+         DAIlqZcEjL3WH7yy0ZlPoS9tc5lYSp3T1buM0Eb9qRnYId43J3Fgonk9XAihJrruobsr
+         gUlrCOY6vJktysAx0+Cjd5+YjY8Gfi57WTlkzgvgHB08tNJgchgNOhFGRLeRx2avY2ML
+         tw1w==
+X-Gm-Message-State: AAQBX9fgi4p0Dt2crlnkHf4yiYZsrdBoLeKLIW6GwuG3u/asm2hi0IDQ
+        e4rYA9P3dnGZvTVsVv8YddIBgQ==
+X-Google-Smtp-Source: AKy350Z1GFt6IUApk1g0YPdKIdF8wPBWzQ1iG4DdhA44udPMwwV1bqNKEmVs8J1NANW0v9bSPKkIgg==
+X-Received: by 2002:a17:907:38c:b0:94e:fdec:67e2 with SMTP id ss12-20020a170907038c00b0094efdec67e2mr12906256ejb.77.1682405291266;
+        Mon, 24 Apr 2023 23:48:11 -0700 (PDT)
+Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id sd14-20020a170906ce2e00b0094f5d1bbb21sm6340135ejb.102.2023.04.24.23.48.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 24 Apr 2023 23:48:10 -0700 (PDT)
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date:   Tue, 25 Apr 2023 08:48:10 +0200
+Message-Id: <CS5MWGNURMH4.2VD8BIIJ3V3Q4@otso>
+Subject: Re: [PATCH RFC 0/4] Add WCN3988 Bluetooth support for Fairphone 4
+From:   "Luca Weiss" <luca.weiss@fairphone.com>
+To:     "Konrad Dybcio" <konrad.dybcio@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Rob Herring" <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        "Balakrishna Godavarthi" <bgodavar@codeaurora.org>,
+        "Rocky Liao" <rjliao@codeaurora.org>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        "Andy Gross" <agross@kernel.org>,
+        "Bjorn Andersson" <andersson@kernel.org>
+Cc:     <~postmarketos/upstreaming@lists.sr.ht>,
+        <phone-devel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
+X-Mailer: aerc 0.14.0
+References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
+ <0f2af683-07f9-7fc7-a043-ee55e41d65c3@linaro.org>
+In-Reply-To: <0f2af683-07f9-7fc7-a043-ee55e41d65c3@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, 23 Apr 2023 22:27:42 -0700 Luiz Augusto von Dentz wrote:
-> bluetooth-next pull request for net-next:
-> 
->  - Introduce devcoredump support
->  - Add support for Realtek RTL8821CS, RTL8851B, RTL8852BS
->  - Add support for Mediatek MT7663, MT7922
->  - Add support for NXP w8997
->  - Add support for Actions Semi ATS2851
->  - Add support for QTI WCN6855
->  - Add support for Marvell 88W8997
+On Sat Apr 22, 2023 at 2:03 PM CEST, Konrad Dybcio wrote:
+>
+>
+> On 21.04.2023 16:11, Luca Weiss wrote:
+> > Just to start with the important part why this is an RFC:
+> >=20
+> > While Bluetooth chip init works totally fine and bluez seems to be
+> > fairly happy with it, there's a (major) problem with scanning, as shown
+> > with this bluetoothctl snippet and dmesg snippet:
+> >=20
+> >   [bluetooth]# scan on
+> >   Failed to start discovery: org.bluez.Error.InProgress
+> >=20
+> >   [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
+> >=20
+> > This opcode should be the following:
+> >=20
+> >   include/net/bluetooth/hci.h:#define HCI_OP_LE_SET_SCAN_PARAM    0x200=
+b
+> Not a bluetooth expert or anything, but does that thing support
+> bluetooth LE?
 
-Looks pulled - 2efb07b5ced64 in net-next. Thanks!
+I don't know too much about Bluetooth details either, but hasn't
+Bluetooth LE been a consistently supported thing since like 10 years?
+
+All the info I can easily find just states SM7225 SoC supports
+"Bluetooth 5.1".
+
+Regards
+Luca
+
+>
+> Konrad
+> >=20
+> > Unfortunately trying various existing code branches in the Bluetooth
+> > driver doesn't show any sign of making this work and I don't really kno=
+w
+> > where to look to debug this further.
+> >=20
+> > On the other hand "discoverable on" makes the device show up on other
+> > devices during scanning , so the RF parts of the Bluetooth chip are
+> > generally functional for sure.
+> >=20
+> > Any ideas are welcome.
+> >=20
+> > @Bjorn: Patch "arm64: dts: qcom: sm6350: add uart1 node" should be fine
+> > to take regardless the RFC status, I don't think the problem is caused
+> > there.
+> >=20
+> > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> > ---
+> > Luca Weiss (4):
+> >       dt-bindings: net: qualcomm: Add WCN3988
+> >       Bluetooth: btqca: Add WCN3988 support
+> >       arm64: dts: qcom: sm6350: add uart1 node
+> >       arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
+> >=20
+> >  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  2 +
+> >  arch/arm64/boot/dts/qcom/sm6350.dtsi               | 63 ++++++++++++++=
+++++++++
+> >  arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts  | 17 ++++++
+> >  drivers/bluetooth/btqca.c                          | 13 ++++-
+> >  drivers/bluetooth/btqca.h                          | 12 ++++-
+> >  drivers/bluetooth/hci_qca.c                        | 12 +++++
+> >  6 files changed, 115 insertions(+), 4 deletions(-)
+> > ---
+> > base-commit: cf4c0112a0350cfe8a63b5eb3377e2366f57545b
+> > change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
+> >=20
+> > Best regards,
+
