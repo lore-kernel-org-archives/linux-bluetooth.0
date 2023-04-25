@@ -2,120 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA46C77B61
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 21:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC47C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 21:10:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232235AbjDYVDI (ORCPT
+        id S232249AbjDYVKX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Apr 2023 17:03:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52818 "EHLO
+        Tue, 25 Apr 2023 17:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231978AbjDYVDH (ORCPT
+        with ESMTP id S232191AbjDYVKW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Apr 2023 17:03:07 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19BEC16F2F;
-        Tue, 25 Apr 2023 14:03:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682456586; x=1713992586;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Jw66GbpVDrNQLpIB5E1F9gDZmk+UiU7wloECDprBEi0=;
-  b=PT8wfXujAkAeowdCA8BYMXFqcejBycN1eGaNXFjrQYAlumG3N3hieLJ8
-   P03dJgbQ63VsKuskjQ6Edpzrp5g+9IZ7MT9RghIvXb2N8nu1+5lRH5k+p
-   ULtLhylfVmYrYQ5cspAvIlivX0Y/mZiywD9XAiWAMN49CD5j9GLmjPACQ
-   W1MfKlSZagYxXa/S2+aGIUXHjKhsbrBXZwWWFacw4YcORHXfy9VHYc2oD
-   Qazx39HTlUC6tGJmiNJSMR7pnCsvQtZHrZlW+F6WOgDzkyNn56rMtdP5J
-   DO/R3R3RKFTDaKHOIvwt0Xli1cZX3cNP0pX1iFDmEHAh38gKNJhmebFa4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10691"; a="346926808"
-X-IronPort-AV: E=Sophos;i="5.99,226,1677571200"; 
-   d="scan'208";a="346926808"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2023 14:03:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10691"; a="724151023"
-X-IronPort-AV: E=Sophos;i="5.99,226,1677571200"; 
-   d="scan'208";a="724151023"
-Received: from lkp-server01.sh.intel.com (HELO b613635ddfff) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 25 Apr 2023 14:03:00 -0700
-Received: from kbuild by b613635ddfff with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1prPoR-000jm0-2X;
-        Tue, 25 Apr 2023 21:02:59 +0000
-Date:   Wed, 26 Apr 2023 05:02:12 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     hildawu@realtek.com, marcel@holtmann.org
-Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mmandlik@google.com, apusaka@chromium.org, yinghsu@chromium.org,
-        alex_lu@realsil.com.cn, max.chou@realtek.com, kidman@realtek.com
-Subject: Re: [PATCH v3] Bluetooth: btrtl: Add Realtek devcoredump support
-Message-ID: <202304260422.XHBgACOW-lkp@intel.com>
-References: <20230420105343.2014-1-hildawu@realtek.com>
+        Tue, 25 Apr 2023 17:10:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8DA5121
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 14:10:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 834D163068
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 21:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E2033C433EF;
+        Tue, 25 Apr 2023 21:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682457020;
+        bh=GQhkHecmq7bnPUhxKa4HDtrdffZ4L9MkD3LzMzGt4K8=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=cEoZKWMI8HAQYRSBes27XxOTXldu9kmPNJk6EP/tcY87JQLs7xX5aEffwvAorsFir
+         bYZBbGAT6+9jr+nPLQVvGsq/wFMu2YYRubH6nJZH1GC7ynb7onwyXCCKzGN/yHIt84
+         nINHKgCGTeipyboEcOQExhfLesqdFkK1uSCju8Q/edccs03BVQFnq4Wiqyc2TUJzRM
+         RNYASYTAsc7XN3dRvSa9Tn8J33XW4WR9xMopnDbSN0aBbN5EQdyuJhIHRKnuqhMOQY
+         ckVhXZHpyr3LkK/1tymLNU2MA0f5Hd4oun2n048qDNEpybZcC9zqqDv588wevyH7DL
+         I2mwOhZtnlBKQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3EA3E5FFC9;
+        Tue, 25 Apr 2023 21:10:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230420105343.2014-1-hildawu@realtek.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/2] shared/bap: add function to get location from PAC
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <168245702079.26790.9427550310181073194.git-patchwork-notify@kernel.org>
+Date:   Tue, 25 Apr 2023 21:10:20 +0000
+References: <3cc705b0fa000b4cfc5071ae13f4c0fcb31bfc25.1682182441.git.pav@iki.fi>
+In-Reply-To: <3cc705b0fa000b4cfc5071ae13f4c0fcb31bfc25.1682182441.git.pav@iki.fi>
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hello:
 
-kernel test robot noticed the following build errors:
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on next-20230425]
-[cannot apply to bluetooth/master linus/master v6.3]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Sat, 22 Apr 2023 17:05:56 +0000 you wrote:
+> Add function to get the PACS Sink/Source Audio Locations field relevant
+> for a given PAC.
+> ---
+>  src/shared/bap.c | 14 ++++++++++++++
+>  src/shared/bap.h |  2 ++
+>  2 files changed, 16 insertions(+)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/hildawu-realtek-com/Bluetooth-btrtl-Add-Realtek-devcoredump-support/20230420-185852
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20230420105343.2014-1-hildawu%40realtek.com
-patch subject: [PATCH v3] Bluetooth: btrtl: Add Realtek devcoredump support
-config: arm-randconfig-r013-20230424 (https://download.01.org/0day-ci/archive/20230426/202304260422.XHBgACOW-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project 437b7602e4a998220871de78afcb020b9c14a661)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # install arm cross compiling tool for clang build
-        # apt-get install binutils-arm-linux-gnueabi
-        # https://github.com/intel-lab-lkp/linux/commit/dd7adb785f34ba9037f5c73dac879071302c636a
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review hildawu-realtek-com/Bluetooth-btrtl-Add-Realtek-devcoredump-support/20230420-185852
-        git checkout dd7adb785f34ba9037f5c73dac879071302c636a
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm SHELL=/bin/bash drivers/
+Here is the summary with links:
+  - [BlueZ,1/2] shared/bap: add function to get location from PAC
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5910b7852801
+  - [BlueZ,2/2] bap: add Location parameter to SelectProperties
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2f88c59391b8
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304260422.XHBgACOW-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/bluetooth/btusb.c:27:
->> drivers/bluetooth/btrtl.h:188:2: error: void function 'btrtl_set_driver_name' should not return a value [-Wreturn-type]
-           return -EOPNOTSUPP;
-           ^      ~~~~~~~~~~~
-   1 error generated.
-
-
-vim +/btrtl_set_driver_name +188 drivers/bluetooth/btrtl.h
-
-   185	
-   186	static inline void btrtl_set_driver_name(struct hci_dev *hdev, const char *driver_name)
-   187	{
- > 188		return -EOPNOTSUPP;
-   189	}
-   190	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
