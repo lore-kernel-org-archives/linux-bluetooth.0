@@ -2,134 +2,118 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD80C77B61
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Apr 2023 23:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F71C77B60
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Apr 2023 04:41:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236311AbjDYXLl (ORCPT
+        id S239386AbjDZElX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Apr 2023 19:11:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41090 "EHLO
+        Wed, 26 Apr 2023 00:41:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235048AbjDYXLk (ORCPT
+        with ESMTP id S238411AbjDZElV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Apr 2023 19:11:40 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6518018EB3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 16:11:12 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-63b5c4c76aaso4651810b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 16:11:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682464229; x=1685056229;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6j5hYe658HjH821uXZ/J0MXsYGEv6OZxaR0xmsdaHYg=;
-        b=qHNfqv5s5MPTC6JwkSrgeTFu2ibnEmPrOWdv3WP7OK3FQe51H/5EXDR1S1PmpXfULn
-         Z3SEKin6Y8fiZplnNFJD9wqHm34mRNDLG6DOO8gHojbIHVUPjH7F75mUslf0G3fA6c6I
-         EzU8Zv/aZsXaa0NI9Hx+tyStte0ILgmreO5juxEK/HTV90PE+hVYQhZptX70dkUSthfn
-         gJxWSJmdeds4LhgciAD12bCQEZ19GcCF6H41Wqo/lRTdj49laJn+eWUafqZz8jtCleqv
-         y0qVKmz2sZcqWFAjY39tI2ZvUN5CcRIVU5v67kxTU3Tb4C4FRzQcYFg06e2edYR8NaGW
-         4KdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682464229; x=1685056229;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6j5hYe658HjH821uXZ/J0MXsYGEv6OZxaR0xmsdaHYg=;
-        b=AHXa7vaqP5YO/+AjbOPc6U7FrqCftIP9LYH+QBHhDocmKrIMJG9K7Hm2r0t2hI8hie
-         ptEC56glzP2TUgrc+V2fbtQW8k9QyeC91TLKYG/G8oqq7rq2rLEp/y1ah8F5QKJgKUJA
-         SJ/onAkVljSclUrfsUilOmOwSds9WmXXJ4CDneOZjDYxO5gom+IB3psPNUp52elfn4Zy
-         +2nyk19C7rfEzymLU9KIwOD37FyZhlgMXiQrDlFWSuDcDX6D39T+16C/KPK0pfOwVxLU
-         ahUC+b19fy9YdHf7f1CrkhIFwAeKz9uM+YsZ5jFq/p9e7oO4Us8pRDzwVz5cx430zPpN
-         bNcA==
-X-Gm-Message-State: AAQBX9ehhjtZHAnLREkVMlXH/dtA02q2+5JdcIgH1VG2m3rqBTX0nDqa
-        tPL27X3HWF7Vz1V1fmRtf78caxPJ2RI=
-X-Google-Smtp-Source: AKy350YkaueGYtLqP2/8eTbsTJp8ugXW067OYXTvJ/grWHtgBiWDAhSRh9pXHAIlaY9WdZ37D19YNg==
-X-Received: by 2002:a05:6a00:17a9:b0:63d:489c:971 with SMTP id s41-20020a056a0017a900b0063d489c0971mr27624246pfg.24.1682464228745;
-        Tue, 25 Apr 2023 16:10:28 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.133.139])
-        by smtp.gmail.com with ESMTPSA id i69-20020a628748000000b00640e12b6464sm2877295pfe.178.2023.04.25.16.10.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Apr 2023 16:10:28 -0700 (PDT)
-Message-ID: <64485de4.620a0220.1b815.6767@mx.google.com>
-Date:   Tue, 25 Apr 2023 16:10:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2720634433673680590=="
+        Wed, 26 Apr 2023 00:41:21 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0816F26AC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Apr 2023 21:41:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 94DDD6323E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 04:41:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F11A2C4339C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 04:41:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682484079;
+        bh=42j1m3ClBBUlnJ2/k/qkkDPrL2cYEJxhTJ6wOLFatx8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=MmdWaq0A5F9erSgnLyx/VKf51P1rZAtIY/VDiciAKYBzj5N+UE0Zn1dBAnbi6wGxU
+         XVWl+vWcXKEvlXwOe5sdsA3hly9wxF1bq1z4qb88OpovWhBw7W3tT4eNHSFWRbIVPD
+         8wIwMMI8eMaUq59u/R1YQzaw2nDqMXh3BYLJVlmVoMzlgoJQ98Su4dplLpuRcX4ji1
+         +F/LU06/sK8cUI4QH2fqpgdpS/lD5DTaMYaVEIU65JCetM5D/g1HNX+c6bBeaXjWj6
+         NWg5nI0+sBXa8ogHnInYQID5kKRPTck7URN6DDL/rh3Pk9Yqu1v6iJvEdAJVvn9um/
+         4oZXwbCNigS0g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id DD3CFC43141; Wed, 26 Apr 2023 04:41:18 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
+Date:   Wed, 26 Apr 2023 04:41:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: einhalb@gmx.net
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-217023-62941-FaAiJSdTrh@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
+References: <bug-217023-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/7] media: Fix not storing Preferred Delay properly
-In-Reply-To: <20230425204729.3943583-1-luiz.dentz@gmail.com>
-References: <20230425204729.3943583-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2720634433673680590==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
 
-This is automated email and please do not reply to this email!
+--- Comment #5 from einhalb@gmx.net ---
+Same error on boot for me with AMD CPU und Intel Wifi AX210:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=743154
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.54 seconds
-GitLint                       PASS      1.82 seconds
-BuildEll                      PASS      26.72 seconds
-BluezMake                     PASS      771.20 seconds
-MakeCheck                     FAIL      11.44 seconds
-MakeDistcheck                 PASS      154.02 seconds
-CheckValgrind                 PASS      245.93 seconds
-CheckSmatch                   PASS      329.77 seconds
-bluezmakeextell               PASS      99.34 seconds
-IncrementalBuild              PASS      4381.54 seconds
-ScanBuild                     PASS      999.98 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,6/7] shared/lc3: Update configuration to use iovec
-ERROR:SPACING: need consistent spacing around '>>' (ctx:WxV)
-#124: FILE: src/shared/lc3.h:56:
-+	LC3_IOV(0x02, LC3_FREQ, _freq, _freq >>8, \
- 	                                     ^
-
-/github/workspace/src/src/13223798.patch total: 1 errors, 0 warnings, 125 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13223798.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+dmesg
+[   12.374403] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   12.374413] Bluetooth: BNEP filters: protocol multicast
+[   12.374421] Bluetooth: BNEP socket layer initialized
+[   13.343660] Bluetooth: hci0: Waiting for firmware download to complete
+[   13.343931] Bluetooth: hci0: Firmware loaded in 1275748 usecs
+[   13.344049] Bluetooth: hci0: Waiting for device to boot
+[   13.373944] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[   13.373952] Bluetooth: hci0: Device booted in 29263 usecs
+[   13.374278] Bluetooth: hci0: Found Intel DDC parameters:
+intel/ibt-0041-0041.ddc
+[   13.382017] Bluetooth: hci0: Applying Intel DDC parameters completed
+[   13.390994] Bluetooth: hci0: Firmware timestamp 2022.5 buildtype 1 build
+38020
+[   13.563429] loop42: detected capacity change from 0 to 8
+[   13.623805] NET: Registered PF_ALG protocol family
+[   13.791859] Bluetooth: hci0: Bad flag given (0x1) vs supported (0x0)
+[   13.802577] Bluetooth: RFCOMM TTY layer initialized
+[   13.802593] Bluetooth: RFCOMM socket layer initialized
+[   13.802605] Bluetooth: RFCOMM ver 1.11
 
 
-##############################
-Test: MakeCheck - FAIL
-Desc: Run Bluez Make Check
-Output:
 
-make[3]: *** [Makefile:11261: test-suite.log] Error 1
-make[2]: *** [Makefile:11369: check-TESTS] Error 2
-make[1]: *** [Makefile:11777: check-am] Error 2
-make: *** [Makefile:11779: check] Error 2
+lscpu
+AMD Ryzen 7 2700U with Radeon Vega Mobile Gfx
 
+lsusb
+Bus 001 Device 002: ID 8087:0032 Intel Corp. AX210 Bluetooth
 
----
-Regards,
-Linux Bluetooth
+lsb_release -a
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04.2 LTS
+Release:        22.04
+Codename:       jammy
 
+uname -a
+Linux NB-1 5.19.0-41-generic #42~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Tue Apr=
+ 18
+17:40:00 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
 
---===============2720634433673680590==--
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
