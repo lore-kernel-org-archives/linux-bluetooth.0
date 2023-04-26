@@ -2,96 +2,160 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB97C7618E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Apr 2023 18:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E9BC7618E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Apr 2023 18:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233321AbjDZSin (ORCPT
+        id S233614AbjDZSko (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Apr 2023 14:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54442 "EHLO
+        Wed, 26 Apr 2023 14:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232813AbjDZSim (ORCPT
+        with ESMTP id S233980AbjDZSkn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Apr 2023 14:38:42 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C4F7AB9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 11:38:41 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-3ef3ce7085bso32379871cf.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 11:38:41 -0700 (PDT)
+        Wed, 26 Apr 2023 14:40:43 -0400
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3484173C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 11:40:41 -0700 (PDT)
+Received: by mail-ot1-x32a.google.com with SMTP id 46e09a7af769-6a5f9c1200eso2947668a34.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 11:40:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682534320; x=1685126320;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=A+rsVt5UUED49vdReRn/5heChy1aNTLFCFVS6yW1H5s=;
-        b=OAV9uXGn/C/kueCsVCwRgpFjYA5aThHY7V4HCDyF/ciYKVIzb8O2oNx97F/U95pMzK
-         eAe/zX1B3VuRcdvCH5sF9U45ETL+KSbmmuaXLidOQFQCaBmAImjfYyeNBRfW1/cyoSMr
-         ZKHWTj7aUTrGLd2JOYr1lCxXIRFNWp2G2LFZKsqtpPjJm5gi2t7LwK3UzZ+KzjkchGWp
-         IXlQB/WdQKOodoJlVV2tfu3LEiqZY8kMKahGBUrRK/X+zOOp+SE/l+jDxK6H8nejcc4Q
-         1pXFvbPW+r0hh9ZrC4KHLUKrzz6vB3+Zqes90UgmXUT/OH/hvd4SbW7VTUVDQRs9Vova
-         TafQ==
+        d=gmail.com; s=20221208; t=1682534441; x=1685126441;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zL8eawPHCEGdqDFy/1gKXaFSyh+OEr3QsrolSnWTRmo=;
+        b=TFN38/TQsztyMqmpfE8uGcXgrX8fbiY7aNc6RhDsywE44TSQNomnJbbYkSsPQzpvVd
+         YJN/q5I/nsjseTzwtYAHDARnBa/KV5DZe1v+CJJ3wMU3A7u+yv0Z3FjV0KNlNqvy7EnX
+         RDN3jtX6bejHtw0bpiJc419OjDjc13Ci0DDyZNlg/uwhAlpArfvK5BMKXNOqHgAKyNDh
+         +z2rcomDCCXbE3ubyVP0mMYzYAbPcDCDnhyhPa4DxE9W6re497rQozAhNTYBHOPhdu2i
+         gLYUVqn2K/Ee3NhT7PEo29lnQtpHcoQjuVXmBwMu8mCXNCLgJ9WHA/PpH/UuZUPGNGja
+         u74A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682534320; x=1685126320;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1682534441; x=1685126441;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=A+rsVt5UUED49vdReRn/5heChy1aNTLFCFVS6yW1H5s=;
-        b=b697enifL5FS5cmlwEPcajDpTeMO0ETAl4lfdn8Cq8QXWodk44N4vxb1BxqcfdzJsE
-         OD+7BZ8fIKO3gm0E1zcrzOSJvEhFTT1ykftIf3+tZXirIqZ/ACmwwkwvnaUSFFydioVQ
-         87xZWlVR+xv3kuM9mdY+w2cTR71KOtGN363OwyC6m91xZjV1u0fW4TIhabulJ+Z+ZmM2
-         jEoCZOJDK6qvLFyLi39RyxPEzSTDr+Uh4TPespqb1ku0sNNHXIWiLbkd64gV+xM2HUpM
-         NOpn7+1eiOeck1FQPhDW1HbF9i0jjO0IlnZ2sUoXwnicxHpIJiisO7CUns1a62mB8l7V
-         tgDw==
-X-Gm-Message-State: AAQBX9dM0bKrt6p2A4QXItqJcNyVMWg6wAxDqQeYf3V5HSP8CtT4rurn
-        2SNmBkbnQIAWr2GR3CH2uOZeGzOYjOQ=
-X-Google-Smtp-Source: AKy350Z8uMeQmtFVdae9lYw2+ck/W7e53CTANHlH54vpz/kWJ6oCvtdGOnMjQhG1PjUkT5DY821DJg==
-X-Received: by 2002:ac8:594d:0:b0:3ec:46e9:bc4b with SMTP id 13-20020ac8594d000000b003ec46e9bc4bmr40206963qtz.29.1682534320085;
-        Wed, 26 Apr 2023 11:38:40 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.6.29])
-        by smtp.gmail.com with ESMTPSA id l9-20020ac81489000000b003e302c1f498sm5516148qtj.37.2023.04.26.11.38.39
+        bh=zL8eawPHCEGdqDFy/1gKXaFSyh+OEr3QsrolSnWTRmo=;
+        b=jO1pzQIByjvEjcOHzt9x7dVAGTgxEf94Iwh9dwe4mgV7Os7t0tmD4cJdjvaEcJ7D6w
+         VRAd9VyO0iUgDAC2wBnD6BHMeJIyzkzpNCP5MmB8RvTEAs380oOvL1107iPm6U/qCg7k
+         Vi3AnCJ/vGGW0hzJBs6TEXQFRb+IGef1AjmVfvfpbJpnTzlJOuyQrOVTAbgm7qj0zVvL
+         2ZidWqcDgYqwl3Zjv8IMSkgHJZ+DNhj3BJtTizzlEblx4TkBL4ZLeNNpMXqA/po43dPA
+         xtZUZKoSDtR+ZR04YVKVfLU09BOdTRhWB8Bog7A0faCgIUpAuyjd940yfzd3xweFAZrp
+         9fSw==
+X-Gm-Message-State: AC+VfDwXSLRatmYmbqzFo2t3yTCIRey24LGSGrr2X7N3C31k5VXiSkT4
+        ucuO4CEumzIyipqr6dRcoH6Ecms+jqFvvqUz
+X-Google-Smtp-Source: ACHHUZ79egC0z1TFbc/mKayBzfcmDfJym+KPZDeRKZy7KIwTZmKqVYm6RHKywjzL6VUqK4xtuxscYw==
+X-Received: by 2002:a05:6808:5c3:b0:390:77fa:1fce with SMTP id d3-20020a05680805c300b0039077fa1fcemr767903oij.40.1682534440255;
+        Wed, 26 Apr 2023 11:40:40 -0700 (PDT)
+Received: from localhost.localdomain ([2804:14c:f429:2d04:9d9f:c9a0:8ef:bc50])
+        by smtp.gmail.com with ESMTPSA id p129-20020acabf87000000b00383cc29d6b2sm6906329oif.51.2023.04.26.11.40.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Apr 2023 11:38:39 -0700 (PDT)
-Message-ID: <64496faf.c80a0220.55121.6c09@mx.google.com>
-Date:   Wed, 26 Apr 2023 11:38:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0822323000644081691=="
+        Wed, 26 Apr 2023 11:40:39 -0700 (PDT)
+From:   Raul Cheleguini <raul.cheleguini@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Raul Cheleguini <raul.cheleguini@gmail.com>
+Subject: [PATCH v2] Bluetooth: Fix unexpected SMP command errors for ATS2851
+Date:   Wed, 26 Apr 2023 15:40:17 -0300
+Message-Id: <20230426184017.2051211-1-raul.cheleguini@gmail.com>
+X-Mailer: git-send-email 2.39.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, raul.cheleguini@gmail.com
-Subject: RE: Bluetooth: Fix unexpected SMP command errors for ATS2851
-In-Reply-To: <20230426183306.2048251-1-raul.cheleguini@gmail.com>
-References: <20230426183306.2048251-1-raul.cheleguini@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0822323000644081691==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Fix unexpected SMP 0x08 and 0x09 command errors when connecting and pairing
+devices using ATS2851 based controllers.
 
-This is an automated email and please do not reply to this email.
+The errors are a result of a race condition in which the host receives the
+commands (without prior authorization by SMP functions) in the moment host
+is sending WRITE_AUTH_PAYLOAD_TIMEOUT command.
 
-Dear Submitter,
+In such a situation, a disconnect event occurs, and the device cannot
+connect or pair.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+To address this issue, we add a condition that skips the
+WRITE_AUTH_PAYLOAD_TIMEOUT command for ATS2851, enabling the SMP
+functions to prepare for commands 0x08 and 0x09 in a timely manner.
 
------ Output -----
-
-error: patch failed: drivers/bluetooth/btusb.c:4374
-error: drivers/bluetooth/btusb.c: patch does not apply
-error: patch failed: include/net/bluetooth/hci.h:316
-error: include/net/bluetooth/hci.h: patch does not apply
-error: patch failed: net/bluetooth/hci_sync.c:4581
-error: net/bluetooth/hci_sync.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Raul Cheleguini <raul.cheleguini@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+V1 -> V2: Fix typo in commit message.
 
+- Note that this patch depends on the broken extended create connection
+  quirk sent in [1].
+  [1]. https://marc.info/?l=linux-bluetooth&m=168244024503639&w=2
 
---===============0822323000644081691==--
+ drivers/bluetooth/btusb.c   | 1 +
+ include/net/bluetooth/hci.h | 7 +++++++
+ net/bluetooth/hci_event.c   | 7 +++++++
+ net/bluetooth/hci_sync.c    | 5 ++++-
+ 4 files changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1cf104feaf85..972ca94de6de 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4374,6 +4374,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &hdev->quirks);
++		set_bit(HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT, &hdev->quirks);
+ 	}
+ 
+ 	if (!reset)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index d5d0e44bf0b6..625c100a74ad 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -316,6 +316,13 @@ enum {
+ 	 * based controllers, which erroneously claims to support it.
+ 	 */
+ 	HCI_QUIRK_BROKEN_EXT_CREATE_CONN,
++
++	/*
++	 * When this quirk is set, the command WRITE_AUTH_PAYLOAD_TIMEOUT is
++	 * skipped. This is required for the Actions Semiconductor ATS2851
++	 * based controllers, due to a race condition in pairing process.
++	 */
++	HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT,
+ };
+ 
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d00ef6e3fc45..2077a7c921f1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3655,6 +3655,13 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
++	/* We skip the WRITE_AUTH_PAYLOAD_TIMEOUT for ATS2851 based controllers
++	 * to avoid unexpected SMP command errors when pairing.
++	 */
++	if (test_bit(HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT,
++		     &hdev->quirks))
++		goto notify;
++
+ 	/* Set the default Authenticated Payload Timeout after
+ 	 * an LE Link is established. As per Core Spec v5.0, Vol 2, Part B
+ 	 * Section 3.3, the HCI command WRITE_AUTH_PAYLOAD_TIMEOUT should be
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 26ab4deb6d52..ecd18c611122 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4581,7 +4581,10 @@ static const struct {
+ 			 "advertised, but not supported."),
+ 	HCI_QUIRK_BROKEN(EXT_CREATE_CONN,
+ 			 "HCI LE Extended Create Connection command is "
+-			 "advertised, but not supported.")
++			"advertised, but not supported."),
++	HCI_QUIRK_BROKEN(WRITE_AUTH_PAYLOAD_TIMEOUT,
++			 "HCI WRITE AUTH PAYLOAD TIMEOUT command leads "
++			 "to unexpected SMP errors when pairing.")
+ };
+ 
+ /* This function handles hdev setup stage:
+-- 
+2.39.2
+
