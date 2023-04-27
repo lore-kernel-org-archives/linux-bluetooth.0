@@ -2,110 +2,366 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27762C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Apr 2023 04:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D54CDC77B7E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Apr 2023 05:37:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjD0EAy (ORCPT
+        id S242847AbjD0FhS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Apr 2023 00:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32858 "EHLO
+        Thu, 27 Apr 2023 01:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjD0EAw (ORCPT
+        with ESMTP id S232094AbjD0FhR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Apr 2023 00:00:52 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E9EF2683
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 21:00:51 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-24736992dd3so5204979a91.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Apr 2023 21:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682568051; x=1685160051;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jkPw3eEAnOvssy/7KikHnd4QXWymkBeS74mVubQcLlE=;
-        b=Ovds85e6/GHlQJIV4qz0jdK+laJUk5+53mpOswduU80e6ZnMbJNVlqdYvVnEYTq1kZ
-         in3c4A/Sm5xPCWeaWlGp8ajINqoDd+b45aT16tYlpqiB1R7edDeLcE0++W0DZwVGJ/bf
-         C1q2kaYztbfaWnw8ryyG99lyMWS5ZXZrwmShn6gZ2K/N6i1QHqhUlhYRyazitZMH4wiD
-         L2OlCjPZw8KIJfW6i+xBlsdW5sMnhw2WVVcuZ16RZ/ARaPHiazRFM/nnPHNOUF4mFLWA
-         BmMz0VMH01qEBXjs1tr3L26azdve4Tyy7ft6McfGtbUJD5dXiHuWUae9ojIzCuGOzZo1
-         S9jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682568051; x=1685160051;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jkPw3eEAnOvssy/7KikHnd4QXWymkBeS74mVubQcLlE=;
-        b=Xf+Gu5SF9Jt4625l58hKN1O+08OJv5TZW9A1WjrDyA61urvU3IkC0VLu666Vu9SN8Y
-         5sA3xxgeoD7ezyDIAxlCWjT8+SlEff+hGd9kHCM8HEZ4RsoC78gkRjQdEjb+XzGeMzg4
-         1vXenaoRwk+o7WcUE53Y9g1TxjCySCmS+HcdoGTBZAmAclhY+OacMefZGalUh/tjWYtk
-         gZz9dMBrFqMNTlVd/cfQ4IWnczlc7o6ol1I7/GDFY+IhjbPZanYSMSI76uKwnCAkpY10
-         +Ev2R/5jEdh5p7taePrfL0pY1ETZjzO4dFfVYsaKIIu7SfoMo7rUWAeBiCh85C9WYx2q
-         /Kig==
-X-Gm-Message-State: AC+VfDyMMymTKjC0GAqcgQ/hzq9SrflN7ZYfSp3Ehn8rXMrGf1zw/Yxp
-        n2A2qhf1QPwFZS5/6W07zMXVb4xTWEI=
-X-Google-Smtp-Source: ACHHUZ7oGR9OP6s7fHB/LYOsP7xqUzAz30sQQVNBqULrpMkf8q0JDBhMcSzQPt3pLH5TZ/N/cyuAHQ==
-X-Received: by 2002:a17:90a:f581:b0:240:95a9:923d with SMTP id ct1-20020a17090af58100b0024095a9923dmr385919pjb.48.1682568050424;
-        Wed, 26 Apr 2023 21:00:50 -0700 (PDT)
-Received: from [172.17.0.2] ([138.91.87.18])
-        by smtp.gmail.com with ESMTPSA id y1-20020a170902700100b0019a7ef5e9a8sm10654453plk.82.2023.04.26.21.00.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Apr 2023 21:00:50 -0700 (PDT)
-Message-ID: <6449f372.170a0220.3fddb.64fd@mx.google.com>
-Date:   Wed, 26 Apr 2023 21:00:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8186047400584367789=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hildawu@realtek.com
-Subject: RE: [v4] Bluetooth: btrtl: Add Realtek devcoredump support
-In-Reply-To: <20230427032755.28519-1-hildawu@realtek.com>
-References: <20230427032755.28519-1-hildawu@realtek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+        Thu, 27 Apr 2023 01:37:17 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648921A4;
+        Wed, 26 Apr 2023 22:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682573835; x=1714109835;
+  h=date:from:to:cc:subject:message-id;
+  bh=0zmSFm72B70qH6+SvJN8flTFFQSMt/vIt0/G0ZTd3fk=;
+  b=Y+IcEx7M9nqk/KqkAnJbweSDXdJ6ZBeSQq7tqJ3PAllUVikZoIEFDWSQ
+   pv7OVOWKQRRy0iPZMKbUm8fz6gFE7zrW5PyRq4Co9jJMkvryt6FCV/sus
+   cEOzOvlizi9VXd7VXpzfUgOpX9l8vMQxRDgsBqnyYp80g/N8/3prCbKHl
+   xoq9zduR9mYveN7hCBc2lQL+70V9drYlUZJVn1eioVb5qyQnm2wq+qAXj
+   kJhkuioN32uxkIaH/178BVeThUbXf/SyrHDLpPt6LHvfnDHfyNah5bnj3
+   hJ7UvKGVhReoo+qOaF2V8jZPWwMVxg49Pfe8oX2EKmPKYgSqaO5dD2JI9
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10692"; a="346094785"
+X-IronPort-AV: E=Sophos;i="5.99,230,1677571200"; 
+   d="scan'208";a="346094785"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2023 22:37:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10692"; a="758936933"
+X-IronPort-AV: E=Sophos;i="5.99,230,1677571200"; 
+   d="scan'208";a="758936933"
+Received: from lkp-server01.sh.intel.com (HELO 1e0e07564161) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 26 Apr 2023 22:37:12 -0700
+Received: from kbuild by 1e0e07564161 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1pruJb-00001h-1n;
+        Thu, 27 Apr 2023 05:37:11 +0000
+Date:   Thu, 27 Apr 2023 13:36:54 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Linux Memory Management List <linux-mm@kvack.org>,
+        amd-gfx@lists.freedesktop.org, linux-acpi@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-watchdog@vger.kernel.org, qat-linux@intel.com,
+        Mark Brown <broonie@kernel.org>
+Subject: [linux-next:master] BUILD SUCCESS WITH WARNING
+ b7455b10da762f2d447678c88e37cc1eb6cb45ee
+Message-ID: <20230427053654.lVx1R%lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8186047400584367789==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: b7455b10da762f2d447678c88e37cc1eb6cb45ee  Add linux-next specific files for 20230426
 
-This is automated email and please do not reply to this email!
+Warning reports:
 
-Dear submitter,
+https://lore.kernel.org/oe-kbuild-all/202304210303.nlMI0sRQ-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202304210349.DykCi88S-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202304220119.94Pw6YsD-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202304270438.mwnBZp1A-lkp@intel.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=743500
+Warning: (recently discovered and may have been fixed)
 
----Test result---
+drivers/base/regmap/regcache-maple.c:113:23: warning: 'lower_index' is used uninitialized [-Wuninitialized]
+drivers/base/regmap/regcache-maple.c:113:36: warning: 'lower_last' is used uninitialized [-Wuninitialized]
+drivers/bluetooth/btnxpuart.c:1332:34: warning: unused variable 'nxpuart_of_match_table' [-Wunused-const-variable]
+drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.c:6339:6: warning: no previous prototype for 'amdgpu_dm_connector_funcs_force' [-Wmissing-prototypes]
+drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.c:6395:21: warning: variable 'count' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/amdgpu_gfx.c:458:16: warning: variable 'j' set but not used [-Wunused-but-set-variable]
+drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c:1078:6: warning: no previous prototype for 'gfx_v9_4_3_disable_gpa_mode' [-Wmissing-prototypes]
+drivers/watchdog/starfive-wdt.c:584:34: warning: unused variable 'starfive_wdt_match' [-Wunused-const-variable]
+fs/ext4/super.c:1262:13: warning: unused variable 'i' [-Wunused-variable]
+fs/ext4/super.c:1262:6: warning: unused variable 'i' [-Wunused-variable]
 
-Test Summary:
-CheckPatch                    PASS      1.33 seconds
-GitLint                       PASS      0.26 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      38.75 seconds
-CheckAllWarning               PASS      42.89 seconds
-CheckSparse                   PASS      48.71 seconds
-CheckSmatch                   PASS      130.61 seconds
-BuildKernel32                 PASS      38.04 seconds
-TestRunnerSetup               PASS      535.77 seconds
-TestRunner_l2cap-tester       PASS      19.81 seconds
-TestRunner_iso-tester         PASS      26.14 seconds
-TestRunner_bnep-tester        PASS      6.99 seconds
-TestRunner_mgmt-tester        PASS      133.64 seconds
-TestRunner_rfcomm-tester      PASS      10.69 seconds
-TestRunner_sco-tester         PASS      9.98 seconds
-TestRunner_ioctl-tester       PASS      11.71 seconds
-TestRunner_mesh-tester        PASS      8.60 seconds
-TestRunner_smp-tester         PASS      9.86 seconds
-TestRunner_userchan-tester    PASS      7.12 seconds
-IncrementalBuild              PASS      36.71 seconds
+Unverified Warning (likely false positive, please contact us if interested):
 
+drivers/acpi/property.c:985 acpi_data_prop_read_single() error: potentially dereferencing uninitialized 'obj'.
+drivers/crypto/intel/qat/qat_common/adf_cfg.c:262 adf_cfg_add_key_value_param() warn: argument 4 to %lx specifier is cast from pointer
 
+Warning ids grouped by kconfigs:
 
----
-Regards,
-Linux Bluetooth
+gcc_recent_errors
+|-- alpha-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- arc-allyesconfig
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_index-is-used-uninitialized
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_last-is-used-uninitialized
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- arc-randconfig-r012-20230426
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_index-is-used-uninitialized
+|   `-- drivers-base-regmap-regcache-maple.c:warning:lower_last-is-used-uninitialized
+|-- arc-randconfig-r021-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- arc-randconfig-r043-20230426
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_index-is-used-uninitialized
+|   `-- drivers-base-regmap-regcache-maple.c:warning:lower_last-is-used-uninitialized
+|-- arc-randconfig-s053-20230426
+|   |-- drivers-base-regmap-regcache-maple.c:warning:lower_index-is-used-uninitialized
+|   `-- drivers-base-regmap-regcache-maple.c:warning:lower_last-is-used-uninitialized
+|-- arm-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- arm-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- arm64-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- i386-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- i386-randconfig-a003
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+|-- i386-randconfig-a014
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+|-- i386-randconfig-a016
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+|-- i386-randconfig-c021
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+|-- i386-randconfig-m021
+|   |-- drivers-acpi-property.c-acpi_data_prop_read_single()-error:potentially-dereferencing-uninitialized-obj-.
+|   `-- drivers-crypto-intel-qat-qat_common-adf_cfg.c-adf_cfg_add_key_value_param()-warn:argument-to-lx-specifier-is-cast-from-pointer
+|-- ia64-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- ia64-randconfig-c041-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- ia64-randconfig-r006-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- loongarch-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- loongarch-defconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- mips-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- mips-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- powerpc-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- riscv-allmodconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- riscv-randconfig-r042-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- s390-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- s390-randconfig-r011-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- s390-randconfig-r044-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- sparc-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- sparc-randconfig-c44-20230426
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- x86_64-allyesconfig
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:no-previous-prototype-for-amdgpu_dm_connector_funcs_force
+|   |-- drivers-gpu-drm-amd-amdgpu-..-display-amdgpu_dm-amdgpu_dm.c:warning:variable-count-set-but-not-used
+|   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_gfx.c:warning:variable-j-set-but-not-used
+|   `-- drivers-gpu-drm-amd-amdgpu-gfx_v9_4_3.c:warning:no-previous-prototype-for-gfx_v9_4_3_disable_gpa_mode
+|-- x86_64-randconfig-a002
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+`-- x86_64-randconfig-m001
+    `-- drivers-acpi-property.c-acpi_data_prop_read_single()-error:potentially-dereferencing-uninitialized-obj-.
+clang_recent_errors
+|-- hexagon-randconfig-r035-20230426
+|   |-- drivers-bluetooth-btnxpuart.c:warning:unused-variable-nxpuart_of_match_table
+|   `-- drivers-watchdog-starfive-wdt.c:warning:unused-variable-starfive_wdt_match
+|-- i386-randconfig-a002
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+|-- x86_64-randconfig-a012
+|   `-- fs-ext4-super.c:warning:unused-variable-i
+`-- x86_64-randconfig-a014
+    `-- fs-ext4-super.c:warning:unused-variable-i
 
+elapsed time: 734m
 
---===============8186047400584367789==--
+configs tested: 121
+configs skipped: 8
+
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              alldefconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r002-20230426   gcc  
+arc                  randconfig-r012-20230426   gcc  
+arc                  randconfig-r013-20230426   gcc  
+arc                  randconfig-r021-20230426   gcc  
+arc                  randconfig-r043-20230426   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                         bcm2835_defconfig   clang
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230426   clang
+arm                           stm32_defconfig   gcc  
+arm                       versatile_defconfig   clang
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r032-20230426   gcc  
+hexagon              randconfig-r035-20230426   clang
+hexagon              randconfig-r041-20230426   clang
+hexagon              randconfig-r045-20230426   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                          randconfig-a001   gcc  
+i386                          randconfig-a002   clang
+i386                          randconfig-a003   gcc  
+i386                          randconfig-a004   clang
+i386                          randconfig-a005   gcc  
+i386                          randconfig-a006   clang
+i386                          randconfig-a011   clang
+i386                          randconfig-a012   gcc  
+i386                          randconfig-a013   clang
+i386                          randconfig-a014   gcc  
+i386                          randconfig-a015   clang
+i386                          randconfig-a016   gcc  
+ia64                             allmodconfig   gcc  
+ia64                                defconfig   gcc  
+ia64                 randconfig-r006-20230426   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r022-20230426   gcc  
+loongarch            randconfig-r036-20230426   gcc  
+m68k                             allmodconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r015-20230426   gcc  
+microblaze           randconfig-r024-20230426   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips         buildonly-randconfig-r006-20230426   gcc  
+mips                  cavium_octeon_defconfig   clang
+mips                      pic32mzda_defconfig   clang
+mips                 randconfig-r031-20230426   gcc  
+mips                 randconfig-r033-20230426   gcc  
+nios2        buildonly-randconfig-r001-20230426   gcc  
+nios2                               defconfig   gcc  
+openrisc     buildonly-randconfig-r002-20230426   gcc  
+openrisc                    or1ksim_defconfig   gcc  
+openrisc             randconfig-r001-20230426   gcc  
+openrisc             randconfig-r025-20230426   gcc  
+openrisc             randconfig-r034-20230426   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r005-20230426   gcc  
+parisc64                            defconfig   gcc  
+powerpc                      acadia_defconfig   clang
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                       ebony_defconfig   clang
+powerpc                 linkstation_defconfig   gcc  
+powerpc                 mpc837x_rdb_defconfig   gcc  
+powerpc                  mpc885_ads_defconfig   clang
+powerpc              randconfig-r004-20230426   clang
+powerpc              randconfig-r023-20230426   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                               defconfig   gcc  
+riscv             nommu_k210_sdcard_defconfig   gcc  
+riscv                randconfig-r042-20230426   gcc  
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r011-20230426   gcc  
+s390                 randconfig-r044-20230426   gcc  
+s390                       zfcpdump_defconfig   gcc  
+sh                               allmodconfig   gcc  
+sh           buildonly-randconfig-r004-20230426   gcc  
+sh                                  defconfig   gcc  
+sh                        edosk7760_defconfig   gcc  
+sh                          sdk7786_defconfig   gcc  
+sh                           se7206_defconfig   gcc  
+sh                           se7705_defconfig   gcc  
+sh                           se7721_defconfig   gcc  
+sh                           se7780_defconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64              randconfig-r003-20230426   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64                        randconfig-a001   clang
+x86_64                        randconfig-a002   gcc  
+x86_64                        randconfig-a003   clang
+x86_64                        randconfig-a004   gcc  
+x86_64                        randconfig-a005   clang
+x86_64                        randconfig-a006   gcc  
+x86_64                        randconfig-a011   gcc  
+x86_64                        randconfig-a012   clang
+x86_64                        randconfig-a013   gcc  
+x86_64                        randconfig-a014   clang
+x86_64                        randconfig-a015   gcc  
+x86_64                        randconfig-a016   clang
+x86_64                               rhel-8.3   gcc  
+xtensa               randconfig-r016-20230426   gcc  
+xtensa                    smp_lx200_defconfig   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
