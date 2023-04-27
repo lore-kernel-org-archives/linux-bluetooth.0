@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C6FC77B61
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Apr 2023 23:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0073C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Apr 2023 23:14:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344392AbjD0XOB (ORCPT
+        id S1344400AbjD0XOD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Apr 2023 19:14:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33156 "EHLO
+        Thu, 27 Apr 2023 19:14:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344399AbjD0XOA (ORCPT
+        with ESMTP id S1344395AbjD0XOC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Apr 2023 19:14:00 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76A8F272E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Apr 2023 16:13:59 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1a516fb6523so92930795ad.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Apr 2023 16:13:59 -0700 (PDT)
+        Thu, 27 Apr 2023 19:14:02 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568B330E9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Apr 2023 16:14:01 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1a92369761cso70991685ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Apr 2023 16:14:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682637238; x=1685229238;
+        d=gmail.com; s=20221208; t=1682637240; x=1685229240;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=E/6BjiB3CztTfLUdP27sBZNVOKuIvJqXf2EZ0PwMXGE=;
-        b=UKOCOv/CBXUfnQVbEq4cO4b+YoohtaUpo8Hcr3T4Xoajzxy/LxRrRIawdCqrjxCz4R
-         ezj58lUMhqLjM4l3JxNjlkARzG31rTN8gbSppYGiz+M7ZHy+IwQQvAKdNLUzMFOeOc3w
-         psWB7OSaV4C7TI2yx+ijHkgvGS/GMpWFXb98xaPCwAUH+CNKOYfoE05kMtgZKug2FkZq
-         B0D13SSDdMEIsIQKZzkIdCExcmwwvWvW+MbcBhcmLNAgK8vWtR/M10vYcb9dUrYcfTBu
-         LBs/pJBiOjQz4zrhLfCINmFazVyLabsunGlWe0SNQB4M+tAR08qVCpTID/ZBX9XCABIb
-         QAsw==
+        bh=hh7rTdclx+rMZsADTYgRxxv+iG2kixOgWMrPKtsLTdw=;
+        b=UI07YG/w2BfIJkd6eJlMxN5aBk3a2WmyZwY5ridfdZkw/4id0rJYWO+q9HiGAUnHtv
+         svmbinNxguCc9qYKRBUnHzIa0tvf2wayuqghsnDYUeNzSlw00FThpE21wXEEdTjuMEs2
+         4fyX4WNI8srPpVqUeYkwnPiGsl7ybKY7b0imR6IspaEbNHsh8iMentvGCnvX+E1J2LQ6
+         TnC+q/Tqc//f3kbDFSPvB+/rZqwGtRMSITs8y0KxdSNiCc8O43NHO2ghsJBWgf4ffJb5
+         Imb4RS/eCP2VjrLg2KX+bc0j0D8Bu8OwvFECmSLQ8xQ75SEPiev3mfOoBaC0bV4ped7I
+         vq7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682637238; x=1685229238;
+        d=1e100.net; s=20221208; t=1682637240; x=1685229240;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E/6BjiB3CztTfLUdP27sBZNVOKuIvJqXf2EZ0PwMXGE=;
-        b=J+y7xpCPUbnqPlvWv86E9UQZvYOb4HHina7AYW+/gqtPiYmUwxopHad2IEfwrQA7ia
-         b3jTYGV7SDO5p18s380frN4YHHpK0fiS4Xl/owucE1i4pc9VFJ/TluAQqQSqv+EMkfky
-         uyOr2Idd5iZQ2K8CBs0FjxoRMXXhTdzG0xcbBmb39TZvnLQpqm6P3LOGxHE45OnIhEn+
-         GjciGSM+m/nB3eG+pA6eVL6v0P+p7vPETyHnh4WJKlLcR3Gb/+8zPvOG+IVM3MkeNmRO
-         H3w+SVXYSjM+JM1x2TvVo5Bb/v+CDEp7YnYjJGPmihdg2KLbM+MI3n5O8A/cX8vl9Ijq
-         3G8g==
-X-Gm-Message-State: AC+VfDyEc6wTAApL6mHjxkksa0gFU4m4M5eOgDCIGv1mKIE4LcfVgGJg
-        6fvrPPFvLcqBZURSgjAPlEhVEETZRFU=
-X-Google-Smtp-Source: ACHHUZ7E8f6CwatxLsugqTHSL0M8oAVZzcsTpUdiGWvSK/6sTRZaKJAlYpsf6EIB4UmFcplwx2r89Q==
-X-Received: by 2002:a17:903:32ce:b0:1a6:3d8e:face with SMTP id i14-20020a17090332ce00b001a63d8efacemr3906178plr.0.1682637238095;
-        Thu, 27 Apr 2023 16:13:58 -0700 (PDT)
+        bh=hh7rTdclx+rMZsADTYgRxxv+iG2kixOgWMrPKtsLTdw=;
+        b=WrkcsOddUVLPmx0tdnDMb9+yOYN9jfw38YgLbtcJ8QQaiTyZ6hKUYF/6hrY9IZp7TM
+         UA5ia/5jP/R3JZQi2VqQDAhloQj3D2ZnZRSOCyWlJJMPtHrFbDney+yaqnN4D/reBg/s
+         Q9tt02zs9fflAdoOYKwPEgwG+DHjSqjYtr1TXcYyaaAyi0TsmQwkPjK1IW6Z2vsnAjjK
+         sGPbek2H9jdh47gJri6FP1sMOSiXA9IukCgO7Wa8MOY+dEehye1BPaqeqf+3CvlrLOyf
+         D8L1b9XnAETNmvv2VO5x9BHHxcb1mMyqvzgu0wQLQ181ZEtME75RzTe01QXaYCQfjkqf
+         fpmw==
+X-Gm-Message-State: AC+VfDwg14aUiBICI+/8yAd1SjbbAsvrhQDfsllRiJ6zzEgAWohw/Tt3
+        2gzx/oy/KyJKR8lqJHk13C4GYdR3110=
+X-Google-Smtp-Source: ACHHUZ6tftQCK0hCO6BKNbvKxgN8yK+8TS1aYShD+N9ufEjzA2jlkREpyz7JoAxPZWsHHBUeFdF1iA==
+X-Received: by 2002:a17:903:22c8:b0:1a6:9ec2:a48f with SMTP id y8-20020a17090322c800b001a69ec2a48fmr3659933plg.34.1682637239991;
+        Thu, 27 Apr 2023 16:13:59 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id c5-20020a170902aa4500b001a24cded097sm12112369plr.236.2023.04.27.16.13.56
+        by smtp.gmail.com with ESMTPSA id c5-20020a170902aa4500b001a24cded097sm12112369plr.236.2023.04.27.16.13.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Apr 2023 16:13:56 -0700 (PDT)
+        Thu, 27 Apr 2023 16:13:58 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v3 3/9] share/bap: Fix not removing timeout on bap_free
-Date:   Thu, 27 Apr 2023 16:13:46 -0700
-Message-Id: <20230427231352.576337-3-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v3 4/9] shared/tester: Add support for NULL PDUs
+Date:   Thu, 27 Apr 2023 16:13:47 -0700
+Message-Id: <20230427231352.576337-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230427231352.576337-1-luiz.dentz@gmail.com>
 References: <20230427231352.576337-1-luiz.dentz@gmail.com>
@@ -68,32 +68,44 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes not removing the process_id timeout when freeing the session
-which can cause the following crash:
-
-Invalid read of size 8
-  at 0x18EB39: bap_debug (bap.c:553)
-  by 0x1913A8: bap_process_queue (bap.c:3542)
-  by 0x1A8630: timeout_callback (timeout-glib.c:25)
-Address 0x55e0650 is 128 bytes inside a block of size 160 free'd
-  at 0x48480E4: free (vg_replace_malloc.c:872)
+This adds support for NULL PDUs which can be used to skip a round of
+TX/RX.
 ---
- src/shared/bap.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/shared/tester.c | 6 +++++-
+ src/shared/tester.h | 2 ++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index bc6177a5ba90..6131c312865a 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -2600,6 +2600,8 @@ static void bap_free(void *data)
- {
- 	struct bt_bap *bap = data;
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 1feaba48335c..34f807556144 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -914,8 +914,12 @@ static bool test_io_send(struct io *io, void *user_data)
  
-+	timeout_remove(bap->process_id);
+ 	g_assert_cmpint(len, ==, iov->iov_len);
+ 
+-	if (!test->iovcnt && test->io_complete_func)
++	if (!test->iovcnt && test->io_complete_func) {
+ 		test->io_complete_func(test->test_data);
++	} else if (test->iovcnt && !test->iov->iov_base) {
++		test_get_iov(test);
++		return test_io_send(io, user_data);
++	}
+ 
+ 	return false;
+ }
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index 49610185a444..16f41022db2b 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -21,6 +21,8 @@
+ 		.iov_len = sizeof(data(args)), \
+ 	}
+ 
++#define IOV_NULL {}
 +
- 	bt_bap_detach(bap);
+ void tester_init(int *argc, char ***argv);
+ int tester_run(void);
  
- 	bap_db_free(bap->rdb);
 -- 
 2.40.0
 
