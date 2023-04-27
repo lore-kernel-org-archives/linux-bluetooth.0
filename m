@@ -2,123 +2,151 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BCCEC77B73
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Apr 2023 17:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA08C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Apr 2023 18:50:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244143AbjD0RXN (ORCPT
+        id S243835AbjD0SuK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Apr 2023 13:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34074 "EHLO
+        Thu, 27 Apr 2023 14:50:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243737AbjD0RXM (ORCPT
+        with ESMTP id S233136AbjD0SuI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Apr 2023 13:23:12 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F2726A6;
-        Thu, 27 Apr 2023 10:23:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682616191; x=1714152191;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e7t003heJi1XAtLbnW5RQXVk9/BjNHIn2f+EIk07P0Y=;
-  b=HNpXP0QQBpMgHUBN+gvyiR8ASfNwfTn8Sno4y4XDQ3kwQoqKKOop2rTE
-   ZBp9RWzWhUTTa8P7N6mu9aKPpCbLWYFHKtgLllafriOB4wZedJ1IJdX8H
-   QIRX5rn/Q0HAci2/Y6XogE5X7PCBdvXQhrS1LKZJi1eR0b5hiqXEO4BvF
-   0qYVOU/ht01vOM8I+f7VKlwS+i9wrWnvWswi9w9JLBeqX8kOh2CEPHFE3
-   wHl0uSafR/FreTPP3M4T5YxA/hirfhKdZiLLfU0u0MPlBz8q6OMhBRc3g
-   kz4xUt1iXiQPN9S9v2EIVB2kZBcX9I2j/I22KctQMGOMh/ZeZJ2Pq61yM
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="344962033"
-X-IronPort-AV: E=Sophos;i="5.99,232,1677571200"; 
-   d="scan'208";a="344962033"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2023 10:21:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10693"; a="868809209"
-X-IronPort-AV: E=Sophos;i="5.99,232,1677571200"; 
-   d="scan'208";a="868809209"
-Received: from lkp-server01.sh.intel.com (HELO b95e16499b55) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 27 Apr 2023 10:21:23 -0700
-Received: from kbuild by b95e16499b55 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1ps5J4-00002z-2a;
-        Thu, 27 Apr 2023 17:21:22 +0000
-Date:   Fri, 28 Apr 2023 01:20:53 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     sean.wang@mediatek.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     oe-kbuild-all@lists.linux.dev, sean.wang@mediatek.com,
-        chris.lu@mediatek.com, Soul.Huang@mediatek.com,
-        Leon.Yen@mediatek.com, Deren.Wu@mediatek.com, km.lin@mediatek.com,
-        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
-        ch.yeh@mediatek.com, jenhao.yang@mediatek.com,
-        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
-        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
-        abhishekpandit@google.com, michaelfsun@google.com,
-        abhishekpandit@chromium.org, mcchou@chromium.org,
-        shawnku@google.com, linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Jing Cai <jing.cai@mediatek.com>
-Subject: Re: [PATCH v4 3/3] Bluetooth: btusb: mediatek: add MediaTek
- devcoredump support
-Message-ID: <202304280130.Aoglg07c-lkp@intel.com>
-References: <01d3fe06d3a1e333b193e7d9fbc9cbfb4ee5d02b.1682549719.git.objelf@gmail.com>
+        Thu, 27 Apr 2023 14:50:08 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6711E359D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Apr 2023 11:50:07 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id 006d021491bc7-549f0b45ac6so1177947eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Apr 2023 11:50:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682621406; x=1685213406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TSw1IlHabKdeoJWFqhha6ktdPaX7I8X8moKzfrrA+xs=;
+        b=c5VdzcPthUwYt+fAt1IPr3kLAhLRh0w+qstLZEj8WYb3uGognGMUbKZJcJEN83rBrU
+         9hD046zwbrCiaOfD1uTLKwJDo1lFoSaiBiNWwuRuQKyvCfZy5s42WTg7XiDWyGXOSReW
+         a9732IBAlF6O1sT9IdCv1z3pwsPDR23SFeox4kc2hdvejZwFLzFQ05zJ63YjgYMYRPxB
+         4C0leKMWCzdn9wnfYPJWY5uuynAGH+W8SwZHElwsF9WzL3eqP/Y07NsbjYR35wgMguu6
+         IleTVey38i11ADRQi/9hbvnFKkrXd0IL0ovdSq/58MXpc5sLLrLq2RykDGZSnK50qlKJ
+         rDRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682621406; x=1685213406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TSw1IlHabKdeoJWFqhha6ktdPaX7I8X8moKzfrrA+xs=;
+        b=Enti7niP/Jp6qEiZcSXunW1SzgZwIR/O8Emd1zhnZ8s0kXU+KuiODjXXTL/P37uBss
+         /MKHrj9j05c0+nTzC44/H5pDMaw7me3AN6QoUGGfH7Lgo733uT06+TuL7e/kmonImAtc
+         Ient0FDq/EI0YD/bQx+7VTgjorXJB3zr8ZAqXh2/UaTnj8ETlmjBWMX8kzQU4OYibFFh
+         cjLOyy0SvxOSuLJQYcRE75Q9yr1HCp0ut7kcnAHs0vI1JloO4H09v6enrT35/l3gTrbu
+         dqfwcebFrv2+xU9++Ng0NVkEh/nMemmq2+RZZytr02GDKlmmk06TpsuRFAK/TQAc+x5p
+         I1Ng==
+X-Gm-Message-State: AC+VfDwtVOTZH9GMYaNYcWQC4vwGmWidtjQfIJ1o7gKyJWhke/28e4qT
+        KO1CBUs0F53ybGg041vnYto7N/CgrER+/zIcnIX4JEWhIw+fpwMC
+X-Google-Smtp-Source: ACHHUZ6mPFjhxOsaKkHe5R6CyJoROA03B2FebAR7i2VDpHZLUTA4rOp0dcOgq61wZgaMqoBMzbi8GOPCWZkxhuNRlTA=
+X-Received: by 2002:a05:6808:60f:b0:38e:8d92:5884 with SMTP id
+ y15-20020a056808060f00b0038e8d925884mr1092207oih.12.1682621406035; Thu, 27
+ Apr 2023 11:50:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01d3fe06d3a1e333b193e7d9fbc9cbfb4ee5d02b.1682549719.git.objelf@gmail.com>
+References: <CACk7upyDgd8kCY+8j+RMJz35GXrF=bwRzDNH76Oh8q4nB8i0KQ@mail.gmail.com>
+In-Reply-To: <CACk7upyDgd8kCY+8j+RMJz35GXrF=bwRzDNH76Oh8q4nB8i0KQ@mail.gmail.com>
+From:   Raul Cheleguini <raul.cheleguini@gmail.com>
+Date:   Thu, 27 Apr 2023 15:49:29 -0300
+Message-ID: <CACk7upyDxpy45wEWXi_EU_r7F8WeD2bObSHRRo82HGTrYGXNHQ@mail.gmail.com>
+Subject: Re: unexpected SMP command errors with controller ATS2851
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+On Fri, Mar 24, 2023 at 12:17=E2=80=AFAM Raul Cheleguini
+<raul.cheleguini@gmail.com> wrote:
+>
+> Hi everyone,
+>
+> I'm trying to understand and narrow down a pairing problem with this
+> controller that I'm trying to make it work in Linux.
+>
+> When pairing, the negotiation does not complete and the system logs
+> the following messages:
+>
+> Bluetooth: hci0: unexpected SMP command 0x08 from dd:5e:b9:fe:49:3f
+> Bluetooth: hci0: unexpected SMP command 0x09 from dd:5e:b9:fe:49:3f
+> Bluetooth: hci0: Opcode 0x200d failed: -110
+> Bluetooth: hci0: request failed to create LE connection: err -110
+>
+> (dd:5e:b9:fe:49:3f is my bluetooth mouse)
+>
+> After some debug I found the condition that refuses the SMP commands and
+> drops them:
+>
+> net/bluetooth/smp.c in smp_sig_channel()
+>
+> if (smp && !test_and_clear_bit(code, &smp->allow_cmd))
+>     goto drop;
+>
+> The interesting part is that if I disable this condition with comments,
+> the pairing process manages to complete and my bluetooth mouse starts to =
+work
+> (even with some errors in logs):
+>
+> Bluetooth: hci0: Opcode 0x200d failed: -110
+> Bluetooth: hci0: request failed to create LE connection: err -110
+> hid: raw HID events driver (C) Jiri Kosina
+> input: Logi M650 L Mouse as /devices/virtual/misc/uhid/0005:046D:B02A.000=
+1/
+> input/input6
+> hid-generic 0005:046D:B02A.0001: input,hidraw0: BLUETOOTH HID v0.09 Mouse
+> [Logi M650 L] on f4:4e:fc:c0:de:5e
+> Bluetooth: hci0: Opcode 0x200d failed: -110
+> Bluetooth: hci0: request failed to create LE connection: err -110
+>
+> Logs from bluetoothd receiving the mouse data events:
+>
+> bluetoothd[576]: src/shared/att.c:can_read_data() (chan 0x55f8ad8db380)
+> ATT PDU received: 0x1b
+> bluetoothd[576]: src/shared/att.c:can_read_data() (chan 0x55f8ad8db380)
+> ATT PDU received: 0x1b
+> bluetoothd[576]: src/shared/att.c:can_read_data() (chan 0x55f8ad8db380)
+> ATT PDU received: 0x1b
+>
+> I kindly ask guidance on what could be done in these cases or any hints
+> how to further debug this issue.
+>
+> For context, the controller works in other systems using generic drivers.
+>
+> Regards,
+> Raul.
 
-kernel test robot noticed the following build warnings:
+For the benefit of any novice who may face similar situation in future:
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v6.3 next-20230426]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+The error "unexpected SMP command 0x08" indicates that command 0x08
+(SMP_CMD_IDENT_INFO) arrives before it has been allowed. That is part smp
+implementation, it allows commands and responds to them in the expected
+context, otherwise it drops them.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/sean-wang-mediatek-com/Bluetooth-btmtk-introduce-btmtk-reset-work/20230427-071054
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/01d3fe06d3a1e333b193e7d9fbc9cbfb4ee5d02b.1682549719.git.objelf%40gmail.com
-patch subject: [PATCH v4 3/3] Bluetooth: btusb: mediatek: add MediaTek devcoredump support
-config: x86_64-randconfig-r035-20211003 (https://download.01.org/0day-ci/archive/20230428/202304280130.Aoglg07c-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/d253c927e94cb7e88bfcd0182449d29e477ca011
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review sean-wang-mediatek-com/Bluetooth-btmtk-introduce-btmtk-reset-work/20230427-071054
-        git checkout d253c927e94cb7e88bfcd0182449d29e477ca011
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 olddefconfig
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/
+In this particular situation, we enter a condition in hci_encrypt_change_ev=
+t()
+[1] that results in an unrelated HCI command being sent during the time we
+should be preparing to receive command 0x08. The command 0x08 arrives befor=
+e
+it has been allowed and this confusion eventually leads to a disconnect eve=
+nt.
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304280130.Aoglg07c-lkp@intel.com/
+According to my raw notes, 0x08 is allowed in smp_allow_key_dist(), as
+a result of a callback chain for this type of connection/adapter:
 
-All warnings (new ones prefixed by >>):
+hci_encrypt_cfm > security_cfm_cb >
+l2cap_security_cfm > smp_resume_cb > smp_distribute_keys > smp_allow_key_di=
+st
 
-   In file included from drivers/bluetooth/btusb.c:28:
->> drivers/bluetooth/btmtk.h:172:6: warning: no previous prototype for 'btmtk_register_coredump' [-Wmissing-prototypes]
-     172 | void btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id, const char *name,
-         |      ^~~~~~~~~~~~~~~~~~~~~~~
+Regards,
+Raul.
 
-
-vim +/btmtk_register_coredump +172 drivers/bluetooth/btmtk.h
-
-   171	
- > 172	void btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id, const char *name,
-   173				     u32 fw_version)
-   174	{
-   175	}
-   176	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+[1]
+https://elixir.bootlin.com/linux/v6.3/source/net/bluetooth/hci_event.c#L367=
+0
