@@ -2,109 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 376B7C77B61
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Apr 2023 21:24:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57259C77B60
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Apr 2023 21:43:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345927AbjD1VY6 (ORCPT
+        id S1345755AbjD1Vnk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Apr 2023 17:24:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50330 "EHLO
+        Fri, 28 Apr 2023 17:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229751AbjD1VY5 (ORCPT
+        with ESMTP id S229614AbjD1Vni (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Apr 2023 17:24:57 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383431BFA;
-        Fri, 28 Apr 2023 14:24:55 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2a8bdcf87f4so1760141fa.2;
-        Fri, 28 Apr 2023 14:24:55 -0700 (PDT)
+        Fri, 28 Apr 2023 17:43:38 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2BB26BA
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Apr 2023 14:43:37 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-74df951e897so17003685a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Apr 2023 14:43:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682717093; x=1685309093;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9rljzU0VELiX9EsAkZDXnPVtLWxUnAXmWBWCF+oOAaY=;
-        b=Q5MkxR2ZExbckiOE+IJDWTRSaZUEwLv8xt4VK0TOnv+3I2cmNdSM89Gki5tvc5TYDM
-         xj+8Xgdzp03DWqnUbeddAFlRQzKuMUnaTdxHvQIp/sFQMfBQosV2BaAQYrPnH/Y1TB26
-         8toagzZu9WS/PpsNxTcmywXhtICGQseS8IR5f4HOkQP9njFtbuEU36HcuhjHPyIdmgdF
-         LX325IZNhynqJc5tcHQSkGFJdzTeg12L9r1ExhixfDswOOQERXGDK59uYjQgq0p1R9PM
-         M+1IE+yq7+a1Bl0OHFIow3lsr47mNDeNuD2lR1mrxsK6fIXUhMQHJGOq1yIWPA6vpyAx
-         tZtw==
+        d=gmail.com; s=20221208; t=1682718216; x=1685310216;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hDFTrl5JCidlVywJtPNae1VR8Jxc/ZEcm1TzlaFiRjE=;
+        b=jb1deUVXHhWoCurYGvylCj9UkQ6O6rBoTpyTKnFyap85Q48DoeRJbZrW08SiDKlpDC
+         fyLCZ5VjFvzWZnBt6DEVGzzzF5rkiW33/3CS86J8u147SGJepE1myR4oMfqcmKYY76Vh
+         2T0ZXUueq3bYdQAVS4r/DQ9k0C7GXkOQoJpOvJmLR3VUD1IQiMh9oK6koe1wF7/jzxfO
+         631wjmkOQ/9O21qwCywl+4OmJnqVH0ZVUJfsAOcfn8MomH2IBMKltlA0HiGu7EgCXEga
+         cf1KksYmkRKDZSXcOxxa6AfOa355sAyAFBbT6FYDOSI509WbK3OcIxCTM/sFAoxvLeXg
+         WlAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682717093; x=1685309093;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9rljzU0VELiX9EsAkZDXnPVtLWxUnAXmWBWCF+oOAaY=;
-        b=ICH+JvPa/hU8sjuUvhPcL0s1A/d8tHtHoqazd740KavOcbWkjHYUs3jqDtvEPqMYB7
-         v8EF6smHjfHJKIY8erDH6CkHHoa0nK8UmzR/by7hp3nwOEcVIjwfiEn+hoAbdfNznxQp
-         E2hFeCCV9iDEjL1dGlTiOf00UC6hFtJSOr2FfozD1CNB3gadQucvrkXItwsbeP2yPync
-         m/d+ATJwZqQPbMAacbRsZRQa/rq9hHmmt479ippZoXqcH86am0UOPRyLES90OIYt7xie
-         2mHZLk/bLG4KeE9+7smDQeMG2EDZeqC/UVtN05aA6Ne5HWoIKyRpEqVeMQjolMfzgCwa
-         yqPQ==
-X-Gm-Message-State: AC+VfDwKMASQ/+5YTZQk9Ld2y1xwu9ITUxBExJQFZRg+HZMSTIrljwqZ
-        oIc/C9NraUqQqRyYVFS4C+aH3H45SuGeVAPy868=
-X-Google-Smtp-Source: ACHHUZ4oG4Cbik7oyvkDGFIjSV1EguFVeok4T//byGPle9kOvG6TBjmUplvTj1WAXGFRYMolQFPGXVzhKa8zO04thMM=
-X-Received: by 2002:a2e:88cd:0:b0:2a8:d0f0:584e with SMTP id
- a13-20020a2e88cd000000b002a8d0f0584emr1826301ljk.16.1682717093101; Fri, 28
- Apr 2023 14:24:53 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1682718216; x=1685310216;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hDFTrl5JCidlVywJtPNae1VR8Jxc/ZEcm1TzlaFiRjE=;
+        b=LF2ta2bkw+uJITYwi6CJYVQuuWroYtvO7QvDxBhL6X7QiHhOxflBzUNvWtd4YRARPD
+         yBq1YoN3R0TKeyzmqalB7VZQe4/d+DR4A50rpniRsKnnpKsTXLI4iROeRo4dBlLq0gx3
+         tgAyAYSppfNIZ7W4XI7QgpDtP9H4SYEytkXH36ObMZOIKyYUAuekEdkOhbUM6rim8UER
+         3EntAYbRS6UWu0eLls2YYB3Ee3yCjZiq0GvhLSsJrT5Z1UlXwhJdCSbR7N0YTMdR/vUM
+         /RHTLI8NqERW/CYAgx7kmVxcSVtOitmn/q291nv9Kbt9E2CU/dR+81M/nfp0Ezsx2MrH
+         RcpA==
+X-Gm-Message-State: AC+VfDyC1e9hGIGET8T4KHMAHRRdZGEmodBdMCYZVjz+w9HbqaGc9Bsw
+        CSuHcQyJ83aExlqGCSsfy8CJiNK7XQo=
+X-Google-Smtp-Source: ACHHUZ76PgMwApdahOUBgXUcwuAZ2jdYs0kzfaAKbPM45qPRA8otMJ+IKZCOn15j4n+a8YltbD51KA==
+X-Received: by 2002:a05:6214:29ec:b0:5b2:fb2:4b1d with SMTP id jv12-20020a05621429ec00b005b20fb24b1dmr10698442qvb.12.1682718216055;
+        Fri, 28 Apr 2023 14:43:36 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.13.56])
+        by smtp.gmail.com with ESMTPSA id h19-20020a0cf453000000b005fe956a64ddsm6344752qvm.103.2023.04.28.14.43.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Apr 2023 14:43:35 -0700 (PDT)
+Message-ID: <644c3e07.0c0a0220.9017.abd4@mx.google.com>
+Date:   Fri, 28 Apr 2023 14:43:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2414255601539474281=="
 MIME-Version: 1.0
-References: <CADm8TemwbUWDP0R_t7axFk4=4-srnm5c+2oJSy7aeSzdKFSVCA@mail.gmail.com>
-In-Reply-To: <CADm8TemwbUWDP0R_t7axFk4=4-srnm5c+2oJSy7aeSzdKFSVCA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 28 Apr 2023 14:24:40 -0700
-Message-ID: <CABBYNZJCbYnxodwXAeq8F9NerzGWFva0OG6SfUWfJ_Grz=Xq6Q@mail.gmail.com>
-Subject: Re: [BUG][RESEND] Bluetooth: L2CAP: possible data race in __sco_sock_close()
-To:     Li Tuo <islituo@gmail.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        "David S. Miller" <davem@davemloft.net>, edumazet@google.com,
-        Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        baijiaju1990@outlook.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v4,1/9] media: Fix not storing Preferred Delay properly
+In-Reply-To: <20230428184640.849066-1-luiz.dentz@gmail.com>
+References: <20230428184640.849066-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============2414255601539474281==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 28, 2023 at 3:27=E2=80=AFAM Li Tuo <islituo@gmail.com> wrote:
->
->   Hello,
->
-> Our static analysis tool finds a possible data race in the l2cap protocol
-> in Linux 6.3.0-rc7:
->
-> In most calling contexts, the variable sk->sk_socket is accessed
-> with holding the lock sk->sk_callback_lock. Here is an example:
->
->   l2cap_sock_accept() --> Line 346 in net/bluetooth/l2cap_sock.c
->       bt_accept_dequeue() --> Line 368 in net/bluetooth/l2cap_sock.c
->           sock_graft() --> Line 240 in net/bluetooth/af_bluetooth.c
->               write_lock_bh(&sk->sk_callback_lock); --> Line 2081 in incl=
-ude/net/sock.h (Lock sk->sk_callback_lock)
->               sk_set_socket() --> Line 2084 in include/net/sock.h
->                   sk->sk_socket =3D sock; --> Line 2054 in include/net/so=
-ck.h (Access sk->sk_socket)
->
-> However, in the following calling context:
->
->   sco_sock_shutdown() --> Line 1227 in net/bluetooth/sco.c
->       __sco_sock_close() --> Line 1243 in net/bluetooth/sco.c
->           BT_DBG(..., sk->sk_socket); --> Line 431 in net/bluetooth/sco.c=
- (Access sk->sk_socket)
->
-> the variable sk->sk_socket is accessed without holding the lock
-> sk->sk_callback_lock, and thus a data race may occur.
->
-> Reported-by: BassCheck <bass@buaa.edu.cn>
+This is automated email and please do not reply to this email!
 
-Need to check in detail what it means to hold the sk_callback_lock,
-btw is this static analysis tool of yours something public that we can
-use in our CI to detect these problems?
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=743913
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      5.30 seconds
+GitLint                       PASS      3.16 seconds
+BuildEll                      PASS      27.05 seconds
+BluezMake                     PASS      860.46 seconds
+MakeCheck                     PASS      11.82 seconds
+MakeDistcheck                 PASS      151.47 seconds
+CheckValgrind                 PASS      248.07 seconds
+CheckSmatch                   PASS      333.33 seconds
+bluezmakeextell               PASS      100.40 seconds
+IncrementalBuild              PASS      6367.43 seconds
+ScanBuild                     PASS      1012.27 seconds
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2414255601539474281==--
