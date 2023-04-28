@@ -2,256 +2,171 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030C0C77B61
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Apr 2023 23:08:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D02C77B60
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Apr 2023 23:55:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229991AbjD1XId (ORCPT
+        id S1347061AbjD1XzA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Apr 2023 19:08:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56982 "EHLO
+        Fri, 28 Apr 2023 19:55:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbjD1XIc (ORCPT
+        with ESMTP id S1347058AbjD1Xyw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Apr 2023 19:08:32 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC4349D5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Apr 2023 16:08:30 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1a92513abebso5161705ad.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Apr 2023 16:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682723309; x=1685315309;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jbBtSA3uJsZp0zrHUcdg57fcZO6mCxmi7bK41/B7hrc=;
-        b=erDp1d80MFQI0D6zvP7oPxbL18pPiV/b3pxsLiBRjhmb2Xc/ebFaEq4QpGi6+Ckz67
-         Im8IkgOJ/Q8Z0GJq52HvZukofib6+TkJoArBoRqhCDjpk7vXVuvcpQHF4jYgJzNwjXUY
-         JAbT7+1Q4JD5XHf4uP1gvOW5lMQE+euCNOpJkGz2eKkvjviepn0So0i4RN40EPxLVYDC
-         F/kzeYRT045FlvfX0Xpbln/qEhQwMjYKl8OA9Jm0glEY5a9quNcGKZslncGu54vSm+t5
-         2T/XeYD6vsurEZSVbtS6iXCL+jqwhrzBPiyZ4F/bQLkuTXfNqmO2zCHDqN8CFoMlL6D6
-         7YVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682723309; x=1685315309;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jbBtSA3uJsZp0zrHUcdg57fcZO6mCxmi7bK41/B7hrc=;
-        b=VtNhyyodFYkbTdpRkPupV6W32PWV6Xht7280gHGnp0yAUsEQVluYjALvgeeRtLfrmo
-         znlSF2HBziTkGEmcrsclt6WwIWB7N07v9I9AHfu+2h1B7VJ+Q6brLxToet1AqoBPRLv+
-         E+vVlPlTkIl0EzA8nythpklvjRRf40rNapqplNgPYn3B90DXyzFLfvfWBTqFgFMQYXB2
-         khC0BxWNDZutoCOHU/hAVNvXQc4+ww+lO0obMVALp12GrH3SJIXLLef1xb/itR8xpOGa
-         cEsORJUOZK/RPJvngsvgCWiJ4P67WTXLcxf5NBUO/0qwpj4RuZCpMCO1O5GxURfc3Uju
-         zcVA==
-X-Gm-Message-State: AC+VfDxJp+krzT33lSVZ3DB2AlQFzlodfPhDW4I3dSfcuIJqQZKYwR0K
-        UaRb5Gy6itZBpxl1IgQrw7Tf+qzJ7N0=
-X-Google-Smtp-Source: ACHHUZ7IsrLO3lV0AtGs7XN2DJeIsvjo0BNqHMZxIlbwgaVo4riyNueaPTzo7jDYphTGRR4hcJ/b6w==
-X-Received: by 2002:a17:902:e804:b0:1a4:f7b1:12f1 with SMTP id u4-20020a170902e80400b001a4f7b112f1mr8074067plg.4.1682723309439;
-        Fri, 28 Apr 2023 16:08:29 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id io6-20020a17090312c600b001a64ed4621csm1809920plb.182.2023.04.28.16.08.27
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Apr 2023 16:08:28 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client/player: Add support for Metadata in BAP Profile
-Date:   Fri, 28 Apr 2023 16:08:27 -0700
-Message-Id: <20230428230827.908680-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.0
+        Fri, 28 Apr 2023 19:54:52 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CEC219A1;
+        Fri, 28 Apr 2023 16:54:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1682726091; x=1714262091;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SJXp+1HzoIh0ZhIOJuOclUQJn51bNAqL1ZXszXf+6/0=;
+  b=gs4Qcnd1rLaEbO5CjCbv8jH++DircSrNw1XZPlc8ZRkgBSJHDAClgbgS
+   EfyjUnxY2Duc3I+zVXz/GIcn0WW+g+La44y8PNGm9/v5DJ2Z2K+i7xz/k
+   Qg77yBH/uFhCDtw6etsAJodZNTWCepxy8osJNY9N0znz9Z/8rk5R6DZaM
+   IzacARTRDgcTob+xtbkNjv4Bp/uMNdxK51gNpzLdOTku/6aRjo4tJPAnY
+   IJsjgv/NXUK5NLXcMgysZf+Fw5vl0bJ/rDumwaIJtyc+WQtxCnqPvxG+6
+   7U1loGX0Zv45SY687DMmKF+eQsBvhAQR4FV8DuayhbqqgS98j0kTWXwS5
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="346655292"
+X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
+   d="scan'208";a="346655292"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 16:54:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="689030623"
+X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
+   d="scan'208";a="689030623"
+Received: from lkp-server01.sh.intel.com (HELO 5bad9d2b7fcb) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 28 Apr 2023 16:54:48 -0700
+Received: from kbuild by 5bad9d2b7fcb with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1psXvL-0000lD-1J;
+        Fri, 28 Apr 2023 23:54:47 +0000
+Date:   Sat, 29 Apr 2023 07:54:10 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com
+Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        quic_bgodavar@quicinc.com, quic_rameshn@quicinc.com,
+        jiangzp@google.com, mmandlik@google.com,
+        Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: Re: [PATCH v1 2/2] Bluetooth: hci_qca: Add qcomm devcoredump support
+Message-ID: <202304290720.TfpPCFY6-lkp@intel.com>
+References: <1682666311-8452-1-git-send-email-quic_saluvala@quicinc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1682666311-8452-1-git-send-email-quic_saluvala@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
+Hi Sai,
 
-This adds support for Metadata in BAP profile.
-In order to register zero Metadata, 0 shall be
-entered when prompted.
+kernel test robot noticed the following build warnings:
 
-[bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06
-[/local/endpoint/ep0] Enter Metadata (value/no): n
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] CIG (auto/value): a
-[/local/endpoint/ep0] CIS (auto/value): a
-Capabilities:
-  03 01 ff 00 02 02 03 02 03 03 05 04 1e 00 f0 00  ................
-Endpoint /local/endpoint/ep0 registered
----
- client/player.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 85 insertions(+), 2 deletions(-)
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v6.3 next-20230428]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/client/player.c b/client/player.c
-index 5572cc566e79..cc35721d85b7 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -70,6 +70,7 @@ struct endpoint {
- 	uint16_t cid;
- 	uint16_t vid;
- 	struct iovec *caps;
-+	struct iovec *meta;
- 	bool auto_accept;
- 	bool acquiring;
- 	uint8_t cig;
-@@ -1582,6 +1583,7 @@ struct endpoint_config {
- 	GDBusProxy *proxy;
- 	struct endpoint *ep;
- 	struct iovec *caps;
-+	struct iovec *meta;
- 	uint8_t target_latency;
- 	const struct codec_qos *qos;
- };
-@@ -1592,6 +1594,7 @@ static void append_properties(DBusMessageIter *iter,
- 	DBusMessageIter dict;
- 	struct codec_qos *qos = (void *)cfg->qos;
- 	const char *key = "Capabilities";
-+	const char *meta = "Metadata";
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
- 
-@@ -1602,6 +1605,15 @@ static void append_properties(DBusMessageIter *iter,
- 					DBUS_TYPE_BYTE, &cfg->caps->iov_base,
- 					cfg->caps->iov_len);
- 
-+	if (cfg->meta->iov_len) {
-+		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &meta,
-+				DBUS_TYPE_BYTE, &cfg->meta->iov_base,
-+				cfg->meta->iov_len);
-+
-+		bt_shell_printf("Metadata:\n");
-+		bt_shell_hexdump(cfg->meta->iov_base, cfg->meta->iov_len);
-+	}
-+
- 	if (!qos)
- 		goto done;
- 
-@@ -1699,6 +1711,9 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
- 	iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
- 	cfg->target_latency = preset->target_latency;
- 
-+	/* Copy metadata */
-+	iov_append(&cfg->meta, cfg->ep->meta->iov_base, cfg->ep->meta->iov_len);
-+
- 	if (preset->qos.phy)
- 		/* Set QoS parameters */
- 		cfg->qos = &preset->qos;
-@@ -1847,6 +1862,12 @@ static void endpoint_free(void *data)
- 		g_free(ep->caps);
- 	}
- 
-+	if (ep->meta) {
-+		if (ep->meta->iov_base)
-+			g_free(ep->meta->iov_base);
-+		g_free(ep->meta);
-+	}
-+
- 	if (ep->msg)
- 		dbus_message_unref(ep->msg);
- 
-@@ -1917,10 +1938,38 @@ static gboolean endpoint_vendor_exists(const GDBusPropertyTable *property,
- 	return ep->cid && ep->vid;
- }
- 
-+static gboolean endpoint_get_metadata(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct endpoint *ep = data;
-+	DBusMessageIter array;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+				DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+				&ep->meta->iov_base,
-+				ep->meta->iov_len);
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
-+static gboolean endpoint_metadata_exists(const GDBusPropertyTable *property,
-+							void *data)
-+{
-+	struct endpoint *ep = data;
-+
-+	return ep->meta ? TRUE : FALSE;
-+}
-+
- static const GDBusPropertyTable endpoint_properties[] = {
- 	{ "UUID", "s", endpoint_get_uuid, NULL, NULL },
- 	{ "Codec", "y", endpoint_get_codec, NULL, NULL },
- 	{ "Capabilities", "ay", endpoint_get_capabilities, NULL, NULL },
-+	{ "Metadata", "ay", endpoint_get_metadata, NULL,
-+				endpoint_metadata_exists },
- 	{ "Vendor", "u", endpoint_get_vendor, NULL, endpoint_vendor_exists },
- 	{ }
- };
-@@ -1930,6 +1979,7 @@ static void register_endpoint_setup(DBusMessageIter *iter, void *user_data)
- 	struct endpoint *ep = user_data;
- 	DBusMessageIter dict;
- 	const char *key = "Capabilities";
-+	const char *meta = "Metadata";
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &ep->path);
- 
-@@ -1955,6 +2005,15 @@ static void register_endpoint_setup(DBusMessageIter *iter, void *user_data)
- 		bt_shell_hexdump(ep->caps->iov_base, ep->caps->iov_len);
- 	}
- 
-+	if (ep->meta) {
-+		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &meta,
-+				DBUS_TYPE_BYTE, &ep->meta->iov_base,
-+				ep->meta->iov_len);
-+
-+		bt_shell_printf("Metadata:\n");
-+		bt_shell_hexdump(ep->meta->iov_base, ep->meta->iov_len);
-+	}
-+
- 	dbus_message_iter_close_container(iter, &dict);
- }
- 
-@@ -2072,6 +2131,30 @@ static void endpoint_auto_accept(const char *input, void *user_data)
- 	bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
- }
- 
-+static void endpoint_set_metadata(const char *input, void *user_data)
-+{
-+	struct endpoint *ep = user_data;
-+
-+	if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
-+		free(ep->meta->iov_base);
-+		ep->meta = NULL;
-+		goto done;
-+	}
-+
-+	if (!ep->meta)
-+		ep->meta = g_new0(struct iovec, 1);
-+
-+	ep->meta->iov_base = str2bytearray((char *) input, &ep->meta->iov_len);
-+	if (!ep->meta->iov_base) {
-+		free(ep->meta);
-+		ep->meta = NULL;
-+	}
-+
-+done:
-+	bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
-+					endpoint_auto_accept, ep);
-+}
-+
- static void endpoint_set_capabilities(const char *input, void *user_data)
- {
- 	struct endpoint *ep = user_data;
-@@ -2091,8 +2174,8 @@ static void endpoint_set_capabilities(const char *input, void *user_data)
- 		ep->caps->iov_len = 0x00;
- 	}
- 
--	bt_shell_prompt_input(ep->path, "Auto Accept (yes/no):",
--						endpoint_auto_accept, ep);
-+	bt_shell_prompt_input(ep->path, "Enter Metadata (value/no):",
-+					endpoint_set_metadata, ep);
- }
- 
- static char *uuid_generator(const char *text, int state)
+url:    https://github.com/intel-lab-lkp/linux/commits/Sai-Teja-Aluvala/Bluetooth-hci_qca-Add-qcomm-devcoredump-support/20230428-152145
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/1682666311-8452-1-git-send-email-quic_saluvala%40quicinc.com
+patch subject: [PATCH v1 2/2] Bluetooth: hci_qca: Add qcomm devcoredump support
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230429/202304290720.TfpPCFY6-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/a3c3d43057a99f13198754e0b8eaf944d1853142
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Sai-Teja-Aluvala/Bluetooth-hci_qca-Add-qcomm-devcoredump-support/20230428-152145
+        git checkout a3c3d43057a99f13198754e0b8eaf944d1853142
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash drivers/
+
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Link: https://lore.kernel.org/oe-kbuild-all/202304290720.TfpPCFY6-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/bluetooth/hci_qca.c:981:5: warning: no previous prototype for 'qca_dmp_hdr' [-Wmissing-prototypes]
+     981 | int qca_dmp_hdr(struct hci_dev *hdev, char *buf, size_t size)
+         |     ^~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c: In function 'qca_controller_memdump':
+   drivers/bluetooth/hci_qca.c:1070:31: error: implicit declaration of function 'hci_devcoredump_init' [-Werror=implicit-function-declaration]
+    1070 |                         ret = hci_devcoredump_init(hu->hdev, qca_memdump->ram_dump_size);
+         |                               ^~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c:1119:25: error: implicit declaration of function 'hci_devcoredump_append_pattern' [-Werror=implicit-function-declaration]
+    1119 |                         hci_devcoredump_append_pattern(hu->hdev, 0x00,
+         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c:1136:25: error: implicit declaration of function 'hci_devcoredump_append' [-Werror=implicit-function-declaration]
+    1136 |                         hci_devcoredump_append(hu->hdev, skb);
+         |                         ^~~~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c:1150:25: error: implicit declaration of function 'hci_devcoredump_complete' [-Werror=implicit-function-declaration]
+    1150 |                         hci_devcoredump_complete(hu->hdev);
+         |                         ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c: In function 'qca_hw_error':
+   drivers/bluetooth/hci_qca.c:1557:17: error: implicit declaration of function 'hci_devcoredump_abort' [-Werror=implicit-function-declaration]
+    1557 |                 hci_devcoredump_abort(hu->hdev);
+         |                 ^~~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c: In function 'hciqca_coredump_enabled':
+   drivers/bluetooth/hci_qca.c:1727:32: error: 'struct device' has no member named 'coredump_disabled'
+    1727 |         return !hu->serdev->dev.coredump_disabled;
+         |                                ^
+   drivers/bluetooth/hci_qca.c: In function 'qca_setup':
+   drivers/bluetooth/hci_qca.c:1866:25: error: 'struct hci_dev' has no member named 'dump'
+    1866 |                 hu->hdev->dump.enabled = hciqca_coredump_enabled;
+         |                         ^~
+   drivers/bluetooth/hci_qca.c:1906:9: error: implicit declaration of function 'hci_devcoredump_register' [-Werror=implicit-function-declaration]
+    1906 |         hci_devcoredump_register(hdev, hci_coredump_qca, qca_dmp_hdr, NULL);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/bluetooth/hci_qca.c: In function 'hciqca_coredump':
+   drivers/bluetooth/hci_qca.c:2458:17: error: 'struct device' has no member named 'coredump_disabled'
+    2458 |         if (!dev->coredump_disabled && hdev->dump.coredump)
+         |                 ^~
+   drivers/bluetooth/hci_qca.c:2458:44: error: 'struct hci_dev' has no member named 'dump'
+    2458 |         if (!dev->coredump_disabled && hdev->dump.coredump)
+         |                                            ^~
+   drivers/bluetooth/hci_qca.c:2459:21: error: 'struct hci_dev' has no member named 'dump'
+    2459 |                 hdev->dump.coredump(hdev);
+         |                     ^~
+   cc1: some warnings being treated as errors
+
+
+vim +/qca_dmp_hdr +981 drivers/bluetooth/hci_qca.c
+
+   980	
+ > 981	int qca_dmp_hdr(struct hci_dev *hdev, char *buf, size_t size)
+   982	{
+   983		struct hci_uart *hu = hci_get_drvdata(hdev);
+   984		struct qca_data *qca = hu->priv;
+   985		int len = 0;
+   986	
+   987		len += snprintf(buf + len, size-len, "Controller Name: 0x%x\n",
+   988				qca->controller_id);
+   989	
+   990		len += snprintf(buf + len, size-len, "Firmware Version: 0x%x\n",
+   991				qca->fw_version);
+   992	
+   993		len += snprintf(buf + len, size-len, "Vendor:Qualcomm\n");
+   994	
+   995		len += snprintf(buf + len, size-len, "Driver: %s\n",
+   996				hu->serdev->dev.driver->name);
+   997	
+   998		bt_dev_info(hdev, "vendor dump hdr size(%d)", len);
+   999		return len;
+  1000	}
+  1001	
+
 -- 
-2.40.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
