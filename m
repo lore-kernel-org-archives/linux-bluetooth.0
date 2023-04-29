@@ -2,171 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D02C77B60
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Apr 2023 23:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EF94C77B60
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Apr 2023 00:12:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347061AbjD1XzA (ORCPT
+        id S1347134AbjD2AM5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Apr 2023 19:55:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41868 "EHLO
+        Fri, 28 Apr 2023 20:12:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347058AbjD1Xyw (ORCPT
+        with ESMTP id S229579AbjD2AMz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Apr 2023 19:54:52 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CEC219A1;
-        Fri, 28 Apr 2023 16:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1682726091; x=1714262091;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=SJXp+1HzoIh0ZhIOJuOclUQJn51bNAqL1ZXszXf+6/0=;
-  b=gs4Qcnd1rLaEbO5CjCbv8jH++DircSrNw1XZPlc8ZRkgBSJHDAClgbgS
-   EfyjUnxY2Duc3I+zVXz/GIcn0WW+g+La44y8PNGm9/v5DJ2Z2K+i7xz/k
-   Qg77yBH/uFhCDtw6etsAJodZNTWCepxy8osJNY9N0znz9Z/8rk5R6DZaM
-   IzacARTRDgcTob+xtbkNjv4Bp/uMNdxK51gNpzLdOTku/6aRjo4tJPAnY
-   IJsjgv/NXUK5NLXcMgysZf+Fw5vl0bJ/rDumwaIJtyc+WQtxCnqPvxG+6
-   7U1loGX0Zv45SY687DMmKF+eQsBvhAQR4FV8DuayhbqqgS98j0kTWXwS5
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="346655292"
-X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
-   d="scan'208";a="346655292"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2023 16:54:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10694"; a="689030623"
-X-IronPort-AV: E=Sophos;i="5.99,235,1677571200"; 
-   d="scan'208";a="689030623"
-Received: from lkp-server01.sh.intel.com (HELO 5bad9d2b7fcb) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 28 Apr 2023 16:54:48 -0700
-Received: from kbuild by 5bad9d2b7fcb with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1psXvL-0000lD-1J;
-        Fri, 28 Apr 2023 23:54:47 +0000
-Date:   Sat, 29 Apr 2023 07:54:10 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com
-Cc:     oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
-        quic_bgodavar@quicinc.com, quic_rameshn@quicinc.com,
-        jiangzp@google.com, mmandlik@google.com,
-        Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Subject: Re: [PATCH v1 2/2] Bluetooth: hci_qca: Add qcomm devcoredump support
-Message-ID: <202304290720.TfpPCFY6-lkp@intel.com>
-References: <1682666311-8452-1-git-send-email-quic_saluvala@quicinc.com>
+        Fri, 28 Apr 2023 20:12:55 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A49BB1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Apr 2023 17:12:55 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-5ef6e0f9d5aso6478496d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Apr 2023 17:12:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682727174; x=1685319174;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SGB5uaKJ5np+pMJs4Q66qMGccex2SeIOndzfR85Yds4=;
+        b=RVhLZT7B9cfjACJJLhcctOvJWvJq0HaBJSqCHZSAe3m3XXRo+7jd8rvouxb6t6AyFk
+         KONAz3e4EQyfGoqtawFtdo+AQhH0diH+yCxle/mJ1Ij6Q+2kDkw2ZVKnyOku/wZOyeCd
+         zwZ3MNrZk0dqKQTigOWAxw+rqeNPRIcwMytAJObjATRJv99AKproYR/TarbnTWSiCUsU
+         J7D4OUyy/IOcz84fVvEQcPD7PMPk7DlfiHwKhJmZuiET05fe1KOJqEQt6SFPbzBZIeOE
+         MxKfWTMyXrQfjGASavvF7IO+jVP9PkcCUTbFNQrB3SLtAJhBPM6PGgDdb8QlkwYrd3Id
+         ZGCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682727174; x=1685319174;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SGB5uaKJ5np+pMJs4Q66qMGccex2SeIOndzfR85Yds4=;
+        b=kjmkXNBX816nfBqBx+MUDQot0rf+RT32/2uw5FMPwi0q1/j1AIltujlmoLfL4GgWOS
+         U4VTHDvMIFXUwUNNgCv7oryWrI/j5YvBHwaoW8L6hxdBCcrMk3EzSFrdbVUhjvxtEKFF
+         YUjMygm1tqdTE/De5KVoSUeN+1YKliCnSCrNiBHJbOxTP27Z9JVdh29ZCbyoJ1Dl5qj0
+         bHB20S0JDWjl3f3TnBpcoeG9Q79UD7YmnMTUZ//3olI1YS1c2+HC+ElE1ATIHrDzdRpc
+         OttSCq8lV8NUZtPExq5i3/jgSKA3XytolC4A9bssnL0fflI+s+f0i0LvybmPcBktUbFE
+         kVNA==
+X-Gm-Message-State: AC+VfDwxttAutuOZBv7aRFnHPiYCWY6fTfhqNlOcVKId+8/akxvwKGe/
+        iUrW3wwJO6r2McLwyD09QdJUpt83OeE=
+X-Google-Smtp-Source: ACHHUZ5PX0d5OB9pri5+ZY1X6H6BNKqPf1LX2tvKZ9k/Ni02je/pRGjNefR0kUtdQi8RCQ+Kr1Xr0g==
+X-Received: by 2002:ad4:5be9:0:b0:5ef:519:b1a with SMTP id k9-20020ad45be9000000b005ef05190b1amr9913357qvc.24.1682727174081;
+        Fri, 28 Apr 2023 17:12:54 -0700 (PDT)
+Received: from [172.17.0.2] ([52.226.126.225])
+        by smtp.gmail.com with ESMTPSA id n8-20020a0ce548000000b005ef5f7c1ae1sm6752864qvm.105.2023.04.28.17.12.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Apr 2023 17:12:53 -0700 (PDT)
+Message-ID: <644c6105.0c0a0220.c2454.c875@mx.google.com>
+Date:   Fri, 28 Apr 2023 17:12:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5578176811000450643=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1682666311-8452-1-git-send-email-quic_saluvala@quicinc.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] client/player: Add support for Metadata in BAP Profile
+In-Reply-To: <20230428230827.908680-1-luiz.dentz@gmail.com>
+References: <20230428230827.908680-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sai,
+--===============5578176811000450643==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build warnings:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v6.3 next-20230428]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sai-Teja-Aluvala/Bluetooth-hci_qca-Add-qcomm-devcoredump-support/20230428-152145
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/1682666311-8452-1-git-send-email-quic_saluvala%40quicinc.com
-patch subject: [PATCH v1 2/2] Bluetooth: hci_qca: Add qcomm devcoredump support
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20230429/202304290720.TfpPCFY6-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/a3c3d43057a99f13198754e0b8eaf944d1853142
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Sai-Teja-Aluvala/Bluetooth-hci_qca-Add-qcomm-devcoredump-support/20230428-152145
-        git checkout a3c3d43057a99f13198754e0b8eaf944d1853142
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash drivers/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=743958
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Link: https://lore.kernel.org/oe-kbuild-all/202304290720.TfpPCFY6-lkp@intel.com/
+---Test result---
 
-All warnings (new ones prefixed by >>):
-
->> drivers/bluetooth/hci_qca.c:981:5: warning: no previous prototype for 'qca_dmp_hdr' [-Wmissing-prototypes]
-     981 | int qca_dmp_hdr(struct hci_dev *hdev, char *buf, size_t size)
-         |     ^~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c: In function 'qca_controller_memdump':
-   drivers/bluetooth/hci_qca.c:1070:31: error: implicit declaration of function 'hci_devcoredump_init' [-Werror=implicit-function-declaration]
-    1070 |                         ret = hci_devcoredump_init(hu->hdev, qca_memdump->ram_dump_size);
-         |                               ^~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c:1119:25: error: implicit declaration of function 'hci_devcoredump_append_pattern' [-Werror=implicit-function-declaration]
-    1119 |                         hci_devcoredump_append_pattern(hu->hdev, 0x00,
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c:1136:25: error: implicit declaration of function 'hci_devcoredump_append' [-Werror=implicit-function-declaration]
-    1136 |                         hci_devcoredump_append(hu->hdev, skb);
-         |                         ^~~~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c:1150:25: error: implicit declaration of function 'hci_devcoredump_complete' [-Werror=implicit-function-declaration]
-    1150 |                         hci_devcoredump_complete(hu->hdev);
-         |                         ^~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c: In function 'qca_hw_error':
-   drivers/bluetooth/hci_qca.c:1557:17: error: implicit declaration of function 'hci_devcoredump_abort' [-Werror=implicit-function-declaration]
-    1557 |                 hci_devcoredump_abort(hu->hdev);
-         |                 ^~~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c: In function 'hciqca_coredump_enabled':
-   drivers/bluetooth/hci_qca.c:1727:32: error: 'struct device' has no member named 'coredump_disabled'
-    1727 |         return !hu->serdev->dev.coredump_disabled;
-         |                                ^
-   drivers/bluetooth/hci_qca.c: In function 'qca_setup':
-   drivers/bluetooth/hci_qca.c:1866:25: error: 'struct hci_dev' has no member named 'dump'
-    1866 |                 hu->hdev->dump.enabled = hciqca_coredump_enabled;
-         |                         ^~
-   drivers/bluetooth/hci_qca.c:1906:9: error: implicit declaration of function 'hci_devcoredump_register' [-Werror=implicit-function-declaration]
-    1906 |         hci_devcoredump_register(hdev, hci_coredump_qca, qca_dmp_hdr, NULL);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/bluetooth/hci_qca.c: In function 'hciqca_coredump':
-   drivers/bluetooth/hci_qca.c:2458:17: error: 'struct device' has no member named 'coredump_disabled'
-    2458 |         if (!dev->coredump_disabled && hdev->dump.coredump)
-         |                 ^~
-   drivers/bluetooth/hci_qca.c:2458:44: error: 'struct hci_dev' has no member named 'dump'
-    2458 |         if (!dev->coredump_disabled && hdev->dump.coredump)
-         |                                            ^~
-   drivers/bluetooth/hci_qca.c:2459:21: error: 'struct hci_dev' has no member named 'dump'
-    2459 |                 hdev->dump.coredump(hdev);
-         |                     ^~
-   cc1: some warnings being treated as errors
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.34 seconds
+BuildEll                      PASS      27.13 seconds
+BluezMake                     PASS      871.46 seconds
+MakeCheck                     PASS      11.73 seconds
+MakeDistcheck                 PASS      153.80 seconds
+CheckValgrind                 PASS      250.79 seconds
+CheckSmatch                   PASS      339.61 seconds
+bluezmakeextell               PASS      101.70 seconds
+IncrementalBuild              PASS      718.81 seconds
+ScanBuild                     PASS      1045.45 seconds
 
 
-vim +/qca_dmp_hdr +981 drivers/bluetooth/hci_qca.c
 
-   980	
- > 981	int qca_dmp_hdr(struct hci_dev *hdev, char *buf, size_t size)
-   982	{
-   983		struct hci_uart *hu = hci_get_drvdata(hdev);
-   984		struct qca_data *qca = hu->priv;
-   985		int len = 0;
-   986	
-   987		len += snprintf(buf + len, size-len, "Controller Name: 0x%x\n",
-   988				qca->controller_id);
-   989	
-   990		len += snprintf(buf + len, size-len, "Firmware Version: 0x%x\n",
-   991				qca->fw_version);
-   992	
-   993		len += snprintf(buf + len, size-len, "Vendor:Qualcomm\n");
-   994	
-   995		len += snprintf(buf + len, size-len, "Driver: %s\n",
-   996				hu->serdev->dev.driver->name);
-   997	
-   998		bt_dev_info(hdev, "vendor dump hdr size(%d)", len);
-   999		return len;
-  1000	}
-  1001	
+---
+Regards,
+Linux Bluetooth
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+
+--===============5578176811000450643==--
