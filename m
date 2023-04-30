@@ -2,143 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4915FC77B73
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Apr 2023 17:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90EF9C77B60
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Apr 2023 18:05:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbjD3R5C (ORCPT
+        id S230211AbjD3SFz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Apr 2023 13:57:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56752 "EHLO
+        Sun, 30 Apr 2023 14:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbjD3R5B (ORCPT
+        with ESMTP id S229568AbjD3SFz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Apr 2023 13:57:01 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2F910E7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 10:57:00 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-61b2f654b54so1239246d6.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 10:57:00 -0700 (PDT)
+        Sun, 30 Apr 2023 14:05:55 -0400
+Received: from pku.edu.cn (mx19.pku.edu.cn [162.105.129.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B5ED8E7B
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 11:05:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682877419; x=1685469419;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNzgd2JfXQiyPxJgLYOA0xXLi2Z0X9mvxb+nUSFD5DQ=;
-        b=B3ayR7wP/y33Zw42JAeVMF+kErACna2wDDA1MPB/TsH83y15KSpQILWUulOciturJC
-         wgo5zPDMkRf9lB3jXe/hr9P3TB5MZGOFkpo75XdJCQonlyp/trxTceDHspJQPRPDS5vh
-         IQ7Ujbj/dsEY2egtb10bCnQx/shVrzda4cehbLqpm8ooI7jch1Um3XkkaU0DcMA3YsAd
-         hDkhJbF87aHrL8W9Yezeb7Go5HXiKPnIrj4a1bWXcag/uenlYULNUb8deS5mYdMZ2vfY
-         O9o9h6QyZTrEbHPFhFWOY27XGwHg/7hMVZrZkbTCdm1C48jGUfhggsnUjc4IJqS5waD6
-         EFzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682877419; x=1685469419;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xNzgd2JfXQiyPxJgLYOA0xXLi2Z0X9mvxb+nUSFD5DQ=;
-        b=g1NtkkyLE7gUIaA7QDxZ4CMpsM6ZqKKU/Inhg8w3v+t2AU1egQGpJqg0pc38/r0aqL
-         3L96dZbCHIPYNx5e/ph8B/Ab+CX6uM5Jl+aCULWfaKcGYoweAHN4yn3geRwWOM6pbmL7
-         q7pzUznVOUdPgadw3CCzsDBbtf2qIG9nGMAZ6n2O6rcSGM+0rOeqgoPiwToZSbuV8V5U
-         iN2vulj4aCvklMnUkARlTivt7tyS3x7MoOrPr2R8cZJOpuMCU69QfWT5/9KOMW205w63
-         UKvM/YimhzKL6YsadOg7NTdvwt1VnLriqRQxFyzTdd5EIklT6FqOgAHK1giXIUBAuy4r
-         hk+Q==
-X-Gm-Message-State: AC+VfDwqaRQzE8CurtqLKLCGK3iDQzoFbWM7fxJzK8LI80tv468jo4gM
-        swaTE1CW+GCmQTAZfdsnoMO222mCucg=
-X-Google-Smtp-Source: ACHHUZ7oAPWds5EjJGShOOF/tEegEmPjmNuZtBApw6jweCIeZLncaHQJExIINq1bGogNcmxVhxJovw==
-X-Received: by 2002:ad4:5dc2:0:b0:61a:d6af:cb00 with SMTP id m2-20020ad45dc2000000b0061ad6afcb00mr1898397qvh.9.1682877419326;
-        Sun, 30 Apr 2023 10:56:59 -0700 (PDT)
-Received: from [172.17.0.2] ([104.45.204.48])
-        by smtp.gmail.com with ESMTPSA id i10-20020a0cedca000000b005ef493c6bebsm8017678qvr.77.2023.04.30.10.56.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Apr 2023 10:56:59 -0700 (PDT)
-Message-ID: <644eabeb.0c0a0220.1245d.fc0b@mx.google.com>
-Date:   Sun, 30 Apr 2023 10:56:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5742443708805543211=="
+        d=pku.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:Date:
+        Message-Id:MIME-Version:Content-Transfer-Encoding; bh=SG+O2Nuecm
+        o3S1C5gW1OXRfwUABkZXk/+etEKv1A1Wo=; b=lJYPCkdSBpS0jLLYMHxp8CsLto
+        yh77CSpQXJ5JUSnNA2fqBJnrPgJ+wP/lPYybxwet8TQrXPOroglJS44jhNIJF+Gu
+        iDYeJbEiMATbzRJLQpUv3HEiLOzaQKfKsLuSSRAxP4OMmKK+eeduSZIIHxjWCO4Q
+        bc5PQLxdOtckID/XU=
+Received: from localhost.localdomain (unknown [10.7.101.92])
+        by front01 (Coremail) with SMTP id 5oFpogBXX2f2rU5kiWv2AA--.57652S2;
+        Mon, 01 May 2023 02:05:47 +0800 (CST)
+From:   Ruihan Li <lrh2000@pku.edu.cn>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Ruihan Li <lrh2000@pku.edu.cn>
+Subject: [PATCH v2] Bluetooth: Fix potential double free caused by hci_conn_unlink
+Date:   Mon,  1 May 2023 02:05:35 +0800
+Message-Id: <20230430180535.168270-1-lrh2000@pku.edu.cn>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, lrh2000@pku.edu.cn
-Subject: RE: Bluetooth: Fix UAF in hci_conn_hash_flush again
-In-Reply-To: <20230430171847.156825-1-lrh2000@pku.edu.cn>
-References: <20230430171847.156825-1-lrh2000@pku.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: 5oFpogBXX2f2rU5kiWv2AA--.57652S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrWkCrWrXrW8JryrKr1xXwb_yoW8tFWUpa
+        y3WayaqF4kJrn3WF4jyw4kWrsYvw1kZFy7Kr1rtryrAws0qry8Aw4FkryUKrW5ZrWkWF4Y
+        vF4Utr1UKF4DC37anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUU9j1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+        IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2
+        jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr1j6rxdM2vYz4IE04k24V
+        AvwVAKI4IrM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xf
+        McIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7
+        v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVCm
+        -wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26w4UJr1UMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+        IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+        C2KfnxnUUI43ZEXa7VUbHa0DUUUUU==
+X-CM-SenderInfo: yssqiiarrvmko6sn3hxhgxhubq/1tbiAgEPBVPy77wh+AAKso
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5742443708805543211==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The hci_conn_unlink function is being called by hci_conn_del, which means
+it should not call hci_conn_del with the input parameter conn again. If it
+does, conn may have already been released when hci_conn_unlink returns,
+leading to potential UAF and double-free issues.
 
-This is automated email and please do not reply to this email!
+This patch resolves the problem by modifying hci_conn_unlink to release
+only conn's child links when necessary, but never release conn itself.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744073
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.12 seconds
-GitLint                       PASS      0.35 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      32.06 seconds
-CheckAllWarning               PASS      34.74 seconds
-CheckSparse                   PASS      39.61 seconds
-CheckSmatch                   PASS      108.27 seconds
-BuildKernel32                 PASS      31.25 seconds
-TestRunnerSetup               PASS      442.52 seconds
-TestRunner_l2cap-tester       PASS      16.91 seconds
-TestRunner_iso-tester         PASS      21.38 seconds
-TestRunner_bnep-tester        PASS      5.63 seconds
-TestRunner_mgmt-tester        PASS      116.50 seconds
-TestRunner_rfcomm-tester      PASS      9.06 seconds
-TestRunner_sco-tester         PASS      8.31 seconds
-TestRunner_ioctl-tester       PASS      9.75 seconds
-TestRunner_mesh-tester        PASS      7.21 seconds
-TestRunner_smp-tester         PASS      8.15 seconds
-TestRunner_userchan-tester    PASS      5.94 seconds
-IncrementalBuild              PASS      29.20 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: Fix UAF in hci_conn_hash_flush again
-WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
-#92: 
-Reported-by: syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=8bb72f86fc823817bc5d
-
-WARNING: Unknown link reference 'Closes:', use 'Link:' instead
-#93: 
-Closes: https://syzkaller.appspot.com/bug?extid=8bb72f86fc823817bc5d
-
-CHECK: Alignment should match open parenthesis
-#163: FILE: net/bluetooth/hci_conn.c:2473:
-+	while ((conn = list_first_entry_or_null(head,
-+				struct hci_conn, list)) != NULL) {
-
-total: 0 errors, 2 warnings, 1 checks, 57 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13227257.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Fixes: 06149746e720 ("Bluetooth: hci_conn: Add support for linking multiple hcon")
+Signed-off-by: Ruihan Li <lrh2000@pku.edu.cn>
 ---
-Regards,
-Linux Bluetooth
+Changes since v1:
+ * CI complains that there are some merge conflicts. This is because
+	void hci_conn_del(struct hci_conn *conn)
+   this completely unrelated line makes the patch dependent on another fix:
+	https://lore.kernel.org/linux-bluetooth/20230430171847.156825-1-lrh2000@pku.edu.cn/
+   But actually, deleting that line makes the two patches independent of
+   each other, and everything still works.
 
+ net/bluetooth/hci_conn.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
---===============5742443708805543211==--
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 85c34c837..5f388202f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1083,8 +1083,18 @@ static void hci_conn_unlink(struct hci_conn *conn)
+ 	if (!conn->parent) {
+ 		struct hci_link *link, *t;
+ 
+-		list_for_each_entry_safe(link, t, &conn->link_list, list)
+-			hci_conn_unlink(link->conn);
++		list_for_each_entry_safe(link, t, &conn->link_list, list) {
++			struct hci_conn *child = link->conn;
++
++			hci_conn_unlink(child);
++
++			/* Due to race, SCO connection might be not established
++			 * yet at this point. Delete it now, otherwise it is
++			 * possible for it to be stuck and can't be deleted.
++			 */
++			if (child->handle == HCI_CONN_HANDLE_UNSET)
++				hci_conn_del(child);
++		}
+ 
+ 		return;
+ 	}
+@@ -1100,12 +1110,5 @@ static void hci_conn_unlink(struct hci_conn *conn)
+ 
+ 	kfree(conn->link);
+ 	conn->link = NULL;
+-
+-	/* Due to race, SCO connection might be not established
+-	 * yet at this point. Delete it now, otherwise it is
+-	 * possible for it to be stuck and can't be deleted.
+-	 */
+-	if (conn->handle == HCI_CONN_HANDLE_UNSET)
+-		hci_conn_del(conn);
+ }
+ 
+-- 
+2.40.0
+
