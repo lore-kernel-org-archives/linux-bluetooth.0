@@ -2,120 +2,97 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E5AC77B60
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Apr 2023 07:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31301C77B60
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Apr 2023 08:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229566AbjD3Hwn (ORCPT
+        id S229814AbjD3IAr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Apr 2023 03:52:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42466 "EHLO
+        Sun, 30 Apr 2023 04:00:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjD3Hwm (ORCPT
+        with ESMTP id S229665AbjD3IAp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Apr 2023 03:52:42 -0400
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA33199A
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 00:52:40 -0700 (PDT)
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-769036b47a7so46142439f.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 00:52:40 -0700 (PDT)
+        Sun, 30 Apr 2023 04:00:45 -0400
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B80A12735
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 01:00:42 -0700 (PDT)
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-32f240747cdso126660875ab.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 01:00:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682841160; x=1685433160;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fDkKPNSsXxANthsudfaiuRAniodyGXR5TzlpJcW5aYk=;
-        b=IAvzBTgatf55O+u2RZpYeoIgwUOnlli22Ltk5fPxGAJW8Y7zyNqnfNXIqXseB7ZVFf
-         Qzy42vGzT8y8gmD/pbLSTCPYaWORjlDb2xFusAMD190ttnnDiZujFlMovSmQtXBbsLnB
-         b36as5t4ipqsCyp4d1L+95jUeaIPKHYGtaQfJyzBZNZo50nEn6HVb7OnyFpvPVr1Rchv
-         ScM9HPNy84/PNoVOD8fIZZUYVBwnT77zCx9uaxZiZOwv5OsEJ5d4jcBBf0e2GU7TsoFT
-         bgXt0KR+8zNqbSXrUhN1J/glu4VwLuELZmRO/GPfTwjIvFhBXf8ruUL3wjMwB4kwjfeG
-         tbCg==
-X-Gm-Message-State: AC+VfDx/qvMTu7zokGHmqoHeG4lW7zuwo9ZI2VV14emjyIaw128fMf57
-        KsnYuFO/zoWJ/Ax47FHg3IHX7T8f+YNcfYwrV7nJfJBaj2nU
-X-Google-Smtp-Source: ACHHUZ7bcG1e/3bUMzc0ymc7D2jyrzRFpHg6OGgc1vjTSzYAQkzB6eb8hwkmLDkQ2x4UKlWv/MXS4mus8I2wW/dEjqwTOCIeYkg4
+        d=1e100.net; s=20221208; t=1682841642; x=1685433642;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=a1IDexcHuombdCZ4bVG8CXLltliWPzqUXk6Z55Zt+1g=;
+        b=ieQub9srlwmw04e5P0sP/OJck/VM9Qv8detKTGrA47anS8KI6kez+g0iqRD7yNx2GU
+         Og0vyYdgBsV+GcHD6ReVKKjy89bqlUWOaw+1Mt2015bz9zOeLNA4/Lq3HOc9A3j+IVWy
+         m/c5H32RcRTXYD3ojw4VQdlaP8mlu4u+vDYjxI3CAXp921BetZ7khyH+HCl13gqVw7xu
+         YZav3wAuUlnhkDLace7jJdNpgo4Z5h7GfKFmK+mI/bCrCMDwA5cT3difCrOIZmoc7K8L
+         J1RK43s1A8A5CAhYRNG/2fzLkUM2OFvwRzS21d90eCgJnPCzdgs0kLwOCbFqIsu0bIii
+         QKvQ==
+X-Gm-Message-State: AC+VfDzf5uZ/Xdvz8IYicLK53mvzZG8AnXgPZVCuOeP7tG5j4t08lx/9
+        8TiKEftQ2Dwbf95N9NEvohcHez/DIP31cBnXq3QnOrCJRvYI
+X-Google-Smtp-Source: ACHHUZ4/XGK5QEZGjatsgLOMA57M9b9WoU+Oaty0ka3edIlYCmGpUkKZ6daOcAJZQHXqDzyXqsUU33DW7FKUNIY+3QmsnOAE6cmb
 MIME-Version: 1.0
-X-Received: by 2002:a6b:90a:0:b0:760:fab7:5bbf with SMTP id
- t10-20020a6b090a000000b00760fab75bbfmr4768392ioi.4.1682841159908; Sun, 30 Apr
- 2023 00:52:39 -0700 (PDT)
-Date:   Sun, 30 Apr 2023 00:52:39 -0700
-In-Reply-To: <000000000000fcbbf805f9aca52b@google.com>
+X-Received: by 2002:a05:6e02:1d96:b0:32c:b2b4:3bc2 with SMTP id
+ h22-20020a056e021d9600b0032cb2b43bc2mr9966869ila.1.1682841642120; Sun, 30 Apr
+ 2023 01:00:42 -0700 (PDT)
+Date:   Sun, 30 Apr 2023 01:00:42 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008cc80505fa88fdfc@google.com>
-Subject: Re: [syzbot] [bluetooth?] WARNING: bad unlock balance in l2cap_disconnect_rsp
-From:   syzbot <syzbot+180f35f8e76c7af067d2@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+Message-ID: <0000000000004abe4905fa891a51@google.com>
+Subject: [syzbot] Monthly bluetooth report (Apr 2023)
+From:   syzbot <syzbot+list71ad3118d9e6461faaf3@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
         linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
         syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Hello bluetooth maintainers/developers,
 
-HEAD commit:    14f8db1c0f9a Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=13b18ef8280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a837a8ba7e88bb45
-dashboard link: https://syzkaller.appspot.com/bug?extid=180f35f8e76c7af067d2
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=167c5f2c280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1430f330280000
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ad6ce516eed3/disk-14f8db1c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1f38c2cc7667/vmlinux-14f8db1c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d795115eee39/Image-14f8db1c.gz.xz
+During the period, 2 new issues were detected and 1 were fixed.
+In total, 24 issues are still open and 50 have been fixed so far.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+180f35f8e76c7af067d2@syzkaller.appspotmail.com
+Some of the still happening issues:
 
-Bluetooth: hci0: unexpected cc 0x0c25 length: 249 > 3
-Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2
-=====================================
-WARNING: bad unlock balance detected!
-6.3.0-rc7-syzkaller-g14f8db1c0f9a #0 Not tainted
--------------------------------------
-kworker/u5:2/5929 is trying to release lock (&conn->chan_lock) at:
-[<ffff8000115d5e64>] l2cap_disconnect_rsp+0x210/0x30c net/bluetooth/l2cap_core.c:4697
-but there are no more locks to release!
-
-other info that might help us debug this:
-2 locks held by kworker/u5:2/5929:
- #0: ffff0000db5a5938 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x664/0x12d4 kernel/workqueue.c:2363
- #1: ffff80001e507c20 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x6a8/0x12d4 kernel/workqueue.c:2365
-
-stack backtrace:
-CPU: 1 PID: 5929 Comm: kworker/u5:2 Not tainted 6.3.0-rc7-syzkaller-g14f8db1c0f9a #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/30/2023
-Workqueue: hci0 hci_rx_work
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:233
- show_stack+0x2c/0x44 arch/arm64/kernel/stacktrace.c:240
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd0/0x124 lib/dump_stack.c:106
- dump_stack+0x1c/0x28 lib/dump_stack.c:113
- print_unlock_imbalance_bug+0x250/0x2a4 kernel/locking/lockdep.c:5109
- lock_release+0x4ac/0x9ac kernel/locking/lockdep.c:5689
- __mutex_unlock_slowpath+0xe0/0x6b4 kernel/locking/mutex.c:907
- mutex_unlock+0x18/0x24 kernel/locking/mutex.c:543
- l2cap_disconnect_rsp+0x210/0x30c net/bluetooth/l2cap_core.c:4697
- l2cap_bredr_sig_cmd+0x974/0x7e94 net/bluetooth/l2cap_core.c:5748
- l2cap_sig_channel net/bluetooth/l2cap_core.c:6507 [inline]
- l2cap_recv_frame+0x83c/0x6a14 net/bluetooth/l2cap_core.c:7786
- l2cap_recv_acldata+0x4f4/0x163c net/bluetooth/l2cap_core.c:8504
- hci_acldata_packet net/bluetooth/hci_core.c:3828 [inline]
- hci_rx_work+0x2cc/0x8b8 net/bluetooth/hci_core.c:4063
- process_one_work+0x788/0x12d4 kernel/workqueue.c:2390
- worker_thread+0x8e0/0xfe8 kernel/workqueue.c:2537
- kthread+0x250/0x2d8 kernel/kthread.c:376
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:870
-
+Ref  Crashes Repro Title
+<1>  6076    Yes   possible deadlock in rfcomm_sk_state_change
+                   https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+<2>  3047    Yes   WARNING in hci_conn_timeout
+                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
+<3>  1047    Yes   INFO: task can't die in __lock_sock
+                   https://syzkaller.appspot.com/bug?extid=7d51f807c81b190a127d
+<4>  662     No    KASAN: slab-use-after-free Read in hci_conn_hash_flush
+                   https://syzkaller.appspot.com/bug?extid=8bb72f86fc823817bc5d
+<5>  331     Yes   possible deadlock in rfcomm_dlc_exists
+                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+<6>  82      No    possible deadlock in hci_unregister_dev
+                   https://syzkaller.appspot.com/bug?extid=c933391d8e4089f1f53e
+<7>  66      Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<8>  47      No    possible deadlock in discov_off
+                   https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
+<9>  29      Yes   WARNING: ODEBUG bug in put_device
+                   https://syzkaller.appspot.com/bug?extid=a9290936c6e87b3dc3c2
+<10> 27      Yes   WARNING: bad unlock balance in l2cap_disconnect_rsp
+                   https://syzkaller.appspot.com/bug?extid=180f35f8e76c7af067d2
 
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
