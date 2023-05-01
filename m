@@ -2,121 +2,90 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C73C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Apr 2023 18:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF858C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 09:03:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229568AbjD3Sde (ORCPT
+        id S231736AbjEAJD2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Apr 2023 14:33:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40262 "EHLO
+        Mon, 1 May 2023 05:03:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjD3Sdd (ORCPT
+        with ESMTP id S229921AbjEAJD1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Apr 2023 14:33:33 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BC7E5B
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 11:33:31 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-619ca08c166so4629126d6.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Apr 2023 11:33:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682879611; x=1685471611;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SsC30ePTSKpSLhzP2jnIZPuh09NUkFIYtg7U3jJBvzs=;
-        b=B6NYCNOFkoJebz7RoBIqyNlOvNy3uwqXaz1oGcG8IlmmMk+Kj+aqpfwefhLZfDBjni
-         ZZoJ0sGUwppL6ZZurzJpMByU6vyElFZdKn2L+ffuvRS5Iozn+KWe2nlmAQSc5fxW7TWa
-         miOgIQrKK0cFLfPAvn9BFZguH49K6RwDmxLDN2I4v3eKkyD/qipX2cGtfqfp/++W/wEN
-         QdLSylUukNXEhE5UXp1hjjx8CdOmB9M35A6JkV7PKzV734z0qmyRM5w+myASLLDbF9NU
-         zJR6XJXouf8FTDf3o19iK8t8AaTYkLzuuTG75hkDaFDlLVuPA92iS4dra1IaoMrlEFZa
-         xgHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682879611; x=1685471611;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SsC30ePTSKpSLhzP2jnIZPuh09NUkFIYtg7U3jJBvzs=;
-        b=KzGsPdMzF/c2B9yZp8y8yiGKEQeAxnLZys5nV/mQy9Og9v6rxMd+K6KqqiSFCNhxjH
-         I2UNmu+FvbEfynsSDcL43J5/B+ejwYRyar+FwPo9rmoDPt5FaWMAogt+7TJ2x+71vsMo
-         /urSzNyVn9zg2DLXKQOVlKtqiYSigeklSSQ+L1Uc+nGBQczaVsHJQTKZ10CkZULOhsrY
-         GPAoT+pU+EZ6I3qJLLFwH9acHshbPGPDgsU1UGF2N+gHlYfyOihfsDaeBZT+tVJfFB4V
-         Nt5y/hE4K+FMxgm0zCjJzFK3V81mLY+sFkXiCc6Sg1xcgtrCdD2jLhUrpqFUmGcZPMw2
-         s69w==
-X-Gm-Message-State: AC+VfDybTLGzlsSASXaMpNcsl9LBR22Q3sJWKRvVh+vpgxcP0/7+vT9O
-        WW8s8Cc0V8RJ6iEumjxvngEYF/Kpyv8=
-X-Google-Smtp-Source: ACHHUZ7zAR9VkBY27+rH6A/MTjxUMqxujHr+p6Jqpc+V0/uxsxfHigTFsO+LlXypAU/NPOkSkTrGmw==
-X-Received: by 2002:ad4:5948:0:b0:616:5c8b:59d with SMTP id eo8-20020ad45948000000b006165c8b059dmr15876688qvb.20.1682879610715;
-        Sun, 30 Apr 2023 11:33:30 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.120.55])
-        by smtp.gmail.com with ESMTPSA id c7-20020a0cca07000000b005e90a67a687sm8019879qvk.65.2023.04.30.11.33.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Apr 2023 11:33:30 -0700 (PDT)
-Message-ID: <644eb47a.0c0a0220.96c6b.e81e@mx.google.com>
-Date:   Sun, 30 Apr 2023 11:33:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3212375016555370168=="
+        Mon, 1 May 2023 05:03:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E320510D8
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 02:02:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 13A6A61BAA
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 09:02:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 738BCC43446
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 09:02:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1682931744;
+        bh=CpMih+Y6al+M6UaN6xQf6e/00vdwXmyVY7x8fv8VJI0=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=FAXbiTrzqPdrO1GbyQZFkIWXq4c1e4Yxnq3DlwBD4EKY/YfSwH6n+dRmJHJDocnRK
+         SL2Tc+PeISWS8iv/sEX1CDxzyUaUqdgF1zF7s+R1DVIGfhFC0NQ2lA1UCbQVrZ3Z0U
+         JoodTyRchw1k08GG06Kizluf2zXY5eSySYkmp1n8GUWf4Az/18ULt4azSe0NCl9iF6
+         QjQj5ePtjhV54capIwejkNIY/JfNccHyMQJMaaasoDtSTKyYpSpf4ggwi5MbHvrgdS
+         fGGMB5dFEmcgWB6Q8RmXHkjtVU9ms8Y2ymIzeVrhlrC8PPoIcWNHB7YgtTGNclvssj
+         7vPh0PNBvc8TA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 63B30C43141; Mon,  1 May 2023 09:02:24 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Mon, 01 May 2023 09:02:23 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pieroavola@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215167-62941-wT6cNpLbiK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, lrh2000@pku.edu.cn
-Subject: RE: [v2] Bluetooth: Fix potential double free caused by hci_conn_unlink
-In-Reply-To: <20230430180535.168270-1-lrh2000@pku.edu.cn>
-References: <20230430180535.168270-1-lrh2000@pku.edu.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3212375016555370168==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-This is automated email and please do not reply to this email!
+--- Comment #51 from Piero Avola (pieroavola@gmail.com) ---
+(In reply to Dan from comment #50)
+> There is a workaround found by hmmsjan.
+>=20
+> su -c "modprobe -r btusb;sleep 2;modprobe btusb"
 
-Dear submitter,
+Unfortunately that workaround does not work 100% of the time. Usually
+re-running it after 10-15 does the job, but also that does not always work =
+for
+me.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744077
+In either case that doesn't solve the problem. Bluetooth should work after
+every boot without intervention.
 
----Test result---
+I'll see if I get around testing the patch from comment #48.
 
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-GitLint                       FAIL      0.56 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      31.08 seconds
-CheckAllWarning               PASS      34.53 seconds
-CheckSparse                   PASS      39.20 seconds
-CheckSmatch                   PASS      109.45 seconds
-BuildKernel32                 PASS      30.18 seconds
-TestRunnerSetup               PASS      441.36 seconds
-TestRunner_l2cap-tester       PASS      16.54 seconds
-TestRunner_iso-tester         PASS      20.36 seconds
-TestRunner_bnep-tester        PASS      5.30 seconds
-TestRunner_mgmt-tester        PASS      111.39 seconds
-TestRunner_rfcomm-tester      PASS      8.46 seconds
-TestRunner_sco-tester         PASS      7.88 seconds
-TestRunner_ioctl-tester       PASS      9.17 seconds
-TestRunner_mesh-tester        PASS      6.77 seconds
-TestRunner_smp-tester         PASS      7.77 seconds
-TestRunner_userchan-tester    PASS      5.56 seconds
-IncrementalBuild              PASS      28.59 seconds
+--=20
+You may reply to this email to add a comment.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: Fix potential double free caused by hci_conn_unlink
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-15: B3 Line contains hard tab characters (\t): "	void hci_conn_del(struct hci_conn *conn)"
-17: B1 Line exceeds max length (84>80): "	https://lore.kernel.org/linux-bluetooth/20230430171847.156825-1-lrh2000@pku.edu.cn/"
-17: B3 Line contains hard tab characters (\t): "	https://lore.kernel.org/linux-bluetooth/20230430171847.156825-1-lrh2000@pku.edu.cn/"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3212375016555370168==--
+You are receiving this mail because:
+You are the assignee for the bug.=
