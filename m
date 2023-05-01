@@ -2,115 +2,120 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F30DC77B61
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 09:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D8DAC77B61
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 12:01:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232305AbjEAJva (ORCPT
+        id S232430AbjEAMBO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 May 2023 05:51:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
+        Mon, 1 May 2023 08:01:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232284AbjEAJv0 (ORCPT
+        with ESMTP id S232408AbjEAMBN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 May 2023 05:51:26 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30E5BE4A;
-        Mon,  1 May 2023 02:51:24 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-24e01ba9e03so517082a91.1;
-        Mon, 01 May 2023 02:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682934683; x=1685526683;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wAyKklJP4RAwcGyHLElFHWzPziFPamUTZVBn88mFHEM=;
-        b=GqMfQC7PQxWSJHUrzTkIrUFwPjo7AQsDMlPtX/wojI4kRyPoU76VlXhPhhdiWO2liC
-         M1Y5g5GAs0zZLbMPhMZnI5FkpQ2WCSHTYZ3mqeftXv/E7ReZJOyGSksVcK4kvfbXG8N5
-         GmgMAXvRjp9iE5FQl3/M4krfXy8951z3lHS5+DK9cKhcX+DFLC3eowFmt7twD7yU14+K
-         YDNV1J+//dvM0DHYoKBmtLshIcTTakJsr7tDmbpkhFzI7A7Ox2INx6MUn4eXx7voZlE6
-         7cq5cS9ggipGlO+YFALA7YmsWyxxwtqk1jHXjO/1utZCrMII0jf38EZ2JKSUr/E1CTrc
-         i6eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682934683; x=1685526683;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wAyKklJP4RAwcGyHLElFHWzPziFPamUTZVBn88mFHEM=;
-        b=flKWZVthQgECi7qZxI+TGlRc63Wqm+XloM+2DrzY1FKs2vMRqQDG4G9yxrZSM1mWmd
-         we9ysisSAOJtXXpOvPJ48JnRBpzFjJIqKYRMtkw8nU0xOmynnyFU/pPXyLj7ucYaDP/x
-         W3Bm5QLuc1w1Azi2dikaIeJZ0xgJHF8Cx22w5apg0F0cAJplqG3GhvjuH6aq2iLRWuJi
-         iAwqCADH+N2wV5Td9HTPW1jGVwWpU4UoiZtuv4VN4Ga096N3+W9rOmT6BGc93lFkhKw2
-         S73kSZEqpnXvCtuAPRaNNJ97/kSQRlPvueP4zL/MaXUfRqFkSP/Pwonvda+rGgrWHyTC
-         wLiA==
-X-Gm-Message-State: AC+VfDwURUefprrKj7xQqpCQ+poRxPM1TyugkaZmWq7r0jHz1+MeqnIG
-        ml5nCo0UsUyA4+Ox0GWfW7w=
-X-Google-Smtp-Source: ACHHUZ7bXlwoLS0yE+UKf5JmSxUljwc8fOGS1fiKev+OTVuxC2eEjE3byoVXgpmu5zrdQewi4e6A0w==
-X-Received: by 2002:a17:90a:bc89:b0:24e:134e:96db with SMTP id x9-20020a17090abc8900b0024e134e96dbmr619501pjr.22.1682934683254;
-        Mon, 01 May 2023 02:51:23 -0700 (PDT)
-Received: from [183.173.17.116] ([183.173.17.116])
-        by smtp.gmail.com with ESMTPSA id h16-20020a17090aea9000b00247164c1947sm5180481pjz.0.2023.05.01.02.51.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 May 2023 02:51:22 -0700 (PDT)
-Message-ID: <d9633b9b-c39f-699a-4b05-1c0c55e2dec9@gmail.com>
-Date:   Mon, 1 May 2023 17:51:20 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [BUG][RESEND] Bluetooth: L2CAP: possible data race in
- __sco_sock_close()
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        "David S. Miller" <davem@davemloft.net>, edumazet@google.com,
-        Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Linux Kernel <linux-kernel@vger.kernel.org>,
-        baijiaju1990@outlook.com
-References: <CADm8TemwbUWDP0R_t7axFk4=4-srnm5c+2oJSy7aeSzdKFSVCA@mail.gmail.com>
- <CABBYNZJCbYnxodwXAeq8F9NerzGWFva0OG6SfUWfJ_Grz=Xq6Q@mail.gmail.com>
-From:   Tuo Li <islituo@gmail.com>
-In-Reply-To: <CABBYNZJCbYnxodwXAeq8F9NerzGWFva0OG6SfUWfJ_Grz=Xq6Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Mon, 1 May 2023 08:01:13 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5671F129;
+        Mon,  1 May 2023 05:01:11 -0700 (PDT)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 341BwZMp013766;
+        Mon, 1 May 2023 12:01:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id; s=qcppdkim1;
+ bh=GTzR/JKjiDDUTEOYY5n13fNjrjSQxoI+C4Wak3ZL/MI=;
+ b=QSVvSZXVSbLHdiOepNpT9ASNHYPzaOJtJReRSGfXzF6r8/mtVpp9N4/l6+csnHtnRyol
+ 3qx8IqbKvaxzncn1Sk0x33k5XhfwAAqsXjUdALUtyrieo2240DvO6v0EhKzFGRYKaRLr
+ Z53pbtT8r/8hoL8tthYObvufXZpmSKUde/qvd0Y7DhuhYkiEhYE70NJcwC0x4/VE2v3N
+ PGbl4QK8pxo1MT1oLiKsXkjfUBYO7474Y+v9HwiHWR5Wa4qG2HWEaBRoBdvQ1xIu8gMM
+ sJuryQf913FTzEoSZychk/4DdYBTI7Tb+vXzANzyBHYkGrJv1UQBjCoRhk3oNin1DrVn SQ== 
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3q8rkwupq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 01 May 2023 12:01:04 +0000
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+        by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 341C10xJ005931;
+        Mon, 1 May 2023 12:01:00 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3q8vakmwfw-1;
+        Mon, 01 May 2023 12:01:00 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 341C0xVn005848;
+        Mon, 1 May 2023 12:00:59 GMT
+Received: from hyd-lablnx377.qualcomm.com (hyd-lablnx377.qualcomm.com [10.204.178.226])
+        by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 341C0x1b005846;
+        Mon, 01 May 2023 12:00:59 +0000
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id EAD0020EB7; Mon,  1 May 2023 17:30:58 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
+        jiangzp@google.com, mmandlik@google.com,
+        Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH v1 1/2] Bluetooth: hci_qca: Add qcomm devcoredump sysfs support
+Date:   Mon,  1 May 2023 17:30:42 +0530
+Message-Id: <1682942442-21507-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: KR4KxSX8uvS134IokWDhl9buk6kku2mw
+X-Proofpoint-GUID: KR4KxSX8uvS134IokWDhl9buk6kku2mw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-01_06,2023-04-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
+ adultscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305010095
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks for your reply and interests. Our static analysis tool is still 
-to be improved, and any feedback on it would be appreciated.
+This patch implements the hci_qca driver side .coredump() callback to
+trigger a devcoredump via sysfs
 
-On 2023/4/29 5:24, Luiz Augusto von Dentz wrote:
-> Hi,
->
-> On Fri, Apr 28, 2023 at 3:27 AM Li Tuo <islituo@gmail.com> wrote:
->>    Hello,
->>
->> Our static analysis tool finds a possible data race in the l2cap protocol
->> in Linux 6.3.0-rc7:
->>
->> In most calling contexts, the variable sk->sk_socket is accessed
->> with holding the lock sk->sk_callback_lock. Here is an example:
->>
->>    l2cap_sock_accept() --> Line 346 in net/bluetooth/l2cap_sock.c
->>        bt_accept_dequeue() --> Line 368 in net/bluetooth/l2cap_sock.c
->>            sock_graft() --> Line 240 in net/bluetooth/af_bluetooth.c
->>                write_lock_bh(&sk->sk_callback_lock); --> Line 2081 in include/net/sock.h (Lock sk->sk_callback_lock)
->>                sk_set_socket() --> Line 2084 in include/net/sock.h
->>                    sk->sk_socket = sock; --> Line 2054 in include/net/sock.h (Access sk->sk_socket)
->>
->> However, in the following calling context:
->>
->>    sco_sock_shutdown() --> Line 1227 in net/bluetooth/sco.c
->>        __sco_sock_close() --> Line 1243 in net/bluetooth/sco.c
->>            BT_DBG(..., sk->sk_socket); --> Line 431 in net/bluetooth/sco.c (Access sk->sk_socket)
->>
->> the variable sk->sk_socket is accessed without holding the lock
->> sk->sk_callback_lock, and thus a data race may occur.
->>
->> Reported-by: BassCheck <bass@buaa.edu.cn>
-> Need to check in detail what it means to hold the sk_callback_lock,
-> btw is this static analysis tool of yours something public that we can
-> use in our CI to detect these problems?
->
->
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Reviewed-by: Manish Mandlik <mmandlik@google.com>
+v1:Initial Patch
+---
+ drivers/bluetooth/hci_qca.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1b06450..ca98f6d 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2380,6 +2380,18 @@ static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
+ #endif
+ 
++#ifdef CONFIG_DEV_COREDUMP
++static void hciqca_coredump(struct device *dev)
++{
++	struct serdev_device *serdev = to_serdev_device(dev);
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++	struct hci_uart *hu = &qcadev->serdev_hu;
++	struct hci_dev  *hdev = hu->hdev;
++
++	if (hdev->dump.coredump)
++		hdev->dump.coredump(hdev);
++}
++#endif
+ 
+ static struct serdev_device_driver qca_serdev_driver = {
+ 	.probe = qca_serdev_probe,
+@@ -2390,6 +2402,9 @@ static struct serdev_device_driver qca_serdev_driver = {
+ 		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
+ 		.shutdown = qca_serdev_shutdown,
+ 		.pm = &qca_pm_ops,
++#ifdef CONFIG_DEV_COREDUMP
++		.coredump = hciqca_coredump,
++#endif
+ 	},
+ };
+ 
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
