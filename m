@@ -2,432 +2,274 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1062AC77B73
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 12:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E84A8C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 12:40:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232430AbjEAMEA (ORCPT
+        id S232419AbjEAMkP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 May 2023 08:04:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46252 "EHLO
+        Mon, 1 May 2023 08:40:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232268AbjEAMD6 (ORCPT
+        with ESMTP id S232376AbjEAMkO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 May 2023 08:03:58 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6D813D;
-        Mon,  1 May 2023 05:03:56 -0700 (PDT)
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 341C1OH8002527;
-        Mon, 1 May 2023 12:03:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id; s=qcppdkim1;
- bh=501L5mMjQVuHD1tfnAtWph9latuYLfCFP7Eyh+nOkro=;
- b=CvoVHQkGjZE4zw0B5/djXaOWKgdZi1tAkr+/oxLxb7jFIO2EE3ytVoCGGSOGei9rHd+w
- J/nOhHE0tNdGmcdYvC/4ne7NVUx9/H1LAYTCzsBULqqc2WF+H+WNIuscLMX6WzYy3HwD
- O9xFEJyxxM/b2rVSHsjgQBzyGP0/n0Vxc7wf0TY2tAnFiOrhwYfpFZb5Gjvxv1p5rsAR
- eygYDaTmWYT9YtKVwWLou1Sh1q5akO9HdeV/rw/rxS3MwDepbQ0j/12gh0Kwbk3lcYOz
- YkDZJ2iY4rYkgRUc29BTYuP+QXM3Zq/yDlALJ0a+1CGWZzLl77S6+bW5wuSl3PYemONe AA== 
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3q8t8ubfr4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 01 May 2023 12:03:51 +0000
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-        by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 341C10xK005931;
-        Mon, 1 May 2023 12:03:48 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3q8vakmwqh-1;
-        Mon, 01 May 2023 12:03:48 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 341C3llK009383;
-        Mon, 1 May 2023 12:03:48 GMT
-Received: from hyd-lablnx377.qualcomm.com (hyd-lablnx377.qualcomm.com [10.204.178.226])
-        by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 341C3lQh009382;
-        Mon, 01 May 2023 12:03:47 +0000
-Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
-        id D088520EB7; Mon,  1 May 2023 17:33:46 +0530 (IST)
-From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
-        jiangzp@google.com, mmandlik@google.com,
-        Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Subject: [PATCH v1 2/2] Bluetooth: hci_qca: Add qcomm devcoredump support
-Date:   Mon,  1 May 2023 17:33:41 +0530
-Message-Id: <1682942621-21720-1-git-send-email-quic_saluvala@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 12oecZgX3h5Il6It6Gh_8A2lUiBSJrin
-X-Proofpoint-GUID: 12oecZgX3h5Il6It6Gh_8A2lUiBSJrin
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
- definitions=2023-05-01_06,2023-04-27_01,2023-02-09_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- adultscore=0 priorityscore=1501 phishscore=0 bulkscore=0 spamscore=0
- mlxscore=0 mlxlogscore=999 impostorscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2303200000 definitions=main-2305010095
+        Mon, 1 May 2023 08:40:14 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A44610F5
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 05:39:47 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id ca18e2360f4ac-760f8ffb27fso35573639f.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 May 2023 05:39:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1682944784; x=1685536784;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=70/epAWgv4Whb0ZBh3fkhTA+e0dfl0st1ZKxQD+hmUk=;
+        b=E2gfLBr6HgAN/hvQvSk5vxekHh1fwbcOG4Urxh4TqivngNC3/MgFjW9X6BKEBsc2iV
+         D6NeMyQwNzlljhiH/MayNRCFPUMqesU3XIKZyv8XAdovjzhJw6iXKyFiEBLhxgU5DFZI
+         A20WA3sutlczFH18ba4dkpYtbDRn8kYeYsTObn5kJdLq7huGp7AY5gCtz4L27+ee5FAA
+         WeWyWp44BPOP/yYQtLkw/RGm5ClsjtDuJ/9MyLWpV5OJrVoID+D7lsVNlJxN5gC9N83q
+         Zs3Hevs14Ee4U0j1gacTP9J0HBOt/wAEmpl1/WmReAWXKFdZ5euaUFJNUlSDs+/EFAMY
+         +Xvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1682944784; x=1685536784;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=70/epAWgv4Whb0ZBh3fkhTA+e0dfl0st1ZKxQD+hmUk=;
+        b=dxlk2Z9c6h5W0Pvw6jNiu6Lvw+amYWIRXS+j7aFzh004j04Dv3qe5UenEF5orEsYMu
+         hZSB7u2z0eugyVRY/gBB1BH9A6dwOiEY1bBOHSzBbQze67BSBNEkJgzQd7KqEt7AFgoN
+         9n8Cot9t1zSe6lfRh5u6sFDvug4PsoGm7g25ZBtfcBYyUH0N7aXitMSI/kjuTQ2gDJAG
+         7slT4m5qWwwpNAHcJCutgzBcvd022PbkYNlFSkwXG3U0yRRPJxGxA9BIX17HSbFRb3m2
+         p7nKOWmKUt+C0bbCyR1r2W1xMgQaD3ZGsAYoJyWiZXS3agAWk/1r3Fa4AALNBfzRKUFo
+         wkzg==
+X-Gm-Message-State: AC+VfDx987wsv4+YfEHCE//+ne3Eh/DwCoDpNbC0DA1IU1JjRmU/gQff
+        OxGgGkh1T7sysASR37LJVh3sYiXdIbg=
+X-Google-Smtp-Source: ACHHUZ70MEV0LIUWRA5eyFHTS14hiJLA3CBt2hwnjTiDOqEGn6o8dOchvs7TptflSLWSocpyZbpslA==
+X-Received: by 2002:a92:d1cc:0:b0:325:b32a:60fc with SMTP id u12-20020a92d1cc000000b00325b32a60fcmr9107318ilg.5.1682944784492;
+        Mon, 01 May 2023 05:39:44 -0700 (PDT)
+Received: from [172.17.0.2] ([40.122.244.104])
+        by smtp.gmail.com with ESMTPSA id f5-20020a056e0212a500b00325df6679a7sm7543046ilr.26.2023.05.01.05.39.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 May 2023 05:39:44 -0700 (PDT)
+Message-ID: <644fb310.050a0220.42179.86b6@mx.google.com>
+Date:   Mon, 01 May 2023 05:39:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4438955733515219870=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_saluvala@quicinc.com
+Subject: RE: [v1,1/2] Bluetooth: hci_qca: Add qcomm devcoredump sysfs support
+In-Reply-To: <1682942442-21507-1-git-send-email-quic_saluvala@quicinc.com>
+References: <1682942442-21507-1-git-send-email-quic_saluvala@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Intercept debug exception events from QCA controller and put them into
-a devcoredump using hci devcoredump APIs of hci_core
+--===============4438955733515219870==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Reviewed-by: Manish Mandlik <mmandlik@google.com>
-v1:Initial Patch
----
- drivers/bluetooth/hci_qca.c | 189 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 137 insertions(+), 52 deletions(-)
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NzQ0MTMyCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMS4zNCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjU3IHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDAuMjAgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MjcuMDYgc2Vjb25kcwpDaGVja0FsbFdhcm5pbmcgICAgICAgICAgICAgICBGQUlMICAgICAgMjku
+NDkgc2Vjb25kcwpDaGVja1NwYXJzZSAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMzMuMDIg
+c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgODkuMjUgc2Vj
+b25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBGQUlMICAgICAgMjUuOTIgc2Vjb25k
+cwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNDUxLjgxIHNlY29uZHMK
+VGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDE2LjU0IHNlY29uZHMKVGVz
+dFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDIwLjQyIHNlY29uZHMKVGVzdFJ1
+bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDUuMzMgc2Vjb25kcwpUZXN0UnVubmVy
+X21nbXQtdGVzdGVyICAgICAgICBQQVNTICAgICAgMTEyLjIzIHNlY29uZHMKVGVzdFJ1bm5lcl9y
+ZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDguNjEgc2Vjb25kcwpUZXN0UnVubmVyX3Njby10
+ZXN0ZXIgICAgICAgICBQQVNTICAgICAgNy44NiBzZWNvbmRzClRlc3RSdW5uZXJfaW9jdGwtdGVz
+dGVyICAgICAgIFBBU1MgICAgICA5LjEyIHNlY29uZHMKVGVzdFJ1bm5lcl9tZXNoLXRlc3RlciAg
+ICAgICAgUEFTUyAgICAgIDYuODMgc2Vjb25kcwpUZXN0UnVubmVyX3NtcC10ZXN0ZXIgICAgICAg
+ICBQQVNTICAgICAgNy43OSBzZWNvbmRzClRlc3RSdW5uZXJfdXNlcmNoYW4tdGVzdGVyICAgIFBB
+U1MgICAgICA1LjY0IHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgRkFJTCAg
+ICAgIDM1LjQ5IHNlY29uZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+ClRlc3Q6IEJ1aWxkS2VybmVsIC0gRkFJTApEZXNjOiBCdWlsZCBLZXJuZWwgZm9yIEJsdWV0b290
+aApPdXRwdXQ6Cgpkcml2ZXJzL2JsdWV0b290aC9oY2lfcWNhLmM6IEluIGZ1bmN0aW9uIOKAmHFj
+YV9zZXR1cOKAmToKZHJpdmVycy9ibHVldG9vdGgvaGNpX3FjYS5jOjE5MDM6NDU6IGVycm9yOiBw
+YXNzaW5nIGFyZ3VtZW50IDMgb2Yg4oCYaGNpX2RldmNkX3JlZ2lzdGVy4oCZIGZyb20gaW5jb21w
+YXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10K
+IDE5MDMgfCAgaGNpX2RldmNkX3JlZ2lzdGVyKGhkZXYsIGhjaV9jb3JlZHVtcF9xY2EsIHFjYV9k
+bXBfaGRyLCBOVUxMKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIF5+fn5+fn5+fn5+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB8CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBpbnQgKCopKHN0cnVjdCBoY2lfZGV2ICosIGNoYXIgKiwgc2l6ZV90KSB7
+YWthIGludCAoKikoc3RydWN0IGhjaV9kZXYgKiwgY2hhciAqLCBsb25nIHVuc2lnbmVkIGludCl9
+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5o
+OjM2LAogICAgICAgICAgICAgICAgIGZyb20gZHJpdmVycy9ibHVldG9vdGgvaGNpX3FjYS5jOjM3
+OgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5oOjY4OjIwOiBub3RlOiBleHBlY3Rl
+ZCDigJhkbXBfaGRyX3TigJkge2FrYSDigJh2b2lkICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBzdHJ1
+Y3Qgc2tfYnVmZiAqKeKAmX0gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUg4oCYaW50ICgqKShzdHJ1
+Y3QgaGNpX2RldiAqLCBjaGFyICosIHNpemVfdCnigJkge2FrYSDigJhpbnQgKCopKHN0cnVjdCBo
+Y2lfZGV2ICosIGNoYXIgKiwgbG9uZyB1bnNpZ25lZCBpbnQp4oCZfQogICA2OCB8ICAgICAgICAg
+IGRtcF9oZHJfdCBkbXBfaGRyLCBub3RpZnlfY2hhbmdlX3Qgbm90aWZ5X2NoYW5nZSk7CiAgICAg
+IHwgICAgICAgICAgfn5+fn5+fn5+fl5+fn5+fn4KY2MxOiBzb21lIHdhcm5pbmdzIGJlaW5nIHRy
+ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoyNTI6
+IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9xY2Eub10gRXJyb3IgMQptYWtlWzJdOiAqKiogW3Njcmlw
+dHMvTWFrZWZpbGUuYnVpbGQ6NDk0OiBkcml2ZXJzL2JsdWV0b290aF0gRXJyb3IgMgptYWtlWzFd
+OiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDk0OiBkcml2ZXJzXSBFcnJvciAyCm1ha2Vb
+MV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZp
+bGU6MjAyNTogLl0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
+Q2hlY2tBbGxXYXJuaW5nIC0gRkFJTApEZXNjOiBSdW4gbGludXgga2VybmVsIHdpdGggYWxsIHdh
+cm5pbmcgZW5hYmxlZApPdXRwdXQ6Cgpkcml2ZXJzL2JsdWV0b290aC9oY2lfcWNhLmM6IEluIGZ1
+bmN0aW9uIOKAmHFjYV9zZXR1cOKAmToKZHJpdmVycy9ibHVldG9vdGgvaGNpX3FjYS5jOjE5MDM6
+NDU6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDMgb2Yg4oCYaGNpX2RldmNkX3JlZ2lzdGVy4oCZ
+IGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9p
+bnRlci10eXBlc10KIDE5MDMgfCAgaGNpX2RldmNkX3JlZ2lzdGVyKGhkZXYsIGhjaV9jb3JlZHVt
+cF9xY2EsIHFjYV9kbXBfaGRyLCBOVUxMKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+CiAgICAgIHwgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8CiAgICAgIHwgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQgKCopKHN0cnVjdCBoY2lfZGV2ICosIGNoYXIg
+Kiwgc2l6ZV90KSB7YWthIGludCAoKikoc3RydWN0IGhjaV9kZXYgKiwgY2hhciAqLCBsb25nIHVu
+c2lnbmVkIGludCl9CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL2luY2x1ZGUvbmV0L2JsdWV0b290
+aC9oY2lfY29yZS5oOjM2LAogICAgICAgICAgICAgICAgIGZyb20gZHJpdmVycy9ibHVldG9vdGgv
+aGNpX3FjYS5jOjM3OgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5oOjY4OjIwOiBu
+b3RlOiBleHBlY3RlZCDigJhkbXBfaGRyX3TigJkge2FrYSDigJh2b2lkICgqKShzdHJ1Y3QgaGNp
+X2RldiAqLCBzdHJ1Y3Qgc2tfYnVmZiAqKeKAmX0gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUg4oCY
+aW50ICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBjaGFyICosIHNpemVfdCnigJkge2FrYSDigJhpbnQg
+KCopKHN0cnVjdCBoY2lfZGV2ICosIGNoYXIgKiwgbG9uZyB1bnNpZ25lZCBpbnQp4oCZfQogICA2
+OCB8ICAgICAgICAgIGRtcF9oZHJfdCBkbXBfaGRyLCBub3RpZnlfY2hhbmdlX3Qgbm90aWZ5X2No
+YW5nZSk7CiAgICAgIHwgICAgICAgICAgfn5+fn5+fn5+fl5+fn5+fn4KY2MxOiBzb21lIHdhcm5p
+bmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmls
+ZS5idWlsZDoyNTI6IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9xY2Eub10gRXJyb3IgMQptYWtlWzJd
+OiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDk0OiBkcml2ZXJzL2JsdWV0b290aF0gRXJy
+b3IgMgptYWtlWzFdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDk0OiBkcml2ZXJzXSBF
+cnJvciAyCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6
+ICoqKiBbTWFrZWZpbGU6MjAyNTogLl0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMKVGVzdDogQ2hlY2tTcGFyc2UgLSBGQUlMCkRlc2M6IFJ1biBzcGFyc2UgdG9vbCB3aXRo
+IGxpbnV4IGtlcm5lbApPdXRwdXQ6CgpuZXQvYmx1ZXRvb3RoL2FmX2JsdWV0b290aC5jOjE3ODoy
+NTogd2FybmluZzogY29udGV4dCBpbWJhbGFuY2UgaW4gJ2J0X2FjY2VwdF9lbnF1ZXVlJyAtIGRp
+ZmZlcmVudCBsb2NrIGNvbnRleHRzIGZvciBiYXNpYyBibG9jawpkcml2ZXJzL2JsdWV0b290aC9o
+Y2lfcWNhLmM6IEluIGZ1bmN0aW9uIOKAmHFjYV9zZXR1cOKAmToKZHJpdmVycy9ibHVldG9vdGgv
+aGNpX3FjYS5jOjE5MDM6NDU6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDMgb2Yg4oCYaGNpX2Rl
+dmNkX3JlZ2lzdGVy4oCZIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1p
+bmNvbXBhdGlibGUtcG9pbnRlci10eXBlc10KIDE5MDMgfCAgaGNpX2RldmNkX3JlZ2lzdGVyKGhk
+ZXYsIGhjaV9jb3JlZHVtcF9xY2EsIHFjYV9kbXBfaGRyLCBOVUxMKTsKICAgICAgfCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+CiAgICAgIHwg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8CiAgICAgIHwgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQgKCopKHN0cnVjdCBo
+Y2lfZGV2ICosIGNoYXIgKiwgc2l6ZV90KSB7YWthIGludCAoKikoc3RydWN0IGhjaV9kZXYgKiwg
+Y2hhciAqLCBsb25nIHVuc2lnbmVkIGludCl9CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL2luY2x1
+ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oOjM2LAogICAgICAgICAgICAgICAgIGZyb20gZHJp
+dmVycy9ibHVldG9vdGgvaGNpX3FjYS5jOjM3OgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9jb3Jl
+ZHVtcC5oOjY4OjIwOiBub3RlOiBleHBlY3RlZCDigJhkbXBfaGRyX3TigJkge2FrYSDigJh2b2lk
+ICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBzdHJ1Y3Qgc2tfYnVmZiAqKeKAmX0gYnV0IGFyZ3VtZW50
+IGlzIG9mIHR5cGUg4oCYaW50ICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBjaGFyICosIHNpemVfdCni
+gJkge2FrYSDigJhpbnQgKCopKHN0cnVjdCBoY2lfZGV2ICosIGNoYXIgKiwgbG9uZyB1bnNpZ25l
+ZCBpbnQp4oCZfQogICA2OCB8ICAgICAgICAgIGRtcF9oZHJfdCBkbXBfaGRyLCBub3RpZnlfY2hh
+bmdlX3Qgbm90aWZ5X2NoYW5nZSk7CiAgICAgIHwgICAgICAgICAgfn5+fn5+fn5+fl5+fn5+fn4K
+Y2MxOiBzb21lIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbM106ICoqKiBb
+c2NyaXB0cy9NYWtlZmlsZS5idWlsZDoyNTI6IGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9xY2Eub10g
+RXJyb3IgMQptYWtlWzJdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6NDk0OiBkcml2ZXJz
+L2JsdWV0b290aF0gRXJyb3IgMgptYWtlWzFdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6
+NDk0OiBkcml2ZXJzXSBFcnJvciAyCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVk
+IGpvYnMuLi4uCm5ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmM6IG5vdGU6IGluIGluY2x1ZGVkIGZp
+bGUgKHRocm91Z2ggaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgpOgouL2luY2x1ZGUv
+bmV0L2JsdWV0b290aC9oY2kuaDoyNjQ2OjQ3OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBz
+dHJ1Y3R1cmVzCi4vaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oOjI3MzI6NDM6IHdhcm5pbmc6
+IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKbmV0L2JsdWV0b290aC9oY2lfY29kZWMuYzog
+bm90ZTogaW4gaW5jbHVkZWQgZmlsZToKLi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUu
+aDoxNTA6MzU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKbmV0L2JsdWV0
+b290aC9zY28uYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZToKLi9pbmNsdWRlL25ldC9ibHVldG9v
+dGgvaGNpX2NvcmUuaDoxNTA6MzU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVy
+ZXMKbWFrZTogKioqIFtNYWtlZmlsZToyMDI1OiAuXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1NtYXRjaCAtIEZBSUwKRGVzYzogUnVuIHNtYXRjaCB0
+b29sIHdpdGggc291cmNlCk91dHB1dDoKCmRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9xY2EuYzogSW4g
+ZnVuY3Rpb24g4oCYcWNhX3NldHVw4oCZOgpkcml2ZXJzL2JsdWV0b290aC9oY2lfcWNhLmM6MTkw
+Mzo0NTogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMyBvZiDigJhoY2lfZGV2Y2RfcmVnaXN0ZXLi
+gJkgZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1w
+b2ludGVyLXR5cGVzXQogMTkwMyB8ICBoY2lfZGV2Y2RfcmVnaXN0ZXIoaGRldiwgaGNpX2NvcmVk
+dW1wX3FjYSwgcWNhX2RtcF9oZHIsIE5VTEwpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwKICAgICAgfCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCAoKikoc3RydWN0IGhjaV9kZXYgKiwgY2hh
+ciAqLCBzaXplX3QpIHtha2EgaW50ICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBjaGFyICosIGxvbmcg
+dW5zaWduZWQgaW50KX0KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4vaW5jbHVkZS9uZXQvYmx1ZXRv
+b3RoL2hjaV9jb3JlLmg6MzYsCiAgICAgICAgICAgICAgICAgZnJvbSBkcml2ZXJzL2JsdWV0b290
+aC9oY2lfcWNhLmM6Mzc6Ci4vaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2NvcmVkdW1wLmg6Njg6MjA6
+IG5vdGU6IGV4cGVjdGVkIOKAmGRtcF9oZHJfdOKAmSB7YWthIOKAmHZvaWQgKCopKHN0cnVjdCBo
+Y2lfZGV2ICosIHN0cnVjdCBza19idWZmICop4oCZfSBidXQgYXJndW1lbnQgaXMgb2YgdHlwZSDi
+gJhpbnQgKCopKHN0cnVjdCBoY2lfZGV2ICosIGNoYXIgKiwgc2l6ZV90KeKAmSB7YWthIOKAmGlu
+dCAoKikoc3RydWN0IGhjaV9kZXYgKiwgY2hhciAqLCBsb25nIHVuc2lnbmVkIGludCnigJl9CiAg
+IDY4IHwgICAgICAgICAgZG1wX2hkcl90IGRtcF9oZHIsIG5vdGlmeV9jaGFuZ2VfdCBub3RpZnlf
+Y2hhbmdlKTsKICAgICAgfCAgICAgICAgICB+fn5+fn5+fn5+Xn5+fn5+fgpjYzE6IHNvbWUgd2Fy
+bmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVszXTogKioqIFtzY3JpcHRzL01ha2Vm
+aWxlLmJ1aWxkOjI1MjogZHJpdmVycy9ibHVldG9vdGgvaGNpX3FjYS5vXSBFcnJvciAxCm1ha2Vb
+Ml06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0OTQ6IGRyaXZlcnMvYmx1ZXRvb3RoXSBF
+cnJvciAyCm1ha2VbMV06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0OTQ6IGRyaXZlcnNd
+IEVycm9yIDIKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbmV0
+L2JsdWV0b290aC9oY2lfZXZlbnQuYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZSAodGhyb3VnaCBp
+bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaCk6Ci4vaW5jbHVkZS9uZXQvYmx1ZXRvb3Ro
+L2hjaS5oOjI2NDY6NDc6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXMKLi9p
+bmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmg6MjczMjo0Mzogd2FybmluZzogYXJyYXkgb2YgZmxl
+eGlibGUgc3RydWN0dXJlcwpuZXQvYmx1ZXRvb3RoL2hjaV9jb2RlYy5jOiBub3RlOiBpbiBpbmNs
+dWRlZCBmaWxlOgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oOjE1MDozNTogd2Fy
+bmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwpuZXQvYmx1ZXRvb3RoL3Njby5jOiBu
+b3RlOiBpbiBpbmNsdWRlZCBmaWxlOgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5o
+OjE1MDozNTogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwptYWtlOiAqKiog
+W01ha2VmaWxlOjIwMjU6IC5dIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+ClRlc3Q6IEJ1aWxkS2VybmVsMzIgLSBGQUlMCkRlc2M6IEJ1aWxkIDMyYml0IEtlcm5lbCBmb3Ig
+Qmx1ZXRvb3RoCk91dHB1dDoKCmRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9xY2EuYzogSW4gZnVuY3Rp
+b24g4oCYcWNhX3NldHVw4oCZOgpkcml2ZXJzL2JsdWV0b290aC9oY2lfcWNhLmM6MTkwMzo0NTog
+ZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMyBvZiDigJhoY2lfZGV2Y2RfcmVnaXN0ZXLigJkgZnJv
+bSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2ludGVy
+LXR5cGVzXQogMTkwMyB8ICBoY2lfZGV2Y2RfcmVnaXN0ZXIoaGRldiwgaGNpX2NvcmVkdW1wX3Fj
+YSwgcWNhX2RtcF9oZHIsIE5VTEwpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIHwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIGludCAoKikoc3RydWN0IGhjaV9kZXYgKiwgY2hhciAqLCBz
+aXplX3QpIHtha2EgaW50ICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBjaGFyICosIHVuc2lnbmVkIGlu
+dCl9CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29y
+ZS5oOjM2LAogICAgICAgICAgICAgICAgIGZyb20gZHJpdmVycy9ibHVldG9vdGgvaGNpX3FjYS5j
+OjM3OgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9jb3JlZHVtcC5oOjY4OjIwOiBub3RlOiBleHBl
+Y3RlZCDigJhkbXBfaGRyX3TigJkge2FrYSDigJh2b2lkICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBz
+dHJ1Y3Qgc2tfYnVmZiAqKeKAmX0gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUg4oCYaW50ICgqKShz
+dHJ1Y3QgaGNpX2RldiAqLCBjaGFyICosIHNpemVfdCnigJkge2FrYSDigJhpbnQgKCopKHN0cnVj
+dCBoY2lfZGV2ICosIGNoYXIgKiwgdW5zaWduZWQgaW50KeKAmX0KICAgNjggfCAgICAgICAgICBk
+bXBfaGRyX3QgZG1wX2hkciwgbm90aWZ5X2NoYW5nZV90IG5vdGlmeV9jaGFuZ2UpOwogICAgICB8
+ICAgICAgICAgIH5+fn5+fn5+fn5efn5+fn5+CmNjMTogc29tZSB3YXJuaW5ncyBiZWluZyB0cmVh
+dGVkIGFzIGVycm9ycwptYWtlWzNdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjUyOiBk
+cml2ZXJzL2JsdWV0b290aC9oY2lfcWNhLm9dIEVycm9yIDEKbWFrZVsyXTogKioqIFtzY3JpcHRz
+L01ha2VmaWxlLmJ1aWxkOjQ5NDogZHJpdmVycy9ibHVldG9vdGhdIEVycm9yIDIKbWFrZVsxXTog
+KioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjQ5NDogZHJpdmVyc10gRXJyb3IgMgptYWtlWzFd
+OiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2VmaWxl
+OjIwMjU6IC5dIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IElu
+Y3JlbWVudGFsQnVpbGQgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFsIGJ1aWxkIHdpdGggdGhlIHBh
+dGNoZXMgaW4gdGhlIHNlcmllcwpPdXRwdXQ6Clt2MSwyLzJdIEJsdWV0b290aDogaGNpX3FjYTog
+QWRkIHFjb21tIGRldmNvcmVkdW1wIHN1cHBvcnQKCmRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9xY2Eu
+YzogSW4gZnVuY3Rpb24g4oCYcWNhX3NldHVw4oCZOgpkcml2ZXJzL2JsdWV0b290aC9oY2lfcWNh
+LmM6MTkwMzo0NTogZXJyb3I6IHBhc3NpbmcgYXJndW1lbnQgMyBvZiDigJhoY2lfZGV2Y2RfcmVn
+aXN0ZXLigJkgZnJvbSBpbmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0
+aWJsZS1wb2ludGVyLXR5cGVzXQogMTkwMyB8ICBoY2lfZGV2Y2RfcmVnaXN0ZXIoaGRldiwgaGNp
+X2NvcmVkdW1wX3FjYSwgcWNhX2RtcF9oZHIsIE5VTEwpOwogICAgICB8ICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn4KICAgICAgfCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwKICAgICAgfCAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGludCAoKikoc3RydWN0IGhjaV9kZXYg
+KiwgY2hhciAqLCBzaXplX3QpIHtha2EgaW50ICgqKShzdHJ1Y3QgaGNpX2RldiAqLCBjaGFyICos
+IGxvbmcgdW5zaWduZWQgaW50KX0KSW4gZmlsZSBpbmNsdWRlZCBmcm9tIC4vaW5jbHVkZS9uZXQv
+Ymx1ZXRvb3RoL2hjaV9jb3JlLmg6MzYsCiAgICAgICAgICAgICAgICAgZnJvbSBkcml2ZXJzL2Js
+dWV0b290aC9oY2lfcWNhLmM6Mzc6Ci4vaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2NvcmVkdW1wLmg6
+Njg6MjA6IG5vdGU6IGV4cGVjdGVkIOKAmGRtcF9oZHJfdOKAmSB7YWthIOKAmHZvaWQgKCopKHN0
+cnVjdCBoY2lfZGV2ICosIHN0cnVjdCBza19idWZmICop4oCZfSBidXQgYXJndW1lbnQgaXMgb2Yg
+dHlwZSDigJhpbnQgKCopKHN0cnVjdCBoY2lfZGV2ICosIGNoYXIgKiwgc2l6ZV90KeKAmSB7YWth
+IOKAmGludCAoKikoc3RydWN0IGhjaV9kZXYgKiwgY2hhciAqLCBsb25nIHVuc2lnbmVkIGludCni
+gJl9CiAgIDY4IHwgICAgICAgICAgZG1wX2hkcl90IGRtcF9oZHIsIG5vdGlmeV9jaGFuZ2VfdCBu
+b3RpZnlfY2hhbmdlKTsKICAgICAgfCAgICAgICAgICB+fn5+fn5+fn5+Xn5+fn5+fgpjYzE6IHNv
+bWUgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVszXTogKioqIFtzY3JpcHRz
+L01ha2VmaWxlLmJ1aWxkOjI1MjogZHJpdmVycy9ibHVldG9vdGgvaGNpX3FjYS5vXSBFcnJvciAx
+Cm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0OTQ6IGRyaXZlcnMvYmx1ZXRv
+b3RoXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0OTQ6IGRy
+aXZlcnNdIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToyMDI1OiAuXSBFcnJvciAyCgoKLS0t
+ClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index ca98f6d..907eaa1 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -77,6 +77,7 @@ enum qca_flags {
- 	QCA_MEMDUMP_COLLECTION,
- 	QCA_HW_ERROR_EVENT,
- 	QCA_SSR_TRIGGERED,
-+	QCA_COREDUMP_TRIGGERED,
- 	QCA_BT_OFF,
- 	QCA_ROM_FW
- };
-@@ -116,9 +117,7 @@ enum qca_memdump_states {
- 	QCA_MEMDUMP_TIMEOUT,
- };
- 
--struct qca_memdump_data {
--	char *memdump_buf_head;
--	char *memdump_buf_tail;
-+struct qca_memdump_info {
- 	u32 current_seq_no;
- 	u32 received_dump;
- 	u32 ram_dump_size;
-@@ -159,13 +158,15 @@ struct qca_data {
- 	struct work_struct ws_tx_vote_off;
- 	struct work_struct ctrl_memdump_evt;
- 	struct delayed_work ctrl_memdump_timeout;
--	struct qca_memdump_data *qca_memdump;
-+	struct qca_memdump_info *qca_memdump;
- 	unsigned long flags;
- 	struct completion drop_ev_comp;
- 	wait_queue_head_t suspend_wait_q;
- 	enum qca_memdump_states memdump_state;
- 	struct mutex hci_memdump_lock;
- 
-+	u16 fw_version;
-+	u16 controller_id;
- 	/* For debugging purpose */
- 	u64 ibs_sent_wacks;
- 	u64 ibs_sent_slps;
-@@ -232,6 +233,7 @@ static void qca_regulator_disable(struct qca_serdev *qcadev);
- static void qca_power_shutdown(struct hci_uart *hu);
- static int qca_power_off(struct hci_dev *hdev);
- static void qca_controller_memdump(struct work_struct *work);
-+static int qca_dmp_hdr(struct hci_dev *hdev, char *buf, size_t size);
- 
- static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
- {
-@@ -543,7 +545,8 @@ static void qca_controller_memdump_timeout(struct work_struct *work)
- 	mutex_lock(&qca->hci_memdump_lock);
- 	if (test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
- 		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
--		if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
-+		if ((!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) ||
-+			(!test_bit(QCA_COREDUMP_TRIGGERED, &qca->flags))) {
- 			/* Inject hw error event to reset the device
- 			 * and driver.
- 			 */
-@@ -976,6 +979,27 @@ static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
- 	return hci_recv_frame(hdev, skb);
- }
- 
-+static int qca_dmp_hdr(struct hci_dev *hdev, char *buf, size_t size)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct qca_data *qca = hu->priv;
-+	int len = 0;
-+
-+	len += snprintf(buf + len, size-len, "Controller Name: 0x%x\n",
-+			qca->controller_id);
-+
-+	len += snprintf(buf + len, size-len, "Firmware Version: 0x%x\n",
-+			qca->fw_version);
-+
-+	len += snprintf(buf + len, size-len, "Vendor:Qualcomm\n");
-+
-+	len += snprintf(buf + len, size-len, "Driver: %s\n",
-+			hu->serdev->dev.driver->name);
-+
-+	bt_dev_info(hdev, "vendor dump hdr size(%d)", len);
-+	return len;
-+}
-+
- static void qca_controller_memdump(struct work_struct *work)
- {
- 	struct qca_data *qca = container_of(work, struct qca_data,
-@@ -983,13 +1007,11 @@ static void qca_controller_memdump(struct work_struct *work)
- 	struct hci_uart *hu = qca->hu;
- 	struct sk_buff *skb;
- 	struct qca_memdump_event_hdr *cmd_hdr;
--	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
-+	struct qca_memdump_info *qca_memdump = qca->qca_memdump;
- 	struct qca_dump_size *dump;
--	char *memdump_buf;
--	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
- 	u16 seq_no;
--	u32 dump_size;
- 	u32 rx_size;
-+	int ret = 0;
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 
- 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
-@@ -1005,7 +1027,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 		}
- 
- 		if (!qca_memdump) {
--			qca_memdump = kzalloc(sizeof(struct qca_memdump_data),
-+			qca_memdump = kzalloc(sizeof(struct qca_memdump_info),
- 					      GFP_ATOMIC);
- 			if (!qca_memdump) {
- 				mutex_unlock(&qca->hci_memdump_lock);
-@@ -1031,44 +1053,49 @@ static void qca_controller_memdump(struct work_struct *work)
- 			set_bit(QCA_IBS_DISABLED, &qca->flags);
- 			set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 			dump = (void *) skb->data;
--			dump_size = __le32_to_cpu(dump->dump_size);
--			if (!(dump_size)) {
-+			qca_memdump->ram_dump_size = __le32_to_cpu(dump->dump_size);
-+			if (!(qca_memdump->ram_dump_size)) {
- 				bt_dev_err(hu->hdev, "Rx invalid memdump size");
- 				kfree(qca_memdump);
- 				kfree_skb(skb);
--				qca->qca_memdump = NULL;
- 				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
- 			}
- 
--			bt_dev_info(hu->hdev, "QCA collecting dump of size:%u",
--				    dump_size);
- 			queue_delayed_work(qca->workqueue,
- 					   &qca->ctrl_memdump_timeout,
--					   msecs_to_jiffies(MEMDUMP_TIMEOUT_MS)
--					  );
--
--			skb_pull(skb, sizeof(dump_size));
--			memdump_buf = vmalloc(dump_size);
--			qca_memdump->ram_dump_size = dump_size;
--			qca_memdump->memdump_buf_head = memdump_buf;
--			qca_memdump->memdump_buf_tail = memdump_buf;
--		}
-+					   msecs_to_jiffies(MEMDUMP_TIMEOUT_MS));
-+			skb_pull(skb, sizeof(qca_memdump->ram_dump_size));
-+			qca_memdump->current_seq_no = 0;
-+			qca_memdump->received_dump = 0;
-+			ret = hci_devcd_init(hu->hdev, qca_memdump->ram_dump_size);
-+			bt_dev_info(hu->hdev, "hci_devcd_init Return:%d",
-+				    ret);
-+			if (ret < 0) {
-+				kfree(qca->qca_memdump);
-+				qca->qca_memdump = NULL;
-+				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
-+				cancel_delayed_work(&qca->ctrl_memdump_timeout);
-+				clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+				mutex_unlock(&qca->hci_memdump_lock);
-+				return;
-+			}
-+
-+			bt_dev_info(hu->hdev, "QCA collecting dump of size:%u",
-+				    qca_memdump->ram_dump_size);
- 
--		memdump_buf = qca_memdump->memdump_buf_tail;
-+		}
- 
- 		/* If sequence no 0 is missed then there is no point in
- 		 * accepting the other sequences.
- 		 */
--		if (!memdump_buf) {
-+		if (!test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
- 			bt_dev_err(hu->hdev, "QCA: Discarding other packets");
- 			kfree(qca_memdump);
- 			kfree_skb(skb);
--			qca->qca_memdump = NULL;
- 			mutex_unlock(&qca->hci_memdump_lock);
- 			return;
- 		}
--
- 		/* There could be chance of missing some packets from
- 		 * the controller. In such cases let us store the dummy
- 		 * packets in the buffer.
-@@ -1078,8 +1105,8 @@ static void qca_controller_memdump(struct work_struct *work)
- 		 * bits, so skip this checking for missing packet.
- 		 */
- 		while ((seq_no > qca_memdump->current_seq_no + 1) &&
--		       (soc_type != QCA_QCA6390) &&
--		       seq_no != QCA_LAST_SEQUENCE_NUM) {
-+			(soc_type != QCA_QCA6390) &&
-+			seq_no != QCA_LAST_SEQUENCE_NUM) {
- 			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
- 				   qca_memdump->current_seq_no);
- 			rx_size = qca_memdump->received_dump;
-@@ -1090,43 +1117,38 @@ static void qca_controller_memdump(struct work_struct *work)
- 					   qca_memdump->received_dump);
- 				break;
- 			}
--			memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
--			memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
-+			hci_devcd_append_pattern(hu->hdev, 0x00,
-+				QCA_DUMP_PACKET_SIZE);
- 			qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
- 			qca_memdump->current_seq_no++;
- 		}
- 
--		rx_size = qca_memdump->received_dump + skb->len;
-+		rx_size = qca_memdump->received_dump  + skb->len;
- 		if (rx_size <= qca_memdump->ram_dump_size) {
- 			if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
--			    (seq_no != qca_memdump->current_seq_no))
-+			    (seq_no != qca_memdump->current_seq_no)) {
- 				bt_dev_err(hu->hdev,
- 					   "QCA memdump unexpected packet %d",
- 					   seq_no);
-+			}
- 			bt_dev_dbg(hu->hdev,
- 				   "QCA memdump packet %d with length %d",
- 				   seq_no, skb->len);
--			memcpy(memdump_buf, (unsigned char *)skb->data,
--			       skb->len);
--			memdump_buf = memdump_buf + skb->len;
--			qca_memdump->memdump_buf_tail = memdump_buf;
--			qca_memdump->current_seq_no = seq_no + 1;
--			qca_memdump->received_dump += skb->len;
-+			hci_devcd_append(hu->hdev, skb);
-+			qca_memdump->current_seq_no += 1;
-+			qca_memdump->received_dump = rx_size;
- 		} else {
- 			bt_dev_err(hu->hdev,
--				   "QCA memdump received %d, no space for packet %d",
--				   qca_memdump->received_dump, seq_no);
-+				   "QCA memdump received no space for packet %d",
-+				    qca_memdump->current_seq_no);
- 		}
--		qca->qca_memdump = qca_memdump;
--		kfree_skb(skb);
-+
- 		if (seq_no == QCA_LAST_SEQUENCE_NUM) {
- 			bt_dev_info(hu->hdev,
--				    "QCA memdump Done, received %d, total %d",
--				    qca_memdump->received_dump,
--				    qca_memdump->ram_dump_size);
--			memdump_buf = qca_memdump->memdump_buf_head;
--			dev_coredumpv(&hu->serdev->dev, memdump_buf,
--				      qca_memdump->received_dump, GFP_KERNEL);
-+				"QCA memdump Done, received %d, total %d",
-+				qca_memdump->received_dump,
-+				qca_memdump->ram_dump_size);
-+			hci_devcd_complete(hu->hdev);
- 			cancel_delayed_work(&qca->ctrl_memdump_timeout);
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
-@@ -1537,8 +1559,8 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 	mutex_lock(&qca->hci_memdump_lock);
- 	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
- 		bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
-+		hci_devcd_abort(hu->hdev);
- 		if (qca->qca_memdump) {
--			vfree(qca->qca_memdump->memdump_buf_head);
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
- 		}
-@@ -1577,7 +1599,8 @@ static void qca_cmd_timeout(struct hci_dev *hdev)
- 	mutex_lock(&qca->hci_memdump_lock);
- 	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
- 		qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
--		if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
-+		if ((!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) ||
-+			(!test_bit(QCA_COREDUMP_TRIGGERED, &qca->flags))) {
- 			/* Inject hw error event to reset the device
- 			 * and driver.
- 			 */
-@@ -1702,6 +1725,65 @@ static int qca_power_on(struct hci_dev *hdev)
- 	return ret;
- }
- 
-+static void hci_coredump_qca(struct hci_dev *hdev)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct qca_data *qca = hu->priv;
-+	struct sk_buff *skb;
-+
-+
-+	set_bit(QCA_COREDUMP_TRIGGERED, &qca->flags);
-+	bt_dev_info(hdev, "Enter mem_dump_status: %d", qca->memdump_state);
-+
-+	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
-+		/* we need to crash the SOC
-+		 * and wait here for 8 seconds to get the dump packets.
-+		 * This will block main thread to be on hold until we
-+		 * collect dump.
-+		 */
-+		set_bit(QCA_SSR_TRIGGERED, &qca->flags);
-+		set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+
-+		skb = bt_skb_alloc(QCA_CRASHBYTE_PACKET_LEN, GFP_KERNEL);
-+		if (!skb) {
-+			bt_dev_err(hu->hdev, "Failed to allocate memory for skb packet");
-+			return;
-+		}
-+
-+		/* We forcefully crash the controller, by sending 0xfb byte for
-+		 * 1024 times. We also might have chance of losing data, To be
-+		 * on safer side we send 1096 bytes to the SoC.
-+		 */
-+		memset(skb_put(skb, QCA_CRASHBYTE_PACKET_LEN), QCA_MEMDUMP_BYTE,
-+			QCA_CRASHBYTE_PACKET_LEN);
-+		hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-+		bt_dev_info(hu->hdev, "crash the soc to collect controller dump");
-+
-+		switch (qca->tx_ibs_state) {
-+		case HCI_IBS_TX_WAKING:
-+			/* Transient state; just keep packet for later */
-+			skb_queue_tail(&qca->tx_wait_q, skb);
-+			break;
-+		case HCI_IBS_TX_AWAKE:
-+			skb_queue_tail(&qca->txq, skb);
-+			hci_uart_tx_wakeup(hu);
-+			break;
-+		case HCI_IBS_TX_ASLEEP:
-+			skb_queue_tail(&qca->tx_wait_q, skb);
-+			qca->tx_ibs_state = HCI_IBS_TX_WAKING;
-+			/* Schedule a work queue to wake up device */
-+			queue_work(qca->workqueue, &qca->ws_awake_device);
-+			break;
-+		}
-+	} else if (qca->memdump_state == QCA_MEMDUMP_COLLECTING) {
-+		/* Let us wait here until memory dump collected or
-+		 * memory dump timer expired.
-+		 */
-+		bt_dev_info(hdev, "waiting for dump to complete");
-+	}
-+	clear_bit(QCA_COREDUMP_TRIGGERED, &qca->flags);
-+}
-+
- static int qca_setup(struct hci_uart *hu)
- {
- 	struct hci_dev *hdev = hu->hdev;
-@@ -1816,6 +1898,9 @@ static int qca_setup(struct hci_uart *hu)
- 		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
- 	else
- 		hu->hdev->set_bdaddr = qca_set_bdaddr;
-+	qca->fw_version = le16_to_cpu(ver.patch_ver);
-+	qca->controller_id = le16_to_cpu(ver.rom_ver);
-+	hci_devcd_register(hdev, hci_coredump_qca, qca_dmp_hdr, NULL);
- 
- 	return ret;
- }
--- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
-
+--===============4438955733515219870==--
