@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EFEC77B73
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 22:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D906C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 May 2023 22:44:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbjEAWoS (ORCPT
+        id S230443AbjEAWoU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 May 2023 18:44:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36102 "EHLO
+        Mon, 1 May 2023 18:44:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbjEAWoR (ORCPT
+        with ESMTP id S229871AbjEAWoT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 May 2023 18:44:17 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355BE26BC
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 15:44:16 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-51b0f9d7d70so2719850a12.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 May 2023 15:44:16 -0700 (PDT)
+        Mon, 1 May 2023 18:44:19 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D371FDD
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 15:44:17 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1a66e7a52d3so22700855ad.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 May 2023 15:44:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682981055; x=1685573055;
+        d=gmail.com; s=20221208; t=1682981056; x=1685573056;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/8jc43J+oF1ouWCuHyNTyI0g5hAkSGiD9T2/GzAsXmw=;
-        b=LofhnNgiKPM3xWsLImMXbIXokQsdeK1B3A/0JRJcm6/fOmq8Jw0226dRkY7sL/hSa3
-         Kzau2FSJL9cTL3hgPFgcDveofzrYPZHUr+lyOAzL6Hn6/o3uqsMWAPfVQYixMFD8ht/l
-         skN0iaesAbyDrCXBUABQ8kBCdt7OvlIG+D84J0YwcXBjzQBEapN3sr9FB6uj04v0HdNC
-         EQ2DmrcTX0vvWQL9+7GVGN2uaafYF3WCzgO1YFxcJUfKu1FCxJhlDpe1CMt2yBULHhY+
-         pfyi6oqh9cyoXUb2A2r6jk9DUtyjcWX01DEXXFMtBXNmL+NHH8nI0/DRVctubX9HJbYj
-         DG7g==
+        bh=7OBlP1yWmSe/KeQ1+ZXJpMbLGfwR1ADwCzc1rSW6r9g=;
+        b=m6LP4j7gqpPpI4ITZMrAd4tOA+Gcigj194u6n0OPftKVXZd+gN3Zl3ztTlrBPO1wft
+         Gp9wAjRuAg0DdNYo82XwvZ7xdGdKRcV0Y2e2c6OJ1ZREwWwSFBd9DE8QtbdyVKZSZp5g
+         Jj9irV2WCslwZNUIrMD1udR09b4sE5CieDaJX54ItbbEy7i426GU/XrJkwax7V6FAL9q
+         q+RvTSIjvLvuIpQhqlNkmpqBBCq+lSRB0LVAYt0sz9zmly3XPSQz9QLBj5yzFRkGetDn
+         IL+eE0e4f5e98xium4nNjFb2JsuDJgzW02y0UlEkdyEP8BmQExcyr4kHBOv5AuQvZT/M
+         FoJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682981055; x=1685573055;
+        d=1e100.net; s=20221208; t=1682981056; x=1685573056;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/8jc43J+oF1ouWCuHyNTyI0g5hAkSGiD9T2/GzAsXmw=;
-        b=LREUK3BooJ8dfrw9sX4mRoKVIzu55efaBszqBqzZvanlnkCVTsT5Ej5WELYswMZE7T
-         ln0YGMFiNkiB1SnxeGXg4iZGgdmr1aUbyO4X8lIEEwyfqsKaBEEbOJJGi0x5uc4kexoK
-         Ku2MVWFC18wS812F0w+vetVPX6RAaCMy6m/DyCK8BUyamUKTlGFh6BJ2f3uCRaRHE2Dj
-         MM0FgSmFXl1PP0cUrVEI57uUHvLWguCCkID5miVlJ4kG+zRlU+wYR3QJncbSQw+pY8ar
-         AQP8E9m4DGOc1le7jjmrS/vmmzoHBU7ZvjHHCEb1HA2tG9jUXzeRtw5dYIY2h+GNn3IM
-         b17Q==
-X-Gm-Message-State: AC+VfDz8anxP1571PkgQA4s+0o6rSgo5LrEJ/KK5/jjyYa/Qe9qpEjzY
-        xsJJb/zq5B+gW8l98BHo6D4/iqBoV3I=
-X-Google-Smtp-Source: ACHHUZ74KT3cQQAIbeHnxM615HaHGpSQ0jgNCFYTLBen8eAwwHeHKOVwdvVhzJ3e1nDeYaB40DMr9Q==
-X-Received: by 2002:a17:903:1103:b0:1aa:f5dd:2d63 with SMTP id n3-20020a170903110300b001aaf5dd2d63mr6040159plh.1.1682981054894;
-        Mon, 01 May 2023 15:44:14 -0700 (PDT)
+        bh=7OBlP1yWmSe/KeQ1+ZXJpMbLGfwR1ADwCzc1rSW6r9g=;
+        b=Wh9nhoCjNVVaE7fSdXpuFcooombQ1aYTedUsEaK5DXN9TGCjgeEaKgKXSBytoVx1yw
+         ALhR2GZSLQRuicluY4CPlgBfFGrSJ9zFQlANmTCfX9nVt6WHJkOrnx2Wr+tkjNG4xRTT
+         M/o51OxDQZhBt1odLamuSiCqXg03WOJRgFtUyjkPoGSeSCjuhn8oFYrTWheu5xxkalZM
+         41SFeXI5kVMBPcmrlHehO2JOXtVCkTze3XUJKMkT4D8b1lQJZOHdzmro5498spDvsY8x
+         XhUdaXWKy/SibtCpYzIeILLvmqhnzTpgdpIK9CPZuENqK8xHIjydIbPACxZ1KSs1Qn48
+         PK/A==
+X-Gm-Message-State: AC+VfDyy49DOu/x4GYsrjRU+/i6H5GBXlEMs5NQUK5f5Q1CPjUClhdaw
+        fE/FbvJ3USkX8Fa0VY29lJk3cjD9B58=
+X-Google-Smtp-Source: ACHHUZ4oysU9Hfyx8pgfkNZ2CN2lKJxWZjC+kmaNFTyEUgDzuIOSuInVKqxcE0/YQ/FpABoZeUa/Yw==
+X-Received: by 2002:a17:903:246:b0:19f:2328:beee with SMTP id j6-20020a170903024600b0019f2328beeemr17613227plh.11.1682981056583;
+        Mon, 01 May 2023 15:44:16 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id w8-20020a170902a70800b001a6756a36f6sm18279806plq.101.2023.05.01.15.44.13
+        by smtp.gmail.com with ESMTPSA id w8-20020a170902a70800b001a6756a36f6sm18279806plq.101.2023.05.01.15.44.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 May 2023 15:44:13 -0700 (PDT)
+        Mon, 01 May 2023 15:44:15 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v3 2/4] client/player: Fix crash when RegisterEndpoint fails
-Date:   Mon,  1 May 2023 15:44:08 -0700
-Message-Id: <20230501224410.1119023-2-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v3 3/4] shared/shell: Fix not releasing prompt
+Date:   Mon,  1 May 2023 15:44:09 -0700
+Message-Id: <20230501224410.1119023-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230501224410.1119023-1-luiz.dentz@gmail.com>
 References: <20230501224410.1119023-1-luiz.dentz@gmail.com>
@@ -68,30 +68,27 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If RegisterEndpoint fails when there are multiple adapters it would
-attempt to free the same endpoint multiple times.
+This fixes not releasing prompt when queueing a line to be executed
+since it can be considered as user input if the init script is
+attempting to enter it as response to prompt input.
 ---
- client/player.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ src/shared/shell.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/client/player.c b/client/player.c
-index cc35721d85b7..7719076c8cfa 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -2028,9 +2028,11 @@ static void register_endpoint_reply(DBusMessage *message, void *user_data)
- 		bt_shell_printf("Failed to register endpoint: %s\n",
- 				error.name);
- 		dbus_error_free(&error);
--		local_endpoints = g_list_remove(local_endpoints, ep);
--		g_dbus_unregister_interface(dbus_conn, ep->path,
-+		if (g_list_find(local_endpoints, ep)) {
-+			local_endpoints = g_list_remove(local_endpoints, ep);
-+			g_dbus_unregister_interface(dbus_conn, ep->path,
- 						BLUEZ_MEDIA_ENDPOINT_INTERFACE);
-+		}
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 8b8b253d0bcf..757e16199ddf 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -1295,6 +1295,9 @@ static int bt_shell_queue_exec(char *line)
  
+ 	/* Queue if already executing */
+ 	if (data.line) {
++		/* Check if prompt is being held then release using the line */
++		if (!bt_shell_release_prompt(line))
++			return 0;
+ 		queue_push_tail(data.queue, strdup(line));
+ 		return 0;
+ 	}
 -- 
 2.40.0
 
