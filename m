@@ -2,119 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73763C7EE21
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 23:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7871EC7EE26
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 23:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbjEBXc3 (ORCPT
+        id S229609AbjEBXiJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 May 2023 19:32:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35026 "EHLO
+        Tue, 2 May 2023 19:38:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjEBXc2 (ORCPT
+        with ESMTP id S229461AbjEBXiI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 May 2023 19:32:28 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1ABB3591
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 16:32:27 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-63b5465fb99so3555493b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 16:32:27 -0700 (PDT)
+        Tue, 2 May 2023 19:38:08 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1C4F3591;
+        Tue,  2 May 2023 16:38:06 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f00d41df22so722671e87.1;
+        Tue, 02 May 2023 16:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683070347; x=1685662347;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=QZZrqVhIZu+ZS94Oc1C+GFJGMXC0JZehKAUyz0IFvQw=;
-        b=l4BzVnLQu5AXa4EKowFBI1B14sn5r6YiobkuFlhLkXLuof+dHsNx0VvXRXc06yHG5i
-         pJ4ISQ76x3XXhEK4Uzlr/MBdxVBnuCz7RqQBWRyaRDx9ydGiFAejbTLXSoSqgUtVPmte
-         NTQt1nH1myZlQVfhKEmEWl0ztwQFyLyyGl8f1HS7lareyUYVRzSPV0UR/vN+mFTxNfuU
-         SZRF8QmhqJ/87Y0YKYjh8bLYIHly/1VV8gLNi2qnwE/xZ8cT2lDAdLO4JyBIhTBuAds6
-         8x0SmO/y/v/3x24kiAOsCoEW6yVpwofuVDrtlLF39Nlz6WvH9jA6+1UCaUQ+wdocrYos
-         x7pw==
+        d=gmail.com; s=20221208; t=1683070685; x=1685662685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6OQxInFdspH8goMZiAQFIMKvayrdCwcSWW5RpkKMAVs=;
+        b=rxwYpimfPHfiaLUYvMZSGzeu4lLfKnxa5lLprs1ayA/SCOBpxHk76Z9C11I8IEn3dk
+         bvKtFzBQjuaO7sSg7VoB/a66Yx4qUm7oNzsQZg+NYWiHvaWHJzELhwr8BjrxRDuQYS5s
+         3vyaGyN4Cs+yK1CHUTrjIbxgiQKJuWLU9SLTAcYz7AESzItR112/2AAGDOxZkjLt+O1p
+         QYs0Y+oemevj0PRP29NY3VH7oUI25qZHohWrIHDxASGXkng+oLUCTGSksk6HINPZFBg8
+         PdWRd9bakYmdTgmieZUgVFLievAojX48jBlp21kqCQ6tAFERmuvgNGt/+57haHzg9mJ0
+         J+dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683070347; x=1685662347;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QZZrqVhIZu+ZS94Oc1C+GFJGMXC0JZehKAUyz0IFvQw=;
-        b=AOOgYl8u+ktlcVvdX25lDGKJjNdGI+PRWCe/akB/9X/A20Hc+qN8w+xF9HTB1Z42ZE
-         IgO0IbKu6DV0yZ72O24nmK5MHmdmtgfxIvqG/z2B5iBCUlmIXmEM22vGzw/EtUvxZ5w8
-         ZtxOAxEN3Qy9qhwQS+5EdAyMy58bVzByFYIk3FUDEQQUYNWAkBOwd6jCOOxmqMmcUbvg
-         vDGN/tKEcv78QbmbQcsyYppiidSTYK9xCosTmoW0yPSJT0zfyvFfYOx4xjrSdv+9mLJX
-         odNVdBGPRbTroQaTkO/uBoSyoPTY0q6GxzJM1MwxgFC/XyDah0pJLfGkCZg/NqZeLGwX
-         trfg==
-X-Gm-Message-State: AC+VfDxCY/4RBt2QU00a+PjPmwUzjBDaOcTO+x7V3H7pvvsLQ/7mJ+J+
-        JzlPqqSYHFzGfOlmc+Cwyyf/1raA+sA=
-X-Google-Smtp-Source: ACHHUZ7xcQpRg0oMr/pzQtuDYrLfj9N0/LKcEU0ZfamFklwXmRXXoYy9nMhmjhggUs1C8z+DAtxbhg==
-X-Received: by 2002:a05:6a21:339f:b0:e9:5b0a:deff with SMTP id yy31-20020a056a21339f00b000e95b0adeffmr24037792pzb.22.1683070346994;
-        Tue, 02 May 2023 16:32:26 -0700 (PDT)
-Received: from [172.17.0.2] ([4.227.0.230])
-        by smtp.gmail.com with ESMTPSA id a22-20020a62d416000000b0063f9de332f8sm17118582pfh.167.2023.05.02.16.32.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 16:32:26 -0700 (PDT)
-Message-ID: <64519d8a.620a0220.73244.3d2a@mx.google.com>
-Date:   Tue, 02 May 2023 16:32:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0656462902792029262=="
+        d=1e100.net; s=20221208; t=1683070685; x=1685662685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6OQxInFdspH8goMZiAQFIMKvayrdCwcSWW5RpkKMAVs=;
+        b=S9knXRWL64xvtEmtjf12waDRPwOCTmfoiFZkJwmurL6pdr1SM2Xsm+lsx1/eu1veIl
+         liWa2ieaCUJUosXPsgDmWydWCJHcpTcqAczyjk38M7nSfddWymLrc0onF+oPwTG1k5sH
+         Wv1kA8G5IE/BpCKti2g3hQRewtwKkHcuxz8G4/x707/kwoJrHk0/gIGuLigx2IQX1Wda
+         PTkNplfkUd1S28qyLztEe1pZLiJId3vny3+xMkUjxjz2CdtQ11DUk8QhFys1HF1zai5H
+         m/ntE/OOEMJm/HuaOb5c1RApeTzM4w2qMXJCcLdv6t92YZOs92jrmdpc+Wacm0grFWe6
+         OpFg==
+X-Gm-Message-State: AC+VfDx/PQPZrQdK/L6JbzcKq1sbABQsfVMpyhI5hB9laajdaPjZm/6O
+        dodklSFPRKYheJ2yiAaQQryCluRfLGi6bcPCs/Q=
+X-Google-Smtp-Source: ACHHUZ4Su0H7dh/63X/8lI+nOZziTVVMVxrq4qKi72IDv95LwiyE0a3aXRPOPr3H8pU/DCEKRH1kU/UtdNkbvhmMJNw=
+X-Received: by 2002:a05:6512:3f1c:b0:4ec:9d13:9d09 with SMTP id
+ y28-20020a0565123f1c00b004ec9d139d09mr51247lfa.34.1683070684774; Tue, 02 May
+ 2023 16:38:04 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
-Subject: RE: [v5,1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding
-In-Reply-To: <c90f4606c85f5862e2e3e1dc330af4ac95f2bc9f.1683065391.git.objelf@gmail.com>
-References: <c90f4606c85f5862e2e3e1dc330af4ac95f2bc9f.1683065391.git.objelf@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230424124852.12625-1-johan+linaro@kernel.org> <20230424124852.12625-2-johan+linaro@kernel.org>
+In-Reply-To: <20230424124852.12625-2-johan+linaro@kernel.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 2 May 2023 16:37:51 -0700
+Message-ID: <CABBYNZLBQjWVb=z8mffi4RmeKS-+RDLV+XF8bR2MiJ-ZOaFVHA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: fix debugfs registration
+To:     Johan Hovold <johan+linaro@kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0656462902792029262==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Johan,
 
-This is automated email and please do not reply to this email!
+On Mon, Apr 24, 2023 at 5:50=E2=80=AFAM Johan Hovold <johan+linaro@kernel.o=
+rg> wrote:
+>
+> Since commit ec6cef9cd98d ("Bluetooth: Fix SMP channel registration for
+> unconfigured controllers") the debugfs interface for unconfigured
+> controllers will be created when the controller is configured.
+>
+> There is however currently nothing preventing a controller from being
+> configured multiple time (e.g. setting the device address using btmgmt)
+> which results in failed attempts to register the already registered
+> debugfs entries:
+>
+>         debugfs: File 'features' in directory 'hci0' already present!
+>         debugfs: File 'manufacturer' in directory 'hci0' already present!
+>         debugfs: File 'hci_version' in directory 'hci0' already present!
+>         ...
+>         debugfs: File 'quirk_simultaneous_discovery' in directory 'hci0' =
+already present!
+>
+> Add a controller flag to avoid trying to register the debugfs interface
+> more than once.
+>
+> Fixes: ec6cef9cd98d ("Bluetooth: Fix SMP channel registration for unconfi=
+gured controllers")
+> Cc: stable@vger.kernel.org      # 4.0
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+> ---
+>  include/net/bluetooth/hci.h | 1 +
+>  net/bluetooth/hci_sync.c    | 3 +++
+>  2 files changed, 4 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 400f8a7d0c3f..b8bca65bcd79 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -335,6 +335,7 @@ enum {
+>  enum {
+>         HCI_SETUP,
+>         HCI_CONFIG,
+> +       HCI_DEBUGFS_CREATED,
+>         HCI_AUTO_OFF,
+>         HCI_RFKILLED,
+>         HCI_MGMT,
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 632be1267288..a8785126df75 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -4501,6 +4501,9 @@ static int hci_init_sync(struct hci_dev *hdev)
+>             !hci_dev_test_flag(hdev, HCI_CONFIG))
+>                 return 0;
+>
+> +       if (hci_dev_test_and_set_flag(hdev, HCI_DEBUGFS_CREATED))
+> +               return 0;
 
-Dear submitter,
+Can't we just use HCI_SETUP like we do with in create_basic:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744518
+    if (hci_dev_test_flag(hdev, HCI_SETUP))
+        hci_debugfs_create_basic(hdev);
 
----Test result---
+Actually we might as well move these checks directly inside the
+hci_debugfs function to make sure these only take effect during the
+setup/first init.
 
-Test Summary:
-CheckPatch                    PASS      2.52 seconds
-GitLint                       FAIL      1.07 seconds
-SubjectPrefix                 PASS      0.27 seconds
-BuildKernel                   PASS      32.25 seconds
-CheckAllWarning               PASS      35.15 seconds
-CheckSparse                   PASS      39.68 seconds
-CheckSmatch                   PASS      110.69 seconds
-BuildKernel32                 PASS      30.98 seconds
-TestRunnerSetup               PASS      440.96 seconds
-TestRunner_l2cap-tester       PASS      16.53 seconds
-TestRunner_iso-tester         PASS      20.25 seconds
-TestRunner_bnep-tester        PASS      5.29 seconds
-TestRunner_mgmt-tester        PASS      112.02 seconds
-TestRunner_rfcomm-tester      PASS      8.47 seconds
-TestRunner_sco-tester         PASS      7.87 seconds
-TestRunner_ioctl-tester       PASS      9.17 seconds
-TestRunner_mesh-tester        PASS      6.66 seconds
-TestRunner_smp-tester         PASS      7.74 seconds
-TestRunner_userchan-tester    PASS      5.50 seconds
-IncrementalBuild              PASS      40.80 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v5,1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (82>80): "[v5,1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding"
+>         hci_debugfs_create_common(hdev);
+>
+>         if (lmp_bredr_capable(hdev))
+> --
+> 2.39.2
+>
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0656462902792029262==--
+--=20
+Luiz Augusto von Dentz
