@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1E3C7EE24
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 20:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DDE2C7EE21
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 20:16:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229598AbjEBUQC (ORCPT
+        id S229916AbjEBUQB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 May 2023 16:16:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48512 "EHLO
+        Tue, 2 May 2023 16:16:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbjEBUQA (ORCPT
+        with ESMTP id S229928AbjEBUP7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 May 2023 16:16:00 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A00721FC3
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 13:15:44 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id 98e67ed59e1d1-24e24b0193fso1187610a91.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 13:15:44 -0700 (PDT)
+        Tue, 2 May 2023 16:15:59 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D71E91FE3
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 13:15:42 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1aaef97652fso22319835ad.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 13:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683058543; x=1685650543;
+        d=gmail.com; s=20221208; t=1683058541; x=1685650541;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9BFwpSW7WSPxSuB/p2o9rzOoGAMdZNpn0wLc1+Av00M=;
-        b=d39t6R9wPjIU8LCr3Gdyg4/pBaLAfPpqNZ1OgOeDo20EBn/+GilGk7Y1Fv7QZt7NEF
-         LVkparK/lj3qLqL4DflyzCwLBVT6zR87I8Zvt2OyPByD8VDtqxvZeYNNo2ooi01cY0oW
-         UwDWfogfJWZnQHtWXPU+dL3X4Y1i25853tjo4oaOy3N/4uOWiFZ9LBhj1NANuVosjIP1
-         ZvSZaLr377gnIq5Gs/byNvozh5gA8fht3Tj3LekQ5CHuzz6615dUQjV+nMfM6l28xuSa
-         an6pVEzejgzIuALm4jsm2Od70FlVZ3pQGyqSN6Jalpw4ncMlHOvH3uVH65vYLyPq0FA+
-         JL3w==
+        bh=/jGjRdSM45bNUBJFmbAVw08c7UDEaSwJ+p/sRBnUNBc=;
+        b=FAbGKTaWIQU8cvEQ2R/oAlqkHEPBOG4Q9fDbDevuLH9/oWNqy+KsXP7uTzAtT/aL2K
+         thTddXZuHQ0rbe5a3r76J2WTCFNDILmnGqpV6okOw9AL/O1uvTmnxgTqcWboszVigWX5
+         s+NdYFrwhCia6Rbd6Q1fF6WujVjw3Hr69hjd/WIIcjXYUv0djESetHtRTZAuuSJIgw/k
+         jUAJ4NtstZaCAIS3yPuVoQube6gQ/yXf1GLknN//kjcYJbxJqIUcubGJjx6SyLdmbaWC
+         kwjuQ5BKtXEDXluGFLiwg1uqsgZs4lV45s47j1b9SjxJZKZgXsvDtcxdgQ8BOoo6Whed
+         zLAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683058543; x=1685650543;
+        d=1e100.net; s=20221208; t=1683058541; x=1685650541;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9BFwpSW7WSPxSuB/p2o9rzOoGAMdZNpn0wLc1+Av00M=;
-        b=KHbyTfzYQIM6EBeF0h1a50Oq+P5JYbvtuAH0W9xNbZ2V/LyjE+q5QwRVeoBxdrYIJJ
-         a3HkUSq/ZAsiMH9zptbA4yg/FFF52LblWhogge/WgaWHBZEN8qCN7b0BcWL9Nl8SNihN
-         zqWpeLbxV7wwWz0mxByxnXZchiuhK7+TT4PNtP0Wix4qMC77PsNZWacmCSgJA3i1foij
-         2Apfs5qz8bAOgX/x9/AAz//WYb6JMjHdqQ1rFRmMGDqezcWJL6FZvoJj4YQqG+jiQB9h
-         gs/Kc8+ayRbZgJYb5Mbe19xXxt6jBiIiUgib6YdjifTqXhSEnAY0mVO875xxbSxaCEbb
-         e0Fg==
-X-Gm-Message-State: AC+VfDyiS0ZlbyY0YqfKRNTL45TFWyLcNuCGW3ytD7/H+Mm7Vz4DbhL7
-        a9BRKNPt4qP7HAW5RHtx+REZEO71+Og=
-X-Google-Smtp-Source: ACHHUZ7e0lDJnRbDPkDTMP6DkigE4iGHlJtvsuR7HLlU6V/ITDAAJGFxuFDhST9EwoXflgf//VOjhg==
-X-Received: by 2002:a17:90a:858b:b0:24d:f802:9172 with SMTP id m11-20020a17090a858b00b0024df8029172mr9413567pjn.19.1683058543301;
-        Tue, 02 May 2023 13:15:43 -0700 (PDT)
+        bh=/jGjRdSM45bNUBJFmbAVw08c7UDEaSwJ+p/sRBnUNBc=;
+        b=DH3d6CS7k9mwEIYZ5rW8pjUSqTNeXc8uSMlBxCW+buoCmnXowOmBGkUxNDlzWLMisr
+         HkajLGqaUrlL76RXm+k1lr9q20Hx/NQ5B345ZTAbSDXQ+fEUQuB6WG9sgDyF6i4IDto6
+         5FkyG7Vcc2q0RxRONLsfwQ1g2mSx8vhQShQ9+fvzCVe1Ar9Z7Dv9YZvhIhIMPp4cOzLG
+         1vuwmV/+iUMZr4B+BniBNLrzUeLrGrmnKebhxRwH7fIOjZHT+k2AtGkRPUWVGqn6wM3J
+         Zp/qluTM/9yJYyJ0yTxk2l/9BozUIMwfIzM2t20hIJ9nZOg8y8Z7pwdUsA+B9FKGbJbY
+         lFjg==
+X-Gm-Message-State: AC+VfDxmkLFxH3PjNFh9jKp1zfltIxMvslDzIvyOY78Wi3R7OMciY6qQ
+        u3h+fcONhAd52coYW46fQswUyF8jmlE=
+X-Google-Smtp-Source: ACHHUZ4v9wq5D5MggBRwtN7Vyn9BLAXGGACtc/CM9UFzeRcWZUhOy9gG+gylpRVM1kTInD0og8IUGQ==
+X-Received: by 2002:a17:902:ecc5:b0:1a1:b440:3773 with SMTP id a5-20020a170902ecc500b001a1b4403773mr23543955plh.27.1683058541461;
+        Tue, 02 May 2023 13:15:41 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id p9-20020a1709028a8900b0019cb6222691sm20133364plo.133.2023.05.02.13.15.41
+        by smtp.gmail.com with ESMTPSA id p9-20020a1709028a8900b0019cb6222691sm20133364plo.133.2023.05.02.13.15.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 13:15:42 -0700 (PDT)
+        Tue, 02 May 2023 13:15:40 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/4] Bluetooth: Unlink CISes when LE disconnects in hci_conn_del
-Date:   Tue,  2 May 2023 13:15:34 -0700
-Message-Id: <20230502201534.1500462-4-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/4] Bluetooth: Fix UAF in hci_conn_hash_flush again
+Date:   Tue,  2 May 2023 13:15:33 -0700
+Message-Id: <20230502201534.1500462-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.0
 In-Reply-To: <20230502201534.1500462-1-luiz.dentz@gmail.com>
 References: <20230502201534.1500462-1-luiz.dentz@gmail.com>
@@ -66,105 +66,124 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Ruihan Li <lrh2000@pku.edu.cn>
 
-Currently, hci_conn_del calls hci_conn_unlink for BR/EDR, (e)SCO, and
-CIS connections, i.e., everything except LE connections. However, if
-(e)SCO connections are unlinked when BR/EDR disconnects, CIS connections
-should also be unlinked when LE disconnects.
+Commit 06149746e720 ("Bluetooth: hci_conn: Add support for linking
+multiple hcon") reintroduced a previously fixed bug [1] ("KASAN:
+slab-use-after-free Read in hci_conn_hash_flush"). This bug was
+originally fixed by commit 5dc7d23e167e ("Bluetooth: hci_conn: Fix
+possible UAF").
 
-In terms of disconnection behavior, CIS and (e)SCO connections are not
-too different. One peculiarity of CIS is that when CIS connections are
-disconnected, the CIS handle isn't deleted, as per [BLUETOOTH CORE
-SPECIFICATION Version 5.4 | Vol 4, Part E] 7.1.6 Disconnect command:
+The hci_conn_unlink function was added to avoid invalidating the link
+traversal caused by successive hci_conn_del operations releasing extra
+connections. However, currently hci_conn_unlink itself also releases
+extra connections, resulted in the reintroduced bug.
 
-        All SCO, eSCO, and CIS connections on a physical link should be
-        disconnected before the ACL connection on the same physical
-        connection is disconnected. If it does not, they will be
-        implicitly disconnected as part of the ACL disconnection.
-        ...
-        Note: As specified in Section 7.7.5, on the Central, the handle
-        for a CIS remains valid even after disconnection and, therefore,
-        the Host can recreate a disconnected CIS at a later point in
-        time using the same connection handle.
+This patch follows a more robust solution for cleaning up all
+connections, by repeatedly removing the first connection until there are
+none left. This approach does not rely on the inner workings of
+hci_conn_del and ensures proper cleanup of all connections.
 
-Since hci_conn_link invokes both hci_conn_get and hci_conn_hold,
-hci_conn_unlink should perform both hci_conn_put and hci_conn_drop as
-well. However, currently it performs only hci_conn_put.
+Meanwhile, we need to make sure that hci_conn_del never fails. Indeed it
+doesn't, as it now always returns zero. To make this a bit clearer, this
+patch also changes its return type to void.
 
-This patch makes hci_conn_unlink call hci_conn_drop as well, which
-simplifies the logic in hci_conn_del a bit and may benefit future users
-of hci_conn_unlink. But it is noted that this change additionally
-implies that hci_conn_unlink can queue disc_work on conn itself, with
-the following call stack:
-
-        hci_conn_unlink(conn)  [conn->parent == NULL]
-                -> hci_conn_unlink(child)  [child->parent == conn]
-                        -> hci_conn_drop(child->parent)
-                                -> queue_delayed_work(&conn->disc_work)
-
-Queued disc_work after hci_conn_del can be spurious, so during the
-process of hci_conn_del, it is necessary to make the call to
-cancel_delayed_work(&conn->disc_work) after invoking hci_conn_unlink.
-
+Reported-by: syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000aa920505f60d25ad@google.com/
+Fixes: 06149746e720 ("Bluetooth: hci_conn: Add support for linking multiple hcon")
 Signed-off-by: Ruihan Li <lrh2000@pku.edu.cn>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_conn.c         | 33 +++++++++++++++++++++-----------
+ 2 files changed, 23 insertions(+), 12 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a6c8aee2f256..8baf34639939 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1327,7 +1327,7 @@ int hci_le_create_cis(struct hci_conn *conn);
+ 
+ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 			      u8 role);
+-int hci_conn_del(struct hci_conn *conn);
++void hci_conn_del(struct hci_conn *conn);
+ void hci_conn_hash_flush(struct hci_dev *hdev);
+ void hci_conn_check_pending(struct hci_dev *hdev);
+ 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 1e8910c50bef..6414f64334aa 100644
+index 44d0643fc681..1e8910c50bef 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -1100,7 +1100,9 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 			 * yet at this point. Delete it now, otherwise it is
- 			 * possible for it to be stuck and can't be deleted.
- 			 */
--			if (child->handle == HCI_CONN_HANDLE_UNSET)
-+			if ((child->type == SCO_LINK ||
-+			     child->type == ESCO_LINK) &&
-+			    child->handle == HCI_CONN_HANDLE_UNSET)
- 				hci_conn_del(child);
- 		}
+@@ -1083,6 +1083,14 @@ static void hci_conn_unlink(struct hci_conn *conn)
+ 	if (!conn->parent) {
+ 		struct hci_link *link, *t;
  
-@@ -1113,6 +1115,7 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 	list_del_rcu(&conn->link->list);
- 	synchronize_rcu();
- 
-+	hci_conn_drop(conn->parent);
- 	hci_conn_put(conn->parent);
- 	conn->parent = NULL;
- 
-@@ -1126,12 +1129,13 @@ void hci_conn_del(struct hci_conn *conn)
- 
- 	BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
- 
-+	hci_conn_unlink(conn);
++		/* If hdev is down it means
++		 * hci_dev_close_sync/hci_conn_hash_flush is in progress
++		 * and links don't need to be cleanup as all connections would
++		 * be cleanup.
++		 */
++		if (!test_bit(HCI_UP, &hdev->flags))
++			return;
 +
- 	cancel_delayed_work_sync(&conn->disc_work);
- 	cancel_delayed_work_sync(&conn->auto_accept_work);
- 	cancel_delayed_work_sync(&conn->idle_work);
+ 		list_for_each_entry_safe(link, t, &conn->link_list, list) {
+ 			struct hci_conn *child = link->conn;
  
- 	if (conn->type == ACL_LINK) {
--		hci_conn_unlink(conn);
- 		/* Unacked frames */
- 		hdev->acl_cnt += conn->sent;
- 	} else if (conn->type == LE_LINK) {
-@@ -1142,13 +1146,6 @@ void hci_conn_del(struct hci_conn *conn)
- 		else
- 			hdev->acl_cnt += conn->sent;
- 	} else {
--		struct hci_conn *acl = conn->parent;
+@@ -1112,7 +1120,7 @@ static void hci_conn_unlink(struct hci_conn *conn)
+ 	conn->link = NULL;
+ }
+ 
+-int hci_conn_del(struct hci_conn *conn)
++void hci_conn_del(struct hci_conn *conn)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 
+@@ -1163,8 +1171,6 @@ int hci_conn_del(struct hci_conn *conn)
+ 	 * rest of hci_conn_del.
+ 	 */
+ 	hci_conn_cleanup(conn);
 -
--		if (acl) {
--			hci_conn_unlink(conn);
--			hci_conn_drop(acl);
--		}
+-	return 0;
+ }
+ 
+ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, uint8_t src_type)
+@@ -2465,22 +2471,27 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active)
+ /* Drop all connection on the device */
+ void hci_conn_hash_flush(struct hci_dev *hdev)
+ {
+-	struct hci_conn_hash *h = &hdev->conn_hash;
+-	struct hci_conn *c, *n;
++	struct list_head *head = &hdev->conn_hash.list;
++	struct hci_conn *conn;
+ 
+ 	BT_DBG("hdev %s", hdev->name);
+ 
+-	list_for_each_entry_safe(c, n, &h->list, list) {
+-		c->state = BT_CLOSED;
 -
- 		/* Unacked ISO frames */
- 		if (conn->type == ISO_LINK) {
- 			if (hdev->iso_pkts)
+-		hci_disconn_cfm(c, HCI_ERROR_LOCAL_HOST_TERM);
++	/* We should not traverse the list here, because hci_conn_del
++	 * can remove extra links, which may cause the list traversal
++	 * to hit items that have already been released.
++	 */
++	while ((conn = list_first_entry_or_null(head,
++						struct hci_conn,
++						list)) != NULL) {
++		conn->state = BT_CLOSED;
++		hci_disconn_cfm(conn, HCI_ERROR_LOCAL_HOST_TERM);
+ 
+ 		/* Unlink before deleting otherwise it is possible that
+ 		 * hci_conn_del removes the link which may cause the list to
+ 		 * contain items already freed.
+ 		 */
+-		hci_conn_unlink(c);
+-		hci_conn_del(c);
++		hci_conn_unlink(conn);
++		hci_conn_del(conn);
+ 	}
+ }
+ 
 -- 
 2.40.0
 
