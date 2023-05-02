@@ -2,110 +2,150 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D607FC19F20
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 22:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E5AC7EE21
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 23:03:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbjEBW6S (ORCPT
+        id S229601AbjEBXDC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 May 2023 18:58:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48176 "EHLO
+        Tue, 2 May 2023 19:03:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbjEBW6Q (ORCPT
+        with ESMTP id S229756AbjEBXDA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 May 2023 18:58:16 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD733589
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 15:57:45 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-32c83c66b1cso35405455ab.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 15:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683068217; x=1685660217;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NkOCkM4QfdvL1aqFpHzcgcKsi2Sh2T4skl+W9h++o2o=;
-        b=rU81dYGIo0xx3w//WNePIyriGeDOi/HSu9IjfXPp5VzmIFrXE5GX3iG5L5PeClU2La
-         HKEZic/Q7twldOx+xEt2yenOnhQHCFwiszUYRdYUnigAw/UyXY7d3MJZamNIEtw2Z3iI
-         PbbpEPB+5k5rVJXh0UqoKiUyuRz/0M4Ho/5GCZUNFNAtnopuA5tx9eQg44lpRKi+aXGE
-         2EgXIIaOSefdghHwbH4cfAxwUrbdQYaXma1nsK2jZVcFt8TB/20n9fG6I3GOXK170bgc
-         HX4X/Aj5uYghkIUXW7FyBWesr9WYRMAIVbqaTRyQy7d3H25/tQdzTyVwJtKDqRWJ9bOW
-         cKdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683068217; x=1685660217;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NkOCkM4QfdvL1aqFpHzcgcKsi2Sh2T4skl+W9h++o2o=;
-        b=PZzLpoLMgxF+Wm1NAxDti33XrAQM1PB+RQkUqhNn3+wuC+QiH6Ia7dCoBdCvWK3jnc
-         T9Miih0g/tJx/ceNATtbguvemS6GPwzQDaUOseZyrUbGXUY80xuRttwT/TvCJVMXsLBc
-         IODZSdfLI+JeMTrXRsDCNDB3HBt7zZWLYDbSt3IED1wa285DyENSl4PzZmuZl92tEfiz
-         waM8nhUW5CyxCcKn65Q3HXL8jwfQB4X9WqRvJELzlnKMSex4Wnt9bsItA9JZThlTOJVy
-         XwQ6ZkemLiJEWW5NaurrXF3U0cunipmZKWXrXwuBqra+hVDnWJyL+rcXwgSq7Am7lZQ7
-         +0qg==
-X-Gm-Message-State: AC+VfDzo928R9rmLINATdbBRy1iwQ+MclnpmZR7LHl1CYrTuHAomvzRD
-        D3Zg6y5c9XIFx5Y8fM4nCrSkATiPxss=
-X-Google-Smtp-Source: ACHHUZ7V+54RIx1rtgn8Bl5uFdIUPsP/kdmndZ2jAUwCipdhDLwChRak041lDvVA87le65js4UR2oA==
-X-Received: by 2002:a92:c68f:0:b0:326:2b56:3cf5 with SMTP id o15-20020a92c68f000000b003262b563cf5mr13509070ilg.22.1683068217160;
-        Tue, 02 May 2023 15:56:57 -0700 (PDT)
-Received: from [172.17.0.2] ([40.86.28.135])
-        by smtp.gmail.com with ESMTPSA id 3-20020a056e020ca300b003261422fdbcsm8439796ilg.80.2023.05.02.15.56.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 15:56:56 -0700 (PDT)
-Message-ID: <64519538.050a0220.eeccd.aa15@mx.google.com>
-Date:   Tue, 02 May 2023 15:56:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4141031182457227613=="
+        Tue, 2 May 2023 19:03:00 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E4B273A;
+        Tue,  2 May 2023 16:02:54 -0700 (PDT)
+X-UUID: 744a450ee93d11ed9cb5633481061a41-20230503
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=nHVEPYLguKcpy/6oCAIqC8r0dEnyeHELgnO194+UDO8=;
+        b=OfII5IIIAH67W5Jw3t9yvTKmYpDpHXuwS6kK1PqjJRaXXTG70FY7MUVpFvzJRwkpOwd3t/jCaRzOiVOm5qnrc0UnUHaaaD/RP3nF8O+9gjgm6/I2l/pJ44g6kA8t3sL2Kq6yZmLdvbOlRSmm80iEzA7XRBja8xCiTKxcoUJ7zkk=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.22,REQID:78669f1f-9b67-4eca-b5c3-32aea9918a9b,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+        release,TS:0
+X-CID-META: VersionHash:120426c,CLOUDID:75288f6a-2f20-4998-991c-3b78627e4938,B
+        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-UUID: 744a450ee93d11ed9cb5633481061a41-20230503
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1190135545; Wed, 03 May 2023 07:02:47 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 3 May 2023 07:02:45 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 3 May 2023 07:02:45 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <sean.wang@mediatek.com>, <chris.lu@mediatek.com>,
+        <Soul.Huang@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
+        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
+        <ch.yeh@mediatek.com>, <jenhao.yang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <abhishekpandit@google.com>,
+        <michaelfsun@google.com>, <abhishekpandit@chromium.org>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v5 1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding
+Date:   Wed, 3 May 2023 07:02:40 +0800
+Message-ID: <c90f4606c85f5862e2e3e1dc330af4ac95f2bc9f.1683065391.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v3] Bluetooth: btusb: Don't suspend when there are connections
-In-Reply-To: <20230502221159.1674607-1-luiz.dentz@gmail.com>
-References: <20230502221159.1674607-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4141031182457227613==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Sean Wang <sean.wang@mediatek.com>
 
-This is automated email and please do not reply to this email!
+Use readx_poll_timeout instead of open coding to poll the hardware reset
+status until it is done.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744511
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.62 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      33.02 seconds
-CheckAllWarning               PASS      35.87 seconds
-CheckSparse                   PASS      40.95 seconds
-CheckSmatch                   PASS      110.81 seconds
-BuildKernel32                 PASS      31.59 seconds
-TestRunnerSetup               PASS      449.98 seconds
-TestRunner_l2cap-tester       PASS      17.48 seconds
-TestRunner_iso-tester         PASS      21.46 seconds
-TestRunner_bnep-tester        PASS      5.73 seconds
-TestRunner_mgmt-tester        PASS      116.60 seconds
-TestRunner_rfcomm-tester      PASS      9.08 seconds
-TestRunner_sco-tester         PASS      8.39 seconds
-TestRunner_ioctl-tester       PASS      9.83 seconds
-TestRunner_mesh-tester        PASS      7.29 seconds
-TestRunner_smp-tester         PASS      8.30 seconds
-TestRunner_userchan-tester    PASS      5.98 seconds
-IncrementalBuild              PASS      29.95 seconds
-
-
-
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+v2: use 20ms as the unit to poll according to the requirement of
+    readx_poll_timeout
+v3: refine btusb_mtk_reset_done and drop the necessary error check
+    in btusb_mtk_cmd_timeout
+v4, v5: rebase onto the latest codebase
+---
+ drivers/bluetooth/btusb.c | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a8e2bb038f5..275e0666503d 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2566,8 +2566,6 @@ static int btusb_setup_realtek(struct hci_dev *hdev)
+ #define MTK_EP_RST_OPT		0x74011890
+ #define MTK_EP_RST_IN_OUT_OPT	0x00010001
+ #define MTK_BT_RST_DONE		0x00000100
+-#define MTK_BT_RESET_WAIT_MS	100
+-#define MTK_BT_RESET_NUM_TRIES	10
+ 
+ static void btusb_mtk_wmt_recv(struct urb *urb)
+ {
+@@ -2938,6 +2936,16 @@ static int btusb_mtk_id_get(struct btusb_data *data, u32 reg, u32 *id)
+ 	return btusb_mtk_reg_read(data, reg, id);
+ }
+ 
++static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	u32 val = 0;
++
++	btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
++
++	return val & MTK_BT_RST_DONE;
++}
++
+ static int btusb_mtk_setup(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -3127,7 +3135,7 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	u32 val;
+-	int err, retry = 0;
++	int err;
+ 
+ 	/* It's MediaTek specific bluetooth reset mechanism via USB */
+ 	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+@@ -3158,18 +3166,10 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+ 	btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
+ 	btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
+ 
+-	/* Poll the register until reset is completed */
+-	do {
+-		btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
+-		if (val & MTK_BT_RST_DONE) {
+-			bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+-			break;
+-		}
+-
+-		bt_dev_dbg(hdev, "Polling Bluetooth Reset CR");
+-		retry++;
+-		msleep(MTK_BT_RESET_WAIT_MS);
+-	} while (retry < MTK_BT_RESET_NUM_TRIES);
++	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
++				 val & MTK_BT_RST_DONE, 20000, 1000000);
++	if (err < 0)
++		bt_dev_err(hdev, "Reset timeout");
+ 
+ 	btusb_mtk_id_get(data, 0x70010200, &val);
+ 	if (!val)
+-- 
+2.25.1
 
---===============4141031182457227613==--
