@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72520C7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 16:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC81C77B7E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 16:22:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233869AbjEBQSX (ORCPT
+        id S233984AbjEBQWo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 May 2023 12:18:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47094 "EHLO
+        Tue, 2 May 2023 12:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233854AbjEBQSW (ORCPT
+        with ESMTP id S229457AbjEBQWl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 May 2023 12:18:22 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BBC1984
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 09:18:16 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2ab25e8a4a7so39674261fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 09:18:16 -0700 (PDT)
+        Tue, 2 May 2023 12:22:41 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8343410D8
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 09:22:17 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2a8bbea12d7so40309351fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 09:22:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683044295; x=1685636295;
+        d=gmail.com; s=20221208; t=1683044536; x=1685636536;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dWvsqDOsA3cc53eqEMTqO0Umsf+DzK5drqWkHB4m/4o=;
-        b=qNEK5tIipJNrkEtGDdEo9T1W2ntjbW25tCK28xLU2cRJl4quIta71fsj6zAlgUO1fx
-         3gu6GB4opc7IaW33WcWLCv9DDmR8OWeVp9G9E7V3OY8mpGlltRom5dV4AuL1myRM9q1R
-         5tRRYrMyNYQvbbKb5Uq57s/GAaB+4m8oDIOTcqMzs83IIlePKwxQUR3uovQEf3otRMaU
-         YHsgf031s1VGRzdx22zL8QtCpEu16ztu94aS56CQOTiyIjdPREQpuTnVKCvQeFgR4ffL
-         2XFxnfGPdMvwNc7+n4r/LoreXTmvi10xjse9y2L9ftfMRunZzWURQiJ5IzgA72VeofR6
-         /lyA==
+        bh=b/NXhqQM3SFvQn4lhet+X4fvOmMKReAyLzS7MIS5Ql4=;
+        b=ZjkRQlsarJpsbU9NHzhM0OWQtArlbzDDZVFu636WrWBC/E9FkDqG7akU30+XE4TbmM
+         xyOjOncjmM5IVfYPzr6WX0xzNj60bEYBTi51Ptw4VgRK7K4f4PU7nimTXtrVVEf1jc61
+         tzCjygAFAeFETa71QSj5moUTVt2YYZ5//vDKyjD/bSF/So5O8hsrkA+BOTa6WbdPVtC6
+         IP8q1wWOHe0MiEvSq1Y3BJZA2ea3C/orQS3PMcNXsX4JV0kC01EdTriDANJNl0LrZIZ3
+         o7RTy+fCMeRn7ARZDjuaMeL/Sj0Ex77PgVVAEfWQGy4nloynUjWE2G5uLgFGffXCgyYy
+         49Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683044295; x=1685636295;
+        d=1e100.net; s=20221208; t=1683044536; x=1685636536;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dWvsqDOsA3cc53eqEMTqO0Umsf+DzK5drqWkHB4m/4o=;
-        b=mAYS6aapYD3eHj0wcogsA8rvcZ+MC4OW9z81xe7kxn3NBVqxafznG9i+TtYKpFmJgI
-         WXFkJxwvcfC36tjGLDZzqXtKycjyJsKj3g0PPG0R+RwWP3nUfEiaXMhsf7LMbi/VHG8E
-         xW61mFwulOyHuDz/gEesujc5W7VWTrH8W8AOLW7d5kJYZULoVFxlTGJqFk/O17p2GOHC
-         LfR6/cyGU7gPaHRi6F2n3h77/kYXlw8uAPU8p1QtpA5/ffEcmdl+Y5On6KWU3lVialsC
-         09z87HG9nV6vtZitmSwPkhFYBnJLQaH+W0EvveS+Z2yzo0GEKCgkclfsR26Fke0ShOkN
-         rH+A==
-X-Gm-Message-State: AC+VfDyYKuOR8s0JfOyRPVRXbJZuP88O0papdQ0vLJgpQISH5vi7t9sW
-        1NTRZGDl/AVFljr+DsXcmTQnoATyE4rAkhdD0bpDXtX0
-X-Google-Smtp-Source: ACHHUZ7SDwm++I42qUZpB+3FcjyzfUTzuzHY9fWtabSYZO9RfLIfm9fKm8I68NLsK2iY88oGVMBh6By0EMmb55LbVgU=
-X-Received: by 2002:a2e:97c4:0:b0:2a8:ca28:e4e with SMTP id
- m4-20020a2e97c4000000b002a8ca280e4emr4871599ljj.24.1683044294683; Tue, 02 May
- 2023 09:18:14 -0700 (PDT)
+        bh=b/NXhqQM3SFvQn4lhet+X4fvOmMKReAyLzS7MIS5Ql4=;
+        b=a7mhLc06G1FlG28n7In8E+sBdtaV276Ga0MJuxro+ldnBKJORMwZw5lW+AwQGc1EJ2
+         rxN/cqZgnsrNJnj3GgNaxNbJFFwzvxD6vRSgj3QgtkrD79wSH4AiaAseMwG/jdu3bC1h
+         VhcbDNgfy/Zmjgu/RaMUgoTnsfZ21JLvdD5FMzxhUYgkqMsBemggY5FzYc3dvDXz5pML
+         5MdW9/hf0vsj1oubjw/O+vRpD77wczS3Kca7aF7ROLFwz0WFPe8oQNof9wagOeBqrbZC
+         yHbbv3XvIbMZCJd5v9sAXYrEr/UQKO1Ro4kby44jWX8pWOCCw+DSqHKC13i7GCdv24lk
+         FgTg==
+X-Gm-Message-State: AC+VfDyGgNy16l/z1KlJpjQd2t47fSGwOpEv8UDZFk3kE02v8tTl4Ryz
+        GWYbGziT+FTip2EAgzEgQnJFVASgny8hsuDpSfM=
+X-Google-Smtp-Source: ACHHUZ5aBr2CK2xO+1dFEOETUPN2mKrCQacQ51Lp3arf9YXMz6jJs8KBNUks7eOEeh5OD0AnHbwbDE9HLLvavzw+CnY=
+X-Received: by 2002:ac2:5df0:0:b0:4eb:3021:3a8f with SMTP id
+ z16-20020ac25df0000000b004eb30213a8fmr110205lfq.61.1683044535527; Tue, 02 May
+ 2023 09:22:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230502145737.140856-1-lrh2000@pku.edu.cn> <20230502145737.140856-7-lrh2000@pku.edu.cn>
-In-Reply-To: <20230502145737.140856-7-lrh2000@pku.edu.cn>
+References: <20230502145737.140856-1-lrh2000@pku.edu.cn> <20230502145737.140856-5-lrh2000@pku.edu.cn>
+In-Reply-To: <20230502145737.140856-5-lrh2000@pku.edu.cn>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 2 May 2023 09:18:02 -0700
-Message-ID: <CABBYNZJS3QLbCPizwaTaKmy13+34vNLFo2YMy2cMS3zwvVeZsw@mail.gmail.com>
-Subject: Re: [PATCH v3 6/6] Bluetooth: Avoid recursion in hci_conn_unlink
+Date:   Tue, 2 May 2023 09:22:03 -0700
+Message-ID: <CABBYNZK=N6kwhpa=v35T8ReyR6-1BEy-yEFtxGbYPJxeOB1S0w@mail.gmail.com>
+Subject: Re: [PATCH v3 4/6] Bluetooth: Perform hci_conn_drop in hci_conn_unlink
 To:     Ruihan Li <lrh2000@pku.edu.cn>
 Cc:     linux-bluetooth@vger.kernel.org,
         Marcel Holtmann <marcel@holtmann.org>,
@@ -70,108 +70,80 @@ Hi Ruihan,
 On Tue, May 2, 2023 at 7:57=E2=80=AFAM Ruihan Li <lrh2000@pku.edu.cn> wrote=
 :
 >
-> Previously, hci_conn_unlink was implemented as a recursion function. To
-> unlink physical connections (e.g. ACL/LE), it calls itself to unlink all
-> its logical channels (e.g. SCO/eSCO/ISO).
+> Since hci_conn_link invokes both hci_conn_get and hci_conn_hold,
+> hci_conn_unlink should perform both hci_conn_put and hci_conn_drop as
+> well. However, currently it performs only hci_conn_put.
 >
-> Recursion is not required. This patch refactors hci_conn_unlink into two
-> functions, where hci_conn_unlink_parent takes a physical connection,
-> checks out all its logical channels, and calls hci_conn_unlink_child for
-> each logical channel to unlink it.
+> This patch makes hci_conn_unlink call hci_conn_drop as well, which
+> simplifies the logic in hci_conn_del a bit and may benefit future users
+> of hci_conn_unlink. But it is noted that this change additionally
+> implies that hci_conn_unlink can queue disc_work on conn itself, with
+> the following call stack:
+>
+>         hci_conn_unlink(conn)  [conn->parent =3D=3D NULL]
+>                 -> hci_conn_unlink(child)  [child->parent =3D=3D conn]
+>                         -> hci_conn_drop(child->parent)
+>                                 -> queue_delayed_work(&conn->disc_work)
+>
+> Queued disc_work after hci_conn_del can be spurious, so during the
+> process of hci_conn_del, it is necessary to make the call to
+> cancel_delayed_work(&conn->disc_work) after invoking hci_conn_unlink.
 >
 > Signed-off-by: Ruihan Li <lrh2000@pku.edu.cn>
 > ---
->  net/bluetooth/hci_conn.c | 55 +++++++++++++++++++++++-----------------
->  1 file changed, 32 insertions(+), 23 deletions(-)
+>  net/bluetooth/hci_conn.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
 >
 > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index de553e062..243d68a64 100644
+> index eef148291..e76ebb50d 100644
 > --- a/net/bluetooth/hci_conn.c
 > +++ b/net/bluetooth/hci_conn.c
-> @@ -1074,34 +1074,13 @@ struct hci_conn *hci_conn_add(struct hci_dev *hde=
-v, int type, bdaddr_t *dst,
->         return conn;
->  }
->
-> -static void hci_conn_unlink(struct hci_conn *conn)
-> +static void hci_conn_unlink_parent(struct hci_conn *conn)
->  {
->         struct hci_dev *hdev =3D conn->hdev;
->
->         bt_dev_dbg(hdev, "hcon %p", conn);
->
-> -       if (!conn->parent) {
-> -               struct hci_link *link, *t;
-> -
-> -               list_for_each_entry_safe(link, t, &conn->link_list, list)=
- {
-> -                       struct hci_conn *child =3D link->conn;
-> -
-> -                       hci_conn_unlink(child);
-> -
-> -                       /* Due to race, SCO connection might be not estab=
-lished
-> -                        * yet at this point. Delete it now, otherwise it=
- is
-> -                        * possible for it to be stuck and can't be delet=
-ed.
-> -                        */
-> -                       if ((child->type =3D=3D SCO_LINK ||
-> -                            child->type =3D=3D ESCO_LINK) &&
-> -                           child->handle =3D=3D HCI_CONN_HANDLE_UNSET)
-> -                               hci_conn_del(child);
-> -               }
-> -
-> -               return;
-> -       }
-> -
-> -       if (!conn->link)
-> +       if (WARN_ON(!conn->link))
->                 return;
->
+> @@ -1105,6 +1105,7 @@ static void hci_conn_unlink(struct hci_conn *conn)
 >         list_del_rcu(&conn->link->list);
-> @@ -1115,6 +1094,36 @@ static void hci_conn_unlink(struct hci_conn *conn)
->         conn->link =3D NULL;
->  }
+>         synchronize_rcu();
 >
-> +static void hci_conn_unlink_children(struct hci_conn *conn)
-> +{
-> +       struct hci_dev *hdev =3D conn->hdev;
-> +       struct hci_link *link, *t;
-> +
-> +       bt_dev_dbg(hdev, "hcon %p", conn);
-> +
-> +       list_for_each_entry_safe(link, t, &conn->link_list, list) {
-> +               struct hci_conn *child =3D link->conn;
-> +
-> +               hci_conn_unlink_parent(child);
-> +
-> +               /* Due to race, SCO connection might be not established
-> +                * yet at this point. Delete it now, otherwise it is
-> +                * possible for it to be stuck and can't be deleted.
-> +                */
-> +               if (child->type =3D=3D SCO_LINK || child->type =3D=3D ESC=
-O_LINK)
-> +                       if (child->handle =3D=3D HCI_CONN_HANDLE_UNSET)
-> +                               hci_conn_del(child);
-> +       }
+> +       hci_conn_drop(conn->parent);
+>         hci_conn_put(conn->parent);
+>         conn->parent =3D NULL;
+>
+> @@ -1118,7 +1119,6 @@ void hci_conn_del(struct hci_conn *conn)
+>
+>         BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
+>
+> -       cancel_delayed_work_sync(&conn->disc_work);
+>         cancel_delayed_work_sync(&conn->auto_accept_work);
+>         cancel_delayed_work_sync(&conn->idle_work);
+>
+> @@ -1134,12 +1134,7 @@ void hci_conn_del(struct hci_conn *conn)
+>                 else
+>                         hdev->acl_cnt +=3D conn->sent;
+>         } else {
+> -               struct hci_conn *acl =3D conn->parent;
+> -
+> -               if (acl) {
+> -                       hci_conn_unlink(conn);
+> -                       hci_conn_drop(acl);
+> -               }
+> +               hci_conn_unlink(conn);
+>
+>                 /* Unacked ISO frames */
+>                 if (conn->type =3D=3D ISO_LINK) {
+> @@ -1152,6 +1147,11 @@ void hci_conn_del(struct hci_conn *conn)
+>                 }
+>         }
+>
+> +       /* hci_conn_unlink may trigger additional disc_work, so
+> +        * ensure to perform cancelling after that.
+> +        */
+> +       cancel_delayed_work_sync(&conn->disc_work);
 
-This is not quite right, when we are unlinking the children's hci_conn
-it shall only unlink itself from the parent not everything.
+Just merge the change where hci_conn_del calls hci_conn_unlink
+unconditionally so we don't have to do this change independently just
+to revert later.
 
-> +}
-> +
-> +static void hci_conn_unlink(struct hci_conn *conn)
-> +{
-> +       if (conn->parent)
-> +               hci_conn_unlink_parent(conn);
-> +       else
-> +               hci_conn_unlink_children(conn);
-> +}
-> +
->  void hci_conn_del(struct hci_conn *conn)
->  {
->         struct hci_dev *hdev =3D conn->hdev;
+>         if (conn->amp_mgr)
+>                 amp_mgr_put(conn->amp_mgr);
+>
 > --
 > 2.40.0
 >
