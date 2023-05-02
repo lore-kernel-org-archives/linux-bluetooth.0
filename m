@@ -2,92 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC3DC77B75
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 22:12:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D607FC19F20
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 22:58:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229487AbjEBWMU (ORCPT
+        id S229824AbjEBW6S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 May 2023 18:12:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46996 "EHLO
+        Tue, 2 May 2023 18:58:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjEBWMT (ORCPT
+        with ESMTP id S230007AbjEBW6Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 May 2023 18:12:19 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073302D4E
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 15:12:03 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1ab0c697c84so10373375ad.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 15:12:02 -0700 (PDT)
+        Tue, 2 May 2023 18:58:16 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD733589
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 15:57:45 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id e9e14a558f8ab-32c83c66b1cso35405455ab.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 15:57:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683065521; x=1685657521;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v7lDS/DUVufJhsyLLgo2/B8BZ79r25vTsYHDbB/n2g8=;
-        b=hO0RzYvYy4WhhnNbEeBavLJu7OD72u+msKLbwjmY83nUpOiKIJnY5YZoM42IZhR+2V
-         caLtwpk18IvKlIO14Oh+OxaMwnmXhM2DLelAXltrvzYJe8WVSiXKzlC7KFUqoo4sO4Dp
-         wV0KR4YIMLQxzop3VPsZVEHNI1sBZu/dVXLqZRoy5rhLjTIJ5FlG2M8YEhUu3b+ZjKzr
-         A2SQtXN7Je6fFyIHq6HKf52X9P6ki02fCDM4wgEcfKfncDbaXzbECFJ7VbrekZwQhjzy
-         e/LHpHhYNI9qETL7xtDJRCPjTg5c5di4TbY/cv74DicsXgKQrztttomoBDbFVbHNb/TB
-         2DaQ==
+        d=gmail.com; s=20221208; t=1683068217; x=1685660217;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NkOCkM4QfdvL1aqFpHzcgcKsi2Sh2T4skl+W9h++o2o=;
+        b=rU81dYGIo0xx3w//WNePIyriGeDOi/HSu9IjfXPp5VzmIFrXE5GX3iG5L5PeClU2La
+         HKEZic/Q7twldOx+xEt2yenOnhQHCFwiszUYRdYUnigAw/UyXY7d3MJZamNIEtw2Z3iI
+         PbbpEPB+5k5rVJXh0UqoKiUyuRz/0M4Ho/5GCZUNFNAtnopuA5tx9eQg44lpRKi+aXGE
+         2EgXIIaOSefdghHwbH4cfAxwUrbdQYaXma1nsK2jZVcFt8TB/20n9fG6I3GOXK170bgc
+         HX4X/Aj5uYghkIUXW7FyBWesr9WYRMAIVbqaTRyQy7d3H25/tQdzTyVwJtKDqRWJ9bOW
+         cKdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683065521; x=1685657521;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v7lDS/DUVufJhsyLLgo2/B8BZ79r25vTsYHDbB/n2g8=;
-        b=MXH/Y2xxoURa3eV5Z8qoe81gMQGoKZkRtvqF2+nr/9MnnnHcRw/MdZoyr3xZhynjxV
-         o3aAf8StJhlibFRlkYJ8oTrp8ZCvqMsprwM31j0jtWRrmSwFgTaqJoNXhHWcwWabaXCS
-         ohRPZR4ufGWP11GZuW14h+dJfpa0MRTMpFbBtn2E4iyvM5DCEkSEOGNYw+ixVmpW08aI
-         ZkNRRN2McPHH6Uisd62ixE7AcbpmS4NfXsQphw5lA63G1SP2H0hCXxyHZrpEJTSWcFNI
-         DqvrHCY/Uk6K5x4SIik+DkdUF8MsaK2DIOOR0O34VIv98451N9LixwHCqjREqj5GyWtD
-         qDQw==
-X-Gm-Message-State: AC+VfDznM1lCLHZrTeJYCokqvzQj+IgwUO8oip0KYQ6nywRLxfKYjo6c
-        VMZJsMH1Hj66bGFnHFlAyOinTkh8uUw=
-X-Google-Smtp-Source: ACHHUZ5/STWbEWxMNShn/YttRBHSgXlSteEJsspPH7YzQOmIu+OFBUhxppdIu93rjoGVLJT4JS5CjA==
-X-Received: by 2002:a17:902:d50c:b0:1a9:98ae:5970 with SMTP id b12-20020a170902d50c00b001a998ae5970mr30734plg.23.1683065521366;
-        Tue, 02 May 2023 15:12:01 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id q18-20020a170902bd9200b001ab0672fc1fsm2258122pls.105.2023.05.02.15.12.00
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1683068217; x=1685660217;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NkOCkM4QfdvL1aqFpHzcgcKsi2Sh2T4skl+W9h++o2o=;
+        b=PZzLpoLMgxF+Wm1NAxDti33XrAQM1PB+RQkUqhNn3+wuC+QiH6Ia7dCoBdCvWK3jnc
+         T9Miih0g/tJx/ceNATtbguvemS6GPwzQDaUOseZyrUbGXUY80xuRttwT/TvCJVMXsLBc
+         IODZSdfLI+JeMTrXRsDCNDB3HBt7zZWLYDbSt3IED1wa285DyENSl4PzZmuZl92tEfiz
+         waM8nhUW5CyxCcKn65Q3HXL8jwfQB4X9WqRvJELzlnKMSex4Wnt9bsItA9JZThlTOJVy
+         XwQ6ZkemLiJEWW5NaurrXF3U0cunipmZKWXrXwuBqra+hVDnWJyL+rcXwgSq7Am7lZQ7
+         +0qg==
+X-Gm-Message-State: AC+VfDzo928R9rmLINATdbBRy1iwQ+MclnpmZR7LHl1CYrTuHAomvzRD
+        D3Zg6y5c9XIFx5Y8fM4nCrSkATiPxss=
+X-Google-Smtp-Source: ACHHUZ7V+54RIx1rtgn8Bl5uFdIUPsP/kdmndZ2jAUwCipdhDLwChRak041lDvVA87le65js4UR2oA==
+X-Received: by 2002:a92:c68f:0:b0:326:2b56:3cf5 with SMTP id o15-20020a92c68f000000b003262b563cf5mr13509070ilg.22.1683068217160;
+        Tue, 02 May 2023 15:56:57 -0700 (PDT)
+Received: from [172.17.0.2] ([40.86.28.135])
+        by smtp.gmail.com with ESMTPSA id 3-20020a056e020ca300b003261422fdbcsm8439796ilg.80.2023.05.02.15.56.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 15:12:00 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Don't suspend when there are connections
-Date:   Tue,  2 May 2023 15:11:59 -0700
-Message-Id: <20230502221159.1674607-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.0
+        Tue, 02 May 2023 15:56:56 -0700 (PDT)
+Message-ID: <64519538.050a0220.eeccd.aa15@mx.google.com>
+Date:   Tue, 02 May 2023 15:56:56 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4141031182457227613=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3] Bluetooth: btusb: Don't suspend when there are connections
+In-Reply-To: <20230502221159.1674607-1-luiz.dentz@gmail.com>
+References: <20230502221159.1674607-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4141031182457227613==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This checks if there are connections before suspending since that may
-disrupt the connections making it stop receiving any data if remote
-wakeup is not enabled.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744511
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.62 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      33.02 seconds
+CheckAllWarning               PASS      35.87 seconds
+CheckSparse                   PASS      40.95 seconds
+CheckSmatch                   PASS      110.81 seconds
+BuildKernel32                 PASS      31.59 seconds
+TestRunnerSetup               PASS      449.98 seconds
+TestRunner_l2cap-tester       PASS      17.48 seconds
+TestRunner_iso-tester         PASS      21.46 seconds
+TestRunner_bnep-tester        PASS      5.73 seconds
+TestRunner_mgmt-tester        PASS      116.60 seconds
+TestRunner_rfcomm-tester      PASS      9.08 seconds
+TestRunner_sco-tester         PASS      8.39 seconds
+TestRunner_ioctl-tester       PASS      9.83 seconds
+TestRunner_mesh-tester        PASS      7.29 seconds
+TestRunner_smp-tester         PASS      8.30 seconds
+TestRunner_userchan-tester    PASS      5.98 seconds
+IncrementalBuild              PASS      29.95 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2a8e2bb038f5..dcf1c4f5042b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4523,6 +4523,10 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 
- 	BT_DBG("intf %p", intf);
- 
-+	/* Don't suspend if there are connections */
-+	if (hci_conn_count(data->hdev))
-+		return -EBUSY;
-+
- 	if (data->suspend_count++)
- 		return 0;
- 
--- 
-2.40.0
 
+--===============4141031182457227613==--
