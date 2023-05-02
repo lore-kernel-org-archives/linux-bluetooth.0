@@ -2,129 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8363C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 01:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E533C77B7E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 04:22:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232490AbjEBBcM (ORCPT
+        id S230484AbjEBEWp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 May 2023 21:32:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34226 "EHLO
+        Tue, 2 May 2023 00:22:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbjEBBcK (ORCPT
+        with ESMTP id S229586AbjEBEWo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 May 2023 21:32:10 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21C161BEF
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 May 2023 18:32:09 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-63b4e5fdb1eso3703548b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 May 2023 18:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1682991128; x=1685583128;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y0rq5fO4pn1ikP+6FczohggTsv1Jy0IYHBlFQlmbzD0=;
-        b=JK1OZDKZU6DUdIZCV+S7/AKcN1fVt5Tdkcornj2j1REfOWchEelTpPhdEtZsyP0vrt
-         T8Iuueer0BYZfprhw8v8QtPp8ACt3w2ogVz7tIYhSXD5xbpXoXyrRZGZjyneO9LKjME1
-         0zuIlfCxMgWCTEQVdazI102rR5K4ei6XOb7X3wSO6hcHKSClsMrCm1JaFcwvDjXYNMXS
-         1s6N3DLK9uUm2ltUQmrsNrogUnRmBapHeAb+bS3xQniI8QA7nsPYTIiLnuJ15nWOL1hM
-         75KS0r539uYHCip6NBEDds9kYCU6yJg+Y0sn4BDslWGheQv1sBmCsaKJy5+IxCwcDk4E
-         8iZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1682991128; x=1685583128;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y0rq5fO4pn1ikP+6FczohggTsv1Jy0IYHBlFQlmbzD0=;
-        b=C7BkAJFvxi0xJQkSvwDnELdx160cWlZseK90vXGPEPLHQm4K48NB0z6mQ1DvQVv2NV
-         uNKDQ78vcmrfSi9vO2Af0MdMRL8qpcDJrxbINEgvAOK6tabbTOzgTcaj+esMvT3glEFs
-         2B5LLmKnU/K34UNFgjnkfunTUx+gT6niNNuXKaM2i/bdgk66ccuvN8oe7gloTfUrep2W
-         cq+r8HfCvjPlbJJTcc2NDwj4JT0CUFUwXbYDpqj5qWi9/q3ZP6HrusL/2+gejXl6U0hl
-         +DgPlH8CCsNt1G00V1wdwiYj1c1n77ywkviAMEprPT7F7a8+O5cR15wlPRVku4sNWo+x
-         lQUg==
-X-Gm-Message-State: AC+VfDyQrGX+JM7EavVNMTjDWqA8fixA461vYefeFX+P0q6BhUSVV8Eb
-        WNoqBqaHpyDRAhxWZq47MxpKuNuhh4g=
-X-Google-Smtp-Source: ACHHUZ6Mr5I2lfD1/zQBuD0Lk/DPXBCD5iEsAjqNQVoUS9lBh5n9S6be5mnIcdZjxe7/PZ2FHeQhMA==
-X-Received: by 2002:a05:6a00:2e1a:b0:5a8:aca5:817d with SMTP id fc26-20020a056a002e1a00b005a8aca5817dmr23399660pfb.5.1682991128276;
-        Mon, 01 May 2023 18:32:08 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.5.200])
-        by smtp.gmail.com with ESMTPSA id 188-20020a6219c5000000b00640e01dfba0sm14142266pfz.175.2023.05.01.18.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 May 2023 18:32:07 -0700 (PDT)
-Message-ID: <64506817.620a0220.1bf91.dbfc@mx.google.com>
-Date:   Mon, 01 May 2023 18:32:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0120475352813642945=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,1/4] client/player: Add support for Metadata in BAP Profile
-In-Reply-To: <20230501224410.1119023-1-luiz.dentz@gmail.com>
-References: <20230501224410.1119023-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+        Tue, 2 May 2023 00:22:44 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47022702;
+        Mon,  1 May 2023 21:22:43 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3424Gocw023660;
+        Tue, 2 May 2023 04:22:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id; s=qcppdkim1;
+ bh=BAI2pSNXMZu9fQ6IMOP1IqPcHZ2SOkxNhVQAdj8f1/c=;
+ b=brwJKGXxI+CkHExJPl8m186mffgc1Nzd2g26wtC2V3VgDBh0ZBPEiNoUz3X2H9uu4+7K
+ Q7smXuokEP4hF2Wi391Tqczubb6WLJ1UAA1E81lhv0KkBH8XqAe2OCF8A69IwkhAA/KP
+ mCt2cd57wM5cx3K+ZMS9dkFEjAtQEFAB+Cq4tH9xzrMmWdlUxezS40a/md7Jt90x3oGt
+ T23vWpIY2wOEwaBae1MItrxEq94U+06U1D83FFq2LwO6/r9w7cU8pdERDnlCvJuI7hXq
+ 0PkXqwVW++Qsbqxoa1ixsHa4tucwVGMwrl5UtCiPcvefd/tCX9UKL/mpBSI5Egiw+DmI 7A== 
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3q8vhgw8hm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 02 May 2023 04:22:38 +0000
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+        by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 3424MXZG008220;
+        Tue, 2 May 2023 04:22:33 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3q8vaks3ca-1;
+        Tue, 02 May 2023 04:22:33 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3424MXZo008213;
+        Tue, 2 May 2023 04:22:33 GMT
+Received: from hyd-lablnx377.qualcomm.com (hyd-lablnx377.qualcomm.com [10.204.178.226])
+        by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 3424MXE7008211;
+        Tue, 02 May 2023 04:22:33 +0000
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id 8EB8B20B88; Tue,  2 May 2023 09:52:32 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
+        jiangzp@google.com, mmandlik@google.com,
+        Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH v2 1/2] Bluetooth: hci_qca: Add qcomm devcoredump sysfs support
+Date:   Tue,  2 May 2023 09:52:12 +0530
+Message-Id: <1683001332-29777-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: zzweEfxt8GraypYnhyDiL3OZnj20lsDt
+X-Proofpoint-ORIG-GUID: zzweEfxt8GraypYnhyDiL3OZnj20lsDt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.942,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-02_02,2023-04-27_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ suspectscore=0 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
+ mlxlogscore=999 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2303200000 definitions=main-2305020036
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0120475352813642945==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch implements the hci_qca driver side .coredump() callback to
+trigger a devcoredump via sysfs and .enable_coredump() callback to
+check if the devcoredump functionality is enabled for a device.
 
-This is automated email and please do not reply to this email!
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Reviewed-by: Manish Mandlik <mmandlik@google.com>
 
-Dear submitter,
+V2:
+--
+Updated to work with the updated HCI devcoredump API. 
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744260
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.24 seconds
-GitLint                       PASS      1.13 seconds
-BuildEll                      PASS      37.12 seconds
-BluezMake                     PASS      1257.00 seconds
-MakeCheck                     PASS      13.05 seconds
-MakeDistcheck                 PASS      204.41 seconds
-CheckValgrind                 PASS      328.74 seconds
-CheckSmatch                   WARNING   455.54 seconds
-bluezmakeextell               PASS      137.58 seconds
-IncrementalBuild              PASS      4310.09 seconds
-ScanBuild                     PASS      1440.05 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v3,4/4] shared/shell: Fix smatch warning
-WARNING:EMAIL_SUBJECT: A patch subject line should describe the change not the tool that found it
-#72: 
-Subject: [BlueZ PATCH v3 4/4] shared/shell: Fix smatch warning
-
-/github/workspace/src/src/13228364.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13228364.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
-
+V1:
+--
+Initial Patch
 
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_qca.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1b06450..ca98f6d 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2380,6 +2380,18 @@ static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, qca_bluetooth_acpi_match);
+ #endif
+ 
++#ifdef CONFIG_DEV_COREDUMP
++static void hciqca_coredump(struct device *dev)
++{
++	struct serdev_device *serdev = to_serdev_device(dev);
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++	struct hci_uart *hu = &qcadev->serdev_hu;
++	struct hci_dev  *hdev = hu->hdev;
++
++	if (hdev->dump.coredump)
++		hdev->dump.coredump(hdev);
++}
++#endif
+ 
+ static struct serdev_device_driver qca_serdev_driver = {
+ 	.probe = qca_serdev_probe,
+@@ -2390,6 +2402,9 @@ static struct serdev_device_driver qca_serdev_driver = {
+ 		.acpi_match_table = ACPI_PTR(qca_bluetooth_acpi_match),
+ 		.shutdown = qca_serdev_shutdown,
+ 		.pm = &qca_pm_ops,
++#ifdef CONFIG_DEV_COREDUMP
++		.coredump = hciqca_coredump,
++#endif
+ 	},
+ };
+ 
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
---===============0120475352813642945==--
