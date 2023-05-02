@@ -2,182 +2,231 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D929C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 21:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B399C19F20
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 May 2023 21:57:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229891AbjEBVZi (ORCPT
+        id S229539AbjEBV5n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 May 2023 17:25:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
+        Tue, 2 May 2023 17:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229889AbjEBVZh (ORCPT
+        with ESMTP id S229458AbjEBV5m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 May 2023 17:25:37 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4613010EF
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 14:25:36 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64115e652eeso367782b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 14:25:36 -0700 (PDT)
+        Tue, 2 May 2023 17:57:42 -0400
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 813151704
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 May 2023 14:57:40 -0700 (PDT)
+Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-3f0b299d739so20782771cf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 May 2023 14:57:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683062735; x=1685654735;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5Ka/SwIDHwEHrJuqFX1XIh48oMlHgMa3gOezG3it4Bk=;
-        b=Zgvi5vPCxzCrmjN49/vGxfjzHtxRrYNcse/MjRqB13tFz1VNH81l4CxErXEKqxzKvX
-         nFasVU2+FjAA383J7Ov3e4c5boylFFItnBwq004ejmBsy7427DE7wa+ukKeJROURDRgm
-         r59FnXUi13mpmAZ1s3EM2ocvRa39YpXEkH85mU69azxvRXc/ZivnnzcA4RBCSdCWK7Zb
-         VqGBT+SfKEC0YvgAYod1JzQq12nhLgdWpH9mCJlhHpJCpUWB3jz+++W1H6Tvm8/IPcdI
-         Qd5ohI3FpsKAK0njXYKDinRR16x+BOI0jdvs9HcTIkbOenVE1yY+x0wxpp6WaS9kInCW
-         7moQ==
+        d=gmail.com; s=20221208; t=1683064659; x=1685656659;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pMGVUKrj3uT/NUePyWsHuEnttSo1QVfGGZ0dNz90jZI=;
+        b=dTZwlI705WziNoeQh4oHsVRnV0fG4oTNfCxv0JXkCmv/Cbyebo8mslDG/EMfZXvK1K
+         PxbMEGH7XMGuZg41ODmmrCdkAsdaEeBYlo7A19jd0iChMQn4sevyp3w1SLDvtRCS8TpA
+         nSFvgTwXPw9zWCz81rAt5zzxXoQWT7+vNKwp1dHRI0vvYeamFjcdLnafPLPomUJWl1iN
+         IaEqPwd1Kygudaxmy83jSkUWKAEM+StPaVbHU+/ltUI04EIABizcrmrPMYvrW0naULqF
+         VPt5/AjR8e1tZ/ZfC3N2rAnj5WNGBVc+aOvpeI4hKPDois2JrGl8b+SRpGZwicLBgpHm
+         d1Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683062735; x=1685654735;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Ka/SwIDHwEHrJuqFX1XIh48oMlHgMa3gOezG3it4Bk=;
-        b=A3PV3x6ssk+OB47nngZmGEw/y8DfKFdNitz8zqJcegLrd6HzzJp874DBkG8bujTp2B
-         sBt41qSwuJHkOckZXwTrPoWZ81yRSSjARsMKP/ekXOFsF2SngU5opTpRlUi0e9gB0MNi
-         0kRUdY6m7XTydnzm+hK6vwJXww2uviBh94wG61mLYmrq/t5FtvqMejPkDMgiwurOzDFU
-         I7KDn18VUQKroUldkUWLV2ZsCNCpp+AKEB5eqOVvgKg9G2zQVz7HXG8bHhbL41mRPchu
-         x4C2HT2TrNqdNDCynR0hY/k9xSupJVMTumlsxEj8Jku8T+VwZskPATMn6gxGkMPn7WBw
-         XSHw==
-X-Gm-Message-State: AC+VfDz9FR5h+EIRTupZ+88UwNCx3GfaYv6qamO4m5H9fcUeYLrg1W2F
-        Qt1PzHcHAdXYCGG/l21c4gxIc4VgP8s=
-X-Google-Smtp-Source: ACHHUZ5rbCWi3v268uIKpLBOMI91xKpYfxl/TjVKmX8X+YNs3wVLaUkgNWUijTVLD2H9lEPBN/wPxg==
-X-Received: by 2002:aa7:8b49:0:b0:63f:32ed:92b1 with SMTP id i9-20020aa78b49000000b0063f32ed92b1mr20353403pfd.7.1683062734955;
-        Tue, 02 May 2023 14:25:34 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id j9-20020a056a00234900b0063d3d776910sm22232459pfj.138.2023.05.02.14.25.33
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1683064659; x=1685656659;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pMGVUKrj3uT/NUePyWsHuEnttSo1QVfGGZ0dNz90jZI=;
+        b=KLr4Bkieh/Z4hgl+RubUarXYPkc9LxKau+xZricn0OJVQ0yOShAxqziVoJrjPzGR66
+         DwgaaUwO0TXgxYHiAomI/oMCHYggVEtITswZrCpStH36RAMzoVpRIYs7iEgNInFaFChB
+         LPiBkyFxow7iEonI3ZsZIcMltlqE/3Z4Ibfss8hqQsoY2OiBLXD0dCKFFlxMXRO0fKPs
+         fynwyxwPQrDgzSjPmqLT1i6V2GSWhybiaaCX6xr6WPAnltSIoyH/6V3j8Mp6DnulEBC0
+         f4P3gI2t6ScSZAnXI1Lf2yCiCfsoPvFBkaX3NfYAYBVtrrYF2mYU8AECFuJUwYRhuSiC
+         QHsQ==
+X-Gm-Message-State: AC+VfDwIMROykoaYQwH6Uq7thDlKFocmsTRTgZ141YHGqPAyiTZbWNaP
+        OJG4J7/ppfscmMa7Po5eFyHIg7gMHhSH3A==
+X-Google-Smtp-Source: ACHHUZ4qBgrlaog3OtPkgaB4Fp/L35UFds3Tl9j8jqkF9f9qjEbNp5p9GOcRxPonQPF28IOcD4mzvg==
+X-Received: by 2002:a05:622a:1a11:b0:3e9:bca:8c2b with SMTP id f17-20020a05622a1a1100b003e90bca8c2bmr30571136qtb.9.1683064659382;
+        Tue, 02 May 2023 14:57:39 -0700 (PDT)
+Received: from [172.17.0.2] ([20.49.37.21])
+        by smtp.gmail.com with ESMTPSA id bp41-20020a05620a45a900b00748613be2adsm10009444qkb.70.2023.05.02.14.57.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 May 2023 14:25:33 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 4/4] Bluetooth: Unlink CISes when LE disconnects in hci_conn_del
-Date:   Tue,  2 May 2023 14:25:27 -0700
-Message-Id: <20230502212527.1662896-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.0
+        Tue, 02 May 2023 14:57:38 -0700 (PDT)
+Message-ID: <64518752.050a0220.9ec55.82e7@mx.google.com>
+Date:   Tue, 02 May 2023 14:57:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6785229507280676602=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3,1/4] Bluetooth: Fix potential double free caused by hci_conn_unlink
 In-Reply-To: <20230502212527.1662896-1-luiz.dentz@gmail.com>
 References: <20230502212527.1662896-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6785229507280676602==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Currently, hci_conn_del calls hci_conn_unlink for BR/EDR, (e)SCO, and
-CIS connections, i.e., everything except LE connections. However, if
-(e)SCO connections are unlinked when BR/EDR disconnects, CIS connections
-should also be unlinked when LE disconnects.
+This is automated email and please do not reply to this email!
 
-In terms of disconnection behavior, CIS and (e)SCO connections are not
-too different. One peculiarity of CIS is that when CIS connections are
-disconnected, the CIS handle isn't deleted, as per [BLUETOOTH CORE
-SPECIFICATION Version 5.4 | Vol 4, Part E] 7.1.6 Disconnect command:
+Dear submitter,
 
-        All SCO, eSCO, and CIS connections on a physical link should be
-        disconnected before the ACL connection on the same physical
-        connection is disconnected. If it does not, they will be
-        implicitly disconnected as part of the ACL disconnection.
-        ...
-        Note: As specified in Section 7.7.5, on the Central, the handle
-        for a CIS remains valid even after disconnection and, therefore,
-        the Host can recreate a disconnected CIS at a later point in
-        time using the same connection handle.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=744510
 
-Since hci_conn_link invokes both hci_conn_get and hci_conn_hold,
-hci_conn_unlink should perform both hci_conn_put and hci_conn_drop as
-well. However, currently it performs only hci_conn_put.
+---Test result---
 
-This patch makes hci_conn_unlink call hci_conn_drop as well, which
-simplifies the logic in hci_conn_del a bit and may benefit future users
-of hci_conn_unlink. But it is noted that this change additionally
-implies that hci_conn_unlink can queue disc_work on conn itself, with
-the following call stack:
+Test Summary:
+CheckPatch                    FAIL      3.26 seconds
+GitLint                       FAIL      1.65 seconds
+SubjectPrefix                 PASS      0.54 seconds
+BuildKernel                   PASS      32.65 seconds
+CheckAllWarning               PASS      35.59 seconds
+CheckSparse                   PASS      40.56 seconds
+CheckSmatch                   PASS      112.78 seconds
+BuildKernel32                 PASS      31.49 seconds
+TestRunnerSetup               PASS      449.26 seconds
+TestRunner_l2cap-tester       PASS      16.56 seconds
+TestRunner_iso-tester         PASS      20.36 seconds
+TestRunner_bnep-tester        PASS      5.37 seconds
+TestRunner_mgmt-tester        PASS      111.98 seconds
+TestRunner_rfcomm-tester      PASS      8.60 seconds
+TestRunner_sco-tester         PASS      7.92 seconds
+TestRunner_ioctl-tester       PASS      9.26 seconds
+TestRunner_mesh-tester        PASS      6.79 seconds
+TestRunner_smp-tester         PASS      7.88 seconds
+TestRunner_userchan-tester    PASS      5.66 seconds
+IncrementalBuild              PASS      66.92 seconds
 
-        hci_conn_unlink(conn)  [conn->parent == NULL]
-                -> hci_conn_unlink(child)  [child->parent == conn]
-                        -> hci_conn_drop(child->parent)
-                                -> queue_delayed_work(&conn->disc_work)
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v3,1/4] Bluetooth: Fix potential double free caused by hci_conn_unlink
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#91: 
+Reported-by: syzbot+690b90b14f14f43f4688@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000484a8205faafe216@google.com/
 
-Queued disc_work after hci_conn_del can be spurious, so during the
-process of hci_conn_del, it is necessary to make the call to
-cancel_delayed_work(&conn->disc_work) after invoking hci_conn_unlink.
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#92: 
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000484a8205faafe216@google.com/
 
-Signed-off-by: Ruihan Li <lrh2000@pku.edu.cn>
+WARNING: Unknown link reference 'Closes:', use 'Link:' instead
+#92: 
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000484a8205faafe216@google.com/
+
+WARNING: Duplicate signature
+#95: 
+Reported-by: syzbot+690b90b14f14f43f4688@syzkaller.appspotmail.com
+
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#95: 
+Reported-by: syzbot+690b90b14f14f43f4688@syzkaller.appspotmail.com
+Reported-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#96: 
+Reported-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Reported-by: syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com
+
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#97: 
+Reported-by: syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+total: 0 errors, 7 warnings, 0 checks, 33 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13229309.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v3,2/4] Bluetooth: Refcnt drop must be placed last in hci_conn_unlink
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#95: 
+Reported-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Closes: https://lore.kernel.org/linux-bluetooth/CABBYNZ+1kce8_RJrLNOXd_8=Mdpb=2bx4Nto-hFORk=qiOkoCg@mail.gmail.com/
+
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#96: 
+Closes: https://lore.kernel.org/linux-bluetooth/CABBYNZ+1kce8_RJrLNOXd_8=Mdpb=2bx4Nto-hFORk=qiOkoCg@mail.gmail.com/
+
+WARNING: Unknown link reference 'Closes:', use 'Link:' instead
+#96: 
+Closes: https://lore.kernel.org/linux-bluetooth/CABBYNZ+1kce8_RJrLNOXd_8=Mdpb=2bx4Nto-hFORk=qiOkoCg@mail.gmail.com/
+
+total: 0 errors, 3 warnings, 0 checks, 15 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13229310.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[v3,3/4] Bluetooth: Fix UAF in hci_conn_hash_flush again
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#105: 
+Reported-by: syzbot+8bb72f86fc823817bc5d@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000aa920505f60d25ad@google.com/
+
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#106: 
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000aa920505f60d25ad@google.com/
+
+WARNING: Unknown link reference 'Closes:', use 'Link:' instead
+#106: 
+Closes: https://lore.kernel.org/linux-bluetooth/000000000000aa920505f60d25ad@google.com/
+
+total: 0 errors, 3 warnings, 0 checks, 73 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13229311.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3,1/4] Bluetooth: Fix potential double free caused by hci_conn_unlink
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+15: B1 Line exceeds max length (88>80): "Closes: https://lore.kernel.org/linux-bluetooth/000000000000484a8205faafe216@google.com/"
+[v3,2/4] Bluetooth: Refcnt drop must be placed last in hci_conn_unlink
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+15: B1 Line exceeds max length (115>80): "Closes: https://lore.kernel.org/linux-bluetooth/CABBYNZ+1kce8_RJrLNOXd_8=Mdpb=2bx4Nto-hFORk=qiOkoCg@mail.gmail.com/"
+[v3,3/4] Bluetooth: Fix UAF in hci_conn_hash_flush again
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+26: B1 Line exceeds max length (88>80): "Closes: https://lore.kernel.org/linux-bluetooth/000000000000aa920505f60d25ad@google.com/"
+
+
 ---
- net/bluetooth/hci_conn.c | 21 ++++++---------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ce588359b290..f75ef12f18f7 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1100,7 +1100,9 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 			 * yet at this point. Delete it now, otherwise it is
- 			 * possible for it to be stuck and can't be deleted.
- 			 */
--			if (child->handle == HCI_CONN_HANDLE_UNSET)
-+			if ((child->type == SCO_LINK ||
-+			     child->type == ESCO_LINK) &&
-+			    child->handle == HCI_CONN_HANDLE_UNSET)
- 				hci_conn_del(child);
- 		}
- 
-@@ -1113,6 +1115,7 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 	list_del_rcu(&conn->link->list);
- 	synchronize_rcu();
- 
-+	hci_conn_drop(conn->parent);
- 	hci_conn_put(conn->parent);
- 	conn->parent = NULL;
- 
-@@ -1126,12 +1129,13 @@ void hci_conn_del(struct hci_conn *conn)
- 
- 	BT_DBG("%s hcon %p handle %d", hdev->name, conn, conn->handle);
- 
-+	hci_conn_unlink(conn);
-+
- 	cancel_delayed_work_sync(&conn->disc_work);
- 	cancel_delayed_work_sync(&conn->auto_accept_work);
- 	cancel_delayed_work_sync(&conn->idle_work);
- 
- 	if (conn->type == ACL_LINK) {
--		hci_conn_unlink(conn);
- 		/* Unacked frames */
- 		hdev->acl_cnt += conn->sent;
- 	} else if (conn->type == LE_LINK) {
-@@ -1142,13 +1146,6 @@ void hci_conn_del(struct hci_conn *conn)
- 		else
- 			hdev->acl_cnt += conn->sent;
- 	} else {
--		struct hci_conn *acl = conn->parent;
--
--		if (acl) {
--			hci_conn_unlink(conn);
--			hci_conn_drop(acl);
--		}
--
- 		/* Unacked ISO frames */
- 		if (conn->type == ISO_LINK) {
- 			if (hdev->iso_pkts)
-@@ -2485,12 +2482,6 @@ void hci_conn_hash_flush(struct hci_dev *hdev)
- 						list)) != NULL) {
- 		conn->state = BT_CLOSED;
- 		hci_disconn_cfm(conn, HCI_ERROR_LOCAL_HOST_TERM);
--
--		/* Unlink before deleting otherwise it is possible that
--		 * hci_conn_del removes the link which may cause the list to
--		 * contain items already freed.
--		 */
--		hci_conn_unlink(conn);
- 		hci_conn_del(conn);
- 	}
- }
--- 
-2.40.0
 
+--===============6785229507280676602==--
