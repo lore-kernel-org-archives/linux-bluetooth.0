@@ -2,128 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019BBC77B7F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 May 2023 07:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFEB7C77B78
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 May 2023 07:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbjECHEp (ORCPT
+        id S229642AbjECH4J (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 May 2023 03:04:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50326 "EHLO
+        Wed, 3 May 2023 03:56:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbjECHEp (ORCPT
+        with ESMTP id S229625AbjECHzy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 May 2023 03:04:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA64E269D;
-        Wed,  3 May 2023 00:04:43 -0700 (PDT)
+        Wed, 3 May 2023 03:55:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FC919A8;
+        Wed,  3 May 2023 00:55:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 63A8160AF8;
-        Wed,  3 May 2023 07:04:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEA42C433EF;
-        Wed,  3 May 2023 07:04:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5003862B46;
+        Wed,  3 May 2023 07:55:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2E66C433EF;
+        Wed,  3 May 2023 07:55:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683097482;
-        bh=M0BKie22cDJLEmh+DW1hFkVbxx3BKs6v3GQgOxwOC1I=;
+        s=k20201202; t=1683100552;
+        bh=FZMKes64ZPppiPezNOHRmqzODpBye3KiXu+nc+tWIhQ=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=akIxmMM83ZB7scSmRZabtnBDF9G9XAKAY+Apri/LWfcfuxEo7vOzWAjEdK6J49uqy
-         4NQpck+EzQRCVS5oBNJzbFCUkmOGhaLuR+3JxZHzabUu5RPbIMMA4Jk9ar+O2SlULV
-         Yy3nelM0+CZr4sAlUkbo0ugEc1qdsKMWvQGrkIgpojwEIRxsZqt8QGvw6GoDixE/fP
-         Kd0G8XunzTC47/LiWrcWmcP3eUiM8jqK5/wfo/0s+ASN//phlEGvWQHWuF7AHnadyL
-         26PupfT3VPijmSYy65DCZNMDvsi8rPSj5+lOc3MqhI8I8Y+TEmHHGlSBflyv6Z9czG
-         EhywdUTYAeYhA==
+        b=DGq4koC1vPyO7XupIKVDi3uZXrcwJiz9Uv4oyLnDFOHU7xwcFaO8ELMl2JWrNVVM6
+         4eqJZYVHUWbabsA2O53GS2qtBiwY6oEpRhzEZBXr+zYyd/7qPOQARzFkGWjsL7swmQ
+         eBAUcB27nYzIckSkL6iE4DbbnX1q6CH4YSUdn2tdxlbNUxCAab137X5LPZ94PGvxQ4
+         c/yq5lRlk4BCuM/MPNRhIlx+QPG/B69rZFvA7GN9DkC63YzYo8mWA9zQ3hbJbjHvMz
+         7ksS95eeVUlFnTJwHrpoNJP/rq5p45z6Zm+R9ByEB1vmXuiXkMaT7N4tLvNgvEyeU/
+         BRPAUieR1kzDw==
 Received: from johan by xi.lan with local (Exim 4.94.2)
         (envelope-from <johan@kernel.org>)
-        id 1pu6Xf-0007Og-E0; Wed, 03 May 2023 09:04:47 +0200
-Date:   Wed, 3 May 2023 09:04:47 +0200
+        id 1pu7LB-0007la-QM; Wed, 03 May 2023 09:55:57 +0200
+Date:   Wed, 3 May 2023 09:55:57 +0200
 From:   Johan Hovold <johan@kernel.org>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     Johan Hovold <johan+linaro@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: fix debugfs registration
-Message-ID: <ZFIHj9OAJkRvSscs@hovoldconsulting.com>
-References: <20230424124852.12625-1-johan+linaro@kernel.org>
- <20230424124852.12625-2-johan+linaro@kernel.org>
- <CABBYNZLBQjWVb=z8mffi4RmeKS-+RDLV+XF8bR2MiJ-ZOaFVHA@mail.gmail.com>
+        netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: fix invalid-bdaddr quirk for
+ non-persistent setup
+Message-ID: <ZFITjVD_7nPYUgjf@hovoldconsulting.com>
+References: <20230424133542.14383-1-johan+linaro@kernel.org>
+ <20230424133542.14383-2-johan+linaro@kernel.org>
+ <CABBYNZ++1hjeP9r-3Y4j6gPx42-Gk6dNZOYzuRe5bgdz+YHL6g@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZLBQjWVb=z8mffi4RmeKS-+RDLV+XF8bR2MiJ-ZOaFVHA@mail.gmail.com>
+In-Reply-To: <CABBYNZ++1hjeP9r-3Y4j6gPx42-Gk6dNZOYzuRe5bgdz+YHL6g@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, May 02, 2023 at 04:37:51PM -0700, Luiz Augusto von Dentz wrote:
+On Tue, May 02, 2023 at 04:44:48PM -0700, Luiz Augusto von Dentz wrote:
 > Hi Johan,
 > 
-> On Mon, Apr 24, 2023 at 5:50 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+> On Mon, Apr 24, 2023 at 6:35 AM Johan Hovold <johan+linaro@kernel.org> wrote:
 > >
-> > Since commit ec6cef9cd98d ("Bluetooth: Fix SMP channel registration for
-> > unconfigured controllers") the debugfs interface for unconfigured
-> > controllers will be created when the controller is configured.
+> > Devices that lack persistent storage for the device address can indicate
+> > this by setting the HCI_QUIRK_INVALID_BDADDR which causes the controller
+> > to be marked as unconfigured until user space has set a valid address.
 > >
-> > There is however currently nothing preventing a controller from being
-> > configured multiple time (e.g. setting the device address using btmgmt)
-> > which results in failed attempts to register the already registered
-> > debugfs entries:
+> > Once configured, the device address must be set on every setup for
+> > controllers with HCI_QUIRK_NON_PERSISTENT_SETUP to avoid marking the
+> > controller as unconfigured and requiring the address to be set again.
 > >
-> >         debugfs: File 'features' in directory 'hci0' already present!
-> >         debugfs: File 'manufacturer' in directory 'hci0' already present!
-> >         debugfs: File 'hci_version' in directory 'hci0' already present!
-> >         ...
-> >         debugfs: File 'quirk_simultaneous_discovery' in directory 'hci0' already present!
-> >
-> > Add a controller flag to avoid trying to register the debugfs interface
-> > more than once.
-> >
-> > Fixes: ec6cef9cd98d ("Bluetooth: Fix SMP channel registration for unconfigured controllers")
-> > Cc: stable@vger.kernel.org      # 4.0
+> > Fixes: 740011cfe948 ("Bluetooth: Add new quirk for non-persistent setup settings")
 > > Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 > > ---
-
+> >  net/bluetooth/hci_sync.c | 28 +++++++++++-----------------
+> >  1 file changed, 11 insertions(+), 17 deletions(-)
+> >
 > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index 632be1267288..a8785126df75 100644
+> > index a8785126df75..f45598b5a532 100644
 > > --- a/net/bluetooth/hci_sync.c
 > > +++ b/net/bluetooth/hci_sync.c
-> > @@ -4501,6 +4501,9 @@ static int hci_init_sync(struct hci_dev *hdev)
-> >             !hci_dev_test_flag(hdev, HCI_CONFIG))
-> >                 return 0;
+> > @@ -4573,23 +4573,17 @@ static int hci_dev_setup_sync(struct hci_dev *hdev)
+> >         invalid_bdaddr = test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
 > >
-> > +       if (hci_dev_test_and_set_flag(hdev, HCI_DEBUGFS_CREATED))
-> > +               return 0;
+> >         if (!ret) {
+> > -               if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
+> > -                       if (!bacmp(&hdev->public_addr, BDADDR_ANY))
+> > -                               hci_dev_get_bd_addr_from_property(hdev);
+> > -
+> > -                       if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> > -                           hdev->set_bdaddr) {
+> > -                               ret = hdev->set_bdaddr(hdev,
+> > -                                                      &hdev->public_addr);
+> > -
+> > -                               /* If setting of the BD_ADDR from the device
+> > -                                * property succeeds, then treat the address
+> > -                                * as valid even if the invalid BD_ADDR
+> > -                                * quirk indicates otherwise.
+> > -                                */
+> > -                               if (!ret)
+> > -                                       invalid_bdaddr = false;
+> > -                       }
+> > +               if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks) &&
+> > +                   !bacmp(&hdev->public_addr, BDADDR_ANY))
+> > +                       hci_dev_get_bd_addr_from_property(hdev);
+> > +
+> > +               if ((invalid_bdaddr ||
+> > +                    test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
+> > +                   bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> > +                   hdev->set_bdaddr) {
+> > +                       ret = hdev->set_bdaddr(hdev, &hdev->public_addr);
+> > +                       if (!ret)
+> > +                               invalid_bdaddr = false;
 > 
-> Can't we just use HCI_SETUP like we do with in create_basic:
-> 
->     if (hci_dev_test_flag(hdev, HCI_SETUP))
->         hci_debugfs_create_basic(hdev);
-> 
-> Actually we might as well move these checks directly inside the
-> hci_debugfs function to make sure these only take effect during the
-> setup/first init.
+> I'd keep the original comments since it appears you haven't changed
+> its logic with respect to invalid_bdaddr.
 
-The problem is that commit ec6cef9cd98d ("Bluetooth: Fix SMP channel
-registration for unconfigured controllers") started deferring creation
-of most parts of the debugfs interface until the controller is
-configured (e.g. as some information is not available until then).
+The comment no longer applies as set_bdaddr can now be called also when
+there is no "device property" holding the address (e.g. when one has
+been set using btmgmt and HCI_QUIRK_NON_PERSISTENT_SETUP is set).
 
-Moving everything back to setup-time would effectively revert that.
-
-Perhaps the interface can be changed in some way so that everything is
-again registered at setup-time (e.g. with placeholder values instead of
-conditionally created attributes), but that would at least not be
-something that we could backport.
-
-> >         hci_debugfs_create_common(hdev);
-> >
-> >         if (lmp_bredr_capable(hdev))
+And obviously we shouldn't mark the controller as unconfigured after
+we've successfully set an address.
 
 Johan
