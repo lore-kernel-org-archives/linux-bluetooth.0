@@ -2,47 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90EA6C7EE22
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD662C77B78
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230417AbjEDTqK (ORCPT
+        id S230432AbjEDTqS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 15:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48886 "EHLO
+        Thu, 4 May 2023 15:46:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbjEDTp2 (ORCPT
+        with ESMTP id S230296AbjEDTpb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 May 2023 15:45:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A71AD37;
-        Thu,  4 May 2023 12:44:06 -0700 (PDT)
+        Thu, 4 May 2023 15:45:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1628AD2E;
+        Thu,  4 May 2023 12:44:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B025E63758;
-        Thu,  4 May 2023 19:44:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12467C433A4;
-        Thu,  4 May 2023 19:44:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 429506375C;
+        Thu,  4 May 2023 19:44:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB3FEC433EF;
+        Thu,  4 May 2023 19:44:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229443;
-        bh=X40QQfdRaA3MHuarzlvmKZkdrjntoaNiRjpsI+0EnKU=;
+        s=k20201202; t=1683229445;
+        bh=EV+MBgoDQwKredYzLzARpMVhSWTqnVwgZVtGo8w2VVs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YBKhIY6T+jlQXe1zaHM31cUnZhFE/kxbetiWHhyVKazwXbN4gZtOolIZiYtu4iOAc
-         hOfbCLUnY947v/5aHbr0fLug3X8PsI/LTga2XU/hhiQzrM6+hRMhP/w61c1YLvyrqP
-         dcIgoFcmE9vy0swmA1UVs8MXL4hHZR9HRqE8yrgyk1AbuIqtYPEU17Eo+UXlDQt9Uf
-         JeMKkux3rIWJ4ZrnmVKi93z7Ivt1/1vCZslrHiIY+Minxvdu58YZoOLLBUI/ru06Ky
-         J29bkqy28ah3enumRo5sJCSs17rsiIQ94HxCEYmNHHyS/pUcVMLaTigzrXQyZRo8Oh
-         FA8FuDHZI2xqA==
+        b=R7QleeYT/Y8TQVYxoCshnX00PR2oQ3WApWNy4f52JkIzpCJA6Qw6apYpLiEcP6fdK
+         k100FrYZzeTnLQjoEsyR9FOG73IGxE3w55hdyVmAlEpsKWwTv0cttgb6R4NN2/pUdv
+         xx/2pLLlOIBEfqczaNwNa6rirZuL9bcrTdKj5xQZiBPwfD1+XxLUxEWZn/6K+Vj+g/
+         u4WJhJnXY3TjoWCMuZwmRSE5XBjDX8svhD0edUqu2ZN782LcrS4QtNwcWaNUwozzbI
+         G+Vxf/IW/6m0HyqZ7d6BPoYkUD1wIUEYxSYyDSUnO96yoOEFZpjjIMtRGzzw8vi0uu
+         0MHdV/xUFzttQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Raul Cheleguini <rcheleguini@google.com>,
+Cc:     Chethan T N <chethan.tumkur.narayan@intel.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.3 53/59] Bluetooth: Improve support for Actions Semi ATS2851 based devices
-Date:   Thu,  4 May 2023 15:41:36 -0400
-Message-Id: <20230504194142.3805425-53-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.3 55/59] Bluetooth: btintel: Add LE States quirk support
+Date:   Thu,  4 May 2023 15:41:38 -0400
+Message-Id: <20230504194142.3805425-55-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230504194142.3805425-1-sashal@kernel.org>
 References: <20230504194142.3805425-1-sashal@kernel.org>
@@ -54,51 +54,39 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Raul Cheleguini <rcheleguini@google.com>
+From: Chethan T N <chethan.tumkur.narayan@intel.com>
 
-[ Upstream commit 7c2b2d2d0cb658aa543e11e90ae95621d3cb5fe6 ]
+[ Upstream commit 77f542b10c535c9a93bf8afdd2665524935807c2 ]
 
-Add two more quirks to resume the device initialization and basic
-operation as the device seems not to support "Read Transmit Power"
-and "Set Extended Scan Parameters".
+Basically all Intel controllers support both Central/Peripheral
+LE states.
 
-< HCI Command: LE Read Transmit Power (0x08|0x004b) plen 0
-> HCI Event: Command Status (0x0f) plen 4
-      LE Read Transmit Power (0x08|0x004b) ncmd 1
-        Status: Unknown HCI Command (0x01)
+This patch enables the LE States quirk by default on all
+Solar and Magnertor Intel controllers.
 
-< HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 8
-        Own address type: Random (0x01)
-        Filter policy: Accept all advertisement (0x00)
-        PHYs: 0x01
-        Entry 0: LE 1M
-          Type: Active (0x01)
-          Interval: 11.250 msec (0x0012)
-          Window: 11.250 msec (0x0012)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
-        Status: Unknown HCI Command (0x01)
-
-Signed-off-by: Raul Cheleguini <rcheleguini@google.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btintel.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 683556dcdc436..1ab5663b009d8 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4105,6 +4105,8 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_ACTIONS_SEMI) {
- 		/* Support is advertised, but not implemented */
- 		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
- 	}
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index af774688f1c0d..7a6dc05553f13 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2684,9 +2684,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		 */
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
  
- 	if (!reset)
+-		/* Valid LE States quirk for GfP */
+-		if (INTEL_HW_VARIANT(ver_tlv.cnvi_bt) == 0x18)
+-			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		/* Apply LE States quirk from solar onwards */
++		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 
+ 		/* Setup MSFT Extension support */
+ 		btintel_set_msft_opcode(hdev,
 -- 
 2.39.2
 
