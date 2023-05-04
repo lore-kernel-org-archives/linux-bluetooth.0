@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F0AC77B78
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8CCEC7EE29
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:56:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231928AbjEDT4l (ORCPT
+        id S231948AbjEDT4m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 15:56:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41106 "EHLO
+        Thu, 4 May 2023 15:56:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231892AbjEDTyt (ORCPT
+        with ESMTP id S231990AbjEDTzB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 May 2023 15:54:49 -0400
+        Thu, 4 May 2023 15:55:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BB51AECA;
-        Thu,  4 May 2023 12:48:10 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8577931B03;
+        Thu,  4 May 2023 12:48:26 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B8EB9636FB;
-        Thu,  4 May 2023 19:48:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96971C4339B;
-        Thu,  4 May 2023 19:48:08 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F420B637CE;
+        Thu,  4 May 2023 19:48:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0773EC4339B;
+        Thu,  4 May 2023 19:48:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229690;
-        bh=ply/ASMcfvhNiPQyAkDXZfwagZWKkhkqMGewzH5yhxw=;
+        s=k20201202; t=1683229701;
+        bh=bpt8Pleh5MT2glcM/SjsemrlW8FxOcpaTz+l4JWV86E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hdPsxDGDzJCPBfLnXweB9iDikCm5rBEmLRnTCxHidrl1diNOs2ErWM9VMsCnjkYHr
-         60Ouek3tMuuZJUwD1UOMjv0ytCxWPUJuo1+56EdngMNAKbWq5lWWJ8ndSKhMoM4hzB
-         zr7RIXqp1RSPmfMrSHdO2CXazj3p9lB89WXawzFh/6Ap4truHJ+V6zUHBbhtacG4o0
-         nutYH9xT80Um2Il/sEm3pmcZkkGTZ/HN2skLgYy/B+e3Fk1Ku+wZKTLTNNY29w7aLm
-         K6erokM76EJVuJTyqMum8Wds9jIYKTcbAQ7fkNHkFO5d3JaVnJE9QyP7jT5iVlzMDU
-         15vJlf+LAtTeQ==
+        b=VUV+2jnrHjDH7k6H+rH+r0nOHXT4alR+GLA38mxqBMp11ytdKSxL4JCPnENRrIUTP
+         BeaUPXeC2H8P2X1QVvkM+M70jhc+X573wWRkb//xgFEezfFSlcvGZ/wRR6+rSUlW8B
+         72T152E0jO2fjSiF8U478MT4WA+MyBuutDI9lUs4RSsWOnzCZnsDmczmE6K7EAlbYf
+         Tqf6fko0yY9x+3+M+Mlhb02mc5YkkL6uYTBQyCjsykxVniNsC6LhY9IxdATuDXOoHP
+         XzzELqxUXU3UBV2h9dQNGp4VZsZIVJGUnZsRF5k/K8s73Wd8Q8SOIRFP9jadLXYt0L
+         w4iszbqVoPNUg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vasily Khoruzhick <anarsoul@gmail.com>,
-        Bastian Germann <bage@debian.org>,
+Cc:     Min Li <lm0963hack@gmail.com>,
+        syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 41/49] Bluetooth: Add new quirk for broken local ext features page 2
-Date:   Thu,  4 May 2023 15:46:18 -0400
-Message-Id: <20230504194626.3807438-41-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 48/49] Bluetooth: L2CAP: fix "bad unlock balance" in l2cap_disconnect_rsp
+Date:   Thu,  4 May 2023 15:46:25 -0400
+Message-Id: <20230504194626.3807438-48-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230504194626.3807438-1-sashal@kernel.org>
 References: <20230504194626.3807438-1-sashal@kernel.org>
@@ -56,63 +56,35 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Vasily Khoruzhick <anarsoul@gmail.com>
+From: Min Li <lm0963hack@gmail.com>
 
-[ Upstream commit 8194f1ef5a815aea815a91daf2c721eab2674f1f ]
+[ Upstream commit 25e97f7b1866e6b8503be349eeea44bb52d661ce ]
 
-Some adapters (e.g. RTL8723CS) advertise that they have more than
-2 pages for local ext features, but they don't support any features
-declared in these pages. RTL8723CS reports max_page = 2 and declares
-support for sync train and secure connection, but it responds with
-either garbage or with error in status on corresponding commands.
+conn->chan_lock isn't acquired before l2cap_get_chan_by_scid,
+if l2cap_get_chan_by_scid returns NULL, then 'bad unlock balance'
+is triggered.
 
-Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-Signed-off-by: Bastian Germann <bage@debian.org>
+Reported-by: syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/all/000000000000894f5f05f95e9f4d@google.com/
+Signed-off-by: Min Li <lm0963hack@gmail.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci.h | 7 +++++++
- net/bluetooth/hci_event.c   | 9 +++++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7a381fcef939d..f80ae7d237342 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -294,6 +294,13 @@ enum {
- 	 * during the hdev->setup vendor callback.
- 	 */
- 	HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
-+
-+	/* When this quirk is set, max_page for local extended features
-+	 * is set to 1, even if controller reports higher number. Some
-+	 * controllers (e.g. RTL8723CS) report more pages, but they
-+	 * don't actually support features declared there.
-+	 */
-+	HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
- };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e62dadad81b31..ee8f806534dfb 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4694,7 +4694,6 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
  
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 42a3a19b111e3..21416ccc30ab2 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -881,8 +881,13 @@ static u8 hci_cc_read_local_ext_features(struct hci_dev *hdev, void *data,
- 	if (rp->status)
- 		return rp->status;
+ 	chan = l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan) {
+-		mutex_unlock(&conn->chan_lock);
+ 		return 0;
+ 	}
  
--	if (hdev->max_page < rp->max_page)
--		hdev->max_page = rp->max_page;
-+	if (hdev->max_page < rp->max_page) {
-+		if (test_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
-+			     &hdev->quirks))
-+			bt_dev_warn(hdev, "broken local ext features page 2");
-+		else
-+			hdev->max_page = rp->max_page;
-+	}
- 
- 	if (rp->page < HCI_MAX_PAGES)
- 		memcpy(hdev->features[rp->page], rp->features, 8);
 -- 
 2.39.2
 
