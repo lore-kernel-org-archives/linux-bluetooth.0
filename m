@@ -2,52 +2,50 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A27C7EE21
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F3EC7EE25
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231492AbjEDTut (ORCPT
+        id S231771AbjEDT4g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 15:50:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58100 "EHLO
+        Thu, 4 May 2023 15:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231584AbjEDTuN (ORCPT
+        with ESMTP id S231983AbjEDTzB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 May 2023 15:50:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4B714938;
-        Thu,  4 May 2023 12:46:34 -0700 (PDT)
+        Thu, 4 May 2023 15:55:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F081AEF0;
+        Thu,  4 May 2023 12:48:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9822763792;
-        Thu,  4 May 2023 19:46:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 948BEC4339B;
-        Thu,  4 May 2023 19:46:20 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C1A0D637C9;
+        Thu,  4 May 2023 19:48:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40023C433EF;
+        Thu,  4 May 2023 19:48:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229582;
-        bh=6Dmf1Df4UH0wUacDcqRyf4uGi54xgTsRAJXlrdZsJ6s=;
+        s=k20201202; t=1683229697;
+        bh=0GXFjYVqZ0PZmO9tVgTtfCagheAJigcdVsSQDV6JnJE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JOLo/Fa4yOWv/SHj1iSuGBBXmhLYC5t12Z3UQgk/Tfssl/n1KlqrwHLv4F00Gvk4d
-         ck9cEGDXY8ww0X6d0AEyjwQUDHxfGv/cxsRhURg/ZonNI68Nd9Q2nTWtLHjCeWQajF
-         YM4XHx/QIEco6u4oqe+Ca4al2+ImUgVN4eMkFoEuTP/BRQt0ctJNa4KHKuaa5cRBVL
-         YRuIHl86C2xg6thN+XwWtSF+T6JFAH9M18o3HkJCAncxuZCJP9TsMADFQ+HYOVQrOo
-         KFSntin3dYPss1aiy/kZebqJyxcx9T42wNvQaXOnS9w8nQKhpx5jksYYD6QvLCuLc2
-         PR7RoCHN1aqKw==
+        b=M97Ii3afl/+sV3kszFMoB2RFv2qzqohbgyryPRCUjDHLImqpYxEtCGo6FCCgFFtDZ
+         wET9aU6aAswiVknZjcb3j07zpQypn59BJDyl8HnFua/6JFlSF9+yQ0J2Eg5SHbr8Oz
+         SE4smzEozd4lXv1pihVRK3fXGb8oiGMn3cCIsHhSCTBjNPa9h+fO5/yfgDaGAWlBNy
+         TaH1eqCGvH0Nd/s5Hmx02jhmLzHejVuVLS+6GYnURGSXbKArnVPuY6YXO+OcgqV7zV
+         FJY2JymcTdrkNP2VmBQJzOzg7XRiWoRsAz5NZWYdqnUDFj4v2o7/FS2AX14r+30pFJ
+         4LP6TuxS98mug==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Raul Cheleguini <raul.cheleguini@gmail.com>,
-        imoc <wzj9912@gmail.com>,
+Cc:     Hans de Goede <hdegoede@redhat.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.2 51/53] Bluetooth: Add new quirk for broken set random RPA timeout for ATS2851
-Date:   Thu,  4 May 2023 15:44:11 -0400
-Message-Id: <20230504194413.3806354-51-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 46/49] Bluetooth: hci_bcm: Fall back to getting bdaddr from EFI if not set
+Date:   Thu,  4 May 2023 15:46:23 -0400
+Message-Id: <20230504194626.3807438-46-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230504194413.3806354-1-sashal@kernel.org>
-References: <20230504194413.3806354-1-sashal@kernel.org>
+In-Reply-To: <20230504194626.3807438-1-sashal@kernel.org>
+References: <20230504194626.3807438-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -56,89 +54,111 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Raul Cheleguini <raul.cheleguini@gmail.com>
+From: Hans de Goede <hdegoede@redhat.com>
 
-[ Upstream commit 91b6d02ddcd113352bdd895990b252065c596de7 ]
+[ Upstream commit 0d218c3642b9ccf71f44987cd03c19320f3bd918 ]
 
-The ATS2851 based controller advertises support for command "LE Set Random
-Private Address Timeout" but does not actually implement it, impeding the
-controller initialization.
+On some devices the BCM Bluetooth adapter does not have a valid bdaddr set.
 
-Add the quirk HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT to unblock the controller
-initialization.
+btbcm.c currently sets HCI_QUIRK_INVALID_BDADDR to indicate when this is
+the case. But this requires users to manual setup a btaddr, by doing e.g.:
 
-< HCI Command: LE Set Resolvable Private... (0x08|0x002e) plen 2
-        Timeout: 900 seconds
-> HCI Event: Command Status (0x0f) plen 4
-      LE Set Resolvable Private Address Timeout (0x08|0x002e) ncmd 1
-        Status: Unknown HCI Command (0x01)
+btmgmt -i hci0 public-addr 'B0:F1:EC:82:1D:B3'
 
-Co-developed-by: imoc <wzj9912@gmail.com>
-Signed-off-by: imoc <wzj9912@gmail.com>
-Signed-off-by: Raul Cheleguini <raul.cheleguini@gmail.com>
+Which means that Bluetooth will not work out of the box on such devices.
+To avoid this (where possible) hci_bcm sets: HCI_QUIRK_USE_BDADDR_PROPERTY
+which tries to get the bdaddr from devicetree.
+
+But this only works on devicetree platforms. On UEFI based platforms
+there is a special Broadcom UEFI variable which when present contains
+the devices bdaddr, just like how there is another UEFI variable which
+contains wifi nvram contents including the wifi MAC address.
+
+Add support for getting the bdaddr from this Broadcom UEFI variable,
+so that Bluetooth will work OOTB for users on devices where this
+UEFI variable is present.
+
+This fixes Bluetooth not working on for example Asus T100HA 2-in-1s.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c   | 1 +
- include/net/bluetooth/hci.h | 8 ++++++++
- net/bluetooth/hci_sync.c    | 6 +++++-
- 3 files changed, 14 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btbcm.c | 47 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1ab5663b009d8..0923582299f3a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4106,6 +4106,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		/* Support is advertised, but not implemented */
- 		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 43e98a598bd9a..de2ea589aa49b 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -6,6 +6,7 @@
+  *  Copyright (C) 2015  Intel Corporation
+  */
+ 
++#include <linux/efi.h>
+ #include <linux/module.h>
+ #include <linux/firmware.h>
+ #include <linux/dmi.h>
+@@ -34,6 +35,43 @@
+ /* For kmalloc-ing the fw-name array instead of putting it on the stack */
+ typedef char bcm_fw_name[BCM_FW_NAME_LEN];
+ 
++#ifdef CONFIG_EFI
++static int btbcm_set_bdaddr_from_efi(struct hci_dev *hdev)
++{
++	efi_guid_t guid = EFI_GUID(0x74b00bd9, 0x805a, 0x4d61, 0xb5, 0x1f,
++				   0x43, 0x26, 0x81, 0x23, 0xd1, 0x13);
++	bdaddr_t efi_bdaddr, bdaddr;
++	efi_status_t status;
++	unsigned long len;
++	int ret;
++
++	if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
++		return -EOPNOTSUPP;
++
++	len = sizeof(efi_bdaddr);
++	status = efi.get_variable(L"BDADDR", &guid, NULL, &len, &efi_bdaddr);
++	if (status != EFI_SUCCESS)
++		return -ENXIO;
++
++	if (len != sizeof(efi_bdaddr))
++		return -EIO;
++
++	baswap(&bdaddr, &efi_bdaddr);
++
++	ret = btbcm_set_bdaddr(hdev, &bdaddr);
++	if (ret)
++		return ret;
++
++	bt_dev_info(hdev, "BCM: Using EFI device address (%pMR)", &bdaddr);
++	return 0;
++}
++#else
++static int btbcm_set_bdaddr_from_efi(struct hci_dev *hdev)
++{
++	return -EOPNOTSUPP;
++}
++#endif
++
+ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ {
+ 	struct hci_rp_read_bd_addr *bda;
+@@ -87,9 +125,12 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
+-		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+-			    &bda->bdaddr);
+-		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++		/* Try falling back to BDADDR EFI variable */
++		if (btbcm_set_bdaddr_from_efi(hdev) != 0) {
++			bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
++				    &bda->bdaddr);
++			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++		}
  	}
  
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 7127313140cf0..9ace8b959d557 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -301,6 +301,14 @@ enum {
- 	 * don't actually support features declared there.
- 	 */
- 	HCI_QUIRK_BROKEN_LOCAL_EXT_FEATURES_PAGE_2,
-+
-+	/*
-+	 * When this quirk is set, the HCI_OP_LE_SET_RPA_TIMEOUT command is
-+	 * skipped during initialization. This is required for the Actions
-+	 * Semiconductor ATS2851 based controllers, which erroneously claims
-+	 * to support it.
-+	 */
-+	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
- };
- 
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 632be12672887..b65ee3a32e5d7 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4093,7 +4093,8 @@ static int hci_le_set_rpa_timeout_sync(struct hci_dev *hdev)
- {
- 	__le16 timeout = cpu_to_le16(hdev->rpa_timeout);
- 
--	if (!(hdev->commands[35] & 0x04))
-+	if (!(hdev->commands[35] & 0x04) ||
-+	    test_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks))
- 		return 0;
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_RPA_TIMEOUT,
-@@ -4533,6 +4534,9 @@ static const struct {
- 			 "HCI Set Event Filter command not supported."),
- 	HCI_QUIRK_BROKEN(ENHANCED_SETUP_SYNC_CONN,
- 			 "HCI Enhanced Setup Synchronous Connection command is "
-+			 "advertised, but not supported."),
-+	HCI_QUIRK_BROKEN(SET_RPA_TIMEOUT,
-+			 "HCI LE Set Random Private Address Timeout command is "
- 			 "advertised, but not supported.")
- };
- 
+ 	kfree_skb(skb);
 -- 
 2.39.2
 
