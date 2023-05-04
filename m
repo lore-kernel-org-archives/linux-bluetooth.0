@@ -2,47 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD662C77B78
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E791C7EE29
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:46:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230432AbjEDTqS (ORCPT
+        id S230325AbjEDTqT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 15:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49748 "EHLO
+        Thu, 4 May 2023 15:46:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230296AbjEDTpb (ORCPT
+        with ESMTP id S230294AbjEDTpb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 4 May 2023 15:45:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1628AD2E;
-        Thu,  4 May 2023 12:44:10 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC6AC619C;
+        Thu,  4 May 2023 12:44:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 429506375C;
-        Thu,  4 May 2023 19:44:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB3FEC433EF;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F0B7F62EB8;
         Thu,  4 May 2023 19:44:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8782DC4339E;
+        Thu,  4 May 2023 19:44:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229445;
-        bh=EV+MBgoDQwKredYzLzARpMVhSWTqnVwgZVtGo8w2VVs=;
+        s=k20201202; t=1683229444;
+        bh=roCqDH/rrFtOfxVCQCfNrQQhMMOYcsjmHbrYglM5Mhk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=R7QleeYT/Y8TQVYxoCshnX00PR2oQ3WApWNy4f52JkIzpCJA6Qw6apYpLiEcP6fdK
-         k100FrYZzeTnLQjoEsyR9FOG73IGxE3w55hdyVmAlEpsKWwTv0cttgb6R4NN2/pUdv
-         xx/2pLLlOIBEfqczaNwNa6rirZuL9bcrTdKj5xQZiBPwfD1+XxLUxEWZn/6K+Vj+g/
-         u4WJhJnXY3TjoWCMuZwmRSE5XBjDX8svhD0edUqu2ZN782LcrS4QtNwcWaNUwozzbI
-         G+Vxf/IW/6m0HyqZ7d6BPoYkUD1wIUEYxSYyDSUnO96yoOEFZpjjIMtRGzzw8vi0uu
-         0MHdV/xUFzttQ==
+        b=nb4J7Py6XGFh1Z4GgCZNxoixCvkSoCU3PCpY3gCGhb6ziJXTxWFLhI1JDkEXxZoGP
+         GIXKBE2TP+Noej0tqAeSaNIRwWC41uUOE/m1eYCMcPbx02SR4kGeMUhI+Je9vbKP5H
+         XRSbgW9PVY8L3kvK5TCOTolkF1+4X120Dgi0741MN0aUJRYOFe4X46ymCphpA3egX6
+         OB8V5JXs69VEZCnXpdqqQiHTb7JEfl7jhgo4lDGUt6rYIbcSDkSjKUyxMmda47Lf7j
+         za2koSkr3+//Zvr/9uA9at1/PqsnorpAv5XVjlCDQ7CrJf9jbINDZJxK4zwyoPRkHa
+         t1rdHg12HRoYQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Chethan T N <chethan.tumkur.narayan@intel.com>,
+Cc:     Max Chou <max.chou@realtek.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.3 55/59] Bluetooth: btintel: Add LE States quirk support
-Date:   Thu,  4 May 2023 15:41:38 -0400
-Message-Id: <20230504194142.3805425-55-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.3 54/59] Bluetooth: btrtl: check for NULL in btrtl_set_quirks()
+Date:   Thu,  4 May 2023 15:41:37 -0400
+Message-Id: <20230504194142.3805425-54-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230504194142.3805425-1-sashal@kernel.org>
 References: <20230504194142.3805425-1-sashal@kernel.org>
@@ -54,39 +54,37 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
+From: Max Chou <max.chou@realtek.com>
 
-[ Upstream commit 77f542b10c535c9a93bf8afdd2665524935807c2 ]
+[ Upstream commit 253cf30e8d3d001850a95c4729d668f916b037ab ]
 
-Basically all Intel controllers support both Central/Peripheral
-LE states.
+The btrtl_set_quirks() has accessed btrtl_dev->ic_info->lmp_subver since
+b8e482d02513. However, if installing a Realtek Bluetooth controller
+without the driver supported, it will hit the NULL point accessed.
 
-This patch enables the LE States quirk by default on all
-Solar and Magnertor Intel controllers.
+Add a check for NULL to avoid the Kernel Oops.
 
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btintel.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/bluetooth/btrtl.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index af774688f1c0d..7a6dc05553f13 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2684,9 +2684,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		 */
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 44b672cca69ee..7061621faeb0c 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -889,6 +889,9 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+ 		break;
+ 	}
  
--		/* Valid LE States quirk for GfP */
--		if (INTEL_HW_VARIANT(ver_tlv.cnvi_bt) == 0x18)
--			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+		/* Apply LE States quirk from solar onwards */
-+		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
- 
- 		/* Setup MSFT Extension support */
- 		btintel_set_msft_opcode(hdev,
++	if (!btrtl_dev->ic_info)
++		return;
++
+ 	switch (btrtl_dev->ic_info->lmp_subver) {
+ 	case RTL_ROM_LMP_8703B:
+ 		/* 8723CS reports two pages for local ext features,
 -- 
 2.39.2
 
