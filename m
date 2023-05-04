@@ -2,63 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8E42C77B7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 21:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160ACC77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 21:29:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbjEDV24 (ORCPT
+        id S229971AbjEDV3s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 17:28:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59994 "EHLO
+        Thu, 4 May 2023 17:29:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230055AbjEDV2s (ORCPT
+        with ESMTP id S229983AbjEDV3q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 May 2023 17:28:48 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA290150F7;
-        Thu,  4 May 2023 14:28:37 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-64115e652eeso15590340b3a.0;
-        Thu, 04 May 2023 14:28:37 -0700 (PDT)
+        Thu, 4 May 2023 17:29:46 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4A21386B;
+        Thu,  4 May 2023 14:29:36 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1aad55244b7so7417455ad.2;
+        Thu, 04 May 2023 14:29:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683235712; x=1685827712;
+        d=gmail.com; s=20221208; t=1683235776; x=1685827776;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fKzf5mgdxK8ZWZ/hO2d3mis74L5K1plt3kebtBa9TF4=;
-        b=qYGPgaiZ97JRmhW72uxcBIC5sglElbqAHmTiISeGp0hKdNK/vt6h2mOAdg3eeACBhW
-         Hcd0cfClqrlvnG1IkC1VCDRPds0wteOy7D24xRfLdi7NmtHfrYNwQw+hqOAMBqtCn0iu
-         3nxSGZ9PqD8GCXwypfGeF3F9fUyDV67yMVnJG4cn2Q6hRjnG5bdmBIky2zD+eYZ7ST3U
-         ptvvax4FI7hdqUqvT1v79Xf2hRbpqQi2EQgU6CCgglrCD0xh9vLYy6NJxcU7AUCl3Ft4
-         ZlMaonNbF0chuJeO2ngh1ejAC4Eduq4K1LHvP8nI6DUrI2NrJ0INiQgtnQDGj343KTrG
-         Cw3g==
+        bh=YigFI0J8gEeJ9cS/4TbGx1mSqvxtVecjV4VaaynehVs=;
+        b=r1MJoYdfVTxCFUkhk4kqzogB35WzJWaXdMwR0kF2naomGKBzqaFz6BMb+Hj+jVYKSF
+         5pXHwjnfyHm9aYOp1CZYXfA/3K4U8lmduHliEi9wxFGdSBGNtRS3Syz2vnISXcwaT2iO
+         RIjq0yG/4FCs3RY2C9wrvWhKXoRU1KEarLEpk/1CGqHMASZqDoizbxDoLftBF9oy1yFe
+         tkK5h7EUNXOI7xaRi3XEuTbtM4JjUIuLZlZYqrgLNjODd/49zSEPfdhT8xiB1vNSO1i6
+         KZPlFsSqrKx4NUpneUzgGGdp5I0cOQAt+4WIVsJd6B0idgQiyM8Rfu5z4+JCUJTPVDFO
+         b+ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683235712; x=1685827712;
+        d=1e100.net; s=20221208; t=1683235776; x=1685827776;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fKzf5mgdxK8ZWZ/hO2d3mis74L5K1plt3kebtBa9TF4=;
-        b=MRxy5YeCeacDWgZWYj34fqkPfinGr/fBuOLGIbv/OaX0JuP3oJFNQeZTeE1KQy3eJP
-         2oQ3TAVeN0pd+NftdEamE5iz+eotHj8DwVfsNQlA/eu0xw+I1p2FOLRGHEF87bNXqnA9
-         sg9qYPA4Bg1MbO+Drn6TxQ30APxCWeG28Nw9F1T+UeP8BGc0wETUDDbMEjEeC4Vhqo16
-         /aJ1vK0X0Wt2GpI4hX2cVpcbnOyssj5Cst5CXetSrcPFT5gjRSRD4Br0AuYIxC6xZFuG
-         GbQGe51iwZYRPaQT+AwEdCz4yrY/yyQzknRBqO2UnIP7vny7FMFQaL4aKBFsRnUJirEc
-         X5CA==
-X-Gm-Message-State: AC+VfDxmhjvKOL/V7CPXYJfjQ0K/QEsHGeqYyKIP/I+88qtWvwT7D5WT
-        0W0J2gavgjsy91Z+BjAI4jwZG0CU0QioFQ==
-X-Google-Smtp-Source: ACHHUZ4ZCy/oVjaXBYMXNbkwXWL87CqFddmbdotuPwc/JDDT221Rxmgpp0qqHi6svhFL4T1wfyDweQ==
-X-Received: by 2002:a17:902:d483:b0:19a:96ea:3850 with SMTP id c3-20020a170902d48300b0019a96ea3850mr5861490plg.17.1683235712591;
-        Thu, 04 May 2023 14:28:32 -0700 (PDT)
+        bh=YigFI0J8gEeJ9cS/4TbGx1mSqvxtVecjV4VaaynehVs=;
+        b=DYwciOSsP0v8kV31lsdl+r06B8BZ0WeBOdYifvEJFuDDbUeGomCJQbgbZF/2/DL7qr
+         wJ74ezuRHRRjUhOnGIgWH/bmj+o6jB1Y3odGknenk4gNtrEQzmOHVMSCPgRJGv+zz8vO
+         rzgmraj+dR3sJxUF7TyMXD4BHK9zmIKsBRkOJpBnY55vWq2qE4Y0EvSwRh5ojUi/LubG
+         1L2XoKcSDA2Ta7UoxzzbN5ePprSg8rqKGpcTktijfU8fbgQydTfzgYW1R/f1uMvDZj5E
+         u0FgNq+uMGEH+Ci+X7FmxriN186KmHHVjfGpdT2YzbEpcfKGUyImcW56NH77V/n0kDj9
+         snOg==
+X-Gm-Message-State: AC+VfDwJ0mkmXaCQJOvReI9GYqOZRlGZHzMO0hTD5WKYaJS0vVCy8hnQ
+        ajTZxPY16YBa8H609/oOyEmohsv+x6t2/w==
+X-Google-Smtp-Source: ACHHUZ5yfp4qg3v5Ax3aZrMPEBASyRDzdpKUZaf2hCWJbtmWyHvnskvhy/DKRKComyvrbLMOVrpC7w==
+X-Received: by 2002:a17:902:f68f:b0:1aa:ec83:e1ac with SMTP id l15-20020a170902f68f00b001aaec83e1acmr5963791plg.53.1683235776025;
+        Thu, 04 May 2023 14:29:36 -0700 (PDT)
 Received: from localhost.localdomain ([2600:8801:9701:6a00:daec:5eff:fea8:3a31])
-        by smtp.gmail.com with ESMTPSA id l13-20020a170903244d00b001ab1bb0126fsm1039pls.102.2023.05.04.14.28.30
+        by smtp.gmail.com with ESMTPSA id z1-20020a17090a8b8100b00247a2498075sm11527121pjn.48.2023.05.04.14.29.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 May 2023 14:28:31 -0700 (PDT)
+        Thu, 04 May 2023 14:29:35 -0700 (PDT)
 From:   Dan Gora <dan.gora@gmail.com>
 Cc:     Dan Gora <dan.gora@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1] Bluetooth: btusb: Add device 6655:8771 to device tables.
-Date:   Thu,  4 May 2023 14:27:53 -0700
-Message-Id: <20230504212752.16179-1-dan.gora@gmail.com>
+Subject: [PATCH 1/1] Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations.
+Date:   Thu,  4 May 2023 14:28:44 -0700
+Message-Id: <20230504212843.18519-1-dan.gora@gmail.com>
 X-Mailer: git-send-email 2.35.1.102.g2b9c120970
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -67,44 +67,55 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This device is an Inspire branded BT 5.1 USB dongle with a
-Realtek RTL8761BU chip using the "Best Buy China" vendor ID.
-
-The device table is as follows:
-
-T:  Bus=01 Lev=01 Prnt=02 Port=09 Cnt=01 Dev#=  7 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=6655 ProdID=8771 Rev=02.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00E04C239987
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+Add missing MODULE_FIRMWARE declarations for firmware referenced in
+btrtl.c.
 
 Signed-off-by: Dan Gora <dan.gora@gmail.com>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btrtl.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2a8e2bb038f5..0b0a02cf0d4a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -655,6 +655,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0x8771), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x6655, 0x8771), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x7392, 0xc611), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x2b89, 0x8761), .driver_info = BTUSB_REALTEK |
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 2915c82d719d..d978e7cea873 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -1367,14 +1367,30 @@ MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723d_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723d_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761b_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761b_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761bu_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761bu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8821c_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8821c_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8821cs_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8821cs_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cs_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cs_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cu_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cu_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8851bu_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8851bu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bs_fw.bin");
+@@ -1383,5 +1399,3 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8851bu_fw.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8851bu_config.bin");
 -- 
 2.35.1.102.g2b9c120970
 
