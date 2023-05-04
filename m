@@ -2,49 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8CCEC7EE29
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5E5C7EE21
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231948AbjEDT4m (ORCPT
+        id S231968AbjEDT4o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 15:56:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42856 "EHLO
+        Thu, 4 May 2023 15:56:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231990AbjEDTzB (ORCPT
+        with ESMTP id S231781AbjEDTyp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 May 2023 15:55:01 -0400
+        Thu, 4 May 2023 15:54:45 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8577931B03;
-        Thu,  4 May 2023 12:48:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88791AED9;
+        Thu,  4 May 2023 12:48:08 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F420B637CE;
-        Thu,  4 May 2023 19:48:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0773EC4339B;
-        Thu,  4 May 2023 19:48:19 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9EAB3637BC;
+        Thu,  4 May 2023 19:48:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20C46C433EF;
+        Thu,  4 May 2023 19:48:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229701;
-        bh=bpt8Pleh5MT2glcM/SjsemrlW8FxOcpaTz+l4JWV86E=;
+        s=k20201202; t=1683229688;
+        bh=QjY5PJBhX3+55LJa3Q6dGuzRZZAQtAcUyOjR9xv0xVc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VUV+2jnrHjDH7k6H+rH+r0nOHXT4alR+GLA38mxqBMp11ytdKSxL4JCPnENRrIUTP
-         BeaUPXeC2H8P2X1QVvkM+M70jhc+X573wWRkb//xgFEezfFSlcvGZ/wRR6+rSUlW8B
-         72T152E0jO2fjSiF8U478MT4WA+MyBuutDI9lUs4RSsWOnzCZnsDmczmE6K7EAlbYf
-         Tqf6fko0yY9x+3+M+Mlhb02mc5YkkL6uYTBQyCjsykxVniNsC6LhY9IxdATuDXOoHP
-         XzzELqxUXU3UBV2h9dQNGp4VZsZIVJGUnZsRF5k/K8s73Wd8Q8SOIRFP9jadLXYt0L
-         w4iszbqVoPNUg==
+        b=ZcHzLbBz8sIACLy4tKX6/jYTLAocjyaWeZ/DetYpllJn6YmdRYS52iAX7S7GIt2co
+         2cP4MFsLwRC+nBxcvIeTsrRgIBXivdDdFmC+nAQ3eEwk2yb/+xivVGiizdPvBr3Uop
+         4w+npFmGJiPrqjjCrVPsRw7rQFJM5xBcGvwZbClmEqfX59OILBzND6ltr8eUDqjC1m
+         u4Po4evc9X1GEvqXY1vDVOfeL/KtFKbROBW8LTMRA5lHogzu8eUYVrHy/EOZXcctKg
+         WSyY6Dz+X37BNDoXYO7AsPK/dFxudK5hx1QGqP/FjkQRpelAuuLCpMAnYfWmaq0T1z
+         dpXcVEBTsAnog==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Min Li <lm0963hack@gmail.com>,
-        syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com,
+Cc:     Meng Tang <tangmeng@uniontech.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 48/49] Bluetooth: L2CAP: fix "bad unlock balance" in l2cap_disconnect_rsp
-Date:   Thu,  4 May 2023 15:46:25 -0400
-Message-Id: <20230504194626.3807438-48-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 40/49] Bluetooth: btusb: Add new PID/VID 04ca:3801 for MT7663
+Date:   Thu,  4 May 2023 15:46:17 -0400
+Message-Id: <20230504194626.3807438-40-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230504194626.3807438-1-sashal@kernel.org>
 References: <20230504194626.3807438-1-sashal@kernel.org>
@@ -56,35 +54,72 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Min Li <lm0963hack@gmail.com>
+From: Meng Tang <tangmeng@uniontech.com>
 
-[ Upstream commit 25e97f7b1866e6b8503be349eeea44bb52d661ce ]
+[ Upstream commit 13209415d0e88396d99d346b184864834d70d68a ]
 
-conn->chan_lock isn't acquired before l2cap_get_chan_by_scid,
-if l2cap_get_chan_by_scid returns NULL, then 'bad unlock balance'
-is triggered.
+This bluetooth device is found in a combo WLAN/BT card
+for a MediaTek 7663.
 
-Reported-by: syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/all/000000000000894f5f05f95e9f4d@google.com/
-Signed-off-by: Min Li <lm0963hack@gmail.com>
+Tested on Acer Aspire A315-24P Notebook
+
+The device information:
+
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3801 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+
+Signed-off-by: Meng Tang <tangmeng@uniontech.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e62dadad81b31..ee8f806534dfb 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4694,7 +4694,6 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 90b85dcb138df..8ee147ad76b79 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -549,6 +549,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x043e, 0x310c), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3801), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
  
- 	chan = l2cap_get_chan_by_scid(conn, scid);
- 	if (!chan) {
--		mutex_unlock(&conn->chan_lock);
- 		return 0;
- 	}
- 
+ 	/* Additional MediaTek MT7668 Bluetooth devices */
+ 	{ USB_DEVICE(0x043e, 0x3109), .driver_info = BTUSB_MEDIATEK |
 -- 
 2.39.2
 
