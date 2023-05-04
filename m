@@ -2,47 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2DD2C7EE2C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD2FC7EE29
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 19:46:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230162AbjEDTqV (ORCPT
+        id S230391AbjEDTq0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 May 2023 15:46:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48652 "EHLO
+        Thu, 4 May 2023 15:46:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230314AbjEDTpf (ORCPT
+        with ESMTP id S230369AbjEDTpk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 May 2023 15:45:35 -0400
+        Thu, 4 May 2023 15:45:40 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1132F14909;
-        Thu,  4 May 2023 12:44:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8856714923;
+        Thu,  4 May 2023 12:44:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D1AB263742;
-        Thu,  4 May 2023 19:44:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20523C433D2;
-        Thu,  4 May 2023 19:44:06 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8922063747;
+        Thu,  4 May 2023 19:44:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BE03C4339E;
+        Thu,  4 May 2023 19:44:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683229447;
-        bh=0GXFjYVqZ0PZmO9tVgTtfCagheAJigcdVsSQDV6JnJE=;
+        s=k20201202; t=1683229451;
+        bh=eJwsPTF1sGf3gATrqhUnKCreLCEh7/RrYOxXYQr156c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=utH/HqAkMMXx2/NqBjOH6ULvi7A7MkaauUxxywVHmPBADN7wDPBJQKnDMhoA/fkb+
-         BzZv1slPNJNHDPnHLbkuvgY03CkXfGw+zcHsPv7XzPiY2sFh8vnYihLit9xwwgDqZN
-         POJ4jcyU9Fo4i6oj8rVCN8nWstrby7gHUqehXmiGja0tjN72YvPFDjiP2MQDBfcRTz
-         HmUkyhgAHaD9ssgvPgroyg+5H85Xg6Wl+5haB+w1mYtokhO4HIq+CQ03k2rMKecYe6
-         op2FK6VDKZ2JHrEAQZiWcOmkKu+i0+9eNyNseexsPg3GcxmR/TB7GTMF8FxnYe4L99
-         q8kfgxbKQLXCA==
+        b=IAsR/AYwNQdnXMXtOlIf6EfV0tEwjQobED/oRbgX3WLxPr1bGnBnmbiY/84rpMIKV
+         vL3i4k+TbrAwbXAb/ECexF3XXjMCb8whuEmd/mlaRQ+J0X4siQnGPn6Vbj1o+DsznC
+         v6eX42f4op4EBnTSwEUyNw4Exay7IUFIOsI185Imr/UsATdztZShhEmMCXxoGl0Npm
+         O+Ksd6yMpZfGZUP8GcC9ZImEg7ktWYpdWMlF+9QK0+BGVpwrE7UHxaZRoQrxt2fXAd
+         tdmpbuKUbvP9ySjyU77644XpYR4EfuBuCpoXdf0YsPdaK5431ItmB14AY7VJ5ykYWj
+         dVFh3eSc3MAtg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hans de Goede <hdegoede@redhat.com>,
+Cc:     Min Li <lm0963hack@gmail.com>,
+        syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.3 56/59] Bluetooth: hci_bcm: Fall back to getting bdaddr from EFI if not set
-Date:   Thu,  4 May 2023 15:41:39 -0400
-Message-Id: <20230504194142.3805425-56-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.3 58/59] Bluetooth: L2CAP: fix "bad unlock balance" in l2cap_disconnect_rsp
+Date:   Thu,  4 May 2023 15:41:41 -0400
+Message-Id: <20230504194142.3805425-58-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230504194142.3805425-1-sashal@kernel.org>
 References: <20230504194142.3805425-1-sashal@kernel.org>
@@ -54,111 +56,35 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hans de Goede <hdegoede@redhat.com>
+From: Min Li <lm0963hack@gmail.com>
 
-[ Upstream commit 0d218c3642b9ccf71f44987cd03c19320f3bd918 ]
+[ Upstream commit 25e97f7b1866e6b8503be349eeea44bb52d661ce ]
 
-On some devices the BCM Bluetooth adapter does not have a valid bdaddr set.
+conn->chan_lock isn't acquired before l2cap_get_chan_by_scid,
+if l2cap_get_chan_by_scid returns NULL, then 'bad unlock balance'
+is triggered.
 
-btbcm.c currently sets HCI_QUIRK_INVALID_BDADDR to indicate when this is
-the case. But this requires users to manual setup a btaddr, by doing e.g.:
-
-btmgmt -i hci0 public-addr 'B0:F1:EC:82:1D:B3'
-
-Which means that Bluetooth will not work out of the box on such devices.
-To avoid this (where possible) hci_bcm sets: HCI_QUIRK_USE_BDADDR_PROPERTY
-which tries to get the bdaddr from devicetree.
-
-But this only works on devicetree platforms. On UEFI based platforms
-there is a special Broadcom UEFI variable which when present contains
-the devices bdaddr, just like how there is another UEFI variable which
-contains wifi nvram contents including the wifi MAC address.
-
-Add support for getting the bdaddr from this Broadcom UEFI variable,
-so that Bluetooth will work OOTB for users on devices where this
-UEFI variable is present.
-
-This fixes Bluetooth not working on for example Asus T100HA 2-in-1s.
-
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Reported-by: syzbot+9519d6b5b79cf7787cf3@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/all/000000000000894f5f05f95e9f4d@google.com/
+Signed-off-by: Min Li <lm0963hack@gmail.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btbcm.c | 47 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 44 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 43e98a598bd9a..de2ea589aa49b 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -6,6 +6,7 @@
-  *  Copyright (C) 2015  Intel Corporation
-  */
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 55a7226233f96..24d075282996c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4694,7 +4694,6 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
  
-+#include <linux/efi.h>
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <linux/dmi.h>
-@@ -34,6 +35,43 @@
- /* For kmalloc-ing the fw-name array instead of putting it on the stack */
- typedef char bcm_fw_name[BCM_FW_NAME_LEN];
- 
-+#ifdef CONFIG_EFI
-+static int btbcm_set_bdaddr_from_efi(struct hci_dev *hdev)
-+{
-+	efi_guid_t guid = EFI_GUID(0x74b00bd9, 0x805a, 0x4d61, 0xb5, 0x1f,
-+				   0x43, 0x26, 0x81, 0x23, 0xd1, 0x13);
-+	bdaddr_t efi_bdaddr, bdaddr;
-+	efi_status_t status;
-+	unsigned long len;
-+	int ret;
-+
-+	if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
-+		return -EOPNOTSUPP;
-+
-+	len = sizeof(efi_bdaddr);
-+	status = efi.get_variable(L"BDADDR", &guid, NULL, &len, &efi_bdaddr);
-+	if (status != EFI_SUCCESS)
-+		return -ENXIO;
-+
-+	if (len != sizeof(efi_bdaddr))
-+		return -EIO;
-+
-+	baswap(&bdaddr, &efi_bdaddr);
-+
-+	ret = btbcm_set_bdaddr(hdev, &bdaddr);
-+	if (ret)
-+		return ret;
-+
-+	bt_dev_info(hdev, "BCM: Using EFI device address (%pMR)", &bdaddr);
-+	return 0;
-+}
-+#else
-+static int btbcm_set_bdaddr_from_efi(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+#endif
-+
- int btbcm_check_bdaddr(struct hci_dev *hdev)
- {
- 	struct hci_rp_read_bd_addr *bda;
-@@ -87,9 +125,12 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM4345C5) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0) ||
- 	    !bacmp(&bda->bdaddr, BDADDR_BCM43341B)) {
--		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
--			    &bda->bdaddr);
--		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+		/* Try falling back to BDADDR EFI variable */
-+		if (btbcm_set_bdaddr_from_efi(hdev) != 0) {
-+			bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
-+				    &bda->bdaddr);
-+			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+		}
+ 	chan = l2cap_get_chan_by_scid(conn, scid);
+ 	if (!chan) {
+-		mutex_unlock(&conn->chan_lock);
+ 		return 0;
  	}
  
- 	kfree_skb(skb);
 -- 
 2.39.2
 
