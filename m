@@ -2,174 +2,212 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA4BC77B7F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 May 2023 17:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35562C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 May 2023 06:23:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229670AbjECReX (ORCPT
+        id S229688AbjEDGXB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 May 2023 13:34:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33402 "EHLO
+        Thu, 4 May 2023 02:23:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbjECReW (ORCPT
+        with ESMTP id S229872AbjEDGW4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 May 2023 13:34:22 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8995AC;
-        Wed,  3 May 2023 10:34:20 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2a8dd1489b0so54372701fa.3;
-        Wed, 03 May 2023 10:34:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683135259; x=1685727259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XqIFFECjD8VbhTkVXBRW7iw73ClVU9Rx1DVSjMQg4AI=;
-        b=bkI/H/0RlNbJpxMKaE08VNPaEMX7VGjhwLUeyFtckK/cp88nmGMTBJKDedNpmrkny0
-         PrY0Nk2uy406S0HQ4FV9zlP0FC/MoJV33b5FInYHwRD/qPY3imf19obSMfi6kmIpzcvU
-         S+rrro7FK8NvGuk8U4e9x0uiyeOTWlFwdAhk98+j5fPl7H8Mjpr/gKdEJpWPtip5rQqL
-         nXqxfZO8+iJ9gf0wR2cbnqjvTMhoJ6Yh+4jqJQ7hojgAC4uLhEIu6G5qJh1TqFaviwi/
-         HdS8sMeifnzXvqzHSLlHNRScTL6BTp2z4q0WH1+T1WmsG0tKRjGkMZ/yKJ5JrvPEsnVJ
-         fMPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683135259; x=1685727259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XqIFFECjD8VbhTkVXBRW7iw73ClVU9Rx1DVSjMQg4AI=;
-        b=kMx/ja9NOpUnhfC1TqJs5T6dUx30jxn/Rx769nCjgC6mE4zWFsDZSaHhO5JDH1B0Br
-         B1P8WCMzXWPRWzfLFBTWlojuVdmFHLsBLgCtRcJAAVWaRX6+8/qvfOAHcnLxXrB1Th9w
-         wk6PuX6XY3MAOFyHeukOoSucHEFINYC/wSUthqtriX0YrmY9PJuN7VLMp3Ws3HSXXH0f
-         2Aut4D0NkpDGhGtMNgTpsrhrx2ykY7yRqoc0HYQft4kVcFwan2Lq8oSymBk2D8NiySON
-         fqNJTO69ClzToFNsGWWa7t9J5ShZrsPSJx1/FQ06ndYgVmc2VROEChHXIMNWcillrV3k
-         +14A==
-X-Gm-Message-State: AC+VfDzSvx4b7jsF1E/EKuNIENOO8vpZ94RK5hH5ULCisdyv3kFOlcJO
-        Fdy98ypxKPPbMTadttkW/CcjnruklpKYfO4TgUI=
-X-Google-Smtp-Source: ACHHUZ7FMfCySIhXZgy4cLrSjQETM2G2bNB+KW2RTdqpfocu+dBYWUTW54izs9Nm00SLN+1A6WDs+d51UH1TPlrg9GI=
-X-Received: by 2002:a2e:94ca:0:b0:2a8:e670:c3cc with SMTP id
- r10-20020a2e94ca000000b002a8e670c3ccmr228651ljh.16.1683135258825; Wed, 03 May
- 2023 10:34:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230424124852.12625-1-johan+linaro@kernel.org>
- <20230424124852.12625-2-johan+linaro@kernel.org> <CABBYNZLBQjWVb=z8mffi4RmeKS-+RDLV+XF8bR2MiJ-ZOaFVHA@mail.gmail.com>
- <ZFIHj9OAJkRvSscs@hovoldconsulting.com>
-In-Reply-To: <ZFIHj9OAJkRvSscs@hovoldconsulting.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 3 May 2023 10:34:06 -0700
-Message-ID: <CABBYNZJ23E50J2gfi5NgHj_bXMuVTHk29s+BH-zMhhWmRsd0Pg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] Bluetooth: fix debugfs registration
-To:     Johan Hovold <johan@kernel.org>
-Cc:     Johan Hovold <johan+linaro@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 4 May 2023 02:22:56 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4733A2D59
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 May 2023 23:22:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1683181375; x=1714717375;
+  h=date:from:to:cc:subject:message-id;
+  bh=QoqLVw1mlyacDDicAaduA0LmIh0lZW6r2GQa3m2T78o=;
+  b=aY5tS+Zb+f9m7wPQXJ5oMZxvDDEWg4yUWCN/urp/2hL4u+UJM5Cqfq7G
+   WYG0i5r54cHcucie5blZ8Fizu6T/F9A86EtvuXz1zg+lP8Pm6OcnYJAAr
+   MXGL8qi3aeojJn4BqWulA3wL1c89KMZwPf6Ohr0xx0SyRhWPoI7N4dxJN
+   POZvSWzXNKEStq5r6nulYRMrqJiBnVUMf0dan1/nI2bU3n4KY5cC8QJPE
+   eBeFEI2yb2opLrzZLJlUZCeO4UGjkkgRMaGngfEMbANhkm4JAiLE9v5Xk
+   QMeUwCGVr4RX15wH/QylwDs+Ye9jr8QsLRw0T8v3CQXvA9Is1liqqGA+f
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="337989516"
+X-IronPort-AV: E=Sophos;i="5.99,249,1677571200"; 
+   d="scan'208";a="337989516"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2023 23:22:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10699"; a="647196879"
+X-IronPort-AV: E=Sophos;i="5.99,249,1677571200"; 
+   d="scan'208";a="647196879"
+Received: from lkp-server01.sh.intel.com (HELO e3434d64424d) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 03 May 2023 23:22:52 -0700
+Received: from kbuild by e3434d64424d with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1puSMd-0002dk-2A;
+        Thu, 04 May 2023 06:22:51 +0000
+Date:   Thu, 04 May 2023 14:22:15 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ e6e576ec4e728b201a801374b0cec649a4473908
+Message-ID: <20230504062215.OM3me%lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: e6e576ec4e728b201a801374b0cec649a4473908  Bluetooth: Unlink CISes when LE disconnects in hci_conn_del
 
-On Wed, May 3, 2023 at 12:04=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
-te:
->
-> On Tue, May 02, 2023 at 04:37:51PM -0700, Luiz Augusto von Dentz wrote:
-> > Hi Johan,
-> >
-> > On Mon, Apr 24, 2023 at 5:50=E2=80=AFAM Johan Hovold <johan+linaro@kern=
-el.org> wrote:
-> > >
-> > > Since commit ec6cef9cd98d ("Bluetooth: Fix SMP channel registration f=
-or
-> > > unconfigured controllers") the debugfs interface for unconfigured
-> > > controllers will be created when the controller is configured.
-> > >
-> > > There is however currently nothing preventing a controller from being
-> > > configured multiple time (e.g. setting the device address using btmgm=
-t)
-> > > which results in failed attempts to register the already registered
-> > > debugfs entries:
-> > >
-> > >         debugfs: File 'features' in directory 'hci0' already present!
-> > >         debugfs: File 'manufacturer' in directory 'hci0' already pres=
-ent!
-> > >         debugfs: File 'hci_version' in directory 'hci0' already prese=
-nt!
-> > >         ...
-> > >         debugfs: File 'quirk_simultaneous_discovery' in directory 'hc=
-i0' already present!
-> > >
-> > > Add a controller flag to avoid trying to register the debugfs interfa=
-ce
-> > > more than once.
-> > >
-> > > Fixes: ec6cef9cd98d ("Bluetooth: Fix SMP channel registration for unc=
-onfigured controllers")
-> > > Cc: stable@vger.kernel.org      # 4.0
-> > > Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
-> > > ---
->
-> > > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > > index 632be1267288..a8785126df75 100644
-> > > --- a/net/bluetooth/hci_sync.c
-> > > +++ b/net/bluetooth/hci_sync.c
-> > > @@ -4501,6 +4501,9 @@ static int hci_init_sync(struct hci_dev *hdev)
-> > >             !hci_dev_test_flag(hdev, HCI_CONFIG))
-> > >                 return 0;
-> > >
-> > > +       if (hci_dev_test_and_set_flag(hdev, HCI_DEBUGFS_CREATED))
-> > > +               return 0;
-> >
-> > Can't we just use HCI_SETUP like we do with in create_basic:
-> >
-> >     if (hci_dev_test_flag(hdev, HCI_SETUP))
-> >         hci_debugfs_create_basic(hdev);
-> >
-> > Actually we might as well move these checks directly inside the
-> > hci_debugfs function to make sure these only take effect during the
-> > setup/first init.
->
-> The problem is that commit ec6cef9cd98d ("Bluetooth: Fix SMP channel
-> registration for unconfigured controllers") started deferring creation
-> of most parts of the debugfs interface until the controller is
-> configured (e.g. as some information is not available until then).
->
-> Moving everything back to setup-time would effectively revert that.
+elapsed time: 721m
 
-Not moving back but just doing something like:
+configs tested: 140
+configs skipped: 14
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index ec0df2f9188e..a6e94c29fc5a 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -310,6 +310,9 @@ DEFINE_INFO_ATTRIBUTE(firmware_info, fw_info);
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
- void hci_debugfs_create_common(struct hci_dev *hdev)
- {
-+       if (!hci_dev_test_flag(hdev, HCI_SETUP))
-+               return;
-+
-        debugfs_create_file("features", 0444, hdev->debugfs, hdev,
-                            &features_fops);
-        debugfs_create_u16("manufacturer", 0444, hdev->debugfs,
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha        buildonly-randconfig-r002-20230502   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r002-20230430   gcc  
+alpha                randconfig-r012-20230501   gcc  
+alpha                randconfig-r025-20230502   gcc  
+alpha                randconfig-r032-20230501   gcc  
+arc                              allyesconfig   gcc  
+arc          buildonly-randconfig-r001-20230430   gcc  
+arc          buildonly-randconfig-r003-20230502   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r006-20230501   gcc  
+arc                  randconfig-r013-20230501   gcc  
+arc                  randconfig-r043-20230430   gcc  
+arc                  randconfig-r043-20230501   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r026-20230502   clang
+arm                  randconfig-r046-20230430   gcc  
+arm                  randconfig-r046-20230501   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r016-20230502   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r015-20230502   gcc  
+csky                 randconfig-r023-20230502   gcc  
+hexagon              randconfig-r041-20230430   clang
+hexagon              randconfig-r041-20230501   clang
+hexagon              randconfig-r045-20230430   clang
+hexagon              randconfig-r045-20230501   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-a001-20230501   gcc  
+i386                 randconfig-a002-20230501   gcc  
+i386                 randconfig-a003-20230501   gcc  
+i386                 randconfig-a004-20230501   gcc  
+i386                 randconfig-a005-20230501   gcc  
+i386                 randconfig-a006-20230501   gcc  
+i386                 randconfig-a011-20230501   clang
+i386                 randconfig-a012-20230501   clang
+i386                 randconfig-a013-20230501   clang
+i386                 randconfig-a014-20230501   clang
+i386                 randconfig-a015-20230501   clang
+i386                 randconfig-a016-20230501   clang
+ia64                             allmodconfig   gcc  
+ia64                                defconfig   gcc  
+ia64                 randconfig-r003-20230501   gcc  
+ia64                 randconfig-r013-20230430   gcc  
+ia64                 randconfig-r031-20230501   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r006-20230502   gcc  
+m68k                 randconfig-r036-20230501   gcc  
+microblaze   buildonly-randconfig-r001-20230502   gcc  
+microblaze           randconfig-r006-20230430   gcc  
+microblaze           randconfig-r014-20230430   gcc  
+microblaze           randconfig-r033-20230501   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips         buildonly-randconfig-r004-20230430   clang
+mips         buildonly-randconfig-r006-20230502   gcc  
+mips                 randconfig-r005-20230501   clang
+mips                 randconfig-r014-20230501   gcc  
+mips                 randconfig-r032-20230430   clang
+nios2                               defconfig   gcc  
+nios2                randconfig-r001-20230430   gcc  
+nios2                randconfig-r004-20230501   gcc  
+nios2                randconfig-r012-20230502   gcc  
+nios2                randconfig-r014-20230502   gcc  
+openrisc     buildonly-randconfig-r006-20230430   gcc  
+openrisc             randconfig-r011-20230501   gcc  
+openrisc             randconfig-r011-20230502   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r016-20230501   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc      buildonly-randconfig-r006-20230501   clang
+powerpc              randconfig-r002-20230502   clang
+powerpc              randconfig-r013-20230502   gcc  
+powerpc              randconfig-r015-20230430   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv        buildonly-randconfig-r003-20230501   clang
+riscv        buildonly-randconfig-r005-20230430   clang
+riscv                               defconfig   gcc  
+riscv                randconfig-r003-20230502   clang
+riscv                randconfig-r004-20230430   gcc  
+riscv                randconfig-r042-20230430   clang
+riscv                randconfig-r042-20230501   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390         buildonly-randconfig-r004-20230502   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r016-20230430   clang
+s390                 randconfig-r022-20230502   gcc  
+s390                 randconfig-r031-20230430   gcc  
+s390                 randconfig-r044-20230430   clang
+s390                 randconfig-r044-20230501   clang
+sh                               allmodconfig   gcc  
+sh                   randconfig-r011-20230430   gcc  
+sparc        buildonly-randconfig-r001-20230501   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r003-20230430   gcc  
+sparc                randconfig-r004-20230502   gcc  
+sparc64      buildonly-randconfig-r002-20230501   gcc  
+sparc64              randconfig-r001-20230502   gcc  
+sparc64              randconfig-r005-20230430   gcc  
+sparc64              randconfig-r005-20230502   gcc  
+sparc64              randconfig-r012-20230430   gcc  
+sparc64              randconfig-r015-20230501   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-a001-20230501   gcc  
+x86_64               randconfig-a002-20230501   gcc  
+x86_64               randconfig-a003-20230501   gcc  
+x86_64               randconfig-a004-20230501   gcc  
+x86_64               randconfig-a005-20230501   gcc  
+x86_64               randconfig-a006-20230501   gcc  
+x86_64               randconfig-a011-20230501   clang
+x86_64               randconfig-a012-20230501   clang
+x86_64               randconfig-a013-20230501   clang
+x86_64               randconfig-a014-20230501   clang
+x86_64               randconfig-a015-20230501   clang
+x86_64               randconfig-a016-20230501   clang
+x86_64               randconfig-r034-20230501   gcc  
+x86_64                               rhel-8.3   gcc  
+xtensa       buildonly-randconfig-r005-20230501   gcc  
+xtensa               randconfig-r001-20230501   gcc  
+xtensa               randconfig-r002-20230501   gcc  
 
-> Perhaps the interface can be changed in some way so that everything is
-> again registered at setup-time (e.g. with placeholder values instead of
-> conditionally created attributes), but that would at least not be
-> something that we could backport.
->
-> > >         hci_debugfs_create_common(hdev);
-> > >
-> > >         if (lmp_bredr_capable(hdev))
->
-> Johan
-
-
-
---=20
-Luiz Augusto von Dentz
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests
