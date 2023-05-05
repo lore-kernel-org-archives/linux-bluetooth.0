@@ -2,137 +2,136 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA100C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 08:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1EBC77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 10:24:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231147AbjEEIf4 (ORCPT
+        id S231393AbjEEKYU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 May 2023 04:35:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36620 "EHLO
+        Fri, 5 May 2023 06:24:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230063AbjEEIfz (ORCPT
+        with ESMTP id S230460AbjEEKYT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 May 2023 04:35:55 -0400
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2062e.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e1b::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 814EB46AD
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 01:35:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CyI4ABXfZSnYgMME/yp78Hn8XRtB+jzif/4uiSvgdCpjVPa4kmwoYO7xNtcbTtXhqh3iqQ/Z0W0h264G2IK0eDn6EfzOZTmx8TuF5Mhp5xB9ApQDfwoyMzI/9FTU9gailrZlVmGqfz2fB5rsxCPRdvZ40NludwKRewSp5lkegxATOoHevijC4aXHGdvOmYd3Y+dZeOLbVtD0CJ5r4z1m6XYjqzJZUOk4RrwuOvInnSfUNNIHQVqaR/YilrSFG457tO7TIC+khpnpj720DNn8MiZI+v0A6A2u6+4S9is8eSWUghG9nqX8VS85urUnvKXG4E7gmgrb+nxh2a5a4ae0Kg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/ssDhyjJNsA/drm8zQ5CH1hca4s8RZmKr7NGrHJmrUw=;
- b=NcZmlrVIA+v++jYaFaDmkfqUBH0P9lmJceMN7xncnz3XofnHsjVNBAfu7TwGDEBt+vypKLFCyJpmB/Oz+Cx/kfk1+0GCAeIUuo0aenNzBfCrWyjoV3y+qh70gyXaNyBPm4Yz+rS9VtaKXZxhdqHyZgnfzIwL7XtC3pM7zFVLvQjEabPWoy0jrLxPHVgxd4SWX/qGv3WRs+xvsLWr2FwLjlQwurnjQ6ZzzCwBLWsLHfgJAk5k3/7fLSgzZAOn/O0tKhsZKE7xTdaWZOvoWnZ4r24JO2w9AvLi14djt8W7OnWsTacmOJATqHeg/Sas9q72VSILle7wH5qzjmp2tn1JmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/ssDhyjJNsA/drm8zQ5CH1hca4s8RZmKr7NGrHJmrUw=;
- b=UgE0u6YNLizxie2p3mxr124AzTXfUKdA0b6Ny2PJmEx6Wdd51RWJ0LRHzIfhX0VMLg3M3709uOdMBViAJL+BejVdtX27mGy8IGvOUf9v5J2zQD1uAyh/8da6izDzMhx1FubiTNbDgBrf7lLnx+f51Ad1A1K1GGTU073I9X33fsA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by AS8PR04MB8101.eurprd04.prod.outlook.com (2603:10a6:20b:3f6::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6363.27; Fri, 5 May
- 2023 08:30:19 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::afb8:bb33:948f:d1e1]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::afb8:bb33:948f:d1e1%9]) with mapi id 15.20.6363.027; Fri, 5 May 2023
- 08:30:19 +0000
-From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 0/5] Add initial code for handling BASS
-Date:   Fri,  5 May 2023 11:29:38 +0300
-Message-Id: <20230505082943.92033-1-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM4PR07CA0036.eurprd07.prod.outlook.com
- (2603:10a6:205:1::49) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+        Fri, 5 May 2023 06:24:19 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B496518DFA
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 03:24:18 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-3ef49c15454so7474861cf.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 May 2023 03:24:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683282257; x=1685874257;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=RyA0GoJwI75K0d/3rCAW1jwayQeAfMB8YQXqt42h2jw=;
+        b=RTmZSj6zfOoBkUepNZ/hafQcYkMJTp0N+fqgdQ487YQKa75HrGppwU7gNSx+c5RRvS
+         8XTkcVKPnz7sfgVtp+b1RbkSePRpcH446D5L1p95x5vgr+NE8GrG+99UYl70gcyb8zA5
+         X0c0NigLLFgTANuWE9Y/q5fZpma9DFeA9r1T3x+DiU3qdDms+ygG5Z8MNQ/xu4V7pId+
+         uddzcLOoIVcuiq4lJ1XTCr9UtqanlEs2WuLpYhDgNa9fhZtDGVkgqQwfuEPROzVM0Umi
+         9twrQc4aaNcGGbhgYI5csOtMxs5hwz8Rv1bOaVLjDud08W2WjxSITed50vg9rYub7EG5
+         X7Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683282257; x=1685874257;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RyA0GoJwI75K0d/3rCAW1jwayQeAfMB8YQXqt42h2jw=;
+        b=K2qCZsZSkEdbigAtKMOnxcowEMwEy8qIVvoj7mJQhu1RJ8txndy4wefuvjuhXyLnvo
+         1+aTR7KkyoxlLM1iW4hmw4K5LzpdnBgwWAgucfMWqA92YOSLvNXw1KPQOodfwiiciwtL
+         qk4Y7jXber3TRcrDVljLkbV1mljb8TZ6PdH9ozGIAE7SctjXmIraUmrlLdj2MurCc3od
+         j2D46T76vocQGMw6m9PmCPbuCJFb2YbpAZ2ePngieaPP2143sJrV5LatpUzeynitPj9Z
+         QzykLKkv2SyQPQYx7Oi5OFLImJuLpvOFeXCxvUeTfVf5yUsxoOtbT/if05LGize6C/7n
+         TREQ==
+X-Gm-Message-State: AC+VfDyl5q4ZjfV59QkwvnNvT8xMUl8zL28V7/R/tAcUBzNNjEB/2ezn
+        ww28ptfvY8n1SqCv1/4V1b3k+vrijLc=
+X-Google-Smtp-Source: ACHHUZ7nxxQKp7ZfPJLfWxt4cxxfjd2yNcx7DOj69+FE4RzvfTp3cK1FMUF1jloOjVPY9kwek0u84A==
+X-Received: by 2002:ac8:5c10:0:b0:3f1:be88:7178 with SMTP id i16-20020ac85c10000000b003f1be887178mr1679959qti.42.1683282257304;
+        Fri, 05 May 2023 03:24:17 -0700 (PDT)
+Received: from [172.17.0.2] ([104.45.200.50])
+        by smtp.gmail.com with ESMTPSA id o11-20020a05620a130b00b0074f1ff2e0aasm473177qkj.46.2023.05.05.03.24.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 May 2023 03:24:17 -0700 (PDT)
+Message-ID: <6454d951.050a0220.cf39a.15fb@mx.google.com>
+Date:   Fri, 05 May 2023 03:24:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2923051421073040169=="
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS8PR04MB8101:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8cbeabb1-adc3-4034-5704-08db4d42f5e2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4TZ8lQQ+cZvvgoLlDcIOoFUhXpP96EQAQUZND7NhT4pgZsafzfKU3JkNZvNBhMwfJje94mWtOFdcTcJCCpWmqMvfbwpT0EJvtwFP/YPJpax6ZVvdqP2MgO10k5QiK4fnFL2h2nAimrLRfR2VXQVlY+A1V2vK9/H3UDCiIzf2VD/HAlT/xu+44CpuXNCHSftbPDjxU/i4r+ilyMctEP8klqzKEDdB4/w5Lvc9F5PG6BYTY0Y2TlIFVYQCiEsslhYAg3QB9icbMRBX/WEa0gw3kpCE37OuKukZWNzya7K3/A9AJDewOkC5e9LVkwURTnO8/NRERFrwfq3CXNwW86dT07RxoQqGcD+mzylFM05+DExsgVWelezEEm6/rQ6+dreuvMxGMFocqgIbjFTBan7QHP1O8R6EwER7fLINlDy4iSsP1LfL8MFqqXEjUdm7coU6WuauiQ4Rz0sY/vgbGrGYqHBbuSaa9nlHypQPSf7yrCY1V5KJiIz7iKI9sbKpU0wMPFYCEMQht4JjTfqJtwSDtR2YNLGKbguUzMa3kKRbejhd5ymD1aOIflGKSheKljC8x65g6d1M66Ia5nG5Y0XhQuFV/LNHWdVqSGz0WsXvq/WtaOjs5zzfpZ0ZHxaq0iUD
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(136003)(366004)(346002)(451199021)(52116002)(6916009)(4326008)(66946007)(66556008)(66476007)(6666004)(478600001)(316002)(36756003)(86362001)(6486002)(83380400001)(2616005)(55236004)(6506007)(6512007)(1076003)(26005)(8676002)(5660300002)(8936002)(4744005)(44832011)(2906002)(41300700001)(38100700002)(186003)(38350700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mb8lg7Ig4XAeNh98gFN39pxeE3WxG/Wh+BDUVsthtQHRntBxJb30UHRIYOg0?=
- =?us-ascii?Q?TZX8jpgueoCIdXVoDFqBScTOLpNrvtazEtBO994+EAQqDEgHiLSJzCgUw6sd?=
- =?us-ascii?Q?Z09tAuaKk49Gq8nbI+O4o319QkoWE9YMqdiGf3UqDM+Kcc5YUb1ds+EYby1H?=
- =?us-ascii?Q?SISYLoAL+hxftSiEqsfHvj+McLg4jjdhKiaw0gkTirZoVwDcewanhyX9lvhb?=
- =?us-ascii?Q?WizUZ+7YxLGiF29pzFD8XD6C9GD/1tRFNoKvoBOJUxH2WuJqkvlB3O2Pn/l2?=
- =?us-ascii?Q?qr0x4Qhfzgznq2HuZEpYlWSf4EIF83aMkT8QZxHRX+bZSYNFF4CqUNxsguQQ?=
- =?us-ascii?Q?ly6XAfAXti2d1WDMcW4vV030tTL6627o/LIsnTicTEsXwMuTvRh4j/fi2xbW?=
- =?us-ascii?Q?d0FQ/3aOIDA5pJBmIQ9GpLx1Y5al6wmT1M2WnhPPq77nX3iPVBSjUMh3cdr8?=
- =?us-ascii?Q?SyimRzJWEL3n9tdu2ziw1LUwcXb9LkZ1DavZV1Gp9bPFHuBnvml5DxkExLUi?=
- =?us-ascii?Q?Od4ADXGQr4exqr0ONYi3qC7WrW8Q0Bm2nqPg7+PlJIiwDgvVQoyHu+NR9hh6?=
- =?us-ascii?Q?jgpDSLzDIdK4vZPot349qwgeB5hI/9OEa0fY58DWGePYjZjVEjngw1gShRos?=
- =?us-ascii?Q?kgc2ZTmjcLyykgBcHGAKKaVy8nuNbuNt9pf94Hpijv8mMvKsvWRkkDS3euUP?=
- =?us-ascii?Q?ox/9wId40gOKCv3Jl3IY8abfkQtq+5DJbgEuk7ACVcnUJNmqHJuowQa4Ke8m?=
- =?us-ascii?Q?BluZFgY42YdrK9mOmmUSZZAYrXsA1JIz/kuDKDRE3VmR2WGvLlA2EeOYUBS1?=
- =?us-ascii?Q?wlfPLM+DkTFa0gIsYdkkt0zG8F25e1q5EaljQC8PBst2nt7dFbnIBEd2aP+C?=
- =?us-ascii?Q?V1Fm0JZTs9x4dXRFGk6/aDqJO0AeIb1CDFGGwc+K22nfeF4KrKosJ2mSKiZx?=
- =?us-ascii?Q?2vhCGTRKkv/Kc/F1+Qkb5w6PsArDT7u6XBQEySQ6nk8jKQL88TZoWiE65nJ7?=
- =?us-ascii?Q?rae2DJyowPSItfEXSfY+eb+6U4kMlYI88U546a0DwCEl40KOjf2/1Z8tDTUo?=
- =?us-ascii?Q?pBqcOcFOo4M9Je70K4Xd0Vh1zlwbAaZTNYJrtsv1qJp0vZO2PVGOOAtielo9?=
- =?us-ascii?Q?z+//uqbkUQGYZGFh0tgyTBppm5q3ikoM6PmdJSe9WTeGxMclPv9zGaB8DIKt?=
- =?us-ascii?Q?WvAGyxVGYfdMMAS9Ov7HQTpGEjCqfgTz3g2J44GNpXBbAsOxeQWq/E1yYpFQ?=
- =?us-ascii?Q?qrPi2CiNg7onTI/FGu0UexWWVs8+jViQE5rO5Gt1A6+p6SsyLJXzGFeeYbgn?=
- =?us-ascii?Q?7j9jMnhTr0CjCoWC892R64efP8HIITChRGTJMb3p3zkuapgzChwDXGnM82Et?=
- =?us-ascii?Q?8PfabGZyjQJinRtb4VRE+b48HC063BRa11DBbNUSuYieeJ9D4JO5Zj+wjIJh?=
- =?us-ascii?Q?77kuufkXrIRGRgzsKFdb6HZLI7zHAbC6kVMTT8YWmO5wye4S9wVDgLwUAd+n?=
- =?us-ascii?Q?zywS7d9a6zJy5z7fG1tZkRg2QUrhCGMShwgrp7ZVolX0EA/QpMsiKUM0VZI0?=
- =?us-ascii?Q?Y31eugie7cLAIHljNgUKARgFc6MGZpXbOutK5iDP2CoHjXMyhEvyL8vVcDlG?=
- =?us-ascii?Q?FQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8cbeabb1-adc3-4034-5704-08db4d42f5e2
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 May 2023 08:30:19.6622
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ULh4y7iWxi3aXaftoIS6u6OdzYn/gioYbkuYQ5lmbOdZlRZ+pl3/H3v8Xp1arzhKZxto7bLD3B+lKDautE/7rg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8101
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: [BlueZ,1/5] lib/uuid: Add BASS UUIDs
+In-Reply-To: <20230505082943.92033-2-iulia.tanasescu@nxp.com>
+References: <20230505082943.92033-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch series adds initial code for handling Broadcast Audio Scan Service.
+--===============2923051421073040169==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Iulia Tanasescu (5):
-  lib/uuid: Add BASS UUIDs
-  shared/att-types: Add BT_ERROR_WRITE_REQUEST_REJECTED error code
-  shared/util: Add iovec helpers for pulling/pushing le32 and le24
-    values
-  shared/bass: Add initial code for handling BASS
-  profiles: Add initial code for BASS plugin
+This is automated email and please do not reply to this email!
 
- Makefile.am            |    1 +
- Makefile.plugins       |    5 +
- configure.ac           |    4 +
- lib/uuid.h             |    5 +
- profiles/audio/bass.c  |  305 ++++++++++++
- src/shared/att-types.h |    4 +-
- src/shared/bass.c      | 1012 ++++++++++++++++++++++++++++++++++++++++
- src/shared/bass.h      |  122 +++++
- src/shared/util.c      |   53 +++
- src/shared/util.h      |    5 +
- 10 files changed, 1515 insertions(+), 1 deletion(-)
- create mode 100644 profiles/audio/bass.c
- create mode 100644 src/shared/bass.c
- create mode 100644 src/shared/bass.h
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=745222
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.69 seconds
+GitLint                       FAIL      1.98 seconds
+BuildEll                      PASS      27.18 seconds
+BluezMake                     PASS      876.48 seconds
+MakeCheck                     PASS      12.32 seconds
+MakeDistcheck                 PASS      154.47 seconds
+CheckValgrind                 PASS      249.05 seconds
+CheckSmatch                   PASS      338.42 seconds
+bluezmakeextell               PASS      101.88 seconds
+IncrementalBuild              PASS      3620.01 seconds
+ScanBuild                     WARNING   1030.84 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,3/5] shared/util: Add iovec helpers for pulling/pushing le32 and le24 values
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (83>80): "[BlueZ,3/5] shared/util: Add iovec helpers for pulling/pushing le32 and le24 values"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:174:9: warning: 1st function call argument is an uninitialized value
+        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:32:26: note: expanded from macro 'be32_to_cpu'
+#define be32_to_cpu(val) bswap_32(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
+#define bswap_32(x) __bswap_32 (x)
+                    ^~~~~~~~~~~~~~
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:184:9: warning: 1st function call argument is an uninitialized value
+        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:33:26: note: expanded from macro 'be64_to_cpu'
+#define be64_to_cpu(val) bswap_64(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
+#define bswap_64(x) __bswap_64 (x)
+                    ^~~~~~~~~~~~~~
+2 warnings generated.
 
 
-base-commit: 3818b99c764efe84cd3455081f6392c256564085
--- 
-2.34.1
 
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2923051421073040169==--
