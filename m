@@ -2,88 +2,127 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B27C77B7C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 18:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBEE4C77B7D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 19:13:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233199AbjEESuv (ORCPT
+        id S233565AbjEETNT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 May 2023 14:50:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58006 "EHLO
+        Fri, 5 May 2023 15:13:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233306AbjEESut (ORCPT
+        with ESMTP id S233614AbjEETM6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 May 2023 14:50:49 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21F942269D
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 11:50:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B8DCC63FE6
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 18:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2405BC433D2;
-        Fri,  5 May 2023 18:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1683312622;
-        bh=F1SmNu+8synsjXbGEazO7aJ0oS//mJRqdCI0G4ijUdY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=J6+UUclt3+Kw8N21fgoOEv4O1OvI9Z+szEYtQ9iVpLxdIc3uNyoPLWO+cadd8Y2Yp
-         ogGrXSS8mF+KkzVwIBz69c2p6AE2vmubCWLmqyaTobVDBEEVilbqsA4iVsVmKs1bAY
-         0mHBfY0bvwOfx1WWnHVJTginQbodyqfCqG19fc24c870pUbfDy2/eM/SH7T3vNNjch
-         gdNPCyjMMSgvvJedc0g33z8bgJ2CuiZdQzZqp+FdCo9LVJGOlEZlq0AgjJktVjigqR
-         DIjVKiTtcTZyK/GS6SJjOqi1wMN9rYqqF//BXgxLUA7BGCHd//vF887i/65EfHTflZ
-         hdyjTUDDxBKbQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0B4E5C395FD;
-        Fri,  5 May 2023 18:50:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/5] Add initial code for handling BASS
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168331262204.28569.10823196736816621597.git-patchwork-notify@kernel.org>
-Date:   Fri, 05 May 2023 18:50:22 +0000
-References: <20230505082943.92033-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20230505082943.92033-1-iulia.tanasescu@nxp.com>
-To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Fri, 5 May 2023 15:12:58 -0400
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAAE72270F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 12:12:45 -0700 (PDT)
+Received: from github.com (hubbernetes-node-b414d4f.va3-iad.github.net [10.48.137.12])
+        by smtp.github.com (Postfix) with ESMTPA id 219205C01D3
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 12:12:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1683313965;
+        bh=0xzJpbdhFhaEWyyFg2bGhA6ZINrJJXNFy+FXF1qZ48c=;
+        h=Date:From:To:Subject:From;
+        b=XQ1gUEeGhzbPBgNZv4ah9/AxDFphbWR/fOS5WicWbqwvFPbw1JGZKAaVglj5PZ4l0
+         Z/r00lbUBF7JeLu2B/+tNtVvPPWBCzd6a8iE5DlN6PNeEbvp++RNIvbcnbefq3FLg4
+         Chr9FBBW3wqEpJQViEcKzePMqhstMXHJscw/+FiM=
+Date:   Fri, 05 May 2023 12:12:45 -0700
+From:   iulia-tanasescu <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/3818b9-6bafe1@github.com>
+Subject: [bluez/bluez] 4e549c: lib/uuid: Add BASS UUIDs
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 4e549cf48b712088d22028282baabbfc93e5f033
+      https://github.com/bluez/bluez/commit/4e549cf48b712088d22028282baabbfc93e5f033
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-05-05 (Fri, 05 May 2023)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M lib/uuid.h
 
-On Fri,  5 May 2023 11:29:38 +0300 you wrote:
-> This patch series adds initial code for handling Broadcast Audio Scan Service.
-> 
-> Iulia Tanasescu (5):
->   lib/uuid: Add BASS UUIDs
->   shared/att-types: Add BT_ERROR_WRITE_REQUEST_REJECTED error code
->   shared/util: Add iovec helpers for pulling/pushing le32 and le24
->     values
->   shared/bass: Add initial code for handling BASS
->   profiles: Add initial code for BASS plugin
-> 
-> [...]
+  Log Message:
+  -----------
+  lib/uuid: Add BASS UUIDs
 
-Here is the summary with links:
-  - [BlueZ,1/5] lib/uuid: Add BASS UUIDs
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4e549cf48b71
-  - [BlueZ,2/5] shared/att-types: Add BT_ERROR_WRITE_REQUEST_REJECTED error code
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d5d921881b7e
-  - [BlueZ,3/5] shared/util: Add iovec helpers for pulling/pushing le32 and le24 values
-    (no matching commit)
-  - [BlueZ,4/5] shared/bass: Add initial code for handling BASS
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a56c7fd16230
-  - [BlueZ,5/5] profiles: Add initial code for BASS plugin
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6bafe1c66515
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This adds BASS UUIDs which will be used by Basic Audio Profile.
 
 
+  Commit: d5d921881b7e143f0a879a1b5d5e43ffb1c7c18f
+      https://github.com/bluez/bluez/commit/d5d921881b7e143f0a879a1b5d5e43ffb1c7c18f
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-05-05 (Fri, 05 May 2023)
+
+  Changed paths:
+    M src/shared/att-types.h
+
+  Log Message:
+  -----------
+  shared/att-types: Add BT_ERROR_WRITE_REQUEST_REJECTED error code
+
+This adds Write Request Rejected Common Profile and Service
+Error Code.
+
+
+  Commit: 18d49830b3e9ba0e346890bc3c0e9dd500eb0c2f
+      https://github.com/bluez/bluez/commit/18d49830b3e9ba0e346890bc3c0e9dd500eb0c2f
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-05-05 (Fri, 05 May 2023)
+
+  Changed paths:
+    M src/shared/util.c
+    M src/shared/util.h
+
+  Log Message:
+  -----------
+  shared/util: Add iovec helpers
+
+This adds iovec helper functions for handling byteorder and alignment
+in place.
+
+
+  Commit: a56c7fd162306460f6f1f0a9a72234cad3308d87
+      https://github.com/bluez/bluez/commit/a56c7fd162306460f6f1f0a9a72234cad3308d87
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-05-05 (Fri, 05 May 2023)
+
+  Changed paths:
+    M Makefile.am
+    A src/shared/bass.c
+    A src/shared/bass.h
+
+  Log Message:
+  -----------
+  shared/bass: Add initial code for handling BASS
+
+This adds initial code for Broadcast Audio Scan Service.
+
+
+  Commit: 6bafe1c66515e576362d0f124450a3f6f4c909aa
+      https://github.com/bluez/bluez/commit/6bafe1c66515e576362d0f124450a3f6f4c909aa
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-05-05 (Fri, 05 May 2023)
+
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    A profiles/audio/bass.c
+
+  Log Message:
+  -----------
+  profiles: Add initial code for BASS plugin
+
+This adds initial code for BASS plugin.
+
+
+Compare: https://github.com/bluez/bluez/compare/3818b99c764e...6bafe1c66515
