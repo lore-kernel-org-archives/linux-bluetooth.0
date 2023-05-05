@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46330C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 21:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D15D6C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 22:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232238AbjEEVTy (ORCPT
+        id S229819AbjEEWAW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 May 2023 17:19:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51026 "EHLO
+        Fri, 5 May 2023 18:00:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232171AbjEEVTk (ORCPT
+        with ESMTP id S229811AbjEEWAV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 May 2023 17:19:40 -0400
-Received: from mail-oa1-x2e.google.com (mail-oa1-x2e.google.com [IPv6:2001:4860:4864:20::2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97FBF525D
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 14:19:39 -0700 (PDT)
-Received: by mail-oa1-x2e.google.com with SMTP id 586e51a60fabf-18f4a6d2822so20116635fac.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 May 2023 14:19:39 -0700 (PDT)
+        Fri, 5 May 2023 18:00:21 -0400
+Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D31F21FDA
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 15:00:20 -0700 (PDT)
+Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-18ef8e9ab4fso1822402fac.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 May 2023 15:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683321579; x=1685913579;
+        d=gmail.com; s=20221208; t=1683324020; x=1685916020;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jgd1X+Gu5xjFnPIfNtY90lsd8GnVU1hNOYE8UcegVDk=;
-        b=TqQDmxY170Lfgd8MFzVeKhPFf8MLepptV1VDjBxoIVo5g9/yPzWRom9n+vA9+M+Ytt
-         exLlJ9FBU5Gz0HKw5H5AeXst7XuidkQolbDDSfHLZiLDl1AocJeoKuTO51M3iF9rG0nP
-         L8W/XnwmL7NNz9Zj+exaYnQuVT3qD+20KPAKlHSKmREEQmgU7XP0u29ZFcp+9neLa5YH
-         FrLk2kLbycNIMkYlbGdEW4kF7KPvUiAdaw21SaFRGM8LFEr3u87RXpoG6Og/w4K9aZe1
-         1QD2YpqxwTvhTJG8m8fYxLVkcAi0fC3+Tna88mC/w8Yz2KOjj+yISfj2bzuSb5+xsl8C
-         QWQA==
+        bh=TFUCLM4zBZUa6ITqRWbIFw8WJkPn1rFWT8HLCcwvQo8=;
+        b=J4pjhLXg/8ePJDIc57WrQ+TzH1B5SfC3FKwTPcJiI7n00sFAnnhMkb1wrn1mW9oTN6
+         l9HGeYX9yW0f/+E3YPXYnB+anO6qJEmpAVZnoHp25I4vAnw4YkkLGismMWUb5KCDmylR
+         NGQjjokp7JP3Pn72OSqOlPNn1P3e0/Ce9QS4wEiITcxsqCHjMrRLK87LTN4i4tXsnBRB
+         5AKs8qfKdMcuT4p2RAcf8tmR5i0bHwHhivk5NqnWo+dU9K1T46hQqOnQxWy3YXJdTiBl
+         Yol1HVeTdn+7MvPp2oT9dCEkHiDiA7qN8biHO06NmuZXGga3avUziEdPpua3ST3+9sXR
+         cPTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683321579; x=1685913579;
+        d=1e100.net; s=20221208; t=1683324020; x=1685916020;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Jgd1X+Gu5xjFnPIfNtY90lsd8GnVU1hNOYE8UcegVDk=;
-        b=agY6DGEKlFLWhjLX2lquucCyQDFNrXJRzS1npsXj+BC6REuU6Af0BCt3cfmVYX7n/u
-         G6xP596IyL8erom22D60/O0MJ90geP38YuyKehKMumuBfgAd4UULg4TjWXnQM1sG5W26
-         +k5zObwlPYhFqTB7OUklkNzKtgz22ayJav7+e88FOj1HUk4sAx+ZYbNcSFfKP3N/ib3H
-         Tgw/8u9sl1/acJsP0cUN1yXt2ltI+k5ajddjryNuCcVIzs9mmkbCgGWFkp+obChy4Aho
-         mtSG4t0a3ZvB/zHZwAJf5cX247eNzzIeXE+ut9X/tYbUDsb/98jn3OWZyBGp8fzby4xb
-         jFaQ==
-X-Gm-Message-State: AC+VfDyou8G4IAHJMFnJ8I2lJ2Djet7QLx7F8wFda2i1KaZYj66N0sCS
-        Z2hZAIQuFOKFXDYUv6bjN2CAwn5wfps=
-X-Google-Smtp-Source: ACHHUZ4uBZFEmom8GdytrR722Txe1P/VvZcdd4VthgvDWtehUEv+VYvIflOwNe3ruy3ELAlM688fPQ==
-X-Received: by 2002:a4a:c905:0:b0:547:62e8:c5bc with SMTP id v5-20020a4ac905000000b0054762e8c5bcmr2070247ooq.0.1683321578612;
-        Fri, 05 May 2023 14:19:38 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.219.151])
-        by smtp.gmail.com with ESMTPSA id j16-20020a9d7690000000b006a6558ef17fsm1336652otl.30.2023.05.05.14.19.38
+        bh=TFUCLM4zBZUa6ITqRWbIFw8WJkPn1rFWT8HLCcwvQo8=;
+        b=EqRhYvT3OG9IBsn+Dugqud+5gbKG8sA+SLZhwoCAHofObeBe2zUWvLNz46Lxr0oyJ6
+         wqNabml26+PLdRrvqSuGS/OaZPH9Fev0R8ICWeYqBC0bRgiHCx+MlyhPneSX/J5+AMy3
+         Y8VhGVNjxiGpkw6QZy4lPMLU4+AgNHxaYC13Wiks0uxn0n/aqtxYgqc4Lb4y3NlnZcVz
+         ovx2h6r1VgyIR8VETVLDoHOzHsEMLlHLZUgdFQggBK1gX+YZ+QLC1P5aC6bIZ6e6M/eS
+         V9UqJjsBunRzuVDI17nvay0ErHc/1Oo2uQvT8gdBwkd+qzmlce823n22DGAMm4BihPTf
+         V+gg==
+X-Gm-Message-State: AC+VfDyvH6UiB3Qo2mPdu7qf95dP9p9/Cdv3oez8Psp/IIg5imKDZFMN
+        Ghv1pBC1J9bF2ubuswGN/++AyrU3+co=
+X-Google-Smtp-Source: ACHHUZ7CkuBqK7Re0eEiWWuzYnaTzVbN8sYDwp7b9cVQw31U6zdu9hDUNyWvgCVh16Uq3nQma/qD/A==
+X-Received: by 2002:a05:6870:8805:b0:17a:cf55:242 with SMTP id n5-20020a056870880500b0017acf550242mr1472292oam.53.1683324019950;
+        Fri, 05 May 2023 15:00:19 -0700 (PDT)
+Received: from [172.17.0.2] ([157.55.189.35])
+        by smtp.gmail.com with ESMTPSA id u22-20020a056871059600b0017703cd8ff6sm2337040oan.7.2023.05.05.15.00.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 May 2023 14:19:38 -0700 (PDT)
-Message-ID: <645572ea.9d0a0220.a907c.75e7@mx.google.com>
-Date:   Fri, 05 May 2023 14:19:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8000969334449018789=="
+        Fri, 05 May 2023 15:00:19 -0700 (PDT)
+Message-ID: <64557c73.050a0220.bfdb4.cc46@mx.google.com>
+Date:   Fri, 05 May 2023 15:00:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7706029534121909012=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@gmail.com
-Subject: RE: [BlueZ] mesh: Update the behavior of --io option
-In-Reply-To: <20230505193931.106760-1-inga.stotland@gmail.com>
-References: <20230505193931.106760-1-inga.stotland@gmail.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] monitor/att: Attempt to insert discovered attributes
+In-Reply-To: <20230505203156.2561265-1-luiz.dentz@gmail.com>
+References: <20230505203156.2561265-1-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8000969334449018789==
+--===============7706029534121909012==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,33 +75,51 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=745379
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=745389
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.31 seconds
-BuildEll                      PASS      31.27 seconds
-BluezMake                     PASS      953.63 seconds
-MakeCheck                     PASS      12.38 seconds
-MakeDistcheck                 PASS      179.73 seconds
-CheckValgrind                 PASS      291.13 seconds
-CheckSmatch                   PASS      381.59 seconds
-bluezmakeextell               PASS      113.70 seconds
-IncrementalBuild              PASS      758.30 seconds
-ScanBuild                     WARNING   1182.91 seconds
+CheckPatch                    FAIL      1.55 seconds
+GitLint                       PASS      0.64 seconds
+BuildEll                      PASS      32.30 seconds
+BluezMake                     PASS      1012.15 seconds
+MakeCheck                     PASS      13.45 seconds
+MakeDistcheck                 PASS      186.69 seconds
+CheckValgrind                 PASS      300.63 seconds
+CheckSmatch                   WARNING   403.87 seconds
+bluezmakeextell               PASS      123.37 seconds
+IncrementalBuild              PASS      1661.30 seconds
+ScanBuild                     PASS      1239.79 seconds
 
 Details
 ##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
 Output:
-mesh/main.c:161:3: warning: Value stored to 'optarg' is never read
-                optarg += strlen("auto");
-                ^         ~~~~~~~~~~~~~~
-1 warning generated.
+[BlueZ,2/2] monitor: Fix misaligment errors
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#106: FILE: monitor/packet.c:11948:
++} __attribute__((packed));
 
+/github/workspace/src/src/13233010.patch total: 0 errors, 1 warnings, 17 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13233010.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1800:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3552:52: warning: array of flexible structuresmonitor/bt.h:3540:40: warning: array of flexible structures
 
 
 ---
@@ -109,4 +127,4 @@ Regards,
 Linux Bluetooth
 
 
---===============8000969334449018789==--
+--===============7706029534121909012==--
