@@ -2,136 +2,116 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1EBC77B7C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 10:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B467C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 May 2023 11:12:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231393AbjEEKYU (ORCPT
+        id S231836AbjEELM6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 May 2023 06:24:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
+        Fri, 5 May 2023 07:12:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230460AbjEEKYT (ORCPT
+        with ESMTP id S229553AbjEELM5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 May 2023 06:24:19 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B496518DFA
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 May 2023 03:24:18 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-3ef49c15454so7474861cf.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 May 2023 03:24:18 -0700 (PDT)
+        Fri, 5 May 2023 07:12:57 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61B121A106;
+        Fri,  5 May 2023 04:12:56 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f1763ee8f8so11221425e9.1;
+        Fri, 05 May 2023 04:12:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683282257; x=1685874257;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RyA0GoJwI75K0d/3rCAW1jwayQeAfMB8YQXqt42h2jw=;
-        b=RTmZSj6zfOoBkUepNZ/hafQcYkMJTp0N+fqgdQ487YQKa75HrGppwU7gNSx+c5RRvS
-         8XTkcVKPnz7sfgVtp+b1RbkSePRpcH446D5L1p95x5vgr+NE8GrG+99UYl70gcyb8zA5
-         X0c0NigLLFgTANuWE9Y/q5fZpma9DFeA9r1T3x+DiU3qdDms+ygG5Z8MNQ/xu4V7pId+
-         uddzcLOoIVcuiq4lJ1XTCr9UtqanlEs2WuLpYhDgNa9fhZtDGVkgqQwfuEPROzVM0Umi
-         9twrQc4aaNcGGbhgYI5csOtMxs5hwz8Rv1bOaVLjDud08W2WjxSITed50vg9rYub7EG5
-         X7Sg==
+        d=gmail.com; s=20221208; t=1683285175; x=1685877175;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ijXnLFs/E46BZ9vNzrvv52u6Szz+pPucPk3iNgQDX0=;
+        b=ktYmbTRAlaZPDQsuTHy/0W24MvI1iC67ZUpDtDkZ9YSlqzbJBWP+0kFoH8q3O4qUut
+         VM98hi2uHsFbz/a0TfWfO7KvfyYzl17T7JQzv6CKZmpSJ0F1+rUE3+8BcLPCasHpRYBh
+         w3+xRL+jvzEaqldrTuZFIITUxQJF8VKhNY10/FJ3qtw7usjlZkbrZUAEo1vviX7GohaY
+         5KKPw12O6XNmC6HTyUrMnlnnG+8ZbqEy6bBgQvW67d6vp4NcGNVms7IDdScdHK7wbMIz
+         1yO76Y4+hDmJbQFYJkb/AMHKBQEFiuadthz9Nyn15POXLgi9VcW19GgSdXDTnt49g9KG
+         6fcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683282257; x=1685874257;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RyA0GoJwI75K0d/3rCAW1jwayQeAfMB8YQXqt42h2jw=;
-        b=K2qCZsZSkEdbigAtKMOnxcowEMwEy8qIVvoj7mJQhu1RJ8txndy4wefuvjuhXyLnvo
-         1+aTR7KkyoxlLM1iW4hmw4K5LzpdnBgwWAgucfMWqA92YOSLvNXw1KPQOodfwiiciwtL
-         qk4Y7jXber3TRcrDVljLkbV1mljb8TZ6PdH9ozGIAE7SctjXmIraUmrlLdj2MurCc3od
-         j2D46T76vocQGMw6m9PmCPbuCJFb2YbpAZ2ePngieaPP2143sJrV5LatpUzeynitPj9Z
-         QzykLKkv2SyQPQYx7Oi5OFLImJuLpvOFeXCxvUeTfVf5yUsxoOtbT/if05LGize6C/7n
-         TREQ==
-X-Gm-Message-State: AC+VfDyl5q4ZjfV59QkwvnNvT8xMUl8zL28V7/R/tAcUBzNNjEB/2ezn
-        ww28ptfvY8n1SqCv1/4V1b3k+vrijLc=
-X-Google-Smtp-Source: ACHHUZ7nxxQKp7ZfPJLfWxt4cxxfjd2yNcx7DOj69+FE4RzvfTp3cK1FMUF1jloOjVPY9kwek0u84A==
-X-Received: by 2002:ac8:5c10:0:b0:3f1:be88:7178 with SMTP id i16-20020ac85c10000000b003f1be887178mr1679959qti.42.1683282257304;
-        Fri, 05 May 2023 03:24:17 -0700 (PDT)
-Received: from [172.17.0.2] ([104.45.200.50])
-        by smtp.gmail.com with ESMTPSA id o11-20020a05620a130b00b0074f1ff2e0aasm473177qkj.46.2023.05.05.03.24.16
+        d=1e100.net; s=20221208; t=1683285175; x=1685877175;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ijXnLFs/E46BZ9vNzrvv52u6Szz+pPucPk3iNgQDX0=;
+        b=CJgXVotR4N9zO4J6gTg+gzp3eT/xh9yYxuNOKWPrPjb7XQspcjBh72QjgnjxzA+vFc
+         NMmfZ64YTFPrDPzBoDR0ZB7aW5SJTPGcjtVy5DYNIuTwNdiH8MuFFURWt9HRROp8MxGz
+         5k5WrwKIZd00pytBK85HQYrKb8pAASvas+KWKghtlIl7JxjvOpPiClSRRHjImvUKPTbn
+         cDh+1hN3JyOUwc0uVon0WmvP5lf5R9frL/hPYkdj2XA5PIn8WNAii8P6nYsawgZGzzwT
+         KyOMrUJ7DvZ4nD2B3GwyxmwQreiWSyDRNkzSmxdXlgpaZ6Esg27uhGkl4UzO9F5NTEG2
+         f76A==
+X-Gm-Message-State: AC+VfDznxBFe2po3j/W2hUAAhDmvb82jgsAMc1HTsv2YXFpPBEiTkzMX
+        bSBvAmLI9w8qiqmNIUytOWo=
+X-Google-Smtp-Source: ACHHUZ7VBqUiJxZux5Zvw1CbWJkUScVvhwDiZ8l56Xhc08qtgy5n+5w+8QOylGPS6kQyJv2SQvxZfw==
+X-Received: by 2002:adf:f188:0:b0:306:37ac:ef8e with SMTP id h8-20020adff188000000b0030637acef8emr1077455wro.56.1683285174620;
+        Fri, 05 May 2023 04:12:54 -0700 (PDT)
+Received: from localhost (host86-156-84-164.range86-156.btcentralplus.com. [86.156.84.164])
+        by smtp.gmail.com with ESMTPSA id g11-20020adff40b000000b002c8476dde7asm2054187wro.114.2023.05.05.04.12.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 May 2023 03:24:17 -0700 (PDT)
-Message-ID: <6454d951.050a0220.cf39a.15fb@mx.google.com>
-Date:   Fri, 05 May 2023 03:24:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2923051421073040169=="
+        Fri, 05 May 2023 04:12:53 -0700 (PDT)
+Date:   Fri, 5 May 2023 12:12:52 +0100
+From:   Lorenzo Stoakes <lstoakes@gmail.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-tegra@vger.kernel.org, linux-um@lists.infradead.org,
+        Mark Brown <broonie@kernel.org>
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 145e5cddfe8b4bf607510b2dcf630d95f4db420f
+Message-ID: <1c8aade0-5859-40f3-b6af-5211d1f6a941@lucifer.local>
+References: <20230505024758.umVTa%lkp@intel.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: [BlueZ,1/5] lib/uuid: Add BASS UUIDs
-In-Reply-To: <20230505082943.92033-2-iulia.tanasescu@nxp.com>
-References: <20230505082943.92033-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230505024758.umVTa%lkp@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2923051421073040169==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, May 05, 2023 at 10:47:58AM +0800, kernel test robot wrote:
+> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> branch HEAD: 145e5cddfe8b4bf607510b2dcf630d95f4db420f  Add linux-next specific files for 20230504
+>
+> Error/Warning reports:
+>
+> https://lore.kernel.org/oe-kbuild-all/202304102354.Q4VOXGTE-lkp@intel.com
+> https://lore.kernel.org/oe-kbuild-all/202304220119.94Pw6YsD-lkp@intel.com
+> https://lore.kernel.org/oe-kbuild-all/202304230014.YbScpx20-lkp@intel.com
+> https://lore.kernel.org/oe-kbuild-all/202304250419.YtCLtUhG-lkp@intel.com
+> https://lore.kernel.org/oe-kbuild-all/202305042329.Gyk53keD-lkp@intel.com
+> https://lore.kernel.org/oe-kbuild-all/202305050237.1cQ4fBKs-lkp@intel.com
+>
+> Error/Warning: (recently discovered and may have been fixed)
+>
+> arch/um/drivers/harddog_user.c:6:10: fatal error: stdio.h: No such file or directory
+> drivers/accel/habanalabs/gaudi/gaudi.c:117:19: warning: unused variable 'gaudi_irq_name' [-Wunused-const-variable]
+> drivers/base/regmap/regcache-maple.c:113:23: warning: 'lower_index' is used uninitialized [-Wuninitialized]
+> drivers/base/regmap/regcache-maple.c:113:36: warning: 'lower_last' is used uninitialized [-Wuninitialized]
+> drivers/bluetooth/btnxpuart.c:1332:34: warning: unused variable 'nxpuart_of_match_table' [-Wunused-const-variable]
+> drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.c:6339:6: warning: no previous prototype for 'amdgpu_dm_connector_funcs_force' [-Wmissing-prototypes]
+> drivers/gpu/drm/amd/amdgpu/../display/amdgpu_dm/amdgpu_dm.c:6395:21: warning: variable 'count' set but not used [-Wunused-but-set-variable]
+> drivers/gpu/drm/amd/amdgpu/amdgpu_gfx.c:494:13: warning: variable 'j' set but not used [-Wunused-but-set-variable]
+> drivers/gpu/drm/amd/amdgpu/gfx_v9_4_3.c:48:38: warning: unused variable 'golden_settings_gc_9_4_3' [-Wunused-const-variable]
+> drivers/gpu/drm/i915/gt/uc/guc_capture_fwif.h:62: warning: wrong kernel-doc identifier on line:
+> drivers/gpu/drm/i915/i915_pmu.h:41: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+> drivers/gpu/drm/i915/i915_request.h:176: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+> drivers/gpu/drm/i915/i915_vma.h:145: warning: expecting prototype for i915_vma_offset(). Prototype was for i915_vma_size() instead
+> drivers/phy/mediatek/phy-mtk-hdmi-mt8195.c:298:6: warning: variable 'ret' is uninitialized when used here [-Wuninitialized]
+> mm/gup.c:2813:14: error: implicit declaration of function 'folio_fast_pin_allowed'; did you mean 'folio_test_pinned'? [-Werror=implicit-function-declaration]
+> mm/gup.c:2813:7: error: call to undeclared function 'folio_fast_pin_allowed'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
 
-This is automated email and please do not reply to this email!
+The folio_fast_pin_allowed() declaration should be fixed in v9 of the series that introduced it [1].
 
-Dear submitter,
+[1]:https://lore.kernel.org/all/cover.1683235180.git.lstoakes@gmail.com/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=745222
+> phy-mtk-hdmi-mt8195.c:(.text+0x186): undefined reference to `__floatundidf'
+> riscv64-linux-ld: phy-mtk-hdmi-mt8195.c:(.text+0x198): undefined reference to `__ltdf2'
+> riscv64-linux-ld: phy-mtk-hdmi-mt8195.c:(.text+0x1b8): undefined reference to `__gedf2'
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.69 seconds
-GitLint                       FAIL      1.98 seconds
-BuildEll                      PASS      27.18 seconds
-BluezMake                     PASS      876.48 seconds
-MakeCheck                     PASS      12.32 seconds
-MakeDistcheck                 PASS      154.47 seconds
-CheckValgrind                 PASS      249.05 seconds
-CheckSmatch                   PASS      338.42 seconds
-bluezmakeextell               PASS      101.88 seconds
-IncrementalBuild              PASS      3620.01 seconds
-ScanBuild                     WARNING   1030.84 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,3/5] shared/util: Add iovec helpers for pulling/pushing le32 and le24 values
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (83>80): "[BlueZ,3/5] shared/util: Add iovec helpers for pulling/pushing le32 and le24 values"
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:174:9: warning: 1st function call argument is an uninitialized value
-        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:32:26: note: expanded from macro 'be32_to_cpu'
-#define be32_to_cpu(val) bswap_32(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
-#define bswap_32(x) __bswap_32 (x)
-                    ^~~~~~~~~~~~~~
-In file included from tools/mesh-gatt/crypto.c:32:
-./src/shared/util.h:184:9: warning: 1st function call argument is an uninitialized value
-        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
-               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/shared/util.h:33:26: note: expanded from macro 'be64_to_cpu'
-#define be64_to_cpu(val) bswap_64(val)
-                         ^~~~~~~~~~~~~
-/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
-#define bswap_64(x) __bswap_64 (x)
-                    ^~~~~~~~~~~~~~
-2 warnings generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2923051421073040169==--
+[snip]
