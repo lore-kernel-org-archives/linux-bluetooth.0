@@ -2,494 +2,385 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88035C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 May 2023 19:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF90EC7EE2C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 May 2023 19:55:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233053AbjEHTak (ORCPT
+        id S233855AbjEHTzO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 May 2023 15:30:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52610 "EHLO
+        Mon, 8 May 2023 15:55:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbjEHTaj (ORCPT
+        with ESMTP id S233761AbjEHTzM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 May 2023 15:30:39 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81B0359C1;
-        Mon,  8 May 2023 12:30:37 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2ac733b813fso54427661fa.1;
-        Mon, 08 May 2023 12:30:37 -0700 (PDT)
+        Mon, 8 May 2023 15:55:12 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50FA165BF;
+        Mon,  8 May 2023 12:54:40 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2ac7c59665bso57381261fa.3;
+        Mon, 08 May 2023 12:54:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683574236; x=1686166236;
+        d=gmail.com; s=20221208; t=1683575668; x=1686167668;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RpFHmWTSO87snqsRDFQuOr7PS8NeITU+H8E5Qf2YRbk=;
-        b=cgbFpOKrBrd11Zhos3+dwntw02ytm8nVOxOtp7uTUYjNx4Xo/v1oCkyhm6+ZH7WZsv
-         QexMgoCxRQzU9IAva7BevB2aTXWFfdwJiJ2WpXlaYGGwm/o2TnGVJ9Nx3p9LgU21MhQS
-         L8T6LhIuHSiuheq6RSLsl5h4Q0RILfpuN73uqqAwZZOjFOoRlZVXftLMbyizqRi4Tcat
-         BVNu029oKHcOZHjCRwoALv5bsy7Zi8OcdgnydSsi9PuVS872zrIZkX/HLFwMD370+6jB
-         1bbIv7PeuDfwqVGOL0bZ7slX9lEatiITtWowphuQ99oUzeDmLY41RJMosrH+Ksh3qKVD
-         xUWw==
+        bh=aond+PBh56G+BZA3H7+tIB9ZL9ml8G3VONmOz3SWSsI=;
+        b=CF9eCwKhsjEdE6QtfUE1lz3kJpia2NFTqxrJB8eyf6nE0slKUMDW+LB4S7hZf4Zefs
+         FDrDSu12mRBTQorkOV1EbSPA86H3zsoW5zxwB1kRysL08aNQCrandfvgSPVMbeSjZGyE
+         EDBCeyUjk5UkYIQrCY9re9OIRmf/77snJEb1LlUD0vrComgtgIHmrIHcBGjUMdRjjs4T
+         4MDXrpOCRXNKUab9lF3D/pbRGIcca8wNZlxEAQlGyMaMkiU53OUpRaHRh9sTqiQPgrO7
+         OSAvM4lY0Gq0NSYrfb8upL4g3P8oifqbui8Eph8tBnjMkrtP84EhGfajyxBmTCFjgQ4L
+         dVJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683574236; x=1686166236;
+        d=1e100.net; s=20221208; t=1683575668; x=1686167668;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RpFHmWTSO87snqsRDFQuOr7PS8NeITU+H8E5Qf2YRbk=;
-        b=JIAMn1WqHbQUiKDi8YbT7IDncNgtu0RXIBUuqoYfHThsJV2vC4LYb3G1VOcLp+VFgL
-         NjKLJDP8WbRqC60NJWBl5ZPHT0fKMqXAvU9C44Y3MINAaAVSK9BUyTDYgK90ME9iTB03
-         GfAxUVZJT8kOpbGBTAxo+zMVGc+baio8hADDqOzsW5ep679TaoOZv2rTDB50/+WCnJEo
-         bE9B6QM2r+e42kSPScmd8zJ0uSl3mMzvobz5J9Puw9BlkrLIGr7MG8mCMzW2JlDcKV0P
-         mF23mXftwbyN2C1EGum00Y3C5m7BLQuwRHc+4zwtn67byZ9/rMdyZeqfbeHOpJkrVYi8
-         RfgQ==
-X-Gm-Message-State: AC+VfDxv7RrjruGW6qcD9MTLyhKYJg5EtQdPKKxedF1K7KQcHDNnb3in
-        aWE2MU/LYNVykvMLAAuNb8bbT33h90iojCfXzGvoy1dz
-X-Google-Smtp-Source: ACHHUZ6w+XyOOEFGVf3IYSwWT5GrQg+yjLSZEGJIkk/BVXQnHiqrtCi5Y12Sqn/WmjtzbcofbQ7Ez+81k53R/fcRBr0=
-X-Received: by 2002:a2e:a16f:0:b0:2a8:ea22:28ab with SMTP id
- u15-20020a2ea16f000000b002a8ea2228abmr57794ljl.25.1683574235396; Mon, 08 May
- 2023 12:30:35 -0700 (PDT)
+        bh=aond+PBh56G+BZA3H7+tIB9ZL9ml8G3VONmOz3SWSsI=;
+        b=WPfZHehEQely7buGa+p+XHKLjxrX7w2uOwlIVj5n/G+EawBTe9MpDT2elaW4MsZvlv
+         SJFBALOgwz3wJH67cN+auG2hhiAkLtMlT5C+C6341LSed17MZuoRfjb5kGe6qz3NBEqG
+         yFhGRBBprMP9vRkJWLOzobC/EMepq6Jz2PkYK6tEM3C+pEdTN4qYFK8hWPgwyq4WDq3O
+         x8gnBYNWDoiIhXNLidqN+8F1B1ISATldZBlwx0mAWu1uPeDsaQs7EpRDjBjFMJxKwjnJ
+         VGJo3Iy6m6h0zCYuRj4IAy/mHzPsiI/8oopxIBmTinWGcz6e5vVFNNSYTA5TZYl6e6Uv
+         1ZnQ==
+X-Gm-Message-State: AC+VfDz0VHwC5df4Mx1GumFV6/1sojL+LM4Y360b32UxXi+FS5QDalDC
+        vLxKO1QK6BdNZKgwiTO8wE8JJrqz6ycwMLUQWrU=
+X-Google-Smtp-Source: ACHHUZ7H4PDX2u0w6WQ6LT5sjOWRLUvhtxu9dXeWV5/9JodHVsFloTya/PWTJ71zN3zfU48x6Cmb/Z/kMU+s/bETORE=
+X-Received: by 2002:a2e:7004:0:b0:2ac:8e5a:1054 with SMTP id
+ l4-20020a2e7004000000b002ac8e5a1054mr96891ljc.0.1683575667931; Mon, 08 May
+ 2023 12:54:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <1683001400-29905-1-git-send-email-quic_saluvala@quicinc.com>
-In-Reply-To: <1683001400-29905-1-git-send-email-quic_saluvala@quicinc.com>
+References: <c90f4606c85f5862e2e3e1dc330af4ac95f2bc9f.1683065391.git.objelf@gmail.com>
+ <ddcbc509b5024882583d5c143ec5f4520bef860a.1683065391.git.objelf@gmail.com>
+In-Reply-To: <ddcbc509b5024882583d5c143ec5f4520bef860a.1683065391.git.objelf@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 8 May 2023 12:30:23 -0700
-Message-ID: <CABBYNZ+QLkWhiWfZt0tb50zagsKA8VjtNZ7jefd8iOeMyfCRBA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] Bluetooth: hci_qca: Add qcomm devcoredump support
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Date:   Mon, 8 May 2023 12:54:15 -0700
+Message-ID: <CABBYNZJQjoTzqmivUbLnDnn826pStW+kTuicYN1qVuHDoQjfmw@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] Bluetooth: btusb: mediatek: add MediaTek
+ devcoredump support
+To:     sean.wang@mediatek.com, Manish Mandlik <mmandlik@google.com>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
-        jiangzp@google.com, mmandlik@google.com
+        chris.lu@mediatek.com, Soul.Huang@mediatek.com,
+        Leon.Yen@mediatek.com, Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, jenhao.yang@mediatek.com,
+        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
+        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
+        abhishekpandit@google.com, michaelfsun@google.com,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        shawnku@google.com, linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Jing Cai <jing.cai@mediatek.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sai,
+Hi Sean,
 
-On Mon, May 1, 2023 at 9:23=E2=80=AFPM Sai Teja Aluvala
-<quic_saluvala@quicinc.com> wrote:
+On Tue, May 2, 2023 at 4:02=E2=80=AFPM <sean.wang@mediatek.com> wrote:
 >
-> Intercept debug exception events from QCA controller and put them into
-> a devcoredump using hci devcoredump APIs of hci_core
+> From: Jing Cai <jing.cai@mediatek.com>
 >
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> Reviewed-by: Manish Mandlik <mmandlik@google.com>
+> This patch implement function .coredump() and dmp_hdr() in btusb
+> driver for MediaTek controller.  FW core dump was triggered by FW
+> specific event to show something unexpected happened in the controller.
 >
-> V2:
-> --
-> Updated to work with the updated HCI devcoredump API.
+> The driver would be responsible for collecting and uploading the device
+> core dump pieces in hci driver using core dump API. Once we finished
+> the whole process, the driver would reset the controller to recover the
+> kind of fatal error.
 >
-> V1:
-> --
-> Initial Patch
+> Co-developed-by: Chris Lu <chris.lu@mediatek.com>
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Jing Cai <jing.cai@mediatek.com>
 > ---
->  drivers/bluetooth/hci_qca.c | 190 ++++++++++++++++++++++++++++++++------=
-------
->  1 file changed, 138 insertions(+), 52 deletions(-)
+> v2, v3: rebase onto the latest codebase
+> v4: update the newest API usage for the coredump which was already
+>     into the upstream
+> v5: support devcoredump on hdev basis
+> ---
+>  drivers/bluetooth/btmtk.c | 117 ++++++++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/btmtk.h |  28 +++++++++
+>  drivers/bluetooth/btusb.c |  14 +++++
+>  3 files changed, 159 insertions(+)
 >
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index ca98f6d..c94a414 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -77,6 +77,7 @@ enum qca_flags {
->         QCA_MEMDUMP_COLLECTION,
->         QCA_HW_ERROR_EVENT,
->         QCA_SSR_TRIGGERED,
-> +       QCA_COREDUMP_TRIGGERED,
->         QCA_BT_OFF,
->         QCA_ROM_FW
->  };
-> @@ -116,9 +117,7 @@ enum qca_memdump_states {
->         QCA_MEMDUMP_TIMEOUT,
->  };
+> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> index ac2fac7e3c5f..657792f9dcab 100644
+> --- a/drivers/bluetooth/btmtk.c
+> +++ b/drivers/bluetooth/btmtk.c
+> @@ -19,6 +19,12 @@
+>  #define MTK_SEC_MAP_COMMON_SIZE        12
+>  #define MTK_SEC_MAP_NEED_SEND_SIZE     52
 >
-> -struct qca_memdump_data {
-> -       char *memdump_buf_head;
-> -       char *memdump_buf_tail;
-> +struct qca_memdump_info {
->         u32 current_seq_no;
->         u32 received_dump;
->         u32 ram_dump_size;
-> @@ -159,13 +158,15 @@ struct qca_data {
->         struct work_struct ws_tx_vote_off;
->         struct work_struct ctrl_memdump_evt;
->         struct delayed_work ctrl_memdump_timeout;
-> -       struct qca_memdump_data *qca_memdump;
-> +       struct qca_memdump_info *qca_memdump;
->         unsigned long flags;
->         struct completion drop_ev_comp;
->         wait_queue_head_t suspend_wait_q;
->         enum qca_memdump_states memdump_state;
->         struct mutex hci_memdump_lock;
+> +enum {
+> +       BTMTK_COREDUMP_INIT,
+> +       BTMTK_COREDUMP_DISABLED,
+> +       BTMTK_COREDUMP_ACTIVE,
+> +};
+> +
+>  struct btmtk_patch_header {
+>         u8 datetime[16];
+>         u8 platform[4];
+> @@ -53,6 +59,56 @@ struct btmtk_section_map {
+>         };
+>  } __packed;
 >
-> +       u16 fw_version;
-> +       u16 controller_id;
->         /* For debugging purpose */
->         u64 ibs_sent_wacks;
->         u64 ibs_sent_slps;
-> @@ -232,6 +233,7 @@ static void qca_regulator_disable(struct qca_serdev *=
-qcadev);
->  static void qca_power_shutdown(struct hci_uart *hu);
->  static int qca_power_off(struct hci_dev *hdev);
->  static void qca_controller_memdump(struct work_struct *work);
-> +static void qca_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb);
->
->  static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
->  {
-> @@ -543,7 +545,8 @@ static void qca_controller_memdump_timeout(struct wor=
-k_struct *work)
->         mutex_lock(&qca->hci_memdump_lock);
->         if (test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
->                 qca->memdump_state =3D QCA_MEMDUMP_TIMEOUT;
-> -               if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
-> +               if ((!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) ||
-> +                       (!test_bit(QCA_COREDUMP_TRIGGERED, &qca->flags)))=
- {
->                         /* Inject hw error event to reset the device
->                          * and driver.
->                          */
-> @@ -976,6 +979,28 @@ static int qca_recv_acl_data(struct hci_dev *hdev, s=
-truct sk_buff *skb)
->         return hci_recv_frame(hdev, skb);
->  }
->
-> +static void qca_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb)
+> +static void btmtk_coredump(struct hci_dev *hdev)
 > +{
-> +       struct hci_uart *hu =3D hci_get_drvdata(hdev);
-> +       struct qca_data *qca =3D hu->priv;
+> +       int err;
+> +
+> +       err =3D __hci_cmd_send(hdev, 0xfd5b, 0, NULL);
+> +       if (err < 0)
+> +               bt_dev_err(hdev, "Coredump failed (%d)", err);
+> +}
+> +
+> +static void btmtk_coredump_hdr(struct hci_dev *hdev, struct sk_buff *skb=
+)
+> +{
+> +       struct btmtk_data *data =3D hci_get_priv(hdev);
 > +       char buf[80];
 > +
-> +       snprintf(buf, sizeof(buf), "Controller Name: 0x%x\n",
-> +               qca->controller_id);
+> +       snprintf(buf, sizeof(buf), "Controller Name: 0x%X\n",
+> +                data->cd_info.dev_id);
 > +       skb_put_data(skb, buf, strlen(buf));
 > +
-> +       snprintf(buf, sizeof(buf), "Firmware Version: 0x%x\n",
-> +               qca->fw_version);
-> +       skb_put_data(skb, buf, strlen(buf));
-> +
-> +       snprintf(buf, sizeof(buf), "Vendor:Qualcomm\n");
+> +       snprintf(buf, sizeof(buf), "Firmware Version: 0x%X\n",
+> +                data->cd_info.fw_version);
 > +       skb_put_data(skb, buf, strlen(buf));
 > +
 > +       snprintf(buf, sizeof(buf), "Driver: %s\n",
-> +               hu->serdev->dev.driver->name);
+> +                data->cd_info.driver_name);
+> +       skb_put_data(skb, buf, strlen(buf));
+> +
+> +       snprintf(buf, sizeof(buf), "Vendor: MediaTek\n");
 > +       skb_put_data(skb, buf, strlen(buf));
 > +}
 > +
->  static void qca_controller_memdump(struct work_struct *work)
->  {
->         struct qca_data *qca =3D container_of(work, struct qca_data,
-> @@ -983,13 +1008,11 @@ static void qca_controller_memdump(struct work_str=
-uct *work)
->         struct hci_uart *hu =3D qca->hu;
->         struct sk_buff *skb;
->         struct qca_memdump_event_hdr *cmd_hdr;
-> -       struct qca_memdump_data *qca_memdump =3D qca->qca_memdump;
-> +       struct qca_memdump_info *qca_memdump =3D qca->qca_memdump;
->         struct qca_dump_size *dump;
-> -       char *memdump_buf;
-> -       char nullBuff[QCA_DUMP_PACKET_SIZE] =3D { 0 };
->         u16 seq_no;
-> -       u32 dump_size;
->         u32 rx_size;
-> +       int ret =3D 0;
->         enum qca_btsoc_type soc_type =3D qca_soc_type(hu);
->
->         while ((skb =3D skb_dequeue(&qca->rx_memdump_q))) {
-> @@ -1005,7 +1028,7 @@ static void qca_controller_memdump(struct work_stru=
-ct *work)
->                 }
->
->                 if (!qca_memdump) {
-> -                       qca_memdump =3D kzalloc(sizeof(struct qca_memdump=
-_data),
-> +                       qca_memdump =3D kzalloc(sizeof(struct qca_memdump=
-_info),
->                                               GFP_ATOMIC);
->                         if (!qca_memdump) {
->                                 mutex_unlock(&qca->hci_memdump_lock);
-> @@ -1031,44 +1054,49 @@ static void qca_controller_memdump(struct work_st=
-ruct *work)
->                         set_bit(QCA_IBS_DISABLED, &qca->flags);
->                         set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
->                         dump =3D (void *) skb->data;
-> -                       dump_size =3D __le32_to_cpu(dump->dump_size);
-> -                       if (!(dump_size)) {
-> +                       qca_memdump->ram_dump_size =3D __le32_to_cpu(dump=
-->dump_size);
-> +                       if (!(qca_memdump->ram_dump_size)) {
->                                 bt_dev_err(hu->hdev, "Rx invalid memdump =
-size");
->                                 kfree(qca_memdump);
->                                 kfree_skb(skb);
-> -                               qca->qca_memdump =3D NULL;
->                                 mutex_unlock(&qca->hci_memdump_lock);
->                                 return;
->                         }
->
-> -                       bt_dev_info(hu->hdev, "QCA collecting dump of siz=
-e:%u",
-> -                                   dump_size);
->                         queue_delayed_work(qca->workqueue,
->                                            &qca->ctrl_memdump_timeout,
-> -                                          msecs_to_jiffies(MEMDUMP_TIMEO=
-UT_MS)
-> -                                         );
-> -
-> -                       skb_pull(skb, sizeof(dump_size));
-> -                       memdump_buf =3D vmalloc(dump_size);
-> -                       qca_memdump->ram_dump_size =3D dump_size;
-> -                       qca_memdump->memdump_buf_head =3D memdump_buf;
-> -                       qca_memdump->memdump_buf_tail =3D memdump_buf;
-> -               }
-> +                                          msecs_to_jiffies(MEMDUMP_TIMEO=
-UT_MS));
-> +                       skb_pull(skb, sizeof(qca_memdump->ram_dump_size))=
-;
-> +                       qca_memdump->current_seq_no =3D 0;
-> +                       qca_memdump->received_dump =3D 0;
-> +                       ret =3D hci_devcd_init(hu->hdev, qca_memdump->ram=
-_dump_size);
-> +                       bt_dev_info(hu->hdev, "hci_devcd_init Return:%d",
-> +                                   ret);
-> +                       if (ret < 0) {
-> +                               kfree(qca->qca_memdump);
-> +                               qca->qca_memdump =3D NULL;
-> +                               qca->memdump_state =3D QCA_MEMDUMP_COLLEC=
-TED;
-> +                               cancel_delayed_work(&qca->ctrl_memdump_ti=
-meout);
-> +                               clear_bit(QCA_MEMDUMP_COLLECTION, &qca->f=
-lags);
-> +                               mutex_unlock(&qca->hci_memdump_lock);
-> +                               return;
-> +                       }
->
-> -               memdump_buf =3D qca_memdump->memdump_buf_tail;
-> +                       bt_dev_info(hu->hdev, "QCA collecting dump of siz=
-e:%u",
-> +                                   qca_memdump->ram_dump_size);
-> +
-> +               }
->
->                 /* If sequence no 0 is missed then there is no point in
->                  * accepting the other sequences.
->                  */
-> -               if (!memdump_buf) {
-> +               if (!test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
->                         bt_dev_err(hu->hdev, "QCA: Discarding other packe=
-ts");
->                         kfree(qca_memdump);
->                         kfree_skb(skb);
-> -                       qca->qca_memdump =3D NULL;
->                         mutex_unlock(&qca->hci_memdump_lock);
->                         return;
->                 }
-> -
->                 /* There could be chance of missing some packets from
->                  * the controller. In such cases let us store the dummy
->                  * packets in the buffer.
-> @@ -1078,8 +1106,8 @@ static void qca_controller_memdump(struct work_stru=
-ct *work)
->                  * bits, so skip this checking for missing packet.
->                  */
->                 while ((seq_no > qca_memdump->current_seq_no + 1) &&
-> -                      (soc_type !=3D QCA_QCA6390) &&
-> -                      seq_no !=3D QCA_LAST_SEQUENCE_NUM) {
-> +                       (soc_type !=3D QCA_QCA6390) &&
-> +                       seq_no !=3D QCA_LAST_SEQUENCE_NUM) {
->                         bt_dev_err(hu->hdev, "QCA controller missed packe=
-t:%d",
->                                    qca_memdump->current_seq_no);
->                         rx_size =3D qca_memdump->received_dump;
-> @@ -1090,43 +1118,38 @@ static void qca_controller_memdump(struct work_st=
-ruct *work)
->                                            qca_memdump->received_dump);
->                                 break;
->                         }
-> -                       memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZ=
-E);
-> -                       memdump_buf =3D memdump_buf + QCA_DUMP_PACKET_SIZ=
-E;
-> +                       hci_devcd_append_pattern(hu->hdev, 0x00,
-> +                               QCA_DUMP_PACKET_SIZE);
->                         qca_memdump->received_dump +=3D QCA_DUMP_PACKET_S=
-IZE;
->                         qca_memdump->current_seq_no++;
->                 }
->
-> -               rx_size =3D qca_memdump->received_dump + skb->len;
-> +               rx_size =3D qca_memdump->received_dump  + skb->len;
->                 if (rx_size <=3D qca_memdump->ram_dump_size) {
->                         if ((seq_no !=3D QCA_LAST_SEQUENCE_NUM) &&
-> -                           (seq_no !=3D qca_memdump->current_seq_no))
-> +                           (seq_no !=3D qca_memdump->current_seq_no)) {
->                                 bt_dev_err(hu->hdev,
->                                            "QCA memdump unexpected packet=
- %d",
->                                            seq_no);
-> +                       }
->                         bt_dev_dbg(hu->hdev,
->                                    "QCA memdump packet %d with length %d"=
-,
->                                    seq_no, skb->len);
-> -                       memcpy(memdump_buf, (unsigned char *)skb->data,
-> -                              skb->len);
-> -                       memdump_buf =3D memdump_buf + skb->len;
-> -                       qca_memdump->memdump_buf_tail =3D memdump_buf;
-> -                       qca_memdump->current_seq_no =3D seq_no + 1;
-> -                       qca_memdump->received_dump +=3D skb->len;
-> +                       hci_devcd_append(hu->hdev, skb);
-> +                       qca_memdump->current_seq_no +=3D 1;
-> +                       qca_memdump->received_dump =3D rx_size;
->                 } else {
->                         bt_dev_err(hu->hdev,
-> -                                  "QCA memdump received %d, no space for=
- packet %d",
-> -                                  qca_memdump->received_dump, seq_no);
-> +                                  "QCA memdump received no space for pac=
-ket %d",
-> +                                   qca_memdump->current_seq_no);
->                 }
-> -               qca->qca_memdump =3D qca_memdump;
-> -               kfree_skb(skb);
-> +
->                 if (seq_no =3D=3D QCA_LAST_SEQUENCE_NUM) {
->                         bt_dev_info(hu->hdev,
-> -                                   "QCA memdump Done, received %d, total=
- %d",
-> -                                   qca_memdump->received_dump,
-> -                                   qca_memdump->ram_dump_size);
-> -                       memdump_buf =3D qca_memdump->memdump_buf_head;
-> -                       dev_coredumpv(&hu->serdev->dev, memdump_buf,
-> -                                     qca_memdump->received_dump, GFP_KER=
-NEL);
-> +                               "QCA memdump Done, received %d, total %d"=
-,
-> +                               qca_memdump->received_dump,
-> +                               qca_memdump->ram_dump_size);
-> +                       hci_devcd_complete(hu->hdev);
->                         cancel_delayed_work(&qca->ctrl_memdump_timeout);
->                         kfree(qca->qca_memdump);
->                         qca->qca_memdump =3D NULL;
-> @@ -1537,8 +1560,8 @@ static void qca_hw_error(struct hci_dev *hdev, u8 c=
-ode)
->         mutex_lock(&qca->hci_memdump_lock);
->         if (qca->memdump_state !=3D QCA_MEMDUMP_COLLECTED) {
->                 bt_dev_err(hu->hdev, "clearing allocated memory due to me=
-mdump timeout");
-> +               hci_devcd_abort(hu->hdev);
->                 if (qca->qca_memdump) {
-> -                       vfree(qca->qca_memdump->memdump_buf_head);
->                         kfree(qca->qca_memdump);
->                         qca->qca_memdump =3D NULL;
->                 }
-> @@ -1577,7 +1600,8 @@ static void qca_cmd_timeout(struct hci_dev *hdev)
->         mutex_lock(&qca->hci_memdump_lock);
->         if (qca->memdump_state !=3D QCA_MEMDUMP_COLLECTED) {
->                 qca->memdump_state =3D QCA_MEMDUMP_TIMEOUT;
-> -               if (!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) {
-> +               if ((!test_bit(QCA_HW_ERROR_EVENT, &qca->flags)) ||
-> +                       (!test_bit(QCA_COREDUMP_TRIGGERED, &qca->flags)))=
- {
->                         /* Inject hw error event to reset the device
->                          * and driver.
->                          */
-> @@ -1702,6 +1726,65 @@ static int qca_power_on(struct hci_dev *hdev)
->         return ret;
->  }
->
-> +static void hci_coredump_qca(struct hci_dev *hdev)
+> +static void btmtk_coredump_notify(struct hci_dev *hdev, int state)
 > +{
-> +       struct hci_uart *hu =3D hci_get_drvdata(hdev);
-> +       struct qca_data *qca =3D hu->priv;
-> +       struct sk_buff *skb;
+> +       struct btmtk_data *data =3D hci_get_priv(hdev);
 > +
-> +
-> +       set_bit(QCA_COREDUMP_TRIGGERED, &qca->flags);
-> +       bt_dev_info(hdev, "Enter mem_dump_status: %d", qca->memdump_state=
-);
-> +
-> +       if (qca->memdump_state =3D=3D QCA_MEMDUMP_IDLE) {
-> +               /* we need to crash the SOC
-> +                * and wait here for 8 seconds to get the dump packets.
-> +                * This will block main thread to be on hold until we
-> +                * collect dump.
-> +                */
-> +               set_bit(QCA_SSR_TRIGGERED, &qca->flags);
-> +               set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-> +
-> +               skb =3D bt_skb_alloc(QCA_CRASHBYTE_PACKET_LEN, GFP_KERNEL=
-);
-> +               if (!skb) {
-> +                       bt_dev_err(hu->hdev, "Failed to allocate memory f=
-or skb packet");
-> +                       return;
-> +               }
-> +
-> +               /* We forcefully crash the controller, by sending 0xfb by=
-te for
-> +                * 1024 times. We also might have chance of losing data, =
-To be
-> +                * on safer side we send 1096 bytes to the SoC.
-> +                */
-> +               memset(skb_put(skb, QCA_CRASHBYTE_PACKET_LEN), QCA_MEMDUM=
-P_BYTE,
-> +                       QCA_CRASHBYTE_PACKET_LEN);
-> +               hci_skb_pkt_type(skb) =3D HCI_COMMAND_PKT;
-> +               bt_dev_info(hu->hdev, "crash the soc to collect controlle=
-r dump");
-
-This seem awkward, the purpose of devcd is to collect coredumps not to
-force the controller to crash to then collect it, so if the controller
-hasn't crashed it shall not call into devcd, if you doing this as part
-of handling a hardware error Id recommend doing it as part of hw_error
-callback, that said be aware that you are probably exposing a
-vulnerability to your firmware with the code above.
-
-> +
-> +               switch (qca->tx_ibs_state) {
-> +               case HCI_IBS_TX_WAKING:
-> +                       /* Transient state; just keep packet for later */
-> +                       skb_queue_tail(&qca->tx_wait_q, skb);
-> +                       break;
-> +               case HCI_IBS_TX_AWAKE:
-> +                       skb_queue_tail(&qca->txq, skb);
-> +                       hci_uart_tx_wakeup(hu);
-> +                       break;
-> +               case HCI_IBS_TX_ASLEEP:
-> +                       skb_queue_tail(&qca->tx_wait_q, skb);
-> +                       qca->tx_ibs_state =3D HCI_IBS_TX_WAKING;
-> +                       /* Schedule a work queue to wake up device */
-> +                       queue_work(qca->workqueue, &qca->ws_awake_device)=
-;
-> +                       break;
-> +               }
-> +       } else if (qca->memdump_state =3D=3D QCA_MEMDUMP_COLLECTING) {
-> +               /* Let us wait here until memory dump collected or
-> +                * memory dump timer expired.
-> +                */
-> +               bt_dev_info(hdev, "waiting for dump to complete");
+> +       switch (state) {
+> +       case HCI_DEVCOREDUMP_IDLE:
+> +               data->cd_info.state =3D BTMTK_COREDUMP_INIT;
+> +               break;
+> +       case HCI_DEVCOREDUMP_ACTIVE:
+> +               data->cd_info.state =3D BTMTK_COREDUMP_ACTIVE;
+> +               break;
+> +       case HCI_DEVCOREDUMP_TIMEOUT:
+> +       case HCI_DEVCOREDUMP_ABORT:
+> +       case HCI_DEVCOREDUMP_DONE:
+> +               data->cd_info.state =3D BTMTK_COREDUMP_INIT;
+> +               btmtk_reset_sync(hdev);
+> +               break;
 > +       }
-> +       clear_bit(QCA_COREDUMP_TRIGGERED, &qca->flags);
+> +}
+
+Don't really like where this is going, why can't you just use the
+state from devcd?
+
+> +
+>  int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+>                               wmt_cmd_sync_func_t wmt_cmd_sync)
+>  {
+> @@ -295,6 +351,67 @@ void btmtk_reset_sync(struct hci_dev *hdev)
+>  }
+>  EXPORT_SYMBOL_GPL(btmtk_reset_sync);
+>
+> +int btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id,
+> +                            const char *name, u32 fw_version)
+> +{
+> +       struct btmtk_data *data =3D hci_get_priv(hdev);
+> +
+> +       if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
+> +               return -EOPNOTSUPP;
+> +
+> +       data->cd_info.dev_id =3D dev_id;
+> +       data->cd_info.fw_version =3D fw_version;
+> +       data->cd_info.state =3D BTMTK_COREDUMP_INIT;
+> +       strncpy(data->cd_info.driver_name, name, MTK_DRIVER_NAME_LEN - 1)=
+;
+
+Im not really sure why every devcd is having to store the driver name
+as a copy, the driver name is already accessible via
+hdev->dev->driver->name.
+
+@Manish Mandlik we might want to fix any code that still is doing
+copies of driver name like above.
+
+> +
+> +       return hci_devcd_register(hdev, btmtk_coredump, btmtk_coredump_hd=
+r,
+> +                                 btmtk_coredump_notify);
+> +}
+> +EXPORT_SYMBOL_GPL(btmtk_register_coredump);
+> +
+> +int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+> +{
+> +       struct btmtk_data *data =3D hci_get_priv(hdev);
+> +       int err;
+> +
+> +       if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
+> +               return 0;
+> +
+> +       switch (data->cd_info.state) {
+> +       case BTMTK_COREDUMP_DISABLED:
+> +               err =3D -EINVAL;
+> +               break;
+> +       case BTMTK_COREDUMP_INIT:
+> +               err =3D hci_devcd_init(hdev, MTK_COREDUMP_SIZE);
+> +               if (err < 0)
+> +                       break;
+> +               /* It is supposed coredump can be done within 5 seconds *=
+/
+> +               schedule_delayed_work(&hdev->dump.dump_timeout,
+> +                                     msecs_to_jiffies(5000));
+> +               fallthrough;
+> +       case BTMTK_COREDUMP_ACTIVE:
+> +       default:
+> +               err =3D hci_devcd_append(hdev, skb);
+> +               if (err < 0)
+> +                       break;
+> +
+> +               if (skb->len > 12 &&
+> +                   !strncmp((char *)&skb->data[skb->len - 13],
+> +                            MTK_COREDUMP_END, 12))
+> +                       hci_devcd_complete(hdev);
+> +
+> +               break;
+> +       }
+> +
+> +       if (err < 0) {
+> +               data->cd_info.state =3D BTMTK_COREDUMP_DISABLED;
+> +               kfree_skb(skb);
+> +       }
+> +
+> +       return err;
+> +}
+> +EXPORT_SYMBOL_GPL(btmtk_process_coredump);
+> +
+>  MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+>  MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
+>  MODULE_DESCRIPTION("Bluetooth support for MediaTek devices ver " VERSION=
+);
+> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+> index 6245662f6ccb..7eb162f0e7aa 100644
+> --- a/drivers/bluetooth/btmtk.h
+> +++ b/drivers/bluetooth/btmtk.h
+> @@ -21,6 +21,10 @@
+>  #define MT7921_DLSTATUS 0x7c053c10
+>  #define BT_DL_STATE BIT(1)
+>
+> +#define MTK_DRIVER_NAME_LEN            16
+> +#define MTK_COREDUMP_SIZE              (1024 * 1000)
+> +#define MTK_COREDUMP_END               "coredump end"
+> +
+>  enum {
+>         BTMTK_WMT_PATCH_DWNLD =3D 0x1,
+>         BTMTK_WMT_TEST =3D 0x2,
+> @@ -119,12 +123,20 @@ struct btmtk_hci_wmt_params {
+>         u32 *status;
+>  };
+>
+> +struct btmtk_coredump_info {
+> +       char driver_name[MTK_DRIVER_NAME_LEN];
+> +       u32 dev_id;
+> +       u32 fw_version;
+> +       int state;
+> +};
+> +
+>  typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
+>                                    struct btmtk_hci_wmt_params *);
+>
+>  typedef int (*btmtk_reset_sync_func_t)(struct hci_dev *, void *);
+>
+>  struct btmtk_data {
+> +       struct btmtk_coredump_info cd_info;
+>         btmtk_reset_sync_func_t reset_sync;
+>  };
+>
+> @@ -139,6 +151,11 @@ int btmtk_setup_firmware(struct hci_dev *hdev, const=
+ char *fwname,
+>                          wmt_cmd_sync_func_t wmt_cmd_sync);
+>
+>  void btmtk_reset_sync(struct hci_dev *hdev);
+> +
+> +int btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id, const char=
+ *name,
+> +                            u32 fw_version);
+> +
+> +int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
+>  #else
+>
+>  static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+> @@ -162,4 +179,15 @@ static int btmtk_setup_firmware(struct hci_dev *hdev=
+, const char *fwname,
+>  static void btmtk_reset_sync(struct hci_dev *hdev)
+>  {
+>  }
+> +
+> +static int btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id, con=
+st char *name,
+> +                            u32 fw_version)
+> +{
+> +       return -EOPNOTSUPP;
 > +}
 > +
->  static int qca_setup(struct hci_uart *hu)
->  {
->         struct hci_dev *hdev =3D hu->hdev;
-> @@ -1816,6 +1899,9 @@ static int qca_setup(struct hci_uart *hu)
->                 hu->hdev->set_bdaddr =3D qca_set_bdaddr_rome;
->         else
->                 hu->hdev->set_bdaddr =3D qca_set_bdaddr;
-> +       qca->fw_version =3D le16_to_cpu(ver.patch_ver);
-> +       qca->controller_id =3D le16_to_cpu(ver.rom_ver);
-> +       hci_devcd_register(hdev, hci_coredump_qca, qca_dmp_hdr, NULL);
+> +static int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *=
+skb)
+> +{
+> +       return -EOPNOTSUPP;
+> +}
+>  #endif
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 034edd8ad777..1c2a0cbcf62e 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3035,6 +3035,10 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+>         }
 >
->         return ret;
->  }
+>         btmtk_data->reset_sync =3D btusb_mtk_reset_work;
+> +       err =3D btmtk_register_coredump(hdev, dev_id, btusb_driver.name,
+> +                               fw_version);
+> +       if (err < 0)
+> +               bt_dev_err(hdev, "Failed to register coredump (%d)", err)=
+;
+>
+>         switch (dev_id) {
+>         case 0x7663:
+> @@ -3189,6 +3193,7 @@ static int btusb_recv_acl_mtk(struct hci_dev *hdev,=
+ struct sk_buff *skb)
+>  {
+>         struct btusb_data *data =3D hci_get_drvdata(hdev);
+>         u16 handle =3D le16_to_cpu(hci_acl_hdr(skb)->handle);
+> +       struct sk_buff *skb_cd;
+>
+>         switch (handle) {
+>         case 0xfc6f:            /* Firmware dump from device */
+> @@ -3196,6 +3201,15 @@ static int btusb_recv_acl_mtk(struct hci_dev *hdev=
+, struct sk_buff *skb)
+>                  * suspend and thus disable auto-suspend.
+>                  */
+>                 usb_disable_autosuspend(data->udev);
+> +
+> +               /* We need to forward the diagnostic packet to userspace =
+daemon
+> +                * for backward compatibility, so we have to clone the pa=
+cket
+> +                * extraly for the in-kernel coredump support.
+> +                */
+> +               skb_cd =3D skb_clone(skb, GFP_ATOMIC);
+> +               if (skb_cd)
+> +                       btmtk_process_coredump(hdev, skb_cd);
+> +
+>                 fallthrough;
+>         case 0x05ff:            /* Firmware debug logging 1 */
+>         case 0x05fe:            /* Firmware debug logging 2 */
 > --
-> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+> 2.25.1
 >
 
 
