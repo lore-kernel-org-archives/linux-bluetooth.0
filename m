@@ -2,176 +2,354 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A69EC77B7F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 May 2023 08:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7869EC77B7F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 May 2023 19:08:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233178AbjEHIjh (ORCPT
+        id S232050AbjEHTIh convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 May 2023 04:39:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58034 "EHLO
+        Mon, 8 May 2023 15:08:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232080AbjEHIjf (ORCPT
+        with ESMTP id S229771AbjEHTIg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 May 2023 04:39:35 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CDE518DC8;
-        Mon,  8 May 2023 01:39:34 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1pvwP6-0007CA-K0; Mon, 08 May 2023 10:39:32 +0200
-Message-ID: <9d1022a5-847b-13f0-84d3-5b7d81355d59@leemhuis.info>
-Date:   Mon, 8 May 2023 10:39:32 +0200
+        Mon, 8 May 2023 15:08:36 -0400
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB4CB4C0C
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 May 2023 12:08:34 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id 38E7A240217
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 May 2023 21:08:33 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4QFW684Q69z6tvJ;
+        Mon,  8 May 2023 21:08:32 +0200 (CEST)
+Message-ID: <69ac275caa52c3518c23bd40c217915687fe3224.camel@iki.fi>
+Subject: Re: [PATCH BlueZ] tools/test-runner: add option to start Pipewire
+ inside the VM
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Mon, 08 May 2023 19:08:32 +0000
+In-Reply-To: <CABBYNZLDR=LBRFXmHU98nd88Q_fUZXfneNyVbge0JAcTP8G8Rw@mail.gmail.com>
+References: <48701651ef435518ac8432d80dfdc2dfe80f3703.1681569400.git.pav@iki.fi>
+         <CABBYNZL9C1cF7vTLobVhZ3_HxhDv7zsobB5NcWonPOwz_Rz+jw@mail.gmail.com>
+         <1bc7d31d989fbdfb0d14897b6ca14a31310546f5.camel@iki.fi>
+         <CABBYNZLDR=LBRFXmHU98nd88Q_fUZXfneNyVbge0JAcTP8G8Rw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: PROBLEM: ThinkPad T430 (BCM20702) Can't Detect Bluetooth Devices
- Starting from Kernel v6.1.0 Until Now v6.3.1
-Content-Language: en-US, de-DE
-To:     Moh Oktavi Aziz Nugraha <moktavizzen@gmail.com>,
-        marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        avisaziz123@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linux kernel regressions list <regressions@lists.linux.dev>
-References: <CAHCNbp3ztCcp31JdVYuxy+s1qXaa+Zy74eGJmfPmyrx_6Wjhhw@mail.gmail.com>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CAHCNbp3ztCcp31JdVYuxy+s1qXaa+Zy74eGJmfPmyrx_6Wjhhw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1683535174;acdecd99;
-X-HE-SMSGID: 1pvwP6-0007CA-K0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[CCing the regression list, as it should be in the loop for regressions:
-https://docs.kernel.org/admin-guide/reporting-regressions.html]
+Hi Luiz,
 
-[TLDR: I'm adding this report to the list of tracked Linux kernel
-regressions; the text you find below is based on a few templates
-paragraphs you might have encountered already in similar form.
-See link in footer if these mails annoy you.]
-
-On 06.05.23 13:33, Moh Oktavi Aziz Nugraha wrote:
-> [1.] One line summary of the problem:
-> ThinkPad T430 (BCM20702) Can't Detect Bluetooth Devices Starting from
-> Kernel v6.1.0 Until Now v6.3.1
+to, 2023-05-04 kello 12:09 -0700, Luiz Augusto von Dentz kirjoitti:
+> On Sat, Apr 22, 2023 at 5:12 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Hi Luiz,
+> > 
+> > to, 2023-04-20 kello 12:49 -0700, Luiz Augusto von Dentz kirjoitti:
+> > > Hi Pauli,
+> > > 
+> > > On Sat, Apr 15, 2023 at 7:44 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > > > 
+> > > > Add option for launching Pipewire inside the VM to serve Bluetooth
+> > > > endpoints, which can be used in tests.
+> > > > 
+> > > > If daemon and emulator were also started, wait for the endpoints to
+> > > > appear.
+> > > > ---
+> > > > 
+> > > > Notes:
+> > > >     An example how you can launch Pipewire to serve Bluetooth endpoints.
+> > > > 
+> > > >  tools/test-runner.c | 247 +++++++++++++++++++++++++++++++++++++++++++-
+> > > >  1 file changed, 242 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/tools/test-runner.c b/tools/test-runner.c
+> > > > index 6660ea8de..d416f80ed 100644
+> > > > --- a/tools/test-runner.c
+> > > > +++ b/tools/test-runner.c
+> > > > @@ -51,6 +51,7 @@ static bool start_dbus_session;
+> > > >  static bool start_daemon = false;
+> > > >  static bool start_emulator = false;
+> > > >  static bool start_monitor = false;
+> > > > +static bool start_pipewire;
+> > > >  static int num_devs = 0;
+> > > >  static const char *qemu_binary = NULL;
+> > > >  static const char *kernel_image = NULL;
+> > > > @@ -252,13 +253,13 @@ static void start_qemu(void)
+> > > >                                 "acpi=off pci=noacpi noapic quiet ro init=%s "
+> > > >                                 "TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
+> > > >                                 "TESTDBUSSESSION=%u XDG_RUNTIME_DIR=/run/user/0 "
+> > > > -                               "TESTAUDIO=%u "
+> > > > +                               "TESTAUDIO=%u TESTPIPEWIRE=%u "
+> > > 
+> > > I'd just reuse TESTAUDIO instead of introducing yet another
+> > > environment variable, that should probably check if it shall run
+> > > pulseaudio or pipewire depending on what is available in the system.
+> > 
+> > TESTAUDIO also adds a virtual soundcard to the VM. Is this needed for
+> > something, if tests and the audio daemon runs inside the VM they should
+> > not need such access to soundcards outside the VM?
+> > 
+> > The tester.config doesn't enable ALSA, so it won't do anything in that
+> > configuration. The VM also fails to boot for me with -A enabled for
+> > that kernel.
+> > 
+> > IIUC, this and running udevd are not currently used for something, and
+> > if so I'll remove those.
 > 
-> [2.] Full description of the problem/report:
-> Last week I installed Ubuntu, but my bluetooth can't detect devices
-> when I use kernel 6.1 and above. My bluetooth was fine when I used
-> kernel 6.0 and before. I'm filing this bug on the kernel because when
-> I tested this bug on Fedora and Ubuntu, the same problem appeared when
-> I used kernel version 6.1 and above.
-> The workaround for version 6.1 and above is to run "hcitool scan" on
-> the terminal if I want to detect bluetooth devices.
-> There are similar problem in earlier kernel version, but it was fixed
-> according to this post https://askubuntu.com/a/1169415
-> Here is the video i made to reproduce the issue https://youtu.be/pHjOIAk90Zc
-> Here is the information about my Bluetooth card:
-> Bus 001 Device 007: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0
-> [ThinkPad]
-> What I have tried:
-> - Installed Fedora 38 and then Install bluetooth firmware
-> https://github.com/winterheart/broadcom-bt-firmware, and then
-> downgrade bluez (bluetooth cant detect devices)
-> - Installed Fedora 37 (no problem, because the default kernel is 6.0)
-> - installed Ubuntu 23.04 and then  install bluetooth firmware
-> https://github.com/winterheart/broadcom-bt-firmware (bluetooth cant
-> detect devices)
-> - Installed Ubuntu 22.10 (no problem, because the default kernel is 5.19)
-> - Installed Ubuntu 22.04 (no problem, because the default kernel is 5.19)
-> - Go back to Ubuntu 23.04 and then try these kernel:
-> v5.15.110 (good)
-> v5.19.17 (good)
-> v6.0.12 (good)
-> v6.0.19 (good)
-> v6.1.27 (bad)
-> v6.2.14 (bad)
-> v6.3.1 (bad)
-> After trying all of that I came to conclusion that this bug is caused
-> by the kernel.
-> I want to try git bisect to find the commit that caused the regression
-> between kernel versions 6.0 and 6.1, but it might take me a while
-> since it’s my first time using it. Plus, I’ve got a bunch of college
-> assignments to finish up this week, so I’m a bit strapped for time.
+> Yep, please remove/replace with something that doesn't depend on ALSA.
 
-FWIW, the following guide recently added might help you (a similar
-document to also cover bisection is planned, but I haven't started on it
-yet...):
-https://docs.kernel.org/admin-guide/quickly-build-trimmed-linux.html
+Ack.
 
-> [3.] Keywords (i.e., modules, networking, kernel):
-> bluetooth, networking, broadcom, bcm20702, thinkpad, t430
->
-> [4.] Kernel information
-> [4.1.] Kernel version (from /proc/version):
-> Linux version 6.3.1-060301-generic (kernel@kathleen)
->
-> (x86_64-linux-gnu-gcc-12 (Ubuntu 12.2.0-17ubuntu1) 12.2.0, GNU ld (GNU
-> Binutils for Ubuntu) 2.40) #202304302031 SMP PREEMPT_DYNAMIC Mon May
-> 1 00:41:22 UTC 2023
-> [4.2.] Kernel .config file:
-> <attachment1-KernelConfig.txt>
+> > > 
+> > > >                                 "TESTMONITOR=%u TESTEMULATOR=%u TESTDEVS=%d "
+> > > >                                 "TESTAUTO=%u TESTARGS=\'%s\'",
+> > > >                                 initcmd, cwd, start_dbus, start_daemon,
+> > > >                                 start_dbus_session, audio_support,
+> > > > -                               start_monitor, start_emulator, num_devs,
+> > > > -                               run_auto, testargs);
+> > > > +                               start_pipewire, start_monitor, start_emulator,
+> > > > +                               num_devs, run_auto, testargs);
+> > > > 
+> > > >         argv = alloca(sizeof(qemu_argv) +
+> > > >                                 (audio_support ? 4 : 0) +
+> > > > @@ -606,6 +607,207 @@ static pid_t start_bluetooth_daemon(const char *home)
+> > > >         return pid;
+> > > >  }
+> > > > 
+> > > > +static char *get_command_stdout(char *command, size_t *size)
+> > > > +{
+> > > > +       char *buf = NULL;
+> > > > +       ssize_t nread = 0;
+> > > > +       size_t allocated = 0;
+> > > > +       int ret;
+> > > > +       FILE *f;
+> > > > +
+> > > > +       f = popen(command, "re");
+> > > > +       if (!f)
+> > > > +               return NULL;
+> > > > +
+> > > > +       while (1) {
+> > > > +               size_t res;
+> > > > +               void *p;
+> > > > +
+> > > > +               if (nread + 256 > allocated) {
+> > > > +                       allocated += allocated + 256;
+> > > > +                       p = realloc(buf, allocated);
+> > > > +                       if (!p) {
+> > > > +                               nread = -1;
+> > > > +                               break;
+> > > > +                       }
+> > > > +                       buf = p;
+> > > > +               }
+> > > > +
+> > > > +               res = fread(buf + nread, 1, allocated - nread - 1, f);
+> > > > +               if (!res)
+> > > > +                       break;
+> > > > +               nread += res;
+> > > > +       }
+> > > > +
+> > > > +       ret = pclose(f);
+> > > > +       if (ret < 0 || !WIFEXITED(ret) || WEXITSTATUS(ret) != 0) {
+> > > > +               printf("%s failed\n", command);
+> > > > +               nread = -1;
+> > > > +       }
+> > > > +
+> > > > +       if (nread >= 0) {
+> > > > +               buf[nread] = 0;
+> > > > +               if (size)
+> > > > +                       *size = nread;
+> > > > +       } else {
+> > > > +               free(buf);
+> > > > +               buf = NULL;
+> > > > +       }
+> > > > +
+> > > > +       return buf;
+> > > > +}
+> > > > +
+> > > > +static void start_pipewire_daemons(pid_t *pipewire_pid, pid_t *wireplumber_pid)
+> > > > +{
+> > > > +       static const char *const daemons[2] = {
+> > > > +               "/usr/bin/pipewire",
+> > > > +               "/usr/bin/wireplumber"
+> > > > +       };
+> > > > +       static const char *const dirs[] = {
+> > > > +               "/run/pw",
+> > > > +               "/run/pw/state",
+> > > > +               "/run/pw/wireplumber",
+> > > > +               "/run/pw/wireplumber/bluetooth.lua.d",
+> > > > +               "/run/pw/wireplumber/main.lua.d",
+> > > > +               NULL
+> > > > +       };
+> > > > +       FILE *f;
+> > > > +       pid_t *pids[2] = {pipewire_pid, wireplumber_pid};
+> > > > +       char *envp[5];
+> > > > +       int i;
+> > > > +
+> > > > +       for (i = 0; dirs[i]; ++i) {
+> > > > +               if (mkdir(dirs[i], 0755) < 0) {
+> > > > +                       perror("Failed to create directory");
+> > > > +                       return;
+> > > > +               }
+> > > > +       }
+> > > > +
+> > > > +       /* Enable only Bluetooth part, disable whatever requires user DBus */
+> > > > +       f = fopen("/run/pw/wireplumber/main.lua.d/51-custom.lua", "w");
+> > > > +       if (!f) {
+> > > > +               perror("Failed to create Pipewire main config");
+> > > > +               return;
+> > > > +       }
+> > > > +       fprintf(f, "alsa_monitor.enabled = false\n"
+> > > > +               "v4l2_monitor.enabled = false\n"
+> > > > +               "libcamera_monitor.enabled = false\n"
+> > > > +               "default_access.properties[\"enable-flatpak-portal\"]"
+> > > > +               " = false\n");
+> > > > +       fclose(f);
+> > > 
+> > > I'd put this into its own function to make it clear that this is
+> > > setting up the configuration e.g.:
+> > > 
+> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/tools/test-runner.c#n450
+> > > 
+> > > > +       f = fopen("/run/pw/wireplumber/bluetooth.lua.d/51-custom.lua", "w");
+> > > > +       if (!f) {
+> > > > +               perror("Failed to create Pipewire bluetooth config");
+> > > > +               return;
+> > > > +       }
+> > > > +       fprintf(f, "bluez_monitor.properties[\"with-logind\"] = false\n"
+> > > > +               "bluez_midi_monitor.enabled = false\n");
+> > > > +       fclose(f);
+> > > > +
+> > > > +       /* Launch daemons */
+> > > > +       for (i = 0; i < 2; ++i)
+> > > > +               *pids[i] = -1;
+> > > > +
+> > > > +       envp[0] = "DBUS_SYSTEM_BUS_ADDRESS=unix:"
+> > > > +                 "path=/run/dbus/system_bus_socket";
+> > > > +       envp[1] = "XDG_STATE_HOME=/run/pw/state";
+> > > > +       envp[2] = "XDG_CONFIG_HOME=/run/pw";
+> > > > +       envp[3] = "XDG_RUNTIME_DIR=/run/pw";
+> > > > +       envp[4] = NULL;
+> > > > +
+> > > > +       for (i = 0; i < 2; ++i) {
+> > > > +               const char *daemon = daemons[i];
+> > > > +               char *argv[2];
+> > > > +               pid_t pid;
+> > > > +
+> > > > +               printf("Starting Pipewire daemon %s\n", daemon);
+> > > > +
+> > > > +               argv[0] = (char *) daemon;
+> > > > +               argv[1] = NULL;
+> > > > +
+> > > > +               pid = fork();
+> > > > +               if (pid < 0) {
+> > > > +                       perror("Failed to fork new process");
+> > > > +                       return;
+> > > > +               }
+> > > > +
+> > > > +               if (pid == 0) {
+> > > > +                       execve(argv[0], argv, envp);
+> > > > +                       exit(EXIT_SUCCESS);
+> > > > +               }
+> > > > +
+> > > > +               *pids[i] = pid;
+> > > > +
+> > > > +               printf("Pipewire daemon process %d created\n", pid);
+> > > > +       }
+> > > > +
+> > > > +       /* Tell pipewire clients where the socket is */
+> > > > +       setenv("PIPEWIRE_RUNTIME_DIR", "/run/pw", 1);
+> > > > +
+> > > > +       /* Wait until daemons completely started */
+> > > > +       for (i = 0; i < 6; ++i) {
+> > > > +               char *buf;
+> > > > +
+> > > > +               if (i > 0) {
+> > > > +                       printf("Wait for Pipewire ready...\n");
+> > > > +                       usleep(500000);
+> > > > +               }
+> > > > +
+> > > > +               buf = get_command_stdout("/usr/bin/pw-dump", NULL);
+> > > > +               if (!buf)
+> > > > +                       continue;
+> > > 
+> > > Don't we have a file or something similar to
+> > > /run/dbus/system_bus_socket that indicates pw is running? Checking
+> > > dump file seems a little overkill to me.
+> > 
+> > You can stat for /run/pipewire-0
+> > 
+> > The daemon running doesn't mean you have a sound devices yet, though,
+> > so if tests need them they need to wait for them themselves.
 > 
-> [5.] Most recent kernel version which did not have the bug:
-> 6.0.19
+> We could perhaps wait to see if Pipewire name popup on D-Bus, but I'd
+> leave that for a later stage when we actually have some tests that
+> depend on Pipewire directly.
 > 
-> [6.] Output of Oops.. message (if applicable) with symbolic
-> information resolved (see Documentation/admin-guide/bug-hunting.rst)
-> I can't find the Oops message when i use "journalctl | grep Oops"
+> > > 
+> > > > +
+> > > > +               if (strstr(buf, "WirePlumber")) {
+> > > > +                       printf("Pipewire ready\n");
+> > > > +                       free(buf);
+> > > > +                       break;
+> > > > +               }
+> > > > +
+> > > > +               free(buf);
+> > > > +       }
+> > > > +       if (i == 6)
+> > > > +               goto fail;
+> > > > +
+> > > > +       if (!start_emulator || !start_daemon)
+> > > > +               return;
+> > > > +
+> > > > +       /* Wait for Bluetooth endpoints */
+> > > > +       for (i = 0; i < 6; ++i) {
+> > > > +               char *buf;
+> > > > +
+> > > > +               if (i > 0) {
+> > > > +                       printf("Wait for endpoints...\n");
+> > > > +                       usleep(500000);
+> > > > +               }
+> > > > +
+> > > > +               buf = get_command_stdout("/usr/bin/bluetoothctl show", NULL);
+> > > > +               if (!buf)
+> > > > +                       continue;
+> > > > +
+> > > > +               if (strstr(buf, "0000110b-0000-1000-8000-00805f9b34fb") ||
+> > > > +                   strstr(buf, "00001850-0000-1000-8000-00805f9b34fb")) {
+> > > > +                       printf("Pipewire endpoints ready\n");
+> > > > +                       free(buf);
+> > > > +                       break;
+> > > > +               }
+> > > > +
+> > > > +               free(buf);
+> > > > +       }
+> > > > +       if (i == 6)
+> > > > +               goto fail;
+> > > 
+> > > Id skip this part, the endpoints registration depends on how
+> > > bluetoothd:main.conf  is configured so we shouldn't really expect
+> > > certain UUIDs like above.
+> > 
+> > Ok, in principle the tests that need endpoints can wait for them.
 > 
-> [7.] A small shell script or example program which triggers the
-> problem (if possible)
-> I cant write a shell script yet, but i have made a video to show the
-> trigger and how to reproduce the issue https://youtu.be/pHjOIAk90Zc
-> 
-> [8.] Environment
-> [8.1.] Software (add the output of the ver_linux script here)
-> <attachment2-Software.txt>
-> [8.2.] Processor information (from /proc/cpuinfo):
-> <attachment3-Processor.txt>
-> [8.3.] Module information (from /proc/modules):
-> <attachment4-Module.txt>
-> [8.4.] Loaded driver and hardware information (/proc/ioports, /proc/iomem)
-> <attachment5-DriverHW.txt>
-> [8.5.] PCI information ('lspci -vvv' as root)
-> <attachment6-PCI.txt>
-> [8.6.] SCSI information (from /proc/scsi/scsi)
-> <attachment7-SCSI.txt>
-> [8.7.] Other information that might be relevant to the problem (please
-> look in /proc and include all information that you think to be
-> relevant):
-> <attachment9-lsusb.txt>
-> 
-> [X.] Other notes, patches, fixes, workarounds:
-> The workaround for version 6.1 and above is to run "hcitool scan" on
-> the terminal if I want to detect bluetooth devices.
+> Let me know if you need more feedback on anything, also what is the
+> status of coordinated set setup? Did you get it working or there are
+> still some blockers?
 
-Thanks for the report. To be sure the issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
-tracking bot:
+The coordinated set stuff was merged in Pipewire some weeks ago. You'll
+need PW 0.3.70 + Wireplumber master branch for it, and it should just
+work.
 
-#regzbot ^introduced v6.0..v6.1
-#regzbot title bluetooth: ThinkPad T430 (BCM20702) does not  Detect
-Bluetooth Devices anymore
-#regzbot ignore-activity
+... aside from some problems I mentioned in earlier mails, which may be
+at lower level than PW. I uploaded some HCI traces for these:
 
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply and tell me -- ideally
-while also telling regzbot about it, as explained by the page listed in
-the footer of this mail.
+https://github.com/bluez/bluez/issues/515   (TWS desynchronization)
+https://github.com/bluez/bluez/issues/516   (transport reacquire fails)
+https://github.com/bluez/bluez/issues/517   (general connection issues)
 
-Developers: When fixing the issue, remember to add 'Link:' tags pointing
-to the report (the parent of this mail). See page linked in footer for
-details.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+-- 
+Pauli Virtanen
