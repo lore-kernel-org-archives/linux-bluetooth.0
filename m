@@ -2,123 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D30C7EE22
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 May 2023 19:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A874C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 May 2023 20:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230310AbjEITxd (ORCPT
+        id S235053AbjEIUko (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 May 2023 15:53:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37174 "EHLO
+        Tue, 9 May 2023 16:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbjEITxc (ORCPT
+        with ESMTP id S229572AbjEIUkn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 May 2023 15:53:32 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A5D23AA4;
-        Tue,  9 May 2023 12:53:31 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6439df6c268so3756893b3a.0;
-        Tue, 09 May 2023 12:53:31 -0700 (PDT)
+        Tue, 9 May 2023 16:40:43 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BE48116
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 May 2023 13:40:42 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-64115eef620so45399061b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 May 2023 13:40:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683662011; x=1686254011;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YigFI0J8gEeJ9cS/4TbGx1mSqvxtVecjV4VaaynehVs=;
-        b=F6SueKdsqAQd67bwmrJH/yXCbVZzk7pexPYCJWZLLHqA4lHaabi8TIl5IBddrEO2Ys
-         92xBtPh2FvUttUfaOhVxveveHmsucYdiMkoYH4+Gda4iKfE9CKrUYMMsQcQGrl7m71Qf
-         +NUURXgF1D/evhSzlLorfzi7JxSkGRG+3ONTr99R90qGFIziWETrsYQvC8YD3SIzQ27r
-         gVE+Xo2GCwJBLqzq1h8KuqgZYNmI9C4pS2Fe44NKtgh2pKklDSLed+ECc/Bv5RgYh/kC
-         U2AJRBi4rYolvjKprwgBCTOHgdupgtOM1+5oA21O/fbqKDUgAsX213lseuB14V433qv7
-         16Sg==
+        d=gmail.com; s=20221208; t=1683664841; x=1686256841;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QxtjgRmz/vJRqRz7Djsq88vCpB7kOFLqyrm7byraDKc=;
+        b=jblQm/m4XisROBoeb3KDopB244x4tXuMJN5Zs0pME9YxShzwTKNKw6pOKRebQ3AUK8
+         KDqhJyQ3+PbaPjyB5Xeq+UZsxfnOcuZJu20C5h17IF3yVRfLaF6V/rUnz+I80K2e5s+Y
+         gnjxBlYbEfX+/CC2QcX88goObUvozocOm2K28zjnZVIUVHpzvFcgkoeG2qp2hDuMdBTt
+         la+6a01DnLryh9SlyJPS+IRQ2b2TPR0LvGGC9kuKDd0a9Jb3tAJBVc2QZCzWUmnOWVR7
+         cDQg3ogHipLZrmmvypL6Zn7BMtAxDofGy7P7mumvw5OUgqTeIc5NCeWcBDRotVcwG51E
+         pkAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683662011; x=1686254011;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YigFI0J8gEeJ9cS/4TbGx1mSqvxtVecjV4VaaynehVs=;
-        b=BZwBPOfSPgG4WXsASAIlVPIBAoW3AWf9wklqIVArzrYkfCSBVsnKjUdgcf8oUS6I8v
-         Es5VNF82d684jjyz3pEHnCmwHLv5PZitnglPpyx54CnJoyYnXFHCKTKUaACQLqMwRaq1
-         NDe4QeRCiGdsucOZ7Mh65kbMAy2XYdAvNKRWKgg4NpMoTLyucjMdSuesPms+HvjPPW+S
-         xfEKtq0uwds1hozSn/F/zyCC5Q3vkg+eTpm61TPRnu/yEvEancQF+gjhAiGmzjjnKW5v
-         Nuqqe8fSiZO5JwAtaijoxqu4ItSUcdD38RQ9+F1sxJ553WtsdDWYJqK06iMY/OFkDp/6
-         nM6A==
-X-Gm-Message-State: AC+VfDx/4tEcNcfRNglmO2orvQfugnKzPF3or5Fx35YoqTyx4gipe3Pk
-        p3aoSL+PJ1corc+VNMMN7MetltObe6Yn/w==
-X-Google-Smtp-Source: ACHHUZ5FoaWYZKlVFSKQYNxq47jfzra4vCZOi5A2k8Y7lH5AQ1iW61wB62HZN1oo7Hw3T5eiqmbTag==
-X-Received: by 2002:a05:6a20:7489:b0:f6:4c57:265d with SMTP id p9-20020a056a20748900b000f64c57265dmr18577016pzd.1.1683662010411;
-        Tue, 09 May 2023 12:53:30 -0700 (PDT)
-Received: from localhost.localdomain (ip70-179-44-160.sd.sd.cox.net. [70.179.44.160])
-        by smtp.gmail.com with ESMTPSA id v10-20020aa7808a000000b0063d3fbf4783sm2124247pff.80.2023.05.09.12.53.29
+        d=1e100.net; s=20221208; t=1683664841; x=1686256841;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QxtjgRmz/vJRqRz7Djsq88vCpB7kOFLqyrm7byraDKc=;
+        b=VyCboneTVpW+nJcpYjVPVSB6IBEdkO+87cx11hJdRB8HgnnFIoPOhwXArcdnwV0OuX
+         UrCoa4P/sA1ub5CbXIMaRMqvKGbiKp4PNe9sQAkn0bfVPHT9cWhWXkgwY+GLsprRmFdW
+         F/YJohRGPVcn4aWsFzwr6btT1wu5l+CmU7ptmEs4eyK7bUUpggrfDg20D4XTu25sbsum
+         +LYFv6iEMzo/4HUrGrRgTlMwBUUWXg2eQWTfCjwrxr7zdpJSrjdv+ER2py/if/uGlVzd
+         0Fw3lMY37voIO2vPDBFnhIuZSUQqesuOvS8muuBv67KbPkDFwoAZXyhq7wkw8vmNJJNy
+         UNUA==
+X-Gm-Message-State: AC+VfDymFbazB1n8YLd4vppqlUDwirfNQD6abJKH25Sk3YsRQxjVO/p1
+        cgs/u+7GbqdoVzqFBo7fA74fKwLAibg=
+X-Google-Smtp-Source: ACHHUZ7lFN3N5atw27uigwyFbNdg4dm6hc1VQ8W+Ogd75nODfNKJ0j7VJSyzuxZCmmskVRFPXXjRTA==
+X-Received: by 2002:a17:902:d505:b0:1a6:f93a:a136 with SMTP id b5-20020a170902d50500b001a6f93aa136mr24584336plg.22.1683664841507;
+        Tue, 09 May 2023 13:40:41 -0700 (PDT)
+Received: from [172.17.0.2] ([138.91.175.192])
+        by smtp.gmail.com with ESMTPSA id 19-20020a17090a195300b0023a84911df2sm20791800pjh.7.2023.05.09.13.40.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 May 2023 12:53:30 -0700 (PDT)
-From:   Dan Gora <dan.gora@gmail.com>
-Cc:     Dan Gora <dan.gora@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations
-Date:   Tue,  9 May 2023 12:51:19 -0700
-Message-Id: <20230509195119.9655-1-dan.gora@gmail.com>
-X-Mailer: git-send-email 2.35.1.102.g2b9c120970
-In-Reply-To: <20230504212843.18519-1-dan.gora@gmail.com>
-References: <20230504212843.18519-1-dan.gora@gmail.com>
+        Tue, 09 May 2023 13:40:40 -0700 (PDT)
+Message-ID: <645aafc8.170a0220.65f64.9cbd@mx.google.com>
+Date:   Tue, 09 May 2023 13:40:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3581478726646323662=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, dan.gora@gmail.com
+Subject: RE: [v2,1/1] Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations
+In-Reply-To: <20230509195119.9655-1-dan.gora@gmail.com>
+References: <20230509195119.9655-1-dan.gora@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add missing MODULE_FIRMWARE declarations for firmware referenced in
-btrtl.c.
+--===============3581478726646323662==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Dan Gora <dan.gora@gmail.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=746241
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.65 seconds
+GitLint                       PASS      0.26 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      43.54 seconds
+CheckAllWarning               PASS      46.87 seconds
+CheckSparse                   PASS      52.62 seconds
+CheckSmatch                   PASS      143.60 seconds
+BuildKernel32                 PASS      42.71 seconds
+TestRunnerSetup               PASS      601.12 seconds
+TestRunner_l2cap-tester       PASS      20.97 seconds
+TestRunner_iso-tester         PASS      27.73 seconds
+TestRunner_bnep-tester        PASS      7.42 seconds
+TestRunner_mgmt-tester        PASS      144.04 seconds
+TestRunner_rfcomm-tester      PASS      11.26 seconds
+TestRunner_sco-tester         PASS      10.85 seconds
+TestRunner_ioctl-tester       PASS      12.87 seconds
+TestRunner_mesh-tester        PASS      9.64 seconds
+TestRunner_smp-tester         PASS      10.78 seconds
+TestRunner_userchan-tester    PASS      7.91 seconds
+IncrementalBuild              PASS      39.85 seconds
+
+
+
 ---
- drivers/bluetooth/btrtl.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 2915c82d719d..d978e7cea873 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1367,14 +1367,30 @@ MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723cs_vf_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723cs_xx_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8723d_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8723d_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8761b_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8761b_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8761bu_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8761bu_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8821c_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8821c_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8821cs_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8821cs_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8822cs_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8822cs_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8822cu_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8822cu_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8851bu_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8851bu_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852bs_fw.bin");
-@@ -1383,5 +1399,3 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
--MODULE_FIRMWARE("rtl_bt/rtl8851bu_fw.bin");
--MODULE_FIRMWARE("rtl_bt/rtl8851bu_config.bin");
--- 
-2.35.1.102.g2b9c120970
 
+--===============3581478726646323662==--
