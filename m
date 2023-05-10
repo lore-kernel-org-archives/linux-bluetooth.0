@@ -2,108 +2,134 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF42BC77B7D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 May 2023 09:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8B9C7EE22
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 May 2023 09:57:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236574AbjEJJ1f (ORCPT
+        id S235484AbjEJJ5T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 May 2023 05:27:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42200 "EHLO
+        Wed, 10 May 2023 05:57:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbjEJJ1e (ORCPT
+        with ESMTP id S235524AbjEJJ5L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 May 2023 05:27:34 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C6733A88
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 02:27:32 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-50bc4b88998so12438996a12.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 02:27:32 -0700 (PDT)
+        Wed, 10 May 2023 05:57:11 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D4D59C3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 02:57:09 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-75776686671so197281885a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 02:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1683710851; x=1686302851;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JBKGh73QpqEYJqax38l5dJYavyHBNPUc6IQPM+Q4Z0I=;
-        b=iPH+ouFoA5GOEgnT5bLA6aVtT6mZ8/JMWvWbyo7xN+jXlp6nS10XYkdja8PCRH+3HD
-         j90pzE45kJTfAuCLCDQvuFmSszJC11Pigyyzs+BntJUG7/t1lUZfGegsNzHlxg4JJcLw
-         B1x9uQrKunyqkx0KF7YCBrwlyAdaNBFW9yPsVVw7O3UxvB9WyqWuDpiYhqxKHKSmvWoe
-         Rr0G+TAqbG2pGAPndeufdxCeF02J0zrWO8vCZN8AmxAVUdqcHt065YS+u1s7rB07fZ4f
-         Oi63pSAk1bFSVleunPCl+RM9T+N676GJgE5aTCKjpWEolxVwuxtL6jdQWDlA+cvUmepM
-         a/Bg==
+        d=gmail.com; s=20221208; t=1683712628; x=1686304628;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zd8z0WtISJwdoSw7N5NwoqgjMnW9Guxu1pvhaqnVHWU=;
+        b=QGw3PpwiGK17QGgnll0Gar4Lg6XJAEyEkj6LcSPS0aVp0N5fQgEzkpXgot67Cz9HFJ
+         LxXnSWPnT+Tu8aLRSf69uXJkvNJRBRADWoMjjhB4Y7dPzYPMHmR/cVfQ+g894vyrXCME
+         iYiZz2ftXGb8nkbrIYqVnXJiF+mB87gt/iH638ufkThV6RIaDVt4KXtreW0pCA3xy+xn
+         woRx2wZJ1qGPTd2P/v8hjtpWtAx6VaxgC8M/jYULZV+04Yehvw2FADPG1XtDHNbomPN4
+         bYJ3acBDUc5atR9Do7GLn1pp6ZAfSRoK5OfmlDtf/l3Vu7DB2k7JimktSbAO8HjA5oxa
+         kjNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683710851; x=1686302851;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1683712628; x=1686304628;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JBKGh73QpqEYJqax38l5dJYavyHBNPUc6IQPM+Q4Z0I=;
-        b=KVX7ud+sHqCXwFLGFkKQug/oC+FXW9IJFs426cnjGjUffDTQ2O73WQkRDDv45ha8Gl
-         QU8s1KKHjBFFRb68HjrAOdmrhUuBxB2cDkb8b5vKQ+1h/tVu1g7DOLOhQZ5MidcuuSWg
-         EvB3sPGgLUPjx6iJ+tudC1wUPIwVxMW+1pfX0odTZIzgqqpbD9JskO5gt1WJQqga1ci5
-         MyPe+YY/FJnImUGja8bIw3hj1So+5NJGzA6rpPYp7mF8wapmqMSiFLKTfXlIqjsafMuF
-         NKfVbZomHOkucTOkIG7Kd6G2O3x6qTGjKN2sucf84PkBwmqIdxnG0EqybY7vA2KwB9il
-         C0Gw==
-X-Gm-Message-State: AC+VfDyZ/9/LjShCNGJ7LGF6JPHHuUhBgTgyW1B3MTpUsWxGHZoVxmlX
-        67jywjiTZW8OVY3WWVt0ZL/cxw==
-X-Google-Smtp-Source: ACHHUZ7Oh9r0VM9/gCBR55+JfnCFHJfLxLYN7lIg6ZiAX7201e+P7Q1p/vq5LK4BKmJ3n6Y7z+jEaQ==
-X-Received: by 2002:aa7:cd0b:0:b0:506:7386:88d7 with SMTP id b11-20020aa7cd0b000000b00506738688d7mr11915481edw.11.1683710850965;
-        Wed, 10 May 2023 02:27:30 -0700 (PDT)
-Received: from [172.16.240.113] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id d16-20020a056402001000b0050bd47f9073sm1691639edu.39.2023.05.10.02.27.29
+        bh=Zd8z0WtISJwdoSw7N5NwoqgjMnW9Guxu1pvhaqnVHWU=;
+        b=VD1y+tmIqb//cKXpmNQl9un3OUxCh+gGyzJyC6NBTvKwU7Fcbv77/NjYwQYjv7+Yr+
+         A06mJpfiP8yM0pZMRR6uIr2UJCFUlsOkDTY29w5P54UiwLurs39S9rcOJybNCgcWHIl4
+         82rknZZVsIhn4D5eECP2eiMitTa/m3gMvvGy5N7j6u22OstDT2w3nnkDeWdaKtFCFnRP
+         W1y7/DIc24RKWuImBQG5QkyzJFf25WJXmQ2sxfQezQK2zC6IM6oLRlRmSazsmhnu+0h4
+         LMa/bC9xJVWDC5wASlCBSJLJty+k+MUPlKpgcTmnz5Ngt0asfNjDR/skwRbhZnDcfy6e
+         49zg==
+X-Gm-Message-State: AC+VfDwpNWx5h+E5V2gezce9ul3BVJmEfmQ8YW9XrdydOei60+TkaUCN
+        RLNv36S66qJUF16EQXNrb+Ak//ADR9g=
+X-Google-Smtp-Source: ACHHUZ68Uorhigps8kE6gF+l464ZdtrxZcXlZHhduAmhs+69MYegnRC+0suGjWBjapHsu2c9ra8kqg==
+X-Received: by 2002:a05:622a:2cf:b0:3ef:6513:75ff with SMTP id a15-20020a05622a02cf00b003ef651375ffmr26504535qtx.7.1683712627876;
+        Wed, 10 May 2023 02:57:07 -0700 (PDT)
+Received: from [172.17.0.2] ([172.176.163.146])
+        by smtp.gmail.com with ESMTPSA id e2-20020ac845c2000000b003f0a7c13fcdsm1237267qto.74.2023.05.10.02.57.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 May 2023 02:27:30 -0700 (PDT)
-From:   Luca Weiss <luca.weiss@fairphone.com>
-Date:   Wed, 10 May 2023 11:27:21 +0200
-Subject: [PATCH] Bluetooth: btqca: make sure to handle byte order for
- soc_id
+        Wed, 10 May 2023 02:57:07 -0700 (PDT)
+Message-ID: <645b6a73.c80a0220.3e0fb.6282@mx.google.com>
+Date:   Wed, 10 May 2023 02:57:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0008631811193714525=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230510-btqca-byte-order-v1-1-82e6a371c5aa@fairphone.com>
-X-B4-Tracking: v=1; b=H4sIAHhjW2QC/x2Nyw7CIBAAf6XZs9tAq43xV4wHoItsYgAXfDRN/
- 13qcZKZzAqFhKnApVtB6M2FU2ygDx24YOKdkOfGMKhhVCet0NanM2iXSphkJkGayGil9NlrBy2
- zphBaMdGFPfT5iFM/9gt+OKN9vKimVMNuZiHP3//8etu2H8inI1WMAAAA
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Simon Horman <simon.horman@corigine.com>,
-        Luca Weiss <luca.weiss@fairphone.com>
-X-Mailer: b4 0.12.2
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luca.weiss@fairphone.com
+Subject: RE: Bluetooth: btqca: make sure to handle byte order for soc_id
+In-Reply-To: <20230510-btqca-byte-order-v1-1-82e6a371c5aa@fairphone.com>
+References: <20230510-btqca-byte-order-v1-1-82e6a371c5aa@fairphone.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The field soc_id in struct qca_btsoc_version is __le32 so we need to
-convert it to host byteorder before using.
+--===============0008631811193714525==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=746366
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.96 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      31.66 seconds
+CheckAllWarning               PASS      35.30 seconds
+CheckSparse                   PASS      39.75 seconds
+CheckSmatch                   PASS      110.33 seconds
+BuildKernel32                 PASS      30.74 seconds
+TestRunnerSetup               PASS      439.27 seconds
+TestRunner_l2cap-tester       PASS      16.58 seconds
+TestRunner_iso-tester         PASS      20.49 seconds
+TestRunner_bnep-tester        PASS      5.32 seconds
+TestRunner_mgmt-tester        PASS      112.02 seconds
+TestRunner_rfcomm-tester      PASS      8.57 seconds
+TestRunner_sco-tester         PASS      7.91 seconds
+TestRunner_ioctl-tester       PASS      9.21 seconds
+TestRunner_mesh-tester        PASS      6.70 seconds
+TestRunner_smp-tester         PASS      7.78 seconds
+TestRunner_userchan-tester    PASS      5.60 seconds
+IncrementalBuild              PASS      29.30 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: btqca: make sure to handle byte order for soc_id
+WARNING: Reported-by: should be immediately followed by Link: with a URL to the report
+#94: 
 Reported-by: Simon Horman <simon.horman@corigine.com>
 Fixes: 059924fdf6c1 ("Bluetooth: btqca: Use NVM files based on SoC ID for WCN3991")
-Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
----
- drivers/bluetooth/btqca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index fd0941fe8608..e7e58a956d15 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -637,7 +637,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		snprintf(config.fwname, sizeof(config.fwname),
- 			 "qca/%s", firmware_name);
- 	else if (qca_is_wcn399x(soc_type)) {
--		if (ver.soc_id == QCA_WCN3991_SOC_ID) {
-+		if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID) {
- 			snprintf(config.fwname, sizeof(config.fwname),
- 				 "qca/crnv%02xu.bin", rom_ver);
- 		} else {
+total: 0 errors, 1 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13236686.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
 
 ---
-base-commit: ac9a78681b921877518763ba0e89202254349d1b
-change-id: 20230510-btqca-byte-order-e6ea10018f1c
+Regards,
+Linux Bluetooth
 
-Best regards,
--- 
-Luca Weiss <luca.weiss@fairphone.com>
 
+--===============0008631811193714525==--
