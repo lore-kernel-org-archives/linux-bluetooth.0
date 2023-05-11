@@ -2,113 +2,72 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD16AC7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 May 2023 00:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F02DC77B7D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 May 2023 00:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236405AbjEKACD (ORCPT
+        id S235708AbjEKAah (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 May 2023 20:02:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53692 "EHLO
+        Wed, 10 May 2023 20:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236189AbjEKACC (ORCPT
+        with ESMTP id S233254AbjEKAag (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 May 2023 20:02:02 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E44A10DA
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 17:02:01 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-64395e2a715so7891742b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 17:02:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683763320; x=1686355320;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rf8eRSKfJPDMFusnZzOI0itkuuwBnCgk1u412CdsNUs=;
-        b=jK+juGZOt4vgvnxNo5tcj/LdUEB+c2rlpnJHmz1GYSkiDr0DIbw05+MB/IiJR7/inR
-         iUekynMomtYvXcSGIklN4fA0YvIxurE5z6L+bKg/htRw/KhSZYehBTVs+4l162AAVlYR
-         /TGPSTEWPIU0qGhFFHAQlsWJhVWA5f2Afi4uV5vTbQzeDicxv78BgdDmxKyrmpq25nyp
-         EHOyi2gDF2kx8oTzjffT5AvQ6Guh0HqGEBRDO1kj8JXnnGPC/xtyqEEgzxNO2J3fOc4+
-         twcdZEooVu8tkst6qGiF7uXEfU8kNvvmCKpihDlXwc/9TCW9yHKUcVo4C5w7g75+bTWk
-         mksA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683763320; x=1686355320;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rf8eRSKfJPDMFusnZzOI0itkuuwBnCgk1u412CdsNUs=;
-        b=fZdl5l/gbYZhtvqXXW7u9+mqCPKXg5K1caQAkjx6GoiRmgJ9YOJgQlThhEweURR5xq
-         b7T/EA3bZ/RrQ8mQdiUKX630DMDprxtD5uLdctUZ9PIiqzIuAvX55D6IlpfAdrVnJqdM
-         PBCxFSRA8rkiPTzxDFyuC15tdfma7vWDRcMIlTHfVVG3WgMtAihVo1cjj4ns77jqonSP
-         Euj9fn+zCiWZsDClJolZRCugamL6L47rzDvhe/NUEb8u25VRVN2MRDSaTmgnyXtVo4PZ
-         0tpbF++rplg00cVEpd9HzfIsXfoimqWZLnwh067Gr93ZaY+sLm2+CT9m1FNsfMfe0SGY
-         n36Q==
-X-Gm-Message-State: AC+VfDy6I6XL5uiBeNmWb78s01zmY3m+D2DGqYL/w+t52Tv35UTHfWtV
-        KoUzbIE7EyrL17wtCAx2Qd3kGVtuwi0=
-X-Google-Smtp-Source: ACHHUZ6oZQyETYr4UO0aA+a+aJUokiLn/gnTU5wxA9YTcsFY2A5XwvMGiwU3/aDezp8w+iL9Sy1j7g==
-X-Received: by 2002:a05:6a21:9996:b0:f5:6530:c7a8 with SMTP id ve22-20020a056a21999600b000f56530c7a8mr24698821pzb.22.1683763320207;
-        Wed, 10 May 2023 17:02:00 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id g15-20020a63f40f000000b0053031f7a367sm3761604pgi.85.2023.05.10.17.01.58
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 May 2023 17:01:58 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Wed, 10 May 2023 20:30:36 -0400
+Received: from out-14.mta1.migadu.com (out-14.mta1.migadu.com [95.215.58.14])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0540E10DD
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 May 2023 17:30:34 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ayaya.dev; s=key1;
+        t=1683764594;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=02JKLSHG1vLTKTxUUXs3wGXxxpnoDhEqlqorGsnIBik=;
+        b=KDzLr76UwfQSVneItCVn9XmpqwXrFeJPvMW+KJM7R18+4VMM3HZt7FOXhPlDAs6hAzxLrj
+        1AbVSyGtQGX3nZv2NxWA9dMKyjqlObdT4yUqdMXdb4ssEgrX9DbljxVlmAGbgrpelM88vx
+        fJLiCaQcdHEh9+fUy1VmoZ34uAKqKBk=
+From:   psykose <alice@ayaya.dev>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] shared/bap: Fix not sending ASE Receiver Stop Ready
-Date:   Wed, 10 May 2023 17:01:55 -0700
-Message-Id: <20230511000155.3721222-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.0
-In-Reply-To: <20230511000155.3721222-1-luiz.dentz@gmail.com>
-References: <20230511000155.3721222-1-luiz.dentz@gmail.com>
+Cc:     alice@ayaya.dev
+Subject: [PATCH BlueZ 3/3] tools/parser: use long long for time_t print
+Date:   Thu, 11 May 2023 02:22:52 +0200
+Message-Id: <20230511002252.30868-3-alice@ayaya.dev>
+In-Reply-To: <20230511002252.30868-1-alice@ayaya.dev>
+References: <20230511002252.30868-1-alice@ayaya.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+%lld is guarantted to be a 64-bit int, which we enforce via
+-D_TIME_BITS=64.
 
-This fixes not sending ASE Receiver Stop Ready if stream is on disabling
-state when CIS is disconnected.
-
-Fixes: https://github.com/bluez/bluez/issues/516
+Signed-off-by: psykose <alice@ayaya.dev>
 ---
- src/shared/bap.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tools/parser/parser.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 6131c312865a..f194f466fde1 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -1115,6 +1115,18 @@ static bool match_stream_io(const void *data, const void *user_data)
- 	return stream->io == io;
- }
- 
-+static void stream_stop_disabling(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+
-+	if (stream->io || stream->ep->state != BT_ASCS_ASE_STATE_DISABLING)
-+		return;
-+
-+	DBG(stream->bap, "stream %p", stream);
-+
-+	bt_bap_stream_stop(stream, NULL, NULL);
-+}
-+
- static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- {
- 	struct bt_bap_stream *link;
-@@ -1133,6 +1145,9 @@ static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- 		/* Detach link if in QoS state */
- 		if (link->ep->state == BT_ASCS_ASE_STATE_QOS)
- 			bap_stream_io_detach(link);
-+	} else {
-+		/* Links without IO on disabling state shall be stopped. */
-+		queue_foreach(stream->links, stream_stop_disabling, NULL);
- 	}
- 
- 	stream_io_unref(io);
+diff --git a/tools/parser/parser.h b/tools/parser/parser.h
+index 5f65f1689..1eda4f290 100644
+--- a/tools/parser/parser.h
++++ b/tools/parser/parser.h
+@@ -120,11 +120,11 @@ static inline void p_indent(int level, struct frame *f)
+ 				struct tm tm;
+ 				time_t t = f->ts.tv_sec;
+ 				localtime_r(&t, &tm);
+-				printf("%04d-%02d-%02d %02d:%02d:%02d.%06lu ",
++				printf("%04d-%02d-%02d %02d:%02d:%02d.%06llu ",
+ 					tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+ 					tm.tm_hour, tm.tm_min, tm.tm_sec, f->ts.tv_usec);
+ 			} else
+-				printf("%8lu.%06lu ", f->ts.tv_sec, f->ts.tv_usec);
++				printf("%8lu.%06llu ", f->ts.tv_sec, f->ts.tv_usec);
+ 		}
+ 		printf("%c ", (f->in ? '>' : '<'));
+ 		parser.state = 1;
 -- 
-2.40.0
+2.40.1
 
