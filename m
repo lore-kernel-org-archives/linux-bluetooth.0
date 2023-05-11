@@ -2,98 +2,204 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B43CBC7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 May 2023 13:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23436C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 May 2023 20:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238191AbjEKNR3 (ORCPT
+        id S229611AbjEKU2i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 May 2023 09:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35026 "EHLO
+        Thu, 11 May 2023 16:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238135AbjEKNQ7 (ORCPT
+        with ESMTP id S239374AbjEKU2d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 May 2023 09:16:59 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F072100DC;
-        Thu, 11 May 2023 06:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1683810946; x=1715346946;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8XQL7bYEaCNAsPYfNtNmF5YMRERIojn4B8v+BqlhGOQ=;
-  b=mflnzpifX7zqm8eXAwHKvnk5a4hleC0Ctjaa1b5ho4zFevEThqLI7Y2o
-   WJbJpN/YRgFYEbKyno1PUiMkoDnCEfjCfaGeBDZzgZ3QWZRbdHBZ3MGXB
-   /rhZYT4LAi7cqJB3K7VoA+RTyC6FS2z5tQd0776DfXoxy5iLTqDTtHXVh
-   DVMDxhUhgDYLcXB1MdsNt4HNGy0oE3N/yKVvgAPoVZZ5PQP9cEyc190i8
-   BT/xsfZS95yJW84QPmOzsFSn0/HMcj3cZF5J0k+v9Wc4ewbMeRuUxjCFc
-   K/647eNMV594JyZdoMR8NuWvTHtsk9BJQPzrVMoO+odMmjeD5iO2JC6yk
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10706"; a="378619605"
-X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
-   d="scan'208";a="378619605"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 06:15:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10706"; a="650169921"
-X-IronPort-AV: E=Sophos;i="5.99,266,1677571200"; 
-   d="scan'208";a="650169921"
-Received: from jsanche3-mobl1.ger.corp.intel.com (HELO ijarvine-MOBL2.ger.corp.intel.com) ([10.252.39.112])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2023 06:15:35 -0700
-From:   =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
-        Rob Herring <robh@kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        Hector Martin <marcan@marcan.st>,
-        Sven Peter <sven@svenpeter.dev>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH 11/17] Bluetooth: hci_bcm4377: Use pcie_lnkctl_clear_and_set() for changing LNKCTL
-Date:   Thu, 11 May 2023 16:14:35 +0300
-Message-Id: <20230511131441.45704-12-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230511131441.45704-1-ilpo.jarvinen@linux.intel.com>
-References: <20230511131441.45704-1-ilpo.jarvinen@linux.intel.com>
+        Thu, 11 May 2023 16:28:33 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D92788A6F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 May 2023 13:28:28 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-64389a44895so7359079b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 May 2023 13:28:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1683836907; x=1686428907;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LpzUOM7Ff2iDt/BIpy7qB4J4jd23xXMR7oT7W/ai9xo=;
+        b=B+N/4IIl2bTwB9FKAm72gPkJb4EIL0QoljrI9zyIWXOyGbmYiD0FZsyDQVLYlxwp5m
+         jMBSx8hmxyOgXiHRGP68XwuRwsCOqYTII6JnKsigOm8sA4RX7D7lumfI30z7iPEUzhmO
+         p41aFoDUYmZ5cO5hQHqIPZS6OqKxLHHI8v7hXuCHBQbfbGIhexKUStSkJ6lPjzYE5wej
+         bqgiFC2Cux5o5J82eHR3mwGmGEciN1iga2AHXmMGb1jHyFeNbloJ+a5k9cXX+hxhD/OD
+         hBWdJgPKuv4B4v5hR+zVb7l7QUvzF2UTsBJzd4ObKahgU2Awk5JglPLBVuNXeYZIWK5D
+         6Tag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1683836907; x=1686428907;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LpzUOM7Ff2iDt/BIpy7qB4J4jd23xXMR7oT7W/ai9xo=;
+        b=eTFSniyT+J6eXd0pdTSj9lV/nqLWXCjY+n3FNwFCALw4qyk5C6Gvg4A2oN+DRQz+gj
+         Vqf8VVKqnKJXaMnqOprUJu7wAVt/xp6TLHRYy7LbAXQztJl/AwucioHmCXbtH5jZsIPS
+         ES6A+iw8xWf3UhEa4rLZAKL4at19MZsYPYxoMKaspVFG48FxyHgJs1DG0NxU/lVsMwwp
+         D81PTC5G62VZ1Bnvpt/IeRAEC8eHRY2xVQw5ORU2ImO7mzv1hJu4dXcQ+zTL27gB0Tn9
+         EuhTZtMa9RGQAROnXQ/awgCu0eHY4Lku0ez0/u0zD+UGPaDLUvVev/MnL2g2+3hK7Ltn
+         ilGw==
+X-Gm-Message-State: AC+VfDzg6lSNxrqlOoxmAQqp604T+jlb19q3M8pJ++d+xgrmkpHZ3Lym
+        PYtAZlv1D2EcJcq1d5yv66O/Gq1lyeg=
+X-Google-Smtp-Source: ACHHUZ7SXp5VzTYI4YqGdlaBmwVXzobaDi8mywV9xm0hmZjRDByHgjoGkWBOI2g4T+gXI+n4nAZPEg==
+X-Received: by 2002:a05:6a20:7491:b0:f5:ae09:ce02 with SMTP id p17-20020a056a20749100b000f5ae09ce02mr30612543pzd.18.1683836907320;
+        Thu, 11 May 2023 13:28:27 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id s24-20020aa78298000000b0062a7462d398sm5864529pfm.170.2023.05.11.13.28.26
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 May 2023 13:28:26 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] client/player: Add support to Max Transports in endpoint.register
+Date:   Thu, 11 May 2023 13:28:24 -0700
+Message-Id: <20230511202825.3983806-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Don't assume that only the driver would be accessing LNKCTL. ASPM
-policy changes can trigger write to LNKCTL outside of driver's control.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Use pcie_lnkctl_clear_and_set() which does proper locking to avoid
-losing concurrent updates to the register value.
-
-Suggested-by: Lukas Wunner <lukas@wunner.de>
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+[bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06
+[/local/endpoint/ep0] Auto Accept (yes/no): y
+[/local/endpoint/ep0] Max Transports (auto/value): 1
+[/local/endpoint/ep0] CIG (auto/value): a
+[/local/endpoint/ep0] CIS (auto/value): a
 ---
- drivers/bluetooth/hci_bcm4377.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ client/player.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 59 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-index 19ad0e788646..e2b489f678d9 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -2232,8 +2232,7 @@ static void bcm4377_disable_aspm(struct bcm4377_data *bcm4377)
- 	 * or if the BIOS hasn't handed over control to us. We must *always*
- 	 * disable ASPM for this device due to hardware errata though.
- 	 */
--	pcie_capability_clear_word(bcm4377->pdev, PCI_EXP_LNKCTL,
--				   PCI_EXP_LNKCTL_ASPMC);
-+	pcie_lnkctl_clear_and_set(bcm4377->pdev, PCI_EXP_LNKCTL_ASPMC, 0);
+diff --git a/client/player.c b/client/player.c
+index 2880c5ffe140..f055ff941569 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -73,6 +73,7 @@ struct endpoint {
+ 	struct iovec *meta;
+ 	bool auto_accept;
+ 	bool acquiring;
++	uint8_t max_transports;
+ 	uint8_t cig;
+ 	uint8_t cis;
+ 	char *transport;
+@@ -1056,6 +1057,16 @@ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
+ 	print_iter("\t", "Properties", &props);
+ 
+ 	free(ep->transport);
++
++	if (!ep->max_transports) {
++		bt_shell_printf("Maximum transports reached: rejecting\n");
++		return g_dbus_create_error(msg,
++					 "org.bluez.Error.Rejected",
++					 "Maximum transports reached");
++	}
++
++	ep->max_transports--;
++
+ 	ep->transport = strdup(path);
+ 
+ 	if (ep->auto_accept) {
+@@ -1672,6 +1683,13 @@ static DBusMessage *endpoint_select_configuration(DBusConnection *conn,
+ 	bt_shell_printf("Endpoint: SelectConfiguration\n");
+ 	print_iter("\t", "Capabilities", &args);
+ 
++	if (!ep->max_transports) {
++		bt_shell_printf("Maximum transports reached: rejecting\n");
++		return g_dbus_create_error(msg,
++					 "org.bluez.Error.Rejected",
++					 "Maximum transports reached");
++	}
++
+ 	if (!ep->auto_accept) {
+ 		ep->msg = dbus_message_ref(msg);
+ 		bt_shell_prompt_input("Endpoint", "Enter preset/configuration:",
+@@ -1688,8 +1706,11 @@ static DBusMessage *endpoint_select_configuration(DBusConnection *conn,
+ 
+ 	reply = endpoint_select_config_reply(msg, p->data.iov_base,
+ 						p->data.iov_len);
+-	if (!reply)
+-		return NULL;
++	if (!reply) {
++		reply = g_dbus_create_error(msg, "org.bluez.Error.Rejected",
++								NULL);
++		return reply;
++	}
+ 
+ 	bt_shell_printf("Auto Accepting using %s...\n", p->name);
+ 
+@@ -1878,6 +1899,13 @@ static DBusMessage *endpoint_select_properties(DBusConnection *conn,
+ 	bt_shell_printf("Endpoint: SelectProperties\n");
+ 	print_iter("\t", "Properties", &args);
+ 
++	if (!ep->max_transports) {
++		bt_shell_printf("Maximum transports reached: rejecting\n");
++		return g_dbus_create_error(msg,
++					 "org.bluez.Error.Rejected",
++					 "Maximum transports reached");
++	}
++
+ 	if (!ep->auto_accept) {
+ 		ep->msg = dbus_message_ref(msg);
+ 		bt_shell_prompt_input("Endpoint", "Enter preset/configuration:",
+@@ -1903,6 +1931,9 @@ static DBusMessage *endpoint_clear_configuration(DBusConnection *conn,
+ {
+ 	struct endpoint *ep = user_data;
+ 
++	if (ep->max_transports != UINT8_MAX)
++		ep->max_transports++;
++
+ 	free(ep->transport);
+ 	ep->transport = NULL;
+ 
+@@ -2234,12 +2265,37 @@ static void endpoint_cig(const char *input, void *user_data)
+ 	bt_shell_prompt_input(ep->path, "CIS (auto/value):", endpoint_cis, ep);
  }
  
- static void bcm4377_pci_free_irq_vectors(void *data)
++static void endpoint_max_transports(const char *input, void *user_data)
++{
++	struct endpoint *ep = user_data;
++	char *endptr = NULL;
++	int value;
++
++	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
++		ep->max_transports = UINT8_MAX;
++	} else {
++		value = strtol(input, &endptr, 0);
++
++		if (!endptr || *endptr != '\0' || value > UINT8_MAX) {
++			bt_shell_printf("Invalid argument: %s\n", input);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++
++		ep->max_transports = value;
++	}
++
++	bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
++}
++
+ static void endpoint_auto_accept(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
+ 
+ 	if (!strcasecmp(input, "y") || !strcasecmp(input, "yes")) {
+ 		ep->auto_accept = true;
++		bt_shell_prompt_input(ep->path, "Max Transports (auto/value):",
++						endpoint_max_transports, ep);
++		return;
+ 	} else if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
+ 		ep->auto_accept = false;
+ 	} else {
+@@ -2977,6 +3033,7 @@ static void register_endpoints(GDBusProxy *proxy)
+ 				continue;
+ 
+ 			ep = endpoint_new(cap);
++			ep->max_transports = UINT8_MAX;
+ 			ep->auto_accept = true;
+ 			ep->cig = BT_ISO_QOS_CIG_UNSET;
+ 			ep->cis = BT_ISO_QOS_CIS_UNSET;
 -- 
-2.30.2
+2.40.0
 
