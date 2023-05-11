@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23436C77B7C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D7FC7EE22
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 May 2023 20:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbjEKU2i (ORCPT
+        id S239384AbjEKU2j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 May 2023 16:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
+        Thu, 11 May 2023 16:28:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239374AbjEKU2d (ORCPT
+        with ESMTP id S239392AbjEKU2f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 May 2023 16:28:33 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D92788A6F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 May 2023 13:28:28 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-64389a44895so7359079b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 May 2023 13:28:28 -0700 (PDT)
+        Thu, 11 May 2023 16:28:35 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88C59A246
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 May 2023 13:28:30 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6436dfa15b3so6106423b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 May 2023 13:28:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683836907; x=1686428907;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LpzUOM7Ff2iDt/BIpy7qB4J4jd23xXMR7oT7W/ai9xo=;
-        b=B+N/4IIl2bTwB9FKAm72gPkJb4EIL0QoljrI9zyIWXOyGbmYiD0FZsyDQVLYlxwp5m
-         jMBSx8hmxyOgXiHRGP68XwuRwsCOqYTII6JnKsigOm8sA4RX7D7lumfI30z7iPEUzhmO
-         p41aFoDUYmZ5cO5hQHqIPZS6OqKxLHHI8v7hXuCHBQbfbGIhexKUStSkJ6lPjzYE5wej
-         bqgiFC2Cux5o5J82eHR3mwGmGEciN1iga2AHXmMGb1jHyFeNbloJ+a5k9cXX+hxhD/OD
-         hBWdJgPKuv4B4v5hR+zVb7l7QUvzF2UTsBJzd4ObKahgU2Awk5JglPLBVuNXeYZIWK5D
-         6Tag==
+        d=gmail.com; s=20221208; t=1683836909; x=1686428909;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=emvuPNhNRveuiLJ+SN5oWzjXH32hbgFtDeH+ADZ9nbM=;
+        b=VQTm0fafHXhE5RGThm1phrZgFgqLu5OtWz3j3P/LGR+fPV8Ugf8/DE0zZTHQfB2eVy
+         NkTFQYOtlFear8r97gqXxX1rxa03KFsqpOvAFTzpwbZRJfYL0MyIxByfZUe9azLfEV4a
+         ZIg6MlTSnkrvcxWI+AzebqBphe0EKqBXGaKcsEgTh7nruaLQnN4cyjKTUyw+xHGWZ3n3
+         uDlSahS9vs+FF5lzO/qlOeCU2IvFUiEuaWTFSx/Biyl4yDCrwCOjcBSQYyi36TNQqJSi
+         42AchNYIi2M5AAdCXSDQmPvqWtNbXutcO+J4HZDx0RkjGFN37N+Tfud3+/jmFLNgY9E8
+         ZS6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683836907; x=1686428907;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LpzUOM7Ff2iDt/BIpy7qB4J4jd23xXMR7oT7W/ai9xo=;
-        b=eTFSniyT+J6eXd0pdTSj9lV/nqLWXCjY+n3FNwFCALw4qyk5C6Gvg4A2oN+DRQz+gj
-         Vqf8VVKqnKJXaMnqOprUJu7wAVt/xp6TLHRYy7LbAXQztJl/AwucioHmCXbtH5jZsIPS
-         ES6A+iw8xWf3UhEa4rLZAKL4at19MZsYPYxoMKaspVFG48FxyHgJs1DG0NxU/lVsMwwp
-         D81PTC5G62VZ1Bnvpt/IeRAEC8eHRY2xVQw5ORU2ImO7mzv1hJu4dXcQ+zTL27gB0Tn9
-         EuhTZtMa9RGQAROnXQ/awgCu0eHY4Lku0ez0/u0zD+UGPaDLUvVev/MnL2g2+3hK7Ltn
-         ilGw==
-X-Gm-Message-State: AC+VfDzg6lSNxrqlOoxmAQqp604T+jlb19q3M8pJ++d+xgrmkpHZ3Lym
-        PYtAZlv1D2EcJcq1d5yv66O/Gq1lyeg=
-X-Google-Smtp-Source: ACHHUZ7SXp5VzTYI4YqGdlaBmwVXzobaDi8mywV9xm0hmZjRDByHgjoGkWBOI2g4T+gXI+n4nAZPEg==
-X-Received: by 2002:a05:6a20:7491:b0:f5:ae09:ce02 with SMTP id p17-20020a056a20749100b000f5ae09ce02mr30612543pzd.18.1683836907320;
-        Thu, 11 May 2023 13:28:27 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1683836909; x=1686428909;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=emvuPNhNRveuiLJ+SN5oWzjXH32hbgFtDeH+ADZ9nbM=;
+        b=AXFGNENsNuvbF3TOk+lT7bRd+rSX2lFdG+ri9xZKySJ9jlBQY0mMSNksDOa3gBcNUr
+         TdiII+BESpx3VHfhuGlVBjZV3MRmzDJ4u46ielKk9evrkkQ71PvAZvRHxJgglX3zG163
+         69YQZXsECNTyEW7M82Rcsdpx9v5G+aAxfmpyWIru1OX/2wHnBhJ6Sp0Bdgosn2NdPbd0
+         hFwQF2EJmDr9r722HU97DZgBWbJD5zjWiLGbolQ+EicTC7t46DmR0ux6tRgqH7QgQf+W
+         q6tZz2GFXZERu4uxrxef4SsVUZVbrF6f8x2lM4ghddoJxYpcmTF+FSb5a2LSPAES/u1C
+         Angw==
+X-Gm-Message-State: AC+VfDzmJ9RBR48dsLi7y6WEfk+dGXh5YV4QjGD0i7AmfoKVchK0f2VU
+        fnUkAZqSLDrc0AUcZHHWtB95OK6fuT8=
+X-Google-Smtp-Source: ACHHUZ7VUa1jG0EaYFs+oKK6s5iNLUDVLbD/Th+OrM0FSp+R7qOqczjRJMQfBx4uONxTa1Sch6LZhg==
+X-Received: by 2002:a05:6a20:9193:b0:ec:7c4f:ed7a with SMTP id v19-20020a056a20919300b000ec7c4fed7amr28748433pzd.34.1683836909246;
+        Thu, 11 May 2023 13:28:29 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id s24-20020aa78298000000b0062a7462d398sm5864529pfm.170.2023.05.11.13.28.26
+        by smtp.gmail.com with ESMTPSA id s24-20020aa78298000000b0062a7462d398sm5864529pfm.170.2023.05.11.13.28.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 May 2023 13:28:26 -0700 (PDT)
+        Thu, 11 May 2023 13:28:27 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client/player: Add support to Max Transports in endpoint.register
-Date:   Thu, 11 May 2023 13:28:24 -0700
-Message-Id: <20230511202825.3983806-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] client/player: Fix not checking for SupportedUUIDs
+Date:   Thu, 11 May 2023 13:28:25 -0700
+Message-Id: <20230511202825.3983806-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230511202825.3983806-1-luiz.dentz@gmail.com>
+References: <20230511202825.3983806-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,142 +68,117 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): 1
-[/local/endpoint/ep0] CIG (auto/value): a
-[/local/endpoint/ep0] CIS (auto/value): a
+When registering an endpoint it should always check for SupportedUUIDs.
 ---
- client/player.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 59 insertions(+), 2 deletions(-)
+ client/player.c | 66 +++++++++++++++++++++++++++++++------------------
+ 1 file changed, 42 insertions(+), 24 deletions(-)
 
 diff --git a/client/player.c b/client/player.c
-index 2880c5ffe140..f055ff941569 100644
+index 091d7005f42a..46eab32a40a0 100644
 --- a/client/player.c
 +++ b/client/player.c
-@@ -73,6 +73,7 @@ struct endpoint {
- 	struct iovec *meta;
- 	bool auto_accept;
- 	bool acquiring;
-+	uint8_t max_transports;
- 	uint8_t cig;
- 	uint8_t cis;
- 	char *transport;
-@@ -1056,6 +1057,16 @@ static DBusMessage *endpoint_set_configuration(DBusConnection *conn,
- 	print_iter("\t", "Properties", &props);
- 
- 	free(ep->transport);
-+
-+	if (!ep->max_transports) {
-+		bt_shell_printf("Maximum transports reached: rejecting\n");
-+		return g_dbus_create_error(msg,
-+					 "org.bluez.Error.Rejected",
-+					 "Maximum transports reached");
-+	}
-+
-+	ep->max_transports--;
-+
- 	ep->transport = strdup(path);
- 
- 	if (ep->auto_accept) {
-@@ -1672,6 +1683,13 @@ static DBusMessage *endpoint_select_configuration(DBusConnection *conn,
- 	bt_shell_printf("Endpoint: SelectConfiguration\n");
- 	print_iter("\t", "Capabilities", &args);
- 
-+	if (!ep->max_transports) {
-+		bt_shell_printf("Maximum transports reached: rejecting\n");
-+		return g_dbus_create_error(msg,
-+					 "org.bluez.Error.Rejected",
-+					 "Maximum transports reached");
-+	}
-+
- 	if (!ep->auto_accept) {
- 		ep->msg = dbus_message_ref(msg);
- 		bt_shell_prompt_input("Endpoint", "Enter preset/configuration:",
-@@ -1688,8 +1706,11 @@ static DBusMessage *endpoint_select_configuration(DBusConnection *conn,
- 
- 	reply = endpoint_select_config_reply(msg, p->data.iov_base,
- 						p->data.iov_len);
--	if (!reply)
--		return NULL;
-+	if (!reply) {
-+		reply = g_dbus_create_error(msg, "org.bluez.Error.Rejected",
-+								NULL);
-+		return reply;
-+	}
- 
- 	bt_shell_printf("Auto Accepting using %s...\n", p->name);
- 
-@@ -1878,6 +1899,13 @@ static DBusMessage *endpoint_select_properties(DBusConnection *conn,
- 	bt_shell_printf("Endpoint: SelectProperties\n");
- 	print_iter("\t", "Properties", &args);
- 
-+	if (!ep->max_transports) {
-+		bt_shell_printf("Maximum transports reached: rejecting\n");
-+		return g_dbus_create_error(msg,
-+					 "org.bluez.Error.Rejected",
-+					 "Maximum transports reached");
-+	}
-+
- 	if (!ep->auto_accept) {
- 		ep->msg = dbus_message_ref(msg);
- 		bt_shell_prompt_input("Endpoint", "Enter preset/configuration:",
-@@ -1903,6 +1931,9 @@ static DBusMessage *endpoint_clear_configuration(DBusConnection *conn,
- {
- 	struct endpoint *ep = user_data;
- 
-+	if (ep->max_transports != UINT8_MAX)
-+		ep->max_transports++;
-+
- 	free(ep->transport);
- 	ep->transport = NULL;
- 
-@@ -2234,12 +2265,37 @@ static void endpoint_cig(const char *input, void *user_data)
- 	bt_shell_prompt_input(ep->path, "CIS (auto/value):", endpoint_cis, ep);
+@@ -2190,9 +2190,32 @@ static void register_endpoint_reply(DBusMessage *message, void *user_data)
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  }
  
-+static void endpoint_max_transports(const char *input, void *user_data)
++static bool media_supports_uuid(GDBusProxy *proxy, const char *uuid)
 +{
-+	struct endpoint *ep = user_data;
-+	char *endptr = NULL;
-+	int value;
++	DBusMessageIter iter, array;
 +
-+	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
-+		ep->max_transports = UINT8_MAX;
-+	} else {
-+		value = strtol(input, &endptr, 0);
++	if (!g_dbus_proxy_get_property(proxy, "SupportedUUIDs", &iter))
++		return false;
 +
-+		if (!endptr || *endptr != '\0' || value > UINT8_MAX) {
-+			bt_shell_printf("Invalid argument: %s\n", input);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
++	dbus_message_iter_recurse(&iter, &array);
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
++		const char *support_uuid;
 +
-+		ep->max_transports = value;
++		dbus_message_iter_get_basic(&array, &support_uuid);
++
++		if (!strcasecmp(uuid, support_uuid))
++			return true;
++
++		dbus_message_iter_next(&array);
 +	}
 +
-+	bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
++	return false;
 +}
 +
- static void endpoint_auto_accept(const char *input, void *user_data)
+ static void endpoint_register(struct endpoint *ep)
  {
- 	struct endpoint *ep = user_data;
+ 	GList *l;
++	int registered = 0;
  
- 	if (!strcasecmp(input, "y") || !strcasecmp(input, "yes")) {
- 		ep->auto_accept = true;
-+		bt_shell_prompt_input(ep->path, "Max Transports (auto/value):",
-+						endpoint_max_transports, ep);
-+		return;
- 	} else if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
- 		ep->auto_accept = false;
- 	} else {
-@@ -2977,6 +3033,7 @@ static void register_endpoints(GDBusProxy *proxy)
- 				continue;
+ 	if (!g_dbus_register_interface(dbus_conn, ep->path,
+ 					BLUEZ_MEDIA_ENDPOINT_INTERFACE,
+@@ -2203,6 +2226,9 @@ static void endpoint_register(struct endpoint *ep)
+ 	}
  
- 			ep = endpoint_new(cap);
-+			ep->max_transports = UINT8_MAX;
- 			ep->auto_accept = true;
- 			ep->cig = BT_ISO_QOS_CIG_UNSET;
- 			ep->cis = BT_ISO_QOS_CIS_UNSET;
+ 	for (l = medias; l; l = g_list_next(l)) {
++		if (!media_supports_uuid(l->data, ep->uuid))
++			continue;
++
+ 		if (!g_dbus_proxy_method_call(l->data, "RegisterEndpoint",
+ 						register_endpoint_setup,
+ 						register_endpoint_reply,
+@@ -2211,8 +2237,13 @@ static void endpoint_register(struct endpoint *ep)
+ 						BLUEZ_MEDIA_ENDPOINT_INTERFACE);
+ 			goto fail;
+ 		}
++
++		registered++;
+ 	}
+ 
++	if (!registered)
++		goto fail;
++
+ 	return;
+ 
+ fail:
+@@ -3015,33 +3046,20 @@ static struct endpoint *endpoint_new(const struct capabilities *cap)
+ static void register_endpoints(GDBusProxy *proxy)
+ {
+ 	struct endpoint *ep;
+-	DBusMessageIter iter, array;
++	size_t i;
+ 
+-	if (!g_dbus_proxy_get_property(proxy, "SupportedUUIDs", &iter))
+-		return;
++	for (i = 0; i < ARRAY_SIZE(caps); i++) {
++		const struct capabilities *cap = &caps[i];
+ 
+-	dbus_message_iter_recurse(&iter, &array);
+-	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_STRING) {
+-		const char *uuid;
+-		size_t i;
++		if (!media_supports_uuid(proxy, cap->uuid))
++			continue;
+ 
+-		dbus_message_iter_get_basic(&array, &uuid);
+-
+-		for (i = 0; i < ARRAY_SIZE(caps); i++) {
+-			const struct capabilities *cap = &caps[i];
+-
+-			if (strcasecmp(cap->uuid, uuid))
+-				continue;
+-
+-			ep = endpoint_new(cap);
+-			ep->max_transports = UINT8_MAX;
+-			ep->auto_accept = true;
+-			ep->cig = BT_ISO_QOS_CIG_UNSET;
+-			ep->cis = BT_ISO_QOS_CIS_UNSET;
+-			endpoint_register(ep);
+-		}
+-
+-		dbus_message_iter_next(&array);
++		ep = endpoint_new(cap);
++		ep->max_transports = UINT8_MAX;
++		ep->auto_accept = true;
++		ep->cig = BT_ISO_QOS_CIG_UNSET;
++		ep->cis = BT_ISO_QOS_CIS_UNSET;
++		endpoint_register(ep);
+ 	}
+ }
+ 
 -- 
 2.40.0
 
