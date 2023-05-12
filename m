@@ -2,124 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC326C7EE2E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 May 2023 15:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C67C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 May 2023 18:31:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241703AbjELPFE (ORCPT
+        id S238780AbjELSbG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 May 2023 11:05:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
+        Fri, 12 May 2023 14:31:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241740AbjELPEz (ORCPT
+        with ESMTP id S238790AbjELSa7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 May 2023 11:04:55 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3663A86
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 08:04:52 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-50bc4b88998so17756963a12.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 08:04:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1683903890; x=1686495890;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Izo9VyuS3FYVOaF5kDuL/kD/h+2fgLodxAQ6aVvs7H0=;
-        b=sKyoYjJI3MITFAQvCWjifmcHx6zBpuP0ztPuFznpYfThmM4g0xW4O99Wbgwehrfo6l
-         ii+axgB4VFElG7ydQPiDBK1S147zQN9q5NdLomm5nadH9LrR8FvWrHOsCQp+CkAX3+4k
-         FXhFb1hJR93yOwuvwtRm0qy5VdMYjP5FTlWr1OciXu4KAHGKLCWxtzDAy3g1oqSo/HTt
-         ZYVdq9jk3D9bkee4kFctBMIt2TzyU/vpXhH2r4fcixZoaW0+24Yzh7W/qfIg4lhvkgTz
-         iRZgZeJ36ZUn/iOJCEJFFxb06e9X1/qr357MQjoTpMTFXOuCHQBDQU0Vr3ZnThyooDUG
-         1kJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683903890; x=1686495890;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Izo9VyuS3FYVOaF5kDuL/kD/h+2fgLodxAQ6aVvs7H0=;
-        b=TMq7clvNedX4qjM1Ml9rOR0XuKLCmBFTDEk9P9MhWMCGZFQilXJYB/KH4Pop8+nEri
-         RZPi4C/qnFlfiaKg1KX0cq76+MkPyLG/x89W7g9YqW1fuRC6ClGRQ5PysS7gaDp/pPSt
-         uPYfTvZqIFUwF25Hf5NiL4VqA0p433oEYSyXYC4Cyw4JENSOt35XhEE69Zc56WrCXG8z
-         XqfEa/0CjW+ZskEhqpFhtXlEXKHIzFt7RHepGtKt8lLmX5cyzrStC76BreJl6LrD+55p
-         TfVbk6geJMcf+medymyTZS2UmRJr95Qn9UJWnYczCyKQP9Xb7tURCF2UmX2L+RRDsPSN
-         2LaQ==
-X-Gm-Message-State: AC+VfDxESYGK+43thuYLItooIcN4MhlqX2+hq9bgPQ+tAI87E3Fm3gyT
-        edpgMMYzmCk+RvtCUZSxs21fFA==
-X-Google-Smtp-Source: ACHHUZ6M194Dg8rWd+r2CKNK1pmDrJfHYbuczNjD43YKU8yr9uviJFXyK7iwoTpVM06NfGGU6TJtHA==
-X-Received: by 2002:a17:907:169f:b0:96a:6723:da47 with SMTP id hc31-20020a170907169f00b0096a6723da47mr6872111ejc.43.1683903890512;
-        Fri, 12 May 2023 08:04:50 -0700 (PDT)
-Received: from ?IPV6:2a02:810d:15c0:828:7ede:fc7b:2328:3883? ([2a02:810d:15c0:828:7ede:fc7b:2328:3883])
-        by smtp.gmail.com with ESMTPSA id hg8-20020a1709072cc800b00932fa67b48fsm5487124ejc.183.2023.05.12.08.04.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 May 2023 08:04:49 -0700 (PDT)
-Message-ID: <67a2f8d6-104b-e7dd-d1b6-3791d5298284@linaro.org>
-Date:   Fri, 12 May 2023 17:04:47 +0200
+        Fri, 12 May 2023 14:30:59 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEC733C11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 11:30:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C1B5657B6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 18:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 62D2DC433D2;
+        Fri, 12 May 2023 18:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1683916220;
+        bh=tuAaKFv4b3AiQHtQkg7OYcBgeDJi+FxQA2nlWvmkmP4=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=no5FuZkvwbwpmtva3xXulgp2FdIXFWX/e835IYP43u5CgtiNibqk0ie1Cu0jXliGD
+         6IMf2kqN/5KNdLW4nbx3sMvJqSpgQ5jYh+v94ncigEdDlrw71xj+AybEk9iDjp2QJ2
+         DQdY1Ra4OGLgMuP0rDm1QqOBFbqQmdbQq1/Q8ComZhcKmzchxmjiVYA3itkjzfahaY
+         HJpVbOPkrVrh9jCmwmi6sEIGgu/gfaMC8Hgo+JgY99RmMvaychfU4F9G9cWuul+Efe
+         2gjJzYOAcDHeUuvcvyT0uTtbydHQKQIF/yWQH5nFzt+SUaA6zs5SOEiZRzgMOqpNAf
+         O2xCsPwoyVS1Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A7C2E450BB;
+        Fri, 12 May 2023 18:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH RFC 3/4] arm64: dts: qcom: sm6350: add uart1 node
-Content-Language: en-US
-To:     Luca Weiss <luca.weiss@fairphone.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>
-Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
- <20230421-fp4-bluetooth-v1-3-0430e3a7e0a2@fairphone.com>
- <8f312ded-8456-eced-85cc-0ae32a0c8bba@linaro.org>
- <CSKDDFPXC6FD.1TAU3XXOSGA0K@otso>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <CSKDDFPXC6FD.1TAU3XXOSGA0K@otso>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] mesh: Update the behavior of --io option
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <168391622030.18524.12856135360396725511.git-patchwork-notify@kernel.org>
+Date:   Fri, 12 May 2023 18:30:20 +0000
+References: <20230505193931.106760-1-inga.stotland@gmail.com>
+In-Reply-To: <20230505193931.106760-1-inga.stotland@gmail.com>
+To:     Inga Stotland <inga.stotland@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, brian.gix@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 12/05/2023 16:30, Luca Weiss wrote:
-> On Sun Apr 23, 2023 at 12:51 PM CEST, Krzysztof Kozlowski wrote:
->> On 21/04/2023 16:11, Luca Weiss wrote:
->>> Add the node describing uart1 incl. opp table and pinctrl.
->>>
->>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
->>> ---
->>>  arch/arm64/boot/dts/qcom/sm6350.dtsi | 63 ++++++++++++++++++++++++++++++++++++
->>>  1 file changed, 63 insertions(+)
->>
->> Please do not send DTS patches for net-next. DTS must go via Qualcomm
->> SoC. Split the series and mention where is the bindings change in DTS
->> patchset.
+Hello:
+
+This patch was applied to bluetooth/bluez.git (master)
+by Brian Gix <brian.gix@gmail.com>:
+
+On Fri,  5 May 2023 12:39:31 -0700 you wrote:
+> This aligns the behavior of command line option --io to
+> add new "auto" value and modify the behavior of "generic"
+> value:
 > 
-> Sorry, just saw now after already sending v2.
+> *auto* - Use first available controller: via MGMT interface
+> if kernel supports it, otherwise, via raw HCI socket (i.e.,
+> default to *generic*).
 > 
-> Is this a special rule for linux-bluetooth@ / netdev@? Isn't it easier
-> to keep it together so the status of series can be assessed easier? I've
-> always submitted patches by topic, like input patches + dts patches and
-> it was never mentioned.
+> [...]
 
-The rule that DTS must go via Qualcomm SoC (arm-soc) was there always,
-but other maintainers often do not pay attention to this. I don't blame
-them, don't get me wrong. I am just stating the observed actions.
-Usually netdev folks and Greg will take everything you throw at them, so
-for these subsystems it is recommended to split DTS to different patchset.
+Here is the summary with links:
+  - [BlueZ] mesh: Update the behavior of --io option
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=93d0d8b2fc69
 
-For other maintainers it is usually also more useful to split, because
-then they can apply entire patchset with one command, instead of picking
-up specific patches (omitting DTS).
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Best regards,
-Krzysztof
 
