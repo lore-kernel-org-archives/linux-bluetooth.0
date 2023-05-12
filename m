@@ -2,171 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31195C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 May 2023 14:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC326C7EE2E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 May 2023 15:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241271AbjELOhB (ORCPT
+        id S241703AbjELPFE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 May 2023 10:37:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60660 "EHLO
+        Fri, 12 May 2023 11:05:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241197AbjELOhA (ORCPT
+        with ESMTP id S241740AbjELPEz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 May 2023 10:37:00 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2002E1BD7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 07:36:58 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-64388cf3263so7174791b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 07:36:58 -0700 (PDT)
+        Fri, 12 May 2023 11:04:55 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3663A86
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 08:04:52 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-50bc4b88998so17756963a12.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 May 2023 08:04:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1683902217; x=1686494217;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iAmRvMv7hHo27KaXjDIlTzqbfySOUtH9LUPEdMWSI/I=;
-        b=gXw6YD3tcUzx/+gG6MHGkVKNvl6QQgbnWEoOXFeTdjckE89HPVADCr3WdDy4fAAwbZ
-         QJa/Px2XOf4WzW5jrxLsdMi+a/Zt7HmX68HKXN6Vo94VyqR4FLrS1o/cWdMXtSNKn4DE
-         LNuR3aybWrx5qpzoQIMT0Q7defghmL8nKaJIWSC2BHbB5fw4vyxLrPCw7JGqmGJklzto
-         5TMIIgW37vkoEJzDS9jgUXNRCOzgoBoeLmOowbJXhmGShF13bzBm5yEE0AkcuQHef/uM
-         pCvvLU7Jx789znkU//aDWPDizcirTGxTlcZTULDtSzWVYfz/P0IU4VvnIT2/AIPjAaWw
-         mOkQ==
+        d=linaro.org; s=google; t=1683903890; x=1686495890;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Izo9VyuS3FYVOaF5kDuL/kD/h+2fgLodxAQ6aVvs7H0=;
+        b=sKyoYjJI3MITFAQvCWjifmcHx6zBpuP0ztPuFznpYfThmM4g0xW4O99Wbgwehrfo6l
+         ii+axgB4VFElG7ydQPiDBK1S147zQN9q5NdLomm5nadH9LrR8FvWrHOsCQp+CkAX3+4k
+         FXhFb1hJR93yOwuvwtRm0qy5VdMYjP5FTlWr1OciXu4KAHGKLCWxtzDAy3g1oqSo/HTt
+         ZYVdq9jk3D9bkee4kFctBMIt2TzyU/vpXhH2r4fcixZoaW0+24Yzh7W/qfIg4lhvkgTz
+         iRZgZeJ36ZUn/iOJCEJFFxb06e9X1/qr357MQjoTpMTFXOuCHQBDQU0Vr3ZnThyooDUG
+         1kJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1683902217; x=1686494217;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iAmRvMv7hHo27KaXjDIlTzqbfySOUtH9LUPEdMWSI/I=;
-        b=c9uJAxWG6oqxG7ANFDMweKBia1Y7aBDIVKh2jnVXQOffJsCmf5lYyCTW4is47b8swi
-         1pmH5MlHen47ZMhf82fgTxDKo3J04f1dRFh/JYAwWbY0lrx4H+DqXvLZmM6KI6tB1odP
-         eBZ8cdVYp0G63RP/ytMgiooiuC81HQyVbqRLfn8gmvCNcwg5K9b7oTxtEykyyvai7swn
-         2ZGO3BpMnHNac7KZdOKar4F9+UrHfdixIGr+vKmFkSgPjtLrFSLKp5493dgT1hjqwfZ8
-         3Hh/G6iB+nTiMIb/PeWrQOqvZaan5/T0d8xeN1bIeKN4MZPVdNLgHDnEBcoznK6jxckj
-         qV3g==
-X-Gm-Message-State: AC+VfDyLkVoJAmEZN/avB3P/+IJwOh5bkO87JFPdkzYD82VjRcK+sZyP
-        AygPME2ib3aiLpD9OapQ0mpJGb3g2AI=
-X-Google-Smtp-Source: ACHHUZ7nuzGU37YL/rZRaakj2mpSP02NG49SJ1pG/BLul8J0OM2lulhTuFqtgQ1wpTXv3e8ARGmYnQ==
-X-Received: by 2002:a05:6a00:2e21:b0:63f:1adb:bf61 with SMTP id fc33-20020a056a002e2100b0063f1adbbf61mr35140635pfb.18.1683902217265;
-        Fri, 12 May 2023 07:36:57 -0700 (PDT)
-Received: from [172.17.0.2] ([13.64.10.201])
-        by smtp.gmail.com with ESMTPSA id f17-20020aa78b11000000b00642ea56f06fsm7198370pfd.0.2023.05.12.07.36.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 May 2023 07:36:57 -0700 (PDT)
-Message-ID: <645e4f09.a70a0220.68dc3.e86c@mx.google.com>
-Date:   Fri, 12 May 2023 07:36:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8793806951572548460=="
+        d=1e100.net; s=20221208; t=1683903890; x=1686495890;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Izo9VyuS3FYVOaF5kDuL/kD/h+2fgLodxAQ6aVvs7H0=;
+        b=TMq7clvNedX4qjM1Ml9rOR0XuKLCmBFTDEk9P9MhWMCGZFQilXJYB/KH4Pop8+nEri
+         RZPi4C/qnFlfiaKg1KX0cq76+MkPyLG/x89W7g9YqW1fuRC6ClGRQ5PysS7gaDp/pPSt
+         uPYfTvZqIFUwF25Hf5NiL4VqA0p433oEYSyXYC4Cyw4JENSOt35XhEE69Zc56WrCXG8z
+         XqfEa/0CjW+ZskEhqpFhtXlEXKHIzFt7RHepGtKt8lLmX5cyzrStC76BreJl6LrD+55p
+         TfVbk6geJMcf+medymyTZS2UmRJr95Qn9UJWnYczCyKQP9Xb7tURCF2UmX2L+RRDsPSN
+         2LaQ==
+X-Gm-Message-State: AC+VfDxESYGK+43thuYLItooIcN4MhlqX2+hq9bgPQ+tAI87E3Fm3gyT
+        edpgMMYzmCk+RvtCUZSxs21fFA==
+X-Google-Smtp-Source: ACHHUZ6M194Dg8rWd+r2CKNK1pmDrJfHYbuczNjD43YKU8yr9uviJFXyK7iwoTpVM06NfGGU6TJtHA==
+X-Received: by 2002:a17:907:169f:b0:96a:6723:da47 with SMTP id hc31-20020a170907169f00b0096a6723da47mr6872111ejc.43.1683903890512;
+        Fri, 12 May 2023 08:04:50 -0700 (PDT)
+Received: from ?IPV6:2a02:810d:15c0:828:7ede:fc7b:2328:3883? ([2a02:810d:15c0:828:7ede:fc7b:2328:3883])
+        by smtp.gmail.com with ESMTPSA id hg8-20020a1709072cc800b00932fa67b48fsm5487124ejc.183.2023.05.12.08.04.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 May 2023 08:04:49 -0700 (PDT)
+Message-ID: <67a2f8d6-104b-e7dd-d1b6-3791d5298284@linaro.org>
+Date:   Fri, 12 May 2023 17:04:47 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luca.weiss@fairphone.com
-Subject: RE: Add WCN3988 Bluetooth support for Fairphone 4
-In-Reply-To: <20230421-fp4-bluetooth-v2-1-3de840d5483e@fairphone.com>
-References: <20230421-fp4-bluetooth-v2-1-3de840d5483e@fairphone.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH RFC 3/4] arm64: dts: qcom: sm6350: add uart1 node
+Content-Language: en-US
+To:     Luca Weiss <luca.weiss@fairphone.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org
+References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
+ <20230421-fp4-bluetooth-v1-3-0430e3a7e0a2@fairphone.com>
+ <8f312ded-8456-eced-85cc-0ae32a0c8bba@linaro.org>
+ <CSKDDFPXC6FD.1TAU3XXOSGA0K@otso>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <CSKDDFPXC6FD.1TAU3XXOSGA0K@otso>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8793806951572548460==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 12/05/2023 16:30, Luca Weiss wrote:
+> On Sun Apr 23, 2023 at 12:51 PM CEST, Krzysztof Kozlowski wrote:
+>> On 21/04/2023 16:11, Luca Weiss wrote:
+>>> Add the node describing uart1 incl. opp table and pinctrl.
+>>>
+>>> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+>>> ---
+>>>  arch/arm64/boot/dts/qcom/sm6350.dtsi | 63 ++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 63 insertions(+)
+>>
+>> Please do not send DTS patches for net-next. DTS must go via Qualcomm
+>> SoC. Split the series and mention where is the bindings change in DTS
+>> patchset.
+> 
+> Sorry, just saw now after already sending v2.
+> 
+> Is this a special rule for linux-bluetooth@ / netdev@? Isn't it easier
+> to keep it together so the status of series can be assessed easier? I've
+> always submitted patches by topic, like input patches + dts patches and
+> it was never mentioned.
 
-This is automated email and please do not reply to this email!
+The rule that DTS must go via Qualcomm SoC (arm-soc) was there always,
+but other maintainers often do not pay attention to this. I don't blame
+them, don't get me wrong. I am just stating the observed actions.
+Usually netdev folks and Greg will take everything you throw at them, so
+for these subsystems it is recommended to split DTS to different patchset.
 
-Dear submitter,
+For other maintainers it is usually also more useful to split, because
+then they can apply entire patchset with one command, instead of picking
+up specific patches (omitting DTS).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=747119
+Best regards,
+Krzysztof
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.13 seconds
-GitLint                       PASS      0.99 seconds
-SubjectPrefix                 FAIL      0.58 seconds
-BuildKernel                   PASS      41.86 seconds
-CheckAllWarning               PASS      47.77 seconds
-CheckSparse                   WARNING   52.98 seconds
-CheckSmatch                   PASS      140.37 seconds
-BuildKernel32                 PASS      40.50 seconds
-TestRunnerSetup               PASS      581.07 seconds
-TestRunner_l2cap-tester       PASS      20.59 seconds
-TestRunner_iso-tester         PASS      26.60 seconds
-TestRunner_bnep-tester        PASS      6.86 seconds
-TestRunner_mgmt-tester        PASS      140.69 seconds
-TestRunner_rfcomm-tester      PASS      10.80 seconds
-TestRunner_sco-tester         PASS      10.23 seconds
-TestRunner_ioctl-tester       PASS      12.14 seconds
-TestRunner_mesh-tester        PASS      9.53 seconds
-TestRunner_smp-tester         PASS      9.84 seconds
-TestRunner_userchan-tester    PASS      7.56 seconds
-IncrementalBuild              PASS      55.33 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,3/4] arm64: dts: qcom: sm6350: add uart1 node
-WARNING: line length of 113 exceeds 100 columns
-#146: FILE: arch/arm64/boot/dts/qcom/sm6350.dtsi:769:
-+				pinctrl-0 = <&qup_uart1_cts>, <&qup_uart1_rts>, <&qup_uart1_tx>, <&qup_uart1_rx>;
-
-WARNING: line length of 109 exceeds 100 columns
-#150: FILE: arch/arm64/boot/dts/qcom/sm6350.dtsi:773:
-+				interconnects = <&clk_virt MASTER_QUP_CORE_0 0 &clk_virt SLAVE_QUP_CORE_0 0>,
-
-WARNING: line length of 103 exceeds 100 columns
-#151: FILE: arch/arm64/boot/dts/qcom/sm6350.dtsi:774:
-+						<&aggre1_noc MASTER_QUP_0 0 &clk_virt SLAVE_EBI_CH0 0>;
-
-total: 0 errors, 3 warnings, 81 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13239341.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[v2,4/4] arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
-WARNING: line length of 113 exceeds 100 columns
-#220: FILE: arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts:652:
-+	pinctrl-1 = <&qup_uart1_sleep_cts>, <&qup_uart1_sleep_rts>, <&qup_uart1_sleep_tx>, <&qup_uart1_sleep_rx>;
-
-total: 0 errors, 1 warnings, 121 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13239343.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/btqca.c:649:24: warning: restricted __le32 degrades to integer
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8793806951572548460==--
