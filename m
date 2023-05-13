@@ -2,253 +2,285 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF7CC77B7F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 13 May 2023 16:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6F3C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 13 May 2023 16:08:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229536AbjEMQIn (ORCPT
+        id S229644AbjEMQIq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 13 May 2023 12:08:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37230 "EHLO
+        Sat, 13 May 2023 12:08:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjEMQIm (ORCPT
+        with ESMTP id S229582AbjEMQIm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Sat, 13 May 2023 12:08:42 -0400
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A05B430F8
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 261D51BFB
         for <linux-bluetooth@vger.kernel.org>; Sat, 13 May 2023 09:08:40 -0700 (PDT)
 Received: from submission (posteo.de [185.67.36.169]) 
-        by mout02.posteo.de (Postfix) with ESMTPS id 13193240108
+        by mout01.posteo.de (Postfix) with ESMTPS id 473CB24002A
         for <linux-bluetooth@vger.kernel.org>; Sat, 13 May 2023 18:08:39 +0200 (CEST)
 Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QJVtG4sVkz6trs;
+        by submission (posteo.de) with ESMTPSA id 4QJVtG6p7Cz6trm;
         Sat, 13 May 2023 18:08:38 +0200 (CEST)
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v3 1/2] test-runner: revert udevd and audio support
-Date:   Sat, 13 May 2023 16:08:36 +0000
-Message-Id: <fcd0cc37474487489e2567f3de7d90f1b62d9613.1683994090.git.pav@iki.fi>
+Subject: [PATCH BlueZ v3 2/2] tools/test-runner: add option to start Pipewire inside the VM
+Date:   Sat, 13 May 2023 16:08:37 +0000
+Message-Id: <b375afe8841f91c0aa530a459afae011487ea297.1683994090.git.pav@iki.fi>
+In-Reply-To: <fcd0cc37474487489e2567f3de7d90f1b62d9613.1683994090.git.pav@iki.fi>
+References: <fcd0cc37474487489e2567f3de7d90f1b62d9613.1683994090.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Tests running inside the VM don't need access to sound cards running on
-the host.
+Add option for launching Pipewire inside the VM to serve Bluetooth
+endpoints, which can be used in tests.
 
-This reverts commit 91a48af52efb0751fab396b2b9026c9186b10b88
-This reverts commit e20e7e0b05c7edb74255c9b092916ac5bb99c97f
+Make the option to optionally take path to the audio daemon, so e.g.
+Pulseaudio support can be added later.
 ---
- tools/test-runner.c | 108 ++------------------------------------------
- 1 file changed, 3 insertions(+), 105 deletions(-)
+ tools/test-runner.c | 149 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 145 insertions(+), 4 deletions(-)
 
 diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 6660ea8de..cd65c4cf0 100644
+index cd65c4cf0..8b18f848a 100644
 --- a/tools/test-runner.c
 +++ b/tools/test-runner.c
-@@ -54,7 +54,6 @@ static bool start_monitor = false;
+@@ -54,6 +54,7 @@ static bool start_monitor = false;
  static int num_devs = 0;
  static const char *qemu_binary = NULL;
  static const char *kernel_image = NULL;
--static bool audio_support;
++static char *audio_server;
  
  static const char *qemu_table[] = {
  	"qemu-system-x86_64",
-@@ -252,16 +251,14 @@ static void start_qemu(void)
- 				"acpi=off pci=noacpi noapic quiet ro init=%s "
+@@ -252,11 +253,11 @@ static void start_qemu(void)
  				"TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
  				"TESTDBUSSESSION=%u XDG_RUNTIME_DIR=/run/user/0 "
--				"TESTAUDIO=%u "
  				"TESTMONITOR=%u TESTEMULATOR=%u TESTDEVS=%d "
- 				"TESTAUTO=%u TESTARGS=\'%s\'",
+-				"TESTAUTO=%u TESTARGS=\'%s\'",
++				"TESTAUTO=%u TESTAUDIO='%s' TESTARGS=\'%s\'",
  				initcmd, cwd, start_dbus, start_daemon,
--				start_dbus_session, audio_support,
-+				start_dbus_session,
+ 				start_dbus_session,
  				start_monitor, start_emulator, num_devs,
- 				run_auto, testargs);
+-				run_auto, testargs);
++				run_auto, audio_server, testargs);
  
  	argv = alloca(sizeof(qemu_argv) +
--				(audio_support ? 4 : 0) +
  				(sizeof(char *) * (4 + (num_devs * 4))));
- 	memcpy(argv, qemu_argv, sizeof(qemu_argv));
- 
-@@ -274,24 +271,6 @@ static void start_qemu(void)
- 	}
- 	argv[0] = (char *) qemu_binary;
- 
--	if (audio_support) {
--		char *xdg_runtime_dir, *audiodev;
--
--		xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
--		if (!xdg_runtime_dir) {
--			fprintf(stderr, "XDG_RUNTIME_DIR not set\n");
--			exit(1);
--		}
--		audiodev = alloca(40 + strlen(xdg_runtime_dir));
--		sprintf(audiodev, "id=audio,driver=pa,server=%s/pulse/native",
--				xdg_runtime_dir);
--
--		argv[pos++] = "-audiodev";
--		argv[pos++] = audiodev;
--		argv[pos++] = "-device";
--		argv[pos++] = "AC97,audiodev=audio";
--	}
--
- 	argv[pos++] = "-kernel";
- 	argv[pos++] = (char *) kernel_image;
- 	argv[pos++] = "-append";
-@@ -744,70 +723,13 @@ static pid_t start_btvirt(const char *home)
+@@ -723,13 +724,120 @@ static pid_t start_btvirt(const char *home)
  	return pid;
  }
  
--static void trigger_udev(void)
--{
--	char *argv[3], *envp[1];
--	pid_t pid;
--
--	argv[0] = "/bin/udevadm";
--	argv[1] = "trigger";
--	argv[2] = NULL;
--
--	envp[0] = NULL;
--
--	printf("Triggering udev events\n");
--
--	pid = fork();
--	if (pid < 0) {
--		perror("Failed to fork new process");
--		return;
--	}
--
--	if (pid == 0) {
--		execve(argv[0], argv, envp);
--		exit(EXIT_SUCCESS);
--	}
--
--	printf("udev trigger process %d created\n", pid);
--}
--
--static pid_t start_udevd(void)
--{
--	char *argv[2], *envp[1];
--	pid_t pid;
--
--	argv[0] = "/lib/systemd/systemd-udevd";
--	argv[1] = NULL;
--
--	envp[0] = NULL;
--
--	printf("Starting udevd daemon\n");
--
--	pid = fork();
--	if (pid < 0) {
--		perror("Failed to fork new process");
--		return -1;
--	}
--
--	if (pid == 0) {
--		execve(argv[0], argv, envp);
--		exit(EXIT_SUCCESS);
--	}
--
--	printf("udevd daemon process %d created\n", pid);
--
--	trigger_udev();
--
--	return pid;
--}
--
++static int create_pipewire_conf(void)
++{
++	static const char *const dirs[] = {
++		"/run/conf",
++		"/run/conf/wireplumber",
++		"/run/conf/wireplumber/bluetooth.lua.d",
++		"/run/conf/wireplumber/main.lua.d",
++		NULL
++	};
++	int i;
++	FILE *f;
++
++	for (i = 0; dirs[i]; ++i)
++		mkdir(dirs[i], 0755);
++
++	/* Enable only Bluetooth part, disable whatever requires user DBus */
++	f = fopen("/run/conf/wireplumber/main.lua.d/51-custom.lua", "w");
++	if (!f)
++		goto fail;
++
++	fprintf(f, "alsa_monitor.enabled = false\n"
++		"v4l2_monitor.enabled = false\n"
++		"libcamera_monitor.enabled = false\n"
++		"default_access.properties[\"enable-flatpak-portal\"]"
++		" = false\n");
++	fclose(f);
++
++	f = fopen("/run/conf/wireplumber/bluetooth.lua.d/51-custom.lua", "w");
++	if (!f)
++		goto fail;
++
++	fprintf(f, "bluez_monitor.properties[\"with-logind\"] = false\n"
++		"bluez_midi_monitor.enabled = false\n");
++	fclose(f);
++
++	return 0;
++
++fail:
++	perror("Failed to create Pipewire config");
++	return -1;
++}
++
++static int start_audio_server(pid_t pids[2])
++{
++	char *daemons[2] = {NULL, NULL};
++	char wp_exe[PATH_MAX];
++	char *ptr;
++	char *envp[5];
++	int i;
++
++	for (i = 0; i < 2; ++i)
++		pids[i] = -1;
++
++	daemons[0] = audio_server;
++
++	ptr = strrchr(audio_server, '/');
++	if (ptr && !strcmp(ptr, "/pipewire")) {
++		if (create_pipewire_conf())
++			return -1;
++
++		snprintf(wp_exe, sizeof(wp_exe), "%.*s/wireplumber",
++				(int)(ptr - audio_server), audio_server);
++		daemons[1] = wp_exe;
++
++		setenv("PIPEWIRE_RUNTIME_DIR", "/run", 1);
++	}
++
++	envp[0] = "DBUS_SYSTEM_BUS_ADDRESS=unix:"
++		"path=/run/dbus/system_bus_socket";
++	envp[1] = "XDG_CONFIG_HOME=/run/conf";
++	envp[2] = "XDG_STATE_HOME=/run";
++	envp[3] = "XDG_RUNTIME_DIR=/run";
++	envp[4] = NULL;
++
++	for (i = 0; i < 2; ++i) {
++		const char *daemon = daemons[i];
++		char *argv[2];
++		pid_t pid;
++
++		if (!daemon)
++			continue;
++
++		printf("Starting audio server %s\n", daemon);
++
++		argv[0] = (char *) daemon;
++		argv[1] = NULL;
++
++		pid = fork();
++		if (pid < 0) {
++			perror("Failed to fork new process");
++			return -1;
++		}
++
++		if (pid == 0) {
++			execve(argv[0], argv, envp);
++			exit(EXIT_SUCCESS);
++		}
++
++		pids[i] = pid;
++
++		printf("Audio server process %d created\n", pid);
++	}
++
++	return 0;
++}
++
  static void run_command(char *cmdname, char *home)
  {
  	char *argv[9], *envp[3];
  	int pos = 0, idx = 0;
  	int serial_fd;
  	pid_t pid, dbus_pid, daemon_pid, monitor_pid, emulator_pid,
--	      dbus_session_pid, udevd_pid;
-+	      dbus_session_pid;
+-	      dbus_session_pid;
++	      dbus_session_pid, audio_pid[2];
++	int i;
  
  	if (!home) {
  		perror("Invalid parameter: TESTHOME");
-@@ -828,11 +750,6 @@ static void run_command(char *cmdname, char *home)
- 	} else
- 		serial_fd = -1;
+@@ -777,6 +885,11 @@ static void run_command(char *cmdname, char *home)
+ 	else
+ 		emulator_pid = -1;
  
--	if (audio_support)
--		udevd_pid = start_udevd();
--	else
--		udevd_pid = -1;
--
- 	if (start_dbus) {
- 		create_dbus_system_conf();
- 		dbus_pid = start_dbus_daemon(false);
-@@ -961,11 +878,6 @@ start_next:
++	if (audio_server)
++		start_audio_server(audio_pid);
++	else
++		audio_pid[0] = audio_pid[1] = -1;
++
+ start_next:
+ 	if (run_auto) {
+ 		if (chdir(home + 5) < 0) {
+@@ -878,6 +991,13 @@ start_next:
  			monitor_pid = -1;
  		}
  
--		if (corpse == udevd_pid) {
--			printf("udevd terminated\n");
--			udevd_pid = -1;
--		}
--
++		for (i = 0; i < 2; ++i) {
++			if (corpse == audio_pid[i]) {
++				printf("Audio server %d terminated\n", i);
++				audio_pid[i] = -1;
++			}
++		}
++
  		if (corpse == pid)
  			break;
  	}
-@@ -990,9 +902,6 @@ start_next:
- 	if (monitor_pid > 0)
- 		kill(monitor_pid, SIGTERM);
+@@ -887,6 +1007,11 @@ start_next:
+ 		goto start_next;
+ 	}
  
--	if (udevd_pid > 0)
--		kill(udevd_pid, SIGTERM);
--
- 	if (serial_fd >= 0)
- 		close(serial_fd);
- }
-@@ -1073,12 +982,6 @@ static void run_tests(void)
++	for (i = 0; i < 2; ++i) {
++		if (audio_pid[i] > 0)
++			kill(audio_pid[i], SIGTERM);
++	}
++
+ 	if (daemon_pid > 0)
+ 		kill(daemon_pid, SIGTERM);
+ 
+@@ -982,6 +1107,17 @@ static void run_tests(void)
  		start_emulator = true;
  	}
  
--	ptr = strstr(cmdline, "TESTAUDIO=1");
--	if (ptr) {
--		printf("Audio support requested\n");
--		audio_support = true;
--	}
--
++	ptr = strstr(cmdline, "TESTAUDIO='");
++	if (ptr) {
++		const char *start = ptr + 11;
++		const char *end = strchr(start, '\'');
++
++		if (end) {
++			audio_server = strndup(start, end - start);
++			printf("Audio server %s requested\n", audio_server);
++		}
++	}
++
  	ptr = strstr(cmdline, "TESTHOME=");
  	if (ptr) {
  		home = ptr + 4;
-@@ -1105,7 +1008,6 @@ static void usage(void)
+@@ -1005,6 +1141,7 @@ static void usage(void)
+ 		"\t-d, --daemon           Start bluetoothd\n"
+ 		"\t-m, --monitor          Start btmon\n"
+ 		"\t-l, --emulator         Start btvirt\n"
++		"\t-A, --audio[=path]     Start audio server\n"
  		"\t-u, --unix [path]      Provide serial device\n"
  		"\t-q, --qemu <path>      QEMU binary\n"
  		"\t-k, --kernel <image>   Kernel image (bzImage)\n"
--		"\t-A, --audio            Add audio support\n"
- 		"\t-h, --help             Show help options\n");
- }
- 
-@@ -1120,7 +1022,6 @@ static const struct option main_options[] = {
+@@ -1022,6 +1159,7 @@ static const struct option main_options[] = {
  	{ "monitor", no_argument,       NULL, 'm' },
  	{ "qemu",    required_argument, NULL, 'q' },
  	{ "kernel",  required_argument, NULL, 'k' },
--	{ "audio",   no_argument,       NULL, 'A' },
++	{ "audio",   optional_argument, NULL, 'A' },
  	{ "version", no_argument,       NULL, 'v' },
  	{ "help",    no_argument,       NULL, 'h' },
  	{ }
-@@ -1140,7 +1041,7 @@ int main(int argc, char *argv[])
+@@ -1041,7 +1179,7 @@ int main(int argc, char *argv[])
  	for (;;) {
  		int opt;
  
--		opt = getopt_long(argc, argv, "aubdslmq:k:Avh", main_options,
-+		opt = getopt_long(argc, argv, "aubdslmq:k:vh", main_options,
+-		opt = getopt_long(argc, argv, "aubdslmq:k:vh", main_options,
++		opt = getopt_long(argc, argv, "aubdslmq:k:A::vh", main_options,
  								NULL);
  		if (opt < 0)
  			break;
-@@ -1174,9 +1075,6 @@ int main(int argc, char *argv[])
+@@ -1075,6 +1213,9 @@ int main(int argc, char *argv[])
  		case 'k':
  			kernel_image = optarg;
  			break;
--		case 'A':
--			audio_support = true;
--			break;
++		case 'A':
++			audio_server = optarg ? optarg : "/usr/bin/pipewire";
++			break;
  		case 'v':
  			printf("%s\n", VERSION);
  			return EXIT_SUCCESS;
