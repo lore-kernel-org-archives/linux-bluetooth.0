@@ -2,230 +2,281 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A0EC7EE26
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 May 2023 11:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA8FC77B75
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 May 2023 12:47:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241247AbjEOLaU (ORCPT
+        id S241870AbjEOMrm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 May 2023 07:30:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38778 "EHLO
+        Mon, 15 May 2023 08:47:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbjEOLaT (ORCPT
+        with ESMTP id S234222AbjEOMrl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 May 2023 07:30:19 -0400
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2105.outbound.protection.outlook.com [40.107.212.105])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A52FEF1;
-        Mon, 15 May 2023 04:30:17 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QPSamaWCak2nEtWz69f7Su/BHz3WzEBMk9suq+eV5xVJF/ZQaodih9gFn7LLrFVwpuYRXB7rG8o5Y7Bt8o6UdWktSlmwX82wU1eb1E/6ZCnNv4HgmBUnSHWiY/PhLejjHMC/p7jNPDMZCaYua30c9TGnrzKnJ+OAQiw5MygVWn8pcUw4JKK1hVzhDm2B7kjFT3l7zAq24UWvJIamb0B6AkvJUcgYN86v/BrPIwFPieIHLpiyQ3nTTQadOJ7Bt9KZzB4rAW7s+u5t1JbcX0PhE0cvBZOiw8GFVE/48TeF5Ng8xHX2NcL4PJj3YfisOynyz0AhCDQRbr5lJm1LJXUrIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GElICwNjFy0HiBeElMaaLExXGCwQyUgIwkQI2OIL5rs=;
- b=AEJYQ792Gj3xertpdC4dXDatOfZ+J6PIq47nd9g8enhYvLnqNoifS2jAz6s35OC5RKrSY7SkNOTUlBV34C4gppJnyvkmGq/huicFXiEgu1Uibku4Bemta43ZikPUdMKib7bocl73HqTDkJwu5PtzC0RvfLzqIViIbxDVHZIHa2ksIySaBo4LUfoG2wzd+3owQTMjDVmSC++sqiMTkpXLHv3ciFco6kHqrDa3RRvMjLonLOohsEf0GVb3koMwiVWpA0Cr8aP03hp04TRdjdFJnv2V86qx2QmCIQYx9z9ZdeWbOc2ijfVNx4ZWgAzGgDA9fEZ9XDS9aLRjfWZGqovJig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GElICwNjFy0HiBeElMaaLExXGCwQyUgIwkQI2OIL5rs=;
- b=tD7TRW5DXADVp5UuAJ4D7m18AeQRwVVZ37fBy1/Xg78gzzWiHdhqecfcBcEyQkc+S6ujqcSkHMdCQCwx0WJGQ7ng7FgCyrxRHZ44b0MGRRq0n9M+Z3egCeWDzH5W8Al0m9Pc8AuYOw+ii2a/Zq7FqE5Kg3Ahsi2oBKaNSdLdgvs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH7PR13MB6433.namprd13.prod.outlook.com (2603:10b6:510:2f1::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.14; Mon, 15 May
- 2023 11:30:14 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::f416:544d:18b7:bb34]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::f416:544d:18b7:bb34%5]) with mapi id 15.20.6387.030; Mon, 15 May 2023
- 11:30:14 +0000
-Date:   Mon, 15 May 2023 13:30:06 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Luca Weiss <luca.weiss@fairphone.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH RFC 2/4] Bluetooth: btqca: Add WCN3988 support
-Message-ID: <ZGIXvv4hQXn+jmFS@corigine.com>
-References: <20230421-fp4-bluetooth-v1-0-0430e3a7e0a2@fairphone.com>
- <20230421-fp4-bluetooth-v1-2-0430e3a7e0a2@fairphone.com>
- <ZE+6e7ZxJ2s9DHI1@corigine.com>
- <CSK97HK2XBSR.1Q5K7TUE55HH7@otso>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CSK97HK2XBSR.1Q5K7TUE55HH7@otso>
-X-ClientProxiedBy: AM0PR06CA0119.eurprd06.prod.outlook.com
- (2603:10a6:208:ab::24) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        Mon, 15 May 2023 08:47:41 -0400
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0301BE44
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 05:47:39 -0700 (PDT)
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-331632be774so447531965ab.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 05:47:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684154858; x=1686746858;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UzjPHYy1YH2B69CAuHHkDfM5nL26LpeVqCg+aXZtonM=;
+        b=PakLGPSAKC0zt5UyxFPV6w9cT/NcyeWRZerSPr3CBn3mQHetsZnUOCSEIQmZFrFNv6
+         ZYLAPUgqce34vOKUojJri5vbvuqMYAIGwHEzImrnWxOGJ5RALfPdKuSgpJZ2Pkm+lqlh
+         P++hnLgomEwjnbMDu3NCn+Jkfg6OToiTDFBFXLZV/5COP0lO6wdVG4t5vm3z7AETpWoW
+         7mtnshbF0avLKV5rfSCOHqkfgbC3BsRx1NZqQPOZdwF6Da+/JhfhEfAMR8kBomHzPZEl
+         CclCG9YF9BKOnSCWuHje75aooW9TsLiy6t8PjpY1XHcT/8uPQTQLhUxQmgHc8bKnPfv3
+         SGWQ==
+X-Gm-Message-State: AC+VfDyvztD7HLyKM11N4Q0EguUZMRU9vpqYJxZVxCycYJ/pzxhQrNbG
+        2/ERRSmy7L5jortK/BQXAEeaVjI30fDXLaQsZh9Epghb3zB1
+X-Google-Smtp-Source: ACHHUZ53ACMJVZgITuxniMs9kAf3gvISCmaij0AkKz+OjWJvx5RBdhNq0Zwf0PXGEjdsbbcY0IXaKlJasMtUg3XKX6DfqCIcSeLF
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB6433:EE_
-X-MS-Office365-Filtering-Correlation-Id: d69ce4b9-1576-445b-4673-08db5537c02b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aj86ON0ek+iekJmI09ZbSjklojAz1E14K+phCHDHBBYk/V+dzH7cTjg+TwT8V/5W77lVik8H+yUpVKmQa7LhebMxyPXmz9EglEaitbnYf2oOztNBAzrW8io6oMd64RtLMm/F+RWNA9HvRINsS/mhg82JzJ2+9Rtqlxap8vfcoMBLzUEaFO+MxLfhlywJSP9h7ZJYxZ/Zm3Z5B0Y3LznZ3Dw5rXHJeHvONAkAXeXSavaQHngcETrHo4nhHycB659+liPtnWkTmDmLJmQUVvpRa9jCwXrHT1BouKFtuyi2ehfOVGc7f0iF7dUGQmYF0mBI6r+bli3eWbeBHTxV5+RMmta3N+0uaMbJOhbMb7CUQQiUZ/7g3Rv+hl9zEo62jK8ORQM5V8dYxhRTvTUBHdnpOJD2xyr/eI9acVPMNsSOahT9H3lD4UCERtyXZyLhNKFSIWCNpBYbLef2VCLM8i8W/v5lS3G8pQ7Oi6GoW2Ba0h1NqHQoLft1jfsk6NOWtBNcpfwJ5h/+tJkOL70FPGegicajb9xxXzDtS0Kz7ya5umiboBpZZjqDIJhvjg5MwnTJFZlQZdbeFPHVSNO+POfdVglajuuzC3URYTlQSSgmG8eITQahYk/u8E4Ol4j3NSL20jGqvZJfzuIliwF01NDnlQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(136003)(376002)(39840400004)(366004)(451199021)(44832011)(2906002)(38100700002)(316002)(41300700001)(5660300002)(8936002)(7416002)(8676002)(36756003)(86362001)(6666004)(478600001)(6512007)(6506007)(186003)(6486002)(2616005)(66946007)(6916009)(4326008)(66556008)(66476007)(83380400001)(54906003)(87944012)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YlEnWXXSi04kMzJiAZxzYQEBItVuNcPFINROlschOXSCY4ytxX0j+Z24ugvj?=
- =?us-ascii?Q?DdkNUIYAXHOCNXpgeNqKx5hzuYzjjNhlqse/iBh3kQzzeDyfqd3nLGFgMgb1?=
- =?us-ascii?Q?TCJfNLM6PKujwgnzv74cwBSjyY3DTGvfhb0ZkjSzCBHg7u/7TsXVV8lgoVCK?=
- =?us-ascii?Q?SRJs47ruICCK+o7DWGq4z6l/7FZXwbaPKhzjd5V7mieKPfLY43zte1OM6pnZ?=
- =?us-ascii?Q?HMf7p0rPcJDDU+grrsN9eO2ITcDO7+qvI/QMTU2lVpcC/49Lb4onhd6kWx1c?=
- =?us-ascii?Q?04ie2d/kSsooRUeo2FpcJEm5RPeRNJ6s36QXD3d2JcSBN32R9bxMd6Jr+rp1?=
- =?us-ascii?Q?ugQhXWi1iAnjLpO07WY4CS0glBMLLmnbefO/wzcS2vsvLdHKhpHEffRAvLW5?=
- =?us-ascii?Q?qYa+q8Oqeem9RSE5Dm/zd43D65hIGPtp4sW9PrjfYwe5V7mR0MuWSXkAjwuc?=
- =?us-ascii?Q?MmLPWvcwQ/VyF9JxM40D0hWRhvtno0aUydNnZVv2wwhU4WGEWWV6sJq0CoCp?=
- =?us-ascii?Q?xodTW5qS4MJaU9XBwwboMHqtJDm3DEqPzF6SZFrut8E6oKLdqnniqicqHyUr?=
- =?us-ascii?Q?h8c+pWPObioC9UrP4aKYWkwyAYLneHj4IfVIsOo7ldpMZ5DE/+Sfv2WqXUbn?=
- =?us-ascii?Q?uLx92AfEJnDol3KetSz1bTxkY7RVChz3/UnEM/Y1niJ4q9xMI5Ma6ICukbN3?=
- =?us-ascii?Q?5IERiTOGRwX/LJoJ8DPvAeuTxlus3RqWpEbryyB71Pd6l2ATf9MmH9vE8vz5?=
- =?us-ascii?Q?u4aLjbmyXcAMpMM1dom5SYj4L7mMy6ctNsSbjR5FYtVK/Cosf9I/qhkuvQch?=
- =?us-ascii?Q?d4EL1s+e24KD+MeT3ZFtqz1B4D9qpR7OHF48J9Bgys/52VBYfs64088R+FoX?=
- =?us-ascii?Q?Hkqidqeidb9cQPQi62Si1vO08cppHWdBrpvgRpetUkoox6j8eWRbZQo25aSY?=
- =?us-ascii?Q?N+WDyoMQxpOXugg+mXaK7Btyq2h8mIa3R2FtfPo7rtVg0Nq+Xtp8/qXRsV3l?=
- =?us-ascii?Q?yQhXxSbKfn/vZZ1PqbiZJuLH1Ve/cZkT28c6jD65dhMbYbz0PRWR7Xfjos3N?=
- =?us-ascii?Q?KWTfAdg+DkkXS/qfM8gK66cUUa4+3ODMbp+pBQk+G3Ei3L9HuMGcUAe8JT6G?=
- =?us-ascii?Q?kFg+r45sQjj4Q2UJBu2OyODnmzF2fVPSMB3N242wSCMPhuj1v7Fi93Pl/bai?=
- =?us-ascii?Q?xklJzCBBNK4ROZu7STOXfXv839YrZ74WNddVi0QpviStF37xpPLx0EOnpk8h?=
- =?us-ascii?Q?Q8eNztDQrNBoW+BXMZXqthgeZQd6j1NLtx2YYBVB+HXtSkvMQZLwus04aYs2?=
- =?us-ascii?Q?8rHgxcgW84byvHWV/5wx7LT7S6TosXKUelpnsoTVS6poR6uLt0YDh9G5ANHk?=
- =?us-ascii?Q?dTMRXubQYxtdhkuIgSvwTDxjIIdMUEkRYRyruxIf+Pgm+nLc7iEa1ghvIGPv?=
- =?us-ascii?Q?J3eJJQBt6GhbalsxEhHaxygPW/Z/A8y9jfanyoiQx93KU7ivvq2n/vnNgUuX?=
- =?us-ascii?Q?C78Xv8wD4Pi9EUMfwFURfacor3uTZgPy4NsuUEPTMHd7AAw7y8J3S7VaG0yL?=
- =?us-ascii?Q?5+EgJ9ikANJxnaa+S6T4+5GlqK1Sxe/WWsmsAQ+rOAv3Me+/vTM3LAYkIyiB?=
- =?us-ascii?Q?tF2CdQlLBYdah9mPRWFmXjF1dBk5K/lAI3X3CEX1cZB0pv0tblsHtFOgmbtI?=
- =?us-ascii?Q?zYQNMg=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d69ce4b9-1576-445b-4673-08db5537c02b
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 May 2023 11:30:14.0633
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jyAntlO+4wbAK8uAEwR1cXm9n9gbwoJpMohBnuJeRtEp4aDT6BprICfWHx9RUiniQ1/tf3z6AGSTpybL+JxYwGbOYKwjelNt9s3iNn553Ow=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB6433
+X-Received: by 2002:a05:6602:2d16:b0:763:b184:fe92 with SMTP id
+ c22-20020a0566022d1600b00763b184fe92mr20328026iow.0.1684154858319; Mon, 15
+ May 2023 05:47:38 -0700 (PDT)
+Date:   Mon, 15 May 2023 05:47:38 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000013b93805fbbadc50@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in sco_chan_del
+From:   syzbot <syzbot+cf54c1da6574b6c1b049@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, May 12, 2023 at 01:14:18PM +0200, Luca Weiss wrote:
-> Hi Simon,
-> 
-> On Mon May 1, 2023 at 3:11 PM CEST, Simon Horman wrote:
-> > On Fri, Apr 21, 2023 at 04:11:39PM +0200, Luca Weiss wrote:
-> > > Add support for the Bluetooth chip codenamed APACHE which is part of
-> > > WCN3988.
-> > > 
-> > > The firmware for this chip has a slightly different naming scheme
-> > > compared to most others. For ROM Version 0x0200 we need to use
-> > > apbtfw10.tlv + apnv10.bin and for ROM version 0x201 apbtfw11.tlv +
-> > > apnv11.bin
-> > > 
-> > > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> > > ---
-> > >  drivers/bluetooth/btqca.c   | 13 +++++++++++--
-> > >  drivers/bluetooth/btqca.h   | 12 ++++++++++--
-> > >  drivers/bluetooth/hci_qca.c | 12 ++++++++++++
-> > >  3 files changed, 33 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> > > index fd0941fe8608..3ee1ef88a640 100644
-> > > --- a/drivers/bluetooth/btqca.c
-> > > +++ b/drivers/bluetooth/btqca.c
-> > > @@ -594,14 +594,20 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> > >  	/* Firmware files to download are based on ROM version.
-> > >  	 * ROM version is derived from last two bytes of soc_ver.
-> > >  	 */
-> > > -	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> > > +	if (soc_type == QCA_WCN3988)
-> > > +		rom_ver = ((soc_ver & 0x00000f00) >> 0x05) | (soc_ver & 0x0000000f);
-> > > +	else
-> > > +		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> >
-> > Hi Luca,
-> >
-> > perhaps it's just me. But I was wondering if this can be improved on a little.
-> >
-> > * Move the common portion outside of the conditional
-> > * And also, I think it's normal to use decimal for shift values.
-> >
-> > e.g.
-> > 	unsigned shift;
-> > 	...
-> >
-> > 	shift = soc_type == QCA_WCN3988 ? 5 : 4;
-> > 	rom_ver = ((soc_ver & 0x00000f00) >> shift) | (soc_ver & 0x0000000f);
-> >
-> > Using some helpers such as GENMASK and FIELD_PREP might also be nice.
-> 
-> While I'm not opposed to the idea, I'm not sure it's worth making
-> beautiful macros for this since - to my eyes - how the mapping of
-> soc_ver to firmware name works is rather obscure since the sources from
-> Qualcomm just have a static lookup table of soc_ver to firmware name so
-> doing this dynamically like here is different.
-> 
-> And I haven't looked at other chips that are covered there to see if
-> there's a pattern to this, for the most part it seems the original
-> formula works for most chips and the one I added works for WCN3988 (and
-> the other "APACHE" chips, whatever they are).
-> 
-> If a third way is added then I would say for sure this line should be
-> made nicer but for now I think it's easier to keep this as I sent it
-> because we don't know what the future will hold.
+Hello,
 
-Thanks. My feeling is that my suggestion mainly makes sense
-if it lease to improved readability and maintainability.
-It sounds like that might not be the case here.
+syzbot found the following issue on:
 
-> > >  	if (soc_type == QCA_WCN6750)
-> > >  		qca_send_patch_config_cmd(hdev);
-> > >  
-> > >  	/* Download rampatch file */
-> > >  	config.type = TLV_TYPE_PATCH;
-> > > -	if (qca_is_wcn399x(soc_type)) {
-> > > +	if (soc_type == QCA_WCN3988) {
-> > > +		snprintf(config.fwname, sizeof(config.fwname),
-> > > +			 "qca/apbtfw%02x.tlv", rom_ver);
-> > > +	} else if (qca_is_wcn399x(soc_type)) {
-> > >  		snprintf(config.fwname, sizeof(config.fwname),
-> > >  			 "qca/crbtfw%02x.tlv", rom_ver);
-> > >  	} else if (soc_type == QCA_QCA6390) {
-> > > @@ -636,6 +642,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> > >  	if (firmware_name)
-> > >  		snprintf(config.fwname, sizeof(config.fwname),
-> > >  			 "qca/%s", firmware_name);
-> > > +	else if (soc_type == QCA_WCN3988)
-> > > +		snprintf(config.fwname, sizeof(config.fwname),
-> > > +			 "qca/apnv%02x.bin", rom_ver);
-> > >  	else if (qca_is_wcn399x(soc_type)) {
-> > >  		if (ver.soc_id == QCA_WCN3991_SOC_ID) {
-> >
-> > Not strictly related to this patch, but while reviewing this I noticed that
-> > ver.soc_id is __le32 but QCA_WCN3991_SOC_ID is in host byteorder.
-> >
-> > Perhaps a cpu_to_le32() or le32_to_cpu() call is in order here?
-> 
-> Good catch, as you've seen I sent a patch separately to fix that. :)
+HEAD commit:    ed23734c23d2 Merge tag 'net-6.4-rc1' of git://git.kernel.o..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16b2a3f4280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=87f9126139666d37
+dashboard link: https://syzkaller.appspot.com/bug?extid=cf54c1da6574b6c1b049
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Thanks!
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c43e1732e675/disk-ed23734c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8f4e7bce7a91/vmlinux-ed23734c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9fe83b099e40/bzImage-ed23734c.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cf54c1da6574b6c1b049@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+BUG: KASAN: slab-use-after-free in atomic_dec_and_test include/linux/atomic/atomic-instrumented.h:575 [inline]
+BUG: KASAN: slab-use-after-free in hci_conn_drop include/net/bluetooth/hci_core.h:1418 [inline]
+BUG: KASAN: slab-use-after-free in sco_chan_del+0x102/0x4f0 net/bluetooth/sco.c:169
+Write of size 4 at addr ffff88804dbea010 by task syz-executor.0/7018
+
+CPU: 0 PID: 7018 Comm: syz-executor.0 Not tainted 6.3.0-syzkaller-13379-ged23734c23d2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/14/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
+ print_report mm/kasan/report.c:462 [inline]
+ kasan_report+0x11c/0x130 mm/kasan/report.c:572
+ check_region_inline mm/kasan/generic.c:181 [inline]
+ kasan_check_range+0x141/0x190 mm/kasan/generic.c:187
+ instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+ atomic_dec_and_test include/linux/atomic/atomic-instrumented.h:575 [inline]
+ hci_conn_drop include/net/bluetooth/hci_core.h:1418 [inline]
+ sco_chan_del+0x102/0x4f0 net/bluetooth/sco.c:169
+ __sco_sock_close+0x178/0x740 net/bluetooth/sco.c:454
+ sco_sock_close net/bluetooth/sco.c:469 [inline]
+ sco_sock_release+0x81/0x360 net/bluetooth/sco.c:1267
+ __sock_release+0xcd/0x290 net/socket.c:653
+ sock_close+0x1c/0x20 net/socket.c:1397
+ __fput+0x27c/0xa90 fs/file_table.c:321
+ task_work_run+0x16f/0x270 kernel/task_work.c:179
+ get_signal+0x1c7/0x25b0 kernel/signal.c:2650
+ arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+ exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+ exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+ syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+ do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f7a97a8c169
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f7a965fe168 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: fffffffffffffffc RBX: 00007f7a97babf80 RCX: 00007f7a97a8c169
+RDX: 0000000000000008 RSI: 0000000020002ec0 RDI: 0000000000000004
+RBP: 00007f7a97ae7ca1 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffca219560f R14: 00007f7a965fe300 R15: 0000000000022000
+ </TASK>
+
+Allocated by task 7018:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:333 [inline]
+ __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
+ kmalloc include/linux/slab.h:559 [inline]
+ kzalloc include/linux/slab.h:680 [inline]
+ hci_conn_add+0xb8/0x16b0 net/bluetooth/hci_conn.c:986
+ hci_connect_sco+0x3c7/0x1050 net/bluetooth/hci_conn.c:1663
+ sco_connect net/bluetooth/sco.c:264 [inline]
+ sco_sock_connect+0x2d7/0xae0 net/bluetooth/sco.c:610
+ __sys_connect_file+0x153/0x1a0 net/socket.c:2003
+ __sys_connect+0x165/0x1a0 net/socket.c:2020
+ __do_sys_connect net/socket.c:2030 [inline]
+ __se_sys_connect net/socket.c:2027 [inline]
+ __x64_sys_connect+0x73/0xb0 net/socket.c:2027
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Freed by task 5708:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2e/0x40 mm/kasan/generic.c:521
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free+0x160/0x1c0 mm/kasan/common.c:200
+ kasan_slab_free include/linux/kasan.h:162 [inline]
+ slab_free_hook mm/slub.c:1781 [inline]
+ slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1807
+ slab_free mm/slub.c:3786 [inline]
+ __kmem_cache_free+0xaf/0x2d0 mm/slub.c:3799
+ device_release+0xa3/0x240 drivers/base/core.c:2484
+ kobject_cleanup lib/kobject.c:683 [inline]
+ kobject_release lib/kobject.c:714 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c2/0x4d0 lib/kobject.c:731
+ put_device+0x1f/0x30 drivers/base/core.c:3733
+ hci_conn_del+0x1e5/0x950 net/bluetooth/hci_conn.c:1162
+ hci_conn_unlink+0x2ce/0x460 net/bluetooth/hci_conn.c:1109
+ hci_conn_unlink+0x362/0x460 net/bluetooth/hci_conn.c:1087
+ hci_conn_hash_flush+0x19b/0x270 net/bluetooth/hci_conn.c:2479
+ hci_dev_close_sync+0x5fb/0x1200 net/bluetooth/hci_sync.c:4941
+ hci_dev_do_close+0x31/0x70 net/bluetooth/hci_core.c:554
+ hci_unregister_dev+0x1ce/0x580 net/bluetooth/hci_core.c:2703
+ vhci_release+0x80/0xf0 drivers/bluetooth/hci_vhci.c:669
+ __fput+0x27c/0xa90 fs/file_table.c:321
+ task_work_run+0x16f/0x270 kernel/task_work.c:179
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xad3/0x2960 kernel/exit.c:871
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1021
+ __do_sys_exit_group kernel/exit.c:1032 [inline]
+ __se_sys_exit_group kernel/exit.c:1030 [inline]
+ __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1030
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+The buggy address belongs to the object at ffff88804dbea000
+ which belongs to the cache kmalloc-4k of size 4096
+The buggy address is located 16 bytes inside of
+ freed 4096-byte region [ffff88804dbea000, ffff88804dbeb000)
+
+The buggy address belongs to the physical page:
+page:ffffea000136fa00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x4dbe8
+head:ffffea000136fa00 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000010200 ffff888012442140 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 4456, tgid 4456 (udevd), ts 192360753903, free_ts 185030986834
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2db/0x350 mm/page_alloc.c:1731
+ prep_new_page mm/page_alloc.c:1738 [inline]
+ get_page_from_freelist+0xf41/0x2c00 mm/page_alloc.c:3502
+ __alloc_pages+0x1cb/0x4a0 mm/page_alloc.c:4768
+ alloc_pages+0x1aa/0x270 mm/mempolicy.c:2279
+ alloc_slab_page mm/slub.c:1851 [inline]
+ allocate_slab+0x25f/0x390 mm/slub.c:1998
+ new_slab mm/slub.c:2051 [inline]
+ ___slab_alloc+0xa91/0x1400 mm/slub.c:3192
+ __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3291
+ __slab_alloc_node mm/slub.c:3344 [inline]
+ slab_alloc_node mm/slub.c:3441 [inline]
+ __kmem_cache_alloc_node+0x136/0x320 mm/slub.c:3490
+ kmalloc_trace+0x26/0xe0 mm/slab_common.c:1057
+ kmalloc include/linux/slab.h:559 [inline]
+ kzalloc include/linux/slab.h:680 [inline]
+ uevent_show+0x15d/0x380 drivers/base/core.c:2641
+ dev_attr_show+0x4f/0xd0 drivers/base/core.c:2349
+ sysfs_kf_seq_show+0x21d/0x430 fs/sysfs/file.c:59
+ seq_read_iter+0x4f9/0x12d0 fs/seq_file.c:230
+ kernfs_fop_read_iter+0x4ce/0x690 fs/kernfs/file.c:279
+ call_read_iter include/linux/fs.h:1862 [inline]
+ new_sync_read fs/read_write.c:389 [inline]
+ vfs_read+0x4b1/0x8a0 fs/read_write.c:470
+ ksys_read+0x12b/0x250 fs/read_write.c:613
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1302 [inline]
+ free_unref_page_prepare+0x62e/0xcb0 mm/page_alloc.c:2564
+ free_unref_page+0x33/0x370 mm/page_alloc.c:2659
+ __unfreeze_partials+0x17c/0x1a0 mm/slub.c:2636
+ qlink_free mm/kasan/quarantine.c:166 [inline]
+ qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
+ kasan_quarantine_reduce+0x195/0x220 mm/kasan/quarantine.c:292
+ __kasan_slab_alloc+0x63/0x90 mm/kasan/common.c:305
+ kasan_slab_alloc include/linux/kasan.h:186 [inline]
+ slab_post_alloc_hook mm/slab.h:711 [inline]
+ slab_alloc_node mm/slub.c:3451 [inline]
+ __kmem_cache_alloc_node+0x17c/0x320 mm/slub.c:3490
+ kmalloc_trace+0x26/0xe0 mm/slab_common.c:1057
+ kmalloc include/linux/slab.h:559 [inline]
+ kzalloc include/linux/slab.h:680 [inline]
+ is_state_visited kernel/bpf/verifier.c:15459 [inline]
+ do_check kernel/bpf/verifier.c:15629 [inline]
+ do_check_common+0x2845/0xc620 kernel/bpf/verifier.c:18215
+ do_check_main kernel/bpf/verifier.c:18278 [inline]
+ bpf_check+0x74aa/0xb010 kernel/bpf/verifier.c:18899
+ bpf_prog_load+0x16d3/0x21f0 kernel/bpf/syscall.c:2648
+ __sys_bpf+0x149f/0x5420 kernel/bpf/syscall.c:5058
+ __do_sys_bpf kernel/bpf/syscall.c:5162 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5160 [inline]
+ __x64_sys_bpf+0x79/0xc0 kernel/bpf/syscall.c:5160
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Memory state around the buggy address:
+ ffff88804dbe9f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88804dbe9f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88804dbea000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                         ^
+ ffff88804dbea080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88804dbea100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
