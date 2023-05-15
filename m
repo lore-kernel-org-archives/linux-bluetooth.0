@@ -2,131 +2,108 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2676C77B7D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 May 2023 20:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5CDC77B7D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 May 2023 21:05:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245387AbjEOUbA convert rfc822-to-8bit (ORCPT
+        id S244765AbjEOVFu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 May 2023 16:31:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48362 "EHLO
+        Mon, 15 May 2023 17:05:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245388AbjEOUa6 (ORCPT
+        with ESMTP id S236784AbjEOVFu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 May 2023 16:30:58 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271FA100C0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 13:30:56 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 8C225240038
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 22:30:55 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QKrbz03vBz9rxN;
-        Mon, 15 May 2023 22:30:54 +0200 (CEST)
-Message-ID: <87eda7c7bdb8479f6233b6709e5c21de0535fdfc.camel@iki.fi>
-Subject: Re: [BlueZ,v3,1/2] test-runner: revert udevd and audio support
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date:   Mon, 15 May 2023 20:30:54 +0000
-In-Reply-To: <CABBYNZLUQOQ-gTdCAeUNknEkgQenmVQhahrog+8CL4y87PZKBg@mail.gmail.com>
-References: <fcd0cc37474487489e2567f3de7d90f1b62d9613.1683994090.git.pav@iki.fi>
-         <645fc6ce.630a0220.1799b.9542@mx.google.com>
-         <CABBYNZLUQOQ-gTdCAeUNknEkgQenmVQhahrog+8CL4y87PZKBg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Mon, 15 May 2023 17:05:50 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B32E81991
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 14:05:48 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64ab2a37812so691503b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 14:05:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684184747; x=1686776747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gnB5yv9oZNhLgZuBAf3kZHHnyPDEbPfDsi/R/yytOW0=;
+        b=NmScp0by6qPoT6YIURRHO+Ruo2K6rs4p+CScfA1zXNsno3PBOfE9ZGQlbiYJ3baCIz
+         KqVq+Fav8AU3P11qqIBm3dQCg2kuDGHKglhntqvqIQ9PBGtDPjmXFHYg/HYghIPdSOVR
+         o6Kf2QwsxhQKp03KacYoMFp34uXZdgLmdrCyIdL7V4yC2mirzBLHul1DVTp3Bz/AR4V0
+         kBp8wOfSQ6XV4w/NEEcMa7GRcsKOi7Wm9eIzJ6Gucx+qUg4MuFN+mTuoDHlprSrkNuEb
+         VsbNEps/pwxa4SsFvwGbkg8BW8f3VkLPEYzYkxRPEtM/CegtKZsgr6CtysLgCgpLU4Gt
+         rjuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684184747; x=1686776747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gnB5yv9oZNhLgZuBAf3kZHHnyPDEbPfDsi/R/yytOW0=;
+        b=hmu1Z0TDTKk7fQ0aC+C/4twecdAuT0VuYid6gvAtEu9+xTSsdKnteJdWILjr07wNE7
+         O1K9mLeVaJ7h79MSLEpwzu+ZssBl/JvTv1jFyYHQpFBIhcJJVv8ZZXlqxKBbC26ciVFF
+         CnXtele8/d7zAoTAiQj8/A12ZNtmgyX7Zkweif/NcKSWc/KNHmBGjaAebxWeqMIdfqNw
+         zsA9rjuDoRkQG23UCFS5JPNB26b+PrgqquDicYXX+5QM2D/PQhc8FwXpzpU8f+AKZYrU
+         tnYHJ8wZIO+RN3jJmspwC3IJp3D3oS9x1aPIZvn2mX9lW6UeIRldWmic1NkUI24e3Mik
+         SGow==
+X-Gm-Message-State: AC+VfDwr4cY3gBmEHFQWsawC5xukR8l+HuEr7D6iaaLLgYsVFBV+1Gp8
+        /IcEwU8HPsMwN1cG1a1vwc91CKMHuSQ=
+X-Google-Smtp-Source: ACHHUZ6U0bNW6pdzoRzJVKS9P5BuTYUXVFbNKENefkRD1oq2x5696J9unHagftEF5HsB/COIN1otng==
+X-Received: by 2002:a17:902:e80b:b0:1a9:57b4:9d5a with SMTP id u11-20020a170902e80b00b001a957b49d5amr46763118plg.31.1684184747093;
+        Mon, 15 May 2023 14:05:47 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id jb4-20020a170903258400b001a04ff0e2eesm13990050plb.58.2023.05.15.14.05.46
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 May 2023 14:05:46 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/7] profile: Add support for experimental flag
+Date:   Mon, 15 May 2023 14:05:39 -0700
+Message-Id: <20230515210545.718701-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ma, 2023-05-15 kello 13:01 -0700, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
-> 
-> On Sat, May 13, 2023 at 10:41 AM <bluez.test.bot@gmail.com> wrote:
-> > 
-> > This is automated email and please do not reply to this email!
-> > 
-> > Dear submitter,
-> > 
-> > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=747273
-> > 
-> > ---Test result---
-> > 
-> > Test Summary:
-> > CheckPatch                    FAIL      1.14 seconds
-> > GitLint                       PASS      0.52 seconds
-> > BuildEll                      PASS      26.21 seconds
-> > BluezMake                     PASS      745.32 seconds
-> > MakeCheck                     PASS      11.04 seconds
-> > MakeDistcheck                 PASS      151.18 seconds
-> > CheckValgrind                 PASS      243.86 seconds
-> > CheckSmatch                   PASS      326.99 seconds
-> > bluezmakeextell               PASS      98.83 seconds
-> > IncrementalBuild              PASS      1262.88 seconds
-> > ScanBuild                     WARNING   964.73 seconds
-> > 
-> > Details
-> > ##############################
-> > Test: CheckPatch - FAIL
-> > Desc: Run checkpatch.pl script
-> > Output:
-> > [BlueZ,v3,1/2] test-runner: revert udevd and audio support
-> > WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '91a48af52efb0751fab396b2b9026c9186b10b88', maybe rebased or not pulled?
-> > #49:
-> > This reverts commit 91a48af52efb0751fab396b2b9026c9186b10b88
-> > 
-> > WARNING:UNKNOWN_COMMIT_ID: Unknown commit id 'e20e7e0b05c7edb74255c9b092916ac5bb99c97f', maybe rebased or not pulled?
-> > #50:
-> > This reverts commit e20e7e0b05c7edb74255c9b092916ac5bb99c97f
-> > 
-> > /github/workspace/src/src/13240258.patch total: 0 errors, 2 warnings, 193 lines checked
-> > 
-> > NOTE: For some of the reported defects, checkpatch may be able to
-> >       mechanically convert to the typical style using --fix or --fix-inplace.
-> > 
-> > /github/workspace/src/src/13240258.patch has style problems, please review.
-> > 
-> > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> > 
-> > NOTE: If any of the errors are false positives, please report
-> >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> > 
-> > 
-> > ##############################
-> > Test: ScanBuild - WARNING
-> > Desc: Run Scan Build
-> > Output:
-> > tools/test-runner.c:924:2: warning: 2nd function call argument is an uninitialized value
-> >         printf("Running command %s\n", cmdname ? cmdname : argv[0]);
-> >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > 1 warning generated.
-> > 
-> > 
-> > 
-> > ---
-> > Regards,
-> > Linux Bluetooth
-> 
-> I tried running on fedora but it looks like something is missing in my setup:
-> 
-> [E][00003.767959] spa.dbus     | [          dbus.c:  329
-> impl_connection_get()] Failed to connect to session bus: Unable to
-> autolaun1
-> [E][00003.769967] mod.portal   | [ module-portal.c:  326
-> pipewire__module_init()] Failed to connect to session bus:
-> Input/output error
+This adds experimental field to btd_profile so the plugin can indicate
+drivers that depends on experimental to be enabled.
+---
+ src/profile.c | 6 ++++++
+ src/profile.h | 5 +++++
+ 2 files changed, 11 insertions(+)
 
-I have those two "errors" too, they should be harmless as the xdg-
-desktop-portal module is optional. With `test-runner -d -l -A` you
-should get the Bluetooth endpoints to appear.
-
-Removing the mod.portal from the configuration can't be done with drop-
-in config files currently, and I didn't want to include a full config
-file here as it has some tens of lines of mandatory boilerplate.
-
+diff --git a/src/profile.c b/src/profile.c
+index e1bebf1ee19c..ea188f36b6dd 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -775,6 +775,12 @@ static struct btd_profile *btd_profile_find_uuid(const char *uuid)
+ 
+ int btd_profile_register(struct btd_profile *profile)
+ {
++	if (profile->experimental && !(g_dbus_get_flags() &
++					G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
++		DBG("D-Bus experimental not enabled");
++		return -ENOTSUP;
++	}
++
+ 	profiles = g_slist_append(profiles, profile);
+ 	return 0;
+ }
+diff --git a/src/profile.h b/src/profile.h
+index 6827f848148c..6871f2f0d7d8 100644
+--- a/src/profile.h
++++ b/src/profile.h
+@@ -28,6 +28,11 @@ struct btd_profile {
+ 	 */
+ 	bool external;
+ 
++	/* Indicates the profile is experimental and shall only be registered
++	 * when experimental has been enabled (see: main.conf:Experimental).
++	 */
++	bool experimental;
++
+ 	int (*device_probe) (struct btd_service *service);
+ 	void (*device_remove) (struct btd_service *service);
+ 
 -- 
-Pauli Virtanen
+2.40.1
+
