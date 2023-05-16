@@ -2,124 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48C3DC77B75
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 May 2023 23:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF80C7EE22
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 May 2023 02:29:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245599AbjEOXKW (ORCPT
+        id S229547AbjEPC3l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 May 2023 19:10:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58046 "EHLO
+        Mon, 15 May 2023 22:29:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230236AbjEOXKU (ORCPT
+        with ESMTP id S229468AbjEPC3l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 May 2023 19:10:20 -0400
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB0B83593
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 16:10:19 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-61b71b7803bso64214546d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 16:10:19 -0700 (PDT)
+        Mon, 15 May 2023 22:29:41 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA7675B80
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 19:29:39 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f13d8f74abso15581927e87.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 May 2023 19:29:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684192219; x=1686784219;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrO3F2a29MhZ6sZfgc9xan+tZeEqdZDzGdu1cbWgEfs=;
-        b=bPRV6OjsX2tLJAGBFFEiwHuPPpFNMLrm1/1MkyjMtpgH+bLQ9bTyCwBqMgP+IigSHz
-         vAjyuG55DTzX4EbxBzsEJ48tcm2Zw/EW4j0S9FSvVk9mzUHfLPexSqx64CgY09HjNhuq
-         7Skmlq0BvUxbw3YEaLNy/IvJh/2252N0uc1najXt2Cuve/3jVxK/hBNXN2Uw4Jl3xzUH
-         kclmkwp1Td3U7c/VNy5iNvjCqdPAMOL3CtvChISh/9PonjsfCMOnObsIU1BVLoGzUeWI
-         8+XLVtNdSY+P6N6bvnYbpS2maYsDEDDZXsxxf+0+4DPpbbhn20YuNrG0LtSY0H+n5iR/
-         vS0A==
+        d=gmail.com; s=20221208; t=1684204178; x=1686796178;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o0NdoRRVsaTM/7abFkjeoSMBtrgqFDGWfwBOlfQ/pK0=;
+        b=rEwYrAAgNj70zMMI4UJmuDmDauECYOmtwYCEGaKe37rXZnwrKN4sAxvhSrz1fB1HbC
+         I0auXJLHj4mLsAy5t+DRqmdWWKwDi35XhzUoBOQdcp4lHLw4JRAJc7uWjnWZLzW5jdQN
+         uUGi1IdCXPp2iCpl6OUB1fjPUjUZKTo7RYgeoEjMI7gHYtu+CR27kJ03uwSvDT9W4GtD
+         NLMOHbmsQ/3ulcUo0/UjdtVR1CTNNOF8UFAIfLp0zHPpL53G8cfEvJ3Vx/51YBYjpXIx
+         iSs4ENuStJkgZm6jLDigfaY2lJhW1hjfMawoxunc/mgQSM1FXH1/Crh5Enw1/7yni4Vz
+         TJ2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684192219; x=1686784219;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IrO3F2a29MhZ6sZfgc9xan+tZeEqdZDzGdu1cbWgEfs=;
-        b=VTp7A8FpNW5zcOYBaXJjwr98pQhwqby50jek45PdsI9+9NJFbGCFVuxpuUJrINS6MR
-         MC6gV7aiJEvNOraHxUQL2BMyt1Giru36Bl7RUpbZ8ll/viwhcy8juRc9tNG2hBK6btpV
-         Q8DQOppYeYgi2I5p2sPYi5PkpxjtXYmoT+4k3e5AHp281mtUUXPBMM2l8wL1RmgQGU7i
-         So0XbpBmTA2IP3Lew6N9OFVywUP6OPbVkegQlaW5q6IeDTv/qpv2Vq5ZZ7aEO1mXQuWp
-         FKVNGSkaIdbfMfIZ7//WRxglWhxOMwbQxt7NaylvDqAGCpeS6oEm/V2KvS/edxf5ICQv
-         Ep0w==
-X-Gm-Message-State: AC+VfDxJ2zsr9RqD44jbH/Z2hXFQUgLUbgTcI4tB87X4KUGQ7+4OB7rG
-        DQMpSTbKXtMjPYqaAzhtplq8baA7Shk=
-X-Google-Smtp-Source: ACHHUZ7kBdeAooGdZj57F1XEhis3oA6Cp+SK2fd7+LsCSQE/+7j9aliRISEK0L0HJwwrixb7KvpoXQ==
-X-Received: by 2002:a05:6214:d04:b0:61a:d6af:cb00 with SMTP id 4-20020a0562140d0400b0061ad6afcb00mr58042024qvh.9.1684192218833;
-        Mon, 15 May 2023 16:10:18 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.163.145])
-        by smtp.gmail.com with ESMTPSA id s15-20020a0ce30f000000b00621066bde91sm5249023qvl.52.2023.05.15.16.10.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 May 2023 16:10:18 -0700 (PDT)
-Message-ID: <6462bbda.0c0a0220.3c4df.b30b@mx.google.com>
-Date:   Mon, 15 May 2023 16:10:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7837572837735897101=="
+        d=1e100.net; s=20221208; t=1684204178; x=1686796178;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o0NdoRRVsaTM/7abFkjeoSMBtrgqFDGWfwBOlfQ/pK0=;
+        b=Lt6JOvlVXsgnRAMftrlpFcIFFedCXMkZf7IDt1H69Hamq1EMfwbHK1zl2tBbmzpcxW
+         xC0pwMzt+vUDlZY78BXXZIvRrwABq+Q/ECw71EjEDFIideJoKnNNancrmOw9ZO7ukCUG
+         iPzrEEdYigyr2+m8GMqSt8HDOjGrbPLYrNzv9JukdVqqiEhDDfKLEtjZMmewI05p9K2O
+         h1QUwXalUWJDCMLWdgQgG+5+X7L6OpNj3EJh2GwVSP8SiLbqv7fBPtfo7aubWT7eya79
+         wl9hrqKQcHWFrhV0sfK9AcT6BVMyRDLyxzwIAPLu5FgH2HIVv+LKmR/fVskj19j3zurr
+         /QNA==
+X-Gm-Message-State: AC+VfDyCYqlF/toV7MD4N/8SoRMCq1o3mmzqHBtHZ5A/qAzwwEIz0yVE
+        1Zy64U3OWxUib0eIa1UKmqCqjTawZ8rvuKbrWT0=
+X-Google-Smtp-Source: ACHHUZ59cVULm+j39FRGhOcz1W0o5BqmdNetW/5H5Qa/VH/JSClTrWJVvnu4xQIQSEW5qpF/qTMi5lCIe7wz4Ltl6bY=
+X-Received: by 2002:ac2:446b:0:b0:4ef:b18c:89b2 with SMTP id
+ y11-20020ac2446b000000b004efb18c89b2mr8299252lfl.56.1684204177714; Mon, 15
+ May 2023 19:29:37 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/7] profile: Add support for experimental flag
-In-Reply-To: <20230515210545.718701-1-luiz.dentz@gmail.com>
-References: <20230515210545.718701-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230510134557.11486-1-claudia.rosu@nxp.com> <168417961964.11671.9854954504887799038.git-patchwork-notify@kernel.org>
+In-Reply-To: <168417961964.11671.9854954504887799038.git-patchwork-notify@kernel.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 15 May 2023 19:29:25 -0700
+Message-ID: <CABBYNZKnzvHn4y424Z4T+fres+ySJFNkJ9+k00qi8j7RKZS1xg@mail.gmail.com>
+Subject: Re: [PATCH v2 0/1] Bluetooth: Check for ISO support in controller
+To:     patchwork-bot+bluetooth@kernel.org
+Cc:     Claudia Draghicescu <claudia.rosu@nxp.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7837572837735897101==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Claudia,
 
-This is automated email and please do not reply to this email!
+On Mon, May 15, 2023 at 12:56=E2=80=AFPM <patchwork-bot+bluetooth@kernel.or=
+g> wrote:
+>
+> Hello:
+>
+> This patch was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>
+> On Wed, 10 May 2023 16:45:56 +0300 you wrote:
+> > This patch checks for ISO_BROADCASTER and ISO_SYNC_RECEIVER in controll=
+er.
+> >
+> > Claudia Draghicescu (1):
+> >   Check for ISO_BROADCASTER and ISO_SYNC_RECEIVER bits in adapter's
+> >     supported features
+> >
+> >  include/net/bluetooth/hci.h      | 1 +
+> >  include/net/bluetooth/hci_core.h | 1 +
+> >  include/net/bluetooth/mgmt.h     | 2 ++
+> >  net/bluetooth/mgmt.c             | 6 ++++++
+> >  4 files changed, 10 insertions(+)
+>
+> Here is the summary with links:
+>   - [v2,1/1] Bluetooth: Check for ISO support in controller
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/fd4fbf8cd81f
+>
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Dear submitter,
+Btw, we need to update the documentation:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=747773
+https://github.com/bluez/bluez/blob/master/doc/mgmt-api.txt#L336
 
----Test result---
+And decoding support:
 
-Test Summary:
-CheckPatch                    FAIL      3.79 seconds
-GitLint                       PASS      2.45 seconds
-BuildEll                      PASS      26.23 seconds
-BluezMake                     PASS      753.81 seconds
-MakeCheck                     PASS      12.07 seconds
-MakeDistcheck                 PASS      153.12 seconds
-CheckValgrind                 PASS      245.43 seconds
-CheckSmatch                   PASS      329.01 seconds
-bluezmakeextell               PASS      99.56 seconds
-IncrementalBuild              PASS      4446.45 seconds
-ScanBuild                     PASS      975.65 seconds
+https://github.com/bluez/bluez/blob/master/monitor/packet.c#L12656
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,7/7] plugin: Treat -ENOTSUP as -ENOSYS
-WARNING:ENOSYS: ENOSYS means 'invalid syscall nr' and nothing else
-#101: FILE: src/plugin.c:189:
-+			if (err == -ENOSYS || err == -ENOTSUP)
-
-/github/workspace/src/src/13242265.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13242265.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
 
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7837572837735897101==--
+--=20
+Luiz Augusto von Dentz
