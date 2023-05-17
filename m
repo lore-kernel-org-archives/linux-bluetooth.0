@@ -2,147 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F417DC77B7F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 07:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCA8C77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 09:29:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbjEQH5r (ORCPT
+        id S229746AbjEQJ34 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 May 2023 03:57:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54116 "EHLO
+        Wed, 17 May 2023 05:29:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230329AbjEQH5q (ORCPT
+        with ESMTP id S230015AbjEQJ31 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 May 2023 03:57:46 -0400
-Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158244495
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 00:57:13 -0700 (PDT)
-Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1926e90d257so181007fac.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 00:57:13 -0700 (PDT)
+        Wed, 17 May 2023 05:29:27 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2126.outbound.protection.outlook.com [40.107.94.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABE255A9;
+        Wed, 17 May 2023 02:29:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QTVEj83yGaxxZoqAOsSkuH5nmayZjBnEQHUZ8LhM3IJhKDP2uTblPcpcu25mjXAgAKXfvyTHTM7jgta0lnZKJk3jSfIVh5x9u952qKK9ywtmxpYTDrgbfS9qr87gnJrQyrlChbOyesn4ynvUiHhWBMEx1IBZ6f+5RYL7r1s85h2A+bYDAuUsuDeMBwjS1K0ieWov60WIjjSDH4Fk3m78ULHjw114Q2xpEl98bpDb0M6u4lDNiIC4y5gNH8A8XGTA1VmLM3GMp1uF5X1PspSlcNl2jCTYoH1dkq3d4QHHbABMdH6mZqhqXkwQi1M4dBDs3Oyu/DzO2zgV/xTo+3Ud+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pNwUFcnYRt7e6W2yAeCzksT/E92MClYfgw9om7Vu7Ew=;
+ b=SlwvasPPVCKcOA3xB2FE8e4fa1ehiZAVZJdPBEltjJxQpQGq2j9mShm4EQKRMR4gwORRXrZlzAKTlhzNO8aPae/+wQ/nPkwLUueoCgo6Pbcl9X+4QpHSfYsIClVorXGNkeVCWk0vf/4So+AAxUSwuV+oNpHjuZMFvuExoWTuBkLd/AIS8MHQs+zkci0G7ZvCBMShr4WuY2XjD7atsfLK+rfS6sa9xCjmVtHCraiI35q18t8Hq/ETVH4EmDBa7IkO7z043+HZwNBoL29kQBlEiX2RzJcJvg82JoBiQvTPMp3I8+YZUgww+sIkotWkwqerJiSckf5bS7loE+SonDCREg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684310230; x=1686902230;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kzbXSHGEhr6oiME3oiV312oJMfEw7r8LcXRpCZMA/78=;
-        b=nfECMGcBIfylL5I1++Ey2DUbEvURnOCpAp+2GVOh0pUOVXwn85Xajzh0DzgADjY/A7
-         cFynS1r5NpO5BBSM2JqYFl7CGJsuAFKVtNZM9myEaf37xl0uQVn1hQZDxP5BoM2oo2Pv
-         wKR5N06XvuB3vYAuyVPCmJPUSnJfl/3T+yXokSFqHnp8GxSam/4U7+d9TeVahWe/jy1S
-         zer1+ZoDz2b89EYTshn6/262RmLjU/3IgRlYrSR13ZB4CWIdLd/1z0cZov3ZtI24WxaA
-         fxzYD28MGL6jGiB5Bw5GEayQIkY52teFcNeok1d/J+o/2LfVvXgLMyZEQOHdDbS7nrFh
-         IMWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684310230; x=1686902230;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kzbXSHGEhr6oiME3oiV312oJMfEw7r8LcXRpCZMA/78=;
-        b=GrLjAdEtI/ql8ST5y+UJyn+IOM28IYpFqnckYPnMyPsGCff4ZdAi6DaG6gJHxigtGa
-         R/ageC3IyUOKHSk7RhrdeqAaheLyIlz/sAuFznq6ztMV8Ds8A9OfQE22sdv49ZHCECQa
-         CClHOORy26zlfeM1ePd+BEx7cwisP5otnoIa7/F0OrGVQnH3/NrfNMqZrlTA1GIKX0CY
-         6thiP/JAyj6Px7DmOiq8AogGoTbhYXEt77+s5uvAtf+D4zhbOak/+lRJn9IoOolMxe2W
-         +EoQx0vfawjDwTr+/7b9Ohj0CCmUx/TFWaKi3f5eHvBmV8QVhF77IWqZS9J/bcTTvpsg
-         ccEQ==
-X-Gm-Message-State: AC+VfDw8pduzY4w1KYCwhqQuYeCVE/BwRmR3VU1nIdOyRIpqq5+Mstkc
-        zp2AyoyJnZxMzmUbQZySngaQwPewFQk=
-X-Google-Smtp-Source: ACHHUZ6zAmoWIGlebz3fMzpSqdUKULE1S8rv60zonrya+GgEZoiHi1IkP9XonTwgzpOd8EK9BnKNPg==
-X-Received: by 2002:a05:6870:718:b0:196:8369:dab0 with SMTP id ea24-20020a056870071800b001968369dab0mr12524267oab.31.1684310230354;
-        Wed, 17 May 2023 00:57:10 -0700 (PDT)
-Received: from [172.17.0.2] ([157.55.189.43])
-        by smtp.gmail.com with ESMTPSA id v5-20020a056870198500b001807f020a39sm13776828oam.12.2023.05.17.00.57.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 May 2023 00:57:10 -0700 (PDT)
-Message-ID: <646488d6.050a0220.34caf.6ea3@mx.google.com>
-Date:   Wed, 17 May 2023 00:57:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3889268780662911905=="
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pNwUFcnYRt7e6W2yAeCzksT/E92MClYfgw9om7Vu7Ew=;
+ b=ToMOonDpASFRsGlBMKbVk+UJGKO5WhqeJ0NAMxUFqOs8b9SaMabq5Y33b7j0Wj4NH+YAAY++mGw75powBA/DZW5IkJbvc3mbaZ02PO8icb7LfW09H0yN9UeUwKFImdYM7lUcoSJbZEtTecfDQEXa0QuS2gB7S1Z3uQ6ZcTwHcZs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by LV3PR13MB6359.namprd13.prod.outlook.com (2603:10b6:408:19e::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Wed, 17 May
+ 2023 09:29:19 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::f416:544d:18b7:bb34]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::f416:544d:18b7:bb34%5]) with mapi id 15.20.6387.033; Wed, 17 May 2023
+ 09:29:19 +0000
+Date:   Wed, 17 May 2023 11:29:12 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+        pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH net] MAINTAINERS: skip CCing netdev for Bluetooth patches
+Message-ID: <ZGSeaLMRsi8abq+B@corigine.com>
+References: <20230517014253.1233333-1-kuba@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230517014253.1233333-1-kuba@kernel.org>
+X-ClientProxiedBy: AM4P190CA0012.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:200:56::22) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: Bluetooth: Add support for creating multiple BISes
-In-Reply-To: <20230517072706.5988-2-iulia.tanasescu@nxp.com>
-References: <20230517072706.5988-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|LV3PR13MB6359:EE_
+X-MS-Office365-Filtering-Correlation-Id: dff9425c-bd4b-4109-2611-08db56b930a6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: d8K2G4x8Te+mGSfOy7GUMQYvJKTdhdd5VPSsP18BsL6SHnZa27OHAQfux8gT7nkGZrXiCYhIZVzRfyiug38ypffP9/aWkHgwVxNuL4HvjbyMLhV7UxUesvgooWIN/erq9QAeEXmx1VL/ESWT8ZxTxoa8SafD/CznepNtI4TGRhTP9IW26ScnT2nMQWnaZi7mKzSgKLuGPoj90DvXkHn1+3BZ0gvX8ysagBCMxpW6S8EPyTnllrxCKMwCAkbKhhpQGsz0dteIrphpbJGZI6dp0nyAcpVhaEDb8b+KM11GP8IlWrKJNGfkRjG11CtFYmKhafpCIbHK+ay+jYKKJPTvzKcu0GbNoRRJAIMYdDko5TGWnEUA9nmxIDXuKrcs8lvGBppL0dPZ5nhEjWvyDGnsKDi7yFTdS35vEvrqKL+N6fnZLKcGPAUFP1Dru/vu9UbPzH0wZp3GRVmetrQ3w9TVp6rgyeGOQxCUKgfgDrc8RGgjQtkEEdrvR0q+p1BwBKq0Sms1JUMVeeNcTvAoXTYWD8G9MLCt6dRe3pyG0ct3vCVFDvNkPzPK8FlwdqPcEZVLBtKsJp1kg2j8XprAHmMCRajnnwtNnTTdZBS6AwdAGQ8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(366004)(39840400004)(376002)(346002)(451199021)(86362001)(36756003)(66946007)(66556008)(66476007)(6916009)(4326008)(316002)(966005)(478600001)(6486002)(6666004)(8936002)(8676002)(5660300002)(41300700001)(4744005)(2906002)(44832011)(38100700002)(2616005)(6506007)(6512007)(186003)(83380400001)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TiYWTMlLP4SAqZtUP4F/5UL70Oh9iyTA9f8HKJNTeaf4br5/nj4X60utaJsQ?=
+ =?us-ascii?Q?2rzi2pcl1y2gZRgEEQ6mqPvEku2fJSzjjzgReGnwwXoyjfsWBCfDal0ZOGfd?=
+ =?us-ascii?Q?v1pXU0D+XQNnxNqRRTSlNP1xDde8FV59TjM+Gj8C4VRaoMK6LJ8MepT3k829?=
+ =?us-ascii?Q?qarhGJStwRPSMYbTugSrnFc4DNjp7t9PAXxkuaHx6YbehDxkmlh9jdBOeJJF?=
+ =?us-ascii?Q?w0MDzuZPsEwEyQDKKRHejNGG/yh3cB7Rse9TfuVMM6LnIGlzLskZBLi30hTN?=
+ =?us-ascii?Q?Cfio2xGdv0EXNRjAic/r2xKgNHd8N4S6U0J6vnm071ksPxKhFtfTg1UJxApG?=
+ =?us-ascii?Q?KmE88pHHPCYXcUW1NBNmalXAzNwAZfk2hZlYJFTW2KJKCHnIpWLN40FnimF1?=
+ =?us-ascii?Q?dL7tH7xaCXziD2b6tF3Hr/OknFyM+Q1vaJ2VqcIYCF6n9IjTmbk79iTSV7Dp?=
+ =?us-ascii?Q?aAbtX77QKnmKOzebl+DG7lFzXUNM2wlju9MRw339k0md8Yxcd8O3QBZc1xCW?=
+ =?us-ascii?Q?YpFheOdsXnRTMHDydCvfuIFXZshDAe8Y8RzUKeUtW0bNJ2YDevyxS3HLmzKx?=
+ =?us-ascii?Q?pAETxIrA+R9R7i6PoSDKIzJNsM7lVgiSJ2bmbzgVa01avo3ciz4ocbJo+oE1?=
+ =?us-ascii?Q?d70aTG0OYfBYcd8y79Bz2Xg6CiuHmaJamhvbVFqAPVpbRNDVRyDYF665Da5p?=
+ =?us-ascii?Q?W9sA8bp4Mo0GuwX+oAYCCu7aE9juOYnV0C1WqazpS4h0QR2CFYJB5gICQ5pg?=
+ =?us-ascii?Q?jGBbcQoI7O7QE+V9JuG6PkpCX6POTKmOZilHPftyVmsaBGFOXtfnjo+iPKL9?=
+ =?us-ascii?Q?FpyCzU9T6RCYrTESFPkYQVV/+F0IjJHj2vMI13zhbqI1brQqDLYAHhNYRnwj?=
+ =?us-ascii?Q?W39PDUmJnlMY6/CQ1sLZNW/l/gIVHKhZRg80mUiHvtZGRgrS8SZexHEKORQK?=
+ =?us-ascii?Q?3xXhJqvDy9bInA1PziYSqYJHIqgNf2IC8R3NbjfJYdPxBeSva6rmYrIUSEIS?=
+ =?us-ascii?Q?tdD98/gbCiPFdGXnI5oXHHzIgDTisOiXzNg/UCPMg850kJh26E/5sM2juu6u?=
+ =?us-ascii?Q?bH31AkiidbbTqwireM6SyvD5RYdTbHRpVlnhEnpFD4pkMq1/e0grcu8VFIiU?=
+ =?us-ascii?Q?ydY3/34u7rtCFCVYetM0IbtamPKdAwP4RzSF13oNKjD4Lfh0SyR931R05vks?=
+ =?us-ascii?Q?MD1mJMnFS9BjyHdrDwEzIQfKaJcjWMMM1z3oiBmuoNi22aYs70lfEVnZM6f6?=
+ =?us-ascii?Q?V4PhdqnxFzYrAQDtwu8nVAdrGrcHJzW7obnL9P14hoTEd9c+QkQEEi3E85dF?=
+ =?us-ascii?Q?YgtmEoNR7dC4K54bZgyLLKiPVz2AqqlVN9UOJm6mL3fG6AnHdLCS/Kq+/pn4?=
+ =?us-ascii?Q?GpRKImSOUt6X3mNI8o4Uc34eNYt86YkPSSNLXaTCUHWmyYKHVy6LFdhurMhW?=
+ =?us-ascii?Q?ZUBhFA4dywmKDeBKmUCng9lja1kmfvmCpWgMi4rBGIU83BmsXLkDGSTppomZ?=
+ =?us-ascii?Q?e7twbrbPugX50q6g5+BkEWcDPLRJYbRjQcPg3x4tJkWGVMBY1I033OxpZJKY?=
+ =?us-ascii?Q?kDgB3ewXVwdvFDoSVI7FV+4xyNPl3AY0Znh0ZLaTEJfc6RDlQkZkDbvKQqYx?=
+ =?us-ascii?Q?r4wR6+4IYrbFQjxHX48DRIrpHL062YW/67Spp2CeHMnmDI3ugE+ZtLhw2MBO?=
+ =?us-ascii?Q?PuaQ1g=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dff9425c-bd4b-4109-2611-08db56b930a6
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2023 09:29:18.9839
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: prE0HDxkep51DhhQT00f2mHPV9lfaHmEXrQ2LAAhtW7oiAS4HzyQ3Qg/G3vSd2eFI2N+08Kp0rLUApFSm5FVJP8U6hqsHYn06dB2bb+JDLM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR13MB6359
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3889268780662911905==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, May 16, 2023 at 06:42:53PM -0700, Jakub Kicinski wrote:
+> As requested by Marcel skip netdev for Bluetooth patches.
+> Bluetooth has its own mailing list and overloading netdev
+> leads to fewer people reading it.
+> 
+> Link: https://lore.kernel.org/netdev/639C8EA4-1F6E-42BE-8F04-E4A753A6EFFC@holtmann.org/
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-This is automated email and please do not reply to this email!
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=748305
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      5.46 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      32.19 seconds
-CheckAllWarning               PASS      35.31 seconds
-CheckSparse                   WARNING   40.44 seconds
-CheckSmatch                   WARNING   109.45 seconds
-BuildKernel32                 PASS      31.65 seconds
-TestRunnerSetup               PASS      453.92 seconds
-TestRunner_l2cap-tester       PASS      17.19 seconds
-TestRunner_iso-tester         PASS      21.60 seconds
-TestRunner_bnep-tester        PASS      5.70 seconds
-TestRunner_mgmt-tester        PASS      115.16 seconds
-TestRunner_rfcomm-tester      PASS      9.01 seconds
-TestRunner_sco-tester         PASS      8.41 seconds
-TestRunner_ioctl-tester       PASS      9.73 seconds
-TestRunner_mesh-tester        PASS      7.14 seconds
-TestRunner_smp-tester         PASS      8.22 seconds
-TestRunner_userchan-tester    PASS      5.94 seconds
-IncrementalBuild              PASS      29.80 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[1/1] Bluetooth: Add support for creating multiple BISes
-WARNING: please, no spaces at the start of a line
-#505: FILE: net/bluetooth/hci_core.c:5:
-+   Copyright 2023 NXP$
-
-CHECK: Avoid CamelCase: <Copyright>
-#505: FILE: net/bluetooth/hci_core.c:5:
-+   Copyright 2023 NXP
-
-total: 0 errors, 1 warnings, 1 checks, 542 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13244298.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c:6964:40: warning: cast to restricted __le16
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3889268780662911905==--
