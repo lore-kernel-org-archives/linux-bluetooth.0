@@ -2,122 +2,267 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCA8C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 09:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B28C1C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 10:44:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbjEQJ34 (ORCPT
+        id S229669AbjEQKor (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 May 2023 05:29:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37514 "EHLO
+        Wed, 17 May 2023 06:44:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230015AbjEQJ31 (ORCPT
+        with ESMTP id S229904AbjEQKoq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 May 2023 05:29:27 -0400
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2126.outbound.protection.outlook.com [40.107.94.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABE255A9;
-        Wed, 17 May 2023 02:29:20 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QTVEj83yGaxxZoqAOsSkuH5nmayZjBnEQHUZ8LhM3IJhKDP2uTblPcpcu25mjXAgAKXfvyTHTM7jgta0lnZKJk3jSfIVh5x9u952qKK9ywtmxpYTDrgbfS9qr87gnJrQyrlChbOyesn4ynvUiHhWBMEx1IBZ6f+5RYL7r1s85h2A+bYDAuUsuDeMBwjS1K0ieWov60WIjjSDH4Fk3m78ULHjw114Q2xpEl98bpDb0M6u4lDNiIC4y5gNH8A8XGTA1VmLM3GMp1uF5X1PspSlcNl2jCTYoH1dkq3d4QHHbABMdH6mZqhqXkwQi1M4dBDs3Oyu/DzO2zgV/xTo+3Ud+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pNwUFcnYRt7e6W2yAeCzksT/E92MClYfgw9om7Vu7Ew=;
- b=SlwvasPPVCKcOA3xB2FE8e4fa1ehiZAVZJdPBEltjJxQpQGq2j9mShm4EQKRMR4gwORRXrZlzAKTlhzNO8aPae/+wQ/nPkwLUueoCgo6Pbcl9X+4QpHSfYsIClVorXGNkeVCWk0vf/4So+AAxUSwuV+oNpHjuZMFvuExoWTuBkLd/AIS8MHQs+zkci0G7ZvCBMShr4WuY2XjD7atsfLK+rfS6sa9xCjmVtHCraiI35q18t8Hq/ETVH4EmDBa7IkO7z043+HZwNBoL29kQBlEiX2RzJcJvg82JoBiQvTPMp3I8+YZUgww+sIkotWkwqerJiSckf5bS7loE+SonDCREg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pNwUFcnYRt7e6W2yAeCzksT/E92MClYfgw9om7Vu7Ew=;
- b=ToMOonDpASFRsGlBMKbVk+UJGKO5WhqeJ0NAMxUFqOs8b9SaMabq5Y33b7j0Wj4NH+YAAY++mGw75powBA/DZW5IkJbvc3mbaZ02PO8icb7LfW09H0yN9UeUwKFImdYM7lUcoSJbZEtTecfDQEXa0QuS2gB7S1Z3uQ6ZcTwHcZs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by LV3PR13MB6359.namprd13.prod.outlook.com (2603:10b6:408:19e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.17; Wed, 17 May
- 2023 09:29:19 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::f416:544d:18b7:bb34]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::f416:544d:18b7:bb34%5]) with mapi id 15.20.6387.033; Wed, 17 May 2023
- 09:29:19 +0000
-Date:   Wed, 17 May 2023 11:29:12 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-        pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH net] MAINTAINERS: skip CCing netdev for Bluetooth patches
-Message-ID: <ZGSeaLMRsi8abq+B@corigine.com>
-References: <20230517014253.1233333-1-kuba@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230517014253.1233333-1-kuba@kernel.org>
-X-ClientProxiedBy: AM4P190CA0012.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:200:56::22) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        Wed, 17 May 2023 06:44:46 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B7097;
+        Wed, 17 May 2023 03:44:44 -0700 (PDT)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34H96Cq4010037;
+        Wed, 17 May 2023 10:44:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=bFnCwGczl3OS9F2aTvxsraVLaxiRaaqktdcvI5Dvz6k=;
+ b=IaiQAFS5WVtG8L5SpXbnC8Wo/6e5vo7FHIYRlyY3Q7X8W20+thJwUAzdUrso5+GRUR3J
+ g3sHywdbIctw1wU+zDcxCvm+6hdxpBTlek/yZazsQfvIANa0E+gbFNZg99e1ALLXIpyQ
+ p9cTe/GuDka7Nl2JkHhypNlWUdq6DJrJWsGgDY495gJjgpJTbtZg4ypZhFDd5mgZUJP5
+ SiAa5Xqxvj3pw81yDaSvh4d3Y9npc9B0dKJv0uT4dNpVyA9wkbQ+DR3cKo2UZz1Te+Lz
+ MltSbsBCx/CvxrRuljeapwbS3zUg//mUwwxKtAuRizXXtHS73XiO3km7/9uQcFeJ6kLJ bg== 
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3qme0m9smd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 May 2023 10:44:40 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 34HAidNJ017404
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 17 May 2023 10:44:39 GMT
+Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Wed, 17 May 2023 03:44:37 -0700
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+To:     <marcel@holtmann.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_tjiang@quicinc.com>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>,
+        <mka@chromium.org>
+Subject: [PATCH v4] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+Date:   Wed, 17 May 2023 18:44:26 +0800
+Message-ID: <20230517104426.14055-1-quic_tjiang@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|LV3PR13MB6359:EE_
-X-MS-Office365-Filtering-Correlation-Id: dff9425c-bd4b-4109-2611-08db56b930a6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: d8K2G4x8Te+mGSfOy7GUMQYvJKTdhdd5VPSsP18BsL6SHnZa27OHAQfux8gT7nkGZrXiCYhIZVzRfyiug38ypffP9/aWkHgwVxNuL4HvjbyMLhV7UxUesvgooWIN/erq9QAeEXmx1VL/ESWT8ZxTxoa8SafD/CznepNtI4TGRhTP9IW26ScnT2nMQWnaZi7mKzSgKLuGPoj90DvXkHn1+3BZ0gvX8ysagBCMxpW6S8EPyTnllrxCKMwCAkbKhhpQGsz0dteIrphpbJGZI6dp0nyAcpVhaEDb8b+KM11GP8IlWrKJNGfkRjG11CtFYmKhafpCIbHK+ay+jYKKJPTvzKcu0GbNoRRJAIMYdDko5TGWnEUA9nmxIDXuKrcs8lvGBppL0dPZ5nhEjWvyDGnsKDi7yFTdS35vEvrqKL+N6fnZLKcGPAUFP1Dru/vu9UbPzH0wZp3GRVmetrQ3w9TVp6rgyeGOQxCUKgfgDrc8RGgjQtkEEdrvR0q+p1BwBKq0Sms1JUMVeeNcTvAoXTYWD8G9MLCt6dRe3pyG0ct3vCVFDvNkPzPK8FlwdqPcEZVLBtKsJp1kg2j8XprAHmMCRajnnwtNnTTdZBS6AwdAGQ8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(366004)(39840400004)(376002)(346002)(451199021)(86362001)(36756003)(66946007)(66556008)(66476007)(6916009)(4326008)(316002)(966005)(478600001)(6486002)(6666004)(8936002)(8676002)(5660300002)(41300700001)(4744005)(2906002)(44832011)(38100700002)(2616005)(6506007)(6512007)(186003)(83380400001)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TiYWTMlLP4SAqZtUP4F/5UL70Oh9iyTA9f8HKJNTeaf4br5/nj4X60utaJsQ?=
- =?us-ascii?Q?2rzi2pcl1y2gZRgEEQ6mqPvEku2fJSzjjzgReGnwwXoyjfsWBCfDal0ZOGfd?=
- =?us-ascii?Q?v1pXU0D+XQNnxNqRRTSlNP1xDde8FV59TjM+Gj8C4VRaoMK6LJ8MepT3k829?=
- =?us-ascii?Q?qarhGJStwRPSMYbTugSrnFc4DNjp7t9PAXxkuaHx6YbehDxkmlh9jdBOeJJF?=
- =?us-ascii?Q?w0MDzuZPsEwEyQDKKRHejNGG/yh3cB7Rse9TfuVMM6LnIGlzLskZBLi30hTN?=
- =?us-ascii?Q?Cfio2xGdv0EXNRjAic/r2xKgNHd8N4S6U0J6vnm071ksPxKhFtfTg1UJxApG?=
- =?us-ascii?Q?KmE88pHHPCYXcUW1NBNmalXAzNwAZfk2hZlYJFTW2KJKCHnIpWLN40FnimF1?=
- =?us-ascii?Q?dL7tH7xaCXziD2b6tF3Hr/OknFyM+Q1vaJ2VqcIYCF6n9IjTmbk79iTSV7Dp?=
- =?us-ascii?Q?aAbtX77QKnmKOzebl+DG7lFzXUNM2wlju9MRw339k0md8Yxcd8O3QBZc1xCW?=
- =?us-ascii?Q?YpFheOdsXnRTMHDydCvfuIFXZshDAe8Y8RzUKeUtW0bNJ2YDevyxS3HLmzKx?=
- =?us-ascii?Q?pAETxIrA+R9R7i6PoSDKIzJNsM7lVgiSJ2bmbzgVa01avo3ciz4ocbJo+oE1?=
- =?us-ascii?Q?d70aTG0OYfBYcd8y79Bz2Xg6CiuHmaJamhvbVFqAPVpbRNDVRyDYF665Da5p?=
- =?us-ascii?Q?W9sA8bp4Mo0GuwX+oAYCCu7aE9juOYnV0C1WqazpS4h0QR2CFYJB5gICQ5pg?=
- =?us-ascii?Q?jGBbcQoI7O7QE+V9JuG6PkpCX6POTKmOZilHPftyVmsaBGFOXtfnjo+iPKL9?=
- =?us-ascii?Q?FpyCzU9T6RCYrTESFPkYQVV/+F0IjJHj2vMI13zhbqI1brQqDLYAHhNYRnwj?=
- =?us-ascii?Q?W39PDUmJnlMY6/CQ1sLZNW/l/gIVHKhZRg80mUiHvtZGRgrS8SZexHEKORQK?=
- =?us-ascii?Q?3xXhJqvDy9bInA1PziYSqYJHIqgNf2IC8R3NbjfJYdPxBeSva6rmYrIUSEIS?=
- =?us-ascii?Q?tdD98/gbCiPFdGXnI5oXHHzIgDTisOiXzNg/UCPMg850kJh26E/5sM2juu6u?=
- =?us-ascii?Q?bH31AkiidbbTqwireM6SyvD5RYdTbHRpVlnhEnpFD4pkMq1/e0grcu8VFIiU?=
- =?us-ascii?Q?ydY3/34u7rtCFCVYetM0IbtamPKdAwP4RzSF13oNKjD4Lfh0SyR931R05vks?=
- =?us-ascii?Q?MD1mJMnFS9BjyHdrDwEzIQfKaJcjWMMM1z3oiBmuoNi22aYs70lfEVnZM6f6?=
- =?us-ascii?Q?V4PhdqnxFzYrAQDtwu8nVAdrGrcHJzW7obnL9P14hoTEd9c+QkQEEi3E85dF?=
- =?us-ascii?Q?YgtmEoNR7dC4K54bZgyLLKiPVz2AqqlVN9UOJm6mL3fG6AnHdLCS/Kq+/pn4?=
- =?us-ascii?Q?GpRKImSOUt6X3mNI8o4Uc34eNYt86YkPSSNLXaTCUHWmyYKHVy6LFdhurMhW?=
- =?us-ascii?Q?ZUBhFA4dywmKDeBKmUCng9lja1kmfvmCpWgMi4rBGIU83BmsXLkDGSTppomZ?=
- =?us-ascii?Q?e7twbrbPugX50q6g5+BkEWcDPLRJYbRjQcPg3x4tJkWGVMBY1I033OxpZJKY?=
- =?us-ascii?Q?kDgB3ewXVwdvFDoSVI7FV+4xyNPl3AY0Znh0ZLaTEJfc6RDlQkZkDbvKQqYx?=
- =?us-ascii?Q?r4wR6+4IYrbFQjxHX48DRIrpHL062YW/67Spp2CeHMnmDI3ugE+ZtLhw2MBO?=
- =?us-ascii?Q?PuaQ1g=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dff9425c-bd4b-4109-2611-08db56b930a6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2023 09:29:18.9839
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: prE0HDxkep51DhhQT00f2mHPV9lfaHmEXrQ2LAAhtW7oiAS4HzyQ3Qg/G3vSd2eFI2N+08Kp0rLUApFSm5FVJP8U6hqsHYn06dB2bb+JDLM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR13MB6359
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: BAI6Bd6tcv-bgQq4KRgoXT3dOAmqXYVZ
+X-Proofpoint-ORIG-GUID: BAI6Bd6tcv-bgQq4KRgoXT3dOAmqXYVZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-17_02,2023-05-16_01,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0
+ spamscore=0 adultscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305170087
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, May 16, 2023 at 06:42:53PM -0700, Jakub Kicinski wrote:
-> As requested by Marcel skip netdev for Bluetooth patches.
-> Bluetooth has its own mailing list and overloading netdev
-> leads to fewer people reading it.
-> 
-> Link: https://lore.kernel.org/netdev/639C8EA4-1F6E-42BE-8F04-E4A753A6EFFC@holtmann.org/
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+This patch adds support for QCA2066 firmware patch and nvm downloading.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+---
+ drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btqca.h   |  4 ++
+ drivers/bluetooth/hci_qca.c |  8 +++-
+ 3 files changed, 86 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index fd0941fe8608..9bb0ba6fe00d 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -205,6 +205,48 @@ static int qca_send_reset(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid)
++{
++	u8 cmd;
++	struct sk_buff *skb;
++	struct edl_event_hdr *edl;
++	int err = 0;
++	int bid_len;
++
++	bt_dev_dbg(hdev, "QCA read board ID");
++
++	cmd = EDL_GET_BID_REQ_CMD;
++	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
++				&cmd, 0, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Reading QCA board ID failed (%d)", err);
++		return err;
++	}
++
++	edl = skb_pull_data(skb, sizeof(*edl));
++	if (!edl) {
++		bt_dev_err(hdev, "QCA read board ID with no header");
++		err = -EILSEQ;
++		goto out;
++	}
++
++	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++	    edl->rtype != EDL_GET_BID_REQ_CMD) {
++		bt_dev_err(hdev, "QCA Wrong packet: %d %d", edl->cresp, edl->rtype);
++		err = -EIO;
++		goto out;
++	}
++
++	bid_len = edl->data[0];
++	*bid = (edl->data[1] << 8) + edl->data[2];
++	bt_dev_info(hdev, "%s: bid len = %x, bid = %x", __func__, bid_len, *bid);
++
++out:
++	kfree_skb(skb);
++	return err;
++}
++
+ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -574,6 +616,29 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
++static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
++		   size_t max_size, struct qca_btsoc_version ver, u16 bid)
++{
++	u8 rom_ver = 0;
++	u32 soc_ver;
++	const char *variant;
++
++	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
++	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
++
++	if ((ver.soc_id & 0x0000ff00) == QCA_HSP_GF_SOC_ID)  /* hsp gf chip */
++		variant = "g";
++	else
++		variant = "";
++
++	if (bid == 0x0)
++		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
++	else
++		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
++
++	bt_dev_info(hdev, "%s: nvm name is %s", __func__, fwname);
++}
++
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+ 		   const char *firmware_name)
+@@ -582,6 +647,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	int err;
+ 	u8 rom_ver = 0;
+ 	u32 soc_ver;
++	u16 boardid = 0;
+ 
+ 	bt_dev_dbg(hdev, "QCA setup on UART");
+ 
+@@ -604,6 +670,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	if (qca_is_wcn399x(soc_type)) {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crbtfw%02x.tlv", rom_ver);
++	} else if (soc_type == QCA_QCA2066) {
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/hpbtfw%02x.tlv", rom_ver);
+ 	} else if (soc_type == QCA_QCA6390) {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htbtfw%02x.tlv", rom_ver);
+@@ -631,6 +700,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	/* Give the controller some time to get ready to receive the NVM */
+ 	msleep(10);
+ 
++	if (soc_type == QCA_QCA2066)
++		qca_read_fw_board_id(hdev, &boardid);
++
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+ 	if (firmware_name)
+@@ -644,7 +716,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 			snprintf(config.fwname, sizeof(config.fwname),
+ 				 "qca/crnv%02x.bin", rom_ver);
+ 		}
+-	}
++	} else if (soc_type == QCA_QCA2066)
++		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname),
++				ver, boardid);
+ 	else if (soc_type == QCA_QCA6390)
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htnv%02x.bin", rom_ver);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index b884095bcd9d..7c9b3464ae4a 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -13,6 +13,7 @@
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+ #define EDL_GET_BUILD_INFO_CMD		(0x20)
+ #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
++#define EDL_GET_BID_REQ_CMD		(0x23)
+ #define EDL_PATCH_CONFIG_CMD		(0x28)
+ #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+ #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+@@ -48,6 +49,8 @@
+ 
+ #define QCA_FW_BUILD_VER_LEN		255
+ 
++#define QCA_HSP_GF_SOC_ID		0x1200
++
+ 
+ enum qca_baudrate {
+ 	QCA_BAUDRATE_115200 	= 0,
+@@ -145,6 +148,7 @@ enum qca_btsoc_type {
+ 	QCA_WCN3990,
+ 	QCA_WCN3998,
+ 	QCA_WCN3991,
++	QCA_QCA2066,
+ 	QCA_QCA6390,
+ 	QCA_WCN6750,
+ 	QCA_WCN6855,
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1b064504b388..c7b8e1c630b4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1729,7 +1729,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	bt_dev_info(hdev, "setting up %s",
+ 		qca_is_wcn399x(soc_type) ? "wcn399x" :
+ 		(soc_type == QCA_WCN6750) ? "wcn6750" :
+-		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
++		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390/QCA2066");
+ 
+ 	qca->memdump_state = QCA_MEMDUMP_IDLE;
+ 
+@@ -1874,6 +1874,11 @@ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
+ 	.num_vregs = 0,
+ };
+ 
++static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
++	.soc_type = QCA_QCA2066,
++	.num_vregs = 0,
++};
++
+ static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
+ 	.soc_type = QCA_WCN6750,
+ 	.vregs = (struct qca_vreg []) {
+@@ -2364,6 +2369,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
+ 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+ 	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
+ 	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
++	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+-- 
+2.17.1
 
