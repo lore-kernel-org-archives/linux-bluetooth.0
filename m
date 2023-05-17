@@ -2,257 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C37BC77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 22:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483E8C77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 23:09:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229733AbjEQWFu convert rfc822-to-8bit (ORCPT
+        id S229744AbjEQXJk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 May 2023 18:05:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54944 "EHLO
+        Wed, 17 May 2023 19:09:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229673AbjEQWFu (ORCPT
+        with ESMTP id S229558AbjEQXJj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 May 2023 18:05:50 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824D446AD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 15:05:46 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 81BC924002B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 May 2023 00:05:39 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QM6cM0gg6z9rxG;
-        Thu, 18 May 2023 00:05:39 +0200 (CEST)
-Message-ID: <e70afeae8f6351243a0534de186b40064a46278b.camel@iki.fi>
-Subject: Re: [BlueZ,v3,1/2] test-runner: revert udevd and audio support
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Wed, 17 May 2023 22:05:38 +0000
-In-Reply-To: <CABBYNZKzCYtNzaDXr3yqaTMsi=7jho9HvSpGGWDtFF53aD0XYw@mail.gmail.com>
-References: <fcd0cc37474487489e2567f3de7d90f1b62d9613.1683994090.git.pav@iki.fi>
-         <645fc6ce.630a0220.1799b.9542@mx.google.com>
-         <CABBYNZLUQOQ-gTdCAeUNknEkgQenmVQhahrog+8CL4y87PZKBg@mail.gmail.com>
-         <87eda7c7bdb8479f6233b6709e5c21de0535fdfc.camel@iki.fi>
-         <CABBYNZKu7pPE0EddZyzv1mbEW0nePOzf_dawkDJ-e6+ReJvS-A@mail.gmail.com>
-         <25523ad612ce4491281743bc8d5a6ccf7673aa76.camel@iki.fi>
-         <CABBYNZJQQQMMbhZBO_4hkvrJwStqTfVjqQ8uphs7acMPGevtyQ@mail.gmail.com>
-         <8991642e1279b0d7548482a6102e5c75306d6009.camel@iki.fi>
-         <CABBYNZJvBY9_kzdoLOkOJEFO32h5k5DeAuY4tWC_SdPr4umvug@mail.gmail.com>
-         <17725c9488b0d5eb5e39404bcff873d58a1e3edb.camel@iki.fi>
-         <CABBYNZKzCYtNzaDXr3yqaTMsi=7jho9HvSpGGWDtFF53aD0XYw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Wed, 17 May 2023 19:09:39 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DC161A4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 16:09:18 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id e9e14a558f8ab-334d7bb7155so3779405ab.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 16:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684364958; x=1686956958;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PwYVaWlbiGqf3/jq+HQARwafBGFuoD1T723fscQ89jg=;
+        b=N8i7DVLmgmXtdw8y7Wa9xXLBvoDz8fkLAGiywV+ZErfZhOBZGAvXVW/9CWLqQf1pew
+         bgv6/XIQ+t/a1B6N6jjSvcfXgCjuyWaZHXhRYoRdqQptoz1vUSqeDmsfBGUW7TyloiLT
+         XK2sK15TYsj8kmKW63Js0m0sNfAOOgXiETWq8if56zowcZq2SdJ0VA+yl7noCn6ZDwL3
+         oceDqRovasjF1qwFglpFNBdxy1iSg8A0Rh51M/5VdguwjsPirL8LwgMo4ZwChTcteRDy
+         qGRYJbEgqQuzU1KbsG72zR1FcM3LTlU1EZV+kCcLR7MLQBLnEiiWQsCTHc6gJuUg3yzj
+         DgGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684364958; x=1686956958;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PwYVaWlbiGqf3/jq+HQARwafBGFuoD1T723fscQ89jg=;
+        b=XFX5D7aXXYPLAfSUt9FCR9762HCY0fvVlp4sC9zRpUy2vsHC/xgrqcVaHW9cwG6OIs
+         hzCCUbZZ1hl+P04utreikwjZcJW7G95xqiNkoDu7HbvsZPfwcF6uRZd2kz8SuegFVyx+
+         6CR5sPk0r9vgAfXjTyZSYl9omPqpj6zhCYYUhcK1OKswKq3kF4dZue0kG/DoR+w1fc98
+         +EZGEvJ/psYGOO+zRqnzWqyL1fZj+x8Vr9YPJa+nLve7do5zKl9Hi2lt21x1KX/pFO7O
+         AYc0TYFMQMdWrFQWA+pIziQlBx7u7tBaoNVuYRXOr+ThWBStV8wNLHl+T6GBNOEGwofp
+         BrqQ==
+X-Gm-Message-State: AC+VfDxYAQ8J6n062c2X/CUK/MFBiePGoCY7mH3LB98e7szAqZDqkQBL
+        +MY6o0t9fguU0aRSC3UgpGJ5c7sU/xE=
+X-Google-Smtp-Source: ACHHUZ6GPzuhqu/s3oU+klYbhbhi5Rh8ueJmCsND+YppyUYdECN8sSLv/F2Du8H9elsW+Bn9I/74fQ==
+X-Received: by 2002:a92:d242:0:b0:334:7263:6283 with SMTP id v2-20020a92d242000000b0033472636283mr2887743ilg.14.1684364957855;
+        Wed, 17 May 2023 16:09:17 -0700 (PDT)
+Received: from [172.17.0.2] ([40.77.92.210])
+        by smtp.gmail.com with ESMTPSA id b8-20020a920b08000000b0033842c3f6b4sm413906ilf.83.2023.05.17.16.09.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 May 2023 16:09:17 -0700 (PDT)
+Message-ID: <64655e9d.920a0220.309d7.08f6@mx.google.com>
+Date:   Wed, 17 May 2023 16:09:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8597806994343513789=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] monitor: Fix using PACKET_FILTER_SHOW_SCO_DATA for ISO packets
+In-Reply-To: <20230517215852.1395512-1-luiz.dentz@gmail.com>
+References: <20230517215852.1395512-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============8597806994343513789==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ke, 2023-05-17 kello 14:50 -0700, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
-> 
-> On Wed, May 17, 2023 at 2:43 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > 
-> > ke, 2023-05-17 kello 14:25 -0700, Luiz Augusto von Dentz kirjoitti:
-> > > Hi Pauli,
-> > > 
-> > > On Wed, May 17, 2023 at 2:16 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > > > 
-> > > > Hi Luiz,
-> > > > 
-> > > > ke, 2023-05-17 kello 13:53 -0700, Luiz Augusto von Dentz kirjoitti:
-> > > > > Hi Pauli,
-> > > > > 
-> > > > > On Wed, May 17, 2023 at 1:30 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > > > > > 
-> > > > > > Hi Luiz,
-> > > > > > 
-> > > > > > ke, 2023-05-17 kello 12:34 -0700, Luiz Augusto von Dentz kirjoitti:
-> > > > > > > Hi Pauli,
-> > > > > > > 
-> > > > > > > On Mon, May 15, 2023 at 1:30 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > > > > > > > 
-> > > > > > > > Hi Luiz,
-> > > > > > > > 
-> > > > > > > > ma, 2023-05-15 kello 13:01 -0700, Luiz Augusto von Dentz kirjoitti:
-> > > > > > > > > Hi Pauli,
-> > > > > > > > > 
-> > > > > > > > > On Sat, May 13, 2023 at 10:41 AM <bluez.test.bot@gmail.com> wrote:
-> > > > > > > > > > 
-> > > > > > > > > > This is automated email and please do not reply to this email!
-> > > > > > > > > > 
-> > > > > > > > > > Dear submitter,
-> > > > > > > > > > 
-> > > > > > > > > > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > > > > > > > > > This is a CI test results with your patch series:
-> > > > > > > > > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=747273
-> > > > > > > > > > 
-> > > > > > > > > > ---Test result---
-> > > > > > > > > > 
-> > > > > > > > > > Test Summary:
-> > > > > > > > > > CheckPatch                    FAIL      1.14 seconds
-> > > > > > > > > > GitLint                       PASS      0.52 seconds
-> > > > > > > > > > BuildEll                      PASS      26.21 seconds
-> > > > > > > > > > BluezMake                     PASS      745.32 seconds
-> > > > > > > > > > MakeCheck                     PASS      11.04 seconds
-> > > > > > > > > > MakeDistcheck                 PASS      151.18 seconds
-> > > > > > > > > > CheckValgrind                 PASS      243.86 seconds
-> > > > > > > > > > CheckSmatch                   PASS      326.99 seconds
-> > > > > > > > > > bluezmakeextell               PASS      98.83 seconds
-> > > > > > > > > > IncrementalBuild              PASS      1262.88 seconds
-> > > > > > > > > > ScanBuild                     WARNING   964.73 seconds
-> > > > > > > > > > 
-> > > > > > > > > > Details
-> > > > > > > > > > ##############################
-> > > > > > > > > > Test: CheckPatch - FAIL
-> > > > > > > > > > Desc: Run checkpatch.pl script
-> > > > > > > > > > Output:
-> > > > > > > > > > [BlueZ,v3,1/2] test-runner: revert udevd and audio support
-> > > > > > > > > > WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '91a48af52efb0751fab396b2b9026c9186b10b88', maybe rebased or not pulled?
-> > > > > > > > > > #49:
-> > > > > > > > > > This reverts commit 91a48af52efb0751fab396b2b9026c9186b10b88
-> > > > > > > > > > 
-> > > > > > > > > > WARNING:UNKNOWN_COMMIT_ID: Unknown commit id 'e20e7e0b05c7edb74255c9b092916ac5bb99c97f', maybe rebased or not pulled?
-> > > > > > > > > > #50:
-> > > > > > > > > > This reverts commit e20e7e0b05c7edb74255c9b092916ac5bb99c97f
-> > > > > > > > > > 
-> > > > > > > > > > /github/workspace/src/src/13240258.patch total: 0 errors, 2 warnings, 193 lines checked
-> > > > > > > > > > 
-> > > > > > > > > > NOTE: For some of the reported defects, checkpatch may be able to
-> > > > > > > > > >       mechanically convert to the typical style using --fix or --fix-inplace.
-> > > > > > > > > > 
-> > > > > > > > > > /github/workspace/src/src/13240258.patch has style problems, please review.
-> > > > > > > > > > 
-> > > > > > > > > > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> > > > > > > > > > 
-> > > > > > > > > > NOTE: If any of the errors are false positives, please report
-> > > > > > > > > >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> > > > > > > > > > 
-> > > > > > > > > > 
-> > > > > > > > > > ##############################
-> > > > > > > > > > Test: ScanBuild - WARNING
-> > > > > > > > > > Desc: Run Scan Build
-> > > > > > > > > > Output:
-> > > > > > > > > > tools/test-runner.c:924:2: warning: 2nd function call argument is an uninitialized value
-> > > > > > > > > >         printf("Running command %s\n", cmdname ? cmdname : argv[0]);
-> > > > > > > > > >         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > > > > > > > > > 1 warning generated.
-> > > > > > > > > > 
-> > > > > > > > > > 
-> > > > > > > > > > 
-> > > > > > > > > > ---
-> > > > > > > > > > Regards,
-> > > > > > > > > > Linux Bluetooth
-> > > > > > > > > 
-> > > > > > > > > I tried running on fedora but it looks like something is missing in my setup:
-> > > > > > > > > 
-> > > > > > > > > [E][00003.767959] spa.dbus     | [          dbus.c:  329
-> > > > > > > > > impl_connection_get()] Failed to connect to session bus: Unable to
-> > > > > > > > > autolaun1
-> > > > > > > > > [E][00003.769967] mod.portal   | [ module-portal.c:  326
-> > > > > > > > > pipewire__module_init()] Failed to connect to session bus:
-> > > > > > > > > Input/output error
-> > > > > > > > 
-> > > > > > > > I have those two "errors" too, they should be harmless as the xdg-
-> > > > > > > > desktop-portal module is optional. With `test-runner -d -l -A` you
-> > > > > > > > should get the Bluetooth endpoints to appear.
-> > > > > > > > 
-> > > > > > > > Removing the mod.portal from the configuration can't be done with drop-
-> > > > > > > > in config files currently, and I didn't want to include a full config
-> > > > > > > > file here as it has some tens of lines of mandatory boilerplate.
-> > > > > > > 
-> > > > > > > Ok, looks like it configuring the endpoints:
-> > > > > > > 
-> > > > > > > https://gist.github.com/Vudentz/0d8851e719affd9f2dc1f4081ce32fb7
-> > > > > > > 
-> > > > > > > That said I probably need to compile pipewire from source in order to
-> > > > > > > have the LE Audio endpoints registered, btw do you have any
-> > > > > > > instructions on how to build it, do I need to build wireplumber as
-> > > > > > > well?
-> > > > > > 
-> > > > > > Should be along these lines to install under $PWD/install and enable
-> > > > > > BAP parts:
-> > > > > > 
-> > > > > > git clone https://gitlab.freedesktop.org/pipewire/pipewire.git
-> > > > > > cd pipewire
-> > > > > > LDFLAGS="-Wl,-rpath=$PWD/install/lib64" \
-> > > > > >    meson setup builddir --prefix=$PWD/install \
-> > > > > >        -Dsystemd-user-service=disabled \
-> > > > > >        -Dudevrulesdir=$PWD/install/lib/udev/rules.d \
-> > > > > >        -Dbluez5-codec-lc3=enabled
-> > > > > > meson install -C builddir
-> > > > > > 
-> > > > > > Meson will clone and install Wireplumber too. Turning experimental on
-> > > > > > in src/main.conf and it should give
-> > > > > > 
-> > > > > > $ ./tools/test-runner -d -l --audio=/home/pauli/tmp/pipewire/install/bin/pipewire -k../linux/arch/x86_64/boot/bzImage sleep 5
-> > > > > > ...
-> > > > > > bluetoothd[29]: profiles/audio/media.c:endpoint_init_pac() PAC :1.1:/MediaEndpointLE/BAPSource/lc3 registered
-> > > > > > bluetoothd[29]: Endpoint registered: sender=:1.1 path=/MediaEndpointLE/BAPSource/lc3
-> > > > > > bluetoothd[29]: profiles/audio/media.c:client_ready_cb() Media application registered: :1.1:/MediaEndpointLE
-> > > > > > ...
-> > > > > 
-> > > > > Thanks, something is not quite right for me since I don't see any
-> > > > > objects on MediaEndpointLE:
-> > > > > 
-> > > > > https://gist.github.com/Vudentz/242e4e2bfb8907acfdfdf18b458eec1d
-> > > > 
-> > > > It gets "No object received" when trying to register the BAP
-> > > > application, so probably the LC3 codec is missing somehow.
-> > > > 
-> > > > meson setup should have reported
-> > > > "Bluetooth audio codecs ... LC3 : YES".
-> > > 
-> > > Yep, that shows as enabled.
-> > > 
-> > > > `ldd install/bin/pipewire` should link to libpipewire-0.3.so.0 under
-> > > > the install/ prefix and not to system lib. If not, the rpath in
-> > > > compilation accordingly should be adjusted accordingly, or set
-> > > > LD_LIBRARY_PATH there.
-> > > 
-> > > libpipewire-0.3.so.0 =>
-> > > /home/vudentz/git/pipewire/install/lib64/libpipewire-0.3.so.0
-> > > (0x00007f3b8e947000)
-> > > 
-> > > > Also the codec plugin
-> > > > install/lib64/spa-0.2/bluez5/libspa-codec-bluez5-lc3.so should exist.
-> > > 
-> > > -rwxr-xr-x. 1 **** **** 166592 May 17 13:39
-> > > install/lib64/spa-0.2/bluez5/libspa-codec-bluez5-lc3.so
-> > 
-> > Does `ldd libspa-codec-bluez5-lc3.so` show it finds liblc3.so?
-> 
-> I guess we found the problem:
-> 
->     liblc3.so.1 => not found
-> 
-> > > Perhaps we need to enable more debugs for pipewire to sort this out?
-> > 
-> > ./tools/test-runner -d -l --audio=/home/pauli/tmp/pipewire/install/bin/pipewire -k../linux/arch/x86_64/boot/bzImage -- /bin/bash
-> > ... inside vm: ...
-> > pkill wireplumber
-> > export XDG_CONFIG_HOME=/run/conf
-> > export XDG_STATE_HOME=/run
-> > export XDG_RUNTIME_DIR=/run
-> > export WIREPLUMBER_DEBUG=4
-> > /home/pauli/tmp/pipewire/install/bin/wireplumber
-> > 
-> > should spit out what it tried to do.
-> 
-> Yep, here is the full trace:
-> 
-> https://gist.github.com/Vudentz/36f9acdc62b623c85e978883ea29c2d3
-> 
-> But I think the problem is with the linking of liblc3, are you running
-> with the latest from git? Perhaps I need to install it also in the
-> same path?
+This is automated email and please do not reply to this email!
 
-Copying liblc3.so* under install/lib64/ probably works since rpath is
-set there. Or maybe /usr/local if not.
+Dear submitter,
 
-I've been running on some older liblc3 git version, but current liblc3
-git 1.0.3 also works.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=748669
 
--- 
-Pauli Virtanen
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      26.47 seconds
+BluezMake                     PASS      791.91 seconds
+MakeCheck                     PASS      11.49 seconds
+MakeDistcheck                 PASS      155.08 seconds
+CheckValgrind                 PASS      247.47 seconds
+CheckSmatch                   WARNING   336.29 seconds
+bluezmakeextell               PASS      101.00 seconds
+IncrementalBuild              PASS      660.64 seconds
+ScanBuild                     PASS      1013.03 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1801:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3552:52: warning: array of flexible structuresmonitor/bt.h:3540:40: warning: array of flexible structures
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8597806994343513789==--
