@@ -2,138 +2,142 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49423C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 11:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7362C77B7F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 May 2023 12:28:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230175AbjEQLfF (ORCPT
+        id S231682AbjEQM2C (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 May 2023 07:35:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53604 "EHLO
+        Wed, 17 May 2023 08:28:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231453AbjEQLeu (ORCPT
+        with ESMTP id S231499AbjEQM2B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 May 2023 07:34:50 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4184B5246
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 04:34:43 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae4e49727eso7921455ad.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 04:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684323282; x=1686915282;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jawsv804WhTV39aoKEjkX2n0F8yFjViYz/3PMnHCvzo=;
-        b=PBx+P4SKez+pFE34/iDrXE0uTXYSyy5Ij3DT+hSnh3zM+ZdNK9zL9XiJp5uhJmccCK
-         1uq1n9YhfWI9rP9AFn+NKWTN4xsi70yhysBLlOws5eRLSUnQEjzkta7eTGBZKDXuMMZ8
-         CQ3tFDxfJ6MbNc2Qo1zqcl7tC8WYVsctRLE3e+l6EngnHhjxnO2bNkaE8UajLhWK9kbx
-         U7kgWqEInmppmrzvvkY34/+sbs+QEAo2LTrnqmNlFJ9a1Ga70ydF67G2DM1iqpl6drtP
-         tADSzlPGn4DP0iCsvbBNEXA4SFou4dj8VSQu0lPtJjWCe7EQwUBsuYYXYHcg6cExbbof
-         oUyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684323282; x=1686915282;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jawsv804WhTV39aoKEjkX2n0F8yFjViYz/3PMnHCvzo=;
-        b=e/fCDu7ptVCnSXrkg5r3ynjVrxDgU9R1LjMJtcMhW1f+w6kIpfUoM1tYArR//m49Hj
-         M52AR7plrZfkgHgXVmN18uSmE2ZvgbzbnzoN/suB/VhLL7XRIud3IzDhrJqQzm7yf/Q1
-         mgPsxIVfifi7c3N18vhYMLEaHYB0CQD0sZufsYSdweyTMj3kIBYEFukUJybHpRDzDmRc
-         +jehM6C2vaPtdAJbjCoivxHRjDJf5RmJaX8WIQwrrfSPQ51sCT9rQElTZEZ1OhMFuJcT
-         KpONWKu+002P6v5BMRPnovd3dGl1s77YR0ue6JxBF3WUp+Yus9Orp3MKdPQCYaeC0gWQ
-         XHgQ==
-X-Gm-Message-State: AC+VfDybTFJXuLjZD1H4jXNDGt/0H5ylw5CeKa29Kz88a6YDZbmDeWWp
-        Izad6zg32DXKwEwVhka/MVK3e++7qGk=
-X-Google-Smtp-Source: ACHHUZ7Xag3Nker2AUSfEbOPEaM+QWfU54RBSaa6FN4YfU6OMiJ5cmjvbVUc9hGtJYPlk+bjljpPfA==
-X-Received: by 2002:a17:902:db08:b0:1ad:e198:c4f2 with SMTP id m8-20020a170902db0800b001ade198c4f2mr23100566plx.18.1684323282241;
-        Wed, 17 May 2023 04:34:42 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.14.130])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170902728d00b001a217a7a11csm14282148pll.131.2023.05.17.04.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 May 2023 04:34:42 -0700 (PDT)
-Message-ID: <6464bbd2.170a0220.728d9.b2ae@mx.google.com>
-Date:   Wed, 17 May 2023 04:34:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7156402454557268547=="
+        Wed, 17 May 2023 08:28:01 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9733110;
+        Wed, 17 May 2023 05:27:59 -0700 (PDT)
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 93F7C61E4052B;
+        Wed, 17 May 2023 14:27:45 +0200 (CEST)
+Message-ID: <506df7b0-6ffb-c829-0c82-89a52f0b0892@molgen.mpg.de>
+Date:   Wed, 17 May 2023 14:27:45 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_tjiang@quicinc.com
-Subject: RE: [v4] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
-In-Reply-To: <20230517104426.14055-1-quic_tjiang@quicinc.com>
-References: <20230517104426.14055-1-quic_tjiang@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
+ SoC QCA2066
+To:     Tim Jiang <quic_tjiang@quicinc.com>
+Cc:     marcel@holtmann.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Hemant Gupta <quic_hemantg@quicinc.com>, mka@chromium.org
+References: <20230516104102.30775-1-quic_tjiang@quicinc.com>
+ <3ef9259f-f778-d18c-6fc6-97aab9e9f9fc@molgen.mpg.de>
+ <d3582e14e5204a7895ce34bcbf994533@quicinc.com>
+Content-Language: en-US
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <d3582e14e5204a7895ce34bcbf994533@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7156402454557268547==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=748375
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.56 seconds
-GitLint                       PASS      0.26 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      39.34 seconds
-CheckAllWarning               PASS      43.29 seconds
-CheckSparse                   WARNING   48.95 seconds
-CheckSmatch                   PASS      132.11 seconds
-BuildKernel32                 PASS      38.76 seconds
-TestRunnerSetup               PASS      542.27 seconds
-TestRunner_l2cap-tester       PASS      19.88 seconds
-TestRunner_iso-tester         PASS      25.41 seconds
-TestRunner_bnep-tester        PASS      6.78 seconds
-TestRunner_mgmt-tester        PASS      132.31 seconds
-TestRunner_rfcomm-tester      PASS      10.57 seconds
-TestRunner_sco-tester         PASS      9.79 seconds
-TestRunner_ioctl-tester       PASS      11.54 seconds
-TestRunner_mesh-tester        PASS      8.51 seconds
-TestRunner_smp-tester         PASS      9.73 seconds
-TestRunner_userchan-tester    PASS      7.21 seconds
-IncrementalBuild              PASS      36.58 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v4] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
-WARNING: DT compatible string "qcom,qca2066-bt" appears un-documented -- check ./Documentation/devicetree/bindings/
-#279: FILE: drivers/bluetooth/hci_qca.c:2372:
-+	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
-
-total: 0 errors, 1 warnings, 160 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13244615.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Dear Tim,
 
 
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-drivers/bluetooth/btqca.c:629:17: warning: restricted __le32 degrades to integerdrivers/bluetooth/btqca.c:712:24: warning: restricted __le32 degrades to integer
+Am 17.05.23 um 04:46 schrieb Tim Jiang (QUIC):
+> Paul :
+>    Thanks for comments, please see inline comments.
+
+Thank you for your reply. (It’d be great, if you used an email client, 
+that can properly quote/cite like Mozilla Thunderbird.)
+
+> -----Original Message-----
+> From: Paul Menzel <pmenzel@molgen.mpg.de>
+> Sent: Tuesday, May 16, 2023 7:00 PM
+
+> Am 16.05.23 um 12:41 schrieb Tim Jiang:
+>> This patch adds support for QCA2066 firmware patch and nvm downloading.
+> 
+> Could you please elaborate, what new features are needed for this as you add common functions?
+> 
+> Please document the datasheet.
+> [Tim] no new feature, only support new chip qca2066 btfw downloading
+
+As I wrote, you add common functions like `qca_read_fw_board_id()`, 
+which were not required before. So please elaborate in the commit message.
+
+>> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+>> ---
+>>    drivers/bluetooth/btqca.c   | 77 ++++++++++++++++++++++++++++++++++++-
+>>    drivers/bluetooth/btqca.h   |  4 ++
+>>    drivers/bluetooth/hci_qca.c |  8 +++-
+>>    3 files changed, 87 insertions(+), 2 deletions(-)
+
+[…]
+
+>> @@ -574,6 +616,30 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>>    }
+>>    EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>>    
+>> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
+>> +		   size_t max_size, struct qca_btsoc_version ver, u16 bid) {
+>> +	u8 rom_ver = 0;
+>> +	u32 soc_ver;
+> 
+> Any reason to fix the size of the variables?
+> [Tim] sorry , I does not got your point
+
+Why can’t you simply use `unsigned int` [1]?
+
+[…]
+
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 1b064504b388..ec24ce451568 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1729,7 +1729,7 @@ static int qca_setup(struct hci_uart *hu)
+>>    	bt_dev_info(hdev, "setting up %s",
+>>    		qca_is_wcn399x(soc_type) ? "wcn399x" :
+>>    		(soc_type == QCA_WCN6750) ? "wcn6750" :
+>> -		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
+>> +		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390/QCA2066");
+>>    
+>>    	qca->memdump_state = QCA_MEMDUMP_IDLE;
+>>    
+>> @@ -1874,6 +1874,11 @@ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
+>>    	.num_vregs = 0,
+>>    };
+>>    
+>> +static const struct qca_device_data qca_soc_data_qca2066 = {
+>> +	.soc_type = QCA_QCA2066,
+>> +	.num_vregs = 0,
+>> +};
+>> +
+>>    static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
+>>    	.soc_type = QCA_WCN6750,
+>>    	.vregs = (struct qca_vreg []) {
+>> @@ -2364,6 +2369,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
+>>    	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+>>    	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
+>>    	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
+>> +	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
+> 
+> Sort it?
+> [Tim] it have been sorted or please guide me how to sort it ?
+
+Sort it lexicographically, that means, q goes before w.
+
+>>    	{ /* sentinel */ }
+>>    };
+>>    MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
 
 
----
-Regards,
-Linux Bluetooth
+Kind regards,
 
-
---===============7156402454557268547==--
+Paul
