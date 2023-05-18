@@ -2,79 +2,93 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 650B2C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 May 2023 04:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 164CCC7EE24
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 May 2023 05:09:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbjEREkX (ORCPT
+        id S229733AbjERFIq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 May 2023 00:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42058 "EHLO
+        Thu, 18 May 2023 01:08:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbjEREkX (ORCPT
+        with ESMTP id S229513AbjERFIo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 May 2023 00:40:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CD319BE
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 May 2023 21:40:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 785BB64C90
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 May 2023 04:40:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C750DC4339B;
-        Thu, 18 May 2023 04:40:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684384820;
-        bh=30DU1b40Wi9wXb9CWIrXfwWRPOeiLWY8iwPRcD7STQU=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Bu+Jlqn8SbhFogYrpkW66DeDZ8Nmw20ywDp2dCT2xJAxCvQVmaeNXFWSUv0t+AHr1
-         6lVNCJUYy55nkza3FuhtFmkGIw4w1+VqJZ/pdTyH+nvjBlHpKSi4u2Pg9pKx+4hE5E
-         6EJk+qhmp1Lo+Fx6g6PPs6HmRW0E71K+w3yoe1unMaX8P0NNeJ5bTdSCL9r2xk0+Ap
-         4SMjaLnchkminAzCNmhxXQGrNTcWDq3NPA1YCbfaE7PaURL/krXauaLyeCvHsh4ckc
-         oWeFb3wI+AxxNJV+/mbOzCnFXNgX+Wiy1Kx1xxqMJgVKd78OlcdGW91CKntfyqFku8
-         UqLgKJx5dX2gQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AD353C32795;
-        Thu, 18 May 2023 04:40:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Thu, 18 May 2023 01:08:44 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A47A211F;
+        Wed, 17 May 2023 22:08:43 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34I4uOiV031976;
+        Thu, 18 May 2023 05:08:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=9vtheZfB7IIMmS9tiyhl518+OWedGvbAC+b5xNv4uc4=;
+ b=T4QjsQWUSywaR27Oh8b1RZC7p6+AX4P9QSQCdTVjJT7nEn0TCny2U2+xu2hx2QzhZQtm
+ Jo2xpdd4Z0gyBmW33vy8IUCTCqJgRVxk95SqqSW1ziMndm4dHqMecUd6qiXdxt2v7yrS
+ iyTWdCKrfaqmmd/I0C+u/9+qlKoGRlMz3bntBTXwMAGlfH80y5lClH8eCgW/bIqysdj3
+ mRj/rcNzKKqgGcH+Q3iYWac3LhI+0ap05itcA/AmsipPqRNQhawvyvQXPRacytLnPIEQ
+ 6bUN0fkPtLWgr1LJl+V2mgPCLrOY4gToYLB2xDGNy6ltklqrhE18rTmBOkgH+d93M1pY eg== 
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3qmrvhtqxd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 May 2023 05:08:39 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 34I58cDc012590
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 May 2023 05:08:38 GMT
+Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Wed, 17 May 2023 22:08:36 -0700
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+To:     <marcel@holtmann.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_tjiang@quicinc.com>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>,
+        <mka@chromium.org>
+Subject: [PATCH v1] dt-bindings: net: Add QCA2066 Bluetooth
+Date:   Thu, 18 May 2023 13:08:26 +0800
+Message-ID: <20230518050826.27316-1-quic_tjiang@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] MAINTAINERS: skip CCing netdev for Bluetooth patches
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <168438482070.9978.1095770654117083488.git-patchwork-notify@kernel.org>
-Date:   Thu, 18 May 2023 04:40:20 +0000
-References: <20230517014253.1233333-1-kuba@kernel.org>
-In-Reply-To: <20230517014253.1233333-1-kuba@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-        pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: sTBp-xdTOZuy107sw8oDAs0urpTi5PLo
+X-Proofpoint-GUID: sTBp-xdTOZuy107sw8oDAs0urpTi5PLo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.170.22
+ definitions=2023-05-18_03,2023-05-17_02,2023-02-09_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=964
+ impostorscore=0 adultscore=0 mlxscore=0 suspectscore=0 clxscore=1015
+ spamscore=0 bulkscore=0 priorityscore=1501 lowpriorityscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2304280000 definitions=main-2305180036
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Add bindings for the QCA2066 chipset.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+---
+ .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml    | 1 +
+ 1 file changed, 1 insertion(+)
 
-On Tue, 16 May 2023 18:42:53 -0700 you wrote:
-> As requested by Marcel skip netdev for Bluetooth patches.
-> Bluetooth has its own mailing list and overloading netdev
-> leads to fewer people reading it.
-> 
-> Link: https://lore.kernel.org/netdev/639C8EA4-1F6E-42BE-8F04-E4A753A6EFFC@holtmann.org/
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] MAINTAINERS: skip CCing netdev for Bluetooth patches
-    https://git.kernel.org/netdev/net/c/bfa00d8f98f7
-
-You are awesome, thank you!
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 68f78b90d23a..f51b0e8ad086 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -16,6 +16,7 @@ description:
+ properties:
+   compatible:
+     enum:
++      - qcom,qca2066-bt
+       - qcom,qca6174-bt
+       - qcom,qca9377-bt
+       - qcom,wcn3990-bt
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.17.1
 
