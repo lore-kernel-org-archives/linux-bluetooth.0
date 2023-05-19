@@ -2,110 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48536C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 May 2023 21:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11518C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 May 2023 21:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbjESVba (ORCPT
+        id S229912AbjESVoQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 May 2023 17:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55402 "EHLO
+        Fri, 19 May 2023 17:44:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229503AbjESVb3 (ORCPT
+        with ESMTP id S229508AbjESVoP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 May 2023 17:31:29 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD6D9F2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 May 2023 14:31:28 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-3f38b7ca98aso33359081cf.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 May 2023 14:31:28 -0700 (PDT)
+        Fri, 19 May 2023 17:44:15 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B0BB4;
+        Fri, 19 May 2023 14:44:14 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-64d341bdedcso839840b3a.3;
+        Fri, 19 May 2023 14:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684531887; x=1687123887;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8A+3uLOtTIxl9vbat4z4eFbaq5x1fRBSqcOJtGv5Si0=;
-        b=XGOeoYTMKyvwjZd0nEc2Tx5I6BdzlIUZdmFV/nrlvoiWgum1DkGd/ELb0jOeWATxPW
-         /IFfKwFQrPZG6euOE4S/BR3BfamGwBgS4UeiMp7wuP0fszh4pO9NjREvsiGCm624nxr8
-         kigT1KqpHT1oolpaK1VKGXyUUS952pVhiF65ZbqM5ZVjcAvkpU9wlsADwwrFuTd6g2FK
-         SU6jnzoNCJpXYvcbLMVVMHTQpC1cl3sKKMii62Uo6SyR6d+97FrJ//hg/gy9DfNKgdMF
-         3BJSyDPq+yc2s+gW7FjkNHaH7lveInZjpqqZ1daLaAyEVXsFJbg738gBsee+rdLWeRpi
-         VBdQ==
+        d=gmail.com; s=20221208; t=1684532654; x=1687124654;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8+YI3oWErqNGQDBE42kFbzwZJwN9CxeeSi1fS965dfk=;
+        b=rAUzIwBGnAq2HbC9AkeTZ/QzT7LAhUHStbdYTu29WP+9B4KMekZ/Reh1WAwJNyCoXm
+         HKQZhImu4kOfk/lFFf8vfU5QD7A6EtXMQ9sy8me3HunVPYoadbpF6DFi6FjuJxPA7prR
+         qAmxOWivMtR3iFZwT0vdk7vIIcc2Mn7TLLjNNd224i0W3o6db5iKf9vpqwKFB0VNGEj1
+         C0H+KeD6HfaaZJeeQY2T6n11NGd1hxin9/2BvHOesEFb4w4zYsjIx8kNkxaCWjMw0iEt
+         lowiAYC6PnZFMhmDJc0XaB52LyK3v9hMZmG5ZReVM882Zr57OFXWCGGWG0qgE9QKBhZ2
+         BNxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684531887; x=1687123887;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1684532654; x=1687124654;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8A+3uLOtTIxl9vbat4z4eFbaq5x1fRBSqcOJtGv5Si0=;
-        b=daUbNU4kkE7swmxlKCmTsruqCDoWb3GxLlMKNghSeeb4lmG6nhjeuNzHW0iBfweDby
-         ZILJtbMTFCRhuYw3AAO7HwyYf92nvQWMa743v75VKS82MXDQtna36d2zzzKDorL5RCYE
-         jvve9W2M//PlxVzFK/x2m+kyjUwVe6wXrMG9ozB7JC7NydnEAlwqjF+cNU0WzAuQGrzn
-         PMZCSF58ZNNHi99KRaDN2ZeUn/3PQvx2RH2+7Ntn0O+Smj+0SRD2tUF3RtXtdlY3q42t
-         nImDmNnf+Y7hxAXpOICa5dS8IxwMxlpmzY/EuBF+sa67y9xRTTkzQLWD10P2QzOmKr0v
-         RqoA==
-X-Gm-Message-State: AC+VfDzVsyW3HRz7z3eVP1b221i+3ftRnSAQodQJMtDwHYtcEClydKg/
-        LMIav8IOUS5NO5HyGPRpM88YQZlIVPI=
-X-Google-Smtp-Source: ACHHUZ5XiyuyOQIyAbaxqVXXcRZwcwPWe0xoDPPt9nkkSKw7maXxnJMeLNNhyLrJyQUVF29mQdM/sA==
-X-Received: by 2002:a05:622a:164f:b0:3f5:371e:5ff2 with SMTP id y15-20020a05622a164f00b003f5371e5ff2mr5918022qtj.67.1684531887154;
-        Fri, 19 May 2023 14:31:27 -0700 (PDT)
-Received: from [172.17.0.2] ([52.226.113.40])
-        by smtp.gmail.com with ESMTPSA id w13-20020a05620a128d00b0074df20fb43dsm1381008qki.97.2023.05.19.14.31.26
+        bh=8+YI3oWErqNGQDBE42kFbzwZJwN9CxeeSi1fS965dfk=;
+        b=BDQ6MtjSu0sAoSXs0+pyUkNhXSorBVV0BtxliNdhPxfhEDqG59a+pBiWFVGZbv4L3c
+         P0O/n7Oyh5Nq3tzJHWYnBFfiSBowuoH63v1AgLpPjNNsAfhfYj5es0YTBe9dIZ4jxVYP
+         DcRUQ+W92jfpZwQGE5C60M2c44u+EtryOqirF2W8dmkHqjsq1AdOikhidJhPQm7pAgAL
+         bE+LFCtSkQfHKb5phWPiQCHIxezCCF+5SihgrcTLCiE103N9zCxaKizEsJLC883Q5yaH
+         WpOtoh+GFe3w1UaVssO5o3hdN3ccB8gsKvTGTglPDs7BOi/IIYtitm0H14nj8UB9lIBU
+         3nkA==
+X-Gm-Message-State: AC+VfDzVNqFr+XvgOAsXwHLI2iKOGz4RIwjbrCh+3rtHB0eZaSt0i+Lb
+        lZ8acJz4U4yWksPrTZ87QDBEtOFlTXP5UA==
+X-Google-Smtp-Source: ACHHUZ4jFLzx+FO3jAHqDqkAzHJNMIWAWbYKZnmQH82BfPHFt21Fyfc9FPiLAF4ODJShKIySdEMOmA==
+X-Received: by 2002:a17:902:d501:b0:1ae:2e0d:b38c with SMTP id b1-20020a170902d50100b001ae2e0db38cmr4599935plg.12.1684532653947;
+        Fri, 19 May 2023 14:44:13 -0700 (PDT)
+Received: from ubuntu777.domain.name (36-228-97-28.dynamic-ip.hinet.net. [36.228.97.28])
+        by smtp.gmail.com with ESMTPSA id s10-20020a170902ea0a00b001ab09f5ca61sm105639plg.55.2023.05.19.14.44.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 May 2023 14:31:26 -0700 (PDT)
-Message-ID: <6467eaae.050a0220.b7172.8585@mx.google.com>
-Date:   Fri, 19 May 2023 14:31:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0320139221320323548=="
+        Fri, 19 May 2023 14:44:13 -0700 (PDT)
+From:   Min-Hua Chen <minhuadotchen@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Min-Hua Chen <minhuadotchen@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_mrvl: use correct __le16 type
+Date:   Sat, 20 May 2023 05:44:08 +0800
+Message-Id: <20230519214408.20984-1-minhuadotchen@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, Larry.Finger@lwfinger.net
-Subject: RE: [V2] Bluetooth: Add device 0bda:b85e to device tables
-In-Reply-To: <20230519205151.9659-1-Larry.Finger@lwfinger.net>
-References: <20230519205151.9659-1-Larry.Finger@lwfinger.net>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0320139221320323548==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Cast 0xffff to __le16 before comparing it with a __le16 type pkt
+and fix the following sparse warnings:
 
-This is automated email and please do not reply to this email!
+drivers/bluetooth/hci_mrvl.c:170:23: sparse: warning:
+restricted __le16 degrades to integer
+drivers/bluetooth/hci_mrvl.c:203:23: sparse: warning:
+restricted __le16 degrades to integer
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=749379
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      31.66 seconds
-CheckAllWarning               PASS      34.63 seconds
-CheckSparse                   PASS      39.63 seconds
-CheckSmatch                   PASS      108.31 seconds
-BuildKernel32                 PASS      30.82 seconds
-TestRunnerSetup               PASS      442.06 seconds
-TestRunner_l2cap-tester       PASS      17.21 seconds
-TestRunner_iso-tester         PASS      21.20 seconds
-TestRunner_bnep-tester        PASS      5.64 seconds
-TestRunner_mgmt-tester        PASS      115.33 seconds
-TestRunner_rfcomm-tester      PASS      9.00 seconds
-TestRunner_sco-tester         PASS      8.37 seconds
-TestRunner_ioctl-tester       PASS      9.75 seconds
-TestRunner_mesh-tester        PASS      7.21 seconds
-TestRunner_smp-tester         PASS      8.26 seconds
-TestRunner_userchan-tester    PASS      5.91 seconds
-IncrementalBuild              PASS      28.93 seconds
-
-
-
+Signed-off-by: Min-Hua Chen <minhuadotchen@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_mrvl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
+index e08222395772..91f63d2b0c02 100644
+--- a/drivers/bluetooth/hci_mrvl.c
++++ b/drivers/bluetooth/hci_mrvl.c
+@@ -167,7 +167,7 @@ static int mrvl_recv_fw_req(struct hci_dev *hdev, struct sk_buff *skb)
+ 	struct mrvl_data *mrvl = hu->priv;
+ 	int ret = 0;
+ 
+-	if ((pkt->lhs ^ pkt->rhs) != 0xffff) {
++	if ((pkt->lhs ^ pkt->rhs) != cpu_to_le16(0xffff)) {
+ 		bt_dev_err(hdev, "Corrupted mrvl header");
+ 		mrvl_send_ack(hu, MRVL_NAK);
+ 		ret = -EINVAL;
+@@ -200,7 +200,7 @@ static int mrvl_recv_chip_ver(struct hci_dev *hdev, struct sk_buff *skb)
+ 	u16 version = le16_to_cpu(pkt->lhs);
+ 	int ret = 0;
+ 
+-	if ((pkt->lhs ^ pkt->rhs) != 0xffff) {
++	if ((pkt->lhs ^ pkt->rhs) != cpu_to_le16(0xffff)) {
+ 		bt_dev_err(hdev, "Corrupted mrvl header");
+ 		mrvl_send_ack(hu, MRVL_NAK);
+ 		ret = -EINVAL;
+-- 
+2.34.1
 
---===============0320139221320323548==--
