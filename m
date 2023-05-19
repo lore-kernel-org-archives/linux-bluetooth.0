@@ -2,82 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C2B4C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 May 2023 20:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BCE7C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 May 2023 20:52:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230171AbjESUUX (ORCPT
+        id S229871AbjESUv6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 May 2023 16:20:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55018 "EHLO
+        Fri, 19 May 2023 16:51:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229653AbjESUUW (ORCPT
+        with ESMTP id S229955AbjESUv5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 May 2023 16:20:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA367FE;
-        Fri, 19 May 2023 13:20:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 41B8E6578B;
-        Fri, 19 May 2023 20:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E1F3C433D2;
-        Fri, 19 May 2023 20:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1684527620;
-        bh=N3VANGUb4aHSfCOqfO6QrYJYArpb3F+YiYYG3POd9tk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=QyHDdOas0TjGGseC8ggyxvcA3+jg5eeE24+V/cNGrFWVcBOzLF32wE7ywf5IHWPg4
-         AWuyCNcpNA68+gabexMd8cn4oVNVf8T68AWUet95zoFYVz7i+FGGRsCYRWXViwQUfc
-         rXiQV7YVXrS3sGOWZImXM/w3HTxrJGLJiHTdem1EXp1jQxh/C/dyxMQjUo6J//j514
-         M2rNEGE+4A8YLcuIxmv/OeUCFOAwQzjYJM3e1ha7ZpgdJ772gMvWz24eB4f6X1ryJg
-         Q2xEBgQB0I+m/n29sn6GQ4HBLd4lVSK73OCqd2LLqh6j/eGCzMRmgnda9P/9ujRBpq
-         PvrbqJ1spChtA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8277EC3959E;
-        Fri, 19 May 2023 20:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 19 May 2023 16:51:57 -0400
+Received: from mail-oa1-x33.google.com (mail-oa1-x33.google.com [IPv6:2001:4860:4864:20::33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EAA31A8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 May 2023 13:51:56 -0700 (PDT)
+Received: by mail-oa1-x33.google.com with SMTP id 586e51a60fabf-19a427d7b57so859593fac.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 May 2023 13:51:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684529515; x=1687121515;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=D8cH7RV4i12cfczW90i15LC3ONTq7m9ORFosf4L4hkE=;
+        b=bHlV3TOhFlJio4glWpo3mv3igVb+1FH/53LzSPefpxQo/yP/wz5oEkwpkMimhihTOi
+         +CttdRERMglhQ9dKHFahaTd2EqyLVNdrXynWebk/4MfrSF+c11Pj9HTSVDZH7qO07kTa
+         cX9rWIXnddp4uYr5BYEmdFjRiqpRVWLk+A26S5GZokCzPZ7TikNwuOWZlK4ZivDAIlwU
+         svJIi5wwxvgEOsVYmll4WdlgsqBPegdjsk9uMu6LOZ5SFkfNGLuRhqvl4ixTZt/tGprG
+         wgdLSj1JZRAi/MME4RmLvqDblmzFZH7jGbkJbmjxQku3stqQ98tsuaX230fcim1RnUJu
+         4rkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684529515; x=1687121515;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D8cH7RV4i12cfczW90i15LC3ONTq7m9ORFosf4L4hkE=;
+        b=Xo5x+dxiW1noew1gEjr2t7dP5/HKscA3rZDCr/K2z7nLXciCiN4iEI+2HRbgALTdu8
+         SvnqLSi+00mWJg4ciUxGrIbLs+IyZei2S9w+2D9ZbJEiPwYJK89ZfOSb1vjt4KqZKU4B
+         o3A5ADO5WJxHmzwpGNMx/berVrViKvJ7FVq5R0YQ31zXeej/bmsQc4jjUBenERtIEyK1
+         cwtItlnx3INbZShFbSjzOpgcm2UYrqrN2l0DwSEcdV8a3KK3CaVrwwiLxPLqqHB8kggE
+         Hwpz5dfj5NU+C1VijUyyqwMjXMIeWu0wnPbl7N6sOGiqsAKNc3dEMKDmswhYRWh9oher
+         6HGA==
+X-Gm-Message-State: AC+VfDwu4v3tOnJEAs8FqyaQKbZ6Godgz7z+P8vpour9vNB1vAdv52Qi
+        2aQgb3DPKOLNE1G/Q5Jhuoc=
+X-Google-Smtp-Source: ACHHUZ6Au0/IiWZ7tVExpBTxJ4mU7p1bK0P2jNCsZRxgkvvTPobJDSluC/oFt75a9wH42wY6ZW6Sjg==
+X-Received: by 2002:a05:6870:b301:b0:196:4a0b:73a6 with SMTP id a1-20020a056870b30100b001964a0b73a6mr1701406oao.26.1684529515615;
+        Fri, 19 May 2023 13:51:55 -0700 (PDT)
+Received: from localhost.localdomain ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id q7-20020a056870028700b0019a291d1672sm2364093oaf.26.2023.05.19.13.51.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 May 2023 13:51:55 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        Ping-Ke Shih <pkshih@realtek.com>
+Subject: [PATCH V2] Bluetooth: Add device 0bda:b85e to device tables
+Date:   Fri, 19 May 2023 15:51:51 -0500
+Message-Id: <20230519205151.9659-1-Larry.Finger@lwfinger.net>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btqca: make sure to handle byte order for
- soc_id
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168452762053.10748.12822242658004808633.git-patchwork-notify@kernel.org>
-Date:   Fri, 19 May 2023 20:20:20 +0000
-References: <20230510-btqca-byte-order-v1-1-82e6a371c5aa@fairphone.com>
-In-Reply-To: <20230510-btqca-byte-order-v1-1-82e6a371c5aa@fairphone.com>
-To:     Luca Weiss <luca.weiss@fairphone.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        gubbaven@codeaurora.org, ~postmarketos/upstreaming@lists.sr.ht,
-        phone-devel@vger.kernel.org, johan.hedberg@intel.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        simon.horman@corigine.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+This device is part of a Realtek RTW8851BE chip.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+The portion of /sys/kernel/debug/usb/devices for this device is
+as follows:
 
-On Wed, 10 May 2023 11:27:21 +0200 you wrote:
-> The field soc_id in struct qca_btsoc_version is __le32 so we need to
-> convert it to host byteorder before using.
-> 
-> Reported-by: Simon Horman <simon.horman@corigine.com>
-> Fixes: 059924fdf6c1 ("Bluetooth: btqca: Use NVM files based on SoC ID for WCN3991")
-> Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> 
-> [...]
+T:  Bus=03 Lev=01 Prnt=01 Port=12 Cnt=03 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=b85e Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-Here is the summary with links:
-  - Bluetooth: btqca: make sure to handle byte order for soc_id
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0f1e103dc579
+Cc: Ping-Ke Shih <pkshih@realtek.com>
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+---
+V2 - Capitalize Bluetooth in subject
+---
+ drivers/bluetooth/btusb.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a8e2bb038f5..5ae52d14b56c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -537,6 +537,10 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
++	/* Realtek 8851BE Bluetooth device */
++	{ USB_DEVICE(0x0bda, 0xb85e), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++
+ 	/* Realtek 8852BE Bluetooth devices */
+ 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
