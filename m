@@ -2,280 +2,157 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E55F3C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 May 2023 16:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8E5C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 May 2023 16:37:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbjEUQQA (ORCPT
+        id S231319AbjEUQhQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 May 2023 12:16:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
+        Sun, 21 May 2023 12:37:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229481AbjEUQP7 (ORCPT
+        with ESMTP id S231309AbjEUQhN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 May 2023 12:15:59 -0400
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC9FAC
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 09:15:57 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout02.posteo.de (Postfix) with ESMTPS id A080E240101
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 18:15:55 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QPQfz132vz9rxG;
-        Sun, 21 May 2023 18:15:54 +0200 (CEST)
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: hci_sync req_complete_skb does not get called?
-Date:   Sun, 21 May 2023 16:15:51 +0000
-Message-Id: <6f0674a4bafc17ab4ab34b0fec99f9e4a1312a90.1684684404.git.pav@iki.fi>
-In-Reply-To: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
-References: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
+        Sun, 21 May 2023 12:37:13 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E004D2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 09:37:11 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1ae3fe67980so49960905ad.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 09:37:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684687031; x=1687279031;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UPqRV1ASvkA1tIMMoFGeb4WuxH6ZgrIVgskwe7NR+pQ=;
+        b=naHLzR5c25IPeFYxMq2IdP2psTnqF+rejHOGwl1TvOMFMgJPSbpViJnQeH+QUNv8bQ
+         3QgONZ4uHJKDi14ztPVF3gdrIzzhcD0iqpy4SIGutyH9x7M82xHvGAiJQIVM77FgmZtp
+         5KrQsEG7WccmNDnGwSXrrDBUn2beGft5JXfo6b/yUpJ2yIjsVT1xyOCFY98aKArEWwQV
+         geodp6w91aMkFFpyy84Ng4Zh5LrCp5ihhoRCJb70BMfnf8Zv8WfdXgAdgTXJCTuTlK2z
+         stwMZN+QgvZX1Zt4fKkQNB4gRZiWJaIHftDIEMfTQXdoN24gCEvaauIS58BgJAoMBmgr
+         UygQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684687031; x=1687279031;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UPqRV1ASvkA1tIMMoFGeb4WuxH6ZgrIVgskwe7NR+pQ=;
+        b=jd5pDF6e65+TSgt0Ve22K9gz9gBNjCxCwQ6Yny1kpu19/uCMwtma9+mBawXs+xsisg
+         MmKk6wa3Ob9SRXP35mUwKj/0X9exRCbSp/4lwGADdEAmgoDTt0bR27TfK8G51qyZtDGP
+         6k8hkFW1eCB3jH+QK//29hUrpGD+hYMscF2CcqDzRToIymcaFqWYxMjWQlmEqX7kNXGL
+         RcnjL6Prnd5Srv41M0kV2nMRXBWL7SFV0By2H7ZEGSomcg1+xVtayvHBndU2zsYaNPQf
+         8biVBS06II8b81kZonoq6LrrwSj99JOJUzQYIdqZqGq0z0+HBVgpUTiXbLC+qvUYjqX5
+         MLBg==
+X-Gm-Message-State: AC+VfDxpKIBzfzcK5yZ+dQKx75EMsfE023XUxlv2P3n2yifvwXRaej43
+        MPTJ0sdRhOUxClwp4i/1/jUDrCHiTXE=
+X-Google-Smtp-Source: ACHHUZ41W+MM0wNY2zV2aJKf48DsJ9mvM9hl86+MFKIqUmuAHK58AYcySIavigRFheyUhhmjSiAMXQ==
+X-Received: by 2002:a17:903:1ca:b0:1ae:55d2:fff5 with SMTP id e10-20020a17090301ca00b001ae55d2fff5mr10102408plh.31.1684687030630;
+        Sun, 21 May 2023 09:37:10 -0700 (PDT)
+Received: from [172.17.0.2] ([13.64.213.128])
+        by smtp.gmail.com with ESMTPSA id f10-20020a170902ce8a00b001a922d43779sm3162967plg.27.2023.05.21.09.37.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 May 2023 09:37:10 -0700 (PDT)
+Message-ID: <646a48b6.170a0220.69e83.4ad9@mx.google.com>
+Date:   Sun, 21 May 2023 09:37:10 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8576717053842697466=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [1/2] Bluetooth: ISO: consider right CIS when removing CIG at cleanup
+In-Reply-To: <cfe0dd7b21b58dcb06af414e92386e5dd372adb0.1684683803.git.pav@iki.fi>
+References: <cfe0dd7b21b58dcb06af414e92386e5dd372adb0.1684683803.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The patch below adds variants of multi-CIG connection tests to BlueZ
-iso-tester that connect them at the same time instead of sequentially.
+--===============8576717053842697466==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In test-runner, the test
+This is automated email and please do not reply to this email!
 
-ISO Connect2 CIG 0x01/0x02 - Success
+Dear submitter,
 
-appears to time out on bluetooth-next/master, as a LE Extended Create
-Connection command gets a timeout.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=749545
 
-This seems to be because hci_le_ext_create_conn_sync waits for
-HCI_LE_Enhanced_Connection_Complete, and things go wrong:
+---Test result---
 
-The controller emits HCI_Command_Status first.
+Test Summary:
+CheckPatch                    FAIL      1.64 seconds
+GitLint                       FAIL      0.85 seconds
+SubjectPrefix                 PASS      0.14 seconds
+BuildKernel                   PASS      38.70 seconds
+CheckAllWarning               PASS      42.33 seconds
+CheckSparse                   PASS      47.65 seconds
+CheckSmatch                   PASS      129.33 seconds
+BuildKernel32                 PASS      37.24 seconds
+TestRunnerSetup               PASS      532.64 seconds
+TestRunner_l2cap-tester       PASS      19.71 seconds
+TestRunner_iso-tester         PASS      25.55 seconds
+TestRunner_bnep-tester        PASS      6.73 seconds
+TestRunner_mgmt-tester        PASS      131.70 seconds
+TestRunner_rfcomm-tester      PASS      10.63 seconds
+TestRunner_sco-tester         PASS      9.81 seconds
+TestRunner_ioctl-tester       PASS      11.61 seconds
+TestRunner_mesh-tester        PASS      8.48 seconds
+TestRunner_smp-tester         PASS      9.66 seconds
+TestRunner_userchan-tester    PASS      7.11 seconds
+IncrementalBuild              PASS      41.57 seconds
 
-Then, kernel queues another command (Disconnect), before the
-Connection_Complete event that hci_le_ext_create_conn_sync waits for
-arrives.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[1/2] Bluetooth: ISO: consider right CIS when removing CIG at cleanup
+ERROR: Missing Signed-off-by: line(s)
 
-This replaces hdev->sent_cmd in hci_cmd_work. Because of this, when the
-Create_Connection event arrives, hci_cmd_sync_complete for the Create
-Connection command won't be called. As a result, creating the connection
-hangs until hci_sync timeout.
+total: 1 errors, 0 warnings, 0 checks, 17 lines checked
 
-This looks like timing-sensitive issue in the hci_request/hci_sync
-logic: the req_complete* callback for a request will not be called if
-another command gets sent while the request waits for an event.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-This seems to block the hci_sync queue for a while, so it probably is
-not intended behavior?
+/github/workspace/src/src/13249430.patch has style problems, please review.
 
-Example trace from
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
-./tools/iso-tester -d -s "ISO Connect2 CIG 0x01/0x02 - Success"
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-and for kernel with enabled debug prints:
 
-> __hci_cmd_sync_sk:154: hci0: Opcode 0x2043
-> hci_cmd_sync_add:88: hci0: opcode 0x2043 plen 58
-> hci_cmd_sync_alloc:66: hci0: skb len 61
-> hci_cmd_sync_run:118: hci0: length 1
-> hci_cmd_work:4092: hci0 cmd_cnt 1 cmd queued 1
-> hci_send_frame:2982: hci0 type 1 len 61
->   Successfully connected
->   Step 1
-> hci_conn_drop:1416: hcon ffff888001933000 orig refcnt 1
-> hci_send_cmd:3020: hci0 opcode 0x0406 plen 3
-> hci_cmd_work:4092: hci0 cmd_cnt 0 cmd queued 1
+[2/2] Bluetooth: ISO: fix CIG auto-allocation to select configurable CIG
+ERROR: Missing Signed-off-by: line(s)
 
-Here, HCI_Disconnect (0x0406) got queued while
-HCI_LE_Extended_Create_Connection (0x2043) sync request is waiting for
-HCI_LE_Enhanced_Connection_Complete (0x0a).  The disconnect cmd is not sent
-yet, as there's no room in cmd_cnt.
+total: 1 errors, 0 warnings, 0 checks, 30 lines checked
 
->   hciemu: vhci: > 01 43 20 3a 00 00 00 01 00 02 01 aa 00 07 60 00  .C :..........`.
->   hciemu: vhci:   60 00 18 00 28 00 00 00 2a 00 00 00 00 00 60 00  `...(...*.....`.
->   hciemu: vhci:   60 00 18 00 28 00 00 00 2a 00 00 00 00 00 60 00  `...(...*.....`.
->   hciemu: vhci:   60 00 18 00 28 00 00 00 2a 00 00 00 00 00        `...(...*.....
->   hciemu: vhci: command 0x2043
->   hciemu: vhci: event 0x0f opcode 0x2043
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   0f 04                                            ..
->   hciemu: vhci:   00 01 43 20                                      ..C
-> hci_rx_work:4017: hci0
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x0f
-> hci_cmd_status_evt:4291: hci0: opcode 0x2043
-> hci_cs_le_ext_create_conn:2910: hci0: status 0x00
-> hci_sent_cmd_data:3083: hci0 opcode 0x2043
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-The HCI_LE_Extended_Create_Connection command status event arrived.  The
-hci_sync request is waiting for a different event, so the status event didn't
-complete it.
+/github/workspace/src/src/13249431.patch has style problems, please review.
 
-hci_cmd_status_evt makes room in cmd_cnt and queues cmd_work.
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
 
-> hci_cmd_work:4092: hci0 cmd_cnt 1 cmd queued 1
-> hci_send_frame:2982: hci0 type 1 len 6
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-The queued HCI_Disconnect was sent to the driver.  At this point hdev->sent_cmd
-is replaced by the skb of the HCI_Disconnect, and the completion callback of
-the HCI_LE_Extended_Create_Connection sync request will never be called.
 
->   hciemu: vhci: conn1 0x46c340 handle 0x002b
->   hciemu: vhci: conn2 0x46d410 handle 0x002a
->   hciemu: btdev: meta event 0x0a
->   hciemu: btdev: event 0x3e
->   hciemu: btdev: < 04                                               .
->   hciemu: btdev:   3e 1f                                            >.
->   hciemu: btdev:   0a 00 2b 00 01 00 00 00 00 01 aa 00 00 00 00 00  ..+.............
->   hciemu: btdev:   00 00 00 00 00 00 00 00 28 00 00 00 2a 00 00     ........(...*..
->   hciemu: btdev: meta event 0x12
->   hciemu: btdev: event 0x3e
->   hciemu: btdev: < 04                                               .
->   hciemu: btdev:   3e 06                                            >.
->   hciemu: btdev:   12 00 01 2b 00 00                                ...+..
->   hciemu: vhci: meta event 0x0a
->   hciemu: vhci: event 0x3e
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   3e 1f                                            >.
->   hciemu: vhci:   0a 00 2b 00 00 00 01 00 02 01 aa 00 00 00 00 00  ..+.............
->   hciemu: vhci:   00 00 00 00 00 00 00 00 28 00 00 00 2a 00 00     ........(...*..
-> hci_rx_work:4017: hci0
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x3e
-> hci_le_meta_evt:7112: hci0: subevent 0x0a
-> hci_le_enh_conn_complete_evt:5988: hci0: status 0x00
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[2/2] Bluetooth: ISO: fix CIG auto-allocation to select configurable CIG
 
-Here the Connection Complete event (0x0a) arrives, but hci_req_cmd_complete and
-hci_cmd_sync_complete are not called.
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+17: B2 Line has trailing whitespace: "    "
+19: B2 Line has trailing whitespace: "    "
+20: B1 Line exceeds max length (83>80): "    ISO Connect2 CIG auto/auto Seq - Success             Passed       0.148 seconds"
 
-Some time passes without hci_sync activity:
-
-> hci_dev_hold:1460: hci0 orig refcnt 16
-> hci_send_cmd:3020: hci0 opcode 0x2016 plen 2
-> hci_conn_hold:1406: hcon ffff888001935000 orig refcnt 1
-> hci_cmd_work:4092: hci0 cmd_cnt 0 cmd queued 1
-> hci_dev_hold:1460: hci0 orig refcnt 16
-> hci_send_cmd:3020: hci0 opcode 0x2016 plen 2
-> hci_conn_hold:1406: hcon ffff888001935000 orig refcnt 1
-> hci_cmd_work:4092: hci0 cmd_cnt 0 cmd queued 1
->   hciemu: vhci: meta event 0x12
->   hciemu: vhci: event 0x3e
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   3e 06                                            >.
->   hciemu: vhci:   12 00 00 2b 00 00                                ...+..
-> hci_rx_work:4017: hci0
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x3e
-> hci_le_meta_evt:7112: hci0: subevent 0x12
-> hci_le_ext_adv_term_evt:6004: hci0: status 0x00
->   mgmt: src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
->   hciemu: vhci: > 01 06 04 03 01 01 13                             .......
->   hciemu: vhci: command 0x0406
->   hciemu: vhci: event 0x0f opcode 0x0406
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   0f 04                                            ..
->   hciemu: vhci:   00 01 06 04                                      ....
-> hci_rx_work:4017: hci0
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x0f
-> hci_cmd_status_evt:4291: hci0: opcode 0x0406
-> hci_cs_disconnect:2760: hci0: status 0x00
-> hci_req_cmd_complete:3954: opcode 0x0406 status 0x00
-> hci_sent_cmd_data:3083: hci0 opcode 0x0406
-> hci_cmd_work:4092: hci0 cmd_cnt 1 cmd queued 1
-> hci_send_frame:2982: hci0 type 1 len 5
->   hciemu: vhci: event 0x05
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   05 04                                            ..
->   hciemu: vhci:   00 01 01 16                                      ....
-> hci_rx_work:4017: hci0
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x05
-> hci_disconn_complete_evt:3383: hci0: status 0x00
->   hciemu: btdev: event 0x05
->   hciemu: btdev: < 04                                               .
->   hciemu: btdev:   05 04                                            ..
->   hciemu: btdev:   00 01 01 13                                      ....
->   hciemu: bthost: > 04 3e 1f 0a 00 2b 00 01 00 00 00 00 01 aa 00 00  .>...+..........
->   hciemu: bthost:   00 00 00 00 00 00 00 00 00 00 00 28 00 00 00 2a  ...........(...*
->   hciemu: bthost:   00 00                                            ..
->   hciemu: bthost: event 0x3e
->   hciemu: bthost: meta event 0x0a
->   hciemu: bthost: ia 00:AA:01:00:00:00 type 0x01 ra 00:AA:01:02:00:01 type 0x01
-> hci_conn_drop:1416: hcon ffff888001932000 orig refcnt 1
->   hciemu: vhci: > 01 16 20 02 2b 00                                .. .+.
->   hciemu: vhci: command 0x2016
->   hciemu: vhci: event 0x0f opcode 0x2016
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   0f 04                                            ..
->   hciemu: vhci:   00 01 16 20                                      ...
->   hciemu: vhci: meta event 0x04
->   hciemu: vhci: event 0x3e
->   hciemu: vhci: < 04                                               .
->   hciemu: vhci:   3e 0c                                            >.
-> hci_dev_put:1452: hci0 orig refcnt 15
-> hci_dev_put:1452: hci0 orig refcnt 14
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x0f
-> hci_cmd_status_evt:4291: hci0: opcode 0x2016
-> hci_cs_le_read_remote_features:2936: hci0: status 0x00
-> hci_req_cmd_complete:3954: opcode 0x2016 status 0x00
-> hci_sent_cmd_data:3083: hci0 opcode 0x2016
-> hci_rx_work:4017: hci0
->   hciemu: vhci:   04 00 2b 00 40 39 00 f0 01 00 00 00              ..+.@9......
-> hci_rx_work:4017: hci0
-> hci_rx_work:4061: hci0 Event packet
-> hci_event_packet:7527: hci0: event 0x3e
-> hci_le_meta_evt:7112: hci0: subevent 0x04
-> hci_le_remote_feat_complete_evt:6555: hci0: status 0x00
-> hci_conn_drop:1416: hcon ffff888001935000 orig refcnt 2
->   hciemu: bthost: > 04 05 04 00 01 01 13                             .......
->   hciemu: bthost: event 0x05
->   hciemu: bthost: > 04 3e 06 12 00 01 2b 00 00                       .>....+..
->   hciemu: bthost: event 0x3e
->   hciemu: bthost: meta event 0x12
->   hciemu: bthost: Unsupported LE Meta event 0x12
-> ISO Connect2 CIG 0x01/0x02 - Success - teardown
-> hci_unregister_dev:2687: ffff888001928000 name hci0 bus 0
-> hci_send_cmd:3020: hci0 opcode 0x0406 plen 3
-> hci_cmd_work:4092: hci0 cmd_cnt 1 cmd queued 1
-> hci_send_frame:2982: hci0 type 1 len 6
-> Bluetooth: hci0: command 0x0406 tx timeout
-> hci_cmd_work:4092: hci0 cmd_cnt 1 cmd queued 0
-> __hci_cmd_sync_sk:192: hci0: end: err -110
-> __hci_cmd_sync_sk:154: hci0: Opcode 0x200e
-
-... until hci_sync timeout for the LE Create Connection connection is
-reached, and it tries to send LE Create Connection Cancel to cancel the
-operation even though it succeeded.
-
-Then things start to go wrong and the test ultimately hangs, as the
-emulator gets torn down due to timeout at a bad time.  Increasing the
-test timeout makes it pass after 6sec, but not clear if this can cause
-problems on a real controller.
 
 ---
- tools/iso-tester.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index fc2a84215..840e53e6b 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -2303,6 +2303,14 @@ int main(int argc, char *argv[])
- 	test_iso("ISO QoS - Invalid", &connect_invalid, setup_powered,
- 							test_connect);
- 
-+	test_iso2("ISO Connect2 CIG 0x01/0x02 - Success", &connect_2_16_2_1,
-+							setup_powered,
-+							test_connect2);
-+
-+	test_iso2("ISO Connect2 CIG auto/auto - Success", &connect_2a_16_2_1,
-+							setup_powered,
-+							test_connect2);
-+
- 	test_iso2("ISO Connect2 CIG 0x01/0x02 Seq - Success", &connect_2_16_2_1,
- 							setup_powered,
- 							test_connect2_seq);
--- 
-2.40.1
 
+--===============8576717053842697466==--
