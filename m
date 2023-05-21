@@ -2,343 +2,352 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC041C7EE2A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 May 2023 15:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C10C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 May 2023 15:27:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229497AbjEUP1t (ORCPT
+        id S230048AbjEUP1t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Sun, 21 May 2023 11:27:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50266 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbjEUP1q (ORCPT
+        with ESMTP id S229794AbjEUP1q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 21 May 2023 11:27:46 -0400
 Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2106ADC
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B72DE
         for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 08:27:44 -0700 (PDT)
 Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 904AD240027
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 17:27:41 +0200 (CEST)
+        by mout01.posteo.de (Postfix) with ESMTPS id D2A19240029
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 17:27:40 +0200 (CEST)
 Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QPPbK0sZJz9rxG;
-        Sun, 21 May 2023 17:27:41 +0200 (CEST)
+        by submission (posteo.de) with ESMTPSA id 4QPPbJ2Q4yz9rxG;
+        Sun, 21 May 2023 17:27:40 +0200 (CEST)
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 3/5] btdev: support multiple CIG
-Date:   Sun, 21 May 2023 15:27:36 +0000
-Message-Id: <69699803f6450633d1b33ccef57fd81f77eee137.1684682575.git.pav@iki.fi>
-In-Reply-To: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
-References: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
+Subject: [PATCH BlueZ 1/5] iso-tester: always use DEFER_SETUP for multiple CIS in same CIG
+Date:   Sun, 21 May 2023 15:27:34 +0000
+Message-Id: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for more than one CIG simultaneously.
----
- emulator/btdev.c | 144 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 108 insertions(+), 36 deletions(-)
+There is a race between multiple connect() for CIS in the same CIG.
+connect() will both reconfigure the CIG and connect the CIS, but CIG
+cannot be reconfigured once one CIS has already connected.  That these
+tests pass currently relies on some timing/event ordering in the
+emulator.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 7980a5280..0eec1d9f2 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -42,6 +42,7 @@
- #define RL_SIZE			16
- #define CIS_SIZE		3
- #define BIS_SIZE		3
-+#define CIG_SIZE		3
- 
- #define has_bredr(btdev)	(!((btdev)->features[4] & 0x20))
- #define has_le(btdev)		(!!((btdev)->features[4] & 0x40))
-@@ -101,6 +102,11 @@ struct le_ext_adv {
- 	unsigned int id;
+Connecting multiple CIS in same CIG is meant to be done using
+DEFER_SETUP, so change the tests to use it, so we test the intended
+usage.
+---
+ tools/iso-tester.c | 150 +++++++++++++++++++++++++++++++--------------
+ 1 file changed, 104 insertions(+), 46 deletions(-)
+
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index c5c6f0aec..164cb465f 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -740,6 +740,12 @@ static const struct iso_client_data defer_16_2_1 = {
+ 	.defer = true,
  };
  
-+struct le_cig {
-+	struct bt_hci_cmd_le_set_cig_params params;
-+	struct bt_hci_cis_params cis[CIS_SIZE];
-+} __attribute__ ((packed));
++static const struct iso_client_data defer_1_16_2_1 = {
++	.qos = QOS_1_16_2_1,
++	.expect_err = 0,
++	.defer = true,
++};
 +
- struct btdev {
- 	enum btdev_type type;
- 	uint16_t id;
-@@ -204,10 +210,7 @@ struct btdev {
- 	uint16_t le_pa_sync_handle;
- 	uint8_t  big_handle;
- 	uint8_t  le_ltk[16];
--	struct {
--		struct bt_hci_cmd_le_set_cig_params params;
--		struct bt_hci_cis_params cis[CIS_SIZE];
--	} __attribute__ ((packed)) le_cig;
-+	struct le_cig le_cig[CIG_SIZE];
- 	uint8_t  le_iso_path[2];
+ static const struct iso_client_data connect_16_2_1_defer_send = {
+ 	.qos = QOS_16_2_1,
+ 	.expect_err = 0,
+@@ -817,6 +823,7 @@ static const struct iso_client_data connect_ac_6i = {
+ 	.qos_2 = AC_6i_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
  
- 	/* Real time length of AL array */
-@@ -5757,6 +5760,36 @@ static int cmd_read_iso_tx_sync(struct btdev *dev, const void *data,
- 	return -ENOTSUP;
+ static const struct iso_client_data connect_ac_6ii = {
+@@ -824,6 +831,7 @@ static const struct iso_client_data connect_ac_6ii = {
+ 	.qos_2 = AC_6ii_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_7i = {
+@@ -831,6 +839,7 @@ static const struct iso_client_data connect_ac_7i = {
+ 	.qos_2 = AC_7i_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_7ii = {
+@@ -838,6 +847,7 @@ static const struct iso_client_data connect_ac_7ii = {
+ 	.qos_2 = AC_7ii_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_8i = {
+@@ -845,6 +855,7 @@ static const struct iso_client_data connect_ac_8i = {
+ 	.qos_2 = AC_8i_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_8ii = {
+@@ -852,6 +863,7 @@ static const struct iso_client_data connect_ac_8ii = {
+ 	.qos_2 = AC_8ii_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_9i = {
+@@ -859,6 +871,7 @@ static const struct iso_client_data connect_ac_9i = {
+ 	.qos_2 = AC_9i_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_9ii = {
+@@ -866,6 +879,7 @@ static const struct iso_client_data connect_ac_9ii = {
+ 	.qos_2 = AC_9ii_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_11i = {
+@@ -873,6 +887,7 @@ static const struct iso_client_data connect_ac_11i = {
+ 	.qos_2 = AC_11i_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data connect_ac_11ii = {
+@@ -880,6 +895,7 @@ static const struct iso_client_data connect_ac_11ii = {
+ 	.qos_2 = AC_11ii_2,
+ 	.expect_err = 0,
+ 	.mcis = true,
++	.defer = true,
+ };
+ 
+ static const struct iso_client_data bcast_16_2_1_send = {
+@@ -1715,13 +1731,9 @@ static gboolean iso_connect2_cb(GIOChannel *io, GIOCondition cond,
+ 	return iso_connect(io, cond, user_data);
  }
  
-+static int find_cig(struct btdev *dev, uint8_t cig_id)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(dev->le_cig); ++i)
-+		if (dev->le_cig[i].params.cig_id == cig_id)
-+			return i;
-+	return -1;
-+}
-+
-+static uint16_t make_cis_handle(uint8_t cig_idx, uint8_t cis_idx)
-+{
-+	/* Put CIG+CIS idxs to handle so don't need to track separately */
-+	return ISO_HANDLE + cig_idx*CIS_SIZE + cis_idx;
-+}
-+
-+static int parse_cis_handle(uint16_t handle, int *cis_idx)
-+{
-+	int cig_idx;
-+
-+	if (handle < ISO_HANDLE || handle >= ISO_HANDLE + CIS_SIZE*CIG_SIZE)
-+		return -1;
-+
-+	cig_idx = (handle - ISO_HANDLE) / CIS_SIZE;
-+	if (cis_idx)
-+		*cis_idx = (handle - ISO_HANDLE) % CIS_SIZE;
-+
-+	return cig_idx;
-+}
-+
- static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 							uint8_t len)
+-static void setup_connect(struct test_data *data, uint8_t num, GIOFunc func)
++static int setup_sock(struct test_data *data, uint8_t num)
  {
-@@ -5766,12 +5799,13 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 		uint16_t handle[CIS_SIZE];
- 	} __attribute__ ((packed)) rsp;
- 	int i = 0;
-+	int cig_idx;
- 	uint32_t interval;
- 	uint16_t latency;
+-	const struct iso_client_data *isodata = data->test_data;
+-	GIOChannel *io;
+ 	int sk, err;
+-	char c;
+-	struct pollfd pfd;
  
- 	memset(&rsp, 0, sizeof(rsp));
- 
--	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig.cis)) {
-+	if (cmd->num_cis > ARRAY_SIZE(dev->le_cig[0].cis)) {
- 		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
- 		goto done;
- 	}
-@@ -5820,14 +5854,14 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 		goto done;
+ 	sk = create_iso_sock(data);
+ 	if (sk < 0) {
+@@ -1729,7 +1741,8 @@ static void setup_connect(struct test_data *data, uint8_t num, GIOFunc func)
+ 			tester_test_abort();
+ 		else
+ 			tester_test_failed();
+-		return;
++
++		return sk;
  	}
  
--	if (dev->le_cig.params.cig_id != 0xff &&
--				dev->le_cig.params.cig_id != cmd->cig_id) {
--		rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+	cig_idx = find_cig(dev, cmd->cig_id);
-+	if (cig_idx < 0)
-+		cig_idx = find_cig(dev, 0xff);
-+	if (cig_idx < 0) {
-+		rsp.params.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
- 		goto done;
+ 	err = connect_iso_sock(data, num, sk);
+@@ -1743,65 +1756,106 @@ static void setup_connect(struct test_data *data, uint8_t num, GIOFunc func)
+ 		else
+ 			tester_test_failed();
+ 
+-		return;
++		return err;
  	}
  
--	memcpy(&dev->le_cig, data, len);
+-	if (isodata->defer) {
+-		int defer;
+-		socklen_t len;
 -
- 	rsp.params.status = BT_HCI_ERR_SUCCESS;
- 	rsp.params.cig_id = cmd->cig_id;
- 
-@@ -5835,7 +5869,7 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 		struct btdev_conn *iso;
- 
- 		rsp.params.num_handles++;
--		rsp.handle[i] = cpu_to_le16(ISO_HANDLE + i);
-+		rsp.handle[i] = cpu_to_le16(make_cis_handle(cig_idx, i));
- 
- 		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
- 		 * page 2553
-@@ -5845,14 +5879,16 @@ static int cmd_set_cig_params(struct btdev *dev, const void *data,
- 		 * code Command Disallowed (0x0C).
- 		 */
- 		iso = queue_find(dev->conns, match_handle,
--				UINT_TO_PTR(cpu_to_le16(rsp.handle[i])));
-+				UINT_TO_PTR(le16_to_cpu(rsp.handle[i])));
- 		if (iso) {
--			rsp.params.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			rsp.params.status = BT_HCI_ERR_COMMAND_DISALLOWED;
- 			i = 0;
- 			goto done;
- 		}
- 	}
- 
-+	memcpy(&dev->le_cig[cig_idx], data, len);
-+
- done:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_CIG_PARAMS, &rsp,
- 				sizeof(rsp.params) + (i * sizeof(uint16_t)));
-@@ -5878,35 +5914,40 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 						uint8_t status)
- {
- 	struct bt_hci_evt_le_cis_established evt;
-+	int cig_idx, cis_idx;
- 
- 	memset(&evt, 0, sizeof(evt));
- 
- 	evt.status = status;
- 	evt.conn_handle = conn ? cpu_to_le16(conn->handle) : 0x0000;
- 
-+	cig_idx = conn ? parse_cis_handle(conn->link->handle, &cis_idx) : -1;
-+	if (cig_idx < 0 && !evt.status)
-+		evt.status = BT_HCI_ERR_UNSPECIFIED_ERROR;
-+
- 	if (!evt.status) {
- 		struct btdev *remote = conn->link->dev;
--		int i = conn->handle - ISO_HANDLE;
-+		struct le_cig *le_cig = &remote->le_cig[cig_idx];
- 
- 		/* TODO: Figure out if these values makes sense */
--		memcpy(evt.cig_sync_delay, remote->le_cig.params.c_interval,
--				sizeof(remote->le_cig.params.c_interval));
--		memcpy(evt.cis_sync_delay, remote->le_cig.params.p_interval,
--				sizeof(remote->le_cig.params.p_interval));
--		memcpy(evt.c_latency, &remote->le_cig.params.c_interval,
--				sizeof(remote->le_cig.params.c_interval));
--		memcpy(evt.p_latency, &remote->le_cig.params.p_interval,
--				sizeof(remote->le_cig.params.p_interval));
--		evt.c_phy = remote->le_cig.cis[i].c_phy;
--		evt.p_phy = remote->le_cig.cis[i].p_phy;
-+		memcpy(evt.cig_sync_delay, le_cig->params.c_interval,
-+				sizeof(le_cig->params.c_interval));
-+		memcpy(evt.cis_sync_delay, le_cig->params.p_interval,
-+				sizeof(le_cig->params.p_interval));
-+		memcpy(evt.c_latency, &le_cig->params.c_interval,
-+				sizeof(le_cig->params.c_interval));
-+		memcpy(evt.p_latency, &le_cig->params.p_interval,
-+				sizeof(le_cig->params.p_interval));
-+		evt.c_phy = le_cig->cis[cis_idx].c_phy;
-+		evt.p_phy = le_cig->cis[cis_idx].p_phy;
- 		evt.nse = 0x01;
- 		evt.c_bn = 0x01;
- 		evt.p_bn = 0x01;
- 		evt.c_ft = 0x01;
- 		evt.p_ft = 0x01;
--		evt.c_mtu = remote->le_cig.cis[i].c_sdu;
--		evt.p_mtu = remote->le_cig.cis[i].p_sdu;
--		evt.interval = remote->le_cig.params.c_latency;
-+		evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
-+		evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
-+		evt.interval = le_cig->params.c_latency;
- 	}
- 
- 	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
-@@ -5927,9 +5968,20 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
- 		struct btdev_conn *acl;
- 		struct btdev_conn *iso;
- 		struct bt_hci_evt_le_cis_req evt;
-+		struct le_cig *le_cig;
-+		int cig_idx, cis_idx;
-+
-+		cig_idx = parse_cis_handle(le16_to_cpu(cis->cis_handle),
-+								&cis_idx);
-+		if (cig_idx < 0) {
-+			le_cis_estabilished(dev, NULL,
-+						BT_HCI_ERR_UNKNOWN_CONN_ID);
-+			break;
-+		}
-+		le_cig = &dev->le_cig[cig_idx];
- 
- 		acl = queue_find(dev->conns, match_handle,
--				UINT_TO_PTR(cpu_to_le16(cis->acl_handle)));
-+				UINT_TO_PTR(le16_to_cpu(cis->acl_handle)));
- 		if (!acl) {
- 			le_cis_estabilished(dev, NULL,
- 						BT_HCI_ERR_UNKNOWN_CONN_ID);
-@@ -5937,9 +5989,9 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
- 		}
- 
- 		iso = queue_find(dev->conns, match_handle,
--				UINT_TO_PTR(cpu_to_le16(cis->cis_handle)));
-+				UINT_TO_PTR(le16_to_cpu(cis->cis_handle)));
- 		if (!iso) {
--			iso = conn_add_cis(acl, cpu_to_le16(cis->cis_handle));
-+			iso = conn_add_cis(acl, le16_to_cpu(cis->cis_handle));
- 			if (!iso) {
- 				le_cis_estabilished(dev, NULL,
- 						BT_HCI_ERR_UNKNOWN_CONN_ID);
-@@ -5949,8 +6001,8 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
- 
- 		evt.acl_handle = cpu_to_le16(acl->handle);
- 		evt.cis_handle = cpu_to_le16(iso->handle);
--		evt.cig_id = iso->dev->le_cig.params.cig_id;
--		evt.cis_id = iso->dev->le_cig.cis[i].cis_id;
-+		evt.cig_id = le_cig->params.cig_id;
-+		evt.cis_id = le_cig->cis[cis_idx].cis_id;
- 
- 		le_meta_event(iso->link->dev, BT_HCI_EVT_LE_CIS_REQ, &evt,
- 					sizeof(evt));
-@@ -5959,20 +6011,37 @@ static int cmd_create_cis_complete(struct btdev *dev, const void *data,
- 	return 0;
- }
- 
-+static bool match_handle_cig_idx(const void *data, const void *match_data)
-+{
-+	const struct btdev_conn *conn = data;
-+	int cig_idx = PTR_TO_INT(match_data);
-+
-+	return cig_idx >= 0 && parse_cis_handle(conn->handle, NULL) == cig_idx;
+-		/* Check if socket has DEFER_SETUP set */
+-		len = sizeof(defer);
+-		if (getsockopt(sk, SOL_BLUETOOTH, BT_DEFER_SETUP, &defer,
+-				&len) < 0) {
+-			tester_warn("getsockopt: %s (%d)", strerror(errno),
+-								errno);
++	return sk;
 +}
 +
- static int cmd_remove_cig(struct btdev *dev, const void *data, uint8_t len)
- {
- 	const struct bt_hci_cmd_le_remove_cig *cmd = data;
- 	struct bt_hci_rsp_le_remove_cig rsp;
-+	struct btdev_conn *conn = NULL;
-+	int idx;
- 
--	memset(&dev->le_cig, 0, sizeof(dev->le_cig));
- 	memset(&rsp, 0, sizeof(rsp));
- 
- 	rsp.cig_id = cmd->cig_id;
- 
--	if (dev->le_cig.params.cig_id == cmd->cig_id)
-+	idx = find_cig(dev, cmd->cig_id);
-+	conn = queue_find(dev->conns, match_handle_cig_idx, INT_TO_PTR(idx));
++static int connect_deferred(int sk)
++{
++	int defer;
++	socklen_t len;
++	struct pollfd pfd;
++	char c;
 +
-+	if (idx >= 0 && !conn) {
-+		memset(&dev->le_cig[idx], 0, sizeof(struct le_cig));
-+		dev->le_cig[idx].params.cig_id = 0xff;
- 		rsp.status = BT_HCI_ERR_SUCCESS;
--	else
-+	} else if (conn) {
-+		rsp.status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+	} else {
- 		rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
++	/* Check if socket has DEFER_SETUP set */
++	len = sizeof(defer);
++	if (getsockopt(sk, SOL_BLUETOOTH, BT_DEFER_SETUP, &defer,
++					&len) < 0) {
++		tester_warn("getsockopt: %s (%d)", strerror(errno),
++				errno);
++		tester_test_failed();
++		return 0;
++	}
++
++	memset(&pfd, 0, sizeof(pfd));
++	pfd.fd = sk;
++	pfd.events = POLLOUT;
++
++	if (poll(&pfd, 1, 0) < 0) {
++		tester_warn("poll: %s (%d)", strerror(errno), errno);
++		tester_test_failed();
++		return -EIO;
++	}
++
++	if (!(pfd.revents & POLLOUT)) {
++		if (read(sk, &c, 1) < 0) {
++			tester_warn("read: %s (%d)", strerror(errno),
++					errno);
+ 			tester_test_failed();
+-			return;
++			return -EIO;
+ 		}
++	}
++
++	return 0;
++}
+ 
+-		memset(&pfd, 0, sizeof(pfd));
+-		pfd.fd = sk;
+-		pfd.events = POLLOUT;
++static void setup_connect_many(struct test_data *data, uint8_t n, uint8_t *num,
++								GIOFunc *func)
++{
++	const struct iso_client_data *isodata = data->test_data;
++	int sk[256];
++	GIOChannel *io;
++	unsigned int i;
+ 
+-		if (poll(&pfd, 1, 0) < 0) {
+-			tester_warn("poll: %s (%d)", strerror(errno), errno);
+-			tester_test_failed();
++	for (i = 0; i < n; ++i) {
++		sk[i] = setup_sock(data, num[i]);
++		if (sk[i] < 0)
+ 			return;
+-		}
 +	}
  
- 	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_CIG, &rsp, sizeof(rsp));
+-		if (!(pfd.revents & POLLOUT)) {
+-			if (read(sk, &c, 1) < 0) {
+-				tester_warn("read: %s (%d)", strerror(errno),
+-								errno);
+-				tester_test_failed();
++	if (isodata->defer) {
++		for (i = 0; i < n; ++i)
++			if (connect_deferred(sk[i]) < 0)
+ 				return;
+-			}
+-		}
+ 	}
  
-@@ -6842,6 +6911,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- {
- 	struct btdev *btdev;
- 	int index;
-+	unsigned int i;
+-	io = g_io_channel_unix_new(sk);
+-	g_io_channel_set_close_on_unref(io, TRUE);
++	for (i = 0; i < n; ++i) {
++		io = g_io_channel_unix_new(sk[i]);
++		g_io_channel_set_close_on_unref(io, TRUE);
  
- 	btdev = malloc(sizeof(*btdev));
- 	if (!btdev)
-@@ -6909,9 +6979,11 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
+-	data->io_id[num] = g_io_add_watch(io, G_IO_OUT, func, NULL);
++		data->io_id[num[i]] = g_io_add_watch(io, G_IO_OUT, func[i],
++									NULL);
  
- 	btdev->iso_mtu = 251;
- 	btdev->iso_max_pkt = 1;
--	btdev->le_cig.params.cig_id = 0xff;
- 	btdev->big_handle = 0xff;
+-	g_io_channel_unref(io);
++		g_io_channel_unref(io);
  
-+	for (i = 0; i < ARRAY_SIZE(btdev->le_cig); ++i)
-+		btdev->le_cig[i].params.cig_id = 0xff;
+-	tester_print("Connect in progress");
++		tester_print("Connect %d in progress", num[i]);
+ 
+-	data->step++;
++		data->step++;
++	}
++}
 +
- 	btdev->country_code = 0x00;
++static void setup_connect(struct test_data *data, uint8_t num, GIOFunc func)
++{
++	return setup_connect_many(data, 1, &num, &func);
+ }
  
- 	index = add_btdev(btdev);
+ static void test_connect(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const struct iso_client_data *isodata = test_data;
++	uint8_t n = 0;
++	GIOFunc func[2];
++	uint8_t num[2] = {0, 1};
+ 
+-	setup_connect(data, 0, iso_connect_cb);
++	func[n++] = iso_connect_cb;
+ 
+ 	/* Check if configuration requires multiple CIS setup */
+ 	if (!isodata->bcast && isodata->mcis)
+-		setup_connect(data, 1, iso_connect2_cb);
++		func[n++] = iso_connect2_cb;
++
++	setup_connect_many(data, n, num, func);
+ }
+ 
+ static void setup_reconnect(struct test_data *data, uint8_t num, GIOFunc func)
+@@ -2066,9 +2120,10 @@ static void test_listen(const void *test_data)
+ static void test_connect2(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
++	uint8_t num[2] = {0, 1};
++	GIOFunc funcs[2] = {iso_connect_cb, iso_connect2_cb};
+ 
+-	setup_connect(data, 0, iso_connect_cb);
+-	setup_connect(data, 1, iso_connect2_cb);
++	setup_connect_many(data, 2, num, funcs);
+ }
+ 
+ static void test_bcast(const void *test_data)
+@@ -2212,10 +2267,6 @@ int main(int argc, char *argv[])
+ 	test_iso_rej("ISO Connect - Reject", &connect_reject, setup_powered,
+ 			test_connect, BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
+ 
+-	test_iso2("ISO Connect2 CIG 0x01 - Success", &connect_1_16_2_1,
+-							setup_powered,
+-							test_connect2);
+-
+ 	test_iso("ISO Send - Success", &connect_16_2_1_send, setup_powered,
+ 							test_connect);
+ 
+@@ -2229,6 +2280,13 @@ int main(int argc, char *argv[])
+ 	test_iso("ISO Defer - Success", &defer_16_2_1, setup_powered,
+ 							test_defer);
+ 
++	test_iso("ISO Defer Connect - Success", &defer_16_2_1, setup_powered,
++							test_connect);
++
++	test_iso2("ISO Defer Connect2 CIG 0x01 - Success", &defer_1_16_2_1,
++							setup_powered,
++							test_connect2);
++
+ 	test_iso("ISO Defer Send - Success", &connect_16_2_1_defer_send,
+ 							setup_powered,
+ 							test_connect);
 -- 
 2.40.1
 
