@@ -2,32 +2,32 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D5BCC7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 May 2023 15:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80C9C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 May 2023 15:27:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229957AbjEUP1q (ORCPT
+        id S229996AbjEUP1r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 May 2023 11:27:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50264 "EHLO
+        Sun, 21 May 2023 11:27:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjEUP1p (ORCPT
+        with ESMTP id S229497AbjEUP1p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 21 May 2023 11:27:45 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C22E1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 08:27:44 -0700 (PDT)
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6001D1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 08:27:43 -0700 (PDT)
 Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id EAE0E240027
+        by mout02.posteo.de (Postfix) with ESMTPS id 3B008240101
         for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 17:27:41 +0200 (CEST)
 Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QPPbK3RQJz9rxH;
-        Sun, 21 May 2023 17:27:41 +0200 (CEST)
+        by submission (posteo.de) with ESMTPSA id 4QPPbJ55M7z9rxF;
+        Sun, 21 May 2023 17:27:40 +0200 (CEST)
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 4/5] btdev: report right reason for local Disconnect complete
-Date:   Sun, 21 May 2023 15:27:37 +0000
-Message-Id: <d1b47d578b8e78ea349356dae031e7744a5cf009.1684682575.git.pav@iki.fi>
+Subject: [PATCH BlueZ 2/5] shared/tester: retain test failure status
+Date:   Sun, 21 May 2023 15:27:35 +0000
+Message-Id: <f490bf6fe5b7d3610b26b2fc005440c8bcd8933d.1684682575.git.pav@iki.fi>
 In-Reply-To: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
 References: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
 MIME-Version: 1.0
@@ -36,40 +36,29 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Disconnect initiated by local host should get Connection Terminated by
-Local Host (0x16) as termination reason.
----
- emulator/btdev.c | 4 +++-
- monitor/bt.h     | 1 +
- 2 files changed, 4 insertions(+), 1 deletion(-)
+If a test has called tester_test_failed, consider the test failed, even
+if the test also called tester_test_passed/abort.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 0eec1d9f2..f9260511a 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -749,7 +749,9 @@ static int cmd_disconnect_complete(struct btdev *dev, const void *data,
- 		return 0;
+This avoids reporting success for misbehaving tests that call the
+status report functions multiple times.
+---
+ src/shared/tester.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 34f807556..a1ee5b687 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -622,6 +622,9 @@ static void test_result(enum test_result result)
+ 		test->timeout_id = 0;
  	}
  
--	disconnect_complete(dev, conn->handle, BT_HCI_ERR_SUCCESS, cmd->reason);
-+	/* Local host has different reason (Core v5.3 Vol 4 Part E Sec 7.1.6) */
-+	disconnect_complete(dev, conn->handle, BT_HCI_ERR_SUCCESS,
-+						BT_HCI_ERR_LOCAL_HOST_TERM);
- 
- 	if (conn->link)
- 		disconnect_complete(conn->link->dev, conn->link->handle,
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 2548f0dcd..b99ada0b2 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -3716,6 +3716,7 @@ struct bt_hci_evt_le_big_info_adv_report {
- #define BT_HCI_ERR_COMMAND_DISALLOWED		0x0c
- #define BT_HCI_ERR_UNSUPPORTED_FEATURE		0x11
- #define BT_HCI_ERR_INVALID_PARAMETERS		0x12
-+#define BT_HCI_ERR_LOCAL_HOST_TERM		0x16
- #define BT_HCI_ERR_UNSPECIFIED_ERROR		0x1f
- #define BT_HCI_ERR_ADV_TIMEOUT			0x3c
- #define BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH	0x3e
++	if (test->result == TEST_RESULT_FAILED)
++		result = TEST_RESULT_FAILED;
++
+ 	test->result = result;
+ 	switch (result) {
+ 	case TEST_RESULT_PASSED:
 -- 
 2.40.1
 
