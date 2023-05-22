@@ -2,60 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5085C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 May 2023 18:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52AFFC77B73
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 May 2023 18:56:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233604AbjEVS2l (ORCPT
+        id S231502AbjEVS4U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 May 2023 14:28:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42370 "EHLO
+        Mon, 22 May 2023 14:56:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233298AbjEVS2k (ORCPT
+        with ESMTP id S231534AbjEVS4T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 May 2023 14:28:40 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977C012B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 11:28:37 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4f3b5881734so3249832e87.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 11:28:37 -0700 (PDT)
+        Mon, 22 May 2023 14:56:19 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77D61CA
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 11:56:14 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2af318fa2b8so25160631fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 11:56:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684780116; x=1687372116;
+        d=gmail.com; s=20221208; t=1684781773; x=1687373773;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E3BUnIse4XpIguUjz9qDWD9DlcWFkt2RaMopnw4xGdA=;
-        b=smK+7lnTrURKLQW/yETMbsLStOanLDicDopSRp5iHhZ6dSfAMYFgGiLUN06qIziaEQ
-         lTSQVd0v3bBfTiMj29LZJrlwnnSjWdUv33HzDU/qbC7i0GedW/O5a5pL58D/Vk/U+EZL
-         bG33+olWyn3m7uLh2qZVnxm1QElnsMFMN4uqdBZ+ZswhL2S4N+ULGmCqQXHZkiF7c46J
-         ieDaW16nLVdTG2ubJqHuySHmPWH9hHhFrCC4XR33gB8mhSkx4iyQ9coEA+5ZmWdser6+
-         sw40z9ENPdJ+1G6tPNGhSGUFD5zq0yNpOzN88ZV2N+FBoSodz7u9ND884DvqlqgzY+Z5
-         /Ipw==
+        bh=D1gsl5gsQwhLK6V6M+qoxSTNog7cnLfbHC3DN7I//Uc=;
+        b=jV0zRuC3DBAxvubJG5IgoPrNlYjT8wFziD5/4uGJyrVCqJxipv2lwfUUe8rW4W0lHW
+         Sj3zYgVcALwgK/QAn0leEg35jqwhhmPDRSXNKWRogehB1qbRxRbN/YBTPpiCKzwXWkKo
+         pxbJcxocVxeAG65oaDIv+QzI59ofxwGu1wiTOOToPNrra5Zztzzg/hc3w6Q9fizLyjXL
+         OUOCW4Ane2iJweMb7i6JfpO8iQbenMCzpL5R7V6wrAbdO9+ho9vp/7GdlZUAIa/0r7vk
+         v/pj3X/RhJIBd0F1RCqa92ZrOqL1lRBAVxK4vcrGQld/EhxSIHHL0RU9BFVf+6Uoh8Bn
+         XTmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684780116; x=1687372116;
+        d=1e100.net; s=20221208; t=1684781773; x=1687373773;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E3BUnIse4XpIguUjz9qDWD9DlcWFkt2RaMopnw4xGdA=;
-        b=avxZxaBpI+Tv0g6AckwJBIwkq6hG90++x006TVWb2qNNDH+sKGi56b2sL1kBHPzn5V
-         3r8oGEJdGi4HdddgloDxrIWvyeSltuaAL4jgzULdpWlE4EnC+W4I4ivHBxclq5M9poR/
-         LtWwRRU77E5nslXiAmbYa0/ZNsEmH8cBfRFHKgMTcVAg5OTQzMbxJ7qJ9t8f73aUALcT
-         PftkUpM68F3VykBQC0DI6ILM88dd093fsA8EzeXCxDrAEOrrMOjdLse8+2g+5xUtEPbg
-         AqihiVfJvsw0menjABejC2rElrAjHFw0XBQ2twOIuDEZ6eFnsP3NmVpMQMJGwZdlIC/W
-         t2Ww==
-X-Gm-Message-State: AC+VfDwNVyMUCdmJG+cr4mlsPtsv7jM9Bb52kZ3URBXFunCjPpq514wX
-        diQvcR8V4S7GMPKs8pSKKJjgtyYBG+5/of7bSsyo1Edm
-X-Google-Smtp-Source: ACHHUZ43DzjyNh+8lhLdMCfk6gSG5cqg5ZF73uPnjyWFCxckcZ27ElQe3p3mDdxXKFKpLjd4jgl7VULkJ3BJEDpr+oU=
-X-Received: by 2002:a2e:98d4:0:b0:2af:1c91:d712 with SMTP id
- s20-20020a2e98d4000000b002af1c91d712mr4353225ljj.39.1684780115357; Mon, 22
- May 2023 11:28:35 -0700 (PDT)
+        bh=D1gsl5gsQwhLK6V6M+qoxSTNog7cnLfbHC3DN7I//Uc=;
+        b=DptscoACPE47Of1Bze69+avTcSL6KaOWeUwxVSnJGx0IQ4HXnohSXEJaUkhPI46KSW
+         0sHu0dGN+0o4OlwCGo1QhzBsbYsP0/17VTfjzKc3yLUHAlhtobZxaoiD5WLwu/Cb9Wff
+         yCjvmSPxQ4PG4Kms31J0uTizl3VmdBf4Jch4YeFZTDfPfBzJqqmTCneIhY9xVEi7MTjO
+         K8jLZtNqQFWYp9n4C2i6/0mndUYO+6vSGSlDtrpuKv9AsfcjI/exr3McIWxtNuUxTzXI
+         4Z1cxT8jP6JO/Y6mOP5xOdq02t2qzbtA0ue79Z8gi7YuhPHswLtKyKU6PN1gLiQuRj5J
+         bokQ==
+X-Gm-Message-State: AC+VfDx+pFFdBiSq5bqELHBv2fwSy4dMn2g6kyVR5+ajr9wMm9tQl4nF
+        43awgtc5ANtOV+iR3A3p0hFsa6EvcfkS7kUdLks=
+X-Google-Smtp-Source: ACHHUZ4xLirSpas+Of1PtO9WuH9mEb1qHNq8ixxu4c2bogLAVSWVG6EUpcnZMm/2eoV9+FGzUHIrqhcz25qvpqm6t/Y=
+X-Received: by 2002:a2e:3a08:0:b0:2ac:8000:1ea0 with SMTP id
+ h8-20020a2e3a08000000b002ac80001ea0mr4533229lja.26.1684781772329; Mon, 22 May
+ 2023 11:56:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
- <aa64f9c867330b2e691ee65ac30104b8757d7a4b.1684682575.git.pav@iki.fi>
-In-Reply-To: <aa64f9c867330b2e691ee65ac30104b8757d7a4b.1684682575.git.pav@iki.fi>
+References: <cfe0dd7b21b58dcb06af414e92386e5dd372adb0.1684683803.git.pav@iki.fi>
+In-Reply-To: <cfe0dd7b21b58dcb06af414e92386e5dd372adb0.1684683803.git.pav@iki.fi>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 22 May 2023 11:28:23 -0700
-Message-ID: <CABBYNZJDw5fNq9fQ7b29WBpEdAypsG_fazp5M_-7430r7YVpSA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/5] iso-tester: add tests for multiple simultaneous CIG
+Date:   Mon, 22 May 2023 11:56:00 -0700
+Message-ID: <CABBYNZLbXfJsS7BJVjqy-V8uSY4hvpCfeh6y+zqqwO13xrr0gg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: ISO: consider right CIS when removing CIG
+ at cleanup
 To:     Pauli Virtanen <pav@iki.fi>
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -66,137 +66,41 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Pauli,
 
-On Sun, May 21, 2023 at 8:32=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+On Sun, May 21, 2023 at 8:52=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
 >
-> Add tests connecting two CIS using different CIG_ID, with fixed and
-> auto-allocated IDs.
->
-> ISO Connect2 CIG 0x01/0x02 Seq - Success
-> ISO Connect2 CIG auto/auto Seq - Success
->
-> The CIS are connected sequentially so that the first is closed after the
-> second is connected. In the auto/auto case the kernel shall pick a new
-> CIG_ID since the first CIG_ID is no longer in a configurable state.
+> When looking for CIS blocking CIG removal, consider only the CIS with
+> the right CIG ID. Don't try to remove CIG with unset CIG ID.
 
-Is this somewhat similar to AC 7(i) but using different CIGs? I
-suspect this is not covered on BAP, although it is a valid audio
-configuration, perhaps we could use AC 7(i)-alt or something.
+You forgot to add Signed-off-by, also we should probably add Fixes tag
+as well since we might want to backport these changes.
 
 > ---
+>  net/bluetooth/hci_conn.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 >
-> Notes:
->     The second tests hits a bug in kernel CIG auto-allocation, which alwa=
-ys
->     picks CIG_ID 0 even if it is not in a configurable state.
->
->     ISO Connect2 CIG auto/auto Seq - Success - setup complete
->     ISO Connect2 CIG auto/auto Seq - Success - run
->       Connecting to 00:AA:01:01:00:00...
->       Connect 0 in progress
->       Connecting to 00:AA:01:02:00:01...
->       Connect 1 in progress
->       Successfully connected
->       Step 1
->       Connect failed: Device or resource busy (16)
->       Expect error: Success (0) !=3D Device or resource busy (16)
->
->  tools/iso-tester.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
->
-> diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-> index 164cb465f..fc2a84215 100644
-> --- a/tools/iso-tester.c
-> +++ b/tools/iso-tester.c
-> @@ -64,6 +64,11 @@
->                 QOS_IO(_interval, _latency, _sdu, _phy, _rtn), \
->                 QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
->
-> +#define QOS_2(_interval, _latency, _sdu, _phy, _rtn) \
-> +       QOS_FULL(0x02, BT_ISO_QOS_CIS_UNSET, \
-> +               QOS_IO(_interval, _latency, _sdu, _phy, _rtn), \
-> +               QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
-> +
->  #define QOS_1_1(_interval, _latency, _sdu, _phy, _rtn) \
->         QOS_FULL(0x01, 0x01, \
->                 QOS_IO(_interval, _latency, _sdu, _phy, _rtn), \
-> @@ -109,6 +114,7 @@
->  #define QOS_16_1_1 QOS(7500, 8, 30, 0x02, 2)
->  #define QOS_16_2_1 QOS(10000, 10, 40, 0x02, 2)
->  #define QOS_1_16_2_1 QOS_1(10000, 10, 40, 0x02, 2)
-> +#define QOS_2_16_2_1 QOS_2(10000, 10, 40, 0x02, 2)
->  #define QOS_1_1_16_2_1 QOS_1_1(10000, 10, 40, 0x02, 2)
->  #define QOS_24_1_1 QOS(7500, 8, 45, 0x02, 2)
->  #define QOS_24_2_1 QOS(10000, 10, 60, 0x02, 2)
-> @@ -546,6 +552,20 @@ static const struct iso_client_data connect_1_16_2_1=
- =3D {
->         .expect_err =3D 0
->  };
->
-> +static const struct iso_client_data connect_2_16_2_1 =3D {
-> +       .qos =3D QOS_1_16_2_1,
-> +       .qos_2 =3D QOS_2_16_2_1,
-> +       .expect_err =3D 0,
-> +       .mcis =3D true,
-> +};
-> +
-> +static const struct iso_client_data connect_2a_16_2_1 =3D {
-> +       .qos =3D QOS_16_2_1,
-> +       .qos_2 =3D QOS_16_2_1,
-> +       .expect_err =3D 0,
-> +       .mcis =3D true,
-> +};
-> +
->  static const struct iso_client_data connect_1_1_16_2_1 =3D {
->         .qos =3D QOS_1_1_16_2_1,
->         .expect_err =3D 0
-> @@ -2126,6 +2146,25 @@ static void test_connect2(const void *test_data)
->         setup_connect_many(data, 2, num, funcs);
->  }
->
-> +static gboolean iso_connect2_seq_cb(GIOChannel *io, GIOCondition cond,
-> +                                                       gpointer user_dat=
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index f75ef12f18f7..2363477af89d 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -950,6 +950,8 @@ static void find_cis(struct hci_conn *conn, void *dat=
 a)
-> +{
-> +       struct test_data *data =3D tester_get_data();
-> +
-> +       data->io_id[0] =3D 0;
-> +
-> +       setup_connect(data, 1, iso_connect2_cb);
-> +
-> +       return iso_connect(io, cond, user_data);
-> +}
-> +
-> +static void test_connect2_seq(const void *test_data)
-> +{
-> +       struct test_data *data =3D tester_get_data();
-> +
-> +       setup_connect(data, 0, iso_connect2_seq_cb);
-> +}
-> +
->  static void test_bcast(const void *test_data)
->  {
->         struct test_data *data =3D tester_get_data();
-> @@ -2264,6 +2303,15 @@ int main(int argc, char *argv[])
->         test_iso("ISO QoS - Invalid", &connect_invalid, setup_powered,
->                                                         test_connect);
+>         /* Ignore broadcast */
+>         if (!bacmp(&conn->dst, BDADDR_ANY))
+>                 return;
+> +       if (d->cig !=3D conn->iso_qos.ucast.cig)
+> +               return;
 >
-> +       test_iso2("ISO Connect2 CIG 0x01/0x02 Seq - Success", &connect_2_=
-16_2_1,
-> +                                                       setup_powered,
-> +                                                       test_connect2_seq=
-);
+>         d->count++;
+>  }
+> @@ -963,6 +965,9 @@ static void cis_cleanup(struct hci_conn *conn)
+>         struct hci_dev *hdev =3D conn->hdev;
+>         struct iso_list_data d;
+>
+> +       if (conn->iso_qos.ucast.cig =3D=3D BT_ISO_QOS_CIG_UNSET)
+> +               return;
 > +
-> +       test_iso2("ISO Connect2 CIG auto/auto Seq - Success",
-> +                                                       &connect_2a_16_2_=
-1,
-> +                                                       setup_powered,
-> +                                                       test_connect2_seq=
-);
-> +
->         test_iso_rej("ISO Connect - Reject", &connect_reject, setup_power=
-ed,
->                         test_connect, BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH=
-);
+>         memset(&d, 0, sizeof(d));
+>         d.cig =3D conn->iso_qos.ucast.cig;
 >
 > --
 > 2.40.1
