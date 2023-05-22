@@ -2,116 +2,206 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F9EAC77B73
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 May 2023 15:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5085C77B75
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 May 2023 18:28:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233806AbjEVPc4 (ORCPT
+        id S233604AbjEVS2l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 May 2023 11:32:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34470 "EHLO
+        Mon, 22 May 2023 14:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231255AbjEVPcz (ORCPT
+        with ESMTP id S233298AbjEVS2k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 May 2023 11:32:55 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2540DAA
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 08:32:55 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id af79cd13be357-75b1219506fso59967485a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 08:32:55 -0700 (PDT)
+        Mon, 22 May 2023 14:28:40 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 977C012B
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 11:28:37 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4f3b5881734so3249832e87.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 11:28:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684769574; x=1687361574;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=V++lWvmZeKSCvvN3KEpfaVcN3n1p/u3T0naCNwr1+oM=;
-        b=kDljaHQJBtt4YzEmOK7E4BO1IOcxh+QKgV8Lo21qdSdxkuM2kwImN5W3D+gtUhxQ3/
-         +Yeikk8A+BgDzdHZBx494XCrRbitX1ZUhrc0q7ziZ3CzjuzxcY2/+iUdQgGMhftgYvbV
-         qJ9MssMDomjmcUEIYsP3IX1Iclg6pKAuq8j6r5THpsjCUfUb7CRydvN2dA59wHYZfpdL
-         YjCMGVIc2HuR1PMABteN5Fc50OtKgfSJER1q7hSDpn1UJ107T1uP3whmlXSubLpTdads
-         9ToJuXNF/IrjF1JnicztfDS8/+mzjNk/QDgjgVzlS+5fktitziPVk0O1IC+7vLOYYOcd
-         D2TA==
+        d=gmail.com; s=20221208; t=1684780116; x=1687372116;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E3BUnIse4XpIguUjz9qDWD9DlcWFkt2RaMopnw4xGdA=;
+        b=smK+7lnTrURKLQW/yETMbsLStOanLDicDopSRp5iHhZ6dSfAMYFgGiLUN06qIziaEQ
+         lTSQVd0v3bBfTiMj29LZJrlwnnSjWdUv33HzDU/qbC7i0GedW/O5a5pL58D/Vk/U+EZL
+         bG33+olWyn3m7uLh2qZVnxm1QElnsMFMN4uqdBZ+ZswhL2S4N+ULGmCqQXHZkiF7c46J
+         ieDaW16nLVdTG2ubJqHuySHmPWH9hHhFrCC4XR33gB8mhSkx4iyQ9coEA+5ZmWdser6+
+         sw40z9ENPdJ+1G6tPNGhSGUFD5zq0yNpOzN88ZV2N+FBoSodz7u9ND884DvqlqgzY+Z5
+         /Ipw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684769574; x=1687361574;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V++lWvmZeKSCvvN3KEpfaVcN3n1p/u3T0naCNwr1+oM=;
-        b=jpSlHoweyQj6TaFcvRWv5NOqqT8A4CVRKCmDpypO+y0AWUHkYQiPrM7QvPywdWz0eh
-         aYay+zBRe5kJEBLq2MgkSi5lL98SBziqKjU0qpxAF3reN4RSa/Q6tckNYq6UDAgbzl+q
-         CJ53xY6ZVT4/q3mpTRxrRhtuksTdqugd6nPRqJLHL5a+DcTqA2zL+6CiQ++dW9riU61K
-         izKWjwT0juDL7xvNu+WC/2Y0emdkOv/8KYLJKpLSEk3f38RoSbnjVQVCHpPkye7lwZmM
-         L6+u0cTX3zgy36NfpcPup+zdHkzroDnJzSwDz2PYCgTuIv1/EN182UMWmV8SLxCGXM4M
-         VNFQ==
-X-Gm-Message-State: AC+VfDwpPllNhlCwhqkelg10jHMnpTzPdhJXYOeZFhRcZxgZAiD6cZQN
-        s1xcpp3fS8T4DG2ch5QNe4JxhmhMuXE=
-X-Google-Smtp-Source: ACHHUZ7Ajl7MH2ACJOdLqbTag5OkK49avwRdPfkEfTb5ivjDu1+cwOCbfg+V/ZGftTV6A/C8btcsBw==
-X-Received: by 2002:a05:620a:210f:b0:75b:23a1:8e5f with SMTP id l15-20020a05620a210f00b0075b23a18e5fmr1125723qkl.48.1684769573991;
-        Mon, 22 May 2023 08:32:53 -0700 (PDT)
-Received: from [172.17.0.2] ([52.184.138.35])
-        by smtp.gmail.com with ESMTPSA id v18-20020a05620a123200b007590aa4b115sm1766312qkj.87.2023.05.22.08.32.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 May 2023 08:32:53 -0700 (PDT)
-Message-ID: <646b8b25.050a0220.31a5f.587d@mx.google.com>
-Date:   Mon, 22 May 2023 08:32:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0981270425321449678=="
+        d=1e100.net; s=20221208; t=1684780116; x=1687372116;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E3BUnIse4XpIguUjz9qDWD9DlcWFkt2RaMopnw4xGdA=;
+        b=avxZxaBpI+Tv0g6AckwJBIwkq6hG90++x006TVWb2qNNDH+sKGi56b2sL1kBHPzn5V
+         3r8oGEJdGi4HdddgloDxrIWvyeSltuaAL4jgzULdpWlE4EnC+W4I4ivHBxclq5M9poR/
+         LtWwRRU77E5nslXiAmbYa0/ZNsEmH8cBfRFHKgMTcVAg5OTQzMbxJ7qJ9t8f73aUALcT
+         PftkUpM68F3VykBQC0DI6ILM88dd093fsA8EzeXCxDrAEOrrMOjdLse8+2g+5xUtEPbg
+         AqihiVfJvsw0menjABejC2rElrAjHFw0XBQ2twOIuDEZ6eFnsP3NmVpMQMJGwZdlIC/W
+         t2Ww==
+X-Gm-Message-State: AC+VfDwNVyMUCdmJG+cr4mlsPtsv7jM9Bb52kZ3URBXFunCjPpq514wX
+        diQvcR8V4S7GMPKs8pSKKJjgtyYBG+5/of7bSsyo1Edm
+X-Google-Smtp-Source: ACHHUZ43DzjyNh+8lhLdMCfk6gSG5cqg5ZF73uPnjyWFCxckcZ27ElQe3p3mDdxXKFKpLjd4jgl7VULkJ3BJEDpr+oU=
+X-Received: by 2002:a2e:98d4:0:b0:2af:1c91:d712 with SMTP id
+ s20-20020a2e98d4000000b002af1c91d712mr4353225ljj.39.1684780115357; Mon, 22
+ May 2023 11:28:35 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
-Subject: RE: Fix l2cap_disconnect_req deadlock
-In-Reply-To: <20230522143759.2880743-1-yinghsu@chromium.org>
-References: <20230522143759.2880743-1-yinghsu@chromium.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <024df2d86c14fc811701ba27bfa576476bc9c0d6.1684682575.git.pav@iki.fi>
+ <aa64f9c867330b2e691ee65ac30104b8757d7a4b.1684682575.git.pav@iki.fi>
+In-Reply-To: <aa64f9c867330b2e691ee65ac30104b8757d7a4b.1684682575.git.pav@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 22 May 2023 11:28:23 -0700
+Message-ID: <CABBYNZJDw5fNq9fQ7b29WBpEdAypsG_fazp5M_-7430r7YVpSA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 5/5] iso-tester: add tests for multiple simultaneous CIG
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0981270425321449678==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+On Sun, May 21, 2023 at 8:32=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add tests connecting two CIS using different CIG_ID, with fixed and
+> auto-allocated IDs.
+>
+> ISO Connect2 CIG 0x01/0x02 Seq - Success
+> ISO Connect2 CIG auto/auto Seq - Success
+>
+> The CIS are connected sequentially so that the first is closed after the
+> second is connected. In the auto/auto case the kernel shall pick a new
+> CIG_ID since the first CIG_ID is no longer in a configurable state.
 
-Dear submitter,
+Is this somewhat similar to AC 7(i) but using different CIGs? I
+suspect this is not covered on BAP, although it is a valid audio
+configuration, perhaps we could use AC 7(i)-alt or something.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=749808
+> ---
+>
+> Notes:
+>     The second tests hits a bug in kernel CIG auto-allocation, which alwa=
+ys
+>     picks CIG_ID 0 even if it is not in a configurable state.
+>
+>     ISO Connect2 CIG auto/auto Seq - Success - setup complete
+>     ISO Connect2 CIG auto/auto Seq - Success - run
+>       Connecting to 00:AA:01:01:00:00...
+>       Connect 0 in progress
+>       Connecting to 00:AA:01:02:00:01...
+>       Connect 1 in progress
+>       Successfully connected
+>       Step 1
+>       Connect failed: Device or resource busy (16)
+>       Expect error: Success (0) !=3D Device or resource busy (16)
+>
+>  tools/iso-tester.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+>
+> diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+> index 164cb465f..fc2a84215 100644
+> --- a/tools/iso-tester.c
+> +++ b/tools/iso-tester.c
+> @@ -64,6 +64,11 @@
+>                 QOS_IO(_interval, _latency, _sdu, _phy, _rtn), \
+>                 QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
+>
+> +#define QOS_2(_interval, _latency, _sdu, _phy, _rtn) \
+> +       QOS_FULL(0x02, BT_ISO_QOS_CIS_UNSET, \
+> +               QOS_IO(_interval, _latency, _sdu, _phy, _rtn), \
+> +               QOS_IO(_interval, _latency, _sdu, _phy, _rtn))
+> +
+>  #define QOS_1_1(_interval, _latency, _sdu, _phy, _rtn) \
+>         QOS_FULL(0x01, 0x01, \
+>                 QOS_IO(_interval, _latency, _sdu, _phy, _rtn), \
+> @@ -109,6 +114,7 @@
+>  #define QOS_16_1_1 QOS(7500, 8, 30, 0x02, 2)
+>  #define QOS_16_2_1 QOS(10000, 10, 40, 0x02, 2)
+>  #define QOS_1_16_2_1 QOS_1(10000, 10, 40, 0x02, 2)
+> +#define QOS_2_16_2_1 QOS_2(10000, 10, 40, 0x02, 2)
+>  #define QOS_1_1_16_2_1 QOS_1_1(10000, 10, 40, 0x02, 2)
+>  #define QOS_24_1_1 QOS(7500, 8, 45, 0x02, 2)
+>  #define QOS_24_2_1 QOS(10000, 10, 60, 0x02, 2)
+> @@ -546,6 +552,20 @@ static const struct iso_client_data connect_1_16_2_1=
+ =3D {
+>         .expect_err =3D 0
+>  };
+>
+> +static const struct iso_client_data connect_2_16_2_1 =3D {
+> +       .qos =3D QOS_1_16_2_1,
+> +       .qos_2 =3D QOS_2_16_2_1,
+> +       .expect_err =3D 0,
+> +       .mcis =3D true,
+> +};
+> +
+> +static const struct iso_client_data connect_2a_16_2_1 =3D {
+> +       .qos =3D QOS_16_2_1,
+> +       .qos_2 =3D QOS_16_2_1,
+> +       .expect_err =3D 0,
+> +       .mcis =3D true,
+> +};
+> +
+>  static const struct iso_client_data connect_1_1_16_2_1 =3D {
+>         .qos =3D QOS_1_1_16_2_1,
+>         .expect_err =3D 0
+> @@ -2126,6 +2146,25 @@ static void test_connect2(const void *test_data)
+>         setup_connect_many(data, 2, num, funcs);
+>  }
+>
+> +static gboolean iso_connect2_seq_cb(GIOChannel *io, GIOCondition cond,
+> +                                                       gpointer user_dat=
+a)
+> +{
+> +       struct test_data *data =3D tester_get_data();
+> +
+> +       data->io_id[0] =3D 0;
+> +
+> +       setup_connect(data, 1, iso_connect2_cb);
+> +
+> +       return iso_connect(io, cond, user_data);
+> +}
+> +
+> +static void test_connect2_seq(const void *test_data)
+> +{
+> +       struct test_data *data =3D tester_get_data();
+> +
+> +       setup_connect(data, 0, iso_connect2_seq_cb);
+> +}
+> +
+>  static void test_bcast(const void *test_data)
+>  {
+>         struct test_data *data =3D tester_get_data();
+> @@ -2264,6 +2303,15 @@ int main(int argc, char *argv[])
+>         test_iso("ISO QoS - Invalid", &connect_invalid, setup_powered,
+>                                                         test_connect);
+>
+> +       test_iso2("ISO Connect2 CIG 0x01/0x02 Seq - Success", &connect_2_=
+16_2_1,
+> +                                                       setup_powered,
+> +                                                       test_connect2_seq=
+);
+> +
+> +       test_iso2("ISO Connect2 CIG auto/auto Seq - Success",
+> +                                                       &connect_2a_16_2_=
+1,
+> +                                                       setup_powered,
+> +                                                       test_connect2_seq=
+);
+> +
+>         test_iso_rej("ISO Connect - Reject", &connect_reject, setup_power=
+ed,
+>                         test_connect, BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH=
+);
+>
+> --
+> 2.40.1
+>
 
----Test result---
 
-Test Summary:
-CheckPatch                    PASS      0.72 seconds
-GitLint                       PASS      0.35 seconds
-SubjectPrefix                 FAIL      0.36 seconds
-BuildKernel                   PASS      32.39 seconds
-CheckAllWarning               PASS      35.19 seconds
-CheckSparse                   PASS      39.93 seconds
-CheckSmatch                   PASS      111.87 seconds
-BuildKernel32                 PASS      31.14 seconds
-TestRunnerSetup               PASS      445.89 seconds
-TestRunner_l2cap-tester       PASS      16.84 seconds
-TestRunner_iso-tester         PASS      20.34 seconds
-TestRunner_bnep-tester        PASS      5.39 seconds
-TestRunner_mgmt-tester        PASS      111.90 seconds
-TestRunner_rfcomm-tester      PASS      8.62 seconds
-TestRunner_sco-tester         PASS      8.10 seconds
-TestRunner_ioctl-tester       PASS      9.24 seconds
-TestRunner_mesh-tester        PASS      6.83 seconds
-TestRunner_smp-tester         PASS      7.85 seconds
-TestRunner_userchan-tester    PASS      5.62 seconds
-IncrementalBuild              PASS      29.53 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0981270425321449678==--
+--=20
+Luiz Augusto von Dentz
