@@ -2,298 +2,618 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFF9C7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 May 2023 05:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7E3C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 May 2023 06:02:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231827AbjEVFvI (ORCPT
+        id S229853AbjEVGC3 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 May 2023 01:51:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37126 "EHLO
+        Mon, 22 May 2023 02:02:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231446AbjEVFvG (ORCPT
+        with ESMTP id S229571AbjEVGC2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 May 2023 01:51:06 -0400
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A612E6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 22:51:03 -0700 (PDT)
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-7636c775952so208216939f.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 May 2023 22:51:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684734662; x=1687326662;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sJ3ECm/S1WpNy1KYNnmDuPolLtz5d+MdB+RcH96oAqU=;
-        b=E+W2ZSic712PNXEykYG9KpULYuHzyQJirw9hl2QOYC13kWv73ZfM75MWvoq1wlQCUy
-         EGQY0vHUVS9/G6Vd22YG0ZFBMhc7RkfqZ9W3jCZivI0PWGY1HleP13yX8j5ESn1zFNOp
-         6KZCEjY9tbuBaDnz6ogdokMbn41pUD2NDQRvRi920daM3YGwGMo6lrrdizxB9hYc/fU4
-         4Jc60W1UX6Lh6qih54U6fHLVGoCbw8888KdFOCxpSaKlNe612IKyj/5hRgwxzi2didWU
-         w2CwlsayJuhkEKuSDzUsRH7+7dF7j8yJApxw3SH3K61QcZ2I4q9BX2LZPpi90JPvVa31
-         0pNw==
-X-Gm-Message-State: AC+VfDwWE62y/APE1NwuBdnu6tQXciVVdNCttvKC3S6w6YEhPXjxGABb
-        sosxPvprEezlMrsFNWHPf6H4E9dv4rSPbkvlqvvhhy7IKUsP
-X-Google-Smtp-Source: ACHHUZ5XGgt+7ySAB+FUoutFLfdWg3yxw/lAJDrDet94dqoqRFVdkZyMPDAc5M/7hlrlF+6P3BNj5nQBgDyQd8+LEcNzsVUOyHnN
+        Mon, 22 May 2023 02:02:28 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B1AFCF;
+        Sun, 21 May 2023 23:02:24 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 34M61uncE007202, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 34M61uncE007202
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=OK);
+        Mon, 22 May 2023 14:01:56 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Mon, 22 May 2023 14:02:06 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Mon, 22 May 2023 14:02:06 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
+ RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
+ 15.01.2375.007; Mon, 22 May 2023 14:02:06 +0800
+From:   Hilda Wu <hildawu@realtek.com>
+To:     "marcel@holtmann.org" <marcel@holtmann.org>
+CC:     "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mmandlik@google.com" <mmandlik@google.com>,
+        "apusaka@chromium.org" <apusaka@chromium.org>,
+        "yinghsu@chromium.org" <yinghsu@chromium.org>,
+        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
+        Max Chou <max.chou@realtek.com>, KidmanLee <kidman@realtek.com>
+Subject: RE: [PATCH v4] Bluetooth: btrtl: Add Realtek devcoredump support
+Thread-Topic: [PATCH v4] Bluetooth: btrtl: Add Realtek devcoredump support
+Thread-Index: AQHZeLhFt1hIfTKg4E+SKRXN39RX2a9lyOWg
+Date:   Mon, 22 May 2023 06:02:05 +0000
+Message-ID: <6e2b544469034ca694f4cc2388f81832@realtek.com>
+References: <20230427032755.28519-1-hildawu@realtek.com>
+In-Reply-To: <20230427032755.28519-1-hildawu@realtek.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.21.132.182]
+x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-X-Received: by 2002:a02:23ca:0:b0:40f:d6c5:2059 with SMTP id
- u193-20020a0223ca000000b0040fd6c52059mr4940956jau.6.1684734662651; Sun, 21
- May 2023 22:51:02 -0700 (PDT)
-Date:   Sun, 21 May 2023 22:51:02 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001bb75a05fc41db40@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in hci_conn_drop
-From:   syzbot <syzbot+21835970af93643f25a2@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Marcel, Johan, Luiz, and Maintainers,
 
-syzbot found the following issue on:
+Friendly ping, we are waiting for a maintainer review.
+If you have any suggestions, please let us know.
+Thank you for your help and your time.
 
-HEAD commit:    1b66c114d161 Merge tag 'nfsd-6.4-1' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=157d87ce280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=94af80bb8ddd23c4
-dashboard link: https://syzkaller.appspot.com/bug?extid=21835970af93643f25a2
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+Regards,
+Hilda
 
-Unfortunately, I don't have any reproducer for this issue yet.
+-----Original Message-----
+From: Hilda Wu <hildawu@realtek.com> 
+Sent: Thursday, April 27, 2023 11:28 AM
+To: marcel@holtmann.org
+Cc: johan.hedberg@gmail.com; luiz.dentz@gmail.com; linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org; mmandlik@google.com; apusaka@chromium.org; yinghsu@chromium.org; alex_lu@realsil.com.cn; Max Chou <max.chou@realtek.com>; KidmanLee <kidman@realtek.com>
+Subject: [PATCH v4] Bluetooth: btrtl: Add Realtek devcoredump support
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f5d99e318272/disk-1b66c114.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2cdf457bc2a6/vmlinux-1b66c114.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a5d135c04826/bzImage-1b66c114.xz
+From: Hilda Wu <hildawu@realtek.com>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+21835970af93643f25a2@syzkaller.appspotmail.com
+Catch debug exception from controller and driver, and trigger a devcoredump using hci devcoredump APIs. The debug exception data will be parsed in userspace.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
-BUG: KASAN: slab-use-after-free in atomic_dec_and_test include/linux/atomic/atomic-instrumented.h:575 [inline]
-BUG: KASAN: slab-use-after-free in hci_conn_drop+0x34/0x2c0 include/net/bluetooth/hci_core.h:1418
-Write of size 4 at addr ffff8880406a6010 by task syz-executor.1/7637
-
-CPU: 0 PID: 7637 Comm: syz-executor.1 Not tainted 6.4.0-rc2-syzkaller-00015-g1b66c114d161 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/28/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:351 [inline]
- print_report+0x163/0x540 mm/kasan/report.c:462
- kasan_report+0x176/0x1b0 mm/kasan/report.c:572
- kasan_check_range+0x283/0x290 mm/kasan/generic.c:187
- instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
- atomic_dec_and_test include/linux/atomic/atomic-instrumented.h:575 [inline]
- hci_conn_drop+0x34/0x2c0 include/net/bluetooth/hci_core.h:1418
- sco_chan_del+0xeb/0x1d0 net/bluetooth/sco.c:169
- sco_sock_close net/bluetooth/sco.c:469 [inline]
- sco_sock_release+0xb3/0x320 net/bluetooth/sco.c:1267
- __sock_release net/socket.c:653 [inline]
- sock_close+0xd1/0x230 net/socket.c:1397
- __fput+0x3b7/0x890 fs/file_table.c:321
- task_work_run+0x24a/0x300 kernel/task_work.c:179
- get_signal+0x1606/0x17e0 kernel/signal.c:2650
- arch_do_signal_or_restart+0x91/0x670 arch/x86/kernel/signal.c:306
- exit_to_user_mode_loop+0x6a/0x100 kernel/entry/common.c:168
- exit_to_user_mode_prepare+0xb1/0x140 kernel/entry/common.c:204
- __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
- syscall_exit_to_user_mode+0x64/0x280 kernel/entry/common.c:297
- do_syscall_64+0x4d/0xc0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f632188c169
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f63225fc168 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: fffffffffffffffc RBX: 00007f63219abf80 RCX: 00007f632188c169
-RDX: 0000000000000008 RSI: 0000000020000100 RDI: 0000000000000004
-RBP: 00007f63218e7ca1 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fff7261be3f R14: 00007f63225fc300 R15: 0000000000022000
- </TASK>
-
-Allocated by task 7519:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:383
- kmalloc include/linux/slab.h:559 [inline]
- kzalloc include/linux/slab.h:680 [inline]
- hci_conn_add+0xc3/0x13a0 net/bluetooth/hci_conn.c:986
- hci_connect_sco+0x8e/0x2b0 net/bluetooth/hci_conn.c:1663
- sco_connect net/bluetooth/sco.c:264 [inline]
- sco_sock_connect+0x2b9/0x990 net/bluetooth/sco.c:610
- __sys_connect_file net/socket.c:2003 [inline]
- __sys_connect+0x2cd/0x300 net/socket.c:2020
- __do_sys_connect net/socket.c:2030 [inline]
- __se_sys_connect net/socket.c:2027 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2027
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Freed by task 7110:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
- kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:521
- ____kasan_slab_free+0xd6/0x120 mm/kasan/common.c:236
- kasan_slab_free include/linux/kasan.h:162 [inline]
- slab_free_hook mm/slub.c:1781 [inline]
- slab_free_freelist_hook mm/slub.c:1807 [inline]
- slab_free mm/slub.c:3786 [inline]
- __kmem_cache_free+0x264/0x3c0 mm/slub.c:3799
- device_release+0x95/0x1c0
- kobject_cleanup lib/kobject.c:683 [inline]
- kobject_release lib/kobject.c:714 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x228/0x470 lib/kobject.c:731
- hci_conn_del+0x321/0x5a0 net/bluetooth/hci_conn.c:1162
- hci_conn_unlink+0x1e1/0x320 net/bluetooth/hci_conn.c:1087
- hci_conn_hash_flush+0x198/0x220 net/bluetooth/hci_conn.c:2479
- hci_dev_close_sync+0xa35/0x1020 net/bluetooth/hci_sync.c:4941
- hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
- hci_unregister_dev+0x1ca/0x480 net/bluetooth/hci_core.c:2703
- vhci_release+0x83/0xd0 drivers/bluetooth/hci_vhci.c:669
- __fput+0x3b7/0x890 fs/file_table.c:321
- task_work_run+0x24a/0x300 kernel/task_work.c:179
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0x68f/0x2290 kernel/exit.c:871
- do_group_exit+0x206/0x2c0 kernel/exit.c:1021
- get_signal+0x1701/0x17e0 kernel/signal.c:2874
- arch_do_signal_or_restart+0x91/0x670 arch/x86/kernel/signal.c:306
- exit_to_user_mode_loop+0x6a/0x100 kernel/entry/common.c:168
- exit_to_user_mode_prepare+0xb1/0x140 kernel/entry/common.c:204
- __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
- syscall_exit_to_user_mode+0x64/0x280 kernel/entry/common.c:297
- do_syscall_64+0x4d/0xc0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Last potentially related work creation:
- kasan_save_stack+0x3f/0x60 mm/kasan/common.c:45
- __kasan_record_aux_stack+0xb0/0xc0 mm/kasan/generic.c:491
- insert_work+0x54/0x3d0 kernel/workqueue.c:1365
- __queue_work+0xb37/0xf10 kernel/workqueue.c:1526
- queue_delayed_work_on+0x15a/0x260 kernel/workqueue.c:1710
- sco_chan_del+0xeb/0x1d0 net/bluetooth/sco.c:169
- sco_sock_close net/bluetooth/sco.c:469 [inline]
- sco_sock_release+0xb3/0x320 net/bluetooth/sco.c:1267
- __sock_release net/socket.c:653 [inline]
- sock_close+0xd1/0x230 net/socket.c:1397
- __fput+0x3b7/0x890 fs/file_table.c:321
- task_work_run+0x24a/0x300 kernel/task_work.c:179
- get_signal+0x1606/0x17e0 kernel/signal.c:2650
- arch_do_signal_or_restart+0x91/0x670 arch/x86/kernel/signal.c:306
- exit_to_user_mode_loop+0x6a/0x100 kernel/entry/common.c:168
- exit_to_user_mode_prepare+0xb1/0x140 kernel/entry/common.c:204
- __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
- syscall_exit_to_user_mode+0x64/0x280 kernel/entry/common.c:297
- do_syscall_64+0x4d/0xc0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-The buggy address belongs to the object at ffff8880406a6000
- which belongs to the cache kmalloc-4k of size 4096
-The buggy address is located 16 bytes inside of
- freed 4096-byte region [ffff8880406a6000, ffff8880406a7000)
-
-The buggy address belongs to the physical page:
-page:ffffea000101a800 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x406a0
-head:ffffea000101a800 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000010200 ffff888012442140 ffffea0000a14a00 dead000000000002
-raw: 0000000000000000 0000000000040004 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d2040(__GFP_IO|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 6060, tgid 6060 (udevadm), ts 248100761058, free_ts 248068222302
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x1e6/0x210 mm/page_alloc.c:1731
- prep_new_page mm/page_alloc.c:1738 [inline]
- get_page_from_freelist+0x321c/0x33a0 mm/page_alloc.c:3502
- __alloc_pages+0x255/0x670 mm/page_alloc.c:4768
- alloc_slab_page+0x6a/0x160 mm/slub.c:1851
- allocate_slab mm/slub.c:1998 [inline]
- new_slab+0x84/0x2f0 mm/slub.c:2051
- ___slab_alloc+0xa85/0x10a0 mm/slub.c:3192
- __slab_alloc mm/slub.c:3291 [inline]
- __slab_alloc_node mm/slub.c:3344 [inline]
- slab_alloc_node mm/slub.c:3441 [inline]
- __kmem_cache_alloc_node+0x1b8/0x290 mm/slub.c:3490
- __do_kmalloc_node mm/slab_common.c:965 [inline]
- __kmalloc+0xa8/0x230 mm/slab_common.c:979
- kmalloc include/linux/slab.h:563 [inline]
- tomoyo_realpath_from_path+0xcf/0x5e0 security/tomoyo/realpath.c:251
- tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
- tomoyo_check_open_permission+0x254/0x4e0 security/tomoyo/file.c:771
- security_file_open+0x63/0xa0 security/security.c:2797
- do_dentry_open+0x308/0x10f0 fs/open.c:907
- do_open fs/namei.c:3636 [inline]
- path_openat+0x27b3/0x3170 fs/namei.c:3791
- do_filp_open+0x234/0x490 fs/namei.c:3818
- do_sys_openat2+0x13f/0x500 fs/open.c:1356
- do_sys_open fs/open.c:1372 [inline]
- __do_sys_openat fs/open.c:1388 [inline]
- __se_sys_openat fs/open.c:1383 [inline]
- __x64_sys_openat+0x247/0x290 fs/open.c:1383
-page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1302 [inline]
- free_unref_page_prepare+0x903/0xa30 mm/page_alloc.c:2564
- free_unref_page+0x37/0x3f0 mm/page_alloc.c:2659
- discard_slab mm/slub.c:2097 [inline]
- __unfreeze_partials+0x1b1/0x1f0 mm/slub.c:2636
- put_cpu_partial+0x116/0x180 mm/slub.c:2712
- qlist_free_all+0x22/0x60 mm/kasan/quarantine.c:185
- kasan_quarantine_reduce+0x14b/0x160 mm/kasan/quarantine.c:292
- __kasan_slab_alloc+0x23/0x70 mm/kasan/common.c:305
- kasan_slab_alloc include/linux/kasan.h:186 [inline]
- slab_post_alloc_hook+0x68/0x3a0 mm/slab.h:711
- slab_alloc_node mm/slub.c:3451 [inline]
- __kmem_cache_alloc_node+0x14c/0x290 mm/slub.c:3490
- kmalloc_trace+0x2a/0xe0 mm/slab_common.c:1057
- kmalloc include/linux/slab.h:559 [inline]
- kzalloc include/linux/slab.h:680 [inline]
- kernfs_iop_get_link+0x67/0x5a0 fs/kernfs/symlink.c:135
- vfs_readlink+0x16e/0x400 fs/namei.c:5098
- do_readlinkat+0x283/0x3b0 fs/stat.c:489
- __do_sys_readlink fs/stat.c:510 [inline]
- __se_sys_readlink fs/stat.c:507 [inline]
- __x64_sys_readlink+0x7f/0x90 fs/stat.c:507
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
-Memory state around the buggy address:
- ffff8880406a5f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8880406a5f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff8880406a6000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                         ^
- ffff8880406a6080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8880406a6100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
+Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v4:
+ - Adjust coredump_info stored on a per hdev basis.
+ - Adjust message level.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Changes in v3:
+ - Rebase, fixed merge confilt
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Changes in v2:
+ - According to devcoredump API revision, modified related part.
+---
+---
+ drivers/bluetooth/btrtl.c | 145 +++++++++++++++++++++++++++++++-------
+ drivers/bluetooth/btrtl.h |  13 ++++
+ drivers/bluetooth/btusb.c |  74 +++++++++++++++++++
+ 3 files changed, 205 insertions(+), 27 deletions(-)
 
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c index 2915c82d719d..3a1abd8fad60 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -32,6 +32,8 @@
+ #define RTL_ROM_LMP_8851B	0x8851
+ #define RTL_CONFIG_MAGIC	0x8723ab55
+ 
++#define RTL_VSC_OP_COREDUMP	0xfcff
++
+ #define IC_MATCH_FL_LMPSUBV	(1 << 0)
+ #define IC_MATCH_FL_HCIREV	(1 << 1)
+ #define IC_MATCH_FL_HCIVER	(1 << 2)
+@@ -81,6 +83,7 @@ struct id_table {
+ 	bool has_msft_ext;
+ 	char *fw_name;
+ 	char *cfg_name;
++	char *hw_info;
+ };
+ 
+ struct btrtl_device_info {
+@@ -102,21 +105,24 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = false,
+ 	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
+-	  .cfg_name = NULL },
++	  .cfg_name = NULL,
++	  .hw_info = "rtl8723au" },
+ 
+ 	/* 8723BS */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723bs_config" },
++	  .cfg_name = "rtl_bt/rtl8723bs_config",
++	  .hw_info  = "rtl8723bs" },
+ 
+ 	/* 8723B */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723b_config" },
++	  .cfg_name = "rtl_bt/rtl8723b_config",
++	  .hw_info  = "rtl8723bu" },
+ 
+ 	/* 8723CS-CG */
+ 	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE | @@ -127,7 +133,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723cs_cg_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723cs_cg_config" },
++	  .cfg_name = "rtl_bt/rtl8723cs_cg_config",
++	  .hw_info  = "rtl8723cs-cg" },
+ 
+ 	/* 8723CS-VF */
+ 	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE | @@ -138,7 +145,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723cs_vf_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723cs_vf_config" },
++	  .cfg_name = "rtl_bt/rtl8723cs_vf_config",
++	  .hw_info  = "rtl8723cs-vf" },
+ 
+ 	/* 8723CS-XX */
+ 	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_CHIP_TYPE | @@ -149,28 +157,32 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723cs_xx_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723cs_xx_config" },
++	  .cfg_name = "rtl_bt/rtl8723cs_xx_config",
++	  .hw_info  = "rtl8723cs" },
+ 
+ 	/* 8723D */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723d_config" },
++	  .cfg_name = "rtl_bt/rtl8723d_config",
++	  .hw_info  = "rtl8723du" },
+ 
+ 	/* 8723DS */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723ds_config" },
++	  .cfg_name = "rtl_bt/rtl8723ds_config",
++	  .hw_info  = "rtl8723ds" },
+ 
+ 	/* 8821A */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8821a_config" },
++	  .cfg_name = "rtl_bt/rtl8821a_config",
++	  .hw_info  = "rtl8821au" },
+ 
+ 	/* 8821C */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_USB), @@ -178,7 +190,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8821c_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8821c_config" },
++	  .cfg_name = "rtl_bt/rtl8821c_config",
++	  .hw_info  = "rtl8821cu" },
+ 
+ 	/* 8821CS */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_UART), @@ -186,14 +199,16 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8821cs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8821cs_config" },
++	  .cfg_name = "rtl_bt/rtl8821cs_config",
++	  .hw_info  = "rtl8821cs" },
+ 
+ 	/* 8761A */
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8761a_config" },
++	  .cfg_name = "rtl_bt/rtl8761a_config",
++	  .hw_info  = "rtl8761au" },
+ 
+ 	/* 8761B */
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART), @@ -201,14 +216,16 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8761b_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8761b_config" },
++	  .cfg_name = "rtl_bt/rtl8761b_config",
++	  .hw_info  = "rtl8761btv" },
+ 
+ 	/* 8761BU */
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761bu_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8761bu_config" },
++	  .cfg_name = "rtl_bt/rtl8761bu_config",
++	  .hw_info  = "rtl8761bu" },
+ 
+ 	/* 8822C with UART interface */
+ 	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0x8, HCI_UART), @@ -216,7 +233,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8822cs_config" },
++	  .cfg_name = "rtl_bt/rtl8822cs_config",
++	  .hw_info  = "rtl8822cs" },
+ 
+ 	/* 8822C with UART interface */
+ 	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0xa, HCI_UART), @@ -224,7 +242,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8822cs_config" },
++	  .cfg_name = "rtl_bt/rtl8822cs_config",
++	  .hw_info  = "rtl8822cs" },
+ 
+ 	/* 8822C with USB interface */
+ 	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0xa, HCI_USB), @@ -232,7 +251,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8822cu_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8822cu_config" },
++	  .cfg_name = "rtl_bt/rtl8822cu_config",
++	  .hw_info  = "rtl8822cu" },
+ 
+ 	/* 8822B */
+ 	{ IC_INFO(RTL_ROM_LMP_8822B, 0xb, 0x7, HCI_USB), @@ -240,7 +260,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8822b_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8822b_config" },
++	  .cfg_name = "rtl_bt/rtl8822b_config",
++	  .hw_info  = "rtl8822bu" },
+ 
+ 	/* 8852A */
+ 	{ IC_INFO(RTL_ROM_LMP_8852A, 0xa, 0xb, HCI_USB), @@ -248,7 +269,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8852au_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8852au_config" },
++	  .cfg_name = "rtl_bt/rtl8852au_config",
++	  .hw_info  = "rtl8852au" },
+ 
+ 	/* 8852B with UART interface */
+ 	{ IC_INFO(RTL_ROM_LMP_8852A, 0xb, 0xb, HCI_UART), @@ -256,7 +278,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8852bs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8852bs_config" },
++	  .cfg_name = "rtl_bt/rtl8852bs_config",
++	  .hw_info  = "rtl8852bs" },
+ 
+ 	/* 8852B */
+ 	{ IC_INFO(RTL_ROM_LMP_8852A, 0xb, 0xb, HCI_USB), @@ -264,7 +287,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8852bu_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8852bu_config" },
++	  .cfg_name = "rtl_bt/rtl8852bu_config",
++	  .hw_info  = "rtl8852bu" },
+ 
+ 	/* 8852C */
+ 	{ IC_INFO(RTL_ROM_LMP_8852A, 0xc, 0xc, HCI_USB), @@ -272,7 +296,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+ 	  .fw_name  = "rtl_bt/rtl8852cu_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8852cu_config" },
++	  .cfg_name = "rtl_bt/rtl8852cu_config",
++	  .hw_info  = "rtl8852cu" },
+ 
+ 	/* 8851B */
+ 	{ IC_INFO(RTL_ROM_LMP_8851B, 0xb, 0xc, HCI_USB), @@ -280,7 +305,8 @@ static const struct id_table ic_id_table[] = {
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = false,
+ 	  .fw_name  = "rtl_bt/rtl8851bu_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8851bu_config" },
++	  .cfg_name = "rtl_bt/rtl8851bu_config",
++	  .hw_info  = "rtl8851bu" },
+ 	};
+ 
+ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev, @@ -590,6 +616,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 				unsigned char **_buf)
+ {
+ 	static const u8 extension_sig[] = { 0x51, 0x04, 0xfd, 0x77 };
++	struct btrealtek_data *coredump_info = hci_get_priv(hdev);
+ 	struct rtl_epatch_header *epatch_info;
+ 	unsigned char *buf;
+ 	int i, len;
+@@ -705,8 +732,10 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 
+ 	epatch_info = (struct rtl_epatch_header *)btrtl_dev->fw_data;
+ 	num_patches = le16_to_cpu(epatch_info->num_patches);
++
+ 	BT_DBG("fw_version=%x, num_patches=%d",
+ 	       le32_to_cpu(epatch_info->fw_version), num_patches);
++	coredump_info->rtl_dump.fw_version = 
++le32_to_cpu(epatch_info->fw_version);
+ 
+ 	/* After the rtl_epatch_header there is a funky patch metadata section.
+ 	 * Assuming 2 patches, the layout is:
+@@ -903,6 +932,53 @@ static int btrtl_setup_rtl8723b(struct hci_dev *hdev,
+ 	return ret;
+ }
+ 
++static void btrtl_coredump(struct hci_dev *hdev) {
++	static const u8 param[] = { 0x00, 0x00 };
++
++	__hci_cmd_send(hdev, RTL_VSC_OP_COREDUMP, sizeof(param), param); }
++
++static void btrtl_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb) {
++	struct btrealtek_data *coredump_info = hci_get_priv(hdev);
++	char buf[80];
++
++	if (coredump_info->rtl_dump.controller)
++		snprintf(buf, sizeof(buf), "Controller Name: %s\n",
++			 coredump_info->rtl_dump.controller);
++	else
++		snprintf(buf, sizeof(buf), "Controller Name: Unknown\n");
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Firmware Version: 0x%X\n",
++		 coredump_info->rtl_dump.fw_version);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Driver: %s\n", coredump_info->rtl_dump.driver_name);
++	skb_put_data(skb, buf, strlen(buf));
++
++	snprintf(buf, sizeof(buf), "Vendor: Realtek\n");
++	skb_put_data(skb, buf, strlen(buf));
++}
++
++static int btrtl_register_devcoredump_support(struct hci_dev *hdev) {
++	int err;
++
++	err = hci_devcd_register(hdev, btrtl_coredump, btrtl_dmp_hdr, NULL);
++
++	return err;
++}
++
++void btrtl_set_driver_name(struct hci_dev *hdev, const char 
++*driver_name) {
++	struct btrealtek_data *coredump_info = hci_get_priv(hdev);
++
++	coredump_info->rtl_dump.driver_name = driver_name; } 
++EXPORT_SYMBOL_GPL(btrtl_set_driver_name);
++
+ static bool rtl_has_chip_type(u16 lmp_subver)  {
+ 	switch (lmp_subver) {
+@@ -964,6 +1040,7 @@ EXPORT_SYMBOL_GPL(btrtl_free);  struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 					   const char *postfix)
+ {
++	struct btrealtek_data *coredump_info = hci_get_priv(hdev);
+ 	struct btrtl_device_info *btrtl_dev;
+ 	struct sk_buff *skb;
+ 	struct hci_rp_read_local_version *resp; @@ -1113,6 +1190,9 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	if (btrtl_dev->ic_info->has_msft_ext)
+ 		hci_set_msft_opcode(hdev, 0xFCF0);
+ 
++	if (btrtl_dev->ic_info)
++		coredump_info->rtl_dump.controller = btrtl_dev->ic_info->hw_info;
++
+ 	return btrtl_dev;
+ 
+ err_free:
+@@ -1125,6 +1205,8 @@ EXPORT_SYMBOL_GPL(btrtl_initialize);
+ int btrtl_download_firmware(struct hci_dev *hdev,
+ 			    struct btrtl_device_info *btrtl_dev)  {
++	int err = 0;
++
+ 	/* Match a set of subver values that correspond to stock firmware,
+ 	 * which is not compatible with standard btusb.
+ 	 * If matched, upload an alternative firmware that does conform to @@ -1133,12 +1215,14 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+ 	 */
+ 	if (!btrtl_dev->ic_info) {
+ 		rtl_dev_info(hdev, "assuming no firmware upload needed");
+-		return 0;
++		err = 0;
++		goto done;
+ 	}
+ 
+ 	switch (btrtl_dev->ic_info->lmp_subver) {
+ 	case RTL_ROM_LMP_8723A:
+-		return btrtl_setup_rtl8723a(hdev, btrtl_dev);
++		err = btrtl_setup_rtl8723a(hdev, btrtl_dev);
++		break;
+ 	case RTL_ROM_LMP_8723B:
+ 	case RTL_ROM_LMP_8821A:
+ 	case RTL_ROM_LMP_8761A:
+@@ -1146,11 +1230,18 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+ 	case RTL_ROM_LMP_8852A:
+ 	case RTL_ROM_LMP_8703B:
+ 	case RTL_ROM_LMP_8851B:
+-		return btrtl_setup_rtl8723b(hdev, btrtl_dev);
++		err = btrtl_setup_rtl8723b(hdev, btrtl_dev);
++		break;
+ 	default:
+ 		rtl_dev_info(hdev, "assuming no firmware upload needed");
+-		return 0;
++		break;
+ 	}
++
++done:
++	if (!err)
++		err = btrtl_register_devcoredump_support(hdev);
++
++	return err;
+ }
+ EXPORT_SYMBOL_GPL(btrtl_download_firmware);
+ 
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h index adb4c2c9abc5..a2d9d34f9fb0 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -109,8 +109,16 @@ enum {
+ 	__REALTEK_NUM_FLAGS,
+ };
+ 
++struct rtl_dump_info {
++	const char *driver_name;
++	char *controller;
++	u32  fw_version;
++};
++
+ struct btrealtek_data {
+ 	DECLARE_BITMAP(flags, __REALTEK_NUM_FLAGS);
++
++	struct rtl_dump_info rtl_dump;
+ };
+ 
+ #define btrealtek_set_flag(hdev, nr)					\
+@@ -139,6 +147,7 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+ 			    struct btrtl_device_info *btrtl_dev,
+ 			    unsigned int *controller_baudrate,
+ 			    u32 *device_baudrate, bool *flow_control);
++void btrtl_set_driver_name(struct hci_dev *hdev, const char 
++*driver_name);
+ 
+ #else
+ 
+@@ -182,4 +191,8 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
+ 	return -ENOENT;
+ }
+ 
++static inline void btrtl_set_driver_name(struct hci_dev *hdev, const 
++char *driver_name) { }
++
+ #endif
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c index 3aa189b1986d..23059e3463eb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -869,10 +869,49 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+ 	gpiod_set_value_cansleep(reset_gpio, 0);  }
+ 
++#define RTK_DEVCOREDUMP_CODE_MEMDUMP		0x01
++#define RTK_DEVCOREDUMP_CODE_HW_ERR		0x02
++#define RTK_DEVCOREDUMP_CODE_CMD_TIMEOUT	0x03
++
++#define RTK_SUB_EVENT_CODE_COREDUMP		0x34
++
++struct rtk_dev_coredump_hdr {
++	u8 type;
++	u8 code;
++	u8 reserved[2];
++} __packed;
++
++static inline void btusb_rtl_alloc_devcoredump(struct hci_dev *hdev,
++		struct rtk_dev_coredump_hdr *hdr, u8 *buf, u32 len) {
++	struct sk_buff *skb;
++
++	skb = alloc_skb(len + sizeof(*hdr), GFP_ATOMIC);
++	if (!skb)
++		return;
++
++	skb_put_data(skb, hdr, sizeof(*hdr));
++	if (len)
++		skb_put_data(skb, buf, len);
++
++	if (!hci_devcd_init(hdev, skb->len)) {
++		hci_devcd_append(hdev, skb);
++		hci_devcd_complete(hdev);
++	} else {
++		bt_dev_err(hdev, "RTL: Failed to generate devcoredump");
++		kfree_skb(skb);
++	}
++}
++
+ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)  {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	struct gpio_desc *reset_gpio = data->reset_gpio;
++	struct rtk_dev_coredump_hdr hdr = {
++		.type = RTK_DEVCOREDUMP_CODE_CMD_TIMEOUT,
++	};
++
++	btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
+ 
+ 	if (++data->cmd_timeout_cnt < 5)
+ 		return;
+@@ -899,6 +938,18 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
+ 	gpiod_set_value_cansleep(reset_gpio, 0);  }
+ 
++static void btusb_rtl_hw_error(struct hci_dev *hdev, u8 code) {
++	struct rtk_dev_coredump_hdr hdr = {
++		.type = RTK_DEVCOREDUMP_CODE_HW_ERR,
++		.code = code,
++	};
++
++	bt_dev_err(hdev, "RTL: hw err, trigger devcoredump (%d)", code);
++
++	btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0); }
++
+ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)  {
+ 	struct btusb_data *data = hci_get_drvdata(hdev); @@ -2539,6 +2590,25 @@ static int btusb_setup_realtek(struct hci_dev *hdev)
+ 	return ret;
+ }
+ 
++static int btusb_recv_event_realtek(struct hci_dev *hdev, struct 
++sk_buff *skb) {
++	if (skb->data[0] == HCI_VENDOR_PKT && skb->data[2] == RTK_SUB_EVENT_CODE_COREDUMP) {
++		struct rtk_dev_coredump_hdr hdr = {
++			.code = RTK_DEVCOREDUMP_CODE_MEMDUMP,
++		};
++
++		bt_dev_dbg(hdev, "RTL: received coredump vendor evt, len %u",
++			skb->len);
++
++		btusb_rtl_alloc_devcoredump(hdev, &hdr, skb->data, skb->len);
++		kfree_skb(skb);
++
++		return 0;
++	}
++
++	return hci_recv_frame(hdev, skb);
++}
++
+ /* UHW CR mapping */
+ #define MTK_BT_MISC		0x70002510
+ #define MTK_BT_SUBSYS_RST	0x70002610
+@@ -3978,6 +4048,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	} else if (id->driver_info & BTUSB_REALTEK) {
+ 		/* Allocate extra space for Realtek device */
+ 		priv_size += sizeof(struct btrealtek_data);
++
++		data->recv_event = btusb_recv_event_realtek;
+ 	}
+ 
+ 	data->recv_acl = hci_recv_frame;
+@@ -4136,9 +4208,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
+ 	    (id->driver_info & BTUSB_REALTEK)) {
++		btrtl_set_driver_name(hdev, btusb_driver.name);
+ 		hdev->setup = btusb_setup_realtek;
+ 		hdev->shutdown = btrtl_shutdown_realtek;
+ 		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
++		hdev->hw_error = btusb_rtl_hw_error;
+ 
+ 		/* Realtek devices need to set remote wakeup on auto-suspend */
+ 		set_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags);
+--
+2.17.1
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
