@@ -2,142 +2,216 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C49D2C77B75
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 May 2023 17:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F361DC7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 May 2023 19:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237576AbjEWRtj (ORCPT
+        id S238195AbjEWTEP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 May 2023 13:49:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47798 "EHLO
+        Tue, 23 May 2023 15:04:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237601AbjEWRtc (ORCPT
+        with ESMTP id S233536AbjEWTEO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 May 2023 13:49:32 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12EBB19B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 May 2023 10:49:10 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id ca18e2360f4ac-7748edd6c87so1581039f.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 May 2023 10:49:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684864148; x=1687456148;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EE/b2plJUzly6mj8iD1XqeQ5YtfmQN0MS5ML9oVAnFs=;
-        b=lSi37r8vDuobMuD6i1lAkhDiLjXC3eUHmI/i+DhmgcE9iDIheap3XZIZJlMjYCUZUh
-         0jP/7cmN3k/2mtBJcTSSmTxSGl+c7laK0nNFc19xoyxmeFAuM+EExpyWqCW5+cWk69ku
-         lsPKhgmnYtyezwU6oMh8EHOnPMtskg7P1aO6/he2l8rWhsM022MfMMsLJuJIsIZVXCgr
-         fQVdY4skIUkNrjEJXXsELJiZgUfeqsf2j8CLzeuufgU0T/OHEaIrbFVC5isfi90dx8rU
-         JrmHKxohlGENsCOgoYxCG4dX+NNhxCDd5B+X890jAFsA8ehEd+gaoWexjmvanF0OGfZ0
-         3Urg==
+        Tue, 23 May 2023 15:04:14 -0400
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A72791;
+        Tue, 23 May 2023 12:04:11 -0700 (PDT)
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-ba80dc46972so79018276.2;
+        Tue, 23 May 2023 12:04:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684864148; x=1687456148;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EE/b2plJUzly6mj8iD1XqeQ5YtfmQN0MS5ML9oVAnFs=;
-        b=A8y3AHHHZOzjK8/Fp+qFe57d8MLtHrPV9Ie40MUcN9iKIBdRXKCz4Br/8bcNGIA5bJ
-         HAOSrN09SVdIUQw1C812nAQPd21THUw2h1IC5H2yCaGcThRP5JKCIxDO1mf3J6UY8QuE
-         iU8+tI9QwLSq8U158TH9XYYGRHuYB8G4/KyzMm5+gVQFhyA4vW56XtMcyBLbm5aptPia
-         g3GWtsRb02VI6LfT6EzYbzQbLKJVvxjCuFv7rWoHoXt7bELUB8EBT/96RM2nPbBtLtns
-         aLG/c2N81tFCZLSxDYqaY4miDd47vroDQm1E1EaLInzAZ3Blt4Cc6HkYPO2MpWIDn1v1
-         5aEw==
-X-Gm-Message-State: AC+VfDz7TQ9zYI8p5xh1pb2XsHnVUc9VNR0nnVaoI2bCFdU1jsQG0Fur
-        gCh6ilSB7PGq6gmtakq/orKQ6qa41qM=
-X-Google-Smtp-Source: ACHHUZ6LBBHtKmByPACGXtCz2kT4uLd4mrT6+K3dJTPVfFXqC7mZyUObbQ/EtNHsnwGok3ZqWdpA5A==
-X-Received: by 2002:a5d:924c:0:b0:76c:6674:243b with SMTP id e12-20020a5d924c000000b0076c6674243bmr9191019iol.15.1684864148383;
-        Tue, 23 May 2023 10:49:08 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id u27-20020a02cb9b000000b00411be337516sm2664573jap.24.2023.05.23.10.49.07
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1684868651; x=1687460651;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r4W28a48SDMi1QUsmpPavFVHSFTXlIc71K5bxCuD8AU=;
+        b=ZRJ/zAT62lvPAsJ7OfmHx5mI+/0OAeVa0HDys5AOeWMY47xppArpln+pBLFrDOBw4z
+         U6PoPXN1NmiwiQwpTszlr8XAnfL4bGQA8SC7bDJ8GVzpkOa/DwbU1gFuClX9P1wokDX/
+         F+pFUSnId7mVTo1E41O3q9BdiiVZy7qrcg0fm+dzxUcxtWGXlyiRGRE6vUOt6I2S8gPe
+         d4Hz7NlMdu4BNGcaQh1KubUgaUXyh6ufU7Q7mzmLWVJGd7g0bLmkW0T65gE2Ca44Ij/p
+         MVry52F6FmUG926OLTHZ1vX++8fut6NZc4FgG/0k6cm5Ac0QHU/nr0h1s+aEADCwAyKv
+         iFjw==
+X-Gm-Message-State: AC+VfDxL9/Qc8IxHogF99/FxVq7zq0bIf1gCrZZcc78h2nJZXPgc88vd
+        jF3PCO68q214fQA/8NVz/j1ZEJ8tuZY=
+X-Google-Smtp-Source: ACHHUZ7q4JW7+x8k8wobTkNcopVEP1XKn8W2OeuB9TqTyMXF1cqswqQ6280FVBRRuKDNccBJcJmtng==
+X-Received: by 2002:a25:4d8:0:b0:bac:7294:4fb6 with SMTP id 207-20020a2504d8000000b00bac72944fb6mr2254036ybe.30.1684868650601;
+        Tue, 23 May 2023 12:04:10 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id x3-20020a2584c3000000b00ba88763e5b5sm2226962ybm.2.2023.05.23.12.04.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 10:49:07 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] iso-tester: Make QoS parameters reflect the tests names
-Date:   Tue, 23 May 2023 10:49:06 -0700
-Message-Id: <20230523174906.2751379-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.1
+        Tue, 23 May 2023 12:04:10 -0700 (PDT)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+Cc:     wuruoyu@me.com, benquike@gmail.com, daveti@purdue.edu,
+        Sungwoo Kim <iam@sung-woo.kim>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: Fix use-after-free in bt_accept_unlink
+Date:   Tue, 23 May 2023 15:03:48 -0400
+Message-Id: <20230523190347.2584368-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+==================================================================
+BUG: KASAN: use-after-free in bt_accept_unlink+0x77/0x1f0 net/bluetooth/af_bluetooth.c:189
+Write of size 8 at addr ffff888104d59300 by task kworker/0:3/128
 
-AC 1 + 2 tests shall use their respective QoS parameters.
+CPU: 0 PID: 128 Comm: kworker/0:3 Not tainted 6.2.0-00001-gef397bd4d5fb-dirty #58
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: events l2cap_chan_timeout
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x72/0x95 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:306 [inline]
+ print_report+0x175/0x478 mm/kasan/report.c:417
+ kasan_report+0xb1/0x130 mm/kasan/report.c:517
+ __list_del include/linux/list.h:114 [inline]
+ __list_del_entry include/linux/list.h:137 [inline]
+ list_del_init include/linux/list.h:206 [inline]
+ bt_accept_unlink+0x77/0x1f0 net/bluetooth/af_bluetooth.c:189
+ l2cap_sock_teardown_cb+0x1c6/0x4c0 net/bluetooth/l2cap_sock.c:1586
+ l2cap_chan_del+0x108/0x5e0 net/bluetooth/l2cap_core.c:651
+ l2cap_chan_close+0x159/0x830 net/bluetooth/l2cap_core.c:859
+ l2cap_chan_timeout+0x14f/0x240 net/bluetooth/l2cap_core.c:452
+ process_one_work+0x4ea/0x8e0 kernel/workqueue.c:2289
+ worker_thread+0x364/0x8e0 kernel/workqueue.c:2436
+ kthread+0x1b9/0x200 kernel/kthread.c:376
+ ret_from_fork+0x2c/0x50 arch/x86/entry/entry_64.S:308
+ </TASK>
+
+Allocated by task 285:
+ kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ __kasan_kmalloc+0x82/0x90 mm/kasan/common.c:383
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __do_kmalloc_node mm/slab_common.c:968 [inline]
+ __kmalloc+0x5a/0x140 mm/slab_common.c:981
+ kmalloc include/linux/slab.h:584 [inline]
+ sk_prot_alloc+0x113/0x1f0 net/core/sock.c:2040
+ sk_alloc+0x36/0x3c0 net/core/sock.c:2093
+ l2cap_sock_alloc.constprop.0+0x39/0x1c0 net/bluetooth/l2cap_sock.c:1851
+ l2cap_sock_create+0x10d/0x220 net/bluetooth/l2cap_sock.c:1897
+ bt_sock_create+0x183/0x290 net/bluetooth/af_bluetooth.c:132
+ __sock_create+0x226/0x380 net/socket.c:1518
+ sock_create net/socket.c:1569 [inline]
+ __sys_socket_create net/socket.c:1606 [inline]
+ __sys_socket_create net/socket.c:1591 [inline]
+ __sys_socket+0x112/0x200 net/socket.c:1639
+ __do_sys_socket net/socket.c:1652 [inline]
+ __se_sys_socket net/socket.c:1650 [inline]
+ __x64_sys_socket+0x40/0x50 net/socket.c:1650
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+Freed by task 285:
+ kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2e/0x50 mm/kasan/generic.c:523
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free mm/kasan/common.c:200 [inline]
+ __kasan_slab_free+0x10a/0x190 mm/kasan/common.c:244
+ kasan_slab_free include/linux/kasan.h:177 [inline]
+ slab_free_hook mm/slub.c:1781 [inline]
+ slab_free_freelist_hook mm/slub.c:1807 [inline]
+ slab_free mm/slub.c:3787 [inline]
+ __kmem_cache_free+0x88/0x1f0 mm/slub.c:3800
+ sk_prot_free net/core/sock.c:2076 [inline]
+ __sk_destruct+0x347/0x430 net/core/sock.c:2168
+ sk_destruct+0x9c/0xb0 net/core/sock.c:2183
+ __sk_free+0x82/0x220 net/core/sock.c:2194
+ sk_free+0x7c/0xa0 net/core/sock.c:2205
+ sock_put include/net/sock.h:1991 [inline]
+ l2cap_sock_kill+0x256/0x2b0 net/bluetooth/l2cap_sock.c:1257
+ l2cap_sock_release+0x169/0x1c0 net/bluetooth/l2cap_sock.c:1427
+ __sock_release+0x80/0x150 net/socket.c:650
+ sock_close+0x19/0x30 net/socket.c:1368
+ __fput+0x17a/0x5c0 fs/file_table.c:320
+ task_work_run+0x132/0x1c0 kernel/task_work.c:179
+ resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+ exit_to_user_mode_prepare+0x113/0x120 kernel/entry/common.c:203
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+ syscall_exit_to_user_mode+0x21/0x50 kernel/entry/common.c:296
+ do_syscall_64+0x4c/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+Last potentially related work creation:
+ kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+ __kasan_record_aux_stack+0x97/0xb0 mm/kasan/generic.c:493
+ insert_work+0x33/0x180 kernel/workqueue.c:1358
+ __queue_work+0x410/0x960 kernel/workqueue.c:1517
+ rcu_work_rcufn+0x2e/0x40 kernel/workqueue.c:1754
+ rcu_do_batch kernel/rcu/tree.c:2246 [inline]
+ rcu_core+0x43b/0xe70 kernel/rcu/tree.c:2506
+ __do_softirq+0x124/0x3f9 kernel/softirq.c:571
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+ __kasan_record_aux_stack+0x97/0xb0 mm/kasan/generic.c:493
+ __call_rcu_common.constprop.0+0x41/0x550 kernel/rcu/tree.c:2755
+ call_rcu_hurry include/linux/rcupdate.h:116 [inline]
+ queue_rcu_work+0x79/0x90 kernel/workqueue.c:1774
+ process_one_work+0x4ea/0x8e0 kernel/workqueue.c:2289
+ worker_thread+0x364/0x8e0 kernel/workqueue.c:2436
+ kthread+0x1b9/0x200 kernel/kthread.c:376
+ ret_from_fork+0x2c/0x50 arch/x86/entry/entry_64.S:308
+
+The buggy address belongs to the object at ffff888104d59000
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 768 bytes inside of
+ 1024-byte region [ffff888104d59000, ffff888104d59400)
+
+The buggy address belongs to the physical page:
+page:0000000067fcb39f refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x104d58
+head:0000000067fcb39f order:2 compound_mapcount:0 subpages_mapcount:0 compound_pincount:0
+anon flags: 0x200000000010200(slab|head|node=0|zone=2)
+raw: 0200000000010200 ffff888100041dc0 ffffea00041fa600 dead000000000003
+raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888104d59200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888104d59280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888104d59300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff888104d59380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888104d59400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+l2cap_chan_timeout() tries to write on (struck sock*)chan->data that
+points to already free'd address by l2cap_sock_release().
+This patch prevents this by clearing the timers in l2cap_sock_release()
+as l2cap_sock_cleanup_listen() does.
+
+Ack: This bug is found by FuzzBT with a modified Syzkaller. Other
+contributors are Ruoyu Wu and Hui Peng.
+Fixes: 1bff51ea59a9 (Bluetooth: fix use-after-free error in
+lock_sock_nested())
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 ---
- tools/iso-tester.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+ net/bluetooth/l2cap_sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index c59d12ef4ba6..63c37bd52161 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -101,6 +101,9 @@
- #define QOS_IN_1(_interval, _latency, _sdu, _phy, _rtn) \
- 	QOS_FULL(0x01, BT_ISO_QOS_CIS_UNSET, \
- 		QOS_IO(_interval, _latency, _sdu, _phy, _rtn), {})
-+#define QOS_IN_2(_interval, _latency, _sdu, _phy, _rtn) \
-+	QOS_FULL(0x02, BT_ISO_QOS_CIS_UNSET, \
-+		QOS_IO(_interval, _latency, _sdu, _phy, _rtn), {})
- #define QOS_IN_1_1(_interval, _latency, _sdu, _phy, _rtn) \
- 	QOS_FULL(0x01, 0x01, \
- 		QOS_IO(_interval, _latency, _sdu, _phy, _rtn), {})
-@@ -148,8 +151,12 @@
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index eebe25610..cb274ee1c 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1423,6 +1423,7 @@ static int l2cap_sock_release(struct socket *sock)
+ 	l2cap_chan_hold(chan);
+ 	l2cap_chan_lock(chan);
  
- /* One unidirectional CIS. Unicast Server is Audio Sink */
- #define AC_1_4 QOS_OUT(10000, 10, 40, 0x02, 2)
-+/* One unidirectional CIS. Unicast Server is Audio Sink CIG 0x01 */
-+#define AC_1_4_1 QOS_OUT_1(10000, 10, 40, 0x02, 2)
- /* One unidirectional CIS. Unicast Server is Audio Source. */
- #define AC_2_10 QOS_IN(10000, 10, 40, 0x02, 2)
-+/* One unidirectional CIS. Unicast Server is Audio Source CIG 0x02 */
-+#define AC_2_10_2 QOS_IN_2(10000, 10, 40, 0x02, 2)
- /* One bidirectional CIS. Unicast Server is Audio Sink and Audio Source. */
- #define AC_3_5 QOS(10000, 10, 40, 0x02, 2)
- /* Two unidirectional CISes. Unicast Server is Audio Sink.
-@@ -552,20 +559,6 @@ static const struct iso_client_data connect_1_16_2_1 = {
- 	.expect_err = 0
- };
++	__clear_chan_timer(chan);
+ 	sock_orphan(sk);
+ 	l2cap_sock_kill(sk);
  
--static const struct iso_client_data connect_ac_1_2_cig_1_2 = {
--	.qos = QOS_1_16_2_1,
--	.qos_2 = QOS_2_16_2_1,
--	.expect_err = 0,
--	.mcis = true,
--};
--
--static const struct iso_client_data connect_ac_1_2 = {
--	.qos = QOS_16_2_1,
--	.qos_2 = QOS_16_2_1,
--	.expect_err = 0,
--	.mcis = true,
--};
--
- static const struct iso_client_data connect_1_1_16_2_1 = {
- 	.qos = QOS_1_1_16_2_1,
- 	.expect_err = 0
-@@ -918,6 +911,20 @@ static const struct iso_client_data connect_ac_11ii = {
- 	.defer = true,
- };
- 
-+static const struct iso_client_data connect_ac_1_2 = {
-+	.qos = AC_1_4,
-+	.qos_2 = AC_2_10,
-+	.expect_err = 0,
-+	.mcis = true,
-+};
-+
-+static const struct iso_client_data connect_ac_1_2_cig_1_2 = {
-+	.qos = AC_1_4_1,
-+	.qos_2 = AC_2_10_2,
-+	.expect_err = 0,
-+	.mcis = true,
-+};
-+
- static const struct iso_client_data bcast_16_2_1_send = {
- 	.qos = QOS_OUT_16_2_1,
- 	.expect_err = 0,
 -- 
-2.40.1
+2.34.1
 
