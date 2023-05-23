@@ -2,175 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF247C7EE29
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 May 2023 00:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF1FC7EE26
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 May 2023 01:17:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232584AbjEWAYt (ORCPT
+        id S231846AbjEWBRp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 May 2023 20:24:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37550 "EHLO
+        Mon, 22 May 2023 21:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232594AbjEWACk (ORCPT
+        with ESMTP id S230345AbjEWBRn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 May 2023 20:02:40 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1848C115
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 16:42:04 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-64d2c865e4eso3414611b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 16:42:04 -0700 (PDT)
+        Mon, 22 May 2023 21:17:43 -0400
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E2C91
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 18:17:41 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-19a7b2f7914so2251388fac.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 May 2023 18:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1684798923; x=1687390923;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S+rx+S7nPaUlZgKRhY0AE4p+8EOHdzzNMhcLSf0Z/iU=;
-        b=oY65iFTHyfg8S/4N8iu/Putyt/v/zxPnz4B4sp8nZMDXWYuMDwoM0UQZ36AS7qs1Hl
-         jju60n3XwzLzDtOJG7OdfQNK5KLBNWTpD5hdPIT5uXgh0CAagpyiXyWKl3vhNUGlnRb2
-         0+k722ujeuXuAzItAYOcEXWHIsCN2rY/o0WUM=
+        d=gmail.com; s=20221208; t=1684804661; x=1687396661;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y0QIW6HsjpUuO5tc8nLRx8GXsjZOdwls2rk7kKV9jd0=;
+        b=bylhWXI0TYABhTt544AOzlZxNSn2Z9LOgZ8LqArwP/hpTwGj+PfzwUb1SYGM2uKXx6
+         WtNIYEhc/ZMolhuq8Dh6ZVPDMhwEb3g8610bRIS9ahU6OEHUCuTk+C4tPmWzpNmOIAOK
+         GmrQYbDFBmcd+0/aCfeiC8Z6taT/UNZyr+y1te4evIG1ijs+hh5reAbGSmlWR+MaDjFl
+         uR15T08UgVciLczDVZ+2ZRcd6so08urRcFIiuI54c4uKHdkawPpTwgSO0PdjoEkpy7kM
+         vMVvlH77EFd1PoC0Y2CJmKIyawaWjRL+XquUnL9dlQRrCVHwICKgU9tQinvoZ8Nj73ud
+         bYfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684798923; x=1687390923;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1684804661; x=1687396661;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=S+rx+S7nPaUlZgKRhY0AE4p+8EOHdzzNMhcLSf0Z/iU=;
-        b=A/lyg/bCsGPh4b0PWrwnfxystHL6cWmg7osKVs/ZlqItzpPScCnXXTt7XE1qevPHcx
-         7l1hHujOkjOZriuZs3o8sSE6RTAYLMXk8m0Q8TZbJDWQ+0Q20MyR3sPYj8WfLVHLXGR1
-         9Gbrb0OuvyXRDS8sXDK2okwx5nNVTO/NyCtQ4N1IzmQif418+ltIL9B9O3OGpL5rAivW
-         ddE3/IyLnqAMSDsEX3+tvVxsO/shqLRPGZAVM8wMlRm9dBXEKrS9+7jy/KhFnawWn7am
-         lyNEvHuId+1asBWZ1nt05U2TulvosoABnrAE4SVSFRbWBGzZUU/gn+1cUFZa99b9VKfo
-         SIxg==
-X-Gm-Message-State: AC+VfDxXFRh3s+rAVb6rPEuT86OkYM+jXzFt2x+/ivli6oMQ5SNt80ky
-        kmhXE3CVyySsHipQ2o2TBmDZ8vTwaE2FoMQzNNk=
-X-Google-Smtp-Source: ACHHUZ75unrkOLJtSpyBDre9dWo7sQ7v1j8uCj4EtwTXwq+bpn1P2qESbwf/vacSMKYJ8Uah6kBgAQ==
-X-Received: by 2002:a05:6a21:329a:b0:10b:4f58:3fef with SMTP id yt26-20020a056a21329a00b0010b4f583fefmr6701973pzb.2.1684798923123;
-        Mon, 22 May 2023 16:42:03 -0700 (PDT)
-Received: from localhost (21.160.199.104.bc.googleusercontent.com. [104.199.160.21])
-        by smtp.gmail.com with UTF8SMTPSA id q26-20020a62e11a000000b0063b675f01a5sm4132014pfh.11.2023.05.22.16.41.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 May 2023 16:42:02 -0700 (PDT)
-From:   Ying Hsu <yinghsu@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Ying Hsu <yinghsu@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix l2cap_disconnect_req deadlock
-Date:   Mon, 22 May 2023 23:41:51 +0000
-Message-ID: <20230522234154.2924052-1-yinghsu@chromium.org>
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
+        bh=Y0QIW6HsjpUuO5tc8nLRx8GXsjZOdwls2rk7kKV9jd0=;
+        b=NN6R5xpcy8qjvQhetw/rEDJxOicfHsz9tYzuuZsGIXSJq2prLqKaF/bFScl6tQCt4s
+         SMy40dH6zzlr/biJ6xawDOUeqtPVQdWxOAsYVKydVEGsn425KwiTB/cM9JpUHwhN58WC
+         SKk7V6TQsAUN39BTmX0CysuPMjea8R3EjPaglDB9RowgdPAg6Tm5RblXu8LtWff2cs5h
+         MhfkZUWq5iL0loxCnyn7m1mFhdEsu5HEJhAkxP5Mz2y/sFPv+BndFJXsu1pvpHTCwQBV
+         j7OWjc6W2773bwCbpxQvZtu6Y26Tesx/iPgRmQ01yeM+7Tav+fK4v9LcpJW4lOk0Ot6y
+         QtJw==
+X-Gm-Message-State: AC+VfDyu8kZuWJSzQ17Wu4lYanDZnXnRbmnZ5cUyhqbR4XCCjT3gTXIE
+        FfcKAgTCyX3XPBNpJWP3DgrQEefmjmw=
+X-Google-Smtp-Source: ACHHUZ5dkWSRbas+HJdWeRB88rlrSKEMP14KBIOXmBTjYR82GNohz9GH/UvQaOi1YdSjjeXGmKKtyg==
+X-Received: by 2002:a05:6870:c811:b0:18b:1936:30ee with SMTP id ee17-20020a056870c81100b0018b193630eemr6837218oab.56.1684804660921;
+        Mon, 22 May 2023 18:17:40 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.170.24])
+        by smtp.gmail.com with ESMTPSA id f9-20020a056830204900b006af74d59a3esm1920832otp.4.2023.05.22.18.17.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 May 2023 18:17:40 -0700 (PDT)
+Message-ID: <646c1434.050a0220.4dce7.8a8f@mx.google.com>
+Date:   Mon, 22 May 2023 18:17:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0473493330472342417=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
+Subject: RE: [v2] Bluetooth: Fix l2cap_disconnect_req deadlock
+In-Reply-To: <20230522234154.2924052-1-yinghsu@chromium.org>
+References: <20230522234154.2924052-1-yinghsu@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-L2CAP assumes that the locks conn->chan_lock and chan->lock are
-acquired in the order conn->chan_lock, chan->lock to avoid
-potential deadlock.
-For example, l2sock_shutdown acquires these locks in the order:
-  mutex_lock(&conn->chan_lock)
-  l2cap_chan_lock(chan)
+--===============0473493330472342417==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-However, l2cap_disconnect_req acquires chan->lock in
-l2cap_get_chan_by_scid first and then acquires conn->chan_lock
-before calling l2cap_chan_del. This means that these locks are
-acquired in unexpected order, which leads to potential deadlock:
-  l2cap_chan_lock(c)
-  mutex_lock(&conn->chan_lock)
+This is automated email and please do not reply to this email!
 
-This patch uses __l2cap_get_chan_by_scid to replace
-l2cap_get_chan_by_scid and adjusts the locking order to avoid the
-potential deadlock.
+Dear submitter,
 
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=749991
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.75 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      43.74 seconds
+CheckAllWarning               PASS      46.42 seconds
+CheckSparse                   PASS      52.72 seconds
+CheckSmatch                   PASS      141.11 seconds
+BuildKernel32                 PASS      40.88 seconds
+TestRunnerSetup               PASS      586.64 seconds
+TestRunner_l2cap-tester       PASS      21.12 seconds
+TestRunner_iso-tester         PASS      29.31 seconds
+TestRunner_bnep-tester        PASS      7.97 seconds
+TestRunner_mgmt-tester        PASS      143.13 seconds
+TestRunner_rfcomm-tester      PASS      11.72 seconds
+TestRunner_sco-tester         PASS      10.72 seconds
+TestRunner_ioctl-tester       PASS      12.37 seconds
+TestRunner_mesh-tester        PASS      9.30 seconds
+TestRunner_smp-tester         PASS      10.29 seconds
+TestRunner_userchan-tester    PASS      7.91 seconds
+IncrementalBuild              PASS      39.00 seconds
+
+
+
 ---
-This commit has been tested on a Chromebook device.
+Regards,
+Linux Bluetooth
 
-Changes in v2:
-- Adding the prefix "Bluetooth:" to subject line.
 
- net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 376b523c7b26..8f08192b8fb1 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4651,8 +4651,16 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 
- 	BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
- 
--	chan = l2cap_get_chan_by_scid(conn, dcid);
-+	mutex_lock(&conn->chan_lock);
-+	chan = __l2cap_get_chan_by_scid(conn, dcid);
-+	if (chan) {
-+		chan = l2cap_chan_hold_unless_zero(chan);
-+		if (chan)
-+			l2cap_chan_lock(chan);
-+	}
-+
- 	if (!chan) {
-+		mutex_unlock(&conn->chan_lock);
- 		cmd_reject_invalid_cid(conn, cmd->ident, dcid, scid);
- 		return 0;
- 	}
-@@ -4663,14 +4671,13 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 
- 	chan->ops->set_shutdown(chan);
- 
--	mutex_lock(&conn->chan_lock);
- 	l2cap_chan_del(chan, ECONNRESET);
--	mutex_unlock(&conn->chan_lock);
- 
- 	chan->ops->close(chan);
- 
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
-+	mutex_unlock(&conn->chan_lock);
- 
- 	return 0;
- }
-@@ -4691,25 +4698,32 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
- 
- 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x", dcid, scid);
- 
--	chan = l2cap_get_chan_by_scid(conn, scid);
-+	mutex_lock(&conn->chan_lock);
-+	chan = __l2cap_get_chan_by_scid(conn, scid);
-+	if (chan) {
-+		chan = l2cap_chan_hold_unless_zero(chan);
-+		if (chan)
-+			l2cap_chan_lock(chan);
-+	}
- 	if (!chan) {
-+		mutex_unlock(&conn->chan_lock);
- 		return 0;
- 	}
- 
- 	if (chan->state != BT_DISCONN) {
- 		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
-+		mutex_unlock(&conn->chan_lock);
- 		return 0;
- 	}
- 
--	mutex_lock(&conn->chan_lock);
- 	l2cap_chan_del(chan, 0);
--	mutex_unlock(&conn->chan_lock);
- 
- 	chan->ops->close(chan);
- 
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
-+	mutex_unlock(&conn->chan_lock);
- 
- 	return 0;
- }
--- 
-2.40.1.698.g37aff9b760-goog
-
+--===============0473493330472342417==--
