@@ -2,120 +2,169 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8056C7EE2C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 08:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03AEDC77B73
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 10:00:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240031AbjEXIkl (ORCPT
+        id S231948AbjEXKAX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 May 2023 04:40:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
+        Wed, 24 May 2023 06:00:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240640AbjEXIkH (ORCPT
+        with ESMTP id S231848AbjEXKAW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 May 2023 04:40:07 -0400
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2061f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e1b::61f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56D2519A8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 01:38:59 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KhPjQPJo4BaP2rt5YEdPuQl7Ntjfpx6+HCd66FnV8bJzv0AkAQrfcymLZxSbm8qQw4Zn6h/OEhXmwHzgOAdRfJSHrkr4SB/mTatKrgZzxYYfZ/S+vRX46RcjK1l2caM5KeXF9F72CxuNuoftRVv9cPTQJdMlzClSmsTJKicCl2LlvgIGRV978SjdV7Fhv8Z9dHaR/oFWQG6Z3+vr7ii2CsEQ1in6HFHv/NrrKV/UGDPT7nymjKM2eR3PP3jwB7mIM1G6kZS1ZNfEpW/cdOMYrk5gkHDnC6LIiUylFBaVunX80NVaJRW34m7XQdVIcBhW25LKyZKXDRLLIhuacK4KIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4Xfp3Rr4IwmhfR6vLU+vfBCXH53UHllN8chX8yoKhfA=;
- b=Art/SW2hLNNLgTo4twNzjbMjC8aSv86Ls9Y8XZb28eIIufo/MQA6tLEA2pk59u8U/K15PsIXiHe44evQTp+MtaBxaKA4jC9dSaYu1DqKIxAK5mBRLcq908eZaAyzQ9SVANwzYn5UVSmWFRtJ2SRx9po9FpWG7A3/kjKfai31EgNTBjz9zhIHlQKJOjbH4sa9ZhyAf0C6ifl3TLeROXM/3N0O366ukawKYqsqtX4gxD+mlyq3WqoeeSjUDp2W+swK2UJeSoH07iye8V7JMT02Pe63FxuK3TGduK1QCaYejiTKiO/lVen0zLfxwbOBuhjqgQzo8Djfp5LMwVD+PLKY3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4Xfp3Rr4IwmhfR6vLU+vfBCXH53UHllN8chX8yoKhfA=;
- b=mMjEPsBCSKPGNGbYSeRp+EkQlMlOhbBgVR8RMKxLbjSR3PaqfSTrkaKcFsdDluVHOtst+73BvAS3xI4Hyfi4maM9VrnvKxmkg6lmIsHJKO1LJyEZ/pqrVuTB9xW19gh4YsruD3JFLG4LwYOoYr7IlBjAfUXKMv/aXo6YhItP6IA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com (2603:10a6:803:4b::31)
- by AM9PR04MB8422.eurprd04.prod.outlook.com (2603:10a6:20b:3ea::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6411.29; Wed, 24 May
- 2023 08:38:20 +0000
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::981d:d04a:5851:1578]) by VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::981d:d04a:5851:1578%4]) with mapi id 15.20.6411.029; Wed, 24 May 2023
- 08:38:20 +0000
-From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-To:     luiz.dentz@gmail.com
-Cc:     iulia.tanasescu@nxp.com, linux-bluetooth@vger.kernel.org,
-        silviu.barbulescu@nxp.com
-Subject: Re: [PATCH BlueZ 5/6] client/player: Update bluetoothctl with support for broadcast source
-Date:   Wed, 24 May 2023 11:38:08 +0300
-Message-Id: <20230524083808.141604-1-silviu.barbulescu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CABBYNZJ9wtSUh-k0HAikoyz4nxWBG6+3d4D-Q3feeUwSNhgfyg@mail.gmail.com>
-References: <CABBYNZJ9wtSUh-k0HAikoyz4nxWBG6+3d4D-Q3feeUwSNhgfyg@mail.gmail.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4P189CA0019.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:5db::10) To VI1PR04MB5344.eurprd04.prod.outlook.com
- (2603:10a6:803:4b::31)
+        Wed, 24 May 2023 06:00:22 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8AC312F;
+        Wed, 24 May 2023 03:00:19 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id 98e67ed59e1d1-2533b600d35so44636a91.1;
+        Wed, 24 May 2023 03:00:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1684922419; x=1687514419;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UNSvuvrQGvwdxH/qdhsUYjzWunRTiKdWvSzt8OcjbNQ=;
+        b=Ov0+DpbPgrrIqbyKmxJ+eJ4OawMMguWIsxAEKBxkEwH9mGRlImk+DEcubbX31amMYS
+         /gER4DSD7hEX9AuQYr0rQy4ZSHTJDKwdxeWkKQ+S0sD/JE/rInkDwSiOBt/oDV5wRxfb
+         vWE9PDql6Nyda03C2wIETWhGABocjrwVTWq6tg9TO5tSmQoKuvCZ2l2KEct442PhJQyB
+         o2e70YCyKVuFVmCLmUG57s07QejSurdW3IVS1RmgyC5hPFvj12rXf3rQvXF7ATRl9ZKA
+         grZRyK7KBe055EMpJPiS/4SsD6H7G9fki7IX7pmsS7nD2zMm1KWQ9e88edddj97YtOUw
+         k0rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1684922419; x=1687514419;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UNSvuvrQGvwdxH/qdhsUYjzWunRTiKdWvSzt8OcjbNQ=;
+        b=BkNGOVLuJpeITnR77pXIYYvOXDgU4PDSY1iICLh2rbzgwHOS3a6gZpLnBYlIv204cH
+         ZNFRqu0G+cs6t2uiBOdTpJRxAdEUAE7Q+kGFYnO7Gqy7/czKC+PhICh8cr8ibDcvqo2e
+         Uldh4by3hArcz8noNtCShgm0Oi23NgjATK4sNvTz9vqll4NR2ooe9mtYhBc+c1XyGQ0V
+         LpcuWvZwZLQcvYPfsLz8r7OkJmaKlE6n7O79b/6dqsi6FDIQSHJ60L2+onXEHJ7S50Iq
+         TS2Gb9uCG1sy1joF7qAT83I2XEr3eQ2K3Mr1F+0BixiyIFywmCzWpRI5moNzG9TbS3CM
+         obsg==
+X-Gm-Message-State: AC+VfDzGJlRFVEm6yt7FdVNLdRB6VDBCaUSuR7U/ULe+VY7CCusQyenU
+        itBFx4BaiKZTe/+pGAW3sG8Zd5RIHAU=
+X-Google-Smtp-Source: ACHHUZ4HzUkejSTlixUkOvAE8dm9+V31YmC0hmTMMOxd/VAwP5P9I9OQi2IKm7VCjKB7xthZmInJaw==
+X-Received: by 2002:a17:90a:ab08:b0:234:889f:c35d with SMTP id m8-20020a17090aab0800b00234889fc35dmr15271241pjq.3.1684922418865;
+        Wed, 24 May 2023 03:00:18 -0700 (PDT)
+Received: from [192.168.43.80] (subs02-180-214-232-28.three.co.id. [180.214.232.28])
+        by smtp.gmail.com with ESMTPSA id 137-20020a63028f000000b0053423447a12sm7515016pgc.73.2023.05.24.03.00.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 May 2023 03:00:18 -0700 (PDT)
+Message-ID: <a8461137-0c87-fd7d-8354-5b8675d8e45d@gmail.com>
+Date:   Wed, 24 May 2023 16:59:41 +0700
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5344:EE_|AM9PR04MB8422:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0a00d9a6-fad6-4265-cb3f-08db5c323a67
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tWYw5JIMDg/goKxhZ4F8z6vRovID0D/iIYKx8N9bvsEUHduQJN6HWXYzaMs9rUezc1TnAfT9gHIgDldWYc+uDb/gbm0TUt8gZFTTiJFe+YeSVrO95XYJXwWCRi0nbsqrarw74t+dVku8KR8gm2Xnm6RB4Qgt5Q4pH0/HWhyMOxERNBcRLD6ThDutbs4Lx4IgdfpLn24NDX7rSA8bEpRdnjPRBDloWWU8ZOJa8rYOvWWzxZGMFmPTzaSE0KSXQBJVLTcRKzD1HQXiGbF0hP234CVwpi8NgNX12W8rRDhfJU0EBdLqsU5igXpd49JVaBN16vOuCyNvLQG31jnzvjEXMoKC7Lq39q9i44syOsv+8A8GISigoZAizJMjFhYJJuw7j0wuL2ur45F+2kQ09b3nTH0r+QtjLal9Nc8zMZ0nWL0C+xso1aRKY7Xh/Cg+xCSgJEkT+Xs1Fy1BJEQJKDpAtAICxkA//uOalsmTg5i2P23c1/69WImm7ntKGEzMVspfAi0n2cUjZ7nd/0MoaXS6Ns78uyK4tNWofmnUsx5rn1nRCQWAVZ0EELXr8xhQ1anM3MV8SPQAS68AeD1wCtnwXA0UfFG5RMYo9xXXv8v/foGvyEyyazTRBGvo1p/dQGwe
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(396003)(346002)(366004)(376002)(451199021)(38100700002)(86362001)(38350700002)(52116002)(2906002)(4744005)(2616005)(478600001)(8676002)(8936002)(6916009)(36756003)(6506007)(1076003)(4326008)(316002)(6512007)(5660300002)(6666004)(6486002)(186003)(26005)(66556008)(41300700001)(66946007)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mvDY5tNY+K+9m4JSUwsVC9b0kJRMbcX+paUGG64j4xChppxud5d78kyPuHB2?=
- =?us-ascii?Q?pRcV2SrQRu7WOHyjWDQLr/I1XA/+VTRcNpKQ9h3398LZ428HJu1s6zDvkTQv?=
- =?us-ascii?Q?IDkV8VW21WQcmJUkyaR3APWnMOsQEcZP1PMK9Jdthx3hOGpBLjWfS9TGk/uw?=
- =?us-ascii?Q?Oj2zln4YmsshEvNnjJ7uHqLv7+Sgp4F2GkM8DmIFbY4X3h1UHfd4afx9tI8M?=
- =?us-ascii?Q?bVh7mRcZ7NwOvQ0wS35ePoI4WTWTn7MainTkwyf/nf4E4xgxLrVJlVsEpFDA?=
- =?us-ascii?Q?x0faNIkBfu0avPx0wA2nxjalY5Nfe8ru+1bZrqfvKukzw6KgQT795EpGoSkn?=
- =?us-ascii?Q?GHXZnPMKuQVHUuhLBnGmpwmlGRbVojsUWd3awdSbZjjFXHmkJhDQwNEa2HtO?=
- =?us-ascii?Q?VC8tTfSSz1Q7WoqqGvbawoU8rwLn1J/YYjdx9xICGDewCFDttKrBSpv5KjsJ?=
- =?us-ascii?Q?I7k0trVCoZYeFzW8ucmhyJb3xttP/DUPKrDJMJRht1riEBR92c12kwcHrs6i?=
- =?us-ascii?Q?/ilypImUNkGDpm7/p8Cc7BcFYUE2V4f17X/Abcvlr4tur8+rOeUuCcL4u+ad?=
- =?us-ascii?Q?yGPk57gz2RouvBbiiqfPk9aeYRzjiKWuYhcEwqxPmZDB7RNtUKUimliGahq6?=
- =?us-ascii?Q?joFnVU7RSfItZlojRlAGCDs/2K1bEcJlveqxmEtjIqaCFF9FLyZFy2ShTcBD?=
- =?us-ascii?Q?n4SsarWLcHhE6UlM4AZ+CBiaxYQZXvaWa/GEvNpSQgltUhxcN3o1KggcCfqr?=
- =?us-ascii?Q?kB0cN4bPbTfC8N5Oei9d9LqygoNtYLaN4npw74mpF09WznB2yfYuS+eGyo4H?=
- =?us-ascii?Q?bQqBibmhpT+3zEqq5SQWydWdUjVR4aMZSFbozT9eFjYLtHXQeWx13vRZpVIJ?=
- =?us-ascii?Q?MdgjOWpQo1sLSujQ+Liqm1s1uj79Fcr0xhXsz3LZWHIBtkItzFXy/wQm94P2?=
- =?us-ascii?Q?PAZmWTn/bgvB1+NEU5MvWk+BUROyjc19VFzgA61c4mOJWh8GxGjUnll6v2Ab?=
- =?us-ascii?Q?WTQqb0yQjW+N2AIX3o0R4uLIuVoJIK/hdYQ5O/B9d43A6Ga6cIh3KwLmRTCO?=
- =?us-ascii?Q?9uzDHRl5MwUMHr4Gd0OLMGhB7V+utRTbUUs3Wo+BHbQRepRYJ/qlFTf9M2Te?=
- =?us-ascii?Q?hftF0EGiNNHRvyE2GWbZDYjR/knO8lFcUBbJK2mmjJQEraS4oKb248xuYGK8?=
- =?us-ascii?Q?n+0gfAd8hGZ/bAHzZjErJkhBsrRL8Zcg6RWaasKX93icst0cMsg5jmM8KjSq?=
- =?us-ascii?Q?JIbzo7G4/WT7kwJKhzu3wQeMeIxZxuDH5DuiEmymJHzk8z8/0/5GR24v55Nd?=
- =?us-ascii?Q?DrHenSsx+fBX8lwt7EC+7oLWUmUFA8lm12ec35fmOoNU4iYREo7JiIJYy0Oq?=
- =?us-ascii?Q?ffLnDiM0wSAaI0AxD3TXdaEsYRN0gGHAiyol9Ais3bl9eUvjTVJAeU5eR70Y?=
- =?us-ascii?Q?9q+W3QCGXOw1YoRcGbE7LF8Oe8IHUEKguJwk6N3eJAsgfaNJNVdEbmrnaUeB?=
- =?us-ascii?Q?Bc0mKgW6UfoQD5GX3uh601wpxmjwN0ZRoo3DxVxRAWS8C4uw8f83a8raVwS7?=
- =?us-ascii?Q?nhSgtsIghMZmD6fsRBJSWgBj2wl9ligDr8zaB3pvfr8FQWiG0r8LF1oDm8+D?=
- =?us-ascii?Q?NQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a00d9a6-fad6-4265-cb3f-08db5c323a67
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5344.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2023 08:38:20.3868
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jTs56uirotyCNMNdxG6BfIfuLOO9Zaw+lzng1iuL3L7zRuHR2eqD2eGtF0+vQK1w2hGG+UVUJ7emgqDZzPA1JD7+WVDIrNOLU9DKVrOiF50=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8422
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux USB <linux-usb@vger.kernel.org>,
+        "Linux Bluetooth (Bluez)" <linux-bluetooth@vger.kernel.org>,
+        Linux MediaTek <linux-mediatek@lists.infradead.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Alberto Garcia <berto@igalia.com>,
+        Aaron Ma <aaron.ma@canonical.com>
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: Fwd: Foxconn / Hon Hai Bluetooth adapter 0489:e0cd stops working on
+ ThinkPad T14s AMD Gen1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi,
 
-Hi Luiz,
+I notice a bug report on Bugzilla [1]. Quoting from it:
 
-To test BAP Broadcast Source support implementation use bluetoothctl with the following commands:
+> Hi,
+> 
+> I'm running Linux on a ThinkPad T14s AMD Gen 1 and I'm having problems
+> with its Bluetooth adapter.
+> 
+> The adapter is a Foxconn / Hon Hai, USB ID 0489:e0cd, and it uses the
+> Mediatek MT7921 driver. Sometimes it just works but often if I suspend
+> the laptop and come back it stops working. This also happens when I
+> use the RF kill switch. The kernel errors vary a bit depending on the
+> moment but it's usually a combination of these:
+> 
+> kernel: Bluetooth: hci0: Failed to get device id (-108)
+> kernel: Bluetooth: hci0: Failed to get fw version (-108)
+> kernel: bluetooth hci0: firmware: direct-loading firmware mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin
+> kernel: Bluetooth: hci0: Execution of wmt command timed out
+> kernel: Bluetooth: hci0: Failed to send wmt patch dwnld (-110)
+> kernel: Bluetooth: hci0: Failed to set up firmware (-110)
+> kernel: Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+> 
+> Interestingly I noticed that if I try to use it on a Linux VM (using
+> USB passthrough) it generally works better, even when it's not working
+> on the host and the guest and the host are running the same OS and
+> kernel version. Still it fails sometimes, although the error messages
+> tend to be a bit different:
+> 
+> kernel: usbcore: registered new interface driver btusb
+> kernel: Bluetooth: hci0: Device setup in 153593 usecs
+> kernel: Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+> kernel: Bluetooth: hci0: Opcode 0x c03 failed: -110
+> kernel: Bluetooth: hci0: Failed to read MSFT supported features (-110)
+> kernel: Bluetooth: hci0: AOSP get vendor capabilities (-110)
+> 
+> (I also tried the adapter with a Windows VM, again using USB
+> passthrough, but here it works perfectly fine)
+> 
+> Back to the host I found out that resetting the adapter using
+> "usb_modeswitch -R -v 0489 -p e0cd" sometimes is enough to bring the
+> adapter back to life and make it work. But this doesn't always
+> succeed, and at some point I end up in a situation like this:
+> 
+> kernel: xhci_hcd 0000:06:00.4: xHCI host not responding to stop endpoint command
+> kernel: xhci_hcd 0000:06:00.4: xHCI host controller not responding, assume dead
+> kernel: xhci_hcd 0000:06:00.4: HC died; cleaning up
+> 
+> Sometimes I can get out of it with this:
+> 
+> $ echo 0000:06:00.4 > /sys/bus/pci/drivers/xhci_hcd/unbind
+> $ echo 0000:06:00.4 > /sys/bus/pci/drivers/xhci_hcd/bind
+> 
+> All this has been happening since I got the laptop, but I'm testing it
+> now with Linux 6.3.3 and the problem is still there.
+> 
+> The end result is that I basically cannot rely on the USB adapter so I
+> have it almost always disabled.
+> 
+> A bit more information about the system:
+> 
+> $ lspci -nn | grep USB
+> 02:00.4 USB controller [0c03]: Realtek Semiconductor Co., Ltd. RTL811x EHCI host controller [10ec:816d] (rev 0e)
+> 05:00.0 USB controller [0c03]: Renesas Technology Corp. uPD720202 USB 3.0 Host Controller [1912:0015] (rev 02)
+> 06:00.3 USB controller [0c03]: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne USB 3.1 [1022:1639]
+> 06:00.4 USB controller [0c03]: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne USB 3.1 [1022:1639]
+> 
+> $ lsusb
+> Bus 007 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+> Bus 006 Device 003: ID 0489:e0cd Foxconn / Hon Hai Wireless_Device
+> Bus 006 Device 002: ID 06cb:00bd Synaptics, Inc. Prometheus MIS Touch Fingerprint Reader
+> Bus 006 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> Bus 005 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+> Bus 004 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> Bus 003 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+> Bus 002 Device 002: ID 04f2:b6cb Chicony Electronics Co., Ltd Integrated Camera
+> Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> 
 
-# endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06
+See bugzilla for the full thread.
 
-# transport.acquire /org/bluez/hci0/dev_00_00_00_00_00_00/pac_broadcast0/fd0
+The reporter said that the bluetooth adapter works well on Windows VM via
+device passthrough, but not on Linux host.
 
-# transport.send /org/bluez/hci0/dev_00_00_00_00_00_00/pac_broadcast0/fd0 <file.wav>
+Thanks.
+
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217475
+
+-- 
+An old man doll... just what I always wanted! - Clara
