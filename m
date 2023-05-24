@@ -2,190 +2,104 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD9FC77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 18:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F5AC77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 19:11:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbjEXS4u (ORCPT
+        id S230203AbjEXTLZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 May 2023 14:56:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35874 "EHLO
+        Wed, 24 May 2023 15:11:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjEXS4t (ORCPT
+        with ESMTP id S229542AbjEXTLY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 May 2023 14:56:49 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2781C113;
-        Wed, 24 May 2023 11:56:46 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2afb2875491so15274481fa.1;
-        Wed, 24 May 2023 11:56:46 -0700 (PDT)
+        Wed, 24 May 2023 15:11:24 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3EB12B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 12:11:23 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2af2db78b38so16631081fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 12:11:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684954604; x=1687546604;
+        d=gmail.com; s=20221208; t=1684955481; x=1687547481;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nFc5+4hJmG80gbCGSLCg+YTvQ2ViynmFbtirUDeRW/w=;
-        b=iPkNWloTpYUleJ4Yo/4U5PL0dlt5rktILW8viFrT7dTFzy8a5m1qLGVzEJMlre1M+2
-         sAMDgB9mw4+i41Xg9qOGM1MIhiO2ehNaaFxEzLrqu8WBMEix5XlZDH7RyIvAw62sTVNY
-         AZMfDZYR3MPot1NdIjWnPe2gLOkpfabb9pfRWLtMHbYQxXY6672oLNLsxarl1wf0KoAI
-         nV2GWNUiwVsy+idgD0IjOa+K00JNPDC+CydKPi3zizB1l/GiebYo9lMVj2Bzb8dzlpvG
-         IDKRzW/t6tawRf5W0jCyWf4pjufXbCWfjEb4tXSak7yIjsgMiDeEMDCHA6LAMS5vCxAc
-         QYXw==
+        bh=5kHhy/KjkX7HKvd1sjw8RkovkQ8NO20aP5vVF4eORGY=;
+        b=WpkE4JpD9r43JYiObEzzDslGHXiOriDbDDa9icWNWxrwWA8OZKulijsrpgxdDh0rlv
+         /U+O1HyigAOP+mkvmxF2t7lAqNbxmnIvZvC7JTT62z8bL4QzsoWWCG8wydXWoPXlO0fZ
+         BBuQBdDSahCRfobYJeLWwShie2U/7Kiz51Ob0O24Bo+Z0owS32VB+vhXgoLSKZO/RNFI
+         wK5aWkwdM+Q6qMPceYwffkPpqRiYN8kberkWijFlUfx/2HZKTSvJkzvTKsJ5ggMDX+7L
+         KvQ7q3qUaM6EaM/N3X+q2yRaBSCCRwGfCif6TO6R3RWHvDgq7/l5PxY4QLmbINihWXDs
+         QNDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684954604; x=1687546604;
+        d=1e100.net; s=20221208; t=1684955481; x=1687547481;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nFc5+4hJmG80gbCGSLCg+YTvQ2ViynmFbtirUDeRW/w=;
-        b=SK+kw6ylfbVZkmR0I7Bx/DEriWiV8nZ5LFn0BMn9yN6ok2GZhz96bT/UQ+ary6FsJR
-         Sqvg5UBQmRggWOsWAdiFKkpY61fYKgwQCy3ntGT+2iByvFTC6xyn9CkCrViwLR9Nda6p
-         QwtnxRbQSGPZGxjPa44PoQhTgo7FNwX5OyXxM40kSkrcy6vUDYgznhoguvleP94XnnfK
-         /Vt1UgS2ruY8iNiInCVsl0BWglkQ115WiU5szzZkc30sBhgtc25ojcjwnIOjrXEp/95Y
-         S2vcPuqMDd5uvAwPoLDyhNkjCHF873GPrApWjDA3JB5KOKPh2DL2yf2wGC7l3yHiM1oC
-         4LQQ==
-X-Gm-Message-State: AC+VfDyosZS4wXKLUFlp9OQjD6XhdfkqLteY0UdGnOhtK1ZrKwf7XQ/8
-        gdfIS9K+AEvXzvDTZYvRY+2hvWxvG6SP1jQ81mg=
-X-Google-Smtp-Source: ACHHUZ7U82Xbuq436/IWABbU91mpiCWN1wfiHa5KlG1XrdwoXANaosuwV0E0Vf3RRfXoNphnTgGv5pB/51aGiVd8e1U=
-X-Received: by 2002:a2e:7215:0:b0:2a8:d13d:88fb with SMTP id
- n21-20020a2e7215000000b002a8d13d88fbmr221362ljc.11.1684954604217; Wed, 24 May
- 2023 11:56:44 -0700 (PDT)
+        bh=5kHhy/KjkX7HKvd1sjw8RkovkQ8NO20aP5vVF4eORGY=;
+        b=k7EsfLXun+xrDiYI8Iooh/HEOGDlgCbixv5j56BejwIU8GRzM5AcNXtnk84dt10Ss/
+         GK9doOBXvCSfkpz6u9T7OWvPa0jxV5tL4ZllDflB+7RRWbpX6+AmwqI9GtKKU7F0jjPe
+         UrLc18+P+gDAqqSA6VpacEVxYgr9+OIWVkzH0Cztj1hYfoA3NnoN+4OuN4ZfIG0vMTLl
+         q5M5+8VAvPbG+itWVYZ5rdq6DTmcP7jm9Xcd20WiXgZqd5+1daDGBon9dRnmIFAsDi3Z
+         Cpwb7sbhjEzNyhoSBPRJiwApCX0qU4nW5oB66wtbmyptJkrB0JkGznQ5BkGigdDQyDqc
+         1Yew==
+X-Gm-Message-State: AC+VfDzAtDIYZkYiTuLHJnq58meG2ehjOH/PuPmqMXzZ2DCmgTm0TDL/
+        cNTojIo3uOKiMIIEi7EzpS5kI62XTPewuCaw8JQ=
+X-Google-Smtp-Source: ACHHUZ4iaSNWRTSCmdaKLhldmBNJ0qspLPNngAUB8uTQn26rXkX62c5h2kmGzsLiwZiYLwXL2EpA9nP0Rx0tHH4bauc=
+X-Received: by 2002:a2e:7004:0:b0:2a7:974d:a461 with SMTP id
+ l4-20020a2e7004000000b002a7974da461mr216275ljc.34.1684955480871; Wed, 24 May
+ 2023 12:11:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230522234154.2924052-1-yinghsu@chromium.org>
- <ZGyPt1GYGV2C2RQZ@corigine.com> <CABBYNZ+by-OQH2aPEMHpQ5cOLoKNpR7k111rJj6iOd2PGLx3gg@mail.gmail.com>
- <CAAa9mD3A+3uJzFK0EbTrn5hX42EOgeixehmxgkwdhp1KetxjVQ@mail.gmail.com>
-In-Reply-To: <CAAa9mD3A+3uJzFK0EbTrn5hX42EOgeixehmxgkwdhp1KetxjVQ@mail.gmail.com>
+References: <e52365b8-f5ee-48d9-ba86-34c4b350c8e3@kili.mountain> <744fd69a-c5a3-4e0f-8c47-33096a1cd374@kili.mountain>
+In-Reply-To: <744fd69a-c5a3-4e0f-8c47-33096a1cd374@kili.mountain>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 24 May 2023 11:56:31 -0700
-Message-ID: <CABBYNZKPv_0AaJJm2_c0F+4qX_vKXQ9BnVgR-kPy40YsDDqSRQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Fix l2cap_disconnect_req deadlock
-To:     Ying Hsu <yinghsu@chromium.org>
-Cc:     Simon Horman <simon.horman@corigine.com>,
-        linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
+Date:   Wed, 24 May 2023 12:11:08 -0700
+Message-ID: <CABBYNZJ2WSHKiQ0ZtqfNZdxaPY+FVO1=gDeNPwSz2zcKWX6ZMA@mail.gmail.com>
+Subject: Re: [bug report] Bluetooth: Add initial implementation of BIS connections
+To:     Dan Carpenter <dan.carpenter@linaro.org>
+Cc:     luiz.von.dentz@intel.com, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ying,
+Hi Dan,
 
-On Wed, May 24, 2023 at 3:54=E2=80=AFAM Ying Hsu <yinghsu@chromium.org> wro=
-te:
+On Tue, May 23, 2023 at 11:52=E2=80=AFPM Dan Carpenter <dan.carpenter@linar=
+o.org> wrote:
 >
-> Hi Simon,
+> On Wed, May 24, 2023 at 09:38:34AM +0300, Dan Carpenter wrote:
+> > Hello Luiz Augusto von Dentz,
+> >
+> > The patch eca0ae4aea66: "Bluetooth: Add initial implementation of BIS
+> > connections" from Mar 9, 2022, leads to the following Smatch static
+> > checker warning:
+> >
+> >       net/bluetooth/hci_conn.c:943 hci_le_remove_cig()
+> >       warn: passing zero to 'ERR_PTR'
+> >
+> > net/bluetooth/hci_conn.c
+> >     939 static int hci_le_remove_cig(struct hci_dev *hdev, u8 handle)
+> >                                                            ^^^^^^^^^^
+> >
+> >     940 {
+> >     941         bt_dev_dbg(hdev, "handle 0x%2.2x", handle);
+> >     942
+> > --> 943         return hci_cmd_sync_queue(hdev, remove_cig_sync, ERR_PT=
+R(handle), NULL);
+> >                                                                        =
+  ^^^^^^
+> > handle is a u8.  It can hold error codes.
 >
-> I understand your concern about the repeated code.
-> However, simply hiding the locking logic in another function
-> introduces hidden assumptions.
-> For this patch, I would like to fix the deadlock in a simple and easy
-> to understand way.
-> We can always refactor the l2cap_chan utility functions later.
->
-> Hi Luis,
->
-> I'll add a fixes tag in the next version.
+> s/can/cannot/.
 
-And how about doing this:
+This is not used as an error though, it is more like INT_PTR, that
+said I'm fine changing it if that is triggering static analyzer
+errors.
 
-https://gist.github.com/Vudentz/e513859ecb31e79c947dfcb4b5c60453
-
-> Best regards,
-> Ying
+> regards,
+> dan carpenter
 >
->
-> On Wed, May 24, 2023 at 3:06=E2=80=AFAM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Simon, Ying,
-> >
-> > On Tue, May 23, 2023 at 3:04=E2=80=AFAM Simon Horman <simon.horman@cori=
-gine.com> wrote:
-> > >
-> > > On Mon, May 22, 2023 at 11:41:51PM +0000, Ying Hsu wrote:
-> > > > L2CAP assumes that the locks conn->chan_lock and chan->lock are
-> > > > acquired in the order conn->chan_lock, chan->lock to avoid
-> > > > potential deadlock.
-> > > > For example, l2sock_shutdown acquires these locks in the order:
-> > > >   mutex_lock(&conn->chan_lock)
-> > > >   l2cap_chan_lock(chan)
-> > > >
-> > > > However, l2cap_disconnect_req acquires chan->lock in
-> > > > l2cap_get_chan_by_scid first and then acquires conn->chan_lock
-> > > > before calling l2cap_chan_del. This means that these locks are
-> > > > acquired in unexpected order, which leads to potential deadlock:
-> > > >   l2cap_chan_lock(c)
-> > > >   mutex_lock(&conn->chan_lock)
-> > > >
-> > > > This patch uses __l2cap_get_chan_by_scid to replace
-> > > > l2cap_get_chan_by_scid and adjusts the locking order to avoid the
-> > > > potential deadlock.
-> >
-> > This needs the fixes tag so we can backport it properly.
-> >
-> > > > Signed-off-by: Ying Hsu <yinghsu@chromium.org>
-> > > > ---
-> > > > This commit has been tested on a Chromebook device.
-> > > >
-> > > > Changes in v2:
-> > > > - Adding the prefix "Bluetooth:" to subject line.
-> > > >
-> > > >  net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++------
-> > > >  1 file changed, 20 insertions(+), 6 deletions(-)
-> > > >
-> > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.=
-c
-> > > > index 376b523c7b26..8f08192b8fb1 100644
-> > > > --- a/net/bluetooth/l2cap_core.c
-> > > > +++ b/net/bluetooth/l2cap_core.c
-> > > > @@ -4651,8 +4651,16 @@ static inline int l2cap_disconnect_req(struc=
-t l2cap_conn *conn,
-> > > >
-> > > >       BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
-> > > >
-> > > > -     chan =3D l2cap_get_chan_by_scid(conn, dcid);
-> > > > +     mutex_lock(&conn->chan_lock);
-> > > > +     chan =3D __l2cap_get_chan_by_scid(conn, dcid);
-> > > > +     if (chan) {
-> > > > +             chan =3D l2cap_chan_hold_unless_zero(chan);
-> > > > +             if (chan)
-> > > > +                     l2cap_chan_lock(chan);
-> > > > +     }
-> > > > +
-> > > >       if (!chan) {
-> > > > +             mutex_unlock(&conn->chan_lock);
-> > > >               cmd_reject_invalid_cid(conn, cmd->ident, dcid, scid);
-> > > >               return 0;
-> > > >       }
-> > >
-> > > Hi Ying,
-> > >
-> > > The conditional setting of chan and calling l2cap_chan_lock()
-> > > is both non-trivial and repeated. It seems that it ought to be
-> > > in a helper.
-> > >
-> > > Something like this (I'm sure a better function name can be chosen):
-> > >
-> > >         chan =3D __l2cap_get_and_lock_chan_by_scid(conn, dcid);
-> > >         if (!chan) {
-> > >                 ...
-> > >         }
-> > >
-> > >         ...
-> >
-> > Or perhaps we could do something like l2cap_del_chan_by_scid:
-> >
-> > https://gist.github.com/Vudentz/e513859ecb31e79c947dfcb4b5c60453
-> >
-> > --
-> > Luiz Augusto von Dentz
-
 
 
 --=20
