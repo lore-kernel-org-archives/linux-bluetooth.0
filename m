@@ -2,106 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF71C77B7E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 01:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E64C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 02:35:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238735AbjEXBad (ORCPT
+        id S232881AbjEXCe6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 May 2023 21:30:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35798 "EHLO
+        Tue, 23 May 2023 22:34:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230359AbjEXBac (ORCPT
+        with ESMTP id S233493AbjEXCew (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 May 2023 21:30:32 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F02F130;
-        Tue, 23 May 2023 18:30:31 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-253310a0df7so87802a91.1;
-        Tue, 23 May 2023 18:30:31 -0700 (PDT)
+        Tue, 23 May 2023 22:34:52 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BB3818C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 May 2023 19:34:50 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-253e0edc278so348032a91.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 May 2023 19:34:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1684891830; x=1687483830;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1orZJfj9173C/tsIWjEiuAZodQHp/rpo+HkDtAUGe9c=;
-        b=Wvg1be6m+luhUM/A/XmwRXRZImnIJo4V+5DbKCPLw9+VJlXba/ecE8yW1qwAX6+uMD
-         LD5GvZf0i0iYuurDQcKZkO56SDlJe727FG+rHhGg7Les2v6glqWM+ttx6JLhiogd24LP
-         atIXv8KzUVMQwPR7tCifnBz7PDjpucvYsTQNvyVDwxuz7vDYT/MCzy+RIH1GO7ckv9xa
-         8EVoaX7vnWC6WAg1gUq0Xi3+BAbn8oVVu4j8kA7vaf8hVsoPYVnlx1dFi0h6sYKzhnyx
-         ras+P4V56EASMdygabBXz5ScRbkAxJtjd52WDlgqhWdGJbklpwnGaEpjtB158D43Kz/P
-         WtRQ==
+        d=gmail.com; s=20221208; t=1684895689; x=1687487689;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GOq8PQDsdbYz4dJh3GxlqCz7FOqlxQO4TjTBPAroYT0=;
+        b=j5mH2WQ2Ofi1pHXYCSbkdG+73+XQSxsUral0kXqKnPS4pA+/2VAJO7jeVXgAM8cbma
+         1Wq8r96eIPNn4VRLYg1s9n9pGayiVsDrYsy9keYjM7cWx6jPfTm/3c6clUAqL0xraUhF
+         ZXPBHxRZPC1uvrdFotr8MGvI9Fq4MB28R2UKAuIVttz6P4FRwd92NIVCScbJo9r4b8dc
+         wwEVXZAMbIDq5nArKyuu9//ISaCL5e5e0j26kAy/jOKZYTIZvoFJYDvEDiSvHOfSuN1i
+         a3y/Q6mHPQwplRQEXLa1r0dHqJft2UZJ5aDr8UpMi4yiw7i6ekTq8DqY9vQPe8C3WCZI
+         2eZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684891830; x=1687483830;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1684895689; x=1687487689;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1orZJfj9173C/tsIWjEiuAZodQHp/rpo+HkDtAUGe9c=;
-        b=KaAV5eT2hGhLrLZ10FtUIMIkW0wWG3RJmlCC9TKvCKPmdnvhQhD2JI9Q4wkXC46J6g
-         THHRMMaxfajJSdlF0mbq1mqLas+MsB9K2/PmWFzvRR1Rd+QjvdFWKmo9URGPexGhSJXa
-         zQV9ieqLtUccXr0prdeIME0G4gt+Q+KQHA4atCWLA/MLxMsUV6EuR2C7Q0hDW9VzmNIA
-         lgXlp8f4l1sOta1Xhfk6jvbRdcDhDfvVH1jPLg6vSbK+OTYqzSHeQPKruREdIqgmnNLe
-         vWMLH3/Xh1wMSh+qWJgXq5RkC88iTN9IY2NlNi06sjbRV/hLZv5wuGpnROPjjluzATyv
-         NgiA==
-X-Gm-Message-State: AC+VfDzK8p+G5Rpw/f4/fxBBtKYAH9C7PCV6E7oTHaC5iVbPt9ZSbwFj
-        RI8wISCqZrkT9PW6n14oH3OC2UWyP4UK0SCWzxA=
-X-Google-Smtp-Source: ACHHUZ4CJROofmRGutqg0VeBUFgLRZ/aIb/oFRjC1KicX8+fjgZp9YoyrEmdulX2Dd8Z7Eun+OI1cg==
-X-Received: by 2002:a17:90b:1bc1:b0:252:b875:6a57 with SMTP id oa1-20020a17090b1bc100b00252b8756a57mr1058324pjb.3.1684891830336;
-        Tue, 23 May 2023 18:30:30 -0700 (PDT)
-Received: from ubuntu.localdomain ([103.114.158.1])
-        by smtp.gmail.com with ESMTPSA id d27-20020a630e1b000000b0052cbd854927sm6484727pgl.18.2023.05.23.18.30.28
+        bh=GOq8PQDsdbYz4dJh3GxlqCz7FOqlxQO4TjTBPAroYT0=;
+        b=UVs7XDDO3hWiosYPbYYHDcpLPKmKNKplA/jzZ/MmNw8Xdl9poWUQDIOTCdOAHk+LSo
+         mpzx4x9TIDJ7CvSDjf8wcoWW8XnPeo1AnMrOOghZdAQp5KwfWld+h4aQqj7QQBveyiwn
+         +wv6UCnZvOBUll8CeR3+tqExtc1upzTOeHF9YU39Wi68n1teTyTwxAR55w+bXIU/m/2+
+         7vVOG4jUrjcviwbsTpmPdkUjAC+PaIEbT86akHk21XpabbN8m1K8nsGIDF+3nClWutFO
+         Gh5zdSUDSmiI+MAMTWmLYNCyM1DaIlWipLMXSvqSMKlBjaD0mDK0F03zBbr7GvPFThBL
+         CYfQ==
+X-Gm-Message-State: AC+VfDxb0Qf5x5TM7eExbOqCM4p1ij7vr06AbqkpGg9MifSDEyuDH46f
+        oX+Vhh8QjKJIxQl8mhA9lcYRFWBYUIc=
+X-Google-Smtp-Source: ACHHUZ6070YmYjr3d/iSu6jc56uapnBL9sZ8RRrFl+n0gk7GghIVM+eqA2vh0qLLAlBXnYmdJ45ABw==
+X-Received: by 2002:a17:90a:e603:b0:253:50d0:a39d with SMTP id j3-20020a17090ae60300b0025350d0a39dmr12946552pjy.48.1684895689474;
+        Tue, 23 May 2023 19:34:49 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.161.23])
+        by smtp.gmail.com with ESMTPSA id 18-20020a17090a1a1200b00247150f2091sm280739pjk.8.2023.05.23.19.34.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 May 2023 18:30:29 -0700 (PDT)
-From:   Min Li <lm0963hack@gmail.com>
-To:     luiz.dentz@gmail.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: HCI: fix use-after-free in hci_remove_ltk/hci_remove_irk
-Date:   Tue, 23 May 2023 19:56:37 +0800
-Message-Id: <20230523115637.14541-1-lm0963hack@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Tue, 23 May 2023 19:34:49 -0700 (PDT)
+Message-ID: <646d77c9.170a0220.ce5f1.0b03@mx.google.com>
+Date:   Tue, 23 May 2023 19:34:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1206722655290671976=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, lm0963hack@gmail.com
+Subject: RE: Bluetooth: HCI: fix use-after-free in hci_remove_ltk/hci_remove_irk
+In-Reply-To: <20230523115637.14541-1-lm0963hack@gmail.com>
+References: <20230523115637.14541-1-lm0963hack@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Similar to commit 0f7d9b31ce7a ("netfilter: nf_tables: fix use-after-free
-in nft_set_catchall_destroy()"). We can not access k after kfree_rcu()
-call.
+--===============1206722655290671976==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Min Li <lm0963hack@gmail.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=750457
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.26 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      41.83 seconds
+CheckAllWarning               PASS      45.95 seconds
+CheckSparse                   PASS      51.32 seconds
+CheckSmatch                   PASS      139.19 seconds
+BuildKernel32                 PASS      40.19 seconds
+TestRunnerSetup               PASS      580.00 seconds
+TestRunner_l2cap-tester       PASS      20.75 seconds
+TestRunner_iso-tester         PASS      28.64 seconds
+TestRunner_bnep-tester        PASS      7.25 seconds
+TestRunner_mgmt-tester        PASS      140.80 seconds
+TestRunner_rfcomm-tester      PASS      11.32 seconds
+TestRunner_sco-tester         PASS      10.43 seconds
+TestRunner_ioctl-tester       PASS      12.18 seconds
+TestRunner_mesh-tester        PASS      9.19 seconds
+TestRunner_smp-tester         PASS      10.39 seconds
+TestRunner_userchan-tester    PASS      7.73 seconds
+IncrementalBuild              PASS      38.00 seconds
+
+
+
 ---
- net/bluetooth/hci_core.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a856b1051d35..0164b56de12d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1416,10 +1416,10 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- 
- int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
- {
--	struct smp_ltk *k;
-+	struct smp_ltk *k, *tmp;
- 	int removed = 0;
- 
--	list_for_each_entry_rcu(k, &hdev->long_term_keys, list) {
-+	list_for_each_entry_safe(k, tmp, &hdev->long_term_keys, list) {
- 		if (bacmp(bdaddr, &k->bdaddr) || k->bdaddr_type != bdaddr_type)
- 			continue;
- 
-@@ -1435,9 +1435,9 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
- 
- void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
- {
--	struct smp_irk *k;
-+	struct smp_irk *k, *tmp;
- 
--	list_for_each_entry_rcu(k, &hdev->identity_resolving_keys, list) {
-+	list_for_each_entry_safe(k, tmp, &hdev->identity_resolving_keys, list) {
- 		if (bacmp(bdaddr, &k->bdaddr) || k->addr_type != addr_type)
- 			continue;
- 
--- 
-2.34.1
 
+--===============1206722655290671976==--
