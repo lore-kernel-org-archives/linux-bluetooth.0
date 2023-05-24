@@ -2,178 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9598EC7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 11:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE746C7EE2D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 May 2023 11:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234173AbjEXLBk (ORCPT
+        id S232084AbjEXLdz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 May 2023 07:01:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36610 "EHLO
+        Wed, 24 May 2023 07:33:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233037AbjEXLBd (ORCPT
+        with ESMTP id S231921AbjEXLdy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 May 2023 07:01:33 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31AEA3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 04:01:29 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-64d44b198baso529591b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 04:01:29 -0700 (PDT)
+        Wed, 24 May 2023 07:33:54 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCEBD12E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 04:33:52 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-38ea3f8e413so76439b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 04:33:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1684926089; x=1687518089;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MlhFitbDMZP7hCQbdHVoNuEXl+NL0ZynFialB8QGO0Y=;
-        b=hqgqSp8p6fg7qL4ZjMoY2COLrFUlRYy/RquBeTwgV8wDs2/2TSNB26j/fWv3zOXz1X
-         B1AA0Oxx4SdBTE7G6P9LvV/AqTgToRdvfvbRoTgOZ3yWookt66AdHwlaHtko7xK2wuf3
-         wFWfcYUlYeGGbqA8boIcz3sCNzTzeId4Stvc0=
+        d=gmail.com; s=20221208; t=1684928032; x=1687520032;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=C7V/2rblxPTdCyxJUH0Ms+oTVyti2bfAzf6+2HvNzOo=;
+        b=mZdRvMzzhayARP6t5mw2kM9dudlEOnXwQPK6bKwJdOqmmDdunGg2cpe4OpWQDu1oGv
+         zz2ZnEFftH+VPNmZYzxrTVZ2twINz1oBf9Elp3EXCODMtGB54om/olaTPd/FUeVceTB6
+         kMoVHo5lyUCQZOtH06CqqEr/zB7olTFcDX6WC/mdRU+31fNbKkYM7U3EnFcjfIelc1F2
+         aBa9FT/h91m7Eq64/UCjgasOSU7hsv4kUWCuf92NgrFnXBMN3R91LhtIMUWYBZuXJrwl
+         TuzUiwz3V3AWMPUqGlDn9nl3KV/6rXwxjYQfb5WX56cPcGEy/GN0rf8Owk2tbwQAUp92
+         fWVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684926089; x=1687518089;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1684928032; x=1687520032;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=MlhFitbDMZP7hCQbdHVoNuEXl+NL0ZynFialB8QGO0Y=;
-        b=LSbSBqpotW07eu5J4jNST4hcV2JKasPbPVBaqt1CDhIye5A++0YQ0rbmC8MraJefyR
-         ORtE4QrO4lE9Tl2VXHJmn8mj71OidIvZkxvw/o8otDWt5oNaFIeUG0qShtGc7ZuH5Vy/
-         XfROa80DwksttJamvcyzqcY8YeW9DQLaJl3cVFERYpi0UczrDgMgTFA8PhvzbPFl11NT
-         qJslVM8DU20oXwYmPQRBnSRfIXAplyRcAiumTQbWYOx2r+5Zd5GbwP4+K74PsacFYz9g
-         lp0n6n8+l06pUVW7hEk01SIVicSUhAGLHNkHB70qRiv+Zcyq+NBO3nX/1osYYx91PyA2
-         3Klw==
-X-Gm-Message-State: AC+VfDyNsd0XyR1hHPsLE8DVbfvzE7Y3gxrWzfxuEyPnogOkgqH2ia33
-        6IWvO2CxurkGuDoJjcGMV6R2/cDa3SMXHIrQ90A=
-X-Google-Smtp-Source: ACHHUZ7TKWb9UWfZXWXmF+S12uaUUjdqdzck6N+WWHPWQssG+IjFKnbU1WolIUCxB0LT/ePGwioTIg==
-X-Received: by 2002:a05:6a20:394e:b0:103:e813:77a1 with SMTP id r14-20020a056a20394e00b00103e81377a1mr21068407pzg.15.1684926088996;
-        Wed, 24 May 2023 04:01:28 -0700 (PDT)
-Received: from localhost (21.160.199.104.bc.googleusercontent.com. [104.199.160.21])
-        by smtp.gmail.com with UTF8SMTPSA id 10-20020a63060a000000b00502fd70b0bdsm7627969pgg.52.2023.05.24.04.01.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 May 2023 04:01:28 -0700 (PDT)
-From:   Ying Hsu <yinghsu@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Ying Hsu <yinghsu@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Fix l2cap_disconnect_req deadlock
-Date:   Wed, 24 May 2023 11:00:00 +0000
-Message-ID: <20230524110119.602679-1-yinghsu@chromium.org>
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
+        bh=C7V/2rblxPTdCyxJUH0Ms+oTVyti2bfAzf6+2HvNzOo=;
+        b=NcjeE367nbF507qo2FUCnB9wCpA+1LILjmEggnuXEMIunvMqTkXRupjxV5h3TWLTh+
+         RffJ00ZMv/+NgGPkLuc2XMy+2xoDyvGtlCLv/jgVHkDpqZjrmKLf2IW5t/cBSRidSLxx
+         laEf0MpXCuQwd7R1JCvTjDVkfZBuuzHA1kPmSwkOkb7qOPqrimOQj3DCfQXtlONvVe79
+         K7G/TZ6CQkg1jjk2cOmJepU4qJoWuIULyMGKlvCxxbD8XTHybp0WQFuzKOXkEsf6FJ0f
+         dD8OH9eGp8ECNerTFKThNnDLEy6Ll179jIKJoP8GYC85HfTVCdkNKTvpzUPB7YBIGues
+         LQwQ==
+X-Gm-Message-State: AC+VfDzjELZ4vW4vYOYDyWhngp1ugrIG19rxnJOhrQb2miOYIKowff8H
+        7zYTyxi56q5SN/SC+4nldeZlbDkBHvBXkg==
+X-Google-Smtp-Source: ACHHUZ4qrHS9ix9mCT1dOE39GKEpLTFwJSF+Z2+p/8E83Ut2ncm+Pz1vfj073++idhV/iW5VDThTCQ==
+X-Received: by 2002:a05:6808:56:b0:38c:11b3:a397 with SMTP id v22-20020a056808005600b0038c11b3a397mr8710761oic.14.1684928031785;
+        Wed, 24 May 2023 04:33:51 -0700 (PDT)
+Received: from [172.17.0.2] ([52.185.204.70])
+        by smtp.gmail.com with ESMTPSA id 3-20020aca0b03000000b00396050dca14sm4721158oil.28.2023.05.24.04.33.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 May 2023 04:33:51 -0700 (PDT)
+Message-ID: <646df61f.ca0a0220.27822.57c6@mx.google.com>
+Date:   Wed, 24 May 2023 04:33:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3011662076003802701=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
+Subject: RE: [v3] Bluetooth: Fix l2cap_disconnect_req deadlock
+In-Reply-To: <20230524110119.602679-1-yinghsu@chromium.org>
+References: <20230524110119.602679-1-yinghsu@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-L2CAP assumes that the locks conn->chan_lock and chan->lock are
-acquired in the order conn->chan_lock, chan->lock to avoid
-potential deadlock.
-For example, l2sock_shutdown acquires these locks in the order:
-  mutex_lock(&conn->chan_lock)
-  l2cap_chan_lock(chan)
+--===============3011662076003802701==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-However, l2cap_disconnect_req acquires chan->lock in
-l2cap_get_chan_by_scid first and then acquires conn->chan_lock
-before calling l2cap_chan_del. This means that these locks are
-acquired in unexpected order, which leads to potential deadlock:
-  l2cap_chan_lock(c)
-  mutex_lock(&conn->chan_lock)
+This is automated email and please do not reply to this email!
 
-This patch uses __l2cap_get_chan_by_scid to replace
-l2cap_get_chan_by_scid and adjusts the locking order to avoid the
-potential deadlock.
+Dear submitter,
 
-Fixes: ("a2a9339e1c9d Bluetooth: L2CAP: Fix use-after-free in l2cap_disconnect_{req,rsp}")
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=750612
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.70 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      37.20 seconds
+CheckAllWarning               PASS      40.25 seconds
+CheckSparse                   PASS      45.22 seconds
+CheckSmatch                   PASS      125.07 seconds
+BuildKernel32                 PASS      35.91 seconds
+TestRunnerSetup               PASS      510.24 seconds
+TestRunner_l2cap-tester       PASS      19.01 seconds
+TestRunner_iso-tester         PASS      25.36 seconds
+TestRunner_bnep-tester        PASS      6.56 seconds
+TestRunner_mgmt-tester        PASS      127.03 seconds
+TestRunner_rfcomm-tester      PASS      9.87 seconds
+TestRunner_sco-tester         PASS      9.08 seconds
+TestRunner_ioctl-tester       PASS      10.41 seconds
+TestRunner_mesh-tester        PASS      7.70 seconds
+TestRunner_smp-tester         PASS      8.93 seconds
+TestRunner_userchan-tester    PASS      6.59 seconds
+IncrementalBuild              PASS      32.29 seconds
+
+
+
 ---
-This commit has been tested on a Chromebook device.
+Regards,
+Linux Bluetooth
 
-Changes in v3:
-- Adding the fixes tag.
 
-Changes in v2:
-- Adding the prefix "Bluetooth:" to subject line.
-
- net/bluetooth/l2cap_core.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 376b523c7b26..7374e3d046da 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4651,8 +4651,15 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 
- 	BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
- 
--	chan = l2cap_get_chan_by_scid(conn, dcid);
-+	mutex_lock(&conn->chan_lock);
-+	chan = __l2cap_get_chan_by_scid(conn, dcid);
-+	if (chan) {
-+		chan = l2cap_chan_hold_unless_zero(chan);
-+		if (chan)
-+			l2cap_chan_lock(chan);
-+	}
- 	if (!chan) {
-+		mutex_unlock(&conn->chan_lock);
- 		cmd_reject_invalid_cid(conn, cmd->ident, dcid, scid);
- 		return 0;
- 	}
-@@ -4663,14 +4670,13 @@ static inline int l2cap_disconnect_req(struct l2cap_conn *conn,
- 
- 	chan->ops->set_shutdown(chan);
- 
--	mutex_lock(&conn->chan_lock);
- 	l2cap_chan_del(chan, ECONNRESET);
--	mutex_unlock(&conn->chan_lock);
- 
- 	chan->ops->close(chan);
- 
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
-+	mutex_unlock(&conn->chan_lock);
- 
- 	return 0;
- }
-@@ -4691,25 +4697,32 @@ static inline int l2cap_disconnect_rsp(struct l2cap_conn *conn,
- 
- 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x", dcid, scid);
- 
--	chan = l2cap_get_chan_by_scid(conn, scid);
-+	mutex_lock(&conn->chan_lock);
-+	chan = __l2cap_get_chan_by_scid(conn, scid);
-+	if (chan) {
-+		chan = l2cap_chan_hold_unless_zero(chan);
-+		if (chan)
-+			l2cap_chan_lock(chan);
-+	}
- 	if (!chan) {
-+		mutex_unlock(&conn->chan_lock);
- 		return 0;
- 	}
- 
- 	if (chan->state != BT_DISCONN) {
- 		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
-+		mutex_unlock(&conn->chan_lock);
- 		return 0;
- 	}
- 
--	mutex_lock(&conn->chan_lock);
- 	l2cap_chan_del(chan, 0);
--	mutex_unlock(&conn->chan_lock);
- 
- 	chan->ops->close(chan);
- 
- 	l2cap_chan_unlock(chan);
- 	l2cap_chan_put(chan);
-+	mutex_unlock(&conn->chan_lock);
- 
- 	return 0;
- }
--- 
-2.40.1.698.g37aff9b760-goog
-
+--===============3011662076003802701==--
