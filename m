@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 699E9C7EE2F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 May 2023 23:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E84C7EE32
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 May 2023 23:46:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241710AbjEYXqv (ORCPT
+        id S241821AbjEYXqw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 May 2023 19:46:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60566 "EHLO
+        Thu, 25 May 2023 19:46:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241716AbjEYXqt (ORCPT
+        with ESMTP id S241801AbjEYXqv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 May 2023 19:46:49 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2435E13D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 May 2023 16:46:48 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-64d3fdcadb8so242563b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 May 2023 16:46:48 -0700 (PDT)
+        Thu, 25 May 2023 19:46:51 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30AF212F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 May 2023 16:46:50 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-64d2a87b9daso259885b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 May 2023 16:46:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685058407; x=1687650407;
+        d=gmail.com; s=20221208; t=1685058409; x=1687650409;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=CCrwrwcO2rqGVk4TdW0IJTTdQ3wW4X9hR3opm81SZgQ=;
-        b=WbjWXHbswZlnJ53jCzWBDJCT9jmzakpMq0ekshVWIzpRbY82B7xzwgs13Dzihjr9kM
-         M88JFNJyjPvnTJQgJK2h2oZ1LUM9RjsfJLcNRap5eYotx/9MDTXJnzAIMoIZGMmcrSu+
-         tQbPSU0xORo+IaAqVrNLf60vs+SrParyH2/l2byUWwX5WzoNUdxowOlB28527VbUZ5Lz
-         Mb1B/VRkCoah0Zive5hphj9vKsPQYeXHJqUgPR3x3hpnsszDntKF7BZoDWm12acdD8Jd
-         LAoUyZD4eCEN8Eu+W48T/sGCxubdszIGH1LS9npthdh4JjRYmbqOe8bGEHISBTrpuJHJ
-         yJxA==
+        bh=5HZPtBtmBmeGKV5ZTkXZ2E4NZTnorrWlKQ+aUP/67lk=;
+        b=C3OTznlDdoty9hLf84ddtfVANqED7PbM8muU+AG7xGTxEoBbk+giyEjab9xJT7O0gY
+         LL2DHxkV17glGbnhbvmoU1JOfgxhdS7gC5XL0jxBjlFCe05A4wZZUSB/99AImj94XpLD
+         r+9VFklazsxOcibM4n6PJ0p5vZEV7p8pBmOpfel+vs0zOyiNrSbABwavnMzsds/IGsrv
+         KNgd+QGn/ulufse0WrXPJNf0cdjscKEjaWVmBsbP+r39eA9pY9NWvjIAR9xYMUCl36f+
+         UMFj0obNUrXvRC2bpAxKEiwt6BWkub8SBc+CV8AATXP/GBm/1AsRpqlzqJ3i9GDSYeHm
+         UPug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685058407; x=1687650407;
+        d=1e100.net; s=20221208; t=1685058409; x=1687650409;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CCrwrwcO2rqGVk4TdW0IJTTdQ3wW4X9hR3opm81SZgQ=;
-        b=QnTKuQFVZZguLwk58JpU8ZSisIN9dl/IODM35xrY44TjyYPyRvz1L50h4L/19gNsSH
-         lv9x3r6jo+0ylEvJp+pi/6ipYKrwyncYVqCOy1J3+Mx7S4FJOw4bhSagULaMA46wSweU
-         Hpn0YbUTSMpND4auD+H2mKaaR/Nc9MCe9tDF+YBo7iEYUY5Bs1+mFgfAs8rJNEKnsT/h
-         LGkJsIErdaTRSf7xUywQ+UIMb0M9TA91RmP2Pt7p+hhC4FKzuLoM8rtLM65vQFd93o0n
-         AE3HNOaHHaGFtoKs5W3JWA7QAlVTkHTXUp8AXn1wT2ZqdqoHVqkETCvPZ1lLDVwQZlwN
-         4wJQ==
-X-Gm-Message-State: AC+VfDxnYLN4waG7QSA/bxeysM3NzjU7Ef1YMwZqW8FlInKaslj/JXJT
-        HnFuXdOSPWBjPLghZlsOufYJCuKoaFY=
-X-Google-Smtp-Source: ACHHUZ6qST7NsiT8m6Jj6MW2gePjYxLSlG6TVMKGd8YqOngI5MZ7iqXaZC/wDJIUZWNz7VPJBHu8Xw==
-X-Received: by 2002:a05:6a00:1a12:b0:64d:742f:f590 with SMTP id g18-20020a056a001a1200b0064d742ff590mr665861pfv.8.1685058406768;
-        Thu, 25 May 2023 16:46:46 -0700 (PDT)
+        bh=5HZPtBtmBmeGKV5ZTkXZ2E4NZTnorrWlKQ+aUP/67lk=;
+        b=bHHMerDZ/FD9Gq5sgjxMlkh+cW1AhZS4B+FdzcgyYjmp8oOjJtPVLy+XDWzmEIEVvB
+         oI88KyhTwMfezx/faTwp/3tzVGVVYXw8yp7auwgC8H+gV7sMMRXL9nK7vUfd9EmsCte/
+         uBzQFX4+PxbgPLh2uD29JMeEodRxJqKQwlj/V/3KCUqQakdATvSy/EySJdMswnb39kNF
+         q9hcZQBbw0bG8NU7rS9h0/+Xo14LaVMgWYFdFVjRvNIHHyQiVIBVyQUCicxweiPYgq7C
+         azRusdC0mvNckjjzvFfjNsFJYQyHlgZm203Ofkzb2KC8iHYn2TUUZX+ngbDohGYNre17
+         rpJQ==
+X-Gm-Message-State: AC+VfDxrNPgEHa/PNdAjSv/QtsoiuDjQ/RTaqPwPM2QEfGbf2xCGaOwm
+        mLYEymDxIEhN2JjRFW8PQl/29XLKup0=
+X-Google-Smtp-Source: ACHHUZ6IOu00fQJpHB0lCzX0Y72XtJr4rY0FAj3rvct5fTJA2xuZyJd5XgFFx2OQtg4c1hHBQYZGuw==
+X-Received: by 2002:a05:6a20:8413:b0:10b:cb87:f5e with SMTP id c19-20020a056a20841300b0010bcb870f5emr17599044pzd.45.1685058408790;
+        Thu, 25 May 2023 16:46:48 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id n23-20020aa79057000000b0064867dc8719sm1626930pfo.118.2023.05.25.16.46.45
+        by smtp.gmail.com with ESMTPSA id n23-20020aa79057000000b0064867dc8719sm1626930pfo.118.2023.05.25.16.46.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 May 2023 16:46:45 -0700 (PDT)
+        Thu, 25 May 2023 16:46:47 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Init sk_peer_* on bt_sock_alloc
-Date:   Thu, 25 May 2023 16:46:42 -0700
-Message-Id: <20230525234643.3597907-2-luiz.dentz@gmail.com>
+Subject: [PATCH 3/3] Bluetooth: hci_sock: Forward credentials to monitor
+Date:   Thu, 25 May 2023 16:46:43 -0700
+Message-Id: <20230525234643.3597907-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230525234643.3597907-1-luiz.dentz@gmail.com>
 References: <20230525234643.3597907-1-luiz.dentz@gmail.com>
@@ -68,105 +68,166 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes sure peer information is always available via sock when using
-bt_sock_alloc.
+This stores scm_creds into hci_skb_cb so they can be properly forwarded
+to the likes of btmon which is then able to print information about the
+process who is originating the traffic:
+
+bluetoothd[35]: @ MGMT Command: Rea.. (0x0001) plen 0  {0x0001}
+@ MGMT Event: Command Complete (0x0001) plen 6         {0x0001}
+      Read Management Version Information (0x0001) plen 3
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/af_bluetooth.c |  8 ++++++++
- net/bluetooth/hidp/sock.c    | 10 +---------
- net/bluetooth/l2cap_sock.c   | 19 -------------------
- 3 files changed, 9 insertions(+), 28 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/hci_sock.c          | 60 +++++++++++++++++++++++++++++--
+ 2 files changed, 59 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 6035422e13da..ba1d01d82f1c 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -157,6 +157,14 @@ struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
- 	sk->sk_protocol = proto;
- 	sk->sk_state    = BT_OPEN;
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index b518e5379045..310231e47b3d 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -471,6 +471,7 @@ struct bt_skb_cb {
+ 		struct sco_ctrl sco;
+ 		struct hci_ctrl hci;
+ 		struct mgmt_ctrl mgmt;
++		struct scm_creds creds;
+ 	};
+ };
+ #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 9c45586f5818..2cb996e88caf 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -264,6 +264,45 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 	kfree_skb(skb_copy);
+ }
  
-+	if (!kern) {
-+		/* Init peer information so it can be properly monitored */
-+		spin_lock(&sk->sk_peer_lock);
-+		sk->sk_peer_pid  = get_pid(task_tgid(current));
-+		sk->sk_peer_cred = get_current_cred();
-+		spin_unlock(&sk->sk_peer_lock);
++static void hci_sock_copy_creds(struct sock *sk, struct scm_creds *creds)
++{
++	if (!sk || !creds)
++		return;
++
++	/* Check if peer credentials is set */
++	if (!sk->sk_peer_pid) {
++		/* Check if parent peer credentials is set */
++		if (bt_sk(sk)->parent && bt_sk(sk)->parent->sk_peer_pid)
++			sk = bt_sk(sk)->parent;
++		else
++			return;
 +	}
 +
- 	return sk;
- }
- EXPORT_SYMBOL(bt_sock_alloc);
-diff --git a/net/bluetooth/hidp/sock.c b/net/bluetooth/hidp/sock.c
-index 369ed92dac99..c93aaeb3a3fa 100644
---- a/net/bluetooth/hidp/sock.c
-+++ b/net/bluetooth/hidp/sock.c
-@@ -256,21 +256,13 @@ static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
- 	if (sock->type != SOCK_RAW)
- 		return -ESOCKTNOSUPPORT;
++	memset(creds, 0, sizeof(*creds));
++
++	creds->pid = pid_vnr(sk->sk_peer_pid);
++	if (sk->sk_peer_cred) {
++		creds->uid = sk->sk_peer_cred->uid;
++		creds->gid = sk->sk_peer_cred->gid;
++	}
++}
++
++static struct sk_buff *hci_skb_clone(struct sk_buff *skb)
++{
++	struct sk_buff *nskb;
++
++	if (!skb)
++		return NULL;
++
++	nskb = skb_clone(skb, GFP_ATOMIC);
++	if (!nskb)
++		return NULL;
++
++	hci_sock_copy_creds(skb->sk, &bt_cb(nskb)->creds);
++
++	return nskb;
++}
++
+ /* Send frame to sockets with specific channel */
+ static void __hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 				  int flag, struct sock *skip_sk)
+@@ -289,7 +328,7 @@ static void __hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 		if (hci_pi(sk)->channel != channel)
+ 			continue;
  
--	sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &hidp_proto, kern);
-+	sk = bt_sock_alloc(net, sock, &hidp_proto, protocol, GFP_ATOMIC, kern);
- 	if (!sk)
- 		return -ENOMEM;
+-		nskb = skb_clone(skb, GFP_ATOMIC);
++		nskb = hci_skb_clone(skb);
+ 		if (!nskb)
+ 			continue;
  
--	sock_init_data(sock, sk);
--
- 	sock->ops = &hidp_sock_ops;
--
- 	sock->state = SS_UNCONNECTED;
+@@ -356,6 +395,8 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!skb_copy)
+ 		return;
  
--	sock_reset_flag(sk, SOCK_ZAPPED);
--
--	sk->sk_protocol = protocol;
--	sk->sk_state	= BT_OPEN;
--
- 	bt_sock_link(&hidp_sk_list, sk);
- 
- 	return 0;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index d3de79b9a70b..f419e95fdcfc 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -177,21 +177,6 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	return err;
- }
- 
--static void l2cap_sock_init_pid(struct sock *sk)
--{
--	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
--
--	/* Only L2CAP_MODE_EXT_FLOWCTL ever need to access the PID in order to
--	 * group the channels being requested.
--	 */
--	if (chan->mode != L2CAP_MODE_EXT_FLOWCTL)
--		return;
--
--	spin_lock(&sk->sk_peer_lock);
--	sk->sk_peer_pid = get_pid(task_tgid(current));
--	spin_unlock(&sk->sk_peer_lock);
--}
--
- static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 			      int alen, int flags)
- {
-@@ -267,8 +252,6 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	    chan->mode != L2CAP_MODE_EXT_FLOWCTL)
- 		chan->mode = L2CAP_MODE_LE_FLOWCTL;
- 
--	l2cap_sock_init_pid(sk);
--
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
-@@ -324,8 +307,6 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 		goto done;
++	hci_sock_copy_creds(skb->sk, &bt_cb(skb_copy)->creds);
++
+ 	/* Put header before the data */
+ 	hdr = skb_push(skb_copy, HCI_MON_HDR_SIZE);
+ 	hdr->opcode = opcode;
+@@ -531,10 +572,12 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
+ 		return NULL;
  	}
  
--	l2cap_sock_init_pid(sk);
--
- 	sk->sk_max_ack_backlog = backlog;
- 	sk->sk_ack_backlog = 0;
+-	skb = bt_skb_alloc(14 + TASK_COMM_LEN , GFP_ATOMIC);
++	skb = bt_skb_alloc(14 + TASK_COMM_LEN, GFP_ATOMIC);
+ 	if (!skb)
+ 		return NULL;
+ 
++	hci_sock_copy_creds(sk, &bt_cb(skb)->creds);
++
+ 	flags = hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) ? 0x1 : 0x0;
+ 
+ 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
+@@ -580,6 +623,8 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+ 	if (!skb)
+ 		return NULL;
+ 
++	hci_sock_copy_creds(sk, &bt_cb(skb)->creds);
++
+ 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
+ 
+ 	__net_timestamp(skb);
+@@ -606,6 +651,8 @@ static struct sk_buff *create_monitor_ctrl_command(struct sock *sk, u16 index,
+ 	if (!skb)
+ 		return NULL;
+ 
++	hci_sock_copy_creds(sk, &bt_cb(skb)->creds);
++
+ 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
+ 	put_unaligned_le16(opcode, skb_put(skb, 2));
+ 
+@@ -638,6 +685,8 @@ send_monitor_note(struct sock *sk, const char *fmt, ...)
+ 	if (!skb)
+ 		return;
+ 
++	hci_sock_copy_creds(sk, &bt_cb(skb)->creds);
++
+ 	va_start(args, fmt);
+ 	vsprintf(skb_put(skb, len), fmt, args);
+ 	*(u8 *)skb_put(skb, 1) = 0;
+@@ -1494,6 +1543,7 @@ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
+ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t len, int flags)
+ {
++	struct scm_cookie scm;
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb;
+ 	int copied, err;
+@@ -1538,11 +1588,17 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 		break;
+ 	}
+ 
++	memset(&scm, 0, sizeof(scm));
++	scm.creds = bt_cb(skb)->creds;
++
+ 	skb_free_datagram(sk, skb);
+ 
+ 	if (flags & MSG_TRUNC)
+ 		copied = skblen;
+ 
++	if (scm.creds.pid)
++		scm_recv(sock, msg, &scm, flags);
++
+ 	return err ? : copied;
+ }
  
 -- 
 2.40.1
