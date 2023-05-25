@@ -2,164 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD87C77B7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 May 2023 00:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B9DC77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 May 2023 01:12:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231596AbjEYAMH (ORCPT
+        id S230011AbjEYBMD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 May 2023 20:12:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36432 "EHLO
+        Wed, 24 May 2023 21:12:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229680AbjEYAMG (ORCPT
+        with ESMTP id S229451AbjEYBMC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 May 2023 20:12:06 -0400
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A8F139
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 17:12:04 -0700 (PDT)
-Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-64d138bd759so928954b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 17:12:04 -0700 (PDT)
+        Wed, 24 May 2023 21:12:02 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30019E6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 18:12:01 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-75b0830e2eeso20506385a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 May 2023 18:12:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1684973524; x=1687565524;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CuGzP4jvcFhZR0qNDB5MEw2qn9YAXXZ3upPhfuHloLo=;
-        b=QyP5/8p7Gy/PZSdwURtv5JC7lUyDeFZAlQgrfKUMESQAz11X9jTC701MmiWTjBTWvF
-         IAuICHYBgGOZqQeEcyVQjQpaMAQYEio+n0H39WxwzhfDxbpisBUkNZjpTJD5ubWRy1Iy
-         c6nUdTAJEBFUNl/+Byq7Cyfiw0sqvpVQLlvMrz2cFsUwhoccvg3tiIsUCPORX8Fr1MC5
-         u000gRpAjzCP6n671I4By3AFo3+L3eeMmeRAwC87rjDfLnqU7Xk3YbbsJ516rCo/V6py
-         UEzelwVRqWiBazvdg4pIdomKH5G/lutEBpQNw1JZ8k27mpiU74Cz5jr01Ri8TpDddZUW
-         QLaA==
+        d=gmail.com; s=20221208; t=1684977120; x=1687569120;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qC3LFGwrGeDlX7D40M6z+e+ZsJ4iyFoBmQ6Y6rXrinM=;
+        b=nVaTsSXFSUc7lXRmGzrgYOgLECkb8CxDPJ6BKnKbt7EdbmG0mv2+ci9ELkTVu7bkHx
+         ZnnJU3TVDVMmk/oa3iHjKurlxEv///ujGrCVVls0eD4/CyzxHYsRtP5SyztMGcwdCEwa
+         3CS0x1kxP+4hmjFnAGEiL8Bvw21+DJtMSL0DWLawFiunHwAl719ChugLhfFQIU5JgK+p
+         k+Lgeb4i4hI92xqCgaODFlH3ThGb37mfPdlIvLmN68trDJxFTHSXIDZ2iEpCqU3VYAYL
+         saHoOIs5ttI71IdMt58PWtLo6y0CI7UG8gyIQel9ZT8ZgK0JRYz+joPukcJwQ0S2Es41
+         fZkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1684973524; x=1687565524;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CuGzP4jvcFhZR0qNDB5MEw2qn9YAXXZ3upPhfuHloLo=;
-        b=O2xB9G47+BKzu7g2KwXpYWdfdu6WObyvkqOmzVp4aELbVsxaQAD9D8ROXdHWcUZmmU
-         MekDsjRx7VttZm0r964D7JPrV9/asbCYtvqnfqLZpgyYbF8ht4DtOCsoL8IToItNEscn
-         xRVyNszWrQ2w2IzNoh7RClj9tje2ZDBtBXJqXZIa1MIweLwOBcHy42cczLd3QffAxhUE
-         2FDsLJH2Piv1/JMu/hkv4j/hyEFxgKQ6T37AlIz/JdYpnpyDGVEOb/b/mA58V+DjN81p
-         av+myUsDJCOaRwxefHIktkJSkFiXwKisQLOQJn26+u+FREKlssKiMEBAQACYsGgo8K17
-         s1Iw==
-X-Gm-Message-State: AC+VfDwlvW37qROhpmr3shXZwRWb4+GQokWHIKBh59ArAmgyI+W10ADN
-        EusukxnrCs7EnhvCUCNPlpYOlMsKxnHiA14OaXGJXnUHCuIE6YPsYoy7xblL0PgN/S5EW8bG6SS
-        dE+3AtxEXRsg25FUZeTF/+Y8KDUMfqyz7XOfMVr5/w2i6kVUy4QQJKpojMFRjYFtt6tZiV9ajHf
-        /Q
-X-Google-Smtp-Source: ACHHUZ5L4U6ncBchHbVPNxt3jSblZwPArf1Lu6PXIrUka0L1XTGS+c1Dcdl+Z/M7MxNvOvoT5Wxs5g76s7/Q
-X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
- (user=jiangzp job=sendgmr) by 2002:a05:6a00:1514:b0:63d:397a:8fdd with SMTP
- id q20-20020a056a00151400b0063d397a8fddmr1747469pfu.0.1684973523938; Wed, 24
- May 2023 17:12:03 -0700 (PDT)
-Date:   Wed, 24 May 2023 17:11:58 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.40.1.698.g37aff9b760-goog
-Message-ID: <20230524171158.kernel.v1.1.Ie9c81a5f8bbdb4f9a2007c56f05001d7e674dbe0@changeid>
-Subject: [kernel PATCH v1] Bluetooth: hci_sync: add lock to protect HCI_UNREGISTER
-From:   Zhengping Jiang <jiangzp@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Zhengping Jiang <jiangzp@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        d=1e100.net; s=20221208; t=1684977120; x=1687569120;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qC3LFGwrGeDlX7D40M6z+e+ZsJ4iyFoBmQ6Y6rXrinM=;
+        b=SZiDQisIr+xwyCvQKljxO5wcAbbe7/BthasafrRNgeYr8auCozy2LDI7AyPbES3PW4
+         lK8iwoa912p4EQrCsRVcw68Mj280ygtVcvhmoXSTj6IqT4btpbvbGmlb7lpPDJmB5fjb
+         0iHBGFIO6jp9Tjz0uaPSQdvvO+ZTX1pu/ch16sAUOKxkoQN8blFhyHMhppXu+hUsYP8D
+         lne6NO/irQdl5PXFzykXmfIYqD978JPUCths/sfwyKVzFbVynjTITIJ4tyBYtPZ6znyF
+         QFpcVFeejWxrs6g6KsbxLUtPFFGhHQj5hUwui2jsYEbM1diVl8CLb7VGhsDsfs3tJCYt
+         EbFw==
+X-Gm-Message-State: AC+VfDwXLZOTRk+stSR0AVOB3PQREo3RiD9TN1cp0KA+qiXiFuyOFjKX
+        GmyCATyXm+h432/5nZCHcnmMT+zTt3c=
+X-Google-Smtp-Source: ACHHUZ4eWMkPP8aLgN1gA5XaFeHr5dI0rmn3gZQkyJSWpF/ZTZrgdCzcKsAIrcXAeqV/gueZzgAMqg==
+X-Received: by 2002:a05:620a:4806:b0:75b:23a1:d849 with SMTP id eb6-20020a05620a480600b0075b23a1d849mr1360429qkb.11.1684977120190;
+        Wed, 24 May 2023 18:12:00 -0700 (PDT)
+Received: from [172.17.0.2] ([52.184.138.39])
+        by smtp.gmail.com with ESMTPSA id k25-20020a05620a139900b0074def53eca5sm20657qki.53.2023.05.24.18.11.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 May 2023 18:12:00 -0700 (PDT)
+Message-ID: <646eb5e0.050a0220.8baf5.00dc@mx.google.com>
+Date:   Wed, 24 May 2023 18:12:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6347565569703387435=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
+Subject: RE: [kernel,v1] Bluetooth: hci_sync: add lock to protect HCI_UNREGISTER
+In-Reply-To: <20230524171158.kernel.v1.1.Ie9c81a5f8bbdb4f9a2007c56f05001d7e674dbe0@changeid>
+References: <20230524171158.kernel.v1.1.Ie9c81a5f8bbdb4f9a2007c56f05001d7e674dbe0@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When the HCI_UNREGISTER flag is set, no jobs should be scheduled. Fix
-potential race when HCI_UNREGISTER is set after the flag is tested in
-hci_cmd_sync_queue.
+--===============6347565569703387435==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 0b94f2651f56 ("Bluetooth: hci_sync: Fix queuing commands when HCI_UNREGISTER is set")
-Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=750829
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.07 seconds
+GitLint                       PASS      0.37 seconds
+SubjectPrefix                 PASS      0.14 seconds
+BuildKernel                   PASS      33.07 seconds
+CheckAllWarning               PASS      34.78 seconds
+CheckSparse                   PASS      39.17 seconds
+CheckSmatch                   PASS      110.97 seconds
+BuildKernel32                 PASS      31.36 seconds
+TestRunnerSetup               PASS      442.40 seconds
+TestRunner_l2cap-tester       PASS      16.63 seconds
+TestRunner_iso-tester         PASS      21.83 seconds
+TestRunner_bnep-tester        PASS      5.45 seconds
+TestRunner_mgmt-tester        PASS      112.10 seconds
+TestRunner_rfcomm-tester      PASS      8.59 seconds
+TestRunner_sco-tester         PASS      7.94 seconds
+TestRunner_ioctl-tester       PASS      9.20 seconds
+TestRunner_mesh-tester        PASS      6.81 seconds
+TestRunner_smp-tester         PASS      7.90 seconds
+TestRunner_userchan-tester    PASS      5.70 seconds
+IncrementalBuild              PASS      29.21 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes in v1:
-- Add a lock to protect HCI_UNREGISTER flag
 
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         |  2 ++
- net/bluetooth/hci_sync.c         | 20 ++++++++++++++------
- 3 files changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c86ecce34854..9a21b4787df5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -515,6 +515,7 @@ struct hci_dev {
- 	struct work_struct	cmd_sync_work;
- 	struct list_head	cmd_sync_work_list;
- 	struct mutex		cmd_sync_work_lock;
-+	struct mutex		hdev_unregister_lock;
- 	struct work_struct	cmd_sync_cancel_work;
- 	struct work_struct	reenable_adv_work;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a856b1051d35..216c78656133 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2686,7 +2686,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
- {
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
-+	mutex_lock(&hdev->hdev_unregister_lock);
- 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
-+	mutex_unlock(&hdev->hdev_unregister_lock);
- 
- 	write_lock(&hci_dev_list_lock);
- 	list_del(&hdev->list);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 647a8ce54062..2038335bdc85 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -629,6 +629,7 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
- 	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
- 	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
- 	mutex_init(&hdev->cmd_sync_work_lock);
-+	mutex_init(&hdev->hdev_unregister_lock);
- 
- 	INIT_WORK(&hdev->cmd_sync_cancel_work, hci_cmd_sync_cancel_work);
- 	INIT_WORK(&hdev->reenable_adv_work, reenable_adv);
-@@ -692,14 +693,19 @@ int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 			void *data, hci_cmd_sync_work_destroy_t destroy)
- {
- 	struct hci_cmd_sync_work_entry *entry;
-+	int err = 0;
- 
--	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
--		return -ENODEV;
-+	mutex_lock(&hdev->hdev_unregister_lock);
-+	if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-+		err = -ENODEV;
-+		goto unlock;
-+	}
- 
- 	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
--	if (!entry)
--		return -ENOMEM;
--
-+	if (!entry) {
-+		err = -ENOMEM;
-+		goto unlock;
-+	}
- 	entry->func = func;
- 	entry->data = data;
- 	entry->destroy = destroy;
-@@ -710,7 +716,9 @@ int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 
- 	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
- 
--	return 0;
-+unlock:
-+	mutex_unlock(&hdev->hdev_unregister_lock);
-+	return err;
- }
- EXPORT_SYMBOL(hci_cmd_sync_submit);
- 
--- 
-2.40.1.698.g37aff9b760-goog
-
+--===============6347565569703387435==--
