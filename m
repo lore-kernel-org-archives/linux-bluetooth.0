@@ -2,179 +2,87 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDE1C7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 May 2023 12:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2164EC7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 May 2023 14:17:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236664AbjEZMCz (ORCPT
+        id S237404AbjEZORE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 May 2023 08:02:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45934 "EHLO
+        Fri, 26 May 2023 10:17:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231881AbjEZMCp (ORCPT
+        with ESMTP id S236487AbjEZORD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 May 2023 08:02:45 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AFA116;
-        Fri, 26 May 2023 05:02:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685102564; x=1716638564;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=niAd+MYPww6pzAj+PuY1sjn6jmYsE0NCxyfY/H+h0AI=;
-  b=C7R/2Oc+GfZKEmusvzmq4fwUCtsz0VO+Rr9VSxUoEe+qYqRhIPRibkCd
-   +0ngHSmb2Yu8LQ/xeCgxQ1le12iKgs/pv8hprcudnkhy9eiwv37hznlXP
-   Gistf6jJwSuwJqyd7PKZlK4vGchZlQz6mYApNKOKQtShQXR511CBE/Fqc
-   LrkzLhklQsnM/otGeZfA3Ecg1qXnXFSF7gFoHrWE2sUkN/3vmKtchjl2U
-   +86m0hfBLNxpowZLZn0u7sLO1XXt3RK4+Z/KMG97ckdvAjuTqeZxRySYz
-   3Dgq0KBRVoUz5Re55lb+4QEJI/6/ooRrZjea6x1aD9TlexHYclMpARlKe
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10721"; a="333812773"
-X-IronPort-AV: E=Sophos;i="6.00,194,1681196400"; 
-   d="scan'208";a="333812773"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2023 05:02:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10721"; a="738231141"
-X-IronPort-AV: E=Sophos;i="6.00,194,1681196400"; 
-   d="scan'208";a="738231141"
-Received: from lkp-server01.sh.intel.com (HELO dea6d5a4f140) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 26 May 2023 05:02:30 -0700
-Received: from kbuild by dea6d5a4f140 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q2W9N-000JJC-1f;
-        Fri, 26 May 2023 12:02:29 +0000
-Date:   Fri, 26 May 2023 20:01:48 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sungwoo Kim <iam@sung-woo.kim>
-Cc:     oe-kbuild-all@lists.linux.dev, wuruoyu@me.com, benquike@gmail.com,
-        daveti@purdue.edu, Sungwoo Kim <iam@sung-woo.kim>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free in
- l2cap_sock_ready_cb
-Message-ID: <202305261912.mKLcy6Fw-lkp@intel.com>
-References: <20230526084038.2199788-1-iam@sung-woo.kim>
+        Fri, 26 May 2023 10:17:03 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF942116
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 07:17:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 472826502F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 14:17:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74CD7C433EF;
+        Fri, 26 May 2023 14:17:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685110621;
+        bh=ghmE+AceXt0Obr0sUVqUs1EVg1wSN4+72y5g68kwRYk=;
+        h=From:Date:Subject:To:Cc:From;
+        b=IdiruQIKSVitp6UO2l4arFJwzNQH35l3M24Dsu/l9z99o2AD1bNrfcisTXVRG16lX
+         slrjD9qKtdl8iAR+YFYfYbyOozwf5yiMpWt+3qJHdR74LjwtCG1ML1+hGVOY2xk7rb
+         Xug7PuTkpQdZQ9A9a7lM5M+8exsS/pgZ7CMssCF+oxe4wOSZMfEeruMrtToyGJtjdY
+         d17j6gBAaGHBc/58aKO/Zc2z/cfnHmxRQytTY9QnNt8RbWBEqFHUWQa6b19hrzlFvT
+         j6+A67BguZoRm4uv2rRJp9PQF9h+8bIAG0hqmrC7oF4tGFA7G5Fr3VkqeJK9dTWb3a
+         FcQhv33joWhyw==
+From:   Simon Horman <horms@kernel.org>
+Date:   Fri, 26 May 2023 16:16:54 +0200
+Subject: [PATCH] Bluetooth: L2CAP: don't check for out-of-bounds value
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230526084038.2199788-1-iam@sung-woo.kim>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230526-l2cap-16bit-v1-1-2cfb83dd28ee@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAFW/cGQC/x2N0QqDMAwAf0XyvEDTTdH9yvChqVEDpZNWx0D89
+ 4U93sFxJ1QpKhWezQlFPlr1nQ3o1kBcQ14EdTIG7/zdtb7D5GPYkDrWHV1PDyZiN8wtWMGhCnI
+ JOa7W5CMlk1uRWb//xWu8rh+CObr5cgAAAA==
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Dan Carpenter <dan.carpenter@linaro.org>,
+        linux-bluetooth@vger.kernel.org, Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.12.2
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sungwoo,
+In l2cap_connect(), scid is an unsigned 16bit variable. Thus, it's
+maximum value is L2CAP_CID_DYN_END (0xffff) and there is no need
+to check for this value being exceeded.
 
-kernel test robot noticed the following build errors:
+Flagged by Smatch as:
 
-[auto build test ERROR on bluetooth/master]
-[also build test ERROR on bluetooth-next/master linus/master v6.4-rc3 next-20230525]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+  .../l2cap_core.c:4165 l2cap_connect() warn: impossible condition '(scid > 65535) => (0-u16max > u16max)'
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sungwoo-Kim/Bluetooth-L2CAP-Fix-use-after-free-in-l2cap_sock_ready_cb/20230526-164241
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20230526084038.2199788-1-iam%40sung-woo.kim
-patch subject: [PATCH] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb
-config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20230526/202305261912.mKLcy6Fw-lkp@intel.com/config)
-compiler: powerpc-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        mkdir -p ~/bin
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/c0c02b1afbe2667fe21aed47375c4e0d45713f38
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Sungwoo-Kim/Bluetooth-L2CAP-Fix-use-after-free-in-l2cap_sock_ready_cb/20230526-164241
-        git checkout c0c02b1afbe2667fe21aed47375c4e0d45713f38
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross W=1 O=build_dir ARCH=powerpc olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 ~/bin/make.cross W=1 O=build_dir ARCH=powerpc SHELL=/bin/bash net/bluetooth/
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ net/bluetooth/l2cap_core.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202305261912.mKLcy6Fw-lkp@intel.com/
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ae397c6819d9..a5d85a5f5930 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4161,8 +4161,12 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 
+ 	result = L2CAP_CR_NO_MEM;
+ 
+-	/* Check for valid dynamic CID range (as per Erratum 3253) */
+-	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
++	/* Check for valid dynamic CID range (as per Erratum 3253).
++	 * As scid is an unsigned 16bit variable it's maximum
++	 * value is L2CAP_CID_DYN_END (0xffff): there is no need to check
++	 * if scid exceeds that value here.
++	 */
++	if (scid < L2CAP_CID_DYN_START) {
+ 		result = L2CAP_CR_INVALID_SCID;
+ 		goto response;
+ 	}
 
-All error/warnings (new ones prefixed by >>):
-
-   net/bluetooth/l2cap_sock.c: In function 'l2cap_sock_release':
->> net/bluetooth/l2cap_sock.c:1418:9: error: implicit declaration of function 'l2cap_sock_cleanup_listen'; did you mean 'l2cap_sock_listen'? [-Werror=implicit-function-declaration]
-    1418 |         l2cap_sock_cleanup_listen(sk);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
-         |         l2cap_sock_listen
-   net/bluetooth/l2cap_sock.c: At top level:
->> net/bluetooth/l2cap_sock.c:1436:13: warning: conflicting types for 'l2cap_sock_cleanup_listen'; have 'void(struct sock *)'
-    1436 | static void l2cap_sock_cleanup_listen(struct sock *parent)
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~
->> net/bluetooth/l2cap_sock.c:1436:13: error: static declaration of 'l2cap_sock_cleanup_listen' follows non-static declaration
-   net/bluetooth/l2cap_sock.c:1418:9: note: previous implicit declaration of 'l2cap_sock_cleanup_listen' with type 'void(struct sock *)'
-    1418 |         l2cap_sock_cleanup_listen(sk);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +1418 net/bluetooth/l2cap_sock.c
-
-  1406	
-  1407	static int l2cap_sock_release(struct socket *sock)
-  1408	{
-  1409		struct sock *sk = sock->sk;
-  1410		int err;
-  1411		struct l2cap_chan *chan;
-  1412	
-  1413		BT_DBG("sock %p, sk %p", sock, sk);
-  1414	
-  1415		if (!sk)
-  1416			return 0;
-  1417	
-> 1418		l2cap_sock_cleanup_listen(sk);
-  1419		bt_sock_unlink(&l2cap_sk_list, sk);
-  1420	
-  1421		err = l2cap_sock_shutdown(sock, SHUT_RDWR);
-  1422		chan = l2cap_pi(sk)->chan;
-  1423	
-  1424		l2cap_chan_hold(chan);
-  1425		l2cap_chan_lock(chan);
-  1426	
-  1427		sock_orphan(sk);
-  1428		l2cap_sock_kill(sk);
-  1429	
-  1430		l2cap_chan_unlock(chan);
-  1431		l2cap_chan_put(chan);
-  1432	
-  1433		return err;
-  1434	}
-  1435	
-> 1436	static void l2cap_sock_cleanup_listen(struct sock *parent)
-  1437	{
-  1438		struct sock *sk;
-  1439	
-  1440		BT_DBG("parent %p state %s", parent,
-  1441		       state_to_string(parent->sk_state));
-  1442	
-  1443		/* Close not yet accepted channels */
-  1444		while ((sk = bt_accept_dequeue(parent, NULL))) {
-  1445			struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-  1446	
-  1447			BT_DBG("child chan %p state %s", chan,
-  1448			       state_to_string(chan->state));
-  1449	
-  1450			l2cap_chan_hold(chan);
-  1451			l2cap_chan_lock(chan);
-  1452	
-  1453			__clear_chan_timer(chan);
-  1454			l2cap_chan_close(chan, ECONNRESET);
-  1455			l2cap_sock_kill(sk);
-  1456	
-  1457			l2cap_chan_unlock(chan);
-  1458			l2cap_chan_put(chan);
-  1459		}
-  1460	}
-  1461	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
