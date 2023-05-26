@@ -2,119 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 273D1C7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 May 2023 14:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D60C77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 May 2023 15:20:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237397AbjEZO5W (ORCPT
+        id S243784AbjEZPT7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 May 2023 10:57:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48470 "EHLO
+        Fri, 26 May 2023 11:19:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231447AbjEZO5V (ORCPT
+        with ESMTP id S243725AbjEZPT6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 May 2023 10:57:21 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994FC9C
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 07:57:19 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-75b17b80834so99435385a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 07:57:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685113038; x=1687705038;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cu7K9QaaYd4mUIBYA+E6Nb6+kIHGJz+Q1EtFcJm3XfU=;
-        b=haVakhQKQUMSVPE9iikgxcYznDXs5oqQ7U7N8F/sw/P2JdEqmRMsYCKozTjG6ktcND
-         UPh/cg8fL0Ir4TI/Mgd7gP356vtq6Uawzk7WkxgGZIGLqZ1D/4cGt4FO4XU6/FX2exOD
-         v05fvJvt/VV5c5epCLdTJC5ELkjNFc/5iYEqwfjza6kwxl0yJ6LC5Ew8WYLBz2hhWnmv
-         q0sr0z/97uadsGx8acBHxydJlqoOcBKJxCNPin7ul4jV/Qd67+Zn2263uGKX2uMMX82Q
-         8g9npDlfrD+1ZQcSri1XwyEst7XlMFHmnhbdFx/v5gEHkG8oZ78W8oFwFWObAHR2DX6M
-         kDqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685113038; x=1687705038;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Cu7K9QaaYd4mUIBYA+E6Nb6+kIHGJz+Q1EtFcJm3XfU=;
-        b=dga+USI2jrREvQ1in44O3XStiJsfMzbfpO95pjw9r6ObbkKKgSt4rmKbgd6+/yGgOs
-         8tzPkG2yx8Ut+Y/kEJt+3bDwTIfcpqV2nWMEJQNPwxjDR7uz6knZ0uVFa0g+hopw45SJ
-         tc++g5KWpMHgNpUhs0agFz5aSQaO0LjP79Pwua3d5WBYDz3IdQjRyL4aVrmdNHHx+Eta
-         4wuGaXxNC06rWGTsQPxsecXzovct3Xdh3WThKFtgeXNSD3Y6ds6SBtkrGnBvOWUjZwkz
-         QUkEcmI3gJuHj/p+h7R9mlgr9O9TBRKr7kcitwbD3c3YhohspBXi0mCRyyEDgNZ/HRSz
-         NOhw==
-X-Gm-Message-State: AC+VfDwlzTE5gDre+oeR9LXFpSpX5IeYVSXgCKDq+6sDVpmIf3Btbt6k
-        NTSgRkpkDiBDuVS23wxJol/whDL+bIU=
-X-Google-Smtp-Source: ACHHUZ6qG3NNcq15ryO1gbIwn0aZsOMgPh9ZM9Sqk77xbPgXRtw5b7uc8YV5X+qS8mZMdqLqomb1iA==
-X-Received: by 2002:ad4:5c46:0:b0:625:aa49:ceb3 with SMTP id a6-20020ad45c46000000b00625aa49ceb3mr2231858qva.60.1685113038283;
-        Fri, 26 May 2023 07:57:18 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.158.20])
-        by smtp.gmail.com with ESMTPSA id e14-20020a0cf74e000000b005dd8b9345besm1257430qvo.86.2023.05.26.07.57.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 May 2023 07:57:18 -0700 (PDT)
-Message-ID: <6470c8ce.0c0a0220.c4651.7003@mx.google.com>
-Date:   Fri, 26 May 2023 07:57:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0411083153176767633=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, horms@kernel.org
-Subject: RE: Bluetooth: L2CAP: don't check for out-of-bounds value
-In-Reply-To: <20230526-l2cap-16bit-v1-1-2cfb83dd28ee@kernel.org>
+        Fri, 26 May 2023 11:19:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28717E7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 08:19:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B323661278
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 15:19:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAC8C4339B;
+        Fri, 26 May 2023 15:19:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685114397;
+        bh=2/koG5iBtXxHvPqcFmQwiEyZN+OwaDK7OQ8WT55ULmQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Om5TFV0pnsghl5yMG23bvhLmSSjm8GpgrlPzXTWC+1RWe721QmB/C81b2/bF/1ha8
+         A0c2cl3n1dbKDkLVgv7PCG+3HaUCZM4G2s30BFCiK1+hN3mEnbGiqxP3jOb9r92XEF
+         E7ps9k6r+n2dAG/sGbufA3TSQ2dyY74eynOo0cSciaE+s4+GjO69I4iFa7uwA/hBK/
+         3szMmZA81ZhAQ0mU2Jw6YYqMoNUKWuq0IuWXgc6i+ceQS2r224B/HX0Z+tMMyu96M7
+         EdSPJYsq0U0Q0mTzU7JpDb7XF6NjG89edoSuNfnRwfRDqR+g+ZbicLxiDgJ8/l5hTd
+         DuxJUrOOPEpaw==
+Date:   Fri, 26 May 2023 17:19:52 +0200
+From:   Simon Horman <horms@kernel.org>
+To:     Dan Carpenter <dan.carpenter@linaro.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: L2CAP: don't check for out-of-bounds value
+Message-ID: <ZHDOGNhIu9pjDKVM@kernel.org>
 References: <20230526-l2cap-16bit-v1-1-2cfb83dd28ee@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+ <fdab8adc-0f61-4664-a2f9-6f532b0c85be@kili.mountain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fdab8adc-0f61-4664-a2f9-6f532b0c85be@kili.mountain>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0411083153176767633==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, May 26, 2023 at 05:34:30PM +0300, Dan Carpenter wrote:
+> On Fri, May 26, 2023 at 04:16:54PM +0200, Simon Horman wrote:
+> > @@ -4161,8 +4161,12 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+> >  
+> >  	result = L2CAP_CR_NO_MEM;
+> >  
+> > -	/* Check for valid dynamic CID range (as per Erratum 3253) */
+> > -	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
+> > +	/* Check for valid dynamic CID range (as per Erratum 3253).
+> > +	 * As scid is an unsigned 16bit variable it's maximum
+> > +	 * value is L2CAP_CID_DYN_END (0xffff): there is no need to check
+> > +	 * if scid exceeds that value here.
+> > +	 */
+> > +	if (scid < L2CAP_CID_DYN_START) {
+> 
+> This is a false positive.  To me the warning looks reasonable.  But one
+> way we could silence it would be to keep a list of macros where the
+> check is impossible but we still want to have it.
 
-This is automated email and please do not reply to this email!
+Hi Dan,
 
-Dear submitter,
+I do agree that the existing code is harmless.
+Is this why you feel it is a false positive?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=751393
+> I could create something where we do:
+> 
+> echo "L2CAP_CID_DYN_END" >> smatch_data/kernel.allowed_impossible_limits
+> 
+> I'd do the same for unsigned comparisons with zero like:
+> 
+> 
+>         if (dpmcp_dev->obj_desc.ver_major < DPMCP_MIN_VER_MAJOR ||
+>             (dpmcp_dev->obj_desc.ver_major == DPMCP_MIN_VER_MAJOR &&
+>              dpmcp_dev->obj_desc.ver_minor < DPMCP_MIN_VER_MINOR)) {
+>              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>                 dev_err(&dpmcp_dev->dev,
+>                         "ERROR: Version %d.%d of DPMCP not supported.\n",
+> 
+> echo "DPMCP_MIN_VER_MINOR" >> smatch_data/kernel.allowed_impossible_limits
 
----Test result---
+FWIIW, I've noticed problems with comparisons to enums. Which, f.e., may in
+practice are unsigned values of a particular width for a given build.
+But in theory could be any type.
 
-Test Summary:
-CheckPatch                    PASS      0.73 seconds
-GitLint                       FAIL      0.59 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      32.79 seconds
-CheckAllWarning               PASS      35.87 seconds
-CheckSparse                   PASS      40.68 seconds
-CheckSmatch                   PASS      110.56 seconds
-BuildKernel32                 PASS      31.81 seconds
-TestRunnerSetup               PASS      451.39 seconds
-TestRunner_l2cap-tester       PASS      17.35 seconds
-TestRunner_iso-tester         PASS      22.55 seconds
-TestRunner_bnep-tester        PASS      5.84 seconds
-TestRunner_mgmt-tester        PASS      117.28 seconds
-TestRunner_rfcomm-tester      PASS      9.20 seconds
-TestRunner_sco-tester         PASS      8.50 seconds
-TestRunner_ioctl-tester       PASS      9.89 seconds
-TestRunner_mesh-tester        PASS      7.29 seconds
-TestRunner_smp-tester         PASS      8.38 seconds
-TestRunner_userchan-tester    PASS      6.04 seconds
-IncrementalBuild              PASS      30.04 seconds
+Perhaps the system you propose above would be useful for silencing
+warnings about such problems? They seem to be a subset of the problem
+at hand.
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: L2CAP: don't check for out-of-bounds value
+> I can do that on Monday if you want.  Other static checkers might
+> complain still though.
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-9: B1 Line exceeds max length (106>80): "  .../l2cap_core.c:4165 l2cap_connect() warn: impossible condition '(scid > 65535) => (0-u16max > u16max)'"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0411083153176767633==--
+No rush from my side.
