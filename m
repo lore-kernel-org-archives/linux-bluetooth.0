@@ -2,79 +2,184 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C9CC77B73
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 May 2023 23:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E5BEC77B7E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 May 2023 12:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbjEZXBU (ORCPT
+        id S230137AbjE0M7T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 May 2023 19:01:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49874 "EHLO
+        Sat, 27 May 2023 08:59:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229693AbjEZXBT (ORCPT
+        with ESMTP id S229571AbjE0M7S (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 May 2023 19:01:19 -0400
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1D46AD
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 16:01:17 -0700 (PDT)
-Received: from github.com (hubbernetes-node-f2ec2b3.va3-iad.github.net [10.48.220.39])
-        by smtp.github.com (Postfix) with ESMTPA id D46085C05C6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 May 2023 16:01:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1685142076;
-        bh=gkd3PNxWH3FoJxthaibRXs/SbbwzGv//xclptFFGmrY=;
-        h=Date:From:To:Subject:From;
-        b=gpe4+CA/SyQkyVqshis+sg8fBsI7c4Hp88bU0Yq4BVcqtv8NMZUn0GPE5ksZvKOeK
-         bbosJjA67llMJsmbPrwf0DkhdJYkFSr/U6nqMeq8qINUyszyl1CgN3vA8PdH40UQFN
-         uMt5pBg8K4OISynVZcCzU1DhSf/g6rOPrnJ9X1tc=
-Date:   Fri, 26 May 2023 16:01:16 -0700
-From:   silviubarbulescu <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/97f338-7002ec@github.com>
-Subject: [bluez/bluez] 07c6d9: lib: Add macro definitions for BAP broadcast
- sourc...
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Sat, 27 May 2023 08:59:18 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0BFB2;
+        Sat, 27 May 2023 05:59:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kZx7CPrwTngD51PcORJJQnWPmtr4DuK7G5aZk0cQI6LeZgGDPvxr04SaaRGUnQbH/rD1Hse3xzyElwVBnVmKX1Ux/WxlT8ll9WlzV6mcH7YNs+cs/fxvwWtMzf2xOHoKk9jNbpWrxDxl5QkhBgfo0vZOqfxKkXeqDmbRi4lXDNv1NPlo7OqpVS/GjUOVYsq5TOGSMmGOMacSofHKDhukjvNIsozlR4I+3zaG6iMAV6Fmol9iP9G/56vPSUa9K0jSMY5waH3EzX4BNA66uTM2ZHfFsAnGXFHkRIeAmAy/GX1G9gUP+SXfchCFcB4vVpn/KlgrpsyLSQUtK4kW3njYGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F1ZPR0fypTa4v+oR9VRgrk8dmV8nGEX8YLaKeoluXJ4=;
+ b=XncVaqat4Oddyn41BvVlrF9lfi9/J7S5doJ2XU+LVnqmaBy4hApa2g1A7S9xAtDS6HRckDROVCW0p75YAJ2/Tf83MclCAcHL3x4NCBwM/EbTOmVbRasaP1rSF4SNl/chAcH1DxsnPS+m9iJE8Qy5ES2jxRhrEEBqvnJFJCRq7Bb3U469/2AxmJARO3RPGnE3IiioB6nQ9ng7omjHeHQuWNT73KyfLEsxo5AL0xga+X8gMPvylbqEXzqBIuIMw5jR65wqzz487wMy2uvsKwKjCdB/qnpYrAkZYHmUljQzlXZuvHiJfmq1TVr7qGXSykGt4LEGTY0qx9ETMsaRDuc6RA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F1ZPR0fypTa4v+oR9VRgrk8dmV8nGEX8YLaKeoluXJ4=;
+ b=DqGiJ+rfN6GrcWF+DdwS3ZV42CCStwdxl8rEY9E/fGQAQyjfhy+glpsoYlANN1rcTauvxYY2G14jp25yOfbEFgDncgLRCBZ7jhwpuWUqLVTm6JlVwsoYmEaYQCiwMloTvoFL1uJP8XGE0J8vwEnUCAyv0KgTw5AUd5WX0kufSYY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SJ0PR13MB5676.namprd13.prod.outlook.com (2603:10b6:a03:403::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.16; Sat, 27 May
+ 2023 12:59:12 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6433.018; Sat, 27 May 2023
+ 12:59:11 +0000
+Date:   Sat, 27 May 2023 14:59:04 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Sungwoo Kim <iam@sung-woo.kim>
+Cc:     benquike@gmail.com, davem@davemloft.net, daveti@purdue.edu,
+        edumazet@google.com, happiness.sung.woo@gmail.com,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, wuruoyu@me.com
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix use-after-free in
+ l2cap_sock_ready_cb
+Message-ID: <ZHH+l73YeZd9iq52@corigine.com>
+References: <20230202120902.2827191-1-iam@sung-woo.kim>
+ <20230526181647.3074391-1-iam@sung-woo.kim>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230526181647.3074391-1-iam@sung-woo.kim>
+X-ClientProxiedBy: AM4PR05CA0009.eurprd05.prod.outlook.com (2603:10a6:205::22)
+ To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5676:EE_
+X-MS-Office365-Filtering-Correlation-Id: e5290033-ccbb-49f5-010b-08db5eb22ab4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: eaPYz0i9cNrCzVfJHtXoL9K6BdocDRGJ153nX3s+6vFKManF1ckIaiWjPtSqliJr8BzjJ5/i9SYLkcTgWW4/alv5BxS+iiV6IhVo6e9ZW50WkFJiPXbAL2cfgwNDvaEPBkAvrA7rHItHVs8/nuTKlHCrgoVz0tvsbfs2UGDZc7dqnXXOsLFwOWGA1s4/LKGtOJdMu2rQJs39BjrCJji0zQcb3mc2raQBcZ8Ehz9vHU9r/s2ZORSUjTSceUtymRC3X36GcODJ3tSaIenVzmyJyDiwwVgUWZPHzxKvekGnJzQlubi3yf+BHQBf8Fqx48gc8IVfE7kLHSxAJsoCh8AbWh3d5ZQPyjW8IJIYUvfEi4rU+4BHjea13GMT91bCvNw0Tc6csK9TZ2BR8O1y3aAmSMFwOLuei5OEFNUKmKAWtugwbahP6t9gokbuWpAlZoYQEtFNjGOL7VGgnpAkr1AS00SAU+sokOKtEKQnjgQsj8kULOUixQQjzaCatQh4r0+S5JOqGsm8qaEv4YZAqkAuDqjVFjRMNnCHXwEov+dUMtTSmYCl0sI90cou7IEUCAV/R0y3XGV1jaofJ4syI6GKB1voNEYjkZHbKIPyB1ewllYyheZ4b5VMTLEYxPQjmionkucHJZ/vkJ0PTQm7UOYZcG9g4dTIy01GLGyFc2K/1X4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39830400003)(376002)(346002)(136003)(366004)(451199021)(478600001)(41300700001)(6486002)(4326008)(66556008)(66476007)(8676002)(8936002)(66946007)(6916009)(5660300002)(2906002)(186003)(83380400001)(2616005)(316002)(6666004)(38100700002)(86362001)(6512007)(7416002)(36756003)(6506007)(44832011)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?dbhldYBIydpfK/xSkl1Rluy+wwGX5Br7Kq9KpJQ2kjAS0ulCVl+wReHHxFey?=
+ =?us-ascii?Q?+Jmkc5cXO1zuympuKYUVkieIzN1pPZuNalYR15ZtGsdPu3BmLoxW8WUSqbAv?=
+ =?us-ascii?Q?Rq7MxoGIWyDi/h0qvVZXlgNyb47gdiUnc0XA0SyG6oLk/GSeAE4y1F82WOGC?=
+ =?us-ascii?Q?8u3Qwrvmu7yuJfEAlcxC37WBgz4d5G32H5/arMgu9UuDE9x9wkz5FWrRE+0O?=
+ =?us-ascii?Q?/z5xwLKBB2mCranWIZv9oI96F1AJdzuVs+tnG73fYnRyawAlSi2678tve6Gn?=
+ =?us-ascii?Q?0sI+o2gU1HmaR2T0MUmWeSOv9a8Z62GxYAhwPHtYXaAfLQVsNIgFViCLu5KT?=
+ =?us-ascii?Q?EkhTOhr8sxr9ugt7KtkjabS52uDwbnoY1OLTrk2IFqsFYYxQcTGYaFULv4ev?=
+ =?us-ascii?Q?X/ogoPfpwMQJB7PFM3R1cioO1BWqWNF0PUTbCFOpTg/iTfQS252zE0dTVgnG?=
+ =?us-ascii?Q?hL/H6uBbQROtQikrlLq9XRp8F6Iumy7E012Js7slwby18yqcotXpNHa9DfLY?=
+ =?us-ascii?Q?h70TNx+QDgg5BvFbo/aP2ZBt9XpuhpLv4i9vl8yxr+q8At9HBuGqE7cJdbO3?=
+ =?us-ascii?Q?hrYvrHB9v5gprKLPRI4gBK0f+gssAYWRx6A7OTmJ5dxxoP81soI3oU7vDIGb?=
+ =?us-ascii?Q?TSmQ4XgOcdIcOJuwKoPQgWHXevc0TNKz4M4rcqN/DvVgZ37bGv0gcy0eNQq7?=
+ =?us-ascii?Q?zhgkKTE9tUgVKMFJjUlb1pZogrNBdpaL526GMoYTdEkKuhdEs2B2xOqixcoo?=
+ =?us-ascii?Q?156YrIEy9qxFtmDdfIEUxb/geH/SSz8adbCGX/73FlxRr1V1aELxs7VwyAmv?=
+ =?us-ascii?Q?WAaDrF5gUU7xudeBkBZhuUaV0P5sSCuWhXydXegx+C8ELq6XnF0im+z3Spdw?=
+ =?us-ascii?Q?54mkpaVbPmISyOuY51kDGi6Fcw8fjtuCaqz/cxCVzrnmGW9huZvlmlKAYzMj?=
+ =?us-ascii?Q?zLFCCMJGYht/VJAVAhgm1Z2TwEVE5vRW2NrBzaRmjTIAUYgitrXRcwDSxDdt?=
+ =?us-ascii?Q?IeGS5ODZUk9mUi78WJgH94QlLfqoJoem9MY9SBa08AXndLYSbbjdt4nuKms9?=
+ =?us-ascii?Q?tPHopK84Ukz0IEU7/2yxrLrQkGHIQUDYX6umzdJwb2e4k7Tx1qNhl0virIaN?=
+ =?us-ascii?Q?nlCtcmpr9U5ki+fhA9MK11KkWeoKTKWJWTCpIIjUhga/AuUAtVBFexQnW0GW?=
+ =?us-ascii?Q?+xnYLZ4JoL4pO3UGuXyDD3NVrlJ0Lyjm5c0chuD7wbec8tzzZ002AuTtzgmh?=
+ =?us-ascii?Q?+o/9NnGawE2zwk35WkFP4v91aj/phOI/wH2eIMm9LLUkYgqikqWjrLjDfhfH?=
+ =?us-ascii?Q?b3jkDKFqaLScYeGAV57FjrUvsJ4e1UtSkUS7/Fjvcxhb6h92x6BZEZzmUzq/?=
+ =?us-ascii?Q?IxpH3Ks4AeJTzleiq5DahS/m3DmSeViY9G54zfyPE1VypfExOzRcTBo6r5hf?=
+ =?us-ascii?Q?HVRO+kgWRi2WlkX1iNrKRL2jtkSpYC1FzWB+D9b5qOK0NlhowLYl+TOCBVjh?=
+ =?us-ascii?Q?d0uawhTxGvtlAI3N4acv+yD0rnv5RLne/NXR7jQa2eKBV7xErPy9LEHgnQEz?=
+ =?us-ascii?Q?462ucxyNubgOBALjHollJiS4XlGsCCP0NpFZzyl7hVa1tl7HbkNoHugCL4uZ?=
+ =?us-ascii?Q?5tmtqfP7UG037ORaebdjtwH2PtvkTSUVFG7+jRWVuXHdOYkRneqWO6pX6xjU?=
+ =?us-ascii?Q?P+ty6w=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5290033-ccbb-49f5-010b-08db5eb22ab4
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2023 12:59:11.8325
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Ppney/tHzl+Nwimtmew19D0jpSJjg1wErtmpVn0llfodNViLDsyfAqE5sX5qZyYWrYlRWRN0luPgZQn2ALH6iAIxxIJyKkSf4IOnyEuSUXg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5676
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 07c6d9b1106545afb2dcbdd7c5ab067fd15310f0
-      https://github.com/bluez/bluez/commit/07c6d9b1106545afb2dcbdd7c5ab067fd15310f0
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2023-05-26 (Fri, 26 May 2023)
+On Fri, May 26, 2023 at 02:16:48PM -0400, Sungwoo Kim wrote:
+> >    net/bluetooth/l2cap_sock.c: In function 'l2cap_sock_release':
+> > >> net/bluetooth/l2cap_sock.c:1418:9: error: implicit declaration of function 'l2cap_sock_cleanup_listen'; did you mean 'l2cap_sock_listen'? [-Werror=implicit-function-declaration]
+> 
+> Fix this error
+> 
+> >     1418 |         l2cap_sock_cleanup_listen(sk);
+> >          |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+> >          |         l2cap_sock_listen
+> >    net/bluetooth/l2cap_sock.c: At top level:
+> > >> net/bluetooth/l2cap_sock.c:1436:13: warning: conflicting types for 'l2cap_sock_cleanup_listen'; have 'void(struct sock *)'
+> >     1436 | static void l2cap_sock_cleanup_listen(struct sock *parent)
+> >          |             ^~~~~~~~~~~~~~~~~~~~~~~~~
+> > >> net/bluetooth/l2cap_sock.c:1436:13: error: static declaration of 'l2cap_sock_cleanup_listen' follows non-static declaration
+> >    net/bluetooth/l2cap_sock.c:1418:9: note: previous implicit declaration of 'l2cap_sock_cleanup_listen' with type 'void(struct sock *)'
+> >     1418 |         l2cap_sock_cleanup_listen(sk);
+> >          |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+> >    cc1: some warnings being treated as errors
+> 
+> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 
-  Changed paths:
-    M lib/bluetooth.h
-    M lib/mgmt.h
-    M lib/uuid.h
+Hi,
 
-  Log Message:
-  -----------
-  lib: Add macro definitions for BAP broadcast source support
+I am confused about why this error occurs.
+In bluetooth-next [1] I see that l2cap_sock_cleanup_listen() is defined
+on line  1435 of l2cap_sock.c. And then used on line 1574.
+So there should be no need for a forward declaration.
 
-This adds macro definitions for BAP broadcast source support.
+[1] a088d769ef3a ("Bluetooth: L2CAP: Fix use-after-free")
 
+> ---
+>  net/bluetooth/l2cap_sock.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index eebe25610..3818e11a8 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -46,6 +46,7 @@ static const struct proto_ops l2cap_sock_ops;
+>  static void l2cap_sock_init(struct sock *sk, struct sock *parent);
+>  static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+>  				     int proto, gfp_t prio, int kern);
+> +static void l2cap_sock_cleanup_listen(struct sock *parent);
+>  
+>  bool l2cap_is_socket(struct socket *sock)
+>  {
+> @@ -1414,7 +1415,8 @@ static int l2cap_sock_release(struct socket *sock)
+>  
+>  	if (!sk)
+>  		return 0;
+> -
+> +		
 
-  Commit: 7002ecc8914ab1f22e36bd98c4d46eb760edf767
-      https://github.com/bluez/bluez/commit/7002ecc8914ab1f22e36bd98c4d46eb760edf767
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2023-05-26 (Fri, 26 May 2023)
+nit: The white-space on the line above was correct (no white-space)
+     Now there are trailing tabs.
 
-  Changed paths:
-    M btio/btio.c
-    M btio/btio.h
+> +	l2cap_sock_cleanup_listen(sk);
 
-  Log Message:
-  -----------
-  btio: Add support for setsockopt (BT_IO_OPT_BASE)
+This change may match the patch subject
+but seems unrelated to the patch description.
 
-This adds btio support for setting the BT_IO_OPT_BASE socket option.
-
-
-Compare: https://github.com/bluez/bluez/compare/97f3386268fa...7002ecc8914a
+>  	bt_sock_unlink(&l2cap_sk_list, sk);
+>  
+>  	err = l2cap_sock_shutdown(sock, SHUT_RDWR);
+> -- 
+> 2.34.1
+> 
+> 
