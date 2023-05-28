@@ -2,101 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A814C77B7C
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 28 May 2023 00:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B251AC7EE2C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 28 May 2023 07:45:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjE1A5P (ORCPT
+        id S229501AbjE1HpC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 27 May 2023 20:57:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57360 "EHLO
+        Sun, 28 May 2023 03:45:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjE1A5O (ORCPT
+        with ESMTP id S229441AbjE1HpA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 27 May 2023 20:57:14 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B1CD3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 May 2023 17:57:13 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-64d2981e3abso1761311b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 May 2023 17:57:13 -0700 (PDT)
+        Sun, 28 May 2023 03:45:00 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A40BB
+        for <linux-bluetooth@vger.kernel.org>; Sun, 28 May 2023 00:44:59 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2af7081c9ebso23337041fa.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 28 May 2023 00:44:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685235432; x=1687827432;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oueXPhJL3rKIK1LXnWBTyVRc5Z2fv+ewuX3HOEcaVY0=;
-        b=nuhCrjKYaDO5zaFCyP7ipxZofCT5reK7ld4iLoMMDhOqZk4DxsY2ugCzFqpau4+Ffc
-         8WF60CWX70MvSQ0940CRHcex1TwVHxODsK9Gvxk4p6A3PcgkeYEq/wnTr1+wqgjK0XmG
-         TGJI3JZeMM1zidFTOi/J+w9iH6+p45b0qa9FDTCAP5JWKheHpDG6IUNyLBqbYLcEJXdC
-         1kMRnYmm2InuvEkqUGV+xDOfb8jC3kKL8vMELwm+9aV9cxEJe5+6hasRa0T6uzWUqR+U
-         fOvJVyAd08MnSL3QGpec8338cyQe8iuD1dY3hj9T4Uw9NEdeqc/G72GvaZYAmTuAddvx
-         ecEQ==
+        d=gmail.com; s=20221208; t=1685259897; x=1687851897;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y15RVRYEyOjh/hOanbFuUr7VWzBxIA9q/UDiR7bVvhg=;
+        b=dhTTyJ2sNYoGUBz9xsH1RfMLtbNf2lkNKLub6p5O+UDo/ib8XZ08Q94BeljVKZ5ZAo
+         jrAKd+tETKejUWSIyPYIajMl5jdBMtT9FWuUDytFKQquB8miL72ngp2bnEpgWrb1yDlu
+         GCVkf0wxer3YO1Czf1IYUFyXf4KM3nyJ1i7WZPGNaKzIAMObuDofKqSS1FnAzXYyLp0/
+         YjJgNN2F/BXr6taoixsduAeFRw+A70t5AnoUWftb3xeMojAca0XSugT/uCdbbOMTdZ6G
+         Ek7Oq2j5nb0kNdFbL3FVAdj6EVjZ/Ov64wfuWeN0y8tRri+2WXh1RVDxiSuuou3EMJpV
+         uDPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685235432; x=1687827432;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1685259897; x=1687851897;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oueXPhJL3rKIK1LXnWBTyVRc5Z2fv+ewuX3HOEcaVY0=;
-        b=B6XGE5dssXBDLVyGQvx7z+mi3XEGI5IBiobmRXx4vNZRLnBv/zRfseh7TkIOcezUxn
-         CYaerGLV23dMxpGGg3HhW7zWin/CfMZIvql+kfjzleYHABpTG+r2KhvO5lKDxT0PeH0O
-         XAnhIj0K0YNei6YFzBNN7JWB04mLP2xNGeLVh3p7i1QxF0wp6L2K+MLcBWAYk+pZV63S
-         +6P3u77g7brR4xvPSODqvXwC2dzawFnBdVHbHBs4mFPHwF9SnJ8c+TRWpbQmlMG8yaWg
-         t0gKM4MESqh6k9rqC/buIoJKXIrg5YkhPKI3TBiRyKmehBBsz5ddYsv58FFZScX69XKr
-         Wggw==
-X-Gm-Message-State: AC+VfDyCvnY3atrY+I4HbKenc5L+Zpq+U3K4tht6hMsrjZ907SxdaJpq
-        UTCpkvJ9XdIGtkvbOuqfohW6A6wGjts=
-X-Google-Smtp-Source: ACHHUZ6tsxRfnDqp7or1+PQtKDNlTDUtMJORk50A6DSLl6p0YB3OHmF+Im3bY/RAGVPdpt/H5iX7Lg==
-X-Received: by 2002:a05:6a20:1594:b0:10f:759d:c5b2 with SMTP id h20-20020a056a20159400b0010f759dc5b2mr5126032pzj.45.1685235432157;
-        Sat, 27 May 2023 17:57:12 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.99.208])
-        by smtp.gmail.com with ESMTPSA id c19-20020aa781d3000000b0064d27a28451sm2335061pfn.100.2023.05.27.17.57.11
+        bh=y15RVRYEyOjh/hOanbFuUr7VWzBxIA9q/UDiR7bVvhg=;
+        b=JYgokR3g3dbUaferI/CQdTz+nrPX7WiPXUxiMf/bHK9/YXDqXhgsxMyV/6QmIvKVNg
+         tg8FNsTZH4XSYTaCTwS7NLErBJP5zJ1HsKyV5byR8TNx14/eOcR/n+y6VwoUYGyfAvpM
+         MXrPVujDBkUeBDA61hS/ZF+cL4QxNKie/S9gh/uSi6n+CzszSmB5KFxwKS4jYWpLRamr
+         QB5ydgOJ0kqKbxU9Wv+D1WRZMTwHfkSTTEHBzDixFGcsi/GIqSUDQeSIKC4Mts2hBQhw
+         eU4uFw+WEyKETjAV39kIf+vlPZMLp/M+PcgX6eIg2/UPGGgLDzqL6vrPkJzyWMqUgdtg
+         6/Sw==
+X-Gm-Message-State: AC+VfDyTqSYKQanG91cTxPezoQEH1D6GIYXHFj9PCkWUd4fzxj0+vE2N
+        npDQWVIZg8mH67JtqikB/FIRoQNCc4hZBQ==
+X-Google-Smtp-Source: ACHHUZ4Ka/b3Iv5pTKLfhgz8uGozafl3dQGpasGzpn1E2gQWyRpNVM8m37efGdfUB+CUfJKqK14l6Q==
+X-Received: by 2002:a2e:9c4c:0:b0:2b0:790e:95ab with SMTP id t12-20020a2e9c4c000000b002b0790e95abmr1000591ljj.31.1685259897267;
+        Sun, 28 May 2023 00:44:57 -0700 (PDT)
+Received: from localhost.localdomain (188.146.125.123.nat.umts.dynamic.t-mobile.pl. [188.146.125.123])
+        by smtp.gmail.com with ESMTPSA id v11-20020a2e9f4b000000b002af25598ef9sm1849095ljk.0.2023.05.28.00.44.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 May 2023 17:57:11 -0700 (PDT)
-Message-ID: <6472a6e7.a70a0220.e9236.496a@mx.google.com>
-Date:   Sat, 27 May 2023 17:57:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5380044020651550942=="
+        Sun, 28 May 2023 00:44:56 -0700 (PDT)
+From:   Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH BlueZ] battery: Check interface before getting property
+Date:   Sun, 28 May 2023 09:44:45 +0200
+Message-Id: <20230528074445.694554-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
-Subject: RE: [BlueZ] media: Register app objects in proxy_added_cb()
-In-Reply-To: <20230527231458.673167-1-arkadiusz.bokowy@gmail.com>
-References: <20230527231458.673167-1-arkadiusz.bokowy@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5380044020651550942==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Client can export other interfaces than the BatteryProvide1 on the
+registered object manager. So, before getting battery provider specific
+property, validate that we are operating on the right interface.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=751626
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.41 seconds
-GitLint                       PASS      0.26 seconds
-BuildEll                      PASS      34.50 seconds
-BluezMake                     PASS      1172.85 seconds
-MakeCheck                     PASS      12.91 seconds
-MakeDistcheck                 PASS      198.14 seconds
-CheckValgrind                 PASS      322.43 seconds
-CheckSmatch                   PASS      446.16 seconds
-bluezmakeextell               PASS      132.82 seconds
-IncrementalBuild              PASS      1016.34 seconds
-ScanBuild                     PASS      1429.99 seconds
-
-
-
+This change will allow client to implement only one object manger for
+media applications, players and battery providers without triggering
+error message.
 ---
-Regards,
-Linux Bluetooth
+ src/battery.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/src/battery.c b/src/battery.c
+index 88a53e80e..5c52581f3 100644
+--- a/src/battery.c
++++ b/src/battery.c
+@@ -288,6 +288,10 @@ static void provided_battery_added_cb(GDBusProxy *proxy, void *user_data)
+ 	uint8_t percentage;
+ 	DBusMessageIter iter;
+ 
++	if (strcmp(g_dbus_proxy_get_interface(proxy),
++		   BATTERY_PROVIDER_INTERFACE) != 0)
++		return;
++
+ 	if (g_dbus_proxy_get_property(proxy, "Device", &iter) == FALSE) {
+ 		warn("Battery object %s does not specify device path", path);
+ 		return;
+@@ -295,10 +299,6 @@ static void provided_battery_added_cb(GDBusProxy *proxy, void *user_data)
+ 
+ 	dbus_message_iter_get_basic(&iter, &export_path);
+ 
+-	if (strcmp(g_dbus_proxy_get_interface(proxy),
+-		   BATTERY_PROVIDER_INTERFACE) != 0)
+-		return;
+-
+ 	device = btd_adapter_find_device_by_path(provider->manager->adapter,
+ 						 export_path);
+ 	if (!device || device_is_temporary(device)) {
+@@ -341,15 +341,15 @@ static void provided_battery_removed_cb(GDBusProxy *proxy, void *user_data)
+ 	const char *export_path;
+ 	DBusMessageIter iter;
+ 
++	if (strcmp(g_dbus_proxy_get_interface(proxy),
++		   BATTERY_PROVIDER_INTERFACE) != 0)
++		return;
++
+ 	if (g_dbus_proxy_get_property(proxy, "Device", &iter) == FALSE)
+ 		return;
+ 
+ 	dbus_message_iter_get_basic(&iter, &export_path);
+ 
+-	if (strcmp(g_dbus_proxy_get_interface(proxy),
+-		   BATTERY_PROVIDER_INTERFACE) != 0)
+-		return;
+-
+ 	DBG("provided battery removed %s", g_dbus_proxy_get_path(proxy));
+ 
+ 	battery = find_battery_by_path(export_path);
+-- 
+2.30.2
 
---===============5380044020651550942==--
