@@ -2,102 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8A1C77B7E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 May 2023 23:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A814C77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 28 May 2023 00:57:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229502AbjE0XPR (ORCPT
+        id S229518AbjE1A5P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 27 May 2023 19:15:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46214 "EHLO
+        Sat, 27 May 2023 20:57:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjE0XPP (ORCPT
+        with ESMTP id S229445AbjE1A5O (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 27 May 2023 19:15:15 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65D75B1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 May 2023 16:15:14 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2af225e5b4bso20238491fa.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 May 2023 16:15:14 -0700 (PDT)
+        Sat, 27 May 2023 20:57:14 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B1CD3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 May 2023 17:57:13 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-64d2981e3abso1761311b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 27 May 2023 17:57:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685229312; x=1687821312;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L6xYUZJ8iVcW3BpQIbPt8WWQzk8DcOdbdHRGC/mMYeA=;
-        b=Jlhlo7idKKu5KAnN4tARG5uVba0XztCxaCs1cPzemwXWz+3FG8qYED7aCRuysMp3l3
-         D6NaFUvmMgxYOjjHaVBpFx+gJw6xt7c5gCCYHtF6PY8U6cADXlrZAoDDnPvJgC7H7s0Q
-         PRi5D3fTCjISxN98jspoFv/EYpD2site9nPjsTHigvFjenn5NRMnrIxdj10uNYPrAZFw
-         dqyD2Sez0qFyoo1U441oWYW7Y6Hmdsi+eSCwRFzEjHJlgtzwaLJttBb+ntlxkZTu+OjX
-         nZJzAR7DGMM+pXL8kxmJiPMOFNOoC5Q5xvA7UMWNqopmb+A5Je3ABUK1ZNE9lkibmvpn
-         YctA==
+        d=gmail.com; s=20221208; t=1685235432; x=1687827432;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oueXPhJL3rKIK1LXnWBTyVRc5Z2fv+ewuX3HOEcaVY0=;
+        b=nuhCrjKYaDO5zaFCyP7ipxZofCT5reK7ld4iLoMMDhOqZk4DxsY2ugCzFqpau4+Ffc
+         8WF60CWX70MvSQ0940CRHcex1TwVHxODsK9Gvxk4p6A3PcgkeYEq/wnTr1+wqgjK0XmG
+         TGJI3JZeMM1zidFTOi/J+w9iH6+p45b0qa9FDTCAP5JWKheHpDG6IUNyLBqbYLcEJXdC
+         1kMRnYmm2InuvEkqUGV+xDOfb8jC3kKL8vMELwm+9aV9cxEJe5+6hasRa0T6uzWUqR+U
+         fOvJVyAd08MnSL3QGpec8338cyQe8iuD1dY3hj9T4Uw9NEdeqc/G72GvaZYAmTuAddvx
+         ecEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685229312; x=1687821312;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1685235432; x=1687827432;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L6xYUZJ8iVcW3BpQIbPt8WWQzk8DcOdbdHRGC/mMYeA=;
-        b=U00/gP+7QUGGzCvTE0IdbrYLgkinFwNurjme/YkEPoK5eMCFF/Np3oiM4uTEzJGouc
-         oIHboSk889lQndsKblrTumROtghvl0OjPgUsNULgN0yBEnG4hRYifaquSBSvRW+YGxTb
-         3HHGWj8cqtJHZ65j1GO/Yt+rArsOj0o3IfWD/bZW2XpVkSqMN5VzZPwB2OIJP5LZ18r9
-         v/3leBJFGnxrF1HL01foFsI2Aj3fen5e9DvfdiFEzj1ou9ekhe/uxcZSLhq0OjGr09mh
-         vRCPj00ysh9eylcCbLQv7TaYll+YrS3syvptmpiQJyS42EQSpZaEJM/k6ldpN7Vwn5RM
-         fIwA==
-X-Gm-Message-State: AC+VfDxkzVAD0iACbcSErsYF8oqFiC0t4W4tTcwtOsMMjdF5Lmlev49w
-        yyibMndkI5c4Ude5sj6YxLwCoU+w75UMPA==
-X-Google-Smtp-Source: ACHHUZ7HKoNC0Kj9GfU8edqyuq9Ahn/3ycWGHH5YVZ2Qk/zixr+r9WV7jspNpeCzJSghcP/rFavNKw==
-X-Received: by 2002:a2e:894b:0:b0:2af:2826:b20d with SMTP id b11-20020a2e894b000000b002af2826b20dmr3257799ljk.13.1685229312079;
-        Sat, 27 May 2023 16:15:12 -0700 (PDT)
-Received: from localhost.localdomain (188.146.125.123.nat.umts.dynamic.t-mobile.pl. [188.146.125.123])
-        by smtp.gmail.com with ESMTPSA id d17-20020a2e3611000000b002b0488ef239sm1649404lja.93.2023.05.27.16.15.11
+        bh=oueXPhJL3rKIK1LXnWBTyVRc5Z2fv+ewuX3HOEcaVY0=;
+        b=B6XGE5dssXBDLVyGQvx7z+mi3XEGI5IBiobmRXx4vNZRLnBv/zRfseh7TkIOcezUxn
+         CYaerGLV23dMxpGGg3HhW7zWin/CfMZIvql+kfjzleYHABpTG+r2KhvO5lKDxT0PeH0O
+         XAnhIj0K0YNei6YFzBNN7JWB04mLP2xNGeLVh3p7i1QxF0wp6L2K+MLcBWAYk+pZV63S
+         +6P3u77g7brR4xvPSODqvXwC2dzawFnBdVHbHBs4mFPHwF9SnJ8c+TRWpbQmlMG8yaWg
+         t0gKM4MESqh6k9rqC/buIoJKXIrg5YkhPKI3TBiRyKmehBBsz5ddYsv58FFZScX69XKr
+         Wggw==
+X-Gm-Message-State: AC+VfDyCvnY3atrY+I4HbKenc5L+Zpq+U3K4tht6hMsrjZ907SxdaJpq
+        UTCpkvJ9XdIGtkvbOuqfohW6A6wGjts=
+X-Google-Smtp-Source: ACHHUZ6tsxRfnDqp7or1+PQtKDNlTDUtMJORk50A6DSLl6p0YB3OHmF+Im3bY/RAGVPdpt/H5iX7Lg==
+X-Received: by 2002:a05:6a20:1594:b0:10f:759d:c5b2 with SMTP id h20-20020a056a20159400b0010f759dc5b2mr5126032pzj.45.1685235432157;
+        Sat, 27 May 2023 17:57:12 -0700 (PDT)
+Received: from [172.17.0.2] ([13.88.99.208])
+        by smtp.gmail.com with ESMTPSA id c19-20020aa781d3000000b0064d27a28451sm2335061pfn.100.2023.05.27.17.57.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 May 2023 16:15:11 -0700 (PDT)
-From:   Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH BlueZ] media: Register app objects in proxy_added_cb()
-Date:   Sun, 28 May 2023 01:14:58 +0200
-Message-Id: <20230527231458.673167-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Sat, 27 May 2023 17:57:11 -0700 (PDT)
+Message-ID: <6472a6e7.a70a0220.e9236.496a@mx.google.com>
+Date:   Sat, 27 May 2023 17:57:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5380044020651550942=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
+Subject: RE: [BlueZ] media: Register app objects in proxy_added_cb()
+In-Reply-To: <20230527231458.673167-1-arkadiusz.bokowy@gmail.com>
+References: <20230527231458.673167-1-arkadiusz.bokowy@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The proxy_added_cb() function is called every time a new client is added
-to the application object manager. Registering media endpoint and player
-in that proxy_added_cb() callback function will allow to register new
-endpoints and players not only during the initial RegisterApplication
-call, but also during the application lifetime. For instance, this might
-allow to dynamically enable/disable support for additional codecs.
+--===============5380044020651550942==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=751626
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.41 seconds
+GitLint                       PASS      0.26 seconds
+BuildEll                      PASS      34.50 seconds
+BluezMake                     PASS      1172.85 seconds
+MakeCheck                     PASS      12.91 seconds
+MakeDistcheck                 PASS      198.14 seconds
+CheckValgrind                 PASS      322.43 seconds
+CheckSmatch                   PASS      446.16 seconds
+bluezmakeextell               PASS      132.82 seconds
+IncrementalBuild              PASS      1016.34 seconds
+ScanBuild                     PASS      1429.99 seconds
+
+
+
 ---
- profiles/audio/media.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 6ce668e31..4c42b7817 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -2821,9 +2821,6 @@ static void client_ready_cb(GDBusClient *client, void *user_data)
- 		goto reply;
- 	}
- 
--	queue_foreach(app->proxies, app_register_endpoint, app);
--	queue_foreach(app->proxies, app_register_player, app);
--
- 	if (app->err) {
- 		if (app->err == -EPROTONOSUPPORT)
- 			reply = btd_error_not_supported(app->reg);
-@@ -2867,6 +2864,10 @@ static void proxy_added_cb(GDBusProxy *proxy, void *user_data)
- 	path = g_dbus_proxy_get_path(proxy);
- 
- 	DBG("Proxy added: %s, iface: %s", path, iface);
-+
-+	app_register_endpoint(proxy, app);
-+	app_register_player(proxy, app);
-+
- }
- 
- static bool match_endpoint_by_path(const void *a, const void *b)
--- 
-2.30.2
 
+--===============5380044020651550942==--
