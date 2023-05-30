@@ -2,115 +2,250 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 056D8C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 May 2023 20:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9C8C77B73
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 May 2023 20:51:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231390AbjE3UGX (ORCPT
+        id S231491AbjE3UvT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 May 2023 16:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44870 "EHLO
+        Tue, 30 May 2023 16:51:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbjE3UGR (ORCPT
+        with ESMTP id S229592AbjE3UvS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 May 2023 16:06:17 -0400
+        Tue, 30 May 2023 16:51:18 -0400
 Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2317BF3;
-        Tue, 30 May 2023 13:06:16 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2af278ca45eso51406361fa.1;
-        Tue, 30 May 2023 13:06:16 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FCFC10A;
+        Tue, 30 May 2023 13:50:52 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2afb2875491so53109891fa.1;
+        Tue, 30 May 2023 13:50:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685477174; x=1688069174;
+        d=gmail.com; s=20221208; t=1685479850; x=1688071850;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Gy7g3HmcFJ07k2+S79J+2E5SNsvjTiJvRjtXbmAogd0=;
-        b=A8URtGPLrsAUgpVPmcSHEyRdUeR0+DAR1lzp8M2EWxjdIYI6P5C85NucXMMrYYq1bx
-         uFrnEBhNCKkWqi0jkTLoTZmnNQ2Q/Vj8eP0olu7MqiiWy700B0g+h7Yq5ZjNYpeOHS7n
-         LBqCtDlyJqmBKQdLn7q0PppcuNY+WBFfDuvPhph0QBmt/5L7Tdtwgz0Y8bbZ2VvLOoco
-         spGtqRYNbp43iW8JIKKci3Gb90J4NZJqSOE9/Y3FBRkNQ+PNsiTmjdPmKN8EynUVrzTK
-         68eMObI35wYQXLc+yAikDnQh6FpPv2x1ROC5o9Tv8rORptarz7AjjKPFefvZe47kDLLu
-         BLHg==
+        bh=1Ylkw/NLGjRglYYdjZVPg6YRfMOUcFgiFJEPQkmObYw=;
+        b=cFeZHxd72eQLJPqj0Y71fYxUtkh8Dk/Phgzhw0QsSbGrd/Pe/FpZ6uQDp/By20Jlg/
+         UsHX5VUl0Ssyt1hDQGvCmJiEA+8R0OR5XzNus2Dt/Z0QcYp20N7Db8k0PTvpJLNepQuI
+         zVUL1c+NAmac87l+XYMO3m4Z9YiXDWIk3tdXD0JIEypNeR+0pcWgN7Z8jCbR5MYkiJh9
+         Wgbf6DtiAyjD3/GhoYVjeHEkBY+UiE0T8tvQ2eQfMIPf9egwoMD8NperlKCzvfK9h1xm
+         9rumJuOXHplb7WZWgoicto6WQGBizH1BS0v6asUz/35CMpvIJdWo9B+4W+QT2j3qXgFo
+         52KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685477174; x=1688069174;
+        d=1e100.net; s=20221208; t=1685479850; x=1688071850;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Gy7g3HmcFJ07k2+S79J+2E5SNsvjTiJvRjtXbmAogd0=;
-        b=LeoiadC4LETLgKsgW4DR6aDNzYB7mW/prty3B98Yhg/p8Q+V4hvZ2ae+TNTHenmxZz
-         EYXcdY/RtsGPdlrma7CX8DNjPF4Km2GV1KNUDptexK9WzrWhjG58132CTC5uaPoHLwn1
-         aPAOm9pULxXrGX1lPIDsk0r8+XCq0Wdm4tjZoXiyueakkLEgsQJt4Q6g2o/T9CrDLB/N
-         Rz3mNMWVO076z5MSiiz5mN0ZsN5PRKhPZaOx1U8CwYYwCJi36F23hI39g/xGi0lSmyP9
-         +DaOvwylI1pTVqyCXVPYVSUHMRdYV6tQDJYkktpuudMkuzwUkzYCjpbFIAONkCq9m4iN
-         sSHg==
-X-Gm-Message-State: AC+VfDw80/Ba8M0QVgqMxn9GT+x+1yyK7mBgNTberWrIfBQIu5s1+hKj
-        ipn29BwCeEWpx/KK/v0ga+oZuyx/ivOHEJeNRvw=
-X-Google-Smtp-Source: ACHHUZ5k1qpbdpbHtwSrm5N7oo/aBUz5QZq8DF/6U/8ESwy7n9GyqYF6hSvis1aU8HwJveHgmbXdmsi8sxVEEp1aXl8=
-X-Received: by 2002:a2e:9682:0:b0:2ad:aa42:8c0b with SMTP id
- q2-20020a2e9682000000b002adaa428c0bmr1491500lji.35.1685477174136; Tue, 30 May
- 2023 13:06:14 -0700 (PDT)
+        bh=1Ylkw/NLGjRglYYdjZVPg6YRfMOUcFgiFJEPQkmObYw=;
+        b=EFOqolcQgbZKEBT8tffs7iGZR43jJl2oUaEtipLaqDIwX7TCztX+Cp9EUvSi97L42L
+         2cVjWYC6sPZEgNQm8KEOW6LlxQeeTwzHjOzX28tVEFzyheEi3b14UL5RSI0KeVpub/D+
+         vWfDlRJr/c/qwcx1LsfEMKKjU/PkUTwuoO/X2zoLIGPDxoWyjNHTurMFt+Yqxo9vrpXP
+         ynhtx9LbkBl6r46G4eJKdKoIx45Tvx9qdnM7sLMzrrEIdHeZgItbgzZG9BP1pjHwOjuV
+         dn4JGkztKMwKfm9gXg5dxdBhnVCBzrYJG8jFQeE55kOKovvlBjekJ8kMlnifUfc4R1ud
+         FSfQ==
+X-Gm-Message-State: AC+VfDwx2hwjWFnAKfcpqPa09S7XWBZDWSx+yIYfmJ6hgxv7P/uBDxvs
+        veWAXaNQsiqkJ4l2AKuasPuYZzzAEomFge1X2Yo12sHM
+X-Google-Smtp-Source: ACHHUZ5n5Jmrhmc1kh/SJJ708j1DWzaUZSdp/68VKKs1M1037UKPw0vinzDJmL971eSMr/3StPc9MMa2hJHfJxJBo7U=
+X-Received: by 2002:a2e:9f09:0:b0:2aa:481b:b439 with SMTP id
+ u9-20020a2e9f09000000b002aa481bb439mr1525949ljk.21.1685479850206; Tue, 30 May
+ 2023 13:50:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230424133542.14383-1-johan+linaro@kernel.org> <ZHYHRW-9BN4n4pPs@hovoldconsulting.com>
-In-Reply-To: <ZHYHRW-9BN4n4pPs@hovoldconsulting.com>
+References: <20230522234154.2924052-1-yinghsu@chromium.org>
+ <ZGyPt1GYGV2C2RQZ@corigine.com> <CABBYNZ+by-OQH2aPEMHpQ5cOLoKNpR7k111rJj6iOd2PGLx3gg@mail.gmail.com>
+ <CAAa9mD3A+3uJzFK0EbTrn5hX42EOgeixehmxgkwdhp1KetxjVQ@mail.gmail.com>
+ <CABBYNZKPv_0AaJJm2_c0F+4qX_vKXQ9BnVgR-kPy40YsDDqSRQ@mail.gmail.com>
+ <CAAa9mD2e-WkuHshXf7ifOHcGEsgHb68xkRdaq5MRMeY7_jzkMg@mail.gmail.com> <CAAa9mD00VriG3utyedjwykuUUXaRU0SvXkr5+VPgmZFpiFokrA@mail.gmail.com>
+In-Reply-To: <CAAa9mD00VriG3utyedjwykuUUXaRU0SvXkr5+VPgmZFpiFokrA@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 30 May 2023 13:06:01 -0700
-Message-ID: <CABBYNZ+ae5h-KdAKwvCRNyDPB3W4nzyuEBzPdw72-8DLb9BAsw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Bluetooth: fix bdaddr quirks
-To:     Johan Hovold <johan@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
+Date:   Tue, 30 May 2023 13:50:37 -0700
+Message-ID: <CABBYNZLpNbYDrP9aZqx9dm=XMh2KdRDAy+2gXX0wexMBHiQQUA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Fix l2cap_disconnect_req deadlock
+To:     Ying Hsu <yinghsu@chromium.org>
+Cc:     Simon Horman <simon.horman@corigine.com>,
+        linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
+Hi Ying,
 
-On Tue, May 30, 2023 at 7:25=E2=80=AFAM Johan Hovold <johan@kernel.org> wro=
-te:
+On Mon, May 29, 2023 at 10:08=E2=80=AFPM Ying Hsu <yinghsu@chromium.org> wr=
+ote:
 >
-> On Mon, Apr 24, 2023 at 03:35:40PM +0200, Johan Hovold wrote:
-> > These patches fixes a couple of issues with the two bdaddr quirks:
+> Gentle ping, Luiz.
+>
+>
+> On Thu, May 25, 2023 at 12:16=E2=80=AFPM Ying Hsu <yinghsu@chromium.org> =
+wrote:
 > >
-> > The first one allows HCI_QUIRK_INVALID_BDADDR to be used with
-> > HCI_QUIRK_NON_PERSISTENT_SETUP.
+> > Hi Luiz,
 > >
-> > The second patch restores the original semantics of the
-> > HCI_QUIRK_USE_BDADDR_PROPERTY so that the controller is marked as
-> > unconfigured when no device address is specified in the devicetree (as
-> > the quirk is documented to work).
+> > The proposal solves the deadlock but might introduce other problems as
+> > it breaks the order of l2cap_chan_del.
+> > There are another way to resolve the deadlock:
+> > ```
+> > @@ -4663,7 +4663,9 @@ static inline int l2cap_disconnect_req(struct
+> > l2cap_conn *conn,
 > >
-> > This specifically makes sure that Qualcomm HCI controllers such as
-> > wcn6855 found on the Lenovo X13s are marked as unconfigured until user
-> > space has provided a valid address.
+> >         chan->ops->set_shutdown(chan);
 > >
-> > Long term, the HCI_QUIRK_USE_BDADDR_PROPERTY should probably be dropped
-> > in favour of HCI_QUIRK_INVALID_BDADDR and always checking the devicetre=
+> > +       l2cap_chan_unlock(chan);
+> >         mutex_lock(&conn->chan_lock);
+> > +       l2cap_chan_lock(chan);
+> >         l2cap_chan_del(chan, ECONNRESET);
+> >         mutex_unlock(&conn->chan_lock);
+> >  ```
+
+Yeah, I kind of like this better, that said I don't think changing the
+order of l2cap_chan_del matters that much but it does change the
+callback teardown sequence so perhaps we should stick to a simpler
+solution for now.
+
+Please submit an updated version so we can move forward with it.
+
+> > If you're okay with it, I'll do some verification and post a full patch=
+.
+> >
+> > Best regards,
+> > Ying
+> >
+> > On Thu, May 25, 2023 at 2:56=E2=80=AFAM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Ying,
+> > >
+> > > On Wed, May 24, 2023 at 3:54=E2=80=AFAM Ying Hsu <yinghsu@chromium.or=
+g> wrote:
+> > > >
+> > > > Hi Simon,
+> > > >
+> > > > I understand your concern about the repeated code.
+> > > > However, simply hiding the locking logic in another function
+> > > > introduces hidden assumptions.
+> > > > For this patch, I would like to fix the deadlock in a simple and ea=
+sy
+> > > > to understand way.
+> > > > We can always refactor the l2cap_chan utility functions later.
+> > > >
+> > > > Hi Luis,
+> > > >
+> > > > I'll add a fixes tag in the next version.
+> > >
+> > > And how about doing this:
+> > >
+> > > https://gist.github.com/Vudentz/e513859ecb31e79c947dfcb4b5c60453
+> > >
+> > > > Best regards,
+> > > > Ying
+> > > >
+> > > >
+> > > > On Wed, May 24, 2023 at 3:06=E2=80=AFAM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Simon, Ying,
+> > > > >
+> > > > > On Tue, May 23, 2023 at 3:04=E2=80=AFAM Simon Horman <simon.horma=
+n@corigine.com> wrote:
+> > > > > >
+> > > > > > On Mon, May 22, 2023 at 11:41:51PM +0000, Ying Hsu wrote:
+> > > > > > > L2CAP assumes that the locks conn->chan_lock and chan->lock a=
+re
+> > > > > > > acquired in the order conn->chan_lock, chan->lock to avoid
+> > > > > > > potential deadlock.
+> > > > > > > For example, l2sock_shutdown acquires these locks in the orde=
+r:
+> > > > > > >   mutex_lock(&conn->chan_lock)
+> > > > > > >   l2cap_chan_lock(chan)
+> > > > > > >
+> > > > > > > However, l2cap_disconnect_req acquires chan->lock in
+> > > > > > > l2cap_get_chan_by_scid first and then acquires conn->chan_loc=
+k
+> > > > > > > before calling l2cap_chan_del. This means that these locks ar=
 e
-> > property.
->
-> > Johan Hovold (2):
-> >   Bluetooth: fix invalid-bdaddr quirk for non-persistent setup
-> >   Bluetooth: fix use-bdaddr-property quirk
-> >
-> >  net/bluetooth/hci_sync.c | 30 +++++++++++-------------------
-> >  1 file changed, 11 insertions(+), 19 deletions(-)
->
-> Any further comments to this series, or can this one be merged for 6.5
-> now?
-
-Looks like this was removed from Patchwork since it has passed 30 days
-without updates, could you please resend it so CI can pick it up and
-test it again.
-
-> Johan
+> > > > > > > acquired in unexpected order, which leads to potential deadlo=
+ck:
+> > > > > > >   l2cap_chan_lock(c)
+> > > > > > >   mutex_lock(&conn->chan_lock)
+> > > > > > >
+> > > > > > > This patch uses __l2cap_get_chan_by_scid to replace
+> > > > > > > l2cap_get_chan_by_scid and adjusts the locking order to avoid=
+ the
+> > > > > > > potential deadlock.
+> > > > >
+> > > > > This needs the fixes tag so we can backport it properly.
+> > > > >
+> > > > > > > Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+> > > > > > > ---
+> > > > > > > This commit has been tested on a Chromebook device.
+> > > > > > >
+> > > > > > > Changes in v2:
+> > > > > > > - Adding the prefix "Bluetooth:" to subject line.
+> > > > > > >
+> > > > > > >  net/bluetooth/l2cap_core.c | 26 ++++++++++++++++++++------
+> > > > > > >  1 file changed, 20 insertions(+), 6 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap=
+_core.c
+> > > > > > > index 376b523c7b26..8f08192b8fb1 100644
+> > > > > > > --- a/net/bluetooth/l2cap_core.c
+> > > > > > > +++ b/net/bluetooth/l2cap_core.c
+> > > > > > > @@ -4651,8 +4651,16 @@ static inline int l2cap_disconnect_req=
+(struct l2cap_conn *conn,
+> > > > > > >
+> > > > > > >       BT_DBG("scid 0x%4.4x dcid 0x%4.4x", scid, dcid);
+> > > > > > >
+> > > > > > > -     chan =3D l2cap_get_chan_by_scid(conn, dcid);
+> > > > > > > +     mutex_lock(&conn->chan_lock);
+> > > > > > > +     chan =3D __l2cap_get_chan_by_scid(conn, dcid);
+> > > > > > > +     if (chan) {
+> > > > > > > +             chan =3D l2cap_chan_hold_unless_zero(chan);
+> > > > > > > +             if (chan)
+> > > > > > > +                     l2cap_chan_lock(chan);
+> > > > > > > +     }
+> > > > > > > +
+> > > > > > >       if (!chan) {
+> > > > > > > +             mutex_unlock(&conn->chan_lock);
+> > > > > > >               cmd_reject_invalid_cid(conn, cmd->ident, dcid, =
+scid);
+> > > > > > >               return 0;
+> > > > > > >       }
+> > > > > >
+> > > > > > Hi Ying,
+> > > > > >
+> > > > > > The conditional setting of chan and calling l2cap_chan_lock()
+> > > > > > is both non-trivial and repeated. It seems that it ought to be
+> > > > > > in a helper.
+> > > > > >
+> > > > > > Something like this (I'm sure a better function name can be cho=
+sen):
+> > > > > >
+> > > > > >         chan =3D __l2cap_get_and_lock_chan_by_scid(conn, dcid);
+> > > > > >         if (!chan) {
+> > > > > >                 ...
+> > > > > >         }
+> > > > > >
+> > > > > >         ...
+> > > > >
+> > > > > Or perhaps we could do something like l2cap_del_chan_by_scid:
+> > > > >
+> > > > > https://gist.github.com/Vudentz/e513859ecb31e79c947dfcb4b5c60453
+> > > > >
+> > > > > --
+> > > > > Luiz Augusto von Dentz
+> > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
 
 
 
