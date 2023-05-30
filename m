@@ -2,91 +2,205 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79EE9C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 May 2023 20:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0959C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 May 2023 22:23:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231590AbjE3Uws (ORCPT
+        id S232278AbjE3WX5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 May 2023 16:52:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36986 "EHLO
+        Tue, 30 May 2023 18:23:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbjE3Uwr (ORCPT
+        with ESMTP id S229945AbjE3WX4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 May 2023 16:52:47 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844F3102
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 May 2023 13:52:46 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7773997237cso125859939f.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 May 2023 13:52:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685479966; x=1688071966;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SpU2AdVw1Ybwch3/ygMnAAKhKAL/LfwFA3E33B8xEmQ=;
-        b=OGm56qRCHIah803puas9qeAejAjNzBT3/xPMj+wJHpO4KUoqeaSS+9LENKdTYd3qcY
-         9nwyRrefRPyyRQvl6uP4djjnTNc9aJmpSzvV+OhnbGCR8Sg9xzwoxRYkf56y2rgsNhMb
-         mrcI2HgGpk1fv2cRBDl2HjnqjOBtvUqKebq1PobhOnfykBG5f7Sl+yHTn/pqL5PebqyC
-         VEYGqY55n0f93GlGVNt/TO/DLoJEj/uNXMTGo1aLtHjbJ13Ic6vOW41Us4DzAW2VgGFz
-         v/EULZROc+OnvdgFqrq4RhoJ2+vR3mKZuk7RbCch3rYOwW4cF3nQI5W9c5Xojfc04glY
-         Znnw==
-X-Gm-Message-State: AC+VfDzhRCRVniDY1iW2J/Nawar+jB6aaAqgVw5B5vffVgpAa9hmYTxl
-        pHZqGsvOjWU+Rx1ArLofi6er8wScuXZjNhGRSjx60jRL/XSV
-X-Google-Smtp-Source: ACHHUZ6M+UGrk1fYFZBfPLehgrSibLYaCCEw+QqHcF+SZxmRJvPy8ryJQjyYNAJttYSinTtSDQZ7P1ra+hR5sL+y+hLPlCEtzD7t
+        Tue, 30 May 2023 18:23:56 -0400
+X-Greylist: delayed 346 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 30 May 2023 15:23:50 PDT
+Received: from m-r2.th.seeweb.it (m-r2.th.seeweb.it [IPv6:2001:4b7a:2000:18::171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AFCDE5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 May 2023 15:23:49 -0700 (PDT)
+Received: from SoMainline.org (94-211-6-86.cable.dynamic.v4.ziggo.nl [94.211.6.86])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by m-r2.th.seeweb.it (Postfix) with ESMTPSA id 3FFD63F321;
+        Wed, 31 May 2023 00:18:00 +0200 (CEST)
+Date:   Wed, 31 May 2023 00:17:58 +0200
+From:   Marijn Suijten <marijn.suijten@somainline.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, Yu Liu <yudiliu@google.com>,
+        Bartosz Fabianowski <bartosz@fabianowski.eu>,
+        Pauli Virtanen <pav@iki.fi>,
+        Marek Czerski <ma.czerski@gmail.com>
+Subject: Re: [PATCH BlueZ v3 1/3] audio/avrcp: Guard SetAbsoluteVolume
+ without target behind config value
+Message-ID: <sh2dylmzfw4whlcru7gxwnaddzc5u7padivf47bllk7mwlfu5b@ebugmc2vjghg>
+References: <20230311003826.454858-1-marijn.suijten@somainline.org>
+ <20230311003826.454858-2-marijn.suijten@somainline.org>
+ <CABBYNZJimKVz46=6b=B4M9O=FW7hXJZBaRSM50U47oWtxcj0rQ@mail.gmail.com>
 MIME-Version: 1.0
-X-Received: by 2002:a02:8669:0:b0:41a:b094:c5b8 with SMTP id
- e96-20020a028669000000b0041ab094c5b8mr1459057jai.2.1685479965893; Tue, 30 May
- 2023 13:52:45 -0700 (PDT)
-Date:   Tue, 30 May 2023 13:52:45 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a4ac4205fcef62b2@google.com>
-Subject: [syzbot] Monthly bluetooth report (May 2023)
-From:   syzbot <syzbot+listf6f400f39b8767bbed14@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZJimKVz46=6b=B4M9O=FW7hXJZBaRSM50U47oWtxcj0rQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello bluetooth maintainers/developers,
+Hi Luiz,
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+I'm still clueless why this reply didn't reach my inbox.  I thought it
+was going into ignore-land again (sorry) but randomly found your replies
+on the BlueZ mailing list.  The bot message didn't make it through
+either, but it did notify me about "audio/transport: Propagate errors
+from avrcp_set_volume to DBus" being applied.
 
-During the period, 3 new issues were detected and 2 were fixed.
-In total, 23 issues are still open and 52 have been fixed so far.
+On 2023-03-14 16:16:55, Luiz Augusto von Dentz wrote:
+> Hi Marijn,
+> 
+> On Fri, Mar 10, 2023 at 4:39 PM Marijn Suijten
+> <marijn.suijten@somainline.org> wrote:
+> >
+> > Commit 179ccb936 ("avrcp: Set volume if volume changed event is
+> > registered") introduced a catch that allows SetAbsoluteVolume to be sent
+> > to a remote device that does _not_ implement the AVRCP TG profile.  This
+> > is strange as the TG role is required to be able to send commands to the
+> > peer, but the commit must have been applied to the tree for a reason.
+> >
+> > We discussed in [1] that workarounds for dubious peers and software
+> > stacks should be guarded behind a config entry in main.conf, so this
+> > starts out by introducing a new [AVRCP] category to to it that will
+> > later be extended with other workarounds.
+> >
+> > [1]: https://marc.info/?l=linux-bluetooth&m=163519566912788&w=2
+> > ---
+> >  profiles/audio/avrcp.c | 12 +++++++++---
+> >  src/btd.h              |  5 +++++
+> >  src/main.c             | 13 +++++++++++++
+> >  src/main.conf          |  6 ++++++
+> >  4 files changed, 33 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> > index 80f34c7a7..5e6322916 100644
+> > --- a/profiles/audio/avrcp.c
+> > +++ b/profiles/audio/avrcp.c
+> > @@ -48,6 +48,7 @@
+> >  #include "src/dbus-common.h"
+> >  #include "src/shared/timeout.h"
+> >  #include "src/shared/util.h"
+> > +#include "src/btd.h"
+> >
+> >  #include "avctp.h"
+> >  #include "avrcp.h"
+> > @@ -4577,9 +4578,14 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+> >                                                                 &volume);
+> >         }
+> >
+> > -       if (!session->controller && !avrcp_event_registered(session,
+> > -                                       AVRCP_EVENT_VOLUME_CHANGED))
+> > -               return -ENOTSUP;
+> > +       if (btd_opts.avrcp.set_absolute_volume_without_target) {
+> > +               if (!session->controller && !avrcp_event_registered(session,
+> > +                                               AVRCP_EVENT_VOLUME_CHANGED))
+> > +                       return -ENOTSUP;
+> > +       } else {
+> > +               if (!session->controller || session->controller->version < 0x0104)
+> > +                       return -ENOTSUP;
+> > +       }
+> >
+> >         memset(buf, 0, sizeof(buf));
+> >
+> > diff --git a/src/btd.h b/src/btd.h
+> > index 42cffcde4..31c04a990 100644
+> > --- a/src/btd.h
+> > +++ b/src/btd.h
+> > @@ -97,6 +97,10 @@ struct btd_avdtp_opts {
+> >         uint8_t  stream_mode;
+> >  };
+> >
+> > +struct btd_avrcp_opts {
+> > +       gboolean set_absolute_volume_without_target;
+> > +};
+> > +
+> >  struct btd_advmon_opts {
+> >         uint8_t         rssi_sampling_period;
+> >  };
+> > @@ -136,6 +140,7 @@ struct btd_opts {
+> >         enum mps_mode_t mps;
+> >
+> >         struct btd_avdtp_opts avdtp;
+> > +       struct btd_avrcp_opts avrcp;
+> >
+> >         uint8_t         key_size;
+> >
+> > diff --git a/src/main.c b/src/main.c
+> > index 99d9c508f..92f74e381 100644
+> > --- a/src/main.c
+> > +++ b/src/main.c
+> > @@ -152,6 +152,11 @@ static const char *avdtp_options[] = {
+> >         NULL
+> >  };
+> >
+> > +static const char *avrcp_options[] = {
+> > +       "SetAbsoluteVolumeWithoutTarget",
+> > +       NULL
+> > +};
+> > +
+> >  static const char *advmon_options[] = {
+> >         "RSSISamplingPeriod",
+> >         NULL
+> > @@ -167,6 +172,7 @@ static const struct group_table {
+> >         { "Policy",     policy_options },
+> >         { "GATT",       gatt_options },
+> >         { "AVDTP",      avdtp_options },
+> > +       { "AVRCP",      avrcp_options },
+> >         { "AdvMon",     advmon_options },
+> >         { }
+> >  };
+> > @@ -975,6 +981,13 @@ static void parse_config(GKeyFile *config)
+> >                 g_free(str);
+> >         }
+> >
+> > +       boolean = g_key_file_get_boolean(config, "AVRCP",
+> > +                                               "SetAbsoluteVolumeWithoutTarget", &err);
+> > +       if (err)
+> > +               g_clear_error(&err);
+> > +       else
+> > +               btd_opts.avrcp.set_absolute_volume_without_target = boolean;
+> > +
+> >         val = g_key_file_get_integer(config, "AdvMon", "RSSISamplingPeriod",
+> >                                                                         &err);
+> >         if (err) {
+> > diff --git a/src/main.conf b/src/main.conf
+> > index f187c9aaa..ca00ed03e 100644
+> > --- a/src/main.conf
+> > +++ b/src/main.conf
+> > @@ -271,6 +271,12 @@
+> >  # streaming: Use L2CAP Streaming Mode
+> >  #StreamMode = basic
+> >
+> > +[AVRCP]
+> > +# Allow SetAbsoluteVolume calls to a peer device that
+> > +# does not advertise the AVRCP remote control target
+> > +# profile.
+> > +#SetAbsoluteVolumeWithoutTarget = false
+> 
+> Let's do just VolumeWithoutTarget and we should probably mention that
+> it would ignore the version as well.
 
-Some of the still happening issues:
+Sure, sounds good.  We can also invert the condition to validate the
+version in the event that ->controller is non-NULL, even if
+VolumeWithoutTarget is set.
 
-Ref Crashes Repro Title
-<1> 6474    Yes   possible deadlock in rfcomm_sk_state_change
-                  https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
-<2> 3382    Yes   WARNING in hci_conn_timeout
-                  https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
-<3> 639     Yes   possible deadlock in rfcomm_dlc_exists
-                  https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
-<4> 82      Yes   WARNING in call_timer_fn
-                  https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<5> 36      Yes   WARNING: ODEBUG bug in put_device
-                  https://syzkaller.appspot.com/bug?extid=a9290936c6e87b3dc3c2
-<6> 2       No    KASAN: slab-use-after-free Write in sco_chan_del
-                  https://syzkaller.appspot.com/bug?extid=cf54c1da6574b6c1b049
-<7> 1       No    KASAN: slab-use-after-free Write in hci_conn_drop
-                  https://syzkaller.appspot.com/bug?extid=21835970af93643f25a2
+- Marijn
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+> 
+> > +
+> >  [Policy]
+> >  #
+> >  # The ReconnectUUIDs defines the set of remote services that should try
+> > --
+> > 2.39.2
+> >
+> 
+> 
+> -- 
+> Luiz Augusto von Dentz
