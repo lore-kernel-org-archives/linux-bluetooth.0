@@ -2,134 +2,309 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 043B9C7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 May 2023 06:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E02CCC7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 May 2023 07:31:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230126AbjE3GeE (ORCPT
+        id S231235AbjE3HbO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 May 2023 02:34:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57354 "EHLO
+        Tue, 30 May 2023 03:31:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjE3GeC (ORCPT
+        with ESMTP id S231129AbjE3Hag (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 May 2023 02:34:02 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28A10BF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 May 2023 23:34:01 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-30ae141785bso3058531f8f.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 May 2023 23:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1685428439; x=1688020439;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4OAxSq+jDW1WBhQxxiq1fw9sqlEfd/X+gHC/8nQV2Q8=;
-        b=dZARwajkzeFy7RSYrno9jhXUgHyLuu/RuFnjS4XXpgpXSMelswQB+6cuDqXfwm165j
-         Xd0lbfarSol9PoyFokMTzYW6GSZ1UTGgmewpv6LGSZpyPoOO4eiwKEhQAc52SeiIAj05
-         ZW+2YcAtMRD3i38aFW/ls4cd9urGQuTfdSIj+iNlwubWvnSjljlXxoKd/Ljorsv5myvT
-         8+FBjGUMCbjVRb4ri+xnFHCBvPINk2a72J1wxSVdLmM1KbzI+oyVQYopnKUd6bZNhWIL
-         ymZy4q7rUQPyLhmtAN1HDeAYlOxrObofEVWWuvr+bQpsOwRKizyEDZ/C9yMxsVJQMPn7
-         oNSQ==
+        Tue, 30 May 2023 03:30:36 -0400
+Received: from mail-io1-f79.google.com (mail-io1-f79.google.com [209.85.166.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D9BE70
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 May 2023 00:30:06 -0700 (PDT)
+Received: by mail-io1-f79.google.com with SMTP id ca18e2360f4ac-76998d984b0so610849739f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 May 2023 00:30:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685428439; x=1688020439;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4OAxSq+jDW1WBhQxxiq1fw9sqlEfd/X+gHC/8nQV2Q8=;
-        b=c2X04N7X90nyo5z801aqGll8SQ6QRQE6vuD1YbbsmOOGzsutaapZKyr7gakf36G/bO
-         Hc13cUfff0hk5umrZakgX7luUsu03r72b4a8GquHgEQvGXYsjjX/u7JP4GtQQLydbl5L
-         y8HtDzEBIbNijWaIfi9aDZJYiw6AlYOafPpdlGF7qQQoL88qoD4wsETPE/m65jpnyTjz
-         ewAVkO6xVQ5KjT+cEeNbOzoSu6UNBn0t8gxleTxQ9kxAQQ/4iyDgIYO/Qn9m9GlcgfYd
-         aXpLVic+16i017cJ4IgMyVDvPz1khjH/rz40RmZsM/Cq652xK2fQ3EgCtVuyASeiusvk
-         bXzA==
-X-Gm-Message-State: AC+VfDwR96w+20OPpE200CBGcYScr9OPxmaFsNRlvFIVydubkzJC69X0
-        0B+R42bNJLZLibNQCHwdVf8ElQ==
-X-Google-Smtp-Source: ACHHUZ6W8BZBm/qIjRNH2p9MGYVv/PsNQ9y2uoGYHDIsU2X7jekAcnXCTyOUAT4jwY11Q8ZxAdNrIw==
-X-Received: by 2002:a5d:6582:0:b0:30a:e5bc:547c with SMTP id q2-20020a5d6582000000b0030ae5bc547cmr781984wru.9.1685428439590;
-        Mon, 29 May 2023 23:33:59 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id w12-20020a5d544c000000b002fed865c55esm2091935wrv.56.2023.05.29.23.33.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 May 2023 23:33:57 -0700 (PDT)
-Date:   Tue, 30 May 2023 09:33:53 +0300
-From:   Dan Carpenter <dan.carpenter@linaro.org>
-To:     Simon Horman <horms@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: L2CAP: don't check for out-of-bounds value
-Message-ID: <e4d89235-6446-4bd4-8ab8-7b53a89d0f19@kili.mountain>
-References: <20230526-l2cap-16bit-v1-1-2cfb83dd28ee@kernel.org>
- <fdab8adc-0f61-4664-a2f9-6f532b0c85be@kili.mountain>
- <ZHDOGNhIu9pjDKVM@kernel.org>
+        d=1e100.net; s=20221208; t=1685431805; x=1688023805;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i7CtQzI0l5t/OOEyepWkdX8Kt74wz/sHmbzRJBgYb20=;
+        b=YCOKIewK3INHEITOsjvDZzFqm28r4z5NM1i88w1a/eJu31VXPgt0T/v4pxGxP5UriF
+         o8tokbhjVFbqM+FlZ116/JwdwAazn03qSlsGf7tOwm8xVe+BteKydWJQdY3cI1ngR/MT
+         465fEIEJ1xWKMpD6e+9rC/s9wnx8ObMD07aCdQz34tScohniFIQSEDgevr29nZs2dWfg
+         VYDcaY4BkQ9TslvAmgtSU1HvRcnR3SvFvuMUgnBkJNMByXOI9IoXvUwlC5gOKfpE7oKu
+         p/aEVCbg1QxCweA2oG8RY0gpaEcVBHPKJdCx9HjkRSBJANuItbZon7Jr3ay4Qj6PUEYc
+         y96g==
+X-Gm-Message-State: AC+VfDzMN++43lCcy+n8K+4HBi+2as0dqBueXUZ3xeOhHN4pDbGKjlyo
+        M4lQYAujzqxJ1u5fIxETQ8phdQB3Zjs665Nzh2i94jmsOGCC
+X-Google-Smtp-Source: ACHHUZ4mCwrPxMk9inZVApufbGOcXZZ2CO9smFEWxdu7I/4/bLxtsQW4DyK5AbVSMhrnSrwW+5AALU03bJxTE+vnERrnT3sJSCTP
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZHDOGNhIu9pjDKVM@kernel.org>
+X-Received: by 2002:a02:62ce:0:b0:41a:902f:70d0 with SMTP id
+ d197-20020a0262ce000000b0041a902f70d0mr681957jac.6.1685431805805; Tue, 30 May
+ 2023 00:30:05 -0700 (PDT)
+Date:   Tue, 30 May 2023 00:30:05 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000140b1405fce42c66@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in sco_conn_del
+From:   syzbot <syzbot+6b9277cad941daf126a2@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, May 26, 2023 at 05:19:52PM +0200, Simon Horman wrote:
-> On Fri, May 26, 2023 at 05:34:30PM +0300, Dan Carpenter wrote:
-> > On Fri, May 26, 2023 at 04:16:54PM +0200, Simon Horman wrote:
-> > > @@ -4161,8 +4161,12 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
-> > >  
-> > >  	result = L2CAP_CR_NO_MEM;
-> > >  
-> > > -	/* Check for valid dynamic CID range (as per Erratum 3253) */
-> > > -	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
-> > > +	/* Check for valid dynamic CID range (as per Erratum 3253).
-> > > +	 * As scid is an unsigned 16bit variable it's maximum
-> > > +	 * value is L2CAP_CID_DYN_END (0xffff): there is no need to check
-> > > +	 * if scid exceeds that value here.
-> > > +	 */
-> > > +	if (scid < L2CAP_CID_DYN_START) {
-> > 
-> > This is a false positive.  To me the warning looks reasonable.  But one
-> > way we could silence it would be to keep a list of macros where the
-> > check is impossible but we still want to have it.
-> 
-> Hi Dan,
-> 
-> I do agree that the existing code is harmless.
-> Is this why you feel it is a false positive?
-> 
+Hello,
 
-Actually I was thinking of something else, but the other reason why this
-is harmless is because it's part of a "clamp both upper and lower
-bounds" condition.  Linus doesn't like these warnings because it's clear
-to a human reader what the intent is. I re-wrote this code last week to
-avoid this kind of warning.  I will push that so now it won't warn.  I
-still need to tweak the re-written code a bit.
+syzbot found the following issue on:
 
-> > I could create something where we do:
-> > 
-> > echo "L2CAP_CID_DYN_END" >> smatch_data/kernel.allowed_impossible_limits
-> > 
-> > I'd do the same for unsigned comparisons with zero like:
-> > 
-> > 
-> >         if (dpmcp_dev->obj_desc.ver_major < DPMCP_MIN_VER_MAJOR ||
-> >             (dpmcp_dev->obj_desc.ver_major == DPMCP_MIN_VER_MAJOR &&
-> >              dpmcp_dev->obj_desc.ver_minor < DPMCP_MIN_VER_MINOR)) {
-> >              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> >                 dev_err(&dpmcp_dev->dev,
-> >                         "ERROR: Version %d.%d of DPMCP not supported.\n",
-> > 
-> > echo "DPMCP_MIN_VER_MINOR" >> smatch_data/kernel.allowed_impossible_limits
-> 
-> FWIIW, I've noticed problems with comparisons to enums. Which, f.e., may in
-> practice are unsigned values of a particular width for a given build.
-> But in theory could be any type.
+HEAD commit:    878ecb0897f4 ipv6: Fix out-of-bounds access in ipv6_find_t..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=17fc501e280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9afc9b1b9107cdcd
+dashboard link: https://syzkaller.appspot.com/bug?extid=6b9277cad941daf126a2
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Enum types are undefined in C but I think Sparse (and thus Smatch)
-follow the same rules as GCC basically so they should catch these bugs.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-	int x;
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4f18f9fc3e6b/disk-878ecb08.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fe938cc7c36c/vmlinux-878ecb08.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2ae8899a247a/bzImage-878ecb08.xz
 
-	if (x < ENUM_ZERO)  <-- x is negative but type promoted to uint
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6b9277cad941daf126a2@syzkaller.appspotmail.com
 
-regards,
-dan carpenter
+==================================================================
+BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+BUG: KASAN: slab-use-after-free in atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:116 [inline]
+BUG: KASAN: slab-use-after-free in __refcount_add include/linux/refcount.h:193 [inline]
+BUG: KASAN: slab-use-after-free in __refcount_inc include/linux/refcount.h:250 [inline]
+BUG: KASAN: slab-use-after-free in refcount_inc include/linux/refcount.h:267 [inline]
+BUG: KASAN: slab-use-after-free in sock_hold include/net/sock.h:775 [inline]
+BUG: KASAN: slab-use-after-free in sco_conn_del+0xb9/0x2b0 net/bluetooth/sco.c:193
+Write of size 4 at addr ffff88807c764080 by task syz-executor.0/21878
 
+CPU: 1 PID: 21878 Comm: syz-executor.0 Not tainted 6.4.0-rc2-syzkaller-00209-g878ecb0897f4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/16/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
+ print_report mm/kasan/report.c:462 [inline]
+ kasan_report+0x11c/0x130 mm/kasan/report.c:572
+ check_region_inline mm/kasan/generic.c:181 [inline]
+ kasan_check_range+0x141/0x190 mm/kasan/generic.c:187
+ instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+ atomic_fetch_add_relaxed include/linux/atomic/atomic-instrumented.h:116 [inline]
+ __refcount_add include/linux/refcount.h:193 [inline]
+ __refcount_inc include/linux/refcount.h:250 [inline]
+ refcount_inc include/linux/refcount.h:267 [inline]
+ sock_hold include/net/sock.h:775 [inline]
+ sco_conn_del+0xb9/0x2b0 net/bluetooth/sco.c:193
+ sco_disconn_cfm+0x75/0xb0 net/bluetooth/sco.c:1392
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1834 [inline]
+ hci_conn_hash_flush+0x114/0x230 net/bluetooth/hci_conn.c:2484
+ hci_dev_close_sync+0x5fb/0x1200 net/bluetooth/hci_sync.c:4941
+ hci_dev_do_close+0x31/0x70 net/bluetooth/hci_core.c:554
+ hci_unregister_dev+0x1ce/0x580 net/bluetooth/hci_core.c:2703
+ vhci_release+0x80/0xf0 drivers/bluetooth/hci_vhci.c:669
+ __fput+0x27c/0xa90 fs/file_table.c:321
+ task_work_run+0x16f/0x270 kernel/task_work.c:179
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xad3/0x2960 kernel/exit.c:871
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1021
+ __do_sys_exit_group kernel/exit.c:1032 [inline]
+ __se_sys_exit_group kernel/exit.c:1030 [inline]
+ __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1030
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fa76928c169
+Code: Unable to access opcode bytes at 0x7fa76928c13f.
+RSP: 002b:00007ffc9f4c2fb8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000029 RCX: 00007fa76928c169
+RDX: 00007fa76928d7ba RSI: 0000000000000000 RDI: 0000000000000007
+RBP: 0000000000000007 R08: ff78736871746264 R09: 0000000000000029
+R10: 00000000000003b8 R11: 0000000000000246 R12: 00007ffc9f4c3630
+R13: 0000000000000003 R14: 00007ffc9f4c35cc R15: 00007fa769386660
+ </TASK>
+
+Allocated by task 1079:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:333 [inline]
+ __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
+ kasan_kmalloc include/linux/kasan.h:196 [inline]
+ __do_kmalloc_node mm/slab_common.c:966 [inline]
+ __kmalloc_node_track_caller+0x5f/0x1a0 mm/slab_common.c:986
+ kmalloc_reserve+0xf0/0x270 net/core/skbuff.c:585
+ pskb_expand_head+0x237/0x1170 net/core/skbuff.c:2054
+ netlink_trim+0x1ea/0x240 net/netlink/af_netlink.c:1321
+ netlink_broadcast+0x63/0xd90 net/netlink/af_netlink.c:1517
+ nlmsg_multicast include/net/netlink.h:1083 [inline]
+ nlmsg_notify+0x93/0x280 net/netlink/af_netlink.c:2589
+ rtnl_notify net/core/rtnetlink.c:771 [inline]
+ rtmsg_ifinfo_send net/core/rtnetlink.c:4016 [inline]
+ rtmsg_ifinfo_event net/core/rtnetlink.c:4032 [inline]
+ rtmsg_ifinfo_event net/core/rtnetlink.c:4019 [inline]
+ rtmsg_ifinfo+0x16e/0x1a0 net/core/rtnetlink.c:4038
+ __dev_notify_flags+0x240/0x2d0 net/core/dev.c:8601
+ rtnl_configure_link+0x181/0x260 net/core/rtnetlink.c:3273
+ veth_newlink+0x446/0x9d0 drivers/net/veth.c:1909
+ rtnl_newlink_create net/core/rtnetlink.c:3443 [inline]
+ __rtnl_newlink+0x10c2/0x1840 net/core/rtnetlink.c:3660
+ rtnl_newlink+0x68/0xa0 net/core/rtnetlink.c:3673
+ rtnetlink_rcv_msg+0x43d/0xd50 net/core/rtnetlink.c:6395
+ netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2546
+ netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+ netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
+ netlink_sendmsg+0x925/0xe30 net/netlink/af_netlink.c:1913
+ sock_sendmsg_nosec net/socket.c:724 [inline]
+ sock_sendmsg+0xde/0x190 net/socket.c:747
+ __sys_sendto+0x23a/0x340 net/socket.c:2144
+ __do_sys_sendto net/socket.c:2156 [inline]
+ __se_sys_sendto net/socket.c:2152 [inline]
+ __x64_sys_sendto+0xe1/0x1b0 net/socket.c:2152
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Last potentially related work creation:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ __kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:491
+ __call_rcu_common.constprop.0+0x99/0x7e0 kernel/rcu/tree.c:2627
+ netlink_release+0xcde/0x1e40 net/netlink/af_netlink.c:828
+ __sock_release+0xcd/0x290 net/socket.c:653
+ sock_close+0x1c/0x20 net/socket.c:1397
+ __fput+0x27c/0xa90 fs/file_table.c:321
+ task_work_run+0x16f/0x270 kernel/task_work.c:179
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xad3/0x2960 kernel/exit.c:871
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1021
+ get_signal+0x2315/0x25b0 kernel/signal.c:2874
+ arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+ exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+ exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+ syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+ do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
+ __kasan_record_aux_stack+0xbc/0xd0 mm/kasan/generic.c:491
+ __call_rcu_common.constprop.0+0x99/0x7e0 kernel/rcu/tree.c:2627
+ netlink_release+0xcde/0x1e40 net/netlink/af_netlink.c:828
+ __sock_release+0xcd/0x290 net/socket.c:653
+ sock_close+0x1c/0x20 net/socket.c:1397
+ __fput+0x27c/0xa90 fs/file_table.c:321
+ task_work_run+0x16f/0x270 kernel/task_work.c:179
+ resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+ exit_to_user_mode_prepare+0x210/0x240 kernel/entry/common.c:204
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+ syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+ do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+The buggy address belongs to the object at ffff88807c764000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 128 bytes inside of
+ freed 2048-byte region [ffff88807c764000, ffff88807c764800)
+
+The buggy address belongs to the physical page:
+page:ffffea0001f1d800 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88807c767000 pfn:0x7c760
+head:ffffea0001f1d800 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000010200 ffff888012442000 ffffea00012ef410 ffffea0000ab4010
+raw: ffff88807c767000 0000000000080001 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd2820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5035, tgid 5035 (syz-executor.4), ts 168058722686, free_ts 163150710676
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x2db/0x350 mm/page_alloc.c:1731
+ prep_new_page mm/page_alloc.c:1738 [inline]
+ get_page_from_freelist+0xf41/0x2c00 mm/page_alloc.c:3502
+ __alloc_pages+0x1cb/0x4a0 mm/page_alloc.c:4768
+ alloc_pages+0x1aa/0x270 mm/mempolicy.c:2279
+ alloc_slab_page mm/slub.c:1851 [inline]
+ allocate_slab+0x25f/0x390 mm/slub.c:1998
+ new_slab mm/slub.c:2051 [inline]
+ ___slab_alloc+0xa91/0x1400 mm/slub.c:3192
+ __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3291
+ __slab_alloc_node mm/slub.c:3344 [inline]
+ slab_alloc_node mm/slub.c:3441 [inline]
+ __kmem_cache_alloc_node+0x136/0x320 mm/slub.c:3490
+ __do_kmalloc_node mm/slab_common.c:965 [inline]
+ __kmalloc_node_track_caller+0x4f/0x1a0 mm/slab_common.c:986
+ kmalloc_reserve+0xf0/0x270 net/core/skbuff.c:585
+ pskb_expand_head+0x237/0x1170 net/core/skbuff.c:2054
+ netlink_trim+0x1ea/0x240 net/netlink/af_netlink.c:1321
+ netlink_broadcast+0x63/0xd90 net/netlink/af_netlink.c:1517
+ nlmsg_multicast include/net/netlink.h:1083 [inline]
+ nlmsg_notify+0x93/0x280 net/netlink/af_netlink.c:2589
+ rtnl_notify net/core/rtnetlink.c:771 [inline]
+ rtmsg_ifinfo_send net/core/rtnetlink.c:4016 [inline]
+ rtmsg_ifinfo_event net/core/rtnetlink.c:4032 [inline]
+ rtmsg_ifinfo_event net/core/rtnetlink.c:4019 [inline]
+ rtmsg_ifinfo+0x16e/0x1a0 net/core/rtnetlink.c:4038
+ __dev_notify_flags+0x240/0x2d0 net/core/dev.c:8601
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1302 [inline]
+ free_unref_page_prepare+0x62e/0xcb0 mm/page_alloc.c:2564
+ free_unref_page+0x33/0x370 mm/page_alloc.c:2659
+ __unfreeze_partials+0x17c/0x1a0 mm/slub.c:2636
+ qlink_free mm/kasan/quarantine.c:166 [inline]
+ qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
+ kasan_quarantine_reduce+0x195/0x220 mm/kasan/quarantine.c:292
+ __kasan_slab_alloc+0x63/0x90 mm/kasan/common.c:305
+ kasan_slab_alloc include/linux/kasan.h:186 [inline]
+ slab_post_alloc_hook mm/slab.h:711 [inline]
+ slab_alloc_node mm/slub.c:3451 [inline]
+ kmem_cache_alloc_node+0x185/0x3e0 mm/slub.c:3496
+ __alloc_skb+0x288/0x330 net/core/skbuff.c:644
+ alloc_skb_fclone include/linux/skbuff.h:1338 [inline]
+ tcp_stream_alloc_skb+0x3c/0x580 net/ipv4/tcp.c:866
+ tcp_sendmsg_locked+0xc47/0x2960 net/ipv4/tcp.c:1329
+ tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1487
+ inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:825
+ sock_sendmsg_nosec net/socket.c:724 [inline]
+ sock_sendmsg+0xde/0x190 net/socket.c:747
+ sock_write_iter+0x295/0x3d0 net/socket.c:1140
+ call_write_iter include/linux/fs.h:1868 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x945/0xd50 fs/read_write.c:584
+ ksys_write+0x1ec/0x250 fs/read_write.c:637
+
+Memory state around the buggy address:
+ ffff88807c763f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff88807c764000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88807c764080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                   ^
+ ffff88807c764100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88807c764180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
