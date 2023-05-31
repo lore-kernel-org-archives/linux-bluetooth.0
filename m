@@ -2,260 +2,136 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84996C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 10:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE05DC77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 14:07:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235248AbjEaKCM (ORCPT
+        id S235905AbjEaOHz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 May 2023 06:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57516 "EHLO
+        Wed, 31 May 2023 10:07:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230300AbjEaKCK (ORCPT
+        with ESMTP id S234316AbjEaOHk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 May 2023 06:02:10 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0DA1E2;
-        Wed, 31 May 2023 03:02:08 -0700 (PDT)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 34V8xxN0012216;
-        Wed, 31 May 2023 10:02:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=qcppdkim1;
- bh=lD+2X1zSALQHvTNQsdQg25A3lUc6+zGS5zMnH7ltgxE=;
- b=a7tee/byZ4wOdlA2/DeawESXZtoplRbBxNVRkKkjR6X1rtMfvR1+9CKHD8bGnah9D0+b
- Al6B+Cb/HkhTFcz1H35W/e0iW08o7QoHYeiIf86pkIzYJXBnJeJfiW+GfPSugWpbTFw9
- KntUlJnqSYpIzSBNfV6EdHvdHN/D6gQmUzWPvkEGkbrZ029rx1ShH0OJCRRSvz0OQIly
- qIYNJVBORPaV87KRG3UCf4w/J22S25jme7srk/IoM2fbnCZ8uNlahcsffToROD87j8E5
- 6R71mrrPEucF6LL3ZHinODg3GpGPe3Na42IwfIwTGZp2JAnyd9X7RsrO9FXLtUhiJkUO oA== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3qx30f85pr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 10:02:00 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 34VA1wxi031961
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 31 May 2023 10:01:58 GMT
-Received: from nalasex01b.na.qualcomm.com (10.47.209.197) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Wed, 31 May 2023 03:01:53 -0700
-Received: from nalasex01b.na.qualcomm.com ([fe80::a057:7d2:b40d:81d6]) by
- nalasex01b.na.qualcomm.com ([fe80::a057:7d2:b40d:81d6%12]) with mapi id
- 15.02.0986.042; Wed, 31 May 2023 03:01:53 -0700
-From:   "Tim Jiang (QUIC)" <quic_tjiang@quicinc.com>
-To:     Johan Hovold <johan@kernel.org>
-CC:     "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>,
-        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>
-Subject: RE: [PATCH v7] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- SoC QCA2066
-Thread-Topic: [PATCH v7] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth SoC QCA2066
-Thread-Index: AQHZk3IcnXyik61A4UCumHqGaYmUyK90mP+A//+MldA=
-Date:   Wed, 31 May 2023 10:01:52 +0000
-Message-ID: <9ff2d2bd20a34ff6915d605d7591d430@quicinc.com>
-References: <20230531034338.23121-1-quic_tjiang@quicinc.com>
- <ZHcYS1PXhhTmrpYa@hovoldconsulting.com>
-In-Reply-To: <ZHcYS1PXhhTmrpYa@hovoldconsulting.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.253.74.59]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: MwpcjYs_-mi8CKFKkTbCcxyHcAtkATQe
-X-Proofpoint-ORIG-GUID: MwpcjYs_-mi8CKFKkTbCcxyHcAtkATQe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-05-31_06,2023-05-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
- bulkscore=0 clxscore=1011 adultscore=0 mlxlogscore=999 phishscore=0
- suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2304280000 definitions=main-2305310087
+        Wed, 31 May 2023 10:07:40 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774B9E55
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 07:03:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685541788; x=1717077788;
+  h=date:from:to:cc:subject:message-id;
+  bh=Q3jKy/mu0l1VX+yTKPMGvvGVtkoeV0UYYJ8aA7WNXeg=;
+  b=JpYFIk6oiORANwg/8rTQb5vo+FXZKweNme/lA4kRHu/58CpxOkTN0g9x
+   5Q5C89Uc8FKWnxcxClAwVVIuQBlhyfGWWjUmOOV6hQrDbNmb26YSiBJbB
+   KHq2053DbR41J3solegZSDG1su0gd3KUTRjqGH6GI+W6yXKfDuQxtLxSg
+   K6kpdzVHLQTu048NR7HLBIXUPBZLWT0W76nNJb0XoRjGlIIn5mzAId/lM
+   6IuFtd1kgAZT4E49MS3wdAhz2O+GQaQJqYySNC+7A0iXLHtA5YbsWsJEE
+   DeOsLSaKlRseGpG9KBjLMyc/Zgad4X03xApQHwiYN4ab5CT4daE3c/NPC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="357631006"
+X-IronPort-AV: E=Sophos;i="6.00,207,1681196400"; 
+   d="scan'208";a="357631006"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2023 06:56:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="819310994"
+X-IronPort-AV: E=Sophos;i="6.00,207,1681196400"; 
+   d="scan'208";a="819310994"
+Received: from lkp-server01.sh.intel.com (HELO fb1ced2c09fb) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 31 May 2023 06:56:25 -0700
+Received: from kbuild by fb1ced2c09fb with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q4MJN-0001Nh-0R;
+        Wed, 31 May 2023 13:56:25 +0000
+Date:   Wed, 31 May 2023 21:56:01 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 533e9a458c7425809b4b92f09f8311dd5887f063
+Message-ID: <20230531135601.BAe2v%lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Johan:
-  Thanks for the review, inline comments.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 533e9a458c7425809b4b92f09f8311dd5887f063  Bluetooth: ISO: Add support for connecting multiple BISes
 
-Regards.
-Tim
+elapsed time: 1037m
 
+configs tested: 64
+configs skipped: 8
 
------Original Message-----
-From: Johan Hovold <johan@kernel.org>=20
-Sent: Wednesday, May 31, 2023 5:50 PM
-To: Tim Jiang (QUIC) <quic_tjiang@quicinc.com>
-Cc: marcel@holtmann.org; linux-kernel@vger.kernel.org; linux-bluetooth@vger=
-.kernel.org; linux-arm-msm@vger.kernel.org; Balakrishna Godavarthi (QUIC) <=
-quic_bgodavar@quicinc.com>; Hemant Gupta (QUIC) <quic_hemantg@quicinc.com>
-Subject: Re: [PATCH v7] Bluetooth: hci_qca: Add support for Qualcomm Blueto=
-oth SoC QCA2066
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-On Wed, May 31, 2023 at 11:43:38AM +0800, Tim Jiang wrote:
-> This patch adds support for QCA2066 firmware patch and nvm downloading.
-> as the RF performance of qca2066 soc chip from different foundries=20
-> will be difference, so we use different nvm to configure them by=20
-> according to board id.
->=20
-> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
-> ---
->  drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btqca.h   |  4 ++
->  drivers/bluetooth/hci_qca.c |  8 +++-
->  3 files changed, 86 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c=20
-> index e7e58a956d15..960a409e16d6 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -205,6 +205,48 @@ static int qca_send_reset(struct hci_dev *hdev)
->  	return 0;
->  }
-> =20
-> +static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid) {
-> +	u8 cmd;
-> +	struct sk_buff *skb;
-> +	struct edl_event_hdr *edl;
-> +	int err =3D 0;
-> +	int bid_len;
-> +
-> +	bt_dev_dbg(hdev, "QCA read board ID");
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r034-20230531   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r043-20230531   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230531   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r036-20230531   gcc  
+csky                                defconfig   gcc  
+hexagon              randconfig-r006-20230531   clang
+hexagon              randconfig-r022-20230531   clang
+hexagon              randconfig-r041-20230531   clang
+hexagon              randconfig-r045-20230531   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r023-20230531   gcc  
+m68k                             allmodconfig   gcc  
+m68k                                defconfig   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r026-20230531   gcc  
+openrisc             randconfig-r005-20230531   gcc  
+openrisc             randconfig-r035-20230531   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r011-20230531   gcc  
+parisc               randconfig-r015-20230531   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc              randconfig-r003-20230531   gcc  
+powerpc              randconfig-r025-20230531   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r042-20230531   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r004-20230531   gcc  
+s390                 randconfig-r031-20230531   gcc  
+s390                 randconfig-r044-20230531   clang
+sh                               allmodconfig   gcc  
+sh                   randconfig-r012-20230531   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r002-20230531   gcc  
+sparc64              randconfig-r014-20230531   gcc  
+sparc64              randconfig-r033-20230531   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64                               rhel-8.3   gcc  
 
-Drop this.
-[Tim] will address it in v8 version.
-
-> +
-> +	cmd =3D EDL_GET_BID_REQ_CMD;
-> +	skb =3D __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN=
-,
-> +				&cmd, 0, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		err =3D PTR_ERR(skb);
-> +		bt_dev_err(hdev, "Reading QCA board ID failed (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	edl =3D skb_pull_data(skb, sizeof(*edl));
-> +	if (!edl) {
-> +		bt_dev_err(hdev, "QCA read board ID with no header");
-> +		err =3D -EILSEQ;
-> +		goto out;
-> +	}
-> +
-> +	if (edl->cresp !=3D EDL_CMD_REQ_RES_EVT ||
-> +	    edl->rtype !=3D EDL_GET_BID_REQ_CMD) {
-> +		bt_dev_err(hdev, "QCA Wrong packet: %d %d", edl->cresp, edl->rtype);
-> +		err =3D -EIO;
-> +		goto out;
-> +	}
-> +
-> +	bid_len =3D edl->data[0];
-> +	*bid =3D (edl->data[1] << 8) + edl->data[2];
-> +	bt_dev_info(hdev, "%s: bid len =3D %x, bid =3D %x", __func__, bid_len,=
-=20
-> +*bid);
-
-This type of information should not be printed by default.
-
-At most this should be dev_dbg() level, but it should probably just be drop=
-ped.
-[Tim] will address it in v8 version
-
-> +
-> +out:
-> +	kfree_skb(skb);
-> +	return err;
-> +}
-> +
->  int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)  {
->  	struct sk_buff *skb;
-> @@ -574,6 +616,29 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,=20
-> const bdaddr_t *bdaddr)  }  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
-> =20
-> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
-> +		   size_t max_size, struct qca_btsoc_version ver, u16 bid) {
-> +	u8 rom_ver =3D 0;
-
-Drop the redundant initialisation.
-[Tim] will address it in v8 version.
-
-> +	u32 soc_ver;
-> +	const char *variant;
-> +
-> +	soc_ver =3D get_soc_ver(ver.soc_id, ver.rom_ver);
-> +	rom_ver =3D ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> +
-> +	if ((le32_to_cpu(ver.soc_id) & 0x0000ff00) =3D=3D QCA_HSP_GF_SOC_ID)  /=
-* hsp gf chip */
-> +		variant =3D "g";
-> +	else
-> +		variant =3D "";
-> +
-> +	if (bid =3D=3D 0x0)
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
-> +	else
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant,=20
-> +bid);
-> +
-> +	bt_dev_info(hdev, "%s: nvm name is %s", __func__, fwname);
-
-dev_dbg(), if at all needed.
-[Tim] will address it in v8 version.
-
-> +}
-> +
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
->  		   const char *firmware_name)
-
-> @@ -644,7 +716,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baud=
-rate,
->  			snprintf(config.fwname, sizeof(config.fwname),
->  				 "qca/crnv%02x.bin", rom_ver);
->  		}
-> -	}
-> +	} else if (soc_type =3D=3D QCA_QCA2066)
-> +		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname),
-> +				ver, boardid);
-
-Missing brackets (if one branch has them, all of them should even the curre=
-nt code may not be following this).
-[Tim] will address it in v8 version.
-
->  	else if (soc_type =3D=3D QCA_QCA6390)
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/htnv%02x.bin", rom_ver);
-
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c=20
-> index 1b064504b388..bf7683040ebd 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1729,7 +1729,7 @@ static int qca_setup(struct hci_uart *hu)
->  	bt_dev_info(hdev, "setting up %s",
->  		qca_is_wcn399x(soc_type) ? "wcn399x" :
->  		(soc_type =3D=3D QCA_WCN6750) ? "wcn6750" :
-> -		(soc_type =3D=3D QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
-> +		(soc_type =3D=3D QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390/QCA2066");
-
-This just looks very lazy.
-
-How about cleaning up the current implementation if you don't want to make =
-this expression worse than it already is?
-[Tim] ok, I will introduce "switch case " to make it more clearly
-
-> =20
->  	qca->memdump_state =3D QCA_MEMDUMP_IDLE;
-> =20
-
-Johan
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
