@@ -2,136 +2,144 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE05DC77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 14:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE71C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 16:28:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235905AbjEaOHz (ORCPT
+        id S229573AbjEaQ2X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 May 2023 10:07:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47646 "EHLO
+        Wed, 31 May 2023 12:28:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234316AbjEaOHk (ORCPT
+        with ESMTP id S229668AbjEaQ2U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 May 2023 10:07:40 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774B9E55
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 07:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685541788; x=1717077788;
-  h=date:from:to:cc:subject:message-id;
-  bh=Q3jKy/mu0l1VX+yTKPMGvvGVtkoeV0UYYJ8aA7WNXeg=;
-  b=JpYFIk6oiORANwg/8rTQb5vo+FXZKweNme/lA4kRHu/58CpxOkTN0g9x
-   5Q5C89Uc8FKWnxcxClAwVVIuQBlhyfGWWjUmOOV6hQrDbNmb26YSiBJbB
-   KHq2053DbR41J3solegZSDG1su0gd3KUTRjqGH6GI+W6yXKfDuQxtLxSg
-   K6kpdzVHLQTu048NR7HLBIXUPBZLWT0W76nNJb0XoRjGlIIn5mzAId/lM
-   6IuFtd1kgAZT4E49MS3wdAhz2O+GQaQJqYySNC+7A0iXLHtA5YbsWsJEE
-   DeOsLSaKlRseGpG9KBjLMyc/Zgad4X03xApQHwiYN4ab5CT4daE3c/NPC
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="357631006"
-X-IronPort-AV: E=Sophos;i="6.00,207,1681196400"; 
-   d="scan'208";a="357631006"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2023 06:56:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="819310994"
-X-IronPort-AV: E=Sophos;i="6.00,207,1681196400"; 
-   d="scan'208";a="819310994"
-Received: from lkp-server01.sh.intel.com (HELO fb1ced2c09fb) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 31 May 2023 06:56:25 -0700
-Received: from kbuild by fb1ced2c09fb with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q4MJN-0001Nh-0R;
-        Wed, 31 May 2023 13:56:25 +0000
-Date:   Wed, 31 May 2023 21:56:01 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 533e9a458c7425809b4b92f09f8311dd5887f063
-Message-ID: <20230531135601.BAe2v%lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Wed, 31 May 2023 12:28:20 -0400
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2109.outbound.protection.outlook.com [40.107.220.109])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88F7698;
+        Wed, 31 May 2023 09:28:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=k1ZHNjbM/nj05073Gngu3l/LItwB0Wsxeft1aY6dobxI8efW154+By6s9ooxM435XffexBRrZd7/YCZYCQkDd/j3XEUun0tkIJdmlJGVRnTldAaxxXkHPgvYcUiIwreCzSxYZWE2fChOyqYopyh3aNx5BF3DEKOiueocvs8kwvD9XyB9M27I4TmdNIvjpzCZpmx0LrPNFWjt/4audXLZc1OE6RmPXnwreYlWhY1JPz/QzQaqH+4OfaZCas+LWA98U7+QGPXmF8ek6Q/TcTJs4Iznom6hB87OS9XjQex1fC8dwgj/SJeX/nOwklAj4co8lfgW7+tQOxKcQkj16a48zQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YBULw9AxaSt5ZrTaYDcS8nypVA9XadtdNWjNolZQRac=;
+ b=kxkrqbZMw3JpXligeS29qTLreS5o2AdN5TjkTkZBj/gX/OHccBm4dN9LdCvjhsN/xHF+z/PtIfl510EPQ+gELY9LZ4wSkqmzTrBrfFG0OCF4NJ8Lx1+u4Z8IvUdwafU+iM7yoPv5EFOMyf7VxF0YsTwYUlnFiOF3U4kEi7gVBm4T66oNY9ze+2r2fAoI3mCT7cO+GzIFEVuAW3TtAfbFA0v5GdckO6laKmbYU8ykeZfmGf/4mcdfS9dZFIf4ggnfSDOZhHsmladUdeN3EhVLNN27hhRkUd0bTbXY5jJQ0CikMC68UlGI9HB+9e3/9lWW0SAqyAiavHLco/Gdf/WT9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YBULw9AxaSt5ZrTaYDcS8nypVA9XadtdNWjNolZQRac=;
+ b=CPSZ2O93z+3a/U1+EHDsECqUmTcQY7XA5qu7YFjWVohnG7ot8SUaqLK0RuXN3HlJCZWMPcrHH6PlCy7PhQJsmTfcV/R6xzNJQOEyrFl1QTwuSTdvVWTooIV/d+T1vHVKR96EAQ4BxL6WDDIGHBjsl/SJnfD+ibQ024dk8qJSF4w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MW4PR13MB5990.namprd13.prod.outlook.com (2603:10b6:303:1ba::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6433.24; Wed, 31 May
+ 2023 16:28:15 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::5e55:9a39:751f:55f6%3]) with mapi id 15.20.6433.024; Wed, 31 May 2023
+ 16:28:15 +0000
+Date:   Wed, 31 May 2023 18:28:08 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Ying Hsu <yinghsu@chromium.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v5] Bluetooth: Fix l2cap_disconnect_req deadlock
+Message-ID: <ZHd1mPanIsBORpLE@corigine.com>
+References: <20230531034522.375889-1-yinghsu@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230531034522.375889-1-yinghsu@chromium.org>
+X-ClientProxiedBy: AM0PR08CA0032.eurprd08.prod.outlook.com
+ (2603:10a6:208:d2::45) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW4PR13MB5990:EE_
+X-MS-Office365-Filtering-Correlation-Id: bcf58abf-066b-41d9-af91-08db61f408e1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4zXVrpl6YItj9jUzJZ1ijf81T6K4XOeVWp71uAsdKUAE43TAsmPX+iu0LKJ8Qe8gbmvEGEuwpz3EkPuJljRHMnkoJAkhhj78nVwj6fF/SZL0UPYE1XbmFGYhQ5/Gys3G+7GPpZcCtfGb9WZSG4qxqSum+yNmGFLfdEtO4X7mbo0JWAxAqkjldfkml83hn/ZOKJevxCPbnUPkWY0Wl51KejfZVlL4lPv5nceHr1VytthVFqVErgLWsg845Piuyp+gpMHYXVOGUtea9Q5FZxXMhTQysgu6dv2iBJPmRYjbwbJYTEkBwbYOtze1/EqxWF8OtjQyYy3Iu7PwAJTGr9P9RBQFOo52+m8EIVXKLh32jIyytjzNVx9aEe51fIfDKkthjG7R3LeRj+SqzVRWXMYCM49dleTxHllTmhVtfgosGNpPQXCFyJ94E5YAwTDnB6y0zx9yIHUsLWZuxYr+JHMqtatyXO+gq+q6488L/JzNQELKzUexcwG78Ot978IFNI9zuDRK8pbxY3toJpLl1tZ9zFdiyWuhmMV/hokQFdanMUvNoI788W46iR8Q/cG6wrro
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(396003)(366004)(376002)(346002)(136003)(451199021)(6486002)(316002)(6666004)(5660300002)(2616005)(8936002)(86362001)(83380400001)(41300700001)(8676002)(44832011)(7416002)(478600001)(38100700002)(186003)(6506007)(6512007)(54906003)(4326008)(6916009)(2906002)(4744005)(66946007)(36756003)(66476007)(66556008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ivoAPdv0fp3Q4ULOHX4sbGsEVWh6nOhRnHlusM+hT6vTcuu7AxJLn6MSHmXw?=
+ =?us-ascii?Q?NdvYhpAoOvCGdXWek5A2drOI3isetve+rqaINUmSWbpXm1Y19SLssqIl/VwI?=
+ =?us-ascii?Q?6N+XGxz/8yR8fLZyztkCv1quJIUdmXa7bxTvXGYkj04N+HvNnZe/j+8ct1vD?=
+ =?us-ascii?Q?D7i+S6n56Qt1/g/uMQjuTX3BmLZa0w7aWyv6jYVQ9CE53KSrhKAwTHhfeIng?=
+ =?us-ascii?Q?4vCb6fbAUkG7kEzJ80UNuPHulhpkw/nHqRSM+QP0gxBnroEOCeGP7OJSFD2r?=
+ =?us-ascii?Q?oHX/TKIaSwpa/fpn2R6QK3XJyD7feQc4YxVb/iMA4TVYnhFEE68nOtn1a0iV?=
+ =?us-ascii?Q?NRcfqKuaiQi81+q4nlTVU7aoiZBIHYvFP0AWf2isQKl3DN+MI2eIjpROHP9f?=
+ =?us-ascii?Q?+lefYWpuGCLG2xjt8Ii2ZM9cMlaJBpm7OJpmf9qwZaQ+kYwfJasGon/8h3NT?=
+ =?us-ascii?Q?Jn/gnvZ91qg6Ks918fVttqegkCxqo7lhmH4fuArzI0qXAJ5rmWE8iSXlEK+A?=
+ =?us-ascii?Q?HnQ3Qy+OmVnrwAOF7Ju7FIgBu3BcQGLq9OiMVTVKgtyiMgvqK4TH1dJmKabB?=
+ =?us-ascii?Q?st0vhZnT8MROocQp7aKOxGgzRFEG+J3eiH3MkPs3ZxOW7IzwJZZ7fLb1LpcW?=
+ =?us-ascii?Q?eQEzbz8wfLraQbRy2QcqNwqaa5M3nFjSG0d9aVJaXaH9H+RpeIW2HxM6Qbfd?=
+ =?us-ascii?Q?qlJywjALHhGYRyvTKMmHUQ+CgP7+7gOyzvDzZDpabMoqMJkWwGHD5Rbtcf9n?=
+ =?us-ascii?Q?0g/51H1OiCgn7II85mBVR+ZJClAiDJYZgmYuISrwwLJE1Cf/BC0Ug66POsmz?=
+ =?us-ascii?Q?/BHAADWsLY9IRbGpbPKT6f5bpYdrv0ND6J+m51oBVdc9/m8u70DeeHje178V?=
+ =?us-ascii?Q?IdsJ1Xihii7RIXQ0U3LloEshcYXLCJ7zO426jxnYk+uu0R/XNolObDHIEAgD?=
+ =?us-ascii?Q?lg1FCNrI5myNoaTF/k8I8vS6kcJ2SRZpvoLYjm4mcgYREvJ/IHaQy6X9Gl8B?=
+ =?us-ascii?Q?Yo0Hgg42j7QTAvT13Y8/XfxwBEq7nHou8e9G6baMUwsSubmtYBrPzvivyCea?=
+ =?us-ascii?Q?Xeds+SL1xQ4hdkW+rSGvuyLK661QiFccBtDH9aVBhzMJ5YZ9eTHOHlBagYO8?=
+ =?us-ascii?Q?hR00dmXUvhel8y6v6+f24IINJBrdoHi9Yu1T9yNyz+v4XJIgBqatXTqSZYDa?=
+ =?us-ascii?Q?aim2R1gp5i4fBDnhltkIjorXEMMkUuIHxT3RxJZmyvicGPMENVM/U2GWywgT?=
+ =?us-ascii?Q?xwm70FeWGOzUqPa1biDeT9lIamLRl6sL3bawstVgYd/EHYPlSgEQ4M5iToTG?=
+ =?us-ascii?Q?t7C15Uai3wWgOXWGukegzlQ1Mq/sVp5XtuzqNS1ww5Vexurmpjor4eR/HSOi?=
+ =?us-ascii?Q?hZnRx9XRjzVNsqsApCHTg8L20giV2s9sJx86XG3j1DRXfRZz7ES6zLvrliNf?=
+ =?us-ascii?Q?DKCCQosxDVyW8nIDNc6b8iweIhpbNB6AEYOyLoPrHnNm4ytCb8lfHARKhIV5?=
+ =?us-ascii?Q?06oW0YIHEHluMdJ/7DR+KeoBP8OeIie1Ch1eysea/5B6nRwh1Hb+UkyU1twU?=
+ =?us-ascii?Q?BbMnCOd13TbzJ1BOrMKz07Q0MGcvyQWE2BqKrsbx+6gozRv8KpLO6aJroI+S?=
+ =?us-ascii?Q?armvlUQlB/KHRmbo5F21VNWZweU6sGD7/J92gMn/chPm48PveHunoc5UsaZh?=
+ =?us-ascii?Q?qjHIkw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bcf58abf-066b-41d9-af91-08db61f408e1
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2023 16:28:15.4669
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5j+f4a3ht2ak211MSx41eyrMsTKms8zImT1JtyUdJ4iOLkvhxIHasIYhKdxkfkcqhLI202q43v7LV2Y/o1hY0D77gnO1njZhY34ij0W9LfA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR13MB5990
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 533e9a458c7425809b4b92f09f8311dd5887f063  Bluetooth: ISO: Add support for connecting multiple BISes
+On Wed, May 31, 2023 at 03:44:56AM +0000, Ying Hsu wrote:
+> L2CAP assumes that the locks conn->chan_lock and chan->lock are
+> acquired in the order conn->chan_lock, chan->lock to avoid
+> potential deadlock.
+> For example, l2sock_shutdown acquires these locks in the order:
+>   mutex_lock(&conn->chan_lock)
+>   l2cap_chan_lock(chan)
+> 
+> However, l2cap_disconnect_req acquires chan->lock in
+> l2cap_get_chan_by_scid first and then acquires conn->chan_lock
+> before calling l2cap_chan_del. This means that these locks are
+> acquired in unexpected order, which leads to potential deadlock:
+>   l2cap_chan_lock(c)
+>   mutex_lock(&conn->chan_lock)
+> 
+> This patch releases chan->lock before acquiring the conn_chan_lock
+> to avoid the potential deadlock.
+> 
+> Fixes: ("a2a9339e1c9d Bluetooth: L2CAP: Fix use-after-free in l2cap_disconnect_{req,rsp}")
 
-elapsed time: 1037m
+nit: this should be
 
-configs tested: 64
-configs skipped: 8
+Fixes: a2a9339e1c9d ("Bluetooth: L2CAP: Fix use-after-free in l2cap_disconnect_{req,rsp}")
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r034-20230531   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r043-20230531   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r046-20230531   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r036-20230531   gcc  
-csky                                defconfig   gcc  
-hexagon              randconfig-r006-20230531   clang
-hexagon              randconfig-r022-20230531   clang
-hexagon              randconfig-r041-20230531   clang
-hexagon              randconfig-r045-20230531   clang
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r023-20230531   gcc  
-m68k                             allmodconfig   gcc  
-m68k                                defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r026-20230531   gcc  
-openrisc             randconfig-r005-20230531   gcc  
-openrisc             randconfig-r035-20230531   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r011-20230531   gcc  
-parisc               randconfig-r015-20230531   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc              randconfig-r003-20230531   gcc  
-powerpc              randconfig-r025-20230531   clang
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r042-20230531   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r004-20230531   gcc  
-s390                 randconfig-r031-20230531   gcc  
-s390                 randconfig-r044-20230531   clang
-sh                               allmodconfig   gcc  
-sh                   randconfig-r012-20230531   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r002-20230531   gcc  
-sparc64              randconfig-r014-20230531   gcc  
-sparc64              randconfig-r033-20230531   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64                               rhel-8.3   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+...
