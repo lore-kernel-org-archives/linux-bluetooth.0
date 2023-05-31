@@ -2,123 +2,204 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 057E9C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 09:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B1FC77B7C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 09:50:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234720AbjEaJep (ORCPT
+        id S235637AbjEaJuK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 May 2023 05:34:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40330 "EHLO
+        Wed, 31 May 2023 05:50:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232214AbjEaJeo (ORCPT
+        with ESMTP id S235659AbjEaJuB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 May 2023 05:34:44 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6153CA0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 02:34:43 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-19f7f41d9dcso2367412fac.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 02:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685525682; x=1688117682;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=I3En16K5KvJAaDwYUgUDzkMOp6rMrDq6dR4y69EGNtE=;
-        b=NETvYVizi6tGHYLNXGIIDQeSsizM8Rw8PgitcYCopcs1kgRFB86DY1Y6ckHcEfsbLu
-         B9s/t2yIj8ph2tc/P9uM2NEHzksBs6OfmMs/gOI4JNVp/aRFLJVPc0D1qjmbME4cgXIX
-         FZv+9LYtdEusQlL2DVDJ2zmX9TqVA7SPfYq7kRDzSyGIstCwxvsqbeZgjY4WhTwQOJ1h
-         mBWXvMfCjtVUlJjvpl7eet49Q98wJyxpe1La47lHpWXLwwryf3RAOKJQgLBs5JSFgHgU
-         JmpdU3nQaLH0qN2ZhehsKDmug/3OszupbrdrMXZPuhFmnS44KEBgywbd1JqE5yCk4Kjk
-         hyXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685525682; x=1688117682;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I3En16K5KvJAaDwYUgUDzkMOp6rMrDq6dR4y69EGNtE=;
-        b=RjEBlQ+rp76X8DHGsmrODhNekAriTV3W0x9vgUerMsn+xzC8yNj4rKgeC9H6MXYqwx
-         L15KybG+tz7MQLGMjLVamMs/qs4ha8YqKPX1tm51dVZpz3pD7XV2598NQgw6Qu3Ravep
-         do7bhuRnzgw7U8iE45IHDpGRqyf95iDe9DOogl2xbb28GWe+glNYZ/9g8eRWNq7Q53Iz
-         HbD7/iAsvKts2vmToe8kYvr6o43GidjI8+s+Lbi6ylk1vvaMb7szJSL0uoJmwHbg4AzI
-         2xCxeA2iYAky7YsC8QLeAuBoVpgQjbRo6Z5LLbT56c3iZsZQK0e5G0fkKT8nsXa88YiM
-         vzzA==
-X-Gm-Message-State: AC+VfDzl0YkbGu0gHtjOkJh6B/gYG/hX8C16qeo58BOt1HhNEJ8ax7B1
-        YS69vZZi//iamSfdzakupKaLXujmubk=
-X-Google-Smtp-Source: ACHHUZ4YCi91E0tB6mdUTR1s0C3nFjYvzKQ9MF+3wnWGP2pJbz++YuMjIJfG+AyZ2dq0MllBzD2i6w==
-X-Received: by 2002:a05:6870:80c7:b0:196:5925:24cc with SMTP id r7-20020a05687080c700b00196592524ccmr4174956oab.21.1685525682516;
-        Wed, 31 May 2023 02:34:42 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.170.20])
-        by smtp.gmail.com with ESMTPSA id r2-20020a4aea82000000b00552502f3ae1sm5995490ooh.39.2023.05.31.02.34.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 May 2023 02:34:42 -0700 (PDT)
-Message-ID: <647714b2.4a0a0220.add82.cee2@mx.google.com>
-Date:   Wed, 31 May 2023 02:34:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0200713201880134901=="
+        Wed, 31 May 2023 05:50:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05D6E2;
+        Wed, 31 May 2023 02:50:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4469B62837;
+        Wed, 31 May 2023 09:50:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E13FC433EF;
+        Wed, 31 May 2023 09:49:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1685526599;
+        bh=5vuxklbladyrpsMX6XXo7g2/x5WLHBaVnR3bJgCUi0M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WvqVlwFrvRz1LIXmnzMu/5/X9qYyUvqiWZtbBi5lBmQs4qu+1F1zNnJRutRRsoJup
+         l3i26105JGu4Ng4xC1AySVnz76KEdds4+Vo5Dr9P0O5ZX4OhmCIAXb6Vwjb6ZMpTdm
+         7/S07jRlyxf8PhEtanRjGF3+m2s114O6P1EQuGmwB8or7FDokZ/IA/mcPdUSQMzK/K
+         O3roHLdgaS1qvGOL6n7BDnZP7KuMLd4XtJvULFunG06GgcNKadn1kqeYtRkNrruWte
+         fkQzyPlfKqFjbVz5jtACNioPblnFYx3+R1P+yXECTobDo66dKNzEYXhLL1ZtHUbHzq
+         50qMWo38nNmVQ==
+Received: from johan by xi.lan with local (Exim 4.94.2)
+        (envelope-from <johan@kernel.org>)
+        id 1q4ISx-0001Ie-GQ; Wed, 31 May 2023 11:50:03 +0200
+Date:   Wed, 31 May 2023 11:50:03 +0200
+From:   Johan Hovold <johan@kernel.org>
+To:     Tim Jiang <quic_tjiang@quicinc.com>
+Cc:     marcel@holtmann.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        quic_bgodavar@quicinc.com, quic_hemantg@quicinc.com
+Subject: Re: [PATCH v7] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA2066
+Message-ID: <ZHcYS1PXhhTmrpYa@hovoldconsulting.com>
+References: <20230531034338.23121-1-quic_tjiang@quicinc.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
-Subject: RE: Bluetooth: fix bdaddr quirks
-In-Reply-To: <20230531090424.3187-2-johan+linaro@kernel.org>
-References: <20230531090424.3187-2-johan+linaro@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230531034338.23121-1-quic_tjiang@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0200713201880134901==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, May 31, 2023 at 11:43:38AM +0800, Tim Jiang wrote:
+> This patch adds support for QCA2066 firmware patch and nvm downloading.
+> as the RF performance of qca2066 soc chip from different foundries will
+> be difference, so we use different nvm to configure them by according
+> to board id.
+> 
+> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+> ---
+>  drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
+>  drivers/bluetooth/btqca.h   |  4 ++
+>  drivers/bluetooth/hci_qca.c |  8 +++-
+>  3 files changed, 86 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index e7e58a956d15..960a409e16d6 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -205,6 +205,48 @@ static int qca_send_reset(struct hci_dev *hdev)
+>  	return 0;
+>  }
+>  
+> +static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid)
+> +{
+> +	u8 cmd;
+> +	struct sk_buff *skb;
+> +	struct edl_event_hdr *edl;
+> +	int err = 0;
+> +	int bid_len;
+> +
+> +	bt_dev_dbg(hdev, "QCA read board ID");
 
-This is automated email and please do not reply to this email!
+Drop this.
 
-Dear submitter,
+> +
+> +	cmd = EDL_GET_BID_REQ_CMD;
+> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
+> +				&cmd, 0, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "Reading QCA board ID failed (%d)", err);
+> +		return err;
+> +	}
+> +
+> +	edl = skb_pull_data(skb, sizeof(*edl));
+> +	if (!edl) {
+> +		bt_dev_err(hdev, "QCA read board ID with no header");
+> +		err = -EILSEQ;
+> +		goto out;
+> +	}
+> +
+> +	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+> +	    edl->rtype != EDL_GET_BID_REQ_CMD) {
+> +		bt_dev_err(hdev, "QCA Wrong packet: %d %d", edl->cresp, edl->rtype);
+> +		err = -EIO;
+> +		goto out;
+> +	}
+> +
+> +	bid_len = edl->data[0];
+> +	*bid = (edl->data[1] << 8) + edl->data[2];
+> +	bt_dev_info(hdev, "%s: bid len = %x, bid = %x", __func__, bid_len, *bid);
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=752646
+This type of information should not be printed by default.
 
----Test result---
+At most this should be dev_dbg() level, but it should probably just be
+dropped.
 
-Test Summary:
-CheckPatch                    PASS      1.31 seconds
-GitLint                       PASS      0.62 seconds
-SubjectPrefix                 PASS      0.20 seconds
-BuildKernel                   PASS      34.55 seconds
-CheckAllWarning               PASS      37.25 seconds
-CheckSparse                   PASS      42.93 seconds
-CheckSmatch                   PASS      114.27 seconds
-BuildKernel32                 PASS      33.57 seconds
-TestRunnerSetup               PASS      471.26 seconds
-TestRunner_l2cap-tester       PASS      17.27 seconds
-TestRunner_iso-tester         FAIL      24.23 seconds
-TestRunner_bnep-tester        PASS      5.78 seconds
-TestRunner_mgmt-tester        PASS      117.97 seconds
-TestRunner_rfcomm-tester      PASS      9.13 seconds
-TestRunner_sco-tester         PASS      8.52 seconds
-TestRunner_ioctl-tester       PASS      9.87 seconds
-TestRunner_mesh-tester        PASS      7.24 seconds
-TestRunner_smp-tester         PASS      8.32 seconds
-TestRunner_userchan-tester    PASS      6.05 seconds
-IncrementalBuild              PASS      36.67 seconds
+> +
+> +out:
+> +	kfree_skb(skb);
+> +	return err;
+> +}
+> +
+>  int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+>  {
+>  	struct sk_buff *skb;
+> @@ -574,6 +616,29 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>  }
+>  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>  
+> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
+> +		   size_t max_size, struct qca_btsoc_version ver, u16 bid)
+> +{
+> +	u8 rom_ver = 0;
 
-Details
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 80, Passed: 75 (93.8%), Failed: 5, Not Run: 0
+Drop the redundant initialisation.
 
-Failed Test Cases
-ISO AC 6(i) - Success                                Failed       0.239 seconds
-ISO AC 7(i) - Success                                Failed       0.237 seconds
-ISO AC 8(i) - Success                                Failed       0.238 seconds
-ISO AC 9(i) - Success                                Failed       0.243 seconds
-ISO AC 11(i) - Success                               Failed       0.238 seconds
+> +	u32 soc_ver;
+> +	const char *variant;
+> +
+> +	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
+> +	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+> +
+> +	if ((le32_to_cpu(ver.soc_id) & 0x0000ff00) == QCA_HSP_GF_SOC_ID)  /* hsp gf chip */
+> +		variant = "g";
+> +	else
+> +		variant = "";
+> +
+> +	if (bid == 0x0)
+> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
+> +	else
+> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
+> +
+> +	bt_dev_info(hdev, "%s: nvm name is %s", __func__, fwname);
 
+dev_dbg(), if at all needed.
 
----
-Regards,
-Linux Bluetooth
+> +}
+> +
+>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+>  		   const char *firmware_name)
 
+> @@ -644,7 +716,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  			snprintf(config.fwname, sizeof(config.fwname),
+>  				 "qca/crnv%02x.bin", rom_ver);
+>  		}
+> -	}
+> +	} else if (soc_type == QCA_QCA2066)
+> +		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname),
+> +				ver, boardid);
 
---===============0200713201880134901==--
+Missing brackets (if one branch has them, all of them should even the
+current code may not be following this).
+
+>  	else if (soc_type == QCA_QCA6390)
+>  		snprintf(config.fwname, sizeof(config.fwname),
+>  			 "qca/htnv%02x.bin", rom_ver);
+
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 1b064504b388..bf7683040ebd 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1729,7 +1729,7 @@ static int qca_setup(struct hci_uart *hu)
+>  	bt_dev_info(hdev, "setting up %s",
+>  		qca_is_wcn399x(soc_type) ? "wcn399x" :
+>  		(soc_type == QCA_WCN6750) ? "wcn6750" :
+> -		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
+> +		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390/QCA2066");
+
+This just looks very lazy.
+
+How about cleaning up the current implementation if you don't want to
+make this expression worse than it already is?
+
+>  
+>  	qca->memdump_state = QCA_MEMDUMP_IDLE;
+>  
+
+Johan
