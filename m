@@ -2,87 +2,163 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDF1DC77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 09:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D12FCC77B73
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 May 2023 09:34:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235178AbjEaJMJ (ORCPT
+        id S235516AbjEaJeG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 May 2023 05:12:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
+        Wed, 31 May 2023 05:34:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235411AbjEaJMG (ORCPT
+        with ESMTP id S234720AbjEaJeC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 May 2023 05:12:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3480E4C;
-        Wed, 31 May 2023 02:11:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 38812636DE;
-        Wed, 31 May 2023 09:11:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95457C433D2;
-        Wed, 31 May 2023 09:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685524312;
-        bh=dF+I5mL0Q8plAB+9FBUAtkmdRhndhxU6IkZbc2o3sws=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BQ2n96TvBTG3hCT+uNITL88gMPQbauET5d0JhFouMdJLm6DTPns3uWRrHmVzAj285
-         qkaISQWcPp0oakWTUq0IDwOJbZ/gtMDLD3YlVZ3FFmmWPYzEVAyPlX8RL+/JB1Jqcs
-         wMZhJ7EVr2cG/b5Zf+oXw0cfyhjd8WAHkQUYH4eg4AkT54OPDQDGbwt1Am7U4X3hpF
-         Ln09x4i7u9txQKbpkgHQWBCIk8tscmrsMppq8hI67F7n4tqxykbeLJIkx6+h3OXot5
-         gbVhV5/PGMAaOKND+jGAQBCBVlDBcVz1iXzBElxYx1aTctYQoiAeICJTsx+KSo+kaa
-         dSZF3WVxo5y4g==
-Received: from johan by xi.lan with local (Exim 4.94.2)
-        (envelope-from <johan@kernel.org>)
-        id 1q4Hs3-0000w0-Ip; Wed, 31 May 2023 11:11:56 +0200
-Date:   Wed, 31 May 2023 11:11:55 +0200
-From:   Johan Hovold <johan@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: [PATCH 0/2] Bluetooth: fix bdaddr quirks
-Message-ID: <ZHcPW2Utn4rQWIu5@hovoldconsulting.com>
-References: <20230424133542.14383-1-johan+linaro@kernel.org>
- <ZHYHRW-9BN4n4pPs@hovoldconsulting.com>
- <CABBYNZ+ae5h-KdAKwvCRNyDPB3W4nzyuEBzPdw72-8DLb9BAsw@mail.gmail.com>
+        Wed, 31 May 2023 05:34:02 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D262A12B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 02:34:00 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-77703f20aa9so135894139f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 02:34:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685525640; x=1688117640;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=KCvPDfwhA54XEtvqUyWdIg2ww5J2A+IjfjVie8boqa4=;
+        b=lAVB1O7hHZuFusdMfvMidJiapkFTtg2ZJoRwoysY6G+z3qop4yWhqeRHoPzVY5xLOL
+         9z/cUjxjI7FT3ncmDI2hFT7oVn1vVUctZaWUp6goCqAY5ooWtxnFJC8b75fe+GM3U+EP
+         AR8LpQbngRvG8OIJD4nxRa7YsvnqT+hKBMEB69LyBWl3Dp8tKFwaWBIYCGU4KrCDjHbe
+         fnNL8Sb+x/KPO52r/TmY9vSvMQnc6dfTjEt+oyTmwOJp1FdzGtyuwHfmhQ4R2S1Zthih
+         jAraUKqckuxHYKG2AZB5WNKNqCvaBs1C0rqrAZArQ8t0K46R8helhId81e8VG7z6gHZi
+         qclw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685525640; x=1688117640;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KCvPDfwhA54XEtvqUyWdIg2ww5J2A+IjfjVie8boqa4=;
+        b=Y7DZ3uaJx+T/VSElQ2/KwHs2szHyfr58ML9BzUB/M6aJw+h3ZPRiYSqQNi4mNytP3x
+         mQj4QXOTe4qhzASaM0EE5Yb6eT+JxJB34Rtl0jLx3M7fxM3sgkTDLV+ytomDFIJ4v8ik
+         xIWEj2zv1q8gRuGca/pZrLHLH/FCd9xi6b8VEsKUriJAak86NOB/OXUiFKy3TPdaGzXO
+         BPHwQN3lVMZPj3xbVtI9Kg/lqNfVfxUpBTA+Gukd4yOHi76E5iccu3XZZNK5CUosE0xJ
+         TElN8ApxcaDFAn7VN0IJq9f/zFH5F2PbsUmqsfJ/gUvI/EnKmY+fYGMKG/+c/xvlci3D
+         s+tg==
+X-Gm-Message-State: AC+VfDxzR6BqzI7OPbM1/c2AZQcwDasHhKc1UO5i0qXEHHaYt1sHiuWw
+        I9d91wL9Ex+3hHsHCwt2fsNGFalwaGI=
+X-Google-Smtp-Source: ACHHUZ5f4qPCigG91RxuZvLpGQLW0Qx0nr4Z01qTGE3E6SB4US0gTihozOXafHXyQAnEmNW7f0yprQ==
+X-Received: by 2002:a6b:d914:0:b0:769:a826:2818 with SMTP id r20-20020a6bd914000000b00769a8262818mr3970332ioc.16.1685525639812;
+        Wed, 31 May 2023 02:33:59 -0700 (PDT)
+Received: from [172.17.0.2] ([40.77.92.208])
+        by smtp.gmail.com with ESMTPSA id c8-20020a6bec08000000b007748d9a6bf2sm3851053ioh.19.2023.05.31.02.33.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 May 2023 02:33:59 -0700 (PDT)
+Message-ID: <64771487.6b0a0220.56ba2.5286@mx.google.com>
+Date:   Wed, 31 May 2023 02:33:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0351466407953096379=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZ+ae5h-KdAKwvCRNyDPB3W4nzyuEBzPdw72-8DLb9BAsw@mail.gmail.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: fix debugfs registration
+In-Reply-To: <20230531085759.2803-2-johan+linaro@kernel.org>
+References: <20230531085759.2803-2-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, May 30, 2023 at 01:06:01PM -0700, Luiz Augusto von Dentz wrote:
-> On Tue, May 30, 2023 at 7:25 AM Johan Hovold <johan@kernel.org> wrote:
-> > On Mon, Apr 24, 2023 at 03:35:40PM +0200, Johan Hovold wrote:
+--===============0351466407953096379==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> > > These patches fixes a couple of issues with the two bdaddr quirks:
+This is automated email and please do not reply to this email!
 
-> > Any further comments to this series, or can this one be merged for 6.5
-> > now?
-> 
-> Looks like this was removed from Patchwork since it has passed 30 days
-> without updates, could you please resend it so CI can pick it up and
-> test it again.
+Dear submitter,
 
-Both series resent:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=752636
 
-	https://lore.kernel.org/lkml/20230531085759.2803-1-johan+linaro@kernel.org/
-	https://lore.kernel.org/lkml/20230531090424.3187-1-johan+linaro@kernel.org/
+---Test result---
 
-Getting both of these, or at least the first one, into 6.4 would of
-course be even better.
+Test Summary:
+CheckPatch                    FAIL      1.67 seconds
+GitLint                       FAIL      0.82 seconds
+SubjectPrefix                 PASS      0.20 seconds
+BuildKernel                   PASS      32.16 seconds
+CheckAllWarning               PASS      35.70 seconds
+CheckSparse                   PASS      40.62 seconds
+CheckSmatch                   PASS      110.56 seconds
+BuildKernel32                 PASS      31.75 seconds
+TestRunnerSetup               PASS      452.79 seconds
+TestRunner_l2cap-tester       PASS      17.51 seconds
+TestRunner_iso-tester         FAIL      23.43 seconds
+TestRunner_bnep-tester        PASS      5.67 seconds
+TestRunner_mgmt-tester        PASS      116.32 seconds
+TestRunner_rfcomm-tester      PASS      9.11 seconds
+TestRunner_sco-tester         PASS      8.39 seconds
+TestRunner_ioctl-tester       PASS      9.81 seconds
+TestRunner_mesh-tester        PASS      7.18 seconds
+TestRunner_smp-tester         PASS      8.32 seconds
+TestRunner_userchan-tester    PASS      6.05 seconds
+IncrementalBuild              PASS      34.63 seconds
 
-Thanks.
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[RESEND,1/2] Bluetooth: fix debugfs registration
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#82: 
+	debugfs: File 'quirk_simultaneous_discovery' in directory 'hci0' already present!
 
-Johan
+total: 0 errors, 1 warnings, 0 checks, 16 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13261771.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[RESEND,1/2] Bluetooth: fix debugfs registration
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+12: B3 Line contains hard tab characters (\t): "	debugfs: File 'features' in directory 'hci0' already present!"
+13: B3 Line contains hard tab characters (\t): "	debugfs: File 'manufacturer' in directory 'hci0' already present!"
+14: B3 Line contains hard tab characters (\t): "	debugfs: File 'hci_version' in directory 'hci0' already present!"
+15: B3 Line contains hard tab characters (\t): "	..."
+16: B1 Line exceeds max length (82>80): "	debugfs: File 'quirk_simultaneous_discovery' in directory 'hci0' already present!"
+16: B3 Line contains hard tab characters (\t): "	debugfs: File 'quirk_simultaneous_discovery' in directory 'hci0' already present!"
+[RESEND,2/2] Bluetooth: hci_qca: fix debugfs registration
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+10: B3 Line contains hard tab characters (\t): "	debugfs: Directory 'ibs' with parent 'hci0' already present!"
+15: B3 Line contains hard tab characters (\t): "Cc: stable@vger.kernel.org	# 4.20"
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 80, Passed: 75 (93.8%), Failed: 5, Not Run: 0
+
+Failed Test Cases
+ISO AC 6(i) - Success                                Failed       0.225 seconds
+ISO AC 7(i) - Success                                Failed       0.226 seconds
+ISO AC 8(i) - Success                                Failed       0.232 seconds
+ISO AC 9(i) - Success                                Failed       0.232 seconds
+ISO AC 11(i) - Success                               Failed       0.224 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0351466407953096379==--
