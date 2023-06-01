@@ -2,515 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B694AC77B7E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 06:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8D6C77B7E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 07:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231680AbjFAGfU (ORCPT
+        id S232085AbjFAHmr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Jun 2023 02:35:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49060 "EHLO
+        Thu, 1 Jun 2023 03:42:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231653AbjFAGfS (ORCPT
+        with ESMTP id S232093AbjFAHkh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Jun 2023 02:35:18 -0400
-Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 190E0E2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 23:35:16 -0700 (PDT)
-Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pav)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 4QWxFr4ZXJz10LN;
-        Thu,  1 Jun 2023 09:35:12 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1685601312;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wMu9MFs031Luusc28bD+gD0i3zSLzoBQxvPfaZZbJlc=;
-        b=ietYhThdFpvBrJ9776xj7k9pNez3cvBpi53Q4t7ubdAIX2qAsTsk2WaekcZx8Z/ILfyvtx
-        wCF43TJIiYPLGxeln7PMzQ415SaaObisOkHuQ2gxHUN13bkPHTWKDnQE9VvqAJ5z1bTDkT
-        c6zwDdV/kfkZTIn5Xp2GVUhHmVSjJZQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1685601312;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wMu9MFs031Luusc28bD+gD0i3zSLzoBQxvPfaZZbJlc=;
-        b=f2LDcErZEiQRfLUAkwd5jjn/NnlFmZzASEHSdFN3eisaAwPrm+tGhtwayRtkiHefwUbPPl
-        c4TIt3REMuZ7P8bYqgGL3M2OnvLhRZMLkdxi6tp9Kgcg7UMY5rPVBndoP4XCcAXTfpjzPV
-        M4e95QY98amQeKOJxzaKQsFVjrbt9+Q=
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1685601312; a=rsa-sha256; cv=none;
-        b=R+DzKgIKyPgGRCPCFc3pt37nuhvKK4QD+20DeBhplke7n3qL2t3QFZ+Zc9HDtybL8zzbCA
-        3JovbiHD+bRjlZsDI98iuAr0S0N+I0l5nCxoQTxG0rx5CUCkRPLMhvLILFM78GzL87ub1n
-        OBDOeh8h/45oRuqUSlmFUsIWpTgm9kc=
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH v2 4/4] Bluetooth: ISO: do not emit new LE Create CIS if previous is pending
-Date:   Thu,  1 Jun 2023 09:34:46 +0300
-Message-Id: <e3935e8c8d3870d0a9fa9b328f882630b047bd30.1685565568.git.pav@iki.fi>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <cover.1685565568.git.pav@iki.fi>
-References: <cover.1685565568.git.pav@iki.fi>
+        Thu, 1 Jun 2023 03:40:37 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A6D3E4C
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jun 2023 00:36:52 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b0478487c3so1687725ad.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Jun 2023 00:36:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685605011; x=1688197011;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=w404iGXLLG9CMCWagZyqh8c4fTPGzxKZaCD+misHwLU=;
+        b=gRniD/sIQ4FSFRaD1/cK6bPl3C7epoM6L89j2ifQE/wBrI+ui3j9UNla4jiMbNEP4N
+         VWL+SiiHhNnPJePvhv+RdY1a5ChDWALZCeF4pCiMf0NI5jS4rHMMz9sRdkxTFZEJRQlm
+         jhBLDvb2DTJqkWjb9cgnIheDm0eNwQsh+PsmrHJg2TedsyTitjFkZhVun3oMMY4gwYMV
+         /s2q4GkHXAHUZ2i3/HnFT+kyiZ4GiMILy8WOzT1lOJHorp1D/oG7PZpLb36u5R9A1bsq
+         Z88sgXNpnHFfwsKTyISpwvhMX4KEwf3sd5qx2GqVeRbfWSAH/YixOuUNRktGZmsaEAhb
+         6OQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685605011; x=1688197011;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w404iGXLLG9CMCWagZyqh8c4fTPGzxKZaCD+misHwLU=;
+        b=JgYOSJRgKG4XKmjDqYFvRZZVUieMcaXPxQkkmstqV5ZYRA+NxkSIduPuXdk/9EZk6V
+         1tIHdK9ANIbQl9tpsR+DhAs3J4BpORUGDsQcrAvv8Y/XYCHst5XlyuNhfgiBoPARrDQq
+         3zJLTiHOc+vu4t+x12aml3YFUVoYAMFD+YXjMpjwoVNBsyKlgSXeU34shGcfyVSRvSbb
+         uCcB7WBzWbpcqB7ZPr3itrRd59TLph6PVeHN5kLnb21fCN+iE3sS8ONDeVdc/DThvaK1
+         jDbJjW8o+RMc0QuX8CbnsS3N1GQwuxDcNRVgWlTmtjFSFNq/JjeHNwXN1SDzRw4sS2ED
+         n+Og==
+X-Gm-Message-State: AC+VfDxadMNSoFX5TbHFIzyvC46k9LfFEaOn/t6+IG1Z63oix0Ktrsy4
+        BkfyzEUtO+beP+xF/cQGxWUlntQ2K7I=
+X-Google-Smtp-Source: ACHHUZ4aKR7xQqya/GvZm0YKO7wvu014Vp1sxr/VOjBg01zwrterXhYnvY9NHb1tJysUkgdnb7Kp0g==
+X-Received: by 2002:a17:902:c78c:b0:1b0:4baa:ba92 with SMTP id w12-20020a170902c78c00b001b04baaba92mr5039192pla.1.1685605011418;
+        Thu, 01 Jun 2023 00:36:51 -0700 (PDT)
+Received: from [172.17.0.2] ([52.160.111.17])
+        by smtp.gmail.com with ESMTPSA id c3-20020a170902d48300b001b050db1894sm2710785plg.36.2023.06.01.00.36.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 00:36:51 -0700 (PDT)
+Message-ID: <64784a93.170a0220.3a473.5204@mx.google.com>
+Date:   Thu, 01 Jun 2023 00:36:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6568576615664573847=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: LE Set CIG Parameters / Create CIS fixes
+In-Reply-To: <97114b5f17f44d913c564f4ac8b41726c3a8eeae.1685565568.git.pav@iki.fi>
+References: <97114b5f17f44d913c564f4ac8b41726c3a8eeae.1685565568.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-LE Create CIS command shall not be sent before all CIS Established
-events from its previous invocation have been processed. Currently it is
-sent via hci_sync but that only waits for the first event, but there can
-be multiple.
+--===============6568576615664573847==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Make it wait for all events, and simplify the CIS creation as follows:
+This is automated email and please do not reply to this email!
 
-Add new flag HCI_CONN_CREATE_CIS, which is set if Create CIS has been
-sent for the connection but it is not yet completed.
+Dear submitter,
 
-Make BT_CONNECT state to mean the connection wants Create CIS.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=752943
 
-On events after which new Create CIS may need to be sent, send it if
-possible and some connections need it. These events are:
-hci_connect_cis, iso_connect_cfm, hci_cs_le_create_cis,
-hci_le_cis_estabilished_evt.
+---Test result---
 
-The Create CIS status/completion events shall queue new Create CIS only
-if at least one of the connections transitions away from BT_CONNECT, so
-that we don't loop if controller is sending bogus events.
+Test Summary:
+CheckPatch                    PASS      3.68 seconds
+GitLint                       PASS      1.00 seconds
+SubjectPrefix                 PASS      0.28 seconds
+BuildKernel                   PASS      38.01 seconds
+CheckAllWarning               PASS      42.14 seconds
+CheckSparse                   WARNING   47.48 seconds
+CheckSmatch                   WARNING   129.23 seconds
+BuildKernel32                 PASS      37.72 seconds
+TestRunnerSetup               PASS      528.41 seconds
+TestRunner_l2cap-tester       PASS      19.39 seconds
+TestRunner_iso-tester         PASS      27.00 seconds
+TestRunner_bnep-tester        PASS      6.56 seconds
+TestRunner_mgmt-tester        PASS      132.55 seconds
+TestRunner_rfcomm-tester      PASS      10.70 seconds
+TestRunner_sco-tester         PASS      9.77 seconds
+TestRunner_ioctl-tester       PASS      11.76 seconds
+TestRunner_mesh-tester        PASS      8.46 seconds
+TestRunner_smp-tester         PASS      9.57 seconds
+TestRunner_userchan-tester    PASS      6.95 seconds
+IncrementalBuild              PASS      81.16 seconds
 
-This fixes sending multiple CIS Create for the same CIS in the
-"ISO AC 6(i) - Success" BlueZ test case:
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
 
-< HCI Command: LE Create Co.. (0x08|0x0064) plen 9  #129 [hci0]
-        Number of CIS: 2
-        CIS Handle: 257
-        ACL Handle: 42
-        CIS Handle: 258
-        ACL Handle: 42
-> HCI Event: Command Status (0x0f) plen 4           #130 [hci0]
-      LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 29           #131 [hci0]
-      LE Connected Isochronous Stream Established (0x19)
-        Status: Success (0x00)
-        Connection Handle: 257
-        ...
-< HCI Command: LE Setup Is.. (0x08|0x006e) plen 13  #132 [hci0]
-        ...
-> HCI Event: Command Complete (0x0e) plen 6         #133 [hci0]
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        ...
-< HCI Command: LE Create Co.. (0x08|0x0064) plen 5  #134 [hci0]
-        Number of CIS: 1
-        CIS Handle: 258
-        ACL Handle: 42
-> HCI Event: Command Status (0x0f) plen 4           #135 [hci0]
-      LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
-        Status: ACL Connection Already Exists (0x0b)
-> HCI Event: LE Meta Event (0x3e) plen 29           #136 [hci0]
-      LE Connected Isochronous Stream Established (0x19)
-        Status: Success (0x00)
-        Connection Handle: 258
-        ...
 
-Fixes: c09b80be6ffc ("Bluetooth: hci_conn: Fix not waiting for HCI_EVT_LE_CIS_ESTABLISHED")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    v2: no changes
 
- include/net/bluetooth/hci_core.h |  4 +-
- include/net/bluetooth/hci_sync.h |  2 +-
- net/bluetooth/hci_conn.c         | 74 +++++++++++---------------
- net/bluetooth/hci_event.c        | 27 +++++++---
- net/bluetooth/hci_sync.c         | 90 ++++++++++++++++++++++----------
- net/bluetooth/iso.c              |  2 +-
- 6 files changed, 118 insertions(+), 81 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 74ec1f40ab6b..2a29ea8e808c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -976,6 +976,7 @@ enum {
- 	HCI_CONN_AUTH_FAILURE,
- 	HCI_CONN_PER_ADV,
- 	HCI_CONN_BIG_CREATED,
-+	HCI_CONN_CREATE_CIS,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-@@ -1351,7 +1352,8 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason);
- bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
- void hci_sco_setup(struct hci_conn *conn, __u8 status);
- bool hci_iso_setup_path(struct hci_conn *conn);
--int hci_le_create_cis(struct hci_conn *conn);
-+int hci_le_create_cis_pending(struct hci_dev *hdev);
-+int hci_conn_check_create_cis(struct hci_conn *conn);
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			      u8 role);
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 2495be4d8b82..b516a0f4a55b 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -124,7 +124,7 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason);
- 
- int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn);
- 
--int hci_le_create_cis_sync(struct hci_dev *hdev, struct hci_conn *conn);
-+int hci_le_create_cis_sync(struct hci_dev *hdev);
- 
- int hci_le_remove_cig_sync(struct hci_dev *hdev, u8 handle);
- 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 15cba23ade52..7d4941e6dbdf 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1992,59 +1992,47 @@ bool hci_iso_setup_path(struct hci_conn *conn)
- 	return true;
- }
- 
-+int hci_conn_check_create_cis(struct hci_conn *conn)
-+{
-+	if (conn->type != ISO_LINK || !bacmp(&conn->dst, BDADDR_ANY))
-+		return -EINVAL;
-+
-+	if (!conn->parent || conn->parent->state != BT_CONNECTED ||
-+	    conn->state != BT_CONNECT || conn->handle == HCI_CONN_HANDLE_UNSET)
-+		return 1;
-+
-+	return 0;
-+}
-+
- static int hci_create_cis_sync(struct hci_dev *hdev, void *data)
- {
--	return hci_le_create_cis_sync(hdev, data);
-+	return hci_le_create_cis_sync(hdev);
- }
- 
--int hci_le_create_cis(struct hci_conn *conn)
-+int hci_le_create_cis_pending(struct hci_dev *hdev)
- {
--	struct hci_conn *cis;
--	struct hci_link *link, *t;
--	struct hci_dev *hdev = conn->hdev;
--	int err;
-+	struct hci_conn *conn;
-+	bool pending = false;
- 
--	bt_dev_dbg(hdev, "hcon %p", conn);
-+	rcu_read_lock();
- 
--	switch (conn->type) {
--	case LE_LINK:
--		if (conn->state != BT_CONNECTED || list_empty(&conn->link_list))
--			return -EINVAL;
--
--		cis = NULL;
--
--		/* hci_conn_link uses list_add_tail_rcu so the list is in
--		 * the same order as the connections are requested.
--		 */
--		list_for_each_entry_safe(link, t, &conn->link_list, list) {
--			if (link->conn->state == BT_BOUND) {
--				err = hci_le_create_cis(link->conn);
--				if (err)
--					return err;
--
--				cis = link->conn;
--			}
-+	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-+		if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags)) {
-+			rcu_read_unlock();
-+			return -EBUSY;
- 		}
- 
--		return cis ? 0 : -EINVAL;
--	case ISO_LINK:
--		cis = conn;
--		break;
--	default:
--		return -EINVAL;
-+		if (!hci_conn_check_create_cis(conn))
-+			pending = true;
- 	}
- 
--	if (cis->state == BT_CONNECT)
-+	rcu_read_unlock();
-+
-+	if (!pending)
- 		return 0;
- 
- 	/* Queue Create CIS */
--	err = hci_cmd_sync_queue(hdev, hci_create_cis_sync, cis, NULL);
--	if (err)
--		return err;
--
--	cis->state = BT_CONNECT;
--
--	return 0;
-+	return hci_cmd_sync_queue(hdev, hci_create_cis_sync, NULL, NULL);
- }
- 
- static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
-@@ -2319,11 +2307,9 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
- 		return NULL;
- 	}
- 
--	/* If LE is already connected and CIS handle is already set proceed to
--	 * Create CIS immediately.
--	 */
--	if (le->state == BT_CONNECTED && cis->handle != HCI_CONN_HANDLE_UNSET)
--		hci_le_create_cis(cis);
-+	cis->state = BT_CONNECT;
-+
-+	hci_le_create_cis_pending(hdev);
- 
- 	return cis;
- }
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d0ccb8ebdcc9..f48456863c27 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3807,6 +3807,7 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
- 	struct hci_cp_le_set_cig_params *cp;
- 	struct hci_conn *conn;
- 	u8 status = rp->status;
-+	bool pending = false;
- 	int i;
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-@@ -3855,13 +3856,8 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
- 			bt_dev_dbg(hdev, "%p handle 0x%4.4x parent %p",
- 				   conn, conn->handle, conn->parent);
- 
--			/* Create CIS if LE is already connected */
--			if (conn->parent &&
--			    conn->parent->state == BT_CONNECTED) {
--				rcu_read_unlock();
--				hci_le_create_cis(conn);
--				rcu_read_lock();
--			}
-+			if (conn->state == BT_CONNECT)
-+				pending = true;
- 
- 			break;
- 		}
-@@ -3870,6 +3866,9 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
- 	rcu_read_unlock();
- 
- unlock:
-+	if (pending)
-+		hci_le_create_cis_pending(hdev);
-+
- 	hci_dev_unlock(hdev);
- 
- 	return rp->status;
-@@ -4235,6 +4234,7 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
- static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_cp_le_create_cis *cp;
-+	bool pending = false;
- 	int i;
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-@@ -4257,12 +4257,18 @@ static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
- 
- 		conn = hci_conn_hash_lookup_handle(hdev, handle);
- 		if (conn) {
-+			if (test_and_clear_bit(HCI_CONN_CREATE_CIS,
-+					       &conn->flags))
-+				pending = true;
- 			conn->state = BT_CLOSED;
- 			hci_connect_cfm(conn, status);
- 			hci_conn_del(conn);
- 		}
- 	}
- 
-+	if (pending)
-+		hci_le_create_cis_pending(hdev);
-+
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -6805,6 +6811,7 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
- {
- 	struct hci_evt_le_cis_established *ev = data;
- 	struct hci_conn *conn;
-+	bool pending = false;
- 	u16 handle = __le16_to_cpu(ev->handle);
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
-@@ -6826,6 +6833,8 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
-+	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags);
-+
- 	if (conn->role == HCI_ROLE_SLAVE) {
- 		__le32 interval;
- 
-@@ -6851,10 +6860,14 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
-+	conn->state = BT_CLOSED;
- 	hci_connect_cfm(conn, ev->status);
- 	hci_conn_del(conn);
- 
- unlock:
-+	if (pending)
-+		hci_le_create_cis_pending(hdev);
-+
- 	hci_dev_unlock(hdev);
- }
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a59695f04c25..dd011ddc1aff 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6170,56 +6170,92 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	return err;
- }
- 
--int hci_le_create_cis_sync(struct hci_dev *hdev, struct hci_conn *conn)
-+int hci_le_create_cis_sync(struct hci_dev *hdev)
- {
- 	struct {
- 		struct hci_cp_le_create_cis cp;
- 		struct hci_cis cis[0x1f];
- 	} cmd;
--	u8 cig;
--	struct hci_conn *hcon = conn;
-+	struct hci_conn *conn;
-+	u8 cig = BT_ISO_QOS_CIG_UNSET;
-+
-+	/* The spec allows only one pending LE Create CIS command at a time. If
-+	 * the command is pending now, don't do anything. We check for pending
-+	 * connections after each CIS Established event.
-+	 *
-+	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-+	 * page 2566:
-+	 *
-+	 * If the Host issues this command before all the
-+	 * HCI_LE_CIS_Established events from the previous use of the
-+	 * command have been generated, the Controller shall return the
-+	 * error code Command Disallowed (0x0C).
-+	 *
-+	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-+	 * page 2567:
-+	 *
-+	 * When the Controller receives the HCI_LE_Create_CIS command, the
-+	 * Controller sends the HCI_Command_Status event to the Host. An
-+	 * HCI_LE_CIS_Established event will be generated for each CIS when it
-+	 * is established or if it is disconnected or considered lost before
-+	 * being established; until all the events are generated, the command
-+	 * remains pending.
-+	 */
- 
- 	memset(&cmd, 0, sizeof(cmd));
--	cmd.cis[0].acl_handle = cpu_to_le16(conn->parent->handle);
--	cmd.cis[0].cis_handle = cpu_to_le16(conn->handle);
--	cmd.cp.num_cis++;
--	cig = conn->iso_qos.ucast.cig;
- 
- 	hci_dev_lock(hdev);
- 
- 	rcu_read_lock();
- 
-+	/* Wait until previous Create CIS has completed */
-+	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-+		if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags))
-+			goto done;
-+	}
-+
-+	/* Find CIG with all CIS ready */
-+	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-+		struct hci_conn *link;
-+
-+		if (hci_conn_check_create_cis(conn))
-+			continue;
-+
-+		cig = conn->iso_qos.ucast.cig;
-+
-+		list_for_each_entry_rcu(link, &hdev->conn_hash.list, list) {
-+			if (hci_conn_check_create_cis(link) > 0 &&
-+			    link->iso_qos.ucast.cig == cig &&
-+			    link->state != BT_CONNECTED) {
-+				cig = BT_ISO_QOS_CIG_UNSET;
-+				break;
-+			}
-+		}
-+
-+		if (cig != BT_ISO_QOS_CIG_UNSET)
-+			break;
-+	}
-+
-+	if (cig == BT_ISO_QOS_CIG_UNSET)
-+		goto done;
-+
- 	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
- 		struct hci_cis *cis = &cmd.cis[cmd.cp.num_cis];
- 
--		if (conn == hcon || conn->type != ISO_LINK ||
--		    conn->state == BT_CONNECTED ||
-+		if (hci_conn_check_create_cis(conn) ||
- 		    conn->iso_qos.ucast.cig != cig)
- 			continue;
- 
--		/* Check if all CIS(s) belonging to a CIG are ready */
--		if (!conn->parent || conn->parent->state != BT_CONNECTED ||
--		    conn->state != BT_CONNECT) {
--			cmd.cp.num_cis = 0;
--			break;
--		}
--
--		/* Group all CIS with state BT_CONNECT since the spec don't
--		 * allow to send them individually:
--		 *
--		 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
--		 * page 2566:
--		 *
--		 * If the Host issues this command before all the
--		 * HCI_LE_CIS_Established events from the previous use of the
--		 * command have been generated, the Controller shall return the
--		 * error code Command Disallowed (0x0C).
--		 */
-+		set_bit(HCI_CONN_CREATE_CIS, &conn->flags);
- 		cis->acl_handle = cpu_to_le16(conn->parent->handle);
- 		cis->cis_handle = cpu_to_le16(conn->handle);
- 		cmd.cp.num_cis++;
-+
-+		if (cmd.cp.num_cis >= ARRAY_SIZE(cmd.cis))
-+			break;
- 	}
- 
-+done:
- 	rcu_read_unlock();
- 
- 	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 485348fcc030..73ac9753728b 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1681,7 +1681,7 @@ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
- 		}
- 
- 		/* Create CIS if pending */
--		hci_le_create_cis(hcon);
-+		hci_le_create_cis_pending(hcon->hdev);
- 		return;
- 	}
- 
--- 
-2.40.1
-
+--===============6568576615664573847==--
