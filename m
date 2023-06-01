@@ -2,192 +2,197 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C83F6C7EE2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 10:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3FFBC77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 22:02:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233449AbjFAKVI (ORCPT
+        id S232994AbjFAWCE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:21:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55658 "EHLO
+        Thu, 1 Jun 2023 18:02:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233991AbjFAKUM (ORCPT
+        with ESMTP id S230220AbjFAWCD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:20:12 -0400
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B962722
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jun 2023 03:16:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1685614617; x=1717150617;
-  h=date:from:to:cc:subject:message-id;
-  bh=yN7MSwzr2qKDbnxOQufUPrV+XvAAEtk0LIHsTEYI5Lc=;
-  b=a3jgW+Ye214nno2MNJqo9hDExlB3WrwkV1/hi+m192qGf+Tdz4MW7O0y
-   dSIuhcrwhkn68QGgd+3UePLpPhfvINvKxdMkrh8ddNif5Kn3lO2NkGnZ9
-   YdVnQ56Cz60F/y57rmQDSh5/Y0bln030HIzNAfwH+OgFm+Yb2WfDQF53J
-   zeimR7pDCispbka7mbhPs8okAsCR14ZinInEOQwjJ+tD8xNiDUOIldf32
-   fHXg//DkjQckB3NjCN6bZechxj5D+XQjzKaR1noBVaClm50kgnStIKXrn
-   Cv2sPlj/u+ZtYyDS54gLSa+qQX2JT2jsOtc2RTfuOmj8Y3P6QkEk1SY73
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="419016830"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="419016830"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 03:13:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="737050824"
-X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
-   d="scan'208";a="737050824"
-Received: from lkp-server01.sh.intel.com (HELO fb1ced2c09fb) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 01 Jun 2023 03:13:35 -0700
-Received: from kbuild by fb1ced2c09fb with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q4fJE-0002B3-2h;
-        Thu, 01 Jun 2023 10:13:32 +0000
-Date:   Thu, 01 Jun 2023 18:13:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 0e31289b2827062975194a68c0ae4d854cd87a81
-Message-ID: <20230601101323.7AIPW%lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Thu, 1 Jun 2023 18:02:03 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D002E18D
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jun 2023 15:02:00 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230601220157euoutp02776f43b3435cbbfef3e5aeabc9df4b8a~kqAkGhlIM3221532215euoutp02n
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jun 2023 22:01:57 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230601220157euoutp02776f43b3435cbbfef3e5aeabc9df4b8a~kqAkGhlIM3221532215euoutp02n
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1685656917;
+        bh=3WrzPlGJEtUHzBKCdYc00TeSvSfBzqLWzwawyBbA3wE=;
+        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
+        b=aqCmWAmLskG8ygGerKJvAebj5GGH/XmcRcd/IAkajZGacxD0nENOwAyqE+XoHwzV6
+         q3zBp8omBnHxhEEcxIuUnFdFmLr5oVW21k29W7nV6EYDBgkD9uH7oYKKKZBPLrXRNC
+         muXcPn7I1ZpUfJSn81ksdBMeX0AnyfPYGzgKPZYI=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20230601220156eucas1p13086dbb1e50c6b3636b227b01192b79a~kqAjtZP2h2463824638eucas1p10;
+        Thu,  1 Jun 2023 22:01:56 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 11.2A.42423.45519746; Thu,  1
+        Jun 2023 23:01:56 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20230601220156eucas1p21caabcf02509fce7eb26f973704980f9~kqAjbK75X2908229082eucas1p2d;
+        Thu,  1 Jun 2023 22:01:56 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20230601220156eusmtrp20c88fe638cfc3c841284c69853b6d229~kqAjanaEr1406014060eusmtrp2d;
+        Thu,  1 Jun 2023 22:01:56 +0000 (GMT)
+X-AuditID: cbfec7f2-a51ff7000002a5b7-93-647915548c7e
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id EE.EA.14344.45519746; Thu,  1
+        Jun 2023 23:01:56 +0100 (BST)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20230601220156eusmtip261d66749e5ad25ba0b01fc271cda08ce~kqAjAvrDF2825028250eusmtip2z;
+        Thu,  1 Jun 2023 22:01:56 +0000 (GMT)
+Message-ID: <ecef83c8-497f-4011-607b-a63c24764867@samsung.com>
+Date:   Fri, 2 Jun 2023 00:01:55 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0)
+        Gecko/20100101 Thunderbird/102.11.0
+Subject: Re: [PATCH RESEND 2/2] Bluetooth: fix use-bdaddr-property quirk
+Content-Language: en-US
+To:     Johan Hovold <johan+linaro@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+In-Reply-To: <20230531090424.3187-3-johan+linaro@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsWy7djPc7ohopUpBh936FqsqLTYNfUYs8Wc
+        a33MFpd3zWGzePp5CqvFt0+/GC0+b3jM6MDuMbvhIovHzll32T3W717O7rFpVSebx+dNcgGs
+        UVw2Kak5mWWpRfp2CVwZTXsWMhfskK54ufo2UwPjU7EuRk4OCQETibdL/rJ1MXJxCAmsYJS4
+        tmYBM4TzhVGipXc3E4TzmVFi89JbzDAtc5beZoFILGeU6Dl2lRHC+cgo8XPdMhaQKl4BO4mP
+        nY9ZQWwWARWJg/dvsULEBSVOznwCViMqkCrxbe4OsLiwgIfEy7NrwGxmAXGJW0/mM4HYIgJr
+        GSUOL9GGiGdKHDm+HuwKNgFDia63XWwgNqeAjcTi/21MEDXyEs1bZ0NdeodD4v3nOAjbRWLN
+        k4lMELawxKvjW9ghbBmJ/zvng70pIdDOKLHg930oZwKjRMPzW4wQVdYSd879AtrGAbRBU2L9
+        Ln2IsKPE/btzmUHCEgJ8EjfeCkLcwCcxadt0qDCvREebEES1msSs4+vg1h68cIl5AqPSLKRQ
+        mYXk+1lIvpmFsHcBI8sqRvHU0uLc9NRiw7zUcr3ixNzi0rx0veT83E2MwAR0+t/xTzsY5776
+        qHeIkYmD8RCjBAezkgivUFh5ihBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFebduTyUIC6Yklqdmp
+        qQWpRTBZJg5OqQamKvNenyjbB4a/Lx3xqlx8d67DHeMXiq0JKp80uUq7VHkNz5WWh/ls/Gt0
+        LdK9yniq/NEC8SNKB1xzufNWr9jW+iSb4YTV+5uvp60t59HfoFXk9EFig71dv135psuHHu/p
+        PKiSXfIm4F0qv8aH56zLdh5S7XTNXta1Y+X9tM3XZ37t9f/SslZ4vdua5n8qgg9uiny8redr
+        GHNnRv+P/pWNs3J9Iozrp55ISEtJEkwQXH736iaDJTfVnqbf7Sk5FLS9Ne/y2wleL312WN+4
+        HeixbFXhnOnysVMOhNU4q/I35G4Jf3pxtZXgsYebzG39Z9qZpbfNz7QtWfH4rr2gAL//8+V6
+        9wyM/dntWSYrxd1SYinOSDTUYi4qTgQA9cCZo68DAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrLIsWRmVeSWpSXmKPExsVy+t/xe7ohopUpBls7ZS1WVFrsmnqM2WLO
+        tT5mi8u75rBZPP08hdXi26dfjBafNzxmdGD3mN1wkcVj56y77B7rdy9n99i0qpPN4/MmuQDW
+        KD2bovzSklSFjPziElulaEMLIz1DSws9IxNLPUNj81grI1MlfTublNSczLLUIn27BL2Mpj0L
+        mQt2SFe8XH2bqYHxqVgXIyeHhICJxJylt1m6GLk4hASWMkoceT2XHSIhI3FyWgMrhC0s8eda
+        FxuILSTwnlHi/AlvEJtXwE7iY+djsBoWARWJg/dvsULEBSVOznzCAmKLCqRK9H5ZwQhiCwt4
+        SLw8uwashllAXOLWk/lMIItFBNYzSiz69haogQMokSlxuUMbYleuxIJFm5hAbDYBQ4mutxA3
+        cArYSCz+38YEMcdMomtrFyOELS/RvHU28wRGoVlIzpiFZN0sJC2zkLQsYGRZxSiSWlqcm55b
+        bKRXnJhbXJqXrpecn7uJERhv24793LKDceWrj3qHGJk4GA8xSnAwK4nwCoWVpwjxpiRWVqUW
+        5ccXleakFh9iNAWGxURmKdHkfGDE55XEG5oZmBqamFkamFqaGSuJ83oWdCQKCaQnlqRmp6YW
+        pBbB9DFxcEo1MO1LVjUQ3L3z12rm087JKZF33iYcNzIqn3j3HKfks41q5tvP87Y+vdn8Svik
+        cU5aqU/DOb6W82ml65+vjfr3Wrb0aeup/dK9M2oy3u/9eD9pyd6HDvMt/FMN/pjkLG5gMZBq
+        u6QtfWLy0b9rziRNj34sUcB0Qnxda33N2209TwPq5BlUdGIC27+sy5926NAuwwdPnAStzIJm
+        LA2axvWPvWv9/H3qijtc928oLBT/7Lh34cuNudfk/6vu+T733TG/wz6eXAadu3xOHHxn9JLf
+        ++zdNTJCR31nXDv2W3iudHzOuSlil2vYeO7vDT6ZaPmlQlThSiTXtKehbqoXru7QF5q09Fnz
+        Ma3IujduOfGr+xyVWIozEg21mIuKEwG8+g2VQAMAAA==
+X-CMS-MailID: 20230601220156eucas1p21caabcf02509fce7eb26f973704980f9
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20230601220156eucas1p21caabcf02509fce7eb26f973704980f9
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230601220156eucas1p21caabcf02509fce7eb26f973704980f9
+References: <20230531090424.3187-1-johan+linaro@kernel.org>
+        <20230531090424.3187-3-johan+linaro@kernel.org>
+        <CGME20230601220156eucas1p21caabcf02509fce7eb26f973704980f9@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 0e31289b2827062975194a68c0ae4d854cd87a81  Bluetooth: Fix l2cap_disconnect_req deadlock
+On 31.05.2023 11:04, Johan Hovold wrote:
+> Devices that lack persistent storage for the device address can indicate
+> this by setting the HCI_QUIRK_INVALID_BDADDR which causes the controller
+> to be marked as unconfigured until user space has set a valid address.
+>
+> The related HCI_QUIRK_USE_BDADDR_PROPERTY was later added to similarly
+> indicate that the device lacks a valid address but that one may be
+> specified in the devicetree.
+>
+> As is clear from commit 7a0e5b15ca45 ("Bluetooth: Add quirk for reading
+> BD_ADDR from fwnode property") that added and documented this quirk and
+> commits like de79a9df1692 ("Bluetooth: btqcomsmd: use
+> HCI_QUIRK_USE_BDADDR_PROPERTY"), the device address of controllers with
+> this flag should be treated as invalid until user space has had a chance
+> to configure the controller in case the devicetree property is missing.
+>
+> As it does not make sense to allow controllers with invalid addresses,
+> restore the original semantics, which also makes sure that the
+> implementation is consistent (e.g. get_missing_options() indicates that
+> the address must be set) and matches the documentation (including
+> comments in the code, such as, "In case any of them is set, the
+> controller has to start up as unconfigured.").
+>
+> Fixes: e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD address missing in dts")
+> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
 
-elapsed time: 902m
+This patch has been recently merged to linux-next as commit 6ac517d8cf8b 
+("Bluetooth: fix use-bdaddr-property quirk"). Unfortunately it breaks 
+bluetooth operation on my Raspberry Pi 3b+, 4b+ and Khadas VIM3 based 
+test systems.
 
-configs tested: 120
-configs skipped: 6
+Before this patch on Raspberry Pi 4b+:
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+root@target:~# dmesg | grep hci0
+[   14.459292] Bluetooth: hci0: BCM: chip id 107
+[   14.464283] Bluetooth: hci0: BCM: features 0x2f
+[   14.470632] Bluetooth: hci0: BCM4345C0
+[   14.474483] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0000
+[   14.487275] Bluetooth: hci0: BCM4345C0 'brcm/BCM4345C0.hcd' Patch
+[   15.347542] Bluetooth: hci0: BCM: features 0x2f
+[   15.354588] Bluetooth: hci0: BCM43455 37.4MHz Raspberry Pi 3+-0159
+[   15.361076] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0290
+root@target:~# hcitool dev
+Devices:
+         hci0    DC:A6:32:12:38:D1
+root@target:~#
+root@target:~# hcitool scan
+Scanning ...
+         88:57:1D:AB:19:B2    Samsung Family Hub
+root@target:~# hcitool | head -n1
+hcitool - HCI Tool ver 5.50
+root@target:~#
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha        buildonly-randconfig-r001-20230531   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r032-20230531   gcc  
-alpha                randconfig-r035-20230531   gcc  
-arc                              allyesconfig   gcc  
-arc          buildonly-randconfig-r005-20230531   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r043-20230531   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r046-20230531   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r024-20230531   clang
-csky                                defconfig   gcc  
-csky                 randconfig-r016-20230531   gcc  
-hexagon              randconfig-r013-20230531   clang
-hexagon              randconfig-r034-20230531   clang
-hexagon              randconfig-r041-20230531   clang
-hexagon              randconfig-r045-20230531   clang
-i386                             allyesconfig   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230531   gcc  
-i386                 randconfig-i002-20230531   gcc  
-i386                 randconfig-i003-20230531   gcc  
-i386                 randconfig-i004-20230531   gcc  
-i386                 randconfig-i005-20230531   gcc  
-i386                 randconfig-i006-20230531   gcc  
-i386                 randconfig-i011-20230531   clang
-i386                 randconfig-i012-20230531   clang
-i386                 randconfig-i013-20230531   clang
-i386                 randconfig-i014-20230531   clang
-i386                 randconfig-i015-20230531   clang
-i386                 randconfig-i016-20230531   clang
-i386                 randconfig-i051-20230531   gcc  
-i386                 randconfig-i052-20230531   gcc  
-i386                 randconfig-i053-20230531   gcc  
-i386                 randconfig-i054-20230531   gcc  
-i386                 randconfig-i055-20230531   gcc  
-i386                 randconfig-i056-20230531   gcc  
-i386                 randconfig-i061-20230531   gcc  
-i386                 randconfig-i062-20230531   gcc  
-i386                 randconfig-i063-20230531   gcc  
-i386                 randconfig-i064-20230531   gcc  
-i386                 randconfig-i065-20230531   gcc  
-i386                 randconfig-i066-20230531   gcc  
-i386                 randconfig-r021-20230531   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r002-20230531   gcc  
-loongarch            randconfig-r014-20230531   gcc  
-m68k                             allmodconfig   gcc  
-m68k         buildonly-randconfig-r006-20230531   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r003-20230531   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 randconfig-r015-20230531   gcc  
-nios2        buildonly-randconfig-r002-20230531   gcc  
-nios2        buildonly-randconfig-r004-20230531   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r012-20230531   gcc  
-openrisc     buildonly-randconfig-r003-20230531   gcc  
-openrisc             randconfig-r004-20230531   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc              randconfig-r031-20230531   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r023-20230531   clang
-riscv                randconfig-r042-20230531   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r001-20230531   gcc  
-s390                 randconfig-r011-20230531   clang
-s390                 randconfig-r044-20230531   clang
-sh                               allmodconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r022-20230531   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230531   gcc  
-x86_64               randconfig-a002-20230531   gcc  
-x86_64               randconfig-a003-20230531   gcc  
-x86_64               randconfig-a004-20230531   gcc  
-x86_64               randconfig-a005-20230531   gcc  
-x86_64               randconfig-a006-20230531   gcc  
-x86_64               randconfig-a011-20230531   clang
-x86_64               randconfig-a012-20230531   clang
-x86_64               randconfig-a013-20230531   clang
-x86_64               randconfig-a014-20230531   clang
-x86_64               randconfig-a015-20230531   clang
-x86_64               randconfig-a016-20230531   clang
-x86_64               randconfig-r006-20230531   gcc  
-x86_64               randconfig-r036-20230531   gcc  
-x86_64               randconfig-x051-20230531   clang
-x86_64               randconfig-x052-20230531   clang
-x86_64               randconfig-x053-20230531   clang
-x86_64               randconfig-x054-20230531   clang
-x86_64               randconfig-x055-20230531   clang
-x86_64               randconfig-x056-20230531   clang
-x86_64               randconfig-x061-20230531   clang
-x86_64               randconfig-x062-20230531   clang
-x86_64               randconfig-x063-20230531   clang
-x86_64               randconfig-x064-20230531   clang
-x86_64               randconfig-x065-20230531   clang
-x86_64               randconfig-x066-20230531   clang
-x86_64                               rhel-8.3   gcc  
 
+After this patch:
+
+root@target:~# dmesg | grep hci0
+[   13.979860] Bluetooth: hci0: BCM: chip id 107
+[   13.984969] Bluetooth: hci0: BCM: features 0x2f
+[   13.991444] Bluetooth: hci0: BCM4345C0
+[   13.995300] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0000
+[   14.005131] Bluetooth: hci0: BCM4345C0 'brcm/BCM4345C0.hcd' Patch
+[   14.839465] Bluetooth: hci0: BCM: features 0x2f
+[   14.846047] Bluetooth: hci0: BCM43455 37.4MHz Raspberry Pi 3+-0159
+[   14.859859] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0290
+root@target:~# hcitool dev
+Devices:
+root@target:~# hcitool scan
+Device is not available: No such device
+root@target:~# hcitool | head -n1
+hcitool - HCI Tool ver 5.50
+root@target:~#
+
+Reverting $subject on top of linux-next fixes this 'issue'.
+
+Let me know if you need more information about my test systems or to 
+make some other tests.
+
+ > ...
+
+Best regards
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
+
