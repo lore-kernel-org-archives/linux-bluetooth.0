@@ -2,97 +2,175 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E56C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 03:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04ABCC7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 06:35:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbjFAD6B (ORCPT
+        id S231224AbjFAGfQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 May 2023 23:58:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57896 "EHLO
+        Thu, 1 Jun 2023 02:35:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229612AbjFAD55 (ORCPT
+        with ESMTP id S230110AbjFAGfP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 May 2023 23:57:57 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BCC793
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 20:57:56 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2af278ca45eso4861971fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 20:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685591874; x=1688183874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2Oi7PWcjBkUW0YlbN/exknEFUJgU8vT115+fDNuws1w=;
-        b=A2G8/HMrnBcP0jqWUqpf/F8Fq+d+bPO1diVviVhejop+paZkFKnjzLrisVG/nmWYGo
-         JCS33vhXTwvfdFhzGjVuAKbg3hVueSQ+ZAq7kZiWlDoJpPhU5IvFsEbJ286hYShxji2M
-         WAYUZ9cABr3QcOiXGnosNnqTm42r43ZzOpMeDZ1jIzlwRomkmlbFu+1uRcIm+Cci9Z1T
-         jn2NoDKVE6efxB9C+LQu0/BvnUAJA8PUx0YjirRpmkvJbK3kYULglhlGiqf/hM7svV9u
-         UcFRMlqqUuDegMWaWNP44q71kUJjHq2zZyAXkGrZR2UoUkqD6XuGyuRWn18KFlXWQD6w
-         aSsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685591874; x=1688183874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2Oi7PWcjBkUW0YlbN/exknEFUJgU8vT115+fDNuws1w=;
-        b=RdQIIAMPlZbrBcFxt1VqroxEGY9eyjXxxOeFhPlHHebKg+hWQBeOewKxCZcsLQ3Amv
-         I3YJKISWdVtvIHmjGuNKa+07pP/NLO+oMw6YxtdziX4qUO7p+XlOEqlVwd8Kt9IS2FbZ
-         l3R8IUfpxskcUsxCnBv3m4vDZISZpebqbUO03y5gjU3B7dwonb2VFtdSxXZ4I/hnkVs6
-         oQwqtCHb+IsIsxeBZt/l2+lyqJKEueTFbQRmDqu/PyqTLCHRu+KA0gygJZIcZus1zysl
-         cBemUdnAE34IvF5qrgo8GfM56nWq8WF8BOp2yPuo7KsdPvL54DtvWccbBt7CqCT1kd8L
-         ga2g==
-X-Gm-Message-State: AC+VfDyoHn2H5qFzJ642Sr4OjIat6uRZ/2WlwnSbKFcWzXzoSR0jxUnL
-        5AaylltVykuSu+3/IsvsgseR1qJo+0NBCujgTYwrZzdIQS8=
-X-Google-Smtp-Source: ACHHUZ4sq6vEMqnVXpIk7gER08ByqhjLK/N7+hXq9pJG2MjHutjPG0VxfLRPMs+0NmwhCujEAiWU1nCP75AcyrZjGb0=
-X-Received: by 2002:a2e:360e:0:b0:2b0:3343:1c0a with SMTP id
- d14-20020a2e360e000000b002b033431c0amr3713625lja.31.1685591873429; Wed, 31
- May 2023 20:57:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230601023835.1117866-1-yinghsu@chromium.org> <64780a7d.d40a0220.ea23f.cabd@mx.google.com>
-In-Reply-To: <64780a7d.d40a0220.ea23f.cabd@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 31 May 2023 20:57:41 -0700
-Message-ID: <CABBYNZ+wmNX0seeh+XeCbnL7=DozCULoRg7s+_WnM3XCnmQoTg@mail.gmail.com>
-Subject: Re: [v6] Bluetooth: Fix l2cap_disconnect_req deadlock
+        Thu, 1 Jun 2023 02:35:15 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52656E2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 May 2023 23:35:14 -0700 (PDT)
+Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4QWxFq2syWzytZ;
+        Thu,  1 Jun 2023 09:35:11 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1685601311;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uwHelr9epidNx4TlyEwPNGxb8mG0HmBux+ZYLk+0kkE=;
+        b=WxSZPXMpaQNTgyQAsjFkmB52S8/UH51wRWr9XNdZ3IsZ/zIz5pOGJJRFtt6tTTTdRIwV3X
+        iDfsVlvit9Mz/xSUvZ3xQLBKqxldwliQnMlSnrpqVI67sqBHvpL5xn8XeztkO8o5z1Gzv2
+        1YB7PHGfTbF67paXrxRvSz8xuQvlrgg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1685601311;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uwHelr9epidNx4TlyEwPNGxb8mG0HmBux+ZYLk+0kkE=;
+        b=k1h/oGL04Waw4PrZcanK+F7hN30VHtbOzirdb7HlnecdFHh9mn/RDa0clZKx80NG6DtOiJ
+        aZHrsp2R+qBAdyhiNGBx1JpyD3v2+JVQPoVR/zfA/tF43MYS0NooIG/J5A5xh8I26GA9ar
+        87LM6rSEIxyw3Xo+I6PsqdK6qnSbfaU=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1685601311; a=rsa-sha256; cv=none;
+        b=WoYtCZ+vJyUGICfkuKXD/OA7iNRmYPs43e45H9a9wNFsHvQOk8eaN7auFOXAF1NDk8zNCW
+        RV057TOGsxu4FNgqnA8ICfAzKsUtYsm5zHs31pdKaUpzORpOy08CaCW+rD1RigtPH8DPhB
+        pS0qQy3hzu3Fou0ecRTspQjKSFK6LDI=
+From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     yinghsu@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc:     luiz.dentz@gmail.com, Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH v2 1/4] Bluetooth: ISO: use hci_sync for setting CIG parameters
+Date:   Thu,  1 Jun 2023 09:34:43 +0300
+Message-Id: <97114b5f17f44d913c564f4ac8b41726c3a8eeae.1685565568.git.pav@iki.fi>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <cover.1685565568.git.pav@iki.fi>
+References: <cover.1685565568.git.pav@iki.fi>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ying,
+When reconfiguring CIG after disconnection of the last CIS, LE Remove
+CIG shall be sent before LE Set CIG Parameters.  Otherwise, it fails
+because CIG is in the inactive state and not configurable (Core v5.3
+Vol 6 Part B Sec. 4.5.14.3). This ordering is currently wrong under
+suitable timing conditions, because LE Remove CIG is sent via the
+hci_sync queue and may be delayed, but Set CIG Parameters is via
+hci_send_cmd.
 
-On Wed, May 31, 2023 at 8:08=E2=80=AFPM <bluez.test.bot@gmail.com> wrote:
->
-> This is an automated email and please do not reply to this email.
->
-> Dear Submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> While preparing the CI tests, the patches you submitted couldn't be appli=
-ed to the current HEAD of the repository.
->
-> ----- Output -----
->
-> error: patch failed: net/bluetooth/l2cap_core.c:4634
-> error: net/bluetooth/l2cap_core.c: patch does not apply
-> hint: Use 'git am --show-current-patch' to see the failed patch
->
-> Please resolve the issue and submit the patches again.
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+Make the ordering well-defined by sending also Set CIG Parameters via
+hci_sync.
 
-It has been pushed already:
+Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/commit/?id=3D0e31289b2827062975194a68c0ae4d854cd87a81
+Notes:
+    v2: rebased, no changes
 
+ net/bluetooth/hci_conn.c | 47 +++++++++++++++++++++++++++++++++-------
+ 1 file changed, 39 insertions(+), 8 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 795b2daa5bac..f45476deca82 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -775,6 +775,11 @@ static void le_conn_timeout(struct work_struct *work)
+ 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
+ }
+ 
++struct iso_cig_params {
++	struct hci_cp_le_set_cig_params cp;
++	struct hci_cis_params cis[0x1f];
++};
++
+ struct iso_list_data {
+ 	union {
+ 		u8  cig;
+@@ -786,10 +791,7 @@ struct iso_list_data {
+ 		u16 sync_handle;
+ 	};
+ 	int count;
+-	struct {
+-		struct hci_cp_le_set_cig_params cp;
+-		struct hci_cis_params cis[0x11];
+-	} pdu;
++	struct iso_cig_params pdu;
+ 	bool big_term;
+ };
+ 
+@@ -1783,10 +1785,33 @@ static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 	return hci_send_cmd(hdev, HCI_OP_LE_CREATE_BIG, sizeof(cp), &cp);
+ }
+ 
++static void set_cig_params_complete(struct hci_dev *hdev, void *data, int err)
++{
++	struct iso_cig_params *pdu = data;
++
++	bt_dev_dbg(hdev, "");
++
++	if (err)
++		bt_dev_err(hdev, "Unable to set CIG parameters: %d", err);
++
++	kfree(pdu);
++}
++
++static int set_cig_params_sync(struct hci_dev *hdev, void *data)
++{
++	struct iso_cig_params *pdu = data;
++	u32 plen;
++
++	plen = sizeof(pdu->cp) + pdu->cp.num_cis * sizeof(pdu->cis[0]);
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_CIG_PARAMS, plen, pdu,
++				     HCI_CMD_TIMEOUT);
++}
++
+ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+ 	struct iso_list_data data;
++	struct iso_cig_params *pdu;
+ 
+ 	memset(&data, 0, sizeof(data));
+ 
+@@ -1856,12 +1881,18 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 	if (qos->ucast.cis == BT_ISO_QOS_CIS_UNSET || !data.pdu.cp.num_cis)
+ 		return false;
+ 
+-	if (hci_send_cmd(hdev, HCI_OP_LE_SET_CIG_PARAMS,
+-			 sizeof(data.pdu.cp) +
+-			 (data.pdu.cp.num_cis * sizeof(*data.pdu.cis)),
+-			 &data.pdu) < 0)
++	pdu = kzalloc(sizeof(*pdu), GFP_KERNEL);
++	if (!pdu)
+ 		return false;
+ 
++	memcpy(pdu, &data.pdu, sizeof(*pdu));
++
++	if (hci_cmd_sync_queue(hdev, set_cig_params_sync, pdu,
++			       set_cig_params_complete) < 0) {
++		kfree(pdu);
++		return false;
++	}
++
+ 	return true;
+ }
+ 
+-- 
+2.40.1
+
