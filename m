@@ -2,328 +2,192 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A21C7EE29
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 10:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C83F6C7EE2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 10:21:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232937AbjFAKB5 (ORCPT
+        id S233449AbjFAKVI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Jun 2023 06:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41822 "EHLO
+        Thu, 1 Jun 2023 06:21:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232055AbjFAKBM (ORCPT
+        with ESMTP id S233991AbjFAKUM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Jun 2023 06:01:12 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7D90E54;
-        Thu,  1 Jun 2023 03:00:43 -0700 (PDT)
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id AE3FA61E4052B;
-        Thu,  1 Jun 2023 12:00:35 +0200 (CEST)
-Message-ID: <f76f9920-7234-ef72-9e88-87713e3b0f8e@molgen.mpg.de>
-Date:   Thu, 1 Jun 2023 12:00:35 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v8] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- SoC QCA2066
-Content-Language: en-US
-To:     Tim Jiang <quic_tjiang@quicinc.com>
-Cc:     marcel@holtmann.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        quic_bgodavar@quicinc.com, quic_hemantg@quicinc.com
-References: <20230601091355.18097-1-quic_tjiang@quicinc.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230601091355.18097-1-quic_tjiang@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+        Thu, 1 Jun 2023 06:20:12 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B962722
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jun 2023 03:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685614617; x=1717150617;
+  h=date:from:to:cc:subject:message-id;
+  bh=yN7MSwzr2qKDbnxOQufUPrV+XvAAEtk0LIHsTEYI5Lc=;
+  b=a3jgW+Ye214nno2MNJqo9hDExlB3WrwkV1/hi+m192qGf+Tdz4MW7O0y
+   dSIuhcrwhkn68QGgd+3UePLpPhfvINvKxdMkrh8ddNif5Kn3lO2NkGnZ9
+   YdVnQ56Cz60F/y57rmQDSh5/Y0bln030HIzNAfwH+OgFm+Yb2WfDQF53J
+   zeimR7pDCispbka7mbhPs8okAsCR14ZinInEOQwjJ+tD8xNiDUOIldf32
+   fHXg//DkjQckB3NjCN6bZechxj5D+XQjzKaR1noBVaClm50kgnStIKXrn
+   Cv2sPlj/u+ZtYyDS54gLSa+qQX2JT2jsOtc2RTfuOmj8Y3P6QkEk1SY73
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="419016830"
+X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
+   d="scan'208";a="419016830"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2023 03:13:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10727"; a="737050824"
+X-IronPort-AV: E=Sophos;i="6.00,209,1681196400"; 
+   d="scan'208";a="737050824"
+Received: from lkp-server01.sh.intel.com (HELO fb1ced2c09fb) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 01 Jun 2023 03:13:35 -0700
+Received: from kbuild by fb1ced2c09fb with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1q4fJE-0002B3-2h;
+        Thu, 01 Jun 2023 10:13:32 +0000
+Date:   Thu, 01 Jun 2023 18:13:23 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 0e31289b2827062975194a68c0ae4d854cd87a81
+Message-ID: <20230601101323.7AIPW%lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Tim,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 0e31289b2827062975194a68c0ae4d854cd87a81  Bluetooth: Fix l2cap_disconnect_req deadlock
 
+elapsed time: 902m
 
-Thank you for the interation.
+configs tested: 120
+configs skipped: 6
 
-Am 01.06.23 um 11:13 schrieb Tim Jiang:
-> This patch adds support for QCA2066 firmware patch and nvm downloading.
-> as the RF performance of qca2066 soc chip from different foundries will
-> be difference, so we use different nvm to configure them by according
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-s/difference/different/
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha        buildonly-randconfig-r001-20230531   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r032-20230531   gcc  
+alpha                randconfig-r035-20230531   gcc  
+arc                              allyesconfig   gcc  
+arc          buildonly-randconfig-r005-20230531   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r043-20230531   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230531   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r024-20230531   clang
+csky                                defconfig   gcc  
+csky                 randconfig-r016-20230531   gcc  
+hexagon              randconfig-r013-20230531   clang
+hexagon              randconfig-r034-20230531   clang
+hexagon              randconfig-r041-20230531   clang
+hexagon              randconfig-r045-20230531   clang
+i386                             allyesconfig   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230531   gcc  
+i386                 randconfig-i002-20230531   gcc  
+i386                 randconfig-i003-20230531   gcc  
+i386                 randconfig-i004-20230531   gcc  
+i386                 randconfig-i005-20230531   gcc  
+i386                 randconfig-i006-20230531   gcc  
+i386                 randconfig-i011-20230531   clang
+i386                 randconfig-i012-20230531   clang
+i386                 randconfig-i013-20230531   clang
+i386                 randconfig-i014-20230531   clang
+i386                 randconfig-i015-20230531   clang
+i386                 randconfig-i016-20230531   clang
+i386                 randconfig-i051-20230531   gcc  
+i386                 randconfig-i052-20230531   gcc  
+i386                 randconfig-i053-20230531   gcc  
+i386                 randconfig-i054-20230531   gcc  
+i386                 randconfig-i055-20230531   gcc  
+i386                 randconfig-i056-20230531   gcc  
+i386                 randconfig-i061-20230531   gcc  
+i386                 randconfig-i062-20230531   gcc  
+i386                 randconfig-i063-20230531   gcc  
+i386                 randconfig-i064-20230531   gcc  
+i386                 randconfig-i065-20230531   gcc  
+i386                 randconfig-i066-20230531   gcc  
+i386                 randconfig-r021-20230531   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r002-20230531   gcc  
+loongarch            randconfig-r014-20230531   gcc  
+m68k                             allmodconfig   gcc  
+m68k         buildonly-randconfig-r006-20230531   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r003-20230531   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r015-20230531   gcc  
+nios2        buildonly-randconfig-r002-20230531   gcc  
+nios2        buildonly-randconfig-r004-20230531   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r012-20230531   gcc  
+openrisc     buildonly-randconfig-r003-20230531   gcc  
+openrisc             randconfig-r004-20230531   gcc  
+parisc                              defconfig   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc              randconfig-r031-20230531   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r023-20230531   clang
+riscv                randconfig-r042-20230531   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r001-20230531   gcc  
+s390                 randconfig-r011-20230531   clang
+s390                 randconfig-r044-20230531   clang
+sh                               allmodconfig   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r022-20230531   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-a001-20230531   gcc  
+x86_64               randconfig-a002-20230531   gcc  
+x86_64               randconfig-a003-20230531   gcc  
+x86_64               randconfig-a004-20230531   gcc  
+x86_64               randconfig-a005-20230531   gcc  
+x86_64               randconfig-a006-20230531   gcc  
+x86_64               randconfig-a011-20230531   clang
+x86_64               randconfig-a012-20230531   clang
+x86_64               randconfig-a013-20230531   clang
+x86_64               randconfig-a014-20230531   clang
+x86_64               randconfig-a015-20230531   clang
+x86_64               randconfig-a016-20230531   clang
+x86_64               randconfig-r006-20230531   gcc  
+x86_64               randconfig-r036-20230531   gcc  
+x86_64               randconfig-x051-20230531   clang
+x86_64               randconfig-x052-20230531   clang
+x86_64               randconfig-x053-20230531   clang
+x86_64               randconfig-x054-20230531   clang
+x86_64               randconfig-x055-20230531   clang
+x86_64               randconfig-x056-20230531   clang
+x86_64               randconfig-x061-20230531   clang
+x86_64               randconfig-x062-20230531   clang
+x86_64               randconfig-x063-20230531   clang
+x86_64               randconfig-x064-20230531   clang
+x86_64               randconfig-x065-20230531   clang
+x86_64               randconfig-x066-20230531   clang
+x86_64                               rhel-8.3   gcc  
 
-> to board id.
-
-chat.lmsys.org with the model vicuna-13b suggested the text below:
-
-> Please correct the spelling/grammar of […]:
-> Sure, here's the corrected version of the sentence:
-> This patch adds support for QCA2066 firmware patch and NVM
-> downloading, as the RF performance of QCA2066 SOC chips from
-> different foundries may vary. Therefore, we use different NVM to
-> configure them based on board ID.
-> I hope that helps!
-
-;-)
-
-> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
-> ---
-
-In the future, it’d be great if you added a change-log between the patch 
-iterations so reviewers know what to look at.
-
->   drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
->   drivers/bluetooth/btqca.h   |  4 ++
->   drivers/bluetooth/hci_qca.c | 40 +++++++++++++++++--
->   3 files changed, 114 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index e7e58a956d15..1f1b141b80f9 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -205,6 +205,46 @@ static int qca_send_reset(struct hci_dev *hdev)
->   	return 0;
->   }
->   
-> +static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid)
-> +{
-> +	u8 cmd;
-> +	struct sk_buff *skb;
-> +	struct edl_event_hdr *edl;
-> +	int err = 0;
-> +	int bid_len;
-
-As the length cannot be negative, why not use `unsigned int`? But also 
-see below.
-
-> +
-> +	cmd = EDL_GET_BID_REQ_CMD;
-> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
-> +				&cmd, 0, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		err = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "Reading QCA board ID failed (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	edl = skb_pull_data(skb, sizeof(*edl));
-> +	if (!edl) {
-> +		bt_dev_err(hdev, "QCA read board ID with no header");
-> +		err = -EILSEQ;
-> +		goto out;
-> +	}
-> +
-> +	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
-> +	    edl->rtype != EDL_GET_BID_REQ_CMD) {
-> +		bt_dev_err(hdev, "QCA Wrong packet: %d %d", edl->cresp, edl->rtype);
-> +		err = -EIO;
-> +		goto out;
-> +	}
-> +
-> +	bid_len = edl->data[0];
-> +	*bid = (edl->data[1] << 8) + edl->data[2];
-> +	bt_dev_dbg(hdev, "%s: bid len = %x, bid = %x", __func__, bid_len, *bid);
-
-Currently, you use `bid_len` only to log it, and not for anything else. 
-Should some sanity checks be added? Otherwise, I think, the variable can 
-be removed?
-
-> +
-> +out:
-> +	kfree_skb(skb);
-> +	return err;
-> +}
-> +
->   int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->   {
->   	struct sk_buff *skb;
-> @@ -574,6 +614,29 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
->   }
->   EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
->   
-> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
-> +		   size_t max_size, struct qca_btsoc_version ver, u16 bid)
-> +{
-> +	u8 rom_ver;
-> +	u32 soc_ver;
-> +	const char *variant;
-> +
-> +	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
-> +	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> +
-> +	if ((le32_to_cpu(ver.soc_id) & 0x0000ff00) == QCA_HSP_GF_SOC_ID)  /* hsp gf chip */
-> +		variant = "g";
-> +	else
-> +		variant = "";
-> +
-> +	if (bid == 0x0)
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
-> +	else
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
-> +
-> +	bt_dev_dbg(hdev, "%s: nvm name is %s", __func__, fwname);
-> +}
-> +
->   int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
->   		   const char *firmware_name)
-> @@ -582,6 +645,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	int err;
->   	u8 rom_ver = 0;
->   	u32 soc_ver;
-> +	u16 boardid = 0;
-
-Sorry, I didn’t get to reply to your v3 answer:
-
-> Why can’t you simply use `unsigned int` [1]?
-> [Tim] you can refer to function qca_uart_setup , which also use u32
-
-I meant `boardid`, which is newly introduced.
-
-
-Kind regards,
-
-Paul
-
-
->   
->   	bt_dev_dbg(hdev, "QCA setup on UART");
->   
-> @@ -604,6 +668,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	if (qca_is_wcn399x(soc_type)) {
->   		snprintf(config.fwname, sizeof(config.fwname),
->   			 "qca/crbtfw%02x.tlv", rom_ver);
-> +	} else if (soc_type == QCA_QCA2066) {
-> +		snprintf(config.fwname, sizeof(config.fwname),
-> +			 "qca/hpbtfw%02x.tlv", rom_ver);
->   	} else if (soc_type == QCA_QCA6390) {
->   		snprintf(config.fwname, sizeof(config.fwname),
->   			 "qca/htbtfw%02x.tlv", rom_ver);
-> @@ -631,6 +698,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	/* Give the controller some time to get ready to receive the NVM */
->   	msleep(10);
->   
-> +	if (soc_type == QCA_QCA2066)
-> +		qca_read_fw_board_id(hdev, &boardid);
-> +
->   	/* Download NVM configuration */
->   	config.type = TLV_TYPE_NVM;
->   	if (firmware_name)
-> @@ -644,8 +714,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   			snprintf(config.fwname, sizeof(config.fwname),
->   				 "qca/crnv%02x.bin", rom_ver);
->   		}
-> -	}
-> -	else if (soc_type == QCA_QCA6390)
-> +	} else if (soc_type == QCA_QCA2066) {
-> +		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname),
-> +				ver, boardid);
-> +	} else if (soc_type == QCA_QCA6390)
->   		snprintf(config.fwname, sizeof(config.fwname),
->   			 "qca/htnv%02x.bin", rom_ver);
->   	else if (soc_type == QCA_WCN6750)
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index b884095bcd9d..234a97a49bb9 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -13,6 +13,7 @@
->   #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
->   #define EDL_GET_BUILD_INFO_CMD		(0x20)
->   #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
-> +#define EDL_GET_BID_REQ_CMD		(0x23)
->   #define EDL_PATCH_CONFIG_CMD		(0x28)
->   #define MAX_SIZE_PER_TLV_SEGMENT	(243)
->   #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
-> @@ -48,6 +49,8 @@
->   
->   #define QCA_FW_BUILD_VER_LEN		255
->   
-> +#define QCA_HSP_GF_SOC_ID		0x1200
-> +
->   
->   enum qca_baudrate {
->   	QCA_BAUDRATE_115200 	= 0,
-> @@ -148,6 +151,7 @@ enum qca_btsoc_type {
->   	QCA_QCA6390,
->   	QCA_WCN6750,
->   	QCA_WCN6855,
-> +	QCA_QCA2066,
->   };
->   
->   #if IS_ENABLED(CONFIG_BT_QCA)
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 1b064504b388..3c65b6b80461 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1712,6 +1712,7 @@ static int qca_setup(struct hci_uart *hu)
->   	const char *firmware_name = qca_get_firmware_name(hu);
->   	int ret;
->   	struct qca_btsoc_version ver;
-> +	const char *soc_name;
->   
->   	ret = qca_check_speeds(hu);
->   	if (ret)
-> @@ -1726,10 +1727,35 @@ static int qca_setup(struct hci_uart *hu)
->   	 */
->   	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->   
-> -	bt_dev_info(hdev, "setting up %s",
-> -		qca_is_wcn399x(soc_type) ? "wcn399x" :
-> -		(soc_type == QCA_WCN6750) ? "wcn6750" :
-> -		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
-> +	switch (soc_type) {
-> +	case QCA_AR3002:
-> +		soc_name = "ar300x";
-> +		break;
-> +	case QCA_ROME:
-> +		soc_name = "ROME";
-> +		break;
-> +	case QCA_WCN3990:
-> +	case QCA_WCN3991:
-> +	case QCA_WCN3998:
-> +		soc_name = "wcn399x";
-> +		break;
-> +	case QCA_QCA2066:
-> +		soc_name = "QCA2066";
-> +		break;
-> +	case QCA_QCA6390:
-> +		soc_name = "QCA6390";
-> +		break;
-> +	case QCA_WCN6750:
-> +		soc_name = "wcn6750";
-> +		break;
-> +	case QCA_WCN6855:
-> +		soc_name = "wcn6855";
-> +		break;
-> +	default:
-> +		soc_name = "unknown soc";
-> +		break;
-> +	}
-> +	bt_dev_info(hdev, "setting up %s", soc_name);
->   
->   	qca->memdump_state = QCA_MEMDUMP_IDLE;
->   
-> @@ -1874,6 +1900,11 @@ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
->   	.num_vregs = 0,
->   };
->   
-> +static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
-> +	.soc_type = QCA_QCA2066,
-> +	.num_vregs = 0,
-> +};
-> +
->   static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
->   	.soc_type = QCA_WCN6750,
->   	.vregs = (struct qca_vreg []) {
-> @@ -2371,6 +2402,7 @@ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
->   
->   #ifdef CONFIG_ACPI
->   static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
-> +	{ "QCOM2066", (kernel_ulong_t)&qca_soc_data_qca2066 },
->   	{ "QCOM6390", (kernel_ulong_t)&qca_soc_data_qca6390 },
->   	{ "DLA16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
->   	{ "DLB16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
