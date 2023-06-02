@@ -2,93 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B5EC7EE24
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 21:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F0BC7EE2C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 21:59:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235425AbjFBV36 (ORCPT
+        id S236441AbjFBV7Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jun 2023 17:29:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41716 "EHLO
+        Fri, 2 Jun 2023 17:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236470AbjFBV35 (ORCPT
+        with ESMTP id S236081AbjFBV7Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jun 2023 17:29:57 -0400
-X-Greylist: delayed 140081 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 02 Jun 2023 14:29:56 PDT
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12550E48
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 14:29:55 -0700 (PDT)
-Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pav)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 4QXx3h4NDJzyWK;
-        Sat,  3 Jun 2023 00:29:51 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1685741392;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Y2aMQk9/QNXTcmFiAfcbnLBpS52wbiaF3IWkyoi19Ek=;
-        b=azqByHb2nBUAxoFNa84DhWut6wqROM6LldC78mokA4+ypDtEocU7n6psyMU/ttz8qHG3lV
-        ZNvT52Ax2eneP9Ap00C+2FR4NeGXJpVQDXbvsNFJvcDQFKVVxRwVKyZ7Dh55a4bF9y7U37
-        PNVWo/09tvmrX0zqY7wmnnomsPdLW48=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1685741392;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Y2aMQk9/QNXTcmFiAfcbnLBpS52wbiaF3IWkyoi19Ek=;
-        b=o8IHqT3KIqi7bD97pZBkCyjv7fKwBDNrfODDtgg+CI0Fu82nbg6E+qv5qc18KXQpaU0F/D
-        QWU7hx9nvoGErcnvq0Yz3ahhZuVOX7MiHumTWQhwMmUKpmo0MSmMnxkNZLkF5szB1Ti44+
-        iBJ4sS8e4IcA7e+hb8iYi1dFzzUfP5s=
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1685741392; a=rsa-sha256; cv=none;
-        b=yNPkAidpPLauzVDqYfd+Dl6x8RuJyseKDEO1psobqEGAhi4e+CCyKKkzbZ05vQnOXjo4bq
-        Y4ZrsVummZxVPSqe53GO31ZI7eFNhdR0MzmhhsC+ptqlbUtL8XUSZ8qsmyN3mW41/kjXfM
-        z4tnXJcrSBI1XG9/nj5X2uLsDp17TKs=
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH] Bluetooth: hci_event: fix Set CIG Parameters error status handling
-Date:   Sat,  3 Jun 2023 00:28:12 +0300
-Message-Id: <d7b290a2d4a3acc77feb10873d28c5c62f26f5ae.1685740877.git.pav@iki.fi>
-X-Mailer: git-send-email 2.40.1
+        Fri, 2 Jun 2023 17:59:24 -0400
+Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 421AFE4E
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 14:59:20 -0700 (PDT)
+Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1a28817f70bso2049698fac.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 14:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685743159; x=1688335159;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TFXlzk6DH3T/qYZYUN0IaGccS5eT9Uts+h6623jJhC4=;
+        b=JOlsTD/joo9uW2UcHfNCMIYXfDT5CU9m5Bhuz/RE9kYkduQFRsQHCMmb5R4tPlqdhA
+         spmn4Qjtv0AcKUkcC1UxloZuOX1+aA6e8D53ALrnsuOtE9kT3R/Nq+u9IWlZxH6MMLN8
+         EoItsSVogtJzsLVZ2zIeChLfA06ZexV/w77DZHDfPuN2aAv2VBr7bw5EoUS/Mczb46lO
+         89iwP3Blbjgi/BbZ5G2vydEkinUCEbRomUdyCasK2IOq8PJLWJhDR5995hkTOT1Mzaog
+         rBQYXmrnIf9pO43eXUOWh/4ujisLGAxvbOVJmQ8Hxn7yae7lXF3uMj83irEJRRWrcHKL
+         KpUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685743159; x=1688335159;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TFXlzk6DH3T/qYZYUN0IaGccS5eT9Uts+h6623jJhC4=;
+        b=LHma1Fydirw499X5za+EXbKIr4Rq1zlnnReM/j0U7P1ePAxhjOdWaX0YHtxdxRtG7F
+         PGgrJPf5WsyCVNGuGs0L7VTuXBQuhW7BtEqXIsbeIUS+9x3m7ztZokxMymZqwMiOgHEn
+         ssgWhPz2i5ZQ0NMz919PlccAsj9CtFSNKswGZrjUwftDLfU2chqepMgAqUrlh0cGiwQ/
+         ot8XcGVtSZ87MApvNv+4IkmKIfwrOcDm/yPbbJG2IEXcTFVch5m42KwnS30GjYZQautG
+         tlANVQ4XfZJImvbHAwsADsuMUPMmtkOKF7OF4rW0DmdzgW2YbaLvGLYO2f5EdblPZ+R8
+         bFeg==
+X-Gm-Message-State: AC+VfDyRk1DD+NsOjJP6jVKzxJ1vXk4blb8g/p7DjhEA9PAZEt+iOSfS
+        45mZ+joisGT2Hx4DDi7S8J0dZFwWnDA=
+X-Google-Smtp-Source: ACHHUZ7dqgSN0Pc8I2rdupk7S02HI1GaSTZcCUVXcIE+Dix2LQJI6A7UNgoLsKBVw2b3KEqQH1tJjQ==
+X-Received: by 2002:a05:6870:8681:b0:1a2:9d72:2703 with SMTP id p1-20020a056870868100b001a29d722703mr2566156oam.19.1685743159319;
+        Fri, 02 Jun 2023 14:59:19 -0700 (PDT)
+Received: from [172.17.0.2] ([23.98.136.39])
+        by smtp.gmail.com with ESMTPSA id dx26-20020a056870769a00b00172ac40356csm1059464oab.50.2023.06.02.14.59.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jun 2023 14:59:19 -0700 (PDT)
+Message-ID: <647a6637.050a0220.77d1.5e88@mx.google.com>
+Date:   Fri, 02 Jun 2023 14:59:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3706987005840995745=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Bluetooth: hci_event: fix Set CIG Parameters error status handling
+In-Reply-To: <d7b290a2d4a3acc77feb10873d28c5c62f26f5ae.1685740877.git.pav@iki.fi>
+References: <d7b290a2d4a3acc77feb10873d28c5c62f26f5ae.1685740877.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If the event has error status, return right error code and don't show
-incorrect "response malformed" messages.
+--===============3706987005840995745==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=753675
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      35.49 seconds
+CheckAllWarning               PASS      38.63 seconds
+CheckSparse                   WARNING   44.13 seconds
+CheckSmatch                   WARNING   119.45 seconds
+BuildKernel32                 PASS      34.45 seconds
+TestRunnerSetup               PASS      504.55 seconds
+TestRunner_l2cap-tester       PASS      19.10 seconds
+TestRunner_iso-tester         PASS      26.91 seconds
+TestRunner_bnep-tester        PASS      6.74 seconds
+TestRunner_mgmt-tester        PASS      130.53 seconds
+TestRunner_rfcomm-tester      PASS      10.60 seconds
+TestRunner_sco-tester         PASS      9.67 seconds
+TestRunner_ioctl-tester       PASS      11.45 seconds
+TestRunner_mesh-tester        PASS      8.50 seconds
+TestRunner_smp-tester         PASS      9.65 seconds
+TestRunner_userchan-tester    PASS      7.02 seconds
+IncrementalBuild              PASS      34.68 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Notes:
-    Correction to
-    "Bluetooth: ISO: use correct CIS order in Set CIG Parameters event"
 
- net/bluetooth/hci_event.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b3825b3f06d9..7c199f7361f7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3813,7 +3813,8 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
- 	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
- 
- 	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_CIG_PARAMS);
--	if (!cp || rp->num_handles != cp->num_cis || rp->cig_id != cp->cig_id) {
-+	if (!rp->status && (!cp || rp->num_handles != cp->num_cis ||
-+			    rp->cig_id != cp->cig_id)) {
- 		bt_dev_err(hdev, "unexpected Set CIG Parameters response data");
- 		status = HCI_ERROR_UNSPECIFIED;
- 	}
--- 
-2.40.1
-
+--===============3706987005840995745==--
