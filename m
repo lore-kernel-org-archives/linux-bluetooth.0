@@ -2,80 +2,93 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19901C7EE29
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 20:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B5EC7EE24
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 21:29:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236077AbjFBUa3 (ORCPT
+        id S235425AbjFBV36 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jun 2023 16:30:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53486 "EHLO
+        Fri, 2 Jun 2023 17:29:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235277AbjFBUa2 (ORCPT
+        with ESMTP id S236470AbjFBV35 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jun 2023 16:30:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0B2E5A;
-        Fri,  2 Jun 2023 13:30:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 2 Jun 2023 17:29:57 -0400
+X-Greylist: delayed 140081 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 02 Jun 2023 14:29:56 PDT
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12550E48
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 14:29:55 -0700 (PDT)
+Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 658F961E00;
-        Fri,  2 Jun 2023 20:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8DABC433D2;
-        Fri,  2 Jun 2023 20:30:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685737820;
-        bh=Now+KUgBzHLU9lGLwsd/mVVtRVXIrRW7/Gpe3WHSQ9w=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=qwXGBAhBUsO/ieVFN5BqkOL2BgyGJbGzpvGWPMHuLkxOpWms50jHNc00G3mYf2hU8
-         AKZO9khGfywugPObf1DlkpKGwcDRWF3CN/G99rvmi03Hnwo7BFDGx6B95Bf9pn4u3o
-         dJ1fDfNhvbEAFaNaeF5cdOiIZ7EwMm4RjYop5vwqjquGQcrNRt8StiussBAZYKHsx5
-         MIhkkVbQzqZPTPeak8W1Icp8mYqbZwKtP5yQ0yXH097OMaJKGdm+/FEdw5dkhg2MW8
-         9e9VBGv10tL8VsnMaAdfZBbiDQ/mVpg361zj4jlovWRp69p3EWCZC8e5jz7crRK17O
-         +qyRpfeIgWRWA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9539CE49FA9;
-        Fri,  2 Jun 2023 20:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4QXx3h4NDJzyWK;
+        Sat,  3 Jun 2023 00:29:51 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1685741392;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Y2aMQk9/QNXTcmFiAfcbnLBpS52wbiaF3IWkyoi19Ek=;
+        b=azqByHb2nBUAxoFNa84DhWut6wqROM6LldC78mokA4+ypDtEocU7n6psyMU/ttz8qHG3lV
+        ZNvT52Ax2eneP9Ap00C+2FR4NeGXJpVQDXbvsNFJvcDQFKVVxRwVKyZ7Dh55a4bF9y7U37
+        PNVWo/09tvmrX0zqY7wmnnomsPdLW48=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1685741392;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Y2aMQk9/QNXTcmFiAfcbnLBpS52wbiaF3IWkyoi19Ek=;
+        b=o8IHqT3KIqi7bD97pZBkCyjv7fKwBDNrfODDtgg+CI0Fu82nbg6E+qv5qc18KXQpaU0F/D
+        QWU7hx9nvoGErcnvq0Yz3ahhZuVOX7MiHumTWQhwMmUKpmo0MSmMnxkNZLkF5szB1Ti44+
+        iBJ4sS8e4IcA7e+hb8iYi1dFzzUfP5s=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1685741392; a=rsa-sha256; cv=none;
+        b=yNPkAidpPLauzVDqYfd+Dl6x8RuJyseKDEO1psobqEGAhi4e+CCyKKkzbZ05vQnOXjo4bq
+        Y4ZrsVummZxVPSqe53GO31ZI7eFNhdR0MzmhhsC+ptqlbUtL8XUSZ8qsmyN3mW41/kjXfM
+        z4tnXJcrSBI1XG9/nj5X2uLsDp17TKs=
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH] Bluetooth: hci_event: fix Set CIG Parameters error status handling
+Date:   Sat,  3 Jun 2023 00:28:12 +0300
+Message-Id: <d7b290a2d4a3acc77feb10873d28c5c62f26f5ae.1685740877.git.pav@iki.fi>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168573782060.11756.12186344038329029663.git-patchwork-notify@kernel.org>
-Date:   Fri, 02 Jun 2023 20:30:20 +0000
-References: <20230602081912.4708-1-johan+linaro@kernel.org>
-In-Reply-To: <20230602081912.4708-1-johan+linaro@kernel.org>
-To:     Johan Hovold <johan+linaro@kernel.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        mka@chromium.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, m.szyprowski@samsung.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+If the event has error status, return right error code and don't show
+incorrect "response malformed" messages.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
-On Fri,  2 Jun 2023 10:19:12 +0200 you wrote:
-> A recent commit restored the original (and still documented) semantics
-> for the HCI_QUIRK_USE_BDADDR_PROPERTY quirk so that the device address
-> is considered invalid unless an address is provided by firmware.
-> 
-> This specifically means that this flag must only be set for devices with
-> invalid addresses, but the Broadcom driver has so far been setting this
-> flag unconditionally.
-> 
-> [...]
+Notes:
+    Correction to
+    "Bluetooth: ISO: use correct CIS order in Set CIG Parameters event"
 
-Here is the summary with links:
-  - Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
-    https://git.kernel.org/bluetooth/bluetooth-next/c/758be2398ff6
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b3825b3f06d9..7c199f7361f7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3813,7 +3813,8 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
+ 
+ 	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_CIG_PARAMS);
+-	if (!cp || rp->num_handles != cp->num_cis || rp->cig_id != cp->cig_id) {
++	if (!rp->status && (!cp || rp->num_handles != cp->num_cis ||
++			    rp->cig_id != cp->cig_id)) {
+ 		bt_dev_err(hdev, "unexpected Set CIG Parameters response data");
+ 		status = HCI_ERROR_UNSPECIFIED;
+ 	}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
