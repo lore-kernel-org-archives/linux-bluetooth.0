@@ -2,131 +2,174 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA4C7EE24
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 08:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F05C77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 09:46:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234595AbjFBI6k (ORCPT
+        id S234706AbjFBJqJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jun 2023 04:58:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57186 "EHLO
+        Fri, 2 Jun 2023 05:46:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234554AbjFBI60 (ORCPT
+        with ESMTP id S234582AbjFBJqI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jun 2023 04:58:26 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C123E41
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 01:58:25 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-33b5dba8c6cso6078655ab.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 01:58:25 -0700 (PDT)
+        Fri, 2 Jun 2023 05:46:08 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C22134
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 02:46:06 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9745c5fed21so115462766b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 02:46:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685696304; x=1688288304;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wVZQ7BJyl7E182Wg5I//4XW0U0UWZ4YIglPySOO3hgI=;
-        b=FNBiZ3X5mdOQe/L7l8xZ9BzVNvyCv9+0n5cIan2WZnoEZUzfNnc46lj7Wz7xojSECi
-         C1pT1r8y+aEsClCiv+h+D5To95dj/FTR0FMx44Btr1yVwkxn1IZ13nnbhGNei3l5Hz01
-         XOJuTqkhujBYMAjIRzWxu3DbBgxtatKJLRk5ANyiFYreogDWx1D780ziIk5A1akVtKlK
-         i6OcnWeJMQnG1guNPqmch8yUOHHmXABbPiQvUpM4Q/sQQ6F7b2Ejnf49lFia0K7fS4c7
-         lN0JcSFkf05DT5YABEl72mySxCAynEfXg5+3p+2l6iaKkJlbOvUjynBTKu5ZW6UlE0Y3
-         a5/Q==
+        d=athom.nl; s=google; t=1685699164; x=1688291164;
+        h=to:date:message-id:subject:mime-version:content-transfer-encoding
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h0lt0mtX5Af0bz+uQwtronJyLa7qinDTnPxE5AHba4Y=;
+        b=C1IyYmDf9hOQ0bDNH9kjv9Z5gc46t0e7HtrDhl/UlA1A2TeXNxAN6Zw9Bk9BpzFR3O
+         YBKVnmgB8vdyWoB603fdiX7VCVrbSuurtLGPzjFAOaPpKTLUuy+rY+lbBW/4UEr2+5hz
+         bi+57u6XH26Zn7kexVS9IG1FGOa/VeG8F6CHw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685696304; x=1688288304;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wVZQ7BJyl7E182Wg5I//4XW0U0UWZ4YIglPySOO3hgI=;
-        b=UfNWtkDdffSh6Jbvn/A5a4fR3jRtg0uNIO/BXTHAlH6JB/qm1/mPp9ocVBUYTIfIiS
-         1QXFsnaf1Csg3s/AcSBZ29sPj/SreZrUys4oB/6w76LKil50zjPYYd3HC5lmNyK5plhC
-         kZkUMF+BeLKEHe0sUH3Gs/WyVMWBWJZI3JOe7gn62scP+iNRkWubwJWdaF3i4sy0EWbG
-         rsjUDFsHP1r3KZgVA/fXauUM7TDqIIsrurDseMoFyNzqK16vCj2ztV+SydUl0Ds5sXwu
-         g0UqdJCxU9N8zeovObL1K9R2kNhsM0PmiuPJOE5v0gtykH8PZ9lYNP3wldhLUYAm/R+2
-         xDDA==
-X-Gm-Message-State: AC+VfDyhDdatAT5qVtq2JYQkFSc16nTOrtpWsJZeOmv+hke9SLmDWRe2
-        Pp8RXNPSnvlH02aNeJwLwZhl6HB2q8o=
-X-Google-Smtp-Source: ACHHUZ7ITDyMpOc1K0XowDihtu5BGjgtdALa+zItnjTnIHNRwbAp8/o0KSszdk/Y0S89mDH1kByIVw==
-X-Received: by 2002:a92:290d:0:b0:33b:363d:27eb with SMTP id l13-20020a92290d000000b0033b363d27ebmr5792684ilg.30.1685696304622;
-        Fri, 02 Jun 2023 01:58:24 -0700 (PDT)
-Received: from [172.17.0.2] ([40.77.123.120])
-        by smtp.gmail.com with ESMTPSA id q9-20020a02c8c9000000b004168689e2e9sm161799jao.57.2023.06.02.01.58.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jun 2023 01:58:24 -0700 (PDT)
-Message-ID: <6479af30.020a0220.df0c6.02f4@mx.google.com>
-Date:   Fri, 02 Jun 2023 01:58:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6107745550358695770=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
-Subject: RE: Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
-In-Reply-To: <20230602081912.4708-1-johan+linaro@kernel.org>
-References: <20230602081912.4708-1-johan+linaro@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+        d=1e100.net; s=20221208; t=1685699164; x=1688291164;
+        h=to:date:message-id:subject:mime-version:content-transfer-encoding
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h0lt0mtX5Af0bz+uQwtronJyLa7qinDTnPxE5AHba4Y=;
+        b=PR0/cZipMyOSoOY7dvRL/qyNM3Mcy8aIg9xC39SAQ1GRUDTb5Ir8EPHIzYnOhLIzZi
+         nMVSUx+EOQESgwNsiO9oeqnsADfk9XYX6eW39uKZDjOSYz6HdoAkakAcn5rGL8FfKG3C
+         ON6TINWaaiScjkZZMoqB8hh1JXIJvlLW/RsaEbk3oqA7EKTbIjvepmnS86oCj9CsipD2
+         kIF6fOqOgU8sS3lDDELb+DiqXW0TdxZjJiyH6hcHrqdzaog3o6u79A9/GQYzG1P5fQtW
+         cs+xVomWuSlTPHHKFD6s3h7kul61QMDRWi8EOyyiBDAeQAOLhA09WxHIHUvBwxq3NYmB
+         g1oA==
+X-Gm-Message-State: AC+VfDxVTTihREa3pkqDF2GIeEwiN5nkr5+4ILeNEZZCqIMA2C38/Cmm
+        Tfx21n5ej6RTqPhkdx+YAGPUVq8w4//Sej++rGzWKN4u
+X-Google-Smtp-Source: ACHHUZ4wdmbSd4AUGroHAuous6GdJnt7qUVitOhufVstCyTefXhWKKf10R2aeUBtnJQA4vagQCXHPw==
+X-Received: by 2002:a17:907:9718:b0:96a:90bb:a2d3 with SMTP id jg24-20020a170907971800b0096a90bba2d3mr9715654ejc.71.1685699164210;
+        Fri, 02 Jun 2023 02:46:04 -0700 (PDT)
+Received: from smtpclient.apple ([37.153.225.197])
+        by smtp.gmail.com with ESMTPSA id rk9-20020a170907214900b0096f8c4b1911sm545987ejb.130.2023.06.02.02.46.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 02 Jun 2023 02:46:03 -0700 (PDT)
+From:   Herman Meerlo <herman.meerlo@athom.nl>
+Content-Type: text/plain;
+        charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
+Subject: Intermittent Not connectable devices reported 
+Message-Id: <76E1E367-BAF0-41A8-A292-7E002B213D8A@athom.nl>
+Date:   Fri, 2 Jun 2023 11:45:53 +0200
+To:     linux-bluetooth@vger.kernel.org
+X-Mailer: Apple Mail (2.3731.500.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6107745550358695770==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+I'm working on a Raspberry Pi device that performs periodic BLE =
+discovery and tries to connect to multiple devices. Most of the times =
+this goes fine but especially in BLE heavy environments every now and =
+then it fails because it says that the device is not found. I have been =
+debugging this issue for a few weeks now and it comes down to this:
 
-This is automated email and please do not reply to this email!
+   =E2=80=A2 Connect to DBus to start the discovery
+   =E2=80=A2 Devices are found, interfacesAdded callbacks are made, =
+everything looks fine
+   =E2=80=A2 Stop discovery
+   =E2=80=A2 Directly some devices are removed by the interfacesRemoved =
+callback
+   =E2=80=A2 My code does not get the device it searches for -> unhappy =
+user
 
-Dear submitter,
+What happens under the hood is that DBus removes all devices from it's =
+cache that have been indicated by Bluez as being Not connectable. I.e. =
+there is no use in keeping them around, you can't connect to them =
+anyway. But... this is not true for the device I'm looking for. It is =
+marked as Not connectable incorrectly.
+So to chase down the problem I create a btmon dump which shows indeed =
+that the device is reported to be Not connectable after having received =
+a SCAN_RSP:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=753409
+> HCI Event: LE Meta Event (0x3e) plen 38 #73 [hci0] 34.359921
+LE Advertising Report (0x02)
+Num reports: 1
+Event type: Scan response - SCAN_RSP (0x04)
+Address type: Public (0x00)
+Address: F4:B8:5E:64:02:55 (Texas Instruments)
+Data length: 26
+Name (complete): BeeWi SmartLite
+Peripheral Conn. Interval: 0x0028 - 0x0050
+TX power: 0 dBm
+RSSI: -42 dBm (0xd6)
+@ MGMT Event: Device Found (0x0012) plen 40 {0x0001} [hci0] 34.360057
+LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
+RSSI: -42 dBm (0xd6)
+Flags: 0x00000004
+Not Connectable
+Data length: 26
+Name (complete): BeeWi SmartLite
+Peripheral Conn. Interval: 0x0028 - 0x0050
+TX power: 0 dBm
 
----Test result---
+But all ADV_IND PDU's before that clearly indicate that the device is =
+connectable, it is only after this SCAN_RSP that it is reported as Not =
+connectable:
 
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-GitLint                       FAIL      0.56 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      34.01 seconds
-CheckAllWarning               PASS      36.62 seconds
-CheckSparse                   PASS      42.25 seconds
-CheckSmatch                   PASS      113.68 seconds
-BuildKernel32                 PASS      33.90 seconds
-TestRunnerSetup               PASS      474.42 seconds
-TestRunner_l2cap-tester       PASS      17.53 seconds
-TestRunner_iso-tester         FAIL      24.51 seconds
-TestRunner_bnep-tester        PASS      5.85 seconds
-TestRunner_mgmt-tester        PASS      119.90 seconds
-TestRunner_rfcomm-tester      PASS      9.36 seconds
-TestRunner_sco-tester         PASS      8.66 seconds
-TestRunner_ioctl-tester       PASS      10.27 seconds
-TestRunner_mesh-tester        PASS      7.43 seconds
-TestRunner_smp-tester         PASS      8.53 seconds
-TestRunner_userchan-tester    PASS      6.13 seconds
-IncrementalBuild              PASS      32.26 seconds
+> HCI Event: LE Meta Event (0x3e) plen 27 #46 [hci0] 34.152817
+LE Advertising Report (0x02)
+Num reports: 1
+Event type: Connectable undirected - ADV_IND (0x00)
+Address type: Public (0x00)
+Address: F4:B8:5E:64:02:55 (Texas Instruments)
+Data length: 15
+Flags: 0x06
+LE General Discoverable Mode
+BR/EDR Not Supported
+Company: Texas Instruments Inc. (13)
+Data: 06030108b0e408f7
+RSSI: -43 dBm (0xd5)
+@ MGMT Event: Device Found (0x0012) plen 31 {0x0001} [hci0] 34.152905
+LE Address: 44:6E:FF:00:0D:65 (Resolvable)
+RSSI: -74 dBm (0xb6)
+Flags: 0x00000000
+Data length: 17
+Flags: 0x1a
+LE General Discoverable Mode
+Simultaneous LE and BR/EDR (Controller)
+Simultaneous LE and BR/EDR (Host)
+TX power: 9 dBm
+Company: Apple, Inc. (76)
+Type: Unknown (16)
+Data: 01188898dc
+> HCI Event: LE Meta Event (0x3e) plen 41 #47 [hci0] 34.156958
+LE Advertising Report (0x02)
+Num reports: 1
+Event type: Connectable undirected - ADV_IND (0x00)
+Address type: Random (0x01)
+Address: FA:BD:8D:12:26:BF (Static)
+Data length: 29
+Name (short): P mesh
+Flags: 0x04
+BR/EDR Not Supported
+128-bit Service UUIDs (partial): 1 entry
+Vendor specific
+RSSI: -47 dBm (0xd1)
+@ MGMT Event: Device Found (0x0012) plen 29 {0x0001} [hci0] 34.157030
+LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
+RSSI: -43 dBm (0xd5)
+Flags: 0x00000000
+Data length: 15
+Flags: 0x06
+LE General Discoverable Mode
+BR/EDR Not Supported
+Company: Texas Instruments Inc. (13)
+Data: 06030108b0e408f7
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
+So I am heavily doubting whether the Linux kernel code has a bug in =
+handling the SCAN_RSP. Please look at this part of the kernel:=20
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-17: B1 Line exceeds max length (83>80): "Link: https://lore.kernel.org/lkml/ecef83c8-497f-4011-607b-a63c24764867@samsung.com"
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 80, Passed: 75 (93.8%), Failed: 5, Not Run: 0
+=
+https://github.com/torvalds/linux/blob/48b1320a674e1ff5de2fad8606bee38f724=
+594dc/net/bluetooth/hci_event.c#L6326
 
-Failed Test Cases
-ISO AC 6(i) - Success                                Failed       0.238 seconds
-ISO AC 7(i) - Success                                Failed       0.234 seconds
-ISO AC 8(i) - Success                                Failed       0.232 seconds
-ISO AC 9(i) - Success                                Failed       0.235 seconds
-ISO AC 11(i) - Success                               Failed       0.243 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6107745550358695770==--
+It sets the NOT CONNECTABLE flag by default for a SCAN_RSP and will =
+overwrite it with any flags it has received with a previous ADV_IND. But =
+it does not seem to take into account that in BLE heavy environments the =
+previous ADV_IND might be of a totally different device. So every now =
+and then it will enter the first path where it will just report the =
+device with a NOT_CONNECTABLE flag. Or am I missing something here?=
