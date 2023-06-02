@@ -2,157 +2,131 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C792C7EE24
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 08:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA4C7EE24
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 08:58:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234599AbjFBIsk (ORCPT
+        id S234595AbjFBI6k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jun 2023 04:48:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48444 "EHLO
+        Fri, 2 Jun 2023 04:58:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234853AbjFBIsT (ORCPT
+        with ESMTP id S234554AbjFBI60 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jun 2023 04:48:19 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A10D171F
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 01:47:33 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230602084730euoutp0224706ddaf39b6719f818dd928d4682a4~ky0NFVbDC0514405144euoutp02f
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 08:47:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230602084730euoutp0224706ddaf39b6719f818dd928d4682a4~ky0NFVbDC0514405144euoutp02f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1685695650;
-        bh=vifMgSmablSJYtcBsnJzPn7Ul7wbzd0xbOWiVjKaYqQ=;
-        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-        b=VgrX91JQm2aNpr78FchK6/KNuxp6IESPkGBBSo8fwGgUmml+chw3EzJ5z+/+c1x14
-         t+kDv4efhpx1jR6wkT9ilU3j2Fa3qFJPlKq8VM30XO32ZddlZZHUonS8nEdepIDsg/
-         3nhI7GI8qtXW8Z0GxmbJFEUTOTe0IezAgukEFUKU=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20230602084730eucas1p1b93d3e14361d7b02f4b79c87b1d56344~ky0M8THCi0628406284eucas1p1l;
-        Fri,  2 Jun 2023 08:47:30 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 48.45.37758.2ACA9746; Fri,  2
-        Jun 2023 09:47:30 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20230602084729eucas1p21d572cc0c2cfa671c1c5668beca53ae8~ky0MjgsIW1432714327eucas1p2y;
-        Fri,  2 Jun 2023 08:47:29 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20230602084729eusmtrp222adcd926bfc53e3c575b6928f24dbae~ky0Mi2Tuy0464204642eusmtrp2T;
-        Fri,  2 Jun 2023 08:47:29 +0000 (GMT)
-X-AuditID: cbfec7f5-815ff7000002937e-3c-6479aca289ae
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 19.95.10549.1ACA9746; Fri,  2
-        Jun 2023 09:47:29 +0100 (BST)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20230602084729eusmtip192a8de50f9973961360bb45f5fbe5456~ky0MJUEUB1505415054eusmtip1L;
-        Fri,  2 Jun 2023 08:47:29 +0000 (GMT)
-Message-ID: <428e37b4-7fb6-7026-8ad9-91218b034a12@samsung.com>
-Date:   Fri, 2 Jun 2023 10:47:28 +0200
+        Fri, 2 Jun 2023 04:58:26 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C123E41
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 01:58:25 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-33b5dba8c6cso6078655ab.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 01:58:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1685696304; x=1688288304;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wVZQ7BJyl7E182Wg5I//4XW0U0UWZ4YIglPySOO3hgI=;
+        b=FNBiZ3X5mdOQe/L7l8xZ9BzVNvyCv9+0n5cIan2WZnoEZUzfNnc46lj7Wz7xojSECi
+         C1pT1r8y+aEsClCiv+h+D5To95dj/FTR0FMx44Btr1yVwkxn1IZ13nnbhGNei3l5Hz01
+         XOJuTqkhujBYMAjIRzWxu3DbBgxtatKJLRk5ANyiFYreogDWx1D780ziIk5A1akVtKlK
+         i6OcnWeJMQnG1guNPqmch8yUOHHmXABbPiQvUpM4Q/sQQ6F7b2Ejnf49lFia0K7fS4c7
+         lN0JcSFkf05DT5YABEl72mySxCAynEfXg5+3p+2l6iaKkJlbOvUjynBTKu5ZW6UlE0Y3
+         a5/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1685696304; x=1688288304;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wVZQ7BJyl7E182Wg5I//4XW0U0UWZ4YIglPySOO3hgI=;
+        b=UfNWtkDdffSh6Jbvn/A5a4fR3jRtg0uNIO/BXTHAlH6JB/qm1/mPp9ocVBUYTIfIiS
+         1QXFsnaf1Csg3s/AcSBZ29sPj/SreZrUys4oB/6w76LKil50zjPYYd3HC5lmNyK5plhC
+         kZkUMF+BeLKEHe0sUH3Gs/WyVMWBWJZI3JOe7gn62scP+iNRkWubwJWdaF3i4sy0EWbG
+         rsjUDFsHP1r3KZgVA/fXauUM7TDqIIsrurDseMoFyNzqK16vCj2ztV+SydUl0Ds5sXwu
+         g0UqdJCxU9N8zeovObL1K9R2kNhsM0PmiuPJOE5v0gtykH8PZ9lYNP3wldhLUYAm/R+2
+         xDDA==
+X-Gm-Message-State: AC+VfDyhDdatAT5qVtq2JYQkFSc16nTOrtpWsJZeOmv+hke9SLmDWRe2
+        Pp8RXNPSnvlH02aNeJwLwZhl6HB2q8o=
+X-Google-Smtp-Source: ACHHUZ7ITDyMpOc1K0XowDihtu5BGjgtdALa+zItnjTnIHNRwbAp8/o0KSszdk/Y0S89mDH1kByIVw==
+X-Received: by 2002:a92:290d:0:b0:33b:363d:27eb with SMTP id l13-20020a92290d000000b0033b363d27ebmr5792684ilg.30.1685696304622;
+        Fri, 02 Jun 2023 01:58:24 -0700 (PDT)
+Received: from [172.17.0.2] ([40.77.123.120])
+        by smtp.gmail.com with ESMTPSA id q9-20020a02c8c9000000b004168689e2e9sm161799jao.57.2023.06.02.01.58.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Jun 2023 01:58:24 -0700 (PDT)
+Message-ID: <6479af30.020a0220.df0c6.02f4@mx.google.com>
+Date:   Fri, 02 Jun 2023 01:58:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6107745550358695770=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0)
-        Gecko/20100101 Thunderbird/102.11.0
-Subject: Re: [PATCH] Bluetooth: hci_bcm: do not mark valid bd_addr as
- invalid
-Content-Language: en-US
-To:     Johan Hovold <johan+linaro@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Matthias Kaehlcke <mka@chromium.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, johan+linaro@kernel.org
+Subject: RE: Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
 In-Reply-To: <20230602081912.4708-1-johan+linaro@kernel.org>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsWy7djPc7qL1lSmGCxsYrdYUWmxa+oxZos5
-        1/qYLS7vmsNm8fTzFFaLb59+MVp83vCY0YHdY3bDRRaPnbPusnus372c3WPTqk42j8+b5AJY
-        o7hsUlJzMstSi/TtErgyZq1+wVqwkq/iy5SFTA2Mv7i7GDk5JARMJO5vOMjaxcjFISSwglHi
-        9crtbBDOF0aJ7SsvMUE4nxkljmxewAjTsuN1PztEYjmjxOf9/SwQzkdGie4Fx1hBqngF7CSu
-        Xe5iA7FZBFQk/i14yA4RF5Q4OfMJC4gtKpAq8W3uDqB6Dg5hAX+JMz+8QMLMAuISt57MZwKx
-        RQTWMkocXqINEc+UOHJ8PTOIzSZgKNH1FmI8p4CNxNf1X1ghauQltr+dwwxyj4TADQ6J6cdm
-        QV3tIvFp+xVWCFtY4tXxLewQtozE/53zmSAa2hklFvy+D+VMYJRoeH4Lqtta4s65X2wglzIL
-        aEqs36UPEXaUeP6zjRkkLCHAJ3HjrSDEEXwSk7ZNhwrzSnS0CUFUq0nMOr4Obu3BC5eYJzAq
-        zUIKlVlI3p+F5J1ZCHsXMLKsYhRPLS3OTU8tNs5LLdcrTswtLs1L10vOz93ECExAp/8d/7qD
-        ccWrj3qHGJk4GA8xSnAwK4nwCoWVpwjxpiRWVqUW5ccXleakFh9ilOZgURLn1bY9mSwkkJ5Y
-        kpqdmlqQWgSTZeLglGpgYth9qG9mtCzDq5CPNxUEZz4w0bxjcPWuh8Fv9WcyQt83W6XH6h3x
-        Sr6xSL130wUp/SkeFsI9Cl1JSyv5VLe8XcVVJTU1LWmX+E0jm9lL5LZdUThX/XziT7W3XItO
-        zlK1m+Fu+EZ9Mu95Y653pdPqYk48EGa2599yhXl/weue5RGeW9YavC3X6JyeYXA2Zcsvo/eh
-        rxc+n7BsUi6bR9B1Lqmb+7mKt4h1rZx6hD+2V7nPdfvCFsUDfK91HirMZs5d7v9BSCh2ymqH
-        jUsmr3LZtfl6W7Kfsdbnx5e78uboLwqObxLdcLA2UKajyrnZZpF+7/X662svqpst3PHJac2a
-        Z9lNu3iOp7aGvki/+4ojRImlOCPRUIu5qDgRAJKfjaavAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPIsWRmVeSWpSXmKPExsVy+t/xu7oL11SmGFx4pWmxotJi19RjzBZz
-        rvUxW1zeNYfN4unnKawW3z79YrT4vOExowO7x+yGiyweO2fdZfdYv3s5u8emVZ1sHp83yQWw
-        RunZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq6dvZpKTmZJalFunbJehlzFr9
-        grVgJV/FlykLmRoYf3F3MXJySAiYSOx43c/excjFISSwlFHi4svtjBAJGYmT0xpYIWxhiT/X
-        utggit4zSvx+vIEJJMErYCdx7TJIgpODRUBF4t+Ch+wQcUGJkzOfsIDYogKpEr1fVoANFRbw
-        lZj/fiZYPbOAuMStJ/OZQIaKCKxnlFj07S1QAwdQIlPicoc2xLJ+RokPDZfAGtgEDCW63kIs
-        4xSwkfi6/gsrxCAzia6tXYwQtrzE9rdzmCcwCs1CcscsJPtmIWmZhaRlASPLKkaR1NLi3PTc
-        YkO94sTc4tK8dL3k/NxNjMCY23bs5+YdjPNefdQ7xMjEwXiIUYKDWUmEVyisPEWINyWxsiq1
-        KD++qDQntfgQoykwMCYyS4km5wOjPq8k3tDMwNTQxMzSwNTSzFhJnNezoCNRSCA9sSQ1OzW1
-        ILUIpo+Jg1OqgSl/5R+uHQKJ8lnaLw8oiHazXBM9tbmz+/yZM3vjL4T67rhUn//OyOVgqlWE
-        Uq673CGdDWyvkhJ6H7888Zqj8t0sP+kXM/TO8jzQiHYTYJCbf12jSfz1Ba6vZjPUZgf17V7p
-        V2T7TPhD2L+YLO0Q5jdbz68wZxIO2lXXonvBt+TavdCv3+Ym3/k5e2uH2aJ9cWZS5i+bdtw/
-        3Wr67O+LjMRD5TIS/jIVDstt758q2cEo5Lxh5haTh02Zie+ddxxJcV7B9922L/j11NavvnHa
-        04Kqrsioli76ar+kuYa16i2HREjS3Fm/b8Z+mbLO0aOofmagXEjgQpZ2ocRND3RXX81MmvNk
-        79Gq3TkWmsI8zEosxRmJhlrMRcWJANzn0pFCAwAA
-X-CMS-MailID: 20230602084729eucas1p21d572cc0c2cfa671c1c5668beca53ae8
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20230602081950eucas1p22a82f91f361fb64e23ecddada3173534
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230602081950eucas1p22a82f91f361fb64e23ecddada3173534
-References: <CGME20230602081950eucas1p22a82f91f361fb64e23ecddada3173534@eucas1p2.samsung.com>
-        <20230602081912.4708-1-johan+linaro@kernel.org>
+References: <20230602081912.4708-1-johan+linaro@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 02.06.2023 10:19, Johan Hovold wrote:
-> A recent commit restored the original (and still documented) semantics
-> for the HCI_QUIRK_USE_BDADDR_PROPERTY quirk so that the device address
-> is considered invalid unless an address is provided by firmware.
->
-> This specifically means that this flag must only be set for devices with
-> invalid addresses, but the Broadcom driver has so far been setting this
-> flag unconditionally.
->
-> Fortunately the driver already checks for invalid addresses during setup
-> and sets the HCI_QUIRK_INVALID_BDADDR flag. Use this flag to indicate
-> when the address can be overridden by firmware (long term, this should
-> probably just always be allowed).
->
-> Fixes: 6ac517d8cf8b ("Bluetooth: fix use-bdaddr-property quirk")
-> Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-> Link: https://lore.kernel.org/lkml/ecef83c8-497f-4011-607b-a63c24764867@samsung.com
-> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
+--===============6107745550358695770==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
+This is automated email and please do not reply to this email!
 
-> ---
->   drivers/bluetooth/hci_bcm.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 83bf5d4330c4..874d23089b39 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -643,7 +643,8 @@ static int bcm_setup(struct hci_uart *hu)
->   	 * Allow the bootloader to set a valid address through the
->   	 * device tree.
->   	 */
-> -	set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hu->hdev->quirks);
-> +	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hu->hdev->quirks))
-> +		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hu->hdev->quirks);
->   
->   	if (!bcm_request_irq(bcm))
->   		err = bcm_setup_sleep(hu);
+Dear submitter,
 
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=753409
 
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       FAIL      0.56 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      34.01 seconds
+CheckAllWarning               PASS      36.62 seconds
+CheckSparse                   PASS      42.25 seconds
+CheckSmatch                   PASS      113.68 seconds
+BuildKernel32                 PASS      33.90 seconds
+TestRunnerSetup               PASS      474.42 seconds
+TestRunner_l2cap-tester       PASS      17.53 seconds
+TestRunner_iso-tester         FAIL      24.51 seconds
+TestRunner_bnep-tester        PASS      5.85 seconds
+TestRunner_mgmt-tester        PASS      119.90 seconds
+TestRunner_rfcomm-tester      PASS      9.36 seconds
+TestRunner_sco-tester         PASS      8.66 seconds
+TestRunner_ioctl-tester       PASS      10.27 seconds
+TestRunner_mesh-tester        PASS      7.43 seconds
+TestRunner_smp-tester         PASS      8.53 seconds
+TestRunner_userchan-tester    PASS      6.13 seconds
+IncrementalBuild              PASS      32.26 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+17: B1 Line exceeds max length (83>80): "Link: https://lore.kernel.org/lkml/ecef83c8-497f-4011-607b-a63c24764867@samsung.com"
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 80, Passed: 75 (93.8%), Failed: 5, Not Run: 0
+
+Failed Test Cases
+ISO AC 6(i) - Success                                Failed       0.238 seconds
+ISO AC 7(i) - Success                                Failed       0.234 seconds
+ISO AC 8(i) - Success                                Failed       0.232 seconds
+ISO AC 9(i) - Success                                Failed       0.235 seconds
+ISO AC 11(i) - Success                               Failed       0.243 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6107745550358695770==--
