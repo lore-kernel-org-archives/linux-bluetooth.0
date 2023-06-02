@@ -2,163 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A44F0C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jun 2023 23:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1686EC7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 00:48:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231346AbjFAXnY (ORCPT
+        id S231232AbjFBAsq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Jun 2023 19:43:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43672 "EHLO
+        Thu, 1 Jun 2023 20:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229651AbjFAXnX (ORCPT
+        with ESMTP id S229682AbjFBAsp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Jun 2023 19:43:23 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DAC3194;
-        Thu,  1 Jun 2023 16:43:18 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2af290cf9b7so20720011fa.3;
-        Thu, 01 Jun 2023 16:43:18 -0700 (PDT)
+        Thu, 1 Jun 2023 20:48:45 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7574FE4
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jun 2023 17:48:44 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-75b050b75a1so139183485a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Jun 2023 17:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685662996; x=1688254996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wXUXOYsaWNhycHkJnu9BK+q/+zGaOZqzGstpDVdACzg=;
-        b=cjETJogGjC0Ea/C68hFQWO7SMxFflQI8WdPfkDtjI01C2g9pxxRQ45VFKkRHo5msMI
-         CQIluQdOf+pvGhnM9Cr/qygxe+sb0YklRXF2nijUf89QWlHKHSMPsfCe6C7ehdmBH4Ml
-         PU8R7+seAbeTq1MrdIBlQmGZN2BWy2BMWnzvY5Gqs3f+BpnG75fbIWqSa4PxqHJnItN0
-         zr4bBQB6DE1WrPGyI0K08fKEkhlgyZWpugxiHdmKbB+f9fqfEaKywRd/1lWSLxI2y1ur
-         U0dd/ms9vRJBn6FhrT8oCUUAYxWfhfrUiKNCT60Ev7KaNB6DROvFAcMjGzTwQZJbF4Oi
-         kVGg==
+        d=gmail.com; s=20221208; t=1685666923; x=1688258923;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3TgFGs3l46uMOecvAJZ3ZqBAqzouNcEsvBBH9nP8/BE=;
+        b=KaaaKPTz67VAoEt82Y9cnsCsgiWTo0PtH+NQcX6SSOHTmkg1/PilVTQekYEl2kvqMq
+         N2u5pkyzM04WV3y0OhXUWwIKMpPNF0z+5DKqCz31y346X7T/wx3zsDspbwYjXjkQPXUU
+         FVBPy1FFXvu4CxCEFHM09PgJZpxMIXxmbf9aCLBjYsWRc6JyiLYPViUbjnsoewFlTJnv
+         pZTaWjBj66+o9kdY6SFGztykcMwoFRuQ6J8DJCoccMoUmYYUbzvXBSwFSx36wD52cd0C
+         fQ2JvKP1CrVEdeKInulcrO0Q1kF9cIXFt0FMM/kolSyBkjXirT6criCpDRNOSQxWGSV8
+         Jfcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685662996; x=1688254996;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wXUXOYsaWNhycHkJnu9BK+q/+zGaOZqzGstpDVdACzg=;
-        b=WX21wbGY154yC3fsDWNFv366ojo4bV318ccdWjIx2MXRpiarbAuoZgmyJLiTU25+uL
-         AHSDQf2kqdbyN5asvCXd6D80RXlIqGlai5WGPQik1mPh7zT1uCojoXV2vosB1BOClnx/
-         M6ASRmzI52q/1Qp1fBZ3V03XkO3WAg1h2GxhZlpQ97dmT3RNQvwo474aTGy46P/bToFq
-         +7Yh6DJCcrG8nDJtRELu2zObvtJLlQabkHpqYkJgRn+HIlOqbaE6G7IkRZkV0OI0tLhL
-         lGM9RMQRZSsu4espNKiCge2yiCcJfAqWyOFtDI7A4iQg4RjoYeMWx8xUGEX00DBw9c+l
-         67BQ==
-X-Gm-Message-State: AC+VfDzpBVwnsx08EMBAfVQyHcxLMu3l6DEeaDosUkyuiTpQbjH8tO3A
-        LxeQYMJmbt6jEuCEkAhWX4Wk48jM7BSkEpxEMq6pi3u+
-X-Google-Smtp-Source: ACHHUZ6rX/fOmNECTeIRnG0+fMgapBsPtceuxzRgFoaKjJx9SOqCSp0+6aVBwWlMd7yzgpOZSiGUhbIhVynmv2q5PR4=
-X-Received: by 2002:a2e:9b04:0:b0:2af:1c0a:20e1 with SMTP id
- u4-20020a2e9b04000000b002af1c0a20e1mr492380lji.52.1685662996198; Thu, 01 Jun
- 2023 16:43:16 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1685666923; x=1688258923;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3TgFGs3l46uMOecvAJZ3ZqBAqzouNcEsvBBH9nP8/BE=;
+        b=jMWBD3oqFzR/b99oMRWe4O80Yojt3l6KP6SmHB/+OGDHssTpuAjC48HwxtXNPzMBHq
+         w996Ao2oUOrvnuVAaWGf4MqOiwNd+hrucyKRPdna9C+zI/bFqvTw+0zhXkdYFyRQbmQV
+         cTpCnu6RyhGEUdrqfTVKfw5FBtYRTXipS8BTRVDaCDsGZidJ+s5I1Nx6QaAAEtQs9lko
+         AiHEQX3kb6j35971WPalG+8214JlxjFL8odSgHVzlH+M3eW5q6zr8L4cAkJOTm6X2uZh
+         aHNtmzOGGlmG7uQRWo1aEh+QVL4fr8OC4m1xHNJcjPEDs+dBgzwtn6jay8M2uPT//sjh
+         +ZSQ==
+X-Gm-Message-State: AC+VfDyhfMVcxBNKucYFbyiXcfPUM2iGcVivgI1CQcxUfZtiHTCj0pZf
+        ANO1nYSNZVHj0i2IQTuVQzh47I2m53A=
+X-Google-Smtp-Source: ACHHUZ44pzKHrIO+FJpis9aIWlf9mnqhP3iYBT/nrnaBQ1c8OGy+Lc6Oj9V4urPyHfG2IFpUfNWTlg==
+X-Received: by 2002:a05:620a:4108:b0:75b:23a1:417 with SMTP id j8-20020a05620a410800b0075b23a10417mr12283782qko.45.1685666923360;
+        Thu, 01 Jun 2023 17:48:43 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.96.41])
+        by smtp.gmail.com with ESMTPSA id a4-20020a05620a124400b0075b1c6f9628sm7292971qkl.71.2023.06.01.17.48.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Jun 2023 17:48:43 -0700 (PDT)
+Message-ID: <64793c6b.050a0220.ba97d.a8ee@mx.google.com>
+Date:   Thu, 01 Jun 2023 17:48:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4074723366658734563=="
 MIME-Version: 1.0
-References: <20230531090424.3187-1-johan+linaro@kernel.org>
- <CGME20230601220156eucas1p21caabcf02509fce7eb26f973704980f9@eucas1p2.samsung.com>
- <20230531090424.3187-3-johan+linaro@kernel.org> <ecef83c8-497f-4011-607b-a63c24764867@samsung.com>
-In-Reply-To: <ecef83c8-497f-4011-607b-a63c24764867@samsung.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 1 Jun 2023 16:43:04 -0700
-Message-ID: <CABBYNZKv94T=BpJBmE-+bWV8Jj=HW_ZEBD_LLX_wQOTFnQi=3w@mail.gmail.com>
-Subject: Re: [PATCH RESEND 2/2] Bluetooth: fix use-bdaddr-property quirk
-To:     Marek Szyprowski <m.szyprowski@samsung.com>
-Cc:     Johan Hovold <johan+linaro@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] monitor: Only print credentials if PID is set
+In-Reply-To: <20230601233317.1419030-1-luiz.dentz@gmail.com>
+References: <20230601233317.1419030-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
+--===============4074723366658734563==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 1, 2023 at 3:01=E2=80=AFPM Marek Szyprowski
-<m.szyprowski@samsung.com> wrote:
->
-> On 31.05.2023 11:04, Johan Hovold wrote:
-> > Devices that lack persistent storage for the device address can indicat=
-e
-> > this by setting the HCI_QUIRK_INVALID_BDADDR which causes the controlle=
-r
-> > to be marked as unconfigured until user space has set a valid address.
-> >
-> > The related HCI_QUIRK_USE_BDADDR_PROPERTY was later added to similarly
-> > indicate that the device lacks a valid address but that one may be
-> > specified in the devicetree.
-> >
-> > As is clear from commit 7a0e5b15ca45 ("Bluetooth: Add quirk for reading
-> > BD_ADDR from fwnode property") that added and documented this quirk and
-> > commits like de79a9df1692 ("Bluetooth: btqcomsmd: use
-> > HCI_QUIRK_USE_BDADDR_PROPERTY"), the device address of controllers with
-> > this flag should be treated as invalid until user space has had a chanc=
-e
-> > to configure the controller in case the devicetree property is missing.
-> >
-> > As it does not make sense to allow controllers with invalid addresses,
-> > restore the original semantics, which also makes sure that the
-> > implementation is consistent (e.g. get_missing_options() indicates that
-> > the address must be set) and matches the documentation (including
-> > comments in the code, such as, "In case any of them is set, the
-> > controller has to start up as unconfigured.").
-> >
-> > Fixes: e668eb1e1578 ("Bluetooth: hci_core: Don't stop BT if the BD addr=
-ess missing in dts")
-> > Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
->
-> This patch has been recently merged to linux-next as commit 6ac517d8cf8b
-> ("Bluetooth: fix use-bdaddr-property quirk"). Unfortunately it breaks
-> bluetooth operation on my Raspberry Pi 3b+, 4b+ and Khadas VIM3 based
-> test systems.
->
-> Before this patch on Raspberry Pi 4b+:
->
-> root@target:~# dmesg | grep hci0
-> [   14.459292] Bluetooth: hci0: BCM: chip id 107
-> [   14.464283] Bluetooth: hci0: BCM: features 0x2f
-> [   14.470632] Bluetooth: hci0: BCM4345C0
-> [   14.474483] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0000
-> [   14.487275] Bluetooth: hci0: BCM4345C0 'brcm/BCM4345C0.hcd' Patch
-> [   15.347542] Bluetooth: hci0: BCM: features 0x2f
-> [   15.354588] Bluetooth: hci0: BCM43455 37.4MHz Raspberry Pi 3+-0159
-> [   15.361076] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0290
-> root@target:~# hcitool dev
-> Devices:
->          hci0    DC:A6:32:12:38:D1
-> root@target:~#
-> root@target:~# hcitool scan
-> Scanning ...
->          88:57:1D:AB:19:B2    Samsung Family Hub
-> root@target:~# hcitool | head -n1
-> hcitool - HCI Tool ver 5.50
-> root@target:~#
->
->
-> After this patch:
->
-> root@target:~# dmesg | grep hci0
-> [   13.979860] Bluetooth: hci0: BCM: chip id 107
-> [   13.984969] Bluetooth: hci0: BCM: features 0x2f
-> [   13.991444] Bluetooth: hci0: BCM4345C0
-> [   13.995300] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0000
-> [   14.005131] Bluetooth: hci0: BCM4345C0 'brcm/BCM4345C0.hcd' Patch
-> [   14.839465] Bluetooth: hci0: BCM: features 0x2f
-> [   14.846047] Bluetooth: hci0: BCM43455 37.4MHz Raspberry Pi 3+-0159
-> [   14.859859] Bluetooth: hci0: BCM4345C0 (003.001.025) build 0290
-> root@target:~# hcitool dev
-> Devices:
-> root@target:~# hcitool scan
-> Device is not available: No such device
-> root@target:~# hcitool | head -n1
-> hcitool - HCI Tool ver 5.50
-> root@target:~#
->
-> Reverting $subject on top of linux-next fixes this 'issue'.
->
-> Let me know if you need more information about my test systems or to
-> make some other tests.
+This is automated email and please do not reply to this email!
 
-Can you give it a look, looks like different manufacturers have
-different expectations, anyway we should probably figure out a way to
-get these controllers working otherwise we will need to revert.
+Dear submitter,
 
---=20
-Luiz Augusto von Dentz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=753319
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.05 seconds
+GitLint                       PASS      0.74 seconds
+BuildEll                      PASS      27.23 seconds
+BluezMake                     PASS      889.25 seconds
+MakeCheck                     PASS      12.26 seconds
+MakeDistcheck                 PASS      155.68 seconds
+CheckValgrind                 PASS      252.09 seconds
+CheckSmatch                   WARNING   341.89 seconds
+bluezmakeextell               PASS      103.28 seconds
+IncrementalBuild              PASS      1456.56 seconds
+ScanBuild                     PASS      1036.99 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1832:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3552:52: warning: array of flexible structuresmonitor/bt.h:3540:40: warning: array of flexible structures
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4074723366658734563==--
