@@ -2,174 +2,162 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F05C77B7A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 09:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75AB2C7EE24
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jun 2023 11:49:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234706AbjFBJqJ (ORCPT
+        id S235014AbjFBLtc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jun 2023 05:46:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54506 "EHLO
+        Fri, 2 Jun 2023 07:49:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234582AbjFBJqI (ORCPT
+        with ESMTP id S235236AbjFBLt2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jun 2023 05:46:08 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C22134
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 02:46:06 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9745c5fed21so115462766b.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 02:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=athom.nl; s=google; t=1685699164; x=1688291164;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=h0lt0mtX5Af0bz+uQwtronJyLa7qinDTnPxE5AHba4Y=;
-        b=C1IyYmDf9hOQ0bDNH9kjv9Z5gc46t0e7HtrDhl/UlA1A2TeXNxAN6Zw9Bk9BpzFR3O
-         YBKVnmgB8vdyWoB603fdiX7VCVrbSuurtLGPzjFAOaPpKTLUuy+rY+lbBW/4UEr2+5hz
-         bi+57u6XH26Zn7kexVS9IG1FGOa/VeG8F6CHw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685699164; x=1688291164;
-        h=to:date:message-id:subject:mime-version:content-transfer-encoding
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h0lt0mtX5Af0bz+uQwtronJyLa7qinDTnPxE5AHba4Y=;
-        b=PR0/cZipMyOSoOY7dvRL/qyNM3Mcy8aIg9xC39SAQ1GRUDTb5Ir8EPHIzYnOhLIzZi
-         nMVSUx+EOQESgwNsiO9oeqnsADfk9XYX6eW39uKZDjOSYz6HdoAkakAcn5rGL8FfKG3C
-         ON6TINWaaiScjkZZMoqB8hh1JXIJvlLW/RsaEbk3oqA7EKTbIjvepmnS86oCj9CsipD2
-         kIF6fOqOgU8sS3lDDELb+DiqXW0TdxZjJiyH6hcHrqdzaog3o6u79A9/GQYzG1P5fQtW
-         cs+xVomWuSlTPHHKFD6s3h7kul61QMDRWi8EOyyiBDAeQAOLhA09WxHIHUvBwxq3NYmB
-         g1oA==
-X-Gm-Message-State: AC+VfDxVTTihREa3pkqDF2GIeEwiN5nkr5+4ILeNEZZCqIMA2C38/Cmm
-        Tfx21n5ej6RTqPhkdx+YAGPUVq8w4//Sej++rGzWKN4u
-X-Google-Smtp-Source: ACHHUZ4wdmbSd4AUGroHAuous6GdJnt7qUVitOhufVstCyTefXhWKKf10R2aeUBtnJQA4vagQCXHPw==
-X-Received: by 2002:a17:907:9718:b0:96a:90bb:a2d3 with SMTP id jg24-20020a170907971800b0096a90bba2d3mr9715654ejc.71.1685699164210;
-        Fri, 02 Jun 2023 02:46:04 -0700 (PDT)
-Received: from smtpclient.apple ([37.153.225.197])
-        by smtp.gmail.com with ESMTPSA id rk9-20020a170907214900b0096f8c4b1911sm545987ejb.130.2023.06.02.02.46.03
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Jun 2023 02:46:03 -0700 (PDT)
-From:   Herman Meerlo <herman.meerlo@athom.nl>
-Content-Type: text/plain;
-        charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.500.231\))
-Subject: Intermittent Not connectable devices reported 
-Message-Id: <76E1E367-BAF0-41A8-A292-7E002B213D8A@athom.nl>
-Date:   Fri, 2 Jun 2023 11:45:53 +0200
-To:     linux-bluetooth@vger.kernel.org
-X-Mailer: Apple Mail (2.3731.500.231)
+        Fri, 2 Jun 2023 07:49:28 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D000610EF;
+        Fri,  2 Jun 2023 04:48:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1685706538; x=1717242538;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9QPnZYdorgxm2tG/6TS44yuCtoro1PqrgtUx93Xiu78=;
+  b=BemgC80972E9OTSM/YDZfiSp1yK4rX6yaztWmgXZ1zRtXNa5YqK1zVrx
+   gGwRFnWC/+TDutQFzQCSWYu9Nh6ygVjgozKZ7q6MmZB6QETSNAaVvTx0O
+   XHytvj9ytyn98TEgWyJGMz3LzvYQSJF28tfdiGmEeml22BnOJw8TvIIGe
+   2iNnTZWYNftxR0uXiRleNxbMXCet1zhFUrQY2buDHeyI5rq3Yb7iR2q+t
+   khisMk85QVIHb7DhWHbFtufjSH37c1lv6NC5pNUSyEntSlYUKre9AFGmt
+   /eq0QIOoM6h9xjoH+bKvgfMwumG7f3qVMAWQny7z13H3vqG60XgA/IjTC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="358279676"
+X-IronPort-AV: E=Sophos;i="6.00,212,1681196400"; 
+   d="scan'208";a="358279676"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 04:48:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10728"; a="707819452"
+X-IronPort-AV: E=Sophos;i="6.00,212,1681196400"; 
+   d="scan'208";a="707819452"
+Received: from rspatil-mobl3.gar.corp.intel.com (HELO ijarvine-MOBL2.ger.corp.intel.com) ([10.251.208.112])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2023 04:48:29 -0700
+From:   =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        Hector Martin <marcan@marcan.st>,
+        Sven Peter <sven@svenpeter.dev>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bjorn Helgaas <bhelgaas@google.com>, asahi@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Subject: [RFC PATCH v1 06/13] Bluetooth: hci_bcm4377: Convert aspm disable to quirk
+Date:   Fri,  2 Jun 2023 14:47:43 +0300
+Message-Id: <20230602114751.19671-7-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230602114751.19671-1-ilpo.jarvinen@linux.intel.com>
+References: <20230602114751.19671-1-ilpo.jarvinen@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I'm working on a Raspberry Pi device that performs periodic BLE =
-discovery and tries to connect to multiple devices. Most of the times =
-this goes fine but especially in BLE heavy environments every now and =
-then it fails because it says that the device is not found. I have been =
-debugging this issue for a few weeks now and it comes down to this:
+pci_disable_link_state() was made reliable regardless of ASPM CONFIG
+and OS being disallowed to change ASPM states to allow drivers to rely
+on pci_disable_link_state() working.
 
-   =E2=80=A2 Connect to DBus to start the discovery
-   =E2=80=A2 Devices are found, interfacesAdded callbacks are made, =
-everything looks fine
-   =E2=80=A2 Stop discovery
-   =E2=80=A2 Directly some devices are removed by the interfacesRemoved =
-callback
-   =E2=80=A2 My code does not get the device it searches for -> unhappy =
-user
+Remove driver working around unreliable pci_disable_link_state() from
+hci_bcm4377 driver and add a PCI quirk to disable ASPM.
 
-What happens under the hood is that DBus removes all devices from it's =
-cache that have been indicated by Bluez as being Not connectable. I.e. =
-there is no use in keeping them around, you can't connect to them =
-anyway. But... this is not true for the device I'm looking for. It is =
-marked as Not connectable incorrectly.
-So to chase down the problem I create a btmon dump which shows indeed =
-that the device is reported to be Not connectable after having received =
-a SCAN_RSP:
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+---
+ drivers/bluetooth/hci_bcm4377.c | 20 --------------------
+ drivers/pci/quirks.c            |  3 +++
+ 2 files changed, 3 insertions(+), 20 deletions(-)
 
-> HCI Event: LE Meta Event (0x3e) plen 38 #73 [hci0] 34.359921
-LE Advertising Report (0x02)
-Num reports: 1
-Event type: Scan response - SCAN_RSP (0x04)
-Address type: Public (0x00)
-Address: F4:B8:5E:64:02:55 (Texas Instruments)
-Data length: 26
-Name (complete): BeeWi SmartLite
-Peripheral Conn. Interval: 0x0028 - 0x0050
-TX power: 0 dBm
-RSSI: -42 dBm (0xd6)
-@ MGMT Event: Device Found (0x0012) plen 40 {0x0001} [hci0] 34.360057
-LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
-RSSI: -42 dBm (0xd6)
-Flags: 0x00000004
-Not Connectable
-Data length: 26
-Name (complete): BeeWi SmartLite
-Peripheral Conn. Interval: 0x0028 - 0x0050
-TX power: 0 dBm
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 19ad0e788646..2348ee2380db 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -490,7 +490,6 @@ struct bcm4377_data;
+  * clear_pciecfg_subsystem_ctrl_bit19: Set to true if bit 19 in the
+  *                                     vendor-specific subsystem control
+  *                                     register has to be cleared
+- * disable_aspm: Set to true if ASPM must be disabled due to hardware errata
+  * broken_ext_scan: Set to true if the chip erroneously claims to support
+  *                  extended scanning
+  * broken_mws_transport_config: Set to true if the chip erroneously claims to
+@@ -509,7 +508,6 @@ struct bcm4377_hw {
+ 
+ 	unsigned long has_bar0_core2_window2 : 1;
+ 	unsigned long clear_pciecfg_subsystem_ctrl_bit19 : 1;
+-	unsigned long disable_aspm : 1;
+ 	unsigned long broken_ext_scan : 1;
+ 	unsigned long broken_mws_transport_config : 1;
+ 
+@@ -2222,20 +2220,6 @@ static int bcm4377_probe_of(struct bcm4377_data *bcm4377)
+ 	return 0;
+ }
+ 
+-static void bcm4377_disable_aspm(struct bcm4377_data *bcm4377)
+-{
+-	pci_disable_link_state(bcm4377->pdev,
+-			       PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+-
+-	/*
+-	 * pci_disable_link_state can fail if either CONFIG_PCIEASPM is disabled
+-	 * or if the BIOS hasn't handed over control to us. We must *always*
+-	 * disable ASPM for this device due to hardware errata though.
+-	 */
+-	pcie_capability_clear_word(bcm4377->pdev, PCI_EXP_LNKCTL,
+-				   PCI_EXP_LNKCTL_ASPMC);
+-}
+-
+ static void bcm4377_pci_free_irq_vectors(void *data)
+ {
+ 	pci_free_irq_vectors(data);
+@@ -2288,9 +2272,6 @@ static int bcm4377_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		return -ENODEV;
+ 	}
+ 
+-	if (bcm4377->hw->disable_aspm)
+-		bcm4377_disable_aspm(bcm4377);
+-
+ 	ret = pci_reset_function_locked(pdev);
+ 	if (ret)
+ 		dev_warn(
+@@ -2448,7 +2429,6 @@ static const struct bcm4377_hw bcm4377_hw_variants[] = {
+ 		.otp_offset = 0x4120,
+ 		.bar0_window1 = 0x1800b000,
+ 		.bar0_window2 = 0x1810c000,
+-		.disable_aspm = true,
+ 		.broken_ext_scan = true,
+ 		.send_ptb = bcm4377_send_ptb,
+ 	},
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index f4e2a88729fd..25b7d7bcb279 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -2407,6 +2407,9 @@ static void quirk_disable_aspm_l0s_l1(struct pci_dev *dev)
+  */
+ DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_ASMEDIA, 0x1080, quirk_disable_aspm_l0s_l1);
+ 
++/* BCM4377 must always disable ASPM due to hardware errata. */
++DECLARE_PCI_FIXUP_FINAL(PCI_VENDOR_ID_BROADCOM, 0x5fa0, quirk_disable_aspm_l0s_l1);
++
+ /*
+  * Some Pericom PCIe-to-PCI bridges in reverse mode need the PCIe Retrain
+  * Link bit cleared after starting the link retrain process to allow this
+-- 
+2.30.2
 
-But all ADV_IND PDU's before that clearly indicate that the device is =
-connectable, it is only after this SCAN_RSP that it is reported as Not =
-connectable:
-
-> HCI Event: LE Meta Event (0x3e) plen 27 #46 [hci0] 34.152817
-LE Advertising Report (0x02)
-Num reports: 1
-Event type: Connectable undirected - ADV_IND (0x00)
-Address type: Public (0x00)
-Address: F4:B8:5E:64:02:55 (Texas Instruments)
-Data length: 15
-Flags: 0x06
-LE General Discoverable Mode
-BR/EDR Not Supported
-Company: Texas Instruments Inc. (13)
-Data: 06030108b0e408f7
-RSSI: -43 dBm (0xd5)
-@ MGMT Event: Device Found (0x0012) plen 31 {0x0001} [hci0] 34.152905
-LE Address: 44:6E:FF:00:0D:65 (Resolvable)
-RSSI: -74 dBm (0xb6)
-Flags: 0x00000000
-Data length: 17
-Flags: 0x1a
-LE General Discoverable Mode
-Simultaneous LE and BR/EDR (Controller)
-Simultaneous LE and BR/EDR (Host)
-TX power: 9 dBm
-Company: Apple, Inc. (76)
-Type: Unknown (16)
-Data: 01188898dc
-> HCI Event: LE Meta Event (0x3e) plen 41 #47 [hci0] 34.156958
-LE Advertising Report (0x02)
-Num reports: 1
-Event type: Connectable undirected - ADV_IND (0x00)
-Address type: Random (0x01)
-Address: FA:BD:8D:12:26:BF (Static)
-Data length: 29
-Name (short): P mesh
-Flags: 0x04
-BR/EDR Not Supported
-128-bit Service UUIDs (partial): 1 entry
-Vendor specific
-RSSI: -47 dBm (0xd1)
-@ MGMT Event: Device Found (0x0012) plen 29 {0x0001} [hci0] 34.157030
-LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
-RSSI: -43 dBm (0xd5)
-Flags: 0x00000000
-Data length: 15
-Flags: 0x06
-LE General Discoverable Mode
-BR/EDR Not Supported
-Company: Texas Instruments Inc. (13)
-Data: 06030108b0e408f7
-
-So I am heavily doubting whether the Linux kernel code has a bug in =
-handling the SCAN_RSP. Please look at this part of the kernel:=20
-
-=
-https://github.com/torvalds/linux/blob/48b1320a674e1ff5de2fad8606bee38f724=
-594dc/net/bluetooth/hci_event.c#L6326
-
-It sets the NOT CONNECTABLE flag by default for a SCAN_RSP and will =
-overwrite it with any flags it has received with a previous ADV_IND. But =
-it does not seem to take into account that in BLE heavy environments the =
-previous ADV_IND might be of a totally different device. So every now =
-and then it will enter the first path where it will just report the =
-device with a NOT_CONNECTABLE flag. Or am I missing something here?=
