@@ -2,271 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C5AC7EE2D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Jun 2023 00:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC0ABC7EE2C
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Jun 2023 00:23:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236891AbjFCAQi (ORCPT
+        id S236735AbjFCAX1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jun 2023 20:16:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58808 "EHLO
+        Fri, 2 Jun 2023 20:23:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236470AbjFCAQg (ORCPT
+        with ESMTP id S236574AbjFCAX0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jun 2023 20:16:36 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A0701B8
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 17:16:35 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-64d24136685so2090002b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 17:16:35 -0700 (PDT)
+        Fri, 2 Jun 2023 20:23:26 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE6D1A5
+        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jun 2023 17:23:25 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b1a6777dd8so30640441fa.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jun 2023 17:23:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1685751394; x=1688343394;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=waBXCZRqkIP2Ni9P178jVN1m8EIaZmqbA1id3TEbBZY=;
-        b=YXKvVw0HTJ/EB4+HfA/lVGnxWrINVoKwaRBBCCtngzVH2F25kh1/2GzuKSWlDeUrZq
-         u/j2w5OjMKRfJiGxFbHq/dav7RVX+ROsznOlJyIMIm+GFuGE7/DfVZAKQKaVqnoVJHZk
-         9aUl7Mh5j5vF0uvRNu1BQH993HHGJTFWmoWNhX5KVrUlErf+cTUZMTHiX3sOU++IW9mz
-         Lv1NHzKhKaM+9e9bsVVXHjSCWOrRO8Wu0HlBywQmTLOeVRqc2Md8E1SNF3F5t4rW4B9T
-         GruwuUJirdcDGx/G05s/9hXsqkb8O0/a9mE58hkv+fBAP7drRklMLgXM/zUb2MPjNzyO
-         V7hA==
+        d=gmail.com; s=20221208; t=1685751803; x=1688343803;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3+ktxA7OaCrS++b79xJMbVK9k6ccfN9ST0oT5GbkoBw=;
+        b=qBxY+2yHP6mLmJfJ70KggSCLyfZwODZU3YiDaUwA80Tk+TICRvWzcF6TRFC6ZoKL9q
+         KshlAisPnV80NepK0nBdzU0MkZ1iBUZWtqgAMLFHZv97Igd2JM4cHLgaEE68c4Y/XpAU
+         U7smEKN5P6ZlXyfVnnjqXcxWW9s0nAuXLZUcZfhOk7SSn8PD3kd9sR2vuzBHNrqtORQW
+         UKqURD/WR9tj1kpg6bk55Ftudu065J7LbIq4OZ45nlOqlL5aXTvoWeQJdemxb8YEsetJ
+         4lAiOOaMV2mDV9/gBJhvGCeAD0r36xsQQWZa0d+89XAGwI4zIHHiz8vfEFYPg6/hc01+
+         NelQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1685751394; x=1688343394;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1685751803; x=1688343803;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=waBXCZRqkIP2Ni9P178jVN1m8EIaZmqbA1id3TEbBZY=;
-        b=QL1nutihyPVd5698cAvQuCq6XYWHVEsCkbct6rXdghvEj3Gviz8afiaTFh9QD+Y3l2
-         z4Sbg9/3/pYogmMdqE50nZF2wjRw+A6nmjFGCo9xEuoM3eqBIVxuLNr0wrH9VEgiAeM1
-         yUG55umk5XvEDtwP60DHiTAtFc40AYOsa+BKIhSR1BOKSFirMeIUPUybrTHZEw1bdnG7
-         crnd+UinhyNoU27zpppNy6Uv3sxCAB5ce/vYt++vpJ9PlXbqkZvrPfxgJ+dtjaXxR8jY
-         Y891YR39C5bjZaQwSkcnla4Zfux+FE4oH6qY7U1wgrlAjQvTRZ10wRz8rM8hNfRZhFiZ
-         dAfQ==
-X-Gm-Message-State: AC+VfDx9vw+GJpIwmPw1QjAa3PE1OGetJgQJUnOzI7Qvfspi8bpbGHQO
-        adrit/P93kuJOlPUTufQmeQwtZ/Sw/k=
-X-Google-Smtp-Source: ACHHUZ70+AugHxZHZ2tlCJa3vjNMzrSipf1iLqdRhJGeDOcC0ASBiSne91Gr6bWaH6Uxvn9vbZlMYQ==
-X-Received: by 2002:a05:6a00:1a8b:b0:64f:ad7c:70fb with SMTP id e11-20020a056a001a8b00b0064fad7c70fbmr6384143pfv.17.1685751393832;
-        Fri, 02 Jun 2023 17:16:33 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id c19-20020aa78e13000000b0064fde7ae1ffsm1496267pfr.38.2023.06.02.17.16.31
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jun 2023 17:16:33 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/3] Bluetooth: hci_sock: Forward credentials to monitor
-Date:   Fri,  2 Jun 2023 17:16:28 -0700
-Message-Id: <20230603001628.1886596-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230603001628.1886596-1-luiz.dentz@gmail.com>
-References: <20230603001628.1886596-1-luiz.dentz@gmail.com>
+        bh=3+ktxA7OaCrS++b79xJMbVK9k6ccfN9ST0oT5GbkoBw=;
+        b=Ns5tf7i9MaUUJcdN5XcjeZSCNzD6Cep0kjZn7rUoljQsM9Pc7uAOBUnedwbPNMLyuu
+         JBIMj53mk0S56ORL1xxameWkxvXtLbwryBxmi+JsNZaYvXo6jtxO1f7BBpsC1ZTmVzUb
+         Pq48t4y3RHrwLbMyyjpK6qFLblbLl0k/ZMA1d92sLEwzxM/nzKCex3f80+yuJY4SAdSD
+         AS2AfSP8Q8Yu5xAOo/85W/tvLhkQIXQRdCJ1+2z2bw8cp8kf3UKZl6zMajHcgEA/iv4o
+         VOQk2arRW3WZEFMZy5H9wmEOdaFLlORC6CqASoRRp9q1G7o2OCzrEpuAPp6QgvepnVR0
+         y8EQ==
+X-Gm-Message-State: AC+VfDxOeUoAk+RJQVkzxdbYV+QzD2qx9rMyz51ebnINdk1eMpWka+is
+        c+eCaYGBpRxgwIfXerLBfQ1WZRiVyTpQNikX/ZHbhH1O
+X-Google-Smtp-Source: ACHHUZ5gYlP0vNJ7u+jr5yXPl+QVaO2p2Q8nstoFn4vMDR2B7s6IIdCzVkwhVYqI4kr5yVOYuyBLaPUnkEwJpaVkVMw=
+X-Received: by 2002:a2e:960b:0:b0:2a8:ac5c:d8f1 with SMTP id
+ v11-20020a2e960b000000b002a8ac5cd8f1mr962875ljh.1.1685751802941; Fri, 02 Jun
+ 2023 17:23:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230530141339.100733-1-silviu.barbulescu@nxp.com> <CABBYNZJ1=ehCm5aDnOO=Zk1gYcxzMk6w0+ASaCrccWTNZWoGHA@mail.gmail.com>
+In-Reply-To: <CABBYNZJ1=ehCm5aDnOO=Zk1gYcxzMk6w0+ASaCrccWTNZWoGHA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 2 Jun 2023 17:23:10 -0700
+Message-ID: <CABBYNZ+u_7Lj6Emc1pz=WRw-Eg2CDxsaynOOzVF4k4JXmDtM7A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 0/4] Add initial support for BAP broadcast source
+To:     Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Silviu,
 
-This stores scm_creds into hci_skb_cb so they can be properly forwarded
-to the likes of btmon which is then able to print information about the
-process who is originating the traffic:
+On Tue, May 30, 2023 at 5:22=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Silviu,
+>
+> On Tue, May 30, 2023 at 7:15=E2=80=AFAM Silviu Florian Barbulescu
+> <silviu.barbulescu@nxp.com> wrote:
+> >
+> > This patch adds initial support for BAP broadcast source.
+> >
+> > The current implementation allows BAP source endpoint registration,
+> > media transport creation, transport acquiring and sending broadcast ISO=
+ data.
+> >
+> > Currently, one BIG containing one BIS is supported.
+> >
+> > To test the current implementation use bluetoothctl with the following =
+commands:
+> > # endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06
+> > # transport.acquire /org/bluez/hci0/dev_00_00_00_00_00_00/pac_broadcast=
+0/fd0
+> > # transport.send /org/bluez/hci0/dev_00_00_00_00_00_00/pac_broadcast0/f=
+d0 <file.wav>
+>
+> I was trying to test this but it doesn't work for me:
+>
+> transport.acquire /org/bluez/hci0/dev_00_00_00_00_00_00/pac_broadcast0/fd=
+0
+> Transport /org/bluez/hci0/dev_00_00_00_00_00_00/pac_broadcast0/fd0 not fo=
+und
+>
+> Anyway I would suggest not to create the endpoint at
+> device_00_00_00_00_00_00 as that is sort of overkill just to be able
+> to broadcast, instead we can probably expose it at adapter level e.g:
+> /org/bluez/hci0/pac_bcast0, and we configure it like:
+>
+> endpoint.config /org/bluez/hci0/pac_bcast0 /local/endpoint/ep3 [preset]
 
-bluetoothd[35]: @ MGMT Command: Rea.. (0x0001) plen 0  {0x0001}
-@ MGMT Event: Command Complete (0x0001) plen 6         {0x0001}
-      Read Management Version Information (0x0001) plen 3
+Are you planning to continue working on this set? Or are you waiting
+for some more feedback?
 
-bluetoothd[35]: < ACL Data T.. flags 0x00 dlen 41
-      ATT: Write Command (0x52) len 36
-        Handle: 0x0043 Type: ASE Control Point (0x2bc6)
-          Data: 020203000110270000022800020a00409c0001000110270000022800020a00409c00
-            Opcode: QoS Configuration (0x02)
-            Number of ASE(s): 2
-            ASE: #0
-            ASE ID: 0x03
-            CIG ID: 0x00
-            CIS ID: 0x01
-            SDU Interval: 10000 usec
-            Framing: Unframed (0x00)
-            PHY: 0x02
-            LE 2M PHY (0x02)
-            Max SDU: 40
-            RTN: 2
-            Max Transport Latency: 10
-            Presentation Delay: 40000 us
-            ASE: #1
-            ASE ID: 0x01
-            CIG ID: 0x00
-            CIS ID: 0x01
-            SDU Interval: 10000 usec
-            Framing: Unframed (0x00)
-            PHY: 0x02
-            LE 2M PHY (0x02)
-            Max SDU: 40
-            RTN: 2
-            Max Transport Latency: 10
-            Presentation Delay: 40000 us
+> > The curent implementation checks that ISO_BROADCASTER is suported on th=
+e board so
+> > "Check for ISO support in controller" patch is required
+> > (https://patchwork.kernel.org/project/bluetooth/patch/20230510134557.11=
+486-2-claudia.rosu@nxp.com/)
+> >
+> > Silviu Florian Barbulescu (4):
+> >   Split bt_bap_qos structure into unicast and broadcast structures
+> >   Update bluetoothctl with support for broadcast source
+> >   This adds the initial code for BAP broadcast source
+> >   Update BAP plugin with broadcast source support
+>
+> Btw, please use proper prefix e.g. shared/bap, client/player, etc, and
+> there are still some lines that are over 80 columns that need fixing.
+>
+> >
+> >  client/player.c            | 223 +++++++++++++++--
+> >  profiles/audio/bap.c       | 478 ++++++++++++++++++++++++++++++++-----
+> >  profiles/audio/media.c     | 142 +++++++++--
+> >  profiles/audio/transport.c |  57 +++--
+> >  src/shared/bap.c           | 370 ++++++++++++++++++++++------
+> >  src/shared/bap.h           |  80 +++++--
+> >  unit/test-bap.c            |  75 +++---
+> >  7 files changed, 1168 insertions(+), 257 deletions(-)
+> >
+> >
+> > base-commit: 7002ecc8914ab1f22e36bd98c4d46eb760edf767
+> > --
+> > 2.34.1
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/hci_sock.c          | 67 ++++++++++++++++++++++++++++++-
- 2 files changed, 66 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index b518e5379045..310231e47b3d 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -471,6 +471,7 @@ struct bt_skb_cb {
- 		struct sco_ctrl sco;
- 		struct hci_ctrl hci;
- 		struct mgmt_ctrl mgmt;
-+		struct scm_creds creds;
- 	};
- };
- #define bt_cb(skb) ((struct bt_skb_cb *)((skb)->cb))
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 9c45586f5818..5e4f718073b7 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -264,6 +264,53 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 	kfree_skb(skb_copy);
- }
- 
-+static void hci_sock_copy_creds(struct sock *sk, struct sk_buff *skb)
-+{
-+	struct scm_creds *creds;
-+
-+	if (!sk || WARN_ON(!skb))
-+		return;
-+
-+	creds = &bt_cb(skb)->creds;
-+
-+	/* Check if peer credentials is set */
-+	if (!sk->sk_peer_pid) {
-+		/* Check if parent peer credentials is set */
-+		if (bt_sk(sk)->parent && bt_sk(sk)->parent->sk_peer_pid)
-+			sk = bt_sk(sk)->parent;
-+		else
-+			return;
-+	}
-+
-+	/* Check if scm_creds already set */
-+	if (creds->pid == pid_vnr(sk->sk_peer_pid))
-+		return;
-+
-+	memset(creds, 0, sizeof(*creds));
-+
-+	creds->pid = pid_vnr(sk->sk_peer_pid);
-+	if (sk->sk_peer_cred) {
-+		creds->uid = sk->sk_peer_cred->uid;
-+		creds->gid = sk->sk_peer_cred->gid;
-+	}
-+}
-+
-+static struct sk_buff *hci_skb_clone(struct sk_buff *skb)
-+{
-+	struct sk_buff *nskb;
-+
-+	if (!skb)
-+		return NULL;
-+
-+	nskb = skb_clone(skb, GFP_ATOMIC);
-+	if (!nskb)
-+		return NULL;
-+
-+	hci_sock_copy_creds(skb->sk, nskb);
-+
-+	return nskb;
-+}
-+
- /* Send frame to sockets with specific channel */
- static void __hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
- 				  int flag, struct sock *skip_sk)
-@@ -289,7 +336,7 @@ static void __hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
- 		if (hci_pi(sk)->channel != channel)
- 			continue;
- 
--		nskb = skb_clone(skb, GFP_ATOMIC);
-+		nskb = hci_skb_clone(skb);
- 		if (!nskb)
- 			continue;
- 
-@@ -356,6 +403,8 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!skb_copy)
- 		return;
- 
-+	hci_sock_copy_creds(skb->sk, skb_copy);
-+
- 	/* Put header before the data */
- 	hdr = skb_push(skb_copy, HCI_MON_HDR_SIZE);
- 	hdr->opcode = opcode;
-@@ -531,10 +580,12 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
- 		return NULL;
- 	}
- 
--	skb = bt_skb_alloc(14 + TASK_COMM_LEN , GFP_ATOMIC);
-+	skb = bt_skb_alloc(14 + TASK_COMM_LEN, GFP_ATOMIC);
- 	if (!skb)
- 		return NULL;
- 
-+	hci_sock_copy_creds(sk, skb);
-+
- 	flags = hci_sock_test_flag(sk, HCI_SOCK_TRUSTED) ? 0x1 : 0x0;
- 
- 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
-@@ -580,6 +631,8 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
- 	if (!skb)
- 		return NULL;
- 
-+	hci_sock_copy_creds(sk, skb);
-+
- 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
- 
- 	__net_timestamp(skb);
-@@ -606,6 +659,8 @@ static struct sk_buff *create_monitor_ctrl_command(struct sock *sk, u16 index,
- 	if (!skb)
- 		return NULL;
- 
-+	hci_sock_copy_creds(sk, skb);
-+
- 	put_unaligned_le32(hci_pi(sk)->cookie, skb_put(skb, 4));
- 	put_unaligned_le16(opcode, skb_put(skb, 2));
- 
-@@ -638,6 +693,8 @@ send_monitor_note(struct sock *sk, const char *fmt, ...)
- 	if (!skb)
- 		return;
- 
-+	hci_sock_copy_creds(sk, skb);
-+
- 	va_start(args, fmt);
- 	vsprintf(skb_put(skb, len), fmt, args);
- 	*(u8 *)skb_put(skb, 1) = 0;
-@@ -1494,6 +1551,7 @@ static void hci_sock_cmsg(struct sock *sk, struct msghdr *msg,
- static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 			    size_t len, int flags)
- {
-+	struct scm_cookie scm;
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb;
- 	int copied, err;
-@@ -1538,11 +1596,16 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 		break;
- 	}
- 
-+	memset(&scm, 0, sizeof(scm));
-+	scm.creds = bt_cb(skb)->creds;
-+
- 	skb_free_datagram(sk, skb);
- 
- 	if (flags & MSG_TRUNC)
- 		copied = skblen;
- 
-+	scm_recv(sock, msg, &scm, flags);
-+
- 	return err ? : copied;
- }
- 
--- 
-2.40.1
 
+--=20
+Luiz Augusto von Dentz
