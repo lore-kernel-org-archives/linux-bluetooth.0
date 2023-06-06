@@ -2,80 +2,118 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7757BC7EE23
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Jun 2023 19:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB424C7EE23
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jun 2023 00:35:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235760AbjFETk0 (ORCPT
+        id S232902AbjFFAe7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Jun 2023 15:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52764 "EHLO
+        Mon, 5 Jun 2023 20:34:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235703AbjFETkY (ORCPT
+        with ESMTP id S229667AbjFFAe6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Jun 2023 15:40:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF50EF1;
-        Mon,  5 Jun 2023 12:40:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4C4D0629C9;
-        Mon,  5 Jun 2023 19:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A8D86C4339C;
-        Mon,  5 Jun 2023 19:40:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1685994021;
-        bh=oRAt9LRIZf64qXrXghsMGNIfmTnUIFazbDZcsKg6jl8=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=OuZibhFb4jwS/M69tdtGt8iJcOKoT75sSbAZIjvXcEQ/SgZAhhvk9dTL+y6TE4I2H
-         O7hWXMgT8yWgxWQpXvhVM3MLV08B3pr7BQP9CBxNhTRvlYNhezSJdj0S/zuVvHyE0W
-         cPwukgr90NQsO02oPDFVGdd94yk3pO3lNtk5RCfdjcQ1bZJbMv5NB8K8Evo/uVT12S
-         9Cg0NtRB3vwerMGyZsTFIHgfhKrZTv046PZkGEFH/bRJlafU1Hqj7+tdaLqnW74Iix
-         j4cbYPV9eeOIqN5nJTOk1IvkdymDCReSN6a1OkU+Ws2hAGhweBu5oNJqHg0HccZDNA
-         Ctao1w+gRli7A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B2D6E4F0A8;
-        Mon,  5 Jun 2023 19:40:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 5 Jun 2023 20:34:58 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E0D4EA;
+        Mon,  5 Jun 2023 17:34:57 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-652699e72f7so2796259b3a.3;
+        Mon, 05 Jun 2023 17:34:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686011697; x=1688603697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qp+N5Z7HA68i2uc1zJ9KQOBMaX5PlDLeZxmtZ6d/RCU=;
+        b=Oo96+HWowncsesiFLPxlX0xq6yW4Zk79zzZ7+LX+3HNe0Is7+77laAytG9jp0OfM1h
+         +bVnv2adG50bt/DBOP0lD9tiXlYXdMeF/afT/dc5rXq3zNSA4F64JRElPYkpgqjMvkdx
+         mjpAWm00hnYHxfi65qjKIy5DiwPy2zsgmm8OEZ/pyjcxv4MPrdEqfdENI+QZefixyO21
+         1vU3MWjpou2XtfCs0HjL8UcStJRQv+B6qKVeHzKy0zSeJptzAJR26aMgyM+0WzqbhQVV
+         z02OqgbL+LvJRuPEIl2LSVieiF83vAYqgJUskciBNxfLeweFybOcDI0zHctVTY/DWfz6
+         pwPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686011697; x=1688603697;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qp+N5Z7HA68i2uc1zJ9KQOBMaX5PlDLeZxmtZ6d/RCU=;
+        b=cyNdV8oz8V+YUNkFP3drEwaU496q6OZH+eXg3hZwBXyOi3OJpWepqrn/AkMIxQNiI5
+         Hhch9ZM+VAyZ3GOUXNXmHeRbVkuzvD1TMNmcq7ABWUS7ez44iVqSxJBiH4xts7Z3+tMN
+         UMH1NS90cNpxiRcrWN5KUQ2vWEHKfVAfBj3JscCf2epFnXiSyTGPzYBW5H18KaXC5PDg
+         FSBcj4W5VQJ3SP6PVEPpr/hbJ0FXMbOmqSRzmIFCLFdu+NqAupNShcW1b/xnw5wg4K8t
+         do6hx70SRiDx4CXmKPblW6UrAoiyF1nIMZaD2gfXFSJlifHecsXGC2ZXY7dAp41N+OJ2
+         ZRTw==
+X-Gm-Message-State: AC+VfDzHBAakYnVusSmprC9zPwfxd1sJei897aeGx0BVVTlVyQYgKRpR
+        +yrEQfJACn70p7cBYyEMOz6MIP4JO2E=
+X-Google-Smtp-Source: ACHHUZ50Nt6IA+eBcUe1gfUoKw19GjghlBZdZfO5aeU4+bUKkYPMvch6Ee90qkdwq7nhr8kFtIx/zg==
+X-Received: by 2002:a05:6a00:b81:b0:643:96e:666b with SMTP id g1-20020a056a000b8100b00643096e666bmr129388pfj.34.1686011696867;
+        Mon, 05 Jun 2023 17:34:56 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id j4-20020aa79284000000b0063b8d21be5asm5894499pfa.147.2023.06.05.17.34.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Jun 2023 17:34:55 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull-request: bluetooth 2023-06-05
+Date:   Mon,  5 Jun 2023 17:34:54 -0700
+Message-Id: <20230606003454.2392552-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btrtl: Correct the length of the HCI command for
- drop fw
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168599402156.27522.5375572234427339145.git-patchwork-notify@kernel.org>
-Date:   Mon, 05 Jun 2023 19:40:21 +0000
-References: <20230530083420.6876-1-max.chou@realtek.com>
-In-Reply-To: <20230530083420.6876-1-max.chou@realtek.com>
-To:     Max Chou <max.chou@realtek.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex_lu@realsil.com.cn, hildawu@realtek.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+The following changes since commit fb928170e32ebf4f983db7ea64901b1ea19ceadf:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Merge branch 'mptcp-addr-adv-fixes' (2023-06-05 15:15:57 +0100)
 
-On Tue, 30 May 2023 16:34:20 +0800 you wrote:
-> From: Max Chou <max.chou@realtek.com>
-> 
-> The original code did not determine the length value of the HCI command
-> for drop fw even there's no parameter needed. In this commit, use struct
-> hci_command_hdr to manage opcode and length. It would be more regular and
-> more readable.
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - Bluetooth: btrtl: Correct the length of the HCI command for drop fw
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a332208e733b
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-06-05
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to 75767213f3d9b97f63694d02260b6a49a2271876:
 
+  Bluetooth: L2CAP: Add missing checks for invalid DCID (2023-06-05 17:24:14 -0700)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fixes to debugfs registration
+ - Fix use-after-free in hci_remove_ltk/hci_remove_irk
+ - Fixes to ISO channel support
+ - Fix missing checks for invalid L2CAP DCID
+ - Fix l2cap_disconnect_req deadlock
+ - Add lock to protect HCI_UNREGISTER
+
+----------------------------------------------------------------
+Johan Hovold (2):
+      Bluetooth: fix debugfs registration
+      Bluetooth: hci_qca: fix debugfs registration
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: Fix use-after-free in hci_remove_ltk/hci_remove_irk
+
+Pauli Virtanen (4):
+      Bluetooth: ISO: consider right CIS when removing CIG at cleanup
+      Bluetooth: ISO: Fix CIG auto-allocation to select configurable CIG
+      Bluetooth: ISO: don't try to remove CIG if there are bound CIS left
+      Bluetooth: ISO: use correct CIS order in Set CIG Parameters event
+
+Sungwoo Kim (1):
+      Bluetooth: L2CAP: Add missing checks for invalid DCID
+
+Ying Hsu (1):
+      Bluetooth: Fix l2cap_disconnect_req deadlock
+
+Zhengping Jiang (1):
+      Bluetooth: hci_sync: add lock to protect HCI_UNREGISTER
+
+ drivers/bluetooth/hci_qca.c      |  6 +++++-
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h |  4 +++-
+ net/bluetooth/hci_conn.c         | 22 ++++++++++++--------
+ net/bluetooth/hci_core.c         | 10 +++++----
+ net/bluetooth/hci_event.c        | 44 ++++++++++++++++++++++++----------------
+ net/bluetooth/hci_sync.c         | 23 +++++++++++++++------
+ net/bluetooth/l2cap_core.c       | 13 ++++++++++++
+ 8 files changed, 84 insertions(+), 39 deletions(-)
