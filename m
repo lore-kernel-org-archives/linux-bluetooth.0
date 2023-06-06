@@ -2,244 +2,242 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1889C77B73
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jun 2023 12:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF22C77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jun 2023 13:31:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237744AbjFFMx6 (ORCPT
+        id S237591AbjFFNbU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jun 2023 08:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52670 "EHLO
+        Tue, 6 Jun 2023 09:31:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234308AbjFFMxy (ORCPT
+        with ESMTP id S231431AbjFFNbS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jun 2023 08:53:54 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B023D10D9
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jun 2023 05:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1686056028; x=1717592028;
-  h=date:from:to:cc:subject:message-id;
-  bh=lrN6/BsLIlUuAYd7JJpfM9WWl7EyDGCsC90rkTPUNds=;
-  b=jdSew4gMdZR7I1BIn4FbDGX4KvJvBTC6rfCoQYzcAeRESSAUduzb8UGh
-   aF/o2HfaHhcu9/k0zf5hJ28lP8u8yWE3x4HJOp6avWT93uXDXTWi5sBJC
-   l5TU5C82TySqYZ+YYwbhQYy21dRj6zObth+L5EirUgazcxXM52yYNpabn
-   g0gEfGs8ypaqdERQYmCkR4MqEK8TieOMbngED2DknfZNBExv/ML/b9uvQ
-   O/PbZ8Fz80LFnfuVc5p5Oq1mFi2ncck9BwzVP/IE+cDZCl7olZvDG7WAy
-   Dvakd8v6qIJbNaY1Ef88eEljX+3vlk/2ON0AT20HWGxOx6wtWSM7Al4Fw
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="341299877"
-X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
-   d="scan'208";a="341299877"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2023 05:53:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10732"; a="709066208"
-X-IronPort-AV: E=Sophos;i="6.00,221,1681196400"; 
-   d="scan'208";a="709066208"
-Received: from lkp-server01.sh.intel.com (HELO 15ab08e44a81) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 06 Jun 2023 05:53:24 -0700
-Received: from kbuild by 15ab08e44a81 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1q6WBf-0005Fi-2Z;
-        Tue, 06 Jun 2023 12:53:23 +0000
-Date:   Tue, 06 Jun 2023 20:52:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 817efd3cad7481ce2ee25fac5108afecbad56228
-Message-ID: <20230606125250.dF8N_%lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Tue, 6 Jun 2023 09:31:18 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3074310C0
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Jun 2023 06:31:17 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-75ec7e8e826so114028685a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Jun 2023 06:31:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686058276; x=1688650276;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=lE0+dhKKFcmGn4WlxVuaSAhUZ+MRUtUufLkbYAuvKVU=;
+        b=InWwPX54QE1O5jNEXVb0KkpGc7LDpq8i8JS6MvnAuoW0qxIX8Cr9o9iGBatbG2jPYt
+         KL9C1h5iCjGWBZQpZpPimkd3meH5+03Myp1h/ihsCLkIgvNlPZILyD7mTQauJkbkJlwY
+         znyvPv61lHK2oJ47iflyi4RhjsOj/3zdHERHMoob+h1JcAQClJBDQynDivhUwJQGTdPf
+         vlF9xqpe1AZz+ozeeOjr+n6H1WLOiBUX9rq41g0IBoW6Pjn5TLB6KszceTKJKB5d01Az
+         bt8BtRqFzAvXj1Drj9iyD3KY8woCifxH0lAb8cr8RABqDEEuHzps3fiD7v3W5c3LWtcm
+         kBIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686058276; x=1688650276;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lE0+dhKKFcmGn4WlxVuaSAhUZ+MRUtUufLkbYAuvKVU=;
+        b=GJYqN/7zIotzbHIXsZVQj4BXT6bHJhqf4MSznk6B20FQXw0QWz+H8nMD4Mq/JQcQeM
+         hiIlJKl6A9ijyzxYlPPgFzGPoWlKHtBtG8HBCMaHe7+k5ykK39ME1pyKy3oAHilOFEqk
+         qvRDOnRRuOV8uGVbGc54XOEHORKvkw9+FMAyee1aj1ytDoV0UHYVZENnQ9+U2aWTcOPp
+         GYNniGhRuzBuDhFYeAgFjUMjdevzlACn3yxgH2w8YY4XLp72T1JCFz5MKn+qeSJYzfWX
+         nosmGnbfFzggO+/ABs5OS4G3Ms04pMkvrFB9U8SyPh1ZmxpUQQ8cSvg5tjZDM/tPK6lt
+         Y5BA==
+X-Gm-Message-State: AC+VfDwGqUjyc/7IflAuvrYX6pjlkiJlODMHcFqQxmzohEvjQxY8cyTH
+        dbi0NvGyENi4VsYLeWwErIeM1utYCyA=
+X-Google-Smtp-Source: ACHHUZ65guHdf9j9iUwieKhD+2I0PjTWBbXtGjdsOEQImN8l5uk/S8khyYjfKS+J9xAxYrX3dfcfPQ==
+X-Received: by 2002:a05:620a:2702:b0:75e:c91b:861e with SMTP id b2-20020a05620a270200b0075ec91b861emr1996031qkp.54.1686058276062;
+        Tue, 06 Jun 2023 06:31:16 -0700 (PDT)
+Received: from [172.17.0.2] ([40.75.125.209])
+        by smtp.gmail.com with ESMTPSA id m14-20020ae9e70e000000b007594a7aedb2sm4879614qka.105.2023.06.06.06.31.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Jun 2023 06:31:15 -0700 (PDT)
+Message-ID: <647f3523.e90a0220.e74c4.ced8@mx.google.com>
+Date:   Tue, 06 Jun 2023 06:31:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4591044676212743865=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, nitin.jadhav@nxp.com
+Subject: RE: Code handling for VOCS service
+In-Reply-To: <20230606120824.4705-2-nitin.jadhav@nxp.com>
+References: <20230606120824.4705-2-nitin.jadhav@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 817efd3cad7481ce2ee25fac5108afecbad56228  Bluetooth: hci_sock: Forward credentials to monitor
+--===============4591044676212743865==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-elapsed time: 725m
+This is automated email and please do not reply to this email!
 
-configs tested: 172
-configs skipped: 10
+Dear submitter,
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=754428
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r005-20230606   gcc  
-alpha                randconfig-r022-20230606   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r043-20230605   gcc  
-arc                  randconfig-r043-20230606   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r003-20230606   clang
-arm                  randconfig-r046-20230605   clang
-arm                  randconfig-r046-20230606   gcc  
-arm64                            allyesconfig   gcc  
-arm64        buildonly-randconfig-r005-20230605   clang
-arm64        buildonly-randconfig-r006-20230606   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r004-20230606   gcc  
-arm64                randconfig-r012-20230605   gcc  
-arm64                randconfig-r025-20230606   clang
-csky                                defconfig   gcc  
-csky                 randconfig-r035-20230605   gcc  
-csky                 randconfig-r035-20230606   gcc  
-hexagon      buildonly-randconfig-r001-20230605   clang
-hexagon              randconfig-r004-20230606   clang
-hexagon              randconfig-r041-20230605   clang
-hexagon              randconfig-r045-20230605   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r005-20230606   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230605   clang
-i386                 randconfig-i001-20230606   gcc  
-i386                 randconfig-i002-20230605   clang
-i386                 randconfig-i002-20230606   gcc  
-i386                 randconfig-i003-20230605   clang
-i386                 randconfig-i003-20230606   gcc  
-i386                 randconfig-i004-20230605   clang
-i386                 randconfig-i004-20230606   gcc  
-i386                 randconfig-i005-20230605   clang
-i386                 randconfig-i005-20230606   gcc  
-i386                 randconfig-i006-20230605   clang
-i386                 randconfig-i006-20230606   gcc  
-i386                 randconfig-i011-20230605   gcc  
-i386                 randconfig-i011-20230606   clang
-i386                 randconfig-i012-20230605   gcc  
-i386                 randconfig-i012-20230606   clang
-i386                 randconfig-i013-20230605   gcc  
-i386                 randconfig-i013-20230606   clang
-i386                 randconfig-i014-20230605   gcc  
-i386                 randconfig-i014-20230606   clang
-i386                 randconfig-i015-20230605   gcc  
-i386                 randconfig-i015-20230606   clang
-i386                 randconfig-i016-20230605   gcc  
-i386                 randconfig-i016-20230606   clang
-i386                 randconfig-i051-20230605   clang
-i386                 randconfig-i051-20230606   gcc  
-i386                 randconfig-i052-20230605   clang
-i386                 randconfig-i052-20230606   gcc  
-i386                 randconfig-i053-20230605   clang
-i386                 randconfig-i053-20230606   gcc  
-i386                 randconfig-i054-20230605   clang
-i386                 randconfig-i054-20230606   gcc  
-i386                 randconfig-i055-20230605   clang
-i386                 randconfig-i055-20230606   gcc  
-i386                 randconfig-i056-20230605   clang
-i386                 randconfig-i056-20230606   gcc  
-i386                 randconfig-i061-20230605   clang
-i386                 randconfig-i061-20230606   gcc  
-i386                 randconfig-i062-20230605   clang
-i386                 randconfig-i062-20230606   gcc  
-i386                 randconfig-i063-20230605   clang
-i386                 randconfig-i063-20230606   gcc  
-i386                 randconfig-i064-20230605   clang
-i386                 randconfig-i064-20230606   gcc  
-i386                 randconfig-i065-20230605   clang
-i386                 randconfig-i065-20230606   gcc  
-i386                 randconfig-i066-20230605   clang
-i386                 randconfig-i066-20230606   gcc  
-i386                 randconfig-r006-20230606   gcc  
-i386                 randconfig-r036-20230606   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r006-20230606   gcc  
-loongarch            randconfig-r016-20230605   gcc  
-loongarch            randconfig-r025-20230606   gcc  
-loongarch            randconfig-r031-20230605   gcc  
-m68k                             allmodconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r002-20230606   gcc  
-m68k                 randconfig-r003-20230606   gcc  
-m68k                 randconfig-r032-20230606   gcc  
-microblaze           randconfig-r003-20230606   gcc  
-microblaze           randconfig-r026-20230605   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 randconfig-r021-20230606   gcc  
-mips                 randconfig-r035-20230605   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r011-20230605   gcc  
-nios2                randconfig-r023-20230606   gcc  
-openrisc     buildonly-randconfig-r004-20230605   gcc  
-openrisc             randconfig-r033-20230605   gcc  
-openrisc             randconfig-r036-20230605   gcc  
-parisc       buildonly-randconfig-r003-20230606   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r015-20230605   gcc  
-parisc               randconfig-r025-20230605   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc              randconfig-r005-20230606   gcc  
-powerpc              randconfig-r012-20230606   clang
-powerpc              randconfig-r021-20230606   clang
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv        buildonly-randconfig-r001-20230606   clang
-riscv        buildonly-randconfig-r002-20230606   clang
-riscv                               defconfig   gcc  
-riscv                randconfig-r022-20230605   gcc  
-riscv                randconfig-r042-20230605   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390         buildonly-randconfig-r005-20230606   clang
-s390                                defconfig   gcc  
-s390                 randconfig-r001-20230606   gcc  
-s390                 randconfig-r002-20230606   gcc  
-s390                 randconfig-r044-20230605   gcc  
-sh                               allmodconfig   gcc  
-sh           buildonly-randconfig-r001-20230606   gcc  
-sh                   randconfig-r031-20230605   gcc  
-sh                   randconfig-r032-20230605   gcc  
-sh                   randconfig-r033-20230605   gcc  
-sh                   randconfig-r033-20230606   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r024-20230605   gcc  
-sparc                randconfig-r032-20230605   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-a001-20230606   gcc  
-x86_64               randconfig-a002-20230606   gcc  
-x86_64               randconfig-a003-20230606   gcc  
-x86_64               randconfig-a004-20230606   gcc  
-x86_64               randconfig-a005-20230606   gcc  
-x86_64               randconfig-a006-20230606   gcc  
-x86_64               randconfig-a011-20230606   clang
-x86_64               randconfig-a012-20230606   clang
-x86_64               randconfig-a013-20230606   clang
-x86_64               randconfig-a014-20230606   clang
-x86_64               randconfig-a015-20230606   clang
-x86_64               randconfig-a016-20230606   clang
-x86_64               randconfig-x051-20230606   clang
-x86_64               randconfig-x052-20230606   clang
-x86_64               randconfig-x053-20230606   clang
-x86_64               randconfig-x054-20230606   clang
-x86_64               randconfig-x055-20230606   clang
-x86_64               randconfig-x056-20230606   clang
-x86_64               randconfig-x061-20230606   clang
-x86_64               randconfig-x062-20230606   clang
-x86_64               randconfig-x063-20230606   clang
-x86_64               randconfig-x064-20230606   clang
-x86_64               randconfig-x065-20230606   clang
-x86_64               randconfig-x066-20230606   clang
-x86_64                               rhel-8.3   gcc  
-xtensa       buildonly-randconfig-r006-20230605   gcc  
-xtensa               randconfig-r013-20230605   gcc  
+---Test result---
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Test Summary:
+CheckPatch                    FAIL      1.73 seconds
+GitLint                       FAIL      0.91 seconds
+BuildEll                      PASS      26.19 seconds
+BluezMake                     PASS      755.55 seconds
+MakeCheck                     PASS      11.55 seconds
+MakeDistcheck                 PASS      152.47 seconds
+CheckValgrind                 PASS      246.78 seconds
+CheckSmatch                   PASS      330.82 seconds
+bluezmakeextell               PASS      99.84 seconds
+IncrementalBuild              PASS      1273.46 seconds
+ScanBuild                     WARNING   986.70 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v1,1/2] Added initial code for handling VOCS
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#97: 
+This commit handles the code implementation of VOCS service and characteristics
+
+ERROR:TRAILING_WHITESPACE: trailing whitespace
+#528: FILE: src/shared/vcp.c:1076:
++^I$
+
+WARNING:LONG_LINE: line length of 82 exceeds 80 columns
+#593: FILE: src/shared/vcp.c:1267:
++static void vcp_audio_descriptor_notify(struct bt_vcp *vcp, uint16_t value_handle,
+
+WARNING:LONG_LINE: line length of 86 exceeds 80 columns
+#611: FILE: src/shared/vcp.c:1339:
++static void read_vol_offset_state(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
+
+WARNING:LONG_LINE: line length of 85 exceeds 80 columns
+#622: FILE: src/shared/vcp.c:1350:
++		DBG(vcp, "Unable to read Vol Offset State: error 0x%02x", att_ecode);
+
+WARNING:LONG_LINE: line length of 89 exceeds 80 columns
+#636: FILE: src/shared/vcp.c:1364:
++static void read_vocs_audio_location(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
+
+WARNING:LONG_LINE: line length of 88 exceeds 80 columns
+#647: FILE: src/shared/vcp.c:1375:
++		DBG(vcp, "Unable to read VOCS Audio Location: error 0x%02x", att_ecode);
+
+WARNING:LONG_LINE: line length of 91 exceeds 80 columns
+#661: FILE: src/shared/vcp.c:1389:
++static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
+
+WARNING:LONG_LINE: line length of 90 exceeds 80 columns
+#672: FILE: src/shared/vcp.c:1400:
++		DBG(vcp, "Unable to read VOCS Audio Descriptor: error 0x%02x", att_ecode);
+
+WARNING:LONG_LINE: line length of 85 exceeds 80 columns
+#696: FILE: src/shared/vcp.c:1573:
++	bt_uuid_t uuid, uuid_vostate, uuid_audio_loc, uuid_vo_cp, uuid_audio_op_decs;
+
+WARNING:LONG_LINE: line length of 85 exceeds 80 columns
+#720: FILE: src/shared/vcp.c:1597:
++						     vcp_voffset_state_notify, NULL);
+
+WARNING:LONG_LINE: line length of 90 exceeds 80 columns
+#726: FILE: src/shared/vcp.c:1603:
++		DBG(vcp, "VOCS Volume Audio Location found: handle 0x%04x", value_handle);
+
+ERROR:TRAILING_WHITESPACE: trailing whitespace
+#729: FILE: src/shared/vcp.c:1606:
++^I^Iif (!vocs || vocs->voal) $
+
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#734: FILE: src/shared/vcp.c:1611:
++		vcp_read_value(vcp, value_handle, read_vocs_audio_location, vcp);
+
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#737: FILE: src/shared/vcp.c:1614:
++						     vcp_audio_loc_notify, NULL);
+
+WARNING:LONG_LINE: line length of 89 exceeds 80 columns
+#755: FILE: src/shared/vcp.c:1632:
++		DBG(vcp, "VOCS Vol Audio Descriptor found: handle 0x%04x", value_handle);
+
+WARNING:LONG_LINE: line length of 83 exceeds 80 columns
+#763: FILE: src/shared/vcp.c:1640:
++		vcp_read_value(vcp, value_handle, read_vocs_audio_descriptor, vcp);
+
+WARNING:LONG_LINE: line length of 87 exceeds 80 columns
+#765: FILE: src/shared/vcp.c:1642:
++						    vcp_audio_descriptor_notify, NULL);
+
+/github/workspace/src/src/13269044.patch total: 2 errors, 16 warnings, 672 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+NOTE: Whitespace errors detected.
+      You may wish to use scripts/cleanpatch or scripts/cleanfile
+
+/github/workspace/src/src/13269044.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+[BlueZ,v1,2/2] Fixed the following issue observed during PTS testing for mandatory test cases - Specified Upper and Lower Limit for Volume offset - Corrected the number of handles for VOCS - VOCS is made as included service of VCS because VOCS is secondar
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#137: FILE: src/shared/vcp.c:174:
++    int16_t vol_offset;$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#138: FILE: src/shared/vcp.c:175:
++    uint8_t counter;$
+
+WARNING:LONG_LINE: line length of 116 exceeds 80 columns
+#146: FILE: src/shared/vcp.c:712:
++	if(req->set_vol_offset > VOCS_VOL_OFFSET_UPPER_LIMIT || req->set_vol_offset < VOCS_VOL_OFFSET_LOWER_LIMIT) {
+
+ERROR:SPACING: space required before the open parenthesis '('
+#146: FILE: src/shared/vcp.c:712:
++	if(req->set_vol_offset > VOCS_VOL_OFFSET_UPPER_LIMIT || req->set_vol_offset < VOCS_VOL_OFFSET_LOWER_LIMIT) {
+
+/github/workspace/src/src/13269045.patch total: 1 errors, 3 warnings, 79 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13269045.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1,2/2] Fixed the following issue observed during PTS testing for mandatory test cases - Specified Upper and Lower Limit for Volume offset - Corrected the number of handles for VOCS - VOCS is made as included service of VCS because VOCS is secondar
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (255>80): "[BlueZ,v1,2/2] Fixed the following issue observed during PTS testing for mandatory test cases - Specified Upper and Lower Limit for Volume offset - Corrected the number of handles for VOCS - VOCS is made as included service of VCS because VOCS is secondar"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/vcp.c:1271:2: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+        memcpy(vocs_audio_loc_n, value, sizeof(uint32_t));
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4591044676212743865==--
