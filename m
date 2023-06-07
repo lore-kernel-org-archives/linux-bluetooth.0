@@ -2,173 +2,197 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62640C7EE25
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jun 2023 13:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BEE0C77B7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jun 2023 19:21:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236543AbjFGNhM (ORCPT
+        id S233157AbjFGTV5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Jun 2023 09:37:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56284 "EHLO
+        Wed, 7 Jun 2023 15:21:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235800AbjFGNhK (ORCPT
+        with ESMTP id S229614AbjFGTV4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Jun 2023 09:37:10 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C951BD7
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jun 2023 06:37:09 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-75ec7e8e826so220151085a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jun 2023 06:37:09 -0700 (PDT)
+        Wed, 7 Jun 2023 15:21:56 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1F21FD5
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jun 2023 12:21:54 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-4f4b384c09fso9366994e87.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jun 2023 12:21:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686145028; x=1688737028;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=o+YgofBQrGNvSRd2Y6G8osTiI2ZfX1A+HStA7UKv83U=;
-        b=fTu6luP/A3FrirqHqk3z3MwkB3fuWGt6zHKNH8XUyPOMoKTyPk/wsenpA5vDe0lrdN
-         MW7K92w7D7Cy8W2ZzAerx+5q+0gx/XfPdhEBNLDlfskD5h/G82cyQpBeoTPWVMPgnp9c
-         nu++9Q0WeBkCa8JM0+iF+Rmvaqia8HlqfSP5nI8XKTwkzNuNhVuknopleYJcGcHVc3tx
-         voGGtY5qKtZvRIeXvJpiTBAghNoAL666QTRStJ3JxGuc2UiDVXyxVL/POAZUeGVamWPK
-         vH8mu8W4ZKaUCkVxIksEEzZfaON905LF7SkfnyU6SMgEXaAeKlG+2GOKpfS0CLS+05Lw
-         H67A==
+        d=gmail.com; s=20221208; t=1686165713; x=1688757713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t0EsGNXtSydSBRo4wZwHRok3oO7Te/zA7Id9vPP2hxQ=;
+        b=a3R99Efjdebcqlk/C2WA4NXBKS2NVtjx0lcSPXe7rk30UbXkOyijIwAUL3prfrkdIB
+         0qNFt+kJG25Qa+MsT557F3Gune8jUzgHe4UXAz74VEh/z2HGCmANHH1nbF96jr6PmIMr
+         ex2tHfb2+IRyMESmuwH5MWTFsmWGXOg+0aJtuD43Mj2UEW+JEgmMjHT85B8b9ga/3aej
+         NPIaJewz2h0cYKTN0B+IyUR3AUF6Cv9BBQC0w85BJKW7IdbYYFn2ImmD2/ttLKhrBmd2
+         zRqZhV2VxikEd10KnyhXW/fEdBFFoXXb1N0GOk6+pebrEskNF4ilWXDxtnWkYOx5/n/c
+         8TSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686145028; x=1688737028;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o+YgofBQrGNvSRd2Y6G8osTiI2ZfX1A+HStA7UKv83U=;
-        b=CihdFv7OLgbtBD9qp+R5SlKU5oPSe74SfZ6efKl/6qblhtfTAT5dQkPpDpbNHOhPea
-         KNvn64mb+Y47fuA9nYojxLYOq42B0wxlaCMnHe1E7qUjy3fep0f4accFWd4NzKzVfX1f
-         hFAcZtL/3qsF6CRXLA/UOxkYAB+INnRoNwjngfJhvzNT3swYEvM3cdfnBaPz9Y3D6/kC
-         tLG/BdWqmbLI+PSUA+h6Vu3M04awR/cD6Kj/6kQOWaozj6N4Ztmee3TJkiBUopAoROZe
-         kTf5qdzq0Dy3xp2Owj5FER6Tv1rJQhB+Cp/ymNSv/kyoLjsafJ0slRr81oQ/A0K0S9E4
-         7pBg==
-X-Gm-Message-State: AC+VfDzMsR4hYzA0fVz9O5QPvfgcprw2FRcvrkHpg8MUFlLiuBkrK/Q3
-        w1S/Im9IbL2HDrxrOppOHP8d1O2BOg4=
-X-Google-Smtp-Source: ACHHUZ6cJog34Zq9RFvNaW7xo0syeo1aQWaJmS4gTjRXouPM+hCgO7Qa7AN9mxzEmyr8xIe+1LIUhA==
-X-Received: by 2002:a37:301:0:b0:75d:50af:1c79 with SMTP id 1-20020a370301000000b0075d50af1c79mr1707060qkd.39.1686145028472;
-        Wed, 07 Jun 2023 06:37:08 -0700 (PDT)
-Received: from [172.17.0.2] ([104.45.204.66])
-        by smtp.gmail.com with ESMTPSA id ou47-20020a05620a622f00b0074d60b697a6sm5653210qkn.12.2023.06.07.06.37.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Jun 2023 06:37:07 -0700 (PDT)
-Message-ID: <64808803.050a0220.7ca89.088c@mx.google.com>
-Date:   Wed, 07 Jun 2023 06:37:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6459675143465960233=="
+        d=1e100.net; s=20221208; t=1686165713; x=1688757713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=t0EsGNXtSydSBRo4wZwHRok3oO7Te/zA7Id9vPP2hxQ=;
+        b=groI9EBMp1gwA97xKjjWRLX0hr8w3aZxnpLunQ2OWfsPQz5eJAdgc4FnJXYpVU7RNv
+         dXmKKBULWjW5nDYGOmQZmRzqn3C1XY0GMp77J/mVmKwq6VrCW9UGEWsx9tu0i8ng7Qlt
+         j0y8I2a2VBknE2huCN/L8F7e0PSApQLjHnthnOWmEwnD51gES3j+T3gXTso2qy15EfXI
+         KjH5aUEG1KKGHq9hCGF12Z5B8/26k7mtk5YJ4uRZOqvz9ChWjA+kkQBjjckGSbG4Tvm6
+         CRkO1c2zPNvPtG/1UqZJLdrSDvmGpZ0f6KH95likwFe4DDdcqy9hVacFtZdgyCAeLZ5P
+         +REg==
+X-Gm-Message-State: AC+VfDzrnO5Ffis/U+IJ/xA32aEWLQ1nz1bQ9UHC6I6ft8+Jcqj9UBI9
+        tFq/NoWbp7h0zxjmkyCqVtLeCwaVyaCsWajX/Oc9qKZg/QA=
+X-Google-Smtp-Source: ACHHUZ5IooadXAQyIJswTRDVn+DxAzVgE7AdYqAd3xnzwYSjVik2zF/eix7u/yB6PhBKgQtEerzxaD2iU0JZIJA8ww4=
+X-Received: by 2002:a2e:968e:0:b0:2ac:bd28:d457 with SMTP id
+ q14-20020a2e968e000000b002acbd28d457mr2841626lji.14.1686165712457; Wed, 07
+ Jun 2023 12:21:52 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, nitin.jadhav@nxp.com
-Subject: RE: Code handling for VOCS service
-In-Reply-To: <20230607121342.6136-2-nitin.jadhav@nxp.com>
-References: <20230607121342.6136-2-nitin.jadhav@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <76E1E367-BAF0-41A8-A292-7E002B213D8A@athom.nl>
+In-Reply-To: <76E1E367-BAF0-41A8-A292-7E002B213D8A@athom.nl>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 7 Jun 2023 12:21:40 -0700
+Message-ID: <CABBYNZ+CYMsDSPTxBn09Js3BcdC-x7vZFfyLJ3ppZGGwJKmUTw@mail.gmail.com>
+Subject: Re: Intermittent Not connectable devices reported
+To:     Herman Meerlo <herman.meerlo@athom.nl>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6459675143465960233==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Herman,
 
-This is automated email and please do not reply to this email!
+On Fri, Jun 2, 2023 at 2:51=E2=80=AFAM Herman Meerlo <herman.meerlo@athom.n=
+l> wrote:
+>
+> I'm working on a Raspberry Pi device that performs periodic BLE discovery=
+ and tries to connect to multiple devices. Most of the times this goes fine=
+ but especially in BLE heavy environments every now and then it fails becau=
+se it says that the device is not found. I have been debugging this issue f=
+or a few weeks now and it comes down to this:
+>
+>    =E2=80=A2 Connect to DBus to start the discovery
+>    =E2=80=A2 Devices are found, interfacesAdded callbacks are made, every=
+thing looks fine
+>    =E2=80=A2 Stop discovery
+>    =E2=80=A2 Directly some devices are removed by the interfacesRemoved c=
+allback
+>    =E2=80=A2 My code does not get the device it searches for -> unhappy u=
+ser
+>
+> What happens under the hood is that DBus removes all devices from it's ca=
+che that have been indicated by Bluez as being Not connectable. I.e. there =
+is no use in keeping them around, you can't connect to them anyway. But... =
+this is not true for the device I'm looking for. It is marked as Not connec=
+table incorrectly.
+> So to chase down the problem I create a btmon dump which shows indeed tha=
+t the device is reported to be Not connectable after having received a SCAN=
+_RSP:
+>
+> > HCI Event: LE Meta Event (0x3e) plen 38 #73 [hci0] 34.359921
+> LE Advertising Report (0x02)
+> Num reports: 1
+> Event type: Scan response - SCAN_RSP (0x04)
+> Address type: Public (0x00)
+> Address: F4:B8:5E:64:02:55 (Texas Instruments)
+> Data length: 26
+> Name (complete): BeeWi SmartLite
+> Peripheral Conn. Interval: 0x0028 - 0x0050
+> TX power: 0 dBm
+> RSSI: -42 dBm (0xd6)
+> @ MGMT Event: Device Found (0x0012) plen 40 {0x0001} [hci0] 34.360057
+> LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
+> RSSI: -42 dBm (0xd6)
+> Flags: 0x00000004
+> Not Connectable
+> Data length: 26
+> Name (complete): BeeWi SmartLite
+> Peripheral Conn. Interval: 0x0028 - 0x0050
+> TX power: 0 dBm
+>
+> But all ADV_IND PDU's before that clearly indicate that the device is con=
+nectable, it is only after this SCAN_RSP that it is reported as Not connect=
+able:
+>
+> > HCI Event: LE Meta Event (0x3e) plen 27 #46 [hci0] 34.152817
+> LE Advertising Report (0x02)
+> Num reports: 1
+> Event type: Connectable undirected - ADV_IND (0x00)
+> Address type: Public (0x00)
+> Address: F4:B8:5E:64:02:55 (Texas Instruments)
+> Data length: 15
+> Flags: 0x06
+> LE General Discoverable Mode
+> BR/EDR Not Supported
+> Company: Texas Instruments Inc. (13)
+> Data: 06030108b0e408f7
+> RSSI: -43 dBm (0xd5)
+> @ MGMT Event: Device Found (0x0012) plen 31 {0x0001} [hci0] 34.152905
+> LE Address: 44:6E:FF:00:0D:65 (Resolvable)
+> RSSI: -74 dBm (0xb6)
+> Flags: 0x00000000
+> Data length: 17
+> Flags: 0x1a
+> LE General Discoverable Mode
+> Simultaneous LE and BR/EDR (Controller)
+> Simultaneous LE and BR/EDR (Host)
+> TX power: 9 dBm
+> Company: Apple, Inc. (76)
+> Type: Unknown (16)
+> Data: 01188898dc
+> > HCI Event: LE Meta Event (0x3e) plen 41 #47 [hci0] 34.156958
+> LE Advertising Report (0x02)
+> Num reports: 1
+> Event type: Connectable undirected - ADV_IND (0x00)
+> Address type: Random (0x01)
+> Address: FA:BD:8D:12:26:BF (Static)
+> Data length: 29
+> Name (short): P mesh
+> Flags: 0x04
+> BR/EDR Not Supported
+> 128-bit Service UUIDs (partial): 1 entry
+> Vendor specific
+> RSSI: -47 dBm (0xd1)
+> @ MGMT Event: Device Found (0x0012) plen 29 {0x0001} [hci0] 34.157030
+> LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
+> RSSI: -43 dBm (0xd5)
+> Flags: 0x00000000
+> Data length: 15
+> Flags: 0x06
+> LE General Discoverable Mode
+> BR/EDR Not Supported
+> Company: Texas Instruments Inc. (13)
+> Data: 06030108b0e408f7
+>
+> So I am heavily doubting whether the Linux kernel code has a bug in handl=
+ing the SCAN_RSP. Please look at this part of the kernel:
+>
+> https://github.com/torvalds/linux/blob/48b1320a674e1ff5de2fad8606bee38f72=
+4594dc/net/bluetooth/hci_event.c#L6326
+>
+> It sets the NOT CONNECTABLE flag by default for a SCAN_RSP and will overw=
+rite it with any flags it has received with a previous ADV_IND. But it does=
+ not seem to take into account that in BLE heavy environments the previous =
+ADV_IND might be of a totally different device. So every now and then it wi=
+ll enter the first path where it will just report the device with a NOT_CON=
+NECTABLE flag. Or am I missing something here?
 
-Dear submitter,
+You are saying that the controller would interleave ADV_IND of
+different peers before SCAN_RSP, in that case yes that would be
+possible that the device would be marked as NOT_CONNECTABLE, usually
+that is not really the case which is why we end up adding the code
+above:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=754867
+     * In the really unlikely case that a controller get confused
+     * and just sends a scan response event, then it is marked as
+     * not connectable as well.
 
----Test result---
+I guess it is not really unlikely after all, so perhaps we need a flag
+indicating this is a standalone SCAN_RSP e.g. MGMT_DEV_FOUND_SCAN_RSP,
+then we can treat it accordingly in userspace.
 
-Test Summary:
-CheckPatch                    FAIL      1.74 seconds
-GitLint                       PASS      0.72 seconds
-BuildEll                      PASS      27.11 seconds
-BluezMake                     PASS      863.57 seconds
-MakeCheck                     PASS      12.34 seconds
-MakeDistcheck                 PASS      154.02 seconds
-CheckValgrind                 PASS      255.60 seconds
-CheckSmatch                   PASS      340.33 seconds
-bluezmakeextell               PASS      102.67 seconds
-IncrementalBuild              PASS      1417.56 seconds
-ScanBuild                     WARNING   1055.29 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v2,1/2] Added initial code for handling VOCS
-WARNING:LONG_LINE: line length of 93 exceeds 80 columns
-#596: FILE: src/shared/vcp.c:1268:
-+				uint16_t value_handle, const uint8_t *value, uint16_t length,
-
-WARNING:LONG_LINE: line length of 89 exceeds 80 columns
-#614: FILE: src/shared/vcp.c:1340:
-+				uint8_t att_ecode, const uint8_t *value, uint16_t length,
-
-WARNING:LONG_LINE: line length of 85 exceeds 80 columns
-#624: FILE: src/shared/vcp.c:1350:
-+		DBG(vcp, "Unable to read Vol Offset State: error 0x%02x", att_ecode);
-
-WARNING:LONG_LINE: line length of 89 exceeds 80 columns
-#639: FILE: src/shared/vcp.c:1365:
-+				uint8_t att_ecode, const uint8_t *value, uint16_t length,
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#649: FILE: src/shared/vcp.c:1375:
-+		DBG(vcp, "Unable to read VOCS Audio Location: error 0x%02x", att_ecode);
-
-WARNING:LONG_LINE: line length of 89 exceeds 80 columns
-#664: FILE: src/shared/vcp.c:1390:
-+				uint8_t att_ecode, const uint8_t *value, uint16_t length,
-
-WARNING:LONG_LINE: line length of 85 exceeds 80 columns
-#724: FILE: src/shared/vcp.c:1599:
-+						     vcp_voffset_state_notify, NULL);
-
-WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-#739: FILE: src/shared/vcp.c:1614:
-+		vcp_read_value(vcp, value_handle, read_vocs_audio_location, vcp);
-
-WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-#742: FILE: src/shared/vcp.c:1617:
-+						     vcp_audio_loc_notify, NULL);
-
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#769: FILE: src/shared/vcp.c:1644:
-+		vcp_read_value(vcp, value_handle, read_vocs_audio_descriptor, vcp);
-
-WARNING:LONG_LINE: line length of 87 exceeds 80 columns
-#771: FILE: src/shared/vcp.c:1646:
-+						    vcp_audio_descriptor_notify, NULL);
-
-/github/workspace/src/src/13270609.patch total: 0 errors, 11 warnings, 676 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13270609.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-src/shared/vcp.c:1272:2: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-        memcpy(vocs_audio_loc_n, value, sizeof(uint32_t));
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6459675143465960233==--
+--=20
+Luiz Augusto von Dentz
