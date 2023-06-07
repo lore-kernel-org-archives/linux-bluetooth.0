@@ -2,51 +2,51 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F9AC7EE29
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jun 2023 08:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CE4C7EE43
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jun 2023 08:23:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238657AbjFGIXX (ORCPT
+        id S239105AbjFGIXZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Jun 2023 04:23:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34798 "EHLO
+        Wed, 7 Jun 2023 04:23:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237506AbjFGIXV (ORCPT
+        with ESMTP id S239059AbjFGIXX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Jun 2023 04:23:21 -0400
+        Wed, 7 Jun 2023 04:23:23 -0400
 Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2040.outbound.protection.outlook.com [40.107.14.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8F96138
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jun 2023 01:23:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1427E184
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jun 2023 01:23:22 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PK7eOGI9F05wSRT0UMIYvUZeUPHSAp06xQk9ZgrtsIPUdOFQflu7JvOH29lTlytxLjAD7m/fVsUaEO19znUbMToVBrFCeZbAW2aNTSfACLNhnnss2ezeJS0hdE7IExZA9bk6P1DNzI7D8QWssF71eGWdy6ZeeXLa8/E27uw/SO1tdxMtkufi4AyO3mRW55rCzTInAvN52a3aq/3O5KMJlvvTIO1M4hEonXslOuCfUYVRB026wDzSA+oyfaEwLbpn4lkwi7Q+Z6v4CofaZMVVgV+8nA+jDvdc9StdKzmiMSWxJ9tJHlWRn3N8M3WAWz/vupvPnhcNENyba8vjtqSsig==
+ b=J87oWInsV6EUX/bCNTBhMWYdQT1n0yRxkuMik4fcjfWNsynuH54cTkyLcqlNY2S6iLrgwoFvoSAtEq87NRGCuTQ/2W1ieFubQvlZmmprvJppCs5f+IRos+yTWM+EQV3RCArIjy582Tz5Jl0Oays51gtf2XjdR4jTNp8868BKlZ2IgVL10jk4Y+smqkKlaBpl4XjhxYQBpd7MWb77T/A4ivSmnNS6fwQ+Hdx+QKjYX6bqgtdxra1H+uwS67kUp7BFMHl2Up7iPODnXuB1pG4OdSO5nJStgAfsCxZ7Bq5SRwaVxlXf5/CnlldU8OYcWAc+owndASdYeGuu3pdwIBQkCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xwOQanpDMzivoZ+6pV9g+FQFRbisslddF1I40+2N2ks=;
- b=BNGA080vYNWssTbGJDQ2qPF+kEfEgxSnmI4q4KMEjy+JIzLACj0CFZNAKdw89fLrJzU3g0R7UzKifWOuRHkAematq/GQFC9FVPjGAnm53IRAaWfg1zlr/5Ah1h3D7vWSkzBzyvW94bPhbduJ+SFGaYaburcRjcg0C7G9Pdqai0yq2vW54glB+bZytZQynfFfqpU5kDC8IKAyRvLczx8jBj+aNt+Bv5FXpuuflS2cYRKNo2w/NGJOuIAP2JzV9aZEhN8mSL+I2CZbVEQDcE578U38fccmcSF1jbh1pin1G6pJyrcVXWdl4pj1OkcTiIENpx8rvFFPZSp+QAY07GIW7g==
+ bh=Be/fnW6tNqM9MDxSHc0sGJX78kUsjaVpfLyV3j2t5ps=;
+ b=JaFihHNiu2OWJC18hKKwIWYMhMnupD3xC3wIjNWwQSsFZirKLs/Mb2N/PX4aRSx1ugaced69dDun2qCT/SJ5xOFhNt8SbEh0EMpla/3h1HMbYeOyTcYh8mjqMY2vfpIZH83YtvRlqoizhJ1cqgGySsB7EGnly3gnHFlSm02mF0Gc82/WWMs3B5z3ba1eDVsvnDOIuXwLULjT/TgiIcMpzc/1X8n87sxE9VvodE2sBP4pelgtOwKahPb6QaZfstrQxxjA1iPPetl+bqzq7A59ERNo3fvIxor3HN8qAOQCNZVS1BPKUWdstjvj//KxXqiJvZV/2AsUQLZpwun+zfg+4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xwOQanpDMzivoZ+6pV9g+FQFRbisslddF1I40+2N2ks=;
- b=HEn0cwa/0Sxtx+vCAR2kOaLjcKJB2ZcHw+3/gFwpDlvw/EiBuN285xSOqU6rdXy5GWEnHHFHzHUByOeHiO2ywf9AA0HuyUMxcBGNA95H4xA0j309+7iwSCLGZR5cEkS8eiE4LlLUbA28RGmzx059Fmf6pKXE3sxcAcb8K0obBfA=
+ bh=Be/fnW6tNqM9MDxSHc0sGJX78kUsjaVpfLyV3j2t5ps=;
+ b=qDWg/dQ5ACP+f7Rxgib+iF56eXYjYUgu+ScDOue35IT+wIba+8PpSTZr8EgHJwdX2K/lHvOS2J/ZDT/KHluAwlS3ycKcgL5BGHIGd/2I/LGujyNVkgKF+2qm1F2e2v+dcp2Fa+xsuUeqWTJHWikhReVCJFP7YmJRz8G6RfzQPhI=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from VI1PR04MB5344.eurprd04.prod.outlook.com (2603:10a6:803:4b::31)
  by DB8PR04MB7114.eurprd04.prod.outlook.com (2603:10a6:10:fe::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Wed, 7 Jun
- 2023 08:23:17 +0000
+ 2023 08:23:18 +0000
 Received: from VI1PR04MB5344.eurprd04.prod.outlook.com
  ([fe80::e8eb:cac:f3e3:1085]) by VI1PR04MB5344.eurprd04.prod.outlook.com
  ([fe80::e8eb:cac:f3e3:1085%4]) with mapi id 15.20.6455.030; Wed, 7 Jun 2023
- 08:23:16 +0000
+ 08:23:18 +0000
 From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Subject: [PATCH v4 1/4] Split bt_bap_qos structure into unicast and broadcast structures
-Date:   Wed,  7 Jun 2023 11:22:57 +0300
-Message-Id: <20230607082300.4970-2-silviu.barbulescu@nxp.com>
+Subject: [PATCH v4 2/4] Update bluetoothctl with support for broadcast source
+Date:   Wed,  7 Jun 2023 11:22:58 +0300
+Message-Id: <20230607082300.4970-3-silviu.barbulescu@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230607082300.4970-1-silviu.barbulescu@nxp.com>
 References: <20230607082300.4970-1-silviu.barbulescu@nxp.com>
@@ -58,1018 +58,456 @@ X-ClientProxiedBy: AM4PR0101CA0083.eurprd01.prod.exchangelabs.com
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VI1PR04MB5344:EE_|DB8PR04MB7114:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77903bfa-a12a-44b3-7088-08db673071ab
+X-MS-Office365-Filtering-Correlation-Id: 85417808-a3f5-4b54-aec5-08db673072b1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kYqjPkfo5RhH1g3j1UA+bgfjKVx3QvI099j37EZegRZ9StFG7M2clgxdHEtRXTO8NIQjW/PU72flzYm3ifUPPt1KE9R+/gQgXZdM0aKJbxd+rfVGMqh/wxgNbyboID5Mrb3WS2sQsybXwI6y/0fda5v599XDsNV2lX+iRwGA73szkr0HptbQ4F+mmzTP/5kHemWMjm5RNaSi5O8M88q2HulaamI3PmHXcSfT0dQfH4ITiArbbOcOm8CaXcadf30o6ZwDW+g4ucmhFHgiFeBjg2koX8bzK/ZQEnlmC2bxVknLVAPCDm1fxdk6p/1gq42Kswxc8aqn0vNdv7wkYszr2CBgJHQc1n2yUNAjVjQgiGnrBk3WmI596Y/v/iYbFpnYDCtwvOkhoZ5zbIFLL4n25JKtSgSOAYlrTkSezxmIK9IdqRmCJW8/LL1vKlY60aZyn2MAyLLqycSB3s8fHB/MdfFcQp03Ld39BYoMRkReysMCblom8/9/ioY3f4Kehj1GcF3UjonNf7YMeApX4LuUpD/NI82JL+8g+qelLURFIor0wztBvgcpmDdz0oM6srvoiLW1IHh6ndEXZckEbaNRyPDOYfRFHlYmlaqlTQTE3XIhdWqS8NDTMaD/hipeM6HT
+X-Microsoft-Antispam-Message-Info: RsYJAp4O9cG2ClhocUQi5/NvtYSLEfR/seJW+ZX6y22AezRdaLDDA1T4W7Y9p0QNvDjlK0eYPPF9WBO4E7e9zNXDyz5RBaSdE2WJh4zyGhbgHmVrT9rv7SmZUlIoeXxUleaEL6bDuLxmZ8oyIHQzSPqzMRbItun6icxH916PGsCn1xAmBT8Ur0LtQUHNwvnpf/X0NeluN787wzyAGNr2fX/Jhzi7hJR24tEbw0/3rBCj4uIrctUZZB/+g18kE1Y2BV+FzvT4PSq0qcJ62Bh7kQzYbCX4cNYijvSO+70EYUezRGISELwR67W/zCN0brRV6NC2bRQh4gT9yO5G9tF8waqc7DBcutWuL1Vl+rZ3KDU/Q+FegXzdKW3CiHEmlWD2cmhNn/VmObJw2e68AKSuWresu2JZzaS1voLvCE9AiFtt62W3y03Ce0LE1Ckiz9RTLolR6vy5KhfsYLCc9L+u/eWLV1XXc/5kqxOHNAvKDcI7vWCm4VzHVXpBC8WZgPj0hRvJN71ZqC2CRXcbnLWkGkBl2LUDoXHEIB5dXjoIz9l7oZP+h3ZJaCXudKFvJfw2Mn4B9jjwHDz/S1105Pzd0OkAtwkfKMbTo4Dp2AYZTMNe3i6UQ9/lNwIJ/H5G0kB0
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(396003)(39860400002)(136003)(346002)(451199021)(55236004)(1076003)(6512007)(6506007)(38100700002)(2616005)(41300700001)(38350700002)(6486002)(52116002)(6666004)(186003)(26005)(83380400001)(478600001)(66556008)(6916009)(66476007)(66946007)(316002)(2906002)(8676002)(8936002)(5660300002)(4326008)(30864003)(86362001)(36756003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?554Wcevvb1YcedbCp4GYLJcTJFnCJDgGTP36EiolfgjtJ3TCgdylErxGqykY?=
- =?us-ascii?Q?Pf3N5la4EffwcYEpwdurgWQHOLKzKEskoTpYyHk/lNVs0rJhUJZtOzOtMNv+?=
- =?us-ascii?Q?40vsflxICABPtbUF/SZlLL6WnwQ0JAtAU6F87y8qwjexshwhNVyVdcfi2KIp?=
- =?us-ascii?Q?vlNj/2Dm6HVXiIfKUSbg1CADGQ7eTVIviwxt45VJEEx2Q2G9GCDtix74fWPj?=
- =?us-ascii?Q?kIjNUUW0bPqngfnhneSAKtIYeEa9l4rbGelMojNy9zrWENEPEKCkWikLq7Fo?=
- =?us-ascii?Q?P+ANp5UU0Fhxg2j+Dp5dYiUoIHeBeXHVsIDZmcC/8K9Efx/DMDNXxJXyad88?=
- =?us-ascii?Q?m887zZ6jTA4o88+ohil32tQuWl1LlkQs+/2pq8lDvnuHIx1jdb4tTQzhGjo6?=
- =?us-ascii?Q?e/tUFoZANXF0LsJTBNjXzkz+/StWZffWQDFZefq4qqJ3dNycoTLDI+5RBB6I?=
- =?us-ascii?Q?qGs8OtpXJMkD0oHu7xKO8QmiEyN/6ED8dWy77tdhKV2YkTJGVS/JIoydJ/Vq?=
- =?us-ascii?Q?eUTr7gdtLrSwc6ugF5RfRCI/kpCbCSpqcgvIe0ruslNypCJ8DIXdcL8ngQ6G?=
- =?us-ascii?Q?5Y1r0hKvpz0lSZqUjt0OrlmZ/2bEaOf3nkyb4OywyvXCmEWf37Q4MqNeRntv?=
- =?us-ascii?Q?CwzSTWZmHc4yvVc08ELOUwU04NIPgY5dWIjYSgL9Eq2fTPjsgobOyBCyPCl4?=
- =?us-ascii?Q?85fpExCR2Vd5OoKeTBqveeIMAhAHQQq3qVlJ+mp55fpUs7EwqG3WgBs8PlWs?=
- =?us-ascii?Q?Sed5Sxi+auL9jrzHlNN3wV/VCgrbrl6u8lwXwXI3c2uKyoiM1eYoif47O4ym?=
- =?us-ascii?Q?7IdOvfFsJRH185CrW7vXRwLP+GulF+8tHxbBpBAeAWTzNFsKuIb/A1IBdVcS?=
- =?us-ascii?Q?Va28+y+tmxO8qiyTzRgDPIOiwungfILqYxujDn3/Vp0BHgcXrx+r412vRMtN?=
- =?us-ascii?Q?kA53TrM5BbFpiwz2SYgNDFLqMwebKOfTk6aMNVuCy4h9ixzSWwKG3hcPT6o5?=
- =?us-ascii?Q?05MD5vNIF3NSWclQ/7TTCjWN8szbG6A44A292Nd3Hs7ChMDEjEzXrfKhDLc/?=
- =?us-ascii?Q?sepybMGCYb8acschVLK8+9zCSdM+OqwELV7ctgLVQzr/0tQc4ftyJXMSIO69?=
- =?us-ascii?Q?z1GLO0KxdKQF6ksexvyWtXudot49K/bUQizd8WT4DH5b2u7pi2Wdb8bklL3X?=
- =?us-ascii?Q?4exgKr5Ybx7Zj/bWY0oZDjA/QPMIMFIXjELOCf48Wd7Ian5S/zbUuEsS0dJu?=
- =?us-ascii?Q?1JSRErcbiSPyyR27dQ1S7v7OKXXTNPKdde4CWQi94/Fkx4XL6WYA0i+QNWeI?=
- =?us-ascii?Q?eDfMg3wCCAthEDw5Ka//2Xe+xYDRMBgBWwl5M/yX5l6L3C768d8ZrBO+6yl0?=
- =?us-ascii?Q?HBBWxk7WFnI3mVnU94zho7DLixpeYXe9Ja8X2onAcFwXR161kEQvBmK9K3cy?=
- =?us-ascii?Q?GVfV0jAD4edNtRFjmqSZLiy2H5jnidM3Jre3u0Ls0tmTiQfG8xBnVnuajylO?=
- =?us-ascii?Q?pPFdOVLABnOpsB+s9YmfT1C66GDd2V1AV0NTf51p5ySVq7dP0pfuQaeEHeaJ?=
- =?us-ascii?Q?em4W32SJPAH4ZDsk2x1jY60BRk7iNbcks6plnwBjlpGleh3gtUOtC2Ksmz5c?=
- =?us-ascii?Q?qA=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BInOR6uZr9Frns83ckzOpiMmXWnZ7v6mecYL9whEuWZgM+WO+U50GiuzlZtU?=
+ =?us-ascii?Q?F12AYZhYQFRuqvTAWhiJrMCu+rzzrsm6MOPduFcT4Ul0Y3yBhzxpkG1cYhQ4?=
+ =?us-ascii?Q?TtoH5K65V/h8b+kbXTnmUhhObzplTqX8fADx5TDx+XEA1j7b28+R2rtl3NLK?=
+ =?us-ascii?Q?QjtpPvo4JE1Vf3ISo4TVTBYjsJOSAzT/2dEVQTuQFCi7wlwBXW8sfI5lrWcu?=
+ =?us-ascii?Q?1y+lNgvMTTjmlO5EzeBFo7VcnEMn1S2XIy0hclkYj8eRenaJ1tZmgp3s6AWj?=
+ =?us-ascii?Q?Dsec+pmQVgUjuZVxwC+wOvhx1VC1DMtngjJvk6eePCTCefy0s9hQ/SLyl68m?=
+ =?us-ascii?Q?eDGepNHp2YpfW+658fBOIlJ9/wjZAEGj5B42Q+AJFf5qmZnfeDyM1mgkLeue?=
+ =?us-ascii?Q?+bDA5Rfbg3qjzuCaZhKp76fAGu+LPnb7ZxbsV8VHMi3EwY806pPplzmYmHRs?=
+ =?us-ascii?Q?L0pQUgxcOfxb2c8NzTex85fd5H1WqBBFq5lsvH5h50x+pwDS93UrbBV4nSEC?=
+ =?us-ascii?Q?/5H0Y2mxXM3yHBhkbfgVwEy3nUmy8PW4j9gEu7Mjqa+xUPfxxMOvEF6oSbWW?=
+ =?us-ascii?Q?P2wz4eEee4U1xG9oS+7R6kIdY2LEjV1gAI4CAcq+7Qc9R7L3GqcNso4nrQT1?=
+ =?us-ascii?Q?JJkQhJFy/devAzEnjrNZcVeXrecR5BeYSMarQ7koRo0WQDV+ILkDPs0HLmpi?=
+ =?us-ascii?Q?yHclbKZp30qlrVlfG3J9bRaebfre7tYgAzkxiDjf5NJw6NzZfyJVTOuVCmR4?=
+ =?us-ascii?Q?7pyZKZgsQaj8OO2eR/NsMb1j+MGcCyGQD5pMKTG/PEvIovXQ8DYxVRwTzHOE?=
+ =?us-ascii?Q?pTQwTZ7FLDJCFM5+xAxj5mHq5DAnGv7kSeqHx17KUaVONZ576oIUWz2wMchz?=
+ =?us-ascii?Q?ERsepPwciBz0ef6nzaa8VsRf1ukLAb19OGUIwxcWi89q+QuqP7SBkjv0xueN?=
+ =?us-ascii?Q?FkbI/aJ1l1J3rtwtnr1rUprCpNhUYPEHuIjnzgCsYWIfcPeaV73tX8SqsdFX?=
+ =?us-ascii?Q?L6mhnRnQLKgSP5hrGJ+NAmzrzIPztHnygcFw+Ld33LvpAHO23JvFXs0znNc1?=
+ =?us-ascii?Q?QUWqwT8ViC7bBGcKH6QIVN3wpbWS7f2eK9+76qWwl4JMxgDN3noFlFHkh1L3?=
+ =?us-ascii?Q?1QSB5r3ITh52csCmvPgGhhEJKIumHYFc3QxjNRMGGl5PQQndIq+aQiEe+qs9?=
+ =?us-ascii?Q?1OT0xRRCzuqrzHGRYk1y6WyXxtGVfkJNqQBmRh0fvb8MmQkQi8+kKCCfF7xQ?=
+ =?us-ascii?Q?6HYrVhxWCHrHHiByMlNOdtnYwt/WgK2T3BZ6Ka4xfMhfidVxK5p80Cm3nVn1?=
+ =?us-ascii?Q?htJgDB5sUg+DF016qW3N/zUExcfR8nlHnXjOeHTewr7Aeugf1UNY1Xxx2IxS?=
+ =?us-ascii?Q?0hPU4ohKfVFeZWi0JgWqLaN2qgLuHba6lHmj9tmEoiPdX0cY4ov2v4HI8QPo?=
+ =?us-ascii?Q?8v6GWZcN7GO2rSRSgUmUhH7eOhrHKStkUFkIitxWh0B/AFZUSoi7A3gg6KfC?=
+ =?us-ascii?Q?VvZDvC4Ze/60TizDkgN+Oqyaz47VoG6V3IGjns6ByrvKqrCfOi5cdWSBIV8l?=
+ =?us-ascii?Q?/dtFR5oJpdZdLLoCE1QfsjNRK06i/IY2dJ/CAvIjD4BQcwfNcXZZMGbw6qEI?=
+ =?us-ascii?Q?DA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77903bfa-a12a-44b3-7088-08db673071ab
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85417808-a3f5-4b54-aec5-08db673072b1
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5344.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2023 08:23:16.8998
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jun 2023 08:23:18.5110
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TJL2/nW2J0nRHzsT75mpfvhXNeQ6tYN9QD+P+AJM4bmaj/xc+OM1qzTQ81tD6W1L2CVTc8keEGNXr5z90HjbAagF6lPWrLPTjibFS/xNmHM=
+X-MS-Exchange-CrossTenant-UserPrincipalName: aXI8JqEGXEdaFJdU3FtstOTCLATXBt5qU5Jl9muBiO4dXHahfyIde+DsKHiIPDBbk3roTp53RJeGjl52bHvoZ7V0H53HLh+VLsfHm2eJ+jA=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7114
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This splits bt_bap_qos structure into unicast and broadcast structures.
+This adds bluetoothctl support for broadcast source.
+To test the current implementation use bluetoothctl with the commands:
+endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06
+endpoint.config <created endpoint> <local endpoint> 16_2_1
+transport.acquire <created transport>
+transport.send <created transport> <file.wav>
 
 ---
- profiles/audio/bap.c       | 58 +++++++++++++-----------
- profiles/audio/media.c     | 33 ++++++++------
- profiles/audio/transport.c | 25 ++++++-----
- src/shared/bap.c           | 92 ++++++++++++++++++++------------------
- src/shared/bap.h           | 42 ++++++++++++++---
- unit/test-bap.c            | 75 ++++++++++++++++---------------
- 6 files changed, 188 insertions(+), 137 deletions(-)
+ client/player.c | 226 ++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 201 insertions(+), 25 deletions(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 1a543a9ce..cbaf705c0 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -253,6 +253,7 @@ static int parse_properties(DBusMessageIter *props, struct iovec **caps,
- 				struct iovec **metadata, struct bt_bap_qos *qos)
- {
- 	const char *key;
-+	struct bt_bap_io_qos io_qos;
- 
- 	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
- 		DBusMessageIter value, entry;
-@@ -282,17 +283,17 @@ static int parse_properties(DBusMessageIter *props, struct iovec **caps,
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->cig_id);
-+			dbus_message_iter_get_basic(&value, &qos->ucast.cig_id);
- 		} else if (!strcasecmp(key, "CIS")) {
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->cis_id);
-+			dbus_message_iter_get_basic(&value, &qos->ucast.cis_id);
- 		} else if (!strcasecmp(key, "Interval")) {
- 			if (var != DBUS_TYPE_UINT32)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->interval);
-+			dbus_message_iter_get_basic(&value, &io_qos.interval);
- 		} else if (!strcasecmp(key, "Framing")) {
- 			dbus_bool_t val;
- 
-@@ -301,7 +302,7 @@ static int parse_properties(DBusMessageIter *props, struct iovec **caps,
- 
- 			dbus_message_iter_get_basic(&value, &val);
- 
--			qos->framing = val;
-+			qos->ucast.framing = val;
- 		} else if (!strcasecmp(key, "PHY")) {
- 			const char *str;
- 
-@@ -311,42 +312,43 @@ static int parse_properties(DBusMessageIter *props, struct iovec **caps,
- 			dbus_message_iter_get_basic(&value, &str);
- 
- 			if (!strcasecmp(str, "1M"))
--				qos->phy = 0x01;
-+				io_qos.phy = 0x01;
- 			else if (!strcasecmp(str, "2M"))
--				qos->phy = 0x02;
-+				io_qos.phy = 0x02;
- 			else
- 				goto fail;
- 		} else if (!strcasecmp(key, "SDU")) {
- 			if (var != DBUS_TYPE_UINT16)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->sdu);
-+			dbus_message_iter_get_basic(&value, &io_qos.sdu);
- 		} else if (!strcasecmp(key, "Retransmissions")) {
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->rtn);
-+			dbus_message_iter_get_basic(&value, &io_qos.rtn);
- 		} else if (!strcasecmp(key, "Latency")) {
- 			if (var != DBUS_TYPE_UINT16)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->latency);
-+			dbus_message_iter_get_basic(&value, &io_qos.latency);
- 		} else if (!strcasecmp(key, "Delay")) {
- 			if (var != DBUS_TYPE_UINT32)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->delay);
-+			dbus_message_iter_get_basic(&value, &qos->ucast.delay);
- 		} else if (!strcasecmp(key, "TargetLatency")) {
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
- 			dbus_message_iter_get_basic(&value,
--							&qos->target_latency);
-+					&qos->ucast.target_latency);
- 		}
- 
- 		dbus_message_iter_next(props);
- 	}
- 
-+	memcpy(&qos->ucast.io_qos, &io_qos, sizeof(io_qos));
- 	return 0;
- 
- fail:
-@@ -456,8 +458,8 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
- 	}
- 
- 	/* Mark CIG and CIS to be auto assigned */
--	ep->qos.cig_id = BT_ISO_QOS_CIG_UNSET;
--	ep->qos.cis_id = BT_ISO_QOS_CIS_UNSET;
-+	ep->qos.ucast.cig_id = BT_ISO_QOS_CIG_UNSET;
-+	ep->qos.ucast.cis_id = BT_ISO_QOS_CIS_UNSET;
- 
- 	if (parse_properties(&props, &ep->caps, &ep->metadata, &ep->qos) < 0) {
- 		DBG("Unable to parse properties");
-@@ -734,11 +736,11 @@ static void bap_iso_qos(struct bt_bap_qos *qos, struct bt_iso_io_qos *io)
- 	if (!qos)
- 		return;
- 
--	io->interval = qos->interval;
--	io->latency = qos->latency;
--	io->sdu = qos->sdu;
--	io->phy = qos->phy;
--	io->rtn = qos->rtn;
-+	io->interval = qos->ucast.io_qos.interval;
-+	io->latency = qos->ucast.io_qos.latency;
-+	io->sdu = qos->ucast.io_qos.sdu;
-+	io->phy = qos->ucast.io_qos.phy;
-+	io->rtn = qos->ucast.io_qos.rtn;
- }
- 
- static bool match_stream_qos(const void *data, const void *user_data)
-@@ -749,10 +751,10 @@ static bool match_stream_qos(const void *data, const void *user_data)
- 
- 	qos = bt_bap_stream_get_qos((void *)stream);
- 
--	if (iso_qos->ucast.cig != qos->cig_id)
-+	if (iso_qos->ucast.cig != qos->ucast.cig_id)
- 		return false;
- 
--	return iso_qos->ucast.cis == qos->cis_id;
-+	return iso_qos->ucast.cis == qos->ucast.cis_id;
- }
- 
- static void iso_confirm_cb(GIOChannel *io, void *user_data)
-@@ -993,8 +995,10 @@ static void bap_create_io(struct bap_data *data, struct bap_ep *ep,
- 	}
- 
- 	memset(&iso_qos, 0, sizeof(iso_qos));
--	iso_qos.ucast.cig = qos[0] ? qos[0]->cig_id : qos[1]->cig_id;
--	iso_qos.ucast.cis = qos[0] ? qos[0]->cis_id : qos[1]->cis_id;
-+	iso_qos.ucast.cig = qos[0] ? qos[0]->ucast.cig_id :
-+						qos[1]->ucast.cig_id;
-+	iso_qos.ucast.cis = qos[0] ? qos[0]->ucast.cis_id :
-+						qos[1]->ucast.cis_id;
- 
- 	bap_iso_qos(qos[0], &iso_qos.ucast.in);
- 	bap_iso_qos(qos[1], &iso_qos.ucast.out);
-@@ -1179,8 +1183,8 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 	g_io_channel_set_close_on_unref(io, FALSE);
- 
- 	/* Attempt to get CIG/CIS if they have not been set */
--	if (ep->qos.cig_id == BT_ISO_QOS_CIG_UNSET ||
--				ep->qos.cis_id == BT_ISO_QOS_CIS_UNSET) {
-+	if (ep->qos.ucast.cig_id == BT_ISO_QOS_CIG_UNSET ||
-+				ep->qos.ucast.cis_id == BT_ISO_QOS_CIS_UNSET) {
- 		struct bt_iso_qos qos;
- 		GError *err = NULL;
- 
-@@ -1192,12 +1196,12 @@ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
- 			return;
- 		}
- 
--		ep->qos.cig_id = qos.ucast.cig;
--		ep->qos.cis_id = qos.ucast.cis;
-+		ep->qos.ucast.cig_id = qos.ucast.cig;
-+		ep->qos.ucast.cis_id = qos.ucast.cis;
- 	}
- 
- 	DBG("stream %p fd %d: CIG 0x%02x CIS 0x%02x", stream, fd,
--					ep->qos.cig_id, ep->qos.cis_id);
-+				ep->qos.ucast.cig_id, ep->qos.ucast.cis_id);
- }
- 
- static void bap_attached(struct bt_bap *bap, void *user_data)
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 6ce668e31..515263af3 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -6,7 +6,7 @@
-  *  Copyright (C) 2006-2007  Nokia Corporation
-  *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
-  *  Copyright (C) 2011  BMW Car IT GmbH. All rights reserved.
-- *
-+ *  Copyright 2023 NXP
-  *
-  */
- 
-@@ -748,7 +748,10 @@ static int parse_select_properties(DBusMessageIter *props, struct iovec *caps,
- 					struct bt_bap_qos *qos)
- {
- 	const char *key;
-+	struct bt_bap_io_qos io_qos;
-+	uint8_t framing = 0;
- 
-+	memset(&io_qos, 0, sizeof(io_qos));
- 	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
- 		DBusMessageIter value, entry;
- 		int var;
-@@ -777,17 +780,17 @@ static int parse_select_properties(DBusMessageIter *props, struct iovec *caps,
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->cig_id);
-+			dbus_message_iter_get_basic(&value, &qos->ucast.cig_id);
- 		} else if (!strcasecmp(key, "CIS")) {
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->cis_id);
-+			dbus_message_iter_get_basic(&value, &qos->ucast.cis_id);
- 		} else if (!strcasecmp(key, "Interval")) {
- 			if (var != DBUS_TYPE_UINT32)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->interval);
-+			dbus_message_iter_get_basic(&value, &io_qos.interval);
- 		} else if (!strcasecmp(key, "Framing")) {
- 			dbus_bool_t val;
- 
-@@ -796,7 +799,7 @@ static int parse_select_properties(DBusMessageIter *props, struct iovec *caps,
- 
- 			dbus_message_iter_get_basic(&value, &val);
- 
--			qos->framing = val;
-+			framing = val;
- 		} else if (!strcasecmp(key, "PHY")) {
- 			const char *str;
- 
-@@ -806,42 +809,44 @@ static int parse_select_properties(DBusMessageIter *props, struct iovec *caps,
- 			dbus_message_iter_get_basic(&value, &str);
- 
- 			if (!strcasecmp(str, "1M"))
--				qos->phy = 0x01;
-+				io_qos.phy = 0x01;
- 			else if (!strcasecmp(str, "2M"))
--				qos->phy = 0x02;
-+				io_qos.phy = 0x02;
- 			else
- 				goto fail;
- 		} else if (!strcasecmp(key, "SDU")) {
- 			if (var != DBUS_TYPE_UINT16)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->sdu);
-+			dbus_message_iter_get_basic(&value, &io_qos.sdu);
- 		} else if (!strcasecmp(key, "Retransmissions")) {
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->rtn);
-+			dbus_message_iter_get_basic(&value, &io_qos.rtn);
- 		} else if (!strcasecmp(key, "Latency")) {
- 			if (var != DBUS_TYPE_UINT16)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->latency);
-+			dbus_message_iter_get_basic(&value, &io_qos.latency);
- 		} else if (!strcasecmp(key, "Delay")) {
- 			if (var != DBUS_TYPE_UINT32)
- 				goto fail;
- 
--			dbus_message_iter_get_basic(&value, &qos->delay);
-+			dbus_message_iter_get_basic(&value, &qos->ucast.delay);
- 		} else if (!strcasecmp(key, "TargetLatency")) {
- 			if (var != DBUS_TYPE_BYTE)
- 				goto fail;
- 
- 			dbus_message_iter_get_basic(&value,
--							&qos->target_latency);
-+						&qos->ucast.target_latency);
- 		}
- 
- 		dbus_message_iter_next(props);
- 	}
- 
-+	memcpy(&qos->ucast.io_qos, &io_qos, sizeof(io_qos));
-+	qos->ucast.framing = framing;
- 	return 0;
- 
- fail:
-@@ -875,8 +880,8 @@ static void pac_select_cb(struct media_endpoint *endpoint, void *ret, int size,
- 	memset(&qos, 0, sizeof(qos));
- 
- 	/* Mark CIG and CIS to be auto assigned */
--	qos.cig_id = BT_ISO_QOS_CIG_UNSET;
--	qos.cis_id = BT_ISO_QOS_CIS_UNSET;
-+	qos.ucast.cig_id = BT_ISO_QOS_CIG_UNSET;
-+	qos.ucast.cis_id = BT_ISO_QOS_CIS_UNSET;
- 
- 	memset(&caps, 0, sizeof(caps));
- 	memset(&meta, 0, sizeof(meta));
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 9172d167e..82f5fa6fe 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -5,6 +5,7 @@
-  *
-  *  Copyright (C) 2006-2007  Nokia Corporation
-  *  Copyright (C) 2004-2009  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright 2023 NXP
-  *
-  *
-  */
-@@ -828,7 +829,7 @@ static gboolean qos_exists(const GDBusPropertyTable *property, void *data)
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
- 
--	return bap->qos.phy != 0x00;
-+	return bap->qos.ucast.io_qos.phy != 0x00;
- }
- 
- static gboolean get_cig(const GDBusPropertyTable *property,
-@@ -838,7 +839,7 @@ static gboolean get_cig(const GDBusPropertyTable *property,
- 	struct bap_transport *bap = transport->data;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
--							&bap->qos.cig_id);
-+							&bap->qos.ucast.cig_id);
- 
- 	return TRUE;
- }
-@@ -850,7 +851,7 @@ static gboolean get_cis(const GDBusPropertyTable *property,
- 	struct bap_transport *bap = transport->data;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
--							&bap->qos.cis_id);
-+							&bap->qos.ucast.cis_id);
- 
- 	return TRUE;
- }
-@@ -862,7 +863,7 @@ static gboolean get_interval(const GDBusPropertyTable *property,
- 	struct bap_transport *bap = transport->data;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32,
--							&bap->qos.interval);
-+					&bap->qos.ucast.io_qos.interval);
- 
- 	return TRUE;
- }
-@@ -872,7 +873,7 @@ static gboolean get_framing(const GDBusPropertyTable *property,
- {
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
--	dbus_bool_t val = bap->qos.framing;
-+	dbus_bool_t val = bap->qos.ucast.framing;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
- 
-@@ -885,7 +886,8 @@ static gboolean get_phy(const GDBusPropertyTable *property,
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &bap->qos.phy);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
-+					&bap->qos.ucast.io_qos.phy);
- 
- 	return TRUE;
- }
-@@ -896,7 +898,8 @@ static gboolean get_sdu(const GDBusPropertyTable *property,
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &bap->qos.sdu);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+					&bap->qos.ucast.io_qos.sdu);
- 
- 	return TRUE;
- }
-@@ -907,7 +910,8 @@ static gboolean get_retransmissions(const GDBusPropertyTable *property,
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &bap->qos.rtn);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
-+					&bap->qos.ucast.io_qos.rtn);
- 
- 	return TRUE;
- }
-@@ -919,7 +923,7 @@ static gboolean get_latency(const GDBusPropertyTable *property,
- 	struct bap_transport *bap = transport->data;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
--							&bap->qos.latency);
-+					&bap->qos.ucast.io_qos.latency);
- 
- 	return TRUE;
- }
-@@ -930,7 +934,8 @@ static gboolean get_delay(const GDBusPropertyTable *property,
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &bap->qos.delay);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32,
-+						&bap->qos.ucast.delay);
- 
- 	return TRUE;
- }
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 7e597c662..05d814cb0 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -4,6 +4,7 @@
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-  *  Copyright (C) 2022  Intel Corporation. All rights reserved.
-+ *  Copyright 2023 NXP
-  *
-  */
- 
-@@ -861,15 +862,15 @@ static void stream_notify_qos(struct bt_bap_stream *stream)
- 	status->state = ep->state;
- 
- 	qos = (void *)status->params;
--	qos->cis_id = stream->qos.cis_id;
--	qos->cig_id = stream->qos.cig_id;
--	put_le24(stream->qos.interval, qos->interval);
--	qos->framing = stream->qos.framing;
--	qos->phy = stream->qos.phy;
--	qos->sdu = cpu_to_le16(stream->qos.sdu);
--	qos->rtn = stream->qos.rtn;
--	qos->latency = cpu_to_le16(stream->qos.latency);
--	put_le24(stream->qos.delay, qos->pd);
-+	qos->cis_id = stream->qos.ucast.cis_id;
-+	qos->cig_id = stream->qos.ucast.cig_id;
-+	put_le24(stream->qos.ucast.io_qos.interval, qos->interval);
-+	qos->framing = stream->qos.ucast.framing;
-+	qos->phy = stream->qos.ucast.io_qos.phy;
-+	qos->sdu = cpu_to_le16(stream->qos.ucast.io_qos.sdu);
-+	qos->rtn = stream->qos.ucast.io_qos.rtn;
-+	qos->latency = cpu_to_le16(stream->qos.ucast.io_qos.latency);
-+	put_le24(stream->qos.ucast.delay, qos->pd);
- 
- 	gatt_db_attribute_notify(ep->attr, (void *) status, len,
- 					bt_bap_get_att(stream->bap));
-@@ -898,8 +899,8 @@ static void stream_notify_metadata(struct bt_bap_stream *stream)
- 	status->state = ep->state;
- 
- 	meta = (void *)status->params;
--	meta->cis_id = stream->qos.cis_id;
--	meta->cig_id = stream->qos.cig_id;
-+	meta->cis_id = stream->qos.ucast.cis_id;
-+	meta->cig_id = stream->qos.ucast.cig_id;
- 
- 	if (stream->meta) {
- 		meta->len = stream->meta->iov_len;
-@@ -1575,20 +1576,22 @@ static uint8_t ascs_qos(struct bt_ascs *ascs, struct bt_bap *bap,
- 
- 	memset(&qos, 0, sizeof(qos));
- 
--	qos.cig_id = req->cig;
--	qos.cis_id = req->cis;
--	qos.interval = get_le24(req->interval);
--	qos.framing = req->framing;
--	qos.phy = req->phy;
--	qos.sdu = le16_to_cpu(req->sdu);
--	qos.rtn = req->rtn;
--	qos.latency = le16_to_cpu(req->latency);
--	qos.delay = get_le24(req->pd);
-+	qos.ucast.cig_id = req->cig;
-+	qos.ucast.cis_id = req->cis;
-+	qos.ucast.io_qos.interval = get_le24(req->interval);
-+	qos.ucast.framing = req->framing;
-+	qos.ucast.io_qos.phy = req->phy;
-+	qos.ucast.io_qos.sdu = le16_to_cpu(req->sdu);
-+	qos.ucast.io_qos.rtn = req->rtn;
-+	qos.ucast.io_qos.latency = le16_to_cpu(req->latency);
-+	qos.ucast.delay = get_le24(req->pd);
- 
- 	DBG(bap, "CIG 0x%02x CIS 0x%02x interval %u framing 0x%02x "
- 			"phy 0x%02x SDU %u rtn %u latency %u pd %u",
--			req->cig, req->cis, qos.interval, qos.framing, qos.phy,
--			qos.sdu, qos.rtn, qos.latency, qos.delay);
-+			req->cig, req->cis, qos.ucast.io_qos.interval,
-+			qos.ucast.framing, qos.ucast.io_qos.phy,
-+			qos.ucast.io_qos.sdu, qos.ucast.io_qos.rtn,
-+			qos.ucast.io_qos.latency, qos.ucast.delay);
- 
- 	ep = bap_get_local_endpoint_id(bap, req->ase);
- 	if (!ep) {
-@@ -3283,13 +3286,13 @@ static void ep_status_qos(struct bt_bap *bap, struct bt_bap_endpoint *ep,
- 	if (!ep->stream)
- 		return;
- 
--	ep->stream->qos.interval = interval;
--	ep->stream->qos.framing = qos->framing;
--	ep->stream->qos.phy = qos->phy;
--	ep->stream->qos.sdu = sdu;
--	ep->stream->qos.rtn = qos->rtn;
--	ep->stream->qos.latency = latency;
--	ep->stream->qos.delay = pd;
-+	ep->stream->qos.ucast.io_qos.interval = interval;
-+	ep->stream->qos.ucast.framing = qos->framing;
-+	ep->stream->qos.ucast.io_qos.phy = qos->phy;
-+	ep->stream->qos.ucast.io_qos.sdu = sdu;
-+	ep->stream->qos.ucast.io_qos.rtn = qos->rtn;
-+	ep->stream->qos.ucast.io_qos.latency = latency;
-+	ep->stream->qos.ucast.delay = pd;
- 
- 	if (ep->old_state == BT_ASCS_ASE_STATE_CONFIG)
- 		bap_stream_config_cfm(ep->stream);
-@@ -4189,8 +4192,8 @@ unsigned int bt_bap_stream_config(struct bt_bap_stream *stream,
- 	memset(&config, 0, sizeof(config));
- 
- 	config.ase = stream->ep->id;
--	config.latency = qos->target_latency;
--	config.phy = qos->phy;
-+	config.latency = qos->ucast.target_latency;
-+	config.phy = qos->ucast.io_qos.phy;
- 	config.codec = stream->rpac->codec;
- 
- 	iov[0].iov_base = &config;
-@@ -4372,15 +4375,15 @@ unsigned int bt_bap_stream_qos(struct bt_bap_stream *stream,
- 
- 	/* TODO: Figure out how to pass these values around */
- 	qos.ase = stream->ep->id;
--	qos.cig = data->cig_id;
--	qos.cis = data->cis_id;
--	put_le24(data->interval, qos.interval);
--	qos.framing = data->framing;
--	qos.phy = data->phy;
--	qos.sdu = cpu_to_le16(data->sdu);
--	qos.rtn = data->rtn;
--	qos.latency = cpu_to_le16(data->latency);
--	put_le24(data->delay, qos.pd);
-+	qos.cig = data->ucast.cig_id;
-+	qos.cis = data->ucast.cis_id;
-+	put_le24(data->ucast.io_qos.interval, qos.interval);
-+	qos.framing = data->ucast.framing;
-+	qos.phy = data->ucast.io_qos.phy;
-+	qos.sdu = cpu_to_le16(data->ucast.io_qos.sdu);
-+	qos.rtn = data->ucast.io_qos.rtn;
-+	qos.latency = cpu_to_le16(data->ucast.io_qos.latency);
-+	put_le24(data->ucast.delay, qos.pd);
- 
- 	iov.iov_base = &qos;
- 	iov.iov_len = sizeof(qos);
-@@ -4784,8 +4787,8 @@ int bt_bap_stream_io_link(struct bt_bap_stream *stream,
- 		return -EALREADY;
- 
- 	if (stream->client != link->client ||
--			stream->qos.cig_id != link->qos.cig_id ||
--			stream->qos.cis_id != link->qos.cis_id)
-+			stream->qos.ucast.cig_id != link->qos.ucast.cig_id ||
-+			stream->qos.ucast.cis_id != link->qos.ucast.cis_id)
- 		return -EINVAL;
- 
- 	if (!stream->links)
-@@ -4822,7 +4825,7 @@ static void bap_stream_get_in_qos(void *data, void *user_data)
- 	struct bt_bap_qos **qos = user_data;
- 
- 	if (!qos || *qos || stream->ep->dir != BT_BAP_SOURCE ||
--						!stream->qos.sdu)
-+				!stream->qos.ucast.io_qos.sdu)
- 		return;
- 
- 	*qos = &stream->qos;
-@@ -4833,7 +4836,8 @@ static void bap_stream_get_out_qos(void *data, void *user_data)
- 	struct bt_bap_stream *stream = data;
- 	struct bt_bap_qos **qos = user_data;
- 
--	if (!qos || *qos || stream->ep->dir != BT_BAP_SINK || !stream->qos.sdu)
-+	if (!qos || *qos || stream->ep->dir != BT_BAP_SINK ||
-+				!stream->qos.ucast.io_qos.sdu)
- 		return;
- 
- 	*qos = &stream->qos;
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index e9f769d0e..0c42e730f 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -4,6 +4,7 @@
-  *  BlueZ - Bluetooth protocol stack for Linux
-  *
-  *  Copyright (C) 2022  Intel Corporation. All rights reserved.
-+ *  Copyright 2023 NXP
-  *
-  */
- 
-@@ -49,17 +50,46 @@ struct bt_ltv {
- 	uint8_t  value[0];
- } __packed;
- 
--struct bt_bap_qos {
-+struct bt_bap_io_qos {
-+	uint32_t interval;	/* Frame interval */
-+	uint16_t latency;	/* Transport Latency */
-+	uint16_t sdu;		/* Maximum SDU Size */
-+	uint8_t  phy;		/* PHY */
-+	uint8_t  rtn;		/* Retransmission Effort */
+diff --git a/client/player.c b/client/player.c
+index a9f56fb94..389fc1d07 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -74,11 +74,13 @@ struct endpoint {
+ 	bool auto_accept;
+ 	bool acquiring;
+ 	uint8_t max_transports;
+-	uint8_t cig;
+-	uint8_t cis;
++	uint8_t iso_group;
++	uint8_t iso_stream;
+ 	char *transport;
+ 	DBusMessage *msg;
+ 	struct preset *preset;
++	bool broadcast;
++	struct iovec *bcode;
+ };
+ 
+ static DBusConnection *dbus_conn;
+@@ -104,6 +106,22 @@ struct transport {
+ 	struct io *timer_io;
+ };
+ 
++static const uint8_t base_lc3_16_2_1[] = {
++	0x28, 0x00, 0x00, /* Presentation Delay */
++	0x01, /* Number of Subgroups */
++	0x01, /* Number of BIS */
++	0x06, 0x00, 0x00, 0x00, 0x00, /* Code ID = LC3 (0x06) */
++	0x11, /* Codec Specific Configuration */
++	0x02, 0x01, 0x03, /* 16 KHZ */
++	0x02, 0x02, 0x01, /* 10 ms */
++	0x05, 0x03, 0x01, 0x00, 0x00, 0x00,  /* Front Left */
++	0x03, 0x04, 0x28, 0x00, /* Frame Length 40 bytes */
++	0x04, /* Metadata */
++	0x03, 0x02, 0x02, 0x00, /* Audio Context: Convertional */
++	0x01, /* BIS */
++	0x00, /* Codec Specific Configuration */
 +};
 +
-+struct bt_bap_ucast_qos {
- 	uint8_t  cig_id;
- 	uint8_t  cis_id;
--	uint32_t interval;		/* Frame interval */
- 	uint8_t  framing;		/* Frame framing */
--	uint8_t  phy;			/* PHY */
--	uint16_t sdu;			/* Maximum SDU Size */
--	uint8_t  rtn;			/* Retransmission Effort */
--	uint16_t latency;		/* Transport Latency */
- 	uint32_t delay;			/* Presentation Delay */
- 	uint8_t  target_latency;	/* Target Latency */
-+	struct bt_bap_io_qos io_qos;
-+};
-+
-+struct bt_bap_bcast_qos {
-+	uint8_t  big;
-+	uint8_t  bis;
-+	uint8_t  sync_interval;
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	uint8_t  encryption;
-+	struct iovec bcode;
-+	uint8_t  options;
-+	uint16_t skip;
-+	uint16_t sync_timeout;
-+	uint8_t  sync_cte_type;
-+	uint8_t  mse;
-+	uint16_t timeout;
-+	uint8_t  pa_sync;
-+	struct bt_bap_io_qos io_qos;
-+};
-+
-+struct bt_bap_qos {
-+	union {
-+			struct bt_bap_ucast_qos ucast;
-+			struct bt_bap_bcast_qos bcast;
-+		};
+ static void endpoint_unregister(void *data)
+ {
+ 	struct endpoint *ep = data;
+@@ -1154,6 +1172,16 @@ static const struct capabilities {
+ 	CODEC_CAPABILITIES(PAC_SOURCE_UUID, LC3_ID,
+ 					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
+ 						3u, 30, 240)),
++	/* Broadcast LC3 Source:
++	 *
++	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
++	 * Duration: 7.5 ms 10 ms
++	 * Channel count: 3
++	 * Frame length: 30-240
++	 */
++	CODEC_CAPABILITIES(BAA_SERVICE_UUID, LC3_ID,
++					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
++						3u, 30, 240)),
  };
  
- typedef void (*bt_bap_ready_func_t)(struct bt_bap *bap, void *user_data);
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index bf525742d..adade07db 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -712,12 +712,15 @@ static void test_disc(void)
- #define QOS_BALANCED_2M \
- 	{ \
- 		.target_latency = BT_BAP_CONFIG_LATENCY_BALANCED, \
--		.phy = BT_BAP_CONFIG_PHY_2M, \
-+		.io_qos.phy = BT_BAP_CONFIG_PHY_2M, \
+ struct codec_qos {
+@@ -1435,6 +1463,7 @@ static struct preset {
+ 	PRESET(A2DP_SINK_UUID, A2DP_CODEC_SBC, sbc_presets, 6),
+ 	PRESET(PAC_SINK_UUID, LC3_ID, lc3_presets, 3),
+ 	PRESET(PAC_SOURCE_UUID, LC3_ID, lc3_presets, 3),
++	PRESET(BAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
+ };
+ 
+ static void parse_vendor_codec(const char *codec, uint16_t *vid, uint16_t *cid)
+@@ -1707,6 +1736,27 @@ struct endpoint_config {
+ 	const struct codec_qos *qos;
+ };
+ 
++#define BCODE {0x01, 0x02, 0x68, 0x05, 0x53, 0xf1, 0x41, 0x5a, \
++				0xa2, 0x65, 0xbb, 0xaf, 0xc6, 0xea, 0x03, 0xb8}
++
++static struct bt_iso_qos bcast_qos = {
++		.bcast = {
++			.big = BT_ISO_QOS_BIG_UNSET,
++			.bis = BT_ISO_QOS_BIS_UNSET,
++			.sync_interval = 0x07,
++			.packing = 0x00,
++			.framing = 0x00,
++			.encryption = 0x00,
++			.bcode = BCODE,
++			.options = 0x00,
++			.skip = 0x0000,
++			.sync_timeout = 0x4000,
++			.sync_cte_type = 0x00,
++			.mse = 0x00,
++			.timeout = 0x4000,
++		}
++	};
++
+ static void append_properties(DBusMessageIter *iter,
+ 						struct endpoint_config *cfg)
+ {
+@@ -1714,6 +1764,7 @@ static void append_properties(DBusMessageIter *iter,
+ 	struct codec_qos *qos = (void *)cfg->qos;
+ 	const char *key = "Capabilities";
+ 	const char *meta = "Metadata";
++	const char *keyBCode = "BroadcastCode";
+ 
+ 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
+ 
+@@ -1742,16 +1793,27 @@ static void append_properties(DBusMessageIter *iter,
+ 					DBUS_TYPE_BYTE, &cfg->target_latency);
  	}
--
-+#define QOS_UCAST \
-+{\
-+	.ucast = QOS_BALANCED_2M, \
-+}
- static struct test_config cfg_snk_8_1 = {
- 	.cc = LC3_CONFIG_8_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -727,7 +730,7 @@ static struct test_config cfg_snk_8_1 = {
- 
- static struct test_config cfg_snk_8_2 = {
- 	.cc = LC3_CONFIG_8_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -737,7 +740,7 @@ static struct test_config cfg_snk_8_2 = {
- 
- static struct test_config cfg_snk_16_1 = {
- 	.cc = LC3_CONFIG_16_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -747,7 +750,7 @@ static struct test_config cfg_snk_16_1 = {
- 
- static struct test_config cfg_snk_16_2 = {
- 	.cc = LC3_CONFIG_16_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -757,7 +760,7 @@ static struct test_config cfg_snk_16_2 = {
- 
- static struct test_config cfg_snk_24_1 = {
- 	.cc = LC3_CONFIG_24_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -767,7 +770,7 @@ static struct test_config cfg_snk_24_1 = {
- 
- static struct test_config cfg_snk_24_2 = {
- 	.cc = LC3_CONFIG_24_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -777,7 +780,7 @@ static struct test_config cfg_snk_24_2 = {
- 
- static struct test_config cfg_snk_32_1 = {
- 	.cc = LC3_CONFIG_32_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -787,7 +790,7 @@ static struct test_config cfg_snk_32_1 = {
- 
- static struct test_config cfg_snk_32_2 = {
- 	.cc = LC3_CONFIG_32_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -797,7 +800,7 @@ static struct test_config cfg_snk_32_2 = {
- 
- static struct test_config cfg_snk_44_1 = {
- 	.cc = LC3_CONFIG_44_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -807,7 +810,7 @@ static struct test_config cfg_snk_44_1 = {
- 
- static struct test_config cfg_snk_44_2 = {
- 	.cc = LC3_CONFIG_44_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -817,7 +820,7 @@ static struct test_config cfg_snk_44_2 = {
- 
- static struct test_config cfg_snk_48_1 = {
- 	.cc = LC3_CONFIG_48_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -827,7 +830,7 @@ static struct test_config cfg_snk_48_1 = {
- 
- static struct test_config cfg_snk_48_2 = {
- 	.cc = LC3_CONFIG_48_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -837,7 +840,7 @@ static struct test_config cfg_snk_48_2 = {
- 
- static struct test_config cfg_snk_48_3 = {
- 	.cc = LC3_CONFIG_48_3,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -847,7 +850,7 @@ static struct test_config cfg_snk_48_3 = {
- 
- static struct test_config cfg_snk_48_4 = {
- 	.cc = LC3_CONFIG_48_4,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -857,7 +860,7 @@ static struct test_config cfg_snk_48_4 = {
- 
- static struct test_config cfg_snk_48_5 = {
- 	.cc = LC3_CONFIG_48_5,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -867,7 +870,7 @@ static struct test_config cfg_snk_48_5 = {
- 
- static struct test_config cfg_snk_48_6 = {
- 	.cc = LC3_CONFIG_48_6,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- };
- 
-@@ -899,7 +902,7 @@ static struct test_config cfg_snk_48_6 = {
- 
- static struct test_config cfg_src_8_1 = {
- 	.cc = LC3_CONFIG_8_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -909,7 +912,7 @@ static struct test_config cfg_src_8_1 = {
- 
- static struct test_config cfg_src_8_2 = {
- 	.cc = LC3_CONFIG_8_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -919,7 +922,7 @@ static struct test_config cfg_src_8_2 = {
- 
- static struct test_config cfg_src_16_1 = {
- 	.cc = LC3_CONFIG_16_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -929,7 +932,7 @@ static struct test_config cfg_src_16_1 = {
- 
- static struct test_config cfg_src_16_2 = {
- 	.cc = LC3_CONFIG_16_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -939,7 +942,7 @@ static struct test_config cfg_src_16_2 = {
- 
- static struct test_config cfg_src_24_1 = {
- 	.cc = LC3_CONFIG_24_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -949,7 +952,7 @@ static struct test_config cfg_src_24_1 = {
- 
- static struct test_config cfg_src_24_2 = {
- 	.cc = LC3_CONFIG_24_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -959,7 +962,7 @@ static struct test_config cfg_src_24_2 = {
- 
- static struct test_config cfg_src_32_1 = {
- 	.cc = LC3_CONFIG_32_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -969,7 +972,7 @@ static struct test_config cfg_src_32_1 = {
- 
- static struct test_config cfg_src_32_2 = {
- 	.cc = LC3_CONFIG_32_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -979,7 +982,7 @@ static struct test_config cfg_src_32_2 = {
- 
- static struct test_config cfg_src_44_1 = {
- 	.cc = LC3_CONFIG_44_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -989,7 +992,7 @@ static struct test_config cfg_src_44_1 = {
- 
- static struct test_config cfg_src_44_2 = {
- 	.cc = LC3_CONFIG_44_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -999,7 +1002,7 @@ static struct test_config cfg_src_44_2 = {
- 
- static struct test_config cfg_src_48_1 = {
- 	.cc = LC3_CONFIG_48_1,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -1009,7 +1012,7 @@ static struct test_config cfg_src_48_1 = {
- 
- static struct test_config cfg_src_48_2 = {
- 	.cc = LC3_CONFIG_48_2,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -1019,7 +1022,7 @@ static struct test_config cfg_src_48_2 = {
- 
- static struct test_config cfg_src_48_3 = {
- 	.cc = LC3_CONFIG_48_3,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -1029,7 +1032,7 @@ static struct test_config cfg_src_48_3 = {
- 
- static struct test_config cfg_src_48_4 = {
- 	.cc = LC3_CONFIG_48_4,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -1039,7 +1042,7 @@ static struct test_config cfg_src_48_4 = {
- 
- static struct test_config cfg_src_48_5 = {
- 	.cc = LC3_CONFIG_48_5,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -1049,7 +1052,7 @@ static struct test_config cfg_src_48_5 = {
- 
- static struct test_config cfg_src_48_6 = {
- 	.cc = LC3_CONFIG_48_6,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- };
- 
-@@ -1141,7 +1144,7 @@ static void test_scc_cc_lc3(void)
- 
- static struct test_config cfg_snk_vs = {
- 	.cc = IOV_NULL,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.snk = true,
- 	.vs = true,
- };
-@@ -1155,7 +1158,7 @@ static struct test_config cfg_snk_vs = {
- 
- static struct test_config cfg_src_vs = {
- 	.cc = IOV_NULL,
--	.qos = QOS_BALANCED_2M,
-+	.qos = QOS_UCAST,
- 	.src = true,
- 	.vs = true,
- };
+ 
+-	if (cfg->ep->cig != BT_ISO_QOS_CIG_UNSET) {
+-		bt_shell_printf("CIG 0x%2.2x\n", cfg->ep->cig);
++	if ((!cfg->ep->broadcast) &&
++			(cfg->ep->iso_group != BT_ISO_QOS_GROUP_UNSET)) {
++		bt_shell_printf("CIG 0x%2.2x\n", cfg->ep->iso_group);
+ 		g_dbus_dict_append_entry(&dict, "CIG", DBUS_TYPE_BYTE,
+-							&cfg->ep->cig);
++							&cfg->ep->iso_group);
++	} else {
++		bt_shell_printf("BIG 0x%2.2x\n", bcast_qos.bcast.big);
++		g_dbus_dict_append_entry(&dict, "BIG", DBUS_TYPE_BYTE,
++							&bcast_qos.bcast.big);
+ 	}
+ 
+-	if (cfg->ep->cis != BT_ISO_QOS_CIS_UNSET) {
+-		bt_shell_printf("CIS 0x%2.2x\n", cfg->ep->cis);
++	if ((!cfg->ep->broadcast) &&
++			(cfg->ep->iso_stream != BT_ISO_QOS_STREAM_UNSET)) {
++		bt_shell_printf("CIS 0x%2.2x\n", cfg->ep->iso_stream);
+ 		g_dbus_dict_append_entry(&dict, "CIS", DBUS_TYPE_BYTE,
+-							&cfg->ep->cis);
++							&cfg->ep->iso_stream);
++
++	} else {
++		bt_shell_printf("BIS 0x%2.2x\n", bcast_qos.bcast.bis);
++		g_dbus_dict_append_entry(&dict, "BIS", DBUS_TYPE_BYTE,
++							&bcast_qos.bcast.bis);
+ 	}
+ 
+ 	bt_shell_printf("Interval %u\n", qos->interval);
+@@ -1759,10 +1821,19 @@ static void append_properties(DBusMessageIter *iter,
+ 	g_dbus_dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT32,
+ 						&qos->interval);
+ 
+-	bt_shell_printf("Framing %s\n", qos->framing ? "true" : "false");
++	if (!cfg->ep->broadcast) {
++		bt_shell_printf("Framing %s\n",
++					qos->framing ? "true" : "false");
+ 
+-	g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BOOLEAN,
+-						&qos->framing);
++		g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BOOLEAN,
++							&qos->framing);
++	} else {
++		bt_shell_printf("Framing %s\n",
++				bcast_qos.bcast.framing ? "true" : "false");
++
++		g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BOOLEAN,
++						&bcast_qos.bcast.framing);
++	}
+ 
+ 	bt_shell_printf("PHY %s\n", qos->phy);
+ 
+@@ -1787,6 +1858,57 @@ static void append_properties(DBusMessageIter *iter,
+ 	g_dbus_dict_append_entry(&dict, "Delay", DBUS_TYPE_UINT32,
+ 						&qos->delay);
+ 
++	if (!cfg->ep->broadcast)
++		goto done;
++
++	bt_shell_printf("SyncInterval %u\n", bcast_qos.bcast.sync_interval);
++
++	g_dbus_dict_append_entry(&dict, "SyncInterval", DBUS_TYPE_BYTE,
++						&bcast_qos.bcast.sync_interval);
++
++	bt_shell_printf("Encryption %u\n", bcast_qos.bcast.encryption);
++
++	g_dbus_dict_append_entry(&dict, "Encryption", DBUS_TYPE_BYTE,
++						&bcast_qos.bcast.encryption);
++
++	bt_shell_printf("Options %u\n", bcast_qos.bcast.options);
++
++	g_dbus_dict_append_entry(&dict, "Options", DBUS_TYPE_BYTE,
++						&bcast_qos.bcast.options);
++
++	bt_shell_printf("Skip %u\n", bcast_qos.bcast.skip);
++
++	g_dbus_dict_append_entry(&dict, "Skip", DBUS_TYPE_UINT16,
++						&bcast_qos.bcast.skip);
++
++	bt_shell_printf("SyncTimeout %u\n", bcast_qos.bcast.sync_timeout);
++
++	g_dbus_dict_append_entry(&dict, "SyncTimeout", DBUS_TYPE_UINT16,
++						&bcast_qos.bcast.sync_timeout);
++
++	bt_shell_printf("SyncCteType %u\n", bcast_qos.bcast.sync_cte_type);
++
++	g_dbus_dict_append_entry(&dict, "SyncCteType", DBUS_TYPE_BYTE,
++					&bcast_qos.bcast.sync_cte_type);
++
++	bt_shell_printf("MSE %u\n", bcast_qos.bcast.mse);
++
++	g_dbus_dict_append_entry(&dict, "MSE", DBUS_TYPE_BYTE,
++						&bcast_qos.bcast.mse);
++
++	bt_shell_printf("Timeout %u\n", bcast_qos.bcast.timeout);
++
++	g_dbus_dict_append_entry(&dict, "Timeout", DBUS_TYPE_UINT16,
++						&bcast_qos.bcast.timeout);
++
++	bt_shell_printf("BroadcastCode:\n");
++	bt_shell_hexdump(cfg->ep->bcode->iov_base, cfg->ep->bcode->iov_len);
++
++	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &keyBCode,
++						DBUS_TYPE_BYTE,
++						&cfg->ep->bcode->iov_base,
++						cfg->ep->bcode->iov_len);
++
+ done:
+ 	dbus_message_iter_close_container(iter, &dict);
+ }
+@@ -2239,14 +2361,14 @@ fail:
+ 
+ }
+ 
+-static void endpoint_cis(const char *input, void *user_data)
++static void endpoint_iso_stream(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
+ 	char *endptr = NULL;
+ 	int value;
+ 
+ 	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
+-		ep->cis = BT_ISO_QOS_CIS_UNSET;
++		ep->iso_stream = BT_ISO_QOS_STREAM_UNSET;
+ 	} else {
+ 		value = strtol(input, &endptr, 0);
+ 
+@@ -2255,20 +2377,20 @@ static void endpoint_cis(const char *input, void *user_data)
+ 			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+ 
+-		ep->cis = value;
++		ep->iso_stream = value;
+ 	}
+ 
+ 	endpoint_register(ep);
+ }
+ 
+-static void endpoint_cig(const char *input, void *user_data)
++static void endpoint_iso_group(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
+ 	char *endptr = NULL;
+ 	int value;
+ 
+ 	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
+-		ep->cig = BT_ISO_QOS_CIG_UNSET;
++		ep->iso_group = BT_ISO_QOS_GROUP_UNSET;
+ 	} else {
+ 		value = strtol(input, &endptr, 0);
+ 
+@@ -2277,10 +2399,15 @@ static void endpoint_cig(const char *input, void *user_data)
+ 			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+ 
+-		ep->cig = value;
++		ep->iso_group = value;
+ 	}
+ 
+-	bt_shell_prompt_input(ep->path, "CIS (auto/value):", endpoint_cis, ep);
++	if (!ep->broadcast)
++		bt_shell_prompt_input(ep->path, "CIS (auto/value):",
++			endpoint_iso_stream, ep);
++	else
++		bt_shell_prompt_input(ep->path, "BIS (auto/value):",
++			endpoint_iso_stream, ep);
+ }
+ 
+ static void endpoint_max_transports(const char *input, void *user_data)
+@@ -2302,13 +2429,24 @@ static void endpoint_max_transports(const char *input, void *user_data)
+ 		ep->max_transports = value;
+ 	}
+ 
+-	bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
++	if (ep->broadcast)
++		bt_shell_prompt_input(ep->path, "BIG (auto/value):",
++			endpoint_iso_group, ep);
++	else
++		bt_shell_prompt_input(ep->path, "CIG (auto/value):",
++			endpoint_iso_group, ep);
+ }
+ 
+ static void endpoint_auto_accept(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
+ 
++	if (!strcmp(ep->uuid, BAA_SERVICE_UUID)) {
++		ep->broadcast = true;
++	} else {
++		ep->broadcast = false;
++	}
++
+ 	if (!strcasecmp(input, "y") || !strcasecmp(input, "yes")) {
+ 		ep->auto_accept = true;
+ 		bt_shell_prompt_input(ep->path, "Max Transports (auto/value):",
+@@ -2321,7 +2459,12 @@ static void endpoint_auto_accept(const char *input, void *user_data)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
++	if (ep->broadcast)
++		bt_shell_prompt_input(ep->path, "BIG (auto/value):",
++					endpoint_iso_group, ep);
++	else
++		bt_shell_prompt_input(ep->path, "CIG (auto/value):",
++					endpoint_iso_group, ep);
+ }
+ 
+ static void endpoint_set_metadata(const char *input, void *user_data)
+@@ -2598,9 +2741,17 @@ static void cmd_config_endpoint(int argc, char *argv[])
+ 			goto fail;
+ 		}
+ 
+-		/* Copy capabilities */
+-		iov_append(&cfg->caps, preset->data.iov_base,
+-						preset->data.iov_len);
++		if (cfg->ep->broadcast) {
++			iov_append(&cfg->ep->bcode, bcast_qos.bcast.bcode,
++				sizeof(bcast_qos.bcast.bcode));
++			/* Copy capabilities for broadcast*/
++			iov_append(&cfg->caps, base_lc3_16_2_1,
++				sizeof(base_lc3_16_2_1));
++		} else {
++			/* Copy capabilities */
++			iov_append(&cfg->caps, preset->data.iov_base,
++							preset->data.iov_len);
++		}
+ 
+ 		/* Set QoS parameters */
+ 		cfg->qos = &preset->qos;
+@@ -3050,8 +3201,8 @@ static void register_endpoints(GDBusProxy *proxy)
+ 								ep->cid);
+ 		ep->max_transports = UINT8_MAX;
+ 		ep->auto_accept = true;
+-		ep->cig = BT_ISO_QOS_CIG_UNSET;
+-		ep->cis = BT_ISO_QOS_CIS_UNSET;
++		ep->iso_group = BT_ISO_QOS_GROUP_UNSET;
++		ep->iso_stream = BT_ISO_QOS_STREAM_UNSET;
+ 		endpoint_register(ep);
+ 	}
+ }
+@@ -3595,6 +3746,7 @@ static void cmd_acquire_transport(int argc, char *argv[])
+ {
+ 	GDBusProxy *proxy;
+ 	int i;
++	struct endpoint *ep, *link;
+ 
+ 	for (i = 1; i < argc; i++) {
+ 		proxy = g_dbus_proxy_lookup(transports, NULL, argv[i],
+@@ -3610,6 +3762,30 @@ static void cmd_acquire_transport(int argc, char *argv[])
+ 			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+ 
++		ep = find_ep_by_transport(g_dbus_proxy_get_path(proxy));
++		if (!ep || ep->acquiring) {
++			bt_shell_printf(
++				"Transport %s already in acquiring process\n",
++				argv[i]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++
++		ep->acquiring = true;
++
++		link = find_link_by_proxy(proxy);
++		if (link) {
++			bt_shell_printf("Link %s found\n", link->transport);
++			/* If link already acquiring wait it to be complete */
++			if (link->acquiring) {
++				bt_shell_printf(
++					"Link %s is in acquiring process\n",
++					argv[i]);
++				return bt_shell_noninteractive_quit(
++								EXIT_FAILURE);
++			}
++			link->acquiring = true;
++		}
++
+ 		if (!g_dbus_proxy_method_call(proxy, "Acquire", NULL,
+ 						acquire_reply, proxy, NULL)) {
+ 			bt_shell_printf("Failed acquire transport\n");
 -- 
 2.34.1
 
