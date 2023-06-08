@@ -2,207 +2,157 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D942C7EE25
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jun 2023 16:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E7C7EE25
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jun 2023 18:20:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231459AbjFHQdJ (ORCPT
+        id S236494AbjFHSUm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Jun 2023 12:33:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41934 "EHLO
+        Thu, 8 Jun 2023 14:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229656AbjFHQdH (ORCPT
+        with ESMTP id S231852AbjFHSUl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Jun 2023 12:33:07 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 834A32119
-        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jun 2023 09:33:04 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-4f6195d2b3fso1015342e87.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jun 2023 09:33:04 -0700 (PDT)
+        Thu, 8 Jun 2023 14:20:41 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B86791993
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jun 2023 11:20:40 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id d2e1a72fcca58-654f8b56807so886329b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jun 2023 11:20:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686241983; x=1688833983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cjR1VXcn9zF31lfQtEdXfr8wK4MLRUCXJRS83/+MZjA=;
-        b=JsTni4gLFQmvm/W/OP9g119/RF5TfFnrCf2gMVkVkTlfQifPC8e6XPyTTj21qzZa0v
-         ueqpC9tRNLWduE00tIw2WChmayVN5Wq990K3M/2kgQVRogWYJT8ottuTSPbUaxWolBUJ
-         KGSDwVAfNuuoc8AYA2nw0zn2LlHbscb+lZoIpopOd4g4uR0V4Gqseh8wGgeAuZCbWRqX
-         OHEOVGhTkcy6BAyH9poJzc87A/ulxGTjOs6TMk0ROC+jyPSd3vamDWAVgMFbJIp47Y4h
-         +RByP8hklUuokVHJIN1HWNY1Msxpblor8cwb/XQXlMDgA6RlQUB1fe8imZqJFTpR6oHK
-         kICQ==
+        d=gmail.com; s=20221208; t=1686248439; x=1688840439;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PVuB3/23DwQdcVUb/m3iNnX2H4EOst6mJJ40Jy3AnJ0=;
+        b=UEdIZtI45GZL+5VyiQoiw43LM7Uea5YjQxT5g0wYItLy5JiGgoivMi2H+DblGQGKki
+         FZdpdBQoBF85mWzShsJL4yzsLuKOa4u8fEcmksrUBO4jUWIAHUj5Gd/EYwoc1C6RAEeD
+         vbnNtlvTytPPc0sddhk9cB8SsTnnR4Rdq1uW3rgeUPn3pSJ3+Fqo0oWQ7pbmqa3dzVTr
+         k6CYWfhRZ6LMFahbF2nsrbMp9WXgjQb3SsCHaZC0gyR+suzghp4FiwypP5g2WL9279em
+         ZTUz9UyeLArU4CbrdTs7A9jX4AyCVpyBfPkjj2QHVa2La5rJexMYGt3AHOG+amUTCpmp
+         qCMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686241983; x=1688833983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cjR1VXcn9zF31lfQtEdXfr8wK4MLRUCXJRS83/+MZjA=;
-        b=g2M8prx3j8b06bvlwYa1nYo/JTfW2VM34uExzKXJRqmxYVxgjEqoQLaoxenXpJPJNr
-         kjV9kqmyZmbA6rMNV/M2DGJ1k8AptYJnMyjSslCeWp96PTEkZt1PdvQxE/I2oeL/QJ0H
-         E3i1UqG4m4anbokoa7A84pLoOxlujLTvdpQhd2/nR6INsXC49N3B73h13NDedtPLwOC7
-         MS3Xa+7mqR6DeD92FuiTO2Z4OTsuCR4xbT4Eui3/Tw7/YmcuVDIfMgmpXjbYMh8ipoSV
-         C/p5PeooFnLjSRzP+hYX5V04HOF1xt3lmYPu97XlEq3UU+qScXHseTa2r9tmsCkx+lbO
-         sVzA==
-X-Gm-Message-State: AC+VfDxDQAq1fU0RR+Q5zsYgeJBi+76WwgY3hUFwHKE2tg2E91wJKMWo
-        K1GgqlSt2HK2W/G5Y1zjxwFP16dtQ1LcTHWbNbgq56bKbCs=
-X-Google-Smtp-Source: ACHHUZ7xHrRozwwRQIzHQm7pRx8rUQL4+dUtytgFdvtsDWBRbdeUL551zhaNFbNp/k68T291TP08p4Wv5tBOwnGX7O8=
-X-Received: by 2002:a2e:8687:0:b0:2b1:d210:10d5 with SMTP id
- l7-20020a2e8687000000b002b1d21010d5mr3504206lji.33.1686241982454; Thu, 08 Jun
- 2023 09:33:02 -0700 (PDT)
-MIME-Version: 1.0
-References: <76E1E367-BAF0-41A8-A292-7E002B213D8A@athom.nl> <CABBYNZ+CYMsDSPTxBn09Js3BcdC-x7vZFfyLJ3ppZGGwJKmUTw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+CYMsDSPTxBn09Js3BcdC-x7vZFfyLJ3ppZGGwJKmUTw@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1686248439; x=1688840439;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PVuB3/23DwQdcVUb/m3iNnX2H4EOst6mJJ40Jy3AnJ0=;
+        b=aTkD30BYBhXJy9AI1pKB5KOBI2hi8KtgZ3vScradIKI7hS4yz3Lw5/ziEBSr9N2PRw
+         umBX74bXKet7Rk71VqCxUoJ5wF+ckDMK1raW140GyL0Hn1CGhrghUAq+to3MfNamFDvn
+         eWaIGqYVDBZfJ7uK/PE0uEzEgSHOdepzzk+Drk5cZaOGBL8QcBJ/e/2mSyCosmU1Wg01
+         dpZYG1GrFqOk1WGHOI0JkGqndUbl6lId822VoOkZa96jPyr1qGnsAjolaS6usSs6WjSS
+         xjbQ7qNCo5B9P0NwHLP6MMbiM69X7WaIQ+clTG1b7cRVZJpIpMLb16Pq50Ms48bOu9tg
+         C6kw==
+X-Gm-Message-State: AC+VfDwwHQN1QZhm0R6EC3WTsGVa5tCNe6iFerHWw4c3e5wBhJwpBRhq
+        kKBb+gY7qX8IHYjaffwH7m/fqR/SwFw=
+X-Google-Smtp-Source: ACHHUZ72hAnEn+UQmyMIVtqZejSpqzcvk7jXr8VrkanAD50lPkABxoIon7Bj+bgtsUC1UncR2yt18w==
+X-Received: by 2002:a05:6a00:988:b0:653:91c1:1611 with SMTP id u8-20020a056a00098800b0065391c11611mr12895160pfg.14.1686248439159;
+        Thu, 08 Jun 2023 11:20:39 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id r1-20020a62e401000000b00662b551e5c4sm1428958pfh.94.2023.06.08.11.20.38
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Jun 2023 11:20:38 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 8 Jun 2023 09:32:49 -0700
-Message-ID: <CABBYNZLrdKqsYUqu7uN63DWiR4uKxdpFucNNbgM8rFZTpP=Cgg@mail.gmail.com>
-Subject: Re: Intermittent Not connectable devices reported
-To:     Herman Meerlo <herman.meerlo@athom.nl>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: ISO: Rework sync_interval to be sync_factor
+Date:   Thu,  8 Jun 2023 11:20:37 -0700
+Message-Id: <20230608182037.3332558-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Herman,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jun 7, 2023 at 12:21=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Herman,
->
-> On Fri, Jun 2, 2023 at 2:51=E2=80=AFAM Herman Meerlo <herman.meerlo@athom=
-.nl> wrote:
-> >
-> > I'm working on a Raspberry Pi device that performs periodic BLE discove=
-ry and tries to connect to multiple devices. Most of the times this goes fi=
-ne but especially in BLE heavy environments every now and then it fails bec=
-ause it says that the device is not found. I have been debugging this issue=
- for a few weeks now and it comes down to this:
-> >
-> >    =E2=80=A2 Connect to DBus to start the discovery
-> >    =E2=80=A2 Devices are found, interfacesAdded callbacks are made, eve=
-rything looks fine
-> >    =E2=80=A2 Stop discovery
-> >    =E2=80=A2 Directly some devices are removed by the interfacesRemoved=
- callback
-> >    =E2=80=A2 My code does not get the device it searches for -> unhappy=
- user
-> >
-> > What happens under the hood is that DBus removes all devices from it's =
-cache that have been indicated by Bluez as being Not connectable. I.e. ther=
-e is no use in keeping them around, you can't connect to them anyway. But..=
-. this is not true for the device I'm looking for. It is marked as Not conn=
-ectable incorrectly.
-> > So to chase down the problem I create a btmon dump which shows indeed t=
-hat the device is reported to be Not connectable after having received a SC=
-AN_RSP:
-> >
-> > > HCI Event: LE Meta Event (0x3e) plen 38 #73 [hci0] 34.359921
-> > LE Advertising Report (0x02)
-> > Num reports: 1
-> > Event type: Scan response - SCAN_RSP (0x04)
-> > Address type: Public (0x00)
-> > Address: F4:B8:5E:64:02:55 (Texas Instruments)
-> > Data length: 26
-> > Name (complete): BeeWi SmartLite
-> > Peripheral Conn. Interval: 0x0028 - 0x0050
-> > TX power: 0 dBm
-> > RSSI: -42 dBm (0xd6)
-> > @ MGMT Event: Device Found (0x0012) plen 40 {0x0001} [hci0] 34.360057
-> > LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
-> > RSSI: -42 dBm (0xd6)
-> > Flags: 0x00000004
-> > Not Connectable
-> > Data length: 26
-> > Name (complete): BeeWi SmartLite
-> > Peripheral Conn. Interval: 0x0028 - 0x0050
-> > TX power: 0 dBm
-> >
-> > But all ADV_IND PDU's before that clearly indicate that the device is c=
-onnectable, it is only after this SCAN_RSP that it is reported as Not conne=
-ctable:
-> >
-> > > HCI Event: LE Meta Event (0x3e) plen 27 #46 [hci0] 34.152817
-> > LE Advertising Report (0x02)
-> > Num reports: 1
-> > Event type: Connectable undirected - ADV_IND (0x00)
-> > Address type: Public (0x00)
-> > Address: F4:B8:5E:64:02:55 (Texas Instruments)
-> > Data length: 15
-> > Flags: 0x06
-> > LE General Discoverable Mode
-> > BR/EDR Not Supported
-> > Company: Texas Instruments Inc. (13)
-> > Data: 06030108b0e408f7
-> > RSSI: -43 dBm (0xd5)
-> > @ MGMT Event: Device Found (0x0012) plen 31 {0x0001} [hci0] 34.152905
-> > LE Address: 44:6E:FF:00:0D:65 (Resolvable)
-> > RSSI: -74 dBm (0xb6)
-> > Flags: 0x00000000
-> > Data length: 17
-> > Flags: 0x1a
-> > LE General Discoverable Mode
-> > Simultaneous LE and BR/EDR (Controller)
-> > Simultaneous LE and BR/EDR (Host)
-> > TX power: 9 dBm
-> > Company: Apple, Inc. (76)
-> > Type: Unknown (16)
-> > Data: 01188898dc
-> > > HCI Event: LE Meta Event (0x3e) plen 41 #47 [hci0] 34.156958
-> > LE Advertising Report (0x02)
-> > Num reports: 1
-> > Event type: Connectable undirected - ADV_IND (0x00)
-> > Address type: Random (0x01)
-> > Address: FA:BD:8D:12:26:BF (Static)
-> > Data length: 29
-> > Name (short): P mesh
-> > Flags: 0x04
-> > BR/EDR Not Supported
-> > 128-bit Service UUIDs (partial): 1 entry
-> > Vendor specific
-> > RSSI: -47 dBm (0xd1)
-> > @ MGMT Event: Device Found (0x0012) plen 29 {0x0001} [hci0] 34.157030
-> > LE Address: F4:B8:5E:64:02:55 (Texas Instruments)
-> > RSSI: -43 dBm (0xd5)
-> > Flags: 0x00000000
-> > Data length: 15
-> > Flags: 0x06
-> > LE General Discoverable Mode
-> > BR/EDR Not Supported
-> > Company: Texas Instruments Inc. (13)
-> > Data: 06030108b0e408f7
-> >
-> > So I am heavily doubting whether the Linux kernel code has a bug in han=
-dling the SCAN_RSP. Please look at this part of the kernel:
-> >
-> > https://github.com/torvalds/linux/blob/48b1320a674e1ff5de2fad8606bee38f=
-724594dc/net/bluetooth/hci_event.c#L6326
-> >
-> > It sets the NOT CONNECTABLE flag by default for a SCAN_RSP and will ove=
-rwrite it with any flags it has received with a previous ADV_IND. But it do=
-es not seem to take into account that in BLE heavy environments the previou=
-s ADV_IND might be of a totally different device. So every now and then it =
-will enter the first path where it will just report the device with a NOT_C=
-ONNECTABLE flag. Or am I missing something here?
->
-> You are saying that the controller would interleave ADV_IND of
-> different peers before SCAN_RSP, in that case yes that would be
-> possible that the device would be marked as NOT_CONNECTABLE, usually
-> that is not really the case which is why we end up adding the code
-> above:
->
->      * In the really unlikely case that a controller get confused
->      * and just sends a scan response event, then it is marked as
->      * not connectable as well.
->
-> I guess it is not really unlikely after all, so perhaps we need a flag
-> indicating this is a standalone SCAN_RSP e.g. MGMT_DEV_FOUND_SCAN_RSP,
-> then we can treat it accordingly in userspace.
+This rework sync_interval to be sync_factor as having sync_interval in
+the order of seconds is sometimes not disarable.
 
-Can you try with the following change:
+Wit sync_factor the application can tell how many SDU intervals it wants
+to send an announcement with PA, the EA interval is set to 2 times that
+so a factor of 24 of BIG SDU interval of 10ms would look like the
+following:
 
-https://patchwork.kernel.org/project/bluetooth/patch/20230607194518.2901376=
--1-luiz.dentz@gmail.com/
+< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+        Handle: 0x01
+        Properties: 0x0000
+        Min advertising interval: 480.000 msec (0x0300)
+        Max advertising interval: 480.000 msec (0x0300)
+        Channel map: 37, 38, 39 (0x07)
+        Own address type: Random (0x01)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+        TX power: Host has no preference (0x7f)
+        Primary PHY: LE 1M (0x01)
+        Secondary max skip: 0x00
+        Secondary PHY: LE 2M (0x02)
+        SID: 0x00
+        Scan request notifications: Disabled (0x00)
+< HCI Command: LE Set Periodic Advertising Parameters (0x08|0x003e) plen 7
+        Handle: 1
+        Min interval: 240.00 msec (0x00c0)
+        Max interval: 240.00 msec (0x00c0)
+        Properties: 0x0000
 
---=20
-Luiz Augusto von Dentz
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h | 2 +-
+ net/bluetooth/hci_conn.c          | 4 ++--
+ net/bluetooth/iso.c               | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 310231e47b3d..34998ae8ed78 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -185,7 +185,7 @@ struct bt_iso_ucast_qos {
+ struct bt_iso_bcast_qos {
+ 	__u8  big;
+ 	__u8  bis;
+-	__u8  sync_interval;
++	__u8  sync_factor;
+ 	__u8  packing;
+ 	__u8  framing;
+ 	struct bt_iso_io_qos in;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7d4941e6dbdf..930fa38841bc 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2074,10 +2074,10 @@ static int create_big_sync(struct hci_dev *hdev, void *data)
+ 		flags |= MGMT_ADV_FLAG_SEC_2M;
+ 
+ 	/* Align intervals */
+-	interval = qos->bcast.out.interval / 1250;
++	interval = (qos->bcast.out.interval / 1250) * qos->bcast.sync_factor;
+ 
+ 	if (qos->bcast.bis)
+-		sync_interval = qos->bcast.sync_interval * 1600;
++		sync_interval = interval * 4;
+ 
+ 	err = hci_start_per_adv_sync(hdev, qos->bcast.bis, conn->le_per_adv_data_len,
+ 				     conn->le_per_adv_data, flags, interval,
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index b9a008fd10b1..c7db728eb84f 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -718,7 +718,7 @@ static struct bt_iso_qos default_qos = {
+ 	.bcast = {
+ 		.big			= BT_ISO_QOS_BIG_UNSET,
+ 		.bis			= BT_ISO_QOS_BIS_UNSET,
+-		.sync_interval		= 0x00,
++		.sync_factor		= 0x01,
+ 		.packing		= 0x00,
+ 		.framing		= 0x00,
+ 		.in			= DEFAULT_IO_QOS,
+@@ -1219,7 +1219,7 @@ static bool check_ucast_qos(struct bt_iso_qos *qos)
+ 
+ static bool check_bcast_qos(struct bt_iso_qos *qos)
+ {
+-	if (qos->bcast.sync_interval > 0x07)
++	if (qos->bcast.sync_factor == 0x00)
+ 		return false;
+ 
+ 	if (qos->bcast.packing > 0x01)
+-- 
+2.40.1
+
