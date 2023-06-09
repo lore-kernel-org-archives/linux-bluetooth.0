@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E543C7EE29
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jun 2023 15:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E0C0C7EE2E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jun 2023 15:59:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242005AbjFIP6N (ORCPT
+        id S242013AbjFIP7a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Jun 2023 11:58:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49668 "EHLO
+        Fri, 9 Jun 2023 11:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242004AbjFIP6L (ORCPT
+        with ESMTP id S241787AbjFIP73 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Jun 2023 11:58:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E1F53588
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Jun 2023 08:57:24 -0700 (PDT)
+        Fri, 9 Jun 2023 11:59:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4A6730CD
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Jun 2023 08:58:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1686326243;
+        s=mimecast20190719; t=1686326321;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=+y+aveIxA7jLi8Qb8e+Oc4pjTAYvwXvNOc23v+nQ9Dc=;
-        b=NerPZvO4grO/Fuju0J6ewWh5D8IyuYOWdNrgV3C2wnx7My57QcMv8zs1u0ugmDXPfA0fOY
-        u4GjakLTV1WzLS71ycnuhR/fr63dY2Gft/UMT51Q5yw8F6/3bzRKsAg3rS9XKFb3oEbkuV
-        YEjZPe3Yj+4jpDk2IziTVIQfyYmJSIQ=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ZASR5/BmaalzeTJJhd66JJTvqi7hh0GteSbPgdTii+8=;
+        b=h8qy1aANWl6VjpJYGa704iWUmO7QK6hrwNUB/KBnQ5snU0RD5i4sxCZCYZ2/daCK9lsIvv
+        9fHtMm4F7xyzodQYfsisfrQzLiuMi8GdqLxOkcAUNtWNEZ4LMhhHgsGWxklsBNvzIrrVp/
+        G0t3orNXgtFhASRPrmS11cZyDYQzuTA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-58-BLbJY18qMyy3J-EnJQoPvA-1; Fri, 09 Jun 2023 11:57:21 -0400
-X-MC-Unique: BLbJY18qMyy3J-EnJQoPvA-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-4f624a4ea72so1406883e87.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Jun 2023 08:57:21 -0700 (PDT)
+ us-mta-411-3xJqja4SN4C1wlC-zyTCYQ-1; Fri, 09 Jun 2023 11:58:39 -0400
+X-MC-Unique: 3xJqja4SN4C1wlC-zyTCYQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3f7eb415010so9440725e9.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Jun 2023 08:58:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686326240; x=1688918240;
+        d=1e100.net; s=20221208; t=1686326318; x=1688918318;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+y+aveIxA7jLi8Qb8e+Oc4pjTAYvwXvNOc23v+nQ9Dc=;
-        b=BFTuDN3BXcEjdYuAMSDcub4pY3vsOdJm3tozOjAGJG5vkfF+9AEsYOhyzMFc0gLOjC
-         7XxOlIlP6pE631XQLnozrSq+d7WaAI8IOFv2aUSkh295SmsQwaKJbv79Ez61PUAXQssq
-         WrkTrRNirG8LOng39HhBMGg5+2Mpm72ygCpf1Q3LagraH3BQWUFrn3ZhV3B+IOdxzSNC
-         nFhyqjN5WkcOggqFmVLWxZXD5T8MzHQEimelCJJIe926XoJ7hdvt11BxbabMv2EGoGcw
-         gPenT5W1zoeOPtrTBnIcr+ObNS3jUoCYheP/O6GSsvwd4tIm4v1v0zd6K41fdZXnk/sR
-         83Sg==
-X-Gm-Message-State: AC+VfDwHJwS5ugICUeI2KrYlQIy8WsTRxoG0ogRO/tY2vZlSi2s+E/MU
-        qNWO86OGncwsVr6Myvxwvs0gjgHZkFyL5zfhsluO8PPJe/PovX/wH44dzqygrFn/qWZQwCHYq/6
-        HKR9b2WKVnfjnEM89fKaak+KMZzYX
-X-Received: by 2002:a19:f24f:0:b0:4f5:f736:cb9f with SMTP id d15-20020a19f24f000000b004f5f736cb9fmr989544lfk.67.1686326240279;
-        Fri, 09 Jun 2023 08:57:20 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4/T5/nSOeffmIMMxsU83CU4sVcwwjp3dmRwDnOHHwbrP+YSlBuBwmQ6CY/6oW8GCAvWshWtA==
-X-Received: by 2002:a19:f24f:0:b0:4f5:f736:cb9f with SMTP id d15-20020a19f24f000000b004f5f736cb9fmr989534lfk.67.1686326239964;
-        Fri, 09 Jun 2023 08:57:19 -0700 (PDT)
+        bh=ZASR5/BmaalzeTJJhd66JJTvqi7hh0GteSbPgdTii+8=;
+        b=i3L75sU56BugVdVzoHpwZLSpMdij8hX4rLAalSHCg4HTO00+C9UkO7ws0lEJ6SZySM
+         T4MUY0zxzSeQnDQCmcd5Qz3A9jm8cqxf+vZ8ZcpRISDvZX0gX73oms/rHGhmHWSt9X2Z
+         aU7kcG71Nicsx3ytJb/jSGMm+JDK2o9J/+lRKgH7/LDh4gGQJVQBHMO8KNmgbUCdo8Mu
+         xidJGAvHvN4zv3XZQC0nkUJj+dibA+IKWM9sZQRSzQHdoG2WX0tsdTOYqZwXTdIWaern
+         F3gRezJqoTlHY/epLbOBPZ2ZmdWeATOpEf3rnSrDaGYUbYSAZQEi2nw59MsLNrCL4xFM
+         Ah3w==
+X-Gm-Message-State: AC+VfDz/bVvNrke27TvPr/4fHPDX9OPlKJWZZwLpitrT4x9wdmCiLfXq
+        d6ayMaPhD8TZNqzCZ4gPhvmGp4EGyXL1dWPD40RnPZLjXM50OeqINhLnH0R3MXJ66Xfzkzvo47d
+        +Nc/+rQhJtL6zAnxSKPtKYkYEeoBJ
+X-Received: by 2002:a05:600c:3547:b0:3f7:f589:b5ca with SMTP id i7-20020a05600c354700b003f7f589b5camr4161990wmq.15.1686326318079;
+        Fri, 09 Jun 2023 08:58:38 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6OksjCtzrynIHd9z5LBpzNB7HtKW+xrrc3WbUfllkzb+rfhixTGuyBW8eVv2rOaSpPAX44dg==
+X-Received: by 2002:a05:600c:3547:b0:3f7:f589:b5ca with SMTP id i7-20020a05600c354700b003f7f589b5camr4161975wmq.15.1686326317767;
+        Fri, 09 Jun 2023 08:58:37 -0700 (PDT)
 Received: from redhat.com ([2a06:c701:7403:2800:22a6:7656:500:4dab])
-        by smtp.gmail.com with ESMTPSA id m7-20020a7bca47000000b003f80b96097esm415596wml.31.2023.06.09.08.57.18
+        by smtp.gmail.com with ESMTPSA id y19-20020a05600c365300b003f7f60203ffsm3065248wmq.25.2023.06.09.08.58.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Jun 2023 08:57:19 -0700 (PDT)
-Date:   Fri, 9 Jun 2023 11:57:16 -0400
+        Fri, 09 Jun 2023 08:58:37 -0700 (PDT)
+Date:   Fri, 9 Jun 2023 11:58:34 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Xianting Tian <xianting.tian@linux.alibaba.com>
 Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
@@ -70,7 +70,7 @@ Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
         Xianting Tian <tianxianting.txt@alibaba-inc.com>
 Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
  unused bufs
-Message-ID: <20230609115617-mutt-send-email-mst@kernel.org>
+Message-ID: <20230609115818-mutt-send-email-mst@kernel.org>
 References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
  <20230609131817.712867-2-xianting.tian@linux.alibaba.com>
 MIME-Version: 1.0
@@ -86,11 +86,11 @@ On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
 > 
 > Cpu stall issue may happen if device is configured with multi queues
 > and large queue depth, so fix it.
-
-What does "may happen" imply exactly?
-was this observed?
-
+> 
 > Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
+
+include a Fixes tag?
+
 > ---
 >  drivers/crypto/virtio/virtio_crypto_core.c | 1 +
 >  1 file changed, 1 insertion(+)
