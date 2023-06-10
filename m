@@ -2,79 +2,76 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 657D4C7EE25
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Jun 2023 03:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C70C7EE2E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Jun 2023 06:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233823AbjFJDVA (ORCPT
+        id S232562AbjFJGvI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Jun 2023 23:21:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59506 "EHLO
+        Sat, 10 Jun 2023 02:51:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbjFJDU6 (ORCPT
+        with ESMTP id S229949AbjFJGvH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Jun 2023 23:20:58 -0400
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B61E1;
-        Fri,  9 Jun 2023 20:20:55 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0VkjuBza_1686367249;
-Received: from 30.13.188.136(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0VkjuBza_1686367249)
-          by smtp.aliyun-inc.com;
-          Sat, 10 Jun 2023 11:20:51 +0800
-Message-ID: <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
-Date:   Sat, 10 Jun 2023 11:20:49 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
- unused bufs
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
-        xuanzhuo@linux.alibaba.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, amit@kernel.org, arnd@arndb.de,
-        gregkh@linuxfoundation.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org,
+        Sat, 10 Jun 2023 02:51:07 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107AE3C00;
+        Fri,  9 Jun 2023 23:51:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A0B9862162;
+        Sat, 10 Jun 2023 06:51:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E12C433D2;
+        Sat, 10 Jun 2023 06:51:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1686379864;
+        bh=9+jSZur8kKMdp4QWKKR2gLKbPRbyGHjjK9ectU9UX8E=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DLyNaTuBZQE7+MgYKCoxoCdQRA94X8bROaqvfbkU8gx0+NpwaPibZJk0l5oukkECv
+         8shxby16yQICGsI/X9KxsIYpcvuMmRmv7jmH1pproqP6uZLaxRNF6gfzkNeplAAhtY
+         PNYR16QU+v/DdQh80N9kmwlgVWWVSsxtRb62w5TA=
+Date:   Sat, 10 Jun 2023 08:51:02 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Xianting Tian <xianting.tian@linux.alibaba.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>, arei.gonglei@huawei.com,
+        jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, amit@kernel.org,
+        arnd@arndb.de, marcel@holtmann.org, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Xianting Tian <tianxianting.txt@alibaba-inc.com>
+Subject: Re: [PATCH 1/3] virtio-crypto: fixup potential cpu stall when free
+ unused bufs
+Message-ID: <2023061036-lived-earflap-26ee@gregkh>
 References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
  <20230609131817.712867-2-xianting.tian@linux.alibaba.com>
  <20230609115617-mutt-send-email-mst@kernel.org>
-From:   Xianting Tian <xianting.tian@linux.alibaba.com>
-In-Reply-To: <20230609115617-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <a0a07bfd-6e44-5478-395d-be6c1f3bd92a@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Sat, Jun 10, 2023 at 11:20:49AM +0800, Xianting Tian wrote:
+> 
+> 在 2023/6/9 下午11:57, Michael S. Tsirkin 写道:
+> > On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
+> > > From: Xianting Tian <tianxianting.txt@alibaba-inc.com>
+> > > 
+> > > Cpu stall issue may happen if device is configured with multi queues
+> > > and large queue depth, so fix it.
+> > What does "may happen" imply exactly?
+> > was this observed?
+> I didn't met such issue, this patch set just a theoretical fix.
 
-在 2023/6/9 下午11:57, Michael S. Tsirkin 写道:
-> On Fri, Jun 09, 2023 at 09:18:15PM +0800, Xianting Tian wrote:
->> From: Xianting Tian <tianxianting.txt@alibaba-inc.com>
->>
->> Cpu stall issue may happen if device is configured with multi queues
->> and large queue depth, so fix it.
-> What does "may happen" imply exactly?
-> was this observed?
-I didn't met such issue, this patch set just a theoretical fix.
->
->> Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
->> ---
->>   drivers/crypto/virtio/virtio_crypto_core.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/virtio/virtio_crypto_core.c
->> index 1198bd306365..94849fa3bd74 100644
->> --- a/drivers/crypto/virtio/virtio_crypto_core.c
->> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
->> @@ -480,6 +480,7 @@ static void virtcrypto_free_unused_reqs(struct virtio_crypto *vcrypto)
->>   			kfree(vc_req->req_data);
->>   			kfree(vc_req->sgs);
->>   		}
->> +		cond_resched();
->>   	}
->>   }
->>   
->> -- 
->> 2.17.1
+Then I would not recommend adding it at this time, as you just slowed
+down the kernel for something that no one has reported :(
+
+thanks,
+
+greg k-h
