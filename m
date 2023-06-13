@@ -2,85 +2,85 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6340EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 21:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 645B7EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 21:31:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235837AbjFMVL7 (ORCPT
+        id S231219AbjFMVbF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jun 2023 17:11:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59236 "EHLO
+        Tue, 13 Jun 2023 17:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236075AbjFMVL5 (ORCPT
+        with ESMTP id S230220AbjFMVbE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Jun 2023 17:11:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA1031BC9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 14:11:53 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 76D7D63AFB
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 21:11:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D9423C433C9;
-        Tue, 13 Jun 2023 21:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1686690712;
-        bh=D5cdq3igM8gRE3zrAHRGTQU4pX8/uQVFWzBlnTgA4ok=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Kxd27UmcbpltRQuSeVtS2mh98/r92tgprqgZjE1Ylnw1xClwbzoDDuuXTnuasPnrn
-         TAbCsvE7IRODdwk5l21p7aSZVLMhUcKWgHvGsWUZI6URQFhz6KzkstOvmZM/BGs1hA
-         wTYrlHem7wWhkWTqJ2BFFX8HxZindD3YRyveKvG156I3BpHqjVkx5u6Y533hYrVxMq
-         ANZH93dYkGCEC1MUhldpiSgQh+XlJZVXxYtIGoKZ+5U41bqzpb05+wqfrdnY+9YQSZ
-         0tirTb1PheHGoIMbYGtOXWVuA0VEcQnZDckvhiiB02uk5XL2sXHtcMEzhmm7m4mNRU
-         bXpET9EOCLgkA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDC6BC00446;
-        Tue, 13 Jun 2023 21:11:52 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/2] shared/bass: Implement CP opcode handlers
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168669071277.22478.4227831114978770735.git-patchwork-notify@kernel.org>
-Date:   Tue, 13 Jun 2023 21:11:52 +0000
-References: <20230613141625.9197-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20230613141625.9197-1-iulia.tanasescu@nxp.com>
-To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
-        silviu.barbulescu@nxp.com, andrei.istodorescu@nxp.com,
-        mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com
+        Tue, 13 Jun 2023 17:31:04 -0400
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E483173C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 14:31:01 -0700 (PDT)
+Received: from github.com (hubbernetes-node-da265f8.ash1-iad.github.net [10.56.148.25])
+        by smtp.github.com (Postfix) with ESMTPA id 927149005D1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 14:31:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1686691860;
+        bh=YBV1u1y571LslYzJ+Ew1125A/OevT4DtERLH66d2mFw=;
+        h=Date:From:To:Subject:From;
+        b=L2Wh1KkVh5sVaGDjx1cmIObxFRWZxYvqvTIBeNDus18Rl7Amw2tV6RQfYP17opN85
+         DtPOwZKJbnULytJ0WM9ZJzd+1iOLSEnafSOsZeBHMv0/P7ATJKrel9t3NVUWnIohmW
+         GV9pAoLK7ibXKxvhaa1frR9Ti43usj4vtq1TPs8Y=
+Date:   Tue, 13 Jun 2023 14:31:00 -0700
+From:   iulia-tanasescu <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/d2d2d1-ddd095@github.com>
+Subject: [bluez/bluez] c0156e: gatt-server: Check pointer before memcpy
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c0156edd198eef10c847b3540098cb4b9d18d142
+      https://github.com/bluez/bluez/commit/c0156edd198eef10c847b3540098cb4b9d18d142
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-06-13 (Tue, 13 Jun 2023)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/gatt-server.c
 
-On Tue, 13 Jun 2023 17:16:23 +0300 you wrote:
-> This patch series introduces opcode handlers for the following
-> BASS Broadcast Audio Scan Control Point opcodes:
->    Remote Scan Stopped
->    Remote Scan Started
->    Remove Source
-> 
-> Iulia Tanasescu (2):
->   gatt-server: Check pointer before memcpy
->   shared/bass: Implement CP opcode handlers
-> 
-> [...]
+  Log Message:
+  -----------
+  gatt-server: Check pointer before memcpy
 
-Here is the summary with links:
-  - [BlueZ,1/2] gatt-server: Check pointer before memcpy
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c0156edd198e
-  - [BlueZ,2/2] shared/bass: Implement CP opcode handlers
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ddd09531e936
+This adds a check before calling memcpy inside
+bt_gatt_server_send_notification, to avoid getting
+the following error in case the user wants to send
+an empty notification for an attribute:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+src/shared/gatt-server.c:1789:3: runtime error:
+null pointer passed as argument 2, which is declared to never be null
 
 
+  Commit: ddd09531e936508ba9ea620f9caaf3402c54496f
+      https://github.com/bluez/bluez/commit/ddd09531e936508ba9ea620f9caaf3402c54496f
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2023-06-13 (Tue, 13 Jun 2023)
+
+  Changed paths:
+    M src/shared/bass.c
+
+  Log Message:
+  -----------
+  shared/bass: Implement CP opcode handlers
+
+This adds handlers for the following BASS Broadcast Audio Scan
+Control Point opcodes:
+   Remote Scan Stopped
+   Remote Scan Started
+   Remove Source
+
+
+Compare: https://github.com/bluez/bluez/compare/d2d2d12f59d6...ddd09531e936
