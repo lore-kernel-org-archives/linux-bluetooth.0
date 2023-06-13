@@ -2,85 +2,90 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 645B7EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 21:31:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A85FAEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 22:27:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231219AbjFMVbF (ORCPT
+        id S237764AbjFMW1a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jun 2023 17:31:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
+        Tue, 13 Jun 2023 18:27:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbjFMVbE (ORCPT
+        with ESMTP id S234648AbjFMW1W (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Jun 2023 17:31:04 -0400
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E483173C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 14:31:01 -0700 (PDT)
-Received: from github.com (hubbernetes-node-da265f8.ash1-iad.github.net [10.56.148.25])
-        by smtp.github.com (Postfix) with ESMTPA id 927149005D1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 14:31:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1686691860;
-        bh=YBV1u1y571LslYzJ+Ew1125A/OevT4DtERLH66d2mFw=;
-        h=Date:From:To:Subject:From;
-        b=L2Wh1KkVh5sVaGDjx1cmIObxFRWZxYvqvTIBeNDus18Rl7Amw2tV6RQfYP17opN85
-         DtPOwZKJbnULytJ0WM9ZJzd+1iOLSEnafSOsZeBHMv0/P7ATJKrel9t3NVUWnIohmW
-         GV9pAoLK7ibXKxvhaa1frR9Ti43usj4vtq1TPs8Y=
-Date:   Tue, 13 Jun 2023 14:31:00 -0700
-From:   iulia-tanasescu <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d2d2d1-ddd095@github.com>
-Subject: [bluez/bluez] c0156e: gatt-server: Check pointer before memcpy
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Tue, 13 Jun 2023 18:27:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74961BCA;
+        Tue, 13 Jun 2023 15:27:20 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 52C1463BB0;
+        Tue, 13 Jun 2023 22:27:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CC32C433C0;
+        Tue, 13 Jun 2023 22:27:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1686695239;
+        bh=+QQcsUVeQ9XRaJDJnjuZElieryUDQ6op05ZbHP6EsJI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=pcuwVV5LayDGPjQm5yW8VWis/SRe4mR7Zq0xa7C0TWkXMyT//B8T/K4ZdD0QsqYLN
+         7CySmQS55/M8CsY+IVEeKyikW0HaR97Jek8DesQpEUvynx4LsJwwMxeN9u8RBZFEc4
+         CZ8IupaMENl7TfeKQ9bBcYzxxUUzXgBLvYH3htNroYHPKxdmGG2dA5RGqmN6vitfMp
+         gHe/dc8DfQSMyAWBytTYRyW/icUYm3xtFVk6Kxw2YC3saKuR8yigxYMYw+epJwoXsY
+         8gcfOgZM/KdSUiEBf5XPZoZfCVFD/j1KVbKKqyKNAOUZ1jmMUdxPqiw37rpSe7xEbw
+         Xtu1QMG3YCfsg==
+From:   Bjorn Andersson <andersson@kernel.org>
+To:     Eric Dumazet <edumazet@google.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andy Gross <agross@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        phone-devel@vger.kernel.org, ~postmarketos/upstreaming@lists.sr.ht,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: (subset) [PATCH v2 0/4] Add WCN3988 Bluetooth support for Fairphone 4
+Date:   Tue, 13 Jun 2023 15:30:17 -0700
+Message-Id: <168669542895.1315701.16862270566326485356.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
+References: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: c0156edd198eef10c847b3540098cb4b9d18d142
-      https://github.com/bluez/bluez/commit/c0156edd198eef10c847b3540098cb4b9d18d142
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2023-06-13 (Tue, 13 Jun 2023)
+On Fri, 12 May 2023 15:58:22 +0200, Luca Weiss wrote:
+> Add support in the btqca/hci_qca driver for the WCN3988 and add it to
+> the sm7225 Fairphone 4 devicetree.
+> 
+> Devicetree patches go via Qualcomm tree, the rest via their respective
+> trees.
+> 
+> --
+> Previously with the RFC version I've had problems before with Bluetooth
+> scanning failing like the following:
+> 
+> [...]
 
-  Changed paths:
-    M src/shared/gatt-server.c
+Applied, thanks!
 
-  Log Message:
-  -----------
-  gatt-server: Check pointer before memcpy
+[3/4] arm64: dts: qcom: sm6350: add uart1 node
+      commit: b179f35b887b2d17e93f1827550290669bc6b110
+[4/4] arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
+      commit: c4ef464b24c5aefb7e23eb8fcc08250a783a529b
 
-This adds a check before calling memcpy inside
-bt_gatt_server_send_notification, to avoid getting
-the following error in case the user wants to send
-an empty notification for an attribute:
-
-src/shared/gatt-server.c:1789:3: runtime error:
-null pointer passed as argument 2, which is declared to never be null
-
-
-  Commit: ddd09531e936508ba9ea620f9caaf3402c54496f
-      https://github.com/bluez/bluez/commit/ddd09531e936508ba9ea620f9caaf3402c54496f
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2023-06-13 (Tue, 13 Jun 2023)
-
-  Changed paths:
-    M src/shared/bass.c
-
-  Log Message:
-  -----------
-  shared/bass: Implement CP opcode handlers
-
-This adds handlers for the following BASS Broadcast Audio Scan
-Control Point opcodes:
-   Remote Scan Stopped
-   Remote Scan Started
-   Remove Source
-
-
-Compare: https://github.com/bluez/bluez/compare/d2d2d12f59d6...ddd09531e936
+Best regards,
+-- 
+Bjorn Andersson <andersson@kernel.org>
