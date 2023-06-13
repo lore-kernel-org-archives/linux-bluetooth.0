@@ -2,60 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74871EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 18:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB86EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 18:06:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231931AbjFMSGS (ORCPT
+        id S231941AbjFMSGT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jun 2023 14:06:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49230 "EHLO
+        Tue, 13 Jun 2023 14:06:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbjFMSGQ (ORCPT
+        with ESMTP id S230108AbjFMSGQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 13 Jun 2023 14:06:16 -0400
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA0019A8
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00D3E19B2
         for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 11:06:10 -0700 (PDT)
 Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 4Qgc1Y25g5z10MP;
-        Tue, 13 Jun 2023 21:06:09 +0300 (EEST)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4Qgc1X4HXBz100v;
+        Tue, 13 Jun 2023 21:06:08 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1686679569;
+        t=1686679568;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=A88fH+WVTfME8Ra4Drw+Ud5TSkQO5GNvM/Shcwais9w=;
-        b=Ow/YcC40506svU97MaNFqHFX/Bp3En1jDPp+9jN0bKpIKcZhQ3x61/4BziBJrFXFrm4gIx
-        gvp4qctClbZC5aFVv0UOdIyPSBhRNwVZtEbEpTFMPp1Inar93yDVX8Wyrs9BaL3u6OCekp
-        zogCBrVjFa9yiifXbiVdmPUeFuu7LUI=
+        bh=lxQRFWLS30If5FnTA2pJHQPuZggXlTJP+zNr6Zw8fFo=;
+        b=eDY1ahGGX57xhsFcEjF8ZDL/jBXeqcdAAlJx6trk3OnJ/s+0o+jEZwvPJDYgKySytiCp5r
+        NHmuSvsoFIssaFTD5sgbbWkIVglsLBp7lKR7rVO4fIDne4RuHh5rNo5h4nblMPf2m/1HTI
+        GJDw33xVQAWAe4YM+Nnhz6ir1KKXOkc=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1686679569;
+        s=meesny; t=1686679568;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=A88fH+WVTfME8Ra4Drw+Ud5TSkQO5GNvM/Shcwais9w=;
-        b=hgwL59+8QY96QUlinwFhfj81qQZaLjw6QLdeZvnCj+sAno29SmG3JUXQ0T1Ca36vU25YVF
-        n13FwHPvny3FM8vHqgER+YH22VzzDx5RBeW8i8eVhkfh44FGXpCq2uhgd0B05phWVX35sH
-        +NxYgwE2MOoIUfGHIL7DBFlTbtF2Ocs=
+        bh=lxQRFWLS30If5FnTA2pJHQPuZggXlTJP+zNr6Zw8fFo=;
+        b=CUmiIq6K6YV/aV5z7WlWpcZBUjalHrDIg9l4Sy+A7eDQtcAWlar7FKdsTpOZ86jKxy84Gb
+        iPYKtiayTxOEFMsDAr9LVx6zc0wmAsiEvAl22AIJFg7QYarcM/Xoo803aO1F7y9q4B/stW
+        ehhSZh0ZzWvJZjOQJRL+RIQSBgp2xuA=
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1686679569; a=rsa-sha256; cv=none;
-        b=Wj+TBaK3GGuNXJ95hfa0gAYTL5fT59mQF5QjkzuPWzlQ22QUvdPy2r/2Ds8efeR8amQrRZ
-        zNWnfbh4mISjZA2r/Xy4U3NHm5zs0sDslmDT5xkTU4yKqdBYAceaBos472vRuXKAXqneht
-        642GnnVy7E9keZBP+wAeJX+bM0Yuup8=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1686679568; a=rsa-sha256; cv=none;
+        b=VBepXH/nPiPJSthuhmyVieCJF3QSBkuw1OUQ8gwqGTHc4rbn73J2HcMvXLz23AX38iv9Go
+        N9wI39/M2L5gTunzcDQL6KwLNjMaeizlNrMGOL8kq06TUqZWEX8kfYwYiWyEkrtxkQE0WE
+        x+Y/aJSop2rfFq8G434KOq9vXhE+G2Q=
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH v2 3/3] Bluetooth: ISO: fix iso_conn related locking and validity issues
-Date:   Tue, 13 Jun 2023 21:06:04 +0300
-Message-Id: <3a0cbe341bd6051ffcd58d3abef6800f9f2615ff.1686589290.git.pav@iki.fi>
+Subject: [PATCH v2 1/3] Bluetooth: use RCU for hci_conn_params and iterate safely in hci_sync
+Date:   Tue, 13 Jun 2023 21:06:02 +0300
+Message-Id: <d579997e06d68153a5630aba1ee9f2854d8b0cb4.1686589290.git.pav@iki.fi>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <cover.1686589290.git.pav@iki.fi>
 References: <cover.1686589290.git.pav@iki.fi>
@@ -65,297 +65,558 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-sk->sk_state indicates whether iso_pi(sk)->conn is valid. Operations
-that check/update sk_state and access conn should hold lock_sock,
-otherwise they can race.
+hci_update_accept_list_sync iterates over hdev->pend_le_conns and
+hdev->pend_le_reports, and waits for controller events in the loop body,
+without holding hdev lock.
 
-The order of taking locks is hci_dev_lock > lock_sock > iso_conn_lock,
-which is how it is in connect/disconnect_cfm -> iso_conn_del ->
-iso_chan_del.
+Meanwhile, these lists and the items may be modified e.g. by
+le_scan_cleanup.  This can invalidate the list cursor in the ongoing
+iterations, resulting to invalid behavior (eg use-after-free).
 
-Fix locking in iso_connect_cis/bis and sendmsg/recvmsg to take lock_sock
-around updating sk_state and conn.
+Use RCU for the hci_conn_params action lists. Since the loop bodies in
+hci_sync block and we cannot use RCU for the whole loop, add
+hci_conn_params.add_pending to keep track which items are left. Copy
+data to avoid needing lock on hci_conn_params. Only the flags field is
+written from elsewhere, so READ_ONCE/WRITE_ONCE should guarantee we read
+valid values.
 
-iso_conn_del must not occur during iso_connect_cis/bis, as it frees the
-iso_conn. Hold hdev->lock longer to prevent that.
+Free params everywhere with hci_conn_params_free so the cleanup is
+guaranteed to be done properly.
 
-This should not reintroduce the issue fixed in commit 241f51931c35
-("Bluetooth: ISO: Avoid circular locking dependency"), since the we
-acquire locks in order. We retain the fix in iso_sock_connect to release
-lock_sock before iso_connect_* acquires hdev->lock.
+This fixes the following, which can be triggered at least by changing
+hci_le_set_cig_params to always return false, and running BlueZ
+iso-tester, which causes connections to be created and dropped fast:
 
-Similarly for commit 6a5ad251b7cd ("Bluetooth: ISO: Fix possible
-circular locking dependency"). We retain the fix in iso_conn_ready to
-not acquire iso_conn_lock before lock_sock.
+==================================================================
+BUG: KASAN: slab-use-after-free in hci_update_passive_scan_sync (net/bluetooth/hci_sync.c:2536 net/bluetooth/hci_sync.c:2723 net/bluetooth/hci_sync.c:2841)
+Read of size 8 at addr ffff888001265018 by task kworker/u3:0/32
 
-iso_conn_add shall return iso_conn with valid hcon. Make it so also when
-reusing an old CIS connection waiting for disconnect timeout (see
-__iso_sock_close where conn->hcon is set to NULL).
-
-Trace with iso_conn_del after iso_chan_add in iso_connect_cis:
-===============================================================
-iso_sock_create:771: sock 00000000be9b69b7
-iso_sock_init:693: sk 000000004dff667e
-iso_sock_bind:827: sk 000000004dff667e 70:1a:b8:98:ff:a2 type 1
-iso_sock_setsockopt:1289: sk 000000004dff667e
-iso_sock_setsockopt:1289: sk 000000004dff667e
-iso_sock_setsockopt:1289: sk 000000004dff667e
-iso_sock_connect:875: sk 000000004dff667e
-iso_connect_cis:353: 70:1a:b8:98:ff:a2 -> 28:3d:c2:4a:7e:da
-hci_get_route:1199: 70:1a:b8:98:ff:a2 -> 28:3d:c2:4a:7e:da
-hci_conn_add:1005: hci0 dst 28:3d:c2:4a:7e:da
-iso_conn_add:140: hcon 000000007b65d182 conn 00000000daf8625e
-__iso_chan_add:214: conn 00000000daf8625e
-iso_connect_cfm:1700: hcon 000000007b65d182 bdaddr 28:3d:c2:4a:7e:da status 12
-iso_conn_del:187: hcon 000000007b65d182 conn 00000000daf8625e, err 16
-iso_sock_clear_timer:117: sock 000000004dff667e state 3
-    <Note: sk_state is BT_BOUND (3), so iso_connect_cis is still
-    running at this point>
-iso_chan_del:153: sk 000000004dff667e, conn 00000000daf8625e, err 16
-hci_conn_del:1151: hci0 hcon 000000007b65d182 handle 65535
-hci_conn_unlink:1102: hci0: hcon 000000007b65d182
-hci_chan_list_flush:2780: hcon 000000007b65d182
-iso_sock_getsockopt:1376: sk 000000004dff667e
-iso_sock_getname:1070: sock 00000000be9b69b7, sk 000000004dff667e
-iso_sock_getname:1070: sock 00000000be9b69b7, sk 000000004dff667e
-iso_sock_getsockopt:1376: sk 000000004dff667e
-iso_sock_getname:1070: sock 00000000be9b69b7, sk 000000004dff667e
-iso_sock_getname:1070: sock 00000000be9b69b7, sk 000000004dff667e
-iso_sock_shutdown:1434: sock 00000000be9b69b7, sk 000000004dff667e, how 1
-__iso_sock_close:632: sk 000000004dff667e state 5 socket 00000000be9b69b7
-     <Note: sk_state is BT_CONNECT (5), even though iso_chan_del sets
-     BT_CLOSED (6). Only iso_connect_cis sets it to BT_CONNECT, so it
-     must be that iso_chan_del occurred between iso_chan_add and end of
-     iso_connect_cis.>
-BUG: kernel NULL pointer dereference, address: 0000000000000000
-PGD 8000000006467067 P4D 8000000006467067 PUD 3f5f067 PMD 0
-Oops: 0000 [#1] PREEMPT SMP PTI
 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014
-RIP: 0010:__iso_sock_close (net/bluetooth/iso.c:664) bluetooth
-===============================================================
-
-Trace with iso_conn_del before iso_chan_add in iso_connect_cis:
-===============================================================
-iso_connect_cis:356: 70:1a:b8:98:ff:a2 -> 28:3d:c2:4a:7e:da
-...
-iso_conn_add:140: hcon 0000000093bc551f conn 00000000768ae504
-hci_dev_put:1487: hci0 orig refcnt 21
-hci_event_packet:7607: hci0: event 0x0e
-hci_cmd_complete_evt:4231: hci0: opcode 0x2062
-hci_cc_le_set_cig_params:3846: hci0: status 0x07
-hci_sent_cmd_data:3107: hci0 opcode 0x2062
-iso_connect_cfm:1703: hcon 0000000093bc551f bdaddr 28:3d:c2:4a:7e:da status 7
-iso_conn_del:187: hcon 0000000093bc551f conn 00000000768ae504, err 12
-hci_conn_del:1151: hci0 hcon 0000000093bc551f handle 65535
-hci_conn_unlink:1102: hci0: hcon 0000000093bc551f
-hci_chan_list_flush:2780: hcon 0000000093bc551f
-__iso_chan_add:214: conn 00000000768ae504
-    <Note: this conn was already freed in iso_conn_del above>
-iso_sock_clear_timer:117: sock 0000000098323f95 state 3
-general protection fault, probably for non-canonical address 0x30b29c630930aec8: 0000 [#1] PREEMPT SMP PTI
-CPU: 1 PID: 1920 Comm: bluetoothd Tainted: G            E      6.3.0-rc7+ #4
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014
-RIP: 0010:detach_if_pending+0x28/0xd0
-Code: 90 90 0f 1f 44 00 00 48 8b 47 08 48 85 c0 0f 84 ad 00 00 00 55 89 d5 53 48 83 3f 00 48 89 fb 74 7d 66 90 48 8b 03 48 8b 53 08 <>
-RSP: 0018:ffffb90841a67d08 EFLAGS: 00010007
-RAX: 0000000000000000 RBX: ffff9141bd5061b8 RCX: 0000000000000000
-RDX: 30b29c630930aec8 RSI: ffff9141fdd21e80 RDI: ffff9141bd5061b8
-RBP: 0000000000000001 R08: 0000000000000000 R09: ffffb90841a67b88
-R10: 0000000000000003 R11: ffffffff8613f558 R12: ffff9141fdd21e80
-R13: 0000000000000000 R14: ffff9141b5976010 R15: ffff914185755338
-FS:  00007f45768bd840(0000) GS:ffff9141fdd00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000619000424074 CR3: 0000000009f5e005 CR4: 0000000000170ee0
+Workqueue: hci0 hci_cmd_sync_work
 Call Trace:
- <TASK>
- timer_delete+0x48/0x80
- try_to_grab_pending+0xdf/0x170
- __cancel_work+0x37/0xb0
- iso_connect_cis+0x141/0x400 [bluetooth]
-===============================================================
+<TASK>
+dump_stack_lvl (./arch/x86/include/asm/irqflags.h:134 lib/dump_stack.c:107)
+print_report (mm/kasan/report.c:320 mm/kasan/report.c:430)
+? __virt_addr_valid (./include/linux/mmzone.h:1915 ./include/linux/mmzone.h:2011 arch/x86/mm/physaddr.c:65)
+? hci_update_passive_scan_sync (net/bluetooth/hci_sync.c:2536 net/bluetooth/hci_sync.c:2723 net/bluetooth/hci_sync.c:2841)
+kasan_report (mm/kasan/report.c:538)
+? hci_update_passive_scan_sync (net/bluetooth/hci_sync.c:2536 net/bluetooth/hci_sync.c:2723 net/bluetooth/hci_sync.c:2841)
+hci_update_passive_scan_sync (net/bluetooth/hci_sync.c:2536 net/bluetooth/hci_sync.c:2723 net/bluetooth/hci_sync.c:2841)
+? __pfx_hci_update_passive_scan_sync (net/bluetooth/hci_sync.c:2780)
+? mutex_lock (kernel/locking/mutex.c:282)
+? __pfx_mutex_lock (kernel/locking/mutex.c:282)
+? __pfx_mutex_unlock (kernel/locking/mutex.c:538)
+? __pfx_update_passive_scan_sync (net/bluetooth/hci_sync.c:2861)
+hci_cmd_sync_work (net/bluetooth/hci_sync.c:306)
+process_one_work (./arch/x86/include/asm/preempt.h:27 kernel/workqueue.c:2399)
+worker_thread (./include/linux/list.h:292 kernel/workqueue.c:2538)
+? __pfx_worker_thread (kernel/workqueue.c:2480)
+kthread (kernel/kthread.c:376)
+? __pfx_kthread (kernel/kthread.c:331)
+ret_from_fork (arch/x86/entry/entry_64.S:314)
+</TASK>
 
-Trace with NULL conn->hcon in state BT_CONNECT:
-===============================================================
-__iso_sock_close:619: sk 00000000f7c71fc5 state 1 socket 00000000d90c5fe5
-...
-__iso_sock_close:619: sk 00000000f7c71fc5 state 8 socket 00000000d90c5fe5
-iso_chan_del:153: sk 00000000f7c71fc5, conn 0000000022c03a7e, err 104
-...
-iso_sock_connect:862: sk 00000000129b56c3
-iso_connect_cis:348: 70:1a:b8:98:ff:a2 -> 28:3d:c2:4a:7d:2a
-hci_get_route:1199: 70:1a:b8:98:ff:a2 -> 28:3d:c2:4a:7d:2a
-hci_dev_hold:1495: hci0 orig refcnt 19
-__iso_chan_add:214: conn 0000000022c03a7e
-    <Note: reusing old conn>
-iso_sock_clear_timer:117: sock 00000000129b56c3 state 3
-...
-iso_sock_ready:1485: sk 00000000129b56c3
-...
-iso_sock_sendmsg:1077: sock 00000000e5013966, sk 00000000129b56c3
-BUG: kernel NULL pointer dereference, address: 00000000000006a8
-PGD 0 P4D 0
-Oops: 0000 [#1] PREEMPT SMP PTI
-CPU: 1 PID: 1403 Comm: wireplumber Tainted: G            E      6.3.0-rc7+ #4
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014
-RIP: 0010:iso_sock_sendmsg+0x63/0x2a0 [bluetooth]
-===============================================================
+Allocated by task 31:
+kasan_save_stack (mm/kasan/common.c:46)
+kasan_set_track (mm/kasan/common.c:52)
+__kasan_kmalloc (mm/kasan/common.c:374 mm/kasan/common.c:383)
+hci_conn_params_add (./include/linux/slab.h:580 ./include/linux/slab.h:720 net/bluetooth/hci_core.c:2277)
+hci_connect_le_scan (net/bluetooth/hci_conn.c:1419 net/bluetooth/hci_conn.c:1589)
+hci_connect_cis (net/bluetooth/hci_conn.c:2266)
+iso_connect_cis (net/bluetooth/iso.c:390)
+iso_sock_connect (net/bluetooth/iso.c:899)
+__sys_connect (net/socket.c:2003 net/socket.c:2020)
+__x64_sys_connect (net/socket.c:2027)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
 
-Fixes: 241f51931c35 ("Bluetooth: ISO: Avoid circular locking dependency")
-Fixes: 6a5ad251b7cd ("Bluetooth: ISO: Fix possible circular locking dependency")
+Freed by task 15:
+kasan_save_stack (mm/kasan/common.c:46)
+kasan_set_track (mm/kasan/common.c:52)
+kasan_save_free_info (mm/kasan/generic.c:523)
+__kasan_slab_free (mm/kasan/common.c:238 mm/kasan/common.c:200 mm/kasan/common.c:244)
+__kmem_cache_free (mm/slub.c:1807 mm/slub.c:3787 mm/slub.c:3800)
+hci_conn_params_del (net/bluetooth/hci_core.c:2323)
+le_scan_cleanup (net/bluetooth/hci_conn.c:202)
+process_one_work (./arch/x86/include/asm/preempt.h:27 kernel/workqueue.c:2399)
+worker_thread (./include/linux/list.h:292 kernel/workqueue.c:2538)
+kthread (kernel/kthread.c:376)
+ret_from_fork (arch/x86/entry/entry_64.S:314)
+==================================================================
+
+Fixes: e8907f76544f ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
 
 Notes:
-    v2: no changes
-    
-    Don't have a clean reproducer, but these occur sometimes on
-    bluetooth-next/master when sending data over ISO and disconnecting +
-    reconnecting immediately, although the timing window required for these
-    to occur is not so wide.
-    
-    These appear to be somewhat more easily reproduced if
-    hci_le_set_cig_params is changed to return errors if CIG is busy.
-    Enabling printks also seems to help.
+    v2: use RCU
 
- net/bluetooth/iso.c | 53 ++++++++++++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 22 deletions(-)
+ include/net/bluetooth/hci_core.h |  5 ++
+ net/bluetooth/hci_conn.c         |  9 ++--
+ net/bluetooth/hci_core.c         | 34 +++++++++---
+ net/bluetooth/hci_event.c        | 12 ++---
+ net/bluetooth/hci_sync.c         | 93 ++++++++++++++++++++++++++++----
+ net/bluetooth/mgmt.c             | 30 +++++------
+ 6 files changed, 141 insertions(+), 42 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index b9a008fd10b1..8f570ab66ae7 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -123,8 +123,11 @@ static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 683666ea210c..8c6ac6d29c62 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -822,6 +822,8 @@ struct hci_conn_params {
+ 
+ 	struct hci_conn *conn;
+ 	bool explicit_connect;
++	/* Accessed without hdev->lock: */
++	bool add_pending;
+ 	hci_conn_flags_t flags;
+ 	u8  privacy_mode;
+ };
+@@ -1605,6 +1607,9 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 					    bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_clear_disabled(struct hci_dev *hdev);
++void hci_conn_params_free(struct hci_conn_params *param);
++void hci_conn_params_set_pending(struct hci_conn_params *param,
++				 struct list_head *list);
+ 
+ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+ 						  bdaddr_t *addr,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7d4941e6dbdf..ae9a35d1405b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -118,7 +118,7 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn, u8 status)
+ 	 */
+ 	params->explicit_connect = false;
+ 
+-	list_del_init(&params->action);
++	hci_conn_params_set_pending(params, NULL);
+ 
+ 	switch (params->auto_connect) {
+ 	case HCI_AUTO_CONN_EXPLICIT:
+@@ -127,10 +127,10 @@ static void hci_connect_le_scan_cleanup(struct hci_conn *conn, u8 status)
+ 		return;
+ 	case HCI_AUTO_CONN_DIRECT:
+ 	case HCI_AUTO_CONN_ALWAYS:
+-		list_add(&params->action, &hdev->pend_le_conns);
++		hci_conn_params_set_pending(params, &hdev->pend_le_conns);
+ 		break;
+ 	case HCI_AUTO_CONN_REPORT:
+-		list_add(&params->action, &hdev->pend_le_reports);
++		hci_conn_params_set_pending(params, &hdev->pend_le_reports);
+ 		break;
+ 	default:
+ 		break;
+@@ -1435,8 +1435,7 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
+ 	if (params->auto_connect == HCI_AUTO_CONN_DISABLED ||
+ 	    params->auto_connect == HCI_AUTO_CONN_REPORT ||
+ 	    params->auto_connect == HCI_AUTO_CONN_EXPLICIT) {
+-		list_del_init(&params->action);
+-		list_add(&params->action, &hdev->pend_le_conns);
++		hci_conn_params_set_pending(params, &hdev->pend_le_conns);
+ 	}
+ 
+ 	params->explicit_connect = true;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 48917c68358d..7992a61fe1fd 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2249,21 +2249,41 @@ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 	return NULL;
+ }
+ 
+-/* This function requires the caller holds hdev->lock */
++/* This function requires the caller holds hdev->lock or rcu_read_lock */
+ struct hci_conn_params *hci_pend_le_action_lookup(struct list_head *list,
+ 						  bdaddr_t *addr, u8 addr_type)
  {
- 	struct iso_conn *conn = hcon->iso_data;
+ 	struct hci_conn_params *param;
  
--	if (conn)
-+	if (conn) {
-+		if (!conn->hcon)
-+			conn->hcon = hcon;
- 		return conn;
+-	list_for_each_entry(param, list, action) {
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(param, list, action) {
+ 		if (bacmp(&param->addr, addr) == 0 &&
+-		    param->addr_type == addr_type)
++		    param->addr_type == addr_type) {
++			rcu_read_unlock();
+ 			return param;
++		}
+ 	}
+ 
++	rcu_read_unlock();
++
+ 	return NULL;
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++void hci_conn_params_set_pending(struct hci_conn_params *param,
++				 struct list_head *list)
++{
++	if (!list_empty(&param->action)) {
++		list_del_rcu(&param->action);
++		synchronize_rcu();
++		INIT_LIST_HEAD(&param->action);
 +	}
++
++	if (list)
++		list_add_rcu(&param->action, list);
++}
++
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 					    bdaddr_t *addr, u8 addr_type)
+@@ -2297,14 +2317,15 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ 	return params;
+ }
  
- 	conn = kzalloc(sizeof(*conn), GFP_KERNEL);
- 	if (!conn)
-@@ -311,14 +314,13 @@ static int iso_connect_bis(struct sock *sk)
- 		goto unlock;
- 	}
- 
--	hci_dev_unlock(hdev);
--	hci_dev_put(hdev);
-+	lock_sock(sk);
- 
- 	err = iso_chan_add(conn, sk, NULL);
--	if (err)
--		return err;
--
--	lock_sock(sk);
-+	if (err) {
-+		release_sock(sk);
-+		goto unlock;
-+	}
- 
- 	/* Update source addr of the socket */
- 	bacpy(&iso_pi(sk)->src, &hcon->src);
-@@ -335,7 +337,6 @@ static int iso_connect_bis(struct sock *sk)
- 	}
- 
- 	release_sock(sk);
--	return err;
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -403,14 +404,13 @@ static int iso_connect_cis(struct sock *sk)
- 		goto unlock;
- 	}
- 
--	hci_dev_unlock(hdev);
--	hci_dev_put(hdev);
-+	lock_sock(sk);
- 
- 	err = iso_chan_add(conn, sk, NULL);
--	if (err)
--		return err;
--
--	lock_sock(sk);
-+	if (err) {
-+		release_sock(sk);
-+		goto unlock;
-+	}
- 
- 	/* Update source addr of the socket */
- 	bacpy(&iso_pi(sk)->src, &hcon->src);
-@@ -427,7 +427,6 @@ static int iso_connect_cis(struct sock *sk)
- 	}
- 
- 	release_sock(sk);
--	return err;
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -1078,8 +1077,8 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 			    size_t len)
+-static void hci_conn_params_free(struct hci_conn_params *params)
++void hci_conn_params_free(struct hci_conn_params *params)
  {
- 	struct sock *sk = sock->sk;
--	struct iso_conn *conn = iso_pi(sk)->conn;
- 	struct sk_buff *skb, **frag;
-+	size_t mtu;
- 	int err;
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -1091,11 +1090,18 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
--	if (sk->sk_state != BT_CONNECTED)
-+	lock_sock(sk);
++	hci_conn_params_set_pending(params, NULL);
 +
-+	if (sk->sk_state != BT_CONNECTED) {
-+		release_sock(sk);
- 		return -ENOTCONN;
-+	}
-+
-+	mtu = iso_pi(sk)->conn->hcon->hdev->iso_mtu;
-+
-+	release_sock(sk);
+ 	if (params->conn) {
+ 		hci_conn_drop(params->conn);
+ 		hci_conn_put(params->conn);
+ 	}
  
--	skb = bt_skb_sendmsg(sk, msg, len, conn->hcon->hdev->iso_mtu,
--			     HCI_ISO_DATA_HDR_SIZE, 0);
-+	skb = bt_skb_sendmsg(sk, msg, len, mtu, HCI_ISO_DATA_HDR_SIZE, 0);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
-@@ -1108,8 +1114,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	while (len) {
- 		struct sk_buff *tmp;
- 
--		tmp = bt_skb_sendmsg(sk, msg, len, conn->hcon->hdev->iso_mtu,
--				     0, 0);
-+		tmp = bt_skb_sendmsg(sk, msg, len, mtu, 0, 0);
- 		if (IS_ERR(tmp)) {
- 			kfree_skb(skb);
- 			return PTR_ERR(tmp);
-@@ -1164,15 +1169,19 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	BT_DBG("sk %p", sk);
- 
- 	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-+		lock_sock(sk);
- 		switch (sk->sk_state) {
- 		case BT_CONNECT2:
--			lock_sock(sk);
- 			iso_conn_defer_accept(pi->conn->hcon);
- 			sk->sk_state = BT_CONFIG;
- 			release_sock(sk);
- 			return 0;
- 		case BT_CONNECT:
-+			release_sock(sk);
- 			return iso_connect_cis(sk);
-+		default:
-+			release_sock(sk);
-+			break;
+-	list_del(&params->action);
+ 	list_del(&params->list);
+ 	kfree(params);
+ }
+@@ -2342,8 +2363,7 @@ void hci_conn_params_clear_disabled(struct hci_dev *hdev)
+ 			continue;
  		}
+ 
+-		list_del(&params->list);
+-		kfree(params);
++		hci_conn_params_free(params);
  	}
  
+ 	BT_DBG("All LE disabled connection parameters were removed");
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7c199f7361f7..8187c9f827fa 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1564,7 +1564,7 @@ static u8 hci_cc_le_set_privacy_mode(struct hci_dev *hdev, void *data,
+ 
+ 	params = hci_conn_params_lookup(hdev, &cp->bdaddr, cp->bdaddr_type);
+ 	if (params)
+-		params->privacy_mode = cp->mode;
++		WRITE_ONCE(params->privacy_mode, cp->mode);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+@@ -2804,8 +2804,8 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
+ 
+ 		case HCI_AUTO_CONN_DIRECT:
+ 		case HCI_AUTO_CONN_ALWAYS:
+-			list_del_init(&params->action);
+-			list_add(&params->action, &hdev->pend_le_conns);
++			hci_conn_params_set_pending(params,
++						    &hdev->pend_le_conns);
+ 			break;
+ 
+ 		default:
+@@ -3423,8 +3423,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+ 
+ 		case HCI_AUTO_CONN_DIRECT:
+ 		case HCI_AUTO_CONN_ALWAYS:
+-			list_del_init(&params->action);
+-			list_add(&params->action, &hdev->pend_le_conns);
++			hci_conn_params_set_pending(params,
++						    &hdev->pend_le_conns);
+ 			hci_update_passive_scan(hdev);
+ 			break;
+ 
+@@ -5972,7 +5972,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
+ 					   conn->dst_type);
+ 	if (params) {
+-		list_del_init(&params->action);
++		hci_conn_params_set_pending(params, NULL);
+ 		if (params->conn) {
+ 			hci_conn_drop(params->conn);
+ 			hci_conn_put(params->conn);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 97da5bcaa904..da12e286ee64 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2160,15 +2160,23 @@ static int hci_le_del_accept_list_sync(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++struct conn_params {
++	bdaddr_t addr;
++	u8 addr_type;
++	hci_conn_flags_t flags;
++	u8 privacy_mode;
++};
++
+ /* Adds connection to resolve list if needed.
+  * Setting params to NULL programs local hdev->irk
+  */
+ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
+-					struct hci_conn_params *params)
++					struct conn_params *params)
+ {
+ 	struct hci_cp_le_add_to_resolv_list cp;
+ 	struct smp_irk *irk;
+ 	struct bdaddr_list_with_irk *entry;
++	struct hci_conn_params *p;
+ 
+ 	if (!use_ll_privacy(hdev))
+ 		return 0;
+@@ -2203,6 +2211,16 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
+ 	/* Default privacy mode is always Network */
+ 	params->privacy_mode = HCI_NETWORK_PRIVACY;
+ 
++	rcu_read_lock();
++	p = hci_pend_le_action_lookup(&hdev->pend_le_conns,
++				      &params->addr, params->addr_type);
++	if (!p)
++		p = hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					      &params->addr, params->addr_type);
++	if (p)
++		WRITE_ONCE(p->privacy_mode, HCI_NETWORK_PRIVACY);
++	rcu_read_unlock();
++
+ done:
+ 	if (hci_dev_test_flag(hdev, HCI_PRIVACY))
+ 		memcpy(cp.local_irk, hdev->irk, 16);
+@@ -2215,7 +2233,7 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
+ 
+ /* Set Device Privacy Mode. */
+ static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
+-					struct hci_conn_params *params)
++					struct conn_params *params)
+ {
+ 	struct hci_cp_le_set_privacy_mode cp;
+ 	struct smp_irk *irk;
+@@ -2240,6 +2258,8 @@ static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
+ 	bacpy(&cp.bdaddr, &irk->bdaddr);
+ 	cp.mode = HCI_DEVICE_PRIVACY;
+ 
++	/* Note: params->privacy_mode is not updated since it is a copy */
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PRIVACY_MODE,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+@@ -2249,7 +2269,7 @@ static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
+  * properly set the privacy mode.
+  */
+ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+-				       struct hci_conn_params *params,
++				       struct conn_params *params,
+ 				       u8 *num_entries)
+ {
+ 	struct hci_cp_le_add_to_accept_list cp;
+@@ -2447,6 +2467,51 @@ struct sk_buff *hci_read_local_oob_data_sync(struct hci_dev *hdev,
+ 	return __hci_cmd_sync_sk(hdev, opcode, 0, NULL, 0, HCI_CMD_TIMEOUT, sk);
+ }
+ 
++static void conn_params_add_iter_init(struct list_head *list)
++{
++	struct hci_conn_params *params;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(params, list, action)
++		params->add_pending = true;
++
++	rcu_read_unlock();
++}
++
++static bool conn_params_add_iter_next(struct list_head *list,
++				      struct conn_params *item)
++{
++	struct hci_conn_params *params;
++
++	rcu_read_lock();
++
++	list_for_each_entry_rcu(params, list, action) {
++		if (!params->add_pending)
++			continue;
++
++		/* No hdev->lock, but: addr, addr_type are immutable.
++		 * privacy_mode is only written by us or in
++		 * hci_cc_le_set_privacy_mode that we wait for.
++		 * We should be idempotent so MGMT updating flags
++		 * while we are processing is OK.
++		 */
++		bacpy(&item->addr, &params->addr);
++		item->addr_type = params->addr_type;
++		item->flags = READ_ONCE(params->flags);
++		item->privacy_mode = READ_ONCE(params->privacy_mode);
++
++		params->add_pending = false;
++
++		rcu_read_unlock();
++		return true;
++	}
++
++	rcu_read_unlock();
++
++	return false;
++}
++
+ /* Device must not be scanning when updating the accept list.
+  *
+  * Update is done using the following sequence:
+@@ -2466,7 +2531,7 @@ struct sk_buff *hci_read_local_oob_data_sync(struct hci_dev *hdev,
+  */
+ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ {
+-	struct hci_conn_params *params;
++	struct conn_params params;
+ 	struct bdaddr_list *b, *t;
+ 	u8 num_entries = 0;
+ 	bool pend_conn, pend_report;
+@@ -2504,6 +2569,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 		if (hci_conn_hash_lookup_le(hdev, &b->bdaddr, b->bdaddr_type))
+ 			continue;
+ 
++		/* Pointers not dereferenced, no locks needed */
+ 		pend_conn = hci_pend_le_action_lookup(&hdev->pend_le_conns,
+ 						      &b->bdaddr,
+ 						      b->bdaddr_type);
+@@ -2532,9 +2598,15 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 	 * available accept list entries in the controller, then
+ 	 * just abort and return filer policy value to not use the
+ 	 * accept list.
++	 *
++	 * The list and params may be mutated while we wait for events,
++	 * so use special iteration with copies.
+ 	 */
+-	list_for_each_entry(params, &hdev->pend_le_conns, action) {
+-		err = hci_le_add_accept_list_sync(hdev, params, &num_entries);
++
++	conn_params_add_iter_init(&hdev->pend_le_conns);
++
++	while (conn_params_add_iter_next(&hdev->pend_le_conns, &params)) {
++		err = hci_le_add_accept_list_sync(hdev, &params, &num_entries);
+ 		if (err)
+ 			goto done;
+ 	}
+@@ -2543,8 +2615,11 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 	 * the list of pending reports and also add these to the
+ 	 * accept list if there is still space. Abort if space runs out.
+ 	 */
+-	list_for_each_entry(params, &hdev->pend_le_reports, action) {
+-		err = hci_le_add_accept_list_sync(hdev, params, &num_entries);
++
++	conn_params_add_iter_init(&hdev->pend_le_reports);
++
++	while (conn_params_add_iter_next(&hdev->pend_le_reports, &params)) {
++		err = hci_le_add_accept_list_sync(hdev, &params, &num_entries);
+ 		if (err)
+ 			goto done;
+ 	}
+@@ -4837,12 +4912,12 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
+ 	struct hci_conn_params *p;
+ 
+ 	list_for_each_entry(p, &hdev->le_conn_params, list) {
++		hci_conn_params_set_pending(p, NULL);
+ 		if (p->conn) {
+ 			hci_conn_drop(p->conn);
+ 			hci_conn_put(p->conn);
+ 			p->conn = NULL;
+ 		}
+-		list_del_init(&p->action);
+ 	}
+ 
+ 	BT_DBG("All LE pending actions cleared");
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 61c8e1b8f3b0..b35b1c685b86 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1303,15 +1303,15 @@ static void restart_le_actions(struct hci_dev *hdev)
+ 		/* Needed for AUTO_OFF case where might not "really"
+ 		 * have been powered off.
+ 		 */
+-		list_del_init(&p->action);
++		hci_conn_params_set_pending(p, NULL);
+ 
+ 		switch (p->auto_connect) {
+ 		case HCI_AUTO_CONN_DIRECT:
+ 		case HCI_AUTO_CONN_ALWAYS:
+-			list_add(&p->action, &hdev->pend_le_conns);
++			hci_conn_params_set_pending(p, &hdev->pend_le_conns);
+ 			break;
+ 		case HCI_AUTO_CONN_REPORT:
+-			list_add(&p->action, &hdev->pend_le_reports);
++			hci_conn_params_set_pending(p, &hdev->pend_le_reports);
+ 			break;
+ 		default:
+ 			break;
+@@ -5175,7 +5175,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	params->flags = current_flags;
++	WRITE_ONCE(params->flags, current_flags);
+ 	status = MGMT_STATUS_SUCCESS;
+ 
+ 	/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
+@@ -7586,7 +7586,7 @@ static int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr,
+ 	if (params->auto_connect == auto_connect)
+ 		return 0;
+ 
+-	list_del_init(&params->action);
++	hci_conn_params_set_pending(params, NULL);
+ 
+ 	switch (auto_connect) {
+ 	case HCI_AUTO_CONN_DISABLED:
+@@ -7595,18 +7595,22 @@ static int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr,
+ 		 * connect to device, keep connecting.
+ 		 */
+ 		if (params->explicit_connect)
+-			list_add(&params->action, &hdev->pend_le_conns);
++			hci_conn_params_set_pending(params,
++						    &hdev->pend_le_conns);
+ 		break;
+ 	case HCI_AUTO_CONN_REPORT:
+ 		if (params->explicit_connect)
+-			list_add(&params->action, &hdev->pend_le_conns);
++			hci_conn_params_set_pending(params,
++						    &hdev->pend_le_conns);
+ 		else
+-			list_add(&params->action, &hdev->pend_le_reports);
++			hci_conn_params_set_pending(params,
++						    &hdev->pend_le_reports);
+ 		break;
+ 	case HCI_AUTO_CONN_DIRECT:
+ 	case HCI_AUTO_CONN_ALWAYS:
+ 		if (!is_connected(hdev, addr, addr_type))
+-			list_add(&params->action, &hdev->pend_le_conns);
++			hci_conn_params_set_pending(params,
++						    &hdev->pend_le_conns);
+ 		break;
+ 	}
+ 
+@@ -7829,9 +7833,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			goto unlock;
+ 		}
+ 
+-		list_del(&params->action);
+-		list_del(&params->list);
+-		kfree(params);
++		hci_conn_params_free(params);
+ 
+ 		device_removed(sk, hdev, &cp->addr.bdaddr, cp->addr.type);
+ 	} else {
+@@ -7862,9 +7864,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 				p->auto_connect = HCI_AUTO_CONN_EXPLICIT;
+ 				continue;
+ 			}
+-			list_del(&p->action);
+-			list_del(&p->list);
+-			kfree(p);
++			hci_conn_params_free(p);
+ 		}
+ 
+ 		bt_dev_dbg(hdev, "All LE connection parameters were removed");
 -- 
 2.40.1
 
