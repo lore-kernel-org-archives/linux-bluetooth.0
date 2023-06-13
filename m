@@ -2,107 +2,102 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8164EB64D0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 16:00:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D832EB64D0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jun 2023 18:06:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241453AbjFMQAo (ORCPT
+        id S231723AbjFMSGQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jun 2023 12:00:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36368 "EHLO
+        Tue, 13 Jun 2023 14:06:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235140AbjFMQAn (ORCPT
+        with ESMTP id S229998AbjFMSGP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Jun 2023 12:00:43 -0400
-Received: from mail-oo1-xc2f.google.com (mail-oo1-xc2f.google.com [IPv6:2607:f8b0:4864:20::c2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE2AE79
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 09:00:42 -0700 (PDT)
-Received: by mail-oo1-xc2f.google.com with SMTP id 006d021491bc7-55afa2472d9so3754379eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 09:00:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686672041; x=1689264041;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=I1bVceBs1R1/N436HyXFJGAS9s58gFgbh2mncZ6Blo0=;
-        b=cnUYFnH1cKgTjG/u8nq/J2Z6vqZH7w1Jvf0GRqmSAPnOD7P7wcy7IKlirGqedGbfjQ
-         7suZNkEgJEMjL2WUQSMg3+22NZNF1cZY96ODaUjoHze/oUL2rUufnz4hcBSCqc/PwN6y
-         is2+SNFquueR2a1YuGqDabIF/ykMnNtbMHXPnszMhRQ3IKG9WSg4MKzTOYeYWrPRxQoO
-         8W0c6yfDzNtLM8ZTuiolm7Rm3lzV+lR3eyLZTsxDEi1c8G3yJyhEic0deHRfLJMb/SBd
-         Ik4Y+mMeJU/DiTBdtKNUDEYnZKn8iouwHsPiHJaG8ASBvv3M0UmKx48Uol2iZot3ayBZ
-         X/uQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686672041; x=1689264041;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I1bVceBs1R1/N436HyXFJGAS9s58gFgbh2mncZ6Blo0=;
-        b=aUi6JWEsygLVg/2XWfHi01Pcuk9te1DwbjUWclDsxkqUW0XBQf77Sl0QCOuyoej11i
-         1AJAeSRJQ0yV1ccJQMcpBL2xe1d8z9Ua1ueyl2jlujYFRre9t1aXuAXlT2nFZKr2iv34
-         PTLxZ0QNBnumjM+UhKmVM6p+gbU0JUp8hIIvYumlnU9ag4JuY6yA0Uq+mtR6vBYyeCKG
-         BCIGB3owhvPiUJeFqprx4osQBMGT2QeRCCykoMMq7DqSjH9IHY1hxs2vlxtgsj12PUUJ
-         e5keCrha96Q9b/mvrNQswbKxbkuGmgK4Era86Fk/rmCa6ykwRpk5BBHOHTCa/SMsOGvD
-         8v+A==
-X-Gm-Message-State: AC+VfDyhK3+HkhFLFLxjqEtDKxZFbzBl4FDNthPt804G8lpCh2VQAOG9
-        4FvIG9zLwZM2Q7HlsEWWxjS/UnBK7tzsAQ==
-X-Google-Smtp-Source: ACHHUZ4GAr7icKljRkFc4PN4gB4A1TJN1awuSccRbUFQIbr4VHgRYe50wqQrWIMwNpXwWUOCQlNivQ==
-X-Received: by 2002:a4a:d6d5:0:b0:54f:4e01:7fc9 with SMTP id j21-20020a4ad6d5000000b0054f4e017fc9mr7302489oot.3.1686672041492;
-        Tue, 13 Jun 2023 09:00:41 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.173.33])
-        by smtp.gmail.com with ESMTPSA id z7-20020a05683020c700b006acfdbdf37csm4940723otq.31.2023.06.13.09.00.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jun 2023 09:00:40 -0700 (PDT)
-Message-ID: <648892a8.050a0220.58b00.797f@mx.google.com>
-Date:   Tue, 13 Jun 2023 09:00:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6518160352373150171=="
+        Tue, 13 Jun 2023 14:06:15 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFEA319A7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 11:06:10 -0700 (PDT)
+Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4Qgc1W5WJXzyR6;
+        Tue, 13 Jun 2023 21:06:07 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1686679567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=y+NAgyxen7eId9gMkPBhizWri1SMI0z/15SuxX1GiM0=;
+        b=i85ufTrAu6D5RpP2Lht7lkGdfYa6h8C5vOG5fU5ErMROmjd90ovknWALSJauOHGousPHH+
+        jV5hkbDXBU2ibUBtR0Yo9GFVQ37/Zz2zjssteo0v2O/szKcOXSbnDqsJUSz/ZVZsTBMf9j
+        FrL0mbM4lqXmF3TooFQwNUGr5aShOV0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1686679567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=y+NAgyxen7eId9gMkPBhizWri1SMI0z/15SuxX1GiM0=;
+        b=EMF2vuO1JXyQnk/VCKnDWTIEiTm3oPF+osC00brzpYL837Z4xGkCgsHJYCDaDQhZcTI5fN
+        MWmoD8sSn7C7YzyqGDYmIdYvhcrGbsw/Kj3jOtOR9G4GIl3xLdOefqpWLylBXRnGVVmG/E
+        Sf7VR1TY+z2Uk0sTJWWb2ncngP0PQsY=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1686679567; a=rsa-sha256; cv=none;
+        b=BK+kqM5bHgJRLEDnqHSwMMZzoUdSwhY0bsuBuYa/X0uLeY/SZEaOIWeHN9sKz7SMWlHX3L
+        H1h5CGbdHSd10dsJB5yanDi77rCti+FZGWxjS8gomVJ3jeEwjKreWTV4cmw2IhzEbWlf7N
+        F6jH5WkeqagAxUs2fdN0sNNvAgh9Lxk=
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH v2 0/3] Bluetooth: ISO-related concurrency fixes
+Date:   Tue, 13 Jun 2023 21:06:01 +0300
+Message-Id: <cover.1686589290.git.pav@iki.fi>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: shared/bass: Implement CP opcode handlers
-In-Reply-To: <20230613141625.9197-2-iulia.tanasescu@nxp.com>
-References: <20230613141625.9197-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6518160352373150171==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This series addresses some concurrency issues (NULL / GPF) in ISO
+sockets or related.
 
-This is automated email and please do not reply to this email!
+v2:
+- Use RCU for the pend_le_* lists, avoid using hci_dev_lock.
+- Always call disconn_cfm before hci_conn_del (L2CAP also needs it).
 
-Dear submitter,
+These were found while testing patches that make hci_le_set_cig_params
+check the validity of the configuration and return false if incorrect.
+This causes dropping of hci_conn just created, which apparently makes
+hitting race conditions easier.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=756771
+The test setup was primitive
 
----Test result---
+while true; do bluetoothctl power on; sleep 12; bluetoothctl power off; sleep 1.5; bluetoothctl power off; sleep 2.5; done;
+while true; do sudo systemctl restart bluetooth; sleep 110; done
+while true; do systemctl --user restart pipewire wireplumber pipewire-pulse; sleep 91; done
+while true; do paplay sample.flac & sleep 2; kill %1; sleep 0.7; done
 
-Test Summary:
-CheckPatch                    PASS      1.14 seconds
-GitLint                       PASS      0.63 seconds
-BuildEll                      PASS      32.29 seconds
-BluezMake                     PASS      1020.71 seconds
-MakeCheck                     PASS      12.55 seconds
-MakeDistcheck                 PASS      186.31 seconds
-CheckValgrind                 PASS      302.76 seconds
-CheckSmatch                   WARNING   405.95 seconds
-bluezmakeextell               PASS      123.21 seconds
-IncrementalBuild              PASS      1656.48 seconds
-ScanBuild                     PASS      1261.57 seconds
+and equivalent operations manually, on VM + connect to TWS earbuds. This
+eventually hit the NULL / GFP errors here, but they are hard to
+reproduce aside from the first one that appears in iso-tester.
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/gatt-server.c:276:25: warning: Variable length array is used.src/shared/gatt-server.c:619:25: warning: Variable length array is used.src/shared/gatt-server.c:718:25: warning: Variable length array is used.src/shared/gatt-server.c:276:25: warning: Variable length array is used.src/shared/gatt-server.c:619:25: warning: Variable length array is used.src/shared/gatt-server.c:718:25: warning: Variable length array is used.src/shared/gatt-server.c:276:25: warning: Variable length array is used.src/shared/gatt-server.c:619:25: warning: Variable length array is used.src/shared/gatt-server.c:718:25: warning: Variable length array is used.
+Pauli Virtanen (3):
+  Bluetooth: use RCU for hci_conn_params and iterate safely in hci_sync
+  Bluetooth: hci_event: call disconnect callback before deleting conn
+  Bluetooth: ISO: fix iso_conn related locking and validity issues
 
+ include/net/bluetooth/hci_core.h |  5 ++
+ net/bluetooth/hci_conn.c         |  9 ++--
+ net/bluetooth/hci_core.c         | 34 +++++++++---
+ net/bluetooth/hci_event.c        | 15 +++---
+ net/bluetooth/hci_sync.c         | 93 ++++++++++++++++++++++++++++----
+ net/bluetooth/iso.c              | 53 ++++++++++--------
+ net/bluetooth/mgmt.c             | 30 +++++------
+ 7 files changed, 175 insertions(+), 64 deletions(-)
 
----
-Regards,
-Linux Bluetooth
+-- 
+2.40.1
 
-
---===============6518160352373150171==--
