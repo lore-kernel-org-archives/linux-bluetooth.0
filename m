@@ -2,363 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E3AEB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jun 2023 04:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB2CEB64D8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jun 2023 05:37:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242675AbjFNE7Y (ORCPT
+        id S234370AbjFNFhJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jun 2023 00:59:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43384 "EHLO
+        Wed, 14 Jun 2023 01:37:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231940AbjFNE7X (ORCPT
+        with ESMTP id S233043AbjFNFhI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jun 2023 00:59:23 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94568122;
-        Tue, 13 Jun 2023 21:59:21 -0700 (PDT)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35E4Uk6t012630;
-        Wed, 14 Jun 2023 04:59:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id; s=qcppdkim1;
- bh=WOBANkS/yJyX2nh6dwdWmYUzm9+a8g1tU7f1ZDffvsw=;
- b=NpV/pjzSTd3e83v0RsPhkmHrqyVHxWMfEU6C7Xbi6Kwegg0ceh0qYjDUbkvVUrthU7Ga
- ytx5hgcvj40R4Dlq8dBZoTXl8uLxJdVg0X02CYKmALe1cQS7TcYYhAIxtZvFgWLwFych
- o4NSwnNrGae6NPHUfrIUBSwLeBqQWs9pK3sFdek0K6edDwLQmAgTyGKizG95Qn1zXEBS
- +aojN1fVhxTNBhTGQr38rvJu4gkMx31WLCm7mvjgjd8AG2TvksdJFjPT99Sp3tGC3/Wq
- DrCfKEZQckPeRLfeug4WIayE4Ae0WtlxSEJuMyODRKdcc8G7vhyqO+XBKmHB58Q1WnMV ww== 
-Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3r6nqh29ws-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Jun 2023 04:59:16 +0000
-Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-        by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 35E4xDbE026452;
-        Wed, 14 Jun 2023 04:59:13 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 3r4j8kyur3-1;
-        Wed, 14 Jun 2023 04:59:13 +0000
-Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35E4xDHs026446;
-        Wed, 14 Jun 2023 04:59:13 GMT
-Received: from hyd-lablnx377.qualcomm.com (hyd-lablnx377.qualcomm.com [10.204.178.226])
-        by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 35E4xD22026441;
-        Wed, 14 Jun 2023 04:59:13 +0000
-Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
-        id 8C90220BFD; Wed, 14 Jun 2023 10:29:12 +0530 (IST)
-From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
-        jiangzp@google.com, mmandlik@google.com,
-        Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Subject: [RESEND v3 2/2] Bluetooth: hci_qca: Add qcom devcoredump support
-Date:   Wed, 14 Jun 2023 10:29:10 +0530
-Message-Id: <1686718750-31861-1-git-send-email-quic_saluvala@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: xkUakEpr4jAWnBnIDPHvi5uxJ8ScYeBd
-X-Proofpoint-ORIG-GUID: xkUakEpr4jAWnBnIDPHvi5uxJ8ScYeBd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.573,FMLib:17.11.176.26
- definitions=2023-06-14_02,2023-06-12_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 impostorscore=0 spamscore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306140040
+        Wed, 14 Jun 2023 01:37:08 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB031984
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 22:37:07 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1a6bd78fd14so1349013fac.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jun 2023 22:37:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1686721026; x=1689313026;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vU7mbLmfXgcVIOWz3z5t3uf+827wY+gHh171xjK0DGc=;
+        b=BEpdmNLlAEEh+O/e/hHvhESvBnDbPTR9HoHlUc0QB28rbqjO68xaI05D9n4EOO31Sw
+         dOPQ7jHp7rovuoe7JpOvuTDrrwqXc4PAoZHDLc/6TFEiqhBUlMKyP3J3DuLgA8/viCib
+         o0aVVz8cpEKUI67ChrMBchcARD62VvWZgHeoFF3Wt8c3Ffz6b5lY+/fka5qeikNTCO17
+         jWhtlMSbrfNUbxbDGi8sU/VEmKCdCNADJo5siwoO8MyHefWYu//fq4Z4xxdnIdOLwANE
+         Jm+vd0meOa9SWzBtXnQLHV59JOyioOsjBdJgUfD806DfQB55ncE0rOagbJwleAV353Ke
+         53Fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1686721026; x=1689313026;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vU7mbLmfXgcVIOWz3z5t3uf+827wY+gHh171xjK0DGc=;
+        b=ebfH5tmvMbUrzU6ZY/B9xB4R5uodUt6hLQoKLKLvmyQLGYI8EXWea6R58Pj8sZ7yEZ
+         xOlBsNDu0yUdixef+h7aNh7T3f5vxu6kZMVcX7kXhU05Tu9rut8WF5x2DvQQRLTvwLJA
+         rp7tP6sMdPQWp23r058RwbFhaPpOaPc/N3a5R3wkphgPHYk/vTkmjQgbpgZ8GPzOUGXB
+         dGQ3E0PTo2Ssrx8WQKYUpOD7JQUfZdyW8Rz2RF6EE0ft/A4vHbNxst0ol42p5kNsPKN/
+         AU2k3Sk90Sjks0YukJF+K4yTcHjFnFfTn/9opWBC19jk1qtQoBA14Dhvzq1HifIlzfeq
+         7xvA==
+X-Gm-Message-State: AC+VfDz3pkwelC+9f/5EHc+4UnS2zBlsnad0SjN+nDy/8j1KJFMmozgd
+        bCnIAXPcJDLN+tlYycpcK0xNNPSO7qg=
+X-Google-Smtp-Source: ACHHUZ7zoq7bIPVwckjK2PUjiIFSbuSNPIvXNBS1Vh7HxvD+6ZdREOiMqASQqyIaYgkDM7cwPV3OXQ==
+X-Received: by 2002:a05:6870:6256:b0:19f:5958:3b01 with SMTP id r22-20020a056870625600b0019f59583b01mr9345981oak.16.1686721026598;
+        Tue, 13 Jun 2023 22:37:06 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.182.65])
+        by smtp.gmail.com with ESMTPSA id n9-20020a056870a44900b00183ff6b45a2sm5146767oal.10.2023.06.13.22.37.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Jun 2023 22:37:06 -0700 (PDT)
+Message-ID: <64895202.050a0220.c23e4.9d0e@mx.google.com>
+Date:   Tue, 13 Jun 2023 22:37:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7456416658728005728=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_saluvala@quicinc.com
+Subject: RE: [RESEND,v3,1/2] Bluetooth: hci_qca: Add qcom devcoredump sysfs support
+In-Reply-To: <1686718695-31734-1-git-send-email-quic_saluvala@quicinc.com>
+References: <1686718695-31734-1-git-send-email-quic_saluvala@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Intercept debug exception events from QCA controller and put them into
-a devcoredump using hci devcoredump APIs of hci_core
+--===============7456416658728005728==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+This is automated email and please do not reply to this email!
 
-V2 -> V3:
----------
-changed hci_coredump_qca function
+Dear submitter,
 
-V1 -> V2:
----------
-Updated to work with the updated HCI devcoredump API.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=756942
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.57 seconds
+GitLint                       PASS      0.63 seconds
+SubjectPrefix                 PASS      0.21 seconds
+BuildKernel                   PASS      42.25 seconds
+CheckAllWarning               PASS      44.82 seconds
+CheckSparse                   PASS      51.92 seconds
+CheckSmatch                   PASS      139.51 seconds
+BuildKernel32                 PASS      40.26 seconds
+TestRunnerSetup               PASS      573.20 seconds
+TestRunner_l2cap-tester       PASS      20.76 seconds
+TestRunner_iso-tester         PASS      30.31 seconds
+TestRunner_bnep-tester        PASS      7.26 seconds
+TestRunner_mgmt-tester        PASS      141.61 seconds
+TestRunner_rfcomm-tester      PASS      11.10 seconds
+TestRunner_sco-tester         PASS      10.71 seconds
+TestRunner_ioctl-tester       PASS      12.69 seconds
+TestRunner_mesh-tester        PASS      9.25 seconds
+TestRunner_smp-tester         PASS      10.17 seconds
+TestRunner_userchan-tester    PASS      7.47 seconds
+IncrementalBuild              PASS      45.20 seconds
+
+
+
 ---
- drivers/bluetooth/hci_qca.c | 135 ++++++++++++++++++++++++++++----------------
- 1 file changed, 85 insertions(+), 50 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 1ee5323..87a7325 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -117,9 +117,7 @@ enum qca_memdump_states {
- 	QCA_MEMDUMP_TIMEOUT,
- };
- 
--struct qca_memdump_data {
--	char *memdump_buf_head;
--	char *memdump_buf_tail;
-+struct qca_memdump_info {
- 	u32 current_seq_no;
- 	u32 received_dump;
- 	u32 ram_dump_size;
-@@ -160,13 +158,15 @@ struct qca_data {
- 	struct work_struct ws_tx_vote_off;
- 	struct work_struct ctrl_memdump_evt;
- 	struct delayed_work ctrl_memdump_timeout;
--	struct qca_memdump_data *qca_memdump;
-+	struct qca_memdump_info *qca_memdump;
- 	unsigned long flags;
- 	struct completion drop_ev_comp;
- 	wait_queue_head_t suspend_wait_q;
- 	enum qca_memdump_states memdump_state;
- 	struct mutex hci_memdump_lock;
- 
-+	u16 fw_version;
-+	u16 controller_id;
- 	/* For debugging purpose */
- 	u64 ibs_sent_wacks;
- 	u64 ibs_sent_slps;
-@@ -233,6 +233,7 @@ static void qca_regulator_disable(struct qca_serdev *qcadev);
- static void qca_power_shutdown(struct hci_uart *hu);
- static int qca_power_off(struct hci_dev *hdev);
- static void qca_controller_memdump(struct work_struct *work);
-+static void qca_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb);
- 
- static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
- {
-@@ -980,6 +981,28 @@ static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
- 	return hci_recv_frame(hdev, skb);
- }
- 
-+static void qca_dmp_hdr(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct qca_data *qca = hu->priv;
-+	char buf[80];
-+
-+	snprintf(buf, sizeof(buf), "Controller Name: 0x%x\n",
-+		qca->controller_id);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Firmware Version: 0x%x\n",
-+		qca->fw_version);
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Vendor:Qualcomm\n");
-+	skb_put_data(skb, buf, strlen(buf));
-+
-+	snprintf(buf, sizeof(buf), "Driver: %s\n",
-+		hu->serdev->dev.driver->name);
-+	skb_put_data(skb, buf, strlen(buf));
-+}
-+
- static void qca_controller_memdump(struct work_struct *work)
- {
- 	struct qca_data *qca = container_of(work, struct qca_data,
-@@ -987,13 +1010,11 @@ static void qca_controller_memdump(struct work_struct *work)
- 	struct hci_uart *hu = qca->hu;
- 	struct sk_buff *skb;
- 	struct qca_memdump_event_hdr *cmd_hdr;
--	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
-+	struct qca_memdump_info *qca_memdump = qca->qca_memdump;
- 	struct qca_dump_size *dump;
--	char *memdump_buf;
--	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
- 	u16 seq_no;
--	u32 dump_size;
- 	u32 rx_size;
-+	int ret = 0;
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 
- 	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
-@@ -1009,7 +1030,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 		}
- 
- 		if (!qca_memdump) {
--			qca_memdump = kzalloc(sizeof(struct qca_memdump_data),
-+			qca_memdump = kzalloc(sizeof(struct qca_memdump_info),
- 					      GFP_ATOMIC);
- 			if (!qca_memdump) {
- 				mutex_unlock(&qca->hci_memdump_lock);
-@@ -1035,44 +1056,49 @@ static void qca_controller_memdump(struct work_struct *work)
- 			set_bit(QCA_IBS_DISABLED, &qca->flags);
- 			set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
- 			dump = (void *) skb->data;
--			dump_size = __le32_to_cpu(dump->dump_size);
--			if (!(dump_size)) {
-+			qca_memdump->ram_dump_size = __le32_to_cpu(dump->dump_size);
-+			if (!(qca_memdump->ram_dump_size)) {
- 				bt_dev_err(hu->hdev, "Rx invalid memdump size");
- 				kfree(qca_memdump);
- 				kfree_skb(skb);
--				qca->qca_memdump = NULL;
- 				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
- 			}
- 
--			bt_dev_info(hu->hdev, "QCA collecting dump of size:%u",
--				    dump_size);
- 			queue_delayed_work(qca->workqueue,
- 					   &qca->ctrl_memdump_timeout,
--					   msecs_to_jiffies(MEMDUMP_TIMEOUT_MS)
--					  );
--
--			skb_pull(skb, sizeof(dump_size));
--			memdump_buf = vmalloc(dump_size);
--			qca_memdump->ram_dump_size = dump_size;
--			qca_memdump->memdump_buf_head = memdump_buf;
--			qca_memdump->memdump_buf_tail = memdump_buf;
--		}
-+					   msecs_to_jiffies(MEMDUMP_TIMEOUT_MS));
-+			skb_pull(skb, sizeof(qca_memdump->ram_dump_size));
-+			qca_memdump->current_seq_no = 0;
-+			qca_memdump->received_dump = 0;
-+			ret = hci_devcd_init(hu->hdev, qca_memdump->ram_dump_size);
-+			bt_dev_info(hu->hdev, "hci_devcd_init Return:%d",
-+				    ret);
-+			if (ret < 0) {
-+				kfree(qca->qca_memdump);
-+				qca->qca_memdump = NULL;
-+				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
-+				cancel_delayed_work(&qca->ctrl_memdump_timeout);
-+				clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+				mutex_unlock(&qca->hci_memdump_lock);
-+				return;
-+			}
- 
--		memdump_buf = qca_memdump->memdump_buf_tail;
-+			bt_dev_info(hu->hdev, "QCA collecting dump of size:%u",
-+				    qca_memdump->ram_dump_size);
-+
-+		}
- 
- 		/* If sequence no 0 is missed then there is no point in
- 		 * accepting the other sequences.
- 		 */
--		if (!memdump_buf) {
-+		if (!test_bit(QCA_MEMDUMP_COLLECTION, &qca->flags)) {
- 			bt_dev_err(hu->hdev, "QCA: Discarding other packets");
- 			kfree(qca_memdump);
- 			kfree_skb(skb);
--			qca->qca_memdump = NULL;
- 			mutex_unlock(&qca->hci_memdump_lock);
- 			return;
- 		}
--
- 		/* There could be chance of missing some packets from
- 		 * the controller. In such cases let us store the dummy
- 		 * packets in the buffer.
-@@ -1082,8 +1108,8 @@ static void qca_controller_memdump(struct work_struct *work)
- 		 * bits, so skip this checking for missing packet.
- 		 */
- 		while ((seq_no > qca_memdump->current_seq_no + 1) &&
--		       (soc_type != QCA_QCA6390) &&
--		       seq_no != QCA_LAST_SEQUENCE_NUM) {
-+			(soc_type != QCA_QCA6390) &&
-+			seq_no != QCA_LAST_SEQUENCE_NUM) {
- 			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
- 				   qca_memdump->current_seq_no);
- 			rx_size = qca_memdump->received_dump;
-@@ -1094,43 +1120,38 @@ static void qca_controller_memdump(struct work_struct *work)
- 					   qca_memdump->received_dump);
- 				break;
- 			}
--			memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
--			memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
-+			hci_devcd_append_pattern(hu->hdev, 0x00,
-+				QCA_DUMP_PACKET_SIZE);
- 			qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
- 			qca_memdump->current_seq_no++;
- 		}
- 
--		rx_size = qca_memdump->received_dump + skb->len;
-+		rx_size = qca_memdump->received_dump  + skb->len;
- 		if (rx_size <= qca_memdump->ram_dump_size) {
- 			if ((seq_no != QCA_LAST_SEQUENCE_NUM) &&
--			    (seq_no != qca_memdump->current_seq_no))
-+			    (seq_no != qca_memdump->current_seq_no)) {
- 				bt_dev_err(hu->hdev,
- 					   "QCA memdump unexpected packet %d",
- 					   seq_no);
-+			}
- 			bt_dev_dbg(hu->hdev,
- 				   "QCA memdump packet %d with length %d",
- 				   seq_no, skb->len);
--			memcpy(memdump_buf, (unsigned char *)skb->data,
--			       skb->len);
--			memdump_buf = memdump_buf + skb->len;
--			qca_memdump->memdump_buf_tail = memdump_buf;
--			qca_memdump->current_seq_no = seq_no + 1;
--			qca_memdump->received_dump += skb->len;
-+			hci_devcd_append(hu->hdev, skb);
-+			qca_memdump->current_seq_no += 1;
-+			qca_memdump->received_dump = rx_size;
- 		} else {
- 			bt_dev_err(hu->hdev,
--				   "QCA memdump received %d, no space for packet %d",
--				   qca_memdump->received_dump, seq_no);
-+				   "QCA memdump received no space for packet %d",
-+				    qca_memdump->current_seq_no);
- 		}
--		qca->qca_memdump = qca_memdump;
--		kfree_skb(skb);
-+
- 		if (seq_no == QCA_LAST_SEQUENCE_NUM) {
- 			bt_dev_info(hu->hdev,
--				    "QCA memdump Done, received %d, total %d",
--				    qca_memdump->received_dump,
--				    qca_memdump->ram_dump_size);
--			memdump_buf = qca_memdump->memdump_buf_head;
--			dev_coredumpv(&hu->serdev->dev, memdump_buf,
--				      qca_memdump->received_dump, GFP_KERNEL);
-+				"QCA memdump Done, received %d, total %d",
-+				qca_memdump->received_dump,
-+				qca_memdump->ram_dump_size);
-+			hci_devcd_complete(hu->hdev);
- 			cancel_delayed_work(&qca->ctrl_memdump_timeout);
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
-@@ -1541,8 +1562,8 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 	mutex_lock(&qca->hci_memdump_lock);
- 	if (qca->memdump_state != QCA_MEMDUMP_COLLECTED) {
- 		bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
-+		hci_devcd_abort(hu->hdev);
- 		if (qca->qca_memdump) {
--			vfree(qca->qca_memdump->memdump_buf_head);
- 			kfree(qca->qca_memdump);
- 			qca->qca_memdump = NULL;
- 		}
-@@ -1706,6 +1727,17 @@ static int qca_power_on(struct hci_dev *hdev)
- 	return ret;
- }
- 
-+static void hci_coredump_qca(struct hci_dev *hdev)
-+{
-+	static const u8 param[] = { 0x26 };
-+	struct sk_buff *skb;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc0c, 1, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb))
-+		bt_dev_err(hdev, "%s: trigger crash failed (%ld)", __func__, PTR_ERR(skb));
-+	kfree_skb(skb);
-+}
-+
- static int qca_setup(struct hci_uart *hu)
- {
- 	struct hci_dev *hdev = hu->hdev;
-@@ -1820,6 +1852,9 @@ static int qca_setup(struct hci_uart *hu)
- 		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
- 	else
- 		hu->hdev->set_bdaddr = qca_set_bdaddr;
-+	qca->fw_version = le16_to_cpu(ver.patch_ver);
-+	qca->controller_id = le16_to_cpu(ver.rom_ver);
-+	hci_devcd_register(hdev, hci_coredump_qca, qca_dmp_hdr, NULL);
- 
- 	return ret;
- }
--- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
+--===============7456416658728005728==--
