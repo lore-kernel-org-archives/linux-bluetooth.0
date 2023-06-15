@@ -2,80 +2,91 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A30EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jun 2023 14:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17273EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jun 2023 14:37:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245732AbjFOOgV (ORCPT
+        id S1344533AbjFOOhK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Jun 2023 10:36:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54844 "EHLO
+        Thu, 15 Jun 2023 10:37:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241156AbjFOOgU (ORCPT
+        with ESMTP id S1343811AbjFOOhJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Jun 2023 10:36:20 -0400
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08D5199
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jun 2023 07:36:19 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3f736e0c9b1so19353715e9.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jun 2023 07:36:19 -0700 (PDT)
+        Thu, 15 Jun 2023 10:37:09 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B012DE52
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jun 2023 07:37:08 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-31109cd8d8cso1612069f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Jun 2023 07:37:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1686839778; x=1689431778;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uzm3VZYDXcStcytclpPFwuHiXTEqB8XHGvxC1QF1m8c=;
-        b=X127q9e0Fgt8n8vIvKG4OAJiNW16xn6FrrF/VADzq21fvh7Ub0BXZv1MapIPDhHy3b
-         LifMG9HXuOJpkCu+nHORz6rXGvcSWlba1JqMeL5NSkjuQBuvZoC4JwXf6HkDLeRxZuS7
-         iGAwJO+buvaJV7A7MQ9dbBDmHu6RWbmnxfoijtCYls0GNXTScFlplIhlCSjPNG/HyQQz
-         l/LojzAeefJZqWcIh8dEMRYVqpiFojWaqckdDxXZDwIyQM9KKOjeyz7z1AfP4moS2oxn
-         0nVqJa/bJtawbzgO219SGUfmX5mgApaVUGM35bvvuyKkqtcKKOVKukuw59YNpFTcn/Ce
-         GGPw==
+        d=gmail.com; s=20221208; t=1686839827; x=1689431827;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pxx1tmOUiKfYcT/P4r7xpeitO/eK6ECGlVf8u10BuwQ=;
+        b=bqbCnVsQs57qDlbohh1QTQIGf7bZ2TgiU8OMVRGcUW5B9wRUmmVYrGUMu8Uh+QN2Fn
+         n8LvNtH55weXQUQtzzWWydFLvNwOVMc5S5KF3PPXiyzOFe0mtzh/lLyeRSjEcKxgbXfG
+         Jf/2yXnGlVX1Q7yra5YjOwp1pmr4/Ys8hhOCDDFp7ePYdOc4xwwHHpfsX1Tz28/cQfX2
+         ykf50Q2d8dpd5t/fx7LXUUBXSpDyrmTEvQvg3herSPUoFEunAKtw79lgAVczfUOnnqsT
+         vJFBq/3Hk/TrtK2srPCJPylwi0YLyBUD9aoHiwFP9W6I5f7i7cXaEr6u43BOMFz0ROJj
+         uvBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686839778; x=1689431778;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uzm3VZYDXcStcytclpPFwuHiXTEqB8XHGvxC1QF1m8c=;
-        b=a8iqKfkoXQlfzSSV7nOD1bayrbmk6DA3Z+gyoD0XixGU7v1p6FWVhBPwGrEDapwqcH
-         kYSTO6AKekkrTFVj4VkEFXJJIbrwm6MokHt56ogDgPFW8MKJ2uQTVhkO7Vyi3Em294it
-         kKOXvxDjr4ZnW5jdG12Z7zTB61Gg8VBBt6RtLL7SY+k8eKE70NSv2xzlScQIRPaBizRs
-         /H6AaHl4LniIMRf6pW+/wE5m9wcPA/3gAga/lbCpzzt3AZjAA6ZJfOpl4q5Xe2gHCXl8
-         W29b/w9HAdbkv7Lw64AABdqVzISt91Y0dkgBAzTtYEMoE4BXSKL2JaPc/HfwMqtQ1hcg
-         jraQ==
-X-Gm-Message-State: AC+VfDzDjD51zp0F6j84xinaOw9+Mv5H6cssKFVdcSrLyoR17KTGPWWY
-        tglxHUB/3j0230vWAkwJsy1YEGwIyIABarCv9bpz1Ax/btbxGsz+/sI=
-X-Google-Smtp-Source: ACHHUZ7AluSf5IsEkK90B/xWUSGHOqVjn2lJsAOz1nEvBR3rMloKQjdWVkHyeLVx/2N7bg+0wT6csjienzGQJNbYxvs=
-X-Received: by 2002:a5d:4d83:0:b0:30f:d1e3:22a4 with SMTP id
- b3-20020a5d4d83000000b0030fd1e322a4mr4923912wru.56.1686839777713; Thu, 15 Jun
- 2023 07:36:17 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1686839827; x=1689431827;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pxx1tmOUiKfYcT/P4r7xpeitO/eK6ECGlVf8u10BuwQ=;
+        b=S9s+hA/VGMjFyHZaw3T1hCvlds1p4bV4hrE4mrN3cOiNjL4RF45YZ63/MV/DjDChIF
+         TvxJDi/V7BPUSH6nTrglUlz9iMX5tj+LyDR3rBhqNxV8Y5TUj9kD1ybtqiDzLLgzOmXx
+         gVdc1NLOF12/VCI200Stxy7LHTbxob7CwU1UKvbMrExYovLbNluxu37py0a7OSHz3E58
+         wb0d9WzDMN76Y3xNTaOwRrcQbhqYqRk0LZzHvMXwPRzIpKRbVLEHR7XS7yXqS4G3UB7I
+         57d7ZMpeAAbNF335KVncYyq3kY5bbJYOFjZpWMHjgscBnZLTzuSueI82qAku4X2/Ajw7
+         JZLQ==
+X-Gm-Message-State: AC+VfDwhNXjdbSGzFKoFSbpMC/jSBFTM79AMhXlP4A+QU6CSSrogxmOM
+        tHUOG9v7mGb2t4WU120/eSxq2GflV3DpqV/+C1DBGeqqZDEuHLmS
+X-Google-Smtp-Source: ACHHUZ4YDumfojVWFr68u1vszP9x9SoA8nDoWbAuHGMfVqgCopOGjHpgoUMWcBj5Ir1IGYvY33+Xg22Mu/HYodH/9QQ=
+X-Received: by 2002:a5d:4d4d:0:b0:30f:d32f:c42 with SMTP id
+ a13-20020a5d4d4d000000b0030fd32f0c42mr4484926wru.70.1686839826844; Thu, 15
+ Jun 2023 07:37:06 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAHe0yEZ3_OtS_2g9To6HyBiO359wiiazyGrUNJ2CsuC=gRB4Rw@mail.gmail.com>
+In-Reply-To: <CAHe0yEZ3_OtS_2g9To6HyBiO359wiiazyGrUNJ2CsuC=gRB4Rw@mail.gmail.com>
 From:   Jake Rue <jakerue222@gmail.com>
-Date:   Thu, 15 Jun 2023 07:36:00 -0700
-Message-ID: <CAHe0yEbS0jcq2LsTcU8MqTDq+5HD0iXqnu-YXcLXPWm090PGKQ@mail.gmail.com>
-Subject: Does the DBUS API prevent obtaining GATT information without a connection?
+Date:   Thu, 15 Jun 2023 07:36:55 -0700
+Message-ID: <CAHe0yEZNjWjj8=Q2fZZxMxEPWsJeW9DJNWbUucp2zEZF2FNtkA@mail.gmail.com>
+Subject: Re: Where does the DeviceID Version value in EIR for Linux hosts come from?
 To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I was looking for a newer and more supported way of collecting GATT
-information, rather than gatttool, which I understand to be
-deprecated. I was looking at bleak (https://github.com/hbldh/bleak) as
-a potential python-based wrapper.
+On Tue, May 16, 2023 at 5:07=E2=80=AFPM Jake Rue <jakerue222@gmail.com> wro=
+te:
+>
+> When I look at btmon output of advertising reports for BT Classic for
+> Linux boxes, I see something like this:
+>
+> > HCI Event: Extended Inquiry Result
+> [cut]
+>         Device ID: USB Implementer's Forum assigned (0x0002)
+>           Vendor: Linux Foundation (0x1d6b)
+>           Product: 0x0246
+>           Version: 5.4.0 (0x0540)
+>
+> I am wondering where the 0x540 version comes from / corresponds to
+> about the host software stack version (I couldn't find such a constant
+> in the BlueZ source code or googling around. But for instance a BlueZ
+> 5.64 had this value, so it doesn't match 1:1 to BlueZ). But it seems
+> to change slightly over time for different Linux machines.
+>
+> And I'm also curious about the 0x246 product ID, though it seems like
+> that's always the same for all Linux machines I've seen thus far.
+>
+> Cheers - Jake
 
-However, when I try to use it to collect information from an AppleTV
-which I can collect successfully with gatttool, it errors out with
-"bleak.exc.BleakDBusError: [org.bluez.Error.Failed]
-br-connection-unknown". I eventually tried the same thing with
-bluetoothctl and it gave the same-ish error of "Failed to connect:
-org.bluez.Error.Failed br-connection-unknown".
-
-So the difference seems to be that bleak/bluetoothctl try to connect
-to the AppleTV (which it rejects, if I don't go accept the pairing on
-the TV itself), whereas gatttool doesn't make a full
-connection/pairing attempt?
-
-The bleak developers said that this is a limitation of the DBUS API,
-and that there's no way to get GATT information without a connection.
-Is that correct?
+It's not the most important thing in the world, but I'm still curious
+if anyone knows where this number comes from.
 
 Cheers - Jake
