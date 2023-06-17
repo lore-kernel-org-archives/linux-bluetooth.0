@@ -2,77 +2,177 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B444EB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Jun 2023 15:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 952E5EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Jun 2023 11:12:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbjFPPKZ (ORCPT
+        id S234499AbjFQLMv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Jun 2023 11:10:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35422 "EHLO
+        Sat, 17 Jun 2023 07:12:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345900AbjFPPJp (ORCPT
+        with ESMTP id S232207AbjFQLMu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Jun 2023 11:09:45 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0FF3AB5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jun 2023 08:09:30 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-77ad4f28a23so63728239f.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Jun 2023 08:09:30 -0700 (PDT)
+        Sat, 17 Jun 2023 07:12:50 -0400
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 738EA1BF3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Jun 2023 04:12:48 -0700 (PDT)
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-77a1f4e92cdso211843939f.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Jun 2023 04:12:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1686928169; x=1689520169;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Imb23EaY07Gm7MJa4Np4kGVuIs1+xNQBFZQNfFls+gM=;
-        b=fyzXVsUGZFC1gFiLspb3wS0m9qPO/0OlazEOUw9fTVrlg+df0JA3slwPTroZ/SGyqg
-         5/X1Aw/6NyawF71StfmJkQgDLrRleuCKchl5uVqMV1AIrzUqdLIy2Q5o5WxqTcXJRC4L
-         i//FnV+vqCeKBYMDIQTKgUnVb33QdBZX64Ai5zsEfBPjEsNw32vesCMbOsA35rpaRWYU
-         oRG7SjD/2jFMIrRi1XhRqY/yYlgsRJWJcLqWRPwMHZ6Oao7ZNXtOg1FY4ENa9RY8MIjg
-         x3z8rOoBQDZnW/Rw6YuU8fxSSNdzyp33ML17BkUV1G3xSchsWz71vaYq2yrq75xQOzeT
-         y48Q==
-X-Gm-Message-State: AC+VfDwL+22jtBJPRylWgT0vkx6I5DAL5XZing8uYPIY7ZdOcbFa+AvU
-        IQdTraD3CBR1F8FusE5UDbT+bEnMxWaCl1MSRVk6HJ4gGj4J
-X-Google-Smtp-Source: ACHHUZ74+dXyvXDTGc+FFJWwCq4aB7E4QHdfr+P5b8tR/ce1Zt3HbjyX4nIZUMIKXW6jGatIamaZTBC88weu2rXjtpNJxD+nybqE
+        d=1e100.net; s=20221208; t=1687000368; x=1689592368;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tqysVBz+NFmrTu+Ca/Xnkrb+OEIx8dLa2JZyf+GKTrw=;
+        b=AoP3UgtOFlE17qYNBKta7T/pz4g2GFIYDzcVM5LNt0CvyKbzhcxHAcJwk56AS9NPAU
+         AliiuSK+aWqHMTIdhwhZybyKsHHbLpBNVuuX4vz6t1zJ/SQFnnavcFeG5B7kQA8zVtKH
+         kxM/GtO6yUGl8Jjro/me6fCuZA+u/VDqktv73uTbkxstUbSsLLY4F0Q+r89QSZOSPvyV
+         9W4p0sQmJMQQh50WduSFc+yo1l6ZBAPr2dbuc9tVdEEkR6EpFviXYVsnWUO1/xrd137r
+         h01xh+Vzr7bIy3xLENllu/r370hW6Zmd4GJ/GfqgiemPdS3QHoY+a8LMvKjbiQ4/T+fm
+         6cnQ==
+X-Gm-Message-State: AC+VfDyk/G2PG4nHgCTwARtce61nOet+DIz444EJhfPYYk8as9P3A8Nt
+        OxWX7tN684z6tle7MJakQuTo2oYDplJc69K0kAmxThAichoP
+X-Google-Smtp-Source: ACHHUZ4msT+TTZyn0q/FX5PQ0CqLUvKtu2X97cf3SNxRrcp6ri3a1sPOQOT2KklftY2+grulVgp2JCc8fdvjhW7CFLx9FFQpBLCb
 MIME-Version: 1.0
-X-Received: by 2002:a02:a119:0:b0:423:13e1:8092 with SMTP id
- f25-20020a02a119000000b0042313e18092mr696867jag.5.1686928169697; Fri, 16 Jun
- 2023 08:09:29 -0700 (PDT)
-Date:   Fri, 16 Jun 2023 08:09:29 -0700
-In-Reply-To: <00000000000098289005dc17b71b@google.com>
+X-Received: by 2002:a05:6e02:1aac:b0:341:e20d:24b with SMTP id
+ l12-20020a056e021aac00b00341e20d024bmr1531796ilv.0.1687000367830; Sat, 17 Jun
+ 2023 04:12:47 -0700 (PDT)
+Date:   Sat, 17 Jun 2023 04:12:47 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000051087405fe4092cc@google.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in sco_conn_del
-From:   syzbot <syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, fgheet255t@gmail.com,
-        hdanton@sina.com, johan.hedberg@gmail.com, josephsih@chromium.org,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lrh2000@pku.edu.cn,
-        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com, yinghsu@chromium.org
+Message-ID: <000000000000a91cfe05fe5161f2@google.com>
+Subject: [syzbot] [bluetooth?] BUG: sleeping function called from invalid
+ context in __hci_cmd_sync_sk
+From:   syzbot <syzbot+c715e1bd8dfbcb1ab176@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+Hello,
 
-commit a2ac591cb4d83e1f2d4b4adb3c14b2c79764650a
-Author: Ruihan Li <lrh2000@pku.edu.cn>
-Date:   Wed May 3 13:39:36 2023 +0000
+syzbot found the following issue on:
 
-    Bluetooth: Fix UAF in hci_conn_hash_flush again
+HEAD commit:    1f6ce8392d6f Add linux-next specific files for 20230613
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14adff43280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d103d5f9125e9fe9
+dashboard link: https://syzkaller.appspot.com/bug?extid=c715e1bd8dfbcb1ab176
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11287563280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14395963280000
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13755717280000
-start commit:   e4cf7c25bae5 Merge tag 'kbuild-fixes-v6.2' of git://git.ke..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=555d27e379d75ff1
-dashboard link: https://syzkaller.appspot.com/bug?extid=b825d87fe2d043e3e652
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10052058480000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1190687c480000
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2d9bf45aeae9/disk-1f6ce839.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e0b03ef83e17/vmlinux-1f6ce839.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b6c21a24174d/bzImage-1f6ce839.xz
 
-If the result looks correct, please mark the issue as fixed by replying with:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c715e1bd8dfbcb1ab176@syzkaller.appspotmail.com
 
-#syz fix: Bluetooth: Fix UAF in hci_conn_hash_flush again
+BUG: sleeping function called from invalid context at net/bluetooth/hci_sync.c:166
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 4430, name: kworker/u5:1
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+4 locks held by kworker/u5:1/4430:
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:20 [inline]
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: raw_atomic64_set include/linux/atomic/atomic-arch-fallback.h:2608 [inline]
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: raw_atomic_long_set include/linux/atomic/atomic-long.h:79 [inline]
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:3196 [inline]
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:675 [inline]
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:702 [inline]
+ #0: ffff888020183138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x8fd/0x16f0 kernel/workqueue.c:2564
+ #1: ffffc900057a7db0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x930/0x16f0 kernel/workqueue.c:2568
+ #2: ffff88802b78c078 (&hdev->lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0xe9/0xab0 net/bluetooth/hci_event.c:6947
+ #3: ffffffff8c9a2840 (rcu_read_lock){....}-{1:2}, at: hci_le_ev_skb_pull net/bluetooth/hci_event.c:79 [inline]
+ #3: ffffffff8c9a2840 (rcu_read_lock){....}-{1:2}, at: hci_le_create_big_complete_evt+0xcc/0xab0 net/bluetooth/hci_event.c:6943
+CPU: 0 PID: 4430 Comm: kworker/u5:1 Not tainted 6.4.0-rc6-next-20230613-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x136/0x150 lib/dump_stack.c:106
+ __might_resched+0x358/0x580 kernel/sched/core.c:10188
+ __hci_cmd_sync_sk+0x359/0xe30 net/bluetooth/hci_sync.c:166
+ __hci_cmd_sync_status_sk+0x45/0x160 net/bluetooth/hci_sync.c:247
+ __hci_cmd_sync_status net/bluetooth/hci_sync.c:273 [inline]
+ hci_le_terminate_big_sync+0xa4/0xd0 net/bluetooth/hci_sync.c:1671
+ hci_le_create_big_complete_evt+0x741/0xab0 net/bluetooth/hci_event.c:6982
+ hci_le_meta_evt+0x2bc/0x510 net/bluetooth/hci_event.c:7182
+ hci_event_func net/bluetooth/hci_event.c:7512 [inline]
+ hci_event_packet+0x641/0xfd0 net/bluetooth/hci_event.c:7567
+ hci_rx_work+0xaeb/0x1340 net/bluetooth/hci_core.c:4064
+ process_one_work+0xa34/0x16f0 kernel/workqueue.c:2594
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2745
+ kthread+0x344/0x440 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
+------------[ cut here ]------------
+Voluntary context switch within RCU read-side critical section!
+WARNING: CPU: 0 PID: 4430 at kernel/rcu/tree_plugin.h:320 rcu_note_context_switch+0xbb9/0x1800 kernel/rcu/tree_plugin.h:320
+Modules linked in:
+CPU: 0 PID: 4430 Comm: kworker/u5:1 Tainted: G        W          6.4.0-rc6-next-20230613-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/25/2023
+Workqueue: hci0 hci_rx_work
+RIP: 0010:rcu_note_context_switch+0xbb9/0x1800 kernel/rcu/tree_plugin.h:320
+Code: 1d 44 68 00 4c 8b 4c 24 30 8b 4c 24 28 48 8b 54 24 20 e9 8f 03 00 00 48 c7 c7 c0 32 6e 8a c6 05 10 41 24 0d 01 e8 87 83 dc ff <0f> 0b e9 4c f5 ff ff 81 e5 ff ff ff 7f 0f 84 d7 f6 ff ff 65 48 8b
+RSP: 0018:ffffc900057a74c0 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: ffff8880b983d340 RCX: 0000000000000000
+RDX: ffff88802c40bb80 RSI: ffffffff814bf5f7 RDI: 0000000000000001
+RBP: ffff88802c40bb80 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
+R13: ffff88802c40bb80 R14: ffffffff8ea9aff0 R15: ffff8880b983c440
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f802b262fc8 CR3: 000000002812e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __schedule+0x276/0x5790 kernel/sched/core.c:6609
+ schedule+0xde/0x1a0 kernel/sched/core.c:6785
+ schedule_timeout+0x14e/0x2b0 kernel/time/timer.c:2167
+ __hci_cmd_sync_sk+0xc1d/0xe30 net/bluetooth/hci_sync.c:166
+ __hci_cmd_sync_status_sk+0x45/0x160 net/bluetooth/hci_sync.c:247
+ __hci_cmd_sync_status net/bluetooth/hci_sync.c:273 [inline]
+ hci_le_terminate_big_sync+0xa4/0xd0 net/bluetooth/hci_sync.c:1671
+ hci_le_create_big_complete_evt+0x741/0xab0 net/bluetooth/hci_event.c:6982
+ hci_le_meta_evt+0x2bc/0x510 net/bluetooth/hci_event.c:7182
+ hci_event_func net/bluetooth/hci_event.c:7512 [inline]
+ hci_event_packet+0x641/0xfd0 net/bluetooth/hci_event.c:7567
+ hci_rx_work+0xaeb/0x1340 net/bluetooth/hci_core.c:4064
+ process_one_work+0xa34/0x16f0 kernel/workqueue.c:2594
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2745
+ kthread+0x344/0x440 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
