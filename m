@@ -2,139 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27834EB64DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jun 2023 20:30:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA3CEB64DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jun 2023 22:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229957AbjFSUap (ORCPT
+        id S229811AbjFSW0I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Jun 2023 16:30:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37014 "EHLO
+        Mon, 19 Jun 2023 18:26:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbjFSUao (ORCPT
+        with ESMTP id S229453AbjFSW0I (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Jun 2023 16:30:44 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C626E4A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jun 2023 13:30:43 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-52cb8e5e9f5so2465555a12.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jun 2023 13:30:43 -0700 (PDT)
+        Mon, 19 Jun 2023 18:26:08 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF8911B
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jun 2023 15:26:02 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-763a2e9494cso90908585a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Jun 2023 15:26:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687206642; x=1689798642;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PgesgxoUiEnt7JhH7f+sQVTH/hKqR6THmg+oGF3TcV4=;
-        b=lAhuWM4fk6unp83MvzpBW17Lnxy/Trv/NNl/GQDWAEDIK6ZOW7EQyT1v4nPUuxTJk3
-         107IcfIufe+ZxLO+sfgoaIALj+PwfpDXw89V/BpwMLTGLGrU2z2kitK2bsqBk/rrQrgt
-         C4Lbsm7zIi0gk7n/rObRELTCoNJuJdpDYxkSmAAgLx7821NQumpmp9ckg0bFlxsLwLoM
-         TSrQS3hx8j5XwRIAAaAyG6rpdDZjo0vagBELEGRXd8mM7pthTG4aCuwjNrboothMGZoA
-         jz4+qSI0yMLSJzccjzSZqCmLGxLBMsOvnMNGI/VR+ysNYDA22Bjfv+wiCuyw5smMofOb
-         +EOQ==
+        d=gmail.com; s=20221208; t=1687213561; x=1689805561;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=G+9l3KkX+fmfAfIKfOFzrEndNE+T8AEuELSG2ez6a6M=;
+        b=LX87dfwoazN8L+pcYTzK22BjRSD0Ccaw7IDpU0Y6pQSX2IUl8t4V7fWeikxXJUIPCm
+         A/pbggIlSXWWCsmRChsZ50hgrmq1EK9/yTyvS+HhQDcoMsOqNokeMjgn7xdK9E5wOKha
+         SyEhpZ2ot+q4C684zd1I80UabpvwN13q3sdDYNN9ez6NqamEBuR4tWMXvXhXig+XkjZA
+         /RJBPnMqjPyuYzVendijWuR+KfcRI33qqRQ4NUYj6vk4LtlZ9BHdHESCKG+j+zRctuJP
+         tfnzGonsOa47RS5hszHmJ4x5Dt6PfcGzflmTUOkSSUf0bq6ooZbjEcMY5VyBoUBo/hqt
+         MUgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687206642; x=1689798642;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PgesgxoUiEnt7JhH7f+sQVTH/hKqR6THmg+oGF3TcV4=;
-        b=NZkb6IaVzIrjDBYQYF0AHiBNchcoYXGf0Z0MsI2MiOx9W4mE1ascN3Famskr8AMh3R
-         ES1Ic1FrJvKZg0obnsyREaLxGK7FmuUV5J7h1xUKEtuFc1saJui960IsO9CWuOyu9xTn
-         LMArgMeniR2GWaNZ6yiJgCwNS57Z+I9kq+Au7Vt7aQ9ByhadO0AM2c+6wzAEp5IYjgK4
-         jyUl3n8FZTnpN2g+kx9W9V8RJLMu5YnkG+wKVelvebQD1rYA0YnNgQkHnpROct0qdF1Y
-         popOHxjoQrrsHNopH5iE4AwWnMpXVNvYuKLhLr/B5sqXW4YBc1+N0YDVvIhDeF+6xokv
-         354Q==
-X-Gm-Message-State: AC+VfDxGknnGNxjvPyJpIYEOTcxR5HBhS2q1mziScoE1IpZxotDVEGwy
-        QOPcgFurcW/QRI9NrAznXrgAtau24AoQww==
-X-Google-Smtp-Source: ACHHUZ7zNqS+Rs8VRPLAtdgeKcocFYJejfUedl96NBQ3t2EoFOTWVk57E39xrrhEkcJfxxaxk49EZg==
-X-Received: by 2002:a17:90a:bb09:b0:25e:d6f0:f0a5 with SMTP id u9-20020a17090abb0900b0025ed6f0f0a5mr9231343pjr.19.1687206641711;
-        Mon, 19 Jun 2023 13:30:41 -0700 (PDT)
-Received: from lvondent-mobl3.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id ju18-20020a170903429200b001b045c9ababsm202714plb.264.2023.06.19.13.30.39
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1687213561; x=1689805561;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G+9l3KkX+fmfAfIKfOFzrEndNE+T8AEuELSG2ez6a6M=;
+        b=khk1pxqLy89HVqOnMDUmIwnm5Smu8h6BUnht+bN9hHgSVGOGFcvzrsuWCsDqxc9HuE
+         dnW2EKOuJ1HfTv4CVDI0lQNK4qKSKqYxivU5p06ORkLYabe96D5ytUWjk21cYglz/MTZ
+         mBIOVUibxWkN/njCIp5e0+8i/uu0kXtiHxzzQZzwMA9h9KwohHp+yCUvsxlPrne3ZOPT
+         4SAJMrAMrmwRgPiYIU/fYhbsExsjD80JKOS4eDlCzh4xoP4Sh64oyK7NcSl/jRKBo+N2
+         IV/5qUzh4WEkEg1SKW7jszrsSxQR0SflsjbLSVefwh9CSQjVjWmYxb15Y+JxX4rACuuP
+         Nn3w==
+X-Gm-Message-State: AC+VfDxNo1vPrNz/w25keSP1iYTusC3IkWrw1B3FhrWZBp0b6xDqaqik
+        85PK1fbV/g8bzMF3M/FPJwWS9N9svTs=
+X-Google-Smtp-Source: ACHHUZ7IOLDzpKOTU5AA5gUfzAQ6zc3kES1jAdQX6b3x+/OHILdLmwYDRJwj73TSCuAvDUUEvf46BQ==
+X-Received: by 2002:a05:620a:6847:b0:763:a7e9:6cfc with SMTP id ru7-20020a05620a684700b00763a7e96cfcmr1854182qkn.11.1687213561114;
+        Mon, 19 Jun 2023 15:26:01 -0700 (PDT)
+Received: from [172.17.0.2] ([104.45.202.167])
+        by smtp.gmail.com with ESMTPSA id p12-20020ae9f30c000000b007607324644asm367101qkg.118.2023.06.19.15.25.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Jun 2023 13:30:40 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5] shared/bap: Pass bcode as a reference instead of value
-Date:   Mon, 19 Jun 2023 13:30:32 -0700
-Message-Id: <20230619203032.6812-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.1
+        Mon, 19 Jun 2023 15:26:00 -0700 (PDT)
+Message-ID: <6490d5f8.e90a0220.24537.0f92@mx.google.com>
+Date:   Mon, 19 Jun 2023 15:26:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8800323859998116475=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/5] shared/bap: Add unespecified bit in audio context to PAC records
 In-Reply-To: <20230619203032.6812-1-luiz.dentz@gmail.com>
 References: <20230619203032.6812-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============8800323859998116475==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes bcode field a pointer which makes it simpler to detect when
-it is set and also fixes the usage of util_iov_free which expects it to
-be allocated.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=758478
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.89 seconds
+GitLint                       PASS      1.82 seconds
+BuildEll                      PASS      27.80 seconds
+BluezMake                     PASS      875.71 seconds
+MakeCheck                     PASS      12.05 seconds
+MakeDistcheck                 PASS      156.89 seconds
+CheckValgrind                 PASS      259.09 seconds
+CheckSmatch                   PASS      345.82 seconds
+bluezmakeextell               PASS      104.47 seconds
+IncrementalBuild              PASS      3647.17 seconds
+ScanBuild                     WARNING   1066.68 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+client/player.c:3661:25: warning: Access to field 'acquiring' results in a dereference of a null pointer (loaded from variable 'ep')
+                if (!ep && queue_find(ep->acquiring, NULL, link))
+                                      ^~~~~~~~~~~~~
+1 warning generated.
+
+
+
 ---
- profiles/audio/bap.c | 12 +++++-------
- src/shared/bap.h     |  2 +-
- 2 files changed, 6 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index f3564c9e8..8e2fc1556 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -427,12 +427,9 @@ static int parse_properties(DBusMessageIter *props, struct iovec **caps,
- 			dbus_message_iter_get_basic(&value,
- 							&qos->bcast.timeout);
- 		} else if (!strcasecmp(key, "BroadcastCode")) {
--			struct iovec *iov;
--
- 			if (var != DBUS_TYPE_ARRAY)
- 				goto fail;
--			iov = &qos->bcast.bcode;
--			parse_array(&value, &iov);
-+			parse_array(&value, &qos->bcast.bcode);
- 		}
- 
- 		dbus_message_iter_next(props);
-@@ -624,7 +621,7 @@ static void ep_free(void *data)
- 	util_iov_free(ep->caps, 1);
- 	util_iov_free(ep->metadata, 1);
- 	if (bt_bap_stream_get_type(ep->stream) == BT_BAP_STREAM_TYPE_BCAST)
--		util_iov_free(&ep->qos.bcast.bcode, 1);
-+		util_iov_free(ep->qos.bcast.bcode, 1);
- 	free(ep->path);
- 	free(ep);
- }
-@@ -1268,7 +1265,8 @@ static void bap_create_bcast_io(struct bap_data *data, struct bap_ep *ep,
- 	iso_qos.bcast.packing = ep->qos.bcast.packing;
- 	iso_qos.bcast.framing = ep->qos.bcast.framing;
- 	iso_qos.bcast.encryption = ep->qos.bcast.encryption;
--	memcpy(iso_qos.bcast.bcode, ep->qos.bcast.bcode.iov_base, 16);
-+	if (ep->qos.bcast.bcode)
-+		memcpy(iso_qos.bcast.bcode, ep->qos.bcast.bcode->iov_base, 16);
- 	iso_qos.bcast.options = ep->qos.bcast.options;
- 	iso_qos.bcast.skip = ep->qos.bcast.skip;
- 	iso_qos.bcast.sync_timeout = ep->qos.bcast.sync_timeout;
-@@ -1811,7 +1809,7 @@ static struct btd_profile bap_profile = {
- 	.disconnect	= bap_disconnect,
- 	.adapter_probe	= bap_adapter_probe,
- 	.adapter_remove	= bap_adapter_remove,
--	.auto_connect	= true,
-+	.auto_connect	= false,
- 	.experimental	= true,
- };
- 
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index 8fc41864a..50b567663 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -79,7 +79,7 @@ struct bt_bap_bcast_qos {
- 	uint8_t  packing;
- 	uint8_t  framing;
- 	uint8_t  encryption;
--	struct iovec bcode;
-+	struct iovec *bcode;
- 	uint8_t  options;
- 	uint16_t skip;
- 	uint16_t sync_timeout;
--- 
-2.40.1
 
+--===============8800323859998116475==--
