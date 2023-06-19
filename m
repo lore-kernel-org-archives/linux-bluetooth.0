@@ -2,96 +2,314 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 177E6EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jun 2023 06:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA663EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jun 2023 12:01:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbjFSGKh (ORCPT
+        id S229909AbjFSMBL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Jun 2023 02:10:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36968 "EHLO
+        Mon, 19 Jun 2023 08:01:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbjFSGKf (ORCPT
+        with ESMTP id S229554AbjFSMBK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Jun 2023 02:10:35 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C06DA
-        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Jun 2023 23:10:33 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-4f85fa03cd9so3030e87.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Jun 2023 23:10:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687155031; x=1689747031;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+l56EVhv3DJvNU1IQjzDjseQEvnEEKyVbt3cN52claY=;
-        b=F/kNBWEEgaE+8lZUPTIARp5HRaAoZ3OJ/XgML6vdgc6EtwY5p58wPd7kV++KSKFm4b
-         OyFBJALpf5kDPATAbF5lTZpwdyu8JFxTuRi+4mcLd7Guw1jwIhL298AzYLOSzwyjpcFs
-         diNAyNdCsjpLeq6GebJUxF9gkklqRHhSUKMHppwtT677LSlbWJNIV/RdCVO8WNFa+K36
-         OgZIXUfm9t/cUUrLLTNJVyCLnRJeUoJ+PQMpUk/s6c2YsiD1uPs7ajY4/f44OtoctmS2
-         w1T49dUAe0bYDleIE21DH/ZQZYp4NMlzFH7d4LkOKrbpxy5b2bL//xP4GGVLpTB7e7dF
-         p7Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687155031; x=1689747031;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+l56EVhv3DJvNU1IQjzDjseQEvnEEKyVbt3cN52claY=;
-        b=IQA3yKb5wFhYqON24uwnkSBo0e4DRLT/PwE4HhvGf2oghX4y/ITrU9HKtINareLuc5
-         kRiTyN9jFNxQIASGGYAGSA0lHNmcpdkPUfXzeWj8pVMmg/9A/QopsbxjkudAUkM5tEoF
-         UT8sIzfu8qmjRAaFrwMQpM+0RV8Bk2ywHpufQcezeprPt/ZWWUxb37yzOzUMwiK8OMsk
-         sQZLz+i5jHLGlovF6RG6MmGySpxxSvGJXCi8MyCybYCLNdPAAsb5OzoyCrzzLqItzb9b
-         2BBrEDu+eWulMjMBAqIQgELVTVFzTHw3k0eLhvyNvQaBqhnKP5Ij1MPu614CP87wOtCY
-         QcOw==
-X-Gm-Message-State: AC+VfDziNA8tm9tmH3YE4o2N/A9D4j1iCNYbSUlQvTGSYMdHGCPzUSnq
-        L+OmjhILOrtcdjn0wM/y5pM4dwgdtug/fRGXqzi+IA==
-X-Google-Smtp-Source: ACHHUZ5YZyM2139hV/S/LS2+fvOQj0z9kDkZezC1c+rH06UyGBkfRjikrsYcNhvom7a/Prxm0KpMhNj4eVR2w8dGe7o=
-X-Received: by 2002:ac2:5450:0:b0:4f2:7840:e534 with SMTP id
- d16-20020ac25450000000b004f27840e534mr267987lfn.0.1687155031253; Sun, 18 Jun
- 2023 23:10:31 -0700 (PDT)
+        Mon, 19 Jun 2023 08:01:10 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6219B3;
+        Mon, 19 Jun 2023 05:01:04 -0700 (PDT)
+X-UUID: f324a56a0e9811eeb20a276fd37b9834-20230619
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=jwsJ4F1+ZT1uWoifSgL2ngTkO+tfUGH8nLdkENrT1hQ=;
+        b=BTr+X/k0CIF7fbdhaJpTx1lqwvgWVVDUsoZdKIkElWeqOf4TuUbC7wSmLZj/+Bc9xui+LZB8RYvWQPmi54tl4R/YEZbrS3Ql2LpurQhh67CBXEwQhoTROrz5X1NFW3XySHqRumrI10h2j3fJ/K1rJszt9SKoiCdxmvVBysZrwWc=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.27,REQID:b577a9e6-9561-4688-a4d2-027e8007233c,IP:0,U
+        RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+        N:release,TS:-25
+X-CID-META: VersionHash:01c9525,CLOUDID:2af6183f-7aa7-41f3-a6bd-0433bee822f3,B
+        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: f324a56a0e9811eeb20a276fd37b9834-20230619
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+        (envelope-from <peter.tsao@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1086746375; Mon, 19 Jun 2023 20:00:57 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.186) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Mon, 19 Jun 2023 20:00:56 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 19 Jun 2023 20:00:55 +0800
+From:   Peter Tsao <peter.tsao@mediatek.com>
+To:     Josh Boyer <jwboyer@kernel.org>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Ben Hutchings <ben@decadent.org.uk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+CC:     Chris Lu <chris.lu@mediatek.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        Deren Wu <deren.Wu@mediatek.com>,
+        Aaron Hou <aaron.hou@mediatek.com>,
+        "Steve Lee" <steve.lee@mediatek.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-firmware <linux-firmware@kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-mediatek <linux-mediatek@lists.infradead.org>,
+        Peter Tsao <peter.tsao@mediatek.com>
+Subject: [PATCH v1] Bluetooth: btusb: Add support Mediatek MT7925
+Date:   Mon, 19 Jun 2023 20:00:53 +0800
+Message-ID: <20230619120053.7780-1-peter.tsao@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-References: <00000000000098289005dc17b71b@google.com> <00000000000051087405fe4092cc@google.com>
-In-Reply-To: <00000000000051087405fe4092cc@google.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 19 Jun 2023 08:10:19 +0200
-Message-ID: <CACT4Y+ZEL5FKx+R7poFFE_v2Di=qFRfv7GNnEoa9f9Y4r6ZK=w@mail.gmail.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in sco_conn_del
-To:     syzbot <syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com>
-Cc:     davem@davemloft.net, edumazet@google.com, fgheet255t@gmail.com,
-        hdanton@sina.com, johan.hedberg@gmail.com, josephsih@chromium.org,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, lrh2000@pku.edu.cn,
-        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com, yinghsu@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, 16 Jun 2023 at 17:09, syzbot
-<syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com> wrote:
->
-> syzbot suspects this issue was fixed by commit:
->
-> commit a2ac591cb4d83e1f2d4b4adb3c14b2c79764650a
-> Author: Ruihan Li <lrh2000@pku.edu.cn>
-> Date:   Wed May 3 13:39:36 2023 +0000
->
->     Bluetooth: Fix UAF in hci_conn_hash_flush again
->
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13755717280000
-> start commit:   e4cf7c25bae5 Merge tag 'kbuild-fixes-v6.2' of git://git.ke..
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=555d27e379d75ff1
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b825d87fe2d043e3e652
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10052058480000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1190687c480000
->
-> If the result looks correct, please mark the issue as fixed by replying with:
->
-> #syz fix: Bluetooth: Fix UAF in hci_conn_hash_flush again
->
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+This patch is added support Mediatek MT7925.
+The firmware location of MT7925 will set to /lib/firmware/mediatek/mt7925
+Add Mediatek private data in hdev to record the device for handle MT7925 flow.
+Use the recoreded dev_id to condition chip reset flow.
 
-Looks reasonable:
+The infomation in /sys/kernel/debug/usb/devices about the MT7925U
+Bluetooth device is listed as the below
 
-#syz fix: Bluetooth: Fix UAF in hci_conn_hash_flush again
+T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 27 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0e8d ProdID=7925 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 5 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=8f(I) Atr=03(Int.) MxPS=   2 Ivl=125us
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+I:* If#= 3 Alt= 0 #EPs= 9 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=08(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=03(Int.) MxPS=   2 Ivl=125us
+
+Signed-off-by: Peter Tsao <peter.tsao@mediatek.com>
+---
+ drivers/bluetooth/btmtk.c |  1 +
+ drivers/bluetooth/btmtk.h |  5 +++
+ drivers/bluetooth/btusb.c | 78 +++++++++++++++++++++++++++++----------
+ 3 files changed, 64 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 809762d64fc6..9482401d97fa 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -289,3 +289,4 @@ MODULE_FIRMWARE(FIRMWARE_MT7622);
+ MODULE_FIRMWARE(FIRMWARE_MT7663);
+ MODULE_FIRMWARE(FIRMWARE_MT7668);
+ MODULE_FIRMWARE(FIRMWARE_MT7961);
++MODULE_FIRMWARE(FIRMWARE_MT7925);
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 2a88ea8e475e..fadc1a520652 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -5,6 +5,7 @@
+ #define FIRMWARE_MT7663		"mediatek/mt7663pr2h.bin"
+ #define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
+ #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
++#define FIRMWARE_MT7925		"mediatek/mt7925/BT_RAM_CODE_MT7925_1_1_hdr.bin"
+ 
+ #define HCI_EV_WMT 0xe4
+ #define HCI_WMT_MAX_EVENT_SIZE		64
+@@ -119,6 +120,10 @@ struct btmtk_hci_wmt_params {
+ 	u32 *status;
+ };
+ 
++struct btmediatek_data {
++	u32 dev_id;
++};
++
+ typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
+ 				   struct btmtk_hci_wmt_params *);
+ 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 8776e0f93c73..ef04c97c7318 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2640,6 +2640,9 @@ static int btusb_recv_event_realtek(struct hci_dev *hdev, struct sk_buff *skb)
+ #define MTK_BT_RST_DONE		0x00000100
+ #define MTK_BT_RESET_WAIT_MS	100
+ #define MTK_BT_RESET_NUM_TRIES	10
++#define MTK_BT_RESET_REG_CONNV3	0x70028610
++#define MTK_BT_READ_DEV_ID	0x70010200
++
+ 
+ static void btusb_mtk_wmt_recv(struct urb *urb)
+ {
+@@ -3020,10 +3023,11 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 	struct sk_buff *skb;
+ 	const char *fwname;
+ 	int err, status;
+-	u32 dev_id;
++	u32 dev_id = 0;
+ 	char fw_bin_name[64];
+ 	u32 fw_version = 0;
+ 	u8 param;
++	struct btmediatek_data *mediatek;
+ 
+ 	calltime = ktime_get();
+ 
+@@ -3033,7 +3037,7 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 		return err;
+ 	}
+ 
+-	if (!dev_id) {
++	if (!dev_id || dev_id != 0x7663) {
+ 		err = btusb_mtk_id_get(data, 0x70010200, &dev_id);
+ 		if (err < 0) {
+ 			bt_dev_err(hdev, "Failed to get device id (%d)", err);
+@@ -3046,6 +3050,9 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 		}
+ 	}
+ 
++	mediatek = hci_get_priv(hdev);
++	mediatek->dev_id = dev_id;
++
+ 	switch (dev_id) {
+ 	case 0x7663:
+ 		fwname = FIRMWARE_MT7663;
+@@ -3055,9 +3062,16 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 		break;
+ 	case 0x7922:
+ 	case 0x7961:
+-		snprintf(fw_bin_name, sizeof(fw_bin_name),
+-			"mediatek/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
+-			 dev_id & 0xffff, (fw_version & 0xff) + 1);
++	case 0x7925:
++		if (dev_id == 0x7925)
++			snprintf(fw_bin_name, sizeof(fw_bin_name),
++				"mediatek/mt%04x/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
++				 dev_id & 0xffff, dev_id & 0xffff, (fw_version & 0xff) + 1);
++		else
++			snprintf(fw_bin_name, sizeof(fw_bin_name),
++				"mediatek/BT_RAM_CODE_MT%04x_1_%x_hdr.bin",
++				 dev_id & 0xffff, (fw_version & 0xff) + 1);
++
+ 		err = btmtk_setup_firmware_79xx(hdev, fw_bin_name,
+ 						btusb_mtk_hci_wmt_sync);
+ 		if (err < 0) {
+@@ -3200,6 +3214,7 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	u32 val;
+ 	int err, retry = 0;
++	struct btmediatek_data *mediatek;
+ 
+ 	/* It's MediaTek specific bluetooth reset mechanism via USB */
+ 	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+@@ -3213,22 +3228,42 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+ 
+ 	btusb_stop_traffic(data);
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
++	mediatek = hci_get_priv(hdev);
++
++	if (mediatek->dev_id == 0x7925) {
++		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
++		val |= (1 << 5);
++		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
++		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
++		val &= 0xFFFF00FF;
++		val |= (1 << 13);
++		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
++		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001);
++		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
++		val |= (1 << 0);
++		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
++		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
++		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
++		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
++		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
++		msleep(100);
++	} else {
++		/* It's Device EndPoint Reset Option Register */
++		bt_dev_dbg(hdev, "Initiating reset mechanism via uhw");
++		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
++		btusb_mtk_uhw_reg_read(data, MTK_BT_WDT_STATUS, &val);
+ 
+-	/* It's Device EndPoint Reset Option Register */
+-	bt_dev_dbg(hdev, "Initiating reset mechanism via uhw");
+-	btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
+-	btusb_mtk_uhw_reg_read(data, MTK_BT_WDT_STATUS, &val);
+-
+-	/* Reset the bluetooth chip via USB interface. */
+-	btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 1);
+-	btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
+-	btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
+-	btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
+-	btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
+-	/* MT7921 need to delay 20ms between toggle reset bit */
+-	msleep(20);
+-	btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
+-	btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
++		/* Reset the bluetooth chip via USB interface. */
++		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 1);
++		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
++		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
++		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
++		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
++		/* MT7921 need to delay 20ms between toggle reset bit */
++		msleep(20);
++		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
++		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
++	}
+ 
+ 	/* Poll the register until reset is completed */
+ 	do {
+@@ -4269,6 +4304,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 		priv_size += sizeof(struct btrealtek_data);
+ 
+ 		data->recv_event = btusb_recv_event_realtek;
++	} else if (id->driver_info & BTUSB_MEDIATEK) {
++		/* Allocate extra space for Mediatek device */
++		priv_size += sizeof(struct btmediatek_data);
+ 	}
+ 
+ 	data->recv_acl = hci_recv_frame;
+-- 
+2.18.0
+
