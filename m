@@ -2,46 +2,51 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBA3EB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jun 2023 08:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E7DEB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jun 2023 08:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231890AbjFTIZj (ORCPT
+        id S231902AbjFTI2E (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Jun 2023 04:25:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41542 "EHLO
+        Tue, 20 Jun 2023 04:28:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbjFTIZh (ORCPT
+        with ESMTP id S229595AbjFTI2D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Jun 2023 04:25:37 -0400
+        Tue, 20 Jun 2023 04:28:03 -0400
 Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 191FCDD;
-        Tue, 20 Jun 2023 01:25:30 -0700 (PDT)
-X-UUID: 0256666c0f4411eeb20a276fd37b9834-20230620
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D496CC;
+        Tue, 20 Jun 2023 01:28:00 -0700 (PDT)
+X-UUID: 59e4711c0f4411eeb20a276fd37b9834-20230620
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
         h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=4e7bpNhZE6fvxscNRuN8+Bxy+9be7E8GWrio0Cw5CoY=;
-        b=u+fZrmF7iYDrPhFAIvKpxeBlgsfsRrat/6lvWRfj8CXcegfboJ+jGoFFxiXi1y0ejJBNoAwZMS2PhuCKYIBUcHgsOl+gfnx2giNXSQAqFwNpjxtEHjnH80PYkFZwX9DoAn5eOKN3sTFMTgrSHRClW1IweptLuUjpWMrJi+YFUi4=;
+        b=gWYVWNLWTpd+GdGg9jKrv9SNBQ35eUU50Pg/pJ+XFLZ3SN4eKVPXSqUYuuNeidmGXlDVVdKYAbzJ5ms7LJMpohPpu0RfaYOQn823ZuushNBS/codJduu6FxzhH2GIrdPH/g4Bt4bDAh5NAd08TDChXDsHgueiAt7RhqPmSzV4XE=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.27,REQID:be8f75d7-2195-42f4-806f-6f0eca7053d8,IP:0,U
-        RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-        N:release,TS:-25
-X-CID-META: VersionHash:01c9525,CLOUDID:31ff313f-7aa7-41f3-a6bd-0433bee822f3,B
-        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-        RL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO
+X-CID-O-INFO: VERSION:1.1.27,REQID:a645683a-16e1-496c-99d7-7be882d359be,IP:0,U
+        RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Release_Ham,ACT
+        ION:release,TS:75
+X-CID-INFO: VERSION:1.1.27,REQID:a645683a-16e1-496c-99d7-7be882d359be,IP:0,URL
+        :0,TC:0,Content:-25,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Spam_GS981B3D,ACT
+        ION:quarantine,TS:75
+X-CID-META: VersionHash:01c9525,CLOUDID:e813323f-7aa7-41f3-a6bd-0433bee822f3,B
+        ulkID:230620162528YEC6LOQG,BulkQuantity:6,Recheck:0,SF:29|28|17|19|48|38,T
+        C:nil,Content:0,EDM:-3,IP:nil,URL:0,File:nil,Bulk:41,QS:nil,BEC:nil,COL:0,
+        OSI:0,OSA:0,AV:0,LES:1,SPR:NO
 X-CID-BVR: 0
 X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 0256666c0f4411eeb20a276fd37b9834-20230620
-Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw02.mediatek.com
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR,TF_CID_SPAM_SDM,
+        TF_CID_SPAM_ASC
+X-UUID: 59e4711c0f4411eeb20a276fd37b9834-20230620
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
         (envelope-from <peter.tsao@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 439973206; Tue, 20 Jun 2023 16:25:26 +0800
+        with ESMTP id 1260463249; Tue, 20 Jun 2023 16:27:53 +0800
 Received: from mtkmbs11n1.mediatek.inc (172.21.101.186) by
  mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 20 Jun 2023 16:25:25 +0800
+ 15.2.1118.26; Tue, 20 Jun 2023 16:27:52 +0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
  mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Tue, 20 Jun 2023 16:25:25 +0800
+ 15.2.1118.26 via Frontend Transport; Tue, 20 Jun 2023 16:27:52 +0800
 From:   Peter Tsao <peter.tsao@mediatek.com>
 To:     Josh Boyer <jwboyer@kernel.org>,
         David Woodhouse <dwmw2@infradead.org>,
@@ -58,9 +63,9 @@ CC:     Chris Lu <chris.lu@mediatek.com>,
         linux-kernel <linux-kernel@vger.kernel.org>,
         linux-mediatek <linux-mediatek@lists.infradead.org>,
         Peter Tsao <peter.tsao@mediatek.com>
-Subject: [PATCH] [PATCH v3] Bluetooth: btusb: Add support Mediatek MT7925
-Date:   Tue, 20 Jun 2023 16:25:23 +0800
-Message-ID: <20230620082523.8879-1-peter.tsao@mediatek.com>
+Subject: [PATCH v4] Bluetooth: btusb: Add support Mediatek MT7925
+Date:   Tue, 20 Jun 2023 16:27:50 +0800
+Message-ID: <20230620082750.9218-1-peter.tsao@mediatek.com>
 X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
 Content-Type: text/plain
