@@ -2,62 +2,63 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94739EB64DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jun 2023 15:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0267DEB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jun 2023 15:20:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233287AbjFTPUL (ORCPT
+        id S233473AbjFTPUN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Jun 2023 11:20:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49588 "EHLO
+        Tue, 20 Jun 2023 11:20:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233750AbjFTPTx (ORCPT
+        with ESMTP id S233288AbjFTPTp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Jun 2023 11:19:53 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A105A12C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 08:19:49 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4f86fbe5e4fso3311653e87.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 08:19:49 -0700 (PDT)
+        Tue, 20 Jun 2023 11:19:45 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262021B6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 08:19:43 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3f918922954so24965405e9.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 08:19:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687274385; x=1689866385;
+        d=linaro.org; s=google; t=1687274381; x=1689866381;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=p40Myde1fQD0UIg2pdHi3GBfZvAX9ZMU2rMN96RSnz4=;
-        b=VSRrMFVzm/tx2+tgs2b4f0TfMWuYR3WoPN5QYWDSkc57hO4M2TqfzIGSC6Fh3KDw+9
-         FLmbhgaqQYm2JPlLDFDyHfL1zdyTnKPECn/fwVAD3NMIRlMEDxJo63B7Mmjr0gylLqAk
-         BAz5rMcZ7xImS8HPaEYZcrMahkzysVugY8M2gCT+97DChTgK3p1a/W8XB/zaApuqgsxO
-         7k3BYpIr7G8G0Po7c7E2laloyjTo8cootFClULrM7V3rW6gT1M9x8WTbei8n5BsuQvgu
-         msuz731EToSmMI4M/g1uq8u5B5TV0iv5TRX2FaVMD20Zd69nY2BEWQ4WzGs0reCuDOvg
-         grWg==
+        bh=mE4VjD0UC/mx9MRHv74c8SBo0/G+ZgbMYrMysjMI6p8=;
+        b=dsRL0Gl6wDrfvoArQOSHh5Z9+zmsc9G5ziM1u/jWhxXx4LercvnLS1OMzbXJ7tZTl2
+         YGdInhbNIqAakFoV2Wyh9jA+ZLn4w1LVoLsxX1cHsYyF1+RwG6RCyJQiL/xeg0w+pnzZ
+         Zgpy5FB3nDWeM7VyHEoZIhL6v4yoWs2dYW1V9arSBLxRowxFNJycliC8KPFSnwIkL0qV
+         ZkurVRnBONB5j7l9e+vyU4xW0IHda022DJJhGoekG7MuFIbuLbfmnJg80e5uClCDq7n3
+         gBBi49C9p3SLPifUeNPD+5Mmk3z8Dz9UFaSbLsMGVSk2WgDo0Al0lRw1lH7qV2gRbJ9a
+         O3vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687274385; x=1689866385;
+        d=1e100.net; s=20221208; t=1687274381; x=1689866381;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p40Myde1fQD0UIg2pdHi3GBfZvAX9ZMU2rMN96RSnz4=;
-        b=hZ5YjFOV1ddASQj40YJGZoV7Lf4y7Mul1D5iC2j52pTNV6UoqLbALIqVKxSuSUOySo
-         xzSu+2WHGbDaXjpCoEMVy03A4o8+KxUHrtM2AGNvQr4saqz2Rf6fJBzL4XAz0QKbAsLt
-         N7emNiEw9VyP8flKtoL/bWWjV01lIjIAtiWOnKCZCPQ+K4bW6BuaMp4hHg2E6DPF3Y7R
-         2qcQQS2zdSm+voCEpMBs2u2NbipaNbEpMrf9EqNk1ynUni1TKID23HBmgvCT1QlLkLYO
-         rTaRJysFQekL1PwvAP2WDGLfY8yZjFfKQFb10LF2WOK850wm3b6Yh7ckWOe54SJuPN7g
-         JJOg==
-X-Gm-Message-State: AC+VfDxEQzXyjLGhJNxD9D11/5t3VS/vPV54/CoILQp+5XCGFzv18/7b
-        wcTiv6tV527TQVyYOxfSV5Ki4w==
-X-Google-Smtp-Source: ACHHUZ6RxrplvWpSP7VbXbCbvL7neIz92yh4McApWcsTpRoLERfQlJKoITO+aNX5plLeHzFdWqKEtg==
-X-Received: by 2002:a19:6702:0:b0:4f8:770d:6d7d with SMTP id b2-20020a196702000000b004f8770d6d7dmr2526971lfc.6.1687274385376;
-        Tue, 20 Jun 2023 08:19:45 -0700 (PDT)
+        bh=mE4VjD0UC/mx9MRHv74c8SBo0/G+ZgbMYrMysjMI6p8=;
+        b=TwPty1FmmkEQzrAxyaLKPTCa9arLTU9yMo6941IxdyvjgWIzsQEzuC6RWidtcamLK6
+         peggEsGi0L8sf1KtMLgHkV7AVCkyyg1GCovf8X7yAamX9luI2c1XMDgy6NTYhbg+0D3e
+         zexbDxaomL2QyRbsF0jDN7DXhfG040Z9DhONjZ22ySLw/cGEaBr0W2YUrg8KKNfjkqdW
+         ar0MgN6kbdHY5QjFKZbQl80hLQRjvw/6ZoNJP2VBVsCk2RLAwbvWWN7gjmrHYJz9XJDV
+         WCJrxvuLaX8kYy/7DOVCQ8+rtQ25jK91/DYYyhvcuRaFV7RzyeYSd70rzgEtIhvCQ2qi
+         LPlw==
+X-Gm-Message-State: AC+VfDw1tBYFhmkm4kThAHVn8bZ0FVQga9SKD8dcfbrLD/A9EKXcHbJV
+        bgH7hDLCeG3qgNR0d0FDWMlUxQ==
+X-Google-Smtp-Source: ACHHUZ7ifkwMcjR6VfzC1mw0iiDujkAUv87V6PC2X4oail3nVuNc2MbOp8lLC1VZEUI7cnHIQ1g2qg==
+X-Received: by 2002:a05:600c:2197:b0:3f9:b358:ac20 with SMTP id e23-20020a05600c219700b003f9b358ac20mr3458180wme.37.1687274381524;
+        Tue, 20 Jun 2023 08:19:41 -0700 (PDT)
 Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:8261:5fff:fe11:bdda])
-        by smtp.gmail.com with ESMTPSA id x23-20020a05600c21d700b003f427687ba7sm2518659wmj.41.2023.06.20.08.19.44
+        by smtp.gmail.com with ESMTPSA id x23-20020a05600c21d700b003f427687ba7sm2518659wmj.41.2023.06.20.08.19.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 08:19:45 -0700 (PDT)
+        Tue, 20 Jun 2023 08:19:41 -0700 (PDT)
 From:   Neil Armstrong <neil.armstrong@linaro.org>
-Date:   Tue, 20 Jun 2023 17:19:39 +0200
-Subject: [PATCH 4/4] arm64: dts: qcom: sm8550-qrd: add bluetooth support
+Date:   Tue, 20 Jun 2023 17:19:36 +0200
+Subject: [PATCH 1/4] dt-bindings: net: bluetooth: qualcomm: document
+ WCN7850 chipset
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230620-topic-sm8550-upstream-bt-v1-4-4728564f8872@linaro.org>
+Message-Id: <20230620-topic-sm8550-upstream-bt-v1-1-4728564f8872@linaro.org>
 References: <20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org>
 In-Reply-To: <20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org>
 To:     "David S. Miller" <davem@davemloft.net>,
@@ -80,108 +81,88 @@ Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-msm@vger.kernel.org,
         Neil Armstrong <neil.armstrong@linaro.org>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1926;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1812;
  i=neil.armstrong@linaro.org; h=from:subject:message-id;
- bh=iuWV9Gxv674pEfpCf7eMGZhLUcpDiyM3q/JmNOeS3JU=;
- b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkkcOKO49c819U+yoUkl35AaT8tcGr+8GX71phwray
- VPP+SsSJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJHDigAKCRB33NvayMhJ0bHuD/
- 40xu1H6nRY7N1Zg0Kd7N9u1eCPUqKqATg+pxuDEwcgP56uQ/znYyJZgny2ON/DAk+nKn4SKWJ+pXp8
- PZ/XH1Few0oNPvudL+WnFDfN2UiKqcAaMDNtrBCNNK1J5Ibg+Z9iUtfFCnS6M+HPXJk0hbFZLtVTPp
- 11toSYOuMJVTLmk7CF/Y1qKlLY14RR2I+g1CJWloAebyk8//BT6cIOjuOrkUAHq5JaSSqTFLfr9CNb
- NijJ/TGHqhkx+WZoNQTFMRsiaGUNwPmeLvXXT3/QHEVmHSePBXao5yA35xv1n9fLOLYNBaXfGp+tFT
- Ifdb75J/duHHRyni7OnNrfQbXSfePSwwHlY1LCPztqCjPHvkt/Spoe9+CC+eKEEIsWYBlBrzuwFmYe
- aJVNuDBpWJI30+qs0ltmryJNDOu6ENJ6vmyBgCBKHVvvjTkEbPcmgU+j9DAD0gb4aDN34blkH33MiW
- 0qPX4Muc7lXXqSiihb7w28sG4Ns9oylHzkLeMrlbTWJssKVny/kN0T5TjuSiT4QIrnwqlWEU4brhHf
- uT2p5xgCwUr6/Al4MChMI94NF9rYHAgh9FHs+qa3QV97zp3H4VY+SMFvfXqhlUz00vd3sp7mSJqMDs
- BpgvuZ1HO/L9OchmUWN/PdDN9KPl2MAaUqBH44Yn2KPijZEEZYyEyZ1SGpIQ==
+ bh=Ujrhm0ILfBHIvctx7fFmL5jlXiqXUTm9FgwTzkhv1BI=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkkcOJnzWD93WHMOLjrfltAL+pMgn9iPfdyOnvlyAh
+ OHWq12+JAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJHDiQAKCRB33NvayMhJ0bbrEA
+ CNtrxdcyViExvOj5EFssA7Mk8biKZ0olbgrUvwvYD4frXz2eVPtGSqzSmkgGq2AtuQRicpWwpdX4Cf
+ y4KyNIHXuyvSLHgNxeGrgjIkNnnrJ9ZLcLQ9RYnMOs2evtGx/8QrPnpHQvdds9qeDWIxELmNEffkjw
+ SWMCRy0H5DjsmW3fYw6Oiu3vrxSks1Nnawa+sRUkWV7DfNB7ITm4sEZUO+68LHAMCAQtrDCDo7CZAb
+ /91yVXdMQmu1HfjCJhUs/DAryHcGA/hlaHFQMY542WOzEk3mu1r2qlpb20/lhNuwTNoGj2435Y9eaz
+ mnpCg/HmlaaXzRuC+ez5lO8q39AUryhJ73PWL7y05sXepomNJRqqFQAgbJ6j/B2Mg9AXRuz23QDJIz
+ 6FbBeV6XzgxHPuZC/P+qkyaFn+LWMwUD17bEKQwfQRZS1KI6zgooQzsDDjrEgg9GWGZwSAvb/0CluM
+ XzQNXlfdHjUbcVZumUuPcT+ZeCT4VL+BGEgGRNwsJrJ/PaTc94+egGlU5gs9Of3LzyLcFluwKJnLz4
+ q1ZFKA7DemN4qJn01GuClW4EBXbWrzdwfugEYFPRyz1yfje0K8a0Z5BJWLWZuJGHyLWGKvmJlFAL6t
+ uxglrOn20EsipjUQlmoaANa5tYqXBPnn6lpSv/hGw0YzMrmEHJaOpGsxpa8w==
 X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
  fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Enable the WCN7850 bluetooth over the UART14 link.
+Document the WCN7850 Bluetooth chipset.
 
 Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 ---
- arch/arm64/boot/dts/qcom/sm8550-qrd.dts | 43 +++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 23 ++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8550-qrd.dts b/arch/arm64/boot/dts/qcom/sm8550-qrd.dts
-index ec4feee6837d..5191fdbe72cb 100644
---- a/arch/arm64/boot/dts/qcom/sm8550-qrd.dts
-+++ b/arch/arm64/boot/dts/qcom/sm8550-qrd.dts
-@@ -22,6 +22,7 @@ / {
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 28296b6d35b2..abc81d0a706e 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -25,6 +25,7 @@ properties:
+       - qcom,qca6390-bt
+       - qcom,wcn6750-bt
+       - qcom,wcn6855-bt
++      - qcom,wcn7850-bt
  
- 	aliases {
- 		serial0 = &uart7;
-+		serial1 = &uart14;
- 	};
+   enable-gpios:
+     maxItems: 1
+@@ -54,6 +55,9 @@ properties:
+   vddaon-supply:
+     description: VDD_AON supply regulator handle
  
- 	wcd938x: audio-codec {
-@@ -691,6 +692,10 @@ &qupv3_id_0 {
- 	status = "okay";
- };
++  vdddig-supply:
++    description: VDD_DIG supply regulator handle
++
+   vddbtcxmx-supply:
+     description: VDD_BT_CXMX supply regulator handle
  
-+&qupv3_id_1 {
-+	status = "okay";
-+};
-+
- &remoteproc_adsp {
- 	firmware-name = "qcom/sm8550/adsp.mbn",
- 			"qcom/sm8550/adsp_dtb.mbn";
-@@ -768,6 +773,21 @@ wcd_tx: codec@0,3 {
- &tlmm {
- 	gpio-reserved-ranges = <32 8>;
+@@ -69,6 +73,9 @@ properties:
+   vddrfa1p2-supply:
+     description: VDD_RFA_1P2 supply regulator handle
  
-+	bt_default: bt-default-state {
-+		bt-en-pins {
-+			pins = "gpio81";
-+			function = "gpio";
-+			drive-strength = <16>;
-+			bias-disable;
-+		};
++  vddrfa1p9-supply:
++    description: VDD_RFA_1P9 supply regulator handle
 +
-+		sw-ctrl-pins {
-+			pins = "gpio82";
-+			function = "gpio";
-+			bias-pull-down;
-+		};
-+	};
-+
- 	sde_dsi_active: sde-dsi-active-state {
- 		pins = "gpio133";
- 		function = "gpio";
-@@ -809,6 +829,29 @@ &uart7 {
- 	status = "okay";
- };
+   vddrfa2p2-supply:
+     description: VDD_RFA_2P2 supply regulator handle
  
-+&uart14 {
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "qcom,wcn7850-bt";
-+
-+		vddio-supply = <&vreg_l15b_1p8>;
-+		vddaon-supply = <&vreg_s4e_0p95>;
-+		vdddig-supply = <&vreg_s4e_0p95>;
-+		vddrfa0p8-supply = <&vreg_s4e_0p95>;
-+		vddrfa1p2-supply = <&vreg_s4g_1p25>;
-+		vddrfa1p9-supply = <&vreg_s6g_1p86>;
-+
-+		max-speed = <3200000>;
-+
-+		enable-gpios = <&tlmm 81 GPIO_ACTIVE_HIGH>;
-+		swctrl-gpios = <&tlmm 82 GPIO_ACTIVE_HIGH>;
-+
-+		pinctrl-0 = <&bt_default>;
-+		pinctrl-names = "default";
-+	};
-+};
-+
- &ufs_mem_hc {
- 	reset-gpios = <&tlmm 210 GPIO_ACTIVE_LOW>;
- 	vcc-supply = <&vreg_l17b_2p5>;
+@@ -152,6 +159,22 @@ allOf:
+         - vddrfa0p8-supply
+         - vddrfa1p2-supply
+         - vddrfa1p7-supply
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - qcom,wcn7850-bt
++    then:
++      required:
++        - enable-gpios
++        - swctrl-gpios
++        - vddio-supply
++        - vddaon-supply
++        - vdddig-supply
++        - vddrfa0p8-supply
++        - vddrfa1p2-supply
++        - vddrfa1p9-supply
+ 
+ examples:
+   - |
 
 -- 
 2.34.1
