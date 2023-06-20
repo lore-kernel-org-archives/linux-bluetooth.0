@@ -2,381 +2,130 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B55AEB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jun 2023 14:41:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2F93EB64DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jun 2023 15:20:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232292AbjFTOle (ORCPT
+        id S233214AbjFTPTo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Jun 2023 10:41:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48430 "EHLO
+        Tue, 20 Jun 2023 11:19:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231723AbjFTOla (ORCPT
+        with ESMTP id S232690AbjFTPTn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Jun 2023 10:41:30 -0400
-Received: from mail.kmu-office.ch (mail.kmu-office.ch [IPv6:2a02:418:6a02::a2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC5F170C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 07:41:25 -0700 (PDT)
-Received: from webmail.kmu-office.ch (unknown [IPv6:2a02:418:6a02::a3])
-        by mail.kmu-office.ch (Postfix) with ESMTPSA id 4CE485C9438;
-        Tue, 20 Jun 2023 16:41:17 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
-        t=1687272077;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FknwGDYCeGnib0E/LN1OlrgdrW2GyW68G+f9kApQ9dM=;
-        b=IJmIrWlR59qN1RaBfq09nUcnp+W7CF7jQSnoHhz6Z5lfef9scY+XDw9iiWDl8fpj8UHdun
-        JLarWupCasoIDBT98Li0GjO10aE7hXsWGaAFfNVz1u4Mmj5qxASeDB/q0MXWYNBTcQvABp
-        I4IDSAoIbP193X1NvGb+euXxooXz4/8=
+        Tue, 20 Jun 2023 11:19:43 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9AADD
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 08:19:41 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3f9b4bf99c2so15732665e9.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 08:19:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687274380; x=1689866380;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7D3/27sIAlZ3B7J/QryMAK6yu8lmX5V348NUxdNvxQQ=;
+        b=T3JN4eITlACkWl8gXWGi47T/9zkxomuMTzVr8hsCUJSp0mg47P1wmb6xdEJOukJ1j9
+         YYitI/FH95lauoEgU6VuAoj7EO7/MBOKHXbGXrXEKccBBHWraAK6gN3i/lwagjAfKAXo
+         qP7Th0tc10vrPT+dWXBYJYgFlw+8haaEVNJhQsIKH9P+5mnLsUtBwT4qL0IYcpQ52ocv
+         eUkWc6XBFLvuBi+LQWVZmbf7DXq/n1J9kCvfKQYVPxZGDwO9LBsp3ur3y85qvBwpLgld
+         rrEjAGiLk8ew/bkBmLoj9b5EoNZzwUzMaXfNesX+Ehlv4+obv81tg3fmshED56aww2b1
+         fCMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687274380; x=1689866380;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7D3/27sIAlZ3B7J/QryMAK6yu8lmX5V348NUxdNvxQQ=;
+        b=Cnlpcdk1S/NPnE8WFtMsme9v46JM/s8RHYjjRuiDoyYTlkym9cp4+Unpw2m3ad4Q6m
+         l1FzS0QiPjtwnwbMystemZD2ytxwUb2lwXsunGo3/khCcy0lcaEpSiwIsO+tNCsyjyZ/
+         85AvnQGwyqQDrF5R14+uSpja/WrXPCTyg7x9Gb12xG1HWBZfF7kV5Kg8pc8TR3JFCmSe
+         Z9NyyAfMQIBOVJK0K0h0vVwRqHvIPy4FUNcRQZlA33p1vkHe8CM/mF8oYCrrci/Gva7C
+         vVOMR8OUmph0KqII55uIdTxWL1as3o9NOGlU272+y58gh3hFPKtXmskoVlDRjo5ZcWXV
+         6B/g==
+X-Gm-Message-State: AC+VfDycmGcE5G4qf+O/4SdrRuCkUZe7Xunxxr/wojKprmvAuFV/OMOP
+        HHuMsaZY8WS4A7OooXV8S+tLfQ==
+X-Google-Smtp-Source: ACHHUZ7rzVXxsoPtiHUXBoCKkJ5rFe7DnWgsi2AceVr5PgOyDIOHpGfiwUasyknfuzjExhUA60aP6g==
+X-Received: by 2002:a05:600c:2650:b0:3f8:1f52:f3a9 with SMTP id 16-20020a05600c265000b003f81f52f3a9mr9007202wmy.23.1687274380277;
+        Tue, 20 Jun 2023 08:19:40 -0700 (PDT)
+Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:8261:5fff:fe11:bdda])
+        by smtp.gmail.com with ESMTPSA id x23-20020a05600c21d700b003f427687ba7sm2518659wmj.41.2023.06.20.08.19.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jun 2023 08:19:39 -0700 (PDT)
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Subject: [PATCH 0/4] bluetooth: qca: enable WCN7850 support
+Date:   Tue, 20 Jun 2023 17:19:35 +0200
+Message-Id: <20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org>
 MIME-Version: 1.0
-Date:   Tue, 20 Jun 2023 16:41:17 +0200
-From:   Stefan Agner <stefan@agner.ch>
-To:     Brian Gix <brian.gix@gmail.com>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Brian Gix <brian.gix@intel.com>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        Regressions <regressions@lists.linux.dev>,
-        =?UTF-8?Q?Jan_=C4=8Cerm?= =?UTF-8?Q?=C3=A1k?= <sairon@sairon.cz>
-Subject: Re: [PATCH v4 2/4] Bluetooth: Rework le_scan_restart for hci_sync
-In-Reply-To: <CABUQxGxBdAFncJ6YVb7a9gnU-_YZDGFDmpHJTtm5K1tDGEGRDQ@mail.gmail.com>
-References: <20220727135834.294184-1-brian.gix@intel.com>
- <20220727135834.294184-3-brian.gix@intel.com>
- <578e6d7afd676129decafba846a933f5@agner.ch>
- <CABBYNZJGKfwTQM8WAdUGXueTPnFyus1a65UO5mg2g4PXVuCnpA@mail.gmail.com>
- <CABBYNZLgG+zTsk-6ceqzLXXyVRnN6p-m8sFq9Ss7mveD0f9BsQ@mail.gmail.com>
- <CABUQxGxBdAFncJ6YVb7a9gnU-_YZDGFDmpHJTtm5K1tDGEGRDQ@mail.gmail.com>
-Message-ID: <0de3f0d0d5eb6d83cfc8d90cbb2b1ba1@agner.ch>
-X-Sender: stefan@agner.ch
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIfDkWQC/x2NQQqDMBBFryKz7kCMprS9SukiiZM6oDHMxFIQ7
+ 97Q5fvw/jtASZgUHt0BQh9W3nKD/tJBnH1+E/LUGKyxg7lag3UrHFHXm3MG96JVyK8YKk4pjoN
+ x6R77EZoevBIG8TnO7SDvy9LGIpT4++89X+f5A2FYjpR/AAAA
+To:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1135;
+ i=neil.armstrong@linaro.org; h=from:subject:message-id;
+ bh=dAwRJxxbreKqEKaekZVrwh5wN7D21C7UA5pt8IQY/gQ=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkkcOJY+FgDQyIt7WU5ufoqKJkGhZXSpCTNxc6fDaK
+ ieUBekmJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJHDiQAKCRB33NvayMhJ0c6ND/
+ 91iUCwBa+20G/uH51adrYkI1+xCCln5H4zhRoVgupJmgZfD57fmhPQtRKbmZs1yF8gmUmvUFmobGWF
+ 7UaqZFfqsD02h/fo0/nUkDh9co+0LzUMJGNk8DZ2OzutTZYftxiT54Mb3BllHgMBmzzq2XbClC2EeC
+ bWZD3Ig1MEU8p2B+v3AHNQzm0nzaMI/fEOAn1o4DmehAraInI5hRh1UJXc2+Zv/2LbruJwiC9xxdVa
+ Cj93P54ixPC4839DkRXFe1l9U6S+jivbWvMxGdcYFMo9eu2L5vlYYZwGLd5d5/BYZPyng0NhMSVyA6
+ rktiBYZen9p7lJA1gIgZi06dVZUK8DTdSSyPDzNvcLxrWxL718JgmEsLEKh/MByQGjZy67t3tOwZNN
+ Gwlanl2O9fvKys9FsdO0qGy9sL5aPMqq+D6bpWYlx+sOTwncta3zVccsY8v9AnU/LKM/6auDxTiNou
+ kI+iP2AK/mjnqX3sI3U1iwy/wVCUxEn/25a5TbUVpgC2vVa7pRzZHh0YKZXnYwHNliJgTv9R28SX5O
+ 7HkZeAVoNAcbXFkQsmdNLO5gWqai5oPg/r+oLradIoJUnhxi9Wx0JuwmMNJ/yIafw+mipHTLt3v6JF
+ o2MUNX/dAxv9aUGnG3hUO+5Gy8fi++pT42CUTNPi6bydEQNBmX1a9o0ZnJOg==
+X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
+ fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2023-06-16 03:22, Brian Gix wrote:
+This serie enables WCN7850 on the Qualcomm SM8550 QRD
+reference platform.
 
-> On Thu, Jun 15, 2023 at 11:28 AM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote: 
-> 
->> +Brian Gix
->> 
->> On Thu, Jun 15, 2023 at 10:27 AM Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> 
->>> Hi Stefan,
->>> 
->>> On Thu, Jun 15, 2023 at 5:06 AM Stefan Agner <stefan@agner.ch> wrote:
->>>> 
->>>> Hi Brian, hi all,
->>>> 
->>>> We experienced quite some Bluetooth issues after moving from Linux 5.15
->>>> to 6.1 on Home Assistant OS, especially on Intel NUC type systems (which
->>>> is a popular choice in our community, so it might just be that). When
->>>> continuously scanning/listening for BLE packets, the packet flow
->>>> suddenly ends. Depending on which and how many devices (possibly also
->>>> other factors) within minutes or hours.
->>>> 
->>>> Jan (in cc) was able to bisect the issue, and was able to pinpoint the
->>>> problem to this change.
->>>> 
->>>> Meanwhile I was able to confirm, that reverting this single commit on
->>>> the latest 6.1.34 seems to resolve the issue.
->>>> 
->>>> I've reviewed the change and surrounding code, and one thing I've
->>>> noticed is that the if statement to set cp.filter_dup in
->>>> hci_le_set_ext_scan_enable_sync and hci_le_set_scan_enable_sync are
->>>> different. Not sure if that needs to be the way it is, but my outside
->>>> gut feeling says hci_le_set_ext_scan_enable_sync should use "if (val &&
->>>> hci_dev_test_flag(hdev, HCI_MESH))" as well.
->>>> 
->>>> However, that did not fix the problem (but maybe it is wrong
->>>> nonetheless?).
->>>> 
->>>> Anyone has an idea what could be the problem here?
->>> 
->>> Are there any logs of the problem? Does any HCI command fails or
->>> anything so that we can track down what could be wrong?
+The WCN7850 is close to the WCN6855 but uses different
+firmware names.
 
-No HCI command fails, there is also no issue reported in the kernel log.
-BlueZ just stops receiving BLE packets, at least from certain devices.
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+Neil Armstrong (4):
+      dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
+      bluetooth: qca: add support for WCN7850
+      arm64: dts: qcom: sm8550: add UART14 nodes
+      arm64: dts: qcom: sm8550-qrd: add bluetooth support
 
->> 
->> @Brian Gix perhaps you have a better idea what is going wrong here?
-> 
-> It seems unlikely that this is Mesh related. Mesh does need for filtering to
-> be FALSE, and Mesh does not use extended scanning in any case. 
-> 
-> But this was part of the final rewrite to retire the hci_req mechanism in
-> favor of the hci_sync mechanism. So my best guess off the top of my head is
-> that there was an unintended race condition that worked better than the
-> synchronous single-threading mechanism?  Filtering (or not) should not
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 23 +++++++++++
+ arch/arm64/boot/dts/qcom/sm8550-qrd.dts            | 43 +++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi               | 30 ++++++++++++++
+ drivers/bluetooth/btqca.c                          |  7 ++++
+ drivers/bluetooth/btqca.h                          | 10 +++++
+ drivers/bluetooth/hci_qca.c                        | 48 +++++++++++++++++-----
+ 6 files changed, 150 insertions(+), 11 deletions(-)
+---
+base-commit: 9dbf40840551df336c95ce2a3adbdd25ed53c0ef
+change-id: 20230620-topic-sm8550-upstream-bt-dfc4305f9c14
 
-After review the code I concluded the same. What is a bit surprising to
-me is that it is so well reproducible. I guess it is nicer to have a
-reproducible one than a hard to reproduce one :)
+Best regards,
+-- 
+Neil Armstrong <neil.armstrong@linaro.org>
 
-> prevent advertising packets from permanently wedging.  Does anyone have an
-> HCI flow log with and without the offending patch?  Ideally they should be
-> identical...  If they are not then I obviously did something wrong. As this
-> was not specifically Mesh related, I may have missed some non-mesh corner
-> cases.
-
-
-I've taken two btmon captures, I created them using:
-btmon -i hci0 -w /config/hcidump-hci-req-working.log
-
-You can find them at:
-https://os-builds.home-assistant.io/hcidump-hci-req-working.log
-https://os-builds.home-assistant.io/hcidump-hci-sync-non-working.log
-
-This is while running our user space software (Home Assistant with
-Bluetooth integration). Besides some BLE devices (e.g. Xioami Mi
-Temperature & Humidity sensor) I have a ESP32 running which sends SPAM
-advertisements every 100ms (this accelerates the issue). In the
-non-working case you'll see that the system doesn't receive any SPAM
-advertisements after around 27 seconds. The working log shows that it
-continuously receives the same packets (capture 120s).
-
-Hope this helps.
-
---
-Stefan
-
-
-
-> 
->>>> --
->>>> Stefan
->>>> 
->>>> On 2022-07-27 15:58, Brian Gix wrote:
->>>>> le_scan_restart delayed work queue was running as a deprecated
->>>>> hci_request instead of on the newer thread-safe hci_sync mechanism.
->>>>>
->>>>> Signed-off-by: Brian Gix <brian.gix@intel.com>
->>>>> ---
->>>>>  net/bluetooth/hci_request.c | 89 -------------------------------------
->>>>>  net/bluetooth/hci_sync.c    | 75 +++++++++++++++++++++++++++++++
->>>>>  2 files changed, 75 insertions(+), 89 deletions(-)
->>>>>
->>>>> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
->>>>> index 32fefaa0d3ca..114af7350363 100644
->>>>> --- a/net/bluetooth/hci_request.c
->>>>> +++ b/net/bluetooth/hci_request.c
->>>>> @@ -1975,92 +1975,6 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
->>>>>       return 0;
->>>>>  }
->>>>>
->>>>> -static int le_scan_restart(struct hci_request *req, unsigned long opt)
->>>>> -{
->>>>> -     struct hci_dev *hdev = req->hdev;
->>>>> -
->>>>> -     /* If controller is not scanning we are done. */
->>>>> -     if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
->>>>> -             return 0;
->>>>> -
->>>>> -     if (hdev->scanning_paused) {
->>>>> -             bt_dev_dbg(hdev, "Scanning is paused for suspend");
->>>>> -             return 0;
->>>>> -     }
->>>>> -
->>>>> -     hci_req_add_le_scan_disable(req, false);
->>>>> -
->>>>> -     if (use_ext_scan(hdev)) {
->>>>> -             struct hci_cp_le_set_ext_scan_enable ext_enable_cp;
->>>>> -
->>>>> -             memset(&ext_enable_cp, 0, sizeof(ext_enable_cp));
->>>>> -             ext_enable_cp.enable = LE_SCAN_ENABLE;
->>>>> -             ext_enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
->>>>> -
->>>>> -             hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_ENABLE,
->>>>> -                         sizeof(ext_enable_cp), &ext_enable_cp);
->>>>> -     } else {
->>>>> -             struct hci_cp_le_set_scan_enable cp;
->>>>> -
->>>>> -             memset(&cp, 0, sizeof(cp));
->>>>> -             cp.enable = LE_SCAN_ENABLE;
->>>>> -             cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
->>>>> -             hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
->>>>> -     }
->>>>> -
->>>>> -     return 0;
->>>>> -}
->>>>> -
->>>>> -static void le_scan_restart_work(struct work_struct *work)
->>>>> -{
->>>>> -     struct hci_dev *hdev = container_of(work, struct hci_dev,
->>>>> -                                         le_scan_restart.work);
->>>>> -     unsigned long timeout, duration, scan_start, now;
->>>>> -     u8 status;
->>>>> -
->>>>> -     bt_dev_dbg(hdev, "");
->>>>> -
->>>>> -     hci_req_sync(hdev, le_scan_restart, 0, HCI_CMD_TIMEOUT, &status);
->>>>> -     if (status) {
->>>>> -             bt_dev_err(hdev, "failed to restart LE scan: status %d",
->>>>> -                        status);
->>>>> -             return;
->>>>> -     }
->>>>> -
->>>>> -     hci_dev_lock(hdev);
->>>>> -
->>>>> -     if (!test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) ||
->>>>> -         !hdev->discovery.scan_start)
->>>>> -             goto unlock;
->>>>> -
->>>>> -     /* When the scan was started, hdev->le_scan_disable has been queued
->>>>> -      * after duration from scan_start. During scan restart this job
->>>>> -      * has been canceled, and we need to queue it again after proper
->>>>> -      * timeout, to make sure that scan does not run indefinitely.
->>>>> -      */
->>>>> -     duration = hdev->discovery.scan_duration;
->>>>> -     scan_start = hdev->discovery.scan_start;
->>>>> -     now = jiffies;
->>>>> -     if (now - scan_start <= duration) {
->>>>> -             int elapsed;
->>>>> -
->>>>> -             if (now >= scan_start)
->>>>> -                     elapsed = now - scan_start;
->>>>> -             else
->>>>> -                     elapsed = ULONG_MAX - scan_start + now;
->>>>> -
->>>>> -             timeout = duration - elapsed;
->>>>> -     } else {
->>>>> -             timeout = 0;
->>>>> -     }
->>>>> -
->>>>> -     queue_delayed_work(hdev->req_workqueue,
->>>>> -                        &hdev->le_scan_disable, timeout);
->>>>> -
->>>>> -unlock:
->>>>> -     hci_dev_unlock(hdev);
->>>>> -}
->>>>> -
->>>>>  bool hci_req_stop_discovery(struct hci_request *req)
->>>>>  {
->>>>>       struct hci_dev *hdev = req->hdev;
->>>>> @@ -2158,7 +2072,6 @@ int hci_req_configure_datapath(struct hci_dev
->>>>> *hdev, struct bt_codec *codec)
->>>>>
->>>>>  void hci_request_setup(struct hci_dev *hdev)
->>>>>  {
->>>>> -     INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
->>>>>       INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
->>>>>       INIT_DELAYED_WORK(&hdev->interleave_scan, interleave_scan_work);
->>>>>  }
->>>>> @@ -2167,8 +2080,6 @@ void hci_request_cancel_all(struct hci_dev *hdev)
->>>>>  {
->>>>>       __hci_cmd_sync_cancel(hdev, ENODEV);
->>>>>
->>>>> -     cancel_delayed_work_sync(&hdev->le_scan_restart);
->>>>> -
->>>>>       if (hdev->adv_instance_timeout) {
->>>>>               cancel_delayed_work_sync(&hdev->adv_instance_expire);
->>>>>               hdev->adv_instance_timeout = 0;
->>>>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
->>>>> index 7dae2ee1bb82..19d57ec0feb8 100644
->>>>> --- a/net/bluetooth/hci_sync.c
->>>>> +++ b/net/bluetooth/hci_sync.c
->>>>> @@ -392,6 +392,79 @@ static void le_scan_disable(struct work_struct *work)
->>>>>       hci_dev_unlock(hdev);
->>>>>  }
->>>>>
->>>>> +static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
->>>>> +                                    u8 filter_dup);
->>>>> +static int hci_le_scan_restart_sync(struct hci_dev *hdev)
->>>>> +{
->>>>> +     /* If controller is not scanning we are done. */
->>>>> +     if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
->>>>> +             return 0;
->>>>> +
->>>>> +     if (hdev->scanning_paused) {
->>>>> +             bt_dev_dbg(hdev, "Scanning is paused for suspend");
->>>>> +             return 0;
->>>>> +     }
->>>>> +
->>>>> +     hci_le_set_scan_enable_sync(hdev, LE_SCAN_DISABLE, 0x00);
->>>>> +     return hci_le_set_scan_enable_sync(hdev, LE_SCAN_ENABLE,
->>>>> +                                        LE_SCAN_FILTER_DUP_ENABLE);
->>>>> +}
->>>>> +
->>>>> +static int le_scan_restart_sync(struct hci_dev *hdev, void *data)
->>>>> +{
->>>>> +     return hci_le_scan_restart_sync(hdev);
->>>>> +}
->>>>> +
->>>>> +static void le_scan_restart(struct work_struct *work)
->>>>> +{
->>>>> +     struct hci_dev *hdev = container_of(work, struct hci_dev,
->>>>> +                                         le_scan_restart.work);
->>>>> +     unsigned long timeout, duration, scan_start, now;
->>>>> +     int status;
->>>>> +
->>>>> +     bt_dev_dbg(hdev, "");
->>>>> +
->>>>> +     hci_dev_lock(hdev);
->>>>> +
->>>>> +     status = hci_cmd_sync_queue(hdev, le_scan_restart_sync, NULL, NULL);
->>>>> +     if (status) {
->>>>> +             bt_dev_err(hdev, "failed to restart LE scan: status %d",
->>>>> +                        status);
->>>>> +             goto unlock;
->>>>> +     }
->>>>> +
->>>>> +     if (!test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) ||
->>>>> +         !hdev->discovery.scan_start)
->>>>> +             goto unlock;
->>>>> +
->>>>> +     /* When the scan was started, hdev->le_scan_disable has been queued
->>>>> +      * after duration from scan_start. During scan restart this job
->>>>> +      * has been canceled, and we need to queue it again after proper
->>>>> +      * timeout, to make sure that scan does not run indefinitely.
->>>>> +      */
->>>>> +     duration = hdev->discovery.scan_duration;
->>>>> +     scan_start = hdev->discovery.scan_start;
->>>>> +     now = jiffies;
->>>>> +     if (now - scan_start <= duration) {
->>>>> +             int elapsed;
->>>>> +
->>>>> +             if (now >= scan_start)
->>>>> +                     elapsed = now - scan_start;
->>>>> +             else
->>>>> +                     elapsed = ULONG_MAX - scan_start + now;
->>>>> +
->>>>> +             timeout = duration - elapsed;
->>>>> +     } else {
->>>>> +             timeout = 0;
->>>>> +     }
->>>>> +
->>>>> +     queue_delayed_work(hdev->req_workqueue,
->>>>> +                        &hdev->le_scan_disable, timeout);
->>>>> +
->>>>> +unlock:
->>>>> +     hci_dev_unlock(hdev);
->>>>> +}
->>>>> +
->>>>>  void hci_cmd_sync_init(struct hci_dev *hdev)
->>>>>  {
->>>>>       INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
->>>>> @@ -400,6 +473,7 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
->>>>>
->>>>>       INIT_WORK(&hdev->cmd_sync_cancel_work, hci_cmd_sync_cancel_work);
->>>>>       INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable);
->>>>> +     INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart);
->>>>>  }
->>>>>
->>>>>  void hci_cmd_sync_clear(struct hci_dev *hdev)
->>>>> @@ -4488,6 +4562,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->>>>>       cancel_delayed_work(&hdev->power_off);
->>>>>       cancel_delayed_work(&hdev->ncmd_timer);
->>>>>       cancel_delayed_work(&hdev->le_scan_disable);
->>>>> +     cancel_delayed_work(&hdev->le_scan_restart);
->>>>>
->>>>>       hci_request_cancel_all(hdev);
->>> 
->>> 
->>> 
->>> --
->>> Luiz Augusto von Dentz
->> 
->> -- 
->> Luiz Augusto von Dentz
