@@ -2,98 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0119EB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 06:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB06FEB64D8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 06:39:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbjFUGJ6 (ORCPT
+        id S230328AbjFUGj6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jun 2023 02:09:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51530 "EHLO
+        Wed, 21 Jun 2023 02:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbjFUGJ4 (ORCPT
+        with ESMTP id S230493AbjFUGjW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jun 2023 02:09:56 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DEE1730
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 23:09:54 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-9883123260fso446617866b.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 23:09:54 -0700 (PDT)
+        Wed, 21 Jun 2023 02:39:22 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D023A1BD4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 23:39:18 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-7624012c0b4so422049385a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jun 2023 23:39:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687327793; x=1689919793;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5KQyTonkUooBZsCr5w5RfeTc4RupKUs9CBjpkXfe2Zk=;
-        b=ZO7zbGSnjCubhNA1aJxOIocol/slpspgaFBAu8h+g0kOo+kkW1gC1geXWAhvpJdqgP
-         fIm7mM239zNKuVAAab7maoqlMR82pr3JLqsCBNEg37JsM6oOwB5XDBZqLDHPVn/rHVSu
-         U7zOz2IzamWLBM7jeuDa5YYnjcnccPnMkETFmO/pXVqAxYp/IIVKCJWj9FuRfJKqtgkR
-         Z760a/ZsctTmvN7IJHN/rOklNWIghh18ThTV2frxr4YtUMWv9w/l0vStw0znN7UG57H2
-         pIlUaYrlvco4xsp2Gw40UOS9xJxeDGMCfDYJjGJZsPkj4d5/PLK9AOslTCV0kZkUG40G
-         T4yQ==
+        d=gmail.com; s=20221208; t=1687329557; x=1689921557;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=skv+QG+wrU9sDOR6lOPjERpY+4XmpyF7JV+hVLdORdY=;
+        b=RnY01ItofJzoBouXuG9cy9rIaD0HPoobiXqvM7JXxkaFnWwEed4GPNV+LkPpa4XNwp
+         zTFkJXZSPPvGHwtaC0xdlZnRL2Lao+JLlWbp8UHwbsP0a/tH72o7mzQDL4tYP9hFggWs
+         RtlIzC7dyoCS5VQAAIWiE4Mx6SbPA2+bZDUvYX7q1PfVQIvGLV6PqxBMc7CjpQO4U8z1
+         oaBZEHn9zizOFNwMrcNH/afPbg5H9cPlK/Bm6Q7se1/V1BM3jTRL2lXJWgK3nB+kCQLi
+         o+CuRxCg9LhxJW0zrDPDfc/diRyU2OWqht5z+PzCDkajKtd6ZPu8HICw+6Q15kTRvKF3
+         Tb3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687327793; x=1689919793;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1687329557; x=1689921557;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5KQyTonkUooBZsCr5w5RfeTc4RupKUs9CBjpkXfe2Zk=;
-        b=EaeT2EJ2wPMrGmZ2078ky7eCmGTDoRW8yY+Iu5aHJxVDiFVf1OVIEzrkIB8yWujNMf
-         vP04AfcpJtPCLsUbILDb5tcbf/hf6Gn742eyiCWqX7imO9uqhME+kJvPCLYhkpjJJOg1
-         dJUyjoM3wtKaSx5PftN5jFa0J9DlUr2NJ2PY4i9HkhnIH8FJOnupyYP37VtzfEaI/WBf
-         xQAZKMqFyjZJG3aeJVZpHOrYGpdLUEdhvKLD1NfxO8yQezXrQz6x1PWiXzb624rrb0xg
-         CmO+mUaMsb5FXSKeRLQgt4zTx8PN08MHyqYt9nd5Gm6vIfkq1/sVAjZmPw0JAzolNs3v
-         5/Tg==
-X-Gm-Message-State: AC+VfDyN2brFlVogsvCEBexRvUKdbEjbq/xwrbXz7S9358w7FZ3QHWcJ
-        HgqoG/vBObRjNC4X+NB0d95s/A==
-X-Google-Smtp-Source: ACHHUZ73bgT3/h24wRR46mzrJ4jW1YcuFSwCdWXXjZ+Pi4NbX0uCX3RQQ5dOf848Fn01ctCLdRnUog==
-X-Received: by 2002:a17:906:974f:b0:989:21e4:6c6e with SMTP id o15-20020a170906974f00b0098921e46c6emr3288108ejy.53.1687327793394;
-        Tue, 20 Jun 2023 23:09:53 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id i10-20020a170906698a00b00988dbbd1f7esm2509815ejr.213.2023.06.20.23.09.51
+        bh=skv+QG+wrU9sDOR6lOPjERpY+4XmpyF7JV+hVLdORdY=;
+        b=SIKW+cR+vpccb0yOaen/pdEhjFejkwI81rh9t9qPx2waIlhjdzp6wOa3UaCXL4YJOx
+         0UKstQppZAj5roB7TDO4+fZdkq7+ba3ygO97YIT2fe8oR/WUilv8wfd9UPoh46j1BTDb
+         MP0DIjktNGplDi5X2zH03502h0pB0fZtYJpL9REjw0oMV/rih1mUxtBARdg6ytw4Q7nO
+         TAz5rZ2g50vBF3cV52Pawyq0xSdgPFV1VU+T8MN0znzq8pF7lGFmEKeckiQT6E3tfi4p
+         HL2YWTttkryaYd+hvLgp/7AJTt8gLBndYV3MWdT0wgb6bmqGLe912J+mMX0DW5NfW709
+         XBTA==
+X-Gm-Message-State: AC+VfDxZ3icMD4fIG5fekXUFJ4e0LFxYeu45JT6fKuq2I86KpJK5Zz/U
+        0LzG3l4sRmpmnZmUCbAhQF0nfli2heA=
+X-Google-Smtp-Source: ACHHUZ5E6KBwQ0WOvw6q5y/SwMZ0To6Iia6bNZLJCPBAH1/IxwGY9L1wt+I2HdSLSxkIhDRnplUbzw==
+X-Received: by 2002:a05:620a:8e17:b0:762:55b8:cf89 with SMTP id re23-20020a05620a8e1700b0076255b8cf89mr8292729qkn.21.1687329557553;
+        Tue, 20 Jun 2023 23:39:17 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.10.19])
+        by smtp.gmail.com with ESMTPSA id v22-20020ae9e316000000b0075f2c1afb65sm1945846qkf.45.2023.06.20.23.39.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 23:09:52 -0700 (PDT)
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth drivers
-Date:   Wed, 21 Jun 2023 08:09:49 +0200
-Message-Id: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.34.1
+        Tue, 20 Jun 2023 23:39:17 -0700 (PDT)
+Message-ID: <64929b15.e90a0220.98d29.6023@mx.google.com>
+Date:   Tue, 20 Jun 2023 23:39:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4427445355570995489=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, krzysztof.kozlowski@linaro.org
+Subject: RE: Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth drivers
+In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Devicetree bindings should be picked up by subsystem maintainers,
-but respective pattern for Bluetooth drivers was missing.
+--===============4427445355570995489==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=758931
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.75 seconds
+GitLint                       PASS      0.40 seconds
+SubjectPrefix                 PASS      0.14 seconds
+BuildKernel                   PASS      39.08 seconds
+CheckAllWarning               PASS      42.42 seconds
+CheckSparse                   PASS      48.03 seconds
+CheckSmatch                   PASS      131.28 seconds
+BuildKernel32                 PASS      37.56 seconds
+TestRunnerSetup               PASS      538.53 seconds
+TestRunner_l2cap-tester       PASS      20.04 seconds
+TestRunner_iso-tester         PASS      29.23 seconds
+TestRunner_bnep-tester        PASS      6.95 seconds
+TestRunner_mgmt-tester        PASS      150.96 seconds
+TestRunner_rfcomm-tester      PASS      10.97 seconds
+TestRunner_sco-tester         PASS      9.97 seconds
+TestRunner_ioctl-tester       PASS      11.87 seconds
+TestRunner_mesh-tester        PASS      8.65 seconds
+TestRunner_smp-tester         PASS      10.05 seconds
+TestRunner_userchan-tester    PASS      7.35 seconds
+IncrementalBuild              PASS      35.48 seconds
+
+
+
 ---
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ea9d87f39345..3d5e378b3f13 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3637,6 +3637,7 @@ S:	Supported
- W:	http://www.bluez.org/
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-+F:	Documentation/devicetree/bindings/net/bluetooth/
- F:	drivers/bluetooth/
- 
- BLUETOOTH SUBSYSTEM
--- 
-2.34.1
 
+--===============4427445355570995489==--
