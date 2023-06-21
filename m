@@ -2,221 +2,191 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D1A3EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 21:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E251EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 21:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbjFUVMf (ORCPT
+        id S229809AbjFUVdj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jun 2023 17:12:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41844 "EHLO
+        Wed, 21 Jun 2023 17:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbjFUVMe (ORCPT
+        with ESMTP id S229530AbjFUVdi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jun 2023 17:12:34 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 167DA173F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:12:33 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b470330145so65944601fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:12:32 -0700 (PDT)
+        Wed, 21 Jun 2023 17:33:38 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 625E41B4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:33:37 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-666ed230c81so4467127b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687381951; x=1689973951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WlMcBZaHWpUuMcXRCbMJQDLR75NLdjYhdOlBeKzZGqQ=;
-        b=pPe+zRXMKd0evvSMM6JtVAN9wlNcTeycEFw4FGtr22fDq6kiGgBTXUUuqnhhXntyQN
-         rwD23M+AnUxM8HkHh/sERPD1bBVtKnCLq9+z6L3LkoTDT9Q7dLRvBs/5ZAWZEq4+aVPe
-         E0AzRqUFEYGiVymycrO+PopUk4ifZB0bAh+9fhi7wNy/lKORfUvqOjcfHy6mpFrdL0Fs
-         9s8HXOI6WLySFINn2A5n8uWP8yvSuMvWp6oYEmpJThmjx4O/AgNAQ1rN5RRIwYY3FMOz
-         L0xcRYqNEEYNEO6gE7CvbKk+bg/GAHY2ybMaZ9e4uJoQOSCBBens5Ecr8J72CSRH/cE9
-         M/TQ==
+        d=gmail.com; s=20221208; t=1687383217; x=1689975217;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zIU3mnWjZNHSiRqWaJpCKXMHEEMTAcXzLi/MlaQD+jM=;
+        b=ST/Y70q+xn6VCt0+mAtOJkDRpWnVSjP0v4tSpKYC5vWemM9pXIwRBIKxK1y4JBAacu
+         a0lnxtK522AaiAh9KWNMcMkvhAghZVX+EPmQQhwbE/hQml1Jn6/pPGLnJZnHw6oWfMU+
+         e1+N/dmmadWaMEVnObjhb5ytTBFnbtsAgfYdg+aYVnN3CRzKyDLdH/wDDgfPrMnZUlnt
+         Gom4sSp7lr4YkNpPU1uH/tWkgVkgAcvp4EZADtO/PG8JdJM3hf5ABTHFTtZOw73/t3t0
+         DgdtubRpQVUb5NoYsxXuv7ACvFGm2ov2j2ZZlKLE803VpO6SNXIEmgInf7IUeMnMsEQE
+         GdEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687381951; x=1689973951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WlMcBZaHWpUuMcXRCbMJQDLR75NLdjYhdOlBeKzZGqQ=;
-        b=duowNa7ivlsiPrIa/MlOE2VAVr3WHyVSsnoSgSm3CUmFKVx8U/20acRB831sc6hRmq
-         MSrMNqZKDs/xpNkbgAo6wTPMsgBsFYbRHwnAHu7Jami5FQOZihN1tRpi5UdJHJ53hZeB
-         GbIyGlhUa8PPL4tS0JbfKv5CXgaz6J865b0KhLC6N1FesSPhGp03TuLzVLPq2E9CyPB+
-         SCU4arAQasv4Wyh/wdg+fAF6M68aIRMqGSolb21qKK128L0sjewBWfiWRw3N7jTMBVnx
-         Fl821vwoFWicet4OES0+rZRcFxpKSZmeeSj4Td5EDzulEUUtYqn4p38f18oCXArxwWAg
-         Dn5Q==
-X-Gm-Message-State: AC+VfDxDEPg5jsdsWW97/GkXBMXDCO7657gvAUoKIFbQ9sJt9Cn7RQZB
-        sA4ee9N7SLsxPLO+kEUHdjuO38alolEgfqteVZSzYNLXyNnQIw==
-X-Google-Smtp-Source: ACHHUZ6nWHR6+T2ADBhBuidQM07icT4brq9/YFLdSiR2ZzWiUGLazdF6CuMIF6mVYd0hXK0JISJRH2mUO4lOyZ8Rmj0=
-X-Received: by 2002:a2e:b0d4:0:b0:2b5:7b58:b9d0 with SMTP id
- g20-20020a2eb0d4000000b002b57b58b9d0mr3956100ljl.8.1687381950996; Wed, 21 Jun
- 2023 14:12:30 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687383217; x=1689975217;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zIU3mnWjZNHSiRqWaJpCKXMHEEMTAcXzLi/MlaQD+jM=;
+        b=AhAlSa5GFEYBS+wDBjeV5bHhcDr1T5oFD5A/d+tBo0qRhJha8e4bADfRL8Mj3Z0wKT
+         l5yXff7CSfDYL6qn/TpoQsp5J+RZIKCRGXgLBPWUXl+RSRoEf7lbOXszcBAzmi18dswg
+         sI6RDZmcOt84hpeYyvILAuoxuIa9LJ5P6iq1ASRivnMXukALAe9Hcijnf1ON5VLq7VuC
+         974k/PQQyzGhE/iGNlAonksxAPYK67tLlnxUOxuNepXxwf0BQcmYy52f5N04ArKIaTLG
+         2tB5l6ksFLo9NSiMiVlpgDCGjETqSH+yC4EG2cRXUnrptsKAtaUe1+4xB7K+8dZcQgCt
+         IbXQ==
+X-Gm-Message-State: AC+VfDwHo9zal1nWmgRmt0KJq+ZfIy4fhNcxnigfkyHLYEhXLctTpEWU
+        kqXs2PHYk+/vTL9fKzkAKiEMACQLm+M=
+X-Google-Smtp-Source: ACHHUZ5jHL55EMHBPx4NyaU++ZKlm6Iy5Igp1HpTmp66Ar1OLqbqFsaWvBrwvS09LA5GiJWvAUakDA==
+X-Received: by 2002:a05:6a00:1a0f:b0:668:82fe:16f1 with SMTP id g15-20020a056a001a0f00b0066882fe16f1mr9905210pfv.1.1687383216687;
+        Wed, 21 Jun 2023 14:33:36 -0700 (PDT)
+Received: from [172.17.0.2] ([13.83.3.172])
+        by smtp.gmail.com with ESMTPSA id 4-20020aa79104000000b0066a31111ccdsm2077418pfh.65.2023.06.21.14.33.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 14:33:36 -0700 (PDT)
+Message-ID: <64936cb0.a70a0220.1f04c.5fb3@mx.google.com>
+Date:   Wed, 21 Jun 2023 14:33:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3554534279436419783=="
 MIME-Version: 1.0
-References: <20230621195407.977001-1-luiz.dentz@gmail.com> <66add9bf780aca773d41cce3ea42589388de2543.camel@iki.fi>
-In-Reply-To: <66add9bf780aca773d41cce3ea42589388de2543.camel@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 21 Jun 2023 14:12:18 -0700
-Message-ID: <CABBYNZ+nGaeGmiAdneF7UEwG0Q8D6Bi1mnGOY66HcM5JwE1hiw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_event: Fix parsing of CIS Established Event
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3] Bluetooth: hci_event: Fix parsing of CIS Established Event
+In-Reply-To: <20230621205230.1006939-1-luiz.dentz@gmail.com>
+References: <20230621205230.1006939-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============3554534279436419783==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 21, 2023 at 1:33=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Hi Luiz,
->
-> ke, 2023-06-21 kello 12:54 -0700, Luiz Augusto von Dentz kirjoitti:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > The ISO Interval on CIS Established Event uses 1.25 ms slots:
-> >
-> >     BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-> >     page 2304:
-> >
-> >       Time =3D N * 1.25 ms
-> >
-> > In addition to that this always update the QoS settings based on CIS
-> > Established Event.
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  net/bluetooth/hci_event.c | 36 +++++++++++++++++++++++-------------
-> >  1 file changed, 23 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index b1aefe4bb751..6fca6d9f1b34 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -6822,6 +6822,7 @@ static void hci_le_cis_estabilished_evt(struct hc=
-i_dev *hdev, void *data,
-> >  {
-> >       struct hci_evt_le_cis_established *ev =3D data;
-> >       struct hci_conn *conn;
-> > +     struct bt_iso_qos *qos;
-> >       bool pending =3D false;
-> >       u16 handle =3D __le16_to_cpu(ev->handle);
-> >
-> > @@ -6846,21 +6847,30 @@ static void hci_le_cis_estabilished_evt(struct =
-hci_dev *hdev, void *data,
-> >
-> >       pending =3D test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags)=
-;
-> >
-> > -     if (conn->role =3D=3D HCI_ROLE_SLAVE) {
-> > -             __le32 interval;
-> > +     qos =3D &conn->iso_qos;
-> >
-> > -             memset(&interval, 0, sizeof(interval));
-> > +     /* Convert ISO Interval (1.25 ms slots) to latency (ms) */
-> > +     qos->ucast.in.latency =3D le16_to_cpu(ev->interval) * 125 / 100;
-> > +     /* Convert ISO Interval (1.25 ms slots) to latency (ms) */
-> > +     qos->ucast.out.latency =3D le16_to_cpu(ev->interval) * 125 / 100;
-> >
-> > -             memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
-> > -             conn->iso_qos.ucast.in.interval =3D le32_to_cpu(interval)=
-;
-> > -             memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
-> > -             conn->iso_qos.ucast.out.interval =3D le32_to_cpu(interval=
-);
-> > -             conn->iso_qos.ucast.in.latency =3D le16_to_cpu(ev->interv=
-al);
-> > -             conn->iso_qos.ucast.out.latency =3D le16_to_cpu(ev->inter=
-val);
-> > -             conn->iso_qos.ucast.in.sdu =3D le16_to_cpu(ev->c_mtu);
-> > -             conn->iso_qos.ucast.out.sdu =3D le16_to_cpu(ev->p_mtu);
-> > -             conn->iso_qos.ucast.in.phy =3D ev->c_phy;
-> > -             conn->iso_qos.ucast.out.phy =3D ev->p_phy;
-> > +     switch (conn->role) {
-> > +     case HCI_ROLE_SLAVE:
-> > +             qos->ucast.in.interval =3D get_unaligned_le24(ev->c_laten=
-cy);
-> > +             qos->ucast.out.interval =3D get_unaligned_le24(ev->p_late=
-ncy);
-> > +             qos->ucast.in.sdu =3D le16_to_cpu(ev->c_mtu);
-> > +             qos->ucast.out.sdu =3D le16_to_cpu(ev->p_mtu);
-> > +             qos->ucast.in.phy =3D ev->c_phy;
-> > +             qos->ucast.out.phy =3D ev->p_phy;
-> > +             break;
->
-> Are the ucast.latency and ucast.interval the right way around here?
->
-> When I trying to use this in userspace, I expected ucast.interval
-> contains the ISO interval, because in Set CIG Parameters we use
-> ucast.interval to specify the SDU_Interval, and ucast.latency is used
-> for the Transport_Latency_C_To_P and Transport_Latency_P_To_C.
->
-> With real numbers the event (AX210<->AX210) looks like this
->
-> > HCI Event: LE Meta Event (0x3e) plen 29               #3493 [hci0] 486.=
-978955
->       LE Connected Isochronous Stream Established (0x19)
->         Status: Success (0x00)
->         Connection Handle: 2560
->         CIG Synchronization Delay: 4020 us (0x000fb4)
->         CIS Synchronization Delay: 4020 us (0x000fb4)
->         Central to Peripheral Latency: 94020 us (0x016f44)
->         Peripheral to Central Latency: 94020 us (0x016f44)
+This is automated email and please do not reply to this email!
 
-No idea why these values look like this, they are not what I expect
-which is to match what the Central configured with Set CIG Parameters.
+Dear submitter,
 
->         Central to Peripheral PHY: LE 2M (0x02)
->         Peripheral to Central PHY: LE 2M (0x02)
->         Number of Subevents: 2
->         Central to Peripheral Burst Number: 1
->         Peripheral to Central Burst Number: 1
->         Central to Peripheral Flush Timeout: 10
->         Peripheral to Central Flush Timeout: 10
->         Central to Peripheral MTU: 240
->         Peripheral to Central MTU: 120
->         ISO Interval: 8
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=759272
 
-These seems to be fine, so I wonder what is going on with CIS
-Established event, this is what we are doing in the emulator:
+---Test result---
 
-        /* TODO: Figure out if these values makes sense */
-        memcpy(evt.cig_sync_delay, le_cig->params.c_interval,
-                sizeof(le_cig->params.c_interval));
-        memcpy(evt.cis_sync_delay, le_cig->params.p_interval,
-                sizeof(le_cig->params.p_interval));
-        memcpy(evt.c_latency, &le_cig->params.c_interval,
-                sizeof(le_cig->params.c_interval));
-        memcpy(evt.p_latency, &le_cig->params.p_interval,
-                sizeof(le_cig->params.p_interval));
-        evt.c_phy =3D le_cig->cis[cis_idx].c_phy;
-        evt.p_phy =3D le_cig->cis[cis_idx].p_phy;
-        evt.nse =3D 0x01;
-        evt.c_bn =3D 0x01;
-        evt.p_bn =3D 0x01;
-        evt.c_ft =3D 0x01;
-        evt.p_ft =3D 0x01;
-        evt.c_mtu =3D le_cig->cis[cis_idx].c_sdu;
-        evt.p_mtu =3D le_cig->cis[cis_idx].p_sdu;
-        evt.interval =3D (le_cig->params.c_latency + 1) / 1.25;
+Test Summary:
+CheckPatch                    PASS      0.57 seconds
+GitLint                       PASS      0.24 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      32.63 seconds
+CheckAllWarning               PASS      35.81 seconds
+CheckSparse                   WARNING   41.19 seconds
+CheckSmatch                   WARNING   110.78 seconds
+BuildKernel32                 PASS      31.94 seconds
+TestRunnerSetup               PASS      456.21 seconds
+TestRunner_l2cap-tester       PASS      17.69 seconds
+TestRunner_iso-tester         FAIL      32.80 seconds
+TestRunner_bnep-tester        PASS      5.89 seconds
+TestRunner_mgmt-tester        PASS      136.43 seconds
+TestRunner_rfcomm-tester      PASS      9.36 seconds
+TestRunner_sco-tester         PASS      8.65 seconds
+TestRunner_ioctl-tester       PASS      10.05 seconds
+TestRunner_mesh-tester        PASS      7.41 seconds
+TestRunner_smp-tester         PASS      8.56 seconds
+TestRunner_userchan-tester    PASS      6.15 seconds
+IncrementalBuild              PASS      29.84 seconds
 
->
-> > +     case HCI_ROLE_MASTER:
-> > +             qos->ucast.out.interval =3D get_unaligned_le24(ev->c_late=
-ncy);
-> > +             qos->ucast.in.interval =3D get_unaligned_le24(ev->p_laten=
-cy);
-> > +             qos->ucast.out.sdu =3D le16_to_cpu(ev->c_mtu);
-> > +             qos->ucast.in.sdu =3D le16_to_cpu(ev->p_mtu);
-> > +             qos->ucast.out.phy =3D ev->c_phy;
-> > +             qos->ucast.in.phy =3D ev->p_phy;
-> > +             break;
-> >       }
-> >
-> >       if (!ev->status) {
->
-> --
-> Pauli Virtanen
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 80, Passed: 17 (21.2%), Failed: 63, Not Run: 0
+
+Failed Test Cases
+ISO QoS 8_1_1 - Success                              Failed       1.134 seconds
+ISO QoS 8_2_1 - Success                              Failed       0.217 seconds
+ISO QoS 16_1_1 - Success                             Failed       0.216 seconds
+ISO QoS 16_2_1 - Success                             Failed       0.216 seconds
+ISO QoS 16_2_1 CIG 0x01 - Success                    Failed       0.217 seconds
+ISO QoS 16_2_1 CIG 0x01 CIS 0x01 - Success           Failed       0.215 seconds
+ISO QoS 24_1_1 - Success                             Failed       0.217 seconds
+ISO QoS 24_2_1 - Success                             Failed       0.214 seconds
+ISO QoS 32_1_1 - Success                             Failed       0.216 seconds
+ISO QoS 32_2_1 - Success                             Failed       0.213 seconds
+ISO QoS 44_1_1 - Success                             Failed       0.218 seconds
+ISO QoS 44_2_1 - Success                             Failed       0.218 seconds
+ISO QoS 48_1_1 - Success                             Failed       0.218 seconds
+ISO QoS 48_2_1 - Success                             Failed       0.217 seconds
+ISO QoS 48_3_1 - Success                             Failed       0.212 seconds
+ISO QoS 48_4_1 - Success                             Failed       0.215 seconds
+ISO QoS 48_5_1 - Success                             Failed       0.216 seconds
+ISO QoS 48_6_1 - Success                             Failed       0.217 seconds
+ISO QoS 8_1_2 - Success                              Failed       0.212 seconds
+ISO QoS 8_2_2 - Success                              Failed       0.212 seconds
+ISO QoS 16_1_2 - Success                             Failed       0.215 seconds
+ISO QoS 16_2_2 - Success                             Failed       0.213 seconds
+ISO QoS 24_1_2 - Success                             Failed       0.213 seconds
+ISO QoS 24_2_2 - Success                             Failed       0.210 seconds
+ISO QoS 32_1_2 - Success                             Failed       0.212 seconds
+ISO QoS 32_2_2 - Success                             Failed       0.214 seconds
+ISO QoS 44_1_2 - Success                             Failed       0.216 seconds
+ISO QoS 44_2_2 - Success                             Failed       0.220 seconds
+ISO QoS 48_1_2 - Success                             Failed       0.220 seconds
+ISO QoS 48_2_2 - Success                             Failed       0.215 seconds
+ISO QoS 48_3_2 - Success                             Failed       0.222 seconds
+ISO QoS 48_4_2 - Success                             Failed       0.220 seconds
+ISO QoS 48_5_2 - Success                             Failed       0.221 seconds
+ISO QoS 48_6_2 - Success                             Failed       0.220 seconds
+ISO Send - Success                                   Failed       0.216 seconds
+ISO Receive - Success                                Failed       0.206 seconds
+ISO Receive Timestamped - Success                    Failed       0.193 seconds
+ISO Defer Connect - Success                          Failed       0.217 seconds
+ISO Defer Connect2 CIG 0x01 - Success                Failed       0.306 seconds
+ISO Defer Send - Success                             Failed       0.218 seconds
+ISO 48_2_1 Defer Send - Success                      Failed       0.219 seconds
+ISO Defer Receive - Success                          Failed       0.201 seconds
+ISO 48_2_1 Defer Receive - Success                   Failed       0.198 seconds
+ISO Send and Receive - Success                       Failed       0.214 seconds
+ISO Disconnect - Success                             Failed       0.216 seconds
+ISO Reconnect - Success                              Failed       0.215 seconds
+ISO AC 1 & 4 - Success                               Failed       0.219 seconds
+ISO AC 2 & 10 - Success                              Failed       0.220 seconds
+ISO AC 3 & 5 - Success                               Failed       0.217 seconds
+ISO AC 6(i) - Success                                Failed       0.248 seconds
+ISO AC 6(ii) - Success                               Failed       0.308 seconds
+ISO AC 7(i) - Success                                Failed       0.245 seconds
+ISO AC 7(ii) - Success                               Failed       0.300 seconds
+ISO AC 8(i) - Success                                Failed       0.245 seconds
+ISO AC 8(ii) - Success                               Failed       0.299 seconds
+ISO AC 9(i) - Success                                Failed       0.247 seconds
+ISO AC 9(ii) - Success                               Failed       0.307 seconds
+ISO AC 11(i) - Success                               Failed       0.250 seconds
+ISO AC 11(ii) - Success                              Failed       0.307 seconds
+ISO AC 1 + 2 - Success                               Failed       4.317 seconds
+ISO AC 1 + 2 CIG 0x01/0x02 - Success                 Failed       4.319 seconds
+ISO Reconnect AC 6(i) - Success                      Failed       0.310 seconds
+ISO Reconnect AC 6(ii) - Success                     Failed       0.309 seconds
 
 
+---
+Regards,
+Linux Bluetooth
 
---=20
-Luiz Augusto von Dentz
+
+--===============3554534279436419783==--
