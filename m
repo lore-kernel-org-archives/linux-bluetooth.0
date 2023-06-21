@@ -2,91 +2,214 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F84EB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 21:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E073CEB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 21:46:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230347AbjFUVi5 (ORCPT
+        id S229862AbjFUVqR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jun 2023 17:38:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54248 "EHLO
+        Wed, 21 Jun 2023 17:46:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbjFUViy (ORCPT
+        with ESMTP id S229661AbjFUVqQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jun 2023 17:38:54 -0400
-Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA191988
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:38:50 -0700 (PDT)
-Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-55e299e1d02so3768547eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:38:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687383529; x=1689975529;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=D7vbYS2ToCosmjFXnjFg6iPNeVmbMl9Q6DWSa8U0smM=;
-        b=m2OwKbK1kSmmzxxVaTW/Wc6tlsSdEWbtgOZUZ8nRKCT7ZMRVzLR/i+Lr/Mzc+3vuvu
-         e51HdDv0Zw/OOP6aZc5DzsNMa/92BFQ+LApXXI9iGD4TJrJAYnODH/uqHbHY5ZRLn/he
-         5Srn+2Og42ce1TiUCZprH03NZnBw8Qf1xORxmXhC2e6SrkQbX+HULSCtVeFFO4PInc76
-         3DpSVeEztE2blJnnI9EK/aIfc4R7d+w3cXVG3Y9kh4lkJGhtLNo5gGnW3VCrugjbGBSj
-         THta1hsJWn3ZFyo6nFw3SfxWJcyjCDU2Za3cA9Ke56ltOJt7xCa35MvpsfUm3zFEH4Ar
-         tt1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687383529; x=1689975529;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D7vbYS2ToCosmjFXnjFg6iPNeVmbMl9Q6DWSa8U0smM=;
-        b=QWmyRs1XDF9Eb5FRTDkXl7GthVk8XobIO1t3OmJ2kziYJjaO7IR2I496QJ/Ftf/lNU
-         qrmpxY8O0poG1XUGGRLRYDhJv8s06ygjm27eSqAd6pwfCVDx67DvYb6okak74xNf/2Fs
-         /yn7MdAr6xL+9T9ECdjlE7PwfAF837hvPTPu3UFy09fxc/HBf/i6NSewjiFMEa/rDuqu
-         4w7+qMH7eO+8WCpQ84GrDrvpTOX5/N31WXIqG3vTKc58IRoVM27dpNkZHofatWKj8nk4
-         z6FxFdKIQxyxvsQwELXTJQBBT2OPNQmh6A+ty9j2jzdeCqy1QEjsu3xBLy5NOuVW1uqu
-         qjGw==
-X-Gm-Message-State: AC+VfDwyxGzPOt5SvLZuCluOgjqnPIu1U5P3zPdJP809SLvvKT1EzcS+
-        fvw+6xVOvisAAm3XrCab9UuNBxLGTO6gmg==
-X-Google-Smtp-Source: ACHHUZ7RxjRGxFpg2EHrJM9v+9Bpq4WlKn8lPRwo77v3lgNZMaZiMAIcj/0fghLsDKVbTMaa11+hkw==
-X-Received: by 2002:a05:6359:2e99:b0:12b:d4a0:fab3 with SMTP id rp25-20020a0563592e9900b0012bd4a0fab3mr9547274rwb.3.1687383528794;
-        Wed, 21 Jun 2023 14:38:48 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id c10-20020aa78c0a000000b0064d5b82f987sm3406643pfd.140.2023.06.21.14.38.47
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 14:38:47 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] btdev: Fix CIS Establish ISO Interval
-Date:   Wed, 21 Jun 2023 14:38:45 -0700
-Message-Id: <20230621213845.1021997-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230621213845.1021997-1-luiz.dentz@gmail.com>
-References: <20230621213845.1021997-1-luiz.dentz@gmail.com>
+        Wed, 21 Jun 2023 17:46:16 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326379B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 14:46:14 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 634D5240027
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 23:46:11 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4QmcWk650Hz9rxL;
+        Wed, 21 Jun 2023 23:46:10 +0200 (CEST)
+Message-ID: <2990d0d245e76864854495cfdab1731c54dfabfb.camel@iki.fi>
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Fix parsing of CIS Established
+ Event
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Wed, 21 Jun 2023 21:46:10 +0000
+In-Reply-To: <CABBYNZ+nGaeGmiAdneF7UEwG0Q8D6Bi1mnGOY66HcM5JwE1hiw@mail.gmail.com>
+References: <20230621195407.977001-1-luiz.dentz@gmail.com>
+         <66add9bf780aca773d41cce3ea42589388de2543.camel@iki.fi>
+         <CABBYNZ+nGaeGmiAdneF7UEwG0Q8D6Bi1mnGOY66HcM5JwE1hiw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-ISO Interval is actually using 1.25 ms slots so it needs to be properly
-converted.
----
- emulator/btdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ke, 2023-06-21 kello 14:12 -0700, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+> 
+> On Wed, Jun 21, 2023 at 1:33 PM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Hi Luiz,
+> > 
+> > ke, 2023-06-21 kello 12:54 -0700, Luiz Augusto von Dentz kirjoitti:
+> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > 
+> > > The ISO Interval on CIS Established Event uses 1.25 ms slots:
+> > > 
+> > >     BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+> > >     page 2304:
+> > > 
+> > >       Time = N * 1.25 ms
+> > > 
+> > > In addition to that this always update the QoS settings based on CIS
+> > > Established Event.
+> > > 
+> > > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > ---
+> > >  net/bluetooth/hci_event.c | 36 +++++++++++++++++++++++-------------
+> > >  1 file changed, 23 insertions(+), 13 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index b1aefe4bb751..6fca6d9f1b34 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -6822,6 +6822,7 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
+> > >  {
+> > >       struct hci_evt_le_cis_established *ev = data;
+> > >       struct hci_conn *conn;
+> > > +     struct bt_iso_qos *qos;
+> > >       bool pending = false;
+> > >       u16 handle = __le16_to_cpu(ev->handle);
+> > > 
+> > > @@ -6846,21 +6847,30 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
+> > > 
+> > >       pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags);
+> > > 
+> > > -     if (conn->role == HCI_ROLE_SLAVE) {
+> > > -             __le32 interval;
+> > > +     qos = &conn->iso_qos;
+> > > 
+> > > -             memset(&interval, 0, sizeof(interval));
+> > > +     /* Convert ISO Interval (1.25 ms slots) to latency (ms) */
+> > > +     qos->ucast.in.latency = le16_to_cpu(ev->interval) * 125 / 100;
+> > > +     /* Convert ISO Interval (1.25 ms slots) to latency (ms) */
+> > > +     qos->ucast.out.latency = le16_to_cpu(ev->interval) * 125 / 100;
+> > > 
+> > > -             memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
+> > > -             conn->iso_qos.ucast.in.interval = le32_to_cpu(interval);
+> > > -             memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
+> > > -             conn->iso_qos.ucast.out.interval = le32_to_cpu(interval);
+> > > -             conn->iso_qos.ucast.in.latency = le16_to_cpu(ev->interval);
+> > > -             conn->iso_qos.ucast.out.latency = le16_to_cpu(ev->interval);
+> > > -             conn->iso_qos.ucast.in.sdu = le16_to_cpu(ev->c_mtu);
+> > > -             conn->iso_qos.ucast.out.sdu = le16_to_cpu(ev->p_mtu);
+> > > -             conn->iso_qos.ucast.in.phy = ev->c_phy;
+> > > -             conn->iso_qos.ucast.out.phy = ev->p_phy;
+> > > +     switch (conn->role) {
+> > > +     case HCI_ROLE_SLAVE:
+> > > +             qos->ucast.in.interval = get_unaligned_le24(ev->c_latency);
+> > > +             qos->ucast.out.interval = get_unaligned_le24(ev->p_latency);
+> > > +             qos->ucast.in.sdu = le16_to_cpu(ev->c_mtu);
+> > > +             qos->ucast.out.sdu = le16_to_cpu(ev->p_mtu);
+> > > +             qos->ucast.in.phy = ev->c_phy;
+> > > +             qos->ucast.out.phy = ev->p_phy;
+> > > +             break;
+> > 
+> > Are the ucast.latency and ucast.interval the right way around here?
+> > 
+> > When I trying to use this in userspace, I expected ucast.interval
+> > contains the ISO interval, because in Set CIG Parameters we use
+> > ucast.interval to specify the SDU_Interval, and ucast.latency is used
+> > for the Transport_Latency_C_To_P and Transport_Latency_P_To_C.
+> > 
+> > With real numbers the event (AX210<->AX210) looks like this
+> > 
+> > > HCI Event: LE Meta Event (0x3e) plen 29               #3493 [hci0] 486.978955
+> >       LE Connected Isochronous Stream Established (0x19)
+> >         Status: Success (0x00)
+> >         Connection Handle: 2560
+> >         CIG Synchronization Delay: 4020 us (0x000fb4)
+> >         CIS Synchronization Delay: 4020 us (0x000fb4)
+> >         Central to Peripheral Latency: 94020 us (0x016f44)
+> >         Peripheral to Central Latency: 94020 us (0x016f44)
+> 
+> No idea why these values look like this, they are not what I expect
+> which is to match what the Central configured with Set CIG Parameters.
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 462f352ea252..0a375febad68 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -5977,7 +5977,7 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 		evt.p_ft = 0x01;
- 		evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
- 		evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
--		evt.interval = le_cig->params.c_latency;
-+		evt.interval = (le_cig->params.c_latency + 1) / 1.25;
- 	}
- 
- 	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
--- 
-2.40.1
+Core v5.3 Vol 6 Part G Sec 3.2.2 has the formulas
+
+Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P *
+ISO_Interval - SDU_Interval_C_To_P
+
+Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C *
+ISO_Interval - SDU_Interval_P_To_C
+
+for unframed so looks these come from there. Don't know how the sync
+delays are chosen.
+
+The Central in this case specified Max Transport Latency of 100ms (BAP
+QoS 48_4_2) so they satisfy it.
+
+Userspace wants to know the exact values since they matter for the
+total audio latency (Transport_Latency + Presentation_Delay), see
+Figure 3.1 in Core v5.4 Vol 6 Part G pp 3073 and Sec 7 in BAP v1.0.1. 
+
+This we need to know for eg. lip sync in video playback. (I have some
+problems getting the latency right with the Samsung device, though,
+needs more looking into as its smaller than the above
+Transport_Latencies.)
+
+> >         Central to Peripheral PHY: LE 2M (0x02)
+> >         Peripheral to Central PHY: LE 2M (0x02)
+> >         Number of Subevents: 2
+> >         Central to Peripheral Burst Number: 1
+> >         Peripheral to Central Burst Number: 1
+> >         Central to Peripheral Flush Timeout: 10
+> >         Peripheral to Central Flush Timeout: 10
+> >         Central to Peripheral MTU: 240
+> >         Peripheral to Central MTU: 120
+> >         ISO Interval: 8
+> 
+> These seems to be fine, so I wonder what is going on with CIS
+> Established event, this is what we are doing in the emulator:
+> 
+>         /* TODO: Figure out if these values makes sense */
+>         memcpy(evt.cig_sync_delay, le_cig->params.c_interval,
+>                 sizeof(le_cig->params.c_interval));
+>         memcpy(evt.cis_sync_delay, le_cig->params.p_interval,
+>                 sizeof(le_cig->params.p_interval));
+>         memcpy(evt.c_latency, &le_cig->params.c_interval,
+>                 sizeof(le_cig->params.c_interval));
+>         memcpy(evt.p_latency, &le_cig->params.p_interval,
+>                 sizeof(le_cig->params.p_interval));
+>         evt.c_phy = le_cig->cis[cis_idx].c_phy;
+>         evt.p_phy = le_cig->cis[cis_idx].p_phy;
+>         evt.nse = 0x01;
+>         evt.c_bn = 0x01;
+>         evt.p_bn = 0x01;
+>         evt.c_ft = 0x01;
+>         evt.p_ft = 0x01;
+>         evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
+>         evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
+>         evt.interval = (le_cig->params.c_latency + 1) / 1.25;
+
+These probably assume zero sync delay in the formulas above.
+
+> 
+> > 
+> > > +     case HCI_ROLE_MASTER:
+> > > +             qos->ucast.out.interval = get_unaligned_le24(ev->c_latency);
+> > > +             qos->ucast.in.interval = get_unaligned_le24(ev->p_latency);
+> > > +             qos->ucast.out.sdu = le16_to_cpu(ev->c_mtu);
+> > > +             qos->ucast.in.sdu = le16_to_cpu(ev->p_mtu);
+> > > +             qos->ucast.out.phy = ev->c_phy;
+> > > +             qos->ucast.in.phy = ev->p_phy;
+> > > +             break;
+> > >       }
+> > > 
+> > >       if (!ev->status) {
+> > 
+> > --
+> > Pauli Virtanen
+> 
+> 
+> 
 
