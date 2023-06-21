@@ -2,129 +2,139 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3920EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 15:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32194EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 19:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232760AbjFUPYK (ORCPT
+        id S230414AbjFUTyO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jun 2023 11:24:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59576 "EHLO
+        Wed, 21 Jun 2023 15:54:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232862AbjFUPXv (ORCPT
+        with ESMTP id S229680AbjFUTyM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jun 2023 11:23:51 -0400
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2107.outbound.protection.outlook.com [40.107.237.107])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13CAF198;
-        Wed, 21 Jun 2023 08:23:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E5AHjcQ9okfr+68m9AeKWFMemTeZ57Emg650KL3JMkw3uP5BgB2bMFak1pTTp2wtIBCf2Arm+6ab5KBpc/OW0AUwBOfVEcZQqD0YoWgdNMiax/gXn3TxSFo8uSIQUUwkXSc/9FUK5ZVDB4q97/xiZoZc6jiK4jNLcxduc1LIyb+HjZ4qIq323ObX/8oEjkVRXhsYCPAsEABXZK82BIMv5k7JOycr6f7Q5SlMEhvcHEIodXzQIKG85bL5bzgEcp1l4LaOaIRbH/Z16cgir0hrQz3BSXmRBl8OXWDt9Mcx0kGhxon0O9fJqfR9KiWjbyyzb4JmFwTFo8P6cTyon4FTTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0Eitzhx9ToCCs0EAg+MUu25sXCW+2FnpOznghU1yVAk=;
- b=d01GO4YoEI3T2lnqYP/lm0hW4SISKaxgfb+qT+ZD/AyZos+QVu/IY7fQGdZGL0AzrErZju7zCawDZZHC9JS94+u13uhAkOkLbIWJC+EJKUir12Dq/dLAvHkM+S1Pi6O01YkJR5hLq5qEvUMlzWUH3O3txVrhGsIXj6O4Jxw5TrFheV5aZTcZQLLuV3vio1dUrQT+NSjoYY1QEtmsvjw4aB2036ErH2vGylCkvfMTxy7nb6hFTxVGxbCFDludE2Q7KezSuC3jFLLhh+tEAAKfB7KZSt32iwHUztigK64app7h6uJtXUFCCgOTOFBj25cz11G3Sg9vOlWm+sZ48HNC/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+        Wed, 21 Jun 2023 15:54:12 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C9E186
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 12:54:11 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-66615629689so5318695b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 12:54:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0Eitzhx9ToCCs0EAg+MUu25sXCW+2FnpOznghU1yVAk=;
- b=OveGHIj4qM7lJ78JMU2cuHFthrFAyzLnBk+FT+wBw/uQSmjrZ4YbAcO69FPIkq4NndFSQ1/8C6cT0s4zrCh3o9VadYMRm66ldST8vJziE+yXxGmu7J+n9XmZJppL0Ogj77qyNLf15kKeIQxWie34PU7Qyp5DkoOHmbH04Is13zE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH3PR13MB6386.namprd13.prod.outlook.com (2603:10b6:610:19c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.26; Wed, 21 Jun
- 2023 15:23:01 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
- 15:23:01 +0000
-Date:   Wed, 21 Jun 2023 17:22:54 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to
- Bluetooth drivers
-Message-ID: <ZJMVznjjsixOSPu2@corigine.com>
-References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
-X-ClientProxiedBy: AM0PR01CA0084.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:10e::25) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=gmail.com; s=20221208; t=1687377250; x=1689969250;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlaXA8R5NjvQ8yQihVGSonTckZ3rsSciI1XtnrP85Do=;
+        b=bKSstTHtxclMjA9iVMSxboiVL8lkzWOLm/mX+M5oG7sZ33rMYOVsaDN2JcXr1YSh4S
+         OKVXY4WXgXlKSO64FM1BRpP7oaFcNRlhC8UWKP95ooKvDMj9fLfH+vUyuGQJxQaQrrZi
+         mOJ/tY+as22wRL0lC1ieSd1z0rIDYI43Et7a05ma6rwLbIv/wTqU9jLGjgiiGpEwY2oJ
+         mOKBMQSAdnBsjQqXQQ9o+ABKfyg9mUozwAoGo7YVmVWMhG11d6JJUjti9/iTaFR2CfqT
+         voD1Z2YilXVULN7alyxWIjo8apk7wualKZlXUoEj2DdiJcH1WMBvTFnDV3j+IIr4JrJO
+         cbhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687377250; x=1689969250;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlaXA8R5NjvQ8yQihVGSonTckZ3rsSciI1XtnrP85Do=;
+        b=Qba2oEmbvFIV9le/Fprkc/CASoZkP1GpM0zNXyvRQZYyuSiaz4tJh7bZaqKm0PHUFu
+         v133BfThtVkz3cOBq//hZs1R4J4jqbSBibT8EOVKkwxRw3JLTV3gkAl1IG8Jm/0VDXqC
+         /5noL6yYTnV1IziVTDq6ePX8/umWKPJKJXFJIvKtjlS4rTbfuE0dPvhJ0Ng+v7HeJ/U9
+         Z5S8ID6AgKKjHIfoHNpVzk3V7QCaVi8PbrdUjOy+uQu4ZHyKuJiQU48BupqjalY0VCkm
+         UYUt9THEXDyLd+4vElqhEv9kRH5Vobj8mmsSeCkWLrmEAYxgpARp5zk6MRWi/K4u5JS1
+         mbPw==
+X-Gm-Message-State: AC+VfDxpgESNamzXXZjHdcGVUCoINRm9Roo5JwZRTDn4I0vphM1e7j47
+        cmd9vVs1x+LEKfx5clLs8HHuO4yZZxqJbg==
+X-Google-Smtp-Source: ACHHUZ53e0lByOYXpKJRWBHWleg8y731zALKsJGn1X5VYwcUSoagZ3VXiukPlpSZGfVx7U7MzOysXw==
+X-Received: by 2002:a17:903:41d0:b0:1b5:5a5f:367c with SMTP id u16-20020a17090341d000b001b55a5f367cmr11803318ple.69.1687377249543;
+        Wed, 21 Jun 2023 12:54:09 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id h15-20020a170902f7cf00b001b682336f83sm3584044plw.42.2023.06.21.12.54.08
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 12:54:08 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: hci_event: Fix parsing of CIS Established Event
+Date:   Wed, 21 Jun 2023 12:54:07 -0700
+Message-Id: <20230621195407.977001-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH3PR13MB6386:EE_
-X-MS-Office365-Filtering-Correlation-Id: 942b6e45-dfe7-437a-6e9c-08db726b668b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hYteki1KWUtXMwqACZKhuEtJptPwQEkvGzvaX1yEMorLOXIq8qZUugpyPH+KF5MN66LpDf6QrQdMoclFbUFAs5v/g4SCa9a5dtkRfAwzRuQlzrHL/FPinfgSJrCDNMKNtvdGk0+CqrzyNrk8Ol6BlhegZ14kPBwyLtKj6sEpOZu944xxzmcoQTtXqb5fbqY9UOn5FyJ9M8uKVk8YJTkx1rSa5mE8uiTwSbLZH7jiY6VzdJX8HguTpss34tiWb6Jj3l7d4EMCUA80w6T2OC2XUdRoe9/KbNsRgIjX3p3AzasG5fa2oyoet2ByfqTBqaXpZ0GA22s8CBYgEUpd7JDAvz1vcpls+inm3aqzr7GWo2ISOx3hOeBwGcqWVrwNUFjpHIQ56pS+HewrWjEiFNTbBhXyOe8WIjbUSwj7rQeCWvhJ+pKxJ8YQkRhOgYdlg5T65kdVpLsRZ18quAHI7RWaiB3r6JRAltSSkuREc4dInPGOcZyStO2rGXVh8/o0VAjDTuYEP6qzLh+f5tzcKhP7BTLqEHsuAcuixX0LzptAlVEbzXaa5aasjqW01t8O6u1iz4pd/nZH5ySCiBjhbMLJj3Y2BQCQPeQVQ+HdjqD+M1w=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(366004)(136003)(39840400004)(376002)(451199021)(4744005)(2906002)(2616005)(36756003)(86362001)(38100700002)(8676002)(8936002)(316002)(6486002)(41300700001)(5660300002)(54906003)(66556008)(66946007)(66476007)(4326008)(6916009)(6666004)(478600001)(186003)(6506007)(6512007)(44832011)(7416002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uJ3LE65xXS+BxhhETBzxptlN8ZSutfpZqf3K85JD5pnRUSmFCLXOuQES41H+?=
- =?us-ascii?Q?NTthJPe6Usv5o8sJdCnLBNM1VLozrWV1CYjr2hjk6AdQYGFU+zagFYGo4Iwl?=
- =?us-ascii?Q?ZfOkDeFn2CCqsPk2+k6G/Vzr9lfz+hSyiqbTSg8eJG6bPafCgQdZewqpK5YY?=
- =?us-ascii?Q?U3GJZvhRpuEeufQA+u/niXIPYHRcOBHXF30IArcgxsX1Bwe9Mf0XkOLMC2Au?=
- =?us-ascii?Q?tQ9VKqkSztQC2mMoIT9d/ToPmghsCltGybQkLeaBPKElYzNhyAhzYbcoYcbQ?=
- =?us-ascii?Q?pF7lZY6ZjNEFvGWTq9iupGt3FifPAQ970PnWNshzwQNWOVTXoJhGNOLObHiP?=
- =?us-ascii?Q?hGx8/S35oVtAerKiy/MI0HhhDZmV6FLJW1PQa78JDvchukFOF4JWuulGN1eK?=
- =?us-ascii?Q?0OFSua6UiGA7X3ziTt2TbYdz8JtS+nHj3FZ80FQgBoK55qSZk6jsQe16QOp6?=
- =?us-ascii?Q?QQZ7jEg7j15WJkaSKwRLv4XxEA5o8qVwVTsPU1HCvxIfaRPR28zCGDpdXvwJ?=
- =?us-ascii?Q?GvX8NC/GW6iaq1xzqaRPccNE4F4KfNqJ/gEgVk1D99c8TnGeS+USmX4ICU8V?=
- =?us-ascii?Q?eHWqcE/+sIVdN11VsKr0MwZQ8rEW5EWD6BgFS+LzRGuH3qtgx8eIaicYQljI?=
- =?us-ascii?Q?9zWCQRAooceXu2jd2Whir7Htn/dueEYIhBP38ENkqlBy31ZBBZKMHRpaI2+V?=
- =?us-ascii?Q?MAXIDUCzIgFnHBYGlF6IH8zevt3jUSS5LqQvFYraN91BRPcflLWtGBYT9EIW?=
- =?us-ascii?Q?oMS+QOEH5UPTphHsk6HVYvUXLBgh63s5vqOq/SFpD2B06eNgdES88O3MtoOK?=
- =?us-ascii?Q?KUx9w5iLLY64OSdRXAaC4H4KJEH+iWhTjtetxLjC2nQ6l0Qi1E5Qw1fNKefI?=
- =?us-ascii?Q?YeJXFKAj4f4r+E+7S32TFpO0235J1y9EtGOkIgVcG0WCQtsZmjnc5zSM/aZy?=
- =?us-ascii?Q?7DFaiRd2IgOVDNl0fQJuVVknvmCuV4pdwLyvl+Xqz4Emszi5e9N4aUgG8lEN?=
- =?us-ascii?Q?a9owCgcz5Q82nao9FjyOIkfgyD72FCsuc685T7qvxl027VoMBzAF9soti5cX?=
- =?us-ascii?Q?/Z4x1HPR51bas2SAwF34xP92mCJ4zMQneVtBhNHUxbuiAcCZ7CREepNl0Wwg?=
- =?us-ascii?Q?fUhVGVoDn/dA1OcxWuYqPNaLT7YyVeTa1E0OykuKZOKOX5YOunedIpvvMjpT?=
- =?us-ascii?Q?UsglPweRHhxVzhy7yewU75syHbwlthA46N77krA4cFO/Mf/njlaEnsVoN9CF?=
- =?us-ascii?Q?Dls98CUEnDY36gRQB7PURA/EcjPQ7Tu/2vH07AEu3W7ujRZeSfkJhwnHBfxX?=
- =?us-ascii?Q?wVAkrewMo45QGa0ZkSegBx2zFd7v3cAsx9gKL0s2qSW8x2dBjKbnDtFD2PY6?=
- =?us-ascii?Q?FDpXEMpvqJvq+7MFZ+mR2U17ZkS1BINygj1JhpzznJjZH3VmsmVRcahuYoHC?=
- =?us-ascii?Q?DzzACRe3/3COZ0+VmIG6OjMxOgd0o2rDkJJa//wGOXpH8+OGKdijFF3KbXNU?=
- =?us-ascii?Q?u34CUYbLU9RZciQejaVE1+hkMJRMRyiEsjU2fYsLv3BQXOggQXAzQr/7hsRp?=
- =?us-ascii?Q?cX/rnZkNEuAVPhRx9ZuQdQsVIbJhqPVbWv91PHtN0paMh3BKjD/6Vsn1JoVl?=
- =?us-ascii?Q?FpAM1PFmdtdiQLtBhieGruLOzg5eJNfN4kNVGPrnc8+XkqgP3R2EDB9z1X8H?=
- =?us-ascii?Q?Ty/IXw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 942b6e45-dfe7-437a-6e9c-08db726b668b
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 15:23:01.1787
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UuM7poKzAvOQLx6RofF2lURVpCch1Sr+x+E7HA+CG2gJxU85gck+pl/hLbtC2SFHCglCiF9fwSxl8IzFXIu0DwohMDAm3Uf0gYGWinyZqB0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6386
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jun 21, 2023 at 08:09:49AM +0200, Krzysztof Kozlowski wrote:
-> The Devicetree bindings should be picked up by subsystem maintainers,
-> but respective pattern for Bluetooth drivers was missing.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+The ISO Interval on CIS Established Event uses 1.25 ms slots:
+
+    BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+    page 2304:
+
+      Time = N * 1.25 ms
+
+In addition to that this always update the QoS settings based on CIS
+Established Event.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_event.c | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b1aefe4bb751..6fca6d9f1b34 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6822,6 +6822,7 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
+ {
+ 	struct hci_evt_le_cis_established *ev = data;
+ 	struct hci_conn *conn;
++	struct bt_iso_qos *qos;
+ 	bool pending = false;
+ 	u16 handle = __le16_to_cpu(ev->handle);
+ 
+@@ -6846,21 +6847,30 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
+ 
+ 	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags);
+ 
+-	if (conn->role == HCI_ROLE_SLAVE) {
+-		__le32 interval;
++	qos = &conn->iso_qos;
+ 
+-		memset(&interval, 0, sizeof(interval));
++	/* Convert ISO Interval (1.25 ms slots) to latency (ms) */
++	qos->ucast.in.latency = le16_to_cpu(ev->interval) * 125 / 100;
++	/* Convert ISO Interval (1.25 ms slots) to latency (ms) */
++	qos->ucast.out.latency = le16_to_cpu(ev->interval) * 125 / 100;
+ 
+-		memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
+-		conn->iso_qos.ucast.in.interval = le32_to_cpu(interval);
+-		memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
+-		conn->iso_qos.ucast.out.interval = le32_to_cpu(interval);
+-		conn->iso_qos.ucast.in.latency = le16_to_cpu(ev->interval);
+-		conn->iso_qos.ucast.out.latency = le16_to_cpu(ev->interval);
+-		conn->iso_qos.ucast.in.sdu = le16_to_cpu(ev->c_mtu);
+-		conn->iso_qos.ucast.out.sdu = le16_to_cpu(ev->p_mtu);
+-		conn->iso_qos.ucast.in.phy = ev->c_phy;
+-		conn->iso_qos.ucast.out.phy = ev->p_phy;
++	switch (conn->role) {
++	case HCI_ROLE_SLAVE:
++		qos->ucast.in.interval = get_unaligned_le24(ev->c_latency);
++		qos->ucast.out.interval = get_unaligned_le24(ev->p_latency);
++		qos->ucast.in.sdu = le16_to_cpu(ev->c_mtu);
++		qos->ucast.out.sdu = le16_to_cpu(ev->p_mtu);
++		qos->ucast.in.phy = ev->c_phy;
++		qos->ucast.out.phy = ev->p_phy;
++		break;
++	case HCI_ROLE_MASTER:
++		qos->ucast.out.interval = get_unaligned_le24(ev->c_latency);
++		qos->ucast.in.interval = get_unaligned_le24(ev->p_latency);
++		qos->ucast.out.sdu = le16_to_cpu(ev->c_mtu);
++		qos->ucast.in.sdu = le16_to_cpu(ev->p_mtu);
++		qos->ucast.out.phy = ev->c_phy;
++		qos->ucast.in.phy = ev->p_phy;
++		break;
+ 	}
+ 
+ 	if (!ev->status) {
+-- 
+2.40.1
+
