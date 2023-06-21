@@ -2,248 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 378D8EB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 10:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3920EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 15:24:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232607AbjFUKqb (ORCPT
+        id S232760AbjFUPYK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jun 2023 06:46:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55232 "EHLO
+        Wed, 21 Jun 2023 11:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230264AbjFUKqE (ORCPT
+        with ESMTP id S232862AbjFUPXv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jun 2023 06:46:04 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D1A11A3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 03:44:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E109C614E9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 10:44:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 57274C433C0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 10:44:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1687344275;
-        bh=i66ISwIE4dqumzFeG6jjePjXQ2CViFbDybxShycW64w=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=jFVv6Yk6M6bjDY5zl22TIUS4JE8Y1yXLEwnJnOUdzeiMrZYMOjIW28bEuHqCdFKwG
-         +Y3g75PxMLpq/aw22PZ87vMxQj6gRswXHJxdDK2ZZwT1n9zc/INLazgUdAESDlkkZa
-         m6elKjSFb4ef6zY0YubRQOVdjlAFwQvEyaYtUOVd9HJoM05/0r9YFTnXwalnCAVCHY
-         dLTGGwEpVCzldxupF28NpwgeTn8ceEAoayb7hKElzTUaDv8tabU0SpHvsgylgTLjyM
-         Z/SRc7FHjILsGpXyRZAn8YZ0+45IlM8eyyn1e/Jq3UFDP+oc6w+s2b/QBaK86GhVdM
-         qfqG3juZLkS5g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 44168C4332E; Wed, 21 Jun 2023 10:44:35 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217581] Bluetooth L2CAP use-after-free
-Date:   Wed, 21 Jun 2023 10:44:35 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mohamed-yassine.jebabli@witbe.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217581-62941-7i7rUEgkuF@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217581-62941@https.bugzilla.kernel.org/>
-References: <bug-217581-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 21 Jun 2023 11:23:51 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2107.outbound.protection.outlook.com [40.107.237.107])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13CAF198;
+        Wed, 21 Jun 2023 08:23:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E5AHjcQ9okfr+68m9AeKWFMemTeZ57Emg650KL3JMkw3uP5BgB2bMFak1pTTp2wtIBCf2Arm+6ab5KBpc/OW0AUwBOfVEcZQqD0YoWgdNMiax/gXn3TxSFo8uSIQUUwkXSc/9FUK5ZVDB4q97/xiZoZc6jiK4jNLcxduc1LIyb+HjZ4qIq323ObX/8oEjkVRXhsYCPAsEABXZK82BIMv5k7JOycr6f7Q5SlMEhvcHEIodXzQIKG85bL5bzgEcp1l4LaOaIRbH/Z16cgir0hrQz3BSXmRBl8OXWDt9Mcx0kGhxon0O9fJqfR9KiWjbyyzb4JmFwTFo8P6cTyon4FTTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0Eitzhx9ToCCs0EAg+MUu25sXCW+2FnpOznghU1yVAk=;
+ b=d01GO4YoEI3T2lnqYP/lm0hW4SISKaxgfb+qT+ZD/AyZos+QVu/IY7fQGdZGL0AzrErZju7zCawDZZHC9JS94+u13uhAkOkLbIWJC+EJKUir12Dq/dLAvHkM+S1Pi6O01YkJR5hLq5qEvUMlzWUH3O3txVrhGsIXj6O4Jxw5TrFheV5aZTcZQLLuV3vio1dUrQT+NSjoYY1QEtmsvjw4aB2036ErH2vGylCkvfMTxy7nb6hFTxVGxbCFDludE2Q7KezSuC3jFLLhh+tEAAKfB7KZSt32iwHUztigK64app7h6uJtXUFCCgOTOFBj25cz11G3Sg9vOlWm+sZ48HNC/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0Eitzhx9ToCCs0EAg+MUu25sXCW+2FnpOznghU1yVAk=;
+ b=OveGHIj4qM7lJ78JMU2cuHFthrFAyzLnBk+FT+wBw/uQSmjrZ4YbAcO69FPIkq4NndFSQ1/8C6cT0s4zrCh3o9VadYMRm66ldST8vJziE+yXxGmu7J+n9XmZJppL0Ogj77qyNLf15kKeIQxWie34PU7Qyp5DkoOHmbH04Is13zE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH3PR13MB6386.namprd13.prod.outlook.com (2603:10b6:610:19c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.26; Wed, 21 Jun
+ 2023 15:23:01 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 15:23:01 +0000
+Date:   Wed, 21 Jun 2023 17:22:54 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to
+ Bluetooth drivers
+Message-ID: <ZJMVznjjsixOSPu2@corigine.com>
+References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+X-ClientProxiedBy: AM0PR01CA0084.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::25) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH3PR13MB6386:EE_
+X-MS-Office365-Filtering-Correlation-Id: 942b6e45-dfe7-437a-6e9c-08db726b668b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: hYteki1KWUtXMwqACZKhuEtJptPwQEkvGzvaX1yEMorLOXIq8qZUugpyPH+KF5MN66LpDf6QrQdMoclFbUFAs5v/g4SCa9a5dtkRfAwzRuQlzrHL/FPinfgSJrCDNMKNtvdGk0+CqrzyNrk8Ol6BlhegZ14kPBwyLtKj6sEpOZu944xxzmcoQTtXqb5fbqY9UOn5FyJ9M8uKVk8YJTkx1rSa5mE8uiTwSbLZH7jiY6VzdJX8HguTpss34tiWb6Jj3l7d4EMCUA80w6T2OC2XUdRoe9/KbNsRgIjX3p3AzasG5fa2oyoet2ByfqTBqaXpZ0GA22s8CBYgEUpd7JDAvz1vcpls+inm3aqzr7GWo2ISOx3hOeBwGcqWVrwNUFjpHIQ56pS+HewrWjEiFNTbBhXyOe8WIjbUSwj7rQeCWvhJ+pKxJ8YQkRhOgYdlg5T65kdVpLsRZ18quAHI7RWaiB3r6JRAltSSkuREc4dInPGOcZyStO2rGXVh8/o0VAjDTuYEP6qzLh+f5tzcKhP7BTLqEHsuAcuixX0LzptAlVEbzXaa5aasjqW01t8O6u1iz4pd/nZH5ySCiBjhbMLJj3Y2BQCQPeQVQ+HdjqD+M1w=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(366004)(136003)(39840400004)(376002)(451199021)(4744005)(2906002)(2616005)(36756003)(86362001)(38100700002)(8676002)(8936002)(316002)(6486002)(41300700001)(5660300002)(54906003)(66556008)(66946007)(66476007)(4326008)(6916009)(6666004)(478600001)(186003)(6506007)(6512007)(44832011)(7416002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uJ3LE65xXS+BxhhETBzxptlN8ZSutfpZqf3K85JD5pnRUSmFCLXOuQES41H+?=
+ =?us-ascii?Q?NTthJPe6Usv5o8sJdCnLBNM1VLozrWV1CYjr2hjk6AdQYGFU+zagFYGo4Iwl?=
+ =?us-ascii?Q?ZfOkDeFn2CCqsPk2+k6G/Vzr9lfz+hSyiqbTSg8eJG6bPafCgQdZewqpK5YY?=
+ =?us-ascii?Q?U3GJZvhRpuEeufQA+u/niXIPYHRcOBHXF30IArcgxsX1Bwe9Mf0XkOLMC2Au?=
+ =?us-ascii?Q?tQ9VKqkSztQC2mMoIT9d/ToPmghsCltGybQkLeaBPKElYzNhyAhzYbcoYcbQ?=
+ =?us-ascii?Q?pF7lZY6ZjNEFvGWTq9iupGt3FifPAQ970PnWNshzwQNWOVTXoJhGNOLObHiP?=
+ =?us-ascii?Q?hGx8/S35oVtAerKiy/MI0HhhDZmV6FLJW1PQa78JDvchukFOF4JWuulGN1eK?=
+ =?us-ascii?Q?0OFSua6UiGA7X3ziTt2TbYdz8JtS+nHj3FZ80FQgBoK55qSZk6jsQe16QOp6?=
+ =?us-ascii?Q?QQZ7jEg7j15WJkaSKwRLv4XxEA5o8qVwVTsPU1HCvxIfaRPR28zCGDpdXvwJ?=
+ =?us-ascii?Q?GvX8NC/GW6iaq1xzqaRPccNE4F4KfNqJ/gEgVk1D99c8TnGeS+USmX4ICU8V?=
+ =?us-ascii?Q?eHWqcE/+sIVdN11VsKr0MwZQ8rEW5EWD6BgFS+LzRGuH3qtgx8eIaicYQljI?=
+ =?us-ascii?Q?9zWCQRAooceXu2jd2Whir7Htn/dueEYIhBP38ENkqlBy31ZBBZKMHRpaI2+V?=
+ =?us-ascii?Q?MAXIDUCzIgFnHBYGlF6IH8zevt3jUSS5LqQvFYraN91BRPcflLWtGBYT9EIW?=
+ =?us-ascii?Q?oMS+QOEH5UPTphHsk6HVYvUXLBgh63s5vqOq/SFpD2B06eNgdES88O3MtoOK?=
+ =?us-ascii?Q?KUx9w5iLLY64OSdRXAaC4H4KJEH+iWhTjtetxLjC2nQ6l0Qi1E5Qw1fNKefI?=
+ =?us-ascii?Q?YeJXFKAj4f4r+E+7S32TFpO0235J1y9EtGOkIgVcG0WCQtsZmjnc5zSM/aZy?=
+ =?us-ascii?Q?7DFaiRd2IgOVDNl0fQJuVVknvmCuV4pdwLyvl+Xqz4Emszi5e9N4aUgG8lEN?=
+ =?us-ascii?Q?a9owCgcz5Q82nao9FjyOIkfgyD72FCsuc685T7qvxl027VoMBzAF9soti5cX?=
+ =?us-ascii?Q?/Z4x1HPR51bas2SAwF34xP92mCJ4zMQneVtBhNHUxbuiAcCZ7CREepNl0Wwg?=
+ =?us-ascii?Q?fUhVGVoDn/dA1OcxWuYqPNaLT7YyVeTa1E0OykuKZOKOX5YOunedIpvvMjpT?=
+ =?us-ascii?Q?UsglPweRHhxVzhy7yewU75syHbwlthA46N77krA4cFO/Mf/njlaEnsVoN9CF?=
+ =?us-ascii?Q?Dls98CUEnDY36gRQB7PURA/EcjPQ7Tu/2vH07AEu3W7ujRZeSfkJhwnHBfxX?=
+ =?us-ascii?Q?wVAkrewMo45QGa0ZkSegBx2zFd7v3cAsx9gKL0s2qSW8x2dBjKbnDtFD2PY6?=
+ =?us-ascii?Q?FDpXEMpvqJvq+7MFZ+mR2U17ZkS1BINygj1JhpzznJjZH3VmsmVRcahuYoHC?=
+ =?us-ascii?Q?DzzACRe3/3COZ0+VmIG6OjMxOgd0o2rDkJJa//wGOXpH8+OGKdijFF3KbXNU?=
+ =?us-ascii?Q?u34CUYbLU9RZciQejaVE1+hkMJRMRyiEsjU2fYsLv3BQXOggQXAzQr/7hsRp?=
+ =?us-ascii?Q?cX/rnZkNEuAVPhRx9ZuQdQsVIbJhqPVbWv91PHtN0paMh3BKjD/6Vsn1JoVl?=
+ =?us-ascii?Q?FpAM1PFmdtdiQLtBhieGruLOzg5eJNfN4kNVGPrnc8+XkqgP3R2EDB9z1X8H?=
+ =?us-ascii?Q?Ty/IXw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 942b6e45-dfe7-437a-6e9c-08db726b668b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 15:23:01.1787
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UuM7poKzAvOQLx6RofF2lURVpCch1Sr+x+E7HA+CG2gJxU85gck+pl/hLbtC2SFHCglCiF9fwSxl8IzFXIu0DwohMDAm3Uf0gYGWinyZqB0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6386
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217581
+On Wed, Jun 21, 2023 at 08:09:49AM +0200, Krzysztof Kozlowski wrote:
+> The Devicetree bindings should be picked up by subsystem maintainers,
+> but respective pattern for Bluetooth drivers was missing.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
---- Comment #3 from Mohamed Yassine JEBABLI (mohamed-yassine.jebabli@witbe.=
-net) ---
-btmon trace :=20
-
-
-@ MGMT Command: Load Long Te.. (0x0013) plen 38  {0x0001} [hci1] 835.836638
-        Keys: 1
-        LE Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Key type: Unauthenticated legacy key (0x00)
-        Central: 0x00
-        Encryption size: 16
-        Diversifier: 5565
-        Randomizer: 08014962c65a5aef
-        Key: ea06c5bdb5409c43d3935b7e5b79877a
-@ MGMT Event: Command Complete (0x0001) plen 3   {0x0001} [hci1] 835.836651
-      Load Long Term Keys (0x0013) plen 0
-        Status: Success (0x00)
-@ MGMT Command: Load Identit.. (0x0030) plen 25  {0x0001} [hci1] 835.837036
-        Keys: 1
-        LE Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Key: d74d35e5fd6e95d6804b8391487d76d8
-@ MGMT Event: Command Complete (0x0001) plen 3   {0x0001} [hci1] 835.837046
-      Load Identity Resolving Keys (0x0030) plen 0
-        Status: Success (0x00)
-< HCI Command: LE Clear Res.. (0x08|0x0029) plen 0  #1018 [hci1] 835.837519
-> HCI Event: Command Complete (0x0e) plen 4         #1019 [hci1] 836.030177
-      LE Clear Resolving List (0x08|0x0029) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Add Devi.. (0x08|0x0027) plen 39  #1020 [hci1] 836.031432
-        Address type: Public (0x00)
-        Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Peer identity resolving key: d74d35e5fd6e95d6804b8391487d76d8
-        Local identity resolving key: 00000000000000000000000000000000
-> HCI Event: Command Complete (0x0e) plen 4         #1021 [hci1] 836.033137
-      LE Add Device To Resolving List (0x08|0x0027) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Addre.. (0x08|0x002d) plen 1  #1022 [hci1] 836.033708
-        Address resolution: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4         #1023 [hci1] 836.035051
-      LE Set Address Resolution Enable (0x08|0x002d) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Adve.. (0x08|0x0008) plen 32  #1024 [hci1] 836.035618
-        Length: 15
-        Flags: 0x05
-          LE Limited Discoverable Mode
-          BR/EDR Not Supported
-        Appearance: Remote Control (0x0180)
-        16-bit Service UUIDs (partial): 3 entries
-          Human Interface Device (0x1812)
-          Battery Service (0x180f)
-          Device Information (0x180a)
-> HCI Event: Command Complete (0x0e) plen 4         #1025 [hci1] 836.037143
-      LE Set Advertising Data (0x08|0x0008) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Scan.. (0x08|0x0009) plen 32  #1026 [hci1] 836.037778
-        Length: 22
-        Name (complete): NVIDIA SHIELD Remote
-> HCI Event: Command Complete (0x0e) plen 4         #1027 [hci1] 836.039032
-      LE Set Scan Response Data (0x08|0x0009) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Adve.. (0x08|0x0006) plen 15  #1028 [hci1] 836.039649
-        Min advertising interval: 20.000 msec (0x0020)
-        Max advertising interval: 20.000 msec (0x0020)
-        Type: Connectable undirected - ADV_IND (0x00)
-        Own address type: Public (0x02)
-        Direct address type: Public (0x00)
-        Direct address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Channel map: 37, 38, 39 (0x07)
-        Filter policy: Allow Scan Request from Any, Allow Connect Request f=
-rom
-Any (0x00)
-> HCI Event: Command Complete (0x0e) plen 4         #1029 [hci1] 836.041059
-      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Adver.. (0x08|0x000a) plen 1  #1030 [hci1] 836.041617
-        Advertising: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4         #1031 [hci1] 836.044146
-      LE Set Advertise Enable (0x08|0x000a) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 31           #1032 [hci1] 836.776845
-      LE Enhanced Connection Complete (0x0a)
-        Status: Success (0x00)
-        Handle: 0 Address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Role: Peripheral (0x01)
-        Peer address type: Resolved Public (0x02)
-        Peer address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Local resolvable private address: 00:00:00:00:00:00 (Non-Resolvable)
-        Peer resolvable private address: 53:6E:75:EF:0A:34 (Resolvable)
-          Identity type: Public (0x00)
-          Identity: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Connection interval: 48.75 msec (0x0027)
-        Connection latency: 0 (0x0000)
-        Supervision timeout: 10000 msec (0x03e8)
-        Central clock accuracy: 0x01
-@ MGMT Event: Device Connected (0x000b) plen 13  {0x0001} [hci1] 836.776999
-        LE Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Flags: 0x00000000
-        Data length: 0
-< HCI Command: LE Read Remo.. (0x08|0x0016) plen 2  #1033 [hci1] 836.777167
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-@ RAW Open: btmon (privileged) version 2.22             {0x0004} 836.777817
-@ RAW Close: btmon                                      {0x0004} 836.777829
-> HCI Event: LE Meta Event (0x3e) plen 4            #1034 [hci1] 836.777798
-      LE Channel Selection Algorithm (0x14)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Algorithm: #1 (0x00)
-@ MGMT Command: Pair Device (0x0019) plen 8      {0x0001} [hci1] 836.777975
-        LE Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Capability: NoInputNoOutput (0x03)
-@ MGMT Event: Command Complete (0x0001) plen 10  {0x0001} [hci1] 836.777985
-      Pair Device (0x0019) plen 7
-        Status: Already Paired (0x13)
-        LE Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-> HCI Event: Command Status (0x0f) plen 4           #1035 [hci1] 836.778817
-      LE Read Remote Used Features (0x08|0x0016) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Adver.. (0x08|0x000a) plen 1  #1036 [hci1] 836.779076
-        Advertising: Disabled (0x00)
-> HCI Event: Command Complete (0x0e) plen 4         #1037 [hci1] 836.780813
-      LE Set Advertise Enable (0x08|0x000a) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 12           #1038 [hci1] 836.885795
-      LE Read Remote Used Features (0x04)
-        Status: Success (0x00)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Features: 0xff 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-          LE Encryption
-          Connection Parameter Request Procedure
-          Extended Reject Indication
-          Peripheral-initiated Features Exchange
-          LE Ping
-          LE Data Packet Length Extension
-          LL Privacy
-          Extended Scanner Filter Policies
-< ACL Data TX: Handle 0 flags 0x00 dlen 6           #1039 [hci1] 836.886185
-      SMP: Security Request (0x0b) len 1
-        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses
-(0x01)
-> HCI Event: Number of Completed P.. (0x13) plen 5  #1040 [hci1] 836.982862
-        Num handles: 1
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Count: 1
-> HCI Event: LE Meta Event (0x3e) plen 13           #1041 [hci1] 837.031821
-      LE Long Term Key Request (0x05)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Random number: 0xef5a5ac662490108
-        Encrypted diversifier: 0x6555
-< HCI Command: LE Long Ter.. (0x08|0x001a) plen 18  #1042 [hci1] 837.031865
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Long term key: ea06c5bdb5409c43d3935b7e5b79877a
-> HCI Event: Command Complete (0x0e) plen 6         #1043 [hci1] 837.033755
-      LE Long Term Key Request Reply (0x08|0x001a) ncmd 1
-        Status: Success (0x00)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-> HCI Event: Encryption Change (0x08) plen 4        #1044 [hci1] 837.177841
-        Status: Success (0x00)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Encryption: Enabled with AES-CCM (0x01)
-< HCI Command: Write Authen.. (0x03|0x007c) plen 4  #1045 [hci1] 837.177998
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Timeout: 30000 msec (0x0bb8)
-> HCI Event: Command Complete (0x0e) plen 6         #1046 [hci1] 837.179778
-      Write Authenticated Payload Timeout (0x03|0x007c) ncmd 1
-        Status: Success (0x00)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-> HCI Event: Disconnect Complete (0x05) plen 4      #1047 [hci1] 837.275758
-        Status: Success (0x00)
-        Handle: 0 Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Reason: Remote User Terminated Connection (0x13)
-@ MGMT Event: Device Disconne.. (0x000c) plen 8  {0x0001} [hci1] 837.275853
-        LE Address: 48:B0:2D:02:81:0A (NVIDIA Corporation)
-        Reason: Connection terminated by remote host (0x03)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
