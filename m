@@ -2,150 +2,87 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 834B3EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jun 2023 22:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E130EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jun 2023 01:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbjFUWbH (ORCPT
+        id S230184AbjFVByH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jun 2023 18:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41032 "EHLO
+        Wed, 21 Jun 2023 21:54:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbjFUWbG (ORCPT
+        with ESMTP id S230131AbjFVByF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jun 2023 18:31:06 -0400
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338A6173F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 15:31:05 -0700 (PDT)
-Received: from github.com (hubbernetes-node-b9afe89.va3-iad.github.net [10.48.144.33])
-        by smtp.github.com (Postfix) with ESMTPA id 7108B41067
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jun 2023 15:31:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1687386664;
-        bh=XZWKBacjbvVt6lvm/6unBrcELrjJiVXTh9XBCk3zwH4=;
-        h=Date:From:To:Subject:From;
-        b=SfoVRryI+g0OT4mqNg9bAdle6Lv0M82qT25ALQU7TGPEyA6i1bgqR9bqsyCA7Dy5w
-         7yb9G8cJIPRXkMMO7pEY/Dtu1SuCt4RuDwzaxQRQmDS7defeDnIyPxz+pGzLkvRs7j
-         HYVUQZ2UOMn1lFUTXKttycxXz5lDS9LVnbpwiMio=
-Date:   Wed, 21 Jun 2023 15:31:04 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/95d3e6-37042c@github.com>
-Subject: [bluez/bluez] 98383b: mgmt-api: Update Device Found Event
- documentation
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Wed, 21 Jun 2023 21:54:05 -0400
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 950C61728;
+        Wed, 21 Jun 2023 18:54:04 -0700 (PDT)
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3420b22365fso31378275ab.1;
+        Wed, 21 Jun 2023 18:54:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687398844; x=1689990844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=31P9F/YC9zMm83CK7+sKmOqWlDM5cGl45VAeEo+lqb0=;
+        b=Db1nv+zrn8ep00FCN7SI4j0FRElfuT40VN2u4MnKRFFfnJ9TV9Gnn1Ai09mgsv3sIw
+         mAHhelKCbS2i/PUyBjr6K0wI8QvqrEr6k+rsgzwHT5F9n4IHoqfskVlpkbTjyV83qID2
+         NPs89GZrprsYihU6S3Blk04u7sI8GLw+cF5asM8gyYraz/Zs0t0ZxWeq6OHSjNHnwsY1
+         Xgrkux2wJ1H2DW0YYIYX2jtMkUMqs6WXP/Xf7IYJbFqsS+rKZmVHLiVrOJ3adSskzkW1
+         E+hgnzrNyJCW2BIXV7W6a9MVCYZG4GSQrvj9yiKaCTWG+Y+8X0gB3Jf85KlG5pPsF095
+         6yvg==
+X-Gm-Message-State: AC+VfDyv9Hw6boTU6vCAHPCwdSz3MOejJSFxLP+NMNHswsFgOPMzRLDv
+        pASfeYJ20UqmycYHZeUKtg==
+X-Google-Smtp-Source: ACHHUZ5X5gkhCzH6ju9HDjxyC21KORxz/L86uLutOzaILz+YG61ViJsYJu97hkmoe7w4uNKpjiLz/Q==
+X-Received: by 2002:a05:6e02:102:b0:340:8cb1:aaa8 with SMTP id t2-20020a056e02010200b003408cb1aaa8mr18420551ilm.21.1687398843862;
+        Wed, 21 Jun 2023 18:54:03 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id dp32-20020a0566381ca000b00420c29f7938sm1444878jab.100.2023.06.21.18.54.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 18:54:03 -0700 (PDT)
+Received: (nullmailer pid 45668 invoked by uid 1000);
+        Thu, 22 Jun 2023 01:54:00 -0000
+Date:   Wed, 21 Jun 2023 19:54:00 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Neil Armstrong <neil.armstrong@linaro.org>
+Cc:     netdev@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Andy Gross <agross@kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        Conor Dooley <conor+dt@kernel.org>,
+        linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        linux-arm-msm@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH 1/4] dt-bindings: net: bluetooth: qualcomm: document
+ WCN7850 chipset
+Message-ID: <168739884042.45610.17624224573017618860.robh@kernel.org>
+References: <20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org>
+ <20230620-topic-sm8550-upstream-bt-v1-1-4728564f8872@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620-topic-sm8550-upstream-bt-v1-1-4728564f8872@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 98383b917a4355c5fb87d1771a31b1f3420f2a1b
-      https://github.com/bluez/bluez/commit/98383b917a4355c5fb87d1771a31b1f3420f2a1b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-06-20 (Tue, 20 Jun 2023)
 
-  Changed paths:
-    M doc/mgmt-api.txt
+On Tue, 20 Jun 2023 17:19:36 +0200, Neil Armstrong wrote:
+> Document the WCN7850 Bluetooth chipset.
+> 
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+> ---
+>  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 23 ++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
 
-  Log Message:
-  -----------
-  mgmt-api: Update Device Found Event documentation
+Reviewed-by: Rob Herring <robh@kernel.org>
 
-This updates Device Found Event documentation to mention the new flag
-introduced to track when the event is generated due a interleaved Scan
-Response that couldn't be merged.
-
-
-  Commit: 741a04aba0c348d4e1b280e1202d439f2e572ab6
-      https://github.com/bluez/bluez/commit/741a04aba0c348d4e1b280e1202d439f2e572ab6
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-06-20 (Tue, 20 Jun 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Add missing flags to MGMT Device Found Event
-
-This adds the missing flags to MGMT Device Found Event so they can be
-decoded properly.
-
-
-  Commit: c8235156c31b36e85784b0a984705b3eb45d4041
-      https://github.com/bluez/bluez/commit/c8235156c31b36e85784b0a984705b3eb45d4041
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-06-20 (Tue, 20 Jun 2023)
-
-  Changed paths:
-    M lib/mgmt.h
-    M src/adapter.c
-    M src/adapter.h
-    M src/adv_monitor.c
-
-  Log Message:
-  -----------
-  adapter: Handle Device Found Event with Scan Response flag
-
-This handles recently introduced Scan Response flag since that
-shouldn't affect connectable flag the device would be considered
-connectable but it shall not create a new device by itself.
-
-
-  Commit: dafec5e4e41e80bc220bd1b577837e6328306ab9
-      https://github.com/bluez/bluez/commit/dafec5e4e41e80bc220bd1b577837e6328306ab9
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-06-20 (Tue, 20 Jun 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Fix decoding of HCI CIS Established Event
-
-The ISO Interval is actually using set using 1.25ms slots:
-
-BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-page 2304:
-
-  Time = N * 1.25 ms
-
-
-  Commit: 2f3479337f14a8e1dbc5ba0d70bf2723bf8b1b0d
-      https://github.com/bluez/bluez/commit/2f3479337f14a8e1dbc5ba0d70bf2723bf8b1b0d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-06-21 (Wed, 21 Jun 2023)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  btdev: Fix CIS Establish ISO Interval
-
-ISO Interval is actually using 1.25 ms slots so it needs to be properly
-converted.
-
-
-  Commit: 37042ca9c6ddcdbbb0899b3d62238935cd53f443
-      https://github.com/bluez/bluez/commit/37042ca9c6ddcdbbb0899b3d62238935cd53f443
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-06-21 (Wed, 21 Jun 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Use get_le24 to convert 24 bits values
-
-This uses get_le24 to convert 24 bits microseconds values.
-
-
-Compare: https://github.com/bluez/bluez/compare/95d3e66524bf...37042ca9c6dd
