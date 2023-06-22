@@ -2,62 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADFAEB64D8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jun 2023 19:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86268EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jun 2023 19:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbjFVTIt (ORCPT
+        id S230257AbjFVT12 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jun 2023 15:08:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47202 "EHLO
+        Thu, 22 Jun 2023 15:27:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbjFVTIs (ORCPT
+        with ESMTP id S229522AbjFVT11 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jun 2023 15:08:48 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 376701FC6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jun 2023 12:08:47 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-39ea511930eso4973042b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jun 2023 12:08:47 -0700 (PDT)
+        Thu, 22 Jun 2023 15:27:27 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7B151987
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jun 2023 12:27:26 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id af79cd13be357-762490831f6so590119585a.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jun 2023 12:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687460926; x=1690052926;
+        d=gmail.com; s=20221208; t=1687462045; x=1690054045;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MMpSuSZp5bN/57iTSFy0rMI4tshkhQTtmO4///5qTBE=;
-        b=CtIaOVhYhFfEJ1wGqcWD7fS65hz4vDSRy/2AgNGRLw9lD3ZQouQdcy/zGODCbY90Dk
-         rOFWxx8Adb58K263clvA0/ki7kmF1gvP2biS19JettJuQQdHH8joPCkhfbbo9Go0VHgr
-         UQMjUkkbQEYeg+F3LoHV1uFgosr/DECl/1QuJvCQnuZnXPHpdLQ77emWtvDIjNJ7gWUq
-         jOPIFaxOOooX8+pAfjFgYbeHiBd2jC14MG+12dngrfDFW4TI1hv65nhkY39f/cBRBOQa
-         CKDtduh1pStwPPYAazdp2wmDUzijxcDArLjt/rVjWTO6LElwdMX8yRHjgGhZ0BvkPxog
-         JiJg==
+        bh=rA81EDSrfjpLvNQ0lkr2EG4BI0BkijknMcGH016sWQA=;
+        b=Oh6DPR2+NzL/KsJMB80muf2JZk6R/oIaTDj5gQ0lr2GqfVeIC+Jfu5SFRtyj23L0RC
+         TMUBAr3O0dCSlNwU/qgDPo7/NFJ7VkjBTHaqQ92L4YJmNbBhgFSUvFECdqRL5kPLdIXf
+         9hCN26tDgDdiYVYSAzWAYZNE1DOs4TyJHz6DNhc7OWQDWa/ghd72rTqie73bJOyZGiIQ
+         COL4cI2DWZdZv0B5XtjPYDJCSwNx2ZApqD58fgeT35a5/6eRICRgf3G/mbzYRzzV/U0f
+         0fHqT2odpoQR8sS3vYhK7iIeaBaX2oGuGhI/CxjiwLexM5BHDWLlYv8J1m38ogADzI3J
+         u5Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687460926; x=1690052926;
+        d=1e100.net; s=20221208; t=1687462045; x=1690054045;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MMpSuSZp5bN/57iTSFy0rMI4tshkhQTtmO4///5qTBE=;
-        b=XniG5I4sz6jYiwegPZJuoLaDxHfJn0++ynk192RxLl9RVixIZZn3QF3CAXkQywLB/z
-         hJj5yC71Cp+BwfiJAS7HKAAM7vWnVeadvFeG9OhHnhk1wenaxX+5qDh/9UEvws6bvBmJ
-         nE88h+IG63ZC1tmdjHcxU0NQjxEPIzPxbGRfR+D370h1Gc+dpe1Nrv/OCiSl6ZuW3h65
-         aDUvPo25yCmZHuJdpFEOkHTYK71eDNrPJLBkQMo+l4rK9F5qghvj+81rLWH5weBiJ6Zr
-         pDo3x6ggPxyxVmFYXin6yBZQfwwV7FzLCwBCf5qy0BoaE/xQDFvolyoRKabOw6K49D95
-         QcWQ==
-X-Gm-Message-State: AC+VfDzBaeebeyC9u7jF8FJvJuTc7ssaXi6HqYwrGHgmquFV8+b9x/yc
-        8EuyNem7Q2/T4Pj2gmRo2Bb4am37l0WcwA==
-X-Google-Smtp-Source: ACHHUZ73efKZEu4DOKRmFlPtEgo6XIZ6M9X7UygvhdKWniKmyV4RjB9cR58hjaLCYnBSTCrDQc4rXg==
-X-Received: by 2002:a05:6808:1584:b0:3a1:a191:d454 with SMTP id t4-20020a056808158400b003a1a191d454mr405170oiw.29.1687460925716;
-        Thu, 22 Jun 2023 12:08:45 -0700 (PDT)
+        bh=rA81EDSrfjpLvNQ0lkr2EG4BI0BkijknMcGH016sWQA=;
+        b=CbB9jnrlrNytvPzjxWuM4Cg2cSCY0KCdYqnEIqcsPUry0UafXi3jaTYwo1gM/H2k3A
+         HLKQf6fUeH4gOACw7/RuGvAhzCilXorCapdvtKAH5rmDfLD5a2sVyqm/ZR6ApVKDtTah
+         SeNcxnfLEQZgGzIUvSolxyybGliQJKmifcgJpEOW6Gfa3wg+ogHIDGmoV+AZb0HE0p5j
+         BSxjnnY+RDzDBwe6X3WnrJQwsvlu7TGPOWoMXKVVlK1NFFNFfHIDuWP2lpEdBECplVYi
+         G+OMDZkXtc1fG/PCsquXe8U2mKgyneaoZjCM/laveAbZb2MaLjOhYCE3ex34nAnHHriE
+         s74g==
+X-Gm-Message-State: AC+VfDw3tNvfJ6E86O0eFLUI47BlSHv8EDSJVAKJbt6LDw/4XEs9tQBw
+        c5Kkq5de8ToUYmWOm1BqKquQfdk0Euev1A==
+X-Google-Smtp-Source: ACHHUZ58f6Sr5ukAmvfb0J30TXV54lJoLa+/+RKA2ancprmW+Ig3bF5u3ykq1fx451o03d+sAdMCvw==
+X-Received: by 2002:a05:620a:3a43:b0:762:57af:e0c9 with SMTP id sk3-20020a05620a3a4300b0076257afe0c9mr12841046qkn.25.1687462045205;
+        Thu, 22 Jun 2023 12:27:25 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id lb10-20020a17090b4a4a00b002609cadc56esm99784pjb.11.2023.06.22.12.08.44
+        by smtp.gmail.com with ESMTPSA id g5-20020a05620a108500b0075f2c1afb7fsm3692151qkk.57.2023.06.22.12.27.23
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 12:08:44 -0700 (PDT)
+        Thu, 22 Jun 2023 12:27:24 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] btdev: Fix LE CIS Established Event
-Date:   Thu, 22 Jun 2023 12:08:43 -0700
-Message-Id: <20230622190843.1242967-1-luiz.dentz@gmail.com>
+Subject: [PATCH v4] Bluetooth: hci_event: Fix parsing of CIS Established Event
+Date:   Thu, 22 Jun 2023 12:27:22 -0700
+Message-Id: <20230622192722.1248374-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -65,88 +64,77 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-LE CIS Established Event Transport Latency shall follow the formula from
-the spec:
+The ISO Interval on CIS Established Event uses 1.25 ms slots:
 
- BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
- page 3050:
+    BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+    page 2304:
 
- Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P ×
- ISO_Interval - SDU_Interval_C_To_P
- Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
- ISO_Interval - SDU_Interval_P_To_C
+      Time = N * 1.25 ms
+
+In addition to that this always update the QoS settings based on CIS
+Established Event.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- emulator/btdev.c | 43 +++++++++++++++++++++++++++++++------------
- 1 file changed, 31 insertions(+), 12 deletions(-)
+ net/bluetooth/hci_event.c | 36 +++++++++++++++++++++++-------------
+ 1 file changed, 23 insertions(+), 13 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 0a375febad68..d5450190c38e 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -5940,6 +5940,18 @@ static int cmd_create_cis(struct btdev *dev, const void *data, uint8_t len)
- 	return 0;
- }
- 
-+static uint32_t le_cis_transport_latecy(uint8_t ft, uint8_t iso_interval,
-+						uint8_t sdu_interval[3])
-+{
-+	uint32_t latency;
-+	uint32_t interval = get_le24(sdu_interval);
-+
-+	/* Transport_Latency = FT × ISO_Interval - SDU_Interval */
-+	latency = ft * (iso_interval * 1250) - interval;
-+
-+	return latency <= interval ? latency : interval;
-+}
-+
- static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 						uint8_t status)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b1aefe4bb751..049aa7f6a7c5 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6822,6 +6822,7 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
  {
-@@ -5959,25 +5971,32 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 		struct btdev *remote = conn->link->dev;
- 		struct le_cig *le_cig = &remote->le_cig[cig_idx];
+ 	struct hci_evt_le_cis_established *ev = data;
+ 	struct hci_conn *conn;
++	struct bt_iso_qos *qos;
+ 	bool pending = false;
+ 	u16 handle = __le16_to_cpu(ev->handle);
  
--		/* TODO: Figure out if these values makes sense */
--		memcpy(evt.cig_sync_delay, le_cig->params.c_interval,
--				sizeof(le_cig->params.c_interval));
--		memcpy(evt.cis_sync_delay, le_cig->params.p_interval,
--				sizeof(le_cig->params.p_interval));
--		memcpy(evt.c_latency, &le_cig->params.c_interval,
--				sizeof(le_cig->params.c_interval));
--		memcpy(evt.p_latency, &le_cig->params.p_interval,
--				sizeof(le_cig->params.p_interval));
-+		memset(evt.cig_sync_delay, 0, sizeof(evt.cig_sync_delay));
-+		memset(evt.cis_sync_delay, 0, sizeof(evt.cis_sync_delay));
-+
- 		evt.c_phy = le_cig->cis[cis_idx].c_phy;
- 		evt.p_phy = le_cig->cis[cis_idx].p_phy;
- 		evt.nse = 0x01;
- 		evt.c_bn = 0x01;
- 		evt.p_bn = 0x01;
--		evt.c_ft = 0x01;
--		evt.p_ft = 0x01;
-+		evt.c_ft = 0x02;
-+		evt.p_ft = 0x02;
- 		evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
- 		evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
--		evt.interval = (le_cig->params.c_latency + 1) / 1.25;
-+		evt.interval = (le_cig->params.c_latency + 0.625) / 1.25;
-+
-+		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
-+		 * page 3050:
-+		 *
-+		 * Transport_Latency_C_To_P = CIG_Sync_Delay + FT_C_To_P ×
-+		 * ISO_Interval - SDU_Interval_C_To_P
-+		 * Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
-+		 * ISO_Interval - SDU_Interval_P_To_C
-+		 */
-+		put_le24(le_cis_transport_latecy(evt.c_ft, evt.interval,
-+				le_cig->params.c_interval), evt.c_latency);
-+		put_le24(le_cis_transport_latecy(evt.p_ft, evt.interval,
-+				le_cig->params.p_interval), evt.p_latency);
+@@ -6846,21 +6847,30 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
+ 
+ 	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags);
+ 
+-	if (conn->role == HCI_ROLE_SLAVE) {
+-		__le32 interval;
++	qos = &conn->iso_qos;
+ 
+-		memset(&interval, 0, sizeof(interval));
++	/* Convert ISO Interval (1.25 ms slots) to latency (ms) */
++	qos->ucast.in.latency = DIV_ROUND_CLOSEST(le16_to_cpu(ev->interval) *
++						  125, 100);
++	qos->ucast.out.latency = qos->ucast.in.latency;
+ 
+-		memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
+-		conn->iso_qos.ucast.in.interval = le32_to_cpu(interval);
+-		memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
+-		conn->iso_qos.ucast.out.interval = le32_to_cpu(interval);
+-		conn->iso_qos.ucast.in.latency = le16_to_cpu(ev->interval);
+-		conn->iso_qos.ucast.out.latency = le16_to_cpu(ev->interval);
+-		conn->iso_qos.ucast.in.sdu = le16_to_cpu(ev->c_mtu);
+-		conn->iso_qos.ucast.out.sdu = le16_to_cpu(ev->p_mtu);
+-		conn->iso_qos.ucast.in.phy = ev->c_phy;
+-		conn->iso_qos.ucast.out.phy = ev->p_phy;
++	switch (conn->role) {
++	case HCI_ROLE_SLAVE:
++		qos->ucast.in.interval = get_unaligned_le24(ev->c_latency);
++		qos->ucast.out.interval = get_unaligned_le24(ev->p_latency);
++		qos->ucast.in.sdu = le16_to_cpu(ev->c_mtu);
++		qos->ucast.out.sdu = le16_to_cpu(ev->p_mtu);
++		qos->ucast.in.phy = ev->c_phy;
++		qos->ucast.out.phy = ev->p_phy;
++		break;
++	case HCI_ROLE_MASTER:
++		qos->ucast.out.interval = get_unaligned_le24(ev->c_latency);
++		qos->ucast.in.interval = get_unaligned_le24(ev->p_latency);
++		qos->ucast.out.sdu = le16_to_cpu(ev->c_mtu);
++		qos->ucast.in.sdu = le16_to_cpu(ev->p_mtu);
++		qos->ucast.out.phy = ev->c_phy;
++		qos->ucast.in.phy = ev->p_phy;
++		break;
  	}
  
- 	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
+ 	if (!ev->status) {
 -- 
 2.40.1
 
