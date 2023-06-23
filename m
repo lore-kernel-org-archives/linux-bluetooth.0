@@ -2,68 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 352C7EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 00:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8DAEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 02:30:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230270AbjFWA6d (ORCPT
+        id S231297AbjFWCaZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jun 2023 20:58:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56520 "EHLO
+        Thu, 22 Jun 2023 22:30:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230090AbjFWA6c (ORCPT
+        with ESMTP id S231286AbjFWCaX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jun 2023 20:58:32 -0400
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66DFAE9;
-        Thu, 22 Jun 2023 17:58:30 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0VlkO6Zp_1687481893;
-Received: from 30.121.14.202(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0VlkO6Zp_1687481893)
-          by smtp.aliyun-inc.com;
-          Fri, 23 Jun 2023 08:58:25 +0800
-Message-ID: <7f9ffecc-726f-5475-48e8-40a266cb43d7@linux.alibaba.com>
-Date:   Fri, 23 Jun 2023 08:58:13 +0800
+        Thu, 22 Jun 2023 22:30:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3442C1BC1;
+        Thu, 22 Jun 2023 19:30:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9703260FF1;
+        Fri, 23 Jun 2023 02:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E6920C433C8;
+        Fri, 23 Jun 2023 02:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1687487421;
+        bh=3ZbCN/ViU53qsdRk8S7Lh80V0DgIwoSkPZYj9zk4rF8=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=GkPyq1+YJa/y9ww+1Iwh5AqHAzabdFG5FUPo67CpemxpivuxZOSrjth7PvgUIq9kf
+         vqY+fiTBsLv10LGL8J3dvgJW0EnJqBaPaHgnBTYwnXED2fnqERUqnctOWQ75XgLVwS
+         Fykz3QwMvTsHlY6fwXOyqVgRyvdhfsnKSV/OoK4W71PNP78s/ZWwE+VFFSEHhufcUG
+         Uj9Ye7gazHq592Va3EW43f7Fvm5ImHJcp4D4gY9iocGqrArlKcZKHNx7KPxKysXLD3
+         XbZR+amnu3C0oISCFKKrP1+34qu+BzMlgX3Dcrw+SWS/y4PuCNmdeb6JKkcXDJqLj0
+         kN2bSOn303VTw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C0DD3C691EE;
+        Fri, 23 Jun 2023 02:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.10.0
-Subject: Re: [PATCH 0/3] fixup potential cpu stall
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
-        xuanzhuo@linux.alibaba.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, amit@kernel.org, arnd@arndb.de,
-        gregkh@linuxfoundation.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230609131817.712867-1-xianting.tian@linux.alibaba.com>
- <20230622075819-mutt-send-email-mst@kernel.org>
-From:   Xianting Tian <xianting.tian@linux.alibaba.com>
-In-Reply-To: <20230622075819-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth
+ drivers
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <168748742078.21061.4290523785212356323.git-patchwork-notify@kernel.org>
+Date:   Fri, 23 Jun 2023 02:30:20 +0000
+References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello:
 
-在 2023/6/22 下午7:59, Michael S. Tsirkin 写道:
-> On Fri, Jun 09, 2023 at 09:18:14PM +0800, Xianting Tian wrote:
->> Cpu stall issue may happen if device is configured with multi queues
->> and large queue depth, so fix it.
->
-> I applied this after tweaking commit log to address Greg's comments.
-> In the future I expect you guys to do such tweaks yourself.
-thanks.
->
->> Xianting Tian (3):
->>    virtio-crypto: fixup potential cpu stall when free unused bufs
->>    virtio_console: fixup potential cpu stall when free unused bufs
->>    virtio_bt: fixup potential cpu stall when free unused bufs
->>
->>   drivers/bluetooth/virtio_bt.c              | 1 +
->>   drivers/char/virtio_console.c              | 1 +
->>   drivers/crypto/virtio/virtio_crypto_core.c | 1 +
->>   3 files changed, 3 insertions(+)
->>
->> -- 
->> 2.17.1
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 21 Jun 2023 08:09:49 +0200 you wrote:
+> The Devicetree bindings should be picked up by subsystem maintainers,
+> but respective pattern for Bluetooth drivers was missing.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+
+Here is the summary with links:
+  - Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth drivers
+    https://git.kernel.org/netdev/net/c/533bbc7ce562
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
