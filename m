@@ -2,187 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 151C1EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 22:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7749C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 22:42:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232135AbjFWWVf convert rfc822-to-8bit (ORCPT
+        id S232306AbjFWWmM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jun 2023 18:21:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53000 "EHLO
+        Fri, 23 Jun 2023 18:42:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232478AbjFWWV3 (ORCPT
+        with ESMTP id S232573AbjFWWmG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jun 2023 18:21:29 -0400
-Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 577532D65
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 15:21:11 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout02.posteo.de (Postfix) with ESMTPS id 4634D240101
-        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Jun 2023 00:21:09 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4QnsC83Xvbz9rxG;
-        Sat, 24 Jun 2023 00:21:08 +0200 (CEST)
-Message-ID: <5930c316c248f6326bd47078ebbc289798c249ce.camel@iki.fi>
-Subject: Re: [PATCH RFC 1/5] Bluetooth: hci_conn: add hci_conn_is_alive
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Fri, 23 Jun 2023 22:21:08 +0000
-In-Reply-To: <CABBYNZK_3aOVYgf6LiFXvkdGbju2UgU4WuEKRSrpuTdwv=BbFg@mail.gmail.com>
-References: <cover.1687525956.git.pav@iki.fi>
-         <45455ee45ccb3313618a48c01be714e14d372257.1687525956.git.pav@iki.fi>
-         <CABBYNZK_3aOVYgf6LiFXvkdGbju2UgU4WuEKRSrpuTdwv=BbFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Fri, 23 Jun 2023 18:42:06 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1383B9D
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 15:42:06 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-3411ea250efso4629535ab.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 15:42:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687560125; x=1690152125;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g1xciNPACgCLOYoTe21g7vnXAM9H5d+1xTq1E1YRKoQ=;
+        b=dIymKq97VoPFZu3anvHTgHqrNr8fxe0pw+X+JCJoecoR3rowK6OqmZFJeaB7aIutLY
+         pHlfKHEdo+t+CJ4t7j3aT1Dh9n7UTxo7t6E5UQuTIgmrdw4wDCl5yqtERNcj0lCcBZnD
+         hwajreP3tALLto6Wxm1xGQECbpE88TtNPBZAFmvQ7+8GInh7p1kJDpmAqe4f/8wCcC7S
+         zChrhmr2UYnWt8iIhfcZ4u9qrkRJ2CtfABlknkBF7kcSzAyC9tg7sE6MSmfYWCr1ueJ2
+         aVHsJjDFQB4+BLyIWwAFou4oqCUkLc+NCqaCjyGg8nAhxegS9ueROJskNMBVZ7J9Xql8
+         qusA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687560125; x=1690152125;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g1xciNPACgCLOYoTe21g7vnXAM9H5d+1xTq1E1YRKoQ=;
+        b=SH6MGmygI9SkY0qX1OEeVyRkQ3HSqy9pJmpGOQSU4NH6nu7C97NxsCijScOepNwWdr
+         XpKfQ79sjsdySTA1gyPBQaALsPc92XypwQ3InbXpKz5gqFlXD3l5OndZlwPNEB9Sa7nr
+         FZV5a8znnw5V+LrlSHBBO+HttnwY4GtK8WE3eWUbGLyEg6kj+x1X9Gy3NCSmcyKBDNNF
+         /wb2xtRnVuYz+DNXcmOERCwhqoR1A/iEeEl58EqPZ5AtqsOrOvDAP3u11qtxEoupLqw1
+         cEC9x/3TQIhQwJ9k+0dVy38bvxW0gN787AhAeNBaKJX6bzmXHt3SJVl3ZFBvcebiAz5M
+         TFSw==
+X-Gm-Message-State: AC+VfDyD++44Q5xzF8XhPt3JAV9o5a1n6BJt/mpFvrbUx6HOBfOdcg7t
+        wGi9FdFTgA6IXjv4t77BQOq2I4YQh7c=
+X-Google-Smtp-Source: ACHHUZ5i/IK9R1umRgjL6XYluxv+kxNhy3s2XgEifg2sbWiNHdUhBMudr85PKSP4GYIkYn5jexykQQ==
+X-Received: by 2002:a92:c60a:0:b0:340:6db8:e814 with SMTP id p10-20020a92c60a000000b003406db8e814mr22407795ilm.22.1687560125147;
+        Fri, 23 Jun 2023 15:42:05 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.63.112])
+        by smtp.gmail.com with ESMTPSA id v2-20020aa78502000000b006667b36e904sm41814pfn.113.2023.06.23.15.42.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 15:42:04 -0700 (PDT)
+Message-ID: <64961fbc.a70a0220.24784.01f3@mx.google.com>
+Date:   Fri, 23 Jun 2023 15:42:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8429188685903281699=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] btdev: Fix CIS Established Event parameters
+In-Reply-To: <20230623212430.1702254-1-luiz.dentz@gmail.com>
+References: <20230623212430.1702254-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============8429188685903281699==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-pe, 2023-06-23 kello 12:39 -0700, Luiz Augusto von Dentz kirjoitti:
-> On Fri, Jun 23, 2023 at 10:37 AM Pauli Virtanen <pav@iki.fi> wrote:
-> > 
-> > A delayed operation such as hci_sync on a given hci_conn needs to take
-> > hci_conn_get, so that the hci_conn doesn't get freed in the meantime.
-> > This does not guarantee the conn is still alive in a valid state, as it
-> > may be cleaned up in the meantime, so one needs to check if it is still
-> > in conn_hash to know if it's still alive.
-> > 
-> > Simplify this alive check, using HCI_CONN_DELETED flag. This is also
-> > meaningful with RCU lock only, but with slightly different semantics.
-> > 
-> > If hci_conn_is_alive(conn) returns true inside rcu_read_lock, conn was
-> > in conn_hash from the point of view of the current task when the flag
-> > was read. Then its deletion cannot complete before rcu_read_unlock.
-> > 
-> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > ---
-> > 
-> > Notes:
-> >     This probably can be done with RCU primitives setting list.prev, but
-> >     that's maybe more magical...
-> > 
-> >  include/net/bluetooth/hci_core.h | 18 ++++++++++++++++++
-> >  net/bluetooth/hci_conn.c         | 10 +---------
-> >  2 files changed, 19 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index 05a9b3ab3f56..cab39bdd0592 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -978,6 +978,7 @@ enum {
-> >         HCI_CONN_PER_ADV,
-> >         HCI_CONN_BIG_CREATED,
-> >         HCI_CONN_CREATE_CIS,
-> > +       HCI_CONN_DELETED,
-> >  };
-> > 
-> >  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-> > @@ -997,6 +998,7 @@ static inline bool hci_conn_sc_enabled(struct hci_conn *conn)
-> >  static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
-> >  {
-> >         struct hci_conn_hash *h = &hdev->conn_hash;
-> > +       WARN_ON(test_bit(HCI_CONN_DELETED, &c->flags));
-> >         list_add_tail_rcu(&c->list, &h->list);
-> >         switch (c->type) {
-> >         case ACL_LINK:
-> > @@ -1023,6 +1025,10 @@ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
-> >  static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
-> >  {
-> >         struct hci_conn_hash *h = &hdev->conn_hash;
-> > +       bool deleted;
-> > +
-> > +       deleted = test_and_set_bit(HCI_CONN_DELETED, &c->flags);
-> > +       WARN_ON(deleted);
-> > 
-> >         list_del_rcu(&c->list);
-> >         synchronize_rcu();
-> > @@ -1049,6 +1055,18 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
-> >         }
-> >  }
-> > 
-> > +/* With hdev->lock: whether hci_conn is in conn_hash.
-> > + * With RCU: if true, the hci_conn is valid conn_hash iteration cursor and
-> > + * hci_conn_hash_del has not completed. (Note that if hci_conn was obtained in
-> > + * this critical section it is always valid, but this may return false!)
-> > + */
-> > +static inline bool hci_conn_is_alive(struct hci_dev *hdev, struct hci_conn *c)
-> > +{
-> > +       RCU_LOCKDEP_WARN(lockdep_is_held(&hdev->lock) || rcu_read_lock_held(),
-> > +                        "suspicious locking");
-> > +       return !test_bit(HCI_CONN_DELETED, &c->flags);
-> > +}
-> 
-> I think we are better off doing something like
-> hci_conn_hold_unless_zero like we do in l2cap_chan_hold_unless_zero,
-> that said we need to check if the hci_conn_drop can still set the ref
-> below zero, anyway that is probably a bug in itself and we should
-> probably WARN_ON if that happens.
+This is automated email and please do not reply to this email!
 
-The problem here is that we'd like to have both
+Dear submitter,
 
-(1) to have hci_conn_del/cleanup delete the item from conn_hash
-immediately
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=759916
 
-(2) be able to continue iteration from the conn we held, after
-releasing and reacquiring RCU or hdev->lock
+---Test result---
 
-If conn is removed from the list, conn->list.next won't be updated any
-more, so it is not safe to access after we have left the critical
-section. So it seems we'd need some marker on whether it is still in
-the list.
+Test Summary:
+CheckPatch                    PASS      0.74 seconds
+GitLint                       PASS      0.51 seconds
+BuildEll                      PASS      26.27 seconds
+BluezMake                     PASS      752.96 seconds
+MakeCheck                     PASS      11.68 seconds
+MakeDistcheck                 PASS      152.27 seconds
+CheckValgrind                 PASS      245.87 seconds
+CheckSmatch                   WARNING   330.57 seconds
+bluezmakeextell               PASS      100.03 seconds
+IncrementalBuild              PASS      1279.32 seconds
+ScanBuild                     PASS      978.92 seconds
 
-Maybe (1) could be given up instead, something like: hci_conn_cleanup
-sets HCI_CONN_DELETED instead of deleting from the list if refcount is
-positive, and lookup functions skip items with this flag. 
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:417:29: warning: Variable length array is used.
 
-Something along these lines could work, need to think a bit.
 
-> >  static inline unsigned int hci_conn_num(struct hci_dev *hdev, __u8 type)
-> >  {
-> >         struct hci_conn_hash *h = &hdev->conn_hash;
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 62a7ccfdfe63..d489a4829be7 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -183,21 +183,13 @@ static void le_scan_cleanup(struct work_struct *work)
-> >         struct hci_conn *conn = container_of(work, struct hci_conn,
-> >                                              le_scan_cleanup);
-> >         struct hci_dev *hdev = conn->hdev;
-> > -       struct hci_conn *c = NULL;
-> > 
-> >         BT_DBG("%s hcon %p", hdev->name, conn);
-> > 
-> >         hci_dev_lock(hdev);
-> > 
-> >         /* Check that the hci_conn is still around */
-> > -       rcu_read_lock();
-> > -       list_for_each_entry_rcu(c, &hdev->conn_hash.list, list) {
-> > -               if (c == conn)
-> > -                       break;
-> > -       }
-> > -       rcu_read_unlock();
-> > -
-> > -       if (c == conn) {
-> > +       if (hci_conn_is_alive(hdev, conn)) {
-> 
-> Hmm, I don't think this is safe, except if we are doing hci_conn_get
-> we can't really access the conn pointer since it may be freed already,
-> anyway this is sort of broken already given that we do access
-> conn->hdev already.
+---
+Regards,
+Linux Bluetooth
 
-hci_conn_get is held here, there's a hci_conn_put at the end of this
-function.
 
-> 
-> >                 hci_connect_le_scan_cleanup(conn, 0x00);
-> >                 hci_conn_cleanup(conn);
-> >         }
-> > --
-> > 2.41.0
-> > 
-> 
-> 
-
+--===============8429188685903281699==--
