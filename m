@@ -2,62 +2,65 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E6AEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 21:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55347C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 21:26:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229581AbjFWV0q (ORCPT
+        id S230171AbjFWV0r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jun 2023 17:26:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59272 "EHLO
+        Fri, 23 Jun 2023 17:26:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231640AbjFWVYf (ORCPT
+        with ESMTP id S231905AbjFWVYg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jun 2023 17:24:35 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFE41997
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 14:24:33 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1b53e1cd0ffso7255445ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 14:24:33 -0700 (PDT)
+        Fri, 23 Jun 2023 17:24:36 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1CDE1FCE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 14:24:35 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b50394a7f2so7060375ad.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 14:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687555472; x=1690147472;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y0+JcJh53G8KrzGIubrj8DDWH3139d9wNlcvJVBjv+s=;
-        b=qB71/EcRl4VIvsMsdYsQNyGrIX9dEtEetSLtXGLFZYss0bSIwbOebeObgZlXv6Ib3a
-         rVq5egXma8ZBcziDDZjGm2H2WI796gfp+3wYSVrgzeS2oJinIhvNvlM0xTwtkl+O0ybL
-         +eX/OUpsocs8/dY1BTNJiHLY0Idb6ymJJxhT7jcSzhJ1aHRGTbDSa59PRDWeyNDGnaYW
-         AZQcbKWUlyLSE2FZFlJEZ5dPqjpZJzBwvbf3g4CZHqBLsAAW+R/QBHUX56SrdyCK351y
-         DS/PPSuBKDJfpC2P9wklhq0+9I+4Iw+fSQU+ZxEa1diUvS+8YHvs3k36rqW6bf0KGmIx
-         fmEQ==
+        d=gmail.com; s=20221208; t=1687555474; x=1690147474;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Rp/ru7qYcdWmXC/qbmOwoVdMj0EeyzmUVpTC1B+bdQc=;
+        b=jl2qQiWSD7wRM9jNT+MEZWmcte1yhdB8AkuWQyFZp8QiDOPkpx6miWk0bhMXPKxDaq
+         a0eHti0eQyZYsOlMWGbqbSqmNNNSoWI2aUheaWyB0Z4eUrKGFHVPIQ7ns2Y00idFXGuE
+         Z0lt9eYPvqhU3hHs98qn0EiizutctRxixCaHgGyF/cXGR0rX8HWTYn+EuY3ukzhHMI0Q
+         iZUQgk/ief5tEP8RFMvNd7/aZs8v6vKBF61pah9riSuUmyDWlBYoS5SjzG5tjpO5BMqM
+         3dNRVBLWHqD1XwXjib6qovnc5agmkZxmyiq7TZ1QCde46AQerkKsI9kdLDxB4GqraImf
+         sBkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687555472; x=1690147472;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y0+JcJh53G8KrzGIubrj8DDWH3139d9wNlcvJVBjv+s=;
-        b=JN78KO0JatoSHSQLBfkFIaQLRZQJA2oafC0gsh1E2nbKoptUZOE51pFdi5l/WsgxVK
-         5jRSL0AZvaobMXx0Kqtlv50HqnXc+csR1m7gWHRgm6RRyPF1ftIi5pm/yVneRH+J41Q1
-         IU5hAbyNhCM2dtA/Ouo+SsRr76DrZljb/CRPBKL72jMe7o0vfywyv0M2IcNSvYUZC9LH
-         KCf3TAfxa+hKofZuNSGh5jB4xNX2W/ncVGqyRceFAmaAhRbVWoROpWkCmPPdPpr0r+5Z
-         T0M+Xy6NNKBc9hUR3UK6WzxFKs/S80GhyKrxLyWkIWSjgyhZZZ+MNsS6Dq7Pret2kkXl
-         gMgw==
-X-Gm-Message-State: AC+VfDxeEZnnaBe6Emb5ClirbzmF910mrigWI+ZhOi2G4SdjkUAM3hPl
-        KPSVQi4BrIlMgc7nIW6c2VeiywIo6DhoHQ==
-X-Google-Smtp-Source: ACHHUZ7zdO9elpNEBj2Nk1A4OleNVk747aRBMwyaYPn/71NaqJL3ZIQZFww/E10/aGTRd4/6OuiN+g==
-X-Received: by 2002:a17:902:f689:b0:1b2:1943:e291 with SMTP id l9-20020a170902f68900b001b21943e291mr243655plg.57.1687555472388;
-        Fri, 23 Jun 2023 14:24:32 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687555474; x=1690147474;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rp/ru7qYcdWmXC/qbmOwoVdMj0EeyzmUVpTC1B+bdQc=;
+        b=fRk/zVe8mlvMiTenEUkM18lFIqu0My0RKs84Br4EFinoMS7RzLhgCYo0Mtncj5YZbO
+         OJrXVfMm3vzxy70GJ4/BBOgV7TIXKJX9T/fpPsEaE3NKYeDEbm1xtZ4JBtfNCXCetg6n
+         XmfypNozUhsZD50L1OhXAxl5iCi9M4EX/3k5Ys5gl2QKHaE2T2XaWD3Dqd74N4mvfFL8
+         3nSYvobXa1wqVIu2bHDBnqjYXwaSWbEXAxhq+kkYBtjio5+9VedOxvqpkUiY20sWsyFz
+         h8+Ms05KbipLGaeX3Sl27Z0NLQh1sTFCMnUc1gVVJV/KY32xSDLXedvExSMARCxooKQ9
+         A94w==
+X-Gm-Message-State: AC+VfDznMgL2RNU/UJgWbTEKYLQJfWMImxZuBe9r45ZI+JGXvXXJSUdk
+        BE0dVj1AUEfBSMrCoH+d/LhsQtzEk4x/TQ==
+X-Google-Smtp-Source: ACHHUZ46CJLP1QQBXtqskYmKmfw99buKXwzx3HyJpMxE9rEi3q/E2J0Z1wmvb3ua6Mo6i51/hPcUhw==
+X-Received: by 2002:a17:902:ecce:b0:1b5:561a:5ca9 with SMTP id a14-20020a170902ecce00b001b5561a5ca9mr312058plh.50.1687555474207;
+        Fri, 23 Jun 2023 14:24:34 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
-        by smtp.gmail.com with ESMTPSA id bb6-20020a170902bc8600b001b694140d96sm20481plb.170.2023.06.23.14.24.31
+        by smtp.gmail.com with ESMTPSA id bb6-20020a170902bc8600b001b694140d96sm20481plb.170.2023.06.23.14.24.32
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 14:24:31 -0700 (PDT)
+        Fri, 23 Jun 2023 14:24:33 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] btdev: Fix CIS Established Event parameters
-Date:   Fri, 23 Jun 2023 14:24:29 -0700
-Message-Id: <20230623212430.1702254-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] iso-tester: Fix checks of latency and interval
+Date:   Fri, 23 Jun 2023 14:24:30 -0700
+Message-Id: <20230623212430.1702254-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230623212430.1702254-1-luiz.dentz@gmail.com>
+References: <20230623212430.1702254-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -65,62 +68,37 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ISO Interval and Transport Latency were inverted.
+Due to rounding of latency, BAP uses msec while HCI uses slots of
+1.25 ms, values may not return an exact match which is fine since the
+BAP QoS suggests they are the maximum latency/interval so values bellow
+that shall be considered a match.
 ---
- emulator/btdev.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ tools/iso-tester.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d5450190c38e..637f0bb98057 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -5940,8 +5940,14 @@ static int cmd_create_cis(struct btdev *dev, const void *data, uint8_t len)
- 	return 0;
- }
- 
--static uint32_t le_cis_transport_latecy(uint8_t ft, uint8_t iso_interval,
--						uint8_t sdu_interval[3])
-+static uint8_t le_cis_interval(uint8_t sdu_interval[3])
-+{
-+	/* ISO Interval (slots of 1.25 ms) = SDU_Interval (us) */
-+	return get_le24(sdu_interval) / 1250;
-+}
-+
-+static uint32_t le_cis_latecy(uint8_t ft, uint8_t iso_interval,
-+					uint8_t sdu_interval[3])
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index d6c79db9072b..bbd5a47f6197 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -1480,14 +1480,14 @@ static int connect_iso_sock(struct test_data *data, uint8_t num, int sk)
+ static bool check_io_qos(const struct bt_iso_io_qos *io1,
+ 				const struct bt_iso_io_qos *io2)
  {
- 	uint32_t latency;
- 	uint32_t interval = get_le24(sdu_interval);
-@@ -5949,7 +5955,7 @@ static uint32_t le_cis_transport_latecy(uint8_t ft, uint8_t iso_interval,
- 	/* Transport_Latency = FT × ISO_Interval - SDU_Interval */
- 	latency = ft * (iso_interval * 1250) - interval;
- 
--	return latency <= interval ? latency : interval;
-+	return latency >= interval ? latency : interval;
- }
- 
- static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
-@@ -5983,7 +5989,7 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 		evt.p_ft = 0x02;
- 		evt.c_mtu = le_cig->cis[cis_idx].c_sdu;
- 		evt.p_mtu = le_cig->cis[cis_idx].p_sdu;
--		evt.interval = (le_cig->params.c_latency + 0.625) / 1.25;
-+		evt.interval = le_cis_interval(le_cig->params.c_interval);
- 
- 		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
- 		 * page 3050:
-@@ -5993,9 +5999,9 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 		 * Transport_Latency_P_To_C = CIG_Sync_Delay + FT_P_To_C ×
- 		 * ISO_Interval - SDU_Interval_P_To_C
- 		 */
--		put_le24(le_cis_transport_latecy(evt.c_ft, evt.interval,
-+		put_le24(le_cis_latecy(evt.c_ft, evt.interval,
- 				le_cig->params.c_interval), evt.c_latency);
--		put_le24(le_cis_transport_latecy(evt.p_ft, evt.interval,
-+		put_le24(le_cis_latecy(evt.p_ft, evt.interval,
- 				le_cig->params.p_interval), evt.p_latency);
+-	if (io1->interval && io2->interval && io1->interval != io2->interval) {
+-		tester_warn("Unexpected IO interval: %u != %u",
++	if (io1->interval && io2->interval && io1->interval > io2->interval) {
++		tester_warn("Unexpected IO interval: %u > %u",
+ 				io1->interval, io2->interval);
+ 		return false;
  	}
  
+-	if (io1->latency && io2->latency && io1->latency != io2->latency) {
+-		tester_warn("Unexpected IO latency: %u != %u",
++	if (io1->latency && io2->latency && io1->latency > io2->latency) {
++		tester_warn("Unexpected IO latency: %u > %u",
+ 				io1->latency, io2->latency);
+ 		return false;
+ 	}
 -- 
 2.40.1
 
