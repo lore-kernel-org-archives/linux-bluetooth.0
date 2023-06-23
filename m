@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F358EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 19:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3103FEB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 19:59:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230426AbjFWTjj (ORCPT
+        id S231389AbjFWT7U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jun 2023 15:39:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35708 "EHLO
+        Fri, 23 Jun 2023 15:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjFWTji (ORCPT
+        with ESMTP id S229620AbjFWT7T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jun 2023 15:39:38 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA26D1FC6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 12:39:36 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b477e9d396so16670121fa.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 12:39:36 -0700 (PDT)
+        Fri, 23 Jun 2023 15:59:19 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86DE510F1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 12:59:17 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b46a06c553so17865701fa.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 12:59:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687549175; x=1690141175;
+        d=gmail.com; s=20221208; t=1687550356; x=1690142356;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IL0iMsUuHbOkRMCHKeutDpYE72FzogH0Q4lnz4SZoNc=;
-        b=swIz82gjx7izxD0QNCWJO7tdwQDkuFauiKsIF9kRmWrm2IP3ObLuAalRmSq709lndh
-         2cp+q/WQeFXfWuOeO9BP8E9ep0exqySUm3sd8uTW9HOP0MGTNb5qVS6s+t3WilFqoNJp
-         tQMgjyUevVG+t7pWn+VmfJ5kBfi9+TOoe+3OYl8lAkUn6/ZODUYVUiKQBkB3E8MLH89/
-         +eXHsu6/z5U8nGCxgj5zeN+tzQIHtFm1S/MlGNvc54GrMLo3SAuNzFXUX5ReKCms8qWL
-         MzzxXnGzUIM4sfwGYW/WM1ybuvRVld0CIQjpc2yLdqNLFELffeKZWvit+9lfL7xuGzHg
-         fblg==
+        bh=iA0Sbq2WMM0K/aJPj+pPdtOTKBc+g4pdC/TXhmCdsM4=;
+        b=emV6gxyUFmMe7EjsAdn1iXFz/SOHluLOyiBbAT/feXoY6hSOPB+WZAxdlW4sT78grA
+         5ty7/P9+g3w9LOHww0G8xMGtWHWxWJ5+YKG6WZUSZqzv7Yx0AYlfPde/b4xcMZtME5u+
+         xpn+lvyw7pksngqq8dHo78rerVqNLZAimSpBUunZ2aUUxEE9klu7/eIALfFmYUltFiYk
+         cNVKwhx2/+hStdhSmpTctXsgFgPTkWuec1Cisdc2ZoQ91AtuiSMZM0kQxOodFgtsNj/4
+         PPVZddiLUq6ArByhig39svq4bLmNdO/UxjDC74npomOz4XB0wd2Ff2iUFCy2Khnws0eQ
+         DYIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687549175; x=1690141175;
+        d=1e100.net; s=20221208; t=1687550356; x=1690142356;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IL0iMsUuHbOkRMCHKeutDpYE72FzogH0Q4lnz4SZoNc=;
-        b=hSg9vnUthahhG3vOS+AXDOlZSWyTY4uqIprf/AT+wYdq9HDPCj3h2KTY2yQf9Huxn/
-         zp2ArjUfhQg2G8kaUYNGBu1dzrowUyxOgQaOd6BPk+trL7ftkeDiz3fe353rjoXcrNp6
-         s4S2BqKrmdioBRac5PJE+t+CWCJhDvb1Cs+RP62eKEQhSOX3x4acv/kas+vM5PImCMCJ
-         AWkLZO0sDYvkP+LYT94SiMpC5ASkGIHyCRiR+Uft+1x6OIyjDZKn1xLQIA5v7EMyhNYc
-         R1gHih68AznDjfjVL0G2b+uS37bpoUVipGfjbH0FbAwGvJlwQklwN9enqGDaEaxpcAdg
-         CvFQ==
-X-Gm-Message-State: AC+VfDxQYwMBtqN05Ag0w+Zh9FJGH+KcQdhJ/QqUZLbkoVVp5ujQMA/M
-        pqx6IGG381RL2wi1NtDR8QdxPl1JIDh5avXu9FWNU/l0XMU=
-X-Google-Smtp-Source: ACHHUZ4SyN7HTG/v+j5w24L0mpG692V5FsWy7H/c1yv+jDPQJLZ97ezri14hGvFe0tFAbUwAt1LMpQHJkbrqJEclaq8=
-X-Received: by 2002:a2e:9846:0:b0:2b4:737c:e316 with SMTP id
- e6-20020a2e9846000000b002b4737ce316mr13943309ljj.14.1687549174689; Fri, 23
- Jun 2023 12:39:34 -0700 (PDT)
+        bh=iA0Sbq2WMM0K/aJPj+pPdtOTKBc+g4pdC/TXhmCdsM4=;
+        b=ib2Q3e0m+nuexCmZq2x4YlQoHo8x2euoUU7RjrihdXcG4pEitHJLDzyVZkpFE/VUTE
+         GrHe7G8bVOlTayGDunpglrcmvIzw8gNMQzrc6CZ8ozBAmaXXuYqoGyrpS7I9RYzJ1+J0
+         RxLz0g+MhOHfy5/b5g4KrM3bgfCP2UFYQwDVPNDeBQksbxIXC9CVMuYczARqvWKPkwG6
+         X0bVh6dpTkufDIqExq5Kkj7tpmNZhwdSeFq8TwZL+mT1jG0RSdIOXVMVK+3sxHHTBwXl
+         74//15a0UbFMXOxw6yT+YJhjBSYkHkP5wUyoNEaq9tZ2/bnh02lbjoHmgnW2Emk31L7S
+         YZdg==
+X-Gm-Message-State: AC+VfDwbikhQ7slyYGD+YbBHwUxA/ONdr5lswQrVpzVesy72EpbKXyUD
+        7u/QDsd3AuTkIZ2AQIM6Nis/vNDIWBaq6IDw2jM=
+X-Google-Smtp-Source: ACHHUZ4/0u9ucKBUBaEp/vaeDmEEsSJZg1uqkDvOcJLG970LO2nPH7y3y6UWe6rj8wCKWlzZN1PCQwrkZo1oj+OuOrU=
+X-Received: by 2002:a2e:9593:0:b0:2b5:9bf9:b1c5 with SMTP id
+ w19-20020a2e9593000000b002b59bf9b1c5mr1632413ljh.8.1687550355554; Fri, 23 Jun
+ 2023 12:59:15 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1687525956.git.pav@iki.fi> <45455ee45ccb3313618a48c01be714e14d372257.1687525956.git.pav@iki.fi>
-In-Reply-To: <45455ee45ccb3313618a48c01be714e14d372257.1687525956.git.pav@iki.fi>
+References: <20230622192722.1248374-1-luiz.dentz@gmail.com> <512cf6a2dd110bf634e391f92aa613ca44a7a756.camel@iki.fi>
+In-Reply-To: <512cf6a2dd110bf634e391f92aa613ca44a7a756.camel@iki.fi>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 23 Jun 2023 12:39:22 -0700
-Message-ID: <CABBYNZK_3aOVYgf6LiFXvkdGbju2UgU4WuEKRSrpuTdwv=BbFg@mail.gmail.com>
-Subject: Re: [PATCH RFC 1/5] Bluetooth: hci_conn: add hci_conn_is_alive
+Date:   Fri, 23 Jun 2023 12:59:03 -0700
+Message-ID: <CABBYNZ+9bP15aOu9Us9g3cC98Y_GidLnTJS-Y0fUhV9WNdUjdQ@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: hci_event: Fix parsing of CIS Established Event
 To:     Pauli Virtanen <pav@iki.fi>
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -67,132 +67,124 @@ Hi Pauli,
 
 On Fri, Jun 23, 2023 at 10:37=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
 >
-> A delayed operation such as hci_sync on a given hci_conn needs to take
-> hci_conn_get, so that the hci_conn doesn't get freed in the meantime.
-> This does not guarantee the conn is still alive in a valid state, as it
-> may be cleaned up in the meantime, so one needs to check if it is still
-> in conn_hash to know if it's still alive.
+> Hi Luiz,
 >
-> Simplify this alive check, using HCI_CONN_DELETED flag. This is also
-> meaningful with RCU lock only, but with slightly different semantics.
+> to, 2023-06-22 kello 12:27 -0700, Luiz Augusto von Dentz kirjoitti:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > The ISO Interval on CIS Established Event uses 1.25 ms slots:
+> >
+> >     BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+> >     page 2304:
+> >
+> >       Time =3D N * 1.25 ms
+> >
+> > In addition to that this always update the QoS settings based on CIS
+> > Established Event.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> >  net/bluetooth/hci_event.c | 36 +++++++++++++++++++++++-------------
+> >  1 file changed, 23 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index b1aefe4bb751..049aa7f6a7c5 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -6822,6 +6822,7 @@ static void hci_le_cis_estabilished_evt(struct hc=
+i_dev *hdev, void *data,
+> >  {
+> >       struct hci_evt_le_cis_established *ev =3D data;
+> >       struct hci_conn *conn;
+> > +     struct bt_iso_qos *qos;
+> >       bool pending =3D false;
+> >       u16 handle =3D __le16_to_cpu(ev->handle);
+> >
+> > @@ -6846,21 +6847,30 @@ static void hci_le_cis_estabilished_evt(struct =
+hci_dev *hdev, void *data,
+> >
+> >       pending =3D test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags)=
+;
+> >
+> > -     if (conn->role =3D=3D HCI_ROLE_SLAVE) {
+> > -             __le32 interval;
+> > +     qos =3D &conn->iso_qos;
+> >
+> > -             memset(&interval, 0, sizeof(interval));
+> > +     /* Convert ISO Interval (1.25 ms slots) to latency (ms) */
+> > +     qos->ucast.in.latency =3D DIV_ROUND_CLOSEST(le16_to_cpu(ev->inter=
+val) *
+> > +                                               125, 100);
+> > +     qos->ucast.out.latency =3D qos->ucast.in.latency;
 >
-> If hci_conn_is_alive(conn) returns true inside rcu_read_lock, conn was
-> in conn_hash from the point of view of the current task when the flag
-> was read. Then its deletion cannot complete before rcu_read_unlock.
+> In Set CIG Parameters:
+> u16 ucast.latency =3D Max_Transport_Latency (ms)
+> u32 ucast.interval =3D SDU_Interval (us)
 >
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->
-> Notes:
->     This probably can be done with RCU primitives setting list.prev, but
->     that's maybe more magical...
->
->  include/net/bluetooth/hci_core.h | 18 ++++++++++++++++++
->  net/bluetooth/hci_conn.c         | 10 +---------
->  2 files changed, 19 insertions(+), 9 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci=
-_core.h
-> index 05a9b3ab3f56..cab39bdd0592 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -978,6 +978,7 @@ enum {
->         HCI_CONN_PER_ADV,
->         HCI_CONN_BIG_CREATED,
->         HCI_CONN_CREATE_CIS,
-> +       HCI_CONN_DELETED,
->  };
->
->  static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-> @@ -997,6 +998,7 @@ static inline bool hci_conn_sc_enabled(struct hci_con=
-n *conn)
->  static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_co=
-nn *c)
->  {
->         struct hci_conn_hash *h =3D &hdev->conn_hash;
-> +       WARN_ON(test_bit(HCI_CONN_DELETED, &c->flags));
->         list_add_tail_rcu(&c->list, &h->list);
->         switch (c->type) {
->         case ACL_LINK:
-> @@ -1023,6 +1025,10 @@ static inline void hci_conn_hash_add(struct hci_de=
-v *hdev, struct hci_conn *c)
->  static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_co=
-nn *c)
->  {
->         struct hci_conn_hash *h =3D &hdev->conn_hash;
-> +       bool deleted;
-> +
-> +       deleted =3D test_and_set_bit(HCI_CONN_DELETED, &c->flags);
-> +       WARN_ON(deleted);
->
->         list_del_rcu(&c->list);
->         synchronize_rcu();
-> @@ -1049,6 +1055,18 @@ static inline void hci_conn_hash_del(struct hci_de=
-v *hdev, struct hci_conn *c)
->         }
->  }
->
-> +/* With hdev->lock: whether hci_conn is in conn_hash.
-> + * With RCU: if true, the hci_conn is valid conn_hash iteration cursor a=
-nd
-> + * hci_conn_hash_del has not completed. (Note that if hci_conn was obtai=
-ned in
-> + * this critical section it is always valid, but this may return false!)
-> + */
-> +static inline bool hci_conn_is_alive(struct hci_dev *hdev, struct hci_co=
-nn *c)
-> +{
-> +       RCU_LOCKDEP_WARN(lockdep_is_held(&hdev->lock) || rcu_read_lock_he=
-ld(),
-> +                        "suspicious locking");
-> +       return !test_bit(HCI_CONN_DELETED, &c->flags);
-> +}
+> Here:
+> u16 ucast.latency =3D ISO_Interval (ms)
+> u32 ucast.interval =3D Transport_Latency (us)
 
-I think we are better off doing something like
-hci_conn_hold_unless_zero like we do in l2cap_chan_hold_unless_zero,
-that said we need to check if the hci_conn_drop can still set the ref
-below zero, anyway that is probably a bug in itself and we should
-probably WARN_ON if that happens.
+Yeah, it sounds like we should keep the same logic as in Set CIG
+Parameters, this event is sort of weird because it does change the
+units for whatever reason, anyway I will swap these around so they are
+the same, anyway with the latest code it does pass all the iso-tester
+tests.
 
->  static inline unsigned int hci_conn_num(struct hci_dev *hdev, __u8 type)
->  {
->         struct hci_conn_hash *h =3D &hdev->conn_hash;
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 62a7ccfdfe63..d489a4829be7 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -183,21 +183,13 @@ static void le_scan_cleanup(struct work_struct *wor=
-k)
->         struct hci_conn *conn =3D container_of(work, struct hci_conn,
->                                              le_scan_cleanup);
->         struct hci_dev *hdev =3D conn->hdev;
-> -       struct hci_conn *c =3D NULL;
+> Currently BlueZ seems to not account for this swapping of the meanings
+> of the QoS fields, eg. in client/player.c it has
 >
->         BT_DBG("%s hcon %p", hdev->name, conn);
+>     num =3D (qos.ucast.out.latency * 1000 / qos.ucast.out.interval);
+>     ...
+>     ts.it_value.tv_nsec =3D qos->ucast.out.latency * 1000000
 >
->         hci_dev_lock(hdev);
+> and writes num packets in each interval. In the AX210 example it seems
+> this would give num =3D=3D 0. I guess this and other places that use thes=
+e
+> need to be updated.
 >
->         /* Check that the hci_conn is still around */
-> -       rcu_read_lock();
-> -       list_for_each_entry_rcu(c, &hdev->conn_hash.list, list) {
-> -               if (c =3D=3D conn)
-> -                       break;
-> -       }
-> -       rcu_read_unlock();
-> -
-> -       if (c =3D=3D conn) {
-> +       if (hci_conn_is_alive(hdev, conn)) {
-
-Hmm, I don't think this is safe, except if we are doing hci_conn_get
-we can't really access the conn pointer since it may be freed already,
-anyway this is sort of broken already given that we do access
-conn->hdev already.
-
->                 hci_connect_le_scan_cleanup(conn, 0x00);
->                 hci_conn_cleanup(conn);
->         }
-> --
-> 2.41.0
+> Since field meanings anyway change, would 1.25ms unit for the
+> ISO_Interval be better than 1ms so user side doesn't need to know how
+> kernel rounds the number and undo that to get the actual value?
+>
+> > -             memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
+> > -             conn->iso_qos.ucast.in.interval =3D le32_to_cpu(interval)=
+;
+> > -             memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
+> > -             conn->iso_qos.ucast.out.interval =3D le32_to_cpu(interval=
+);
+> > -             conn->iso_qos.ucast.in.latency =3D le16_to_cpu(ev->interv=
+al);
+> > -             conn->iso_qos.ucast.out.latency =3D le16_to_cpu(ev->inter=
+val);
+> > -             conn->iso_qos.ucast.in.sdu =3D le16_to_cpu(ev->c_mtu);
+> > -             conn->iso_qos.ucast.out.sdu =3D le16_to_cpu(ev->p_mtu);
+> > -             conn->iso_qos.ucast.in.phy =3D ev->c_phy;
+> > -             conn->iso_qos.ucast.out.phy =3D ev->p_phy;
+> > +     switch (conn->role) {
+> > +     case HCI_ROLE_SLAVE:
+> > +             qos->ucast.in.interval =3D get_unaligned_le24(ev->c_laten=
+cy);
+> > +             qos->ucast.out.interval =3D get_unaligned_le24(ev->p_late=
+ncy);
+> > +             qos->ucast.in.sdu =3D le16_to_cpu(ev->c_mtu);
+> > +             qos->ucast.out.sdu =3D le16_to_cpu(ev->p_mtu);
+> > +             qos->ucast.in.phy =3D ev->c_phy;
+> > +             qos->ucast.out.phy =3D ev->p_phy;
+> > +             break;
+> > +     case HCI_ROLE_MASTER:
+> > +             qos->ucast.out.interval =3D get_unaligned_le24(ev->c_late=
+ncy);
+> > +             qos->ucast.in.interval =3D get_unaligned_le24(ev->p_laten=
+cy);
+> > +             qos->ucast.out.sdu =3D le16_to_cpu(ev->c_mtu);
+> > +             qos->ucast.in.sdu =3D le16_to_cpu(ev->p_mtu);
+> > +             qos->ucast.out.phy =3D ev->c_phy;
+> > +             qos->ucast.in.phy =3D ev->p_phy;
+> > +             break;
+> >       }
+> >
+> >       if (!ev->status) {
 >
 
 
