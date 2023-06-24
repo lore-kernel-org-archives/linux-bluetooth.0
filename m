@@ -2,107 +2,91 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7749C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jun 2023 22:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F15EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jun 2023 17:08:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232306AbjFWWmM (ORCPT
+        id S231518AbjFXRId (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jun 2023 18:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
+        Sat, 24 Jun 2023 13:08:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232573AbjFWWmG (ORCPT
+        with ESMTP id S229448AbjFXRId (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jun 2023 18:42:06 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1383B9D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 15:42:06 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-3411ea250efso4629535ab.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jun 2023 15:42:06 -0700 (PDT)
+        Sat, 24 Jun 2023 13:08:33 -0400
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4975F1A4;
+        Sat, 24 Jun 2023 10:08:32 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5705386cfa3so1082667b3.1;
+        Sat, 24 Jun 2023 10:08:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687560125; x=1690152125;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=g1xciNPACgCLOYoTe21g7vnXAM9H5d+1xTq1E1YRKoQ=;
-        b=dIymKq97VoPFZu3anvHTgHqrNr8fxe0pw+X+JCJoecoR3rowK6OqmZFJeaB7aIutLY
-         pHlfKHEdo+t+CJ4t7j3aT1Dh9n7UTxo7t6E5UQuTIgmrdw4wDCl5yqtERNcj0lCcBZnD
-         hwajreP3tALLto6Wxm1xGQECbpE88TtNPBZAFmvQ7+8GInh7p1kJDpmAqe4f/8wCcC7S
-         zChrhmr2UYnWt8iIhfcZ4u9qrkRJ2CtfABlknkBF7kcSzAyC9tg7sE6MSmfYWCr1ueJ2
-         aVHsJjDFQB4+BLyIWwAFou4oqCUkLc+NCqaCjyGg8nAhxegS9ueROJskNMBVZ7J9Xql8
-         qusA==
+        d=gmail.com; s=20221208; t=1687626511; x=1690218511;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L67IGZMeFq5syFvEsERJ4iNX2S9oc5dwGEC3VfRdfUA=;
+        b=mrIHvbvRgw28TdwdnedIVAvp0PRHSEWCItaBIAHwRPWtGb44akoAMpDBDzcsqN1Vy4
+         eNIE+UgJoTaVImXcnnHjbci5d/4pfjJJm+mNug6BqmX+WePPHmDQ2j5AFMSOSo5d99iQ
+         J5t55nGC3akSvaSS0t5cvd5nNWv5ZYFVZP7R82/WEvzSZZU2nUTU8sZPpm/SKOD/Bw30
+         +GTzii0JROvF3xYJ9Cu/L4Nd29VkYWsV+YmVfuSySKalWEU1Vis1NMJqrUUfQsArM2IZ
+         ZJ1SXTEWhne/yNojsRxOKp/cXHs/aDvhv3hPK10LviAjfBMJIp0JQFKb99SN+e2rrv66
+         zpPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687560125; x=1690152125;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1687626511; x=1690218511;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=g1xciNPACgCLOYoTe21g7vnXAM9H5d+1xTq1E1YRKoQ=;
-        b=SH6MGmygI9SkY0qX1OEeVyRkQ3HSqy9pJmpGOQSU4NH6nu7C97NxsCijScOepNwWdr
-         XpKfQ79sjsdySTA1gyPBQaALsPc92XypwQ3InbXpKz5gqFlXD3l5OndZlwPNEB9Sa7nr
-         FZV5a8znnw5V+LrlSHBBO+HttnwY4GtK8WE3eWUbGLyEg6kj+x1X9Gy3NCSmcyKBDNNF
-         /wb2xtRnVuYz+DNXcmOERCwhqoR1A/iEeEl58EqPZ5AtqsOrOvDAP3u11qtxEoupLqw1
-         cEC9x/3TQIhQwJ9k+0dVy38bvxW0gN787AhAeNBaKJX6bzmXHt3SJVl3ZFBvcebiAz5M
-         TFSw==
-X-Gm-Message-State: AC+VfDyD++44Q5xzF8XhPt3JAV9o5a1n6BJt/mpFvrbUx6HOBfOdcg7t
-        wGi9FdFTgA6IXjv4t77BQOq2I4YQh7c=
-X-Google-Smtp-Source: ACHHUZ5i/IK9R1umRgjL6XYluxv+kxNhy3s2XgEifg2sbWiNHdUhBMudr85PKSP4GYIkYn5jexykQQ==
-X-Received: by 2002:a92:c60a:0:b0:340:6db8:e814 with SMTP id p10-20020a92c60a000000b003406db8e814mr22407795ilm.22.1687560125147;
-        Fri, 23 Jun 2023 15:42:05 -0700 (PDT)
-Received: from [172.17.0.2] ([20.171.63.112])
-        by smtp.gmail.com with ESMTPSA id v2-20020aa78502000000b006667b36e904sm41814pfn.113.2023.06.23.15.42.03
+        bh=L67IGZMeFq5syFvEsERJ4iNX2S9oc5dwGEC3VfRdfUA=;
+        b=MLeYybazocIgr+chGoHTmpNZi+6jQwDeWHQU46lZ/zrwjCv/IlWCh7f9VhqnCcozNr
+         lGKWJD4sskjlC1CfbbWCC2budGu70eB7EuIzrojhXzhSVgGL9KUHSwXv2F0C4lPAGxE7
+         UIaxO/F02Pd2Ic/2EV4mnJ9HawPbBzuLz5yfpyYr2lowkgTLEC2EJdTDSNj1fqZZMzMh
+         F6hbNP6tCzwA0WwkrMbXRLP7xVuXP7t3Kwj+j+4LeoAj/A9XQxfzHpfL314JHjb5Ki/z
+         XsWRHXNzsE9e1Abwa4CM471sFyM0PDiICyFDnWHquf87JOTJ8zDLQkFWD3fgLCruJzpU
+         rKXA==
+X-Gm-Message-State: AC+VfDzstQ8mw6t5v6SZC5n+aFu8aM4HxQh7tQtW5CcghBToImCwUAhI
+        3BThN6cg5N1m/Od4vcKK2Qo=
+X-Google-Smtp-Source: ACHHUZ7BV+fWrIAgQhDxV9DPUEAaSr3Eao2EvYsYEk1Hrw3c07VuB7rF4BaNNOboIfJe8mxLyWDpSA==
+X-Received: by 2002:a81:9a17:0:b0:569:322b:d067 with SMTP id r23-20020a819a17000000b00569322bd067mr13854203ywg.4.1687626511329;
+        Sat, 24 Jun 2023 10:08:31 -0700 (PDT)
+Received: from localhost.localdomain ([173.23.87.62])
+        by smtp.gmail.com with ESMTPSA id l67-20020a819446000000b0057031fa8c08sm423110ywg.14.2023.06.24.10.08.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 15:42:04 -0700 (PDT)
-Message-ID: <64961fbc.a70a0220.24784.01f3@mx.google.com>
-Date:   Fri, 23 Jun 2023 15:42:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8429188685903281699=="
+        Sat, 24 Jun 2023 10:08:30 -0700 (PDT)
+From:   Matthew Anderson <ruinairas1992@gmail.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matthew Anderson <ruinairas1992@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally
+Date:   Sat, 24 Jun 2023 12:08:10 -0500
+Message-ID: <20230624170810.298776-1-ruinairas1992@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] btdev: Fix CIS Established Event parameters
-In-Reply-To: <20230623212430.1702254-1-luiz.dentz@gmail.com>
-References: <20230623212430.1702254-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8429188685903281699==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Adding the device ID from the Asus Ally gets the bluetooth working
+on the device.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=759916
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.74 seconds
-GitLint                       PASS      0.51 seconds
-BuildEll                      PASS      26.27 seconds
-BluezMake                     PASS      752.96 seconds
-MakeCheck                     PASS      11.68 seconds
-MakeDistcheck                 PASS      152.27 seconds
-CheckValgrind                 PASS      245.87 seconds
-CheckSmatch                   WARNING   330.57 seconds
-bluezmakeextell               PASS      100.03 seconds
-IncrementalBuild              PASS      1279.32 seconds
-ScanBuild                     PASS      978.92 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-emulator/btdev.c:417:29: warning: Variable length array is used.
-
-
+Signed-off-by: Matthew Anderson <ruinairas1992@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a8e2bb038f5..7427da184fe0 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -613,6 +613,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0d9), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0f5), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+-- 
+2.41.0
 
---===============8429188685903281699==--
