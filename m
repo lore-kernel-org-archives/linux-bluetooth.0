@@ -2,122 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50705EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jun 2023 17:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CACE8EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Jun 2023 08:45:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231792AbjFXRdO (ORCPT
+        id S231516AbjFYIp3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 24 Jun 2023 13:33:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
+        Sun, 25 Jun 2023 04:45:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbjFXRdN (ORCPT
+        with ESMTP id S230102AbjFYIp2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 24 Jun 2023 13:33:13 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D0A1BC2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Jun 2023 10:33:12 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-400813cff23so17999041cf.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Jun 2023 10:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687627991; x=1690219991;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+hkra1oDx5GGBJB9GGMZi4dTCO3dBtYNofuqj2AULK4=;
-        b=dWBM2x/lkfAYLwirIwiRXp9jZIjA9UXTONnzQeTyymfBsnddokg/eFYRDizoeFDRo3
-         0RYZySYq1ViwEoiViFgcx4H6kmnbo63c+8gS++tn7z2GgmpICJen2/XxRdktAgIpVzPI
-         XjCYxLnNNXLeHilVFLs9HlQSTsg+2aKeCi0IDTKlWvXXXY6IegOT/d2DeA1ScQ++gmBQ
-         WbrtDH/mjKqXYuKuezPcrWeg97HvQcVXI7fImPDYTKB2ZwL4x2x3URlulv8ThTjGnrsY
-         QnT7jdzLi0oDRFrKdlG2FESL9hVSZl62Zy2Tmk/HMLqutT8hrZFCJSv/uv6LwTQwvA1Z
-         if6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687627991; x=1690219991;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+hkra1oDx5GGBJB9GGMZi4dTCO3dBtYNofuqj2AULK4=;
-        b=B5h968EAAEtwCLS45p9fxwYIBD0geoxFXgBILbAQbDXadh/L4vi/Pl1j+zqIK+5wd3
-         vy4EgRxMjUv7We2NZutmbn5UvT3m3yWFHhpBl+THSxFTPsAwXMegDvORWtYmjK39kGQ1
-         DDaK6awapX5TNeCorlA1MzFj4DEU76O2wADVDTK55lQeAYpagAKLz2Pi18PhkI8z0JDb
-         ixvdv3s04WfrIJEoR5zD7z2V6g0+tf95DjKUCCTpkswyzYM2lqKhCt7GPIXxHA2pG0Hr
-         T9K3hJO5trFu+W5nWaRIkmsOYBow+jnEkPgmBNui2nOgWwedT/Q6scNBMFeWBxiF3nhs
-         hBAA==
-X-Gm-Message-State: AC+VfDz522bpTrFK2EB5KzZN54HY4eilKL9m4aYlBja5ElbzRwDn+qvf
-        blybfCzkn3O34p1deyNo09+ywSU64PY=
-X-Google-Smtp-Source: ACHHUZ74RrSjoY20qyDf/h6hEkGpZ/RcoZeDE2NAxiT9XCdqK5Mwh5wDkqbB+nsOVArTp3uAOr2ybw==
-X-Received: by 2002:a05:622a:1b8c:b0:3fd:e091:3fe4 with SMTP id bp12-20020a05622a1b8c00b003fde0913fe4mr27219185qtb.58.1687627991524;
-        Sat, 24 Jun 2023 10:33:11 -0700 (PDT)
-Received: from [172.17.0.2] ([104.45.204.71])
-        by smtp.gmail.com with ESMTPSA id o23-20020ac85557000000b003f6bbd7863csm934751qtr.86.2023.06.24.10.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Jun 2023 10:33:11 -0700 (PDT)
-Message-ID: <649728d7.c80a0220.423aa.159c@mx.google.com>
-Date:   Sat, 24 Jun 2023 10:33:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4835389528226690349=="
+        Sun, 25 Jun 2023 04:45:28 -0400
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B3B1AE;
+        Sun, 25 Jun 2023 01:45:26 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Vlro46n_1687682714;
+Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0Vlro46n_1687682714)
+          by smtp.aliyun-inc.com;
+          Sun, 25 Jun 2023 16:45:24 +0800
+From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH] Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + memcpy
+Date:   Sun, 25 Jun 2023 16:45:13 +0800
+Message-Id: <20230625084513.6319-1-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ruinairas1992@gmail.com
-Subject: RE: Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally
-In-Reply-To: <20230624170810.298776-1-ruinairas1992@gmail.com>
-References: <20230624170810.298776-1-ruinairas1992@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4835389528226690349==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Use kmemdup rather than duplicating its implementation.
 
-This is automated email and please do not reply to this email!
+./net/bluetooth/hci_conn.c:1880:7-14: WARNING opportunity for kmemdup.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=759995
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.74 seconds
-GitLint                       PASS      0.37 seconds
-SubjectPrefix                 PASS      0.14 seconds
-BuildKernel                   PASS      33.88 seconds
-CheckAllWarning               PASS      37.06 seconds
-CheckSparse                   PASS      42.21 seconds
-CheckSmatch                   PASS      113.68 seconds
-BuildKernel32                 PASS      32.91 seconds
-TestRunnerSetup               PASS      468.69 seconds
-TestRunner_l2cap-tester       PASS      17.78 seconds
-TestRunner_iso-tester         FAIL      25.51 seconds
-TestRunner_bnep-tester        PASS      5.99 seconds
-TestRunner_mgmt-tester        PASS      137.48 seconds
-TestRunner_rfcomm-tester      PASS      9.45 seconds
-TestRunner_sco-tester         PASS      8.57 seconds
-TestRunner_ioctl-tester       PASS      9.98 seconds
-TestRunner_mesh-tester        PASS      7.39 seconds
-TestRunner_smp-tester         PASS      8.50 seconds
-TestRunner_userchan-tester    PASS      6.08 seconds
-IncrementalBuild              PASS      29.80 seconds
-
-Details
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 80, Passed: 76 (95.0%), Failed: 4, Not Run: 0
-
-Failed Test Cases
-ISO Receive - Success                                Failed       0.212 seconds
-ISO Receive Timestamped - Success                    Failed       0.203 seconds
-ISO Defer Receive - Success                          Failed       0.203 seconds
-ISO 48_2_1 Defer Receive - Success                   Failed       0.202 seconds
-
-
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=5597
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 62a7ccfdfe63..47e7aa4d63a9 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1877,12 +1877,10 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 	if (qos->ucast.cis == BT_ISO_QOS_CIS_UNSET || !data.pdu.cp.num_cis)
+ 		return false;
+ 
+-	pdu = kzalloc(sizeof(*pdu), GFP_KERNEL);
++	pdu = kmemdup(&data.pdu, sizeof(*pdu), GFP_KERNEL);
+ 	if (!pdu)
+ 		return false;
+ 
+-	memcpy(pdu, &data.pdu, sizeof(*pdu));
+-
+ 	if (hci_cmd_sync_queue(hdev, set_cig_params_sync, pdu,
+ 			       set_cig_params_complete) < 0) {
+ 		kfree(pdu);
+-- 
+2.20.1.7.g153144c
 
---===============4835389528226690349==--
