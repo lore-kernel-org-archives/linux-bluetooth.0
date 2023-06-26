@@ -2,52 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61783EB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 20:42:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4ECC001B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 20:42:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbjFZUmh (ORCPT
+        id S230171AbjFZUmi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Jun 2023 16:42:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
+        Mon, 26 Jun 2023 16:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229623AbjFZUmb (ORCPT
+        with ESMTP id S230063AbjFZUmc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Jun 2023 16:42:31 -0400
+        Mon, 26 Jun 2023 16:42:32 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E6CE54
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 13:42:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6DDE19BA;
+        Mon, 26 Jun 2023 13:42:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2543D60F6E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 20:42:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7F06EC433CA;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4F50E60F79;
+        Mon, 26 Jun 2023 20:42:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9CE3AC433C9;
         Mon, 26 Jun 2023 20:42:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1687812134;
-        bh=ROY2C+vz6Aza/XLavVEep12p6uoYd6K0rQaYl+KRAxQ=;
+        bh=+L005PfmtR6wWWP0Xltnl1KnCOk0d39rmSCki7NghLw=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=bOE50HEp7HYCw+JWHnVb82mchktNe3p7/jL6f1rj7wJNvVTztdlPYdOUl09jMv8PN
-         7b/r/P38hQ1R1dyo7WGjRF6emmxdPAuSM9U2BP7nJJ7JQlbFDuc+7bF79pBiRuqBop
-         opzi4PV9+G3OLsjhA4ZbEQDNtCZTciVncDwHbjnN+pONmc6gaTRhZt3jgwdDjZg5/H
-         0c3oEIlcCFcMTVtFl0qpDC3z8RFI6AMV2umVHw4QV8Vy5tou00EASdIubX5sbknUsi
-         0Q1iRW6ejbwJpHT/xPjVwAMdPfZxocg2qCrxskQOaPRkKVbx29BaTfoF++qSI/+HKx
-         xTMQv+VhMBaOw==
+        b=DyDjgqgAM8w77q7+810tcqBaJWt2ouE/nmLhgYxjjreo5izhFTMUiYXrtqc7WMl8e
+         /d/fE/VpZbclT6Kbi9Q8M3LTzSgrurZ7xXyryZ3rJWLhMUea9UTRVDntnmQubgX3kv
+         F7LyohwcoTlyEha2uAoFMep5gKMk/s5PU1FlA4AOrKcm1qHCRo1iaa33QHZx8UkZW0
+         6X7wp3KhApY0tY+hglXQd6RVb0LxG27NdcOMBraBchI/tZt0I+Mn+aSKmuODCBEESD
+         uwTqquZmaW6aFFy3vjIWd55RX08Kk0C+uxnU0hliyD9P89c2bni2PA31wbCkXrdG94
+         kl+RN5FsGxb4A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5FE76E537FE;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78FA8E53808;
         Mon, 26 Jun 2023 20:42:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] Bluetooth: hci_event: Fix parsing of CIS Established Event
+Subject: Re: [PATCH v5] Bluetooth: msft: Extended monitor tracking by address
+ filter
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168781213438.29844.9936704307447731174.git-patchwork-notify@kernel.org>
+Message-Id: <168781213448.29844.3605670439854920705.git-patchwork-notify@kernel.org>
 Date:   Mon, 26 Jun 2023 20:42:14 +0000
-References: <20230623212439.1702413-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230623212439.1702413-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20230621100031.19477-1-hildawu@realtek.com>
+In-Reply-To: <20230621100031.19477-1-hildawu@realtek.com>
+To:     Hilda Wu <hildawu@realtek.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        apusaka@chromium.org, mmandlik@google.com, yinghsu@chromium.org,
+        simon.horman@corigine.com, max.chou@realtek.com,
+        alex_lu@realsil.com.cn, kidman@realtek.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -57,19 +64,26 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 23 Jun 2023 14:24:39 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 21 Jun 2023 18:00:31 +0800 you wrote:
+> From: Hilda Wu <hildawu@realtek.com>
 > 
-> The ISO Interval on CIS Established Event uses 1.25 ms slots:
-> 
->     BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
->     page 2304:
+> Since limited tracking device per condition, this feature is to support
+> tracking multiple devices concurrently.
+> When a pattern monitor detects the device, this feature issues an address
+> monitor for tracking that device. Let pattern monitor can keep monitor
+> new devices.
+> This feature adds an address filter when receiving a LE monitor device
+> event which monitor handle is for a pattern, and the controller started
+> monitoring the device. And this feature also has cancelled the monitor
+> advertisement from address filters when receiving a LE monitor device
+> event when the controller stopped monitoring the device specified by an
+> address and monitor handle.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5] Bluetooth: hci_event: Fix parsing of CIS Established Event
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5f68122ac282
+  - [v5] Bluetooth: msft: Extended monitor tracking by address filter
+    https://git.kernel.org/bluetooth/bluetooth-next/c/53c7c193d66a
 
 You are awesome, thank you!
 -- 
