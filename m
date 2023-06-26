@@ -2,72 +2,116 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FA9EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 16:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B11FEB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 19:25:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbjFZQoN (ORCPT
+        id S230087AbjFZTZa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Jun 2023 12:44:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38426 "EHLO
+        Mon, 26 Jun 2023 15:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229871AbjFZQoL (ORCPT
+        with ESMTP id S230158AbjFZTZ2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Jun 2023 12:44:11 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FCC18E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 09:44:10 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b69a48368fso26936021fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 09:44:09 -0700 (PDT)
+        Mon, 26 Jun 2023 15:25:28 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4177A1700;
+        Mon, 26 Jun 2023 12:25:26 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b5c2433134so30032651fa.0;
+        Mon, 26 Jun 2023 12:25:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687797848; x=1690389848;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=S97iDdxXomin2hgt7Q7KQsGB2EbuZT6bm8fRUpHJMbI=;
-        b=RivLTjPa0uyxXPTumYvPfVCDjZCKcsjSa1jGaNdB2ARoh2RyFMDeBalptJQbDU3lA1
-         /nWQhpUKJwSKQpzgzpRtk5+LsrbEaetMaRA7SvF4qmvF7khzlddBa87+TJJ5sFNv7zkC
-         2FQU5O7E6+U4CQUbLW7v6POxlmvVx4v/KmcFGmyi5Wc+GN0EEuAgNrKXj6NL/zZbSd5z
-         PVnwpb9sCm3kFxkpFlQ8RBTbj2yo3NLGfnaRZro0RzwiVsfgMquh4vvnjxIUUXxMQBH7
-         RFm/fT2inWDVtc0zuff9eU6TLJZnVmS5Nww90qB1GSaDJoCSKAayXlfdPVJ4RwpWdg50
-         fYng==
+        d=gmail.com; s=20221208; t=1687807524; x=1690399524;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9NFypNUympay54cWESrUztMRbmrTa5aoLaDv8wRaHyk=;
+        b=LnHIUwEIcP2pbXYaPoaAF/4xSheQVBu061Iu2+/UOzv5F5HeQk9tVn3M+KeSXKcgn5
+         bH/gjVAeB+ISb5Dt9HYF773Wv3RyiXBXEBjjkF1NKcUtjA0Z9QQ/j+gDOWBAFH3r3ute
+         wNyyiLmezGAH2Q/bfZJ8rkWwBAySe8cNp4MB7J9fqJtmoqLbXIljLZNVkj0hLV9TeJhZ
+         My50++zYAkbgOEEZ9OEZgjdVFaCFPhzmL0KiXcAYe4/F4ythLq8wWNqJgxb0dbZHKVzU
+         0u0uibLstNJ1ggzsHso8yXTR3nPdHQVK/aPeSDHY5WGYvUIqDRA/N3o6MM70q0et/T6h
+         4bvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687797848; x=1690389848;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S97iDdxXomin2hgt7Q7KQsGB2EbuZT6bm8fRUpHJMbI=;
-        b=lA45XpQwzBeBz4wRojBKt1l97UVgsHvzYJC0uitvFKagZ6RYseUtR9M7Z4/rU297zP
-         g26Goda8L6L9Fdmh0Iv3SJErID2/STGTgf53mAg8/5bnqSODv8aursp3D9mtWmx+4iAW
-         dAWqoIcbGTU5zTnXybYMKvj3gsqkkHz6zgKZOgSEAfw0uKnGZEOesCcD194iNVvhKjEh
-         YoHpq0Svj7FJwErRA3kiiroAf1FQT+5Yx3EikVnExld6yMstIEOl+xqIqgipROcoIRw/
-         2npPPXabJTGoFbExNlcvWxBXwNfNWpIZekvF9/EwlR3S/kT9/GdMQyOtblw/l9YMWAmk
-         LmjA==
-X-Gm-Message-State: AC+VfDz7Fqg1f6Uxxj5z+QLs+uC4gRmPiYjR7GbmqZ36wi1coEWal/Vd
-        eMYkvVSE2hp8UbocLgB5rzQUZdmIs0qGlZ64BnoqfamIo7DWxA==
-X-Google-Smtp-Source: ACHHUZ7D3hHHxcQsB4a0SRSR9ydPkLDGFUtHqpkWc55A3SiWEjW7ldQwobPO3EVo3O/kLjKa/BAAd5Gv48ZvFNfHA2Q=
-X-Received: by 2002:a05:6512:39c4:b0:4f6:1b9e:d2fb with SMTP id
- k4-20020a05651239c400b004f61b9ed2fbmr17447434lfu.11.1687797847242; Mon, 26
- Jun 2023 09:44:07 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687807524; x=1690399524;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9NFypNUympay54cWESrUztMRbmrTa5aoLaDv8wRaHyk=;
+        b=d74MmAwB+fFC8uKLLyjOwTF0t5C+5vwo8Z/IboTRF8QQYfRI+VgKR/rZYXxDLiwysS
+         3yvF6sBH/ozi2TGdaA5gXm2mvomQz5j8m13y6VjnJKg/CZMmAUaBLwtlbFUzyjU0/SEY
+         McSQImaZwQR6YtITZc91sfq75e4UViISe9JSknL3lyXpGOjsQas4R8RZU73OVRaj6hG2
+         GwKaYuh9sohn/6fql74mmqL6rBi+uh048Ns84JSy7rlTYOtsF1T4rob+QCLBj1cVg7Ya
+         eIhtfZDDvTr+qLw6eky0s0ayuTzzypbh4zYjigKZE1DerYbS5saPc2yyoKeG2bzQU1qx
+         XpqA==
+X-Gm-Message-State: AC+VfDx2HcO+tcyG1vbI5HyszLijL05dEDF8HftTdRUwmtE3ZSLYmzFb
+        cJt2OAgxvDjbiW1KvdO15P7wywyynquFhXhgHwY=
+X-Google-Smtp-Source: ACHHUZ52YLNCzMs7G5WhmajLVFQEbSpIPEzBT2uH/WajntZtI7mXMfpPIwlie0L7t6pFa9D+R6aydxShD/0DtMiCZk0=
+X-Received: by 2002:a2e:a268:0:b0:2b4:7763:c1fb with SMTP id
+ k8-20020a2ea268000000b002b47763c1fbmr9829487ljm.13.1687807524076; Mon, 26 Jun
+ 2023 12:25:24 -0700 (PDT)
 MIME-Version: 1.0
-From:   Dmitriy <dms700@gmail.com>
-Date:   Mon, 26 Jun 2023 12:42:25 -0400
-Message-ID: <CAAdvvMdexKkhtNA3y1FQFQczDLrrJtZC=kT8VkXuqwt_5VQL+w@mail.gmail.com>
-Subject: BlueZ-hid2hci package for android-x86
-To:     linux-bluetooth@vger.kernel.org
+References: <259e755c.4eaad.188f817a0f3.Coremail.lxybhu@buaa.edu.cn>
+In-Reply-To: <259e755c.4eaad.188f817a0f3.Coremail.lxybhu@buaa.edu.cn>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 26 Jun 2023 12:25:12 -0700
+Message-ID: <CABBYNZJtGo2SSRREH9jpAKM8UoEUNgK9uzyPuzqDdks_KBoDdw@mail.gmail.com>
+Subject: Re: [BUG]Bluetooth: HCI_Command_Status: possible semantic bug when
+ Num_HCI_Command_Packets set to zero
+To:     =?UTF-8?B?5YiY5paw5a6H?= <lxybhu@buaa.edu.cn>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello
+Hi,
 
-Does the BlueZ-hid2hci package exist which can be installed on 32 bit
-android-x86?
+On Mon, Jun 26, 2023 at 7:25=E2=80=AFAM =E5=88=98=E6=96=B0=E5=AE=87 <lxybhu=
+@buaa.edu.cn> wrote:
+>
+> Hello,
+>
+> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in=
+ Linux 5.18:
+>
+> During the connection process, the host server needs to receive the HCI_C=
+ommand_Status packet from the hardware controller. In normal cases, the Num=
+_HCI_Command_Packets field of this packet is not zero, and the host server =
+can normally handle this packet. However, in our testing, when the Num_HCI_=
+Command_Packets field is set to zero, the Bluetooth functionality is totall=
+y stopped until it is manually reopened.
+>
+> In the Bluetooth Core Specification 5.4, the section 7.7.15 "Command Stat=
+us event" says that:
+>
+> "The Num_HCI_Command_Packets event parameter allows the Controller to ind=
+icate the number of HCI command packets the Host can send to the Controller=
+. If the Controller requires the Host to stop sending commands, the Num_HCI=
+_Command_Packets event parameter will be set to zero."
+>
+> This section does not mean that the Bluetooth functionality needs to be t=
+otally stopped when Num_HCI_Command_Packets is zero. Maybe in this case, th=
+e Bluetooth functionality could be still available, but the host server cou=
+ld reject any packet until Num_HCI_Command_Packets is not zero.
 
-I have Dell E6400 laptop (Intel Core 2 Duo CPU) with Dell 370
-Bluetooth mini PCI card (VID/PID 413c:8156), as far as I understand,
-this card is based on Broadcom BCM2046 (VID/PID 0a5c:4500). In CentOS
-I was able to make this Bluetooth card work by installing the
-bluez-hid2hci package. I'm trying to make this card work in
-Android-x86 4.19.110.
+Well it says, If the Controller requires the Host to stop sending
+commands, so if your tool is sending 0 then it is requesting he host
+to stop sending more commands, if you want it to continue just send
+another Num_HCI_Command_Packets, or are you saying some other
+functionality that doesn't require sending commands shall still work?
 
-Thank you
-Dmitriy
+> We are not sure whether this is a semantic bug or implementation feature =
+in the Linux kernel. Any feedback would be appreciated, thanks!
+>
+>
+> Best wishes,
+> Xin-Yu Liu
+
+
+
+--=20
+Luiz Augusto von Dentz
