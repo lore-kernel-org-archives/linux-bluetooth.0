@@ -2,204 +2,93 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98932EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 22:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6F8EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 22:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231993AbjFZWJY (ORCPT
+        id S229501AbjFZWPj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Jun 2023 18:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58468 "EHLO
+        Mon, 26 Jun 2023 18:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbjFZWJE (ORCPT
+        with ESMTP id S229562AbjFZWPV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Jun 2023 18:09:04 -0400
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D4A859CC
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 15:05:41 -0700 (PDT)
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com [209.85.167.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 78FD23F268
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 22:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1687816801;
-        bh=WrPgRiS83Y2mIcWHryPXtoWboK6sANlwF7CN0nqeeXc=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-        b=qQM9tTvvQdz58zqZnYVXLY6GLI53DKyGpp1cmabVV0YHUgPFsSGgWn8ds4RphxJfv
-         bH1U9tqEWSzwYgpf3aE2X/Wm8U9uEG7PNjQ/5wS4X6XOLDwy9QVtPZB7ULdwXAbxOt
-         I8HrZ8Bb45gBYSyrfX2xnvKhIc/IPglLNJojJaZ7EbRdESmZp3wa7GdUbN+xaoyAlO
-         ZCzmYwN1N2HYuOtu0vZR7IxNFULCHEMAyP4UYvd/9tqgI7abTqzsxMrUxlDmYWM3CG
-         xdoM1jEtPXUrxcr64bzKv8lwssKJfsP54g8IAYezRVCB7anJKzXtRrzXQcj8kQoP4S
-         q6bh4J1FtK1pA==
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb7d06a7e6so791182e87.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 15:00:01 -0700 (PDT)
+        Mon, 26 Jun 2023 18:15:21 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 581E3359E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 15:13:59 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-765a311a7a9so74719185a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 15:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687817638; x=1690409638;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QlpYYAVC/MWdIUZuaUadftJpfVZkJVH5Wq1ooN45W+Q=;
+        b=HOlRiGBwAxqNgXcLdXxFMZhkN6BsupBpMrGbnwR4So1iXo09PsjLlOR45G3YVoK8Hy
+         3UGEwyzXq/4PE0c+Zdp7tYmWwj7Pq392PTdZ4VdUPhIzg3LwJWlyKG+4sY1ULmZwXv8j
+         BIOuWg8bGnzQBZKAjkRBiJBdWKMil1yoWCuP2HQOn56ZWkS9VV1PCV+ZORKTHW4XC8HN
+         g5eZJW2Ke2/jCfc6GavlAkmNMq/0xmYnR3MiFe1CXJ4EZP9YYHDHOfTpf4YidVWkLvJs
+         SywlN2Qk5s80Wntm4MdqHfgHCLalO2QmmqhXfQX5qJ3GPl6GJfBFiSwy8VsAqJMoQdJw
+         AzDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687816801; x=1690408801;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1687817638; x=1690409638;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WrPgRiS83Y2mIcWHryPXtoWboK6sANlwF7CN0nqeeXc=;
-        b=lH9vBHWV/E1hSBzow/P/2hXT3Lmi3xGdz1UWAeIj1qdhYoxwKMeuqTZ2NqK5ytayfB
-         bKcmQ6uSxxoKsds7Sg+4pqFRauW4HBMvv4Wwkiy5gaSSwgKtB98ox65hr2zH/fFepI4J
-         aI7M60rBwVA0A/zFOBxtiT+3k2hkHC6qOncoX9Divh6qeggMAjd28lKfmWvnvYBCvYQZ
-         sVnl/0Nf4WTopwgu/9yVp5IdrmJ1UhLSdb5B7LDssTv3rY4xpLUrKaVxCbv8zowrBi9g
-         YUkgFOf8iARawl8j8eW+fzZqySkZohdeEhag2+J914IqCOeehooayxxTTqg5+esbaRLt
-         MRcg==
-X-Gm-Message-State: AC+VfDz/YvrpWMkXsTPVjZnwVk1zpaXPQUOCupAPUMTso9LvD5rRk1nm
-        aZ4jo1VGSjdkIse5IPhSpAJjkc5AaA/AZa9DCfF3IP4T4HMHWUcP3/YEo9uZp+LGmgHGrf5r0Mg
-        8pxy8e0SXW0U5K1+RhVqtWHbZFLMHevE/4f46bEecxz8RSg==
-X-Received: by 2002:a2e:8689:0:b0:2b4:6195:bb2f with SMTP id l9-20020a2e8689000000b002b46195bb2fmr17494470lji.25.1687816800743;
-        Mon, 26 Jun 2023 15:00:00 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5kEAG7BKp281vQ4Tc4uIIwnYqIhjtiqYLG/VOPCVutTsyYJTaNlnV0Ghbwg0sP5GAXOWPw1Q==
-X-Received: by 2002:a2e:8689:0:b0:2b4:6195:bb2f with SMTP id l9-20020a2e8689000000b002b46195bb2fmr17494457lji.25.1687816800440;
-        Mon, 26 Jun 2023 15:00:00 -0700 (PDT)
-Received: from amikhalitsyn.local (dslb-002-205-064-187.002.205.pools.vodafone-ip.de. [2.205.64.187])
-        by smtp.gmail.com with ESMTPSA id y7-20020a1709060a8700b0098f99048053sm2097490ejf.148.2023.06.26.14.59.59
+        bh=QlpYYAVC/MWdIUZuaUadftJpfVZkJVH5Wq1ooN45W+Q=;
+        b=erIdhgyROBJUo3yBNFPCQbstJHgzeUUczxt7w+lb0b4niRr6FgH1mRcvu19rYPILKT
+         HsGrKO/Rnhgl9kGhXPODyczBmJPaB9HPwC8YU6dZz9tmi/Lz1BCKGRgIXcZUDAS/13u+
+         MhyiPvmdKrqv0jY5lDV32gWAXaxFRwLow3IDaVqBBKEVt+w71iq+Pb0HJ9mgz0mNNRj9
+         rfbGaXgHZO+JJANSNpxOCHE1PQ+HHJyXI5Zw8OwYEvvaIRVLdbztudSjY2fP5WwwbQgZ
+         TXE1aLD0rSRfEjj5kcWM0J8CYyacfba0Vvb0uxHU9iRqqd5hNCGtFAmxby/+gGH1Gzpb
+         A3YA==
+X-Gm-Message-State: AC+VfDxH3oFqGIC3hPTenyMd+8IHwH7qT1K7T8wxp79DppC9Buu6sPJz
+        tbI5v/ifT9pTdQlLfM9G5VRquGFd/Ao=
+X-Google-Smtp-Source: ACHHUZ4JfY3mwrFwMp+bNeVAxevGh0aPcimLmxfpOD8k9aXfpE96VaI1iyoFuIWY+83ozH1xrGCfrg==
+X-Received: by 2002:a05:620a:4111:b0:765:70df:d338 with SMTP id j17-20020a05620a411100b0076570dfd338mr7442314qko.9.1687817637692;
+        Mon, 26 Jun 2023 15:13:57 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.98.52])
+        by smtp.gmail.com with ESMTPSA id a4-20020a05620a124400b00762581d01dbsm3143568qkl.30.2023.06.26.15.13.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 14:59:59 -0700 (PDT)
-From:   Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-To:     davem@davemloft.net
-Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Christian Brauner <brauner@kernel.org>,
-        Kuniyuki Iwashima <kuniyu@amazon.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH net-next] net: scm: introduce and use scm_recv_unix helper
-Date:   Mon, 26 Jun 2023 23:59:51 +0200
-Message-Id: <20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 26 Jun 2023 15:13:57 -0700 (PDT)
+Message-ID: <649a0da5.050a0220.a50e7.67e0@mx.google.com>
+Date:   Mon, 26 Jun 2023 15:13:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6783403933793776064=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org,
+        aleksandr.mikhalitsyn@canonical.com
+Subject: RE: [net-next] net: scm: introduce and use scm_recv_unix helper
+In-Reply-To: <20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com>
+References: <20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Recently, our friends from bluetooth subsystem reported
-[1] that after ("scm: add SO_PASSPIDFD and SCM_PIDFD")
-scm_recv helper become unusable in kernel modules (because it
-uses unexported pidfd_prepare() API).
+--===============6783403933793776064==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-We were aware of this issue and workarounded it in a hard way
-by ("af_unix: Kconfig: make CONFIG_UNIX bool").
+This is an automated email and please do not reply to this email.
 
-But recently a new functionality was added in the scope of
-817efd3cad74 ("Bluetooth: hci_sock: Forward credentials to monitor")
-and after that bluetooth can't be compiled as a kernel module.
+Dear Submitter,
 
-After some discussion in [1] we decided to split scm_recv into
-two helpers, one won't support SCM_PIDFD (used for unix sockets),
-and another one will be completely the same as it was before
-("scm: add SO_PASSPIDFD and SCM_PIDFD").
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-[1] https://lore.kernel.org/lkml/CAJqdLrpFcga4n7wxBhsFqPQiN8PKFVr6U10fKcJ9W7AcZn+o6Q@mail.gmail.com/
+----- Output -----
 
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+error: patch failed: net/unix/af_unix.c:2808
+error: net/unix/af_unix.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- include/net/scm.h  | 35 +++++++++++++++++++++++++----------
- net/unix/af_unix.c |  4 ++--
- 2 files changed, 27 insertions(+), 12 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/scm.h b/include/net/scm.h
-index c67f765a165b..409b8efda2c9 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -151,8 +151,8 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
- 		fd_install(pidfd, pidfd_file);
- }
- 
--static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
--				struct scm_cookie *scm, int flags)
-+static inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
-+					 struct scm_cookie *scm, int flags)
- {
- 	if (!msg->msg_control) {
- 		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
-@@ -160,7 +160,7 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
- 		    scm->fp || scm_has_secdata(sock))
- 			msg->msg_flags |= MSG_CTRUNC;
- 		scm_destroy(scm);
--		return;
-+		return false;
- 	}
- 
- 	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
-@@ -173,19 +173,34 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
- 		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
- 	}
- 
--	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
--		scm_pidfd_recv(msg, scm);
-+	scm_passec(sock, msg, scm);
- 
--	scm_destroy_cred(scm);
-+	if (scm->fp)
-+		scm_detach_fds(msg, scm);
- 
--	scm_passec(sock, msg, scm);
-+	return true;
-+}
- 
--	if (!scm->fp)
-+static inline void scm_recv(struct socket *sock, struct msghdr *msg,
-+				struct scm_cookie *scm, int flags)
-+{
-+	if (!__scm_recv_common(sock, msg, scm, flags))
- 		return;
--	
--	scm_detach_fds(msg, scm);
-+
-+	scm_destroy_cred(scm);
- }
- 
-+static inline void scm_recv_unix(struct socket *sock, struct msghdr *msg,
-+				     struct scm_cookie *scm, int flags)
-+{
-+	if (!__scm_recv_common(sock, msg, scm, flags))
-+		return;
-+
-+	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
-+		scm_pidfd_recv(msg, scm);
-+
-+	scm_destroy_cred(scm);
-+}
- 
- #endif /* __LINUX_NET_SCM_H */
- 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index f2f234f0b92c..20ac83e012e4 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2427,7 +2427,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
- 	}
- 	err = (flags & MSG_TRUNC) ? skb->len - skip : size;
- 
--	scm_recv(sock, msg, &scm, flags);
-+	scm_recv_unix(sock, msg, &scm, flags);
- 
- out_free:
- 	skb_free_datagram(sk, skb);
-@@ -2808,7 +2808,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 
- 	mutex_unlock(&u->iolock);
- 	if (state->msg && check_creds)
--		scm_recv(sock, state->msg, &scm, flags);
-+		scm_recv_unix(sock, state->msg, &scm, flags);
- 	else
- 		scm_destroy(&scm);
- out:
--- 
-2.34.1
 
+--===============6783403933793776064==--
