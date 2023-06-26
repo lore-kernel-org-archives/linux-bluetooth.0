@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 953CBEB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 19:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1A3EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 20:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229599AbjFZTzX (ORCPT
+        id S229779AbjFZUFP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Jun 2023 15:55:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50158 "EHLO
+        Mon, 26 Jun 2023 16:05:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229516AbjFZTzW (ORCPT
+        with ESMTP id S231569AbjFZUEy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Jun 2023 15:55:22 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 371CDE7B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 12:55:21 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b69ea3b29fso25356911fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 12:55:21 -0700 (PDT)
+        Mon, 26 Jun 2023 16:04:54 -0400
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9619726B8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 13:04:38 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b6a152a933so22539591fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 13:04:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687809319; x=1690401319;
+        d=gmail.com; s=20221208; t=1687809877; x=1690401877;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HJHr43ETmdQF5k4COj21CqvW11WxmS13eatfPxe+o28=;
-        b=KjF621Y0G0nPN5zvuuDxOXsN2eRlfqnOncmLcDXZW9LSTvM5XBa/mYwU/4hYw7BEU8
-         R7h2JXnIZFUIkv7afVcbJd86FJHeAlLtfr0ZmuyDSygH84x+Vrl81nFcxF2mkZmdgq+y
-         utTrc5YRxeMkA5ywop0CCr+cx11FW0rzJldMfSFRLHOD/ppswSx4GgWWNs1Kj4sUeuy5
-         1JrWI09ZD2cXj2WUjsVU58Mttu0LCvNTC2HYfYq96RJhAyjycPfwD0GJRy8kAQ/a0c/0
-         4CFZlLAobDuIS1zSaOLKPsAtmnBBxdBWa5CDnJGNFdN95zd1aku2Q6u00cWSZ8aDEaVe
-         Fu8A==
+        bh=+y9hI5m+9YCKqVHgRpV6LEmudivWd2mAwMbCHqHrjl4=;
+        b=EyGj7Ww5FOeUP09b+mLU76Q4UqJFjJ0k3w94p4mqJ/PtLV4YZmsIgyuvXXIryXjUBy
+         qNjGf8LIOgx+zrrKj7fnN25sXiK+QoqZSOrg5rEwkxfSrnWHiqqHBq2ToWnaPPNCgQa2
+         YqokTJChe7GICSfNh0BmmNmGSlFhpJ7+bY2vplMt8Rfq6jAkfEuIkYbxEN/HyJpa6H/K
+         2qDT/KY+yXjn7sqqNU95Iz04AlkGhaovz4t0r3z7tjDzbDaxiRFeeQKT5BMvkUpF0O+M
+         OnAskpEd+W7F+kja5iG4zrLOPPi88CWe9SyBS8vc/ZVlsQ03VKaMKAqy4o+Vm+W1YoQS
+         uMCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687809319; x=1690401319;
+        d=1e100.net; s=20221208; t=1687809877; x=1690401877;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HJHr43ETmdQF5k4COj21CqvW11WxmS13eatfPxe+o28=;
-        b=gQruutj3JJMBqhFT7KZwKszEPylAqeNoHw2DSxjXDfWy3SYN4hb0DTFOSegsJqIzdD
-         BbSD8dBnNQckIpSoJwtrCYJtwhyghnN622nTqu8ZV+DW4yjIbO50PeQOnv/8HYuZdvqF
-         XWnd/1YgwBL7RRSi6M6uO8JE0NjgAvuYxwvBTFLC36K5mofNv3jj85yVdCoqN6XYI80g
-         iv1g22zw34Y/mthoji5hKkXIjiSET6VuqiT1YGKsUtGZVRUZx/Uu0CgnnYNEMlHVHW0I
-         5dSRJH58eMiF27B1qLoL7iPMVIkXCOe+O87WCXksVTdkLxXthHO5ZxnRPGrOjsU7zOno
-         LctA==
-X-Gm-Message-State: AC+VfDzppuXwJP6m/h8f+UJCiI7+ykrJ52++Y0xR0bICcPyKUMGLlmlG
-        7NHISGkSonaY5V+KXW9sworNv4xG84heNBtTkhQ=
-X-Google-Smtp-Source: ACHHUZ7bZ87EIM6s0Ul2kTOHK3myLWA/ZRZ8ydYSJEgPm5nspxu4jCRjxO9PzALu+o5AR95oPrRHr6UqDTpY/A+J8AI=
-X-Received: by 2002:a2e:3508:0:b0:2b4:5b9c:a019 with SMTP id
- z8-20020a2e3508000000b002b45b9ca019mr18097522ljz.8.1687809319228; Mon, 26 Jun
- 2023 12:55:19 -0700 (PDT)
+        bh=+y9hI5m+9YCKqVHgRpV6LEmudivWd2mAwMbCHqHrjl4=;
+        b=Eeo1jq38kDUhGWM7QKx16L+yTpvJSLOtsIz19qHBndAORARYES05gGCidydrJ20VMr
+         f/X3O4tNrMIMxGAm5hGfCIbJyt/Gtdjl48yIfUc1Kej8J1IMJNlwrcAaX8HHFjS1sx1M
+         zzrQ16jjzv79Qs6DIJQq9hL8HgMiTCOwc/+RykMVBj6YNM0KJ/f+kER6zeXEE2dcAN6V
+         f5SM026GIq8p/Sx62aIeFdFmILN8Ev1Sx5y9mCjuxR/t6ZV8iVV9alNEtYXT5LbMBUE3
+         ux+RcjefTzG1IBg5snRMlZdaQWm3SoP1DDD4KCPpkrBjEU8jbLHMC5t+hYtjK2/+8n+Q
+         SRGw==
+X-Gm-Message-State: AC+VfDzCZzJh569WJde8n12DXXzjBNUtpe98hy2OH8xwnOyzpyZeRgMd
+        RMW44MRf5kgi58Iu2GPGppFHh/CEKN0Mh2iVDlNVGchc7kWPGA==
+X-Google-Smtp-Source: ACHHUZ7pLauKXgFumLww5rWAez+tZNokTvA22bS2l2gxGkPdy9SBLjjLErz9TKNVOchZB9WkAA5jpC2NWYIg7H3bb1k=
+X-Received: by 2002:a2e:8842:0:b0:2b4:6b64:6855 with SMTP id
+ z2-20020a2e8842000000b002b46b646855mr16339706ljj.24.1687809876563; Mon, 26
+ Jun 2023 13:04:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230623074657.16618-1-iulia.tanasescu@nxp.com> <20230623074657.16618-2-iulia.tanasescu@nxp.com>
-In-Reply-To: <20230623074657.16618-2-iulia.tanasescu@nxp.com>
+References: <20230623074657.16618-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20230623074657.16618-1-iulia.tanasescu@nxp.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 26 Jun 2023 12:55:07 -0700
-Message-ID: <CABBYNZL=b8Ts6pZY3=XJTt_TtdNnGtqs8gNkgq=3Wz6XEQnH=g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] btio: Add option for binding iso broadcast address
+Date:   Mon, 26 Jun 2023 13:04:24 -0700
+Message-ID: <CABBYNZJxjggNE45_U+adaLLD1FXstt5U91wKJMy=qJoRoZ09LQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/2] shared/bass: Introduce Add Source opcode handler
 To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
 Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
         mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
@@ -67,181 +67,46 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Iulia,
 
-On Fri, Jun 23, 2023 at 1:14=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
-p.com> wrote:
+On Fri, Jun 23, 2023 at 12:51=E2=80=AFAM Iulia Tanasescu
+<iulia.tanasescu@nxp.com> wrote:
 >
-> This adds the BT_IO_OPT_ISO_BC_ADDR btio option, to allow the user
-> to set the iso_bc field of an address at bind.
+> This patch series adds the BASS control point handler
+> for the Add Source operation.
 >
-> ---
->  btio/btio.c | 56 +++++++++++++++++++++++++++++++++++++++++++----------
->  btio/btio.h |  3 ++-
->  2 files changed, 48 insertions(+), 11 deletions(-)
+> If instructed by a Client through the Add Source opcode,
+> the BASS Server attempts to synchronize to a Broadcast
+> Source, by opening a btio channel.
 >
-> diff --git a/btio/btio.c b/btio/btio.c
-> index b68bfb14c..00e46abb0 100644
-> --- a/btio/btio.c
-> +++ b/btio/btio.c
-> @@ -16,6 +16,7 @@
->
->  #include <stdarg.h>
->  #include <stdlib.h>
-> +#include <stdbool.h>
->  #include <unistd.h>
->  #include <errno.h>
->  #include <poll.h>
-> @@ -71,6 +72,8 @@ struct set_opts {
->         uint16_t voice;
->         struct bt_iso_qos qos;
->         struct bt_iso_base base;
-> +       struct sockaddr_iso_bc iso_bc_addr;
-> +       bool bc_addr_set;
+> The BT_IO_OPT_ISO_BC_ADDR btio option has been added,
+> to allow binding a socket to a broadcast address.
 
-I guess we could just check for BDADDR_ANY instead of using a dedicated fie=
-ld.
+Im having second thoughts on this, Im not sure if it is a good idea to
+introduce BT_IO_OPT_ISO_BC_ADDR, there are already options to set the
+address and address type, perhaps we should add what is missing e.g.
+num of bis, etc. At least on iso-test the logic I used was that if a
+destination is given for listen then it must be a broadcast address.
 
->  };
+> The BASS adapter_probe callback has been implemented,
+> in order to automatically configure BASS into the adapter
+> database. The adapter bdaddr is also stored along with the
+> BASS database configuration, and this address will be used
+> as the source address when binding the btio channel.
 >
->  struct connect {
-> @@ -771,21 +774,40 @@ static int sco_bind(int sock, const bdaddr_t *src, =
-GError **err)
->  }
+> Iulia Tanasescu (2):
+>   btio: Add option for binding iso broadcast address
+>   shared/bass: Introduce Add Source opcode handler
 >
->  static int iso_bind(int sock, const bdaddr_t *src, uint8_t src_type,
-> -                                                       GError **err)
-> +                                       struct sockaddr_iso_bc *bc_addr,
-> +                                       GError **err)
->  {
-> -       struct sockaddr_iso addr;
-> +       struct sockaddr_iso *addr =3D NULL;
-> +       size_t addr_len;
-> +       int ret =3D 0;
+>  Makefile.am           |   2 +-
+>  btio/btio.c           |  56 +++++-
+>  btio/btio.h           |   3 +-
+>  profiles/audio/bass.c |  26 ++-
+>  src/shared/bass.c     | 424 ++++++++++++++++++++++++++++++++++++++++--
+>  src/shared/bass.h     |  14 +-
+>  unit/test-bass.c      |   2 +-
+>  7 files changed, 498 insertions(+), 29 deletions(-)
 >
-> -       memset(&addr, 0, sizeof(addr));
-> -       addr.iso_family =3D AF_BLUETOOTH;
-> -       bacpy(&addr.iso_bdaddr, src);
-> -       addr.iso_bdaddr_type =3D src_type;
-> +       if (bc_addr)
-> +               addr_len =3D sizeof(*addr) + sizeof(*addr->iso_bc);
-> +       else
-> +               addr_len =3D sizeof(*addr);
-> +
-> +       addr =3D malloc(addr_len);
-> +
-> +       if (!addr)
-> +               return -ENOMEM;
 >
-> -       if (!bind(sock, (struct sockaddr *) &addr, sizeof(addr)))
-> -               return 0;
-> +       memset(addr, 0, addr_len);
-> +       addr->iso_family =3D AF_BLUETOOTH;
-> +       bacpy(&addr->iso_bdaddr, src);
-> +       addr->iso_bdaddr_type =3D src_type;
->
-> +       if (bc_addr)
-> +               memcpy(addr->iso_bc, bc_addr, sizeof(*bc_addr));
-> +
-> +       if (!bind(sock, (struct sockaddr *)addr, addr_len))
-> +               goto done;
-> +
-> +       ret =3D -errno;
->         ERROR_FAILED(err, "iso_bind", errno);
->
-> -       return -errno;
-> +done:
-> +       free(addr);
-> +       return ret;
->  }
->
->  static int sco_connect(int sock, const bdaddr_t *dst)
-> @@ -980,6 +1002,11 @@ static gboolean parse_set_opts(struct set_opts *opt=
-s, GError **err,
->                 case BT_IO_OPT_BASE:
->                         opts->base =3D *va_arg(args, struct bt_iso_base *=
-);
->                         break;
-> +               case BT_IO_OPT_ISO_BC_ADDR:
-> +                       opts->iso_bc_addr =3D *va_arg(args,
-> +                                               struct sockaddr_iso_bc *)=
-;
-> +                       opts->bc_addr_set =3D true;
-> +                       break;
->                 case BT_IO_OPT_INVALID:
->                 case BT_IO_OPT_KEY_SIZE:
->                 case BT_IO_OPT_SOURCE_CHANNEL:
-> @@ -1305,6 +1332,7 @@ parse_opts:
->                 case BT_IO_OPT_VOICE:
->                 case BT_IO_OPT_QOS:
->                 case BT_IO_OPT_BASE:
-> +               case BT_IO_OPT_ISO_BC_ADDR:
->                 default:
->                         g_set_error(err, BT_IO_ERROR, EINVAL,
->                                         "Unknown option %d", opt);
-> @@ -1460,6 +1488,7 @@ static gboolean rfcomm_get(int sock, GError **err, =
-BtIOOption opt1,
->                 case BT_IO_OPT_VOICE:
->                 case BT_IO_OPT_QOS:
->                 case BT_IO_OPT_BASE:
-> +               case BT_IO_OPT_ISO_BC_ADDR:
->                 case BT_IO_OPT_INVALID:
->                 default:
->                         g_set_error(err, BT_IO_ERROR, EINVAL,
-> @@ -1571,6 +1600,7 @@ static gboolean sco_get(int sock, GError **err, BtI=
-OOption opt1, va_list args)
->                 case BT_IO_OPT_VOICE:
->                 case BT_IO_OPT_QOS:
->                 case BT_IO_OPT_BASE:
-> +               case BT_IO_OPT_ISO_BC_ADDR:
->                 case BT_IO_OPT_INVALID:
->                 default:
->                         g_set_error(err, BT_IO_ERROR, EINVAL,
-> @@ -1660,6 +1690,7 @@ static gboolean iso_get(int sock, GError **err, BtI=
-OOption opt1, va_list args)
->                 case BT_IO_OPT_FLUSHABLE:
->                 case BT_IO_OPT_PRIORITY:
->                 case BT_IO_OPT_VOICE:
-> +               case BT_IO_OPT_ISO_BC_ADDR:
->                 case BT_IO_OPT_INVALID:
->                 default:
->                         g_set_error(err, BT_IO_ERROR, EINVAL,
-> @@ -1790,6 +1821,7 @@ static GIOChannel *create_io(gboolean server, struc=
-t set_opts *opts,
->  {
->         int sock;
->         GIOChannel *io;
-> +       struct sockaddr_iso_bc *iso_bc_addr =3D NULL;
->
->         switch (opts->type) {
->         case BT_IO_L2CAP:
-> @@ -1836,7 +1868,11 @@ static GIOChannel *create_io(gboolean server, stru=
-ct set_opts *opts,
->                         ERROR_FAILED(err, "socket(SEQPACKET, ISO)", errno=
-);
->                         return NULL;
->                 }
-> -               if (iso_bind(sock, &opts->src, opts->src_type, err) < 0)
-> +               if (opts->bc_addr_set)
-> +                       iso_bc_addr =3D &opts->iso_bc_addr;
-> +
-> +               if (iso_bind(sock, &opts->src, opts->src_type,
-> +                                        iso_bc_addr, err) < 0)
->                         goto failed;
->                 if (!iso_set_qos(sock, &opts->qos, err))
->                         goto failed;
-> diff --git a/btio/btio.h b/btio/btio.h
-> index e9a8a01a3..516220504 100644
-> --- a/btio/btio.h
-> +++ b/btio/btio.h
-> @@ -46,7 +46,8 @@ typedef enum {
->         BT_IO_OPT_VOICE,
->         BT_IO_OPT_PHY,
->         BT_IO_OPT_QOS,
-> -       BT_IO_OPT_BASE
-> +       BT_IO_OPT_BASE,
-> +       BT_IO_OPT_ISO_BC_ADDR,
->  } BtIOOption;
->
->  typedef enum {
+> base-commit: 37042ca9c6ddcdbbb0899b3d62238935cd53f443
 > --
 > 2.34.1
 >
