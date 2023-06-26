@@ -2,55 +2,52 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FDCEB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 20:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61783EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jun 2023 20:42:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbjFZUmg (ORCPT
+        id S229780AbjFZUmh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Jun 2023 16:42:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42396 "EHLO
+        Mon, 26 Jun 2023 16:42:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229571AbjFZUmb (ORCPT
+        with ESMTP id S229623AbjFZUmb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 26 Jun 2023 16:42:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B512412C;
-        Mon, 26 Jun 2023 13:42:15 -0700 (PDT)
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E6CE54
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 13:42:15 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0DF4560F59;
-        Mon, 26 Jun 2023 20:42:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 74434C433C8;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2543D60F6E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 20:42:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7F06EC433CA;
         Mon, 26 Jun 2023 20:42:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1687812134;
-        bh=gOj1k9JojrNwRP9mT37pNzDg/rLxVjtZQAF51Mcy+ew=;
+        bh=ROY2C+vz6Aza/XLavVEep12p6uoYd6K0rQaYl+KRAxQ=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=kn0aopctOVfmLUS9K0QnhWSG70BVPy1jSGhOy24BBgYtctIho+//6ZpNbZJ32NrIp
-         BdrBuF6qQckboalLHd1ZqruaYaMQTE9fUKoLJQk5E62wTNA/O/z0TycdbC7jwhVegh
-         z3IVe0Wk4e5weRLv12TpAtDn6OJ8CKx1HkpRIyLlOcni3MxZEanL916yc+R0/l5Zmv
-         Gaim8qQFNVQiRAL+8YrgV3xdFA+fkGfe91/KtenF/jxYIKr96KcusTJ3739jToydhG
-         FKbHcCYvBxkfvbYhQvJDzBXkOWf+6aX/dmSpXd4OehrABm5kSDtpcixtNsnZ7SAhJg
-         BSeJ68E92KRTg==
+        b=bOE50HEp7HYCw+JWHnVb82mchktNe3p7/jL6f1rj7wJNvVTztdlPYdOUl09jMv8PN
+         7b/r/P38hQ1R1dyo7WGjRF6emmxdPAuSM9U2BP7nJJ7JQlbFDuc+7bF79pBiRuqBop
+         opzi4PV9+G3OLsjhA4ZbEQDNtCZTciVncDwHbjnN+pONmc6gaTRhZt3jgwdDjZg5/H
+         0c3oEIlcCFcMTVtFl0qpDC3z8RFI6AMV2umVHw4QV8Vy5tou00EASdIubX5sbknUsi
+         0Q1iRW6ejbwJpHT/xPjVwAMdPfZxocg2qCrxskQOaPRkKVbx29BaTfoF++qSI/+HKx
+         xTMQv+VhMBaOw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 530F4C395E0;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5FE76E537FE;
         Mon, 26 Jun 2023 20:42:14 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_conn: Use kmemdup() to replace kzalloc +
- memcpy
+Subject: Re: [PATCH v5] Bluetooth: hci_event: Fix parsing of CIS Established Event
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168781213432.29844.16837505476926129837.git-patchwork-notify@kernel.org>
+Message-Id: <168781213438.29844.9936704307447731174.git-patchwork-notify@kernel.org>
 Date:   Mon, 26 Jun 2023 20:42:14 +0000
-References: <20230625084513.6319-1-jiapeng.chong@linux.alibaba.com>
-In-Reply-To: <20230625084513.6319-1-jiapeng.chong@linux.alibaba.com>
-To:     Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        abaci@linux.alibaba.com
+References: <20230623212439.1702413-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230623212439.1702413-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -60,20 +57,19 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sun, 25 Jun 2023 16:45:13 +0800 you wrote:
-> Use kmemdup rather than duplicating its implementation.
+On Fri, 23 Jun 2023 14:24:39 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> ./net/bluetooth/hci_conn.c:1880:7-14: WARNING opportunity for kmemdup.
+> The ISO Interval on CIS Established Event uses 1.25 ms slots:
 > 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=5597
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+>     BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+>     page 2304:
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + memcpy
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f1a9a7cc825f
+  - [v5] Bluetooth: hci_event: Fix parsing of CIS Established Event
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5f68122ac282
 
 You are awesome, thank you!
 -- 
