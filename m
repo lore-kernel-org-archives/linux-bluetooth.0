@@ -2,160 +2,546 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A63AEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 18:37:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D0DEB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 18:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230221AbjF0ShS (ORCPT
+        id S230474AbjF0S72 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Jun 2023 14:37:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33116 "EHLO
+        Tue, 27 Jun 2023 14:59:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbjF0ShQ (ORCPT
+        with ESMTP id S229488AbjF0S70 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Jun 2023 14:37:16 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F84D196
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 11:37:14 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4008dbf2ef4so886291cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 11:37:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687891033; x=1690483033;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MyyHCJLmE7njhSS3d0lPlhd9/qu/u/yhy8eVMKYK6yI=;
-        b=XMFJDcKFZrvnTj1qfTifqlzkRqhfY7quaj+w89+jLe4AWf0mAXwVQOcnBbvnrg+o0H
-         RlhaWW5bTf7i+3i+3T9OoBvmQk+K3wohm3d8qrBoBpuFbRwT5UWz/5rF0DMBKe4XCUNr
-         l5tZoNbnyGiQcrxhn2/F/160NwHQhutc7K+DomsJv7hW8Z65dm5PiiLZmRkFJux1HUCn
-         v0ARk6cfX1x+80qDEQXULCA1RcQqUmg4FDQBGcvVd1QV1jVBI+gqAMmE2UViVOI96lgi
-         3xLiSrQ3aMUNI9YlfetqdFgatkDp90i+pAIw/0QdyAxYi3GOqLJWL//gDE7hIhtjVe8p
-         hOyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687891033; x=1690483033;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MyyHCJLmE7njhSS3d0lPlhd9/qu/u/yhy8eVMKYK6yI=;
-        b=jptRDPpkDS/+llaKvRd2jSHSlwiRhQF55YTpk6Nq91IKJJnaYaLdEYvQQJU/lbMHAj
-         6mJmf9c/lEUTLC87owZ5eEploo+fmgX1Uw63PGRI5Fi2rflXDzeZMypCAFjLvS/8ZXaY
-         pIhD6wibMNryfOE1cgNbFpXnptklBRmzVXdhPANNz7G4H/b1Ret+sxUCgGa3W6M4Omq8
-         ymVM54FEWaxXvc+a4dAVkWTq6bzC/0sqQRi3pP5ZTbE67a61WNPVDPqrPTMzKxmLJ8JG
-         Z2s4Qzm1Z2DSdxvFvaTmTRDKif5eJpbGNWwJ9g6qiGHxZpo0O3OmtyOdV3yp6ZRx/4h0
-         tATg==
-X-Gm-Message-State: AC+VfDzibUa+9SeorIy1yv160Qytv+dHvOGrXmfsSWUOxCpQxpNeqRyR
-        Ph534ePCoCAyVYtQEB+7pjvgui4wdoM=
-X-Google-Smtp-Source: ACHHUZ757jozEp/kAmzOpoLSmEtyB0qhds5kxjUEWuWGgqW8Rj7x4W20BmKqsDQgvikSQvXgqhnEnA==
-X-Received: by 2002:ac8:4e50:0:b0:400:8613:5378 with SMTP id e16-20020ac84e50000000b0040086135378mr16462400qtw.20.1687891033106;
-        Tue, 27 Jun 2023 11:37:13 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.217.79])
-        by smtp.gmail.com with ESMTPSA id m18-20020ae9e012000000b0075d49ce31c3sm2583545qkk.91.2023.06.27.11.37.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 11:37:12 -0700 (PDT)
-Message-ID: <649b2c58.e90a0220.27db2.6f00@mx.google.com>
-Date:   Tue, 27 Jun 2023 11:37:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4746480249932805801=="
+        Tue, 27 Jun 2023 14:59:26 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C9119A9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 11:59:24 -0700 (PDT)
+Received: from [192.168.1.195] (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav@iki.fi)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4QrDXS17Vdz49Q44;
+        Tue, 27 Jun 2023 21:59:20 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1687892360;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nB7XJFilQCQfTHdnXkmwBWwoDxE9y/mHevamYnf1c3s=;
+        b=rT/V5gKLMpPuID+fGFdEnItwCZ9e/zxcp/CAzNfiGXXhlptuvL1zWxMyolQMSCDP6FUZ7l
+        WYAxG/L6D8kFgsve/K/DTO9pRfiAJ8iUC+V9PQZN9BZNcpA3CAFLCSR0TmQ6LfNYs6dI52
+        gTxKlFphHv/hIEqAYSKa0RNLOCGJWrOKo2Eq7/zVn+hGi3QBtW8IucoY2Yd3LNH3W7IeJO
+        GhyfT3qvhv+jslxQTAozSMMElv12vuVOLjgRYXLgw4GJSoPwHE5f6zzrltUTdhSZekizlv
+        oukzbFm48AL+kgp5Z4Hsk+gF/OtHTZFMa4o2cbxOHbzF3ZFpf9YLpwVGIK/P3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=lahtoruutu; t=1687892360;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nB7XJFilQCQfTHdnXkmwBWwoDxE9y/mHevamYnf1c3s=;
+        b=oPQmuPdoQHPIc+HeOjvyPsBVSlE6BLfHD2FHIcp2r1ivMeYikVsxAbNRmAi/Ee8hxIplWu
+        KyIpBmV7tqdJWaUfnL/YQaKc9wjuPWpBE/BqL28zx2pTzuF/dBZvsz0zvRasPhw7bhkcG7
+        GCBdACmQ2joI+LezjFy6CdwfyHwoBhWTFI9B7kam4f3vtWwGxriCQvgajoXa760SkTVQXJ
+        zwvkQTbGM9Q+s4CJthf7dEIezWbvtf83Lwnwl+dcVDOpkr32EALnO730wkDcSKV+j7oYWn
+        r7cpB0rtN1vHeNVTtU/PQ66iekg99Z6hMzq7RU/YlW9K2T5ZWWedkEUV8GJoqQ==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1687892360; a=rsa-sha256;
+        cv=none;
+        b=XEV7d1nPYPKSyzDx7gn4y0pqYrqxfzf7LH1Omw5e+YJm2GM40D3S08/nMNLZdbclXayClr
+        U4bAhG1P0gnxBo7of69by29B5qLowr+j74AYt7Cxl9HJVExidIxF8Rzap6hMLY7VbcPZgV
+        N1xMhqGALagK/585UnIZgQ2i7EhYA9so0fyPtpeEtArBOmDWRo4PwJC96eEre2iZEhqdzB
+        J9LY1W9vgDwEBOrxetizxY5HbZoizQhbfcDX/qh/d4id290Dw+KyN+NgIrPtL3YRo3OiCn
+        O7oXDoEWyPsCBJwG4GhTfEtZdHXI9B03LOpBILCbjnimlDbS+ubSKJsZzsAc0A==
+Message-ID: <9239cf4864abf17bd50ece04ef4c93e9d8aecf8b.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v5 3/3] shared/vcp.c: Make VOCS as an included
+ service of VCS
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Nitin Jadhav <nitin.jadhav@nxp.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     devyani.godbole@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com
+Date:   Tue, 27 Jun 2023 21:59:14 +0300
+In-Reply-To: <20230612133251.194-4-nitin.jadhav@nxp.com>
+References: <20230612133251.194-1-nitin.jadhav@nxp.com>
+         <20230612133251.194-4-nitin.jadhav@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, kuniyu@amazon.com
-Subject: RE: af_unix: Followup fixes for SO_PASSPIDFD.
-In-Reply-To: <20230627174314.67688-2-kuniyu@amazon.com>
-References: <20230627174314.67688-2-kuniyu@amazon.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4746480249932805801==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+ma, 2023-06-12 kello 19:02 +0530, Nitin Jadhav kirjoitti:
+> Fixed the following issue observed during PTS testing
+> - Specified Upper and Lower Limit for Volume offset
+> - Corrected the number of handles for VOCS
+> - VOCS is made as included service of VCS
+>   (VOCS is secondary service and VSC is primary service)
 
-Dear submitter,
+I'm seeing a crash on BlueZ master branch
+6b9d167034b741605c3186e78e9742dda8e28e08 with this patch, when trying
+pair LE Audio TWS earbuds, with ControllerMode=3Dle and experimental
+features enabled in config and sound server with BAP support running.
+It seems to crash reproducibly here during pairing. Also trying to
+connect to previously paired BlueZ<->BlueZ seems to crash.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=760703
+Reverting commit d2d2d12f59d65002c4a671a5af1837f295181142
+("shared/vcp.c: Make VOCS as an included service of VCS") makes it to
+not crash any more. Didn't try to look so far into detail if it's
+directly related to this patch, but something in VCP might not be quite
+right.
 
----Test result---
+Logs:
 
-Test Summary:
-CheckPatch                    FAIL      1.86 seconds
-GitLint                       FAIL      0.98 seconds
-SubjectPrefix                 FAIL      0.52 seconds
-BuildKernel                   PASS      32.39 seconds
-CheckAllWarning               PASS      35.01 seconds
-CheckSparse                   PASS      39.57 seconds
-CheckSmatch                   PASS      112.14 seconds
-BuildKernel32                 PASS      31.26 seconds
-TestRunnerSetup               PASS      442.82 seconds
-TestRunner_l2cap-tester       PASS      16.57 seconds
-TestRunner_iso-tester         PASS      22.53 seconds
-TestRunner_bnep-tester        PASS      5.30 seconds
-TestRunner_mgmt-tester        PASS      128.55 seconds
-TestRunner_rfcomm-tester      PASS      8.45 seconds
-TestRunner_sco-tester         PASS      7.85 seconds
-TestRunner_ioctl-tester       PASS      9.22 seconds
-TestRunner_mesh-tester        PASS      6.67 seconds
-TestRunner_smp-tester         PASS      7.81 seconds
-TestRunner_userchan-tester    PASS      5.58 seconds
-IncrementalBuild              PASS      56.70 seconds
+bluetoothd[38339]: src/device.c:gatt_client_ready_cb() status: success, err=
+or: 0
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001800-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001801-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 0000180a-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 0000180f-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 0000180f-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: a7a473e9-19=
+c6-491b-aea6-7ea92b8f043a
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 0000184f-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 0000184e-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001850-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 0000184d-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001844-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001855-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00008fe1-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001846-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:update_gatt_uuids() UUID Added: 00001853-00=
+00-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/gap/gas.c:gap_probe() GAP profile probe (28:3D:=
+C2:4A:7D:2A)
+bluetoothd[38339]: src/service.c:change_state() 0x6040000409d0: device 28:3=
+D:C2:4A:7D:2A profile gap-profile state changed: unavailable -> disconnecte=
+d (0)
+bluetoothd[38339]: profiles/gap/gas.c:gap_accept() GAP profile accept (28:3=
+D:C2:4A:7D:2A)
+bluetoothd[38339]: profiles/gap/gas.c:handle_characteristic() Unsupported c=
+haracteristic: 00002aa6-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/service.c:change_state() 0x6040000409d0: device 28:3=
+D:C2:4A:7D:2A profile gap-profile state changed: disconnected -> connected =
+(0)
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/service.c:change_state() 0x604000040cd0: device 28:3=
+D:C2:4A:7D:2A profile deviceinfo state changed: unavailable -> disconnected=
+ (0)
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:deviceinfo_accept() dev=
+iceinfo profile accept (28:3D:C2:4A:7D:2A)
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a29-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a24-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a25-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a27-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a26-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a28-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a23-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: profiles/deviceinfo/deviceinfo.c:handle_characteristic()=
+ Unsupported characteristic: 00002a2a-0000-1000-8000-00805f9b34fb
+bluetoothd[38339]: src/service.c:change_state() 0x604000040cd0: device 28:3=
+D:C2:4A:7D:2A profile deviceinfo state changed: disconnected -> connected (=
+0)
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/battery/battery.c:batt_probe() BATT profile pro=
+be (28:3D:C2:4A:7D:2A)
+bluetoothd[38339]: src/service.c:change_state() 0x604000040e50: device 28:3=
+D:C2:4A:7D:2A profile batt-profile state changed: unavailable -> disconnect=
+ed (0)
+bluetoothd[38339]: profiles/battery/battery.c:batt_accept() BATT profile ac=
+cept (28:3D:C2:4A:7D:2A)
+bluetoothd[38339]: profiles/battery/battery.c:foreach_batt_service() More t=
+han one BATT service exists for this device
+bluetoothd[38339]: src/service.c:change_state() 0x604000040e50: device 28:3=
+D:C2:4A:7D:2A profile batt-profile state changed: disconnected -> connected=
+ (0)
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/audio/bass.c:bass_probe() 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/gatt-database.c:gatt_db_service_added() GATT Service=
+ added to local database
+bluetoothd[38339]: src/gatt-database.c:send_notification_to_device() GATT s=
+erver sending indication
+bluetoothd[38339]: src/gatt-database.c:db_hash_read_cb() Database Hash read
+bluetoothd[38339]: profiles/audio/bass.c:bass_data_add() data 0x603000087b2=
+0
+bluetoothd[38339]: src/service.c:change_state() 0x6040000410d0: device 28:3=
+D:C2:4A:7D:2A profile bass state changed: unavailable -> disconnected (0)
+bluetoothd[38339]: profiles/audio/bass.c:bass_accept() 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/shared/bass.c:foreach_bass_char() Broadcast Audio Sc=
+an Control Point found: handle 0x003d
+bluetoothd[38339]: src/shared/bass.c:foreach_bass_char() Broadcast Receive =
+State found: handle 0x003f
+bluetoothd[38339]: src/service.c:change_state() 0x6040000410d0: device 28:3=
+D:C2:4A:7D:2A profile bass state changed: disconnected -> connected (0)
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/audio/bap.c:bap_probe() 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/audio/bap.c:bap_data_add() data 0x60b000022fe0
+bluetoothd[38339]: src/service.c:change_state() 0x604000042b10: device 28:3=
+D:C2:4A:7D:2A profile bap state changed: unavailable -> disconnected (0)
+bluetoothd[38339]: profiles/audio/bap.c:bap_accept() 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/audio/bap.c:bap_attached() 0x60e0000043a0
+bluetoothd[38339]: src/shared/bap.c:foreach_pacs_char() PAC Context found: =
+handle 0x0050
+bluetoothd[38339]: src/shared/bap.c:foreach_pacs_char() PAC Supported Conte=
+xt found: handle 0x0053
+bluetoothd[38339]: src/shared/bap.c:foreach_pacs_char() Sink PAC Location f=
+ound: handle 0x0056
+bluetoothd[38339]: src/shared/bap.c:foreach_pacs_char() Sink PAC found: han=
+dle 0x0059
+bluetoothd[38339]: src/shared/bap.c:foreach_pacs_char() Source PAC Location=
+ found: handle 0x005c
+bluetoothd[38339]: src/shared/bap.c:foreach_pacs_char() Source PAC found: h=
+andle 0x005f
+bluetoothd[38339]: src/shared/bap.c:foreach_ascs_char() ASE Control Point f=
+ound: handle 0x0043
+bluetoothd[38339]: src/shared/bap.c:bap_cp_attach() ASE CP handle 0x0043
+bluetoothd[38339]: src/shared/bap.c:foreach_ascs_char() ASE Sink found: han=
+dle 0x0046
+bluetoothd[38339]: src/shared/bap.c:bap_endpoint_attach() ASE handle 0x0046
+bluetoothd[38339]: src/shared/bap.c:foreach_ascs_char() ASE Sink found: han=
+dle 0x0049
+bluetoothd[38339]: src/shared/bap.c:bap_endpoint_attach() ASE handle 0x0049
+bluetoothd[38339]: src/shared/bap.c:foreach_ascs_char() ASE Source found: h=
+andle 0x004c
+bluetoothd[38339]: src/shared/bap.c:bap_endpoint_attach() ASE handle 0x004c
+bluetoothd[38339]: src/service.c:change_state() 0x604000042b10: device 28:3=
+D:C2:4A:7D:2A profile bap state changed: disconnected -> connected (0)
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/device.c:device_probe_profiles() Probing profiles fo=
+r device 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/audio/vcp.c:vcp_probe() 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: profiles/audio/vcp.c:vcp_data_add() data 0x60300008ab20
+bluetoothd[38339]: src/service.c:change_state() 0x6040000432d0: device 28:3=
+D:C2:4A:7D:2A profile vcp state changed: unavailable -> disconnected (0)
+bluetoothd[38339]: profiles/audio/vcp.c:vcp_accept() 28:3D:C2:4A:7D:2A
+bluetoothd[38339]: src/shared/vcp.c:foreach_vcs_char() VCS Vol state found:=
+ handle 0x0024
+bluetoothd[38339]: src/shared/vcp.c:foreach_vcs_char() VCS Volume CP found:=
+ handle 0x0027
+bluetoothd[38339]: src/shared/vcp.c:foreach_vcs_char() VCS Vol Flag found: =
+handle 0x0029
+bluetoothd[38339]: =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+bluetoothd[38339]: =3D=3D38339=3D=3DERROR: AddressSanitizer: heap-buffer-ov=
+erflow on address 0x60400003db08 at pc 0x0000006368fe bp 0x7ffd259cd910 sp =
+0x7ffd259cd908
+bluetoothd[38339]: READ of size 8 at 0x60400003db08 thread T0
+bluetoothd[38339]:     #0 0x6368fd in gatt_db_attribute_get_char_data src/s=
+hared/gatt-db.c:1877
+bluetoothd[38339]:     #1 0x6135ac in notify_chrc_create src/shared/gatt-cl=
+ient.c:323
+bluetoothd[38339]:     #2 0x61b275 in register_notify src/shared/gatt-clien=
+t.c:1765
+bluetoothd[38339]:     #3 0x624940 in bt_gatt_client_register_notify src/sh=
+ared/gatt-client.c:3741
+bluetoothd[38339]:     #4 0x66472e in vcp_register_notify src/shared/vcp.c:=
+1517
+bluetoothd[38339]:     #5 0x664eac in foreach_vcs_char src/shared/vcp.c:158=
+6
+bluetoothd[38339]:     #6 0x6351a2 in gatt_db_service_foreach src/shared/ga=
+tt-db.c:1524
+bluetoothd[38339]:     #7 0x635234 in gatt_db_service_foreach_char src/shar=
+ed/gatt-db.c:1532
+bluetoothd[38339]:     #8 0x665993 in foreach_vcs_service src/shared/vcp.c:=
+1686
+bluetoothd[38339]:     #9 0x634452 in foreach_service_in_range src/shared/g=
+att-db.c:1413
+bluetoothd[38339]:     #10 0x6347ba in foreach_in_range src/shared/gatt-db.=
+c:1436
+bluetoothd[38339]:     #11 0x5f7364 in queue_foreach src/shared/queue.c:207
+bluetoothd[38339]:     #12 0x634d75 in gatt_db_foreach_service_in_range src=
+/shared/gatt-db.c:1478
+bluetoothd[38339]:     #13 0x634198 in gatt_db_foreach_service src/shared/g=
+att-db.c:1383
+bluetoothd[38339]:     #14 0x665c15 in bt_vcp_attach src/shared/vcp.c:1722
+bluetoothd[38339]:     #15 0x4b3ebc in vcp_accept profiles/audio/vcp.c:251
+bluetoothd[38339]:     #16 0x561410 in service_accept src/service.c:203
+bluetoothd[38339]:     #17 0x58275e in add_gatt_service src/device.c:3979
+bluetoothd[38339]:     #18 0x634452 in foreach_service_in_range src/shared/=
+gatt-db.c:1413
+bluetoothd[38339]:     #19 0x6347ba in foreach_in_range src/shared/gatt-db.=
+c:1436
+bluetoothd[38339]:     #20 0x5f7364 in queue_foreach src/shared/queue.c:207
+bluetoothd[38339]:     #21 0x634d75 in gatt_db_foreach_service_in_range src=
+/shared/gatt-db.c:1478
+bluetoothd[38339]:     #22 0x634198 in gatt_db_foreach_service src/shared/g=
+att-db.c:1383
+bluetoothd[38339]:     #23 0x582929 in device_add_gatt_services src/device.=
+c:3993
+bluetoothd[38339]:     #24 0x58a590 in register_gatt_services src/device.c:=
+5368
+bluetoothd[38339]:     #25 0x58a6ad in gatt_client_ready_cb src/device.c:53=
+86
+bluetoothd[38339]:     #26 0x619375 in notify_client_ready src/shared/gatt-=
+client.c:1390
+bluetoothd[38339]:     #27 0x61cf29 in init_complete src/shared/gatt-client=
+.c:2092
+bluetoothd[38339]:     #28 0x614439 in discovery_op_complete src/shared/gat=
+t-client.c:476
+bluetoothd[38339]:     #29 0x619cec in db_hash_read_cb src/shared/gatt-clie=
+nt.c:1496
+bluetoothd[38339]:     #30 0x673d37 in discovery_op_complete src/shared/gat=
+t-helpers.c:615
+bluetoothd[38339]:     #31 0x677336 in read_by_type_cb src/shared/gatt-help=
+ers.c:1344
+bluetoothd[38339]:     #32 0x60d878 in handle_rsp src/shared/att.c:860
+bluetoothd[38339]:     #33 0x60e5cd in can_read_data src/shared/att.c:1052
+bluetoothd[38339]:     #34 0x66f30e in watch_callback src/shared/io-glib.c:=
+157
+bluetoothd[38339]:     #35 0x7fdd0af8239b in g_main_context_dispatch (/lib6=
+4/libglib-2.0.so.0+0x5c39b) (BuildId: b0e6a618cd46494b058c5f00ce2f1a650b200=
+ce3)
+bluetoothd[38339]:     #36 0x7fdd0afe0437 in g_main_context_iterate.isra.0 =
+(/lib64/libglib-2.0.so.0+0xba437) (BuildId: b0e6a618cd46494b058c5f00ce2f1a6=
+50b200ce3)
+bluetoothd[38339]:     #37 0x7fdd0af8199e in g_main_loop_run (/lib64/libgli=
+b-2.0.so.0+0x5b99e) (BuildId: b0e6a618cd46494b058c5f00ce2f1a650b200ce3)
+bluetoothd[38339]:     #38 0x66fd29 in mainloop_run src/shared/mainloop-gli=
+b.c:66
+bluetoothd[38339]:     #39 0x67077e in mainloop_run_with_signal src/shared/=
+mainloop-notify.c:188
+bluetoothd[38339]:     #40 0x4da138 in main src/main.c:1450
+bluetoothd[38339]:     #41 0x7fdd0a649b49 in __libc_start_call_main (/lib64=
+/libc.so.6+0x27b49) (BuildId: 245240a31888ad5c11bbc55b18e02d87388f59a9)
+bluetoothd[38339]:     #42 0x7fdd0a649c0a in __libc_start_main_alias_2 (/li=
+b64/libc.so.6+0x27c0a) (BuildId: 245240a31888ad5c11bbc55b18e02d87388f59a9)
+bluetoothd[38339]:     #43 0x40c974 in _start (/usr/local/stow/bluez-dev/li=
+bexec/bluetooth/bluetoothd+0x40c974) (BuildId: 339d83124c60413f66f5c84af62c=
+d00e236e7733)
+bluetoothd[38339]: 0x60400003db08 is located 8 bytes before 40-byte region =
+[0x60400003db10,0x60400003db38)
+bluetoothd[38339]: allocated by thread T0 here:
+bluetoothd[38339]:     #0 0x7fdd0a8d92ff in malloc (/lib64/libasan.so.8+0xd=
+92ff) (BuildId: dc689b05ca2577037af24700212bb5cce1f91c8a)
+bluetoothd[38339]:     #1 0x5f86b7 in util_malloc src/shared/util.c:46
+bluetoothd[38339]:     #2 0x62fe56 in gatt_db_service_create src/shared/gat=
+t-db.c:533
+bluetoothd[38339]:     #3 0x631171 in gatt_db_insert_service src/shared/gat=
+t-db.c:734
+bluetoothd[38339]:     #4 0x61844f in discovery_parse_services src/shared/g=
+att-client.c:1205
+bluetoothd[38339]:     #5 0x618e8f in discover_primary_cb src/shared/gatt-c=
+lient.c:1326
+bluetoothd[38339]:     #6 0x673d37 in discovery_op_complete src/shared/gatt=
+-helpers.c:615
+bluetoothd[38339]:     #7 0x67432e in read_by_grp_type_cb src/shared/gatt-h=
+elpers.c:717
+bluetoothd[38339]:     #8 0x60d878 in handle_rsp src/shared/att.c:860
+bluetoothd[38339]:     #9 0x60e5cd in can_read_data src/shared/att.c:1052
+bluetoothd[38339]:     #10 0x66f30e in watch_callback src/shared/io-glib.c:=
+157
+bluetoothd[38339]:     #11 0x7fdd0af8239b in g_main_context_dispatch (/lib6=
+4/libglib-2.0.so.0+0x5c39b) (BuildId: b0e6a618cd46494b058c5f00ce2f1a650b200=
+ce3)
+bluetoothd[38339]:     #12 0x7fdd0afe0437 in g_main_context_iterate.isra.0 =
+(/lib64/libglib-2.0.so.0+0xba437) (BuildId: b0e6a618cd46494b058c5f00ce2f1a6=
+50b200ce3)
+bluetoothd[38339]:     #13 0x7fdd0af8199e in g_main_loop_run (/lib64/libgli=
+b-2.0.so.0+0x5b99e) (BuildId: b0e6a618cd46494b058c5f00ce2f1a650b200ce3)
+bluetoothd[38339]:     #14 0x66fd29 in mainloop_run src/shared/mainloop-gli=
+b.c:66
+bluetoothd[38339]:     #15 0x67077e in mainloop_run_with_signal src/shared/=
+mainloop-notify.c:188
+bluetoothd[38339]:     #16 0x4da138 in main src/main.c:1450
+bluetoothd[38339]:     #17 0x7fdd0a649b49 in __libc_start_call_main (/lib64=
+/libc.so.6+0x27b49) (BuildId: 245240a31888ad5c11bbc55b18e02d87388f59a9)
+bluetoothd[38339]:     #18 0x7fdd0a649c0a in __libc_start_main_alias_2 (/li=
+b64/libc.so.6+0x27c0a) (BuildId: 245240a31888ad5c11bbc55b18e02d87388f59a9)
+bluetoothd[38339]:     #19 0x40c974 in _start (/usr/local/stow/bluez-dev/li=
+bexec/bluetooth/bluetoothd+0x40c974) (BuildId: 339d83124c60413f66f5c84af62c=
+d00e236e7733)
+bluetoothd[38339]: SUMMARY: AddressSanitizer: heap-buffer-overflow src/shar=
+ed/gatt-db.c:1877 in gatt_db_attribute_get_char_data
+bluetoothd[38339]: Shadow bytes around the buggy address:
+bluetoothd[38339]:   0x60400003d880: fa fa fd fd fd fd fd fd fa fa fd fd fd=
+ fd fd fa
+bluetoothd[38339]:   0x60400003d900: fa fa fd fd fd fd fd fd fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]:   0x60400003d980: fa fa fd fd fd fd fd fa fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]:   0x60400003da00: fa fa fd fd fd fd fd fa fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]:   0x60400003da80: fa fa fd fd fd fd fd fa fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]: =3D>0x60400003db00: fa[fa]00 00 00 00 00 fa fa fa 00 00 =
+00 00 00 fa
+bluetoothd[38339]:   0x60400003db80: fa fa 00 00 00 00 00 00 fa fa fd fd fd=
+ fd fd fa
+bluetoothd[38339]:   0x60400003dc00: fa fa fd fd fd fd fd fd fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]:   0x60400003dc80: fa fa fd fd fd fd fd fa fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]:   0x60400003dd00: fa fa fd fd fd fd fd fa fa fa fd fd fd=
+ fd fd fd
+bluetoothd[38339]:   0x60400003dd80: fa fa fd fd fd fd fd fd fa fa fd fd fd=
+ fd fd fa
+bluetoothd[38339]: Shadow byte legend (one shadow byte represents 8 applica=
+tion bytes):
+bluetoothd[38339]:   Addressable:           00
+bluetoothd[38339]:   Partially addressable: 01 02 03 04 05 06 07
+bluetoothd[38339]:   Heap left redzone:       fa
+bluetoothd[38339]:   Freed heap region:       fd
+bluetoothd[38339]:   Stack left redzone:      f1
+bluetoothd[38339]:   Stack mid redzone:       f2
+bluetoothd[38339]:   Stack right redzone:     f3
+bluetoothd[38339]:   Stack after return:      f5
+bluetoothd[38339]:   Stack use after scope:   f8
+bluetoothd[38339]:   Global redzone:          f9
+bluetoothd[38339]:   Global init order:       f6
+bluetoothd[38339]:   Poisoned by user:        f7
+bluetoothd[38339]:   Container overflow:      fc
+bluetoothd[38339]:   Array cookie:            ac
+bluetoothd[38339]:   Intra object redzone:    bb
+bluetoothd[38339]:   ASan internal:           fe
+bluetoothd[38339]:   Left alloca redzone:     ca
+bluetoothd[38339]:   Right alloca redzone:    cb
+bluetoothd[38339]: =3D=3D38339=3D=3DABORTING
+systemd[1]: bluetooth.service: Main process exited, code=3Ddumped, status=
+=3D6/ABRT
+systemd[1]: bluetooth.service: Failed with result 'core-dump'.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v1,net-next,1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL.
-WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
-#148: 
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-total: 0 errors, 1 warnings, 10 lines checked
+> ---
+> v2: Cosmetic Changes (Bluez Test Bot)
+> v5: Resolved GitLint warning (tedd_an/GitLint)
+> ---
+>=20
+>  src/shared/vcp.c | 25 ++++++++++++++++++-------
+>  1 file changed, 18 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+> index 92f21fd0b..74bd01729 100644
+> --- a/src/shared/vcp.c
+> +++ b/src/shared/vcp.c
+> @@ -32,9 +32,13 @@
+> =20
+>  #define VCP_STEP_SIZE 1
+> =20
+> +#define VOCS_VOL_OFFSET_UPPER_LIMIT	 255
+> +#define VOCS_VOL_OFFSET_LOWER_LIMIT	-255
+> +
+>  /* Apllication Error Code */
+>  #define BT_ATT_ERROR_INVALID_CHANGE_COUNTER	0x80
+>  #define BT_ATT_ERROR_OPCODE_NOT_SUPPORTED	0x81
+> +#define BT_ATT_ERROR_VALUE_OUT_OF_RANGE		0x82
+> =20
+>  #define BT_VCP_NA                   BIT(0)
+>  #define BT_VCP_FRONT_LEFT           BIT(1)
+> @@ -100,7 +104,7 @@ struct bt_vcs_ab_vol {
+> =20
+>  struct bt_vocs_set_vol_off {
+>  	uint8_t	change_counter;
+> -	uint8_t	set_vol_offset;
+> +	int16_t set_vol_offset;
+>  } __packed;
+> =20
+>  struct bt_vcp_cb {
+> @@ -167,7 +171,7 @@ struct bt_vcs {
+> =20
+>  /* Contains local bt_vcp_db */
+>  struct vol_offset_state {
+> -	uint16_t vol_offset;
+> +	int16_t vol_offset;
+>  	uint8_t counter;
+>  } __packed;
+> =20
+> @@ -705,6 +709,11 @@ static uint8_t vocs_set_vol_offset(struct bt_vocs *v=
+ocs, struct bt_vcp *vcp,
+>  		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
+>  	}
+> =20
+> +	if (req->set_vol_offset > VOCS_VOL_OFFSET_UPPER_LIMIT ||
+> +		req->set_vol_offset < VOCS_VOL_OFFSET_LOWER_LIMIT) {
+> +		DBG(vcp, "error: Value Out of Range");
+> +		return BT_ATT_ERROR_VALUE_OUT_OF_RANGE;
+> +	}
+>  	vstate->vol_offset =3D req->set_vol_offset;
+>  	vstate->counter =3D -~vstate->counter; /*Increment Change Counter*/
+> =20
+> @@ -971,7 +980,7 @@ static void vocs_voaodec_read(struct gatt_db_attribut=
+e *attrib,
+>  							iov.iov_len);
+>  }
+> =20
+> -static struct bt_vcs *vcs_new(struct gatt_db *db)
+> +static struct bt_vcs *vcs_new(struct gatt_db *db, struct bt_vcp_db *vdb)
+>  {
+>  	struct bt_vcs *vcs;
+>  	struct vol_state *vstate;
+> @@ -990,6 +999,8 @@ static struct bt_vcs *vcs_new(struct gatt_db *db)
+>  	/* Populate DB with VCS attributes */
+>  	bt_uuid16_create(&uuid, VCS_UUID);
+>  	vcs->service =3D gatt_db_add_service(db, &uuid, true, 9);
+> +	gatt_db_service_add_included(vcs->service, vdb->vocs->service);
+> +	gatt_db_service_set_active(vdb->vocs->service, true);
+> =20
+>  	bt_uuid16_create(&uuid, VOL_STATE_CHRC_UUID);
+>  	vcs->vs =3D gatt_db_service_add_characteristic(vcs->service,
+> @@ -1048,7 +1059,8 @@ static struct bt_vocs *vocs_new(struct gatt_db *db)
+> =20
+>  	/* Populate DB with VOCS attributes */
+>  	bt_uuid16_create(&uuid, VOL_OFFSET_CS_UUID);
+> -	vocs->service =3D gatt_db_add_service(db, &uuid, true, 9);
+> +
+> +	vocs->service =3D gatt_db_add_service(db, &uuid, false, 12);
+> =20
+>  	bt_uuid16_create(&uuid, VOCS_STATE_CHAR_UUID);
+>  	vocs->vos =3D gatt_db_service_add_characteristic(vocs->service,
+> @@ -1110,11 +1122,10 @@ static struct bt_vcp_db *vcp_db_new(struct gatt_d=
+b *db)
+>  	if (!vcp_db)
+>  		vcp_db =3D queue_new();
+> =20
+> -	vdb->vcs =3D vcs_new(db);
+> -	vdb->vcs->vdb =3D vdb;
+> -
+>  	vdb->vocs =3D vocs_new(db);
+>  	vdb->vocs->vdb =3D vdb;
+> +	vdb->vcs =3D vcs_new(db, vdb);
+> +	vdb->vcs->vdb =3D vdb;
+> =20
+>  	queue_push_tail(vcp_db, vdb);
+> =20
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13294846.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v1,net-next,1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "[v1,net-next,1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL."
-24: B1 Line exceeds max length (96>80): "WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_pidfd_recv include/net/scm.h:138 [inline]"
-25: B1 Line exceeds max length (105>80): "WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177"
-27: B1 Line exceeds max length (82>80): "CPU: 1 PID: 3245 Comm: syz-executor.1 Not tainted 6.4.0-rc5-01219-gfa0e21fa4443 #2"
-28: B1 Line exceeds max length (115>80): "Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014"
-31: B1 Line exceeds max length (199>80): "Code: 67 fd e9 55 fd ff ff e8 4a 70 67 fd e9 7f fd ff ff e8 40 70 67 fd e9 3e fb ff ff e8 36 70 67 fd e9 02 fd ff ff e8 8c 3a 20 fd <0f> 0b e9 fe fb ff ff e8 50 70 67 fd e9 2e f9 ff ff e8 46 70 67 fd"
-59: B1 Line exceeds max length (199>80): "Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48"
-[v1,net-next,2/2] net: scm: introduce and use scm_recv_unix helper
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-22: B1 Line exceeds max length (106>80): "Link: https://lore.kernel.org/lkml/CAJqdLrpFcga4n7wxBhsFqPQiN8PKFVr6U10fKcJ9W7AcZn+o6Q@mail.gmail.com/ [1]"
-27: B1 Line exceeds max length (98>80): "  * Resolve conflict with https://lore.kernel.org/netdev/20230626205837.82086-1-kuniyu@amazon.com/"
-32: B1 Line exceeds max length (92>80): "v1: https://lore.kernel.org/all/20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com/"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4746480249932805801==--
