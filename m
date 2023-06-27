@@ -2,65 +2,65 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2400C001B3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 08:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D384C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 08:16:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231317AbjF0IQN (ORCPT
+        id S230064AbjF0IQQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Jun 2023 04:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55234 "EHLO
+        Tue, 27 Jun 2023 04:16:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231249AbjF0IQL (ORCPT
+        with ESMTP id S230498AbjF0IQN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Jun 2023 04:16:11 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783C4173C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 01:16:05 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3f9ede60140so39671005e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 01:16:05 -0700 (PDT)
+        Tue, 27 Jun 2023 04:16:13 -0400
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD43F212B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 01:16:07 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fa96fd79f0so26380465e9.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 01:16:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687853764; x=1690445764;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7yQFEnlmWTzmD4v8v49zNv7VsmYLYcrpbow9siGJNP4=;
-        b=czgQCnAFJ8Xd83kIpzwxPdcxqmidfRNk5flJtIQBcPdEe38IDE7p+10TmWw9W5W1fZ
-         IlxxqS9Uoid5yXSNrm/Qi6Z/HlMQEeMn+DkNQ0CEVa4MneNtDOU5iVgdsXOyc6iwY7iI
-         ErHfSWg7V3aZibXcxjc6OyvKoZvt7/4ggad1m1Ep2qGcryW7MmGk3QogAqzy7nojjU/N
-         NNq/g6XuLicIVB7xmDGFYbQ8AncRcAnH9jXjmWwWoIpRxJU4TG2oOCLA4jwtm6G1NrEn
-         izKeLiUeB5dJxyACip6u0A05HuPlqm1yci/aKB6qGFGqOFO2NSdOOy9H2kN5Rb8NihvA
-         eSjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687853764; x=1690445764;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1687853766; x=1690445766;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7yQFEnlmWTzmD4v8v49zNv7VsmYLYcrpbow9siGJNP4=;
-        b=ga5ufyVVqlJUi84KxFKVAWmnKoO83G9GhLthd91STNuP8dgLa+mjd2eyuNVtUiBFa6
-         qPT1uWCkh6SYbC73+uUfEipXCUdR5uj1xc1vq2VWnoSm07Hruca2a1J/bDK4hh9EDgHa
-         1eGlHYtp5QvG8H589zoBaZuayUyIVgQX3KQJbWNpTWyqmcbweegXUm0HJd1TOjJ8r70A
-         hOdNdHdCX48jPUnCAmcpIO2hk7QEziUpwANHk6daNWneSuQoJjnT5XYX0SlPiJhsI9VH
-         n3tdHr39BT2xzwEUCZxP76DwVdbhOAwmWyD8oWebg4cnG/sh8Xl1YNQKZtx0T98QgXrV
-         RCHg==
-X-Gm-Message-State: AC+VfDxR9ZTDvSp+LO3P8iH9STCiVxj3dggoSEp19xvyJ33tKkoZSlF9
-        v2B+iXgLFRcNobW6PXqVSkuF0Q==
-X-Google-Smtp-Source: ACHHUZ5buXqau94bITzRkCNSm8pvrrp74ljkSE95CsdnNaaE7n+AhvA6hq0iDdRKf9Cu8uL5Sx9U2g==
-X-Received: by 2002:a1c:6a0a:0:b0:3f9:2c0:b58 with SMTP id f10-20020a1c6a0a000000b003f902c00b58mr20010969wmc.4.1687853763862;
-        Tue, 27 Jun 2023 01:16:03 -0700 (PDT)
+        bh=bUbLXpYZ9hbHgMFkQBPgvaWFt2LORh/NmdLaZvqf0uc=;
+        b=jFhwV6ZuhNVaBpcMZziyYNirG//4VbUqivdX3Lu4GjPup53xppjsMOSB+rUSMFDn5+
+         5dzbs44NqIOHMSgTgrWTyLhD1Eh8SGeqY/w1vp4jUNH84CRe+DntXWVFiZPwhraIe2uD
+         dLOPTQUTEXUMQLe7GlGoPLuwHhYVOi2+hDzu0O+iiNGv0h/7bsH4idE7AO2AJG3YC9BE
+         l9yJ1+LBmgNPUzd2ooKm4EJvgXv1/AeRwL1XBe7JPAwb3nknTrChsvZuoquX7h07ayO5
+         vVwnhcB7WmNmlnj1VtWaMRYIXAjKgrIALM4myXv2MRCbd54MkAHAfrVi+oYjjd3nyQ/p
+         /WtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687853766; x=1690445766;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bUbLXpYZ9hbHgMFkQBPgvaWFt2LORh/NmdLaZvqf0uc=;
+        b=KaPpw9VYDMdr73i7PuY44V/I1OpiXclt7KEDRhh8o6ACmRx1Hulft2Nb2EwTXhu4Zc
+         JP1PVRB0OlhRAM+FHCSujRq9vzCpIqAbYVP91vWRnuB7CceAuIRUK6EvNTMPZi4gwCyL
+         VAlhTZyIxw3FaSDPhkQQodGigGHKIfMGgxlGM/dEIAeCVO7AxNqJr47g0dCQPt2IHWQK
+         jLEZQzS0n/XXxEo0hl/rNSitjHwczNn3OFnbpZ7Y9V2S6cMRgRl0dwxwAEVm1FJ15H48
+         2VGF1Jia+DACAFEqfQmoQ/G+IOQjOtSdHixQQKIHiY/p+ExuQKFlTQ2DIPuVLYSA9mHh
+         1aQA==
+X-Gm-Message-State: AC+VfDzXnzHJmIKBJM5BrMuu1kuwxP4NFgwDOaB6/GyQWiSZlBBLfbWn
+        O2dPTLLjuhaQ+M+LjUz4RJNFug==
+X-Google-Smtp-Source: ACHHUZ7oLNUN9T3n36ev2QIwwRvlSKmUXzwmdjHeWPmlb6Kyxq6bjqhk6njoMIMj1puDA/+xsWNGSg==
+X-Received: by 2002:a05:600c:2206:b0:3f9:515:ccfb with SMTP id z6-20020a05600c220600b003f90515ccfbmr32960384wml.12.1687853766256;
+        Tue, 27 Jun 2023 01:16:06 -0700 (PDT)
 Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a])
-        by smtp.gmail.com with ESMTPSA id m21-20020a7bcb95000000b003faabd8fcb8sm3922480wmi.46.2023.06.27.01.16.02
+        by smtp.gmail.com with ESMTPSA id m21-20020a7bcb95000000b003faabd8fcb8sm3922480wmi.46.2023.06.27.01.16.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 01:16:03 -0700 (PDT)
+        Tue, 27 Jun 2023 01:16:05 -0700 (PDT)
 From:   Neil Armstrong <neil.armstrong@linaro.org>
-Subject: [PATCH v2 0/5] bluetooth: qca: enable WCN7850 support
-Date:   Tue, 27 Jun 2023 10:15:53 +0200
-Message-Id: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
+Date:   Tue, 27 Jun 2023 10:15:55 +0200
+Subject: [PATCH v2 2/5] bluetooth: qca: use switch case for soc type
+ behavior
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIALmammQC/42NQQ6DIBBFr9Kw7jSIqLSr3qNxgQg6iYIZ0LQx3
- r3UE3T5XvL/21m0hDayx2VnZDeMGHwGcb0wM2o/WMA+MxNclLwWHFJY0ECcVVVxWJeYyOoZugS
- 9M7LklbubQrI873S00JH2ZswHfp2mLBeyDt9n79VmHjGmQJ8zvxU/+0dpK4CDbISqaumUasRzQ
- q8p3AINrD2O4wtFIP1w1gAAAA==
+Message-Id: <20230620-topic-sm8550-upstream-bt-v2-2-98b0043d31a4@linaro.org>
+References: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
+In-Reply-To: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
 To:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
@@ -79,62 +79,589 @@ To:     "David S. Miller" <davem@davemloft.net>,
 Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-arm-msm@vger.kernel.org,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        Rob Herring <robh@kernel.org>
+        Neil Armstrong <neil.armstrong@linaro.org>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1410;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=15642;
  i=neil.armstrong@linaro.org; h=from:subject:message-id;
- bh=8ajAaelp7METtTO+em4pEvC+eBHXTg//fu024TG3vFk=;
- b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkmprAZG99W3x4f389GUC2SbWIaDEijrZdWHQhQmXY
- nIYBPYWJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJqawAAKCRB33NvayMhJ0YpJD/
- 9enhJFRMX81YEnArzQ0WWLgwhe3V9qmJjnMxyFelBwC1bnCPVwAyjBx6imUlzTlV3+U1YQNVHjRnHZ
- AFOorjd4lGc+yUZZnXZU5Ok0T1UuD/TOuotykKcsuILad9aiVeFeSFVP/28mGn8NzpLXgkKAVGV/wr
- E3OUxR9lYss4yYivFeVaGdP6U9k+SR8fyxBTjJ5ZOuXNuwj0cd6IkdWuh8t4sGXcig3K1UWIQf9SXP
- sonkYvB29wZA3bWRJxkEOsKhv0KJCexLIh3RFnWxgtw2Br/C08JhS31DYMLd1TMSiuk80oE6Zo9zZD
- CvsVrNWqqronc+oYgwBW2nyHmleDUWsWPT2Y/08rozuBxnm5L/3AJQ8jX0kg38DGSBMDcgXi1q03Gl
- Y6xwZ+C5cz9zKMsrsOjWrPip2t7tIEK7vXZFLjrO4ccL+e8Fm6YL3S/psBHFSaANqqSIusnejKRX56
- YUuXKkH6qCho4B3Bg/q9H2o8rBesAfhfIVNn9aUjIfU+X3FOrOOVSDn3SYpDq6U1w4mS415xM04trM
- 32tL/HrGosvbz6IA953hE/zLCG/m9AtzfCiQbof/f6GSEHhwCjExF/hIjTkzetJGud/l+robth02pe
- 1IYFLkNazchLFs3w3gl9CHbNKUpGADA9kmITCa55C8sJiC2OStD2m/np4wgg==
+ bh=ApLQkypensJ5zfDyFrdxJsiq10gUUrb6Pxgj3YfcEtg=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkmprApM/6Zm3Y2GuwwS4pkxo6TF/fDYhVRaMsZ+rw
+ WqZnw1GJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJqawAAKCRB33NvayMhJ0cEzEA
+ CyM9WufFh6mNEVeyMm6x281vgCJlYK/Hl1sUfWDUrba++Q+Fr67SjiNtXqTA1cAh/YvnbEe714l41s
+ sNYJpLzk21NDcZWZaSaEH7I7gKVe07mPtJ/DCvKpmA2c4igosxAzXOTdPglM6YQJwPjV+9sgIzHvEz
+ 7+IAEI3PTAT5KLAoNI2UINa3gjOqm/sLYR+dYNA8t439wP+7YTBgTcpgDyUqyidapEzYtyQLlF4Q2V
+ x1MOyWrDIDjXvTygyYO6Uf55cWYOCtyONT5vAaxWbzYDrGvJvbQhmBhBfSyzPfCHTn6nHF13/zrXqK
+ ZWZpafSqYPL1fd5uMb08OAHacMGfE8l3O61Q86HAevmaK25p9HWQRpmHqCI3hpt+6djjK42aqTt0AV
+ Yw5Ei7i9OlzGbEGF6bU3HspSE7CtjRnnA5gJf1IX3KoZFGbdiRF4JJuSjaY9CEf3Y1Qw+ATa74WkdB
+ yyqW9gPi+5s33j7mB6dP/1KMY6vvMoIo/eYTVl2kMoft3LZKwgYv3i/Wo4CM5Zx7A8JtDbVIGRVRxn
+ IEqWEjPLf9OwbusksHjZDz7lLmdEKiMsjuHdnKj5eFdQbxjW4ddHEjd1/JjvCMNm+yqn7nh8EA1pfX
+ K4R1pLQ55LFt1aNZey2F+ypvysefJr4XsoNr0m2hXSuwichWyKELyRfnWmGw==
 X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
  fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This serie enables WCN7850 on the Qualcomm SM8550 QRD
-reference platform.
+Use switch/case to handle soc type specific behaviour,
+the permit dropping the qca_is_xxx() inline functions
+and maked the code clearer and easier to update for new
+SoCs.
 
-The WCN7850 is close to the WCN6855 but uses different
-firmware names.
-
+Suggested-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 ---
-Changes in v2:
-- Convert if/else and qca_is_*() macros by switch/case to simplify adding now BT SoCs
-- Add bindings reviewed-by
-- Link to v1: https://lore.kernel.org/r/20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org
+ drivers/bluetooth/btqca.c   |  72 ++++++++++-----
+ drivers/bluetooth/btqca.h   |  29 ------
+ drivers/bluetooth/hci_qca.c | 219 +++++++++++++++++++++++++++++++++-----------
+ 3 files changed, 213 insertions(+), 107 deletions(-)
 
----
-Neil Armstrong (5):
-      dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
-      bluetooth: qca: use switch case for soc type behavior
-      bluetooth: qca: add support for WCN7850
-      arm64: dts: qcom: sm8550: add UART14 nodes
-      arm64: dts: qcom: sm8550-qrd: add bluetooth support
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index e7e58a956d15..13820cebe5ba 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -601,23 +601,30 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 
+ 	/* Download rampatch file */
+ 	config.type = TLV_TYPE_PATCH;
+-	if (qca_is_wcn399x(soc_type)) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crbtfw%02x.tlv", rom_ver);
+-	} else if (soc_type == QCA_QCA6390) {
++		break;
++	case QCA_QCA6390:
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htbtfw%02x.tlv", rom_ver);
+-	} else if (soc_type == QCA_WCN6750) {
++		break;
++	case QCA_WCN6750:
+ 		/* Choose mbn file by default.If mbn file is not found
+ 		 * then choose tlv file
+ 		 */
+ 		config.type = ELF_TYPE_PATCH;
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/msbtfw%02x.mbn", rom_ver);
+-	} else if (soc_type == QCA_WCN6855) {
++		break;
++	case QCA_WCN6855:
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/hpbtfw%02x.tlv", rom_ver);
+-	} else {
++		break;
++	default:
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/rampatch_%08x.bin", soc_ver);
+ 	}
+@@ -633,30 +640,40 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+-	if (firmware_name)
++	if (firmware_name) {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/%s", firmware_name);
+-	else if (qca_is_wcn399x(soc_type)) {
+-		if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID) {
++	} else {
++		switch (soc_type) {
++		case QCA_WCN3990:
++		case QCA_WCN3991:
++		case QCA_WCN3998:
++			if (le32_to_cpu(ver.soc_id) == QCA_WCN3991_SOC_ID) {
++				snprintf(config.fwname, sizeof(config.fwname),
++					 "qca/crnv%02xu.bin", rom_ver);
++			} else {
++				snprintf(config.fwname, sizeof(config.fwname),
++					 "qca/crnv%02x.bin", rom_ver);
++			}
++			break;
++		case QCA_QCA6390:
+ 			snprintf(config.fwname, sizeof(config.fwname),
+-				 "qca/crnv%02xu.bin", rom_ver);
+-		} else {
++				 "qca/htnv%02x.bin", rom_ver);
++			break;
++		case QCA_WCN6750:
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/msnv%02x.bin", rom_ver);
++			break;
++		case QCA_WCN6855:
+ 			snprintf(config.fwname, sizeof(config.fwname),
+-				 "qca/crnv%02x.bin", rom_ver);
++				 "qca/hpnv%02x.bin", rom_ver);
++			break;
++
++		default:
++			snprintf(config.fwname, sizeof(config.fwname),
++				 "qca/nvm_%08x.bin", soc_ver);
+ 		}
+ 	}
+-	else if (soc_type == QCA_QCA6390)
+-		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/htnv%02x.bin", rom_ver);
+-	else if (soc_type == QCA_WCN6750)
+-		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/msnv%02x.bin", rom_ver);
+-	else if (soc_type == QCA_WCN6855)
+-		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/hpnv%02x.bin", rom_ver);
+-	else
+-		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/nvm_%08x.bin", soc_ver);
+ 
+ 	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+ 	if (err < 0) {
+@@ -664,10 +681,17 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		return err;
+ 	}
+ 
+-	if (soc_type >= QCA_WCN3991) {
++	switch (soc_type) {
++	case QCA_WCN3991:
++	case QCA_QCA6390:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		err = qca_disable_soc_logging(hdev);
+ 		if (err < 0)
+ 			return err;
++		break;
++	default:
++		break;
+ 	}
+ 
+ 	/* WCN399x and WCN6750 supports the Microsoft vendor extension with 0xFD70 as the
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index b884095bcd9d..e7d50a821bb7 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -160,20 +160,6 @@ int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+ 			 enum qca_btsoc_type);
+ int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev);
+-static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+-{
+-	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
+-	       soc_type == QCA_WCN3998;
+-}
+-static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
+-{
+-	return soc_type == QCA_WCN6750;
+-}
+-static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
+-{
+-	return soc_type == QCA_WCN6855;
+-}
+-
+ #else
+ 
+ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+@@ -201,21 +187,6 @@ static inline int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+-{
+-	return false;
+-}
+-
+-static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
+-{
+-	return false;
+-}
+-
+-static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
+-{
+-	return false;
+-}
+-
+ static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ {
+ 	return -EOPNOTSUPP;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 1b064504b388..25f1eeb605b6 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -605,9 +605,17 @@ static int qca_open(struct hci_uart *hu)
+ 	if (hu->serdev) {
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 
+-		if (qca_is_wcn399x(qcadev->btsoc_type) ||
+-		    qca_is_wcn6750(qcadev->btsoc_type))
++		switch (qcadev->btsoc_type) {
++		case QCA_WCN3990:
++		case QCA_WCN3991:
++		case QCA_WCN3998:
++		case QCA_WCN6750:
+ 			hu->init_speed = qcadev->init_speed;
++			break;
++
++		default:
++			break;
++		}
+ 
+ 		if (qcadev->oper_speed)
+ 			hu->oper_speed = qcadev->oper_speed;
+@@ -1316,12 +1324,18 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
+ 
+ 	/* Give the controller time to process the request */
+-	if (qca_is_wcn399x(qca_soc_type(hu)) ||
+-	    qca_is_wcn6750(qca_soc_type(hu)) ||
+-	    qca_is_wcn6855(qca_soc_type(hu)))
++	switch (qca_soc_type(hu)) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		usleep_range(1000, 10000);
+-	else
++		break;
++
++	default:
+ 		msleep(300);
++	}
+ 
+ 	return 0;
+ }
+@@ -1394,13 +1408,18 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
+ 
+ static int qca_check_speeds(struct hci_uart *hu)
+ {
+-	if (qca_is_wcn399x(qca_soc_type(hu)) ||
+-	    qca_is_wcn6750(qca_soc_type(hu)) ||
+-	    qca_is_wcn6855(qca_soc_type(hu))) {
++	switch (qca_soc_type(hu)) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+ 		    !qca_get_speed(hu, QCA_OPER_SPEED))
+ 			return -EINVAL;
+-	} else {
++		break;
++
++	default:
+ 		if (!qca_get_speed(hu, QCA_INIT_SPEED) ||
+ 		    !qca_get_speed(hu, QCA_OPER_SPEED))
+ 			return -EINVAL;
+@@ -1429,14 +1448,27 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		/* Disable flow control for wcn3990 to deassert RTS while
+ 		 * changing the baudrate of chip and host.
+ 		 */
+-		if (qca_is_wcn399x(soc_type) ||
+-		    qca_is_wcn6750(soc_type) ||
+-		    qca_is_wcn6855(soc_type))
++		switch (soc_type) {
++		case QCA_WCN3990:
++		case QCA_WCN3991:
++		case QCA_WCN3998:
++		case QCA_WCN6750:
++		case QCA_WCN6855:
+ 			hci_uart_set_flow_control(hu, true);
++			break;
+ 
+-		if (soc_type == QCA_WCN3990) {
++		default:
++			break;
++		}
++
++		switch (soc_type) {
++		case QCA_WCN3990:
+ 			reinit_completion(&qca->drop_ev_comp);
+ 			set_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
++			break;
++
++		default:
++			break;
+ 		}
+ 
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+@@ -1448,12 +1480,21 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		host_set_baudrate(hu, speed);
+ 
+ error:
+-		if (qca_is_wcn399x(soc_type) ||
+-		    qca_is_wcn6750(soc_type) ||
+-		    qca_is_wcn6855(soc_type))
++		switch (soc_type) {
++		case QCA_WCN3990:
++		case QCA_WCN3991:
++		case QCA_WCN3998:
++		case QCA_WCN6750:
++		case QCA_WCN6855:
+ 			hci_uart_set_flow_control(hu, false);
++			break;
+ 
+-		if (soc_type == QCA_WCN3990) {
++		default:
++			break;
++		}
++
++		switch (soc_type) {
++		case QCA_WCN3990:
+ 			/* Wait for the controller to send the vendor event
+ 			 * for the baudrate change command.
+ 			 */
+@@ -1465,6 +1506,10 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 			}
+ 
+ 			clear_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
++			break;
++
++		default:
++			break;
+ 		}
+ 	}
+ 
+@@ -1626,12 +1671,19 @@ static int qca_regulator_init(struct hci_uart *hu)
+ 		}
+ 	}
+ 
+-	if (qca_is_wcn399x(soc_type)) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
+ 		/* Forcefully enable wcn399x to enter in to boot mode. */
+ 		host_set_baudrate(hu, 2400);
+ 		ret = qca_send_power_pulse(hu, false);
+ 		if (ret)
+ 			return ret;
++		break;
++
++	default:
++		break;
+ 	}
+ 
+ 	/* For wcn6750 need to enable gpio bt_en */
+@@ -1648,10 +1700,17 @@ static int qca_regulator_init(struct hci_uart *hu)
+ 
+ 	qca_set_speed(hu, QCA_INIT_SPEED);
+ 
+-	if (qca_is_wcn399x(soc_type)) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
+ 		ret = qca_send_power_pulse(hu, true);
+ 		if (ret)
+ 			return ret;
++		break;
++
++	default:
++		break;
+ 	}
+ 
+ 	/* Now the device is in ready state to communicate with host.
+@@ -1685,11 +1744,16 @@ static int qca_power_on(struct hci_dev *hdev)
+ 	if (!hu->serdev)
+ 		return 0;
+ 
+-	if (qca_is_wcn399x(soc_type) ||
+-	    qca_is_wcn6750(soc_type) ||
+-	    qca_is_wcn6855(soc_type)) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		ret = qca_regulator_init(hu);
+-	} else {
++		break;
++
++	default:
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->bt_en) {
+ 			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+@@ -1712,6 +1776,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	const char *firmware_name = qca_get_firmware_name(hu);
+ 	int ret;
+ 	struct qca_btsoc_version ver;
++	const char *soc_name;
+ 
+ 	ret = qca_check_speeds(hu);
+ 	if (ret)
+@@ -1726,10 +1791,25 @@ static int qca_setup(struct hci_uart *hu)
+ 	 */
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 
+-	bt_dev_info(hdev, "setting up %s",
+-		qca_is_wcn399x(soc_type) ? "wcn399x" :
+-		(soc_type == QCA_WCN6750) ? "wcn6750" :
+-		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++		soc_name = "wcn399x";
++		break;
++
++	case QCA_WCN6750:
++		soc_name = "wcn6750";
++		break;
++
++	case QCA_WCN6855:
++		soc_name = "wcn6855";
++		break;
++
++	default:
++		soc_name = "ROME/QCA6390";
++	}
++	bt_dev_info(hdev, "setting up %s", soc_name);
+ 
+ 	qca->memdump_state = QCA_MEMDUMP_IDLE;
+ 
+@@ -1740,16 +1820,21 @@ static int qca_setup(struct hci_uart *hu)
+ 
+ 	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+ 
+-	if (qca_is_wcn399x(soc_type) ||
+-	    qca_is_wcn6750(soc_type) ||
+-	    qca_is_wcn6855(soc_type)) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 		hci_set_aosp_capable(hdev);
+ 
+ 		ret = qca_read_soc_version(hdev, &ver, soc_type);
+ 		if (ret)
+ 			goto out;
+-	} else {
++		break;
++
++	default:
+ 		qca_set_speed(hu, QCA_INIT_SPEED);
+ 	}
+ 
+@@ -1763,9 +1848,15 @@ static int qca_setup(struct hci_uart *hu)
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 	}
+ 
+-	if (!(qca_is_wcn399x(soc_type) ||
+-	      qca_is_wcn6750(soc_type) ||
+-	      qca_is_wcn6855(soc_type))) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
++		break;
++
++	default:
+ 		/* Get QCA version information */
+ 		ret = qca_read_soc_version(hdev, &ver, soc_type);
+ 		if (ret)
+@@ -1930,11 +2021,17 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 
+ 	qcadev = serdev_device_get_drvdata(hu->serdev);
+ 
+-	if (qca_is_wcn399x(soc_type)) {
++	switch (soc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
+ 		host_set_baudrate(hu, 2400);
+ 		qca_send_power_pulse(hu, false);
+ 		qca_regulator_disable(qcadev);
+-	} else if (soc_type == QCA_WCN6750 || soc_type == QCA_WCN6855) {
++		break;
++
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 		msleep(100);
+ 		qca_regulator_disable(qcadev);
+@@ -1942,7 +2039,9 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 			sw_ctrl_state = gpiod_get_value_cansleep(qcadev->sw_ctrl);
+ 			bt_dev_dbg(hu->hdev, "SW_CTRL is %d", sw_ctrl_state);
+ 		}
+-	} else if (qcadev->bt_en) {
++		break;
++
++	default:
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 	}
+ 
+@@ -2067,11 +2166,17 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 	if (!qcadev->oper_speed)
+ 		BT_DBG("UART will pick default operating speed");
+ 
+-	if (data &&
+-	    (qca_is_wcn399x(data->soc_type) ||
+-	     qca_is_wcn6750(data->soc_type) ||
+-	     qca_is_wcn6855(data->soc_type))) {
++	if (data)
+ 		qcadev->btsoc_type = data->soc_type;
++	else
++		qcadev->btsoc_type = QCA_ROME;
++
++	switch (qcadev->btsoc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
+ 		qcadev->bt_power = devm_kzalloc(&serdev->dev,
+ 						sizeof(struct qca_power),
+ 						GFP_KERNEL);
+@@ -2115,12 +2220,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 			BT_ERR("wcn3990 serdev registration failed");
+ 			return err;
+ 		}
+-	} else {
+-		if (data)
+-			qcadev->btsoc_type = data->soc_type;
+-		else
+-			qcadev->btsoc_type = QCA_ROME;
++		break;
+ 
++	default:
+ 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+ 					       GPIOD_OUT_LOW);
+ 		if (IS_ERR_OR_NULL(qcadev->bt_en)) {
+@@ -2176,13 +2278,22 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+ 	struct qca_power *power = qcadev->bt_power;
+ 
+-	if ((qca_is_wcn399x(qcadev->btsoc_type) ||
+-	     qca_is_wcn6750(qcadev->btsoc_type) ||
+-	     qca_is_wcn6855(qcadev->btsoc_type)) &&
+-	    power->vregs_on)
+-		qca_power_shutdown(&qcadev->serdev_hu);
+-	else if (qcadev->susclk)
+-		clk_disable_unprepare(qcadev->susclk);
++	switch (qcadev->btsoc_type) {
++	case QCA_WCN3990:
++	case QCA_WCN3991:
++	case QCA_WCN3998:
++	case QCA_WCN6750:
++	case QCA_WCN6855:
++		if (power->vregs_on) {
++			qca_power_shutdown(&qcadev->serdev_hu);
++			break;
++		}
++		fallthrough;
++
++	default:
++		if (qcadev->susclk)
++			clk_disable_unprepare(qcadev->susclk);
++	}
+ 
+ 	hci_uart_unregister_device(&qcadev->serdev_hu);
+ }
 
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  23 ++
- arch/arm64/boot/dts/qcom/sm8550-qrd.dts            |  43 ++++
- arch/arm64/boot/dts/qcom/sm8550.dtsi               |  30 +++
- drivers/bluetooth/btqca.c                          |  82 +++++--
- drivers/bluetooth/btqca.h                          |  30 +--
- drivers/bluetooth/hci_qca.c                        | 250 ++++++++++++++++-----
- 6 files changed, 350 insertions(+), 108 deletions(-)
----
-base-commit: d4cee89031c80066ec461bb77b5e13a4f37d5fd2
-change-id: 20230620-topic-sm8550-upstream-bt-dfc4305f9c14
-
-Best regards,
 -- 
-Neil Armstrong <neil.armstrong@linaro.org>
+2.34.1
 
