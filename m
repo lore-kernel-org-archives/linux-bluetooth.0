@@ -2,58 +2,52 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E4CC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 19:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C67C001B3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 19:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230489AbjF0TB5 (ORCPT
+        id S231267AbjF0TCB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Jun 2023 15:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40142 "EHLO
+        Tue, 27 Jun 2023 15:02:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjF0TBz (ORCPT
+        with ESMTP id S229459AbjF0TB4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Jun 2023 15:01:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95AD8116;
-        Tue, 27 Jun 2023 12:01:54 -0700 (PDT)
+        Tue, 27 Jun 2023 15:01:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B4A185
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 12:01:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 31CBF611FB;
-        Tue, 27 Jun 2023 19:01:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8609DC433CA;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 39DDD61210
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 19:01:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F05FC433C9;
         Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1687892513;
-        bh=pd5ltRiIOaj/yKrVyXhVz/cvhptO3VIDm67Rl/G6O3w=;
+        bh=xZqTGmehsLYPdQdAdr5GswqHugDzpBDyVQUPE6vBiZo=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=hu99a1SWwpcgIUDdVf7+kAjL0QITH77k2W2SSELAO6KDmkUvtU0rnRrwkXISvXaS2
-         1+S9tUbZidslBPc7VO9enIKPIwC4VAuBpvuyZSHlU+JO9gOZsmK5Z5zXnYsBEH8pOA
-         v08UdZMQi+L4/AhGcZKh0yDQ5v45TeLr7Bu/j2IDHqhrBoUZ3GlU8h9e9HpnhFjZAS
-         /VPpaYooNuc5jyqCarUFfsJMOwYMX3IzXx/gJAbAj6jQ1Sufhfa0k+ebb0n6pjnd6u
-         A6mp0Eww6G/vVF08cndZhzK1zYTfPIsALhJWOiHP8b4QW+LnvK6MO3Me0XFsZP5+lF
-         hiKckaMgNmavQ==
+        b=d59sye1UsAOgaYWiul5Zbh/0NINpd6vjdNW2+D0Qa75iASazCYDnmcshaer5Gu/xA
+         NqyVnIyvwXVTUkq+Lw7hOz+ST0jj/sMMv64rTLGVYTNQVmwPGIztPZ+8u91d2B+hkF
+         dtPIkfz9Z3zsr5M6qzXXxRTVtucddoR4wTQX+ymqE1nQaGj+EB0D/lNSyOFgQyLzbj
+         t73kA3I+rGh4Vx+dGtpkH0F0856y9sUX9577khOZwaC17n1erWJg8PGHXEK5KyyewN
+         +0tv1X2NBfv8RiDLnDKmfqudiUQyxYhh6ZNvelNzCIVDedjiNA4mEIVB6V2xnvC6bM
+         lPq3X8WrI1hGw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 598EEC64457;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FB1FC6445B;
         Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth
- drivers
+Subject: Re: [PATCH v5] Bluetooth: hci_event: Fix parsing of CIS Established Event
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168789251335.11348.15831606026121795757.git-patchwork-notify@kernel.org>
+Message-Id: <168789251345.11348.3015421877953257030.git-patchwork-notify@kernel.org>
 Date:   Tue, 27 Jun 2023 19:01:53 +0000
-References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230627003142.2274828-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230627003142.2274828-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -61,20 +55,21 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 21 Jun 2023 08:09:49 +0200 you wrote:
-> The Devicetree bindings should be picked up by subsystem maintainers,
-> but respective pattern for Bluetooth drivers was missing.
+On Mon, 26 Jun 2023 17:31:42 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
+> The ISO Interval on CIS Established Event uses 1.25 ms slots:
+> 
+>     BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+>     page 2304:
+> 
+> [...]
 
 Here is the summary with links:
-  - Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth drivers
-    https://git.kernel.org/bluetooth/bluetooth-next/c/533bbc7ce562
+  - [v5] Bluetooth: hci_event: Fix parsing of CIS Established Event
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8649851b1945
 
 You are awesome, thank you!
 -- 
