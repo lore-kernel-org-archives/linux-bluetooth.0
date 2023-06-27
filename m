@@ -2,142 +2,139 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3681EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 03:49:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2400C001B3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 08:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbjF0DtR (ORCPT
+        id S231317AbjF0IQN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Jun 2023 23:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50760 "EHLO
+        Tue, 27 Jun 2023 04:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbjF0Ds6 (ORCPT
+        with ESMTP id S231249AbjF0IQL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Jun 2023 23:48:58 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D501BFB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Jun 2023 20:47:56 -0700 (PDT)
-Received: from [192.168.0.2] (ip5f5aeb05.dynamic.kabel-deutschland.de [95.90.235.5])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3B02061E5FE01;
-        Tue, 27 Jun 2023 05:47:47 +0200 (CEST)
-Message-ID: <0d8ecb01-e998-e28d-1eb8-d286bdaccecd@molgen.mpg.de>
-Date:   Tue, 27 Jun 2023 05:47:46 +0200
+        Tue, 27 Jun 2023 04:16:11 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 783C4173C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 01:16:05 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id 5b1f17b1804b1-3f9ede60140so39671005e9.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 01:16:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687853764; x=1690445764;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7yQFEnlmWTzmD4v8v49zNv7VsmYLYcrpbow9siGJNP4=;
+        b=czgQCnAFJ8Xd83kIpzwxPdcxqmidfRNk5flJtIQBcPdEe38IDE7p+10TmWw9W5W1fZ
+         IlxxqS9Uoid5yXSNrm/Qi6Z/HlMQEeMn+DkNQ0CEVa4MneNtDOU5iVgdsXOyc6iwY7iI
+         ErHfSWg7V3aZibXcxjc6OyvKoZvt7/4ggad1m1Ep2qGcryW7MmGk3QogAqzy7nojjU/N
+         NNq/g6XuLicIVB7xmDGFYbQ8AncRcAnH9jXjmWwWoIpRxJU4TG2oOCLA4jwtm6G1NrEn
+         izKeLiUeB5dJxyACip6u0A05HuPlqm1yci/aKB6qGFGqOFO2NSdOOy9H2kN5Rb8NihvA
+         eSjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687853764; x=1690445764;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7yQFEnlmWTzmD4v8v49zNv7VsmYLYcrpbow9siGJNP4=;
+        b=ga5ufyVVqlJUi84KxFKVAWmnKoO83G9GhLthd91STNuP8dgLa+mjd2eyuNVtUiBFa6
+         qPT1uWCkh6SYbC73+uUfEipXCUdR5uj1xc1vq2VWnoSm07Hruca2a1J/bDK4hh9EDgHa
+         1eGlHYtp5QvG8H589zoBaZuayUyIVgQX3KQJbWNpTWyqmcbweegXUm0HJd1TOjJ8r70A
+         hOdNdHdCX48jPUnCAmcpIO2hk7QEziUpwANHk6daNWneSuQoJjnT5XYX0SlPiJhsI9VH
+         n3tdHr39BT2xzwEUCZxP76DwVdbhOAwmWyD8oWebg4cnG/sh8Xl1YNQKZtx0T98QgXrV
+         RCHg==
+X-Gm-Message-State: AC+VfDxR9ZTDvSp+LO3P8iH9STCiVxj3dggoSEp19xvyJ33tKkoZSlF9
+        v2B+iXgLFRcNobW6PXqVSkuF0Q==
+X-Google-Smtp-Source: ACHHUZ5buXqau94bITzRkCNSm8pvrrp74ljkSE95CsdnNaaE7n+AhvA6hq0iDdRKf9Cu8uL5Sx9U2g==
+X-Received: by 2002:a1c:6a0a:0:b0:3f9:2c0:b58 with SMTP id f10-20020a1c6a0a000000b003f902c00b58mr20010969wmc.4.1687853763862;
+        Tue, 27 Jun 2023 01:16:03 -0700 (PDT)
+Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a])
+        by smtp.gmail.com with ESMTPSA id m21-20020a7bcb95000000b003faabd8fcb8sm3922480wmi.46.2023.06.27.01.16.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 01:16:03 -0700 (PDT)
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Subject: [PATCH v2 0/5] bluetooth: qca: enable WCN7850 support
+Date:   Tue, 27 Jun 2023 10:15:53 +0200
+Message-Id: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v5] Bluetooth: hci_event: Fix parsing of CIS Established
- Event
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20230627003142.2274828-1-luiz.dentz@gmail.com>
-Content-Language: en-US
-Cc:     linux-bluetooth@vger.kernel.org
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230627003142.2274828-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALmammQC/42NQQ6DIBBFr9Kw7jSIqLSr3qNxgQg6iYIZ0LQx3
+ r3UE3T5XvL/21m0hDayx2VnZDeMGHwGcb0wM2o/WMA+MxNclLwWHFJY0ECcVVVxWJeYyOoZugS
+ 9M7LklbubQrI873S00JH2ZswHfp2mLBeyDt9n79VmHjGmQJ8zvxU/+0dpK4CDbISqaumUasRzQ
+ q8p3AINrD2O4wtFIP1w1gAAAA==
+To:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Rob Herring <robh@kernel.org>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1410;
+ i=neil.armstrong@linaro.org; h=from:subject:message-id;
+ bh=8ajAaelp7METtTO+em4pEvC+eBHXTg//fu024TG3vFk=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkmprAZG99W3x4f389GUC2SbWIaDEijrZdWHQhQmXY
+ nIYBPYWJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJqawAAKCRB33NvayMhJ0YpJD/
+ 9enhJFRMX81YEnArzQ0WWLgwhe3V9qmJjnMxyFelBwC1bnCPVwAyjBx6imUlzTlV3+U1YQNVHjRnHZ
+ AFOorjd4lGc+yUZZnXZU5Ok0T1UuD/TOuotykKcsuILad9aiVeFeSFVP/28mGn8NzpLXgkKAVGV/wr
+ E3OUxR9lYss4yYivFeVaGdP6U9k+SR8fyxBTjJ5ZOuXNuwj0cd6IkdWuh8t4sGXcig3K1UWIQf9SXP
+ sonkYvB29wZA3bWRJxkEOsKhv0KJCexLIh3RFnWxgtw2Br/C08JhS31DYMLd1TMSiuk80oE6Zo9zZD
+ CvsVrNWqqronc+oYgwBW2nyHmleDUWsWPT2Y/08rozuBxnm5L/3AJQ8jX0kg38DGSBMDcgXi1q03Gl
+ Y6xwZ+C5cz9zKMsrsOjWrPip2t7tIEK7vXZFLjrO4ccL+e8Fm6YL3S/psBHFSaANqqSIusnejKRX56
+ YUuXKkH6qCho4B3Bg/q9H2o8rBesAfhfIVNn9aUjIfU+X3FOrOOVSDn3SYpDq6U1w4mS415xM04trM
+ 32tL/HrGosvbz6IA953hE/zLCG/m9AtzfCiQbof/f6GSEHhwCjExF/hIjTkzetJGud/l+robth02pe
+ 1IYFLkNazchLFs3w3gl9CHbNKUpGADA9kmITCa55C8sJiC2OStD2m/np4wgg==
+X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
+ fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Luiz,
+This serie enables WCN7850 on the Qualcomm SM8550 QRD
+reference platform.
 
+The WCN7850 is close to the WCN6855 but uses different
+firmware names.
 
-Thank you for your patch.
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+Changes in v2:
+- Convert if/else and qca_is_*() macros by switch/case to simplify adding now BT SoCs
+- Add bindings reviewed-by
+- Link to v1: https://lore.kernel.org/r/20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org
 
-Am 27.06.23 um 02:31 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> The ISO Interval on CIS Established Event uses 1.25 ms slots:
-> 
->      BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
->      page 2304:
-> 
->        Time = N * 1.25 ms
-> 
-> In addition to that this always update the QoS settings based on CIS
-> Established Event.
+---
+Neil Armstrong (5):
+      dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
+      bluetooth: qca: use switch case for soc type behavior
+      bluetooth: qca: add support for WCN7850
+      arm64: dts: qcom: sm8550: add UART14 nodes
+      arm64: dts: qcom: sm8550-qrd: add bluetooth support
 
-update*s*
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  23 ++
+ arch/arm64/boot/dts/qcom/sm8550-qrd.dts            |  43 ++++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi               |  30 +++
+ drivers/bluetooth/btqca.c                          |  82 +++++--
+ drivers/bluetooth/btqca.h                          |  30 +--
+ drivers/bluetooth/hci_qca.c                        | 250 ++++++++++++++++-----
+ 6 files changed, 350 insertions(+), 108 deletions(-)
+---
+base-commit: d4cee89031c80066ec461bb77b5e13a4f37d5fd2
+change-id: 20230620-topic-sm8550-upstream-bt-dfc4305f9c14
 
-Does “always” mean, it wasn’t set for the master role before, and that 
-is done now?
+Best regards,
+-- 
+Neil Armstrong <neil.armstrong@linaro.org>
 
-
-Kind regards,
-
-Paul
-
-
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   net/bluetooth/hci_event.c | 45 ++++++++++++++++++++++++++++-----------
->   1 file changed, 32 insertions(+), 13 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index b1aefe4bb751..77cbf13037b3 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -6822,6 +6822,7 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
->   {
->   	struct hci_evt_le_cis_established *ev = data;
->   	struct hci_conn *conn;
-> +	struct bt_iso_qos *qos;
->   	bool pending = false;
->   	u16 handle = __le16_to_cpu(ev->handle);
->   
-> @@ -6846,21 +6847,39 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
->   
->   	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags);
->   
-> -	if (conn->role == HCI_ROLE_SLAVE) {
-> -		__le32 interval;
-> +	qos = &conn->iso_qos;
->   
-> -		memset(&interval, 0, sizeof(interval));
-> +	/* Convert ISO Interval (1.25 ms slots) to SDU Interval (us) */
-> +	qos->ucast.in.interval = le16_to_cpu(ev->interval) * 1250;
-> +	qos->ucast.out.interval = qos->ucast.in.interval;
->   
-> -		memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
-> -		conn->iso_qos.ucast.in.interval = le32_to_cpu(interval);
-> -		memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
-> -		conn->iso_qos.ucast.out.interval = le32_to_cpu(interval);
-> -		conn->iso_qos.ucast.in.latency = le16_to_cpu(ev->interval);
-> -		conn->iso_qos.ucast.out.latency = le16_to_cpu(ev->interval);
-> -		conn->iso_qos.ucast.in.sdu = le16_to_cpu(ev->c_mtu);
-> -		conn->iso_qos.ucast.out.sdu = le16_to_cpu(ev->p_mtu);
-> -		conn->iso_qos.ucast.in.phy = ev->c_phy;
-> -		conn->iso_qos.ucast.out.phy = ev->p_phy;
-> +	switch (conn->role) {
-> +	case HCI_ROLE_SLAVE:
-> +		/* Convert Transport Latency (us) to Latency (msec) */
-> +		qos->ucast.in.latency =
-> +			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->c_latency),
-> +					  1000);
-> +		qos->ucast.out.latency =
-> +			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->p_latency),
-> +					  1000);
-> +		qos->ucast.in.sdu = le16_to_cpu(ev->c_mtu);
-> +		qos->ucast.out.sdu = le16_to_cpu(ev->p_mtu);
-> +		qos->ucast.in.phy = ev->c_phy;
-> +		qos->ucast.out.phy = ev->p_phy;
-> +		break;
-> +	case HCI_ROLE_MASTER:
-> +		/* Convert Transport Latency (us) to Latency (msec) */
-> +		qos->ucast.out.latency =
-> +			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->c_latency),
-> +					  1000);
-> +		qos->ucast.in.latency =
-> +			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->p_latency),
-> +					  1000);
-> +		qos->ucast.out.sdu = le16_to_cpu(ev->c_mtu);
-> +		qos->ucast.in.sdu = le16_to_cpu(ev->p_mtu);
-> +		qos->ucast.out.phy = ev->c_phy;
-> +		qos->ucast.in.phy = ev->p_phy;
-> +		break;
->   	}
->   
->   	if (!ev->status) {
