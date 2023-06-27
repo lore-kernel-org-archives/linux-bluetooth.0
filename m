@@ -2,110 +2,172 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A17BEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 22:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE32EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 22:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229687AbjF0WdN (ORCPT
+        id S230152AbjF0W7W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Jun 2023 18:33:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
+        Tue, 27 Jun 2023 18:59:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbjF0WdM (ORCPT
+        with ESMTP id S230145AbjF0W7U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Jun 2023 18:33:12 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A77211E
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 15:33:10 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id ca18e2360f4ac-7836272f36eso96518939f.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 15:33:10 -0700 (PDT)
+        Tue, 27 Jun 2023 18:59:20 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06DF426B9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 15:59:20 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b8303cd32aso5661455ad.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jun 2023 15:59:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687905190; x=1690497190;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hqSQrN8MAGBAo6GDIhqDkqOROUf72pifgPYi221wRIY=;
-        b=hNMnATSbyErhgRsKheOVo17l/EHVBxMd0kCAQGoan5vq4M5FVw3EIygPgboLOtOMDp
-         H7z7M5Bm/lQdAjghrkoDheece6kZRd3VcB1rH/MEET5NVbttYaY6mwtV1qIEIPD0WI3A
-         O6k9GxtYmdzn6ilYlboDxyV/q5tTQvppgV5nTYcZNrVkzG29aEa4m3fYJAWX3kIr11sD
-         suHu9ybdVNSfFOrlGVlDT4KIBnGIOkFakBZXNFXlwgdYTK1xZ2dmjSsPJOxYoRQhkZIw
-         fqi2e9vSWZTXBQl6j+FeHYjWKweR0HnWj3BrvMve3hKTd2PyctMG9z7GvyM747dd2Eqa
-         eKLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687905190; x=1690497190;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20221208; t=1687906759; x=1690498759;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hqSQrN8MAGBAo6GDIhqDkqOROUf72pifgPYi221wRIY=;
-        b=T5js8rStDyjqDX9ltQFIPiN7v+aQJ8VjL5De1eLdegIkUeIGZzKxpFrBm8niaFxka9
-         ZTOoDHBvof+U2yz5yl8iNslRRwHCWgW51fu9a96fYW6D9gVIDTsQUQMvBQ4KoOHz8cB5
-         /RTSZLbbwdoAo7SaVfKYuzNhFP6a3nIvmLeBZTGU3J0MQNAcDaz9rslZM176NDR4vOZH
-         PsoZxBwJKE8OqP1ABD/ONE806q8r7uVvTK9yfeMrh4IJChYavz+azHA+TZGKpqxKv5l1
-         fZI8aTi05F0XY74XfTuR2NVjY/Otshz5EkTtoAgYwGBOLKQl6kH3IQtFVHTsY/EQFizM
-         Cx9g==
-X-Gm-Message-State: AC+VfDytQvlGgNzMDX2O6X1De2ga3vQXoHeRD0OH7Fd3uFmq2m8VlJdB
-        JmQL4vIw9ZIxlxCX2gJs+WSLng05N/E=
-X-Google-Smtp-Source: ACHHUZ4i/fzu2sEnxqiXofGXNdDzzbRpfu0xMo24TCS4AGVezTxqMLr7lGSO8h9NH2PJR1O8ZYPS1g==
-X-Received: by 2002:a92:d08a:0:b0:345:8373:4ca8 with SMTP id h10-20020a92d08a000000b0034583734ca8mr10545130ilh.27.1687905189619;
-        Tue, 27 Jun 2023 15:33:09 -0700 (PDT)
-Received: from [172.17.0.2] ([40.77.45.158])
-        by smtp.gmail.com with ESMTPSA id v12-20020a92c80c000000b003426356a35asm2958668iln.0.2023.06.27.15.33.09
+        bh=B400Y8XQpX5Kj5os/HOHkhu+4T29AiPMC5/AIc/v82I=;
+        b=dBU1DdoQjwBiwnZxYJaUhb4WXjBR0KFRzsMLYdPJUeoxbhDp8GktUa5DWkR6X8na13
+         7BeyRR41lCx8xbmNM9yjQ07Mvq2zeq5QZrdjxv9dNoxZ4Q7kO4QK+zfgx1h71K6bgXoZ
+         a0a9CkGr7RUONpTzx9b15ElmfGNefxaEX/NmesMLAAe+qqI6Qjp3j20ZcV1PPmVS94Bs
+         ux31yfalMUF5GXu/tqIQ+RYlYkBuCuuD2e6aGxwZpb5XyLwVDsaKHXAR87zjFv50HPk6
+         Yk4AuOloDW7+A+/37qgjhpah2q67KLB2QYIg+M0Q7LmHPuREwlhtZ5mzO3d2zv9rZ5be
+         h5xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687906759; x=1690498759;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B400Y8XQpX5Kj5os/HOHkhu+4T29AiPMC5/AIc/v82I=;
+        b=DBwn1PnXi1RNl7ZI+4D87KsumJRGmYaVYA2L2437VazxTTUhqklgm4obx0Xz9l2u9I
+         C2m1n9xXVjkuDMo5E82uSj1gCZ+hZ2VeaVsNOWv3TYhNzUOzPT8PU1NIOek9dcZ3nHWS
+         SBti9yJebmL22STHdIPfWMiF/Pm6lmf/BgxldNQ9gXrsAf385FLSpPRfRxtS6HvgbgZN
+         X1daKvScMNmdE0Pxz1DsozYhpmPJt//3WBYWtQkjniNliO5DL11+Ugqsnsz5Lop8J0Aa
+         jj3lbEnsIPEZDfWNjXtX+TlONYD2FWn0YyLf3Ckli50kG4LmggL8cD4LGCdvpdNCj/1l
+         3Hsw==
+X-Gm-Message-State: AC+VfDxAqw86YRc4JXBhz33bOcq3nym8dHKAwxd7sT4T5PXe9c0CB2VD
+        qgvwSWY69o8vfJxzNClALiBrx0eLIevdtQ==
+X-Google-Smtp-Source: ACHHUZ4uMrQ3LsJzTpQtGoWLzgxiHU1TCn/j5RO7PltPoJtfP2jTs6RreVJ/FJm725vdyEkZyPDYgQ==
+X-Received: by 2002:a17:903:244f:b0:1ac:a6b0:1c87 with SMTP id l15-20020a170903244f00b001aca6b01c87mr14569638pls.48.1687906758598;
+        Tue, 27 Jun 2023 15:59:18 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id w5-20020a170902d3c500b001b1a2bf5277sm259290plb.39.2023.06.27.15.59.17
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 15:33:09 -0700 (PDT)
-Message-ID: <649b63a5.920a0220.c6db9.3d77@mx.google.com>
-Date:   Tue, 27 Jun 2023 15:33:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8533304711327968779=="
+        Tue, 27 Jun 2023 15:59:17 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: hci_sync: Fix not handling ISO_LINK in hci_abort_conn_sync
+Date:   Tue, 27 Jun 2023 15:59:15 -0700
+Message-Id: <20230627225915.2674812-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230627225915.2674812-1-luiz.dentz@gmail.com>
+References: <20230627225915.2674812-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: hci_conn: Consolidate code for aborting connections
-In-Reply-To: <20230627215301.2648840-1-luiz.dentz@gmail.com>
-References: <20230627215301.2648840-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8533304711327968779==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+ISO_LINK connections where not being handled properly on
+hci_abort_conn_sync which sometimes resulted in sending the wrong
+commands, or in case of having the reject command being sent by the
+socket code (iso.c) which is sort of a layer violation.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=760750
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.18 seconds
-GitLint                       PASS      0.29 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      32.11 seconds
-CheckAllWarning               PASS      34.85 seconds
-CheckSparse                   PASS      39.32 seconds
-CheckSmatch                   PASS      110.88 seconds
-BuildKernel32                 PASS      31.18 seconds
-TestRunnerSetup               PASS      441.19 seconds
-TestRunner_l2cap-tester       PASS      16.34 seconds
-TestRunner_iso-tester         PASS      22.12 seconds
-TestRunner_bnep-tester        PASS      5.21 seconds
-TestRunner_mgmt-tester        PASS      125.89 seconds
-TestRunner_rfcomm-tester      PASS      8.33 seconds
-TestRunner_sco-tester         PASS      9.77 seconds
-TestRunner_ioctl-tester       PASS      8.92 seconds
-TestRunner_mesh-tester        PASS      6.57 seconds
-TestRunner_smp-tester         PASS      7.69 seconds
-TestRunner_userchan-tester    PASS      5.47 seconds
-IncrementalBuild              PASS      29.16 seconds
-
-
-
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sync.c | 34 ++++++++++++++++++++++++++++++++++
+ net/bluetooth/iso.c      | 14 --------------
+ 2 files changed, 34 insertions(+), 14 deletions(-)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index ef8297d04a8c..29bcfd576713 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5292,6 +5292,24 @@ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 	if (conn->type == LE_LINK)
+ 		return hci_le_connect_cancel_sync(hdev, conn, reason);
+ 
++	if (conn->type == ISO_LINK) {
++		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
++		 * page 1857:
++		 *
++		 * If this command is issued for a CIS on the Central and the
++		 * CIS is successfully terminated before being established,
++		 * then an HCI_LE_CIS_Established event shall also be sent for
++		 * this CIS with the Status Operation Cancelled by Host (0x44).
++		 */
++		if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags))
++			return hci_disconnect_sync(hdev, conn, reason);
++
++		/* There is no way to cancel a BIS without terminating the BIG
++		 * which is done later on connection cleanup.
++		 */
++		return 0;
++	}
++
+ 	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
+ 		return 0;
+ 
+@@ -5318,11 +5336,27 @@ static int hci_reject_sco_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
++static int hci_le_reject_cis_sync(struct hci_dev *hdev, struct hci_conn *conn,
++				  u8 reason)
++{
++	struct hci_cp_le_reject_cis cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = cpu_to_le16(conn->handle);
++	cp.reason = reason;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_REJECT_CIS,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 				u8 reason)
+ {
+ 	struct hci_cp_reject_conn_req cp;
+ 
++	if (conn->type == ISO_LINK)
++		return hci_le_reject_cis_sync(hdev, conn, reason);
++
+ 	if (conn->type == SCO_LINK || conn->type == ESCO_LINK)
+ 		return hci_reject_sco_sync(hdev, conn, reason);
+ 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 84d238d0639a..9c41af55f2c7 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -614,18 +614,6 @@ static void iso_sock_kill(struct sock *sk)
+ 	sock_put(sk);
+ }
+ 
+-static void iso_conn_defer_reject(struct hci_conn *conn)
+-{
+-	struct hci_cp_le_reject_cis cp;
+-
+-	BT_DBG("conn %p", conn);
+-
+-	memset(&cp, 0, sizeof(cp));
+-	cp.handle = cpu_to_le16(conn->handle);
+-	cp.reason = HCI_ERROR_REJ_BAD_ADDR;
+-	hci_send_cmd(conn->hdev, HCI_OP_LE_REJECT_CIS, sizeof(cp), &cp);
+-}
+-
+ static void __iso_sock_close(struct sock *sk)
+ {
+ 	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
+@@ -650,8 +638,6 @@ static void __iso_sock_close(struct sock *sk)
+ 		break;
+ 
+ 	case BT_CONNECT2:
+-		if (iso_pi(sk)->conn->hcon)
+-			iso_conn_defer_reject(iso_pi(sk)->conn->hcon);
+ 		iso_chan_del(sk, ECONNRESET);
+ 		break;
+ 	case BT_CONNECT:
+-- 
+2.40.1
 
---===============8533304711327968779==--
