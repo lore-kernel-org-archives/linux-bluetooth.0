@@ -2,45 +2,45 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB34EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 17:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A00C1EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jun 2023 17:44:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbjF0RoG (ORCPT
+        id S229924AbjF0Ro3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Jun 2023 13:44:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59648 "EHLO
+        Tue, 27 Jun 2023 13:44:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbjF0RoF (ORCPT
+        with ESMTP id S229923AbjF0Ro1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Jun 2023 13:44:05 -0400
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F52F2D45;
-        Tue, 27 Jun 2023 10:44:02 -0700 (PDT)
+        Tue, 27 Jun 2023 13:44:27 -0400
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40978296B;
+        Tue, 27 Jun 2023 10:44:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687887843; x=1719423843;
+  t=1687887867; x=1719423867;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=c8mQHeBLT962Vu5wMR7M5W6rbadM12YbQc0pxpK6fk4=;
-  b=dS+kJI9tVg4Q090VwvrzPp23FybmyS+yNIPzol5LGks9OzIIesB6nqnd
-   +m0tMKkXrAWB6XUaD+tRpnjBFgtZfVW2D5Y4pRoOmvPV3PwEDY/o/V4nu
-   Alj838+jQFtZqo1k3ahdn8dCROLAGt4S2QFGaFqgRMi0nj5rcds3tNqpO
-   M=;
+  bh=uFkTCQX8AfT2qU1mGZK3CaQ2g/IPGKwwnVUWVSMRUXQ=;
+  b=QJILsuoyVgF5MVWmicMV1EB8iPL5K37PL07o/YmYSfYPMBbWIn+yLzNK
+   Bp51jizg91k1vQkN9/t3+O96O2qE1IayKSRIhzfZ6AcP0gc+C7kKqjL+c
+   0zyx5FLiC++ZSUKjR9uANttLx/LmKD08kT/AFar6wCea93H/nbb9vea/5
+   k=;
 X-IronPort-AV: E=Sophos;i="6.01,163,1684800000"; 
-   d="scan'208";a="568976523"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 17:43:59 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com (Postfix) with ESMTPS id DD5B88ADC8;
-        Tue, 27 Jun 2023 17:43:57 +0000 (UTC)
+   d="scan'208";a="336478735"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 17:44:22 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-pdx-2b-m6i4x-f253a3a3.us-west-2.amazon.com (Postfix) with ESMTPS id A96078A5C5;
+        Tue, 27 Jun 2023 17:44:20 +0000 (UTC)
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 27 Jun 2023 17:43:54 +0000
+ 15.2.1118.26; Tue, 27 Jun 2023 17:44:19 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.101.41) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 27 Jun 2023 17:43:50 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
+ Tue, 27 Jun 2023 17:44:16 +0000
 From:   Kuniyuki Iwashima <kuniyu@amazon.com>
 To:     "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
@@ -52,10 +52,10 @@ CC:     Alexander Mikhalitsyn <alexander@mihalicyn.com>,
         Kuniyuki Iwashima <kuniyu@amazon.com>,
         Kuniyuki Iwashima <kuni1840@gmail.com>,
         <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH v1 net-next 1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL.
-Date:   Tue, 27 Jun 2023 10:43:13 -0700
-Message-ID: <20230627174314.67688-2-kuniyu@amazon.com>
+        Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Subject: [PATCH v1 net-next 2/2] net: scm: introduce and use scm_recv_unix helper
+Date:   Tue, 27 Jun 2023 10:43:14 -0700
+Message-ID: <20230627174314.67688-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230627174314.67688-1-kuniyu@amazon.com>
 References: <20230627174314.67688-1-kuniyu@amazon.com>
@@ -63,99 +63,136 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.106.101.41]
-X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
+X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzkaller hit a WARN_ON_ONCE(!scm->pid) in scm_pidfd_recv().
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 
-In unix_stream_read_generic(), if there is no skb in the queue, we could
-bail out the do-while loop without calling scm_set_cred():
+Recently, our friends from bluetooth subsystem reported [1] that after
+commit 5e2ff6704a27 ("scm: add SO_PASSPIDFD and SCM_PIDFD") scm_recv()
+helper become unusable in kernel modules (because it uses unexported
+pidfd_prepare() API).
 
-  1. No skb in the queue
-  2. sk is non-blocking
-       or
-     shutdown(sk, RCV_SHUTDOWN) is called concurrently
-       or
-     peer calls close()
+We were aware of this issue and workarounded it in a hard way
+by commit 97154bcf4d1b ("af_unix: Kconfig: make CONFIG_UNIX bool").
 
-If the socket is configured with SO_PASSPIDFD, scm_pidfd_recv() would
-populate cmsg with garbage emitting the warning.
+But recently a new functionality was added in the scope of commit
+817efd3cad74 ("Bluetooth: hci_sock: Forward credentials to monitor")
+and after that bluetooth can't be compiled as a kernel module.
 
-Let's skip SCM_PIDFD if scm->pid is NULL in scm_pidfd_recv().
+After some discussion in [1] we decided to split scm_recv() into
+two helpers, one won't support SCM_PIDFD (used for unix sockets),
+and another one will be completely the same as it was before commit
+5e2ff6704a27 ("scm: add SO_PASSPIDFD and SCM_PIDFD").
 
-Note another way would be skip calling scm_recv() in such cases, but this
-caused a regression resulting in commit 9d797ee2dce1 ("Revert "af_unix:
-Call scm_recv() only after scm_set_cred()."").
-
-WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_pidfd_recv include/net/scm.h:138 [inline]
-WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177
-Modules linked in:
-CPU: 1 PID: 3245 Comm: syz-executor.1 Not tainted 6.4.0-rc5-01219-gfa0e21fa4443 #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:scm_pidfd_recv include/net/scm.h:138 [inline]
-RIP: 0010:scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177
-Code: 67 fd e9 55 fd ff ff e8 4a 70 67 fd e9 7f fd ff ff e8 40 70 67 fd e9 3e fb ff ff e8 36 70 67 fd e9 02 fd ff ff e8 8c 3a 20 fd <0f> 0b e9 fe fb ff ff e8 50 70 67 fd e9 2e f9 ff ff e8 46 70 67 fd
-RSP: 0018:ffffc90009af7660 EFLAGS: 00010216
-RAX: 00000000000000a1 RBX: ffff888041e58a80 RCX: ffffc90003852000
-RDX: 0000000000040000 RSI: ffffffff842675b4 RDI: 0000000000000007
-RBP: ffffc90009af7810 R08: 0000000000000007 R09: 0000000000000013
-R10: 00000000000000f8 R11: 0000000000000001 R12: ffffc90009af7db0
-R13: 0000000000000000 R14: ffff888041e58a88 R15: 1ffff9200135eecc
-FS:  00007f6b7113f640(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6b7111de38 CR3: 0000000012a6e002 CR4: 0000000000770ee0
-PKRU: 55555554
-Call Trace:
- <TASK>
- unix_stream_read_generic+0x5fe/0x1f50 net/unix/af_unix.c:2830
- unix_stream_recvmsg+0x194/0x1c0 net/unix/af_unix.c:2880
- sock_recvmsg_nosec net/socket.c:1019 [inline]
- sock_recvmsg+0x188/0x1d0 net/socket.c:1040
- ____sys_recvmsg+0x210/0x610 net/socket.c:2712
- ___sys_recvmsg+0xff/0x190 net/socket.c:2754
- do_recvmmsg+0x25d/0x6c0 net/socket.c:2848
- __sys_recvmmsg net/socket.c:2927 [inline]
- __do_sys_recvmmsg net/socket.c:2950 [inline]
- __se_sys_recvmmsg net/socket.c:2943 [inline]
- __x64_sys_recvmmsg+0x224/0x290 net/socket.c:2943
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x72/0xdc
-RIP: 0033:0x7f6b71da2e5d
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
-RSP: 002b:00007f6b7113ecc8 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-RAX: ffffffffffffffda RBX: 00000000004bc050 RCX: 00007f6b71da2e5d
-RDX: 0000000000000007 RSI: 0000000020006600 RDI: 000000000000000b
-RBP: 00000000004bc050 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000120 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f6b71e03530 R15: 0000000000000000
- </TASK>
-
+Link: https://lore.kernel.org/lkml/CAJqdLrpFcga4n7wxBhsFqPQiN8PKFVr6U10fKcJ9W7AcZn+o6Q@mail.gmail.com/ [1]
 Fixes: 5e2ff6704a27 ("scm: add SO_PASSPIDFD and SCM_PIDFD")
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/scm.h | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+v2:
+  * Resolve conflict with https://lore.kernel.org/netdev/20230626205837.82086-1-kuniyu@amazon.com/
+  * Add SHA1 in changelog
+  * Fix checkpatch warnings for mismatch open parenthesis and unwrapped link.
+  * Add Fixes and Reviewed-by tags
+
+v1: https://lore.kernel.org/all/20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com/
+---
+ include/net/scm.h  | 35 +++++++++++++++++++++++++----------
+ net/unix/af_unix.c |  4 ++--
+ 2 files changed, 27 insertions(+), 12 deletions(-)
 
 diff --git a/include/net/scm.h b/include/net/scm.h
-index c67f765a165b..d456fc41b8bf 100644
+index d456fc41b8bf..c5bcdf65f55c 100644
 --- a/include/net/scm.h
 +++ b/include/net/scm.h
-@@ -135,7 +135,9 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
- 		return;
+@@ -153,8 +153,8 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
+ 		fd_install(pidfd, pidfd_file);
+ }
+ 
+-static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
+-				struct scm_cookie *scm, int flags)
++static inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
++				     struct scm_cookie *scm, int flags)
+ {
+ 	if (!msg->msg_control) {
+ 		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
+@@ -162,7 +162,7 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
+ 		    scm->fp || scm_has_secdata(sock))
+ 			msg->msg_flags |= MSG_CTRUNC;
+ 		scm_destroy(scm);
+-		return;
++		return false;
  	}
  
--	WARN_ON_ONCE(!scm->pid);
-+	if (!scm->pid)
+ 	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
+@@ -175,19 +175,34 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
+ 		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
+ 	}
+ 
+-	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
+-		scm_pidfd_recv(msg, scm);
++	scm_passec(sock, msg, scm);
+ 
+-	scm_destroy_cred(scm);
++	if (scm->fp)
++		scm_detach_fds(msg, scm);
+ 
+-	scm_passec(sock, msg, scm);
++	return true;
++}
+ 
+-	if (!scm->fp)
++static inline void scm_recv(struct socket *sock, struct msghdr *msg,
++			    struct scm_cookie *scm, int flags)
++{
++	if (!__scm_recv_common(sock, msg, scm, flags))
+ 		return;
+-	
+-	scm_detach_fds(msg, scm);
++
++	scm_destroy_cred(scm);
+ }
+ 
++static inline void scm_recv_unix(struct socket *sock, struct msghdr *msg,
++				 struct scm_cookie *scm, int flags)
++{
++	if (!__scm_recv_common(sock, msg, scm, flags))
 +		return;
 +
- 	pidfd = pidfd_prepare(scm->pid, 0, &pidfd_file);
++	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
++		scm_pidfd_recv(msg, scm);
++
++	scm_destroy_cred(scm);
++}
  
- 	if (put_cmsg(msg, SOL_SOCKET, SCM_PIDFD, sizeof(int), &pidfd)) {
+ #endif /* __LINUX_NET_SCM_H */
+ 
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 3953daa2e1d0..123b35ddfd71 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2427,7 +2427,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
+ 	}
+ 	err = (flags & MSG_TRUNC) ? skb->len - skip : size;
+ 
+-	scm_recv(sock, msg, &scm, flags);
++	scm_recv_unix(sock, msg, &scm, flags);
+ 
+ out_free:
+ 	skb_free_datagram(sk, skb);
+@@ -2808,7 +2808,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 
+ 	mutex_unlock(&u->iolock);
+ 	if (state->msg)
+-		scm_recv(sock, state->msg, &scm, flags);
++		scm_recv_unix(sock, state->msg, &scm, flags);
+ 	else
+ 		scm_destroy(&scm);
+ out:
 -- 
 2.30.2
 
