@@ -2,338 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3585CEB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jun 2023 22:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23951EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jun 2023 22:59:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231345AbjF1Wz0 (ORCPT
+        id S230173AbjF1W7T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Jun 2023 18:55:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53382 "EHLO
+        Wed, 28 Jun 2023 18:59:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbjF1WzM (ORCPT
+        with ESMTP id S229667AbjF1W7R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Jun 2023 18:55:12 -0400
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FF042728;
-        Wed, 28 Jun 2023 15:55:09 -0700 (PDT)
-X-UUID: d0adca64160611eeb20a276fd37b9834-20230629
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=G5uQCI2w3XuA8f8ZdbTyrJd+anMUIfjm0nhpI2CFW74=;
-        b=OPRYKZizGayeAAi0XZKpesNqR+RZfX6OVhtwdbnSdz09T2crXZbJlKB7i5BoIppG9t6GsIQtLoYWnisDLvN8gtb65C4H81gebZTfAyuzEHdXwamXfJNmmF6HZzVcebRgPGVytn8N+9MLFKlnORFEDbfoVaSsLCDZpgb6LL8v1To=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.27,REQID:63e90dd4-721d-47c3-8d0e-5c9aad539ced,IP:0,U
-        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-        :release,TS:95
-X-CID-INFO: VERSION:1.1.27,REQID:63e90dd4-721d-47c3-8d0e-5c9aad539ced,IP:0,URL
-        :0,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,BULK:0,RULE:Spam_GS981B3D,ACTION
-        :quarantine,TS:95
-X-CID-META: VersionHash:01c9525,CLOUDID:1ba7a50d-c22b-45ab-8a43-3004e9216b56,B
-        ulkID:230629065504FU36365B,BulkQuantity:0,Recheck:0,SF:17|19|48|38|29|28,T
-        C:nil,Content:0,EDM:-3,IP:nil,URL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-        L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_ULN,TF_CID_SPAM_SNR,
-        TF_CID_SPAM_SDM,TF_CID_SPAM_ASC
-X-UUID: d0adca64160611eeb20a276fd37b9834-20230629
-Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 244536646; Thu, 29 Jun 2023 06:55:02 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 29 Jun 2023 06:55:00 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Thu, 29 Jun 2023 06:55:00 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>
-CC:     <sean.wang@mediatek.com>, <chris.lu@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <Leon.Yen@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <jenhao.yang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <abhishekpandit@google.com>,
-        <michaelfsun@google.com>, <mmandlik@google.com>,
-        <abhishekpandit@chromium.org>, <mcchou@chromium.org>,
-        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Jing Cai <jing.cai@mediatek.com>
-Subject: [PATCH v8 2/3] Bluetooth: btmtk: introduce btmtk reset work
-Date:   Thu, 29 Jun 2023 06:54:56 +0800
-Message-ID: <7ede62f5025c67097fae257eea3808bb5b66f473.1687991820.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <80efe66b16d933e3457bd38b1a60a5d51d4dee9e.1687991820.git.objelf@gmail.com>
-References: <80efe66b16d933e3457bd38b1a60a5d51d4dee9e.1687991820.git.objelf@gmail.com>
+        Wed, 28 Jun 2023 18:59:17 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A461210DA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jun 2023 15:59:16 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id ca18e2360f4ac-783698a37beso3524439f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jun 2023 15:59:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687993156; x=1690585156;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OuLUAz/+BEftB3i4mhIoYxM0s+5YoyJy2nN3gcXty/M=;
+        b=LZ9eBGZCQQwW1BEllWHmThBydKm9LxW4D7DQCAIsE6xCnX5cjZFyHsc9/9+FyVhd/a
+         rYPvPuUpdVAiX231CxJy7n7yIndbMsijtU+aRvhavAkobFbEAAAU58ilFQJh5Cv+vT3P
+         dnAe+KSkbY6GThToihAaCevDgZIJxoQLwRLC4dCTBEwr+rR+EOltAFHMQ5PrmaGQflQx
+         0ASWVUkxWUmyUD+HpZAZt0z/RXBPQtLKm4Xvjj01dhDvgwA9Yc6r4/iLpnoHORb4zMoL
+         zBr7eHS2lWyhfKShAZNd/zPp9m5M3mGaDEniLEyg9fB5GzrCAnnSAqXXd0aavLfKLvUK
+         bv8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687993156; x=1690585156;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OuLUAz/+BEftB3i4mhIoYxM0s+5YoyJy2nN3gcXty/M=;
+        b=L1j4vCnsgSGAsFahNij+VDj13zUIMtVkGYpxmv0afjbf+Jmw2FIDTyvALHYY7HVHK+
+         MMrGhZ/i0jvm/+rkOVB7CuVVQ/lomdcvc+xJEBbPiRSZ3IbtAHYmCi1hKI24mdQfMR/E
+         qqnivhgTus03z4MdPzN8E4JY4EzESfzyTmLTRM+Bv4lpmiFDXtpsdDog8OLEBoMjBurN
+         ZaW3ztT8a0e31SwGJ29K+w3U1LGJqlv7d6qjeBixIV7FfnkmQtF/1FsVRlSqieq0+Lbe
+         onMNJQrlyl/7D98G6QZdMzRrvyqG6zNVUrJ+LSWrMj7l45DsRH8cEMWBfBndYm6tm34f
+         Da3Q==
+X-Gm-Message-State: AC+VfDziuAPoTwIUl3Md7jvz+pWAuxOsMZV+J1qu2MFZb/MO3JbN4eOU
+        dEd8Anuskh3htbkfXYK1XlTGaybX2JA=
+X-Google-Smtp-Source: ACHHUZ4irV12G4VA6/pggz5+XmxcKHzoiPc5VxhGyB9ZulUGRbo+gZ/uXlG56JnWyNHTSoQ1ezfjfw==
+X-Received: by 2002:a92:ce0b:0:b0:345:9798:9f7 with SMTP id b11-20020a92ce0b000000b00345979809f7mr13647905ilo.14.1687993155387;
+        Wed, 28 Jun 2023 15:59:15 -0700 (PDT)
+Received: from [172.17.0.2] ([40.122.243.91])
+        by smtp.gmail.com with ESMTPSA id v8-20020a92c6c8000000b003421231fb8csm3684870ilm.74.2023.06.28.15.59.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jun 2023 15:59:15 -0700 (PDT)
+Message-ID: <649cbb43.920a0220.6028b.4722@mx.google.com>
+Date:   Wed, 28 Jun 2023 15:59:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8082147374863283879=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
+Subject: RE: [v3] Bluetooth: btmtk: add printing firmware information
+In-Reply-To: <1c40a12b51ccd6ee2ee002276f5b1ba92c377100.1687990098.git.objelf@gmail.com>
+References: <1c40a12b51ccd6ee2ee002276f5b1ba92c377100.1687990098.git.objelf@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Jing Cai <jing.cai@mediatek.com>
+--===============8082147374863283879==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Introduce btmtk_reset_work which can be called whenever the firmware abort,
-HCI command timeout, other fatal error happen.
+This is automated email and please do not reply to this email!
 
-Co-developed-by: Chris Lu <chris.lu@mediatek.com>
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Jing Cai <jing.cai@mediatek.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=761058
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.61 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      37.03 seconds
+CheckAllWarning               PASS      34.78 seconds
+CheckSparse                   PASS      39.96 seconds
+CheckSmatch                   PASS      111.49 seconds
+BuildKernel32                 PASS      30.79 seconds
+TestRunnerSetup               PASS      438.73 seconds
+TestRunner_l2cap-tester       PASS      16.62 seconds
+TestRunner_iso-tester         PASS      22.39 seconds
+TestRunner_bnep-tester        PASS      5.27 seconds
+TestRunner_mgmt-tester        PASS      126.12 seconds
+TestRunner_rfcomm-tester      PASS      8.42 seconds
+TestRunner_sco-tester         PASS      7.77 seconds
+TestRunner_ioctl-tester       PASS      8.99 seconds
+TestRunner_mesh-tester        PASS      6.65 seconds
+TestRunner_smp-tester         PASS      7.77 seconds
+TestRunner_userchan-tester    PASS      5.51 seconds
+IncrementalBuild              PASS      29.42 seconds
+
+
+
 ---
-v2, v3, v4: rebase onto the latest codebase
-v5: reset the device on hdev basis and use hci_cmd_sync_queue to
-    schedule reset work
-v6 and v7: rebase onto the latest codebase
-v8: drop _work suffix
----
- drivers/bluetooth/btmtk.c |  15 ++++
- drivers/bluetooth/btmtk.h |   8 +++
- drivers/bluetooth/btusb.c | 145 +++++++++++++++++++-------------------
- 3 files changed, 97 insertions(+), 71 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 8490d59502a5..c83ea3fd524f 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -285,6 +285,21 @@ int btmtk_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
- }
- EXPORT_SYMBOL_GPL(btmtk_set_bdaddr);
- 
-+void btmtk_reset_sync(struct hci_dev *hdev)
-+{
-+	struct btmediatek_data *reset_work = hci_get_priv(hdev);
-+	int err;
-+
-+	hci_dev_lock(hdev);
-+
-+	err = hci_cmd_sync_queue(hdev, reset_work->reset_sync, NULL, NULL);
-+	if (err)
-+		bt_dev_err(hdev, "failed to reset (%d)", err);
-+
-+	hci_dev_unlock(hdev);
-+}
-+EXPORT_SYMBOL_GPL(btmtk_reset_sync);
-+
- MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
- MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
- MODULE_DESCRIPTION("Bluetooth support for MediaTek devices ver " VERSION);
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index fadc1a520652..75d8e71efcd3 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -120,8 +120,11 @@ struct btmtk_hci_wmt_params {
- 	u32 *status;
- };
- 
-+typedef int (*btmtk_reset_sync_func_t)(struct hci_dev *, void *);
-+
- struct btmediatek_data {
- 	u32 dev_id;
-+	btmtk_reset_sync_func_t reset_sync;
- };
- 
- typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
-@@ -136,6 +139,8 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
- 
- int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
- 			 wmt_cmd_sync_func_t wmt_cmd_sync);
-+
-+void btmtk_reset_sync(struct hci_dev *hdev);
- #else
- 
- static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
-@@ -156,4 +161,7 @@ static int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,
- 	return -EOPNOTSUPP;
- }
- 
-+static void btmtk_reset_sync(struct hci_dev *hdev)
-+{
-+}
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4c38d1c0f059..983380c4e609 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3040,6 +3040,78 @@ static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
- 	return val & MTK_BT_RST_DONE;
- }
- 
-+static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	struct btmediatek_data *mediatek;
-+	u32 val;
-+	int err;
-+
-+	/* It's MediaTek specific bluetooth reset mechanism via USB */
-+	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
-+		bt_dev_err(hdev, "last reset failed? Not resetting again");
-+		return -EBUSY;
-+	}
-+
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err < 0)
-+		return err;
-+
-+	btusb_stop_traffic(data);
-+	usb_kill_anchored_urbs(&data->tx_anchor);
-+	mediatek = hci_get_priv(hdev);
-+
-+	if (mediatek->dev_id == 0x7925) {
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
-+		val |= (1 << 5);
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
-+		val &= 0xFFFF00FF;
-+		val |= (1 << 13);
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
-+		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001);
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
-+		val |= (1 << 0);
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
-+		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
-+		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
-+		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
-+		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
-+		msleep(100);
-+	} else {
-+		/* It's Device EndPoint Reset Option Register */
-+		bt_dev_dbg(hdev, "Initiating reset mechanism via uhw");
-+		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_WDT_STATUS, &val);
-+
-+		/* Reset the bluetooth chip via USB interface. */
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 1);
-+		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
-+		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
-+		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
-+		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
-+		/* MT7921 need to delay 20ms between toggle reset bit */
-+		msleep(20);
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-+	}
-+
-+	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
-+				 val & MTK_BT_RST_DONE, 20000, 1000000);
-+	if (err < 0)
-+		bt_dev_err(hdev, "Reset timeout");
-+
-+	btusb_mtk_id_get(data, 0x70010200, &val);
-+	if (!val)
-+		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
-+
-+	usb_queue_reset_device(data->intf);
-+
-+	clear_bit(BTUSB_HW_RESET_ACTIVE, &data->flags);
-+
-+	return err;
-+}
-+
- static int btusb_mtk_setup(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -3079,6 +3151,7 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 
- 	mediatek = hci_get_priv(hdev);
- 	mediatek->dev_id = dev_id;
-+	mediatek->reset_sync = btusb_mtk_reset;
- 
- 	switch (dev_id) {
- 	case 0x7663:
-@@ -3236,76 +3309,6 @@ static int btusb_mtk_shutdown(struct hci_dev *hdev)
- 	return 0;
- }
- 
--static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
--{
--	struct btusb_data *data = hci_get_drvdata(hdev);
--	u32 val;
--	int err;
--	struct btmediatek_data *mediatek;
--
--	/* It's MediaTek specific bluetooth reset mechanism via USB */
--	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
--		bt_dev_err(hdev, "last reset failed? Not resetting again");
--		return;
--	}
--
--	err = usb_autopm_get_interface(data->intf);
--	if (err < 0)
--		return;
--
--	btusb_stop_traffic(data);
--	usb_kill_anchored_urbs(&data->tx_anchor);
--	mediatek = hci_get_priv(hdev);
--
--	if (mediatek->dev_id == 0x7925) {
--		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
--		val |= (1 << 5);
--		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
--		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
--		val &= 0xFFFF00FF;
--		val |= (1 << 13);
--		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
--		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001);
--		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
--		val |= (1 << 0);
--		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
--		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
--		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
--		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
--		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
--		msleep(100);
--	} else {
--		/* It's Device EndPoint Reset Option Register */
--		bt_dev_dbg(hdev, "Initiating reset mechanism via uhw");
--		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
--		btusb_mtk_uhw_reg_read(data, MTK_BT_WDT_STATUS, &val);
--
--		/* Reset the bluetooth chip via USB interface. */
--		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 1);
--		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
--		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT, &val);
--		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT1, 0x000000FF);
--		btusb_mtk_uhw_reg_read(data, MTK_UDMA_INT_STA_BT1, &val);
--		/* MT7921 need to delay 20ms between toggle reset bit */
--		msleep(20);
--		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
--		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
--	}
--
--	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
--				 val & MTK_BT_RST_DONE, 20000, 1000000);
--	if (err < 0)
--		bt_dev_err(hdev, "Reset timeout");
--
--	btusb_mtk_id_get(data, 0x70010200, &val);
--	if (!val)
--		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
--
--	usb_queue_reset_device(data->intf);
--
--	clear_bit(BTUSB_HW_RESET_ACTIVE, &data->flags);
--}
--
- static int btusb_recv_acl_mtk(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -4432,7 +4435,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->setup = btusb_mtk_setup;
- 		hdev->shutdown = btusb_mtk_shutdown;
- 		hdev->manufacturer = 70;
--		hdev->cmd_timeout = btusb_mtk_cmd_timeout;
-+		hdev->cmd_timeout = btmtk_reset_sync;
- 		hdev->set_bdaddr = btmtk_set_bdaddr;
- 		set_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN, &hdev->quirks);
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
--- 
-2.25.1
 
+--===============8082147374863283879==--
