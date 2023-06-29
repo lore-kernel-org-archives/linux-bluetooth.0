@@ -2,84 +2,148 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C27C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 19:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0708EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 21:08:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231497AbjF2Tbb (ORCPT
+        id S231522AbjF2VIM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jun 2023 15:31:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53028 "EHLO
+        Thu, 29 Jun 2023 17:08:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232047AbjF2TbE (ORCPT
+        with ESMTP id S229727AbjF2VIL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jun 2023 15:31:04 -0400
+        Thu, 29 Jun 2023 17:08:11 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A0C3586
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jun 2023 12:30:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED2A2D4C;
+        Thu, 29 Jun 2023 14:08:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 674DA615FF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jun 2023 19:30:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4AFBC433CA;
-        Thu, 29 Jun 2023 19:30:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 699EB61640;
+        Thu, 29 Jun 2023 21:08:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC82BC433CC;
+        Thu, 29 Jun 2023 21:08:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688067021;
-        bh=eZe75AE+IB/TijDI3jgsEz5uQBcyAmgMr3PJvTOcSxs=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=AqpY76zTLyvL7bJtINf8ARtN2WUsCz+6bKqsXHgv5P6TiUzg8HtfW50qb7zP/HxSn
-         5WMeoSl/ainocsc4L2regdlTkV/ORbdBFjBVvBufw2tDb3SYsN6h9g/UfT5jsvLNCQ
-         OjGUDem/AgNitmGPx/Y+EJjlaupmGOte42OxrO6dM/Z6sJR1781SZLoUnri4IWWGmX
-         UKG2X6BqzSCS90BqBqbO5nri4czafMWIZ3OPfdL5KWxzxJgyNI+DIIC9W05rHj5oOs
-         NmmyepDFn9FvD96Bfz88s74NKuKVRegBMTUtbTSF2bxrZDoh34bGbSHps8hTR/qnUP
-         rVgE/v+PTsQHQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9BE57C41671;
-        Thu, 29 Jun 2023 19:30:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1688072889;
+        bh=QVWWSgeIDy9G1T0y1s1CguF1zCjfXWdS83lM64yH870=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=R0CzxeqamLxMSeOUudK9QLDYHXutU4k1i7YAU/+nbdoHGbbXXiPe7urw9sDNEJLAL
+         aVDE8AZM6wPuRaqrkBRJQ+Vsp7VabCX8CRCZyCzpLv0sGygnHpMeEzcuGK9nBIb98U
+         Wj3wtfiP8Or1RUoId9/E1N7KZdRJTK/S+EsW7yEiRpxUebQt52CKB3gnG9nY9/9Fo5
+         OE9oWn+jsh5oWgUc3BBhvjBbt72tozVDtgMUSHcEabrlow+kZqmeyfQ2/OJFpl9UTk
+         OeytmAd7bSVCpIXGYlID5yu9Gs8H4hh+ifQbjlMMRuDi4DLp9IO3GdvQOI7Qcl/6xJ
+         TTi8z1bczuBiw==
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-4f13c41c957so333166e87.1;
+        Thu, 29 Jun 2023 14:08:09 -0700 (PDT)
+X-Gm-Message-State: ABy/qLaBOQEWDC8tMtpRYqtr8gNqtB1MmeW0zNSOh5SLjWwyBsNbSmpl
+        vx86PpG3za5NJjDdfxTRcFMUHyuoPf+1syur/Ps=
+X-Google-Smtp-Source: APBJJlFiLvq/00pxW1fSfw8POZDWzgKpN6sQ94B0C73Uomase4zWNPqdpHugOi5T3I9U3e3RhH+sUGWixwBHEGJceUE=
+X-Received: by 2002:a05:651c:c97:b0:2b6:b9ee:a7b1 with SMTP id
+ bz23-20020a05651c0c9700b002b6b9eea7b1mr708635ljb.5.1688072887642; Thu, 29 Jun
+ 2023 14:08:07 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 1/3] Bluetooth: hci_conn: Consolidate code for aborting
- connections
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168806702163.7890.5101160749253819751.git-patchwork-notify@kernel.org>
-Date:   Thu, 29 Jun 2023 19:30:21 +0000
-References: <20230629001310.2946122-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230629001310.2946122-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+References: <1c40a12b51ccd6ee2ee002276f5b1ba92c377100.1687990098.git.objelf@gmail.com>
+ <20b61d77-7397-e3ba-3215-232f49eb8c07@molgen.mpg.de>
+In-Reply-To: <20b61d77-7397-e3ba-3215-232f49eb8c07@molgen.mpg.de>
+From:   Sean Wang <sean.wang@kernel.org>
+Date:   Thu, 29 Jun 2023 14:07:55 -0700
+X-Gmail-Original-Message-ID: <CAGp9LzqbqAGe0AXN2zH-PViOtu0TcygE265S61QfLxczoHgm3Q@mail.gmail.com>
+Message-ID: <CAGp9LzqbqAGe0AXN2zH-PViOtu0TcygE265S61QfLxczoHgm3Q@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: btmtk: add printing firmware information
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Sean Wang <sean.wang@mediatek.com>,
+        Chris Lu <chris.lu@mediatek.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Soul.Huang@mediatek.com, Leon.Yen@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, jenhao.yang@mediatek.com,
+        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
+        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
+        abhishekpandit@google.com, michaelfsun@google.com,
+        mmandlik@google.com, abhishekpandit@chromium.org,
+        mcchou@chromium.org, shawnku@google.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+HI Paul,
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Thanks! I will update the patch with your suggestions.
 
-On Wed, 28 Jun 2023 17:13:08 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This consolidates code for aborting connections using
-> hci_cmd_sync_queue so it is synchronized with other threads, but
-> because of the fact that some commands may block the cmd_sync_queue
-> while waiting specific events this attempt to cancel those requests by
-> using hci_cmd_sync_cancel.
-> 
-> [...]
+thanks!
+Sean
 
-Here is the summary with links:
-  - [v4,1/3] Bluetooth: hci_conn: Consolidate code for aborting connections
-    https://git.kernel.org/bluetooth/bluetooth-next/c/22f0e1a7429e
-  - [v4,2/3] Bluetooth: hci_sync: Fix not handling ISO_LINK in hci_abort_conn_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b2947ca2f663
-  - [v4,3/3] Bluetooth: hci_conn: Always allocate unique handles
-    https://git.kernel.org/bluetooth/bluetooth-next/c/fd859b4a3815
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+On Wed, Jun 28, 2023 at 3:44=E2=80=AFPM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
+>
+> Dear Sean, dear Chris,
+>
+>
+> Thank you for your patch.
+>
+> Am 29.06.23 um 00:20 schrieb sean.wang@mediatek.com:
+> > From: Chris Lu <chris.lu@mediatek.com>
+> >
+> > Add printing firmware information part when driver loading firmware tha=
+t
+> > user can get mediatek bluetooth information.
+>
+> Maybe use the commit message summary/title below:
+>
+> Bluetooth: btmtk: Log hw/sw version and fw build time
+>
+> Maybe also paste one log message example to the commit message.
+>
+> > Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> > Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> > ---
+> > v3: resend again with the latest tree
+> > ---
+> >   drivers/bluetooth/btmtk.c | 5 +++++
+> >   1 file changed, 5 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> > index 9482401d97fa..8490d59502a5 100644
+> > --- a/drivers/bluetooth/btmtk.c
+> > +++ b/drivers/bluetooth/btmtk.c
+> > @@ -57,6 +57,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, c=
+onst char *fwname,
+> >                             wmt_cmd_sync_func_t wmt_cmd_sync)
+> >   {
+> >       struct btmtk_hci_wmt_params wmt_params;
+> > +     struct btmtk_patch_header *hdr;
+> >       struct btmtk_global_desc *globaldesc =3D NULL;
+> >       struct btmtk_section_map *sectionmap;
+> >       const struct firmware *fw;
+> > @@ -75,9 +76,13 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, =
+const char *fwname,
+> >
+> >       fw_ptr =3D fw->data;
+> >       fw_bin_ptr =3D fw_ptr;
+> > +     hdr =3D (struct btmtk_patch_header *)fw_ptr;
+> >       globaldesc =3D (struct btmtk_global_desc *)(fw_ptr + MTK_FW_ROM_P=
+ATCH_HEADER_SIZE);
+> >       section_num =3D le32_to_cpu(globaldesc->section_num);
+> >
+> > +     bt_dev_info(hdev, "HW/SW Version: 0x%04x%04x, Build Time: %s",
+>
+> Why not print 0x%04x/0x%04x, that means with a slash?
+>
+> > +                 le16_to_cpu(hdr->hwver), le16_to_cpu(hdr->swver), hdr=
+->datetime);
+> > +
+> >       for (i =3D 0; i < section_num; i++) {
+> >               first_block =3D 1;
+> >               fw_ptr =3D fw_bin_ptr;
+>
+>
+> Kind regards,
+>
+> Paul
