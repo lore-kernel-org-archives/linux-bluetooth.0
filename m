@@ -2,52 +2,54 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EB4EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 08:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48056EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 08:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232196AbjF2II3 (ORCPT
+        id S232068AbjF2IIu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jun 2023 04:08:29 -0400
+        Thu, 29 Jun 2023 04:08:50 -0400
 Received: from mail-he1eur01on2048.outbound.protection.outlook.com ([40.107.13.48]:45537
         "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232489AbjF2IIF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jun 2023 04:08:05 -0400
+        id S232191AbjF2II2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 29 Jun 2023 04:08:28 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PuoqrxYqKdsGqsn+gWkPt2cOjBSWQZav7b4ID+ff9HCsFvS63yNfa8Uo3nM3E72jpRg0/J3u010KZOnTKF2z8ixLeXjJyOAdwzT/iUuRBeWUDRx9buInit1zxRg2ZY4Xi2U2EKfMBAFmEBdDrCHoVCLvDeIMYzhQAwODCGfs5tQp/WvwXyFq2NxRW84aYH38+2jIt4HMbF1US0eYIneS/F7e7Py2TsrIprl3XYLElU+sjxyK+QzJjHiczK29LezrV6KhxliT8N8xEubxpvKf3QTGSxTbIRXBSwtBSgjf/56OyPGR510ksNNUeimcrNdNT64nZ+752Xl9rs0tEz2FkA==
+ b=jFJzJIX1L5coUQn5QcMPsJopFBUyz44qmlcOdDof6WApQR5SBM5rxHtbvdSYCjvSJuxCDKu7tWxJLUIrvOMWTpMR50JFS7UamCe6qS51sZHRtHMhQTSDpRQA2Wj3BWBfn3IhkBWQTF/Pi6T/bKTHgXojT8CsISQ3rFiTUwN+GiBi7UWt9ZGgSwp0mJmKrVhJCpMdu5Cag4ZngcNcgdNZ6+h5QDjbU82YyWClo4U5oLWn+nh2SmjfrBfoaa+4bI/h0YDAA6G0UEfW/q8kKrfZ280N1XE6Nbq9P2Tdefu1ZS7yh+fB67cUqT46UEVD5iEqIv6SahPwuc1q62+t01aGwQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H+d8UFXIA0I9DsaiP0Bw9RqQAqj2m7Kfr5V2JKyyaZE=;
- b=d3C0VDFCWf2JLfgxCEVnT43W1TYMfvmpWPcw6MxK3jv0lnxuiOq4VTs8zkqyMxAlWsSYVoxRBwoM4amJ/drIzIPRBJnpvzuPZSjypLoiJ8tmRbkU/73Q06jieNpCfI+cq5kG5wUUi6GC7ZEAnezQIXpzaXCG1YwbiRTdfcUnxmCXf2dxAE+CTbBLSVJ4hzKX1vkgYW9X5t8g2sDw6JuQshXQfL5CqoQ63eHced0YfwId6aFu74T0RATtc6DJrK2qp6WxpGpDJsEoWhNpuILdbHrGb0nYRygNeGiWAQhu3dUvkku4dRheMRi0fFcmt08drxOttIDPgNXvULZhv0NcyA==
+ bh=oVAXqQyNk2EkawDN2J7sLSf0qO1THMsLaaUWURRUYsg=;
+ b=EhU8bcEvqgG2JOZilWrC53+vfl6KYgXtNbpNtOCwR/V6EjwbVgFf6Ngdmz6wKORf2Y7lF+8QusuJm9PDDrfr4Lcr/pmK++MQ0Diq/Ap42wt1PzKXR4XBG7Zv9QkgW5C0ED08gAyYziijkAaU1OUylISkOgi+eFwgZZyKn+ne7tYoZeGxTw4yzJ4Paa/xRFCV+wax9PqfrEjsiwvCvmhld0w7tcjzo2gM8QkDGAcOlpL/9YIvFYYJBOK+Kr0umzDhi/cqLwXIR9aas9tdDF39MTMcBhQ3t83x2CZuIRK2Sz/DKaRD/gI0qlMiLlZS9lArzUb9BzEPoHEUGDQnAprM9Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H+d8UFXIA0I9DsaiP0Bw9RqQAqj2m7Kfr5V2JKyyaZE=;
- b=JOumddVNIdDS7gan+vmmtideg8aj1aef3pZESTVk1ZFoeJ/PoluD0Jr6vaNiVU70hv2DzZwV3cGDUbY2LabYcw9m9vfOX8iv0AMffFfYxIWaIQrJAWxwW4F4i0fpJYAGHRib1CF/GcEoMJIfusSZXBv5Ijws6iUQtj/c/fWdRnw=
+ bh=oVAXqQyNk2EkawDN2J7sLSf0qO1THMsLaaUWURRUYsg=;
+ b=pMAnMjvDJ5nYjrE8Lv3aYTztyVA7cOvjP0OexzjG+IF5iw8dhGhFL+OJSepSFa5hay4aEDLrclqIdvWkdAlNjy+y3vmwGhGHEfrRHG5aTNuQnxgwhOEdwSGsjFW2NJ6Ue/BOCpX3zYIYg1LrnvHFNFmBhLHz6S4Rsw37MovBjO4=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by DU2PR04MB9130.eurprd04.prod.outlook.com (2603:10a6:10:2f5::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Thu, 29 Jun
- 2023 08:08:02 +0000
+ 2023 08:08:08 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::7526:7510:9b32:e1fe]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::7526:7510:9b32:e1fe%7]) with mapi id 15.20.6521.026; Thu, 29 Jun 2023
- 08:08:02 +0000
+ 08:08:08 +0000
 From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
         silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
         andrei.istodorescu@nxp.com,
         Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ v3 0/2] shared/bass: Introduce Add Source opcode handler
-Date:   Thu, 29 Jun 2023 11:07:33 +0300
-Message-Id: <20230629080735.525650-1-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ v3 1/2] btio: Add options for binding iso broadcast address
+Date:   Thu, 29 Jun 2023 11:07:34 +0300
+Message-Id: <20230629080735.525650-2-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230629080735.525650-1-iulia.tanasescu@nxp.com>
+References: <20230629080735.525650-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: AS4P192CA0049.EURP192.PROD.OUTLOOK.COM
@@ -56,90 +58,228 @@ X-ClientProxiedBy: AS4P192CA0049.EURP192.PROD.OUTLOOK.COM
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DU2PR04MB9130:EE_
-X-MS-Office365-Filtering-Correlation-Id: f0591749-d131-4c82-4079-08db7877f5ec
+X-MS-Office365-Filtering-Correlation-Id: f9cb3021-d3b4-4aeb-7942-08db7877f93a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RfaFF3M48aTCqvvYO3+L7owcgv46FJEtDc5Wyesj+1ZP3Cs/dEMw//4w0Z3OFt8wXpbMCvnAhbxIQe1JZIW4A8xfkfuJzPma3zlqsQBLDCdmSKPONMmCiz8zKOBtD+k3p8KN9vs/FK/ISyIf6utchukJdsDW5T0WaHIrdxEX7IqgqXd2rOaZ9iatcTO9Hg8chvgig5ADOe1A+m6ePaIUc2cS8Fr5wvwj/SktOwnEIBTPfzDMO5q+/HY4uGnfGyca1G6SBIID/izTU0kN3bUi12GTTfAqjBT+DaCffidXhimnfuv2T2unJMhNlbtN3ldt/h0AH5J+SWwP6SCoI9Zt4N5NXO7nKO7DI+PQboHqKbxWxD59n2AIrY8x5nVEsq6tJrjBsxBw9CyEcVcT4h07nE+K9MqteQdU1eZnvVS2PmmcjImnnhwmcMo1S0y8VFtTjUNBb3YfJWjEoLGfEzB++VtbX3FEpqMtoespIr/pzRg+SJBFZ91PyLUXHQy/AlRZvyIKWXylOYMMd6y9sSJf8EByeHM/RacK9zZcXLl423HSm4am0q9cH01fTBr9bUnTuW+uJr3EmWGWu3ulzOdEN8wnBUNdwKmC6uOMU3bUeQyA/lvc/0hn/eu6WMgAnFeKO/L10IxmkVFxMhKBuZXcikP6FGREMelcD0T22gCFPhQ=
+X-Microsoft-Antispam-Message-Info: 3hgPM2ns29HN+reOUFbkeX/F7Z/lbkmbAwqdxAC5PdcFk++z69/uu9ExbMWRaZvX1PPPPHwd9gH+i9R+M5e9psu6B2QjjWongmmsA1DM6YBE7fiMdorq+woggPKY8Wzio6BiO97Sml8NCR61DeWwVzmPWT0RuYVtnVSK3mQygzZ2fWNoldiNjw2/DtPSqKmXkMMjSJt76rSxUSlo2iSYIWnvW85NO54UiFe0yPL6yQJ8X7L58UQLekcr8IWrz90RWryQ1Q2JUEPoKyaNXJBMs+I8dfKBfqhRKR+kN6pLLfCmTTbgCcbNrpPVYjfejkDmqNhI9h3h4XEGsL9Y/MzM0vWNKj7irICFofH7hSa3juTWTLogaj0BDnb+M5/wdH2vQtrGILgQWo+X05AaXd/nDYhgz2QoGOEhHl7EC+LBiSQbV5S0gQrC4eBnSc8IF2valpyCYXGknSTI1x0WNRfoEKUe0NcF90Zwjp1eQx/0YXsb5/8QaEYY0d9Sya6I/l787hqkuwiqY2Wkos7dXAAYYexxp6a9ACmO+/8wnl3HJ9pF3F0GZ7Sfs5OUdTiY24uOAK74R6K/W1FIsKnB/S2/8HkhURUafYff9vUSx7xTA8EILYu0he00zoPtC3PTQmCCdLWCu2nl337TaAxevYtLmIYTWngAUE2AQY9fJ3bVgnc=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(366004)(136003)(346002)(39860400002)(451199021)(52116002)(41300700001)(6512007)(316002)(83380400001)(86362001)(55236004)(186003)(44832011)(6506007)(26005)(1076003)(2616005)(2906002)(38100700002)(38350700002)(5660300002)(36756003)(8676002)(8936002)(478600001)(4326008)(66556008)(66476007)(66946007)(6486002)(6916009)(6666004);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VpCDqyn9Gv2rRtcAq82MTxh1ccf9R5UZ6rQ6ObJ9r1sbg3PzXHE4eZqylq7U?=
- =?us-ascii?Q?mcgEy9cDIvRNCLqagbmAeXMgUgu7ruEz10ksFT2In0lTdgjKMm2f+VAysZDn?=
- =?us-ascii?Q?vhkQzCJV/92GpnKPo5I/dmCYOwcdESkPSNtJcpG6a9+EiA3RUp/tt/1tqiRR?=
- =?us-ascii?Q?zENRrGCXULvVIG0WzleNIlrec9tT3EGr4POELDhN5rr3W65qBnbCBS2r5DDp?=
- =?us-ascii?Q?JdlvQauX48Uyf04S036eFF8S3jxYrl936HLHTzeLLKnx1aSedIx8I25EjuaK?=
- =?us-ascii?Q?p/kp4Hws5msEZAMhLVBoNysbhcRIH13cghtrTGDfjbF/T6y0D2r3oERcg53Z?=
- =?us-ascii?Q?eKPTmiuMW/Q6xGsQlWAcNRxppWRLJTomicmT1KHXx5zuYKxUIWw70sL44PGr?=
- =?us-ascii?Q?tnIwz+Fn+0QP+zqfRKW8VBGe/yBmxPoJfJB4rbX2hIh6BtaLrIj2jiEIeTot?=
- =?us-ascii?Q?GP94VNImqAqVV6P03nx0y7kCM/3PEkaGOOPtnIUzLc/blLle8g0zd/Z4HZq9?=
- =?us-ascii?Q?TzmUjiFPYYZW5C8PZB682zyWWH1umkJxkpDHsUxukAYstQ2FLKKcQhTpYgbR?=
- =?us-ascii?Q?d+SZHWEQpy18kyIuwNk7+oXdH0+juK/ttSiVrhMooLcyqabhafWJFT1qdGCe?=
- =?us-ascii?Q?ZbriLuBw+hLRKH4gGlhqU/eIA95fOQ68IcfXtveXfKU9b8C5KGu+JlZVm6YJ?=
- =?us-ascii?Q?GrD/dr+5Vmg6z7eqMD8BIq17R3QksQqWGSri9+FN5ElYfTJWfD3b2i88249Y?=
- =?us-ascii?Q?YebNklGu/tdqKBeKkIjx6KSGWgA885kd3lBm3EicyRY0CTR3tpYbTrC+CR9t?=
- =?us-ascii?Q?0a9Uq+dsLVZ1Kxn4u06Rcr16YXHsO4mZ6dFKLR2CdzSU02qljpoNPhk7DHfx?=
- =?us-ascii?Q?Uktk70gBT0okc/LKEKWhR7H50SBwuGx9e4qFQH1sFwHcgEM9HWLS9sx4mqLb?=
- =?us-ascii?Q?sEximgl3TzLt/H7lHdkSbxIHwFEKABeOA74mSjwBBH6Mk42XNGHm09Kdg3xf?=
- =?us-ascii?Q?OsV79xBhbDFjv+JGG3lHMT/gjrCJnAobrBpe0gKREPO6t7HitA43swZZzmRn?=
- =?us-ascii?Q?03Y2bDVGSSKRgOVuz9C2EJgBrSjKx9+tVCV9NkkaF2J/HuN27Hw9uBXujz6K?=
- =?us-ascii?Q?5Y5QVlPMVsldB3LSU7GR6xzMsjIYZ+SYsg1vt8BJ4h7Z1LYf27LeB+pDboM1?=
- =?us-ascii?Q?N3+q/21UDagecm/eESlmb2UoZSIhOYmxOkKvLMoDkyYjlwjXSzdm7CsTMgQ2?=
- =?us-ascii?Q?l8ps8lLeJOIRAZP3ECMak0k/T50Bc32bkKUQLQubX7xYz1Gm8N1VSxMfCI/9?=
- =?us-ascii?Q?Ar8VasXh3JsyJKirxRTm+TsY2d9uWGQHJ/dnTNkBam497NsFua32hnG1ktvR?=
- =?us-ascii?Q?qpN8TIXgh83LPPg672C45Dtua+4hewsetrilsG5BAMUtw5lybq0xH7S04pYK?=
- =?us-ascii?Q?JE+NlJuiaJA3D2Mie7G/RilG2M9TihqSOoIZV7T/8KDzkYWGj7yreeGZRa/5?=
- =?us-ascii?Q?LUqqYLj8VbGKeH8aE7YqGuNwghBPLD7rB/v25U0wT0VThBXnf9LBoaIP2CGL?=
- =?us-ascii?Q?9/TXOtKRXgQAteQsIhwubNcwuyCenPUzckmdG9xIWU8lCiTmvMqkp6MMgpyv?=
- =?us-ascii?Q?2Q=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Lssif/p2jzZ1muio5uTeLgQrm6ZDDf/RawoPREBwxMj2PxdXSzEjE8DnuF9o?=
+ =?us-ascii?Q?OTl0dSNtX8LQwm3WM4r4q10mXMyakCIlm73UMRMyWlNSnSmNqFHDt31Y3j0d?=
+ =?us-ascii?Q?r2ml3YYhg9AmiJ6z5DAsUdXprS5e22/HqR+L7bYn1vXxktf2I8BlYpkoR3WH?=
+ =?us-ascii?Q?f1PNbv6c7jPEefr7BeDMBl7KphEBb/MS43zod6Z/d0ZUtUqYJH/046HVheVf?=
+ =?us-ascii?Q?tx4pQSsc39MUl8Z9lNwlx3DKIKHRfkCFyigi+4auBd0eYF6QNHPifF3nKT/n?=
+ =?us-ascii?Q?g0Kt3lQ5Iw4/omHLTY8kU+G/WmaF8/17V98vZ4zFlhAVVr/5lchNoWfg3CU6?=
+ =?us-ascii?Q?PyQLbUxNgEkqYbt/ScgVhiZrWk2Z40zc3KvpvJZ0aD/WaWjQxOyC01lmXZUx?=
+ =?us-ascii?Q?c6EVPErdUMz9djn50/G85pOurEdy+WgCbqczXKA8ElJwp0x4D6S3UMp8PNvL?=
+ =?us-ascii?Q?DMXiKTiAqv4hzZ1f5O7DYuGCGcsUC+Y7S91o6KbzRAG/LInwq3BsY68/y3wY?=
+ =?us-ascii?Q?hNu2dhkTb5o3EX4295x6DKWfp2+SfqBxo2I5GViOcj8tRU4f66b6y+lE0XgZ?=
+ =?us-ascii?Q?M2ibli30tzDLuQDaHj7Eq/6AERl+bE0yt7Bez7MeVlrjTkpSjVGsH5EQnYrN?=
+ =?us-ascii?Q?hQKLozDn9wEwhzF0tz4p9M065t++Z9LDXxuScrBmtYtPKXI6BAf9W8ODtoDh?=
+ =?us-ascii?Q?Ohj3FR5IRfEx+BrxM6QO+BIyVeT48Tnhm/fLsM7cgrs3jewEaoWaIctovjWi?=
+ =?us-ascii?Q?HbWxTM6Sku5lC6INu9CREn6xMxhnkfhaIgIsvpuMyyKvztN3m2kWg/A90+X8?=
+ =?us-ascii?Q?vOOuW1k+YbTBI+Oi/YAhl/oaTvlnztf3hxHAov5sn0XaQAi9z7Py9F+KAG2f?=
+ =?us-ascii?Q?2SOY97WLboT6/I23VmjT7AR7c1848vFzhIT4S6pDWzOdsj5EPQB2jvHC4ZZ/?=
+ =?us-ascii?Q?2YDrhJ1z1rnly1MEGsxXEhf3HSTrFgk19lxT215HXvw932rNUyTqCHlAiDPm?=
+ =?us-ascii?Q?zYCznmdbD2hkHd/cunV+yOB3+RRgG0vB27f+zq5SBp58b3O/+F/UBdb0+HoU?=
+ =?us-ascii?Q?S5PzwVCu0gNEDd70Hjgx/LHPwj+bafwSRQ7Lqw8Wd2BR6WPRoqUW5LGfIXHO?=
+ =?us-ascii?Q?XIE4asFZhPeZMWhdi/Cnb0LNLKLnkvV4OYoMAUR7GzS1XS7NjQ2ZNsQvkggX?=
+ =?us-ascii?Q?q8popieIi4ArMOxf/b5R/tOuWc+KdvU3u2DFY3IqutL6YZS9RYKdYyTKRtou?=
+ =?us-ascii?Q?VANMm4UTyovLJ67SqTh8JjFdDm2mYaQuQh5gODCHgIN3dmcSDdfvVemZUMjO?=
+ =?us-ascii?Q?e0gB+XKoHIGOMvCOhvRUyZOEZwkejhQf5BY3XYGjrBmRHykNSx86duRxQalf?=
+ =?us-ascii?Q?Cz/p3HLHn/uqxQlYcGwf767l6uSqOjDdCMqv6fxM3qZA6ElbNAw9Gw4LAHE0?=
+ =?us-ascii?Q?GtOX60CTdp9GMQWJoX6V3k5KB4lW8NLNlP/V5xXoOORtTBY3sPdEwpjDxWGm?=
+ =?us-ascii?Q?gfU22zsxSBRWpon7uO0XfnNXewYI4Gf8POYJumuKRjpRbUEggcv/MEImIMc/?=
+ =?us-ascii?Q?4KHtMR9emJF6Z6jgteux6QlToDZCGdxte9QX6Z7lIzLeuW0zvO3EX/tiGxf0?=
+ =?us-ascii?Q?tg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f0591749-d131-4c82-4079-08db7877f5ec
+X-MS-Exchange-CrossTenant-Network-Message-Id: f9cb3021-d3b4-4aeb-7942-08db7877f93a
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2023 08:08:02.6843
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2023 08:08:08.1888
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pbOobN7uZ1EjzjSPMCHGbdZiK0/liexhT+GWmo6yJI07ODw81+AxEoOh1wObEDWYZAaEJOBwExgnq5xvyCEXCA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: FbPfD43PapooAcgGuvDh1Qmay0PCUKasfsP8mn6Sk6lGYEtD7DXDk7bycY1t0lHmIRN+uXnECAhhVkoIIkrjQQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB9130
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch series adds the BASS control point handler
-for the Add Source operation.
+This adds additional btio options, to allow binding a socket
+to a broadcaster address.
+---
+ btio/btio.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++-------
+ btio/btio.h |  5 +++-
+ 2 files changed, 70 insertions(+), 11 deletions(-)
 
-If instructed by a Client through the Add Source opcode,
-the BASS Server attempts to synchronize to a Broadcast
-Source, by opening a btio channel.
-
-Some additional btio options have been added,
-to allow binding a socket to a broadcast address.
-
-The BASS adapter_probe callback has been implemented,
-in order to automatically configure BASS into the adapter
-database. The adapter bdaddr is also stored along with the
-BASS database configuration, and this address will be used
-as the source address when binding the btio channel.
-
-This patch version fixes the compilation errors from
-the previous version.
-
-Iulia Tanasescu (2):
-  btio: Add option for binding iso broadcast address
-  shared/bass: Introduce Add Source opcode handler
-
- Makefile.am           |   2 +-
- btio/btio.c           |  76 +++++++-
- btio/btio.h           |   5 +-
- profiles/audio/bass.c |  26 ++-
- src/shared/bass.c     | 427 ++++++++++++++++++++++++++++++++++++++++--
- src/shared/bass.h     |  14 +-
- unit/test-bass.c      |   2 +-
- 7 files changed, 523 insertions(+), 29 deletions(-)
-
-
-base-commit: d6bfbd28420edf91382635b229b9f8b2f94dc060
+diff --git a/btio/btio.c b/btio/btio.c
+index b68bfb14c..179be6289 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -16,6 +16,7 @@
+ 
+ #include <stdarg.h>
+ #include <stdlib.h>
++#include <stdbool.h>
+ #include <unistd.h>
+ #include <errno.h>
+ #include <poll.h>
+@@ -71,6 +72,9 @@ struct set_opts {
+ 	uint16_t voice;
+ 	struct bt_iso_qos qos;
+ 	struct bt_iso_base base;
++	uint8_t bc_sid;
++	uint8_t bc_num_bis;
++	uint8_t bc_bis[ISO_MAX_NUM_BIS];
+ };
+ 
+ struct connect {
+@@ -771,21 +775,47 @@ static int sco_bind(int sock, const bdaddr_t *src, GError **err)
+ }
+ 
+ static int iso_bind(int sock, const bdaddr_t *src, uint8_t src_type,
+-							GError **err)
++					const bdaddr_t *dst, uint8_t dst_type,
++					uint8_t bc_sid, uint8_t num_bis,
++					uint8_t *bis, GError **err)
+ {
+-	struct sockaddr_iso addr;
++	struct sockaddr_iso *addr = NULL;
++	size_t addr_len;
++	int ret = 0;
+ 
+-	memset(&addr, 0, sizeof(addr));
+-	addr.iso_family = AF_BLUETOOTH;
+-	bacpy(&addr.iso_bdaddr, src);
+-	addr.iso_bdaddr_type = src_type;
++	if (num_bis)
++		addr_len = sizeof(*addr) + sizeof(*addr->iso_bc);
++	else
++		addr_len = sizeof(*addr);
++
++	addr = malloc(addr_len);
++
++	if (!addr)
++		return -ENOMEM;
++
++	memset(addr, 0, addr_len);
++	addr->iso_family = AF_BLUETOOTH;
++	bacpy(&addr->iso_bdaddr, src);
++	addr->iso_bdaddr_type = src_type;
+ 
+-	if (!bind(sock, (struct sockaddr *) &addr, sizeof(addr)))
+-		return 0;
++	if (num_bis) {
++		bacpy(&addr->iso_bc->bc_bdaddr, dst);
++		addr->iso_bc->bc_bdaddr_type = dst_type;
++		addr->iso_bc->bc_sid = bc_sid;
++		addr->iso_bc->bc_num_bis = num_bis;
++		memcpy(addr->iso_bc->bc_bis, bis,
++			addr->iso_bc->bc_num_bis);
++	}
++
++	if (!bind(sock, (struct sockaddr *)addr, addr_len))
++		goto done;
+ 
++	ret = -errno;
+ 	ERROR_FAILED(err, "iso_bind", errno);
+ 
+-	return -errno;
++done:
++	free(addr);
++	return ret;
+ }
+ 
+ static int sco_connect(int sock, const bdaddr_t *dst)
+@@ -980,6 +1010,16 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 		case BT_IO_OPT_BASE:
+ 			opts->base = *va_arg(args, struct bt_iso_base *);
+ 			break;
++		case BT_IO_OPT_ISO_BC_SID:
++			opts->bc_sid = va_arg(args, int);
++			break;
++		case BT_IO_OPT_ISO_BC_NUM_BIS:
++			opts->bc_num_bis = va_arg(args, int);
++			break;
++		case BT_IO_OPT_ISO_BC_BIS:
++			memcpy(opts->bc_bis, va_arg(args, uint8_t *),
++					opts->bc_num_bis);
++			break;
+ 		case BT_IO_OPT_INVALID:
+ 		case BT_IO_OPT_KEY_SIZE:
+ 		case BT_IO_OPT_SOURCE_CHANNEL:
+@@ -1305,6 +1345,9 @@ parse_opts:
+ 		case BT_IO_OPT_VOICE:
+ 		case BT_IO_OPT_QOS:
+ 		case BT_IO_OPT_BASE:
++		case BT_IO_OPT_ISO_BC_SID:
++		case BT_IO_OPT_ISO_BC_NUM_BIS:
++		case BT_IO_OPT_ISO_BC_BIS:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+ 					"Unknown option %d", opt);
+@@ -1460,6 +1503,9 @@ static gboolean rfcomm_get(int sock, GError **err, BtIOOption opt1,
+ 		case BT_IO_OPT_VOICE:
+ 		case BT_IO_OPT_QOS:
+ 		case BT_IO_OPT_BASE:
++		case BT_IO_OPT_ISO_BC_SID:
++		case BT_IO_OPT_ISO_BC_NUM_BIS:
++		case BT_IO_OPT_ISO_BC_BIS:
+ 		case BT_IO_OPT_INVALID:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1571,6 +1617,9 @@ static gboolean sco_get(int sock, GError **err, BtIOOption opt1, va_list args)
+ 		case BT_IO_OPT_VOICE:
+ 		case BT_IO_OPT_QOS:
+ 		case BT_IO_OPT_BASE:
++		case BT_IO_OPT_ISO_BC_SID:
++		case BT_IO_OPT_ISO_BC_NUM_BIS:
++		case BT_IO_OPT_ISO_BC_BIS:
+ 		case BT_IO_OPT_INVALID:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1660,6 +1709,9 @@ static gboolean iso_get(int sock, GError **err, BtIOOption opt1, va_list args)
+ 		case BT_IO_OPT_FLUSHABLE:
+ 		case BT_IO_OPT_PRIORITY:
+ 		case BT_IO_OPT_VOICE:
++		case BT_IO_OPT_ISO_BC_SID:
++		case BT_IO_OPT_ISO_BC_NUM_BIS:
++		case BT_IO_OPT_ISO_BC_BIS:
+ 		case BT_IO_OPT_INVALID:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1836,7 +1888,11 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
+ 			ERROR_FAILED(err, "socket(SEQPACKET, ISO)", errno);
+ 			return NULL;
+ 		}
+-		if (iso_bind(sock, &opts->src, opts->src_type, err) < 0)
++
++		if (iso_bind(sock, &opts->src, opts->src_type,
++				 &opts->dst, opts->dst_type,
++				 opts->bc_sid, opts->bc_num_bis,
++				 opts->bc_bis, err) < 0)
+ 			goto failed;
+ 		if (!iso_set_qos(sock, &opts->qos, err))
+ 			goto failed;
+diff --git a/btio/btio.h b/btio/btio.h
+index e9a8a01a3..642af2e22 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
+@@ -46,7 +46,10 @@ typedef enum {
+ 	BT_IO_OPT_VOICE,
+ 	BT_IO_OPT_PHY,
+ 	BT_IO_OPT_QOS,
+-	BT_IO_OPT_BASE
++	BT_IO_OPT_BASE,
++	BT_IO_OPT_ISO_BC_SID,
++	BT_IO_OPT_ISO_BC_NUM_BIS,
++	BT_IO_OPT_ISO_BC_BIS,
+ } BtIOOption;
+ 
+ typedef enum {
 -- 
 2.34.1
 
