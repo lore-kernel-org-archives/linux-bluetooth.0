@@ -2,90 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B954EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 19:27:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C223EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 19:27:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232817AbjF2T1L (ORCPT
+        id S232837AbjF2T1M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jun 2023 15:27:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51970 "EHLO
+        Thu, 29 Jun 2023 15:27:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232307AbjF2TZ4 (ORCPT
+        with ESMTP id S232324AbjF2T0B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jun 2023 15:25:56 -0400
+        Thu, 29 Jun 2023 15:26:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A65923AB1;
-        Thu, 29 Jun 2023 12:24:45 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CEF43AB3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jun 2023 12:24:46 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6F18061627;
-        Thu, 29 Jun 2023 19:24:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CB296C433CB;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 57B9761616
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jun 2023 19:24:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B9FBAC433C9;
         Thu, 29 Jun 2023 19:24:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1688066683;
-        bh=L9C7oOakDN59nBwxio4rrnZ5puCMWHaJhaQkT95aTVs=;
+        bh=2oJvohimrtBxgh46YXcxeBnk00MReuYlG5DqyWPcT88=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=tIh/Xv1fjjFllaWns4oz4Nak8x4gAUKrBLHf7Xgu65f26Q6G0PLLaEcyWYQ7zNkOL
-         5oKn78ofQ2lwfXdUb7ncxnpUZe7vY4e0Dop96CCxzxZLND6S/yBdP+OEVSiYaKdh7a
-         CfZaBLGa/siBHomfr/EGpOAQRVBrAKG40/LIx+uiCJB6MtHk3Od7iycx7nKZSBDTgU
-         JHeFB1GLERTyamYrx0gI7Zpcu7kdSqFQmLgDjZDl2qxFFjrNJg8pgKHqoP7jFqMCPw
-         v0RkKgxaMVPeC3WZOv5McxSh7ujI6LttGFY8RGRLQC4lTSm5jwjVkzIM+92X79N1x8
-         BIoHXxjErQXqA==
+        b=jcr6GOznFFfsKUkVxXf53xF0ecsEwG/8Ryy/WaOf+L8qfTeiMNYxp2n9ElAFF7xFM
+         zxEzpyDFZkfZB8WczcgyEHwUkQV6foZ6GKM8qdVXs4iCyNnGb7EAmnJVxdsJHmefhP
+         1ZqgSNJGxCwCbTh02Eukxs78cP4/aqUNbPfQgwTo1qpolpVpAnXbjZfIzjlOa5JA9/
+         PUSGh4lKWYt7pBz9AI9fYQyjrVJaXCijhQXz1DsHXYorjXLDw5tbk/9xfo0ff8Pe7u
+         mSzPrTyLfyIw6+U26Nw1QBtxrGsiap8mcZb/Ow4LcBzKEw654gOFD+X1EPyvfsoF49
+         JFE+FZcFBmsJg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A334AE5381B;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 971BDC64458;
         Thu, 29 Jun 2023 19:24:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v8 1/3] Bluetooth: btusb: mediatek: readx_poll_timeout
- replaces open coding
+Subject: Re: [PATCH v3 0/1] Bluetooth: hci_sync: Enable events for BIS capable
+ device
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168806668365.29593.2167157062342737212.git-patchwork-notify@kernel.org>
+Message-Id: <168806668360.29593.8609924413523480751.git-patchwork-notify@kernel.org>
 Date:   Thu, 29 Jun 2023 19:24:43 +0000
-References: <80efe66b16d933e3457bd38b1a60a5d51d4dee9e.1687991820.git.objelf@gmail.com>
-In-Reply-To: <80efe66b16d933e3457bd38b1a60a5d51d4dee9e.1687991820.git.objelf@gmail.com>
-To:     Sean Wang <sean.wang@mediatek.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        chris.lu@mediatek.com, Soul.Huang@mediatek.com,
-        Leon.Yen@mediatek.com, Deren.Wu@mediatek.com, km.lin@mediatek.com,
-        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
-        ch.yeh@mediatek.com, jenhao.yang@mediatek.com,
-        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
-        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
-        abhishekpandit@google.com, michaelfsun@google.com,
-        mmandlik@google.com, abhishekpandit@chromium.org,
-        mcchou@chromium.org, shawnku@google.com,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20230629134518.5574-1-claudia.rosu@nxp.com>
+In-Reply-To: <20230629134518.5574-1-claudia.rosu@nxp.com>
+To:     Claudia Draghicescu <claudia.rosu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 29 Jun 2023 06:54:55 +0800 you wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
+On Thu, 29 Jun 2023 16:45:17 +0300 you wrote:
+> In the case of a Synchronized Receiver capable device, enable at start-up the
+> events for PA reports, PA Sync Established and Big Info Adv reports.
 > 
-> Use readx_poll_timeout instead of open coding to poll the hardware reset
-> status until it is done.
+> Claudia Draghicescu (1):
+>   Bluetooth: hci_sync: Enable events for BIS capable devices
 > 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+>  net/bluetooth/hci_sync.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
 > [...]
 
 Here is the summary with links:
-  - [v8,1/3] Bluetooth: btusb: mediatek: readx_poll_timeout replaces open coding
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c56e5f834e13
-  - [v8,2/3] Bluetooth: btmtk: introduce btmtk reset work
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ed2e80b8b6a7
-  - [v8,3/3] Bluetooth: btusb: mediatek: add MediaTek devcoredump support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/872f8c253cb9
+  - [v3,1/1] Bluetooth: hci_sync: Enable events for BIS capable devices
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e006be3454c9
 
 You are awesome, thank you!
 -- 
