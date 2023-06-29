@@ -2,121 +2,112 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F8FEB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 01:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 157CEEB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jun 2023 01:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230447AbjF2B05 (ORCPT
+        id S231363AbjF2B7G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Jun 2023 21:26:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41222 "EHLO
+        Wed, 28 Jun 2023 21:59:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbjF2B04 (ORCPT
+        with ESMTP id S230314AbjF2B7E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Jun 2023 21:26:56 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B293E1FE7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jun 2023 18:26:55 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id 006d021491bc7-560c617c820so102165eaf.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jun 2023 18:26:55 -0700 (PDT)
+        Wed, 28 Jun 2023 21:59:04 -0400
+X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 28 Jun 2023 18:59:02 PDT
+Received: from mx-lax3-3.ucr.edu (mx-lax3-3.ucr.edu [169.235.156.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AEAF2693
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jun 2023 18:59:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
+  t=1688003942; x=1719539942;
+  h=mime-version:references:in-reply-to:from:date:message-id:
+   subject:to:cc:content-transfer-encoding;
+  bh=pe35qtVkGgjfoC1i4JMkatChz6WIyH40TUO3MKRfwUU=;
+  b=sh76aNU//FSXh/8Siz++l+feKuI+/ggXfEuIZ7DrQOYzDCAN3lLGo9IJ
+   rUc+bWVyUkOY6rzSG428DgRXSYOpy8DRa3Ot/WdxInRHuNVWHTRQszokh
+   btR5BIVJXDmbzdWWdJZNkkyegTpCGSWoxQxXVUPA4c/BJEp/PLmqvEpPI
+   UqSksnIpB5Xhb+NFNrb6d3s22Ds6+DGgcC+ZahA+AOAhiTPcXvyyX7mMM
+   v6tuPAjhP1RQJLV7C2cLALZgR2k90GRir/W9P8ty8YmKZMU73VjcfAFeL
+   qUduV1e+h/dspX185VBf9OVJmtq7H5jcVex9zP2fDjhNPg2FcLvWcuILw
+   w==;
+Received: from mail-wr1-f71.google.com ([209.85.221.71])
+  by smtp-lax3-3.ucr.edu with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Jun 2023 18:57:59 -0700
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3127a76c56bso82734f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jun 2023 18:57:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688002015; x=1690594015;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zh73Jv4s9OmzMkQoBA4UzTQdUSwzcjVfNJwk28V/7VQ=;
-        b=ky1XdFADgarxEHJr8mmGz6a3tvGU6uTqBDT5eRjGFins8vsZCqpo6vTbizCe5w23jx
-         FJv+pEQIzKFP8vIcqUrUqkPE0+Q7YKxYVmiFJqYby3Imwc8Jn+WXxymFxBPVOnOyndVQ
-         c98LTQaJLoP0MwsBNRJlj9N6M6M4iZTPCZgmL9HyA0hrvF+1Z472MQHnJXzPwUHHCNOU
-         KgiHkPUFTNqhIO/DOzqCy6EE3zeT1c064Ks4KrIC06Ah5ZBOpE0km8BTvavCPL/sQHnO
-         99EdDbJPrahx6xAmjNSUITPuyZR3Xzh0kB1IqeCBGjqf9OPtkl+XMms+5kPNQplOgPjl
-         A0BQ==
+        d=ucr.edu; s=rmail; t=1688003878; x=1690595878;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pe35qtVkGgjfoC1i4JMkatChz6WIyH40TUO3MKRfwUU=;
+        b=VFkawkT4irTE5sIF+gsnj7bJs7eIR08hSU7dK4LdxEsh08HQmbnpeKrOycV34L3fOY
+         j6E1gcT79LHbD95tV+xo5fG1a6EqAAExDRJDkPt6t5BNks3SYoM6iL6qy6TwYEK+26zu
+         W6wfV0vMe1Yrwog+wtydo9HFVBv9YK5tiZpL4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688002015; x=1690594015;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zh73Jv4s9OmzMkQoBA4UzTQdUSwzcjVfNJwk28V/7VQ=;
-        b=TpSssoxAE2w26nFrvC9zaJXFyk0/E3y/IVbAcRSYyiKUI1LZ/baHYDH01PsbTAQUdd
-         WhAevTBoS+tnhBNo5zjNw33Nvt9AHQaE2NPX88h9BNIk9cvxP/siIfF9Lt+ICQWywU5t
-         GLF9ocp3xMQkPpLoyzVCjMIJBXFEzX/FFYYzJ0KykJCrrzdK5nksi+Olj3R0iwA5G+l7
-         THrhNMXMpQ20PHj5ko7zAUQsTFTx8mCzSrclnScFLiA3Wu4BtAyeMnEsiH7TZPDQu60/
-         qRj/jM/f1ZD+ShWEyutlLpDy2UpJQQQrkjDKlMfsq4++WY5MIlk2pi2OHhkNBsnv6wEX
-         PN9A==
-X-Gm-Message-State: AC+VfDw4E+AMfYI7HtQ2RSrpgQkf9EF6eBxoR3/b8OJY0g7qTEPlPUdN
-        ACmornsDNMgD0YiaHiZi1pQIVfDjsZ8=
-X-Google-Smtp-Source: ACHHUZ4E632nFco3YDWIEBelJGTFYmcjKTMPUGRr0f4/8J5ld0cu3vRp+sZJdSc39VsDS2daDh8xGw==
-X-Received: by 2002:a05:6808:14c:b0:3a2:1b3d:2384 with SMTP id h12-20020a056808014c00b003a21b3d2384mr6032258oie.7.1688002014816;
-        Wed, 28 Jun 2023 18:26:54 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.170.2])
-        by smtp.gmail.com with ESMTPSA id 15-20020aca280f000000b003a1ed9482d4sm2902616oix.4.2023.06.28.18.26.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 18:26:54 -0700 (PDT)
-Message-ID: <649cddde.ca0a0220.d4438.2512@mx.google.com>
-Date:   Wed, 28 Jun 2023 18:26:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5155670580397464338=="
+        d=1e100.net; s=20221208; t=1688003878; x=1690595878;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pe35qtVkGgjfoC1i4JMkatChz6WIyH40TUO3MKRfwUU=;
+        b=Jc4zdzELTBNBJNbN3tEu/pWsgMGlmPCagfwMMeR8Wy5TPiY19GOMXFUaOnh4jUqXwP
+         tZbuSjJX2y3V4xpU5tE31xz7JHJduX3IwWRVNPg45XOiBkwvqy/up/T7EExzJtjmVs7H
+         zO9BbISrkcJZkwK4Yyu5/izSyQRig6VkCixWq9ryTDfV+gu6fO9/g/4GIUBjnm/V0SqE
+         jityVFIvnJQ5K9QqMEOVY6CKhab/g6Zc+Q+pmYCuPlWLJ1/4z8YUk2kjrLRA1L+OgGPZ
+         bS2HI3dQ4Yf3d/1mzhW1XVvnWRDENeU2WcIkTyQPm1Sv1s/WJ3kKCyBPGhhKSqqILsGX
+         KeRA==
+X-Gm-Message-State: ABy/qLYCQKt374oG2RzOrzJmJiH3ubFChjmc5dA4jI3e5sEkA040oy1h
+        AgwOgOI19SncPcXe3zI+jEcttBKHdB5JL9UOB9P9D6Eeh8Mkkcch4JIZWR6DEofFLNFPU6qRG9R
+        lcXih3zRW/9HEXJ65bm059VgOZB0xoHXumDhwRDI8MP1geQ==
+X-Received: by 2002:adf:f2c7:0:b0:314:13da:39a4 with SMTP id d7-20020adff2c7000000b0031413da39a4mr743210wrp.66.1688003878301;
+        Wed, 28 Jun 2023 18:57:58 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFOF/6OWGWZTemvPXak6D95jENYjn5TNXI25OqnTNh53Sx8ZHggcEwCmrswHwElG9FHDlCm3+xlThuhf23SAes=
+X-Received: by 2002:adf:f2c7:0:b0:314:13da:39a4 with SMTP id
+ d7-20020adff2c7000000b0031413da39a4mr743200wrp.66.1688003878052; Wed, 28 Jun
+ 2023 18:57:58 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v4,1/3] Bluetooth: hci_conn: Consolidate code for aborting connections
-In-Reply-To: <20230629001310.2946122-1-luiz.dentz@gmail.com>
-References: <20230629001310.2946122-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230628150140.GU21539@linux-l9pv.suse>
+In-Reply-To: <20230628150140.GU21539@linux-l9pv.suse>
+From:   Yu Hao <yhao016@ucr.edu>
+Date:   Wed, 28 Jun 2023 18:57:47 -0700
+Message-ID: <CA+UBctDPEvHdkHMwD340=n02rh+jNRJNNQ5LBZNA+Wm4Keh2ow@mail.gmail.com>
+Subject: Re: How to reproduce the BUG general protection fault in hci_uart_tty_ioctl?
+To:     Weiteng Chen <wchen130@ucr.edu>
+Cc:     joeyli <jlee@suse.com>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5155670580397464338==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Weiteng,
 
-This is automated email and please do not reply to this email!
+Could you give more info about the bug, e.g., kernel configuration,
+qemu arguments.
 
-Dear submitter,
+Thanks.
+Yu Hao
+Ph.D. student
+Department of Computer Science & Engineering
+University of California, Riverside
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=761073
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.47 seconds
-GitLint                       PASS      0.89 seconds
-SubjectPrefix                 PASS      0.30 seconds
-BuildKernel                   PASS      37.83 seconds
-CheckAllWarning               PASS      42.13 seconds
-CheckSparse                   WARNING   47.23 seconds
-CheckSmatch                   WARNING   127.59 seconds
-BuildKernel32                 PASS      37.05 seconds
-TestRunnerSetup               PASS      525.20 seconds
-TestRunner_l2cap-tester       PASS      15.19 seconds
-TestRunner_iso-tester         PASS      27.81 seconds
-TestRunner_bnep-tester        PASS      6.49 seconds
-TestRunner_mgmt-tester        PASS      147.80 seconds
-TestRunner_rfcomm-tester      PASS      10.38 seconds
-TestRunner_sco-tester         PASS      11.59 seconds
-TestRunner_ioctl-tester       PASS      11.01 seconds
-TestRunner_mesh-tester        PASS      8.37 seconds
-TestRunner_smp-tester         PASS      9.48 seconds
-TestRunner_userchan-tester    PASS      6.79 seconds
-IncrementalBuild              PASS      72.87 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5155670580397464338==--
+On Wed, Jun 28, 2023 at 8:02=E2=80=AFAM joeyli <jlee@suse.com> wrote:
+>
+> Hi Yu Hao,
+>
+> I am looking at your "BUG: general protection fault in hci_uart_tty_ioctl=
+":
+>
+> https://lore.kernel.org/all/CA+UBctC3p49aTgzbVgkSZ2+TQcqq4fPDO7yZitFT5uBP=
+DeCO2g@mail.gmail.com/
+>
+> I am trying the C reproducer in your URL, but it is not success yet:
+> https://gist.github.com/ZHYfeng/a3e3ff2bdfea5ed5de5475f0b54d55cb
+>
+> I am using v6.2 mainline kernel to run the C reproducer.
+>
+> Could you please provide suggestions for how to reproduce this issue?
+> And what is your qemu environment for reproducing issue?
+>
+> Thanks a lot!
+> Joey Lee
