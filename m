@@ -2,128 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1309FEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 22:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB95EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 22:34:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232355AbjF3Wdu (ORCPT
+        id S230480AbjF3WeD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Jun 2023 18:33:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
+        Fri, 30 Jun 2023 18:34:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232666AbjF3Wdr (ORCPT
+        with ESMTP id S232730AbjF3WeB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Jun 2023 18:33:47 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED40C3C29
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:33:46 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-26307d808a4so1619989a91.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:33:46 -0700 (PDT)
+        Fri, 30 Jun 2023 18:34:01 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6516423F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:33:55 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-63588812c7aso10958416d6.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:33:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688164426; x=1690756426;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hxfCoOso1eZfolB7gUqXEtVsJqGJE4ixGbTkHqSu72o=;
-        b=C8Lei+oKaIkEOJW4Zxcm3YA1B+r3cUE9UbUJ6YJL+vcSf0La47MCNSSaQUSbG1CF8r
-         GGaSfn2RB4Lo2InoqkZf0t7WYWI0gi+X/Yw5OwQZsrXfdok9x6Ymci1S9s6xrmjdxqHN
-         K2mIvnQ2vFbpfX7lJ/oXkMv10xlgRjzeociy0=
+        d=gmail.com; s=20221208; t=1688164434; x=1690756434;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jo3/q+IkZSk1d5Fcv4MT6WpzfQAAtS4okKwlbwy0Hws=;
+        b=PGjkLhpLgnoVi1qsd5C92d6lamBOQyjLgMCJjhCP0blDA9e9c329H+1ji0AbBsGJte
+         KNpq8s8wLTbmtLP8NQNcYfGfnO/E4PY5a5f8cGcrw1KQDRaIKBfUTfAJAp+VyzXVdVye
+         PUZm8V870c3K4X0aQlUiYLN5vhne3WpoChO1eYu6/lW4I4u9zTAfAI7HeVlWsZ9/2KIq
+         Dv2miejo+BeeLmPZKNfE6LIGL1zwdKDSjl98PSaewkVsOA/1EpGcJ0qgTTJ1R3KayMQA
+         vHh7NlvdaLt8qOpqC5ijO9Kbbnn94tFmf0EFByiHaBJkY1jmXLZIYV044lTwH2GXsXVL
+         E2rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688164426; x=1690756426;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hxfCoOso1eZfolB7gUqXEtVsJqGJE4ixGbTkHqSu72o=;
-        b=XhjWnFKWqDqBlq4DbNTMOwHyx8rjyxxM5n5GVqxSqeg0eSvvfYhwJnHFn4+R3mcpA2
-         fuAJnMEhM/E04QcjZTW+vlbehu+W5YducW0uJOtZhBifEHXzakK79dSPCeWjAa9gsPfx
-         qp6vDoRTkCYKo5LJq4pj1vK28FtIF6e4fpRf4xpFUS3H0+TME6Eisebir26bCxPxKpe6
-         4KgpLNcy+3wGLf2e+MLaiWaPOIYINvSYD0WF5Ix7Z2YwBsER9IgIu8RPdT6oBHBIfvVm
-         XchjjlENxBVpwLQxPzxtcN/HlVS5cVs+Zuakf1SfFHhON5qlR+erL2/rz9KruxgbkjL9
-         Emjw==
-X-Gm-Message-State: ABy/qLb37LP7oyLUuEHV6zSMFKVVv24u4oJwYXkAanLTrVd8W7Tp6Oja
-        btXWdSpHh84XI3y7ksFSwsRVuw==
-X-Google-Smtp-Source: APBJJlE/uNVnU1FE/z80KZnmJw9NpYEV3u7Ktt1iGRliZNqrRICWS8P/gtjk8dGriLHNDB8sz4GlHA==
-X-Received: by 2002:a17:90a:c684:b0:25b:d8fe:2c92 with SMTP id n4-20020a17090ac68400b0025bd8fe2c92mr3130810pjt.48.1688164426450;
-        Fri, 30 Jun 2023 15:33:46 -0700 (PDT)
-Received: from tictac2.mtv.corp.google.com ([2620:15c:9d:2:e9c4:8375:7234:e6c2])
-        by smtp.gmail.com with ESMTPSA id em23-20020a17090b015700b0026356c056cbsm3105864pjb.34.2023.06.30.15.33.45
+        d=1e100.net; s=20221208; t=1688164434; x=1690756434;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jo3/q+IkZSk1d5Fcv4MT6WpzfQAAtS4okKwlbwy0Hws=;
+        b=kkXRU7wzGNNaoUGv054iHQar6j3znqFOoTbXKd6iOYpiGV8IWRK2JHM1uDHGPNqvaK
+         tTMmpFCTt4SepphdOHU+xCLiaSohdvJou0lPFsHurzxT3dlv1pniQqKLfTgy28rX/95e
+         xHCfGe27SZlQa2KPgUt4euOgmk4kfxduqPHMgWQGGLN6aoiT/qczPjAfxeZjNHoEN8Pz
+         Hl8wUO26vsfnu8o5Yxcl3OwWyauGE9RvgS12PN6rTdHycE0mPXJukQCEcD2uA4ghTD6Z
+         yEgz07iNITYqfNisYZ+WnjBhOug7mhlLX9Z/n3z8cntF336SgM3K26lEPUHCHyKlKM+H
+         /6vg==
+X-Gm-Message-State: ABy/qLaS92wYXGxXFXT25K5oLVHgrEXWJdC9OULMCaibhuc08k/obGdB
+        +jd26PSyBXHni+UThjKY46RLQaJBpJ4=
+X-Google-Smtp-Source: APBJJlFX3pCd9PbrmR90f6XKs5TCKFqQkevFq/eCAioUX042OWhnpEp0MqHjjrCGtE9XYZ9Yp6Eb/Q==
+X-Received: by 2002:ad4:5cab:0:b0:5dd:b986:b44 with SMTP id q11-20020ad45cab000000b005ddb9860b44mr6337671qvh.6.1688164434015;
+        Fri, 30 Jun 2023 15:33:54 -0700 (PDT)
+Received: from [172.17.0.2] ([172.176.217.72])
+        by smtp.gmail.com with ESMTPSA id m16-20020ad44d50000000b00635eeb8a4fcsm4791679qvm.114.2023.06.30.15.33.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jun 2023 15:33:45 -0700 (PDT)
-From:   Douglas Anderson <dianders@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Stephen Boyd <swboyd@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] Bluetooth: hci_sync: Don't double print name in add/remove adv_monitor
-Date:   Fri, 30 Jun 2023 15:33:15 -0700
-Message-ID: <20230630153315.v3.2.I8b6365c6a13afc74d7a91324dad73601a42038c9@changeid>
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-In-Reply-To: <20230630153315.v3.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
-References: <20230630153315.v3.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
+        Fri, 30 Jun 2023 15:33:53 -0700 (PDT)
+Message-ID: <649f5851.d40a0220.6ab19.df43@mx.google.com>
+Date:   Fri, 30 Jun 2023 15:33:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0175891301673091346=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, dianders@chromium.org
+Subject: RE: [v2,1/2] Bluetooth: hci_sync: Avoid use-after-free in dbg for hci_remove_adv_monitor()
+In-Reply-To: <20230630150906.v2.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
+References: <20230630150906.v2.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The hci_add_adv_monitor() hci_remove_adv_monitor() functions call
-bt_dev_dbg() to print some debug statements. The bt_dev_dbg() macro
-automatically adds in the device's name. That means that we shouldn't
-include the name in the bt_dev_dbg() calls.
+--===============0175891301673091346==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=761688
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.42 seconds
+GitLint                       FAIL      0.95 seconds
+SubjectPrefix                 PASS      0.25 seconds
+BuildKernel                   PASS      33.76 seconds
+CheckAllWarning               PASS      36.91 seconds
+CheckSparse                   PASS      42.22 seconds
+CheckSmatch                   PASS      113.64 seconds
+BuildKernel32                 PASS      32.64 seconds
+TestRunnerSetup               PASS      464.86 seconds
+TestRunner_l2cap-tester       PASS      14.30 seconds
+TestRunner_iso-tester         PASS      25.74 seconds
+TestRunner_bnep-tester        PASS      6.16 seconds
+TestRunner_mgmt-tester        PASS      140.60 seconds
+TestRunner_rfcomm-tester      PASS      9.94 seconds
+TestRunner_sco-tester         PASS      11.26 seconds
+TestRunner_ioctl-tester       PASS      10.58 seconds
+TestRunner_mesh-tester        PASS      7.70 seconds
+TestRunner_smp-tester         PASS      8.97 seconds
+TestRunner_userchan-tester    PASS      6.43 seconds
+IncrementalBuild              PASS      36.49 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,1/2] Bluetooth: hci_sync: Avoid use-after-free in dbg for hci_remove_adv_monitor()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (86>80): "[v2,1/2] Bluetooth: hci_sync: Avoid use-after-free in dbg for hci_remove_adv_monitor()"
+
+
 ---
+Regards,
+Linux Bluetooth
 
-(no changes since v2)
 
-Changes in v2:
-- ("Don't double print name...") new for v2.
-
- net/bluetooth/hci_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index dbb2043a9112..de15a2c77e9f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1949,14 +1949,14 @@ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
- 
- 	switch (hci_get_adv_monitor_offload_ext(hdev)) {
- 	case HCI_ADV_MONITOR_EXT_NONE:
--		bt_dev_dbg(hdev, "%s add monitor %d status %d", hdev->name,
-+		bt_dev_dbg(hdev, "add monitor %d status %d",
- 			   monitor->handle, status);
- 		/* Message was not forwarded to controller - not an error */
- 		break;
- 
- 	case HCI_ADV_MONITOR_EXT_MSFT:
- 		status = msft_add_monitor_pattern(hdev, monitor);
--		bt_dev_dbg(hdev, "%s add monitor %d msft status %d", hdev->name,
-+		bt_dev_dbg(hdev, "add monitor %d msft status %d",
- 			   monitor->handle, status);
- 		break;
- 	}
-@@ -1976,15 +1976,15 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
- 
- 	switch (hci_get_adv_monitor_offload_ext(hdev)) {
- 	case HCI_ADV_MONITOR_EXT_NONE: /* also goes here when powered off */
--		bt_dev_dbg(hdev, "%s remove monitor %d status %d", hdev->name,
-+		bt_dev_dbg(hdev, "remove monitor %d status %d",
- 			   monitor->handle, status);
- 		goto free_monitor;
- 
- 	case HCI_ADV_MONITOR_EXT_MSFT:
- 		handle = monitor->handle;
- 		status = msft_remove_monitor(hdev, monitor);
--		bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
--			   hdev->name, handle, status);
-+		bt_dev_dbg(hdev, "remove monitor %d msft status %d",
-+			   handle, status);
- 		break;
- 	}
- 
--- 
-2.41.0.255.g8b1d071c50-goog
-
+--===============0175891301673091346==--
