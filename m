@@ -2,178 +2,137 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E80EB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 11:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D035EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 13:33:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232815AbjF3LT1 (ORCPT
+        id S232631AbjF3NdG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Jun 2023 07:19:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
+        Fri, 30 Jun 2023 09:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231967AbjF3LT0 (ORCPT
+        with ESMTP id S231508AbjF3NdE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Jun 2023 07:19:26 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735AC10E5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 04:19:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688123965; x=1719659965;
-  h=date:from:to:cc:subject:message-id;
-  bh=PtMVT4e6Sq+vPpfIsm88C/nt33n5frQmm1OkkMTogLo=;
-  b=GipBFySXp7DqawAinoHNn2c9grZrzuQPrZNJ5MenanMTD2IFBhWCZ1WV
-   mTUcdK4dR/XiDcW1ZbrT+GNSyxbq/6akWX/gM52P0B29uDfeHGJuDDhJQ
-   Tc6krPmDiROMBzXTvrBNjod5JY7OseQCWTBwJx+vgtTofcMYbEknJdi/h
-   LQR2Vh2OvGLASs4M5tkBnDdBzXJ2/DS2SzwLGdO1ke3RoUuFFX/nApf63
-   dV7OfsV5prcTu+uCXvvIBQbKFjOQgA8gAYP7acU/eE37JQFUSzr78GuWR
-   2FfANRvwt6llS8j4Cs2Zw2GXUtUoYMxcrLnr3MgFFiSQzDjNjoaRuxh4S
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="347153302"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="347153302"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 04:19:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="752963411"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="752963411"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2023 04:19:23 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qFC9q-000EuV-2V;
-        Fri, 30 Jun 2023 11:19:22 +0000
-Date:   Fri, 30 Jun 2023 19:18:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- fd859b4a38153b4d9e1942ade471f4fdcd8d224b
-Message-ID: <202306301920.wzpVVUjY-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Fri, 30 Jun 2023 09:33:04 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC9E3583;
+        Fri, 30 Jun 2023 06:32:58 -0700 (PDT)
+X-UUID: 97cfdcce174a11eeb20a276fd37b9834-20230630
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=iK4IiZuupKCVysdp9+ObQBOJXW6f9UGKbW4oKCJYlT8=;
+        b=hH1cKklyxbF0CBiskTE6VYW5KJXf8ZbSrvu/p0zTfTBLVF8sZ7IiGVpbf3Yj5lyC4f3wu6Y/J80FQc4I2JHyJ4Ut1cOsh4C3uwAgmBJZ9BxTVMxZq4uvWd/gM2q5MynuLFVczqOw1Aj9GKegxpPrsZ/SF0weTwFhuilgnxwDAOs=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.27,REQID:7e87b20a-eca5-4c35-8fb6-60d49e7640aa,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+        release,TS:0
+X-CID-META: VersionHash:01c9525,CLOUDID:5ec18e82-5a99-42ae-a2dd-e4afb731b474,B
+        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:
+        NO
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 97cfdcce174a11eeb20a276fd37b9834-20230630
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw02.mediatek.com
+        (envelope-from <chris.lu@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 926939932; Fri, 30 Jun 2023 21:32:43 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.186) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 30 Jun 2023 21:32:42 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 30 Jun 2023 21:32:42 +0800
+From:   Chris Lu <chris.lu@mediatek.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Von Dentz <luiz.dentz@gmail.com>
+CC:     Sean Wang <sean.wang@mediatek.com>,
+        Deren Wu <deren.Wu@mediatek.com>,
+        Aaron Hou <aaron.hou@mediatek.com>,
+        Steve Lee <steve.lee@mediatek.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-mediatek <linux-mediatek@lists.infradead.org>,
+        Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH RESEND v2 1/1] Bluetooth: btusb: Add a new VID/PID 0489/e0f6 for MT7922
+Date:   Fri, 30 Jun 2023 21:32:30 +0800
+Message-ID: <242298f784e2bba8eb6d8c9a993ca7c0b9ca802b.1688008770.git.chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: fd859b4a38153b4d9e1942ade471f4fdcd8d224b  Bluetooth: hci_conn: Always allocate unique handles
+From: "Chris Lu" <chris.lu@mediatek.com>
 
-elapsed time: 721m
+Add VID/PID 0489/e0f6 for MediaTek MT7922 USB Bluetooth chip.
 
-configs tested: 106
-configs skipped: 5
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e0f6 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r006-20230630   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r004-20230630   gcc  
-arc                  randconfig-r034-20230630   gcc  
-arc                  randconfig-r043-20230630   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r046-20230630   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r014-20230630   gcc  
-hexagon              randconfig-r024-20230629   clang
-hexagon              randconfig-r041-20230630   clang
-hexagon              randconfig-r045-20230630   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230629   gcc  
-i386         buildonly-randconfig-r005-20230629   gcc  
-i386         buildonly-randconfig-r006-20230629   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230629   gcc  
-i386                 randconfig-i002-20230629   gcc  
-i386                 randconfig-i003-20230629   gcc  
-i386                 randconfig-i004-20230629   gcc  
-i386                 randconfig-i005-20230629   gcc  
-i386                 randconfig-i006-20230629   gcc  
-i386                 randconfig-i011-20230629   clang
-i386                 randconfig-i012-20230629   clang
-i386                 randconfig-i013-20230629   clang
-i386                 randconfig-i014-20230629   clang
-i386                 randconfig-i015-20230629   clang
-i386                 randconfig-i016-20230629   clang
-i386                 randconfig-r026-20230629   clang
-i386                 randconfig-r036-20230630   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r032-20230630   gcc  
-loongarch            randconfig-r033-20230630   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 randconfig-r002-20230630   clang
-mips                 randconfig-r015-20230630   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r005-20230630   gcc  
-nios2                randconfig-r025-20230629   gcc  
-nios2                randconfig-r035-20230630   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r023-20230629   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc              randconfig-r011-20230630   clang
-powerpc              randconfig-r012-20230630   clang
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r042-20230630   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r001-20230630   gcc  
-s390                 randconfig-r044-20230630   clang
-sh                               allmodconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r013-20230630   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                   randconfig-r021-20230629   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230629   gcc  
-x86_64       buildonly-randconfig-r002-20230629   gcc  
-x86_64       buildonly-randconfig-r003-20230629   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-x001-20230629   clang
-x86_64               randconfig-x002-20230629   clang
-x86_64               randconfig-x003-20230629   clang
-x86_64               randconfig-x004-20230629   clang
-x86_64               randconfig-x005-20230629   clang
-x86_64               randconfig-x006-20230629   clang
-x86_64               randconfig-x011-20230629   gcc  
-x86_64               randconfig-x012-20230629   gcc  
-x86_64               randconfig-x013-20230629   gcc  
-x86_64               randconfig-x014-20230629   gcc  
-x86_64               randconfig-x015-20230629   gcc  
-x86_64               randconfig-x016-20230629   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa               randconfig-r031-20230630   gcc  
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+v2: resend with the latest tree
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index cb58691b63ca..1a8a4efb3ed4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -628,6 +628,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0f6), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Additional Realtek 8723AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.18.0
+
