@@ -2,156 +2,178 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC08CEB64D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 11:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E80EB64D7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 11:19:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231546AbjF3LAf (ORCPT
+        id S232815AbjF3LT1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Jun 2023 07:00:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48520 "EHLO
+        Fri, 30 Jun 2023 07:19:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbjF3LAd (ORCPT
+        with ESMTP id S231967AbjF3LT0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Jun 2023 07:00:33 -0400
-Received: from mail.kmu-office.ch (mail.kmu-office.ch [IPv6:2a02:418:6a02::a2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 790E62D56
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 03:59:45 -0700 (PDT)
-Received: from webmail.kmu-office.ch (unknown [IPv6:2a02:418:6a02::a3])
-        by mail.kmu-office.ch (Postfix) with ESMTPSA id A0A475C03E7;
-        Fri, 30 Jun 2023 12:59:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
-        t=1688122772;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Y7+SfiHSeBGQ5eR3l0vWzH9AkKmN/hNTqBEfAakH5ko=;
-        b=XfNM3s9VPsqjE7azDvfhfvrFA8ZJSclF4FRACjjNCI7hrUosGuwxcTYq+qZGYQnxoQw271
-        ue4Uscgh0Vfh+FQFfiNdJHpt4oEOMm826M6RVCJquF4h/KWDxeeg6IrzItcLPSNsxKP+Ok
-        nZ/l51g2+himHBDCvaWSYu12SEpWa0U=
-MIME-Version: 1.0
-Date:   Fri, 30 Jun 2023 12:59:32 +0200
-From:   Stefan Agner <stefan@agner.ch>
-To:     Brian Gix <brian.gix@gmail.com>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        Regressions <regressions@lists.linux.dev>,
-        =?UTF-8?Q?Jan_=C4=8Cerm=C3=A1k?= <sairon@sairon.cz>
-Subject: Re: [PATCH v4 2/4] Bluetooth: Rework le_scan_restart for hci_sync
-In-Reply-To: <0de3f0d0d5eb6d83cfc8d90cbb2b1ba1@agner.ch>
-References: <20220727135834.294184-1-brian.gix@intel.com>
- <20220727135834.294184-3-brian.gix@intel.com>
- <578e6d7afd676129decafba846a933f5@agner.ch>
- <CABBYNZJGKfwTQM8WAdUGXueTPnFyus1a65UO5mg2g4PXVuCnpA@mail.gmail.com>
- <CABBYNZLgG+zTsk-6ceqzLXXyVRnN6p-m8sFq9Ss7mveD0f9BsQ@mail.gmail.com>
- <CABUQxGxBdAFncJ6YVb7a9gnU-_YZDGFDmpHJTtm5K1tDGEGRDQ@mail.gmail.com>
- <0de3f0d0d5eb6d83cfc8d90cbb2b1ba1@agner.ch>
-Message-ID: <fcdf856db8fd8e77558b4d82b843c51e@agner.ch>
-X-Sender: stefan@agner.ch
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Fri, 30 Jun 2023 07:19:26 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 735AC10E5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 04:19:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688123965; x=1719659965;
+  h=date:from:to:cc:subject:message-id;
+  bh=PtMVT4e6Sq+vPpfIsm88C/nt33n5frQmm1OkkMTogLo=;
+  b=GipBFySXp7DqawAinoHNn2c9grZrzuQPrZNJ5MenanMTD2IFBhWCZ1WV
+   mTUcdK4dR/XiDcW1ZbrT+GNSyxbq/6akWX/gM52P0B29uDfeHGJuDDhJQ
+   Tc6krPmDiROMBzXTvrBNjod5JY7OseQCWTBwJx+vgtTofcMYbEknJdi/h
+   LQR2Vh2OvGLASs4M5tkBnDdBzXJ2/DS2SzwLGdO1ke3RoUuFFX/nApf63
+   dV7OfsV5prcTu+uCXvvIBQbKFjOQgA8gAYP7acU/eE37JQFUSzr78GuWR
+   2FfANRvwt6llS8j4Cs2Zw2GXUtUoYMxcrLnr3MgFFiSQzDjNjoaRuxh4S
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="347153302"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="347153302"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 04:19:24 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="752963411"
+X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
+   d="scan'208";a="752963411"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 30 Jun 2023 04:19:23 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qFC9q-000EuV-2V;
+        Fri, 30 Jun 2023 11:19:22 +0000
+Date:   Fri, 30 Jun 2023 19:18:23 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ fd859b4a38153b4d9e1942ade471f4fdcd8d224b
+Message-ID: <202306301920.wzpVVUjY-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: fd859b4a38153b4d9e1942ade471f4fdcd8d224b  Bluetooth: hci_conn: Always allocate unique handles
 
-Gentle ping on the issue below.
+elapsed time: 721m
 
-On 2023-06-20 16:41, Stefan Agner wrote:
-> On 2023-06-16 03:22, Brian Gix wrote:
-> 
->> On Thu, Jun 15, 2023 at 11:28 AM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>
->>> +Brian Gix
->>>
->>> On Thu, Jun 15, 2023 at 10:27 AM Luiz Augusto von Dentz
->>> <luiz.dentz@gmail.com> wrote:
->>>>
->>>> Hi Stefan,
->>>>
->>>> On Thu, Jun 15, 2023 at 5:06 AM Stefan Agner <stefan@agner.ch> wrote:
->>>>>
->>>>> Hi Brian, hi all,
->>>>>
->>>>> We experienced quite some Bluetooth issues after moving from Linux 5.15
->>>>> to 6.1 on Home Assistant OS, especially on Intel NUC type systems (which
->>>>> is a popular choice in our community, so it might just be that). When
->>>>> continuously scanning/listening for BLE packets, the packet flow
->>>>> suddenly ends. Depending on which and how many devices (possibly also
->>>>> other factors) within minutes or hours.
->>>>>
->>>>> Jan (in cc) was able to bisect the issue, and was able to pinpoint the
->>>>> problem to this change.
->>>>>
->>>>> Meanwhile I was able to confirm, that reverting this single commit on
->>>>> the latest 6.1.34 seems to resolve the issue.
->>>>>
->>>>> I've reviewed the change and surrounding code, and one thing I've
->>>>> noticed is that the if statement to set cp.filter_dup in
->>>>> hci_le_set_ext_scan_enable_sync and hci_le_set_scan_enable_sync are
->>>>> different. Not sure if that needs to be the way it is, but my outside
->>>>> gut feeling says hci_le_set_ext_scan_enable_sync should use "if (val &&
->>>>> hci_dev_test_flag(hdev, HCI_MESH))" as well.
->>>>>
->>>>> However, that did not fix the problem (but maybe it is wrong
->>>>> nonetheless?).
->>>>>
->>>>> Anyone has an idea what could be the problem here?
->>>>
->>>> Are there any logs of the problem? Does any HCI command fails or
->>>> anything so that we can track down what could be wrong?
-> 
-> No HCI command fails, there is also no issue reported in the kernel log.
-> BlueZ just stops receiving BLE packets, at least from certain devices.
-> 
->>>
->>> @Brian Gix perhaps you have a better idea what is going wrong here?
->>
->> It seems unlikely that this is Mesh related. Mesh does need for filtering to
->> be FALSE, and Mesh does not use extended scanning in any case.
->>
->> But this was part of the final rewrite to retire the hci_req mechanism in
->> favor of the hci_sync mechanism. So my best guess off the top of my head is
->> that there was an unintended race condition that worked better than the
->> synchronous single-threading mechanism?  Filtering (or not) should not
-> 
-> After review the code I concluded the same. What is a bit surprising to
-> me is that it is so well reproducible. I guess it is nicer to have a
-> reproducible one than a hard to reproduce one :)
-> 
->> prevent advertising packets from permanently wedging.  Does anyone have an
->> HCI flow log with and without the offending patch?  Ideally they should be
->> identical...  If they are not then I obviously did something wrong. As this
->> was not specifically Mesh related, I may have missed some non-mesh corner
->> cases.
-> 
-> 
-> I've taken two btmon captures, I created them using:
-> btmon -i hci0 -w /config/hcidump-hci-req-working.log
-> 
-> You can find them at:
-> https://os-builds.home-assistant.io/hcidump-hci-req-working.log
-> https://os-builds.home-assistant.io/hcidump-hci-sync-non-working.log
+configs tested: 106
+configs skipped: 5
 
-Could you gain any insights from these logs?
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
---
-Stefan
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r006-20230630   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r004-20230630   gcc  
+arc                  randconfig-r034-20230630   gcc  
+arc                  randconfig-r043-20230630   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230630   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r014-20230630   gcc  
+hexagon              randconfig-r024-20230629   clang
+hexagon              randconfig-r041-20230630   clang
+hexagon              randconfig-r045-20230630   clang
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-r004-20230629   gcc  
+i386         buildonly-randconfig-r005-20230629   gcc  
+i386         buildonly-randconfig-r006-20230629   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230629   gcc  
+i386                 randconfig-i002-20230629   gcc  
+i386                 randconfig-i003-20230629   gcc  
+i386                 randconfig-i004-20230629   gcc  
+i386                 randconfig-i005-20230629   gcc  
+i386                 randconfig-i006-20230629   gcc  
+i386                 randconfig-i011-20230629   clang
+i386                 randconfig-i012-20230629   clang
+i386                 randconfig-i013-20230629   clang
+i386                 randconfig-i014-20230629   clang
+i386                 randconfig-i015-20230629   clang
+i386                 randconfig-i016-20230629   clang
+i386                 randconfig-r026-20230629   clang
+i386                 randconfig-r036-20230630   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r032-20230630   gcc  
+loongarch            randconfig-r033-20230630   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r002-20230630   clang
+mips                 randconfig-r015-20230630   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r005-20230630   gcc  
+nios2                randconfig-r025-20230629   gcc  
+nios2                randconfig-r035-20230630   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r023-20230629   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc              randconfig-r011-20230630   clang
+powerpc              randconfig-r012-20230630   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r042-20230630   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r001-20230630   gcc  
+s390                 randconfig-r044-20230630   clang
+sh                               allmodconfig   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r013-20230630   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                   randconfig-r021-20230629   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-r001-20230629   gcc  
+x86_64       buildonly-randconfig-r002-20230629   gcc  
+x86_64       buildonly-randconfig-r003-20230629   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-x001-20230629   clang
+x86_64               randconfig-x002-20230629   clang
+x86_64               randconfig-x003-20230629   clang
+x86_64               randconfig-x004-20230629   clang
+x86_64               randconfig-x005-20230629   clang
+x86_64               randconfig-x006-20230629   clang
+x86_64               randconfig-x011-20230629   gcc  
+x86_64               randconfig-x012-20230629   gcc  
+x86_64               randconfig-x013-20230629   gcc  
+x86_64               randconfig-x014-20230629   gcc  
+x86_64               randconfig-x015-20230629   gcc  
+x86_64               randconfig-x016-20230629   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa               randconfig-r031-20230630   gcc  
 
-
-> 
-> This is while running our user space software (Home Assistant with
-> Bluetooth integration). Besides some BLE devices (e.g. Xioami Mi
-> Temperature & Humidity sensor) I have a ESP32 running which sends SPAM
-> advertisements every 100ms (this accelerates the issue). In the
-> non-working case you'll see that the system doesn't receive any SPAM
-> advertisements after around 27 seconds. The working log shows that it
-> continuously receives the same packets (capture 120s).
-> 
-> Hope this helps.
-> 
-> --
-> Stefan
-> 
-> 
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
