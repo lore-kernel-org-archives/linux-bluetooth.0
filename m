@@ -2,109 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0B3EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 22:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7F6C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jun 2023 22:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231448AbjF3WKW (ORCPT
+        id S231810AbjF3WKY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Jun 2023 18:10:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
+        Fri, 30 Jun 2023 18:10:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbjF3WKV (ORCPT
+        with ESMTP id S231764AbjF3WKX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Jun 2023 18:10:21 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6881A3C29
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:10:19 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-55b0e7efb1cso1321008a12.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:10:19 -0700 (PDT)
+        Fri, 30 Jun 2023 18:10:23 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE544420C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:10:20 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1b7f9d66812so18037055ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 15:10:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688163019; x=1690755019;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wJ7kxnAKg6Cu8Pu7Voq9nKWydDnN6Tk0Ch2JNhThoso=;
-        b=aGkPwnLnHayzjcvlPC0S/w8My+uR91LuCAWSxVO4ashAxJ1pmhX/Ebg1wreE5baRh9
-         ipTQHJK80q1LmoGv4y1dxVHl+x0VkLHjPDlqiD2UnPcXgDWjMXGVQB0KbU1+rBZEHA66
-         NtBF7MwzFRdjHIb4vortgyayAbaOd2zEvjC9Q=
+        d=chromium.org; s=google; t=1688163020; x=1690755020;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HaAN0G7fwCuNl5CzPxOPdbGCqVfxseZDjS8aC/Jsx3Y=;
+        b=e3P4cQ8hu7ahgxfyUOoSkEIYQdlx2lHHDXZTEEP32jHHZTvBd6yXMb3tZ1VNAewpvb
+         e+LkTlfonZstm3DdWuKP4h2Pjtv7qPH3Ha539VoU8zZSfg6sF9yE62h76pewy3hEpQfq
+         9IvjY5xDP+Cdjy/gkQeFL7D7so60UlGTKUe8Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688163019; x=1690755019;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wJ7kxnAKg6Cu8Pu7Voq9nKWydDnN6Tk0Ch2JNhThoso=;
-        b=mD+5z/w0yV/QA6hi4t/aN56Hh51YUBSQpQPiTYYwFD9wLRZUbp2nPPtxkCPHTVGJ6K
-         RkukqvTTG/ePUfOaEWhPLk1Jx+FMybscJdpw4IiIdqZ7ooyKkKdmEwyIdWX2/LzV1TRQ
-         pmXibqfDGrTSsGt+h8ZjMCRJMru9rhlXB5rp9XlSOb//i/fTKR1HzqOLqj9RFKanlRBr
-         SpHlGnoPG1imBlm/v1QKj1+a/+dqSCJrt27vtSqqR9nOCGSZyDQfrLJlpH3BNHP5lf63
-         VbcVs2EwdqDnaVUR6oTRL5qd47JqEg97fm/ojeaEfWYMC0ygODiVlxAKL961CWX0R+ev
-         dvCw==
-X-Gm-Message-State: AC+VfDwL72nTBYhxqlTno4ZU3plQEV3/KeojCu8HHinN50gVdxNUQitV
-        sSkswJ+2yiriiZCs2BTtsrO21g==
-X-Google-Smtp-Source: ACHHUZ5vRSB70zXnWQz1lLVzwVB4LIsI55bIhO5OlwOkZSSgqWm+WZvjUNS+IX5K9D+iEprZUhwVcQ==
-X-Received: by 2002:a05:6a20:b711:b0:12c:7528:d981 with SMTP id fg17-20020a056a20b71100b0012c7528d981mr2972407pzb.18.1688163018835;
-        Fri, 30 Jun 2023 15:10:18 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688163020; x=1690755020;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HaAN0G7fwCuNl5CzPxOPdbGCqVfxseZDjS8aC/Jsx3Y=;
+        b=VGFQTieOa2XsJw6X0S/boew78n/jcNAsnU26M6eikCpKjBlkSjTwMPB/eWuD1h/t+c
+         bAqOaTOrzZLGz+GueJZIBf7Iuf6I+NrOzv2Y8w2tPqLDTwjIugRr/vZHCKFZ7/zGcGJU
+         gHNNYs5wmD70K/5zTiHTKMq1gJWisgrPwJOC79bJ+JuMfIvfFSQ9N37EWS4YP0Nkks/a
+         vB4J7cfb19+SkOiNRuUrUhI03jQ6ssBvypJnj2bqON1paizrfPb/n7OCBMuk8nan0FHw
+         eTqU8NnJhpqd1Efa9QgvpcF13BnPxxPAmvjb8VgcSAS3yCdixDdXSotzfqcHIdDM6uJn
+         emqg==
+X-Gm-Message-State: ABy/qLaq1dTAdmpq9GiVJOoxWbgjAIE7DkZLE0aWLYZaYv6Nr9ZNk/OG
+        yrQpcL6Bo1rFyl5OUDSg+I8i8g==
+X-Google-Smtp-Source: APBJJlEgjiww29Uk47zncHTRUxXnIYTM/5vIHSdwNVSYwHJKplW02d7JYNLEZLLXGSSXLZtIXPitEA==
+X-Received: by 2002:a17:903:24e:b0:1b7:f73d:524 with SMTP id j14-20020a170903024e00b001b7f73d0524mr4015022plh.43.1688163020445;
+        Fri, 30 Jun 2023 15:10:20 -0700 (PDT)
 Received: from tictac2.mtv.corp.google.com ([2620:15c:9d:2:e9c4:8375:7234:e6c2])
-        by smtp.gmail.com with ESMTPSA id q3-20020a17090311c300b001ac897026cesm11238797plh.102.2023.06.30.15.10.17
+        by smtp.gmail.com with ESMTPSA id q3-20020a17090311c300b001ac897026cesm11238797plh.102.2023.06.30.15.10.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jun 2023 15:10:18 -0700 (PDT)
+        Fri, 30 Jun 2023 15:10:19 -0700 (PDT)
 From:   Douglas Anderson <dianders@chromium.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     Stephen Boyd <swboyd@chromium.org>,
         Douglas Anderson <dianders@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        Miao-chen Chou <mcchou@google.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: hci_sync: Avoid use-after-free in dbg for hci_remove_adv_monitor()
-Date:   Fri, 30 Jun 2023 15:09:06 -0700
-Message-ID: <20230630150906.v2.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
+Subject: [PATCH v2 2/2] Bluetooth: hci_sync: Don't double print name in add/remove adv_monitor
+Date:   Fri, 30 Jun 2023 15:09:07 -0700
+Message-ID: <20230630150906.v2.2.I8b6365c6a13afc74d7a91324dad73601a42038c9@changeid>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+In-Reply-To: <20230630150906.v2.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
+References: <20230630150906.v2.1.I3b7c8905728f3124576361ca35ed28e37f12f5d1@changeid>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-KASAN reports that there's a use-after-free in
-hci_remove_adv_monitor(). Trawling through the disassembly, you can
-see that the complaint is from the access in bt_dev_dbg() under the
-HCI_ADV_MONITOR_EXT_MSFT case. The problem case happens because
-msft_remove_monitor() can end up freeing the monitor
-structure. Specifically:
-  hci_remove_adv_monitor() ->
-  msft_remove_monitor() ->
-  msft_remove_monitor_sync() ->
-  msft_le_cancel_monitor_advertisement_cb() ->
-  hci_free_adv_monitor()
+The hci_add_adv_monitor() hci_remove_adv_monitor() functions call
+bt_dev_dbg() to print some debug statements. The bt_dev_dbg() macro
+automatically adds in the device's name. That means that we shouldn't
+include the name in the bt_dev_dbg() calls.
 
-Moving the printout to before the memory is freed.
-
-Fixes: 7cf5c2978f23 ("Bluetooth: hci_sync: Refactor remove Adv Monitor")
+Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Signed-off-by: Douglas Anderson <dianders@chromium.org>
 ---
 
 Changes in v2:
-- Move the print, don't stash handle in a local.
+- ("Don't double print name...") new for v2.
 
- net/bluetooth/hci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 48917c68358d..7e2ecf8a55d8 100644
+index 7e2ecf8a55d8..a8e54383e551 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1980,9 +1980,9 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
+@@ -1949,14 +1949,14 @@ int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
+ 
+ 	switch (hci_get_adv_monitor_offload_ext(hdev)) {
+ 	case HCI_ADV_MONITOR_EXT_NONE:
+-		bt_dev_dbg(hdev, "%s add monitor %d status %d", hdev->name,
++		bt_dev_dbg(hdev, "add monitor %d status %d",
+ 			   monitor->handle, status);
+ 		/* Message was not forwarded to controller - not an error */
+ 		break;
+ 
+ 	case HCI_ADV_MONITOR_EXT_MSFT:
+ 		status = msft_add_monitor_pattern(hdev, monitor);
+-		bt_dev_dbg(hdev, "%s add monitor %d msft status %d", hdev->name,
++		bt_dev_dbg(hdev, "add monitor %d msft status %d",
+ 			   monitor->handle, status);
+ 		break;
+ 	}
+@@ -1975,13 +1975,13 @@ static int hci_remove_adv_monitor(struct hci_dev *hdev,
+ 
+ 	switch (hci_get_adv_monitor_offload_ext(hdev)) {
+ 	case HCI_ADV_MONITOR_EXT_NONE: /* also goes here when powered off */
+-		bt_dev_dbg(hdev, "%s remove monitor %d status %d", hdev->name,
++		bt_dev_dbg(hdev, "remove monitor %d status %d",
+ 			   monitor->handle, status);
  		goto free_monitor;
  
  	case HCI_ADV_MONITOR_EXT_MSFT:
--		status = msft_remove_monitor(hdev, monitor);
- 		bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
- 			   hdev->name, monitor->handle, status);
-+		status = msft_remove_monitor(hdev, monitor);
+-		bt_dev_dbg(hdev, "%s remove monitor %d msft status %d",
+-			   hdev->name, monitor->handle, status);
++		bt_dev_dbg(hdev, "remove monitor %d msft status %d",
++			   monitor->handle, status);
+ 		status = msft_remove_monitor(hdev, monitor);
  		break;
  	}
- 
 -- 
 2.41.0.255.g8b1d071c50-goog
 
