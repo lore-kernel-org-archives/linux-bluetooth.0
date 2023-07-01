@@ -2,90 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C531EB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Jul 2023 04:13:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BABA0EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 Jul 2023 05:21:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229518AbjGAENF (ORCPT
+        id S229490AbjGAFVD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 1 Jul 2023 00:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54108 "EHLO
+        Sat, 1 Jul 2023 01:21:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbjGAEND (ORCPT
+        with ESMTP id S229456AbjGAFVC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 1 Jul 2023 00:13:03 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCFD92
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 21:13:01 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-bd6446528dcso2551901276.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 21:13:01 -0700 (PDT)
+        Sat, 1 Jul 2023 01:21:02 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99544E65
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 22:21:01 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-76547539775so204537185a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jun 2023 22:21:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=heitbaum.com; s=google; t=1688184780; x=1690776780;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rq0+wc8el5OWiq5aP4AyS7h40iIrwF8fTq8KKhQSqSE=;
-        b=UFB/L3Nzx6FGdGPK9+fvSp4WeBy3T41aLcp9NA+j1L21e9t4zXHNelgJ6OSrDz1Fi2
-         jb3yYJrKGgkQ/0rXnBwO9zdopLxwjrtFBj+KfKAFL5r900r4Y2054f9OCC+YvyM2ZFza
-         UY1koomMUf8b9JKmUw/uinJijk5eOKSjRKHZw=
+        d=gmail.com; s=20221208; t=1688188860; x=1690780860;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kuPiPeTzXWoH+a1sMtr2Bw2xJgATFRYJwaqwlaIOufQ=;
+        b=hMxv250H48FOCOC8SXKw9zTpQbksStuTRiXkmssF2yxijSS60/2HwvQaWpgXA6TeDQ
+         Yxgtv1WbADoAd3IvuilzajBF8i3N+yNiRBTX6Q0w2LMaU8FwkhC57J+YTRM9Tu2cWeH6
+         x87IhS8soWAs6d/11hhJAVfPs1rOCszQeKpVfru7f4QwYG5+TD1B8sZpoBNoHbFmfpi0
+         P7TRk1HB2cEcJ9gFkA1MlPhO/JLkb4wRq6z2gkVZ0z7FFWKGB2tMjcqDlc3zs4foB5Sd
+         Hxc1I1zGJqPhVPwy0waW62skQYV185YHbMVqf7GyRey9NHT6GQPlSpjN8nfrMUrU9Ud+
+         WLeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688184780; x=1690776780;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1688188860; x=1690780860;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rq0+wc8el5OWiq5aP4AyS7h40iIrwF8fTq8KKhQSqSE=;
-        b=FJDVqxEChlKOEXVMsMzR3ERCnTkK/GMLBTxvCNg8KCwq52jKFLwNSIsOCRTc979R4Z
-         nNvePsEHjabJm8gcA+7O9vGM65ZMfoRR3pkAmeueJlkBNEOGn9XwUf3TbUISsa+UcdZl
-         X5j50kDkulgk94OjSnr3uzKlre+z5iZvlsmzLnnDV1FRJejf/H7xVRtl/2lzsqnoS6nw
-         Vft9By1w/ueUzfCQJhXgl28XWTLbeSJaqBEHUnqOySkgc2+pVek9mDC6P/Mgl7t0cg85
-         kKp9t3yiezi3vsbWQT0y2sQSjcN+FpT1W6XDN1BGzHvkuQRAYoD1Z1qzjX6RdGWnNelo
-         NvUA==
-X-Gm-Message-State: ABy/qLYsxjQlAVKaQHM9PSG2i1Qz09qe5xByHK6/QBu2zjANAawJzCvM
-        AMYenlBxmuLGgZa4sWdI2UkymjQ1E+0Iz0q/kUgjwshx
-X-Google-Smtp-Source: APBJJlE/zVZCMWi+UzBIjUGC3cSnTJNAOjjd5vudqwT89E3gOu1xynCaPK0n7suR69Cr2LQbJHiLeA==
-X-Received: by 2002:a25:f808:0:b0:bc7:afaf:539b with SMTP id u8-20020a25f808000000b00bc7afaf539bmr4883826ybd.43.1688184780226;
-        Fri, 30 Jun 2023 21:13:00 -0700 (PDT)
-Received: from 6a33e4bd7b5d.heitbaum.com ([122.199.31.3])
-        by smtp.googlemail.com with ESMTPSA id r4-20020a632b04000000b00553ebb05d28sm11285290pgr.41.2023.06.30.21.12.58
+        bh=kuPiPeTzXWoH+a1sMtr2Bw2xJgATFRYJwaqwlaIOufQ=;
+        b=Mf9NBiZ3djF6Q3Ggp1OsaNHPcuCaGgYwyyevfRWDffisp0ZU6qAZ2D3bhBKRqotGqE
+         BDiJIhypGUrrIch4t5xYiAe5E0pvv1wJTr1DLPusLRPJNN99IxR46RG3E78N9AOG9VpJ
+         SMCpXphOSHyBUCqnWOZ3HNdNA6mmIp8DA7mRzDVdMBXVXthkodUBvQSgkTOdd/S8dXMX
+         FETCoFnqdw68GQP/Lo5uhe6xnQkokGvqAHblLmvfffthI2xXFlyYbtkieAbDTTO2XtCh
+         1n42OkeBJkj5K6pmaczfcfljItynO0INKjR2wUBr6aY2T0IC7vCSVo3IgMls2MxjioLc
+         ayfQ==
+X-Gm-Message-State: AC+VfDxI0WoB+LX/S5JqBuOj0V83FiDAEqhrQzPCzWI4alHxEsRhVcyb
+        RCBl7UMjS/QV/hQ7U1+PSo/N0E+oSrs=
+X-Google-Smtp-Source: ACHHUZ55iL3sDbiPE/f8DId5pHOFzWvtlYIKTO0IL9DunLDUqfPbtUd7t9bG1ZnVOBnaVe2w1MGzxw==
+X-Received: by 2002:a05:620a:2447:b0:765:a723:655c with SMTP id h7-20020a05620a244700b00765a723655cmr5286216qkn.5.1688188860515;
+        Fri, 30 Jun 2023 22:21:00 -0700 (PDT)
+Received: from [172.17.0.2] ([40.75.74.47])
+        by smtp.gmail.com with ESMTPSA id m4-20020ae9f204000000b007628f6e0833sm7718489qkg.100.2023.06.30.22.21.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jun 2023 21:12:59 -0700 (PDT)
-From:   Rudi Heitbaum <rudi@heitbaum.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, Rudi Heitbaum <rudi@heitbaum.com>
-Subject: [PATCH] configure: Fix check ell path for cross compiling
-Date:   Sat,  1 Jul 2023 04:12:52 +0000
-Message-Id: <20230701041252.139338-1-rudi@heitbaum.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 30 Jun 2023 22:21:00 -0700 (PDT)
+Message-ID: <649fb7bc.e90a0220.277e4.2d75@mx.google.com>
+Date:   Fri, 30 Jun 2023 22:21:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4807811211639795892=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, rudi@heitbaum.com
+Subject: RE: configure: Fix check ell path for cross compiling
+In-Reply-To: <20230701041252.139338-1-rudi@heitbaum.com>
+References: <20230701041252.139338-1-rudi@heitbaum.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use of AC_CHECK_FILE prevents cross compilation.
-Instead use test to support cross compiling.
+--===============4807811211639795892==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=761714
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.47 seconds
+GitLint                       PASS      0.35 seconds
+BuildEll                      PASS      27.33 seconds
+BluezMake                     PASS      981.12 seconds
+MakeCheck                     PASS      12.33 seconds
+MakeDistcheck                 PASS      156.72 seconds
+CheckValgrind                 PASS      257.33 seconds
+CheckSmatch                   PASS      341.43 seconds
+bluezmakeextell               PASS      103.52 seconds
+IncrementalBuild              PASS      851.66 seconds
+ScanBuild                     PASS      1060.78 seconds
+
+
+
 ---
- configure.ac | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/configure.ac b/configure.ac
-index eff297960..bc7edfcd3 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -298,9 +298,10 @@ if (test "${enable_external_ell}" = "yes"); then
- 	AC_SUBST(ELL_LIBS)
- fi
- if (test "${enable_external_ell}" != "yes"); then
--	AC_CHECK_FILE(${srcdir}/ell/ell.h, dummy=yes,
--			AC_CHECK_FILE(${srcdir}/../ell/ell/ell.h, dummy=yes,
--				AC_MSG_ERROR(ELL source is required or use --enable-external-ell)))
-+	if (test ! -f ${srcdir}/ell/ell.h) &&
-+			(test ! -f ${srcdir}/../ell/ell/ell.h); then
-+				AC_MSG_ERROR(ELL source is required or use --enable-external-ell)
-+	fi
- fi
- AM_CONDITIONAL(EXTERNAL_ELL, test "${enable_external_ell}" = "yes" ||
- 				(test "${enable_btpclient}" != "yes" &&
--- 
-2.34.1
 
+--===============4807811211639795892==--
