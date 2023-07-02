@@ -2,169 +2,95 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF54AEB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Jul 2023 18:43:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C72BEB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Jul 2023 19:34:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229761AbjGBSnL (ORCPT
+        id S229513AbjGBTeZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Jul 2023 14:43:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56802 "EHLO
+        Sun, 2 Jul 2023 15:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjGBSnJ (ORCPT
+        with ESMTP id S229992AbjGBTeZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Jul 2023 14:43:09 -0400
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71203C1
-        for <linux-bluetooth@vger.kernel.org>; Sun,  2 Jul 2023 11:43:08 -0700 (PDT)
+        Sun, 2 Jul 2023 15:34:25 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9DE4E6A
+        for <linux-bluetooth@vger.kernel.org>; Sun,  2 Jul 2023 12:34:23 -0700 (PDT)
 Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 4QvHxQ2N0GzyV2;
-        Sun,  2 Jul 2023 21:43:06 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1688323386;
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4QvK4Y5ZlDz49Q7F;
+        Sun,  2 Jul 2023 22:34:21 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1688326461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=AlTNCG/fnP1tZEPZpzcmGFC8ncxPhXa9qgQ2PyluIaQ=;
-        b=qiHbVWQ3R5fGKcERTPeITzX1KbES21MGXG5D2nHKif9EeSVHxpSDC6Agxb2pmhEa1cfvb2
-        aih9mH/3fdGLJVVsBpXVa4vn6amI3XW6Fkoq3kVW8J0a8S7ggamtp039DBuDWF+juX3uBN
-        06bfczvug1gBeJSpjTzWn/LjhK1xZQs=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2ry3Gs3ypdQxJSRFrm44H6LVyp9adVRUWAhuPQORacI=;
+        b=S7l+lekHTFbvPsAsnA4C/xD3gYQtkg5yc3LwXRSMRBtdf1OeweqOz9ahD+sgvfT0BQMNXg
+        vbhdNTD/HS5G6U2a7FmTBt2kZkpHXs2Hyv42Opp585chFR4943kzRwiajuQuptoqMXwNkV
+        UmCGNJ8p5kjaVs0U+YpRHG9kA1h+Np/5nSAQ0EKu++hguPNFRlHvQcLah8qd0wgBaufa3c
+        ol8TAHhW0M1A+Q7qNrXVydH7Qb5T+V6ePxT4g1hfva4onn0FU/fHmdEJ7a6unJMpSZ5cDk
+        NZtSlSBK+FEcsCbCDQ8UZqmU9ZcAVbPQw2A2iVO8pf3u+/5+O+SdSqMRruNNgw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1688323386;
+        s=lahtoruutu; t=1688326461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=AlTNCG/fnP1tZEPZpzcmGFC8ncxPhXa9qgQ2PyluIaQ=;
-        b=pe3Bg3r27+yosFFkcFSB3WuZAwIiik1DcPaJn7nbqbfMjmVAHGyaJPilpJSjAw8r+fo+7S
-        d/uwabfxnC8CnLbQlvYisaLGupr8fLisZoPOm6qqNnk/voyrmpbjqQExdB6T1+AmArUi63
-        s5/BOI/6iNq/hNE3j4wdqLX9sKUVcks=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2ry3Gs3ypdQxJSRFrm44H6LVyp9adVRUWAhuPQORacI=;
+        b=goI5+1uljPvZAmRlZVjWKkq6VtgqDZoGUjlmHldchL2oKigr1AL+srDvluocHxVnV0fn7l
+        /aT5/0qiyGUdeKVvgzaM6Q9y9nheqeXczEz/pYsQgbmA+OVuwgFnpirbGPZVQpencQ7vdZ
+        Bhv8D+c56eMvJBWwYUHnP8xo85l+UcUQzQlCjn6icf2XFUkIDuqVi09gDm21AFKu1r2UQw
+        kD97Y9I6iY5xJJ+z7SNlbQrZhAkKzf74pN0Tf0U0yjJuT/BuVfV5+3cwZN9vV0PBwnUsxI
+        InzdBb2XXPRcmRF6FURd+aPkHmsEAtZ36pbT/icVG2uLkADSaxw5pwev2siYgg==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1688323386; a=rsa-sha256; cv=none;
-        b=BcAF5nJsn99SX1H4/cY91LAjrDZcVa+fW74e8xOgvyUqug2d0IR69MSDxy/9e8vndsehOP
-        L2pt5OvYRouQKanzRwNZuK9a0qKnIRkHh4ui5dRunElwaSPXYw+GbCdwCbFiF1ztE6exNX
-        l/pn2LjY377a+BIU4/zOJWMszXNZ4pc=
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1688326461; a=rsa-sha256;
+        cv=none;
+        b=jsUhJ+QE+NOqkwIXZW9eXjUbRpVmCE35al1g5Q+LifncO1AbLrRwxP64Z/zivslpcCUDny
+        bOg+zx+dwyrJtwwz3wy5ARRwMAeTPsO+iSInDy2FsLLYq/o2gx4u5rC/3A4FOF1nw5WQ9t
+        9EzN+Cc8bj2IKeIVa0AMBQirKNwaP57/Iq31ckaI042E/YdRd7Y7UWb8hiq8Kj+Xi2iCCU
+        YExt0j+EV5TMeo7XdCc16OSzHAksA+Oyw6G1+oVRKJT7i2UFIo5R3gZ/goyI9L/Sr2l0Z0
+        LFU4FtcHLt8cwcLwXK4u6AWkl+BhjoxNCdz7CmAi9KZvMbY3QlXxl+MAg9J3xQ==
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 1/2] shared/bap: detach io for source ASEs only after Stop Ready
-Date:   Sun,  2 Jul 2023 21:43:04 +0300
-Message-ID: <09443d89e7486d890b346d47ebc5c6a8f5eb30af.1688323254.git.pav@iki.fi>
+Subject: [PATCH BlueZ 2/2] shared/bap: use only nonzero req->id
+Date:   Sun,  2 Jul 2023 22:34:19 +0300
+Message-ID: <7e5753e471757d50569802ddb19546768dea07f5.1688326228.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
+References: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Client may terminate a CIS when sink is in QOS and source in
-Disabling states (BAP v1.0.1 Sec 5.6.5).  It may also terminate it when
-Receiver Stop Ready has completed successfully (BAP v1.0.1 Sec 5.6.5.1).
-
-It appears Samsung Galaxy Buds2 Pro (R510XXUOAWA5) ignores the Receiver
-Stop Ready command if CIS is already disconnected, and then gets stuck
-in disabling state. It works if CIS is disconnected after Receiver Stop
-Ready.
-
-For better compatibility as client for this device, and since it
-shouldn't matter for us in which order we do it, disconnect CIS after
-completion of Receiver Stop Ready, instead of immediately in Disabling.
-
-We disconnect also if Receiver Stop Ready fails, given that
-disconnecting in Disabled state should be OK.
-
-Link: https://github.com/bluez/bluez/issues/516
+In bap_req_new, use same pattern as elsewhere to not use zero as
+a valid id.
 ---
-
-Notes:
-    v2: Disconnect when Receiver Stop has completed.
-        Keep BAP server behavior unchanged.
-    
-    I don't have access to PTS, so if it's needed to verify what it does,
-    someone else must do it.
-    
-    Assuming this device was PTS tested, I'd guess its test case does not
-    disconnect CIS immediately in Disabling.
-
- src/shared/bap.c | 33 +++++++++++++++------------------
- 1 file changed, 15 insertions(+), 18 deletions(-)
+ src/shared/bap.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/shared/bap.c b/src/shared/bap.c
-index cf5d810bb..13c76afe6 100644
+index 13c76afe6..72ce67c08 100644
 --- a/src/shared/bap.c
 +++ b/src/shared/bap.c
-@@ -1168,18 +1168,6 @@ static bool match_stream_io(const void *data, const void *user_data)
- 	return stream->io == io;
- }
+@@ -4303,7 +4303,7 @@ static struct bt_bap_req *bap_req_new(struct bt_bap_stream *stream,
+ 	static unsigned int id;
  
--static void stream_stop_disabling(void *data, void *user_data)
--{
--	struct bt_bap_stream *stream = data;
--
--	if (stream->io || stream->ep->state != BT_ASCS_ASE_STATE_DISABLING)
--		return;
--
--	DBG(stream->bap, "stream %p", stream);
--
--	bt_bap_stream_stop(stream, NULL, NULL);
--}
--
- static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- {
- 	struct bt_bap_stream *link;
-@@ -1198,9 +1186,6 @@ static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- 		/* Detach link if in QoS state */
- 		if (link->ep->state == BT_ASCS_ASE_STATE_QOS)
- 			bap_stream_io_detach(link);
--	} else {
--		/* Links without IO on disabling state shall be stopped. */
--		queue_foreach(stream->links, stream_stop_disabling, NULL);
- 	}
- 
- 	stream_io_unref(io);
-@@ -1244,6 +1229,15 @@ static struct bt_bap *bt_bap_ref_safe(struct bt_bap *bap)
- 	return bt_bap_ref(bap);
- }
- 
-+static void stream_stop_complete(struct bt_bap_stream *stream, uint8_t code,
-+					uint8_t reason,	void *user_data)
-+{
-+	DBG(stream->bap, "stream %p stop 0x%02x 0x%02x", stream, code, reason);
-+
-+	if (stream->ep->state == BT_ASCS_ASE_STATE_DISABLING)
-+		bap_stream_io_detach(stream);
-+}
-+
- static void bap_stream_state_changed(struct bt_bap_stream *stream)
- {
- 	struct bt_bap *bap = stream->bap;
-@@ -1271,7 +1265,9 @@ static void bap_stream_state_changed(struct bt_bap_stream *stream)
- 		bap_stream_update_io_links(stream);
- 		break;
- 	case BT_ASCS_ASE_STATE_DISABLING:
--		bap_stream_io_detach(stream);
-+		/* As client, we detach after Receiver Stop Ready */
-+		if (!stream->client)
-+			bap_stream_io_detach(stream);
- 		break;
- 	case BT_ASCS_ASE_STATE_QOS:
- 		if (stream->io && !stream->io->connecting)
-@@ -1305,8 +1301,9 @@ static void bap_stream_state_changed(struct bt_bap_stream *stream)
- 			bt_bap_stream_start(stream, NULL, NULL);
- 		break;
- 	case BT_ASCS_ASE_STATE_DISABLING:
--		if (!bt_bap_stream_get_io(stream))
--			bt_bap_stream_stop(stream, NULL, NULL);
-+		/* Send Stop Ready, and detach IO after remote replies */
-+		if (stream->client)
-+			bt_bap_stream_stop(stream, stream_stop_complete, NULL);
- 		break;
- 	}
- 
+ 	req = new0(struct bt_bap_req, 1);
+-	req->id = ++id;
++	req->id = ++id ? id : ++id;
+ 	req->stream = stream;
+ 	req->op = op;
+ 	req->iov = util_iov_dup(iov, len);
 -- 
 2.41.0
 
