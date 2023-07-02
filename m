@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6926EEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Jul 2023 21:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79363EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Jul 2023 21:33:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbjGBVcT (ORCPT
+        id S229800AbjGBVc7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Jul 2023 17:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
+        Sun, 2 Jul 2023 17:32:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbjGBVcS (ORCPT
+        with ESMTP id S229504AbjGBVc7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Jul 2023 17:32:18 -0400
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B68F199
-        for <linux-bluetooth@vger.kernel.org>; Sun,  2 Jul 2023 14:32:17 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-635857af3beso19050976d6.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Jul 2023 14:32:17 -0700 (PDT)
+        Sun, 2 Jul 2023 17:32:59 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D5F199
+        for <linux-bluetooth@vger.kernel.org>; Sun,  2 Jul 2023 14:32:56 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id d9443c01a7336-1b7fb02edfaso31354315ad.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Jul 2023 14:32:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688333536; x=1690925536;
+        d=gmail.com; s=20221208; t=1688333576; x=1690925576;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5cYQLvl1PrzinEQl6MBhoXQgVfiUkslMc48Utoz76X4=;
-        b=Kk/WOrPwf6SQYikobQrGrHCpn2ogaesHsnP9AeHi2Ivpt+agCaa+8nh9LhIZ3k0ici
-         pleLBHWR/VrTRJriL2V9cTCb2xY4DxAUq0GRpkkUf5B7kNxsFeU31BxqqqD7z865L3wN
-         VCde110rewxECVbPupPeHIj175TUa05GXCdlT0XDgW3tbIugy+mBEMw2DlUML+YwwnDa
-         pGa8+lEdvUx0BGu4XYg0hldZ16E4X8uKBY1yrzmVxWXGlhHnQ9IflLoI0LBVRFJO3PS0
-         qZtaW6RRdaxAWa7HdUuQflURMKasz5Mfbfzyu4l6OjxdlGkC7tZ/sOoDJ/WYt+UfxUK2
-         n5hw==
+        bh=pgGPeIcK1cWF/pgu7QN3nWuBoItsC72u0UdPoHWq4lk=;
+        b=fXHWIyxVt4VOwNKutbDW3RlsJNrWxSsUkdM8mD9cYJcKpeDnHo6v8M4gUGYAXbwMn8
+         HdhloU9lKmwLsgDcau35SBvZQDU0LaJ4DwPHSm+UBWn4lbWpNH/Eh7CtRWF3MfzBRjJB
+         j8BuXtAzRhFwW6sKR25dya3n5RAP8HeqxaGPp7a7IqNRxG2I9mxjbTta4kbcMFzDKY5L
+         JGLgaGXRQXkHLeVkLL+IqfSHYZgD8JlQvR0wM7QFjUzPpgLYSl78GccgffffUPK+5nHc
+         yulJhDwHzbuv6Flp1ByOeWJmK20Qe2iVUzHKoFRk343qDhc8Ma+5nJXmsMdUKgaoCTNn
+         kZ2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688333536; x=1690925536;
+        d=1e100.net; s=20221208; t=1688333576; x=1690925576;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5cYQLvl1PrzinEQl6MBhoXQgVfiUkslMc48Utoz76X4=;
-        b=NuoJCq7imFn27lmnexIGYxow2vJo+ysEHByrJ8pKZ+rggIwJMPAi6FfLGAMHnDNR03
-         MbA+i+JBQ5hFrgXmORCYY4Qcc+nBaXLk+dGPYbngpDRC57jRd4wF5rZUhqGa9ro6UQLM
-         SYQkNyfsbuRbFP75xYqnA2uZkv7vANPF157RFNiXNFwLbuzYUcSPZ3EcykJv29MxvdBD
-         5kNdgX9y9b/Kv+gCM+XLHM+4v864RF0lcn1u0VzNbXoV7SdONrSG30Rlxk2X2eGNpB+U
-         wc1MNyef5Rg624OXWZRvow0h1pFgsAYUnfjtalnemV8o0s+kk6hmV1XqmX5zd3Ih5TRv
-         bGfQ==
-X-Gm-Message-State: ABy/qLbssuYunT/Y6yeLWgvMi98hdy64s/g1ADjHgna5QMHdoEzcsEt4
-        G8vEFwFRfQ0kwvO+6gI5N+J4v9RQV6E=
-X-Google-Smtp-Source: APBJJlHdG2AksmmQuu1J+Cn7ZLv4z524louYessTRlhmWN9JVU7ksYFcERgcFrP9W+rpCfbUuKB9Eg==
-X-Received: by 2002:a05:6214:ccc:b0:635:e303:ed63 with SMTP id 12-20020a0562140ccc00b00635e303ed63mr10878982qvx.8.1688333536276;
-        Sun, 02 Jul 2023 14:32:16 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.98.52])
-        by smtp.gmail.com with ESMTPSA id ee12-20020a0562140a4c00b0062ffbf23c22sm10642766qvb.131.2023.07.02.14.32.16
+        bh=pgGPeIcK1cWF/pgu7QN3nWuBoItsC72u0UdPoHWq4lk=;
+        b=i8I6pDU2BO8OHXZN+Rtq/6CH88iRjM5MzOP/xFSlHdTha1ka1i8BoDA9Z+Sc6JO4kt
+         dQsDkSmaa9V9gvdijVCirzmzMLYEpS1V/ayASUNCw7sE0Px9bz1T4nTfozt0lJXAWbvf
+         dDmebwMKbuFyTc/9vNptZEj8JZQPk1KEylNMHK9CmQO/15CnARz1nOXbnJDHM72DecFe
+         1oG/bagor7ZfpcHX8ZNmK7sHUt4lblTe8PWPfM1709oycPrrj6Gi6oeogcrPht/ysmIF
+         9yYgT7/azLPNCQD7dmv65wRMn6potEXRNkHc1CswNHHFOb5eiPrUZhBoEOXKpnsSyW0c
+         ypdA==
+X-Gm-Message-State: ABy/qLaycREXBX9N3VY1nqrnAYEeRp948fU1IKmY0u4ZLI/Fo7R6ijS0
+        UaeVpoffrtFaHiOjgmz6N4+tLQQWv9Y=
+X-Google-Smtp-Source: APBJJlHT3B8z6SdC86pj3OQzo+INUg2NYh/YqEffEGtg+9U5u5afo0TZXbg+TCiXcmldDY+DYg4KAA==
+X-Received: by 2002:a17:902:8207:b0:1b8:4f93:b210 with SMTP id x7-20020a170902820700b001b84f93b210mr7952639pln.45.1688333575887;
+        Sun, 02 Jul 2023 14:32:55 -0700 (PDT)
+Received: from [172.17.0.2] ([13.88.61.209])
+        by smtp.gmail.com with ESMTPSA id u10-20020a17090282ca00b001b8062c1db3sm11420602plz.82.2023.07.02.14.32.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jul 2023 14:32:16 -0700 (PDT)
-Message-ID: <64a1ece0.050a0220.1fa26.86d4@mx.google.com>
-Date:   Sun, 02 Jul 2023 14:32:16 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5014011711320194555=="
+        Sun, 02 Jul 2023 14:32:55 -0700 (PDT)
+Message-ID: <64a1ed07.170a0220.1b90e.6996@mx.google.com>
+Date:   Sun, 02 Jul 2023 14:32:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7300948416451177985=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, valentin.david@gmail.com
-Subject: RE: Bluetooth: btusb: Add device 0489:e0f5 as MT7922 device
-In-Reply-To: <20230702210138.226929-1-valentin.david@gmail.com>
-References: <20230702210138.226929-1-valentin.david@gmail.com>
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/2] transport: handle BAP Enabling state correctly when resuming
+In-Reply-To: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
+References: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5014011711320194555==
+--===============7300948416451177985==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,53 +75,38 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=761869
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=761861
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      0.95 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      33.53 seconds
-CheckAllWarning               PASS      36.46 seconds
-CheckSparse                   PASS      41.12 seconds
-CheckSmatch                   PASS      113.59 seconds
-BuildKernel32                 PASS      32.27 seconds
-TestRunnerSetup               PASS      454.28 seconds
-TestRunner_l2cap-tester       PASS      13.00 seconds
-TestRunner_iso-tester         PASS      23.67 seconds
-TestRunner_bnep-tester        PASS      5.65 seconds
-TestRunner_mgmt-tester        PASS      132.22 seconds
-TestRunner_rfcomm-tester      PASS      8.98 seconds
-TestRunner_sco-tester         PASS      10.55 seconds
-TestRunner_ioctl-tester       PASS      9.85 seconds
-TestRunner_mesh-tester        PASS      7.09 seconds
-TestRunner_smp-tester         PASS      8.13 seconds
-TestRunner_userchan-tester    PASS      5.85 seconds
-IncrementalBuild              PASS      30.19 seconds
+CheckPatch                    PASS      0.74 seconds
+GitLint                       FAIL      0.79 seconds
+BuildEll                      PASS      30.22 seconds
+BluezMake                     PASS      927.56 seconds
+MakeCheck                     PASS      12.58 seconds
+MakeDistcheck                 PASS      174.49 seconds
+CheckValgrind                 PASS      288.93 seconds
+CheckSmatch                   PASS      382.64 seconds
+bluezmakeextell               PASS      116.35 seconds
+IncrementalBuild              PASS      1538.64 seconds
+ScanBuild                     PASS      1187.46 seconds
 
 Details
 ##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
+Test: GitLint - FAIL
+Desc: Run gitlint
 Output:
-Bluetooth: btusb: Add device 0489:e0f5 as MT7922 device
-ERROR: Missing Signed-off-by: line(s)
+[BlueZ,1/2] transport: handle BAP Enabling state correctly when resuming
 
-total: 1 errors, 0 warnings, 9 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13299507.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+24: B1 Line exceeds max length (86>80): "profiles/audio/transport.c:bap_state_changed() stream 0x25c2880: qos(2) -> enabling(3)"
+26: B1 Line exceeds max length (86>80): "profiles/audio/transport.c:bap_state_changed() stream 0x25cc590: qos(2) -> enabling(3)"
+28: B1 Line exceeds max length (92>80): "src/shared/bap.c:bap_stream_state_changed() stream 0x25cc590 dir 0x01: enabling -> streaming"
+30: B1 Line exceeds max length (92>80): "profiles/audio/transport.c:bap_state_changed() stream 0x25cc590: enabling(3) -> streaming(4)"
+32: B1 Line exceeds max length (132>80): "profiles/audio/transport.c:transport_update_playing() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd1 State=TRANSPORT_STATE_IDLE Playing=1"
+33: B1 Line exceeds max length (153>80): "profiles/audio/transport.c:transport_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd1: TRANSPORT_STATE_IDLE -> TRANSPORT_STATE_PENDING"
+34: B1 Line exceeds max length (153>80): "profiles/audio/transport.c:transport_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd0: TRANSPORT_STATE_IDLE -> TRANSPORT_STATE_PENDING"
 
 
 ---
@@ -129,4 +114,4 @@ Regards,
 Linux Bluetooth
 
 
---===============5014011711320194555==--
+--===============7300948416451177985==--
