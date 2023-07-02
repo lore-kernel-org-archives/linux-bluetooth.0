@@ -2,95 +2,251 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C72BEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Jul 2023 19:34:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 185B8EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Jul 2023 19:34:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbjGBTeZ (ORCPT
+        id S230027AbjGBTe1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Jul 2023 15:34:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49964 "EHLO
+        Sun, 2 Jul 2023 15:34:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229992AbjGBTeZ (ORCPT
+        with ESMTP id S229992AbjGBTe0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Jul 2023 15:34:25 -0400
+        Sun, 2 Jul 2023 15:34:26 -0400
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9DE4E6A
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B956CE60
         for <linux-bluetooth@vger.kernel.org>; Sun,  2 Jul 2023 12:34:23 -0700 (PDT)
 Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4QvK4Y5ZlDz49Q7F;
-        Sun,  2 Jul 2023 22:34:21 +0300 (EEST)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4QvK4X6fdbz49Q2n;
+        Sun,  2 Jul 2023 22:34:20 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
         t=1688326461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ry3Gs3ypdQxJSRFrm44H6LVyp9adVRUWAhuPQORacI=;
-        b=S7l+lekHTFbvPsAsnA4C/xD3gYQtkg5yc3LwXRSMRBtdf1OeweqOz9ahD+sgvfT0BQMNXg
-        vbhdNTD/HS5G6U2a7FmTBt2kZkpHXs2Hyv42Opp585chFR4943kzRwiajuQuptoqMXwNkV
-        UmCGNJ8p5kjaVs0U+YpRHG9kA1h+Np/5nSAQ0EKu++hguPNFRlHvQcLah8qd0wgBaufa3c
-        ol8TAHhW0M1A+Q7qNrXVydH7Qb5T+V6ePxT4g1hfva4onn0FU/fHmdEJ7a6unJMpSZ5cDk
-        NZtSlSBK+FEcsCbCDQ8UZqmU9ZcAVbPQw2A2iVO8pf3u+/5+O+SdSqMRruNNgw==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1N1lZrXUJXWHRvziwccYAWbBah6BneplGet8LPsr/qs=;
+        b=sBM1X75R/j5xR+BBXtbMd1Ow0tZtFSK5QjzbGlGogDvKNCCo0iEMcL/wizyf3BXBSkPvlg
+        rf/HbpnA+0iE/CMqdiwewyBxuvA87xWsCQptvATwhhACri97j4dM1hI0ogjEmHRvw35nq/
+        KjJvuBCGpC+oX+oIuecqEkNrfjiyAcoHxWoevjnB3KBCZ+3mGahvRIs9QErdHeJjJ5cJ9u
+        jDJLRVTos1ZytutmE9/8isubOcwILuCKnYs5BV3Ph5l9n+4/HZyGLjaU8Y0hHrUd2a0Zyq
+        ry0+lHUEy6wmfFpedH/WnUn/ODA37esPt2L7pSvflRip+/+v4v2+Oz5MniK9cA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
         s=lahtoruutu; t=1688326461;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2ry3Gs3ypdQxJSRFrm44H6LVyp9adVRUWAhuPQORacI=;
-        b=goI5+1uljPvZAmRlZVjWKkq6VtgqDZoGUjlmHldchL2oKigr1AL+srDvluocHxVnV0fn7l
-        /aT5/0qiyGUdeKVvgzaM6Q9y9nheqeXczEz/pYsQgbmA+OVuwgFnpirbGPZVQpencQ7vdZ
-        Bhv8D+c56eMvJBWwYUHnP8xo85l+UcUQzQlCjn6icf2XFUkIDuqVi09gDm21AFKu1r2UQw
-        kD97Y9I6iY5xJJ+z7SNlbQrZhAkKzf74pN0Tf0U0yjJuT/BuVfV5+3cwZN9vV0PBwnUsxI
-        InzdBb2XXPRcmRF6FURd+aPkHmsEAtZ36pbT/icVG2uLkADSaxw5pwev2siYgg==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=1N1lZrXUJXWHRvziwccYAWbBah6BneplGet8LPsr/qs=;
+        b=Qi1jv++HlqcvKRIKcg9YEDGwA0DyyVSVhY+CDPGLlJMfK0vxkXmNd0gDvctRBp1BwPl8bl
+        Nn4kWkO0n1fs04VHG48vloM9va3cxIJek/LRYqsPdAYQCCe4+c5g8PkdaxMdqJaKiKd0eN
+        NiyrrSkckl01jxVX8k++yr5yoyPigZezAmvX+1ktFMolt2Is2z5lqo+LVWyd4oMGRIPGfB
+        O6vdnMS6RB2BcEp9gyBpChYrNVX3CDOKgcCsoPPAwSrfhcqtsfo6yDTVRrEZ6op3rnMpKo
+        lbJpNGdz5Pa3Nl/woPazZfjhI+cHO7osEDu/b5RamtZxYIwrnW99rw4zVxTNuQ==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1688326461; a=rsa-sha256;
         cv=none;
-        b=jsUhJ+QE+NOqkwIXZW9eXjUbRpVmCE35al1g5Q+LifncO1AbLrRwxP64Z/zivslpcCUDny
-        bOg+zx+dwyrJtwwz3wy5ARRwMAeTPsO+iSInDy2FsLLYq/o2gx4u5rC/3A4FOF1nw5WQ9t
-        9EzN+Cc8bj2IKeIVa0AMBQirKNwaP57/Iq31ckaI042E/YdRd7Y7UWb8hiq8Kj+Xi2iCCU
-        YExt0j+EV5TMeo7XdCc16OSzHAksA+Oyw6G1+oVRKJT7i2UFIo5R3gZ/goyI9L/Sr2l0Z0
-        LFU4FtcHLt8cwcLwXK4u6AWkl+BhjoxNCdz7CmAi9KZvMbY3QlXxl+MAg9J3xQ==
+        b=NWOb0lmaBTQXgPBoS5cNLjD1tBfd8Fu1DBVU1vibXklGJNxqoop7Piv6XoxV2BBKbLGpo7
+        GznZH2nfNjVlY/ottHeMQkifhNwkZZaCLBQNYz58aVZkYj5RvqoxURC9sGgyFkrI2ovt3l
+        UhZ3B/2PWU4ccOGGDmVNo5dC+xFjdNDClnD1oprzbXPs/NyMfDfjeNp3N8uyKfeJWpvafb
+        nu6vOtCI+IkhQxbzmhy1BfkSkdEHjkvEJ2iVUSSjeJKujHsEJ1hHZRtpEMIgJn9JO8FM9C
+        iiwse7fs539MP8rwGC3DW2sbOYPQl/au08himxTfdXR5Xhg1WHDDBHtmviZOXg==
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 2/2] shared/bap: use only nonzero req->id
-Date:   Sun,  2 Jul 2023 22:34:19 +0300
-Message-ID: <7e5753e471757d50569802ddb19546768dea07f5.1688326228.git.pav@iki.fi>
+Subject: [PATCH BlueZ 1/2] transport: handle BAP Enabling state correctly when resuming
+Date:   Sun,  2 Jul 2023 22:34:18 +0300
+Message-ID: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
-References: <8af1dd5097cc4411ff2681ed39c49c232f817ebe.1688326228.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In bap_req_new, use same pattern as elsewhere to not use zero as
-a valid id.
----
- src/shared/bap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+If BAP stream is in Enabling state when transport acquire is attempted,
+we should wait for bap_state_changed to emit the completion event.
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 13c76afe6..72ce67c08 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -4303,7 +4303,7 @@ static struct bt_bap_req *bap_req_new(struct bt_bap_stream *stream,
- 	static unsigned int id;
+transport->resume() is only called with new owner with no
+owner->pending, and shall return nonzero completion id on success.
+Currently if BAP stream is Enabling, it returns zero which fails the
+acquire operation.
+
+To fix this, return valid completion id in this case instead.  Also keep
+track of the g_idle_add resume id, so that we don't try to give it to
+bt_bap_stream_cancel.
+
+Fixes sound server getting spurious Not Authorized errors when trying to
+acquire a pending transport.  This can happen on BAP server: linked
+transports become pending when the first of the two enters Streaming. If
+sound server tries to acquire the other linked transport whose stream is
+still Enabling, the acquire fails (media_owner_free +
+btd_error_not_authorized).
+
+Log:
+===============================================================
+profiles/audio/transport.c:bap_state_changed() stream 0x25c2880: qos(2) -> enabling(3)
+...
+profiles/audio/transport.c:bap_state_changed() stream 0x25cc590: qos(2) -> enabling(3)
+...
+src/shared/bap.c:bap_stream_state_changed() stream 0x25cc590 dir 0x01: enabling -> streaming
+profiles/audio/bap.c:bap_state() stream 0x25cc590: enabling(3) -> streaming(4)
+profiles/audio/transport.c:bap_state_changed() stream 0x25cc590: enabling(3) -> streaming(4)
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd1: fd(36) ready
+profiles/audio/transport.c:transport_update_playing() /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd1 State=TRANSPORT_STATE_IDLE Playing=1
+profiles/audio/transport.c:transport_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd1: TRANSPORT_STATE_IDLE -> TRANSPORT_STATE_PENDING
+profiles/audio/transport.c:transport_set_state() State changed /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/fd0: TRANSPORT_STATE_IDLE -> TRANSPORT_STATE_PENDING
+profiles/audio/transport.c:media_owner_create() Owner created: sender=:1.1242
+profiles/audio/transport.c:media_owner_free() Owner :1.1242
+===============================================================
+---
+ profiles/audio/transport.c | 67 +++++++++++++++++++++++++++++++-------
+ 1 file changed, 55 insertions(+), 12 deletions(-)
+
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 77216e10b..aa3a718b0 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -86,6 +86,7 @@ struct bap_transport {
+ 	unsigned int		state_id;
+ 	bool			linked;
+ 	struct bt_bap_qos	qos;
++	guint			resume_id;
+ };
  
- 	req = new0(struct bt_bap_req, 1);
--	req->id = ++id;
-+	req->id = ++id ? id : ++id;
- 	req->stream = stream;
- 	req->op = op;
- 	req->iov = util_iov_dup(iov, len);
+ struct media_transport {
+@@ -1191,17 +1192,27 @@ static void bap_enable_complete(struct bt_bap_stream *stream,
+ 		media_transport_remove_owner(owner->transport);
+ }
+ 
+-static gboolean resume_complete(void *data)
++static void bap_resume_complete(struct media_transport *transport)
+ {
+-	struct media_transport *transport = data;
++	struct bap_transport *bap = transport->data;
+ 	struct media_owner *owner = transport->owner;
+ 
++	DBG("stream %p owner %p resume complete", bap->stream, owner);
++
++	if (bap->resume_id) {
++		g_source_remove(bap->resume_id);
++		bap->resume_id = 0;
++	}
++
+ 	if (!owner)
+-		return FALSE;
++		return;
++
++	if (owner->pending)
++		owner->pending->id = 0;
+ 
+ 	if (transport->fd < 0) {
+ 		media_transport_remove_owner(transport);
+-		return FALSE;
++		return;
+ 	}
+ 
+ 	if (owner->pending) {
+@@ -1215,15 +1226,13 @@ static gboolean resume_complete(void *data)
+ 						DBUS_TYPE_INVALID);
+ 		if (!ret) {
+ 			media_transport_remove_owner(transport);
+-			return FALSE;
++			return;
+ 		}
+ 	}
+ 
+ 	media_owner_remove(owner);
+ 
+ 	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
+-
+-	return FALSE;
+ }
+ 
+ static void bap_update_links(const struct media_transport *transport);
+@@ -1306,6 +1315,32 @@ static void bap_update_qos(const struct media_transport *transport)
+ 			"Delay");
+ }
+ 
++static gboolean bap_resume_complete_cb(void *data)
++{
++	struct media_transport *transport = data;
++	struct bap_transport *bap = transport->data;
++
++	bap->resume_id = 0;
++	bap_resume_complete(transport);
++	return FALSE;
++}
++
++static gboolean bap_resume_wait_cb(void *data)
++{
++	struct media_transport *transport = data;
++	struct bap_transport *bap = transport->data;
++	struct media_owner *owner = transport->owner;
++
++	/* bap_state_changed will call completion callback when ready */
++	DBG("stream %p owner %p resume wait", bap->stream, owner);
++
++	bap->resume_id = 0;
++	if (owner && owner->pending)
++		owner->pending->id = 0;
++
++	return FALSE;
++}
++
+ static guint resume_bap(struct media_transport *transport,
+ 				struct media_owner *owner)
+ {
+@@ -1315,17 +1350,19 @@ static guint resume_bap(struct media_transport *transport,
+ 
+ 	if (!bap->stream)
+ 		return 0;
++	if (bap->resume_id)
++		return 0;
+ 
+ 	bap_update_links(transport);
+ 
+ 	switch (bt_bap_stream_get_state(bap->stream)) {
+ 	case BT_BAP_STREAM_STATE_ENABLING:
+ 		bap_enable_complete(bap->stream, 0x00, 0x00, owner);
+-		if (owner->pending)
+-			return owner->pending->id;
+-		return 0;
++		bap->resume_id = g_idle_add(bap_resume_wait_cb, transport);
++		return bap->resume_id;
+ 	case BT_BAP_STREAM_STATE_STREAMING:
+-		return g_idle_add(resume_complete, transport);
++		bap->resume_id = g_idle_add(bap_resume_complete_cb, transport);
++		return bap->resume_id;
+ 	}
+ 
+ 	meta = bt_bap_stream_get_metadata(bap->stream);
+@@ -1389,6 +1426,12 @@ static void cancel_bap(struct media_transport *transport, guint id)
+ {
+ 	struct bap_transport *bap = transport->data;
+ 
++	if (id == bap->resume_id && bap->resume_id) {
++		g_source_remove(bap->resume_id);
++		bap->resume_id = 0;
++		return;
++	}
++
+ 	if (!bap->stream)
+ 		return;
+ 
+@@ -1491,7 +1534,7 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ 	transport_update_playing(transport, TRUE);
+ 
+ done:
+-	resume_complete(transport);
++	bap_resume_complete(transport);
+ }
+ 
+ static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
 -- 
 2.41.0
 
