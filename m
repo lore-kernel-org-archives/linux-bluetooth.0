@@ -2,175 +2,136 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85243EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jul 2023 04:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4611FEB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jul 2023 06:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230137AbjGDEIq (ORCPT
+        id S230318AbjGDGCG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jul 2023 00:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51640 "EHLO
+        Tue, 4 Jul 2023 02:02:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbjGDEIp (ORCPT
+        with ESMTP id S229505AbjGDGCE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jul 2023 00:08:45 -0400
-X-Greylist: delayed 63 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 03 Jul 2023 21:08:44 PDT
-Received: from mx2.ucr.edu (mx2.ucr.edu [138.23.62.3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96DD1BD
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jul 2023 21:08:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
-  t=1688443724; x=1719979724;
-  h=mime-version:subject:from:in-reply-to:date:cc:
-   content-transfer-encoding:message-id:references:to;
-  bh=6UVlEepawDuM/VPstT4lRiIdcxjkv6S//tPe9iRIdiM=;
-  b=sp/LmvHWo0PTi4zAxif3tNCiApVge9lNvjv085MS3rGNgX2KMb28wcKb
-   fgp4r8R/Y1HMpQDUVNCTxgmTEEnQnAR17yYxMqfNgnLgUzjN8L4cR+QGG
-   rW1BR1wvx/aMTvBA0vhAdFZAMfV7LwTs9cDM6lcR6FIZkNpqsaMfE9TkG
-   iRmXoSAYXRxcwALJNwff5o/zPy/VcsYE7/MUtUd2JjqG30UNYYmRuNHH+
-   WQN3OTh13kaVAJKmagdbCWoUQn76U74Dn9h1VuQ6dXby9Kui0sl+PdQVz
-   ILZiiGxRLIe0itC2vBZSc3oU7kgHpq3Ewzg+G4fjgPpQIqVa/YO/os/WO
-   w==;
-Received: from mail-pf1-f198.google.com ([209.85.210.198])
-  by smtp2.ucr.edu with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Jul 2023 21:07:40 -0700
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-668728bb904so6888645b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jul 2023 21:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ucr.edu; s=rmail; t=1688443660; x=1691035660;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rYbBPoCQXFspNQ4UhnwzJ1YkFLkhsAyZYQXFXB1aF9s=;
-        b=Dn4kbeLJ3vxRZvD2Pq8zvlqa8BwoeZrvFfK3lH2tOp60YiFlw8+BxkdcM1KU/cpoQM
-         leFCM6XX0iLMyYEUmBTsD7GqA5TgcrlFAURLgCR7dlAkimlNHjAKxO6SV0OXPoBGXWqu
-         AMc8U1VC1csj7uFxUqGr4GrWWmyril7WDmDXo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688443660; x=1691035660;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rYbBPoCQXFspNQ4UhnwzJ1YkFLkhsAyZYQXFXB1aF9s=;
-        b=AJ19V+cYgPx573h6VqIWFFDB/Ba/nmtgTkXz//68J1i9bhwkaUjxJtWmP7Rx5ndcyK
-         ydLRd7htPSm/HowL99xTA8LX6LMnMzzn2597djRAQ9UA0361JsC5jLKicgQooSvt3r2I
-         02McNGJ1wYtn7ZKcsTJ1KCYA5lerLTW6vaLphJ0Ra8NidhIiuD1hE+dqfUkXRXmnjUpi
-         2UH9wJUg9KHwPCfquVq/Sr1HhGxydqfXJx9VOxpBxcwDmbr4oRWvXN8Xkq1TWSeQ4GNT
-         5kZt0GNSAr5+jJz510PEvckHPPFFTgYMEBEzqsv4yHDHighparsJvfYRVnhPf/QMPk+j
-         2SAw==
-X-Gm-Message-State: ABy/qLa7GfEl2eWL8dOE+5SL9GTzfbYrHNDvc9AbiB/u74Gtcl4tZRvM
-        zlrmwWAdhgkCKOYu5XIwAgkVQxjtPsg+K477FU71X2b6J/KGCvoULljtPByrSCoJSINF7DpcXpH
-        puHGjnUPmWakzPW0x6tB9en5pdWpJGA==
-X-Received: by 2002:a05:6a00:15c9:b0:674:8fe0:126f with SMTP id o9-20020a056a0015c900b006748fe0126fmr17355222pfu.27.1688443660220;
-        Mon, 03 Jul 2023 21:07:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFu1EI5tuQFJaO3ExIznCFEi5jbLwstf56rh2tmnRfS/qBauGTXaI+xw/iaiHP6ytS9nSbEHw==
-X-Received: by 2002:a05:6a00:15c9:b0:674:8fe0:126f with SMTP id o9-20020a056a0015c900b006748fe0126fmr17355207pfu.27.1688443659871;
-        Mon, 03 Jul 2023 21:07:39 -0700 (PDT)
-Received: from smtpclient.apple ([2601:600:9080:8720:d48c:dec1:96d1:7ea5])
-        by smtp.gmail.com with ESMTPSA id x24-20020aa784d8000000b0065438394fa4sm7457264pfn.90.2023.07.03.21.07.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Jul 2023 21:07:39 -0700 (PDT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: How to reproduce the BUG general protection fault in
- hci_uart_tty_ioctl?
-From:   Weiteng Chen <wchen130@ucr.edu>
-In-Reply-To: <20230704030131.GY5866@linux-l9pv.suse>
-Date:   Mon, 3 Jul 2023 21:07:38 -0700
-Cc:     Yu Hao <yhao016@ucr.edu>, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <191B9131-6E47-49B6-8089-108E2B12B9DC@ucr.edu>
-References: <20230628150140.GU21539@linux-l9pv.suse>
- <CA+UBctDPEvHdkHMwD340=n02rh+jNRJNNQ5LBZNA+Wm4Keh2ow@mail.gmail.com>
- <20230704030131.GY5866@linux-l9pv.suse>
-To:     joeyli <jlee@suse.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Tue, 4 Jul 2023 02:02:04 -0400
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2057.outbound.protection.outlook.com [40.107.249.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F67E52
+        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jul 2023 23:02:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iVuBlkjfGO+QixrnFl84xGNcqpNgr5sPLJpUrZt+b8Z+49/+fTqk01S+tlsmzLCx2JCZHUE0xFn88ft6UHMjnZQ+WHogmMf59Bis0PUFblopFRCSbpyRZgamUozzcq2RVFKZhqsRjECreCf08jvOgMn6G+4MIrrnD/uQ3aFE/L0HhMcMm14oJGZBa0xX0Je08+0X6SJKfzD2Lwo9TQUo6RIV9Aowb3OXYeEVoTDQuEZMq/gKGGYSLUXKaMxVla13g8vPHCy6H2vRGdqDFyRl9VfNFSL6B8kTS3Cao0exbAL6+DRLrIMKzRe+RSsXsJkLtYVyFuPrCHg7itmm6tkFaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TPWsLr0EVaEvR18JPv3WOyyGPhXYrUxNnPsXuvolA9o=;
+ b=UepaK6e68NFZ2jm/8ZQfQdhPUQQ8DrxdHBAysO6F/mtp7J185DyuJQ9sosiZwcyzZdPwzYbRWDvSrPq93zSaQKlNW2tkqE9VCiRN8+rqoRfEKZVMTitq7/paIf5n1gErnfqXrHLSCnueD0Xzm94hnD14gGsrGR+Na+9jtLVr6kSAtqrG+92LZPTyC8AQt5dm4Qll1MsfIijt11Bw/GXUS4z53lMDuQaNzPBaV5mfQ1oB5Gx2ewNJoInf4QE73ZeKIm8aby1F7J3I9ThCt2c+WBP/JEu4bxHO8FljtbmMhbv+biiawAzmAbrSVEX0YLmlNTnbThC2QmReN+Rm+3Ds4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TPWsLr0EVaEvR18JPv3WOyyGPhXYrUxNnPsXuvolA9o=;
+ b=XYki0nMIUX0FbClS4vbuWAssrJGMPp6H9722lDj27/nLSPJBNkNOdhwhCvxynNkXdIRXtARCUtGOiYkScd77cqLLcwx+8JcGb4QhBvMKk3cKwWY9fqDLfhM7oE35dmdDAseWlX/enx/n/B3XL4RT/STMrHPJTpbK2CNJZzdoVr8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from DB6PR0402MB2919.eurprd04.prod.outlook.com (2603:10a6:4:9b::14)
+ by PR3PR04MB7452.eurprd04.prod.outlook.com (2603:10a6:102:80::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
+ 2023 06:02:00 +0000
+Received: from DB6PR0402MB2919.eurprd04.prod.outlook.com
+ ([fe80::dc24:7fb0:d2f4:6be6]) by DB6PR0402MB2919.eurprd04.prod.outlook.com
+ ([fe80::dc24:7fb0:d2f4:6be6%8]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 06:02:00 +0000
+From:   Vlad Pruteanu <vlad.pruteanu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, iulia.tanasescu@nxp.com,
+        andrei.istodorescu@nxp.com, Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Subject: [PATCH BlueZ 0/1] plugins/admin: Fix heap-use-after-free when using 2 controllers
+Date:   Tue,  4 Jul 2023 08:56:42 +0300
+Message-Id: <20230704055643.296260-1-vlad.pruteanu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM9P195CA0007.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21f::12) To DB6PR0402MB2919.eurprd04.prod.outlook.com
+ (2603:10a6:4:9b::14)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB6PR0402MB2919:EE_|PR3PR04MB7452:EE_
+X-MS-Office365-Filtering-Correlation-Id: 627468f7-cd1d-495c-6415-08db7c542e0b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fCJjqfF1Y54U7joQmpnH9m2NtcMgqeEjm2xanPgtRynREa06tpGqKY88Ng+/J1dfGhU9w7cjKIGUes7fRlAE+1S+SwoDbOvSAb/kGafJ9q2gk0RusL+MKLCsXV5L0RnlrASpCuBdmw2mgx55F9H2NK3YN5IMRIn1hRPIm1jykHmNeR8h6yBe7DzDaaOus0+Ne1h2jE+U0W8pn8ZMNdJgByVujPri/BsZl4aFaA4TrJpVsABFhlsXzFYPaqFBgW8Tek6gfBaPn0OtvVycxXbrdWFnG73kpXo3JkD7SVUzk5WEp5EWdJBR0a2zkC3Q0xg9yBGX8T3xhsaRErlfUjYVr4ISL3el+1dV4JmpP8X5G0KMWBTN/No7xk14h9kMOV1R39dJU9NcQpPGE0CkBfzMBgRoAw/41krmz+QYa6hefe6n/igoPKASGu4v+yiBw1eKMRlSVcrvvwev4utRxcKaQzPdQB+AjKj1LDNE0iH6b9Uscti6xQRze7rC5rIhGKgNp5D2z8t96s3uzt8Wie+VnUUtdeUZHT3tUkHu1ZHXeRF6gu7jbildN0I1zGOlTHc3o6JESl5h0oTcsc7nOWO6znaxnL1ZSUrwCevrtjVdoAlqtH794mpRbPI3OrdSz2ls
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB6PR0402MB2919.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(366004)(136003)(376002)(346002)(451199021)(316002)(41300700001)(6486002)(52116002)(6512007)(26005)(83380400001)(186003)(6506007)(1076003)(2616005)(38350700002)(6666004)(478600001)(38100700002)(44832011)(66946007)(66556008)(66476007)(4326008)(6916009)(5660300002)(86362001)(4744005)(2906002)(8676002)(8936002)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+VxxgvkWis9g2QH1xBFhOPHuV9pwqzb1IEz8YmuBb2kPnqLbHsDQbRBEWhs1?=
+ =?us-ascii?Q?P7ZzX00CQwPmOvTpVPHC2eHzCGAtjOLfysuJDMulk1k0jpalhK6Ni05Jf7ey?=
+ =?us-ascii?Q?6L1LFWgK5m6JStuK6cWP53SOYu2C4oK1jpDNS3Q6994LJMpI13ZW1OUm6bbT?=
+ =?us-ascii?Q?dmb7pX+YAOZqUqX5SJG6y2nBxLbYrj3fSLA/nGqA1jonrEIIDTXIgp/N5EPT?=
+ =?us-ascii?Q?vdFOG8W5/53GfcTazusKBn+OAvIXcE+pWs0XcnyJs7lvp0ehkxJvaIWJIPdX?=
+ =?us-ascii?Q?Qkp94/XAhd9rmk5iuJ3gRbtftA+JkwpPVar3kxqLZVoqK3rp7B0DzQoA9AKU?=
+ =?us-ascii?Q?b8dCPR1AwXP2hcvJSy4pmOl1qLVdCQ+oOAQhO8cWWfULKzC36KCRDpzBzDrf?=
+ =?us-ascii?Q?uqMrzpkiwT+TK7Ps1v0ArnIOSRR/TqYJ5t0tjO4Um0anmpA8EgV3+PyV5STC?=
+ =?us-ascii?Q?6yfXb8Iq+5Qa2F7eVEOwMl1h02sberacUdORjBK4Tv3xeYVGqZCRPl4Di1y1?=
+ =?us-ascii?Q?bwGaIXc3pZCLwU8GwJPvXqIXbvZInl4q75Ig5+O5XbFq44u2TbvJbZZyEzYH?=
+ =?us-ascii?Q?LkQ+fng+NfgLhC+484BMKYBv1ysncjeWWjq05dTlOBvpJKluRRIawZbWwPbE?=
+ =?us-ascii?Q?M3O4fSwUl664rBo8WtPiLmrO//HQbS8LPmFMUwCzJudFkEuUQU2PY3/eSZZ+?=
+ =?us-ascii?Q?PUwI5+lhMPmwPO4C6ylYR77jJqAa5Gh30QOoCxATOtPFMKMO/NK6S6cBLJ/I?=
+ =?us-ascii?Q?y71xiXxuOAeC4LmhNFxaLVJwAPFDkEslMF2b4qWRIlNMrTqcq+fxotGYKa2A?=
+ =?us-ascii?Q?iYDkuGEZlabo9zBhfRwFL+hI2hCo/z4Cn6RxVjIf3OKzRgrrSdTFxJ7aLGNP?=
+ =?us-ascii?Q?SVOO9AB71U1w4dqbDcImtrp07zZNWNU/7VE/+6RUfqyOjc/5zhi7qAQFyAQU?=
+ =?us-ascii?Q?Tg2l9xLEAkDO5vTexIaooMrxd3UUm4uNIUSRgtJadGX0/fgSmT4bRc2N020/?=
+ =?us-ascii?Q?YPA0ZSpV7HDtqv54evHGgfwtCko21vr3Mu42xUADbD985yRDS2/H+B2KxSt1?=
+ =?us-ascii?Q?UcZ2U3DxG8VYS/6rgec6n/QLaFxGhxnP1qFprRbm5xBI8zN+ZeKT9Ez7hAdn?=
+ =?us-ascii?Q?RfjbMaiPUcz2Gjh6CyA+BuS7RLFCSLIMvcSITKK/W+DX2najybsYykVhLu/b?=
+ =?us-ascii?Q?WmdGk6gEYq6+XFbQNwOInbbPC5VRvV4s/qzqIPSoaQI5WOLBzZZ2XZJ7rwnb?=
+ =?us-ascii?Q?RevbLA3U2sFCthCmUtjQJinw417ujTJ7h4H3pi5Y6IRc9mH2nQkFkPDsLpBV?=
+ =?us-ascii?Q?ix+aHRM2cpMSxFTtjpRavdNAsx5XdnpBptYE6vH6cE2F3LbrZsDqIcCE+2kM?=
+ =?us-ascii?Q?wJ4TnDnDP8UZBdxCrt5fL3z9hNgDYwycJx/Ktvz6QgAv3p8lONP1gPtC484B?=
+ =?us-ascii?Q?1iG5adtTSE3ZDHoU3m4hbI3F97Xtp732rvaPmJfeQbaPPSG2dbGJOZKT533i?=
+ =?us-ascii?Q?WuYEYWMUrKQYufx/CYlL4EiY08RUp3YaZSskjxdoultSKEczlj7TNPnrOBZZ?=
+ =?us-ascii?Q?POD4mlQXEm/IjrHtiPHN7z99/Ja4CqU4yzwQfTkC?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 627468f7-cd1d-495c-6415-08db7c542e0b
+X-MS-Exchange-CrossTenant-AuthSource: DB6PR0402MB2919.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 06:01:59.9228
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7HKKz4K1XIUWDKoU98lxmWzhSjjmB+AkrpWxz3Ih4nuuQpxpp4WBrdS+MXIMatCKlNdGA0bN5EX/1QyIA5o/Vg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7452
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joey,
+This commit fixes the heap-use-after-free error when connecting 2
+controllers. When a controller is connected
+admin_policy_adapter_probe is called. If policy_data was already
+allocated it gets freed, if not, it only gets allocated. Eventually
+add_interface is called. Here policy_data is put in the "data" variable
+(specific for each controller) and the process_changes task is called
+with idle priority. This function ultimately accesses policy_data from
+the "data" variable.
 
-Sorry for my late response.
+When Bluez crashes the flow is:
+1)first controller is attached
+2)admin_policy_adapter_probe is called and policy_data is allocated
+4)second controller is attached
+5)admin_policy_adapter_probe is called and policy_data is freed, then
+allocated again
+6)process_changes runs and the policy_data for the first controller is
+read, but it was already freed, thus the crash
 
-=
-https://elixir.bootlin.com/linux/v6.3-rc7/source/drivers/bluetooth/hci_ldi=
-sc.c#L764
+Vlad Pruteanu (1):
+  plugins/admin.c: Fix heap-use-after-free error when connecting 2
+    controllers
 
-switch (cmd) {
-        case HCIUARTSETPROTO:
-                if (!test_and_set_bit(HCI_UART_PROTO_SET, &hu->flags)) {
-                        printk(=E2=80=9Ctest_and_set_bit=E2=80=A6=E2=80=9D=
-) // insert a prink to make the race easy to trigger
-                        err =3D hci_uart_set_proto(hu, arg);
-                        if (err)
-                                clear_bit(HCI_UART_PROTO_SET, =
-&hu->flags);
-                } else
-                        err =3D -EBUSY;
-                break;
+ plugins/admin.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-        case HCIUARTGETPROTO:
-                if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
-                        err =3D hu->proto->id;  =E2=86=90- null pointer =
-deference
-                else
-                        err =3D -EUNATCH;
-                break;
-
-This is a race condition between HCIUARTSETPROTO and HCIUARTGETPROTO. =
-HCI_UART_PROTO_SET is set before hu->proto is set and thus it may =
-dereference a null pointer.
-
-To easily trigger this bug, I inserted a prink in the source code so =
-that the C producer can easily trigger the bug. Please let me know if =
-you have any questions.
-
-Best,
-Weiteng Chen
-
-> On Jul 3, 2023, at 8:01 PM, joeyli <jlee@suse.com> wrote:
->=20
-> Hi,
->=20
-> On Wed, Jun 28, 2023 at 06:57:47PM -0700, Yu Hao wrote:
->> Hi Weiteng,
->>=20
->> Could you give more info about the bug, e.g., kernel configuration,
->> qemu arguments.
->>=20
->=20
-> Base on kernel code, looks that the HCIUARTSETPROTO and =
-HCIUARTGETPROTO
-> blocks in hci_uart_tty_ioctl() should use hci_uart->proto_lock.=20
->=20
-> I have run the C reproducer a couple of days in qemu, but it did not
-> reproduce issue until now.
->=20
-> Does anyone know how to reproduce this issue easily?
->=20
-> Thanks
-> Joey Lee
->>=20
->> On Wed, Jun 28, 2023 at 8:02=E2=80=AFAM joeyli <jlee@suse.com> wrote:
->>>=20
->>> Hi Yu Hao,
->>>=20
->>> I am looking at your "BUG: general protection fault in =
-hci_uart_tty_ioctl":
->>>=20
->>> =
-https://lore.kernel.org/all/CA+UBctC3p49aTgzbVgkSZ2+TQcqq4fPDO7yZitFT5uBPD=
-eCO2g@mail.gmail.com/
->>>=20
->>> I am trying the C reproducer in your URL, but it is not success yet:
->>> https://gist.github.com/ZHYfeng/a3e3ff2bdfea5ed5de5475f0b54d55cb
->>>=20
->>> I am using v6.2 mainline kernel to run the C reproducer.
->>>=20
->>> Could you please provide suggestions for how to reproduce this =
-issue?
->>> And what is your qemu environment for reproducing issue?
->>>=20
->>> Thanks a lot!
->>> Joey Lee
+-- 
+2.34.1
 
