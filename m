@@ -2,94 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46DC4C001B1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jul 2023 14:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6329BC001B1
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jul 2023 17:07:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231661AbjGDOL7 (ORCPT
+        id S231654AbjGDRG7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jul 2023 10:11:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40850 "EHLO
+        Tue, 4 Jul 2023 13:06:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231544AbjGDOLp (ORCPT
+        with ESMTP id S231482AbjGDRG6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jul 2023 10:11:45 -0400
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E555F10C1;
-        Tue,  4 Jul 2023 07:11:39 -0700 (PDT)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-666e97fcc60so3280333b3a.3;
-        Tue, 04 Jul 2023 07:11:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688479899; x=1691071899;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gVWqdQakMSUsv5oj8nSg9QczQrmrUO38b67MhpmWVYY=;
-        b=ZH/KPRP50O9QKZQfFKaA+IfAWPHaD+Gxo1Eu3fP8ZxyDdYI3LJSQtB5pJ1LNZCP35q
-         IiV8TxAZlRORnVGaqCJdzy5BFSME/+DZq9B+IS9yAxJQ4FU3c0sHLNVg4LaQttqWg5hd
-         bM5LMjlOQJCGjfyUqstEXhs3Dd8wimOob7Q0h3RUn4qjwSxiYa/nobSPuoeZEPS9MS42
-         srKFZ70VAwX7m2pI0PgphsbWrm6lh/UXvykFGzcIugoINW1nJ0OhoX+WdVsTs9eNV23E
-         aJtRS4HrQ1C6JxK+hMqI3oWzf0iKWvVdvHE7pO3iCmyrKE+K3UE6Y5185bgItTX1QEDi
-         4JGA==
-X-Gm-Message-State: AC+VfDyguM2YZAAPdq0N9FgoO29YGFEhGKrGIR6kCa7gx3X6HXmDtixw
-        qsAUMcwhyjDMUOAki/oH7fs=
-X-Google-Smtp-Source: ACHHUZ4mKI72SACTkxfTB3tQ6Ji13XYniCvY2MHAxg/n5JeT4DfHtHYI7qLyK+rPyEqNoEPYk2/cWg==
-X-Received: by 2002:a05:6a20:1456:b0:12c:d9cc:340e with SMTP id a22-20020a056a20145600b0012cd9cc340emr10681222pzi.5.1688479899229;
-        Tue, 04 Jul 2023 07:11:39 -0700 (PDT)
-Received: from [192.168.50.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id e26-20020a62aa1a000000b00682a9325ffcsm1178509pff.5.2023.07.04.07.11.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 07:11:38 -0700 (PDT)
-Message-ID: <739807cf-4551-4760-83e0-a94026b5c1b8@acm.org>
-Date:   Tue, 4 Jul 2023 07:11:37 -0700
+        Tue, 4 Jul 2023 13:06:58 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0295FE70
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Jul 2023 10:06:56 -0700 (PDT)
+Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4QwTjT3TDrzykW;
+        Tue,  4 Jul 2023 20:06:53 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1688490413;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=eHO4A7bt4cjZVAZOZ+/OEa1ArWt99JHanNEHKTDRs7I=;
+        b=TZbuZDX0ZZk00n/E82ujJgso/6PYSLqPdgAUJfWVmFmNJbRR912IvQPo4UGQ58t26RbHMH
+        wP1ci7EL0vtSkiNIxUOqqS6T0w9ohz8twT7Nq3xWmQ5oTZLae311qGenuDhIq9MkVfMZV4
+        RMYGrl8dgzwetIiOTuioXiuJ0smRxo0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1688490413;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=eHO4A7bt4cjZVAZOZ+/OEa1ArWt99JHanNEHKTDRs7I=;
+        b=F8J1EuTwqP1DQHMEnHr3FmouG5XtYuBuaC1vzNXMu8EmWZKbkKDACKQalqgLFC2y81ufaT
+        JAFrzUUBr+JtW5meWETHCbUe6zxNgloc4rMl3vNrHorz7/wwvDk5Uu0yRR8jknL1wpoW4i
+        cjR3zB8jOrFCbZBbFmUtXxqqI0tyfRI=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1688490413; a=rsa-sha256; cv=none;
+        b=lva2UpfPsml+tOil2Atj1SEsFFaTRgD3oA1J6IWd8F3fiEKQZjToCvSjBQhVVHkJ1jpMbE
+        Zf1x9T7XhnfRJH5npwmD59w2gBZrsOfqJEELsNC/DPysZu8+vlNWy6uOtVgI/n0I5wSD3z
+        3gD4pVzH1ZGpfhphsBGKu4zN7dNw51I=
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] doc/tester-config: enable DEBUG_KERNEL, PROVE_RCU, DEBUG_ATOMIC_SLEEP
+Date:   Tue,  4 Jul 2023 20:06:51 +0300
+Message-ID: <fdec6ddf8eacfb37cbd34d9049fcadf29041c103.1688490237.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 296d53d8f84ce50ffaee7d575487058c8d437335
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>, kernel test robot <lkp@intel.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        kunit-dev@googlegroups.com, kvmarm@lists.linux.dev,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org
-References: <202307032309.v4K1IBoR-lkp@intel.com>
- <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 7/4/23 00:15, Marc Zyngier wrote:
-> On 2023-07-03 16:11, kernel test robot wrote:
->> tree/branch:
->> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
->> master
->> branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next
->> specific files for 20230703
->>
-> 
-> [...]
-> 
->> Unverified Error/Warning (likely false positive, please contact us if
->> interested):
->>
->> arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
-> 
-> This *is* a false positive. The function is entered with a lock
-> held, it will exit with the lock held as well. Inside the body
-> of the function, we release and reacquire the lock.
+Add more lock/sleep debugging to the default tester config.
 
-Which tool reported this message? If this message was reported by 
-sparse, has it been considered to add a __must_hold() annotation?
+Enable DEBUG_KERNEL since olddefconfig won't enable PROVE_LOCKING
+without it. Enable PROVE_RCU to also check RCU usage. Enable
+DEBUG_ATOMIC_SLEEP to catch those as well.
+---
+ doc/test-runner.txt | 3 +++
+ doc/tester.config   | 3 +++
+ 2 files changed, 6 insertions(+)
 
-Thanks,
-
-Bart.
+diff --git a/doc/test-runner.txt b/doc/test-runner.txt
+index 019c23188..43ce42be6 100644
+--- a/doc/test-runner.txt
++++ b/doc/test-runner.txt
+@@ -74,9 +74,12 @@ Lock debuging
+ To catch locking related issues the following set of kernel config
+ options may be useful:
+ 
++	CONFIG_DEBUG_KERNEL=y
+ 	CONFIG_LOCKDEP_SUPPORT=y
+ 	CONFIG_DEBUG_SPINLOCK=y
+ 	CONFIG_DEBUG_LOCK_ALLOC=y
++	CONFIG_DEBUG_ATOMIC_SLEEP=y
+ 	CONFIG_PROVE_LOCKING=y
++	CONFIG_PROVE_RCU=y
+ 	CONFIG_LOCKDEP=y
+ 	CONFIG_DEBUG_MUTEXES=y
+diff --git a/doc/tester.config b/doc/tester.config
+index 4429a7222..099eddc79 100644
+--- a/doc/tester.config
++++ b/doc/tester.config
+@@ -47,10 +47,13 @@ CONFIG_UNIX=y
+ 
+ CONFIG_UHID=y
+ 
++CONFIG_DEBUG_KERNEL=y
+ CONFIG_LOCKDEP_SUPPORT=y
+ CONFIG_DEBUG_SPINLOCK=y
+ CONFIG_DEBUG_LOCK_ALLOC=y
++CONFIG_DEBUG_ATOMIC_SLEEP=y
+ CONFIG_PROVE_LOCKING=y
++CONFIG_PROVE_RCU=y
+ CONFIG_LOCKDEP=y
+ CONFIG_DEBUG_MUTEXES=y
+ CONFIG_KASAN=y
+-- 
+2.41.0
 
