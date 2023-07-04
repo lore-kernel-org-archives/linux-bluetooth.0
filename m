@@ -2,116 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FCDEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jul 2023 09:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0E2EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jul 2023 10:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231843AbjGDJPo (ORCPT
+        id S231562AbjGDKbK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jul 2023 05:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42982 "EHLO
+        Tue, 4 Jul 2023 06:31:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231819AbjGDJPj (ORCPT
+        with ESMTP id S230090AbjGDKbI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jul 2023 05:15:39 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 299C810CA
-        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Jul 2023 02:15:36 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-7659924cd9bso575183485a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Jul 2023 02:15:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688462135; x=1691054135;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7yaXsGR387VZXBSBeSAIuv1c/LxBCl1LfUUZpreikWk=;
-        b=JwJujg5nHGFsqSlbyDwedhmbHJyUP24UG2N/Dln8lOAIn3eje/uUkqdAJxMi8BbEPD
-         f2fIGtcoHqn25KmFNeriI6FPDX0gPWj9JFw6+XvV/kAUEeAwj7mNG/CfvFmIig86K8bd
-         SNGDWNHQuqED/S74hrLYu02Rvu5Gt1+Noa5sYbKmwxzACplbVIlsW4WjzPVlPImsFB59
-         YlXLEyK1EfLX6++pqEol2NtuUQvWosnvnm0rWgq0LQnTIZD/6VJBSuJxFGHts+fBrZPb
-         r95z8OfhvV35vnTAXKrLaGAsYPJjz2DfXKH3CsVUVh3qNh1hA230q/mP2qP4rqNewYAs
-         T9vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688462135; x=1691054135;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7yaXsGR387VZXBSBeSAIuv1c/LxBCl1LfUUZpreikWk=;
-        b=BGyMl9G5LP0EtQlp1skHhc1fIbfGEts8VGrvb3SdLnnMMDVm04Fd0KtdSwuIWOaYnO
-         dDo5f3XYukXXfnU5NWdZ+RkNiy+9wy1AQJotjVFood+Dz0sFJg+/+qoMU72O+frd7eKE
-         Kw7GW66z8n0IfiQo/ZVBvzuXRpMN6MvOht67kuw6NMclxmEynVKFP0giQvk1p1S0ZhAJ
-         2J5i09D/B6pMlmR4i/YLQb7g7wKw4+Vr+38I970N0Zm2aPVxocvFT+V2LTPCjNKUNt39
-         7rYDokDhfSGBascUUq+w2Rel5Bwt7tE0eKAc4s2W0c62lWzPDwC7wD27+SHIcf1n/E+G
-         ZqWg==
-X-Gm-Message-State: ABy/qLacnqRGLhdMrVN67Pxajj9sSYBPd45GG7We6uNJUuwHM/Piuju6
-        hw67R/gHl5GN/E+x1h2Wo2ibmmBl0A0=
-X-Google-Smtp-Source: APBJJlHTOtMGkJSavwt0k8JKI9vE4MFiZ8PdICBznCkbVT140BQIzuj19yNgi2TuVUQBoOtq2kPVzA==
-X-Received: by 2002:a37:f718:0:b0:766:fd2c:fca1 with SMTP id q24-20020a37f718000000b00766fd2cfca1mr13164853qkj.75.1688462135069;
-        Tue, 04 Jul 2023 02:15:35 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.188.80])
-        by smtp.gmail.com with ESMTPSA id i12-20020a05620a144c00b00765ab6d3e81sm9349093qkl.122.2023.07.04.02.15.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 02:15:34 -0700 (PDT)
-Message-ID: <64a3e336.050a0220.760a9.7427@mx.google.com>
-Date:   Tue, 04 Jul 2023 02:15:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5998621574667517551=="
+        Tue, 4 Jul 2023 06:31:08 -0400
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2049.outbound.protection.outlook.com [40.107.96.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD5B135;
+        Tue,  4 Jul 2023 03:31:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Owv4yTsdDdXVUkGLtPEYCg48QKy3eQ62+Dfm4f1/+LdLbtIS0YjQTiDMODhyQIyJhpaqupvahtCWvGa7Y0GZO9kbWh6cbSBF6fLLo2LZjziO41K7r13pINfDKjKDD4d+ACzweNKt15QSUnPcmijM3i1jVGdTS9rjFvqikC15mpwtZAuhdff7oVnDY+zurk2N6HUKiWPBJ5c6/Ri7KR1/xqcuPhE5endYFLOLWeh2LM8cK+m7nE6uyiGGL1wgyF1N9vq996/oCJVbGO07+Hd+WeS703zcjexKZiMqAqbVtcgThsVvVUW29uellD0S2zwuxm+D2gCR5dG6YLwmTRjIvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j6Ki/oDE73OM2g24kGgjiV8glv9v3VhsD3MghY96r4M=;
+ b=INegiR0LQ8IdzHvw3dcLM1XHmQwiQjgsgvkPd6ik9ihEyZsPXKK03jB+Cp129PXhHqAZs25jBWL1a+fIudiYXpqGwMHce0dwWX3Yde82jaL2+HY6K4KtN9uqJHOgtQu5yxrVL92J5oEdPclWUef5rJtmlua6++OgxQkoLOU+/hddCnhqMwGRDWuo2VHgQQZ/Sc7ur+0/1DLykVCLzhl4/QE4WoXmwjH7D7uxhtdWyPvtkBsRt1xojYtmRz8Wfmbg5mv0qB61ZWY/NeMSoP/vTxWydcxKWZZOPucddYYiRu4nZ3H9ZE7xZkBLYAlFAGYm9BVCM/Ci7pNRBy4Ki09XIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j6Ki/oDE73OM2g24kGgjiV8glv9v3VhsD3MghY96r4M=;
+ b=HS4CN+3utxELqT81Gc0WRXIc6jITo6UP4avHd3xPYFQQEpXcSC8uHjBUU4lQbDhNbg0Ujo8QLY/k4aOWL2DArUq2tiaAa5EtB2i0HjGepRqFfGeysSztmHUnTDiPk76kCrMpbz4HzspC7frZs1t1rEP3L5jULR6Cf9keWDY6X2C6XSVcnjrf9RgqsIraZYs0489IKePThsLK43Tbfmn886ZR9xLhdN7TpRjXmPisPrC7pHEztt11ws0ihUK/ePhZzuCkkBBcRjFEdw9FWYkirQsH4mz6lzSKp0nXKfjReQRZtHOk1aR+pFegtQJ39PoELVQ1pNeY2G1jjelXK7C+qA==
+Received: from MW4P221CA0020.NAMP221.PROD.OUTLOOK.COM (2603:10b6:303:8b::25)
+ by PH7PR12MB8106.namprd12.prod.outlook.com (2603:10b6:510:2ba::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
+ 2023 10:31:04 +0000
+Received: from CO1NAM11FT022.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:8b:cafe::d4) by MW4P221CA0020.outlook.office365.com
+ (2603:10b6:303:8b::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.18 via Frontend
+ Transport; Tue, 4 Jul 2023 10:31:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT022.mail.protection.outlook.com (10.13.175.199) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.44 via Frontend Transport; Tue, 4 Jul 2023 10:31:03 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Tue, 4 Jul 2023
+ 03:30:53 -0700
+Received: from [172.27.1.49] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Tue, 4 Jul 2023
+ 03:30:47 -0700
+Message-ID: <5621fe4a-5c21-b407-91a1-4cc299f5abb0@nvidia.com>
+Date:   Tue, 4 Jul 2023 13:30:43 +0300
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com
-Subject: RE: monitor: Add decoding support for Sync Receiver events
-In-Reply-To: <20230704074144.5587-2-claudia.rosu@nxp.com>
-References: <20230704074144.5587-2-claudia.rosu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [linux-next:master] BUILD REGRESSION
+ 296d53d8f84ce50ffaee7d575487058c8d437335
+Content-Language: en-US
+To:     kernel test robot <lkp@intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     Linux Memory Management List <linux-mm@kvack.org>,
+        <kunit-dev@googlegroups.com>, <kvmarm@lists.linux.dev>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kselftest@vger.kernel.org>, <linux-parisc@vger.kernel.org>,
+        <linux-rdma@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+        <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <202307032309.v4K1IBoR-lkp@intel.com>
+From:   Shay Drory <shayd@nvidia.com>
+In-Reply-To: <202307032309.v4K1IBoR-lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.231.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT022:EE_|PH7PR12MB8106:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1e39ff4d-e360-4728-e8d7-08db7c79c4c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9Dg1qCc2ry6ECA1DeFK0AJNkukvr5SGvJUuu2Rc/EXg/nkPf1U6wqU8GA3nNoha245s/tZ4H9sB+ynensGCbCTW7vQQRrmpovDizSt8fig3pTU3prn2qxQnv1NxY2LvPwSFPWs7tqJvFqFlOmPejF7sn3jX3GpzFPxXaNZeaZN5oFuDa6KAF3xD6Wzk61XVgjICVN3Fk74W4SWQTFyB+DycJTK79YGKjHxZZQZ313TOSeI9WGkIyCkKcGmqaFgo7SO1kKJTBwXCDKWONm6+rz/DNvKIaG0tASDCj4+Ia01ZpyyB1DTboQJnLuBPMvlDElWeFeQPJ9gpC5B1QgAN5UFSig0HCPKWKXmR1uPGroeyKn+sHTL/qzT21zY46prAfPemcmyJZoDpnMZMulhsPJtErnW5ofKTkQSrMRlkeZbYQV3AXLz/4R8BdLMmLqBtiC16h7WuDajf98C+go4ExFMa6dVGbAjJ/yw7RXa/n+sCw26z3N9p8T2/wf7lxIQFvoDrF1hodAaA2GVz6UTHYMew4SbKRbXX/VkRYToUO5q6DhKhF2tkyiHtBTvSn4R+7JWDQ9aimDD/xsnBuPiaAh9vh6jDKgTReBm4phdBMaJ02xiG5qnIsV5JJJt0giv2HblD0ocQ+UBJeit/JKmDXPn37M6qICNo4K4/H5D41w9qsULAerbp1WAkfqTadJSvPUNlGrtmbXdOEMawhAHam/xplHW2taeQoO+aXSCgWFV+TNlSgXRWfMP0oj6j9DUuCfJhPicOwkKBiqOC5zu31Oyv5JYVmJhJDQqB8mvJXYMAe/HIJoTIgCky7SAcoVu+0
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(136003)(376002)(346002)(451199021)(36840700001)(46966006)(40470700004)(6666004)(16526019)(186003)(966005)(31686004)(478600001)(4744005)(7416002)(26005)(5660300002)(47076005)(36756003)(2906002)(2616005)(86362001)(83380400001)(336012)(82310400005)(31696002)(426003)(82740400003)(36860700001)(70586007)(4326008)(7636003)(70206006)(316002)(8936002)(16576012)(110136005)(54906003)(41300700001)(356005)(8676002)(40480700001)(53546011)(40460700003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 10:31:03.6023
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e39ff4d-e360-4728-e8d7-08db7c79c4c3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT022.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8106
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5998621574667517551==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=762233
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      26.52 seconds
-BluezMake                     PASS      782.29 seconds
-MakeCheck                     PASS      11.23 seconds
-MakeDistcheck                 PASS      155.31 seconds
-CheckValgrind                 PASS      250.03 seconds
-CheckSmatch                   WARNING   334.74 seconds
-bluezmakeextell               PASS      101.71 seconds
-IncrementalBuild              PASS      651.12 seconds
-ScanBuild                     WARNING   1007.16 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1832:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3552:52: warning: array of flexible structuresmonitor/bt.h:3540:40: warning: array of flexible structures
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-monitor/packet.c:12370:2: warning: Null pointer passed to 2nd parameter expecting 'nonnull'
-        memcpy(tx, tv, sizeof(*tv));
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
+On 03/07/2023 18:11, kernel test robot wrote:
+> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next specific files for 20230703
 
 
+[...]
 
----
-Regards,
-Linux Bluetooth
+> Unverified Error/Warning (likely false positive, please contact us if interested):
+>
+> drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c:98 mlx5_devcom_register_device() error: uninitialized symbol 'tmp_dev'.
 
 
---===============5998621574667517551==--
+This *is* a false positive. there is a comment explaining it.
+
