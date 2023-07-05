@@ -2,99 +2,137 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E28E4C001DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jul 2023 16:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C29B2EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jul 2023 17:39:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232227AbjGEQXG (ORCPT
+        id S231570AbjGERjR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Jul 2023 12:23:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49680 "EHLO
+        Wed, 5 Jul 2023 13:39:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbjGEQXF (ORCPT
+        with ESMTP id S231269AbjGERjQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Jul 2023 12:23:05 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72FECA9;
-        Wed,  5 Jul 2023 09:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de;
- s=s31663417; t=1688574164; x=1689178964; i=deller@gmx.de;
- bh=Hlber4Z7Cd3qr0L2Uhoc2fvca7T/yNNA9ie9vqfcvcg=;
- h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
- b=HHpiJod8lIUM1nYnFzSr85XxN/f+IBdaxNXE7JfrN1JmwyQ6bV7eRAGjwk7Hn0jwrXbv69f
- /91fGDVcBJPk3s6A7fvG1ByfgCaSF0t8DoWbosXUtDs5X0U8e/45rqFiAyKj/o1ntTPVYMDIb
- j2Ri0CT0wHlesq5KtOAMgaoz++ki35qI6WLe8/32L6QLFBUapiBj+HOt1/aQTULW67kd/7Gir
- zwpRLRPoco7Ll6YyNMfYA9Hewaz2efHwpXslPkU8HWWvlb7wv2mSAhmG4kaq5zMpmaRdSwkfa
- SijXWpiuLiCfXMJWQ0sHt6dWzzZlqmTj9cjk8gsQmidsGBe21f0A==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.20.60] ([94.134.149.108]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MK3Rm-1qaOoU0OWk-00LSx0; Wed, 05
- Jul 2023 18:22:44 +0200
-Message-ID: <17b4e65f-a140-8e4d-505b-f2f6f7d1a8c5@gmx.de>
-Date:   Wed, 5 Jul 2023 18:22:42 +0200
+        Wed, 5 Jul 2023 13:39:16 -0400
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240FC171A
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jul 2023 10:39:12 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b70404a5a0so1569481fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jul 2023 10:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688578750; x=1691170750;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Weq9bZQxoIKIpV9bvKq/erXpr8iWhWkl79IG7bYwFpU=;
+        b=LbvBmP78W0KdVhKDDz3h23KLTxREVkpgtNm1Nxz4J5ItjkFsBUW/L5eCvqXZKfPCQK
+         kG5KQ8O3kutcv72BIJloMN38WFHmMvciPQwvEXhIcN56aREo6Gf2RkLLQ/j+yX1c+7E9
+         UhE0DiRvNLKec1ZEty11shmK/ltprbVO2Ak5HbFqB80lDhf9bsDYzgPaW39RHaIdxMkn
+         3BMUEno+GTePm+mqGh7YieQbGEVgSdqRxXcuCbYdETykFag7yLwRmH8RwAklY9bFifW3
+         PbKCKBdrCH1gECX8r5baUy5EOwyqQiR9nbLUN+1MHv5uFgbctHbeGyeMHxPnzM1qoEeP
+         4z9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688578750; x=1691170750;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Weq9bZQxoIKIpV9bvKq/erXpr8iWhWkl79IG7bYwFpU=;
+        b=BjHUXsESKNez9hjLy3Sp1rBFML5Ed/D89A/+bAgYWxjYtm49cuGYjrT7PwI7znsfCj
+         eZ/ctlCl7DZYnNOqW0QompKBJvyrf0pHUjfmuCnIoXdrM7J73U21/k2jjOVIXNuI5qls
+         ejLzTc0lfIU/Pr8EfJNykvdoajChNSsvHjcjAF4aU7uEIHzko9v9laQM9/hDm+dF8qm2
+         uuox2/dnsupeasNx1do0RyI0jTGdNPpKp6N+yZDxxQdi4JA7Nl+pV7tczKc2EbeDLhKq
+         iJmnjCxOUzZIaSLmwsAqMrhyErGEI4tvzcEpSqJN9QcnTzgRDzEbUL0wd2fbv63UWO/N
+         tYGg==
+X-Gm-Message-State: ABy/qLbgj3XNeDaKsgMisP1Q8Iw7wiICt3kDRiP9lKzdEeqSJ2HJ8Xy7
+        VD/8CVlLQG7JT+lDMAMDbWSojS6ff6V0fAw40mY=
+X-Google-Smtp-Source: APBJJlEnH9JqtV2KbvWl2Q/2IDjSmHagJymDENfkKCTpJxlksWiwnJEdqCkrPWUjPOlzx725zi3KPR1vHgSHm0rIImI=
+X-Received: by 2002:a05:651c:1055:b0:2b6:db9b:aadc with SMTP id
+ x21-20020a05651c105500b002b6db9baadcmr10860912ljm.32.1688578749962; Wed, 05
+ Jul 2023 10:39:09 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [linux-next:master] BUILD REGRESSION
- e1f6a8eaf1c271a0158114a03e3605f4fba059ad
-To:     kernel test robot <lkp@intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-Cc:     Linux Memory Management List <linux-mm@kvack.org>,
-        intel-gfx@lists.freedesktop.org, kunit-dev@googlegroups.com,
-        linux-bluetooth@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-serial@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-References: <202307060015.uSSLonkv-lkp@intel.com>
-Content-Language: en-US
-From:   Helge Deller <deller@gmx.de>
-In-Reply-To: <202307060015.uSSLonkv-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20230705085131.6643-1-claudia.rosu@nxp.com> <20230705085131.6643-2-claudia.rosu@nxp.com>
+In-Reply-To: <20230705085131.6643-2-claudia.rosu@nxp.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 5 Jul 2023 10:38:57 -0700
+Message-ID: <CABBYNZ+dh-E=zKARKcF9U6qbAAa-DkS=uOZHi_woicDX_Mu19g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/1] adapter: Allow broadcaster to be passed up
+ to application
+To:     Claudia Draghicescu <claudia.rosu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:JWzwb8Bva/UEgbtilJvt13AQt9pzz5xRYErsh3WY62+4pR/JSr7
- E/ZCgIGCfWrdxsdAhFANBDjvFgoalIGY6w7xXDDvVbo6bukUPeo3H0kPOGuGfEuEPW+hpci
- 5yURWZq12WjOMTG4sxOTFyDeY6nqEQEW+JLLHm6PvKGEeuQtUcX+IqGGbdSuMFfQaX3tZ/X
- GoEZ2H3cKEEDXrgvGuj3g==
-UI-OutboundReport: notjunk:1;M01:P0:S8CTIvuZ93Q=;Yy5kGFHKOIF64l/dJf6L9tVy8J1
- F9W0Dixe2+IK8eY7U+fy5r+gr5Z7DsLdmqZD9wUVe80JXUrFIjGe8+cpSdO5uqMn1jdSKQqT1
- duQOsmIvSS9J1BF5x7eK7c7f7YzTXH7R9Ca9x0l5U3h0/cl9qz3iIJM6u5IqSb68CUweB8D5t
- xQspgNRbIzAH3pm7gSyTMTVlw75mE358cIp+jQ5FFt4Og4NiejEzNxSww8Q3ONC3mAAvycbZU
- YVpyFtVW2bkh0FFPgKbVS64+ARCtNJ5ro3XzK4YnevLWgNcvpHQe8219vzx5nlWq0XyogFDEo
- 9vPQF5UaGWPfv7Wsj226k2bTtCKlKtpSboIoyjizpulceSkWD9JCipY4RgPs+e+wJozuFqypQ
- Wz5uFxNK4TQ5l5zDSbpG6oEQlJtFwVPRjSyM3Z+/mTedJGd2820lI7IfMaRCMpcP6ubx2Uv2Y
- qtiYcTr6tQKiJz5NkE1AqJ03oTm5LcjvOt2IdiFrN1rEnrq++kG0t+ysXUfZHrHRMTFVZm1Sa
- qCJ0dRaRO9JccFTBTK1Gd3PFFyMSRRW4RS1hdu1QKieuqkRKqTlY/FOAQ2d4jROlTl0GlbbKi
- o2ps10rlSfUJJOtUVxCEfmJIE+SnsBgMxr0YbFGJKYds9ABZHri17Mr8eSAyAH61a2cb1D+HV
- YcZwSIeQVsnycKrL3o7nA+Lte5BshDpdg91Q5SiA3geQQA4rL5DVKiJ8zjbk1+6QWHr6YNNiS
- PQDFUy9enCi0YnwOVWO0kwztKDESTsmi9yLXT5PsgvmNykmAj0DKuRRxJ54XAk9XLzIeLEjq4
- cXKbOveLChOhfQsyMw2xVG1SW4221+M4AwacU90YTahWCAz+NPQKTf8JjLDnuadxFmaVXL2ga
- xM7TtHxhRd+SNNqUGhS1sEPgxbLC1iGmAPn79H9YZmKUBx+a65O2nsAs19qrUoCNRy9wViDu0
- FilYK2I9u34XYp7IBPL+4eEQKPU=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 7/5/23 18:07, kernel test robot wrote:
-> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-=
-next.git master
-> branch HEAD: e1f6a8eaf1c271a0158114a03e3605f4fba059ad  Add linux-next sp=
-ecific files for 20230705
->
-> Error/Warning reports:
->
-> https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.co=
-m
-> https://lore.kernel.org/oe-kbuild-all/202306260401.qZlYQpV2-lkp@intel.co=
-m
-> https://lore.kernel.org/oe-kbuild-all/202306291857.nyJjYwqk-lkp@intel.co=
-m
-> https://lore.kernel.org/oe-kbuild-all/202306301756.x8dgyYnL-lkp@intel.co=
-m
->
-> Error/Warning: (recently discovered and may have been fixed)
->
-> arch/parisc/kernel/pdt.c:67:6: warning: no previous prototype for 'arch_=
-report_meminfo' [-Wmissing-prototypes]
+Hi Claudia,
 
-The arch/parisc/* warnings have been fixed a few days ago in for-next, and
-the patches will most likely be merged upstream today...
+On Wed, Jul 5, 2023 at 2:02=E2=80=AFAM Claudia Draghicescu <claudia.rosu@nx=
+p.com> wrote:
+>
+> Allow a broadcast advertiser to be passed up to application,
+> if the scanner is an ISO Sync Receiver capable device.
+> This allows for a broadcast sink to discover broadcast sources.
+>
+> ---
+>  src/adapter.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 2679d4302..9c971d488 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7031,6 +7031,16 @@ static bool is_filter_match(GSList *discovery_filt=
+er, struct eir_data *eir_data,
+>         return got_match;
+>  }
+>
+> +static bool accept_bcast_adv(struct btd_adapter *adapter,
+> +                               struct eir_data *eir_data)
+> +{
+> +       if ((btd_adapter_has_settings(adapter, MGMT_SETTING_ISO_SYNC_RECE=
+IVER))
+> +               && !(eir_data->flags & (EIR_LIM_DISC | EIR_GEN_DISC)))
+> +               return true;
+> +
+> +       return false;
+> +}
+> +
+>  static void filter_duplicate_data(void *data, void *user_data)
+>  {
+>         struct discovery_client *client =3D data;
+> @@ -7154,12 +7164,18 @@ void btd_adapter_device_found(struct btd_adapter =
+*adapter,
+>                         return;
+>                 }
+>
+> +               if (accept_bcast_adv(adapter, &eir_data))
+> +                       monitoring =3D true;
+> +
+>                 if (!discoverable && !monitoring && !eir_data.rsi) {
+>                         eir_data_free(&eir_data);
+>                         return;
+>                 }
 
-Helge
+Lets match by advertising UUID since it should contain a broadcast
+audio announcement to be considered a broadcaster.
+
+>                 dev =3D adapter_create_device(adapter, bdaddr, bdaddr_typ=
+e);
+> +
+> +               if (accept_bcast_adv(adapter, &eir_data))
+> +                       btd_device_set_temporary(dev, false);
+
+I wouldn't persist broadcasters like that, at least not until we
+synchronize with it, that said, if it is using a random address it
+probably cannot be stored anyway.
+
+>         }
+>
+>         if (!dev) {
+> --
+> 2.34.1
+>
+
+
+--=20
+Luiz Augusto von Dentz
