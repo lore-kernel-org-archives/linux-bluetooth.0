@@ -2,159 +2,226 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8454EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jul 2023 08:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA7BFEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jul 2023 09:36:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231990AbjGEIwL (ORCPT
+        id S231736AbjGEJg7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Jul 2023 04:52:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34478 "EHLO
+        Wed, 5 Jul 2023 05:36:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230453AbjGEIwJ (ORCPT
+        with ESMTP id S231666AbjGEJgx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Jul 2023 04:52:09 -0400
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2086.outbound.protection.outlook.com [40.107.241.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6961AE47
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jul 2023 01:52:08 -0700 (PDT)
+        Wed, 5 Jul 2023 05:36:53 -0400
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2059.outbound.protection.outlook.com [40.107.8.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605E3173E;
+        Wed,  5 Jul 2023 02:36:51 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EUcTrPWbpngVCb2LvVKlOb0SSF3mAnrBlYzjHZ8HzfFvsEZumF7op3Xf6ZApu/Af5USDbqImP1JovvpsqYROseCpaskDYWfk6va6Ri4Os5DV76dzqjNaIKWkS4LBXFYqvvv9xydPij49Pgv0gvnZGNwnUcP1PaEgTdX2aKiSyKgEWrwLOvujh69meZ0ny1BMoU3xxtOpgzsHQuTuUp/mnaa5kOdxJIqThUspd7l2SBwFuzgkGHy2/ti0eMoSzhJpLwCcH72vytdb4L9kYi+KrUh0Qa2Za7dKcTHdK5Ls+up/8RlIL293WBMmVmy0ckE4iesPrC66cNuaZXIl4SoAFw==
+ b=hrTW1xMjgiQeKjolG+Dlun+/qW8TkBZZ6ZswVsgQAcoN35p7db/KFGJsSOUkausVH3JOsLZ3cLj46DDnX5eSHmGib0gK0FZXkglodI/On+1AXVaJ4kq03UNzvqI0jyE29fA8rXoz83f0hISU+CROqICfb7MfjohEtTxjxjwRCVCJ/NfPQNcPeyCMWdOhzxJXnINe6oPLxS4SlWmsEC/6knJZ5EvT37E7con7k4CKoVjJu1C9onQ/lilhPKUK9LzlWy2QqJ70jQt8oKLneCI55nf+gaOUCbis7QqAlXji+9r8/T7herzzAMQ6+FZDHnELgFFTsRuZddE5/PQdX3FkxA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X5Q1wslN8niL2WakhQKoHYD9KHuHkSkR+IPBhPR70Lc=;
- b=AytqbAC6w9GYXOeBOZY9wJXP9Ey5rTMdGSC22a5rUKCy5sC5uvcgUdABa9wDa7U9cLFXLJfM4O30Su92dI5GAT++Q6hcMftOdS130DbqOXs0LIxvMduj+jArebj6T0pGJnD18NFuJ+clFAInJlPqNDVZ0t51nxroR0jCKYx4VBPqRnAKykK7GjeVKiOtTs02u3sb7/a/oU/YxcbjtnxT9pFLaTvuFmwG2W4JZjbEp83y/z2cFM6opadcdRSGo2eVTU/e4fLp9dBubxAgZWYsVZu3Qj3f2ThIipNgn8En0JJ5yUW/V0QT0Cbg/sgiLoSPbrxhLItoB30sICzX9Ev5Xg==
+ bh=oFnspkMdQ0unIXE4rJ2K2f3czgHjMZojJCCiJUPqeqk=;
+ b=oRTapCBQ7zyaCAClFHvFnwRf3L5yjRkTEgVuvhoUzmGDQTU7yewM4Vfr9JGbIXYuICuPLcAWRQFugaA6rdY2NhCCHIS+ZdHpZ28ZrhfG2T0A8A+BMUSc7JBUQP8VIus4Se6KPOAweLny7sYJrleOHlfCxFjivEbTrG2xzuLSV7nuLF+AL04zhhQBx6UcH4Isjbk9iUNQ4TVIOkKDKIZePDCWTh2lEtzH8M2/MtPqMdqwIOhUiET0X+hi3j8X5SMGGR2DoLKMLPH0TOa0rKa6YgFMitJXuL8PEEc8C+O+34+BuOPOBHoaaAy2LBId9InMHAeMULzAwlviBkQYr/42RQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X5Q1wslN8niL2WakhQKoHYD9KHuHkSkR+IPBhPR70Lc=;
- b=pgLG3UWQtAUbWwIx6OYCbZhzHCVErUIDpFVRYYNt74WH6I2LQGf8qQnzMcFV5FkA4/GJwmpGLKPZ7gr0/wD0CSlylAODmX7sICqriyLoA0aU33ZC43NCNnji7dwPeT8u2hC9HrX2osbTrlW5nirIKAJKn3Df+Ax852HImsuS1HY=
+ bh=oFnspkMdQ0unIXE4rJ2K2f3czgHjMZojJCCiJUPqeqk=;
+ b=Ig/Aziu90AMW5DFOryCE4Bq/+X2jm/yuPI8Jo8AoiTGogYLEqJrWQggwrg5wpmShB8YDR9hDkz4iTx7UsjruRnTKG30LQlvrwHhDML18P6sgUMAi2Gw61VrxpyedBN1um4f75af/KDU5orcbDC0BhsP9sd6DfxXFdw0pmANFs1Wf5YH5sB22oRqlVQz32dncoemE46dU2ZAmWJjphcJWo87j4gvYIE/WQZnPlGEpV7LYlglra8Mbd44AULizggBFOnh9wt6C2KMVOwHgasb5LngjTEdURh622nOg5PPnyinXjJi4TLI33mcodbsCOia65HhIlQrZrZV6pKqpsV/oCA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
- by VI1PR04MB6846.eurprd04.prod.outlook.com (2603:10a6:803:12f::20) with
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from DB8PR04MB7164.eurprd04.prod.outlook.com (2603:10a6:10:129::23)
+ by AS4PR04MB9623.eurprd04.prod.outlook.com (2603:10a6:20b:4cd::10) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Wed, 5 Jul
- 2023 08:52:05 +0000
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::2cc8:4c5d:9b6f:5cab]) by GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::2cc8:4c5d:9b6f:5cab%7]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
- 08:52:05 +0000
-From:   Claudia Draghicescu <claudia.rosu@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Claudia Draghicescu <claudia.rosu@nxp.com>
-Subject: [PATCH BlueZ v2 1/1] adapter: Allow broadcaster to be passed up to application
-Date:   Wed,  5 Jul 2023 11:51:31 +0300
-Message-Id: <20230705085131.6643-2-claudia.rosu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230705085131.6643-1-claudia.rosu@nxp.com>
-References: <20230705085131.6643-1-claudia.rosu@nxp.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
+ 2023 09:36:48 +0000
+Received: from DB8PR04MB7164.eurprd04.prod.outlook.com
+ ([fe80::637f:a940:d807:34c2]) by DB8PR04MB7164.eurprd04.prod.outlook.com
+ ([fe80::637f:a940:d807:34c2%2]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
+ 09:36:48 +0000
+Date:   Wed, 5 Jul 2023 17:36:36 +0800
+From:   joeyli <jlee@suse.com>
+To:     Weiteng Chen <wchen130@ucr.edu>, Yu Hao <yhao016@ucr.edu>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: How to reproduce the BUG general protection fault in
+ hci_uart_tty_ioctl?
+Message-ID: <20230705093636.GL5866@linux-l9pv.suse>
+References: <20230628150140.GU21539@linux-l9pv.suse>
+ <CA+UBctDPEvHdkHMwD340=n02rh+jNRJNNQ5LBZNA+Wm4Keh2ow@mail.gmail.com>
+ <20230704030131.GY5866@linux-l9pv.suse>
+ <191B9131-6E47-49B6-8089-108E2B12B9DC@ucr.edu>
+ <20230705084148.GK5866@linux-l9pv.suse>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM4PR0302CA0022.eurprd03.prod.outlook.com
- (2603:10a6:205:2::35) To GV1PR04MB9151.eurprd04.prod.outlook.com
- (2603:10a6:150:26::9)
+In-Reply-To: <20230705084148.GK5866@linux-l9pv.suse>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-ClientProxiedBy: TYWP286CA0009.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:400:178::7) To DB8PR04MB7164.eurprd04.prod.outlook.com
+ (2603:10a6:10:129::23)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|VI1PR04MB6846:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5c55ab05-f515-49eb-0f2a-08db7d351b69
+X-MS-TrafficTypeDiagnostic: DB8PR04MB7164:EE_|AS4PR04MB9623:EE_
+X-MS-Office365-Filtering-Correlation-Id: fef5162d-8889-4156-8d05-08db7d3b5aff
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lKUF/f1AaHbZgyPgUaE9eY1wpN0TpTYbMMOH2TDpWgCaz0TN8XG5BvCza0IHkQgg/UsnWmnEgHfaYAUgE1rEihWv0vgXq0IT0MKN/zezO9msC6dZ1J+sPZoPGgp05GjpO96mWu7Bo2L+DBbi5TH+MEbz03nofVjxectvVaLmaCsyD6RQDushS5lAZzdA5sN0gdRqzF31JWS2kZcTrtEQvtDuhiM73yDZrz/yBM6hqhoqkfFdU7n086ccmlUxsAHRU+MEMVM5A20mKK5u9/qUyJgwVVtRgV64uxv2vUgFPkUM3bSMzVIFNxbROMoxl0Eqg8EAbVFC5Fp+jTBOjKwDq9DNaclRdbq17z2lur4Ct4SfM+6eLV2NZPwBv/Ux48OYfzKjKyNoFc7EGb3DznVmNpatgV4tbJtn3D0QNXwDp7Yiqnjtfnqc+s6k4Y4PeJsY4vioWLDehqEYRFXgGp9tO2aLUDvHkf1hM7knpADmGKJlUslqn/uhOLL+r2cJPHlvg1U/PuvAcww4DGCUEWVFir05ULY91QiCeMSY3pS1LincmZV+Iy9ON1G9ojaDwz5CpQcUealqu3wOQA8+fXIHEik2PU1tGt3z5CNOQwfOG3Qv6eSKlt2tCwtgdLvHyLwq
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(366004)(136003)(39860400002)(346002)(451199021)(6666004)(478600001)(52116002)(6512007)(86362001)(6486002)(66946007)(6506007)(38100700002)(38350700002)(316002)(55236004)(1076003)(186003)(6916009)(26005)(4326008)(66476007)(66556008)(2616005)(5660300002)(8676002)(8936002)(2906002)(41300700001)(36756003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: zDDSQedcGJbvVtlPRw7DrTnmzZiBATUIg/E0BXrf+jtAnZwR3hzEkOUAx10zFDaLg3zwGe2IVz8J9c9AgqEenBfbjX8x52j7yiL6sTIYTNGdafpQ+C1VpavScj1Kbc+Nyeqg9R2SWHT0IIGX9+MIn2vSjqpeV0dWovr/h1c3SXspMmpal39BY11Nit0tIh5trzbNFYQwCSEFMMsMAgOwTFVaHSOa70jec/TmOIG4Ebka8tJbxaa5fiyt+lbUEmDm9GzrKdOlF+XUtspLInafTD4w6EQJQo5DICrM9pySvLWgpLEEGfJwRsPuuo2LQRYd5DD1t8jT/JDu0/ntUjeIV40GMWeVtl+QVzAhSl0u51y6HlrL0ZH25FRnWcISZndU9Y7x4bFbXg8Lkf4BZ/h6QlqkEYL3PFsBfygBNCTxfHBdl8baD5ApqvoK198VyeJYo4E5onPag0JMweFGXNwTSAO3HP8KFGTEawZX62lqt9ZYun3x08NHP2/djl6EAl3I2k3L5einMtnzWhK1sQXup2Vs1fe3TsIbp/qrHbi8q7k3fGFnzo4iZtiet7u4d1aP90/MevrRwYEtHIvQGzbvfrwoD9ut93OptR4YkAb2l4uPf4f1aTiI5HWSzgOLVVZUAhLsd+6b4OnESF7Mje5eow==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8PR04MB7164.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(346002)(136003)(366004)(39860400002)(396003)(451199021)(8936002)(53546011)(5660300002)(8676002)(86362001)(38100700002)(83380400001)(41300700001)(316002)(66556008)(66476007)(36756003)(4326008)(66946007)(966005)(186003)(9686003)(6512007)(33656002)(26005)(478600001)(110136005)(6666004)(1076003)(6486002)(6506007)(2906002)(84970400001)(43062005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cGsHmfsWhwyxekts+/iWIpKBSaBImvQH1e147m+D4sVgA/3X6dSF2YG8eimn?=
- =?us-ascii?Q?D2LGrnbQSTc8udEsd6npsDupa8xAG2masLaJaOzqtDo8T3DkU2TRv796izDY?=
- =?us-ascii?Q?CzRkQC26KafT2YvMo4EMVMJc6pC4migomd0FLI+J5a2qI30Q/wtQ7j22CbA6?=
- =?us-ascii?Q?6N+GWWn6IK9o6ru/MkKkanfdDVGIQxQNCZV2t0WA3+gMJmjLZnTJFxfkw8QL?=
- =?us-ascii?Q?e9ZpSeDjZ9zXxumsJ3QBx5xOOTBLdjlm6emAVodk5JIx2sPUnLRidjC5kHfp?=
- =?us-ascii?Q?idPnkp4BF4JxV5OBoM5fvgdrAP+957YNthvi0RUjc1f73CT5Jnle2D2ZEJr3?=
- =?us-ascii?Q?y8Whr7w4y+6wSTleqvisft010pAjhK5Whmf4oXwGDIuEJ5IYHAR6Plz+UgiC?=
- =?us-ascii?Q?ENMCgFr/03PdL30A/QsGMeLNlWAHq8/I5jzzOiiRCRN4gNlzNZDKko/ZYYhW?=
- =?us-ascii?Q?5ulOEO0CErJU97RWtGz0gMWmADd6RIlftN/OrxcfqiCtr7tHJEBttyFtTbaY?=
- =?us-ascii?Q?gsb0IocCzMAqGf/d23OpR7SLtm7by8aI6MVY9llc4d1NFC0tqVIKPLpU0JaU?=
- =?us-ascii?Q?VzzVRaKAhaXRpKuDybkcEcqjsLVxMAAyOAM9K86RQxpVbfH+6PQ5EYeCWN7z?=
- =?us-ascii?Q?0leUqCaJfW0tcihFg2N5TvFz8fn/QQHVi+NNYHtAOFUtIVH7N7wbzirdK4mv?=
- =?us-ascii?Q?UQQCFhuq2quXMY+UVy1Bcoq8HaeOWaB9H3+NEEeNm7xXLzZ+XCm5VA3LDLrj?=
- =?us-ascii?Q?rG3Ow/pv80ju1eOVhvfYmj0toPibAs7xEZhRw4m3acuWbJ221U/Z/dmc2u6w?=
- =?us-ascii?Q?F9EYSHo7nYWT9vHu5vA9/28B28QVAZHLgD1Rn1cUcN8KTbdeVFeeLh8WCDYE?=
- =?us-ascii?Q?JczyPp/BkKNY1JsETz0HqFwMw8sTkX8nCUJ9WyBdtvkrZHg3q3XNv3iMLyqV?=
- =?us-ascii?Q?gWXCPT9BR11P08AdtuEP3XSVlXabEZ9tDyMjAPmwpu8R5yxl5R9JOUrSyoVn?=
- =?us-ascii?Q?tk0hLLW0l+XmO/qd5N8xMWs4xGyp5UkEVdHPV+GBFVpINes0CfprZCrwwWpy?=
- =?us-ascii?Q?23z72LThIArbvX39N0l+JBzUxZyGDPfP8btR2CETEFUuaMD/4cdBMiie89uu?=
- =?us-ascii?Q?nXOO2r1rroDvtosBjen8/KydPf3UeUIfEU4k0EZV29FWXpzvC1T6mfXEwQre?=
- =?us-ascii?Q?tOPnB2a3+/MIkMY5BP7MJou20xP4j1QjsIgKBSOvMKZv935bdwh4L5bbucPF?=
- =?us-ascii?Q?ISWjga/RIVprqvpNN6TAQv/KxXsF6gkP8uR75fsTUE1DdWGHFBLqxXuXbqv/?=
- =?us-ascii?Q?0M04+LToJIBFaT2Qr+bye+d/BiO/eZUqLD46JxGC5SiGT57+lhmtY/C1mqb1?=
- =?us-ascii?Q?Z1UZsbW/YAn2guLpB9sTzgtdHWHI74K/YGtB6FORqUEiur3s/6GDyndPbzp6?=
- =?us-ascii?Q?l3jf3okoM+rxuM93q1Y5eGTPS8Tez56WSJDPukCpc94bgO4TM+I24ag2qGoy?=
- =?us-ascii?Q?2JH20HtysZp9Lp44XmGUuVUiDz0LEWunrSlK9+qJd5ttX1UQ+XDneuwnwqOC?=
- =?us-ascii?Q?69s6j1yc2ly+EMLrk5GBBn4VEEj9cz4hGVT3tCNS?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c55ab05-f515-49eb-0f2a-08db7d351b69
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a2cyb1Nid21zMkpLZVEzMStONmxFa1dySnV3QkFSR1VVdGVXandZdEcrL1Ir?=
+ =?utf-8?B?SDNHbVpEd2JKWUtJOXZYbWkycDN5c0wvckQzVUhSNi9oTTF2eUtTQkpOd0ZQ?=
+ =?utf-8?B?ckR3cGlFL1JzZ2MxMjhWL05XdnVkREowRVFmSmF1dk1FeXhSbGZTU0E1YTNG?=
+ =?utf-8?B?WDRyYnhGUWFkSW14aE1ER0RDRmxwOExoUUVmdHlMZDFkL1Q4aUZKQ2UreWVE?=
+ =?utf-8?B?TVZBM1llaTg2UlUxVHhhTU5qQ3RETTYyak9lY0IwOHZYc09OTCttSGdFRXI4?=
+ =?utf-8?B?WEpoWUVQTUhIQjRIc2V3NUJoMEFxeWhYS3U2UHNmcUxQWGNjT1RiUFR0MjNx?=
+ =?utf-8?B?RHRGQ003NHVieEIxL29ldWE4bGcyb2FKdms4d1hmWUtnVTBhckRxcnBvcmJL?=
+ =?utf-8?B?eGgxVkp1Q0YwL3hFQ3VLUTJBZ3hNWlRRc21OV2tBdnhESGlPMFVnaWFNd1JX?=
+ =?utf-8?B?amcvU2hBM3NzbUlORG8wcGs5Sk9tcEVkcEZBSksvaDdVdzBaSEx6MGlMNktS?=
+ =?utf-8?B?RG1sN0xrV3lwRGtzK1ZTbXkwcmxwU2dXSDErNEI2RUMzaUJlaWVBbUxQcTA2?=
+ =?utf-8?B?aW9ManVQT29HQW5MQ2NDTU9FMWUvanM0VkNFYVFSV3pHR3QzYlpzeVNRTUpM?=
+ =?utf-8?B?TWZqcUlybytVak9GaHZndVROOWIwTUNlNWhmZHlxeGZHV1AvMWcrcklpNU5B?=
+ =?utf-8?B?R1hxLy9kcWdaOU5jaHpsNEI2ek15bHJTRkZiK2dRMlhHMnpLajUwQnV2b2Vw?=
+ =?utf-8?B?SHZ0THdYVFNvbGNkMiswaHpla3JJbk5ZVVJWYWlQb21oL2I1bnV5SEtkLzZP?=
+ =?utf-8?B?NVVOcE9sUlpMc1VqWWJIY1NEbHNiaW1OVHI5cTJhL0Z5RHBBaGZpNE1uL0ZG?=
+ =?utf-8?B?SkpYUmZFRnBYTjRYRTYwTGRPRVZWalNmeTlCekNaWCs3NWNWVzF1SCtRdGdK?=
+ =?utf-8?B?eTd4U21zaGZNb1pHamZGZmdqYVc4M3c5K25ZT0hvY1RXNXpibklKZlVTbTFO?=
+ =?utf-8?B?MXJkMXM2UnVYV2xBQklRUkpXd21FbGZFVm8zZFhDQkx6NWRXL2NpdjhNSmMz?=
+ =?utf-8?B?RDlQb2dLY0t0cWxBZDRlRlVGTzhoZWczcHFZaHMrakFGVnRVUFloSUtPQnZt?=
+ =?utf-8?B?TWpwODVQSlJRcWVXVi80OUg1REh5eFJvM3VwbDd2L3NqdC8vZnBqUElBcy9I?=
+ =?utf-8?B?ZSt0SnBRR3JLKy9DV3FpdHpDQmR1ZG5QNzVCQkNMTmtRR3FWZWxyUlB4K2M5?=
+ =?utf-8?B?aXUyeWhlNW51bUgrWlA0TVp5WEhpNVBycGtUY244VklBbTBlcUN3MnNUQlBL?=
+ =?utf-8?B?cXpNckZneWFERmxrYStCTG9ESVUzZFZkNVI1ZXVRTjRHdG5ULzRmbGMvL0Qw?=
+ =?utf-8?B?NUgvdXBmR2thYVRnNUlqczhDNzVzRkdNbmp6d09HSnZ2NStDSFRhczBzaW1K?=
+ =?utf-8?B?L0hhRGVnMDdpeC9vRXBkQnhLNzNUNllsTHphRWJ4T29zTnhjTkozamRETE1y?=
+ =?utf-8?B?Q2txWFBCdDFXWlJnTFhkbk5XNHpsWVlZSUNSVGMyUnBPUUdPRHErUEI1b3Y4?=
+ =?utf-8?B?SHEwMy9wWlh3cDdzRWs3TmF6YzhKaDV2UHRQeDcvak8zQnFtcVR3REJoTHJY?=
+ =?utf-8?B?T0dQRlUzWGRRSUlkTkY0RkMvaFJNOUVjaWJpQkZ1RW9vZFV2eHduRE9LWkVl?=
+ =?utf-8?B?Tm81NVplLzFtZUUrZC9HeE1pVDUxcVlCaEQ5RlNNbnRQVjg2Z2FUaEgyUURj?=
+ =?utf-8?B?MGUxYi81eHRiSjNtem1aQ0xWWVBJSEMyZnZOMUZSWnZVY2kva0sxZDU2NURL?=
+ =?utf-8?B?S2t6SGU1RUlmbm5IRDhpUG93ZGhmenJqVFdCeDFraWVKMjBQM0dKbU5hTUJH?=
+ =?utf-8?B?RHRDaXNUcXFDVjBHc2dJME5aeDVKZStkRjRCTmdTQUxUN1ZTT0RDNDc2OXF3?=
+ =?utf-8?B?SitrUTg4ZUNoS3ZsQTBBRW54bndhQS8xemdlbkpxMGNmUjgvU1pUUXFUcGxu?=
+ =?utf-8?B?WGVnSUN0blJBZ3BXY0g5aG9FS0dLalo0TmJvZ2NiWWcvUWI0a3QxN2Z6eXJa?=
+ =?utf-8?B?ckRkV1ZjT2RwY3V0TG01V3Vkb0RXTzl5aUtGRXFYZEdGTGlPVmk5V0xEODJJ?=
+ =?utf-8?Q?HCpE=3D?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fef5162d-8889-4156-8d05-08db7d3b5aff
+X-MS-Exchange-CrossTenant-AuthSource: DB8PR04MB7164.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 08:52:05.1409
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 09:36:48.7433
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6hJOlWenmJnzBNQ4hV3I/X+AdekOmL9IK8Mgq1PfZwH4BI3xZUhPYha0XKRXjfXhcnvg6a8BFs3sHTFmXvq1FA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6846
+X-MS-Exchange-CrossTenant-UserPrincipalName: i0/BPSip4EGYdZeNH3IZQcJiIC+fQxVfpuFZHb3rFslIc/tCR0tStZdbz086NNSI
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9623
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Allow a broadcast advertiser to be passed up to application,
-if the scanner is an ISO Sync Receiver capable device.
-This allows for a broadcast sink to discover broadcast sources.
+On Wed, Jul 05, 2023 at 04:41:48PM +0800, joeyli wrote:
+> Hi Weiteng Chen, Yu Hao, 
+> 
+> On Mon, Jul 03, 2023 at 09:07:38PM -0700, Weiteng Chen wrote:
+> > Hi Joey,
+> > 
+> > Sorry for my late response.
+> > 
+> > https://elixir.bootlin.com/linux/v6.3-rc7/source/drivers/bluetooth/hci_ldisc.c#L764
+> > 
+> > switch (cmd) {
+> >         case HCIUARTSETPROTO:
+> >                 if (!test_and_set_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+> >                         printk(“test_and_set_bit…”) // insert a prink to make the race easy to trigger
+> >                         err = hci_uart_set_proto(hu, arg);
+> >                         if (err)
+> >                                 clear_bit(HCI_UART_PROTO_SET, &hu->flags);
+> >                 } else
+> >                         err = -EBUSY;
+> >                 break;
+> > 
+> >         case HCIUARTGETPROTO:
+> >                 if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
+> >                         err = hu->proto->id;  ←- null pointer deference
+> >                 else
+> >                         err = -EUNATCH;
+> >                 break;
+> > 
+> > This is a race condition between HCIUARTSETPROTO and HCIUARTGETPROTO. HCI_UART_PROTO_SET is set before hu->proto is set and thus it may dereference a null pointer.
+> > 
+> > To easily trigger this bug, I inserted a prink in the source code so that the C producer can easily trigger the bug. Please let me know if you have any questions.
+> > 
+> 
+> Thanks! I can reproduce the issue now. 
+> 
+> Weiteng, Yu Hao, do you have plan for sending patch to fix this problem?
+> 
+> Joey Lee
 
----
- src/adapter.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+Looks that check HCI_UART_PROTO_READY is enough to avoid problem:
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2679d4302..9c971d488 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7031,6 +7031,16 @@ static bool is_filter_match(GSList *discovery_filter, struct eir_data *eir_data,
- 	return got_match;
- }
+--- linux.orig/drivers/bluetooth/hci_ldisc.c
++++ linux/drivers/bluetooth/hci_ldisc.c
+@@ -771,7 +771,7 @@ static int hci_uart_tty_ioctl(struct tty
+                break;
  
-+static bool accept_bcast_adv(struct btd_adapter *adapter,
-+				struct eir_data *eir_data)
-+{
-+	if ((btd_adapter_has_settings(adapter, MGMT_SETTING_ISO_SYNC_RECEIVER))
-+		&& !(eir_data->flags & (EIR_LIM_DISC | EIR_GEN_DISC)))
-+		return true;
-+
-+	return false;
-+}
-+
- static void filter_duplicate_data(void *data, void *user_data)
- {
- 	struct discovery_client *client = data;
-@@ -7154,12 +7164,18 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
- 			return;
- 		}
- 
-+		if (accept_bcast_adv(adapter, &eir_data))
-+			monitoring = true;
-+
- 		if (!discoverable && !monitoring && !eir_data.rsi) {
- 			eir_data_free(&eir_data);
- 			return;
- 		}
- 
- 		dev = adapter_create_device(adapter, bdaddr, bdaddr_type);
-+
-+		if (accept_bcast_adv(adapter, &eir_data))
-+			btd_device_set_temporary(dev, false);
- 	}
- 
- 	if (!dev) {
--- 
-2.34.1
+        case HCIUARTGETPROTO:
+-               if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
++               if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+                        err = hu->proto->id;
+                else
+                        err = -EUNATCH;
 
+If you do not have plan to send patch, then I will send the above change.
+
+Thanks
+Joey Lee
+
+> 
+> 
+> > Best,
+> > Weiteng Chen
+> > 
+> > > On Jul 3, 2023, at 8:01 PM, joeyli <jlee@suse.com> wrote:
+> > > 
+> > > Hi,
+> > > 
+> > > On Wed, Jun 28, 2023 at 06:57:47PM -0700, Yu Hao wrote:
+> > >> Hi Weiteng,
+> > >> 
+> > >> Could you give more info about the bug, e.g., kernel configuration,
+> > >> qemu arguments.
+> > >> 
+> > > 
+> > > Base on kernel code, looks that the HCIUARTSETPROTO and HCIUARTGETPROTO
+> > > blocks in hci_uart_tty_ioctl() should use hci_uart->proto_lock. 
+> > > 
+> > > I have run the C reproducer a couple of days in qemu, but it did not
+> > > reproduce issue until now.
+> > > 
+> > > Does anyone know how to reproduce this issue easily?
+> > > 
+> > > Thanks
+> > > Joey Lee
+> > >> 
+> > >> On Wed, Jun 28, 2023 at 8:02 AM joeyli <jlee@suse.com> wrote:
+> > >>> 
+> > >>> Hi Yu Hao,
+> > >>> 
+> > >>> I am looking at your "BUG: general protection fault in hci_uart_tty_ioctl":
+> > >>> 
+> > >>> https://lore.kernel.org/all/CA+UBctC3p49aTgzbVgkSZ2+TQcqq4fPDO7yZitFT5uBPDeCO2g@mail.gmail.com/
+> > >>> 
+> > >>> I am trying the C reproducer in your URL, but it is not success yet:
+> > >>> https://gist.github.com/ZHYfeng/a3e3ff2bdfea5ed5de5475f0b54d55cb
+> > >>> 
+> > >>> I am using v6.2 mainline kernel to run the C reproducer.
+> > >>> 
+> > >>> Could you please provide suggestions for how to reproduce this issue?
+> > >>> And what is your qemu environment for reproducing issue?
+> > >>> 
+> > >>> Thanks a lot!
+> > >>> Joey Lee
