@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D354EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jul 2023 19:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00ADEEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jul 2023 19:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232097AbjGFTsH (ORCPT
+        id S230036AbjGFTxH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jul 2023 15:48:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51752 "EHLO
+        Thu, 6 Jul 2023 15:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229609AbjGFTsG (ORCPT
+        with ESMTP id S229490AbjGFTxG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jul 2023 15:48:06 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 484171BEE
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jul 2023 12:48:05 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1b8bd586086so7035815ad.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jul 2023 12:48:05 -0700 (PDT)
+        Thu, 6 Jul 2023 15:53:06 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 268771BF4
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jul 2023 12:53:05 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-666e97fcc60so897972b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jul 2023 12:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688672884; x=1691264884;
+        d=gmail.com; s=20221208; t=1688673184; x=1691265184;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X9w9UJ+qBqEaJm9FE++i1BQ1SA/D9TEIP9yW0WOBcmo=;
-        b=H8DAIESZ8l6brIdFrPWbbGZgkcTT4hZXAnAWUGJice7dxp8ePaD5cCxr0C+Oem0XXw
-         37ZVmzHQYGiQzM9ZM+KDpWlBLEx/espTSbFE4385KeFcAXMtu+JIdpvnUCKZOi5MwXeT
-         gCiPfYG6ChuQGXbXpZoXQOSmgNued4yMjp7HNTy0PiYDnYP9EVzDvAEj+TftQzki1Egx
-         m53CZZL5bks7RhKZSEJNuedm3Ba0HfUYBVwsBw1FD4NEwQZ1iCx2ZN/fQccuuy7QNlFl
-         7XEHN9MIj0qks57vem/+OepYr+bw+Gyr9ngxJ3zkJ7cMQeAzr/rbwAsJ9XQsXHzvySxU
-         NcMQ==
+        bh=Ouw02jZWi/s79zedc1y3o/UBqif9/zA8Pb5KBdWb480=;
+        b=IZ50v//iVJ+PuEBz7OAhIVw0omth+G80/HoX+Z70nOgXOIrah9snOU6wxIKhRhNmC/
+         l5nRxevJaPqVsZb/nnvpN7qZVfnhcwwtOhnEY5SVHEIjQ0A4rChU9gAzkSwfpjijZXxv
+         lWSkeZbLbso1VDP12MfpRDv7benQhwCSZYfrME4GSJfnzkBA6Cf8A0R9GsFvfqlZLnhb
+         mx4jjZOozweqCbGgvCdpE+fzh57Fmyl05ltpQw2RwrvTH6Hjl+epHbfQpwCs5IVAI+y2
+         RgIAigZdG6OAO/6LQeKh3TWs2Qmn4S9Bv+sS2sXrLEJZk7Tjpgu4tPx4uYeNkZAF5U6S
+         ZxQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688672884; x=1691264884;
+        d=1e100.net; s=20221208; t=1688673184; x=1691265184;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X9w9UJ+qBqEaJm9FE++i1BQ1SA/D9TEIP9yW0WOBcmo=;
-        b=gsMNcMR8Iy64DcBDzHg7EZBueUD6GqnvUK/YhaAyY5Twyhk9jFobP3aHVnmr+8atuV
-         OtNJRToCv7xd7OezoDDWoZE3785dFiBnF6a6CZOKOWvNC/6KPcy8BDJ8Nt6vwHsWWFKI
-         tqSZ8RwxnfM8yN3u3fmLQWlr60+/TqJC3XOXzaqcq02H8VdGN6GI6DAneQ97t+YSrN68
-         7baj9zcEa1t5sc10Lf6IAnULd4I5LaxWd93gMNa0XmQbT1YOmaihBpH2FKOdi8Kcn4KI
-         t/7WaefjD+UsNVgUIV3GZOsl8KaHcdGu612yWCrijtuM7lthfNnO/e9smsWUaUgCE3F7
-         yL3A==
-X-Gm-Message-State: ABy/qLZPzKIUpwaGyhd8DmjslSTOvmnyA9TobYvZVdRE2RA2fXirWo9r
-        LoDI41EP9D1JX8ygydvoSYiu4FXebbg=
-X-Google-Smtp-Source: APBJJlGBc6Q6odk+4oq3DigT5tB9Itd6JTBHSqHzRWkuPmWIqScWDIESFP4SMSIPyjpzY19d0zS0ww==
-X-Received: by 2002:a17:902:ec87:b0:1ac:8717:d436 with SMTP id x7-20020a170902ec8700b001ac8717d436mr3270512plg.60.1688672883918;
-        Thu, 06 Jul 2023 12:48:03 -0700 (PDT)
+        bh=Ouw02jZWi/s79zedc1y3o/UBqif9/zA8Pb5KBdWb480=;
+        b=W1m43W+7SqXSYpGPIcRwBDvUkgcAeNtkt9fXWMJYAeKZnKvJHBWoGJrumbMUAtYmja
+         r1Tx3LuBbMhF/I++LFW5Ntq3baAcT+Bw4gYQoMOnheMDNBj1wQ/VxishTd3h3rbriuJh
+         LCb/dXce9Fm/jptfBE3KPHDcDkfwQMQHFVtkCHpxUPT/7CfUCl5Ia/c4TZ2mlB+qzzJm
+         1SRzJ/QxwzI7+rw+Nqy/mrU26zhmDHCWMZmeo5CyX63pVTFiygylAYIXkFUbe0ouErg1
+         siT9PMbjZlMtS6alMNEQuSNDzU7HnSmgsiJtLkJgstrKEdpKTvUJTsZKu3eL+poLmOq6
+         bwbg==
+X-Gm-Message-State: ABy/qLZuAB3u0TcHXBU3zOYnR9suoRcidCD/nezLQfrCMiygHNbYxiqn
+        2PmWFRXjR7RucQYJHqX7lEFSg+5ig14=
+X-Google-Smtp-Source: APBJJlHODSDguiN1BTMkm+uZAm/Sk2lZg3u7EZRPm6pHetz67ft/NqsyuKkQnBiBqA41IU0qwbU7wQ==
+X-Received: by 2002:a05:6a20:2a0a:b0:12e:641b:454a with SMTP id e10-20020a056a202a0a00b0012e641b454amr2217130pzh.30.1688673183717;
+        Thu, 06 Jul 2023 12:53:03 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id jc5-20020a17090325c500b001ac5896e96esm1766651plb.207.2023.07.06.12.48.02
+        by smtp.gmail.com with ESMTPSA id i11-20020a170902eb4b00b001b80b583092sm1773803pli.210.2023.07.06.12.53.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 12:48:02 -0700 (PDT)
+        Thu, 06 Jul 2023 12:53:03 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mgmt-tester: Fix tests that consider 31 bytes the max adv lenght
-Date:   Thu,  6 Jul 2023 12:48:01 -0700
-Message-Id: <20230706194801.391764-1-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: MGMT: Fix always using HCI_MAX_AD_LENGTH
+Date:   Thu,  6 Jul 2023 12:53:01 -0700
+Message-Id: <20230706195301.395052-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,123 +64,100 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes a couple of tests that consider 31 bytes the max advertising
-length since in case of extended advertising that number is actually
-251.
----
- tools/mgmt-tester.c | 71 ++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 67 insertions(+), 4 deletions(-)
+HCI_MAX_AD_LENGTH shall only be used if the controller doesn't support
+extended advertising, otherwise HCI_MAX_EXT_AD_LENGTH shall be used
+instead.
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index aec91fb41d3b..7dfd1b0c747d 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -5904,8 +5904,8 @@ static const char ext_adv_hci_params_valid[] = {
- static const char ext_adv_params_mgmt_rsp_valid_50[] = {
- 	0x01, /* instance */
- 	0x00, /* tx_power defaults to 0 on BT5 platform*/
--	0x1f, /* max_adv_data_len */
--	0x1f, /* max_scan_rsp_len */
-+	0xfb, /* max_adv_data_len */
-+	0xfb, /* max_scan_rsp_len */
- };
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_event.c        | 12 +++++++-----
+ net/bluetooth/mgmt.c             |  6 +++---
+ 3 files changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 105c1c394f82..8200a6689b39 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1801,6 +1801,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ /* Extended advertising support */
+ #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
  
- static const char ext_adv_params_mgmt_rsp_valid[] = {
-@@ -7725,6 +7725,23 @@ static const uint8_t add_advertising_param_scrsp_data_only_too_long[] = {
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00,
- };
++/* Maximum advertising length */
++#define max_adv_len(dev) \
++	(ext_adv_capable(dev) ? HCI_MAX_EXT_AD_LENGTH : HCI_MAX_AD_LENGTH)
++
+ /* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 1789:
+  *
+  * C24: Mandatory if the LE Controller supports Connection State and either
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c29eece88d2c..f1fcece29e7d 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1747,7 +1747,7 @@ static void store_pending_adv_report(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ {
+ 	struct discovery_state *d = &hdev->discovery;
  
-@@ -7778,6 +7795,29 @@ static const uint8_t add_advertising_param_scrsp_appear_data_too_long[] = {
- 	/* scan rsp data: */
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- };
+-	if (len > HCI_MAX_AD_LENGTH)
++	if (len > max_adv_len(hdev))
+ 		return;
  
-@@ -7991,6 +8031,29 @@ static const uint8_t add_advertising_param_name_data_inv[] = {
- 	/* adv data: */
- 	/* scan rsp data: */
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
- };
+ 	bacpy(&d->last_adv_addr, bdaddr);
+@@ -6249,8 +6249,9 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 		return;
+ 	}
  
-@@ -8084,8 +8147,8 @@ static const struct generic_data set_appearance_success = {
+-	if (!ext_adv && len > HCI_MAX_AD_LENGTH) {
+-		bt_dev_err_ratelimited(hdev, "legacy adv larger than 31 bytes");
++	if (len > max_adv_len(hdev)) {
++		bt_dev_err_ratelimited(hdev,
++				       "adv larger than maximum supported");
+ 		return;
+ 	}
  
- static const uint8_t read_adv_features_rsp_3[] =  {
- 	0xff, 0xff, 0x01, 0x00,	/* supported flags */
--	0x1f,			/* max_adv_data_len */
--	0x1f,			/* max_scan_rsp_len */
-+	0xfb,			/* max_adv_data_len */
-+	0xfb,			/* max_scan_rsp_len */
- 	0x03,			/* max_instances */
- 	0x00,			/* num_instances */
- };
+@@ -6315,7 +6316,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	 */
+ 	conn = check_pending_le_conn(hdev, bdaddr, bdaddr_type, bdaddr_resolved,
+ 				     type);
+-	if (!ext_adv && conn && type == LE_ADV_IND && len <= HCI_MAX_AD_LENGTH) {
++	if (!ext_adv && conn && type == LE_ADV_IND &&
++	    len <= max_adv_len(hdev)) {
+ 		/* Store report for later inclusion by
+ 		 * mgmt_device_connected
+ 		 */
+@@ -6456,7 +6458,7 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, void *data,
+ 					info->length + 1))
+ 			break;
+ 
+-		if (info->length <= HCI_MAX_AD_LENGTH) {
++		if (info->length <= max_adv_len(hdev)) {
+ 			rssi = info->data[info->length];
+ 			process_adv_report(hdev, info->type, &info->bdaddr,
+ 					   info->bdaddr_type, NULL, 0, rssi,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3156bc27088e..33c06f7c7641 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8428,8 +8428,8 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
+ 	supported_flags = get_supported_adv_flags(hdev);
+ 
+ 	rp->supported_flags = cpu_to_le32(supported_flags);
+-	rp->max_adv_data_len = HCI_MAX_AD_LENGTH;
+-	rp->max_scan_rsp_len = HCI_MAX_AD_LENGTH;
++	rp->max_adv_data_len = max_adv_len(hdev);
++	rp->max_scan_rsp_len = max_adv_len(hdev);
+ 	rp->max_instances = hdev->le_num_of_adv_sets;
+ 	rp->num_instances = hdev->adv_instance_cnt;
+ 
+@@ -8465,7 +8465,7 @@ static u8 calculate_name_len(struct hci_dev *hdev)
+ static u8 tlv_data_max_len(struct hci_dev *hdev, u32 adv_flags,
+ 			   bool is_adv_data)
+ {
+-	u8 max_len = HCI_MAX_AD_LENGTH;
++	u8 max_len = max_adv_len(hdev);
+ 
+ 	if (is_adv_data) {
+ 		if (adv_flags & (MGMT_ADV_FLAG_DISCOV |
 -- 
 2.40.1
 
