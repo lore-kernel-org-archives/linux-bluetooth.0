@@ -2,192 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C9AEB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jul 2023 11:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBE2EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jul 2023 13:37:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232235AbjGFLAe (ORCPT
+        id S232077AbjGFNhM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jul 2023 07:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50944 "EHLO
+        Thu, 6 Jul 2023 09:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232196AbjGFLAb (ORCPT
+        with ESMTP id S229501AbjGFNhL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jul 2023 07:00:31 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C381BE3
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jul 2023 04:00:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688641226; x=1720177226;
-  h=date:from:to:cc:subject:message-id;
-  bh=AQNN4fbA8zpnd/AkTKHBeUR6dySTLfcBJQV/UD2gIBU=;
-  b=GNOY+0JIPxdMR5pygsBWg70aw8vRbhV8sf4K2J6LmMdfG87O8DfupGIJ
-   kkZv48O0lrs32P+dFNuYyx7hYmpHIADA+mhuitHq/3N2LcO7n1QHFNAMk
-   YSpx3ct5Vd0yO04I3JrZJub6SVlQc55HUUIUW/2pldnAXqolBACLYimHx
-   zvzM1z5QyqAYX+lP7eQERJcUj998u0eT5VncZuNA53IcEWOjHs8DhCNbR
-   yld2WqDbGjupUwppfjSKX2kWp2vVTYxDu5xDvnUcA1FSY8ik4xRZ5GxuR
-   Z9KwSibWRSHr43Vwu7QYMZsi0rVuIg/pGx2wov0vGVKOxDfcWKvvaAJsi
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="394328910"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="394328910"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 04:00:25 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="719548130"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="719548130"
-Received: from lkp-server01.sh.intel.com (HELO c544d7fc5005) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 06 Jul 2023 04:00:23 -0700
-Received: from kbuild by c544d7fc5005 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qHMik-0001Gd-1o;
-        Thu, 06 Jul 2023 11:00:22 +0000
-Date:   Thu, 06 Jul 2023 19:00:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 22d2055a576d2d6a879599193de8252e50200db8
-Message-ID: <202307061907.p31byf8i-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Thu, 6 Jul 2023 09:37:11 -0400
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2055.outbound.protection.outlook.com [40.107.22.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 479EC8F
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jul 2023 06:37:10 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KxlbjxsrnuN0pFhpzb5c3xfoZzR3YXmuPt+wTj7UYJdVzLJPrt1IMVz3R8NOm1IaPLe6EmRQ9pLmE5wH7/M5jJxqozG/DXE3Ib9mVzDbkPhTrRLWCOaVkTWaz6y7ou7DLnEDTAS69b8+BwH7NoC+weMxA4SI0okStubbszzFNTHJ9MMYBVccme5p5L6paVs0SK1MTj8+M9SzFAc3HpSmIjBjgF40LOSi5AzGrLQVY2QD9SxliFbSRhBYsCTjEbwoSDf+JM2S+7oEG2mC6ab4/TZ/E/ubX6T/ndEwYJrbLUq6m/SZAiVZ5M3ErSxRThP9X3vLw3SNKPx0VCt+uKkMVA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kujAM5FJGSvtXoeyWuCTgYBB2xqDfhnJmLrLhqFT0gk=;
+ b=QTkvA73RKelyc4WDXid9aTWjip9rsJOK78VCQvCmNvA78zIuYGKVzJSmAW/fSKhEXl+2EJDOIc5KbZyi1TmCAnzl9xffzVNUcQmqnQ5FI/VFsKZeL1yXsKrwVDNF3uXo7hoiE5fVSjmibZySQnRtiqi68JT2oeP1huNrOxEMLgmG2g/i/5CCUL/yVHPIKc2PHGl46Ri6ZqtRpjxw1tg5SnfxMNZTPz5NEEpXVPqYwLhbiabFxWygawqZ+itl1WtDYzlplFjTwdli+o39y+FapTp3BEJeh3SoryAAgoo8zbNVpwkUwA1HjkL+1vpldi5fmf0YEFMTAdER6b5E6FtQUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kujAM5FJGSvtXoeyWuCTgYBB2xqDfhnJmLrLhqFT0gk=;
+ b=MBHxd7ObXCf90XNjSKrcuPsex2XFAS6U0/CR8SYsK/QLgShpa5Qc1hrlxUNwafvQ7vH/nWionscVcCopSAB3XQ72x4uQKOtovuTAToy/ZTCCoaH/3Tpo4lFGXBiv7FUwhluJgKCusyBodo/vIJCcwOv8GHh9MNGE5c5bnxkzuA8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
+ by AM8PR04MB7443.eurprd04.prod.outlook.com (2603:10a6:20b:1d6::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
+ 2023 13:37:07 +0000
+Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
+ ([fe80::2cc8:4c5d:9b6f:5cab]) by GV1PR04MB9151.eurprd04.prod.outlook.com
+ ([fe80::2cc8:4c5d:9b6f:5cab%7]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 13:37:07 +0000
+From:   Claudia Draghicescu <claudia.rosu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com,
+        Claudia Draghicescu <claudia.rosu@nxp.com>
+Subject: [PATCH BlueZ v3 0/1] adapter: Allow broadcaster to be passed up to application
+Date:   Thu,  6 Jul 2023 16:36:04 +0300
+Message-Id: <20230706133605.23325-1-claudia.rosu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR02CA0109.eurprd02.prod.outlook.com
+ (2603:10a6:20b:28c::6) To GV1PR04MB9151.eurprd04.prod.outlook.com
+ (2603:10a6:150:26::9)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|AM8PR04MB7443:EE_
+X-MS-Office365-Filtering-Correlation-Id: b7bcffc7-d6f7-41ce-f736-08db7e261782
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: n+yxFMCWcxF2bLcedypBfDAMl/b0qA5158PNPsP44PgD4MSlYrjSSaznAeK+iNwWWIB+fnAcm56CNEmaMGHsuiYGSsuyXqBCU56YtVrsJSoyb2muJNdep4ZUGFQUKPvCOD2RvflGT/dfEO11xnhZMnw23RKd31vMmTPu5XyJOLskbgrvGvgdQ4Vvbg5MuUmY00g4MsBsPJhHam7lg341FdUTJ2ZGIa2fWvjDT2TNZahocD5Q937XXSZsDG12iY71lWv6Ndrq0ZUsptyro3BxSIfiQQst8wfacgRiYYJPq85vkYSefa2lfOWuu3UyHBzDph3EJ4ZD0ajd2KIU3F6xJwew2cTG6k5z/+i7dEn37MAwydxOd/2GCN4JMM6YdF/CDDn5neJs8382PTAxVtu3Y4dkiCz7WEMs25qmfFr+S1JTNyiO+Rs3gt4vA5QxjTDNOR6C4gAHWX37zg2efaSCw8SMQaUNCgNqPUXXHFBP3qnP9SP1n2ZLWOaj3laLkuZ+lqE3PCVODhr+nWjIx8HGNEHOviwWlgseLIbfT8uBUX+nH0WZHYpyHhlgzngupE725hdmoVNuYAN3PYadNQzBNHb+AFyi+zqXjTL7M4YrAMUbqDQ0dIrZtUazWU9kup3S
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39860400002)(396003)(136003)(346002)(376002)(451199021)(6916009)(38350700002)(38100700002)(66946007)(66476007)(4326008)(66556008)(2616005)(186003)(86362001)(55236004)(36756003)(6486002)(6666004)(6512007)(1076003)(26005)(52116002)(6506007)(478600001)(4744005)(8936002)(8676002)(5660300002)(316002)(2906002)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RifGi8uBtM8xvndPdcEhDyy3PX5Lp3GHOwCMWKsJdoAq/oLsWrhh2DIQdjhM?=
+ =?us-ascii?Q?oCOAY7SWMRog0T+MdDcusfyWuGxlScTPZ3x8Ido3TTsXZcbzYx4RioAUBEEO?=
+ =?us-ascii?Q?DEPGzJ1qhiUdDWYJWgGWSGtzXKfZTDFEFTrVGAk7Qrj4xZdlmkcr5xmcapku?=
+ =?us-ascii?Q?Rj8IGA1oTL4XV00Qy9PKABdl3Z6TNUIBxjtzINoVJAYQPugPU25B1FCJwpE6?=
+ =?us-ascii?Q?iqTGgk78wz9LM4J3GjpcpxFzZirGqX/CBrj4EStjUr2Rxf7SBfKwzLFGXIMV?=
+ =?us-ascii?Q?AOZLL6bZ+gDLvfERRM8g7OZwgF5L7HXlPGKk3rX65dBARS9iL65XY3g0UTT9?=
+ =?us-ascii?Q?0qjlqv3+xf7al624+jmDUOBxm00QtozcpC5S9AxuSjsqgyvCuvN4qfEXpO1b?=
+ =?us-ascii?Q?spMsS3MSDALtdLXVElMc/lX6IwIvfmURdYDBYHUWRgJa9uZH8h58wGCOctuE?=
+ =?us-ascii?Q?DnwPbpgumWCnHCWSU7Wek0T65fpy/dPsB8/3xhRgxmETQNpVykYX8K/WOgk8?=
+ =?us-ascii?Q?S34xvAdZCTbfYni51HnRVG2U+6ftlGic4gOtZ8H6NoYqbtNNBrXSa+pg/lIB?=
+ =?us-ascii?Q?OW0Ma/2az9w3mc2XwtBvugPAQLgrnN6Vc6MhyLBU4gCVAyezYYdD1Von0DT6?=
+ =?us-ascii?Q?5r59qrQqBuLTeO1WS167U37GRhhPYzYCnmKchS1VSQGNYHp5sdBdQgNTAJQS?=
+ =?us-ascii?Q?iAdIyvwJBwdq4PUiIVb7W0AypzGyk887vEXezZ6gBDtjMdV/KOiCfcNLa2UE?=
+ =?us-ascii?Q?oD6b7Lqjr6a2/wLc6l0S8NVoyT31o7M+Ql8d4LesJDS5rlXh9FgWkyR1lIMH?=
+ =?us-ascii?Q?a5VKHccbWVgX/4CJLK4KmmuLNJuwfp3QMM3Z4CayHZfNbvVnsak5F9QvbAu6?=
+ =?us-ascii?Q?KHLuqSPpa9Zihs/L7mR+hhFPanvte8VXJuq0XalCxrdXOi7RU8Mm+v6Q8a8k?=
+ =?us-ascii?Q?J3O8LzGonCUYsXvAQSShTEAtqHl0nVCmxXzOpUwcK0NSj3lbXNcMinrfHtu3?=
+ =?us-ascii?Q?b/4KvJevKj47wRMuKWncfGbE+MQ1TecEP3bdHaspSCoWXGr0bq3k0dYqnR/c?=
+ =?us-ascii?Q?d7zdRkNIx1KVsVTDbnmKQ7syBtIUKWZnQGzesAuqbFJTxp6KakGVgsgOYi16?=
+ =?us-ascii?Q?dSbf26p6RzrpXoEn76Eb1iJGBHDEXBOlweInUnnQ8MbWNbY/4NiFqxfcC9Vb?=
+ =?us-ascii?Q?ETk5EUfAk0h3oKZtyuLLY4PDGJps4a33q06oLOiU1GMfJd5PqVuhM4fouOf2?=
+ =?us-ascii?Q?KpAy8kQg4/gorOL+qfHvM8HKg86UMFpXYo+cYUvqIhO7UMldRcK9esrYyg5x?=
+ =?us-ascii?Q?Q9tcizxVGPTBDMdEBCJyB7lqT2+paW1qAW3IZnCZLpIsW7ypQyI913XuxP7y?=
+ =?us-ascii?Q?2/vmbGu6xRl9M8ynM0JW4SoyHw5FI4bwHdEs5a6qNyl1/poW1XHmEddMhS7C?=
+ =?us-ascii?Q?ctxLtlJogTqtJYK+qWe3+bgjk0trPGwWzYLgkW8K8pG+Mp+t68MGXISQ9ahN?=
+ =?us-ascii?Q?gwlMgf3Qb2p3e6Bej0DTuhe0LmF8JauyuJVVDVhZp7wGnGx8QEqBY943wUVL?=
+ =?us-ascii?Q?iErbJGHC1j7Ct0kPqXcjf7C2xHlsiYk+F7b4c+lg?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7bcffc7-d6f7-41ce-f736-08db7e261782
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 13:37:07.3473
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rrML2RWl5LPYH+AVRFXFRTbyNtjLhcJocLQRHLPBp0WsnwlJYmFXCwRGzWqkywxKWioIFmmh67QaBEPNvInT/A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7443
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 22d2055a576d2d6a879599193de8252e50200db8  Bluetooth: hci_sync: Don't double print name in add/remove adv_monitor
+Allow a broadcast advertiser to be passed up to application,
+if the scanner is an ISO Sync Receiver capable device.
+This allows for a broadcast sink to discover broadcast sources.
 
-elapsed time: 720m
+Claudia Draghicescu (1):
+  adapter: Allow broadcaster to be passed up to application
 
-configs tested: 120
-configs skipped: 7
+ src/adapter.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r043-20230706   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                          collie_defconfig   clang
-arm                                 defconfig   gcc  
-arm                       imx_v4_v5_defconfig   clang
-arm                            mps2_defconfig   gcc  
-arm                             mxs_defconfig   clang
-arm                          pxa910_defconfig   gcc  
-arm                  randconfig-r025-20230706   clang
-arm                  randconfig-r046-20230706   clang
-arm                           sama7_defconfig   clang
-arm                          sp7021_defconfig   clang
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-csky                                defconfig   gcc  
-hexagon              randconfig-r026-20230706   clang
-hexagon              randconfig-r041-20230706   clang
-hexagon              randconfig-r045-20230706   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230706   clang
-i386         buildonly-randconfig-r005-20230706   clang
-i386         buildonly-randconfig-r006-20230706   clang
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230705   gcc  
-i386                 randconfig-i002-20230705   gcc  
-i386                 randconfig-i003-20230705   gcc  
-i386                 randconfig-i004-20230705   gcc  
-i386                 randconfig-i005-20230705   gcc  
-i386                 randconfig-i006-20230705   gcc  
-i386                 randconfig-i011-20230706   gcc  
-i386                 randconfig-i012-20230706   gcc  
-i386                 randconfig-i013-20230706   gcc  
-i386                 randconfig-i014-20230706   gcc  
-i386                 randconfig-i015-20230706   gcc  
-i386                 randconfig-i016-20230706   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r004-20230706   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r001-20230706   gcc  
-m68k                 randconfig-r005-20230706   gcc  
-m68k                           sun3_defconfig   gcc  
-microblaze           randconfig-r003-20230706   gcc  
-microblaze           randconfig-r006-20230706   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 randconfig-r012-20230706   clang
-nios2                               defconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r011-20230706   gcc  
-parisc               randconfig-r032-20230705   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                  iss476-smp_defconfig   gcc  
-powerpc                   lite5200b_defconfig   clang
-powerpc                     mpc5200_defconfig   clang
-powerpc                      ppc64e_defconfig   clang
-powerpc              randconfig-r036-20230705   gcc  
-powerpc                     redwood_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r016-20230706   gcc  
-riscv                randconfig-r024-20230706   gcc  
-riscv                randconfig-r042-20230706   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r031-20230705   gcc  
-s390                 randconfig-r044-20230706   gcc  
-sh                               allmodconfig   gcc  
-sh                         ecovec24_defconfig   gcc  
-sh                   randconfig-r021-20230706   gcc  
-sh                           se7751_defconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r002-20230706   gcc  
-sparc64              randconfig-r022-20230706   gcc  
-sparc64              randconfig-r035-20230705   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230706   clang
-x86_64       buildonly-randconfig-r002-20230706   clang
-x86_64       buildonly-randconfig-r003-20230706   clang
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-x001-20230706   gcc  
-x86_64               randconfig-x002-20230706   gcc  
-x86_64               randconfig-x003-20230706   gcc  
-x86_64               randconfig-x004-20230706   gcc  
-x86_64               randconfig-x005-20230706   gcc  
-x86_64               randconfig-x006-20230706   gcc  
-x86_64               randconfig-x011-20230706   clang
-x86_64               randconfig-x012-20230706   clang
-x86_64               randconfig-x013-20230706   clang
-x86_64               randconfig-x014-20230706   clang
-x86_64               randconfig-x015-20230706   clang
-x86_64               randconfig-x016-20230706   clang
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                  cadence_csp_defconfig   gcc  
-xtensa               randconfig-r034-20230705   gcc  
-
+base-commit: ddfa40977c7e7b8723fc3ba9389822631ddeeb5c
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
+
