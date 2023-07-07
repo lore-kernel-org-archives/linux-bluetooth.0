@@ -2,110 +2,165 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B1FEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jul 2023 12:49:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 712FAEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jul 2023 13:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232257AbjGGMtI (ORCPT
+        id S231786AbjGGNnP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jul 2023 08:49:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38082 "EHLO
+        Fri, 7 Jul 2023 09:43:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230040AbjGGMtH (ORCPT
+        with ESMTP id S230166AbjGGNnO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jul 2023 08:49:07 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C38DA10EA
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jul 2023 05:49:06 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-767b6d6bb87so25666785a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jul 2023 05:49:06 -0700 (PDT)
+        Fri, 7 Jul 2023 09:43:14 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC2B211C
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jul 2023 06:43:12 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-634f59e7d47so12589916d6.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jul 2023 06:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688734146; x=1691326146;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yLLhmkDXPCLVNW8Q5RMRlC5gFzdxpK2G47dDAKbC/Hg=;
-        b=I9n97S8DKF8R86vQqH0C3JP/3CkCU+MT5Wm3LIRO5ashs/qYGBzG9LHa20MID4aTcS
-         ylbTz6VC2UeFePhxaUJQr1NzqoOIs1VuoXUvQIlGcotoTpRYAe4Ll7vLfmk+btM4xAlw
-         hfh59VczyurUcLRFqMX/Sc3GGF9C8O4x43roeggm393DImbJTqgsJhpo3W4ohvCOLZel
-         H25ckzqUTSuM9US1FfINGs/Ppdu05onK7tQTSd14Yd7StaWRh/D0cI7/4mrlhXNzand6
-         KgF+U3nSzLbvtF52+RiRxnuy5Y7ZN5Iiy5ZvYwV3pwy2nSbTZiKDQsGkcLOGKu323kL1
-         lfMg==
+        d=linaro.org; s=google; t=1688737391; x=1691329391;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=dzZkPG7RI0wAetYk691Ba8KUKNWl6F1qo7jNyyUdK70=;
+        b=p59HvEZUQAvjmAzFEUEIg3jouNj+3W3V4HWCRoTddqH1X5xky3rZjaSrMloOmkT1r5
+         l2l85R/Q8A0VNuX2IhonifMxEhUGtlLiVP8MoaC1fm/XTiNxKU4aKZ+tnUNompGJcZys
+         bkJ9tdbcBmNrWndDt5aTtrTcmNGWDrlKlHiqzfdhq1O8h57VDlpMqOHFytcSosFtmR9g
+         Kcnmh5JZUtiGXtCBg4IlGzjm6dLzN0OnTlVbCdVn7C1j7mmozqdLyiO41szzrD/U+fcV
+         4whLWWkMNZEt0WuF15IZjz9PRLtpp3Rsevg/WoQinG860O2X/BuAc21esYFGW030m0rq
+         yXgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688734146; x=1691326146;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1688737391; x=1691329391;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yLLhmkDXPCLVNW8Q5RMRlC5gFzdxpK2G47dDAKbC/Hg=;
-        b=KBDpI6TKJEOaLEZyJ/W9oD6iRXfr5YWp4QiecewURFNSF4YvbaE7ce9dnd04S1CYyU
-         +hdNn7qTBa2E8K/OyG/JZZDhEgaKwvuNXOhozZnKRI0F1MfwLcGqTjPFAmZRCu5wKcBr
-         WhFRn/aeXHJ922wSyq6b+RoD8azybjMhuqjdHF9niexFCvYBpNuNKtPmT616rv0Fv0N7
-         WfrFcdfvyukTHnWznfZLhLILr2gjzq0SP0aY+pKC55kRYmHltN7LLOlpyTEmadV15HzD
-         NAySXbvHk1fYxuFWdwQMUb4cJqfu2taXckNLjztIhEumtJY7vYdQWn1soVgP4cYOBm07
-         bhfg==
-X-Gm-Message-State: ABy/qLZV5FFIwDk9sufLXhxdZv/N8FRS+Wmybg8ftnb2NtvXCaCAehGU
-        fdmdYiuaGgnVuwrjMB3+qBTXD8Gc4Oc=
-X-Google-Smtp-Source: APBJJlGAXBYs2YV/D6aTPKljuMGc880ySjTlZaN+sLcRW8yqj1yWyV2tCKS23dSpii1UDWGIlJYFhw==
-X-Received: by 2002:a0c:f394:0:b0:62b:3c25:5ae9 with SMTP id i20-20020a0cf394000000b0062b3c255ae9mr3923380qvk.65.1688734145703;
-        Fri, 07 Jul 2023 05:49:05 -0700 (PDT)
-Received: from [172.17.0.2] ([172.176.214.57])
-        by smtp.gmail.com with ESMTPSA id a12-20020a0ce38c000000b00628563d4441sm2034643qvl.66.2023.07.07.05.49.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 05:49:05 -0700 (PDT)
-Message-ID: <64a809c1.0c0a0220.ed6b9.58b6@mx.google.com>
-Date:   Fri, 07 Jul 2023 05:49:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1554413305737596838=="
+        bh=dzZkPG7RI0wAetYk691Ba8KUKNWl6F1qo7jNyyUdK70=;
+        b=NcgPGfsd9GwnXNSAJIthKI3sxV26k3C6Aaib07bQQCOu7LgG9f97jEu82SONQn7kti
+         iv8bNf3C7+MVEnRT9b8HLwB1JIFbGRKunC31HT//g9T73ZKvabxfKpcWsJmuD2H0R5nW
+         eJnKlxo8dLgcUAdQL7gNXd1M/GoGJccHX6MVS1N/pxMT02vJ3vmpxbZFdhx3e7Fq5LqQ
+         011eRwx1vcElQATejNXAdtTLdNWPkX0ed035DT0HQiyLowkZHIdLzJt7zxTb58aLsLd0
+         Xe+XawfD4BTjuWol1MdT+6kOzk8O2ckJwsZ/OX9P9zjgLFrQqpuVFHIa5kgh7F5bJDT0
+         hxPw==
+X-Gm-Message-State: ABy/qLbTaBEJFfy+9YOoG3iNi5MoIzBB/ycjNHdBNuRhO7c/bUMkECAM
+        B610KUWJcl8rtbfOAt3OFgK+DZsKw7/BdeCIwKLITA==
+X-Google-Smtp-Source: APBJJlFpy8jDyr+KlmdxqCpqIx3uqmKGuxqPWsdaP5UQPNw0Sk1yW0BVcwfYgifZv/9oQcKxx9JRXU8ymUO0lbn+u0c=
+X-Received: by 2002:a0c:9e81:0:b0:635:e81d:e57d with SMTP id
+ r1-20020a0c9e81000000b00635e81de57dmr4166916qvd.55.1688737391400; Fri, 07 Jul
+ 2023 06:43:11 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_tjiang@quicinc.com
-Subject: RE: [v9] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
-In-Reply-To: <20230707113645.10673-1-quic_tjiang@quicinc.com>
-References: <20230707113645.10673-1-quic_tjiang@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230531090424.3187-1-johan+linaro@kernel.org>
+ <20230531090424.3187-3-johan+linaro@kernel.org> <CAMi1Hd3fe=wk02WG8J7K5Ud1GcWkuKKKrxFjkNguxDkzNz2WVQ@mail.gmail.com>
+ <ZKfyH4jRGlVlcLeY@hovoldconsulting.com>
+In-Reply-To: <ZKfyH4jRGlVlcLeY@hovoldconsulting.com>
+From:   Amit Pundir <amit.pundir@linaro.org>
+Date:   Fri, 7 Jul 2023 19:12:35 +0530
+Message-ID: <CAMi1Hd2CGQKbMPm6GXfSHgrdHsyngBQ_DBseF08=oEvGdizVcw@mail.gmail.com>
+Subject: Re: [PATCH RESEND 2/2] Bluetooth: fix use-bdaddr-property quirk
+To:     Johan Hovold <johan@kernel.org>
+Cc:     Johan Hovold <johan+linaro@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Linux regressions mailing list <regressions@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1554413305737596838==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, 7 Jul 2023 at 16:37, Johan Hovold <johan@kernel.org> wrote:
+>
+> On Fri, Jul 07, 2023 at 03:11:11PM +0530, Amit Pundir wrote:
+>
+> > On Wed, 31 May 2023 at 14:35, Johan Hovold <johan+linaro@kernel.org> wrote:
+> > >
+> > > Devices that lack persistent storage for the device address can indicate
+> > > this by setting the HCI_QUIRK_INVALID_BDADDR which causes the controller
+> > > to be marked as unconfigured until user space has set a valid address.
+> > >
+> > > The related HCI_QUIRK_USE_BDADDR_PROPERTY was later added to similarly
+> > > indicate that the device lacks a valid address but that one may be
+> > > specified in the devicetree.
+> > >
+> > > As is clear from commit 7a0e5b15ca45 ("Bluetooth: Add quirk for reading
+> > > BD_ADDR from fwnode property") that added and documented this quirk and
+> > > commits like de79a9df1692 ("Bluetooth: btqcomsmd: use
+> > > HCI_QUIRK_USE_BDADDR_PROPERTY"), the device address of controllers with
+> > > this flag should be treated as invalid until user space has had a chance
+> > > to configure the controller in case the devicetree property is missing.
+> > >
+> > > As it does not make sense to allow controllers with invalid addresses,
+> > > restore the original semantics, which also makes sure that the
+> > > implementation is consistent (e.g. get_missing_options() indicates that
+> > > the address must be set) and matches the documentation (including
+> > > comments in the code, such as, "In case any of them is set, the
+> > > controller has to start up as unconfigured.").
+>
+> > This patch broke Bluetooth on Dragonboard 845c (SDM845) devboard.
+> > Reverting this patch fixes the BT breakage and I see the following
+> > messages in dmesg:
+> >
+> > Bluetooth: hci0: setting up wcn399x
+> > Bluetooth: hci0: QCA Product ID   :0x0000000a
+> > Bluetooth: hci0: QCA SOC Version  :0x40010214
+> > Bluetooth: hci0: QCA ROM Version  :0x00000201
+> > Bluetooth: hci0: QCA Patch Version:0x00000001
+> > Bluetooth: hci0: QCA controller version 0x02140201
+> > Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+> > Bluetooth: hci0: QCA Downloading qca/crnv21.bin
+> > Bluetooth: hci0: QCA setup on UART is completed
+>
+> That's odd. You should still see the above messages also with this patch
+> applied, but you may now need to provide a valid device address before
+> being able to use device in case the bootloader has not provided one
+> (e.g. using btmgmt).
 
-This is automated email and please do not reply to this email!
+Sorry for the confusion, I missed the part where I do see these
+messages when the kernel module is loaded but the direct firmware
+loading fails.
 
-Dear submitter,
+Bluetooth: hci0: setting up wcn399x
+Bluetooth: hci0: QCA Product ID   :0x0000000a
+Bluetooth: hci0: QCA SOC Version  :0x40010214
+Bluetooth: hci0: QCA ROM Version  :0x00000201
+Bluetooth: hci0: QCA Patch Version:0x00000001
+Bluetooth: hci0: QCA controller version 0x02140201
+Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+bluetooth hci0: Direct firmware load for qca/crbtfw21.tlv failed with error -2
+Bluetooth: hci0: QCA Failed to request file: qca/crbtfw21.tlv (-2)
+Bluetooth: hci0: QCA Failed to download patch (-2)
+Bluetooth: hci0: QCA preshutdown_cmd failed (-56)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=763432
+This happens in all the cases (working and non-working BT) because
+filesystem is not mounted by that time. I'm running AOSP and all the
+kernel modules get loaded from a ramdisk. But in the working case, the
+firmware loading kicks in again later in the boot process and BT gets
+initiazed..
 
----Test result---
+With this patch, after the first attempt to load the firmware fails,
+the firmware loading doesn't kick-in again. Also even if I keep the
+firmware in ramdisk then the direct firmware loading from ramdisk
+happens but BT still doesn't work
+https://bugs.linaro.org/attachment.cgi?id=1148.
 
-Test Summary:
-CheckPatch                    PASS      1.17 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      34.62 seconds
-CheckAllWarning               PASS      38.12 seconds
-CheckSparse                   PASS      43.91 seconds
-CheckSmatch                   PASS      116.20 seconds
-BuildKernel32                 PASS      33.32 seconds
-TestRunnerSetup               PASS      510.99 seconds
-TestRunner_l2cap-tester       PASS      24.68 seconds
-TestRunner_iso-tester         PASS      42.77 seconds
-TestRunner_bnep-tester        PASS      10.85 seconds
-TestRunner_mgmt-tester        PASS      232.99 seconds
-TestRunner_rfcomm-tester      PASS      16.68 seconds
-TestRunner_sco-tester         PASS      17.29 seconds
-TestRunner_ioctl-tester       PASS      18.55 seconds
-TestRunner_mesh-tester        PASS      13.46 seconds
-TestRunner_smp-tester         PASS      14.89 seconds
-TestRunner_userchan-tester    PASS      12.17 seconds
-IncrementalBuild              PASS      32.23 seconds
+>
+> Are there any error messages in the log when running with this patch?
 
+I don't see any relevant error message in dmesg. I'll check if I can
+find a command line BT debug tool which I can use on AOSP for
+debugging. There used to be a few hci command line tools, when I
+looked into it a few years ago. Not sure if they are still around and
+useful.
 
-
----
 Regards,
-Linux Bluetooth
+Amit Pundir
 
-
---===============1554413305737596838==--
+>
+> Does
+>
+>         btmgmt --index 0 public-addr <bdaddr>
+>
+> work?
+>
+> Johan
