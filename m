@@ -2,123 +2,141 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B822EEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jul 2023 03:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3880EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jul 2023 06:30:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229778AbjGGDtj (ORCPT
+        id S230123AbjGGGaN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jul 2023 23:49:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
+        Fri, 7 Jul 2023 02:30:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjGGDth (ORCPT
+        with ESMTP id S229559AbjGGGaM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jul 2023 23:49:37 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A2321FC9
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jul 2023 20:49:36 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id af79cd13be357-767582c6c72so138439385a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jul 2023 20:49:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688701775; x=1691293775;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=oOu7PkyjYv7Mzr87fm6JVzEI4XwfKU1UpXmQM7xxsh4=;
-        b=NkMjWSPUKQcJvj6mkPr2moJGfGDnm1NoiWFxQAo0huLzTYvrd5QaECKMwUuBk2Ti68
-         VhpzV8Y22eABsdNNDIePY3N13VchCGbk3ZdQMzgdZNvFQNzvQl0yoIG/EoSWJHCG+4rU
-         +o7vtKGDPwXEz4B+aPYbr3/xMXra4CQuTjbCOxyCoetnYTmdgJ6Z8vh1CO2QNF3ghfao
-         Kx4aB2N6RXVJ6G3QtgbBjFAozKV3JBJcMP8Cl3aORpsXvGcb4hJXiBo4wbQeqHjJrQDl
-         tUWoXCFAReXTlo4HohSa0usseo/FqGTt300AiEMKmub64mK/1QC39WZF81HxSz2pngsQ
-         Rf3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688701775; x=1691293775;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oOu7PkyjYv7Mzr87fm6JVzEI4XwfKU1UpXmQM7xxsh4=;
-        b=YvRICezhoMXYAiF/MBE5jYwm858JrC4motsWqKrNNU08HdGx7EJAbIo73kv3DuDPdq
-         oFbx58B61mmwsqAuuEbawJ0/lKA7gOOsz0pLlAGl9o8oEhK0a4AprVhyrCbfY31AKz56
-         YbaIESp23LVG1BNOjJgFdz/2hec5NDeX40mW0AEdHpJLpnTDOGZzmpAlZlrL13rSx82a
-         a5oN1F0Da86ixKG5VJcWWzj7uao4PReIgiqWOO+UIAJWQ5Mji/Px+cktAwA3BSrgkG/1
-         67oNRJ7eQW8M7KvQgqSacfO7e2qqJJlXL6WW1m5QGvK+EevFIhZe056B1YFjIJ6iDe2/
-         /Xyg==
-X-Gm-Message-State: ABy/qLYAtoC/eHH2sXg2ucod5zKQ5ObBlrQCD1ObDz5kRDje4arrNUfr
-        V3Pik88+v/YyLDati7Cl+HEL1SLGnwo=
-X-Google-Smtp-Source: APBJJlGFG6AGev+Mk6e2gw6wBGcsGCPkrjoqW2c4BEGECB/xt2AcDMrnzA/FMMM12PTarC8RR+ka7g==
-X-Received: by 2002:ac8:5ac9:0:b0:3fb:42cb:aa9 with SMTP id d9-20020ac85ac9000000b003fb42cb0aa9mr5250498qtd.45.1688701774713;
-        Thu, 06 Jul 2023 20:49:34 -0700 (PDT)
-Received: from [172.17.0.2] ([52.190.14.160])
-        by smtp.gmail.com with ESMTPSA id t9-20020ac87609000000b0040091d8e63fsm1312604qtq.73.2023.07.06.20.49.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 20:49:34 -0700 (PDT)
-Message-ID: <64a78b4e.c80a0220.961a7.4771@mx.google.com>
-Date:   Thu, 06 Jul 2023 20:49:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0865002634999180643=="
+        Fri, 7 Jul 2023 02:30:12 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F4F9D;
+        Thu,  6 Jul 2023 23:30:07 -0700 (PDT)
+X-UUID: b45e3c101c8f11ee9cb5633481061a41-20230707
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=UAziGWEIBjQI0wuqlkRiC4ex2AoxNSXCmO21CSvsE4E=;
+        b=XGlbXCueM09dKinvQhK629iKAwF5q3eDwKHjJvmc6dH5xDlHs9JwDknkRWUw1kznO8oL5kqjJ7rwQMnXz86dee7FqD4sfLQabC2INWJxXwzB6Ok2AAS85ijjRP/Sgx8cSoYyFViPeeRHxqVMj65DDP/6DlbRHp5bXtTwhL4VVac=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.27,REQID:e0c0e52b-c14b-45e1-aaaf-fef34f5cb335,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+        :release,TS:95
+X-CID-INFO: VERSION:1.1.27,REQID:e0c0e52b-c14b-45e1-aaaf-fef34f5cb335,IP:0,URL
+        :0,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,BULK:0,RULE:Spam_GS981B3D,ACTION
+        :quarantine,TS:95
+X-CID-META: VersionHash:01c9525,CLOUDID:b619ab0d-26a8-467f-b838-f99719a9c083,B
+        ulkID:230707143004Z89Y8BRV,BulkQuantity:0,Recheck:0,SF:38|29|28|17|19|48,T
+        C:nil,Content:0,EDM:-3,IP:nil,URL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+        L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_SDM,TF_CID_SPAM_ASC,TF_CID_SPAM_FAS,
+        TF_CID_SPAM_FSD,TF_CID_SPAM_ULN
+X-UUID: b45e3c101c8f11ee9cb5633481061a41-20230707
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+        (envelope-from <chris.lu@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1891374206; Fri, 07 Jul 2023 14:30:02 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 7 Jul 2023 14:30:02 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 7 Jul 2023 14:30:02 +0800
+From:   Chris Lu <chris.lu@mediatek.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Von Dentz <luiz.dentz@gmail.com>
+CC:     Sean Wang <sean.wang@mediatek.com>,
+        Aaron Hou <aaron.hou@mediatek.com>,
+        Steve Lee <steve.lee@mediatek.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-mediatek <linux-mediatek@lists.infradead.org>,
+        Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v3 2/2] Bluetooth: btusb: Add new VID/PID 04ca/3804 for MT7922
+Date:   Fri, 7 Jul 2023 14:29:59 +0800
+Message-ID: <20230707062959.30371-2-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20230707062959.30371-1-chris.lu@mediatek.com>
+References: <20230707062959.30371-1-chris.lu@mediatek.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: [v2,1/2] Bluetooth: btusb: Add VID 0489 & PID e102 for MediaTek MT7922 USB Bluetooth chip
-In-Reply-To: <20230707030442.25330-1-chris.lu@mediatek.com>
-References: <20230707030442.25330-1-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0865002634999180643==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add VID 04ca & PID 3804 for MediaTek MT7922 USB Bluetooth chip.
 
-This is automated email and please do not reply to this email!
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Dear submitter,
+T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=04ca ProdID=3804 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=763292
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.43 seconds
-GitLint                       FAIL      0.93 seconds
-SubjectPrefix                 PASS      0.25 seconds
-BuildKernel                   PASS      33.72 seconds
-CheckAllWarning               PASS      37.39 seconds
-CheckSparse                   PASS      42.34 seconds
-CheckSmatch                   PASS      113.62 seconds
-BuildKernel32                 PASS      32.65 seconds
-TestRunnerSetup               PASS      495.43 seconds
-TestRunner_l2cap-tester       PASS      23.85 seconds
-TestRunner_iso-tester         PASS      42.06 seconds
-TestRunner_bnep-tester        PASS      10.76 seconds
-TestRunner_mgmt-tester        PASS      219.06 seconds
-TestRunner_rfcomm-tester      PASS      16.18 seconds
-TestRunner_sco-tester         PASS      17.08 seconds
-TestRunner_ioctl-tester       PASS      18.38 seconds
-TestRunner_mesh-tester        PASS      13.87 seconds
-TestRunner_smp-tester         PASS      14.56 seconds
-TestRunner_userchan-tester    PASS      11.27 seconds
-IncrementalBuild              PASS      37.09 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,1/2] Bluetooth: btusb: Add VID 0489 & PID e102 for MediaTek MT7922 USB Bluetooth chip
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (89>80): "[v2,1/2] Bluetooth: btusb: Add VID 0489 & PID e102 for MediaTek MT7922 USB Bluetooth chip"
-[v2,2/2] Bluetooth: btusb: Add VID 04ca & PID 3804 for MediaTek MT7922 USB Bluetooth chip
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (89>80): "[v2,2/2] Bluetooth: btusb: Add VID 04ca & PID 3804 for MediaTek MT7922 USB Bluetooth chip"
-
-
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+v2: update commit message
+v3: fix bot checking error, change title
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 9c886c9cce64..323ca92539eb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -638,6 +638,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe102), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3804), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Additional Realtek 8723AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+-- 
+2.18.0
 
---===============0865002634999180643==--
