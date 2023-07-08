@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C7CEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jul 2023 23:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68990EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jul 2023 01:04:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229881AbjGGXhq (ORCPT
+        id S232501AbjGHBEv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jul 2023 19:37:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42470 "EHLO
+        Fri, 7 Jul 2023 21:04:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229458AbjGGXhp (ORCPT
+        with ESMTP id S232010AbjGHBEu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jul 2023 19:37:45 -0400
-Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B8C7210B
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jul 2023 16:37:45 -0700 (PDT)
-Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6b711c3ad1fso2350511a34.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jul 2023 16:37:45 -0700 (PDT)
+        Fri, 7 Jul 2023 21:04:50 -0400
+Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3C5210B
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jul 2023 18:04:50 -0700 (PDT)
+Received: by mail-oo1-xc2c.google.com with SMTP id 006d021491bc7-565a8d9d832so1962791eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jul 2023 18:04:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688773064; x=1691365064;
+        d=gmail.com; s=20221208; t=1688778288; x=1691370288;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ako4ZmmU42Sy7rEuDP2Fa/IjHwDsE5AhwidqWukxHDw=;
-        b=QLwYHpP1wpXnYacpmEjooXs9Q7Dbr9/X3jPSjoItyfZXfmZOTU6fxpwzB6b/rPRTWr
-         2Cbp/OPf8DbxavblFkvte0F+IfNOa072IRS2RkvfECp3qqF0FTWOBmwQ0exQA19CtKDc
-         hq7KoEQznkvgJXVC1zH5PuAa5XxlGAIy5Fq8Xg4F0zs5qIyGpGOJYjY/MM1kt+0z9K9X
-         lSjCAJF8F9T7FsKggeFEUSvxGWwuT0go1Mc+lBxhLMsVOaCPFI6J7O2tnXq/mqQZ1zWi
-         PTa4aYF4CqTgM8G7YPuLSVZSx+oolu+EgK4M2P9gslBibZ6WBOIZ2kmYflTvEESmeZPk
-         Mu5g==
+        bh=JTtsP0v5oCR6LBeoHSFqnBvz12KoS0FlBeCZr6L+XCk=;
+        b=EEbOqNfzGk9NdulHTK8eDwTJH0WN2dUN+xGiLuw22d5Pzl3dtmFxonVumvjhG8IIEK
+         KGycmALrU0HwvV+ctCUy5q3s3MCCO4tZGCCntJpr3XbWYUHAL4AsYunapbxHN6J9yVDt
+         s9ZM3LuPRJI3pGZxjV3Q3Y9ye2zn31pl0G7KHCjrmpFCWP3SXEUw5lvyetd0eNFL/cQI
+         Swj9kvigyjQGvE6pzLLmQ8xP6n5PNLVA+CzzferirlJXd1HeHBHP1cgKZ2LwClyjXk+Q
+         RMU+osS9NFA/Tpw6QnoyhJX7NKAR2/1Na21D4yQrg9tsXiQmAXr/rPHLpVQMKudKER45
+         d5wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688773064; x=1691365064;
+        d=1e100.net; s=20221208; t=1688778288; x=1691370288;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ako4ZmmU42Sy7rEuDP2Fa/IjHwDsE5AhwidqWukxHDw=;
-        b=HM8DccQCapva4teso3sWRsC2fdckuAOYnT1IsPiZxqP1UI1aBNPczUvshAQxLyRPLW
-         dKGtjvNJ1t8nJZQV+1RMq34KsuJKQRUGWTGQhMciqyDf7kkJhs9YA9uTiT6YAzVquePD
-         gU/YCiM0VuQy56PF0H9GAvvzqiGFCtBny7W1TCQJuSUbcPEJtn1pSysadx4jD4xOCTJA
-         ZpOhzfEcKO4D3yj9f+Y0tTEv24+UMZAR3AIdF9GQbKFS3+kTDsKMo+ALJfgo9Sl8yc77
-         iAm7MZu/ANIPntkGZeawSEVqQpunaeoybOdmUGXux++MYNdVN9FxKVXmXCPRRdq35Esb
-         6nWg==
-X-Gm-Message-State: ABy/qLbduea/NuC72LX372QQVndKgZvaI+29vsrjjuMsO/2YqVTG+9Xo
-        0iwJpWJyboseFm0AM7msHH5VaVYEI34=
-X-Google-Smtp-Source: APBJJlHU3X1jiZIQkztrQ0qyi13sB2BHgxSwAwvruTrOabL+aOrgTNpDpzNCx0RW10BA8nMofCGSGA==
-X-Received: by 2002:a05:6830:186:b0:6b8:886d:852 with SMTP id q6-20020a056830018600b006b8886d0852mr6679799ota.26.1688773064317;
-        Fri, 07 Jul 2023 16:37:44 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.170.65])
-        by smtp.gmail.com with ESMTPSA id h15-20020a9d6f8f000000b006b74bea76c0sm2180572otq.47.2023.07.07.16.37.44
+        bh=JTtsP0v5oCR6LBeoHSFqnBvz12KoS0FlBeCZr6L+XCk=;
+        b=BI4iREBgeAOHEVbQ67kGNXezVMp47VB4jPz8YsniaHkdTidKEx8Z1wKDpVSXuBtTqX
+         dooKAa8au/BkYTLapphooNlnzdMsn5mw+bP1d6AZqeI2aHQp4fSrHPZ7n1HaYTiRhr3b
+         Z1pgU0bec4UNATZ4bBMMa+wXbL55lQEUv4/gz1C2Tqs71XTvR+n0XzYW650fQj9sED28
+         A8ueURPcPGoyffhA3CUHMZgLs6jS/wf332ySIt4cJrjhkqkt2R1af5jlpB4iEBqlyU2o
+         58Vsp9oPxMLfQnUjlc5mCjl7lozG2QJZv7avd7IQluUQcdNGwjtPL5WWiDuSqw3eNptF
+         vxxQ==
+X-Gm-Message-State: ABy/qLb8KKpBoMyXYcB1/CvydL9kj+kaMPTRpkQnCDNBbpTa18oomd+v
+        QjqfrBT9pfapZWeLsZP44fXr86Y69vE=
+X-Google-Smtp-Source: APBJJlF7zGmHZWLyL31uv11hl78B0ytJC2f7B1jj63JJceBLaXURiLP7BWQRJ/+CDbc2+tjAw9hL9A==
+X-Received: by 2002:a05:6358:7e8b:b0:132:f2dc:e961 with SMTP id o11-20020a0563587e8b00b00132f2dce961mr6673734rwn.10.1688778288367;
+        Fri, 07 Jul 2023 18:04:48 -0700 (PDT)
+Received: from [172.17.0.2] ([137.135.38.226])
+        by smtp.gmail.com with ESMTPSA id k3-20020a170902e90300b001a1b66af22fsm3832368pld.62.2023.07.07.18.04.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 16:37:44 -0700 (PDT)
-Message-ID: <64a8a1c8.9d0a0220.65703.cf90@mx.google.com>
-Date:   Fri, 07 Jul 2023 16:37:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4857896071001692524=="
+        Fri, 07 Jul 2023 18:04:48 -0700 (PDT)
+Message-ID: <64a8b630.170a0220.5ca70.84e9@mx.google.com>
+Date:   Fri, 07 Jul 2023 18:04:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5830325777436611266=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/2] Bluetooth: MGMT: Fix always using HCI_MAX_AD_LENGTH
-In-Reply-To: <20230707224318.677205-1-luiz.dentz@gmail.com>
-References: <20230707224318.677205-1-luiz.dentz@gmail.com>
+Subject: RE: [v2,1/4] mgmt-tester: Fix tests that consider 31 bytes the max adv lenght
+In-Reply-To: <20230707224434.677627-1-luiz.dentz@gmail.com>
+References: <20230707224434.677627-1-luiz.dentz@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4857896071001692524==
+--===============5830325777436611266==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,52 +75,33 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=763576
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=763577
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      1.76 seconds
-GitLint                       PASS      0.56 seconds
-SubjectPrefix                 PASS      0.18 seconds
-BuildKernel                   PASS      34.73 seconds
-CheckAllWarning               PASS      37.00 seconds
-CheckSparse                   WARNING   42.19 seconds
-CheckSmatch                   WARNING   113.61 seconds
-BuildKernel32                 PASS      33.37 seconds
-TestRunnerSetup               PASS      500.57 seconds
-TestRunner_l2cap-tester       PASS      23.05 seconds
-TestRunner_iso-tester         PASS      41.37 seconds
-TestRunner_bnep-tester        PASS      10.82 seconds
-TestRunner_mgmt-tester        FAIL      217.84 seconds
-TestRunner_rfcomm-tester      PASS      15.73 seconds
-TestRunner_sco-tester         PASS      16.70 seconds
-TestRunner_ioctl-tester       PASS      17.81 seconds
-TestRunner_mesh-tester        PASS      13.42 seconds
-TestRunner_smp-tester         PASS      14.30 seconds
-TestRunner_userchan-tester    PASS      11.15 seconds
-IncrementalBuild              PASS      37.71 seconds
+CheckPatch                    PASS      1.58 seconds
+GitLint                       PASS      1.11 seconds
+BuildEll                      PASS      34.28 seconds
+BluezMake                     PASS      1015.70 seconds
+MakeCheck                     PASS      13.60 seconds
+MakeDistcheck                 PASS      188.77 seconds
+CheckValgrind                 PASS      308.41 seconds
+CheckSmatch                   PASS      404.99 seconds
+bluezmakeextell               PASS      124.11 seconds
+IncrementalBuild              PASS      3196.63 seconds
+ScanBuild                     WARNING   1268.29 seconds
 
 Details
 ##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
 Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 492 (99.0%), Failed: 2, Not Run: 3
+src/shared/ad.c:381:19: warning: Use of zero-allocated memory
+                                buf[(*pos)++] = ad_type;
+                                              ^
+1 warning generated.
 
-Failed Test Cases
-Read Ext Advertising Features - Success 3 (PHY flags) Failed       0.244 seconds
-Ext Adv MGMT Params - (5.0) Success                  Failed       0.288 seconds
 
 
 ---
@@ -128,4 +109,4 @@ Regards,
 Linux Bluetooth
 
 
---===============4857896071001692524==--
+--===============5830325777436611266==--
