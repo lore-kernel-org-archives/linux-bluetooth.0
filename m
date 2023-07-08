@@ -2,80 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F55EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jul 2023 09:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0341AEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jul 2023 14:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbjGHJx6 (ORCPT
+        id S230411AbjGHOMb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 8 Jul 2023 05:53:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50448 "EHLO
+        Sat, 8 Jul 2023 10:12:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbjGHJx5 (ORCPT
+        with ESMTP id S230370AbjGHOM1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 8 Jul 2023 05:53:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888F61BC3
-        for <linux-bluetooth@vger.kernel.org>; Sat,  8 Jul 2023 02:53:56 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E01960B40
-        for <linux-bluetooth@vger.kernel.org>; Sat,  8 Jul 2023 09:53:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6C2F3C433CB
-        for <linux-bluetooth@vger.kernel.org>; Sat,  8 Jul 2023 09:53:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688810035;
-        bh=YLo4ec54k8UrKtuMjBsZe4aWoWa1Y1H3erqDx6ppLVw=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=OJh+hb8IRUrVEmQxuwMzM/T0cFStPmKKqoPwnY1TE7QShHjNb4kg05lbaPK7BXjvj
-         DBeHmYV1Jxvx+Gq8sYSwzWP6vNMh/I+m5EIA3g3nDhyBRXWhVs6XLcw7D9HdujCumA
-         j1lYlx0/e6OVU4KkBY7jHD16u7zteOHomJ4PfHmEFVl/LLQIR/4vRdgFA0MmAMHjgU
-         8aOrzH8X6NSpLbdRQRGE28F3DNegBG1JMSE60Vr/MIqjJk2Sr99Ob6ZYRIv5wAC7sk
-         v9LOrV5PJUuclRkDIY9fv9Ag5EXTyJ4OB8c7e+r2MmF1DasW2ZA9D6UZpjweQVOmcu
-         y7QwBUmCP03aw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 53C5DC53BD0; Sat,  8 Jul 2023 09:53:55 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 200007] HP Elite Presenter Mouse support
-Date:   Sat, 08 Jul 2023 09:53:54 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: marco.morandini@polimi.it
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-200007-62941-IYXvOUklRe@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200007-62941@https.bugzilla.kernel.org/>
-References: <bug-200007-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Sat, 8 Jul 2023 10:12:27 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D19D61991;
+        Sat,  8 Jul 2023 07:12:25 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qI8fe-0004R5-4r; Sat, 08 Jul 2023 16:12:22 +0200
+Message-ID: <cf6ef663-d947-ca54-a9c4-beeb105ff5bb@leemhuis.info>
+Date:   Sat, 8 Jul 2023 16:12:21 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RESEND 2/2] Bluetooth: fix use-bdaddr-property quirk
+Content-Language: en-US, de-DE
+To:     Amit Pundir <amit.pundir@linaro.org>,
+        Johan Hovold <johan+linaro@kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Linux regressions mailing list <regressions@lists.linux.dev>
+References: <20230531090424.3187-1-johan+linaro@kernel.org>
+ <20230531090424.3187-3-johan+linaro@kernel.org>
+ <CAMi1Hd3fe=wk02WG8J7K5Ud1GcWkuKKKrxFjkNguxDkzNz2WVQ@mail.gmail.com>
+From:   "Linux regression tracking #adding (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <CAMi1Hd3fe=wk02WG8J7K5Ud1GcWkuKKKrxFjkNguxDkzNz2WVQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688825545;b7616270;
+X-HE-SMSGID: 1qI8fe-0004R5-4r
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D200007
+[TLDR: I'm adding this report to the list of tracked Linux kernel
+regressions; the text you find below is based on a few templates
+paragraphs you might have encountered already in similar form.
+See link in footer if these mails annoy you.]
 
---- Comment #5 from marco.morandini@polimi.it ---
-Should be fixed by
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/d=
-rivers/hid/hid-quirks.c?id=3D0db117359e47750d8bd310d19f13e1c4ef7fc26a
+On 07.07.23 11:41, Amit Pundir wrote:
+> Hi Johan,
+> 
+> On Wed, 31 May 2023 at 14:35, Johan Hovold <johan+linaro@kernel.org> wrote:
+>>
+>> Devices that lack persistent storage for the device address can indicate
+>> this by setting the HCI_QUIRK_INVALID_BDADDR which causes the controller
+>> to be marked as unconfigured until user space has set a valid address.
+>>
+>> The related HCI_QUIRK_USE_BDADDR_PROPERTY was later added to similarly
+>> indicate that the device lacks a valid address but that one may be
+>> specified in the devicetree.
+>>
+>> As is clear from commit 7a0e5b15ca45 ("Bluetooth: Add quirk for reading
+>> BD_ADDR from fwnode property") that added and documented this quirk and
+>> commits like de79a9df1692 ("Bluetooth: btqcomsmd: use
+>> HCI_QUIRK_USE_BDADDR_PROPERTY"), the device address of controllers with
+>> this flag should be treated as invalid until user space has had a chance
+>> to configure the controller in case the devicetree property is missing.
+>>
+>> As it does not make sense to allow controllers with invalid addresses,
+>> restore the original semantics, which also makes sure that the
+>> implementation is consistent (e.g. get_missing_options() indicates that
+>> the address must be set) and matches the documentation (including
+>> comments in the code, such as, "In case any of them is set, the
+>> controller has to start up as unconfigured.").
+>>
+> 
+> This patch broke Bluetooth on Dragonboard 845c (SDM845) devboard.
+> Reverting this patch fixes the BT breakage and I see the following
+> messages in dmesg:
+> 
+> Bluetooth: hci0: setting up wcn399x
+> Bluetooth: hci0: QCA Product ID   :0x0000000a
+> Bluetooth: hci0: QCA SOC Version  :0x40010214
+> Bluetooth: hci0: QCA ROM Version  :0x00000201
+> Bluetooth: hci0: QCA Patch Version:0x00000001
+> Bluetooth: hci0: QCA controller version 0x02140201
+> Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
+> Bluetooth: hci0: QCA Downloading qca/crnv21.bin
+> Bluetooth: hci0: QCA setup on UART is completed
 
---=20
-You may reply to this email to add a comment.
+Thanks for the report. To be sure the issue doesn't fall through the
+cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
+tracking bot:
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+#regzbot ^introduced 6945795bc81
+#regzbot title Bluetooth: Dragonboard 845c (SDM845) devboard broken
+#regzbot ignore-activity
+
+This isn't a regression? This issue or a fix for it are already
+discussed somewhere else? It was fixed already? You want to clarify when
+the regression started to happen? Or point out I got the title or
+something else totally wrong? Then just reply and tell me -- ideally
+while also telling regzbot about it, as explained by the page listed in
+the footer of this mail.
+
+Developers: When fixing the issue, remember to add 'Link:' tags pointing
+to the report (the parent of this mail). See page linked in footer for
+details.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
