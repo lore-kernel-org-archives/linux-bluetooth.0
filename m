@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D68C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jul 2023 06:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4A4EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jul 2023 06:23:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233226AbjGIGSG (ORCPT
+        id S233008AbjGIGXt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jul 2023 02:18:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58266 "EHLO
+        Sun, 9 Jul 2023 02:23:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233227AbjGIGSF (ORCPT
+        with ESMTP id S232560AbjGIGXs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jul 2023 02:18:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9E1E4D
-        for <linux-bluetooth@vger.kernel.org>; Sat,  8 Jul 2023 23:18:04 -0700 (PDT)
+        Sun, 9 Jul 2023 02:23:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B4661BE
+        for <linux-bluetooth@vger.kernel.org>; Sat,  8 Jul 2023 23:23:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 724B460BBC
-        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jul 2023 06:18:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D4D6EC43142
-        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jul 2023 06:18:03 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A46B560BC2
+        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jul 2023 06:23:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1864AC43215
+        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jul 2023 06:23:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688883483;
-        bh=NN90zc+nZbIzu9OLXY/oFBB5tNKtXUdNiM6LAwq5VhA=;
+        s=k20201202; t=1688883827;
+        bh=RVkBEbTBO168A+UiYe18ezr5RSe9fYiR0iDRJ4LDUEk=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=f/FE7PvARqsbMBJkHlasutXIcrz6O6dgVi9DHcFsYvQrDS+1nyixFIIDjHKs9rl7U
-         icoYMklk6Kih4IjzUQzb8VwkDSQfT1UNTzv/DEhcimlno5Cnu3+kmvDQoqVE1iflSr
-         gSjaDIxVXda1XfHvDKXzhaG42mPT/99EEtypmLPURXZ4agSBSqAnFOPeZscYUbFqTn
-         whz/y5nizCwKpZ/JTnUejRRhtdyEDD1oxpd4IQbJSxBtp3pd5NmGx5N+Y4LMlftEWC
-         078Fu/x0N0yylHtYYEaDGz/KJFqbtFgseOmMxRUEPn1lPu9gbFbTFL11sfpNZxP3ph
-         E2kCP7vmj+5rw==
+        b=P+FtIGVIXzpKK+4Kpo3GAuWM1OC7oWmAXf6Tet1A/S6AtCAIMci4J6E6mJhNd/F6O
+         brJiHjfH/4hWOwDuOr0xujXHpgCXpwcfZZk/2VEM7jzMYyyOiPQ335kXcsgNPvl4HT
+         NfKz2yoflq/lMY255p/sjUogjtm+P1cmcw2d0lmHxZwS/ut9eZXzlz0nxEJDFXny53
+         WIuqKbLyMEdQVIlELzi8VktzjJePPfa8whEZVCGjI5LkHIDbZ1loYKUclOm0BgxytG
+         8AhketxJk/LdiAlpccdIsPZirBmHjumQcxLRyELPgFqBbq1iRTJeS53xn6qR8xoDgj
+         4bXuyjv/qaVxQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C6CECC53BC6; Sun,  9 Jul 2023 06:18:03 +0000 (UTC)
+        id 094CCC53BD2; Sun,  9 Jul 2023 06:23:47 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Sun, 09 Jul 2023 06:18:02 +0000
+Date:   Sun, 09 Jul 2023 06:23:45 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -55,7 +55,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215167-62941-hGGHxSbZQy@https.bugzilla.kernel.org/>
+Message-ID: <bug-215167-62941-k1Yi0A0568@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
 References: <bug-215167-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,10 +69,9 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
---- Comment #52 from Hussam Al-Tayeb (ht990332@gmx.com) ---
-For me, only a horrible modprobe -r xhci_pci && modprobe xhci_pci seems to =
-make
-it work against without a reboot.
+--- Comment #53 from Hussam Al-Tayeb (ht990332@gmx.com) ---
+Another note. This also breaks after resuming from hibernate and not only a
+shutdown.
 
 --=20
 You may reply to this email to add a comment.
