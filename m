@@ -2,188 +2,277 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB171EB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 05:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F4CEEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 05:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230052AbjGJF4F (ORCPT
+        id S229793AbjGJF7h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jul 2023 01:56:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51122 "EHLO
+        Mon, 10 Jul 2023 01:59:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbjGJF4E (ORCPT
+        with ESMTP id S229493AbjGJF7e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jul 2023 01:56:04 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54868F9;
-        Sun,  9 Jul 2023 22:56:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688968563; x=1720504563;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=wYJcIYySX+SJ0oSNuHkV0uVYqnUccs7v+gboXsjW1N8=;
-  b=gs/VEEW6tbHjaS3pO6FEIXJKR3VsSE3kaF9ihKu39lZzpHHDGXYha9TL
-   Pc6Koc8BadoKv4Ao4gvYDukY5dw4PHpg+4cC0CdpyfHqvTNHUeL2lkLlo
-   Y6kK2pukywYXwetd3LHyv72eLFJ1SQ4hBDNnnxtJ9JGz12W3vwIDn7Hdg
-   BT5o/SdAWaHZsfzfAbs9Z4lU38D95wAWO2fLJ3d404y6ir1+IAdpLCRPt
-   CMhdTaAHx5WMIAWudMDFWI63VR5mjiSdck9VjHeLxbLdoIAJ/86Jpfp6U
-   9vqw9cweFE+o0q7E79sHnzhzWi6UmPrU6IJQESxG9G/pwQxpJaAAtbDOk
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="367758236"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="367758236"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2023 22:56:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10766"; a="844769065"
-X-IronPort-AV: E=Sophos;i="6.01,194,1684825200"; 
-   d="scan'208";a="844769065"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga004.jf.intel.com with ESMTP; 09 Jul 2023 22:56:02 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 9 Jul 2023 22:56:01 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Sun, 9 Jul 2023 22:56:01 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+        Mon, 10 Jul 2023 01:59:34 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84F19FB;
+        Sun,  9 Jul 2023 22:59:33 -0700 (PDT)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A5G2QA025918;
+        Mon, 10 Jul 2023 05:59:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=RhOldehScMSwi5AeuIPDV8GaMxJmSVCmjddCRltK9Ug=;
+ b=R/AnOAzSryrxgeVy1GxBm4pzyso8ckXbin0lYVwWSM+0aXYkV1MucZr8HlBJlw/d7t4q
+ d+SSAB43JAztD0JEulxQky52PEDYlDu8w6+hJcrkCmNGL2rU4gYXpBjJBUmvXfWQ/lmX
+ hoSAIlmSMSFu5LS/uwgprdrerPR7Mp7ssGtE8rbw6eugspGBBdeaa/f6YiEQYQBvbtV8
+ kdob8xzBl3tfFX7FNg46kd5K05o/4uH4LfUPHDMw2hnMVKvWg8SGgkBscU5ElfsFySTm
+ HkWssInkPx7HMwjxBOCi1126HzxfF4cpW0lM6cMmv3WPQZyaShUbOvhNq2fynxMCqQ5g Dg== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rq01djkjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jul 2023 05:59:29 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36A5xS2O020778
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Jul 2023 05:59:29 GMT
+Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Sun, 9 Jul 2023 22:56:01 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e5x9uFSle+67XJKxwZHbaxkYRLqpmEVni5jZAC4dIdKFQlYo85b1c+/I7ND6QAuwG+6xixHDgVY5T/dJ/fDVaO0aPP758p4Pn2P4qXp+Eh9TUNr9q3wGX45Qne1Na3f37lG4rRyPDSDSJNuaxbp88qNAFq7SJJHHM8ioRdXbgNSFtuAtiH7/rGhhOrf9oQYUfVO00xQV6afVTrhGR8lHk3rBubL0GvwwyLyGPSv8QRRZMFxcG8r71TuezbMEUMbne2nY6ipwJVKCMmYbtbpJY5hWFB0No44Vnn6ttoErbMSTB3IpE34D+b4hGqOmvTwv9mRyDteIBKKzzwCUPimxwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VwbfdKOzFnlzuLMd2+VfiBeERlrcIoWruIQT0EB/fx4=;
- b=VvnByd0c0kw6yBTx7jVFd0UovO7UbM9iQEE2n0+Pn0AsHut/2w8GtuZbP3xlKPVNRJyi/oSJtaLVz/xWCaiUVHxZRr2h2wIEZEk3HHSJKOdk3GT6DJkyMJoehVOkaFU6FNpgC8A1rxyl2FNLkPO22SJ7PcO5f06jzg8TJRV+qgi+U0J7X+XTE4MVGhVOXvmZPGyWoNHE959z45CQBuSidFJLqJZBbxnSSpzNuXXdYx20HbJ9MzXaT8QTm0sIvUjC/QAf+ikRn8Tk8NHEzxzH507OOQRxY00bIoyrOyjqjbNirxoRYI6tSxCA921DYV/kKWPhkr3ENYRkiTDxkqNHGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6392.namprd11.prod.outlook.com (2603:10b6:930:37::15)
- by IA0PR11MB8335.namprd11.prod.outlook.com (2603:10b6:208:493::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Mon, 10 Jul
- 2023 05:55:59 +0000
-Received: from CY5PR11MB6392.namprd11.prod.outlook.com
- ([fe80::5486:41e6:7c9e:740e]) by CY5PR11MB6392.namprd11.prod.outlook.com
- ([fe80::5486:41e6:7c9e:740e%7]) with mapi id 15.20.6565.028; Mon, 10 Jul 2023
- 05:55:59 +0000
-Date:   Mon, 10 Jul 2023 13:51:42 +0800
-From:   Yujie Liu <yujie.liu@intel.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-CC:     Marc Zyngier <maz@kernel.org>, kernel test robot <lkp@intel.com>,
-        "Andrew Morton" <akpm@linux-foundation.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        <kunit-dev@googlegroups.com>, <kvmarm@lists.linux.dev>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <linux-parisc@vger.kernel.org>,
-        <linux-rdma@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-        <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 296d53d8f84ce50ffaee7d575487058c8d437335
-Message-ID: <ZKucbr9WHLipxmAh@yujie-X299>
-References: <202307032309.v4K1IBoR-lkp@intel.com>
- <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
- <739807cf-4551-4760-83e0-a94026b5c1b8@acm.org>
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <739807cf-4551-4760-83e0-a94026b5c1b8@acm.org>
-X-ClientProxiedBy: SI2PR06CA0010.apcprd06.prod.outlook.com
- (2603:1096:4:186::6) To CY5PR11MB6392.namprd11.prod.outlook.com
- (2603:10b6:930:37::15)
+ 15.2.1118.30; Sun, 9 Jul 2023 22:59:26 -0700
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+To:     <johan@kernel.org>, <dmitry.baryshkov@linaro.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_tjiang@quicinc.com>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>
+Subject: [PATCH v10 1/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+Date:   Mon, 10 Jul 2023 13:59:13 +0800
+Message-ID: <20230710055915.3290-1-quic_tjiang@quicinc.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6392:EE_|IA0PR11MB8335:EE_
-X-MS-Office365-Filtering-Correlation-Id: 23c0e95d-5ff4-43e5-f757-08db810a5564
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: e02NnTCzC92coVCSLdfp8EapCWzlj0c58hKShF/0e+d0h27pq5sWx3FfRsT4xq3fZoA33XHTcDncnVqTL0fMaKmTX117tK1ZbvSEv4xIKlilL9gospy11diJnLJaEpa5nC1ES41jMJfYYmAsqv+9MzRNatd8OUojnu7+9/rw+xeFs2AMDUkw1P63iqyGXEwrJepvLPBqjdKmEg4ek7M1beamfBLLTv0VsuUHG/wd7QiDJNSVAXO69nxHctngLPayN9KEtkRMy8D0NeQHAdZEHv3ca7V+EB8TRvAEegNBNRY7NMik0UcuQ0kuA7DghzDKBku1aDVth8mOzHvxy8dYWALYVCH5RwujBNQYDr2Gms9WHTimHi8/XISkKarLocfddBrYGhjdAlMyqedBXFXCSr5NgSvljtiJ5poZ8agKIe3/NCYFFSroVfOMXgTvL2Y++qGach9rCfhyLa2EHGckKdRMESr8252aZ38wAPEy3SJuVK/dNnZWIfrm29hJ+vDhKJSkJJazf5DwTGnp696LDFzU47dWwCvWS9/V0HiVtMn/5mRMxfmrEXUx/ms6KBjuX+q2aVy8l3wBvfj0vhyPWA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6392.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(396003)(376002)(346002)(39860400002)(136003)(451199021)(41300700001)(44832011)(5660300002)(7416002)(54906003)(6486002)(316002)(2906002)(8676002)(8936002)(6512007)(966005)(66476007)(4326008)(66556008)(6916009)(66946007)(9686003)(33716001)(478600001)(6666004)(86362001)(186003)(38100700002)(83380400001)(6506007)(82960400001)(53546011)(26005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?iso-8859-1?Q?BJ/uLB6c47wttZJb1LGp90k0R5f10SUubW4C3Ncd5jmVpQiNS5+wv1Z8hb?=
- =?iso-8859-1?Q?YmTnqncsT0l8EOLFKVRQ6ijV00MFJAGDcz2rxfk1JOw6vgYzQJKlx73Qt6?=
- =?iso-8859-1?Q?UO2oLBj+MiItMcf5iCPRpOaZo+LVTFwLxIyyZlMLGI7okrf/uq0VHJNp7t?=
- =?iso-8859-1?Q?VKHTadJYNeLrkMEobM8AW7ovIzqEPuVr4oj4TW22qmYjbroQozuhed7In8?=
- =?iso-8859-1?Q?VaH0aIuNTFR+qG9wLZ4jQ5Hb+shMfGYkRTdBmmLvWb7dpy0KEgKZ4zpGiC?=
- =?iso-8859-1?Q?ZElMt/PHlLoFB4+o08Jui7/i9pbFWVmjXy9GBPkwJC4pE9A5K0HotEF2y1?=
- =?iso-8859-1?Q?aWLUMj3uUeAFIaE+9aJebcerkOMRDclqa81x9o3TyG7vLF2Qzreuui9ZMU?=
- =?iso-8859-1?Q?DOCQsXPws6grBEe5qQcyA4eFo7wLmPuOo3oO8vEqkhtUVZvDPiBZBPyrQT?=
- =?iso-8859-1?Q?k89/hYYY/3W263QRq9Wgp8PwnQxXtSLwCp0OcWCLjsr1tsEIjeDjyvJwzz?=
- =?iso-8859-1?Q?VBjwCTBXS7vQoiWx3qRYJnpCVQhLZus2w8ITTBHzzceqpVHyQJjcXVk0qZ?=
- =?iso-8859-1?Q?JHJR6YhvpIbwadZx6ob9qJjmxCwYqVLq/AINYdcuKC1oGxr82tB5Sh4LzH?=
- =?iso-8859-1?Q?MEtuW8HQO5YOmJ4LfRNhPAYV1bEkLTujztpcC1VUh5AO5xIRD4xAdOXSfj?=
- =?iso-8859-1?Q?nfhgmDHNqhdtYebZYKgw2tbmOk8MUlhU4eraKyLECfR+27NUCQ0IsjwjTr?=
- =?iso-8859-1?Q?M2VY/DOSK3At4OSD54sBU49Vy0RQ7eL5Fv482DR6iXnLteiZ4ANX7xfySh?=
- =?iso-8859-1?Q?CxijRVaMWpbGrcWw2fv/fuutBlFLw3poN8bhfzAg+Bcf0iTVxqdipQDx2q?=
- =?iso-8859-1?Q?/B5iMK44rzEzCka/m1nX6C4xGD5BgoYd+SQLbWc0VfBQbU+5d828L/B4PZ?=
- =?iso-8859-1?Q?Xkx6HnM0EH9FWW99UVPEYycNfBLU9fZnGOPGkD/P+EErScmx46Fe4//APV?=
- =?iso-8859-1?Q?5S7JAJmi5POkKXMBDff76u3/LKHYo6K4nhmpkixlVjFYBVoia6iEGMS3wZ?=
- =?iso-8859-1?Q?KbnGsy/XY91OUwvhwi/iRbIqVJFwzGXRZjNJyMOGtf2K6TGdYcwKYbRMXF?=
- =?iso-8859-1?Q?+R8g0NwDwgoc8Wu4w1zvfru796XDyrvlWAHsKMZ5jdxz+iuPBQOM0d+Ttg?=
- =?iso-8859-1?Q?zdoHcc+S/ln+A2nXgdRSWghiE3Hu6epPgP36wFlmsxQ3GePdXAFVeuL4I5?=
- =?iso-8859-1?Q?EwgWtC4EUUH3vCXmgQ4pb7kjRbFAgmLhQAFKaHjGqSBoGwnwA9xjbLIW2q?=
- =?iso-8859-1?Q?yYhI+6cPO/+5Im0IMgJzcgnwqLTrhoUh8WcotexbZNTu7NQTlps4ME0FY+?=
- =?iso-8859-1?Q?kmZuLRoKUcDGWM4QpIly1Dr0ED/k0DkdhlpAv2/y8cmSlS1ZHAnwZOPb1j?=
- =?iso-8859-1?Q?pvmvEfx/6rzmuYEa540PO3cWmIz+1de8q860jSZAaGc7FCL9jPEKjGSmNV?=
- =?iso-8859-1?Q?suC7k+l30hCwq4vtADKoRXEXA2/nza69SKVlJpW5Mh4zVQCIoZIL7Namod?=
- =?iso-8859-1?Q?8hFtxXLMDS50bVJEJegUAy7TZ3EqUjNp8wV2SqQ3cfZKqrc7g08HoHryyG?=
- =?iso-8859-1?Q?fy0WSEvKXmd/U3wdAFEzXCw1NhekGarpSd?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23c0e95d-5ff4-43e5-f757-08db810a5564
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6392.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2023 05:55:58.8682
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: h3wUJtFiqKHl2zrxiJrI4UKXeVPhlm8qj1Lsu3C5jintNGMNpKe5Jin9kG9fr5GAUETNhNoFUhsM6jmfC/Ov2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8335
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: VO-FBOrA6tavoztJ7SR6AFZXfrOoLVLx
+X-Proofpoint-GUID: VO-FBOrA6tavoztJ7SR6AFZXfrOoLVLx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-10_04,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxscore=0
+ priorityscore=1501 clxscore=1015 adultscore=0 mlxlogscore=999
+ malwarescore=0 lowpriorityscore=0 spamscore=0 phishscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307100055
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bart,
+This patch adds support for QCA2066 firmware patch and NVM downloading.
+as the RF performance of QCA2066 SOC chip from different foundries may
+vary. Therefore we use different NVM to configure them based on board ID.
 
-On Tue, Jul 04, 2023 at 07:11:37AM -0700, Bart Van Assche wrote:
-> On 7/4/23 00:15, Marc Zyngier wrote:
-> > On 2023-07-03 16:11, kernel test robot wrote:
-> > > tree/branch:
-> > > https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-> > > master
-> > > branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next
-> > > specific files for 20230703
-> > > 
-> > 
-> > [...]
-> > 
-> > > Unverified Error/Warning (likely false positive, please contact us if
-> > > interested):
-> > > 
-> > > arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
-> > 
-> > This *is* a false positive. The function is entered with a lock
-> > held, it will exit with the lock held as well. Inside the body
-> > of the function, we release and reacquire the lock.
-> 
-> Which tool reported this message? If this message was reported by sparse,
-> has it been considered to add a __must_hold() annotation?
+Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+---
+ drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btqca.h   |  4 ++
+ drivers/bluetooth/hci_qca.c |  8 ++++
+ 3 files changed, 86 insertions(+), 2 deletions(-)
 
-Sorry for the late reply.
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index e7e58a956d15..834b28706d90 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -205,6 +205,46 @@ static int qca_send_reset(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int qca_read_fw_board_id(struct hci_dev *hdev, u16 *bid)
++{
++	u8 cmd;
++	struct sk_buff *skb;
++	struct edl_event_hdr *edl;
++	int err = 0;
++	u8 bid_len;
++
++	cmd = EDL_GET_BID_REQ_CMD;
++	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
++				&cmd, 0, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Reading QCA board ID failed (%d)", err);
++		return err;
++	}
++
++	edl = skb_pull_data(skb, sizeof(*edl));
++	if (!edl) {
++		bt_dev_err(hdev, "QCA read board ID with no header");
++		err = -EILSEQ;
++		goto out;
++	}
++
++	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++	    edl->rtype != EDL_GET_BID_REQ_CMD) {
++		bt_dev_err(hdev, "QCA Wrong packet: %d %d", edl->cresp, edl->rtype);
++		err = -EIO;
++		goto out;
++	}
++
++	bid_len = edl->data[0];
++	*bid = (edl->data[1] << 8) + edl->data[2];
++	bt_dev_dbg(hdev, "%s: bid len = %x, bid = %x", __func__, bid_len, *bid);
++
++out:
++	kfree_skb(skb);
++	return err;
++}
++
+ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -574,6 +614,29 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+ 
++static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
++		   size_t max_size, struct qca_btsoc_version ver, u16 bid)
++{
++	u8 rom_ver;
++	u32 soc_ver;
++	const char *variant;
++
++	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
++	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
++
++	if ((le32_to_cpu(ver.soc_id) & 0x0000ff00) == QCA_HSP_GF_SOC_ID)  /* hsp gf chip */
++		variant = "g";
++	else
++		variant = "";
++
++	if (bid == 0x0)
++		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
++	else
++		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
++
++	bt_dev_dbg(hdev, "%s: nvm name is %s", __func__, fwname);
++}
++
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+ 		   const char *firmware_name)
+@@ -582,6 +645,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	int err;
+ 	u8 rom_ver = 0;
+ 	u32 soc_ver;
++	u16 boardid = 0;
+ 
+ 	bt_dev_dbg(hdev, "QCA setup on UART");
+ 
+@@ -604,6 +668,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	if (qca_is_wcn399x(soc_type)) {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/crbtfw%02x.tlv", rom_ver);
++	} else if (soc_type == QCA_QCA2066) {
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/hpbtfw%02x.tlv", rom_ver);
+ 	} else if (soc_type == QCA_QCA6390) {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htbtfw%02x.tlv", rom_ver);
+@@ -631,6 +698,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	/* Give the controller some time to get ready to receive the NVM */
+ 	msleep(10);
+ 
++	if (soc_type == QCA_QCA2066)
++		qca_read_fw_board_id(hdev, &boardid);
++
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+ 	if (firmware_name)
+@@ -644,8 +714,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 			snprintf(config.fwname, sizeof(config.fwname),
+ 				 "qca/crnv%02x.bin", rom_ver);
+ 		}
+-	}
+-	else if (soc_type == QCA_QCA6390)
++	} else if (soc_type == QCA_QCA2066) {
++		qca_generate_nvm_name(hdev, config.fwname, sizeof(config.fwname),
++				ver, boardid);
++	} else if (soc_type == QCA_QCA6390)
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htnv%02x.bin", rom_ver);
+ 	else if (soc_type == QCA_WCN6750)
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index b884095bcd9d..234a97a49bb9 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -13,6 +13,7 @@
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+ #define EDL_GET_BUILD_INFO_CMD		(0x20)
+ #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
++#define EDL_GET_BID_REQ_CMD		(0x23)
+ #define EDL_PATCH_CONFIG_CMD		(0x28)
+ #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+ #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+@@ -48,6 +49,8 @@
+ 
+ #define QCA_FW_BUILD_VER_LEN		255
+ 
++#define QCA_HSP_GF_SOC_ID		0x1200
++
+ 
+ enum qca_baudrate {
+ 	QCA_BAUDRATE_115200 	= 0,
+@@ -148,6 +151,7 @@ enum qca_btsoc_type {
+ 	QCA_QCA6390,
+ 	QCA_WCN6750,
+ 	QCA_WCN6855,
++	QCA_QCA2066,
+ };
+ 
+ #if IS_ENABLED(CONFIG_BT_QCA)
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 87a7325c75b1..c9774f7dbf24 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1748,6 +1748,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	const char *firmware_name = qca_get_firmware_name(hu);
+ 	int ret;
+ 	struct qca_btsoc_version ver;
++	const char *soc_name;
+ 
+ 	ret = qca_check_speeds(hu);
+ 	if (ret)
+@@ -1913,6 +1914,11 @@ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
+ 	.num_vregs = 0,
+ };
+ 
++static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
++	.soc_type = QCA_QCA2066,
++	.num_vregs = 0,
++};
++
+ static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
+ 	.soc_type = QCA_WCN6750,
+ 	.vregs = (struct qca_vreg []) {
+@@ -2403,6 +2409,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
+ 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+ 	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
+ 	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
++	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+@@ -2410,6 +2417,7 @@ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+ 
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id qca_bluetooth_acpi_match[] = {
++	{ "QCOM2066", (kernel_ulong_t)&qca_soc_data_qca2066 },
+ 	{ "QCOM6390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+ 	{ "DLA16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+ 	{ "DLB16390", (kernel_ulong_t)&qca_soc_data_qca6390 },
+-- 
+2.41.0
 
-This message was reported by coccinelle and may be a false positive.
-Please check the link [1] for details.
-
-[1] https://lore.kernel.org/oe-kbuild/202307031751.Ztgi3O29-lkp@intel.com/
-
-Best Regards,
-Yujie
