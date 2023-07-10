@@ -2,128 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 457ABEB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 05:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8F1EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 06:41:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbjGJF7i (ORCPT
+        id S231663AbjGJGlS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jul 2023 01:59:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51992 "EHLO
+        Mon, 10 Jul 2023 02:41:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229907AbjGJF7f (ORCPT
+        with ESMTP id S231604AbjGJGlR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jul 2023 01:59:35 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52B1FF;
-        Sun,  9 Jul 2023 22:59:34 -0700 (PDT)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36A4RfqS022835;
-        Mon, 10 Jul 2023 05:59:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=b7ImpdCaLHOcomQ2bEf2VeR0HVAv+fD+eYx4tIxtWzs=;
- b=WQa9JaY9uH7jO1HVbdKg9BKJOBceCbbT2Ma/4Fsju+3yrRXp71aHis2j6upaqsj5+b26
- x1JToUWmAEx76q5eTIGtTDJotQH2aGM7IiHuBbNZSSVEOZLRakyZzXq7ErvZY5S+oXof
- 2iwrLzax4hhEDnycXuwlASffh8ufyrDoiKhlUGGZjXCQ8TDfPkNglNJ4nalTlERUj/4q
- 36GBX8wZIUR6cP9JraaF2RhxPs/6eEiKGwoNkmEesvsQYLWJW6G2Eh/yPLA6v8d6Ei2q
- Fwi83qSexkNkHZHX2Gv87m51xxh7q4lKYS5B3FsaZ4KDldy0EWDtLRjETuLQk89uyvsI gg== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rq0yt2hbs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Jul 2023 05:59:31 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36A5xVoK027430
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 10 Jul 2023 05:59:31 GMT
-Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sun, 9 Jul 2023 22:59:29 -0700
-From:   Tim Jiang <quic_tjiang@quicinc.com>
-To:     <johan@kernel.org>, <dmitry.baryshkov@linaro.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <quic_tjiang@quicinc.com>,
-        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>
-Subject: [PATCH v10 2/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
-Date:   Mon, 10 Jul 2023 13:59:14 +0800
-Message-ID: <20230710055915.3290-2-quic_tjiang@quicinc.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 10 Jul 2023 02:41:17 -0400
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 812E213D
+        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jul 2023 23:41:15 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63770af327fso28967556d6.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Jul 2023 23:41:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688971274; x=1691563274;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=59a9kaPFqiDyUxeqth8PGfYgpQpescSxm5rI0wrvx38=;
+        b=YWVEor0ZxtrA+j+QsScSqfMTDgUgdt6VTSNsyAIgmHtDvNaD7TiIekxnUf2noc30R5
+         SJO4/Wu07Ui4sjodzuK2YtF5Uf/EX15A4RVaAHZpfNuZsl1XnxAfZkxJGqYKOfTuOUSa
+         NAjiau438tVfs7Yho4xa7hecgf1QM1rSI+CUVKy3IIT8IZTNlu5+7liCsu7a0WIvcs5x
+         PWRbWV30HkxrLhFGAxbc+o/MxTBjeRMJhZpf7bKUS75kNfgjS4BpMxoT5iWDULhoNlH8
+         2Ujvh5APjCM/7EaltkBCiICqV6T7076TzR2/3KBx2f/XjuHe8BC+gGB3TtTej5FdF8Y8
+         0T2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688971274; x=1691563274;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=59a9kaPFqiDyUxeqth8PGfYgpQpescSxm5rI0wrvx38=;
+        b=VMOkvyPeUertV6kfJFYBMdDNnf2mw4zlBSt8svwlNPwpaXyr0g7KCrYNUBUqP9h3dF
+         kvEAmnxgkq1V6GScPOfHF8tecICYZE9fWkw5jtSjohnqih0Nng4z4Ehrav1p1Ub6uoGv
+         yXKJmqsU3pZw3koGOXkB3ZF8pdPa5r5sM1CjCDh4gdy+qUwKU5RYFBALdV6MFRRJBgeB
+         Z7OUdiUaZiltcqkDc0wohoERC73wbYtPbeGPvQGW2H9if5TriDj9O5XgEG1Vi2g/Z34E
+         uZ2kJuMT4tYqlLI53nqJbhGMFW7P5KCwAay0z+4lu2ZRnISXA4j51mgTuO52brSVAI6+
+         22kA==
+X-Gm-Message-State: ABy/qLZF1UnVcD3oKDvcIDD5DEsbnjKCtv5no47Y96bSHEhuU5bZMa9V
+        RtbkHoFylLIu0wcalT1t01M/mUVAJuDNlQ==
+X-Google-Smtp-Source: APBJJlGB9BY3xsshcdCE/uh2gqfz6EI9WuzVeYUxLq4MdqyCcd5Wf4IHMZSgWi6CEkCsf+gVm4L/Gw==
+X-Received: by 2002:a0c:e4c7:0:b0:635:ef7b:c74e with SMTP id g7-20020a0ce4c7000000b00635ef7bc74emr10556198qvm.62.1688971274314;
+        Sun, 09 Jul 2023 23:41:14 -0700 (PDT)
+Received: from [172.17.0.2] ([40.75.122.125])
+        by smtp.gmail.com with ESMTPSA id d15-20020a0ce44f000000b00623950fbe48sm5282102qvm.41.2023.07.09.23.41.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jul 2023 23:41:14 -0700 (PDT)
+Message-ID: <64aba80a.0c0a0220.aa670.c38d@mx.google.com>
+Date:   Sun, 09 Jul 2023 23:41:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2041716840770786654=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_tjiang@quicinc.com
+Subject: RE: [v10,1/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
 In-Reply-To: <20230710055915.3290-1-quic_tjiang@quicinc.com>
 References: <20230710055915.3290-1-quic_tjiang@quicinc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _UXZ5OHL6GXxENge-soEHlpb4d31hl6r
-X-Proofpoint-ORIG-GUID: _UXZ5OHL6GXxENge-soEHlpb4d31hl6r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-10_04,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 clxscore=1015
- phishscore=0 mlxlogscore=968 impostorscore=0 priorityscore=1501 mlxscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307100055
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch make the print btsoc type expression more clearly.
+--===============2041716840770786654==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=763866
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.79 seconds
+GitLint                       PASS      0.67 seconds
+SubjectPrefix                 PASS      0.25 seconds
+BuildKernel                   PASS      32.53 seconds
+CheckAllWarning               PASS      35.32 seconds
+CheckSparse                   PASS      40.15 seconds
+CheckSmatch                   PASS      111.85 seconds
+BuildKernel32                 PASS      30.83 seconds
+TestRunnerSetup               PASS      475.12 seconds
+TestRunner_l2cap-tester       PASS      22.12 seconds
+TestRunner_iso-tester         PASS      40.87 seconds
+TestRunner_bnep-tester        PASS      10.11 seconds
+TestRunner_mgmt-tester        PASS      212.00 seconds
+TestRunner_rfcomm-tester      PASS      15.28 seconds
+TestRunner_sco-tester         PASS      16.07 seconds
+TestRunner_ioctl-tester       PASS      17.17 seconds
+TestRunner_mesh-tester        PASS      12.60 seconds
+TestRunner_smp-tester         PASS      13.64 seconds
+TestRunner_userchan-tester    PASS      10.62 seconds
+IncrementalBuild              PASS      34.47 seconds
+
+
+
 ---
- drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++----
- 1 file changed, 29 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index c9774f7dbf24..d90ee1ccfd9c 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1763,10 +1763,35 @@ static int qca_setup(struct hci_uart *hu)
- 	 */
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 
--	bt_dev_info(hdev, "setting up %s",
--		qca_is_wcn399x(soc_type) ? "wcn399x" :
--		(soc_type == QCA_WCN6750) ? "wcn6750" :
--		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
-+	switch (soc_type) {
-+	case QCA_AR3002:
-+		soc_name = "ar300x";
-+		break;
-+	case QCA_ROME:
-+		soc_name = "ROME";
-+		break;
-+	case QCA_WCN3990:
-+	case QCA_WCN3991:
-+	case QCA_WCN3998:
-+		soc_name = "wcn399x";
-+		break;
-+	case QCA_QCA2066:
-+		soc_name = "QCA2066";
-+		break;
-+	case QCA_QCA6390:
-+		soc_name = "QCA6390";
-+		break;
-+	case QCA_WCN6750:
-+		soc_name = "wcn6750";
-+		break;
-+	case QCA_WCN6855:
-+		soc_name = "wcn6855";
-+		break;
-+	default:
-+		soc_name = "unknown soc";
-+		break;
-+	}
-+	bt_dev_info(hdev, "setting up %s", soc_name);
- 
- 	qca->memdump_state = QCA_MEMDUMP_IDLE;
- 
--- 
-2.41.0
 
+--===============2041716840770786654==--
