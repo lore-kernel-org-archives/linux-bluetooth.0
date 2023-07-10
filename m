@@ -2,78 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C15E6C001DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 19:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF64EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 21:30:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbjGJTk1 (ORCPT
+        id S229921AbjGJVa0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jul 2023 15:40:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46742 "EHLO
+        Mon, 10 Jul 2023 17:30:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbjGJTkZ (ORCPT
+        with ESMTP id S231847AbjGJVaY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jul 2023 15:40:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 687A5136
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 12:40:24 -0700 (PDT)
+        Mon, 10 Jul 2023 17:30:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 618DB106
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 14:30:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C1B39611BD
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 19:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 242FDC433C9;
-        Mon, 10 Jul 2023 19:40:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F3A4561210
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 21:30:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6553EC433C9;
+        Mon, 10 Jul 2023 21:30:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689018023;
-        bh=XG2yZlE6rJL3MtI8Ya/000FGvuaRc6nyOafSzElqYHk=;
+        s=k20201202; t=1689024622;
+        bh=++3lTdb1uyzWbe4+o1ezr3Ge1YYmSlnUmL818IFnAV4=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=GYultrSkSNtZsPqunvCMQXK3TIXKFbwHmZtavLoq1cYsZ8M838pzw7bMoRmIb1fgf
-         AQnPyKqD7R2/eDTrcPAmP+IPaqeDwxyZfKsyGlBRYG2Gh95PVoTeX39UC9KCsVVMFH
-         xfZg7RunsRuUjLvTKnEXOufijiwu4tzGUVxoNJgwr6EA8TZxA60dYSwTRqxG85vkl2
-         hWTvCe4pHdxXG8P4jEl/79Y693Oy3eEzUQlfmzVc3Zj92whYA4bFR+n92H9JXpvUT4
-         nrrV/ix1CHFCisIcVXcOB30KJ2uehFey1Sz1gOB7Xhk3jtwsg8TrNNitQJWvlPyza5
-         9FY8xBAvwBWAQ==
+        b=POGvv+23xVvhzf+FOWcct0peUfLd7UfIzSgGEn4znVChM5dPu0AUIAyODrowvFm7h
+         IrKBldL3DbX6h3zhmJ1EcN+4cjQwYDISsMUtq4eJDJQuF1YbikEYiEZKkH2iiYFWLL
+         OUuEAvhK+MyRucWq7IDBtYTpnYFQEv+rysiBvV5cpTU5sHG8pw526tSQSqbCEsqiFg
+         aJpX2/cd+1x6gZ36b5V3aEHzdSdBo0jGIFtN9oj+Wjow8BJF7Aq+xSGubfUh3WM3Ny
+         a5JeSlR4whR1+2v/8nqxLYKCVZH7IsXhlNlatRFAXMGYG7ye8mnBz5coPRtXofPHFT
+         ERojdC2tYXubQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 03F8DE52BEF;
-        Mon, 10 Jul 2023 19:40:23 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34F54E5380A;
+        Mon, 10 Jul 2023 21:30:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v3 0/2] shared/bass: Introduce Add Source opcode handler
+Subject: Re: [PATCH v2 1/2] Bluetooth: MGMT: Fix always using HCI_MAX_AD_LENGTH
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168901802301.22137.10039217524697261844.git-patchwork-notify@kernel.org>
-Date:   Mon, 10 Jul 2023 19:40:23 +0000
-References: <20230629080735.525650-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20230629080735.525650-1-iulia.tanasescu@nxp.com>
-To:     Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
-        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
-        vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
+Message-Id: <168902462221.18683.18234487358526141050.git-patchwork-notify@kernel.org>
+Date:   Mon, 10 Jul 2023 21:30:22 +0000
+References: <20230707224318.677205-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230707224318.677205-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 29 Jun 2023 11:07:33 +0300 you wrote:
-> This patch series adds the BASS control point handler
-> for the Add Source operation.
+On Fri,  7 Jul 2023 15:43:17 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> If instructed by a Client through the Add Source opcode,
-> the BASS Server attempts to synchronize to a Broadcast
-> Source, by opening a btio channel.
+> HCI_MAX_AD_LENGTH shall only be used if the controller doesn't support
+> extended advertising, otherwise HCI_MAX_EXT_AD_LENGTH shall be used
+> instead.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v3,1/2] btio: Add options for binding iso broadcast address
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=da85360a956f
-  - [BlueZ,v3,2/2] shared/bass: Introduce Add Source opcode handler
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8a8f8c143b18
+  - [v2,1/2] Bluetooth: MGMT: Fix always using HCI_MAX_AD_LENGTH
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c9a85685d0c1
+  - [v2,2/2] Bluetooth: hci_sync: Fix using Legacy PDUs with certain advertising
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
