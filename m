@@ -2,140 +2,165 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5061EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 16:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33531EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 16:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230389AbjGJQCn (ORCPT
+        id S230304AbjGJQsp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jul 2023 12:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57666 "EHLO
+        Mon, 10 Jul 2023 12:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbjGJQCk (ORCPT
+        with ESMTP id S230016AbjGJQso (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jul 2023 12:02:40 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F26C3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 09:02:38 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-39ca120c103so3266805b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 09:02:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689004958; x=1691596958;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XItR1y6b3uVnlw9fvVueVop2Viu8xYEXcJoxrokcheM=;
-        b=FTKEtpf2jA3VzxGxmg4+PlbuNi8DIQK02dE369NNquCCOKLBCZKBn+6mZTOTHiOLE9
-         BQvZmLYb7pYgcVsiOXd4WJWQHFqRdnCWLdecMqxtPu24EYn9Xdt655Y5yJdlnqnHok/N
-         +DNWGp+Jf1GOq7a7jZRbxwDYf+5xIHMqMu7XJNLwb6DG5cQKuQZBx5y515EhZxqPbEbr
-         RF4LuLV8kkPd/qagREJPkJaj+Wx2AHoTIPsMI66LRc/4gYH/RFdeahICiJS5f2cGZnf6
-         BuGbPzG4zXvVdeIZdWzl/of2WAkIn1A90TkC0j/fBZ3S9oqic4X5wMnLnZ91nzLgo4ws
-         c+Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689004958; x=1691596958;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XItR1y6b3uVnlw9fvVueVop2Viu8xYEXcJoxrokcheM=;
-        b=LrvOWw0muVFwFRLhIh0fWINUCtgdGtt2lt4kAGjtzz12tgDhVW94aGEh/Wjp2eVsol
-         +MWE/07wqZ/HFKiUsYU3GCLSPVwKWxdOL3WglUyKPQ+rxmya4WSQAdvlOEL6EbU5K2wU
-         0rfnh74ho5m0ncTQvO0eQABeQ5EyyGFp53KOeKIDUSzQgiHwGOFu/axv5xq1L4IaQaTx
-         ro6LAE8FFKS434o5/KCLTcDQuLcqrsglUNs2F95r1+pRnCDSz6XrhKciLRYUqHyFIW8v
-         5giYvAOIIq8XyDd907SA41/CBXy2feb1nRX/zwZJtyq03Q+ZtIeooFJlCIOsOwS0CXpe
-         Rb2A==
-X-Gm-Message-State: ABy/qLZoUN0UFB1dSrvV+rQX4hurr1hEOT+sYDyU0xPYM5mw7xbCvfR3
-        NakcRs9FlorRxU1lZXw0Vh3b5jp0R0E=
-X-Google-Smtp-Source: APBJJlHFips434dBbN06HEhyG80mt+aF1jMuFKm9hqp4NQtcL5B+Fc3QPAGcpOCEZrV+xof2I/WMLw==
-X-Received: by 2002:a05:6808:905:b0:3a1:dcba:ed7b with SMTP id w5-20020a056808090500b003a1dcbaed7bmr11575761oih.53.1689004957889;
-        Mon, 10 Jul 2023 09:02:37 -0700 (PDT)
-Received: from [172.17.0.2] ([65.52.35.3])
-        by smtp.gmail.com with ESMTPSA id y14-20020a056808130e00b003a1f1933957sm46443oiv.16.2023.07.10.09.02.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jul 2023 09:02:37 -0700 (PDT)
-Message-ID: <64ac2b9d.050a0220.3b35.0690@mx.google.com>
-Date:   Mon, 10 Jul 2023 09:02:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2061425517291739484=="
+        Mon, 10 Jul 2023 12:48:44 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E1B1F2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 09:48:31 -0700 (PDT)
+Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4R091L0GVhz49Q0S;
+        Mon, 10 Jul 2023 19:48:21 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1689007702;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0drjbMnIOweBAIQt+MBPd7WklNyY2x1W1lj5DIqv/i0=;
+        b=byvHedoi0AlLwKY5fJEkiId4DdyLKuijD2DyzgdxRacJ0rbtNLcAmp2/noSfbE6oy6VBUU
+        Pzy2mYrmGYMdJvn2L1CrIyp4j7UwoLP+XjSWZYVNV/opjmWEyWynRJe2sFeb5i2pyPs5Q0
+        v8H/9xIpHVUlGVpJL0EgTvjwoctdgZBrCfINdaizSFC68wZLBSZLKe78Q/W/MGHRRFY1Fx
+        vGjvcZh9xGDOwzgy4zVaGpgHFa3ijYo+t4soYdpEVh/mMYv4k0qjhYNgytBTMbi0EpY3DL
+        0okLWaiT/2+jlFU4c1uzDR0sT1q8WtSDR/W3b7HVszMqbD5qASSfDRmcj7HCcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=lahtoruutu; t=1689007702;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=0drjbMnIOweBAIQt+MBPd7WklNyY2x1W1lj5DIqv/i0=;
+        b=igD4GjywT+3pKJOXfuO+40LwG9QVPcwp4wZn7eQk3jr9mSHcEwmXJFyb1Vzfzk8u8r8FY7
+        Bm8b+ig6CQ1FF/AbboZlLDyfGNyi+02/rzHF1VbuyJdKKJuYLb8cMYfGTuhlyDFeg6tOoA
+        o5SyssRzPo5BjzeeYwAcJD6CPFZTPH4sMxXY2yVH9GW8/tRSvemWCtZ/37wCjkWpcGmDkD
+        01WtpxvPtbqwXKwIBbKB1A5JiN/I0/F2XnDKVNvSy6PsUdqm3fNVOF9fA8jDm/iN4dyNUt
+        06IP8fHNl4AyZ3WdR4aJBMCGSddgUwX6J0pxesHIXZzkkj9z1OFkmgKnB0CCXg==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1689007702; a=rsa-sha256;
+        cv=none;
+        b=bRPz8+nSxlfJ7T4I6u2Yttn0JIGtY+6sEFGMnRs5hrZmeiO3dWqzVo1fL1ImClNOXFULvT
+        3ZDhLQt7B9qqajerIalcoNByDUpSk27qGAbxIZZ+fGXN8nZ9KHtfHjr+3OWqmzxbSSLu8f
+        JuPMfmnVAAnKlGn5xmYBUb289RKiM5Jw9MhN8RBfDNnAs4pQG/HkU+9NsQ5UGrWNU5W5y5
+        A4LysGYTAVseqPJ0kUwd1kc69WBCzqr9gPp6kH0lOovoNJF+srpAdgc4EqATDB549+uS8m
+        +WkAi7yRxGYh53LibvfyGQAjiLYag6ehCuMTyyuSst4mak+H0N0RJir7Vch46w==
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>, pobrn@protonmail.com
+Subject: [PATCH] Bluetooth: SCO: fix sco_conn related locking and validity issues
+Date:   Mon, 10 Jul 2023 19:48:19 +0300
+Message-ID: <490b5c6a0e13047fd1bea42d3184b46623adc359.1689003801.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, joeyli.kernel@gmail.com
-Subject: RE: Bluetooth: hci_ldisc: check HCI_UART_PROTO_READY flag in HCIUARTGETPROTO
-In-Reply-To: <20230710151723.15617-1-jlee@suse.com>
-References: <20230710151723.15617-1-jlee@suse.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2061425517291739484==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Operations that check/update sk_state and access conn should hold
+lock_sock, otherwise they can race.
 
-This is automated email and please do not reply to this email!
+The order of taking locks is hci_dev_lock > lock_sock > sco_conn_lock,
+which is how it is in connect/disconnect_cfm -> sco_conn_del ->
+sco_chan_del.
 
-Dear submitter,
+Fix locking in sco_connect to take lock_sock around updating sk_state
+and conn.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=764081
+sco_conn_del must not occur during sco_connect, as it frees the
+sco_conn. Hold hdev->lock longer to prevent that.
 
----Test result---
+sco_conn_add shall return sco_conn with valid hcon. Make it so also when
+reusing an old SCO connection waiting for disconnect timeout (see
+__sco_sock_close where conn->hcon is set to NULL).
 
-Test Summary:
-CheckPatch                    FAIL      0.84 seconds
-GitLint                       FAIL      0.51 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      33.31 seconds
-CheckAllWarning               PASS      36.54 seconds
-CheckSparse                   PASS      41.27 seconds
-CheckSmatch                   PASS      114.64 seconds
-BuildKernel32                 PASS      32.48 seconds
-TestRunnerSetup               PASS      487.10 seconds
-TestRunner_l2cap-tester       PASS      22.77 seconds
-TestRunner_iso-tester         PASS      40.83 seconds
-TestRunner_bnep-tester        PASS      10.48 seconds
-TestRunner_mgmt-tester        PASS      211.04 seconds
-TestRunner_rfcomm-tester      PASS      15.72 seconds
-TestRunner_sco-tester         PASS      16.73 seconds
-TestRunner_ioctl-tester       PASS      17.64 seconds
-TestRunner_mesh-tester        PASS      12.98 seconds
-TestRunner_smp-tester         PASS      13.90 seconds
-TestRunner_userchan-tester    PASS      10.94 seconds
-IncrementalBuild              PASS      30.52 seconds
+This should not reintroduce the issue fixed in the earlier
+commit 9a8ec9e8ebb5 ("Bluetooth: SCO: Fix possible circular locking
+dependency on sco_connect_cfm"), the relevant fix of releasing lock_sock
+in sco_sock_connect before acquiring hdev->lock is retained.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: hci_ldisc: check HCI_UART_PROTO_READY flag in HCIUARTGETPROTO
-WARNING: From:/Signed-off-by: email address mismatch: 'From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>' != 'Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>'
+These changes mirror similar fixes earlier in ISO sockets.
 
-total: 0 errors, 1 warnings, 9 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13307193.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: hci_ldisc: check HCI_UART_PROTO_READY flag in HCIUARTGETPROTO
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-13: B1 Line exceeds max length (107>80): "Closes: https://lore.kernel.org/all/CA+UBctC3p49aTgzbVgkSZ2+TQcqq4fPDO7yZitFT5uBPDeCO2g@mail.gmail.com/ [1]"
-15: B1 Line exceeds max length (110>80): "Closes: https://lore.kernel.org/lkml/CA+UBctDPEvHdkHMwD340=n02rh+jNRJNNQ5LBZNA+Wm4Keh2ow@mail.gmail.com/T/ [2]"
-
-
+Fixes: 9a8ec9e8ebb5 ("Bluetooth: SCO: Fix possible circular locking dependency on sco_connect_cfm")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    Possibly related:
+    
+    https://lore.kernel.org/linux-bluetooth/00000000000036b9590600095d33@google.com/
+    https://lore.kernel.org/linux-bluetooth/HwByr9Ffw_HVVE5pnMu6CTIrQjKwBJpJcSskM0xOP0S-4XiIdmGFTLYAcgKJsOkrxt62je88hFJ1vkHzYtCgwsEATe0KFq3E4YX8LeN5Fdo=@protonmail.com/
 
---===============2061425517291739484==--
+ net/bluetooth/sco.c | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index bbf7072f5e80..ec6dce488a40 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -126,8 +126,11 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+ 	struct hci_dev *hdev = hcon->hdev;
+ 	struct sco_conn *conn = hcon->sco_data;
+ 
+-	if (conn)
++	if (conn) {
++		if (!conn->hcon)
++			conn->hcon = hcon;
+ 		return conn;
++	}
+ 
+ 	conn = kzalloc(sizeof(struct sco_conn), GFP_KERNEL);
+ 	if (!conn)
+@@ -268,21 +271,21 @@ static int sco_connect(struct sock *sk)
+ 		goto unlock;
+ 	}
+ 
+-	hci_dev_unlock(hdev);
+-	hci_dev_put(hdev);
+-
+ 	conn = sco_conn_add(hcon);
+ 	if (!conn) {
+ 		hci_conn_drop(hcon);
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto unlock;
+ 	}
+ 
+-	err = sco_chan_add(conn, sk, NULL);
+-	if (err)
+-		return err;
+-
+ 	lock_sock(sk);
+ 
++	err = sco_chan_add(conn, sk, NULL);
++	if (err) {
++		release_sock(sk);
++		goto unlock;
++	}
++
+ 	/* Update source addr of the socket */
+ 	bacpy(&sco_pi(sk)->src, &hcon->src);
+ 
+@@ -296,8 +299,6 @@ static int sco_connect(struct sock *sk)
+ 
+ 	release_sock(sk);
+ 
+-	return err;
+-
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	hci_dev_put(hdev);
+-- 
+2.41.0
+
