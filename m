@@ -2,123 +2,85 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD3EEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 11:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A7B9EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 12:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231290AbjGJLoc (ORCPT
+        id S231207AbjGJMIb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jul 2023 07:44:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46130 "EHLO
+        Mon, 10 Jul 2023 08:08:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbjGJLob (ORCPT
+        with ESMTP id S229671AbjGJMIb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jul 2023 07:44:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A48AC4;
-        Mon, 10 Jul 2023 04:44:30 -0700 (PDT)
+        Mon, 10 Jul 2023 08:08:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0CAF9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 05:08:30 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BA6BD60FBD;
-        Mon, 10 Jul 2023 11:44:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 256CBC433C8;
-        Mon, 10 Jul 2023 11:44:29 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0917F60F6E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 12:08:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6A2EAC433C8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jul 2023 12:08:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1688989469;
-        bh=o1LGyiMiSOQEwQarMwvLLj/BJ1xUtrDcPUNJciAkFqM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=u8704k+zd3ZP775T2wQbMQQdBn48H0kbYUxSje47l21G2u4w7VXGnRvoG1N7fEMEV
-         G5x740RU9jMYZukY1NEHbqOqVCZSbptouYvrOo0fmdFMbmkWY9tIij3278M2FCKzk6
-         ZYDlJL/KW318e1m2ZMiKqMDbjw0P3vpJeKPcw6vLFZNU7+EcwE2zVyGxYF8FggONRk
-         WxG65J1qCt61IQ9IDRe3JP7py1M060Fnh0BLbUkyiSCoi7ymvNFx2D6nRE0BwWq0s1
-         czwZEYCrUx+TRZIl5ggzX7cxLDeZbDXC7V523BVCXgtFzAqVJlX2TP2muF2osI5p4m
-         JB99siiRGkDLw==
-Received: from johan by xi.lan with local (Exim 4.96)
-        (envelope-from <johan@kernel.org>)
-        id 1qIpK3-0002D4-1X;
-        Mon, 10 Jul 2023 13:44:55 +0200
-Date:   Mon, 10 Jul 2023 13:44:55 +0200
-From:   Johan Hovold <johan@kernel.org>
-To:     Amit Pundir <amit.pundir@linaro.org>
-Cc:     Johan Hovold <johan+linaro@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: [PATCH RESEND 2/2] Bluetooth: fix use-bdaddr-property quirk
-Message-ID: <ZKvvN53dM5vbAFGi@hovoldconsulting.com>
-References: <20230531090424.3187-1-johan+linaro@kernel.org>
- <20230531090424.3187-3-johan+linaro@kernel.org>
- <CAMi1Hd3fe=wk02WG8J7K5Ud1GcWkuKKKrxFjkNguxDkzNz2WVQ@mail.gmail.com>
- <ZKfyH4jRGlVlcLeY@hovoldconsulting.com>
- <CAMi1Hd2CGQKbMPm6GXfSHgrdHsyngBQ_DBseF08=oEvGdizVcw@mail.gmail.com>
+        s=k20201202; t=1688990909;
+        bh=f2S+DNv96vDvWcedfmfXzPUldgOVv7NLZpNwNkNgIak=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=rQuDdmPhR1bHFdHb27hcKD/zXAakeSx0T1VDG2T2K8AfxKQw/Bj0dlCb0cqseTxzo
+         ICw2T28fRCub4HHevdggZICNCxfLaHsJN/Zp6Bl2H9Khe4t6WrOq7WVTMmhOojfeo9
+         GnWfuwveylEPZS6prKwL5MrqoOvlfhuF3Oz/AqcVbvPrwKZjSpktR66RHeqqbtazyo
+         XxEuRlzu60EgmPBpqueandZ92jK+QaOLmvImw3ITmQHJuxJPO+ePm/ApgrfZiopWmR
+         Bx7gpsLIhcMFSu7Y175Xvz/E3wZYorYc69K7SiUlWz7QhLpDV4Nus76619Zmx6G6fD
+         NKLXR4huCt4sA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 56ECEC4332E; Mon, 10 Jul 2023 12:08:29 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217651] BCM20702B0  Bluetooth device in MacBook no longer
+ working
+Date:   Mon, 10 Jul 2023 12:08:29 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: johnbholland@icloud.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-217651-62941-rw34Vhg3bC@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217651-62941@https.bugzilla.kernel.org/>
+References: <bug-217651-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMi1Hd2CGQKbMPm6GXfSHgrdHsyngBQ_DBseF08=oEvGdizVcw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jul 07, 2023 at 07:12:35PM +0530, Amit Pundir wrote:
-> On Fri, 7 Jul 2023 at 16:37, Johan Hovold <johan@kernel.org> wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217651
 
-> > That's odd. You should still see the above messages also with this patch
-> > applied, but you may now need to provide a valid device address before
-> > being able to use device in case the bootloader has not provided one
-> > (e.g. using btmgmt).
-> 
-> Sorry for the confusion, I missed the part where I do see these
-> messages when the kernel module is loaded but the direct firmware
-> loading fails.
-> 
-> Bluetooth: hci0: setting up wcn399x
-> Bluetooth: hci0: QCA Product ID   :0x0000000a
-> Bluetooth: hci0: QCA SOC Version  :0x40010214
-> Bluetooth: hci0: QCA ROM Version  :0x00000201
-> Bluetooth: hci0: QCA Patch Version:0x00000001
-> Bluetooth: hci0: QCA controller version 0x02140201
-> Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
-> bluetooth hci0: Direct firmware load for qca/crbtfw21.tlv failed with error -2
-> Bluetooth: hci0: QCA Failed to request file: qca/crbtfw21.tlv (-2)
-> Bluetooth: hci0: QCA Failed to download patch (-2)
-> Bluetooth: hci0: QCA preshutdown_cmd failed (-56)
-> 
-> This happens in all the cases (working and non-working BT) because
-> filesystem is not mounted by that time. I'm running AOSP and all the
-> kernel modules get loaded from a ramdisk. But in the working case, the
-> firmware loading kicks in again later in the boot process and BT gets
-> initiazed..
-> 
-> With this patch, after the first attempt to load the firmware fails,
-> the firmware loading doesn't kick-in again. Also even if I keep the
-> firmware in ramdisk then the direct firmware loading from ramdisk
-> happens but BT still doesn't work
-> https://bugs.linaro.org/attachment.cgi?id=1148.
+--- Comment #3 from johnbholland@icloud.com ---
+Created attachment 304584
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D304584&action=3Dedit
+lspci from arch kernel 6.3.9
 
-So everything appears to work as intended. First, the firmware needs to
-be in your initramfs if you want to avoid that initial fw load failure.
+this is the latest 6.3.9 kernel in the arch archive, and bluetooth works wi=
+th
+it
 
-And after that you need to provide a valid device address as these
-devices ship without one.
+--=20
+You may reply to this email to add a comment.
 
-Once you set the address, the firmware should be loaded if it hasn't
-been already.
-
-> > Are there any error messages in the log when running with this patch?
-> 
-> I don't see any relevant error message in dmesg. I'll check if I can
-> find a command line BT debug tool which I can use on AOSP for
-> debugging. There used to be a few hci command line tools, when I
-> looked into it a few years ago. Not sure if they are still around and
-> useful.
-
-Yeah, I'm not sure how you set the device address with the Android
-stack, but there must be some way as there are other bluetooth
-controllers out there which similarly need a valid address before they
-can be used.
-
-Johan
+You are receiving this mail because:
+You are the assignee for the bug.=
