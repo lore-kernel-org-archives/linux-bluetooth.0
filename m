@@ -2,110 +2,99 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8F1EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 06:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F9CEB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jul 2023 07:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231663AbjGJGlS (ORCPT
+        id S229865AbjGJHIi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jul 2023 02:41:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45454 "EHLO
+        Mon, 10 Jul 2023 03:08:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231604AbjGJGlR (ORCPT
+        with ESMTP id S229450AbjGJHIi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jul 2023 02:41:17 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 812E213D
-        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jul 2023 23:41:15 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-63770af327fso28967556d6.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Jul 2023 23:41:15 -0700 (PDT)
+        Mon, 10 Jul 2023 03:08:38 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40DBDE9;
+        Mon, 10 Jul 2023 00:08:37 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-38e04d1b2b4so3186606b6e.3;
+        Mon, 10 Jul 2023 00:08:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688971274; x=1691563274;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=59a9kaPFqiDyUxeqth8PGfYgpQpescSxm5rI0wrvx38=;
-        b=YWVEor0ZxtrA+j+QsScSqfMTDgUgdt6VTSNsyAIgmHtDvNaD7TiIekxnUf2noc30R5
-         SJO4/Wu07Ui4sjodzuK2YtF5Uf/EX15A4RVaAHZpfNuZsl1XnxAfZkxJGqYKOfTuOUSa
-         NAjiau438tVfs7Yho4xa7hecgf1QM1rSI+CUVKy3IIT8IZTNlu5+7liCsu7a0WIvcs5x
-         PWRbWV30HkxrLhFGAxbc+o/MxTBjeRMJhZpf7bKUS75kNfgjS4BpMxoT5iWDULhoNlH8
-         2Ujvh5APjCM/7EaltkBCiICqV6T7076TzR2/3KBx2f/XjuHe8BC+gGB3TtTej5FdF8Y8
-         0T2A==
+        d=gmail.com; s=20221208; t=1688972916; x=1691564916;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lRffpOTNrk7dJQa/vcMl/GzDO2mvO/jwkJDpoRGjyYk=;
+        b=KD8Qgv1BeZ8e6crtV/35C0AWOe4D0LXeKO8bJUZ3P7IFenhEOvAsQrO9O7pqTKBikJ
+         CLHfwxXs795UKuWRvxBtlKdhiywPk6DcbGf23fTj4We+i81UwIF3bLl8WYy3GUlexxx6
+         60NLqNTNQVWCxyhNgYxkTjraRJMPGiukIoH9KihTikwP9aPsecE0l2/BXIp8xDhqrRYf
+         zCK/RNCMLoZkZLo5+cVhJTsIoMSkNdfRYKYHNK29CfMQkPHUQoWrV0LGqjHj0bFPm+QP
+         mbE/BUNFHTobSrkaKCGpTniEIkmWoHiE+w1NIeO+CchhFtc1AV658nL1jxtqnsiYfGIm
+         HtNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688971274; x=1691563274;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=59a9kaPFqiDyUxeqth8PGfYgpQpescSxm5rI0wrvx38=;
-        b=VMOkvyPeUertV6kfJFYBMdDNnf2mw4zlBSt8svwlNPwpaXyr0g7KCrYNUBUqP9h3dF
-         kvEAmnxgkq1V6GScPOfHF8tecICYZE9fWkw5jtSjohnqih0Nng4z4Ehrav1p1Ub6uoGv
-         yXKJmqsU3pZw3koGOXkB3ZF8pdPa5r5sM1CjCDh4gdy+qUwKU5RYFBALdV6MFRRJBgeB
-         Z7OUdiUaZiltcqkDc0wohoERC73wbYtPbeGPvQGW2H9if5TriDj9O5XgEG1Vi2g/Z34E
-         uZ2kJuMT4tYqlLI53nqJbhGMFW7P5KCwAay0z+4lu2ZRnISXA4j51mgTuO52brSVAI6+
-         22kA==
-X-Gm-Message-State: ABy/qLZF1UnVcD3oKDvcIDD5DEsbnjKCtv5no47Y96bSHEhuU5bZMa9V
-        RtbkHoFylLIu0wcalT1t01M/mUVAJuDNlQ==
-X-Google-Smtp-Source: APBJJlGB9BY3xsshcdCE/uh2gqfz6EI9WuzVeYUxLq4MdqyCcd5Wf4IHMZSgWi6CEkCsf+gVm4L/Gw==
-X-Received: by 2002:a0c:e4c7:0:b0:635:ef7b:c74e with SMTP id g7-20020a0ce4c7000000b00635ef7bc74emr10556198qvm.62.1688971274314;
-        Sun, 09 Jul 2023 23:41:14 -0700 (PDT)
-Received: from [172.17.0.2] ([40.75.122.125])
-        by smtp.gmail.com with ESMTPSA id d15-20020a0ce44f000000b00623950fbe48sm5282102qvm.41.2023.07.09.23.41.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jul 2023 23:41:14 -0700 (PDT)
-Message-ID: <64aba80a.0c0a0220.aa670.c38d@mx.google.com>
-Date:   Sun, 09 Jul 2023 23:41:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2041716840770786654=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_tjiang@quicinc.com
-Subject: RE: [v10,1/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
-In-Reply-To: <20230710055915.3290-1-quic_tjiang@quicinc.com>
-References: <20230710055915.3290-1-quic_tjiang@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+        d=1e100.net; s=20221208; t=1688972916; x=1691564916;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lRffpOTNrk7dJQa/vcMl/GzDO2mvO/jwkJDpoRGjyYk=;
+        b=YMbj9bDukFqUhMbHnwy98uJ6MBkRp5V6+yB0j8gVUoFyygGTXMno/aBW242QHwFz4T
+         LsOZ9m/HrVbOREEmGDXcFpZZZsU7GancKIGi7i3oq80oid7nr1qmcTT5FO7oZggRPId5
+         Wb/VZ7fdgt6jmfQ369RnygvuXq2m+z9uDA9U3LnIOUJHeFLao2Zf5xkPlp1+u07MY64v
+         bC+Zj/D/MrsiYnGx5ipyIR1DSuHgSRQPvC0Zm/JSULho8tX80NZyzUx8P9rprgRq17D0
+         09+G2ebOtOUDUO+wPZQRvMzUcxs312TqKr20jW7Y3u/hC/u25ErBw1nsRici0Jzw8PLJ
+         qimA==
+X-Gm-Message-State: ABy/qLYeCZb4aLUJPmNRAKJZdUXJM6uJD74OQ7CyQez3qcpQqVd1/fWH
+        LrurqDLqiJrAKEkl32joJqU=
+X-Google-Smtp-Source: APBJJlGp8Q/DJY3BU7LHF5D9EuLW6pEQZpxwfdc0Msg8NYZhJNEVVbTzRjAOfBARd9hr9Rn4jAhYEQ==
+X-Received: by 2002:a05:6808:1190:b0:3a3:f45b:aa5f with SMTP id j16-20020a056808119000b003a3f45baa5fmr6107983oil.52.1688972916400;
+        Mon, 10 Jul 2023 00:08:36 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id i190-20020a639dc7000000b0055c4c9cc013sm1207925pgd.49.2023.07.10.00.08.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Jul 2023 00:08:36 -0700 (PDT)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yu Hao <yhao016@ucr.edu>, "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH] Bluetooth: hci_ldisc: check HCI_UART_PROTO_READY flag in HCIUARTGETPROTO
+Date:   Mon, 10 Jul 2023 15:07:45 +0800
+Message-Id: <20230710070745.5505-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2041716840770786654==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch adds code to check HCI_UART_PROTO_READY flag before
+accessing hci_uart->proto. It fixs the race condition in
+hci_uart_tty_ioctl() between HCIUARTSETPROTO and HCIUARTGETPROTO.
+This issue bug found by Yu Hao and Weiteng Chen:
 
-This is automated email and please do not reply to this email!
+BUG: general protection fault in hci_uart_tty_ioctl
+https://lore.kernel.org/all/CA+UBctC3p49aTgzbVgkSZ2+TQcqq4fPDO7yZitFT5uBPDeCO2g@mail.gmail.com/
 
-Dear submitter,
+The information of C reproducer can also reference here:
+https://lore.kernel.org/lkml/CA+UBctDPEvHdkHMwD340=n02rh+jNRJNNQ5LBZNA+Wm4Keh2ow@mail.gmail.com/T/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=763866
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.79 seconds
-GitLint                       PASS      0.67 seconds
-SubjectPrefix                 PASS      0.25 seconds
-BuildKernel                   PASS      32.53 seconds
-CheckAllWarning               PASS      35.32 seconds
-CheckSparse                   PASS      40.15 seconds
-CheckSmatch                   PASS      111.85 seconds
-BuildKernel32                 PASS      30.83 seconds
-TestRunnerSetup               PASS      475.12 seconds
-TestRunner_l2cap-tester       PASS      22.12 seconds
-TestRunner_iso-tester         PASS      40.87 seconds
-TestRunner_bnep-tester        PASS      10.11 seconds
-TestRunner_mgmt-tester        PASS      212.00 seconds
-TestRunner_rfcomm-tester      PASS      15.28 seconds
-TestRunner_sco-tester         PASS      16.07 seconds
-TestRunner_ioctl-tester       PASS      17.17 seconds
-TestRunner_mesh-tester        PASS      12.60 seconds
-TestRunner_smp-tester         PASS      13.64 seconds
-TestRunner_userchan-tester    PASS      10.62 seconds
-IncrementalBuild              PASS      34.47 seconds
-
-
-
+Reported-by: Weiteng Chen <wchen130@ucr.edu>
+Reported-by: Yu Hao <yhao016@ucr.edu>
+Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_ldisc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index efdda2c3fce8..a76eb98c0047 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -770,7 +770,8 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, unsigned int cmd,
+ 		break;
+ 
+ 	case HCIUARTGETPROTO:
+-		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
++		if (test_bit(HCI_UART_PROTO_SET, &hu->flags) &&
++		    test_bit(HCI_UART_PROTO_READY, &hu->flags))
+ 			err = hu->proto->id;
+ 		else
+ 			err = -EUNATCH;
+-- 
+2.35.3
 
---===============2041716840770786654==--
