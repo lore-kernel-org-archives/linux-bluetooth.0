@@ -2,98 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2ECEB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jul 2023 16:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00752EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jul 2023 17:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbjGKQNT (ORCPT
+        id S230035AbjGKRs4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Jul 2023 12:13:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48088 "EHLO
+        Tue, 11 Jul 2023 13:48:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230196AbjGKQNS (ORCPT
+        with ESMTP id S229537AbjGKRsz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Jul 2023 12:13:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DBCCE4F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 09:13:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 98D7261560
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 16:13:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 055C3C433C9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 16:13:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689091996;
-        bh=Vhige8aDcYZbCJyPqT/HY22bRUf2YrWuTiOSo+fYgSg=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=LKK3wB+2EItBswLSi5rYwyZ1rrg1Cp3BbnOyyqjYrfh5pX7xsqX6L7FkvMWm5rZFI
-         VOnGhGZpW2XX5ArSmZb63NNLGzO9tOcNry3upxLlzu9xVMCe/eVkfoADHp9EWDiI5k
-         qu2afbV/A1DQyPsAx7ljRMnXVvZab+aXucev2sbfGlqEQZmlRiUFk9eezk+GGMDcdY
-         lMhnyjYVh5kF85Rv/M5D5+3ugy1M/ngnEyLw7zC5gMyq+qIC4ivX4iqYecXLdgCVJd
-         3KBkCuOq52kngUKGKhFb44a2hoEiBKonENCo/NiUJrs0whXDxSiW4OFPXYO+0IfV9Z
-         Aqn/fZzXLbWiA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id E1366C53BD0; Tue, 11 Jul 2023 16:13:15 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217651] BCM20702B0  Bluetooth device in MacBook no longer
- working
-Date:   Tue, 11 Jul 2023 16:13:15 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: johnbholland@icloud.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217651-62941-XXVz87G6Jn@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217651-62941@https.bugzilla.kernel.org/>
-References: <bug-217651-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 11 Jul 2023 13:48:55 -0400
+X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 11 Jul 2023 10:48:53 PDT
+Received: from smtp.smtpout.orange.fr (smtp-25.smtpout.orange.fr [80.12.242.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9880E3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 10:48:53 -0700 (PDT)
+Received: from pop-os.home ([86.243.2.178])
+        by smtp.orange.fr with ESMTPA
+        id JHMVqjHlJfeeSJHMVqss1D; Tue, 11 Jul 2023 19:41:21 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+        s=t20230301; t=1689097281;
+        bh=YoD+Ttv8p1Nh3mEyaQHiXi8KW24Liu1RyHhVbajtzok=;
+        h=From:To:Cc:Subject:Date;
+        b=oR2zg4513ehzhFQ6QP9nOz7MGNj5YBwormiQ/aYH5QNhZN1YB+68nRpSNC0R3DKF1
+         bgyfSIHJ308rDLeiI1S7AHqCJTCvQLXlXfLMsUoRBwz6abj/jtxdQtxE8IW5IlbLiL
+         EpT5FYFJPbfWmXpf0LlJskNM0a4GAbapC9xW1frjA+4W+TwvgnomrkkL9A8h4bJnxb
+         eORxgPgzSzA/E56+7iX2BSvvAbW/d0RRmCiYX1tOUR7UTXpiChvEzQdwRhU5uyPHFq
+         JRx7izsEl0yz+xHmQy4zzF4yyGTiOqrtz9sB57qK3jqd7bG4iQR8gR9G2rFboOhuNs
+         r7ATrYsjpsx/w==
+X-ME-Helo: pop-os.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 11 Jul 2023 19:41:21 +0200
+X-ME-IP: 86.243.2.178
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To:     akpm@linux-foundation.org, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: hci_debugfs: Use kstrtobool() instead of strtobool()
+Date:   Tue, 11 Jul 2023 19:41:10 +0200
+Message-Id: <58247d1b8105739f0371030a93fb28ea3dbedc57.1673687451.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217651
+strtobool() is the same as kstrtobool().
+However, the latter is more used within the kernel.
 
---- Comment #13 from johnbholland@icloud.com ---
-> Thanks for trying to find the cause, that helpful and simply needed in ca=
-ses
-> like this. You might want to bisect between 6.3 and 6.4, as maybe it's so=
-me
-> change outside of bluetooth that broke things (but it's possible that you=
- are
-> on the right track, too).
->
-> Side notes:
-> * might be worth giving 6.5-rc1 a try, with a bit of luck it might contai=
-n a
-> fix (but there is a decent chance we are unlucky).
-> * cross-compiling might help to speed things up.
+In order to remove strtobool() and slightly simplify kstrtox.h, switch to
+the other function name.
 
+While at it, include the corresponding header file (<linux/kstrtox.h>)
 
-You're welcome. This is a new experience for me. It's pretty mechanical=20
-at this point, it just takes a while for each kernel rebuild. I hope at=20
-the end of it to have some useful information.I may be doing this off=20
-and on for a couple days :) . I'm getting much more comfortable with the=20
-steps to make my system boot with a new kernel.
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+This patch was already sent as a part of a serie ([1]) that axed all usages
+of strtobool().
+Most of the patches have been merged in -next.
 
---=20
-You may reply to this email to add a comment.
+I synch'ed with latest -next and re-send the remaining ones as individual
+patches.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Only 2 patches remain un-applied.
+
+Changes in v3:
+  - No change
+  - Adding in cc: akpm@linux-foundation.org
+  - Fix a duplicated Signed-off-by at the end of the "below --- section"
+
+Changes in v2:
+  - No change
+  - https://lore.kernel.org/all/58207d5b81c5739c037c030893fb08ea3dbedc57.1673687451.git.christophe.jaillet@wanadoo.fr/
+
+v1:  
+[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
+---
+ net/bluetooth/hci_debugfs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
+index b7f682922a16..f1ef60ddd4a6 100644
+--- a/net/bluetooth/hci_debugfs.c
++++ b/net/bluetooth/hci_debugfs.c
+@@ -22,6 +22,7 @@
+ */
+ 
+ #include <linux/debugfs.h>
++#include <linux/kstrtox.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -1152,7 +1153,7 @@ static ssize_t force_no_mitm_write(struct file *file,
+ 		return -EFAULT;
+ 
+ 	buf[buf_size] = '\0';
+-	if (strtobool(buf, &enable))
++	if (kstrtobool(buf, &enable))
+ 		return -EINVAL;
+ 
+ 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
+-- 
+2.34.1
+
