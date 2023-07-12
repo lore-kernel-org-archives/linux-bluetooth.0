@@ -2,119 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F9FEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 13:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751C1EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 13:51:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233482AbjGLNDu (ORCPT
+        id S229720AbjGLNvp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 09:03:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39914 "EHLO
+        Wed, 12 Jul 2023 09:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233478AbjGLND2 (ORCPT
+        with ESMTP id S229632AbjGLNvi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 09:03:28 -0400
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF461BFD;
-        Wed, 12 Jul 2023 06:03:22 -0700 (PDT)
-X-UUID: 7815dfbe20b411ee9cb5633481061a41-20230712
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=G1HHJBk/sQvVbiomYqcZlgk1NLXE+A6QfL373AvC8Vo=;
-        b=VoYwL7RMiyz/1jncyQ4wWRS+Ueq3h/g5vL9ZdvrXIWaZlD9LU+Ruge2dcgShe2lWebCsmDgGbAjwJBwh95qM+5Hi2Ql+synKKs2EPfBqklREsncTIrmhxe7XMKWmZG1heF4jHUGjmMMCdt2zn3gtihgbXZqbHbTMYFaokjR+4E8=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.28,REQID:98e51d2a-2e82-4c3c-86e0-b1f2dc874cc2,IP:0,U
-        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-        release,TS:0
-X-CID-META: VersionHash:176cd25,CLOUDID:5693270e-c22b-45ab-8a43-3004e9216b56,B
-        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-        RL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:
-        NO,DKR:0,DKP:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 7815dfbe20b411ee9cb5633481061a41-20230712
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
-        (envelope-from <chris.lu@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 401310188; Wed, 12 Jul 2023 21:03:17 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 12 Jul 2023 21:03:16 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 12 Jul 2023 21:03:16 +0800
-From:   Chris Lu <chris.lu@mediatek.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Von Dentz <luiz.dentz@gmail.com>
-CC:     Sean Wang <sean.wang@mediatek.com>,
-        Aaron Hou <aaron.hou@mediatek.com>,
-        Steve Lee <steve.lee@mediatek.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        linux-mediatek <linux-mediatek@lists.infradead.org>,
-        Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v4] Bluetooth: btmtk: Fix null pointer when processing coredump
-Date:   Wed, 12 Jul 2023 21:02:19 +0800
-Message-ID: <20230712130218.376-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+        Wed, 12 Jul 2023 09:51:38 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCDD61BEA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 06:51:33 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6b72c4038b6so5814385a34.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 06:51:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689169893; x=1691761893;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=vRoubrQfWLxXxldbPlKNEI/3SX7r/YWPC5h9Dm9FEuc=;
+        b=ehU/j1pPLk1IIZ4uMF7RpIh9zrKcD89ItdQYeKgHCeujVQvZA0Z9Va7nuZcpK76o4/
+         H1tASCgVra9aBagwO0/XYxuRNdRJx68UvFVwoyTntLVY3S+S2qFvaImPTgl0rSo/PmNA
+         a+vNQLpjCKs+GlMcbBSOQ7KuUKBtPTYqbTkXUmqAGt4g7s3sXTmOu39JxNtVaiYR+W1E
+         9fV+0f52XELc0uSjwZ527K6dCF4tf2cDWOFNI7lxE/JRMvrhomF1eJ0GRnFaJiFA4ZWA
+         YV52ggI2n4gPYg3q/dxQN+d4htCLZG7kGvl2WfxQjlE0LNcKThPeQgi9HtIf4vk5LPKW
+         Blkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689169893; x=1691761893;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vRoubrQfWLxXxldbPlKNEI/3SX7r/YWPC5h9Dm9FEuc=;
+        b=CFWu9SaNz+yCCSbgWnAP0MNdZpGZIwpehv+eDPILu1wZIUN2myWV6/N/PXYq4eOeSt
+         Qsjz4AqOl9A3sh2dXmY2G9mUPFaMmYaWtZhUZaqMYfWWrejuqmIUpv0ByU6u7Gt0hI5f
+         b0moYHh+2FdrY3PtyDozP57C5UkXbTZIt7hfSX3M/6cTZq1NbABwb1e8vJYUA4s5nRWm
+         w/UNUDjzgtttNyXFqcwIXXvE1Jb9NIePl4zTGNhOpb4IfGv+op/sq8FiUP9on/TX2cuA
+         sUM3nJihkLs881FwJoMBTOs1zqZ3gECXyyj1eK/fzLbHd/ooRYZ33lVLbly/tAnPnZqz
+         pu/Q==
+X-Gm-Message-State: ABy/qLafGKdVZVXibFwc8eLX6NlFBt7Ya8X7/yuIvXb3+ybI3qdNxUpj
+        6piyIuBNoIhgIM4WDeCppeezCmHdAuQ=
+X-Google-Smtp-Source: APBJJlFiG0yc3p/3KUVjSAalta46cG/ROAhxtoLRHk9ok0oax+JrcRv2gviiK6SkWymXhjJVJDJEoA==
+X-Received: by 2002:a05:6830:14d3:b0:6b9:9e4f:5f4c with SMTP id t19-20020a05683014d300b006b99e4f5f4cmr1658289otq.29.1689169893020;
+        Wed, 12 Jul 2023 06:51:33 -0700 (PDT)
+Received: from [172.17.0.2] ([23.102.140.54])
+        by smtp.gmail.com with ESMTPSA id e13-20020a0568301e4d00b006b87f593877sm1898844otj.37.2023.07.12.06.51.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 06:51:32 -0700 (PDT)
+Message-ID: <64aeafe4.050a0220.43c97.c40d@mx.google.com>
+Date:   Wed, 12 Jul 2023 06:51:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0497013771041925637=="
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
+Subject: RE: [v4] Bluetooth: btmtk: Fix null pointer when processing coredump
+In-Reply-To: <20230712130218.376-1-chris.lu@mediatek.com>
+References: <20230712130218.376-1-chris.lu@mediatek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There may be a potential null pointer risk if offset value is
-less than 0 when doing memcmp in btmtk_process_coredump().
-Check offset is valid before doing memcmp.
+--===============0497013771041925637==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=764864
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.76 seconds
+GitLint                       PASS      0.28 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      32.72 seconds
+CheckAllWarning               PASS      35.67 seconds
+CheckSparse                   PASS      40.50 seconds
+CheckSmatch                   PASS      113.44 seconds
+BuildKernel32                 PASS      31.76 seconds
+TestRunnerSetup               PASS      477.48 seconds
+TestRunner_l2cap-tester       PASS      22.23 seconds
+TestRunner_iso-tester         PASS      39.87 seconds
+TestRunner_bnep-tester        PASS      10.26 seconds
+TestRunner_mgmt-tester        PASS      212.08 seconds
+TestRunner_rfcomm-tester      PASS      15.16 seconds
+TestRunner_sco-tester         PASS      15.95 seconds
+TestRunner_ioctl-tester       PASS      17.20 seconds
+TestRunner_mesh-tester        PASS      12.71 seconds
+TestRunner_smp-tester         PASS      13.75 seconds
+TestRunner_userchan-tester    PASS      10.54 seconds
+IncrementalBuild              PASS      29.52 seconds
+
+
+
 ---
-v2: fix typo
-v3: fix bot checking error
-v4: reduce variable 'offset' declaration in v3
----
- drivers/bluetooth/btmtk.c | 12 ++++++------
- drivers/bluetooth/btmtk.h |  1 +
- 2 files changed, 7 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index 786f775196ae..9cc789272ab7 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -395,12 +395,12 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 		/* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
- 		if (data->cd_info.cnt > MTK_COREDUMP_NUM &&
--		    skb->len > sizeof(MTK_COREDUMP_END) &&
--		    !memcmp((char *)&skb->data[skb->len - sizeof(MTK_COREDUMP_END)],
--			    MTK_COREDUMP_END, sizeof(MTK_COREDUMP_END) - 1)) {
--			bt_dev_info(hdev, "Mediatek coredump end");
--			hci_devcd_complete(hdev);
--		}
-+		    skb->len > MTK_COREDUMP_END_LEN)
-+			if (!memcmp((char *)&skb->data[skb->len - MTK_COREDUMP_END_LEN],
-+			    MTK_COREDUMP_END, MTK_COREDUMP_END_LEN - 1)) {
-+				bt_dev_info(hdev, "Mediatek coredump end");
-+				hci_devcd_complete(hdev);
-+			}
- 
- 		break;
- 	}
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 68309dfe076a..56f5502baadf 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -24,6 +24,7 @@
- 
- #define MTK_COREDUMP_SIZE		(1024 * 1000)
- #define MTK_COREDUMP_END		"coredump end"
-+#define MTK_COREDUMP_END_LEN		(sizeof(MTK_COREDUMP_END))
- #define MTK_COREDUMP_NUM		255
- 
- enum {
--- 
-2.18.0
 
+--===============0497013771041925637==--
