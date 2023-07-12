@@ -2,77 +2,125 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C541FEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 22:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7345EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 22:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232620AbjGLWu0 (ORCPT
+        id S232412AbjGLW7z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 18:50:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45686 "EHLO
+        Wed, 12 Jul 2023 18:59:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbjGLWuY (ORCPT
+        with ESMTP id S231774AbjGLW7y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 18:50:24 -0400
+        Wed, 12 Jul 2023 18:59:54 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC3F1BE4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 15:50:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B74C12E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 15:59:53 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C3C861985
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 22:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D3B7C433CB;
-        Wed, 12 Jul 2023 22:50:21 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A439961986
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 22:59:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 09050C433C9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 22:59:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689202221;
-        bh=/9Mtq6S7+1xtBYfd9py9EXhpMIpEac/u+6KNlhTM+eM=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=lMVxkLyFDyKeqguPegXStlRJL+wI/SjVVU+Yre8aDbTRAFrZBM3ybmHVeP8QskuRP
-         QuDzQOpZlirvrLiieynGVT29WG7wpWQuiIh1cyCfUkoV0XBLCPq2XXVSecbaiIJPCx
-         LbCKEINUiU1gociFjZ17HJ+OW0WwnV/r2RxiLd1J3HBumrap6GxbeuK9wYclPGoBRt
-         +MKNnVjERBXwjdLWxGpDhoZYO4jd4dAfQ38y2v+n27KonKnhf6Xy7vPxDeL7ljNBwl
-         3Wa7476yYZphZ3Vt7dC1vnZAkc6Waguamhp+xHIxEGaMOB/DNhB4zTIgqkK0CiPRJW
-         hvbwIVfXdpKEQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 68A56E52508;
-        Wed, 12 Jul 2023 22:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1689202792;
+        bh=tqR/KSxFdT2UcBL3D8J//fwX5186RBp/hDV2XE/59e8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=Q4yTir+wZxa0Lh8ZbQU1pG57zfba6qi/RGA/SVKDczNo94/eFmdPF01oRAbX10hev
+         M+ewdspun+m9Car18khsropd2cEa92q47xxATWWZEHnNYQstgyj+xUC0kazzEH3k3C
+         c4cmZR2XLjzlntVjwUnM2AZPUa/7HJW34GxKZ/XGHdtbqjcAthMnSdP/OQfDgxs083
+         Rq8gL+4L0SBpe9GBNHdZS+pd9CMrmt0urYQRuacjgHkwW9czvy0/Va+eni7LUGpYgc
+         cvgARDwi/MVvaS7WiKjRGQpjIJTgvS7kUApkT/WpAgkSMe1Mw3RtGJFZzJtojJ3WI7
+         AmFFpuMGuqbog==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id E6605C53BCD; Wed, 12 Jul 2023 22:59:51 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217651] BCM20702B0  Bluetooth device in MacBook no longer
+ working
+Date:   Wed, 12 Jul 2023 22:59:51 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: johnbholland@icloud.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-217651-62941-Hk3dwMQ6SC@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217651-62941@https.bugzilla.kernel.org/>
+References: <bug-217651-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] configure: Fix check ell path for cross compiling
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168920222142.32437.8791264843870601970.git-patchwork-notify@kernel.org>
-Date:   Wed, 12 Jul 2023 22:50:21 +0000
-References: <20230701041252.139338-1-rudi@heitbaum.com>
-In-Reply-To: <20230701041252.139338-1-rudi@heitbaum.com>
-To:     Rudi Heitbaum <rudi@heitbaum.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217651
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+--- Comment #14 from johnbholland@icloud.com ---
+I believe I have identified the problem and a fix. Commit
+c13380a55522bf14e54779a142487c224509db95 is the cause, found by bisecting a=
+nd
+testing. Without it (built from immediately prior commit) the problem goes
+away. Also, in the current code, this change is there and the latest version
+6.5.0-rc1 has the issue, and it can be fixed by reverting this change. The
+change in question is:
 
-On Sat,  1 Jul 2023 04:12:52 +0000 you wrote:
-> Use of AC_CHECK_FILE prevents cross compilation.
-> Instead use test to support cross compiling.
-> 
-> Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
-> ---
->  configure.ac | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5c536151ef83..4ca91c033d2f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3831,13 +3831,9 @@ static int btusb_probe(struct usb_interface *intf,
 
-Here is the summary with links:
-  - configure: Fix check ell path for cross compiling
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c62a4cb55183
+        BT_DBG("intf %p id %p", intf, id);
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+-       /* interface numbers are hardcoded in the spec */
+-       if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) {
+-               if (!(id->driver_info & BTUSB_IFNUM_2))
+-                       return -ENODEV;
+-               if (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2)
+-                       return -ENODEV;
+-       }
++       if ((id->driver_info & BTUSB_IFNUM_2) &&
++           (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
++               return -ENODEV;
 
+        ifnum_base =3D intf->cur_altsetting->desc.bInterfaceNumber;
 
+( - is the code that works, + is the code that doesn't).=20
+Looking at the code, it looks like it was meant to remove the outer if
+statement and turn the inner part into something simpler. I think it is mis=
+sing
+an ! and uses && instead of || if that is what it intends.=20
+
+When I changed it to that though, the problem still existed. So what worked=
+ for
+me was to revert this block of code to the previous version, in both 6.3 and
+6.5.  In 6.5 this file has changed a lot, but this block is the same as the
+commit made it.=20
+
+My 2014 Macbook Pro is perhaps an obscure bit of hardware and I don't know
+whether this change was fixing something on other hardware. On my Macbook,
+though, it causes the internal Bluetooth controller to not be seen.=20
+I will also send an email to the people in the commit,
+ Signed-off-by: Tomasz Mo=C5=84 <tomasz.mon@nordicsemi.no>
+    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
