@@ -2,99 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E7EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 23:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D59FEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 23:13:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232052AbjGLXLy (ORCPT
+        id S232633AbjGLXN5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 19:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59472 "EHLO
+        Wed, 12 Jul 2023 19:13:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231144AbjGLXLx (ORCPT
+        with ESMTP id S231888AbjGLXNs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 19:11:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3643319B
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 16:11:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C38BF61986
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 23:11:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26B17C433C7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 23:11:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689203511;
-        bh=2dQXb+orygkP7VWpl2KDFER8ZF0wEwtXrX1RRF6FyeA=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=kqk68GRx3STv7NPjDN3v9PJwFjE8THIrzAsq5rtX5/HHMFpQf1PlDIhrrc9q4ssIv
-         LvGh3ZbHaT9ho7bs6bY1Uq7yftMKQFZu+TOaT4wVMQxagkaUayH247hcpOP8jgNIDk
-         8QUnUQ41SBiXgE7ZRvZ90huaq7Il2PbfYHd1q+NE8019l6r86RbzT6R+d17ZqMhpx9
-         7iO3L+cRSSV9J7DoPwE8fBoOwHWK7s5LgyKdVGB3paS0TQgkGbTSsb7+PKPlfAAAiO
-         bViADDxCjNazwiXscCQgxPsVzyhNBJe6kh4z5MXCl24FsREyXBc0bO9HxfNRU4j6Dj
-         pQ0/yo/KWRLHQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 0C095C53BD1; Wed, 12 Jul 2023 23:11:51 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
- fails (a timing issue?)
-Date:   Wed, 12 Jul 2023 23:11:50 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: espritlibre@yadim.dismail.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216936-62941-hQFltOX1OV@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
-References: <bug-216936-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 12 Jul 2023 19:13:48 -0400
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71C32683
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 16:13:20 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id 46e09a7af769-6b8baa72c71so36897a34.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 16:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689203600; x=1691795600;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=znj+4q+TQh6sfUKALZ94Ur+6iAhuqrpKrTHlRdoRPfM=;
+        b=nRCej8UHbS1TAirPmGuYwjkO9NAKJ0saz0b2hSi75avj5fGHNLFP9v9WlUhByDNmJD
+         YaxHSRfLqekGIDG8uHEQ3MHJdBvmLY+8zpIVcVVFL99zXK4aAYzq4Iqwk1LgakgTqe4f
+         Lv3mlSXjGVg/6sOkTBT4CFCs/59oGs7V1rZI5HYg44X0j/uwt+Vwd4d2kWcp8gpb2Pa0
+         oty3HwyfwZ3SpnL5gVbHNIpdNdpLHgZsI9NqMX04rZc55JxgjjpMzcMz9M4+e58Aljgv
+         zLLTVBSYBAzStUnM0TXUo6FuruF9Iw90k1ZX/RmILClGpjUQmLz58blgTyWzDr7uDCVN
+         nXBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689203600; x=1691795600;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=znj+4q+TQh6sfUKALZ94Ur+6iAhuqrpKrTHlRdoRPfM=;
+        b=IVw09HQ/F8ATBZ7L1aF51TN86JO73YwIK24+E9PwfBHVkk01Q+3yEbL4s/DxhrAuaf
+         MsnpfM2hHfLF+DJTDGZhYl216FeFWkiJiIMjTT/ZTpbvTXnvUSg0k+9RE2NKLPX2ZPFb
+         y+vW7Lzrp7mp/HB2EO+UhdxIctn0rFgYXufuGLBz/Fxi1YvvRsAgw3ATV/usMtO5rdvI
+         dxOjIJiEnIPmnktjp884X38Vj0OqKzDHGR2lWzNgBBW7YCXZF2q5D3YK1MJ6HLZebzkx
+         i92n26tehzu4MtPk9te45Id47yLa26iMHwLWsRga7P/co9C7TqHNuFC8IXVTL/X+hWUF
+         lIcg==
+X-Gm-Message-State: ABy/qLY4n+2CXOS4YNXvwwWvEpddL6ZEtYkPSDSxC2Xi3jhgMhZCbcaa
+        mEC7Fc4pSZFzNXJ7R2nskXuXQ/aXwFI=
+X-Google-Smtp-Source: APBJJlHIuIVBhXW9SGNMILMUJWRYl+gK5oNxJdA7QI6yMiQevmMRhsQIv05NToURN8hA4Sxuw2QjRA==
+X-Received: by 2002:a05:6870:4711:b0:1ad:e92:62e1 with SMTP id b17-20020a056870471100b001ad0e9262e1mr110109oaq.54.1689203599822;
+        Wed, 12 Jul 2023 16:13:19 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.106.80])
+        by smtp.gmail.com with ESMTPSA id h5-20020a0cf205000000b006238d903f9bsm2547055qvk.42.2023.07.12.16.13.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 16:13:18 -0700 (PDT)
+Message-ID: <64af338e.0c0a0220.ee0b4.96fa@mx.google.com>
+Date:   Wed, 12 Jul 2023 16:13:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5559254486973012908=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, bugzilla-daemon@kernel.org
+Subject: RE: [Bug,217651] BCM20702B0 Bluetooth device in MacBook no longer working
+In-Reply-To: <bug-217651-62941-Hk3dwMQ6SC@https.bugzilla.kernel.org/>
+References: <bug-217651-62941-Hk3dwMQ6SC@https.bugzilla.kernel.org/>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
+--===============5559254486973012908==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---- Comment #15 from espritlibre (espritlibre@yadim.dismail.de) ---
-sorry! forget what i wrote, 5.19.11 seems to be bad too...
+This is an automated email and please do not reply to this email.
 
-i think this could be a race condition between user space and kernel. becau=
-se i
-start my notbeook always in flight mode, in my case it's gnome/wayland. whe=
-n i
-turn off flight mode, the bluetooth firmware gets loaded.
+Dear Submitter,
 
-if i turn flight mode off and quickly on again, so the firmware download ge=
-ts
-interrupted and results in a:
-kernel: Bluetooth: hci0: FW download error recovery failed (-19)
-most of the time
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-or:
-kernel: Bluetooth: hci0: FW download error recovery failed (-108)
+----- Output -----
 
-i think on boot, the kernel trys to upload the firmware and then the flight
-mode kicks in, resulting in the error, sometimes. i need to pay more attent=
-ion
-and not use flight mode and see if the error appears again.
+error: patch failed: drivers/bluetooth/btusb.c:3831
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
---=20
-You may reply to this email to add a comment.
+Please resolve the issue and submit the patches again.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5559254486973012908==--
