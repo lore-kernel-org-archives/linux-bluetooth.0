@@ -2,81 +2,118 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCF1EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 04:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB04FEB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 05:19:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbjGLEwD (ORCPT
+        id S231828AbjGLFTZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 00:52:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59312 "EHLO
+        Wed, 12 Jul 2023 01:19:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbjGLEwB (ORCPT
+        with ESMTP id S231241AbjGLFTW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 00:52:01 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E9AE49
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 21:52:00 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-ca3cc52ee62so389034276.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 21:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=personaltelco-net.20221208.gappssmtp.com; s=20221208; t=1689137519; x=1691729519;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/Eqg7Kpk0k+ogd6aNIVIKNqz1QHCLjcIuS+g/K7qBp0=;
-        b=3I3FSSDwbq+BeBEUgRPE+w1Xu1+OOiqOuE6oWxroVLOXkpYi7ylgxSQaWQKJNSvnKe
-         LxzsYjgXwls/BCXnsQWEFCBDX+cNqoW9wubEuVeSb/BebfgXEoFuxzZn5/3pv52Rg+mU
-         o3M3Yd2U4HQZGcmDBgszWoQd1VB0IXhS7NjEjH2naKd1gnLpyNhrtrQnuLyxFhTBZcg1
-         QgfOoljtSeZ9SwiV3nUZXHinAKFusXyMWU5JfH4ZL+qDMYO7iLGxr/B/x3X7klRRpESE
-         dBfpe3tQaYPrkmNxO09gfq5rlHsGwxo7qf9nD66/bxS9r2HEwVes+FTud6H5fyyecF3p
-         Ug2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689137519; x=1691729519;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Eqg7Kpk0k+ogd6aNIVIKNqz1QHCLjcIuS+g/K7qBp0=;
-        b=VqccP7SllEmqLroXR3wuOjjHFAQaWXuoz5u2Q3qbKcRt1NHeV/wFcgyCupexoodBlb
-         S4WbthWOwbQGOWvR+B5IbMaLP+NIXhZhRdQQNEM7FK/pJD2yx9TyewI3UvX2gb/NkB5a
-         g2ChhnhI8DdER6tqB2Pi07rRyCbwoGzWILnZTuSrXvHWE4ib7WfAD9Cl4JVKV+M2uek+
-         808QyaZMfI9epBQdhaw3jA96BIwHeHDmMWI5N0NLDN/rVTcJUNgjUEEaAGWYgHQHr81f
-         F44IIQ2sCng4Gju476oD5zypmAhm7n5ssdS+NLDEZHMtwXK3hvVR2r8soxwOxc2Mmh/1
-         Ncfw==
-X-Gm-Message-State: ABy/qLaW6yBC+SuWHOVrx9ev5NmNbaCbcxLDWvsGB7CwuarUuoURs7sx
-        qBL5xsrveJxhT94J99QCjY6Eue0BvOQ4rf3tQGqGQsk1yV0Cz4TT
-X-Google-Smtp-Source: APBJJlEzh3Mlva20eTtW4Z7MoOFJzSMibovWRtrkPtDRXDJtxeasb4hrvOX/f5DJ7f0SEv0lrfpy48dptKqU3d8ibrQ=
-X-Received: by 2002:a0d:f182:0:b0:56c:e70b:b741 with SMTP id
- a124-20020a0df182000000b0056ce70bb741mr17349992ywf.20.1689137519179; Tue, 11
- Jul 2023 21:51:59 -0700 (PDT)
+        Wed, 12 Jul 2023 01:19:22 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2B31A6;
+        Tue, 11 Jul 2023 22:19:17 -0700 (PDT)
+X-UUID: a3a99a6c207311ee9cb5633481061a41-20230712
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=HFjVLrSlHIovITeC28nKCrvDmOrnc0uXGtIt3SR2nPc=;
+        b=Yg1bBEQRniF8y4SsvuJtDogNbDaqCPswW9n2NCkH/waEuXzu84JOa75IZXbuy2FNNXlCbY9QoMZ7v7Ysr2J910+8wLVcVddfWCgB+dswkJuOZRYCB3nBUhDo1sMFZdyXsbVJpJTY1Rtdadh2JxGjwPuhHe7bkWkR3IXZkCx5few=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.28,REQID:fd91dbcc-ccc0-47c2-9abf-1c4e56ec9467,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+        release,TS:0
+X-CID-META: VersionHash:176cd25,CLOUDID:514a2268-314d-4083-81b6-6a74159151eb,B
+        ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:
+        NO,DKR:0,DKP:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: a3a99a6c207311ee9cb5633481061a41-20230712
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
+        (envelope-from <chris.lu@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1545327841; Wed, 12 Jul 2023 13:19:13 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 12 Jul 2023 13:19:12 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 12 Jul 2023 13:19:12 +0800
+From:   Chris Lu <chris.lu@mediatek.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Von Dentz <luiz.dentz@gmail.com>
+CC:     Sean Wang <sean.wang@mediatek.com>,
+        Aaron Hou <aaron.hou@mediatek.com>,
+        Steve Lee <steve.lee@mediatek.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-mediatek <linux-mediatek@lists.infradead.org>,
+        Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v3] Bluetooth: btmtk: Fix null pointer when processing coredump
+Date:   Wed, 12 Jul 2023 13:18:58 +0800
+Message-ID: <20230712051857.13812-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-References: <CAHP3WfM2efs35fvQ+uOjy2awWgKosAfA7FbeAob8k6GhBwZvng@mail.gmail.com>
-In-Reply-To: <CAHP3WfM2efs35fvQ+uOjy2awWgKosAfA7FbeAob8k6GhBwZvng@mail.gmail.com>
-From:   Russell Senior <russell@personaltelco.net>
-Date:   Tue, 11 Jul 2023 21:51:47 -0700
-Message-ID: <CAHP3WfMz1p4MHwwDGTeU6iyuPz3OhnoB2EZ62s4voZbjhBEocw@mail.gmail.com>
-Subject: ell location bug/inconsistency with README
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I mentioned this on the irc channel recently, thought I'd escalate to
-the mailing list. Also, I am a total newbie with bluez, so please
-pardon what appears like and actually is pathetic ignorance.
+There may be a potential null pointer risk if offset value is
+less than 0 when doing memcmp in btmtk_process_coredump().
+Checking offset is valid before doing memcmp.
 
-I am building bluez 5.68 on OpenWrt and found that a recent commit
-1106b28be8 seems to have made the configure script look for ell
-whether or not --enable-mesh or --enable-btpclient are used (I'm not
-using them), in contrast to the language in the README:
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+v2: fix typo
+v3: fix bot checking error
+---
+ drivers/bluetooth/btmtk.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-"When neither --enable-mesh nor --enable-btpclient is specified, then this
-part is irrelevant and Embedded Linux library is not required."
-
-I worked around it by patching out the part of configure that errors
-on not finding ell, but this seems like a bug either in the code or
-the README.
-
-Thanks,
-
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 786f775196ae..0f290430ae0e 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -370,7 +370,7 @@ EXPORT_SYMBOL_GPL(btmtk_register_coredump);
+ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct btmediatek_data *data = hci_get_priv(hdev);
+-	int err;
++	int err, offset;
+ 
+ 	if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
+ 		return 0;
+@@ -392,15 +392,15 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ 		if (err < 0)
+ 			break;
+ 		data->cd_info.cnt++;
++		offset = skb->len - sizeof(MTK_COREDUMP_END);
+ 
+ 		/* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
+-		if (data->cd_info.cnt > MTK_COREDUMP_NUM &&
+-		    skb->len > sizeof(MTK_COREDUMP_END) &&
+-		    !memcmp((char *)&skb->data[skb->len - sizeof(MTK_COREDUMP_END)],
+-			    MTK_COREDUMP_END, sizeof(MTK_COREDUMP_END) - 1)) {
+-			bt_dev_info(hdev, "Mediatek coredump end");
+-			hci_devcd_complete(hdev);
+-		}
++		if (data->cd_info.cnt > MTK_COREDUMP_NUM && offset > 0)
++			if (!memcmp((char *)&skb->data[offset], MTK_COREDUMP_END,
++				    sizeof(MTK_COREDUMP_END) - 1)) {
++				bt_dev_info(hdev, "Mediatek coredump end");
++				hci_devcd_complete(hdev);
++			}
+ 
+ 		break;
+ 	}
 -- 
-Russell Senior
-russell@personaltelco.net
+2.18.0
+
