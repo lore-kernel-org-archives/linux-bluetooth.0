@@ -2,117 +2,75 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE43C001B0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 21:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF1DC001B0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 21:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232229AbjGLVKb (ORCPT
+        id S232490AbjGLVKd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 17:10:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35592 "EHLO
+        Wed, 12 Jul 2023 17:10:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229640AbjGLVK3 (ORCPT
+        with ESMTP id S232252AbjGLVKb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 17:10:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ADB41FCC;
-        Wed, 12 Jul 2023 14:10:25 -0700 (PDT)
+        Wed, 12 Jul 2023 17:10:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 490971FCD
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 14:10:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A97386192E;
-        Wed, 12 Jul 2023 21:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0FCF7C433C8;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BA54C61946
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 21:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2259BC433CA;
         Wed, 12 Jul 2023 21:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1689196224;
-        bh=gkJ3RdQJQAVOa+LZoIl/+VCWMq+ZKQ81OiBGIjnFgeg=;
+        bh=mjetRKcA26BEvsmiifj2y4y6okeiEmfHUeFuRyBbvew=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=SK/DUXHqAAe45Bjemju2jwJLutPo2e/K0pp0yjrFxde/xnXwzFwcxCX3OtBSu0/12
-         gQsAfphgzFzbXvuJUGD0qx89cmaHiENemlacv/oiWmJZ6u+wlXnV2jA/dno54M9bDZ
-         q+Kd2oLl+JN8b5LCgSTO9pZXCzb98PAVpTZw4zBkJqLauaUVTfezs1i2gACLfSil83
-         8odxhqKk3jx/t4i0DnHHvtMj9I2FeHegn2a3d3BFN8AWa3bEkAc1bEPT6pgitkOrru
-         7kshMkwxECEOfp8WBjiyb9GE+YQc1VTObbwJmkSh19z4ZZb0R/sOH9A7YGEnJ+3Cqh
-         12XfdGEoHVa8A==
+        b=E/ju7YrxE+u/6zU6aE5bDqUo3yi2V0UQepyODcknIyVFbzUpyPNvU5MsHL/p8VWIL
+         joAr78b9gbJACOwOb7g9zFio/DXlMFxwmEWrr0OAjiVp27LnwBaVC2aWjT65dPqBYC
+         7e/DHivAOY11yHeGR9YO7kjUXXpsl1oYJWCPzviF9Xk8bYRTBgAaJsgNv3m658fBmy
+         VMASD/ioN0By3+TJK+GSgJ4EtB7CRmINfXbcpjafeZdmRVOQhiVN6gToQ6LML4NrzB
+         SVqqLUX8ozOGgGBftjpPtE53X3edfalmGsntndjY5Lbqbg50XgSdMzuvrvb2dH2IEb
+         F406Baw0diXuw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E8EFFC4167B;
-        Wed, 12 Jul 2023 21:10:23 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04F18E4D010;
+        Wed, 12 Jul 2023 21:10:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 1/2] Bluetooth: btusb: Add new VID/PID 0489/e102 for MT7922
+Subject: Re: [PATCH] Bluetooth: SCO: fix sco_conn related locking and validity
+ issues
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168919622394.11357.13331236987237504295.git-patchwork-notify@kernel.org>
-Date:   Wed, 12 Jul 2023 21:10:23 +0000
-References: <20230707062959.30371-1-chris.lu@mediatek.com>
-In-Reply-To: <20230707062959.30371-1-chris.lu@mediatek.com>
-To:     Chris Lu <chris.lu@mediatek.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        sean.wang@mediatek.com, aaron.hou@mediatek.com,
-        steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
+Message-Id: <168919622401.11357.16209979465018497480.git-patchwork-notify@kernel.org>
+Date:   Wed, 12 Jul 2023 21:10:24 +0000
+References: <490b5c6a0e13047fd1bea42d3184b46623adc359.1689003801.git.pav@iki.fi>
+In-Reply-To: <490b5c6a0e13047fd1bea42d3184b46623adc359.1689003801.git.pav@iki.fi>
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org, pobrn@protonmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 7 Jul 2023 14:29:58 +0800 you wrote:
-> Add VID 0489 & PID e102 for MediaTek MT7922 USB Bluetooth chip.
+On Mon, 10 Jul 2023 19:48:19 +0300 you wrote:
+> Operations that check/update sk_state and access conn should hold
+> lock_sock, otherwise they can race.
 > 
-> The information in /sys/kernel/debug/usb/devices about the Bluetooth
-> device is listed as the below.
-> 
-> T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e102 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> The order of taking locks is hci_dev_lock > lock_sock > sco_conn_lock,
+> which is how it is in connect/disconnect_cfm -> sco_conn_del ->
+> sco_chan_del.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,1/2] Bluetooth: btusb: Add new VID/PID 0489/e102 for MT7922
-    https://git.kernel.org/bluetooth/bluetooth-next/c/159c43e9925e
-  - [v3,2/2] Bluetooth: btusb: Add new VID/PID 04ca/3804 for MT7922
-    https://git.kernel.org/bluetooth/bluetooth-next/c/b18d35adebf4
+  - Bluetooth: SCO: fix sco_conn related locking and validity issues
+    https://git.kernel.org/bluetooth/bluetooth-next/c/23ba0a1d51bd
 
 You are awesome, thank you!
 -- 
