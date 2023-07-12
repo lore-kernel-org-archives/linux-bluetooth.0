@@ -2,134 +2,81 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0EEEB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 04:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCF1EB64D9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 04:52:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230447AbjGLEj0 (ORCPT
+        id S231322AbjGLEwD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 00:39:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53768 "EHLO
+        Wed, 12 Jul 2023 00:52:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjGLEjY (ORCPT
+        with ESMTP id S229945AbjGLEwB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 00:39:24 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7C8139
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 21:39:22 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-767ca28fb32so13704185a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 21:39:22 -0700 (PDT)
+        Wed, 12 Jul 2023 00:52:01 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E9AE49
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 21:52:00 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id 3f1490d57ef6-ca3cc52ee62so389034276.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 21:52:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689136762; x=1691728762;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HnYSYZdUyzGTsdHp0hLh4I+zD2spM9ogeISavqWbDsw=;
-        b=J1mfU50emBAnLuMNfZqM/3Z3vEA1SqNvys6Ryo/A8FybOnA31D4CWhNw6L0bv5Hmnx
-         +D6o8RRB7Kmem8O7ZQAyx0VvglY8oN69/165GmbtTIwlv8nsBIMInFJ+kRenGKUeuYcv
-         5bjHDEf9q2Uh3vGEVa1III8Nn6l13FHXHdSXZ+rNrKCupcxdfapKPhfPM+MvKIFKgFKQ
-         OQfo39ajK0X9phzkH27xf3JFeCRnE7RLkGsQteBstLR62FObo64nitQ3CViSVk7j3HYC
-         bkthQ6GBHwC6LJfac65vM3tmGUPfYMF6vkTnNDJzJhAef/8Vft1bP8cYtZXvBlhpocgT
-         2faw==
+        d=personaltelco-net.20221208.gappssmtp.com; s=20221208; t=1689137519; x=1691729519;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/Eqg7Kpk0k+ogd6aNIVIKNqz1QHCLjcIuS+g/K7qBp0=;
+        b=3I3FSSDwbq+BeBEUgRPE+w1Xu1+OOiqOuE6oWxroVLOXkpYi7ylgxSQaWQKJNSvnKe
+         LxzsYjgXwls/BCXnsQWEFCBDX+cNqoW9wubEuVeSb/BebfgXEoFuxzZn5/3pv52Rg+mU
+         o3M3Yd2U4HQZGcmDBgszWoQd1VB0IXhS7NjEjH2naKd1gnLpyNhrtrQnuLyxFhTBZcg1
+         QgfOoljtSeZ9SwiV3nUZXHinAKFusXyMWU5JfH4ZL+qDMYO7iLGxr/B/x3X7klRRpESE
+         dBfpe3tQaYPrkmNxO09gfq5rlHsGwxo7qf9nD66/bxS9r2HEwVes+FTud6H5fyyecF3p
+         Ug2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689136762; x=1691728762;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HnYSYZdUyzGTsdHp0hLh4I+zD2spM9ogeISavqWbDsw=;
-        b=dtPrrqYWIwfp4bKqPpr4aBN86sqrcG6YLNBgEYWkvCo8hzxSKlhaen1QT6Tmc7PzhX
-         nWam0o155e7bk4OJGudRPyJK53VubLgf1Hr0fRdgn9Edb2NASP2yaMHIsBpodTK91br5
-         xfkLHrq72YCeWp72wKHA61qESlMWqZX3LpGlQRqhVVTKrA7Z5mzH9RpBRxak5vGYCPvr
-         7wymTDa5lLZKo3T3umwL3PN8BPQvggGoruiqfdU2JeeAPsBB5lmPlg1Pfrs2IWkmuZDs
-         7BHLvopZ/5V42KKP0xzp9sjw533Vt3MC004QFRyln/0NJ6Lo+tJe0EG8EhYAmZCS9cm0
-         NDmQ==
-X-Gm-Message-State: ABy/qLbQQKKSrLMCKs5xrY0vw0k87Omm46XGVCCllwbqDhmQneTcfF9Q
-        /i0zexdyuILEBpZlPEAf7zw8Lf2Qofk=
-X-Google-Smtp-Source: APBJJlE2H8MANE8Z7T/N6az0ytVSoUSDugY8DAQy6WjeeDiPSs+2iXjKE3vJ6KV6UDLY8AQiLKle8Q==
-X-Received: by 2002:a05:620a:1792:b0:765:5a1f:89 with SMTP id ay18-20020a05620a179200b007655a1f0089mr865331qkb.13.1689136761977;
-        Tue, 11 Jul 2023 21:39:21 -0700 (PDT)
-Received: from [172.17.0.2] ([104.45.203.193])
-        by smtp.gmail.com with ESMTPSA id d1-20020a05620a136100b00767cfac77c3sm1774567qkl.134.2023.07.11.21.39.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jul 2023 21:39:21 -0700 (PDT)
-Message-ID: <64ae2e79.050a0220.6992e.580a@mx.google.com>
-Date:   Tue, 11 Jul 2023 21:39:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4697270334922067771=="
+        d=1e100.net; s=20221208; t=1689137519; x=1691729519;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Eqg7Kpk0k+ogd6aNIVIKNqz1QHCLjcIuS+g/K7qBp0=;
+        b=VqccP7SllEmqLroXR3wuOjjHFAQaWXuoz5u2Q3qbKcRt1NHeV/wFcgyCupexoodBlb
+         S4WbthWOwbQGOWvR+B5IbMaLP+NIXhZhRdQQNEM7FK/pJD2yx9TyewI3UvX2gb/NkB5a
+         g2ChhnhI8DdER6tqB2Pi07rRyCbwoGzWILnZTuSrXvHWE4ib7WfAD9Cl4JVKV+M2uek+
+         808QyaZMfI9epBQdhaw3jA96BIwHeHDmMWI5N0NLDN/rVTcJUNgjUEEaAGWYgHQHr81f
+         F44IIQ2sCng4Gju476oD5zypmAhm7n5ssdS+NLDEZHMtwXK3hvVR2r8soxwOxc2Mmh/1
+         Ncfw==
+X-Gm-Message-State: ABy/qLaW6yBC+SuWHOVrx9ev5NmNbaCbcxLDWvsGB7CwuarUuoURs7sx
+        qBL5xsrveJxhT94J99QCjY6Eue0BvOQ4rf3tQGqGQsk1yV0Cz4TT
+X-Google-Smtp-Source: APBJJlEzh3Mlva20eTtW4Z7MoOFJzSMibovWRtrkPtDRXDJtxeasb4hrvOX/f5DJ7f0SEv0lrfpy48dptKqU3d8ibrQ=
+X-Received: by 2002:a0d:f182:0:b0:56c:e70b:b741 with SMTP id
+ a124-20020a0df182000000b0056ce70bb741mr17349992ywf.20.1689137519179; Tue, 11
+ Jul 2023 21:51:59 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: [v2] Bluetooth: btmtk: Fix null pointer when processing coredump
-In-Reply-To: <20230712034206.12484-1-chris.lu@mediatek.com>
-References: <20230712034206.12484-1-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <CAHP3WfM2efs35fvQ+uOjy2awWgKosAfA7FbeAob8k6GhBwZvng@mail.gmail.com>
+In-Reply-To: <CAHP3WfM2efs35fvQ+uOjy2awWgKosAfA7FbeAob8k6GhBwZvng@mail.gmail.com>
+From:   Russell Senior <russell@personaltelco.net>
+Date:   Tue, 11 Jul 2023 21:51:47 -0700
+Message-ID: <CAHP3WfMz1p4MHwwDGTeU6iyuPz3OhnoB2EZ62s4voZbjhBEocw@mail.gmail.com>
+Subject: ell location bug/inconsistency with README
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4697270334922067771==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+I mentioned this on the irc channel recently, thought I'd escalate to
+the mailing list. Also, I am a total newbie with bluez, so please
+pardon what appears like and actually is pathetic ignorance.
 
-This is automated email and please do not reply to this email!
+I am building bluez 5.68 on OpenWrt and found that a recent commit
+1106b28be8 seems to have made the configure script look for ell
+whether or not --enable-mesh or --enable-btpclient are used (I'm not
+using them), in contrast to the language in the README:
 
-Dear submitter,
+"When neither --enable-mesh nor --enable-btpclient is specified, then this
+part is irrelevant and Embedded Linux library is not required."
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=764635
+I worked around it by patching out the part of configure that errors
+on not finding ell, but this seems like a bug either in the code or
+the README.
 
----Test result---
+Thanks,
 
-Test Summary:
-CheckPatch                    FAIL      0.98 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      33.41 seconds
-CheckAllWarning               PASS      37.07 seconds
-CheckSparse                   PASS      41.83 seconds
-CheckSmatch                   PASS      112.94 seconds
-BuildKernel32                 PASS      32.24 seconds
-TestRunnerSetup               PASS      494.86 seconds
-TestRunner_l2cap-tester       PASS      23.46 seconds
-TestRunner_iso-tester         PASS      42.33 seconds
-TestRunner_bnep-tester        PASS      10.63 seconds
-TestRunner_mgmt-tester        PASS      220.73 seconds
-TestRunner_rfcomm-tester      PASS      16.10 seconds
-TestRunner_sco-tester         PASS      17.10 seconds
-TestRunner_ioctl-tester       PASS      18.45 seconds
-TestRunner_mesh-tester        PASS      13.72 seconds
-TestRunner_smp-tester         PASS      14.62 seconds
-TestRunner_userchan-tester    PASS      11.37 seconds
-IncrementalBuild              PASS      30.90 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2] Bluetooth: btmtk: Fix null pointer when processing coredump
-WARNING: Co-developed-by: must be immediately followed by Signed-off-by:
-#82: 
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
----
-
-total: 0 errors, 1 warnings, 30 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13309551.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4697270334922067771==--
+-- 
+Russell Senior
+russell@personaltelco.net
