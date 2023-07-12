@@ -2,125 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D73FEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 17:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB5FEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 18:21:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232295AbjGLR6H (ORCPT
+        id S231368AbjGLSVG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 13:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54130 "EHLO
+        Wed, 12 Jul 2023 14:21:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232334AbjGLR5z (ORCPT
+        with ESMTP id S229506AbjGLSVF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 13:57:55 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81D6112F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 10:57:54 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b70404a5a0so117143381fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 10:57:54 -0700 (PDT)
+        Wed, 12 Jul 2023 14:21:05 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F1DD173C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 11:21:03 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-4039f7e1d3aso47028291cf.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 11:21:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689184673; x=1691776673;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8bNzseOEzJI/IEqjpsh3eUHRT47ND0wnfP+O9/IoxVI=;
-        b=JHuQf/W+w3haPv+FBg/kikLHxpfTV4hGFFtcy4oj6DTiP/AN9kbW86lvwJz74CBTb8
-         i26uq/bTTV+8k++awvjekbL3yT5m2v2qBmBY3VJUHmbwYZYi5l7jNyUScg5e8PDG2yGb
-         fVZ2u1b80fgeGqu6B7oV9KAwnWwFWwy/K6vEdsGxcnyTaFzNc5FbQ8MKekhNtHcNzSJC
-         PUY9mN0YXyRIP5rtpq+YVxLboWsvT8vsErfCZPf0l/Z9ERXsLutuo/HVzmN/3C+dKKfN
-         pqH5vaEQuQxOImkDVF2/VSkuJCp3ECdeZQl1fi2QHHk8aisVr2QyAJfMa41aRC23P7Rg
-         VUAA==
+        d=gmail.com; s=20221208; t=1689186062; x=1691778062;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sByOhXEGuO/az592aH/DccrRSOVwP+gcb3glzPV95fs=;
+        b=L1xVaDu93j/FmxEmYCsWHisqQyr+YYHGpt/VX8tYgLLwUjO17DuRjuHtIUwAZNlBdT
+         684T4u4tVYivqWTWHjyvPQIKzbW75vsU5pyh4KCwfkmBRHvCxfk3G8sPmGP+FyRzIJpS
+         qVcuKdiA+FoJHIed/9nZawSRuvAHdfpEa6Wp5pf6hvROb+4t84tFp8rxG1x8mfJ5YjWu
+         TECxAyXCod5es2WKZQZbkJ5rBnebG1Hy83uBxZKGEnjaHNePy+vg2Nbf3UXRPG+kvTd4
+         2Wn6UK+LATvAqOkX7/n+5XVxUPIsZpnST69XYhnyoVHsOqdGyzio8CpZFa+GAF4gtJW1
+         nnjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689184673; x=1691776673;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8bNzseOEzJI/IEqjpsh3eUHRT47ND0wnfP+O9/IoxVI=;
-        b=Zm9ds/u4xOsShil2ZGl1EaUEnrBMc4AmcrEpVylAG046sHFwGUMwGQeBDrPdq+E0I+
-         pD3gm1+zznjVD/WqW/+ymPhptVBZDqyBM00LCWeNp5L3J3CrdOiOEo6ix7GiQxIDhvWb
-         ThsFOXP8Y7GjwDggOqvDwYoBYxyiirb+OdUFSGFIyvn5CnR3xJd7wz3CI9Vb1j7UB69W
-         n+nCl6m+2BgVa1Y+j8CfXHKF6Md8Xpkq9LvusuJC20KFwkwIX2aPRa2vj1bgrI2ksyk/
-         yja++mCemozdLRw80MMSeIaO5hJmbqsexhBdK0X+B2HACv3Qzgr6w6y9Bf65CRTJ7EQD
-         nT1w==
-X-Gm-Message-State: ABy/qLYBax91A7tBplUam6doJEDztuDRaIivlB0S1tSIPJ0ade0qB27x
-        htia83idvj/vXbcT5/0rUn51Jr/v+7pyLs1E3FW+HsPi
-X-Google-Smtp-Source: APBJJlHAppZ6kUUHDv/yefiW8VPXj2QqaAv7Kaa54RVYAw492uPoTGD4RNnTG3YxHiQxsUoq0zDKlWDmNReZxmwv4dc=
-X-Received: by 2002:a05:651c:120e:b0:2b6:9bd3:840e with SMTP id
- i14-20020a05651c120e00b002b69bd3840emr19358448lja.21.1689184672527; Wed, 12
- Jul 2023 10:57:52 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689186062; x=1691778062;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sByOhXEGuO/az592aH/DccrRSOVwP+gcb3glzPV95fs=;
+        b=CDvDvWvwNSzU7SoBvlkB6+DMRnzVJHrZKQSzi9IsdzjpuIE4UITHmdkDPhkWT/uiMM
+         nnj/JvfWVSm5y/BG8W1ChBuUGp/VhsM857ZCRasxpAaIKRbLbsMMa87wQueDrXzz3p76
+         vFxDXWxh2K+ygZUnFy+j8Doe/rk/+fWijR6OJCeltIgaZ3PtZlkdYWf0v5VG+VDVmeLi
+         HiGMHuPqhMdkk6U9fi7dFu+4Tf8loiVlF6YoDu6RmlucCGRRWgM9sLQC3qKx9p3JPWGK
+         RD3/YAU1qCh8hQHJ7XJ9IE52BiNZSNQ1iaWzA9XzcrcJwXDtZrpx7lXdMjppGhAgw3rr
+         4Bhg==
+X-Gm-Message-State: ABy/qLY20FLSzeGDF5aLxQnJKo6N9PjFnQKQdODBraSTc0Mqkr9OWPIO
+        vUmwY0U6Oq1IFdfaRfJarzD9qjt71HABcQ==
+X-Google-Smtp-Source: APBJJlHF9BXtbj9fpay1iPPHjv7qRSv7wIDbd0+mbjABqvSnM+1L1LA8m5AB2VzKGUgumLVV432vUw==
+X-Received: by 2002:ac8:584d:0:b0:403:9be1:c969 with SMTP id h13-20020ac8584d000000b004039be1c969mr25899529qth.62.1689186061981;
+        Wed, 12 Jul 2023 11:21:01 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.75.128])
+        by smtp.gmail.com with ESMTPSA id f13-20020ac87f0d000000b00401217aa51dsm2448031qtk.76.2023.07.12.11.21.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jul 2023 11:21:01 -0700 (PDT)
+Message-ID: <64aeef0d.c80a0220.14547.9284@mx.google.com>
+Date:   Wed, 12 Jul 2023 11:21:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8820049603435659340=="
 MIME-Version: 1.0
-References: <859a1c176765dbb9ea394dde387b8ed072365ca8.1689180344.git.pav@iki.fi>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [BlueZ,1/2] test-runner: set non-quiet printk before running tests
 In-Reply-To: <859a1c176765dbb9ea394dde387b8ed072365ca8.1689180344.git.pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 12 Jul 2023 10:57:40 -0700
-Message-ID: <CABBYNZJu-RmP75pi32jeDPusKOx8L14jkWn0mubG48d_3B-A8g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] test-runner: set non-quiet printk before
- running tests
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <859a1c176765dbb9ea394dde387b8ed072365ca8.1689180344.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+--===============8820049603435659340==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 12, 2023 at 10:00=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
->
-> It is useful to see WARN_ON/bt_dev_err messages when running the tests.
-> Enable non-quiet printk levels after boot, so that it is on by default
-> and doesn't need to be handled in local test scripts.
-> ---
->
-> Notes:
->     It could be useful to also check for BUG/WARNING in the bluez test bo=
-t.
->
->  tools/test-runner.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->
-> diff --git a/tools/test-runner.c b/tools/test-runner.c
-> index d74bb1087..288901a61 100644
-> --- a/tools/test-runner.c
-> +++ b/tools/test-runner.c
-> @@ -136,6 +136,20 @@ static const char *config_table[] =3D {
->         NULL
->  };
->
-> +static void enable_printk(void)
-> +{
-> +       FILE *f;
-> +
-> +       /* Set non-quiet printk level */
-> +       f =3D fopen("/proc/sys/kernel/printk", "w");
-> +       if (!f) {
-> +               perror("Failed to set printk");
-> +               return;
-> +       }
-> +       fprintf(f, "7 4 1 7");
+This is automated email and please do not reply to this email!
 
-Can you have a comment on what this 7 4 1 7 is for?
+Dear submitter,
 
-> +       fclose(f);
-> +}
-> +
->  static void prepare_sandbox(void)
->  {
->         int i;
-> @@ -181,6 +195,8 @@ static void prepare_sandbox(void)
->                                 "mode=3D0755") < 0)
->                         perror("Failed to create filesystem");
->         }
-> +
-> +       enable_printk();
->  }
->
->  static char *const qemu_argv[] =3D {
-> --
-> 2.41.0
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=764973
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.97 seconds
+GitLint                       PASS      0.65 seconds
+BuildEll                      PASS      26.62 seconds
+BluezMake                     PASS      771.59 seconds
+MakeCheck                     PASS      11.94 seconds
+MakeDistcheck                 PASS      155.03 seconds
+CheckValgrind                 PASS      250.24 seconds
+CheckSmatch                   PASS      335.90 seconds
+bluezmakeextell               PASS      101.43 seconds
+IncrementalBuild              PASS      1295.86 seconds
+ScanBuild                     WARNING   1024.62 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+tools/test-runner.c:941:2: warning: 2nd function call argument is an uninitialized value
+        printf("Running command %s\n", cmdname ? cmdname : argv[0]);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8820049603435659340==--
