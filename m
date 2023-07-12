@@ -2,126 +2,160 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FF8EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 11:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19425EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 12:23:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232520AbjGLL1e (ORCPT
+        id S232797AbjGLMXl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 07:27:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51628 "EHLO
+        Wed, 12 Jul 2023 08:23:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232081AbjGLL1d (ORCPT
+        with ESMTP id S232944AbjGLMXj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 07:27:33 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01D768F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 04:27:32 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-403a72df0a6so23613221cf.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 04:27:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689161251; x=1691753251;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bkT13qxh5KQxsDufIJ3YNaE/NQZYY6Xyxz/yEjQ+7mQ=;
-        b=CZEFlr8HW1z4LgaZsq82LYNYlTDVPT7n41WLIXzr8m5iy59IGOY0UjDlUzzb2Rq22i
-         pZua+2M6qT4kei/eFHOtsd/5SGLOx6s4ts5z2FOMFtnPVxXI5hmWYuJ6KpgTSEku6gQj
-         5AIwXPJEqyWWe19EALS3WxIyp6D7Fo/nkKIgynV9NYOTAwJFIZMwTGOV+UjhgXiqpEhX
-         gNBKG0zDo73TUBrWpuB74SpmXFiJWnynRHZO1LL/ALtfScYrE82/pE4WqVqsB9zoqWWA
-         zbKWNjOnPPg2KOsNnPTtBiAWDCjB3ATLeYTD0PKZ3uVTYamsh94wCgxrBwiJBIMLl51a
-         lUXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689161251; x=1691753251;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bkT13qxh5KQxsDufIJ3YNaE/NQZYY6Xyxz/yEjQ+7mQ=;
-        b=Ko5NYIoJD0zFDzFhzT4N1n2xudUfE9P6aIy5BJPF8/CMjPiy/HKf5tMSqtSqrwf/nH
-         cgFCyrc/o6bONIAkbIm5yjkpMfdGsFKyxsh/0paz9372XvQnol5OIp0sEkrL89DYXJqC
-         4/bX+SY+rwsF70p2CcA8qHYB8G34xU4zkDt+6Q9Wy7vOZRPZfCzh9QtFEyAZ80klPIDf
-         daz7j8ZmaGQQ85qEYXciV9qawsmTPYZcjFBps/Kbd87nWZvucZe64ZG89Hd02tamGmYX
-         NS+Cbdi8gB8H/BX3GtXYNyYsP6PvB3SOmEdecHmuYjcINV+Xe01DG7uEqDySsd4t7kM6
-         lqGA==
-X-Gm-Message-State: ABy/qLaIrUqUZHlPp9KjAsjcucaSFFPsREdZMgXnvvJaFQu68ybjv8Am
-        Q4PZviwqla+DRq/pRW5u4DGiTFwWhEc=
-X-Google-Smtp-Source: APBJJlEH6zqitRiGegyjErpnFqrsmHr6OgNW5jHDyNRXrt+W4JMNLpRG17dKsP6ic4xWY7BaqCOZlQ==
-X-Received: by 2002:a05:622a:1108:b0:403:9572:e378 with SMTP id e8-20020a05622a110800b004039572e378mr20063544qty.54.1689161250835;
-        Wed, 12 Jul 2023 04:27:30 -0700 (PDT)
-Received: from [172.17.0.2] ([20.114.128.125])
-        by smtp.gmail.com with ESMTPSA id x9-20020ac87009000000b003f6b0562ad7sm2181456qtm.16.2023.07.12.04.27.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jul 2023 04:27:30 -0700 (PDT)
-Message-ID: <64ae8e22.c80a0220.c2b04.6cd4@mx.google.com>
-Date:   Wed, 12 Jul 2023 04:27:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5547301342954807771=="
+        Wed, 12 Jul 2023 08:23:39 -0400
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2070.outbound.protection.outlook.com [40.107.104.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DC41980
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 05:23:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Xug84vxVzGZAfws+qktTDbXGxRsmtWUP3+EU9OGDy9YmQ+cQb3VTDRBSkrJLAHrBMbLru5t3JvErLoGHglYn0Qk6YdxMeZH0IsuE/QYD2o0orDtQ7UPKcJL4kveEb9JIUhMKzprMZa26WM29KTJDnfYhIP2n1vJmiLnY6GmC6mGdBfClBCq5FZENooaTGMmwk7/M3ssaKvg7CkFSUrVfmzWdx7QGeFl9CHBGYDMyvPLxzsvUk8BTRtkHRh16sWqrjJWLl7JF+xzlQJryLJEoc5dCj0qLT6fzcj4l0dpeOya18pJ0UnHKq4FepsIGXktwn+7eQ/KzL0q2PNr+FVo27g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4XUqFkM/Gimatb6mvBGZi6nXPehNOlRRQRxS/V4Jsd4=;
+ b=XX7FdrApIk9rGUKlnqvLe17V4Axx8aIYsQHmGV91QNajD9OiOPRlq2p0pgXAF8TYDucvbz1wFIbO+cHpczCOOFG6s9IRVixMWRoEKX4XzqBE4YJytfzCsrDV+wqHKVgrtasgrVfuhNf+4d6O9TN/gS5uqGDQ5CCEmmxqPJE2oOAsf1VJ72K2E6UZsjxFa/quksKHdJJZdJHTmv7eV2iSklnqL4vKuLQ0uc+SiwwfUO0qxbFRqJuWQ52EA+DFyKQ3H9v2xyPweZ/gRrUxgaBB5rhp+XrfZMPlkxL2ZBhTLaTy+2A99otgAIn3TxC1Ncq8TJeWQuo5VnZFI3CZfydZcw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4XUqFkM/Gimatb6mvBGZi6nXPehNOlRRQRxS/V4Jsd4=;
+ b=PbF2Qr/5WHnZxZxUlmbhFYfKjKuZQ0t9PUtHKfUeOHKk1cRizee8Qn3JBtG4RjRbG9XQzJGzVwhfAVbPoIIFWCh6Cfu78JuEPgihPA/6g5SDHTSh2ldby9gjSWdMM/Ig+m6x6whXhWR+jri/sq9ARWCX1mCjfJMwIHORUC6rM5Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
+ by GVXPR04MB9877.eurprd04.prod.outlook.com (2603:10a6:150:113::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.30; Wed, 12 Jul
+ 2023 12:23:36 +0000
+Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
+ ([fe80::2cc8:4c5d:9b6f:5cab]) by GV1PR04MB9151.eurprd04.prod.outlook.com
+ ([fe80::2cc8:4c5d:9b6f:5cab%7]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
+ 12:23:36 +0000
+From:   Claudia Draghicescu <claudia.rosu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com,
+        Claudia Draghicescu <claudia.rosu@nxp.com>
+Subject: [PATCH BlueZ v2 0/6] Add support for BAP broadcast sink
+Date:   Wed, 12 Jul 2023 15:21:29 +0300
+Message-Id: <20230712122135.7734-1-claudia.rosu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR03CA0019.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::32) To GV1PR04MB9151.eurprd04.prod.outlook.com
+ (2603:10a6:150:26::9)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com
-Subject: RE: Add support for BAP broadcast sink
-In-Reply-To: <20230712085900.5423-2-claudia.rosu@nxp.com>
-References: <20230712085900.5423-2-claudia.rosu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|GVXPR04MB9877:EE_
+X-MS-Office365-Filtering-Correlation-Id: 00f96b0b-f232-4ef6-1405-08db82d2d0bc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +qrseIfcEPUHYlrVVjEe2EQbKqErPuAf0okHuN80G5OpsXVd1uKpNMxQ9d27LABI8S8gBehd0p8EMRFT3yN8Yg3KIWJOLiYOUDm72OK7SKBDalbuTJwXvqxcNshxkuSqmix9Y5r6ZfgcXVnuztjB6/NX06WDejpB52ue4TLWNVby+uvrExRx1a6UHP2DFyfksbOlTQ+zAtHrlQnXqLF51Obg9ZQy0WVmIZWMEGJp++Lc6fnG0et1nhsoXwrGQi7foSgJk7KFT5MMIJ8lyN+5KZxg6XYoQjXDpyqZyKcFOOvBudYgcZCJB/owU2NrP+iXedDYJOcrrrli6MMR1viL5viGe/xDARcSIFb6+J2nuVXH7P0fMnUCUX9wSnDjWUey1XXMUeP+Tutg2T/GOs2zYKmgPfocpVQ+2JJKKyVuZYjIDRtT28cPE5yigaWwNWegZy6swuBWEjVAsKtdV1YMrE02Gme+xh7nEn4rFlRgQP3nYhnjdbJdmrtQ4yBXIG65V9TWevq+3Smf2UBT+4MRKCp6JlysG2wBFjmwGctHnrzfYJysbb8EB3oQZ2scAMSuj7aChpSlXkBiJ4ICDAacbGRHpwYoJJWDwiL5/Udr8fXUXNKCWNhY1XdMgX9lvvL1
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(39860400002)(366004)(136003)(376002)(451199021)(478600001)(52116002)(6666004)(6486002)(6506007)(1076003)(26005)(55236004)(6512007)(186003)(66946007)(2906002)(316002)(41300700001)(6916009)(66556008)(4326008)(66476007)(8676002)(38350700002)(8936002)(5660300002)(38100700002)(86362001)(36756003)(83380400001)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SCorJt0dTjwruWk/IeHUinqAE8opSAIql+1HEzRVXwJh49r1FrAnsf8T7BDK?=
+ =?us-ascii?Q?E7tdcErOaIt+lXPsSLCtWcIivJv7GZy8vFUfvIM2/y74zqXZ/d9w3x3DpT6L?=
+ =?us-ascii?Q?qqC9TYSF/BRLPS4n08jalfaLbNScFV8KwLrAJ8kWEWCiFbmk8rpYaM1PoJQC?=
+ =?us-ascii?Q?xsVLlH5jAAvqbgbPmsPMT/JaLptjSyjagYAXBUpPFfLShhXO+LNpTA+liDxj?=
+ =?us-ascii?Q?H+/TdGG6yuA08hlKgyHEMuTXaB7yqwKvC4LRoK3M1uhlFMRiG2BkL/s16iEr?=
+ =?us-ascii?Q?xC03WtD+9XV4CcXjkWe8A52KBufxAdyiWciHVbZ2cuAtDX/QnRSzPbr43OQA?=
+ =?us-ascii?Q?iiESD9bMWOtJ4pYQz16DvDfBPUpcfPPQk5uHuzyLnrSXLsZRAkPEl0wYmkBp?=
+ =?us-ascii?Q?4zTO7cl/Oz5azm56GjqQNmW5Bso3H0+yLiBxY+dyt7uTjrpTgCM4jlZTS8pp?=
+ =?us-ascii?Q?SV93t5/qYsKHi9VcfOLov4szi/OqCjFU6Fg7n0XfHEOQexnrJOrROIwY6NY3?=
+ =?us-ascii?Q?1rqvzKcVn2ms756MXIlvdtCUfy1IzpvpRjjZM0vwChfVA0neLzpqwK9qrvXE?=
+ =?us-ascii?Q?7jQ6ORQeyJ1QktXEiPhiHgnv2e3pzSh2ynePbV5x0U8ZAF7MHRfkM8bd1u1Z?=
+ =?us-ascii?Q?3afEw9u7qNrIzSXlQO9uU7xykFEusLGmbioufsH3HxhSQO2gKkehOSW2SEok?=
+ =?us-ascii?Q?/GkJ5v3rMBf4HeVk6pekg07R6ODKq20YNE0lDmodsCOxMdkkqirMYcWwP7rp?=
+ =?us-ascii?Q?MMf5ex4NUJSXJiIaCrhxb/VyWjJ2KSmlenk8J7LBSngZEDeVCJwEkovF6BRF?=
+ =?us-ascii?Q?Kys/q48U101HzMTEHyQ/Gty1KyBFBfizQBTunP/W9PwxsjHuxrSNszbPOCRj?=
+ =?us-ascii?Q?8AptuwebC4ZY2mbWcXj3GlWNGQnhXOlYMJZhhRitBtMI/4tW1441ipsvCY52?=
+ =?us-ascii?Q?nvNkz9tFSpwbETuqhg683vRnk0Ue1Z7DR2O+QodhMtZWWq37qPV2S9WdjvDi?=
+ =?us-ascii?Q?RJQhvuYXxw5Aveywd43qkz8M/FWSoKpwQvSv+iojivCGRm37IXJ4pMLSdSQ4?=
+ =?us-ascii?Q?fYYLCf2+0DyivpJpO41Fh5QovCvFp+JDt49c1akxKk8bERKk+IX4MVcLbive?=
+ =?us-ascii?Q?9uLv6+97NbLyb8XxFLxxJz0qrVJP49wEP5s29SQ1TYuc27U/2qtwIxMjgbyk?=
+ =?us-ascii?Q?cfygzBJXN8/SpElntS8R6dw3ijf5jsU5rCYucCiQMi0KjCex6crdZ38eK6de?=
+ =?us-ascii?Q?IBSy99zzWzVtMvkXTTe0lM9QndBkA4HwBZz0Ni95uZzhlaJx18TGoD5T9fjr?=
+ =?us-ascii?Q?lD2/YzMHFt4peo3Coa4UBZBFRehLmljTesmCug9+uI19pemxYVXHmmaZLYw3?=
+ =?us-ascii?Q?ZzR5cdD78zehQy+zvcC36T2sUBg104Ua+NlTNr1jcDX1iO8mKIQZzGSd4oaD?=
+ =?us-ascii?Q?DOuiXfSeu9scZOZgL231DIGH/SU3hbwV9UU+hsUVyTJVtJSo58GtWH3r5P2a?=
+ =?us-ascii?Q?VaUnhw/Klu2EbCuL7hmgqv8Y1YbsSWuqClsjvYTxWoW7GqWktq+GOmYlEb4o?=
+ =?us-ascii?Q?D6UPl5cELTycBFDVmvWqJbqk9gxcK+G03dKMY/jN?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00f96b0b-f232-4ef6-1405-08db82d2d0bc
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 12:23:36.1655
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YM9c/TmDVw5fQStq/5whxu3/I/Iq55hUzI3VKI+nis870aw9tVQRblWJv/HL+CdPCdf0yPNjd/J4bTaRylvPMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9877
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5547301342954807771==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This series of patches adds support for BAP broadcast sink.
+It consists in registering a sink endpoint using the Sink PAC UUID,
+discovering of broadcast advertisers that announce the
+Broadcast Audio Announcement service, synchronizes to the Periodic
+advertisements of the source and synchronizes to the BIG advertised
+in the PA train.
+To retrieve the BASE info advertised in the PA train, the patch
+Bluetooth: ISO: Add support for periodic adv reports processing
+was used.
 
-This is automated email and please do not reply to this email!
+This feature was tested using bluetoothctl with the following commands:
 
-Dear submitter,
+[bluetooth]# endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06
+[/local/endpoint/ep0] Auto Accept (yes/no): y
+[/local/endpoint/ep0] Max Transports (auto/value): a
+[/local/endpoint/ep0] unicast/broadcast (u/b): b
+[/local/endpoint/ep0] BIG (auto/value): a
+[/local/endpoint/ep0] BIS (auto/value): a
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=764738
+[bluetooth]# scan on
 
----Test result---
+[bluetooth]# endpoint.config /org/bluez/hci0/pac_bcast0
+/local/endpoint/ep0 16_2_1 <source_address>
 
-Test Summary:
-CheckPatch                    PASS      4.18 seconds
-GitLint                       FAIL      2.34 seconds
-BuildEll                      PASS      27.10 seconds
-BluezMake                     PASS      993.03 seconds
-MakeCheck                     PASS      12.77 seconds
-MakeDistcheck                 PASS      158.86 seconds
-CheckValgrind                 PASS      263.06 seconds
-CheckSmatch                   PASS      349.14 seconds
-bluezmakeextell               PASS      106.30 seconds
-IncrementalBuild              PASS      4981.09 seconds
-ScanBuild                     PASS      1040.99 seconds
+Claudia Draghicescu (6):
+  client/player: Add broadcast sink endpoint registration and
+    configuration.
+  client/main: Add broadcast source discovery
+  media: Add support for a broadcast sink media endpoint
+  transport: Update transport properties for a broadcast stream
+  btio: Add support for getsockopt(BT_ISO_BASE)
+  bap: Add gdbus interface for BAP broadcast sink, create
+    synchronization with source and create BAP broadcast sink stream
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,1/6] client/player: Add broadcast sink endpoint registration and configuration.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (86>80): "[BlueZ,1/6] client/player: Add broadcast sink endpoint registration and configuration."
-1: T3 Title has trailing punctuation (.): "[BlueZ,1/6] client/player: Add broadcast sink endpoint registration and configuration."
-20: B2 Line has trailing whitespace: "[bluetooth]# endpoint.config /org/bluez/hci0/pac_bcast0 "
-[BlueZ,2/6] client/main: Add broadcast source discovery
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-3: B2 Line has trailing whitespace: "This checks if the scanned device advertises the "
-19: B2 Line has trailing whitespace: "[bluetooth]# endpoint.config /org/bluez/hci0/pac_bcast0 "
-[BlueZ,3/6] media: Add support for a broadcast sink media endpoint
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-3: B2 Line has trailing whitespace: "This patch adds the possibility to register a broadcast sink "
-[BlueZ,6/6] bap: Add support for BAP broadcast sink
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-4: B2 Line has trailing whitespace: "to synchronize to a given source and sets the QOS and capabilities "
-17: B2 Line has trailing whitespace: "[bluetooth]# endpoint.config /org/bluez/hci0/pac_bcast0 "
+ btio/btio.c                |  13 +-
+ client/main.c              |  57 +++++-
+ client/player.c            | 187 +++++++++++++++++++-
+ client/player.h            |   3 +
+ profiles/audio/bap.c       | 347 ++++++++++++++++++++++++++++++++++---
+ profiles/audio/media.c     |  35 +++-
+ profiles/audio/media.h     |   2 +-
+ profiles/audio/transport.c | 244 +++++++++++++++++++++++++-
+ src/shared/bap.c           |  50 +++++-
+ src/shared/bap.h           |   4 +-
+ 10 files changed, 888 insertions(+), 54 deletions(-)
 
 
----
-Regards,
-Linux Bluetooth
+base-commit: 838e1578072900d1f98dfb31cc538940d2fad876
+-- 
+2.34.1
 
-
---===============5547301342954807771==--
