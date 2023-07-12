@@ -2,121 +2,112 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE36EB64D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 06:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D084C001DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 06:32:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231937AbjGLGMh (ORCPT
+        id S230329AbjGLGcb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 02:12:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54780 "EHLO
+        Wed, 12 Jul 2023 02:32:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231544AbjGLGMf (ORCPT
+        with ESMTP id S232311AbjGLGbk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 02:12:35 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2903910C2;
-        Tue, 11 Jul 2023 23:12:34 -0700 (PDT)
-Received: from [192.168.0.2] (ip5f5aed4f.dynamic.kabel-deutschland.de [95.90.237.79])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+        Wed, 12 Jul 2023 02:31:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B98211F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jul 2023 23:30:54 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 147F861E5FE01;
-        Wed, 12 Jul 2023 08:11:42 +0200 (CEST)
-Message-ID: <0cb29d27-a76f-47f2-86c3-f39ba25e8bc2@molgen.mpg.de>
-Date:   Wed, 12 Jul 2023 08:11:41 +0200
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 995DA616E6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 06:29:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 06D52C433CA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 06:29:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689143398;
+        bh=s8XQ4z6LPJRXPzEh4EQoDPbonH4TMU0Svuc2qvlrzlc=;
+        h=From:To:Subject:Date:From;
+        b=K34+7N3sgY57bkCguH+zlt9IoNSDNBsAKCrQi9pifWzCsCMLwhEsln4gXaVLETVpe
+         FQbpUGEHYFjxOw0WcONSu8QMqcDZSkVK3AhWWYqiIcrvkG0r4iMRNBnjtIW/l1o5td
+         z7XPMA8qAtdeds0/4idBGk6rLyruoVmcjTSotRSmv40G1BdYyki5air+lZRlheOJ0W
+         hpX8jNDs9Vw2Tq3pe7ox3uuo7GgpNeh6rlVPycrEJJQwwzkmTri+O9kt3yS2sOxvlg
+         ydg6KiEmRmXF931ISEKReSXJA30W1cs1VnAUcSpDWqsAp7ZeuN6gA+loZE49Tz2voi
+         7CLzHNNs+e//Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id E2F0CC4332E; Wed, 12 Jul 2023 06:29:57 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217663] New: Bluetooth GPS modules profile unavailable
+Date:   Wed, 12 Jul 2023 06:29:57 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: dicetrash@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-217663-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.0
-Subject: Re: [PATCH v3] Bluetooth: btmtk: Fix null pointer when processing
- coredump
-Content-Language: en-US
-To:     Chris Lu <chris.lu@mediatek.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Von Dentz <luiz.dentz@gmail.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        Aaron Hou <aaron.hou@mediatek.com>,
-        Steve Lee <steve.lee@mediatek.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mediatek@lists.infradead.org
-References: <20230712051857.13812-1-chris.lu@mediatek.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230712051857.13812-1-chris.lu@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Chris,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217663
 
+            Bug ID: 217663
+           Summary: Bluetooth GPS modules profile unavailable
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: dicetrash@gmail.com
+        Regression: No
 
-Am 12.07.23 um 07:18 schrieb Chris Lu:
-> There may be a potential null pointer risk if offset value is
-> less than 0 when doing memcmp in btmtk_process_coredump().
-> Checking offset is valid before doing memcmp.
+bluetoothctl: 5.66
+Linux version 5.10.110-3+=20
 
-Use imperative mood: Check offset …
+As a pilot I have a bluetooth skypro gps module, this module works with and=
+roid
+and ipads.
+Specifically I have an XGPS160, when I attempt to connect with bluetoothctl=
+ I
+get the error
 
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> v2: fix typo
-> v3: fix bot checking error
-> ---
->   drivers/bluetooth/btmtk.c | 16 ++++++++--------
->   1 file changed, 8 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index 786f775196ae..0f290430ae0e 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -370,7 +370,7 @@ EXPORT_SYMBOL_GPL(btmtk_register_coredump);
->   int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
->   {
->   	struct btmediatek_data *data = hci_get_priv(hdev);
-> -	int err;
-> +	int err, offset;
->   
->   	if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
->   		return 0;
-> @@ -392,15 +392,15 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
->   		if (err < 0)
->   			break;
->   		data->cd_info.cnt++;
-> +		offset = skb->len - sizeof(MTK_COREDUMP_END);
+[CHG] Device 00:19:01:40:62:32 ServicesResolved: yes
+Failed to connect: org.bluez.Error.NotAvailable
+br-connection-profile-unavailable
+[CHG] Device 00:19:01:40:62:32 ServicesResolved: no
 
-For `sizeof()` shouldn’t you use `size_t`? But that is unsigned of 
-course. Maybe ssize_t then?
+I attempted to debug the device and received its services list with Qt
+Bluetooth, it identifies its service as {00001101-0000-1000-8000-00805f9b34=
+fb}
 
->   
->   		/* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
-> -		if (data->cd_info.cnt > MTK_COREDUMP_NUM &&
-> -		    skb->len > sizeof(MTK_COREDUMP_END) &&
-> -		    !memcmp((char *)&skb->data[skb->len - sizeof(MTK_COREDUMP_END)],
-> -			    MTK_COREDUMP_END, sizeof(MTK_COREDUMP_END) - 1)) {
-> -			bt_dev_info(hdev, "Mediatek coredump end");
-> -			hci_devcd_complete(hdev);
-> -		}
-> +		if (data->cd_info.cnt > MTK_COREDUMP_NUM && offset > 0)
+I am under the impression it is a sort of serial device that gpsd would be =
+able
+to read from.
 
-Why not keep it like before, and just add the condition `skb->len < 
-sizeof(MTK_COREDUMP_END)`? The compiler is probably going to optimize so 
-the value is not calculated twice.
+--=20
+You may reply to this email to add a comment.
 
-
-Kind regards,
-
-Paul
-
-
-> +			if (!memcmp((char *)&skb->data[offset], MTK_COREDUMP_END,
-> +				    sizeof(MTK_COREDUMP_END) - 1)) {
-> +				bt_dev_info(hdev, "Mediatek coredump end");
-> +				hci_devcd_complete(hdev);
-> +			}
->   
->   		break;
->   	}
+You are receiving this mail because:
+You are the assignee for the bug.=
