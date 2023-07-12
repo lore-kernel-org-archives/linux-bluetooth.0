@@ -2,170 +2,153 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B43FEC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 09:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AC3C001DD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 09:25:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233005AbjGLJDj (ORCPT
+        id S232550AbjGLJZv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 05:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51696 "EHLO
+        Wed, 12 Jul 2023 05:25:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233104AbjGLJCl (ORCPT
+        with ESMTP id S231472AbjGLJZu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 05:02:41 -0400
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2049.outbound.protection.outlook.com [40.107.104.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F9291724
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 02:01:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nYWfKgXSDNcLeQF9TO/4reHeNAtS1MI/AqLtpC7hw7uJU8PsbFblFf0klGfs6x2FxBaxB+tDXugcu8/EftRkDOmtI0oziPTPlbA6mUeqwsFIJPdnydHikc5vOJJ1LTFOX1Mw2uTIJFHrhZOw4lgnWndZG6OpxAoU1UFnptc58ieyM9NHCT1iUguy8vomIEofzqEmg+odzGYFkHKLa3CiOUjaCx3ta5crUHOFvQ56bXETAnGKtpeNBhrS4y/cWpSYBdW+WpcMmSW3UP7AsSrLWTd0my3SdMWPY4Qc4s51cWc9sYEowwslRtO4/elIJX01V+VNIqrdgn7UdjForHfZaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IrxBLncj+ZstmuJpGTINckKfaoffvLT9Zud2iiwClqg=;
- b=fTyVGqjqUGntI8aR+IMWbJ065cauIrexO9YcOk+meJ1VJHcHz/14HXDObUmpbB1Ii7sfPHmtqigORDInLkrzwvLQ4l6mMtcipRU3c8pLBEtNV7zGfGE5wUeyE5FIMc7/7nVjUiibEI6EehZt47AlXwZKDOjkbyijkAStdRO5FltP4SBHs17IOy3piq6uJ8C/43/V2AzhHD2zk9O+0cSc5rzROGhwjNkI9XVcw1It1BzlMn+1s6zvpi/nrPAHgHbYkKboYG8cOGgaR+TGbj6OYSAqPr1bRuuwHAGgtIcSKIy8f9mwDY9lLoIH0mn5qMtZiEjjXufkh7K1GKniCa6QTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IrxBLncj+ZstmuJpGTINckKfaoffvLT9Zud2iiwClqg=;
- b=MLhcAUEK8zAX31awWpuZB1sL9Gv74DCNy4tCmvNf1fCSGc9qo6+s2k2m9VkFoY9DIYo+z93zaUmnKBWVYpI55W7Tkp+G6LYGDKaJKu4HLraX+uT0dPceERqSNqEFh7ztIxPEALxA038PZDsNCCMm2THTtZJSuy8WwvJQZtHe/nE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
- by PAXPR04MB8525.eurprd04.prod.outlook.com (2603:10a6:102:210::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Wed, 12 Jul
- 2023 09:01:27 +0000
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::2cc8:4c5d:9b6f:5cab]) by GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::2cc8:4c5d:9b6f:5cab%7]) with mapi id 15.20.6588.017; Wed, 12 Jul 2023
- 09:01:26 +0000
-From:   Claudia Draghicescu <claudia.rosu@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
-        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
-        andrei.istodorescu@nxp.com,
-        Claudia Draghicescu <claudia.rosu@nxp.com>
-Subject: [PATCH BlueZ 5/6] btio: Add support for getsockopt(BT_ISO_BASE)
-Date:   Wed, 12 Jul 2023 11:58:59 +0300
-Message-Id: <20230712085900.5423-6-claudia.rosu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230712085900.5423-1-claudia.rosu@nxp.com>
-References: <20230712085900.5423-1-claudia.rosu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4P250CA0004.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:5df::12) To GV1PR04MB9151.eurprd04.prod.outlook.com
- (2603:10a6:150:26::9)
+        Wed, 12 Jul 2023 05:25:50 -0400
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10DEBE5F;
+        Wed, 12 Jul 2023 02:25:48 -0700 (PDT)
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 472E361E5FE03;
+        Wed, 12 Jul 2023 11:25:21 +0200 (CEST)
+Message-ID: <b8a27d63-c214-0af6-7ad0-b82402208e3b@molgen.mpg.de>
+Date:   Wed, 12 Jul 2023 11:25:20 +0200
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|PAXPR04MB8525:EE_
-X-MS-Office365-Filtering-Correlation-Id: 96bea680-a563-43d1-2541-08db82b69324
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: dDGrklGD4bWWLQj6wN6SBehyMFrB2FczXwnl9mo/GbglCVDjRMwkVhJB74621CHJfx1VDrfYwy6TqYo9GDZZ3rtnB3tYGzhbs51EHq5wnSiXbT+jacSCigr7X93Vh/UNk7FrQthdR1p2LNjYoiS2gT8hFhMyp+qXKr+y4OPLAaNJppottGnZpuhrnEALmKnBLxnBTI2NUumQgL0cngrTItg2H1+sxBKDk2SUo0feGpmlHWnLCKXvT7dG1PXgTkXwPdpkZk8OwmYdAZK5Y+40MRyGF0KKIA7ZYHHydMRUsjE5A3b8fV8Mshq2ITGICjLK6l4eTkH0fWVg0VDBNSN8AHcyPjeDu9oNbSCHx4ReIKf7BFvj2sAscbK7jZEKieZsRAHTje4r3T5+8awkmIMczKNPj5DJBJcFDre4LcDbxa8X3R4+XQyoXyOTBhRnF/1eb4YMDgYb5cthGyk0bLPjTT6coTTKFE2XZXOz7lrzgQNxdTj6xqvtIAGvpay/sQkLlt80qgW5GRNEqzy7HY6/UCzRlzppj5VAzaVcXrcOohsStTesosNBp26I6E1WclGZkt6pUSxqJbBXO2umcMfo4i4JMm+ZrFvPaOHEQtbisjMYaU09t6ty6k0UyZmCt+DQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(39860400002)(346002)(396003)(136003)(451199021)(55236004)(83380400001)(2616005)(2906002)(36756003)(86362001)(38350700002)(38100700002)(41300700001)(4326008)(52116002)(6916009)(6512007)(316002)(6486002)(5660300002)(8676002)(8936002)(478600001)(66946007)(66476007)(6666004)(66556008)(186003)(26005)(1076003)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UWCB1otFWESrjRKJeMgGlPw71Xjt7N3+9up4PdAXV9s0WxXIWjyYYOI/lK48?=
- =?us-ascii?Q?ZYbm+wpmfZkf3MaMdTJBO2l6yWL0HMzI8KBoHeZzDCl79tbyKtplphf5z9bs?=
- =?us-ascii?Q?W0n4GUOkKrMbgf8diZB+KLvoNVCeaLylnfk3NHnKdqJ7o59D8a5C3JIFd/Xu?=
- =?us-ascii?Q?nrPNCzBv5hke18BrdKo1HFvRVPedGvPCDRdKKQN0b4v08JkbFUEKYzj+1tzp?=
- =?us-ascii?Q?gaReLdP8Kup0xW0ay+piGFZzAkv5PSbbarAxdsALyBygZgHghqve13Od1UmM?=
- =?us-ascii?Q?urK5b4rm6dXmiPcI1XYOGTP85fG/qvEZArsaZ7hD+gHgXRLYEFsheJaGksBz?=
- =?us-ascii?Q?vNl/tBxJXeDdVwTmNCDLjrPcsxp0yhoIH59fk80u1mG/fFgDOJq4g8nSgD8m?=
- =?us-ascii?Q?AKYPYdHBuTm/ipZK3+geyxhTKkFSUvX+9CsaEU6YPxIJ7ssFrIudElH5YEnl?=
- =?us-ascii?Q?Jh62P9FoGxlJVbW8ngFq+tP0NHIzkHmgDYTZWRCvkTHWQfVxHtNJ+6jgheCt?=
- =?us-ascii?Q?yqDJMh9QFOyv0rmXTmjjnofGxqjOn4g6khKUF6EO0LTSWDfgGk691oCai+Vp?=
- =?us-ascii?Q?YuOxvk1dZ+Cfrr9kNT+PqxDLzGr1kjDLvFZF1dWY1PNKk/G74hsGjPJs//2a?=
- =?us-ascii?Q?SolDqsTaL1Nv0P2U7XHje0S2yCboWmY3dLEmykW8pINiiChEukHWh9sfgXbW?=
- =?us-ascii?Q?t3IZ8SdMqnCYGFjw3RXje37LcYLz5Vrgba2e4+ptz9lVZSQ1mt+0qpA/TTjz?=
- =?us-ascii?Q?eCpbggw2BMXqVG7aqOgd0YG1EBhc5Mbo0HhgLAHaL2s8U62p4BLij6Sf3TGc?=
- =?us-ascii?Q?7d/i+BHVvnhhUt/XgerCiDjr1+nWI5sdFwMZoK6+fVI+1wOpgDwbwyD1j5Ls?=
- =?us-ascii?Q?Bq9oXxYebts7QsDh57nu/WmcXxB38yZebJ7wGyBGLj4Q5WIHBuHPmi1UMP71?=
- =?us-ascii?Q?ed0wBEMaq1E8wlh+ke4IfvvBqd8C+uZ/shJ3RCasmtcifSG3ymEcKtHIJfdf?=
- =?us-ascii?Q?CQKR2azVbsa52lQBtvWIsD8wMX72vsbh9CzLrcKrPtIb2pmRBpI6F/bsWSDa?=
- =?us-ascii?Q?pLOAEWG/UxEX9a4VJhxCemgBuDfN6oLWpHtTAdIQLx/nYwGSWbKyOem8q72y?=
- =?us-ascii?Q?+ZBU6TCnivZ+Ob77TUXMB2p7d+2SzdLwiA57ihbKHX60nDxYMpISuYFwAEHV?=
- =?us-ascii?Q?qG1x7VXFogNXaYLhCYSPr0NsHiKqXVEn0WUgI/gnk/FJYyq2eRuCRpAGHzRJ?=
- =?us-ascii?Q?ncnzPYWFTrF6UbttO36ZWOtZvnx/4BgdGxgUxpYe0ruSc1SQB2np+yNYqsJ6?=
- =?us-ascii?Q?tiotGM9GohL94D8SN8p9itsa2C6wjwlYmQZes6mODYVGKb8Wv2I7O1DQ5Pv9?=
- =?us-ascii?Q?yjGAC6iwLZoUkhfBrJrMhCzpDD+pW4n9vpz1CYnmcb8/sAm8lwUkT89ZNBw1?=
- =?us-ascii?Q?o0ORZEOD9AfZ8jrXgocUid5ECkhrGmMQuxExkWiEjzmx158C9bqEas2g1u0f?=
- =?us-ascii?Q?ilFL/SfQaa4XKthLe1sWf5VwhoFKMaf9HrZsqYC40pRVRzqLnHvQ+3u9c2mn?=
- =?us-ascii?Q?qUsea/hdgo9YHJS0tsbrr1PyrHz4k1MDhGkSGOi1maUDlW0+ZBwhcFIpRY+V?=
- =?us-ascii?Q?Pw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96bea680-a563-43d1-2541-08db82b69324
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2023 09:01:26.9047
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B6qLlCrXJB7HwCte+/NoB+J5AHj5KCr/+WnOXH5P10nfJB2H3iHlL7Ux5i55xHXqT0s99dsjo2n9kGPG54MBFQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8525
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH v3] Bluetooth: btmtk: Fix null pointer when processing
+ coredump
+To:     =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?= <Chris.Lu@mediatek.com>
+Cc:     marcel@holtmann.org, linux-kernel@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
+        =?UTF-8?B?U3RldmUgTGVlICjmnY7oppboqqAp?= <steve.lee@mediatek.com>,
+        Sean Wang <Sean.Wang@mediatek.com>,
+        =?UTF-8?B?QWFyb24gSG91ICjkvq/kv4rku7Ap?= <Aaron.Hou@mediatek.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20230712051857.13812-1-chris.lu@mediatek.com>
+ <0cb29d27-a76f-47f2-86c3-f39ba25e8bc2@molgen.mpg.de>
+ <d8f82d97496c73c01521dbbce5455ad23521036c.camel@mediatek.com>
+Content-Language: en-US
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <d8f82d97496c73c01521dbbce5455ad23521036c.camel@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds the posibility for a broadcast sink to retrieve the
-BASE information received from a source afeter a PA synchronization,
-using the getsockopt(BT_ISO_BASE) function.
-This needs the patch from bluetooth-next:
-Bluetooth: ISO: Add support for periodic adv reports processing
+Dear Chris,
 
----
- btio/btio.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 179be6289..8178250d2 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -1638,6 +1638,7 @@ static gboolean iso_get(int sock, GError **err, BtIOOption opt1, va_list args)
- 	BtIOOption opt = opt1;
- 	struct sockaddr_iso src, dst;
- 	struct bt_iso_qos qos;
-+	struct bt_iso_base base;
- 	socklen_t len;
- 	uint32_t phy;
- 
-@@ -1648,6 +1649,11 @@ static gboolean iso_get(int sock, GError **err, BtIOOption opt1, va_list args)
- 		return FALSE;
- 	}
- 
-+	if (getsockopt(sock, SOL_BLUETOOTH, BT_ISO_BASE, &base, &len) < 0) {
-+		ERROR_FAILED(err, "getsockopt(BT_ISO_BASE)", errno);
-+		return FALSE;
-+	}
-+
- 	if (!get_src(sock, &src, sizeof(src), err))
- 		return FALSE;
- 
-@@ -1694,6 +1700,8 @@ static gboolean iso_get(int sock, GError **err, BtIOOption opt1, va_list args)
- 			*(va_arg(args, struct bt_iso_qos *)) = qos;
- 			break;
- 		case BT_IO_OPT_BASE:
-+			*(va_arg(args, struct bt_iso_base *)) = base;
-+			break;
- 		case BT_IO_OPT_HANDLE:
- 		case BT_IO_OPT_CLASS:
- 		case BT_IO_OPT_DEFER_TIMEOUT:
-@@ -1896,8 +1904,9 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
- 			goto failed;
- 		if (!iso_set_qos(sock, &opts->qos, err))
- 			goto failed;
--		if (!iso_set_base(sock, &opts->base, err))
--			goto failed;
-+		if (opts->base.base_len)
-+			if (!iso_set_base(sock, &opts->base, err))
-+				goto failed;
- 		break;
- 	case BT_IO_INVALID:
- 	default:
--- 
-2.34.1
+Am 12.07.23 um 10:53 schrieb Chris Lu (陸稚泓):
+> On Wed, 2023-07-12 at 08:11 +0200, Paul Menzel wrote:
+>>   	
+>> External email : Please do not click links or open attachments until
+>> you have verified the sender or the content.
 
+(It’d be nice if you removed such (automatically added) phrases from 
+your reply.)
+
+> Thanks for your review and feedback to Mediatek's Bluetooth driver
+> code.
+
+Thank you for your reply.
+
+>> Am 12.07.23 um 07:18 schrieb Chris Lu:
+>>> There may be a potential null pointer risk if offset value is
+>>> less than 0 when doing memcmp in btmtk_process_coredump().
+>>> Checking offset is valid before doing memcmp.
+>>
+>> Use imperative mood: Check offset …
+>>
+>>> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+>>> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+>>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+>>> ---
+>>> v2: fix typo
+>>> v3: fix bot checking error
+>>> ---
+>>>    drivers/bluetooth/btmtk.c | 16 ++++++++--------
+>>>    1 file changed, 8 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+>>> index 786f775196ae..0f290430ae0e 100644
+>>> --- a/drivers/bluetooth/btmtk.c
+>>> +++ b/drivers/bluetooth/btmtk.c
+>>> @@ -370,7 +370,7 @@ EXPORT_SYMBOL_GPL(btmtk_register_coredump);
+>>>    int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+>>>    {
+>>>    struct btmediatek_data *data = hci_get_priv(hdev);
+>>> -int err;
+>>> +int err, offset;
+>>>    
+>>>    if (!IS_ENABLED(CONFIG_DEV_COREDUMP))
+>>>    return 0;
+>>> @@ -392,15 +392,15 @@ int btmtk_process_coredump(struct hci_dev
+>> *hdev, struct sk_buff *skb)
+>>>    if (err < 0)
+>>>    break;
+>>>    data->cd_info.cnt++;
+>>> +offset = skb->len - sizeof(MTK_COREDUMP_END);
+>>
+>> For `sizeof()` shouldn’t you use `size_t`? But that is unsigned of
+>> course. Maybe ssize_t then?
+>
+> yes, it's better to use ssize_t or size_t, I'll change declaratins of
+> offset from int to ssize_t.
+> 
+>>>    
+>>>    /* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
+>>> -if (data->cd_info.cnt > MTK_COREDUMP_NUM &&
+>>> -    skb->len > sizeof(MTK_COREDUMP_END) &&
+>>> -    !memcmp((char *)&skb->data[skb->len - sizeof(MTK_COREDUMP_END)],
+>>> -    MTK_COREDUMP_END, sizeof(MTK_COREDUMP_END) - 1)) {
+>>> -bt_dev_info(hdev, "Mediatek coredump end");
+>>> -hci_devcd_complete(hdev);
+>>> -}
+>>> +if (data->cd_info.cnt > MTK_COREDUMP_NUM && offset > 0)
+>>
+>> Why not keep it like before, and just add the condition `skb->len <
+>> sizeof(MTK_COREDUMP_END)`? The compiler is probably going to optimize
+>> so the value is not calculated twice.
+
+> The reason why I send this patch is when I backport devcoredump feature
+> to specific project with older kernel version, the compiler might not
+> so optimized that it would cause kernel panic when run into memcmp.
+> As a result, make sure `skb->len > sizeof(MTK_COREDUMP_END) ` before
+> doing memcmp part can avoid null pointer issue.
+> Besides, only in condition 'data->cd_info.cnt > MTK_COREDUMP_NUM &&
+> offset > 0' need to do memcmp to check the end of coredump. Driver do
+> noting with condition `skb->len < sizeof(MTK_COREDUMP_END) ` that
+> additional condiction is not really necessary.
+
+Just to avoid misunderstandings, my point, to add the comparison and get 
+rid of the variable `offset`.
+
+
+Kind regards,
+
+Paul
+
+
+>>> +if (!memcmp((char *)&skb->data[offset], MTK_COREDUMP_END,
+>>> +    sizeof(MTK_COREDUMP_END) - 1)) {
+>>> +bt_dev_info(hdev, "Mediatek coredump end");
+>>> +hci_devcd_complete(hdev);
+>>> +}
+>>>    
+>>>    break;
+>>>    }
