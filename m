@@ -2,140 +2,99 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C3BEEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 23:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E7EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jul 2023 23:11:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232269AbjGLXCN (ORCPT
+        id S232052AbjGLXLy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jul 2023 19:02:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50468 "EHLO
+        Wed, 12 Jul 2023 19:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbjGLXCI (ORCPT
+        with ESMTP id S231144AbjGLXLx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jul 2023 19:02:08 -0400
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4250011D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 16:02:07 -0700 (PDT)
-Received: from github.com (hubbernetes-node-9f428fa.ash1-iad.github.net [10.56.131.58])
-        by smtp.github.com (Postfix) with ESMTPA id 6D8E5340D1C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 16:02:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1689202926;
-        bh=vDEG0HBZVuu6PfLgJr5fffJGyaOLb88uzTa4zmD9BHg=;
-        h=Date:From:To:Subject:From;
-        b=e9ZS4JbRRovVzRIQK2BvUDdgIdpiU/QlaYpD3ulGg6N1tobVd3134m9s8uAEvm/V2
-         zFcGkylq8kU9YGuTtUjamg/9bKnfnbHruiKbDhQ2bMeUHEsZIKSf4aAyyxOLLFPO93
-         Q/JNtj84x+BITDl0L0OzhgU95LyqhiDW+KktdX5U=
-Date:   Wed, 12 Jul 2023 16:02:06 -0700
-From:   Rudi Heitbaum <noreply@github.com>
+        Wed, 12 Jul 2023 19:11:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3643319B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 16:11:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C38BF61986
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 23:11:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 26B17C433C7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 23:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689203511;
+        bh=2dQXb+orygkP7VWpl2KDFER8ZF0wEwtXrX1RRF6FyeA=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=kqk68GRx3STv7NPjDN3v9PJwFjE8THIrzAsq5rtX5/HHMFpQf1PlDIhrrc9q4ssIv
+         LvGh3ZbHaT9ho7bs6bY1Uq7yftMKQFZu+TOaT4wVMQxagkaUayH247hcpOP8jgNIDk
+         8QUnUQ41SBiXgE7ZRvZ90huaq7Il2PbfYHd1q+NE8019l6r86RbzT6R+d17ZqMhpx9
+         7iO3L+cRSSV9J7DoPwE8fBoOwHWK7s5LgyKdVGB3paS0TQgkGbTSsb7+PKPlfAAAiO
+         bViADDxCjNazwiXscCQgxPsVzyhNBJe6kh4z5MXCl24FsREyXBc0bO9HxfNRU4j6Dj
+         pQ0/yo/KWRLHQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 0C095C53BD1; Wed, 12 Jul 2023 23:11:51 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/838e15-c62a4c@github.com>
-Subject: [bluez/bluez] c48468: shared/ad: Use util_iov_push_* helpers to
- generate...
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
+ fails (a timing issue?)
+Date:   Wed, 12 Jul 2023 23:11:50 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: espritlibre@yadim.dismail.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216936-62941-hQFltOX1OV@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
+References: <bug-216936-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: c48468328f28f3c2aad488fdd917db0b517da451
-      https://github.com/bluez/bluez/commit/c48468328f28f3c2aad488fdd917db0b517da451
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-10 (Mon, 10 Jul 2023)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
 
-  Changed paths:
-    M src/shared/ad.c
+--- Comment #15 from espritlibre (espritlibre@yadim.dismail.de) ---
+sorry! forget what i wrote, 5.19.11 seems to be bad too...
 
-  Log Message:
-  -----------
-  shared/ad: Use util_iov_push_* helpers to generate data
+i think this could be a race condition between user space and kernel. becau=
+se i
+start my notbeook always in flight mode, in my case it's gnome/wayland. whe=
+n i
+turn off flight mode, the bluetooth firmware gets loaded.
 
-This makes use of util_iov_push_* helpers to generate the data.
+if i turn flight mode off and quickly on again, so the firmware download ge=
+ts
+interrupted and results in a:
+kernel: Bluetooth: hci0: FW download error recovery failed (-19)
+most of the time
 
+or:
+kernel: Bluetooth: hci0: FW download error recovery failed (-108)
 
-  Commit: 9b0087bc3d2513d32630d84c2bb499a51c155d35
-      https://github.com/bluez/bluez/commit/9b0087bc3d2513d32630d84c2bb499a51c155d35
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-10 (Mon, 10 Jul 2023)
+i think on boot, the kernel trys to upload the firmware and then the flight
+mode kicks in, resulting in the error, sometimes. i need to pay more attent=
+ion
+and not use flight mode and see if the error appears again.
 
-  Changed paths:
-    M src/main.c
+--=20
+You may reply to this email to add a comment.
 
-  Log Message:
-  -----------
-  main: Remove DEFAULT_SIRK
-
-DEFAULT_SIRK is currently not used.
-
-
-  Commit: d1b33eb8bf0f502761844d09dc64803ed5c9e687
-      https://github.com/bluez/bluez/commit/d1b33eb8bf0f502761844d09dc64803ed5c9e687
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-11 (Tue, 11 Jul 2023)
-
-  Changed paths:
-    M src/shared/util.c
-    M src/shared/util.h
-
-  Log Message:
-  -----------
-  shared/util: Introduce strisutf8
-
-This introduces strisutf8 which can be used to verify if a string is
-encoded using UTF-8 format.
-
-
-  Commit: bc2ab4ba3c6103540b902802a3b156f769791fca
-      https://github.com/bluez/bluez/commit/bc2ab4ba3c6103540b902802a3b156f769791fca
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-12 (Wed, 12 Jul 2023)
-
-  Changed paths:
-    M src/shared/ad.c
-    M src/shared/ad.h
-
-  Log Message:
-  -----------
-  shared/ad: Make use of util_iov_pull_* to parse data
-
-This makes use of util_iov_pull_* helpers to parse data.
-
-
-  Commit: b8f916b7ee6eb99cee47cd65a5b52e4ece18c17e
-      https://github.com/bluez/bluez/commit/b8f916b7ee6eb99cee47cd65a5b52e4ece18c17e
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-12 (Wed, 12 Jul 2023)
-
-  Changed paths:
-    M unit/test-eir.c
-
-  Log Message:
-  -----------
-  test-eir: Run tests using bt_ad
-
-This enables the same tests done with eir_data using bt_ad.
-
-
-  Commit: c62a4cb55183a38ac84ed312214a4671c994ca0b
-      https://github.com/bluez/bluez/commit/c62a4cb55183a38ac84ed312214a4671c994ca0b
-  Author: Rudi Heitbaum <rudi@heitbaum.com>
-  Date:   2023-07-12 (Wed, 12 Jul 2023)
-
-  Changed paths:
-    M configure.ac
-
-  Log Message:
-  -----------
-  configure: Fix check ell path for cross compiling
-
-Use of AC_CHECK_FILE prevents cross compilation.
-Instead use test to support cross compiling.
-
-
-Compare: https://github.com/bluez/bluez/compare/838e15780729...c62a4cb55183
+You are receiving this mail because:
+You are the assignee for the bug.=
