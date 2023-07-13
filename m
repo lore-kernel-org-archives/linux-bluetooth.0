@@ -2,81 +2,81 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A1BAC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 19:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A58FC001DC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 19:31:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230444AbjGMT1A (ORCPT
+        id S233139AbjGMTbT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jul 2023 15:27:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60096 "EHLO
+        Thu, 13 Jul 2023 15:31:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbjGMT07 (ORCPT
+        with ESMTP id S231745AbjGMTbS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jul 2023 15:26:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3DF51989
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 12:26:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4181B61B3C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 19:26:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9AFD8C433C7;
-        Thu, 13 Jul 2023 19:26:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689276417;
-        bh=UcLv6JPWzqnQyBaRNXGLE+LNY8gSn4nOvNcA3zlZvS0=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Gx8TkBzTvBBJOSu3ofHuTWrlimIBFOk5kAw2zCr+qX23MscCz9FYLcgA14lpuPZJb
-         SKwF0ZHhhNGqc3p/EzecDouhxQAzhso/aAhtZ06QDt9ZHlVb7t+mRTXjHh6IgqdhcY
-         Wh0DgzuafoYWGhzgUoA9YSTuoIRU1RUPVtkiMxsmxY+z7CrM+VJYOodsXnM43Fqea2
-         4RX31Rw1epdS3Q+8XTIM6x+ZDIiHdY7jqCQAk3MyxKDvCQHGFjo40P1WzH/Oejay8b
-         Jk52gbXc0FuoSpdCtjWTuPFOmL55RliBCB71RDqWJO++DhsbDQ5PIn+MmEKJ53QF1Z
-         3hed5bpzxI/LQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7265CE4508F;
-        Thu, 13 Jul 2023 19:26:57 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/2] test-runner: set non-quiet printk before running
- tests
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168927641746.6361.8863203110548738608.git-patchwork-notify@kernel.org>
-Date:   Thu, 13 Jul 2023 19:26:57 +0000
-References: <e521a8d35e8baff45db1fdf8a26725bdc8d595ee.1689196901.git.pav@iki.fi>
-In-Reply-To: <e521a8d35e8baff45db1fdf8a26725bdc8d595ee.1689196901.git.pav@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
+        Thu, 13 Jul 2023 15:31:18 -0400
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09842D68
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 12:31:16 -0700 (PDT)
+Received: from github.com (hubbernetes-node-2a8587f.ash1-iad.github.net [10.56.149.37])
+        by smtp.github.com (Postfix) with ESMTPA id E8DF81010CB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 12:31:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1689276675;
+        bh=92Bw0Ak3cUj7C+IuSV92+7IzTC1tP+2DlZ4Wk8fKeI0=;
+        h=Date:From:To:Subject:From;
+        b=JDyC/RWk3ALZdb428EXjvaCLYrsOyunjRBReyZt/+30Gw5SWNBquywMvF3tjTEOmK
+         eYXRttDOff17iCIQVs2FDIjpV/JFriXHHEeyUlvpwTfuUmvlzfJTLpZyl2bgs2IC6K
+         Yjj0myX945O2Ht1xgAnDSQVcP3C1H68QElndUvbA=
+Date:   Thu, 13 Jul 2023 12:31:15 -0700
+From:   Pauli Virtanen <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/c62a4c-9aff3f@github.com>
+Subject: [bluez/bluez] 7cea6b: test-runner: set non-quiet printk before
+ running t...
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 7cea6b964119747925312a7a00ff217021d6c4a1
+      https://github.com/bluez/bluez/commit/7cea6b964119747925312a7a00ff217021d6c4a1
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2023-07-13 (Thu, 13 Jul 2023)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M tools/test-runner.c
 
-On Thu, 13 Jul 2023 00:22:48 +0300 you wrote:
-> It is useful to see WARN_ON etc. messages when running the tests.
-> 
-> The 'quiet' in cmdline suppresses levels >= WARN, so re-enable them
-> explicitly after boot, so that it is on by default and doesn't need to
-> be handled in local test scripts.
-> ---
-> 
-> [...]
+  Log Message:
+  -----------
+  test-runner: set non-quiet printk before running tests
 
-Here is the summary with links:
-  - [BlueZ,v2,1/2] test-runner: set non-quiet printk before running tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7cea6b964119
-  - [BlueZ,v2,2/2] test-runner: fix behavior when no audio server
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9aff3f494142
+It is useful to see WARN_ON etc. messages when running the tests.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The 'quiet' in cmdline suppresses levels >= WARN, so re-enable them
+explicitly after boot, so that it is on by default and doesn't need to
+be handled in local test scripts.
 
 
+  Commit: 9aff3f4941426d6a79d08404e1fe36767eadd0fd
+      https://github.com/bluez/bluez/commit/9aff3f4941426d6a79d08404e1fe36767eadd0fd
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2023-07-13 (Thu, 13 Jul 2023)
+
+  Changed paths:
+    M tools/test-runner.c
+
+  Log Message:
+  -----------
+  test-runner: fix behavior when no audio server
+
+If no audio server, don't pass NULL to printf and parse TESTAUDIO
+correctly.
+
+
+Compare: https://github.com/bluez/bluez/compare/c62a4cb55183...9aff3f494142
