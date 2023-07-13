@@ -2,55 +2,56 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA6DC001DC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 20:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D95C00528
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 20:10:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233603AbjGMUK2 (ORCPT
+        id S233704AbjGMUK3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jul 2023 16:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45680 "EHLO
+        Thu, 13 Jul 2023 16:10:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232017AbjGMUKY (ORCPT
+        with ESMTP id S233557AbjGMUKY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 13 Jul 2023 16:10:24 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37012273E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271BB2709;
         Thu, 13 Jul 2023 13:10:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B95F161B63;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A698761B5F;
         Thu, 13 Jul 2023 20:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FAB3C433CD;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 120C9C433CC;
         Thu, 13 Jul 2023 20:10:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1689279022;
-        bh=/T0RGImw5OHbBJqaqZIGtDVaNfpbb1jTUyvOzVCwqwc=;
+        bh=lOcxPAn7eW8rV5VQ5ki2zUL6NoKylKlp4dLBNIixKAE=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=qptsmUk/s9g37BNrYb553GLnStu/I0oyNyzlTqBV+ZvSkkie6WljdpBaEnUkXiaiV
-         VcHFdVS4aqekHNY8Ym02sxxD7FvT45Neat3KDUUcNIzTlnVIVb/CIliblIZZCGg3IW
-         mJiSO+b9VSu5La1Jv/xK6m/E8Z1vIUQ1oOmug8tmKbXu4qUmtVVaJF9M1zD+epXXwM
-         6qQE7nviXikgLC+OqNftvbF76FaeDKcieg15zpjiL4aVvbuCzRitSH+jYOkhJL9bfm
-         jAtkaoIXdtW4W1GHJMyTKYIpBMTC4y+ZTPPjeiZvv4xZaInXwAaQHUOwxMvvNelosV
-         IjpMwxGrIrlOQ==
+        b=uBS5rfT+Db8Tt5JpaNjmHcNM3Zrb2s9NRMvWHmIEbjv0L5mGLw82jDpcU9c7TeFEG
+         m1UvrV9Kij7FzvP8/gqs8/eWehrz1nHRow9wsD6W/mveKARl0mezBxXEcAOU/gMhtT
+         8IlRBJZym1IXnIgsSrbMKi34H5B9iFKlmKeDOiW2MetIIlzRqQXRTb7aJdkAreQeZb
+         1GBRnyCutOTvXsu0/tSTHIx4B795Dn5R5HYb9rOfG54sdlEChu5M8fcN6XY42pCk4V
+         upTI/SHICikH2tX5wt8rxgv//ym443lq4/ZRj9QZzDslT05cFiVMeJph1ZC209jc1S
+         XqL6CMbjfI0Ig==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 024D9F83708;
-        Thu, 13 Jul 2023 20:10:22 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7077E29F42;
+        Thu, 13 Jul 2023 20:10:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: Fix hci_suspend_sync crash
+Subject: Re: [PATCH v6] Bluetooth: btmtk: Fix kernel crash when processing
+ coredump
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168927902200.26469.6694434190230470998.git-patchwork-notify@kernel.org>
-Date:   Thu, 13 Jul 2023 20:10:22 +0000
-References: <20230705210647.1.I636c21e4dc8fe3352f4d7aef26c0ec3857e24ca0@changeid>
-In-Reply-To: <20230705210647.1.I636c21e4dc8fe3352f4d7aef26c0ec3857e24ca0@changeid>
-To:     Ying Hsu <yinghsu@chromium.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, marcel@holtmann.org,
-        linux-kernel@vger.kernel.org
+Message-Id: <168927902193.26469.1216998273378842695.git-patchwork-notify@kernel.org>
+Date:   Thu, 13 Jul 2023 20:10:21 +0000
+References: <20230713071105.26248-1-chris.lu@mediatek.com>
+In-Reply-To: <20230713071105.26248-1-chris.lu@mediatek.com>
+To:     Chris Lu <chris.lu@mediatek.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        sean.wang@mediatek.com, aaron.hou@mediatek.com,
+        steve.lee@mediatek.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -60,33 +61,79 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  5 Jul 2023 21:06:47 +0000 you wrote:
-> If hci_unregister_dev() frees the hci_dev object but hci_suspend_notifier
-> may still be accessing it, it can cause the program to crash.
-> Here's the call trace:
->   <4>[102152.653246] Call Trace:
->   <4>[102152.653254]  hci_suspend_sync+0x109/0x301 [bluetooth]
->   <4>[102152.653259]  hci_suspend_dev+0x78/0xcd [bluetooth]
->   <4>[102152.653263]  hci_suspend_notifier+0x42/0x7a [bluetooth]
->   <4>[102152.653268]  notifier_call_chain+0x43/0x6b
->   <4>[102152.653271]  __blocking_notifier_call_chain+0x48/0x69
->   <4>[102152.653273]  __pm_notifier_call_chain+0x22/0x39
->   <4>[102152.653276]  pm_suspend+0x287/0x57c
->   <4>[102152.653278]  state_store+0xae/0xe5
->   <4>[102152.653281]  kernfs_fop_write+0x109/0x173
->   <4>[102152.653284]  __vfs_write+0x16f/0x1a2
->   <4>[102152.653287]  ? selinux_file_permission+0xca/0x16f
->   <4>[102152.653289]  ? security_file_permission+0x36/0x109
->   <4>[102152.653291]  vfs_write+0x114/0x21d
->   <4>[102152.653293]  __x64_sys_write+0x7b/0xdb
->   <4>[102152.653296]  do_syscall_64+0x59/0x194
->   <4>[102152.653299]  entry_SYSCALL_64_after_hwframe+0x5c/0xc1
+On Thu, 13 Jul 2023 15:11:06 +0800 you wrote:
+> There may be a potential kernel crash risk if 'skb->len
+> - MTK_COREDUMP_END_LEN' value is less than 0 when doing
+> memcmp in btmtk_process_coredump().
+> Check the value is valid before doing memcmp.
+> 
+> [215.021695] Unable to handle kernel paging request at
+>              virtual address ffffff939fffd3c5
+> [215.021781] Mem abort info:
+> [215.021805]   ESR = 0x96000005
+> [215.021833]   EC = 0x25: DABT (current EL), IL = 32 bits
+> [215.021861]   SET = 0, FnV = 0
+> [215.021875]   EA = 0, S1PTW = 0
+> [215.021886] Data abort info:
+> [215.021899]   ISV = 0, ISS = 0x00000005
+> [215.021912]   CM = 0, WnR = 0
+> [215.021929] swapper pgtable: 4k pages, 39-bit VAs,
+>              pgdp=00000000410de000
+> [215.021943] [ffffff939fffd3c5] pgd=0000000000000000,
+>              p4d=0000000000000000, pud=0000000000000000
+> [215.021979] Internal error: Oops: 96000005 [#1] PREEMPT SMP
+> [215.022496] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.10.186#3
+>              (HASH:ad23 4)
+> [215.022511] Hardware name: MediaTek Tomato board (DT)
+> [215.022530] pstate: 80400009 (Nzcv daif +PAN -UAO -TCO BTYPE=--)
+> [215.022556] pc : __pi_memcmp+0xd0/0x1b8
+> [215.022579] lr : btmtk_process_coredump+0xb0/0x5f8 [btmtk]
+> [215.022593] sp : ffffffc010003d40
+> [215.022607] x29: ffffffc010003d40 x28: 0000000000000006
+> [215.022633] x27: ffffffda696350c0 x26: 0000000000000002
+> [215.022659] x25: 00000000000003ff x24: ffffff9360cca804
+> [215.022685] x23: 0000000000000000 x22: ffffff9365638500
+> [215.022710] x21: ffffff9365638700 x20: 0000000000000000
+> [215.022736] x19: ffffff936002e000 x18: 0000000000000000
+> [215.022761] x17: 0000000000000180 x16: ffffffda6881b8b4
+> [215.022787] x15: 0000000000000001 x14: 0000000000002d00
+> [215.022812] x13: 0000000000060000 x12: 0000000000000181
+> [215.022837] x11: 0000000000000006 x10: fffffffffffffffd
+> [215.022862] x9 : 0000000000000006 x8 : 0000000000000003
+> [215.022887] x7 : 0000000000000000 x6 : 0000000000000000
+> [215.022913] x5 : ffffff93656387b8 x4 : 0000000000000000
+> [215.022938] x3 : ffffffc010003c18 x2 : 0000000000000006
+> [215.022963] x1 : ffffffda09d4124a x0 : ffffff939fffd3c5
+> [215.022989] Call trace:
+> [215.023012]  __pi_memcmp+0xd0/0x1b8
+> [215.023053]  btusb_recv_acl_mtk+0x64/0x90 [btusb (HASH:dc6b 5)]
+> [215.023087]  btusb_recv_bulk+0x118/0x170 [btusb (HASH:dc6b 5)]
+> [215.023121]  btusb_bulk_complete+0x8c/0x148 [btusb (HASH:dc6b 5)]
+> [215.023144]  __usb_hcd_giveback_urb+0xbc/0x148
+> [215.023164]  usb_giveback_urb_bh+0xb4/0x190
+> [215.023184]  tasklet_action_common+0x98/0x1a0
+> [215.023201]  tasklet_action+0x2c/0x38
+> [215.023220]  __do_softirq+0xe0/0x38c
+> [215.023241]  invoke_softirq+0x34/0x6c
+> [215.023258]  irq_exit+0x6c/0xb0
+> [215.023279]  __handle_domain_irq+0x98/0xd4
+> [215.023296]  gic_handle_irq+0x5c/0x11c
+> [215.023313]  el1_irq+0xd0/0x180
+> [215.023332]  cpuidle_enter_state+0xac/0x338
+> [215.023349]  cpuidle_enter+0x40/0x70
+> [215.023366]  do_idle+0x150/0x278
+> [215.023384]  cpu_startup_entry+0x2c/0x58
+> [215.023401]  rest_init+0xdc/0xec
+> [215.023419]  arch_call_rest_init+0x18/0x24
+> [215.023435]  start_kernel+0x334/0x400
+> [215.023460] Code: 91002129 eb09010a 9a89810b cb0b0042 (38401403)
+> [215.023478] ---[ end trace 28668fd20c7a90cd ]
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: Fix hci_suspend_sync crash
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0c9bf63ad8ca
+  - [v6] Bluetooth: btmtk: Fix kernel crash when processing coredump
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2ba6216b8b37
 
 You are awesome, thank you!
 -- 
