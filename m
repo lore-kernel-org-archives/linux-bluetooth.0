@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69F1C001DF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 22:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A05C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 22:43:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232532AbjGMWnG (ORCPT
+        id S232499AbjGMWnK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jul 2023 18:43:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38048 "EHLO
+        Thu, 13 Jul 2023 18:43:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233624AbjGMWnF (ORCPT
+        with ESMTP id S231465AbjGMWnI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jul 2023 18:43:05 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5902721
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:43:04 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3a04e5baffcso1065675b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:43:04 -0700 (PDT)
+        Thu, 13 Jul 2023 18:43:08 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45084271C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:43:07 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-668711086f4so794491b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:43:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689288182; x=1691880182;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AE3bURiprag7eyXYZWuuYwmt+jom0SmOz+1qpDxWg6c=;
-        b=Umb79jRKHTVh8OMhIfF4FPjioJqrsAfJhf2qAjydtmCZroAbkDKZ8r8qSiPrZjooXj
-         lBbdZXCErRlPGKBoGILlS+P8HQGjiDiwjGIUMidVxGiF5xpwBSIQ8WiyWXwC0MJgEE/Y
-         P/baBXzupFRvDgbDM42IDiCXFsUfeOUDk+AG191x7FZc0uv3kP83KJbXEy+TDCP6L0Is
-         MVZOJUV0HQNZmT0sn9WfLHd4UsL6N+RLZUS+frrX+XY8tj9CodAqPPUPHMQ86eBG3J7G
-         3ciyh3TB6flIFPnZAM1p4pmfYSKubpYvGdHP+G2bIjOTRf7azN8YI2FzS+Bp5m/8gPm6
-         8e1w==
+        d=gmail.com; s=20221208; t=1689288185; x=1691880185;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ujGPO1ISGimR9OdwCY8sWPzAFBpmN+XxPTpRfopQtgQ=;
+        b=qzk9kv08D7hSlWRmjAn11rFfPsABbnAuo311lshA7jV4fou7ab2bL0GwRgOcCMn+vS
+         amNVifFB3OgHQvAy/eP4WYyUbFa8DnpENI8svzQX9iuLNLUV9/Zx55EBUs6d3tUr6Lif
+         +6n6N4CjVyFxWzDrCdT2sfw6y76lggx25xF0KDBdgUxnyQTyFj6RHQj4C44gXWR7f+/V
+         Rwui46rqybt7HVRjlitI3VxaJNuaEbH+O1LGSLcSY+LEkaklfMDTYHRzzhlVES5qQl2i
+         g77a5hZmeEAABrQzTS97lwklJOAI45Q6FerhC21BWcw6NuMw7U+5qLx3s2+v+MEWCxgp
+         5Z/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689288182; x=1691880182;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AE3bURiprag7eyXYZWuuYwmt+jom0SmOz+1qpDxWg6c=;
-        b=gFvGIgxrki17WHcwnnomZ6YILWMIYGumhnF2rNRWKTFPOp5F077h75Ye0ay8RiHIs6
-         p9iBPDLQchVBtqlP84Z5RkhMBkTA6h6zva4N2N936emDR90te2L5YosLF1X8a+jN33Zs
-         O7ArXhHlv1wchNFZNOwhFwdtJ3nYYi+dviMOYuRzrcG+0xwMC2j5hwYCtHxSGbtZtczM
-         Zj60pr16mvSZDTPR0pCZ39N1LNMYr6ST2gSiZsnQ/DWSEcRzPzXlBVby/UVcR2RKW/6T
-         ln4QrC1R3AmneMCf/H06zNJbkRW+ySPYMlV9IMltTQYSN6ODMnNIi3Ocg2Mbg6WAJ03v
-         Ph7Q==
-X-Gm-Message-State: ABy/qLZN0t/XiDUzu3nErN8PC6CVe7/2J4D3QYE4xHTg4m5H8NEH8HiQ
-        YgK2TAC940rhp8icLVtZ+n88/Kp0gb0=
-X-Google-Smtp-Source: APBJJlHFI0o5sB95W8pnFZZT72/T4ZHht6Q+BBYfqN02CLZBZuzCreY9ax8KAVzwOk9sIPD/qq7kWQ==
-X-Received: by 2002:a05:6358:9886:b0:132:d42f:8e19 with SMTP id q6-20020a056358988600b00132d42f8e19mr4139406rwa.31.1689288182270;
-        Thu, 13 Jul 2023 15:43:02 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689288185; x=1691880185;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ujGPO1ISGimR9OdwCY8sWPzAFBpmN+XxPTpRfopQtgQ=;
+        b=ZUxM5wUfi6CO1w9a8xlQ+l0gRPabB4WSNXsY6+FJUNsS4mjSElG4Nk05MqLgB2zlCS
+         uoWzOj4jw7bCfFqnPS9R6EM7+0xJKZVbXW2bbfq+q4N9JzZ5NWDeemgIiSVXtE48ucjo
+         nf8Ut2gpPaONPZkZW3kL+N9iTxspxz0ZhEfmj/HhkW3Ig2gzPu5qOBMdUHUeo44QgiXf
+         TJXoWiGxWKBK7VP1/gmf7zDu0XYvYpDTjIl4G2TFjQ2kzMVpsjCutpScTUvm/oG0E7Vv
+         mr7PTjf/duGFDJlihLOFAnJgrpFeChAA6MNmaAIcVb+iazG04N9lgrLzCvNGsLflZzD9
+         m/iA==
+X-Gm-Message-State: ABy/qLYDikk8Z+gDrPHPKd4UrSdCF6X0fZ3tFLJrEDD2l3B89PCf3nJ+
+        5URfwFXDtZRUiUSsiAnrockqghJzeTM=
+X-Google-Smtp-Source: APBJJlFeK/No/L7QXpYbAUgdxWbV38FUPu2YO4sXGZBsIa9Vc31IYqbmeH7lWe4xeH6j/C8KouPqjg==
+X-Received: by 2002:a05:6a20:430f:b0:10b:764b:a942 with SMTP id h15-20020a056a20430f00b0010b764ba942mr1208952pzk.11.1689288185020;
+        Thu, 13 Jul 2023 15:43:05 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id t12-20020a63b24c000000b0055bf13811f5sm2568433pgo.15.2023.07.13.15.43.00
+        by smtp.gmail.com with ESMTPSA id t12-20020a63b24c000000b0055bf13811f5sm2568433pgo.15.2023.07.13.15.43.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 15:43:01 -0700 (PDT)
+        Thu, 13 Jul 2023 15:43:02 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] bthost: Add support to set ISO Packet Status
-Date:   Thu, 13 Jul 2023 15:42:59 -0700
-Message-Id: <20230713224300.2286788-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] iso-tester: Add test for BT_PKT_STATUS sockopt
+Date:   Thu, 13 Jul 2023 15:43:00 -0700
+Message-Id: <20230713224300.2286788-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230713224300.2286788-1-luiz.dentz@gmail.com>
+References: <20230713224300.2286788-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,85 +68,166 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support to set ISO Packet Status to bthost_send_iso.
+This adds a test for setting BT_PKT_STATUS sockopt and checks if
+BT_SCM_PKT_STATUS is properly received.
 ---
- emulator/bthost.c  | 12 ++++++------
- emulator/bthost.h  |  4 ++--
- tools/iso-tester.c |  2 +-
- 3 files changed, 9 insertions(+), 9 deletions(-)
+ tools/iso-tester.c | 89 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 88 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 3179bb3d20fe..c7d59eefc80c 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -732,8 +732,8 @@ void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
- }
- 
- static void send_iso(struct bthost *bthost, uint16_t handle, bool ts,
--					uint16_t sn, uint32_t timestamp,
--					const struct iovec *iov, int iovcnt)
-+			uint16_t sn, uint32_t timestamp, uint8_t pkt_status,
-+			const struct iovec *iov, int iovcnt)
- {
- 	struct bt_hci_iso_hdr iso_hdr;
- 	struct bt_hci_iso_data_start data_hdr;
-@@ -773,7 +773,7 @@ static void send_iso(struct bthost *bthost, uint16_t handle, bool ts,
- 	}
- 
- 	data_hdr.sn = cpu_to_le16(sn);
--	data_hdr.slen = cpu_to_le16(iso_data_len_pack(len, 0));
-+	data_hdr.slen = cpu_to_le16(iso_data_len_pack(len, pkt_status));
- 
- 	pdu[3].iov_base = &data_hdr;
- 	pdu[3].iov_len = sizeof(data_hdr);
-@@ -782,8 +782,8 @@ static void send_iso(struct bthost *bthost, uint16_t handle, bool ts,
- }
- 
- void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
--					uint16_t sn, uint32_t timestamp,
--					const struct iovec *iov, int iovcnt)
-+			uint16_t sn, uint32_t timestamp, uint8_t pkt_status,
-+			const struct iovec *iov, int iovcnt)
- {
- 	struct btconn *conn;
- 
-@@ -791,7 +791,7 @@ void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
- 	if (!conn)
- 		return;
- 
--	send_iso(bthost, handle, ts, sn, timestamp, iov, iovcnt);
-+	send_iso(bthost, handle, ts, sn, timestamp, pkt_status, iov, iovcnt);
- }
- 
- bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t code,
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index cdc12dc1ce8e..46781365b283 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -81,8 +81,8 @@ void bthost_send_cid(struct bthost *bthost, uint16_t handle, uint16_t cid,
- void bthost_send_cid_v(struct bthost *bthost, uint16_t handle, uint16_t cid,
- 					const struct iovec *iov, int iovcnt);
- void bthost_send_iso(struct bthost *bthost, uint16_t handle, bool ts,
--					uint16_t sn, uint32_t timestamp,
--					const struct iovec *iov, int iovcnt);
-+			uint16_t sn, uint32_t timestamp, uint8_t pkt_status,
-+			const struct iovec *iov, int iovcnt);
- 
- typedef void (*bthost_l2cap_rsp_cb) (uint8_t code, const void *data,
- 						uint16_t len, void *user_data);
 diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index bbd5a47f6197..7140f83b2236 100644
+index 7140f83b2236..8f43d7becf16 100644
 --- a/tools/iso-tester.c
 +++ b/tools/iso-tester.c
-@@ -1715,7 +1715,7 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
+@@ -400,6 +400,7 @@ struct iso_client_data {
+ 	bool disconnect;
+ 	bool ts;
+ 	bool mconn;
++	uint8_t pkt_status;
+ 	const uint8_t *base;
+ 	size_t base_len;
+ };
+@@ -833,6 +834,14 @@ static const struct iso_client_data listen_16_2_1_recv_ts = {
+ 	.ts = true,
+ };
  
- 	host = hciemu_client_get_host(data->hciemu);
- 	bthost_send_iso(host, data->handle, isodata->ts, sn++, 0,
--							isodata->recv, 1);
-+				isodata->pkt_status, isodata->recv, 1);
++static const struct iso_client_data listen_16_2_1_recv_pkt_status = {
++	.qos = QOS_16_2_1,
++	.expect_err = 0,
++	.recv = &send_16_2_1,
++	.server = true,
++	.pkt_status = 0x02,
++};
++
+ static const struct iso_client_data defer_16_2_1 = {
+ 	.qos = QOS_16_2_1,
+ 	.expect_err = 0,
+@@ -1322,6 +1331,7 @@ static void test_setsockopt(const void *test_data)
+ 	int sk, err;
+ 	socklen_t len;
+ 	struct bt_iso_qos qos = QOS_16_1_2;
++	int pkt_status = 1;
  
- 	data->io_id[0] = g_io_add_watch(io, G_IO_IN, iso_recv_data, data);
+ 	sk = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_ISO);
+ 	if (sk < 0) {
+@@ -1350,6 +1360,26 @@ static void test_setsockopt(const void *test_data)
+ 		goto end;
+ 	}
+ 
++	err = setsockopt(sk, SOL_BLUETOOTH, BT_PKT_STATUS, &pkt_status,
++			 sizeof(pkt_status));
++	if (err < 0) {
++		tester_warn("Can't set socket BT_PKT_STATUS option: "
++				"%s (%d)", strerror(errno), errno);
++		tester_test_failed();
++		goto end;
++	}
++
++	len = sizeof(pkt_status);
++	memset(&pkt_status, 0, len);
++
++	err = getsockopt(sk, SOL_BLUETOOTH, BT_PKT_STATUS, &pkt_status, &len);
++	if (err < 0) {
++		tester_warn("Can't get socket option : %s (%d)",
++							strerror(errno), errno);
++		tester_test_failed();
++		goto end;
++	}
++
+ 	tester_test_passed();
+ 
+ end:
+@@ -1678,12 +1708,24 @@ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
+ 	struct test_data *data = user_data;
+ 	const struct iso_client_data *isodata = data->test_data;
+ 	int sk = g_io_channel_unix_get_fd(io);
++	unsigned char control[64];
+ 	ssize_t ret;
+ 	char buf[1024];
++	struct msghdr msg;
++	struct iovec iov;
+ 
+ 	data->io_id[0] = 0;
+ 
+-	ret = read(sk, buf, isodata->recv->iov_len);
++	iov.iov_base = buf;
++	iov.iov_len = isodata->recv->iov_len;
++
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++	msg.msg_control = control;
++	msg.msg_controllen = sizeof(control);
++
++	ret = recvmsg(sk, &msg, MSG_DONTWAIT);
+ 	if (ret < 0 || isodata->recv->iov_len != (size_t) ret) {
+ 		tester_warn("Failed to read %zu bytes: %s (%d)",
+ 				isodata->recv->iov_len, strerror(errno), errno);
+@@ -1691,6 +1733,35 @@ static gboolean iso_recv_data(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 	}
+ 
++	if (isodata->pkt_status) {
++		struct cmsghdr *cmsg;
++		uint8_t pkt_status = 0;
++
++		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
++					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++			if (cmsg->cmsg_level != SOL_BLUETOOTH)
++				continue;
++
++			if (cmsg->cmsg_type == BT_SCM_PKT_STATUS) {
++				memcpy(&pkt_status, CMSG_DATA(cmsg),
++						sizeof(pkt_status));
++				tester_debug("BT_SCM_PKT_STATUS = 0x%2.2x",
++							pkt_status);
++				break;
++			}
++		}
++
++		if (isodata->pkt_status != pkt_status) {
++			tester_warn("isodata->pkt_status 0x%2.2x != 0x%2.2x "
++					"pkt_status", isodata->pkt_status,
++					pkt_status);
++			tester_test_failed();
++		} else
++			tester_test_passed();
++
++		return FALSE;
++	}
++
+ 	if (memcmp(buf, isodata->recv->iov_base, ret))
+ 		tester_test_failed();
+ 	else
+@@ -2250,6 +2321,18 @@ static gboolean iso_accept_cb(GIOChannel *io, GIOCondition cond,
+ 		return false;
+ 	}
+ 
++	if (isodata->pkt_status) {
++		int opt = 1;
++
++		if (setsockopt(new_sk, SOL_BLUETOOTH, BT_PKT_STATUS, &opt,
++							sizeof(opt)) < 0) {
++			tester_print("Can't set socket BT_PKT_STATUS option: "
++					"%s (%d)", strerror(errno), errno);
++			tester_test_failed();
++			return false;
++		}
++	}
++
+ 	return iso_connect(io, cond, user_data);
  }
+ 
+@@ -2448,6 +2531,10 @@ int main(int argc, char *argv[])
+ 							setup_powered,
+ 							test_listen);
+ 
++	test_iso("ISO Receive Packet Status - Success",
++						&listen_16_2_1_recv_pkt_status,
++						setup_powered, test_listen);
++
+ 	test_iso("ISO Defer - Success", &defer_16_2_1, setup_powered,
+ 							test_defer);
+ 
 -- 
 2.40.1
 
