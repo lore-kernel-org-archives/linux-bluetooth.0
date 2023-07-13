@@ -2,45 +2,45 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D01EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 05:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EECEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 05:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233454AbjGMFpc (ORCPT
+        id S233971AbjGMF6W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jul 2023 01:45:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33368 "EHLO
+        Thu, 13 Jul 2023 01:58:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232348AbjGMFpa (ORCPT
+        with ESMTP id S233799AbjGMF6V (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jul 2023 01:45:30 -0400
+        Thu, 13 Jul 2023 01:58:21 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A216E65
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 22:45:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C8E1FDE
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jul 2023 22:58:20 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CD0A3619DD
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 05:45:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 42B60C433C9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 05:45:29 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5401761A22
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 05:58:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B9B95C433CA
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 05:58:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689227129;
-        bh=D2MrYUYzwLlFDLeG8y1gqmiNuYbN7hORq8F+puOFEcg=;
+        s=k20201202; t=1689227899;
+        bh=jDc2UqbQdPMBkaSGMw8akWUthCACWhxmYRux6vnsNtM=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=J72fdYZqIoYnY8qlp5CRfSkYFxSLARyocNIQclZtbhimUyHhUB/UUOeggmIxFycL3
-         aV52TSrpsIuc8FSAhlH6DOOz5O5JfK32RDUxbbhhx5oFoszCo7xBBUWtnaNZVZeGkE
-         VCTRyhw4tqNkzUaqGFmOuWsiYxRbp40Em0NNS8lzUqbSBwAPCanSTFTLUjp2gAuTb4
-         mZrMOxDqLwqMup/ptnXxhaBLAClFLZY857ettTHLYfaiESVU8f+IYm80BXlAwIm0zF
-         fxC3+12DCEcqDn+DuBDC9nsNm5VB4zbrLu7LES9o1ENJVwXEf3ko/zlSEj73GINhoJ
-         R6BAqjrdsy6Ew==
+        b=hSXo8j6gSqQeU8X/ouczqOt1vl4Rq+Gu9dD9qN0Und4xZ6VtNrqdoneOMbsr7haXh
+         R/4ZeJD2KeOJPUgd1ZW0hMygXrK8vcOIaui1OBYbowL0N6vEQdokpYfXIc1YwZ6+41
+         FYtRaR3/salqfY21+uSPC/jI/5PAmccGXHC+drLGKOKfdOeyWVtszJw5/COHvfqdOu
+         xPrIGAEjHTVF4N7/z8msvTHlqRdbJOo6Kv1B9gpAzPottIHeqbudmojZn7MfPT9Ct7
+         4FYLU5GiyptNGjCn8MIJ/iSccD99KdFaacsBPKIpjZ3tj6HCN+izYm9iPsJ/fa9Wng
+         9JSpjPz0MwIzw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 3380DC53BD2; Thu, 13 Jul 2023 05:45:29 +0000 (UTC)
+        id A637DC53BD0; Thu, 13 Jul 2023 05:58:19 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 217651] BCM20702B0  Bluetooth device in MacBook no longer
  working
-Date:   Thu, 13 Jul 2023 05:45:28 +0000
+Date:   Thu, 13 Jul 2023 05:58:19 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -56,7 +56,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217651-62941-RkBcMY1icy@https.bugzilla.kernel.org/>
+Message-ID: <bug-217651-62941-MQgb6EFOlf@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-217651-62941@https.bugzilla.kernel.org/>
 References: <bug-217651-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -70,32 +70,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D217651
 
---- Comment #17 from Tomasz Mo=C5=84 (desowin@gmail.com) ---
-I think I understand the issue now, but the lsusb output would confirm it.
-Before my patch, the driver would allow both interface 0 and 2, after it on=
-ly
-interface 2 is allowed for devices with BTUSB_IFNUM_2 flag set.
+--- Comment #18 from Tomasz Mo=C5=84 (desowin@gmail.com) ---
+The previous proposal is bogus as I messed up the conditions again. It would
+reject anything with BTUSB_IFNUM_2 when the interface is either 0 or 2. Wha=
+t we
+want is to allow either 0 or 2 when BTUSB_IFNUM_2 is set.
 
-I see two potential solutions:
-  1. Remove the check completely
-  2. Change the if condition to allow both interface 0 and 2.
-
-For the second solution, please try following patch:
+The correct patch to try would be:
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5ec4ad0a5c86..46844194f54e 100644
+index 5ec4ad0a5c86..764d176e9735 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -4104,7 +4104,8 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -4104,6 +4104,7 @@ static int btusb_probe(struct usb_interface *intf,
         BT_DBG("intf %p id %p", intf, id);
 
         if ((id->driver_info & BTUSB_IFNUM_2) &&
--           (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
-+           ((intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) ||
-+            (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
++           (intf->cur_altsetting->desc.bInterfaceNumber !=3D 0) &&
+            (intf->cur_altsetting->desc.bInterfaceNumber !=3D 2))
                 return -ENODEV;
-
-        ifnum_base =3D intf->cur_altsetting->desc.bInterfaceNumber;
 
 --=20
 You may reply to this email to add a comment.
