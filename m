@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A23C3C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 22:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69F1C001DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jul 2023 22:43:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232141AbjGMWm5 (ORCPT
+        id S232532AbjGMWnG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jul 2023 18:42:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37954 "EHLO
+        Thu, 13 Jul 2023 18:43:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231465AbjGMWm4 (ORCPT
+        with ESMTP id S233624AbjGMWnF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jul 2023 18:42:56 -0400
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCAA2D47
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:42:55 -0700 (PDT)
-Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3a1c162cdfeso1041127b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:42:55 -0700 (PDT)
+        Thu, 13 Jul 2023 18:43:05 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5902721
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:43:04 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-3a04e5baffcso1065675b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jul 2023 15:43:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689288173; x=1691880173;
+        d=gmail.com; s=20221208; t=1689288182; x=1691880182;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
         bh=AE3bURiprag7eyXYZWuuYwmt+jom0SmOz+1qpDxWg6c=;
-        b=igSd+YZj5s2RB8nB4c8NW/fmGK+WpxWphR0tfcjiUC3D+52Vjaq3Kwk4ZKY/Se+Ne1
-         7eOZrFO1hNFOZmSDXIBoMN0fNq+y0Rb3EauLruwv/x8tXY1ak56esF0U5fuVMjxw/qM9
-         LsJw2N0ZFvH46DP1nefwp+FSY0Ral8hAWG9PEBSlOCjHY1ltrXsXbhxQZadcvwWPCDYa
-         O5N79bz2ZfdrheBhYiIGSaK1qW7y3d4o9OX4mcfSapvp6z5aDk+crUzGT0E8VLoZ37Wb
-         2KDeXLsyvLS1bzDSdpuugl64ZFD+fXjAwMHz9m+p37JY92G1E/b3ndRtOBBGQzS1yyoO
-         2NIw==
+        b=Umb79jRKHTVh8OMhIfF4FPjioJqrsAfJhf2qAjydtmCZroAbkDKZ8r8qSiPrZjooXj
+         lBbdZXCErRlPGKBoGILlS+P8HQGjiDiwjGIUMidVxGiF5xpwBSIQ8WiyWXwC0MJgEE/Y
+         P/baBXzupFRvDgbDM42IDiCXFsUfeOUDk+AG191x7FZc0uv3kP83KJbXEy+TDCP6L0Is
+         MVZOJUV0HQNZmT0sn9WfLHd4UsL6N+RLZUS+frrX+XY8tj9CodAqPPUPHMQ86eBG3J7G
+         3ciyh3TB6flIFPnZAM1p4pmfYSKubpYvGdHP+G2bIjOTRf7azN8YI2FzS+Bp5m/8gPm6
+         8e1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689288173; x=1691880173;
+        d=1e100.net; s=20221208; t=1689288182; x=1691880182;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
         bh=AE3bURiprag7eyXYZWuuYwmt+jom0SmOz+1qpDxWg6c=;
-        b=DhQpW9KpWgOzl11CxmVVD+/oyxNH8Sl9BjKNOhBS0WUsPHH9gu9D5EQhWCmmqDTpEB
-         FfiVsND4TGbNeRNEU5iM7FrVdLKQhpNp0WXAF3WsgmzZcjU0ORZIJ/FQ7DaDeZVqEJqK
-         /+9jRn0OBiwFZCu2qLW9r2H9HbgMpNNCjFQU2hzx3k/eu/GvHshTPjR5mMKC9hx/7NLv
-         TDpdgPU5avxD9prLH7Px39bCmhZqIZHXHoWHcZAsp/jU9cSge77ZoSyRfnQtXVdXVh1P
-         x0ZoaL3EYOMOXbbs+6Ig7XFW2d42+JHyKsP/Jfqz0SCDjFu7BAwwOpQ95SsUwGZGGmwg
-         bjAw==
-X-Gm-Message-State: ABy/qLYhOkKoOuaSSRVxHJ64C5pO3J28Y7YpL+oP8ocMTJDFt9Q7cyT7
-        LaxE186jhIM/wTXMUFhUJCYZXp8CuXc=
-X-Google-Smtp-Source: APBJJlGJI1z2Pmhrdd3Vvjj1VuA2XZBlLJAa3IuyV3prbKNqo5g1EovgNMJQOyAeYacDuR1hd9b4cw==
-X-Received: by 2002:a05:6808:1186:b0:3a4:1441:531d with SMTP id j6-20020a056808118600b003a41441531dmr3359805oil.48.1689288173213;
-        Thu, 13 Jul 2023 15:42:53 -0700 (PDT)
+        b=gFvGIgxrki17WHcwnnomZ6YILWMIYGumhnF2rNRWKTFPOp5F077h75Ye0ay8RiHIs6
+         p9iBPDLQchVBtqlP84Z5RkhMBkTA6h6zva4N2N936emDR90te2L5YosLF1X8a+jN33Zs
+         O7ArXhHlv1wchNFZNOwhFwdtJ3nYYi+dviMOYuRzrcG+0xwMC2j5hwYCtHxSGbtZtczM
+         Zj60pr16mvSZDTPR0pCZ39N1LNMYr6ST2gSiZsnQ/DWSEcRzPzXlBVby/UVcR2RKW/6T
+         ln4QrC1R3AmneMCf/H06zNJbkRW+ySPYMlV9IMltTQYSN6ODMnNIi3Ocg2Mbg6WAJ03v
+         Ph7Q==
+X-Gm-Message-State: ABy/qLZN0t/XiDUzu3nErN8PC6CVe7/2J4D3QYE4xHTg4m5H8NEH8HiQ
+        YgK2TAC940rhp8icLVtZ+n88/Kp0gb0=
+X-Google-Smtp-Source: APBJJlHFI0o5sB95W8pnFZZT72/T4ZHht6Q+BBYfqN02CLZBZuzCreY9ax8KAVzwOk9sIPD/qq7kWQ==
+X-Received: by 2002:a05:6358:9886:b0:132:d42f:8e19 with SMTP id q6-20020a056358988600b00132d42f8e19mr4139406rwa.31.1689288182270;
+        Thu, 13 Jul 2023 15:43:02 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id p2-20020aa78602000000b006687b4f2044sm5910182pfn.164.2023.07.13.15.42.51
+        by smtp.gmail.com with ESMTPSA id t12-20020a63b24c000000b0055bf13811f5sm2568433pgo.15.2023.07.13.15.43.00
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jul 2023 15:42:51 -0700 (PDT)
+        Thu, 13 Jul 2023 15:43:01 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ 1/2] bthost: Add support to set ISO Packet Status
-Date:   Thu, 13 Jul 2023 15:42:44 -0700
-Message-Id: <20230713224250.2286663-1-luiz.dentz@gmail.com>
+Date:   Thu, 13 Jul 2023 15:42:59 -0700
+Message-Id: <20230713224300.2286788-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
