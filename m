@@ -2,125 +2,135 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B619C001DC
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 18:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43462C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 18:44:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236192AbjGNSoo (ORCPT
+        id S236470AbjGNSop (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jul 2023 14:44:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51620 "EHLO
+        Fri, 14 Jul 2023 14:44:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236107AbjGNSom (ORCPT
+        with ESMTP id S236238AbjGNSoo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jul 2023 14:44:42 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B579E2D6B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 11:44:41 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4036d80caaeso14669941cf.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 11:44:41 -0700 (PDT)
+        Fri, 14 Jul 2023 14:44:44 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6CBA2D73;
+        Fri, 14 Jul 2023 11:44:42 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b703c900e3so34370531fa.1;
+        Fri, 14 Jul 2023 11:44:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20221208; t=1689360281; x=1691952281;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tqu2bxetn8WYs+UeNRGyJM2QO6Bg4lTE289m7SYadAY=;
-        b=o5W48DEUgVtjriLbOT9wzDaMHKWcdUcHfPNpVQdL4tTCltrqMuFigy+rO3QWmRd1Yw
-         Cm4nOweV254JIkJhCaaYyW7pHgTtCyMfRPu2ZaJojHb6XyImYu3YyUZeAhNXdbLU1C45
-         MpAUQ3b8ujuyb/x3Dh5anC1Hqj1XTJU1kM2IqONOKDGBNP8CBHhoW9Hq9fvjIhIuW6v5
-         sNLEILZBo9pwtXgtI6ULBN7Ly9McSM+lYMAkcBGCpAnayiY08xWSnxlU9qeDU5fjOBV4
-         Py6DcNScGMrZshsoOVUSxYqYM5j0i+aBQszRvsQRJGTDEtPrqx97GuwdtCZ6JlERkCbs
-         HoXQ==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WiTiOlt1XJQdn9IJyzeR6Oi5H77aLqIo6gLSmte40zI=;
+        b=p9AAAy3rgXf65E73pctjyNfEgeN4qk6ux4LaxWDYTVUvmSODWPIFotDGeL3oG128jQ
+         OeV3xi63nQF5pj+karbgcpObwLP2pws8c6xHXI+8xvQcg+ArUMxjzZA4Letr2Rdyv2BR
+         +leYH0cFIrYys62GIKQ1gcoGawmTrxmhO6Gy3JjzDzzTVG+6FX46snBBD81IiVhRPMw7
+         kfscja15OANNaq797N3w6iAPk7G+uthHM157uBP87vK8XUYjbfbO4AbVr5J9hDwmkYws
+         /8L72/5alvUgmD+lGlwyZnt8sl3rjR9m+Mx+4NY1PUmvj4yTYawIHncNxRGCCXNK8fTk
+         FDsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1689360281; x=1691952281;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tqu2bxetn8WYs+UeNRGyJM2QO6Bg4lTE289m7SYadAY=;
-        b=HNXPIvBMCqHVKFI3Fd30LJ8k5Df/w8JPKtiuzgRu5rlmsY8k7pbP2douUPtg29RsDy
-         H0+3+SI9YsNFZTKztt4PkE4IagkEr2uLt3EsWBY1L4cZugjok3ZrfkDzzKgXcFcS7V9i
-         HNXlhDmc8sNR0yjaKnyE/VF5WP5cqHMacBQ4ssHMSXFd02QFGOTcbaAdq/ZS0ienZhQJ
-         a8X84T+BFDfYmVBGN93Jh9yahNqpQxdqe1L0paZWf6qYcn//8PzpINjxHSxkQ7bWlRpa
-         hn6ucVLQD/22Yga8Uf2AHyE9QLbesB2C0j8Hx4ZU72d+MEtCFayZoyxJBiBZ1TMJN8OQ
-         iclg==
-X-Gm-Message-State: ABy/qLbZgoilK/ZhWfjKpmy8njTCPXOcWg8wQu2zKHHTvIwMo5ugvJ1y
-        zgaXeNNTNwWN4sBWLbECAAbqbzE2O7k=
-X-Google-Smtp-Source: APBJJlE9RqswRB9wGZP2/NcwI8MWIU2e/QgMvxbd+5Y7FRL7TfSkUW5utZoXWLlGBqHs1/e3as4wtg==
-X-Received: by 2002:ac8:5c06:0:b0:403:b8b6:49f8 with SMTP id i6-20020ac85c06000000b00403b8b649f8mr4936409qti.47.1689360280711;
-        Fri, 14 Jul 2023 11:44:40 -0700 (PDT)
-Received: from [172.17.0.2] ([40.75.74.34])
-        by smtp.gmail.com with ESMTPSA id g13-20020ac8774d000000b0040353ea0827sm4150959qtu.56.2023.07.14.11.44.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 11:44:40 -0700 (PDT)
-Message-ID: <64b19798.c80a0220.baa04.108a@mx.google.com>
-Date:   Fri, 14 Jul 2023 11:44:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0529582255077459016=="
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WiTiOlt1XJQdn9IJyzeR6Oi5H77aLqIo6gLSmte40zI=;
+        b=X05VmJ1rnvRdeQ1w1jMHTjunTvU2lmyPl+fvmZTLaQZegmv9oxS31Kp7uu+qFoSv0S
+         dlRKfEP9T71tQViJuGUoHYINx35/HSeV/fSia7g2YfPnfbMfK9+UZR0KkryyQsEirX9b
+         /2RoyxoO4r6caieGNy9QdCS8KED1ELEogMLty30gfKrHqguhegfeeILVvxFiNLyyV2k7
+         wsIYFpQvWF/ndaZ0CXza0JyOU3KjmFBZOPYvxAxsGGtXT6pJKohDyokSEk6qWwWCrmNE
+         3/Y62kMUEouOS8U6nTBPt1MYxI7v5sGHXMICh1NmLrajuc41VTWcYCGb/93u1QeKiE/x
+         a/rA==
+X-Gm-Message-State: ABy/qLZzzldR0lx3jjyywLQRvZzXCSgu8st3U5iOHwQhzH8eTgMMr5f2
+        YYNa7ICpG3w09wz0yjHYB0qayJb9iquaCWxSJdVBN0Jp
+X-Google-Smtp-Source: APBJJlGm/SFvX7efyWMjRgZsQu1iLJu0IQhWMc7tF1WRs2avL8T1CSpVqxAtVKE6x3OdW3Uoq/5YS90f27oxEWOoutE=
+X-Received: by 2002:a05:651c:120c:b0:2b7:344c:a039 with SMTP id
+ i12-20020a05651c120c00b002b7344ca039mr4202216lja.33.1689360280585; Fri, 14
+ Jul 2023 11:44:40 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, robh@kernel.org
-Subject: RE: bluetooth: Explicitly include correct DT includes
-In-Reply-To: <20230714174057.4041063-1-robh@kernel.org>
-References: <20230714174057.4041063-1-robh@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230714161210.20969-1-jlee@suse.com>
+In-Reply-To: <20230714161210.20969-1-jlee@suse.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 14 Jul 2023 11:44:28 -0700
+Message-ID: <CABBYNZJ46Lt-Y4OjT7AqXczaGyGoRTzEA0gpG4Z+91GugHwsNw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Ignore NULL link key
+To:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0529582255077459016==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Chun-Yi,
 
-This is automated email and please do not reply to this email!
+On Fri, Jul 14, 2023 at 9:14=E2=80=AFAM Lee, Chun-Yi <joeyli.kernel@gmail.c=
+om> wrote:
+>
+> This change is used to relieve CVE-2020-26555. The description of the
+> CVE:
+>
+> Bluetooth legacy BR/EDR PIN code pairing in Bluetooth Core Specification
+> 1.0B through 5.2 may permit an unauthenticated nearby device to spoof
+> the BD_ADDR of the peer device to complete pairing without knowledge
+> of the PIN. [1]
+>
+> The detail of this attack is in IEEE paper:
+> BlueMirror: Reflections on Bluetooth Pairing and Provisioning Protocols
+> [2]
+>
+> It's a reflection attack. Base on the paper, attacker can induce the
+> attacked target to generate null link key (zero key) without PIN code.
+>
+> We can ignore null link key in the handler of "Link Key Notification
+> event" to relieve the attack. A similar implementation also shows in
+> btstack project. [3]
+>
+> Closes: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3DCVE-2020-26555 [=
+1]
+> Closes: https://ieeexplore.ieee.org/abstract/document/9474325/authors#aut=
+hors [2]
+> Closes: https://github.com/bluekitchen/btstack/blob/master/src/hci.c#L372=
+2 [3]
 
-Dear submitter,
+Shouldn't the last 2 be using Link: instead?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=765817
+> Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> ---
+>  net/bluetooth/hci_event.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 95816a938cea..e81b8d6c13ba 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4684,6 +4684,12 @@ static void hci_link_key_notify_evt(struct hci_dev=
+ *hdev, void *data,
+>         bool persistent;
+>         u8 pin_len =3D 0;
+>
+> +       /* Ignore NULL link key against CVE-2020-26555 */
+> +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
+> +               BT_DBG("Ignore NULL link key (ZERO KEY) for %pMR", &ev->b=
+daddr);
 
----Test result---
+Please use bt_dev_dbg instead.
 
-Test Summary:
-CheckPatch                    PASS      1.15 seconds
-GitLint                       PASS      0.36 seconds
-SubjectPrefix                 FAIL      0.36 seconds
-BuildKernel                   PASS      42.45 seconds
-CheckAllWarning               PASS      45.71 seconds
-CheckSparse                   PASS      51.96 seconds
-CheckSmatch                   PASS      138.88 seconds
-BuildKernel32                 PASS      40.47 seconds
-TestRunnerSetup               PASS      618.07 seconds
-TestRunner_l2cap-tester       PASS      29.54 seconds
-TestRunner_iso-tester         PASS      61.30 seconds
-TestRunner_bnep-tester        PASS      13.65 seconds
-TestRunner_mgmt-tester        FAIL      264.78 seconds
-TestRunner_rfcomm-tester      PASS      21.98 seconds
-TestRunner_sco-tester         PASS      22.34 seconds
-TestRunner_ioctl-tester       PASS      24.60 seconds
-TestRunner_mesh-tester        PASS      17.53 seconds
-TestRunner_smp-tester         PASS      20.10 seconds
-TestRunner_userchan-tester    PASS      15.69 seconds
-IncrementalBuild              PASS      40.44 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 497, Passed: 495 (99.6%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-LL Privacy - Unpair 1                                Timed out    1.995 seconds
-LL Privacy - Unpair 2 (Remove from AL)               Timed out    4.985 seconds
+> +               return;
+> +       }
+> +
+>         bt_dev_dbg(hdev, "");
+>
+>         hci_dev_lock(hdev);
+> --
+> 2.35.3
+>
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0529582255077459016==--
+--=20
+Luiz Augusto von Dentz
