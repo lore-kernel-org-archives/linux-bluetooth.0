@@ -2,90 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40BAC001B0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 15:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E34EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 16:11:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235911AbjGNPHl (ORCPT
+        id S236010AbjGNQLC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jul 2023 11:07:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40394 "EHLO
+        Fri, 14 Jul 2023 12:11:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234425AbjGNPHj (ORCPT
+        with ESMTP id S236016AbjGNQLB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jul 2023 11:07:39 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B8F32702
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 08:07:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DE30461D70
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 15:07:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 501CCC433C7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 15:07:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689347258;
-        bh=HGd9ocdbxyEalzYLlpCGQFfKl+8zkN/f6YEvmn1LGCc=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=P7fToaxXyPPPV1Ovm+80cu9k37hvKHN842tNtdnINdbWxTpm2o7nxqW4paNqm7a3u
-         M5v1L1ObQQyAcydQd3/KvVG9MI0RvAe5G11ohR5SX5h8b7rOQTWlyfZ8lBqhwD2IcO
-         B2YGaSzblhZmmRBKUQtTQo8Ziz7KJHf3yVz1MNJnJkVgoHLLalRTNS8kXnq54Rqm9L
-         D63jglQaUTrmrOQ8emr452Y8hifrmcbGmsS6qu2k7HttrjoDra3Yelbkltmc7/wI3W
-         wFGT2BAYAEXM5+yCNzEKt8bxnIVYK8pe5xzouqeDkO9wR65rS+TLClB3ftk5ftnK3t
-         Ab/EwwkR2v59A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 429EEC53BD3; Fri, 14 Jul 2023 15:07:38 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Fri, 14 Jul 2023 15:07:35 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: marwane.elbaraka@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-ZG9SPXrZpg@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Fri, 14 Jul 2023 12:11:01 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D329B35A2;
+        Fri, 14 Jul 2023 09:10:58 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-668709767b1so1556729b3a.2;
+        Fri, 14 Jul 2023 09:10:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689351058; x=1691943058;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cJT4JvcoBJI1s+TLldc7ex2Zu19/5zU0zWJ4jSuF7fQ=;
+        b=CtXXldw+iZHVpX6qIr9p4KT37Kx7qBmRnpnq+S3lRaLk5dlTZ9RHGMt9UfPqB1dfEy
+         e7Pn1VYiykKBznEhBrSEDwFC466zDTJgOeYNcLthON3YP7It/50qqhCczUfwZzWGquq0
+         bYCkmdo1NsVyX/q/7a2PxHxJx73MhScc19QsQpSlK7+dbfsffeA1yJ+3B7fD0Tae0m12
+         V6haBs8KDTlG35Hy2gYqyjurxzyfukTCi9FY8tht9CzBbmTfydy0RBC2CpkYusld/06m
+         OxGR+GH4YeG1xEc+6HdjU2QgsODBNnkMT94yrqtpjDUoRneboKqhAfbSdV8p0cHBHS8k
+         qE/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689351058; x=1691943058;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cJT4JvcoBJI1s+TLldc7ex2Zu19/5zU0zWJ4jSuF7fQ=;
+        b=Ty4PZKUKF/DE+EVcVy2ZYy8fGcsamiY/qlaUKg7n3DDn9K9nWAl6xdMGkKw9uOCzWC
+         SoI83E4FBsyZRKbPIxwmile88Y9d8Ex6iWrL/GG82+DiMSs8zPx6iGr19tqacuTOiiph
+         Tw0SipwNSLpF1QmA1UhmvhMM88X0nY8JS5dG+mrkVRN+9CsJA9F4A2/sPNqU+G/eLdep
+         3c6jnADQl+788HNKPg3+BBTXxxJQUTtl/L+BISHTDG3g3H2yPLeWJ28HHEw0rNl0s8lK
+         oVs14n1NiFc6XJ9C1bZrl7+QfyydWwjisUlkV4okWSlBE8kAfLSeFaNM1bhDMQodoXIK
+         iWnA==
+X-Gm-Message-State: ABy/qLZhTQw+Tk3w8pP8FsdBv99Y1mWDtFt6AzvVJbMYhnLq2R1c8SA3
+        p4+2EgRkmDlBjr3sAlU0LbE29KV8xG4=
+X-Google-Smtp-Source: APBJJlFZoztqjGGEvX5dj7b03i4Z8unODw3IQSxPkgJjXaAt3iwb1U1omDrUXzc3dlyNX+gL8T9Cvw==
+X-Received: by 2002:a05:6a00:2386:b0:682:b6c8:2eb with SMTP id f6-20020a056a00238600b00682b6c802ebmr4754758pfc.1.1689351058162;
+        Fri, 14 Jul 2023 09:10:58 -0700 (PDT)
+Received: from linux-l9pv.suse ([124.11.22.254])
+        by smtp.gmail.com with ESMTPSA id b30-20020a63931e000000b0055bbc746272sm7544607pge.17.2023.07.14.09.10.56
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Jul 2023 09:10:57 -0700 (PDT)
+From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        "Lee, Chun-Yi" <jlee@suse.com>
+Subject: [PATCH] Bluetooth: hci_ldisc: check HCI_UART_PROTO_READY flag in HCIUARTGETPROTO
+Date:   Sat, 15 Jul 2023 00:08:54 +0800
+Message-Id: <20230714160854.20562-1-jlee@suse.com>
+X-Mailer: git-send-email 2.12.3
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+This patch adds code to check HCI_UART_PROTO_READY flag before
+accessing hci_uart->proto. It fixs the race condition in
+hci_uart_tty_ioctl() between HCIUARTSETPROTO and HCIUARTGETPROTO.
+This issue bug found by Yu Hao and Weiteng Chen:
 
---- Comment #273 from MarTCM (marwane.elbaraka@gmail.com) ---
-(In reply to MarTCM from comment #272)
-> (In reply to Marcos Ferreira from comment #271)
-> > The device support will be dropped down?
-> > There is a possibility to keep this device working since the changes ab=
-ove
-> > can make to the device work, even with some logs in dmesg...
->=20
-> That patch doesn't seem to work anymore *sigh*
+BUG: general protection fault in hci_uart_tty_ioctl [1]
 
-nvm the file was changed and so did the number of the line that needed chan=
-ging
-I ended up doing it manually and I'm now waiting for the kernel to compile.
+The information of C reproducer can also reference the link [2]
 
---=20
-You may reply to this email to add a comment.
+Reported-by: Yu Hao <yhao016@ucr.edu>
+Closes: https://lore.kernel.org/all/CA+UBctC3p49aTgzbVgkSZ2+TQcqq4fPDO7yZitFT5uBPDeCO2g@mail.gmail.com/ [1]
+Reported-by: Weiteng Chen <wchen130@ucr.edu>
+Closes: https://lore.kernel.org/lkml/CA+UBctDPEvHdkHMwD340=n02rh+jNRJNNQ5LBZNA+Wm4Keh2ow@mail.gmail.com/T/ [2]
+Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+---
+ drivers/bluetooth/hci_ldisc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index efdda2c3fce8..a76eb98c0047 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -770,7 +770,8 @@ static int hci_uart_tty_ioctl(struct tty_struct *tty, unsigned int cmd,
+ 		break;
+ 
+ 	case HCIUARTGETPROTO:
+-		if (test_bit(HCI_UART_PROTO_SET, &hu->flags))
++		if (test_bit(HCI_UART_PROTO_SET, &hu->flags) &&
++		    test_bit(HCI_UART_PROTO_READY, &hu->flags))
+ 			err = hu->proto->id;
+ 		else
+ 			err = -EUNATCH;
+-- 
+2.35.3
+
