@@ -2,176 +2,90 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D29C00528
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 09:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A00EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 14:58:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235515AbjGNJIM (ORCPT
+        id S236265AbjGNO6R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jul 2023 05:08:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41888 "EHLO
+        Fri, 14 Jul 2023 10:58:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235846AbjGNJIF (ORCPT
+        with ESMTP id S235487AbjGNO6Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jul 2023 05:08:05 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B63E30E7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 02:07:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689325679; x=1720861679;
-  h=date:from:to:cc:subject:message-id;
-  bh=KfP4DtdAwBbdswSBrPXBQMGHK6jgG97cqRbZkqFxiTk=;
-  b=hmzMVV76B8wFeC4j52quHuBC4vmE5SDDkfu/0E9F/mhoPsGlTDt7nRq9
-   5KpqhAY67Qiej2rlwxuGEdb5tvUaMFmGmeDQLhjwd5SVsCZp4005tKKIR
-   9KzXfW4sGnHOOyV56m366Yv0Yi/h1RfYl2dNCPfv9KcyEH8wsk79Tj5zf
-   T1JFjOdh1Nr8aM/wwfiflb8n2yof9SCJiM4gxAGPSFGZUBMNfL8QL3Zr7
-   zZJbL3GzeF4rDgAgluHVTILCCUqis/CF56uQHuLklScrUBAkVbe1bs5Ag
-   WbggALP89kmEvzp6Eqbf32bi9slWgGoYjydqHYlVXlMqEovQWIKqEMUyo
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="364303285"
-X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="364303285"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jul 2023 02:06:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10770"; a="672626164"
-X-IronPort-AV: E=Sophos;i="6.01,204,1684825200"; 
-   d="scan'208";a="672626164"
-Received: from lkp-server01.sh.intel.com (HELO c544d7fc5005) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 14 Jul 2023 02:06:29 -0700
-Received: from kbuild by c544d7fc5005 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qKEku-0007Kp-0Z;
-        Fri, 14 Jul 2023 09:06:28 +0000
-Date:   Fri, 14 Jul 2023 17:05:46 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 2ba6216b8b375666776fcba4eea11e134fed0ea6
-Message-ID: <202307141744.p3gNXDvi-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Fri, 14 Jul 2023 10:58:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D40E81991
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 07:58:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 68D7661D5C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 14:58:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CC035C433CD
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 14:58:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1689346694;
+        bh=WCLwADHtg87tMlLp4uYH0NFu4nD/WNN13PrNM7hmlV4=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=sJeeag2lK5QsHxCoS0/9dJvx76MPfya8/lKGziJbnHazWmZkqUAj2gpIV3njTKQUt
+         6uGwkf6ghZUl0fEsTS1c92pO0VgYU5EedfNM1gwfHIM5u5L3w60+ez/pSfrZIvBPXi
+         LdmMKewy9QBtO29J9ZhINAa9ZP6+NHdMR66cjlWQ/In+oCLC5yK/aBnrW6Js/lTZdI
+         11XYrv0F2+9QEgSLTEEkJXzb/P6SbrZC6rCqRLg77dNSAeACYS+TZNGhJt8gCP10G/
+         +4eMsYOHWql5roNEuAOrvS64QO03VOtAQ3trrDE3CjWett7M9TVUBkvjqJ5lZFUIAa
+         9PKzwUnLeioAA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id BF3DDC4332E; Fri, 14 Jul 2023 14:58:14 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Fri, 14 Jul 2023 14:58:11 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: marwane.elbaraka@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-344NKWUP9m@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 2ba6216b8b375666776fcba4eea11e134fed0ea6  Bluetooth: btmtk: Fix kernel crash when processing coredump
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-elapsed time: 725m
+MarTCM (marwane.elbaraka@gmail.com) changed:
 
-configs tested: 104
-configs skipped: 6
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |marwane.elbaraka@gmail.com
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #272 from MarTCM (marwane.elbaraka@gmail.com) ---
+(In reply to Marcos Ferreira from comment #271)
+> The device support will be dropped down?
+> There is a possibility to keep this device working since the changes above
+> can make to the device work, even with some logs in dmesg...
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r034-20230713   gcc  
-arc                  randconfig-r043-20230713   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                         axm55xx_defconfig   gcc  
-arm                                 defconfig   gcc  
-arm                           h3600_defconfig   gcc  
-arm                  randconfig-r015-20230713   clang
-arm                  randconfig-r046-20230713   clang
-arm                       versatile_defconfig   clang
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r013-20230713   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r025-20230713   gcc  
-hexagon              randconfig-r041-20230713   clang
-hexagon              randconfig-r045-20230713   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230713   clang
-i386         buildonly-randconfig-r005-20230713   clang
-i386         buildonly-randconfig-r006-20230713   clang
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230713   clang
-i386                 randconfig-i002-20230713   clang
-i386                 randconfig-i003-20230713   clang
-i386                 randconfig-i004-20230713   clang
-i386                 randconfig-i005-20230713   clang
-i386                 randconfig-i006-20230713   clang
-i386                 randconfig-i011-20230713   gcc  
-i386                 randconfig-i012-20230713   gcc  
-i386                 randconfig-i013-20230713   gcc  
-i386                 randconfig-i014-20230713   gcc  
-i386                 randconfig-i015-20230713   gcc  
-i386                 randconfig-i016-20230713   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r001-20230713   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze           randconfig-r021-20230713   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                 randconfig-r012-20230713   clang
-nios2                               defconfig   gcc  
-openrisc             randconfig-r032-20230713   gcc  
-openrisc             randconfig-r035-20230713   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc              randconfig-r022-20230713   gcc  
-powerpc              randconfig-r026-20230713   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r002-20230713   clang
-riscv                randconfig-r003-20230713   clang
-riscv                randconfig-r011-20230713   gcc  
-riscv                randconfig-r036-20230713   clang
-riscv                randconfig-r042-20230713   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r044-20230713   gcc  
-sh                               allmodconfig   gcc  
-sh                   randconfig-r023-20230713   gcc  
-sh                   randconfig-r031-20230713   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                       sparc64_defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230713   clang
-x86_64       buildonly-randconfig-r002-20230713   clang
-x86_64       buildonly-randconfig-r003-20230713   clang
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-r024-20230713   gcc  
-x86_64               randconfig-x011-20230713   clang
-x86_64               randconfig-x012-20230713   clang
-x86_64               randconfig-x013-20230713   clang
-x86_64               randconfig-x014-20230713   clang
-x86_64               randconfig-x015-20230713   clang
-x86_64               randconfig-x016-20230713   clang
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                generic_kc705_defconfig   gcc  
-xtensa               randconfig-r005-20230713   gcc  
-xtensa               randconfig-r014-20230713   gcc  
+That patch doesn't seem to work anymore *sigh*
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
