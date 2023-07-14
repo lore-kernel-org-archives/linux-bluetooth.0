@@ -2,149 +2,120 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C66AC001B0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 17:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8F4EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jul 2023 17:41:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235470AbjGNRHV (ORCPT
+        id S236253AbjGNRle (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jul 2023 13:07:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38672 "EHLO
+        Fri, 14 Jul 2023 13:41:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235395AbjGNRHU (ORCPT
+        with ESMTP id S236181AbjGNRlU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jul 2023 13:07:20 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE4DF1BC9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 10:07:18 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-3465ec72cc8so9971765ab.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jul 2023 10:07:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689354438; x=1691946438;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQ/TE+0ndA5r2XZguC55t8CyBTFW2JYdsUNWoibzB4g=;
-        b=Ez2RSS9z4FxXUOXuOBXny6T6S8BuT1D56CJPxYf8NedPUj2UYWU/bZIDYl9caiewn4
-         +k4GRGV77t3/p9tPz3UXvD+8GlYYnsBJhUJRtBdi+rjSeVL3jx4Thd85bQ4XmCx8X7Ba
-         Q7vLYQB43Wqfj4trtf+UkEZ69Auem74PA7cdxV+iDEQ04HDXdvXPZ04DUYOT89YCuT7V
-         /3T2Ys24YdRCSkiWku1Tsy8jkt89AlQPqeAq9r2duA8y2RP2d0DJGFcTbljWn4nSXXLs
-         zA0+Phh/9CbbNUsWgYJXy1nwIWpi037Xzj3NkceN2Njrs5hOddK0vBx8VhN9ywY4qBU+
-         8hQA==
+        Fri, 14 Jul 2023 13:41:20 -0400
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F03835A8;
+        Fri, 14 Jul 2023 10:41:03 -0700 (PDT)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-346392da0d6so9591515ab.3;
+        Fri, 14 Jul 2023 10:41:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689354438; x=1691946438;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1689356462; x=1691948462;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OQ/TE+0ndA5r2XZguC55t8CyBTFW2JYdsUNWoibzB4g=;
-        b=K84bU0hc2Ug7ly8KH/YWSMofFS6Ty7Vi0AQiDAwbX88OGe42Z1I14oLkZx3/8ig18G
-         cPbzJA1fz4UgF7rRiguqSnr8Sr7ocvmx/V8tem+K+o/AtPjKwCLL1j6B13JpBK5c3E4U
-         2hh67r13iSOLsXV4w0+sD+QWG6JKXwd90sS7oY6OsbI1+cRF1azHS6Cw4SKlGlI9eJut
-         RTc8sWZ/+CC72R9dNweHAmXy5VKiOvlGTlDEpFqb/bCVH/Jo79RkJt9bbX3ZKcDPbHwm
-         5Yf2sWp7QqDuWvL2PznJa9w82k9dFspKlFVFkxQQfzmMtBXZxDuwJmyCg0SBUfABCObM
-         JHqQ==
-X-Gm-Message-State: ABy/qLYIBTxD/IIxwCX2VM5FLJVz/jw/WtUc33f1IccZ0D+Q5C1fD5wo
-        hfyN9mzbGU8mcdjKwq5ZaEaw1dmetgs=
-X-Google-Smtp-Source: APBJJlGbzZ21gC2Q7zCzTZHx2e3UBnjkA64i91qKWkwkJm0zLHdUrfa6fOJVnibs5LLqJVzzFa9iPQ==
-X-Received: by 2002:a92:ce88:0:b0:346:5a8b:53f3 with SMTP id r8-20020a92ce88000000b003465a8b53f3mr5619641ilo.26.1689354437808;
-        Fri, 14 Jul 2023 10:07:17 -0700 (PDT)
-Received: from [172.17.0.2] ([40.86.18.88])
-        by smtp.gmail.com with ESMTPSA id q4-20020a02cf04000000b0042b6cb44429sm2677270jar.46.2023.07.14.10.07.17
+        bh=t8B9VdIZYHl/5f2hD4bWd1FxmyEJhurzf9pPuxBMOhI=;
+        b=Hs7n6GRpGAU0fDNvRi2WJQsaN4EWAcbiZl/6N1HH/98HKeq982sWX7yRUQcs5MhypY
+         KMah6b9nOHpCzSmFG0iB8caCWRn7IK0ZS6jE0cBhk8jCCaDGMVxzlhcVJ84M9r9daaGG
+         R384hQu5IsRa5pvWLY4Z5DQUBlvW5YON7gU4d9sd4fTLr2q/A4H/0JIwRFhVbd9Utofx
+         iFI+r//q5yfruT30rZFZh6Y7Cn2FCnrC2/qs4vQg3jLKWPI2cmzJtoomaoC0UtKyFpAT
+         NMRO6vn8CW9v7eSRNN23liU1bwsMkBhdB2ZC6Z8vpfENAysOIvN9GYRSrTb4A+hlyB8s
+         wyxw==
+X-Gm-Message-State: ABy/qLZDaDpWZSjfo952sWpKO1VOzFyBFq2vfsLJv3oo8KfWSWiimV/D
+        pZep5DODDklVqYWmVFfu3g==
+X-Google-Smtp-Source: APBJJlEwpCn38iv9tGhrnrnRZNdeny56jS4GeSg/y1spExD6DCQAepba72GgW14TRDqilD0Y6vUlXA==
+X-Received: by 2002:a92:d44b:0:b0:346:3193:224d with SMTP id r11-20020a92d44b000000b003463193224dmr5476204ilm.5.1689356462577;
+        Fri, 14 Jul 2023 10:41:02 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id k18-20020a02ccd2000000b0042b4e2fc546sm2673897jaq.140.2023.07.14.10.41.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jul 2023 10:07:17 -0700 (PDT)
-Message-ID: <64b180c5.020a0220.4fc47.4687@mx.google.com>
-Date:   Fri, 14 Jul 2023 10:07:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0919123460273890046=="
+        Fri, 14 Jul 2023 10:41:01 -0700 (PDT)
+Received: (nullmailer pid 4041135 invoked by uid 1000);
+        Fri, 14 Jul 2023 17:40:59 -0000
+From:   Rob Herring <robh@kernel.org>
+To:     Sean Wang <sean.wang@mediatek.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+Cc:     devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] bluetooth: Explicitly include correct DT includes
+Date:   Fri, 14 Jul 2023 11:40:57 -0600
+Message-Id: <20230714174057.4041063-1-robh@kernel.org>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, joeyli.kernel@gmail.com
-Subject: RE: Bluetooth: hci_event: Ignore NULL link key
-In-Reply-To: <20230714161210.20969-1-jlee@suse.com>
-References: <20230714161210.20969-1-jlee@suse.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0919123460273890046==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The DT of_device.h and of_platform.h date back to the separate
+of_platform_bus_type before it as merged into the regular platform bus.
+As part of that merge prepping Arm DT support 13 years ago, they
+"temporarily" include each other. They also include platform_device.h
+and of.h. As a result, there's a pretty much random mix of those include
+files used throughout the tree. In order to detangle these headers and
+replace the implicit includes with struct declarations, users need to
+explicitly include the correct includes.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=765780
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.94 seconds
-GitLint                       FAIL      0.54 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      33.91 seconds
-CheckAllWarning               PASS      36.79 seconds
-CheckSparse                   WARNING   41.59 seconds
-CheckSmatch                   WARNING   113.49 seconds
-BuildKernel32                 PASS      32.55 seconds
-TestRunnerSetup               PASS      496.37 seconds
-TestRunner_l2cap-tester       PASS      23.35 seconds
-TestRunner_iso-tester         PASS      41.73 seconds
-TestRunner_bnep-tester        PASS      10.61 seconds
-TestRunner_mgmt-tester        PASS      217.91 seconds
-TestRunner_rfcomm-tester      PASS      16.03 seconds
-TestRunner_sco-tester         PASS      16.84 seconds
-TestRunner_ioctl-tester       PASS      17.97 seconds
-TestRunner_mesh-tester        PASS      13.39 seconds
-TestRunner_smp-tester         PASS      14.57 seconds
-TestRunner_userchan-tester    PASS      11.50 seconds
-IncrementalBuild              PASS      31.19 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: hci_event: Ignore NULL link key
-WARNING: From:/Signed-off-by: email address mismatch: 'From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>' != 'Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>'
-
-total: 0 errors, 1 warnings, 0 checks, 12 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13313835.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: hci_event: Ignore NULL link key
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-23: B1 Line exceeds max length (81>80): "Closes: https://ieeexplore.ieee.org/abstract/document/9474325/authors#authors [2]"
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-
-
+Signed-off-by: Rob Herring <robh@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btmtkuart.c | 1 -
+ drivers/bluetooth/hci_h5.c    | 2 +-
+ drivers/bluetooth/hci_qca.c   | 2 +-
+ 3 files changed, 2 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
+index 7680c67cdb35..935feab815d9 100644
+--- a/drivers/bluetooth/btmtkuart.c
++++ b/drivers/bluetooth/btmtkuart.c
+@@ -17,7 +17,6 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/of.h>
+-#include <linux/of_device.h>
+ #include <linux/pinctrl/consumer.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/regulator/consumer.h>
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index fefc37b98b4a..71e748a9477e 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -11,7 +11,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/kernel.h>
+ #include <linux/mod_devicetable.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/serdev.h>
+ #include <linux/skbuff.h>
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index e30c979535b1..dcab942fa5a2 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -25,7 +25,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+-#include <linux/of_device.h>
++#include <linux/of.h>
+ #include <linux/acpi.h>
+ #include <linux/platform_device.h>
+ #include <linux/regulator/consumer.h>
+-- 
+2.40.1
 
---===============0919123460273890046==--
