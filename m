@@ -2,87 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 305CDEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Jul 2023 03:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11932EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Jul 2023 03:29:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230340AbjGQDHu (ORCPT
+        id S229972AbjGQD3Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Jul 2023 23:07:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36728 "EHLO
+        Sun, 16 Jul 2023 23:29:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbjGQDHt (ORCPT
+        with ESMTP id S229787AbjGQD3J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Jul 2023 23:07:49 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B41B310C;
-        Sun, 16 Jul 2023 20:07:45 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3a1c162cdfeso2827498b6e.2;
-        Sun, 16 Jul 2023 20:07:45 -0700 (PDT)
+        Sun, 16 Jul 2023 23:29:09 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF29FF
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Jul 2023 20:29:08 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-40348601753so30139121cf.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Jul 2023 20:29:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689563265; x=1692155265;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P1cF7aE0O334w6SieqGerie0ev5721fo103fEanx5vI=;
-        b=X0QzLlcdDyPEULFRD0ZEN4qFLBoJCv2i0tWTBy3cwCJ2Oi+4p2LkJl4R/HXJ1V7akU
-         2Jde6aQZAJDXf8zzPGMTxW5rIDgXvpH4xibWUqFuXPwHQa/+hsIYIkqfPFLF3hZLaP7H
-         nJSJgj2OGV8bQrX7ZDrvXHVPNB+3NfJ8BJZfapSe7cXauyuEJx/erw/JGOuzaOKAFbtf
-         trMenhqjpzSJ8dliWh3Nq/3FPs2Imw0CBTtge25g45lCD9DDJSLodtaaynMMptmAI8IG
-         cu4tMq4kfEDmIXQS/xZkFjuGbYi4aOTvZh5+/2j4IIaWwdsWoBTLgtTNEBDSupPSFTs9
-         Pftg==
+        d=gmail.com; s=20221208; t=1689564547; x=1692156547;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fW9xPyTBIAtmNowqMIYZzOAem+AG/ECDsh9Ti4l0vpk=;
+        b=dK/X372u9P+OdBW+FlGZe4DiS9pXh/el9izWVBnRIWYRyjiL2c1Im72rE729O6qntM
+         u7Auo6bzI7f2s0sg7bHbrySpe7v1oz5xWJtys1xHtAbvWurpcVFsV5gQhJubWEI2pNqq
+         udsMqSsgdNg1zYUUIh/mGDWikincxrGh7+leHHSD6jcRadoPSsi7UrbL/gNT2o7MYi52
+         H3WP+9JwEYe1mVQXvEeGxZ9gWlSI8hk53PejWrqSD4WdWQO4KTVPs35Wi9qSyrjf2u6k
+         BE7+6RKQ83A9xlzUOn7moHsOL+6XrlR3sNPaLfEbSOs7CjSmoX2NjGNNUEqF+CkDtEVa
+         QQVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689563265; x=1692155265;
-        h=content-disposition:mime-version:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P1cF7aE0O334w6SieqGerie0ev5721fo103fEanx5vI=;
-        b=N2OVbTJVQpCu4AgFUSyocjIwrtleusUM24XpS3/S3fVDCJnpl9H9mYgxWdyBIwMy6E
-         1/o3pbpKLJLjG0k9CFOsgoxEIqtyf7AbpG/bEVgscOJ0vzrhRq5FVl1fkUMXozWIgnXi
-         hmA9pAVwGff0CKflteCwpGxFOKtAyRQpCLKNGETtE38jrjNQVL/wndK7NxkoY94uhKlQ
-         C1jWY80/XoVJzOZw2Igbh+a+r+ilUWZo3cqCJZIgqQISk3lXDfZQtnSUwg7fRitvkyRD
-         QhQZsgaLdzXxUYDY0Nx7N+NsCsM0805Qyp7pRpEO5q7kQbjU+iu/70BvaW7Rydskr5dg
-         mTIQ==
-X-Gm-Message-State: ABy/qLbXiAjZhr/9FbLRNmEi0uLUlyspdl16Fo0lCUbrtgpB3pqT6nvC
-        cphxN9jYYpTqwkLEklIhn6E=
-X-Google-Smtp-Source: APBJJlGdR3SVNPCXRrFeb38Mu5xgb1z6xNlAt0dTJl7qCM6K+K1ucbpkZ56OKvVAc+H16zKKC8mu7Q==
-X-Received: by 2002:aca:ded5:0:b0:39c:9173:31f1 with SMTP id v204-20020acaded5000000b0039c917331f1mr9165869oig.28.1689563264924;
-        Sun, 16 Jul 2023 20:07:44 -0700 (PDT)
-Received: from bud-laptop (cpe-70-122-131-40.tx.res.rr.com. [70.122.131.40])
-        by smtp.gmail.com with ESMTPSA id b18-20020a056808011200b003a05afbcbf0sm6309908oie.22.2023.07.16.20.07.43
+        d=1e100.net; s=20221208; t=1689564547; x=1692156547;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fW9xPyTBIAtmNowqMIYZzOAem+AG/ECDsh9Ti4l0vpk=;
+        b=EyJTsI3rBjq2hsD8xD/97kupnpg1X32Zw4uMqXjQpNcgWozc2JewAAGEP2zborCwyK
+         +/1QE9lPilzQ6QOTukS6GWpbNa/m1VTgiZ0+FltZFPFfEDl/6aurDlJojmO1Wse+eWKC
+         cGgn23RHwOmEk+qKIBYfMq3jfDrX72KEejTTiEEOSM8Del4Qula2zKr1m5iE/8Ka7Btz
+         +Qj3ofV6TS6UOyJLSoepnO293XKO+tq1iyoKCcRsnlPc8tYDi/9w/WB86YUWvnixjkTO
+         oV+rUHgytR3VQomiJy0ei5ERUYhjnBlfijb9pDZNlp3nB83Gwk2pxNfLjWy2LCYdityl
+         u93w==
+X-Gm-Message-State: ABy/qLb3HrJoRKLi+koIhpYoNZg4xENmpsM5+FVNHU/Yj5kIY4yQSL1J
+        336QkdrqxCEkLWp7OZZl8fkKe2pCTAU=
+X-Google-Smtp-Source: APBJJlH5Bc//TEbORHR+ahQBWJGQ5He338TmqcMw2nsz2ICrqI8vRWUKFlVTeNAl3HdFiSFMvyi11w==
+X-Received: by 2002:a05:622a:34c:b0:400:9126:3f16 with SMTP id r12-20020a05622a034c00b0040091263f16mr15834496qtw.1.1689564547696;
+        Sun, 16 Jul 2023 20:29:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.76.128])
+        by smtp.gmail.com with ESMTPSA id i16-20020a0cf390000000b0063640486254sm6080463qvk.116.2023.07.16.20.29.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 16 Jul 2023 20:07:44 -0700 (PDT)
-Date:   Sun, 16 Jul 2023 22:07:42 -0500
-From:   Wes Miser <buddwm@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add VID/PID 0489/e102 for MediaTek MT7922
-Message-ID: <ZLSwfv2pQ5uH6bja@bud-laptop>
+        Sun, 16 Jul 2023 20:29:07 -0700 (PDT)
+Message-ID: <64b4b583.0c0a0220.69d45.3ee9@mx.google.com>
+Date:   Sun, 16 Jul 2023 20:29:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6617095122263055844=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, buddwm@gmail.com
+Subject: RE: Bluetooth: Add VID/PID 0489/e102 for MediaTek MT7922
+In-Reply-To: <ZLSwfv2pQ5uH6bja@bud-laptop>
+References: <ZLSwfv2pQ5uH6bja@bud-laptop>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Tested on Acer Swift Edge 16 Notebook
+--===============6617095122263055844==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Wes Miser <buddwm@gmail.com>
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/bluetooth/btusb.c:628
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5ec4ad0a5c86..95f43d48f383 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -628,6 +628,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe102), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
--- 
-2.41.0
 
+--===============6617095122263055844==--
