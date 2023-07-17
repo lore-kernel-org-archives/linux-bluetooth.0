@@ -2,110 +2,84 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A314BC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Jul 2023 17:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 832F0EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Jul 2023 02:53:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbjGORmU (ORCPT
+        id S230389AbjGQCxl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Jul 2023 13:42:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36624 "EHLO
+        Sun, 16 Jul 2023 22:53:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbjGORmT (ORCPT
+        with ESMTP id S229920AbjGQCxl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Jul 2023 13:42:19 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 278B9101
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Jul 2023 10:42:19 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id 98e67ed59e1d1-262ea2ff59dso1448694a91.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Jul 2023 10:42:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689442938; x=1692034938;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kqAjNG1ch7vZe1taIamltbtSx5MZR0TNovs7QQXEksg=;
-        b=hXBcEyWaTysavoN+kflGrD+VISipc0+bkU8htV3FDOjejmyHOb2ldMbweU1ED7444w
-         s/qHiMIFaqRKxrNpgEbFr+NtGucOmjbL6ApbVQP1sVrxQ10PTg1wYxALHIw9ZT0uQ5i6
-         Omxf/KBWMlDxBsybAZLywu7ooQMqIIzMwhE0K21NL33FKFDfw1rGOP3XWSHEEcWrwYlV
-         on3EkWp3uqRw1qywsN+7y6KUtz5uJzYu+ORBfVdHmHjKOCQbp990izFxE3JhOgLW8I+Q
-         ZEyHv+qVNuhQVTI6SUAMeyfM8ANe2sJmwgiMDo06ZxrcPJ1+wqEUic0vg5lng5fDQUcj
-         EnUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689442938; x=1692034938;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kqAjNG1ch7vZe1taIamltbtSx5MZR0TNovs7QQXEksg=;
-        b=JTAri8t6bD/ZtDN2IPoMz2fVZmU/dkgtp0UYhg0GqaMvjOs8khfkJgKnyfczIrPmR6
-         O9A8V/j3CxdkfAjbPqZvJy/nU/ErBQQ+2P9wVw9YCbsHIfAClYS7hHej/7Srpv+vSINt
-         PNn1Fgv5ZudNo5aY7e+BwMvvHjIHNkf52uEj5a50Vk0AKeCoqdkipXUV94PywnyqJqWS
-         NnvMd9sdhzJtMnR80axXIau8L9tj/M3Pk5slW5aKb/xLUM9O5Ta9UAoI5DJAC79mT7BG
-         8afOs0q4PiHLuRlqnorfUzaAETUbmXV0aqNOgxzFJfdHF7etGUzGlUjrzxyLsoFKUdf/
-         vxYg==
-X-Gm-Message-State: ABy/qLY0FCYbE+j9w6Xs3SOhx/23sCIAQbWxornsoHvDxMK6/1uMdg5n
-        zeR1c7S58Tt4ii5tmj5XqvgUON0B9LU=
-X-Google-Smtp-Source: APBJJlGFYB/4Bw049wUbdK5Qnq1cwv6DgruWuGWy+HQt5BWqIB8dmVoXcfa8V3US5AdAyeedvGERVw==
-X-Received: by 2002:a17:90b:1d90:b0:267:7743:985b with SMTP id pf16-20020a17090b1d9000b002677743985bmr2523735pjb.7.1689442938346;
-        Sat, 15 Jul 2023 10:42:18 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.98.113])
-        by smtp.gmail.com with ESMTPSA id a24-20020a17090abe1800b0025eaeaae318sm2649066pjs.7.2023.07.15.10.42.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 15 Jul 2023 10:42:18 -0700 (PDT)
-Message-ID: <64b2da7a.170a0220.dc1db.4880@mx.google.com>
-Date:   Sat, 15 Jul 2023 10:42:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0207545331966816054=="
+        Sun, 16 Jul 2023 22:53:41 -0400
+Received: from mail-4316.protonmail.ch (mail-4316.protonmail.ch [185.70.43.16])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2687107
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Jul 2023 19:53:39 -0700 (PDT)
+Date:   Mon, 17 Jul 2023 02:53:21 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail3; t=1689562417; x=1689821617;
+        bh=Lm1hC9x8ZQ00YPQk0nFR4Er9obaeamtJGoQRzDp8/bg=;
+        h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+         Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID:BIMI-Selector;
+        b=oBlHHA+gu/1eN9XQJMjtpCI3eoMAEctw+VvgKJrXHfu5B9Nq+EcHiFvUrWelSfPFU
+         EXgKZ3zXjv8gENs+ny5o7KgwjOgTRG8PxSQnPZX4HOVw05B0WJSe/V5lROu4YBtRV6
+         /Mc4qdpaMzKM7euRMvXIzkbQDeXdA48pBdQyZ3pbHvrZu2ShZJpFlapgxiwNl8/2E6
+         436Pn0fG9BlUvo5sEoEvx0eCFOgcL9sMUASVZb5aSyORekz3x3s3rUYRW6yYwD/uis
+         l0TgdVOStQ0/3JBg6B3CovffmVhOTEgvYSR6FLmf+x/OcrqM7Ccl7XYiNxwgB+C9EU
+         vV/Kn4tyCpDBg==
+To:     Pauli Virtanen <pav@iki.fi>
+From:   =?utf-8?Q?Barnab=C3=A1s_P=C5=91cze?= <pobrn@protonmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: kernel NULL pointer dereference in hci_send_sco()
+Message-ID: <k5qpp03yvZD9ab1IO2soENsqFqfAxLlOwhLxvF0-goDYaBdZv2DQXkoXX6V_p-zE2c_r9BUjFI8159s7JxRAkICRApI54o2DP5q_jW2bi5Q=@protonmail.com>
+In-Reply-To: <GA10KgIDqqUNFO-YfBh4OPbYtNt9zMUeqgQ73fCU2ptnNwVagJYbzg_5h43e0QwBREdrzflftwpfS-YedtCV2zZ6CjjRMKGhed6THanGpj0=@protonmail.com>
+References: <HwByr9Ffw_HVVE5pnMu6CTIrQjKwBJpJcSskM0xOP0S-4XiIdmGFTLYAcgKJsOkrxt62je88hFJ1vkHzYtCgwsEATe0KFq3E4YX8LeN5Fdo=@protonmail.com> <K1uGCKZsw3ZP_ygn9btfq5S3EUFCmo0bye7Ew5PG54tNa7_DOiGQ1B3lchlJf_AEZeICj7lGaeSY2tCIJXvgjQOEz0rzD8uoSBw4Ir-Gisc=@protonmail.com> <eb5a46bb08053fc2c6108f0fe45e00fa0b0692d7.camel@iki.fi> <GA10KgIDqqUNFO-YfBh4OPbYtNt9zMUeqgQ73fCU2ptnNwVagJYbzg_5h43e0QwBREdrzflftwpfS-YedtCV2zZ6CjjRMKGhed6THanGpj0=@protonmail.com>
+Feedback-ID: 20568564:user:proton
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mans@mansr.com
-Subject: RE: Bluetooth: btbcm: add default address for BCM43430A1
-In-Reply-To: <20230715164159.16368-1-mans@mansr.com>
-References: <20230715164159.16368-1-mans@mansr.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0207545331966816054==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+2023. j=C3=BAlius 12., szerda 0:21 keltez=C3=A9ssel, Barnab=C3=A1s P=C5=
+=91cze <pobrn@protonmail.com> =C3=ADrta:
 
-This is automated email and please do not reply to this email!
+> [...]
+> >
+> > Those generally should be harmless, as the hci_conn may be destroyed
+> > earlier than when controller stops sending SCO packets for it.
+> >
+> > It's not clear those should be printed as errors, same also for the
+> > "corrupted SCO packet" messages which are also printed when the
+> > hci_conn has been already destroyed. You get lots of that spam during
+> > normal SCO operation.
+> >
+> > For this crash, maybe you can try apply the following patches:
+> >
+> > https://lore.kernel.org/linux-bluetooth/490b5c6a0e13047fd1bea42d3184b46=
+623adc359.1689003801.git.pav@iki.fi/
+> >
+> > https://lore.kernel.org/linux-bluetooth/20230711131353.40500-1-code@sid=
+dh.me/
+> >
+> > Basically the ISO sockets had similar crashes before, which are now
+> > fixed and SCO seems to need similar fixes.
+>=20
+> Thanks. I will try them. Any idea as to how I could trigger the issue? I =
+haven't
+> noticed any pattern yet... Seemingly `hci_send_sco()` is only hit when I =
+set
+> the profile to HSP/HFP, however, every time this issue was triggered, the=
+ device
+> was in the A2DP profile (at least as far as I can tell).
+> [...]
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=766180
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.62 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.06 seconds
-BuildKernel                   PASS      45.50 seconds
-CheckAllWarning               PASS      49.17 seconds
-CheckSparse                   PASS      55.67 seconds
-CheckSmatch                   PASS      146.86 seconds
-BuildKernel32                 PASS      42.67 seconds
-TestRunnerSetup               PASS      656.97 seconds
-TestRunner_l2cap-tester       PASS      31.97 seconds
-TestRunner_iso-tester         PASS      79.53 seconds
-TestRunner_bnep-tester        PASS      14.41 seconds
-TestRunner_mgmt-tester        PASS      260.56 seconds
-TestRunner_rfcomm-tester      PASS      21.71 seconds
-TestRunner_sco-tester         PASS      21.87 seconds
-TestRunner_ioctl-tester       PASS      25.22 seconds
-TestRunner_mesh-tester        PASS      18.57 seconds
-TestRunner_smp-tester         PASS      19.30 seconds
-TestRunner_userchan-tester    PASS      15.28 seconds
-IncrementalBuild              PASS      40.10 seconds
-
+I have not seen the oops since applying those two patches on 2023-07-12,
+so hopefully the issue is fixed.
 
 
----
 Regards,
-Linux Bluetooth
-
-
---===============0207545331966816054==--
+Barnab=C3=A1s P=C5=91cze
