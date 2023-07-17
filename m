@@ -2,169 +2,267 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07757EB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Jul 2023 21:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A64F3EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Jul 2023 23:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbjGQVly (ORCPT
+        id S229946AbjGQXHS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Jul 2023 17:41:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58732 "EHLO
+        Mon, 17 Jul 2023 19:07:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbjGQVlx (ORCPT
+        with ESMTP id S229892AbjGQXHR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Jul 2023 17:41:53 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80B318B;
-        Mon, 17 Jul 2023 14:41:50 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 2adb3069b0e04-4fa48b5dc2eso8117498e87.1;
-        Mon, 17 Jul 2023 14:41:50 -0700 (PDT)
+        Mon, 17 Jul 2023 19:07:17 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97BFF1738
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jul 2023 16:06:29 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-668730696a4so3364151b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jul 2023 16:06:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689630109; x=1692222109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OXdjqVaFGDV9Y1hhPrabhlg9MxCHiJlgDy6kNxcqWZ0=;
-        b=bp37a+P9yE5nNmiRCfAjkZTg2YwY7ebFUVcl5PenLmwDVDeYtWqsSxG5OjeffB62a1
-         L2RC3ZRInHykyeEbNW6BNbsDD+fW6p3Kgz1oDK7KMkXBmsRS0QvoD9Xiut2rCdKrdoqI
-         zYaL/MOAuEarjvFSXOp3V7152RDYvhG9DwX9BsKdserK+7AC3IL69Dgh96SOaPwuDQ6H
-         OJJMHjx52ngai9aRXhItY4CT45AD/KpvdMzaRnYshf6l/XjKPwe2xclWW5tD5EDvanm1
-         SlDR/5H/LNqBOkLTDF3tI8Qoa98jvhXHwt5SzFBUgtLy7bhH7dnrePDt9tqBhJhfL64R
-         jevg==
+        d=gmail.com; s=20221208; t=1689635088; x=1692227088;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=T1jZ3obdwBFHUr8wXg6Wh9p0CpFibeSvnlGWTIhrYag=;
+        b=n2cXrzhntPUhFh3Hrud7zMoW+uERySb6EXOcQTCRjYJqRrXvq423uA52KSOz48Ir9e
+         yWmL3jlY+CD4I7vo7PIdnA1hviJZtOm77VygFMJO+9yvpPSoXde8ze0nSwQ2YguYHlFC
+         N7c+E0YKLgLWP/Q8wIT8XfG7/0qsj9dKyfiyM5aATWgFY4k23i+lg31+DzVmcM891fzN
+         3BAbUhLDBtwYbtPUuwC3qyUnylU8F6f8HpEg7XZM/AVWFV+5kYv8fuyv10KIKZ3eexAG
+         bYd4YgMpQyn9rGp/a6XoZoZLGlG/Er6DtrzA/eKDzJJMXtcQJXQLozxHIKHnT4eZ6clS
+         MWpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689630109; x=1692222109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OXdjqVaFGDV9Y1hhPrabhlg9MxCHiJlgDy6kNxcqWZ0=;
-        b=I/h69QgNUp7oiAbe5pBx38VBzxgLBcymGmFprJbXrfeBKIeZweM4kq1u2wI4QHs0+p
-         N1YqxrOtfWjKoy/Kf691o8BjMsUu1+UBHlqU6mdOiuOegjNrzSyFO5SQDEuZhUFvnt72
-         3DNIunBs1EiLFunDSW7/GYQPxbLCvlv55cAJSj5USoaE+lx0bt+Pp1S00+1fDJWMCPOI
-         VEnGhsJm4619H1uXiL5tEcidazd/13sDY5fkXkfKqq5gIQpiGqiEI4fdjpkDSpZm6zsH
-         NPBvpMmbRAso2eSBxdJ7TSatwiDKiow8VzJ3ESO9i57g3a20MgymOkiHuwirwIZeCiVV
-         0grQ==
-X-Gm-Message-State: ABy/qLZuLth1uf6+JrHsrrdgs7Z1SunkjELijmG8AGLQVxzP1ub6DN9y
-        4xD0mC0RxkLLJ/nqt9lGuOWns5YujjPtjnvX4lP1cEAWYuL8Tn2R
-X-Google-Smtp-Source: APBJJlGnTEkxTLleAmvBH4r4u03YXLl4WeDvpeMDUlEX+vQxlqycqFmyau79I9/McppCNUrynCQqelQhKYpB+t6X2hs=
-X-Received: by 2002:a05:6512:3e1b:b0:4f9:ec5e:d624 with SMTP id
- i27-20020a0565123e1b00b004f9ec5ed624mr389943lfv.38.1689630108754; Mon, 17 Jul
- 2023 14:41:48 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1689635088; x=1692227088;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T1jZ3obdwBFHUr8wXg6Wh9p0CpFibeSvnlGWTIhrYag=;
+        b=Gk5Y9PQGP9C1mYnrA1kzupuGMi5JSU0SkPMPyy0Af/bVYpdDKcqVR/M6aSFC82JIyG
+         OKbojwvi0T0D4yORLoM7hAA7/EtQ3KN+G1Zel55VnOVwjEfQRZblsD9REB6ucB1Zy8Kr
+         r+iJEFfgFFCAFQDMZM72Qvuu4ca/qyUR7Ywa44LveJZulv1HSIc2Lsy1A101hV2CWZwy
+         j8lAe/2oCNjiU4N5dMupumj0I4J6Py/LgtbbEMrMgyfwfVxsqduwMJ6NgwAvvD1ciXSR
+         BWYZpQHpsoTeFFirVf9+ltcbPCywIZVQ1OWD95GiBPAMc9f3Q2ydWnD3CiXm+GS3zfJ3
+         V7hw==
+X-Gm-Message-State: ABy/qLbnc1X8rs76SYo3mskvpbVOcHqVI94/ES1yjhzbT9f8qBbjh+3r
+        nimPFNvLDnDYGIDvvEL0egr+6GgXU68=
+X-Google-Smtp-Source: APBJJlEK1Bl4DjoRvwefl4eJQPwNMeU4p1NvhT2OvCbEjyQqx+Ruv2Hx3qgC6T22bn8qoFr9Sv2VxQ==
+X-Received: by 2002:a05:6a20:3d83:b0:126:9539:ec30 with SMTP id s3-20020a056a203d8300b001269539ec30mr14360642pzi.19.1689635087950;
+        Mon, 17 Jul 2023 16:04:47 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
+        by smtp.gmail.com with ESMTPSA id a16-20020aa780d0000000b00678cb337353sm277169pfn.208.2023.07.17.16.04.46
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jul 2023 16:04:47 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] btmgmt: Add man page
+Date:   Mon, 17 Jul 2023 16:04:45 -0700
+Message-ID: <20230717230445.168998-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-References: <ZLSwfv2pQ5uH6bja@bud-laptop> <CABBYNZLvqcO9Bnbr-mFa23yPvKbePSeRk7s9xr5Vfred9hhUTw@mail.gmail.com>
-In-Reply-To: <CABBYNZLvqcO9Bnbr-mFa23yPvKbePSeRk7s9xr5Vfred9hhUTw@mail.gmail.com>
-From:   Wes Miser <buddwm@gmail.com>
-Date:   Mon, 17 Jul 2023 16:41:38 -0500
-Message-ID: <CAHCcUCp4rgLP8SrTm_ncTe638ndWrgyz-ioicPYYXEZQZgHUYg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add VID/PID 0489/e102 for MediaTek MT7922
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-(Re-sending in text-only mode)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Hey Luiz,
+This adds btmgmt.rst which is then converted to btmgmt.1 using rst2man.
+---
+ Makefile.tools   |   5 +-
+ tools/btmgmt.rst | 163 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 166 insertions(+), 2 deletions(-)
+ create mode 100644 tools/btmgmt.rst
 
-I noticed that this may have already been submitted per
-https://github.com/bluez/bluetooth-next/commit/159c43e9925e8f4655b8f834cbb8=
-64f5ecaf1778
-(I was building against torvalds/linux and didn't notice this in
-bluetooth-next).  In any case here's the information about the device
-from my system:
+diff --git a/Makefile.tools b/Makefile.tools
+index 7d9697001b75..c1de187bf72b 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -347,7 +347,8 @@ profiles_iap_iapd_SOURCES = profiles/iap/main.c
+ profiles_iap_iapd_LDADD = gdbus/libgdbus-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
+ 
+ if MANPAGES
+-man_MANS += tools/rctest.1 tools/l2ping.1 tools/btattach.1 tools/isotest.1
++man_MANS += tools/rctest.1 tools/l2ping.1 tools/btattach.1 tools/isotest.1 \
++		tools/btmgmt.1
+ endif
+ 
+ if MESH
+@@ -468,7 +469,7 @@ manual_pages += tools/hciattach.1 tools/hciconfig.1 \
+ 			tools/hcitool.1 tools/hcidump.1 \
+ 			tools/rfcomm.1 tools/sdptool.1 tools/ciptool.1 \
+ 			tools/rctest.1 tools/l2ping.1 tools/btattach.1 \
+-			tools/bdaddr.1 tools/isotest.1
++			tools/bdaddr.1 tools/isotest.1 tools/btmgmt.1
+ 
+ if HID2HCI
+ udevdir = $(UDEV_DIR)
+diff --git a/tools/btmgmt.rst b/tools/btmgmt.rst
+new file mode 100644
+index 000000000000..4a720dabccd1
+--- /dev/null
++++ b/tools/btmgmt.rst
+@@ -0,0 +1,163 @@
++======
++btmgmt
++======
++
++-------------------------------------
++interactive bluetooth management tool
++-------------------------------------
++
++:Version: BlueZ
++:Copyright: Free use of this software is granted under ther terms of the GNU
++            Lesser General Public Licenses (LGPL).
++:Date: July 2023
++:Manual section: 1
++:Manual group: Linux System Administration
++
++SYNOPSIS
++========
++
++**btmgmt** [--options] [commands]
++
++DESCRIPTION
++===========
++
++**btmgmt(1)** interactive bluetooth management tool. The tool issues commands
++to the Kernel using the Bluetooth Management socket, some commands may require
++net-admin capability in order to work.
++
++
++OPTIONS
++=======
++
++.. csv-table::
++   :header: "Options", "Description"
++   :align: left
++
++   *-i/--index*, Specify adapter index
++   *-m-/-monitor*, Enable monitor output
++   *-t/--timeout*, Timeout in seconds for non-interactive mode
++   *-v/--version*, Display version
++   *-i/--init-script*, Init script file
++   *-*h/--help*, Display help
++
++COMMANDS
++========
++
++.. csv-table::
++   :header: "Command", "Arguments", "Description"
++   :align: left
++
++   *select*, "<index>", Select a different index
++   *revision*, , Get the MGMT Revision
++   *commands*, , List supported commands
++   *config*, , Show configuration info
++   *info*, , Show controller info
++   *extinfo*, , Show extended controller info
++   *auto-power*, , Power all available features
++   *power*, <on/off>, Toggle powered state
++   *discov*, <yes/no/limited> [timeout], Toggle discoverable state
++   *connectable*, <on/off>, Toggle connectable state
++   *fast-conn*, <on/off>, Toggle fast connectable state
++   *bondable*, <on/off>, Toggle bondable state
++   *pairable*, <on/off>, Toggle bondable state
++   *linksec*, <on/off>, Toggle link level security
++   *ssp*, <on/off>, Toggle SSP mode
++   *sc*, <on/off/only>, Toggle SC support
++   *hs*, <on/off>, Toggle HS support
++   *le*, <on/off>, Toggle LE support
++   *advertising*, <on/off>, Toggle LE advertising
++   *bredr*, <on/off>, Toggle BR/EDR support
++   *privacy*, <on/off> [irk], Toggle privacy support
++   *class*, <major> <minor>, Set device major/minor class
++   *disconnect*, [-t type] <remote address>, Disconnect device
++   *con*, , List connections
++   *find*, [-l|-b] [-L], Discover nearby devices
++   *find-service*, [-u UUID] [-r RSSI_Threshold] [-l|-b], Discover nearby service
++   *stop-find*, [-l|-b], Stop discovery
++   *name*, <name> [shortname], Set local name
++   *pair*, [-c cap] [-t type] <remote address>, Pair with a remote device
++   *cancelpair*, [-t type] <remote address>, Cancel pairing
++   *unpair*, [-t type] <remote address>, Unpair device
++   *keys*, ,Load Link Keys
++   *ltks*, ,Load Long Term Keys
++   *irks*, [--local index] [--file file path], Load Identity Resolving Keys
++   *block*, [-t type] <remote address> Block Device
++   *unblock*, [-t type] <remote address>, Unblock Device
++   *add-uuid*, <UUID> <service class hint>, Add UUID
++   *rm-uuid*, <UUID>, Remove UUID
++   *clr-uuids*, ,Clear UUIDs
++   *local-oob*, ,Local OOB data
++   *remote-oob*, [-t <addr_type>] [-r <rand192>] [-h <hash192>] [-R <rand256>] [-H <hash256>] <addr>, Remote OOB data
++   *did*, <source>:<vendor>:<product>:<version>, Set Device ID
++   *static-addr*, <address>, Set static address
++   *public-addr*, <address>, Set public address
++   *ext-config*, <on/off>, External configuration
++   *debug-keys*, <on/off>, Toggle debug keys
++   *conn-info*, [-t type] <remote address>, Get connection information
++   *io-cap*, <cap>, Set IO Capability
++   *scan-params*, <interval> <window>, Set Scan Parameters
++   *get-clock*, [address], Get Clock Information
++   *add-device*, [-a action] [-t type] <address>, Add Device
++   *del-device*, [-t type] <address>, Remove Device
++   *clr-devices*, ,Clear Devices
++   *bredr-oob*, ,Local OOB data (BR/EDR)
++   *le-oob*, ,Local OOB data (LE)
++   *advinfo*, ,Show advertising features
++   *advsize*, [options] <instance_id>, Show advertising size info
++   *add-adv*, [options] <instance_id>, Add advertising instance
++   *rm-adv*, <instance_id>, Remove advertising instance
++   *clr-adv*, ,Clear advertising instances
++   *add-ext-adv-params*, [options] <instance_id>, Add extended advertising params
++   *add-ext-adv-data*, [options] <instance_id>, Add extended advertising data
++   *appearance*, <appearance>, Set appearance
++   *phy*, [LE1MTX] [LE1MRX] [LE2MTX] [LE2MRX] [LECODEDTX] [LECODEDRX] [BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT][EDR2M1SLOT] [EDR2M3SLOT] [EDR2M5SLOT][EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT], Get/Set PHY Configuration
++   *wbs*, <on/off>, Toggle Wideband-Speech support
++   *secinfo*, ,Show security information
++   *expinfo*, ,Show experimental features
++   *exp-debug*, <on/off>, Set debug feature
++   *exp-privacy*, <on/off>, Set LL privacy feature
++   *exp-quality*, <on/off>, Set bluetooth quality report feature
++   *exp-offload*, <on/off>, Toggle codec support
++   *read-sysconfig*, ,Read System Configuration
++   *set-sysconfig*, <-v|-h> [options...], Set System Configuration
++   *get-flags*, [-t type] <address>, Get device flags
++   *set-flags*, [-f flags] [-t type] <address>, Set device flags
++   *menu*, <name>, Select submenu
++   *version*, ,Display version
++   *quit*, , Quit program
++   *exit*, , Quit program
++   *help*, , Display help about this program
++   *export*, ,Print environment variables
++
++AUTOMATION
++==========
++Two common ways to automate the tool are to pass the commands directly like in
++the follow example:
++
++::
++
++   btmgmt <<EOF
++   list
++   show
++   EOF
++
++Or create a script and give it as init-script:
++
++::
++
++  vi test-script.bt
++  list
++  show
++  quit
++  :wq
++  btmgmt --init-script=test-script
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
+-- 
+2.41.0
 
-T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D04 Cnt=3D02 Dev#=3D  3 Spd=3D480  Mx=
-Ch=3D 0
-D:  Ver=3D 2.10 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0489 ProdID=3De102 Rev=3D 1.00
-S:  Manufacturer=3DMediaTek Inc.
-S:  Product=3DWireless_Device
-S:  SerialNumber=3D000000000
-C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-A:  FirstIf#=3D 0 IfCount=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01
-I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D125us
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
-I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 6 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
-I:* If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D125us
-E:  Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D  64 Ivl=3D125us
-I:  If#=3D 2 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3D(none)
-E:  Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
-E:  Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125u
-
-
-On Mon, Jul 17, 2023 at 2:56=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Wes,
->
-> On Sun, Jul 16, 2023 at 8:07=E2=80=AFPM Wes Miser <buddwm@gmail.com> wrot=
-e:
-> >
-> > Tested on Acer Swift Edge 16 Notebook
-> >
-> > Signed-off-by: Wes Miser <buddwm@gmail.com>
-> > ---
-> >  drivers/bluetooth/btusb.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 5ec4ad0a5c86..95f43d48f383 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -628,6 +628,9 @@ static const struct usb_device_id blacklist_table[]=
- =3D {
-> >         { USB_DEVICE(0x0489, 0xe0f2), .driver_info =3D BTUSB_MEDIATEK |
-> >                                                      BTUSB_WIDEBAND_SPE=
-ECH |
-> >                                                      BTUSB_VALID_LE_STA=
-TES },
-> > +       { USB_DEVICE(0x0489, 0xe102), .driver_info =3D BTUSB_MEDIATEK |
-> > +                                                    BTUSB_WIDEBAND_SPE=
-ECH |
-> > +                                                    BTUSB_VALID_LE_STA=
-TES },
-> >
-> >         /* Additional Realtek 8723AE Bluetooth devices */
-> >         { USB_DEVICE(0x0930, 0x021d), .driver_info =3D BTUSB_REALTEK },
-> > --
-> > 2.41.0
->
-> Please include the information from /sys/kernel/debug/usb/devices
->
-> --
-> Luiz Augusto von Dentz
