@@ -2,144 +2,147 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B84EB64DC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jul 2023 17:22:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C964C001DC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jul 2023 19:31:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231787AbjGRRWm (ORCPT
+        id S229995AbjGRTbO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Jul 2023 13:22:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51822 "EHLO
+        Tue, 18 Jul 2023 15:31:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjGRRWm (ORCPT
+        with ESMTP id S229437AbjGRTbN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Jul 2023 13:22:42 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0C6FD;
-        Tue, 18 Jul 2023 10:22:40 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b74310566cso93628721fa.2;
-        Tue, 18 Jul 2023 10:22:40 -0700 (PDT)
+        Tue, 18 Jul 2023 15:31:13 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BC76198E;
+        Tue, 18 Jul 2023 12:31:12 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b6fdaf6eefso93029531fa.0;
+        Tue, 18 Jul 2023 12:31:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689700959; x=1692292959;
+        d=gmail.com; s=20221208; t=1689708670; x=1692300670;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ShSHl+im1nbx7LmGJnqqFW1rmMFnTlSsCgSMYiB20zI=;
-        b=V3IGj5hpdWbWT1Fq8OiAk7azeBPn28e/HbXXerIOQijGn+AG+TNeMksk4cUpkmGz34
-         o/pE3T2sc/33HHwd2sGoM53f4/6Aoz2zXh0LpsXTCF3XtN6iQND83pg23uAUXiXyVdY6
-         4KrxAlSHzWSb4CHp8ZyI+/2YATfDoHQPqrl3IJ+95w8Xp9fuQePHRvNDSGLH1U+BBu3u
-         EaCv9eh/zGbJyOt6MMS0D4kce5oSzIB+pUYW5EHgMJcYfpqvSj5c1xUIUpKNEp0AryJY
-         W3g/ZcpW1l3wwRnmnm6IR6g0HlNIhXkIekGmEQa6Tee09Rp/TP6J9qSJDpJwkYDzaRDF
-         s2/Q==
+        bh=iTrSAnnMNi3CJrN72jg6c2jFERcFPh+1lB6HHppzE2o=;
+        b=YstOd1W6X1vyeMfDJmOipRaiIKM3IzxuY+kVIN/FOQeM6+H/CIXHfev4VHYQDS7zaR
+         0kkXOJNSctTui42cWYPOOZUpWLOsizTbde2fZeUuqjApV9AYOBavHGPoqPjEihsrceJ9
+         MU3Z0Ghyv+GV5CnWqWUaOH6UijQkEiUHlOEkacpTf5roK4x3DanRGNJCVFPQ9fNmrMqK
+         X4PF/vBNHywJmm+QqMtWs9Y1kHdK5fNHP98DS6PeU48OWxFWe3UTfXSMGN9llTvi3cey
+         /1/1VQeRp1rh86mVF3atw9KlljWG1Yi6ZdEKQZmHZgtt/T4iHKVnul9V8byJrn+GPu4n
+         VglA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689700959; x=1692292959;
+        d=1e100.net; s=20221208; t=1689708670; x=1692300670;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ShSHl+im1nbx7LmGJnqqFW1rmMFnTlSsCgSMYiB20zI=;
-        b=M+pEwW4NTQBU+HMDtIiKDRMVQwhz9SKL05yPfrSkS6CIIp/01uIoPQCsb4RaEHf3Jv
-         dQ5pL4IUq1u6i2VLVdd0Vw+JyidwCYssg5uXiHZtqcPa7ToMA1XN+Zi4+GQRR9uBQGbO
-         3PZfhNNmn2yVQQkh6gkEwcoaSN2ms0BCOoEwA66fsQsSqtnRRU1Ucpr+Z22qRri4bYJQ
-         yUReQmB1rcnQj2f0TXB6K7whPugsCcVQxA44sw8DsOBVdP/GmUiwaJsO8lIKURaQPT7S
-         4M4uGLCYZV3UjDaaVw8PHuPMNbphWfegHNWMAkASJqeNDOSlKInWJ+/FLvVrXsJj/Zze
-         HP1g==
-X-Gm-Message-State: ABy/qLY+CAer+SqJnyqvftf6YHOL8RJddJHLhGmVRztGAnUanXaP0rQ1
-        88puxsxVK5DlPB/am3WqLvoWJveodxaJE6y+EMmyEa2x
-X-Google-Smtp-Source: APBJJlEyzzOFIRE3d+O+hSrFB8jyF/a31wWBmUxwATsv190BbPkZl6SWuAZweVdLGtjuvb6ue/rUrTLfxh+iisjIlwo=
-X-Received: by 2002:a2e:83c9:0:b0:2b6:a057:8098 with SMTP id
- s9-20020a2e83c9000000b002b6a0578098mr10795381ljh.0.1689700958527; Tue, 18 Jul
- 2023 10:22:38 -0700 (PDT)
+        bh=iTrSAnnMNi3CJrN72jg6c2jFERcFPh+1lB6HHppzE2o=;
+        b=SFHhAqwEmoy63AGN3qkHJ1jfr7mYtHCwUFT+URt1EE6BpUkzWHtuRQizTnS/b14Oh8
+         bGXRnv0dYUl9aOPxauhLcmc+ARd6J5NfdmGaiVKyY4W4VcPwdXrgx1K1CET/EsuWhL5Z
+         aC3lmXmjwf2KCdfagYzKfV/0D1l3YRUbAygP8x87UHK4jezxkfTDRFEBPiLTO17LXp+y
+         pAMEFeHXBGhlkBAJexqHxPCJ68qzaPNKJBQe4ijpVLku4SO8lDecFNOcWYKFG6AIuyyJ
+         yzRy/eCcVWlbzquAULwKB6LOgO5rK4LWxrmSdqpMsP50ppjOsdRTBOHjmxL400KHK8HA
+         jifg==
+X-Gm-Message-State: ABy/qLYv4gx4IwIOjH74jfoCCqqI+O0lRYMIplKCVXoCgAqzywirTwpm
+        Bc3tb5dEk267RWDUhXvPrpZv1nDpmmFFd38UNCyDfkVq
+X-Google-Smtp-Source: APBJJlHI4rX84tOEoaXYW/2w4q01fgbrq4MG7euNNK4/ARs8hVqH6cIsj+6x6vLLQZutSVqnnyi3aTO0pVXh+qr52LY=
+X-Received: by 2002:a2e:b611:0:b0:2b7:2066:10e1 with SMTP id
+ r17-20020a2eb611000000b002b7206610e1mr11095537ljn.0.1689708670027; Tue, 18
+ Jul 2023 12:31:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230718034337.23502-1-jlee@suse.com>
-In-Reply-To: <20230718034337.23502-1-jlee@suse.com>
+References: <5cbde2b4-69b5-4b25-a095-251c8347cb09@kili.mountain>
+In-Reply-To: <5cbde2b4-69b5-4b25-a095-251c8347cb09@kili.mountain>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 18 Jul 2023 10:22:26 -0700
-Message-ID: <CABBYNZJ97UMyZ7yX1YAGbuU4XwNDdoFewKNwbd=51_L9aNrrCQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_event: Ignore NULL link key
-To:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Date:   Tue, 18 Jul 2023 12:30:57 -0700
+Message-ID: <CABBYNZK5MfkOSVUBtWLOLt+H-BBdYrQbZv=rmYtn4WtDyvJopw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_conn: clean up some casts
+To:     Dan Carpenter <dan.carpenter@linaro.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org,
-        Markus Elfring <Markus.Elfring@web.de>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        linux-bluetooth@vger.kernel.org, "Lee, Chun-Yi" <jlee@suse.com>
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Chun-Yi,
+Hi Dan,
 
-On Mon, Jul 17, 2023 at 8:43=E2=80=AFPM Lee, Chun-Yi <joeyli.kernel@gmail.c=
-om> wrote:
+On Mon, Jul 17, 2023 at 3:20=E2=80=AFAM Dan Carpenter <dan.carpenter@linaro=
+.org> wrote:
 >
-> This change is used to relieve CVE-2020-26555. The description of the
-> CVE:
+> The ERR_PTR/PTR_ERR() functions are only for error pointers.  They're
+> not a generic way to cast pointers to int.
 >
-> Bluetooth legacy BR/EDR PIN code pairing in Bluetooth Core Specification
-> 1.0B through 5.2 may permit an unauthenticated nearby device to spoof
-> the BD_ADDR of the peer device to complete pairing without knowledge
-> of the PIN. [1]
-
-Btw, it is probably worth mentioning that in BR/EDR the key generation
-is actually handled in the controller, below HCI.
-
-> The detail of this attack is in IEEE paper:
-> BlueMirror: Reflections on Bluetooth Pairing and Provisioning Protocols
-> [2]
->
-> It's a reflection attack. Base on the paper, attacker can induce the
-> attacked target to generate null link key (zero key) without PIN code.
->
-> We can ignore null link key in the handler of "Link Key Notification
-> event" to relieve the attack. A similar implementation also shows in
-> btstack project. [3]
-
-Perhaps we could clarify this statement by stating that if we ignore
-the link key it means the stack will not consider the device is bonded
-and will not persist the link key, that said the controller will still
-consider it as paired, so I perhaps we should go one step forward and
-disconnect if we detect such a key is being used.
-
-> v2:
-> - Used Link: tag instead of Closes:
-> - Used bt_dev_dbg instead of BT_DBG
-> - Added Fixes: tag
->
-> Fixes: 55ed8ca10f35 ("Bluetooth: Implement link key handling for the mana=
-gement interface")
-> Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3DCVE-2020-26555 [1]
-> Link: https://ieeexplore.ieee.org/abstract/document/9474325/authors#autho=
-rs [2]
-> Link: https://github.com/bluekitchen/btstack/blob/master/src/hci.c#L3722 =
-[3]
-> Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > ---
->  net/bluetooth/hci_event.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+> We should really create INT_PTR/PTR_INT() functions.  But this is a
+> cleanup until someone creates those.
+
+Is there any reason you didn't create such macros? I mean we could
+have it local first, or perhaps we just do HANDLE_PTR/PTR_HANDLE to
+avoid any confusion.
+
+>  net/bluetooth/hci_conn.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 95816a938cea..ff0c331f53d6 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4684,6 +4684,12 @@ static void hci_link_key_notify_evt(struct hci_dev=
- *hdev, void *data,
->         bool persistent;
->         u8 pin_len =3D 0;
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index cccc2b8b60a8..aea6fa12d954 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -873,7 +873,7 @@ static void bis_cleanup(struct hci_conn *conn)
 >
-> +       /* Ignore NULL link key against CVE-2020-26555 */
-> +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
-> +               bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) for %pM=
-R", &ev->bdaddr);
-> +               return;
-> +       }
-> +
->         bt_dev_dbg(hdev, "");
+>  static int remove_cig_sync(struct hci_dev *hdev, void *data)
+>  {
+> -       u8 handle =3D PTR_ERR(data);
+> +       u8 handle =3D (unsigned long)data;
 >
->         hci_dev_lock(hdev);
+>         return hci_le_remove_cig_sync(hdev, handle);
+>  }
+> @@ -882,7 +882,7 @@ static int hci_le_remove_cig(struct hci_dev *hdev, u8=
+ handle)
+>  {
+>         bt_dev_dbg(hdev, "handle 0x%2.2x", handle);
+>
+> -       return hci_cmd_sync_queue(hdev, remove_cig_sync, ERR_PTR(handle),=
+ NULL);
+> +       return hci_cmd_sync_queue(hdev, remove_cig_sync, (void *)(unsigne=
+d long)handle, NULL);
+>  }
+>
+>  static void find_cis(struct hci_conn *conn, void *data)
+> @@ -1234,7 +1234,7 @@ void hci_conn_failed(struct hci_conn *conn, u8 stat=
+us)
+>  static void create_le_conn_complete(struct hci_dev *hdev, void *data, in=
+t err)
+>  {
+>         struct hci_conn *conn;
+> -       u16 handle =3D PTR_ERR(data);
+> +       u16 handle =3D (unsigned long)data;
+>
+>         conn =3D hci_conn_hash_lookup_handle(hdev, handle);
+>         if (!conn)
+> @@ -1264,7 +1264,7 @@ static void create_le_conn_complete(struct hci_dev =
+*hdev, void *data, int err)
+>  static int hci_connect_le_sync(struct hci_dev *hdev, void *data)
+>  {
+>         struct hci_conn *conn;
+> -       u16 handle =3D PTR_ERR(data);
+> +       u16 handle =3D (unsigned long)data;
+>
+>         conn =3D hci_conn_hash_lookup_handle(hdev, handle);
+>         if (!conn)
+> @@ -2854,7 +2854,7 @@ u32 hci_conn_get_phy(struct hci_conn *conn)
+>  static int abort_conn_sync(struct hci_dev *hdev, void *data)
+>  {
+>         struct hci_conn *conn;
+> -       u16 handle =3D PTR_ERR(data);
+> +       u16 handle =3D (unsigned long)data;
+>
+>         conn =3D hci_conn_hash_lookup_handle(hdev, handle);
+>         if (!conn)
 > --
-> 2.35.3
+> 2.39.2
 >
 
 
