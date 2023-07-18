@@ -2,207 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8897DEB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jul 2023 08:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B84EB64DC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jul 2023 17:22:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231983AbjGRIlP (ORCPT
+        id S231787AbjGRRWm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Jul 2023 04:41:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
+        Tue, 18 Jul 2023 13:22:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231989AbjGRIlO (ORCPT
+        with ESMTP id S229471AbjGRRWm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Jul 2023 04:41:14 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D342E55
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jul 2023 01:41:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1689669673; x=1721205673;
-  h=date:from:to:cc:subject:message-id;
-  bh=52QTXxwZx1E2KtoICgNB2iV6nXR6kGGZXTFzLBHDTPc=;
-  b=BxkwkFsYdxkVkNsuxGD2sY2Wc2YTPRYbqzHxvUt8E8yKQzY0E/FAuqik
-   2yadNkPIC4TYVkDyyz3OB6z5pVm6vfo7H2FeuvadOpAzgsKbOkmB8+D4g
-   O5tR/PRwBvkNMaPYXNLgo5oW8wZINjPfK6SckwmNtgaehX4Bh+yPR4fdb
-   OxgS0xwyHmjEKZRzGWef59AKP4iU1L0wSz9rMvrJ1mkab49dL5qqcqpRX
-   aoNdVZzm9N0aGGLEYVpEcUZO/tmSIw+RqlHrFmD/hELW7sRabSxgZHKmb
-   4VkotH6Sc8KsF8+kI1tiDdWGbZqe13p3e+DK4caSEMkQDTECgjI0oMcuI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="366189626"
-X-IronPort-AV: E=Sophos;i="6.01,213,1684825200"; 
-   d="scan'208";a="366189626"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2023 01:41:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10774"; a="723532155"
-X-IronPort-AV: E=Sophos;i="6.01,213,1684825200"; 
-   d="scan'208";a="723532155"
-Received: from lkp-server02.sh.intel.com (HELO 36946fcf73d7) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 18 Jul 2023 01:41:12 -0700
-Received: from kbuild by 36946fcf73d7 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qLgGb-0000NJ-1d;
-        Tue, 18 Jul 2023 08:41:10 +0000
-Date:   Tue, 18 Jul 2023 16:40:25 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 75401514ef1b9eed3828825e3e20d9f3735afe60
-Message-ID: <202307181623.3DDgakBC-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+        Tue, 18 Jul 2023 13:22:42 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0C6FD;
+        Tue, 18 Jul 2023 10:22:40 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b74310566cso93628721fa.2;
+        Tue, 18 Jul 2023 10:22:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1689700959; x=1692292959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ShSHl+im1nbx7LmGJnqqFW1rmMFnTlSsCgSMYiB20zI=;
+        b=V3IGj5hpdWbWT1Fq8OiAk7azeBPn28e/HbXXerIOQijGn+AG+TNeMksk4cUpkmGz34
+         o/pE3T2sc/33HHwd2sGoM53f4/6Aoz2zXh0LpsXTCF3XtN6iQND83pg23uAUXiXyVdY6
+         4KrxAlSHzWSb4CHp8ZyI+/2YATfDoHQPqrl3IJ+95w8Xp9fuQePHRvNDSGLH1U+BBu3u
+         EaCv9eh/zGbJyOt6MMS0D4kce5oSzIB+pUYW5EHgMJcYfpqvSj5c1xUIUpKNEp0AryJY
+         W3g/ZcpW1l3wwRnmnm6IR6g0HlNIhXkIekGmEQa6Tee09Rp/TP6J9qSJDpJwkYDzaRDF
+         s2/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1689700959; x=1692292959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ShSHl+im1nbx7LmGJnqqFW1rmMFnTlSsCgSMYiB20zI=;
+        b=M+pEwW4NTQBU+HMDtIiKDRMVQwhz9SKL05yPfrSkS6CIIp/01uIoPQCsb4RaEHf3Jv
+         dQ5pL4IUq1u6i2VLVdd0Vw+JyidwCYssg5uXiHZtqcPa7ToMA1XN+Zi4+GQRR9uBQGbO
+         3PZfhNNmn2yVQQkh6gkEwcoaSN2ms0BCOoEwA66fsQsSqtnRRU1Ucpr+Z22qRri4bYJQ
+         yUReQmB1rcnQj2f0TXB6K7whPugsCcVQxA44sw8DsOBVdP/GmUiwaJsO8lIKURaQPT7S
+         4M4uGLCYZV3UjDaaVw8PHuPMNbphWfegHNWMAkASJqeNDOSlKInWJ+/FLvVrXsJj/Zze
+         HP1g==
+X-Gm-Message-State: ABy/qLY+CAer+SqJnyqvftf6YHOL8RJddJHLhGmVRztGAnUanXaP0rQ1
+        88puxsxVK5DlPB/am3WqLvoWJveodxaJE6y+EMmyEa2x
+X-Google-Smtp-Source: APBJJlEyzzOFIRE3d+O+hSrFB8jyF/a31wWBmUxwATsv190BbPkZl6SWuAZweVdLGtjuvb6ue/rUrTLfxh+iisjIlwo=
+X-Received: by 2002:a2e:83c9:0:b0:2b6:a057:8098 with SMTP id
+ s9-20020a2e83c9000000b002b6a0578098mr10795381ljh.0.1689700958527; Tue, 18 Jul
+ 2023 10:22:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230718034337.23502-1-jlee@suse.com>
+In-Reply-To: <20230718034337.23502-1-jlee@suse.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 18 Jul 2023 10:22:26 -0700
+Message-ID: <CABBYNZJ97UMyZ7yX1YAGbuU4XwNDdoFewKNwbd=51_L9aNrrCQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Ignore NULL link key
+To:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org,
+        Markus Elfring <Markus.Elfring@web.de>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        linux-bluetooth@vger.kernel.org, "Lee, Chun-Yi" <jlee@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 75401514ef1b9eed3828825e3e20d9f3735afe60  Bluetooth: MGMT: Use correct address for memcpy()
+Hi Chun-Yi,
 
-elapsed time: 721m
+On Mon, Jul 17, 2023 at 8:43=E2=80=AFPM Lee, Chun-Yi <joeyli.kernel@gmail.c=
+om> wrote:
+>
+> This change is used to relieve CVE-2020-26555. The description of the
+> CVE:
+>
+> Bluetooth legacy BR/EDR PIN code pairing in Bluetooth Core Specification
+> 1.0B through 5.2 may permit an unauthenticated nearby device to spoof
+> the BD_ADDR of the peer device to complete pairing without knowledge
+> of the PIN. [1]
 
-configs tested: 135
-configs skipped: 5
+Btw, it is probably worth mentioning that in BR/EDR the key generation
+is actually handled in the controller, below HCI.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+> The detail of this attack is in IEEE paper:
+> BlueMirror: Reflections on Bluetooth Pairing and Provisioning Protocols
+> [2]
+>
+> It's a reflection attack. Base on the paper, attacker can induce the
+> attacked target to generate null link key (zero key) without PIN code.
+>
+> We can ignore null link key in the handler of "Link Key Notification
+> event" to relieve the attack. A similar implementation also shows in
+> btstack project. [3]
 
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r022-20230717   gcc  
-arc                              allyesconfig   gcc  
-arc                          axs101_defconfig   gcc  
-arc                                 defconfig   gcc  
-arc                            hsdk_defconfig   gcc  
-arc                 nsimosci_hs_smp_defconfig   gcc  
-arc                  randconfig-r043-20230717   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                        clps711x_defconfig   gcc  
-arm                                 defconfig   gcc  
-arm                           h3600_defconfig   gcc  
-arm                        keystone_defconfig   gcc  
-arm                          pxa910_defconfig   gcc  
-arm                  randconfig-r046-20230717   clang
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r025-20230717   gcc  
-arm64                randconfig-r035-20230717   clang
-csky                                defconfig   gcc  
-csky                 randconfig-r001-20230717   gcc  
-csky                 randconfig-r024-20230717   gcc  
-hexagon              randconfig-r005-20230717   clang
-hexagon              randconfig-r041-20230717   clang
-hexagon              randconfig-r045-20230717   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230717   clang
-i386         buildonly-randconfig-r005-20230717   clang
-i386         buildonly-randconfig-r006-20230717   clang
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230717   clang
-i386                 randconfig-i002-20230717   clang
-i386                 randconfig-i003-20230717   clang
-i386                 randconfig-i004-20230717   clang
-i386                 randconfig-i005-20230717   clang
-i386                 randconfig-i006-20230717   clang
-i386                 randconfig-i011-20230717   gcc  
-i386                 randconfig-i012-20230717   gcc  
-i386                 randconfig-i013-20230717   gcc  
-i386                 randconfig-i014-20230717   gcc  
-i386                 randconfig-i015-20230717   gcc  
-i386                 randconfig-i016-20230717   gcc  
-i386                 randconfig-r004-20230717   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r032-20230717   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                        m5272c3_defconfig   gcc  
-m68k                        stmark2_defconfig   gcc  
-microblaze           randconfig-r006-20230717   gcc  
-microblaze           randconfig-r023-20230717   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                      fuloong2e_defconfig   gcc  
-mips                     loongson1b_defconfig   gcc  
-mips                malta_qemu_32r6_defconfig   clang
-mips                        qi_lb60_defconfig   clang
-mips                 randconfig-r034-20230717   gcc  
-mips                 randconfig-r036-20230717   gcc  
-mips                       rbtx49xx_defconfig   clang
-nios2                               defconfig   gcc  
-openrisc             randconfig-r012-20230717   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r016-20230717   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                     asp8347_defconfig   gcc  
-powerpc                       eiger_defconfig   gcc  
-powerpc                      katmai_defconfig   clang
-powerpc                       maple_defconfig   gcc  
-powerpc                      ppc6xx_defconfig   gcc  
-powerpc                         ps3_defconfig   gcc  
-powerpc                     rainier_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r042-20230717   gcc  
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r002-20230717   clang
-s390                 randconfig-r015-20230717   gcc  
-s390                 randconfig-r033-20230717   clang
-s390                 randconfig-r044-20230717   gcc  
-sh                               allmodconfig   gcc  
-sh                ecovec24-romimage_defconfig   gcc  
-sh                          kfr2r09_defconfig   gcc  
-sh                          lboxre2_defconfig   gcc  
-sh                   randconfig-r026-20230717   gcc  
-sh                   rts7751r2dplus_defconfig   gcc  
-sh                           se7705_defconfig   gcc  
-sh                           se7722_defconfig   gcc  
-sh                   sh7724_generic_defconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64              randconfig-r011-20230717   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230717   clang
-x86_64       buildonly-randconfig-r002-20230717   clang
-x86_64       buildonly-randconfig-r003-20230717   clang
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-r003-20230717   clang
-x86_64               randconfig-r031-20230717   clang
-x86_64               randconfig-x001-20230717   gcc  
-x86_64               randconfig-x002-20230717   gcc  
-x86_64               randconfig-x003-20230717   gcc  
-x86_64               randconfig-x004-20230717   gcc  
-x86_64               randconfig-x005-20230717   gcc  
-x86_64               randconfig-x006-20230717   gcc  
-x86_64               randconfig-x011-20230717   clang
-x86_64               randconfig-x012-20230717   clang
-x86_64               randconfig-x013-20230717   clang
-x86_64               randconfig-x014-20230717   clang
-x86_64               randconfig-x015-20230717   clang
-x86_64               randconfig-x016-20230717   clang
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa               randconfig-r021-20230717   gcc  
+Perhaps we could clarify this statement by stating that if we ignore
+the link key it means the stack will not consider the device is bonded
+and will not persist the link key, that said the controller will still
+consider it as paired, so I perhaps we should go one step forward and
+disconnect if we detect such a key is being used.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> v2:
+> - Used Link: tag instead of Closes:
+> - Used bt_dev_dbg instead of BT_DBG
+> - Added Fixes: tag
+>
+> Fixes: 55ed8ca10f35 ("Bluetooth: Implement link key handling for the mana=
+gement interface")
+> Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3DCVE-2020-26555 [1]
+> Link: https://ieeexplore.ieee.org/abstract/document/9474325/authors#autho=
+rs [2]
+> Link: https://github.com/bluekitchen/btstack/blob/master/src/hci.c#L3722 =
+[3]
+> Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> ---
+>  net/bluetooth/hci_event.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 95816a938cea..ff0c331f53d6 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4684,6 +4684,12 @@ static void hci_link_key_notify_evt(struct hci_dev=
+ *hdev, void *data,
+>         bool persistent;
+>         u8 pin_len =3D 0;
+>
+> +       /* Ignore NULL link key against CVE-2020-26555 */
+> +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
+> +               bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) for %pM=
+R", &ev->bdaddr);
+> +               return;
+> +       }
+> +
+>         bt_dev_dbg(hdev, "");
+>
+>         hci_dev_lock(hdev);
+> --
+> 2.35.3
+>
+
+
+--=20
+Luiz Augusto von Dentz
