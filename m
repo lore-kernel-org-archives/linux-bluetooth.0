@@ -2,121 +2,141 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72956EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jul 2023 03:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A30EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jul 2023 04:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230373AbjGRDnq (ORCPT
+        id S230159AbjGREhn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Jul 2023 23:43:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42538 "EHLO
+        Tue, 18 Jul 2023 00:37:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230348AbjGRDno (ORCPT
+        with ESMTP id S229953AbjGREhl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Jul 2023 23:43:44 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B757410D1;
-        Mon, 17 Jul 2023 20:43:42 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b8a8154f9cso32741445ad.1;
-        Mon, 17 Jul 2023 20:43:42 -0700 (PDT)
+        Tue, 18 Jul 2023 00:37:41 -0400
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604A7E52
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jul 2023 21:37:39 -0700 (PDT)
+Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3a3a8d21208so4139838b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jul 2023 21:37:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689651822; x=1692243822;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IZdp+09RIWAK2Z+OGrivU9Ui9C1GynRgrEwV5eGtimc=;
-        b=HwyHVWhJSAqEDdZPWTTNDnK1NW00QB6Mf6OmMADWZ+XUuvXB6xVquntN5XQw7lKWyR
-         1+hYqdxj4zkSr26JeIQJg2/U31HBibDDNH9lFvhcVG1yyev74oV+PwS9hetkVHgHNaeF
-         1Xxp6bNRBLgIKuboL7pJ/WHt7j2bBjVhqG+Z/PoLznbwAY2+ph414dWQ2cH7DzLvd9fX
-         kKyWfs+uhjN7XSoLzKXC8vf6l10eZeB9q0juf44uGyaG0HU5y/1BI1yAFPiYPAxdQahk
-         IWKog1bJhpWuy8Wb5kRHpYnHW15noFtrlIztqU08HXU3+ylHFO8ZU7zxAdLM/sz69Zvx
-         EUcQ==
+        d=gmail.com; s=20221208; t=1689655058; x=1692247058;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FAKdnMKzfFrh7mnGSOZxNCvccE5O9LjfBnQ7iOImGAg=;
+        b=ZDrRBc25KT8KMvYqsp/Hhl2JWuc9Y98gKGizTlBectA2ZDiB1aSNmipog7QvMDAm6p
+         fmipj6r7zYBemQFk6N9nvOVkCCReY+JCe92iNBJreMc3MXLX4XgdI8rBKAI6vgrY/g6S
+         4eu9tJrSDaevgro6Tuy17Hqoyd5HHI0OxLFIKlVkcFGXg6d3nRNegep03cmiil0DY9u6
+         HE+trAbTEPx+E4mlG/JnJWk286560uCpycdvtNNE66yAyKTU2xYBV6PxKGg+xQXbaNhs
+         nOpbFflnBf7pLkAuupMRXPzHODNJ6k8YgD5DZgVK+b+1JbRWuvfaR8Hx3EXYDBNxT2jh
+         pPug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689651822; x=1692243822;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IZdp+09RIWAK2Z+OGrivU9Ui9C1GynRgrEwV5eGtimc=;
-        b=bgLiaeGytL+c567mDK9QUezMkQut1CRQFe7siWDCs7gMW2+no9ra3eEidU48AneJQL
-         rBfCrp54ub+ghY8ao/5McX3+y7rSRaTad/BwA+ND26x/l7TxCP+2oVwc6EhJRQ0v8NvG
-         8HPMCJBPeuIYtiRacnI+Gat/8vyOBE+rXdeuw8xZ/K9McZBLrJsJTsai45r0t8AlWScA
-         h62yxXLt9Y0SYTxsfGZCVeRzwoPDvEPX6PwtfA7n3lY1QZDVQhragTwenFK6SJriPjcK
-         lsjSSefplPSlj4CrdkBp7L+YEgDLyy3rBC27XkEBkSAO3EG4AHZawkivSaFQslWgwLmn
-         FPRQ==
-X-Gm-Message-State: ABy/qLYw22fhWOs/CkvhmtTHMXnHCfW11lkpSUKgLdwl/VKiC7AOsSJl
-        WcDkAPggEIPjVtewllE523w=
-X-Google-Smtp-Source: APBJJlHHeaJbqHg0s9NrwU8yx/cjKW+AFtQBWDJd984QimNU2yEcNSlNONq8l9WXpnICJorEdZcRsA==
-X-Received: by 2002:a17:902:f548:b0:1b7:de50:7d9c with SMTP id h8-20020a170902f54800b001b7de507d9cmr15245504plf.15.1689651821905;
-        Mon, 17 Jul 2023 20:43:41 -0700 (PDT)
-Received: from linux-l9pv.suse ([124.11.22.254])
-        by smtp.gmail.com with ESMTPSA id f16-20020a170902ce9000b001b85a56597bsm614741plg.185.2023.07.17.20.43.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Jul 2023 20:43:41 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Markus Elfring <Markus.Elfring@web.de>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        linux-bluetooth@vger.kernel.org, "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH v2] Bluetooth: hci_event: Ignore NULL link key
-Date:   Tue, 18 Jul 2023 11:43:37 +0800
-Message-Id: <20230718034337.23502-1-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
+        d=1e100.net; s=20221208; t=1689655058; x=1692247058;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FAKdnMKzfFrh7mnGSOZxNCvccE5O9LjfBnQ7iOImGAg=;
+        b=cGA84qSubpAbyFtV3LIoB6AyhgManONc58UwabJ7lDbUO+zzAbZ0a1UpNJeN/yGQCf
+         sLli3wdh6Fhd7FfAQ2Gdc8IMtE4A/untibmYxis4eCzVh1kcn9ewChYAcFxEdMnz+9XY
+         C4QM4wUJvD+Iz5RAkX4nQHrksAWE88jllJP2Pp1eyHywUo0/U4mWsRGBl9snraZ1PBQn
+         NN8bQ9ZpCeAcTlNQyBnOAJR9xjShgILNrmZNYf7XUUSdfsRJBZIMvukeMF+mBbqNhT+k
+         C+2tvmMwobJeBhEqHFCir1YCrL9jO5wZ1JAzUjVcmH1AZXnAKA30LtzemaI+rACveet+
+         JieA==
+X-Gm-Message-State: ABy/qLbm2dvPGVp9zDtfiLdGC2M4ApLwEuyIyGE74h5MF3ZVerl8DZ6I
+        FAXuHXD28OohoBvssL2E+2MYxJpnZXY=
+X-Google-Smtp-Source: APBJJlHRTQvZiMm30WmdON0tIcxgJE1atAgjiD2DZgswaqK2/+vx2mhckarLVJto2/vl+BDP8Zy6jg==
+X-Received: by 2002:a05:6808:220d:b0:3a4:30fb:58e9 with SMTP id bd13-20020a056808220d00b003a430fb58e9mr17142790oib.56.1689655058501;
+        Mon, 17 Jul 2023 21:37:38 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.177.2])
+        by smtp.gmail.com with ESMTPSA id 16-20020aca2110000000b003a43759b9cdsm410697oiz.29.2023.07.17.21.37.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jul 2023 21:37:38 -0700 (PDT)
+Message-ID: <64b61712.ca0a0220.c14da.2944@mx.google.com>
+Date:   Mon, 17 Jul 2023 21:37:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7152757112264966062=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, joeyli.kernel@gmail.com
+Subject: RE: [v2] Bluetooth: hci_event: Ignore NULL link key
+In-Reply-To: <20230718034337.23502-1-jlee@suse.com>
+References: <20230718034337.23502-1-jlee@suse.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change is used to relieve CVE-2020-26555. The description of the
-CVE:
+--===============7152757112264966062==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Bluetooth legacy BR/EDR PIN code pairing in Bluetooth Core Specification
-1.0B through 5.2 may permit an unauthenticated nearby device to spoof
-the BD_ADDR of the peer device to complete pairing without knowledge
-of the PIN. [1]
+This is automated email and please do not reply to this email!
 
-The detail of this attack is in IEEE paper:
-BlueMirror: Reflections on Bluetooth Pairing and Provisioning Protocols
-[2]
+Dear submitter,
 
-It's a reflection attack. Base on the paper, attacker can induce the
-attacked target to generate null link key (zero key) without PIN code.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=766763
 
-We can ignore null link key in the handler of "Link Key Notification
-event" to relieve the attack. A similar implementation also shows in
-btstack project. [3]
+---Test result---
 
-v2:
-- Used Link: tag instead of Closes:
-- Used bt_dev_dbg instead of BT_DBG
-- Added Fixes: tag
+Test Summary:
+CheckPatch                    FAIL      0.81 seconds
+GitLint                       PASS      0.27 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      32.47 seconds
+CheckAllWarning               PASS      35.57 seconds
+CheckSparse                   WARNING   40.49 seconds
+CheckSmatch                   WARNING   111.98 seconds
+BuildKernel32                 PASS      31.15 seconds
+TestRunnerSetup               PASS      476.51 seconds
+TestRunner_l2cap-tester       PASS      22.02 seconds
+TestRunner_iso-tester         PASS      40.00 seconds
+TestRunner_bnep-tester        PASS      10.08 seconds
+TestRunner_mgmt-tester        PASS      211.97 seconds
+TestRunner_rfcomm-tester      PASS      15.18 seconds
+TestRunner_sco-tester         PASS      16.01 seconds
+TestRunner_ioctl-tester       PASS      16.96 seconds
+TestRunner_mesh-tester        PASS      12.81 seconds
+TestRunner_smp-tester         PASS      13.44 seconds
+TestRunner_userchan-tester    PASS      10.61 seconds
+IncrementalBuild              PASS      29.63 seconds
 
-Fixes: 55ed8ca10f35 ("Bluetooth: Implement link key handling for the management interface")
-Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-26555 [1]
-Link: https://ieeexplore.ieee.org/abstract/document/9474325/authors#authors [2]
-Link: https://github.com/bluekitchen/btstack/blob/master/src/hci.c#L3722 [3]
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: hci_event: Ignore NULL link key
+WARNING: From:/Signed-off-by: email address mismatch: 'From: "Lee, Chun-Yi" <joeyli.kernel@gmail.com>' != 'Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>'
+
+total: 0 errors, 1 warnings, 0 checks, 12 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13316718.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+
+
 ---
- net/bluetooth/hci_event.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 95816a938cea..ff0c331f53d6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4684,6 +4684,12 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, void *data,
- 	bool persistent;
- 	u8 pin_len = 0;
- 
-+	/* Ignore NULL link key against CVE-2020-26555 */
-+	if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
-+		bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) for %pMR", &ev->bdaddr);
-+		return;
-+	}
-+
- 	bt_dev_dbg(hdev, "");
- 
- 	hci_dev_lock(hdev);
--- 
-2.35.3
 
+--===============7152757112264966062==--
