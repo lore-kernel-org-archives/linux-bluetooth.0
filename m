@@ -2,189 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD1CDC001B0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 00:29:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE34C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 02:27:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229822AbjGTA3Y (ORCPT
+        id S229591AbjGTC1n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Jul 2023 20:29:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57536 "EHLO
+        Wed, 19 Jul 2023 22:27:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229781AbjGTA3W (ORCPT
+        with ESMTP id S229452AbjGTC1m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Jul 2023 20:29:22 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1AD91A8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jul 2023 17:29:21 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-76731802203so24791185a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jul 2023 17:29:21 -0700 (PDT)
+        Wed, 19 Jul 2023 22:27:42 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B6919BC
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jul 2023 19:27:41 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1b8a462e0b0so1781465ad.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jul 2023 19:27:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689812960; x=1692404960;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yA6UUXyFTO5GmXU2zsZoTlaLvLg/A1iycqt2aCfaztw=;
-        b=HwrJ/CjO5myzwDIpIsle4u+YBT5DbD/42kq8rssi5BncEnp374kaXEt7Mvm74dKYSb
-         VaLGMi14kGyMdlNZwsSalk1iPxZcEHZb1EzvEQairGXuymVaggLe+ujFacG+iOmHsKXF
-         YDrxfSYkB7mIMReyAQpPult9P3HPfcPU0avEos0RJUswByIi51kT38t5MZB5QNFeHgB9
-         frBqJO+rqb8O5RUZ9Cum5nIDl4LA0GJxaovWOULBnb7Hhs4AvYQQh+C84vzHUFFpS1+4
-         a0GJNRXl5KalQpmZP47loI+VHfMA1/tQymDSfuOfUO/EJyWa/JfCZfpd+b6N9CEwLdSN
-         n66Q==
+        d=gmail.com; s=20221208; t=1689820061; x=1690424861;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=T3TyMU48Vr5t3ea0hymijoQ9ugxHyqXoB/GNC/gRcjE=;
+        b=lZ3LdaMj0V+LNlWHi9WH2kp6577354COTUqieTSS9x0z+pT78VlUzAMzMeyIG/2Gnc
+         vrB+FfeuBnLqT4Lg0CloyKuWwz+4pg7Lny0WEoNrXYJkeXs6Cr1rKl7lwW4OHmKAfgNz
+         fN7obBWsstmNciuHplpCgwnPzkWb127sbaqeaNthCciwNMVbUgIO8zUFT5lX6cj0ymdF
+         jQ3s5drTC8ewARTThEKjSuskewo9nG+Xe1pkLeegjrGXSQmqxkCmFl6Gl7Ylmj2j/q9H
+         NZ6tgigvJoFuZv2qf52FKXsdxPYeirLKAsIakAoQx9qCo9TEO/l1zR59Gmne0N8SXiUK
+         xZ4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689812960; x=1692404960;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yA6UUXyFTO5GmXU2zsZoTlaLvLg/A1iycqt2aCfaztw=;
-        b=aHsBm9jykV17wkZtR7YRYLZOYFKYEPMhZgEUj8yi0Yx3itfc66VaDDvro1wum6PtV9
-         MQ4AYNf620RAVl1H4rmq0hm21gy9Gj11SmIcuhVUV8XM4eDGVUQFUWNH28aQX8wHgXdK
-         pUmwxeP/JKh34YgQz2oR+AaRPZYrBgKModYUXDfpZkxRC8N/DYBLlFtVNKegFjPgufw2
-         1nBSJ7QxbFPHU0zReZdfBaFhYz+J9LLFoCVgfAGe2qoE5uPIbGOWQ6K4oJs0XOaYzkvv
-         qgNu66LDkMDi/RAz54VIbHM+0MTH5VSaPR8ieW0XX1PiTLxVgwbYZ5dnTlPViRDtmrqI
-         807Q==
-X-Gm-Message-State: ABy/qLYR7FGeeDiwN1M0LgLSsJgamstROMg2mQJy4J2RlY6xJ95U7XAs
-        isaY0ZWfDAx0bCe+YiOuUfeTJnQXeCI=
-X-Google-Smtp-Source: APBJJlGJqA4jutSGqonEeP8+fPZViMCEPhTua1Km4Z5WbZ8Bt1WpeVQ20a0sbXGiJtXLoqKr677eCw==
-X-Received: by 2002:a05:620a:4707:b0:767:eb51:ac27 with SMTP id bs7-20020a05620a470700b00767eb51ac27mr24347225qkb.5.1689812959925;
-        Wed, 19 Jul 2023 17:29:19 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id r25-20020a05620a03d900b007623c96430csm1619472qkm.111.2023.07.19.17.29.18
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1689820061; x=1690424861;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T3TyMU48Vr5t3ea0hymijoQ9ugxHyqXoB/GNC/gRcjE=;
+        b=Lj+gdQiZQTNu2NAoocfwSSBx3FsIg0ygK5T4icI+MLcAK5JkgCLLjGThb+7qMAlmAj
+         RpurVgfh3pvPEzemp8VuUMYq+LWQhms2mDuVfM1SFTdfSpe/cC2oLbeTooKTN/Iho1/y
+         dyfPxgvZLPpnFtmi/s9VxAqhm8E/V1FOJkssoSkevphIrzbsgvemDrcCGGXOylidhTLF
+         18hCLXN0L3OHC6ygvYV8c9nIYhvHSsWOj8wewMZ/FQdh79DG1L9MhP63+BwTXNsmb/6z
+         J1NPmvNZHrRjrv5vgaSCSY9ExihCs+dczDfSP6v9gyk6C1t0QvtyxCqTlo/aEymtvijd
+         ikcA==
+X-Gm-Message-State: ABy/qLYptOhmSgSLPMhBNuq3hUC/AbngUTG+CznfKzSKBFjFd+uueps5
+        VMTYt27Jz0rdZ9AVC/t8kxaer7aXBfQ=
+X-Google-Smtp-Source: APBJJlEhurHZDdqnFs1gWe25f3hmr062FjCIzJv7Ha8tBfY/h5EDXS7BcF8akZy3yh1GHROB0Z+JeA==
+X-Received: by 2002:a17:902:f681:b0:1b6:bced:1dc2 with SMTP id l1-20020a170902f68100b001b6bced1dc2mr4236679plg.0.1689820060566;
+        Wed, 19 Jul 2023 19:27:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.171.133.129])
+        by smtp.gmail.com with ESMTPSA id n5-20020a170902d2c500b001bb0b1a93dfsm4686957plc.126.2023.07.19.19.27.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jul 2023 17:29:19 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v4 3/3] client: Add bluetoothctl-monitor.1 man page
-Date:   Wed, 19 Jul 2023 17:29:13 -0700
-Message-ID: <20230720002913.342733-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Wed, 19 Jul 2023 19:27:39 -0700 (PDT)
+Message-ID: <64b89b9b.170a0220.e3b15.aba7@mx.google.com>
+Date:   Wed, 19 Jul 2023 19:27:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1448031739957187496=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v4,1/3] btmgmt: Add man page
 In-Reply-To: <20230720002913.342733-1-luiz.dentz@gmail.com>
 References: <20230720002913.342733-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1448031739957187496==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds bluetoothctl-monitor.rst which is then converted to
-bluetoothctl-mgmt.1 using rst2man.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=767584
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.93 seconds
+GitLint                       PASS      0.72 seconds
+BuildEll                      PASS      26.98 seconds
+BluezMake                     PASS      803.17 seconds
+MakeCheck                     PASS      11.88 seconds
+MakeDistcheck                 FAIL      72.98 seconds
+CheckValgrind                 PASS      252.52 seconds
+CheckSmatch                   PASS      341.19 seconds
+bluezmakeextell               PASS      103.36 seconds
+IncrementalBuild              PASS      2002.05 seconds
+ScanBuild                     PASS      1045.57 seconds
+
+Details
+##############################
+Test: MakeDistcheck - FAIL
+Desc: Run Bluez Make Distcheck
+Output:
+
+make[2]: *** No rule to make target 'client/bluetoothctl-mgmt.1', needed by 'all-am'.  Stop.
+make[2]: *** Waiting for unfinished jobs....
+make[1]: *** [Makefile:4536: all] Error 2
+make: *** [Makefile:11795: distcheck] Error 1
+
+
 ---
- Makefile.tools                  |  3 +-
- client/bluetoothctl-monitor.rst | 89 +++++++++++++++++++++++++++++++++
- 2 files changed, 91 insertions(+), 1 deletion(-)
- create mode 100644 client/bluetoothctl-monitor.rst
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 6c5835bbd65d..09e41dd07469 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -348,7 +348,8 @@ profiles_iap_iapd_LDADD = gdbus/libgdbus-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
- 
- if MANPAGES
- man_MANS += tools/rctest.1 tools/l2ping.1 tools/btattach.1 tools/isotest.1 \
--		tools/btmgmt.1 client/bluetoothctl-mgmt.1
-+		tools/btmgmt.1 client/bluetoothctl-mgmt.1 \
-+		client/bluetoothctl-monitor.1
- endif
- 
- if MESH
-diff --git a/client/bluetoothctl-monitor.rst b/client/bluetoothctl-monitor.rst
-new file mode 100644
-index 000000000000..2357a56ace36
---- /dev/null
-+++ b/client/bluetoothctl-monitor.rst
-@@ -0,0 +1,89 @@
-+====================
-+bluetoothctl-monitor
-+====================
-+
-+---------------
-+Monitor Submenu
-+---------------
-+
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under ther terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: July 2023
-+:Manual section: 1
-+:Manual group: Linux System Administration
-+
-+SYNOPSIS
-+========
-+
-+**bluetoothctl** [--options] [monitor.commands]
-+
-+Monitor Commands
-+================
-+
-+set-rssi-threshold
-+------------------
-+
-+Set RSSI threshold parameter
-+
-+:Usage: **# set-rssi-threshold <low_threshold> <high_threshold>**
-+
-+set-rssi-timeout
-+----------------
-+
-+Set RSSI timeout parameter
-+
-+:Usage: **# set-rssi-timeout <low_timeout> <high_timeout>**
-+
-+set-rssi-sampling-period
-+-------------------------
-+
-+Set RSSI sampling period parameter
-+
-+:Usage: **# set-rssi-timeout <low_timeout> <high_timeout>**
-+
-+add-or-pattern
-+--------------
-+
-+Register 'or pattern' type monitor with the specified RSSI parameters
-+
-+:Usage: **# add-or-pattern [patterns=pattern1 pattern2 ...]**
-+
-+get-pattern
-+-----------
-+
-+Get advertisement monitor
-+
-+:Usage: **# get-pattern <monitor-id/all>**
-+
-+remove-pattern
-+--------------
-+
-+Remove advertisement monitor
-+
-+:Usage: **# remove-pattern <monitor-id/all>**
-+
-+get-supported-info
-+------------------
-+
-+Get advertisement manager supported features and supported monitor types
-+
-+:Usage: **# get-supported-info**
-+
-+print-usage
-+-----------
-+
-+Print the command usage
-+
-+:Usage: **# print-usage <add-or-pattern>**
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
-+
--- 
-2.41.0
 
+--===============1448031739957187496==--
