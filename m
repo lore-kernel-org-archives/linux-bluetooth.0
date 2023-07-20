@@ -2,53 +2,57 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81713EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 23:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E311C001DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 23:50:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229751AbjGTXuY (ORCPT
+        id S229894AbjGTXuZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jul 2023 19:50:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50292 "EHLO
+        Thu, 20 Jul 2023 19:50:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbjGTXuY (ORCPT
+        with ESMTP id S229571AbjGTXuY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 20 Jul 2023 19:50:24 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81F2E2737;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86780273A;
         Thu, 20 Jul 2023 16:50:22 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0973261CCB;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C07661CCC;
         Thu, 20 Jul 2023 23:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 65762C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5FB79C433C8;
         Thu, 20 Jul 2023 23:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1689897021;
-        bh=09vCGBt4albRAEEXLRSkOtlpb9RvRo/i9QsRDRcbhbI=;
+        bh=feJewLUTFiUeftAknY22nUa7pWdY5sIWSFqpthJJNOs=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=JEYUAI39Y1KlbZ7XtNL7H+F12w2SAWKG8LmItZZdg+CduhUQAWCwji5t0RsavX7M6
-         xqPT6UGP3wlWT1nIbVhaZKiFS5zEzXk8J5l4/id2C+/UWPbM5NHSm2scx4zIw71fiI
-         ayfCe34Y66f07GRoML16z4l9pvG20XUbrZ8gJqlrkiFPgPZrvHN+h4WhnSzLQEpWOI
-         9WWaTPvmEo6BjQ9olFn4B1WOCf50+bPi1ppbuWF+DayMzKY3k4bN7jslepqaWw5di2
-         ooBcLQVixZRjjDbBK+Cm3AryQFCkf1Scsz502wBwQ1OI3ZSYYzev8jygmosjc28+4T
-         qiSTfmKw063WA==
+        b=tXBDZOgsmTJnhGz7BNLECINsPd6ybEu+oBNJSilrewRog3SQz9ZhoqJNRumFvO4/n
+         VSUvaCzLsE5VtAri9r/PYG8eni8lspd28m2qrse6zvuwLwG1ca1zB7ZO4+i4RY+8N1
+         fuyg3ODxaGveVsJTfgwXlZOG5Qjm875XmS34ksuLnsuTwdcKyotEF+G/+wK0PoBXw4
+         PRSuYZTbu/W5ZE7qdLvCUN3HqdMMfPaV4fmkrlX9t/Qea3XbNOhxYls0a4Qw/L1fBA
+         WdoJJOUixdLOUu76cur/wiw+GU3f6EjTo45m2ecPEookHgzSM758bOGPCt9pdWKaYg
+         /8NhzLAUWTxLQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4B245E21EF6;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41E98C595C3;
         Thu, 20 Jul 2023 23:50:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btbcm: add default address for BCM43430A1
+Subject: Re: [PATCH] bluetooth: Explicitly include correct DT includes
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168989702130.8881.11036571095108497021.git-patchwork-notify@kernel.org>
+Message-Id: <168989702126.8881.8720051222737802178.git-patchwork-notify@kernel.org>
 Date:   Thu, 20 Jul 2023 23:50:21 +0000
-References: <20230715164159.16368-1-mans@mansr.com>
-In-Reply-To: <20230715164159.16368-1-mans@mansr.com>
-To:     Mans Rullgard <mans@mansr.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230714174057.4041063-1-robh@kernel.org>
+In-Reply-To: <20230714174057.4041063-1-robh@kernel.org>
+To:     Rob Herring <robh@kernel.org>
+Cc:     sean.wang@mediatek.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -58,19 +62,21 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 15 Jul 2023 17:41:59 +0100 you wrote:
-> The BCM43430A1 has a default MAC address of AA:AA:AA:AA:AA:AA.
-> Although, unlike some other entries, this does not include the
-> chip name, it is clearly not a real address. This was found in
-> AzureWave AW-NB197SM and AW-NM372SM modules.
-> 
-> Signed-off-by: Mans Rullgard <mans@mansr.com>
+On Fri, 14 Jul 2023 11:40:57 -0600 you wrote:
+> The DT of_device.h and of_platform.h date back to the separate
+> of_platform_bus_type before it as merged into the regular platform bus.
+> As part of that merge prepping Arm DT support 13 years ago, they
+> "temporarily" include each other. They also include platform_device.h
+> and of.h. As a result, there's a pretty much random mix of those include
+> files used throughout the tree. In order to detangle these headers and
+> replace the implicit includes with struct declarations, users need to
+> explicitly include the correct includes.
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: btbcm: add default address for BCM43430A1
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2d54008f4b68
+  - bluetooth: Explicitly include correct DT includes
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f0eecb651f96
 
 You are awesome, thank you!
 -- 
