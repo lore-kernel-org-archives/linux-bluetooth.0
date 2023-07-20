@@ -2,82 +2,95 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 250E2EB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 20:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB610EB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 21:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229633AbjGTUkY (ORCPT
+        id S229609AbjGTVBV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jul 2023 16:40:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36096 "EHLO
+        Thu, 20 Jul 2023 17:01:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjGTUkX (ORCPT
+        with ESMTP id S229477AbjGTVBU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jul 2023 16:40:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF50712F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 13:40:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5FFCC61C36
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 20:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8E5EC433C8;
-        Thu, 20 Jul 2023 20:40:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1689885621;
-        bh=AXY/KOvo7u/NrHc9ZIkt/XERJmJsoNqMmrgg5GOnPTk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jiwqb2I+WL/Hj1bwPtYxJhNRuLpN3U1lOMMTPdWepWffhXAfveyUskskFV98ntukB
-         2QZy1c20gjD4exU/UUa53Yg589hNSFZurxiXsJTcYGbF5b7T9FRftvV1X5tQ3MFS03
-         L/EaOrepcEgbKWK/Xy7PG7X8CJ/+rDCypZOZSKIPmbd9Nsoy5rrXZeh0KyFEaDUhxb
-         PBla8+9RJM173P8ouEiBGTyFo7HI7SYxRRjD5LcEAKKXc/y7DiPSA/npLrzs9eIcA9
-         zgH1csCBLiOP3cUx63b+2QIXieWhsu8WZRa0p+TkxPc0wuvoxuPSUZ/6R36afc/QEw
-         mlAIsgqg5RaZA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 97F19C595C4;
-        Thu, 20 Jul 2023 20:40:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ PATCH v5 1/3] btmgmt: Add man page
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <168988562161.5880.9801368453450487903.git-patchwork-notify@kernel.org>
-Date:   Thu, 20 Jul 2023 20:40:21 +0000
-References: <20230720190228.446570-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230720190228.446570-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Thu, 20 Jul 2023 17:01:20 -0400
+Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88FA519A6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 14:01:19 -0700 (PDT)
+Received: from github.com (hubbernetes-node-70ae9a2.ash1-iad.github.net [10.56.200.58])
+        by smtp.github.com (Postfix) with ESMTPA id AC23A340D18
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 14:01:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1689886878;
+        bh=xKv0UFNJiVDwLNKL73Ya3UCku5KCnrOuo8A2YWecVZI=;
+        h=Date:From:To:Subject:From;
+        b=WGFfO1dWy0MZxfg3fVDW2MCC3sdAb1guuVQjAI79gpK8AWMNvJVyMsOVCStd52MSS
+         Abr4/8wP3z/GSb3qpsVhzBHDKD0IseK1PGvUggGpVR5+zzKRFRFL2kQ9yz0R0JVZ38
+         JgGEUMIIxBt2NUfvTwPjI/KX7I1jVWtjMZsTMqnw=
+Date:   Thu, 20 Jul 2023 14:01:18 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/b9e93e-82d3d8@github.com>
+Subject: [bluez/bluez] 9ccebf: btmgmt: Add man page
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 9ccebfa7f91cb2aeb0c451592a7c4634569578f1
+      https://github.com/bluez/bluez/commit/9ccebfa7f91cb2aeb0c451592a7c4634569578f1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-07-20 (Thu, 20 Jul 2023)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M Makefile.tools
+    A tools/btmgmt.rst
 
-On Thu, 20 Jul 2023 12:02:26 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds btmgmt.rst which is then converted to btmgmt.1 using rst2man.
-> ---
->  Makefile.tools   |  5 +--
->  tools/btmgmt.rst | 79 ++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 82 insertions(+), 2 deletions(-)
->  create mode 100644 tools/btmgmt.rst
+  Log Message:
+  -----------
+  btmgmt: Add man page
 
-Here is the summary with links:
-  - [BlueZ,v5,1/3] btmgmt: Add man page
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9ccebfa7f91c
-  - [BlueZ,v5,2/3] client: Add bluetoothctl-mgmt.1 man page
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f0bfd7628025
-  - [BlueZ,v5,3/3] client: Add bluetoothctl-monitor.1 man page
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=82d3d803d4c5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This adds btmgmt.rst which is then converted to btmgmt.1 using rst2man.
 
 
+  Commit: f0bfd76280250f53ecceaaa955d268c0e830145b
+      https://github.com/bluez/bluez/commit/f0bfd76280250f53ecceaaa955d268c0e830145b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-07-20 (Thu, 20 Jul 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-mgmt.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-mgmt.1 man page
+
+This adds bluetoothctl-mgmt.rst which is then converted to
+bluetooth-mgmt.1 using rst2man.
+
+
+  Commit: 82d3d803d4c54946378f706f8b6b0c0ff9d4e821
+      https://github.com/bluez/bluez/commit/82d3d803d4c54946378f706f8b6b0c0ff9d4e821
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-07-20 (Thu, 20 Jul 2023)
+
+  Changed paths:
+    M Makefile.tools
+    A client/bluetoothctl-monitor.rst
+
+  Log Message:
+  -----------
+  client: Add bluetoothctl-monitor.1 man page
+
+This adds bluetoothctl-monitor.rst which is then converted to
+bluetoothctl-mgmt.1 using rst2man.
+
+
+Compare: https://github.com/bluez/bluez/compare/b9e93e01161c...82d3d803d4c5
