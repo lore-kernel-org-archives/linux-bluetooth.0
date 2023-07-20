@@ -2,269 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 822EFEB64DA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 22:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B2EEB64DA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jul 2023 23:04:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230260AbjGTWUw (ORCPT
+        id S229517AbjGTXEc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jul 2023 18:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48108 "EHLO
+        Thu, 20 Jul 2023 19:04:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbjGTWUq (ORCPT
+        with ESMTP id S229451AbjGTXEb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jul 2023 18:20:46 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEF6A2D57
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 15:20:19 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6682909acadso888222b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 15:20:19 -0700 (PDT)
+        Thu, 20 Jul 2023 19:04:31 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEFEC1731
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 16:04:30 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-262dc1ced40so798062a91.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jul 2023 16:04:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1689891596; x=1690496396;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YN5/G/u7O9LH7esUEl5mcO0xhdLZqRJRZQsHaTmhTEI=;
-        b=P0cJPxShTRtdDr4LKDFImjMKFdtAyZEIJei+MtQY9Dc0g6B0NyNEkjYAb9HsKWgVFc
-         XK9XNBDPw5RZTUt53aoGzOtsFNxLHj2OgLpiRaAbaZs2vfoYS0+jTaQG3r/iDXl8WfGf
-         YfKu87r9WpOMRFxE1qXSiuC3nrakn+gbgoBhsSbHofxRz/Uz7SPdCYuqyaxo8fxOw5+3
-         Ccoa3hATbqGHp6VZOrnAwDbUYbUQ6BNPlV3M+XG1DrZPkCfJpHjQ4L4RnzXTLdGi1WLW
-         EdYtobube+FwiqgFl/pEEpUA63QWlKrtov4OSNHa0zvPiEF9VyiCfUK/Dhrap2/dlqPx
-         8nqw==
+        d=gmail.com; s=20221208; t=1689894270; x=1690499070;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zxvSzHyMRK+W1AfWFdz9M1MXBMV1zfcjfJDwVes5T9o=;
+        b=m3Qcv7MCf3i29fYNAMdlOupcCnVhRKDO9mAhddC117jc5FcZWjxHhRCe2sTbqoOn9+
+         wbmK2rradEm2oPo0MMhyWQHP8eB06Z10jHdxt2AAZBV/1W2p/u/OPKQuX/BmI/hYlPFy
+         vRdYxbMCE6Ylm5BpJKqsg7a/PFKz4c5D8RvCpBru0wLqBA4OanCJOFMR0FJI440ideNA
+         Y6DqGf25lXWd6XwDNZqvYWBJN7BSp/AfGSx6VsfA8UlboPvbigWG1fCv1qUtgqtUZw92
+         0HJRaObpMvyPKQ52kQhRw1sfAGub0TBBKT5gKr57GFFRUeqNbOvdztt9CUmRa9F8TK5m
+         N/1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1689891596; x=1690496396;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YN5/G/u7O9LH7esUEl5mcO0xhdLZqRJRZQsHaTmhTEI=;
-        b=PnqGlnWV2NYz7/d+d85dfK8EuvpsQwKNpTfZ4cURwujtjmopK3Pp0p2sJKu2gsA0qM
-         nl5WWAewpmdE1V901uCC3ggbk8oPGdsnsNA2IaR++oHdeVKIegKbfWW3CCBDmziHtqqk
-         H0Di4SzWvXXdnHFl8IuceqttZA+8saEPyurlHPAKwBQfhd+4CG/7x3NkYEyeafftXxyZ
-         Xv3cwkL+uadV76zHxi5GDdPauXo0jRusFmJlvOALyys4rg2OfdcGujh3pRRnHksRf0P+
-         +C6CH+ym0ZYAV18/PPr8Pk+zncnVFI6BeIaRFVfzOWXavEo1a3svB1WTLPG9TwP/B64L
-         GKEQ==
-X-Gm-Message-State: ABy/qLZ/vTlo7sSgkwueVsupCVY/FqaUhRvYXrR/NeaYGBmUOgg/uu1n
-        RnwueotZDxL2ur2J12jCbR8F0UHdex8=
-X-Google-Smtp-Source: APBJJlHBHOzJCw0bt2mx6W5/BjyDTSxiNnNmKvkfgb4oZanAmZr6ZF2RNG3vLOAYvQaVMrSaPp93nw==
-X-Received: by 2002:a05:6a20:9684:b0:133:5eca:a8aa with SMTP id hp4-20020a056a20968400b001335ecaa8aamr147919pzc.46.1689891596466;
-        Thu, 20 Jul 2023 15:19:56 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id e4-20020a170902744400b001b8903d6773sm1912634plt.85.2023.07.20.15.19.55
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1689894270; x=1690499070;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zxvSzHyMRK+W1AfWFdz9M1MXBMV1zfcjfJDwVes5T9o=;
+        b=ldWYAX8pYq4UEx8hR+patFWJiUmFS6NBskur5/scMv3aaO7E2tDQInqXCb0Mu34a2+
+         kA0uzNmVyLWOKk8h1w9fJ+XXufUQkRMMLNR8tdtbmGXkiE5GlKOw1Nw0jGFy/0GPnPsE
+         TJfWaoAdIiyUOvER8pZ1f/GfQH8WLDB9HVHp/N1ZlCc4BoSjeyMbWhrntStRjbX6i2tN
+         8Pp3fuCnnzH8Q/UVuy0is3mEnBXIDuMlbdlK3vtgH0OrhyPNHAAH6UPJhi+C55SUKyxz
+         O+o0io/Yc37oGlpW6YudutrbpySWJr3zdOHJh/EjV1HNppAaXqg45+fs1th3UhryakG+
+         tFtg==
+X-Gm-Message-State: ABy/qLY3SLfz+LqsFBtqabG1W4SDoc/jrlmZTQ+SRzTN9hORAfV1Kld9
+        KBmjJ7ZStL9pD9z5hrKPDY6BkJtkoYg=
+X-Google-Smtp-Source: APBJJlEBr5BmgAvFCVBzID4zWhiT7MI7XEgKOgTQzY7Zdq4N40KDow9ZBLNEG/wfEfS10nex00UClg==
+X-Received: by 2002:a17:90a:3841:b0:256:d4a:ea4c with SMTP id l1-20020a17090a384100b002560d4aea4cmr77079pjf.30.1689894269844;
+        Thu, 20 Jul 2023 16:04:29 -0700 (PDT)
+Received: from [172.17.0.2] ([13.87.245.150])
+        by smtp.gmail.com with ESMTPSA id 5-20020a17090a190500b0025bfda134ccsm1552195pjg.16.2023.07.20.16.04.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jul 2023 15:19:55 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Move btusb_recv_event_intel to btintel
-Date:   Thu, 20 Jul 2023 15:19:54 -0700
-Message-ID: <20230720221954.517948-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Thu, 20 Jul 2023 16:04:29 -0700 (PDT)
+Message-ID: <64b9bd7d.170a0220.dd99c.30ee@mx.google.com>
+Date:   Thu, 20 Jul 2023 16:04:29 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4270893622927196642=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: btusb: Move btusb_recv_event_intel to btintel
+In-Reply-To: <20230720221954.517948-1-luiz.dentz@gmail.com>
+References: <20230720221954.517948-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4270893622927196642==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-btusb_recv_event_intel is specific to Intel controllers therefore it
-shall be placed inside btintel.c so btusb don't have a mix of vendor
-specific code with the generic parts.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=767998
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.09 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      39.56 seconds
+CheckAllWarning               PASS      43.31 seconds
+CheckSparse                   PASS      49.59 seconds
+CheckSmatch                   PASS      133.43 seconds
+BuildKernel32                 PASS      38.20 seconds
+TestRunnerSetup               PASS      580.86 seconds
+TestRunner_l2cap-tester       PASS      27.15 seconds
+TestRunner_iso-tester         PASS      64.40 seconds
+TestRunner_bnep-tester        PASS      12.78 seconds
+TestRunner_mgmt-tester        FAIL      242.32 seconds
+TestRunner_rfcomm-tester      PASS      19.39 seconds
+TestRunner_sco-tester         PASS      19.88 seconds
+TestRunner_ioctl-tester       PASS      22.11 seconds
+TestRunner_mesh-tester        PASS      16.00 seconds
+TestRunner_smp-tester         PASS      17.17 seconds
+TestRunner_userchan-tester    PASS      13.16 seconds
+IncrementalBuild              PASS      35.68 seconds
+
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 497, Passed: 496 (99.8%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+LL Privacy - Unpair 1                                Timed out    1.891 seconds
+
+
 ---
- drivers/bluetooth/btintel.c | 74 ++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  1 +
- drivers/bluetooth/btusb.c   | 75 +------------------------------------
- 3 files changed, 76 insertions(+), 74 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index b32277cb045d..633e8d9bf58f 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2948,6 +2948,80 @@ int btintel_configure_setup(struct hci_dev *hdev, const char *driver_name)
- }
- EXPORT_SYMBOL_GPL(btintel_configure_setup);
- 
-+static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct intel_tlv *tlv = (void *)&skb->data[5];
-+
-+	/* The first event is always an event type TLV */
-+	if (tlv->type != INTEL_TLV_TYPE_ID)
-+		goto recv_frame;
-+
-+	switch (tlv->val[0]) {
-+	case INTEL_TLV_SYSTEM_EXCEPTION:
-+	case INTEL_TLV_FATAL_EXCEPTION:
-+	case INTEL_TLV_DEBUG_EXCEPTION:
-+	case INTEL_TLV_TEST_EXCEPTION:
-+		/* Generate devcoredump from exception */
-+		if (!hci_devcd_init(hdev, skb->len)) {
-+			hci_devcd_append(hdev, skb);
-+			hci_devcd_complete(hdev);
-+		} else {
-+			bt_dev_err(hdev, "Failed to generate devcoredump");
-+			kfree_skb(skb);
-+		}
-+		return 0;
-+	default:
-+		bt_dev_err(hdev, "Invalid exception type %02X", tlv->val[0]);
-+	}
-+
-+recv_frame:
-+	return hci_recv_frame(hdev, skb);
-+}
-+
-+int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_event_hdr *hdr = (void *)skb->data;
-+	const char diagnostics_hdr[] = { 0x87, 0x80, 0x03 };
-+
-+	if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
-+	    hdr->plen > 0) {
-+		const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
-+		unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
-+
-+		if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
-+			switch (skb->data[2]) {
-+			case 0x02:
-+				/* When switching to the operational firmware
-+				 * the device sends a vendor specific event
-+				 * indicating that the bootup completed.
-+				 */
-+				btintel_bootup(hdev, ptr, len);
-+				break;
-+			case 0x06:
-+				/* When the firmware loading completes the
-+				 * device sends out a vendor specific event
-+				 * indicating the result of the firmware
-+				 * loading.
-+				 */
-+				btintel_secure_send_result(hdev, ptr, len);
-+				break;
-+			}
-+		}
-+
-+		/* Handle all diagnostics events separately. May still call
-+		 * hci_recv_frame.
-+		 */
-+		if (len >= sizeof(diagnostics_hdr) &&
-+		    memcmp(&skb->data[2], diagnostics_hdr,
-+			   sizeof(diagnostics_hdr)) == 0) {
-+			return btintel_diagnostics(hdev, skb);
-+		}
-+	}
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+EXPORT_SYMBOL_GPL(btintel_recv_event);
-+
- void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len)
- {
- 	const struct intel_bootup *evt = ptr;
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 7fd29ef038bd..2ed646609dee 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -222,6 +222,7 @@ int btintel_read_boot_params(struct hci_dev *hdev,
- int btintel_download_firmware(struct hci_dev *dev, struct intel_version *ver,
- 			      const struct firmware *fw, u32 *boot_param);
- int btintel_configure_setup(struct hci_dev *hdev, const char *driver_name);
-+int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb);
- void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
- void btintel_secure_send_result(struct hci_dev *hdev,
- 				const void *ptr, unsigned int len);
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 96395994eb1f..68ea9ee6b062 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2495,79 +2495,6 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
- 	return btusb_recv_bulk(data, buffer, count);
- }
- 
--static int btusb_intel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct intel_tlv *tlv = (void *)&skb->data[5];
--
--	/* The first event is always an event type TLV */
--	if (tlv->type != INTEL_TLV_TYPE_ID)
--		goto recv_frame;
--
--	switch (tlv->val[0]) {
--	case INTEL_TLV_SYSTEM_EXCEPTION:
--	case INTEL_TLV_FATAL_EXCEPTION:
--	case INTEL_TLV_DEBUG_EXCEPTION:
--	case INTEL_TLV_TEST_EXCEPTION:
--		/* Generate devcoredump from exception */
--		if (!hci_devcd_init(hdev, skb->len)) {
--			hci_devcd_append(hdev, skb);
--			hci_devcd_complete(hdev);
--		} else {
--			bt_dev_err(hdev, "Failed to generate devcoredump");
--			kfree_skb(skb);
--		}
--		return 0;
--	default:
--		bt_dev_err(hdev, "Invalid exception type %02X", tlv->val[0]);
--	}
--
--recv_frame:
--	return hci_recv_frame(hdev, skb);
--}
--
--static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
--{
--	struct hci_event_hdr *hdr = (void *)skb->data;
--	const char diagnostics_hdr[] = { 0x87, 0x80, 0x03 };
--
--	if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
--	    hdr->plen > 0) {
--		const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
--		unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
--
--		if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
--			switch (skb->data[2]) {
--			case 0x02:
--				/* When switching to the operational firmware
--				 * the device sends a vendor specific event
--				 * indicating that the bootup completed.
--				 */
--				btintel_bootup(hdev, ptr, len);
--				break;
--			case 0x06:
--				/* When the firmware loading completes the
--				 * device sends out a vendor specific event
--				 * indicating the result of the firmware
--				 * loading.
--				 */
--				btintel_secure_send_result(hdev, ptr, len);
--				break;
--			}
--		}
--
--		/* Handle all diagnostics events separately. May still call
--		 * hci_recv_frame.
--		 */
--		if (len >= sizeof(diagnostics_hdr) &&
--		    memcmp(&skb->data[2], diagnostics_hdr,
--			   sizeof(diagnostics_hdr)) == 0) {
--			return btusb_intel_diagnostics(hdev, skb);
--		}
--	}
--
--	return hci_recv_frame(hdev, skb);
--}
--
- static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct urb *urb;
-@@ -4353,7 +4280,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		priv_size += sizeof(struct btintel_data);
- 
- 		/* Override the rx handlers */
--		data->recv_event = btusb_recv_event_intel;
-+		data->recv_event = btintel_recv_event;
- 		data->recv_bulk = btusb_recv_bulk_intel;
- 	} else if (id->driver_info & BTUSB_REALTEK) {
- 		/* Allocate extra space for Realtek device */
--- 
-2.41.0
 
+--===============4270893622927196642==--
