@@ -2,208 +2,136 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15797C001DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 01:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30763C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 08:56:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230475AbjGXBvW (ORCPT
+        id S232038AbjGXI41 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jul 2023 21:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54350 "EHLO
+        Mon, 24 Jul 2023 04:56:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231273AbjGXBvI (ORCPT
+        with ESMTP id S231971AbjGXI4P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jul 2023 21:51:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C2B7D80;
-        Sun, 23 Jul 2023 18:42:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 23F6F60FD6;
-        Mon, 24 Jul 2023 01:37:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 260C5C433CA;
-        Mon, 24 Jul 2023 01:37:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690162623;
-        bh=OWxp6WTnn1dkHR4+MAKsUiLf97zFkXNhtuzKDsO6/v8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Tp74vN8iNmiO8nQb0K1P0kx2IXg7gizh2sTasRwUJKjDJmJdbAH4YyMm6DW80mGwS
-         hGOJosHLGzSOuURB+IaKW3rizIFWDkUnfGqtwNCTroE/DIThu89Y9it+Iq19jcG07w
-         oPQKe7OgOAyH/D+TNIQXVtwic0Asfy78GpDuzuiYe/m9MM5nT3kdcSscUNUhyNtuGK
-         G54J7zznzAkpgZCPPvusXTR1L3EPQoxa5qncFNws2HwEDMpcN7Qe1qY/apsLP8CDru
-         apkLjxc47GpJdh5SgZZiqH6+bddd/NDpuXgFGaVOj6cPDay26RySuK8QhfkBZAibVr
-         U0nCA7DhTzIpQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Sungwoo Kim <iam@sung-woo.kim>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 8/9] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb
-Date:   Sun, 23 Jul 2023 21:35:50 -0400
-Message-Id: <20230724013554.2334965-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230724013554.2334965-1-sashal@kernel.org>
-References: <20230724013554.2334965-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.14.320
+        Mon, 24 Jul 2023 04:56:15 -0400
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2079.outbound.protection.outlook.com [40.107.105.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A78AD19A1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 01:56:00 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M4+eva2mUaMWzBXqsSVRBzFZNN2bbUMkYFoqT+VuafUi9oYQTFsLOyOHOnlLjSMMsOdBJ8N6if8+jC0sSYI+ItRXAx0i8cwgsNbzBzLKFQYHRdNwOa503r+IT10KrrVEIY8pd6qjQj6qSj6xqgY4pNUGrKQmghecUT3zUkXcFVxT8l9gYIUwTNxJaqxaLUy+7mffbNzsj4uJ5/Q0AP7XxtTyAfcjbYcd2bdQSv5lBUu8eZNT128rUZ0XzLk5lec2SuqfRKSq0kQgmRacEORSIbAG7iYJG52P9sOzjF9ld7z3zRizq/Xq6YxTFO50JzArLlfKXbZqm37jokr1Uf8+Hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=orFneN1+Oxw/4fNqRV/okxHZk+vZkVuKzUSJE27KPJE=;
+ b=U6PdsV46sQBnhEsTxwcHWnpRZD631WCI02CxLdVsabN18KLJHHyr9fllJBo7WKDa1yfI9L5/6q8ipKc2Tro3gDLP/3J+tSsE/bjuvqbvdcgbsK71jrIvvJcC0zUwQnf1bpBDn02wgrYQdZ8BHrzimsoruQcZb6qHbQxb+WmrfqRdVCm2D1yu5Ab2X+wsbEEcJkSyn9eFw5PqxuHIDysXWjvo6A3K6CBYN4oGp2xSVTMMlSGbIGIqwHIwNgM8PF9bDV9JP+uo5nWr/5QxnXhYjLQ3JKhnA5u8GCUNPVCx6oYrOcp/xCx0Mjznwa6rgD4lo8kUz/ebeylPahRIr2GoHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=orFneN1+Oxw/4fNqRV/okxHZk+vZkVuKzUSJE27KPJE=;
+ b=h9RvzWyatS9eQGNPAZ3AMZjHgTwt+4s7mGkAMpHp//e6GjSaC7b7w9Xz22mfWlJsrMv1Y+o2XEX8LKSmXu5A5Jn/4sxTzW6P1vGvjrSsGFUFBEkyzc8EI3szeW4b8t5cTnmVH7U1e0o8Xey8GhqC57Jw700gRSrX6LqBuFTk0dU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB9126.eurprd04.prod.outlook.com (2603:10a6:20b:449::16)
+ by AM9PR04MB8537.eurprd04.prod.outlook.com (2603:10a6:20b:434::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
+ 2023 08:55:57 +0000
+Received: from AS8PR04MB9126.eurprd04.prod.outlook.com
+ ([fe80::273d:f528:aaa9:288]) by AS8PR04MB9126.eurprd04.prod.outlook.com
+ ([fe80::273d:f528:aaa9:288%4]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
+ 08:55:57 +0000
+From:   Nitin Jadhav <nitin.jadhav@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     devyani.godbole@nxp.com, pav@iki.fi, luiz.dentz@gmail.com,
+        sathish.narasimman@intel.com, nitin.jadhav@nxp.com
+Subject: [PATCH BlueZ v1 0/1] Fixed the crash observed with VOCS when pairing with LE Audio TWS earbuds
+Date:   Mon, 24 Jul 2023 11:55:29 +0300
+Message-Id: <20230724085530.5555-1-nitin.jadhav@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI1PR02CA0056.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::7) To AS8PR04MB9126.eurprd04.prod.outlook.com
+ (2603:10a6:20b:449::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB9126:EE_|AM9PR04MB8537:EE_
+X-MS-Office365-Filtering-Correlation-Id: fa537ea9-3690-4add-3e2f-08db8c23cbc7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: wwzw+H6Dva4hxQGebMN84HN9n9NzaFu70FK+R5k7PEwu+O1i/9VnE7sS/Q3nAZkG0vU2lx56rZl4BfkW9x23HMaGfEYuW7TakdTf+l2STSde6QKsRjF2xcX/Pjp8Hcfd/7deEa6s4hkckbf0EEWrM0fiKCPN5DUZqNUisEMuSLZiPCFFbW2Il3h5IEMSR0K7J5OXPAst4nqZN4HxsdCPx+UfRnBZdOp2vl/ePJJNRxNwOUfO5KBTBlEaodxLQIYP4j6sHWaZ7lR3FOoMjOI/PsJrj303tCOVpAmitryc4YXjgkmO5h007hWYMdPgL4BvKE3JHNZHesCfObNQT5OuMUvQuFH2Ac6dGahI8mzpCmBso173g07fj28eMEhT7Aj6YQVdQ2Amq0jytI/YK2JsaC+xDhkdCYXr+kvwqzb5wydK25BMcJBpJo4Usn+g78P5V3hCzzz1kgjqNdFezl0VUwGaJidCHX9PALpxcRbaFI6K6XkEjo+MhFtHa+COkiHOeQ7zXT5oH7XbC7z8keb6AEqQkdSr4KpxNUJ0cmNm2cu3me+p9ilT8NG9SwocnKMCJ6XPMYd/333ahXyoKh1c6ImScy6s+M5d1+4pV14syrw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB9126.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(39860400002)(376002)(346002)(136003)(451199021)(86362001)(38100700002)(38350700002)(66476007)(4326008)(6916009)(478600001)(41300700001)(316002)(66946007)(5660300002)(44832011)(8676002)(8936002)(966005)(6486002)(6512007)(6666004)(2906002)(4744005)(186003)(52116002)(1076003)(26005)(6506007)(66556008)(83380400001)(36756003)(55236004)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Yd2bfPmKHSb2rJjtKFix9mlEqKOJbh6rjJ1RRwH/hrMoAdMUx6Et4HxK0HWz?=
+ =?us-ascii?Q?CutZ8rNwosDCofuoM3ABmH7rvb8KD0woEhbxqQIwgRH4EYrbWh87LjqQ3TbH?=
+ =?us-ascii?Q?KcNRWzNo0HmhjDxubxWxBrnEhTbdQaZK+vCuITpZ0QBSTbLZP0AfJi+wbju9?=
+ =?us-ascii?Q?RQSyLqoDCZ0/D02TxEdbN9rW7lC71NUXjvokkFwbXnGzsGfdncVqrzKVONy1?=
+ =?us-ascii?Q?ll4aZNUypS5b2dhXCNMPizFus7rF/bl7BdW2xkRIsEeWikCPJtJytx/RLxjy?=
+ =?us-ascii?Q?4QgPuOp+/Aagchnr5Tc1FdA8Mcx+rErxwQpvdg/zQg+SH2qo01mSXRn+9CR2?=
+ =?us-ascii?Q?U7kIZjQZD4rr3r3W+itrrCOvDK1nKoC9vPs69Y0Yal7UydTCGkbRPsOmQdRP?=
+ =?us-ascii?Q?dBK5pdAKzHojlYsm58DaH41CzR0bmR96lmkofUUW9EXrQlnSO7SId3igqVPg?=
+ =?us-ascii?Q?rEQOeIh+Aew10xlN5Tt1na1kSOYJKXaWfrpmez418M0wNtNxFOxoO7sxSh6I?=
+ =?us-ascii?Q?WosybYS7pNpSElkEtBAiljVdwMIGpr4nGF3aDiLWHbyd87W47HJuVkygiveA?=
+ =?us-ascii?Q?EPTG7yUi3QgXFBTBHRuLWZ5kzGclkGo02pdNxstT3qRp/viOCEciZKNw4lsl?=
+ =?us-ascii?Q?GlM0rMU4rAGIb5Pof/XxmoDUYCOfvok7qpXzSjATVv1yFjlf/LMiPWRskoFj?=
+ =?us-ascii?Q?/2usNoBrFIZ5TVfrZwUSvMX2RcGkJ/Fxa7HyIu9eBtOfK6X0v42hyt2FzRJf?=
+ =?us-ascii?Q?cuu7VE9ixh0AfpkKIwhlTg5JR9Tqtd2+ucoPrdH31opHh+0LuesKcCJbmgL+?=
+ =?us-ascii?Q?RZ5pohOqmK7nJbfpHKG8Jz2+a+YivKN5V9oBjVIbuPK13Dq3hvnYSE6pwED/?=
+ =?us-ascii?Q?/JE59VLZ8hXDyThixLN9mT2Men+4f12J3zE7AuPXNRrd9nQKygr9G+jI2uQ8?=
+ =?us-ascii?Q?tiOh0EV06VLcWLTbmyY4T9Pmpy8ddyuTQx6S9y+gCkqoCyPSlDt6wmWCVawb?=
+ =?us-ascii?Q?7FVEBv3F9FTE5h68jcGMIJxl2azk8L47aJ/f3z7Xzsj/+aYx/sQtSKjUOuEZ?=
+ =?us-ascii?Q?O7fJK+yFXvnq9anayATpa/FyQO/CHSLSM7iVN8DD5hNhhBSqLKeIHyyTSR4E?=
+ =?us-ascii?Q?/xURKew1SZz5vs+dXgaSFyfpYfyhDtv0VTgYzCaYCTqQs+pSqxewb/74NJBs?=
+ =?us-ascii?Q?1ImbIzrGgXWQyoLZNqrwvEfXDYaDo7eWQTGPxYSpxcFHHx6y5XjDFnAYQtkD?=
+ =?us-ascii?Q?lFB1ln9ovK97x7NXzLjssj60q1Xl7tSUTYbHcXWKV2yxcEAlQ/IQe9ueAFPA?=
+ =?us-ascii?Q?mlqOaeuhGTxnZHeNODryWnBG4FJrgjSp7pGtowJxChQW59Y59qnJ68Svwlyv?=
+ =?us-ascii?Q?/1FWOaX7nYkxlwV0DqYAKi5BvjYLVXe3SIYLJS2DYzlsnjBE48f2C5KBAaI3?=
+ =?us-ascii?Q?gX2JTyrgLNEY/HDzaYMrptv8GUneCtGdL3sqBATuytQah8gMenFcguaZF1f0?=
+ =?us-ascii?Q?lPHp8bXThv/kN048FcDg6yXtSatQcbdE6JkLCIW/xmPvyUFnv8KRnfIPljnK?=
+ =?us-ascii?Q?isdpD/TkDI7QicaazFUHxOHVsXyMVKkjYtOEBNnr?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa537ea9-3690-4add-3e2f-08db8c23cbc7
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB9126.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 08:55:57.4567
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EZq3jx4uUPjmSI1yuIw4MWRRuaFzJwp3qZylqhzwcBpXTC4ZVxISwPq1lf5klQbmVap3eNSSK2R5kyCr5WZ3ig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8537
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sungwoo Kim <iam@sung-woo.kim>
+Hello Maintainers
 
-[ Upstream commit 1728137b33c00d5a2b5110ed7aafb42e7c32e4a1 ]
+This patch handles the fix for the crash observed with VOCS when trying to pair with LE Audio TWS earbuds. 
 
-l2cap_sock_release(sk) frees sk. However, sk's children are still alive
-and point to the already free'd sk's address.
-To fix this, l2cap_sock_release(sk) also cleans sk's children.
+A crash was reproted for the following patch by Pauli Virtanen <pav@iki.fi>. 
+Patch Link: https://patchwork.kernel.org/project/bluetooth/patch/20230612133251.194-4-nitin.jadhav@nxp.com/
 
-==================================================================
-BUG: KASAN: use-after-free in l2cap_sock_ready_cb+0xb7/0x100 net/bluetooth/l2cap_sock.c:1650
-Read of size 8 at addr ffff888104617aa8 by task kworker/u3:0/276
+Root cause: 
+- There are two types of database- Remote and Local (rdb and ldb)
+- In client mode currently the code was written to access ldb
 
-CPU: 0 PID: 276 Comm: kworker/u3:0 Not tainted 6.2.0-00001-gef397bd4d5fb-dirty #59
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-Workqueue: hci2 hci_rx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x72/0x95 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:306 [inline]
- print_report+0x175/0x478 mm/kasan/report.c:417
- kasan_report+0xb1/0x130 mm/kasan/report.c:517
- l2cap_sock_ready_cb+0xb7/0x100 net/bluetooth/l2cap_sock.c:1650
- l2cap_chan_ready+0x10e/0x1e0 net/bluetooth/l2cap_core.c:1386
- l2cap_config_req+0x753/0x9f0 net/bluetooth/l2cap_core.c:4480
- l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:5739 [inline]
- l2cap_sig_channel net/bluetooth/l2cap_core.c:6509 [inline]
- l2cap_recv_frame+0xe2e/0x43c0 net/bluetooth/l2cap_core.c:7788
- l2cap_recv_acldata+0x6ed/0x7e0 net/bluetooth/l2cap_core.c:8506
- hci_acldata_packet net/bluetooth/hci_core.c:3813 [inline]
- hci_rx_work+0x66e/0xbc0 net/bluetooth/hci_core.c:4048
- process_one_work+0x4ea/0x8e0 kernel/workqueue.c:2289
- worker_thread+0x364/0x8e0 kernel/workqueue.c:2436
- kthread+0x1b9/0x200 kernel/kthread.c:376
- ret_from_fork+0x2c/0x50 arch/x86/entry/entry_64.S:308
- </TASK>
+Fix:
+- Correcting it to access rdb has resolved the problem in VOCS
+- Same correction is done for VCS.
 
-Allocated by task 288:
- kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0x82/0x90 mm/kasan/common.c:383
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- __do_kmalloc_node mm/slab_common.c:968 [inline]
- __kmalloc+0x5a/0x140 mm/slab_common.c:981
- kmalloc include/linux/slab.h:584 [inline]
- sk_prot_alloc+0x113/0x1f0 net/core/sock.c:2040
- sk_alloc+0x36/0x3c0 net/core/sock.c:2093
- l2cap_sock_alloc.constprop.0+0x39/0x1c0 net/bluetooth/l2cap_sock.c:1852
- l2cap_sock_create+0x10d/0x220 net/bluetooth/l2cap_sock.c:1898
- bt_sock_create+0x183/0x290 net/bluetooth/af_bluetooth.c:132
- __sock_create+0x226/0x380 net/socket.c:1518
- sock_create net/socket.c:1569 [inline]
- __sys_socket_create net/socket.c:1606 [inline]
- __sys_socket_create net/socket.c:1591 [inline]
- __sys_socket+0x112/0x200 net/socket.c:1639
- __do_sys_socket net/socket.c:1652 [inline]
- __se_sys_socket net/socket.c:1650 [inline]
- __x64_sys_socket+0x40/0x50 net/socket.c:1650
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x72/0xdc
+Thanks
+Warm Regards
+Nitin Jadhav
 
-Freed by task 288:
- kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
- kasan_set_track+0x25/0x30 mm/kasan/common.c:52
- kasan_save_free_info+0x2e/0x50 mm/kasan/generic.c:523
- ____kasan_slab_free mm/kasan/common.c:236 [inline]
- ____kasan_slab_free mm/kasan/common.c:200 [inline]
- __kasan_slab_free+0x10a/0x190 mm/kasan/common.c:244
- kasan_slab_free include/linux/kasan.h:177 [inline]
- slab_free_hook mm/slub.c:1781 [inline]
- slab_free_freelist_hook mm/slub.c:1807 [inline]
- slab_free mm/slub.c:3787 [inline]
- __kmem_cache_free+0x88/0x1f0 mm/slub.c:3800
- sk_prot_free net/core/sock.c:2076 [inline]
- __sk_destruct+0x347/0x430 net/core/sock.c:2168
- sk_destruct+0x9c/0xb0 net/core/sock.c:2183
- __sk_free+0x82/0x220 net/core/sock.c:2194
- sk_free+0x7c/0xa0 net/core/sock.c:2205
- sock_put include/net/sock.h:1991 [inline]
- l2cap_sock_kill+0x256/0x2b0 net/bluetooth/l2cap_sock.c:1257
- l2cap_sock_release+0x1a7/0x220 net/bluetooth/l2cap_sock.c:1428
- __sock_release+0x80/0x150 net/socket.c:650
- sock_close+0x19/0x30 net/socket.c:1368
- __fput+0x17a/0x5c0 fs/file_table.c:320
- task_work_run+0x132/0x1c0 kernel/task_work.c:179
- resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
- exit_to_user_mode_prepare+0x113/0x120 kernel/entry/common.c:203
- __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
- syscall_exit_to_user_mode+0x21/0x50 kernel/entry/common.c:296
- do_syscall_64+0x4c/0x90 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x72/0xdc
+Nitin Jadhav (1):
+  shared/vcp: Fixed the crash observed with VOCS when pairing with LE
+    Audio TWS earbuds
 
-The buggy address belongs to the object at ffff888104617800
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 680 bytes inside of
- 1024-byte region [ffff888104617800, ffff888104617c00)
+ src/shared/vcp.c | 52 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 29 insertions(+), 23 deletions(-)
 
-The buggy address belongs to the physical page:
-page:00000000dbca6a80 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888104614000 pfn:0x104614
-head:00000000dbca6a80 order:2 compound_mapcount:0 subpages_mapcount:0 compound_pincount:0
-flags: 0x200000000010200(slab|head|node=0|zone=2)
-raw: 0200000000010200 ffff888100041dc0 ffffea0004212c10 ffffea0004234b10
-raw: ffff888104614000 0000000000080002 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff888104617980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888104617a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888104617a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                  ^
- ffff888104617b00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888104617b80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-Ack: This bug is found by FuzzBT with a modified Syzkaller. Other
-contributors are Ruoyu Wu and Hui Peng.
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/l2cap_sock.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 47a16f6e741b8..70b86ef50491b 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -45,6 +45,7 @@ static const struct proto_ops l2cap_sock_ops;
- static void l2cap_sock_init(struct sock *sk, struct sock *parent);
- static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
- 				     int proto, gfp_t prio, int kern);
-+static void l2cap_sock_cleanup_listen(struct sock *parent);
- 
- bool l2cap_is_socket(struct socket *sock)
- {
-@@ -1206,6 +1207,7 @@ static int l2cap_sock_release(struct socket *sock)
- 	if (!sk)
- 		return 0;
- 
-+	l2cap_sock_cleanup_listen(sk);
- 	bt_sock_unlink(&l2cap_sk_list, sk);
- 
- 	err = l2cap_sock_shutdown(sock, 2);
 -- 
-2.39.2
+2.34.1
 
