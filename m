@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B350C04E69
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 01:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7F6C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 01:38:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbjGXBiT (ORCPT
+        id S229913AbjGXBiU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jul 2023 21:38:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41288 "EHLO
+        Sun, 23 Jul 2023 21:38:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232050AbjGXBiA (ORCPT
+        with ESMTP id S232023AbjGXBh6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jul 2023 21:38:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 508EA3AAD;
-        Sun, 23 Jul 2023 18:33:58 -0700 (PDT)
+        Sun, 23 Jul 2023 21:37:58 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5319F3A86;
+        Sun, 23 Jul 2023 18:33:54 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C154C60F54;
-        Mon, 24 Jul 2023 01:32:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 260ACC433CA;
-        Mon, 24 Jul 2023 01:32:12 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BA66760F1A;
+        Mon, 24 Jul 2023 01:32:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECB8DC433D9;
+        Mon, 24 Jul 2023 01:32:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690162333;
-        bh=k60N+mmm1ATq46odD8m+W88ylO4F8rYQSdhL4Be7grI=;
+        s=k20201202; t=1690162330;
+        bh=VWn7I8aeOGGxbqba3PmdYM9O7ZKxNndmWAI4lNJd0nM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nnoHtaXsUM4i6J4AUGUwKcftbYp7BY+SANUzBlfztg5cPig7ypy7cKROe4KP82WfU
-         gpbQKmNalN+VoVjKDLSh/y7p7kKVhS0vFQiVeKv+KK4q4xdh9Q5BjpDc88hHZvT33Y
-         T+GPY9uV8iW/oudnBuyZ9DsHa73gLJ7iY20YyqtbzstzeGV7QrgB7ILkgOZRAm71cI
-         c23XOIBp2wRcL/ijVi7rAj5QG+1bAc37g6/yvYlmdo0P1S5vOIiqOjy0VBMoFd1R2u
-         lIEdaZ6WLhtjaYpB4DrdXMSISL9xbJRnr6tALmkWgC6If0ukmKWftVG5MD5fObqL7Y
-         xF6K3kTqkZExg==
+        b=hwPBp819TecWumj6uZkymau1WW2ikZymIXJzT4mvo3ofHWIk+UoJY9SkZDFNawKuA
+         QijjltEbGmz0VVQVoW2LVz+rRyKLs5xzappYu0LRTldhIRa0UldzELDFLPYUhacs0Y
+         DLCEVWhWNZWn9Wb4CqK6dVxymUZJe0M6YStrn3EjDzQaeS7EigQqJJuJvgdrOfguLU
+         EIBtPTadQDDQQRk84b4ghxPtlFR4icoUJHmXImvVNneMiJ5mCB3uUi3CRRDyEdvCE9
+         IG9X9V2Pp65qig15MrwM9As2xD310E47pgKyqsDcwk0Fufo0JIFJYRLSF/8fhiZDK0
+         4WCefD41aFAGg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Matthew Anderson <ruinairas1992@gmail.com>,
+Cc:     Zhengping Jiang <jiangzp@google.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        gustavo@padovan.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 23/40] Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally
-Date:   Sun, 23 Jul 2023 21:31:23 -0400
-Message-Id: <20230724013140.2327815-23-sashal@kernel.org>
+        gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 21/40] Bluetooth: L2CAP: Fix use-after-free
+Date:   Sun, 23 Jul 2023 21:31:21 -0400
+Message-Id: <20230724013140.2327815-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230724013140.2327815-1-sashal@kernel.org>
 References: <20230724013140.2327815-1-sashal@kernel.org>
@@ -57,35 +57,39 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Matthew Anderson <ruinairas1992@gmail.com>
+From: Zhengping Jiang <jiangzp@google.com>
 
-[ Upstream commit fa01eba11f0e57c767a5eab5291c7a01407a00be ]
+[ Upstream commit f752a0b334bb95fe9b42ecb511e0864e2768046f ]
 
-Adding the device ID from the Asus Ally gets the bluetooth working
-on the device.
+Fix potential use-after-free in l2cap_le_command_rej.
 
-Signed-off-by: Matthew Anderson <ruinairas1992@gmail.com>
+Signed-off-by: Zhengping Jiang <jiangzp@google.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/l2cap_core.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2a8e2bb038f58..7427da184fe02 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -613,6 +613,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0d9), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0f5), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c5e8798e297ca..17ca13e8c044c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6374,9 +6374,14 @@ static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
+ 	if (!chan)
+ 		goto done;
+ 
++	chan = l2cap_chan_hold_unless_zero(chan);
++	if (!chan)
++		goto done;
++
+ 	l2cap_chan_lock(chan);
+ 	l2cap_chan_del(chan, ECONNREFUSED);
+ 	l2cap_chan_unlock(chan);
++	l2cap_chan_put(chan);
+ 
+ done:
+ 	mutex_unlock(&conn->chan_lock);
 -- 
 2.39.2
 
