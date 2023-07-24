@@ -2,228 +2,208 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2069DC001B0
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jul 2023 09:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6C3C001DC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 01:38:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbjGWJp1 (ORCPT
+        id S230195AbjGXBiS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jul 2023 05:45:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
+        Sun, 23 Jul 2023 21:38:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbjGWJp0 (ORCPT
+        with ESMTP id S232048AbjGXBiA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jul 2023 05:45:26 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A93E6D
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jul 2023 02:45:24 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fbc6ab5ff5so26195735e9.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jul 2023 02:45:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690105523; x=1690710323;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LoEqP9g4RnCV+rCQcPRVucKkzyAi7lOTpMtAx4H6NwI=;
-        b=dn1K/Mrj7Jbm9TygDZ1s6+g2vM/ucfyfLrOYzH+t3f8BXIqHtMsGuYs9WYxc40hybi
-         EOBbrBA+iVgQpsKBEB4zU1gQV5cuPqvWMapk2OsF0+XNtJCIXLw7hPRLBYZjz/Z571/f
-         7vP32bf68EEc1YWgng9+0eQiOl8z7lDzcASz/G/MTPHEfl3C4+w+myG4Fvj/kEnI0gIE
-         yF0Wq9ctdoZu3c3OdiVVlXdsI/kWVmMV73rykcUDiLRuiLgHQJJCJaUpQft0SvD2Pp0h
-         0Bg93w5x9srZVZ+X56ZZa26zG08a+sCrrWw3fTCnrxl0ewRcZNKkfT/UG5qbt8sPeGZE
-         4BXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690105523; x=1690710323;
-        h=content-transfer-encoding:in-reply-to:references:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LoEqP9g4RnCV+rCQcPRVucKkzyAi7lOTpMtAx4H6NwI=;
-        b=V6DuVQLc1/39Vy+LayojOsh+/CVlXGLxNkh1fgeEwd4deqp9OoQzbWLk2xYCD/Bqe8
-         eeLRqsdugpMBHnlbesY2/uBtitMtlBFUocCh+PLfhSGb2pHC1C0KJKE8+CjMgqCoHj3h
-         zR3+96eeFL86iD55nw5Ay85Fx7tsNduiF7tkPNIuI14RK/Mn7ylINKxgNCzLaJqHMXlJ
-         s9qLV3kyeAwktJNQ7J1vDri/q2nCe+YCe33A1JnW9IEE4m22y22WCz5td/pchCm4gM+0
-         fW+FD5nkKrYeWNuPXnoEXt36Tcaa/tMkPLFdRHKNCaslKUxYNrN57a17vCqt1J8YDYsR
-         uucw==
-X-Gm-Message-State: ABy/qLaWzd+//91g0ttMFWgDDpegBcxaJzwUaGebYSLc0jg8vGvFjcKq
-        aoZDIysIrDICE3hpvNF+wGhhwuFCXCE=
-X-Google-Smtp-Source: APBJJlFR1YPoHqMSvYhzEmBl9zE7ctBJ08GNZpIlsNRUnbzGcB6ZP5/+6v1MaQS2+QEbKGmSJ4GC6A==
-X-Received: by 2002:a05:600c:2316:b0:3fc:5a3:367c with SMTP id 22-20020a05600c231600b003fc05a3367cmr5428315wmo.32.1690105522777;
-        Sun, 23 Jul 2023 02:45:22 -0700 (PDT)
-Received: from ?IPV6:2a02:8440:a20a:4a73:67b:cbff:feb2:30bc? ([2a02:8440:a20a:4a73:67b:cbff:feb2:30bc])
-        by smtp.gmail.com with ESMTPSA id a12-20020a5d53cc000000b00313f9a0c521sm9150589wrw.107.2023.07.23.02.45.21
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 23 Jul 2023 02:45:22 -0700 (PDT)
-Message-ID: <a8f64e29-c36a-3a5f-4553-ccd71afaed78@gmail.com>
-Date:   Sun, 23 Jul 2023 11:45:20 +0200
+        Sun, 23 Jul 2023 21:38:00 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB79E3AA6;
+        Sun, 23 Jul 2023 18:33:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4F23760F2D;
+        Mon, 24 Jul 2023 01:32:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 909D9C433C9;
+        Mon, 24 Jul 2023 01:32:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690162331;
+        bh=m+qiXopLaqaJ4ENuTKhGDEMlQWgBDWjLxIYWisjKJCw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Bpc+qwLbwqZv5pd9U0YDyoV/UPmaowH5fxmNDgmFnOXhvtqt2x65jI6uk2jVKvc+N
+         6V6AKcQQ1lfOCkIYbpE76iGEX7yyDSGeWxZVy4EIiXj+NRbAtkXO/3ZvA52DaSNeUH
+         yhdvkuqSnDwPLRn3DQHbx87tmKxIVeVheFukoSrOTDyfsFhOBwwzPL5og1pWkPnqMz
+         CGlX6MqByeEUiYfrXDPooafnGSV9WX/kUGtiRX4QGWAqDUaCvEpmHLPtwr9qj9ABvP
+         SuKGhkaSsKSVSNpCGabocj1ihnsM7acWudHW85v9gBsFBSoWvwlpv6ayK2vfqYjC8T
+         zSrbD5NA4ePVg==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Sungwoo Kim <iam@sung-woo.kim>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
+        gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 22/40] Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb
+Date:   Sun, 23 Jul 2023 21:31:22 -0400
+Message-Id: <20230724013140.2327815-22-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230724013140.2327815-1-sashal@kernel.org>
+References: <20230724013140.2327815-1-sashal@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PROBLEM] on T14s AMD Gen3: Bluetooth: hci0: Failed to send
- headers (or body or access otp area)
-Content-Language: en-CA
-From:   =?UTF-8?B?RnJhbsOnb2lz?= <fanf42@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-References: <977f687e-533f-ebce-a50c-2dde1e1adb99@gmail.com>
-In-Reply-To: <977f687e-533f-ebce-a50c-2dde1e1adb99@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.4.5
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-And sorry for the formating, it seems that I don't know how to tell 
-thunderbird to send well formatted text message anymore. The logs can be 
-seen better formatted at https://bbs.archlinux.org/viewtopic.php?id=286929
+From: Sungwoo Kim <iam@sung-woo.kim>
 
+[ Upstream commit 1728137b33c00d5a2b5110ed7aafb42e7c32e4a1 ]
 
-On 23/07/2023 11:10, François wrote:
-> Hello,
->
-> (Sorry by advance if it's not the correct place to discuss that, but I 
-> tried other place like my distro kernel forum 
-> (https://bbs.archlinux.org/viewtopic.php?id=286929), interactive chat, 
-> etc and nobody was able to help).
->
-> [1] Short summary:
->
-> I have a lenovo T14S AMD Gen 3 with a *Qualcomm NFA725A* Wi-Fi card 
-> (which is actually reported by lspci as QCNFA765) and bluetooth never 
-> worked on it, failing to load the rampatch with "failed to send 
-> header" or "failed to send body" or "|Failed to access otp area (-71)"|.
->
-> Other people reports bluetooth as working 
-> (https://wiki.archlinux.org/title/Lenovo_ThinkPad_T14s_(AMD)_Gen_3) 
-> and a work friend has a T16 AMD gen1 which seems to have exactly the 
-> same chipset and work flowlessly.
-> And sorry for the formating, it seems that I don't know how to tell 
-> thunderbird to send well formatted text message anymore. The logs can 
-> be seen better formatted at 
-> https://bbs.archlinux.org/viewtopic.php?id=286929
->
-> => How can this be further qualified/debuged/workarounded?
->
-> |Any help, even RTFM pointing to corresponding manuals would be very 
-> much appreciated. |
->
-> [2] logs and more details
->
-> I have that laptop since october 2022 and use archlinux with the 
-> standard kernels. None made bluetooth wroked since then, starting 
-> around linux 6.0.10 and current kernel: 6.4.3-arch1-2.
->
-> There is nothing obvious in bios setting that could lead to that 
-> (bluetooth is enabled).
->
->
-> # LSPCI
-> lspci -k -s 01:00.0
-> 01:00.0 Network controller: Qualcomm Technologies, Inc QCNFA765 
-> Wireless Network Adapter (rev 01)
->     Subsystem: Lenovo QCNFA765 Wireless Network Adapter
->     Kernel driver in use: ath11k_pci
->     Kernel modules: ath11k_pci
->
->
-> # kernel boot log: "|Failed to send headers (-71)"|
-> kernel: thinkpad_acpi: radio switch found; radios are enabled
-> kernel: thinkpad_acpi: This ThinkPad has standard ACPI backlight 
-> brightness control, supported by the ACPI video driver
-> kernel: thinkpad_acpi: Disabling thinkpad-acpi brightness events by 
-> default...
-> kernel: thinkpad_acpi: rfkill switch tpacpi_bluetooth_sw: radio is 
-> unblocked
-> ...
-> rfkill[6774]: unblock set for type bluetooth
-> sudo[6773]: pam_unix(sudo:session): session closed for user root
-> kernel: usb 1-3.1: new full-speed USB device number 3 using xhci_hcd
-> kernel: usb 1-3.1: New USB device found, idVendor=10ab, 
-> idProduct=9309, bcdDevice= 0.01
-> kernel: usb 1-3.1: New USB device strings: Mfr=0, Product=0, 
-> SerialNumber=0
-> boltd[935]: probing: started [1000]
-> kernel: Bluetooth: Core ver 2.22
-> kernel: NET: Registered PF_BLUETOOTH protocol family
-> kernel: Bluetooth: HCI device and connection manager initialized
-> kernel: Bluetooth: HCI socket layer initialized
-> kernel: Bluetooth: L2CAP socket layer initialized
-> kernel: Bluetooth: SCO socket layer initialized
-> kernel: usbcore: registered new interface driver btusb
-> systemd[1328]: Reached target Bluetooth.
-> kernel: Bluetooth: hci0: using rampatch file: 
-> qca/rampatch_usb_00130201.bin
-> kernel: Bluetooth: hci0: QCA: patch rome 0x130201 build 0x5073, 
-> firmware rome 0x130201 build 0x38e6
-> kernel: Bluetooth: hci0: Failed to send headers (-71)
-> systemd[1]: Starting Bluetooth service...
-> bluetoothd[6866]: Bluetooth daemon 5.66
-> systemd[1]: Started Bluetooth service.
-> systemd[1]: Reached target Bluetooth Support.
-> bluetoothd[6866]: Starting SDP server
-> bluetoothd[6866]: profiles/audio/vcp.c:vcp_init() D-Bus experimental 
-> not enabled
-> bluetoothd[6866]: src/plugin.c:plugin_init() Failed to init vcp plugin
-> bluetoothd[6866]: profiles/audio/mcp.c:mcp_init() D-Bus experimental 
-> not enabled
-> bluetoothd[6866]: src/plugin.c:plugin_init() Failed to init mcp plugin
-> bluetoothd[6866]: profiles/audio/bap.c:bap_init() D-Bus experimental 
-> not enabled
-> bluetoothd[6866]: src/plugin.c:plugin_init() Failed to init bap plugin
-> kernel: Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-> kernel: Bluetooth: BNEP filters: protocol multicast
-> kernel: Bluetooth: BNEP socket layer initialized
-> bluetoothd[6866]: Bluetooth management interface 1.22 initialized
-> kernel: usb 1-3.1: USB disconnect, device number 3
-> systemd[1328]: Stopped target Bluetooth.
-> systemd[1]: Stopped target Bluetooth Support.
->
-> # rfkill status
->
-> sudo rfkill
-> ID TYPE      DEVICE                   SOFT      HARD
->  0 bluetooth tpacpi_bluetooth_sw   blocked unblocked
->  1 wlan      phy0                unblocked unblocked
+l2cap_sock_release(sk) frees sk. However, sk's children are still alive
+and point to the already free'd sk's address.
+To fix this, l2cap_sock_release(sk) also cleans sk's children.
 
-> rfkill[105640]: unblock set for type bluetooth
-> sudo[105639]: pam_unix(sudo:session): session closed for user root
-> kernel: usb 1-3.1: new full-speed USB device number 4 using xhci_hcd
-> kernel: usb 1-3.1: New USB device found, idVendor=10ab, 
-> idProduct=9309, bcdDevice= 0.01
-> kernel: usb 1-3.1: New USB device strings: Mfr=0, Product=0, 
-> SerialNumber=0
-> kernel: Bluetooth: hci0: using rampatch file: 
-> qca/rampatch_usb_00130201.bin
-> kernel: Bluetooth: hci0: QCA: patch rome 0x130201 build 0x5073, 
-> firmware rome 0x130201 build 0x38e6
-> kernel: Bluetooth: hci0: Failed to send body at 40 of 142192 (-71)
-> kernel: usb 1-3.1: USB disconnect, device number 4
-> boltd[935]: probing: started [1000]
-> systemd[1328]: Reached target Bluetooth.
-> systemd[1328]: Stopped target Bluetooth.
-> systemd[1]: Reached target Bluetooth Support.
-> systemd[1]: Stopped target Bluetooth Support.
+==================================================================
+BUG: KASAN: use-after-free in l2cap_sock_ready_cb+0xb7/0x100 net/bluetooth/l2cap_sock.c:1650
+Read of size 8 at addr ffff888104617aa8 by task kworker/u3:0/276
 
-> # unloading and loading back kernel related modules (|bluetooth`, 
-> `btusb`, etc) and modprobe them back, and I get the same kind of logs 
-> after `rfkill unblock bluetoot`:
->
-> rfkill[106483]: unblock set for type bluetooth
-> sudo[106482]: pam_unix(sudo:session): session closed for user root
-> kernel: usb 1-3.1: new full-speed USB device number 5 using xhci_hcd
-> kernel: usb 1-3.1: New USB device found, idVendor=10ab, 
-> idProduct=9309, bcdDevice= 0.01
-> kernel: usb 1-3.1: New USB device strings: Mfr=0, Product=0, 
-> SerialNumber=0
-> kernel: usb 1-3.1: Failed to access otp area (-71)
-> kernel: usb 1-3.1: USB disconnect, device number 5
-> boltd[935]: probing: started [1000]
-> systemd[1328]: Reached target Bluetooth.
-> systemd[1]: Reached target Bluetooth Support.
-> systemd[1328]: Stopped target Bluetooth.
-> systemd[1]: Stopped target Bluetooth Support.
-> boltd[935]: probing: timeout, done: [3001068] (2000000)
->
-> |Have a nice day, |
->
+CPU: 0 PID: 276 Comm: kworker/u3:0 Not tainted 6.2.0-00001-gef397bd4d5fb-dirty #59
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci2 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x72/0x95 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:306 [inline]
+ print_report+0x175/0x478 mm/kasan/report.c:417
+ kasan_report+0xb1/0x130 mm/kasan/report.c:517
+ l2cap_sock_ready_cb+0xb7/0x100 net/bluetooth/l2cap_sock.c:1650
+ l2cap_chan_ready+0x10e/0x1e0 net/bluetooth/l2cap_core.c:1386
+ l2cap_config_req+0x753/0x9f0 net/bluetooth/l2cap_core.c:4480
+ l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:5739 [inline]
+ l2cap_sig_channel net/bluetooth/l2cap_core.c:6509 [inline]
+ l2cap_recv_frame+0xe2e/0x43c0 net/bluetooth/l2cap_core.c:7788
+ l2cap_recv_acldata+0x6ed/0x7e0 net/bluetooth/l2cap_core.c:8506
+ hci_acldata_packet net/bluetooth/hci_core.c:3813 [inline]
+ hci_rx_work+0x66e/0xbc0 net/bluetooth/hci_core.c:4048
+ process_one_work+0x4ea/0x8e0 kernel/workqueue.c:2289
+ worker_thread+0x364/0x8e0 kernel/workqueue.c:2436
+ kthread+0x1b9/0x200 kernel/kthread.c:376
+ ret_from_fork+0x2c/0x50 arch/x86/entry/entry_64.S:308
+ </TASK>
 
+Allocated by task 288:
+ kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ ____kasan_kmalloc mm/kasan/common.c:374 [inline]
+ __kasan_kmalloc+0x82/0x90 mm/kasan/common.c:383
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __do_kmalloc_node mm/slab_common.c:968 [inline]
+ __kmalloc+0x5a/0x140 mm/slab_common.c:981
+ kmalloc include/linux/slab.h:584 [inline]
+ sk_prot_alloc+0x113/0x1f0 net/core/sock.c:2040
+ sk_alloc+0x36/0x3c0 net/core/sock.c:2093
+ l2cap_sock_alloc.constprop.0+0x39/0x1c0 net/bluetooth/l2cap_sock.c:1852
+ l2cap_sock_create+0x10d/0x220 net/bluetooth/l2cap_sock.c:1898
+ bt_sock_create+0x183/0x290 net/bluetooth/af_bluetooth.c:132
+ __sock_create+0x226/0x380 net/socket.c:1518
+ sock_create net/socket.c:1569 [inline]
+ __sys_socket_create net/socket.c:1606 [inline]
+ __sys_socket_create net/socket.c:1591 [inline]
+ __sys_socket+0x112/0x200 net/socket.c:1639
+ __do_sys_socket net/socket.c:1652 [inline]
+ __se_sys_socket net/socket.c:1650 [inline]
+ __x64_sys_socket+0x40/0x50 net/socket.c:1650
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
 
+Freed by task 288:
+ kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+ kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+ kasan_save_free_info+0x2e/0x50 mm/kasan/generic.c:523
+ ____kasan_slab_free mm/kasan/common.c:236 [inline]
+ ____kasan_slab_free mm/kasan/common.c:200 [inline]
+ __kasan_slab_free+0x10a/0x190 mm/kasan/common.c:244
+ kasan_slab_free include/linux/kasan.h:177 [inline]
+ slab_free_hook mm/slub.c:1781 [inline]
+ slab_free_freelist_hook mm/slub.c:1807 [inline]
+ slab_free mm/slub.c:3787 [inline]
+ __kmem_cache_free+0x88/0x1f0 mm/slub.c:3800
+ sk_prot_free net/core/sock.c:2076 [inline]
+ __sk_destruct+0x347/0x430 net/core/sock.c:2168
+ sk_destruct+0x9c/0xb0 net/core/sock.c:2183
+ __sk_free+0x82/0x220 net/core/sock.c:2194
+ sk_free+0x7c/0xa0 net/core/sock.c:2205
+ sock_put include/net/sock.h:1991 [inline]
+ l2cap_sock_kill+0x256/0x2b0 net/bluetooth/l2cap_sock.c:1257
+ l2cap_sock_release+0x1a7/0x220 net/bluetooth/l2cap_sock.c:1428
+ __sock_release+0x80/0x150 net/socket.c:650
+ sock_close+0x19/0x30 net/socket.c:1368
+ __fput+0x17a/0x5c0 fs/file_table.c:320
+ task_work_run+0x132/0x1c0 kernel/task_work.c:179
+ resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
+ exit_to_user_mode_prepare+0x113/0x120 kernel/entry/common.c:203
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
+ syscall_exit_to_user_mode+0x21/0x50 kernel/entry/common.c:296
+ do_syscall_64+0x4c/0x90 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+The buggy address belongs to the object at ffff888104617800
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 680 bytes inside of
+ 1024-byte region [ffff888104617800, ffff888104617c00)
+
+The buggy address belongs to the physical page:
+page:00000000dbca6a80 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888104614000 pfn:0x104614
+head:00000000dbca6a80 order:2 compound_mapcount:0 subpages_mapcount:0 compound_pincount:0
+flags: 0x200000000010200(slab|head|node=0|zone=2)
+raw: 0200000000010200 ffff888100041dc0 ffffea0004212c10 ffffea0004234b10
+raw: ffff888104614000 0000000000080002 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff888104617980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888104617a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888104617a80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff888104617b00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888104617b80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+Ack: This bug is found by FuzzBT with a modified Syzkaller. Other
+contributors are Ruoyu Wu and Hui Peng.
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/bluetooth/l2cap_sock.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index eebe256104bc0..947ca580bb9a2 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -46,6 +46,7 @@ static const struct proto_ops l2cap_sock_ops;
+ static void l2cap_sock_init(struct sock *sk, struct sock *parent);
+ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 				     int proto, gfp_t prio, int kern);
++static void l2cap_sock_cleanup_listen(struct sock *parent);
+ 
+ bool l2cap_is_socket(struct socket *sock)
+ {
+@@ -1415,6 +1416,7 @@ static int l2cap_sock_release(struct socket *sock)
+ 	if (!sk)
+ 		return 0;
+ 
++	l2cap_sock_cleanup_listen(sk);
+ 	bt_sock_unlink(&l2cap_sk_list, sk);
+ 
+ 	err = l2cap_sock_shutdown(sock, SHUT_RDWR);
 -- 
-François ARMAND
+2.39.2
 
