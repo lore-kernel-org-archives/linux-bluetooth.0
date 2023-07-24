@@ -2,38 +2,38 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E98C001B0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 01:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05717C41513
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 01:45:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232433AbjGXBop (ORCPT
+        id S232543AbjGXBpj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jul 2023 21:44:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47462 "EHLO
+        Sun, 23 Jul 2023 21:45:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232561AbjGXBn0 (ORCPT
+        with ESMTP id S232952AbjGXBoK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jul 2023 21:43:26 -0400
+        Sun, 23 Jul 2023 21:44:10 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B4442689;
-        Sun, 23 Jul 2023 18:38:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E153C20;
+        Sun, 23 Jul 2023 18:39:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C26286100C;
-        Mon, 24 Jul 2023 01:33:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C730C433C7;
-        Mon, 24 Jul 2023 01:33:44 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 057296103B;
+        Mon, 24 Jul 2023 01:34:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42F6BC433C7;
+        Mon, 24 Jul 2023 01:34:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690162426;
-        bh=2YoCrwXNn5L2KW+P/U6cPT1N9UXv0/k5KP4tTfnqIfg=;
+        s=k20201202; t=1690162456;
+        bh=NFfT96HskUNUd6UDCjplWewtb3AWg0d2uV1CnZ+9fLQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JM/J+1LVpRaOrUdMGarC0ubqgpezVmR68QNrpgNWDEuutWst7j+8J+ZyYz3xw1cmo
-         YDcSu5s8N3zOlK9WNjAW8ucU8Og6zwsyH4rsEpW1j6TotIOumM/bJP+hFaqKa2/IyW
-         BuTf209Vyuu/yBJMby0mcMWZTSoTQhKWMNuywsHqdJMy6g4oRwpxBshycPcvbvckTC
-         eRmIIJ40yOhWWuIvuts0yoNsT4ad3pu/F6p+qeEwn5XpF36H10AfhtDMiiiea+03YW
-         1QeGEe+Kr5xbpLcvFjBd/0VOcSW5Itk5+qmp9gXkLPXOvDcHKOuvC3yAfX+Buli1XA
-         OPHsIkz6InnlA==
+        b=CemstGoOcXnUxFjSDnqLe8m+qKEv9ooT8hB+a5nA87MDaZKxqjSac0XBzTGyA7v0c
+         62KhI/LcrKcC3PCvdwa/3Z8zLn3ICk2SEhwIQUd/zxSCKDl6xr8kT9LS5nlF+hBaSP
+         BKb+mMlcORAwHKJC6EmsVXU6WfInrHEjTEQEBYnytL5lMPCzH3FGH3nsh3p25zU/LL
+         O4toETkV53JVMdOP1sBxHGWWCBLNayEnyvO9lAJotb8NIRMDpkhpT0Tq0SxmyxmJH8
+         lORsqJKKCo316/RZRydA38tEHffo3S+ilW8GAG2dHJszX+q8gTJ6tjqQdWs2rs03Fe
+         wjAZ++7Nb/g2w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhengping Jiang <jiangzp@google.com>,
@@ -42,16 +42,16 @@ Cc:     Zhengping Jiang <jiangzp@google.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         gustavo@padovan.org, johan.hedberg@gmail.com, davem@davemloft.net,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 14/24] Bluetooth: L2CAP: Fix use-after-free
-Date:   Sun, 23 Jul 2023 21:33:15 -0400
-Message-Id: <20230724013325.2332084-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 10/16] Bluetooth: L2CAP: Fix use-after-free
+Date:   Sun, 23 Jul 2023 21:33:54 -0400
+Message-Id: <20230724013401.2333159-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230724013325.2332084-1-sashal@kernel.org>
-References: <20230724013325.2332084-1-sashal@kernel.org>
+In-Reply-To: <20230724013401.2333159-1-sashal@kernel.org>
+References: <20230724013401.2333159-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.121
+X-stable-base: Linux 5.10.186
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -72,10 +72,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9dd54247029a8..0770286ecf0bc 100644
+index 568f0f072b3df..7b40e4737a2bb 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -6375,9 +6375,14 @@ static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
+@@ -6370,9 +6370,14 @@ static inline int l2cap_le_command_rej(struct l2cap_conn *conn,
  	if (!chan)
  		goto done;
  
