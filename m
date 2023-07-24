@@ -2,241 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995FAC001DE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 08:56:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB282C001DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 10:28:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231974AbjGXI4g (ORCPT
+        id S229655AbjGXK21 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Jul 2023 04:56:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52644 "EHLO
+        Mon, 24 Jul 2023 06:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231980AbjGXI4a (ORCPT
+        with ESMTP id S231417AbjGXK1f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jul 2023 04:56:30 -0400
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2079.outbound.protection.outlook.com [40.107.105.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36472E7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 01:56:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K66+sl4N8RLOtWZFcFf9C5gGeOvQYPlPVSiTzg9N547xv3NqAlCtk+/AiU5b57yx6vRgzfT5tiWvsTccvKdtgWPTMX0MHUQFN84+w/IXbCsChU6JsZkCpQFs/PkwMO/1yoTMw1ApLv4vn1zBc4db75g46vEa3KBeLhJ9fhOjKQMtRUl0VwKH6H0P8H5wC7s5edKOaXxGXxT2xaIqCLnCBJhxnl1z7lm1EmuffESw4j8MOxqIhHSoYiv4Qs069GlBNzp8FqeqZ+eLz9o65NOjFBL6gKUAoCs/IziHLMt+zIz6d0HjiqDllu1OqATuJsuxvHiFwPR0JkkoIPA7GDgyzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cp6lHxd6f22aUF5HEP9QvRTWR44J5m11pJnIh1DrzdM=;
- b=IAru/53aCcLQxXLkpG7ReFrE0iTlConnhqXgz//5jGYE7s5tfknmhTRDJhbrVz2XlnV74iwS6ZQ2LrfPgeU+PaK8UKkDs0ZGr3qsLxYUZ8qBaCUK5CsA3zBHydg3A4hgPuWv3rIt+BD1Zjut7ryqkMrZgn5bbYy3rx810t7LxLQv/CEydKsi860YT5ScmIQ512SivbdgAyQ3VMyp5qAIawWJIOjy9m7gwou78FIPl+uZNz1+T158UlrlbKKu7mTOOscKoLhIY0UYkqbDfMBvIHE6Zj172RmkZOniMNYte9edK6bwBU70B1dUZMfzXkfQ83IR9YvPsOH/MCEUPRI5qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cp6lHxd6f22aUF5HEP9QvRTWR44J5m11pJnIh1DrzdM=;
- b=mBCbtxk9Gp3YWcO5cOjgfZe4wYfSFuUnZB+Jgh/p+ZFJt5CJmbdBUUWndPNujXMKedhDBUtTrFwt4L30N+Bzxb7U2ZG2Tbzi7Q2RtTmWhOwyVrjqZ4/2soT8AqrLbu563+Mk7V5hYWpZYmy2cNEDIJh8b9i4Ap1Wk/OdOS/XHFY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB9126.eurprd04.prod.outlook.com (2603:10a6:20b:449::16)
- by AM9PR04MB8537.eurprd04.prod.outlook.com (2603:10a6:20b:434::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.32; Mon, 24 Jul
- 2023 08:56:10 +0000
-Received: from AS8PR04MB9126.eurprd04.prod.outlook.com
- ([fe80::273d:f528:aaa9:288]) by AS8PR04MB9126.eurprd04.prod.outlook.com
- ([fe80::273d:f528:aaa9:288%4]) with mapi id 15.20.6609.032; Mon, 24 Jul 2023
- 08:56:10 +0000
-From:   Nitin Jadhav <nitin.jadhav@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     devyani.godbole@nxp.com, pav@iki.fi, luiz.dentz@gmail.com,
-        sathish.narasimman@intel.com, nitin.jadhav@nxp.com
-Subject: [PATCH BlueZ v1 1/1] shared/vcp: Fixed the crash observed with VOCS when pairing with LE Audio TWS earbuds
-Date:   Mon, 24 Jul 2023 11:55:30 +0300
-Message-Id: <20230724085530.5555-2-nitin.jadhav@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230724085530.5555-1-nitin.jadhav@nxp.com>
-References: <20230724085530.5555-1-nitin.jadhav@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI1PR02CA0056.apcprd02.prod.outlook.com
- (2603:1096:4:1f5::7) To AS8PR04MB9126.eurprd04.prod.outlook.com
- (2603:10a6:20b:449::16)
+        Mon, 24 Jul 2023 06:27:35 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC071FC9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 03:23:20 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666ecb21f86so3985411b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 03:23:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690194199; x=1690798999;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=a0g8neNlOf99i29eUycGFI19veQjtSet6SMwPNrAe/Y=;
+        b=d+FPQtQnoTNLEu/+Yo7jzvukdmDIL7spb0iocLAz1UC6KE6sx84cRpRnO5Vu9DRx0/
+         9eIjjZ19ScIoywHzt4i9KYLm/XJTIhPbB2dDaQyhDlKIj9o78Q7lyb2vHWxrwAp3pIQy
+         +PO/SXw0cMf3ipmDOjLShGmtuCOOOBijiipM5hb7h9FckwM1BsaJHQ13brG2viVxUHqN
+         zCeo/6saB/XHqA059gkZsG1DtSKte6GxmkEK/5S0B6L8+46zJTR6LE1DmSnip7eSghCP
+         bIdcE3I4pThYi0Wx/Rxzz9wOHd53w5/wi6PwGcivIiXgIPRY5yASD1vXILtfQDqoWMVv
+         9aDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690194199; x=1690798999;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a0g8neNlOf99i29eUycGFI19veQjtSet6SMwPNrAe/Y=;
+        b=RYdsaMqEv/Ex4FMD/5t6sloLSm49I/25UCQL+VTrRRbfKzoFinQSIwe2hZfy1t9KCS
+         d6OwpOljNbB43JsOVS99e9eGayjFwdQlPydqVmhdoQtc7Aw0ADA/pQQAm767qff2UuSj
+         Jf+e1txDoBljx3aXrMRoT2Zv+ru7IVttLg1qcXIS8ncxGB7f9a2gxZU1lvP+01gdO9dF
+         +93SVWpVii6eRJbHsmNYXg/wLOVQItglXsECQttFXkgITVP1wUscWKgryxkPiWhuD8o8
+         FRDJ6dS99QcVcoomJmQvMiUqveZc2vU7HByk18U4XAydxtsQPo1BprgAQhSyXkOaV+7H
+         ctVQ==
+X-Gm-Message-State: ABy/qLbync2IsVSWUSlCokk/o85KFSBia7OfQe9d7bo3MRaE/RI/GrV6
+        fphHGlCa7i1UREAborzHrYTqINtvzk8=
+X-Google-Smtp-Source: APBJJlEc652X+0GVFzrLm35el83vfsjbZXhtodKYVGzgSd/u8BkBuZwZoMbWlJhjV/rNPwbMeRFBAg==
+X-Received: by 2002:a05:6a00:2ea9:b0:666:d78c:33ab with SMTP id fd41-20020a056a002ea900b00666d78c33abmr11778140pfb.21.1690194199547;
+        Mon, 24 Jul 2023 03:23:19 -0700 (PDT)
+Received: from [172.17.0.2] ([13.87.245.114])
+        by smtp.gmail.com with ESMTPSA id a4-20020aa780c4000000b00682c1db7551sm7368474pfn.49.2023.07.24.03.23.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 03:23:19 -0700 (PDT)
+Message-ID: <64be5117.a70a0220.58afd.c6da@mx.google.com>
+Date:   Mon, 24 Jul 2023 03:23:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4118140222315661301=="
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB9126:EE_|AM9PR04MB8537:EE_
-X-MS-Office365-Filtering-Correlation-Id: 90c59792-0e06-4e4a-10af-08db8c23d371
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: N+05hJ+lc7hFDNGXvuodefy8J4QhRoHwRyfSXWLGZOSuPMPRfMcFAQOQVgfbNbwa+EEMMjafN3k9C19nSMQ42IT+MnfbCr9iRNE4W71B8JrGOs3fhjDxrJi02TO4+Fdsl5gRb/lQeNfmenb7lrn1ZkT1EvThCSqVROr6X5pB5AZSv76pdxyjmZw80xj6KvN6EaNx+TBd0SUAdOj/BpdqYL1N4T777BeUSKcZInkqn62PAr6DPxtC0fTeelei5QAJivRAdsn5gO/mpJAmjmjjqQ2jP1/4ZNSIFhaNMqO04jNg+Dr84bKydreD6WB1rup3iIMPCafrOvjILsXBRBkm+Vg6W6TFpiqWJ/3F7GMn95Txfe6rQLjeSOB6Nx48gHhltNnQuiFZzi3RRPNmEN/VBq2dciRB6mpMnmjhpzL8EFKMdQMrKuZ2pbHT4yaubH1YnQ4Qoa4w98Jf24rjQ3s6+DIGBuUzVNVaeABZB5jsGpNtkOU0TmSTHiV4p1vXXiHxVoxrANpKG4kfLypDU+tt68udrgHCqpcMI1JF6vPOpH8va340RB4llxS57MMPB3H1irp6FTU1dXYO8kLqTzGx1cQmQpwH9q20CRfYD7t8OoNiEbXTF7JMmXAKm+vyHuiQ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB9126.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(39860400002)(376002)(346002)(136003)(451199021)(86362001)(38100700002)(38350700002)(66476007)(4326008)(6916009)(478600001)(41300700001)(316002)(66946007)(5660300002)(44832011)(8676002)(8936002)(6486002)(6512007)(6666004)(2906002)(186003)(52116002)(1076003)(26005)(6506007)(66556008)(83380400001)(36756003)(55236004)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?v7Jf15vf/yNYhM86ToZY50ye0YEEBr+3i7S/5eX01J5E6eK+6jwF2Gw2jIUS?=
- =?us-ascii?Q?RaGpc6dRjU9vikC127QvXHlMCegD2IsG3nOe4DkI7h/ARvvQCSJa2VQG6kYk?=
- =?us-ascii?Q?BJuAVUwqA89e4zllMN+KdtZxK0uxLni3cEei7yTCc9Y5mkviLNOVten/dnO4?=
- =?us-ascii?Q?HIy7XDBJBiOV1J9QwNHPMukXboFmbkhAdOn4qyM7HJ5ybLVr+LvdMa8+eOKQ?=
- =?us-ascii?Q?pJSIzZrZSRJ3xEQBTYj4mLjcPXcX2k+HXXQDu/5d54mRkau3znNESdG/6aWx?=
- =?us-ascii?Q?dKrQxRCwqJTjOrY1uz6Qv5JHuJzT8UP/jtcBMgKBeE8LUIQ+b7GCtiPihdCP?=
- =?us-ascii?Q?ZiG86j5Kidj0QIR9jM/CVnNVNN3tMqrJ80vHyvb70G+/E+9ZZXgep4aI/fpe?=
- =?us-ascii?Q?eTRm7Bcs4QQTZpmT1exYrT03cWThaOobR3N2WfAPtU10wqwUwaDi2BimeotP?=
- =?us-ascii?Q?AopIPovhR2GWPS/eH/MUS1CgGgJFAREyyL5qXJldbTjAJ7rJQsZ6Bbud8tHg?=
- =?us-ascii?Q?ysqlg/KB2MFQlGCZyzC0/2FTkxmpM/daGmZzMIl3n5ChgraThqf72G+Ky0k0?=
- =?us-ascii?Q?mM42RsvYsnXs4rsG0ezuT1yNr0PSKFAk8R1ZigkKUaInxJ/eFMuYC66a/C3o?=
- =?us-ascii?Q?iG9OoGva9eOQzbEMIzE4AtTWHABDX8kTvXs8XeYMX/x90Ed3DvAdCtKrqGjH?=
- =?us-ascii?Q?TEvlTM9tzXC+TkQ2asIeSQ2Qpimlpg0ZUcBGsmm2gv3cR6qXiha3aofhcjk8?=
- =?us-ascii?Q?+s760RqSyAwafEC7nuH9gHL6DoUDp91Ude81S9KlHTrBxbC4b1TSNMH/VAEf?=
- =?us-ascii?Q?a1HwRvmSv8Anysv55vtDtkX3USmZz0ZU+in9J1kuDviBVhxY4gcxCgMU15vi?=
- =?us-ascii?Q?wSR+/AYEQ5mR63+PZlAh4rOeQCMq52q3Ab+pIM6p7jJw1dyxuxdfsP832Irz?=
- =?us-ascii?Q?dnk+5NgWNUdCK8dK7lnvcU8YfgGzxYuBGMFrP34FjUBrq38a1cHyT6wU2J+T?=
- =?us-ascii?Q?dvyKU20Dn8ocxvLZfTX+HNnjwovUkGsUqSahNBMBN/tecqA5kGD8hAXNZK18?=
- =?us-ascii?Q?YmU3J/7xMVFdwKcRfwSbEUxKDHgNF8WhRp4KctortWmUYiPcUWVGUsXdcpO1?=
- =?us-ascii?Q?n3fNOlfiC1rNz6+pnZ3lOJFnmKxW8osn9BZoo4jDK2THNuqmduRIGg0VQi8M?=
- =?us-ascii?Q?cjrej1fyl5BWjLdBZOpfD+pVGd1qgteliwfKI4CLyoFyZViZX2Ez1x1z94TH?=
- =?us-ascii?Q?ccbB1DQ6zp/nlIYSuj6+22goaijafXQtOc0VOUobDGalzd9ACcQZfsxmr1u7?=
- =?us-ascii?Q?VWt7PkLdBaOOjZmBtsmdzO5X25UlnoM+JBAI3uEYVsIOv9GXE3O3LGDkqotC?=
- =?us-ascii?Q?LSjlwDBFSxXf/Suo3PYKkTU8GfZD0SIcbgRNgXef0/iE6fwj1UnVDE28yUbC?=
- =?us-ascii?Q?TTRMx1eW+EZJUPvT2F8Yo1zZbyX1FcXpfc/su7sjcmW2xqaFMagMnsss7Jwy?=
- =?us-ascii?Q?B2EYrkhCLg6ILaN9jnJ/BnDdIOFRBGSUsoSLoZd4MVeK4Hw4uR9yecdtUZmH?=
- =?us-ascii?Q?pcIU31D8AuACqf6MrhYObTWRB7r4i6JD8OJISxFE?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 90c59792-0e06-4e4a-10af-08db8c23d371
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB9126.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jul 2023 08:56:10.5018
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7SYKUShL5s3LynAFaJ4pPyATmPO7+5i4Uv3+LPtO8F6WffbNaLhxZ/bXyDuGsiHk2DR7miJVvaSgeEkbq+CpZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8537
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, nitin.jadhav@nxp.com
+Subject: RE: Fixed the crash observed with VOCS when pairing with LE Audio TWS earbuds
+In-Reply-To: <20230724085530.5555-2-nitin.jadhav@nxp.com>
+References: <20230724085530.5555-2-nitin.jadhav@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Root cause
-- There are two types of database- Remote and Local (rdb and ldb).
-- In client mode currently the code was written to access ldb.
+--===============4118140222315661301==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix
-- Correcting it, to access rdb has resolved the problem in VOCS.
-- Same correction is done for VCS.
+This is automated email and please do not reply to this email!
 
-Reported-by: Pauli Virtanen <pav@iki.fi>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=768787
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.40 seconds
+GitLint                       FAIL      0.64 seconds
+BuildEll                      PASS      32.68 seconds
+BluezMake                     PASS      990.43 seconds
+MakeCheck                     PASS      13.04 seconds
+MakeDistcheck                 PASS      185.50 seconds
+CheckValgrind                 PASS      300.84 seconds
+CheckSmatch                   PASS      394.85 seconds
+bluezmakeextell               PASS      121.85 seconds
+IncrementalBuild              PASS      809.02 seconds
+ScanBuild                     WARNING   1239.51 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1,1/1] shared/vcp: Fixed the crash observed with VOCS when pairing with LE Audio TWS earbuds
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (100>80): "[BlueZ,v1,1/1] shared/vcp: Fixed the crash observed with VOCS when pairing with LE Audio TWS earbuds"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/vcp.c:1424:3: warning: Potential leak of memory pointed to by 'vocs_ao_dec_r'
+                DBG(vcp, "Unable to read VOCS Audio Descriptor: error 0x%02x",
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/vcp.c:31:2: note: expanded from macro 'DBG'
+        vcp_debug(_vcp, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+        ^~~~~~~~~
+1 warning generated.
+
+
+
 ---
- src/shared/vcp.c | 52 +++++++++++++++++++++++++++---------------------
- 1 file changed, 29 insertions(+), 23 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index 74bd01729..f30d7a533 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -973,7 +973,7 @@ static void vocs_voaodec_read(struct gatt_db_attribute *attrib,
- 	struct bt_vocs *vocs = user_data;
- 	struct iovec iov;
- 
--	iov.iov_base = &vocs->vocs_ao_dec;
-+	iov.iov_base = vocs->vocs_ao_dec;
- 	iov.iov_len = strlen(vocs->vocs_ao_dec);
- 
- 	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-@@ -998,10 +998,12 @@ static struct bt_vcs *vcs_new(struct gatt_db *db, struct bt_vcp_db *vdb)
- 
- 	/* Populate DB with VCS attributes */
- 	bt_uuid16_create(&uuid, VCS_UUID);
--	vcs->service = gatt_db_add_service(db, &uuid, true, 9);
-+
-+	vcs->service = gatt_db_add_service(db, &uuid, true, 10);
- 	gatt_db_service_add_included(vcs->service, vdb->vocs->service);
- 	gatt_db_service_set_active(vdb->vocs->service, true);
- 
-+
- 	bt_uuid16_create(&uuid, VOL_STATE_CHRC_UUID);
- 	vcs->vs = gatt_db_service_add_characteristic(vcs->service,
- 					&uuid,
-@@ -1385,11 +1387,12 @@ static void read_vocs_audio_location(struct bt_vcp *vcp, bool success,
- 				     const uint8_t *value, uint16_t length,
- 				     void *user_data)
- {
--	uint32_t *vocs_audio_loc;
--	struct iovec iov = {
--		.iov_base = (void *) value,
--		.iov_len = length,
--	};
-+	uint32_t vocs_audio_loc;
-+
-+	if (!value) {
-+		DBG(vcp, "Unable to get VOCS Audio Location");
-+		return;
-+	}
- 
- 	if (!success) {
- 		DBG(vcp, "Unable to read VOCS Audio Location: error 0x%02x",
-@@ -1397,26 +1400,25 @@ static void read_vocs_audio_location(struct bt_vcp *vcp, bool success,
- 		return;
- 	}
- 
--	vocs_audio_loc = iov_pull_mem(&iov, sizeof(uint32_t));
--	if (!*vocs_audio_loc) {
--		DBG(vcp, "Unable to get VOCS Audio Location");
--		return;
--	}
-+	memcpy(&vocs_audio_loc, value, length);
- 
--	DBG(vcp, "VOCS Audio Loc:%x", *vocs_audio_loc);
-+	DBG(vcp, "VOCS Audio Loc:%x", vocs_audio_loc);
- }
- 
--
- static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success,
- 				       uint8_t att_ecode,
- 				       const uint8_t *value, uint16_t length,
- 				       void *user_data)
- {
- 	char *vocs_ao_dec_r;
--	struct iovec iov = {
--		.iov_base = (void *) value,
--		.iov_len = length,
--	};
-+
-+	if (!value) {
-+		DBG(vcp, "Unable to get VOCS Audio Descriptor");
-+		return;
-+	}
-+
-+	vocs_ao_dec_r = malloc(length+1);
-+	memset(vocs_ao_dec_r, 0, length+1);
- 
- 	if (!success) {
- 		DBG(vcp, "Unable to read VOCS Audio Descriptor: error 0x%02x",
-@@ -1424,13 +1426,17 @@ static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success,
- 		return;
- 	}
- 
--	vocs_ao_dec_r = iov_pull_mem(&iov, length);
--	if (!*vocs_ao_dec_r) {
-+	memcpy(vocs_ao_dec_r, value, length);
-+
-+	if (!vocs_ao_dec_r) {
- 		DBG(vcp, "Unable to get VOCS Audio Descriptor");
- 		return;
- 	}
- 
--	DBG(vcp, "VOCS Audio Descriptor:%s", *vocs_ao_dec_r);
-+	DBG(vcp, "VOCS Audio Descriptor: %s", vocs_ao_dec_r);
-+
-+	free(vocs_ao_dec_r);
-+	vocs_ao_dec_r = NULL;
- }
- 
- static void vcp_pending_destroy(void *data)
-@@ -1719,10 +1725,10 @@ bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client)
- 		return false;
- 
- 	bt_uuid16_create(&uuid, VCS_UUID);
--	gatt_db_foreach_service(vcp->ldb->db, &uuid, foreach_vcs_service, vcp);
-+	gatt_db_foreach_service(vcp->rdb->db, &uuid, foreach_vcs_service, vcp);
- 
- 	bt_uuid16_create(&uuid, VOL_OFFSET_CS_UUID);
--	gatt_db_foreach_service(vcp->ldb->db, &uuid, foreach_vocs_service, vcp);
-+	gatt_db_foreach_service(vcp->rdb->db, &uuid, foreach_vocs_service, vcp);
- 
- 	return true;
- }
--- 
-2.34.1
 
+--===============4118140222315661301==--
