@@ -2,240 +2,356 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA633EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 18:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0095FEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jul 2023 21:27:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230013AbjGXS1a (ORCPT
+        id S230120AbjGXV1j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Jul 2023 14:27:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41504 "EHLO
+        Mon, 24 Jul 2023 17:27:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjGXS13 (ORCPT
+        with ESMTP id S229485AbjGXV1h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jul 2023 14:27:29 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C02AF127
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 11:27:27 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b933bbd3eeso68033741fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 11:27:27 -0700 (PDT)
+        Mon, 24 Jul 2023 17:27:37 -0400
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62235125
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 14:27:36 -0700 (PDT)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-577ddda6ab1so71744977b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jul 2023 14:27:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690223246; x=1690828046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7BoyKUsMpbwF4KyR+TkDwzP2KqObXCZp7Iv0he6kCls=;
-        b=mXBQC2/fLJeyt+wVZPFchEms0wpOcInvoJSmox+44pA7LUsUcFesXjbcysoFf9Mh/h
-         7G5hiYlx1vBIWj5wm6KmQqxgPLZHp6TUI/sG207isTNOlTpPU/uvVw0m1mVLo+lHw4n+
-         SuYtaflkSF0esprOERFrWe8a+tapb5pz5MiJ+CS7DWuCejSuDgao9vnYa39AEeCpVJ4O
-         stUD9OB6wRHzzatrlKD0n4yBYVPYM9J8HSfK1id4Jjwa9narAeWUIVwDTjkJGc3bS//F
-         nCOWbNhKFFyZzquSfypIPxEZlvQPbuemYC7JwGHOWz33XDKrfFlcmAYpzzhlaz5Az707
-         vgUw==
+        d=gmail.com; s=20221208; t=1690234055; x=1690838855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6LA4V+YmdCfiyvWfCNoKpDYw2rK0pj+t+9AqFXmTaoI=;
+        b=gEdidN53KzznZWXIa7WOo/6nwqiBoA3joNnsxDrgUOc+mXpufj+0MGIlztlv+n+wSX
+         PdONeYSQhHfmng1xESKnt7kRjEBudgfDok9sw2WGduEFwcqx7gPgfkEX+0BffS+cMP//
+         lIUKt0KNnqZstnpMDSgHU042sBao6GLnWi7VZ0EIByoCk0JapPKNzctmzONxWuf4Rh8k
+         rCi64VwrfYn9p1mOR93+lHQle3zzob8GJC9plC/ZGFfayXp2xX/+0xg6wvUR0FPqL53y
+         AqMUuRHjGlT/PbyG6muXjYjsdblCgPn2hNdRQyJqw24bcBq29HXBStHZiNNFEkOQarp8
+         +F/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690223246; x=1690828046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7BoyKUsMpbwF4KyR+TkDwzP2KqObXCZp7Iv0he6kCls=;
-        b=B2nf3L4CNc3XBRbNcX1c2bVfP7f8/In5b/V0vaQb8WvAuYJ24wt6k37Yltujv12u6u
-         lEa3Pgn7siS6WWLgh2UyclBs87QGeQlnoiV8lIY3W2kajXqHBH3E9FfxIR62vDFJueii
-         TkETW01ZAGkAYSprAy/HX81K2Zr1bRm8hn8gU6fbqeRTVOIWGj5jn38PhJ/rbegVFUqn
-         3sl2X9Wlnzv94tFbjhTy0RzdKLRrEamgOrG638fS5PfFQvcqktcXMC5gAKh1drd5bM/K
-         0hk9jhEuWKt+NEEeyxV7OliAOdXPUTJ3EPLMilvQA/gB+j/yzgP3asyMICdJV1mrrWKb
-         djPg==
-X-Gm-Message-State: ABy/qLbzC88LMAI1kJT5tt/RxkkeWz6CNdnrOblXsO+OozYSLYIZrTAJ
-        yDkw1OQzAGopCpEHziU3CL+FhvrZIPMyMbXILL8=
-X-Google-Smtp-Source: APBJJlGsymKhh31gg09xhW9WcnIAVlryWejtBVjCaLpdkqM55u0hMnzKRtJ8sjdVUk+SMmFqUkPKOqi0yqADEPaArRs=
-X-Received: by 2002:a2e:95cc:0:b0:2b6:df71:cff1 with SMTP id
- y12-20020a2e95cc000000b002b6df71cff1mr7043105ljh.52.1690223245680; Mon, 24
- Jul 2023 11:27:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20230724122908.42409-1-nitin.jadhav@nxp.com> <20230724122908.42409-2-nitin.jadhav@nxp.com>
-In-Reply-To: <20230724122908.42409-2-nitin.jadhav@nxp.com>
+        d=1e100.net; s=20221208; t=1690234055; x=1690838855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6LA4V+YmdCfiyvWfCNoKpDYw2rK0pj+t+9AqFXmTaoI=;
+        b=DJD8cH5ksW9gvcFSlWJGah9Hj8hLJBXYJRuIE46zSDb6YoCr16+VUOeDrefcE1dRyy
+         kmHjjOecPaDzBx53O34YillowTVEDfCCiKo41GZVWDScmlzzGLMKeH5GpmJ9gSkwgCB5
+         y4noZ8kGNt+WKV9LibLtWpPUPtFGIhj3AtrshfU41tWtMqo8anMMcPRxXPlXXbZlvQYQ
+         lD/qihErPwuScFHIGn22GFlQ+sado/SETilYKgAfrLfCKZAKZ+LyXQ9QBvuxd41cgekL
+         VnaIs2xoe9pSFBCZtOWN0prZdsoYHwU4sPbfN5AnTQspJEVdyVSOld5CUzNI/H/ZiYYg
+         mOkQ==
+X-Gm-Message-State: ABy/qLb9VBu0Auq3VunvRauYG6Dm04F4OYfIlQhfKsnQPcR0nTz90UgL
+        udiu+Rw1iDu8a1XwwsuQq3xbaBQ3jag=
+X-Google-Smtp-Source: APBJJlGqWJOl3I7YjRF1Xqu0Dd/gjPWUr3zfWw4bHzMnBHmOgMlD4I/kwovaG49GQQ+ezsPd+YJ8xQ==
+X-Received: by 2002:a81:92d4:0:b0:56d:4d1e:74ab with SMTP id j203-20020a8192d4000000b0056d4d1e74abmr570552ywg.23.1690234054744;
+        Mon, 24 Jul 2023 14:27:34 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
+        by smtp.gmail.com with ESMTPSA id w135-20020a0dd48d000000b0057d24f8278bsm3039128ywd.104.2023.07.24.14.27.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jul 2023 14:27:33 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 24 Jul 2023 11:27:13 -0700
-Message-ID: <CABBYNZJWLEAaLvi0cuHZ+yPimOB=dZXv302xhh1UiuBhD1mZnw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/1] shared/vcp: Fixed the crash observed with VOCS
-To:     Nitin Jadhav <nitin.jadhav@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org, devyani.godbole@nxp.com,
-        pav@iki.fi, sathish.narasimman@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] gatt: Fix not establishing a socket for each device
+Date:   Mon, 24 Jul 2023 14:27:31 -0700
+Message-ID: <20230724212731.848134-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Nitin,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jul 24, 2023 at 5:29=E2=80=AFAM Nitin Jadhav <nitin.jadhav@nxp.com>=
- wrote:
->
-> Root cause
-> - There are two types of database- Remote and Local (rdb and ldb).
-> - In client mode currently the code was written to access ldb.
->
-> Fix
-> - Correcting it, to access rdb has resolved the problem in VOCS.
-> - Same correction is done for VCS.
->
-> Reported-by: Pauli Virtanen <pav@iki.fi>
-> ---
-> v2: Fixed GitLint and ScanBuild warnings
-> ---
->  src/shared/vcp.c | 52 +++++++++++++++++++++++++++---------------------
->  1 file changed, 29 insertions(+), 23 deletions(-)
->
-> diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-> index 74bd01729..80d4dfcd4 100644
-> --- a/src/shared/vcp.c
-> +++ b/src/shared/vcp.c
-> @@ -973,7 +973,7 @@ static void vocs_voaodec_read(struct gatt_db_attribut=
-e *attrib,
->         struct bt_vocs *vocs =3D user_data;
->         struct iovec iov;
->
-> -       iov.iov_base =3D &vocs->vocs_ao_dec;
-> +       iov.iov_base =3D vocs->vocs_ao_dec;
->         iov.iov_len =3D strlen(vocs->vocs_ao_dec);
->
->         gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-> @@ -998,10 +998,12 @@ static struct bt_vcs *vcs_new(struct gatt_db *db, s=
-truct bt_vcp_db *vdb)
->
->         /* Populate DB with VCS attributes */
->         bt_uuid16_create(&uuid, VCS_UUID);
-> -       vcs->service =3D gatt_db_add_service(db, &uuid, true, 9);
-> +
-> +       vcs->service =3D gatt_db_add_service(db, &uuid, true, 10);
+AcquireWrite and AcquireNotify shall establish a socket pair for each
+device connected otherwise the application cannot distinct the
+operations of each client.
 
-Not sure what this has to do with the crashes?
+Fixes: https://github.com/bluez/bluez/issues/460
+---
+ src/gatt-database.c | 160 ++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 138 insertions(+), 22 deletions(-)
 
->         gatt_db_service_add_included(vcs->service, vdb->vocs->service);
->         gatt_db_service_set_active(vdb->vocs->service, true);
->
-> +
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 01dd84e8e3f7..7221ffc87f0d 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -110,6 +110,12 @@ struct external_profile {
+ 	struct queue *profiles; /* btd_profile list */
+ };
+ 
++struct client_io {
++	struct bt_att *att;
++	unsigned int disconn_id;
++	struct io *io;
++};
++
+ struct external_chrc {
+ 	struct external_service *service;
+ 	char *path;
+@@ -119,8 +125,8 @@ struct external_chrc {
+ 	uint32_t perm;
+ 	uint32_t ccc_perm;
+ 	uint16_t mtu;
+-	struct io *write_io;
+-	struct io *notify_io;
++	struct queue *write_ios;
++	struct queue *notify_ios;
+ 	struct gatt_db_attribute *attrib;
+ 	struct gatt_db_attribute *ccc;
+ 	struct queue *pending_reads;
+@@ -463,12 +469,22 @@ static void cancel_pending_write(void *data)
+ 	op->owner_queue = NULL;
+ }
+ 
++static void client_io_free(void *data)
++{
++	struct client_io *client = data;
++
++	bt_att_unregister_disconnect(client->att, client->disconn_id);
++	bt_att_unref(client->att);
++	io_destroy(client->io);
++	free(client);
++}
++
+ static void chrc_free(void *data)
+ {
+ 	struct external_chrc *chrc = data;
+ 
+-	io_destroy(chrc->write_io);
+-	io_destroy(chrc->notify_io);
++	queue_destroy(chrc->write_ios, client_io_free);
++	queue_destroy(chrc->notify_ios, client_io_free);
+ 
+ 	queue_destroy(chrc->pending_reads, cancel_pending_read);
+ 	queue_destroy(chrc->pending_writes, cancel_pending_write);
+@@ -2543,18 +2559,29 @@ static void flush_pending_writes(GDBusProxy *proxy,
+ 	queue_remove_all(owner_queue, NULL, NULL, NULL);
+ }
+ 
++static bool match_client_io(const void *data, const void *user_data)
++{
++	const struct client_io *client = data;
++	const struct io *io = user_data;
++
++	return client->io == io;
++}
++
+ static bool sock_hup(struct io *io, void *user_data)
+ {
+ 	struct external_chrc *chrc = user_data;
++	struct client_io *client;
+ 
+ 	DBG("%p closed\n", io);
+ 
+-	if (io == chrc->write_io)
+-		chrc->write_io = NULL;
+-	else
+-		chrc->notify_io = NULL;
++	client = queue_remove_if(chrc->write_ios, match_client_io, io);
++	if (!client) {
++		client = queue_remove_if(chrc->notify_ios, match_client_io, io);
++		if (!client)
++			return false;
++	}
+ 
+-	io_destroy(io);
++	client_io_free(client);
+ 
+ 	return false;
+ }
+@@ -2608,10 +2635,68 @@ static int sock_io_send(struct io *io, const void *data, size_t len)
+ 	return sendmsg(io_get_fd(io), &msg, MSG_NOSIGNAL);
+ }
+ 
++static void att_disconnect_cb(int err, void *user_data)
++{
++	struct client_io *client = user_data;
++
++	/* If ATT is disconnected shutdown correspondent client IO so sock_hup
++	 * is triggered and the server socket is closed.
++	 */
++	io_shutdown(client->io);
++}
++
++static struct client_io *
++client_io_new(struct external_chrc *chrc, int fd, struct bt_att *att)
++{
++	struct client_io *client;
++
++	client = new0(struct client_io, 1);
++	client->att = bt_att_ref(att);
++	client->disconn_id = bt_att_register_disconnect(att, att_disconnect_cb,
++							client, NULL);
++	client->io = sock_io_new(fd, chrc);
++
++	return client;
++}
++
++static bool match_client_att(const void *data, const void *user_data)
++{
++	const struct client_io *client = data;
++	const struct bt_att *att = user_data;
++
++	/* Always match if ATT instance is not set since that is used by
++	 * clear_cc_state to clear all instances.
++	 */
++	if (!att)
++		return true;
++
++	return client->att == att;
++}
++
++static struct client_io *
++client_write_io_get(struct external_chrc *chrc, int fd, struct bt_att *att)
++{
++	struct client_io *client;
++
++	client = queue_find(chrc->write_ios, match_client_att, att);
++	if (client)
++		return client;
++
++	client = client_io_new(chrc, fd, att);
++
++	if (!chrc->write_ios)
++		chrc->write_ios = queue_new();
++
++	queue_push_tail(chrc->write_ios, client);
++
++	return client;
++}
++
+ static void acquire_write_reply(DBusMessage *message, void *user_data)
+ {
+ 	struct pending_op *op = user_data;
+ 	struct external_chrc *chrc;
++	struct client_io *client;
+ 	DBusError err;
+ 	int fd;
+ 	uint16_t mtu;
+@@ -2651,10 +2736,12 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
+ 
+ 	DBG("AcquireWrite success: fd %d MTU %u\n", fd, mtu);
+ 
+-	chrc->write_io = sock_io_new(fd, chrc);
++	client = client_write_io_get(chrc, fd, op->att);
++	if (!client)
++		goto retry;
+ 
+ 	while ((op = queue_peek_head(chrc->pending_writes)) != NULL) {
+-		if (sock_io_send(chrc->write_io, op->data.iov_base,
++		if (sock_io_send(client->io, op->data.iov_base,
+ 					op->data.iov_len) < 0)
+ 			goto retry;
+ 
+@@ -2711,10 +2798,32 @@ static struct pending_op *acquire_write(struct external_chrc *chrc,
+ 	return NULL;
+ }
+ 
++static struct client_io *
++client_notify_io_get(struct external_chrc *chrc, int fd, struct bt_att *att)
++{
++	struct client_io *client;
++
++	client = queue_find(chrc->notify_ios, match_client_att, att);
++	if (client)
++		return client;
++
++	client = client_io_new(chrc, fd, att);
++
++	io_set_read_handler(client->io, sock_io_read, chrc, NULL);
++
++	if (!chrc->notify_ios)
++		chrc->notify_ios = queue_new();
++
++	queue_push_tail(chrc->notify_ios, client);
++
++	return client;
++}
++
+ static void acquire_notify_reply(DBusMessage *message, void *user_data)
+ {
+ 	struct pending_op *op = user_data;
+ 	struct external_chrc *chrc = (void *) op->data.iov_base;
++	struct client_io *client;
+ 	DBusError err;
+ 	int fd;
+ 	uint16_t mtu;
+@@ -2748,8 +2857,9 @@ static void acquire_notify_reply(DBusMessage *message, void *user_data)
+ 
+ 	DBG("AcquireNotify success: fd %d MTU %u\n", fd, mtu);
+ 
+-	chrc->notify_io = sock_io_new(fd, chrc);
+-	io_set_read_handler(chrc->notify_io, sock_io_read, chrc, NULL);
++	client = client_notify_io_get(chrc, fd, op->att);
++	if (!client)
++		goto retry;
+ 
+ 	__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+ 
+@@ -2782,6 +2892,7 @@ static void acquire_notify_setup(DBusMessageIter *iter, void *user_data)
+ static uint8_t ccc_write_cb(struct pending_op *op, void *user_data)
+ {
+ 	struct external_chrc *chrc = user_data;
++	struct client_io *client;
+ 	DBusMessageIter iter;
+ 	uint16_t value;
+ 
+@@ -2794,15 +2905,17 @@ static uint8_t ccc_write_cb(struct pending_op *op, void *user_data)
+ 		if (!chrc->ntfy_cnt)
+ 			goto done;
+ 
+-		if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
+-			goto done;
+-
+-		if (chrc->notify_io) {
+-			io_destroy(chrc->notify_io);
+-			chrc->notify_io = NULL;
++		client = queue_remove_if(chrc->notify_ios, match_client_att,
++							op ? op->att : NULL);
++		if (client) {
++			client_io_free(client);
++			__sync_sub_and_fetch(&chrc->ntfy_cnt, 1);
+ 			goto done;
+ 		}
+ 
++		if (__sync_sub_and_fetch(&chrc->ntfy_cnt, 1))
++			goto done;
++
+ 		/*
+ 		 * Send request to stop notifying. This is best-effort
+ 		 * operation, so simply ignore the return the value.
+@@ -2822,7 +2935,8 @@ static uint8_t ccc_write_cb(struct pending_op *op, void *user_data)
+ 		(value == 2 && !(chrc->props & BT_GATT_CHRC_PROP_INDICATE)))
+ 		return BT_ERROR_CCC_IMPROPERLY_CONFIGURED;
+ 
+-	if (chrc->notify_io) {
++	client = queue_find(chrc->notify_ios, match_client_att, op->att);
++	if (client) {
+ 		__sync_fetch_and_add(&chrc->ntfy_cnt, 1);
+ 		goto done;
+ 	}
+@@ -3123,6 +3237,7 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 					void *user_data)
+ {
+ 	struct external_chrc *chrc = user_data;
++	struct client_io *client;
+ 	struct btd_device *device;
+ 	struct queue *queue;
+ 	DBusMessageIter iter;
+@@ -3158,8 +3273,9 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 	if (opcode == BT_ATT_OP_EXEC_WRITE_REQ)
+ 		chrc->prep_authorized = false;
+ 
+-	if (chrc->write_io) {
+-		if (sock_io_send(chrc->write_io, value, len) < 0) {
++	client = queue_find(chrc->write_ios, match_client_att, att);
++	if (client) {
++		if (sock_io_send(client->io, value, len) < 0) {
+ 			error("Unable to write: %s", strerror(errno));
+ 			goto fail;
+ 		}
+-- 
+2.41.0
 
-Please remove the extra space above.
-
->         bt_uuid16_create(&uuid, VOL_STATE_CHRC_UUID);
->         vcs->vs =3D gatt_db_service_add_characteristic(vcs->service,
->                                         &uuid,
-> @@ -1385,11 +1387,12 @@ static void read_vocs_audio_location(struct bt_vc=
-p *vcp, bool success,
->                                      const uint8_t *value, uint16_t lengt=
-h,
->                                      void *user_data)
->  {
-> -       uint32_t *vocs_audio_loc;
-> -       struct iovec iov =3D {
-> -               .iov_base =3D (void *) value,
-> -               .iov_len =3D length,
-> -       };
-> +       uint32_t vocs_audio_loc;
-> +
-> +       if (!value) {
-> +               DBG(vcp, "Unable to get VOCS Audio Location");
-> +               return;
-> +       }
->
->         if (!success) {
->                 DBG(vcp, "Unable to read VOCS Audio Location: error 0x%02=
-x",
-> @@ -1397,26 +1400,22 @@ static void read_vocs_audio_location(struct bt_vc=
-p *vcp, bool success,
->                 return;
->         }
->
-> -       vocs_audio_loc =3D iov_pull_mem(&iov, sizeof(uint32_t));
-> -       if (!*vocs_audio_loc) {
-> -               DBG(vcp, "Unable to get VOCS Audio Location");
-> -               return;
-> -       }
-> +       memcpy(&vocs_audio_loc, value, length);
->
-> -       DBG(vcp, "VOCS Audio Loc:%x", *vocs_audio_loc);
-> +       DBG(vcp, "VOCS Audio Loc:%x", vocs_audio_loc);
-
-We should probably store the location within vcp, that said I don't
-think this has anything to do with the crashes though.
-
->  }
->
-> -
->  static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success,
->                                        uint8_t att_ecode,
->                                        const uint8_t *value, uint16_t len=
-gth,
->                                        void *user_data)
->  {
->         char *vocs_ao_dec_r;
-> -       struct iovec iov =3D {
-> -               .iov_base =3D (void *) value,
-> -               .iov_len =3D length,
-> -       };
-> +
-> +       if (!value) {
-> +               DBG(vcp, "Unable to get VOCS Audio Descriptor");
-> +               return;
-> +       }
->
->         if (!success) {
->                 DBG(vcp, "Unable to read VOCS Audio Descriptor: error 0x%=
-02x",
-> @@ -1424,13 +1423,20 @@ static void read_vocs_audio_descriptor(struct bt_=
-vcp *vcp, bool success,
->                 return;
->         }
->
-> -       vocs_ao_dec_r =3D iov_pull_mem(&iov, length);
-> -       if (!*vocs_ao_dec_r) {
-> +       vocs_ao_dec_r =3D malloc(length+1);
-> +       memset(vocs_ao_dec_r, 0, length+1);
-> +
-> +       memcpy(vocs_ao_dec_r, value, length);
-> +
-> +       if (!vocs_ao_dec_r) {
->                 DBG(vcp, "Unable to get VOCS Audio Descriptor");
->                 return;
->         }
->
-> -       DBG(vcp, "VOCS Audio Descriptor:%s", *vocs_ao_dec_r);
-> +       DBG(vcp, "VOCS Audio Descriptor: %s", vocs_ao_dec_r);
->
-> +       free(vocs_ao_dec_r);
-> +       vocs_ao_dec_r =3D NULL;
-
-Ditto, not really sure what this has to do with the crashes, besides
-allocating memory just to free it here sounds useless.
-
->  }
->
->  static void vcp_pending_destroy(void *data)
-> @@ -1719,10 +1725,10 @@ bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_=
-gatt_client *client)
->                 return false;
->
->         bt_uuid16_create(&uuid, VCS_UUID);
-> -       gatt_db_foreach_service(vcp->ldb->db, &uuid, foreach_vcs_service,=
- vcp);
-> +       gatt_db_foreach_service(vcp->rdb->db, &uuid, foreach_vcs_service,=
- vcp);
->
->         bt_uuid16_create(&uuid, VOL_OFFSET_CS_UUID);
-> -       gatt_db_foreach_service(vcp->ldb->db, &uuid, foreach_vocs_service=
-, vcp);
-> +       gatt_db_foreach_service(vcp->rdb->db, &uuid, foreach_vocs_service=
-, vcp);
-
-These changes seem to be the actual problem, so I'd split them and if
-you still want to introduce the other changes as well please create
-proper commits describing why they are required.
-
->         return true;
->  }
-> --
-> 2.34.1
->
-
-
---=20
-Luiz Augusto von Dentz
