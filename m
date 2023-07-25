@@ -2,162 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D6AC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 19:12:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C89CC001DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 19:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229623AbjGYTMq (ORCPT
+        id S229929AbjGYTu2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jul 2023 15:12:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55208 "EHLO
+        Tue, 25 Jul 2023 15:50:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231260AbjGYTMm (ORCPT
+        with ESMTP id S231379AbjGYTuY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jul 2023 15:12:42 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C18A71BDA
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 12:12:36 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b974031aeaso66950881fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 12:12:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690312355; x=1690917155;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KluA/XIpxJA1rRKd6K3r2oojJvDMTS0Q5/F5t5pahbU=;
-        b=S+RfmZOGqEJ8/Iw2T5wx8wIbQ21BtKUSAH6rBYZCqpJz1Y3m1lR+mlqMGsWr2Wn3Bj
-         VhvHZucikE6FER3/tV1+x5Dhi0Phc5lBmHpukfF67rz6eE6qKZVj5l6r97yzRMg49oYm
-         GLqv6IkeaXcuNN4tyuoLL082S6DKE6NxlQ1i3VJO/TOA+rWkUNHJSEUo04LJ5zcA+64T
-         VA6ZX7Bgi9bMDNDZdD7s4Q/sIlGDPK+uxVcpQYJpnOsiw1/V1e0CIW8ot9CblgyhU8HB
-         m8SXk3jYitURJJqzK/9DsSIEx6q8ODdnwa9KcSenuDbtLWQNOkVxXMDMM0FNkPA8Po/E
-         hGdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690312355; x=1690917155;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KluA/XIpxJA1rRKd6K3r2oojJvDMTS0Q5/F5t5pahbU=;
-        b=chwwc6DBsYzJyGVGaX5Yj7QUFg55aak39bxvRazUm0Cvefxzjg8tupzlW0zO/e2pph
-         co1cyp8TtrXjoy1qyRD+d1KTV6lBjlNGRmqGCiXFToL9+73pdBIRc0VxMB+0Anfl57vY
-         sfMKzheqnLwMdSeLhD9+Z+vDnRmvR3Sw+U6UwI5YFyiusT86f1oX/x5kujQ4YbdqUH7L
-         qp3FXiezyWGhmJvzFfPkCkW/Vyy6MKBTM9qmDzevqF2Rsgtgh79nZUc/a5+K+LbBKm3S
-         epJwRzy5L2Tcm3Cfc14yDbNMrm/yo3//EC2k4j+dR9SZTgL6UCN38JJjMoM1/QGxaPWF
-         FAgA==
-X-Gm-Message-State: ABy/qLbx7bsxnwjF4f6rAhNNXz7H0nXdRbsy0X5P7Vp4J2eBCnn8ad51
-        nxFl4qfBgg9CyMv13e7kaGj8f/9Bc7/dl4gbhcqwyxhM
-X-Google-Smtp-Source: APBJJlHvR4rZApqRYiFRQjj6vQYJheusrGd1kQf5aygYVV8d3Sz8g6GSXs+wKwEbFzjLxNO71T/EKvZaj+R0jvtwCfw=
-X-Received: by 2002:a2e:b712:0:b0:2b6:da64:734f with SMTP id
- j18-20020a2eb712000000b002b6da64734fmr9287832ljo.47.1690312354602; Tue, 25
- Jul 2023 12:12:34 -0700 (PDT)
+        Tue, 25 Jul 2023 15:50:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10CE619BF
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 12:50:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9A6436187E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 19:50:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0219AC433C7;
+        Tue, 25 Jul 2023 19:50:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690314622;
+        bh=WWgW2I11KrMvPYi46g5snzKXtMTnPXBm99zoOkfaDys=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=E1ygexOVHqApdU/kDNLDULYt/3GntjNH+MQsw2R6UEXmpcXeEoqHFvdHtpN1KLqoA
+         uNys+sO7zC/k7h1xsgdFtiedCu0XkICag5ZF6Owg4S7vzRzCVK0htlCoUUjKDB7s1X
+         hp7hEAaNNNiaxn+1ycxkt2md6NZoeYJ2YU+Lv9vAYOaODW3q43+nw9s4vDAqpPOpQo
+         FkXJ7Fk6B+ZfH0Yfq85Mw5opLa5d2C/L7rbo+Dq9WdmkQTlPpqnwyFc58J2DthKM+6
+         1PHdg67KOWmRavbJJ19vgAQz1yXxw2N+PC1TUEzXdFo6IF/MtVpMlfO1BiroA2VwXO
+         bGlH/NfrqPYgg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D274FC59A4C;
+        Tue, 25 Jul 2023 19:50:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20230725084431.640332-1-simon.mikuda@streamunlimited.com> <20230725084431.640332-6-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20230725084431.640332-6-simon.mikuda@streamunlimited.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 25 Jul 2023 12:12:22 -0700
-Message-ID: <CABBYNZJ81vnZNnAhBFyu7_-5Mr0yxEtprk-7Gd6ZtzZNvx5nMA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 5/8] device: Fix pairing and discovery with dual
- mode devices
-To:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v3 0/3] Fixed the crash observed with VOCS
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169031462185.19624.11352500926929002201.git-patchwork-notify@kernel.org>
+Date:   Tue, 25 Jul 2023 19:50:21 +0000
+References: <20230725112126.49656-1-nitin.jadhav@nxp.com>
+In-Reply-To: <20230725112126.49656-1-nitin.jadhav@nxp.com>
+To:     Nitin Jadhav <nitin.jadhav@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, devyani.godbole@nxp.com,
+        pav@iki.fi, luiz.dentz@gmail.com, sathish.narasimman@intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Simon,
+Hello:
 
-On Tue, Jul 25, 2023 at 1:56=E2=80=AFAM Simon Mikuda
-<simon.mikuda@streamunlimited.com> wrote:
->
-> We'll prefer to pair and discover services on connected bearer first.
->
-> There was a problem with pairing, that select_conn_bearer returned BR/EDR
-> even when we have connection to LE bearer only. In these situation we sho=
-uld
-> pair over connected bearer, since connection to another bearer can fail.
->
-> Similar problem with discovery that after connection on LE bearer discove=
-ry
-> was requested on BR/EDR bearer which can cause connection error (e.g. Pag=
-e
-> Timeout).
-> ---
->  src/device.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 6f28e261e..446e978ee 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -2504,6 +2504,16 @@ static uint8_t select_conn_bearer(struct btd_devic=
-e *dev)
->         return dev->bdaddr_type;
->  }
->
-> +static uint8_t select_active_bearer(struct btd_device *dev)
-> +{
-> +       if (dev->bredr_state.connected)
-> +               return BDADDR_BREDR;
-> +       else if (dev->le_state.connected)
-> +               return dev->bdaddr_type =3D=3D BDADDR_BREDR
-> +                       ? BDADDR_LE_PUBLIC : dev->bdaddr_type;
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-The code above assumes BR/EDR has the priority in case both are
-connected, perhaps we should have a clear policy in case both are
-connected.
+On Tue, 25 Jul 2023 14:21:23 +0300 you wrote:
+> Hello Maintainers
+> 
+> This series of patch handles the fix for the crash observed with VOCS when trying to pair with LE Audio TWS earbuds and few other issues.
+> 
+> A crash was reported for the following patch by Pauli Virtanen <pav@iki.fi>.
+> Patch Link: https://patchwork.kernel.org/project/bluetooth/patch/20230612133251.194-4-nitin.jadhav@nxp.com/
+> 
+> [...]
 
-> +       return select_conn_bearer(dev);
-> +}
-> +
->  static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
->                                                         void *user_data)
->  {
-> @@ -3018,7 +3028,7 @@ static DBusMessage *pair_device(DBusConnection *con=
-n, DBusMessage *msg,
->         else if (device->le_state.bonded)
->                 bdaddr_type =3D BDADDR_BREDR;
->         else
-> -               bdaddr_type =3D select_conn_bearer(device);
-> +               bdaddr_type =3D select_active_bearer(device);
->
->         state =3D get_state(device, bdaddr_type);
->
-> @@ -3055,7 +3065,7 @@ static DBusMessage *pair_device(DBusConnection *con=
-n, DBusMessage *msg,
->                         err =3D device_connect_le(device);
->                 else
->                         err =3D adapter_create_bonding(adapter, &device->=
-bdaddr,
-> -                                                       device->bdaddr_ty=
-pe,
-> +                                                       bdaddr_type,
->                                                         io_cap);
->         } else {
->                 err =3D adapter_create_bonding(adapter, &device->bdaddr,
-> @@ -6207,12 +6217,9 @@ static bool start_discovery_cb(gpointer user_data)
->  {
->         struct btd_device *device =3D user_data;
->
-> -       if (device->bredr)
-> -               device_browse_sdp(device, NULL);
-> -       else
-> -               device_browse_gatt(device, NULL);
-> -
->         device->discov_timer =3D 0;
-> +       device_discover_services(device, select_active_bearer(device),
-> +                       NULL);
+Here is the summary with links:
+  - [BlueZ,v3,1/3] shared/vcp: Fixed the crash observed with VOCS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=06ec4f61000a
+  - [BlueZ,v3,2/3] shared/vcp: Fixed issues related to read audio location and descriptor
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2a0e392b40fa
+  - [BlueZ,v3,3/3] shared/vcp: Corrected handle size to accommodate included service
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4d714becb7df
 
-Perhaps in case of discovery we could do both in parallel, although if
-the remote side supports GATT services as part of SDP we may end up
-with redundant discovery but bt_gatt_client/gatt_db shall be able to
-handle that.
-
->         return FALSE;
->  }
-> --
-> 2.34.1
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
