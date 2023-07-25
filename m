@@ -2,97 +2,80 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F03EC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 18:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CB47EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 18:44:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232241AbjGYSHW (ORCPT
+        id S229764AbjGYSoM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jul 2023 14:07:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57634 "EHLO
+        Tue, 25 Jul 2023 14:44:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232634AbjGYSHV (ORCPT
+        with ESMTP id S229567AbjGYSoL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jul 2023 14:07:21 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3D7211B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 11:07:19 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b7441bfa9eso1767171fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 11:07:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690308437; x=1690913237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IN0zdmQ+1E3hM1xkGjX/rVmaqWp9GiVbOxPA6Ux+FOc=;
-        b=JHfgM0kwoOrqBYrpUWzgYP1HE5FAbad5uERuEzAux0Mqh46KxeXlY7DiWtHjxLWS0Q
-         tod9E4vRs06Ok8QA06BRAmYAzI8Ru1uIf1raRq/W9Ho7l5Df0Rf1LktBf9pgA4C0GetQ
-         jXcPfzkfIVN5bLgyPBrkiq4MBBSpqk2hlq15QJyuXPE+sbIG1bfhtszmp81wSyeg2Krr
-         zWWVqSkIP5qYha+qxQ01eowFfc2IXmvchRRG+qvUl2t2z2lnumUIcSBbhfTe2fCkqCcu
-         pg9YVNAyj3bthPKAYScpN0UzdJrCwE35USejje3qa7MiZrMNy5imggcYwXftS0oliRXj
-         /iLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690308437; x=1690913237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IN0zdmQ+1E3hM1xkGjX/rVmaqWp9GiVbOxPA6Ux+FOc=;
-        b=DA2k9w3yL1aV6KMBVULql919TBO1KnaGY2leu76QNktvA5Nlm35bE23gHqA6rXSio/
-         KBPujVj2yEC2jSepGNkjis95uZBljlYtfQETk73BGpc6YDdD7T2E/MVZ2apsBgXM0r3a
-         KRoP5oRtIp5Ukpe+tgkD8W5wwbcZx0/76zAtfL3sOzNC9ojg+CTHtbZ1Xl1fNzvLPFx9
-         mpyhXcJGf5E/8cwAlDkud4yg8J5IsnJfEm+WgDle/BR5vsGUMkZFIi/iXWsYYcWotudf
-         Rnk4C88J2DZt/tXpNHS9bkTiqtbH8VmEqeywuyNrxdhcmxhMVehMT7hB8u51sC4cLhNs
-         TBng==
-X-Gm-Message-State: ABy/qLZK1DfY0voGGs0Zz1Ltir8k/rdkdrPfBZpuey8iTgvD8KfckzeS
-        r4ErqwLdEikIUXihlVS/qtHuOEEC+h1hB021rC066Dme
-X-Google-Smtp-Source: APBJJlFONmiIsGIkHfAYk/a2JLR6J4s11SAS2KUqGoHh1D8LCkfSWjCvh92AMW77N45ogrpqUM21kmkc2AVCmtHSoAI=
-X-Received: by 2002:a2e:9cd6:0:b0:2b9:344c:181e with SMTP id
- g22-20020a2e9cd6000000b002b9344c181emr1112394ljj.19.1690308437225; Tue, 25
- Jul 2023 11:07:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAAvW=MyYArpr-bpiHkHjrqmkGsiSpMqyAivbMCLepV1HajyAzA@mail.gmail.com>
-In-Reply-To: <CAAvW=MyYArpr-bpiHkHjrqmkGsiSpMqyAivbMCLepV1HajyAzA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 25 Jul 2023 11:07:05 -0700
-Message-ID: <CABBYNZ+Keecvkfzf4+m+e3M5ohc6rGHrFs_wYEYzSV9fSt-aZA@mail.gmail.com>
-Subject: Re: Bluetooth for hearing aids support (ASHA)
-To:     Stefnotch <brandmairstefan@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Tue, 25 Jul 2023 14:44:11 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B081819AD
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 11:44:10 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 45F0161880
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 18:44:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A4622C433CA
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 18:44:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690310649;
+        bh=8yNygyUm2QQLznDm5It4xtnhbBKjoPgUSs2ygIQ5JQs=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=CLjRKjfEAYJFGGqibyOsH06kZ4vMtPcItrMZkmihdgrXTLTx/+PlZczB2rIqBYovX
+         KA0an17jpufNt7KtR9SpzZil+95aLeIKzMruBRh6Ehy/StgY3bCKrB8OCkRKmwK0e9
+         /zLG1zbMrJvTXU1iMFB0ojUdYCZJS3My5eR0JCi47XndT6Tk4YCR6Mu9q03XbNPFiu
+         08Lg3Fy9q3jM2zn+Ns2GCAakRqeI+CGe+jwA4LNg/C0l6QsJKyp+R0Mo/zcbAlyGwD
+         4oO9EZKegAALzIaykkvQwe9eeRmw02afjkhMJ5v0QbSFZr/KjvOGgJfcXK7Zkgf1FS
+         0TkRYWzsyMOLg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 87607C53BCD; Tue, 25 Jul 2023 18:44:09 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
+Date:   Tue, 25 Jul 2023 18:44:09 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: bavay@slf.ch
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-217023-62941-7RUgwuAhaW@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
+References: <bug-217023-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stefnotch,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
 
-On Tue, Jul 25, 2023 at 6:49=E2=80=AFAM Stefnotch <brandmairstefan@gmail.co=
-m> wrote:
->
-> Hello
->
-> I have hearing aids, which can be connected to devices that support
-> the Bluetooth ASHA protocol.
-> https://source.android.com/docs/core/connect/bluetooth/asha
-> That protocol is open and somewhat well documented. However, it is
-> only supported on Android devices at the moment. BlueZ on Linux does
-> not appear to support it.
->
-> The idea is with Bluetooth ASHA, one can stream audio from a computer
-> directly to a pair of hearing aids. Without Bluetooth ASHA, I'm
-> limited to using a battery powered, clumsy accessory from Cochlear.
->
->  I was wondering if it would be worthwhile to support that in BlueZ.
->
-> For the record, this has been requested in the past, but hasn't
-> progressed any further.
-> https://www.reddit.com/r/linuxquestions/comments/l54zku/accessibility_for=
-_the_deaf/
-> https://github.com/bluez/bluez/issues/481
-
-Don't think there is any objection to having support for ASHA, the
-problem is that most of the companies contributing to BlueZ are
-focusing on LE Audio which supersedes ASHA, so the challenge is to
-find someone to support this feature.
+--- Comment #7 from Mathias Bavay (bavay@slf.ch) ---
+I am out of the office from Saturday 14.07.2023 until Monday 07.08.2023. Pl=
+ease
+consider sending your email again when I will be back at the office.
 
 --=20
-Luiz Augusto von Dentz
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
