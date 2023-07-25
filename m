@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0DEC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 08:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44365C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 08:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231822AbjGYIrK (ORCPT
+        id S232101AbjGYIrM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jul 2023 04:47:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35442 "EHLO
+        Tue, 25 Jul 2023 04:47:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232228AbjGYIqi (ORCPT
+        with ESMTP id S229541AbjGYIqk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jul 2023 04:46:38 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7756B1BD1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 01:45:15 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-99313a34b2dso769338166b.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 01:45:15 -0700 (PDT)
+        Tue, 25 Jul 2023 04:46:40 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D041FD7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 01:45:17 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-51e28b299adso8369933a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 01:45:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1690274692; x=1690879492;
+        d=streamunlimited.com; s=google; t=1690274694; x=1690879494;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VaL2DgaNC+1z327qtfZ1KrQuYZxhQvPHWnqk5Q87V8k=;
-        b=oI4kGqxgoVNrQROxKKw/FqtcrhcNUyfoSoU30wAFtfdxZMJgawHN96MlJZyP4bFAlG
-         igTf5Cs/N34p0G+WXk/eXofUtZVfSj378GSZMYfL8VkWkFlXJnT3rkZniPB0fzdG7ePt
-         5kEKatSKd5gCmql8xfj6dwtibjhWB5fG5jcZo=
+        bh=Q90pg3qDzBvVPqD6CaJUpw83QakxOeK89A7ElltIbrY=;
+        b=b/bELl+u9cAb6gssmCrAqNgn80T1vdQqXdUVzY80r2kcECrAv1Y6Ue2BKePme3mUyQ
+         Ypnspl0J9yuA8Z24bAAEmVhv495uKpCTbVKjoCKQ2sQn/Kh5FtNR51CgGKKGDDW/cXSS
+         hj3Y4H5g/hJwLH5BId0iAK+kH3ojyI9d4MI8Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690274692; x=1690879492;
+        d=1e100.net; s=20221208; t=1690274694; x=1690879494;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VaL2DgaNC+1z327qtfZ1KrQuYZxhQvPHWnqk5Q87V8k=;
-        b=W5hhdYEnP/BqNX3aBxhPeqyWsR2IqcFAEXt+7ecJFcicySEvl4QUzjgV00e7pDrSbF
-         8g53gYj1f9Cg3AWlAhfQHIfGCZA4ry25RSiw/uw0EEwu4Sfwpd5jcAF0FrgLcd73jOvh
-         33W0U7kCLUZ2cAE5FrOy0PRt2GiAKE+0kEmcKonnE75DUx9zEq1P00MN1bRjRIU4dYIl
-         2sdKU9j+bukcKxTljCHkc/N31/PmBUn2+Sr2+dkty3KIyBJwxxrAK/lLMkEoSpl/98+e
-         fk8d8RQoPB+2X+IR5Mx7wUITTzKiA4GwsNFeev3Azjw482UP9ZT+1G69chllr6PD62HF
-         65zg==
-X-Gm-Message-State: ABy/qLZ81Tu+7xtngiF//jxuEGYLZTjbq0yh3qnjgDgaU8xQ46tZWclE
-        d831Erhf9wft185/Wmj+Voo1KU8zHVP4e2goGtc=
-X-Google-Smtp-Source: APBJJlGOu98XeKUnao9zQqlO1TNjXeL0S1Q0cobuo1TnWmrKKBtuIp91xp6TzpP3FuQaPpY/TPCzHQ==
-X-Received: by 2002:a17:907:7895:b0:99a:7ff1:9b5a with SMTP id ku21-20020a170907789500b0099a7ff19b5amr12467744ejc.4.1690274692468;
-        Tue, 25 Jul 2023 01:44:52 -0700 (PDT)
+        bh=Q90pg3qDzBvVPqD6CaJUpw83QakxOeK89A7ElltIbrY=;
+        b=acwZqAM+WB3DxfyAoUUD14QdsGWZ0nUf/YcQMfCg18/6RUlxclNFt1rLIPLVPWNIOx
+         4bnFPniiAOe+n89FZquo7hqQ84iHAi2lmLiaY8W4lZfhJZ/1XT7kEMx5tRcX+brKaCs/
+         Q34oCUREmQYYh3mpbdsaejr+98DAZC2888aPgM9mMIV/ZNGdijqm+gdFDGPxlMoxDKZ7
+         1h8XqEI8h3/6Y9qf9L/uzlhf2xd6NJW/xUOe7FgCQlnd2tzN3eVqtYapMyml7CKQVpMW
+         XRrgfM2g45Hq+Mk4hemmEV4hNb2Hi+aSbVVHjQVZbm5vG1l540sUYauO58IoF3D0076c
+         SEBg==
+X-Gm-Message-State: ABy/qLY6wwPgtHnKMQN/t2ZwbMtAu9XHtJIuELGGPIPlXzINjTCjf7oS
+        iVdmrKXr1p5T4+445w3t9ReXsZyohqSyjEbR9n8=
+X-Google-Smtp-Source: APBJJlFiJyy/2zFqyFGD/qlsVjJ4eHB1AqDKHmY+VldQVTBj/9d148Js2GHpgBxfym+PcZr8V55+Gw==
+X-Received: by 2002:a17:906:2216:b0:989:3e0d:89fb with SMTP id s22-20020a170906221600b009893e0d89fbmr13885411ejs.45.1690274694717;
+        Tue, 25 Jul 2023 01:44:54 -0700 (PDT)
 Received: from Legionbuntu.. ([2a01:c846:10c0:200:ed64:7921:ba0:11aa])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170906164a00b00977cad140a8sm7866577ejd.218.2023.07.25.01.44.52
+        by smtp.gmail.com with ESMTPSA id n10-20020a170906164a00b00977cad140a8sm7866577ejd.218.2023.07.25.01.44.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jul 2023 01:44:52 -0700 (PDT)
+        Tue, 25 Jul 2023 01:44:54 -0700 (PDT)
 From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 1/8] advertising: Fix setting "BR/EDR not supported" flag
-Date:   Tue, 25 Jul 2023 10:44:24 +0200
-Message-Id: <20230725084431.640332-2-simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ 4/8] device: Rename start_discovery function
+Date:   Tue, 25 Jul 2023 10:44:27 +0200
+Message-Id: <20230725084431.640332-5-simon.mikuda@streamunlimited.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230725084431.640332-1-simon.mikuda@streamunlimited.com>
 References: <20230725084431.640332-1-simon.mikuda@streamunlimited.com>
@@ -63,41 +63,43 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We need to check if adapter is connectable since remote device can connect
-to our device even when we are not discoverable according to advertised
-MAC address.
+Rename it to start_discovery_cb to indicate that it is callback function
+from timer.
 ---
- src/advertising.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ src/device.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index d959bf38f..b50900029 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -95,6 +95,8 @@ struct dbus_obj_match {
- 	const char *path;
- };
+diff --git a/src/device.c b/src/device.c
+index 82740216d..6f28e261e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6203,7 +6203,7 @@ bool device_is_connectable(struct btd_device *device)
+ 	return state->connectable;
+ }
  
-+static int get_adv_flags(struct btd_adv_client *client);
-+
- static bool match_client(const void *a, const void *b)
+-static bool start_discovery(gpointer user_data)
++static bool start_discovery_cb(gpointer user_data)
  {
- 	const struct btd_adv_client *client = a;
-@@ -736,11 +738,11 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
- 	if (!btd_adapter_get_bredr(client->manager->adapter))
- 		flags |= BT_AD_FLAG_NO_BREDR;
+ 	struct btd_device *device = user_data;
  
--	/* Set BR/EDR Not Supported if adapter is not discoverable but the
-+	/* Set BR/EDR Not Supported if adapter is not connectable but the
- 	 * instance is.
- 	 */
--	if ((flags & (BT_AD_FLAG_GENERAL | BT_AD_FLAG_LIMITED)) &&
--			!btd_adapter_get_discoverable(client->manager->adapter))
-+	if ((get_adv_flags(client) & MGMT_ADV_FLAG_CONNECTABLE) &&
-+			!btd_adapter_get_connectable(client->manager->adapter))
- 		flags |= BT_AD_FLAG_NO_BREDR;
+@@ -6363,7 +6363,7 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+ 			DBG("setting timer for reverse service discovery");
+ 			device->discov_timer = timeout_add_seconds(
+ 							DISCOVERY_TIMER,
+-							start_discovery,
++							start_discovery_cb,
+ 							device, NULL);
+ 		}
+ 	}
+@@ -6406,7 +6406,7 @@ unsigned int device_wait_for_svc_complete(struct btd_device *dev,
+ 		timeout_remove(dev->discov_timer);
+ 		dev->discov_timer = timeout_add_seconds(
+ 						0,
+-						start_discovery,
++						start_discovery_cb,
+ 						dev, NULL);
+ 	}
  
- 	if (!bt_ad_add_flags(client->data, &flags, 1))
 -- 
 2.34.1
 
