@@ -2,79 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644D0C001DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 13:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E79C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 13:33:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230416AbjGYNcR (ORCPT
+        id S230414AbjGYNdE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jul 2023 09:32:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59154 "EHLO
+        Tue, 25 Jul 2023 09:33:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230407AbjGYNcQ (ORCPT
+        with ESMTP id S230324AbjGYNdD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:32:16 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B761BC3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 06:32:14 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b96789d574so76593111fa.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 06:32:14 -0700 (PDT)
+        Tue, 25 Jul 2023 09:33:03 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2A9AD
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 06:33:01 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-66869feb7d1so3288018b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 06:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690291933; x=1690896733;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0Eo5FpiwXwtBY77ip4TqwvVlUbqb49/1Uq3/iXzSAV4=;
-        b=eqM3fHZUlWMtVxSGTXBIGHocR/hgDYy9fOKrvNW6lTPT0GKaKLJZj8Nnidy0bGN/cG
-         N7NhLhCpJ28K63vbLoJvAQ6YMGVXlaclUKUHwB/oadRvULsfrT103ikdIz2grBEioR/z
-         UijMtqK1Yf7WhfqT8nmStTag3ECC3bSmf2XxgX3SEDW2gE3EwA4FdkMbE2vbLOE3UjPh
-         fa8G4fc/LTA1nKU3wzte/zs36RrvuJFiSUUBWTb/lQ0m6v23TpNNliRtkkbvwii0Lewp
-         Dy6UO//zKqKpYdkZemzwV3fBmnyfJnmlONk5Mm7nPIhlQ/5Qqz9r2rimENjRrp+Oedm+
-         ihJQ==
+        d=gmail.com; s=20221208; t=1690291981; x=1690896781;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hxqy33lGOnm5IH/xWforaNfd6QKrVbr3tF/Htpk6c1Q=;
+        b=Nw6IID28r+74m9ceClQS0eHvz0AFNqcadH2PRpSMJjiBZ61L8m5Vqf/7++v6eN6cKj
+         +FX0xeaIoco41zuh4ytPvqYAI4gCcQBIqWdPbkW79XZepUci/FH6zPfPOjlRPaH1396V
+         k6VEzyfZl5ZA32ZXN3Enhd30xMDiAcLI6L4VC3eZ8ov2cWhv376EvCy9mQ2YF5Lcjppm
+         gSVV9z/kyvTT3/RlaNp7h7sSD1R2p1VTjUKmOZIc9AmQeR782+HUJn1/7IHkUQtq92aZ
+         I0eNR8D8eP6EemcIf7OXH6ACpMh17xesFJLyXFBP//G2m3QOo+tsj+Fmvd5+pheXrMzt
+         Mbgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690291933; x=1690896733;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0Eo5FpiwXwtBY77ip4TqwvVlUbqb49/1Uq3/iXzSAV4=;
-        b=IXTBPaTnLNl0mQjziSTZCoKqlDAx9l9E6LJd/AZGycpUViQa8plTHPdxYzGoVHpQMN
-         rkfMnezFIjvwu42bFUFIaQ1LcM2/4sYpRv48yFZfUxe6T8hphHwncEDZsBrV1mGODGxO
-         oh558yLB6JhmcB3mbFOb4QWepptX0uCHh1lzd+lOhXrXw4kImAOhE/PNOgk3LnIpnSrL
-         b0bAx3BZehgaJpCHBOG0EfXyyhwJdf9LfK3ZGQ/xRTLrZvRHxUa7xbiu56N1zNLzkz9z
-         TvorEDS8sOpqgiiC+DXVYfWEZlozaYMj7dYiyLq00MnhIe93SVTHVbapJg7MTJjMMRxG
-         BOfQ==
-X-Gm-Message-State: ABy/qLbsLb9A6eDNG230ugjcZwnwdGY++xctHSMcMxxvPnyw2ytLGHd5
-        FHyUq56YSdos21qvOJCc4y18ehxetrTnZtGJBPOzOqyGEiq6rA==
-X-Google-Smtp-Source: APBJJlHu/iRuBpxOzzwMiEb+go1VW3C13/i8ONH95Morythhp2yLZJNxvf9D4zb4H/I9l8RnSx7PXwXh2o8dxAkAQTE=
-X-Received: by 2002:a2e:9894:0:b0:2b9:ad7d:a144 with SMTP id
- b20-20020a2e9894000000b002b9ad7da144mr400738ljj.11.1690291932683; Tue, 25 Jul
- 2023 06:32:12 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690291981; x=1690896781;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hxqy33lGOnm5IH/xWforaNfd6QKrVbr3tF/Htpk6c1Q=;
+        b=gxuv4HbKlzdIQycqBquiU4yQoVVPvSKXXw8Ka6BhvhAzG3AyvK2FM8i+MabYhKRcd5
+         Jz6G4GyZ93Dw/6IpqZiRfmwZO1Ds120VTKJOasF1FaIJbIncMvVkOGM9J3mzyj3Ctl4/
+         IUTPXA/VA26E4z98PDPxaFRM0N/W5uuZROMtvl4ZsFUZ4GJdVu4ko8bWZ+y5A2umcK9E
+         mAUnw3e00DXTltizx7uA/VWLrbolFJZBDN0nbc1PozCRWJEYyPoFRuajhqZZPtHWfXqS
+         WTgqILqa1irlLrVfz42AeGriSDHrtUDW6qt4THldARlOfY2dG0NdFAr1jxMipn79r3rL
+         ZrPg==
+X-Gm-Message-State: ABy/qLad784xe/sDK91a8bbBsWNN0WsE8RvAfpVf/gUpZ4MpmPUGuK3j
+        0yqe8DgU/FyltYDremkAu1LPBUm4DpM=
+X-Google-Smtp-Source: APBJJlGlzOz1FnU2gPisHeEVaxg5DW4FxTbTwgBebhW35cyk9MK52GdMMJfmXo7I8nRG8q3w1Rv9Fg==
+X-Received: by 2002:a17:90b:3a83:b0:268:7d8:597d with SMTP id om3-20020a17090b3a8300b0026807d8597dmr6743242pjb.46.1690291980573;
+        Tue, 25 Jul 2023 06:33:00 -0700 (PDT)
+Received: from [172.17.0.2] ([13.87.243.244])
+        by smtp.gmail.com with ESMTPSA id o4-20020a17090a420400b002638e5d2986sm9642882pjg.17.2023.07.25.06.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jul 2023 06:33:00 -0700 (PDT)
+Message-ID: <64bfcf0c.170a0220.504b.136b@mx.google.com>
+Date:   Tue, 25 Jul 2023 06:33:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2388039260558727754=="
 MIME-Version: 1.0
-From:   Stefnotch <brandmairstefan@gmail.com>
-Date:   Tue, 25 Jul 2023 15:31:35 +0200
-Message-ID: <CAAvW=MyYArpr-bpiHkHjrqmkGsiSpMqyAivbMCLepV1HajyAzA@mail.gmail.com>
-Subject: Bluetooth for hearing aids support (ASHA)
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, nitin.jadhav@nxp.com
+Subject: RE: Fixed the crash observed with VOCS
+In-Reply-To: <20230725112126.49656-2-nitin.jadhav@nxp.com>
+References: <20230725112126.49656-2-nitin.jadhav@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello
+--===============2388039260558727754==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I have hearing aids, which can be connected to devices that support
-the Bluetooth ASHA protocol.
-https://source.android.com/docs/core/connect/bluetooth/asha
-That protocol is open and somewhat well documented. However, it is
-only supported on Android devices at the moment. BlueZ on Linux does
-not appear to support it.
+This is automated email and please do not reply to this email!
 
-The idea is with Bluetooth ASHA, one can stream audio from a computer
-directly to a pair of hearing aids. Without Bluetooth ASHA, I'm
-limited to using a battery powered, clumsy accessory from Cochlear.
+Dear submitter,
 
- I was wondering if it would be worthwhile to support that in BlueZ.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=769262
 
-For the record, this has been requested in the past, but hasn't
-progressed any further.
-https://www.reddit.com/r/linuxquestions/comments/l54zku/accessibility_for_the_deaf/
-https://github.com/bluez/bluez/issues/481
+---Test result---
 
-kind regards
+Test Summary:
+CheckPatch                    FAIL      1.47 seconds
+GitLint                       FAIL      1.02 seconds
+BuildEll                      PASS      34.62 seconds
+BluezMake                     PASS      1221.61 seconds
+MakeCheck                     PASS      13.02 seconds
+MakeDistcheck                 PASS      200.94 seconds
+CheckValgrind                 PASS      327.52 seconds
+CheckSmatch                   PASS      460.63 seconds
+bluezmakeextell               PASS      134.82 seconds
+IncrementalBuild              PASS      3132.74 seconds
+ScanBuild                     PASS      1394.25 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v3,2/3] shared/vcp: Fixed issues related to read audio location and descriptor
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#99: 
+- Audio output descriptor & location read functions, requires code correction
+
+/github/workspace/src/src/13326329.patch total: 0 errors, 1 warnings, 76 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13326329.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v3,2/3] shared/vcp: Fixed issues related to read audio location and descriptor
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (85>80): "[BlueZ,v3,2/3] shared/vcp: Fixed issues related to read audio location and descriptor"
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2388039260558727754==--
