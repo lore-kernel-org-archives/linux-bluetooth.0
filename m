@@ -2,53 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB58CC001E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 13:48:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D93BDC001DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 13:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231477AbjGYNsT (ORCPT
+        id S231485AbjGYNsU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jul 2023 09:48:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42210 "EHLO
+        Tue, 25 Jul 2023 09:48:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231623AbjGYNsF (ORCPT
+        with ESMTP id S231724AbjGYNsM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jul 2023 09:48:05 -0400
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2089.outbound.protection.outlook.com [40.107.15.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5639100
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 06:48:03 -0700 (PDT)
+        Tue, 25 Jul 2023 09:48:12 -0400
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2057.outbound.protection.outlook.com [40.107.15.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E58DE0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 06:48:11 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gGJCqHIk2XO1PX056nfeX3XyIpMg2GRVamXkkVa5EjZ5+9o8dWpYdVjuTjQ4T93KdO8AEq7bo1CPnLZdkpYGrdfyjcDxMW2bZ5NnqDSno+ubDQLj6yp9yViX2p2c3YBsigpYCQz43sRyqRVgQowJkyPCNYH4pxuWUn9kB/YNgniuGRCL6eD9FQA07RNKwBhe6DeOUB9LbNUn2Tz4D716pE4giGbvzJg7dn9mAs3cwF/OXnGnkEFWhiDvDopz7+K7eKmQl2PK25MemxtLpk2S5/cW60t+NHui41Gj5hXJ/ukJMTxoxEl5h7FFErzHcrf0Zyya/clqhYKT4b2NaN1EEQ==
+ b=QJiaKDfG6JVGVY6fn4/VfcSoKXtKfOrcyC/wG1UWYeXHYNaEzQ7cWC2kyH8nL1OjNnTP8PJkMkV2SHdPcb9Ni5lWqKWQQygqqmks9nXucM+CMncj9J2v+xEbuP2l3AGgFBrnqvNMpfQMGPSFBZrYl8ytPgPk3oWDEpbLmeEI7da56R6VKwduNmHCTtgMKECWqOtQ0dr4vlnnetiVPMEWNOyYnll4natFnDOCioIRikCgGMUdVchj58abjWDFOZT1HPA/MOBZoDeOA0uOJTmLQAMppVLrdJJ9B8q8HfmBj828eiwP+LP31TvvKHr78zGkC9Rc4uYEXeM/LoNGt+R/zg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v77dW3Rd1d+ag8HTw0QHLsZXs5kV/QWAiBGcduNZ++I=;
- b=ClJOPyUquKT8STxw6V0opOcCYSkZodzeQxN4OGjZIk2h4uBCYIF7EhU9DsrHk4g53q0Y80dr/eR3FWo6EsSn/nBeU1Y0/5DYS1G4FgneNcCqg3AwfEY6qe1Jv1OO7Amwx3zG3/kJT+oNvAXVrUMk0e/kUW/JQUSKvk0NP25GRT0wg3mdiRF/1J6jC3yTLe2Y5eKLK5q0YZGQlLVY46KyVh72/lnIiv8XhO2qPN6OOcKvzUS69w+EelyEUhNNciCEcnHGWcd7VLxVJX7lwaGPZNcQOEFoBX+IoSOnTYIXz1wmDJ1R+9IoJjrUH5JOeR0N0MeCNQ8TVVo5hZYmvjUD+Q==
+ bh=V5uPLcb3lBZSZoQkNE1JLZCYriiHEbzyU2LLLOzjBOY=;
+ b=gbQ60vTUD9rnEBwhWOhphr0J5248h53/DRY83rVPcPQWY4KKJ30D3atHPs3IF4XnNZIWePQWPMZJq/OtHwBJblfjinI3ugWvBGHm21nbwYfLEtJe5Wcr3JFd9MYctFqrxhSIXmvmX7++E7eKDqXnmVmCv3VUOjm+VHE7VywDf0ZBjxDKGtA2thMy/lKGiYw1kLGkekpCUh9D8MLq5IipbTnIw3PCgKCA1/LJxGD1qt0wPFlZKGQ5mr2V9rG1NBeK2twwF9bAvG1ZJaovn0QHcguLHPOi4TfsP5tONJqmCb1HowdReW5wyVODZYo0Og9pcXMJzwaLSXEqcUfaoac+ow==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v77dW3Rd1d+ag8HTw0QHLsZXs5kV/QWAiBGcduNZ++I=;
- b=s+3sDu/Rha6hYpSBXKZIRghk9rhTLxCBFhTiVIJRgHUPtCfZWUUCIdq6DXQ2H9/cpShSEVT35M4SMtRJM/msHdPnwg9rkAT1stgpNtKZCw0VaqKsgnIQpolQapFLRR4/Hie/YYkOjiGmjM0faU4hF4vHV4rYjaHPKRfFchPVkvg=
+ bh=V5uPLcb3lBZSZoQkNE1JLZCYriiHEbzyU2LLLOzjBOY=;
+ b=CrDxtKEJ5SyMs8a6aLqOxM9YbN3aS3J7UsYaMOk/CLpcZcibJ3nYQO3O0VP29eGaQ65g/VVaMUnr5DDFDdmDsew0A/QN55e39R3le0zr6/2F7s8Yq/MBfsvytQEBe57T3UBSVpoq3Rz9voVen5xX5/nkhT7LtqIcDqlu3R29Afo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB9126.eurprd04.prod.outlook.com (2603:10a6:20b:449::16)
  by PAXPR04MB9593.eurprd04.prod.outlook.com (2603:10a6:102:24f::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Tue, 25 Jul
- 2023 13:48:01 +0000
+ 2023 13:48:08 +0000
 Received: from AS8PR04MB9126.eurprd04.prod.outlook.com
  ([fe80::273d:f528:aaa9:288]) by AS8PR04MB9126.eurprd04.prod.outlook.com
  ([fe80::273d:f528:aaa9:288%4]) with mapi id 15.20.6609.032; Tue, 25 Jul 2023
- 13:48:01 +0000
+ 13:48:08 +0000
 From:   Nitin Jadhav <nitin.jadhav@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     devyani.godbole@nxp.com, pav@iki.fi, luiz.dentz@gmail.com,
         sathish.narasimman@intel.com, nitin.jadhav@nxp.com
-Subject: [PATCH BlueZ v4 0/3] Fix the crash observed with VOCS
-Date:   Tue, 25 Jul 2023 16:47:39 +0300
-Message-Id: <20230725134742.51651-1-nitin.jadhav@nxp.com>
+Subject: [PATCH BlueZ v4 2/3] shared/vcp: Fix issues of audio location and descriptor
+Date:   Tue, 25 Jul 2023 16:47:41 +0300
+Message-Id: <20230725134742.51651-3-nitin.jadhav@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230725134742.51651-1-nitin.jadhav@nxp.com>
+References: <20230725134742.51651-1-nitin.jadhav@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: AS4P189CA0037.EURP189.PROD.OUTLOOK.COM
@@ -57,84 +59,156 @@ X-ClientProxiedBy: AS4P189CA0037.EURP189.PROD.OUTLOOK.COM
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB9126:EE_|PAXPR04MB9593:EE_
-X-MS-Office365-Filtering-Correlation-Id: f42bb216-6bc0-4990-99d3-08db8d15c304
+X-MS-Office365-Filtering-Correlation-Id: e28c3f0a-9f80-4b84-db35-08db8d15c7ae
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FsAY2a4qcbJ2+N+GExuFnfjO7rYx/suP2sS9AdMlOulux2byQSPfdX24ZpxKtcvETF6LJaSvmvZH1LdmkMaYdsTCqnhtkioYUDVOJcqopHbdKHD5uJXiEfTon5phnX9IDUw8Oy1GqvUbd4G4vW3IF9R2J0qbnaAYmFSxnM21XMPb5ghU7f8DqJRcZfBCkQGhGZWzRzTMidf6CGVRMlsw5qwshTSr3WL+79Hs1+qgbIa++P87cvhqDQ/5qOSLjhoByVaCHOnNAQzhj54wiPXLpfrnajwOiB0PvnbEnNrSt+UHV+xnX9PUiGd/tsVRIrRAWxh2v+cW+/ezqyq7p1Xsqi44XftFEv3Xgg6LceVYzX5d//dkVR11l4NK3C75YGUitz42sbd+XhG7/FQi7gKcC96txYTXZs+mi5zmYTGjNugJ7Xt0S6UfXefSbvPxkGyv6tNZ2ziztaayMRG1w2KneBc8iQz6iIAP9j/9mbIIURSrc5Ik1mo9+1XT3zUqmG5vA9Nk5MnSXSSZ6YcL1Tmi593Gq8ARn1hXYSlVeEtz+xFMJiekZNv21jkQEnmqIPtn5n5gM6ui10RuV1ugXbDPd+xNVGC4zEFSyn+FLPIwgiM=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB9126.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(396003)(366004)(39860400002)(346002)(451199021)(36756003)(86362001)(2906002)(52116002)(478600001)(38100700002)(38350700002)(186003)(1076003)(26005)(2616005)(6506007)(55236004)(5660300002)(8676002)(41300700001)(6666004)(6512007)(44832011)(66946007)(6486002)(966005)(66476007)(4326008)(83380400001)(316002)(66556008)(8936002)(6916009);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: /faB8oXdVDg/tFwn/N92ukWpPBdOcXhABtT1eULObB8RBlnsOkoR1JIno4yzf6G8FA5oRel2aea5n/ZOaNnoaCnD06XKoQtO8dSP8cFs4J5LKEfgMeZMpELB6FPw5GO/2ZD7HsFXWCaUfyllLhnnLKMeter/PCOFkGqMygf/n5Ydy+7wFY8/ILI6nl2vGxbj/f8kZz+593Rrw+Jmtr62CDgVhUl3bqI/qvqFBbJf/1fR9tZBsbXCEnYAdAhYThdMUz2xfwYsEAd60tevuE27hwyMh4Xxo1DnRLz5HawtfkrdAd9sS8Vgn5iUiMhXGibKGDRdzG2ggRc173AAAUSEKaQCbwagEjUepd+WdYxfJY6h29qIy/uzII5IxRKgyoaZEH4RETjn6ccvfXb/8qoxwL4kn6L58kLC/vdtHClkvAaOdRGu1UGYkrzkS6nSYkO7cY1kPFZfB0hp9wfh2ynVLxUd8N4GKcPsa+A7XiEI5tQP1AAKtZ03L5sbVWMF0/eTesOdfa1gSc0azZmbuYTP0gfN++xTO91MDGIeRqF+C/NOmVlD+/Ce/4SQ8Y8yq/IA3xeq8Zr9iNRosaydwvY5PxeE3vQ8nKEvzgk7t44sFdAskwc7IL6BTgELna9HcvQt
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB9126.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(396003)(366004)(39860400002)(346002)(451199021)(36756003)(86362001)(2906002)(52116002)(478600001)(38100700002)(38350700002)(186003)(1076003)(26005)(2616005)(6506007)(55236004)(5660300002)(8676002)(41300700001)(6666004)(6512007)(44832011)(66946007)(6486002)(66476007)(4326008)(83380400001)(316002)(66556008)(8936002)(6916009);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NkKm65eoGx3sI0x8Z8M/hLqtmOOhSAAkD3rAD8MFmPDsZcupfAlubuT1fBFu?=
- =?us-ascii?Q?mhxnJHL9BidtrVGwsw5eCfv60GpvhJzz3uQzrTQneivco+J8GIqYtpEWGy3h?=
- =?us-ascii?Q?mTMg3KG2mbfcS65myapTHzgp2JT7dNkS7ebhzMPEjgqoheUerNmimxQ2lP9c?=
- =?us-ascii?Q?cGvJaEJRZ6EbcIsgzXB+uQMw30QvgPFc4yZdgUlp8bn3O3tLs20nQdXzMyOy?=
- =?us-ascii?Q?Ii0vMMh9HsG+zWHIXwZHikGokZRmMroiEH0reWAXgqNZxW2LqrCDrYIh6TsT?=
- =?us-ascii?Q?ECL7Jdq6t3t7tIlj5JM8x+5lSqPwOaQ0O09Z9TkIwiRMDCcmB5KO/qOtqpaa?=
- =?us-ascii?Q?8rHSh3uNzHzsTOHo0SxWuaWU46Xsa2fVxFaH/D7ZxdK3Y8RYJeFZDw3d8BQW?=
- =?us-ascii?Q?64xV2A1+05PJq6HZPwxTuwJCVoJZqG/LK26R32c/dVtIW/FMgmkw0xqxNpAg?=
- =?us-ascii?Q?jqZOc5yKy2XrRkMrWV4uLOeTyhUIT91avY5JakMcVVWEXmIl1Rx/9xpc5PtE?=
- =?us-ascii?Q?SmGzqkb+mq5oEQ4NOG6+XMtDKMDGu2tOFiRomAuW3pjKXBanOsGCsoDEV2R4?=
- =?us-ascii?Q?jnduFrBL0gFYjN4IU6+IjcnhNBVvE5EjYeurnkSBALe6kzZIAAcxLY4GpyxO?=
- =?us-ascii?Q?9NlyV8ZSYuKx/Vu6R0lFoa+X76DKWL5/maZFEeqMGQQExaj5Ijfj/mPWvLdM?=
- =?us-ascii?Q?CuYsfIOlCwmJdOW3VTeGie+g7lM33rnVx2Q36FPokoi+4a68xY8+Ku4xEUBG?=
- =?us-ascii?Q?6Sd7QHlE9Wd11vx9S6YyEkDRuK6XQF1XLi/np8085O2wEoLW6H3htLJ2qjDS?=
- =?us-ascii?Q?wedC53ycDHp0XfuQbFuXjnRhNlozKH+cFNqZaSgtKgCQMYSegEeFi6vallyc?=
- =?us-ascii?Q?Tk2pauJLTV3UCKdhkn7R/BFXhU/xAxbz+5vI7fdNZuZ2l8L35e1oe3TCY5AQ?=
- =?us-ascii?Q?mF0nBrg94ekt9knkfNNAv3sdWp/b+ILUrR9BE+eFN9plAu6PDQUN4RAEXfuM?=
- =?us-ascii?Q?bHiAzUOoTMwuS8/78FgW7AIFi4kUmdoh3iItcOHqttddvqrLWP4mnVKzQ5Ca?=
- =?us-ascii?Q?rd2fq7nE/nAZQtOJ7sf+HIP0rkdsAAxgVC2Vc1AWEnPtTkBR+C2j5GPbGRM6?=
- =?us-ascii?Q?VR+CYxUJn0eIQvzpKBYGM5xwJRlNp6w6a9dLxmvW/iQwsHVptQtSFxk1KGyk?=
- =?us-ascii?Q?pTQehZ8xUjOCuyXp8zajskaEIfCGcEsFp0J4xZXyDvadQanygz9ZzTdTWIlx?=
- =?us-ascii?Q?SONcTzW5wKi78i0Y9r+rBgBA9ZAThaeT6DA0wTwLgU0wGKKTj4YeZ5kHZAlS?=
- =?us-ascii?Q?Y3ZTxgcUZSGnKDamF95AxBmqr0Gh/HSAxuNqqWDcBw3xhXuEdMQB6uRiN/ux?=
- =?us-ascii?Q?ACj6i7lSogHKPHs1EaD+yIzGXHPklfJ2xbcJLEgwebpn3AAnWcAonoW9jQdT?=
- =?us-ascii?Q?H73FWbT39mA2qKYapnj2FC5mWV0cAHNkbhJx4ua76HdiTS6rGQFSXAli+MLG?=
- =?us-ascii?Q?15CMmJVGa8ixyPW0ggpvMdH4unoLV/cXy26127fUIBxtj5Mi+fYEjmm2ncnK?=
- =?us-ascii?Q?r1QUjqFSm7IX0LPvdJry7TGg6+LcsyGuiGFSWNOc?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VW0avO5IPglbChi8KxnZKAmK5cH4cMupA483fqdWW2pXHYxIlsJFchQ1d7Nd?=
+ =?us-ascii?Q?iha2ped0sllX7N/M/Ar/i68DcPy7XaZorP5L1xXl347d2R0u1XRKSxWEl+qj?=
+ =?us-ascii?Q?Qt0SvDOoacqp/rdBcxpMwpFa8Ei/jsTev1J5duwQ+8izj4SxyQp6dsTJVLqI?=
+ =?us-ascii?Q?zYoJtQcq8oUpl18snsDNDh02F2uW8BHin/BZrjqr62XxbXP3pjZiqC/jlwjo?=
+ =?us-ascii?Q?qQLnDpqiN51PPTwhQW6kptJOdQ8uw6TKEQULpMmncaD1bNUw+1peJPFHkMPh?=
+ =?us-ascii?Q?sOechY/X3FvNHhVVqX/I6Q38SZ3LnGO7AmhFa8jUiQ+4EdvDaY40eejbket4?=
+ =?us-ascii?Q?+QhZwLltDmqU5NkWC5LQMQ2I6PfvpBCNK3EfvZhXv/G8iA0r9l2j20sZJe10?=
+ =?us-ascii?Q?9rqODf69E3UvmdtZDmxJXxecOEuvSy8f5cuvCL3thWRsZGUInjmzVUDIFJ5Z?=
+ =?us-ascii?Q?IQ96g4rqKkbzSaRG79DXAEvFzhlhmEzehk/eaS7GAKYxL+iYMAK415yz8Dj/?=
+ =?us-ascii?Q?f4Pz7GXwQkZql7QcUpdeujOUZR09Y8RhH77BdN7MMrUmUYJtHK13hEsAKYv1?=
+ =?us-ascii?Q?y4mLWIxZQSn/cQ4+Lf6jn0GeuDPorcIbQlP+r292uQatJxxZR+4/7I7YA45s?=
+ =?us-ascii?Q?jM3qggGo5n2vhSak7os8TA0SYZNPUfsBvSrVT1kcEysoUbTHTGs45NslY41D?=
+ =?us-ascii?Q?AE/TR+Rm05cMB0BlKZjLODY165suplgrnS76CXRVMk2yi6yF2ZPbAQxfjgeS?=
+ =?us-ascii?Q?Wh5KQIhjxUR+LYlmL5zIgKGbMqkT8PaPtJP0JjKki+RUIWciAKD7T61DrAqU?=
+ =?us-ascii?Q?Cawec4YsMEEYM1JsOWnTadpmOpotm+ejXJ2MZptYhWh8vTocYgz3mB/6EdeQ?=
+ =?us-ascii?Q?3KzXV4wvZ5bimehX9QuT7yafRqtWLFuJoz5JPXlB/E3jNZ3XAVtBa/hlUI+O?=
+ =?us-ascii?Q?cd7TEuGyrfObI9lBIkpKNTv3LZsJRlyPFLTiZIpApDFUPRfixy7orEObAzHV?=
+ =?us-ascii?Q?gUmgw0UeE6RS/MrS/vayn415niBZWTEX1n95fMTsoKcqo5OkDkmX0B8aYV+C?=
+ =?us-ascii?Q?UOu9SFdd64RSehhukBnC8n30IuqW/6p2tPcaHjIuGF6yVTiXopDRikJZ6+Sc?=
+ =?us-ascii?Q?HwHxryhIHHt3QSn+DDK6tFUa8gw8oiCogLV5v1SkmNcVukP+nS7N9nEgorqE?=
+ =?us-ascii?Q?F9dnnhpvDo5OlQrHW7KEYTwCOFsDCrVGFnX/Vob+jq9aQ34hDfaTq4Vhn2GU?=
+ =?us-ascii?Q?57j6n7vdAIeO+zjV8fQoXmwxQdyYbNRYWvDH7f8AHcwy/aLhlbkfimUhwsqq?=
+ =?us-ascii?Q?Zx/9nkpH7Iolo31IltTbIiPcDeYcoCtZuTpGgCdZu4oBDQmvF/wCdmEAYgva?=
+ =?us-ascii?Q?ZS+fRt1wvrtUqFAJDsoBZg81Z9BWEylA+ox9bEet98IZFTOGDwmdsAXEn89O?=
+ =?us-ascii?Q?lMy5RFeDnQI3bx02xNXWwx1pCjuIZlKmFrFo6IIQNbwlQ0OhDuf9FmsroF5N?=
+ =?us-ascii?Q?o++jFLeT1FJC2N95RFIE5r/PyMWus0iF88dVv2w6vFnIp+LTbChFOTjymJfk?=
+ =?us-ascii?Q?2xT/4Zi57wrw1wXU9c2b8P524CCp5KHei6l12W/A?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f42bb216-6bc0-4990-99d3-08db8d15c304
+X-MS-Exchange-CrossTenant-Network-Message-Id: e28c3f0a-9f80-4b84-db35-08db8d15c7ae
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB9126.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 13:48:01.0199
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jul 2023 13:48:08.7874
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d2M2eKbvL67/iGqsD52tgW3DCjc87JiJ6rajBuy2WrzaYMcNITeqFvw7pIENzMxfJLf+MDv1ykrAlCghl3zlNA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: qhMPz0D+kN5oNEaKQEwbdJEatsEMwGLX8+TES9SzKxZ3/FlLKd3RBfbljxbx3lPYlsWtB6VBBmvOsd0lCQPlCw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9593
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Maintainers
+Issues
+- Audio output descriptor & location read functions requires code
+correction.
+- During reading audio location descriptor value was checked
+instead of the pointer. DBG statement wrongly accessed value
+to print the log that caused the crash.
 
-This series of patch handles the fix for the crash observed with VOCS when trying to pair with LE Audio TWS earbuds and few other issues. 
+Fix
+- Corrected audio output descriptor read variable
+- Corrected the audio location debug printing function
+- Allocated the memory as a char pointer to the audio descriptor variable.
+- Corrected the audio descriptor pointer checking condition
+---
+ src/shared/vcp.c | 41 ++++++++++++++++++++++-------------------
+ 1 file changed, 22 insertions(+), 19 deletions(-)
 
-A crash was reported for the following patch by Pauli Virtanen <pav@iki.fi>. 
-Patch Link: https://patchwork.kernel.org/project/bluetooth/patch/20230612133251.194-4-nitin.jadhav@nxp.com/
-
-Root cause: 
-- There are two types of database- Remote and Local (rdb and ldb)
-- In client mode currently the code was written to access ldb
-
-Fix:
-- Correcting it to access rdb has resolved the problem in VOCS
-- Same correction is done for VCS.
-
-Later to fixing the above crash few more issues were observed, these are fixed in subsequent patches.
-
-Thanks,
-Warm Regards,
-Nitin Jadhav
-
-Nitin Jadhav (3):
-  shared/vcp: Fix the crash observed with VOCS
-  shared/vcp: Fix issues of audio location and descriptor
-  shared/vcp: Reserve one more handle in VCS for VOCS
-
- src/shared/vcp.c | 47 +++++++++++++++++++++++++----------------------
- 1 file changed, 25 insertions(+), 22 deletions(-)
-
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 314618664..0408531b2 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -973,7 +973,7 @@ static void vocs_voaodec_read(struct gatt_db_attribute *attrib,
+ 	struct bt_vocs *vocs = user_data;
+ 	struct iovec iov;
+ 
+-	iov.iov_base = &vocs->vocs_ao_dec;
++	iov.iov_base = vocs->vocs_ao_dec;
+ 	iov.iov_len = strlen(vocs->vocs_ao_dec);
+ 
+ 	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
+@@ -1385,11 +1385,12 @@ static void read_vocs_audio_location(struct bt_vcp *vcp, bool success,
+ 				     const uint8_t *value, uint16_t length,
+ 				     void *user_data)
+ {
+-	uint32_t *vocs_audio_loc;
+-	struct iovec iov = {
+-		.iov_base = (void *) value,
+-		.iov_len = length,
+-	};
++	uint32_t vocs_audio_loc;
++
++	if (!value) {
++		DBG(vcp, "Unable to get VOCS Audio Location");
++		return;
++	}
+ 
+ 	if (!success) {
+ 		DBG(vcp, "Unable to read VOCS Audio Location: error 0x%02x",
+@@ -1397,13 +1398,9 @@ static void read_vocs_audio_location(struct bt_vcp *vcp, bool success,
+ 		return;
+ 	}
+ 
+-	vocs_audio_loc = iov_pull_mem(&iov, sizeof(uint32_t));
+-	if (!*vocs_audio_loc) {
+-		DBG(vcp, "Unable to get VOCS Audio Location");
+-		return;
+-	}
++	memcpy(&vocs_audio_loc, value, length);
+ 
+-	DBG(vcp, "VOCS Audio Loc:%x", *vocs_audio_loc);
++	DBG(vcp, "VOCS Audio Loc: %x", vocs_audio_loc);
+ }
+ 
+ 
+@@ -1413,10 +1410,11 @@ static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success,
+ 				       void *user_data)
+ {
+ 	char *vocs_ao_dec_r;
+-	struct iovec iov = {
+-		.iov_base = (void *) value,
+-		.iov_len = length,
+-	};
++
++	if (!value) {
++		DBG(vcp, "Unable to get VOCS Audio Location");
++		return;
++	}
+ 
+ 	if (!success) {
+ 		DBG(vcp, "Unable to read VOCS Audio Descriptor: error 0x%02x",
+@@ -1424,13 +1422,18 @@ static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success,
+ 		return;
+ 	}
+ 
+-	vocs_ao_dec_r = iov_pull_mem(&iov, length);
+-	if (!*vocs_ao_dec_r) {
++	vocs_ao_dec_r = malloc(length+1);
++	memset(vocs_ao_dec_r, 0, length+1);
++	memcpy(vocs_ao_dec_r, value, length);
++
++	if (!vocs_ao_dec_r) {
+ 		DBG(vcp, "Unable to get VOCS Audio Descriptor");
+ 		return;
+ 	}
+ 
+-	DBG(vcp, "VOCS Audio Descriptor:%s", *vocs_ao_dec_r);
++	DBG(vcp, "VOCS Audio Descriptor: %s", vocs_ao_dec_r);
++	free(vocs_ao_dec_r);
++	vocs_ao_dec_r = NULL;
+ }
+ 
+ static void vcp_pending_destroy(void *data)
 -- 
 2.34.1
 
