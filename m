@@ -2,80 +2,97 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D1FEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jul 2023 20:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A887C41513
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jul 2023 05:23:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230086AbjGYUyO (ORCPT
+        id S231730AbjGZFXJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jul 2023 16:54:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47128 "EHLO
+        Wed, 26 Jul 2023 01:23:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229953AbjGYUyN (ORCPT
+        with ESMTP id S231866AbjGZFXF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jul 2023 16:54:13 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3FB21736
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 13:54:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5919761648
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 20:54:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BB742C433C7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jul 2023 20:54:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690318451;
-        bh=klz8lUzIz+CcDlwOwRp+BB4noft+zHlA2xjfvJL7PEk=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=GBFteSdmeIWI4pPjE8yvTQkk9T9/yZqgs192NRws6XMcsoXHKd9FDm6LmQKSNAOJm
-         nde/Hetx5jM0X/81fENVWLTAN58UkUStQeJxnnJFl3rHfFRkIuhovztM5VvQz5O6NB
-         aIpoN5GPY+ORbDzY4lLMh/sSg0gjDn1fZfrq6Hd/Guo//kHdf+8TLVf9Ea1t+AD+9D
-         BuAdm1wzjQF13+v1N92EydVkTXspGV31V1FyCgSFKro2Kzy5CldNAZXSqA6sp3BXyT
-         9QmSoLinzn+MsA94RhmgAc6302o99VIo6IsEW68r37kVFscOTsUFnrA9jHPPoFrvsA
-         XcdqeZVWgOy3Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 97908C4332E; Tue, 25 Jul 2023 20:54:11 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216819] kernel detects Mediatek bluetooth does not work
-Date:   Tue, 25 Jul 2023 20:54:11 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jeremy53561@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216819-62941-NNgx9shjV1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216819-62941@https.bugzilla.kernel.org/>
-References: <bug-216819-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 26 Jul 2023 01:23:05 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4873212D;
+        Tue, 25 Jul 2023 22:23:04 -0700 (PDT)
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36Q56Ug8020315;
+        Wed, 26 Jul 2023 05:22:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=Tdo5YcyYRsi0Ope8WOli39xSsIoCDBYyOOxjWW2jTYs=;
+ b=inyILzvcz8szl63zAJpQSdvov+PhZjIVIVFIumbWJaaI4HAPoGM1SjiWaEQxnyC/w5no
+ hYnh1eaPglEZX73AYl+VvBxtDJa2AY3qb70LqYhIxP8Zqj2UWkqrcXb0fICFlysQ6J3D
+ 2n3rttvTtzz05kgiTNjuLR3J5tvRnyOgTlmFCk4iIY0qlRdET5g21IiMlTpPg01s1uSA
+ SliHVyrP4VwckDt8mOvp6NDHnrS2nzDTmvbPkN8yR+LPTKIWho1OqVf8IaU8jQUYdVB2
+ knLnVCuaBIuEXlGOv5FgfqtxmCf+bwDSeYXn1cx1YChbBveMHHFjHhvMbWmrMxOYqn9t EA== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s2dqaj21f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Jul 2023 05:22:59 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36Q5MwJx032069
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 26 Jul 2023 05:22:58 GMT
+Received: from tjiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 25 Jul 2023 22:22:56 -0700
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+To:     <marcel@holtmann.org>, <johan@kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_tjiang@quicinc.com>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>
+Subject: [PATCH v12 0/2] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+Date:   Wed, 26 Jul 2023 13:22:43 +0800
+Message-ID: <20230726052245.609987-1-quic_tjiang@quicinc.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 2vVRty4DxeGAVDwSkkNL_XK5r3ZAehJh
+X-Proofpoint-ORIG-GUID: 2vVRty4DxeGAVDwSkkNL_XK5r3ZAehJh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-25_14,2023-07-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=923
+ bulkscore=0 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 suspectscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2307260046
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216819
+Changes in v12
+ - fix compile error issue for patch 1/2
 
---- Comment #3 from jeremy (jeremy53561@gmail.com) ---
-This can be closed, fixed with
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-h=3Dv6.5-rc3&id=3D13209415d0e88396d99d346b184864834d70d68a
+Changes in v11
+ - reverse two patches order
 
---=20
-You may reply to this email to add a comment.
+Changes in v10
+ - break out btsoc type print into seperate patch
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Changes in v2-v9
+ - solve review comments for code style and commit message context
+
+
+Tim Jiang (2):
+  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+
+ drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btqca.h   |  4 +-
+ drivers/bluetooth/hci_qca.c | 41 ++++++++++++++++++--
+ 3 files changed, 114 insertions(+), 7 deletions(-)
+
+-- 
+2.41.0
+
