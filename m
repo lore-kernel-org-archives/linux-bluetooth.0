@@ -2,101 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A779C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jul 2023 16:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B7CC001DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jul 2023 17:11:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233288AbjGZQTq (ORCPT
+        id S229824AbjGZRK7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Jul 2023 12:19:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43488 "EHLO
+        Wed, 26 Jul 2023 13:10:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233315AbjGZQTp (ORCPT
+        with ESMTP id S230482AbjGZRK7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Jul 2023 12:19:45 -0400
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EBA2704
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jul 2023 09:19:35 -0700 (PDT)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-1bb74752ddbso27767fac.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jul 2023 09:19:35 -0700 (PDT)
+        Wed, 26 Jul 2023 13:10:59 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0532126
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jul 2023 10:10:58 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b702319893so104522601fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jul 2023 10:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690388375; x=1690993175;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5lL/kQikztMs8Cn8f+6C2BZVYlml8hsfQzt97f+eYBw=;
-        b=p2QG2aFEV022hFKS6FWbpC4qZ1QEy8TSD2uncNYuUK0GoF1nuYNxB/FkwRrNiqY6KP
-         JAFOgJCPJJSPjP0+ICkEYAmfR34T2ffB0vnUffut/h8VrT7ZVUOybZ0VwugJqTtMw5nd
-         nnZ5dtXHzgr90z4mF/2Z+pMS6YIPw8NnBjutLrn6K6f24es4hagpJDhgUg765NVYp+Nu
-         i8XCNRdcmvnG3Xvc6F+JDAJySQo6LMfrrIF4Iu7Vi4QNfkm2Zema11rE8y0PMzXh5t3n
-         CRWgdL6jWlKZkChtfPH3Dba8FLtnbRN68XXHx/FDLxeSFioSZmgq//9g/Vbo7sBU/7Ve
-         yAxg==
+        d=gmail.com; s=20221208; t=1690391456; x=1690996256;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ik8ZwSu5T4EXDiNvC+FWhWa6uj7Vx2ERwidY4Ti3bjI=;
+        b=oDusZn2isjPNC/QvVlPg2GObsXJ3EGpBFLliiMOxw4lbDFQWwcKzj+a8/se11sEewc
+         lxHXX4kQSsD6W2yqWuurOUcpIAO6LZYvhLMfUQKgUpUyVoj0wp8qSdT/JrX5ztcnpSbo
+         hTxjkS9XvWsPWxz7bUll8IPBsUhFuw/sBRITGfISitBzlzHF38LbGtmWdGGJcMzsJW/S
+         tT8IvJ4EZcexhvd0cmJJCBSMuYJQMB9iVeg71Z6nldkVOMGkiB32LtPXapUhxLPzPtwM
+         W4mysdgDfD62ARSfJwU0kbHliHxluNB/QC8pGriTM4aP9AHFGVk0jUplPU2VnQzflpbg
+         3nEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690388375; x=1690993175;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5lL/kQikztMs8Cn8f+6C2BZVYlml8hsfQzt97f+eYBw=;
-        b=WYb2n3rEh5RcYx2DkN7vMkX8OC+Y0qy2gAw+Lu9GAUk5qEhWN++0tTJ2Y1FxdRjdB+
-         Q5p5+HrP2PISWPBAkPCgZmXdFwqrqTG7N0OCK4tiwX9MPuorV6vaAA2dLcAj7IOKJ9mz
-         W7qhLaE7wqR0A33qtAIAgnf/3jN4KgRLsb18jscWhKu7Him2VD1bt4yz4mMwj5eglg9E
-         7n7RDtoyVYJRFVBDwYH3NW8bENr4XXc+enAZN3Ihe7tHqqUcBJ1sCuEEsXnFZHT1dkdp
-         qQMxSAm1KKgVG9rvjEnVkp+6pU07O/0oq5ir48NQV7tbjzb/lEqJl+H3lcQEUW69BF1J
-         I/Gg==
-X-Gm-Message-State: ABy/qLZ2AE2M7u+REGHCMtLfeMxMjoXrxT+XpkMunEMUBgW5fyo1rJ8l
-        Oi1jetJSMPP8aSJWYS2vbvLtybUyZh4=
-X-Google-Smtp-Source: APBJJlESVkKPIg3Dv/cksE6iADuWLW7MkY8Ottc4H48b887zSx+A/d99xV/Qs9qyEzHCzGDjOMoTtQ==
-X-Received: by 2002:a05:6870:a446:b0:1ba:8307:9a17 with SMTP id n6-20020a056870a44600b001ba83079a17mr12999oal.10.1690388374855;
-        Wed, 26 Jul 2023 09:19:34 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.171.126])
-        by smtp.gmail.com with ESMTPSA id v1-20020a05683018c100b006b89596bc61sm5971440ote.61.2023.07.26.09.19.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jul 2023 09:19:33 -0700 (PDT)
-Message-ID: <64c14795.050a0220.e1e0f.41ae@mx.google.com>
-Date:   Wed, 26 Jul 2023 09:19:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6846479088677373646=="
+        d=1e100.net; s=20221208; t=1690391456; x=1690996256;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ik8ZwSu5T4EXDiNvC+FWhWa6uj7Vx2ERwidY4Ti3bjI=;
+        b=ceDlGSjLFXNTzQ7ZY6C6Nz8ebyVi4LDtFoEL8sB/hyJ0UXDrnW9JkfWBk5JMPxVZjc
+         mpdLaEktN3oNGbsvekl4hukRLugsJxgehEHdwfMywdhgMDM9Ue7QgEjfvVsfy3nml6Xc
+         ULXwhfytjJBCFIovVcXGkS8f0PRlUoaN38jdCfaDpGCeEz1M86fuJzqe2/ymZEIDVpjh
+         nK25XL2FPToaLo4fGm4/3/8zdfSdtT5TkdlwWT+IBJI8t8NZ1sTFaA9AvqQIGmD1WtB3
+         tl+WL2oajarSCydQQRbaUCM9bfKVs9SakYYQ/Wu6dtvqChcCyOmuOpfeC2f2ZViQtvls
+         WWvw==
+X-Gm-Message-State: ABy/qLaGvzKh3rDMhoKcC8+PvB+zb6teJGhdp9xz4KuhccPdTEod9t6X
+        4TWoQ2B5hgTSBHUDlcgAzI7caE6cqb7Zf9mnKO1V/u/r
+X-Google-Smtp-Source: APBJJlF7nPCgbneHhCfuH+zcAl/wm3kQ11fEq3iqWoPYaeYqAmBw8Ze8fK6/580BPfCX11DHCmPxGIAxWsZfbuPgb3E=
+X-Received: by 2002:a2e:8743:0:b0:2b6:e283:32cb with SMTP id
+ q3-20020a2e8743000000b002b6e28332cbmr1923127ljj.23.1690391455934; Wed, 26 Jul
+ 2023 10:10:55 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, silviu.barbulescu@nxp.com
-Subject: RE: Rename BAA_SERVICE to BCAST_AA_SERVICE add BASIC_AA_SERVICE
-In-Reply-To: <20230726145303.137597-2-silviu.barbulescu@nxp.com>
-References: <20230726145303.137597-2-silviu.barbulescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230726145303.137597-1-silviu.barbulescu@nxp.com>
+In-Reply-To: <20230726145303.137597-1-silviu.barbulescu@nxp.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 26 Jul 2023 10:10:42 -0700
+Message-ID: <CABBYNZLJeeE3SG1wfjkoy3aihSAQnS3YDkbhw0GGJFBrcs9oUA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/1] Rename BAA_SERVICE to BCAST_AA_SERVICE add BASIC_AA_SERVICE
+To:     Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+        mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6846479088677373646==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Silviu,
 
-This is automated email and please do not reply to this email!
+On Wed, Jul 26, 2023 at 8:03=E2=80=AFAM Silviu Florian Barbulescu
+<silviu.barbulescu@nxp.com> wrote:
+>
+> Rename BAA_SERVICE to BCAST_AA_SERVICE and added BCAST_AA_SERVICE(0x1851)
+> as UUID for the broadcast sink.
+>
+> Silviu Florian Barbulescu (1):
+>   Rename BAA_SERVICE to BCAST_AA_SERVICE and added
+>     BASIC_AA_SERVICE(0x1851) as UUID for the broadcast sink.
 
-Dear submitter,
+How about BCAA and BAA instead?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=769755
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.43 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      27.99 seconds
-BluezMake                     PASS      1019.84 seconds
-MakeCheck                     PASS      13.03 seconds
-MakeDistcheck                 PASS      161.25 seconds
-CheckValgrind                 PASS      261.36 seconds
-CheckSmatch                   PASS      350.77 seconds
-bluezmakeextell               PASS      106.68 seconds
-IncrementalBuild              PASS      882.03 seconds
-ScanBuild                     PASS      1098.76 seconds
-
+>  client/player.c            | 8 ++++----
+>  lib/uuid.h                 | 7 +++++--
+>  profiles/audio/bap.c       | 2 +-
+>  profiles/audio/media.c     | 2 +-
+>  profiles/audio/transport.c | 4 ++--
+>  5 files changed, 13 insertions(+), 10 deletions(-)
+>
+>
+> base-commit: d8ca06631b7434ea8837f9c571bfe31d6602d31f
+> --
+> 2.34.1
+>
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============6846479088677373646==--
+--=20
+Luiz Augusto von Dentz
