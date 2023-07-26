@@ -2,135 +2,126 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DC2C001DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jul 2023 07:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB69C00528
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jul 2023 10:33:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232453AbjGZHLr (ORCPT
+        id S233879AbjGZKdc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Jul 2023 03:11:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44730 "EHLO
+        Wed, 26 Jul 2023 06:33:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232439AbjGZHLU (ORCPT
+        with ESMTP id S233981AbjGZKdQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Jul 2023 03:11:20 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A88A3C24;
-        Wed, 26 Jul 2023 00:08:04 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3971A61709;
-        Wed, 26 Jul 2023 07:07:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E4FEC433C8;
-        Wed, 26 Jul 2023 07:07:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690355245;
-        bh=7abV0l4C3qKzncBqw93/hcngzGzhBVF9y7thXLvQed0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CT3Qy7r2CYKduSMwIaVtpHDFiL0YN5NMei7s4lsNfvWhK9h9dg6iPDW3yqxOklL7m
-         DNTHNQUDPlAS/Dv3nbHjQpI8Zkscw56rgJ4sen9K3tXnEJDurjAIjpEMinK+rlHIob
-         uG5r6fefxNZIXhrVzbFhpt/3maXqHRod+wOLRbX7VwSggKc6Eqzo/vh8yJrLQk7pkC
-         27yFJeTHUmsMLRwqKzJU7NuPqJib5QVRlXzJONNzTNtvTJfZ3Q19DguOvg4iMtq+Qt
-         pBSeZgf8QVlnYZcyxBChqZPjPYRvTEbIEMbyqM3qiir09vgFQaPhf1KYa8tc6GG3jm
-         L92GIW6um5D8Q==
-Received: from johan by xi.lan with local (Exim 4.96)
-        (envelope-from <johan@kernel.org>)
-        id 1qOYcX-0003T7-1x;
-        Wed, 26 Jul 2023 09:07:41 +0200
-Date:   Wed, 26 Jul 2023 09:07:41 +0200
-From:   Johan Hovold <johan@kernel.org>
-To:     Tim Jiang <quic_tjiang@quicinc.com>
-Cc:     marcel@holtmann.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        quic_bgodavar@quicinc.com, quic_hemantg@quicinc.com
-Subject: Re: [PATCH v12 2/2] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth SoC QCA2066
-Message-ID: <ZMDGPTSEvfpHRDvh@hovoldconsulting.com>
-References: <20230726052245.609987-1-quic_tjiang@quicinc.com>
- <20230726052245.609987-3-quic_tjiang@quicinc.com>
-MIME-Version: 1.0
+        Wed, 26 Jul 2023 06:33:16 -0400
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2138.outbound.protection.outlook.com [40.107.212.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED4C52126;
+        Wed, 26 Jul 2023 03:33:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TtOrrbfjommzzF4PgJPfS/CGBbrI9OryC8da+/kng5qxi4WZN7yoM8O0v7OPJXxPVv+La5Ul0xb55wiBg6lVVMKwTRx4FXKXdZxmpDxOGbmSf5QA7TNFUwkS1nLQKHiu2n2qfHont+kznjS2uOcn1qc4i8AspuS49j3JLWBhGd/jvB0UjAF1MnY+ISMskEJyMIlewSQ0BlEfdbTDzR6sV3HGMAyLIDJPL7QC4Ay9Fj+qM3Tu6QTIvL8l1tZyaWfV0NFJtWn6qlleYhHweO2M0J3KobLArXm0e+02HGWngg1gd6n8QUwHVuocs1jqh3eG+BuExANBSIvuopLG2M3Gxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jqkMUatlcPXvZB3kf7JWcwNcqa8mMAMOaV13DHWEFXY=;
+ b=AvH+IaYxwKQHB50zktb94UJtlQRP3IMQwXT5Ca/9LsAZya6ob0wL8TpmvuIoA0gGV6ECSBN1/JRE9vswSat+jSetLPn91ExlPX/EucZ/z5EaEoPV9VDupW7FW3pM4OzknFB9jHFWdfw+lFFt0KvUcrhSrFI5n82d2DGM28GPdAywheFUmbM0hW8WeYBg+SOYtfJb+K/8Z887Zd6ZlHg9g7XQVxyo/LCvOutMLAQmffBmQ+LC8jw3mKylNbGLtEqhkn5/C+4watoEtG3HUXB0tY3Dc9gCM18xk4Hky0C9g8srRTJjWxACQWg9a+QurBWfDMB2UCnmidxXMfujKe5SEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jqkMUatlcPXvZB3kf7JWcwNcqa8mMAMOaV13DHWEFXY=;
+ b=SlVZ0nXVM0PDbKxt3P36dvJphyvgzER21iLBG5itRrs7vOAzosDqvXDxNUNp41mgynRGcsIFbFh8h6DoHxGEQhhLouzOVlqyg4TRZ+5Z9lqhEvW2bxDp+Yz7E9xn5I7t9kk/42C8fC1dnl7ZWsFod0ZZoK/61spHk6bkHYA1/Jw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SA0PR13MB4064.namprd13.prod.outlook.com (2603:10b6:806:72::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6609.33; Wed, 26 Jul
+ 2023 10:33:13 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::fde7:9821:f2d9:101d%7]) with mapi id 15.20.6609.032; Wed, 26 Jul 2023
+ 10:33:13 +0000
+Date:   Wed, 26 Jul 2023 12:33:06 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Howard Chung <howardchung@google.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        Archie Pusaka <apusaka@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: Add timeout in disconnect when power off
+Message-ID: <ZMD2YqAJ9+2i5ZvH@corigine.com>
+References: <20230724111206.3067352-1-howardchung@google.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230726052245.609987-3-quic_tjiang@quicinc.com>
+In-Reply-To: <20230724111206.3067352-1-howardchung@google.com>
+X-ClientProxiedBy: AM0P190CA0029.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::39) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA0PR13MB4064:EE_
+X-MS-Office365-Filtering-Correlation-Id: 258e5a45-046e-4ae9-3a7e-08db8dc3b73b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ZXYj9BeNaqW6MmAQ+pqL58WOMF5UfJiqj+daQ2N8ZWzWHIr4OvKXrOpGJW4dw4Pb/knBweUVT7F1+k6Y+L9t2/KZN9C4Fbr7ZynLDGB+O2A1YUXov3LHmqcrAFr2+PRtaWvdTp7emST9lVXa35aXzIw+YW2hNC9mybllvAuae6Uk7GKmxKwKmz4fRuS6gl3QOEwcTSOOiyuGQBcZUnSAiBt+/KYisKxpAFhXQycSsgXikHGbkG80X8bE7/a1g9GpXeb8OathtSMC/h7IEts7m4Y83S9ESkoLVpYsEP9xkKJooMw/cVHQ0TMLXaZLx5eKH9Ov63rvFG1hZv4XuB5E5H6BzPwEnYkopv2raqMaKyTRzP6Gehe6Mmsq/HEDQ8owPuL/QCwkj66IEkKiJ2jjXiHOWV2iGkjQ7HljWa4WQpxW3erxnDtM47O5vfSJ71VRIpbObv6AndkVzfC19NnX1W9pXj+/H+EK++RPHdaxtjW8QnxbJz/UlcUM9eHka08FyeqZT88xRBW1PXl0MiPub+JcwOmUeq8cTHEeADCZH97/cdYyTm2dw+PP66kPmP901xf2vVuaBdFYjtCOG0DUVAxQU/w/OBmkZdz9Z/o8s6fcOSo3cyHl6O3SmUqHMAg6G7jK3cB6J3mPSlcOs5EUteYI341lvDO83kt4AiCz2/U=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(136003)(39850400004)(346002)(376002)(451199021)(83380400001)(6506007)(186003)(41300700001)(316002)(2616005)(6512007)(6486002)(6666004)(478600001)(38100700002)(54906003)(4326008)(44832011)(66476007)(66556008)(66946007)(8936002)(8676002)(7416002)(6916009)(86362001)(5660300002)(4744005)(36756003)(2906002)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?evleGRBosSUBWWSSeZJTaVNnuDuGtBAh9wJLN/2cS5MGqn2ynDGcBIfNyDWk?=
+ =?us-ascii?Q?25nCVldA+wno3kYHCuaO9wg1gXzYhL1MnLHz0iGPTHRUM/VsxNCQoDfTj+mg?=
+ =?us-ascii?Q?2AzvrampzqfeVawJIIMbJucrKpPh6RQVzSMROvHRBsSbnOAM5CbAMcmwA6ZF?=
+ =?us-ascii?Q?mWGlLffwSpdg4mTQBAy6/sqxP3I/VwrndUi4aslkdoDV5iUskWAvSqmsVsDv?=
+ =?us-ascii?Q?TCLTCSUXjcLIBGLu9q5+ZhoufEsAVvS5qa/SC1WPx5DvBqEUQ9mAlX/o9kpD?=
+ =?us-ascii?Q?AwqblHtfN2Q3o13OH/p+JhNa3h0lAea2NJ8akih/Zod5Lsuh6ET9oKz8qU2m?=
+ =?us-ascii?Q?5iDA4TgpzNK+z6i7VPTtC5kuMye8dGlqOQ2Rp6cSlinftEesJUC7egw3yPnX?=
+ =?us-ascii?Q?zJElwUVnjHvbIL5AW+pJnljDIIB4fOaxr89ptuMHePTRmuEix7i8VwI+6nDy?=
+ =?us-ascii?Q?3AExweEUbNoALUsww0rkPek4VsF3asBx9qAeaE5ROLXsb5R14AeR+WXGNMVQ?=
+ =?us-ascii?Q?DHGMQDmvBOlqMvTwoqJTu19soE8gN1RRl85lvKr2Wa7iilfYGMc2qKMFeYLP?=
+ =?us-ascii?Q?JjWIhciupl9xZrAP3stSmr7tc0kkwYkTCOm+jI4E+UGgLbcdUzdd1RRXfXEm?=
+ =?us-ascii?Q?J3iodo035BTsjh3NahUtt/LsJYXoVab/mDWewxpCKymTtjrnZm3pxnKcACvC?=
+ =?us-ascii?Q?aq8q8F8ittrnCS4X9ymuCX4mcWgXC2jMzSdttP+3vejThI/LXf+o86QFAGg0?=
+ =?us-ascii?Q?Z/6CDE1OReQzI7zsGNSkQayjtQCH7II4mwFyprbGFl54lwrvZz2gyJYTE4Nn?=
+ =?us-ascii?Q?iW4iIOUUSi3FJaVS/+HCegmNUOMD7VwVDOruF4B80hYhKCivwsv7CTA9DvZx?=
+ =?us-ascii?Q?zFMTQyE/ajyYSewEq9uXTPZy/W/qU7jDZ/ZAH9ehR5k7gbm1vT7XKSHXavKx?=
+ =?us-ascii?Q?UoxNrzmoOtzhiGJVwLq6kIa3M9XMFWfKoAr6ktKkSkI/qNzzBZEVHuXXYlRz?=
+ =?us-ascii?Q?JBKezUoKvjAvlOp+Z0+CB5SToaMqd/qZPrsvTn3SnUDBWWSQT7RYLCR7mUP6?=
+ =?us-ascii?Q?JElGCx21fvU9sXl92s0NQnRnNpDEqvOOtFRRhArAtbDVEXDOMKH9QtZZayO4?=
+ =?us-ascii?Q?UERF545UFXyK9d7sb0XZLTfVSi533xYaedihUNzqOZJGKu/pJlvwI7PjkXhS?=
+ =?us-ascii?Q?lyj0DU3BIJofRC2Y1uj5uiwoy4PFuiLmNQbFcJZrH9AZRGTC8Exl75e/mDOw?=
+ =?us-ascii?Q?6YD8PnPhbEQXhc3wVmbCN0zf5WtBIFvGvGcwrWXQ/NjzsAP36LwAU238uLfv?=
+ =?us-ascii?Q?Q2wMf0KZwDmBKExsa8UKAbbqRTHzpNcKqKID9pUf3pVosXKVj5WeX5HUNkqS?=
+ =?us-ascii?Q?HzSCwwW5O0wwyiNEsJ3B4u8oxvON2bujeg+rPn8sp2r48+FgHtaUngZ/MUYP?=
+ =?us-ascii?Q?Zej8TlmtAe/beZa/Z9W3ovchWd9p67jrScDXuCwNdHfWdSLVDW7IZDiLUPlU?=
+ =?us-ascii?Q?9/qTfoH0SNJPJdMc5Kvbkr08FLCzpjr0OXU2ZkEXZ+AyK3z5Y9CZ8ZdBFGZM?=
+ =?us-ascii?Q?L26W+67q9proMg3+kPiLrbhfFxJaWtyi6QmtLMwLG/0SHg9f59qCmzV71vNW?=
+ =?us-ascii?Q?GutDU5/cR2ubDunhQ7DQABTaze9LBddeYnbu9hclFm0gp4lqwdijMcnR1HnC?=
+ =?us-ascii?Q?C86gBA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 258e5a45-046e-4ae9-3a7e-08db8dc3b73b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jul 2023 10:33:13.6512
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s+T5YzxTZmJNLqSQdy54NW5g97QI96JrQKDSTic77hIfCifLmKtP18F1U6HBuPUB2Mep54hR1Oe3WEMdjMNSA97dbW1hIY8xeTrbZDHaJF0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR13MB4064
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jul 26, 2023 at 01:22:45PM +0800, Tim Jiang wrote:
-> This patch adds support for QCA2066 firmware patch and NVM downloading.
-> as the RF performance of QCA2066 SOC chip from different foundries may
-> vary. Therefore we use different NVM to configure them based on board ID.
-> 
-> Signed-off-by: Tim Jiang <quic_tjiang@quicinc.com>
-> ---
->  drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btqca.h   |  3 +-
->  drivers/bluetooth/hci_qca.c |  7 ++++
->  3 files changed, 83 insertions(+), 3 deletions(-)
-  
-> +static void qca_generate_nvm_name(struct hci_dev *hdev, char *fwname,
-> +		   size_t max_size, struct qca_btsoc_version ver, u16 bid)
-> +{
-> +	u8 rom_ver;
-> +	u32 soc_ver;
-> +	const char *variant;
-> +
-> +	soc_ver = get_soc_ver(ver.soc_id, ver.rom_ver);
-> +	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> +
-> +	if ((le32_to_cpu(ver.soc_id) & 0x0000ff00) == QCA_HSP_GF_SOC_ID)  /* hsp gf chip */
-> +		variant = "g";
-> +	else
-> +		variant = "";
-> +
-> +	if (bid == 0x0)
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.bin", rom_ver, variant);
-> +	else
-> +		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
-> +
-> +	bt_dev_dbg(hdev, "%s: nvm name is %s", __func__, fwname);
+On Mon, Jul 24, 2023 at 07:12:04PM +0800, Howard Chung wrote:
+> For some controllers, it is known that when the HCI disconnect and HCI
+> Reset are too close to each other, the LMP disconnect command might not
+> been sent out yet and the command will be dropped by the controoler when
 
-no need for "nvme name is" if you keep __func__ as a prefix
+nit: controoler -> controller
 
-> +}
-> +
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
->  		   const char *firmware_name)
-> @@ -582,6 +645,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  	int err;
->  	u8 rom_ver = 0;
->  	u32 soc_ver;
-> +	u16 boardid = 0;
->  
->  	bt_dev_dbg(hdev, "QCA setup on UART");
-
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 453000df7aec..353c775f53ef 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1939,6 +1939,11 @@ static const struct qca_device_data qca_soc_data_qca6390 __maybe_unused = {
->  	.num_vregs = 0,
->  };
->  
-> +static const struct qca_device_data qca_soc_data_qca2066 __maybe_unused = {
-> +	.soc_type = QCA_QCA2066,
-> +	.num_vregs = 0,
-> +};
-
-Add before qca_soc_data_qca6390 to maintain some order.
-
-> +
->  static const struct qca_device_data qca_soc_data_wcn6750 __maybe_unused = {
->  	.soc_type = QCA_WCN6750,
->  	.vregs = (struct qca_vreg []) {
-> @@ -2429,6 +2434,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
->  	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
->  	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
->  	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
-> +	{ .compatible = "qcom,qca2066-bt", .data = &qca_soc_data_qca2066},
-
-Keep the entries sorted by compatible.
-
-Johan
+...
