@@ -2,60 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734E4C001DC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 18:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8A8C00528
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 18:48:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229580AbjG0SrM (ORCPT
+        id S231670AbjG0Ssd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jul 2023 14:47:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36342 "EHLO
+        Thu, 27 Jul 2023 14:48:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231150AbjG0SrJ (ORCPT
+        with ESMTP id S231815AbjG0SsZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jul 2023 14:47:09 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5839F3594
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 11:46:46 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b72161c6e9so32671831fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 11:46:46 -0700 (PDT)
+        Thu, 27 Jul 2023 14:48:25 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FBB030FB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 11:48:12 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b703a0453fso19901491fa.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 11:48:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690483604; x=1691088404;
+        d=gmail.com; s=20221208; t=1690483690; x=1691088490;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D3dCGkB2CqSVrXijKF0/PGpFfu+hd98oUmpfn0/x8MI=;
-        b=LuBRtOU3cA/s7j+HDW3+F0d7X3BZgiMFE1wBTYbtLrFBj3KjD85qPebBTUnFfJ1mCn
-         lvehu488sB5rLmA/QYik6TI4Bg6gLUuE6VYuL3kMZxyU80RNm57w/iAuUGdU82STXQjc
-         T8gv+sJUOddqWE48gSg7d11E/rxBXauEgu31cEMmGIndPWEagxx0hisv/ikaY98RhAB1
-         t7Z0TCSlPbB8tNpPUKdjW4NDsKg1AXcsQqExbZbI+G8fefUXJjWZB0bdwtOjtrvJA8T9
-         wJzuGr2ZaYPyFNWxUGo7MYj+09X3n99QAWGa1l9m7ddsW/Lr1lzcAFjtDlVtE6ydNqxS
-         M7Kg==
+        bh=yfSIJHKVO4u5JFm2gLQ1JdCqsnXydYIvBCEF/5n3SZQ=;
+        b=NHFRwP9CISX8G2xagBQUoP9L//iOwFAwa3Tw8ybCeAxROTO3JSyQNTIbDtjhpeZLBN
+         468MqA0+zBYJqd3oqNfJz8t4qJ2ow42vV0qQbrcYbS9wot3Fhjrq25xYTcTipQ8KhCBC
+         0I7693eFWk8kghChuZwzNgqRUxHYbnvM/Io6QVlpsCr0NBLrWcpGyIb2JU0aY9+NnKDQ
+         Rhc9MmUiLt7nnSkntuJ7rZJh6I+gdv8P4qokj5vXjMXRPAjPdK/9HhikVSlWGQx/7eL2
+         0wLDvcAeOJaOgxZuo66x7UlEIF6cnAM0i0rwhbGZ7uk+fPHzfTL/D+peuqGr2HbGExqN
+         CWPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690483604; x=1691088404;
+        d=1e100.net; s=20221208; t=1690483690; x=1691088490;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D3dCGkB2CqSVrXijKF0/PGpFfu+hd98oUmpfn0/x8MI=;
-        b=fmna+D0x5RUBxKm/379fXslfzRzmRlMxjYNyL7qaUoK2l9o9RnFiIvP/N2Yf/CO4zW
-         aFY9zAOfCTHRE79ykgLlXi29wwJEMTbX93TwiGy1N/XFMdKMetoLOMv8lYQmzyMzzYbi
-         OIvBiU+hh7IrC7b/7fcy3hGeivZUENyYXmVAVaqtMkBUgb3Ay/YPjY4EBVvuRheNp0iH
-         Gi9AKwfBKx2USk2ZvWzgl6Uf9YKUTe3RFRgcRT2dFsd9o2pbaoaE5l3wZu0zo+8RdrJF
-         bblyfrR/TfUkQ9w8I5FR8EvjBR9fC79CUTIzrtO0GaIitJQ5196T3K5qrZGMV1gn0rj7
-         0KOQ==
-X-Gm-Message-State: ABy/qLZoaPkRT9A8aMUS3Ao/EgwQrEjAgJa2QGDM8G3OhvyrLKUp7pCy
-        ALAWklrCY8SgIvZSaiAajKqXb6hz1jLB0aZIBbhBSmfu
-X-Google-Smtp-Source: APBJJlF/MoBC/iBtwKz5L63h+eDW0k2FvD2MYnp5zJqRVYVpMjUca37MjC172sLa74h5+2+NNpo5OGGcSTv4lvpQv6U=
-X-Received: by 2002:a2e:b74c:0:b0:2b9:b27c:f77d with SMTP id
- k12-20020a2eb74c000000b002b9b27cf77dmr1155312ljo.3.1690483604236; Thu, 27 Jul
- 2023 11:46:44 -0700 (PDT)
+        bh=yfSIJHKVO4u5JFm2gLQ1JdCqsnXydYIvBCEF/5n3SZQ=;
+        b=dMPBJ+sf364FQLXspLlGYh7PNrcrKZA+dzi90qhpb+/Oa/MqKZN2Rm5elM+ASIU9E/
+         +R0hS4bwW1poUrS3E9Q6K6fU+7b8/n1PsQQrHty6b5sdnpc9pNxYwLXIwJIbeso8mVpy
+         fCKvgi1ffWfZpS0UAPqKmnIpl4G5kMHU3UWh0xMBIfImKG3faSx1IXECrOcu3Au0cN7s
+         J2Qnvi6GEe+hOEFjzq8wvlUkEMmCVpj21tcqubyO/54MUWOWDliynOCeQzm9ZiaG+DRL
+         mbHvPsGyImVcRxRcWTyme/I3K0+m1dS5tYFjtp/fYolCbyFZukEtfKH6EVIGsM/CLl2V
+         Q4JA==
+X-Gm-Message-State: ABy/qLZQ7i+W62GVgIOYCzqGXoul6V9yedqhn6MQE4Er9QnIrBzxmdub
+        Bs+/zt9lbz7t3mcG8su1e6DLM6uxOmIZi0dYjnSMbs1D
+X-Google-Smtp-Source: APBJJlGCLkX5ZnBdvZm1bYs3b0eZm3rwZXQwKwe0Mv0BxVKL0XkX4l19zf6Xlx+/FXqTQeP9fyWz2w7M0nYdFqpfybM=
+X-Received: by 2002:a2e:7304:0:b0:2b9:cb86:ef0f with SMTP id
+ o4-20020a2e7304000000b002b9cb86ef0fmr616204ljc.32.1690483690125; Thu, 27 Jul
+ 2023 11:48:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230725084431.640332-1-simon.mikuda@streamunlimited.com> <20230725084431.640332-7-simon.mikuda@streamunlimited.com>
-In-Reply-To: <20230725084431.640332-7-simon.mikuda@streamunlimited.com>
+References: <20230725084431.640332-1-simon.mikuda@streamunlimited.com> <20230725084431.640332-9-simon.mikuda@streamunlimited.com>
+In-Reply-To: <20230725084431.640332-9-simon.mikuda@streamunlimited.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 27 Jul 2023 11:46:32 -0700
-Message-ID: <CABBYNZ+R2HFUiMY5xhLVPsWO20qM=+3h6_RVW=ar-gPq-oZTPA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 6/8] device: Handle error from discover services
- request after pair
+Date:   Thu, 27 Jul 2023 11:47:57 -0700
+Message-ID: <CABBYNZ+yGTjzDwGCzf7ShUejDRz-THfh8w_=+Cn7xupxXogHng@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 8/8] adapter: Ensure that file exists on IRK write
 To:     Simon Mikuda <simon.mikuda@streamunlimited.com>
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -69,57 +68,31 @@ Hi Simon,
 On Tue, Jul 25, 2023 at 1:56=E2=80=AFAM Simon Mikuda
 <simon.mikuda@streamunlimited.com> wrote:
 >
-> If discovery was requesed from pair request we will report successfull
-> pairing even if there was an error during discovery.
 > ---
->  src/device.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
+>  src/adapter.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> diff --git a/src/device.c b/src/device.c
-> index 446e978ee..35c46e451 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -6309,6 +6309,7 @@ void device_bonding_complete(struct btd_device *dev=
-ice, uint8_t bdaddr_type,
->         struct bonding_req *bonding =3D device->bonding;
->         struct authentication_req *auth =3D device->authr;
->         struct bearer_state *state =3D get_state(device, bdaddr_type);
-> +       int err;
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 4c3bb091d..fe8ae7604 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -8823,6 +8823,8 @@ static void store_irk(struct btd_adapter *adapter, =
+const bdaddr_t *peer,
 >
->         DBG("bonding %p status 0x%02x", bonding, status);
+>         g_key_file_set_string(key_file, "IdentityResolvingKey", "Key", st=
+r);
 >
-> @@ -6358,8 +6359,16 @@ void device_bonding_complete(struct btd_device *de=
-vice, uint8_t bdaddr_type,
->                 DBG("Proceeding with service discovery");
->                 /* If we are initiators remove any discovery timer and ju=
-st
->                  * start discovering services directly */
-> -               device_discover_services(device, bdaddr_type, bonding->ms=
-g);
-> -
-> +               err =3D device_discover_services(device, bdaddr_type, bon=
-ding->msg);
-> +               if (err) {
-> +                       if (device->pending_paired) {
-> +                               g_dbus_emit_property_changed(dbus_conn, d=
-evice->path,
-> +                                               DEVICE_INTERFACE, "Paired=
-");
-> +                               device->pending_paired =3D false;
-> +                       }
-> +                       /* Disregard browse errors in case of Pair */
-> +                       g_dbus_send_reply(dbus_conn, bonding->msg, DBUS_T=
-YPE_INVALID);
-> +               }
->                 bonding_request_free(bonding);
->         } else if (!state->svc_resolved) {
->                 if (!device->browse && !device->discov_timer &&
+> +       create_file(filename, 0600);
+> +
+>         store_data =3D g_key_file_to_data(key_file, &length, NULL);
+>         if (!g_file_set_contents(filename, store_data, length, &gerr)) {
+>                 error("Unable set contents for %s: (%s)", filename,
 > --
 > 2.34.1
 
-This looks like a fix so I'd recommend sending it separately rewording
-the commit to something like: device: Fix returning discovery error
-for Device.Pair...
+This looks like a fix as well so reword it and send it separately,
+also please add the runtime error in the description.
+
 
 --=20
 Luiz Augusto von Dentz
