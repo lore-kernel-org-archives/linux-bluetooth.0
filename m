@@ -2,140 +2,251 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3A9C001DC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 17:32:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EB6C41513
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 18:37:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231232AbjG0RcL (ORCPT
+        id S229939AbjG0ShX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jul 2023 13:32:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60586 "EHLO
+        Thu, 27 Jul 2023 14:37:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230386AbjG0RcJ (ORCPT
+        with ESMTP id S229505AbjG0ShV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jul 2023 13:32:09 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1642D76
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 10:32:08 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b9cbaee7a9so3944901fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 10:32:07 -0700 (PDT)
+        Thu, 27 Jul 2023 14:37:21 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A667126B2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 11:37:20 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-686e0213c0bso991572b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 11:37:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690479126; x=1691083926;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S3ATJWt8vV8tm0SBHmbtqJd3LPMyRhEBIbA2a/rURVY=;
-        b=kh7yn67nBng3Hn15lwHDDj3fP+4fARDPizqhwgm5Yti7Arz3d8vepO5nswrwG8Bb7c
-         9h/pWtJgtgXKwkkH8mwERtKkzG7Jz/EnvttgGa3bVsbDR0lSSsLCX8Xmex0Kk9yZvcRC
-         ae1umJSY8BKse828iJ8iiUtVcwDe0my+aJ4eCLji5Id3yqpLEhShL5zLNBH3WOe77chl
-         Cfb9F77Ze181fl8KKQWD3Zg3GQBOhbGc6Aifnu43Ak26C69/Dd0k1VFCdRf8oDtaHIW7
-         hQBcX+SEO73CUJXZ3Ue60Q1wGHf1Wp8DOTg0Kzfu0pZepIiyWgFTKSM6gKVBun3Zhbka
-         7gBg==
+        d=gmail.com; s=20221208; t=1690483039; x=1691087839;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NooYqgMuLQmvvk9sLNuz16j/q9TGsAcMpTc382jvOGI=;
+        b=shFgTu3n0JwamrZ2823YwjzyJAvNLDMeZ1bY+10HslOoNtpjci+pBKSAU03ci8UJZd
+         t+ERo1LFG+6Wf+CUC24GMgM1i754UZe1sYr1J5x2OTMbQa6xZe4U5ejzbiWSrNEwsEWb
+         b5Vu2Dn49KDJZJKRno2XbVSZTX6p95loCslLAbLjf6ZOO4erHMWR6N81ao1Lotd29O88
+         Q1lQz4mPx/YMTf74XWQMXH3XWS6oGDgfEg16t3RVWN0bL0kZXaz9oO4OI1dgRwFcxwpC
+         uU5tfWlxktw91gOfS13b/NpojTsv7SU5H+ZNfRtVrmXIkipJ/NEPoEkHkjI9bdJLVXlX
+         rfKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690479126; x=1691083926;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S3ATJWt8vV8tm0SBHmbtqJd3LPMyRhEBIbA2a/rURVY=;
-        b=bpiL48wS7o6xIAj/OlrAcWlqcdIpDKQiE8QPcPioU8w+cvlXEnqs7digitdNpyuB7y
-         bvsFyf301c5BQng4hrG/REpFx5k3AFcLyUOrGB8D+Uo2kkarTE0gQSEIbHAxCprylxO7
-         FZpWuRBZPjHDCj+w7dt7rA9Wb0xaHPtWxYus6WGFhdI/MqCoRI0WBqWtXUbVdvyswIaG
-         tBYeuyssEmArhVfsq4pL5S8zm0b3rSQ4rSeWe4RlKmSinApP71LQD1WvNKM1/vFKcvBD
-         F2d/kqwhsI5ZgvsPhTCZ4G+gbl/cj8/r9jtywl+IDM1Y7oc1b++3RoqJfQiroDQdynZF
-         6BJw==
-X-Gm-Message-State: ABy/qLau9GNQM5p0HfjDMNzZTBI3hO8x0qbc9rerwb8sWk8f/+nFWy2/
-        eXnpSLdnKqVOPvtmTI9oIfFh7PTU3QtfSHBrSmkrmWsc
-X-Google-Smtp-Source: APBJJlFjHSG3kD8ncET3XLWhoImZL6CWkxlL8SUyCMI+yZIbhallZyW4Fsb1FpI6RvQtnbzD0YWcBYYCzxG6AGC+Sl8=
-X-Received: by 2002:a2e:b60a:0:b0:2b6:d137:b61c with SMTP id
- r10-20020a2eb60a000000b002b6d137b61cmr2248967ljn.39.1690479125908; Thu, 27
- Jul 2023 10:32:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAAvW=MyYArpr-bpiHkHjrqmkGsiSpMqyAivbMCLepV1HajyAzA@mail.gmail.com>
- <CABBYNZ+Keecvkfzf4+m+e3M5ohc6rGHrFs_wYEYzSV9fSt-aZA@mail.gmail.com> <CAAvW=MzR_h2sYxz-wRWeBoP1QoQGaP11sm+TrGxq5Drat7-uXg@mail.gmail.com>
-In-Reply-To: <CAAvW=MzR_h2sYxz-wRWeBoP1QoQGaP11sm+TrGxq5Drat7-uXg@mail.gmail.com>
+        d=1e100.net; s=20221208; t=1690483039; x=1691087839;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NooYqgMuLQmvvk9sLNuz16j/q9TGsAcMpTc382jvOGI=;
+        b=U3g28B01RnDps1N9IoivxogdqBDv+MCNN51Cl0pIwXEXas7IrtlxEQuRDb6w1mD/Lj
+         NMGSZDMJmDhqwyR2C5PcDJTQWtr7kFrdPKoFNGKlBLV9JHlZvxS8BSY218HwVnKKEpDF
+         bOHZSt3rx0ZT8qHedZh7VyNLVMj9uBUFuOm5ZcL0OVwCsbrtjvgWysJ5hyrfCJsn69um
+         ST5jUdTwdtX2OOo/AWTGQMmvorwuaQrNQKtbwW7/tMSX19D4mIz4/oAKnhb3YgHXw4Gx
+         A0ZB+XKChGMA30GKjHabyBJUpWBH27fik+UJaMMUorqr0K10hCOhv+9eimPLEoBtc8UM
+         68ng==
+X-Gm-Message-State: ABy/qLbMuM3I1DntK0lDARvQLrF5zcUq1CTdWNM4T3AroUi6npiT9j7H
+        gw7l+yU95FKCXa3oZ7bW2lX6xIN8qzY=
+X-Google-Smtp-Source: APBJJlGfB8TQJPqtsbyzRIHUj8z8tkiHuhGJgf3uRa2cFtfaSLj6JZ7QX+zjQIdWq2XQgiEv1pPtcQ==
+X-Received: by 2002:a05:6a00:1a0a:b0:664:aff0:240 with SMTP id g10-20020a056a001a0a00b00664aff00240mr6496112pfv.33.1690483039193;
+        Thu, 27 Jul 2023 11:37:19 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
+        by smtp.gmail.com with ESMTPSA id y2-20020aa78542000000b0066a31111ccdsm1796332pfn.65.2023.07.27.11.37.18
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jul 2023 11:37:18 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 27 Jul 2023 10:31:53 -0700
-Message-ID: <CABBYNZ+Rs8XLy9=BSJfTUPeJe69Fw0bVCpb1KQmNw305ATH-0w@mail.gmail.com>
-Subject: Re: Bluetooth for hearing aids support (ASHA)
-To:     Stefnotch <brandmairstefan@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH v2] monitor: Use gnuplot to plot graph of Latency-Packets
+Date:   Thu, 27 Jul 2023 11:37:17 -0700
+Message-ID: <20230727183717.1026331-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stefnotch,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jul 26, 2023 at 6:13=E2=80=AFAM Stefnotch <brandmairstefan@gmail.co=
-m> wrote:
->
-> Hello Luiz,
->
-> On Tue, Jul 25, 2023 at 8:07=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Stefnotch,
-> >
-> > On Tue, Jul 25, 2023 at 6:49=E2=80=AFAM Stefnotch <brandmairstefan@gmai=
-l.com> wrote:
-> > >
-> > > Hello
-> > >
-> > > I have hearing aids, which can be connected to devices that support
-> > > the Bluetooth ASHA protocol.
-> > > https://source.android.com/docs/core/connect/bluetooth/asha
-> > > That protocol is open and somewhat well documented. However, it is
-> > > only supported on Android devices at the moment. BlueZ on Linux does
-> > > not appear to support it.
-> > >
-> > > The idea is with Bluetooth ASHA, one can stream audio from a computer
-> > > directly to a pair of hearing aids. Without Bluetooth ASHA, I'm
-> > > limited to using a battery powered, clumsy accessory from Cochlear.
-> > >
-> > >  I was wondering if it would be worthwhile to support that in BlueZ.
-> > >
-> > > For the record, this has been requested in the past, but hasn't
-> > > progressed any further.
-> > > https://www.reddit.com/r/linuxquestions/comments/l54zku/accessibility=
-_for_the_deaf/
-> > > https://github.com/bluez/bluez/issues/481
-> >
-> > Don't think there is any objection to having support for ASHA, the
-> > problem is that most of the companies contributing to BlueZ are
-> > focusing on LE Audio which supersedes ASHA, so the challenge is to
-> > find someone to support this feature.
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Glad to hear that I found the right place to ask about this. Do you
-> think it would be worthwhile to try to find someone to support this
-> feature, or is the Bluetooth team usually very short staffed?
+This make use of gnuplot when using -a/--analyze to plot a graph of
+Latency-Packets:
 
-There are not so many people dedicated to upstream full time, besides
-normally for big features like this we normally rely on companies
-interested in the feature to support the work upstream.
+  Found BR-ACL connection with handle 256
+        Address: XX:XX:XX:XX:XX:XX (Sony Home Entertainment&Sound Products Inc)
+        60 RX packets
+        22548 TX packets
+        22547 TX completed packets
+        3 msec min latency
+        73 msec max latency
+        11 msec median latency
+        6 octets TX min packet size
+        850 octets TX max packet size
+        847 octets TX median packet size
 
-> From a user-perspective, I think that a number of existing hearing
-> aids support ASHA, and might never receive a firmware update for any
-> newer Bluetooth Audio Standards. For example, the Cochlear Nucleus 7
-> supports ASHA, however it has been superseded by the Cochlear Nucleus
-> 8. I really don't know if companies have much incentive to update old
-> devices that many people rely on.
-> Considering the price tag on some of those hearing aids, I fear that
-> this ASHA support request might still be relevant in 10 years.
+  7000 +-------------------------------------------------------------------+
+       |        +       +        +       +        +       +        +       |
+       |        +                                          Packets +-----+ |
+  6000 |-+     +|                                                        +-|
+       |       ||                                                          |
+  5000 |-+     ||                                                        +-|
+       |       ||                                                          |
+       |       ||                                                          |
+  4000 |-+     ||                                                        +-|
+       |       ||                                                          |
+       |       ||                                                          |
+  3000 |-+     |+                                                        +-|
+       |       ||                                                          |
+       |       ||                                                          |
+  2000 |-+     ||                                                        +-|
+       |      +||                                                          |
+  1000 |-+    |||++                                                      +-|
+       |      |||||+ +                                                     |
+       |      ||||||+|+++        +       +        +       +        +       |
+     0 +-------------------------------------------------------------------+
+       0        10      20       30      40       50      60       70      80
+                                   Latency (ms)
+---
+ monitor/analyze.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
-Well you could consider asking the manufacturer, or google, to support
-Linux in general, but I'm afraid they might push back saying they
-support just the major OSes.
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index a20ba98b0be4..c7c274fb25fe 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -17,6 +17,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <sys/time.h>
++#include <unistd.h>
+ 
+ #include "lib/bluetooth.h"
+ 
+@@ -28,6 +29,9 @@
+ #include "monitor/packet.h"
+ #include "monitor/analyze.h"
+ 
++#define TIMEVAL_MSEC(_tv) \
++	(long long)((_tv)->tv_sec * 1000 + (_tv)->tv_usec / 1000)
++
+ struct hci_dev {
+ 	uint16_t index;
+ 	uint8_t type;
+@@ -69,12 +73,18 @@ struct hci_conn {
+ 	struct timeval tx_lat_min;
+ 	struct timeval tx_lat_max;
+ 	struct timeval tx_lat_med;
++	struct queue *plot;
+ 	uint16_t tx_pkt_min;
+ 	uint16_t tx_pkt_max;
+ 	uint16_t tx_pkt_med;
+ 	struct queue *chan_list;
+ };
+ 
++struct conn_plot {
++	long long x_msec;
++	size_t y_count;
++};
++
+ struct l2cap_chan {
+ 	uint16_t cid;
+ 	uint16_t psm;
+@@ -135,6 +145,44 @@ static struct l2cap_chan *chan_lookup(struct hci_conn *conn, uint16_t cid,
+ 	return chan;
+ }
+ 
++static void tmp_write(void *data, void *user_data)
++{
++	struct conn_plot *plot = data;
++	FILE *tmp = user_data;
++
++	fprintf(tmp, "%lld %zu\n", plot->x_msec, plot->y_count);
++}
++
++static void conn_plot_draw(struct hci_conn *conn)
++{
++	const char *filename = "analyze.tmp";
++	FILE *gplot = popen("gnuplot", "w");
++	FILE *tmp;
++
++	if (!gplot)
++		return;
++
++	if (queue_isempty(conn->plot))
++		goto done;
++
++	tmp = fopen(filename, "w");
++	if (!tmp)
++		goto done;
++
++	queue_foreach(conn->plot, tmp_write, tmp);
++
++	fprintf(gplot, "set terminal dumb enhanced ansi\n");
++	fprintf(gplot, "set xlabel 'Latency (ms)'\n");
++	fprintf(gplot, "plot './%s' using 1:2 t 'Packets' w impulses\n",
++								filename);
++	fflush(gplot);
++
++	fclose(tmp);
++done:
++	pclose(gplot);
++	unlink(filename);
++}
++
+ static void conn_destroy(void *data)
+ {
+ 	struct hci_conn *conn = data;
+@@ -187,6 +235,10 @@ static void conn_destroy(void *data)
+ 	print_field("%u octets TX min packet size", conn->tx_pkt_min);
+ 	print_field("%u octets TX max packet size", conn->tx_pkt_max);
+ 	print_field("%u octets TX median packet size", conn->tx_pkt_med);
++
++	conn_plot_draw(conn);
++
++	queue_destroy(conn->plot, free);
+ 	queue_destroy(conn->chan_list, chan_destroy);
+ 
+ 	queue_destroy(conn->tx_queue, free);
+@@ -447,6 +499,35 @@ static void evt_cmd_complete(struct hci_dev *dev, struct timeval *tv,
+ 	}
+ }
+ 
++static bool match_plot_latency(const void *data, const void *user_data)
++{
++	const struct conn_plot *plot = data;
++	const struct timeval *latency = user_data;
++
++	return TIMEVAL_MSEC(latency) == plot->x_msec;
++}
++
++static void conn_plot_add(struct hci_conn *conn, struct timeval *latency,
++						uint16_t count)
++{
++	struct conn_plot *plot;
++
++	plot = queue_find(conn->plot, match_plot_latency, latency);
++	if (plot) {
++		plot->y_count += count;
++		return;
++	}
++
++	if (!conn->plot)
++		conn->plot = queue_new();
++
++	plot = new0(struct conn_plot, 1);
++	plot->x_msec = TIMEVAL_MSEC(latency);
++	plot->y_count = count;
++
++	queue_push_tail(conn->plot, plot);
++}
++
+ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 					const void *data, uint16_t size)
+ {
+@@ -504,6 +585,8 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 			} else
+ 				conn->tx_lat_med = res;
+ 
++			conn_plot_add(conn, &res, count);
++
+ 			free(last_tx);
+ 		}
+ 	}
+-- 
+2.41.0
 
-> If it is indeed worthwhile to try and find someone to support this
-> feature, is there anything I could do to support this?
->
-> --
-> Stefnotch
-
-
-
---=20
-Luiz Augusto von Dentz
