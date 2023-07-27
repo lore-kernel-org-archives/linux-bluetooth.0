@@ -2,217 +2,282 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0378AEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 22:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4ECEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 22:34:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232651AbjG0WaA (ORCPT
+        id S232985AbjG0WeC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jul 2023 18:30:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
+        Thu, 27 Jul 2023 18:34:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232226AbjG0W36 (ORCPT
+        with ESMTP id S232924AbjG0WeA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jul 2023 18:29:58 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BE82696;
-        Thu, 27 Jul 2023 15:29:56 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b6f97c7115so24152701fa.2;
-        Thu, 27 Jul 2023 15:29:56 -0700 (PDT)
+        Thu, 27 Jul 2023 18:34:00 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6699171D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 15:33:19 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b701e1ca63so23273821fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 15:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690496995; x=1691101795;
+        d=gmail.com; s=20221208; t=1690497177; x=1691101977;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Wf1VfD2mrsoeJHi9af8lkNzG5SBTTSXYfrfwad1NxqQ=;
-        b=Sk86zoXZky8KTz19W03fhhjpebEf3oFjFutbH0n3MHxGFraphpEv2PoFdVNv1b1ALp
-         4ViJcDwJQ/kqNqFEAYbT3BJKFqpbKqO+Cw/m0Kfb6XqmCw4TDi2KnLcRHuoUwhn3c935
-         E6R8qUjBzC3AJ9GoTe67aCcule9m37mtHkKag3YXic21V7JnqI+CDbNUqreCGh0fDXI4
-         raOjaVlb4Dv718+TSlDUEvV3u8W9PlI3GLP51JyrkdkBnyl6rYTPYLf1CPjvJS9OMPdz
-         53ibbng7gqRgES8SXHJ9/tevL4kPTuA2jckS855FK9pbGFU93YJb/y4SYzOiYES7074R
-         vZ+g==
+        bh=4XQu2ovVujkoYV9YXdAATZBMCCwfcl6QvW+JuCF56gc=;
+        b=IND5pmeB3IDX0zO+veeVjmrunI9S/E1VdgY/WAs3dFl4GGv93T44MUmUkMQi9pB8nO
+         hcvGL76IC/u1zjE2QwwZ1Bxgzg1NQgslMTWtWoJ2c013i4n+BcZIbiTTx17kLpxBvAXh
+         D7ihjVkpyhGI30OoOa90lzVwdKoPxkUJ/80rubX4uw+1ZYIQGi2mbjzoLgJEYInscMkK
+         sysdbkCWkkIDLtLOP4lFQ6yNeAHPrGeNSj665aBny727ti1jEQDvBh8ab3chGLK09xiD
+         vzLjWZacnhxj/DbF2m124Jh2/rFdoCAXG1ll98MIfVAA9OABJk3kQXX0dhUke1J5kwIq
+         kJXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690496995; x=1691101795;
+        d=1e100.net; s=20221208; t=1690497177; x=1691101977;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Wf1VfD2mrsoeJHi9af8lkNzG5SBTTSXYfrfwad1NxqQ=;
-        b=XJnZo+mCgtq/zksbWnX0uPEJH48sS2oDrpmBfFcQnhBBgND+us/Ucu6UaoCyH1oCz7
-         vDuwoD7k/IvqHkJqSTnScLm6r6cVqIwOQvWdDJcoDf+UHyQoXWNrf9mGfhpHKVLgVvP8
-         jijiAOf3uTeb/KnKysu61ZoZXGOATrzueFxnSqgsNN+y4FWoX0yS4Dhvt0TTCxXxMpV9
-         BOfeb1Sc498zlX3xxHrS7QQE3+51DkojOBzJYl88Lm+RSq3IqYKVEFpjqQPnq7Zrir3g
-         SkfiiNdkiWF0BC0kiwmJM2Qhoz53AT3X6/tpqCObexXCbBO5pigKwTnD0qI6CrPjf2zC
-         x2UQ==
-X-Gm-Message-State: ABy/qLZCCUb2JZgthBPpfrwylBOZYwJnBOQ1HcTErpm51YdJNy6N3ehZ
-        pGXsPy4/kmbKrzd7lGCCEuuZ2rl/KpNFsa1V4gI=
-X-Google-Smtp-Source: APBJJlEOHNkvOux8Yi22ws6pP3YjaVT/+qvLVC7gs2uw3NLLS1NmbrvFPZ0BrRfLY509HcuTYMFLHBSmDoGtGCYD30Y=
-X-Received: by 2002:a2e:9f42:0:b0:2b6:bc30:7254 with SMTP id
- v2-20020a2e9f42000000b002b6bc307254mr269783ljk.13.1690496994820; Thu, 27 Jul
- 2023 15:29:54 -0700 (PDT)
+        bh=4XQu2ovVujkoYV9YXdAATZBMCCwfcl6QvW+JuCF56gc=;
+        b=N8kMEsNS+UJSuYis9y/t3VjwbQ3/SmtIMCvPQF/TjIEbslsvu4xh3z/oJsBsnkeKnA
+         Le6kC+6h0oWmXRrfYFP+2O4lAGFimYUCaVVZiNG6no7/ioqF+P7HeevpyJi02aregEjO
+         v+YNdSNv520Oy4szH3ze1HsctaMka996bEbv9FBey4CLrvSZnyIvbmkGdWTDXp0Qq9C0
+         c3EM8xeeSBHmhPhysyLpOM7M6dFfZrOzpQZ+GL46WlgOSUYEUCqN6j/4pvEBcKGjY1Op
+         zCt1Wa809aU0+GIdD+6yOwp5WFAVR3BpacqlGsvuMj98kBQTQXWKa7h6XnPcDAGokH8A
+         gt3g==
+X-Gm-Message-State: ABy/qLa0ceqAqpqftUGauIBftRJoQItJwauQBC+2D2fZhe0IgfVt+nF8
+        uG1IK7gHg1+Fpw9G17X95Et3ejc+pS8ABohwIm+YP/4z
+X-Google-Smtp-Source: APBJJlEjkb/8RBNx7Wk31CLHYFWkrMdTCEurZAqtym5g4QYIS3nUIQ/RArzI/TIczpti9T25MOs7tHVg8UR53PUtc9I=
+X-Received: by 2002:a2e:7a05:0:b0:2b6:a763:5d13 with SMTP id
+ v5-20020a2e7a05000000b002b6a7635d13mr270968ljc.27.1690497177273; Thu, 27 Jul
+ 2023 15:32:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230718034337.23502-1-jlee@suse.com> <CABBYNZJ97UMyZ7yX1YAGbuU4XwNDdoFewKNwbd=51_L9aNrrCQ@mail.gmail.com>
- <20230719154918.GJ14791@linux-l9pv.suse> <CABBYNZLKJTKwBeypHbwm1r2CnqY+S2pY6dLYri+Z-otEx-UQ6A@mail.gmail.com>
-In-Reply-To: <CABBYNZLKJTKwBeypHbwm1r2CnqY+S2pY6dLYri+Z-otEx-UQ6A@mail.gmail.com>
+References: <ME3PR01MB56237F9982C4F3C9201AFF1FF02DA@ME3PR01MB5623.ausprd01.prod.outlook.com>
+ <CABBYNZ+Q1iupoeK8GJbWcHRgrhNRjZKhS+Gu-DhO7Vx_wiqqeA@mail.gmail.com>
+ <ME3PR01MB56234E61153A7358403B834AF032A@ME3PR01MB5623.ausprd01.prod.outlook.com>
+ <CABBYNZJVgV7sy9HO37ZD=0XCT+JBu+NAeYYuzcok1LobW9nN9A@mail.gmail.com>
+In-Reply-To: <CABBYNZJVgV7sy9HO37ZD=0XCT+JBu+NAeYYuzcok1LobW9nN9A@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 27 Jul 2023 15:29:42 -0700
-Message-ID: <CABBYNZJZisYm0Vgfzd8F2ge9RPJvUYBVGpj-4iySerT_wUTJNA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: hci_event: Ignore NULL link key
-To:     joeyli <jlee@suse.com>
-Cc:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org,
-        Markus Elfring <Markus.Elfring@web.de>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        linux-bluetooth@vger.kernel.org
+Date:   Thu, 27 Jul 2023 15:32:44 -0700
+Message-ID: <CABBYNZK48oTH9UKfmOMHgH-v=tk0TSHQo6PJDC+ngQdaw=scpA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix for Bluetooth SIG test L2CAP/COS/CED/BI-02-C
+To:     "Xigang(Ted) Feng" <Xigang.Feng@gallagher.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joeyli,
+Hi Ted,
 
-On Wed, Jul 19, 2023 at 5:25=E2=80=AFPM Luiz Augusto von Dentz
+On Fri, Jul 14, 2023 at 3:27=E2=80=AFPM Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
-> Hi Joeyli,
+> Hi,
 >
-> On Wed, Jul 19, 2023 at 8:49=E2=80=AFAM joeyli <jlee@suse.com> wrote:
+> On Sat, Jul 8, 2023 at 4:26=E2=80=AFPM Xigang(Ted) Feng
+> <Xigang.Feng@gallagher.com> wrote:
 > >
-> > Hi Luiz Augusto von Dentz,
+> > Hi Luiz,
 > >
-> > On Tue, Jul 18, 2023 at 10:22:26AM -0700, Luiz Augusto von Dentz wrote:
-> > > Hi Chun-Yi,
-> > >
-> > > On Mon, Jul 17, 2023 at 8:43=E2=80=AFPM Lee, Chun-Yi <joeyli.kernel@g=
-mail.com> wrote:
+> > > On Thu, Jul 6, 2023 at 7:46=E2=80=AFPM Xigang(Ted) Feng
+> > > <Xigang.Feng@gallagher.com> wrote:
 > > > >
-> > > > This change is used to relieve CVE-2020-26555. The description of t=
-he
-> > > > CVE:
+> > > > This test case is for verifying the L2CAP signalling PDUs that have=
+ invalid length
+> > > are properly handled.
+> > > > With this patch, the "L2CAP: Command Reject" packet is sent correct=
+ly to the
+> > > malformed signal packet
+> > > > contained in "L2CAP: Connection Request" packet.
 > > > >
-> > > > Bluetooth legacy BR/EDR PIN code pairing in Bluetooth Core Specific=
-ation
-> > > > 1.0B through 5.2 may permit an unauthenticated nearby device to spo=
-of
-> > > > the BD_ADDR of the peer device to complete pairing without knowledg=
-e
-> > > > of the PIN. [1]
-> > >
-> > > Btw, it is probably worth mentioning that in BR/EDR the key generatio=
-n
-> > > is actually handled in the controller, below HCI.
-> > >
-> >
-> > Yes, the key generation be handled by link manager. I will mention it
-> > in patch description.
-> >
-> > > > The detail of this attack is in IEEE paper:
-> > > > BlueMirror: Reflections on Bluetooth Pairing and Provisioning Proto=
-cols
-> > > > [2]
+> > > > BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 3, Part A page 1041
 > > > >
-> > > > It's a reflection attack. Base on the paper, attacker can induce th=
-e
-> > > > attacked target to generate null link key (zero key) without PIN co=
-de.
+> > > > 'When a packet is received with a Code field that is unknown or dis=
+allowed on
+> > > the
+> > > > signalling channel it is received on, an L2CAP_COMMAND_REJECT_RSP
+> > > > packet (defined in Section 4.1) is sent in response.'
 > > > >
-> > > > We can ignore null link key in the handler of "Link Key Notificatio=
-n
-> > > > event" to relieve the attack. A similar implementation also shows i=
-n
-> > > > btstack project. [3]
+> > > > Before this patch:
+> > > >
+> > > > > ACL Data RX: Handle 1 flags 0x02 dlen 15
+> > > >       L2CAP: Connection Request (0x02) ident 3 len 4
+> > > >         PSM: 1 (0x0001)
+> > > >         Source CID: 64
+> > > >         malformed signal packet
+> > > >         00 00 00                                         ...
+> > > > < ACL Data TX: Handle 1 flags 0x00 dlen 16
+> > > >       L2CAP: Connection Response (0x03) ident 3 len 8
+> > > >         Destination CID: 64
+> > > >         Source CID: 64
+> > > >         Result: Connection successful (0x0000)
+> > > >         Status: No further information available (0x0000)
+> > > > < ACL Data TX: Handle 1 flags 0x00 dlen 23
+> > > >       L2CAP: Configure Request (0x04) ident 3 len 15
+> > > >         Destination CID: 64
+> > > >         Flags: 0x0000
+> > > >         Option: Retransmission and Flow Control (0x04) [mandatory]
+> > > >           Mode: Basic (0x00)
+> > > >           TX window size: 0
+> > > >           Max transmit: 0
+> > > >           Retransmission timeout: 0
+> > > >           Monitor timeout: 0
+> > > >           Maximum PDU size: 0
+> > > > > HCI Event: Number of Completed Packets (0x13) plen 5
+> > > >         Num handles: 1
+> > > >         Handle: 1
+> > > >         Count: 2
+> > > > > ACL Data RX: Handle 1 flags 0x02 dlen 25
+> > > >       L2CAP: Configure Response (0x05) ident 3 len 17
+> > > >         Source CID: 64
+> > > >         Flags: 0x0000
+> > > >         Result: Success (0x0000)
+> > > >         Option: Retransmission and Flow Control (0x04) [mandatory]
+> > > >           Mode: Basic (0x00)
+> > > >           TX window size: 0
+> > > >           Max transmit: 0
+> > > >           Retransmission timeout: 0
+> > > >           Monitor timeout: 0
+> > > >           Maximum PDU size: 0
+> > > > < ACL Data TX: Handle 1 flags 0x00 dlen 12
+> > > >       L2CAP: Disconnection Request (0x06) ident 4 len 4
+> > > >         Destination CID: 64
+> > > >         Source CID: 64
+> > > > > HCI Event: Number of Completed Packets (0x13) plen 5
+> > > >         Num handles: 1
+> > > >         Handle: 1
+> > > >         Count: 1
+> > > > > ACL Data RX: Handle 1 flags 0x02 dlen 12
+> > > >       L2CAP: Disconnection Response (0x07) ident 4 len 4
+> > > >         Destination CID: 64
+> > > >         Source CID: 64
+> > > > < HCI Command: Disconnect (0x01|0x0006) plen 3
+> > > >         Handle: 1
+> > > >         Reason: Remote User Terminated Connection (0x13)
+> > > >
+> > > > After this patch:
+> > > >
+> > > > > ACL Data RX: Handle 1 flags 0x02 dlen 15
+> > > >       L2CAP: Connection Request (0x02) ident 3 len 4
+> > > >         PSM: 4113 (0x1011)
+> > > >         Source CID: 64
+> > > >         malformed signal packet
+> > > >         00 00 00                                         ...
+> > > > < ACL Data TX: Handle 1 flags 0x00 dlen 16
+> > > >       L2CAP: Connection Response (0x03) ident 3 len 8
+> > > >         Destination CID: 64
+> > > >         Source CID: 64
+> > > >         Result: Connection successful (0x0000)
+> > > >         Status: No further information available (0x0000)
+> > > > < ACL Data TX: Handle 1 flags 0x00 dlen 23
+> > > >       L2CAP: Configure Request (0x04) ident 3 len 15
+> > > >         Destination CID: 64
+> > > >         Flags: 0x0000
+> > > >         Option: Retransmission and Flow Control (0x04) [mandatory]
+> > > >           Mode: Basic (0x00)
+> > > >           TX window size: 0
+> > > >           Max transmit: 0
+> > > >           Retransmission timeout: 0
+> > > >           Monitor timeout: 0
+> > > >           Maximum PDU size: 0
 > > >
-> > > Perhaps we could clarify this statement by stating that if we ignore
-> > > the link key it means the stack will not consider the device is bonde=
-d
-> > > and will not persist the link key, that said the controller will stil=
-l
-> > > consider it as paired, so I perhaps we should go one step forward and
-> > > disconnect if we detect such a key is being used.
-> > >
+> > > Looks like we are still sending a Configure Request which is sort of
+> > > useless if we are sending a Reject in the follow up command.
 > >
-> > I am new on bluetooth field. Did you mean like this patch? Sending
-> > HCI_Disconnect when we found zero link key?
+> > I'm following the test case "L2CAP/COS/CED/BI-02-C" in " L2CAP Test Sui=
+te" from Bluetooth SIG.
+> > In Test Procedure, step 3 sends a L2CAP_CONNECTION_REQ with three extra=
+ bytes of 0.
 > >
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index ff0c331f53d6..3482031cbbb8 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -4698,6 +4700,15 @@ static void hci_link_key_notify_evt(struct hci_d=
-ev *hdev, void *data,
-> >         if (!conn)
-> >                 goto unlock;
-> >
-> > +       /* Ignore NULL link key against CVE-2020-26555 */
-> > +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
-> > +               bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) for %=
-pMR", &ev->bdaddr);
-> > +               hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
-> > +               hci_conn_drop(conn);
-> > +               goto unlock;
-> > +       }
+> > Step 4 sends back L2CAP_CONNECTION_RSP to indicate the connection estab=
+lished successfully,
+> > And send L2CAP_COMMAND_REJECT_RSP to reject the unknow command(the extr=
+a three bytes of 0) contained in L2CAP_CONNECTION_REQ.
 >
-> Yeah, something like that should do it, btw I hope you are testing
-> these changes do actually work properly, even better if you could
-> introduce a test into the likes of mgmt-tester to generate a ZERO_KEY
-> so we are not caught by surprise if something doesn't quite work as
-> expected, or some change cause a regression where this key is accepted
-> again.
+> Well I guess that is assuming the stack would consider the extra bytes
+> as a different command, in which case the PDU flow is correct but then
+> we probably need to check for unparsed bytes for all commands, not
+> just L2CAP_CONNECTION_REQ. Perhaps we need to take a look at the
+> errata which added this test to know exactly the intent of such test,
+> if I recall correctly L2CAP signalling channel supports more than one
+> outstanding command at the time, so perhaps it is valid to send
+> multiple commands in a row which is why this tests is done with extra
+> bytes at the end to simulate another command.
 
-Are you still planning on updating these changes so we can apply it?
+Any chance to update these changes? Or are you not planning on
+continuing working on them?
 
-> >         hci_conn_hold(conn);
-> >         conn->disc_timeout =3D HCI_DISCONN_TIMEOUT;
-> >         hci_conn_drop(conn);
+> > In step 5, the Lower Tester can continue sending L2CAP_CONFIGURATION_RE=
+Q because the connection has been established successfully,
+> > So in my opinion, the Configure Request sent by IUT is also a correct b=
+ehaviour.
 > >
-> >
-> > Is there anything I'm missing? Thanks a lot!
-> >
-> > > > v2:
-> > > > - Used Link: tag instead of Closes:
-> > > > - Used bt_dev_dbg instead of BT_DBG
-> > > > - Added Fixes: tag
+> > >
+> > > > < ACL Data TX: Handle 1 flags 0x00 dlen 10
+> > > >       L2CAP: Command Reject (0x01) ident 0 len 2
+> > > >         Reason: Command not understood (0x0000)
+> > > > > HCI Event: Number of Completed Packets (0x13) plen 5
+> > > >         Num handles: 1
+> > > >         Handle: 1 Address: 00:1B:DC:F4:B3:E1 (Vencer Co., Ltd.)
+> > > >         Count: 2
+> > > > > HCI Event: Number of Completed Packets (0x13) plen 5
+> > > >        Num handles: 1
+> > > >         Handle: 1 Address: 00:1B:DC:F4:B3:E1 (Vencer Co., Ltd.)
+> > > >         Count: 1
+> > > > > ACL Data RX: Handle 1 flags 0x02 dlen 25
+> > > >       L2CAP: Configure Response (0x05) ident 3 len 17
+> > > >         Source CID: 64
+> > > >         Flags: 0x0000
+> > > >         Result: Success (0x0000)
+> > > >         Option: Retransmission and Flow Control (0x04) [mandatory]
+> > > >           Mode: Basic (0x00)
+> > > >           TX window size: 0
+> > > >           Max transmit: 0
+> > > >           Retransmission timeout: 0
+> > > >           Monitor timeout: 0
+> > > >           Maximum PDU size: 0
 > > > >
-> > > > Fixes: 55ed8ca10f35 ("Bluetooth: Implement link key handling for th=
-e management interface")
-> > > > Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3DCVE-2020-265=
-55 [1]
-> > > > Link: https://ieeexplore.ieee.org/abstract/document/9474325/authors=
-#authors [2]
-> > > > Link: https://github.com/bluekitchen/btstack/blob/master/src/hci.c#=
-L3722 [3]
-> > > > Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> > > > Signed-off-by: Xigang(Ted) Feng <Xigang.Feng@gallagher.com>
 > > > > ---
-> > > >  net/bluetooth/hci_event.c | 6 ++++++
-> > > >  1 file changed, 6 insertions(+)
+> > > >  net/bluetooth/l2cap_core.c | 8 ++++++++
+> > > >  1 file changed, 8 insertions(+)
 > > > >
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index 95816a938cea..ff0c331f53d6 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -4684,6 +4684,12 @@ static void hci_link_key_notify_evt(struct h=
-ci_dev *hdev, void *data,
-> > > >         bool persistent;
-> > > >         u8 pin_len =3D 0;
+> > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.=
+c
+> > > > index 17ca13e8c044..c3af7727ee1e 100644
+> > > > --- a/net/bluetooth/l2cap_core.c
+> > > > +++ b/net/bluetooth/l2cap_core.c
+> > > > @@ -6534,6 +6534,14 @@ static inline void l2cap_sig_channel(struct
+> > > l2cap_conn *conn,
+> > > >                 skb_pull(skb, len);
+> > > >         }
 > > > >
-> > > > +       /* Ignore NULL link key against CVE-2020-26555 */
-> > > > +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
-> > > > +               bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) f=
-or %pMR", &ev->bdaddr);
-> > > > +               return;
+> > > > +       if (skb->len) {
+> > > > +               struct l2cap_cmd_rej_unk rej;
+> > > > +
+> > > > +               rej.reason =3D cpu_to_le16(L2CAP_REJ_NOT_UNDERSTOOD=
+);
+> > > > +               l2cap_send_cmd(conn, 0, L2CAP_COMMAND_REJ,
+> > > > +                                       sizeof(rej), &rej);
 > > > > +       }
 > > > > +
-> > > >         bt_dev_dbg(hdev, "");
-> > > >
-> > > >         hci_dev_lock(hdev);
+> > > >  drop:
+> > > >         kfree_skb(skb);
+> > > >  }
 > > > > --
-> > > > 2.35.3
-> > > >
+> > > > 2.34.1
+> > > --
+> > > Luiz Augusto von Dentz
 > >
-> > Thanks a lot!
-> > Joey Lee
+> > Best Regards,
+> > Xigang
+> > ________________________________
+> >  This email is confidential and may contain information subject to lega=
+l privilege. If you are not the intended recipient please advise us of our =
+error by return e-mail then delete this email and any attached files. You m=
+ay not copy, disclose or use the contents in any way. The views expressed i=
+n this email may not be those of Gallagher Group Ltd or subsidiary companie=
+s thereof.
+> > ________________________________
 >
 >
 >
