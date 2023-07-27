@@ -2,104 +2,223 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC7EEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 22:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0378AEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 22:30:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230515AbjG0WV7 (ORCPT
+        id S232651AbjG0WaA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jul 2023 18:21:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43258 "EHLO
+        Thu, 27 Jul 2023 18:30:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230407AbjG0WV6 (ORCPT
+        with ESMTP id S232226AbjG0W36 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jul 2023 18:21:58 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9E32D5E;
-        Thu, 27 Jul 2023 15:21:57 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fb7589b187so2568036e87.1;
-        Thu, 27 Jul 2023 15:21:57 -0700 (PDT)
+        Thu, 27 Jul 2023 18:29:58 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BE82696;
+        Thu, 27 Jul 2023 15:29:56 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b6f97c7115so24152701fa.2;
+        Thu, 27 Jul 2023 15:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690496516; x=1691101316;
+        d=gmail.com; s=20221208; t=1690496995; x=1691101795;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V5RV8/ahM+DUvJaKMceFZxwjrN0t9JLY7D20I2svw9s=;
-        b=m5XSBNqMGx+saO8HB1KQ9lGLOSZ8Jw2PgDrnT5mE31Kksuj/DuIX4MnSQLWoM/WvQ9
-         qf8C4CXamSVgmS0Bc4K7s9rmIFXVkvg24tl4MZe/hhB2mVg33zJc6A5MFW6cKife9AYm
-         tfUnwgtZ/fw8jj0Y74WCW5UbOueASuOagtP4473j4SE1EvOr6XfGi60yF6sUwU5GIntM
-         6PoXPSdFmePSkZtUYhvcvoDPqjR67/j+JyMVrq79SWWMpMlzd1gn68UGeFNGNW8FAUVp
-         oDwNyHZse6JDMTTioEeVCpuniUUFO1tRh4VKdbbI+kAKtkhogIfrB68q2TQ51ciH5JXD
-         570Q==
+        bh=Wf1VfD2mrsoeJHi9af8lkNzG5SBTTSXYfrfwad1NxqQ=;
+        b=Sk86zoXZky8KTz19W03fhhjpebEf3oFjFutbH0n3MHxGFraphpEv2PoFdVNv1b1ALp
+         4ViJcDwJQ/kqNqFEAYbT3BJKFqpbKqO+Cw/m0Kfb6XqmCw4TDi2KnLcRHuoUwhn3c935
+         E6R8qUjBzC3AJ9GoTe67aCcule9m37mtHkKag3YXic21V7JnqI+CDbNUqreCGh0fDXI4
+         raOjaVlb4Dv718+TSlDUEvV3u8W9PlI3GLP51JyrkdkBnyl6rYTPYLf1CPjvJS9OMPdz
+         53ibbng7gqRgES8SXHJ9/tevL4kPTuA2jckS855FK9pbGFU93YJb/y4SYzOiYES7074R
+         vZ+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690496516; x=1691101316;
+        d=1e100.net; s=20221208; t=1690496995; x=1691101795;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=V5RV8/ahM+DUvJaKMceFZxwjrN0t9JLY7D20I2svw9s=;
-        b=Vu/b3ITRpHRbuOWueOno5bNL1H8W4wspbHwu/jayJDo7Kp3lXm4HB4ZBygYzKUgV7Q
-         P3JVlPv0Iq/1XcYq5Oj5RDC7B3wSM+hTtNulW6ZK8YkPBgTe0lCMwFD+aQTpMsgjZQT/
-         RyhAVBphGCWqRtTT/6tRGGEzm0aqHSjjcYokD1PNnWqSQhTGvWXADoNSY9RrJso/XCoQ
-         IR9HgfckV4R728pDxlh0Hw+Nrv08f/SONxm2rV0T+6cTyiAD8x6u8xAtfjlpIbNaJnIf
-         +3ACsMqjACSywHibKv8/XUde1bk9alF9Tz4JZCSAlhit3cw556akj37Wg/m/GhkdjaYs
-         pfwA==
-X-Gm-Message-State: ABy/qLZ+/DDo0pdqTMvMK27NRIeYT8u44tm/niMBpaKwTp4RC0DTH62z
-        Ux7Urtr84xJpSG/zRa5kfp0DAYQHb5M5v46XaJM=
-X-Google-Smtp-Source: APBJJlGgdghveGc4LPwbjgWr6rCMeOEEwHaSD9Kk4Xp3udouUdBA6OEkFoqd6rjBNaq6reNj5zqvtnAtYVvpEAXT/Pc=
-X-Received: by 2002:a2e:3505:0:b0:2b5:9f54:e290 with SMTP id
- z5-20020a2e3505000000b002b59f54e290mr263701ljz.0.1690496515604; Thu, 27 Jul
- 2023 15:21:55 -0700 (PDT)
+        bh=Wf1VfD2mrsoeJHi9af8lkNzG5SBTTSXYfrfwad1NxqQ=;
+        b=XJnZo+mCgtq/zksbWnX0uPEJH48sS2oDrpmBfFcQnhBBgND+us/Ucu6UaoCyH1oCz7
+         vDuwoD7k/IvqHkJqSTnScLm6r6cVqIwOQvWdDJcoDf+UHyQoXWNrf9mGfhpHKVLgVvP8
+         jijiAOf3uTeb/KnKysu61ZoZXGOATrzueFxnSqgsNN+y4FWoX0yS4Dhvt0TTCxXxMpV9
+         BOfeb1Sc498zlX3xxHrS7QQE3+51DkojOBzJYl88Lm+RSq3IqYKVEFpjqQPnq7Zrir3g
+         SkfiiNdkiWF0BC0kiwmJM2Qhoz53AT3X6/tpqCObexXCbBO5pigKwTnD0qI6CrPjf2zC
+         x2UQ==
+X-Gm-Message-State: ABy/qLZCCUb2JZgthBPpfrwylBOZYwJnBOQ1HcTErpm51YdJNy6N3ehZ
+        pGXsPy4/kmbKrzd7lGCCEuuZ2rl/KpNFsa1V4gI=
+X-Google-Smtp-Source: APBJJlEOHNkvOux8Yi22ws6pP3YjaVT/+qvLVC7gs2uw3NLLS1NmbrvFPZ0BrRfLY509HcuTYMFLHBSmDoGtGCYD30Y=
+X-Received: by 2002:a2e:9f42:0:b0:2b6:bc30:7254 with SMTP id
+ v2-20020a2e9f42000000b002b6bc307254mr269783ljk.13.1690496994820; Thu, 27 Jul
+ 2023 15:29:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230727013907.29068-1-yuehaibing@huawei.com>
-In-Reply-To: <20230727013907.29068-1-yuehaibing@huawei.com>
+References: <20230718034337.23502-1-jlee@suse.com> <CABBYNZJ97UMyZ7yX1YAGbuU4XwNDdoFewKNwbd=51_L9aNrrCQ@mail.gmail.com>
+ <20230719154918.GJ14791@linux-l9pv.suse> <CABBYNZLKJTKwBeypHbwm1r2CnqY+S2pY6dLYri+Z-otEx-UQ6A@mail.gmail.com>
+In-Reply-To: <CABBYNZLKJTKwBeypHbwm1r2CnqY+S2pY6dLYri+Z-otEx-UQ6A@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 27 Jul 2023 15:21:43 -0700
-Message-ID: <CABBYNZ+Fxmkxg3qQMABt-1DcvhMcUnqsOrwGgHXMQum5ezF82Q@mail.gmail.com>
-Subject: Re: [PATCH v2 -next] Bluetooth: Remove unused declaration amp_read_loc_info()
-To:     Yue Haibing <yuehaibing@huawei.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pmenzel@molgen.mpg.de
+Date:   Thu, 27 Jul 2023 15:29:42 -0700
+Message-ID: <CABBYNZJZisYm0Vgfzd8F2ge9RPJvUYBVGpj-4iySerT_wUTJNA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_event: Ignore NULL link key
+To:     joeyli <jlee@suse.com>
+Cc:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org,
+        Markus Elfring <Markus.Elfring@web.de>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yue,
+Hi Joeyli,
 
-On Wed, Jul 26, 2023 at 6:42=E2=80=AFPM Yue Haibing <yuehaibing@huawei.com>=
- wrote:
+On Wed, Jul 19, 2023 at 5:25=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> This is introduced in commit 903e45411099 ("Bluetooth: AMP: Use HCI cmd t=
-o Read Loc AMP Assoc")
-> and never be implemented.
+> Hi Joeyli,
+>
+> On Wed, Jul 19, 2023 at 8:49=E2=80=AFAM joeyli <jlee@suse.com> wrote:
+> >
+> > Hi Luiz Augusto von Dentz,
+> >
+> > On Tue, Jul 18, 2023 at 10:22:26AM -0700, Luiz Augusto von Dentz wrote:
+> > > Hi Chun-Yi,
+> > >
+> > > On Mon, Jul 17, 2023 at 8:43=E2=80=AFPM Lee, Chun-Yi <joeyli.kernel@g=
+mail.com> wrote:
+> > > >
+> > > > This change is used to relieve CVE-2020-26555. The description of t=
+he
+> > > > CVE:
+> > > >
+> > > > Bluetooth legacy BR/EDR PIN code pairing in Bluetooth Core Specific=
+ation
+> > > > 1.0B through 5.2 may permit an unauthenticated nearby device to spo=
+of
+> > > > the BD_ADDR of the peer device to complete pairing without knowledg=
+e
+> > > > of the PIN. [1]
+> > >
+> > > Btw, it is probably worth mentioning that in BR/EDR the key generatio=
+n
+> > > is actually handled in the controller, below HCI.
+> > >
+> >
+> > Yes, the key generation be handled by link manager. I will mention it
+> > in patch description.
+> >
+> > > > The detail of this attack is in IEEE paper:
+> > > > BlueMirror: Reflections on Bluetooth Pairing and Provisioning Proto=
+cols
+> > > > [2]
+> > > >
+> > > > It's a reflection attack. Base on the paper, attacker can induce th=
+e
+> > > > attacked target to generate null link key (zero key) without PIN co=
+de.
+> > > >
+> > > > We can ignore null link key in the handler of "Link Key Notificatio=
+n
+> > > > event" to relieve the attack. A similar implementation also shows i=
+n
+> > > > btstack project. [3]
+> > >
+> > > Perhaps we could clarify this statement by stating that if we ignore
+> > > the link key it means the stack will not consider the device is bonde=
+d
+> > > and will not persist the link key, that said the controller will stil=
+l
+> > > consider it as paired, so I perhaps we should go one step forward and
+> > > disconnect if we detect such a key is being used.
+> > >
+> >
+> > I am new on bluetooth field. Did you mean like this patch? Sending
+> > HCI_Disconnect when we found zero link key?
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index ff0c331f53d6..3482031cbbb8 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -4698,6 +4700,15 @@ static void hci_link_key_notify_evt(struct hci_d=
+ev *hdev, void *data,
+> >         if (!conn)
+> >                 goto unlock;
+> >
+> > +       /* Ignore NULL link key against CVE-2020-26555 */
+> > +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
+> > +               bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) for %=
+pMR", &ev->bdaddr);
+> > +               hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
+> > +               hci_conn_drop(conn);
+> > +               goto unlock;
+> > +       }
+>
+> Yeah, something like that should do it, btw I hope you are testing
+> these changes do actually work properly, even better if you could
+> introduce a test into the likes of mgmt-tester to generate a ZERO_KEY
+> so we are not caught by surprise if something doesn't quite work as
+> expected, or some change cause a regression where this key is accepted
+> again.
 
-The commit information above shall be added with Fixes: tag so it can
-be properly backported, etc.
+Are you still planning on updating these changes so we can apply it?
 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> ---
-> v2: fix SOB and update commit log
-> ---
->  net/bluetooth/amp.h | 1 -
->  1 file changed, 1 deletion(-)
+> >         hci_conn_hold(conn);
+> >         conn->disc_timeout =3D HCI_DISCONN_TIMEOUT;
+> >         hci_conn_drop(conn);
+> >
+> >
+> > Is there anything I'm missing? Thanks a lot!
+> >
+> > > > v2:
+> > > > - Used Link: tag instead of Closes:
+> > > > - Used bt_dev_dbg instead of BT_DBG
+> > > > - Added Fixes: tag
+> > > >
+> > > > Fixes: 55ed8ca10f35 ("Bluetooth: Implement link key handling for th=
+e management interface")
+> > > > Link: https://cve.mitre.org/cgi-bin/cvename.cgi?name=3DCVE-2020-265=
+55 [1]
+> > > > Link: https://ieeexplore.ieee.org/abstract/document/9474325/authors=
+#authors [2]
+> > > > Link: https://github.com/bluekitchen/btstack/blob/master/src/hci.c#=
+L3722 [3]
+> > > > Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> > > > ---
+> > > >  net/bluetooth/hci_event.c | 6 ++++++
+> > > >  1 file changed, 6 insertions(+)
+> > > >
+> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > > index 95816a938cea..ff0c331f53d6 100644
+> > > > --- a/net/bluetooth/hci_event.c
+> > > > +++ b/net/bluetooth/hci_event.c
+> > > > @@ -4684,6 +4684,12 @@ static void hci_link_key_notify_evt(struct h=
+ci_dev *hdev, void *data,
+> > > >         bool persistent;
+> > > >         u8 pin_len =3D 0;
+> > > >
+> > > > +       /* Ignore NULL link key against CVE-2020-26555 */
+> > > > +       if (!memcmp(ev->link_key, ZERO_KEY, HCI_LINK_KEY_SIZE)) {
+> > > > +               bt_dev_dbg(hdev, "Ignore NULL link key (ZERO KEY) f=
+or %pMR", &ev->bdaddr);
+> > > > +               return;
+> > > > +       }
+> > > > +
+> > > >         bt_dev_dbg(hdev, "");
+> > > >
+> > > >         hci_dev_lock(hdev);
+> > > > --
+> > > > 2.35.3
+> > > >
+> >
+> > Thanks a lot!
+> > Joey Lee
 >
-> diff --git a/net/bluetooth/amp.h b/net/bluetooth/amp.h
-> index 832764dfbfb3..97c87abd129f 100644
-> --- a/net/bluetooth/amp.h
-> +++ b/net/bluetooth/amp.h
-> @@ -28,7 +28,6 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, stru=
-ct amp_mgr *mgr,
 >
->  int phylink_gen_key(struct hci_conn *hcon, u8 *data, u8 *len, u8 *type);
 >
-> -void amp_read_loc_info(struct hci_dev *hdev, struct amp_mgr *mgr);
->  void amp_read_loc_assoc_frag(struct hci_dev *hdev, u8 phy_handle);
->  void amp_read_loc_assoc(struct hci_dev *hdev, struct amp_mgr *mgr);
->  void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
 > --
-> 2.34.1
->
+> Luiz Augusto von Dentz
+
 
 
 --=20
