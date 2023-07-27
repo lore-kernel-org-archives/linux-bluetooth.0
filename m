@@ -2,143 +2,133 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25852C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 21:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A91F4EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 21:35:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231922AbjG0VY2 (ORCPT
+        id S231744AbjG0Vfn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jul 2023 17:24:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48190 "EHLO
+        Thu, 27 Jul 2023 17:35:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232146AbjG0VYR (ORCPT
+        with ESMTP id S230509AbjG0Vfn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jul 2023 17:24:17 -0400
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5BE1B8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 14:23:52 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b97f34239cso21369681fa.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 14:23:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690493022; x=1691097822;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3v/h5cCsQrW4ln+fS02QRsQUzam6Cdj4Xv6G23fl90c=;
-        b=VLY5vwkX6Vx4h1L/IevhWw9T352QfvprylCpICLBviLzNJsz9Y5pUeyJVYbvLzLYg/
-         yYUqCdC3SIsyd03tEOh0x+xNCW4iCY4ed41h1E/vOayTaK/bUiTpYswPUJm6ZO+PetLO
-         WLf73SVAPBN4TTHBOj4T+Gi3Ia9XRwvBbrKhhWsnLlsGO9IPc1NBR55HtBTWb2JqRRK8
-         u+fCLHoEdig25rD8ik6KyymhpeB+T3wTVjfVItt97OGOoOIAunwRDvygrMmDb1NHiiHa
-         TjueUlI8VjlnXly0QR2vUR60I1lI2aV7xo8Nd9dyRINFegUgjXoB913Q6jwrXoAP7Ddk
-         q7bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690493022; x=1691097822;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3v/h5cCsQrW4ln+fS02QRsQUzam6Cdj4Xv6G23fl90c=;
-        b=kLZxlL7JVcHCud2I7FiuntKkeoKRBR+BtT/n4+IN0v4HbCUSBEiWgA56Q2AUeGFJYm
-         8HAxI2+mAzXmLC+Bm77KTtkhTlHOS87KJxt8EUfVy94b9r4h5RDSVatQrlWWkznJ2pxe
-         PNMvAcMg7WMmifTkR4zsv6RFjsMJnGdKcpV+u3hya85opS3UXX3EumOZrP9R7kjTlQbK
-         KdICFHesd+g4PdspyGn6JuqVngi/Qx21ScBLgjulTdR/oPvsTc1fA/nxkiMh3Vv+Shfh
-         kl7IEDE52hl7OfTts1JTVv+H7OVWs3VejkYDk/SmC5f3urZzRCMRW2x0szboDQKLzCm9
-         QTmA==
-X-Gm-Message-State: ABy/qLYj2mCbvtibrWLUKVRYGekLi0Btb4630GyLvUa+UC7l/MimK69L
-        YijgTgM9MOxCc3UyLRMdqabaQyeilwxAYWUTXzmBLQWrcWg=
-X-Google-Smtp-Source: APBJJlFvU7Z26g/E4zA1hk7fR8NzxdztJpAMDNyo91b0EAAMKuZNClZKDJxg9eJCa3oWu3zuuMWV0DGci9wBtnFGiaA=
-X-Received: by 2002:a2e:7013:0:b0:2b9:5b46:2107 with SMTP id
- l19-20020a2e7013000000b002b95b462107mr198648ljc.9.1690493021517; Thu, 27 Jul
- 2023 14:23:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1690399379.git.pav@iki.fi> <6d9672c9a1e97b87e823e05ff07576013683979d.1690399379.git.pav@iki.fi>
-In-Reply-To: <6d9672c9a1e97b87e823e05ff07576013683979d.1690399379.git.pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 27 Jul 2023 14:23:29 -0700
-Message-ID: <CABBYNZLfL0BFoctaCuxp8xwbhk9kWa=FRC7w1Gh7GnTURa1_jg@mail.gmail.com>
-Subject: Re: [PATCH RFC 5/6] Bluetooth: hci_sync: delete CIS in
- BT_OPEN/CONNECT/BOUND when aborting
-To:     Pauli Virtanen <pav@iki.fi>
+        Thu, 27 Jul 2023 17:35:43 -0400
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41717C3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 14:35:32 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout02.posteo.de (Postfix) with ESMTPS id B53ED240103
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jul 2023 23:35:29 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4RBkZn0Lb0z9rxR;
+        Thu, 27 Jul 2023 23:35:28 +0200 (CEST)
+Message-ID: <15a7a714e1f16a2b215accf451927378417c0929.camel@iki.fi>
+Subject: Re: [PATCH RFC 6/6] Bluetooth: ISO: handle bound CIS cleanup via
+ hci_conn
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org
+Date:   Thu, 27 Jul 2023 21:35:27 +0000
+In-Reply-To: <CABBYNZK-im2S7KnbBuP7Bq4V8yvJa-KZ5fZkW7zySepDY9DNTA@mail.gmail.com>
+References: <cover.1690399379.git.pav@iki.fi>
+         <f02203d5565bbe78c2406ca45a5a72336a1315ea.1690399379.git.pav@iki.fi>
+         <CABBYNZK-im2S7KnbBuP7Bq4V8yvJa-KZ5fZkW7zySepDY9DNTA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+Hi Luiz,
 
-On Wed, Jul 26, 2023 at 2:43=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Dropped CIS that are in state BT_OPEN/BT_BOUND, and in state BT_CONNECT
-> with HCI_CONN_CREATE_CIS unset, should be cleaned up immediately.
-> Closing CIS ISO sockets should result to the hci_conn be deleted, so
-> that potentially pending CIG removal can run.
->
-> hci_abort_conn cannot refer to them by handle, since their handle is
-> still unset if Set CIG Parameters has not yet completed.
->
-> This fixes CIS not being terminated if the socket is shut down
-> immediately after connection, so that the hci_abort_conn runs before Set
-> CIG Parameters completes. See new BlueZ test "ISO Connect Close - Success=
-"
->
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->  net/bluetooth/hci_sync.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 101548fe81da..3926213c29e6 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -5339,6 +5339,10 @@ static int hci_connect_cancel_sync(struct hci_dev =
-*hdev, struct hci_conn *conn,
->                 if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags))
->                         return hci_disconnect_sync(hdev, conn, reason);
->
-> +               /* CIS with no Create CIS sent have nothing to cancel */
-> +               if (bacmp(&conn->dst, BDADDR_ANY))
-> +                       return HCI_ERROR_LOCAL_HOST_TERM;
-> +
->                 /* There is no way to cancel a BIS without terminating th=
-e BIG
->                  * which is done later on connection cleanup.
->                  */
-> @@ -5426,9 +5430,17 @@ int hci_abort_conn_sync(struct hci_dev *hdev, stru=
-ct hci_conn *conn, u8 reason)
->         case BT_CONNECT2:
->                 return hci_reject_conn_sync(hdev, conn, reason);
->         case BT_OPEN:
-> -               /* Cleanup bises that failed to be established */
-> -               if (test_and_clear_bit(HCI_CONN_BIG_SYNC_FAILED, &conn->f=
-lags))
-> +               /* Cleanup failed CIS, and BIS that failed to be establis=
-hed */
-> +               if (bacmp(&conn->dst, BDADDR_ANY) ||
-> +                   test_and_clear_bit(HCI_CONN_BIG_SYNC_FAILED, &conn->f=
-lags))
+to, 2023-07-27 kello 14:14 -0700, Luiz Augusto von Dentz kirjoitti:
+> On Wed, Jul 26, 2023 at 2:37 PM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Calling hci_conn_del in __iso_sock_close is invalid. It needs
+> > hdev->lock, but it cannot be acquired there due to lock ordering.
+> > 
+> > Fix this by doing cleanup via hci_conn_drop.
+> > 
+> > Return hci_conn with refcount 1 from hci_bind_cis and hci_connect_cis,
+> > so that the iso_conn always holds one reference.  This also fixes
+> > refcounting when error handling.
+> > 
+> > Since hci_conn_abort shall handle termination of connections in any
+> > state properly, we can handle BT_CONNECT socket state in the same way as
+> > BT_CONNECTED.
+> > 
+> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > ---
+> >  net/bluetooth/hci_conn.c |  5 +++++
+> >  net/bluetooth/iso.c      | 14 +-------------
+> >  2 files changed, 6 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index ba339a0eb851..33fbdc8e0748 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -1901,6 +1901,8 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+> >                 return ERR_PTR(-EINVAL);
+> >         }
+> > 
+> > +       hci_conn_hold(cis);
+> > +
+> >         cis->iso_qos = *qos;
+> >         cis->state = BT_BOUND;
+> > 
+> > @@ -2254,6 +2256,9 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+> >                 return ERR_PTR(-ENOLINK);
+> >         }
+> > 
+> > +       /* Link takes the refcount */
+> > +       hci_conn_drop(cis);
+> > +
+> >         cis->state = BT_CONNECT;
+> > 
+> >         hci_le_create_cis_pending(hdev);
+> > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> > index cbe3299b4a41..358954bfbb32 100644
+> > --- a/net/bluetooth/iso.c
+> > +++ b/net/bluetooth/iso.c
+> > @@ -628,6 +628,7 @@ static void __iso_sock_close(struct sock *sk)
+> >                 iso_sock_cleanup_listen(sk);
+> >                 break;
+> > 
+> > +       case BT_CONNECT:
+> >         case BT_CONNECTED:
+> >         case BT_CONFIG:
+> >                 if (iso_pi(sk)->conn->hcon) {
+> > @@ -643,19 +644,6 @@ static void __iso_sock_close(struct sock *sk)
+> >                 break;
+> > 
+> >         case BT_CONNECT2:
+> > -               iso_chan_del(sk, ECONNRESET);
+> > -               break;
+> > -       case BT_CONNECT:
+> > -               /* In case of DEFER_SETUP the hcon would be bound to CIG which
+> > -                * needs to be removed so just call hci_conn_del so the cleanup
+> > -                * callback do what is needed.
+> > -                */
+> > -               if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
+> > -                   iso_pi(sk)->conn->hcon) {
+> > -                       hci_conn_del(iso_pi(sk)->conn->hcon);
+> > -                       iso_pi(sk)->conn->hcon = NULL;
+> > -               }
+> > -
+> >                 iso_chan_del(sk, ECONNRESET);
+> >                 break;
+> >         case BT_DISCONN:
+> > --
+> > 2.41.0
+> 
+> I guess this sort of fix can be sent separately which I guess helps
+> here since we can prioritize the ones that don't have side effects.
 
-bacmp(&conn->dst, BDADDR_ANY) will match connections other than
-ISO_LINK as well so I wonder if this is intentional? If it is then we
-need to update the commands to reflect that we are going to call
-hci_conn_failed, it seems we didn't call it before but perhaps this is
-a side effect of the other changes.
+Right, I can send these separately in the actual patch series.
 
-> +                       hci_conn_failed(conn, reason);
-> +               break;
-> +       case BT_BOUND:
-> +               /* Bound CIS should be cleaned up */
-> +               if (conn->type =3D=3D ISO_LINK && bacmp(&conn->dst, BDADD=
-R_ANY))
->                         hci_conn_failed(conn, reason);
-> +               else
-> +                       conn->state =3D BT_CLOSED;
->                 break;
->         default:
->                 conn->state =3D BT_CLOSED;
-> --
-> 2.41.0
->
+This one requires hci_conn_abort deletes conns with no handle yet
+though, otherwise it introduces failure to cleanup in a race condition.
 
-
---=20
-Luiz Augusto von Dentz
+-- 
+Pauli Virtanen
