@@ -2,117 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 191CFC001DC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 07:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E62BC00528
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jul 2023 07:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231792AbjG0Hy6 (ORCPT
+        id S232328AbjG0H6d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jul 2023 03:54:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60680 "EHLO
+        Thu, 27 Jul 2023 03:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230232AbjG0Hyh (ORCPT
+        with ESMTP id S233642AbjG0H5w (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jul 2023 03:54:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5BA5252;
-        Thu, 27 Jul 2023 00:50:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DB0F361D93;
-        Thu, 27 Jul 2023 07:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46FECC433C8;
-        Thu, 27 Jul 2023 07:50:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1690444222;
-        bh=lWGwY1QhsymOYMK/LuXKj9gYqKYIQIFk/HwFmgDO3HU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MHTKxkLl4FLueg27w9rlU6X20u/MmWpNKiN2jUxJU6n3ksprFcwkrsKnIuGUXHOhE
-         vsNJfq58fPH85c3exh34dqOFYKur2HzW1QJF1xg7a4hquL+OL2j8bEisYNe2azUPLf
-         tu2b9ZCwQF3Zjr+dKgKcetNENV8IOcBEVG7jgaXFDZBqWg2+M31+CWKj+st8bgorCS
-         Q7ucBgDfZpx76xNFgM66BpAIaYiOS77rwU7TGFQXxzskiZkJrGARxOqkvrxdlmw4fQ
-         J4oTZ8+G+ATubDqBsxyy+9OKC+jNWVzQQCongrFjAiRzbkxKDgI1LjSYVG8rwkbeuX
-         W/h/JmcWI9MLA==
-Received: from johan by xi.lan with local (Exim 4.96)
-        (envelope-from <johan@kernel.org>)
-        id 1qOvlf-00007v-1i;
-        Thu, 27 Jul 2023 09:50:40 +0200
-Date:   Thu, 27 Jul 2023 09:50:39 +0200
-From:   Johan Hovold <johan@kernel.org>
-To:     Tim Jiang <quic_tjiang@quicinc.com>
-Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
-        quic_hemantg@quicinc.com
-Subject: Re: [PATCH v13 1/2] Bluetooth: hci_qca: adjust qca btsoc type print
- expression
-Message-ID: <ZMIhz_ULbfwxZjZ8@hovoldconsulting.com>
-References: <20230727044011.965205-1-quic_tjiang@quicinc.com>
- <20230727044011.965205-2-quic_tjiang@quicinc.com>
- <ZMIcZqpN-CBgCFS8@hovoldconsulting.com>
- <11643479-3411-381e-4708-7259f6a15668@quicinc.com>
+        Thu, 27 Jul 2023 03:57:52 -0400
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 282443C3F;
+        Thu, 27 Jul 2023 00:55:08 -0700 (PDT)
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36R6wa6J012197;
+        Thu, 27 Jul 2023 07:55:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=wNI0rleG38u1p1JaTjkOzXrKMH0gmtg9EtYqPGh7CRU=;
+ b=exIVC8huDEZIxp+fq/elpwhB9teFLfBjyl0h1d5gQzkOlbBC9OXC/RF/xy2JtyMYpo6t
+ CXPFyKwGqpMSrFji2IwwT11V1J3xqo87WfCBc3j/KO/ao/4V5gcpdGZt5f1icTndqjmf
+ +yZ6yx72kg8dPRzjsHAnbHGZHvkg70Nh9XXdv6bt2nSG8S8o2qRctSRAPQrM2RwKd27r
+ 6+wJ9QF/jpcOW3oucyxLTWiaVSjjk51Of1WTG65/hc1ef5+KR0TR595qM5r2baj0pVE5
+ 3NX1ttt3lMLssSoCz4lX2MaTRGrC44mUUzD1ggC2KfDxxDJdceeH+r0a+R5abDnjrVa/ 5w== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s3krn83f5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 07:55:02 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36R7t1pW028870
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 27 Jul 2023 07:55:01 GMT
+Received: from [10.239.104.229] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Thu, 27 Jul
+ 2023 00:54:28 -0700
+Message-ID: <af383bea-f30d-f0fe-500f-c50904505293@quicinc.com>
+Date:   Thu, 27 Jul 2023 15:54:24 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <11643479-3411-381e-4708-7259f6a15668@quicinc.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v13 0/2] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA2066
+Content-Language: en-US
+To:     Johan Hovold <johan@kernel.org>
+CC:     <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
+        <johan.hedberg@gmail.com>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>
+References: <20230727044011.965205-1-quic_tjiang@quicinc.com>
+ <ZMIb6RWvhvtteRXE@hovoldconsulting.com>
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+In-Reply-To: <ZMIb6RWvhvtteRXE@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: CxYAEnMOvumcmZg_anTe4Cc7Y61w5DZg
+X-Proofpoint-GUID: CxYAEnMOvumcmZg_anTe4Cc7Y61w5DZg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-26_08,2023-07-26_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ adultscore=0 suspectscore=0 mlxlogscore=502 priorityscore=1501 bulkscore=0
+ phishscore=0 lowpriorityscore=0 malwarescore=0 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2306200000
+ definitions=main-2307270069
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 27, 2023 at 03:34:53PM +0800, Tim Jiang wrote:
-> On 7/27/23 15:27, Johan Hovold wrote:
-> > On Thu, Jul 27, 2023 at 12:40:10PM +0800, Tim Jiang wrote:
 
-> >> @@ -1762,10 +1763,32 @@ static int qca_setup(struct hci_uart *hu)
-> >>   	 */
-> >>   	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> >>   
-> >> -	bt_dev_info(hdev, "setting up %s",
-> >> -		qca_is_wcn399x(soc_type) ? "wcn399x" :
-> >> -		(soc_type == QCA_WCN6750) ? "wcn6750" :
-> >> -		(soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
-> >> +	switch (soc_type) {
-> >> +	case QCA_AR3002:
-> >> +		soc_name = "ar300x";
-> >> +		break;
-> >> +	case QCA_ROME:
-> >> +		soc_name = "ROME";
-> >> +		break;
-> >> +	case QCA_QCA6390:
-> >> +		soc_name = "QCA6390";
-> >> +		break;
-> >> +	case QCA_WCN3990:
-> >> +	case QCA_WCN3991:
-> >> +	case QCA_WCN3998:
-> >> +		soc_name = "wcn399x";
-> >> +		break;
-> >> +	case QCA_WCN6750:
-> >> +		soc_name = "wcn6750";
-> >> +		break;
-> >> +	case QCA_WCN6855:
-> >> +		soc_name = "wcn6855";
-> >> +		break;
-> > I still think the above should be sorted (alphabetically) as maintaining
-> > these lists otherwise soon becomes harder than it should be. And similar
-> > throughout the driver.
+On 7/27/23 15:25, Johan Hovold wrote:
+> On Thu, Jul 27, 2023 at 12:40:09PM +0800, Tim Jiang wrote:
+>> This series adds support for qualcomm bluetooth soc qca2066
+>>
+>> Changes in v13
+>>   - change the subject name for patch 1/2
+>>   - solve review comments for patch 2/2
+> Again, this is not specific enough and essentially only explains why you
+> changed something, but doesn't say what you changed.
+>
+> You also again ignored some of my review comments without even
+> explaining why.
 
-> [Tim] Hi Johan: I think we no need to sort it, we only add the new btsoc 
-> name following the older one, for example , ar300x is the oldest , ROME 
-> is new than ar300x, actually qca2066 is newer version chip than qca6390, 
-> so I does not think we need to sort it.
+[Tim] sorry for that , seems the email I explain why we do not need to 
+sort the btsoc name does not be sent out for network issue.
 
-Possibly, but generally this becomes hard to maintain and eventually
-someone will need to sort these entries anyway. Therefore it's generally
-a good idea to just do so from the start.
+as qc define btsoc name does not be sorted  alphabetilly, and we add new 
+chip name followed by old one , I think we only under this rule is OK,  
+do you agree?  thank you very much.
 
-But it was good that you replied so that we know that this comment was
-not just missed or ignored.
-
-> >> +	default:
-> >> +		soc_name = "unknown soc";
-> >> +		break;
-> >> +	}
-> >> +	bt_dev_info(hdev, "setting up %s", soc_name);
-
-Johan
+>
+> Seriously, you Qualcomm engineers really need to get your act together
+> and stop wasting other people's time.
+>
+> Johan
