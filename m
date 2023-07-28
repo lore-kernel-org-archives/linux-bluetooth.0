@@ -2,101 +2,68 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AE2C001E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jul 2023 12:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 708CAC0015E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jul 2023 13:37:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236620AbjG1MWa (ORCPT
+        id S236077AbjG1Nhf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jul 2023 08:22:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38570 "EHLO
+        Fri, 28 Jul 2023 09:37:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236413AbjG1MWL (ORCPT
+        with ESMTP id S235105AbjG1Nhe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jul 2023 08:22:11 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BAED49ED
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 05:20:02 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-63cfa3e564eso12377216d6.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 05:20:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690546790; x=1691151590;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gMuBuPwEDlsM0/nAvqTQpBcDmrE03AEfusqt68cL4Lg=;
-        b=nMc3a4g59c6z4WqTHW9dV4pioi7hqQMiZy+w9496CXsBbh7rjAuGt2M5nGRPR5nAQW
-         0YncNdBwKB/PWMMqN9OgUhvOxl1vaGZIrzzwW5B+b+VFIDpsXXutiYFXVeQG7vGhEAjR
-         gXsJT6WJk1g7CyhAQQpTVRjJbjMmWqjwpz2RaehhxAQF/bo8J5xh0IP1M8nqqbdzplRK
-         Zw0GPHHLlT1aMMykWj90CiIMW/gIxVXp27VmjSChn40neRYRpX66Ddg9tE3nASroktGU
-         2bjeCpRzt005xjbSJl5qqUVgmobpHdCfj98sSPvGiKX8+fVTAt7lacpBLK6494c4Q9n/
-         htmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690546790; x=1691151590;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gMuBuPwEDlsM0/nAvqTQpBcDmrE03AEfusqt68cL4Lg=;
-        b=CBy4miKUX28/7Ek6sSm1lp8i9YE+8/tRLOup5Rm5yJgDY1APwlV5WC21P/ZRYHBSdj
-         Ta+MVWAcM/xay93tXvWyyB9J5MgCQhTslQIH1ubz+PYYPYvnrxV6pUGG9BC36k0TM8xq
-         s/Uo3mv9p8R7x2GO+krPi/z6iX1ObF7bAy827DKq8bwWWZ3ysP/tF9K4DJFpfiw2IVlj
-         JxUqSeVVfOWeXkQICWt/9XEcP6l2RJATdSxjnS1hkrLysfCMNf6vD8P/E3nGFIjKzgoc
-         pLrdlydNnbMlAP5oK08P10dBFVKBQYjEpyj8Aw6orn3z4KzebuJqNBkkdK2/+Zk9OGKi
-         6HVw==
-X-Gm-Message-State: ABy/qLZELGWihZduYe/grN5GWgv69ooARgj8VtDnrorkyt7Svim+rMRK
-        xDHV5mBNeXzaQuG8zOeDHEtnylRC2M8=
-X-Google-Smtp-Source: APBJJlHGVxSuQzzzfUbHTIKla1/WtP5EVZ5NI4yDSQndO1MKnwfxTJF3zc9yxrMBOWzP+Q4W0KviXw==
-X-Received: by 2002:a0c:b406:0:b0:63c:fbd0:84a6 with SMTP id u6-20020a0cb406000000b0063cfbd084a6mr2459952qve.5.1690546789879;
-        Fri, 28 Jul 2023 05:19:49 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.255.0])
-        by smtp.gmail.com with ESMTPSA id m10-20020a0c9d0a000000b0062b76c29978sm1203933qvf.6.2023.07.28.05.19.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 05:19:49 -0700 (PDT)
-Message-ID: <64c3b265.0c0a0220.8ef23.4aaa@mx.google.com>
-Date:   Fri, 28 Jul 2023 05:19:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6738810955935200749=="
+        Fri, 28 Jul 2023 09:37:34 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E3444B4;
+        Fri, 28 Jul 2023 06:37:02 -0700 (PDT)
+Received: from canpemm500007.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4RC7rj4RMrzLnnm;
+        Fri, 28 Jul 2023 21:33:57 +0800 (CST)
+Received: from localhost (10.174.179.215) by canpemm500007.china.huawei.com
+ (7.192.104.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 28 Jul
+ 2023 21:36:34 +0800
+From:   Yue Haibing <yuehaibing@huawei.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <brian.gix@intel.com>
+CC:     <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] Bluetooth: Remove unused declaration hci_req_prepare_suspend()
+Date:   Fri, 28 Jul 2023 21:36:03 +0800
+Message-ID: <20230728133603.35112-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
-Subject: RE: [BlueZ] advertising: Fix peripheral adverts when Discoverable = false
-In-Reply-To: <20230728105604.948472-1-simon.mikuda@streamunlimited.com>
-References: <20230728105604.948472-1-simon.mikuda@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [10.174.179.215]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm500007.china.huawei.com (7.192.104.62)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6738810955935200749==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: YueHaibing <yuehaibing@huawei.com>
 
-This is automated email and please do not reply to this email!
+commit 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+left behind this.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=770527
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.53 seconds
-GitLint                       PASS      0.37 seconds
-BuildEll                      PASS      32.33 seconds
-BluezMake                     PASS      967.12 seconds
-MakeCheck                     PASS      13.52 seconds
-MakeDistcheck                 PASS      184.18 seconds
-CheckValgrind                 PASS      303.51 seconds
-CheckSmatch                   PASS      401.78 seconds
-bluezmakeextell               PASS      122.84 seconds
-IncrementalBuild              PASS      791.91 seconds
-ScanBuild                     PASS      1251.06 seconds
-
-
-
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_request.h | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index b9c5a9823837..0be75cf0efed 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -71,7 +71,5 @@ struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
+ void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn);
+ void hci_req_add_le_passive_scan(struct hci_request *req);
+ 
+-void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
+-
+ void hci_request_setup(struct hci_dev *hdev);
+ void hci_request_cancel_all(struct hci_dev *hdev);
+-- 
+2.34.1
 
---===============6738810955935200749==--
