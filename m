@@ -2,199 +2,99 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02714C001DE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jul 2023 08:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B07C00528
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jul 2023 08:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233482AbjG1Imw (ORCPT
+        id S233422AbjG1I4x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jul 2023 04:42:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41642 "EHLO
+        Fri, 28 Jul 2023 04:56:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233433AbjG1Imu (ORCPT
+        with ESMTP id S229949AbjG1I4f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jul 2023 04:42:50 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF5511B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 01:42:49 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id 5614622812f47-3a5ac8717c6so1498828b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 01:42:49 -0700 (PDT)
+        Fri, 28 Jul 2023 04:56:35 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30AB410EC
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 01:56:34 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-986d8332f50so258826866b.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 01:56:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690533768; x=1691138568;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8iztI3BVARUSwGaVHMFNL7pBtUyobm/fjAMIBrjY8i8=;
-        b=P6QcowyzWpXqwUwwbWN4TBtjKtUs+jo6n53LXXvAHjYVdvIkkViOwiwy/VyqRiUQDI
-         BC58+m/OHNvshns1ecpeMBHj4nfWVow8FrP8sG/oCn07mIbRK273tF7uBdJhJ0lio/nK
-         QvW8o6cSFdZleUlZ73e83paX+/W2ySTmgMOvBSeegQU1K8qAjXR08XNaJUMyfAAL5sgV
-         6gjYMtlc8RUtytnaV/1YFQhYisLbCof6DdsKqfic32h/Xb5JKsP3BptvDg1P2Wt878P4
-         3IKjVWqR38ieYVZM2DHKLeqyE5l7kWQ7YB5BO3dp5+Lw6i2ZN2qj51IEKxds9BzcJZqg
-         54DQ==
+        d=streamunlimited.com; s=google; t=1690534592; x=1691139392;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VaL2DgaNC+1z327qtfZ1KrQuYZxhQvPHWnqk5Q87V8k=;
+        b=hnOx51w5MpC+QnIOP4rvYl7zv9T4MydlAj7u9Hm0KSHXD/74DOvc1s99S/+0hG/W/5
+         z3qmRS43ge9Lz729QY/bhSmN4UON0jfga7e4cA494ngvlONGAv5iwrlMKMwMQSdhzfFA
+         vkBm8am9V6+Ny+eKy7q6sifHsjyFw4p04vHpA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690533768; x=1691138568;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1690534592; x=1691139392;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8iztI3BVARUSwGaVHMFNL7pBtUyobm/fjAMIBrjY8i8=;
-        b=b9cA1Y/3Ub72OnihLT/Eq8Lft+N4yAyjkfrPgjedoZHaFP5o45dn2xY4pJiIbYJ81J
-         r7JKFI+6sYjO49SHjIstSPeyKhIIEWn2wKXOhBVqcqwVKAu5QFqJRZvlcLImAXCzxAva
-         BmIJcVqOMDuxY1A4VrbRzrwzUqBznHUNgd/Zew+1iNxLwiaAwG2iNEiYSTKTlF47X7MY
-         1wi46bz3oHIjhcTC3ckaw8inqvEvYcBEAl63Z8txMeCZbvrI4u/aN2flFCjwwn4Gja8i
-         nmomrOh1cQLwB1OsPfevhY9KiT0HgkxikTXTtzekY/28yePnOrznysBnKLL7fWEGJXOq
-         0Hng==
-X-Gm-Message-State: ABy/qLa3a2vmTsTLdzcDls2rB9Xc8anVh6+q1UYsy1138GSQ3mz4jme/
-        fQPr+sqd/+eMEupHz2FN65m58o2BsJk=
-X-Google-Smtp-Source: APBJJlGstU9MZHH5CQdl9ExECtnHr701mDOixxU3rZUzJsoII0ea0UwZfrY1+iEWXMRwNnJgzC3T0Q==
-X-Received: by 2002:a05:6808:4044:b0:3a5:cc7d:3d66 with SMTP id cz4-20020a056808404400b003a5cc7d3d66mr1846407oib.49.1690533768270;
-        Fri, 28 Jul 2023 01:42:48 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.171.112])
-        by smtp.gmail.com with ESMTPSA id p14-20020a05680811ce00b003a37fd2be45sm1450464oiv.31.2023.07.28.01.42.47
+        bh=VaL2DgaNC+1z327qtfZ1KrQuYZxhQvPHWnqk5Q87V8k=;
+        b=WRmb9N5HX6FiHS+sg2VnfPAckW2HOYxCe11Me+i524Xv0WRSlH9r3nFMivZvhIFPjB
+         0Nka1weXdp5OZeaq1cVYoWqVtj/aQCJMujfRhYGfms1LlC1lYot0ElXIrKzUhfLlkdwJ
+         JTbFlIegPKDvUViVnXHax8OTkwVRbaDuxAMZNawuxQwIRyRgK/tIKanQ71ANRak1Wc2N
+         kMTEvxKYe4sJtXgWuumyABthbUkbJQ9sAdpOagmJjopVEeG3a1DXwehJs8y0Zt9jSWqV
+         mTD57OWkYbrai3D00gMTF7I9ZE7okQsa9AElEnmojMPQj+yUtwOFfuTxRdckQn4kpto7
+         EOBg==
+X-Gm-Message-State: ABy/qLaLa3InKHr74pN4rH2MHN03WOtd2+xw6h8fJf+04IvkLHl3CkJZ
+        q5qXNUvyR4z542JCR1iKWlHtB/L03R2GehYP+bI=
+X-Google-Smtp-Source: APBJJlFmf8LiSOBmoxihWI677nCvhtmMHzpqJT8uNyrxvNDY1AMRE2E+J4HBQInX9U7Fh9XJtxagSg==
+X-Received: by 2002:a17:906:d9:b0:997:eab5:f1c3 with SMTP id 25-20020a17090600d900b00997eab5f1c3mr1138410eji.73.1690534592358;
+        Fri, 28 Jul 2023 01:56:32 -0700 (PDT)
+Received: from smi-ubuntu.sueba ([2a01:390:0:101:353d:c2fa:e0df:3251])
+        by smtp.gmail.com with ESMTPSA id o12-20020a1709061b0c00b0097073f1ed84sm1828994ejg.4.2023.07.28.01.56.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jul 2023 01:42:48 -0700 (PDT)
-Message-ID: <64c37f88.050a0220.b079.8eee@mx.google.com>
-Date:   Fri, 28 Jul 2023 01:42:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3155602409425855690=="
+        Fri, 28 Jul 2023 01:56:31 -0700 (PDT)
+From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
+Subject: [PATCH BlueZ] advertising: Fix setting "BR/EDR not supported" flag
+Date:   Fri, 28 Jul 2023 10:56:27 +0200
+Message-Id: <20230728085627.683418-1-simon.mikuda@streamunlimited.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
-Subject: RE: Device pairing and discovery fixes
-In-Reply-To: <20230728053153.584222-2-simon.mikuda@streamunlimited.com>
-References: <20230728053153.584222-2-simon.mikuda@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3155602409425855690==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=770402
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.88 seconds
-GitLint                       PASS      1.55 seconds
-BuildEll                      PASS      33.07 seconds
-BluezMake                     PASS      1196.56 seconds
-MakeCheck                     PASS      12.58 seconds
-MakeDistcheck                 PASS      192.41 seconds
-CheckValgrind                 PASS      304.17 seconds
-CheckSmatch                   PASS      422.49 seconds
-bluezmakeextell               PASS      127.59 seconds
-IncrementalBuild              PASS      5054.50 seconds
-ScanBuild                     PASS      1352.14 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/5] device: Refactor device_discover_services function
-WARNING:LONG_LINE: line length of 86 exceeds 80 columns
-#136: FILE: src/device.c:5874:
-+						uint8_t bdaddr_type, DBusMessage *msg)
-
-WARNING:LONG_LINE: line length of 87 exceeds 80 columns
-#177: FILE: src/device.h:180:
-+						uint8_t bdaddr_type, DBusMessage *msg);
-
-/github/workspace/src/src/13331214.patch total: 0 errors, 2 warnings, 71 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13331214.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,3/5] device: Fix returning discovery error for Device.Pair
-WARNING:TYPO_SPELLING: 'successfull' may be misspelled - perhaps 'successful'?
-#80: 
-If discovery was requesed from pair request we will report successfull
-                                                           ^^^^^^^^^^^
-
-WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-#104: FILE: src/device.c:6355:
-+		err = device_discover_services(device, bdaddr_type, bonding->msg);
-
-WARNING:LONG_LINE: line length of 85 exceeds 80 columns
-#107: FILE: src/device.c:6358:
-+				g_dbus_emit_property_changed(dbus_conn, device->path,
-
-WARNING:LONG_LINE: line length of 86 exceeds 80 columns
-#112: FILE: src/device.c:6363:
-+			g_dbus_send_reply(dbus_conn, bonding->msg, DBUS_TYPE_INVALID);
-
-/github/workspace/src/src/13331216.patch total: 0 errors, 4 warnings, 25 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13331216.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,4/5] device: Fix pairing with dual mode devices
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#82: 
-even when we have connection to LE bearer only. In these situation we should
-
-/github/workspace/src/src/13331217.patch total: 0 errors, 1 warnings, 11 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13331217.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[BlueZ,5/5] device: Fix reverse service discovery handling for dual mode devices
-WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
-#185: FILE: src/device.c:2795:
-+	 * device->state.browse is set and "InProgress" error is returned instead
-
-WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
-#349: FILE: src/device.c:6406:
-+		 * timer */
-
-/github/workspace/src/src/13331218.patch total: 0 errors, 2 warnings, 268 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13331218.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+We need to check if adapter is connectable since remote device can connect
+to our device even when we are not discoverable according to advertised
+MAC address.
 ---
-Regards,
-Linux Bluetooth
+ src/advertising.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/src/advertising.c b/src/advertising.c
+index d959bf38f..b50900029 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -95,6 +95,8 @@ struct dbus_obj_match {
+ 	const char *path;
+ };
+ 
++static int get_adv_flags(struct btd_adv_client *client);
++
+ static bool match_client(const void *a, const void *b)
+ {
+ 	const struct btd_adv_client *client = a;
+@@ -736,11 +738,11 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
+ 	if (!btd_adapter_get_bredr(client->manager->adapter))
+ 		flags |= BT_AD_FLAG_NO_BREDR;
+ 
+-	/* Set BR/EDR Not Supported if adapter is not discoverable but the
++	/* Set BR/EDR Not Supported if adapter is not connectable but the
+ 	 * instance is.
+ 	 */
+-	if ((flags & (BT_AD_FLAG_GENERAL | BT_AD_FLAG_LIMITED)) &&
+-			!btd_adapter_get_discoverable(client->manager->adapter))
++	if ((get_adv_flags(client) & MGMT_ADV_FLAG_CONNECTABLE) &&
++			!btd_adapter_get_connectable(client->manager->adapter))
+ 		flags |= BT_AD_FLAG_NO_BREDR;
+ 
+ 	if (!bt_ad_add_flags(client->data, &flags, 1))
+-- 
+2.34.1
 
---===============3155602409425855690==--
