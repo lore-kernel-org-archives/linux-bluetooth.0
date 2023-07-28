@@ -2,163 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D365C001E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jul 2023 10:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A5E1C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jul 2023 10:26:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233621AbjG1KHj convert rfc822-to-8bit (ORCPT
+        id S230398AbjG1K0q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jul 2023 06:07:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41870 "EHLO
+        Fri, 28 Jul 2023 06:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234190AbjG1KHg (ORCPT
+        with ESMTP id S235888AbjG1K0P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jul 2023 06:07:36 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FBE330F5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 03:07:32 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 13DE5240028
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 12:07:30 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4RC3GT4jtJz9rxK;
-        Fri, 28 Jul 2023 12:07:29 +0200 (CEST)
-Message-ID: <fcffb650464c260f7f23d168f25783d7650d6f2a.camel@iki.fi>
-Subject: Re: [PATCH RFC 6/6] Bluetooth: ISO: handle bound CIS cleanup via
- hci_conn
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Fri, 28 Jul 2023 10:07:28 +0000
-In-Reply-To: <CABBYNZ+9-dxfumDqnQyx7Rd3dUsNiKk-jVsxAkgdgN=xjNF4Rw@mail.gmail.com>
-References: <cover.1690399379.git.pav@iki.fi>
-         <f02203d5565bbe78c2406ca45a5a72336a1315ea.1690399379.git.pav@iki.fi>
-         <CABBYNZK-im2S7KnbBuP7Bq4V8yvJa-KZ5fZkW7zySepDY9DNTA@mail.gmail.com>
-         <15a7a714e1f16a2b215accf451927378417c0929.camel@iki.fi>
-         <CABBYNZ+9-dxfumDqnQyx7Rd3dUsNiKk-jVsxAkgdgN=xjNF4Rw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Fri, 28 Jul 2023 06:26:15 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9B6C4C08
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 03:25:36 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6b9defb366eso1672229a34.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 03:25:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690539935; x=1691144735;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZSJuDkW2bX3XuG5xMgt8wmSdFOa4VtfSTamHBbEURvQ=;
+        b=rON7RUXzgB2ILFNEIJH3ACgyFHD7RojUTeQ19NcJAS0eVKRCXCOauua3iqkSjvGoCq
+         HZYPXxuqTc4hjMQP++0lc7P97hw1bPuoAtu0jARSdg8rXqHXyyYYWiWVSnhbNO7+bPeX
+         5ZWdtMwRbVPmUfX0OuSzXtPRzmbXS1yLR80XlHIwQtKUzk516BCzzcgLbe2jRBKv3yJf
+         vAz6EIoLcD+/85JLSZgNQKLZo6ZtzcbwB9Z/v0CKwPTum4DdZZ+ygpe3VvIALtrWgNe0
+         lVcvYzEyzzRK0ujM7dJndx+XmWpLP7O+V/LSs5Do2FelZ3m6XTtZscIehKq3OvYYpBo8
+         OgDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690539935; x=1691144735;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZSJuDkW2bX3XuG5xMgt8wmSdFOa4VtfSTamHBbEURvQ=;
+        b=kuaHYBs1eeB+mBXlZ/OnnLhmbLJDZc8FeTyzQunpMIcHtrg2sTHZIYNRSNYfg0ygIp
+         wpBsLsrnenMitSzclUD8Vxnwudy3OcwouelxdU64QFz7VMv5wDCWPm1FiZ9LBiZYlL9/
+         lOtBw+k6nZONmpFdl8ONcpJakDvZLtHJ/6Dno70Zt+OR23dMtCh74Yo2RyuiWbD2Y6iO
+         K7bHmylddY4bgr8T85v7RBMrIJfYC1+PRXZx4qrMPIs/Uc1dwrpegeIIrl+pR+6YBrVl
+         jGhFTHfvLgP8wU29Xd8448kn5xZFI77VR4d3gSy+UgAY3khHBqn2i08mF8jMhmPxnSGZ
+         EATA==
+X-Gm-Message-State: ABy/qLbMeN2EGMbPM0AusN1+JJV3yRMIGmPAQGsXq1jGDuTgihn6mn4B
+        jZA5/9NIZr5CX+JMDpj5xqK8xAS6saI=
+X-Google-Smtp-Source: APBJJlFov7CARE7gtwoA7rV4zAOXYvXwbn0fuDwO90W0UW04fDmhImpGQBhxdtpmwSBgzIDvtHh9dg==
+X-Received: by 2002:a9d:5e90:0:b0:6b5:920c:649c with SMTP id f16-20020a9d5e90000000b006b5920c649cmr2206900otl.29.1690539935383;
+        Fri, 28 Jul 2023 03:25:35 -0700 (PDT)
+Received: from [172.17.0.2] ([104.210.138.133])
+        by smtp.gmail.com with ESMTPSA id l6-20020a0568301d6600b006b87f593877sm234446oti.37.2023.07.28.03.25.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jul 2023 03:25:34 -0700 (PDT)
+Message-ID: <64c3979e.050a0220.f2965.0cb3@mx.google.com>
+Date:   Fri, 28 Jul 2023 03:25:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7138538921940473583=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
+Subject: RE: [BlueZ] advertising: Fix peripheral adverts when Discoverable = false
+In-Reply-To: <20230728085713.683655-1-simon.mikuda@streamunlimited.com>
+References: <20230728085713.683655-1-simon.mikuda@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============7138538921940473583==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-to, 2023-07-27 kello 17:27 -0700, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
-> 
-> On Thu, Jul 27, 2023 at 2:35 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > 
-> > Hi Luiz,
-> > 
-> > to, 2023-07-27 kello 14:14 -0700, Luiz Augusto von Dentz kirjoitti:
-> > > On Wed, Jul 26, 2023 at 2:37 PM Pauli Virtanen <pav@iki.fi> wrote:
-> > > > 
-> > > > Calling hci_conn_del in __iso_sock_close is invalid. It needs
-> > > > hdev->lock, but it cannot be acquired there due to lock ordering.
-> > > > 
-> > > > Fix this by doing cleanup via hci_conn_drop.
-> > > > 
-> > > > Return hci_conn with refcount 1 from hci_bind_cis and hci_connect_cis,
-> > > > so that the iso_conn always holds one reference.  This also fixes
-> > > > refcounting when error handling.
-> > > > 
-> > > > Since hci_conn_abort shall handle termination of connections in any
-> > > > state properly, we can handle BT_CONNECT socket state in the same way as
-> > > > BT_CONNECTED.
-> > > > 
-> > > > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > > > ---
-> > > >  net/bluetooth/hci_conn.c |  5 +++++
-> > > >  net/bluetooth/iso.c      | 14 +-------------
-> > > >  2 files changed, 6 insertions(+), 13 deletions(-)
-> > > > 
-> > > > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > > > index ba339a0eb851..33fbdc8e0748 100644
-> > > > --- a/net/bluetooth/hci_conn.c
-> > > > +++ b/net/bluetooth/hci_conn.c
-> > > > @@ -1901,6 +1901,8 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
-> > > >                 return ERR_PTR(-EINVAL);
-> > > >         }
-> > > > 
-> > > > +       hci_conn_hold(cis);
-> > > > +
-> > > >         cis->iso_qos = *qos;
-> > > >         cis->state = BT_BOUND;
-> > > > 
-> > > > @@ -2254,6 +2256,9 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
-> > > >                 return ERR_PTR(-ENOLINK);
-> > > >         }
-> > > > 
-> > > > +       /* Link takes the refcount */
-> > > > +       hci_conn_drop(cis);
-> > > > +
-> > > >         cis->state = BT_CONNECT;
-> > > > 
-> > > >         hci_le_create_cis_pending(hdev);
-> > > > diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> > > > index cbe3299b4a41..358954bfbb32 100644
-> > > > --- a/net/bluetooth/iso.c
-> > > > +++ b/net/bluetooth/iso.c
-> > > > @@ -628,6 +628,7 @@ static void __iso_sock_close(struct sock *sk)
-> > > >                 iso_sock_cleanup_listen(sk);
-> > > >                 break;
-> > > > 
-> > > > +       case BT_CONNECT:
-> > > >         case BT_CONNECTED:
-> > > >         case BT_CONFIG:
-> > > >                 if (iso_pi(sk)->conn->hcon) {
-> > > > @@ -643,19 +644,6 @@ static void __iso_sock_close(struct sock *sk)
-> > > >                 break;
-> > > > 
-> > > >         case BT_CONNECT2:
-> > > > -               iso_chan_del(sk, ECONNRESET);
-> > > > -               break;
-> > > > -       case BT_CONNECT:
-> > > > -               /* In case of DEFER_SETUP the hcon would be bound to CIG which
-> > > > -                * needs to be removed so just call hci_conn_del so the cleanup
-> > > > -                * callback do what is needed.
-> > > > -                */
-> > > > -               if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
-> > > > -                   iso_pi(sk)->conn->hcon) {
-> > > > -                       hci_conn_del(iso_pi(sk)->conn->hcon);
-> > > > -                       iso_pi(sk)->conn->hcon = NULL;
-> > > > -               }
-> > > > -
-> > > >                 iso_chan_del(sk, ECONNRESET);
-> > > >                 break;
-> > > >         case BT_DISCONN:
-> > > > --
-> > > > 2.41.0
-> > > 
-> > > I guess this sort of fix can be sent separately which I guess helps
-> > > here since we can prioritize the ones that don't have side effects.
-> > 
-> > Right, I can send these separately in the actual patch series.
-> > 
-> > This one requires hci_conn_abort deletes conns with no handle yet
-> > though, otherwise it introduces failure to cleanup in a race condition.
-> 
-> I thought we need to lookup by handle to avoid races as well, or are
-> you doing that because the handle could be updated in the meantime?
-> Perhaps we could store the temporary handles in case the connection
-> handles get updated then it can still be looked up by its temporary
-> handle, either that or we disregard updates to handle when they're in
-> the process of being aborted.
+This is automated email and please do not reply to this email!
 
-Would it be simpler to hold hci_conn_get, and then in the hci_sync
-callback check if the conn is still in conn_hash? The purpose of the
-HCI_CONN_DELETED flag in the series is to make this check easy.
+Dear submitter,
 
-Also, I don't think just the handle thing protects you from races, as
-noted in the cover letter. AFAIK, hci_sync.c callbacks and hci_event.c
-processing can run at the same time on different CPU (since they run
-from different workqueues), so you have to lock.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=770478
 
-Moreover, handle lookup might pick up different connection than
-intended if a handle was reused. hci_abort_conn_sync might run quite a
-bit after hci_abort_conn queues it and there might be stuff like
-another abort and Set CIG Parametrers in the queue...
+---Test result---
 
--- 
-Pauli Virtanen
+Test Summary:
+CheckPatch                    PASS      0.44 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      35.46 seconds
+BluezMake                     PASS      1077.40 seconds
+MakeCheck                     PASS      12.44 seconds
+MakeDistcheck                 PASS      183.39 seconds
+CheckValgrind                 PASS      296.96 seconds
+CheckSmatch                   PASS      407.05 seconds
+bluezmakeextell               PASS      121.52 seconds
+IncrementalBuild              PASS      958.51 seconds
+ScanBuild                     PASS      1241.02 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7138538921940473583==--
