@@ -2,94 +2,104 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C75C001DC
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Jul 2023 04:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1934FC0015E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Jul 2023 19:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233590AbjG2Emz (ORCPT
+        id S229812AbjG2TJy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Jul 2023 00:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57156 "EHLO
+        Sat, 29 Jul 2023 15:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbjG2Emx (ORCPT
+        with ESMTP id S229530AbjG2TJx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Jul 2023 00:42:53 -0400
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2566A1984
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jul 2023 21:42:52 -0700 (PDT)
-Received: from [192.168.0.185] (ip5f5ae835.dynamic.kabel-deutschland.de [95.90.232.53])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5996B61E5FE01;
-        Sat, 29 Jul 2023 06:42:44 +0200 (CEST)
-Message-ID: <907983cc-4175-1130-cb1c-ca42baa40dfa@molgen.mpg.de>
-Date:   Sat, 29 Jul 2023 06:42:43 +0200
+        Sat, 29 Jul 2023 15:09:53 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C84730FA
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jul 2023 12:09:51 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9b9f0387dso48576991fa.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jul 2023 12:09:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20221208.gappssmtp.com; s=20221208; t=1690657789; x=1691262589;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h2f9G3S3gQHFDX8koiPrvowoAowEL/8UCFombGPSuuI=;
+        b=0dIY32HqiixFcLZrUI3TM0WepE+WjqZlBAej5bPAIAivIqYs/qP4uSccl44H1SKgZU
+         jnUHqz+GwsKqB5Q7DziqvMgpBvLCjEeHDspST6UpnRWp7Q6SCrjrFzoOY5IUbpIKP8/4
+         /k8imn5cojETRbc7ggai7JWWBzyA5PsycEOWhCmtiYi7Bz32ZcqA/cNBWeq+JYhJkrC8
+         l61FuBMfFm7XNtvWMyXgimIfL+ew56IP+nX/0Vp4nVS10usGmvDywjUet68/JRIasz1c
+         v/DbGX14h7/JT5kQJv6/aU1JyxCMGSavlZk3SDPIz2iq7eiGfofi6k30MTtvraMn9aLx
+         FdMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690657789; x=1691262589;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h2f9G3S3gQHFDX8koiPrvowoAowEL/8UCFombGPSuuI=;
+        b=kEPYl6TojfHVt1tlR2q6xEj5/eBPH5Jv6xbBdaSP/6/9UV0WANClJJn0LDD4xww0FR
+         qzBAkBQPw0PsSq/Dp58SX8kCTzRBV0lV1Ajiho987fV69Dpa8Eo/WsopWUSI2WghMDEN
+         yrGxIc0PKY0TZU5ELyZXwwkQtzckk8Vd2BTzxEPyuXcIcIYbcDLtgHkZNQMkET4ExJdY
+         Wu8PKyo8HKUIRrah8LQzJbAAZ2BfL+tNjWqMqah4IPGDyHkkqd+KN6YoPvcfT8ba/mXu
+         LUVSfNYd1emiC43G8DPCnE7hpbnLYlNfLBBdJexa+6s1rj4YwXvyoFyeVOLUh+10hDLq
+         gTpw==
+X-Gm-Message-State: ABy/qLaC2CCOeqi/HtGX3Ucmkf0iGreWLCXxkhAj2Ni/QvDAkhM40r4P
+        lIh4oIlJD2sd+gfegFZWtv/wmsoMl8LEGDAsRCg=
+X-Google-Smtp-Source: APBJJlGWNBlNE6b9grgsAIPaBd5WKOpPWVTl8xGXNp7dPcCjnmAsMpsnS9O94xmbxw6X05CaW01izA==
+X-Received: by 2002:a2e:90c8:0:b0:2b7:7ab:3c60 with SMTP id o8-20020a2e90c8000000b002b707ab3c60mr4440642ljg.32.1690657789438;
+        Sat, 29 Jul 2023 12:09:49 -0700 (PDT)
+Received: from localhost.localdomain (217.96.255.138.ipv4.supernova.orange.pl. [217.96.255.138])
+        by smtp.gmail.com with ESMTPSA id l14-20020a2e3e0e000000b002b6e13fcedcsm1663531lja.122.2023.07.29.12.09.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Jul 2023 12:09:49 -0700 (PDT)
+From:   =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
+        <lukasz.rymanowski@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     =?UTF-8?q?=C5=81ukasz=20Rymanowski?= 
+        <lukasz.rymanowski@codecoup.pl>
+Subject: [PATCH BlueZ v2 5/5] monitor: Add parsing Service Data of UUID 128
+Date:   Sat, 29 Jul 2023 21:09:45 +0200
+Message-Id: <20230729190945.1427101-1-lukasz.rymanowski@codecoup.pl>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH BlueZ 5/5] monitor: Add parsing Service Data of UUID 128
-To:     =?UTF-8?Q?=c5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
-References: <20230729004552.1422547-1-lukasz.rymanowski@codecoup.pl>
- <20230729004552.1422547-6-lukasz.rymanowski@codecoup.pl>
-Content-Language: en-US
-Cc:     linux-bluetooth@vger.kernel.org
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20230729004552.1422547-6-lukasz.rymanowski@codecoup.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Łukasz,
+In the advertising report, instead of parsing EIR 0x21 like this:
 
+	Unknown EIR field 0x21: 3a048f2ba97ea6ae1b49c619e973a4a701480d130d
 
-Thank you for your patch.
+We can do bit better
 
-Am 29.07.23 um 02:45 schrieb Łukasz Rymanowski:
-> In the advertising report, instead of deciding EIR 0x21 into this:
+        Service Data UUID 128: Vendor specific
+          Data: 01480d130d
+---
+ monitor/packet.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Do you mean deciphering?
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 3031b028f..21e08ccef 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3997,6 +3997,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
+ 			print_service_data(data, data_len);
+ 			break;
+ 
++		case BT_EIR_SERVICE_DATA128:
++			if (data_len <= 16)
++				break;
++
++			print_field("Service Data UUID 128: %s ",
++						bt_uuid128_to_str(&data[0]));
++
++			if (data_len > 16)
++				print_hex_field("  Data", &data[16],
++								data_len - 16);
++
++			break;
+ 		case BT_EIR_RANDOM_ADDRESS:
+ 			if (data_len < 6)
+ 				break;
+-- 
+2.34.1
 
-> 
-> 	Unknown EIR field 0x21: 3a048f2ba97ea6ae1b49c619e973a4a701480d130d
-> 
-> We can do bit better
-> 
->          Service Data UUID 128: Vendor specific
->            Data: 01480d130d
-> ---
->   monitor/packet.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index 3031b028f..21e08ccef 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -3997,6 +3997,18 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
->   			print_service_data(data, data_len);
->   			break;
->   
-> +		case BT_EIR_SERVICE_DATA128:
-> +			if (data_len <= 16)
-> +				break;
-> +
-> +			print_field("Service Data UUID 128: %s ",
-> +						bt_uuid128_to_str(&data[0]));
-> +
-> +			if (data_len > 16)
-> +				print_hex_field("  Data", &data[16],
-> +								data_len - 16);
-> +
-> +			break;
->   		case BT_EIR_RANDOM_ADDRESS:
->   			if (data_len < 6)
->   				break;
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
