@@ -2,120 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA40BC001DC
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jul 2023 09:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A59AC04A94
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jul 2023 09:18:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229948AbjGaJEM (ORCPT
+        id S232072AbjGaJSK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Jul 2023 05:04:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34194 "EHLO
+        Mon, 31 Jul 2023 05:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231650AbjGaJD4 (ORCPT
+        with ESMTP id S232228AbjGaJRz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Jul 2023 05:03:56 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5749219B7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 02:02:57 -0700 (PDT)
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36V7fK9q018837;
-        Mon, 31 Jul 2023 09:02:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=b1a4U7ribxZDV2vAgEWAcD6ZMOJ13y0Kdpa0T/ZbxU8=;
- b=YezEgs7BbJBX4+ypvL40rh3vQRffWeAFZr0tOifNaBK2YEKwjdBltmO6gsRwdQjWG78b
- Mmdw1Q6CilROdD/D2NbZCn2K2hJUyC0TEaysA/XAABTtaz0ijEaxOMKWDTHtRWYGq8L0
- B1x9gtIKl0NGzE1CQNHTs/rVAbWcf9KkGXVncYeUAjL5OKbnkJRq4NiQNX7pQNV8KrrS
- YQAlH1Ac6EC3GF0lpjVX4dbwNHzvyrcaja465DM9IFM/bJV0THVGjnz9KGxySAgFpwNe
- smDG1N/RfyOpaaRgkzBPfN4xu+jowAbTyY7hAXsg5/A5ufFsru6XGbH7gilKNdGQtXPe 1Q== 
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s4ug232xj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Jul 2023 09:02:04 +0000
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-        by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 36V923m1011519
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 31 Jul 2023 09:02:03 GMT
-Received: from [10.253.13.173] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Mon, 31 Jul
- 2023 02:02:01 -0700
-Message-ID: <b2151d37-b108-7edf-e9d9-870fbde4553c@quicinc.com>
-Date:   Mon, 31 Jul 2023 16:58:24 +0800
+        Mon, 31 Jul 2023 05:17:55 -0400
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0666E1B7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 02:16:55 -0700 (PDT)
+Received: by mail-io1-xd2d.google.com with SMTP id ca18e2360f4ac-78374596182so207843339f.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 02:16:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690795015; x=1691399815;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=bXD8cpI9yhBkM3xFtblY5iqLCgSqtNZXN6UReUiZ2Jw=;
+        b=n8QxKDg5pL5M7E6wAl98doVQTJPhQolroHrwUrpc33NiS3CsF8yi7YK2WDoOLY6sF3
+         Bz83c6TXjytw0cdf8bjC1/GaZ4mwR45ODcgtl5UWiWtIf8B1pZHReYRSFO6XwFiQe1Af
+         zJkkmZGiphGEIHPm5d3Dk+Q4bkDu8G6pW1PhbRgh2rYkjp6rLY7MYDRY6CyyAsKLRf8U
+         YuhBIhUMucZ4dpcR68kUzyruU3xMB7sRiNTPVRVJUWgYLViUnKiR0alw6Y3Ca/LaHn3r
+         Rq9tmA7q7YATIW4UHlP95pVE+yIptJfnGCwFntSoEAWPetLnFQwhcQ9BWFPdZ1yoVasX
+         9qww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690795015; x=1691399815;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bXD8cpI9yhBkM3xFtblY5iqLCgSqtNZXN6UReUiZ2Jw=;
+        b=Cxdv66W9QPxZpCmsYbyICBWoSIubp8u24/yWmyzyIm8gCdAAvyfsKdkGXDl7gdJm/U
+         J+2Mwh+ZDh4DN3N6YQ573pPXiu/OMtFkAD0yWTtYB6HEs76bGdLJi99zgC0/EFQv1UHp
+         IYsfIzi1ezZK5YjDYhL4jNyqqu/3tV6kS5xqdaSWEmBF/COzfh7LT64FLTt26h8+uNoO
+         bsTaFlX3q9JRtYi1WKUVHz/4V14m8rohNBtz7a2hPTHI+TAk7pRGkyunEehLHjaV2Uyt
+         xT0/HcxzIcFrZgXaxubt5JDFY4SzyAkjXhGnV8CKKEQ+LJHq5jwFoJ9ykR0dhwY0fmiz
+         m0dw==
+X-Gm-Message-State: ABy/qLa4Z1bMc6p9sO/ZiOX2PBcMoa7lB0HyHfWCasc4f57WwyWHLeo2
+        e/QuFwGiZbR9TLCx/c/R+oRK0vT1ad0=
+X-Google-Smtp-Source: APBJJlHZ0E8qlqhP1srBti+uP/Rfef7ggKE9rGDffrez7Yy2gO5nIvtN5NveIWUmA7jWolLDSD3/Yw==
+X-Received: by 2002:a5e:920a:0:b0:785:d28f:1526 with SMTP id y10-20020a5e920a000000b00785d28f1526mr8568930iop.3.1690795015118;
+        Mon, 31 Jul 2023 02:16:55 -0700 (PDT)
+Received: from [172.17.0.2] ([40.86.27.96])
+        by smtp.gmail.com with ESMTPSA id d20-20020a5d9bd4000000b00790af7745b1sm202673ion.20.2023.07.31.02.16.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Jul 2023 02:16:54 -0700 (PDT)
+Message-ID: <64c77c06.5d0a0220.89f98.02b5@mx.google.com>
+Date:   Mon, 31 Jul 2023 02:16:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3268434092134533554=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v1] main: Fix a logical error within parse_config_int()
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-CC:     <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v1] main: Fix a logical error within parse_config_int()
+In-Reply-To: <1690789604-3576-1-git-send-email-quic_zijuhu@quicinc.com>
 References: <1690789604-3576-1-git-send-email-quic_zijuhu@quicinc.com>
- <698aa5d3-3261-c9d9-d754-d36ae9716eb4@molgen.mpg.de>
-Content-Language: en-US
-From:   quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <698aa5d3-3261-c9d9-d754-d36ae9716eb4@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 4hgQSIKmAGBRgB7j1KCVmZE8jBV5Ew3w
-X-Proofpoint-ORIG-GUID: 4hgQSIKmAGBRgB7j1KCVmZE8jBV5Ew3w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-31_02,2023-07-26_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- priorityscore=1501 malwarescore=0 impostorscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 clxscore=1011 mlxscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2307310081
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 7/31/2023 4:48 PM, Paul Menzel wrote:
-> Dear Zijun,
-> 
-> 
-> Am 31.07.23 um 09:46 schrieb Zijun Hu:
->> Fix a logical error within parse_config_int().
-> 
-> Thank you for spotting and fixing this. I guess this warning was printed on the terminal?
-no any warnings by following Compilation steps of README.
-> 
-> Although obvious, instead of duplicating the commit message summary in the body, it would be great, if you still wrote a more elaborate commit message. Maybe:
-> 
-> Having a config file with the line below
-> 
->     …
-> 
-> causes the config file to be ignored, and the warning below:
-> 
->     …
->
-the error is very simple, so i don't write more to explain it.
->> ---
->>   src/main.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/src/main.c b/src/main.c
->> index 150a5af4cca4..13501440b052 100644
->> --- a/src/main.c
->> +++ b/src/main.c
->> @@ -458,7 +458,7 @@ static bool parse_config_int(GKeyFile *config, const char *group,
->>           return false;
->>       }
->>   -    if (tmp < max) {
->> +    if (tmp > max) {
->>           warn("%s.%s = %d is out of range (> %d)", group, key, tmp, max);
->>           return false;
->>       }
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> 
-> Kind regards,
-> 
-> Paul
+--===============3268434092134533554==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=771058
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.41 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      26.97 seconds
+BluezMake                     PASS      819.40 seconds
+MakeCheck                     PASS      11.22 seconds
+MakeDistcheck                 PASS      158.87 seconds
+CheckValgrind                 PASS      253.18 seconds
+CheckSmatch                   PASS      343.26 seconds
+bluezmakeextell               PASS      103.67 seconds
+IncrementalBuild              PASS      679.27 seconds
+ScanBuild                     PASS      1095.06 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3268434092134533554==--
