@@ -2,101 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C904C001DE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jul 2023 10:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7865C001DE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jul 2023 17:50:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229763AbjGaKqT (ORCPT
+        id S230310AbjGaRu1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Jul 2023 06:46:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37586 "EHLO
+        Mon, 31 Jul 2023 13:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjGaKqS (ORCPT
+        with ESMTP id S229980AbjGaRu0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Jul 2023 06:46:18 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EBEB1A7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 03:46:18 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-686b879f605so2810148b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 03:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690800377; x=1691405177;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qqxV0tqjBQs9609OSuCPEzgsJEE6dwVjdH6r/bcvGWE=;
-        b=KkARoV9vUDMQ5s3m8cDC7iUdWF3PHPhxokiV775qWJXt94kGA5o+NXVzmYtF6mpWzD
-         obqKdwEdoy+Y0TQYYiIWDglCxvuXLbk3/zSCmec5ro3tXXAxfiGWqAJYWLu3DfKDpnF9
-         6nwCCp6/1ZKnJswzT1X/7+c0tkrr+PtzDB4xCVbiOCnm4YbU7QnC2JsjH7AdovFE9k3T
-         PNdibfvkAeI/sbhjQKmt5vY8Z3a2C9cpWk+qeNo4OId7afkpm99CXHu+A+yvQTyF8RoG
-         UuSHez9Vt7iNxIL5sfX2I7bklIC6LDpff+yOUg+KZNaCWTphNZGML4bLFx5hjFeXzJkj
-         /XcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690800377; x=1691405177;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qqxV0tqjBQs9609OSuCPEzgsJEE6dwVjdH6r/bcvGWE=;
-        b=jLWlBthpy0Xj8GugeAgYrRl033Lqf73g+ePFYzngVKhzr2RozwWlp40IK6PgjELns8
-         ZwiY+xwXSBHLcrJ/k5vYoa6ETzyLtMRG8FQ7mr4zbdGG4vtbj3X5IUnScgNJYgnOAD4o
-         DVAJXo29fRe8BB3HavKldM7Ylr+VTFUTlGGxiKNbCmIU3uMRuckg30cGRCEPiqaVkUIx
-         pJkIjn+lQtIM12pA6eod1wUR3eydNVwnMOw3WZvzl8e0zwDMyclxfiFuLGqVjC/IVcBz
-         /wlnYiyqV3gaWP0FmVaI6go6rtJCbUo2vEDTdCZRh3vGvyfkD9JGSG1Q+llLsgX3HKvp
-         LRJA==
-X-Gm-Message-State: ABy/qLb9pfBfqAwlcBZxEhCunVWfTK3mwMqHUd7Nf8SYrtWu+GIovVXh
-        MMdY46FVcwyhcyBfpihZcanm051Qim0=
-X-Google-Smtp-Source: APBJJlE/ADigPY3hi19WeTGwuee8dUpSpOLJl1X8A5RpckqVCPR0L2UjVe4B53bqRglR+5AXL0mzRA==
-X-Received: by 2002:a05:6a20:1615:b0:137:53d1:3e2 with SMTP id l21-20020a056a20161500b0013753d103e2mr10469114pzj.41.1690800377302;
-        Mon, 31 Jul 2023 03:46:17 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.100.245])
-        by smtp.gmail.com with ESMTPSA id n19-20020aa78a53000000b0064fde7ae1ffsm7353309pfa.38.2023.07.31.03.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 03:46:17 -0700 (PDT)
-Message-ID: <64c790f9.a70a0220.f25d7.cf54@mx.google.com>
-Date:   Mon, 31 Jul 2023 03:46:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0681918794439196849=="
+        Mon, 31 Jul 2023 13:50:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EFFCDC
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 10:50:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E0D866125E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 17:50:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F2F2C433C9;
+        Mon, 31 Jul 2023 17:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1690825824;
+        bh=76aVjxgJmxi5xjMjNbx0R2xRwNMqjyCrFd8NNj87J9g=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=TEnGpaa5bw8zJpww0HIClgtRnQH2ABqWEItT2Mjp91/b8esEpVOVCskRsMVGajN9C
+         6Pc77B980CoqOirc/uzsrzFHe66SUxg5pogVXyYJEN4aYL25bLPWgNrcWLrGCwf5ml
+         pA4ecIdcmSPnbH9+9Gg8p/qIjQpSQFkRijMnHCjbJ66bBgXLAPxV0fgVvpboWg10HI
+         YKKlAZjtebLAsD+gTDqIHtQlxGMcjE4UpqGT2/atufACEuCbsB5ZQHSAGWzY62dUPT
+         ROdFjo8JFdB+2pqCHZ8Hbqe3Mn0W2vIgzeWi185x9c2a8kCKNdnollW5Ez6QIcuxx3
+         sRMf12oMsvrhQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 36895E96AD8;
+        Mon, 31 Jul 2023 17:50:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [BlueZ,v2] main: Fix integer configuration option parse failures
-In-Reply-To: <1690795722-29873-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1690795722-29873-1-git-send-email-quic_zijuhu@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ PATCH v5 1/7] monitor: Use gnuplot to plot graph of
+ Latency-Packets
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169082582422.13999.16583862419911662723.git-patchwork-notify@kernel.org>
+Date:   Mon, 31 Jul 2023 17:50:24 +0000
+References: <20230728224247.102057-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230728224247.102057-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0681918794439196849==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri, 28 Jul 2023 15:42:41 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This make use of gnuplot when using -a/--analyze to plot a graph of
+> Latency-Packets:
+> 
+>   Found BR-ACL connection with handle 256
+>         Address: XX:XX:XX:XX:XX:XX (Sony Home Entertainment&Sound Products Inc)
+>         60 RX packets
+>         22548 TX packets
+>         22547 TX completed packets
+>         3 msec min latency
+>         73 msec max latency
+>         11 msec median latency
+>         6 octets TX min packet size
+>         850 octets TX max packet size
+>         847 octets TX median packet size
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=771110
+Here is the summary with links:
+  - [BlueZ,v5,1/7] monitor: Use gnuplot to plot graph of Latency-Packets
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ac04b56c41fe
+  - [BlueZ,v5,2/7] monitor: Update documentation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9a657dcec988
+  - [BlueZ,v5,3/7] monitor: Consolidate code around latency calculation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5d090ddc6aa6
+  - [BlueZ,v5,4/7] monitor: Fix not dequeing TX packet properly
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=77fb0ab5287c
+  - [BlueZ,v5,5/7] monitor: Fix not calculating latency for ISO/SCO packets
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f150939419d3
+  - [BlueZ,v5,6/7] monitor/analyze: Fix not dequeing TX packet properly
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b4cf0900d05c
+  - [BlueZ,v5,7/7] monitor/analyze: Fix not calculating latency for ISO/SCO packets
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=dce3971d227d
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.36 seconds
-GitLint                       PASS      0.26 seconds
-BuildEll                      PASS      32.64 seconds
-BluezMake                     PASS      972.40 seconds
-MakeCheck                     PASS      13.63 seconds
-MakeDistcheck                 PASS      187.41 seconds
-CheckValgrind                 PASS      311.54 seconds
-CheckSmatch                   PASS      411.05 seconds
-bluezmakeextell               PASS      123.87 seconds
-IncrementalBuild              PASS      797.78 seconds
-ScanBuild                     PASS      1256.69 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---===============0681918794439196849==--
