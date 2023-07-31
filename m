@@ -2,246 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1043C001E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jul 2023 20:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DADBC001DE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jul 2023 21:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbjGaUIu (ORCPT
+        id S230320AbjGaVji (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Jul 2023 16:08:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43540 "EHLO
+        Mon, 31 Jul 2023 17:39:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjGaUIt (ORCPT
+        with ESMTP id S229881AbjGaVjh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Jul 2023 16:08:49 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A7D710E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 13:08:48 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id e9e14a558f8ab-34916d419a3so3880075ab.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 13:08:48 -0700 (PDT)
+        Mon, 31 Jul 2023 17:39:37 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F317D8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 14:39:37 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-403b3213d8aso30404661cf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jul 2023 14:39:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690834127; x=1691438927;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAisdvmYOGIL7GH+7tWPlzo+7zINYpaH/xzNielVMYo=;
-        b=p7ZDNqMtpZ8NcYsHpaPOhe4Nz6F8d0vqlW3Nx4Skl6/6mms/KD+gG7uNMwYgiwZA1I
-         ZCxy5MnXLWzFiRWXlhL1m0DnN18tbukrBFoP+NZGdaNwaDgrYQEbByt5Z45oQ9pKeXSx
-         LDqZAU9W3Dvw1p/+J2zAzFnwmLzvAkk4q53o0aypCWSlZnrP4yIIE6uhUny+018ZlqbM
-         IgrlRXwEgIk5+ITDi2jvmQXvt4gLUAcMLlB1VPJqLB61tD5BCQZ0mcf8/R3lhqLegq3p
-         MWxIFbrCBdqJUtxY/Eutci1HeGuLfRBmL483xhCFvR6QSqPkW+P5BpBD6bqZ/RRhoV97
-         2/rg==
+        d=gmail.com; s=20221208; t=1690839576; x=1691444376;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=rYiFDZqutnQN5UfQ5iBONprN7KsHZewPRwPyGoDWKK4=;
+        b=A7MvlUog2T9durfS/2SopEvewAz64NAYg59v4uFoxesg1sG5ULlEi1IQuLXsp7d0/h
+         pAgEnnDdWoeM6xoRshyHxT4D4/VsstNacRb+Kjv74R9Qyuj90xnnUJaGU04RbfAk0dsE
+         C0T01Z4ZBZEufP0ah1vqi0UXTLIBtMmlYtQncLQarSbHTPlqrxVbtwBByF6gC1bybKPF
+         yxt4vtv2kvuNj93/0Qh+0o1RDwxbqTCOX7J+owjvctn+CSDHZavXNr5fWSyLTgOJ27H8
+         dhQBoqQdPa4gLpFCGZ+JnbENYcFRtNXeR1PzIbFcOZZODdvGM/T98fYst6/iIA88BkOj
+         5xkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690834127; x=1691438927;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAisdvmYOGIL7GH+7tWPlzo+7zINYpaH/xzNielVMYo=;
-        b=XZOf4dey3nCjCca3hIRy/YaeccpcIVZsXtJ/KRw96YkY5JK4dKLNb56Khm/Pled7sS
-         eFKPusrpWvnjO0d5h3d7eL9f4ZP3l1CLhIB3y3htkqnRvNdqCXvqG3JxoZMsY+axWmol
-         EZtHntK9U/3fTGTPfhCNQwiV5HNM+AG7KQcE+VVSSYQNuZWIdcDEfupHnFc2b5sSPaZp
-         QIPJIUib9KdTDCu7b/Oof698ZH8g++hP3lh/YsylKPqhH+j8g/ndpyhTXCSOce74UaoE
-         u7utscJbZgs9ZC8M/G9HdR+d9qK4TCLkITSvUPKFdC7znrbOZgH9uDMXtt6Dp9cHlxf+
-         PBBA==
-X-Gm-Message-State: ABy/qLYpQ1YUtJxYI15c6JMaW8GmolbjvWeO9khytRPCUJs1MU1ND1fI
-        qqfTxHV+b+cYfS1bwbcdrSAOFFwOj8A=
-X-Google-Smtp-Source: APBJJlG//abH5218hlVjix7dFSOF6o6SyBzZpQzDltJQcgkfssxgDp0E7Vsg2X0Y4KzFJ3JYry9/Kg==
-X-Received: by 2002:a05:6e02:1a47:b0:345:fe2d:56f with SMTP id u7-20020a056e021a4700b00345fe2d056fmr10329257ilv.14.1690834126592;
-        Mon, 31 Jul 2023 13:08:46 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id k6-20020a02ccc6000000b0042b1d495aecsm3318971jaq.123.2023.07.31.13.08.45
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1690839576; x=1691444376;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rYiFDZqutnQN5UfQ5iBONprN7KsHZewPRwPyGoDWKK4=;
+        b=cn+XIkcnPaofqS1ms4uox+8cPuWQFbtlZ8fSrtc0l9xhKVmwqxV80h0fqDgMvfzdRw
+         Uhez3O+waM9ZzFlnSRi0fWcb8WjLMP4VcOEOAiBW0HQZYNeMvTVp1ZVtPxC2gYe9DIv/
+         SGt22c0rTFZVtmSw+CRsckULDdWmGOO1IzMMh0MKVE8CkuLDOiaoUrNobROHAW/rJnsm
+         HnjwwuuUCDq7bj8+kFrELiDPy7r+UysYJtTYGvNIHheC4fyvak+HDZ6vweeZeM10aBEh
+         vn5BiKdRuovHYUegMEzuRHwj/s1iPGOZEj7xX+UfjVdy7cbNWkUcHlM1NaBMf1U2z6It
+         x57g==
+X-Gm-Message-State: ABy/qLYDVdUtJGDMXXBgVp4+MNpZ5h1bUYL9R6ynB8lgTd3gYOs59lCs
+        WN5Ma+lhpBM1horBMQdixHQ+N0TmMNQ=
+X-Google-Smtp-Source: APBJJlEulrU9+4euf2YUxF1Pswd39wEyPK38AygEzNp5lgt/zsjDZPPxW2Y9na77aGPJKHt9ZgFbLA==
+X-Received: by 2002:a05:622a:178c:b0:403:af80:7cc1 with SMTP id s12-20020a05622a178c00b00403af807cc1mr12895054qtk.42.1690839576107;
+        Mon, 31 Jul 2023 14:39:36 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.75.184])
+        by smtp.gmail.com with ESMTPSA id p5-20020ac84085000000b0040b3aa5f7ecsm2388240qtl.70.2023.07.31.14.39.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jul 2023 13:08:45 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] monitor: Add TX frame number and speed estimation
-Date:   Mon, 31 Jul 2023 13:08:44 -0700
-Message-ID: <20230731200844.384507-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 31 Jul 2023 14:39:35 -0700 (PDT)
+Message-ID: <64c82a17.c80a0220.af5bb.74cd@mx.google.com>
+Date:   Mon, 31 Jul 2023 14:39:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3513924777009326303=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] monitor: Add TX frame number and speed estimation
+In-Reply-To: <20230731200844.384507-1-luiz.dentz@gmail.com>
+References: <20230731200844.384507-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3513924777009326303==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds the frame information while decoding:
+This is automated email and please do not reply to this email!
 
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256 Address: XX:XX:XX:XX:XX:XX
-        Count: 1
-        #188: len 850 (755 Kb/s)
-        Latency: 9 msec (3-21 msec ~6 msec)
-        Channel: 68 [PSM 25 mode Basic (0x00)] {chan 4}
-        Channel Latency: 9 msec (7-21 msec ~9 msec)
+Dear submitter,
 
-Or the speed estimation while analyzing:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=771337
 
-  Found BR-ACL connection with handle 256
-        Address: XX:XX:XX:XX:XX:XX
-        60 RX packets
-        22548 TX packets
-        22547 TX completed packets
-        3-73 msec (~11 msec) TX Latency
-        6-850 octets (~847 octets) TX packet size
-        ~568 Kb/s TX transfer speed
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.64 seconds
+GitLint                       PASS      0.39 seconds
+BuildEll                      PASS      36.17 seconds
+BluezMake                     PASS      1283.93 seconds
+MakeCheck                     PASS      13.31 seconds
+MakeDistcheck                 PASS      207.42 seconds
+CheckValgrind                 PASS      333.37 seconds
+CheckSmatch                   WARNING   471.14 seconds
+bluezmakeextell               PASS      141.83 seconds
+IncrementalBuild              PASS      1085.39 seconds
+ScanBuild                     PASS      1513.19 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1832:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3602:52: warning: array of flexible structuresmonitor/bt.h:3590:40: warning: array of flexible structures
+
+
 ---
- monitor/analyze.c |  4 +++-
- monitor/packet.c  | 37 ++++++++++++++++++++++++-------------
- monitor/packet.h  |  7 +++++++
- 3 files changed, 34 insertions(+), 14 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index b4a7cf726ac9..ff3b419c4c38 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -221,11 +221,13 @@ static void conn_destroy(void *data)
- 	print_field("%lu RX packets", conn->rx_num);
- 	print_field("%lu TX packets", conn->tx_num);
- 	print_field("%lu TX completed packets", conn->tx_num_comp);
--	print_field("%lld-%lld msec (~%lld msec) TX Latency",
-+	print_field("%lld-%lld msec (~%lld msec/~lld Kb/s) TX Latency",
- 			TV_MSEC(conn->tx_l.min), TV_MSEC(conn->tx_l.max),
- 			TV_MSEC(conn->tx_l.med));
- 	print_field("%u-%u octets (~%u octets) TX packet size",
- 			conn->tx_pkt_min, conn->tx_pkt_max, conn->tx_pkt_med);
-+	print_field("~%lld Kb/s TX transfer speed",
-+			conn->tx_bytes * 8 / TV_MSEC(conn->tx_l.total));
- 
- 	plot_draw(conn->plot);
- 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index fb469cdeafed..84af03a0011f 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -10397,6 +10397,8 @@ static void role_change_evt(struct timeval *tv, uint16_t index,
- 
- void packet_latency_add(struct packet_latency *latency, struct timeval *delta)
- {
-+	timeradd(&latency->total, delta, &latency->total);
-+
- 	if ((!timerisset(&latency->min) || timercmp(delta, &latency->min, <))
- 				&& delta->tv_sec >= 0 && delta->tv_usec >= 0)
- 		latency->min = *delta;
-@@ -10427,28 +10429,30 @@ void packet_latency_add(struct packet_latency *latency, struct timeval *delta)
- static void packet_dequeue_tx(struct timeval *tv, uint16_t handle)
- {
- 	struct packet_conn_data *conn;
--	struct timeval *tx;
-+	struct packet_frame *frame;
- 	struct timeval delta;
- 
- 	conn = packet_get_conn_data(handle);
- 	if (!conn)
- 		return;
- 
--	tx = queue_pop_head(conn->tx_q);
--	if (!tx)
-+	frame = queue_pop_head(conn->tx_q);
-+	if (!frame)
- 		return;
- 
--	timersub(tv, tx, &delta);
-+	timersub(tv, &frame->tv, &delta);
- 
- 	packet_latency_add(&conn->tx_l, &delta);
- 
-+	print_field("#%zu: len %zu (%lld Kb/s)", frame->num, frame->len,
-+					frame->len * 8 / TV_MSEC(delta));
- 	print_field("Latency: %lld msec (%lld-%lld msec ~%lld msec)",
- 			TV_MSEC(delta), TV_MSEC(conn->tx_l.min),
- 			TV_MSEC(conn->tx_l.max), TV_MSEC(conn->tx_l.med));
- 
- 	l2cap_dequeue_frame(&delta, conn);
- 
--	free(tx);
-+	free(frame);
- }
- 
- static void num_completed_packets_evt(struct timeval *tv, uint16_t index,
-@@ -12442,10 +12446,11 @@ void packet_hci_event(struct timeval *tv, struct ucred *cred, uint16_t index,
- 	event_data->func(tv, index, data, hdr->plen);
- }
- 
--static void packet_queue_tx(struct timeval *tv, uint16_t handle)
-+static void packet_enqueue_tx(struct timeval *tv, uint16_t handle,
-+				size_t num, uint16_t len)
- {
- 	struct packet_conn_data *conn;
--	struct timeval *tx;
-+	struct packet_frame *frame;
- 
- 	conn = packet_get_conn_data(handle);
- 	if (!conn)
-@@ -12454,9 +12459,12 @@ static void packet_queue_tx(struct timeval *tv, uint16_t handle)
- 	if (!conn->tx_q)
- 		conn->tx_q = queue_new();
- 
--	tx = new0(struct timeval, 1);
--	memcpy(tx, tv, sizeof(*tv));
--	queue_push_tail(conn->tx_q, tx);
-+	frame = new0(struct packet_frame, 1);
-+	if (tv)
-+		memcpy(&frame->tv, tv, sizeof(*tv));
-+	frame->num = num;
-+	frame->len = len;
-+	queue_push_tail(conn->tx_q, frame);
- }
- 
- void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
-@@ -12497,7 +12505,8 @@ void packet_hci_acldata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 						handle_str, extra_str);
- 
- 	if (!in)
--		packet_queue_tx(tv, acl_handle(handle));
-+		packet_enqueue_tx(tv, acl_handle(handle),
-+					index_list[index].frame, dlen);
- 
- 	if (size != dlen) {
- 		print_text(COLOR_ERROR, "invalid packet size (%d != %d)",
-@@ -12549,7 +12558,8 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 						handle_str, extra_str);
- 
- 	if (!in)
--		packet_queue_tx(tv, acl_handle(handle));
-+		packet_enqueue_tx(tv, acl_handle(handle),
-+					index_list[index].frame, hdr->dlen);
- 
- 	if (size != hdr->dlen) {
- 		print_text(COLOR_ERROR, "invalid packet size (%d != %d)",
-@@ -12599,7 +12609,8 @@ void packet_hci_isodata(struct timeval *tv, struct ucred *cred, uint16_t index,
- 						handle_str, extra_str);
- 
- 	if (!in)
--		packet_queue_tx(tv, acl_handle(handle));
-+		packet_enqueue_tx(tv, acl_handle(handle),
-+					index_list[index].frame, hdr->dlen);
- 
- 	if (size != hdr->dlen) {
- 		print_text(COLOR_ERROR, "invalid packet size (%d != %d)",
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 12cb68d508f8..750ce405e4bc 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -26,11 +26,18 @@
- #define TV_MSEC(_tv) (long long)((_tv).tv_sec * 1000 + (_tv).tv_usec / 1000)
- 
- struct packet_latency {
-+	struct timeval total;
- 	struct timeval min;
- 	struct timeval max;
- 	struct timeval med;
- };
- 
-+struct packet_frame {
-+	struct timeval tv;
-+	size_t num;
-+	size_t len;
-+};
-+
- struct packet_conn_data {
- 	uint16_t index;
- 	uint8_t  src[6];
--- 
-2.41.0
 
+--===============3513924777009326303==--
