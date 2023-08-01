@@ -2,206 +2,177 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E27B9C04A94
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Aug 2023 16:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F4DC001DF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Aug 2023 18:08:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231572AbjHAQi4 (ORCPT
+        id S230393AbjHASIq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Aug 2023 12:38:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60844 "EHLO
+        Tue, 1 Aug 2023 14:08:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231479AbjHAQiw (ORCPT
+        with ESMTP id S229814AbjHASIo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Aug 2023 12:38:52 -0400
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391E81FE5
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Aug 2023 09:38:51 -0700 (PDT)
-Received: from monolith.lan (unknown [193.138.7.198])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RFgm670Yzz49QDC;
-        Tue,  1 Aug 2023 19:38:46 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-        t=1690907927;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aA9WBYwLW9Pq/8rjGKY9g7y1iXggWwfbmq0+4mehOSw=;
-        b=eWVEfvfS2SOeEQHcMsKoLvwDahRSKau7FdFfLLsJAAf3atobl6YjfSIGqSU6J7ALu5Qg+9
-        gkHa4pNHFXCGK+xHrv+I7/4wf0CkvzpR9x7UHB/VZDfXcp4NYGBZ5Pn2is3KUKkjR66ISF
-        Q9BGCkRST5Ce3WbYkWyD8hl9kaAn/UZ/nNrlc/R/SnP65PaN6ZZyQHrG2J9tEvxDSCrLNl
-        U3nBL19bFmmon9DxwnKxz9u5qNIvVXU2I509exvA4/+aDC6uObFcszvCOC4LxmGBx8RuZB
-        PFh86HmNQ+8b9RPzKAm8ueT4iCW83lev+l2Ac496cvGd3QlFPJKnTvunGVbh6w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=lahtoruutu; t=1690907927;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aA9WBYwLW9Pq/8rjGKY9g7y1iXggWwfbmq0+4mehOSw=;
-        b=pe0knknrRjARFbZ+xfVuS5NDd9kAQcFBRatNZix18QykZcYLmXkXJCYuIUCNjji/hhk2HR
-        m8Gm4b0QWFO9KBG5gCJgqMkpicH+UaXiXymL5mOXdJdyCQfgn/hOMjDBipv8nVwSWV7ruX
-        AaExaaB5n08Qqq92lmsSD8v9ZJn22epFAn1WY2CakzNyELeIf/OyQRgb0cZMZRNkHA2jY4
-        W8IWzqa7hlsOErppvy5E/acvjdk1/2QvSSXxgPIB3fTMByufjju9MW16NjPL1IJQCu0LYB
-        xjO3oPHblzkAlBo9KPYlsg2YtcSOHzHr1SJ6cWREyYO/ujlk3cIJ/VA/qVjjhg==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1690907927; a=rsa-sha256;
-        cv=none;
-        b=IvAK/MERLwCNd1Qa/Bu7xDrGZjKmRCvjra+bSEBKxn7qOiOVfi9Two4HDhcGV2phP/rJzv
-        ybaKMsYwWCrYsUORmzlOkquayLs3a1whUejhEZ6jojNr3ZqmpM1Oj+x8QVODFlZr0thJd8
-        hJ/TTTKXHyqYgfyHcw6IAyYJCN44mP+/Ha2+lSehFhbU3SIza4FN4FHmrDJtThMZ4C3F6d
-        d8XYQg0pJnPfhHs+/SKEIXjNplEhmAlp71S59f+9EUL93pQ9TN0qaZoyE69Dqfvm1+8jPC
-        RiU5+aNSN+wwZqBVIgn4r/IvUFPagZkkC4F2X7cqwFCoRwIEOuT75QlDTNOgKA==
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 5/5] iso-tester: add tests checking Remove CIG is emitted
-Date:   Tue,  1 Aug 2023 19:38:42 +0300
-Message-ID: <3b903474a8a71074f58882382065f4b695b0454e.1690907478.git.pav@iki.fi>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1690907478.git.pav@iki.fi>
-References: <cover.1690907478.git.pav@iki.fi>
+        Tue, 1 Aug 2023 14:08:44 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2991210D;
+        Tue,  1 Aug 2023 11:08:33 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fe383c1a26so3856873e87.1;
+        Tue, 01 Aug 2023 11:08:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1690913312; x=1691518112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nas0AweN10zWYTWttDcfjEFMCRYBHpH9zSmnxdV53u0=;
+        b=f5NTAN1JLSRZ2+aFg/6zFOPPNjQZyPu2SqnWLCTVtpjfsXLr6yOShAPHoIbOUwiZIa
+         3whwUY4GvL6vi/SU2Tvbt/ycr9U4mFxrBOuhq8En5m9PN545txooicsV+BWDlx3LBCx4
+         HOCQ5Kww+p/Ri/JIzNcXaELYTBKlhdXcOs9NRl6VfbpKkHzp+ghj3XC3HfGi0OaA2NIz
+         8OdrUStok5XoKzEjRlZd4heDBH2mx8se8Ce6cbdImCLe7BSnEbsb0M/HpZIjxn1PySii
+         gDceRuH/j+Y18V/Yk2p0fFBPEgLPTdaTVEGriX6z1tRx4Z+7dYv/TKwFPrbzj7sCOYdk
+         MMgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690913312; x=1691518112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Nas0AweN10zWYTWttDcfjEFMCRYBHpH9zSmnxdV53u0=;
+        b=WCV7UgwDfYOq5FbfqmWygwk9IQXNifg7pvXlOf5TFj7DaBcU0h5JqcjCluW9Oo0lcT
+         hhZ/TmtdTpL2ED/jmybeGDreDhuTNS42u0GpqNveEbriCNe/PgGNivfudLrV4wA6qAaY
+         8PmREPsCFZjurmCbBnhH0Cv2SXpgP+/UpebtT5TTQfoa/hnhFRskFN2iO0gTxNJGwjoX
+         a+OqB4cDsS3kq9cmCwsLKnKcx29VeSH3yWwSZ0WMUsxdo3/bS8JtmGjLghs1I2uJfjyL
+         ZcKD7x/A8XVynOrusiarK1u3kJSPjHMyBYJyHJbZZvNO6UlzA7OxqvP90q50OjHTS/FE
+         gqJg==
+X-Gm-Message-State: ABy/qLaIJ8NIPQeXguuxiRI+IsBb1NX9zzcYsSAimVH2SHS3h2oXIi++
+        KHcdGfIyoE9sBNMbzU/cpuqgdgpcAXXHqn8I/sQ=
+X-Google-Smtp-Source: APBJJlFDpbpxqL7TpaRFaW/ohZ1CcICVBTt/+pzdYA9WXXSDhC3jueiBVoUI1ne6Il4vBBlKs3gqapwEocCPxrhSNIA=
+X-Received: by 2002:a2e:95cc:0:b0:2b9:cf90:ab9c with SMTP id
+ y12-20020a2e95cc000000b002b9cf90ab9cmr2838657ljh.8.1690913311619; Tue, 01 Aug
+ 2023 11:08:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
+ <CABBYNZJPw=Oxi+J2oA=6aosEZjCBK=u=8HEJywzRJCCrmGnkGA@mail.gmail.com>
+ <CSMMO2ZBOS6Y.3SAQOHDLW68ME@otso> <CUH4IE1600FN.2SYHOEBM2LS1K@otso>
+In-Reply-To: <CUH4IE1600FN.2SYHOEBM2LS1K@otso>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 1 Aug 2023 11:08:19 -0700
+Message-ID: <CABBYNZJaYRrL+_X-+N5c=DTONg6DD-k_npE2UcLTf6m+H8qccA@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] Add WCN3988 Bluetooth support for Fairphone 4
+To:     Luca Weiss <luca.weiss@fairphone.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Kernel should send LE Remove CIG after all CIS are shut down.  Add tests
-checking this, closing either immediately or after waiting connection to
-complete.
+Hi Luca,
 
-ISO Defer Close - Success
-ISO Connect Close - Success
-ISO Defer Wait Close - Success
-ISO Connect Wait Close - Success
----
+On Tue, Aug 1, 2023 at 3:07=E2=80=AFAM Luca Weiss <luca.weiss@fairphone.com=
+> wrote:
+>
+> Hi Luiz,
+>
+> On Mon May 15, 2023 at 8:12 AM CEST, Luca Weiss wrote:
+> > On Fri May 12, 2023 at 10:53 PM CEST, Luiz Augusto von Dentz wrote:
+> > > Hi Luca,
+> > >
+> > > On Fri, May 12, 2023 at 6:58=E2=80=AFAM Luca Weiss <luca.weiss@fairph=
+one.com> wrote:
+> > > >
+> > > > Add support in the btqca/hci_qca driver for the WCN3988 and add it =
+to
+> > > > the sm7225 Fairphone 4 devicetree.
+> > > >
+> > > > Devicetree patches go via Qualcomm tree, the rest via their respect=
+ive
+> > > > trees.
+> > >
+> > > Just to be sure, patches 1-2 shall be applied to bluetooth-next the
+> > > remaining are going to be handled elsewhere?
+> >
+> > Sounds good.
+>
+> Is anything missing for the patches 1 & 2 to be applied? I don't see
+> them yet in linux-next. Should I resend them?
 
-Notes:
-    v2: no change
+Looks like this set is no longer on patchwork, could you please resend?
 
- tools/iso-tester.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 96 insertions(+)
+> Regards
+> Luca
+>
+> >
+> > >
+> > > > --
+> > > > Previously with the RFC version I've had problems before with Bluet=
+ooth
+> > > > scanning failing like the following:
+> > > >
+> > > >   [bluetooth]# scan on
+> > > >   Failed to start discovery: org.bluez.Error.InProgress
+> > > >
+> > > >   [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
+> > > >
+> > > > This appears to only happen with driver built-in (=3Dy) when the su=
+pported
+> > > > local commands list doesn't get updated in the Bluetooth core and
+> > > > use_ext_scan() returning false. I'll try to submit this separately =
+since
+> > > > this now works well enough with =3Dm. But in both cases (=3Dy, =3Dm=
+) it's
+> > > > behaving a bit weirdly before (re-)setting the MAC address with "su=
+do
+> > > > btmgmt public-addr fo:oo:ba:ar"
+> > > >
+> > > > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
+> > > > ---
+> > > > Changes in v2:
+> > > > - Add pinctrl & 'tlmm 64' irq to uart node
+> > > > - Pick up tags
+> > > > - Link to v1: https://lore.kernel.org/r/20230421-fp4-bluetooth-v1-0=
+-0430e3a7e0a2@fairphone.com
+> > > >
+> > > > ---
+> > > > Luca Weiss (4):
+> > > >       dt-bindings: net: qualcomm: Add WCN3988
+> > > >       Bluetooth: btqca: Add WCN3988 support
+> > > >       arm64: dts: qcom: sm6350: add uart1 node
+> > > >       arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
+> > > >
+> > > >  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   2 +
+> > > >  arch/arm64/boot/dts/qcom/sm6350.dtsi               |  63 +++++++++=
+++++
+> > > >  arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts  | 103 +++++++++=
+++++++++++++
+> > > >  drivers/bluetooth/btqca.c                          |  13 ++-
+> > > >  drivers/bluetooth/btqca.h                          |  12 ++-
+> > > >  drivers/bluetooth/hci_qca.c                        |  12 +++
+> > > >  6 files changed, 201 insertions(+), 4 deletions(-)
+> > > > ---
+> > > > base-commit: f2fe50eb7ca6b7bc6c63745f5c26f7c6022fcd4a
+> > > > change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
+> > > >
+> > > > Best regards,
+> > > > --
+> > > > Luca Weiss <luca.weiss@fairphone.com>
+> > > >
+>
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 9f853a0f9..bbf959420 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -2425,6 +2425,90 @@ static void test_connect2_nodefer(const void *test_data)
- 	close(sk);
- }
- 
-+static gboolean iso_connect_close_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	data->io_id[0] = 0;
-+
-+	tester_print("Disconnected");
-+
-+	--data->step;
-+	if (!data->step)
-+		tester_test_passed();
-+
-+	return FALSE;
-+}
-+
-+static bool hook_remove_cig(const void *msg, uint16_t len, void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_print("Remove CIG");
-+
-+	--data->step;
-+	if (!data->step)
-+		tester_test_passed();
-+
-+	return true;
-+}
-+
-+static void test_connect_close(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	int sk;
-+	GIOChannel *io;
-+
-+	data->step = 2;
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_CMD,
-+					BT_HCI_CMD_LE_REMOVE_CIG,
-+					hook_remove_cig, data);
-+
-+	sk = setup_sock(data, 0);
-+	if (sk < 0)
-+		return;
-+
-+	io = g_io_channel_unix_new(sk);
-+	g_io_channel_set_close_on_unref(io, TRUE);
-+	data->io_id[0] = g_io_add_watch(io, G_IO_HUP, iso_connect_close_cb,
-+									data);
-+
-+	shutdown(sk, SHUT_RDWR);
-+}
-+
-+static gboolean iso_connect_wait_close_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	int sk;
-+
-+	tester_print("Connected");
-+
-+	sk = g_io_channel_unix_get_fd(io);
-+
-+	data->io_id[0] = g_io_add_watch(io, G_IO_HUP, iso_connect_close_cb,
-+									data);
-+
-+	shutdown(sk, SHUT_RDWR);
-+
-+	return FALSE;
-+}
-+
-+static void test_connect_wait_close(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	data->step = 1;
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_CMD,
-+					BT_HCI_CMD_LE_REMOVE_CIG,
-+					hook_remove_cig, data);
-+
-+	setup_connect(data, 0, iso_connect_wait_close_cb);
-+}
-+
- static void test_bcast(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -2601,6 +2685,18 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Defer Connect - Success", &defer_16_2_1, setup_powered,
- 							test_connect);
- 
-+	test_iso("ISO Defer Close - Success", &defer_16_2_1, setup_powered,
-+							test_connect_close);
-+
-+	test_iso("ISO Connect Close - Success", &connect_16_2_1, setup_powered,
-+							test_connect_close);
-+
-+	test_iso("ISO Defer Wait Close - Success", &defer_16_2_1,
-+					setup_powered, test_connect_wait_close);
-+
-+	test_iso("ISO Connect Wait Close - Success", &connect_16_2_1,
-+					setup_powered, test_connect_wait_close);
-+
- 	test_iso2("ISO Defer Connect2 CIG 0x01 - Success", &defer_1_16_2_1,
- 							setup_powered,
- 							test_connect2);
--- 
-2.41.0
 
+--=20
+Luiz Augusto von Dentz
