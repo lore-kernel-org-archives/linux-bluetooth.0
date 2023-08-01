@@ -2,177 +2,181 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F4DC001DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Aug 2023 18:08:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F24D4C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Aug 2023 18:53:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230393AbjHASIq (ORCPT
+        id S229509AbjHASxQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Aug 2023 14:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58828 "EHLO
+        Tue, 1 Aug 2023 14:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229814AbjHASIo (ORCPT
+        with ESMTP id S229746AbjHASxO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Aug 2023 14:08:44 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2991210D;
-        Tue,  1 Aug 2023 11:08:33 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fe383c1a26so3856873e87.1;
-        Tue, 01 Aug 2023 11:08:33 -0700 (PDT)
+        Tue, 1 Aug 2023 14:53:14 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762CAE71
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Aug 2023 11:53:10 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id af79cd13be357-76ad8892d49so526754685a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Aug 2023 11:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690913312; x=1691518112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Nas0AweN10zWYTWttDcfjEFMCRYBHpH9zSmnxdV53u0=;
-        b=f5NTAN1JLSRZ2+aFg/6zFOPPNjQZyPu2SqnWLCTVtpjfsXLr6yOShAPHoIbOUwiZIa
-         3whwUY4GvL6vi/SU2Tvbt/ycr9U4mFxrBOuhq8En5m9PN545txooicsV+BWDlx3LBCx4
-         HOCQ5Kww+p/Ri/JIzNcXaELYTBKlhdXcOs9NRl6VfbpKkHzp+ghj3XC3HfGi0OaA2NIz
-         8OdrUStok5XoKzEjRlZd4heDBH2mx8se8Ce6cbdImCLe7BSnEbsb0M/HpZIjxn1PySii
-         gDceRuH/j+Y18V/Yk2p0fFBPEgLPTdaTVEGriX6z1tRx4Z+7dYv/TKwFPrbzj7sCOYdk
-         MMgw==
+        d=gmail.com; s=20221208; t=1690915989; x=1691520789;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=An4Pg3cd/SgFneX/Yw2mfLBPeNkIGtK5mw1G7OYbGac=;
+        b=ZFuo4qLLC9upbx8HsFCPIAspaHNky3ma7lJBQruKNCD5g8jLW5blT/w4ByQXEcw77O
+         DC9c17VbJIIHkgkbFeEPN8EYac8AASONYDWDxKCepk0dyPF5qaiheASKEyd8vz+Yj+wC
+         FpBJtm3sbWYAeZF1L38PGYuGaiN1+6FQ6Y6XKBR9awdVD5KsbDRhbht2rWGr1tVta8R9
+         K16F83YKZXQ/itmxbd4ZvGSjORIlzcWDlKVcsjgMv61cHbAgeMNYO9pD0XoAwdLfPh8U
+         LQ1+I2kdN1CTG38mWhPntS73m7VvnHe3QKwFq6O1zOFPR8ttpPT4VxP9qNxNC/yaczyY
+         mEFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690913312; x=1691518112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Nas0AweN10zWYTWttDcfjEFMCRYBHpH9zSmnxdV53u0=;
-        b=WCV7UgwDfYOq5FbfqmWygwk9IQXNifg7pvXlOf5TFj7DaBcU0h5JqcjCluW9Oo0lcT
-         hhZ/TmtdTpL2ED/jmybeGDreDhuTNS42u0GpqNveEbriCNe/PgGNivfudLrV4wA6qAaY
-         8PmREPsCFZjurmCbBnhH0Cv2SXpgP+/UpebtT5TTQfoa/hnhFRskFN2iO0gTxNJGwjoX
-         a+OqB4cDsS3kq9cmCwsLKnKcx29VeSH3yWwSZ0WMUsxdo3/bS8JtmGjLghs1I2uJfjyL
-         ZcKD7x/A8XVynOrusiarK1u3kJSPjHMyBYJyHJbZZvNO6UlzA7OxqvP90q50OjHTS/FE
-         gqJg==
-X-Gm-Message-State: ABy/qLaIJ8NIPQeXguuxiRI+IsBb1NX9zzcYsSAimVH2SHS3h2oXIi++
-        KHcdGfIyoE9sBNMbzU/cpuqgdgpcAXXHqn8I/sQ=
-X-Google-Smtp-Source: APBJJlFDpbpxqL7TpaRFaW/ohZ1CcICVBTt/+pzdYA9WXXSDhC3jueiBVoUI1ne6Il4vBBlKs3gqapwEocCPxrhSNIA=
-X-Received: by 2002:a2e:95cc:0:b0:2b9:cf90:ab9c with SMTP id
- y12-20020a2e95cc000000b002b9cf90ab9cmr2838657ljh.8.1690913311619; Tue, 01 Aug
- 2023 11:08:31 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1690915989; x=1691520789;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=An4Pg3cd/SgFneX/Yw2mfLBPeNkIGtK5mw1G7OYbGac=;
+        b=KUjA2lESvgQPwU5G/7PJRJh15dTzslXQcO/Xg/lgc1OEeAcPbduvetpdqY1TVbwOT2
+         XsKwbaC1aelV2RCU5xC3FeWLWlKIYCPiFUsTzzNT1wDog1f+XB77cVNoxWSeNqhf1EAA
+         7X2Ngjvfd9Fi8H84w8NzY/0F0zUryrxOtGDRXfrEl1QsIyAfG5PECWRxg+FKNVhQajNF
+         gQ+hHS+2ltR0vW+A5Y7fPVymroJVd1emGKcFkKLCN9RawMzdelYlDpT9OP/eLsEF9FJm
+         k5ao5F0U/jqA9a2wsnLpYz4tXpQG1M6E4Bz5Xdqr4EokgVhpQNmxUoCTqdJPWFoSbVFg
+         WE3Q==
+X-Gm-Message-State: ABy/qLYkvrirr31y5YQKi8ZHjqvjA/LHYPR92sbiK+kIRwwIAW1DcG/k
+        4zvDXXHtUWNnKMtMvGEcNgzD62u5Nyo=
+X-Google-Smtp-Source: APBJJlErnzkKCqLDyx5xb3UVhvGL2TWvwPIi6ASmwME+ykukTqlRxmCb/Pk6BredukR2kDhlS+hHVQ==
+X-Received: by 2002:a05:620a:19a3:b0:76c:c99b:8d5 with SMTP id bm35-20020a05620a19a300b0076cc99b08d5mr1536177qkb.40.1690915989464;
+        Tue, 01 Aug 2023 11:53:09 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.46.128])
+        by smtp.gmail.com with ESMTPSA id g3-20020a37e203000000b00767ed2e6436sm4349532qki.78.2023.08.01.11.53.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Aug 2023 11:53:09 -0700 (PDT)
+Message-ID: <64c95495.370a0220.f7320.10ab@mx.google.com>
+Date:   Tue, 01 Aug 2023 11:53:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3317596285371219651=="
 MIME-Version: 1.0
-References: <20230421-fp4-bluetooth-v2-0-3de840d5483e@fairphone.com>
- <CABBYNZJPw=Oxi+J2oA=6aosEZjCBK=u=8HEJywzRJCCrmGnkGA@mail.gmail.com>
- <CSMMO2ZBOS6Y.3SAQOHDLW68ME@otso> <CUH4IE1600FN.2SYHOEBM2LS1K@otso>
-In-Reply-To: <CUH4IE1600FN.2SYHOEBM2LS1K@otso>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 1 Aug 2023 11:08:19 -0700
-Message-ID: <CABBYNZJaYRrL+_X-+N5c=DTONg6DD-k_npE2UcLTf6m+H8qccA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] Add WCN3988 Bluetooth support for Fairphone 4
-To:     Luca Weiss <luca.weiss@fairphone.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: Additional tests for ISO and hci_sync
+In-Reply-To: <5eca51146b08a512052261b88ae5c8a7437af5fc.1690907478.git.pav@iki.fi>
+References: <5eca51146b08a512052261b88ae5c8a7437af5fc.1690907478.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luca,
+--===============3317596285371219651==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 1, 2023 at 3:07=E2=80=AFAM Luca Weiss <luca.weiss@fairphone.com=
-> wrote:
->
-> Hi Luiz,
->
-> On Mon May 15, 2023 at 8:12 AM CEST, Luca Weiss wrote:
-> > On Fri May 12, 2023 at 10:53 PM CEST, Luiz Augusto von Dentz wrote:
-> > > Hi Luca,
-> > >
-> > > On Fri, May 12, 2023 at 6:58=E2=80=AFAM Luca Weiss <luca.weiss@fairph=
-one.com> wrote:
-> > > >
-> > > > Add support in the btqca/hci_qca driver for the WCN3988 and add it =
-to
-> > > > the sm7225 Fairphone 4 devicetree.
-> > > >
-> > > > Devicetree patches go via Qualcomm tree, the rest via their respect=
-ive
-> > > > trees.
-> > >
-> > > Just to be sure, patches 1-2 shall be applied to bluetooth-next the
-> > > remaining are going to be handled elsewhere?
-> >
-> > Sounds good.
->
-> Is anything missing for the patches 1 & 2 to be applied? I don't see
-> them yet in linux-next. Should I resend them?
+This is automated email and please do not reply to this email!
 
-Looks like this set is no longer on patchwork, could you please resend?
+Dear submitter,
 
-> Regards
-> Luca
->
-> >
-> > >
-> > > > --
-> > > > Previously with the RFC version I've had problems before with Bluet=
-ooth
-> > > > scanning failing like the following:
-> > > >
-> > > >   [bluetooth]# scan on
-> > > >   Failed to start discovery: org.bluez.Error.InProgress
-> > > >
-> > > >   [  202.371374] Bluetooth: hci0: Opcode 0x200b failed: -16
-> > > >
-> > > > This appears to only happen with driver built-in (=3Dy) when the su=
-pported
-> > > > local commands list doesn't get updated in the Bluetooth core and
-> > > > use_ext_scan() returning false. I'll try to submit this separately =
-since
-> > > > this now works well enough with =3Dm. But in both cases (=3Dy, =3Dm=
-) it's
-> > > > behaving a bit weirdly before (re-)setting the MAC address with "su=
-do
-> > > > btmgmt public-addr fo:oo:ba:ar"
-> > > >
-> > > > Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
-> > > > ---
-> > > > Changes in v2:
-> > > > - Add pinctrl & 'tlmm 64' irq to uart node
-> > > > - Pick up tags
-> > > > - Link to v1: https://lore.kernel.org/r/20230421-fp4-bluetooth-v1-0=
--0430e3a7e0a2@fairphone.com
-> > > >
-> > > > ---
-> > > > Luca Weiss (4):
-> > > >       dt-bindings: net: qualcomm: Add WCN3988
-> > > >       Bluetooth: btqca: Add WCN3988 support
-> > > >       arm64: dts: qcom: sm6350: add uart1 node
-> > > >       arm64: dts: qcom: sm7225-fairphone-fp4: Add Bluetooth
-> > > >
-> > > >  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   2 +
-> > > >  arch/arm64/boot/dts/qcom/sm6350.dtsi               |  63 +++++++++=
-++++
-> > > >  arch/arm64/boot/dts/qcom/sm7225-fairphone-fp4.dts  | 103 +++++++++=
-++++++++++++
-> > > >  drivers/bluetooth/btqca.c                          |  13 ++-
-> > > >  drivers/bluetooth/btqca.h                          |  12 ++-
-> > > >  drivers/bluetooth/hci_qca.c                        |  12 +++
-> > > >  6 files changed, 201 insertions(+), 4 deletions(-)
-> > > > ---
-> > > > base-commit: f2fe50eb7ca6b7bc6c63745f5c26f7c6022fcd4a
-> > > > change-id: 20230421-fp4-bluetooth-b36a0e87b9c8
-> > > >
-> > > > Best regards,
-> > > > --
-> > > > Luca Weiss <luca.weiss@fairphone.com>
-> > > >
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=771771
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      3.01 seconds
+GitLint                       FAIL      1.95 seconds
+BuildEll                      PASS      26.83 seconds
+BluezMake                     PASS      785.29 seconds
+MakeCheck                     PASS      12.26 seconds
+MakeDistcheck                 PASS      156.24 seconds
+CheckValgrind                 PASS      251.21 seconds
+CheckSmatch                   WARNING   341.55 seconds
+bluezmakeextell               PASS      109.60 seconds
+IncrementalBuild              PASS      3312.84 seconds
+ScanBuild                     WARNING   1019.24 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v2,1/5] btdev: check error conditions for HCI_Create_Connection_Cancel
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#277: FILE: monitor/bt.h:596:
++} __attribute__ ((packed));
+
+/github/workspace/src/src/13337000.patch total: 0 errors, 1 warnings, 163 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13337000.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
---=20
-Luiz Augusto von Dentz
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,3/5] sco-tester: test local and remote disconnecting simultaneously
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+6: B3 Line contains hard tab characters (\t): "	[controller] > HCI Synchronous Connect Complete"
+7: B3 Line contains hard tab characters (\t): "	[controller] > HCI Disconnection Complete (from remote)"
+8: B3 Line contains hard tab characters (\t): "	[user] shutdown(sco_socket)"
+9: B3 Line contains hard tab characters (\t): "	[kernel] hci_conn_abort(SCO handle)"
+10: B3 Line contains hard tab characters (\t): "	[kernel] > HCI Create Connection Cancel"
+11: B3 Line contains hard tab characters (\t): "	[kernel] < HCI Synchronous Connect Complete"
+12: B3 Line contains hard tab characters (\t): "	[kernel] < HCI Disconnect Complete"
+13: B3 Line contains hard tab characters (\t): "	[controller] < HCI Create Connection Cancel"
+14: B3 Line contains hard tab characters (\t): "	[controller] > HCI Command Status (Create Connection Cancel)"
+15: B3 Line contains hard tab characters (\t): "	[kernel] < HCI Command Status (Create Connection Cancel)"
+31: B2 Line has trailing whitespace: "    "
+35: B2 Line has trailing whitespace: "    "
+36: B1 Line exceeds max length (84>80): "    CPU: 0 PID: 35 Comm: kworker/u3:2 Not tainted 6.5.0-rc1-00520-gf57f797eebfe #152"
+37: B1 Line exceeds max length (85>80): "    Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014"
+64: B2 Line has trailing whitespace: "    "
+76: B2 Line has trailing whitespace: "    "
+92: B2 Line has trailing whitespace: "    "
+105: B2 Line has trailing whitespace: "    "
+110: B2 Line has trailing whitespace: "    "
+112: B1 Line exceeds max length (93>80): "    page:ffffea00000a7800 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x29e0"
+119: B2 Line has trailing whitespace: "    "
+[BlueZ,v2,4/5] iso-tester: test with large CIS_ID and invalid CIG_ID/CIS_ID
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+19: B2 Line has trailing whitespace: "    "
+21: B2 Line has trailing whitespace: "    "
+22: B1 Line exceeds max length (83>80): "    ISO QoS CIG 0xF0 - Invalid                           Timed out    2.301 seconds"
+23: B1 Line exceeds max length (83>80): "    ISO QoS CIS 0xF0 - Invalid                           Failed       0.117 seconds"
+24: B1 Line exceeds max length (83>80): "    ISO Connect2 CIG 0x01 - Success/Invalid              Failed       0.189 seconds"
+25: B1 Line exceeds max length (83>80): "    ISO AC 6(ii) CIS 0xEF/auto - Success                 Failed       0.196 seconds"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:420:29: warning: Variable length array is used.emulator/btdev.c:420:29: warning: Variable length array is used.tools/sco-tester.c: note: in included file:./lib/bluetooth.h:216:15: warning: array of flexible structures./lib/bluetooth.h:221:31: warning: array of flexible structures
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+emulator/btdev.c:1083:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
+        while ((conn = queue_find(dev->conns, match_handle,
+                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+emulator/btdev.c:1334:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn')
+        pending_conn_del(dev, conn->link->dev);
+                              ^~~~~~~~~~
+emulator/btdev.c:1456:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn')
+        send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
+                   ^~~~~~~~~
+3 warnings generated.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3317596285371219651==--
