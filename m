@@ -2,111 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D454FC001DF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Aug 2023 16:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E153C04A94
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Aug 2023 16:38:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231465AbjHAQiv (ORCPT
+        id S231494AbjHAQiw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Aug 2023 12:38:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60830 "EHLO
+        Tue, 1 Aug 2023 12:38:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231374AbjHAQit (ORCPT
+        with ESMTP id S231377AbjHAQit (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 1 Aug 2023 12:38:49 -0400
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37A781FE5
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B411FE8
         for <linux-bluetooth@vger.kernel.org>; Tue,  1 Aug 2023 09:38:48 -0700 (PDT)
 Received: from monolith.lan (unknown [193.138.7.198])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RFgm60Q2cz49Q4D;
-        Tue,  1 Aug 2023 19:38:45 +0300 (EEST)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RFgm63rYGz49QBP;
+        Tue,  1 Aug 2023 19:38:46 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
         t=1690907926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=IMGGkyFmtLIiLQWPgOi3/yfrQT0lH9bzCBdkcDEgnpo=;
-        b=uhrIAk3Slh+56DAbkWfXGvH5hcL9WUYvbksAGgF8TI4UaN3LNSSR1Gku7isFbmNR/oShHo
-        AwPORZFAHjnbfsV/N1arrHrLniFMf4NiZ+CQ9lPscuJ4NTWLIvjCgN9FEhP+4Fvc3gTAbE
-        i3VD0cgKTFNoMoqlmWH6EEGMf7tvP2vsXsWgs+45TbgKTHEnsk6j7E1oqB/as+EJkYTdYv
-        0iPEB2lDQoVpsDjz1vaHo6ibE/dMP7aL2nKppMdv3X1uLdqCHrwlYgUzwITm4PM8FErV4Z
-        WUiGJGUCQA/CGUSsFJy/FubBqD0bvQCU7oSk7OKMy/voNx2ALEsriN4zR7tZlw==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bXGlzG0HOmoIdevnyhrOyZ1aMraEhvkaqTn8FITNBOA=;
+        b=jSPKuPgtt6HUdzSeuCTA+h/RU3KmVJkSmU8lhURIYh1qBv4QJYGBhhsZxsSpwpsmhOvvj9
+        7SCBzIwhlKW4myPtWuDqdYCSFbkMRsBaMjF5WmGCKPH/14E0JI2ssXCX9ChHX1hm2fEnt/
+        uAMyTunzjqZ9IQEpCu7Le3r5T8NV7FLuNEuFG8v7T4B2tZLn5ic4KjkDd5nm0Ga3AI2g1Y
+        /NaTYF5DksCKEqYRgRdyEmTCK1+pjjEv8T4pG7MlPAjSAKFmnCD9qQIqa8mYVgDYwGJEvF
+        0lNdI0zNusV/sVubpIFfDJeMJugIrRgi+D9RwezcbSNrNYpSI/QuLElpfQ7uug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
         s=lahtoruutu; t=1690907926;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=IMGGkyFmtLIiLQWPgOi3/yfrQT0lH9bzCBdkcDEgnpo=;
-        b=mRD0NxqRDPjs5Uw90yEhTB2fIum46kO4KtShkdfE8yLePtGgoQyPxH16XJtvQqYf4xncUS
-        BfGczXI4OjOxxL43YlOAqBIZZE4GlMKEv5TvQCXu+WA1Jggc4NRe+eZ1+OJ8/gtcsT89UA
-        vJXwWAYHuo41+7015OMeFmDSXBGVFyeG8RkSUZbhed9PYuGLNcM0KCwQuPnkgfLYDogFJj
-        5eRxkzgpyUl0roS7FqRQ4wQcfpqsWke4NPSIPYP4oLddW9cB2xQxbfP3Fz+6MUjwiYiQTg
-        6nl5K0WuLdADLrDUrXFbfoeXXDrQdyWTjGe05SyvcyGJ57dm+BbriKq44klBIA==
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bXGlzG0HOmoIdevnyhrOyZ1aMraEhvkaqTn8FITNBOA=;
+        b=Iiu1tKzLTjqjHkcTONgmn4OIlE01SfXLzsVvatUi94LSzxDgTmeevIVW+poWrLwKpKugQ6
+        JqtBx2MPPnlN2f8is7L85gAqHzfzCONdlw0cHMg54NmunwI0O51P+UkqW6ml8NIqTUJwmz
+        eyfl2PaRFLXhPWgtT2CbpADiwFPk38oiWDgGUfUablVJX0I/K39r93jiqzY+WDbJDDojnU
+        YAIdxVMylZh6/jeJdWXvpFb0JxCrNz6jkrF0HUdtyf29OR9TSke4fo3rPSQZWQ3oLFuuID
+        vaGNJe/BV5aTq+c3owLxkVKgg3eVIkiiZ7vS1C7w3wSR6miLRx3r5hReVR6gmg==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1690907926; a=rsa-sha256;
         cv=none;
-        b=tu3ZBc6ueDNdAgqwWlcN6zk1PR3vgGGl5RqdycpXdahwouetxF/Ny8bj4ZZceQRGCU7Z8S
-        PB+jfbYoLPdIzcbcsXlIh4mg3norBHzSi+WEzZyOWxjcitDp4cR11V+2A/F+G+ZdeWDZhn
-        Fq7Ef5n46vfK04vC/eIqJ49eTbi70EOXn2s8kSMN1y2SY89dTeSXuxZca8Sr5sCDFm+sQV
-        0DjSRgL/w2+CQLcP/Fz8lRDpVooF0ap9/VJSki914NpTOONjyAcptSUdsbpVkcrnfiaMxO
-        Eh8E8yaXCyFpQzzoEuwfYZorhP+lDL3Hes1yNLrXfHLmaF+CP2HiZBuxHzyIIQ==
+        b=NpD+RXPu5/blepl2pz+AkUY5bicI/zqecCPaOaQm008bt2DjjFLZAyDmRo8zfoB4TKMyLu
+        0KY7cRYOhIMDWeHQMJMdobOqsZNyPc2IOmLdHZ0ex1hQJRPLmfuCrpRBBk90DFF+qBF4Eo
+        w7CnWINfSa++rZDQ4z2CwG696+v/CFVk51QWTmfPuMHACNmYbilYrFGvabUCmeZchZ0/86
+        ljIQht4ycv1yxwKgtef1tpf9aASDYVnRcc8rlkuu2v6IsklGpY+YKg6uuqxh7Ce8elJR9F
+        qgnKZTOE2Ni/vhZb+WByZ7DO+HfYcWOhKGyDjTqO7GL4AFVtzay5joLFSDnyYw==
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2 0/5] Additional tests for ISO and hci_sync
-Date:   Tue,  1 Aug 2023 19:38:37 +0300
-Message-ID: <cover.1690907478.git.pav@iki.fi>
+Subject: [PATCH BlueZ v2 2/5] btdev: fix Command Status command opcodes for Setup Sync Conn
+Date:   Tue,  1 Aug 2023 19:38:39 +0300
+Message-ID: <87afe28e40f3bade2466073ace781625235850b9.1690907478.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <cover.1690907478.git.pav@iki.fi>
+References: <cover.1690907478.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds a few tests checking ISO socket handling of invalid input
-parameters and cleanup in some race conditions:
+The command opcode should be the CMD, not EVT.
+---
 
-    ISO QoS CIG 0xF0 - Invalid
-    ISO QoS CIS 0xF0 - Invalid
-    ISO Connect2 CIG 0x01 - Success/Invalid
-    ISO AC 6(ii) CIS 0xEF/auto - Success
-    ISO AC 6(ii) CIS 0xEF/0xEF - Invalid
-    ISO Defer Close - Success
-    ISO Connect Close - Success
-    ISO Defer Wait Close - Success
-    ISO Connect Wait Close - Success
+Notes:
+    v2: no change
 
-There's also one for a hci_sync race condition that triggers GPF:
+ emulator/btdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-    eSCO Simultaneous Disconnect - Failure
-
-I have a patch series fixing these, but we'll revisit the
-HCI_CONN_DELETED flag there, so maybe discussion needed.
-
-These fail on current bluetooth-next/master, so it could make most sense
-to wait for the fixes first.
-
-v2:
-- emit correct event from HCI_Create_Connection_Cancel + fix compile
-
-Pauli Virtanen (5):
-  btdev: check error conditions for HCI_Create_Connection_Cancel
-  btdev: fix Command Status command opcodes for Setup Sync Conn
-  sco-tester: test local and remote disconnecting simultaneously
-  iso-tester: test with large CIS_ID and invalid CIG_ID/CIS_ID
-  iso-tester: add tests checking Remove CIG is emitted
-
- emulator/btdev.c   |  90 ++++++++++++++++++++----
- monitor/bt.h       |   4 ++
- tools/iso-tester.c | 168 +++++++++++++++++++++++++++++++++++++++++++++
- tools/sco-tester.c |  59 ++++++++++++++++
- 4 files changed, 308 insertions(+), 13 deletions(-)
-
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 8658b4121..38dcb189e 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -2685,7 +2685,7 @@ static int cmd_enhanced_setup_sync_conn(struct btdev *dev, const void *data,
+ 	if (cmd->tx_coding_format[0] > 5)
+ 		status = BT_HCI_ERR_INVALID_PARAMETERS;
+ 
+-	cmd_status(dev, status, BT_HCI_EVT_SYNC_CONN_COMPLETE);
++	cmd_status(dev, status, BT_HCI_CMD_ENHANCED_SETUP_SYNC_CONN);
+ 
+ 	return 0;
+ }
+@@ -2731,7 +2731,7 @@ done:
+ 
+ static int cmd_setup_sync_conn(struct btdev *dev, const void *data, uint8_t len)
+ {
+-	cmd_status(dev, BT_HCI_ERR_SUCCESS, BT_HCI_EVT_SYNC_CONN_COMPLETE);
++	cmd_status(dev, BT_HCI_ERR_SUCCESS, BT_HCI_CMD_SETUP_SYNC_CONN);
+ 
+ 	return 0;
+ }
 -- 
 2.41.0
 
