@@ -2,129 +2,120 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731FCC001DF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Aug 2023 03:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 601CDC001DF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Aug 2023 06:56:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231991AbjHBDVJ (ORCPT
+        id S231481AbjHBG4j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Aug 2023 23:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
+        Wed, 2 Aug 2023 02:56:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231129AbjHBDVI (ORCPT
+        with ESMTP id S230047AbjHBG4g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Aug 2023 23:21:08 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 673891723
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Aug 2023 20:21:06 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1bc0d39b52cso18706325ad.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Aug 2023 20:21:06 -0700 (PDT)
+        Wed, 2 Aug 2023 02:56:36 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C98C3E53
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Aug 2023 23:56:33 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-52256241b76so8437985a12.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Aug 2023 23:56:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1690946465; x=1691551265;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AN9x+TMPkEzptao6stcpncTtykK2wV0dleElB0UYCT8=;
-        b=Cno0mjJQUhwb57ViBaSN1P5M1BMrnGd8Jp47E8UeBnsNMo1dOXGNxuCknXPnv+YECI
-         x14l0OKjhHYg76Z3ytr3w9016v0jLz2j4q4pxDDCvALutta/wbwMZAKEKQxKljXaH+oh
-         1y/1bhHGTXVB2ZvLcin7kz8GKjr9tGnMOSCNzyjIXOyd/yVDjbJk5gF7UNLZvLQHl6/j
-         13pY8uvNAnron7ID5SoXOBEOxqy7Aa2pnhG6JZW2fAk5BudVTA2PDh2HTANS4IytlD1G
-         sxqZqVtKHbl6l9DyYhitVhea+x1P/Ih9fT2Xi9Z5BV0ZcklERkYbbe3jfDYF4SXqKCk5
-         migA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690946465; x=1691551265;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=fairphone.com; s=fair; t=1690959392; x=1691564192;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=AN9x+TMPkEzptao6stcpncTtykK2wV0dleElB0UYCT8=;
-        b=dpj0I5bs23FOvosvSNzs1dcbUuJWvj1GJXH+09AESOzePhQ49L7BeItdWRDoiSs83F
-         tPukkFS2A87Dg3dR4ERypLOYjWZpQVXeKBHa2fYLZwBiqleCmUb4iZDmM8ue1hjg5ZPh
-         Bmi1Kd7NuWYPZ3iHuhK43cH8RfIUHyZiHJg+o1cURExkroMZPl+YNv09SXGF0Zh2aASn
-         GM49Rt0/nx5mXMttHodzgwbi9NKfyD1eW3Bz9t26ik75jSKlHQZTdQyzU+p5v3PeASL0
-         mlU2bdy/CSXKjibnb5B+pqJKP2jxuLgtjsvllq8SQ+VYEwaaaXgVi87JL7PpLZvRNY+3
-         EyAw==
-X-Gm-Message-State: ABy/qLb2lrsMki8ECRbzoos7ZE4rp4cCnBxAVH9bQbncl39YuwONWppU
-        yTGnraItvE0jYohSW4JY9Qhv/htn6PM=
-X-Google-Smtp-Source: APBJJlGJ4qBqj61KMaoP839lqRaM6W9R3dX8eyXZs6dolax/FjVRGF63iyNBBy4u1XWddNl6J0udTA==
-X-Received: by 2002:a17:903:22c6:b0:1b8:41d4:89f with SMTP id y6-20020a17090322c600b001b841d4089fmr16222412plg.4.1690946465462;
-        Tue, 01 Aug 2023 20:21:05 -0700 (PDT)
-Received: from [172.17.0.2] ([13.87.243.30])
-        by smtp.gmail.com with ESMTPSA id c10-20020a170902c1ca00b001bc18e579aesm4110923plc.101.2023.08.01.20.21.04
+        bh=4WekZWN6r3kEo9Z2SWEpwzpGIFVoo4aO3LnnSXjlvYM=;
+        b=dQbyTvayxNXzXnaDzhb3dWNJb8dFPo5kSGVOQt8Y0gQ7TNrrZWVkzaPRmfiPVPLedF
+         mGG3RDRxV7QUaRLkg8aVqfQRr8ODrJ2KdPxvphBZYq0UGKJh7blaLtLFzzm2ln4bq2SZ
+         pF2N2ir4xI/1aJevJD8H6tvnHfK+Rt5zs9kzVaMa7JpPd7qTC+FCUx4vV1ewbi36xjTS
+         D2WrR+vD7Wg0O/RVDXd7roySAyHYTJh2dkMkOCeFgVjpinIQdXwuvXegP8wymfFstsH2
+         RsY5OPte5dp5ISxz1iL9meNywNIq3qCZazN3AlfMZY30BSCWZfnrp2DCBjI0CVRpIlnD
+         ruTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1690959392; x=1691564192;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4WekZWN6r3kEo9Z2SWEpwzpGIFVoo4aO3LnnSXjlvYM=;
+        b=LilAdSf2Fi/RCSV5n+8DZc0CAWjUj7fQ/HWHAbDTtUIp08HKiNH52QbzgQewy2lqXg
+         Spo7FYC7AkwQW8bEVwiM0AaKDbf00q7/pjcch5cQGfRAKE0uGKaHQbN6fOgnX+VegqUJ
+         g+j1XQJPMBrGRohqzFihYrBqaI9YuMO9FYfHe0XJMsZ4fQoEkxS+e/zLMN05rfPZglLm
+         u7CkEAV2G1yqrPPrlfUcmn54edL4QDq78qS/7AVq3upVS2z2eAWgc/nHB92OBwWzYCDz
+         KBm5wEsv4+sM9nKPA4JX1Sv+AJ4xMHrWmN4VBREpOMvoCBgP4UFVtZznEqtjWiY+G1Nt
+         yW8w==
+X-Gm-Message-State: ABy/qLaXmT0mUClzewdpkGfO/VWZKishBZDNPtQvWPsJ5psWYpUBAaOg
+        TapXPc8u+TyY3+T4zjJUdl3/2w==
+X-Google-Smtp-Source: APBJJlFGxq+aMT3PqHDgik/2AOf8hLDUHBWjDVKJBcTpdIfewNezftcZ0MjSF0LXzcYzfzYmQ/xYmw==
+X-Received: by 2002:a17:907:7631:b0:993:f9b2:93c1 with SMTP id jy17-20020a170907763100b00993f9b293c1mr4129777ejc.9.1690959392217;
+        Tue, 01 Aug 2023 23:56:32 -0700 (PDT)
+Received: from [172.16.240.113] (144-178-202-138.static.ef-service.nl. [144.178.202.138])
+        by smtp.gmail.com with ESMTPSA id e1-20020a1709062c0100b0099bd5b72d93sm8567400ejh.43.2023.08.01.23.56.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Aug 2023 20:21:05 -0700 (PDT)
-Message-ID: <64c9cba1.170a0220.f573e.95ab@mx.google.com>
-Date:   Tue, 01 Aug 2023 20:21:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4752363289852577924=="
+        Tue, 01 Aug 2023 23:56:31 -0700 (PDT)
+From:   Luca Weiss <luca.weiss@fairphone.com>
+Date:   Wed, 02 Aug 2023 08:56:28 +0200
+Subject: [PATCH v3 1/2] dt-bindings: net: qualcomm: Add WCN3988
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,1/5] monitor: Add TX frame number and speed estimation
-In-Reply-To: <20230801233135.537864-1-luiz.dentz@gmail.com>
-References: <20230801233135.537864-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230802-fp4-bluetooth-v3-1-7c9e7a6e624b@fairphone.com>
+References: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
+In-Reply-To: <20230802-fp4-bluetooth-v3-0-7c9e7a6e624b@fairphone.com>
+To:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+Cc:     ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        Luca Weiss <luca.weiss@fairphone.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.12.3
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4752363289852577924==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add the compatible for the Bluetooth part of the Qualcomm WCN3988
+chipset.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=771876
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.29 seconds
-GitLint                       PASS      1.16 seconds
-BuildEll                      PASS      31.35 seconds
-BluezMake                     PASS      1114.06 seconds
-MakeCheck                     PASS      12.21 seconds
-MakeDistcheck                 PASS      173.74 seconds
-CheckValgrind                 PASS      279.47 seconds
-CheckSmatch                   WARNING   410.45 seconds
-bluezmakeextell               PASS      122.44 seconds
-IncrementalBuild              PASS      4864.81 seconds
-ScanBuild                     PASS      1312.92 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v3,3/5] monitor: Print channel latency information with -a/--analyze
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#96: 
-  10000 +-+----------------------------------------------------------------+
-
-/github/workspace/src/src/13337398.patch total: 0 errors, 1 warnings, 255 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13337398.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1832:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3602:52: warning: array of flexible structuresmonitor/bt.h:3590:40: warning: array of flexible structures
-
-
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Luca Weiss <luca.weiss@fairphone.com>
 ---
-Regards,
-Linux Bluetooth
+ Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 56cbb42b5aea..2735c6a4f336 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -19,6 +19,7 @@ properties:
+       - qcom,qca2066-bt
+       - qcom,qca6174-bt
+       - qcom,qca9377-bt
++      - qcom,wcn3988-bt
+       - qcom,wcn3990-bt
+       - qcom,wcn3991-bt
+       - qcom,wcn3998-bt
+@@ -111,6 +112,7 @@ allOf:
+         compatible:
+           contains:
+             enum:
++              - qcom,wcn3988-bt
+               - qcom,wcn3990-bt
+               - qcom,wcn3991-bt
+               - qcom,wcn3998-bt
 
---===============4752363289852577924==--
+-- 
+2.41.0
+
