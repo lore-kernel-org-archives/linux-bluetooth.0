@@ -2,126 +2,116 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B82B3C00528
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Aug 2023 07:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 216E1C00528
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Aug 2023 08:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233065AbjHBHsO (ORCPT
+        id S231985AbjHBIBz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Aug 2023 03:48:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48942 "EHLO
+        Wed, 2 Aug 2023 04:01:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233428AbjHBHrt (ORCPT
+        with ESMTP id S231966AbjHBIBn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Aug 2023 03:47:49 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D067A3C2B
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Aug 2023 00:44:40 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-522382c4840so9360032a12.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Aug 2023 00:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1690962279; x=1691567079;
-        h=in-reply-to:references:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GmZUwCATYcE4I44HqWj5mINUgIL9T66G/Uq+yOfL8/I=;
-        b=PaAbygFf3Injl5w1BWy3k42sWQc8+A+0Eb8dh5C/4YmhYirBvJ2Plsm/wGbODCl0EP
-         FKhtvZfFaIyCb80VUGIfIQuFEoAsz8FxlZiFW1YtAyKh995k3eei4lKwkgW5zyvxvYGP
-         6GstQcgd08qABfabA42c4snHgb8ofhIZ/XKk3z7VEzJed7adeV23YFOHqXsZJAcg4qnT
-         d067591v8ckAaobVRFOcsGb1wmlArdirQ7jPA6eQBKL4TJHnlWRqOv/FzgzqYnS3PHV2
-         baPgwBHcvmh3Yh1kamvXpr3mIsF67mRXYpD+rH76hF9Sbb9JKijFh7W+0Sbhy3Rw9RTA
-         OUlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1690962279; x=1691567079;
-        h=in-reply-to:references:to:from:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GmZUwCATYcE4I44HqWj5mINUgIL9T66G/Uq+yOfL8/I=;
-        b=arKIAJiIneFUXCo7FlUYa54Gw8WlnrOBWxY/UznuMa5Yje0BZM6LO57sXhzSc/fBhg
-         0JIc6SwNv61fRYqqfYW3aMeQWXSoxfC+5k3z1T7rO0D3Teoyp/rrpOytB78WyThxWhXO
-         3OT1kmt34syY1oaMNZI34IEGbbVwtpD/8y6+3DHgb80U6budvrdeGAx9lLtO+tatvEVA
-         Dg8gHPOLFnVHw2bdIap83Bmgp94SpOBGvpkSdfj9q9YpmR7WS5ecDe+hq1TnnIHrSbB8
-         47/l3aLTiLVcOzfVWg1nvUU1xB05kIluNr0MdhJZgUZLtmtUONw+c/vCaaZdF52CyF3R
-         Nh3w==
-X-Gm-Message-State: ABy/qLYUOPW/FsvaOYSc7jE9HlzWTV4gwr6t3KgvTUMnzO0pRgKi71XB
-        NSQoin28uCIfYdNpPxdKCFKUJvtjEKBf8GnXlBf+bQ==
-X-Google-Smtp-Source: APBJJlEw23V9wEWT+QOq6+62Q9yYMMQtWHn1NNmAf7yK+OfyRs/DiLUYXGxKVeOXzKWbPHorCGExvg==
-X-Received: by 2002:a50:fb84:0:b0:522:5932:57ec with SMTP id e4-20020a50fb84000000b00522593257ecmr3882320edq.41.1690962279065;
-        Wed, 02 Aug 2023 00:44:39 -0700 (PDT)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id bc21-20020a056402205500b0052229882fb0sm8008394edb.71.2023.08.02.00.44.38
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Aug 2023 00:44:38 -0700 (PDT)
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date:   Wed, 02 Aug 2023 09:44:38 +0200
-Message-Id: <CUHW3MP9M1IZ.60K0KONDMM7J@otso>
-Subject: Re: Add WCN3988 Bluetooth support for Fairphone 4
-From:   "Luca Weiss" <luca.weiss@fairphone.com>
-To:     <linux-bluetooth@vger.kernel.org>
-X-Mailer: aerc 0.15.2
-References: <20230802-fp4-bluetooth-v3-1-7c9e7a6e624b@fairphone.com>
- <64ca0759.170a0220.f8e23.106f@mx.google.com>
-In-Reply-To: <64ca0759.170a0220.f8e23.106f@mx.google.com>
+        Wed, 2 Aug 2023 04:01:43 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C5D3B4;
+        Wed,  2 Aug 2023 01:01:42 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37211fkI008077;
+        Wed, 2 Aug 2023 08:01:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=NqWLVpp+y1y0zXW6k+mxHCmC9rdsQy22hgANj0VoGkQ=;
+ b=eNZ6KWmzjSuNq1MtdNJXi5VcWoI2G0mv/WzoUy+Q2vO7iyQDk7Duw/g4slwQaLJHpsTz
+ /SUrqDQHVkfqmAS+hRh6kF78RM+69Y+DhBFb7ygy3+5ohDSDxlppXZahWmdgBho564bq
+ H1fCUfCy1BXzTK7Dbp9bcJVjifwwMf2ZGyQHziqYlC6QmsMGb5TYAaVS8S5Lre1SwSL6
+ I1oLfevEeJR/QfDstGMlorb2ly0+FfU8oH5pahsQyjtsi20rA6/h2UOjMJ+oiACE+A94
+ gz2bta8BZ/kqIcEeYJQwvfzwJMbCFsE3mmXnanoxy4CXcVK95/nyzf8Ax2bdVVoGxO2n 1A== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s75b31qpb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 02 Aug 2023 08:01:36 +0000
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 37281ZtD026320
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 2 Aug 2023 08:01:35 GMT
+Received: from [10.239.104.229] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.30; Wed, 2 Aug
+ 2023 01:01:32 -0700
+Message-ID: <39e7dec4-8c84-2406-3490-251ff942282c@quicinc.com>
+Date:   Wed, 2 Aug 2023 16:01:30 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v14 0/2] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth SoC QCA2066
+Content-Language: en-US
+To:     <johan@kernel.org>
+CC:     <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
+        <johan.hedberg@gmail.com>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <quic_bgodavar@quicinc.com>, <quic_hemantg@quicinc.com>
+References: <20230727083555.1023992-1-quic_tjiang@quicinc.com>
+From:   Tim Jiang <quic_tjiang@quicinc.com>
+In-Reply-To: <20230727083555.1023992-1-quic_tjiang@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: -Iq4voRhO5Cm_Q6Bj98KzKBCe9oaft-1
+X-Proofpoint-ORIG-GUID: -Iq4voRhO5Cm_Q6Bj98KzKBCe9oaft-1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-08-02_03,2023-08-01_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ suspectscore=0 phishscore=0 lowpriorityscore=0 priorityscore=1501
+ mlxscore=0 spamscore=0 mlxlogscore=837 bulkscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2306200000 definitions=main-2308020070
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed Aug 2, 2023 at 9:35 AM CEST,  wrote:
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D772=
-019
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.41 seconds
-> GitLint                       PASS      0.49 seconds
-> SubjectPrefix                 FAIL      0.45 seconds
-> BuildKernel                   PASS      34.12 seconds
-> CheckAllWarning               PASS      37.35 seconds
-> CheckSparse                   PASS      42.35 seconds
-> CheckSmatch                   PASS      114.38 seconds
-> BuildKernel32                 PASS      32.91 seconds
-> TestRunnerSetup               PASS      502.09 seconds
-> TestRunner_l2cap-tester       PASS      23.78 seconds
-> TestRunner_iso-tester         PASS      43.12 seconds
-> TestRunner_bnep-tester        PASS      10.73 seconds
-> TestRunner_mgmt-tester        PASS      218.39 seconds
-> TestRunner_rfcomm-tester      PASS      16.22 seconds
-> TestRunner_sco-tester         PASS      17.27 seconds
-> TestRunner_ioctl-tester       PASS      18.37 seconds
-> TestRunner_mesh-tester        PASS      13.81 seconds
-> TestRunner_smp-tester         PASS      14.59 seconds
-> TestRunner_userchan-tester    PASS      11.37 seconds
-> IncrementalBuild              PASS      36.70 seconds
->
-> Details
-> ##############################
-> Test: SubjectPrefix - FAIL
-> Desc: Check subject contains "Bluetooth" prefix
-> Output:
-> "Bluetooth: " prefix is not specified in the subject
+Hi Johan:
 
-$ git log --oneline --no-merges Documentation/devicetree/bindings/net/bluet=
-ooth/qualcomm-bluetooth.yaml
-a52ced6cf835 dt-bindings: net: qualcomm: Add WCN3988
-6a0a6dd8df9b dt-bindings: net: bluetooth: qualcomm: document VDD_CH1
-87a1752bdd8a dt-bindings: net: Add QCA2066 Bluetooth
-b1d00baaa029 dt-bindings: net: Add WCN6855 Bluetooth
-45564c4ef607 dt-bindings: net: Add generic Bluetooth controller
+   sorry to disturb you , any other comments for this version ? could 
+you help merge this patch, thank you very much.
 
-Don't think I'll reword this commit message to start with "Bluetooth: "
 
+On 7/27/23 16:35, Tim Jiang wrote:
+> This series adds support for qualcomm bluetooth soc qca2066
+>
+> Changes in v14
+>   - remove stray newline
+>
+> Changes in v13
+>   - change the subject name for patch 1/2, and move the qca066 type code to patch 2/2.
+>   - correct log style and sort qca2066 btsoc type for patch 2/2
+>
+> Changes in v12
+>   - fix compile error issue for patch 1/2
+>
+> Changes in v11
+>   - reverse two patches order
+>
+> Changes in v10
+>   - break out btsoc type print into seperate patch
+>
+> Changes in v2-v9
+>   - solve review comments for code style and commit message context
 >
 >
-> ---
-> Regards,
-> Linux Bluetooth
-
+> Tim Jiang (2):
+>    Bluetooth: hci_qca: adjust qca btsoc type print expression
+>    Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC QCA2066
+>
+>   drivers/bluetooth/btqca.c   | 76 ++++++++++++++++++++++++++++++++++++-
+>   drivers/bluetooth/btqca.h   |  4 +-
+>   drivers/bluetooth/hci_qca.c | 41 ++++++++++++++++++--
+>   3 files changed, 114 insertions(+), 7 deletions(-)
+>
