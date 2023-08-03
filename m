@@ -2,97 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3BAC04A6A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 13:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90FFAEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 14:58:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233127AbjHCNGY (ORCPT
+        id S236439AbjHCO6h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Aug 2023 09:06:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
+        Thu, 3 Aug 2023 10:58:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233322AbjHCNGC (ORCPT
+        with ESMTP id S232505AbjHCO6g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Aug 2023 09:06:02 -0400
+        Thu, 3 Aug 2023 10:58:36 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149704C18;
-        Thu,  3 Aug 2023 06:04:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA278173F;
+        Thu,  3 Aug 2023 07:58:35 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E8B4661DB5;
-        Thu,  3 Aug 2023 13:04:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62881C433CD;
-        Thu,  3 Aug 2023 13:04:35 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5E4F861DEB;
+        Thu,  3 Aug 2023 14:58:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFD23C433C8;
+        Thu,  3 Aug 2023 14:58:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691067876;
-        bh=B0ccqMDH+AdwAIknI9mc/N/RE4LfBQNH+2x2/BA7yZ8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BO22zNhs3Sa8KgtAkQf9FwOBVJk+7NMnXn5hYUMVwKrHn/Sl1kOIb82ojmdgFsLCV
-         109LDOgAUGFwNuLVcK0ZHH8Y58Q49OmVAOg0wQmSHkwG7kqEQqFHxJhrPv7adgd3/J
-         p9OjKrWn1G6VrE4ipwGN5YHnKEw+0jhryDetWTqelwTBeud8lcmuutIOCPtru5C4Z/
-         y2NB+APbpdOdae7chURFqC5k/ZF+JBUjyTZo/w9eE7G5XIvi7p/qJN/jzuHX5c0Fwy
-         pTaFVVeK7ig07+TWnJkFI+Vk3hR6vL96NRgYSx2dVSStPCChLGSYzCvSj1LPLBy8G7
-         y3Tk+91B1WbrQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 3/4] Bluetooth: MGMT: Use correct address for memcpy()
-Date:   Thu,  3 Aug 2023 09:04:27 -0400
-Message-Id: <20230803130429.641927-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230803130429.641927-1-sashal@kernel.org>
-References: <20230803130429.641927-1-sashal@kernel.org>
+        s=k20201202; t=1691074714;
+        bh=yMg1YEwuJlIFczOQZY8fQXTUaLaqCwPe1K5AJfailb0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dnZo4TfWlyzyTmeTVwJWce2tqZsbJPYrVVSOM8snyxCcEa18Q473++Mm5TzoZbXF4
+         XG/fbkrFrX8fv2hmeJHqpy34ohk+n3uYw4VyKDaeQBvKAblqmLjRXZOr+s5scO1P3S
+         ISgoZraioxE44UFUuwofEcSSikNuLQl4qrcUE5ALRpzMgRVvoYVKXBBKu0QWubvLXt
+         +nivNO666XHDvB7isEqr2AOhNL3doay5dUfd9BsKgbeuSd3Yr2LPd49UxnVCd5HG4b
+         ingQ56KYEVvDxjWb8/cBWUsziSCYyn3eCzRX5ThpJinsY6AVmqyIzTpdAkt/Z5JQKA
+         dqb99rMqyWC/A==
+Date:   Thu, 3 Aug 2023 16:58:28 +0200
+From:   Simon Horman <horms@kernel.org>
+To:     Neil Armstrong <neil.armstrong@linaro.org>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] bluetooth: qca: use switch case for soc type
+ behavior
+Message-ID: <ZMvAlO2Y9CfJtOlE@kernel.org>
+References: <20230803-topic-sm8550-upstream-bt-v3-0-6874a1507288@linaro.org>
+ <20230803-topic-sm8550-upstream-bt-v3-2-6874a1507288@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.42
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230803-topic-sm8550-upstream-bt-v3-2-6874a1507288@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+On Thu, Aug 03, 2023 at 10:45:27AM +0200, Neil Armstrong wrote:
+> Use switch/case to handle soc type specific behaviour,
+> the permit dropping the qca_is_xxx() inline functions
+> and maked the code clearer and easier to update for new
 
-[ Upstream commit d1f0a9816f5fbc1316355ec1aa4ddfb9b624cca5 ]
+nit: maked -> make
 
-In function ‘fortify_memcpy_chk’,
-    inlined from ‘get_conn_info_complete’ at net/bluetooth/mgmt.c:7281:2:
-include/linux/fortify-string.h:592:25: error: call to
-‘__read_overflow2_field’ declared with attribute warning: detected read
-beyond size of field (2nd parameter); maybe use struct_group()?
-[-Werror=attribute-warning]
-  592 |                         __read_overflow2_field(q_size_field, size);
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
+> SoCs.
+> 
+> Suggested-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+> Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 
-This is due to the wrong member is used for memcpy(). Use correct one.
-
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 815f2abe918ef..81e8da4502a1e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7277,7 +7277,7 @@ static void get_conn_info_complete(struct hci_dev *hdev, void *data, int err)
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
--	memcpy(&rp.addr, &cp->addr.bdaddr, sizeof(rp.addr));
-+	memcpy(&rp.addr, &cp->addr, sizeof(rp.addr));
- 
- 	status = mgmt_status(err);
- 	if (status == MGMT_STATUS_SUCCESS) {
--- 
-2.40.1
-
+...
