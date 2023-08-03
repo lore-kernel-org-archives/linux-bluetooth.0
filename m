@@ -2,52 +2,52 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE5B6C001E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 07:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A6BC001E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 07:21:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233785AbjHCHVE (ORCPT
+        id S233772AbjHCHVL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Aug 2023 03:21:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38780 "EHLO
+        Thu, 3 Aug 2023 03:21:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233792AbjHCHVA (ORCPT
+        with ESMTP id S233697AbjHCHVJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Aug 2023 03:21:00 -0400
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2082.outbound.protection.outlook.com [40.107.6.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8A992D69
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 00:20:57 -0700 (PDT)
+        Thu, 3 Aug 2023 03:21:09 -0400
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2079.outbound.protection.outlook.com [40.107.6.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2899E2D6A
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 00:21:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mw8nSbtQJ1j9/0de/ficGnBOyyVbRqugh65eKpSBa1/q/L95acwxnc8pNroeEEIzfvmexB4ooYV+gODtU7TsznpO9ozsmqmjMr0RoGSjLgOoHgSpQRrAyACb6I9TkF5eX8eBrkLM2qV4obCxhq2cXm79wSxeuv9E0PsW17HrKOVAF42nGKJvxzmAuZMWS6ln+qrlUoBZckCr73Ff0ikkyrjsEg0kDUzK+KYQHUTvY0mU5zX5LekLc32wPshXkaO6EIoW3O3eFD6cCt7aLLwi1aS4kla4QoHXjoZZqjpv4GE5bCivkIdBjD7asoi0DQIR0WOaQQrerI3pB+qB5IQoGQ==
+ b=JSfVjQGjTwDfpFJJF73kzEu8y2Vc6lyrsRugxU4Q0TYM/opdWkZ/YEQfewHyhriSwUbkXn6ryTUhCKMC12yWVL337hSvleeoPOQyEViga/twlh3D0CwAKEzliscsfPUnfRfX03eM7gp8GYWXpBiE1akIEHefDcQHnNoibQGRZO9Wg3pNlNCMf6dRUWsBH/ohP6HM+8HpRPhg5rOwCaiLIuHtGg7UOrAq9lcG2/p6H0CuMJ2Z5x2jwRr3rzQy5WdUwh2mBIdsUSgXtIYRrnRdv6UZjLsj9JmDIEndOXLc8dlakCym7qIo6xf7vGFN6FKx95KZjHO7X8R42EgIHDtf7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SIX4M8oYNUY2aGL5/KwkyU0WRb/cYKNuwctDzxFRIck=;
- b=b/bQOcPJ51/9x8bCwv9VXnH6mnJhJNPBsiTaQnynFhkzphijFYOV2SfPANR0EDl2DdT8a/xN6AqrUnFscl/emfIUc0rqXnSt+McLmzsLyMOmjgPYzgwXfIxKmqSCTS7rV/2kzKON8poP0TbQUsbfNQMhtRxSqhoE89H3c69mc+zFvti3nh+3yU5cwry5bCnyArDq09iAAYIfTHAhDwlCShh8679RbcV/lXRmIbPNwhC+HMvlQTjIRRc3yOV7oHttxNpc1k37XmPZv0In58QVZrRf0n6HGx1yLDQS3dpANbP86qPh0moxJNtbE9NIckHhd+pk3RhIfu+JefsE0RpuQw==
+ bh=ybGHPIVxTh7xjWPFbuoY4xW7eDTO+NySTP1UetPmwRI=;
+ b=QPREXZkd1yA2AyFl+6fx941irGnnoipjrGrwdhiOfmj++3w1Ph6D2CV5+pz9O8YebE/0I3YMGT76ly+iI4oUQoDox7oHYg0xa07LqgVVrSkLttDI7qQyU0lX/t7DIfuAVeTAMNtixEi0SIfrxLaSbsUPkg54CduCTY55eG5SNXeYSpwUfsxBGWcQigfiaErrCVezA/yN/vdFETIKmlt3Sr3qepWsUbxvOkNnu5wnJX05SKUCeDUzcUexyEmQAZGxSk+yL4aKSJuT6ePolcQtKogSsKvKhH8+Ox6IpZj5MDUutQ9VcY+sNgyopcNldPMwNCt4TqEpv2vcqVhr0faaGA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SIX4M8oYNUY2aGL5/KwkyU0WRb/cYKNuwctDzxFRIck=;
- b=BALd7WQmu01MakblyENxxhyyC30OXLYaENmgER3Ve3+uCXnI5uV1olsHEZ6hbVGiNY+PSnjbvxk9iYVOvJ+xH8GYjF9v9imEDksgw0CuU34K0fOhsMgzZ18z18nWkB7DtvyrBXeUzfyW57+ozMhcipIV4+0AWJkEn2UVF9c8bV0=
+ bh=ybGHPIVxTh7xjWPFbuoY4xW7eDTO+NySTP1UetPmwRI=;
+ b=syeACVZ2zr6S7MxgCfEv3bwuZtSJX6PcneBjxFy6Q6pa5Kn0o6oH6k4n3ih/0KioTOuIPdnIRNJMQXipwWhoQowVVcYW20cF1qZ08EG+qa+OwoIY3IYOEW1X2lXnGqDNl0SA11fDGRawrB+J/fp+K12VW+0SNXrK4tk8AmQX01s=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from VI1PR04MB6991.eurprd04.prod.outlook.com (2603:10a6:803:12d::13)
  by DU0PR04MB9418.eurprd04.prod.outlook.com (2603:10a6:10:359::6) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6631.47; Thu, 3 Aug
- 2023 07:20:55 +0000
+ 2023 07:21:02 +0000
 Received: from VI1PR04MB6991.eurprd04.prod.outlook.com
  ([fe80::4299:5db1:461:bc17]) by VI1PR04MB6991.eurprd04.prod.outlook.com
  ([fe80::4299:5db1:461:bc17%7]) with mapi id 15.20.6631.046; Thu, 3 Aug 2023
- 07:20:55 +0000
+ 07:21:02 +0000
 From:   Mahesh Talewad <mahesh.talewad@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.dentz@gmail.com, devyani.godbole@nxp.com,
         nitin.jadhav@nxp.com, mahesh.talewad@nxp.com
-Subject: [PATCH BlueZ v1 2/3] client/player: Add interface menu to configure MICP-MICS during PTS testing.
-Date:   Thu,  3 Aug 2023 10:20:10 +0300
-Message-Id: <20230803072011.191449-3-mahesh.talewad@nxp.com>
+Subject: [PATCH BlueZ v1 3/3] unit/test-micp: Add unit test code for testing MICP-MICS
+Date:   Thu,  3 Aug 2023 10:20:11 +0300
+Message-Id: <20230803072011.191449-4-mahesh.talewad@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230803072011.191449-1-mahesh.talewad@nxp.com>
 References: <20230803072011.191449-1-mahesh.talewad@nxp.com>
@@ -59,609 +59,793 @@ X-ClientProxiedBy: SG2PR01CA0125.apcprd01.prod.exchangelabs.com
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VI1PR04MB6991:EE_|DU0PR04MB9418:EE_
-X-MS-Office365-Filtering-Correlation-Id: dc57af45-d4fb-4299-8575-08db93f22d59
+X-MS-Office365-Filtering-Correlation-Id: 4bc39ef1-8487-451c-ec80-08db93f2313d
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uGmgiJglJvdoOVHaHYYmNtYtQJX/bzg1BdQ7ZHEDlaTVU/ZeiNm8CD0fG6ihR2m5X/NwxTYC/mxTeZNLjKYNIAxSav2vJydBwxp9/WlUj/pL68ucraB7HJ62pyggGa6RSuaN5H0OHO2quhTPJjf3Ws17QSAZFYK9bZxr5Zjs2oloMFiosY7irvZ80cG/2iC/M0bexK22U+7bncdu7CZBzAsbC0ljgWp1y6CPPKbKYla9ch2DnzI9qewZv05FvC6meSj9Y4Cy5wFPFIfAqtgtTU60Lz3tgjH2rxvSIardgBJzRCXYqlPsJ+vv6jlOaua0TWCPEwJa5QHaHcKUgewz6lJ5UHJdHDhVG8RRguvkZGShbMbu7sQOG8WmbHtW+QBDBuVSxYbuEeVluoGVPQpto/pGWZeyT4pllchCjOAE9bc8dgQD+Jc5xKLnPIwlI5diDEMoX9SlA8GFDe9K+GzXN9RcIdWapgwh4J2E9+Yisn0ezFKl/NHhiNg4BrdXMcD32InBkP5d6pSh13Fpd4JvOjX7oQfVBwTbmZy0rhHaaE43sp/7Lm/74lbanYYfAlA0O7txnJ5knv3QNZwAomOBbzBxw7equ0zFzSC3Y6OCQZiMtF2ELZmNSonJRSiNYwbP
+X-Microsoft-Antispam-Message-Info: evl8h23So9/UIXHmtMfUtZksjRBXERGPNZXbnqXAd/A9nz+KY+K+7csUIBnmEZ9dMnajqiiTpRlBihpDKNSUHAUOOVw6881mfVMGFmOORFrNF88oZclqZfMEU7StH1UBVvPEk9bEz3T/BaA4S2ntmFSK5GNTHa6HQGTeZ1sqzw8c6d1qLZyyZNT4PS5k7JgPUhL81ASCEH8+JjrUWg5Iv8xdrvpGwCzI1MIexxMmg1SqEwII8j2vZwoq4mwVKJgiqWSRhRQjTCCZeiio2uOeEWZgeLSmjLtdV6SHiGuvcdzsInRsbKkKGtNDMCC4S+Ye0fFyS0j1bYUIjR0CJuHXabSeO56cXbfFkMCNURqvbhcDx0SFYTOyjgwa6/2Sfq0xzIqoLVuWbnajK0Nf0Qld4UiBI7qCEYfbQX/cWZUrTrcuQv+p55vsKl+tfUOzRJjtLDGTXfXH5Jenn/k8/Que3sgs1yZoBi/LmwofgrnKe146C/Dc4/2uNl9BRbxKDIqDNeSwrYFDYerOrlmPcBO0577lDzCGz2LOvTl35mOhdC4nIDGVrXyjzoK24hK9njKXZ7mVHETjPcIplE+becd1m5/bYJOnpy3DqjkNn9ysbkCxhWTcfzri+osyQjIFmszB
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB6991.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(346002)(376002)(396003)(366004)(136003)(451199021)(36756003)(86362001)(52116002)(478600001)(38100700002)(38350700002)(2616005)(1076003)(186003)(26005)(83380400001)(6506007)(55236004)(41300700001)(8676002)(8936002)(44832011)(6512007)(6666004)(6486002)(30864003)(316002)(66476007)(66556008)(5660300002)(6916009)(4326008)(2906002)(66946007);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Eqf04dOAd41I1bkjq5pKqKBCW+aGq24AwWBTKr5fNVWpX4in/tNSEwECHuFm?=
- =?us-ascii?Q?LfaBKIII0Y4HBaJ3Y0IaOV5XD4mBa7+PsvUD9wybFlG35Vsy8tncl4NU99h4?=
- =?us-ascii?Q?moWy9n8yGV1YoJTBj8HH1pYit6BwjHy2dgI16dbVYmxftLz+vJZgf2f8/d2G?=
- =?us-ascii?Q?xdTTLywQrs6Xq3sJr5LlvanBPxwB0CqnWjjPull1jGu9zyU6D0RuQ+6e0LIu?=
- =?us-ascii?Q?USDDudhRYd93gsPtt5VgoSr6HpD+aNrMaKKmiO7xADWikcf/YsOUQzNOGcAD?=
- =?us-ascii?Q?rG5XjD3Yarvwv1LJyv9baOEMSLwIz8LB++H+NuQp1ObCJj/0ruMaes+uWKMv?=
- =?us-ascii?Q?u+ZdHKqYQ1gnUZciQXa95P4S71hdQ9nzQy/eA8B9yZIxJjpLjKAbj9ydTy4+?=
- =?us-ascii?Q?UWpQkWylzPJ7ijxxBbKnJRNsd0ytZGV5Wme+Gr8UNpPW070rl1v5c2b1zjQ5?=
- =?us-ascii?Q?3kXVPEkGkyrM7FCXlOz+useLkHDpjCLCFDUFtHqcYMHnp2brX44tLvMd4Pac?=
- =?us-ascii?Q?cqDCs5eiPDkRFpF9jk85xjk+zXb3bhTwsefB63n9F5VlVV5CpqoIas+Y6EcX?=
- =?us-ascii?Q?EKrzksTgYDKGFkeuqEoeAGnoA+zismD2BsXVkj4hTWOp5NTiuqlngtd2DnpL?=
- =?us-ascii?Q?wiOsEE6VOssVKieDUnlBndh2wOOHmCvchnu+sawDUXUbVltFXs6MUsETy4QY?=
- =?us-ascii?Q?cIWYZhZaOFDou38fgtwSbUL1H32yY4M8fwOBSM5DvlGqYxk+R5P7rY4yvDWN?=
- =?us-ascii?Q?kYsX6z9JfFdPy6BH7Kasx7is4AZXBXzV9lobSsKaKxu0iu9M8szT58/R1B23?=
- =?us-ascii?Q?Eoz1h/XA+N8DNV6n7yA8Dnt9zsc022e1MuyAnWC4oEx7CYWsbNr0C9Xj+F1R?=
- =?us-ascii?Q?+NutpepVG+0XjG3LQwitCTtDDPt5PwHguOoiUpZ0Mz2+8FNvdpHPy3msuU2s?=
- =?us-ascii?Q?ZIQ9++QFD9HLoWiHWrTJ/T0D7fLVO9uv2DPxXJqi+28JGuHKAexR71idCame?=
- =?us-ascii?Q?A3OExy0C1Kre2R6Fa5/fKKApuDEXE/AkeOyf8MJYYMT7ErhBg48fz9LA1yD+?=
- =?us-ascii?Q?0kWrjDDOn3QVW+P1ssIgexk+1gJoDWl2d9XgP7YIynvZt43xFwoTU71x4DGO?=
- =?us-ascii?Q?VEj8/Muu5qs1On5ZDJverhx2wU3M1+KpHLZAEF775eZAkWUQG38bBU4g4TJ1?=
- =?us-ascii?Q?B8eOvhTTir80Y4gpNGC9jjcn2EJRlGIc4ntpcLKMxo/G2o/DoU84p8tGLL2N?=
- =?us-ascii?Q?TYElNroXXZEiqJmsiYPkOYz6CZb66ygkZC6+MAM0ZxBmGfL9ivDoXLJmyQHs?=
- =?us-ascii?Q?G3SGeI1MT1cGMx4uNxC2UXtwK0nnyn7mHol+FWKbs0WOzqBjKDOgpvjOaaRQ?=
- =?us-ascii?Q?DKWuZiKTvxB9NAPoAfprnlBhFQ8FYgVX0mj3ipdqvSVOlul8x0tLHrDJsuEN?=
- =?us-ascii?Q?P6r/kG4hvfufIbxCRJFI34l+cYW5R7xBwwsD2iy+LefoYMNNaoAQwNuaPViJ?=
- =?us-ascii?Q?DZHJCR+GPtjqapjvYKCNEEGB1ot9arpsoakqGULzaUHWAcX8yJ/u/8lEAHky?=
- =?us-ascii?Q?vqSdNInMaB5qic31MtRKuR95a3R+H40NTgMNCmHo?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Om1tjF1Xd6X6dBMDaGYkt3yjawvh+DSjhb+qOUPo2LTleUPQ/OGnJQGz7Kr1?=
+ =?us-ascii?Q?9aLAKy+VksmJYGs/Eb4sQbLcBqQehao7FuzlM1CbkCTfP2so/KwWCh2u5iO8?=
+ =?us-ascii?Q?or/MejQvoMPHf6k3Fe9AHKc8yY2VL0i6zJowfQP3RGadqnSQqkbbSl7hnc4o?=
+ =?us-ascii?Q?bWonLusQTs0UbuQ9VnWGk3kQyJktfYPLy3pwFyRD9nZaVN1TqAeUwrIi7710?=
+ =?us-ascii?Q?wV6R/eFGgVrA0DWaVKFK1HFiYFei5UDH8NoSh5JqW5UZouy3QtROMR9glatJ?=
+ =?us-ascii?Q?1hMctc/J2dMhz30d53pqlMzLc1af/rwLSbePXikdnX99XS4US4spV4zkxyLN?=
+ =?us-ascii?Q?ghJbB16EUTcPkutXHjrixxExyRHqlaya+JWpJtxtQgeJY6fiuPQY087R4MU1?=
+ =?us-ascii?Q?JLSSxX8JVsnkgzpwS5+4TD0ZOuyNCAznxt6gyu+dIpIRMVFEpfr/Fc4WOxk1?=
+ =?us-ascii?Q?CU1jKLa1E1E6AeO5r2ScQR7dk8pmMKrAKO8oRKOha18ZYC2Ds1gQ05V1Pr8z?=
+ =?us-ascii?Q?UZ0eHdJ0WGKH1EQ/c/VyR0Qr+wfo2JIePkFSvR5fmKRKVesXX+rQVOgbDWMB?=
+ =?us-ascii?Q?ZqGD6XSV3u/yFNEKQmvvJsK4UGhetsxHKI/r1ysQh05UnvDOiy4uejKfUG2+?=
+ =?us-ascii?Q?yZwTpiDAhWftUmx3ceyBdHYXw9SAEE2MGAy2GFRyeKEUSoFRcru/5/MimM13?=
+ =?us-ascii?Q?Rv3kV3wsOyOlTPFIfN4Pf99x0JdrnIZiGGXg5Ns9JrCtNM0pdxV2wl53kDU+?=
+ =?us-ascii?Q?7ZUEYJQT198EWDYDTm8yXCLrnriB/Ww/qIgO0l5/2om7pVlLlXk1YVP9CRxG?=
+ =?us-ascii?Q?nXZMU0xejYX+VEMcY4kNKW0X4d50oleg6q9+qb95UPq5VGe2u+tFWHv6peFO?=
+ =?us-ascii?Q?k+S84OS+6CPALx2slt4j/QQJPcJNa1JKHYd44yeNDclnDRU+SwJ9oz0XWH3b?=
+ =?us-ascii?Q?0PdfAu/l3+h0ly40V0AXpEY41AnEPdBXWbFkckUpj0hF5epvF81oL2DoCttm?=
+ =?us-ascii?Q?vAq+BHfpBYqje4udFv1BhRKmiY3GqmZtW+v7lszYuy5L2KcNqmoOkuOCjxLF?=
+ =?us-ascii?Q?uq66xq6jly4c5YwXu6S5/0P5K3/swWe43uJrkK7hqRe+p2TY36BYzmqqL/iQ?=
+ =?us-ascii?Q?ZOPjetaQ4sfvW1mQXO+q+u5IK1b+jDf02t/yllE00h0/kc7sbfDgNpEETQd3?=
+ =?us-ascii?Q?HdwsgMbdFJjVTQK6GIs6lUAE/Tv94XOTnovCCwj4rT5BK1Ppx0y9v2zfx0pO?=
+ =?us-ascii?Q?SbnVg0H/s4+VeiQQiSWHAGx3MXRQWzlTruLtC6mnzKegMjMBVRreTq3qh0h7?=
+ =?us-ascii?Q?omcCOP5Ekc4qN4Ky0oKOJwQC8vXSphsQtRzbjGqjHkAbYuGxtx3H3Ja5fPtw?=
+ =?us-ascii?Q?yxO7amlGkp/UWR1thhcvmruITu5canogl+lw/A5SUmg4pmHiFRJc4FScR8fX?=
+ =?us-ascii?Q?V1T3v+tFKlpjxqpM2aq+pxyUpu7vbiVr12AgcGir+NkcHQwbyHkikLea2YFa?=
+ =?us-ascii?Q?9yGDyEaqroC8OCdYR0KvRTn8jx9kmhdjG8j9gMeflToClzdzYS43ZOzeCPZr?=
+ =?us-ascii?Q?MeF9owE5Xbl7xMZx8kNPaH2TMXc76/xIhQYMufob?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc57af45-d4fb-4299-8575-08db93f22d59
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4bc39ef1-8487-451c-ec80-08db93f2313d
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB6991.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 07:20:55.6440
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Aug 2023 07:21:02.2513
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1texrbndt7axO0FbSuzajGjvVOzoUfHQ0n17A9uX+JozLIdxtlhrs4bLM+0mLXl5aRfkHd8IlLTuvZqlQTrEGA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: DsZ2l6tOvTaQC1GGeMcb5H9B3DMKCF1Kz64BF62JbQwVsmrFGeCkQZ2x7wy9BUa3dasvTe8GFHCiW2M74dmSmA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9418
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-- Includes implementations required for PTS testing for MICS and MICP.
-- Interface given in bluetoothctl/player menu for sending MICS and MICP
-commands while excecuting PTS test cases. Tested all MICP and MICS PTS
-test cases[LE] and all are passed.
-- Added flag - MICP_MICS_PTS_FLAG in configure.ac which enable/disable
-PTS testing related code during compilation. uncomment this flag in
-configure.ac inorder to enable PTS testing related code and comment
-it for disable. By default this flag is disabled.
-- Spec implementation/PTS testing:
-MICS - MICS_v1.0.pdf
-MICP - MICP_v1.0.pdf
-PTS Testing MICS: MICS.TS.p0ed2.pdf
-PTS Testing MICP: MICP.TS.p3.pdf
+-Implemented UNIT Testcases for MICS[test-micp.c] and MICP[test-mics.c].
 ---
- client/main.c     |  12 ++++
- client/player.c   | 164 ++++++++++++++++++++++++++++++++++++++++++++++
- client/player.h   |   4 ++
- configure.ac      |   3 +
- src/adapter.c     |  87 ++++++++++++++++++++++++
- src/shared/micp.c | 122 ++++++++++++++++++++++++++++++++++
- src/shared/micp.h |   8 +++
- 7 files changed, 400 insertions(+)
+ Makefile.am       |  13 ++
+ src/shared/micp.c |  26 ++++
+ src/shared/micp.h |   2 +
+ unit/test-micp.c  | 357 ++++++++++++++++++++++++++++++++++++++++++++++
+ unit/test-mics.c  | 290 +++++++++++++++++++++++++++++++++++++
+ 5 files changed, 688 insertions(+)
+ create mode 100644 unit/test-micp.c
+ create mode 100644 unit/test-mics.c
 
-diff --git a/client/main.c b/client/main.c
-index 0eac5bdf5..d7c735d19 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -413,6 +413,10 @@ static struct adapter *adapter_new(GDBusProxy *proxy)
- 	if (!default_ctrl)
- 		default_ctrl = adapter;
+diff --git a/Makefile.am b/Makefile.am
+index 6f40f2a74..cde55bebf 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -573,6 +573,19 @@ unit_test_gattrib_LDADD = src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la \
+ 				$(GLIB_LIBS) $(DBUS_LIBS) -ldl -lrt
  
-+#ifdef MICP_MICS_PTS_FLAG
-+	mics_set_proxy((void *)adapter);
-+#endif /* MICP_MICS_PTS_FLAG */
++unit_tests += unit/test-micp
 +
- 	return adapter;
- }
++unit_test_micp_SOURCES = unit/test-micp.c
++
++unit_test_micp_LDADD = src/libshared-glib.la \
++			lib/libbluetooth-internal.la $(GLIB_LIBS)
++
++unit_tests += unit/test-mics
++
++unit_test_mics_SOURCES = unit/test-mics.c
++unit_test_mics_LDADD = src/libshared-glib.la \
++				lib/libbluetooth-internal.la $(GLIB_LIBS)
++
+ unit_tests += unit/test-bap
  
-@@ -892,6 +896,10 @@ static void cmd_show(int argc, char *argv[])
- 		}
- 	}
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+	mics_set_proxy((void *)adapter);
-+#endif /*MICP_MICS_PTS_FLAG*/
-+
- 	if (!g_dbus_proxy_get_property(adapter->proxy, "Address", &iter))
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 
-@@ -951,6 +959,10 @@ static void cmd_select(int argc, char *argv[])
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+	mics_set_proxy((void *)adapter);
-+#endif /*MICP_MICS_PTS_FLAG*/
-+
- 	if (default_ctrl && default_ctrl->proxy == adapter->proxy)
- 		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- 
-diff --git a/client/player.c b/client/player.c
-index e5084967a..2e48025e8 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -596,6 +596,153 @@ static void cmd_show_item(int argc, char *argv[])
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+struct mics_adapter {
-+	GDBusProxy *proxy;
-+};
-+static struct mics_adapter *mics_default_ctrl;
-+void mics_set_proxy(void *proxy)
-+{
-+	mics_default_ctrl = (struct mics_adapter *)proxy;
-+	if (mics_default_ctrl == NULL) {
-+		bt_shell_printf("mics_default_ctrl is NULL\n");
-+		return;
-+	}
-+}
-+static gboolean parse_argument(int argc, char *argv[], const char **arg_table,
-+					const char *msg, dbus_bool_t *value,
-+					const char **option)
-+{
-+	const char **opt;
-+
-+	if (!strcmp(argv[1], "help")) {
-+		for (opt = arg_table; opt && *opt; opt++)
-+			bt_shell_printf("%s\n", *opt);
-+		bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+		return FALSE;
-+	}
-+
-+	if (!strcmp(argv[1], "on") || !strcmp(argv[1], "yes")) {
-+		*value = TRUE;
-+		if (option)
-+			*option = "";
-+		return TRUE;
-+	}
-+
-+	if (!strcmp(argv[1], "off") || !strcmp(argv[1], "no")) {
-+		*value = FALSE;
-+		return TRUE;
-+	}
-+
-+	for (opt = arg_table; opt && *opt; opt++) {
-+		if (strcmp(argv[1], *opt) == 0) {
-+			*value = TRUE;
-+			*option = *opt;
-+			return TRUE;
-+		}
-+	}
-+
-+	bt_shell_printf("Invalid argument %s\n", argv[1]);
-+	return FALSE;
-+}
-+
-+static void cmd_set_mute_state(int argc, char *argv[])
-+{
-+	dbus_bool_t mute_state;
-+	char *str;
-+
-+	if (!parse_argument(argc, argv, NULL, NULL, &mute_state, NULL))
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	str = g_strdup_printf("mics %s", mute_state == TRUE ? "on" : "off");
-+
-+	if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy, "mics",
-+					DBUS_TYPE_BOOLEAN, &mute_state,
-+					generic_callback, str, g_free) == TRUE)
-+		return;
-+	g_free(str);
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_enable_disable_mute_state(int argc, char *argv[])
-+{
-+	dbus_bool_t mute_state;
-+	char *str;
-+
-+	if (!parse_argument(argc, argv, NULL, NULL, &mute_state, NULL))
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	str = g_strdup_printf("mics %s", mute_state == TRUE ? "on" : "off");
-+
-+	if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
-+				"mics_state", DBUS_TYPE_BOOLEAN, &mute_state,
-+				generic_callback, str, g_free) == TRUE)
-+		return;
-+	g_free(str);
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_micp_discover_mute(int argc, char *argv[])
-+{
-+	dbus_bool_t mute_state = 0;
-+	char *str;
-+
-+
-+	if (!parse_argument(argc, argv, NULL, NULL, &mute_state, NULL))
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	str = g_strdup_printf("mics %s", mute_state == TRUE ? "on" : "off");
-+
-+	if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
-+				"micp_disc", DBUS_TYPE_BOOLEAN, &mute_state,
-+				generic_callback, str, g_free) == TRUE)
-+		return;
-+	g_free(str);
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_enable_read_mute_state(int argc, char *argv[])
-+{
-+	char *endptr = NULL;
-+	int handle;
-+
-+	handle = strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
-+		bt_shell_printf("Invalid argument: %s\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+	bt_shell_printf("%s: %x\n", __func__, handle);
-+	if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
-+				"micp_read_char", DBUS_TYPE_UINT16, &handle,
-+				generic_callback, NULL, NULL) == TRUE)
-+		return;
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+
-+static void cmd_enable_write_mute_state(int argc, char *argv[])
-+{
-+	char *endptr = NULL;
-+	int handle;
-+
-+	handle = strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
-+		bt_shell_printf("Invalid argument: %s\n", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+	bt_shell_printf("%s : %x\n", __func__, handle);
-+	if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
-+				"micp_write_char", DBUS_TYPE_UINT16, &handle,
-+				generic_callback, NULL, NULL) == TRUE)
-+		return;
-+
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+}
-+#endif /* MICP_MICS_PTS_FLAG */
-+
- static void cmd_show(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
-@@ -969,6 +1116,23 @@ static const struct bt_shell_menu player_menu = {
- 							item_generator},
- 	{ "show-item",   "<item>",    cmd_show_item, "Show item information",
- 							item_generator},
-+#ifdef MICP_MICS_PTS_FLAG
-+	{ "mics_mute",     "<on/off>", cmd_set_mute_state,
-+					"Set Mics Mute state to on / off",
-+							NULL },
-+	{ "mics_state",     "<on/off>", cmd_enable_disable_mute_state,
-+					"Set Mics Mute state to on[enable] / off[disable]",
-+							NULL },
-+	{ "micp_discover",     "<on/off>", cmd_micp_discover_mute,
-+					"discover Mute Characteristic",
-+							NULL },
-+	{ "micp_read",     "<handle>", cmd_enable_read_mute_state,
-+					"Read Mute Characteristic",
-+							NULL },
-+	{ "micp_write",     "<handle>", cmd_enable_write_mute_state,
-+					"Write Mute Characteristic",
-+							NULL },
-+#endif /* MICP_MICS_PTS_FLAG */
- 	{} },
- };
- 
-diff --git a/client/player.h b/client/player.h
-index e7778cb1e..316090721 100644
---- a/client/player.h
-+++ b/client/player.h
-@@ -10,3 +10,7 @@
- 
- void player_add_submenu(void);
- void player_remove_submenu(void);
-+
-+#ifdef MICP_MICS_PTS_FLAG
-+void mics_set_proxy(void *proxy);
-+#endif /*MICP_MICS_PTS_FLAG*/
-diff --git a/configure.ac b/configure.ac
-index 9a8856380..a190d9168 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -215,6 +215,9 @@ AC_ARG_ENABLE(micp, AS_HELP_STRING([--disable-micp],
- 		[disable MICP profile]), [enable_micp=${enableval}])
- AM_CONDITIONAL(MICP, test "${enable_micp}" != "no")
- 
-+#AC_DEFINE(MICP_MICS_PTS_FLAG, 1,
-+#	[Enable/Disable PTS related code changes in MICP and MICS])
-+
- AC_ARG_ENABLE(csip, AS_HELP_STRING([--disable-csip],
- 		[disable CSIP profile]), [enable_csip=${enableval}])
- AM_CONDITIONAL(CSIP, test "${enable_csip}" != "no")
-diff --git a/src/adapter.c b/src/adapter.c
-index 2679d4302..89f6d76f4 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -68,6 +68,10 @@
- #include "eir.h"
- #include "battery.h"
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+#include "src/shared/micp.h"
-+#endif /*MICP_MICS_PTS_FLAG*/
-+
- #define MODE_OFF		0x00
- #define MODE_CONNECTABLE	0x01
- #define MODE_DISCOVERABLE	0x02
-@@ -3333,6 +3337,82 @@ static void property_set_pairable(const GDBusPropertyTable *property,
- 	property_set_mode(adapter, MGMT_SETTING_BONDABLE, iter, id);
- }
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+static void property_set_mute_state(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
-+{
-+	dbus_bool_t enable;
-+
-+	dbus_message_iter_get_basic(iter, &enable);
-+	DBG("SET %s: %d\n", __func__, enable);
-+	mics_change_mute_state(enable);
-+	g_dbus_pending_property_success(id);
-+}
-+
-+static void property_mute_enable_disable(const GDBusPropertyTable *propert,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
-+{
-+	dbus_bool_t enable;
-+
-+	dbus_message_iter_get_basic(iter, &enable);
-+	DBG("%s: %d\n", __func__, enable);
-+	mics_enable_disable_mute(enable);
-+	g_dbus_pending_property_success(id);
-+}
-+
-+static void property_micp_discover_mute(const GDBusPropertyTable *propert,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
-+{
-+	dbus_bool_t enable;
-+
-+	dbus_message_iter_get_basic(iter, &enable);
-+	DBG("%s : %d\n", __func__, enable);
-+	micp_discover_mute_char();
-+	g_dbus_pending_property_success(id);
-+}
-+
-+static void property_micp_read_mute(const GDBusPropertyTable *propert,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
-+{
-+	uint16_t handle;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16) {
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".InvalidArguments",
-+				"Expected UINT16");
-+		return;
-+	}
-+	dbus_message_iter_get_basic(iter, &handle);
-+	DBG("%s : %x\n", __func__, handle);
-+
-+	mics_mute_char_read(handle);
-+	g_dbus_pending_property_success(id);
-+}
-+
-+static void property_micp_write_mute(const GDBusPropertyTable *propert,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
-+{
-+	uint16_t handle;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16) {
-+		g_dbus_pending_property_error(id,
-+				ERROR_INTERFACE ".InvalidArguments",
-+				"Expected UINT16");
-+		return;
-+	}
-+	dbus_message_iter_get_basic(iter, &handle);
-+	DBG("%s : %x\n", __func__, handle);
-+
-+	micp_char_write_value(handle);
-+	g_dbus_pending_property_success(id);
-+}
-+#endif /*MICP_MICS_PTS_FLAG*/
-+
- static gboolean property_get_pairable_timeout(
- 					const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
-@@ -3886,6 +3966,13 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "DiscoverableTimeout", "u", property_get_discoverable_timeout,
- 					property_set_discoverable_timeout },
- 	{ "Pairable", "b", property_get_pairable, property_set_pairable },
-+#ifdef MICP_MICS_PTS_FLAG
-+	{ "mics", "b", NULL, property_set_mute_state },
-+	{ "mics_state", "b", NULL, property_mute_enable_disable },
-+	{ "micp_disc", "b", NULL, property_micp_discover_mute },
-+	{ "micp_read_char", "q", NULL, property_micp_read_mute },
-+	{ "micp_write_char", "q", NULL, property_micp_write_mute },
-+#endif /*MICP_MICS_PTS_FLAG*/
- 	{ "PairableTimeout", "u", property_get_pairable_timeout,
- 					property_set_pairable_timeout },
- 	{ "Discovering", "b", property_get_discovering },
+ unit_test_bap_SOURCES = unit/test-bap.c
 diff --git a/src/shared/micp.c b/src/shared/micp.c
-index 25ffa6940..c5b814d98 100644
+index c5b814d98..bb71999be 100644
 --- a/src/shared/micp.c
 +++ b/src/shared/micp.c
-@@ -6,6 +6,10 @@
-  *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
-  *
-  */
+@@ -1042,3 +1042,29 @@ void micp_char_write_value(uint16_t handle)
+ 
+ }
+ #endif /*MICP_MICS_PTS_FLAG*/
++
++static void micp_write_cb1(bool success, uint8_t att_ecode, void *user_data)
++{
++	if (success)
++		printf("MICP Write successful\n");
++	else
++		printf("\nWrite failed: 0x%02x\n", att_ecode);
++}
++
++void micp_write_value(struct bt_micp *micp, void *user_data)
++{
++	struct bt_mics *mics = micp_get_mics(micp);
++	uint16_t	value_handle;
++	int ret;
++	const uint16_t value = 0x0001;
++
++	gatt_db_attribute_get_char_data(mics->ms, NULL, &value_handle,
++							NULL, NULL, NULL);
++
++	printf("%s handle: %x\n", __func__, value_handle);
++	ret = bt_gatt_client_write_value(micp->client, value_handle,
++		(void *)&value, sizeof(value), micp_write_cb1, NULL, NULL);
++	if (!ret)
++		printf("bt_gatt_client_write_value() : Write FAILED");
++
++}
+diff --git a/src/shared/micp.h b/src/shared/micp.h
+index 4a9807ed4..f20d46c9c 100644
+--- a/src/shared/micp.h
++++ b/src/shared/micp.h
+@@ -52,3 +52,5 @@ void micp_discover_mute_char(void);
+ void mics_mute_char_read(uint16_t handle);
+ void micp_char_write_value(uint16_t handle);
+ #endif /*MICP_MICS_PTS_FLAG*/
++
++void micp_write_value(struct bt_micp *micp, void *user_data);
+diff --git a/unit/test-micp.c b/unit/test-micp.c
+new file mode 100644
+index 000000000..3db32a4f7
+--- /dev/null
++++ b/unit/test-micp.c
+@@ -0,0 +1,357 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
++ *
++ */
++
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>
 +#endif
 +
- #define _GNU_SOURCE
- #include <inttypes.h>
- #include <string.h>
-@@ -74,6 +78,11 @@ struct bt_micp {
- 	void *user_data;
- };
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+struct bt_mics *pts_mics;
-+struct bt_micp *pts_micp;
-+#endif /*MICP_MICS_PTS_FLAG*/
++#define _GNU_SOURCE
++#include <unistd.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <fcntl.h>
 +
- static struct queue *micp_db;
- static struct queue *micp_cbs;
- static struct queue *sessions;
-@@ -532,6 +541,9 @@ static struct bt_micp_db *micp_db_new(struct gatt_db *db)
- 	mdb->mics = mics_new(db);
- 	mdb->mics->mdb = mdb;
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+	pts_mics = mdb->mics;
-+#endif /*MICP_MICS_PTS_FLAG*/
- 	queue_push_tail(micp_db, mdb);
- 
- 	return mdb;
-@@ -783,6 +795,10 @@ static void foreach_mics_char(struct gatt_db_attribute *attr, void *user_data)
- 	bt_uuid_t uuid, uuid_mute;
- 	struct bt_mics *mics;
- 
-+#ifdef MICP_MICS_PTS_FLAG
-+	pts_micp = micp;
-+#endif /*MICP_MICS_PTS_FLAG*/
 +
- 	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
- 			NULL, NULL, &uuid))
- 		return;
-@@ -920,3 +936,109 @@ bool bt_micp_attach(struct bt_micp *micp, struct bt_gatt_client *client)
- 						micp);
- 	return true;
- }
++#include <glib.h>
 +
-+#ifdef MICP_MICS_PTS_FLAG
-+void mics_change_mute_state(bool state)
++#include "lib/bluetooth.h"
++#include "lib/uuid.h"
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++#include "src/shared/queue.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-server.h"
++#include "src/shared/micp.h"
++
++struct test_data {
++	struct gatt_db *db;
++	struct bt_micp *micp;
++	struct bt_gatt_server *server;
++	struct bt_gatt_client *client;
++	struct queue *ccc_states;
++	size_t iovcnt;
++	struct iovec *iov;
++	struct test_config *cfg;
++};
++
++struct ccc_state {
++	uint16_t handle;
++	uint16_t value;
++};
++
++struct notify {
++	uint16_t handle, ccc_handle;
++	uint8_t *value;
++	uint16_t len;
++	bt_gatt_server_conf_func_t conf;
++	void *user_data;
++};
++
++#define iov_data(args...) ((const struct iovec[]) { args })
++
++#define define_test(name, function, _cfg, args...)		\
++	do {							\
++		const struct iovec iov[] = { args };		\
++		static struct test_data data;			\
++		data.cfg = _cfg;				\
++		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
++		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
++		tester_add(name, &data, NULL, function,	\
++				test_teardown);			\
++	} while (0)
++
++static void print_debug(const char *str, void *user_data)
 +{
-+	if (pts_micp == NULL)
-+		return;
++	const char *prefix = user_data;
 +
-+	DBG(pts_micp, "%s: %d", __func__, state);
-+	state == true ? mics_muted(pts_mics, pts_micp, 0) :
-+					mics_not_muted(pts_mics, pts_micp, 0);
++	if (tester_use_debug())
++		tester_debug("%s%s", prefix, str);
 +}
 +
-+static uint8_t mics_mute_enable_disable(struct bt_mics *mics, uint8_t state)
++static void test_teardown(const void *user_data)
 +{
-+	uint8_t *mute_state;
++	struct test_data *data = (void *)user_data;
 +
-+	mute_state = mdb_get_mute_state(mics->mdb);
++	bt_micp_unref(data->micp);
++	bt_gatt_server_unref(data->server);
++	util_iov_free(data->iov, data->iovcnt);
++	gatt_db_unref(data->db);
 +
-+	*mute_state = state;
++	queue_destroy(data->ccc_states, free);
 +
-+	return 0;
++	tester_teardown_complete();
 +}
 +
-+void mics_enable_disable_mute(bool state)
++static void test_complete_cb(const void *user_data)
 +{
-+	state == true ? mics_mute_enable_disable(pts_mics, MICS_MUTED) :
-+			mics_mute_enable_disable(pts_mics, MICS_DISABLED);
++	tester_test_passed();
 +}
 +
-+static void micp_char_search_cb(bool success, uint8_t att_ecode,
-+						struct bt_gatt_result *result,
-+						void *user_data)
++static bool ccc_state_match(const void *a, const void *b)
 +{
-+	DBG(pts_micp, "micp_char_search_cb");
++	const struct ccc_state *ccc = a;
++	uint16_t handle = PTR_TO_UINT(b);
 +
++	return ccc->handle == handle;
 +}
 +
-+static void micp_foreach_mics_service(struct gatt_db_attribute *attr,
-+							void *user_data)
++static struct ccc_state *find_ccc_state(struct test_data *data,
++				uint16_t handle)
 +{
-+	uint16_t start, end;
-+	bool primary;
-+	bt_uuid_t uuid;
-+	struct bt_gatt_request *gatt_ret;
-+	struct bt_att *micp_att;
-+	struct bt_micp *micp = user_data;
-+	struct bt_mics *mics = micp_get_mics(micp);
++	return queue_find(data->ccc_states, ccc_state_match,
++				UINT_TO_PTR(handle));
++}
 +
-+	if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
-+		&uuid)) {
-+		DBG(micp, "%s: ERR! gatt_db_attribute_get_service_data\n",
-+			__func__);
-+		return;
++static struct ccc_state *get_ccc_state(struct test_data *data, uint16_t handle)
++{
++	struct ccc_state *ccc;
 +
++	ccc = find_ccc_state(data, handle);
++	if (ccc)
++		return ccc;
++
++	ccc = new0(struct ccc_state, 1);
++	ccc->handle = handle;
++	queue_push_tail(data->ccc_states, ccc);
++
++	return ccc;
++}
++
++static void gatt_notify_cb(struct gatt_db_attribute *attrib,
++					struct gatt_db_attribute *ccc,
++					const uint8_t *value, size_t len,
++					struct bt_att *att, void *user_data)
++{
++	struct test_data *data = user_data;
++	struct notify notify;
++
++	memset(&notify, 0, sizeof(notify));
++
++	notify.handle = gatt_db_attribute_get_handle(attrib);
++	notify.ccc_handle = gatt_db_attribute_get_handle(ccc);
++	notify.value = (void *) value;
++	notify.len = len;
++
++	printf("%s: notify.value:%d notify->len:%d\n", __func__,
++		(int)*(notify.value), notify.len);
++	if (!bt_gatt_server_send_notification(data->server,
++			notify.handle, notify.value,
++			notify.len, false))
++		printf("%s: Failed to send notification\n", __func__);
++}
++
++static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
++{
++	struct test_data *data = user_data;
++	struct ccc_state *ccc;
++	uint16_t handle;
++	uint8_t ecode = 0;
++	const uint8_t *value = NULL;
++	size_t len = 0;
++
++	handle = gatt_db_attribute_get_handle(attrib);
++
++	ccc = get_ccc_state(data, handle);
++	if (!ccc) {
++		ecode = BT_ATT_ERROR_UNLIKELY;
++		goto done;
 +	}
-+	micp_att = bt_micp_get_att(micp);
-+	gatt_ret = bt_gatt_discover_characteristics(micp_att, start, end,
-+					micp_char_search_cb, NULL, NULL);
 +
-+	if (gatt_ret)
-+		DBG(micp, "MICP GATT DISCOVER START\n");
++	len = sizeof(ccc->value);
++	value = (void *) &ccc->value;
++
++done:
++	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
++}
++
++static void test_server(const void *user_data)
++{
++	struct test_data *data = (void *)user_data;
++	struct bt_att *att;
++	struct io *io;
++
++	io = tester_setup_io(data->iov, data->iovcnt);
++	g_assert(io);
++
++	tester_io_set_complete_func(test_complete_cb);
++
++	att = bt_att_new(io_get_fd(io), false);
++	g_assert(att);
++
++	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
++
++	data->db = gatt_db_new();
++	g_assert(data->db);
++
++	gatt_db_ccc_register(data->db, gatt_ccc_read_cb, NULL,
++					gatt_notify_cb, data);
++
++	data->micp = bt_micp_new(data->db, NULL);
++	g_assert(data->micp);
++
++	data->server = bt_gatt_server_new(data->db, att, 64, 0);
++	g_assert(data->server);
++
++	bt_gatt_server_set_debug(data->server, print_debug, "bt_gatt_server:",
++					NULL);
++
++	data->ccc_states = queue_new();
++
++	tester_io_send();
++
++	bt_att_unref(att);
++}
++
++#define EXCHANGE_MTU	IOV_DATA(0x02, 0x40, 0x00), \
++						IOV_DATA(0x03, 0x40, 0x00)
++
++#define	MICS_MUTE_WRITE_VAL_00 \
++			IOV_DATA(0x12, 0x03, 0x00, 0x00), \
++			IOV_DATA(0x13)
++
++#define	MICS_MUTE_WRITE_VAL_01 \
++			IOV_DATA(0x12, 0x03, 0x00, 0x01), \
++			IOV_DATA(0x13)
++
++#define	MICS_MUTE_READ \
++			IOV_DATA(0x0a, 0x03, 0x00), \
++			IOV_DATA(0x0b, 0x01)
++
++#define DISCOVER_PRIM_SERV_NOTIF \
++		IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
++		IOV_DATA(0x11, 0x06, 0x01, 0x00, 0x04, 0x00, 0x4d, 0x18), \
++		IOV_DATA(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28), \
++		IOV_DATA(0x01, 0x10, 0x05, 0x00, 0x0a)
++
++/* ATT: Read By Type Request (0x08) len 6
++ *   Handle range: 0x0001-0x0009
++ *   Attribute type: Characteristic (0x2803)
++ * ATT: Read By Type Response (0x09) len 22
++ * Attribute data length: 7
++ *   Handle: 0x0002
++ *   Value: 1a0300c82b
++ *   Properties: 0x1a
++ *   Value Handle: 0x0003
++ *   Value UUID: Mute (0x2bc3)
++ */
++#define DISC_MICS_CHAR_1 \
++	IOV_DATA(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28), \
++	IOV_DATA(0x09, 0x07, \
++		0x02, 0x00, 0x1a, 0x03, 0x00, 0xc3, 0x2b), \
++	IOV_DATA(0x08, 0x05, 0x00, 0x05, 0x00, 0x03, 0x28), \
++	IOV_DATA(0x01, 0x08, 0x05, 0x00, 0x0a)
++
++
++#define MICS_FIND_BY_TYPE_VALUE \
++	IOV_DATA(0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x4d, 0x18), \
++	IOV_DATA(0x07, 0x01, 0x00, 0x04, 0x00), \
++	IOV_DATA(0x06, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28, 0x4d, 0x18), \
++	IOV_DATA(0x01, 0x06, 0x05, 0x00, 0x0a)
++
++#define DISC_MICS_CHAR_AFTER_TYPE \
++	IOV_DATA(0x08, 0x01, 0x00, 0x05, 0x00, 0x03, 0x28), \
++	IOV_DATA(0x09, 0x07, \
++		0x02, 0x00, 0x1a, 0x03, 0x00, 0xc3, 0x2b), \
++	IOV_DATA(0x08, 0x03, 0x00, 0x05, 0x00, 0x03, 0x28), \
++	IOV_DATA(0x01, 0x08, 0x03, 0x00, 0x0a)
++
++#define MICS_WRITE_CCD \
++	IOV_DATA(0x12, 0x04, 0x00, 0x00, 0x00), \
++	IOV_DATA(0x13), \
++	IOV_DATA(0x12, 0x04, 0x00, 0x01, 0x00), \
++	IOV_DATA(0x13)
++
++#define MICS_FIND_INFO \
++	IOV_DATA(0x04, 0x04, 0x00, 0x05, 0x00), \
++	IOV_DATA(0x05, 0x01, 0x04, 0x00, 0x02, 0x29), \
++	IOV_DATA(0x04, 0x05, 0x00, 0x05, 0x00), \
++	IOV_DATA(0x01, 0x04, 0x05, 0x00, 0x0a)
++
++#define MICS_SR_SPN_BV_01_C \
++			EXCHANGE_MTU, \
++			DISCOVER_PRIM_SERV_NOTIF, \
++			DISC_MICS_CHAR_1, \
++			MICS_FIND_BY_TYPE_VALUE, \
++			DISC_MICS_CHAR_AFTER_TYPE, \
++			MICS_FIND_INFO, \
++			MICS_WRITE_CCD, \
++			IOV_DATA(0x0a, 0x03, 0x00), \
++			IOV_DATA(0x0b, 0x01), \
++			MICS_MUTE_WRITE_VAL_00, \
++			IOV_DATA(0x1b, 0x03, 0x00, 0x00), \
++			MICS_MUTE_WRITE_VAL_01, \
++			IOV_DATA(0x1b, 0x03, 0x00, 0x01), \
++			IOV_DATA(0x0a, 0x03, 0x00), \
++			IOV_DATA(0x0b, 0x01)
++
++#define MICS_SR_SGGIT_SER_BV_01_C \
++						EXCHANGE_MTU, \
++						DISCOVER_PRIM_SERV_NOTIF, \
++						MICS_FIND_BY_TYPE_VALUE
++
++#define MICS_SR_SGGIT_CHA_BV_01_C \
++						EXCHANGE_MTU, \
++						DISCOVER_PRIM_SERV_NOTIF, \
++						MICS_FIND_BY_TYPE_VALUE, \
++						DISC_MICS_CHAR_AFTER_TYPE
++
++#define MICS_WRITE_MUTE_CHAR_INVALID \
++			IOV_DATA(0x12, 0x03, 0x00, 0x02), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x13), \
++			IOV_DATA(0x12, 0x03, 0x00, 0x05), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x13)
++
++#define MICS_SR_SPE_BI_1_C	\
++						EXCHANGE_MTU, \
++						DISCOVER_PRIM_SERV_NOTIF, \
++						MICS_FIND_BY_TYPE_VALUE, \
++						MICS_WRITE_MUTE_CHAR_INVALID
++
++#define	MICS_MUTE_READ_INVALID \
++			IOV_DATA(0x0a, 0x03, 0x00), \
++			IOV_DATA(0x0b, 0x02)
++
++#define	MICS_MUTE_WRITE_1 \
++			IOV_DATA(0x12, 0x03, 0x00, 0x01), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x80)
++
++#define	MICS_MUTE_WRITE_0 \
++			IOV_DATA(0x12, 0x03, 0x00, 0x00), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x80)
++
++#define MICS_SR_SPE_BI_02_C	\
++						EXCHANGE_MTU, \
++						DISCOVER_PRIM_SERV_NOTIF, \
++						MICS_FIND_BY_TYPE_VALUE, \
++						MICS_MUTE_READ_INVALID, \
++						MICS_MUTE_WRITE_0, \
++						MICS_MUTE_WRITE_1
++
++int main(int argc, char *argv[])
++{
++
++	tester_init(&argc, &argv);
++
++	define_test("MICS/SR/SGGIT/SER/BV-01-C", test_server, NULL,
++					MICS_SR_SGGIT_SER_BV_01_C);
++	define_test("MICS/SR/SGGIT/CHA/BV-01-C", test_server, NULL,
++					MICS_SR_SGGIT_CHA_BV_01_C);
++	define_test("MICS/SR/SPE/BI-01-C", test_server, NULL,
++					MICS_SR_SPE_BI_1_C);
++	define_test("MICS/SR/SPE/BI-02-C", test_server, NULL,
++					MICS_SR_SPE_BI_02_C);
++	define_test("MICS/SR/SPN/BV-01-C", test_server, NULL,
++					MICS_SR_SPN_BV_01_C);
++
++	return tester_run();
++}
+diff --git a/unit/test-mics.c b/unit/test-mics.c
+new file mode 100644
+index 000000000..fe84fb02d
+--- /dev/null
++++ b/unit/test-mics.c
+@@ -0,0 +1,290 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <unistd.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <fcntl.h>
++
++
++#include <glib.h>
++
++#include "lib/bluetooth.h"
++#include "lib/uuid.h"
++#include "btio/btio.h"
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++#include "src/shared/queue.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-helpers.h"
++#include "src/shared/micp.h"
++
++struct test_data {
++	struct gatt_db *db;
++	struct bt_micp *micp;
++	struct bt_gatt_client *client;
++	size_t iovcnt;
++	struct iovec *iov;
++	struct test_config *cfg;
++};
++
++struct db_attribute_micp_test_data {
++	struct gatt_db_attribute *match;
++	bool found;
++};
++
++#define MICP_GATT_CLIENT_MTU	64
++#define iov_data(args...) ((const struct iovec[]) { args })
++
++#define define_test(name, function, _cfg, args...)		\
++	do {							\
++		const struct iovec iov[] = { args };		\
++		static struct test_data data;			\
++		data.cfg = _cfg;				\
++		data.iovcnt = ARRAY_SIZE(iov_data(args));	\
++		data.iov = util_iov_dup(iov, ARRAY_SIZE(iov_data(args))); \
++		tester_add(name, &data, test_setup, function,	\
++				test_teardown);			\
++	} while (0)
++
++static void print_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	if (tester_use_debug())
++		tester_debug("%s %s", prefix, str);
++}
++
++static void test_teardown(const void *user_data)
++{
++	struct test_data *data = (void *)user_data;
++
++	bt_gatt_client_unref(data->client);
++	util_iov_free(data->iov, data->iovcnt);
++	gatt_db_unref(data->db);
++
++	tester_teardown_complete();
++}
++
++static void test_complete_cb(const void *user_data)
++{
++	tester_test_passed();
++}
++
++static void client_ready_cb(bool success, uint8_t att_ecode, void *user_data)
++{
++
++	if (!success)
++		tester_setup_failed();
 +	else
-+		DBG(micp, "MICP GATT DISCOVER FAILED\n");
-+
-+	mics->service = attr;
-+
-+	gatt_db_service_set_claimed(attr, true);
-+	gatt_db_service_foreach_char(attr, foreach_mics_char, micp);
++		tester_setup_complete();
 +}
 +
-+void micp_discover_mute_char(void)
++static void micp_ready(struct bt_micp *micp, void *user_data)
 +{
-+	bt_uuid_t uuid;
-+
-+	bt_uuid16_create(&uuid, MICS_UUID);
-+	gatt_db_foreach_service(pts_micp->ldb->db, &uuid,
-+					micp_foreach_mics_service, pts_micp);
++	micp_write_value(micp, user_data);
 +}
 +
-+void mics_mute_char_read(uint16_t handle)
++static void test_client(const void *user_data)
 +{
-+	DBG(pts_micp, "%s. handle: %x\n", __func__, handle);
-+	micp_read_value(pts_micp, handle, read_mute_state, pts_micp);
++	struct test_data *data = (void *)user_data;
++	struct io *io;
++
++	io = tester_setup_io(data->iov, data->iovcnt);
++	g_assert(io);
++
++	tester_io_set_complete_func(test_complete_cb);
++
++	data->db = gatt_db_new();
++	g_assert(data->db);
++
++	data->micp = bt_micp_new(data->db, bt_gatt_client_get_db(data->client));
++	g_assert(data->micp);
++
++	bt_micp_set_debug(data->micp, print_debug, "bt_mip: ", NULL);
++
++	bt_micp_ready_register(data->micp, micp_ready, data, NULL);
++
++	bt_micp_attach(data->micp, data->client);
 +}
 +
-+static void micp_write_cb(bool success, uint8_t att_ecode, void *user_data)
++	/* ATT: Exchange MTU Response (0x03) len 2
++	 *   Server RX MTU: 64
++	 */
++	/* ATT: Exchange MTU Request (0x02) len 2
++	 *    Client RX MTU: 64
++	 */
++#define ATT_EXCHANGE_MTU	IOV_DATA(0x02, 0x40, 0x00), \
++			IOV_DATA(0x03, 0x40, 0x00)
++
++/*
++ *      ATT: Read By Type Request (0x08) len 6
++ *        Handle range: 0x0001-0xffff
++ *        Attribute type: Server Supported Features (0x2b3a)
++ */
++#define MICP_READ_SR_FEATURE	IOV_DATA(0x08, 0x01, 0x00, 0Xff, 0xff, \
++			0x3a, 0x2b), \
++			IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
++
++	/*
++	 * ATT: Read By Group Type Request (0x10) len 6
++	 *   Handle range: 0x0001-0xffff
++	 *   Attribute group type: Primary Service (0x2800)
++	 */
++
++/*
++ *     ATT: Read By Group Type Response (0x11) len 7
++ *        Attribute data length: 6
++ *        Attribute group list: 1 entry
++ *        Handle range: 0x00a0-0x00a4
++ *        UUID: Microphone Control (0x184d)
++ */
++#define MICP_READ_GROUP_TYPE	\
++			IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28), \
++			IOV_DATA(0x11, 0x06, \
++				0x01, 0x00, 0x04, 0x00, 0x4d, 0x18), \
++			IOV_DATA(0x10, 0x05, 0x00, 0xff, 0xff, 0x00, 0x28), \
++			IOV_DATA(0x01, 0x10, 0x06, 0x00, 0x0a)
++
++	/* ATT: Read By Group Type Request (0x10) len 6
++	 *   Handle range: 0x0001-0xffff
++	 *   Attribute group type: Secondary Service (0x2801)
++	 */
++	/* ATT: Error Response (0x01) len 4
++	 *   Read By Group Type Request (0x10)
++	 *   Handle: 0x0001
++	 *   Error: Attribute Not Found (0x0a)08 01 00 05 00 02 28
++	 */
++#define MICP_READ_REQ_SECOND_SERVICE	\
++			IOV_DATA(0x10, 0x01, 0x00, 0xff, 0xff, 0x01, 0x28), \
++			IOV_DATA(0x01, 0x10, 0x01, 0x00, 0x0a)
++
++#define MICP_READ_REQ_INCLUDE_SERVICE	\
++			IOV_DATA(0x08, 0x01, 0x00, 0x04, 0x00, 0x02, 0x28), \
++			IOV_DATA(0x01, 0x08, 0x01, 0x00, 0x0a)
++
++	/* ATT: Read By Type Request (0x08) len 6
++	 *   Handle range: 0x0001-0x0004
++	 *   Attribute type: Characteristic (0x2803)
++	 */
++
++/*      ATT: Find Information Request (0x04) len 4
++ *        Handle range: 0x0004-0x0004
++ */
++#define	MICP_FIND_INFO_REQ	\
++			IOV_DATA(0x04, 0x04, 0x00, 0x04, 0x00), \
++			IOV_DATA(0x05, 0x01, 0x04, 0x00, 0x02, 0x29)
++
++/*
++ *      ATT: Read By Type Request (0x08) len 6
++ *        Handle range: 0x0001-0x0004
++ *        Attribute type: Characteristic (0x2803)
++ */
++#define	MICP_READ_REQ_CHAR	\
++			IOV_DATA(0x08, 0x01, 0x00, 0x04, 0x00, 0x03, 0x28),\
++			IOV_DATA(0x09, 0x07, \
++			0x02, 0x00, 0x1a, 0x03, 0x00, 0xc3, 0x2b), \
++			IOV_DATA(0x08, 0x03, 0x00, 0x04, 0x00, 0x03, 0x28), \
++			IOV_DATA(0x01, 0x08, 0x04, 0x00, 0x0a)
++
++#define	MICS_MUTE_READ \
++			IOV_DATA(0x0a, 0x03, 0x00), \
++			IOV_DATA(0x0b, 0x01)
++
++#define	MICS_EN_MUTE_DISCPTR	\
++			IOV_DATA(0x12, 0x04, 0x00, 0x01, 0x00), \
++			IOV_DATA(0x13)
++
++#define	MICS_MUTE_WRITE	\
++			IOV_DATA(0x12, 0x03, 0x00, 0x01),\
++			IOV_DATA(0x13)
++
++#define MICP_CL_CGGIT_SER_BV_01_C \
++			MICS_MUTE_READ, \
++			MICS_EN_MUTE_DISCPTR, \
++			IOV_DATA(0x12, 0x03, 0x00, 0x01, 0x00), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x013)
++
++#define	MICP_CL_CGGIT_CHA_BV_01_C	\
++			MICS_MUTE_READ, \
++			MICS_EN_MUTE_DISCPTR, \
++			IOV_DATA(0x12, 0x03, 0x00, 0x06, 0x00), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x013), \
++			MICS_MUTE_READ
++
++#define MICP_CL_SPE_BI_01_C	\
++			MICS_MUTE_READ, \
++			MICS_EN_MUTE_DISCPTR, \
++			IOV_DATA(0x12, 0x03, 0x00, 0x01, 0x00), \
++			IOV_DATA(0x01, 0x12, 0x03, 0x00, 0x80)
++
++/* GATT Discover All procedure */
++static const struct iovec setup_data[] = {
++				ATT_EXCHANGE_MTU,
++				MICP_READ_SR_FEATURE,
++				MICP_READ_GROUP_TYPE,
++				MICP_READ_REQ_SECOND_SERVICE,
++				MICP_READ_REQ_INCLUDE_SERVICE,
++				MICP_READ_REQ_CHAR,
++				MICP_FIND_INFO_REQ
++};
++
++static void test_setup(const void *user_data)
 +{
-+	if (success)
-+		DBG(pts_micp, "MICP Write successful\n");
-+	else
-+		DBG(pts_micp, "\nWrite failed: 0x%02x\n", att_ecode);
++	struct test_data *data = (void *)user_data;
++	struct bt_att *att;
++	struct gatt_db *db;
++	struct io *io;
++
++	io = tester_setup_io(setup_data, ARRAY_SIZE(setup_data));
++	g_assert(io);
++
++	att = bt_att_new(io_get_fd(io), false);
++	g_assert(att);
++
++	bt_att_set_debug(att, BT_ATT_DEBUG, print_debug, "bt_att:", NULL);
++
++	db = gatt_db_new();
++	g_assert(db);
++
++
++	data->client = bt_gatt_client_new(db, att, MICP_GATT_CLIENT_MTU, 0);
++	g_assert(data->client);
++
++	bt_gatt_client_set_debug(data->client, print_debug, "bt_gatt_client:",
++						NULL);
++
++	bt_gatt_client_ready_register(data->client, client_ready_cb, data,
++						NULL);
++
++	bt_att_unref(att);
++	gatt_db_unref(db);
 +}
 +
-+void micp_char_write_value(uint16_t handle)
++
++int main(int argc, char *argv[])
 +{
-+	const uint8_t value = 0x01;
 +
-+	if (!pts_micp->client) {
-+		DBG(pts_micp, "%s: pts_micp->client is NULL", __func__);
-+		return;
-+	}
-+	bt_gatt_client_write_value(pts_micp->client, handle, &value, 0x01,
-+			micp_write_cb, NULL, NULL);
++	tester_init(&argc, &argv);
 +
++	define_test("MICP/CL/CGGIT/SER/BV-01-C", test_client, NULL,
++					MICS_MUTE_READ);
++	define_test("MICP/CL/CGGIT/CHA/BV-01-C", test_client, NULL,
++					MICP_CL_CGGIT_SER_BV_01_C);
++	define_test("MICP/CL/SPE/BI-01-C", test_client, NULL,
++					MICP_CL_SPE_BI_01_C);
++
++	return tester_run();
 +}
-+#endif /*MICP_MICS_PTS_FLAG*/
-diff --git a/src/shared/micp.h b/src/shared/micp.h
-index b307ac9f4..4a9807ed4 100644
---- a/src/shared/micp.h
-+++ b/src/shared/micp.h
-@@ -44,3 +44,11 @@ bool bt_micp_ready_unregister(struct bt_micp *micp, unsigned int id);
- 
- bool bt_micp_unregister(unsigned int id);
- struct bt_micp *bt_micp_new(struct gatt_db *ldb, struct gatt_db *rdb);
-+
-+#ifdef MICP_MICS_PTS_FLAG
-+void mics_change_mute_state(bool state);
-+void mics_enable_disable_mute(bool state);
-+void micp_discover_mute_char(void);
-+void mics_mute_char_read(uint16_t handle);
-+void micp_char_write_value(uint16_t handle);
-+#endif /*MICP_MICS_PTS_FLAG*/
 -- 
 2.34.1
 
