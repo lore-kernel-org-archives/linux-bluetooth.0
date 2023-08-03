@@ -2,118 +2,180 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CA7C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 09:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3EBC0015E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 10:03:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbjHCJka (ORCPT
+        id S231478AbjHCKDP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Aug 2023 05:40:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33772 "EHLO
+        Thu, 3 Aug 2023 06:03:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230422AbjHCJkQ (ORCPT
+        with ESMTP id S234628AbjHCKCq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Aug 2023 05:40:16 -0400
-Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3E6FF
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 02:40:13 -0700 (PDT)
-Received: by mail-oo1-xc2a.google.com with SMTP id 006d021491bc7-56c711a889dso490870eaf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 02:40:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691055612; x=1691660412;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIIC0uhNaMCHUV1MUb2kGLPH4gEcPRysNzl79Ql47tw=;
-        b=C4SioWKeARcMmhDdf9BTQPLrPDrqUuPOHDqKdmOxuDaCPGW87mgtk2LpcjHQUIKpvQ
-         rksvPgYHnzMvkbFzlwOmxX27iIOSQbH9U8BeXkw0v62ffkSsXv+tCptZDHAMOHj6JCLG
-         lox6nOEm9Qj4PHShOnQCAGvqqG8HNKqBHPlsRM7ulP/9hqQEMvRdNy/vbvf18mu2+FzB
-         KbqiisjItQctW2k9np3aTCDOyICjyu08UirCqDOYCO65mws/K6BmnhK9fmnvQjw82P+G
-         ac3GUKDpW5m/uNemZsdkULrbHUgjBmUZ9DAO93NORs1zBZZVGbv1IdubeRU1Dw7J3aWN
-         be7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691055612; x=1691660412;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tIIC0uhNaMCHUV1MUb2kGLPH4gEcPRysNzl79Ql47tw=;
-        b=agPptF6BLZ+tL03mgDaMb+mpxCiLkJaoTXGyU3L3K0P5fhS0ucmtKSFlOyD4VhUbKL
-         b0VHcAVn6NcNzf8Sdhn3Rj1sztQNd/8Um1s6c3HZ/VIO1txmtgQMK/fT9k5bLsZL1e4t
-         9STgMx7N9PVV/wwbMWHemJxiuorW2ArsZSvjEvddPgMciT2l4QW+9yD+izmcUIoBQtX6
-         cHDDDcuebASgOjOcCDPLWFmDxxcq+WtEhZYgbCGuqhHFbPgjEsZXY7tGGT7ZdoWhrizS
-         a9nEor7IdN42nzFrfBANrcZHODtC+wGTUXMzOPwpm070xzoGsthSSfDNWjMygHYY4hkO
-         xnHQ==
-X-Gm-Message-State: ABy/qLZytWePLn80YV4Wmn/RNp5zMIFdaGALocUP9YelWuezolZce9tM
-        U5bNnXVLe7/43OcExFCUENSybVPjZs0=
-X-Google-Smtp-Source: APBJJlEDZ0b6qdbv4mGI6sR55eUze6DP3UT+jJwhs6WDMUBmSonbQhC+g8kuTeP8BEpa13oSFvUP8A==
-X-Received: by 2002:a4a:6c5b:0:b0:56c:e928:2889 with SMTP id u27-20020a4a6c5b000000b0056ce9282889mr7394938oof.3.1691055612306;
-        Thu, 03 Aug 2023 02:40:12 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.176.205])
-        by smtp.gmail.com with ESMTPSA id v2-20020a4a5a02000000b005660ed0becesm7221932ooa.39.2023.08.03.02.40.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 02:40:12 -0700 (PDT)
-Message-ID: <64cb75fc.4a0a0220.c0e92.0616@mx.google.com>
-Date:   Thu, 03 Aug 2023 02:40:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0822135193808348804=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, neil.armstrong@linaro.org
-Subject: RE: bluetooth: qca: enable WCN7850 support
-In-Reply-To: <20230803-topic-sm8550-upstream-bt-v3-1-6874a1507288@linaro.org>
-References: <20230803-topic-sm8550-upstream-bt-v3-1-6874a1507288@linaro.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+        Thu, 3 Aug 2023 06:02:46 -0400
+Received: from mgamail.intel.com (unknown [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64356B2
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 03:02:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691056964; x=1722592964;
+  h=date:from:to:cc:subject:message-id;
+  bh=IuMEjoSTDvQGHnpYblU15YX6tL6guVGilVh11XvmsUg=;
+  b=gGUTWk1X9wrpxY4eOvEkGkhfhj7hldrPoOfLrx8NGk57RaKkUON9yUos
+   YIsr6y1LtNhJR7cS7DBlHAHWu1O/zMq77BNdYZkcoRd9OvFZ5xvvKfmTq
+   NfJpl9QXLnbTFxZTG6DqCs/EVIZ4HjNxARwK5eauWf0fbEKBkmL5bYniH
+   JddMQV7MiMs5vX6CNu5tznLCJVV9DlDEy95kibt+BzKn5Ln0GoKCA5Co4
+   3mfAIyxG0aoEu5sbH8ehw25P5IWJfad9DD1tqKxYCiq0+hN129HwhU7PL
+   qRTs3iZtfLCGiHIjygv7FmNjREPZhfjVB/75n7lsviodvW39KrxgzD5Wu
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="350123807"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="350123807"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2023 03:02:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10790"; a="976010905"
+X-IronPort-AV: E=Sophos;i="6.01,251,1684825200"; 
+   d="scan'208";a="976010905"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 03 Aug 2023 03:02:19 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qRV9u-000221-0X;
+        Thu, 03 Aug 2023 10:02:18 +0000
+Date:   Thu, 03 Aug 2023 18:01:22 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ c8573f208a1267021ecd4ed6fea7f548c864b2cf
+Message-ID: <202308031819.IV6pAmiy-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0822135193808348804==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: c8573f208a1267021ecd4ed6fea7f548c864b2cf  Bluetooth: Remove unused declaration amp_read_loc_info()
 
-This is automated email and please do not reply to this email!
+elapsed time: 727m
 
-Dear submitter,
+configs tested: 108
+configs skipped: 3
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=772514
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r002-20230801   gcc  
+arc                  randconfig-r043-20230731   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230731   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r033-20230731   gcc  
+csky                                defconfig   gcc  
+hexagon              randconfig-r012-20230731   clang
+hexagon              randconfig-r015-20230731   clang
+hexagon              randconfig-r041-20230731   clang
+hexagon              randconfig-r045-20230731   clang
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-r004-20230731   gcc  
+i386         buildonly-randconfig-r005-20230731   gcc  
+i386         buildonly-randconfig-r006-20230731   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230801   gcc  
+i386                 randconfig-i002-20230801   gcc  
+i386                 randconfig-i003-20230801   gcc  
+i386                 randconfig-i004-20230801   gcc  
+i386                 randconfig-i005-20230801   gcc  
+i386                 randconfig-i006-20230801   gcc  
+i386                 randconfig-i011-20230801   clang
+i386                 randconfig-i012-20230801   clang
+i386                 randconfig-i013-20230801   clang
+i386                 randconfig-i014-20230801   clang
+i386                 randconfig-i015-20230801   clang
+i386                 randconfig-i016-20230801   clang
+i386                 randconfig-r005-20230801   gcc  
+i386                 randconfig-r014-20230731   clang
+i386                 randconfig-r024-20230731   clang
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r022-20230731   gcc  
+mips                 randconfig-r032-20230731   clang
+nios2                               defconfig   gcc  
+nios2                randconfig-r011-20230731   gcc  
+nios2                randconfig-r035-20230731   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r026-20230731   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r004-20230801   gcc  
+riscv                randconfig-r025-20230731   clang
+riscv                randconfig-r042-20230731   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r001-20230801   gcc  
+s390                 randconfig-r021-20230731   clang
+s390                 randconfig-r044-20230731   clang
+sh                               allmodconfig   gcc  
+sh                   randconfig-r003-20230801   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r023-20230731   gcc  
+sparc                randconfig-r034-20230731   gcc  
+sparc64              randconfig-r013-20230731   gcc  
+sparc64              randconfig-r016-20230731   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-r001-20230731   gcc  
+x86_64       buildonly-randconfig-r002-20230731   gcc  
+x86_64       buildonly-randconfig-r003-20230731   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-r006-20230801   gcc  
+x86_64               randconfig-r036-20230731   gcc  
+x86_64               randconfig-x001-20230731   clang
+x86_64               randconfig-x002-20230731   clang
+x86_64               randconfig-x003-20230731   clang
+x86_64               randconfig-x004-20230731   clang
+x86_64               randconfig-x005-20230731   clang
+x86_64               randconfig-x006-20230731   clang
+x86_64               randconfig-x011-20230731   gcc  
+x86_64               randconfig-x012-20230731   gcc  
+x86_64               randconfig-x013-20230731   gcc  
+x86_64               randconfig-x014-20230731   gcc  
+x86_64               randconfig-x015-20230731   gcc  
+x86_64               randconfig-x016-20230731   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
 
-Test Summary:
-CheckPatch                    PASS      3.09 seconds
-GitLint                       PASS      0.94 seconds
-SubjectPrefix                 FAIL      0.57 seconds
-BuildKernel                   PASS      39.20 seconds
-CheckAllWarning               PASS      43.11 seconds
-CheckSparse                   PASS      48.53 seconds
-CheckSmatch                   PASS      130.89 seconds
-BuildKernel32                 PASS      37.86 seconds
-TestRunnerSetup               PASS      576.58 seconds
-TestRunner_l2cap-tester       PASS      27.60 seconds
-TestRunner_iso-tester         PASS      65.42 seconds
-TestRunner_bnep-tester        PASS      12.76 seconds
-TestRunner_mgmt-tester        PASS      238.21 seconds
-TestRunner_rfcomm-tester      PASS      19.13 seconds
-TestRunner_sco-tester         PASS      19.71 seconds
-TestRunner_ioctl-tester       PASS      21.41 seconds
-TestRunner_mesh-tester        PASS      16.12 seconds
-TestRunner_smp-tester         PASS      17.12 seconds
-TestRunner_userchan-tester    PASS      13.60 seconds
-IncrementalBuild              PASS      48.41 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0822135193808348804==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
