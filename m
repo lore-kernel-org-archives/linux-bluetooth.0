@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65840EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 18:16:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CEE1C001DF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Aug 2023 18:16:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230521AbjHCSQg (ORCPT
+        id S230513AbjHCSQh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Aug 2023 14:16:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45060 "EHLO
+        Thu, 3 Aug 2023 14:16:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231288AbjHCSQa (ORCPT
+        with ESMTP id S230407AbjHCSQc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Aug 2023 14:16:30 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D8D30D5
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 11:16:29 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id af79cd13be357-7656652da3cso90145385a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 11:16:28 -0700 (PDT)
+        Thu, 3 Aug 2023 14:16:32 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C4D26B0
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 11:16:30 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id 6a1803df08f44-63cf57c79b5so7877566d6.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 11:16:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691086587; x=1691691387;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=j3DxfGnE9pko5LgOCrvrs8GTtt8YvXgf0sEuqXG+a4k=;
-        b=BYaGJy0GbS/hn6JgqUKZ1Wc6kCCkb1CoMlGvqG+ev/+WVWVuYzdGzdfK0ZLYvIfFTO
-         2eOD9H7H7aQOqmzzfm79UnsOQcITUWbHLJ9G38aexHTIXusWwKL1BMmFz3tcrzMhFEpG
-         SRS03a7POuL1fwEEhsFBZLi4Kwwlrcvv9CuAAk+0DEkFIL7Pc/J4XjOyQO1Q2ufEOFWV
-         mI/pTalQGvKjiyB/4AccEKo25cea6zCZcLanhkrtf7JhumYoGXzAh77Bv0AjcAfIKEtP
-         BjzBRxFXxbMxUFR3PtbAafQADnErkpWzVyw86PX//FACFOk7hRgkXQTbuVA7WMgGnVXZ
-         v19w==
+        d=gmail.com; s=20221208; t=1691086589; x=1691691389;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gYHqPoMcf0KfL9JJufhhWG/TzQIqcnMmxRayQQIU2Gw=;
+        b=ZpHN3+j+MUe65cKcxeSqOun+5FOFaE0y1BKrDEDQxH0Sb3wOG9jks2nbbmS6VdLaeN
+         6CnNMWNKCiAN2NAXcF6+wy8uJ2a/zpUVUf/rEd+iWln96P2VRk6zgDygc5o1PoO407p4
+         ljvcJ0g/v7lOjjFWDJ2A6zLySUS3eJdLeuaVp30SBmWHSnHUVMjGj5GCH4xYgz4A5MJi
+         J40pWvKN3W8IwZJvCFsU70owA6SKaFjeQugpxsY5Fdn2ZST+DZKjrT+d2FWqqjeNe+hI
+         T4H/bZh3JPfy8ExDgrXQMnbX2nRRJAumO8EwZ5XGVW1oQGzK4jv4T+XnKkesiAt+KhxP
+         wD6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691086587; x=1691691387;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j3DxfGnE9pko5LgOCrvrs8GTtt8YvXgf0sEuqXG+a4k=;
-        b=V835II55n1SWNw5WDscwbuhabO8OG3aro7go4aAP6hDk/Y7MHzrmFpeVXTZl05BC9l
-         824uSpR6LtkIMjhNGS4fd73hH1dFbgGt0Fg/O7POLgegcLSCEPhad7NGd0Xtugki2bq1
-         AOikPjd5yuytE0EnrRe2vNDvpBf2VPWkNYgHOPQwkB+KhQIskEmLztz/bhONu6oeVDCp
-         Fm9eB9Q7kotlTPJNhy1errtzWInkpNo54GDK1fyFrliVIMNxpSNvHE3SVuW7szKT1FjJ
-         4I+UrP7FCBdcmzFGvEbR1vAHwhfz9r53EGfZtJ4TZqSScXZptimghC//aZp6Z57Cf6t0
-         VD/Q==
-X-Gm-Message-State: ABy/qLYnZq4I570aYF5xpegx3B2TqS36jE6Et4Ux+IIgzVCFaaNnXjae
-        4f2Uh3TPO4lUsURDuNltawWt3Khl0fU=
-X-Google-Smtp-Source: APBJJlECfgz1NAElNABlvUPHZg05troHwXZYG8yqdREL/urNTDm80dhX1YthcONycoPjPvhcIoM0yQ==
-X-Received: by 2002:a05:620a:2802:b0:765:a496:8a63 with SMTP id f2-20020a05620a280200b00765a4968a63mr28055417qkp.4.1691086587440;
-        Thu, 03 Aug 2023 11:16:27 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691086589; x=1691691389;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gYHqPoMcf0KfL9JJufhhWG/TzQIqcnMmxRayQQIU2Gw=;
+        b=Q9iz75OxXMqRuhyLm7qb/G8Cvpma493pce7y7Qc+eIbOXLftGh/C9tKp2c6C1IeUZu
+         yqvCq6mbhufaU2apgFasH6N2wOxxp4KnjVSG1Pzj3cU2WBHwIzMp4boANp8IAORL9llG
+         UUcAB3LBcquC1FjGxmAqNu0YX74gIjxConhi/ytQ4CpN2yKd0NoaVkqHzl6QMjGy6/B9
+         H8Gm7AJszkVzA9Oi6GgbHrf/JO8qzGg91OAMohwpapaseSK+/Zfz8lTtKzoub96aGhs4
+         aUiPHZruhvo7eUbZMyUvUHpJVU7svw0dhSM0+/lEUmzqM+gbc9a0yPfq83ZHM0J2HshT
+         xTCg==
+X-Gm-Message-State: ABy/qLaWN+5jRj6czM2SITQzi/PkHtWpSEcfzmJpmjGqcDsHiF1wtddM
+        jrQlhSpUNP8z6/C1YZBQ+gMOMkeQ6HA=
+X-Google-Smtp-Source: APBJJlH/egZVrLCQUkVgXnLryBF643VJV44FllkwwmTasdPfI3D6n1q1ydkWXA3E3peUCPYB7TC9OA==
+X-Received: by 2002:a0c:e4c5:0:b0:635:dda5:bb8e with SMTP id g5-20020a0ce4c5000000b00635dda5bb8emr22155601qvm.22.1691086589069;
+        Thu, 03 Aug 2023 11:16:29 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id q5-20020a0cf5c5000000b00626362f1bf1sm83358qvm.63.2023.08.03.11.16.26
+        by smtp.gmail.com with ESMTPSA id q5-20020a0cf5c5000000b00626362f1bf1sm83358qvm.63.2023.08.03.11.16.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 11:16:26 -0700 (PDT)
+        Thu, 03 Aug 2023 11:16:28 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: hci_sync: Fix handling of HCI_OP_CREATE_CONN_CANCEL
-Date:   Thu,  3 Aug 2023 11:16:23 -0700
-Message-ID: <20230803181624.746299-1-luiz.dentz@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync
+Date:   Thu,  3 Aug 2023 11:16:24 -0700
+Message-ID: <20230803181624.746299-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230803181624.746299-1-luiz.dentz@gmail.com>
+References: <20230803181624.746299-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,39 +68,106 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When sending HCI_OP_CREATE_CONN_CANCEL it shall Wait for
-HCI_EV_CONN_COMPLETE, not HCI_EV_CMD_STATUS, when the reason is
-anything but HCI_ERROR_REMOTE_POWER_OFF. This reason is used when
-suspending or powering off, where we don't want to wait for the peer's
-response.
+Connections may be cleanup while waiting for the commands to complete so
+this attempts to check if the connection handle remains valid in case of
+errors that would lead to call hci_conn_failed:
+
+BUG: KASAN: slab-use-after-free in hci_conn_failed+0x1f/0x160
+Read of size 8 at addr ffff888001376958 by task kworker/u3:0/52
+
+CPU: 0 PID: 52 Comm: kworker/u3:0 Not tainted
+6.5.0-rc1-00527-g2dfe76d58d3a #5615
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
+1.16.2-1.fc38 04/01/2014
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x1d/0x70
+ print_report+0xce/0x620
+ ? __virt_addr_valid+0xd4/0x150
+ ? hci_conn_failed+0x1f/0x160
+ kasan_report+0xd1/0x100
+ ? hci_conn_failed+0x1f/0x160
+ hci_conn_failed+0x1f/0x160
+ hci_abort_conn_sync+0x237/0x360
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/bluetooth/hci_sync.c | 44 +++++++++++++++++++++++++---------------
+ 1 file changed, 28 insertions(+), 16 deletions(-)
 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 3348a1b0e3f7..420d25cce2b0 100644
+index 420d25cce2b0..f7908044b411 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -5317,6 +5317,17 @@ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 	if (hdev->hci_ver < BLUETOOTH_VER_1_2)
- 		return 0;
+@@ -5385,25 +5385,17 @@ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
  
-+	/* Wait for HCI_EV_CONN_COMPLETE, not HCI_EV_CMD_STATUS, when the
-+	 * reason is anything but HCI_ERROR_REMOTE_POWER_OFF. This reason is
-+	 * used when suspending or powering off, where we don't want to wait
-+	 * for the peer's response.
+ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ {
+-	int err;
++	int err = 0;
++	u16 handle = conn->handle;
+ 
+ 	switch (conn->state) {
+ 	case BT_CONNECTED:
+ 	case BT_CONFIG:
+-		return hci_disconnect_sync(hdev, conn, reason);
++		err = hci_disconnect_sync(hdev, conn, reason);
++		break;
+ 	case BT_CONNECT:
+ 		err = hci_connect_cancel_sync(hdev, conn, reason);
+-		/* Cleanup hci_conn object if it cannot be cancelled as it
+-		 * likelly means the controller and host stack are out of sync
+-		 * or in case of LE it was still scanning so it can be cleanup
+-		 * safely.
+-		 */
+-		if (err) {
+-			hci_dev_lock(hdev);
+-			hci_conn_failed(conn, err);
+-			hci_dev_unlock(hdev);
+-		}
+-		return err;
++		break;
+ 	case BT_CONNECT2:
+ 		return hci_reject_conn_sync(hdev, conn, reason);
+ 	case BT_OPEN:
+@@ -5413,13 +5405,33 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 			hci_conn_failed(conn, reason);
+ 			hci_dev_unlock(hdev);
+ 		}
+-		break;
++		return 0;
+ 	default:
+ 		conn->state = BT_CLOSED;
+-		break;
++		return 0;
+ 	}
+ 
+-	return 0;
++	/* Cleanup hci_conn object if it cannot be cancelled as it
++	 * likelly means the controller and host stack are out of sync
++	 * or in case of LE it was still scanning so it can be cleanup
++	 * safely.
 +	 */
-+	if (reason != HCI_ERROR_REMOTE_POWER_OFF)
-+		return __hci_cmd_sync_status_sk(hdev, HCI_OP_CREATE_CONN_CANCEL,
-+						6, &conn->dst,
-+						HCI_EV_CONN_COMPLETE,
-+						HCI_CMD_TIMEOUT, NULL);
++	if (err) {
++		struct hci_conn *c;
 +
- 	return __hci_cmd_sync_status(hdev, HCI_OP_CREATE_CONN_CANCEL,
- 				     6, &conn->dst, HCI_CMD_TIMEOUT);
++		/* Check if the connection hasn't been cleanup while waiting
++		 * commands to complete.
++		 */
++		c = hci_conn_hash_lookup_handle(hdev, handle);
++		if (!c || c != conn)
++			return 0;
++
++		hci_dev_lock(hdev);
++		hci_conn_failed(conn, err);
++		hci_dev_unlock(hdev);
++	}
++
++	return err;
  }
+ 
+ static int hci_disconnect_all_sync(struct hci_dev *hdev, u8 reason)
 -- 
 2.41.0
 
