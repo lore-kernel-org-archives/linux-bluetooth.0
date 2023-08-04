@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518ADC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 00:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6A9C001DF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 00:11:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232320AbjHDAL0 (ORCPT
+        id S232258AbjHDAL2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Aug 2023 20:11:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32810 "EHLO
+        Thu, 3 Aug 2023 20:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232258AbjHDALZ (ORCPT
+        with ESMTP id S231761AbjHDAL0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Aug 2023 20:11:25 -0400
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5586D4224
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 17:11:22 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-63cf4827630so8588086d6.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 17:11:22 -0700 (PDT)
+        Thu, 3 Aug 2023 20:11:26 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEBEB420E
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 17:11:23 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-63d03d3cac6so8587956d6.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 17:11:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691107880; x=1691712680;
+        d=gmail.com; s=20221208; t=1691107882; x=1691712682;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nk0LqftkGcvUkx2geH25FY/+oHYJHbqC58Qr0CCsDVI=;
-        b=OOIf4dgbcv9YUbMmwUGSWKhbxR/IIfLRlc0sXOW7Kv1PCD51K3OF4ak22sIuQIvw5i
-         U+UGAEBFGb4ul4qzJBRnACk24lURHV/r8Y4VNVvOMNCuP6r+Y0ZQy9XHxsxtsPB8HL1C
-         kgBjgU5d7wQSArlPAGLW+J0WV8fdfszt7qy4vsuaQY4+OMnPVz5fmG453VXUwgVMrq5F
-         zQsiO6qwHPeIWyFNfUNnOjKdU9m3B2hUDfNzv55aW8nm30LXsEY2RsMaiRnUMkG67qsO
-         E+sLLHxZK17JWf7p4mVHv7YBDj5+YMGlPlibNf2LO3xuJWze1m0o8S/z29pcE/Rj9KhR
-         c9jA==
+        bh=y55Yg/C7ifA7uYXM7obeHwISK1JjvWlPYwGVPva4JEs=;
+        b=SWpZupy4UCPkqDyJ3j34KE9HLpSfJmwvXDMf/I+ggGna0CcpDaD520ppQGD7tEt7gw
+         z6rrkoh9h3PdDW0D/kdefLWTiBrV75GKLzd8ZWz8leMPMMt8ZyougiUCWli9nrxrW9LY
+         ooF3elYCif3F+JPcVMHpNQT+fk6FXu+/nHAy2/cAHbHC1roMkcHw8OlreAt2faJhoxYH
+         w21diB9BMlL14Byb6WSPW/+NRl/S+vxVoYmRu4wbXHuxUILKgEMkxPzQu+XE6An9ZXZj
+         CNQkL7hxNB1hU9COxMji/RCH0T38HRSutHKrKgwoDVEIESzv9+r5DP0yf04CY0rTWPI0
+         4Hww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691107880; x=1691712680;
+        d=1e100.net; s=20221208; t=1691107882; x=1691712682;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nk0LqftkGcvUkx2geH25FY/+oHYJHbqC58Qr0CCsDVI=;
-        b=YcO6/xl8ZLmd8/jPSEZZFcEOOliKKUm9sYkcF9zpCBllCxltuoF2GuA4G6x6/TtQdC
-         OLk53nC+VDUsO3bm+XpYerBJJGAiFapXvvAHMfDSZLudIzDVU3SfW3lWCpE9k1XKFU74
-         5NuPO1SWXtbFgt5mrq/lhmlwQAxkCreBpfRjwOscXylmqUPgXy4/YyhgMm5MPoeurphf
-         zu8ipTDJMBYvuCkrnsAdFhknsWaOqQweWWMx5wUZ653k3qLHRWfpiPnzE+cGzHDmdS+0
-         KHCkoxYdAq0zt7YYUMawbvXmnpX4ZCP8VBtcumKiiMvyoH1S8lpn8n4XU9h9KsqzzgME
-         5U6g==
-X-Gm-Message-State: AOJu0YyzACkPphSEs9bXheGSHNbfSC0hdZfpLFs3ctHTxzaPaX0i8QJr
-        im/lUO3K8rPbqg+BRHA3AYvcQ/1tUJM=
-X-Google-Smtp-Source: AGHT+IESssMob16uWJmvzXXaPhsD/ZyG9itHojo11q8RzfbHcnDUUbgtSov6XOL8sg9nUPEp9i9rlg==
-X-Received: by 2002:a0c:e513:0:b0:62d:eaa8:27e4 with SMTP id l19-20020a0ce513000000b0062deaa827e4mr179045qvm.36.1691107880619;
-        Thu, 03 Aug 2023 17:11:20 -0700 (PDT)
+        bh=y55Yg/C7ifA7uYXM7obeHwISK1JjvWlPYwGVPva4JEs=;
+        b=Tk0j8LduFh/O4exziTTMdkRQxjajFWIF20s8QESyaZ+LjX9F6Ij0HzrRYX7NqydjpM
+         n1QZbwb4OL54nMYP/zk34Qbht+TnpN7RCZ4dzvX0ho6kOdtz9zcL0eAlnEaeEgCEzCgn
+         4O6cvU9dH4/Tmpg55ehFocgn+Q/3U6MEeYtx46fF1szRPdS0Q73bin5Rq33B3TpQKMdD
+         hh0lDqV9PBULWOUTWkzfqdlO4jz8xs80MONjso0MenM2IWKbRQ6tu8HAypftGSGQK/tY
+         SOWBpx8mws3pKVA19sgf8VkAqIyoPuVQ2BkUNi6tIFcZD4QHAeAGc9g+U+LIIQIAnl5N
+         kCTw==
+X-Gm-Message-State: AOJu0Yx4h0t68nuaK/7VyeMJZt3ex7/J6GyWx72HTRj5HcMCQML26E/A
+        AvredXEFiKZ+9O24O3+rjPysLLGCdN0=
+X-Google-Smtp-Source: AGHT+IEANTOTi/hzAGo6W4FCN923h1viwj4tro40Xfw9CJc6hq8ErgnGzd1FjbvJ95+Anki77E0xUA==
+X-Received: by 2002:ad4:4e82:0:b0:636:955e:3dd7 with SMTP id dy2-20020ad44e82000000b00636955e3dd7mr164880qvb.42.1691107882256;
+        Thu, 03 Aug 2023 17:11:22 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id y11-20020a0ce04b000000b0063c6c7f4b92sm272448qvk.1.2023.08.03.17.11.19
+        by smtp.gmail.com with ESMTPSA id y11-20020a0ce04b000000b0063c6c7f4b92sm272448qvk.1.2023.08.03.17.11.20
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 17:11:19 -0700 (PDT)
+        Thu, 03 Aug 2023 17:11:21 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync
-Date:   Thu,  3 Aug 2023 17:11:12 -0700
-Message-ID: <20230804001115.907885-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/5] Bluetooth: ISO: Fix not checking for valid CIG/CIS IDs
+Date:   Thu,  3 Aug 2023 17:11:13 -0700
+Message-ID: <20230804001115.907885-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230804001115.907885-1-luiz.dentz@gmail.com>
 References: <20230804001115.907885-1-luiz.dentz@gmail.com>
@@ -68,106 +68,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Connections may be cleanup while waiting for the commands to complete so
-this attempts to check if the connection handle remains valid in case of
-errors that would lead to call hci_conn_failed:
+Valid range of CIG/CIS are 0x00 to 0xEF, so this checks they are
+properly checked before attempting to use HCI_OP_LE_SET_CIG_PARAMS.
 
-BUG: KASAN: slab-use-after-free in hci_conn_failed+0x1f/0x160
-Read of size 8 at addr ffff888001376958 by task kworker/u3:0/52
-
-CPU: 0 PID: 52 Comm: kworker/u3:0 Not tainted
-6.5.0-rc1-00527-g2dfe76d58d3a #5615
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS
-1.16.2-1.fc38 04/01/2014
-Workqueue: hci0 hci_cmd_sync_work
-Call Trace:
- <TASK>
- dump_stack_lvl+0x1d/0x70
- print_report+0xce/0x620
- ? __virt_addr_valid+0xd4/0x150
- ? hci_conn_failed+0x1f/0x160
- kasan_report+0xd1/0x100
- ? hci_conn_failed+0x1f/0x160
- hci_conn_failed+0x1f/0x160
- hci_abort_conn_sync+0x237/0x360
-
+Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c | 45 ++++++++++++++++++++++++++--------------
- 1 file changed, 29 insertions(+), 16 deletions(-)
+ net/bluetooth/iso.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a9b048d7b419..ec8929e79502 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5389,27 +5389,20 @@ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 358954bfbb32..6b66d6a88b9a 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1187,6 +1187,12 @@ static bool check_io_qos(struct bt_iso_io_qos *qos)
  
- int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ static bool check_ucast_qos(struct bt_iso_qos *qos)
  {
--	int err;
-+	int err = 0;
-+	u16 handle = conn->handle;
- 
- 	switch (conn->state) {
- 	case BT_CONNECTED:
- 	case BT_CONFIG:
--		return hci_disconnect_sync(hdev, conn, reason);
-+		err = hci_disconnect_sync(hdev, conn, reason);
-+		break;
- 	case BT_CONNECT:
- 		err = hci_connect_cancel_sync(hdev, conn, reason);
--		/* Cleanup hci_conn object if it cannot be cancelled as it
--		 * likelly means the controller and host stack are out of sync
--		 * or in case of LE it was still scanning so it can be cleanup
--		 * safely.
--		 */
--		if (err) {
--			hci_dev_lock(hdev);
--			hci_conn_failed(conn, err);
--			hci_dev_unlock(hdev);
--		}
--		return err;
-+		break;
- 	case BT_CONNECT2:
--		return hci_reject_conn_sync(hdev, conn, reason);
-+		err = hci_reject_conn_sync(hdev, conn, reason);
-+		break;
- 	case BT_OPEN:
- 	case BT_BOUND:
- 		hci_dev_lock(hdev);
-@@ -5418,10 +5411,30 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 		return 0;
- 	default:
- 		conn->state = BT_CLOSED;
--		break;
-+		return 0;
- 	}
- 
--	return 0;
-+	/* Cleanup hci_conn object if it cannot be cancelled as it
-+	 * likelly means the controller and host stack are out of sync
-+	 * or in case of LE it was still scanning so it can be cleanup
-+	 * safely.
-+	 */
-+	if (err) {
-+		struct hci_conn *c;
++	if (qos->ucast.cig > 0xef && qos->ucast.cig != BT_ISO_QOS_CIG_UNSET)
++		return false;
 +
-+		/* Check if the connection hasn't been cleanup while waiting
-+		 * commands to complete.
-+		 */
-+		c = hci_conn_hash_lookup_handle(hdev, handle);
-+		if (!c || c != conn)
-+			return 0;
++	if (qos->ucast.cis > 0xef && qos->ucast.cis != BT_ISO_QOS_CIS_UNSET)
++		return false;
 +
-+		hci_dev_lock(hdev);
-+		hci_conn_failed(conn, err);
-+		hci_dev_unlock(hdev);
-+	}
-+
-+	return err;
- }
+ 	if (qos->ucast.sca > 0x07)
+ 		return false;
  
- static int hci_disconnect_all_sync(struct hci_dev *hdev, u8 reason)
 -- 
 2.41.0
 
