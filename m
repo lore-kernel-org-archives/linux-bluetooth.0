@@ -2,387 +2,324 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3680CC001DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 09:17:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4AE7C04A94
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 09:31:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbjHDJRN (ORCPT
+        id S230417AbjHDJbV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Aug 2023 05:17:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33184 "EHLO
+        Fri, 4 Aug 2023 05:31:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbjHDJQl (ORCPT
+        with ESMTP id S230357AbjHDJbM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Aug 2023 05:16:41 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C7F5FDC
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Aug 2023 02:14:19 -0700 (PDT)
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 70E264248F
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Aug 2023 09:14:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1691140458;
-        bh=8rGo3k1kC3SG0JlA6B0FcgRpR27Y/ljgOCgJUJB3eww=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=hhUeh7pifFKY4s1sD6lpLbpZx1kiCMa/ty3cTXBE8bTLW1Vu31Nmd4pnfQx2kFylS
-         OF1HFlFge91yJ7afRH4+GVFPIdwok7Gb/MPE0Ng6siBJqf0BHdWLXee2d2ZPy0kU51
-         AOOdY2iUipHM7PRmQ20AaWx2WI7MyKKjTu90W5bx8Z1y29V9UO0Y90eEGcDWU6g7Pz
-         b6lLKcNbxcMlL4dPXjbppw57BNixPwI8BKQJxBh+ffw3gA/N0/lJxBeK5EUSS2sK+1
-         M62f9kRb5QYQ4pMFWrGaWjT10gjkxw1RuEH3M/aAcBq551JU2f6qC/prXNekk5CLYg
-         tfHJGjgyQS04w==
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-99c0bd2ca23so166775666b.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Aug 2023 02:14:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691140458; x=1691745258;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8rGo3k1kC3SG0JlA6B0FcgRpR27Y/ljgOCgJUJB3eww=;
-        b=XlbFJT2VYKTrP1EpzrgI1Nk74ZQYXxWVQkL1Nzt9TxtvzB2UQoU32++RpnibXpDzfl
-         TV7qpupa1ETsZmtz7Sr3woHDu9jw27Fs68OoXeSbLb/6Btgum2kNoJSK0fnQHJFPiFGG
-         L6uQnBXQZPMqEIrV7Rb/e2EJol7cFjE0FcPaQkC87nPDX4lJe40ksbw0Fjq1RDxblIfI
-         yQ23wbZYfBFzr1QOIbAfq3aq9slgL+TkQIr9pMcE+jO57I/AnvCIACPYE8kxEVtvqv1/
-         u3SemibWlyjWR+KoMCUymTd8/SqyfFj3/hvNAgsWDCF8SiYgL/+qhXQ3w3iYEOiXhWqD
-         PLeg==
-X-Gm-Message-State: AOJu0Yxl6CZW75UUJn8qlSdOxDjatljsUcQNJvn11KRg7604jqethAoU
-        /8hCnYoL4IOjb9BW6MtIi4FOP4DUO9SKi9zYK4S5TEs57NwtmJTGZegnWx5iG0RbuJwHMFqpIZ6
-        zd4b2LcA3NnUac6Mns197ybwKt913qIFxGTp5apTHxEokTFLmXaAmOjYlR9E2Qw==
-X-Received: by 2002:a05:6402:74f:b0:522:560d:d691 with SMTP id p15-20020a056402074f00b00522560dd691mr1009171edy.25.1691140457907;
-        Fri, 04 Aug 2023 02:14:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGqku7xSzPYmc5dC7/kOwNHWqg5sQE1nZEda6zjwqOZ6nmwhGbUJMA/VGl5mwPLtTMMPEMKKT/ny4Xz8neyyQg=
-X-Received: by 2002:a05:6402:74f:b0:522:560d:d691 with SMTP id
- p15-20020a056402074f00b00522560dd691mr1009144edy.25.1691140457462; Fri, 04
- Aug 2023 02:14:17 -0700 (PDT)
-MIME-Version: 1.0
+        Fri, 4 Aug 2023 05:31:12 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB65E49E8;
+        Fri,  4 Aug 2023 02:31:06 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3749UXoE4028706, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3749UXoE4028706
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+        Fri, 4 Aug 2023 17:30:33 +0800
+Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Fri, 4 Aug 2023 17:30:10 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Fri, 4 Aug 2023 17:30:08 +0800
+Received: from RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3]) by
+ RTEXMBS03.realtek.com.tw ([fe80::5510:ad08:5390:1ed3%2]) with mapi id
+ 15.01.2375.007; Fri, 4 Aug 2023 17:30:08 +0800
+From:   Max Chou <max.chou@realtek.com>
+To:     You-Sheng Yang <vicamo.yang@canonical.com>
+CC:     "marcel@holtmann.org" <marcel@holtmann.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
+        Hilda Wu <hildawu@realtek.com>,
+        Karen Hsu <karenhsu@realtek.com>,
+        KidmanLee <kidman@realtek.com>,
+        "juerg.haefliger@canonical.com" <juerg.haefliger@canonical.com>,
+        "Riley.Kao@dell.com" <Riley.Kao@dell.com>
+Subject: RE: [PATCH] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for RTL8852C
+Thread-Topic: [PATCH] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for
+ RTL8852C
+Thread-Index: AQHZxpgkEr5rSREj8kSXpMCCHTNRG6/ZVLuAgACKEeA=
+Date:   Fri, 4 Aug 2023 09:30:08 +0000
+Message-ID: <6801ac03d44b4e02807c255d7edfb59d@realtek.com>
 References: <20230804055426.6806-1-max.chou@realtek.com>
-In-Reply-To: <20230804055426.6806-1-max.chou@realtek.com>
-From:   You-Sheng Yang <vicamo.yang@canonical.com>
-Date:   Fri, 4 Aug 2023 17:14:05 +0800
-Message-ID: <CA+rHWAJuO0D3Km+cuyG2FQX45N=q546iVF6n78RV60onqOBKsA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for RTL8852C
-To:     max.chou@realtek.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex_lu@realsil.com.cn, hildawu@realtek.com, karenhsu@realtek.com,
-        kidman@realtek.com, juerg.haefliger@canonical.com,
-        Riley.Kao@dell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ <CA+rHWAJuO0D3Km+cuyG2FQX45N=q546iVF6n78RV60onqOBKsA@mail.gmail.com>
+In-Reply-To: <CA+rHWAJuO0D3Km+cuyG2FQX45N=q546iVF6n78RV60onqOBKsA@mail.gmail.com>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.21.132.197]
+x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-By the way, what will you do to linux-firmware commit 53e48f93f
-("rtl_bt: Add firmware and config files for RTL8851B")? It is also a
-V2 firmware. If it's not subjected to the rename here, there will be
-some V2 firmware blobs with V1 names, which may add some more troubles
-in the future.
-
-$ hexdump -C rtl_bt/rtl8851bu_fw.bin | head -n1
-00000000  52 54 42 54 43 6f 72 65  41 b0 34 01 44 ba 01 00  |RTBTCoreA.4.D.=
-..|
-
-On Fri, Aug 4, 2023 at 1:54=E2=80=AFPM <max.chou@realtek.com> wrote:
->
-> From: Max Chou <max.chou@realtek.com>
->
-> In the commit of linux-firmware project, rtl8852cu_fw.bin is updated as
-> FW v2 format[1]. Consider the case that if driver did not be updated for
-> FW v2 supported[2], it can not use FW v2.
-> By Canonical's suggestion, older driver should be able to load FW v1,
-> so rtl8852cu_fw.bin will be revert to the previous commit as FW v1 and
-> add rtl8852cu_fw_v2.bin as FW v2. This item will be started on
-> linux-firmware project.
->
-> In this commit, the driver prefers to load FW v2 if available. Fallback t=
-o
-> FW v1 otherwise.
->
-> To do on linux-firmware project.
-> rtl_bt/rtl8852cu_fw.bin: FW v1 (stay at ver. 0xD7B8_FABF)
-> rtl_bt/rtl8852cu_fw_v2.bin: FW v2 (to be maintained)
->
-> [1]'9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")'
-> [2]'55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
->     to 0x040D_7225")'
->
-> Suggested-by: Juerg Haefliger <juerg.haefliger@canonical.com>
-> Tested-by: Hilda Wu <hildawu@realtek.com>
-> Signed-off-by: Max Chou <max.chou@realtek.com>
-> ---
->  drivers/bluetooth/btrtl.c | 68 +++++++++++++++++++++++++--------------
->  1 file changed, 44 insertions(+), 24 deletions(-)
->
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index ddae6524106d..8bfa86dd12f7 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -104,7 +104,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
->           .config_needed =3D false,
->           .has_rom_version =3D false,
-> -         .fw_name =3D "rtl_bt/rtl8723a_fw.bin",
-> +         .fw_name =3D "rtl_bt/rtl8723a_fw",
->           .cfg_name =3D NULL,
->           .hw_info =3D "rtl8723au" },
->
-> @@ -112,7 +112,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_UART),
->           .config_needed =3D true,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723bs_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723bs_fw",
->           .cfg_name =3D "rtl_bt/rtl8723bs_config",
->           .hw_info  =3D "rtl8723bs" },
->
-> @@ -120,7 +120,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
->           .config_needed =3D false,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723b_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723b_fw",
->           .cfg_name =3D "rtl_bt/rtl8723b_config",
->           .hw_info  =3D "rtl8723bu" },
->
-> @@ -132,7 +132,7 @@ static const struct id_table ic_id_table[] =3D {
->           .hci_bus =3D HCI_UART,
->           .config_needed =3D true,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723cs_cg_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723cs_cg_fw",
->           .cfg_name =3D "rtl_bt/rtl8723cs_cg_config",
->           .hw_info  =3D "rtl8723cs-cg" },
->
-> @@ -144,7 +144,7 @@ static const struct id_table ic_id_table[] =3D {
->           .hci_bus =3D HCI_UART,
->           .config_needed =3D true,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723cs_vf_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723cs_vf_fw",
->           .cfg_name =3D "rtl_bt/rtl8723cs_vf_config",
->           .hw_info  =3D "rtl8723cs-vf" },
->
-> @@ -156,7 +156,7 @@ static const struct id_table ic_id_table[] =3D {
->           .hci_bus =3D HCI_UART,
->           .config_needed =3D true,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723cs_xx_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723cs_xx_fw",
->           .cfg_name =3D "rtl_bt/rtl8723cs_xx_config",
->           .hw_info  =3D "rtl8723cs" },
->
-> @@ -164,7 +164,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
->           .config_needed =3D true,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723d_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723d_fw",
->           .cfg_name =3D "rtl_bt/rtl8723d_config",
->           .hw_info  =3D "rtl8723du" },
->
-> @@ -172,7 +172,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
->           .config_needed =3D true,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8723ds_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8723ds_fw",
->           .cfg_name =3D "rtl_bt/rtl8723ds_config",
->           .hw_info  =3D "rtl8723ds" },
->
-> @@ -180,7 +180,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
->           .config_needed =3D false,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8821a_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8821a_fw",
->           .cfg_name =3D "rtl_bt/rtl8821a_config",
->           .hw_info  =3D "rtl8821au" },
->
-> @@ -189,7 +189,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8821c_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8821c_fw",
->           .cfg_name =3D "rtl_bt/rtl8821c_config",
->           .hw_info  =3D "rtl8821cu" },
->
-> @@ -198,7 +198,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D true,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8821cs_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8821cs_fw",
->           .cfg_name =3D "rtl_bt/rtl8821cs_config",
->           .hw_info  =3D "rtl8821cs" },
->
-> @@ -206,7 +206,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
->           .config_needed =3D false,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8761a_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8761a_fw",
->           .cfg_name =3D "rtl_bt/rtl8761a_config",
->           .hw_info  =3D "rtl8761au" },
->
-> @@ -215,7 +215,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8761b_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8761b_fw",
->           .cfg_name =3D "rtl_bt/rtl8761b_config",
->           .hw_info  =3D "rtl8761btv" },
->
-> @@ -223,7 +223,7 @@ static const struct id_table ic_id_table[] =3D {
->         { IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
->           .config_needed =3D false,
->           .has_rom_version =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8761bu_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8761bu_fw",
->           .cfg_name =3D "rtl_bt/rtl8761bu_config",
->           .hw_info  =3D "rtl8761bu" },
->
-> @@ -232,7 +232,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D true,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8822cs_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8822cs_fw",
->           .cfg_name =3D "rtl_bt/rtl8822cs_config",
->           .hw_info  =3D "rtl8822cs" },
->
-> @@ -241,7 +241,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D true,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8822cs_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8822cs_fw",
->           .cfg_name =3D "rtl_bt/rtl8822cs_config",
->           .hw_info  =3D "rtl8822cs" },
->
-> @@ -250,7 +250,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8822cu_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8822cu_fw",
->           .cfg_name =3D "rtl_bt/rtl8822cu_config",
->           .hw_info  =3D "rtl8822cu" },
->
-> @@ -259,7 +259,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D true,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8822b_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8822b_fw",
->           .cfg_name =3D "rtl_bt/rtl8822b_config",
->           .hw_info  =3D "rtl8822bu" },
->
-> @@ -268,7 +268,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8852au_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8852au_fw",
->           .cfg_name =3D "rtl_bt/rtl8852au_config",
->           .hw_info  =3D "rtl8852au" },
->
-> @@ -277,7 +277,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D true,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8852bs_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8852bs_fw",
->           .cfg_name =3D "rtl_bt/rtl8852bs_config",
->           .hw_info  =3D "rtl8852bs" },
->
-> @@ -286,7 +286,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8852bu_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8852bu_fw",
->           .cfg_name =3D "rtl_bt/rtl8852bu_config",
->           .hw_info  =3D "rtl8852bu" },
->
-> @@ -295,7 +295,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D true,
-> -         .fw_name  =3D "rtl_bt/rtl8852cu_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8852cu_fw",
->           .cfg_name =3D "rtl_bt/rtl8852cu_config",
->           .hw_info  =3D "rtl8852cu" },
->
-> @@ -304,7 +304,7 @@ static const struct id_table ic_id_table[] =3D {
->           .config_needed =3D false,
->           .has_rom_version =3D true,
->           .has_msft_ext =3D false,
-> -         .fw_name  =3D "rtl_bt/rtl8851bu_fw.bin",
-> +         .fw_name  =3D "rtl_bt/rtl8851bu_fw",
->           .cfg_name =3D "rtl_bt/rtl8851bu_config",
->           .hw_info  =3D "rtl8851bu" },
->         };
-> @@ -1045,10 +1045,12 @@ struct btrtl_device_info *btrtl_initialize(struct=
- hci_dev *hdev,
->         struct sk_buff *skb;
->         struct hci_rp_read_local_version *resp;
->         struct hci_command_hdr *cmd;
-> +       char fw_name[40];
->         char cfg_name[40];
->         u16 hci_rev, lmp_subver;
->         u8 hci_ver, lmp_ver, chip_type =3D 0;
->         int ret;
-> +       int fw_load_retry =3D 0;
->         u8 reg_val[2];
->
->         btrtl_dev =3D kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
-> @@ -1154,9 +1156,26 @@ struct btrtl_device_info *btrtl_initialize(struct =
-hci_dev *hdev,
->                         goto err_free;
->         }
->
-> -       btrtl_dev->fw_len =3D rtl_load_file(hdev, btrtl_dev->ic_info->fw_=
-name,
-> +fw_name_load:
-> +       if (btrtl_dev->ic_info->fw_name) {
-> +               if (lmp_subver =3D=3D RTL_ROM_LMP_8852A && hci_rev =3D=3D=
- 0x000c &&
-> +                                 fw_load_retry =3D=3D 0) {
-> +                       fw_load_retry =3D 1;
-> +                       snprintf(fw_name, sizeof(fw_name), "%s_v2.bin",
-> +                                btrtl_dev->ic_info->fw_name);
-> +               } else {
-> +                       fw_load_retry =3D 0;
-> +                       snprintf(fw_name, sizeof(fw_name), "%s.bin",
-> +                                btrtl_dev->ic_info->fw_name);
-> +               }
-> +               btrtl_dev->fw_len =3D rtl_load_file(hdev, fw_name,
->                                           &btrtl_dev->fw_data);
-> +       }
-> +
->         if (btrtl_dev->fw_len < 0) {
-> +               if (fw_load_retry =3D=3D 1)
-> +                       goto fw_name_load;
-> +
->                 rtl_dev_err(hdev, "firmware file %s not found",
->                             btrtl_dev->ic_info->fw_name);
->                 ret =3D btrtl_dev->fw_len;
-> @@ -1491,4 +1510,5 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
->  MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
-> --
-> 2.34.1
->
-
-
---=20
-Regards,
-You-Sheng Yang
+SGkhIFlvdS1TaGVuZywNClRoZSBmaXJzdCBjb21taXQgZm9yIHRoZSBGVyBmaWxlIG9mIFJUTDg4
+NTFCIGlzIEZXIHYyIGZvcm1hdCwgc28gSSBiZWxpZXZlIGl0J3Mgbm8gd29ycnkgYWJvdXQgdGhh
+dC4NCg0KQlJzLA0KTWF4DQoNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9t
+OiBZb3UtU2hlbmcgWWFuZyA8dmljYW1vLnlhbmdAY2Fub25pY2FsLmNvbT4NCj4gU2VudDogRnJp
+ZGF5LCBBdWd1c3QgNCwgMjAyMyA1OjE0IFBNDQo+IFRvOiBNYXggQ2hvdSA8bWF4LmNob3VAcmVh
+bHRlay5jb20+DQo+IENjOiBtYXJjZWxAaG9sdG1hbm4ub3JnOyBqb2hhbi5oZWRiZXJnQGdtYWls
+LmNvbTsgbHVpei5kZW50ekBnbWFpbC5jb207DQo+IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5l
+bC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGFsZXhfbHVAcmVhbHNpbC5j
+b20uY247IEhpbGRhIFd1IDxoaWxkYXd1QHJlYWx0ZWsuY29tPjsgS2FyZW4gSHN1DQo+IDxrYXJl
+bmhzdUByZWFsdGVrLmNvbT47IEtpZG1hbkxlZSA8a2lkbWFuQHJlYWx0ZWsuY29tPjsNCj4ganVl
+cmcuaGFlZmxpZ2VyQGNhbm9uaWNhbC5jb207IFJpbGV5Lkthb0BkZWxsLmNvbQ0KPiBTdWJqZWN0
+OiBSZTogW1BBVENIXSBCbHVldG9vdGg6IGJ0cnRsOiBMb2FkIEZXIHYyIG90aGVyd2lzZSBGVyB2
+MSBmb3INCj4gUlRMODg1MkMNCj4gDQo+IA0KPiBFeHRlcm5hbCBtYWlsLg0KPiANCj4gDQo+IA0K
+PiBCeSB0aGUgd2F5LCB3aGF0IHdpbGwgeW91IGRvIHRvIGxpbnV4LWZpcm13YXJlIGNvbW1pdCA1
+M2U0OGY5M2YNCj4gKCJydGxfYnQ6IEFkZCBmaXJtd2FyZSBhbmQgY29uZmlnIGZpbGVzIGZvciBS
+VEw4ODUxQiIpPyBJdCBpcyBhbHNvIGENCj4gVjIgZmlybXdhcmUuIElmIGl0J3Mgbm90IHN1Ympl
+Y3RlZCB0byB0aGUgcmVuYW1lIGhlcmUsIHRoZXJlIHdpbGwgYmUgc29tZSBWMg0KPiBmaXJtd2Fy
+ZSBibG9icyB3aXRoIFYxIG5hbWVzLCB3aGljaCBtYXkgYWRkIHNvbWUgbW9yZSB0cm91YmxlcyBp
+biB0aGUNCj4gZnV0dXJlLg0KPiANCj4gJCBoZXhkdW1wIC1DIHJ0bF9idC9ydGw4ODUxYnVfZncu
+YmluIHwgaGVhZCAtbjENCj4gMDAwMDAwMDAgIDUyIDU0IDQyIDU0IDQzIDZmIDcyIDY1ICA0MSBi
+MCAzNCAwMSA0NCBiYSAwMSAwMA0KPiB8UlRCVENvcmVBLjQuRC4uLnwNCj4gDQo+IE9uIEZyaSwg
+QXVnIDQsIDIwMjMgYXQgMTo1NOKAr1BNIDxtYXguY2hvdUByZWFsdGVrLmNvbT4gd3JvdGU6DQo+
+ID4NCj4gPiBGcm9tOiBNYXggQ2hvdSA8bWF4LmNob3VAcmVhbHRlay5jb20+DQo+ID4NCj4gPiBJ
+biB0aGUgY29tbWl0IG9mIGxpbnV4LWZpcm13YXJlIHByb2plY3QsIHJ0bDg4NTJjdV9mdy5iaW4g
+aXMgdXBkYXRlZA0KPiA+IGFzIEZXIHYyIGZvcm1hdFsxXS4gQ29uc2lkZXIgdGhlIGNhc2UgdGhh
+dCBpZiBkcml2ZXIgZGlkIG5vdCBiZQ0KPiA+IHVwZGF0ZWQgZm9yIEZXIHYyIHN1cHBvcnRlZFsy
+XSwgaXQgY2FuIG5vdCB1c2UgRlcgdjIuDQo+ID4gQnkgQ2Fub25pY2FsJ3Mgc3VnZ2VzdGlvbiwg
+b2xkZXIgZHJpdmVyIHNob3VsZCBiZSBhYmxlIHRvIGxvYWQgRlcgdjEsDQo+ID4gc28gcnRsODg1
+MmN1X2Z3LmJpbiB3aWxsIGJlIHJldmVydCB0byB0aGUgcHJldmlvdXMgY29tbWl0IGFzIEZXIHYx
+IGFuZA0KPiA+IGFkZCBydGw4ODUyY3VfZndfdjIuYmluIGFzIEZXIHYyLiBUaGlzIGl0ZW0gd2ls
+bCBiZSBzdGFydGVkIG9uDQo+ID4gbGludXgtZmlybXdhcmUgcHJvamVjdC4NCj4gPg0KPiA+IElu
+IHRoaXMgY29tbWl0LCB0aGUgZHJpdmVyIHByZWZlcnMgdG8gbG9hZCBGVyB2MiBpZiBhdmFpbGFi
+bGUuDQo+ID4gRmFsbGJhY2sgdG8gRlcgdjEgb3RoZXJ3aXNlLg0KPiA+DQo+ID4gVG8gZG8gb24g
+bGludXgtZmlybXdhcmUgcHJvamVjdC4NCj4gPiBydGxfYnQvcnRsODg1MmN1X2Z3LmJpbjogRlcg
+djEgKHN0YXkgYXQgdmVyLiAweEQ3QjhfRkFCRikNCj4gPiBydGxfYnQvcnRsODg1MmN1X2Z3X3Yy
+LmJpbjogRlcgdjIgKHRvIGJlIG1haW50YWluZWQpDQo+ID4NCj4gPiBbMV0nOWEyNGNlNWUyOWIx
+ICgiQmx1ZXRvb3RoOiBidHJ0bDogRmlybXdhcmUgZm9ybWF0IHYyIHN1cHBvcnQiKScNCj4gPiBb
+Ml0nNTVlNzQ0ODUzM2U3ICgicnRsX2J0OiBVcGRhdGUgUlRMODg1MkMgQlQgVVNCIGZpcm13YXJl
+DQo+ID4gICAgIHRvIDB4MDQwRF83MjI1IiknDQo+ID4NCj4gPiBTdWdnZXN0ZWQtYnk6IEp1ZXJn
+IEhhZWZsaWdlciA8anVlcmcuaGFlZmxpZ2VyQGNhbm9uaWNhbC5jb20+DQo+ID4gVGVzdGVkLWJ5
+OiBIaWxkYSBXdSA8aGlsZGF3dUByZWFsdGVrLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBNYXgg
+Q2hvdSA8bWF4LmNob3VAcmVhbHRlay5jb20+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvYmx1ZXRv
+b3RoL2J0cnRsLmMgfCA2OA0KPiA+ICsrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
+LS0tLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgNDQgaW5zZXJ0aW9ucygrKSwgMjQgZGVsZXRpb25z
+KC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9ibHVldG9vdGgvYnRydGwuYyBiL2Ry
+aXZlcnMvYmx1ZXRvb3RoL2J0cnRsLmMNCj4gPiBpbmRleCBkZGFlNjUyNDEwNmQuLjhiZmE4NmRk
+MTJmNyAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idHJ0bC5jDQo+ID4gKysr
+IGIvZHJpdmVycy9ibHVldG9vdGgvYnRydGwuYw0KPiA+IEBAIC0xMDQsNyArMTA0LDcgQEAgc3Rh
+dGljIGNvbnN0IHN0cnVjdCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0gew0KPiA+ICAgICAgICAg
+eyBJQ19JTkZPKFJUTF9ST01fTE1QXzg3MjNBLCAweGIsIDB4NiwgSENJX1VTQiksDQo+ID4gICAg
+ICAgICAgIC5jb25maWdfbmVlZGVkID0gZmFsc2UsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3Zl
+cnNpb24gPSBmYWxzZSwNCj4gPiAtICAgICAgICAgLmZ3X25hbWUgPSAicnRsX2J0L3J0bDg3MjNh
+X2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lID0gInJ0bF9idC9ydGw4NzIzYV9mdyIs
+DQo+ID4gICAgICAgICAgIC5jZmdfbmFtZSA9IE5VTEwsDQo+ID4gICAgICAgICAgIC5od19pbmZv
+ID0gInJ0bDg3MjNhdSIgfSwNCj4gPg0KPiA+IEBAIC0xMTIsNyArMTEyLDcgQEAgc3RhdGljIGNv
+bnN0IHN0cnVjdCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0gew0KPiA+ICAgICAgICAgeyBJQ19J
+TkZPKFJUTF9ST01fTE1QXzg3MjNCLCAweGIsIDB4NiwgSENJX1VBUlQpLA0KPiA+ICAgICAgICAg
+ICAuY29uZmlnX25lZWRlZCA9IHRydWUsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3ZlcnNpb24g
+PSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0bDg3MjNic19mdy5i
+aW4iLA0KPiA+ICsgICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0bDg3MjNic19mdyIsDQo+
+ID4gICAgICAgICAgIC5jZmdfbmFtZSA9ICJydGxfYnQvcnRsODcyM2JzX2NvbmZpZyIsDQo+ID4g
+ICAgICAgICAgIC5od19pbmZvICA9ICJydGw4NzIzYnMiIH0sDQo+ID4NCj4gPiBAQCAtMTIwLDcg
+KzEyMCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRfdGFibGUgaWNfaWRfdGFibGVbXSA9IHsN
+Cj4gPiAgICAgICAgIHsgSUNfSU5GTyhSVExfUk9NX0xNUF84NzIzQiwgMHhiLCAweDYsIEhDSV9V
+U0IpLA0KPiA+ICAgICAgICAgICAuY29uZmlnX25lZWRlZCA9IGZhbHNlLA0KPiA+ICAgICAgICAg
+ICAuaGFzX3JvbV92ZXJzaW9uID0gdHJ1ZSwNCj4gPiAtICAgICAgICAgLmZ3X25hbWUgID0gInJ0
+bF9idC9ydGw4NzIzYl9mdy5iaW4iLA0KPiA+ICsgICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0
+L3J0bDg3MjNiX2Z3IiwNCj4gPiAgICAgICAgICAgLmNmZ19uYW1lID0gInJ0bF9idC9ydGw4NzIz
+Yl9jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdfaW5mbyAgPSAicnRsODcyM2J1IiB9LA0KPiA+
+DQo+ID4gQEAgLTEzMiw3ICsxMzIsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IGlkX3RhYmxlIGlj
+X2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICAgIC5oY2lfYnVzID0gSENJX1VBUlQsDQo+ID4g
+ICAgICAgICAgIC5jb25maWdfbmVlZGVkID0gdHJ1ZSwNCj4gPiAgICAgICAgICAgLmhhc19yb21f
+dmVyc2lvbiA9IHRydWUsDQo+ID4gLSAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODcy
+M2NzX2NnX2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODcy
+M2NzX2NnX2Z3IiwNCj4gPiAgICAgICAgICAgLmNmZ19uYW1lID0gInJ0bF9idC9ydGw4NzIzY3Nf
+Y2dfY29uZmlnIiwNCj4gPiAgICAgICAgICAgLmh3X2luZm8gID0gInJ0bDg3MjNjcy1jZyIgfSwN
+Cj4gPg0KPiA+IEBAIC0xNDQsNyArMTQ0LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBpZF90YWJs
+ZSBpY19pZF90YWJsZVtdID0gew0KPiA+ICAgICAgICAgICAuaGNpX2J1cyA9IEhDSV9VQVJULA0K
+PiA+ICAgICAgICAgICAuY29uZmlnX25lZWRlZCA9IHRydWUsDQo+ID4gICAgICAgICAgIC5oYXNf
+cm9tX3ZlcnNpb24gPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0
+bDg3MjNjc192Zl9mdy5iaW4iLA0KPiA+ICsgICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0
+bDg3MjNjc192Zl9mdyIsDQo+ID4gICAgICAgICAgIC5jZmdfbmFtZSA9ICJydGxfYnQvcnRsODcy
+M2NzX3ZmX2NvbmZpZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4NzIzY3MtdmYi
+IH0sDQo+ID4NCj4gPiBAQCAtMTU2LDcgKzE1Niw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRf
+dGFibGUgaWNfaWRfdGFibGVbXSA9IHsNCj4gPiAgICAgICAgICAgLmhjaV9idXMgPSBIQ0lfVUFS
+VCwNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSB0cnVlLA0KPiA+ICAgICAgICAgICAu
+aGFzX3JvbV92ZXJzaW9uID0gdHJ1ZSwNCj4gPiAtICAgICAgICAgLmZ3X25hbWUgID0gInJ0bF9i
+dC9ydGw4NzIzY3NfeHhfZncuYmluIiwNCj4gPiArICAgICAgICAgLmZ3X25hbWUgID0gInJ0bF9i
+dC9ydGw4NzIzY3NfeHhfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAicnRsX2J0L3J0
+bDg3MjNjc194eF9jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdfaW5mbyAgPSAicnRsODcyM2Nz
+IiB9LA0KPiA+DQo+ID4gQEAgLTE2NCw3ICsxNjQsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IGlk
+X3RhYmxlIGljX2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICB7IElDX0lORk8oUlRMX1JPTV9M
+TVBfODcyM0IsIDB4ZCwgMHg4LCBIQ0lfVVNCKSwNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVk
+ZWQgPSB0cnVlLA0KPiA+ICAgICAgICAgICAuaGFzX3JvbV92ZXJzaW9uID0gdHJ1ZSwNCj4gPiAt
+ICAgICAgICAgLmZ3X25hbWUgID0gInJ0bF9idC9ydGw4NzIzZF9mdy5iaW4iLA0KPiA+ICsgICAg
+ICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0bDg3MjNkX2Z3IiwNCj4gPiAgICAgICAgICAgLmNm
+Z19uYW1lID0gInJ0bF9idC9ydGw4NzIzZF9jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdfaW5m
+byAgPSAicnRsODcyM2R1IiB9LA0KPiA+DQo+ID4gQEAgLTE3Miw3ICsxNzIsNyBAQCBzdGF0aWMg
+Y29uc3Qgc3RydWN0IGlkX3RhYmxlIGljX2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICB7IElD
+X0lORk8oUlRMX1JPTV9MTVBfODcyM0IsIDB4ZCwgMHg4LCBIQ0lfVUFSVCksDQo+ID4gICAgICAg
+ICAgIC5jb25maWdfbmVlZGVkID0gdHJ1ZSwNCj4gPiAgICAgICAgICAgLmhhc19yb21fdmVyc2lv
+biA9IHRydWUsDQo+ID4gLSAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODcyM2RzX2Z3
+LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODcyM2RzX2Z3IiwN
+Cj4gPiAgICAgICAgICAgLmNmZ19uYW1lID0gInJ0bF9idC9ydGw4NzIzZHNfY29uZmlnIiwNCj4g
+PiAgICAgICAgICAgLmh3X2luZm8gID0gInJ0bDg3MjNkcyIgfSwNCj4gPg0KPiA+IEBAIC0xODAs
+NyArMTgwLDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0g
+ew0KPiA+ICAgICAgICAgeyBJQ19JTkZPKFJUTF9ST01fTE1QXzg4MjFBLCAweGEsIDB4NiwgSENJ
+X1VTQiksDQo+ID4gICAgICAgICAgIC5jb25maWdfbmVlZGVkID0gZmFsc2UsDQo+ID4gICAgICAg
+ICAgIC5oYXNfcm9tX3ZlcnNpb24gPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAi
+cnRsX2J0L3J0bDg4MjFhX2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxf
+YnQvcnRsODgyMWFfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAicnRsX2J0L3J0bDg4
+MjFhX2NvbmZpZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4ODIxYXUiIH0sDQo+
+ID4NCj4gPiBAQCAtMTg5LDcgKzE4OSw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRfdGFibGUg
+aWNfaWRfdGFibGVbXSA9IHsNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSBmYWxzZSwN
+Cj4gPiAgICAgICAgICAgLmhhc19yb21fdmVyc2lvbiA9IHRydWUsDQo+ID4gICAgICAgICAgIC5o
+YXNfbXNmdF9leHQgPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0
+bDg4MjFjX2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODgy
+MWNfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAicnRsX2J0L3J0bDg4MjFjX2NvbmZp
+ZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4ODIxY3UiIH0sDQo+ID4NCj4gPiBA
+QCAtMTk4LDcgKzE5OCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRfdGFibGUgaWNfaWRfdGFi
+bGVbXSA9IHsNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSB0cnVlLA0KPiA+ICAgICAg
+ICAgICAuaGFzX3JvbV92ZXJzaW9uID0gdHJ1ZSwNCj4gPiAgICAgICAgICAgLmhhc19tc2Z0X2V4
+dCA9IHRydWUsDQo+ID4gLSAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODgyMWNzX2Z3
+LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODgyMWNzX2Z3IiwN
+Cj4gPiAgICAgICAgICAgLmNmZ19uYW1lID0gInJ0bF9idC9ydGw4ODIxY3NfY29uZmlnIiwNCj4g
+PiAgICAgICAgICAgLmh3X2luZm8gID0gInJ0bDg4MjFjcyIgfSwNCj4gPg0KPiA+IEBAIC0yMDYs
+NyArMjA2LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0g
+ew0KPiA+ICAgICAgICAgeyBJQ19JTkZPKFJUTF9ST01fTE1QXzg3NjFBLCAweGEsIDB4NiwgSENJ
+X1VTQiksDQo+ID4gICAgICAgICAgIC5jb25maWdfbmVlZGVkID0gZmFsc2UsDQo+ID4gICAgICAg
+ICAgIC5oYXNfcm9tX3ZlcnNpb24gPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAi
+cnRsX2J0L3J0bDg3NjFhX2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxf
+YnQvcnRsODc2MWFfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAicnRsX2J0L3J0bDg3
+NjFhX2NvbmZpZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4NzYxYXUiIH0sDQo+
+ID4NCj4gPiBAQCAtMjE1LDcgKzIxNSw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRfdGFibGUg
+aWNfaWRfdGFibGVbXSA9IHsNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSBmYWxzZSwN
+Cj4gPiAgICAgICAgICAgLmhhc19yb21fdmVyc2lvbiA9IHRydWUsDQo+ID4gICAgICAgICAgIC5o
+YXNfbXNmdF9leHQgPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0
+bDg3NjFiX2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODc2
+MWJfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAicnRsX2J0L3J0bDg3NjFiX2NvbmZp
+ZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4NzYxYnR2IiB9LA0KPiA+DQo+ID4g
+QEAgLTIyMyw3ICsyMjMsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IGlkX3RhYmxlIGljX2lkX3Rh
+YmxlW10gPSB7DQo+ID4gICAgICAgICB7IElDX0lORk8oUlRMX1JPTV9MTVBfODc2MUEsIDB4Yiwg
+MHhhLCBIQ0lfVVNCKSwNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSBmYWxzZSwNCj4g
+PiAgICAgICAgICAgLmhhc19yb21fdmVyc2lvbiA9IHRydWUsDQo+ID4gLSAgICAgICAgIC5md19u
+YW1lICA9ICJydGxfYnQvcnRsODc2MWJ1X2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1l
+ICA9ICJydGxfYnQvcnRsODc2MWJ1X2Z3IiwNCj4gPiAgICAgICAgICAgLmNmZ19uYW1lID0gInJ0
+bF9idC9ydGw4NzYxYnVfY29uZmlnIiwNCj4gPiAgICAgICAgICAgLmh3X2luZm8gID0gInJ0bDg3
+NjFidSIgfSwNCj4gPg0KPiA+IEBAIC0yMzIsNyArMjMyLDcgQEAgc3RhdGljIGNvbnN0IHN0cnVj
+dCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0gew0KPiA+ICAgICAgICAgICAuY29uZmlnX25lZWRl
+ZCA9IHRydWUsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3ZlcnNpb24gPSB0cnVlLA0KPiA+ICAg
+ICAgICAgICAuaGFzX21zZnRfZXh0ID0gdHJ1ZSwNCj4gPiAtICAgICAgICAgLmZ3X25hbWUgID0g
+InJ0bF9idC9ydGw4ODIyY3NfZncuYmluIiwNCj4gPiArICAgICAgICAgLmZ3X25hbWUgID0gInJ0
+bF9idC9ydGw4ODIyY3NfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAicnRsX2J0L3J0
+bDg4MjJjc19jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdfaW5mbyAgPSAicnRsODgyMmNzIiB9
+LA0KPiA+DQo+ID4gQEAgLTI0MSw3ICsyNDEsNyBAQCBzdGF0aWMgY29uc3Qgc3RydWN0IGlkX3Rh
+YmxlIGljX2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICAgIC5jb25maWdfbmVlZGVkID0gdHJ1
+ZSwNCj4gPiAgICAgICAgICAgLmhhc19yb21fdmVyc2lvbiA9IHRydWUsDQo+ID4gICAgICAgICAg
+IC5oYXNfbXNmdF9leHQgPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0
+L3J0bDg4MjJjc19mdy5iaW4iLA0KPiA+ICsgICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0
+bDg4MjJjc19mdyIsDQo+ID4gICAgICAgICAgIC5jZmdfbmFtZSA9ICJydGxfYnQvcnRsODgyMmNz
+X2NvbmZpZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4ODIyY3MiIH0sDQo+ID4N
+Cj4gPiBAQCAtMjUwLDcgKzI1MCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRfdGFibGUgaWNf
+aWRfdGFibGVbXSA9IHsNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSBmYWxzZSwNCj4g
+PiAgICAgICAgICAgLmhhc19yb21fdmVyc2lvbiA9IHRydWUsDQo+ID4gICAgICAgICAgIC5oYXNf
+bXNmdF9leHQgPSB0cnVlLA0KPiA+IC0gICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0bDg4
+MjJjdV9mdy5iaW4iLA0KPiA+ICsgICAgICAgICAuZndfbmFtZSAgPSAicnRsX2J0L3J0bDg4MjJj
+dV9mdyIsDQo+ID4gICAgICAgICAgIC5jZmdfbmFtZSA9ICJydGxfYnQvcnRsODgyMmN1X2NvbmZp
+ZyIsDQo+ID4gICAgICAgICAgIC5od19pbmZvICA9ICJydGw4ODIyY3UiIH0sDQo+ID4NCj4gPiBA
+QCAtMjU5LDcgKzI1OSw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgaWRfdGFibGUgaWNfaWRfdGFi
+bGVbXSA9IHsNCj4gPiAgICAgICAgICAgLmNvbmZpZ19uZWVkZWQgPSB0cnVlLA0KPiA+ICAgICAg
+ICAgICAuaGFzX3JvbV92ZXJzaW9uID0gdHJ1ZSwNCj4gPiAgICAgICAgICAgLmhhc19tc2Z0X2V4
+dCA9IHRydWUsDQo+ID4gLSAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODgyMmJfZncu
+YmluIiwNCj4gPiArICAgICAgICAgLmZ3X25hbWUgID0gInJ0bF9idC9ydGw4ODIyYl9mdyIsDQo+
+ID4gICAgICAgICAgIC5jZmdfbmFtZSA9ICJydGxfYnQvcnRsODgyMmJfY29uZmlnIiwNCj4gPiAg
+ICAgICAgICAgLmh3X2luZm8gID0gInJ0bDg4MjJidSIgfSwNCj4gPg0KPiA+IEBAIC0yNjgsNyAr
+MjY4LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0gew0K
+PiA+ICAgICAgICAgICAuY29uZmlnX25lZWRlZCA9IGZhbHNlLA0KPiA+ICAgICAgICAgICAuaGFz
+X3JvbV92ZXJzaW9uID0gdHJ1ZSwNCj4gPiAgICAgICAgICAgLmhhc19tc2Z0X2V4dCA9IHRydWUs
+DQo+ID4gLSAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODg1MmF1X2Z3LmJpbiIsDQo+
+ID4gKyAgICAgICAgIC5md19uYW1lICA9ICJydGxfYnQvcnRsODg1MmF1X2Z3IiwNCj4gPiAgICAg
+ICAgICAgLmNmZ19uYW1lID0gInJ0bF9idC9ydGw4ODUyYXVfY29uZmlnIiwNCj4gPiAgICAgICAg
+ICAgLmh3X2luZm8gID0gInJ0bDg4NTJhdSIgfSwNCj4gPg0KPiA+IEBAIC0yNzcsNyArMjc3LDcg
+QEAgc3RhdGljIGNvbnN0IHN0cnVjdCBpZF90YWJsZSBpY19pZF90YWJsZVtdID0gew0KPiA+ICAg
+ICAgICAgICAuY29uZmlnX25lZWRlZCA9IHRydWUsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3Zl
+cnNpb24gPSB0cnVlLA0KPiA+ICAgICAgICAgICAuaGFzX21zZnRfZXh0ID0gdHJ1ZSwNCj4gPiAt
+ICAgICAgICAgLmZ3X25hbWUgID0gInJ0bF9idC9ydGw4ODUyYnNfZncuYmluIiwNCj4gPiArICAg
+ICAgICAgLmZ3X25hbWUgID0gInJ0bF9idC9ydGw4ODUyYnNfZnciLA0KPiA+ICAgICAgICAgICAu
+Y2ZnX25hbWUgPSAicnRsX2J0L3J0bDg4NTJic19jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdf
+aW5mbyAgPSAicnRsODg1MmJzIiB9LA0KPiA+DQo+ID4gQEAgLTI4Niw3ICsyODYsNyBAQCBzdGF0
+aWMgY29uc3Qgc3RydWN0IGlkX3RhYmxlIGljX2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICAg
+IC5jb25maWdfbmVlZGVkID0gZmFsc2UsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3ZlcnNpb24g
+PSB0cnVlLA0KPiA+ICAgICAgICAgICAuaGFzX21zZnRfZXh0ID0gdHJ1ZSwNCj4gPiAtICAgICAg
+ICAgLmZ3X25hbWUgID0gInJ0bF9idC9ydGw4ODUyYnVfZncuYmluIiwNCj4gPiArICAgICAgICAg
+LmZ3X25hbWUgID0gInJ0bF9idC9ydGw4ODUyYnVfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25h
+bWUgPSAicnRsX2J0L3J0bDg4NTJidV9jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdfaW5mbyAg
+PSAicnRsODg1MmJ1IiB9LA0KPiA+DQo+ID4gQEAgLTI5NSw3ICsyOTUsNyBAQCBzdGF0aWMgY29u
+c3Qgc3RydWN0IGlkX3RhYmxlIGljX2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICAgIC5jb25m
+aWdfbmVlZGVkID0gZmFsc2UsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3ZlcnNpb24gPSB0cnVl
+LA0KPiA+ICAgICAgICAgICAuaGFzX21zZnRfZXh0ID0gdHJ1ZSwNCj4gPiAtICAgICAgICAgLmZ3
+X25hbWUgID0gInJ0bF9idC9ydGw4ODUyY3VfZncuYmluIiwNCj4gPiArICAgICAgICAgLmZ3X25h
+bWUgID0gInJ0bF9idC9ydGw4ODUyY3VfZnciLA0KPiA+ICAgICAgICAgICAuY2ZnX25hbWUgPSAi
+cnRsX2J0L3J0bDg4NTJjdV9jb25maWciLA0KPiA+ICAgICAgICAgICAuaHdfaW5mbyAgPSAicnRs
+ODg1MmN1IiB9LA0KPiA+DQo+ID4gQEAgLTMwNCw3ICszMDQsNyBAQCBzdGF0aWMgY29uc3Qgc3Ry
+dWN0IGlkX3RhYmxlIGljX2lkX3RhYmxlW10gPSB7DQo+ID4gICAgICAgICAgIC5jb25maWdfbmVl
+ZGVkID0gZmFsc2UsDQo+ID4gICAgICAgICAgIC5oYXNfcm9tX3ZlcnNpb24gPSB0cnVlLA0KPiA+
+ICAgICAgICAgICAuaGFzX21zZnRfZXh0ID0gZmFsc2UsDQo+ID4gLSAgICAgICAgIC5md19uYW1l
+ICA9ICJydGxfYnQvcnRsODg1MWJ1X2Z3LmJpbiIsDQo+ID4gKyAgICAgICAgIC5md19uYW1lICA9
+ICJydGxfYnQvcnRsODg1MWJ1X2Z3IiwNCj4gPiAgICAgICAgICAgLmNmZ19uYW1lID0gInJ0bF9i
+dC9ydGw4ODUxYnVfY29uZmlnIiwNCj4gPiAgICAgICAgICAgLmh3X2luZm8gID0gInJ0bDg4NTFi
+dSIgfSwNCj4gPiAgICAgICAgIH07DQo+ID4gQEAgLTEwNDUsMTAgKzEwNDUsMTIgQEAgc3RydWN0
+IGJ0cnRsX2RldmljZV9pbmZvICpidHJ0bF9pbml0aWFsaXplKHN0cnVjdA0KPiBoY2lfZGV2ICpo
+ZGV2LA0KPiA+ICAgICAgICAgc3RydWN0IHNrX2J1ZmYgKnNrYjsNCj4gPiAgICAgICAgIHN0cnVj
+dCBoY2lfcnBfcmVhZF9sb2NhbF92ZXJzaW9uICpyZXNwOw0KPiA+ICAgICAgICAgc3RydWN0IGhj
+aV9jb21tYW5kX2hkciAqY21kOw0KPiA+ICsgICAgICAgY2hhciBmd19uYW1lWzQwXTsNCj4gPiAg
+ICAgICAgIGNoYXIgY2ZnX25hbWVbNDBdOw0KPiA+ICAgICAgICAgdTE2IGhjaV9yZXYsIGxtcF9z
+dWJ2ZXI7DQo+ID4gICAgICAgICB1OCBoY2lfdmVyLCBsbXBfdmVyLCBjaGlwX3R5cGUgPSAwOw0K
+PiA+ICAgICAgICAgaW50IHJldDsNCj4gPiArICAgICAgIGludCBmd19sb2FkX3JldHJ5ID0gMDsN
+Cj4gPiAgICAgICAgIHU4IHJlZ192YWxbMl07DQo+ID4NCj4gPiAgICAgICAgIGJ0cnRsX2RldiA9
+IGt6YWxsb2Moc2l6ZW9mKCpidHJ0bF9kZXYpLCBHRlBfS0VSTkVMKTsgQEANCj4gPiAtMTE1NCw5
+ICsxMTU2LDI2IEBAIHN0cnVjdCBidHJ0bF9kZXZpY2VfaW5mbyAqYnRydGxfaW5pdGlhbGl6ZShz
+dHJ1Y3QgaGNpX2Rldg0KPiAqaGRldiwNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICBnb3Rv
+IGVycl9mcmVlOw0KPiA+ICAgICAgICAgfQ0KPiA+DQo+ID4gLSAgICAgICBidHJ0bF9kZXYtPmZ3
+X2xlbiA9IHJ0bF9sb2FkX2ZpbGUoaGRldiwNCj4gYnRydGxfZGV2LT5pY19pbmZvLT5md19uYW1l
+LA0KPiA+ICtmd19uYW1lX2xvYWQ6DQo+ID4gKyAgICAgICBpZiAoYnRydGxfZGV2LT5pY19pbmZv
+LT5md19uYW1lKSB7DQo+ID4gKyAgICAgICAgICAgICAgIGlmIChsbXBfc3VidmVyID09IFJUTF9S
+T01fTE1QXzg4NTJBICYmIGhjaV9yZXYgPT0NCj4gMHgwMDBjICYmDQo+ID4gKyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIGZ3X2xvYWRfcmV0cnkgPT0gMCkgew0KPiA+ICsgICAgICAg
+ICAgICAgICAgICAgICAgIGZ3X2xvYWRfcmV0cnkgPSAxOw0KPiA+ICsgICAgICAgICAgICAgICAg
+ICAgICAgIHNucHJpbnRmKGZ3X25hbWUsIHNpemVvZihmd19uYW1lKSwNCj4gIiVzX3YyLmJpbiIs
+DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnRydGxfZGV2LT5pY19pbmZv
+LT5md19uYW1lKTsNCj4gPiArICAgICAgICAgICAgICAgfSBlbHNlIHsNCj4gPiArICAgICAgICAg
+ICAgICAgICAgICAgICBmd19sb2FkX3JldHJ5ID0gMDsNCj4gPiArICAgICAgICAgICAgICAgICAg
+ICAgICBzbnByaW50Zihmd19uYW1lLCBzaXplb2YoZndfbmFtZSksICIlcy5iaW4iLA0KPiA+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJ0cnRsX2Rldi0+aWNfaW5mby0+ZndfbmFt
+ZSk7DQo+ID4gKyAgICAgICAgICAgICAgIH0NCj4gPiArICAgICAgICAgICAgICAgYnRydGxfZGV2
+LT5md19sZW4gPSBydGxfbG9hZF9maWxlKGhkZXYsIGZ3X25hbWUsDQo+ID4gICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgJmJ0cnRsX2Rldi0+ZndfZGF0YSk7DQo+ID4g
+KyAgICAgICB9DQo+ID4gKw0KPiA+ICAgICAgICAgaWYgKGJ0cnRsX2Rldi0+ZndfbGVuIDwgMCkg
+ew0KPiA+ICsgICAgICAgICAgICAgICBpZiAoZndfbG9hZF9yZXRyeSA9PSAxKQ0KPiA+ICsgICAg
+ICAgICAgICAgICAgICAgICAgIGdvdG8gZndfbmFtZV9sb2FkOw0KPiA+ICsNCj4gPiAgICAgICAg
+ICAgICAgICAgcnRsX2Rldl9lcnIoaGRldiwgImZpcm13YXJlIGZpbGUgJXMgbm90IGZvdW5kIiwN
+Cj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYnRydGxfZGV2LT5pY19pbmZvLT5md19u
+YW1lKTsNCj4gPiAgICAgICAgICAgICAgICAgcmV0ID0gYnRydGxfZGV2LT5md19sZW47IEBAIC0x
+NDkxLDQgKzE1MTAsNSBAQA0KPiA+IE1PRFVMRV9GSVJNV0FSRSgicnRsX2J0L3J0bDg4NTJic19j
+b25maWcuYmluIik7DQo+ID4gIE1PRFVMRV9GSVJNV0FSRSgicnRsX2J0L3J0bDg4NTJidV9mdy5i
+aW4iKTsNCj4gPiAgTU9EVUxFX0ZJUk1XQVJFKCJydGxfYnQvcnRsODg1MmJ1X2NvbmZpZy5iaW4i
+KTsNCj4gPiAgTU9EVUxFX0ZJUk1XQVJFKCJydGxfYnQvcnRsODg1MmN1X2Z3LmJpbiIpOw0KPiA+
+ICtNT0RVTEVfRklSTVdBUkUoInJ0bF9idC9ydGw4ODUyY3VfZndfdjIuYmluIik7DQo+ID4gIE1P
+RFVMRV9GSVJNV0FSRSgicnRsX2J0L3J0bDg4NTJjdV9jb25maWcuYmluIik7DQo+ID4gLS0NCj4g
+PiAyLjM0LjENCj4gPg0KPiANCj4gDQo+IC0tDQo+IFJlZ2FyZHMsDQo+IFlvdS1TaGVuZyBZYW5n
+DQo+IA0KPiAtLS0tLS1QbGVhc2UgY29uc2lkZXIgdGhlIGVudmlyb25tZW50IGJlZm9yZSBwcmlu
+dGluZyB0aGlzIGUtbWFpbC4NCg0K
