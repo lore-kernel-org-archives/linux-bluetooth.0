@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6A9C001DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 00:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31E39C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 00:11:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232258AbjHDAL2 (ORCPT
+        id S229659AbjHDALa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Aug 2023 20:11:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32808 "EHLO
+        Thu, 3 Aug 2023 20:11:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbjHDAL0 (ORCPT
+        with ESMTP id S230292AbjHDAL3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Aug 2023 20:11:26 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEBEB420E
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 17:11:23 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-63d03d3cac6so8587956d6.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 17:11:23 -0700 (PDT)
+        Thu, 3 Aug 2023 20:11:29 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B0284210
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 17:11:25 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-63cf8754d95so8630006d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 17:11:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691107882; x=1691712682;
+        d=gmail.com; s=20221208; t=1691107884; x=1691712684;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=y55Yg/C7ifA7uYXM7obeHwISK1JjvWlPYwGVPva4JEs=;
-        b=SWpZupy4UCPkqDyJ3j34KE9HLpSfJmwvXDMf/I+ggGna0CcpDaD520ppQGD7tEt7gw
-         z6rrkoh9h3PdDW0D/kdefLWTiBrV75GKLzd8ZWz8leMPMMt8ZyougiUCWli9nrxrW9LY
-         ooF3elYCif3F+JPcVMHpNQT+fk6FXu+/nHAy2/cAHbHC1roMkcHw8OlreAt2faJhoxYH
-         w21diB9BMlL14Byb6WSPW/+NRl/S+vxVoYmRu4wbXHuxUILKgEMkxPzQu+XE6An9ZXZj
-         CNQkL7hxNB1hU9COxMji/RCH0T38HRSutHKrKgwoDVEIESzv9+r5DP0yf04CY0rTWPI0
-         4Hww==
+        bh=5bSxYb47b3tMEJ98dX1ZqPQ6oX8LUr00D4CqTLz8w+M=;
+        b=m4EtReiScMrR1SRNroDbhGFWb9ak8hMWHkbrgudfEF7R8lTckmr2CuJX01AguLiXsL
+         aFlANYyg0PR8j5BNGNlnW8F0AKCVc1sUfXKaxaG1yCRvAHCsHmGXeiNrIMkp/A2T0f2v
+         GCDFtyFdu7OwmKgTAQqbu5aFe17nRsHcdSz++IMEy6chjD4nGq02l/u9OLJW9iZ0wFE0
+         z/wxpWkG0Y1+3bqWQycqjM2PRu29xACDO5eilKzaO1krpbCtGzRE1XA+Dnm+DzQ/ohvo
+         iEDdeTXEKHTrSvkSOMOvGFCYLsn5WWCxXZtHXC6qyzSp9fgVLnUfI4qFWBQtM6LzNRk+
+         5K3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691107882; x=1691712682;
+        d=1e100.net; s=20221208; t=1691107884; x=1691712684;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y55Yg/C7ifA7uYXM7obeHwISK1JjvWlPYwGVPva4JEs=;
-        b=Tk0j8LduFh/O4exziTTMdkRQxjajFWIF20s8QESyaZ+LjX9F6Ij0HzrRYX7NqydjpM
-         n1QZbwb4OL54nMYP/zk34Qbht+TnpN7RCZ4dzvX0ho6kOdtz9zcL0eAlnEaeEgCEzCgn
-         4O6cvU9dH4/Tmpg55ehFocgn+Q/3U6MEeYtx46fF1szRPdS0Q73bin5Rq33B3TpQKMdD
-         hh0lDqV9PBULWOUTWkzfqdlO4jz8xs80MONjso0MenM2IWKbRQ6tu8HAypftGSGQK/tY
-         SOWBpx8mws3pKVA19sgf8VkAqIyoPuVQ2BkUNi6tIFcZD4QHAeAGc9g+U+LIIQIAnl5N
-         kCTw==
-X-Gm-Message-State: AOJu0Yx4h0t68nuaK/7VyeMJZt3ex7/J6GyWx72HTRj5HcMCQML26E/A
-        AvredXEFiKZ+9O24O3+rjPysLLGCdN0=
-X-Google-Smtp-Source: AGHT+IEANTOTi/hzAGo6W4FCN923h1viwj4tro40Xfw9CJc6hq8ErgnGzd1FjbvJ95+Anki77E0xUA==
-X-Received: by 2002:ad4:4e82:0:b0:636:955e:3dd7 with SMTP id dy2-20020ad44e82000000b00636955e3dd7mr164880qvb.42.1691107882256;
-        Thu, 03 Aug 2023 17:11:22 -0700 (PDT)
+        bh=5bSxYb47b3tMEJ98dX1ZqPQ6oX8LUr00D4CqTLz8w+M=;
+        b=bNDr8A3UBuLlQ8pIWA7jEK1xsnmSpTUJEDHcca5fCyotaqCXX+yIk7i07pOVpqIVIf
+         x8kscPyZM9FRepcwzThv3C/3B3ULUwSvSrmWg9zh7HgJcpha54GOpGtKZ5oA4owRkyJe
+         IqPlqWdALa67lbKncAo9TtuFoMEN5usuiPKZKykYvWlSsg5pB+vdUazDfu0W2/TsAahX
+         XhEmreCg7IRoZ/HLr/ZhTKSV3CBVB7Ns6FBpX4axR4r7zfefy3jcEeSifsD+hBp6yYa3
+         BEC3k5j8ur/ZEbXbWhbjSROa9Zo1dx1BRCmS/uBdFfv2nmNX55J+SD4h4fD+dbqZR6Wc
+         k6vg==
+X-Gm-Message-State: AOJu0YxAGxQ+ZHbwCyNht2APKpKc2Wjr2KiM9yWnySBDhX8oVlpFvBym
+        LlMse2HMchi4ITlB6rCHuZ55om1ezCs=
+X-Google-Smtp-Source: AGHT+IG7mx8sYSeKS8JiJGPMlM59E9J+tUTUwwL0UNNNQUxHkIUz4kyVw12gUj3MGBs9l2+Mp9+uHg==
+X-Received: by 2002:a0c:f151:0:b0:63c:d901:d5d3 with SMTP id y17-20020a0cf151000000b0063cd901d5d3mr162520qvl.9.1691107883791;
+        Thu, 03 Aug 2023 17:11:23 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
-        by smtp.gmail.com with ESMTPSA id y11-20020a0ce04b000000b0063c6c7f4b92sm272448qvk.1.2023.08.03.17.11.20
+        by smtp.gmail.com with ESMTPSA id y11-20020a0ce04b000000b0063c6c7f4b92sm272448qvk.1.2023.08.03.17.11.22
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Aug 2023 17:11:21 -0700 (PDT)
+        Thu, 03 Aug 2023 17:11:23 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/5] Bluetooth: ISO: Fix not checking for valid CIG/CIS IDs
-Date:   Thu,  3 Aug 2023 17:11:13 -0700
-Message-ID: <20230804001115.907885-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/5] Bluetooth: hci_conn: Fix modifying handle while aborting
+Date:   Thu,  3 Aug 2023 17:11:14 -0700
+Message-ID: <20230804001115.907885-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230804001115.907885-1-luiz.dentz@gmail.com>
 References: <20230804001115.907885-1-luiz.dentz@gmail.com>
@@ -68,32 +68,148 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Valid range of CIG/CIS are 0x00 to 0xEF, so this checks they are
-properly checked before attempting to use HCI_OP_LE_SET_CIG_PARAMS.
+This introduces hci_conn_set_handle which takes care of verifying the
+conditions where the hci_conn handle can be modified, including when
+hci_conn_abort has been called and also checks that the handles is
+valid as well.
 
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/iso.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_conn.c         | 30 ++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        | 29 +++++++++++------------------
+ 3 files changed, 42 insertions(+), 18 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 358954bfbb32..6b66d6a88b9a 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1187,6 +1187,12 @@ static bool check_io_qos(struct bt_iso_io_qos *qos)
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 8200a6689b39..d2a3a2a9fd7d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1425,6 +1425,7 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
+ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
  
- static bool check_ucast_qos(struct bt_iso_qos *qos)
+ void hci_conn_failed(struct hci_conn *conn, u8 status);
++u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle);
+ 
+ /*
+  * hci_conn_get() and hci_conn_put() are used to control the life-time of an
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 923bb7e7be2b..13bd2753abbb 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1231,6 +1231,36 @@ void hci_conn_failed(struct hci_conn *conn, u8 status)
+ 	hci_conn_del(conn);
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	bt_dev_dbg(hdev, "hcon %p handle 0x%4.4x", conn, handle);
++
++	if (conn->handle == handle)
++		return 0;
++
++	if (handle > HCI_CONN_HANDLE_MAX) {
++		bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x",
++			   handle, HCI_CONN_HANDLE_MAX);
++		return HCI_ERROR_INVALID_PARAMETERS;
++	}
++
++	/* If abort_reason has been sent it means the connection is being
++	 * aborted and the handle shall not be changed.
++	 */
++	if (conn->abort_reason) {
++		bt_dev_err(hdev, "hcon %p abort_reason 0x%2.2x", conn,
++			   conn->abort_reason);
++		return conn->abort_reason;
++	}
++
++	conn->handle = handle;
++
++	return 0;
++}
++
+ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
  {
-+	if (qos->ucast.cig > 0xef && qos->ucast.cig != BT_ISO_QOS_CIG_UNSET)
-+		return false;
-+
-+	if (qos->ucast.cis > 0xef && qos->ucast.cis != BT_ISO_QOS_CIS_UNSET)
-+		return false;
-+
- 	if (qos->ucast.sca > 0x07)
- 		return false;
+ 	struct hci_conn *conn;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f1fcece29e7d..218da9b0fe8f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3179,13 +3179,9 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 	}
  
+ 	if (!status) {
+-		conn->handle = __le16_to_cpu(ev->handle);
+-		if (conn->handle > HCI_CONN_HANDLE_MAX) {
+-			bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x",
+-				   conn->handle, HCI_CONN_HANDLE_MAX);
+-			status = HCI_ERROR_INVALID_PARAMETERS;
++		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
++		if (status)
+ 			goto done;
+-		}
+ 
+ 		if (conn->type == ACL_LINK) {
+ 			conn->state = BT_CONFIG;
+@@ -3849,11 +3845,9 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
+ 		if (conn->state != BT_BOUND && conn->state != BT_CONNECT)
+ 			continue;
+ 
+-		conn->handle = __le16_to_cpu(rp->handle[i]);
++		if (hci_conn_set_handle(conn, __le16_to_cpu(rp->handle[i])))
++			continue;
+ 
+-		bt_dev_dbg(hdev, "%p handle 0x%4.4x parent %p", conn,
+-			   conn->handle, conn->parent);
+-		
+ 		if (conn->state == BT_CONNECT)
+ 			pending = true;
+ 	}
+@@ -5039,11 +5033,8 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 
+ 	switch (status) {
+ 	case 0x00:
+-		conn->handle = __le16_to_cpu(ev->handle);
+-		if (conn->handle > HCI_CONN_HANDLE_MAX) {
+-			bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x",
+-				   conn->handle, HCI_CONN_HANDLE_MAX);
+-			status = HCI_ERROR_INVALID_PARAMETERS;
++		status = hci_conn_set_handle(conn, __le16_to_cpu(ev->handle));
++		if (status) {
+ 			conn->state = BT_CLOSED;
+ 			break;
+ 		}
+@@ -6978,7 +6969,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ {
+ 	struct hci_evt_le_create_big_complete *ev = data;
+ 	struct hci_conn *conn;
+-	__u8 bis_idx = 0;
++	__u8 i = 0;
+ 
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 
+@@ -6996,7 +6987,9 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 		    conn->iso_qos.bcast.big != ev->handle)
+ 			continue;
+ 
+-		conn->handle = __le16_to_cpu(ev->bis_handle[bis_idx++]);
++		if (hci_conn_set_handle(conn,
++					__le16_to_cpu(ev->bis_handle[i++])))
++			continue;
+ 
+ 		if (!ev->status) {
+ 			conn->state = BT_CONNECTED;
+@@ -7015,7 +7008,7 @@ static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
+ 		rcu_read_lock();
+ 	}
+ 
+-	if (!ev->status && !bis_idx)
++	if (!ev->status && !i)
+ 		/* If no BISes have been connected for the BIG,
+ 		 * terminate. This is in case all bound connections
+ 		 * have been closed before the BIG creation
 -- 
 2.41.0
 
