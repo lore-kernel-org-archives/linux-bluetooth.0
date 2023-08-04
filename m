@@ -2,350 +2,387 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD960C001DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 05:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5453C001DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Aug 2023 06:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232480AbjHDFzU (ORCPT
+        id S233610AbjHDGka (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Aug 2023 01:55:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
+        Fri, 4 Aug 2023 02:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232416AbjHDFzN (ORCPT
+        with ESMTP id S231356AbjHDGkE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Aug 2023 01:55:13 -0400
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A05933A85;
-        Thu,  3 Aug 2023 22:55:11 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3745sYpmD016212, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3745sYpmD016212
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-        Fri, 4 Aug 2023 13:54:34 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Fri, 4 Aug 2023 13:54:33 +0800
-Received: from localhost.localhost (172.21.132.123) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Fri, 4 Aug 2023 13:54:32 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
-        <karenhsu@realtek.com>, <kidman@realtek.com>,
-        <max.chou@realtek.com>, <juerg.haefliger@canonical.com>,
-        <vicamo.yang@canonical.com>, <Riley.Kao@dell.com>
-Subject: [PATCH] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for RTL8852C
-Date:   Fri, 4 Aug 2023 13:54:26 +0800
-Message-ID: <20230804055426.6806-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 4 Aug 2023 02:40:04 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA2F46BD
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Aug 2023 23:39:43 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-5230ac6dbc5so2065603a12.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Aug 2023 23:39:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=streamunlimited.com; s=google; t=1691131182; x=1691735982;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AN91KFs9Ps1X5VZqldmBIs4TMtfIa8G2VVO79N3rlS8=;
+        b=u/F0HvUCT7P3x2cRDGUSoPSV5FUGs0WXwpUeqRyuuXyo1NUcBsMed3LdOd74/VToAs
+         DxvCZp8/XbgNJWNd5hVtJOlNpMGP6T9i0jUhjdiBIqGa/NhVJcF9Pp/hTHW6FA2IZafD
+         RozUUL4IEBTlw2NPB/HoTvMsWCCUrdN5P9rW0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691131182; x=1691735982;
+        h=content-transfer-encoding:in-reply-to:from:cc:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AN91KFs9Ps1X5VZqldmBIs4TMtfIa8G2VVO79N3rlS8=;
+        b=KWv8pDkOIG9u1iGq+C2QdgXDJP5Ux8AH5WJ4rQ6XPZ7wjr74GObonNZTOzAYK/8/Ao
+         24TsIZAgEJTrUpR5U2ezGmbm7R0uJPcD6awGr3UOVLrc7CcCi3P+I4GXLCAPNe75wXnY
+         4oIUBh0CL/HPmKAR80IHkBWwiPvoHaukbXrwoOlc3BXgDAFlhOUc92Z3cOsSCrxjPf7n
+         vhsKe5lylvH8roJTbom1ZdKI+xUWNxII2ZLMARkZhaI39WGSH1z67uw0judXfrGfljTr
+         G4WO0whXcX1+SCVud3CQxogofj6+EcUjHJBzs5MQNaRDn4cY5CayNjkEc1lRduSZzeG/
+         e8HA==
+X-Gm-Message-State: AOJu0YyEidzSEzeCW5SRD81iEhIqhtuSTfrBnVcv1ipSpcOd5ZpIi9z4
+        cEaYjp3mBZjILiZBbg5bG4HFLpbmpuvxyVNwk6o=
+X-Google-Smtp-Source: AGHT+IFTDKeiGF31o2x9KqCWvEoJPO8c9rNbdZJrwwfy8fyKpg/sWPW/1xk88XQbPMyHvzayi4wKoA==
+X-Received: by 2002:aa7:df90:0:b0:523:78c:166c with SMTP id b16-20020aa7df90000000b00523078c166cmr826038edy.16.1691131182295;
+        Thu, 03 Aug 2023 23:39:42 -0700 (PDT)
+Received: from ?IPV6:2a01:c846:10c0:200:46fe:8c34:c680:5cb9? ([2a01:c846:10c0:200:46fe:8c34:c680:5cb9])
+        by smtp.gmail.com with ESMTPSA id m13-20020aa7c2cd000000b0051df54c6a27sm818543edp.56.2023.08.03.23.39.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Aug 2023 23:39:41 -0700 (PDT)
+Message-ID: <d0d84f73-19e1-b1e4-ed81-0f3f92c73c89@streamunlimited.com>
+Date:   Fri, 4 Aug 2023 08:39:40 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [172.21.132.123]
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS03.realtek.com.tw (172.21.6.96)
-X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.0
+Subject: Re: [PATCH BlueZ 5/5] device: Fix reverse service discovery handling
+ for dual mode devices
+Content-Language: en-US
+To:     luiz.dentz@gmail.com
+References: <20230728053153.584222-1-simon.mikuda@streamunlimited.com>
+ <20230728053153.584222-6-simon.mikuda@streamunlimited.com>
+Cc:     linux-bluetooth@vger.kernel.org
+From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
+In-Reply-To: <20230728053153.584222-6-simon.mikuda@streamunlimited.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+Hi Luiz.
 
-In the commit of linux-firmware project, rtl8852cu_fw.bin is updated as
-FW v2 format[1]. Consider the case that if driver did not be updated for
-FW v2 supported[2], it can not use FW v2.
-By Canonical's suggestion, older driver should be able to load FW v1,
-so rtl8852cu_fw.bin will be revert to the previous commit as FW v1 and
-add rtl8852cu_fw_v2.bin as FW v2. This item will be started on
-linux-firmware project.
+Do you plan to review and merge also this commit series?
 
-In this commit, the driver prefers to load FW v2 if available. Fallback to
-FW v1 otherwise.
+I already updated it according to your message:
 
-To do on linux-firmware project.
-rtl_bt/rtl8852cu_fw.bin: FW v1 (stay at ver. 0xD7B8_FABF)
-rtl_bt/rtl8852cu_fw_v2.bin: FW v2 (to be maintained)
+Perhaps in case of discovery we could do both in parallel, although if
+the remote side supports GATT services as part of SDP we may end up
+with redundant discovery but bt_gatt_client/gatt_db shall be able to
+handle that.
 
-[1]'9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")'
-[2]'55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
-    to 0x040D_7225")'
+Thank you.
 
-Suggested-by: Juerg Haefliger <juerg.haefliger@canonical.com>
-Tested-by: Hilda Wu <hildawu@realtek.com>
-Signed-off-by: Max Chou <max.chou@realtek.com>
----
- drivers/bluetooth/btrtl.c | 68 +++++++++++++++++++++++++--------------
- 1 file changed, 44 insertions(+), 24 deletions(-)
+BR,
+Simon
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index ddae6524106d..8bfa86dd12f7 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -104,7 +104,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
- 	  .config_needed = false,
- 	  .has_rom_version = false,
--	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
-+	  .fw_name = "rtl_bt/rtl8723a_fw",
- 	  .cfg_name = NULL,
- 	  .hw_info = "rtl8723au" },
- 
-@@ -112,7 +112,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_UART),
- 	  .config_needed = true,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723bs_fw",
- 	  .cfg_name = "rtl_bt/rtl8723bs_config",
- 	  .hw_info  = "rtl8723bs" },
- 
-@@ -120,7 +120,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
- 	  .config_needed = false,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723b_fw",
- 	  .cfg_name = "rtl_bt/rtl8723b_config",
- 	  .hw_info  = "rtl8723bu" },
- 
-@@ -132,7 +132,7 @@ static const struct id_table ic_id_table[] = {
- 	  .hci_bus = HCI_UART,
- 	  .config_needed = true,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723cs_cg_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723cs_cg_fw",
- 	  .cfg_name = "rtl_bt/rtl8723cs_cg_config",
- 	  .hw_info  = "rtl8723cs-cg" },
- 
-@@ -144,7 +144,7 @@ static const struct id_table ic_id_table[] = {
- 	  .hci_bus = HCI_UART,
- 	  .config_needed = true,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723cs_vf_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723cs_vf_fw",
- 	  .cfg_name = "rtl_bt/rtl8723cs_vf_config",
- 	  .hw_info  = "rtl8723cs-vf" },
- 
-@@ -156,7 +156,7 @@ static const struct id_table ic_id_table[] = {
- 	  .hci_bus = HCI_UART,
- 	  .config_needed = true,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723cs_xx_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723cs_xx_fw",
- 	  .cfg_name = "rtl_bt/rtl8723cs_xx_config",
- 	  .hw_info  = "rtl8723cs" },
- 
-@@ -164,7 +164,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
- 	  .config_needed = true,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723d_fw",
- 	  .cfg_name = "rtl_bt/rtl8723d_config",
- 	  .hw_info  = "rtl8723du" },
- 
-@@ -172,7 +172,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
- 	  .config_needed = true,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8723ds_fw",
- 	  .cfg_name = "rtl_bt/rtl8723ds_config",
- 	  .hw_info  = "rtl8723ds" },
- 
-@@ -180,7 +180,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
- 	  .config_needed = false,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8821a_fw",
- 	  .cfg_name = "rtl_bt/rtl8821a_config",
- 	  .hw_info  = "rtl8821au" },
- 
-@@ -189,7 +189,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8821c_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8821c_fw",
- 	  .cfg_name = "rtl_bt/rtl8821c_config",
- 	  .hw_info  = "rtl8821cu" },
- 
-@@ -198,7 +198,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = true,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8821cs_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8821cs_fw",
- 	  .cfg_name = "rtl_bt/rtl8821cs_config",
- 	  .hw_info  = "rtl8821cs" },
- 
-@@ -206,7 +206,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
- 	  .config_needed = false,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8761a_fw",
- 	  .cfg_name = "rtl_bt/rtl8761a_config",
- 	  .hw_info  = "rtl8761au" },
- 
-@@ -215,7 +215,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8761b_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8761b_fw",
- 	  .cfg_name = "rtl_bt/rtl8761b_config",
- 	  .hw_info  = "rtl8761btv" },
- 
-@@ -223,7 +223,7 @@ static const struct id_table ic_id_table[] = {
- 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
- 	  .config_needed = false,
- 	  .has_rom_version = true,
--	  .fw_name  = "rtl_bt/rtl8761bu_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8761bu_fw",
- 	  .cfg_name = "rtl_bt/rtl8761bu_config",
- 	  .hw_info  = "rtl8761bu" },
- 
-@@ -232,7 +232,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = true,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8822cs_fw",
- 	  .cfg_name = "rtl_bt/rtl8822cs_config",
- 	  .hw_info  = "rtl8822cs" },
- 
-@@ -241,7 +241,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = true,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8822cs_fw",
- 	  .cfg_name = "rtl_bt/rtl8822cs_config",
- 	  .hw_info  = "rtl8822cs" },
- 
-@@ -250,7 +250,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8822cu_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8822cu_fw",
- 	  .cfg_name = "rtl_bt/rtl8822cu_config",
- 	  .hw_info  = "rtl8822cu" },
- 
-@@ -259,7 +259,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = true,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8822b_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8822b_fw",
- 	  .cfg_name = "rtl_bt/rtl8822b_config",
- 	  .hw_info  = "rtl8822bu" },
- 
-@@ -268,7 +268,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8852au_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8852au_fw",
- 	  .cfg_name = "rtl_bt/rtl8852au_config",
- 	  .hw_info  = "rtl8852au" },
- 
-@@ -277,7 +277,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = true,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8852bs_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8852bs_fw",
- 	  .cfg_name = "rtl_bt/rtl8852bs_config",
- 	  .hw_info  = "rtl8852bs" },
- 
-@@ -286,7 +286,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8852bu_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8852bu_fw",
- 	  .cfg_name = "rtl_bt/rtl8852bu_config",
- 	  .hw_info  = "rtl8852bu" },
- 
-@@ -295,7 +295,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = true,
--	  .fw_name  = "rtl_bt/rtl8852cu_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8852cu_fw",
- 	  .cfg_name = "rtl_bt/rtl8852cu_config",
- 	  .hw_info  = "rtl8852cu" },
- 
-@@ -304,7 +304,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .has_msft_ext = false,
--	  .fw_name  = "rtl_bt/rtl8851bu_fw.bin",
-+	  .fw_name  = "rtl_bt/rtl8851bu_fw",
- 	  .cfg_name = "rtl_bt/rtl8851bu_config",
- 	  .hw_info  = "rtl8851bu" },
- 	};
-@@ -1045,10 +1045,12 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 	struct sk_buff *skb;
- 	struct hci_rp_read_local_version *resp;
- 	struct hci_command_hdr *cmd;
-+	char fw_name[40];
- 	char cfg_name[40];
- 	u16 hci_rev, lmp_subver;
- 	u8 hci_ver, lmp_ver, chip_type = 0;
- 	int ret;
-+	int fw_load_retry = 0;
- 	u8 reg_val[2];
- 
- 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
-@@ -1154,9 +1156,26 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 			goto err_free;
- 	}
- 
--	btrtl_dev->fw_len = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
-+fw_name_load:
-+	if (btrtl_dev->ic_info->fw_name) {
-+		if (lmp_subver == RTL_ROM_LMP_8852A && hci_rev == 0x000c &&
-+				  fw_load_retry == 0) {
-+			fw_load_retry = 1;
-+			snprintf(fw_name, sizeof(fw_name), "%s_v2.bin",
-+				 btrtl_dev->ic_info->fw_name);
-+		} else {
-+			fw_load_retry = 0;
-+			snprintf(fw_name, sizeof(fw_name), "%s.bin",
-+				 btrtl_dev->ic_info->fw_name);
-+		}
-+		btrtl_dev->fw_len = rtl_load_file(hdev, fw_name,
- 					  &btrtl_dev->fw_data);
-+	}
-+
- 	if (btrtl_dev->fw_len < 0) {
-+		if (fw_load_retry == 1)
-+			goto fw_name_load;
-+
- 		rtl_dev_err(hdev, "firmware file %s not found",
- 			    btrtl_dev->ic_info->fw_name);
- 		ret = btrtl_dev->fw_len;
-@@ -1491,4 +1510,5 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
--- 
-2.34.1
-
+On 28. 7. 2023 7:31, Simon Mikuda wrote:
+> There can be situation that after connection to LE bearer we will try
+> to start reverse discovery on BR/EDR bearer even when it is not connected.
+>
+> This change separates SDP and GATT reverse services discoveries to their
+> respective bearers. SDP to BR/EDR and GATT to LE.
+> ---
+>   src/device.c | 129 +++++++++++++++++++++++++++++++++------------------
+>   1 file changed, 83 insertions(+), 46 deletions(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 367e2f046..90d6a7615 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -158,6 +158,10 @@ struct bearer_state {
+>   	bool initiator;
+>   	bool connectable;
+>   	time_t last_seen;
+> +	/* reverse service discovery timer */
+> +	unsigned int discov_timer;
+> +	/* service discover request (SDP, GATT) */
+> +	struct browse_req *browse;
+>   };
+>   
+>   struct ltk_info {
+> @@ -236,9 +240,7 @@ struct btd_device {
+>   	bool		temporary;
+>   	bool		connectable;
+>   	unsigned int	disconn_timer;
+> -	unsigned int	discov_timer;
+>   	unsigned int	temporary_timer;	/* Temporary/disappear timer */
+> -	struct browse_req *browse;		/* service discover request */
+>   	struct bonding_req *bonding;
+>   	struct authentication_req *authr;	/* authentication request */
+>   	GSList		*disconnects;		/* disconnects message */
+> @@ -684,8 +686,10 @@ static void browse_request_free(struct browse_req *req)
+>   {
+>   	struct btd_device *device = req->device;
+>   
+> -	if (device->browse == req)
+> -		device->browse = NULL;
+> +	if (device->bredr_state.browse == req)
+> +		device->bredr_state.browse = NULL;
+> +	if (device->le_state.browse == req)
+> +		device->le_state.browse = NULL;
+>   
+>   	if (req->listener_id)
+>   		g_dbus_remove_watch(dbus_conn, req->listener_id);
+> @@ -833,8 +837,10 @@ static void device_free(gpointer user_data)
+>   	if (device->disconn_timer)
+>   		timeout_remove(device->disconn_timer);
+>   
+> -	if (device->discov_timer)
+> -		timeout_remove(device->discov_timer);
+> +	if (device->bredr_state.discov_timer)
+> +		timeout_remove(device->bredr_state.discov_timer);
+> +	if (device->le_state.discov_timer)
+> +		timeout_remove(device->le_state.discov_timer);
+>   
+>   	if (device->temporary_timer)
+>   		timeout_remove(device->temporary_timer);
+> @@ -1848,8 +1854,10 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+>   	if (device->bonding)
+>   		bonding_request_cancel(device->bonding);
+>   
+> -	if (device->browse)
+> -		browse_request_cancel(device->browse);
+> +	if (device->bredr_state.browse)
+> +		browse_request_cancel(device->bredr_state.browse);
+> +	if (device->le_state.browse)
+> +		browse_request_cancel(device->le_state.browse);
+>   
+>   	if (device->att_io) {
+>   		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+> @@ -2304,7 +2312,7 @@ void btd_device_update_allowed_services(struct btd_device *dev)
+>   	/* If service discovery is ongoing, let the service discovery complete
+>   	 * callback call this function.
+>   	 */
+> -	if (dev->browse) {
+> +	if (dev->bredr_state.browse) {
+>   		ba2str(&dev->bdaddr, addr);
+>   		DBG("service discovery of %s is ongoing. Skip updating allowed "
+>   							"services", addr);
+> @@ -2370,7 +2378,7 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services)
+>   {
+>   	GSList *l;
+>   
+> -	if (dev->pending || dev->connect || dev->browse)
+> +	if (dev->pending || dev->connect || dev->bredr_state.browse)
+>   		return -EBUSY;
+>   
+>   	if (!btd_adapter_get_powered(dev->adapter))
+> @@ -2401,7 +2409,7 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+>   	DBG("%s %s, client %s", dev->path, uuid ? uuid : "(all)",
+>   						dbus_message_get_sender(msg));
+>   
+> -	if (dev->pending || dev->connect || dev->browse)
+> +	if (dev->pending || dev->connect || dev->bredr_state.browse)
+>   		return btd_error_in_progress_str(msg, ERR_BREDR_CONN_BUSY);
+>   
+>   	if (!btd_adapter_get_powered(dev->adapter)) {
+> @@ -2784,7 +2792,7 @@ static void browse_request_complete(struct browse_req *req, uint8_t type,
+>   
+>   	/* if successfully resolved services we need to free browsing request
+>   	 * before passing message back to connect functions, otherwise
+> -	 * device->browse is set and "InProgress" error is returned instead
+> +	 * device->state.browse is set and "InProgress" error is returned instead
+>   	 * of actually connecting services
+>   	 */
+>   	msg = dbus_message_ref(req->msg);
+> @@ -2829,7 +2837,7 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t browse_type,
+>   						uint8_t bdaddr_type, int err)
+>   {
+>   	struct bearer_state *state = get_state(dev, bdaddr_type);
+> -	struct browse_req *req = dev->browse;
+> +	struct browse_req *req = state->browse;
+>   
+>   	DBG("%s err %d", dev->path, err);
+>   
+> @@ -3060,7 +3068,7 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+>   			err = device_connect_le(device);
+>   		else
+>   			err = adapter_create_bonding(adapter, &device->bdaddr,
+> -							device->bdaddr_type,
+> +							bdaddr_type,
+>   							io_cap);
+>   	} else {
+>   		err = adapter_create_bonding(adapter, &device->bdaddr,
+> @@ -4657,8 +4665,10 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+>   		device_cancel_bonding(device, status);
+>   	}
+>   
+> -	if (device->browse)
+> -		browse_request_cancel(device->browse);
+> +	if (device->bredr_state.browse)
+> +		browse_request_cancel(device->bredr_state.browse);
+> +	if (device->le_state.browse)
+> +		browse_request_cancel(device->le_state.browse);
+>   
+>   	while (device->services != NULL) {
+>   		struct btd_service *service = device->services->data;
+> @@ -5317,7 +5327,7 @@ static void att_disconnected_cb(int err, void *user_data)
+>   
+>   	DBG("");
+>   
+> -	if (device->browse)
+> +	if (device->le_state.browse)
+>   		goto done;
+>   
+>   	DBG("%s (%d)", strerror(err), err);
+> @@ -5345,7 +5355,7 @@ done:
+>   
+>   static void register_gatt_services(struct btd_device *device)
+>   {
+> -	struct browse_req *req = device->browse;
+> +	struct browse_req *req = device->le_state.browse;
+>   	GSList *services = NULL;
+>   
+>   	if (!bt_gatt_client_is_ready(device->client))
+> @@ -5636,8 +5646,8 @@ static void att_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>   			adapter_connect_list_add(device->adapter, device);
+>   		}
+>   
+> -		if (device->browse)
+> -			browse_request_complete(device->browse,
+> +		if (device->le_state.browse)
+> +			browse_request_complete(device->le_state.browse,
+>   						BROWSE_GATT,
+>   						device->bdaddr_type,
+>   						-ECONNABORTED);
+> @@ -5751,15 +5761,24 @@ static struct browse_req *browse_request_new(struct btd_device *device,
+>   							DBusMessage *msg)
+>   {
+>   	struct browse_req *req;
+> +	struct bearer_state *state;
+>   
+> -	if (device->browse)
+> +	switch (type) {
+> +	case BROWSE_SDP:
+> +		state = get_state(device, BDADDR_BREDR);
+> +		break;
+> +	case BROWSE_GATT:
+> +		state = get_state(device, BDADDR_LE_PUBLIC);
+> +		break;
+> +	}
+> +	if (state->browse)
+>   		return NULL;
+>   
+>   	req = g_new0(struct browse_req, 1);
+>   	req->device = device;
+>   	req->type = type;
+>   
+> -	device->browse = req;
+> +	state->browse = req;
+>   
+>   	if (!msg)
+>   		return req;
+> @@ -5879,15 +5898,17 @@ int device_discover_services(struct btd_device *device,
+>   						uint8_t bdaddr_type, DBusMessage *msg)
+>   {
+>   	int err;
+> +	struct bearer_state *state;
+>   
+>   	if (bdaddr_type == BDADDR_BREDR)
+>   		err = device_browse_sdp(device, msg);
+>   	else
+>   		err = device_browse_gatt(device, msg);
+>   
+> -	if (err == 0 && device->discov_timer) {
+> -		timeout_remove(device->discov_timer);
+> -		device->discov_timer = 0;
+> +	state = get_state(device, bdaddr_type);
+> +	if (err == 0 && state->discov_timer) {
+> +		timeout_remove(state->discov_timer);
+> +		state->discov_timer = 0;
+>   	}
+>   
+>   	return err;
+> @@ -6208,16 +6229,22 @@ bool device_is_connectable(struct btd_device *device)
+>   	return state->connectable;
+>   }
+>   
+> -static bool start_discovery_cb(gpointer user_data)
+> +static bool start_sdp_discovery_cb(gpointer user_data)
+>   {
+>   	struct btd_device *device = user_data;
+>   
+> -	if (device->bredr)
+> -		device_browse_sdp(device, NULL);
+> -	else
+> -		device_browse_gatt(device, NULL);
+> +	device->bredr_state.discov_timer = 0;
+> +	device_browse_sdp(device, NULL);
+>   
+> -	device->discov_timer = 0;
+> +	return FALSE;
+> +}
+> +
+> +static bool start_gatt_discovery_cb(gpointer user_data)
+> +{
+> +	struct btd_device *device = user_data;
+> +
+> +	device->le_state.discov_timer = 0;
+> +	device_browse_gatt(device, NULL);
+>   
+>   	return FALSE;
+>   }
+> @@ -6368,17 +6395,27 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
+>   			g_dbus_send_reply(dbus_conn, bonding->msg, DBUS_TYPE_INVALID);
+>   		}
+>   		bonding_request_free(bonding);
+> -	} else if (!state->svc_resolved) {
+> -		if (!device->browse && !device->discov_timer &&
+> -				btd_opts.reverse_discovery) {
+> -			/* If we are not initiators and there is no currently
+> -			 * active discovery or discovery timer, set discovery
+> -			 * timer */
+> -			DBG("setting timer for reverse service discovery");
+> -			device->discov_timer = timeout_add_seconds(
+> -							DISCOVERY_TIMER,
+> -							start_discovery_cb,
+> -							device, NULL);
+> +
+> +	} else if (!state->svc_resolved
+> +			&& !state->browse
+> +			&& !state->discov_timer
+> +			&& btd_opts.reverse_discovery) {
+> +
+> +		/* If we are not initiators and there is no currently
+> +		 * active discovery or discovery timer, set discovery
+> +		 * timer */
+> +		if (bdaddr_type == BDADDR_BREDR) {
+> +			DBG("setting timer for reverse SDP service discovery");
+> +			state->discov_timer = timeout_add_seconds(
+> +					DISCOVERY_TIMER,
+> +					start_sdp_discovery_cb,
+> +					device, NULL);
+> +		} else {
+> +			DBG("setting timer for reverse GATT service discovery");
+> +			state->discov_timer = timeout_add_seconds(
+> +					DISCOVERY_TIMER,
+> +					start_gatt_discovery_cb,
+> +					device, NULL);
+>   		}
+>   	}
+>   }
+> @@ -6416,11 +6453,11 @@ unsigned int device_wait_for_svc_complete(struct btd_device *dev,
+>   
+>   	if (state->svc_resolved || !btd_opts.reverse_discovery)
+>   		cb->idle_id = g_idle_add(svc_idle_cb, cb);
+> -	else if (dev->discov_timer > 0) {
+> -		timeout_remove(dev->discov_timer);
+> -		dev->discov_timer = timeout_add_seconds(
+> +	else if (dev->bredr_state.discov_timer > 0) {
+> +		timeout_remove(dev->bredr_state.discov_timer);
+> +		dev->bredr_state.discov_timer = timeout_add_seconds(
+>   						0,
+> -						start_discovery_cb,
+> +						start_sdp_discovery_cb,
+>   						dev, NULL);
+>   	}
+>   
