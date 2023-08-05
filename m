@@ -2,281 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D53DC001DB
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Aug 2023 00:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C55DEB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Aug 2023 05:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229552AbjHEAat (ORCPT
+        id S229475AbjHEFKC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Aug 2023 20:30:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41078 "EHLO
+        Sat, 5 Aug 2023 01:10:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbjHEAas (ORCPT
+        with ESMTP id S229445AbjHEFKA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Aug 2023 20:30:48 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF8714694
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Aug 2023 17:30:46 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b9cdbf682eso42018881fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Aug 2023 17:30:46 -0700 (PDT)
+        Sat, 5 Aug 2023 01:10:00 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC8714ED8;
+        Fri,  4 Aug 2023 22:09:58 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b9f48b6796so42057241fa.3;
+        Fri, 04 Aug 2023 22:09:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691195445; x=1691800245;
+        d=gmail.com; s=20221208; t=1691212197; x=1691816997;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZZEZIUPKs3wiLixVNlH1oDxndyOHWGTbpRR1ihKExKc=;
-        b=Ol8pptZ0oDsdKH891QzIlXap7zbwjg6IkH1aI/qbx+zjQayz0OPhHW+iH5BeDthDD5
-         T6Wjpldt9B2CCTcLLmQ2XSeoMyG7hdXBON1upwgYkM6/KmKTb5H8hKl0sPF1UrzmbU14
-         34xyWz2xXb4JLS8FoDdXrG4LQSKLL8+MvkGgwgoge2tfOYNBplWlbsKAuU4kubZ0juEA
-         UmdyPIFY9Dsrei7slKcSiTu4S2VrCjW4609NE2JEd0kLC2qBjzr9Z2dYFA9aIfmxfylA
-         5guDCSoM13WvdMGeo3Ui7aAixwqLcXi+/L90NRxpcTylSvrfyy+3ODYmrhiIoyefCTCk
-         1QVQ==
+        bh=1KldLBiFwSL+U5xUltvcJvXEpQEYt+vbYhZvqxWXYyU=;
+        b=FbTm3Z4QhAkRbiqII6hLJoVkJQtpLednvFEFHd0HHxHn0twFOCwjnlYPLszFRmY5EY
+         vhYhraxC2ouYoge35Q2jAFBaLP4L66sP8HxfL9zrUh0wj3aUKRbqdoaH1V4EqDQt2oIo
+         xZQXRcCpB3BtZ7or6678C5CyuwNxvrbYuvjHgqsMQE5bj1/IF3uRlcHgnUnoSdrSq857
+         /273uBUXQishTBhP0v3WtzTArKFDrT7GUuvrk8ISczfoEnARhWgLV/JWtXRayuLUzZ9p
+         /kH/ssWeldETLXT6WpV9nS/r1H9Ija7Spgf6QZNJF2wkqO4hLxpuI7NMgAX27yXpJOHo
+         6/1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691195445; x=1691800245;
+        d=1e100.net; s=20221208; t=1691212197; x=1691816997;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZZEZIUPKs3wiLixVNlH1oDxndyOHWGTbpRR1ihKExKc=;
-        b=NT4mbwj16UPJtvd0Txc+IUCTR3ppgVZ35xoPiGZl6Kmzk7oxvIZWfKsGWDJMVEATNa
-         Iu/XwZzvvXvjP4c945XpQaLMvsi0m/ZBgtjNJmPBRs5u9O/23xBh2PQ2L7NX9Pjd5b7t
-         T470YqtgTWOjiKsXzZB3wnFBZ6xIcMXj2rr2ZPfxfvbLrSzwMOCo90t3T/kqFh7pESiE
-         xJbvupC7ed9O1d6lGIH6ErWPdQGQhG0kUN0DOqDtO9/OywKwNaEWu+o1tq5JTkduxgAF
-         hbHXsy6+e7y08IdozvUP3yTtlV93j9vfX1Z1NArThBERc6UE1fQFv8DYSkxKs/fLJGQL
-         KTRQ==
-X-Gm-Message-State: AOJu0YxKDjKfnUK1xU+zSANIWrzWdWZU15qAJ/yGtsA28toKFvxtiYNp
-        GYTm6GdrMExBGDRHb8abQ8O9pnoGONvjNlQE85KLi/Bj
-X-Google-Smtp-Source: AGHT+IGljdRcQROZ2OZHJCPZ8OChcB7M1m+4U3YFJs/UMwedBy5jkcEkaJ9ki1urMe9T9DpswEmUagV7OUBKDhODMo4=
-X-Received: by 2002:a2e:9815:0:b0:2ba:cbb:47b7 with SMTP id
- a21-20020a2e9815000000b002ba0cbb47b7mr2535722ljj.21.1691195444816; Fri, 04
- Aug 2023 17:30:44 -0700 (PDT)
+        bh=1KldLBiFwSL+U5xUltvcJvXEpQEYt+vbYhZvqxWXYyU=;
+        b=ZcLbn2tCqnHKBC2YOUOnvhk2HukyO1uXihOlp/04DI2VUEAClLfgUKkkuNOUJ3sUpN
+         KQH0xyRwUUMJyhBfUJ7ioGYKajvz5Hv2fI5YDrK1GS9U0S7C3AdH5YyT2R0gye4j0H8B
+         m37YJUvE8gWpkXMrRaSFnJe2jNvSu0YpYSyZCFDJxmmDcCnldE92UAdWAAV0rzf02ZyD
+         SUyqoBBCbHni1XtpwL58cBH7jb8yvYJdX822xM9XwqLzXvp+o2ir4vqoidybzeuAmK67
+         ogKB+kJLeYMX37RT0hdjjBJHyNoSlwI9Zi5FXRYBWvgV9iHhXipmsOTPLfUxd9I+sEJr
+         ByOQ==
+X-Gm-Message-State: AOJu0YwscBy9Q1T3tdobR4z6WpkU2mp/RjOt4pAugV7b3iypiIN1wpkf
+        fR3fGOXYAO8giHB0o3U0Rjid/dP9TNW71Oa1LMo/bCvPCkM=
+X-Google-Smtp-Source: AGHT+IGCw4sul8vw4580XYl3TAj7SSZjvNqnALZCs7l9G3Kya94G/RaqS1BVS6Iz9IdpjHVlOBqSu5YUTs+U4tEja54=
+X-Received: by 2002:a2e:740d:0:b0:2b6:bc30:7254 with SMTP id
+ p13-20020a2e740d000000b002b6bc307254mr2510862ljc.13.1691212196867; Fri, 04
+ Aug 2023 22:09:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230804001115.907885-1-luiz.dentz@gmail.com> <20230804001115.907885-4-luiz.dentz@gmail.com>
- <4c5eadaa0e013bced982050038de97435ad2881f.camel@iki.fi>
-In-Reply-To: <4c5eadaa0e013bced982050038de97435ad2881f.camel@iki.fi>
+References: <ed32aad7-41c0-c84d-c1f3-085a4d43ce09@buaa.edu.cn>
+In-Reply-To: <ed32aad7-41c0-c84d-c1f3-085a4d43ce09@buaa.edu.cn>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 4 Aug 2023 17:30:32 -0700
-Message-ID: <CABBYNZLXhO84HdA8vzLqpEHyBQiH9QdHWEzOBYJfMeFYmofV0g@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] Bluetooth: hci_conn: Fix modifying handle while aborting
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth@vger.kernel.org
+Date:   Fri, 4 Aug 2023 22:09:44 -0700
+Message-ID: <CABBYNZJZbiyhnary2F7iZMKg5xSFKNV0iRVJ6ye7NayS-z-a0Q@mail.gmail.com>
+Subject: Re: [BUG]Bluetooth: possible semantic bug when the status field of
+ the HCI_Connection_Complete packet set to non-zero
+To:     Xinyu Liu <LXYbhu@buaa.edu.cn>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+Hi,
 
-On Fri, Aug 4, 2023 at 9:28=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+On Fri, Aug 4, 2023 at 9:35=E2=80=AFPM Xinyu Liu <LXYbhu@buaa.edu.cn> wrote=
+:
 >
-> Hi Luiz,
+> Hello,
 >
-> to, 2023-08-03 kello 17:11 -0700, Luiz Augusto von Dentz kirjoitti:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This introduces hci_conn_set_handle which takes care of verifying the
-> > conditions where the hci_conn handle can be modified, including when
-> > hci_conn_abort has been called and also checks that the handles is
-> > valid as well.
+> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in=
+ Linux 6.2:
 >
-> It looks there could still be problem vs. sequences of the type
+> During the connection process, the host server needs to receive the HCI_C=
+onnection_Complete packet from the hardware controller. In normal cases, th=
+e status field of this packet is zero, which means that the connection is s=
+uccessfully completed:
 >
-> [kernel] hci_acl_create_connection(AA:AA:AA:AA:AA:AA)
-> [controller] < Create Connection AA:AA:AA:AA:AA:AA
-> [controller] > Connection Complete handle X
-> [kernel] hci_conn_complete_evt(handle X)
-> [kernel] hci_acl_create_connection(BB:BB:BB:BB:BB:BB)
-> [kernel] hci_abort_conn(handle X)
-> [controller] > Disconnect Complete handle X (from remote)
-> [kernel] hci_disconn_complete_evt(handle X)
-> [controller] < Create Connection BB:BB:BB:BB:BB:BB
-> [controller] > Connection Complete handle X  (same handle value)
-> [kernel] hci_conn_complete_evt(handle X)
-> ...
-> [kernel] hci_abort_conn_sync(handle X)
+> However, in our testing, when the status field was set to non-zero, 47 fo=
+r instance, the Bluetooth connection failed. After that, when we attempt to=
+ reestablish a Bluetooth connection, the connection always fails. Upon anal=
+yzing the event packets sent from the controller to the host server, we obs=
+erved that the Status field of the HCI_Command_Status packet becomes 0B, in=
+dicating that the controller believes the connection already exists. This s=
+ituation has been causing the connection failure persistently:
+
+That seems like a link-layer issue, the controller is saying the
+connection had failed, and 0x0b also doesn't help either except if you
+are saying that the other parameters are actually valid (e.g. handle),
+that said the spec seems pretty clear about status other than 0x00
+means the connection had failed:
+
+BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+page 2170
+
+0x01 to 0xFF Connection failed to Complete. See [Vol 1] Part F,
+Controller Error Codes
+for a list of error codes and descriptions.
+
 >
-> This would seem to terminate the wrong connection.
-
-Perhaps we need a test for it, it shall also be possible to cancel the call=
-back.
-
-> Some flag/abort_reason could be checked to see if the looked up conn is
-> to be aborted before doing it. This can also be used to make
-> hci_disconnect_all_sync iteration UAF-safe.
-
-Yep, I am also thinking of introducing some functions to lookup on the
-cmd_sync_queue to avoid submitting duplicated commands, or for example
-if we want to cancel a callback.
-
-> It's unclear to me if you agree that tasks from hdev->workqueue and
-> hdev->req_workqueue can run concurrently, so that locking is needed.
-
-I think what we should do is to check if we can have a more clear
-separation, because the workqueue is used for example by the likes of
-rx_work which does process everything we receive from the controller,
-which perhaps is not the best idea given in case of HCI events it
-might be better to process them in the same context of commands for
-example, to ensure that HCI states is not being modified concurrently
-which seems to be what causes the most problems.
-
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  include/net/bluetooth/hci_core.h |  1 +
-> >  net/bluetooth/hci_conn.c         | 30 ++++++++++++++++++++++++++++++
-> >  net/bluetooth/hci_event.c        | 29 +++++++++++------------------
-> >  3 files changed, 42 insertions(+), 18 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index 8200a6689b39..d2a3a2a9fd7d 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -1425,6 +1425,7 @@ int hci_conn_switch_role(struct hci_conn *conn, _=
-_u8 role);
-> >  void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_acti=
-ve);
-> >
-> >  void hci_conn_failed(struct hci_conn *conn, u8 status);
-> > +u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle);
-> >
-> >  /*
-> >   * hci_conn_get() and hci_conn_put() are used to control the life-time=
- of an
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 923bb7e7be2b..13bd2753abbb 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -1231,6 +1231,36 @@ void hci_conn_failed(struct hci_conn *conn, u8 s=
-tatus)
-> >       hci_conn_del(conn);
-> >  }
-> >
-> > +/* This function requires the caller holds hdev->lock */
-> > +u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle)
-> > +{
-> > +     struct hci_dev *hdev =3D conn->hdev;
-> > +
-> > +     bt_dev_dbg(hdev, "hcon %p handle 0x%4.4x", conn, handle);
-> > +
-> > +     if (conn->handle =3D=3D handle)
-> > +             return 0;
-> > +
-> > +     if (handle > HCI_CONN_HANDLE_MAX) {
-> > +             bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x",
-> > +                        handle, HCI_CONN_HANDLE_MAX);
-> > +             return HCI_ERROR_INVALID_PARAMETERS;
-> > +     }
-> > +
-> > +     /* If abort_reason has been sent it means the connection is being
-> > +      * aborted and the handle shall not be changed.
-> > +      */
-> > +     if (conn->abort_reason) {
-> > +             bt_dev_err(hdev, "hcon %p abort_reason 0x%2.2x", conn,
-> > +                        conn->abort_reason);
-> > +             return conn->abort_reason;
-> > +     }
-> > +
-> > +     conn->handle =3D handle;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> >  static void create_le_conn_complete(struct hci_dev *hdev, void *data, =
-int err)
-> >  {
-> >       struct hci_conn *conn;
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index f1fcece29e7d..218da9b0fe8f 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -3179,13 +3179,9 @@ static void hci_conn_complete_evt(struct hci_dev=
- *hdev, void *data,
-> >       }
-> >
-> >       if (!status) {
-> > -             conn->handle =3D __le16_to_cpu(ev->handle);
-> > -             if (conn->handle > HCI_CONN_HANDLE_MAX) {
-> > -                     bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.=
-4x",
-> > -                                conn->handle, HCI_CONN_HANDLE_MAX);
-> > -                     status =3D HCI_ERROR_INVALID_PARAMETERS;
-> > +             status =3D hci_conn_set_handle(conn, __le16_to_cpu(ev->ha=
-ndle));
-> > +             if (status)
-> >                       goto done;
-> > -             }
-> >
-> >               if (conn->type =3D=3D ACL_LINK) {
-> >                       conn->state =3D BT_CONFIG;
-> > @@ -3849,11 +3845,9 @@ static u8 hci_cc_le_set_cig_params(struct hci_de=
-v *hdev, void *data,
-> >               if (conn->state !=3D BT_BOUND && conn->state !=3D BT_CONN=
-ECT)
-> >                       continue;
-> >
-> > -             conn->handle =3D __le16_to_cpu(rp->handle[i]);
-> > +             if (hci_conn_set_handle(conn, __le16_to_cpu(rp->handle[i]=
-)))
-> > +                     continue;
-> >
-> > -             bt_dev_dbg(hdev, "%p handle 0x%4.4x parent %p", conn,
-> > -                        conn->handle, conn->parent);
-> > -
-> >               if (conn->state =3D=3D BT_CONNECT)
-> >                       pending =3D true;
-> >       }
-> > @@ -5039,11 +5033,8 @@ static void hci_sync_conn_complete_evt(struct hc=
-i_dev *hdev, void *data,
-> >
-> >       switch (status) {
-> >       case 0x00:
-> > -             conn->handle =3D __le16_to_cpu(ev->handle);
-> > -             if (conn->handle > HCI_CONN_HANDLE_MAX) {
-> > -                     bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.=
-4x",
-> > -                                conn->handle, HCI_CONN_HANDLE_MAX);
-> > -                     status =3D HCI_ERROR_INVALID_PARAMETERS;
-> > +             status =3D hci_conn_set_handle(conn, __le16_to_cpu(ev->ha=
-ndle));
-> > +             if (status) {
-> >                       conn->state =3D BT_CLOSED;
-> >                       break;
-> >               }
-> > @@ -6978,7 +6969,7 @@ static void hci_le_create_big_complete_evt(struct=
- hci_dev *hdev, void *data,
-> >  {
-> >       struct hci_evt_le_create_big_complete *ev =3D data;
-> >       struct hci_conn *conn;
-> > -     __u8 bis_idx =3D 0;
-> > +     __u8 i =3D 0;
-> >
-> >       BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-> >
-> > @@ -6996,7 +6987,9 @@ static void hci_le_create_big_complete_evt(struct=
- hci_dev *hdev, void *data,
-> >                   conn->iso_qos.bcast.big !=3D ev->handle)
-> >                       continue;
-> >
-> > -             conn->handle =3D __le16_to_cpu(ev->bis_handle[bis_idx++])=
-;
-> > +             if (hci_conn_set_handle(conn,
-> > +                                     __le16_to_cpu(ev->bis_handle[i++]=
-)))
-> > +                     continue;
-> >
-> >               if (!ev->status) {
-> >                       conn->state =3D BT_CONNECTED;
-> > @@ -7015,7 +7008,7 @@ static void hci_le_create_big_complete_evt(struct=
- hci_dev *hdev, void *data,
-> >               rcu_read_lock();
-> >       }
-> >
-> > -     if (!ev->status && !bis_idx)
-> > +     if (!ev->status && !i)
-> >               /* If no BISes have been connected for the BIG,
-> >                * terminate. This is in case all bound connections
-> >                * have been closed before the BIG creation
+> In our understanding, it would be more preferable if a single failed Blue=
+tooth connection does not result in subsequent connections also failing. We=
+ believe that having some mechanism to facilitate Bluetooth's recovery and =
+restoration to normal functionality could be considered as a potentially be=
+tter option.
 >
+> We are not sure whether this is a semantic bug or implementation feature =
+in the Linux kernel. Any feedback would be appreciated, thanks!
+
+Well we can't do much about the dangling connection if we don't know
+its handle to be able to disconnect since there is no command to
+disconnect by address if that is what you were expecting us to do, so
+the bottom line seems to be that sending 0x0b to the controller is
+useless since we can't do anything about at the host, well other than
+reset but would likely affect other functionality as well.
 
 
 --=20
