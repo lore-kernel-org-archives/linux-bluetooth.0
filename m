@@ -2,208 +2,203 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1894C001DF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 15:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED64C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 15:27:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229589AbjHFP1u (ORCPT
+        id S229639AbjHFP1w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Aug 2023 11:27:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59898 "EHLO
+        Sun, 6 Aug 2023 11:27:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbjHFP1s (ORCPT
+        with ESMTP id S229510AbjHFP1t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Aug 2023 11:27:48 -0400
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F15BF3
+        Sun, 6 Aug 2023 11:27:49 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F066E6
         for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 08:27:47 -0700 (PDT)
 Received: from monolith.lan (unknown [193.138.7.198])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RJjxr47bzz49Q64;
-        Sun,  6 Aug 2023 18:27:44 +0300 (EEST)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RJjxq6THdz49Q3D;
+        Sun,  6 Aug 2023 18:27:43 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
         t=1691335664;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ARuo5LTrE5HL803ZSwc+NL5xY+iBRrp465y+GAVAZd8=;
-        b=KSCReRwuVUMzns6H8IJYxw7wncD0zg634docRDvwx4m2tFMXSo48Sf8VhVzuJqDxskwVeX
-        hSq5Y2QOdBvqCGXkSyJL2tL06ydgpLaBUYyFGbww/8tJrgXrUlVeFgeSapl8fic8lnVGIM
-        huTgPk138+41nOhwKuLordQNpCUH61sCVkIZGXNHlMTNh7fySXTBlIVWKjLVosOJSCc9NB
-        K7HZFky1/igRwMUGgowkAdP0KYdnPKq/eALHqcF3RaKsRBtBaJ0oCwsBkyUHzw2cZ1MgYu
-        cbnXa8wSGukGhmbJqfPhaCWExDeXtun+6p/tFz1ki6Ywb7qEKGpiqHyvYvTGzQ==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3N0CGa6ode3fZYG87mYm19jTPbKxxmxXuOK3wspRIFA=;
+        b=fJUqfizrivaCXPIWvO+5kUu3LJK2BU6puuPUe7mSuNPBQIJVI2xFtWhHFFjT3TeV7edecQ
+        PUuTgaEtK7R75MVW4j8RLL/ufxAfiQN/4eKaN5meSBrpxe4O/dkYXfAsdPCQu8KVzjVGNJ
+        nhA21BA6HblkR0rgOLb3utEnT1tUy2L60C6PbK1o4dwJ/o9VHL7IwPrjqvVVpPPrGCajsV
+        pUzcg/iBdeCDbt9mx2teYMJ2m+UqLWwWAglBkVN/UzeQgPA77WyPFIgEZma4FGBTOoZOFi
+        MJ4v9YenjOSM+AezksCcYMmWfMq9OmOy9y66KxO2JJZs0R9ErLUwQUUeuZEHbw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
         s=lahtoruutu; t=1691335664;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ARuo5LTrE5HL803ZSwc+NL5xY+iBRrp465y+GAVAZd8=;
-        b=pSW/djYoCowB+Cdp5pExkHiZaBx7qw5zvsjZrfIDKkn7zaKcCRrBXzVxB99TUV6qleYVIX
-        rlBtPDK+jRMGDMKHA1n1wJtsxqI43P9ShWaQ3p/UM0MIPG8NYKTuGx7DeLahAPOczhQU3O
-        qT8WaWn9McDNUdYtlZQEcPjrduCNGYGcNPkGnK315ALTIKi4Pl9MH4jXuuCwJyXrnUtEpJ
-        p73g/yoenq8EjqaZFsPwVIWPOe9j/UeLsvflQAyT8vTpfWXpXpiHeEYhfpab734KkbASAO
-        uouNfUfxuWhYS1NXY1Mfsk1xcOF3u0QcWwrHO13AODqPEFWxlxnxpJ5YCAXtuw==
+         content-transfer-encoding:content-transfer-encoding;
+        bh=3N0CGa6ode3fZYG87mYm19jTPbKxxmxXuOK3wspRIFA=;
+        b=MvXc2Vj2IR6NnY+LvTTEohJ1ROFi3vUNtZPnf50Iq71feSZtJqk/nbUijsLUtOlXJVbqMu
+        9yYtB2dc/tKT6yRz80wEm0q2mMnx5kydm1Hje2vocb9BPOcpBznza0h5EuQJwC9vXP2fOA
+        AR3Y+NlLS6UYvL7jKG+rAgXstApO4J9NVYI7JUlU2elUDrClBLgW674GSB3Iy7HgZzElG3
+        ztEZCd+JvPVDfe/7Ns5dDiTA6N7HpF9+AnuLjBoDmgWj9AEImpaMNpFNmfOwC7x5i3TO0q
+        bBaUQaRxUCXkYi8f/yixrMAjegRiU24Y7Vuakaw4DidG2tx29hoGncsHejaZ5w==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1691335664; a=rsa-sha256;
         cv=none;
-        b=vhhZKk35DOqGrXVrFmm7LqfyFwgDbBFZkjHMEWm4nP6dcz00ijMqaLXcKaZuc23+RKzkPq
-        xX0I2vc6V7SMIAypfbMAieBP+HntdTZbJ8OuUaM5wh84mxc8Uec5ysxrrZOZEFqi30sA/q
-        3rmjWF8fU856bfpO2dxS6+P36TkRdwPaMGQXxLH20vv9zFYC13jP5eerbdFGd2ADZjjOBL
-        7fMDrAlsOUphByAmp/RE9KIP136JJBou/gW5Z/zc+GDEij1N1UpXMmB0LRvYXO+PjC1HfI
-        zrVbEfH6prd5zknzIVF6fJSB4FzDzx4XdGSEiziXfn8bcSlqkRxOwCmmZ5AEtQ==
+        b=r9p6bNjCEKO6dY19R2WDLHB/6EBJw7wFL/lL+EQ3eDkOhWrXRFY/Dt1Sf0Ag9RBBGG5ED9
+        3DO7K4IMBcnxtbfdTWfshdn6j+sg/v912NPhbsLA5IZ26g2tA6M6aofrJj9yBUgaygh6Zq
+        mnPPR3Lnts8n4IH1Dk2DBsz+v+/rbRFJjye1Htt6NuKfwbDNJ5uDA6d/Yhp74FTdWFNWDC
+        fhkOo+GA0+HP+11s4QiKuDGBauZoxH9NxNlBkrqQ/hnWlzcmsnKuqnwXwxuq3LP1ipeZHg
+        Ac/zpJHyw3hiM9q+GeEID5GKceWiG1g/mw/rf+PGUS7fOWI3BKCuzWA0Vzzs/Q==
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH 2/3] Bluetooth: hci_sync: fix use-after-free in hci_disconnect_all_sync
-Date:   Sun,  6 Aug 2023 18:27:38 +0300
-Message-ID: <60e979dc19e16e12489ba2ed956a7bae347e7a09.1691331800.git.pav@iki.fi>
+Subject: [PATCH 1/3] Bluetooth: hci_sync: fix canceling LE scanning / CIS create conn state
+Date:   Sun,  6 Aug 2023 18:27:37 +0300
+Message-ID: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
-References: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use-after-free occurs in hci_disconnect_all_sync if a connection is
-deleted by concurrent processing of a controller event.  This can occur
-while waiting for controller events (big time window) or at other times
-(less likely).
+In hci_abort_conn_sync, some errors from hci_le_connect_cancel_sync
+indicate the connection can be terminated immediately.  However,
+hci_abort_conn_sync passes these errors through, making
+hci_disconnect_all_sync stop processing in these cases.
 
-Fix the iteration in hci_disconnect_all_sync to allow hci_conn to be
-deleted at any time.
+Fix by using a separate flag to indicate if canceled connection can be
+deleted directly.
 
-UAF crash log:
-==================================================================
-BUG: KASAN: slab-use-after-free in hci_set_powered_sync (net/bluetooth/hci_sync.c:5424) [bluetooth]
-Read of size 8 at addr ffff888009d9c000 by task kworker/u9:0/124
-
-CPU: 0 PID: 124 Comm: kworker/u9:0 Tainted: G        W          6.5.0-rc1+ #10
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014
-Workqueue: hci0 hci_cmd_sync_work [bluetooth]
-Call Trace:
- <TASK>
- dump_stack_lvl+0x5b/0x90
- print_report+0xcf/0x670
- ? __virt_addr_valid+0xdd/0x160
- ? hci_set_powered_sync+0x2c9/0x4a0 [bluetooth]
- kasan_report+0xa6/0xe0
- ? hci_set_powered_sync+0x2c9/0x4a0 [bluetooth]
- ? __pfx_set_powered_sync+0x10/0x10 [bluetooth]
- hci_set_powered_sync+0x2c9/0x4a0 [bluetooth]
- ? __pfx_hci_set_powered_sync+0x10/0x10 [bluetooth]
- ? __pfx_lock_release+0x10/0x10
- ? __pfx_set_powered_sync+0x10/0x10 [bluetooth]
- hci_cmd_sync_work+0x137/0x220 [bluetooth]
- process_one_work+0x526/0x9d0
- ? __pfx_process_one_work+0x10/0x10
- ? __pfx_do_raw_spin_lock+0x10/0x10
- ? mark_held_locks+0x1a/0x90
- worker_thread+0x92/0x630
- ? __pfx_worker_thread+0x10/0x10
- kthread+0x196/0x1e0
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x2c/0x50
- </TASK>
-
-Allocated by task 1782:
- kasan_save_stack+0x33/0x60
- kasan_set_track+0x25/0x30
- __kasan_kmalloc+0x8f/0xa0
- hci_conn_add+0xa5/0xa80 [bluetooth]
- hci_bind_cis+0x881/0x9b0 [bluetooth]
- iso_connect_cis+0x121/0x520 [bluetooth]
- iso_sock_connect+0x3f6/0x790 [bluetooth]
- __sys_connect+0x109/0x130
- __x64_sys_connect+0x40/0x50
- do_syscall_64+0x60/0x90
- entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-
-Freed by task 695:
- kasan_save_stack+0x33/0x60
- kasan_set_track+0x25/0x30
- kasan_save_free_info+0x2b/0x50
- __kasan_slab_free+0x10a/0x180
- __kmem_cache_free+0x14d/0x2e0
- device_release+0x5d/0xf0
- kobject_put+0xdf/0x270
- hci_disconn_complete_evt+0x274/0x3a0 [bluetooth]
- hci_event_packet+0x579/0x7e0 [bluetooth]
- hci_rx_work+0x287/0xaa0 [bluetooth]
- process_one_work+0x526/0x9d0
- worker_thread+0x92/0x630
- kthread+0x196/0x1e0
- ret_from_fork+0x2c/0x50
-==================================================================
-
-Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+Fixes: 0f2efc1d02d5 ("Bluetooth: hci_conn: Consolidate code for aborting connections")
+Fixes: dd1f6778b17b ("Bluetooth: hci_sync: delete CIS in BT_OPEN/CONNECT/BOUND when aborting")
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- net/bluetooth/hci_sync.c | 41 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 34 insertions(+), 7 deletions(-)
+ net/bluetooth/hci_sync.c | 48 ++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 51ff682f66e0..be0f9527de2b 100644
+index 41a8e57d8267..51ff682f66e0 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -5415,16 +5415,43 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 
- static int hci_disconnect_all_sync(struct hci_dev *hdev, u8 reason)
- {
--	struct hci_conn *conn, *tmp;
--	int err;
-+	struct hci_conn *c, *conn;
-+	int err = 0;
-+
-+	rcu_read_lock();
-+
-+	/* Any conn may be gone while waiting for events, iterate safely.
-+	 * If conn is in conn_hash and we didn't abort it, it probably
-+	 * has not yet been aborted.
-+	 */
-+	list_for_each_entry_rcu(c, &hdev->conn_hash.list, list)
-+		c->abort_reason = (reason == 0xff) ? 0xfe : 0xff;
-+
-+	do {
-+		conn = NULL;
-+		list_for_each_entry_rcu(c, &hdev->conn_hash.list, list) {
-+			if (c->abort_reason != reason) {
-+				conn = c;
-+				break;
-+			}
-+		}
-+		if (!conn)
-+			break;
-+
-+		conn->abort_reason = reason;
-+		hci_conn_get(conn);
-+
-+		rcu_read_unlock();
- 
--	list_for_each_entry_safe(conn, tmp, &hdev->conn_hash.list, list) {
- 		err = hci_abort_conn_sync(hdev, conn, reason);
--		if (err)
--			return err;
--	}
-+		hci_conn_put(conn);
- 
--	return 0;
-+		rcu_read_lock();
-+	} while (!err);
-+
-+	rcu_read_unlock();
-+
-+	return err;
+@@ -5253,13 +5253,14 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
  }
  
- /* This function perform power off HCI command sequence as follows:
+ static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
+-				      struct hci_conn *conn, u8 reason)
++				      struct hci_conn *conn, u8 reason,
++				      bool *del)
+ {
+-	/* Return reason if scanning since the connection shall probably be
+-	 * cleanup directly.
+-	 */
+-	if (test_bit(HCI_CONN_SCANNING, &conn->flags))
+-		return reason;
++	/* If scanning, connection can be just deleted */
++	if (test_bit(HCI_CONN_SCANNING, &conn->flags)) {
++		*del = true;
++		return 0;
++	}
+ 
+ 	if (conn->role == HCI_ROLE_SLAVE ||
+ 	    test_and_set_bit(HCI_CONN_CANCEL, &conn->flags))
+@@ -5270,10 +5271,10 @@ static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
+ }
+ 
+ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
+-				   u8 reason)
++				   u8 reason, bool *del)
+ {
+ 	if (conn->type == LE_LINK)
+-		return hci_le_connect_cancel_sync(hdev, conn, reason);
++		return hci_le_connect_cancel_sync(hdev, conn, reason, del);
+ 
+ 	if (conn->type == ISO_LINK) {
+ 		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+@@ -5287,9 +5288,9 @@ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
+ 		if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags))
+ 			return hci_disconnect_sync(hdev, conn, reason);
+ 
+-		/* CIS with no Create CIS sent have nothing to cancel */
++		/* CIS with no Create CIS sent can be just deleted */
+ 		if (bacmp(&conn->dst, BDADDR_ANY))
+-			return HCI_ERROR_LOCAL_HOST_TERM;
++			*del = true;
+ 
+ 		/* There is no way to cancel a BIS without terminating the BIG
+ 		 * which is done later on connection cleanup.
+@@ -5370,6 +5371,7 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ {
+ 	int err = 0;
+ 	u16 handle = conn->handle;
++	bool del = false;
+ 
+ 	switch (conn->state) {
+ 	case BT_CONNECTED:
+@@ -5377,17 +5379,15 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 		err = hci_disconnect_sync(hdev, conn, reason);
+ 		break;
+ 	case BT_CONNECT:
+-		err = hci_connect_cancel_sync(hdev, conn, reason);
++		err = hci_connect_cancel_sync(hdev, conn, reason, &del);
+ 		break;
+ 	case BT_CONNECT2:
+ 		err = hci_reject_conn_sync(hdev, conn, reason);
+ 		break;
+ 	case BT_OPEN:
+ 	case BT_BOUND:
+-		hci_dev_lock(hdev);
+-		hci_conn_failed(conn, reason);
+-		hci_dev_unlock(hdev);
+-		return 0;
++		del = true;
++		break;
+ 	default:
+ 		conn->state = BT_CLOSED;
+ 		return 0;
+@@ -5398,18 +5398,15 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 	 * or in case of LE it was still scanning so it can be cleanup
+ 	 * safely.
+ 	 */
+-	if (err) {
+-		struct hci_conn *c;
++	if (err || del) {
++		hci_dev_lock(hdev);
+ 
+ 		/* Check if the connection hasn't been cleanup while waiting
+ 		 * commands to complete.
+ 		 */
+-		c = hci_conn_hash_lookup_handle(hdev, handle);
+-		if (!c || c != conn)
+-			return 0;
++		if (hci_conn_hash_lookup_handle(hdev, handle) == conn)
++			hci_conn_failed(conn, del ? reason : err);
+ 
+-		hci_dev_lock(hdev);
+-		hci_conn_failed(conn, err);
+ 		hci_dev_unlock(hdev);
+ 	}
+ 
+@@ -6311,8 +6308,11 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ 				       conn->conn_timeout, NULL);
+ 
+ done:
+-	if (err == -ETIMEDOUT)
+-		hci_le_connect_cancel_sync(hdev, conn, 0x00);
++	if (err == -ETIMEDOUT) {
++		bool __maybe_unused del;
++
++		hci_le_connect_cancel_sync(hdev, conn, 0x00, &del);
++	}
+ 
+ 	/* Re-enable advertising after the connection attempt is finished. */
+ 	hci_resume_advertising_sync(hdev);
 -- 
 2.41.0
 
