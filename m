@@ -2,203 +2,142 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED64C001B0
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 15:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD32C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 16:00:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229639AbjHFP1w (ORCPT
+        id S230283AbjHFQAG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Aug 2023 11:27:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59900 "EHLO
+        Sun, 6 Aug 2023 12:00:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjHFP1t (ORCPT
+        with ESMTP id S229510AbjHFQAF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Aug 2023 11:27:49 -0400
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F066E6
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 08:27:47 -0700 (PDT)
-Received: from monolith.lan (unknown [193.138.7.198])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RJjxq6THdz49Q3D;
-        Sun,  6 Aug 2023 18:27:43 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-        t=1691335664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=3N0CGa6ode3fZYG87mYm19jTPbKxxmxXuOK3wspRIFA=;
-        b=fJUqfizrivaCXPIWvO+5kUu3LJK2BU6puuPUe7mSuNPBQIJVI2xFtWhHFFjT3TeV7edecQ
-        PUuTgaEtK7R75MVW4j8RLL/ufxAfiQN/4eKaN5meSBrpxe4O/dkYXfAsdPCQu8KVzjVGNJ
-        nhA21BA6HblkR0rgOLb3utEnT1tUy2L60C6PbK1o4dwJ/o9VHL7IwPrjqvVVpPPrGCajsV
-        pUzcg/iBdeCDbt9mx2teYMJ2m+UqLWwWAglBkVN/UzeQgPA77WyPFIgEZma4FGBTOoZOFi
-        MJ4v9YenjOSM+AezksCcYMmWfMq9OmOy9y66KxO2JJZs0R9ErLUwQUUeuZEHbw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=lahtoruutu; t=1691335664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=3N0CGa6ode3fZYG87mYm19jTPbKxxmxXuOK3wspRIFA=;
-        b=MvXc2Vj2IR6NnY+LvTTEohJ1ROFi3vUNtZPnf50Iq71feSZtJqk/nbUijsLUtOlXJVbqMu
-        9yYtB2dc/tKT6yRz80wEm0q2mMnx5kydm1Hje2vocb9BPOcpBznza0h5EuQJwC9vXP2fOA
-        AR3Y+NlLS6UYvL7jKG+rAgXstApO4J9NVYI7JUlU2elUDrClBLgW674GSB3Iy7HgZzElG3
-        ztEZCd+JvPVDfe/7Ns5dDiTA6N7HpF9+AnuLjBoDmgWj9AEImpaMNpFNmfOwC7x5i3TO0q
-        bBaUQaRxUCXkYi8f/yixrMAjegRiU24Y7Vuakaw4DidG2tx29hoGncsHejaZ5w==
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1691335664; a=rsa-sha256;
-        cv=none;
-        b=r9p6bNjCEKO6dY19R2WDLHB/6EBJw7wFL/lL+EQ3eDkOhWrXRFY/Dt1Sf0Ag9RBBGG5ED9
-        3DO7K4IMBcnxtbfdTWfshdn6j+sg/v912NPhbsLA5IZ26g2tA6M6aofrJj9yBUgaygh6Zq
-        mnPPR3Lnts8n4IH1Dk2DBsz+v+/rbRFJjye1Htt6NuKfwbDNJ5uDA6d/Yhp74FTdWFNWDC
-        fhkOo+GA0+HP+11s4QiKuDGBauZoxH9NxNlBkrqQ/hnWlzcmsnKuqnwXwxuq3LP1ipeZHg
-        Ac/zpJHyw3hiM9q+GeEID5GKceWiG1g/mw/rf+PGUS7fOWI3BKCuzWA0Vzzs/Q==
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH 1/3] Bluetooth: hci_sync: fix canceling LE scanning / CIS create conn state
-Date:   Sun,  6 Aug 2023 18:27:37 +0300
-Message-ID: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
-X-Mailer: git-send-email 2.41.0
+        Sun, 6 Aug 2023 12:00:05 -0400
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50751988
+        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 09:00:01 -0700 (PDT)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-57026f4bccaso40842587b3.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Aug 2023 09:00:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691337600; x=1691942400;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5wJU5JabgdT9+dDiMms2sobG2SkJ9CcH5U1nKHxRNFk=;
+        b=Q/yrR+qCMS9WZmDhXo5v/SAjtCBOB7piSOphXu44HicCMRNYbW3JzesHJajmbTKAIR
+         0wNaxwJyQp18yYQJVEyOzBTgMxGDgvwN/4gq9XYv3CzgstjXMJEBvZ7u8iV0X8nvVeqd
+         71pvVh9iMCC4WT7T/SE9kVpCB3vZ69o9aK3WH/oC1DhSX5PvBkhvaxhjPo4Hf/GLX5tC
+         yMhukLob/WWzEZsYP5nF5g4AeoDCGxIqzOKy0ueW+oxLooMdGbNPhhK6cb5P0LaJTcHm
+         5kVLG4baYywrjK0QRKr2mtUNMCtJflbpB/z8NfnSMF+azQLHSUmQI4DeaHeb1r12WgBJ
+         xKSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691337600; x=1691942400;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5wJU5JabgdT9+dDiMms2sobG2SkJ9CcH5U1nKHxRNFk=;
+        b=Ro5xEcRv5n7vBXDJs66vw0LsLLgMcwTfdtNZeges7OnQiA7fb4uwEK+RATk9PwD5NK
+         gwsJTeLmbGmBsn4UM+UfS1jIRE7P1IoKnXWyU7hOykqOj0DD/xoD63JdGtXCgpiv+l8z
+         7oA/3PGo1IA3q50Yaj8voZb7BAjRZUat++lx8qNr4ViSmoJY8MEG6N2dUEaeQLWkwNhr
+         ViqzJFBMLXtbosZzr3SNtzJ3oxEuSVDVdTOwdyOYb0tKot3QfxFdfVnx3uIphCgIZ+E1
+         pb470cNPbn3GprjLXiHXthhvhsmGH4IDB3UOZcs5Q5W2GzYRD3qkLEwOFYR+EO6AZoga
+         QiGA==
+X-Gm-Message-State: AOJu0Yz4AtHdmO3BQSQC4Y6d3xipsRgnMFKfphrvhigeO30vat5PEzAo
+        7k04zb5jNffz2od2KPZtLDpnI/akikQ=
+X-Google-Smtp-Source: AGHT+IHTVMRwJZgln0a7adwWWGR6u2Bq5PAbO4R8OF+zSdiI2iEtOuBqmIFILcIxjv9ddP8MzzC8uQ==
+X-Received: by 2002:a81:4990:0:b0:576:c543:2a5f with SMTP id w138-20020a814990000000b00576c5432a5fmr7452195ywa.4.1691337600488;
+        Sun, 06 Aug 2023 09:00:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.13.29])
+        by smtp.gmail.com with ESMTPSA id w10-20020a0cb54a000000b0063d47a29e6fsm2222327qvd.55.2023.08.06.09.00.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Aug 2023 09:00:00 -0700 (PDT)
+Message-ID: <64cfc380.0c0a0220.5d647.84d5@mx.google.com>
+Date:   Sun, 06 Aug 2023 09:00:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8991176580645284981=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: [1/3] Bluetooth: hci_sync: fix canceling LE scanning / CIS create conn state
+In-Reply-To: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
+References: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In hci_abort_conn_sync, some errors from hci_le_connect_cancel_sync
-indicate the connection can be terminated immediately.  However,
-hci_abort_conn_sync passes these errors through, making
-hci_disconnect_all_sync stop processing in these cases.
+--===============8991176580645284981==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fix by using a separate flag to indicate if canceled connection can be
-deleted directly.
+This is automated email and please do not reply to this email!
 
-Fixes: 0f2efc1d02d5 ("Bluetooth: hci_conn: Consolidate code for aborting connections")
-Fixes: dd1f6778b17b ("Bluetooth: hci_sync: delete CIS in BT_OPEN/CONNECT/BOUND when aborting")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=773436
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      2.27 seconds
+GitLint                       FAIL      1.19 seconds
+SubjectPrefix                 PASS      0.35 seconds
+BuildKernel                   PASS      32.20 seconds
+CheckAllWarning               PASS      35.20 seconds
+CheckSparse                   PASS      40.12 seconds
+CheckSmatch                   PASS      111.99 seconds
+BuildKernel32                 PASS      31.53 seconds
+TestRunnerSetup               PASS      472.33 seconds
+TestRunner_l2cap-tester       PASS      22.17 seconds
+TestRunner_iso-tester         PASS      43.64 seconds
+TestRunner_bnep-tester        PASS      10.03 seconds
+TestRunner_mgmt-tester        PASS      211.21 seconds
+TestRunner_rfcomm-tester      PASS      15.03 seconds
+TestRunner_sco-tester         PASS      18.23 seconds
+TestRunner_ioctl-tester       PASS      17.04 seconds
+TestRunner_mesh-tester        PASS      12.45 seconds
+TestRunner_smp-tester         PASS      13.56 seconds
+TestRunner_userchan-tester    PASS      10.49 seconds
+IncrementalBuild              PASS      40.72 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[2/3] Bluetooth: hci_sync: fix use-after-free in hci_disconnect_all_sync
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#100: 
+CPU: 0 PID: 124 Comm: kworker/u9:0 Tainted: G        W          6.5.0-rc1+ #10
+
+total: 0 errors, 1 warnings, 0 checks, 50 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13342873.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[2/3] Bluetooth: hci_sync: fix use-after-free in hci_disconnect_all_sync
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+13: B1 Line exceeds max length (99>80): "BUG: KASAN: slab-use-after-free in hci_set_powered_sync (net/bluetooth/hci_sync.c:5424) [bluetooth]"
+17: B1 Line exceeds max length (81>80): "Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014"
+
+
 ---
- net/bluetooth/hci_sync.c | 48 ++++++++++++++++++++--------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 41a8e57d8267..51ff682f66e0 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5253,13 +5253,14 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
- }
- 
- static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
--				      struct hci_conn *conn, u8 reason)
-+				      struct hci_conn *conn, u8 reason,
-+				      bool *del)
- {
--	/* Return reason if scanning since the connection shall probably be
--	 * cleanup directly.
--	 */
--	if (test_bit(HCI_CONN_SCANNING, &conn->flags))
--		return reason;
-+	/* If scanning, connection can be just deleted */
-+	if (test_bit(HCI_CONN_SCANNING, &conn->flags)) {
-+		*del = true;
-+		return 0;
-+	}
- 
- 	if (conn->role == HCI_ROLE_SLAVE ||
- 	    test_and_set_bit(HCI_CONN_CANCEL, &conn->flags))
-@@ -5270,10 +5271,10 @@ static int hci_le_connect_cancel_sync(struct hci_dev *hdev,
- }
- 
- static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
--				   u8 reason)
-+				   u8 reason, bool *del)
- {
- 	if (conn->type == LE_LINK)
--		return hci_le_connect_cancel_sync(hdev, conn, reason);
-+		return hci_le_connect_cancel_sync(hdev, conn, reason, del);
- 
- 	if (conn->type == ISO_LINK) {
- 		/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-@@ -5287,9 +5288,9 @@ static int hci_connect_cancel_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 		if (test_bit(HCI_CONN_CREATE_CIS, &conn->flags))
- 			return hci_disconnect_sync(hdev, conn, reason);
- 
--		/* CIS with no Create CIS sent have nothing to cancel */
-+		/* CIS with no Create CIS sent can be just deleted */
- 		if (bacmp(&conn->dst, BDADDR_ANY))
--			return HCI_ERROR_LOCAL_HOST_TERM;
-+			*del = true;
- 
- 		/* There is no way to cancel a BIS without terminating the BIG
- 		 * which is done later on connection cleanup.
-@@ -5370,6 +5371,7 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- {
- 	int err = 0;
- 	u16 handle = conn->handle;
-+	bool del = false;
- 
- 	switch (conn->state) {
- 	case BT_CONNECTED:
-@@ -5377,17 +5379,15 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 		err = hci_disconnect_sync(hdev, conn, reason);
- 		break;
- 	case BT_CONNECT:
--		err = hci_connect_cancel_sync(hdev, conn, reason);
-+		err = hci_connect_cancel_sync(hdev, conn, reason, &del);
- 		break;
- 	case BT_CONNECT2:
- 		err = hci_reject_conn_sync(hdev, conn, reason);
- 		break;
- 	case BT_OPEN:
- 	case BT_BOUND:
--		hci_dev_lock(hdev);
--		hci_conn_failed(conn, reason);
--		hci_dev_unlock(hdev);
--		return 0;
-+		del = true;
-+		break;
- 	default:
- 		conn->state = BT_CLOSED;
- 		return 0;
-@@ -5398,18 +5398,15 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 	 * or in case of LE it was still scanning so it can be cleanup
- 	 * safely.
- 	 */
--	if (err) {
--		struct hci_conn *c;
-+	if (err || del) {
-+		hci_dev_lock(hdev);
- 
- 		/* Check if the connection hasn't been cleanup while waiting
- 		 * commands to complete.
- 		 */
--		c = hci_conn_hash_lookup_handle(hdev, handle);
--		if (!c || c != conn)
--			return 0;
-+		if (hci_conn_hash_lookup_handle(hdev, handle) == conn)
-+			hci_conn_failed(conn, del ? reason : err);
- 
--		hci_dev_lock(hdev);
--		hci_conn_failed(conn, err);
- 		hci_dev_unlock(hdev);
- 	}
- 
-@@ -6311,8 +6308,11 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 				       conn->conn_timeout, NULL);
- 
- done:
--	if (err == -ETIMEDOUT)
--		hci_le_connect_cancel_sync(hdev, conn, 0x00);
-+	if (err == -ETIMEDOUT) {
-+		bool __maybe_unused del;
-+
-+		hci_le_connect_cancel_sync(hdev, conn, 0x00, &del);
-+	}
- 
- 	/* Re-enable advertising after the connection attempt is finished. */
- 	hci_resume_advertising_sync(hdev);
--- 
-2.41.0
 
+--===============8991176580645284981==--
