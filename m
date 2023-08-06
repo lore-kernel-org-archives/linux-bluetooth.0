@@ -2,111 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 726FDC001DE
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 09:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B9EC001B0
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 15:27:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbjHFJvu (ORCPT
+        id S229559AbjHFP1t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Aug 2023 05:51:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
+        Sun, 6 Aug 2023 11:27:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjHFJvt (ORCPT
+        with ESMTP id S229458AbjHFP1s (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Aug 2023 05:51:49 -0400
-Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92190199A
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 02:51:48 -0700 (PDT)
-Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1bfce114ef9so368364fac.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Aug 2023 02:51:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691315507; x=1691920307;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/VUDCWHTrUSC45aF8XFs/czgBHd5Q1+rA+0ftuIR4sc=;
-        b=ItwN+sGqDJnn3tcS94i5MCZVGGeY6U8hv6gxLM2XRKsMkAnR0sR3F4ur4ew2IWLysN
-         /bMe1VzMHgNugSvGHH1oa8ZplX2+p69JiHFkqfEi+/tmKN5SXmg18h1psaYnrFMhuhkY
-         MHFCq8mq7UMruynqW9W8rPo+vGbLhGbbv6s3jw2UK0uOSixAtdpigUZLbhLZ1EYekbEm
-         q5TyMPaP75sAItljy58dLEI2j10dbxeSHSpkKQWrfys++6vSt97M+BUxseDn4luV+0PP
-         3XtGgLwGTZvRr/eKgE4HmfJl+eJMQuWlZXVN7qJowbiZCOVKrnhScvXTM02UzQgBkf8v
-         4nHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691315507; x=1691920307;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/VUDCWHTrUSC45aF8XFs/czgBHd5Q1+rA+0ftuIR4sc=;
-        b=CX/l00ovdDaMzYg+l0n3vC+43JJJEqx+XDf2TmkmRRl7xeSpJBCZWl1CmsqNv9IXZO
-         1teh++pwZW0lK35Wvt+Qp2/7OM+lvVESwOq1+CLLHfncFXh+Pl7ofcdHPTrs93h64G8B
-         nZxqnYMQ1vBTFTQt7YwoYQciK9uyr6oaMyS3CQxhaT1mVC1gIxi6VZ81XD0lf89l430A
-         QUgdYvq3VnXfs+0SB3g4DR1Po6Ulw3KOZD0PkcShNq8YfvfjJLsA3bXwk7XwABWiMutv
-         JRdTbF+pwoWBp40dIIMsXKfjxlKJ629Yw9LjzOPZoEPiXADjhvLwREO7mIf4lSzMbU08
-         LDrQ==
-X-Gm-Message-State: AOJu0YyLJjFiZ7H7Tfr+8X7/pxuRO1plb+56RRRVE6WAqom3qOKF+Qem
-        zEgq/3c7Wfc3AdgDtu/Ay2GgUaOCj2Y=
-X-Google-Smtp-Source: AGHT+IG9l64vKd63pk9S8huP6ZkLhFrtRDgIj5w/dZK+atOMSyUaKVX3EmZsdZzfKuMafSu+JRn3uw==
-X-Received: by 2002:a9d:61c8:0:b0:6b7:507a:e13 with SMTP id h8-20020a9d61c8000000b006b7507a0e13mr6416049otk.19.1691315507366;
-        Sun, 06 Aug 2023 02:51:47 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.170.104])
-        by smtp.gmail.com with ESMTPSA id y18-20020a056830209200b006b71deb7809sm3617192otq.14.2023.08.06.02.51.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 02:51:47 -0700 (PDT)
-Message-ID: <64cf6d33.050a0220.3ed28.0362@mx.google.com>
-Date:   Sun, 06 Aug 2023 02:51:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1889080970492991458=="
+        Sun, 6 Aug 2023 11:27:48 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F002D3
+        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 08:27:47 -0700 (PDT)
+Received: from monolith.lan (unknown [193.138.7.198])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4RJjxr591qz49Q8H;
+        Sun,  6 Aug 2023 18:27:44 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1691335664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6GlQTR+ZTtiAWaaFWtKO7MBI16joiTsNFOmWWklszOI=;
+        b=m1/eedfefh+20BdnFEKskXX++/lMtn8E18Nsp2BqRoYcV6vZmK4ArTKeiJqgLgE9rwL9gq
+        SjcGMK6d6gKgYQXwBq11oGFFbc2FwvlGays3rzQzeoH4jLxF0S270XYlJtNqTcsFrKxMDB
+        nHUFLk0tJWt0ALiITFjmxD0JnTDWutF1r/YjSys9Mv45gFuvZLB8ro9yz8/JSYHCP0WYd+
+        QLQ5T5RL+lDbqOus8fW9ikiRKJuRdXpjL589bHxKBd9K9y6Ox4YhfY/TfF63w/1pZlALZ5
+        Eij2bSFXE8+8oDt1M35pF4Q2/OqNqBuJEfXCLvcmGQ36Qg/g3g4CHTxUDi5akA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=lahtoruutu; t=1691335664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6GlQTR+ZTtiAWaaFWtKO7MBI16joiTsNFOmWWklszOI=;
+        b=CSPdwc3KknFv/oGzDO+NBps9GQ7yXP1vkyOCaaywSSJypU3X50OolYnZCOEyULCiU5plqx
+        noYQ5D4sUvOWylVsj3mOZSV6k+ev1Vyu9vypANa2HhqfGm7i7y0Tu+nVrGi+gfJgq11dWT
+        BrTUu1y2o/ED8bYPop8nxOowJT+RDYlzj+HOBHfNuipwnLyISzRluNuCDTmMi03Zplb+th
+        6fDz4eoKN1jbkRPJO2Oqv1M7y90Qn2P3JeCqBXyJORyQ/MkytWsWbW9wNHxt9ujmSgberW
+        ohdN08WLDIwp/o9sv9/BBMd+ms6cLwljCDuLn+6O+MWGQtYL4IhUIWyRB6FrRw==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1691335664; a=rsa-sha256;
+        cv=none;
+        b=Iw9XLlig/6LAnwCDu8TK3/gYnsSF30TY2+dy13PHqqQWyWpe6CKc6sSS7f9VXwdLRCeSsA
+        hePV9lDGOsIx1G0ZlXVpJ0MHBzcC13W8cvry0sjDnF9c2lE42AX3K6mwKTeiZakL63tKTB
+        dAW1azMeCZAXXqC2kndSB+NSgts/1ihzj7RO/0dxLha0+/4NO8gLC7lF1tg9Qe4R+JJTXN
+        LAv0SePDTrZhP+74NKy8XkF4H37DZGplcnnJbBVETU1sQuqEP4AQi4eVJx1mmvyPu953Hv
+        YxdW1YtYsPUEjKBEq8mnuoB0cCeMogYW9yOlbFpYqlRufOlKvBZSugrboBPvjw==
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH 3/3] Bluetooth: hci_conn: verify connection is to be aborted before doing it
+Date:   Sun,  6 Aug 2023 18:27:39 +0300
+Message-ID: <b49f9428a680a77613b8452a5664d09593a5966e.1691331800.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
+References: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691331800.git.pav@iki.fi>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
-Subject: RE: Report proper error on connect
-In-Reply-To: <20230806080109.1639693-2-simon.mikuda@streamunlimited.com>
-References: <20230806080109.1639693-2-simon.mikuda@streamunlimited.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1889080970492991458==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When processing connections in abort_conn_sync, also check the
+connection handle still refers to a connection that should be aborted.
 
-This is automated email and please do not reply to this email!
+There is a theoretical race condition where a connection handle is
+reused, after hci_abort_conn but before abort_conn_sync is processed in
+hci_sync. This change should avoid terminating a wrong connection in
+this case.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=773409
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.92 seconds
-GitLint                       PASS      0.63 seconds
-BuildEll                      PASS      32.96 seconds
-BluezMake                     PASS      1188.84 seconds
-MakeCheck                     PASS      13.56 seconds
-MakeDistcheck                 PASS      193.65 seconds
-CheckValgrind                 PASS      317.85 seconds
-CheckSmatch                   PASS      443.22 seconds
-bluezmakeextell               PASS      132.21 seconds
-IncrementalBuild              PASS      2073.05 seconds
-ScanBuild                     WARNING   1396.94 seconds
-
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-profiles/audio/a2dp.c:352:8: warning: Use of memory after it is freed
-                if (!cb->resume_cb)
-                     ^~~~~~~~~~~~~
-1 warning generated.
-
-
-
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ae206eb551f7..b65a1e9b178b 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2861,7 +2861,7 @@ static int abort_conn_sync(struct hci_dev *hdev, void *data)
+ 	u16 handle = PTR_ERR(data);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (!conn)
++	if (!conn || !conn->abort_reason)
+ 		return 0;
+ 
+ 	return hci_abort_conn_sync(hdev, conn, conn->abort_reason);
+@@ -2876,6 +2876,8 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	 */
+ 	if (conn->abort_reason)
+ 		return 0;
++	if (!reason)
++		return -EINVAL;
+ 
+ 	bt_dev_dbg(hdev, "handle 0x%2.2x reason 0x%2.2x", conn->handle, reason);
+ 
+-- 
+2.41.0
 
---===============1889080970492991458==--
