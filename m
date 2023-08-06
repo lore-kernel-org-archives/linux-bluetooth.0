@@ -2,79 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F67C41513
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 08:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 726FDC001DE
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 09:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229558AbjHFIBm (ORCPT
+        id S230193AbjHFJvu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Aug 2023 04:01:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52280 "EHLO
+        Sun, 6 Aug 2023 05:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjHFIBj (ORCPT
+        with ESMTP id S229449AbjHFJvt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Aug 2023 04:01:39 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B1D1FC4
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 01:01:37 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-3175f17a7baso2571989f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Aug 2023 01:01:37 -0700 (PDT)
+        Sun, 6 Aug 2023 05:51:49 -0400
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92190199A
+        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 02:51:48 -0700 (PDT)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1bfce114ef9so368364fac.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Aug 2023 02:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=streamunlimited.com; s=google; t=1691308895; x=1691913695;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=L8LIK8Fu0/zVJT/CZVS1ttUz3gAb8D8U8YN7LnPrWsM=;
-        b=aqB6cmLHXAUBLsGa5B2y72G8pDjBu3f1LcXHw6eEd4Y68NGldat1eNdVIR0kwWRQKI
-         yZJpZI5yTw3esYLaFooO9ujP7grnIE874NyTDI7Owvqf9uA/8IT85QH6s7e6bhnwK7Xm
-         ylUvZCwTkyb2M+sxZlGGa6Bxkv4WLhwzRIC8w=
+        d=gmail.com; s=20221208; t=1691315507; x=1691920307;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/VUDCWHTrUSC45aF8XFs/czgBHd5Q1+rA+0ftuIR4sc=;
+        b=ItwN+sGqDJnn3tcS94i5MCZVGGeY6U8hv6gxLM2XRKsMkAnR0sR3F4ur4ew2IWLysN
+         /bMe1VzMHgNugSvGHH1oa8ZplX2+p69JiHFkqfEi+/tmKN5SXmg18h1psaYnrFMhuhkY
+         MHFCq8mq7UMruynqW9W8rPo+vGbLhGbbv6s3jw2UK0uOSixAtdpigUZLbhLZ1EYekbEm
+         q5TyMPaP75sAItljy58dLEI2j10dbxeSHSpkKQWrfys++6vSt97M+BUxseDn4luV+0PP
+         3XtGgLwGTZvRr/eKgE4HmfJl+eJMQuWlZXVN7qJowbiZCOVKrnhScvXTM02UzQgBkf8v
+         4nHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691308895; x=1691913695;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1691315507; x=1691920307;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=L8LIK8Fu0/zVJT/CZVS1ttUz3gAb8D8U8YN7LnPrWsM=;
-        b=GfUi/WSlJHgpwUZomrz+Ns31DsKO7rMikHZnPzkyVsWNqAGGfxUBUgYWznvqMmwoNH
-         B6xxOphJcp9V1vwTjbO1Irq9YhQWcJmYlW2oUKJt8d16xAFgEmDemfWqN9fXFHvKVqUS
-         AgSd2w3N7SJght/e9VwQX9giSRf4AqwngJc0ZioJyCfD5KHGOrs/p5UyUeZ3YFD6h1ns
-         yrT13yu0xv12abRWL+FDk+3hcAYFAT+ksvYsfBTp8qcy0TVWYHFB7vU4OsiSDp6Wx+8A
-         3RyxaWyGEBVuuGnl/EZ/FqnF+3G8PtlE2BxtpyiRLOV32kNUSNp2OUal8aI4J2DPpXpQ
-         Kwug==
-X-Gm-Message-State: AOJu0YyHmqpB6eQhJfSc/zbs5X8xYeFEYJInP9c7642KIxPZ9sQlMR2M
-        afw5sRNGZDfgU+myyFq+zMiXhAJOvZoODLVgtuk=
-X-Google-Smtp-Source: AGHT+IF7dEpJ2nUh154Y8UcQHNDRruh3ZvrPMAUZ3SFyA27U25Bp1qsW5zrHuSfbdpZZxV99uPwJXg==
-X-Received: by 2002:adf:fecc:0:b0:313:ee2e:dae1 with SMTP id q12-20020adffecc000000b00313ee2edae1mr3562198wrs.18.1691308894950;
-        Sun, 06 Aug 2023 01:01:34 -0700 (PDT)
-Received: from Legionbuntu.. ([2a01:c846:10c0:200:9bf4:d5f:8c8:5ad6])
-        by smtp.gmail.com with ESMTPSA id u7-20020a5d5147000000b0031437ec7ec1sm6974156wrt.2.2023.08.06.01.01.34
+        bh=/VUDCWHTrUSC45aF8XFs/czgBHd5Q1+rA+0ftuIR4sc=;
+        b=CX/l00ovdDaMzYg+l0n3vC+43JJJEqx+XDf2TmkmRRl7xeSpJBCZWl1CmsqNv9IXZO
+         1teh++pwZW0lK35Wvt+Qp2/7OM+lvVESwOq1+CLLHfncFXh+Pl7ofcdHPTrs93h64G8B
+         nZxqnYMQ1vBTFTQt7YwoYQciK9uyr6oaMyS3CQxhaT1mVC1gIxi6VZ81XD0lf89l430A
+         QUgdYvq3VnXfs+0SB3g4DR1Po6Ulw3KOZD0PkcShNq8YfvfjJLsA3bXwk7XwABWiMutv
+         JRdTbF+pwoWBp40dIIMsXKfjxlKJ629Yw9LjzOPZoEPiXADjhvLwREO7mIf4lSzMbU08
+         LDrQ==
+X-Gm-Message-State: AOJu0YyLJjFiZ7H7Tfr+8X7/pxuRO1plb+56RRRVE6WAqom3qOKF+Qem
+        zEgq/3c7Wfc3AdgDtu/Ay2GgUaOCj2Y=
+X-Google-Smtp-Source: AGHT+IG9l64vKd63pk9S8huP6ZkLhFrtRDgIj5w/dZK+atOMSyUaKVX3EmZsdZzfKuMafSu+JRn3uw==
+X-Received: by 2002:a9d:61c8:0:b0:6b7:507a:e13 with SMTP id h8-20020a9d61c8000000b006b7507a0e13mr6416049otk.19.1691315507366;
+        Sun, 06 Aug 2023 02:51:47 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.170.104])
+        by smtp.gmail.com with ESMTPSA id y18-20020a056830209200b006b71deb7809sm3617192otq.14.2023.08.06.02.51.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 01:01:34 -0700 (PDT)
-From:   Simon Mikuda <simon.mikuda@streamunlimited.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Simon Mikuda <simon.mikuda@streamunlimited.com>
-Subject: [PATCH BlueZ 0/2] Report proper error on connect
-Date:   Sun,  6 Aug 2023 10:01:07 +0200
-Message-Id: <20230806080109.1639693-1-simon.mikuda@streamunlimited.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 06 Aug 2023 02:51:47 -0700 (PDT)
+Message-ID: <64cf6d33.050a0220.3ed28.0362@mx.google.com>
+Date:   Sun, 06 Aug 2023 02:51:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1889080970492991458=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, simon.mikuda@streamunlimited.com
+Subject: RE: Report proper error on connect
+In-Reply-To: <20230806080109.1639693-2-simon.mikuda@streamunlimited.com>
+References: <20230806080109.1639693-2-simon.mikuda@streamunlimited.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When we connect A2DP profile and remote device doesn't have our key
-(e.g. was deleted) we've received "unknown" error.
+--===============1889080970492991458==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-These patches add mapping to "Invalid exchange" error which is returned
-in this use case as "key missing" error.
+This is automated email and please do not reply to this email!
 
-Simon Mikuda (2):
-  error: Add "Invalid exchange" mapping
-  a2dp: Expose "Key missing" error
+Dear submitter,
 
- profiles/audio/a2dp.c | 1 +
- src/error.c           | 4 ++++
- src/error.h           | 2 ++
- 3 files changed, 7 insertions(+)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=773409
 
--- 
-2.34.1
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      0.92 seconds
+GitLint                       PASS      0.63 seconds
+BuildEll                      PASS      32.96 seconds
+BluezMake                     PASS      1188.84 seconds
+MakeCheck                     PASS      13.56 seconds
+MakeDistcheck                 PASS      193.65 seconds
+CheckValgrind                 PASS      317.85 seconds
+CheckSmatch                   PASS      443.22 seconds
+bluezmakeextell               PASS      132.21 seconds
+IncrementalBuild              PASS      2073.05 seconds
+ScanBuild                     WARNING   1396.94 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+profiles/audio/a2dp.c:352:8: warning: Use of memory after it is freed
+                if (!cb->resume_cb)
+                     ^~~~~~~~~~~~~
+1 warning generated.
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1889080970492991458==--
