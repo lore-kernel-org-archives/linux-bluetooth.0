@@ -2,60 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D21FC001DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 17:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76F64C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 18:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbjHGRut (ORCPT
+        id S229946AbjHGSHX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 13:50:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45034 "EHLO
+        Mon, 7 Aug 2023 14:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbjHGRur (ORCPT
+        with ESMTP id S229775AbjHGSHW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 13:50:47 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE4DF9
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 10:50:43 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fe216edaf7so7085913e87.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 10:50:43 -0700 (PDT)
+        Mon, 7 Aug 2023 14:07:22 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F6FA6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 11:07:19 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b9e6cc93d8so77140291fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 11:07:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691430642; x=1692035442;
+        d=gmail.com; s=20221208; t=1691431638; x=1692036438;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xtWEijEhbeVCKOqPthJhn1mX3e57dFYQYFzvo/BG7AQ=;
-        b=i/aa6jhEUKCisfThXqohYaGOAI9LoAvGP2oA9q+PC8CK53aPeq8BoQ5pnadKv4K1O5
-         phe7Z3kZr6sm9R6YPgh7M1XLvSNym3HzRnVXG+VJZr1QuJZ4pZF+TpRUFJi/eY7QF6Vb
-         rj7Y0IeoVKG//P+KvdCMtsFPcwuxUg2aU0wxLBen5ULsNNrCKGa5oAe+0D8wPWzRHDM/
-         ItfLSeDJxDIqdOvYSGEPCooNlsOWbtQLaNyoVP4jqB7JB+AkADsQgLYbBcVtmMbnIPd9
-         thEnaTe/IEttLaie+qcpxldnBqS33QXYwnerNYF8ZesoFGiN+01joQ5J1zFxq/dMdnoM
-         sKBw==
+        bh=rhgR69gZTryS2Trz0dNIchpm+R+Fb62Bnh9XcToZHmc=;
+        b=YosQKQNQkFWwItGtHDDAzEK4ns/U//lSuA6miCrf26XMRmXJgIBeLYkLrk2qqovxhD
+         Zo+SGdkkJrro42L2BwFZiz4hg7tIgboPPNzyS4bgiI7Q0SGVuTpapvFbBt9TfV+8gRLB
+         LpVfc1zBrgP8LBOsIkJyoZ3pi5VMFkiyM5YNS/9IQfGG8VThxOm83QeqlmQ/NP/gTDs4
+         a8d+ByIlGuDYBzxRCGGOrTQNYumeZGTDuHcyuLpuLSdxy+3Tg0ip+NZC9tcmn3OxfzLo
+         leyYUa3kaVfcYc8kJzvh+LTd4plKImHPDyobVt9KEDe5sMSxHCLtXgVV2bgsKVCn7mWj
+         OA2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691430642; x=1692035442;
+        d=1e100.net; s=20221208; t=1691431638; x=1692036438;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xtWEijEhbeVCKOqPthJhn1mX3e57dFYQYFzvo/BG7AQ=;
-        b=WZsFWRixSjd0rPHvJKTa4g36pmM6b2gZUzOrH6qZJgjqVkeOlQQQF/iPOVDHjl8PMR
-         ZGALfexEILzeqBgjaKZRhsPtL+QzzWY705tY4dHzf2GfosJxO2Lfh9RGGdvrNknK7IuN
-         TCzd2iWnMOffA4ohnGvHx2JAML2h1GK3Z5/c6o7reo9mVRBrQu44Oese+Af6dMZ9Z+AL
-         J9CDS8meRpFRj9vg8QX44yXvotCtY13atbKD9CrpzT5Mb+EbwWaxp0IS/DtS4vXNOiB8
-         Mf8PgnVBTlVcVUslyRX+X9cJuwhMOdwMU2dthY3wquRsWhovaCwuGvmmC0CCxQ8vllsn
-         VYdg==
-X-Gm-Message-State: AOJu0YyQvR8P0s/Ms3l2LnVEVbeTWem/Q6tv5Rgs+vPIAG5LPk1/Sltv
-        ADTSkRzzJoqN8ji39Pi2eOhCxYBvuzgPlaYQHzMkWEQ+
-X-Google-Smtp-Source: AGHT+IHQapMkTvYIyVZzIIDiDiAwDQrMMxPdzIgrFMGuW2txBtStUWx3WKWu+lyf83kWQ9+yi/nVHhSfyW9Q7ZjylCc=
-X-Received: by 2002:a2e:b784:0:b0:2b6:f85a:20af with SMTP id
- n4-20020a2eb784000000b002b6f85a20afmr2474079ljo.4.1691430641521; Mon, 07 Aug
- 2023 10:50:41 -0700 (PDT)
+        bh=rhgR69gZTryS2Trz0dNIchpm+R+Fb62Bnh9XcToZHmc=;
+        b=X22cEUmA6EamZB+WYSfm8Dyk8xfizzHl5mpcapQXIiw6E2Y4sKgjH1rZfuVpwu2Hyx
+         Z2KBrrwFn+JllNW90DF3580cYqxXk3SMEfMs9sI4L0SI0qt5ew4hH5KHulO2vOrqZJ2m
+         2bidE9Vs9xGXgK1FmV/k70pavk07dxTXKIpscivtuG8NogG6gumj9PA4CH2D7tt23s94
+         2v/6IYUZkbetsNO5pstxcroBnW3zyT64GuGGGb5B113Ueprt0/6Ledb5Wn1NWl9dUZYO
+         dJEVMPEFYg+9Bx7gNashZJ9raUQ46dVVMnQxHGtFlQuQvV2Z194Xsz17J+Hs46BP1VlP
+         2Mlg==
+X-Gm-Message-State: AOJu0Yyt7nz08do4RL55/SkclKiLBTvZ3ds6iaIDh7g33IkshyWtPpyZ
+        BNdWNUiXm1+XNzvqWOVyoe9yy31KjUg5Uqo2Bs83jPG/
+X-Google-Smtp-Source: AGHT+IE1VKoWBZ/rKNe+HS87fdxx0I+lV6oL/xsIdTMsinTUrHkXGbhky41BcTjmjTNgdbsZxQ7f5+SGvFaUqVHubow=
+X-Received: by 2002:a2e:7e0f:0:b0:2b9:f3ca:e35b with SMTP id
+ z15-20020a2e7e0f000000b002b9f3cae35bmr6529275ljc.44.1691431637492; Mon, 07
+ Aug 2023 11:07:17 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230803072011.191449-1-mahesh.talewad@nxp.com> <20230803072011.191449-2-mahesh.talewad@nxp.com>
-In-Reply-To: <20230803072011.191449-2-mahesh.talewad@nxp.com>
+References: <20230803072011.191449-1-mahesh.talewad@nxp.com> <20230803072011.191449-3-mahesh.talewad@nxp.com>
+In-Reply-To: <20230803072011.191449-3-mahesh.talewad@nxp.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 7 Aug 2023 10:50:29 -0700
-Message-ID: <CABBYNZ+TFMYM1JC_YWHm48tPBBU3a3WPN-W5GUYOx-Bnr3vmng@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1 1/3] shared/micp: Add initial code for handling
- micp and mics
+Date:   Mon, 7 Aug 2023 11:07:05 -0700
+Message-ID: <CABBYNZLf2zn2MqiREs6m-Z1nvp7siDKSOYD5FhNJubOwm0t+WA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 2/3] client/player: Add interface menu to
+ configure MICP-MICS during PTS testing.
 To:     Mahesh Talewad <mahesh.talewad@nxp.com>
 Cc:     linux-bluetooth@vger.kernel.org, devyani.godbole@nxp.com,
         nitin.jadhav@nxp.com
@@ -70,1288 +70,573 @@ Hi Mahesh,
 On Thu, Aug 3, 2023 at 12:20=E2=80=AFAM Mahesh Talewad <mahesh.talewad@nxp.=
 com> wrote:
 >
-> - This commit is for implementations of MICS and MICP
-> - Specifications referred for implementation:
+> - Includes implementations required for PTS testing for MICS and MICP.
+> - Interface given in bluetoothctl/player menu for sending MICS and MICP
+> commands while excecuting PTS test cases. Tested all MICP and MICS PTS
+> test cases[LE] and all are passed.
+> - Added flag - MICP_MICS_PTS_FLAG in configure.ac which enable/disable
+> PTS testing related code during compilation. uncomment this flag in
+> configure.ac inorder to enable PTS testing related code and comment
+> it for disable. By default this flag is disabled.
+
+We could perhaps have a more generic solution that the testing
+interfaces with a testing flag, which we can perhaps enable at
+runtime, that said in the past we took a different approach of having
+a dedicated tool for testing protocols (e.g. avtest), but I think I
+would rather do this with bluetoothctl nowadays.
+
+> - Spec implementation/PTS testing:
 > MICS - MICS_v1.0.pdf
 > MICP - MICP_v1.0.pdf
+> PTS Testing MICS: MICS.TS.p0ed2.pdf
+> PTS Testing MICP: MICP.TS.p3.pdf
 > ---
->  Makefile.am           |   1 +
->  Makefile.plugins      |   5 +
->  configure.ac          |   4 +
->  lib/uuid.h            |   4 +
->  profiles/audio/micp.c | 340 ++++++++++++++++
->  src/shared/micp.c     | 922 ++++++++++++++++++++++++++++++++++++++++++
->  src/shared/micp.h     |  46 +++
->  7 files changed, 1322 insertions(+)
->  create mode 100644 profiles/audio/micp.c
->  create mode 100644 src/shared/micp.c
->  create mode 100644 src/shared/micp.h
+>  client/main.c     |  12 ++++
+>  client/player.c   | 164 ++++++++++++++++++++++++++++++++++++++++++++++
+>  client/player.h   |   4 ++
+>  configure.ac      |   3 +
+>  src/adapter.c     |  87 ++++++++++++++++++++++++
+>  src/shared/micp.c | 122 ++++++++++++++++++++++++++++++++++
+>  src/shared/micp.h |   8 +++
+>  7 files changed, 400 insertions(+)
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index 4b9b7e5cd..6f40f2a74 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -233,6 +233,7 @@ shared_sources =3D src/shared/io.h src/shared/timeout=
-.h \
->                         src/shared/bap.h src/shared/bap.c src/shared/ascs=
-.h \
->                         src/shared/mcs.h src/shared/mcp.h src/shared/mcp.=
-c \
->                         src/shared/vcp.c src/shared/vcp.h \
-> +                       src/shared/micp.c src/shared/micp.h \
-
-Please split the changes adding micp.c and micp.h to shared to the
-micp plugin, they are 2 very distinct instances so there is no reason
-to keep them together.
-
->                         src/shared/csip.c src/shared/csip.h \
->                         src/shared/bass.h src/shared/bass.c \
->                         src/shared/lc3.h src/shared/tty.h
-> diff --git a/Makefile.plugins b/Makefile.plugins
-> index fc19522e4..5880ed0df 100644
-> --- a/Makefile.plugins
-> +++ b/Makefile.plugins
-> @@ -137,6 +137,11 @@ builtin_modules +=3D vcp
->  builtin_sources +=3D profiles/audio/vcp.c
->  endif
+> diff --git a/client/main.c b/client/main.c
+> index 0eac5bdf5..d7c735d19 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -413,6 +413,10 @@ static struct adapter *adapter_new(GDBusProxy *proxy=
+)
+>         if (!default_ctrl)
+>                 default_ctrl =3D adapter;
 >
-> +if MICP
-> +builtin_modules +=3D micp
-> +builtin_sources +=3D profiles/audio/micp.c
-> +endif
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       mics_set_proxy((void *)adapter);
+> +#endif /* MICP_MICS_PTS_FLAG */
+
+At the client side we should probably do a runtime detection, by
+checking if a specific interface is supported, rather than depend on a
+compilation flag since you may have the client and daemon coming from
+different packages.
+
+>         return adapter;
+>  }
+>
+> @@ -892,6 +896,10 @@ static void cmd_show(int argc, char *argv[])
+>                 }
+>         }
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       mics_set_proxy((void *)adapter);
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > +
->  if CSIP
->  builtin_modules +=3D csip
->  builtin_sources +=3D profiles/audio/csip.c
+>         if (!g_dbus_proxy_get_property(adapter->proxy, "Address", &iter))
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>
+> @@ -951,6 +959,10 @@ static void cmd_select(int argc, char *argv[])
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       mics_set_proxy((void *)adapter);
+> +#endif /*MICP_MICS_PTS_FLAG*/
+> +
+>         if (default_ctrl && default_ctrl->proxy =3D=3D adapter->proxy)
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>
+> diff --git a/client/player.c b/client/player.c
+> index e5084967a..2e48025e8 100644
+> --- a/client/player.c
+> +++ b/client/player.c
+> @@ -596,6 +596,153 @@ static void cmd_show_item(int argc, char *argv[])
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+> +struct mics_adapter {
+> +       GDBusProxy *proxy;
+> +};
+> +static struct mics_adapter *mics_default_ctrl;
+> +void mics_set_proxy(void *proxy)
+> +{
+> +       mics_default_ctrl =3D (struct mics_adapter *)proxy;
+> +       if (mics_default_ctrl =3D=3D NULL) {
+> +               bt_shell_printf("mics_default_ctrl is NULL\n");
+> +               return;
+> +       }
+> +}
+> +static gboolean parse_argument(int argc, char *argv[], const char **arg_=
+table,
+> +                                       const char *msg, dbus_bool_t *val=
+ue,
+> +                                       const char **option)
+> +{
+> +       const char **opt;
+> +
+> +       if (!strcmp(argv[1], "help")) {
+> +               for (opt =3D arg_table; opt && *opt; opt++)
+> +                       bt_shell_printf("%s\n", *opt);
+> +               bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +               return FALSE;
+> +       }
+> +
+> +       if (!strcmp(argv[1], "on") || !strcmp(argv[1], "yes")) {
+> +               *value =3D TRUE;
+> +               if (option)
+> +                       *option =3D "";
+> +               return TRUE;
+> +       }
+> +
+> +       if (!strcmp(argv[1], "off") || !strcmp(argv[1], "no")) {
+> +               *value =3D FALSE;
+> +               return TRUE;
+> +       }
+> +
+> +       for (opt =3D arg_table; opt && *opt; opt++) {
+> +               if (strcmp(argv[1], *opt) =3D=3D 0) {
+> +                       *value =3D TRUE;
+> +                       *option =3D *opt;
+> +                       return TRUE;
+> +               }
+> +       }
+> +
+> +       bt_shell_printf("Invalid argument %s\n", argv[1]);
+> +       return FALSE;
+> +}
+> +
+> +static void cmd_set_mute_state(int argc, char *argv[])
+> +{
+> +       dbus_bool_t mute_state;
+> +       char *str;
+> +
+> +       if (!parse_argument(argc, argv, NULL, NULL, &mute_state, NULL))
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       str =3D g_strdup_printf("mics %s", mute_state =3D=3D TRUE ? "on" =
+: "off");
+> +
+> +       if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy, "mi=
+cs",
+> +                                       DBUS_TYPE_BOOLEAN, &mute_state,
+> +                                       generic_callback, str, g_free) =
+=3D=3D TRUE)
+> +               return;
+> +       g_free(str);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +
+> +static void cmd_enable_disable_mute_state(int argc, char *argv[])
+> +{
+> +       dbus_bool_t mute_state;
+> +       char *str;
+> +
+> +       if (!parse_argument(argc, argv, NULL, NULL, &mute_state, NULL))
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       str =3D g_strdup_printf("mics %s", mute_state =3D=3D TRUE ? "on" =
+: "off");
+> +
+> +       if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
+> +                               "mics_state", DBUS_TYPE_BOOLEAN, &mute_st=
+ate,
+> +                               generic_callback, str, g_free) =3D=3D TRU=
+E)
+> +               return;
+> +       g_free(str);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +
+> +static void cmd_micp_discover_mute(int argc, char *argv[])
+> +{
+> +       dbus_bool_t mute_state =3D 0;
+> +       char *str;
+> +
+> +
+> +       if (!parse_argument(argc, argv, NULL, NULL, &mute_state, NULL))
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       str =3D g_strdup_printf("mics %s", mute_state =3D=3D TRUE ? "on" =
+: "off");
+> +
+> +       if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
+> +                               "micp_disc", DBUS_TYPE_BOOLEAN, &mute_sta=
+te,
+> +                               generic_callback, str, g_free) =3D=3D TRU=
+E)
+> +               return;
+> +       g_free(str);
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +
+> +static void cmd_enable_read_mute_state(int argc, char *argv[])
+> +{
+> +       char *endptr =3D NULL;
+> +       int handle;
+> +
+> +       handle =3D strtol(argv[1], &endptr, 0);
+> +       if (!endptr || *endptr !=3D '\0' || handle > UINT16_MAX) {
+> +               bt_shell_printf("Invalid argument: %s\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +       bt_shell_printf("%s: %x\n", __func__, handle);
+> +       if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
+> +                               "micp_read_char", DBUS_TYPE_UINT16, &hand=
+le,
+> +                               generic_callback, NULL, NULL) =3D=3D TRUE=
+)
+> +               return;
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +
+> +static void cmd_enable_write_mute_state(int argc, char *argv[])
+> +{
+> +       char *endptr =3D NULL;
+> +       int handle;
+> +
+> +       handle =3D strtol(argv[1], &endptr, 0);
+> +       if (!endptr || *endptr !=3D '\0' || handle > UINT16_MAX) {
+> +               bt_shell_printf("Invalid argument: %s\n", argv[1]);
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +       bt_shell_printf("%s : %x\n", __func__, handle);
+> +       if (g_dbus_proxy_set_property_basic(mics_default_ctrl->proxy,
+> +                               "micp_write_char", DBUS_TYPE_UINT16, &han=
+dle,
+> +                               generic_callback, NULL, NULL) =3D=3D TRUE=
+)
+> +               return;
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +#endif /* MICP_MICS_PTS_FLAG */
+> +
+>  static void cmd_show(int argc, char *argv[])
+>  {
+>         GDBusProxy *proxy;
+> @@ -969,6 +1116,23 @@ static const struct bt_shell_menu player_menu =3D {
+>                                                         item_generator},
+>         { "show-item",   "<item>",    cmd_show_item, "Show item informati=
+on",
+>                                                         item_generator},
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       { "mics_mute",     "<on/off>", cmd_set_mute_state,
+> +                                       "Set Mics Mute state to on / off"=
+,
+> +                                                       NULL },
+> +       { "mics_state",     "<on/off>", cmd_enable_disable_mute_state,
+> +                                       "Set Mics Mute state to on[enable=
+] / off[disable]",
+> +                                                       NULL },
+> +       { "micp_discover",     "<on/off>", cmd_micp_discover_mute,
+> +                                       "discover Mute Characteristic",
+> +                                                       NULL },
+> +       { "micp_read",     "<handle>", cmd_enable_read_mute_state,
+> +                                       "Read Mute Characteristic",
+> +                                                       NULL },
+> +       { "micp_write",     "<handle>", cmd_enable_write_mute_state,
+> +                                       "Write Mute Characteristic",
+> +                                                       NULL },
+> +#endif /* MICP_MICS_PTS_FLAG */
+>         {} },
+>  };
+>
+> diff --git a/client/player.h b/client/player.h
+> index e7778cb1e..316090721 100644
+> --- a/client/player.h
+> +++ b/client/player.h
+> @@ -10,3 +10,7 @@
+>
+>  void player_add_submenu(void);
+>  void player_remove_submenu(void);
+> +
+> +#ifdef MICP_MICS_PTS_FLAG
+> +void mics_set_proxy(void *proxy);
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > diff --git a/configure.ac b/configure.ac
-> index bc7edfcd3..9a8856380 100644
+> index 9a8856380..a190d9168 100644
 > --- a/configure.ac
 > +++ b/configure.ac
-> @@ -211,6 +211,10 @@ AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
->                 [disable VCP profile]), [enable_vcp=3D${enableval}])
->  AM_CONDITIONAL(VCP, test "${enable_vcp}" !=3D "no")
+> @@ -215,6 +215,9 @@ AC_ARG_ENABLE(micp, AS_HELP_STRING([--disable-micp],
+>                 [disable MICP profile]), [enable_micp=3D${enableval}])
+>  AM_CONDITIONAL(MICP, test "${enable_micp}" !=3D "no")
 >
-> +AC_ARG_ENABLE(micp, AS_HELP_STRING([--disable-micp],
-> +               [disable MICP profile]), [enable_micp=3D${enableval}])
-> +AM_CONDITIONAL(MICP, test "${enable_micp}" !=3D "no")
+> +#AC_DEFINE(MICP_MICS_PTS_FLAG, 1,
+> +#      [Enable/Disable PTS related code changes in MICP and MICS])
 > +
 >  AC_ARG_ENABLE(csip, AS_HELP_STRING([--disable-csip],
 >                 [disable CSIP profile]), [enable_csip=3D${enableval}])
 >  AM_CONDITIONAL(CSIP, test "${enable_csip}" !=3D "no")
-> diff --git a/lib/uuid.h b/lib/uuid.h
-> index cd3b3655f..6661a537f 100644
-> --- a/lib/uuid.h
-> +++ b/lib/uuid.h
-> @@ -206,6 +206,10 @@ extern "C" {
->  #define CS_LOCK                                                0x2B86
->  #define CS_RANK                                                0x2B87
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 2679d4302..89f6d76f4 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -68,6 +68,10 @@
+>  #include "eir.h"
+>  #include "battery.h"
 >
-> +/* Microphone Control Service(MICS) */
-> +#define MICS_UUID                      0x184D
-> +#define MUTE_CHRC_UUID         0x2BC3
+> +#ifdef MICP_MICS_PTS_FLAG
+> +#include "src/shared/micp.h"
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > +
->  typedef struct {
->         enum {
->                 BT_UUID_UNSPEC =3D 0,
-> diff --git a/profiles/audio/micp.c b/profiles/audio/micp.c
-> new file mode 100644
-> index 000000000..452027c75
-> --- /dev/null
-> +++ b/profiles/audio/micp.c
-> @@ -0,0 +1,340 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + *
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
-> + *
-> + *
-> + */
+>  #define MODE_OFF               0x00
+>  #define MODE_CONNECTABLE       0x01
+>  #define MODE_DISCOVERABLE      0x02
+> @@ -3333,6 +3337,82 @@ static void property_set_pairable(const GDBusPrope=
+rtyTable *property,
+>         property_set_mode(adapter, MGMT_SETTING_BONDABLE, iter, id);
+>  }
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+
+The code below definitely _doesn't_ belong to the daemon core.
+
+> +static void property_set_mute_state(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter,
+> +                               GDBusPendingPropertySet id, void *user_da=
+ta)
+> +{
+> +       dbus_bool_t enable;
+> +
+> +       dbus_message_iter_get_basic(iter, &enable);
+> +       DBG("SET %s: %d\n", __func__, enable);
+> +       mics_change_mute_state(enable);
+> +       g_dbus_pending_property_success(id);
+> +}
+> +
+> +static void property_mute_enable_disable(const GDBusPropertyTable *prope=
+rt,
+> +                               DBusMessageIter *iter,
+> +                               GDBusPendingPropertySet id, void *user_da=
+ta)
+> +{
+> +       dbus_bool_t enable;
+> +
+> +       dbus_message_iter_get_basic(iter, &enable);
+> +       DBG("%s: %d\n", __func__, enable);
+> +       mics_enable_disable_mute(enable);
+> +       g_dbus_pending_property_success(id);
+> +}
+> +
+> +static void property_micp_discover_mute(const GDBusPropertyTable *proper=
+t,
+> +                               DBusMessageIter *iter,
+> +                               GDBusPendingPropertySet id, void *user_da=
+ta)
+> +{
+> +       dbus_bool_t enable;
+> +
+> +       dbus_message_iter_get_basic(iter, &enable);
+> +       DBG("%s : %d\n", __func__, enable);
+> +       micp_discover_mute_char();
+> +       g_dbus_pending_property_success(id);
+> +}
+> +
+> +static void property_micp_read_mute(const GDBusPropertyTable *propert,
+> +                               DBusMessageIter *iter,
+> +                               GDBusPendingPropertySet id, void *user_da=
+ta)
+> +{
+> +       uint16_t handle;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) !=3D DBUS_TYPE_UINT16) {
+> +               g_dbus_pending_property_error(id,
+> +                               ERROR_INTERFACE ".InvalidArguments",
+> +                               "Expected UINT16");
+> +               return;
+> +       }
+> +       dbus_message_iter_get_basic(iter, &handle);
+> +       DBG("%s : %x\n", __func__, handle);
+> +
+> +       mics_mute_char_read(handle);
+> +       g_dbus_pending_property_success(id);
+> +}
+> +
+> +static void property_micp_write_mute(const GDBusPropertyTable *propert,
+> +                               DBusMessageIter *iter,
+> +                               GDBusPendingPropertySet id, void *user_da=
+ta)
+> +{
+> +       uint16_t handle;
+> +
+> +       if (dbus_message_iter_get_arg_type(iter) !=3D DBUS_TYPE_UINT16) {
+> +               g_dbus_pending_property_error(id,
+> +                               ERROR_INTERFACE ".InvalidArguments",
+> +                               "Expected UINT16");
+> +               return;
+> +       }
+> +       dbus_message_iter_get_basic(iter, &handle);
+> +       DBG("%s : %x\n", __func__, handle);
+> +
+> +       micp_char_write_value(handle);
+> +       g_dbus_pending_property_success(id);
+> +}
+> +#endif /*MICP_MICS_PTS_FLAG*/
+> +
+>  static gboolean property_get_pairable_timeout(
+>                                         const GDBusPropertyTable *propert=
+y,
+>                                         DBusMessageIter *iter, void *user=
+_data)
+> @@ -3886,6 +3966,13 @@ static const GDBusPropertyTable adapter_properties=
+[] =3D {
+>         { "DiscoverableTimeout", "u", property_get_discoverable_timeout,
+>                                         property_set_discoverable_timeout=
+ },
+>         { "Pairable", "b", property_get_pairable, property_set_pairable }=
+,
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       { "mics", "b", NULL, property_set_mute_state },
+> +       { "mics_state", "b", NULL, property_mute_enable_disable },
+> +       { "micp_disc", "b", NULL, property_micp_discover_mute },
+> +       { "micp_read_char", "q", NULL, property_micp_read_mute },
+> +       { "micp_write_char", "q", NULL, property_micp_write_mute },
+
+Perhaps rather than doing this via profile specific interface we could
+check the runtime flag and expose the adapter GATT database, then at
+bluetoothctl one could select the attributes, since you probably are
+doing this to enable testing the procedures without having to depend
+on things like MediaTransport.Volume which depends on BAP to setup a
+stream first which I guess PTS doesn't utilize currently?
+
+Anyway, tapping on GATT procedures directly shall cover all testing
+when the upper profile uses GATT procedures, that way we don't have to
+keep adding new interfaces for testing with PTS, anyway I would
+recommend you split these changes to a different set after we have
+done merging the initial code for MICP.
+
+> +#endif /*MICP_MICS_PTS_FLAG*/
+>         { "PairableTimeout", "u", property_get_pairable_timeout,
+>                                         property_set_pairable_timeout },
+>         { "Discovering", "b", property_get_discovering },
+> diff --git a/src/shared/micp.c b/src/shared/micp.c
+> index 25ffa6940..c5b814d98 100644
+> --- a/src/shared/micp.c
+> +++ b/src/shared/micp.c
+> @@ -6,6 +6,10 @@
+>   *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
+>   *
+>   */
 > +#ifdef HAVE_CONFIG_H
 > +#include <config.h>
 > +#endif
 > +
-> +#define        _GNU_SOURCE
+>  #define _GNU_SOURCE
+>  #include <inttypes.h>
+>  #include <string.h>
+> @@ -74,6 +78,11 @@ struct bt_micp {
+>         void *user_data;
+>  };
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+> +struct bt_mics *pts_mics;
+> +struct bt_micp *pts_micp;
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > +
-> +#include <ctype.h>
-> +#include <stdbool.h>
-> +#include <stdlib.h>
-> +#include <stdio.h>
-> +#include <sys/types.h>
-> +#include <sys/stat.h>
-> +#include <fcntl.h>
-> +#include <errno.h>
+>  static struct queue *micp_db;
+>  static struct queue *micp_cbs;
+>  static struct queue *sessions;
+> @@ -532,6 +541,9 @@ static struct bt_micp_db *micp_db_new(struct gatt_db =
+*db)
+>         mdb->mics =3D mics_new(db);
+>         mdb->mics->mdb =3D mdb;
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       pts_mics =3D mdb->mics;
+> +#endif /*MICP_MICS_PTS_FLAG*/
+>         queue_push_tail(micp_db, mdb);
+>
+>         return mdb;
+> @@ -783,6 +795,10 @@ static void foreach_mics_char(struct gatt_db_attribu=
+te *attr, void *user_data)
+>         bt_uuid_t uuid, uuid_mute;
+>         struct bt_mics *mics;
+>
+> +#ifdef MICP_MICS_PTS_FLAG
+> +       pts_micp =3D micp;
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > +
-> +#include <glib.h>
+>         if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
+>                         NULL, NULL, &uuid))
+>                 return;
+> @@ -920,3 +936,109 @@ bool bt_micp_attach(struct bt_micp *micp, struct bt=
+_gatt_client *client)
+>                                                 micp);
+>         return true;
+>  }
 > +
-> +#include "gdbus/gdbus.h"
-> +
-> +#include "lib/bluetooth.h"
-> +#include "lib/hci.h"
-> +#include "lib/sdp.h"
-> +#include "lib/uuid.h"
-> +
-> +#include "src/dbus-common.h"
-> +#include "src/shared/util.h"
-> +#include "src/shared/att.h"
-> +#include "src/shared/queue.h"
-> +#include "src/shared/gatt-db.h"
-> +#include "src/shared/gatt-server.h"
-> +#include "src/shared/micp.h"
-> +
-> +#include "btio/btio.h"
-> +#include "src/plugin.h"
-> +#include "src/adapter.h"
-> +#include "src/gatt-database.h"
-> +#include "src/device.h"
-> +#include "src/profile.h"
-> +#include "src/service.h"
-> +#include "src/log.h"
-> +#include "src/error.h"
-> +
-> +#define MICS_UUID_STR  "0000184D-0000-1000-8000-00805f9b34fb"
-> +
-> +struct micp_data {
-> +       struct btd_device *device;
-> +       struct btd_service *service;
-> +       struct bt_micp *micp;
-> +       unsigned int ready_id;
-> +};
-> +
-> +static struct queue *sessions;
-> +
-> +static void micp_debug(const char *str, void *user_data)
+> +#ifdef MICP_MICS_PTS_FLAG
+> +void mics_change_mute_state(bool state)
 > +{
-> +       DBG_IDX(0xffff, "%s", str);
-> +}
-> +
-> +static int micp_disconnect(struct btd_service *service)
-> +{
-> +       return 0;
-> +}
-> +
-> +static struct micp_data *micp_data_new(struct btd_device *device)
-> +{
-> +       struct micp_data *data;
-> +
-> +       data =3D new0(struct micp_data, 1);
-> +       g_assert(data);
-> +       data->device =3D device;
-> +
-> +       return data;
-> +}
-> +
-> +static void micp_data_add(struct micp_data *data)
-> +{
-> +       DBG("data %p", data);
-> +
-> +       if (queue_find(sessions, NULL, data)) {
-> +               error("data %p allready added", data);
-> +               return;
-> +       }
-> +
-> +       bt_micp_set_debug(data->micp, micp_debug, NULL, NULL);
-> +
-> +       if (!sessions)
-> +               sessions =3D queue_new();
-> +
-> +       queue_push_tail(sessions, data);
-> +
-> +       if (data->service)
-> +               btd_service_set_user_data(data->service, data);
-> +}
-> +
-> +static bool match_data(const void *data, const void *match_data)
-> +{
-> +       const struct micp_data *mdata =3D data;
-> +       const struct bt_micp *micp =3D match_data;
-> +
-> +       return mdata->micp =3D=3D micp;
-> +}
-> +
-> +static void micp_data_free(struct micp_data *data)
-> +{
-> +       if (data->service) {
-> +               btd_service_set_user_data(data->service, NULL);
-> +               bt_micp_set_user_data(data->micp, NULL);
-> +       }
-> +
-> +       bt_micp_ready_unregister(data->micp, data->ready_id);
-> +       bt_micp_unref(data->micp);
-> +       free(data);
-> +}
-> +
-> +static void micp_data_remove(struct micp_data *data)
-> +{
-> +       DBG("data %p", data);
-> +
-> +       if (!queue_remove(sessions, data))
+> +       if (pts_micp =3D=3D NULL)
 > +               return;
 > +
-> +       micp_data_free(data);
-> +
-> +       if (queue_isempty(sessions)) {
-> +               queue_destroy(sessions, NULL);
-> +               sessions =3D NULL;
-> +       }
+> +       DBG(pts_micp, "%s: %d", __func__, state);
+> +       state =3D=3D true ? mics_muted(pts_mics, pts_micp, 0) :
+> +                                       mics_not_muted(pts_mics, pts_micp=
+, 0);
 > +}
 > +
-> +static void micp_detached(struct bt_micp *micp, void *user_data)
+> +static uint8_t mics_mute_enable_disable(struct bt_mics *mics, uint8_t st=
+ate)
 > +{
-> +       struct micp_data *data;
-> +
-> +       DBG("%p", micp);
-> +
-> +       data =3D queue_find(sessions, match_data, micp);
-> +       if (!data) {
-> +               error("unable to find sessio");
-> +               return;
-> +       }
-> +
-> +       micp_data_remove(data);
-> +}
-> +
-> +static void micp_ready(struct bt_micp *micp, void *user_data)
-> +{
-> +       DBG("micp %p\n", micp);
-> +}
-> +
-> +static void micp_attached(struct bt_micp *micp, void *user_data)
-> +{
-> +       struct micp_data *data;
-> +       struct bt_att *att;
-> +       struct btd_device *device;
-> +
-> +       DBG("%p", micp);
-> +
-> +       data =3D queue_find(sessions, match_data, micp);
-> +       if (data)
-> +               return;
-> +
-> +       att =3D bt_micp_get_att(micp);
-> +       if (!att)
-> +               return;
-> +
-> +       device =3D btd_adapter_find_device_by_fd(bt_att_get_fd(att));
-> +       if (!device) {
-> +               error("unable to find device");
-> +               return;
-> +       }
-> +
-> +       data =3D micp_data_new(device);
-> +       g_assert(data);
-> +       data->micp =3D micp;
-> +
-> +       micp_data_add(data);
-> +}
-> +
-> +static int micp_probe(struct btd_service *service)
-> +{
-> +       struct btd_device *device =3D btd_service_get_device(service);
-> +       struct btd_adapter *adapter =3D device_get_adapter(device);
-> +       struct btd_gatt_database *database =3D btd_adapter_get_database(a=
-dapter);
-> +       struct micp_data *data =3D btd_service_get_user_data(service);
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       /*Ignore, if we probed for this device allready */
-> +       if (data) {
-> +               error("Profile probed twice for this device");
-> +               return -EINVAL;
-> +       }
-> +
-> +       data =3D micp_data_new(device);
-> +       data->service =3D service;
-> +
-> +       data->micp =3D bt_micp_new(btd_gatt_database_get_db(database),
-> +                                       btd_device_get_gatt_db(device));
-> +
-> +       if (!data->micp) {
-> +               error("unable to create MICP instance");
-> +               free(data);
-> +               return -EINVAL;
-> +       }
-> +
-> +       micp_data_add(data);
-> +
-> +       data->ready_id =3D bt_micp_ready_register(data->micp, micp_ready,=
- service,
-> +                                                               NULL);
-> +
-> +       bt_micp_set_user_data(data->micp, service);
-> +
-> +       return 0;
-> +}
-> +
-> +static void micp_remove(struct btd_service *service)
-> +{
-> +       struct btd_device *device =3D btd_service_get_device(service);
-> +       struct micp_data *data;
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       data =3D btd_service_get_user_data(service);
-> +       if (!data) {
-> +               error("MICP Service not handled by profile");
-> +               return;
-> +       }
-> +
-> +       micp_data_remove(data);
-> +}
-> +
-> +static int micp_accept(struct btd_service *service)
-> +{
-> +       struct btd_device *device =3D btd_service_get_device(service);
-> +       struct bt_gatt_client *client =3D btd_device_get_gatt_client(devi=
-ce);
-> +       struct micp_data *data =3D btd_service_get_user_data(service);
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       if (!data) {
-> +               error("MICP Service not handled by profile");
-> +               return -EINVAL;
-> +       }
-> +
-> +       if (!bt_micp_attach(data->micp, client)) {
-> +               error("MICP unable to attach");
-> +               return -EINVAL;
-> +       }
-> +
-> +       btd_service_connecting_complete(service, 0);
-> +
-> +       return 0;
-> +}
-> +
-> +static int micp_connect(struct btd_service *service)
-> +{
-> +       struct btd_device *device =3D btd_service_get_device(service);
-> +       char addr[18];
-> +
-> +       ba2str(device_get_address(device), addr);
-> +       DBG("%s", addr);
-> +
-> +       return 0;
-> +}
-> +
-> +static int micp_server_probe(struct btd_profile *p,
-> +                               struct btd_adapter *adapter)
-> +{
-> +       struct btd_gatt_database *database =3D btd_adapter_get_database(a=
-dapter);
-> +
-> +       DBG("MICP path %s", adapter_get_path(adapter));
-> +
-> +       bt_micp_add_db(btd_gatt_database_get_db(database));
-> +
-> +       return 0;
-> +}
-> +
-> +static void micp_server_remove(struct btd_profile *p,
-> +                                       struct btd_adapter *adapter)
-> +{
-> +       DBG("MICP remove adapter");
-> +}
-> +
-> +static struct btd_profile micp_profile =3D {
-> +       .name           =3D "micp",
-> +       .priority       =3D BTD_PROFILE_PRIORITY_MEDIUM,
-> +       .remote_uuid    =3D MICS_UUID_STR,
-> +
-> +       .device_probe   =3D micp_probe,
-> +       .device_remove  =3D micp_remove,
-> +
-> +       .accept =3D micp_accept,
-> +       .connect        =3D micp_connect,
-> +       .disconnect     =3D micp_disconnect,
-> +
-> +       .adapter_probe  =3D micp_server_probe,
-> +       .adapter_remove =3D micp_server_remove,
-> +};
-> +
-> +static unsigned int micp_id;
-> +
-> +static int micp_init(void)
-> +{
-> +       if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-> +               warn("D-Bus experimental not enabled");
-> +               return -ENOTSUP;
-> +       }
-> +
-> +       btd_profile_register(&micp_profile);
-> +       micp_id =3D bt_micp_register(micp_attached, micp_detached, NULL);
-> +
-> +       return 0;
-> +}
-> +
-> +static void micp_exit(void)
-> +{
-> +       if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
-> +               btd_profile_unregister(&micp_profile);
-> +               bt_micp_unregister(micp_id);
-> +       }
-> +}
-> +
-> +BLUETOOTH_PLUGIN_DEFINE(micp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT=
-,
-> +                                                       micp_init, micp_e=
-xit)
-> diff --git a/src/shared/micp.c b/src/shared/micp.c
-> new file mode 100644
-> index 000000000..25ffa6940
-> --- /dev/null
-> +++ b/src/shared/micp.c
-> @@ -0,0 +1,922 @@
-> +// SPDX-License-Identifier: LGPL-2.1-or-later
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
-> + *
-> + */
-> +#define _GNU_SOURCE
-> +#include <inttypes.h>
-> +#include <string.h>
-> +#include <stdlib.h>
-> +#include <stdbool.h>
-> +#include <unistd.h>
-> +#include <errno.h>
-> +
-> +#include "lib/bluetooth.h"
-> +#include "lib/uuid.h"
-> +
-> +#include "src/shared/queue.h"
-> +#include "src/shared/util.h"
-> +#include "src/shared/timeout.h"
-> +#include "src/shared/att.h"
-> +#include "src/shared/gatt-db.h"
-> +#include "src/shared/gatt-server.h"
-> +#include "src/shared/gatt-helpers.h"
-> +#include "src/shared/micp.h"
-> +
-> +#define DBG(_micp, fmt, arg...) \
-> +       micp_debug(_micp, "%s:%s() " fmt, __FILE__, __func__, ##arg)
-> +
-> +/* Application error codes */
-> +#define MICP_ERROR_MUTE_DISABLED            0x80
-> +#define MICP_ERROR_VALUE_NOT_ALLOWED        0x13
-> +#define BT_ATT_ERROR_OPCODE_NOT_SUPPORTED   0x81
-> +
-> +/* Mute char values */
-> +#define MICS_NOT_MUTED  0x00
-> +#define MICS_MUTED      0x01
-> +#define MICS_DISABLED   0x02
-> +
-> +struct bt_micp_db {
-> +       struct gatt_db *db;
-> +       struct bt_mics *mics;
-> +};
-> +
-> +struct bt_mics {
-> +       struct bt_micp_db *mdb;
-> +       uint8_t mute_stat;
-> +       struct gatt_db_attribute *service;
-> +       struct gatt_db_attribute *ms;
-> +       struct gatt_db_attribute *ms_ccc;
-> +};
-> +
-> +struct bt_micp {
-> +       int ref_count;
-> +       struct bt_micp_db *ldb;
-> +       struct bt_micp_db *rdb;
-> +       struct bt_gatt_client *client;
-> +       struct bt_att *att;
-> +       unsigned int mute_id;
-> +
-> +       unsigned int idle_id;
-> +       uint8_t mute;
-> +
-> +       struct queue *notify;
-> +       struct queue *pending;
-> +       struct queue *ready_cbs;
-> +
-> +       bt_micp_debug_func_t debug_func;
-> +       bt_micp_destroy_func_t debug_destroy;
-> +
-> +       void *debug_data;
-> +       void *user_data;
-> +};
-> +
-> +static struct queue *micp_db;
-> +static struct queue *micp_cbs;
-> +static struct queue *sessions;
-> +
-> +struct bt_micp_cb {
-> +       unsigned int id;
-> +       bt_micp_func_t attached;
-> +       bt_micp_func_t detached;
-> +       void *user_data;
-> +};
-> +
-> +typedef void (*micp_func_t)(struct bt_micp *micp, bool success,
-> +                               uint8_t att_ecode, const uint8_t *value,
-> +                               uint16_t length, void *user_data);
-> +
-> +struct bt_micp_pending {
-> +       unsigned int id;
-> +       struct bt_micp *micp;
-> +       micp_func_t func;
-> +       void *userdata;
-> +};
-> +
-> +struct bt_micp_ready {
-> +       unsigned int id;
-> +       bt_micp_ready_func_t func;
-> +       bt_micp_destroy_func_t destroy;
-> +       void *data;
-> +};
-> +
-> +typedef void (*micp_notify_t)(struct bt_micp *micp, uint16_t value_handl=
-e,
-> +                               const uint8_t *value, uint16_t length,
-> +                               void *user_data);
-> +
-> +struct bt_micp_notify {
-> +       unsigned int id;
-> +       struct bt_micp *micp;
-> +       micp_notify_t func;
-> +       void *user_data;
-> +};
-> +
-> +static void *iov_pull_mem(struct iovec *iov, size_t len)
-> +{
-> +       void *data =3D iov->iov_base;
-> +
-> +       if (iov->iov_len < len)
-> +               return NULL;
-> +
-> +       iov->iov_base +=3D len;
-> +       iov->iov_len -=3D len;
-> +
-> +       return data;
-> +}
-> +
-> +static struct bt_micp_db *micp_get_mdb(struct bt_micp *micp)
-> +{
-> +       if (!micp)
-> +               return NULL;
-> +
-> +       if (micp->ldb)
-> +               return micp->ldb;
-> +
-> +       return NULL;
-> +}
-> +
-> +static uint8_t *mdb_get_mute_state(struct bt_micp_db *vdb)
-> +{
-> +       if (!vdb->mics)
-> +               return NULL;
-> +
-> +       return &(vdb->mics->mute_stat);
-> +}
-> +
-> +static struct bt_mics *micp_get_mics(struct bt_micp *micp)
-> +{
-> +       if (!micp)
-> +               return NULL;
-> +
-> +       if (micp->rdb->mics)
-> +               return micp->rdb->mics;
-> +
-> +       micp->rdb->mics =3D new0(struct bt_mics, 1);
-> +       micp->rdb->mics->mdb =3D micp->rdb;
-> +
-> +       return micp->rdb->mics;
-> +}
-> +
-> +static void micp_detached(void *data, void *user_data)
-> +{
-> +       struct bt_micp_cb *cb =3D data;
-> +       struct bt_micp *micp =3D user_data;
-> +
-> +       cb->detached(micp, cb->user_data);
-> +}
-> +
-> +void bt_micp_detach(struct bt_micp *micp)
-> +{
-> +       if (!queue_remove(sessions, micp))
-> +               return;
-> +
-> +       bt_gatt_client_unref(micp->client);
-> +       micp->client =3D NULL;
-> +
-> +       queue_foreach(micp_cbs, micp_detached, micp);
-> +}
-> +
-> +static void micp_db_free(void *data)
-> +{
-> +       struct bt_micp_db *mdb =3D data;
-> +
-> +       if (!mdb)
-> +               return;
-> +
-> +       gatt_db_unref(mdb->db);
-> +
-> +       free(mdb->mics);
-> +       free(mdb);
-> +}
-> +
-> +static void micp_ready_free(void *data)
-> +{
-> +       struct bt_micp_ready *ready =3D data;
-> +
-> +       if (ready->destroy)
-> +               ready->destroy(ready->data);
-> +
-> +       free(ready);
-> +}
-> +
-> +static void micp_free(void *data)
-> +{
-> +       struct bt_micp *micp =3D data;
-> +
-> +       bt_micp_detach(micp);
-> +
-> +       micp_db_free(micp->rdb);
-> +
-> +       queue_destroy(micp->pending, NULL);
-> +       queue_destroy(micp->ready_cbs, micp_ready_free);
-> +
-> +       free(micp);
-> +}
-> +
-> +bool bt_micp_set_user_data(struct bt_micp *micp, void *user_data)
-> +{
-> +
-> +       if (!micp)
-> +               return false;
-> +
-> +       micp->user_data =3D user_data;
-> +
-> +       return true;
-> +}
-> +
-> +static bool micp_db_match(const void *data, const void *match_data)
-> +{
-> +       const struct bt_micp_db *mdb =3D data;
-> +       const struct gatt_db *db =3D match_data;
-> +
-> +       return (mdb->db =3D=3D db);
-> +}
-> +
-> +struct bt_att *bt_micp_get_att(struct bt_micp *micp)
-> +{
-> +       if (!micp)
-> +               return NULL;
-> +
-> +       if (micp->att)
-> +               return micp->att;
-> +
-> +       return bt_gatt_client_get_att(micp->client);
-> +}
-> +
-> +struct bt_micp *bt_micp_ref(struct bt_micp *micp)
-> +{
-> +       if (!micp)
-> +               return NULL;
-> +
-> +       __sync_fetch_and_add(&micp->ref_count, 1);
-> +
-> +       return micp;
-> +}
-> +
-> +void bt_micp_unref(struct bt_micp *micp)
-> +{
-> +       if (!micp)
-> +               return;
-> +
-> +       if (__sync_sub_and_fetch(&micp->ref_count, 1))
-> +               return;
-> +
-> +       micp_free(micp);
-> +}
-> +
-> +static void micp_debug(struct bt_micp *micp, const char *format, ...)
-> +{
-> +       va_list ap;
-> +
-> +       if (!micp || !format || !micp->debug_func)
-> +               return;
-> +
-> +       va_start(ap, format);
-> +       util_debug_va(micp->debug_func, micp->debug_data, format, ap);
-> +       va_end(ap);
-> +}
-> +
-> +static void micp_disconnected(int err, void *user_data)
-> +{
-> +       struct bt_micp *micp =3D user_data;
-> +
-> +       DBG(micp, "micp %p disconnected err %d", micp, err);
-> +
-> +       bt_micp_detach(micp);
-> +}
-> +
-> +static struct bt_micp *micp_get_session(struct bt_att *att, struct gatt_=
-db *db)
-> +{
-> +       const struct queue_entry *entry;
-> +       struct bt_micp *micp;
-> +
-> +       for (entry =3D queue_get_entries(sessions); entry; entry =3D entr=
-y->next) {
-> +               struct bt_micp *micp =3D entry->data;
-> +
-> +               if (att =3D=3D bt_micp_get_att(micp))
-> +                       return micp;
-> +       }
-> +
-> +       micp =3D bt_micp_new(db, NULL);
-> +       micp->att =3D att;
-> +
-> +       bt_att_register_disconnect(att, micp_disconnected, micp, NULL);
-> +
-> +       bt_micp_attach(micp, NULL);
-> +
-> +       return micp;
-> +}
-> +
-> +static void mics_mute_read(struct gatt_db_attribute *attrib,
-> +                       unsigned int id, uint16_t offset,
-> +                       uint8_t opcode, struct bt_att *att,
-> +                       void *user_data)
-> +{
-> +       struct bt_mics *mics =3D user_data;
-> +       struct iovec iov;
-> +
-> +       iov.iov_base =3D &mics->mute_stat;
-> +       iov.iov_len =3D sizeof(mics->mute_stat);
-> +
-> +       gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-> +                                                                 iov.iov=
-_len);
-> +}
-> +
-> +static uint8_t mics_not_muted(struct bt_mics *mics, struct bt_micp *micp=
-,
-> +                                                         struct iovec *i=
-ov)
-> +{
-> +       struct bt_micp_db *mdb;
 > +       uint8_t *mute_state;
 > +
-> +       DBG(micp, "Mute state OP: Not Muted");
+> +       mute_state =3D mdb_get_mute_state(mics->mdb);
 > +
-> +       mdb =3D micp_get_mdb(micp);
-> +       if (!mdb) {
-> +               DBG(micp, "error: MDB not available");
-> +               return 0;
-> +       }
-> +
-> +       mute_state =3D mdb_get_mute_state(mdb);
-> +       if (!mute_state) {
-> +               DBG(micp, "Error : Mute State not available");
-> +               return 0;
-> +       }
-> +
-> +       *mute_state =3D MICS_NOT_MUTED;
-> +
-> +       gatt_db_attribute_notify(mdb->mics->ms, (void *)mute_state,
-> +                               sizeof(uint8_t), bt_micp_get_att(micp));
+> +       *mute_state =3D state;
 > +
 > +       return 0;
 > +}
 > +
-> +static uint8_t mics_muted(struct bt_mics *mics, struct bt_micp *micp,
-> +                                                 struct iovec *iov)
+> +void mics_enable_disable_mute(bool state)
 > +{
-> +       struct bt_micp_db *mdb;
-> +       uint8_t *mute_state;
-> +
-> +       DBG(micp, "Mute state OP: Muted");
-> +
-> +       mdb =3D micp_get_mdb(micp);
-> +       if (!mdb) {
-> +               DBG(micp, "error: MDB not available");
-> +               return 0;
-> +       }
-> +
-> +       mute_state =3D mdb_get_mute_state(mdb);
-> +
-> +       *mute_state =3D MICS_MUTED;
-> +
-> +       gatt_db_attribute_notify(mdb->mics->ms, (void *)mute_state,
-> +                               sizeof(uint8_t), bt_micp_get_att(micp));
-> +
-> +       return 0;
+> +       state =3D=3D true ? mics_mute_enable_disable(pts_mics, MICS_MUTED=
+) :
+> +                       mics_mute_enable_disable(pts_mics, MICS_DISABLED)=
+;
 > +}
 > +
-> +#define MICS_OP(_str, _op, _size, _func) \
-> +       {                                    \
-> +               .str =3D _str,                     \
-> +               .op =3D _op,                       \
-> +               .size =3D _size,                   \
-> +               .func =3D _func,                   \
-> +       }
-> +
-> +struct mics_op_handler {
-> +       const char *str;
-> +       uint8_t op;
-> +       size_t size;
-> +       uint8_t (*func)(struct bt_mics *mics, struct bt_micp *micp,
-> +                                       struct iovec *iov);
-> +} micp_handlers[] =3D {
-> +       MICS_OP("Not Muted", MICS_NOT_MUTED,
-> +                       sizeof(uint8_t), mics_not_muted),
-> +       MICS_OP("Muted", MICS_MUTED,
-> +                       sizeof(uint8_t), mics_muted),
-> +       {}};
-> +
-> +static void mics_mute_write(struct gatt_db_attribute *attrib,
-> +                                       unsigned int id, uint16_t offset,
-> +                                       const uint8_t *value, size_t len,
-> +                                       uint8_t opcode, struct bt_att *at=
-t,
-> +                                       void *user_data)
+> +static void micp_char_search_cb(bool success, uint8_t att_ecode,
+> +                                               struct bt_gatt_result *re=
+sult,
+> +                                               void *user_data)
 > +{
-> +       struct bt_mics *mics =3D user_data;
-> +       struct bt_micp *micp =3D micp_get_session(att, mics->mdb->db);
-> +       struct iovec iov =3D {
-> +               .iov_base =3D (void *)value,
-> +               .iov_len =3D len,
-> +       };
-> +       uint8_t *micp_op, *mute_state;
-> +       struct mics_op_handler *handler;
-> +       uint8_t ret =3D BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
-> +       struct bt_micp_db *mdb;
+> +       DBG(pts_micp, "micp_char_search_cb");
 > +
-> +       DBG(micp, "MICS Mute Char write: len: %ld: %ld", len, iov.iov_len=
-);
-> +
-> +       if (offset) {
-> +               DBG(micp, "invalid offset: %d", offset);
-> +               ret =3D BT_ATT_ERROR_INVALID_OFFSET;
-> +               goto respond;
-> +       }
-> +
-> +       if (len < sizeof(*micp_op)) {
-> +               DBG(micp, "invalid length: %ld < %ld sizeof(param)", len,
-> +                       sizeof(*micp_op));
-> +               ret =3D BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
-> +               goto respond;
-> +       }
-> +
-> +       micp_op =3D iov_pull_mem(&iov, sizeof(*micp_op));
-> +
-> +       if ((*micp_op =3D=3D MICS_DISABLED) || (*micp_op !=3D MICS_NOT_MU=
-TED
-> +               && *micp_op !=3D MICS_MUTED)) {
-> +               DBG(micp, "Invalid operation - MICS DISABLED/RFU mics op:=
-%d",
-> +                                       micp_op);
-> +               ret =3D MICP_ERROR_VALUE_NOT_ALLOWED;
-> +               goto respond;
-> +       }
-> +
-> +       mdb =3D micp_get_mdb(micp);
-> +       if (!mdb) {
-> +               DBG(micp, "error: MDB not available");
-> +               goto respond;
-> +       }
-> +
-> +       mute_state =3D mdb_get_mute_state(mdb);
-> +       if (*mute_state =3D=3D MICS_DISABLED) {
-> +               DBG(micp, "state: MICS DISABLED , can not write value: %d=
-",
-> +                               *micp_op);
-> +               ret =3D MICP_ERROR_MUTE_DISABLED;
-> +               goto respond;
-> +       }
-> +
-> +       for (handler =3D micp_handlers; handler && handler->str; handler+=
-+) {
-> +               DBG(micp, "handler->op: %d micp_op: %d iov.iov_len: %ld",
-> +                                       handler->op, *micp_op, iov.iov_le=
-n);
-> +               if (handler->op !=3D *micp_op)
-> +                       continue;
-> +
-> +               if (len < handler->size) {
-> +                       DBG(micp, "invalid len %ld : %ld < %ld handler->s=
-ize",
-> +                       len, iov.iov_len, handler->size);
-> +                       ret =3D BT_ATT_ERROR_OPCODE_NOT_SUPPORTED;
-> +                       goto respond;
-> +               }
-> +
-> +               break;
-> +       }
-> +
-> +       if (handler && handler->str) {
-> +               DBG(micp, "%s", handler->str);
-> +
-> +               ret =3D handler->func(mics, micp, &iov);
-> +       } else {
-> +               DBG(micp, "unknown opcode 0x%02x", *micp_op);
-> +               ret =3D BT_ATT_ERROR_OPCODE_NOT_SUPPORTED;
-> +       }
-> +
-> +respond:
-> +       gatt_db_attribute_write_result(attrib, id, ret);
 > +}
 > +
-> +static struct bt_mics *mics_new(struct gatt_db *db)
+> +static void micp_foreach_mics_service(struct gatt_db_attribute *attr,
+> +                                                       void *user_data)
 > +{
-> +       struct bt_mics *mics;
+> +       uint16_t start, end;
+> +       bool primary;
 > +       bt_uuid_t uuid;
-> +
-> +       if (!db)
-> +               return NULL;
-> +
-> +       mics =3D new0(struct bt_mics, 1);
-> +
-> +       mics->mute_stat =3D MICS_MUTED;
-> +
-> +       /* Populate DB with MICS attributes */
-> +       bt_uuid16_create(&uuid, MICS_UUID);
-> +       mics->service =3D gatt_db_add_service(db, &uuid, true, 4);
-> +
-> +       bt_uuid16_create(&uuid, MUTE_CHRC_UUID);
-> +       mics->ms =3D gatt_db_service_add_characteristic(mics->service,
-> +                               &uuid,
-> +                               BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
-> +                               BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PRO=
-P_WRITE
-> +                               | BT_GATT_CHRC_PROP_NOTIFY,
-> +                               mics_mute_read, mics_mute_write,
-> +                               mics);
-> +
-> +       mics->ms_ccc =3D gatt_db_service_add_ccc(mics->service,
-> +                               BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-> +
-> +       gatt_db_service_set_active(mics->service, true);
-> +
-> +       return mics;
-> +}
-> +
-> +static struct bt_micp_db *micp_db_new(struct gatt_db *db)
-> +{
-> +       struct bt_micp_db *mdb;
-> +
-> +       if (!db)
-> +               return NULL;
-> +
-> +       mdb =3D new0(struct bt_micp_db, 1);
-> +       mdb->db =3D gatt_db_ref(db);
-> +
-> +       if (!micp_db)
-> +               micp_db =3D queue_new();
-> +
-> +       mdb->mics =3D mics_new(db);
-> +       mdb->mics->mdb =3D mdb;
-> +
-> +       queue_push_tail(micp_db, mdb);
-> +
-> +       return mdb;
-> +}
-> +
-> +static struct bt_micp_db *micp_get_db(struct gatt_db *db)
-> +{
-> +       struct bt_micp_db *mdb;
-> +
-> +       mdb =3D queue_find(micp_db, micp_db_match, db);
-> +       if (mdb)
-> +               return mdb;
-> +
-> +       return micp_db_new(db);
-> +}
-> +
-> +void bt_micp_add_db(struct gatt_db *db)
-> +{
-> +       micp_db_new(db);
-> +}
-> +
-> +bool bt_micp_set_debug(struct bt_micp *micp, bt_micp_debug_func_t func,
-> +                       void *user_data, bt_micp_destroy_func_t destroy)
-> +{
-> +       if (!micp)
-> +               return false;
-> +
-> +       if (micp->debug_destroy)
-> +               micp->debug_destroy(micp->debug_data);
-> +
-> +       micp->debug_func =3D func;
-> +       micp->debug_destroy =3D destroy;
-> +       micp->debug_data =3D user_data;
-> +
-> +       return true;
-> +}
-> +
-> +unsigned int bt_micp_register(bt_micp_func_t attached, bt_micp_func_t de=
-tached,
-> +                                                         void *user_data=
-)
-> +{
-> +       struct bt_micp_cb *cb;
-> +       static unsigned int id;
-> +
-> +       if (!attached && !detached)
-> +               return 0;
-> +
-> +       if (!micp_cbs)
-> +               micp_cbs =3D queue_new();
-> +
-> +       cb =3D new0(struct bt_micp_cb, 1);
-> +       cb->id =3D ++id ? id : ++id;
-> +       cb->attached =3D attached;
-> +       cb->detached =3D detached;
-> +       cb->user_data =3D user_data;
-> +
-> +       queue_push_tail(micp_cbs, cb);
-> +
-> +       return cb->id;
-> +}
-> +
-> +static bool match_id(const void *data, const void *match_data)
-> +{
-> +       const struct bt_micp_cb *cb =3D data;
-> +       unsigned int id =3D PTR_TO_UINT(match_data);
-> +
-> +       return (cb->id =3D=3D id);
-> +}
-> +
-> +bool bt_micp_unregister(unsigned int id)
-> +{
-> +       struct bt_micp_cb *cb;
-> +
-> +       cb =3D queue_remove_if(micp_cbs, match_id, UINT_TO_PTR(id));
-> +       if (!cb)
-> +               return false;
-> +
-> +       free(cb);
-> +
-> +       return true;
-> +}
-> +
-> +struct bt_micp *bt_micp_new(struct gatt_db *ldb, struct gatt_db *rdb)
-> +{
-> +       struct bt_micp *micp;
-> +       struct bt_micp_db *mdb;
-> +
-> +       if (!ldb)
-> +               return NULL;
-> +
-> +       mdb =3D micp_get_db(ldb);
-> +       if (!mdb)
-> +               return NULL;
-> +
-> +       micp =3D new0(struct bt_micp, 1);
-> +       micp->ldb =3D mdb;
-> +       micp->pending =3D queue_new();
-> +       micp->ready_cbs =3D queue_new();
-> +
-> +       if (!rdb)
-> +               goto done;
-> +
-> +       mdb =3D new0(struct bt_micp_db, 1);
-> +       mdb->db =3D gatt_db_ref(rdb);
-> +
-> +       micp->rdb =3D mdb;
-> +
-> +done:
-> +       bt_micp_ref(micp);
-> +
-> +       return micp;
-> +}
-> +
-> +static void micp_pending_destroy(void *data)
-> +{
-> +       struct bt_micp_pending *pending =3D data;
-> +       struct bt_micp *micp =3D pending->micp;
-> +
-> +       if (queue_remove_if(micp->pending, NULL, pending))
-> +               free(pending);
-> +}
-> +
-> +static void micp_pending_complete(bool success, uint8_t att_ecode,
-> +                               const uint8_t *value, uint16_t length,
-> +                               void *user_data)
-> +{
-> +       struct bt_micp_pending *pending =3D user_data;
-> +
-> +       if (pending->func)
-> +               pending->func(pending->micp, success, att_ecode, value, l=
-ength,
-> +                                         pending->userdata);
-> +}
-> +
-> +static void micp_read_value(struct bt_micp *micp, uint16_t value_handle,
-> +                               micp_func_t func, void *user_data)
-> +{
-> +       struct bt_micp_pending *pending;
-> +
-> +       pending =3D new0(struct bt_micp_pending, 1);
-> +       pending->micp =3D micp;
-> +       pending->func =3D func;
-> +       pending->userdata =3D user_data;
-> +
-> +       pending->id =3D bt_gatt_client_read_value(micp->client, value_han=
-dle,
-> +                                       micp_pending_complete, pending,
-> +                                       micp_pending_destroy);
-> +
-> +       if (!pending->id) {
-> +               DBG(micp, "unable to send read request");
-> +               free(pending);
-> +               return;
-> +       }
-> +
-> +       queue_push_tail(micp->pending, pending);
-> +}
-> +
-> +static void micp_register(uint16_t att_ecode, void *user_data)
-> +{
-> +       struct bt_micp_notify *notify =3D user_data;
-> +
-> +       if (att_ecode)
-> +               DBG(notify->micp, "MICP register failed 0x%04x", att_ecod=
-e);
-> +}
-> +
-> +static void micp_notify(uint16_t value_handle, const uint8_t *value,
-> +                               uint16_t length, void *user_data)
-> +{
-> +       struct bt_micp_notify *notify =3D user_data;
-> +
-> +       if (notify->func)
-> +               notify->func(notify->micp, value_handle, value, length,
-> +                                        notify->user_data);
-> +}
-> +
-> +static void micp_notify_destroy(void *data)
-> +{
-> +       struct bt_micp_notify *notify =3D data;
-> +       struct bt_micp *micp =3D notify->micp;
-> +
-> +       if (queue_remove_if(micp->notify, NULL, notify))
-> +               free(notify);
-> +}
-> +
-> +static unsigned int micp_register_notify(struct bt_micp *micp,
-> +                                       uint16_t value_handle,
-> +                                       micp_notify_t func,
-> +                                       void *user_data)
-> +{
-> +       struct bt_micp_notify *notify;
-> +
-> +       notify =3D new0(struct bt_micp_notify, 1);
-> +       notify->micp =3D micp;
-> +       notify->func =3D func;
-> +       notify->user_data =3D user_data;
-> +
-> +       notify->id =3D bt_gatt_client_register_notify(micp->client,
-> +                                       value_handle, micp_register,
-> +                                       micp_notify, notify,
-> +                                       micp_notify_destroy);
-> +       if (!notify->id) {
-> +               DBG(micp, "Unable to register for notifications");
-> +               free(notify);
-> +               return 0;
-> +       }
-> +
-> +       queue_push_tail(micp->notify, notify);
-> +
-> +       return notify->id;
-> +}
-> +
-> +static void micp_mute_state_notify(struct bt_micp *micp, uint16_t value_=
-handle,
-> +                                       const uint8_t *value, uint16_t le=
-ngth,
-> +                                       void *user_data)
-> +{
-> +       uint8_t mute_state;
-> +
-> +       memcpy(&mute_state, value, sizeof(mute_state));
-> +
-> +       DBG(micp, "Mute state: 0x%x", mute_state);
-> +}
-> +
-> +static void read_mute_state(struct bt_micp *micp, bool success,
-> +                                       uint8_t att_ecode, const uint8_t =
-*value,
-> +                                       uint16_t length, void *user_data)
-> +{
-> +       uint8_t *mute_state;
-> +       struct iovec iov =3D {
-> +               .iov_base =3D (void *)value,
-> +               .iov_len =3D length,
-> +       };
-> +
-> +       if (!success) {
-> +               DBG(micp, "Unable to read Mute state: error 0x%02x", att_=
-ecode);
-> +               return;
-> +       }
-> +
-> +       mute_state =3D iov_pull_mem(&iov, sizeof(uint8_t));
-> +       if (mute_state =3D=3D NULL) {
-> +               DBG(micp, "Unable to get Mute state");
-> +               return;
-> +       }
-> +
-> +       DBG(micp, "Mute state: %x", *mute_state);
-> +}
-> +
-> +static void foreach_mics_char(struct gatt_db_attribute *attr, void *user=
-_data)
-> +{
-> +       struct bt_micp *micp =3D user_data;
-> +       uint16_t value_handle;
-> +       bt_uuid_t uuid, uuid_mute;
-> +       struct bt_mics *mics;
-> +
-> +       if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
-> +                       NULL, NULL, &uuid))
-> +               return;
-> +
-> +       bt_uuid16_create(&uuid_mute, MUTE_CHRC_UUID);
-> +       if (!bt_uuid_cmp(&uuid, &uuid_mute)) {
-> +               DBG(micp, "MICS Mute characteristic found: handle 0x%04x"=
-,
-> +                               value_handle);
-> +
-> +               mics =3D micp_get_mics(micp);
-> +               if (!mics || mics->ms)
-> +                       return;
-> +
-> +               mics->ms =3D attr;
-> +
-> +               micp_read_value(micp, value_handle, read_mute_state, micp=
-);
-> +
-> +               micp->mute_id =3D micp_register_notify(micp, value_handle=
-,
-> +                                               micp_mute_state_notify, N=
-ULL);
-> +       }
-> +}
-> +
-> +static void foreach_mics_service(struct gatt_db_attribute *attr,
-> +                                       void *user_data)
-> +{
+> +       struct bt_gatt_request *gatt_ret;
+> +       struct bt_att *micp_att;
 > +       struct bt_micp *micp =3D user_data;
 > +       struct bt_mics *mics =3D micp_get_mics(micp);
+> +
+> +       if (!gatt_db_attribute_get_service_data(attr, &start, &end, &prim=
+ary,
+> +               &uuid)) {
+> +               DBG(micp, "%s: ERR! gatt_db_attribute_get_service_data\n"=
+,
+> +                       __func__);
+> +               return;
+> +
+> +       }
+> +       micp_att =3D bt_micp_get_att(micp);
+> +       gatt_ret =3D bt_gatt_discover_characteristics(micp_att, start, en=
+d,
+> +                                       micp_char_search_cb, NULL, NULL);
+> +
+> +       if (gatt_ret)
+> +               DBG(micp, "MICP GATT DISCOVER START\n");
+> +       else
+> +               DBG(micp, "MICP GATT DISCOVER FAILED\n");
 > +
 > +       mics->service =3D attr;
 > +
@@ -1359,169 +644,62 @@ ULL);
 > +       gatt_db_service_foreach_char(attr, foreach_mics_char, micp);
 > +}
 > +
-> +unsigned int bt_micp_ready_register(struct bt_micp *micp,
-> +                               bt_micp_ready_func_t func, void *user_dat=
-a,
-> +                               bt_micp_destroy_func_t destroy)
-> +{
-> +       struct bt_micp_ready *ready;
-> +       static unsigned int id;
-> +
-> +       DBG(micp, "bt_micp_ready_register_Entry\n");
-> +       if (!micp)
-> +               return 0;
-> +
-> +       ready =3D new0(struct bt_micp_ready, 1);
-> +       ready->id =3D ++id ? id : ++id;
-> +       ready->func =3D func;
-> +       ready->destroy =3D destroy;
-> +       ready->data =3D user_data;
-> +
-> +       queue_push_tail(micp->ready_cbs, ready);
-> +
-> +       return ready->id;
-> +}
-> +
-> +static bool match_ready_id(const void *data, const void *match_data)
-> +{
-> +       const struct bt_micp_ready *ready =3D data;
-> +       unsigned int id =3D PTR_TO_UINT(match_data);
-> +
-> +       return (ready->id =3D=3D id);
-> +}
-> +
-> +bool bt_micp_ready_unregister(struct bt_micp *micp, unsigned int id)
-> +{
-> +       struct bt_micp_ready *ready;
-> +
-> +       ready =3D queue_remove_if(micp->ready_cbs, match_ready_id,
-> +                                               UINT_TO_PTR(id));
-> +       if (!ready)
-> +               return false;
-> +
-> +       micp_ready_free(ready);
-> +
-> +       return true;
-> +}
-> +
-> +static struct bt_micp *bt_micp_ref_safe(struct bt_micp *micp)
-> +{
-> +       if (!micp || !micp->ref_count)
-> +               return NULL;
-> +
-> +       return bt_micp_ref(micp);
-> +}
-> +
-> +static void micp_notify_ready(struct bt_micp *micp)
-> +{
-> +       const struct queue_entry *entry;
-> +
-> +       if (!bt_micp_ref_safe(micp))
-> +               return;
-> +
-> +       for (entry =3D queue_get_entries(micp->ready_cbs); entry;
-> +                                                       entry =3D entry->=
-next) {
-> +               struct bt_micp_ready *ready =3D entry->data;
-> +
-> +               ready->func(micp, ready->data);
-> +       }
-> +
-> +       bt_micp_unref(micp);
-> +}
-> +
-> +static void micp_idle(void *data)
-> +{
-> +       struct bt_micp *micp =3D data;
-> +
-> +       micp->idle_id =3D 0;
-> +       micp_notify_ready(micp);
-> +}
-> +
-> +bool bt_micp_attach(struct bt_micp *micp, struct bt_gatt_client *client)
+> +void micp_discover_mute_char(void)
 > +{
 > +       bt_uuid_t uuid;
 > +
-> +       if (!sessions)
-> +               sessions =3D queue_new();
-> +
-> +       queue_push_tail(sessions, micp);
-> +
-> +       if (!client)
-> +               return true;
-> +
-> +       if (micp->client)
-> +               return false;
-> +
-> +       micp->client =3D bt_gatt_client_clone(client);
-> +       if (!micp->client)
-> +               return false;
-> +
-> +       bt_gatt_client_idle_register(micp->client, micp_idle, micp, NULL)=
-;
-> +
 > +       bt_uuid16_create(&uuid, MICS_UUID);
-> +       gatt_db_foreach_service(micp->ldb->db, &uuid, foreach_mics_servic=
-e,
-> +                                               micp);
-> +       return true;
+> +       gatt_db_foreach_service(pts_micp->ldb->db, &uuid,
+> +                                       micp_foreach_mics_service, pts_mi=
+cp);
 > +}
+> +
+> +void mics_mute_char_read(uint16_t handle)
+> +{
+> +       DBG(pts_micp, "%s. handle: %x\n", __func__, handle);
+> +       micp_read_value(pts_micp, handle, read_mute_state, pts_micp);
+> +}
+> +
+> +static void micp_write_cb(bool success, uint8_t att_ecode, void *user_da=
+ta)
+> +{
+> +       if (success)
+> +               DBG(pts_micp, "MICP Write successful\n");
+> +       else
+> +               DBG(pts_micp, "\nWrite failed: 0x%02x\n", att_ecode);
+> +}
+> +
+> +void micp_char_write_value(uint16_t handle)
+> +{
+> +       const uint8_t value =3D 0x01;
+> +
+> +       if (!pts_micp->client) {
+> +               DBG(pts_micp, "%s: pts_micp->client is NULL", __func__);
+> +               return;
+> +       }
+> +       bt_gatt_client_write_value(pts_micp->client, handle, &value, 0x01=
+,
+> +                       micp_write_cb, NULL, NULL);
+> +
+> +}
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > diff --git a/src/shared/micp.h b/src/shared/micp.h
-> new file mode 100644
-> index 000000000..b307ac9f4
-> --- /dev/null
+> index b307ac9f4..4a9807ed4 100644
+> --- a/src/shared/micp.h
 > +++ b/src/shared/micp.h
-> @@ -0,0 +1,46 @@
-> +/* SPDX-License-Identifier: LGPL-2.1-or-later */
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2023  NXP Semiconductors. All rights reserved.
-> + *
-> + */
-> +#include <stdbool.h>
-> +#include <inttypes.h>
+> @@ -44,3 +44,11 @@ bool bt_micp_ready_unregister(struct bt_micp *micp, un=
+signed int id);
+>
+>  bool bt_micp_unregister(unsigned int id);
+>  struct bt_micp *bt_micp_new(struct gatt_db *ldb, struct gatt_db *rdb);
 > +
-> +#include "src/shared/io.h"
-> +#include "src/shared/gatt-client.h"
-> +
-> +struct bt_micp;
-> +
-> +typedef void (*bt_micp_ready_func_t)(struct bt_micp *micp, void *user_da=
-ta);
-> +typedef void (*bt_micp_destroy_func_t)(void *user_data);
-> +typedef void (*bt_micp_debug_func_t)(const char *str, void *user_data);
-> +typedef void (*bt_micp_func_t)(struct bt_micp *micp, void *user_data);
-> +
-> +struct bt_micp *bt_micp_ref(struct bt_micp *micp);
-> +void bt_micp_unref(struct bt_micp *micp);
-> +
-> +void bt_micp_add_db(struct gatt_db *db);
-> +
-> +bool bt_micp_attach(struct bt_micp *micp, struct bt_gatt_client *client)=
-;
-> +void bt_micp_detach(struct bt_micp *micp);
-> +
-> +bool bt_micp_set_debug(struct bt_micp *micp, bt_micp_debug_func_t func,
-> +               void *user_data, bt_micp_destroy_func_t destroy);
-> +
-> +struct bt_att *bt_micp_get_att(struct bt_micp *micp);
-> +
-> +bool bt_micp_set_user_data(struct bt_micp *micp, void *user_data);
-> +
-> +/* session related functions */
-> +unsigned int bt_micp_register(bt_micp_func_t attached, bt_micp_func_t de=
-tached,
-> +                                       void *user_data);
-> +unsigned int bt_micp_ready_register(struct bt_micp *micp,
-> +                               bt_micp_ready_func_t func, void *user_dat=
-a,
-> +                               bt_micp_destroy_func_t destroy);
-> +bool bt_micp_ready_unregister(struct bt_micp *micp, unsigned int id);
-> +
-> +bool bt_micp_unregister(unsigned int id);
-> +struct bt_micp *bt_micp_new(struct gatt_db *ldb, struct gatt_db *rdb);
+> +#ifdef MICP_MICS_PTS_FLAG
+> +void mics_change_mute_state(bool state);
+> +void mics_enable_disable_mute(bool state);
+> +void micp_discover_mute_char(void);
+> +void mics_mute_char_read(uint16_t handle);
+> +void micp_char_write_value(uint16_t handle);
+> +#endif /*MICP_MICS_PTS_FLAG*/
 > --
 > 2.34.1
 >
