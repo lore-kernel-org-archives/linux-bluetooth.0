@@ -2,142 +2,84 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA17BC001DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 23:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D573EC001DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 23:50:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230073AbjHGXei (ORCPT
+        id S230127AbjHGXuZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 19:34:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32994 "EHLO
+        Mon, 7 Aug 2023 19:50:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbjHGXeh (ORCPT
+        with ESMTP id S229473AbjHGXuY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 19:34:37 -0400
-Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B791721
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 16:34:36 -0700 (PDT)
-Received: from github.com (hubbernetes-node-a0c4ff4.va3-iad.github.net [10.48.220.68])
-        by smtp.github.com (Postfix) with ESMTPA id AD7D19404E0
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 16:34:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1691451275;
-        bh=TGBO0YPmjVXbSVHGqauw624DRRKu9pLgLTdrO6ke8yI=;
-        h=Date:From:To:Subject:From;
-        b=M9DfeI2pS9fp79MD2ygwfk7Bi8lhsdW3FO7uWx4OUy9aH/4yLEXpNfbBkESVgo/wr
-         WzvDbdX/5duoAiSlxAV7aadfNWCZnabRwdMMN+Vo9IqTXYXpg26xtL0xg1Enh0tmRZ
-         ltX2Wy1lLOtHgnQZm3EVdrMaMIZkjtG0dJS5Lr5k=
-Date:   Mon, 07 Aug 2023 16:34:35 -0700
-From:   =?UTF-8?B?xaBpbW9uIE1pa3VkYQ==?= <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/966502-59569c@github.com>
-Subject: [bluez/bluez] d987ff: monitor: Plot RX information with -a/--analyze
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Mon, 7 Aug 2023 19:50:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E92AB3
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 16:50:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B58E462334
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 23:50:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 23051C433C8;
+        Mon,  7 Aug 2023 23:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691452223;
+        bh=j8j32qL4Gj4OtQl0H7H9ckvJF1oJIVWqEpqA8gdwd+Y=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Pb7x6lycNEhJRLr9pcgSKROIUlaIoBuaHVcoIw+CB3DKnDTXzvVA9vb4KXrp7Un5i
+         hQ6gBHzY6sl5WLTJtTsJS1aTU6MkePeOeZcNzQnazaInsKGC4I+UfW570QQVH3EJT7
+         DrCs92S69x66S9kV0x3XZQ2y+ekkxCQwhoI0tM8UaV0G0vylFaUFqVtx2c+PdyIEAr
+         2csMF0RcRw5i763mrfpMkl77K98+GpkiFVYLfaALNdLrVUtdspLwajSUqtoj3eFdVb
+         wRz1YQAImGh/KGK0CDUnDSv/SAPf0z1tFk/SWxwLzYBVeoaOodzjVUFeC/m355xjOW
+         /mWgmQi48ffMg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F3A9E270C2;
+        Mon,  7 Aug 2023 23:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/2] Bluetooth: hci_event: drop only unbound CIS if Set CIG
+ Parameters fails
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169145222305.5057.17030807199575322111.git-patchwork-notify@kernel.org>
+Date:   Mon, 07 Aug 2023 23:50:23 +0000
+References: <5af5d6830d65173124aa525dd01b2718548ffb65.1691251325.git.pav@iki.fi>
+In-Reply-To: <5af5d6830d65173124aa525dd01b2718548ffb65.1691251325.git.pav@iki.fi>
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: d987ff347b83e4a49d1b646ccf182a19f118d96a
-      https://github.com/bluez/bluez/commit/d987ff347b83e4a49d1b646ccf182a19f118d96a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-07 (Mon, 07 Aug 2023)
+Hello:
 
-  Changed paths:
-    M monitor/analyze.c
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  monitor: Plot RX information with -a/--analyze
+On Sat,  5 Aug 2023 19:08:41 +0300 you wrote:
+> When user tries to connect a new CIS when its CIG is not configurable,
+> that connection shall fail, but pre-existing connections shall not be
+> affected.  However, currently hci_cc_le_set_cig_params deletes all CIS
+> of the CIG on error so it doesn't work, even though controller shall not
+> change CIG/CIS configuration if the command fails.
+> 
+> Fix by failing on command error only the connections that are not yet
+> bound, so that we keep the previous CIS configuration like the
+> controller does.
+> 
+> [...]
 
-This attempts to plot the RX information just as TX:
+Here is the summary with links:
+  - [1/2] Bluetooth: hci_event: drop only unbound CIS if Set CIG Parameters fails
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f5669a036ae6
+  - [2/2] Bluetooth: hci_conn: avoid checking uninitialized CIG/CIS ids
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6130cdd83d40
 
-  Found BR-ACL connection with handle 256
-        Address: XX:XX:XX:XX:XX:XX
-        RX packets: 60/60
-        RX Latency: 0-39040 msec (~20294 msec)
-        RX size: 6-344 octets (~34 octets)
-        RX speed: ~0 Kb/s
-
-  100 +-+------------------------------------------------------------------+
-       +|                                                                  |
-       +|                                                       RX +-----+ |
-       +|                                                                  |
-       +|                                                                  |
-       +|                                                                  |
-        |                                                                  |
-        |                                                                  |
-   10 +-|                                                                  |
-       +|                                                                  |
-       +|                                                                  |
-       +|                                                                  |
-       +|                                                                  |
-       +|                                                                  |
-        |                                                                  |
-        |                                                                  |
-    1 +-|  + +                                                           + |
-       +|  | |                                                           | |
-       ++------------------------------------------------------------------+
-        +       +        +       +        +       +       +        +       +
-        0      5000    10000   15000    20000   25000   30000    35000   40000
-                                   Latency (ms)
-
-        TX packets: 22548/22547
-        TX Latency: 3-73 msec (~11 msec)
-        TX size: 6-850 octets (~847 octets)
-        TX speed: ~568 Kb/s
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: b9c57e815e6e63965c6b0fa5907f7a761d169091
-      https://github.com/bluez/bluez/commit/b9c57e815e6e63965c6b0fa5907f7a761d169091
-  Author: Karl Bieber <karl.bieber@proton.me>
-  Date:   2023-08-07 (Mon, 07 Aug 2023)
-
-  Changed paths:
-    M src/main.c
-
-  Log Message:
-  -----------
-  main: Fix missing comma
-
-
-  Commit: 0ee60b31a8432b0737df2bfdbf630c24ca7ef4d3
-      https://github.com/bluez/bluez/commit/0ee60b31a8432b0737df2bfdbf630c24ca7ef4d3
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-08-07 (Mon, 07 Aug 2023)
-
-  Changed paths:
-    M src/error.c
-    M src/error.h
-
-  Log Message:
-  -----------
-  error: Add "Invalid exchange" mapping
-
-This error is returned on this event:
-> HCI Event: Auth Complete (0x06) plen 3
-        Status: PIN or Key Missing (0x06)
-        Handle: 11 Address: 00:00:00:00:00:00 (OUI 00-00-00)
-
-
-  Commit: 59569c1f947d648f1e0b9234dad3707f6c34739b
-      https://github.com/bluez/bluez/commit/59569c1f947d648f1e0b9234dad3707f6c34739b
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-08-07 (Mon, 07 Aug 2023)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-
-  Log Message:
-  -----------
-  a2dp: Expose "Key missing" error
-
-This error is not expected and retries will likely end up with same error.
-
-
-Compare: https://github.com/bluez/bluez/compare/9665025cc042...59569c1f947d
