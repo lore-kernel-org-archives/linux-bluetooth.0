@@ -2,111 +2,126 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02ED5C41513
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 10:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02133EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 11:03:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230442AbjHGKlK (ORCPT
+        id S231576AbjHGLDn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 06:41:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57528 "EHLO
+        Mon, 7 Aug 2023 07:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229775AbjHGKlI (ORCPT
+        with ESMTP id S231778AbjHGLD2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 06:41:08 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85D9110FA;
-        Mon,  7 Aug 2023 03:41:05 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1qSxfX-000663-HB; Mon, 07 Aug 2023 12:40:59 +0200
-Message-ID: <d0a6b711-f683-0104-a1c8-09130a160861@leemhuis.info>
-Date:   Mon, 7 Aug 2023 12:40:58 +0200
+        Mon, 7 Aug 2023 07:03:28 -0400
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2079.outbound.protection.outlook.com [40.107.22.79])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F08E8
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 04:02:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OTY7VZyOWSPOKd/1qrgGEqmDrD748n4NcvpjGP4Y0Q/HQaT5wgvTYRbJOS7u7Ws1edPtN8zdKjc32xchQoxW0nThLkaiXMbzZ8iNDNkovG6teCWNYUgjHOeFNkZPT+DdtGkJgYLn3E+LvQFgFfT+lUVXHF9Ett8VJNFSeYhwx0IFSfHMemHdRBqbawVBoAtKvqrZDRhwsXuLFElUfOUv6xo7cXxXUI/kI1He0W5hG4ris6VMlokpax1vnL9T33MqUC6U7kEBEeK6AjVq0EcrTihcnVB66cql5koUgR8/9PEc151gXfDX8xr23aUYuNC4+5ztGa21XoyyHUzyiv61yw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UJN5xEpTPScwahccSgMdLFUcuasc8PgB1NwJx3Dj5dQ=;
+ b=YIlrbm3AZ27sMQPSL4iD2xDzK7G988lejxuVWaSh+Ek5jnK8t7FavRJX7iDzobhGUmU7jnq1KvnHDvMiHEdCEs9MKbH6VnGNWYcyx89t8xP7GTcPCs562TD/Mntcy2YL66C5MjlBe8Zj6TIYbwDoadCxk6/7U8qAHJDgbj0ofKSpAZTdQqUkTVAle/vv4pPyeX+wr6Ht/mGQCjn7F1WalFqLw8vCzWvbtNwHStodZebiM7VqkqnsEbP3f8lsRUa7CfIiRfn43NDxWXC3LpVaH2di4Y0Yc+AFnBUPQ2dq3Gw8ie3mtgJAWpC7WL+iC4U1eHsDU2q2dQdHrnyp/mo2Og==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UJN5xEpTPScwahccSgMdLFUcuasc8PgB1NwJx3Dj5dQ=;
+ b=WNOWOnowon2gZ1kT/WEQejw30TFxeGTbeDW5o7/hkWLdcKcHVggjtnfGejNwX/jAoP/AAO4B10UVSRE2306umSC9hDtrXuHiyUow8inK2MDcZTbJLIg931jFpqgM8TO3e7i0g4amcm6g/YaZSu0vYZmIXCaYe8TrR80/25HDWxk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VI1PR04MB5344.eurprd04.prod.outlook.com (2603:10a6:803:4b::31)
+ by DBBPR04MB8028.eurprd04.prod.outlook.com (2603:10a6:10:1e0::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.26; Mon, 7 Aug
+ 2023 11:02:45 +0000
+Received: from VI1PR04MB5344.eurprd04.prod.outlook.com
+ ([fe80::cf28:7578:cc46:bc2c]) by VI1PR04MB5344.eurprd04.prod.outlook.com
+ ([fe80::cf28:7578:cc46:bc2c%5]) with mapi id 15.20.6652.026; Mon, 7 Aug 2023
+ 11:02:45 +0000
+From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
+Subject: [PATCH v2 0/2] Configure BASE using separate structure
+Date:   Mon,  7 Aug 2023 14:02:22 +0300
+Message-Id: <20230807110224.6024-1-silviu.barbulescu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR07CA0001.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::14) To VI1PR04MB5344.eurprd04.prod.outlook.com
+ (2603:10a6:803:4b::31)
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for
- RTL8852C
-Content-Language: en-US, de-DE
-To:     Juerg Haefliger <juerg.haefliger@canonical.com>,
-        max.chou@realtek.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        alex_lu@realsil.com.cn, hildawu@realtek.com, karenhsu@realtek.com,
-        kidman@realtek.com, vicamo.yang@canonical.com, Riley.Kao@dell.com,
-        stable@vger.kernel.org, jwboyer@kernel.org, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        regressions@lists.linux.dev
-References: <20230807014415.12358-1-max.chou@realtek.com>
- <20230807120630.79b9e933@smeagol>
-From:   "Linux regression tracking (Thorsten Leemhuis)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <20230807120630.79b9e933@smeagol>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1691404865;526a6906;
-X-HE-SMSGID: 1qSxfX-000663-HB
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR04MB5344:EE_|DBBPR04MB8028:EE_
+X-MS-Office365-Filtering-Correlation-Id: 16f74bd7-bf90-45ef-1b71-08db9735d3f4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Fw4ofAJi+pdCVN2qW1JrEtTqwrT7gUoHQ5Kydxnjw8zQEqTWzhyflE85tNl5tA9ZjKUmr3uIqLHolrkrBWFjREXkhqCPoxtDmumLebsz3fcLN7+YwfyFfufh5ERgsWJHYVMMzvwBmTmHG8/Aln6deMpqgTTANDexDPnK2Uj6O3P1zTDNGvU9tbSMpAW/DQrN3wNG4BffJrLpZlRNYFGoKl/jc6dhnl6xhjStDygSbKJqzlpKgn9XZYwmK/NX2laDyWKRGpmWOhKEfH45MpKuKqTnlrujaSg2CUgTqdpr6H8nt7n0sKpcfo4YdHsyQ2qLMTjpjJUD1RYIFejq+QI4oYToRFsmvmHusl0Tn6yoyoU6Gu0UL/zcVjAkbhIx4BLxynv7VnZhdDDPFXfLRTd9h6A+z3TBwotKw/rqc6TpBs6Wx+cOmVIB3kMLfPBNVSA9uAHQHc483G53B8PMHME8sOQibMF0yIdafMPK4EL/fTk+Su86JkUFx8swwMxkBxPbOfe/4MD5Re69R/KU6QDgz+avyhZ/0fANlno41xL3VaccvLDjQTuu92dk0iaPLh65uJt0jOZeU5JXbBVWQsynj/W1aMzoWTV6ozMuJEUQfMMJEj3g77aM4QVFRKEkZufg
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(136003)(396003)(39860400002)(1800799003)(186006)(451199021)(1076003)(41300700001)(26005)(2906002)(5660300002)(83380400001)(8676002)(4744005)(8936002)(2616005)(6916009)(86362001)(316002)(6506007)(38350700002)(38100700002)(6486002)(66556008)(66476007)(52116002)(66946007)(6666004)(478600001)(6512007)(4326008)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8JG6Coz7iCvrXvxIXTCQ8M83/vof+KBqIUcRjALsvjf/iJb9CVsfrJcwcqZ0?=
+ =?us-ascii?Q?xPSS1feJ0Dd9NWTyWrx6ELx8QwOqT8BGrsAmGbGA8tdNKoAFDkfdleewvjKB?=
+ =?us-ascii?Q?H5pFzl8jxEfkhe3rhAaqyKMskRta1WSPsXMllaYdlTqN45okqw3D8mpmuNt3?=
+ =?us-ascii?Q?K1NJ1L8veflqWpeIe7vidXqk1qTEJQ0GJX00g9+oYJAefkqkc4RNaxBxje4C?=
+ =?us-ascii?Q?tCNIi5eMSsG0aH3Z064MFI8d9sz7B6SXY+eZTZbB69u7GLzN0AgqelgDeFLn?=
+ =?us-ascii?Q?EPZ93s3I6YPfhlSZPe/yhhu8gZarTQqYO8g6Vysp2GTYi35xgXHu6fWp4qJv?=
+ =?us-ascii?Q?JPe8z9sr6lshtixwnNidD6hQfiIBa/Zri2x21O8LAnfNt+rBKTxDgz6DJFAl?=
+ =?us-ascii?Q?4xv6Rp4xJC9XpLlEJEX325f0HtzAwtEKKNKAw83fQJET8HsCh0+mtpueun8K?=
+ =?us-ascii?Q?H7VUmviaEVUtBwAnJcwXpyLmNdjvBERzWLYl9RuWPYDpZR1sln9ZI8hliLe/?=
+ =?us-ascii?Q?eXqtFvAO6z2x7JAPGUzMc1JTCJINlM9LccnaLDRyaWQ//o4RsYAidPYJQ5aY?=
+ =?us-ascii?Q?JxkpEPvcz09uVsn5l0iaBz0YO0cmrkFpNfFRNdiy90ksu9fotAWXhCZEkxq7?=
+ =?us-ascii?Q?OLOQgkrC8AzUsFWZALS4/eggFquzpD03cykFaBw9nL6SIEKW7SVAooUizq9Q?=
+ =?us-ascii?Q?fqYB4+qPQaLGc2qfwQgkugLi4ad92zxWjWEwAGHoElHAUlH0uJLcDdUCOjFe?=
+ =?us-ascii?Q?Jj4J9/6zcYpCqxm89DqjNeEKxAXOVmGIESiNGoMyYtMfh57Ff9k3qSqZDd7W?=
+ =?us-ascii?Q?qZDO21z/ORiWS93JevfrB4BR3hHG30+IVsqUK7BF9VMB3Xhy5Biw2xQI8UDv?=
+ =?us-ascii?Q?yVpHqbTCgp9SDTnSqCaLnyHCbItaA5O3AGP8rkNhRsfTxqHD1q4GLRhBS8wx?=
+ =?us-ascii?Q?MpxvYcreSzZM/pB84H9awFTf1LFwvVJ+Sa+C4gv/G3Vk2xL/k7xUWN+KUg/p?=
+ =?us-ascii?Q?ZZV1OHg0Aqbc/ACD2pFvBpQT0DmsZbbTNLIK7WtOpSi9XCQZNjSt2FzgkeqN?=
+ =?us-ascii?Q?p4Ap4YaP0zKeUbEu0W9mRSgMmhasBQZECu2cmInxvL6yeE/Z2J1GVKImTgz7?=
+ =?us-ascii?Q?BRWJTodtNxRTHuX8gPd1xYWBgUH16x1uZ/Elqh5OBop7c8DLUW+rCe4+rXcv?=
+ =?us-ascii?Q?kpT0domGr+srDtKV38bn4fZ7CgB6sYiCCA7FWv30AJddnqOHRAbB+moz8l+y?=
+ =?us-ascii?Q?ZAQHPOiY/HTg0YkWkDPVToYAFbWffuEG4LRVRq+W4VPu35uE/S3zdgTTS5yH?=
+ =?us-ascii?Q?Cq5B+cjRBvWOdSHdovBXWCUQ6AkuS1R9PTMuuLu4suX0EQ/81nppIcfhxMJc?=
+ =?us-ascii?Q?NA1y29RQF1c50R72LjGCGH7j5li46ktLbzP4x96lxVWiX3tEdKO+N62WtVVa?=
+ =?us-ascii?Q?8HDXMiawSvsVhPyfuulC5Uts2MDWx2jDcdKkd7CVOsQU8sC8cveVxoTodJBF?=
+ =?us-ascii?Q?QWvFOs8EDPgdURbltkngIhrjlTRB4KjXCWrxqvQeW2nC2o4l4rNDhw1ZMqt+?=
+ =?us-ascii?Q?RLsvHuEAu+KPfUu2RU7pU5SMIgpOP9HLq3DQjNH0Y3Tcemn4X7sI7iXKqcBR?=
+ =?us-ascii?Q?AQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16f74bd7-bf90-45ef-1b71-08db9735d3f4
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5344.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2023 11:02:45.1013
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LZfcpFBwwSGcWZuogAeMMD4B78aB4VtQqI+ua+xtqoYMJcfAIMObVdujzpSDjQD6oVfmMI3mX3UDSLgX55Ootshqvk8E0NFOsk5EXb4EgP4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB8028
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 07.08.23 12:06, Juerg Haefliger wrote:
-> On Mon, 7 Aug 2023 09:44:15 +0800
-> <max.chou@realtek.com> wrote:
-> 
->> From: Max Chou <max.chou@realtek.com>
->>
->> In the commit of linux-firmware project, rtl8852cu_fw.bin is updated as
->> FW v2 format[1]. Consider the case that if driver did not be updated for
->> FW v2 supported[2], it can not use FW v2.
->> By Canonical's suggestion, older driver should be able to load FW v1,
->> so rtl8852cu_fw.bin will be revert to the previous commit as FW v1 and
->> add rtl8852cu_fw_v2.bin as FW v2. This item will be started on
->> linux-firmware project.
->>
->> In this commit, the driver prefers to load FW v2 if available. Fallback to
->> FW v1 otherwise.
->>
->> Note that the driver has supported to extract the data for v1 and v2
->> since the commit[1].
->> The previous FW format of RTL8852C is v1. After the commit[2], the FW
->> format was changed to v2. Only RTL8852C suffered the different FW formats,
->> so we will use rtl8852cu_fw.bin for the original commit as FW v1 and
->> rtl8852cu_fw_v2.bin for the future maintained as FW v2. Other Realtek
->> chips will not been impacted by this patch.
->>
->> To do on linux-firmware project after this commit.
->> 1. revert '55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
->>    to 0x040D_7225")'
->>    => rtl_bt/rtl8852cu_fw.bin: FW v1 (stay at ver. 0xD7B8_FABF)  
->> 2. Add a new commit for rtl8852cu_fw_v2.bin
->>    =>rtl_bt/rtl8852cu_fw_v2.bin: FW v2 (to be maintained)  
->>
->> Reference:
->> [1]'9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")'
->> [2]'55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
->>     to 0x040D_7225")'
-> 
-> IMO this commit message is too confusing. I don't think you need nor should
-> refer to linux-firmware commits and what happened in that repo. This commit
-> simply fixes the v2 support by trying to load a v2 file for certain chips
-> with a fall-back if fw is not found (or failed to load). That's all that
-> needs to be mentioned in the commit message.
+Use preset configuration in capabilities.
+Configure BASE using separate structure.
 
-/me totally agrees that this in confusing the way it is and needs to be
-simplified, but explaining things briefly with maybe a Link: to the
-linux-firmware commit in question might nevertheless be a good idea (YMMV)
+Claudia Draghicescu (2):
+  client/player: Use preset configuration in capabilities. Configure
+    BASE using separate structure
+  bap: Use the BASE structure received from upper layer
 
->> Fixes: '9a24ce5e29b ("Bluetooth: btrtl: Firmware format v2 support")'
-> 
-> No '' quotes.
+ client/player.c      | 24 +++++++++++++++++-------
+ profiles/audio/bap.c | 13 ++++++++++---
+ 2 files changed, 27 insertions(+), 10 deletions(-)
 
-Max Chou, you could have just picked the two tags I mentioned earlier
-just without the space in front of it[1]. If you do so the 0-day robot
-will also stop complaining, as you apparently misunderstood what I meant
-with stable tag; [2] explains this.
 
-Ciao, Thorsten
+base-commit: 80107630396d3d3a3984c599e0cb9b015be0499c
+-- 
+2.34.1
 
-[1]
-https://lore.kernel.org/all/f11ba0ef-0bb1-b925-3088-2ba7a8d17393@leemhuis.info/
-[2] https://docs.kernel.org/process/stable-kernel-rules.html
