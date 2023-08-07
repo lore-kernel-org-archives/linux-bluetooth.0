@@ -2,110 +2,434 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8873FEB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 07:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A597EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 10:06:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229965AbjHGHf7 (ORCPT
+        id S231388AbjHGKGl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 03:35:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41960 "EHLO
+        Mon, 7 Aug 2023 06:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbjHGHf6 (ORCPT
+        with ESMTP id S229581AbjHGKGk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 03:35:58 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB9410FD
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 00:35:58 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id af79cd13be357-76cdf055c64so374558685a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 00:35:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691393757; x=1691998557;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fGPgqzxxNlEWA1Oj89+poKYMK7N8oaF0g+JmhxFXViA=;
-        b=B3eCeXS+oFd1jHdsrlFw5emTRHfowefLV3zVRQCkqNDbX1W918r1FiLUx3mwFT+fmT
-         dEFp6OGi4KNz+lLmbAMK03mrx+ty4NwXHi5s9WJjjJPzwZ2gdpvtTb4YK6K7CJ8iwvW3
-         QzxwCUksPWqMb6YqbavuPS1jWJ0DN0x1y9MxfcR0UKc8jKJhsao/QqMDkB5bMKZSOJ2h
-         YHMv+wmiQDNXBMgax+Z5eEJ+AT2c/mk1VtHBmqN+2fCwiYHTy+l7LB0Vzj+TW7nAsvRs
-         Of/jssBhPJmY1voSLRWu/i2rExvEwHtE5G6eMdlC9rFxDxk5VOmAQR81I0G0rjY+3sJe
-         bbNQ==
+        Mon, 7 Aug 2023 06:06:40 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6AAF9
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 03:06:38 -0700 (PDT)
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com [209.85.208.200])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 517B6417BB
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 10:06:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1691402796;
+        bh=tiBd4FV24pTIyw+lEOPD46vPQPAgrmVT10F9gyKM1yo=;
+        h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+         MIME-Version:Content-Type;
+        b=VACVweLbaLO7r+GLA8JnBlZbVKnVtEdaBF8djECwDDZHoT5jGwPzkBaPeMpjcMeDj
+         U6qcf9J7U0L+CsP9bYCmhOJ7xjoStQ5KeXp1HNIT4obBQ2AtgID2sIFfYaq56pG118
+         f39R6d1+RnyRmdgZXCLvQN6R5Vc2oKRhxe5qbkEXVyQNfO1s2ATV2VqQs/RQCYO1//
+         E7diYmThwvcPUxZJt4F7dDuPaZhZeKbRqIkVvTtRqotULP6RGqZAdqwuMDBYkMSoPh
+         7TS+hU+ai4XdFy3ch/r4Db8J/slCj/bKSt5i482Z8pZ9Eb3S75S/hkuizAox0zxWuC
+         GT9ot+Cv+PL1A==
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2b9dc1bfdd2so45437771fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 03:06:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691393757; x=1691998557;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fGPgqzxxNlEWA1Oj89+poKYMK7N8oaF0g+JmhxFXViA=;
-        b=lst7egpzF3kqrFymxWCftX6/2x0VPca68vMEYHaHSvYAw3+T442zpdytlki99a70KI
-         wxTJnIrol3kXl3R9mecRiLNqtTP/snfY0Yk993Sx6aaNHx11mlEOfjLWit97atKAxrXN
-         WJjei9ILsskZ3TPG5ayI9q95hyjz0jdiF8e1osldYnUE2rnDit+3kXLYCs6A/vNps6L+
-         xCnp1OYjeK2uabgOJS3UycMEMa9f2QAS8yqDDXwTLcqocd/I+EWYyxSPuNzMIis+Ovs3
-         aBHXHldR/lDrkNhxgHO54v7HYNZNgas46+FElzkTm5ALvrJJKTd6kjnb7rvPmgDcE3xj
-         rMyA==
-X-Gm-Message-State: AOJu0Yzp1PL/s0cxTEL0lDAbczNhdFDal31FKU7HgTWtMRkFp/z0HklP
-        kqJIN+PQGArK5PSeyYc1I4VQN/Up+6Rufg==
-X-Google-Smtp-Source: AGHT+IHlZVG6gFTyup19c7wxH/8K2W7E+nGwAAoZKXt18gvKpbECKvzr5tAoFHldQo7y2ZC74rkF/w==
-X-Received: by 2002:a05:620a:4513:b0:767:e9aa:5d51 with SMTP id t19-20020a05620a451300b00767e9aa5d51mr11882492qkp.3.1691393757058;
-        Mon, 07 Aug 2023 00:35:57 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.69.195])
-        by smtp.gmail.com with ESMTPSA id n19-20020a0ce553000000b00636e767d445sm2680282qvm.62.2023.08.07.00.35.56
+        d=1e100.net; s=20221208; t=1691402793; x=1692007593;
+        h=mime-version:organization:references:in-reply-to:message-id:subject
+         :cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tiBd4FV24pTIyw+lEOPD46vPQPAgrmVT10F9gyKM1yo=;
+        b=JxuFtG+f1Su+rMe/2TKSrBM3oezyZ/ypNdHLeFX40E1ZjG+LVMHpgOa4VIpuiSHPci
+         8aj3ZtHmMUeBN7uTV36aBqmsBv1g1k4ODq7JPh+9TCkIkfRgAxenAvL0HAKhlaNzYYBz
+         q85IM8WAic/zedYRF9anWllPYhv3pdb6ga7l0V0Haq/ELvAEL3OacIkE5HShRlEwOCrU
+         KFEQbr1PHJVgWbVoOgoUMYmiVdJi1YxjUUHl1tcr4lcgLSgoYqlktpF0DGi5ViS7PXEp
+         70KXzDTaIk7QD6DJVzexXQdXOvtUdkf9TpaLn17vlYrr7r+9t8fatJoxpjfoeFDDGNPn
+         XL1Q==
+X-Gm-Message-State: AOJu0YzQMP8ThT32QsaJ1llm8GA8dzpWBV+zPOjyDKnBW8unn9XzyxDb
+        ZCOOQTE141MSbBZxJg/HE7PAtO5YWhI/NoXeyg1QHMtwOenePjt/cO6fYoz77llk4IIMXz6ImeF
+        5095utmNBbHQU5VjKtVF+q8KHZKJEOG1zMFehcqCJrxPL8g==
+X-Received: by 2002:a05:651c:1030:b0:2b9:e230:25ce with SMTP id w16-20020a05651c103000b002b9e23025cemr5820423ljm.12.1691402793574;
+        Mon, 07 Aug 2023 03:06:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0JrQw6Apt/haUT8sfawDGDhXFni9hmPq0KuqW+fbQkSnP6PkyiajBrVGgi+QU0zeG/z7Chw==
+X-Received: by 2002:a05:651c:1030:b0:2b9:e230:25ce with SMTP id w16-20020a05651c103000b002b9e23025cemr5820397ljm.12.1691402793109;
+        Mon, 07 Aug 2023 03:06:33 -0700 (PDT)
+Received: from smeagol ([194.191.244.86])
+        by smtp.gmail.com with ESMTPSA id l26-20020a1c791a000000b003fbb06af219sm10197710wme.32.2023.08.07.03.06.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Aug 2023 00:35:56 -0700 (PDT)
-Message-ID: <64d09edc.0c0a0220.d135c.8e42@mx.google.com>
-Date:   Mon, 07 Aug 2023 00:35:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0715385763793986420=="
+        Mon, 07 Aug 2023 03:06:32 -0700 (PDT)
+Date:   Mon, 7 Aug 2023 12:06:30 +0200
+From:   Juerg Haefliger <juerg.haefliger@canonical.com>
+To:     <max.chou@realtek.com>
+Cc:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <alex_lu@realsil.com.cn>,
+        <hildawu@realtek.com>, <karenhsu@realtek.com>,
+        <kidman@realtek.com>, <vicamo.yang@canonical.com>,
+        <Riley.Kao@dell.com>, <stable@vger.kernel.org>,
+        <jwboyer@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>,
+        <regressions@lists.linux.dev>
+Subject: Re: [PATCH v3] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for
+ RTL8852C
+Message-ID: <20230807120630.79b9e933@smeagol>
+In-Reply-To: <20230807014415.12358-1-max.chou@realtek.com>
+References: <20230807014415.12358-1-max.chou@realtek.com>
+Organization: Canonical Ltd
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_rjliao@quicinc.com
-Subject: RE: [v1] Bluetooth: btusb: add shutdown function for QCA6174
-In-Reply-To: <20230807064626.980-1-quic_rjliao@quicinc.com>
-References: <20230807064626.980-1-quic_rjliao@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/ycLv.MY4m=zxGSdbwkiRmra";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0715385763793986420==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+--Sig_/ycLv.MY4m=zxGSdbwkiRmra
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This is automated email and please do not reply to this email!
+On Mon, 7 Aug 2023 09:44:15 +0800
+<max.chou@realtek.com> wrote:
 
-Dear submitter,
+> From: Max Chou <max.chou@realtek.com>
+>=20
+> In the commit of linux-firmware project, rtl8852cu_fw.bin is updated as
+> FW v2 format[1]. Consider the case that if driver did not be updated for
+> FW v2 supported[2], it can not use FW v2.
+> By Canonical's suggestion, older driver should be able to load FW v1,
+> so rtl8852cu_fw.bin will be revert to the previous commit as FW v1 and
+> add rtl8852cu_fw_v2.bin as FW v2. This item will be started on
+> linux-firmware project.
+>=20
+> In this commit, the driver prefers to load FW v2 if available. Fallback to
+> FW v1 otherwise.
+>=20
+> Note that the driver has supported to extract the data for v1 and v2
+> since the commit[1].
+> The previous FW format of RTL8852C is v1. After the commit[2], the FW
+> format was changed to v2. Only RTL8852C suffered the different FW formats,
+> so we will use rtl8852cu_fw.bin for the original commit as FW v1 and
+> rtl8852cu_fw_v2.bin for the future maintained as FW v2. Other Realtek
+> chips will not been impacted by this patch.
+>=20
+> To do on linux-firmware project after this commit.
+> 1. revert '55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
+>    to 0x040D_7225")'
+>    =3D> rtl_bt/rtl8852cu_fw.bin: FW v1 (stay at ver. 0xD7B8_FABF) =20
+> 2. Add a new commit for rtl8852cu_fw_v2.bin
+>    =3D>rtl_bt/rtl8852cu_fw_v2.bin: FW v2 (to be maintained) =20
+>=20
+> Reference:
+> [1]'9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")'
+> [2]'55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
+>     to 0x040D_7225")'
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=773521
+IMO this commit message is too confusing. I don't think you need nor should
+refer to linux-firmware commits and what happened in that repo. This commit
+simply fixes the v2 support by trying to load a v2 file for certain chips
+with a fall-back if fw is not found (or failed to load). That's all that
+needs to be mentioned in the commit message.
 
----Test result---
+> Fixes: '9a24ce5e29b ("Bluetooth: btrtl: Firmware format v2 support")'
 
-Test Summary:
-CheckPatch                    PASS      0.69 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      32.81 seconds
-CheckAllWarning               PASS      37.48 seconds
-CheckSparse                   PASS      41.82 seconds
-CheckSmatch                   PASS      115.30 seconds
-BuildKernel32                 PASS      32.91 seconds
-TestRunnerSetup               PASS      491.93 seconds
-TestRunner_l2cap-tester       PASS      22.64 seconds
-TestRunner_iso-tester         PASS      45.30 seconds
-TestRunner_bnep-tester        PASS      10.06 seconds
-TestRunner_mgmt-tester        PASS      211.85 seconds
-TestRunner_rfcomm-tester      PASS      15.51 seconds
-TestRunner_sco-tester         PASS      18.68 seconds
-TestRunner_ioctl-tester       PASS      17.34 seconds
-TestRunner_mesh-tester        PASS      12.66 seconds
-TestRunner_smp-tester         PASS      13.71 seconds
-TestRunner_userchan-tester    PASS      10.93 seconds
-IncrementalBuild              PASS      31.13 seconds
+No '' quotes.
+
+...Juerg
 
 
+> Suggested-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+> Tested-by: Hilda Wu <hildawu@realtek.com>
+> Signed-off-by: Max Chou <max.chou@realtek.com>
+>=20
+> ---
+> Changes in v2:
+> - Fix commit log for CheckPatch FAIL
+>=20
+> Changes in v2:
+> - Tuning the code for more readable. Thanks Juerg!
+> - Modify the commit log.
+> ---
+>  drivers/bluetooth/btrtl.c | 70 +++++++++++++++++++++++++--------------
+>  1 file changed, 45 insertions(+), 25 deletions(-)
+>=20
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index ddae6524106d..84c2c2e1122f 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -104,7 +104,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D false,
+> -	  .fw_name =3D "rtl_bt/rtl8723a_fw.bin",
+> +	  .fw_name =3D "rtl_bt/rtl8723a_fw",
+>  	  .cfg_name =3D NULL,
+>  	  .hw_info =3D "rtl8723au" },
+> =20
+> @@ -112,7 +112,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_UART),
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723bs_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723bs_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723bs_config",
+>  	  .hw_info  =3D "rtl8723bs" },
+> =20
+> @@ -120,7 +120,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723b_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723b_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723b_config",
+>  	  .hw_info  =3D "rtl8723bu" },
+> =20
+> @@ -132,7 +132,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .hci_bus =3D HCI_UART,
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723cs_cg_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723cs_cg_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723cs_cg_config",
+>  	  .hw_info  =3D "rtl8723cs-cg" },
+> =20
+> @@ -144,7 +144,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .hci_bus =3D HCI_UART,
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723cs_vf_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723cs_vf_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723cs_vf_config",
+>  	  .hw_info  =3D "rtl8723cs-vf" },
+> =20
+> @@ -156,7 +156,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .hci_bus =3D HCI_UART,
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723cs_xx_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723cs_xx_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723cs_xx_config",
+>  	  .hw_info  =3D "rtl8723cs" },
+> =20
+> @@ -164,7 +164,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723d_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723d_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723d_config",
+>  	  .hw_info  =3D "rtl8723du" },
+> =20
+> @@ -172,7 +172,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8723ds_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8723ds_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8723ds_config",
+>  	  .hw_info  =3D "rtl8723ds" },
+> =20
+> @@ -180,7 +180,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8821a_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8821a_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8821a_config",
+>  	  .hw_info  =3D "rtl8821au" },
+> =20
+> @@ -189,7 +189,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8821c_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8821c_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8821c_config",
+>  	  .hw_info  =3D "rtl8821cu" },
+> =20
+> @@ -198,7 +198,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8821cs_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8821cs_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8821cs_config",
+>  	  .hw_info  =3D "rtl8821cs" },
+> =20
+> @@ -206,7 +206,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8761a_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8761a_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8761a_config",
+>  	  .hw_info  =3D "rtl8761au" },
+> =20
+> @@ -215,7 +215,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8761b_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8761b_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8761b_config",
+>  	  .hw_info  =3D "rtl8761btv" },
+> =20
+> @@ -223,7 +223,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8761bu_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8761bu_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8761bu_config",
+>  	  .hw_info  =3D "rtl8761bu" },
+> =20
+> @@ -232,7 +232,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8822cs_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8822cs_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8822cs_config",
+>  	  .hw_info  =3D "rtl8822cs" },
+> =20
+> @@ -241,7 +241,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8822cs_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8822cs_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8822cs_config",
+>  	  .hw_info  =3D "rtl8822cs" },
+> =20
+> @@ -250,7 +250,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8822cu_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8822cu_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8822cu_config",
+>  	  .hw_info  =3D "rtl8822cu" },
+> =20
+> @@ -259,7 +259,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8822b_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8822b_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8822b_config",
+>  	  .hw_info  =3D "rtl8822bu" },
+> =20
+> @@ -268,7 +268,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8852au_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8852au_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8852au_config",
+>  	  .hw_info  =3D "rtl8852au" },
+> =20
+> @@ -277,7 +277,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D true,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8852bs_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8852bs_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8852bs_config",
+>  	  .hw_info  =3D "rtl8852bs" },
+> =20
+> @@ -286,7 +286,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8852bu_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8852bu_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8852bu_config",
+>  	  .hw_info  =3D "rtl8852bu" },
+> =20
+> @@ -295,7 +295,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D true,
+> -	  .fw_name  =3D "rtl_bt/rtl8852cu_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8852cu_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8852cu_config",
+>  	  .hw_info  =3D "rtl8852cu" },
+> =20
+> @@ -304,7 +304,7 @@ static const struct id_table ic_id_table[] =3D {
+>  	  .config_needed =3D false,
+>  	  .has_rom_version =3D true,
+>  	  .has_msft_ext =3D false,
+> -	  .fw_name  =3D "rtl_bt/rtl8851bu_fw.bin",
+> +	  .fw_name  =3D "rtl_bt/rtl8851bu_fw",
+>  	  .cfg_name =3D "rtl_bt/rtl8851bu_config",
+>  	  .hw_info  =3D "rtl8851bu" },
+>  	};
+> @@ -1045,6 +1045,7 @@ struct btrtl_device_info *btrtl_initialize(struct h=
+ci_dev *hdev,
+>  	struct sk_buff *skb;
+>  	struct hci_rp_read_local_version *resp;
+>  	struct hci_command_hdr *cmd;
+> +	char fw_name[40];
+>  	char cfg_name[40];
+>  	u16 hci_rev, lmp_subver;
+>  	u8 hci_ver, lmp_ver, chip_type =3D 0;
+> @@ -1154,8 +1155,26 @@ struct btrtl_device_info *btrtl_initialize(struct =
+hci_dev *hdev,
+>  			goto err_free;
+>  	}
+> =20
+> -	btrtl_dev->fw_len =3D rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
+> -					  &btrtl_dev->fw_data);
+> +	if (!btrtl_dev->ic_info->fw_name) {
+> +		ret =3D -ENOMEM;
+> +		goto err_free;
+> +	}
+> +
+> +	btrtl_dev->fw_len =3D -EIO;
+> +	if (lmp_subver =3D=3D RTL_ROM_LMP_8852A && hci_rev =3D=3D 0x000c) {
+> +		snprintf(fw_name, sizeof(fw_name), "%s_v2.bin",
+> +				btrtl_dev->ic_info->fw_name);
+> +		btrtl_dev->fw_len =3D rtl_load_file(hdev, fw_name,
+> +				&btrtl_dev->fw_data);
+> +	}
+> +
+> +	if (btrtl_dev->fw_len < 0) {
+> +		snprintf(fw_name, sizeof(fw_name), "%s.bin",
+> +				btrtl_dev->ic_info->fw_name);
+> +		btrtl_dev->fw_len =3D rtl_load_file(hdev, fw_name,
+> +				&btrtl_dev->fw_data);
+> +	}
+> +
+>  	if (btrtl_dev->fw_len < 0) {
+>  		rtl_dev_err(hdev, "firmware file %s not found",
+>  			    btrtl_dev->ic_info->fw_name);
+> @@ -1491,4 +1510,5 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
+>  MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
+>  MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
+>  MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
+> +MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
+>  MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
 
----
-Regards,
-Linux Bluetooth
 
+--Sig_/ycLv.MY4m=zxGSdbwkiRmra
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
---===============0715385763793986420==--
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEhZfU96IuprviLdeLD9OLCQumQrcFAmTQwiYACgkQD9OLCQum
+Qrdl1xAAh9eK8IPvSD/Id5Kvfl7sJ3IiKybrK09SXp9H+V4EPuMELlHIjjuZ1FDU
+EeTJSeP0vy3ron+Ckgs4NlGEY1oZhdNb6XMNhbzSS/uRaswO/K5LJg8f+PujfQ7B
+/RaxTAcNU+DBO4vUaFT9/2QEsa9xRz7dKP87Sfca00HxgBkw20EvFQ1x9Go1AkKD
+mH/ms1XQ9C9eC7j5N0Co3M3Sp13m9stxZqDVXQAqziIiKk/t7EsRc0lLHFRhndtA
+DxhMojzyscGq4uEcXD7nBM4U7IP4hXOQhUtnoLIa0U6Hp8pO8wgOvP574XWjgWKu
+qfDBhKr/cbjFhJKsfXDbYtbOUI+PT7a+lfyu+Hnjq5cxlirg9HO+UP+CBjrEL7q4
+2icumMW/QVCBZZryMOUd92JS/52SlcuJj9Gnf2GEOnz8ppfiNltzwVUGPQaxydBD
+D7wE8SlZzlZM9TnS/y59+A15YhCKrKU9CP5LxxXsNHKtjMH7LoM4BuMbpYcJtaic
+D48YVwpTZ4bJTyRWOaNbKIYkoHjqe0tB/ZI6phePNwjnDajc1LNzwx7dpWd+hW/+
+AjPE2hN2AW3A4nNr2q7AFygkYCHxI6jLNXpDVWJ6ouv81UqwZEieneE4K+ifWXUA
+vYKUl5JLcKTe0PNU2SeG9SMCe0g9NDgm8lS9Ih+wHcSop4vxiXY=
+=9qNN
+-----END PGP SIGNATURE-----
+
+--Sig_/ycLv.MY4m=zxGSdbwkiRmra--
