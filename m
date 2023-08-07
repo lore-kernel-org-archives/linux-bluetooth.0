@@ -2,95 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C190C04A94
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 06:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E93EB64DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 07:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbjHGGrL (ORCPT
+        id S231559AbjHGHRD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 02:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46412 "EHLO
+        Mon, 7 Aug 2023 03:17:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230235AbjHGGrK (ORCPT
+        with ESMTP id S231542AbjHGHQz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 02:47:10 -0400
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA281B5;
-        Sun,  6 Aug 2023 23:47:09 -0700 (PDT)
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3774n87B022868;
-        Mon, 7 Aug 2023 06:47:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=qcppdkim1;
- bh=VuqF2i1KSXv2OuTyKvF7D6u9nEHqYt6V7gK2npJup9I=;
- b=bMfL8VYMqwqf8A4rMSA3yNA+6gAZo0uD3UqjgZTbkjzHmOkkZ6qPQpmfT9yuRFa5S66T
- MmM7O1bQ99splaZDpecb3MgvPvRyURhzf2lN9EcRXuDsgP/1t442v9gcJ/jzjmSJfzgk
- 1SOReddDtWikarl7RXqwlzUiGlZgg7C6razU7I2T20OWkS2PIDnxLnZr42yKlnUnSEed
- 7MVmrPrxh2hbugcbKw3FKu1joTEAncgteU0fG1kcVbnopHoxL2GlQ7toGhHW+642N+Z/
- fIE/igj6OyA19QJBMKTmOVBXo193VW3rdaUSJk/WSHQWLJXv1+YsvJ78TJx1Il0fe6x1 ig== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3s9drrjsd7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Aug 2023 06:47:06 +0000
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-        by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3776klkI008408
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 7 Aug 2023 06:46:47 GMT
-Received: from rjliao1.ap.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sun, 6 Aug 2023 23:46:45 -0700
-From:   Rocky Liao <quic_rjliao@quicinc.com>
-To:     <marcel@holtmann.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        Rocky Liao <quic_rjliao@quicinc.com>
-Subject: [PATCH v1] Bluetooth: btusb: add shutdown function for QCA6174
-Date:   Mon, 7 Aug 2023 14:46:26 +0800
-Message-ID: <20230807064626.980-1-quic_rjliao@quicinc.com>
-X-Mailer: git-send-email 2.38.1.windows.1
+        Mon, 7 Aug 2023 03:16:55 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F13BE1703
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 00:16:51 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-63f80abbbb9so9991976d6.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 00:16:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691392611; x=1691997411;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DV/yHzroZxSVTmf0gfJT5JNn0LqXL1RjLQnvV3bgmbg=;
+        b=p5kMyvQAgMd1GmFXVLpxsxKZm6N2a7xm2iMM+5Xj0oRINUhFEEefbGWdpQUC7+zNQs
+         F9DCV4Z+OMxGPMBeyeNhIEAnj9n++p4IzueSNxAk1Mf858sRRkF52Aavc951WvBvgBBH
+         lsBH6cU8tcKJ4cunLMoyv/+PLr9eD7+lM+Qq3iq6vHB+tTwy+AA7vPJu2Hhz7EpC92e8
+         gUvc65+/uk10VrXRs8XogW9HCVsY88emxbBs3Xh09MT5IqNNFBsrqZYz70CkjJZhFftm
+         iN4pZYFku5YraN2+2DCVfiJYIeDEkK7Rt8IGTc8yOrbd/1B+LZwqbkvtyYzhT10El2q5
+         VU1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691392611; x=1691997411;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DV/yHzroZxSVTmf0gfJT5JNn0LqXL1RjLQnvV3bgmbg=;
+        b=BA2ykP2CwIcZPi6vTygrbrxCxp36Ym9tJnC934XxUGqlm5EaaIimvuNGBD79PUXDNe
+         MbLE1poH/iW5noCapinxmLkDGvM642pPlxdqTk4AwdkqpHRNIEVPDRatIqbX8R7GEjmJ
+         SUIWL4CgsfnDmFc3fnsS+9NxXciokZkIQr41jEMhZmYrcSCQntT/VcBxOu6J0zb6P8am
+         0Hco2xICjgdHi3HTrouLp7OIGtQlXybctDE3ieAe8F0oXIJSpiCQ8gRjNV5zWFQLE0NM
+         rBkFzJFKCvGrVTLIVQpYAvqsFVtUln0svvugAikKCNXG9jBmZAil2+Rfnmo5IcT8UiP6
+         HVMg==
+X-Gm-Message-State: AOJu0YzorcyIIZ0WS52Tt0+C2y4aWDcnMhVsAHagOnuxZkuAHVGNGJ/e
+        MX6+lk2tYYjcIEGViFS8LyC1dHGx4G0=
+X-Google-Smtp-Source: AGHT+IH/mi3nn3ROdj4ruOwYL6Q+/l+PN0VpwSRMGPVTHnNPbdXzmxAu8Y/TYdM2CGccqHyxU+linQ==
+X-Received: by 2002:a0c:e3d4:0:b0:636:afa1:345e with SMTP id e20-20020a0ce3d4000000b00636afa1345emr8406808qvl.12.1691392611026;
+        Mon, 07 Aug 2023 00:16:51 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.14.209])
+        by smtp.gmail.com with ESMTPSA id z5-20020a0cf245000000b00635ef3a34ebsm2662176qvl.48.2023.08.07.00.16.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 00:16:50 -0700 (PDT)
+Message-ID: <64d09a62.0c0a0220.89ff6.909e@mx.google.com>
+Date:   Mon, 07 Aug 2023 00:16:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2124434574110648831=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: INAKSMYEn5psaL1htd92bBye8XfdcArX
-X-Proofpoint-GUID: INAKSMYEn5psaL1htd92bBye8XfdcArX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-08-07_03,2023-08-03_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- phishscore=0 mlxlogscore=999 adultscore=0 spamscore=0 clxscore=1011
- bulkscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2306200000 definitions=main-2308070062
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, karl.bieber@proton.me
+Subject: RE: main: Fix missing comma
+In-Reply-To: <20230807054108.234233-2-karl.bieber@proton.me>
+References: <20230807054108.234233-2-karl.bieber@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We should send hci reset command before bt turn off, which can reset bt
-firmware status.
+--===============2124434574110648831==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Rocky Liao <quic_rjliao@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=773494
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.34 seconds
+BuildEll                      PASS      27.53 seconds
+BluezMake                     PASS      868.93 seconds
+MakeCheck                     PASS      12.56 seconds
+MakeDistcheck                 PASS      158.28 seconds
+CheckValgrind                 PASS      258.62 seconds
+CheckSmatch                   PASS      344.39 seconds
+bluezmakeextell               PASS      104.23 seconds
+IncrementalBuild              PASS      714.51 seconds
+ScanBuild                     PASS      1074.26 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1bb3b09013b0..ac4d8cf831df 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4419,6 +4419,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	if (id->driver_info & BTUSB_QCA_ROME) {
- 		data->setup_on_usb = btusb_setup_qca;
-+		hdev->shutdown = btusb_shutdown_qca;
- 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
- 		hdev->cmd_timeout = btusb_qca_cmd_timeout;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
--- 
-2.38.1.windows.1
 
+--===============2124434574110648831==--
