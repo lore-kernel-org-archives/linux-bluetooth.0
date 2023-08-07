@@ -2,943 +2,431 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 548A3C001B0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 20:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B253EC41513
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 21:58:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230518AbjHGUDO (ORCPT
+        id S230196AbjHGV6c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 16:03:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50428 "EHLO
+        Mon, 7 Aug 2023 17:58:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230349AbjHGUDN (ORCPT
+        with ESMTP id S229699AbjHGV6b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 16:03:13 -0400
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48AEB1
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 13:03:10 -0700 (PDT)
-Received: from github.com (hubbernetes-node-5a3d514.ash1-iad.github.net [10.56.151.23])
-        by smtp.github.com (Postfix) with ESMTPA id EA5A4101228
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 13:03:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1691438590;
-        bh=b1mKEM3BRHjT0kcEpO2I25tjjNKZBb3Dkol2WO3fQM0=;
-        h=Date:From:To:Subject:From;
-        b=VjBB8GtA19K/TYmGWgqzPRIXn+C/zePVhTM6MReEsqWnusIagrJaLJY0xL1CD8U3a
-         meZFkp/aJVDDzGhluzVrLpv2nxO52HIo1KYCsgm3yq86MPm5sqOiR5tm8xPCaT32Dt
-         llsB0jopRUZTc9XQzquJdl9Xjd1qs1FlZ+wpdvFU=
-Date:   Mon, 07 Aug 2023 13:03:09 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
+        Mon, 7 Aug 2023 17:58:31 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68C6FC1
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 14:58:29 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1bc7e65ea44so2021645ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 14:58:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691445508; x=1692050308;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6SOAVMqMpOLZsaLwtI1hyIAM2BcgaSxDZZkckTXhdA8=;
+        b=Iog0LGrXRrX3bJrFDTk6aKBQ318v1Fyiy9SqbAkSIqfUMHy4b8IdHfJdz0Zfdvx40e
+         Zzmt7tZxSYXWWzjSNepOOzGO6Zxzc+VCt5fIkeAB3AMtvL6BrLKBjKnbATXruq1ThTuH
+         U3oNB25qeH1ktkfImC4rmTnE0eICnJijkxXF/A9PFiV1QZ0OAnHeBTl2hGTVXb4WTb3v
+         MqJkXi3SgxMd7d0Elh+G4x7HLm71fZ/1p13lY623MyRPPJdT73TCBnm9MbpaUz+Zb66P
+         yGddtvIrbJxZ51EExlIQCH3/t4F3LED4KRMHvgVTk42vcLnPxyJNw0bJeHdsZnJWjQO0
+         B2sA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691445508; x=1692050308;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6SOAVMqMpOLZsaLwtI1hyIAM2BcgaSxDZZkckTXhdA8=;
+        b=SYLDRRLg/z5hSO5vjLoqlIlahd9WMoDe0LOOq/CWZKkgsshLGcaE6mnt5A9C7oNzDZ
+         Qvsid05OiGLlfMArGWxRuUPthM4yKvgtfxFySoMJu8CG6wC6BmgLrVotGfl3pXnHRjVC
+         57mkTUTAKJt7RqsYJNT6epaeeP+iNhbDIerU+urkQsiSXlbwb/xTdyViVs0tUSBei9e4
+         oX5AV80dIAEbzMMrAG4IQSeTdDxrC0wilrPhO9QT3StUioecuonl00JrARd8LJE/79iP
+         obQIbGKZ2kgZdhRDhoU9z3lVzab9zgq+Tife9zeyCS9WPo+7mF2+pK8WzDUie2rxo4bc
+         uu8Q==
+X-Gm-Message-State: AOJu0Yz+YY4hWWmYgiHBIvko3ktIs1Y1mMg90dK6DyrfyMX1aptOCnG7
+        yWTbyABQO+gPiyOrKqqgrMITw0lXL0s=
+X-Google-Smtp-Source: AGHT+IHrcqUTGGpHUb1kX4E4tVtnhPQnMmQRB/K8tzrnkQNWclbAVJwkRV3Bh+U3owtYXht1u1i4tw==
+X-Received: by 2002:a17:902:a3c8:b0:1b8:8702:1e7c with SMTP id q8-20020a170902a3c800b001b887021e7cmr8391148plb.33.1691445507916;
+        Mon, 07 Aug 2023 14:58:27 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
+        by smtp.gmail.com with ESMTPSA id kb14-20020a170903338e00b001bbbc655ca1sm7382986plb.219.2023.08.07.14.58.26
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Aug 2023 14:58:26 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d8ca06-966502@github.com>
-Subject: [bluez/bluez] 06ec4f: shared/vcp: Fix the crash observed with VOCS
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Subject: [PATCH BlueZ] monitor: Plot RX information with -a/--analyze
+Date:   Mon,  7 Aug 2023 14:58:25 -0700
+Message-ID: <20230807215825.1251961-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 06ec4f61000aad92df33ff7d95df0594136797b6
-      https://github.com/bluez/bluez/commit/06ec4f61000aad92df33ff7d95df0=
-594136797b6
-  Author: Nitin Jadhav <nitin.jadhav@nxp.com>
-  Date:   2023-07-25 (Tue, 25 Jul 2023)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  shared/vcp: Fix the crash observed with VOCS
-
-Root cause
-- There are two types of database- Remote and Local (rdb and ldb).
-- In client mode currently the code was written to access ldb.
-
-Fix
-- Correcting it, to access rdb has resolved the problem in VOCS.
-- Same correction is done for VCS.
-
-Reported-by: Pauli Virtanen <pav@iki.fi>
-
-
-  Commit: 2a0e392b40fae902ebf4d789a0456df020bbcc16
-      https://github.com/bluez/bluez/commit/2a0e392b40fae902ebf4d789a0456=
-df020bbcc16
-  Author: Nitin Jadhav <nitin.jadhav@nxp.com>
-  Date:   2023-07-25 (Tue, 25 Jul 2023)
-
-  Changed paths:
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  shared/vcp: Fix issues of audio location and descriptor
-
-Issues
-- Audio output descriptor & location read functions requires code
-correction.
-- During reading audio location descriptor value was checked
-instead of the pointer. DBG statement wrongly accessed value
-to print the log that caused the crash.
-
-Fix
-- Corrected audio output descriptor read variable
-- Corrected the audio location debug printing function
-- Allocated the memory as a char pointer to the audio descriptor variable=
-.
-- Corrected the audio descriptor pointer checking condition
-
-
-  Commit: 4d714becb7df1fd928340ffc5b9a759f9a625c47
-      https://github.com/bluez/bluez/commit/4d714becb7df1fd928340ffc5b9a7=
-59f9a625c47
-  Author: Nitin Jadhav <nitin.jadhav@nxp.com>
-  Date:   2023-07-25 (Tue, 25 Jul 2023)
-
-  Changed paths:
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  shared/vcp: Reserve one more handle in VCS for VOCS
-
-Fix: As per specs, VOCS is a secondary service;
-hence it should be included under a primary service VCS.
-The current number of handles is increased to accommodate the
-included service
-
-
-  Commit: c7276fa7cf3399affeb5fc0abe32d8884017e76b
-      https://github.com/bluez/bluez/commit/c7276fa7cf3399affeb5fc0abe32d=
-8884017e76b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-26 (Wed, 26 Jul 2023)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Fix memory leaks
-
-This fixes the following memory leaks on exit:
-
-g32 bytes in 1 blocks are definitely lost in loss record 170 of 800
-g   at 0x484182F: malloc (vg_replace_malloc.c:431)
-g   by 0x47C942: util_malloc (util.c:46)
-g   by 0x47AD6A: queue_new (queue.c:47)
-g   by 0x379CB6: bap_data_new (bap.c:1565)
-g   by 0x379E24: bap_probe (bap.c:1757)
-g   by 0x4048F3: service_probe (service.c:153)
-g   by 0x4190D5: probe_service (device.c:4817)
-g   by 0x41927D: dev_probe (device.c:4836)
-g   by 0x403918: btd_profile_foreach (profile.c:740)
-g   by 0x421861: device_probe_profiles (device.c:4896)
-g   by 0x3E5023: probe_devices (adapter.c:4590)
-g   by 0x498022F: g_slist_foreach (in /usr/lib64/libglib-2.0.so.0.7600.4)=
-
-g
-g64 bytes in 2 blocks are definitely lost in loss record 556 of 800
-g   at 0x484182F: malloc (vg_replace_malloc.c:431)
-g   by 0x47C942: util_malloc (util.c:46)
-g   by 0x47AD6A: queue_new (queue.c:47)
-g   by 0x379CB6: bap_data_new (bap.c:1565)
-g   by 0x37DEA7: bap_adapter_probe (bap.c:1843)
-g   by 0x3CDB51: probe_profile (adapter.c:5066)
-g   by 0x403918: btd_profile_foreach (profile.c:740)
-g   by 0x3F557E: adapter_register (adapter.c:9288)
-g   by 0x3F557E: read_info_complete (adapter.c:10186)
-g   by 0x480D91: request_complete (mgmt.c:306)
-g   by 0x484466: can_read_data (mgmt.c:394)
-g   by 0x4ED93F: watch_callback (io-glib.c:157)
-g   by 0x496348B: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0=
-.7600.4)
-
-
-  Commit: 16c1166d8737d445f84c3a99b447f4c50e8f6d8b
-      https://github.com/bluez/bluez/commit/16c1166d8737d445f84c3a99b447f=
-4c50e8f6d8b
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M src/adapter.c
-
-  Log Message:
-  -----------
-  adapter: Fix generating IRK for adapter with privacy enabled
-
-When root folder for adapter doesn't exist we will get this runtime error=
-:
-src/adapter.c:generate_and_write_irk() Unable set contents for
- /var/lib/bluetooth/00:00:00:00:00:00/identity:
- (Failed to create file =E2=80=9C/var/lib/bluetooth/00:00:00:00:00:00/ide=
-ntity.EKQ581=E2=80=9D:
- No such file or directory)
-
-
-  Commit: 828bc564e6e84fc0499f2e3a99438240e4ff6de7
-      https://github.com/bluez/bluez/commit/828bc564e6e84fc0499f2e3a99438=
-240e4ff6de7
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M src/advertising.c
-
-  Log Message:
-  -----------
-  advertising: Fix peripheral adverts when Discoverable =3D false
-
-There is a problem with this configuration: Type =3D peripheral,
-Discoverable =3D false and Adapter is discoverable
-
-In this state device will start advertise discoverable advertisements
-even when user wanted non-discoverable advertisements.
-
-This change will add empty Flags when "Discoverable" parameter is set.
-
-
-  Commit: cda5549f247554b788dbf23b17c36bfa9ab629be
-      https://github.com/bluez/bluez/commit/cda5549f247554b788dbf23b17c36=
-bfa9ab629be
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M doc/gatt-api.txt
-    M src/gatt-client.c
-
-  Log Message:
-  -----------
-  gatt-client: Add read-only handles to dbus
-
-This can be usefull when mapping names for services and characteristics
-to their handle numbers.
-
-
-  Commit: ac04b56c41fea0f17f8862e1b8197514224b757a
-      https://github.com/bluez/bluez/commit/ac04b56c41fea0f17f8862e1b8197=
-514224b757a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-
-  Log Message:
-  -----------
-  monitor: Use gnuplot to plot graph of Latency-Packets
-
-This make use of gnuplot when using -a/--analyze to plot a graph of
-Latency-Packets:
-
-  Found BR-ACL connection with handle 256
-        Address: XX:XX:XX:XX:XX:XX (Sony Home Entertainment&Sound Product=
-s Inc)
-        60 RX packets
-        22548 TX packets
-        22547 TX completed packets
-        3 msec min latency
-        73 msec max latency
-        11 msec median latency
-        6 octets TX min packet size
-        850 octets TX max packet size
-        847 octets TX median packet size
-
-  10000 +-+--------------------------------------------------------------=
---+
-         +|      ++                                                      =
-  |
-         +|      ||+                                       Packets +-----=
-+ |
-         +|      |||                                                     =
-  |
-   1000 +-|      |||++                                                   =
-  |
-         +|      |||||  +                                                =
-  |
-         +|      |||||++|                                                =
-  |
-         +|      ||||||||+++                                             =
-  |
-    100 +-|      |||||||||||  +                                          =
-  |
-         +|      |||||||||||+++  +                                       =
-  |
-         +|      ||||||||||||||  |                                       =
-  |
-         +| ++   ||||||||||||||++|+                                      =
-  |
-          | ||   |||||||||||||||||++                                     =
-  |
-     10 +-| ||   |||||||||||||||||||+                                    =
-  |
-         +| ||   ||||||||||||||||||||  +                                 =
-  |
-         +| || ++||||||||||||||||||||++|++++       +                     =
-  |
-          | || |||||||||||||||||||||||||||||       |                     =
-  |
-      1 +-| ||+||||||||||||||||||||||||||||| +  +  |                 +   =
-  |
-         ++--------------------------------------------------------------=
---+
-          +       +       +       +        +       +       +       +     =
-  +
-          0       10      20      30       40      50      60      70    =
-  80
-                                    Latency (ms)
-
-
-  Commit: 9a657dcec988ff84e7e08345ea6512538a1b3207
-      https://github.com/bluez/bluez/commit/9a657dcec988ff84e7e08345ea651=
-2538a1b3207
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/btmon.rst
-    M monitor/main.c
-
-  Log Message:
-  -----------
-  monitor: Update documentation
-
-This updates the documentation to mention gnuplot usage.
-
-
-  Commit: 5d090ddc6aa6288e66f5624ed3e2e301cb39a44c
-      https://github.com/bluez/bluez/commit/5d090ddc6aa6288e66f5624ed3e2e=
-301cb39a44c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-    M monitor/l2cap.c
-    M monitor/packet.c
-    M monitor/packet.h
-
-  Log Message:
-  -----------
-  monitor: Consolidate code around latency calculation
-
-This move latency calculations to a helper function called
-packet_latency_add so it can get reused by the likes of l2cap.c and
-analyze.c
-
-
-  Commit: 77fb0ab5287c0cb2be2a3cfea00260eb0e649443
-      https://github.com/bluez/bluez/commit/77fb0ab5287c0cb2be2a3cfea0026=
-0eb0e649443
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Fix not dequeing TX packet properly
-
-num_completed_packets_evt contain a count for how many packets have been
-completed per handle.
-
-
-  Commit: f150939419d3854205d760d994c5b4397e5b524f
-      https://github.com/bluez/bluez/commit/f150939419d3854205d760d994c5b=
-4397e5b524f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Fix not calculating latency for ISO/SCO packets
-
-ISO/SCO packets latency was not being calculated because no connection
-was assigned to them.
-
-
-  Commit: b4cf0900d05c5fbd369f7f0c301c3917ca5b20a8
-      https://github.com/bluez/bluez/commit/b4cf0900d05c5fbd369f7f0c301c3=
-917ca5b20a8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-
-  Log Message:
-  -----------
-  monitor/analyze: Fix not dequeing TX packet properly
-
-num_completed_packets_evt contain a count for how many packets have been
-completed per handle.
-
-
-  Commit: dce3971d227de4fe7f4d2e4349d0153008782296
-      https://github.com/bluez/bluez/commit/dce3971d227de4fe7f4d2e4349d01=
-53008782296
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-28 (Fri, 28 Jul 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-
-  Log Message:
-  -----------
-  monitor/analyze: Fix not calculating latency for ISO/SCO packets
-
-ISO/SCO packets latency was not being calculated because no connection wa=
-s
-being assigned to them.
-
-
-  Commit: caf7db313e9dbb23365769c5384bd352f697f406
-      https://github.com/bluez/bluez/commit/caf7db313e9dbb23365769c5384bd=
-352f697f406
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M src/adapter.c
-
-  Log Message:
-  -----------
-  adapter: Be able to use ConnectDevice for discovered devices
-
-This can be useful when you want to specify trasport type for already
-paired device (e.g. use LE transport for dual mode device).
-
-
-  Commit: 255ef572ca76db8d7fa8450653dce99c170c406a
-      https://github.com/bluez/bluez/commit/255ef572ca76db8d7fa8450653dce=
-99c170c406a
-  Author: Simon Mikuda <simon.mikuda@streamunlimited.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M doc/adapter-api.txt
-
-  Log Message:
-  -----------
-  adapter: Update ConnectDevice documentation
-
-
-  Commit: 446d8ada5790e5ca2cdc359eafa4bf7136b43ac5
-      https://github.com/bluez/bluez/commit/446d8ada5790e5ca2cdc359eafa4b=
-f7136b43ac5
-  Author: Zijun Hu <quic_zijuhu@quicinc.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M src/main.c
-
-  Log Message:
-  -----------
-  main: Fix integer configuration option parse failures
-
-parse_config_int() has a obvious logical error, so causes many
-parse failures of integer configuration options, fixed by this
-change.
-
-
-  Commit: 1dbd9ba1f19542ba6398aa662caaf5a5eaf659b2
-      https://github.com/bluez/bluez/commit/1dbd9ba1f19542ba6398aa662caaf=
-5a5eaf659b2
-  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M client/player.c
-    M lib/uuid.h
-    M profiles/audio/media.c
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  Rename BAA_SERVICE to BCAA_SERVICE add BAA_SERVICE(0x1851)
-
-Rename BAA_SERVICE to BCAA_SERVICE and added BAA_SERVICE(0x1851)
-as UUID for the broadcast sink.
-
-
-  Commit: 86a4015659e3ed25bcae01a0ca1c0ba5d655131f
-      https://github.com/bluez/bluez/commit/86a4015659e3ed25bcae01a0ca1c0=
-ba5d655131f
-  Author: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/bt.h
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Fix decoding Command Complete for Remove ISO Data path
-
-Before
-
-< HCI Command: LE Remove Isochronous Data Path (0x08|0x006f) plen 3
-        Connection Handle: 96
-        Data Path Direction: Output (Controller to Host) (0x01)
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Remove Isochronous Data Path (0x08|0x006f) ncmd 1
-        invalid packet size
-        00 60 00
-
-After patch
-
-< HCI Command: LE Remove Isochronous Data Path (0x08|0x006f) plen 3
-        Connection Handle: 96
-        Data Path Direction: 0x01
-          Input (Host to Controller)
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Remove Isochronous Data Path (0x08|0x006f) ncmd 1
-        Status: Success (0x00)
-        Connection handle: 96
-
-
-  Commit: 7c6e030ac976b3d746edce9a1e36d7dc9696edcb
-      https://github.com/bluez/bluez/commit/7c6e030ac976b3d746edce9a1e36d=
-7dc9696edcb
-  Author: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Update le event mask with bits 20-23
-
-
-  Commit: af3549724b0ab3103e8379e5a2e0e653f5f31a99
-      https://github.com/bluez/bluez/commit/af3549724b0ab3103e8379e5a2e0e=
-653f5f31a99
-  Author: Szymon Czapracki <szymon.czapracki@codecoup.pl>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/bt.h
-    M monitor/ll.c
-
-  Log Message:
-  -----------
-  monitor/ll: Add support for connection parameter command.
-
-LL_CONNECTION_PARAM_REQ (0x0f)
-  Interval min: 7.50 msec (0x0006)
-  Interval max: 7.50 msec (0x0006)
-  Latency: 0 (0x0000)
-  Timeout: 5000 msec (0x01f4)
-  Preffered periodicity: 0.00 (0x00)
-  Reference connection event count: 4 (0x04)
-  Offset 0: 0.00 msec (0x00)
-  Offset 1: 0.00 msec (0x00)
-  Offset 2: 1.25 msec (0x01)
-  Offset 3: 0.00 msec (0x00)
-  Offset 4: 2.50 msec (0x02)
-  Offset 5: 0.00 msec (0x00)
-
-LL_CONNECTION_PARAM_RSP (0x10)
-  Interval min: 7.50 msec (0x0006)
-  Interval max: 7.50 msec (0x0006)
-  Latency: 0 (0x0000)
-  Timeout: 5000 msec (0x01f4)
-  Preffered periodicity: 0.00 (0x00)
-  Reference connection event count: 4 (0x04)
-  Offset 0: 318.75 msec (0xff)
-  Offset 1: 318.75 msec (0xff)
-  Offset 2: 318.75 msec (0xff)
-  Offset 3: 318.75 msec (0xff)
-  Offset 4: 318.75 msec (0xff)
-  Offset 5: 318.75 msec (0xff)
-
-
-  Commit: 652e8b8dd309a5604fe7f565d9face088028432e
-      https://github.com/bluez/bluez/commit/652e8b8dd309a5604fe7f565d9fac=
-e088028432e
-  Author: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/bt.h
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Add support to decode le read ISO link quality
-
-btmon: Add parsing LE Read ISO link quality
-
-    > HCI Event: Command Complete (0x0e) plen 34
-          LE Read ISO link quality (0x08|0x0075) ncmd 1
-            Status: Success (0x00)
-            Handle: 98
-            TX unacked packets 0
-            TX flushed packets 257602
-            TX last subevent packets 0
-            TX retrnansmitted packets 0
-            TX crc error packets 2594
-            RX unreceived packets 0
-            Duplicated packets 0
-
-
-  Commit: 8d60b555e8e18992348662a6d232cba9d19178aa
-      https://github.com/bluez/bluez/commit/8d60b555e8e18992348662a6d232c=
-ba9d19178aa
-  Author: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Add parsing Service Data of UUID 128
-
-In the advertising report, instead of deciding EIR 0x21 into this:
-
-	Unknown EIR field 0x21: 3a048f2ba97ea6ae1b49c619e973a4a701480d130d
-
-We can do bit better
-
-        Service Data UUID 128: Vendor specific
-          Data: 01480d130d
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-  Commit: 8eb1dee87e019f29b6c8233dfe0f9aef8ee44461
-      https://github.com/bluez/bluez/commit/8eb1dee87e019f29b6c8233dfe0f9=
-aef8ee44461
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M src/gatt-database.c
-
-  Log Message:
-  -----------
-  gatt: Fix not establishing a socket for each device
-
-AcquireWrite and AcquireNotify shall establish a socket pair for each
-device connected otherwise the application cannot distinct the
-operations of each client.
-
-Fixes: https://github.com/bluez/bluez/issues/460
-
-
-  Commit: 604633556d7a93e9f16df965c979e7ed9ce0b14f
-      https://github.com/bluez/bluez/commit/604633556d7a93e9f16df965c979e=
-7ed9ce0b14f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-    M monitor/packet.c
-    M monitor/packet.h
-
-  Log Message:
-  -----------
-  monitor: Add TX frame number and speed estimation
-
-This adds the frame information while decoding:
-
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 256 Address: XX:XX:XX:XX:XX:XX
-        Count: 1
-        #188: len 850 (755 Kb/s)
-        Latency: 9 msec (3-21 msec ~6 msec)
-        Channel: 68 [PSM 25 mode Basic (0x00)] {chan 4}
-        Channel Latency: 9 msec (7-21 msec ~9 msec)
-
-Or the speed estimation while analyzing:
+This attempts to plot the RX information just as TX:
 
   Found BR-ACL connection with handle 256
         Address: XX:XX:XX:XX:XX:XX
-        60 RX packets
-        22548 TX packets
-        22547 TX completed packets
-        3-73 msec (~11 msec) TX Latency
-        6-850 octets (~847 octets) TX packet size
-        ~568 Kb/s TX transfer speed
+        RX packets: 60/60
+        RX Latency: 0-39040 msec (~20294 msec)
+        RX size: 6-344 octets (~34 octets)
+        RX speed: ~0 Kb/s
 
+  100 +-+------------------------------------------------------------------+
+       +|                                                                  |
+       +|                                                       RX +-----+ |
+       +|                                                                  |
+       +|                                                                  |
+       +|                                                                  |
+        |                                                                  |
+        |                                                                  |
+   10 +-|                                                                  |
+       +|                                                                  |
+       +|                                                                  |
+       +|                                                                  |
+       +|                                                                  |
+       +|                                                                  |
+        |                                                                  |
+        |                                                                  |
+    1 +-|  + +                                                           + |
+       +|  | |                                                           | |
+       ++------------------------------------------------------------------+
+        +       +        +       +        +       +       +        +       +
+        0      5000    10000   15000    20000   25000   30000    35000   40000
+                                   Latency (ms)
 
-  Commit: 54740308b52e288d34b928ef61156a33e3371991
-      https://github.com/bluez/bluez/commit/54740308b52e288d34b928ef61156=
-a33e3371991
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
+        TX packets: 22548/22547
+        TX Latency: 3-73 msec (~11 msec)
+        TX size: 6-850 octets (~847 octets)
+        TX speed: ~568 Kb/s
+---
+ monitor/analyze.c | 177 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 103 insertions(+), 74 deletions(-)
 
-  Changed paths:
-    M monitor/analyze.c
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 9f882a6c8b71..608ef4d77c85 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -59,23 +59,27 @@ struct hci_dev {
+ #define CONN_LE_ACL	0x04
+ #define CONN_LE_ISO	0x05
+ 
++struct hci_stats {
++	size_t bytes;
++	size_t num;
++	size_t num_comp;
++	struct packet_latency latency;
++	struct queue *plot;
++	uint16_t min;
++	uint16_t max;
++};
++
+ struct hci_conn {
+ 	uint16_t handle;
+ 	uint8_t type;
+ 	uint8_t bdaddr[6];
+ 	bool setup_seen;
+ 	bool terminated;
+-	unsigned long rx_num;
+-	unsigned long tx_num;
+-	unsigned long tx_num_comp;
+-	size_t tx_bytes;
+ 	struct queue *tx_queue;
+-	struct packet_latency tx_l;
+-	struct queue *plot;
+-	uint16_t tx_pkt_min;
+-	uint16_t tx_pkt_max;
+-	uint16_t tx_pkt_med;
++	struct timeval last_rx;
+ 	struct queue *chan_list;
++	struct hci_stats rx;
++	struct hci_stats tx;
+ };
+ 
+ struct hci_conn_tx {
+@@ -92,12 +96,9 @@ struct l2cap_chan {
+ 	uint16_t cid;
+ 	uint16_t psm;
+ 	bool out;
+-	unsigned long num;
+-	size_t tx_bytes;
+-	struct packet_latency tx_l;
+-	struct queue *plot;
+-	uint16_t tx_pkt_min;
+-	uint16_t tx_pkt_max;
++	struct timeval last_rx;
++	struct hci_stats rx;
++	struct hci_stats tx;
+ };
+ 
+ static struct queue *dev_list;
+@@ -110,7 +111,7 @@ static void tmp_write(void *data, void *user_data)
+ 	fprintf(tmp, "%lld %zu\n", plot->x_msec, plot->y_count);
+ }
+ 
+-static void plot_draw(struct queue *queue)
++static void plot_draw(struct queue *queue, const char *tittle)
+ {
+ 	FILE *gplot;
+ 
+@@ -130,37 +131,48 @@ static void plot_draw(struct queue *queue)
+ 	fprintf(gplot, "set tics out nomirror\n");
+ 	fprintf(gplot, "set log y\n");
+ 	fprintf(gplot, "set yrange [0.5:*]\n");
+-	fprintf(gplot, "plot $data using 1:2 t 'Packets' w impulses\n");
++	fprintf(gplot, "plot $data using 1:2 t '%s' w impulses\n", tittle);
+ 	fflush(gplot);
+ 
+ 	pclose(gplot);
+ }
+ 
++static void print_stats(struct hci_stats *stats, const char *label)
++{
++	if (!stats->num)
++		return;
++
++	print_field("%s packets: %zu/%zu", label, stats->num, stats->num_comp);
++	print_field("%s Latency: %lld-%lld msec (~%lld msec)", label,
++			TV_MSEC(stats->latency.min),
++			TV_MSEC(stats->latency.max),
++			TV_MSEC(stats->latency.med));
++	print_field("%s size: %u-%u octets (~%zd octets)", label,
++			stats->min, stats->max, stats->bytes / stats->num);
++
++	if (TV_MSEC(stats->latency.total))
++		print_field("%s speed: ~%lld Kb/s", label,
++			stats->bytes * 8 / TV_MSEC(stats->latency.total));
++
++	plot_draw(stats->plot, label);
++}
++
+ static void chan_destroy(void *data)
+ {
+ 	struct l2cap_chan *chan = data;
+ 
++	if (!chan->rx.num && !chan->tx.num)
++		goto done;
++
+ 	printf("  Found %s L2CAP channel with CID %u\n",
+ 					chan->out ? "TX" : "RX", chan->cid);
+ 	if (chan->psm)
+ 		print_field("PSM %u", chan->psm);
+ 
+-	print_field("%lu packets", chan->num);
+-
+-	if (!queue_isempty(chan->plot)) {
+-		print_field("%lld-%lld msec (~%lld msec) TX Latency",
+-			TV_MSEC(chan->tx_l.min), TV_MSEC(chan->tx_l.max),
+-			TV_MSEC(chan->tx_l.med));
+-		print_field("%u-%u octets TX packet size",
+-				chan->tx_pkt_min, chan->tx_pkt_max);
+-	}
+-
+-	if (TV_MSEC(chan->tx_l.total))
+-		print_field("~%lld Kb/s TX transfer speed",
+-				chan->tx_bytes * 8 / TV_MSEC(chan->tx_l.total));
+-
+-	plot_draw(chan->plot);
++	print_stats(&chan->rx, "RX");
++	print_stats(&chan->tx, "TX");
+ 
++done:
+ 	free(chan);
+ }
+ 
+@@ -173,7 +185,8 @@ static struct l2cap_chan *chan_alloc(struct hci_conn *conn, uint16_t cid,
+ 
+ 	chan->cid = cid;
+ 	chan->out = out;
+-	chan->plot = queue_new();
++	chan->rx.plot = queue_new();
++	chan->tx.plot = queue_new();
+ 
+ 	return chan;
+ }
+@@ -229,30 +242,16 @@ static void conn_destroy(void *data)
+ 		break;
+ 	}
+ 
+-	if (conn->tx_num > 0)
+-		conn->tx_pkt_med = conn->tx_bytes / conn->tx_num;
+-
+ 	printf("  Found %s connection with handle %u\n", str, conn->handle);
+ 	/* TODO: Store address type */
+ 	packet_print_addr("Address", conn->bdaddr, 0x00);
+ 	if (!conn->setup_seen)
+ 		print_field("Connection setup missing");
+-	print_field("%lu RX packets", conn->rx_num);
+-	print_field("%lu TX packets", conn->tx_num);
+-	print_field("%lu TX completed packets", conn->tx_num_comp);
+-	print_field("%lld-%lld msec (~%lld msec) TX Latency",
+-			TV_MSEC(conn->tx_l.min), TV_MSEC(conn->tx_l.max),
+-			TV_MSEC(conn->tx_l.med));
+-	print_field("%u-%u octets (~%u octets) TX packet size",
+-			conn->tx_pkt_min, conn->tx_pkt_max, conn->tx_pkt_med);
++	print_stats(&conn->rx, "RX");
++	print_stats(&conn->tx, "TX");
+ 
+-	if (TV_MSEC(conn->tx_l.total))
+-		print_field("~%lld Kb/s TX transfer speed",
+-			conn->tx_bytes * 8 / TV_MSEC(conn->tx_l.total));
+-
+-	plot_draw(conn->plot);
+-
+-	queue_destroy(conn->plot, free);
++	queue_destroy(conn->rx.plot, free);
++	queue_destroy(conn->tx.plot, free);
+ 	queue_destroy(conn->chan_list, chan_destroy);
+ 
+ 	queue_destroy(conn->tx_queue, free);
+@@ -269,7 +268,8 @@ static struct hci_conn *conn_alloc(struct hci_dev *dev, uint16_t handle,
+ 	conn->handle = handle;
+ 	conn->type = type;
+ 	conn->tx_queue = queue_new();
+-	conn->plot = queue_new();
++	conn->tx.plot = queue_new();
++	conn->rx.plot = queue_new();
+ 
+ 	conn->chan_list = queue_new();
+ 
+@@ -566,7 +566,7 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 		if (!conn)
+ 			continue;
+ 
+-		conn->tx_num_comp += count;
++		conn->tx.num_comp += count;
+ 
+ 		for (j = 0; j < count; j++) {
+ 			last_tx = queue_pop_head(conn->tx_queue);
+@@ -575,12 +575,14 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 
+ 				timersub(tv, &last_tx->tv, &res);
+ 
+-				packet_latency_add(&conn->tx_l, &res);
+-				plot_add(conn->plot, &res, 1);
++				packet_latency_add(&conn->tx.latency, &res);
++				plot_add(conn->tx.plot, &res, 1);
+ 
+ 				if (chan) {
+-					packet_latency_add(&chan->tx_l, &res);
+-					plot_add(chan->plot, &res, 1);
++					chan->tx.num_comp += count;
++					packet_latency_add(&chan->tx.latency,
++									&res);
++					plot_add(chan->tx.plot, &res, 1);
+ 				}
+ 
+ 				free(last_tx);
+@@ -733,31 +735,60 @@ static void event_pkt(struct timeval *tv, uint16_t index,
+ 	}
+ }
+ 
++static void stats_add(struct hci_stats *stats, uint16_t size)
++{
++	stats->num++;
++	stats->bytes += size;
++
++	if (!stats->min || size < stats->min)
++		stats->min = size;
++	if (!stats->max || size > stats->max)
++		stats->max = size;
++}
++
+ static void conn_pkt_tx(struct hci_conn *conn, struct timeval *tv,
+ 				uint16_t size, struct l2cap_chan *chan)
+ {
+ 	struct hci_conn_tx *last_tx;
+ 
+-	conn->tx_num++;
+-
+ 	last_tx = new0(struct hci_conn_tx, 1);
+ 	memcpy(last_tx, tv, sizeof(*tv));
+ 	last_tx->chan = chan;
+ 	queue_push_tail(conn->tx_queue, last_tx);
+-	conn->tx_bytes += size;
+ 
+-	if (!conn->tx_pkt_min || size < conn->tx_pkt_min)
+-		conn->tx_pkt_min = size;
+-	if (!conn->tx_pkt_max || size > conn->tx_pkt_max)
+-		conn->tx_pkt_max = size;
++	stats_add(&conn->tx, size);
++
++	if (chan)
++		stats_add(&chan->tx, size);
++}
++
++static void conn_pkt_rx(struct hci_conn *conn, struct timeval *tv,
++				uint16_t size, struct l2cap_chan *chan)
++{
++	struct timeval res;
++
++	if (timerisset(&conn->last_rx)) {
++		timersub(tv, &conn->last_rx, &res);
++		packet_latency_add(&conn->rx.latency, &res);
++		plot_add(conn->rx.plot, &res, 1);
++	}
++
++	conn->last_rx = *tv;
++
++	stats_add(&conn->rx, size);
++	conn->rx.num_comp++;
+ 
+ 	if (chan) {
+-		chan->tx_bytes += size;
++		if (timerisset(&chan->last_rx)) {
++			timersub(tv, &chan->last_rx, &res);
++			packet_latency_add(&chan->rx.latency, &res);
++			plot_add(chan->rx.plot, &res, 1);
++		}
+ 
+-		if (!chan->tx_pkt_min || size < chan->tx_pkt_min)
+-			chan->tx_pkt_min = size;
+-		if (!chan->tx_pkt_max || size > chan->tx_pkt_max)
+-			chan->tx_pkt_max = size;
++		chan->last_rx = *tv;
++
++		stats_add(&chan->rx, size);
++		chan->rx.num_comp++;
+ 	}
+ }
+ 
+@@ -790,8 +821,6 @@ static void acl_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	case 0x02:
+ 		cid = get_le16(data + 2);
+ 		chan = chan_lookup(conn, cid, out);
+-		if (chan)
+-			chan->num++;
+ 		if (cid == 1)
+ 			l2cap_sig(conn, out, data + 4, size - 4);
+ 		break;
+@@ -800,7 +829,7 @@ static void acl_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	if (out) {
+ 		conn_pkt_tx(conn, tv, size, chan);
+ 	} else {
+-		conn->rx_num++;
++		conn_pkt_rx(conn, tv, size, chan);
+ 	}
+ }
+ 
+@@ -826,7 +855,7 @@ static void sco_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	if (out) {
+ 		conn_pkt_tx(conn, tv, size - sizeof(*hdr), NULL);
+ 	} else {
+-		conn->rx_num++;
++		conn_pkt_rx(conn, tv, size - sizeof(*hdr), NULL);
+ 	}
+ }
+ 
+@@ -913,7 +942,7 @@ static void iso_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	if (out) {
+ 		conn_pkt_tx(conn, tv, size - sizeof(*hdr), NULL);
+ 	} else {
+-		conn->rx_num++;
++		conn_pkt_rx(conn, tv, size - sizeof(*hdr), NULL);
+ 	}
+ }
+ 
+-- 
+2.41.0
 
-  Log Message:
-  -----------
-  monitor/analyze: Use conn_pkt_tx on acl_pkt
-
-This makes use of conn_pkt_tx also on acl_pkt like other connections.
-
-
-  Commit: 6bb476800fe8ada6589a1ff9154d3bf5e745c27f
-      https://github.com/bluez/bluez/commit/6bb476800fe8ada6589a1ff9154d3=
-bf5e745c27f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-07-31 (Mon, 31 Jul 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-
-  Log Message:
-  -----------
-  monitor: Print channel latency information with -a/--analyze
-
-This prints channel latency information and use gnuplot when using
--a/--analyze to plot a graph of channels:
-
-  Found TX L2CAP channel with CID 68
-        PSM 25
-        22490 packets
-        7-50 msec (~11 msec) TX Latency
-        850-850 octets TX packet size
-        ~569 Kb/s TX transfer speed
-
-  10000 +-+--------------------------------------------------------------=
---+
-         +|     ++                                                       =
-  |
-         +|     || +                                       Packets +-----=
-+ |
-         +|   + || |                                                     =
-  |
-   1000 +-|   | || |+ ++                                                 =
-  |
-         +|   | || || ||   +                                             =
-  |
-         +|   | || || ||+ +|                                             =
-  |
-         +|   | || || ||| || ++ ++                                       =
-  |
-    100 +-|   | || || ||| || || ||   +                                   =
-  |
-         +|   | || || ||| || || || ++| +   +                             =
-  |
-         +|   | || || ||| || || || ||| |   |                             =
-  |
-         +|   | || || ||| || || || ||| |+ +| +                           =
-  |
-          |   | || || ||| || || || ||| || || |+ +                        =
-  |
-     10 +-|   | || || ||| || || || ||| || || || |+                       =
-  |
-         +|   | || || ||| || || || ||| || || || ||     +                 =
-  |
-         +|  +| || || ||| || || || ||| || || || ||+ ++ |+ ++ +           =
-  |
-          |  || || || ||| || || || ||| || || || ||| || || || |           =
-  |
-      1 +-|  || || || ||| || || || ||| || || || ||| || || || |   +     + =
-  |
-         ++--------------------------------------------------------------=
---+
-          +      +      +       +      +      +      +       +      +    =
-  +
-          5      10     15      20     25     30     35      40     45   =
-  50
-                                    Latency (ms)
-
-
-  Commit: 1f6e606c8504270da56a0888fa729866e82eebb8
-      https://github.com/bluez/bluez/commit/1f6e606c8504270da56a0888fa729=
-866e82eebb8
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-01 (Tue, 01 Aug 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-
-  Log Message:
-  -----------
-  monitor: Add connection tracking for SCO/ISO with -a/--analyze
-
-This adds proper connection tracking to SCO/ISO connection by handling
-the events that establishes them.
-
-
-  Commit: 80107630396d3d3a3984c599e0cb9b015be0499c
-      https://github.com/bluez/bluez/commit/80107630396d3d3a3984c599e0cb9=
-b015be0499c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-01 (Tue, 01 Aug 2023)
-
-  Changed paths:
-    M monitor/analyze.c
-
-  Log Message:
-  -----------
-  monitor/analyze: Inline data to gnuplot
-
-Instead of creating a separate file just to write the x:y axis inline
-the data via gnuplot $data variable then use it to plot.
-
-
-  Commit: 5815a92423c3d074e26974f4ca5de0cc4b596845
-      https://github.com/bluez/bluez/commit/5815a92423c3d074e26974f4ca5de=
-0cc4b596845
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-08-02 (Wed, 02 Aug 2023)
-
-  Changed paths:
-    M emulator/btdev.c
-    M monitor/bt.h
-
-  Log Message:
-  -----------
-  btdev: check error conditions for HCI_Create_Connection_Cancel
-
-Create Connection Cancel shall return Command Complete with error status
-when there is no Create Connection that can be canceled.  In these
-cases, we should not send a (spurious) Connection Complete event.
-
-Fix by keeping a list of pending Create Connection commands, and
-returning command errors if there is none pending at the moment.
-
-
-  Commit: 23a7d4003064761e225394a42253d51dd5e81093
-      https://github.com/bluez/bluez/commit/23a7d4003064761e225394a42253d=
-51dd5e81093
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-08-02 (Wed, 02 Aug 2023)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  btdev: fix Command Status command opcodes for Setup Sync Conn
-
-The command opcode should be the CMD, not EVT.
-
-
-  Commit: 80c8266ae20ae6bf6d468d0b32d9ebffc1f4d400
-      https://github.com/bluez/bluez/commit/80c8266ae20ae6bf6d468d0b32d9e=
-bffc1f4d400
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-08-02 (Wed, 02 Aug 2023)
-
-  Changed paths:
-    M tools/sco-tester.c
-
-  Log Message:
-  -----------
-  sco-tester: test local and remote disconnecting simultaneously
-
-Demonstrate a kernel race condition when remote side disconnects at the
-same time as local side tries to cancel the connection. I.e.
-
-	[controller] > HCI Synchronous Connect Complete
-	[controller] > HCI Disconnection Complete (from remote)
-	[user] shutdown(sco_socket)
-	[kernel] hci_conn_abort(SCO handle)
-	[kernel] > HCI Create Connection Cancel
-	[kernel] < HCI Synchronous Connect Complete
-	[kernel] < HCI Disconnect Complete
-	[controller] < HCI Create Connection Cancel
-	[controller] > HCI Command Status (Create Connection Cancel)
-	[kernel] < HCI Command Status (Create Connection Cancel)
-
-and then we get BUG: KASAN: slab-use-after-free in hci_conn_failed when
-hci_conn_abort tries to delete the same connection a second time.
-
-This type of crash is probably not limited to the sequence here, but for
-this one it was possible to get the timing right in the emulator.
-
-Add a test that hits this in the emulator environment (pretty narrow
-window to hit on real hardware):
-
-eSCO Simultaneous Disconnect - Failure
-
-
-  Commit: 10d83e3423bb3cc59fc0b5cb680c466b8658edfa
-      https://github.com/bluez/bluez/commit/10d83e3423bb3cc59fc0b5cb680c4=
-66b8658edfa
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-08-02 (Wed, 02 Aug 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: test with large CIS_ID and invalid CIG_ID/CIS_ID
-
-Add test with a large CIS_ID and multiple CIS so it hits an error
-condition in current kernels (which is why the AC configuration is
-used).
-
-Add tests for invalid configurations with bad or duplicate IDs, and for
-trying to connect two CIS in same CIG without BT_DEFER_SETUP.
-
-ISO QoS CIG 0xF0 - Invalid
-ISO QoS CIS 0xF0 - Invalid
-ISO Connect2 CIG 0x01 - Success/Invalid
-ISO AC 6(ii) CIS 0xEF/auto - Success
-ISO AC 6(ii) CIS 0xEF/0xEF - Invalid
-
-
-  Commit: 033b68cbb1bf73b1bb9d26f5ffac35b6dc0afab8
-      https://github.com/bluez/bluez/commit/033b68cbb1bf73b1bb9d26f5ffac3=
-5b6dc0afab8
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2023-08-02 (Wed, 02 Aug 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: add tests checking Remove CIG is emitted
-
-Kernel should send LE Remove CIG after all CIS are shut down.  Add tests
-checking this, closing either immediately or after waiting connection to
-complete.
-
-ISO Defer Close - Success
-ISO Connect Close - Success
-ISO Defer Wait Close - Success
-ISO Connect Wait Close - Success
-
-
-  Commit: 9665025cc042db2ba2d3b95ff8f0794c9826311d
-      https://github.com/bluez/bluez/commit/9665025cc042db2ba2d3b95ff8f07=
-94c9826311d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-04 (Fri, 04 Aug 2023)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: Fix test ISO Connect2 CIG 0x01 - Success/Invalid
-
-This test shall succeed rather than fail as this appears to be a bug in
-the kernel code preventing Set CIG Parameters to work properly when
-there are concurrent tasks only one CIS is being programmed.
-
-
-Compare: https://github.com/bluez/bluez/compare/d8ca06631b74...9665025cc0=
-42
