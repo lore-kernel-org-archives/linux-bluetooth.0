@@ -2,143 +2,366 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FBCC04A6A
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Aug 2023 21:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BF7C001DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 01:45:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbjHFVAi (ORCPT
+        id S229548AbjHGBpP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Aug 2023 17:00:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60356 "EHLO
+        Sun, 6 Aug 2023 21:45:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbjHFVAh (ORCPT
+        with ESMTP id S229530AbjHGBpO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Aug 2023 17:00:37 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 531301719
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Aug 2023 14:00:35 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-68706b39c4cso2588923b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Aug 2023 14:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691355634; x=1691960434;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7d+xvE/EDkACZA/XyS/+3Ghc5Yr3CveXZEM7ilLYj78=;
-        b=juOcKewF81BWCYuep5yabt1pqnMwGpAbDsoJ1iABT5IFKow5rQTZ+lw7em505JnOQw
-         +Hzn315VVdWFOwA15e/FfPo69xFgVNdIwHhRXyqkLN8dE7Ln3rNi5PGNkBzGJKh9PLlb
-         BPYq2q4WMYXVNczxyx7+mCPiOerHjYyoqkB7fryUELSbZH3lURdr/DfJeoILEZy+NF7C
-         8dsOC2SbnGEjdSNvcdAKnhOMv88d6LGYAHihIKJh/nOFcYwCldzIBHxs09etejOmpJ3X
-         P4YGY+NiCleXI9hpwEO3Nn7kZPJFLXPPGChPOs1ifNP6sViWG2GSZ39alaVsJ40rVGZh
-         vg4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691355634; x=1691960434;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7d+xvE/EDkACZA/XyS/+3Ghc5Yr3CveXZEM7ilLYj78=;
-        b=iiKRRoAsyralZKGno0o/8th7ZANukhV4cHCy4nVuIQDwpSPp6mqLfnfDZEdO1b/gf1
-         veARRFqMRXUd9LXbPCgI22Jy3oC2OE3GJm6Sn4UG+ALPoXu30ws3643hmsMEPLiTrqDO
-         HdoJIUFXMXULNr2KgZWIevojmImO8t8WKQznYDmBer2soolEVM/1mw7TzAD/5MJgqP/0
-         49aA9P2zVlYrXP6wGNuO6sxM0DwiullvfsrES7EVk5IJqIHDM2WpJ3TcnmvyGInPIe3i
-         DG4Wci9KqZQ4Wy31nqxzBLggGaL7KuSKMZezDb8+5w/Tts/N6eqhUzPl6+72+fVasKAq
-         p8+Q==
-X-Gm-Message-State: AOJu0YwKnyCBVLpvGpuNEalzxdAnIOr91h7eZ0E1wdXZZ1sw8w9OtN5k
-        x6tWoHhAnmMAAX9LT/i8H66nBBVF+3s=
-X-Google-Smtp-Source: AGHT+IHCNQOFzxfi5CGOep5nUx4h0mJ9h1dZwkrM5EM1Xqf6mpzQVoMKrUMjIfMBt2Co0Joir92khg==
-X-Received: by 2002:a05:6a20:8e09:b0:132:cb65:b47c with SMTP id y9-20020a056a208e0900b00132cb65b47cmr8917715pzj.43.1691355634032;
-        Sun, 06 Aug 2023 14:00:34 -0700 (PDT)
-Received: from [172.17.0.2] ([4.227.0.231])
-        by smtp.gmail.com with ESMTPSA id i5-20020a63bf45000000b00563397f1624sm3433142pgo.69.2023.08.06.14.00.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Aug 2023 14:00:33 -0700 (PDT)
-Message-ID: <64d009f1.630a0220.1ae59.5d95@mx.google.com>
-Date:   Sun, 06 Aug 2023 14:00:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2953949323672323537=="
+        Sun, 6 Aug 2023 21:45:14 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7833C170B;
+        Sun,  6 Aug 2023 18:45:11 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3771i6ZG1031859, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3771i6ZG1031859
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+        Mon, 7 Aug 2023 09:44:06 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Mon, 7 Aug 2023 09:44:22 +0800
+Received: from localhost.localhost (172.21.132.123) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Mon, 7 Aug 2023 09:44:19 +0800
+From:   <max.chou@realtek.com>
+To:     <marcel@holtmann.org>
+CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
+        <karenhsu@realtek.com>, <kidman@realtek.com>,
+        <max.chou@realtek.com>, <juerg.haefliger@canonical.com>,
+        <vicamo.yang@canonical.com>, <Riley.Kao@dell.com>,
+        <stable@vger.kernel.org>, <jwboyer@kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <regressions@lists.linux.dev>
+Subject: [PATCH v3] Bluetooth: btrtl: Load FW v2 otherwise FW v1 for RTL8852C
+Date:   Mon, 7 Aug 2023 09:44:15 +0800
+Message-ID: <20230807014415.12358-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [v2,1/4] Bluetooth: hci_sync: fix canceling LE scanning / CIS create conn state
-In-Reply-To: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691352503.git.pav@iki.fi>
-References: <b2ed850478c905299c40154c1d6dfc304a93d77a.1691352503.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [172.21.132.123]
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS03.realtek.com.tw (172.21.6.96)
+X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2953949323672323537==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Max Chou <max.chou@realtek.com>
 
-This is automated email and please do not reply to this email!
+In the commit of linux-firmware project, rtl8852cu_fw.bin is updated as
+FW v2 format[1]. Consider the case that if driver did not be updated for
+FW v2 supported[2], it can not use FW v2.
+By Canonical's suggestion, older driver should be able to load FW v1,
+so rtl8852cu_fw.bin will be revert to the previous commit as FW v1 and
+add rtl8852cu_fw_v2.bin as FW v2. This item will be started on
+linux-firmware project.
 
-Dear submitter,
+In this commit, the driver prefers to load FW v2 if available. Fallback to
+FW v1 otherwise.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=773450
+Note that the driver has supported to extract the data for v1 and v2
+since the commit[1].
+The previous FW format of RTL8852C is v1. After the commit[2], the FW
+format was changed to v2. Only RTL8852C suffered the different FW formats,
+so we will use rtl8852cu_fw.bin for the original commit as FW v1 and
+rtl8852cu_fw_v2.bin for the future maintained as FW v2. Other Realtek
+chips will not been impacted by this patch.
 
----Test result---
+To do on linux-firmware project after this commit.
+1. revert '55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
+   to 0x040D_7225")'
+   => rtl_bt/rtl8852cu_fw.bin: FW v1 (stay at ver. 0xD7B8_FABF)
+2. Add a new commit for rtl8852cu_fw_v2.bin
+   =>rtl_bt/rtl8852cu_fw_v2.bin: FW v2 (to be maintained)
 
-Test Summary:
-CheckPatch                    FAIL      2.55 seconds
-GitLint                       FAIL      1.27 seconds
-SubjectPrefix                 PASS      0.33 seconds
-BuildKernel                   PASS      33.28 seconds
-CheckAllWarning               PASS      36.11 seconds
-CheckSparse                   PASS      40.39 seconds
-CheckSmatch                   PASS      112.02 seconds
-BuildKernel32                 PASS      30.97 seconds
-TestRunnerSetup               PASS      485.38 seconds
-TestRunner_l2cap-tester       PASS      22.99 seconds
-TestRunner_iso-tester         PASS      44.11 seconds
-TestRunner_bnep-tester        PASS      10.17 seconds
-TestRunner_mgmt-tester        PASS      210.83 seconds
-TestRunner_rfcomm-tester      PASS      15.40 seconds
-TestRunner_sco-tester         PASS      18.57 seconds
-TestRunner_ioctl-tester       PASS      17.02 seconds
-TestRunner_mesh-tester        PASS      12.77 seconds
-TestRunner_smp-tester         PASS      13.66 seconds
-TestRunner_userchan-tester    PASS      10.60 seconds
-IncrementalBuild              PASS      48.22 seconds
+Reference:
+[1]'9a24ce5e29b1 ("Bluetooth: btrtl: Firmware format v2 support")'
+[2]'55e7448533e7 ("rtl_bt: Update RTL8852C BT USB firmware
+    to 0x040D_7225")'
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,2/4] Bluetooth: hci_sync: fix use-after-free in hci_disconnect_all_sync
-WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#100: 
-CPU: 0 PID: 124 Comm: kworker/u9:0 Tainted: G        W          6.5.0-rc1+ #10
-
-total: 0 errors, 1 warnings, 0 checks, 56 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13342903.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,2/4] Bluetooth: hci_sync: fix use-after-free in hci_disconnect_all_sync
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-13: B1 Line exceeds max length (99>80): "BUG: KASAN: slab-use-after-free in hci_set_powered_sync (net/bluetooth/hci_sync.c:5424) [bluetooth]"
-17: B1 Line exceeds max length (81>80): "Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc38 04/01/2014"
-80: B2 Line has trailing whitespace: "    "
-
+Fixes: '9a24ce5e29b ("Bluetooth: btrtl: Firmware format v2 support")'
+Suggested-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+Tested-by: Hilda Wu <hildawu@realtek.com>
+Signed-off-by: Max Chou <max.chou@realtek.com>
 
 ---
-Regards,
-Linux Bluetooth
+Changes in v2:
+- Fix commit log for CheckPatch FAIL
 
+Changes in v2:
+- Tuning the code for more readable. Thanks Juerg!
+- Modify the commit log.
+---
+ drivers/bluetooth/btrtl.c | 70 +++++++++++++++++++++++++--------------
+ 1 file changed, 45 insertions(+), 25 deletions(-)
 
---===============2953949323672323537==--
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index ddae6524106d..84c2c2e1122f 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -104,7 +104,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = false,
+-	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
++	  .fw_name = "rtl_bt/rtl8723a_fw",
+ 	  .cfg_name = NULL,
+ 	  .hw_info = "rtl8723au" },
+ 
+@@ -112,7 +112,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723bs_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723bs_config",
+ 	  .hw_info  = "rtl8723bs" },
+ 
+@@ -120,7 +120,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723b_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723b_config",
+ 	  .hw_info  = "rtl8723bu" },
+ 
+@@ -132,7 +132,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .hci_bus = HCI_UART,
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723cs_cg_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723cs_cg_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723cs_cg_config",
+ 	  .hw_info  = "rtl8723cs-cg" },
+ 
+@@ -144,7 +144,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .hci_bus = HCI_UART,
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723cs_vf_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723cs_vf_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723cs_vf_config",
+ 	  .hw_info  = "rtl8723cs-vf" },
+ 
+@@ -156,7 +156,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .hci_bus = HCI_UART,
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723cs_xx_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723cs_xx_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723cs_xx_config",
+ 	  .hw_info  = "rtl8723cs" },
+ 
+@@ -164,7 +164,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723d_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723d_config",
+ 	  .hw_info  = "rtl8723du" },
+ 
+@@ -172,7 +172,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8723ds_fw",
+ 	  .cfg_name = "rtl_bt/rtl8723ds_config",
+ 	  .hw_info  = "rtl8723ds" },
+ 
+@@ -180,7 +180,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8821a_fw",
+ 	  .cfg_name = "rtl_bt/rtl8821a_config",
+ 	  .hw_info  = "rtl8821au" },
+ 
+@@ -189,7 +189,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8821c_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8821c_fw",
+ 	  .cfg_name = "rtl_bt/rtl8821c_config",
+ 	  .hw_info  = "rtl8821cu" },
+ 
+@@ -198,7 +198,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8821cs_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8821cs_fw",
+ 	  .cfg_name = "rtl_bt/rtl8821cs_config",
+ 	  .hw_info  = "rtl8821cs" },
+ 
+@@ -206,7 +206,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8761a_fw",
+ 	  .cfg_name = "rtl_bt/rtl8761a_config",
+ 	  .hw_info  = "rtl8761au" },
+ 
+@@ -215,7 +215,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8761b_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8761b_fw",
+ 	  .cfg_name = "rtl_bt/rtl8761b_config",
+ 	  .hw_info  = "rtl8761btv" },
+ 
+@@ -223,7 +223,7 @@ static const struct id_table ic_id_table[] = {
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8761bu_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8761bu_fw",
+ 	  .cfg_name = "rtl_bt/rtl8761bu_config",
+ 	  .hw_info  = "rtl8761bu" },
+ 
+@@ -232,7 +232,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8822cs_fw",
+ 	  .cfg_name = "rtl_bt/rtl8822cs_config",
+ 	  .hw_info  = "rtl8822cs" },
+ 
+@@ -241,7 +241,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8822cs_fw",
+ 	  .cfg_name = "rtl_bt/rtl8822cs_config",
+ 	  .hw_info  = "rtl8822cs" },
+ 
+@@ -250,7 +250,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8822cu_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8822cu_fw",
+ 	  .cfg_name = "rtl_bt/rtl8822cu_config",
+ 	  .hw_info  = "rtl8822cu" },
+ 
+@@ -259,7 +259,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8822b_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8822b_fw",
+ 	  .cfg_name = "rtl_bt/rtl8822b_config",
+ 	  .hw_info  = "rtl8822bu" },
+ 
+@@ -268,7 +268,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8852au_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8852au_fw",
+ 	  .cfg_name = "rtl_bt/rtl8852au_config",
+ 	  .hw_info  = "rtl8852au" },
+ 
+@@ -277,7 +277,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8852bs_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8852bs_fw",
+ 	  .cfg_name = "rtl_bt/rtl8852bs_config",
+ 	  .hw_info  = "rtl8852bs" },
+ 
+@@ -286,7 +286,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8852bu_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8852bu_fw",
+ 	  .cfg_name = "rtl_bt/rtl8852bu_config",
+ 	  .hw_info  = "rtl8852bu" },
+ 
+@@ -295,7 +295,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = true,
+-	  .fw_name  = "rtl_bt/rtl8852cu_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8852cu_fw",
+ 	  .cfg_name = "rtl_bt/rtl8852cu_config",
+ 	  .hw_info  = "rtl8852cu" },
+ 
+@@ -304,7 +304,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .has_msft_ext = false,
+-	  .fw_name  = "rtl_bt/rtl8851bu_fw.bin",
++	  .fw_name  = "rtl_bt/rtl8851bu_fw",
+ 	  .cfg_name = "rtl_bt/rtl8851bu_config",
+ 	  .hw_info  = "rtl8851bu" },
+ 	};
+@@ -1045,6 +1045,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	struct sk_buff *skb;
+ 	struct hci_rp_read_local_version *resp;
+ 	struct hci_command_hdr *cmd;
++	char fw_name[40];
+ 	char cfg_name[40];
+ 	u16 hci_rev, lmp_subver;
+ 	u8 hci_ver, lmp_ver, chip_type = 0;
+@@ -1154,8 +1155,26 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 			goto err_free;
+ 	}
+ 
+-	btrtl_dev->fw_len = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
+-					  &btrtl_dev->fw_data);
++	if (!btrtl_dev->ic_info->fw_name) {
++		ret = -ENOMEM;
++		goto err_free;
++	}
++
++	btrtl_dev->fw_len = -EIO;
++	if (lmp_subver == RTL_ROM_LMP_8852A && hci_rev == 0x000c) {
++		snprintf(fw_name, sizeof(fw_name), "%s_v2.bin",
++				btrtl_dev->ic_info->fw_name);
++		btrtl_dev->fw_len = rtl_load_file(hdev, fw_name,
++				&btrtl_dev->fw_data);
++	}
++
++	if (btrtl_dev->fw_len < 0) {
++		snprintf(fw_name, sizeof(fw_name), "%s.bin",
++				btrtl_dev->ic_info->fw_name);
++		btrtl_dev->fw_len = rtl_load_file(hdev, fw_name,
++				&btrtl_dev->fw_data);
++	}
++
+ 	if (btrtl_dev->fw_len < 0) {
+ 		rtl_dev_err(hdev, "firmware file %s not found",
+ 			    btrtl_dev->ic_info->fw_name);
+@@ -1491,4 +1510,5 @@ MODULE_FIRMWARE("rtl_bt/rtl8852bs_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
+-- 
+2.34.1
+
