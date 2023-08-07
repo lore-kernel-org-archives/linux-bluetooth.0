@@ -2,96 +2,210 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70486C001B0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 17:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7609C04A6A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 17:48:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232250AbjHGRXu (ORCPT
+        id S230288AbjHGRsf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 13:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        Mon, 7 Aug 2023 13:48:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232256AbjHGRXt (ORCPT
+        with ESMTP id S229820AbjHGRse (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 13:23:49 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62B7F107
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 10:23:43 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b9ab1725bbso75061371fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Aug 2023 10:23:43 -0700 (PDT)
+        Mon, 7 Aug 2023 13:48:34 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132E610D2;
+        Mon,  7 Aug 2023 10:48:33 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b9a828c920so73545671fa.1;
+        Mon, 07 Aug 2023 10:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691429021; x=1692033821;
+        d=gmail.com; s=20221208; t=1691430511; x=1692035311;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SOU5L7LWEIkPaWjX6U2ySnFWYxQ7e3XELLDX5N8LPjk=;
-        b=gPZsl/Krnk6Xs9pbwN6q0p8sZpiIne+oWi/l3DmRqrOa9yysB5VH/vcXixs6cwGmff
-         PIYtPgghV9o98bmqKsbNAYxmH1w8MYDKV0cMdp/Rvae6pdsZiG0tfU6DtVRqh8QiXJF3
-         825N5AB+tcmqoa+gA7nkfXwKym8Z4nZdawxyilDPAy2mMFEeAKLZTKBwKbJ5VFyyULjv
-         0r84jXrRWQtKToVqLbGmtnW5/SXFAU3plH1EOUFUyKGJkzbyJ9OeCuAdtENa4rQWLMDS
-         Vbt/hOe3hOdd24foOdW+OAf9JegR3uibLx9rDxtb5rHXhzFr6rjrRxuXMbnfpSCi4Boz
-         mOkw==
+        bh=vrGvRWh9RSqDH14rxZjW9oT1sHqJ1ms+qPPvJzGNms4=;
+        b=VtryM6sem7phiyVNPheUXk5MPP+daA9hIc+FH9dpEPDjQLZysuMKhHGXObHZth90za
+         l9y0FsQeLiHQzMoDX+Nu80Kl3tWERI6c56eczaPZTK8eVopyB0AEp9BxUP+FjDWk21+z
+         OHxjkRYox+KvU8sMxnCeNk2/uLmDeUf07h3b6XA7IOTcx1S2M+iwhONnWVQGYoG0iPJ1
+         xMSGj2eYEmHL2xxLoh0MJHIo24wcBAimmps8QPhdfSEWhwp4Xz3iwluo68UMa44qU55G
+         v32zkZxYNIig6hBOPd36dWf8/9bL3TzMT+DVIJEuXWP/ii4EL/trYbhOKJvllUYwcDOc
+         aC7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691429021; x=1692033821;
+        d=1e100.net; s=20221208; t=1691430511; x=1692035311;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SOU5L7LWEIkPaWjX6U2ySnFWYxQ7e3XELLDX5N8LPjk=;
-        b=BVIKwl+T6Kndr5/NKk5dtMg7Ub3KvD72aXI3r38DCEW5T9DqNPGGqr7mId4+NZOGmG
-         yLqssOIouANt46sduIBDD1967A+5xwQkDj1uFNRG0aDuZohBfJToYJ299ZNTD4JUHkxV
-         X/ePzmI/xfCFegWhX0z8fKj9ct89i+uv7RjfRV8ufCc/MHx4EsMalwxRQb9+HM/4uWqC
-         QYfRJM29IQvFXS0nYAmq1sDVT6p+ANmuae/IpcmTGfDQKLoU3sidbM7wOYyfuzF38xJV
-         jex7AY/aIOpMyFw5i6QJ6Hy2pHbSOEeJQfsDRgbXiVFwDskEIQjslrcj5b4wStit6SV1
-         v/bA==
-X-Gm-Message-State: AOJu0YxyO6KEArc0JeFlHgTpX48XoM7nTohwZ4cN3hkiOWfauM6Alkgr
-        f+sMRcbo93gVg6HugXaaTMETCMLpokshUtqjB3S9OQFQ
-X-Google-Smtp-Source: AGHT+IGf2U9HCMBFRjKBhIQ2BNmrirpzHJfyThkxSEfYVY5vmyX+euejqguFjFoO192y/LO+PMAlUiMKnOcPiv7LmeQ=
-X-Received: by 2002:a2e:900c:0:b0:2b6:dac0:affe with SMTP id
- h12-20020a2e900c000000b002b6dac0affemr7235723ljg.31.1691429021205; Mon, 07
- Aug 2023 10:23:41 -0700 (PDT)
+        bh=vrGvRWh9RSqDH14rxZjW9oT1sHqJ1ms+qPPvJzGNms4=;
+        b=N6WPX7vRyq1sfoXJXEWWC1NGtmB7UbafL8Eo5iNHMj7AuDKzuNBZ4L7eCt6Pi8LbJ/
+         HK8lx6WcRmWCqaCWBl6V+WNxslJf6Q4iQUfxGm36HSrdSypRBQYzD0mdxbZKXhPjOkBB
+         e//NW29QFVjd1MSgCn/T7yCcaLKibtV2Pvja82+1Vq88el/cItFlO7jL0m8UiyJAAE5N
+         phmbgs1lCq1W4stusta74Pjkh4js8KfeA6MRXWGsr6lzN+5zZn9wUpAZ+q3Xvjzrx2xh
+         mEQ+8/T8GpRDkNbcvZJ9G/dCYNPnbQsjKpgwAdtlo8EZZFoeDTdqvLBcI57Nj4F1D+rg
+         Jl0Q==
+X-Gm-Message-State: AOJu0YwzIF/xtx6ZvA0c7XqUJsay90QSUtXQHQkZEH1UMkuGd+goaGgv
+        8bSB7jq0ZYf406+L1iMwAFuBlopotqMF48xgqZ0=
+X-Google-Smtp-Source: AGHT+IHLh71dLppBcDeJERt7vwCNTp0PJVm+Vkx/AuubHXt8MByWMEhbnbu4vMWCCWuZuHHJjZvwTgmyeuxgBzCDgMU=
+X-Received: by 2002:a2e:90c2:0:b0:2b5:81bc:43a8 with SMTP id
+ o2-20020a2e90c2000000b002b581bc43a8mr6861726ljg.0.1691430510882; Mon, 07 Aug
+ 2023 10:48:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230807110224.6024-1-silviu.barbulescu@nxp.com>
-In-Reply-To: <20230807110224.6024-1-silviu.barbulescu@nxp.com>
+References: <CABBYNZJZbiyhnary2F7iZMKg5xSFKNV0iRVJ6ye7NayS-z-a0Q@mail.gmail.com>
+ <451e5766-e39e-37fb-6ee6-fd42d7d96720@buaa.edu.cn>
+In-Reply-To: <451e5766-e39e-37fb-6ee6-fd42d7d96720@buaa.edu.cn>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 7 Aug 2023 10:23:28 -0700
-Message-ID: <CABBYNZ+ecHHUfh=3rtXWwp-u2r0kSt-_SRWmYqUJBXgUs6S=oQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] Configure BASE using separate structure
-To:     Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
-        mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com,
-        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
+Date:   Mon, 7 Aug 2023 10:48:18 -0700
+Message-ID: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
+Subject: Re: [BUG]Bluetooth: possible semantic bug when the status field of
+ the HCI_Connection_Complete packet set to non-zero
+To:     =?UTF-8?B?5YiY5bCP5paw?= <LXYbhu@buaa.edu.cn>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Silviu,
+Hi,
 
-On Mon, Aug 7, 2023 at 4:11=E2=80=AFAM Silviu Florian Barbulescu
-<silviu.barbulescu@nxp.com> wrote:
+On Mon, Aug 7, 2023 at 8:17=E2=80=AFAM =E5=88=98=E5=B0=8F=E6=96=B0 <LXYbhu@=
+buaa.edu.cn> wrote:
 >
-> Use preset configuration in capabilities.
-> Configure BASE using separate structure.
+> Hello,
+>
+> Thanks for your reply.
+>
+> I apologize for my previous unclear statement, which may have misled you.
+>
+> Let me rephrase our question:
+>
+> When a Bluetooth device initiates a connection to another device, its hos=
+t sends an HCI_Create_Connection command (OGF: 0x01, OCF: 0x0005) to the co=
+ntroller. Once the connection is established, the controller sends an HCI_C=
+onnection_Complete event (Event Code: 0x03) back to the host. If a valid HC=
+I_Connection_Complete event has its parameter "Status" altered (with all ot=
+her parameters unchanged), changing 0x00 to any value between 0x01 and 0xFF=
+ for example, the host will considerd that the connection fails to complete=
+.
+>
+> In reality, if the HCI_Connection_Complete event's parameter "Connection_=
+Handle" is valid and unaltered, it means the handle resource exists and has=
+ not been released. The observations we made support this statement:
 
-Im not really sure why we want to switch to use BASE over
-Capabilities, up until now Capabilities is sort of mandatory and is
-already profile specific in case you are wondering how can someone
-detect what is the format used in Capabilities that is based on the
-UUID already.
+Well according to the spec we can only assume the handle is valid if
+the status is set to 0x00, so I am not really sure how we can possibly
+check if the handle is valid if the status indicates a connection
+failure?
 
-> Claudia Draghicescu (2):
->   client/player: Use preset configuration in capabilities. Configure
->     BASE using separate structure
->   bap: Use the BASE structure received from upper layer
+> (a) When the tampered HCI_Connection_Complete event with altered "Status"=
+ is sent to the host, if we attempt to reconnect to the same device by send=
+ing another HCI_Create_Connection command, the controller will send an HCI_=
+Command_Status event (Event Code: 0x0F) to the host, with the "Status" para=
+meter set to 0x0B, indicating "CONNECTION ALREADY EXISTS" and leading to th=
+e connection failure.
 >
->  client/player.c      | 24 +++++++++++++++++-------
->  profiles/audio/bap.c | 13 ++++++++++---
->  2 files changed, 27 insertions(+), 10 deletions(-)
+> (b) When the tampered HCI_Connection_Complete event is sent to the host, =
+if we manually send an HCI_Disconnect command, with the "Connection_Handle"=
+ parameter set to the same value as the previous HCI_Connection_Complete ev=
+ent's "Connection_Handle," and the "Reason" parameter set to 0x15, indicati=
+ng "REMOTE DEVICE TERMINATED CONNECTION DUE TO POWER OFF," we receive a pro=
+per response, signifying that the Connection_Handle is valid and exists. Ad=
+ditionally, the issue described in (a) disappears.
+
+Just read again the sentence above: 'TERMINATED CONNECTION', it can't
+possible mean the handle is valid and exists, I'm afraid you are
+arguing based on a controller implementation that doesn't comply with
+the spec text above, it shall either disconnect the link so we
+invalidate the handle on the host, then later we can reconnect, or
+indicate the status is 0x00.
+
+> Well we can't do much about the dangling connection if we don't know
+> its handle to be able to disconnect since there is no command to
+> disconnect by address if that is what you were expecting us to do, so
+> the bottom line seems to be that sending 0x0b to the controller is
+> useless since we can't do anything about at the host, well other than
+> reset but would likely affect other functionality as well.
 >
+> With knowledge of the handle, we think we can manually send an HCI_Discon=
+nect command to deal with the dangling connection, just as we mentioned in =
+(b).
+
+Assuming the handle is valid on status !=3D 0x00 would probably not work
+with most controllers following the spec to the letter, in which case
+the HCI_Disconnect would fail and in the meantime we have an hci_conn
+with invalid state, so I don't think it is worth going sideways just
+to get it working under special circumstances, where this special
+circumstances might be a bug in the way status is used.
+
+> We believe that, in the situation we mentioned, the handle is valid but i=
+s rendered useless. Implementing an automated mechanism to handle the relea=
+se of the handle (e.g., by sending an HCI_Disconnect command) might be a be=
+tter choice.
+
+Sorry but I have to disagree, in that case HCI_Disconnect would need
+to be sent every time, which can also fail if the link-layer had
+terminated the connection as indicated in the status.
+
+> Best wishes,
+> Xin-Yu Liu
 >
-> base-commit: 80107630396d3d3a3984c599e0cb9b015be0499c
-> --
-> 2.34.1
+> =E5=9C=A8 2023/8/5 13:09, Luiz Augusto von Dentz =E5=86=99=E9=81=93:
+>
+> Hi,
+>
+> On Fri, Aug 4, 2023 at 9:35=E2=80=AFPM Xinyu Liu <LXYbhu@buaa.edu.cn> wro=
+te:
+>
+> Hello,
+>
+> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in=
+ Linux 6.2:
+>
+> During the connection process, the host server needs to receive the HCI_C=
+onnection_Complete packet from the hardware controller. In normal cases, th=
+e status field of this packet is zero, which means that the connection is s=
+uccessfully completed:
+>
+> However, in our testing, when the status field was set to non-zero, 47 fo=
+r instance, the Bluetooth connection failed. After that, when we attempt to=
+ reestablish a Bluetooth connection, the connection always fails. Upon anal=
+yzing the event packets sent from the controller to the host server, we obs=
+erved that the Status field of the HCI_Command_Status packet becomes 0B, in=
+dicating that the controller believes the connection already exists. This s=
+ituation has been causing the connection failure persistently:
+>
+> That seems like a link-layer issue, the controller is saying the
+> connection had failed, and 0x0b also doesn't help either except if you
+> are saying that the other parameters are actually valid (e.g. handle),
+> that said the spec seems pretty clear about status other than 0x00
+> means the connection had failed:
+>
+> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+> page 2170
+>
+> 0x01 to 0xFF Connection failed to Complete. See [Vol 1] Part F,
+> Controller Error Codes
+> for a list of error codes and descriptions.
+>
+> In our understanding, it would be more preferable if a single failed Blue=
+tooth connection does not result in subsequent connections also failing. We=
+ believe that having some mechanism to facilitate Bluetooth's recovery and =
+restoration to normal functionality could be considered as a potentially be=
+tter option.
+>
+> We are not sure whether this is a semantic bug or implementation feature =
+in the Linux kernel. Any feedback would be appreciated, thanks!
+>
+> Well we can't do much about the dangling connection if we don't know
+> its handle to be able to disconnect since there is no command to
+> disconnect by address if that is what you were expecting us to do, so
+> the bottom line seems to be that sending 0x0b to the controller is
+> useless since we can't do anything about at the host, well other than
+> reset but would likely affect other functionality as well.
+>
 >
 
 
