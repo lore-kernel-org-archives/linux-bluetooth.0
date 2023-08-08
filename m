@@ -2,84 +2,180 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D573EC001DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Aug 2023 23:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E25C001B0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Aug 2023 15:57:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbjHGXuZ (ORCPT
+        id S231191AbjHHP5m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Aug 2023 19:50:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37184 "EHLO
+        Tue, 8 Aug 2023 11:57:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbjHGXuY (ORCPT
+        with ESMTP id S231132AbjHHPz6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Aug 2023 19:50:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E92AB3
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 16:50:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B58E462334
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Aug 2023 23:50:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 23051C433C8;
-        Mon,  7 Aug 2023 23:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691452223;
-        bh=j8j32qL4Gj4OtQl0H7H9ckvJF1oJIVWqEpqA8gdwd+Y=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Pb7x6lycNEhJRLr9pcgSKROIUlaIoBuaHVcoIw+CB3DKnDTXzvVA9vb4KXrp7Un5i
-         hQ6gBHzY6sl5WLTJtTsJS1aTU6MkePeOeZcNzQnazaInsKGC4I+UfW570QQVH3EJT7
-         DrCs92S69x66S9kV0x3XZQ2y+ekkxCQwhoI0tM8UaV0G0vylFaUFqVtx2c+PdyIEAr
-         2csMF0RcRw5i763mrfpMkl77K98+GpkiFVYLfaALNdLrVUtdspLwajSUqtoj3eFdVb
-         wRz1YQAImGh/KGK0CDUnDSv/SAPf0z1tFk/SWxwLzYBVeoaOodzjVUFeC/m355xjOW
-         /mWgmQi48ffMg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0F3A9E270C2;
-        Mon,  7 Aug 2023 23:50:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] Bluetooth: hci_event: drop only unbound CIS if Set CIG
- Parameters fails
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169145222305.5057.17030807199575322111.git-patchwork-notify@kernel.org>
-Date:   Mon, 07 Aug 2023 23:50:23 +0000
-References: <5af5d6830d65173124aa525dd01b2718548ffb65.1691251325.git.pav@iki.fi>
-In-Reply-To: <5af5d6830d65173124aa525dd01b2718548ffb65.1691251325.git.pav@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
+        Tue, 8 Aug 2023 11:55:58 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E5D5B8A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Aug 2023 08:43:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691509428; x=1723045428;
+  h=date:from:to:cc:subject:message-id;
+  bh=lNmuMfebT5EzHd6ekhBJ+qqub1gPCjCg0ObNj2KYyY0=;
+  b=N1J0Eh8yJoZho9QXFYObbcxDojEbpp6lVpdtx6/lJSuXB2PSuAzJyqz6
+   uDmnrOX3LfB/9wHlPW367pRb5sImwIUSPva/9ouMK6la6T3tnLuzcrC01
+   rD5eFg2wac9LCXDAOTtWPGu5yE1FaK5a0H8OW7K09HeTMKEcfwwvbGsiH
+   ST5ENG7N9UCLrzA3claba6+p10hZdqmkizGiX0ess4P2PrUU81Vp84e9R
+   8pesxRB7IKjguypRssbn+DzLDyv9HdWKTrKNjIXGVSS1ymecypxj2fkgS
+   CZ5JzbAGSfaaIaBBctJGh33ik56nIMXHt2hAJaPpI1TjGyAFSSF4U4EIZ
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="457188125"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="457188125"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2023 05:01:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10795"; a="845456477"
+X-IronPort-AV: E=Sophos;i="6.01,156,1684825200"; 
+   d="scan'208";a="845456477"
+Received: from lkp-server01.sh.intel.com (HELO d1ccc7e87e8f) ([10.239.97.150])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Aug 2023 05:01:57 -0700
+Received: from kbuild by d1ccc7e87e8f with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qTLPQ-0005K1-1E;
+        Tue, 08 Aug 2023 12:01:56 +0000
+Date:   Tue, 08 Aug 2023 20:01:52 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 6130cdd83d4078d7cbf7792e201d53bf944ee035
+Message-ID: <202308082050.oOSF0Wwk-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 6130cdd83d4078d7cbf7792e201d53bf944ee035  Bluetooth: hci_conn: avoid checking uninitialized CIG/CIS ids
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+elapsed time: 726m
 
-On Sat,  5 Aug 2023 19:08:41 +0300 you wrote:
-> When user tries to connect a new CIS when its CIG is not configurable,
-> that connection shall fail, but pre-existing connections shall not be
-> affected.  However, currently hci_cc_le_set_cig_params deletes all CIS
-> of the CIG on error so it doesn't work, even though controller shall not
-> change CIG/CIS configuration if the command fails.
-> 
-> Fix by failing on command error only the connections that are not yet
-> bound, so that we keep the previous CIS configuration like the
-> controller does.
-> 
-> [...]
+configs tested: 108
+configs skipped: 3
 
-Here is the summary with links:
-  - [1/2] Bluetooth: hci_event: drop only unbound CIS if Set CIG Parameters fails
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f5669a036ae6
-  - [2/2] Bluetooth: hci_conn: avoid checking uninitialized CIG/CIS ids
-    https://git.kernel.org/bluetooth/bluetooth-next/c/6130cdd83d40
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-You are awesome, thank you!
+tested configs:
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r003-20230807   gcc  
+alpha                randconfig-r016-20230807   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                  randconfig-r043-20230807   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   gcc  
+arm                  randconfig-r046-20230807   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r001-20230807   gcc  
+arm64                randconfig-r004-20230807   gcc  
+arm64                randconfig-r025-20230807   clang
+csky                                defconfig   gcc  
+csky                 randconfig-r013-20230807   gcc  
+csky                 randconfig-r021-20230807   gcc  
+csky                 randconfig-r023-20230807   gcc  
+csky                 randconfig-r034-20230807   gcc  
+hexagon              randconfig-r012-20230807   clang
+hexagon              randconfig-r041-20230807   clang
+hexagon              randconfig-r045-20230807   clang
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-r004-20230807   gcc  
+i386         buildonly-randconfig-r005-20230807   gcc  
+i386         buildonly-randconfig-r006-20230807   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230807   gcc  
+i386                 randconfig-i002-20230807   gcc  
+i386                 randconfig-i003-20230807   gcc  
+i386                 randconfig-i004-20230807   gcc  
+i386                 randconfig-i005-20230807   gcc  
+i386                 randconfig-i006-20230807   gcc  
+i386                 randconfig-i011-20230807   clang
+i386                 randconfig-i012-20230807   clang
+i386                 randconfig-i013-20230807   clang
+i386                 randconfig-i014-20230807   clang
+i386                 randconfig-i015-20230807   clang
+i386                 randconfig-i016-20230807   clang
+i386                 randconfig-r002-20230807   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch            randconfig-r005-20230807   gcc  
+loongarch            randconfig-r032-20230807   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                                defconfig   gcc  
+microblaze           randconfig-r026-20230807   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r022-20230807   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r031-20230807   gcc  
+parisc               randconfig-r033-20230807   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc              randconfig-r036-20230807   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r006-20230807   gcc  
+riscv                randconfig-r042-20230807   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r011-20230807   clang
+s390                 randconfig-r044-20230807   clang
+sh                               allmodconfig   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc64              randconfig-r024-20230807   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                   randconfig-r014-20230807   gcc  
+um                   randconfig-r015-20230807   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-r001-20230807   gcc  
+x86_64       buildonly-randconfig-r002-20230807   gcc  
+x86_64       buildonly-randconfig-r003-20230807   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-x001-20230807   clang
+x86_64               randconfig-x002-20230807   clang
+x86_64               randconfig-x003-20230807   clang
+x86_64               randconfig-x004-20230807   clang
+x86_64               randconfig-x005-20230807   clang
+x86_64               randconfig-x006-20230807   clang
+x86_64               randconfig-x011-20230807   gcc  
+x86_64               randconfig-x012-20230807   gcc  
+x86_64               randconfig-x013-20230807   gcc  
+x86_64               randconfig-x014-20230807   gcc  
+x86_64               randconfig-x015-20230807   gcc  
+x86_64               randconfig-x016-20230807   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
