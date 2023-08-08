@@ -2,55 +2,57 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CAD9C04FDF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Aug 2023 16:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 920D5C001DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Aug 2023 16:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232634AbjHHQ1X (ORCPT
+        id S232520AbjHHQ21 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Aug 2023 12:27:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48994 "EHLO
+        Tue, 8 Aug 2023 12:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231903AbjHHQZw (ORCPT
+        with ESMTP id S232821AbjHHQ1N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Aug 2023 12:25:52 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2072.outbound.protection.outlook.com [40.107.8.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BA84693
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Aug 2023 08:50:23 -0700 (PDT)
+        Tue, 8 Aug 2023 12:27:13 -0400
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2089.outbound.protection.outlook.com [40.107.8.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F0A211F52
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Aug 2023 08:50:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iuTqzCek56moi1yQxAi39ABzOol203XBZZfuq9rePoKO7VpNo5NGi9EYKwhvLhepNw+k9D9dtahwpspx+YppbA0BK5RqZvh/dP//Msc/Y0dD+gANFU4jO055LmZa4A4UMubd4lKthsr6gqDSkuJJxyo+ma+OiU/BY9pmGDPul/F+ozdp7LoUgoHyEGQX/0AYDr+BonbnM7OkYyODgTRVkljnUZ9sowlgNSvZKSjf5zlksqkQY231ie7xFjbIjGYnkqP2nvZsp5gnt5u4DSgcD0H95WInmnh5yTo3092jRrniJuzWw0W6sOnJ/XX+WF7hjOd5cKUqVw5sIj7vDpvvwQ==
+ b=ZwP6G8ujXkXSS7oRIWcO2SD2znPi+3wsi3xBxWvD4QirY7PbrTk4vxacfcwDyVDQfx5dv7RvAR/LHyNVOwSV/Zj4OAQLkuMqWVuII4hxkQF/vxi61vQh2dOKV987pA0L9S07TdHkXcIQgaA99w4DnBP9kQ0eotEJJAqaFdJBpNevHUekvi2cb5f2zpxjxS5+/6Y2mxq0WAyCAdyf095mxnBZekK0wImrZeXxp4grodlKfmSg5a06hDFGDL24J8Oyb4n7PodDBYN6i6hH4RHlEQ0mkDf667AsC5i01SoXr6xKVadGYfbP0YXZZVWwc/qTDNWSdyWhvFPIf5MQcEqmfQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nO8RjUqXfgSblWdvRTjBYBSksZCvEFjrW153W6/l4YY=;
- b=c1iCnDU6KmO+kniB8jihZ1JP3RCCGB9vug9I3EsXpNL7D91OkchzJ+TlOegGTXp2hL4mp16u+sOJNn+0i8eqYqCbApRIInWJ8pplfjVGd9iuYqW3pq88fVBs7snkIK763Z0xYKyaNUdMhNih/KnV8zl32N1hDX67Dj/NgAE8sCfLfJnfdvuI3OA25CtUHk++fSlOMNGSkxv5LgH1Cx/AYzLLhWi1TMZu1VeVCnTURLYTDJe9w8IY2XkUFdwNtlcSfVE5j+6OGoDz/gQEoCGs2rLiPU9Nr7u2J2kNkGnFl7iZGgu9dnoTVDjA2Az+t+7fhFdtWJVSMS1sfNAPcpxNBQ==
+ bh=cywR7JEzuV7zKrI1xonk74lSgQYfUdDI2o8FsJNsdxA=;
+ b=lZ0vj9Pn+dlPlw6GjfFfhsMK5a+zjGE47Y52hxTALflhVD+eQ4XpAkcKwaxMBVwj9o3sSzxh7jO9KarGFt2eYmSsPYHV/gQd9MfyvVZ5xnBPNkWBxpZofg5M3IvmkcfWScEG5Nf4rb1/GR7pvjhgYlcQYWppNSWZ+i9PChOtSwLMCeDAvjE1EfE5IddJslFOLQgK7WzlOgPbZi1dvoaGejiNyCyx98/XHSqVl2qGfu7HY2iJVgr/0PrNUcUGFG9Lm2N4fGSpoy0CadKGkPY5acrVkkxAutZ6htEzIaJKFJ+HqrOyjgbz57mtVzOgTkve0QeUxjDaVqjbuQxHFHaa4g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nO8RjUqXfgSblWdvRTjBYBSksZCvEFjrW153W6/l4YY=;
- b=dwjqBs24EEUJVF5HKnkag8neN8qOZanxvy0OieXmfzTvnY+qwNcZagQjI7NqP2UUvdJ7bUdeYml8kmLzK2B2TOs4YU3ZlFYi0Cz38WXuA7wfLg3gkHgaK+HCuYvA1dmB/6qyZ1pL+1YRwLveqZvPmpYgRmSgQasv3Mu1zJRgmwU=
+ bh=cywR7JEzuV7zKrI1xonk74lSgQYfUdDI2o8FsJNsdxA=;
+ b=ZUkVXWkYG7qf+F74XV9yUENreQz2BaWsHXsFXp1BJ4h/ghP1s+7EHsZNkw7NxcTZQCA74LEpcN0Mzhamr/ZGcuAGB/JJxtEp3X/umBkHHu6AWJRnX+UO4DID5OIH347U7lCqh8TBqTNjthZ8kvWRIbNm8cvO11FB7MjzZw1IE8E=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
  by DUZPR04MB10062.eurprd04.prod.outlook.com (2603:10a6:10:4e2::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.25; Tue, 8 Aug
- 2023 11:52:47 +0000
+ 2023 11:53:01 +0000
 Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
  ([fe80::c2fe:9eef:61ea:36d9]) by GV1PR04MB9151.eurprd04.prod.outlook.com
  ([fe80::c2fe:9eef:61ea:36d9%7]) with mapi id 15.20.6652.021; Tue, 8 Aug 2023
- 11:52:47 +0000
+ 11:53:01 +0000
 From:   Claudia Draghicescu <claudia.rosu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
         silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
         andrei.istodorescu@nxp.com,
         Claudia Draghicescu <claudia.rosu@nxp.com>
-Subject: [PATCH BlueZ v5 0/7] Add support for BAP broadcast sink
-Date:   Tue,  8 Aug 2023 14:50:33 +0300
-Message-Id: <20230808115040.4403-1-claudia.rosu@nxp.com>
+Subject: [PATCH BlueZ v5 1/7] client/player: Add broadcast sink endpoint
+Date:   Tue,  8 Aug 2023 14:50:34 +0300
+Message-Id: <20230808115040.4403-2-claudia.rosu@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230808115040.4403-1-claudia.rosu@nxp.com>
+References: <20230808115040.4403-1-claudia.rosu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: AM9P192CA0001.EURP192.PROD.OUTLOOK.COM
@@ -59,67 +61,62 @@ X-ClientProxiedBy: AM9P192CA0001.EURP192.PROD.OUTLOOK.COM
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|DUZPR04MB10062:EE_
-X-MS-Office365-Filtering-Correlation-Id: f60e82fb-a11e-41ba-5ea3-08db9805fc37
+X-MS-Office365-Filtering-Correlation-Id: f52b11ad-9c11-4499-a41a-08db980603f6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vQMnbTyONcWnORASlg03b4F1itTbKW8ot67TNJ05WUMmeF+57LeO68tzyteDmImpMfgD79nnQ7G7O6HbvhGeml/mqVsMzJf+yRVEkyjDz/i/54M1V9tB2bBrd63ul/71RKOZAEz3faFEmJhAkUddyjo482og3VzWp2vFxHFIv17q6Cu2tbexJwwN7xPTD7crncnPFtqs1mhN61kUHxSWB4lRKHMVVdx/R5mqzPb0F7e7z1rhX61TyJY74f4uilnOcgWtKEUOfWxyyjUl4WnqWrV5XOnkiz1e4HggKNiu9NLLzrM8NU83VaUiWuFRialm8ETsfYPyX+bJRV0q1Pb8LG8iRSL/REmpJylKl7zUOEKcWdjFj1/btFdMH3QVeOi9QhxKd6oLButeyg/5JGJb6Dwb9xqLTClTHeY3VlNPx+is4qcmqbXxa4mOjejjyiv6qP//dc48DG1zeffPBy/1Y5ysO6beWk65kmVMUvpbMgz1sxSJBPo3ldKA9vYBmtof0pMUeE7QZUfRUbBJQonhaUPQc4MONVJ4+rWDOtf2p9XJaxjlfmvM4v5WeR02Ga3+noHRdszw5W2xqP1sBTJLLUTzkHVKFbOVBX65r6YTDhkjIkc8pQmDL30UFH8KPTUv
+X-Microsoft-Antispam-Message-Info: S6FuORQhlXchA3mqJb8YxkkPyKWEr6e4e7oHRQZ0sH4LLXp+2FAvnJdyyh1yDeGCERo2PY34C0hGw38XUYjx6wTpnht1CvKWossrNzZz+r0BWaP+8Zg/TAd2ayQshb6myKfAHFBW2dyrqp5Gn7aUIEqVorF+ByVP/ZDqOZhjm6FPn5+mRgMQaakzoXbI/DZszvVfY/71go9wg+xchPaLLYN2Z80i2Yvwo4LFQYyB/rPpFCvTKL1hcX1Sr2kPXq931Q+z/qJUBs1PyCOar6bHy8TNJcjrHs/dMGw5kx2KtI0/y/Je7y00FOdB/qarSpm3U8+nM3ZtMk27vATHfuqfi6IRRvNqxjNaiGJ2bCRsujfS/3dOHA1MvMI2Ukx4dv3OY3cka19hOBxL4jSvch8QvKj58wRxa9eEATGNEEdII8H3d3y1aACinGfdHvQevf4lAaCD40+hvSzvukxvDwEVfQMjMBzDkm/EQl8hGRdt3BqrtX8UvmqRpQwNnmIBCfuazW7RotFXT+1sgaq4TMmzuGLNxJmqI/074Zz+MVZWVd77RN3nWrtIxQHY0CKRSkWrTU6oVHqjsMJdYaN3oaQMwrb2JK3nkNrxBhwskAP77F5Ini5Y2jmSOoKR1NWb96uN
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(396003)(136003)(39860400002)(1800799003)(186006)(451199021)(83380400001)(2616005)(52116002)(6916009)(38100700002)(38350700002)(41300700001)(2906002)(4326008)(5660300002)(316002)(8676002)(8936002)(66476007)(66946007)(66556008)(6512007)(86362001)(478600001)(6666004)(6486002)(6506007)(36756003)(26005)(1076003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?g2+k4oOxybt9U/4S12MavdIZ4+FKsM9uuRCQkaA+8yyoKgpS2NbCuQjk2P1s?=
- =?us-ascii?Q?3MAl3V4svy55VnSgi7w19kOBYmHn8ld0HmDcLFXw7HZReJDetCKJv4TLnvvr?=
- =?us-ascii?Q?VS6JDcej9vuoqZH0oLzhBqUie7d99Fxr3g+Pqm4jZ13OInU5/fbnwUeWHfCA?=
- =?us-ascii?Q?SgZLVkb5uS1o6/jf+8WdKAXdd3vIqSf2VEzdSYpcW1uGwz1OtMZJj7GyT4KD?=
- =?us-ascii?Q?i166pViGEd7TEnq15zPFT8cMcVs4Bl6W9snT/rv32JHr6jPlVmWYttbUr1FB?=
- =?us-ascii?Q?YWYVG3WVtK0WtINHmXqe+xwdgQjdjPh5YcnLl3AGwtfzJSGyyKe7dnPA4u01?=
- =?us-ascii?Q?VcPViR3DjwbWciENJY9OY3c+5m3CtOA6E49QmBjF1Tqlm7s8KzZQvCdrfcdC?=
- =?us-ascii?Q?F6+RYENzBxxER80GizIlLd7pER/GtFdmmVWolDoDuHxwlCvezrlajnRmzwUl?=
- =?us-ascii?Q?2zThtUjtj892B/M+bVOgrgHSPTroTqdZssV4dHPymWD3dN7/0rmXjB+ZWKsE?=
- =?us-ascii?Q?T11KKYlFh++QZ1nPMwJ9p+Ca/PVUcKiRS+imHJ8u2dWUsBrDazs3aXBdMx6j?=
- =?us-ascii?Q?LJD8AE1LvRq7hMoATPzieANmGXwZ6vHP0h5sSv5fX06QqQo9VlDOt2HiExwq?=
- =?us-ascii?Q?y/QrbJ5qqPIHvOcw4fJAKrR9uTslLtH2b0oUfBhu0IxOwkNafhyuLCr/EfYL?=
- =?us-ascii?Q?5T753Q7o2wB2SB1rEMk8I17ILkE+QUf9RvqlheQjYQkoO6gsfSDgD2dTKsW9?=
- =?us-ascii?Q?L8/fSMOH7Z4ZpMA9GKb3zDumWRIZ+6UPb7hov3dTwPZ1c8SztqKv/df9RsHE?=
- =?us-ascii?Q?6NFDDYj5pGt5ky/Sgdv3k+V5mPR9RuNjbzFi9eeqOs1/GlgNS1j+wECcGVvZ?=
- =?us-ascii?Q?Z5lsF+KqGq3JLIPZAXovAPoAo9f5zi/RhWLERvdVX4G+gY56wesyDwZYg6Jb?=
- =?us-ascii?Q?UufbMV69hhX7CmWQb9JT+sRW83XAi07Tmq8cDF1Re771ItBvA4tVjP2oVUHD?=
- =?us-ascii?Q?Dr/ZN1VYpvr1RF/3/dkZugRifDOoAD43iyYti7+LqlmPB0aMy3RVh484T/Rq?=
- =?us-ascii?Q?xsDehoydoP/h57ou7flg/f3nAoLgHhLTCcnVaj6D4EVW6r0l9R2KbNAZTKG7?=
- =?us-ascii?Q?KCUc6tLFbCCM1lqUD3qaS38mYpRvmJLPrNj/Q85uaz+oYt1vaZOxR7zi3zCt?=
- =?us-ascii?Q?gV8zT6sBfvxWJCLVuCOKh5TcPixOCq1pHsGbdOsCrxXdmGQ29KraxhLGd7so?=
- =?us-ascii?Q?sVNbf5Hjxtx2uaNxKBPgSZnrN5qloOcVo2vUvWSVyn3yki/CcL3L+RPihVz2?=
- =?us-ascii?Q?EJkKcCMdFKbemIGAmLYiGm7rV8wxftbFnW4JptKZc9tTZ1lcoySFg+6QjNlE?=
- =?us-ascii?Q?W//p2C4Vx1w9clCm7gDbTCd5Rr1d+iwbuht7cp6E+Ndxihfl47fdOsPyW2rE?=
- =?us-ascii?Q?CpptTQLc30hlYU/4RvVwYzWzZ9fMMvME4t0E+XUa/z/nRdHRAwaN7xChsEoJ?=
- =?us-ascii?Q?4VixZC3bjct6z9n6QE3RsCMeWeBq1ppheROb57RC5SJ/me9lAUR+0Rp3nWhm?=
- =?us-ascii?Q?H6xlrSdzDhYx9I5iLkSsKqs7QnCsqdpCNs/BeE2o?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ozfJTpdOmdGJ4T0+3WY9lg5MZaNp4eAKpzc1mxtr16WgzHRI1AO9hq0LCSj4?=
+ =?us-ascii?Q?+B+rfSnh7VgprWUv/oxrgeu0K89Non+8xtusdI7iQ7XZTz8UEqznD6A/rqXM?=
+ =?us-ascii?Q?hTAOwPIRXyntaOb76INaebT0lOB8Qp1gfm/SqwBatVpeYSrIThGv0O7r1AAT?=
+ =?us-ascii?Q?YY7ZhASc2AxncuCiSEpso22NDJ0jdF3z4D1eCgqd2I8IO/OszYLXEf2s8GTm?=
+ =?us-ascii?Q?d4aNDKA/kU059hjWwL77C3zjM3S39QnJO3Isk01eQbmsfi4H5wIrKL/E7edw?=
+ =?us-ascii?Q?Fr5Zo0TBr66YSAZ5U8YLqT/2APn1NVr/sTIuu9dIjmUik7GwHrG0BZeHKKyX?=
+ =?us-ascii?Q?TSDCTWoOS6ZEC0bJnsm9be8dd+vie/3fMrSpvotcj+hDKrFEIFnJcOjDeXeX?=
+ =?us-ascii?Q?vOdvLQ6jFfi7tah11guMBcvM3E6npUsw3OhYOJF6yNoKBNuFf3zl1vTqsDM/?=
+ =?us-ascii?Q?HVmoGqzZgMdTxebGHeEoc7SfDJ+v700onK5MGZKzQ+JuRV+BtHIuXrcqOp7k?=
+ =?us-ascii?Q?jLr7+KgkV+WeEWB6iDA6PsKmInO2Mv2bfxL1HQvb9qnl3+eXB3EBYVBRMeLc?=
+ =?us-ascii?Q?KqVxxiOx6HBKC3cKDoBRCXsqG/uAqp32jjBv7ERQ2WsMFc2n98MOyfQ14TOA?=
+ =?us-ascii?Q?+mmN4X1mCaFGjGfMVmCHBcERA7s/hH/c8LcLpuYUeDcRTCZCmx8e5UCII9f6?=
+ =?us-ascii?Q?vF9hbpIOMsnJ01TMS0Nk25jq+n8/6ka9LKpbL6Fo1sZsqS1PO1hd7VtBq/Yr?=
+ =?us-ascii?Q?aqKk7wKeIIdKujYN0eldTbW0gyYBZgcngC3oAa5CGigkoNqwQOmIww5RrvBI?=
+ =?us-ascii?Q?AdZiHc3D8WW3L0l7F/9uV4cMkgzy9y9qbRmgDkgzw6ojixm9lhb7oecEtA2w?=
+ =?us-ascii?Q?/FMmxrw70Wl9F1+YVfn1Eb1dV3L00XS8pQZz2dZxhYoPK50+DRDLIFDBBzBn?=
+ =?us-ascii?Q?X6m1zEI8u2PGNgSG6pHj+e+fG3FlFiPRX+5IUewj3aP/y+tw/3c3ehb3bXKQ?=
+ =?us-ascii?Q?QwMayEyDv1wEs7Q7lWH+/kPMujX65CjWmHe61k1dRecjS8UN9XnPPkvJmooI?=
+ =?us-ascii?Q?JP+M3XGgfPz4qG8Z2efXa9CpzKxsm7OkALw8qNtngJGiA8AiyxRw3m/+vnZw?=
+ =?us-ascii?Q?qDJHQwG0rIYr3za01h2076PnKx0u9U/axcG78QYg9lNamXcpLKaNx6409Tgn?=
+ =?us-ascii?Q?TGqOu8Oahojae4s/dnA8Nj9EwGGhc/28cocjv/y/nLgh5ZRYc5i6YvUtKpOD?=
+ =?us-ascii?Q?KKCHk9ST4pd5hakNRcx+F/Un0vKcYKLtFxg3ThPfMzK0bHyOidVlRGlAiK7f?=
+ =?us-ascii?Q?GQQ8uMoZ1ZUeIWidIrmtpcpgg4R1cZRG7Ld2Ot2PPQ6I5EN2nvkhrfo4Huem?=
+ =?us-ascii?Q?pD3G6aFBh/p+CocJu7xp0maxUmsFqpZEEzp4NRX3mvU0Z9T++FXkzX28STQB?=
+ =?us-ascii?Q?DywtoeAv1NjI8Jv7Az5yGIit90B0yFMoBdHpGhTe96AW52tqEyP9SXvL1z+I?=
+ =?us-ascii?Q?vP+73BP1ByWoDrt8sGz0JYYU4+l8HYpACC8Q6UF1/l8JLpsFpzRkFjiDfm2h?=
+ =?us-ascii?Q?FBI4YQLlVAD8M5gvEiRjCFTSeA5867/PuWtOjqYSifEKuAYxlvWrsZQwBExh?=
+ =?us-ascii?Q?ww=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f60e82fb-a11e-41ba-5ea3-08db9805fc37
+X-MS-Exchange-CrossTenant-Network-Message-Id: f52b11ad-9c11-4499-a41a-08db980603f6
 X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 11:52:47.8457
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Aug 2023 11:53:00.9485
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pkVWy2nmWbNeKkj6jV5FQyMmtx3s+FNuWakXK9HspU2z13+i9iSJKWv0ftkGfmp7TnXNSYe6EJMbwlgVG/nquw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5imGn6p+ES0YKZAhc5qQU6fJpdtF8D3MfgDmPrPNIb0WOjG5sTvBxGt4IYdCXzJn2SDFGm5zUft6ac0+Zo4Inw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB10062
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This series of patches adds support for BAP broadcast sink.
-It consists in registering a broadcastsink endpoint using the
-Basic Audio Announcement Service UUID,
-discovering of broadcast advertisers that announce the
-Broadcast Audio Announcement Service, synchronizes to the Periodic
-advertisements of the source and synchronizes to the BIG advertised
-in the PA train.
-To retrieve the BASE info advertised in the PA train, the patch
-Bluetooth: ISO: Add support for periodic adv reports processing
-was used.
-
-This feature was tested using bluetoothctl with the following commands:
+Added support for broadcast sink registration using the 0x1851 UUID.
+Added support for remote endpoint creation when a broadcast source
+is discovered.
+Added support for creating a local endpoint when the broadcast sink
+endpoint was registered from an external application (Pipewire).
+To test this feature use the following commands:
 
 [bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
 [bluetooth]# scan on
@@ -128,30 +125,143 @@ This feature was tested using bluetoothctl with the following commands:
 /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/pac_bcast0
 /local/endpoint/ep0 16_2_1
 
-Claudia Draghicescu (7):
-  client/player: Add broadcast sink endpoint
-  btio: Add support for getsockopt(BT_ISO_BASE)
-  adapter: Do not filter out broadcast advertiser
-  profile: Add probe_on_discover flag
-  bap: Add support for BAP broadcast sink
-  media: Add broadcast sink media endpoint
-  transport: Update transport properties for a broadcast stream
+---
+ client/player.c | 61 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 53 insertions(+), 8 deletions(-)
 
- btio/btio.c                |  13 +-
- client/player.c            |  61 ++++++-
- profiles/audio/bap.c       | 334 +++++++++++++++++++++++++++++++++----
- profiles/audio/media.c     |  82 +++++++--
- profiles/audio/media.h     |   3 +-
- profiles/audio/transport.c | 245 ++++++++++++++++++++++++++-
- src/adapter.c              |  10 ++
- src/device.c               |  22 ++-
- src/profile.h              |   5 +
- src/shared/bap.c           | 139 ++++++++++++---
- src/shared/bap.h           |   6 +-
- 11 files changed, 831 insertions(+), 89 deletions(-)
-
-
-base-commit: 59569c1f947d648f1e0b9234dad3707f6c34739b
+diff --git a/client/player.c b/client/player.c
+index 9bc5f2a36..3611a8dfe 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1183,6 +1183,17 @@ static const struct capabilities {
+ 	CODEC_CAPABILITIES(BCAA_SERVICE_UUID, LC3_ID,
+ 					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
+ 						3u, 30, 240)),
++
++	/* Broadcast LC3 Sink:
++	 *
++	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
++	 * Duration: 7.5 ms 10 ms
++	 * Channel count: 3
++	 * Frame length: 30-240
++	 */
++	CODEC_CAPABILITIES(BAA_SERVICE_UUID, LC3_ID,
++					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
++						3u, 30, 240)),
+ };
+ 
+ struct codec_qos {
+@@ -1465,6 +1476,7 @@ static struct preset {
+ 	PRESET(PAC_SINK_UUID, LC3_ID, lc3_presets, 3),
+ 	PRESET(PAC_SOURCE_UUID, LC3_ID, lc3_presets, 3),
+ 	PRESET(BCAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
++	PRESET(BAA_SERVICE_UUID,  LC3_ID, lc3_presets, 3),
+ };
+ 
+ static void parse_vendor_codec(const char *codec, uint16_t *vid, uint16_t *cid)
+@@ -2285,6 +2297,9 @@ static void register_endpoint_setup(DBusMessageIter *iter, void *user_data)
+ 		bt_shell_hexdump(ep->meta->iov_base, ep->meta->iov_len);
+ 	}
+ 
++	g_dbus_dict_append_entry(&dict, "Broadcast", DBUS_TYPE_BOOLEAN,
++				&ep->broadcast);
++
+ 	dbus_message_iter_close_container(iter, &dict);
+ }
+ 
+@@ -2455,7 +2470,8 @@ static void endpoint_auto_accept(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
+ 
+-	if (!strcmp(ep->uuid, BCAA_SERVICE_UUID)) {
++	if (!strcmp(ep->uuid, BCAA_SERVICE_UUID) ||
++		!strcmp(ep->uuid, BAA_SERVICE_UUID)) {
+ 		ep->broadcast = true;
+ 	} else {
+ 		ep->broadcast = false;
+@@ -2728,13 +2744,20 @@ static void endpoint_config(const char *input, void *user_data)
+ 	endpoint_set_config(cfg);
+ }
+ 
++static struct endpoint *endpoint_new(const struct capabilities *cap);
++
+ static void cmd_config_endpoint(int argc, char *argv[])
+ {
+ 	struct endpoint_config *cfg;
+ 	const struct codec_preset *preset;
++	const struct capabilities *cap;
++	char *uuid;
++	uint8_t codec_id;
++	bool broadcast = false;
+ 
+ 	cfg = new0(struct endpoint_config, 1);
+ 
++	/* Search for the remote endpoint name on DBUS */
+ 	cfg->proxy = g_dbus_proxy_lookup(endpoints, NULL, argv[1],
+ 						BLUEZ_MEDIA_ENDPOINT_INTERFACE);
+ 	if (!cfg->proxy) {
+@@ -2742,16 +2765,36 @@ static void cmd_config_endpoint(int argc, char *argv[])
+ 		goto fail;
+ 	}
+ 
++	/* Search for the local endpoint */
+ 	cfg->ep = endpoint_find(argv[2]);
+ 	if (!cfg->ep) {
+-		bt_shell_printf("Local Endpoint %s not found\n", argv[2]);
+-		goto fail;
++
++		/* When the local endpoint was not found either we received
++		 * UUID, or the provided local endpoint is not available
++		 */
++		uuid = argv[2];
++		codec_id = strtol(argv[3], NULL, 0);
++		cap = find_capabilities(uuid, codec_id);
++		if (cap) {
++			broadcast = true;
++			cfg->ep = endpoint_new(cap);
++			cfg->ep->preset = find_presets_name(uuid, argv[3]);
++			if (!cfg->ep->preset)
++				bt_shell_printf("Preset not found\n");
++		} else {
++			bt_shell_printf("Local Endpoint %s,"
++				"or capabilities not found\n", uuid);
++			goto fail;
++		}
+ 	}
+ 
+-	if (argc > 3) {
+-		preset = preset_find_name(cfg->ep->preset, argv[3]);
++	if (((broadcast == false) && (argc > 3)) ||
++		((broadcast == true) && (argc > 4))) {
++		char *preset_name = (broadcast == false)?argv[3]:argv[4];
++
++		preset = preset_find_name(cfg->ep->preset, preset_name);
+ 		if (!preset) {
+-			bt_shell_printf("Preset %s not found\n", argv[3]);
++			bt_shell_printf("Preset %s not found\n", preset_name);
+ 			goto fail;
+ 		}
+ 
+@@ -3172,7 +3215,8 @@ static const struct bt_shell_menu endpoint_menu = {
+ 	{ "unregister",   "<UUID/object>", cmd_unregister_endpoint,
+ 						"Register Endpoint",
+ 						local_endpoint_generator },
+-	{ "config",       "<endpoint> <local endpoint> [preset]",
++	{ "config",
++		"<endpoint> [local endpoint/UUID] [preset/codec id] [preset]",
+ 						cmd_config_endpoint,
+ 						"Configure Endpoint",
+ 						endpoint_generator },
+@@ -3189,7 +3233,8 @@ static struct endpoint *endpoint_new(const struct capabilities *cap)
+ 
+ 	ep = new0(struct endpoint, 1);
+ 	ep->uuid = g_strdup(cap->uuid);
+-	ep->broadcast = strcmp(cap->uuid, BCAA_SERVICE_UUID) ? false : true;
++	ep->broadcast = (strcmp(cap->uuid, BCAA_SERVICE_UUID) &&
++			strcmp(cap->uuid, BAA_SERVICE_UUID)) ? false : true;
+ 	ep->codec = cap->codec_id;
+ 	ep->path = g_strdup_printf("%s/ep%u", BLUEZ_MEDIA_ENDPOINT_PATH,
+ 					g_list_length(local_endpoints));
 -- 
 2.34.1
 
