@@ -2,210 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46C8BC04FDF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Aug 2023 19:46:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69AFFC04A6A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Aug 2023 20:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232400AbjHHTq0 (ORCPT
+        id S234736AbjHHUVt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Aug 2023 15:46:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52708 "EHLO
+        Tue, 8 Aug 2023 16:21:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235635AbjHHTqG (ORCPT
+        with ESMTP id S234244AbjHHUVh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Aug 2023 15:46:06 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38DBF4A044;
-        Tue,  8 Aug 2023 09:50:23 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-686e0213c0bso4253024b3a.1;
-        Tue, 08 Aug 2023 09:50:23 -0700 (PDT)
+        Tue, 8 Aug 2023 16:21:37 -0400
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BCFD5BD5D
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Aug 2023 12:28:46 -0700 (PDT)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1bf7eb259d5so133676fac.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Aug 2023 12:28:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691513422; x=1692118222;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m86pfXXuQMAMRz51pUxOAytG4Ja5agUvJe7SSaobTsg=;
-        b=lbfB0HwgDOICfiD5Jx2dkcibdBn+BBpeqM+H7RPgRY7cOdP26E6zPQQ/VzPdtli3Rs
-         H8w9FmyUeXjNXMVSuBwJhXEMVH/hWu8C6ivoumSXYOcEdxCGtQri1jpZhcf3PVCoMEI1
-         8fWiHdHnnrduzt9GRtvZTs/6VicmpvNtp03t+a463gRi33+3jnBMaJPoxjAFxMaBT7/L
-         aFhfeDd/ISRwUsDu8gnfocajpdroNsI0ihXQDqjN7bRi9SpbQdtuVmDjPt6W5L1kygFe
-         oc2wap/sNggfuHJSdB8rVwlThAl5+6mQ64Of3dAhYaiA/Z2+P3VEtDXZtKZnUnvTdUMV
-         t1Lg==
+        d=gmail.com; s=20221208; t=1691522926; x=1692127726;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/y3LNkYt8xN4admkh2/Bw8Vr1sfU+XKRwNwgeZCksOw=;
+        b=QZ9cZ+svcwU1H/9MpZ/FsUC9FUzylj89xbFdaJoNpsoOCKwgV2E7UwVm7p4LS0V/MA
+         k2bHhez2xgk3OxUl5+pGfQKWN1zibiksRF/NP1Xx7Vey0g1FyzVH2DsdoWDvbUFxQ6ZD
+         E6hlSiqsw24lyxrfDZQE+bBHz+ItJnIGhywVLXrPkmcD83nEL7m25ymalZT8maXOsH99
+         4yCJTvf2i3ZPAjO/WtmfliyQfXu52jevTpJqidcFXgdQzOwfIymHD5s+E2b8ca0nverC
+         CE4HQt6dt6jVss5Jl6t0YCLy4RB4CRwC6ATE9QGG4QEP1UdHvSG6UYl9TWJAl39SylLh
+         4N3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691513422; x=1692118222;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=m86pfXXuQMAMRz51pUxOAytG4Ja5agUvJe7SSaobTsg=;
-        b=fwXTYNG1VgDfihfZO3Ho76o+VaHB4UIbHDujYrTtk0fjr0hevs+w3vxOLkPH5Ec4Bw
-         JuQ4thAQ+S1YqAPY7vMfDPwzhFc0L49UnM/hjdOmsagxPm7CjDRzg0o989XMnMJbRrhb
-         38AO8nam7jUN4NGRdKBpEtkT2ZAZRjdsXjfrlucm0LKSCExVaEj6gnWDbC5x8RgHg6nt
-         JRfvF2FLyGjt9UdkAYj7IgQoQZuuzPB9XFg+EB8OeRbWNOjpXZ8PE+U83k5BBH+3mwRN
-         f7Tk0/Xp2bExh7+koM6/lDHz0+fc1GtkouZFCrp/wrnZrHRTV9xWBnnLLSFqg3OKJFkH
-         KtIA==
-X-Gm-Message-State: AOJu0Yx/Bd6IzmwhgTbHrU+5P1DnzP1BBXpSeosVg1JZNJqRMlqVsQ0R
-        FJDajfO+E+g2nrbHH/DQr/O4ndMRgG8=
-X-Google-Smtp-Source: AGHT+IExw3PsoAFt7iUN1CtlVmtBWxSm6CiZ27g8sCTwbosvnsXuzLew22DanAUYdLPQltuAGYVbjQ==
-X-Received: by 2002:a17:902:c409:b0:1bc:5b36:a2df with SMTP id k9-20020a170902c40900b001bc5b36a2dfmr8343835plk.1.1691502291367;
-        Tue, 08 Aug 2023 06:44:51 -0700 (PDT)
-Received: from [192.168.0.105] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id z11-20020a170902ee0b00b001bb7a736b4csm9066071plb.77.2023.08.08.06.44.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Aug 2023 06:44:50 -0700 (PDT)
-Message-ID: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
-Date:   Tue, 8 Aug 2023 20:44:36 +0700
+        d=1e100.net; s=20221208; t=1691522926; x=1692127726;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/y3LNkYt8xN4admkh2/Bw8Vr1sfU+XKRwNwgeZCksOw=;
+        b=K3XM1oBwq/bIc24C34JtAO0BIQpWX6BGyaLpsVvqX47I+Jw5+29DEp3gyoC+ffWyvX
+         04+Qjcblbyl1KN6dFZTPGwTYEH50lEW6eluTjLAxS50XBdMLTPfAllA7n0CrJyKvfUXb
+         HmBc3tbLCM5CMjSvFLhW89Njit4csVigiW/tpydNQnDTg8h+VPDrbvdEoDtsjjbVztsA
+         Mei44wxXqd+2cFN9vcCWDGCPj31oBmb2qPgyvleRoNGctLOm4hGaPoT6OHV9Mab3EPCH
+         IcjhXNrbwqUBVQJaqlaOvPxSbXm8np/6R2YH8tqUCFL5QmKLC+2DSV+yfV/F3cSIEnyS
+         UZ8w==
+X-Gm-Message-State: AOJu0Yx70hzEacp5TkgWIzSgUtK7+xiPaIc6DYSF18pRR/VGwL7MgJZ5
+        8JZ55h2nKYnE49VZTiCcWl/mBAeMK1s=
+X-Google-Smtp-Source: AGHT+IF1YRcZ9uNQFWieI2buSCfvTtw4qHM1V48BeuYRhUp2nXsMOnuepahinAqmW6DJ5MPEGyPe3w==
+X-Received: by 2002:a05:6871:b28:b0:1b4:4935:961c with SMTP id fq40-20020a0568710b2800b001b44935961cmr508490oab.27.1691522925660;
+        Tue, 08 Aug 2023 12:28:45 -0700 (PDT)
+Received: from [172.17.0.2] ([104.210.133.24])
+        by smtp.gmail.com with ESMTPSA id eb18-20020a056870a89200b001bf3942ea12sm6441857oab.1.2023.08.08.12.28.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 12:28:45 -0700 (PDT)
+Message-ID: <64d2976d.050a0220.10e55.f62b@mx.google.com>
+Date:   Tue, 08 Aug 2023 12:28:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4554771167508707907=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.14.0
-Content-Language: en-US
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        TatriX <tatrics@gmail.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Regressions <regressions@lists.linux.dev>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Build System <linux-kbuild@vger.kernel.org>
-From:   Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: Bluetooth LE scan doesn't show device name
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, gioele@svario.it
+Subject: RE: Makefile.am: Install D-Bus policy in /usr/share, not /etc
+In-Reply-To: <20230808065734.1475152-2-gioele@svario.it>
+References: <20230808065734.1475152-2-gioele@svario.it>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============4554771167508707907==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I notice a regression report on Bugzilla [1]. Quoting from it:
+This is automated email and please do not reply to this email!
 
-> Hi!
-> At some point after kernel 5.9 I started having issues with LE device scanning.
-> Here's how it used to work:
-> 
->     $ bluetoothctl
->     # power on
->     # scan on
->      ...
->     [NEW] Device 68:71:DD:73:97:D5 Playfinity-2
-> 
-> It successfully finds my device and it's name.
-> On a newer kernel instead I'm getting no name:
-> 
->     [NEW] Device 4D:18:19:A8:63:B5 4D-18-19-A8-63-B5
-> 
-> Here's corresponding btmon logs. First from kernel 5.9.12 that can see device's name:
-> 
-> ```5.9.12
->> HCI Event: LE Meta Event (0x3e) plen 33                  #118 [hci0] 5.607028
->       LE Extended Advertising Report (0x0d)
->         Num reports: 1
->         Entry 0
->           Event type: 0x0013
->             Props: 0x0013
->               Connectable
->               Scannable
->               Use legacy advertising PDUs
->             Data status:  [0;32mComplete [0m
->           Legacy PDU Type: ADV_IND (0x0013)
->           Address type: Random (0x01)
->           Address: 68:71:DD:73:97:D5 (Resolvable)
->           Primary PHY: LE 1M
->           Secondary PHY: No packets
->           SID: no ADI field (0xff)
->           TX power: 127 dBm
->           RSSI: -54 dBm (0xca)
->           Periodic advertising interval: 0.00 msec (0x0000)
->           Direct address type: Public (0x00)
->           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->           Data length: 0x07
->         02 01 06 03 02 f0 ff                             .......
->         Flags: 0x06
->           LE General Discoverable Mode
->           BR/EDR Not Supported
->         16-bit Service UUIDs (partial): 1 entry
->           Unknown (0xfff0)
->> HCI Event: LE Meta Event (0x3e) plen 49                  #119 [hci0] 5.608029
->       LE Extended Advertising Report (0x0d)
->         Num reports: 1
->         Entry 0
->           Event type: 0x001b
->             Props: 0x001b
->               Connectable
->               Scannable
->               Scan response
->               Use legacy advertising PDUs
->             Data status:  [0;32mComplete [0m
->           Legacy PDU Type: SCAN_RSP to an ADV_SCAN_IND (0x001b)
->           Address type: Random (0x01)
->           Address: 68:71:DD:73:97:D5 (Resolvable)
->           Primary PHY: LE 1M
->           Secondary PHY: No packets
->           SID: no ADI field (0xff)
->           TX power: 127 dBm
->           RSSI: -54 dBm (0xca)
->           Periodic advertising interval: 0.00 msec (0x0000)
->           Direct address type: Public (0x00)
->           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->           Data length: 0x17
->         0d 09 50 6c 61 79 66 69 6e 69 74 79 2d 32 02 0a  ..Playfinity-2..
->         00 05 12 50 00 68 00                             ...P.h.
->         Name (complete): Playfinity-2
->         TX power: 0 dBm
->         Peripheral Conn. Interval: 0x0050 - 0x0068
-> ```
-> 
-> And from 6.4.8:
-> 
-> ```6.4.8
->> HCI Event: LE Meta Event (0x3e) plen 33                  #130 [hci0] 9.180207
->       LE Extended Advertising Report (0x0d)
->         Num reports: 1
->         Entry 0
->           Event type: 0x0013
->             Props: 0x0013
->               Connectable
->               Scannable
->               Use legacy advertising PDUs
->             Data status: �[0;32mComplete�[0m
->           Legacy PDU Type: ADV_IND (0x0013)
->           Address type: Random (0x01)
->           Address: 4D:18:19:A8:63:B5 (Resolvable)
->           Primary PHY: LE 1M
->           Secondary PHY: No packets
->           SID: no ADI field (0xff)
->           TX power: 127 dBm
->           RSSI: -53 dBm (0xcb)
->           Periodic advertising interval: 0.00 msec (0x0000)
->           Direct address type: Public (0x00)
->           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->           Data length: 0x07
->         02 01 06 03 02 f0 ff                             .......
->         Flags: 0x06
->           LE General Discoverable Mode
->           BR/EDR Not Supported
->         16-bit Service UUIDs (partial): 1 entry
->           Unknown (0xfff0)
-> ```
-> 
-> I've tried compiling 5.9.12 to see if I can bissect, but it fails to compile with gcc12..
-> 
-> Is it expected that newer kernels can't get device name? Perhaps some additional action is needed fetch it?
->  
-> Thanks!
+Dear submitter,
 
-See Bugzilla for the full thread.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=774181
 
-TatriX: Can you also attach dmesg output to your Bugzilla report?
-Since you also have kernel build problem, can you also attach build
-log (``make 2>&1 | tee build.log``)?
+---Test result---
 
-Anyway, I'm adding this regression to be tracked by regzbot:
+Test Summary:
+CheckPatch                    FAIL      0.65 seconds
+GitLint                       PASS      0.32 seconds
+BuildEll                      PASS      33.30 seconds
+BluezMake                     PASS      1034.49 seconds
+MakeCheck                     PASS      14.02 seconds
+MakeDistcheck                 PASS      194.13 seconds
+CheckValgrind                 PASS      312.82 seconds
+CheckSmatch                   PASS      414.43 seconds
+bluezmakeextell               PASS      127.22 seconds
+IncrementalBuild              PASS      839.33 seconds
+ScanBuild                     PASS      1292.79 seconds
 
-#regzbot introduced: v5.9..v6.4 https://bugzilla.kernel.org/show_bug.cgi?id=217773
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[PREFIX,BlueZ,1/1] Makefile.am: Install D-Bus policy in /usr/share, not /etc
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#61: 
+> deprecates installing packages' default policies into `/etc/dbus-1/systemd`,
 
-Thanks.
+/github/workspace/src/src/13346586.patch total: 0 errors, 1 warnings, 8 lines checked
 
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217773
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
--- 
-An old man doll... just what I always wanted! - Clara
+/github/workspace/src/src/13346586.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4554771167508707907==--
