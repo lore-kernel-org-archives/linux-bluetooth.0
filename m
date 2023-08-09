@@ -2,120 +2,126 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734E8C001E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Aug 2023 23:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92692C001DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 01:04:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbjHHXVP (ORCPT
+        id S230346AbjHIBEL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Aug 2023 19:21:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35258 "EHLO
+        Tue, 8 Aug 2023 21:04:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230115AbjHHXVO (ORCPT
+        with ESMTP id S229463AbjHIBEJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Aug 2023 19:21:14 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8344F1BE1
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Aug 2023 16:21:12 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b9db1de50cso95506491fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Aug 2023 16:21:12 -0700 (PDT)
+        Tue, 8 Aug 2023 21:04:09 -0400
+Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD3D9FB;
+        Tue,  8 Aug 2023 18:04:08 -0700 (PDT)
+Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-5607cdb0959so3439385eaf.2;
+        Tue, 08 Aug 2023 18:04:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691536871; x=1692141671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8IjCgF6bbim8x60egR3BL5qa6jVn/etl5Sq0m7ZXh2c=;
-        b=SUU+/9ObwfR9LQa/neotxTj0o9P5AVcWtJ6Z3XgaxKTTIf7RK99r9zn3u1BzmKa+Of
-         1KaskXjfRLzGiI0/ounGs+9BLdbDUj3h6JuehluK5PcrqT/4OsXQXNdVjPunPg/xvSNq
-         xBGa+1Rb+PjHG86DunBVbjU9jWNarse53KdDON0UCJGFUm/BvHPGQ2ncCO0fUFWWc3U2
-         kegomZLsFhKWD/XBW9CpEvWKQvu0nhpLXUppCqqZNvzzU7GqPms+OLmFoid5OIcfy7yF
-         SbzDR8GA9TqBjQelIwLLlMQoLCzYsnfu5yCYFmZVmnuWPcd/rZmwnwksg94IAvF0kTbz
-         +DkQ==
+        d=gmail.com; s=20221208; t=1691543048; x=1692147848;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=jGn47MFQ5cdYQxVHXHzFR9FnA1MOUkniifQd5U494N0=;
+        b=CABdulQmDvgh93kNI+rOLjHR2I1lH/0CXlbUMnvdoGNsmVB5YTfs0UYeARg8sSi9om
+         sJX0Gi8l3daxOw7VmqEAZOXi2lhm5nhF1Ia9aZT7Cqtq8darUQZNvWKGzcNq3cF6ghgV
+         ZrRiIRhfqKOoV/+pfgHLFUgqtCYXtAduBu2stTVrGt4+qgwqhR2LGww5HEbPiFhnND60
+         LbwG5DVKMiWXfbmLSqYzuUIH88Qa+yu/jsLceopHiLpiTvf9uifLl+csnPTVIjguuTx2
+         Gjo4aUZqvJvZ1XmFrsbk0v6vYt8vacq2A62VbVrV9ExIaTvDXymVJnP3xefJRZfPrlJ8
+         UOPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691536871; x=1692141671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8IjCgF6bbim8x60egR3BL5qa6jVn/etl5Sq0m7ZXh2c=;
-        b=NhoKRSCPOCIV2YsuFNAHnHICjXxvMD1n9U8s0ZuvyR0Ao2lYglbXqRl2qxxxyrRYIz
-         Q1A7j3JvU80FbQLe64Dgb1y4/SN4p4870P8P6ed2SKx9352IkT63AOH/KHt8WIulnF+Y
-         vJFaxLYlgXeCkbcO5tFmmpyou11Tjm3MwzvXmwHCDLjHfehLErTA7Jh8PBLs62KaWBK9
-         gPbsEGbWo37bLGwIFMt/dIbiEq7s4Di7M0B9hZ4WXKkPxGLqmjYpabrSamH+lsARJAqq
-         4qMNNkixVzu3cSZRvVuFHnpKW66SzU8l2NgepnVsN+u6FRDJI/KUdOTjgT6ww3AAnwpE
-         21Pw==
-X-Gm-Message-State: AOJu0YwmyB3VrxlHBkI0OY/zWSDxXbeyj3tE/exBFG/c4+d9Wtjgz3HH
-        z765pQ81By9aGvKeBOtsHpYuHP3ieo5t8YSv65huxEd+
-X-Google-Smtp-Source: AGHT+IFb2dDrlqk0MUSQ+TMjRCkPVvhPxEF/pSVjaXV7MYewd2mMMEdB+E9ovxrtBZzRQkIc2q/0mWVqM85IXvrk204=
-X-Received: by 2002:a2e:7a0f:0:b0:2b6:dc55:c3c7 with SMTP id
- v15-20020a2e7a0f000000b002b6dc55c3c7mr643174ljc.20.1691536870452; Tue, 08 Aug
- 2023 16:21:10 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1691543048; x=1692147848;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jGn47MFQ5cdYQxVHXHzFR9FnA1MOUkniifQd5U494N0=;
+        b=ByDAX1N9a01zms+8kVA5kyrzAueuJPEuWn94nYIu/94dCOdNudtWl0r60GOotP/SAM
+         9vAYd2O0tSUblgGXy37Yx3pYtgQDkM9nS1wxg0L7q1lCqAGo0Cw1NzbK6OP7BP4xT8+H
+         8Wu/lPBJ52cl3uKD/zok3O9Ap/BH1WrRW3xQ0ufimd6RxC63HuqcE20anw6175YhTc4f
+         d+N6jQSnZt6JMAVuBmNGOQabP8BtPvmKE4e2xxwzCLcFyCWn71Faon5ZFYAFh5JWwmoI
+         8y/aim6knj0GETuPi+cpLPBd/GGK39/CiAtXaYgONyVK3msMSvIadOMG2uzVaDtn8HV1
+         r6Xw==
+X-Gm-Message-State: AOJu0Yz9R6nGyZh29w0zLZZQW8aP04rxi8L83znr10kNDCCKrt5GBj9j
+        vvXpvZkx3xJVi4g2K5Giu6E=
+X-Google-Smtp-Source: AGHT+IFshKHghpvcOi+9iDr7BSDtKWMg8C3bSX4FTPeNBmGbNdMqaTcaBJCVylcfOiem6ZVYaWr5bw==
+X-Received: by 2002:aca:2b14:0:b0:3a1:df63:60cc with SMTP id i20-20020aca2b14000000b003a1df6360ccmr1283328oik.59.1691543048014;
+        Tue, 08 Aug 2023 18:04:08 -0700 (PDT)
+Received: from localhost.localdomain ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id w2-20020a056808140200b0039ee0bd8a11sm6531589oiv.42.2023.08.08.18.04.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Aug 2023 18:04:07 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        stable@vger.kernel.org
+Subject: [PATCH v2] bluetooth: Add device 0bda:4853 to device tables
+Date:   Tue,  8 Aug 2023 20:04:03 -0500
+Message-ID: <20230809010403.24612-1-Larry.Finger@lwfinger.net>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-References: <20230808115040.4403-1-claudia.rosu@nxp.com> <20230808115040.4403-4-claudia.rosu@nxp.com>
-In-Reply-To: <20230808115040.4403-4-claudia.rosu@nxp.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Aug 2023 16:20:58 -0700
-Message-ID: <CABBYNZJEhRvT8w9C-JBcr2pjNdStN3KkYO2zyuLb+2=5NWPhZw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v5 3/7] adapter: Do not filter out broadcast advertiser
-To:     Claudia Draghicescu <claudia.rosu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com,
-        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
-        vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Claudia,
+This device is part of a Realtek RTW8852BE chip. The device table
+is as follows:
 
-On Tue, Aug 8, 2023 at 9:45=E2=80=AFAM Claudia Draghicescu <claudia.rosu@nx=
-p.com> wrote:
->
-> This allows a broadcast advertiser to be passed up to application,
-> if the adapter has the capability of being a Synchronized Receiver.
+T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#= 4 Spd=12 MxCh= 0
+D: Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
+P: Vendor=0bda ProdID=4853 Rev= 0.00
+S: Manufacturer=Realtek
+S: Product=Bluetooth Radio
+S: SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
+E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
+I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
+I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
+I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
+I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
+I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
 
-We probably need a proper method to check if there is any profile with
-probe_on_discover that matches the advertising before we allow every
-broadcaster to be added as a new device.
+Cc: stable@vger.kernel.org
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+---
+v2 - fix too long line in description
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> ---
->  src/adapter.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 491bd7031..fa15030e0 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7029,6 +7029,13 @@ static bool is_filter_match(GSList *discovery_filt=
-er, struct eir_data *eir_data,
->         return got_match;
->  }
->
-> +static bool accept_bcast_adv(struct btd_adapter *adapter)
-> +{
-> +       if ((btd_adapter_has_settings(adapter, MGMT_SETTING_ISO_SYNC_RECE=
-IVER)))
-> +               return true;
-> +
-> +       return false;
-> +}
->  static void filter_duplicate_data(void *data, void *user_data)
->  {
->         struct discovery_client *client =3D data;
-> @@ -7152,6 +7159,9 @@ void btd_adapter_device_found(struct btd_adapter *a=
-dapter,
->                         return;
->                 }
->
-> +               if (accept_bcast_adv(adapter))
-> +                       monitoring =3D true;
-> +
->                 if (!discoverable && !monitoring && !eir_data.rsi) {
->                         eir_data_free(&eir_data);
->                         return;
-> --
-> 2.34.1
->
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 764d176e9735..1019f19d86a7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -540,6 +540,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	/* Realtek 8852BE Bluetooth devices */
+ 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0x4853), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3571), .driver_info = BTUSB_REALTEK |
+-- 
+2.41.0
 
-
---=20
-Luiz Augusto von Dentz
