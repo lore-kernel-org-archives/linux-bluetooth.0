@@ -2,59 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9B5C0015E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 18:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 296E9C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 18:06:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231789AbjHISCC (ORCPT
+        id S230141AbjHISGu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Aug 2023 14:02:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49684 "EHLO
+        Wed, 9 Aug 2023 14:06:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232981AbjHISB5 (ORCPT
+        with ESMTP id S229539AbjHISGt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Aug 2023 14:01:57 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6494B1999
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 11:01:55 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2ba1e9b1fa9so1332101fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Aug 2023 11:01:55 -0700 (PDT)
+        Wed, 9 Aug 2023 14:06:49 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1668DE5F
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 11:06:48 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b9338e4695so1439961fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Aug 2023 11:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691604113; x=1692208913;
+        d=gmail.com; s=20221208; t=1691604405; x=1692209205;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zxyZBuCcK9uKpJnp8jBKeKlBjHeBhIZN/cXWmfyGoss=;
-        b=Puv0iMmF/5eKP7qM3uBfp317QPV4Cvrix1W/nnoc2Cw1dynBoDBWk0Gr4cVS5sCfd6
-         M1vhYCaPFfci7gzqQAOE0CoNrIhcIIKfYqeHlbh1YdoPDL3By2xYWlrMsXHiPBCTWnOs
-         H21wfauvMHiO4655rDZh3MSGpyJaahC/aTwwh9wOgZsPppfRzhaqPi0y6oD0c27LkDAR
-         UKGuNb/QmLAN6cIv1xp2zuCs007svZlNAbDS0nI9VbENhRWq0BBIf3jg2BU7upRyigVL
-         MAek+ARQlVxZxYvVQf6P/39x5fnt/iCNzXHMugD9CXd7fWB8UAoAruZNu+wyvI/XaiAF
-         XcAQ==
+        bh=A33r+cUwE9h45LU57hWMQV2esYR0dedEQBAdOylePCU=;
+        b=IQ0kcH4/rPHYKBdrsJyXkMkrLy8YedbT7ZA4D0kaZnQiEbFhTl2gIzHFVCFP8chX6h
+         DvF0PihaVEaL+xCHD9xjQ8Sq08vRe1sntzZlTpfy6n5FTepdNjTNOQKqGPf+AbqV1jnr
+         WrTFejbWxit2jWCLip+UpXOqfJUG8IAvrSNLos5/eHRVQ0TgTr+gG3mWMyq9GOFB4r69
+         Dxj3cWkBNcJtJjbGWCiisDeWlTU6JMiKHVp13yD0NUEw4QycGRzM/L+EbU81bfhhhqbl
+         4cinmKDLpxh8tTc6th+9UzWy8FybBlJ4Fv8cN/tmt4y3AINKfKJyd7GD8bDFX/wnM82n
+         YGBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691604113; x=1692208913;
+        d=1e100.net; s=20221208; t=1691604405; x=1692209205;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zxyZBuCcK9uKpJnp8jBKeKlBjHeBhIZN/cXWmfyGoss=;
-        b=D9B2zQXsYgeSalP8rx/eUx4jYYlI0CleKK3qE5K1qOGpAXDgHR12Yq6ujWR5exxoQs
-         whAEGmJkD4ksBWhXbENUDBhsuD7HisCeWNznaKgZAYfXzTe9Je1+wm/nrgtRK0XMD4bs
-         oihCeLkpPXQJ5wz3yQ/e+GDZtxwZKmYBhNN7DBG0arD63y6aHwghpjPoWEZLZXmrZBCY
-         OvDh8fz/YCoLJQYOaKIhyiaPzC7re/vEeaPw6Y/6zMLFHJvoq5Gjy13PKcFb511Bqq2R
-         Ab6hqAOTv9aQhP6jfIMdH/ezJdjHpnbcurxODzpmRuL0Y7c0Fzcj7dqTiYcT2OzdFNQh
-         d4Ng==
-X-Gm-Message-State: AOJu0YxQSLVo/Vmyi3uJc5BRzKimoc+bTQFgBkMAgaC5dTQ5VGZ9moOE
-        0N5Zxu4Z5bhEyJXV3m4rij+wyST2Iq7iPQyS035Drxs2
-X-Google-Smtp-Source: AGHT+IEl+Sc4lJ0f22ApV/qbI5Ed3qtbYEYnO4ITcK4YMFxHdmiye6JhsyTgsGgPysEWpv3SMPdbxSXM1QBilqN2IBY=
-X-Received: by 2002:a2e:8609:0:b0:2b7:3633:2035 with SMTP id
- a9-20020a2e8609000000b002b736332035mr2473631lji.32.1691604113263; Wed, 09 Aug
- 2023 11:01:53 -0700 (PDT)
+        bh=A33r+cUwE9h45LU57hWMQV2esYR0dedEQBAdOylePCU=;
+        b=LtVbVr9DW5Pn5kuANGIYp22FTe/6PHhJLaPrOo6kdl3Ff7JJc/IyLlNE2wpR3J50xd
+         IYpWhxYrybvg3el2yT+CZfaNqr2qqKM0GAfsVUJJnZyHtNiWhVYrZutHcWA9cWUh1XJG
+         BuypVq2A+/mW3UPZfGCjRO1/PMKKg6zF6Gsmz9LHjvfGEElEcbtYm0eNXRckjb1cQW4S
+         2AYR7ro50VU6pQ1jKyVnjA/cXOi4jGncTbndZdww4A32fFxJVlFEKTxaBgLHr0vxp7rP
+         ZZP7wFOn72RFs3nq+9rxd5NXMBG9d6SfY5O+bAEFpIOmWhBH+GDLwD47k4N3kBfKRzSz
+         S5PQ==
+X-Gm-Message-State: AOJu0YwgMfqCBnNbsbsK3+g6ig+bvX5MydeDovCFlhh0/SBAVU2EBG7j
+        YewDAQdf72b7SlG/umqd98JFeOV/ZdtGDBOzB3U=
+X-Google-Smtp-Source: AGHT+IGwr33ooYhKdH3mmghGfWMMFqGlPFhCQmdKvn8Xcsveu++/WtjE37W+LyArDP83cNceogzYbVI36qPxd7s7ENk=
+X-Received: by 2002:a2e:8010:0:b0:2b7:bb73:b6e5 with SMTP id
+ j16-20020a2e8010000000b002b7bb73b6e5mr2618645ljg.27.1691604405341; Wed, 09
+ Aug 2023 11:06:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230808115040.4403-1-claudia.rosu@nxp.com> <20230808115040.4403-7-claudia.rosu@nxp.com>
-In-Reply-To: <20230808115040.4403-7-claudia.rosu@nxp.com>
+References: <20230808115040.4403-1-claudia.rosu@nxp.com> <20230808115040.4403-8-claudia.rosu@nxp.com>
+In-Reply-To: <20230808115040.4403-8-claudia.rosu@nxp.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 9 Aug 2023 11:01:40 -0700
-Message-ID: <CABBYNZ+CkAgxboz7U+S3A=orYqPuBvKNusNoLKsmBSZi7AigLg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v5 6/7] media: Add broadcast sink media endpoint
+Date:   Wed, 9 Aug 2023 11:06:32 -0700
+Message-ID: <CABBYNZKQ1zsSEXZdMKiv1mDPTaimR9r5pb8+7mhCF_vr+-Nj=w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 7/7] transport: Update transport properties for a
+ broadcast stream
 To:     Claudia Draghicescu <claudia.rosu@nxp.com>
 Cc:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com,
         mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
@@ -67,264 +68,394 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Claudia,
 
-On Tue, Aug 8, 2023 at 9:46=E2=80=AFAM Claudia Draghicescu <claudia.rosu@nx=
-p.com> wrote:
+On Tue, Aug 8, 2023 at 10:35=E2=80=AFAM Claudia Draghicescu
+<claudia.rosu@nxp.com> wrote:
 >
-> This patch adds the possibility to register a broadcast
-> media endpoint if the controller has support for ISO Sync Receiver.
+> This patch gets the QOS broadcast stream parameters and passes them
+> to upper layers.
 > ---
->  profiles/audio/media.c | 82 +++++++++++++++++++++++++++++++++---------
->  profiles/audio/media.h |  3 +-
->  2 files changed, 68 insertions(+), 17 deletions(-)
+>  profiles/audio/transport.c | 245 ++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 243 insertions(+), 2 deletions(-)
 >
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 15c64c8d6..59143060b 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -105,6 +105,7 @@ struct media_endpoint {
->         GSList                  *requests;
->         struct media_adapter    *adapter;
->         GSList                  *transports;
-> +       bool                    broadcast;
-
-Can't we use the uuid to determine if it is a broadcast or not?
-
->  };
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index cf5662d1d..107339520 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -552,6 +552,8 @@ static DBusMessage *acquire(DBusConnection *conn, DBu=
+sMessage *msg,
+>         owner =3D media_owner_create(msg);
 >
->  struct media_player {
-> @@ -1058,7 +1059,9 @@ static struct media_transport *pac_bcast_config(str=
-uct bt_bap_stream *stream,
->                                                 struct media_endpoint *en=
-dpoint)
+>         if (!strcmp(media_endpoint_get_uuid(transport->endpoint),
+> +                                               BAA_SERVICE_UUID)
+> +               || !strcmp(media_endpoint_get_uuid(transport->endpoint),
+>                                                 BCAA_SERVICE_UUID)) {
+
+This code above is probably what media_endpoint_is_broadcast should be
+doing, so it matches by uuid.
+
+>                 req =3D media_request_create(msg, 0x00);
+>                 media_owner_add(owner, req);
+> @@ -853,6 +855,9 @@ static gboolean qos_exists(const GDBusPropertyTable *=
+property, void *data)
+>         struct media_transport *transport =3D data;
+>         struct bap_transport *bap =3D transport->data;
+>
+> +       if (media_endpoint_is_broadcast(transport->endpoint))
+> +               return bap->qos.bcast.io_qos.sdu !=3D 0x00;
+> +
+>         return bap->qos.ucast.io_qos.phy !=3D 0x00;
+>  }
+>
+> @@ -868,6 +873,18 @@ static gboolean get_cig(const GDBusPropertyTable *pr=
+operty,
+>         return TRUE;
+>  }
+>
+> +static gboolean get_big(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                                       &bap->qos.bcast.b=
+ig);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static gboolean get_cis(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *data=
+)
 >  {
->         struct bt_bap *bap =3D bt_bap_stream_get_session(stream);
-> -       struct btd_adapter *adapter =3D bt_bap_get_user_data(bap);
-> +       struct btd_adapter *adapter =3D endpoint->adapter->btd_adapter;
-> +       struct btd_device *device =3D
-> +                       btd_service_get_device(bt_bap_get_user_data(bap))=
+> @@ -880,6 +897,18 @@ static gboolean get_cis(const GDBusPropertyTable *pr=
+operty,
+>         return TRUE;
+>  }
+>
+> +static gboolean get_bis(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                                       &bap->qos.bcast.b=
+is);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static gboolean get_interval(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *data=
+)
+>  {
+> @@ -899,6 +928,9 @@ static gboolean get_framing(const GDBusPropertyTable =
+*property,
+>         struct bap_transport *bap =3D transport->data;
+>         dbus_bool_t val =3D bap->qos.ucast.framing;
+>
+> +       if (media_endpoint_is_broadcast(transport->endpoint))
+> +               val =3D bap->qos.bcast.framing;
+> +
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
+>
+>         return TRUE;
+> @@ -910,6 +942,12 @@ static gboolean get_phy(const GDBusPropertyTable *pr=
+operty,
+>         struct media_transport *transport =3D data;
+>         struct bap_transport *bap =3D transport->data;
+>
+> +       if (media_endpoint_is_broadcast(transport->endpoint)) {
+> +               dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                       &bap->qos.bcast.io_qos.phy);
+> +               return TRUE;
+> +       }
+> +
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+>                                         &bap->qos.ucast.io_qos.phy);
+>
+> @@ -922,6 +960,12 @@ static gboolean get_sdu(const GDBusPropertyTable *pr=
+operty,
+>         struct media_transport *transport =3D data;
+>         struct bap_transport *bap =3D transport->data;
+>
+> +       if (media_endpoint_is_broadcast(transport->endpoint)) {
+> +               dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+> +                                       &bap->qos.bcast.io_qos.sdu);
+> +               return TRUE;
+> +       }
+> +
+>         dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+>                                         &bap->qos.ucast.io_qos.sdu);
+>
+> @@ -1040,6 +1084,121 @@ static gboolean get_links(const GDBusPropertyTabl=
+e *property,
+>         return TRUE;
+>  }
+>
+> +static gboolean get_sync_interval(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                               &bap->qos.bcast.sync_inte=
+rval);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_packing(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                               &bap->qos.bcast.packing);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_bcode(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +       DBusMessageIter array;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                                       DBUS_TYPE_BYTE_AS_STRING, &array)=
 ;
->         const char *path;
->
->         if (!adapter) {
-> @@ -1066,9 +1069,17 @@ static struct media_transport *pac_bcast_config(st=
-ruct bt_bap_stream *stream,
->                 return NULL;
->         }
->
-> +       if (!device) {
-> +               DBG("no device found");
-> +       } else {
-> +               char name[30];
 > +
-> +               device_get_name(device, name, 30);
-> +               DBG("device found name %s", name);
-> +       }
-
-Seems like a leftover to debug if the code is working properly, on the
-final version this is probably not needed.
-
->         path =3D bt_bap_stream_get_user_data(stream);
->
-> -       return media_transport_create(NULL, path, cfg->iov_base, cfg->iov=
-_len,
-> +       return media_transport_create(device, path, cfg->iov_base, cfg->i=
-ov_len,
->                                         endpoint, stream);
->  }
->
-> @@ -1238,6 +1249,12 @@ static bool endpoint_init_broadcast_source(struct =
-media_endpoint *endpoint,
->         return endpoint_init_pac(endpoint, BT_BAP_BCAST_SOURCE, err);
->  }
->
-> +static bool endpoint_init_broadcast_sink(struct media_endpoint *endpoint=
-,
-> +                                               int *err)
-> +{
-> +       return endpoint_init_pac(endpoint, BT_BAP_BCAST_SINK, err);
+> +       if (bap->qos.bcast.bcode && bap->qos.bcast.bcode->iov_len)
+> +               dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BY=
+TE,
+> +                                               &bap->qos.bcast.bcode->io=
+v_base,
+> +                                               bap->qos.bcast.bcode->iov=
+_len);
+> +
+> +       dbus_message_iter_close_container(iter, &array);
+> +       return TRUE;
 > +}
 > +
->  static bool endpoint_properties_exists(const char *uuid,
->                                                 struct btd_device *dev,
->                                                 void *user_data)
-> @@ -1351,6 +1368,17 @@ static bool experimental_broadcaster_ep_supported(=
-struct btd_adapter *adapter)
->         return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
->  }
->
-> +static bool experimental_bcast_sink_ep_supported(struct btd_adapter *ada=
-pter)
+> +static gboolean get_options(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
 > +{
-> +       if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET))
-> +               return false;
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
 > +
-> +       if (!btd_adapter_has_settings(adapter, MGMT_SETTING_ISO_SYNC_RECE=
-IVER))
-> +               return false;
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                       &bap->qos.bcast.options);
 > +
-> +       return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
+> +       return TRUE;
 > +}
 > +
->  static struct media_endpoint_init {
->         const char *uuid;
->         bool (*func)(struct media_endpoint *endpoint, int *err);
-> @@ -1366,6 +1394,8 @@ static struct media_endpoint_init {
->                                 experimental_endpoint_supported },
->         { BCAA_SERVICE_UUID, endpoint_init_broadcast_source,
->                         experimental_broadcaster_ep_supported },
-> +       { BAA_SERVICE_UUID, endpoint_init_broadcast_sink,
-> +                       experimental_bcast_sink_ep_supported },
+> +static gboolean get_skip(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+> +                                       &bap->qos.bcast.skip);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_sync_timeout(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+> +                                       &bap->qos.bcast.sync_timeout);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_sync_cte_type(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                       &bap->qos.bcast.sync_cte_type);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_mse(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> +                                       &bap->qos.bcast.mse);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_timeout(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct bap_transport *bap =3D transport->data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
+> +                                       &bap->qos.bcast.timeout);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static const GDBusPropertyTable bap_properties[] =3D {
+>         { "Device", "o", get_device },
+>         { "UUID", "s", get_uuid },
+> @@ -1059,6 +1218,17 @@ static const GDBusPropertyTable bap_properties[] =
+=3D {
+>         { "Location", "u", get_location },
+>         { "Metadata", "ay", get_metadata },
+>         { "Links", "ao", get_links, NULL, links_exists },
+> +       { "BIG", "y", get_big, NULL, qos_exists },
+> +       { "BIS", "y", get_bis, NULL, qos_exists },
+> +       { "SyncInterval", "y", get_sync_interval, NULL, qos_exists },
+> +       { "Packing", "y", get_packing, NULL, qos_exists },
+> +       { "BCode", "ay", get_bcode, NULL, qos_exists },
+> +       { "Options", "y", get_options, NULL, qos_exists },
+> +       { "Skip", "q", get_skip, NULL, qos_exists },
+> +       { "SyncTimeout", "q", get_sync_timeout, NULL, qos_exists },
+> +       { "SyncCteType", "y", get_sync_cte_type, NULL, qos_exists },
+> +       { "MSE", "y", get_mse, NULL, qos_exists },
+> +       { "Timeout", "q", get_timeout, NULL, qos_exists },
+>         { }
 >  };
 >
->  static struct media_endpoint *
-> @@ -1382,6 +1412,7 @@ media_endpoint_create(struct media_adapter *adapter=
-,
->                                                 int size,
->                                                 uint8_t *metadata,
->                                                 int metadata_size,
-> +                                               bool broadcast,
->                                                 int *err)
+> @@ -1341,6 +1511,71 @@ static gboolean bap_resume_wait_cb(void *data)
+>         return FALSE;
+>  }
+>
+> +static void bap_update_bcast_qos(const struct media_transport *transport=
+)
+> +{
+> +       struct bap_transport *bap =3D transport->data;
+> +       struct bt_bap_qos *qos;
+> +
+> +       qos =3D bt_bap_stream_get_qos(bap->stream);
+> +
+> +       if (!memcmp(qos, &bap->qos, sizeof(struct bt_bap_qos)))
+> +               return;
+> +
+> +       bap->qos =3D *qos;
+> +
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "BIG");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "BIS");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "SyncInterval");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Packing");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Framing");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "BCode");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Options");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Skip");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "SyncTimeout");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "SyncCteType");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "MSE");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Timeout");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Interval");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "Latency");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "PHY");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "SDU");
+> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
+> +                       transport->path, MEDIA_TRANSPORT_INTERFACE,
+> +                       "RTN");
+> +}
+> +
+>  static guint resume_bap(struct media_transport *transport,
+>                                 struct media_owner *owner)
 >  {
->         struct media_endpoint *endpoint;
-> @@ -1397,6 +1428,7 @@ media_endpoint_create(struct media_adapter *adapter=
-,
->         endpoint->cid =3D cid;
->         endpoint->vid =3D vid;
->         endpoint->delay_reporting =3D delay_reporting;
-> +       endpoint->broadcast =3D broadcast;
->
->         if (qos)
->                 endpoint->qos =3D *qos;
-> @@ -1458,11 +1490,11 @@ struct vendor {
->  } __packed;
->
->  static int parse_properties(DBusMessageIter *props, const char **uuid,
-> -                               gboolean *delay_reporting, uint8_t *codec=
-,
-> -                               uint16_t *cid, uint16_t *vid,
-> -                               struct bt_bap_pac_qos *qos,
-> -                               uint8_t **capabilities, int *size,
-> -                               uint8_t **metadata, int *metadata_size)
-> +                       gboolean *delay_reporting, uint8_t *codec,
-> +                       uint16_t *cid, uint16_t *vid,
-> +                       struct bt_bap_pac_qos *qos,
-> +                       uint8_t **capabilities, int *size,
-> +                       uint8_t **metadata, int *metadata_size, bool *bro=
-adcast)
->  {
->         gboolean has_uuid =3D FALSE;
->         gboolean has_codec =3D FALSE;
-> @@ -1546,6 +1578,10 @@ static int parse_properties(DBusMessageIter *props=
-, const char **uuid,
->                         if (var !=3D DBUS_TYPE_UINT16)
->                                 return -EINVAL;
->                         dbus_message_iter_get_basic(&value, &qos->ppd_max=
-);
-> +               } else if (strcasecmp(key, "Broadcast") =3D=3D 0) {
-> +                       if (var !=3D DBUS_TYPE_BOOLEAN)
-> +                               return -EINVAL;
-> +                       dbus_message_iter_get_basic(&value, broadcast);
-
-I'm not in favor of adding yet another if we can distinct the endpoint
-based on their uuid.
-
->                 }
->
->                 dbus_message_iter_next(props);
-> @@ -1569,6 +1605,7 @@ static DBusMessage *register_endpoint(DBusConnectio=
-n *conn, DBusMessage *msg,
->         uint8_t *metadata =3D NULL;
->         int size =3D 0;
->         int metadata_size =3D 0;
-> +       bool broadcast =3D false;
->         int err;
->
->         sender =3D dbus_message_get_sender(msg);
-> @@ -1587,13 +1624,13 @@ static DBusMessage *register_endpoint(DBusConnect=
-ion *conn, DBusMessage *msg,
->
->         if (parse_properties(&props, &uuid, &delay_reporting, &codec, &ci=
-d,
->                         &vid, &qos, &capabilities, &size, &metadata,
-> -                       &metadata_size) < 0)
-> +                       &metadata_size, &broadcast) < 0)
->                 return btd_error_invalid_args(msg);
->
->         if (media_endpoint_create(adapter, sender, path, uuid, delay_repo=
-rting,
-> -                                       codec, cid, vid, &qos, capabiliti=
-es,
-> -                                       size, metadata, metadata_size,
-> -                                       &err) =3D=3D NULL) {
-> +                               codec, cid, vid, &qos, capabilities,
-> +                               size, metadata, metadata_size, broadcast,
-> +                               &err) =3D=3D NULL) {
->                 if (err =3D=3D -EPROTONOSUPPORT)
->                         return btd_error_not_supported(msg);
->                 else
-> @@ -2627,6 +2664,7 @@ static void app_register_endpoint(void *data, void =
-*user_data)
->         int metadata_size =3D 0;
->         DBusMessageIter iter, array;
->         struct media_endpoint *endpoint;
-> +       bool broadcast =3D false;
->
->         if (app->err)
+> @@ -1493,7 +1728,10 @@ static void bap_state_changed(struct bt_bap_stream=
+ *stream, uint8_t old_state,
+>                 if (owner && owner->pending)
+>                         return;
+>                 bap_update_links(transport);
+> -               bap_update_qos(transport);
+> +               if (!media_endpoint_is_broadcast(transport->endpoint))
+> +                       bap_update_qos(transport);
+> +               else if (bt_bap_stream_io_dir(stream) !=3D BT_BAP_BCAST_S=
+OURCE)
+> +                       bap_update_bcast_qos(transport);
+>                 transport_update_playing(transport, FALSE);
 >                 return;
-> @@ -2736,12 +2774,18 @@ static void app_register_endpoint(void *data, voi=
-d *user_data)
->                 dbus_message_iter_get_basic(&iter, &qos.ppd_min);
+>         case BT_BAP_STREAM_STATE_DISABLING:
+> @@ -1503,6 +1741,8 @@ static void bap_state_changed(struct bt_bap_stream =
+*stream, uint8_t old_state,
+>                         return;
+>                 break;
+>         case BT_BAP_STREAM_STATE_STREAMING:
+> +               if (bt_bap_stream_io_dir(stream) =3D=3D BT_BAP_BCAST_SOUR=
+CE)
+> +                       bap_update_bcast_qos(transport);
+>                 break;
 >         }
 >
-> +       if (g_dbus_proxy_get_property(proxy, "Broadcast", &iter)) {
-> +               if (dbus_message_iter_get_arg_type(&iter) !=3D DBUS_TYPE_=
-BOOLEAN)
-> +                       goto fail;
-> +               dbus_message_iter_get_basic(&iter, &broadcast);
-> +       }
-> +
->         endpoint =3D media_endpoint_create(app->adapter, app->sender, pat=
-h, uuid,
-> -                                               delay_reporting, codec,
-> -                                               vendor.cid, vendor.vid, &=
-qos,
-> -                                               capabilities, size,
-> -                                               metadata, metadata_size,
-> -                                               &app->err);
-> +                                       delay_reporting, codec,
-> +                                       vendor.cid, vendor.vid, &qos,
-> +                                       capabilities, size,
-> +                                       metadata, metadata_size, broadcas=
-t,
-> +                                       &app->err);
->         if (!endpoint) {
->                 error("Unable to register endpoint %s:%s: %s", app->sende=
-r,
->                                                 path, strerror(-app->err)=
-);
-> @@ -3245,3 +3289,9 @@ struct btd_adapter *media_endpoint_get_btd_adapter(
->  {
->         return endpoint->adapter->btd_adapter;
->  }
-> +
-> +bool media_endpoint_is_broadcast(
-> +       struct media_endpoint *endpoint)
-> +{
-> +       return endpoint->broadcast;
-> +}
-> diff --git a/profiles/audio/media.h b/profiles/audio/media.h
-> index 1de84a8ff..0eeb5746a 100644
-> --- a/profiles/audio/media.h
-> +++ b/profiles/audio/media.h
-> @@ -22,5 +22,6 @@ const char *media_endpoint_get_uuid(struct media_endpoi=
-nt *endpoint);
->  uint8_t media_endpoint_get_codec(struct media_endpoint *endpoint);
->  struct btd_adapter *media_endpoint_get_btd_adapter(
->                                         struct media_endpoint *endpoint);
-> -
-> +bool media_endpoint_is_broadcast(
-> +       struct media_endpoint *endpoint);
->  int8_t media_player_get_device_volume(struct btd_device *device);
+> @@ -1631,7 +1871,8 @@ struct media_transport *media_transport_create(stru=
+ct btd_device *device,
+>                 properties =3D a2dp_properties;
+>         } else if (!strcasecmp(uuid, PAC_SINK_UUID) ||
+>                                 !strcasecmp(uuid, PAC_SOURCE_UUID) ||
+> -                               !strcasecmp(uuid, BCAA_SERVICE_UUID)) {
+> +                               !strcasecmp(uuid, BCAA_SERVICE_UUID) ||
+> +                               !strcasecmp(uuid, BAA_SERVICE_UUID)) {
+>                 if (media_transport_init_bap(transport, stream) < 0)
+>                         goto fail;
+>                 properties =3D bap_properties;
 > --
 > 2.34.1
 >
