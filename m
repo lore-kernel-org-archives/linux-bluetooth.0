@@ -2,165 +2,175 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7E7EB64DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 09:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACD7C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 15:11:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbjHIJqg (ORCPT
+        id S233516AbjHIPLS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Aug 2023 05:46:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59640 "EHLO
+        Wed, 9 Aug 2023 11:11:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbjHIJqe (ORCPT
+        with ESMTP id S230340AbjHIPLP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Aug 2023 05:46:34 -0400
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2057.outbound.protection.outlook.com [40.107.22.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAE20ED
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 02:46:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P7MwB3NuqosXV5izdX1XrwN0KyTC5BRIbLZQAREEkwbNRTL17x3qh90pXJ8lEvH7Xx/s7HDdFkXiK0vmYUzCzU/Dfk6SSBtCweFBO1CRZwdt93wvm7noSii6ge78+ZsyPOUq9rPTVGryFtxID/mXf8k9Q22o5a3/Hagw+u6qisAgzXHZ3z2nIkv146kwJWg5jJknnzuspAdozv4Rqfr716WRbNvx6UdpDQ1C7xxQnyyQK8FCsXJmefRQCXonoSl1h65Sso4LIfG+U9Iep1YezekU+ISIqkjxYqIH8MTJ6Yck1JJh+k5Lk6qMS0yrMgQxSxyReGzMoGfyBKuv6VwZKw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+O2Qg/ewGsHkHkWgjNxbSMVHbOP3toZEHlKA7cAQ5Ms=;
- b=QuSEvossJUa9ae06RsuA0GP2MGltUALwpYezadQWUyqtIChAYBfoPnfNb+kaMptmBj2roWf6vgdbebexDhwr0BjzHXyKKadgfUK37+e7bUEiq0TMmUNcEx6vJjB7tT3U10TC/OuzxVrvU9TPKrm6m3q1FiHOBnbqv2LoPCA+HO5lLoL+aoO4a91ro3k4RPkP3cIKUq/PvfDdyaw8Dkv2O8CvkwbtvGTUi4t3rGdHpj2Amx34jpj2nV7LcDAJU8vLRNepZRe8rfn9WruGLCVpNOnLF5abp9hFA5mek2VYu4KkQS2ZyrMO92SjItX7Wojbm14HaXWxeHjqJRGqDd66ZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+O2Qg/ewGsHkHkWgjNxbSMVHbOP3toZEHlKA7cAQ5Ms=;
- b=L9bTkFnVs9gvwU6r99uM0BOQOLlHZy20Kf1GZWSXwoR/PeeC7+hd2RLFLcqr4aTZ2cDAatPxIGp71C3gJRJOmGqbJz/nYovMSsDO9s3maa9bwRROLsM8+Hf3WrBh+65kowKFs2FZCEnXRu6mOc1QQrRvvbPiu8dGr4DnlCbtTV0=
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com (2603:10a6:803:4b::31)
- by DBBPR04MB7625.eurprd04.prod.outlook.com (2603:10a6:10:202::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6652.28; Wed, 9 Aug
- 2023 09:46:31 +0000
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::cf28:7578:cc46:bc2c]) by VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::cf28:7578:cc46:bc2c%5]) with mapi id 15.20.6652.026; Wed, 9 Aug 2023
- 09:46:30 +0000
-From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Claudia Cristina Draghicescu <claudia.rosu@nxp.com>,
-        Mihai-Octavian Urzica <mihai-octavian.urzica@nxp.com>,
-        Vlad Pruteanu <vlad.pruteanu@nxp.com>,
-        Andrei Istodorescu <andrei.istodorescu@nxp.com>,
-        Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: RE: [EXT] Re: [PATCH v2 0/2] Configure BASE using separate structure
-Thread-Topic: [EXT] Re: [PATCH v2 0/2] Configure BASE using separate structure
-Thread-Index: AQHZyR6xUnFW0mExLkGmRyf7FwfiKK/fFYQAgAKfRRA=
-Date:   Wed, 9 Aug 2023 09:46:30 +0000
-Message-ID: <VI1PR04MB53446602D3975AF7A5548A03EB12A@VI1PR04MB5344.eurprd04.prod.outlook.com>
-References: <20230807110224.6024-1-silviu.barbulescu@nxp.com>
- <CABBYNZ+ecHHUfh=3rtXWwp-u2r0kSt-_SRWmYqUJBXgUs6S=oQ@mail.gmail.com>
-In-Reply-To: <CABBYNZ+ecHHUfh=3rtXWwp-u2r0kSt-_SRWmYqUJBXgUs6S=oQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: VI1PR04MB5344:EE_|DBBPR04MB7625:EE_
-x-ms-office365-filtering-correlation-id: 97a1e5ad-7ec9-4311-6d8b-08db98bd825d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 4Od5cSIzv3V9igcY3eIyjY3tcyaojVDOBu6WlT8T8G2RH/E646iPdTJLTkEvQjESawWwmktLLAg/wgWLIh2dO6zaV85d8g/xj6IiJ+PIFCKZPvUv4FJmoFRqKV8/9RPZR/3Nq9PUANddfyY44N+aAg/zNQe0bQ1eoz0C4rzJm6mroIiTk7ed9WSoMOlYvq4xrypj3xEHGn6i7VgUZxifKNiu+WgTS1fSghwLNNbBvPCabO9tzdisG2mykyfMl22cFjj/ZUy52LdrowBgy8qbcHKvX3FDhqHrqP+CWLZdgS8+sIrV88Hv9dlj8wLKRwrS67DfuoOGlC9C/tGjgdOBmLapfhw4ulCqv7bg0Aymeqv/JHX8pqbwpNKbpVhUj9/gEP3XTklbL1MwfkEtHUbV4F19xKByARH72cnc0U23X7m7PUdRQicu4bx7OPbORUxsX4ZrEUJnXfdcGjW6paF1arWNX/c4CtANMXYx2Gq0sySafAsVzruk7MImXblvzokHO0b+xPdsPXjACvmm1fN9RxIrBMGMHkjqKA5fWjXdViQO3tT3DgMa6PhoEScMNLP0yStvkPBtuOtgxJArVjZ3k8QZx1xpRW5vbbWL+Bi6WyautY/T5XcEkdzSjvnk322L
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(376002)(346002)(136003)(39860400002)(186006)(1800799006)(451199021)(478600001)(122000001)(83380400001)(9686003)(26005)(55016003)(6506007)(33656002)(66446008)(66476007)(66556008)(64756008)(8676002)(66946007)(76116006)(41300700001)(8936002)(316002)(4326008)(6916009)(2906002)(7696005)(71200400001)(54906003)(38100700002)(86362001)(38070700005)(5660300002)(52536014);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?OE1OVWpVcVIrOG9OclR6dVFzZERRVU9jMVBkQWFEZUU3YjcxQ1JqNmU2OGpX?=
- =?utf-8?B?ZXR6ZWIzaG8yRVJBOWdNTWZ3L3gyMlJzUlVNdjlET214dlpaNDUzSnIzemhX?=
- =?utf-8?B?d25FaXQyVHdlU2YveVpCdEZ4eXNBdzJNdGhwUWt2NWFUbXhSZTdPUDdHOElB?=
- =?utf-8?B?Wklob3RVSGZFeTIzR00zNzJZc0dDRjZNVE1ZWVNVMXJtMGpva1cveVFub21n?=
- =?utf-8?B?T1g4SnB1VXNlSW1QcFdyeDVoWGtHK0UzWmI3UXkxWkhtWHoyeEVlTExuZ0Jt?=
- =?utf-8?B?dThaYnhORDVtM2RXSlQ1T005bXJFd29vVTBHMjBIQjUrRVp3K2QxbVNnVWRQ?=
- =?utf-8?B?eW1PVlA0aURkdENlS3ZHWHNDbGFRUUR4ZUhDK2MyeEpCUUxVSmZUWEwxd1pM?=
- =?utf-8?B?VW9BUjlLS3k4NjRPQmIxMjdnbHlJY1p4OTlBYytML0JwWTVvWllDTTNwQWJ1?=
- =?utf-8?B?RWdRTlJDUERVVVE4ajVLQzNXSERVckVhWXBTSk03YlZxa0llU09TRGFDbndD?=
- =?utf-8?B?V3l5ZU1rOXp1Wk9SMFF0VFBianRuSCtlU2l5MnFuY3lvV29TM2JXSmFSdDBm?=
- =?utf-8?B?NGluVlVwM0I3cll2Z0h3b0Y2T1NJelpuOTd1SGM2ekp0L1lBRGRJRE5KTFQw?=
- =?utf-8?B?QnJDRXNJODFBRXg1ZEg3V0VyNzkrdUpOVFQ1eDQ3dWMyTWp4QXZYTkQrdEhO?=
- =?utf-8?B?WWJDYkUrWWR4Y2o5NHcyZ0Rtek54Rm5DN3NKZlpJWEpkSDI1OUMxSlZKL3Zx?=
- =?utf-8?B?VXJhR3J1OS9zVXlzYXByaDBRSlZ5ZkJoRG5abnVOT2FxN2ZXVUI3T2pWdEhL?=
- =?utf-8?B?MDc5cytkbWlTZnArdDQ5WGdwai9xUWl2RnpieElFU3FmM3I2TzhjcW1pVHQ3?=
- =?utf-8?B?b1c3d1VCaGZiL2Z0dThzYUxzVml6WlV0cDg4TktjYk5Yc2ptWmpVUVA4b1kz?=
- =?utf-8?B?ZEtRUlFIeElIbnpFaWt3ZndhTTFmTWY2ajhyNXpzREpnMW5QOHpBOG9sZEZp?=
- =?utf-8?B?aVpIZEtISVF4NjVqZVNlbWxkN1BLd2h3dTdIVkpZS2xBM21mUkpYMlZRbWNN?=
- =?utf-8?B?bzZEc0FqclgwYk1Gc0pFT0ZWbWJEMlJvZjgyM2N6N3laSkVtMnNFdUI0a3Fk?=
- =?utf-8?B?V1ovNThYb0gvbVh0TmdrTzV5cHFXU05KSm5wMlZNcHRhQWxUaGQxa201VlNB?=
- =?utf-8?B?Zk0vM2hBa0RCTzlPcXFoM0JZZFh0YmNNellURmlheGN2QW5iT1JqZlJIRktk?=
- =?utf-8?B?bUErdFVhRlN5R2tmaEJEM2lCT0cwYlJpVlgzUlJneHVJRFBycjVMS1lBcmo5?=
- =?utf-8?B?Y09KKy9RNTAyb20yWUpyZ0REODhQZlUrelZyY0Z5bytTenN0dUcwREJTZmV2?=
- =?utf-8?B?WTNqQ2FiTHk1aDA4VTJ3Q080R3IrTnlJQkJTRGNMYUlINXhBVmh4bmlzaGdm?=
- =?utf-8?B?VDJUbWJTUStnaGVTWUlZaXE2RjZNRjVGUG9mbzd1cXVhUkRCWHJKNTFmUy9n?=
- =?utf-8?B?M0M4MkVJOU12WGF1dm1GakJXRmIwTGlNeWlTeGI1cDM2M3IwL3c1OWlxWjBv?=
- =?utf-8?B?aTZrTGRxUTBIZTVQamVNbGZQWWNTYTJNaGwzQk1MbVFROXI2S3hhNG1YYUFj?=
- =?utf-8?B?UWZMdUc3c1RqNkliWTNxcG5KTkJLbCttRjRXQW9zU3RyZXhXclZucVhIL1FL?=
- =?utf-8?B?alNWQVc0WWVlWU5rckZqTTgrTXVlcWZneDVoQytGb0NPMGVvMjZZeTNIRXBx?=
- =?utf-8?B?NEkyZDRXU09ES0RQclZFSk5GaTI4emg0eHhzaW5ocXRoVEwwem5iczJhc3ZY?=
- =?utf-8?B?NDhSTmlSV05Ic0RWdFNMMno3UWRJNjdUMjJybFFqdksxMXZOUW1xQkhPczd3?=
- =?utf-8?B?RUhPU2xMdG5lWVZaSE1xUGhjZmNsancyVjdRclNPR0FsMkJZelg4N0ZLMURH?=
- =?utf-8?B?aVQ3RHd1R2NCQUdEUnNTMlZQUjdyelE5YUw2UG9mZk9xNDBiWVkwTTNpeVpq?=
- =?utf-8?B?MXExd1NvV0o4MDlTSmVWTTVVUnBvNkxjS0RYY3VVK28zeDZwRFpxWW5FVllz?=
- =?utf-8?B?ZVgwRkFNNHIvMkUvWGtpRzVQbWlhWVF4K2hjSUlwOUQrdEJQSjYxeTZOdkdE?=
- =?utf-8?Q?97FzSjcW2mAEEBc2dsrWGv2wh?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 9 Aug 2023 11:11:15 -0400
+Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 322FA210D;
+        Wed,  9 Aug 2023 08:10:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=buaa.edu.cn; s=buaa; h=Received:Message-ID:Date:MIME-Version:
+        User-Agent:Subject:To:Cc:References:From:In-Reply-To:
+        Content-Type:Content-Transfer-Encoding; bh=qdAiPe8csqwuuyDj6hTE7
+        PynnBwpqRO66suZ0OgkS3A=; b=GGIl5b9rBvyjp+SHD++MmiqmBvWcpFomjJE+4
+        6ouGUCB/NdgjX6bhl/fKObsDaQCnPtXQHsq8zoQjxIFrNt1CpVrGfxRn0TZ1tE0S
+        uWP0wT/MCYHAIW8HhhjMjOWPk4d3kcVlmR+GDlkNhchXcf4X1Idd9FJ9IoshdqaT
+        Hz3fOE=
+Received: from [10.193.157.69] (unknown [10.193.157.69])
+        by coremail-app1 (Coremail) with SMTP id OCz+CgDn7_NirNNkLfyhDA--.28238S3;
+        Wed, 09 Aug 2023 23:10:27 +0800 (CST)
+Message-ID: <5aca90c4-8436-40d1-87d5-3406fdb26c47@buaa.edu.cn>
+Date:   Wed, 9 Aug 2023 23:10:27 +0800
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5344.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97a1e5ad-7ec9-4311-6d8b-08db98bd825d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2023 09:46:30.6308
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7inPnCcddHajNnDqqezi6XWeOb9jHIxSQ/XRbMYwas5iT2O6ly98co5d5sSAWqgjv4uMFCnBOsvNSkAVsXQQ6+Mod0Kd5eldUhM56oN8t14=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7625
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG]Bluetooth: possible semantic bug when the status field of
+ the HCI_Connection_Complete packet set to non-zero
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+References: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
+From:   Xin-Yu Liu <LXYbhu@buaa.edu.cn>
+In-Reply-To: <CABBYNZLQo-WhM9jDJbk_zXu-ETdv8QkJ5UG9d+nWDBEA66Y+VQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: OCz+CgDn7_NirNNkLfyhDA--.28238S3
+X-Coremail-Antispam: 1UD129KBjvJXoWxtF1kGF1fCrW8XFyUGFWxWFg_yoWxKry5pF
+        WYya9FkryDJ3WSyFnrAw48CF9Fv3yktrsrJr90q340y345WrykKFsak3Z0kayUGrsav3Wj
+        vF12qrZrA3Z8A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+        cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
+        AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
+        6r4j6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
+        xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+        6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+        0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xSY4AK6svPMxAIw28I
+        cxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Aw1UJr1UMxC20s026xCaFVCjc4AY6r1j6r
+        4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+        67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+        x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+        z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+        UI43ZEXa7IU5IksPUUUUU==
+X-CM-SenderInfo: te1sjjazrrjqpexdthxhgxhubq/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-PkZyb206IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXouZGVudHpAZ21haWwuY29tPiANCj5T
-ZW50OiBNb25kYXksIEF1Z3VzdCA3LCAyMDIzIDg6MjMgUE0NCj5UbzogU2lsdml1IEZsb3JpYW4g
-QmFyYnVsZXNjdSA8c2lsdml1LmJhcmJ1bGVzY3VAbnhwLmNvbT4NCj5DYzogbGludXgtYmx1ZXRv
-b3RoQHZnZXIua2VybmVsLm9yZzsgQ2xhdWRpYSBDcmlzdGluYSBEcmFnaGljZXNjdSA8Y2xhdWRp
-YS5yb3N1QG54cC5jb20+OyBNaWhhaS1PY3RhdmlhbiBVcnppY2EgPG1paGFpLW9jdGF2aWFuLnVy
-emljYUBueHAuY29tPjsgVmxhZCBQcnV0ZWFudSA8dmxhZC5wcnV0ZWFudUBueHAuY29tPjsgQW5k
-cmVpIElzdG9kb3Jlc2N1IDxhbmRyZWkuaXN0b2RvcmVzY3VAbnhwLmNvbT47IEl1bGlhIFRhbmFz
-ZXNjdSA8aXVsaWEudGFuYXNlc2N1QG54cC5jb20+DQo+U3ViamVjdDogW0VYVF0gUmU6IFtQQVRD
-SCB2MiAwLzJdIENvbmZpZ3VyZSBCQVNFIHVzaW5nIHNlcGFyYXRlIHN0cnVjdHVyZQ0KPg0KPkNh
-dXRpb246IFRoaXMgaXMgYW4gZXh0ZXJuYWwgZW1haWwuIFBsZWFzZSB0YWtlIGNhcmUgd2hlbiBj
-bGlja2luZyBsaW5rcyBvciBvcGVuaW5nIGF0dGFjaG1lbnRzLiBXaGVuIGluIGRvdWJ0LCByZXBv
-cnQgdGhlIG1lc3NhZ2UgdXNpbmcgdGhlICdSZXBvcnQgdGhpcyBlbWFpbCcgYnV0dG9uDQo+DQo+
-DQo+SGkgU2lsdml1LA0KPg0KPk9uIE1vbiwgQXVnIDcsIDIwMjMgYXQgNDoxMeKAr0FNIFNpbHZp
-dSBGbG9yaWFuIEJhcmJ1bGVzY3UgPHNpbHZpdS5iYXJidWxlc2N1QG54cC5jb20+IHdyb3RlOg0K
-Pj4NCj4+IFVzZSBwcmVzZXQgY29uZmlndXJhdGlvbiBpbiBjYXBhYmlsaXRpZXMuDQo+PiBDb25m
-aWd1cmUgQkFTRSB1c2luZyBzZXBhcmF0ZSBzdHJ1Y3R1cmUuDQo+DQo+SW0gbm90IHJlYWxseSBz
-dXJlIHdoeSB3ZSB3YW50IHRvIHN3aXRjaCB0byB1c2UgQkFTRSBvdmVyIENhcGFiaWxpdGllcywg
-dXAgdW50aWwgbm93IENhcGFiaWxpdGllcyBpcyBzb3J0IG9mIG1hbmRhdG9yeSBhbmQgaXMgYWxy
-ZWFkeSBwcm9maWxlIHNwZWNpZmljIGluIGNhc2UgeW91IGFyZSB3b25kZXJpbmcgaG93IGNhbiBz
-b21lb25lIGRldGVjdCB3aGF0IGlzIHRoZSBmb3JtYXQgdXNlZCBpbiBDYXBhYmlsaXRpZXMgdGhh
-dCBpcyBiYXNlZCBvbiB0aGUgVVVJRCBhbHJlYWR5Lg0KDQpIaSBMdWl6LCB3ZSBkb24ndCBpbnRl
-bmQgdG8gc3dpdGNoIHVzZSBCQVNFIG92ZXIgQ2FwYWJpbGl0aWVzLCB3ZSBqdXN0IHdhbnQgdG8g
-dXNlIGJvdGggZm9yIGJyb2FkY2FzdC4gQ2FwYWJpbGl0aWVzIGZvciBjb2RlYyBjYXBhYmlsaXRp
-ZXMgZnJvbSBwcmVzZXQgdGhhdCB3aWxsIGJlIHVzZWQgaW4gdHJhbnNwb3J0IGNvbmZpZ3VyYXRp
-b24uIEJBU0UgaXMgdXNlZCBmb3IgdGhlIG92ZXItdGhlLWFpciBwYXlsb2FkIGluIFBlcmlvZGlj
-IEFkdiBEYXRhIHdoaWNoIGlzIGNvbmZvcm1hbnQgdG8gVGFibGUgMy4xNTogRm9ybWF0IG9mIEJB
-U0UgdXNlZCBpbiBCYXNpYyBBdWRpbyBBbm5vdW5jZW1lbnRzIGZyb20gQkFQIFNwZWNpZmljYXRp
-b24sIGFsc28gaXQgaXMgdXNlZCBmb3IgUFRTIHRlc3RpbmcgdGhhdCBhc2sgdG8gbW9kaWZ5IHRo
-ZSBCQVNFIHN0cnVjdHVyZS4gQW5kIHdlIHdpbGwgY29weSB0aGUgY2FwYWJpbGl0aWVzIHByZXNl
-dCB0byB0aGUgYmFzZSBzdHJ1Y3R1cmUgdG8gYmUgc3VyZSB3ZSBoYXZlIHRoZSBzYW1lIGNvZGVj
-IGNhcGFiaWxpdGllcyBpbiBib3RoIG9mIHRoZW0uIA0KDQo+DQo+PiBDbGF1ZGlhIERyYWdoaWNl
-c2N1ICgyKToNCj4+ICAgY2xpZW50L3BsYXllcjogVXNlIHByZXNldCBjb25maWd1cmF0aW9uIGlu
-IGNhcGFiaWxpdGllcy4gQ29uZmlndXJlDQo+PiAgICAgQkFTRSB1c2luZyBzZXBhcmF0ZSBzdHJ1
-Y3R1cmUNCj4+ICAgYmFwOiBVc2UgdGhlIEJBU0Ugc3RydWN0dXJlIHJlY2VpdmVkIGZyb20gdXBw
-ZXIgbGF5ZXINCj4+DQo+PiAgY2xpZW50L3BsYXllci5jICAgICAgfCAyNCArKysrKysrKysrKysr
-KysrKy0tLS0tLS0NCj4+ICBwcm9maWxlcy9hdWRpby9iYXAuYyB8IDEzICsrKysrKysrKystLS0N
-Cj4+ICAyIGZpbGVzIGNoYW5nZWQsIDI3IGluc2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0K
-Pj4NCj4+DQo+PiBiYXNlLWNvbW1pdDogODAxMDc2MzAzOTZkM2QzYTM5ODRjNTk5ZTBjYjliMDE1
-YmUwNDk5Yw0KPj4gLS0NCj4+IDIuMzQuMQ0KPj4NCj4NCj4NCj4tLQ0KPkx1aXogQXVndXN0byB2
-b24gRGVudHoNCg==
+Hi,
+
+Thanks for your reply.
+
+After carefully considering your feedback, we now realize that the scenario we were assuming is indeed quite exceptional. It has become clear that there is no necessity for any supplementary mechanisms to reset the Bluetooth system. In our forthcoming work, we plan to engage in an in-depth exploration of the spec and Linux Bluetooth source code, with the aim of deriving more valuable insights and outcomes.
+
+Once again, thank you for your active engagement and for taking the time to address our queries. Your assistance has been instrumental in guiding our approach.
+
+Wishing you all the best and looking forward to future interactions.
+
+Warm regards,
+Xin-Yu Liu
+
+2023/8/8 1:48, Luiz Augusto von Dentz :
+> Hi,
+>
+> On Mon, Aug 7, 2023 at 8:17 AM Xin-Yu Liu <LXYbhu@buaa.edu.cn> wrote:
+>> Hello,
+>>
+>> Thanks for your reply.
+>>
+>> I apologize for my previous unclear statement, which may have misled you.
+>>
+>> Let me rephrase our question:
+>>
+>> When a Bluetooth device initiates a connection to another device, its host sends an HCI_Create_Connection command (OGF: 0x01, OCF: 0x0005) to the controller. Once the connection is established, the controller sends an HCI_Connection_Complete event (Event Code: 0x03) back to the host. If a valid HCI_Connection_Complete event has its parameter "Status" altered (with all other parameters unchanged), changing 0x00 to any value between 0x01 and 0xFF for example, the host will considerd that the connection fails to complete.
+>>
+>> In reality, if the HCI_Connection_Complete event's parameter "Connection_Handle" is valid and unaltered, it means the handle resource exists and has not been released. The observations we made support this statement:
+>>
+> Well according to the spec we can only assume the handle is valid if
+> the status is set to 0x00, so I am not really sure how we can possibly
+> check if the handle is valid if the status indicates a connection
+> failure?
+>
+>> (a) When the tampered HCI_Connection_Complete event with altered "Status" is sent to the host, if we attempt to reconnect to the same device by sending another HCI_Create_Connection command, the controller will send an HCI_Command_Status event (Event Code: 0x0F) to the host, with the "Status" parameter set to 0x0B, indicating "CONNECTION ALREADY EXISTS" and leading to the connection failure.
+>>
+>> (b) When the tampered HCI_Connection_Complete event is sent to the host, if we manually send an HCI_Disconnect command, with the "Connection_Handle" parameter set to the same value as the previous HCI_Connection_Complete event's "Connection_Handle," and the "Reason" parameter set to 0x15, indicating "REMOTE DEVICE TERMINATED CONNECTION DUE TO POWER OFF," we receive a proper response, signifying that the Connection_Handle is valid and exists. Additionally, the issue described in (a) disappears.
+> Just read again the sentence above: 'TERMINATED CONNECTION', it can't
+> possible mean the handle is valid and exists, I'm afraid you are
+> arguing based on a controller implementation that doesn't comply with
+> the spec text above, it shall either disconnect the link so we
+> invalidate the handle on the host, then later we can reconnect, or
+> indicate the status is 0x00.
+>
+>> Well we can't do much about the dangling connection if we don't know
+>> its handle to be able to disconnect since there is no command to
+>> disconnect by address if that is what you were expecting us to do, so
+>> the bottom line seems to be that sending 0x0b to the controller is
+>> useless since we can't do anything about at the host, well other than
+>> reset but would likely affect other functionality as well.
+>>
+>> With knowledge of the handle, we think we can manually send an HCI_Disconnect command to deal with the dangling connection, just as we mentioned in (b).
+> Assuming the handle is valid on status != 0x00 would probably not work
+> with most controllers following the spec to the letter, in which case
+> the HCI_Disconnect would fail and in the meantime we have an hci_conn
+> with invalid state, so I don't think it is worth going sideways just
+> to get it working under special circumstances, where this special
+> circumstances might be a bug in the way status is used.
+>
+>> We believe that, in the situation we mentioned, the handle is valid but is rendered useless. Implementing an automated mechanism to handle the release of the handle (e.g., by sending an HCI_Disconnect command) might be a better choice.
+> Sorry but I have to disagree, in that case HCI_Disconnect would need
+> to be sent every time, which can also fail if the link-layer had
+> terminated the connection as indicated in the status.
+>
+>> Best wishes,
+>> Xin-Yu Liu
+>>
+>> 2023/8/5 13:09, Luiz Augusto von Dentz :
+>>
+>> Hi,
+>>
+>> On Fri, Aug 4, 2023 at 9:35 PM Xinyu Liu <LXYbhu@buaa.edu.cn> wrote:
+>>
+>> Hello,
+>>
+>> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in Linux 6.2:
+>>
+>> During the connection process, the host server needs to receive the HCI_Connection_Complete packet from the hardware controller. In normal cases, the status field of this packet is zero, which means that the connection is successfully completed:
+>>
+>> However, in our testing, when the status field was set to non-zero, 47 for instance, the Bluetooth connection failed. After that, when we attempt to reestablish a Bluetooth connection, the connection always fails. Upon analyzing the event packets sent from the controller to the host server, we observed that the Status field of the HCI_Command_Status packet becomes 0B, indicating that the controller believes the connection already exists. This situation has been causing the connection failure persistently:
+>>
+>> That seems like a link-layer issue, the controller is saying the
+>> connection had failed, and 0x0b also doesn't help either except if you
+>> are saying that the other parameters are actually valid (e.g. handle),
+>> that said the spec seems pretty clear about status other than 0x00
+>> means the connection had failed:
+>>
+>> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+>> page 2170
+>>
+>> 0x01 to 0xFF Connection failed to Complete. See [Vol 1] Part F,
+>> Controller Error Codes
+>> for a list of error codes and descriptions.
+>>
+>> In our understanding, it would be more preferable if a single failed Bluetooth connection does not result in subsequent connections also failing. We believe that having some mechanism to facilitate Bluetooth's recovery and restoration to normal functionality could be considered as a potentially better option.
+>>
+>> We are not sure whether this is a semantic bug or implementation feature in the Linux kernel. Any feedback would be appreciated, thanks!
+>>
+>> Well we can't do much about the dangling connection if we don't know
+>> its handle to be able to disconnect since there is no command to
+>> disconnect by address if that is what you were expecting us to do, so
+>> the bottom line seems to be that sending 0x0b to the controller is
+>> useless since we can't do anything about at the host, well other than
+>> reset but would likely affect other functionality as well.
+>>
+>>
+>
+
