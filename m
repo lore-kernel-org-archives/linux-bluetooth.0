@@ -2,72 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F2C8C001E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 06:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C725C001E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 08:16:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbjHIGwX (ORCPT
+        id S230091AbjHIIQk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Aug 2023 02:52:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51002 "EHLO
+        Wed, 9 Aug 2023 04:16:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229737AbjHIGwW (ORCPT
+        with ESMTP id S229459AbjHIIQj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Aug 2023 02:52:22 -0400
-Received: from mail.svario.it (mail.svario.it [IPv6:2a02:2770:13::112:0:1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B482D1BFB
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Aug 2023 23:52:21 -0700 (PDT)
-Received: from localhost.localdomain (dynamic-093-131-108-051.93.131.pool.telefonica.de [93.131.108.51])
-        by mail.svario.it (Postfix) with ESMTPSA id 5647BDA0CE;
-        Wed,  9 Aug 2023 08:52:20 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svario.it; s=201710;
-        t=1691563940; bh=jO11Vmz2bohC4/Z9GnAvRwGYI5QFy8hHRKJHetlBVhg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pddXeeFePTOmhRGUr2gJOBP+uShCFdTGV2MpiqCrPvK2Li5Xss6fGNOyhEzB9OReo
-         E8Gbcn5E0AM1i93fG2G4ce+unXA4jQ1TtkIlrnVJQnls0JB0JGhldP9RfHIfosjSbb
-         17ZxW3xdVLkkco1mUAKTCNt/u0EguIkSAYGxWR9GSwLjJQpvZbFvkL4wyiSy0H6WSH
-         uWI0vno3r/tGjiVPwmxLTdJYBjrTjdbkOUHqom06oTOyfwng9sQninbu0f1aSsHc8C
-         1TpEdDvHVCm92K1rsMzS3n9oKq8+knGIVIbvIivA1bezEnvS4H0yO61Yh6HnM41PvX
-         bHU2FMpE2vE7A==
-From:   Gioele Barabucci <gioele@svario.it>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Gioele Barabucci <gioele@svario.it>
-Subject: [PATCH BlueZ v4 2/2] configure.ac: Install D-Bus policy in /usr/share, not /etc
-Date:   Wed,  9 Aug 2023 08:51:43 +0200
-Message-Id: <20230809065143.2002324-3-gioele@svario.it>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230809065143.2002324-1-gioele@svario.it>
-References: <20230809065143.2002324-1-gioele@svario.it>
+        Wed, 9 Aug 2023 04:16:39 -0400
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F11210F6;
+        Wed,  9 Aug 2023 01:16:38 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-583fe10bb3cso75193267b3.2;
+        Wed, 09 Aug 2023 01:16:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1691568997; x=1692173797;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=5IEuzWykTMtItBBOAFGOiv2XbuELxF8lm+BVPreJJuo=;
+        b=q97l8KGdYR6vSPeBPn5HJ6Iy8BCXsLr6xdF/EBnHsEZs587lM7np7eptBi/4MP+arH
+         dlL0+wk8KZutec0aS8NZtcHyslmnniF9L9hkAV533WLVuAx5Nagv78KzaTlcdBeBWEmK
+         vPAmfcJSizIpzA8mzol/5pZiJXMLr0k+RUwSddXcdtX0ozFnC3e24YsEbf6TVWuUWhc0
+         9xojO8cV1bR3zOK44Tjo50S7kV9Xe1AHAgFSFomGZOarl04kXqZMNSeeOd0TxTkN0dYq
+         N8PcyyQYn0DVdrYkbRYw85AbQkKNWYfjc+yhXg9QiBXeEBxA1yej+mAdVHpUxRPPi5A8
+         QJkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1691568997; x=1692173797;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5IEuzWykTMtItBBOAFGOiv2XbuELxF8lm+BVPreJJuo=;
+        b=ENxtKAaipNuYbZ99BGczOo/VsZ6vy37HDw92BW2qnAYB0heIEZfZUqfQmhhe0oV8+h
+         I0kzhEZNff6XRDrvrm/Qp5ivEQt9mcUzgBWVpXYuh7tSUEqZV/CJdT77V5POcHL6OmC2
+         Gz70A+wEb2iq3Ot8e7Lp7GLrMSjGG+S/1nKmMKWvdyIA3cNb/dV/Uzc9uwkoCbPPqlG8
+         snHa9XrTozLVeahWl2j60TS1lN/jtK/Jf+yr0ymjmtKEnVYDycIucbcjPJZJUEuSw21U
+         tAtsxuhseALGTSQJyQgucL8bCEcqSHHaXTemnxwRK8QqzPQdunHyBvfxEjNAbN6FNw3M
+         5n1g==
+X-Gm-Message-State: AOJu0YzatRH/h6F2U1N2LvJgTvHkKEAAct6UAv0xelov7UzQz3twFT/j
+        698erL1SabrDnnz8pJlx3hs0Ds4a81/ZQ6KS0j0=
+X-Google-Smtp-Source: AGHT+IHS0MXJBfpz/y6yTU3fPASv7s5C/fpHPIcAx3s3X69HAorv6O8k4CBnsZhYTv6+C1NjXVpQpvXRTloJJZLEKjc=
+X-Received: by 2002:a81:82c3:0:b0:586:b686:8234 with SMTP id
+ s186-20020a8182c3000000b00586b6868234mr3054576ywf.8.1691568997495; Wed, 09
+ Aug 2023 01:16:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
+In-Reply-To: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
+From:   TatriX <tatrics@gmail.com>
+Date:   Wed, 9 Aug 2023 10:16:26 +0200
+Message-ID: <CAG7LdX7DwNs4AenJgAkdUMa_09s_25jUE0O=4=0BR+Y9KU93GA@mail.gmail.com>
+Subject: Re: Bluetooth LE scan doesn't show device name
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Build System <linux-kbuild@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From https://bugs.debian.org/1006631:
+> TatriX: Can you also attach dmesg output to your Bugzilla report?
 
-> dbus supports policy files in both `/usr/share/dbus-1/system.d` and
-> `/etc/dbus-1/systemd`. [The] recently released dbus 1.14.0, officially
-> deprecates installing packages' default policies into
-> `/etc/dbus-1/systemd`, instead reserving it for the sysadmin.
-> This is the same idea as the difference between `/usr/lib/udev/rules.d`
-> and `/etc/udev/rules.d`.
----
- configure.ac | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Shall I include full dmesg output for both kernels?
+I have a laptop where I keep 5.9.12 and a desktop machine, where I use
+latest stable from the Arch repo.
 
-diff --git a/configure.ac b/configure.ac
-index 298b8cd59..ad864dea7 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -95,7 +95,7 @@ AC_ARG_WITH([dbusconfdir], AS_HELP_STRING([--with-dbusconfdir=DIR],
- 					[path_dbusconfdir=${withval}])
- if (test -z "${path_dbusconfdir}"); then
- 	AC_MSG_CHECKING([D-Bus configuration directory])
--	path_dbusconfdir="`$PKG_CONFIG --variable=sysconfdir dbus-1`"
-+	path_dbusconfdir="`$PKG_CONFIG --variable=datadir dbus-1`"
- 	if (test -z "${path_dbusconfdir}"); then
- 		AC_MSG_ERROR([D-Bus configuration directory is required])
- 	fi
--- 
-2.39.2
-
+When it comes to compilation issues, I'm experiencing the same
+symptoms as described here:
+https://unix.stackexchange.com/questions/709671/linux-kernel-5-15-54-compilation-errors-with-gcc-12-1
+I'll have to investigate how to downgrade gcc before I can do the bisection.
