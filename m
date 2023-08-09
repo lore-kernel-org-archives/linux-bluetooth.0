@@ -2,101 +2,181 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B99DDC001DE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 21:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D3BC41513
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 21:39:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbjHIVQ3 (ORCPT
+        id S232447AbjHIVjV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Aug 2023 17:16:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
+        Wed, 9 Aug 2023 17:39:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbjHIVQ3 (ORCPT
+        with ESMTP id S232416AbjHIVjV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Aug 2023 17:16:29 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17B1010CA
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 14:16:27 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id d75a77b69052e-4085ee5b1e6so6895301cf.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Aug 2023 14:16:27 -0700 (PDT)
+        Wed, 9 Aug 2023 17:39:21 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D5D1BD9
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 14:39:19 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-686ed1d2594so220513b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Aug 2023 14:39:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691615786; x=1692220586;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zMaWeJYdEeRrARXdlCdC/uTtESIiz4jbMMTwG0Oihd0=;
-        b=fwN07e/uvlLvcUVT/CnRxcc/wSOZnOpdI9S5eBtWrOphrQxhkHAI5tEINb2cmBOlOp
-         FpeJBSbFhWpw9KiMgcsJ0I/Z410J9WMsLtbvY2eumW6lW8FtTk2/Li9zoCY32VbqnPzz
-         j9AHMWkSKp0JTx64sRoI5f02/Pt/6HQCvgZ5R9MFcvh9F3DVXBhg8isvDii06rAAw6Nu
-         1aU8PKMr1VxzpAzLqI0MZ52pd7CKtIoWLxlGWWtXf9uI1FuTBEiQ/ktKmL2hjaO2MSXX
-         AxwdhWTh8AaM48A8JCTv3hgWkLyuMmDHSypKGwOlpL8u4Xe2gmG9CKCJMkJppjB/wLSM
-         4toA==
+        d=gmail.com; s=20221208; t=1691617158; x=1692221958;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Mf8UaUQ/L32XIlNjn4sfg2KP/sVO7iobJQCjvT+8PM=;
+        b=UDM8iTNEsU7YkUziUa6UGCfypnaMKFl62szBz9w9w43y87tHIVeaPMF+YDMChAHSXp
+         oQGk0QPZQXVOZeYeHVDQi1gpL+koqZFROanY8z9hSrd0Jq8cnbEpYtlfODmzS040foWI
+         UcZ6siLcZOgn+a6JFYwV4z9ohJOo2guuaoreFgotFYEN620cRH0bDQNQ1gbgt/icdKg1
+         gWEIvI5/5ISXuwLRb2rWLWXoRfOuIvXD9y70x+jnuNaes0/K/Q3RpnlJS6b6E2u1q40Y
+         fk89sJQt9JzAf4sOSJuGJ3l5s2Viwp05/qpTQOtfsYM1o3cTOrmkqCWg5/nuqAVb5S7+
+         Ngxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691615786; x=1692220586;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zMaWeJYdEeRrARXdlCdC/uTtESIiz4jbMMTwG0Oihd0=;
-        b=RzapT5bUJB0qBZKlXi6oTYOUMdtMDEs6xk9rXwCwwDUMKoMY9lfD0a71cKvfXicGra
-         csxnxHpdMX8w+i8UMout7qPyaQus5QdlsvbK7uwqthcKnX4TlteyJCW/qIrU4tzDYnCu
-         jdhhuh0uyoSND6X74LcCq6JipUpuHDNlwinpbLWDR7QUewJU2z9JgCbmqtJDDVcqW5LO
-         8pAhWqpShbXo0BHjyW4Jvj3DYH43Sl8kQZR2Y+abf/CpJUbxS0lga7BQYJG632jZ48be
-         7CS3TrFPd68GQMv38SLPRs0TAtb1pi9rMa5QGBpyEpbas9rco3L3U6lItZfse+3ohumT
-         RqJg==
-X-Gm-Message-State: AOJu0YyhR4iHDF1v3U5tU9P17JcF22I/p/uKj8aF0Adjwtkzyl5CvopL
-        oNHkjV25+2AoHYHCFEcN50L2NFz91q0=
-X-Google-Smtp-Source: AGHT+IHRuQBDjpM5Wi1Z6k2uzA96weoGBspSu+In36QrBCabNNbdJkF9hyic8pAAU2F+ILhJYnLS2Q==
-X-Received: by 2002:ac8:7e83:0:b0:403:b63a:afd with SMTP id w3-20020ac87e83000000b00403b63a0afdmr143022qtj.9.1691615786061;
-        Wed, 09 Aug 2023 14:16:26 -0700 (PDT)
-Received: from [172.17.0.2] ([20.39.61.188])
-        by smtp.gmail.com with ESMTPSA id b10-20020ac8678a000000b0040ff25d8712sm15651qtp.18.2023.08.09.14.16.25
+        d=1e100.net; s=20221208; t=1691617158; x=1692221958;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Mf8UaUQ/L32XIlNjn4sfg2KP/sVO7iobJQCjvT+8PM=;
+        b=f59+tUxihVplhQfhNCGjnttpqrgOYF3l9yFilx6G3Lo7rKEDJzyRedSWudzXDPAklh
+         I5TpHQs8urqsZ7IJ7PU3jONCs9rS3swbXfUzsXzq4rFYsyoDwnaYgrXnd5ejXQ5Gp0B1
+         qQJ9D+nQfjCub2PFooRdgJfswocjjQy1dxPeYY89SGqUVApj0AMieP4SPNb6QD/9wChb
+         BvDxfnrB5uLHAZ29u0jb6lJX553WQ1u4LvfTzOD889ALbaYurWg0MVvxNMvGZs4H6HEd
+         Rw6e18YxnzM00f4ORjLnBpyR/dTIGBbNzE4TvS/XbeKei++l3YlJF29+W9T3VG7/6IvY
+         e/lg==
+X-Gm-Message-State: AOJu0YxoXJ+PGuoV6Eq0m/jdaTp2c/+ZFlqgGkZUPtpV+Dgz1B+he3jc
+        e4XUQzl812M4mn6e0PRHK2uP7nZo/9s=
+X-Google-Smtp-Source: AGHT+IEwv02ETNybXsOnl6IDW6ShPga9tLN/lJawjxKezIsf/y0NMQSgOw0EcEgJChck8wM1BMIULQ==
+X-Received: by 2002:a05:6a21:3e0c:b0:13d:54cd:63e7 with SMTP id bk12-20020a056a213e0c00b0013d54cd63e7mr457434pzc.33.1691617158032;
+        Wed, 09 Aug 2023 14:39:18 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-236-201-58.hsd1.or.comcast.net. [71.236.201.58])
+        by smtp.gmail.com with ESMTPSA id 8-20020aa79108000000b00686da0e163bsm64883pfh.11.2023.08.09.14.39.16
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Aug 2023 14:16:25 -0700 (PDT)
-Message-ID: <64d40229.c80a0220.3a28.0143@mx.google.com>
-Date:   Wed, 09 Aug 2023 14:16:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8916598636388849960=="
+        Wed, 09 Aug 2023 14:39:17 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: hci_sync: Add hci_cmd_sync_queue_once
+Date:   Wed,  9 Aug 2023 14:39:16 -0700
+Message-ID: <20230809213916.1636311-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] device: Fix not probing drivers at startup
-In-Reply-To: <20230809194620.1595792-1-luiz.dentz@gmail.com>
-References: <20230809194620.1595792-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8916598636388849960==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This adds hci_cmd_sync_queue_once which can be used for callback that
+shall be schedule only once.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=774671
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.53 seconds
-GitLint                       PASS      0.36 seconds
-BuildEll                      PASS      27.92 seconds
-BluezMake                     PASS      884.46 seconds
-MakeCheck                     PASS      12.63 seconds
-MakeDistcheck                 PASS      161.48 seconds
-CheckValgrind                 PASS      260.45 seconds
-CheckSmatch                   PASS      351.02 seconds
-bluezmakeextell               PASS      107.80 seconds
-IncrementalBuild              PASS      738.38 seconds
-ScanBuild                     PASS      1131.15 seconds
-
-
-
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_sync.h |  5 +++
+ net/bluetooth/hci_sync.c         | 56 +++++++++++++++++++++++++++-----
+ 2 files changed, 53 insertions(+), 8 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 57eeb07aeb25..3d2ffcb6c461 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -48,6 +48,11 @@ int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 			void *data, hci_cmd_sync_work_destroy_t destroy);
+ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 		       void *data, hci_cmd_sync_work_destroy_t destroy);
++bool hci_cmd_sync_lookup(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			 void *data, hci_cmd_sync_work_destroy_t destroy,
++			 bool cancel);
++int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			    void *data, hci_cmd_sync_work_destroy_t destroy);
+ 
+ int hci_update_eir_sync(struct hci_dev *hdev);
+ int hci_update_class_sync(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 5eb30ba21370..32fa9006f381 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -639,6 +639,17 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
+ 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
+ }
+ 
++static void _hci_cmd_sync_cancel_entry(struct hci_dev *hdev,
++				       struct hci_cmd_sync_work_entry *entry,
++				       int err)
++{
++	if (entry->destroy)
++		entry->destroy(hdev, entry->data, err);
++
++	list_del(&entry->list);
++	kfree(entry);
++}
++
+ void hci_cmd_sync_clear(struct hci_dev *hdev)
+ {
+ 	struct hci_cmd_sync_work_entry *entry, *tmp;
+@@ -647,13 +658,8 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
+ 	cancel_work_sync(&hdev->reenable_adv_work);
+ 
+ 	mutex_lock(&hdev->cmd_sync_work_lock);
+-	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
+-		if (entry->destroy)
+-			entry->destroy(hdev, entry->data, -ECANCELED);
+-
+-		list_del(&entry->list);
+-		kfree(entry);
+-	}
++	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list)
++		_hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
+ 	mutex_unlock(&hdev->cmd_sync_work_lock);
+ }
+ 
+@@ -740,6 +746,39 @@ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ }
+ EXPORT_SYMBOL(hci_cmd_sync_queue);
+ 
++bool hci_cmd_sync_lookup(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			 void *data, hci_cmd_sync_work_destroy_t destroy,
++			 bool cancel)
++{
++	struct hci_cmd_sync_work_entry *entry, *tmp;
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
++		if (entry->func == func && entry->data == data &&
++		    entry->destroy == destroy) {
++			if (cancel)
++				_hci_cmd_sync_cancel_entry(hdev, entry,
++							   -ECANCELED);
++			mutex_unlock(&hdev->cmd_sync_work_lock);
++			return true;
++		}
++	}
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	return false;
++}
++EXPORT_SYMBOL(hci_cmd_sync_pending);
++
++int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			    void *data, hci_cmd_sync_work_destroy_t destroy)
++{
++	if (hci_cmd_sync_lookup(hdev, func, data, destroy, false))
++		return 0;
++
++	return hci_cmd_sync_queue(hdev, func, data, destroy);
++}
++EXPORT_SYMBOL(hci_cmd_sync_queue_once);
++
+ int hci_update_eir_sync(struct hci_dev *hdev)
+ {
+ 	struct hci_cp_write_eir cp;
+@@ -2949,7 +2988,8 @@ int hci_update_passive_scan(struct hci_dev *hdev)
+ 	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
+ 		return 0;
+ 
+-	return hci_cmd_sync_queue(hdev, update_passive_scan_sync, NULL, NULL);
++	return hci_cmd_sync_queue_once(hdev, update_passive_scan_sync, NULL,
++				       NULL);
+ }
+ 
+ int hci_write_sc_support_sync(struct hci_dev *hdev, u8 val)
+-- 
+2.41.0
 
---===============8916598636388849960==--
