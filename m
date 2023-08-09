@@ -2,86 +2,81 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F4AAC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 18:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C9DC0015E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Aug 2023 18:20:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229738AbjHISNt (ORCPT
+        id S230139AbjHISUX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Aug 2023 14:13:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51916 "EHLO
+        Wed, 9 Aug 2023 14:20:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjHISNs (ORCPT
+        with ESMTP id S229489AbjHISUW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Aug 2023 14:13:48 -0400
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC0721736
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 11:13:47 -0700 (PDT)
-Received: from github.com (hubbernetes-node-04cd247.ash1-iad.github.net [10.56.151.29])
-        by smtp.github.com (Postfix) with ESMTPA id 32F183410C8
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 11:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1691604827;
-        bh=Xoc+4nAINeL51/u2OFR+JXzMVf800xkMoNryXwApsEk=;
-        h=Date:From:To:Subject:From;
-        b=Hny1WEcffd2ccyFd1weJc6K1N8BJzzClnikqWksKCs8XhZcFiSdnhmWOo/SodXLcZ
-         7uRR6PqPw9flD42W/XOqzHjGey3CMbtnsHrtWyeDbx60Br10blQ5mkHBO92bv0u7AO
-         rxqWM5YnltIR9IqgRzdcSybdAu4cSdOuq5p0ovco=
-Date:   Wed, 09 Aug 2023 11:13:47 -0700
-From:   Gioele <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/67a26a-fc6f58@github.com>
-Subject: [bluez/bluez] 8b6432: configure.ac: Bump minimum D-Bus version to
- 1.10
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Wed, 9 Aug 2023 14:20:22 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 265BDFE
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 11:20:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BA24D64354
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 18:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 21C76C433C8;
+        Wed,  9 Aug 2023 18:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1691605221;
+        bh=EEcDqhSaoXPh6YEatIY5MkTuMKDg6R22JxTA4Hlv50Q=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=NMrY0j2kg575N/B7mWnRhla2VrQB9ZrmzJNxhyzNJtstaXpJVq8YokDR++1YuaXLU
+         hBlCyVFtR/9fZN1MSEUmPVhYlNwmrCfnsT0RMY4AUH1wvAwpRJZxzHxmNXOHK0YeXL
+         LgI2pJTgBOAingjy16G+Ao0XAM+KOsTNJzA5ZFxjAJvDq4MR1vq/QA1MkdUTp5MmBN
+         KqVkdT/5+aVbwQ4r+8PrMKVH6JeRdPXqw4V4K+juMS1IyYVa0YWDbvOtFuSwQK/oi7
+         x6Qd/CkyyYtRBYSkLm4Dx12rxk1LDYcVfpd2clPflf5IFvIYRHpN+6FsbcaDkFUP8n
+         MwRFXwIam+6Xg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 01CB6C3274B;
+        Wed,  9 Aug 2023 18:20:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v4 0/2] configure.ac: Install D-Bus policy in
+ /usr/share, not /etc
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169160522100.14644.4519904446970876636.git-patchwork-notify@kernel.org>
+Date:   Wed, 09 Aug 2023 18:20:21 +0000
+References: <20230809065143.2002324-1-gioele@svario.it>
+In-Reply-To: <20230809065143.2002324-1-gioele@svario.it>
+To:     Gioele Barabucci <gioele@svario.it>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 8b6432a8728f87aa328bd67f07a35a1e755d75e6
-      https://github.com/bluez/bluez/commit/8b6432a8728f87aa328bd67f07a35a1e755d75e6
-  Author: Gioele Barabucci <gioele@svario.it>
-  Date:   2023-08-09 (Wed, 09 Aug 2023)
+Hello:
 
-  Changed paths:
-    M configure.ac
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  configure.ac: Bump minimum D-Bus version to 1.10
+On Wed,  9 Aug 2023 08:51:41 +0200 you wrote:
+> [Sending again, this time with the right commit titles. Sorry for the noise.]
+> 
+> This patch changes configure.am to install the bluez D-Bus policy in
+> `/usr/share/dbus-1/system.d` instead of `/etc/dbus-1/system.d`.
+> 
+> From https://bugs.debian.org/1006631:
+> 
+> [...]
 
-D-Bus 1.10, released in 2015, is the first version that supports reading
-policy files from `/usr/share/dbus-1` in addition to `/etc/dbus-1`.
+Here is the summary with links:
+  - [BlueZ,v4,1/2] configure.ac: Bump minimum D-Bus version to 1.10
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8b6432a8728f
+  - [BlueZ,v4,2/2] configure.ac: Install D-Bus policy in /usr/share, not /etc
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fc6f5856d177
 
-The previous minimum version, 1.6, was released in 2012.
-
-
-  Commit: fc6f5856d1775b39712b35049307afdd65df3d27
-      https://github.com/bluez/bluez/commit/fc6f5856d1775b39712b35049307afdd65df3d27
-  Author: Gioele Barabucci <gioele@svario.it>
-  Date:   2023-08-09 (Wed, 09 Aug 2023)
-
-  Changed paths:
-    M configure.ac
-
-  Log Message:
-  -----------
-  configure.ac: Install D-Bus policy in /usr/share, not /etc
-
-From https://bugs.debian.org/1006631:
-
-> dbus supports policy files in both `/usr/share/dbus-1/system.d` and
-> `/etc/dbus-1/systemd`. [The] recently released dbus 1.14.0, officially
-> deprecates installing packages' default policies into
-> `/etc/dbus-1/systemd`, instead reserving it for the sysadmin.
-> This is the same idea as the difference between `/usr/lib/udev/rules.d`
-> and `/etc/udev/rules.d`.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/67a26abe53bf...fc6f5856d177
