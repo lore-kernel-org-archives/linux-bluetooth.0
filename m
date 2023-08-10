@@ -2,107 +2,91 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84118C04A6A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Aug 2023 18:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF30C04A6A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Aug 2023 20:33:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235235AbjHJSfl (ORCPT
+        id S232278AbjHJUdP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Aug 2023 14:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58842 "EHLO
+        Thu, 10 Aug 2023 16:33:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235439AbjHJSfk (ORCPT
+        with ESMTP id S230459AbjHJUdO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Aug 2023 14:35:40 -0400
-Received: from mail11.truemail.it (mail11.truemail.it [IPv6:2001:4b7e:0:8::81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21FB126B8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Aug 2023 11:35:40 -0700 (PDT)
-Received: from gaggiata.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
-        by mail11.truemail.it (Postfix) with ESMTPA id BEA95207DB;
-        Thu, 10 Aug 2023 20:35:33 +0200 (CEST)
-Received: from livingston (unknown [192.168.42.11])
-        by gaggiata.pivistrello.it (Postfix) with ESMTP id 5C2F87FBA0;
-        Thu, 10 Aug 2023 20:35:33 +0200 (CEST)
-Received: from pivi by livingston with local (Exim 4.96)
-        (envelope-from <francesco@dolcini.it>)
-        id 1qUAVR-0001Go-0f;
-        Thu, 10 Aug 2023 20:35:33 +0200
-Date:   Thu, 10 Aug 2023 20:35:33 +0200
-From:   Francesco Dolcini <francesco@dolcini.it>
-To:     Neeraj sanjay kale <neeraj.sanjaykale@nxp.com>
-Cc:     Francesco Dolcini <francesco@dolcini.it>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-        Rohit Fule <rohit.fule@nxp.com>,
-        Sherry Sun <sherry.sun@nxp.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1] Bluetooth: btnxpuart: Add support for IW624 chipset
-Message-ID: <ZNUt9V2WCS/ZCavl@livingston.pivistrello.it>
-References: <20230810094802.832652-1-neeraj.sanjaykale@nxp.com>
- <ZNUUeD2Zr1SfTODT@francesco-nb.int.toradex.com>
- <DU2PR04MB860074DF11676414E57A5904E713A@DU2PR04MB8600.eurprd04.prod.outlook.com>
+        Thu, 10 Aug 2023 16:33:14 -0400
+X-Greylist: delayed 524 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 10 Aug 2023 13:33:13 PDT
+Received: from mout-b-105.mailbox.org (mout-b-105.mailbox.org [IPv6:2001:67c:2050:102:465::105])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079522737
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Aug 2023 13:33:12 -0700 (PDT)
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mout-b-105.mailbox.org (Postfix) with ESMTPS id 4RMJLH5k9Cz9vSg;
+        Thu, 10 Aug 2023 22:24:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shiphrah.com;
+        s=MBO0001; t=1691699063;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=cujtdTt9vm57nL92w5TpyhVxThZCrv9eYl7g4XDUGfI=;
+        b=Yuv5PoSEASxMT/4Fplgs7+9PUz1c6AaaOjsvmXTkPRRyxiPXMvZHUVMiPA/9+bibWcip8f
+        nRLhWi+nM3cxKe9Nd7RQ2NtYQvw3CSREOSyEJGIJq38HNik25nujf2/r/6QaG3CGOBfl0n
+        kMW2TjqcBxwhKRMm4lOch3hPdrLodV8GHIVUMfWlmJdcnUb0LRjLPmjOaH5ovJyslhPv3a
+        mWX66I/PM9WkfBWzW/zlbwZvRQjJCZ/CnZkZbGY32BS8OGlBxjeyqel56NLHrAiJGozSAU
+        0xEscAc3EV4miAqBWbpqFmO6OyssjjWihJ5BhLofBinC7GvCQ/VX7BXPrI8pdQ==
+Message-ID: <8ddaee26-b4d7-f694-ac8b-2aaf4d3c5f8e@shiphrah.com>
+Date:   Thu, 10 Aug 2023 22:24:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DU2PR04MB860074DF11676414E57A5904E713A@DU2PR04MB8600.eurprd04.prod.outlook.com>
+Content-Language: de-DE
+From:   =?UTF-8?Q?J=c3=bcrgen_Hofmann?= <hofmann@shiphrah.com>
+Subject: Firmware for MT7922 missing in initrd; bluetooth disabled after
+ update
+Organization: shiphrah GmbH
+To:     linux-bluetooth@vger.kernel.org
+Cc:     tiwai@suse.de
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Aug 10, 2023 at 06:02:32PM +0000, Neeraj sanjay kale wrote:
-> Hi Francesco
-> 
-> Thank you for reviewing this patch.
-> 
-> > > --- a/drivers/bluetooth/btnxpuart.c
-> > > +++ b/drivers/bluetooth/btnxpuart.c
-> > ...
-> > > @@ -547,7 +553,7 @@ static int nxp_download_firmware(struct hci_dev
-> > *hdev)
-> > >       serdev_device_set_flow_control(nxpdev->serdev, false);
-> > >       nxpdev->current_baudrate = HCI_NXP_PRI_BAUDRATE;
-> > >
-> > > -     /* Wait till FW is downloaded and CTS becomes low */
-> > > +     /* Wait till FW is downloaded */
-> > >       err = wait_event_interruptible_timeout(nxpdev->fw_dnld_done_wait_q,
-> > >                                              !test_bit(BTNXPUART_FW_DOWNLOADING,
-> > >
-> > > &nxpdev->tx_state), @@ -558,16 +564,11 @@ static int
-> > nxp_download_firmware(struct hci_dev *hdev)
-> > >       }
-> > >
-> > >       serdev_device_set_flow_control(nxpdev->serdev, true);
-> > > -     err = serdev_device_wait_for_cts(nxpdev->serdev, 1, 60000);
-> > > -     if (err < 0) {
-> > > -             bt_dev_err(hdev, "CTS is still high. FW Download failed.");
-> > > -             return err;
-> > > -     }
-> > this seems like an unrelated change, and it's moving from a 60secs timeout
-> > polling CTS to nothing.
-> > 
-> > What's the reason for this? Should be this a separate commit with a proper
-> > explanation?
-> > 
-> While working on integrating IW624 in btnxpuart driver, I observed that the
-> first reset command was getting timed out, after FW download was complete 2
-> out of 10 times. On further timing analysis, I noticed that this wait for CTS
-> code did not actually help much, since CTS is already low after FW download,
-> and becomes high after few more milli-seconds, and then low again after FW is
-> initialized.  So it was either adding a "wait for CTS high" followed by "wait
-> for CTS low", or simply increasing the sleep delay from 1000msec to 1200msec.
-> I chose the later as it seemed more cleaner, and did the job perfectly, and
-> tested all previously supported chipsets to make sure nothing is broke.  But
-> you are right, I should add an explanation for this change in the commit
-> message in the v2 patch.
+Hi everybody,
 
-This should be a separate commit, and probably it should have a fixes tag,
-since this is solving a bug. I recently noted some bugs around this, I just did
-not have the time to reproduce on the latest mainline kernel to report those.
+I updated openSuse Tumbleweed 20230806 with a bluetooth keyboard 
+attached to the PC. After the update to 20230808 and rebooting bluetooth 
+was disabled and it was impossible to enable it again. Before the update 
+bluetooth was working fine.
 
-One more question on this, what about the use case in which a combo firmware
-is used and no firmware is loaded here? Will this use case be affected?
+The attached bluetooth keyboard caused the bluetooth module being added 
+to initrd. However, the corresponding firmware for MT7922 is not added.
 
-Francesco
+dmesg shows:
 
+[    4.368031] bluetooth hci0: Direct firmware load for 
+mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin failed with error -2
+
+In fact the file is present on the system
+
+ls -l /usr/lib/firmware/mediatek/BT_RAM_CODE*
+-rw-r--r-- 1 root root 512104  3. Aug 17:36 
+/usr/lib/firmware/mediatek/BT_RAM_CODE_MT7922_1_1_hdr.bin.xz
+-rw-r--r-- 1 root root 343052  3. Aug 17:36 
+/usr/lib/firmware/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin.xz
+
+but missing in initrd
+
+lsinitrd | grep BT_RAM_CODE
+-rw-r--r--   1 root     root       343052 Aug  3 17:36 
+usr/lib/firmware/mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin.xz
+
+Manually adding the file to initrd makes bluetooth work again.
+
+I reported the bug here
+https://bugzilla.suse.com/show_bug.cgi?id=1214133
+and was requested to report here.
+
+If I can be of any help or you need further information please let me know.
+
+Thanks and kind regards
+
+Jürgen
