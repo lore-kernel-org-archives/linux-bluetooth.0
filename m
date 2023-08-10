@@ -2,132 +2,159 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 006F7C04E69
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Aug 2023 14:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 240F0C04E69
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Aug 2023 14:53:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234068AbjHJOpR (ORCPT
+        id S234619AbjHJOx0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Aug 2023 10:45:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41326 "EHLO
+        Thu, 10 Aug 2023 10:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235166AbjHJOpP (ORCPT
+        with ESMTP id S232030AbjHJOxZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Aug 2023 10:45:15 -0400
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF0D2709;
-        Thu, 10 Aug 2023 07:45:12 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-3a7ca8720a0so772314b6e.2;
-        Thu, 10 Aug 2023 07:45:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1691678712; x=1692283512;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=rjkJeuVhwpYmerUZg6+H8//Urh09ziH3ZOgeiUCEQzI=;
-        b=apRBe8cYG91FJb50kRWngSicYQuaLPZ+t1tIQMI35aKEraVpDuu7FqQPUyV84WMph2
-         UlJP3i2BDUd5RnfqlkrSngvsGxDpcMMERxYvuGcGZk7v6QUu0+PupB0pO+bqs6xU5SSd
-         sv6UZWV8CdHza9bj8yWwfFaGr2fm5h5EXpWqnr5KZJIGaCsMlZ3sKaPWWy6M9YzbK+QE
-         bX8uHIpGH6Xoe7bHzZAVjbjU52GaFXPsSRPmlLtm4X6Bu/A2x+6QDGHaXZJruZov9w2/
-         EKhl6IIzTFl9HEN3M9sDbs9mM6bbxTt35F9gh+BiJu5OQvM1l1+Qn+nhoebyLF1NF7Y4
-         lKkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1691678712; x=1692283512;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rjkJeuVhwpYmerUZg6+H8//Urh09ziH3ZOgeiUCEQzI=;
-        b=VICSd1dyKurOziGGPIc+UyFlZi5xSxRle4AcHSg4GTDdChJDmbidoM7sXF96uzRKQT
-         fMMmrYie+M9irfYiDRiE7CNlNVqPsJ0+3SlkHx1aeRnDmQZW9zqaYAbIWlP+PeiIhbIX
-         WQa0gTzHGXxnfQJzCU1aFUu+mS/7MtjT6Qf7SJEZldw063g3W2t/JDd3B4JooqEVRV9b
-         601dqrzYapnBiHCx6V5dcabflI8PciMrsimc1Ahat4+EHqsMzeaeLIdX0soiht44fYSm
-         KpaetD853h/t/ddzVWPzjRLOq0Pt3Jp1ETkEZ8bjDTowQfbrglbhfhWOvs6z8aL9hu+n
-         PnjA==
-X-Gm-Message-State: AOJu0YwWmXfPAKJHfVq3PtClzjNVKCm5S6kMBrPWSE/N0yOJENUZq22w
-        7RDwiBAkyzub1HWwK549WWg=
-X-Google-Smtp-Source: AGHT+IEHu25GLPRipZrB9sku1nuH1UA63NNobR7w01LH5A1voBseoPgtJd8fEbbHSTb2J617QgrTrg==
-X-Received: by 2002:a05:6808:190b:b0:3a7:215c:e34 with SMTP id bf11-20020a056808190b00b003a7215c0e34mr3749950oib.15.1691678711963;
-        Thu, 10 Aug 2023 07:45:11 -0700 (PDT)
-Received: from localhost.localdomain ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id l10-20020a54450a000000b003a79a5cc3bfsm723666oil.41.2023.08.10.07.45.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Aug 2023 07:45:11 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-From:   Larry Finger <Larry.Finger@lwfinger.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        stable@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Add device 0bda:4853 to blacklist/quirk table
-Date:   Thu, 10 Aug 2023 09:45:07 -0500
-Message-ID: <20230810144507.9599-1-Larry.Finger@lwfinger.net>
-X-Mailer: git-send-email 2.41.0
+        Thu, 10 Aug 2023 10:53:25 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B5A26A0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Aug 2023 07:53:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1691679205; x=1723215205;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=45X/ZfiDWS2puw40oOVVOOkMvVBayKSkp2hmndMyr6Q=;
+  b=BQFMYK7p2VKTp+woAg/hpfR6ISt1l0P5lXbCGSYPwtWcsODZLfSQ/wks
+   ok0qZCRU+DpNHPatZIQ6XG1DQhuODdlDm+hkFu1fElSbiOd8F3Mjp9HtN
+   v6Zabo/F7u4UdrtbmtK7zOxCsD9mjPRBjfUSXfkzJIJfZoYT/PsUdmhhe
+   fvMTOTm+T+M90iWK3bwaTkuhIp6AlDsbbXjC6NqzlkKshcB+8GHKuFDC4
+   ymBf4heY2F6RuedfZgbANpOARlAmDcRBQEg0Kgr24H0xn6f1VOxu6Bmja
+   SnOCD80UqL2yeTysQFcEVWe8TgILzB2xqRsUSjxwE6ROdLQZm/zjCSvto
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="371435175"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="371435175"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2023 07:53:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10798"; a="682148503"
+X-IronPort-AV: E=Sophos;i="6.01,162,1684825200"; 
+   d="scan'208";a="682148503"
+Received: from castle-black.iind.intel.com ([10.66.185.63])
+  by orsmga003.jf.intel.com with ESMTP; 10 Aug 2023 07:53:21 -0700
+From:   Lokendra Singh <lokendra.singh@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        luiz.von.dentz@intel.com, tedd.an@intel.com, kiran.k@intel.com,
+        Lokendra Singh <lokendra.singh@intel.com>,
+        Seema Sreemantha <seema.sreemantha@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel: Send new command for PPAG
+Date:   Thu, 10 Aug 2023 20:26:55 +0530
+Message-Id: <20230810145653.1780-1-lokendra.singh@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This new device is part of a Realtek RTW8852BE chip. Without this change
-the device utilizes an obsolete version of the firmware that is encoded
-in it rather than the updated Realtek firmware and config files from
-the firmware directory. The latter files implement many new features.
+Added support for the new command opcode FE0B
+(HCI Intel PPAG Enable).
 
-The device table is as follows:
+btmon log:
+< HCI Command: Intel PPAG Enable (0x3f|0x020b) plen 4
+        Enable: 0x00000002
+> HCI Event: Command Complete (0x0e) plen 4
+      Intel PPAG Enable (0x3f|0x020b) ncmd 1
+        Status: Success (0x00)
 
-T: Bus=03 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#= 4 Spd=12 MxCh= 0
-D: Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0bda ProdID=4853 Rev= 0.00
-S: Manufacturer=Realtek
-S: Product=Bluetooth Radio
-S: SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
-E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+Signed-off-by: Seema Sreemantha <seema.sreemantha@intel.com>
+Signed-off-by: Lokendra Singh <lokendra.singh@intel.com>
 ---
-v2 - fix too long line in description
-v3 - change "bluetooth" in subject to "Bluetooth"
-     change subject to better explain what this patch accomplishes
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btintel.c | 28 +++++++++++++++++++---------
+ drivers/bluetooth/btintel.h |  8 +++-----
+ 2 files changed, 22 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 764d176e9735..1019f19d86a7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -540,6 +540,8 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Realtek 8852BE Bluetooth devices */
- 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0bda, 0x4853), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0x887b), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3571), .driver_info = BTUSB_REALTEK |
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 633e8d9bf58f..d2c93b88c527 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2401,7 +2401,7 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ {
+ 	struct btintel_ppag ppag;
+ 	struct sk_buff *skb;
+-	struct btintel_loc_aware_reg ppag_cmd;
++	struct hci_ppag_enable_cmd ppag_cmd;
+ 	acpi_handle handle;
+ 
+ 	/* PPAG is not supported if CRF is HrP2, Jfp2, JfP1 */
+@@ -2409,6 +2409,8 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 	case 0x504:     /* Hrp2 */
+ 	case 0x202:     /* Jfp2 */
+ 	case 0x201:     /* Jfp1 */
++		bt_dev_warn(hdev, "PPAG not supported for Intel CNVr (0x%3x)",
++			    ver->cnvr_top & 0xFFF);
+ 		return;
+ 	}
+ 
+@@ -2434,24 +2436,32 @@ static void btintel_set_ppag(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 	}
+ 
+ 	if (ppag.domain != 0x12) {
+-		bt_dev_warn(hdev, "PPAG-BT: domain is not bluetooth");
++		bt_dev_warn(hdev, "PPAG-BT: Bluetooth domain is disabled in ACPI firmware");
+ 		return;
+ 	}
+ 
+-	/* PPAG mode, BIT0 = 0 Disabled, BIT0 = 1 Enabled */
+-	if (!(ppag.mode & BIT(0))) {
+-		bt_dev_dbg(hdev, "PPAG-BT: disabled");
++	/* PPAG mode
++	 * BIT 0 : 0 Disabled in EU
++	 *         1 Enabled in EU
++	 * BIT 1 : 0 Disabled in China
++	 *         1 Enabled in China
++	 */
++	if ((ppag.mode & 0x01) != BIT(0) && (ppag.mode & 0x02) != BIT(1)) {
++		bt_dev_warn(hdev, "PPAG-BT: EU, China mode are disabled in CB/BIOS");
+ 		return;
+ 	}
+ 
+-	ppag_cmd.mcc = cpu_to_le32(0);
+-	ppag_cmd.sel = cpu_to_le32(0); /* 0 - Enable , 1 - Disable, 2 - Testing mode */
+-	ppag_cmd.delta = cpu_to_le32(0);
+-	skb = __hci_cmd_sync(hdev, 0xfe19, sizeof(ppag_cmd), &ppag_cmd, HCI_CMD_TIMEOUT);
++	/* HCI_Intel_PpagEnable_CMD - opcode: 0xFE0B
++	 * ppag_enable_flags - ppag mode
++	 */
++	ppag_cmd.ppag_enable_flags = ppag.mode;
++
++	skb = __hci_cmd_sync(hdev, 0xfe0b, sizeof(ppag_cmd), &ppag_cmd, HCI_CMD_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		bt_dev_warn(hdev, "Failed to send PPAG Enable (%ld)", PTR_ERR(skb));
+ 		return;
+ 	}
++	bt_dev_info(hdev, "PPAG-BT: Enabled (Mode %d)", ppag.mode);
+ 	kfree_skb(skb);
+ }
+ 
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 2ed646609dee..01e87f68fab0 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -137,11 +137,9 @@ struct intel_offload_use_cases {
+ 	__u8	preset[8];
+ } __packed;
+ 
+-struct btintel_loc_aware_reg {
+-	__le32 mcc;
+-	__le32 sel;
+-	__le32 delta;
+-} __packed;
++struct hci_ppag_enable_cmd {
++	u32 ppag_enable_flags;
++};
+ 
+ #define INTEL_TLV_TYPE_ID		0x01
+ 
 -- 
-2.41.0
+2.25.1
 
