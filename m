@@ -2,77 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A19FCC001E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Aug 2023 00:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7EBC001B0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Aug 2023 00:56:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbjHJAK2 (ORCPT
+        id S229733AbjHJA43 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Aug 2023 20:10:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49970 "EHLO
+        Wed, 9 Aug 2023 20:56:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbjHJAKZ (ORCPT
+        with ESMTP id S229540AbjHJA42 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Aug 2023 20:10:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ACDB10F5
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 17:10:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6827C6422C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Aug 2023 00:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9BB1C433CA;
-        Thu, 10 Aug 2023 00:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1691626223;
-        bh=4j4sQCxNAtnFEgnDlfIlSEEwhVClq6AiAeCb43gFEQE=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=QhLIVs2WDyJKrPEvwWrGuL39N5vQ0bdJc0qLHycx24mMch7nepk7xDjfahuPJH/qg
-         ZaKdMUK/DuuL1HkLBqadLRTOwfHMrgozwJ3K5jpMtkpP7uQW54gtRUFneANuxkiNtN
-         WDCc+O6KyJxs79FFhk7ZNFyULmyMDPYweQfeBSe55k73Cn3Fp4vrrCF2a5uvwREqwT
-         aNsKa/iTBXKeuNY/u0c3Flce4bwidGaMf8LL/DR/wgKRs8LUwh3jEXvw/J/JG00x1v
-         AAz0dLaVMGTaIk9n0OtTXrgHSDE5GV42G0fTKGmQhMVw3xnL3+x/bVPvNr7e7+fp7R
-         uegJu1qz+ZqmA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0425E505D5;
-        Thu, 10 Aug 2023 00:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] fix writes to attributes of size 512 
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169162622371.3909.9864804498327871801.git-patchwork-notify@kernel.org>
-Date:   Thu, 10 Aug 2023 00:10:23 +0000
-References: <20230809202724.15429-1-bart.philips@inspiro.nl>
-In-Reply-To: <20230809202724.15429-1-bart.philips@inspiro.nl>
-To:     Bart Philips <bartphilips1@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, bart.philips@inspiro.nl
+        Wed, 9 Aug 2023 20:56:28 -0400
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A417AF5
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 17:56:28 -0700 (PDT)
+Received: from github.com (hubbernetes-node-36bba2f.va3-iad.github.net [10.48.133.18])
+        by smtp.github.com (Postfix) with ESMTPA id 076658C0DC4
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Aug 2023 17:56:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1691628988;
+        bh=+sgN5t7pHFEEWDwGi7SeK9OrVKQdIPRFBJxZLdy5/+M=;
+        h=Date:From:To:Subject:From;
+        b=J9Ov+Pt3/gmrNVm0rExeRSB1zw/mTHQ94+gdpAET6JfTP8wislBq2iEOacXbxKQeg
+         7ZhJLT7M4R3T5DKR384vS5JKJL2mDmBWisWyVjoOHDoYHJyuZMHQgwF6bdeKVwTwrP
+         x4g1tL8AI6efXD1Pvg1oGkzJIr/Xb8Y3ny5MVOFM=
+Date:   Wed, 09 Aug 2023 17:56:28 -0700
+From:   bp1001 <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/fc6f58-8bf3a4@github.com>
+Subject: [bluez/bluez] ac04e5: device: Fix not probing drivers at startup
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: ac04e5f38225d672a10ffd0a9162c3e466b6977b
+      https://github.com/bluez/bluez/commit/ac04e5f38225d672a10ffd0a9162c3e466b6977b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-08-09 (Wed, 09 Aug 2023)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/device.c
 
-On Wed,  9 Aug 2023 22:27:22 +0200 you wrote:
-> writing attributes of length 512 fails, although the Bluetooth spec (Vol 4, Part F, 3.2.9) states that attributes sizes up to 512 are allowed. The check_length calls in write_cb and prep_write_cb in gatt-server.c currently pass the length parameter that include the handle/offset length and therefore fail for attributes of length 512. This patch subtracts the handle/offset length before passing it to the check_length function, allowing writes to attributes up to 512 in size.
-> 
-> Bart Philips (1):
->   fix writing attributes of length 512
-> 
->  src/shared/gatt-server.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+  Log Message:
+  -----------
+  device: Fix not probing drivers at startup
 
-Here is the summary with links:
-  - [BlueZ,1/1] fix writing attributes of length 512
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8bf3a4a265bb
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Patch 67a26abe53bf ("profile: Add probe_on_discover flag") introduced a
+regression which prevents drivers to be properly loaded at startup since
+at that point they are not connected when code shall testing if
+the devide is temporary instead.
 
 
+  Commit: 8bf3a4a265bb199e21735639c57f1f652e5b8d45
+      https://github.com/bluez/bluez/commit/8bf3a4a265bb199e21735639c57f1f652e5b8d45
+  Author: Bart Philips <bartphilips1@gmail.com>
+  Date:   2023-08-09 (Wed, 09 Aug 2023)
+
+  Changed paths:
+    M src/shared/gatt-server.c
+
+  Log Message:
+  -----------
+  shared/gatt-server: Fix not allowing valid attribute writes
+
+The length check shall not consider the command header, just its
+payload.
+
+
+Compare: https://github.com/bluez/bluez/compare/fc6f5856d177...8bf3a4a265bb
