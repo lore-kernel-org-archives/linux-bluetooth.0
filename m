@@ -2,65 +2,61 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DAD4C04E69
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Aug 2023 17:54:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BCADC0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Aug 2023 18:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238969AbjHORxg (ORCPT
+        id S238970AbjHOSAD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Aug 2023 13:53:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38964 "EHLO
+        Tue, 15 Aug 2023 14:00:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238995AbjHORx3 (ORCPT
+        with ESMTP id S239012AbjHOR7w (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Aug 2023 13:53:29 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A8E1BDD;
-        Tue, 15 Aug 2023 10:53:28 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b9a2033978so85716521fa.0;
-        Tue, 15 Aug 2023 10:53:28 -0700 (PDT)
+        Tue, 15 Aug 2023 13:59:52 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C00C10D1;
+        Tue, 15 Aug 2023 10:59:50 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2b962c226ceso88714621fa.3;
+        Tue, 15 Aug 2023 10:59:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692122007; x=1692726807;
+        d=gmail.com; s=20221208; t=1692122388; x=1692727188;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R6izKbIOTgb/qz23oAv6uR2Dz0fJpUIMeg8RsCpk5YY=;
-        b=NZhdilkX6qy2u8vPeM3IEdmjoKeYXzSKq3yVNByqsAykdaePQ1XnSjCfKd62EQnQv9
-         ybsw49p8VxUsI9yINGMpXqHicmHBSZy+LxTVUNAq1GiRxSaCL5jM6/CRDXiVSjT7T3pC
-         z4NMD3MWW+X/72L2RwAev85q1IiQl+ru2zZh1+RKOLDYiP3CNxmA8oMtqWXy9pZri/PD
-         XVVbik0G38mexR0p4sJgTjzNJ6H/9TsNGLXNk8f7UZa85hZ4EMUBZr8g1zkV0WUyqU7Y
-         ViKa7v64QknHqVcGUYtWDFwWWohz9Dw76o6UdvBLHvMvbXyPgZt6T95QM9/qV3I5jihe
-         hLMw==
+        bh=w6NHmk/DgGXyST2YEwWwlaKi2K/9fFe8f3GMLQJZvUg=;
+        b=U4tS8SwR1/aseYZ2pAs6GJuRc6XQkGa+gTD/zUkXpxOTSusuiITMuPp0fKykCz1KUm
+         ZqctaUbNL2HAnGYLCdCKI84T7xbS+uyZS/iFInww9gx4JnXxYut5muYyNYStEJEi0dFc
+         Y1tZ5FOFtfUpTVVBhE2snX6RM+S2dz/0rijkw1TfHFvXgw3jvfdH86D6u3uS2NMm/YUI
+         i6Z5PCIIe1UW9j7IbjD+7tba3Qayon6FG/VjgBK649k9epHN5dHG/Q6ozv6VCDFOtoA7
+         kpJvFK/83/OZVmOh2znbtWgAjLWf0c5HvxwdyeWby1omnYN+4YTFSumV8Jr+k6jWQTdi
+         wkyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692122007; x=1692726807;
+        d=1e100.net; s=20221208; t=1692122388; x=1692727188;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R6izKbIOTgb/qz23oAv6uR2Dz0fJpUIMeg8RsCpk5YY=;
-        b=NTaJWPcitIxLDex0f6irwhkE1uSwp7jMn451+OnVFce10wHVqbpAWWACCu8KFynhz/
-         vH85+x+ybTb2Qzu7uTPMe1fFq+4ta/1YSK45DC6TSRUIFN5HKuZxpD7/c0a/B86hNS65
-         csESB48owxXlbRe8BoLtozbEPQlcxiuarrKagw0AOY5hLdsidiTbYsDJ1/HpQiqCL5KP
-         l+OaZ53Ga3L43VF+KhDtHTvBZoii4oqaNjQnPfF7KB/45Sbq/5Hx2ZMk7GvofzljKBH9
-         S0yLbtR4crrbJR0vuFocFzHHP+QTmIH3dOu0MJh1AxP+UwV164L+4Y+IDUT8eaF/G04F
-         o5jA==
-X-Gm-Message-State: AOJu0Yw+oJ+xo9ssYh2TBuOrXfjCcm7Mnquu8N8V83J/RMtmMrp5j58G
-        g4wS6nRPgt6EFdQnO2XGNuc1EEhR2ePCURfH7ro=
-X-Google-Smtp-Source: AGHT+IH7c5x5jsgYP8WMrhIP4iE8RWzsBQAYP6BKmOTFVj6nJZTMweOqmB9pyAjZ1eIhRhKutpsDvfzE/Fn0/zreUKE=
-X-Received: by 2002:a2e:9cd8:0:b0:2b9:e53f:e201 with SMTP id
- g24-20020a2e9cd8000000b002b9e53fe201mr9372665ljj.31.1692122006479; Tue, 15
- Aug 2023 10:53:26 -0700 (PDT)
+        bh=w6NHmk/DgGXyST2YEwWwlaKi2K/9fFe8f3GMLQJZvUg=;
+        b=fO2NBRiE9zCkHWcuBK3W0QPiEhOxuPVDWj3ozl23U6RBYeFogCdl/R8hgeCY0hh28V
+         mDy+cdtSln6W8u/vN5xP4ePLjjP2N9K0y00IxiKf+B2B3gQ6531vug/3/c+567F0WgG6
+         dfY1GP8UoxNb9EfsjqMrGdn/C7b5Z7vQOht0fsP2kh+1y1Mk/bemz4Z0d3ANMmOD2Zn9
+         YqtSESBjdDGjzsnEZUESfZsz17B0Lz2LSsipceWBTD8ICZyt3wTBtd7SHn+7JDA6tknU
+         OIvx+ymOKu60Us8W8oetbZX/pNcgW596W4VG23hBPuC7nIjNDXSKmmUceDDr8zB3LyTw
+         wUUg==
+X-Gm-Message-State: AOJu0YxNCwX2worOLge9CnAcAUw08qGr3sJKO9HNlQw5kJDo6NDkfPoh
+        n0K4I2d/mJSBlEInkFH8Y069GKDPLZJRuyZqPQg=
+X-Google-Smtp-Source: AGHT+IHxeGu09Tc4NJA+lpMNiy5ztuNkF3kT3ir3FHuKDj6HH6KUnBRAXKrYdJVJqgJAewNhREeL8BtOLXno/MERbyQ=
+X-Received: by 2002:a2e:a0cc:0:b0:2b5:8bb9:4dd6 with SMTP id
+ f12-20020a2ea0cc000000b002b58bb94dd6mr9410143ljm.12.1692122388168; Tue, 15
+ Aug 2023 10:59:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <869240bf-7f91-4131-b56a-7ac2585dee4e@buaa.edu.cn>
-In-Reply-To: <869240bf-7f91-4131-b56a-7ac2585dee4e@buaa.edu.cn>
+References: <20230811192256.1988031-1-luiz.dentz@gmail.com> <20230814164546.71dbc695@kernel.org>
+In-Reply-To: <20230814164546.71dbc695@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 15 Aug 2023 10:53:14 -0700
-Message-ID: <CABBYNZ+_LFZ4uNHRKqb39_J-vDKj2qkmiTGikP8uMi3v4YtLsg@mail.gmail.com>
-Subject: Re: [BUG]Bluetooth: HCI_Connection_Complete: possible semantic bug
- when HCI_Connection_Complete is discarded
-To:     Xin-Yu Liu <LXYbhu@buaa.edu.cn>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        baijiaju1990@gmail.com, sy2239101@buaa.edu.cn,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+Date:   Tue, 15 Aug 2023 10:59:35 -0700
+Message-ID: <CABBYNZJmkOpPgF6oox-JAyGAZRxzX7Kn9JQpLPXi_FR=Cf-FOA@mail.gmail.com>
+Subject: Re: pull request: bluetooth-next 2023-08-11
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
         netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -68,57 +64,28 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Jakub,
 
-On Tue, Aug 15, 2023 at 6:56=E2=80=AFAM Xin-Yu Liu <LXYbhu@buaa.edu.cn> wro=
-te:
+On Mon, Aug 14, 2023 at 4:45=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Hello,
+> On Fri, 11 Aug 2023 12:22:56 -0700 Luiz Augusto von Dentz wrote:
+> > bluetooth-next pull request for net-next:
+> >
+> >  - Add new VID/PID for Mediatek MT7922
+> >  - Add support multiple BIS/BIG
+> >  - Add support for Intel Gale Peak
+> >  - Add support for Qualcomm WCN3988
+> >  - Add support for BT_PKT_STATUS for ISO sockets
+> >  - Various fixes for experimental ISO support
+> >  - Load FW v2 for RTL8852C
+> >  - Add support for NXP AW693 chipset
+> >  - Add support for Mediatek MT2925
 >
-> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in=
- Linux 6.2:
->
-> According to the core specification v5.4, when connecting to a remote dev=
-ice, the Host sends an HCI_Create_Connection command to the Controller, and=
- upon successful execution of this command, the Host receives an HCI_Connec=
-tion_Complete event=EF=BC=9A
->
->
->
-> In our testing, if the HCI_Connection_Complete event is discarded and not=
- received by the Host, it will result in a connection failure. Subsequently=
-, when attempting to reconnect to the same device, the Host does not send a=
-n HCI_Create_Connection command, but instead sends a Create Connection Canc=
-el command and receives the corresponding HCI_Command_Complete event. Howev=
-er, the connection still fails. Performing the same steps after some time y=
-ields the same result=EF=BC=9A
->
->
->
-> We are inclined to consider the possibility of occasional HCI event loss,=
- and it is reasonable to expect Bluetooth to incorporate some solution for =
-managing packet loss or implementing a timeout mechanism. However, based on=
- our testing observations, the loss of an HCI_Connection_Complete event dur=
-ing a connection attempt appears to lead to subsequent connection failures,=
- which could potentially be seen as less than optimal. There could be corre=
-sponding remedies to address this issue; for instance, implementing a timeo=
-ut mechanism might be a more favorable option.
+> As indicated by Stephen's complaint about lack of an SoB tag,
+> it appears that DaveM merged this PR over the weekend :)
 
-There is already a command timeout in place, as for packet loss that
-should be handled by the underline driver as it depends on how
-reliable the transport is. If you are saying the connection
-cancel/abort logic does prevent new connection with the same peer that
-would be a bug, that said if the attempts are concurrent, within the
-command timeout, then the same hci_conn would be used as there should
-be only 1 ACL at time for a given peer.
-
-> We are not sure whether this is a semantic bug or implementation feature =
-in the Linux kernel. Any feedback would be appreciated, thanks!
->
-> Best wishes,
-> Xinyu Liu
-
-
+Ok, since it has been applied what shall we do?
 
 --=20
 Luiz Augusto von Dentz
