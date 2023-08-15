@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54C9EC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Aug 2023 22:18:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D8F9C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Aug 2023 22:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237809AbjHOWRr (ORCPT
+        id S239659AbjHOWST (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Aug 2023 18:17:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33708 "EHLO
+        Tue, 15 Aug 2023 18:18:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240356AbjHOWRm (ORCPT
+        with ESMTP id S239705AbjHOWSI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Aug 2023 18:17:42 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755341FF0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 15:17:41 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1bddac1b7bfso18304055ad.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 15:17:41 -0700 (PDT)
+        Tue, 15 Aug 2023 18:18:08 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A95D31FEE
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 15:18:07 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6887b3613e4so218084b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 15:18:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692137860; x=1692742660;
+        d=gmail.com; s=20221208; t=1692137886; x=1692742686;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S2GGNUHxPfs0gRZZKe1YJ7DdUoT+B9tUTgGV0yBJ9pA=;
-        b=HLUOzWbO9P7JXjN06qG8vjbMmXv9ZlRJy0Cje5Toe1XxOKZpC/7dA4ugi6ffdnmbSn
-         ZtPR/UjhX0TrU3zxmaDItXLgiszupQszrvqp9FxMxGSBKzPVLWZLEIXk7B7yqMhiZBrN
-         QgHoC+HB8XjSnL78SVRq+S02xU3ySpWDPByJluamXgQ7jKgd6ocUfiPbwJZ3/jpqGL18
-         4m5dE3528l/YhpNsLDsTytuG0Ds8tAMbPxBoYZX0GaJFojiflIcUtKm8FEIhl3NN2Jjp
-         KI5+yw+/MPEhc9wqLlHVCCX9EaaI27iQIL78lbGSXuODsmOeZqhgV+469an23sVatca7
-         UNJQ==
+        bh=YEtttGym/u8sgUzXCm7YcAHUA4L942pJv1+j7zJ3Hn4=;
+        b=j9JtVeYSfYvzYgliJA7qthArrwzkYb4f7h9Q7mpIk+z/XJgdP6cG4sYJIya50GJvM7
+         S9BVirRqN9KoBL1EFHF3YuiQOTJ0K9ia1dThVIlp+JIN6yg6TRqe4s9YZAUvlkywPRcq
+         2xgN/e9cYQG5z07zHaDpgEIPkLDbMUIbH+GuqURJfJiAOkNJgR1E9ENK/vo97WPR37lY
+         EwNxvLVkd12ahr+DHtVxX0GADQoRKiF4M1GkkIK322Js6r5qYyXl1fp7iMTdGa3YP5sd
+         49C7K33kZ1ifkiFvnFmxUi/qRX9+CkXRRmgLaWFk1GoFC+9HQh3R3Qreb8SUmM+aor1Q
+         3qDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692137860; x=1692742660;
+        d=1e100.net; s=20221208; t=1692137886; x=1692742686;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S2GGNUHxPfs0gRZZKe1YJ7DdUoT+B9tUTgGV0yBJ9pA=;
-        b=N+kh5gS3SCM6OX/pjaGKFDCa03vBpF2Ne1O9D0MQ3RzJ11+yZik9rmA3Nc1249X2dP
-         CSnM0SCX/7029T4Kdr8Cl/QxYKsrbxic5e4PUCIble264gmoRr5GtahDzuE4mkpm6Wsk
-         fD7KJ9sERc7WIu/L1EkARHAu/BpxTATEkc4uCQliw2Z6/5sm8eEHevQJ81LHlTlMZz74
-         GQA4CdmWqhROtX3MTOfURSnBYURyjWwiRkQ93TxbSYCsPDxKXNdTaL+XEvoIPNxeozGB
-         p/7tDv9tswexqMrByR2rBLgtUWnYOdfP3MfaEF39OKJisb0pTxg2/MK4KEHm306lKZsH
-         JFPA==
-X-Gm-Message-State: AOJu0YwdXvPrw2J3oLxQIy7dJ9/wg+UZTVSfC1FuGpG1ODvD1JaQ63C5
-        qQ4xCsxHmpyCixMwgP9hEPGaVs9mmf0=
-X-Google-Smtp-Source: AGHT+IHJbqo/rw24teC46Wgc7pLgmvSZtusT7ohpQ91K3Gr6IEUjaRp72aUT+A6KkAvgiVOUlT22nw==
-X-Received: by 2002:a17:903:22c6:b0:1bb:b2f7:e075 with SMTP id y6-20020a17090322c600b001bbb2f7e075mr358171plg.7.1692137860007;
-        Tue, 15 Aug 2023 15:17:40 -0700 (PDT)
+        bh=YEtttGym/u8sgUzXCm7YcAHUA4L942pJv1+j7zJ3Hn4=;
+        b=PQZ4Xv1lILPJhFifs/uSamf5wkjiPI1oKhtfQvniyfffp+AnTeefxMVphB4t4WbWQA
+         XmwNWAgUZwzaa+PCwkSIrYNKP8T6lTACK9pS2KaXBZcvIpfqEQyDijwpwjkXRrg5Ff4Z
+         0nxvcRdaanA4DzejQiVTjLbtgwyaEfmmxXqDMUa+KuU1/cs2UuGUeQn23ZoAXzXE5N/p
+         ldU9bnXF8hDDxWRCNcKuBjJnvcokpT/JSSpycdoSzkiaOLPMWHNOXJug6zQ5KwwSLujI
+         UFURaF2qP5qq7aw9cUsBee56Pns5wuVSbg8AupSITAhXzNemix2g/KDZpRxmGI2E6/f/
+         Z2wQ==
+X-Gm-Message-State: AOJu0YzrrbBe6e76cLVp9JdKzlcgg1W+RxulZ9NoBQHv8Atdd1QQfjGs
+        4Nf60w0GLhYEmu42PiyShJoYgdBFtXU=
+X-Google-Smtp-Source: AGHT+IH9L6OfL1s7UPci47Wr2aw+4hp3WU/C7rxpUAfKT1FwCCmBHFuC7pR8qQvTAiWrVT59TxAhUw==
+X-Received: by 2002:a05:6a00:14d3:b0:686:bbfa:68e3 with SMTP id w19-20020a056a0014d300b00686bbfa68e3mr99375pfu.15.1692137885487;
+        Tue, 15 Aug 2023 15:18:05 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id u15-20020a170902e5cf00b001adf6b21c77sm11543606plf.107.2023.08.15.15.17.38
+        by smtp.gmail.com with ESMTPSA id g9-20020aa78189000000b006870ccfbb54sm9751563pfi.196.2023.08.15.15.18.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Aug 2023 15:17:39 -0700 (PDT)
+        Tue, 15 Aug 2023 15:18:04 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] iso-tester: Add suspend tests
-Date:   Tue, 15 Aug 2023 15:17:38 -0700
-Message-ID: <20230815221738.2491772-1-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: hci_conn: Fix sending BT_HCI_CMD_LE_CREATE_CONN_CANCEL
+Date:   Tue, 15 Aug 2023 15:18:03 -0700
+Message-ID: <20230815221803.2491905-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,190 +64,36 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the following test which attempt to trigger suspend code path
-while ISO sockets are connecting or have been connected:
+This fixes sending BT_HCI_CMD_LE_CREATE_CONN_CANCEL when
+hci_le_create_conn_sync has not been called because HCI_CONN_SCANNING
+has been clear too early before its cmd_sync callback has been run.
 
-ISO Connect Suspend - Success
-ISO Connected Suspend - Success
-ISO Connect2 Suspend - Success
-ISO Connected2 Suspend - Success
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- tools/iso-tester.c | 85 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 84 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_conn.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 5a8b1fe6857b..b1a2afba09e1 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -25,6 +25,7 @@
- #include "lib/mgmt.h"
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 234746721047..95339623883c 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1299,6 +1299,7 @@ static int hci_connect_le_sync(struct hci_dev *hdev, void *data)
  
- #include "monitor/bt.h"
-+#include "emulator/vhci.h"
- #include "emulator/bthost.h"
- #include "emulator/hciemu.h"
+ 	bt_dev_dbg(hdev, "conn %p", conn);
  
-@@ -391,6 +392,7 @@ struct test_data {
- 	uint8_t client_num;
- 	int step;
- 	bool reconnect;
-+	bool suspending;
- };
++	clear_bit(HCI_CONN_SCANNING, &conn->flags);
+ 	conn->state = BT_CONNECT;
  
- struct iso_client_data {
-@@ -405,6 +407,7 @@ struct iso_client_data {
- 	bool disconnect;
- 	bool ts;
- 	bool mconn;
-+	bool suspend;
- 	uint8_t pkt_status;
- 	const uint8_t *base;
- 	size_t base_len;
-@@ -806,6 +809,11 @@ static const struct iso_client_data connect_reject = {
- 	.expect_err = -ENOSYS
- };
+ 	return hci_le_create_conn_sync(hdev, conn);
+@@ -1370,8 +1371,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->conn_timeout = conn_timeout;
  
-+static const struct iso_client_data connect_suspend = {
-+	.qos = QOS_16_2_1,
-+	.expect_err = -ECONNRESET
-+};
-+
- static const struct iso_client_data connect_cig_f0_invalid = {
- 	.qos = QOS_FULL(0xF0, 0x00, {}, QOS_IO(10000, 10, 40, 0x02, 2)),
- 	.expect_err = -EINVAL
-@@ -920,6 +928,11 @@ static const struct iso_client_data disconnect_16_2_1 = {
- 	.disconnect = true,
- };
- 
-+static const struct iso_client_data suspend_16_2_1 = {
-+	.qos = QOS_16_2_1,
-+	.suspend = true,
-+};
-+
- static const struct iso_client_data reconnect_16_2_1 = {
- 	.qos = QOS_16_2_1,
- 	.expect_err = 0,
-@@ -1255,7 +1268,7 @@ static void setup_powered_callback(uint8_t status, uint16_t length,
- 			continue;
- 
- 		if (isodata->send || isodata->recv || isodata->disconnect ||
--						data->accept_reason)
-+				isodata->suspend || data->accept_reason)
- 			bthost_set_iso_cb(host, iso_accept_conn, iso_new_conn,
- 									data);
- 
-@@ -1892,6 +1905,46 @@ static void iso_shutdown(struct test_data *data, GIOChannel *io)
- 	tester_print("Disconnecting...");
- }
- 
-+static bool hook_set_event_mask(const void *msg, uint16_t len, void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_print("Set Event Mask");
-+
-+	--data->step;
-+	if (!data->step)
-+		tester_test_passed();
-+
-+	return true;
-+}
-+
-+static void trigger_force_suspend(void *user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct vhci *vhci = hciemu_get_vhci(data->hciemu);
-+	int err;
-+
-+	/* Make sure suspend is only triggered once */
-+	if (data->suspending)
-+		return;
-+
-+	data->suspending = true;
-+
-+	/* Triggers the suspend */
-+	tester_print("Set the system into Suspend via force_suspend");
-+	err = vhci_set_force_suspend(vhci, true);
-+	if (err) {
-+		tester_warn("Unable to enable the force_suspend");
-+		return;
-+	}
-+
-+	data->step++;
-+
-+	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_CMD,
-+					BT_HCI_CMD_SET_EVENT_MASK,
-+					hook_set_event_mask, data);
-+}
-+
- static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-@@ -1954,6 +2007,8 @@ static gboolean iso_connect(GIOChannel *io, GIOCondition cond,
- 			iso_recv(data, io);
- 		else if (isodata->disconnect)
- 			iso_shutdown(data, io);
-+		else if (isodata->suspend)
-+			trigger_force_suspend(data);
- 		else
- 			tester_test_passed();
- 	}
-@@ -2567,6 +2622,12 @@ static void test_connect_wait_close(const void *test_data)
- 	setup_connect(data, 0, iso_connect_wait_close_cb);
- }
- 
-+static void test_connect_suspend(const void *test_data)
-+{
-+	test_connect(test_data);
-+	trigger_force_suspend((void *)test_data);
-+}
-+
- static void test_bcast(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -2590,6 +2651,12 @@ static void test_bcast_recv(const void *test_data)
- 	setup_listen(data, 0, iso_accept_cb);
- }
- 
-+static void test_connect2_suspend(const void *test_data)
-+{
-+	test_connect2(test_data);
-+	trigger_force_suspend((void *)test_data);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -2755,6 +2822,14 @@ int main(int argc, char *argv[])
- 	test_iso("ISO Connect Wait Close - Success", &connect_16_2_1,
- 					setup_powered, test_connect_wait_close);
- 
-+	test_iso("ISO Connect Suspend - Success", &connect_suspend,
-+							setup_powered,
-+							test_connect_suspend);
-+
-+	test_iso("ISO Connected Suspend - Success", &suspend_16_2_1,
-+							setup_powered,
-+							test_connect);
-+
- 	test_iso2("ISO Connect2 CIG 0x01 - Success", &connect_1_16_2_1,
- 							setup_powered,
- 							test_connect2);
-@@ -2767,6 +2842,14 @@ int main(int argc, char *argv[])
- 							setup_powered,
- 							test_connect2);
- 
-+	test_iso2("ISO Connect2 Suspend - Success", &connect_suspend,
-+							setup_powered,
-+							test_connect2_suspend);
-+
-+	test_iso2("ISO Connected2 Suspend - Success", &suspend_16_2_1,
-+							setup_powered,
-+							test_connect2);
-+
- 	test_iso("ISO Defer Send - Success", &connect_16_2_1_defer_send,
- 							setup_powered,
- 							test_connect);
+-	clear_bit(HCI_CONN_SCANNING, &conn->flags);
+-
+ 	err = hci_cmd_sync_queue(hdev, hci_connect_le_sync,
+ 				 UINT_PTR(conn->handle),
+ 				 create_le_conn_complete);
 -- 
 2.41.0
 
