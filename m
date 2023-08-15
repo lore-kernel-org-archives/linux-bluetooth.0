@@ -2,149 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E77CC0015E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Aug 2023 19:20:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C46C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Aug 2023 19:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233405AbjHOTTe (ORCPT
+        id S235977AbjHOTVm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Aug 2023 15:19:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41192 "EHLO
+        Tue, 15 Aug 2023 15:21:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240023AbjHOTT3 (ORCPT
+        with ESMTP id S235848AbjHOTVM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Aug 2023 15:19:29 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F17F71FFE
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 12:18:48 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b9dc1bff38so85387241fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 12:18:48 -0700 (PDT)
+        Tue, 15 Aug 2023 15:21:12 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D221BD8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 12:20:31 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b703a0453fso86789811fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 12:20:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692127070; x=1692731870;
+        d=gmail.com; s=20221208; t=1692127170; x=1692731970;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rT9RhN8biKhym+6DEpm73zSZsTdklPEko9APDlfwQ/o=;
-        b=ZmshoJSnZ3syyBir4buaS7MLdXnKrMO3Shrr+qVmnZN9pZNMqHf1CKhHmWV8G+yZcn
-         j3XyBM2S+7jjpl8QK5GcJGwQN+uMzbeFPjg5N115u8FPL9SuFXMxvlI2zd0o7j2ocB0P
-         pbKHAEDp4aYvpuzHcgOCZmjM9zMhAn+nAMuYBUbT36NMx8cPs2VmZvUQRGZ8uWYJqxH1
-         TttSzYaYmXYSFMIPDXat7wNhXxUd1Pe+UW2OITTJUjFh2KXnrHinklv0dPRpgpOyNKLN
-         wvZmTcRUFkYujZeyt7t4OjGFH6cWm8AZLnecZrgz0r6ARBhGiOj3uvhojHS0V55Yzz6k
-         QfKg==
+        bh=gC1d5t7NZcOc2HNZuL4PCzkWVV3GuYKKN1PQ2xa3zwk=;
+        b=jnzs+GqTR+8Lar68JwZ2DtjpNuz7YYivFrKoGgzQrnh6Zkllq5NXozmkPRnOzWBfuL
+         EZHqrr+ayM+rb62Vinvem2TWtBpQckWHjF2ikoTRTw6NYrnq/6nrGCAICDPpB3hFlmtx
+         GTj6EGK1LG22ada0HRUh/+mBAMUYa+L6VFl1PNFUQfMcfjt6s5UEWZNwhF6zZ7ZWyivq
+         uT2ngygzEb9RSqjCc6waZ8C4KH8JRr6MBZt3SHwCfBRrQYFCEDLaStoBu4keJo6tB8Qs
+         3D/aFJtYdw6Qap5Lh8OIarkixkFc06kB0R44iY/IBxJ/0Ra0NJ9gFy3/lVrulDsl/omt
+         e7YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692127070; x=1692731870;
+        d=1e100.net; s=20221208; t=1692127170; x=1692731970;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rT9RhN8biKhym+6DEpm73zSZsTdklPEko9APDlfwQ/o=;
-        b=gyX+bKP3kfkC7IE4R9HR5sxOaHjCBkwDE9cPhzkb6Yn5wdTgUf48f7AVGiIpW63JRi
-         FTKut0BPB22/keF2JdUI/lra40zjm4lRj9O9YA6vtyn5lcKv8kn1LBwrcUSKqYr19qVP
-         Uq57qvwPUYTNYlibCN/yGD+t50KikOP5Pofo4jA8BHnsfw2yCHw9igRZMLh2rWE49Zz4
-         ee6hvOAjX5yFBosvDnpBoJpAVb5zNA3pGmUWrhPwmHZkbT8pM9coUhjoszkmwXROXY9a
-         hV+pP3N7ZYlLbO2w8XWnXrAWRnJnmUbm2/ZYX93mCP+zwVbGefg6cy3Zmh99M5uZOHco
-         QjoA==
-X-Gm-Message-State: AOJu0YxsekuzfN0ny+nLZ7Ew3LSESyyT53NjIETcmq4+pvKvj30ONTdw
-        sG6Ui4inXTTKcwh6D8cC3fFcyxf6Mlu+/ZW9xOLF0Isf
-X-Google-Smtp-Source: AGHT+IFatxcSlgRBweF5DY3ljb1sKpC/FaZcIPGVldrR1TVVymU6pIjIHUerxj591GriRhQj+VYJP19MW3lUSJAf77M=
-X-Received: by 2002:a2e:b174:0:b0:2b9:cce3:a126 with SMTP id
- a20-20020a2eb174000000b002b9cce3a126mr9686477ljm.21.1692127069521; Tue, 15
- Aug 2023 12:17:49 -0700 (PDT)
+        bh=gC1d5t7NZcOc2HNZuL4PCzkWVV3GuYKKN1PQ2xa3zwk=;
+        b=ILJoos/0pNHV9UZYaRNYlpwDSRWOYbL70M+C+PS2PoEnaUOcI0+QFO3fehOmaY6T9A
+         fdIVZImn/LVK52rCkeKTFw1PDtE9gGehNUgBFzFV/EaMn7iavdIVC5QLLHWJB7b3qR7D
+         Vxs0BaWllxEhsffOJFpZiBn7V7OUheHmWw45964s3val21q/xVEnsNtiy4p76Mngw6S3
+         YLl+1/Aec/5R534Scljrkz6qiWYcfxFWJj/HSOhnY0w+FPo+K9RruKblGCoLxfK3Fqx9
+         m18zAsPsXrndrjitJAlHGUiKu5aEF7PjlLsuPS1GSHYq2W6BibufGYUtS22qVoxypyXQ
+         tgTg==
+X-Gm-Message-State: AOJu0YzyrqFAnxPKpVwWL0Ao1iX1vgluggHaxJT4awHJ78/K5dDAaoTa
+        2vdJv+9FaIl6p3yH8w0I5ZyF9Q+RqzcDTJsXhgY=
+X-Google-Smtp-Source: AGHT+IH/Z+oU16dnQL1Kww5DR++4+X5FFvRgF7bwfKjHAv1riB1mgNcbOL5Uv5M2A3BJRzYzRyLihqJjDq/Egcaop6o=
+X-Received: by 2002:a2e:a308:0:b0:2b9:ebcb:9c80 with SMTP id
+ l8-20020a2ea308000000b002b9ebcb9c80mr9737813lje.39.1692127170177; Tue, 15 Aug
+ 2023 12:19:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230807110224.6024-1-silviu.barbulescu@nxp.com>
- <CABBYNZ+ecHHUfh=3rtXWwp-u2r0kSt-_SRWmYqUJBXgUs6S=oQ@mail.gmail.com> <VI1PR04MB53446602D3975AF7A5548A03EB12A@VI1PR04MB5344.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR04MB53446602D3975AF7A5548A03EB12A@VI1PR04MB5344.eurprd04.prod.outlook.com>
+References: <20230808115040.4403-1-claudia.rosu@nxp.com> <169160162069.13361.8621022436013059913.git-patchwork-notify@kernel.org>
+In-Reply-To: <169160162069.13361.8621022436013059913.git-patchwork-notify@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 15 Aug 2023 12:17:37 -0700
-Message-ID: <CABBYNZL3SWe_8kn--LY3xvp9pW46xFT4y1ZMXO2dAppK3qo-Rg@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH v2 0/2] Configure BASE using separate structure
-To:     Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Claudia Cristina Draghicescu <claudia.rosu@nxp.com>,
-        Mihai-Octavian Urzica <mihai-octavian.urzica@nxp.com>,
-        Vlad Pruteanu <vlad.pruteanu@nxp.com>,
-        Andrei Istodorescu <andrei.istodorescu@nxp.com>,
-        Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Date:   Tue, 15 Aug 2023 12:19:18 -0700
+Message-ID: <CABBYNZKMQGOonJtN-jorJiFu6OZhegA0wyK0s9=Z5fAWvizSnA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 0/7] Add support for BAP broadcast sink
+To:     patchwork-bot+bluetooth@kernel.org
+Cc:     Claudia Draghicescu <claudia.rosu@nxp.com>,
+        linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com,
+        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+        vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Silviu,
+Hi Claudia,
 
-On Wed, Aug 9, 2023 at 2:46=E2=80=AFAM Silviu Florian Barbulescu
-<silviu.barbulescu@nxp.com> wrote:
+On Wed, Aug 9, 2023 at 10:40=E2=80=AFAM <patchwork-bot+bluetooth@kernel.org=
+> wrote:
 >
-> >From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> >Sent: Monday, August 7, 2023 8:23 PM
-> >To: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-> >Cc: linux-bluetooth@vger.kernel.org; Claudia Cristina Draghicescu <claud=
-ia.rosu@nxp.com>; Mihai-Octavian Urzica <mihai-octavian.urzica@nxp.com>; Vl=
-ad Pruteanu <vlad.pruteanu@nxp.com>; Andrei Istodorescu <andrei.istodorescu=
-@nxp.com>; Iulia Tanasescu <iulia.tanasescu@nxp.com>
-> >Subject: [EXT] Re: [PATCH v2 0/2] Configure BASE using separate structur=
-e
-> >
-> >Caution: This is an external email. Please take care when clicking links=
- or opening attachments. When in doubt, report the message using the 'Repor=
-t this email' button
-> >
-> >
-> >Hi Silviu,
-> >
-> >On Mon, Aug 7, 2023 at 4:11=E2=80=AFAM Silviu Florian Barbulescu <silviu=
-.barbulescu@nxp.com> wrote:
-> >>
-> >> Use preset configuration in capabilities.
-> >> Configure BASE using separate structure.
-> >
-> >Im not really sure why we want to switch to use BASE over Capabilities, =
-up until now Capabilities is sort of mandatory and is already profile speci=
-fic in case you are wondering how can someone detect what is the format use=
-d in Capabilities that is based on the UUID already.
+> Hello:
 >
-> Hi Luiz, we don't intend to switch use BASE over Capabilities, we just wa=
-nt to use both for broadcast. Capabilities for codec capabilities from pres=
-et that will be used in transport configuration. BASE is used for the over-=
-the-air payload in Periodic Adv Data which is conformant to Table 3.15: For=
-mat of BASE used in Basic Audio Announcements from BAP Specification, also =
-it is used for PTS testing that ask to modify the BASE structure. And we wi=
-ll copy the capabilities preset to the base structure to be sure we have th=
-e same codec capabilities in both of them.
-
-Not really following you here, if the Capabilities does contain the
-codec settings what does the BASE would have, having the same
-information twice sounds like a bad idea if this is where you are
-heading because it can cause inconsistencies and I'd like to maintain
-some symmetry with the unicast so the application have an easier time
-to set it up, even though we need to have some work on it for adapting
-to BASE format, but this should simplify for example use cases where
-the streaming goes from broadcast->unicast and vice-versa.
-
-Btw, we intend to have a release soon, so I hope we can pick up the
-pace here, so let me know if you want to sync-up offline.
-
+> This series was applied to bluetooth/bluez.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 >
+> On Tue,  8 Aug 2023 14:50:33 +0300 you wrote:
+> > This series of patches adds support for BAP broadcast sink.
+> > It consists in registering a broadcastsink endpoint using the
+> > Basic Audio Announcement Service UUID,
+> > discovering of broadcast advertisers that announce the
+> > Broadcast Audio Announcement Service, synchronizes to the Periodic
+> > advertisements of the source and synchronizes to the BIG advertised
+> > in the PA train.
+> > To retrieve the BASE info advertised in the PA train, the patch
+> > Bluetooth: ISO: Add support for periodic adv reports processing
+> > was used.
 > >
-> >> Claudia Draghicescu (2):
-> >>   client/player: Use preset configuration in capabilities. Configure
-> >>     BASE using separate structure
-> >>   bap: Use the BASE structure received from upper layer
-> >>
-> >>  client/player.c      | 24 +++++++++++++++++-------
-> >>  profiles/audio/bap.c | 13 ++++++++++---
-> >>  2 files changed, 27 insertions(+), 10 deletions(-)
-> >>
-> >>
-> >> base-commit: 80107630396d3d3a3984c599e0cb9b015be0499c
-> >> --
-> >> 2.34.1
-> >>
-> >
-> >
-> >--
-> >Luiz Augusto von Dentz
+> > [...]
+>
+> Here is the summary with links:
+>   - [BlueZ,v5,1/7] client/player: Add broadcast sink endpoint
+>     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D4352a42ec1e2
+>   - [BlueZ,v5,2/7] btio: Add support for getsockopt(BT_ISO_BASE)
+>     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D7b3aa05323f2
+>   - [BlueZ,v5,3/7] adapter: Do not filter out broadcast advertiser
+>     (no matching commit)
+>   - [BlueZ,v5,4/7] profile: Add probe_on_discover flag
+>     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D67a26abe53bf
+>   - [BlueZ,v5,5/7] bap: Add support for BAP broadcast sink
+>     (no matching commit)
+>   - [BlueZ,v5,6/7] media: Add broadcast sink media endpoint
+>     (no matching commit)
+>   - [BlueZ,v5,7/7] transport: Update transport properties for a broadcast=
+ stream
+>     (no matching commit)
+>
+> You are awesome, thank you!
+> --
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 
-
+Let me know if you need more feedback for this set, we do intend to
+have a release soon, so I hope we can have the broadcast sink working
+as well.
 
 --=20
 Luiz Augusto von Dentz
