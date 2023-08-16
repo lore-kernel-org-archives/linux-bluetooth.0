@@ -2,78 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC98C04FE0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 00:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CB1C0015E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 00:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240754AbjHPAKo (ORCPT
+        id S240782AbjHPAUe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Aug 2023 20:10:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41040 "EHLO
+        Tue, 15 Aug 2023 20:20:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240736AbjHPAK3 (ORCPT
+        with ESMTP id S240847AbjHPAUZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Aug 2023 20:10:29 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD051FF9;
-        Tue, 15 Aug 2023 17:10:29 -0700 (PDT)
+        Tue, 15 Aug 2023 20:20:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2B62117
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 17:20:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A4CC961880;
-        Wed, 16 Aug 2023 00:10:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 04ACDC433C9;
-        Wed, 16 Aug 2023 00:10:28 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 696CF61774
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 00:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C54BDC433C8;
+        Wed, 16 Aug 2023 00:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692144628;
-        bh=PFERWxFe0pV2t+pXvFf/AlJyFRD48CblFwfyjMNOvPE=;
+        s=k20201202; t=1692145220;
+        bh=vhl2JpVgGgjC+5H3C/Adbs7zhVl+9Qrl/oD7C+z7XUE=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Dzrz2OhbVgGkdAx7y/nLBVHTuVULiZQp1nxalxJjnCj+bn0Nr4IikB9cHoXqH7Ofk
-         MsoAksl+1npQ0Ruw3nEUnHQf5g5oBYqkM2X4jJsTPTXS7kgJ1TqqJvatoU4k2EEFX5
-         FwvVVtY+Obk3Q1Nf8uzxqK8bHWh2r1nOhxTdseJrAshZN8BNy2Z8oKcFhubi72BuFC
-         DkeY/IRyuGryRZxa2fd4f1+HbPBQt4k9dGNuIMFnjNPrNU0YbmTp3z3KCMnV7y7Ajl
-         sBrxxdW/bMNRnFww+crFbbCNh3tqVjphy1WXarNz7nAAFBUju/Gfhs7wzWPaVnJ2qk
-         EIadnxkHCfTbA==
+        b=NxC/Prfw2rZrTx+u8ECtjEAIIYaoIszxkyF+Grrb8y0ZwcrvqCWo7TqSmGxfnYngM
+         7kfAXCiLm5TA5Tfat5k5loo1fY0qEOwBHmIy7+Kud8I24sXE52JW10WZ+zNH0JyjTA
+         33abw0hsPPvUa9w36Qsn1fzAlq+bGH7vxjvEod+aIQCsF+dgFHmQF0H+rwvyVeTYxm
+         DyOtXGPgqCTewcM9MiImFDR1K757CtKLVLEB0EIwiz4IuuX/Kc7nB5mdBxFSHcGZtl
+         /jY/Mlwf42TW8Trj71fZlKb3nZBMRAGMbE2+VEI3C25UgI5fo4vwz3sjF/sgEnouRO
+         gt80kmydC+pdA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DBD87C39562;
-        Wed, 16 Aug 2023 00:10:27 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AB175C395C5;
+        Wed, 16 Aug 2023 00:20:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/2] Bluetooth: btnxpuart: Add support for IW624 chipset
+Subject: Re: [PATCH BlueZ] iso-tester: Add suspend tests
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169214462789.26309.9496972962553175060.git-patchwork-notify@kernel.org>
-Date:   Wed, 16 Aug 2023 00:10:27 +0000
-References: <20230811101232.844769-1-neeraj.sanjaykale@nxp.com>
-In-Reply-To: <20230811101232.844769-1-neeraj.sanjaykale@nxp.com>
-To:     Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <169214522069.30914.12189703602866375463.git-patchwork-notify@kernel.org>
+Date:   Wed, 16 Aug 2023 00:20:20 +0000
+References: <20230815221738.2491772-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230815221738.2491772-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 11 Aug 2023 15:42:30 +0530 you wrote:
-> This patch series adds support for IW624 in btnxpuart driver.
+On Tue, 15 Aug 2023 15:17:38 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> The first patch removes check for CTS low after FW downloaded as
-> it was found to be redundant. It increases the delay from 1000msec
-> to 1200msec after FW download as IW624 requires more time to complete
-> FW initialization.
+> This adds the following test which attempt to trigger suspend code path
+> while ISO sockets are connecting or have been connected:
+> 
+> ISO Connect Suspend - Success
+> ISO Connected Suspend - Success
+> ISO Connect2 Suspend - Success
+> ISO Connected2 Suspend - Success
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/2] Bluetooth: btnxpuart: Remove check for CTS low after FW download
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8f24666933f1
-  - [v2,2/2] Bluetooth: btnxpuart: Add support for IW624 chipset
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f6b00a4fae83
+  - [BlueZ] iso-tester: Add suspend tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=583d579178d4
 
 You are awesome, thank you!
 -- 
