@@ -2,86 +2,170 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54567C001B0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 00:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6338DC04A94
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 08:07:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240860AbjHPAo3 (ORCPT
+        id S242704AbjHPIHQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Aug 2023 20:44:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48374 "EHLO
+        Wed, 16 Aug 2023 04:07:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240873AbjHPAoI (ORCPT
+        with ESMTP id S242743AbjHPIG4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Aug 2023 20:44:08 -0400
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CBF1BFB
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 17:44:07 -0700 (PDT)
-Received: from github.com (hubbernetes-node-4800431.ash1-iad.github.net [10.56.151.36])
-        by smtp.github.com (Postfix) with ESMTPA id 7DEF9100811
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Aug 2023 17:44:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1692146646;
-        bh=nYfE5gjmVkUHhD/15RQPQQ+Tgnvj0mHFgGIfYXbrN5Y=;
-        h=Date:From:To:Subject:From;
-        b=foj/3k8ntOaf8En/NIuBEufyD+i0j7IqWT7PSC4FmymWYKOIXbLh32ogXybkWKfjl
-         TThrKcPYBUsSUgJCOs7F9sqV0fEPUimPoWn9XQMOLwkpHElOfiKVpObfbPA83/z9GU
-         BLIq2aqEWc65z8FFEvxQw5a5h6POoLk5cKucbBUU=
-Date:   Tue, 15 Aug 2023 17:44:06 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d68bfb-f4aea3@github.com>
-Subject: [bluez/bluez] 583d57: iso-tester: Add suspend tests
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+        Wed, 16 Aug 2023 04:06:56 -0400
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BD3A2700
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 01:06:53 -0700 (PDT)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-317798b359aso5414761f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 01:06:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1692173211; x=1692778011;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tw5E2UBQXvOpbGHprcCTw5ennRO9STUpYBfUSdY86ds=;
+        b=t4Y/X17KHem58LEiK8ROQhxkwMypsmvrbTaHQ5mJuc1GhgmqRSxJUK7J5Pncti0vPX
+         vhLZLzn2o8a1zlbizbdsegpIMSmMOBIaGboNgMvHQZBg2usnJI8YcHWUKNQGSBZyfp2t
+         6lchihWpwecA9cuAhxobl0U79XgNzl7qv4p9fv9HZZuZfPfzsawyx1bEbIUGkhJDao1q
+         NqLj1fN7TsJkWKpAu84lbAhFBLVeLPTLfMMEQPFcd00whfD0JL4LL/oyL/RJjEPrdZSb
+         NH8lzTrfF5OERCzVYS82cpssawlrmmcdpEAHnSgNclq+CsM7CM9Ii5U/+wSi7HIvWKB6
+         Z4KA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692173211; x=1692778011;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tw5E2UBQXvOpbGHprcCTw5ennRO9STUpYBfUSdY86ds=;
+        b=iGYlF7p4prnABFAuHQt0WQDKmVZ/Kj6D9bK9FUS/lL+LKwu4+XU+Wuwp53pQA9Ydnl
+         VWgNj/fZv931s1MUJ9D+jMCdqCyUk4bDp5666HkIeXsrerScNG/WEskiT1AXlev8P68o
+         Gbgor6uA1qC520VJQuuQQQdieThTUGttX/WFdinB5HYrlU2tR5jJcO/MToWQP3/g46wq
+         JsQNuMW/2jR5f3sTT8GeKKaFKJLdfgfjpaX+5xRlDd5VrTaoNxoz0th4tB3amzzE3u7K
+         4/L5HfiMquXX/skfsBxhq+nVcUF04GVNgwhN61UG2gWHGQYNNlRi6/BQxJ0be0BuvQDD
+         iDqQ==
+X-Gm-Message-State: AOJu0YyDY/5+1kAem5n0X5ECB8ZEBtAqI5+gnybxlA4zOFLy9+nqNuRO
+        EObWQJ88T8CN+HDv+yBZU1qcgg==
+X-Google-Smtp-Source: AGHT+IH6NpwmoudJyghMIrpgE7AXA8Trjw/2cTk2K4YqOd5aQB8yeFebZw1Zr7XrtTox1oneOCs2lw==
+X-Received: by 2002:a5d:61cb:0:b0:319:72f8:7244 with SMTP id q11-20020a5d61cb000000b0031972f87244mr993379wrv.45.1692173211520;
+        Wed, 16 Aug 2023 01:06:51 -0700 (PDT)
+Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a])
+        by smtp.gmail.com with ESMTPSA id x5-20020adfdcc5000000b00317878d83c6sm20430428wrm.72.2023.08.16.01.06.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 01:06:51 -0700 (PDT)
+From:   Neil Armstrong <neil.armstrong@linaro.org>
+Date:   Wed, 16 Aug 2023 10:06:46 +0200
+Subject: [PATCH v4 1/3] dt-bindings: net: bluetooth: qualcomm: document
+ WCN7850 chipset
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Message-Id: <20230816-topic-sm8550-upstream-bt-v4-1-2ea2212719f6@linaro.org>
+References: <20230816-topic-sm8550-upstream-bt-v4-0-2ea2212719f6@linaro.org>
+In-Reply-To: <20230816-topic-sm8550-upstream-bt-v4-0-2ea2212719f6@linaro.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+Cc:     netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        Rob Herring <robh@kernel.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1856;
+ i=neil.armstrong@linaro.org; h=from:subject:message-id;
+ bh=F961/lw+yAY73+/udy9usG6VmzbRuCgDP2WSGtHNz0o=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBk3IOXsOco9A8t7v3yhlPuyA6uFeqjOoMHcE6lvojX
+ Av0S/JCJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZNyDlwAKCRB33NvayMhJ0VV3D/
+ 92enjP4XckJJxHlstLtRpx5pIAKjD55yGTKeZAOMtfpa6hnw73fw/vzkPA0frqFW5PJkf+uSqreDzh
+ WpKcI1HWQ8/dWlt+Qz1O8boQUM1KHVBY2h4GuP8Vqy9gR3OFa4yYINUjF3g484buaBGou9fPRYmVGK
+ HhTZdbwRn7iKX39C2WRtD06sXaFDrOhxjsAOvwsPU63FEKDXrrPld6WrkVIQ2Y7juo7Hb219ZD0cIG
+ q86qBcW+fZ20W/g4wgh6DbDc8H9rXfvE5m6/3/UKNtkW4/Ff8WLynTwyrYKwZaxmqca8pq0vuy6dcP
+ QtvVkBWpWsEo/5UNUYx64+WgPF0fe4KrjjX8qUFJ0uDL0ncp3uayhenKPqCUSg0t6YjE2rVWeFgfmr
+ Eqv8mMK0U3mZtv1FP3YRbEtxd76HKkk2KUBaSXhGWDHu2zmoNdBs2H8eCuRJcu9Yj3MxLzAGHq6UQF
+ KRNw+3Wnyz3wVb9xUJXNYIqXg+dX4izy8o2zOB/asn87Vphoe7xK+IAdmaFC3bwqASjWvXGLqu1WJT
+ 4HJugAA0T1M+DjktUUAoVy43uTSyyKn2vxHZ/BFkzQj8uROv9gDXOAS2JgVpSnRXKWPZOw7zm+6oB1
+ lQwvPRXaO3Wks9S0x05OB5Tgkh9P38t5N13ILEFF2BTAJBPRlR9M40KdZozg==
+X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
+ fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 583d579178d440a850db06d9825bb9ac5eca8943
-      https://github.com/bluez/bluez/commit/583d579178d440a850db06d9825bb9ac5eca8943
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-15 (Tue, 15 Aug 2023)
+Document the WCN7850 Bluetooth chipset.
 
-  Changed paths:
-    M tools/iso-tester.c
+Reviewed-by: Rob Herring <robh@kernel.org>
+Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml | 23 ++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-  Log Message:
-  -----------
-  iso-tester: Add suspend tests
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 2735c6a4f336..eba2f3026ab0 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -26,6 +26,7 @@ properties:
+       - qcom,qca6390-bt
+       - qcom,wcn6750-bt
+       - qcom,wcn6855-bt
++      - qcom,wcn7850-bt
+ 
+   enable-gpios:
+     maxItems: 1
+@@ -58,6 +59,9 @@ properties:
+   vddaon-supply:
+     description: VDD_AON supply regulator handle
+ 
++  vdddig-supply:
++    description: VDD_DIG supply regulator handle
++
+   vddbtcxmx-supply:
+     description: VDD_BT_CXMX supply regulator handle
+ 
+@@ -73,6 +77,9 @@ properties:
+   vddrfa1p2-supply:
+     description: VDD_RFA_1P2 supply regulator handle
+ 
++  vddrfa1p9-supply:
++    description: VDD_RFA_1P9 supply regulator handle
++
+   vddrfa2p2-supply:
+     description: VDD_RFA_2P2 supply regulator handle
+ 
+@@ -157,6 +164,22 @@ allOf:
+         - vddrfa0p8-supply
+         - vddrfa1p2-supply
+         - vddrfa1p7-supply
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - qcom,wcn7850-bt
++    then:
++      required:
++        - enable-gpios
++        - swctrl-gpios
++        - vddio-supply
++        - vddaon-supply
++        - vdddig-supply
++        - vddrfa0p8-supply
++        - vddrfa1p2-supply
++        - vddrfa1p9-supply
+ 
+ examples:
+   - |
 
-This adds the following test which attempt to trigger suspend code path
-while ISO sockets are connecting or have been connected:
+-- 
+2.34.1
 
-ISO Connect Suspend - Success
-ISO Connected Suspend - Success
-ISO Connect2 Suspend - Success
-ISO Connected2 Suspend - Success
-
-
-  Commit: f4aea37ee6cf6b6cb3f91e4d4c9f09611acfd610
-      https://github.com/bluez/bluez/commit/f4aea37ee6cf6b6cb3f91e4d4c9f09611acfd610
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-15 (Tue, 15 Aug 2023)
-
-  Changed paths:
-    M Makefile.am
-
-  Log Message:
-  -----------
-  build: Fix make distcheck
-
-This fixes the following errors:
-
-make[2]: *** No rule to make target 'doc/test-runner.txt',
-needed by 'distdir-am'.  Stop.
-make[1]: *** [Makefile:11708: distdir] Error 2
-make: *** [Makefile:11784: dist] Error 2
-
-
-Compare: https://github.com/bluez/bluez/compare/d68bfb6564ea...f4aea37ee6cf
