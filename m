@@ -2,80 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A52C41513
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 19:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F359C10F19
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 19:28:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345766AbjHPTUl (ORCPT
+        id S1345389AbjHPT1l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Aug 2023 15:20:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54512 "EHLO
+        Wed, 16 Aug 2023 15:27:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345800AbjHPTU0 (ORCPT
+        with ESMTP id S1345422AbjHPT1d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Aug 2023 15:20:26 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31F62272C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 12:20:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B0527623E9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 19:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 197B6C433CA;
-        Wed, 16 Aug 2023 19:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692213621;
-        bh=PAKM+2JiMUUW5BUIV/kFLKRonqI+dETqWF61b1BsQLs=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=gA+qHR5srnzMILk86qrMvH6jyiw+bwNeIkOUSUjhXjF+SCFRc+/3O9gz7hbC+ZAAE
-         NUygcpJ8it2Sg1PvMst/AfoAQQBxrWlj84qoVfUaKb6ks8MK7oQDwmL3qT+HtgPnS+
-         rW5DxWH/wWYzbSQ46atDRGjznHxfxHPK4jCkChT4fSMHpcLtdv/5EvgVCntp+XiOyQ
-         +0Gf2xzd2AA6cQJplJSCJ+SNvKTMDmelNHx+jVvqF2W6/IywW7x2mvfHfIZKqMRJlS
-         v48afowZkrreuF3DZzxVZ4q15hQfOTT6Fd2C2xtnDWi5/IFI9k2HVVcqdwXiPhONFx
-         fjc7u2I/Po5EQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F3730E93B39;
-        Wed, 16 Aug 2023 19:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 16 Aug 2023 15:27:33 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239461FCE
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 12:27:32 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id af79cd13be357-76d77cf99afso33617785a.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 12:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692214051; x=1692818851;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0YKL+2wwuDKCIydxpNG/hxnlHuBTiTG692kIglrDdOo=;
+        b=QKNDyq1h7aP/zyXwx7TFZwniTXne3pBwHfh2VyPF2dwfyjHQq7HGudkG13ygKlBfkL
+         NawTvsxNcGloYWhoT8bBdVyZTIbLB/KNSV+LsQT6uYTt/GqidULnuDaP/lx7r7HvKNQv
+         AAzl4oXctmZOBnL/75MTFjpHXrgtI9fSGPTrE7D9+W3O+Rt7KMGDVHpqMwycTuZKIBxP
+         f9bF6RynX8+lxzQYSjn244z0tWkrCBse0l12E8msbBjY4AZTNyjitHfjLt1kNoksavj1
+         j+GmpfT9UI7Y0vbiiPLjGAw+LKibVEfDK+GYgWO0sO/tprCW/CbsXr/iN0ChD1yO2h7C
+         HsXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692214051; x=1692818851;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0YKL+2wwuDKCIydxpNG/hxnlHuBTiTG692kIglrDdOo=;
+        b=OlTpx0iKex5ZTd1zReeL4ISG5mIdTE45yuD5BjFrbiCe2+MRHjX4486g3wYm78/XWX
+         4r+3550/8D3qosnJoVJMInwCYTsL31X27+UhkFRoGL5SUq2hu5F3zEGtxe7l+w911Y9R
+         x/eVx5fCAO6rFDtwCvnQG0XmBNRyFEfEPZbiYedTNjyyr6QtuYzlfvr1RcQPmhzF5FfM
+         X6L5W02FRnqP9dNK1vsseg5ZDMLI8aJzr62LaSai1g7m+KimWM7q60cAYUMNcPckfFwc
+         MpJqXyUN0iKDBp6QCcRbvm62g0EmIr/8SSnd5Xj77+Q2EXv5hdH+MIh5TTaYkUwE1vZ5
+         h3Qg==
+X-Gm-Message-State: AOJu0YzshDokRhgAne6y5jiyQGCMlT/1ddOhxUoSOTs2xRszz+1Qg6XR
+        UDQ+ObvcmPu2QZmeWaIGMhjnaf5dDEQ=
+X-Google-Smtp-Source: AGHT+IHWVd92CtyB7B+ny/QzG8hCYPENWG3TurLEmoA7pOgTycx4EB52MUS8oivFPyqwpta9Y/cnHA==
+X-Received: by 2002:a05:620a:4d9:b0:76c:c636:4772 with SMTP id 25-20020a05620a04d900b0076cc6364772mr2838562qks.65.1692214051133;
+        Wed, 16 Aug 2023 12:27:31 -0700 (PDT)
+Received: from [172.17.0.2] ([104.45.204.73])
+        by smtp.gmail.com with ESMTPSA id y22-20020a37e316000000b00767dcf6f4adsm4570215qki.51.2023.08.16.12.27.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Aug 2023 12:27:30 -0700 (PDT)
+Message-ID: <64dd2322.370a0220.6db46.495e@mx.google.com>
+Date:   Wed, 16 Aug 2023 12:27:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2367270135539527757=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_conn: Fix sending
- BT_HCI_CMD_LE_CREATE_CONN_CANCEL
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169221362099.4169.5061483289978372460.git-patchwork-notify@kernel.org>
-Date:   Wed, 16 Aug 2023 19:20:20 +0000
-References: <20230815221803.2491905-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230815221803.2491905-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com
+Subject: RE: Add support for BAP broadcast sink
+In-Reply-To: <20230816164435.5149-2-claudia.rosu@nxp.com>
+References: <20230816164435.5149-2-claudia.rosu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============2367270135539527757==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This is automated email and please do not reply to this email!
 
-On Tue, 15 Aug 2023 15:18:03 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes sending BT_HCI_CMD_LE_CREATE_CONN_CANCEL when
-> hci_le_create_conn_sync has not been called because HCI_CONN_SCANNING
-> has been clear too early before its cmd_sync callback has been run.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - Bluetooth: hci_conn: Fix sending BT_HCI_CMD_LE_CREATE_CONN_CANCEL
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5109ebb80dad
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=776703
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      4.80 seconds
+GitLint                       PASS      2.58 seconds
+BuildEll                      PASS      28.09 seconds
+BluezMake                     PASS      906.09 seconds
+MakeCheck                     PASS      12.59 seconds
+MakeDistcheck                 PASS      162.47 seconds
+CheckValgrind                 PASS      263.52 seconds
+CheckSmatch                   PASS      354.69 seconds
+bluezmakeextell               PASS      106.84 seconds
+IncrementalBuild              PASS      5182.61 seconds
+ScanBuild                     PASS      1101.46 seconds
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2367270135539527757==--
