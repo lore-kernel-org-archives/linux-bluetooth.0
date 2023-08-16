@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDA6C27C42
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 22:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D786DC27C7A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Aug 2023 22:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344275AbjHPWbw (ORCPT
+        id S1346934AbjHPWcZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Aug 2023 18:31:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34820 "EHLO
+        Wed, 16 Aug 2023 18:32:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346997AbjHPWbw (ORCPT
+        with ESMTP id S1346928AbjHPWby (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Aug 2023 18:31:52 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E762F1B2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 15:31:50 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1bdbbede5d4so48126435ad.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 15:31:50 -0700 (PDT)
+        Wed, 16 Aug 2023 18:31:54 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0519125
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 15:31:52 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bc8045e09dso46666605ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Aug 2023 15:31:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692225110; x=1692829910;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCWyHgLcVPzpFFLmX+q9DIaBIvCOJPEVjefrgbIlmFo=;
-        b=O3DRLbtzIdCs/ZzehdEtl84ag5tl3M577D/GYACO6nEsoZ2sSXo/PYsUDEv7MEL48C
-         1IYs22p0j+rC+tFQuSGGzYGg27Nxcj72lQcrTYJRQt6S3oJxIAtl+CQ64NIzOVrBv9sG
-         KNh+xx9QAwH5S6+28DNo6eopTqLsATvwQheLY1cN5fqN5D9vdzYxMp7GnSwz6oB9i4Y2
-         VFt5EvEoa9s6/fp5FxXxqh2vmyGJhuVKWwXl5owYfSGtbNDLelO2ifmv2fvkzefq+Mue
-         +xjQm74fDCQnZ71SdiDk/C7GWGHilh2cHD8e9W8iHY1hVmKXII1jqKCMrpPhSvvQhFaH
-         wlBA==
+        d=gmail.com; s=20221208; t=1692225111; x=1692829911;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fHCnStYv3VpHCvWJ+Rqq7y9urXTVeJpgi7x1cxy6CdQ=;
+        b=ZTzzUPmizDrDGboO8jNNp8fXAOeP/lBurztSX1MfAS+hxSjDvUCE56n/5gAP1NTM4F
+         88xnixP6bxI3R4xBzo6QFkf8hcvvvsWEJrCxp+UcAPc0HqUnLAfG6UcOLSKg8seCbzfv
+         k6PJx9NkQGCkV1JhhuCBDWwTl5lTjTwD0Kx21FQmpQfJ4YDOItajCd7Vr8pEM/4GHLfd
+         DLA3Y44ZkucynqQ2QGFOxlLj9eiOq5e3KtNzQHB1vlmxNCTCoXYat8M6n1wys7KwBPbm
+         1xmIH6DYzlDnGkC6vjaetBcGnr64hYIrDcFZt66AEm37gKP/Gw6c+D51sNpi+wTs/aOM
+         5N9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692225110; x=1692829910;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCWyHgLcVPzpFFLmX+q9DIaBIvCOJPEVjefrgbIlmFo=;
-        b=b6wVXNaxkqHfrZmPLY25N0stB+qOzG1L1Mp5Y+YbtKSocbh4jR6i9+95/pV4BkFZYH
-         FDVZFwnv/QK/F8vciHNyJebG1oKsd6xFzVW45m0DBGeQ1Ocz0jj/bBmb4PTeBHba4qAU
-         QPe1sJwb/fR5zDJ0guNLRwW/8ItGHCi7fqNhlwWcXeydtegJJxGbgjRMCXDLhqgZp9eR
-         ppeqGBdadR2BHhzDDKirMDsxUa7WlR4UXpbXtVzrhd8vDDDzWWxSoGMgUA48THLz3oiD
-         QMH5Leu2KRwycqWBomTaNvKXz/Ia+4a+L7OZJN8j/Fjgvn8tDwwtnrgZCIeXcCMeMJKq
-         RmpA==
-X-Gm-Message-State: AOJu0YxZckaQ7gJ6guefUAw1Org7Yb8uCxaZe0oLT2zhfRqliZs7Hart
-        8TLHU9PGdQ/4InGxLDkK1VO1WYJWywc=
-X-Google-Smtp-Source: AGHT+IFzDRKFc1BIBVUR9S2YO4+YRMiPO2aBVltFTPi1i311jKI2eUauPXWNM4uCSXezij+aRpu0bQ==
-X-Received: by 2002:a17:903:1109:b0:1b5:2fdf:5bd8 with SMTP id n9-20020a170903110900b001b52fdf5bd8mr4673157plh.8.1692225109616;
-        Wed, 16 Aug 2023 15:31:49 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692225111; x=1692829911;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fHCnStYv3VpHCvWJ+Rqq7y9urXTVeJpgi7x1cxy6CdQ=;
+        b=kjVSUYpeUxUg7SM1ZBlngDgJdIQLfXP0yEHX8a6nOaO53E1DyCX77hxY5johunK6bf
+         VNS+9aIl4Vw3BAdK7+MLeFpLknKAS26V/dyck3rhjTglHnpYdom0INP2hiCZD0IPytaU
+         hG0jMEJK6gV53i97IkXaNtR0hlOxO/5GFXghQgnzVfRA0ON9Hy5U5sreIlPivbAvfpT8
+         qERLafiaOY1NMbFZ+p/mvST8rlzM2BD9dEziA24eainNh4O9FgBxqdyoovHR3qFyA51p
+         RU9I5Tmlgpky0RyEFFtGVtfJqNQiM01m5MKWjbAmJkp53l6B2fXrvyeLzwnhS7r7kWry
+         nqEg==
+X-Gm-Message-State: AOJu0YwGjLrvvmCRQ+18LBlW6rXbjVs20Eiue1y/GvdAwKLJsYIOMvp7
+        2ilKqwQoilo7mJkqlL+QwCBK21EQ1rs=
+X-Google-Smtp-Source: AGHT+IHI6USqwexVzdsVYJC0YvJdWHHhhkKGX2jnsuAxKozLOZg9Qh4GRXm9WVDfLljcMgKcvkzEZQ==
+X-Received: by 2002:a17:902:ea08:b0:1b3:ea47:796c with SMTP id s8-20020a170902ea0800b001b3ea47796cmr3183104plg.29.1692225111529;
+        Wed, 16 Aug 2023 15:31:51 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id 12-20020a170902e9cc00b001993a1fce7bsm13582347plk.196.2023.08.16.15.31.47
+        by smtp.gmail.com with ESMTPSA id 12-20020a170902e9cc00b001993a1fce7bsm13582347plk.196.2023.08.16.15.31.49
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Aug 2023 15:31:48 -0700 (PDT)
+        Wed, 16 Aug 2023 15:31:50 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] monitor: Fix not printing latency information with -r
-Date:   Wed, 16 Aug 2023 15:31:46 -0700
-Message-ID: <20230816223147.2787284-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] monitor: Detect LE-ACL connections
+Date:   Wed, 16 Aug 2023 15:31:47 -0700
+Message-ID: <20230816223147.2787284-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20230816223147.2787284-1-luiz.dentz@gmail.com>
+References: <20230816223147.2787284-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,111 +68,164 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When reading a log from file hci_devba may not work, also store link
-information so assign_handle can use use the parent (ACL) destination.
+This enables LE-ACL connections to be detected by processing its events
+otherwise they would be assumed to be BR-ACL. Also make sure that LE-ISO
+address is set based on its ACL link.
 ---
- monitor/packet.c | 40 +++++++++++++++++++++++++++++++++++++---
- monitor/packet.h |  1 +
- 2 files changed, 38 insertions(+), 3 deletions(-)
+ monitor/analyze.c | 88 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 84 insertions(+), 4 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 84af03a0011f..8eae8c9ea8fa 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -174,6 +174,18 @@ static uint16_t get_format(uint32_t cookie)
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 608ef4d77c85..3cc482cd9227 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -71,6 +71,7 @@ struct hci_stats {
  
- static struct packet_conn_data conn_list[MAX_CONN];
- 
-+static struct packet_conn_data *lookup_parent(uint16_t handle)
-+{
-+	int i;
-+
-+	for (i = 0; i < MAX_CONN; i++) {
-+		if (conn_list[i].link == handle)
-+			return &conn_list[i];
-+	}
-+
-+	return NULL;
-+}
-+
- static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
- 					uint8_t *dst, uint8_t dst_type)
- {
-@@ -181,15 +193,27 @@ static void assign_handle(uint16_t index, uint16_t handle, uint8_t type,
- 
- 	for (i = 0; i < MAX_CONN; i++) {
- 		if (conn_list[i].handle == 0x0000) {
--			if (hci_devba(index, (bdaddr_t *)conn_list[i].src) < 0)
--				return;
-+			hci_devba(index, (bdaddr_t *)conn_list[i].src);
- 
- 			conn_list[i].index = index;
- 			conn_list[i].handle = handle;
- 			conn_list[i].type = type;
- 
--			if (!dst)
-+			if (!dst) {
-+				struct packet_conn_data *p;
-+
-+				/* If destination is not set attempt to use the
-+				 * parent one if that exists.
-+				 */
-+				p = lookup_parent(handle);
-+				if (p) {
-+					memcpy(conn_list[i].dst, p->dst,
-+						sizeof(conn_list[i].dst));
-+					conn_list[i].dst_type = p->dst_type;
-+				}
-+
- 				break;
-+			}
- 
- 			memcpy(conn_list[i].dst, dst, sizeof(conn_list[i].dst));
- 			conn_list[i].dst_type = dst_type;
-@@ -8725,9 +8749,14 @@ static void le_set_cig_params_rsp(uint16_t index, const void *data,
- static void print_cis(const void *data, int i)
- {
- 	const struct bt_hci_cis *cis = data;
-+	struct packet_conn_data *conn;
- 
- 	print_field("CIS Handle: %d", cis->cis_handle);
- 	print_field("ACL Handle: %d", cis->acl_handle);
-+
-+	conn = packet_get_conn_data(cis->acl_handle);
-+	if (conn)
-+		conn->link = cis->cis_handle;
- }
- 
- static void le_create_cis_cmd(uint16_t index, const void *data, uint8_t size)
-@@ -11643,11 +11672,16 @@ static void le_req_cis_evt(struct timeval *tv, uint16_t index,
- 					const void *data, uint8_t size)
- {
- 	const struct bt_hci_evt_le_cis_req *evt = data;
-+	struct packet_conn_data *conn;
- 
- 	print_field("ACL Handle: %d", le16_to_cpu(evt->acl_handle));
- 	print_field("CIS Handle: %d", le16_to_cpu(evt->cis_handle));
- 	print_field("CIG ID: 0x%2.2x", evt->cig_id);
- 	print_field("CIS ID: 0x%2.2x", evt->cis_id);
-+
-+	conn = packet_get_conn_data(evt->acl_handle);
-+	if (conn)
-+		conn->link = evt->cis_handle;
- }
- 
- static void print_bis_handle(const void *data, int i)
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 750ce405e4bc..384f460d2f58 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -42,6 +42,7 @@ struct packet_conn_data {
- 	uint16_t index;
- 	uint8_t  src[6];
+ struct hci_conn {
  	uint16_t handle;
 +	uint16_t link;
- 	uint8_t  type;
- 	uint8_t  dst[6];
- 	uint8_t  dst_type;
+ 	uint8_t type;
+ 	uint8_t bdaddr[6];
+ 	bool setup_seen;
+@@ -290,6 +291,20 @@ static struct hci_conn *conn_lookup(struct hci_dev *dev, uint16_t handle)
+ 						UINT_TO_PTR(handle));
+ }
+ 
++static bool link_match_handle(const void *a, const void *b)
++{
++	const struct hci_conn *conn = a;
++	uint16_t handle = PTR_TO_UINT(b);
++
++	return (conn->link == handle && !conn->terminated);
++}
++
++static struct hci_conn *link_lookup(struct hci_dev *dev, uint16_t handle)
++{
++	return queue_find(dev->conn_list, link_match_handle,
++						UINT_TO_PTR(handle));
++}
++
+ static struct hci_conn *conn_lookup_type(struct hci_dev *dev, uint16_t handle,
+ 								uint8_t type)
+ {
+@@ -297,7 +312,7 @@ static struct hci_conn *conn_lookup_type(struct hci_dev *dev, uint16_t handle,
+ 
+ 	conn = queue_find(dev->conn_list, conn_match_handle,
+ 						UINT_TO_PTR(handle));
+-	if (!conn || conn->type != type) {
++	if (!conn || (type && conn->type != type)) {
+ 		conn = conn_alloc(dev, handle, type);
+ 		queue_push_tail(dev->conn_list, conn);
+ 	}
+@@ -542,6 +557,42 @@ static void plot_add(struct queue *queue, struct timeval *latency,
+ 	queue_push_tail(queue, plot);
+ }
+ 
++static void evt_le_conn_complete(struct hci_dev *dev, struct timeval *tv,
++					struct iovec *iov)
++{
++	const struct bt_hci_evt_le_conn_complete *evt;
++	struct hci_conn *conn;
++
++	evt = util_iov_pull_mem(iov, sizeof(*evt));
++	if (!evt || evt->status)
++		return;
++
++	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), CONN_LE_ACL);
++	if (!conn)
++		return;
++
++	memcpy(conn->bdaddr, evt->peer_addr, 6);
++	conn->setup_seen = true;
++}
++
++static void evt_le_enh_conn_complete(struct hci_dev *dev, struct timeval *tv,
++					struct iovec *iov)
++{
++	const struct bt_hci_evt_le_enhanced_conn_complete *evt;
++	struct hci_conn *conn;
++
++	evt = util_iov_pull_mem(iov, sizeof(*evt));
++	if (!evt || evt->status)
++		return;
++
++	conn = conn_lookup_type(dev, le16_to_cpu(evt->handle), CONN_LE_ACL);
++	if (!conn)
++		return;
++
++	memcpy(conn->bdaddr, evt->peer_addr, 6);
++	conn->setup_seen = true;
++}
++
+ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 					const void *data, uint16_t size)
+ {
+@@ -612,7 +663,7 @@ static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
+ 					struct iovec *iov)
+ {
+ 	const struct bt_hci_evt_le_cis_established *evt;
+-	struct hci_conn *conn;
++	struct hci_conn *conn, *link;
+ 
+ 	evt = util_iov_pull_mem(iov, sizeof(*evt));
+ 	if (!evt || evt->status)
+@@ -624,6 +675,27 @@ static void evt_le_cis_established(struct hci_dev *dev, struct timeval *tv,
+ 		return;
+ 
+ 	conn->setup_seen = true;
++
++	link = link_lookup(dev, conn->handle);
++	if (link)
++		memcpy(conn->bdaddr, link->bdaddr, 6);
++}
++
++static void evt_le_cis_req(struct hci_dev *dev, struct timeval *tv,
++					struct iovec *iov)
++{
++	const struct bt_hci_evt_le_cis_req *evt;
++	struct hci_conn *conn;
++
++	evt = util_iov_pull_mem(iov, sizeof(*evt));
++	if (!evt)
++		return;
++
++	conn = conn_lookup(dev, le16_to_cpu(evt->acl_handle));
++	if (!conn)
++		return;
++
++	conn->link = le16_to_cpu(evt->cis_handle);
+ }
+ 
+ static void evt_le_big_complete(struct hci_dev *dev, struct timeval *tv,
+@@ -685,9 +757,18 @@ static void evt_le_meta_event(struct hci_dev *dev, struct timeval *tv,
+ 		return;
+ 
+ 	switch (subevt) {
++	case BT_HCI_EVT_LE_CONN_COMPLETE:
++		evt_le_conn_complete(dev, tv, &iov);
++		break;
++	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
++		evt_le_enh_conn_complete(dev, tv, &iov);
++		break;
+ 	case BT_HCI_EVT_LE_CIS_ESTABLISHED:
+ 		evt_le_cis_established(dev, tv, &iov);
+ 		break;
++	case BT_HCI_EVT_LE_CIS_REQ:
++		evt_le_cis_req(dev, tv, &iov);
++		break;
+ 	case BT_HCI_EVT_LE_BIG_COMPLETE:
+ 		evt_le_big_complete(dev, tv, &iov);
+ 		break;
+@@ -811,8 +892,7 @@ static void acl_pkt(struct timeval *tv, uint16_t index, bool out,
+ 	dev->num_hci++;
+ 	dev->num_acl++;
+ 
+-	conn = conn_lookup_type(dev, le16_to_cpu(hdr->handle) & 0x0fff,
+-								CONN_BR_ACL);
++	conn = conn_lookup_type(dev, le16_to_cpu(hdr->handle) & 0x0fff, 0x00);
+ 	if (!conn)
+ 		return;
+ 
 -- 
 2.41.0
 
