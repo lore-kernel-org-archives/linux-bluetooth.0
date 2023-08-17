@@ -2,64 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C86CC678DC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D82C678DF
 	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Aug 2023 22:42:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355807AbjHQWli (ORCPT
+        id S1355802AbjHQWlh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Aug 2023 18:41:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37454 "EHLO
+        Thu, 17 Aug 2023 18:41:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355799AbjHQWlJ (ORCPT
+        with ESMTP id S1355789AbjHQWlI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Aug 2023 18:41:09 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA513B9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 15:41:08 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1bc73a2b0easo2862445ad.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 15:41:08 -0700 (PDT)
+        Thu, 17 Aug 2023 18:41:08 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFA4B9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 15:41:07 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1bf3a2f44ffso133465ad.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 15:41:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692312067; x=1692916867;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=J8AkT+XbMJGmmldcsgFM4Bvk9OwSgkiuO67EBOYO4IE=;
-        b=TWMP1DqGB+srh6q1mQCPqtGU+bCT6x0QqjlYsFMwo6253Sgmif2Fok9zXliO/pGyx9
-         2FcKAoq0BcATAuwc3IlOunNA9eVrfEge9JB56Sm2ZYAn4+7AZ7dy1CCNyN6bI30GIuTH
-         +g2Zjum1Vf7rJQf+oR5dsoecOz6ROX6eW0Cqn0lMvw7fzdLSr2iR67JnLim+uGs8rrGQ
-         /TeNsGIbJEYUpcgA+5eg5qqz6cqO6X/DDmxsr5CUEqxkzJQ4wV+UGRe/w+3PA6GH4+A2
-         uB995fI0780DXhin9kky3P8ovZn0cLDc8oGHi4L5gI+7diJYXy+lvkgdOA7QLKb8TIxJ
-         V7TA==
+        d=gmail.com; s=20221208; t=1692312066; x=1692916866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Q8Fm0hxWBZ6wilqZy1iDERfetf4M3xy+L2/2VQ17Y8=;
+        b=UBbVSOwuSiUFJJg4aZ9yxWgm4d6U/eIUHlf+LyVLcEHT3aIns0prxIU/snawg1MUMp
+         3Xe3iHX70ll+99BfPT3ca/SK5QA2VrT/vviJ5yOehWlUaaV3acZ5Ig9yKbR9T2t5tIF1
+         Mh4JabwpPa4BjICmLuPtefV2VyKEDCXmBUjYSxCxWp7hPzIOp8NF0N7Hu7SE/v9whNHl
+         kyIm6ONMBWegOi/eeYXdLlvsJk3CaPTDOEtBu0AQOPxmTLcBb58+jnfV+FXr1kzVlcV8
+         68X1kTxxKuQD8jtYc1kwDz795r4xyxA8Utpj3yBtZhVcA2AEuR124tGLn4Tg+Dh2NxW/
+         34zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692312067; x=1692916867;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J8AkT+XbMJGmmldcsgFM4Bvk9OwSgkiuO67EBOYO4IE=;
-        b=TeH4P9sFB9boA8eIJ2Gv2xFu9j4gyMgKXOUB6lgd8RGp8z01n67SLQeriXWbLcgBh+
-         uAbeTjoPpBbuimJmSTvdJkE6qMs6qUhtdFL0almD8lwgQmOmz73Gg474DXggANN8V+V1
-         5JbfmnFuYQI0hQrA1K/scjhJ94WSz2pDL1+Xc2Kpg4x9+qX6B3Spe0va+ASqyPDDXvBD
-         tRWCsljJsHUBxACl2bDqSAAgxVdxtGV2OCXgiYz5yWrVHkHPsK0RSMTeGPHEcNB2ppcg
-         x1xKZyBQn41qZF57c1DEMkYVJZU8kXkTt7VHd4gGY2bT5Mc/xqLugP+9or8KMKhWQ2IZ
-         1mIg==
-X-Gm-Message-State: AOJu0YwAx/vFxUStEbx984ZEoyFi90CM80f3Jw1xpr1W94UczhbDMu7a
-        lM5zdl5vyA/FOwmdq1Oe4y6sSi8c61Q=
-X-Google-Smtp-Source: AGHT+IFWeJ3cBOUu4rygqjqWclwUw8vDWkt3Xr9yvaTmgumW0dS2c+StJbEe1UasqvN/9jNUUPwCuA==
-X-Received: by 2002:a17:902:d486:b0:1bd:bba1:be78 with SMTP id c6-20020a170902d48600b001bdbba1be78mr831561plg.23.1692312067438;
-        Thu, 17 Aug 2023 15:41:07 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692312066; x=1692916866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Q8Fm0hxWBZ6wilqZy1iDERfetf4M3xy+L2/2VQ17Y8=;
+        b=gvPwuGxA0U9Tp2cGnqnaHQgeB7z2+mJpYzF13qxAcqRdkk8qy7+4MTIrIGRq9QG5Vg
+         GWWpSBLQj+RV/m3pcMzZpLfPzAzx8+y08tSb8Xbm+xI+HF/GrmEe1/w5uiTpPa39xKtF
+         tR3FfRZKtTkKHsRWIZlvCmoQEldwqk+6+C8xsYLRZYcFsROku+6APx/DbT2Y/IBJ03qO
+         iFJE6S3SK97sBEsvC3848kJjSxuoD0r7dxcwWsm+YqnKyhaN9HkHoyPc2UlnSgIviCe5
+         FYd3WwuGf/r8YnWq2W/wvCkpBPCh2bF7lfrK5BLRaZTBaYwzxMe+zb1Zn70YsZn4v09j
+         KhIA==
+X-Gm-Message-State: AOJu0YwL7eSCyJLAKJ/4EYwxdQQfuucdOXG82KPXZ5P79MTcSFrFGDdA
+        B/if1LD2IhvIYa0ZKG2at2nUDl9qpR4=
+X-Google-Smtp-Source: AGHT+IFcg0mubcXW9TO1zKITwxkL/MapkQ4Qquw27u7FVmy1v673iyzzawNuh9O2O6qaqkp8O8wAqw==
+X-Received: by 2002:a17:903:1245:b0:1b8:66f6:87a3 with SMTP id u5-20020a170903124500b001b866f687a3mr923309plh.52.1692312065821;
+        Thu, 17 Aug 2023 15:41:05 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id iy20-20020a170903131400b001b89b7e208fsm281877plb.88.2023.08.17.15.41.06
+        by smtp.gmail.com with ESMTPSA id iy20-20020a170903131400b001b89b7e208fsm281877plb.88.2023.08.17.15.41.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 15:41:06 -0700 (PDT)
+        Thu, 17 Aug 2023 15:41:04 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] device: Restart temporary timer while connecting
-Date:   Thu, 17 Aug 2023 15:41:03 -0700
-Message-ID: <20230817224103.3042055-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] device: Don't attempt to set auto_connect for devices using RPAs
+Date:   Thu, 17 Aug 2023 15:41:02 -0700
+Message-ID: <20230817224103.3042055-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230817224103.3042055-1-luiz.dentz@gmail.com>
-References: <20230817224103.3042055-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -68,28 +64,26 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the device is temporary restart its timer when attempt to connect to
-it since it can interrupt the connection attempt prematurely while it
-still scanning, etc.
+Device using private address cannot be programmed into the auto_connect
+list without them being paired and its IRK being distributed otherwise
+there is no way to resolve it address and the command will fail.
 ---
- src/device.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/device.c b/src/device.c
-index f6b0167bf55b..9b58e0c4e6c5 100644
+index e0ff0b1c1543..f6b0167bf55b 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -5754,6 +5754,10 @@ int device_connect_le(struct btd_device *dev)
- 	/* Keep this, so we can cancel the connection */
- 	dev->att_io = io;
+@@ -2006,7 +2006,7 @@ static void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ {
+ 	char addr[18];
  
-+	/* Restart temporary timer to give it time to connect/pair, etc. */
-+	if (dev->temporary)
-+		set_temporary_timer(dev, btd_opts.tmpto);
-+
- 	return 0;
- }
+-	if (!device || !device->le)
++	if (!device || !device->le || device_address_is_private(device))
+ 		return;
  
+ 	ba2str(&device->bdaddr, addr);
 -- 
 2.41.0
 
