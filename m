@@ -2,78 +2,114 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27CA5EE4998
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Aug 2023 20:51:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BB9EE4997
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Aug 2023 21:09:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240429AbjHRUu5 (ORCPT
+        id S240344AbjHRVJS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Aug 2023 16:50:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55762 "EHLO
+        Fri, 18 Aug 2023 17:09:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242991AbjHRUuY (ORCPT
+        with ESMTP id S239806AbjHRVIq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Aug 2023 16:50:24 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC4C30D8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Aug 2023 13:50:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6E7F9642A0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Aug 2023 20:50:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C50EFC433C8;
-        Fri, 18 Aug 2023 20:50:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692391821;
-        bh=85ql82GtvPHiUa87if4An5zv6GFMpclB3BYQbIqKJtY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=SGJLxH454vyrG1lTikQY78VL0yA+TNWDHtRd8CYGd4Iu83rM2wzvUpGwCd9HtaOzo
-         VtYCU4ydFyufn+OM7Y+eY1CtCWpY7wFyvnKP7W3R6J3A00R/hk6RgWP3fg+eTDz+80
-         QG2pkCXmZkatOoJfg3sCiXxwQFKuesbT/WO++bFeha9/d0gmZA3qeZLx6PM4OHt0zQ
-         peuY0/Dxyx3tObvoaplp/p/fwe/pqIJghv6Lf2a7xs9TylNkAkAw6mU7pjDQFRHKhk
-         2W9vfxp35sCetRrhNZ1N2zBImbXu0jOAkbN2kB29FAFPPfAtHTayfkYmxBwhiM0Tvm
-         WIl/WAHw4oPuQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AABD2E26D33;
-        Fri, 18 Aug 2023 20:50:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ PATCH v2] profile: Remove probe_on_discover
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169239182169.11543.68783625002745091.git-patchwork-notify@kernel.org>
-Date:   Fri, 18 Aug 2023 20:50:21 +0000
-References: <20230817212606.3024276-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230817212606.3024276-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Fri, 18 Aug 2023 17:08:46 -0400
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6772421B
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Aug 2023 14:08:45 -0700 (PDT)
+Received: from github.com (hubbernetes-node-05fbcf7.ac4-iad.github.net [10.52.135.36])
+        by smtp.github.com (Postfix) with ESMTPA id 2585C700817
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Aug 2023 14:08:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1692392925;
+        bh=AnbxVy3+S3YYtkcDW9WszoOPlwhsKqkQRB2JeK8C88A=;
+        h=Date:From:To:Subject:From;
+        b=O2w2VqClgokuNUZIcAPehrxVlMRLodNz3aVUU+PBWA/s1SWmvRM8hXI3EmrEDFScC
+         6A++v5y+YSWt+mB+Puy1mZw8p5z0Uw+SCYAlTqob1tdX0vGyWJuW58y2PN6PTAB+xh
+         Zjd/HoT99iFnlu+GY67gtLrwbNmQT4dumhT92jR4=
+Date:   Fri, 18 Aug 2023 14:08:45 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/60731c-0004eb@github.com>
+Subject: [bluez/bluez] fb642e: bap: Set auto_connect
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: fb642eced45f2048d4812a8cb86db487395b5694
+      https://github.com/bluez/bluez/commit/fb642eced45f2048d4812a8cb86db487395b5694
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-08-17 (Thu, 17 Aug 2023)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/audio/bap.c
 
-On Thu, 17 Aug 2023 14:26:06 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> The concept of probing not connected devices is already supported when
-> loading devices from storage, so drivers shall already be capabable of
-> handling such a thing as there are dedicated callbacks to indicate when
-> there is a new connection in the form of .accept callback.
-> 
-> [...]
+  Log Message:
+  -----------
+  bap: Set auto_connect
 
-Here is the summary with links:
-  - [BlueZ,v2] profile: Remove probe_on_discover
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=507ba12483c3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Patch 2a4cf63f2152 has reset the flag back to false when it shouldn't
+so this revert it to its original behavior.
 
 
+  Commit: 507ba12483c3b6504d7fc0abfbbe1b4a0c8fa006
+      https://github.com/bluez/bluez/commit/507ba12483c3b6504d7fc0abfbbe1b4a0c8fa006
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-08-17 (Thu, 17 Aug 2023)
+
+  Changed paths:
+    M src/device.c
+    M src/profile.h
+
+  Log Message:
+  -----------
+  profile: Remove probe_on_discover
+
+The concept of probing not connected devices is already supported when
+loading devices from storage, so drivers shall already be capabable of
+handling such a thing as there are dedicated callbacks to indicate when
+there is a new connection in the form of .accept callback.
+
+
+  Commit: cc7dbadb7236e5e9a7da5567f838b962a524df13
+      https://github.com/bluez/bluez/commit/cc7dbadb7236e5e9a7da5567f838b962a524df13
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-08-18 (Fri, 18 Aug 2023)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Don't attempt to set auto_connect for devices using RPAs
+
+Device using private address cannot be programmed into the auto_connect
+list without them being paired and its IRK being distributed otherwise
+there is no way to resolve it address and the command will fail.
+
+
+  Commit: 0004eb06d5d9a2f27521d9ce3b206d6f3f82c61e
+      https://github.com/bluez/bluez/commit/0004eb06d5d9a2f27521d9ce3b206d6f3f82c61e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-08-18 (Fri, 18 Aug 2023)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Restart temporary timer while connecting
+
+If the device is temporary restart its timer when attempt to connect to
+it since it can interrupt the connection attempt prematurely while it
+still scanning, etc.
+
+
+Compare: https://github.com/bluez/bluez/compare/60731cab5891...0004eb06d5d9
