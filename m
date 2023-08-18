@@ -2,119 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5D73C7113B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Aug 2023 04:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 124F0C71136
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Aug 2023 06:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357893AbjHREm0 (ORCPT
+        id S1356685AbjHRGU1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Aug 2023 00:42:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54624 "EHLO
+        Fri, 18 Aug 2023 02:20:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357880AbjHREmH (ORCPT
+        with ESMTP id S1352567AbjHRGUE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Aug 2023 00:42:07 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF3D3AAB
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 21:42:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1692333725; x=1723869725;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aVg6TsKGK0yXtEWSLHl7bBzeJlWYtFq7F2+1JAl4Y50=;
-  b=i47QCZi3ktFDwaKk4g6ns2R9QDYpMz2bscsUKhXteJsLcVdhcZRueVF+
-   pam+dXYnUbE1ZJ+d0Pf5yKxkn8crPobQVx4FuRC6rdyu77Ff6UiJHAdjm
-   xkssm4/om/pjgozWEAyM+xu8d1ABuO8yW2AIEmNPLrLW2UwpUalz31NIL
-   kGU2qWDOy57ILa1VNrIKs1Zk5VOSzAX7ppm05poK+HWfsyWlLetrVXIp3
-   QmZK0sM6SBAbaEW02vKkMjnQLZu+BNWIKrTku2t/QOeYIaAL+LGoW38FG
-   sn3eYSlpfBP3hleb2hY8qPWxMOhMucCUhQHd8aZpi9DaRTukVZstGnGXC
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="436925133"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="436925133"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2023 21:42:05 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10805"; a="849134009"
-X-IronPort-AV: E=Sophos;i="6.01,182,1684825200"; 
-   d="scan'208";a="849134009"
-Received: from castle-black.iind.intel.com ([10.66.185.63])
-  by fmsmga002.fm.intel.com with ESMTP; 17 Aug 2023 21:42:03 -0700
-From:   Lokendra Singh <lokendra.singh@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        luiz.von.dentz@intel.com, tedd.an@intel.com, kiran.k@intel.com,
-        Lokendra Singh <lokendra.singh@intel.com>
-Subject: [PATCH v2] monitor/intel: Add decoding of PPAG Enable command
-Date:   Fri, 18 Aug 2023 10:15:43 +0530
-Message-Id: <20230818044542.532700-1-lokendra.singh@intel.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 18 Aug 2023 02:20:04 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 324B035A6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 23:20:02 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1bdf98a6086so4845555ad.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 23:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692339601; x=1692944401;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKVmpxwCJY1NjQFR/nW+hEA/4849Zh4IYgMrvDyNSvM=;
+        b=C+7gfNrNHgPqy62u/3Xl/CS6xVinldHwxNPHI4DUcmxga4hyMTqsL9uHevRe4oZG59
+         d5GnOdmqS2xN8FUT1PqO0fTAhBlB4nKvwj5tdLrGTBRmahaFB7dOqgl3MZCDfRPtXNKN
+         QDArTmVkhaObpeBOSQNoMMUuxZt5DI49kSO/vIY+KWm+IrxTYWugcTC+NuQH9/ygMqZo
+         MpSVnhqu+Tl+f2mV9OU8sE6pw5SwWK7DBmBd88nwvNd1yvHFNjVXGicvcEvBP0rE3uI5
+         pmRAr2gc/ZtIDY3DoU7MoZpFEl/xI2LL32C9WQmlqgib6/jFa1IGhnqe9Uk3o7eoKtmM
+         Jo/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692339601; x=1692944401;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cKVmpxwCJY1NjQFR/nW+hEA/4849Zh4IYgMrvDyNSvM=;
+        b=SqIZqa5JeYDcmHouGxEbDZ7v7KdtfBIvPHZGX33UiYcPEda9BX/hGpa6YC91ljhsod
+         WihrV2wMtWnoFiEcdCRDpl7yFiTlm72gJdL3iLoWAwgd4xSsGzesLv4qBSvm7Zh3pheP
+         LH1ciQRn74kwB3zt04vyVPagF/0vpyuUnSuysl438TdzCqD9jyNjljDnpTMWprpsFClv
+         bz2z3k5fIE3awLiArxS660WiBV48IbjMMTEBRCWzUTVfbsADn4Q0oMSqIwZJxEUnWtI9
+         b+zGS5TrvVAirFTkfEqXRg3tVXpMvjsKLoQh5szRSkQzej3gbW/1R2PHyefCC8nZIt/V
+         pGqg==
+X-Gm-Message-State: AOJu0YzaJ0W120v8DbbWP7pJJv1llIBA67dGKxwLqGXKGLT8oUoxAWAf
+        HLe8eLv4Uriney7GrZf4qYvuqWDc27s=
+X-Google-Smtp-Source: AGHT+IEUB8qNr50wh/kGVD+UDIiXt5T4QJnqNd8Hl+waQ4/mPI4w5pctTglrtYUQJ6JW1LhrIENcDg==
+X-Received: by 2002:a17:902:f54d:b0:1ae:8892:7d27 with SMTP id h13-20020a170902f54d00b001ae88927d27mr1654764plf.42.1692339601322;
+        Thu, 17 Aug 2023 23:20:01 -0700 (PDT)
+Received: from [172.17.0.2] ([13.73.50.88])
+        by smtp.gmail.com with ESMTPSA id h10-20020a170902748a00b001b39ffff838sm843340pll.25.2023.08.17.23.20.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Aug 2023 23:20:00 -0700 (PDT)
+Message-ID: <64df0d90.170a0220.2350c.1cea@mx.google.com>
+Date:   Thu, 17 Aug 2023 23:20:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5048510887881706277=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, lokendra.singh@intel.com
+Subject: RE: [v2] monitor/intel: Add decoding of PPAG Enable command
+In-Reply-To: <20230818044542.532700-1-lokendra.singh@intel.com>
+References: <20230818044542.532700-1-lokendra.singh@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add decoding support for Intel PPAG Enable
-command.
+--===============5048510887881706277==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-btmon log:
-< HCI Command: Intel PPAG Enable (0x3f|0x020b) plen 4
-        Enable: 0x00000002 (China)
-> HCI Event: Command Complete (0x0e) plen 4
-      Intel PPAG Enable (0x3f|0x020b) ncmd 1
-        Status: Success (0x00)
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Lokendra Singh <lokendra.singh@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=777282
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.38 seconds
+GitLint                       PASS      0.25 seconds
+BuildEll                      PASS      31.66 seconds
+BluezMake                     PASS      972.48 seconds
+MakeCheck                     PASS      12.98 seconds
+MakeDistcheck                 PASS      179.92 seconds
+CheckValgrind                 PASS      295.03 seconds
+CheckSmatch                   PASS      392.40 seconds
+bluezmakeextell               PASS      119.40 seconds
+IncrementalBuild              PASS      792.17 seconds
+ScanBuild                     PASS      1209.03 seconds
+
+
+
 ---
- monitor/intel.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/intel.c b/monitor/intel.c
-index bdb95b7a79c0..0191987d45fb 100644
---- a/monitor/intel.c
-+++ b/monitor/intel.c
-@@ -712,6 +712,29 @@ static void read_supported_features_rsp(uint16_t index, const void *data,
- 	packet_hexdump(data + 3, size - 3);
- }
- 
-+static void ppag_enable(uint16_t index, const void *data, uint8_t size)
-+{
-+	uint32_t enable = get_le32(data);
-+	char *ppag_enable_flags;
-+
-+	switch (enable) {
-+	case 0x01:
-+		ppag_enable_flags = "EU";
-+		break;
-+	case 0x02:
-+		ppag_enable_flags = "China";
-+		break;
-+	case 0x03:
-+		ppag_enable_flags = "EU and China";
-+		break;
-+	default:
-+		ppag_enable_flags = "Unknown";
-+		break;
-+	}
-+
-+	print_field("Enable: %s (0x%8.8x)", ppag_enable_flags, enable);
-+}
-+
- static const struct vendor_ocf vendor_ocf_table[] = {
- 	{ 0x001, "Reset",
- 			reset_cmd, 8, true,
-@@ -777,7 +800,9 @@ static const struct vendor_ocf vendor_ocf_table[] = {
- 	{ 0x0a6, "Read Supported Features",
- 			read_supported_features_cmd, 1, true,
- 			read_supported_features_rsp, 19, true },
--
-+	{ 0x20b, "PPAG Enable",
-+			ppag_enable, 4, true,
-+			status_rsp, 1, true },
- 	{ }
- };
- 
--- 
-2.25.1
 
+--===============5048510887881706277==--
