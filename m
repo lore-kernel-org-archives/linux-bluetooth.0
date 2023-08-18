@@ -2,101 +2,77 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A880C678DF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Aug 2023 00:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D958C71136
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Aug 2023 04:41:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356720AbjHRAgV (ORCPT
+        id S1357866AbjHREkO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Aug 2023 20:36:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57326 "EHLO
+        Fri, 18 Aug 2023 00:40:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356698AbjHRAf5 (ORCPT
+        with ESMTP id S1357859AbjHREjh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Aug 2023 20:35:57 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5961A2D5F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 17:35:56 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id 5614622812f47-3a76cbd4bbfso237484b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 17:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692318955; x=1692923755;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BU5BcQJvibb2uMkmikrRHAku6nVgwZFfk7tkjMtkwWs=;
-        b=sGO8dSSo4sywqqRj/K7R3vc6NarcZCoXvbD9yOro5tTZaqeNo4er2GKO2yvP7Gffx4
-         iBXeR927xWO3Zoe0nol4h0EpKCH9fyXJwaCC9c3iPHrM22fH4NyLK7Pg2kIXpKHjcifg
-         6mBBVrjgFno2NUPSHgilkO3NgqJy6D15p/68x15psitzk7e4tTdUlM06UaJzc4r+pZP8
-         iJ8TteWpeN7kho9Yb7pDcnkd7ITPNwUfEDG/lNVxSZJUgQPq95rL1oVMSgmFZUFSZLyX
-         pXlliCtor0rcAQP4v2d6WcF/woDGLx5J/R2ecgh9GGOwbEvUrVQijdHu7GW4HS92jMlR
-         c2QQ==
+        Fri, 18 Aug 2023 00:39:37 -0400
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE6093AAB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 21:39:36 -0700 (PDT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1bc49d0cb4aso7100755ad.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Aug 2023 21:39:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692318955; x=1692923755;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BU5BcQJvibb2uMkmikrRHAku6nVgwZFfk7tkjMtkwWs=;
-        b=LaJnEGD0+zVQKFkSM/BLvbPnAd9U5dg1nrC719W1EB40tL/q2ONmvgUPTAy3LkQA2j
-         MCQrjpAWonfedX0Xa5PfpFiRr6tH3ICyYKa4uALwQhntNUM1h9OyhaMMEK/7zn4QG05G
-         CmsB1t7gcCHQv/IurBNTtenMwtlF5pqw2K+e6lX6e/Fm3BNKFFG1gn8jct9XWpNxWV8v
-         hRoeg6I94PACk0/EyBO6Dazv6ZA0JtIq/+W2fgVpwfMd1Yp9n5sEnvfHaCNj8fsHvLAV
-         Z1nkXtgT8iay5zElD0cWK9UoA6Yx2Mg6j0CBjQiBbzBRJEMVSuRbh/aeamsesIun7THN
-         nJiA==
-X-Gm-Message-State: AOJu0YwGor8sRwyXkEoh3nj+H+TTF01L6zBJDUTS/ejKcD7fCLv2Nbyb
-        TgM+eVVMbR72EFYNZyNsK7WwwTLi5Gc=
-X-Google-Smtp-Source: AGHT+IEfK+zruB0mhhrimanYe8+sztJxsICetWYQt8FssdeVaypHq5FXk2/gQ1MczsllbOj7b2uIQg==
-X-Received: by 2002:a05:6808:2018:b0:3a7:6532:75f3 with SMTP id q24-20020a056808201800b003a7653275f3mr1483564oiw.46.1692318955492;
-        Thu, 17 Aug 2023 17:35:55 -0700 (PDT)
-Received: from [172.17.0.2] ([23.98.136.33])
-        by smtp.gmail.com with ESMTPSA id bj38-20020a05680819a600b003a74933a1e2sm384762oib.46.2023.08.17.17.35.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Aug 2023 17:35:55 -0700 (PDT)
-Message-ID: <64debceb.050a0220.76394.2a0a@mx.google.com>
-Date:   Thu, 17 Aug 2023 17:35:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8140197710184001640=="
+        d=1e100.net; s=20221208; t=1692333576; x=1692938376;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dvFwXjLMYeqdlXwre0HE3uWwxv+R86ki6i68P3Vs0+0=;
+        b=BnRjZPpg3h9KBNAJs7krvhcuMgb8M4AZlQFnjQwwNaJ8XnN4/E1ji/2G0Ptt+UO8RJ
+         xQphr1DiFD8gVD+7BOwmq9nZcTIZAlQ1i1Aza6qHBslvx4rZ/dG+PDcAQoLx7Hl0m8vh
+         TDz8aEIE/BiIEYL9qzy1a70jilFP6JyGEWB4P3HUlGC5E74gnYrjeZKsuo39cC/iDOk2
+         jULJJkxtLQyeUN31HTFYK23nqwCHwS0YDBn5BXxjee2Org47fHf8JvyfNtwy/HNY6TKk
+         tWr4q+/oOwKVPa1nHTCdeyCReXEH5gBqTjiq4pgMpI1q0yjZEyRF/xtl0HUhi/1U88j1
+         V+Zw==
+X-Gm-Message-State: AOJu0YwRPlanfrpeC0q1yF0Uc1kX7M/lU3PboLiSjqtKIDSvMH6OXIqt
+        sPrOwjtFTkO/p8ilK60HlNLd2R3HDkumdR/dAhxyyL0sDJig
+X-Google-Smtp-Source: AGHT+IEOWZ9TR7uxnnrr5o2vN1zMwhChrSWkI3uvdoJ384ju6Mbmly2riQQtj6/6k2K4DgTVbAMNubudY8qv1xdOJsYBGe16jePd
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] device: Don't attempt to set auto_connect for devices using RPAs
-In-Reply-To: <20230817224103.3042055-1-luiz.dentz@gmail.com>
-References: <20230817224103.3042055-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a17:902:da92:b0:1b9:e8e5:b0a4 with SMTP id
+ j18-20020a170902da9200b001b9e8e5b0a4mr573998plx.8.1692333576338; Thu, 17 Aug
+ 2023 21:39:36 -0700 (PDT)
+Date:   Thu, 17 Aug 2023 21:39:36 -0700
+In-Reply-To: <00000000000013b93805fbbadc50@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a8c57a06032b1dd2@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in sco_chan_del
+From:   syzbot <syzbot+cf54c1da6574b6c1b049@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, lrh2000@pku.edu.cn,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        pav@iki.fi, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8140197710184001640==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+syzbot has bisected this issue to:
 
-This is automated email and please do not reply to this email!
+commit 45c37c4e9c9aab5bb1cf5778d8e5ebd9f9ad820a
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Aug 9 23:49:33 2023 +0000
 
-Dear submitter,
+    Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=777197
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1331e265a80000
+start commit:   47762f086974 Add linux-next specific files for 20230817
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=10b1e265a80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1731e265a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ed03cf326b3ef94c
+dashboard link: https://syzkaller.appspot.com/bug?extid=cf54c1da6574b6c1b049
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1125bc65a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14ce8f03a80000
 
----Test result---
+Reported-by: syzbot+cf54c1da6574b6c1b049@syzkaller.appspotmail.com
+Fixes: 45c37c4e9c9a ("Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync")
 
-Test Summary:
-CheckPatch                    PASS      0.95 seconds
-GitLint                       PASS      0.63 seconds
-BuildEll                      PASS      32.45 seconds
-BluezMake                     PASS      1002.94 seconds
-MakeCheck                     PASS      13.71 seconds
-MakeDistcheck                 PASS      186.14 seconds
-CheckValgrind                 PASS      305.56 seconds
-CheckSmatch                   PASS      405.99 seconds
-bluezmakeextell               PASS      123.37 seconds
-IncrementalBuild              PASS      1634.12 seconds
-ScanBuild                     PASS      1250.37 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8140197710184001640==--
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
