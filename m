@@ -2,101 +2,139 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AC7EE49A5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Aug 2023 13:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E32EE49A5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Aug 2023 13:33:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232805AbjHSNdY (ORCPT
+        id S232812AbjHSNdd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Aug 2023 09:33:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51838 "EHLO
+        Sat, 19 Aug 2023 09:33:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbjHSNdY (ORCPT
+        with ESMTP id S229436AbjHSNdc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Aug 2023 09:33:24 -0400
+        Sat, 19 Aug 2023 09:33:32 -0400
 Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36113F58C
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 974031A2A8
         for <linux-bluetooth@vger.kernel.org>; Sat, 19 Aug 2023 06:31:34 -0700 (PDT)
 Received: from monolith.lan (91-152-120-101.elisa-laajakaista.fi [91.152.120.101])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by meesny.iki.fi (Postfix) with ESMTPSA id 4RSflf4ktXzyPG;
-        Sat, 19 Aug 2023 16:31:26 +0300 (EEST)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4RSflg30FMzyfN;
+        Sat, 19 Aug 2023 16:31:27 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-        t=1692451886;
+        t=1692451887;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=QFzl1Q1pyyM4DuuxOqyyoJaMaJEA7LV10cSwcwZSSf0=;
-        b=YWVrFMnMmF2OKUkfPRAvFyqI80ucjHn0ZIxbpipk6xGa0NFm2rsmd9irEjV3n6l/yeSjZE
-        ocfGyICULHqXv4JvPVWUtHakGpNMpI4cmXeW+4fP6cP1oGBWsPkNjrYb/vUR3WMH3VIswk
-        EYhG3N32ekOi0WlDtNPP+U0oNCKiWvI=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2CeyuORkRww/CWbLS26iE+78V82b5y9/EStIhVviNYA=;
+        b=Z5NGIEHowI8I2Bm48J5yOVN4+3uEiGKi28rdzEYxIHB3+OWlHqsX27hDcVY2x6nvRZkyq/
+        rwEH54lPZZbCN3CZuCWQELFA8RPN0SDbH/kC+et8glLdBrCV8QYbd8EqtjuLaFcpK3JMFU
+        dnjTf3GwndNL1sDaI0ddjLlVMFAcMpg=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-        s=meesny; t=1692451886;
+        s=meesny; t=1692451887;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=QFzl1Q1pyyM4DuuxOqyyoJaMaJEA7LV10cSwcwZSSf0=;
-        b=ydeKb607BviIae4m6cBOvbzuSgY5Rmb/niwHK7F9WiKdjqfY7r7hRRJLPlMFchPMdEvOGS
-        WP2vpuE4QN0C/Sz5pTikGH97sbqaM7JtgauzaGx8CcrJ00D6gUcTsNoxz3CNaqWUSw1Pcz
-        boBv+KVcU1ygxI1Rs7sYit0Tc5XTrlk=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2CeyuORkRww/CWbLS26iE+78V82b5y9/EStIhVviNYA=;
+        b=y2cvH4Uz2DbRMVrgQf95Fq1g3jexyLhcX7FNZqCSMojPmVjoPjEVCH4/PiBvjy3QcyHzcL
+        z8/gPZSs51ZiwndB9iOEssSLRnytoCI5hSocygdo4BOpwOpJWbUrdD+y0CT7+V/xlndmt1
+        yGtcznSb6/ifE0xf7VaWLsIhHBnNgIg=
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1692451886; a=rsa-sha256; cv=none;
-        b=PlNDE+EmU5wN+ZmX74QDZrrnFhrdcj962fDwNh5Wrl3bMSdOH+w72AnlzdY96gcL0mz46d
-        60kAwWbpFdpE6vcmcjXOnD8EgiFm4Fx2GhPwZMvzqOMheADj+ga+6JlmrkbWaQDt1NbOzi
-        S57Q2IG2d+ZGLhTqFrz9hzFVZNQjC6k=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1692451887; a=rsa-sha256; cv=none;
+        b=sS7pkbBeh/gwfiHjQPUt9/AuSIVGJvE3qlBndACbNXWAikj3z/cjCqDobZxAl3m5SsKYT3
+        B0Vk1FO/mUmPRzs6o1NO2YXkM5ZkVuyzcpEFzUq5SyzRDAFvAEQsu42CVtiPKO3SPEOd1O
+        Lr+qe6bcPNWhtFZQZ5ZDd8kUVCB/06w=
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/4] vhci: Add function to pause processing input from vhci
-Date:   Sat, 19 Aug 2023 16:31:20 +0300
-Message-ID: <feaee15ebafa76155f6c1a91755d6d5ba054d451.1692451184.git.pav@iki.fi>
+Subject: [PATCH BlueZ 4/4] iso-tester: add test for ACL disconnect before ISO created
+Date:   Sat, 19 Aug 2023 16:31:23 +0300
+Message-ID: <444c48235fb02ac68871236ce669fd02b4a4736d.1692451184.git.pav@iki.fi>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <feaee15ebafa76155f6c1a91755d6d5ba054d451.1692451184.git.pav@iki.fi>
+References: <feaee15ebafa76155f6c1a91755d6d5ba054d451.1692451184.git.pav@iki.fi>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add function to pause (temporarily) reading data from vhci.  This can be
-used to synchronously pause handling of btdev commands from the kernel.
----
- emulator/vhci.c | 9 +++++++++
- emulator/vhci.h | 1 +
- 2 files changed, 10 insertions(+)
+Simulate ACL being disconnected when connecting ISO, before LE Create
+CIS got sent.  The kernel shall indicate connection failure for the ISO
+socket immediately when the ACL is gone, since connecting the ISO can no
+longer proceed.
 
-diff --git a/emulator/vhci.c b/emulator/vhci.c
-index ecf1db3c7..c6a5caa5e 100644
---- a/emulator/vhci.c
-+++ b/emulator/vhci.c
-@@ -178,6 +178,15 @@ void vhci_close(struct vhci *vhci)
- 	vhci_destroy(vhci);
+ISO Connect ACL Disconnect - Failure
+---
+
+Notes:
+    Current bluetooth-next/master kernel fails this.
+
+ tools/iso-tester.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
+
+diff --git a/tools/iso-tester.c b/tools/iso-tester.c
+index b1a2afba0..48c8ab52a 100644
+--- a/tools/iso-tester.c
++++ b/tools/iso-tester.c
+@@ -2628,6 +2628,40 @@ static void test_connect_suspend(const void *test_data)
+ 	trigger_force_suspend((void *)test_data);
  }
  
-+bool vhci_pause_input(struct vhci *vhci, bool paused)
++static bool hook_acl_disc(const void *msg, uint16_t len, void *user_data)
 +{
-+	if (paused)
-+		return io_set_read_handler(vhci->io, NULL, NULL, NULL);
-+	else
-+		return io_set_read_handler(vhci->io, vhci_read_callback, vhci,
-+									NULL);
++	const uint8_t *msg_data = msg;
++	const struct bt_hci_evt_le_enhanced_conn_complete *ev;
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost;
++
++	if (msg_data[0] != BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE)
++		return true;
++
++	ev = (void *) &msg_data[1];
++
++	tester_print("Disconnect ACL");
++
++	bthost = hciemu_client_get_host(data->hciemu);
++	bthost_hci_disconnect(bthost, le16_to_cpu(ev->handle), 0x13);
++
++	hciemu_flush_client_events(data->hciemu);
++
++	return true;
 +}
 +
- struct btdev *vhci_get_btdev(struct vhci *vhci)
++static void test_connect_acl_disc(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++
++	/* ACL disconnected before ISO is created */
++	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_EVT,
++					BT_HCI_EVT_LE_META_EVENT,
++					hook_acl_disc, NULL);
++
++	test_connect(test_data);
++}
++
+ static void test_bcast(const void *test_data)
  {
- 	if (!vhci)
-diff --git a/emulator/vhci.h b/emulator/vhci.h
-index 68eae4c4a..12c4b55a0 100644
---- a/emulator/vhci.h
-+++ b/emulator/vhci.h
-@@ -31,3 +31,4 @@ int vhci_set_emu_opcode(struct vhci *vhci, uint16_t opcode);
- int vhci_set_force_static_address(struct vhci *vhci, bool enable);
- int vhci_force_devcd(struct vhci *vhci, const void *data, size_t len);
- int vhci_read_devcd(struct vhci *vhci, void *buf, size_t size);
-+bool vhci_pause_input(struct vhci *vhci, bool paused);
+ 	struct test_data *data = tester_get_data();
+@@ -2850,6 +2884,10 @@ int main(int argc, char *argv[])
+ 							setup_powered,
+ 							test_connect2);
+ 
++	test_iso("ISO Connect ACL Disconnect - Failure", &connect_suspend,
++							setup_powered,
++							test_connect_acl_disc);
++
+ 	test_iso("ISO Defer Send - Success", &connect_16_2_1_defer_send,
+ 							setup_powered,
+ 							test_connect);
 -- 
 2.41.0
 
