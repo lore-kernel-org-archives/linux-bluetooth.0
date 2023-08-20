@@ -2,115 +2,363 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6CFAEE4993
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Aug 2023 15:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F07DEE4993
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Aug 2023 11:52:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233750AbjHSP4Z (ORCPT
+        id S230284AbjHTLwT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Aug 2023 11:56:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45018 "EHLO
+        Sun, 20 Aug 2023 07:52:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231128AbjHSP4Z (ORCPT
+        with ESMTP id S230201AbjHTLwS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Aug 2023 11:56:25 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59DC61D755
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Aug 2023 08:56:23 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id af79cd13be357-76d77d2ee36so127404085a.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Aug 2023 08:56:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692460582; x=1693065382;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=dnPjw+D1i+ZWBYACttyIfmea+/R1PEQJ9gDeztdLpKk=;
-        b=ULanuiH2Hmwv3lA9nuswih2aXjgJEiJPvVCVhZUa249VK0rm4bEtjmJZ/Jkyc38l0s
-         AH9p/qurCXuz+LiwHXdQqQeeAUGpBob41VKq58e9Wi/N6lFwrcWhVT4tAV5CfiyrZC3x
-         GMneprJoJN8ox3ze4JC9LZRRSnm0dsYP8eh2TwLoYNw9dB+WiI6goZKE8rxs5kUIrzok
-         PE/P6Tz3o4sazpVWe3j/7xr2Z8thhjXqC5eevMBHb7EyVBVjLt/CAEBSGQvzHyr96GEm
-         jBHBlgEbnemKZAhA4pvo11wO1Nf6kbkAIZuF0h5k44MZqBch4sRvZ+AXz9m93BJBCg/T
-         BfFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692460582; x=1693065382;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dnPjw+D1i+ZWBYACttyIfmea+/R1PEQJ9gDeztdLpKk=;
-        b=DkRfpThXN12t0mp9kbMhwjBFYDGtGTvvGz1/br2VbrsRgwIfejYUJTh2hw/WZtWYkm
-         ynV2vHY+fPZh1cMLH7RkQsT/nv/0a8xPHbVL9src9jWBetHsFdTKX+47UipKAhdsOM+g
-         3xSnM/MgYya9jtcVY2WtHb/PV+ziP/PDnJ8cBKNPvguskRSivCA+//WNBAJoaNoM8sLK
-         pWVzuE65GVQ8WnB8URG0dMDJD0ldgWpejlhzOTeS0bECcQrdtRRe7wP1yYxgQqC3ndi1
-         tR5IBNuXAibzunE+uRvHAr0gG4AcTiyZDI1x1v3UGUr9WKifYhodC4G8WwOFqHTeP1J/
-         mBow==
-X-Gm-Message-State: AOJu0YzEGQ2ax+sXSJguQlIrErvYFSTlzT76NWPdblelATZMtaANJh5f
-        1QIorCEQHlgrPh5Mtne86VDkqWa5c1HVrg==
-X-Google-Smtp-Source: AGHT+IHG4fitZfD1umRBncYXvdzKD4HvWjUWE9LKxPIbVJjvihpxOQQ2WF+QqnuZ9Hi+w94RfFoZmg==
-X-Received: by 2002:a05:620a:4084:b0:76c:bfeb:97d0 with SMTP id f4-20020a05620a408400b0076cbfeb97d0mr3198480qko.58.1692460582213;
-        Sat, 19 Aug 2023 08:56:22 -0700 (PDT)
-Received: from [172.17.0.2] ([52.240.53.67])
-        by smtp.gmail.com with ESMTPSA id u21-20020a05620a121500b0076da0f81baesm67922qkj.35.2023.08.19.08.56.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 19 Aug 2023 08:56:21 -0700 (PDT)
-Message-ID: <64e0e625.050a0220.a8640.03e8@mx.google.com>
-Date:   Sat, 19 Aug 2023 08:56:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1821578002973934830=="
+        Sun, 20 Aug 2023 07:52:18 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C072D67
+        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Aug 2023 04:47:13 -0700 (PDT)
+Received: from monolith.lan (unknown [185.77.218.2])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 4RTDNt5t3xzyY4;
+        Sun, 20 Aug 2023 14:47:10 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1692532031;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=YsGh9bSy+MtxORr2/lhtkdeQLYhyYsW1MmqLSEikG+8=;
+        b=U4+d/PBJA2WfuqCTfqlBfSYsgt8GLkownzbX4MZW/qlC7IFQCthvRZH9nebVrsEw14Bo8H
+        X16vS6Uw1mJFzNTKtMJSay2RNdXMiXQ1cvzNMb0OF2AU2JRtBlsXg2OQIZ2wiR6uIMqeLy
+        jor6BwvZjJTB/A/1WsYsWpKnNSMLonU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1692532031;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=YsGh9bSy+MtxORr2/lhtkdeQLYhyYsW1MmqLSEikG+8=;
+        b=OaqNP3ZQN0wCT5vShgObxgdOa5bTgcyte7dEdrhwZnnEIENRZIUOEHgtpU4JdbZunROqju
+        pgVRRzUbfM4KR1I6z6BQbIjY35i1OZGUDTMFcmgUeL2XYcUMXCzjPs+t9cCzeotpiXPEBl
+        LIP++szpyLeVHkBCRUhTv2OwA3D5xRo=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1692532031; a=rsa-sha256; cv=none;
+        b=EUSd3Gpi3qw4BYqjo5BfRDajbq+GRJHpkGwJkuFmhmLvpqnlnadwH4LH3AfTZ+4wHCmpWr
+        rRnYZE/s7LSi7uzM6wsBQ3sz3rHkegvBrzYqUx00f1Ms1OMv9Bcd0cz6l8gqIxNSl6/xCy
+        Pt6Ee+B0gFT/hzZLF0QyEHQ3HVHTYac=
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ v2] adapter: wait for kernel exp features in adapter initialization
+Date:   Sun, 20 Aug 2023 14:47:06 +0300
+Message-ID: <00052eaeb78774fd7be365805203cb0c8b189243.1692531437.git.pav@iki.fi>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,1/4] vhci: Add function to pause processing input from vhci
-In-Reply-To: <feaee15ebafa76155f6c1a91755d6d5ba054d451.1692451184.git.pav@iki.fi>
-References: <feaee15ebafa76155f6c1a91755d6d5ba054d451.1692451184.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1821578002973934830==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Things like BAP depend on ISO sockets being enabled in kernel.  It is
+possible the MGMT commands enabling experimental kernel features do not
+complete, before BAP etc. initialization and probing starts, in which
+case BAP will be mostly nonfunctional.
 
-This is automated email and please do not reply to this email!
+This was observed to occur always when running BlueZ in a Fedora VM,
+requiring bluetoothd restart after every boot for BAP to work,
+log containing lines in the order:
 
-Dear submitter,
+bluetoothd[981]: src/adapter.c:read_exp_features_complete() 6fbaf188-05e0-496a-9885-d6ddfdb4e03e flags 0 action 1
+bluetoothd[981]: src/adapter.c:read_info_complete() index 0 status 0x00
+bluetoothd[981]: profiles/audio/bap.c:bap_probe() BAP requires ISO Socket which is not enabled
+bluetoothd[981]: src/adapter.c:iso_socket_complete() ISO Socket successfully set
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=777635
+Fix by waiting in adapter initialization that all MGMT exp feature
+requests are done, before proceeding to read adapter information.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.53 seconds
-GitLint                       FAIL      1.59 seconds
-BuildEll                      PASS      27.66 seconds
-BluezMake                     PASS      992.12 seconds
-MakeCheck                     PASS      12.10 seconds
-MakeDistcheck                 PASS      158.27 seconds
-CheckValgrind                 PASS      258.93 seconds
-CheckSmatch                   WARNING   345.63 seconds
-bluezmakeextell               PASS      104.86 seconds
-IncrementalBuild              PASS      3340.97 seconds
-ScanBuild                     PASS      1062.42 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,3/4] sco-tester: add test for ACL disconnect before SCO established
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B1 Line exceeds max length (86>80): "Link: https://lore.kernel.org/linux-bluetooth/00000000000013b93805fbbadc50@google.com/"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/sco-tester.c: note: in included file:./lib/bluetooth.h:216:15: warning: array of flexible structures./lib/bluetooth.h:221:31: warning: array of flexible structures
-
-
+Also fix canceling MGMT_OP_SET_EXP_FEATURE for ISO sockets.
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2: use queue to store pending mgmt set exp request ids
 
---===============1821578002973934830==--
+ src/adapter.c | 135 +++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 107 insertions(+), 28 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 004062e7c..324b13e56 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -239,6 +239,11 @@ struct btd_adapter_pin_cb_iter {
+ 	/* When the iterator reaches the end, it is NULL and attempt is 0 */
+ };
+ 
++struct exp_pending {
++	struct btd_adapter *adapter;
++	unsigned int id;
++};
++
+ enum {
+ 	ADAPTER_POWER_STATE_OFF,
+ 	ADAPTER_POWER_STATE_ON,
+@@ -331,6 +336,7 @@ struct btd_adapter {
+ 
+ 	bool is_default;		/* true if adapter is default one */
+ 
++	struct queue *exp_pending;
+ 	struct queue *exps;
+ };
+ 
+@@ -5754,6 +5760,16 @@ static void remove_discovery_list(struct btd_adapter *adapter)
+ 	adapter->discovery_list = NULL;
+ }
+ 
++static void cancel_exp_pending(void *data)
++{
++	struct exp_pending *pending = data;
++	struct btd_adapter *adapter = pending->adapter;
++
++	pending->adapter = NULL;
++	mgmt_cancel(adapter->mgmt, pending->id);
++	g_free(pending);
++}
++
+ static void adapter_free(gpointer user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
+@@ -5782,6 +5798,8 @@ static void adapter_free(gpointer user_data)
+ 	g_queue_free(adapter->auths);
+ 	queue_destroy(adapter->exps, NULL);
+ 
++	queue_destroy(adapter->exp_pending, cancel_exp_pending);
++
+ 	/*
+ 	 * Unregister all handlers for this specific index since
+ 	 * the adapter bound to them is no longer valid.
+@@ -6848,6 +6866,7 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
+ 
+ 	adapter->auths = g_queue_new();
+ 	adapter->exps = queue_new();
++	adapter->exp_pending = queue_new();
+ 
+ 	return btd_adapter_ref(adapter);
+ }
+@@ -6895,6 +6914,8 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 
+ 	g_slist_free(adapter->msd_callbacks);
+ 	adapter->msd_callbacks = NULL;
++
++	queue_remove_all(adapter->exp_pending, NULL, NULL, cancel_exp_pending);
+ }
+ 
+ const char *adapter_get_path(struct btd_adapter *adapter)
+@@ -9824,10 +9845,38 @@ static bool set_blocked_keys(struct btd_adapter *adapter)
+ 	.func = _func, \
+ }
+ 
++static void exp_complete(void *user_data);
++
++static bool exp_mgmt_send(struct btd_adapter *adapter, uint16_t opcode,
++			uint16_t index, uint16_t length, const void *param,
++			mgmt_request_func_t callback)
++{
++	struct exp_pending *pending;
++
++	pending = g_new0(struct exp_pending, 1);
++	pending->adapter = adapter;
++
++	if (!queue_push_tail(adapter->exp_pending, pending)) {
++		g_free(pending);
++		return false;
++	}
++
++	pending->id = mgmt_send(adapter->mgmt, opcode, index, length, param,
++					callback, pending, exp_complete);
++	if (!pending->id) {
++		queue_remove(adapter->exp_pending, pending);
++		g_free(pending);
++		return false;
++	}
++
++	return true;
++}
++
+ static void set_exp_debug_complete(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+-	struct btd_adapter *adapter = user_data;
++	struct exp_pending *pending = user_data;
++	struct btd_adapter *adapter = pending->adapter;
+ 	uint8_t action;
+ 
+ 	if (status != 0) {
+@@ -9852,9 +9901,9 @@ static void exp_debug_func(struct btd_adapter *adapter, uint8_t action)
+ 	memcpy(cp.uuid, debug_uuid.val, 16);
+ 	cp.action = action;
+ 
+-	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
++	if (exp_mgmt_send(adapter, MGMT_OP_SET_EXP_FEATURE,
+ 			adapter->dev_id, sizeof(cp), &cp,
+-			set_exp_debug_complete, adapter, NULL) > 0)
++			set_exp_debug_complete))
+ 		return;
+ 
+ 	btd_error(adapter->dev_id, "Failed to set exp debug");
+@@ -9877,7 +9926,8 @@ static void quality_report_func(struct btd_adapter *adapter, uint8_t action)
+ static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+-	struct btd_adapter *adapter = user_data;
++	struct exp_pending *pending = user_data;
++	struct btd_adapter *adapter = pending->adapter;
+ 	uint8_t action;
+ 
+ 	if (status != 0) {
+@@ -9902,9 +9952,9 @@ static void rpa_resolution_func(struct btd_adapter *adapter, uint8_t action)
+ 	memcpy(cp.uuid, rpa_resolution_uuid.val, 16);
+ 	cp.action = action;
+ 
+-	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
++	if (exp_mgmt_send(adapter, MGMT_OP_SET_EXP_FEATURE,
+ 			adapter->dev_id, sizeof(cp), &cp,
+-			set_rpa_resolution_complete, adapter, NULL) > 0)
++			set_rpa_resolution_complete))
+ 		return;
+ 
+ 	btd_error(adapter->dev_id, "Failed to set RPA Resolution");
+@@ -9913,7 +9963,8 @@ static void rpa_resolution_func(struct btd_adapter *adapter, uint8_t action)
+ static void codec_offload_complete(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+-	struct btd_adapter *adapter = user_data;
++	struct exp_pending *pending = user_data;
++	struct btd_adapter *adapter = pending->adapter;
+ 	uint8_t action;
+ 
+ 	if (status != 0) {
+@@ -9938,9 +9989,9 @@ static void codec_offload_func(struct btd_adapter *adapter, uint8_t action)
+ 	memcpy(cp.uuid, codec_offload_uuid.val, 16);
+ 	cp.action = action;
+ 
+-	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
++	if (exp_mgmt_send(adapter, MGMT_OP_SET_EXP_FEATURE,
+ 			adapter->dev_id, sizeof(cp), &cp,
+-			codec_offload_complete, adapter, NULL) > 0)
++			codec_offload_complete))
+ 		return;
+ 
+ 	btd_error(adapter->dev_id, "Failed to set Codec Offload");
+@@ -9949,7 +10000,8 @@ static void codec_offload_func(struct btd_adapter *adapter, uint8_t action)
+ static void iso_socket_complete(uint8_t status, uint16_t len,
+ 				const void *param, void *user_data)
+ {
+-	struct btd_adapter *adapter = user_data;
++	struct exp_pending *pending = user_data;
++	struct btd_adapter *adapter = pending->adapter;
+ 	uint8_t action;
+ 
+ 	if (status != 0) {
+@@ -9974,9 +10026,9 @@ static void iso_socket_func(struct btd_adapter *adapter, uint8_t action)
+ 	memcpy(cp.uuid, iso_socket_uuid.val, 16);
+ 	cp.action = action;
+ 
+-	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
++	if (exp_mgmt_send(adapter, MGMT_OP_SET_EXP_FEATURE,
+ 			MGMT_INDEX_NONE, sizeof(cp), &cp,
+-			iso_socket_complete, adapter, NULL) > 0)
++			iso_socket_complete))
+ 		return;
+ 
+ 	btd_error(adapter->dev_id, "Failed to set ISO Socket");
+@@ -10001,7 +10053,8 @@ static const struct exp_feat {
+ static void read_exp_features_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+-	struct btd_adapter *adapter = user_data;
++	struct exp_pending *pending = user_data;
++	struct btd_adapter *adapter = pending->adapter;
+ 	const struct mgmt_rp_read_exp_features_info *rp = param;
+ 	size_t feature_count = 0;
+ 	size_t i = 0;
+@@ -10061,9 +10114,8 @@ static void read_exp_features_complete(uint8_t status, uint16_t length,
+ 
+ static void read_exp_features(struct btd_adapter *adapter)
+ {
+-	if (mgmt_send(adapter->mgmt, MGMT_OP_READ_EXP_FEATURES_INFO,
+-			adapter->dev_id, 0, NULL, read_exp_features_complete,
+-			adapter, NULL) > 0)
++	if (exp_mgmt_send(adapter, MGMT_OP_READ_EXP_FEATURES_INFO,
++			adapter->dev_id, 0, NULL, read_exp_features_complete))
+ 		return;
+ 
+ 	btd_error(adapter->dev_id, "Failed to read exp features info");
+@@ -10389,6 +10441,43 @@ static void reset_adv_monitors(uint16_t index)
+ 	error("Failed to reset Adv Monitors");
+ }
+ 
++static void read_info(struct btd_adapter *adapter)
++{
++	DBG("sending read info command for index %u", adapter->dev_id);
++
++	if (mgmt_send(mgmt_primary, MGMT_OP_READ_INFO, adapter->dev_id, 0, NULL,
++					read_info_complete, adapter, NULL) > 0)
++		return;
++
++	btd_error(adapter->dev_id,
++			"Failed to read controller info for index %u",
++			adapter->dev_id);
++
++	adapter_list = g_list_remove(adapter_list, adapter);
++
++	btd_adapter_unref(adapter);
++}
++
++static void exp_complete(void *user_data)
++{
++	struct exp_pending *pending = user_data;
++	struct btd_adapter *adapter = pending->adapter;
++
++	if (!adapter)
++		return;  /* canceled */
++
++	queue_remove(adapter->exp_pending, pending);
++	g_free(pending);
++
++	if (queue_isempty(adapter->exp_pending)) {
++		read_info(adapter);
++		return;
++	}
++
++	DBG("index %u has %u pending MGMT EXP requests", adapter->dev_id,
++					queue_length(adapter->exp_pending));
++}
++
+ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+@@ -10435,18 +10524,8 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 	 */
+ 	adapter_list = g_list_append(adapter_list, adapter);
+ 
+-	DBG("sending read info command for index %u", index);
+-
+-	if (mgmt_send(mgmt_primary, MGMT_OP_READ_INFO, index, 0, NULL,
+-					read_info_complete, adapter, NULL) > 0)
+-		return;
+-
+-	btd_error(adapter->dev_id,
+-			"Failed to read controller info for index %u", index);
+-
+-	adapter_list = g_list_remove(adapter_list, adapter);
+-
+-	btd_adapter_unref(adapter);
++	if (queue_isempty(adapter->exp_pending))
++		read_info(adapter);
+ }
+ 
+ static void index_removed(uint16_t index, uint16_t length, const void *param,
+-- 
+2.41.0
+
