@@ -2,54 +2,54 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2E5EE49A6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 15:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72540EE49AA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 15:51:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236341AbjHUPvl (ORCPT
+        id S236462AbjHUPvm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Aug 2023 11:51:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48752 "EHLO
+        Mon, 21 Aug 2023 11:51:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236462AbjHUPvj (ORCPT
+        with ESMTP id S236237AbjHUPvl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Aug 2023 11:51:39 -0400
+        Mon, 21 Aug 2023 11:51:41 -0400
 Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2064.outbound.protection.outlook.com [40.107.241.64])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A41A1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 08:51:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0F9F1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 08:51:38 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MoDnvOmwms3OlSOzjYIJys3U7H/RhfiP06YaPlK02+WUlPy9yuscO5vRyQJz+KIWMyXP4nhwpUCBXF+f4jwNkZt8PKG5JubcHhQScH54Dopk9z995TeyUGel4jDkWi9DsoE3dXu0Bl+zCVE3D3pFjVRjfg4se4yXdwGmKJwxmwcWG0eWK2FbypU93BrBCj9mXwr1HadQYOxgfuMlNYEBCSeJFXsmTr2/zGRvj0JLgMaEzqoxb6PDVO0mOpPfeCfSwvXnNxlIvPhDI46LUjyxt/+slUpDyjlyLeCgr7q5uz/sG6WFZd4Fpa6aDQ+vkpEofj7C8B3o7Z4VypvC+Yb51g==
+ b=Yb9oIlLwfjUKq3FqrHO8qnUoJdW4jGUP13DjszdeDNX+bRQCxjG1MtyE9mjjcNsF+Fz1VllrjlUOiA2rzcVvflnoJQi2mF2uZ6N8Bulk72+ZrfzPNh7TxcjQFLa43z0JlAwc3aD2sNzJwVhCwMGUW3J5uNSHhZxlo4XaEbfM8bChaZgUilt1gJoLn4ZChwFH2AqCCdk2voG4wS1ZhoPifDPIjddN4W5EgNziDx5MDE9cQtdXVhR5U41nX/XrzORzuyzKNQKWGUzG3hf6h4WcSD58ZxfOXeDfvjE6FoLvznPMWHcMLIsAqKhR9/OzXplTiJl6EM+H7vzRb//eWTmDZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vftM1PO1nVvxK/O/Aq+ZVl6bkDRzJoRm3SRkx2t2ZUI=;
- b=D/ObNAaRhCkgoMZWtOGDGhCCPM6LMFPcB9MVDzJaZGXlhsOlT5G/qpN1+SshjEQWeu/WP6JhUubWwhw6CnqNXpo50zfvIHHtbVQngtUET/3rsVOq6Fz5OQvcZIdIgJNkpnrt7cp33DusAbFJQNTCca9X3SnoTBicu4PDChg67CPlkdptA2DE3G0bXi69IpEEOhENgogKqESb51W9w0WiFj1ojv07lkKKKA444ISvvNsqGVeDZra6HQoD193//r3hg8xkTz/bs+jT3XNisjAzSJIytUvr8msQH2OQsrlWepgpsyEAPMt+SyLNYRAaH+iBi0k7Bur5A5C96OXyZaBPvg==
+ bh=9UsPKt6Zv5B0rP9rpjOnZ3FPsObhSZASkjFInhC92CU=;
+ b=YMekDocWflDhEng2tOCFcpOTgbk0V88LcieppXH2J6Ex+9vWJs6rw7aT4K1uw/0cpa/y0AmsieJm1cpeElvUX8PGlIbY9Rq9qRzPbA/kNcwbu+4BXz5s+IELZRa/99/7RGIE7FxCyL/T1PZ2BkO5faHkwaTPsq7LWQTxjtoaHuJT6pjZqFxQhuBSlZlGp0l2U4BnTiYrKciHY4YeKQi9oQWQ9xA0vD3woWoYmKDFVLHZGK078zFKzGkUc7zB7lLF9lbLY2tsYIQKSnphasg2Ujt7MnyL+j9N4XX2yhlxO+31Y97UbE/ahp/DRmkFBcFyWX1k99xYoSyzRADfDz5PIg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vftM1PO1nVvxK/O/Aq+ZVl6bkDRzJoRm3SRkx2t2ZUI=;
- b=VwK9A5YanzEL9DP7zyRrYYjzTOE/YpJUlCx+p4tXYURLvr+/3pP0brMaYSw+bPCVdOox3eLitLsi7yaNGNl0vWSUr98KWOgydpfA8/1oAt4fTtvmTndWvhpiEuUEf/mjg+3C1N3gi7I40X7jmbSzZKe15IkHJD/9GhTnySmdWPM=
+ bh=9UsPKt6Zv5B0rP9rpjOnZ3FPsObhSZASkjFInhC92CU=;
+ b=j0arvLOA31Znl5Qfv1bQNqbpJaMuvfjT7Xi4JDl9sMQkdpQRazg5yMUbeMqAdip+rvQbb+3FrsAC/HE3cDfpJOinzenFtroGd7SQt9RfYyH3EJXLxu+xPDCyJat3GINxqozTWKBqPLCUgjyTgRqMsqYBJQ++S2wGhRssdK6W4Mc=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
  by GVXPR04MB9952.eurprd04.prod.outlook.com (2603:10a6:150:117::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.20; Mon, 21 Aug
- 2023 15:51:32 +0000
+ 2023 15:51:36 +0000
 Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
  ([fe80::c2fe:9eef:61ea:36d9]) by GV1PR04MB9151.eurprd04.prod.outlook.com
  ([fe80::c2fe:9eef:61ea:36d9%7]) with mapi id 15.20.6699.020; Mon, 21 Aug 2023
- 15:51:32 +0000
+ 15:51:35 +0000
 From:   Claudia Draghicescu <claudia.rosu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
         silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
         andrei.istodorescu@nxp.com,
         Claudia Draghicescu <claudia.rosu@nxp.com>
-Subject: [PATCH BlueZ v7 1/6] shared/bap: Add support for BAP broadcast sink
-Date:   Mon, 21 Aug 2023 18:50:59 +0300
-Message-Id: <20230821155104.86954-2-claudia.rosu@nxp.com>
+Subject: [PATCH BlueZ v7 2/6] bap: Add support for BAP broadcast sink
+Date:   Mon, 21 Aug 2023 18:51:00 +0300
+Message-Id: <20230821155104.86954-3-claudia.rosu@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230821155104.86954-1-claudia.rosu@nxp.com>
 References: <20230821155104.86954-1-claudia.rosu@nxp.com>
@@ -61,50 +61,50 @@ X-ClientProxiedBy: AM0PR04CA0127.eurprd04.prod.outlook.com
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|GVXPR04MB9952:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2805cf0-6ca7-4903-b067-08dba25e7dc8
+X-MS-Office365-Filtering-Correlation-Id: 3e007588-d7a4-4afd-a876-08dba25e7fbf
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vvKoaR09BgHh5wKmAL1+YorlX9oHEEKZBI1dnnI0NotCngE44K+OLWRTryqNej2PB+6MQhnpq4zH1nK9ms8rSlG5VVx8vSxpL8ZbHec/TwE3m9IzfBJpygowstj/GdOXYS5tPf0ckI9lo8GKV8la5u7X1uLX4CAE768WmVNmGUH5FeMLJ0ybLVTsL5RM5uZoOubmorL6PpzANWSJoCI0+MDDMthbpvZExAMxPH5BPh7FvMb4PaP41NITFMT/qlKuDO3tkF1ewgqcCscGOlplhAfWj3drmzZx5u5/HZXwzuzE8wxPyE069QXDOcjr4tIxZ37MwW0iBDW3/8d5lcf7pk41lxJfIsC7gbMuHNxmxadq702Wy8CRvZ9bIQQyVO502U5QBSqMiJS7UeBhvT/MAcmVoMrEuWMNwgkhM0Gy5YLcG1Sm1827E8SZusoATopZ/EmhHJqCaf7nNT45c7CDI3j93As63g9hQIO4Qk0Os1gIx3w3SJcGDycmJCSGC6+IFMk5BgJdGINAmwFw8q/eimpw578lwqd1IpudQYSkO6C4VS/okOqIfwtN3J15fCjsy+1kls0rG1tkNxAPQy2jzI4V/FhJ9GSdSma4YHmNXTm09LfemeWmeZER/Xr/2hFQ
+X-Microsoft-Antispam-Message-Info: Qgf1L9bp4fMW/XRoDVjhJrUk5Ky/rMLLCp/Zuw8odp+lb2wtYHpKz80U+So4AWALuc6swzsooEctCN0Vc93xOE5McIGe8Z7tXsZ6S0a9nVyCqR547zH8XcVuQEuV/9nabLB5LVeGAH3HE8XTJgJqYbOfguzRv+QpL4Tr2Jw8hFR3IKACR8hiyexjf1E31iX+AwFhMys0LtLZ8yy56bM25Tjm4RHuTCfSj/5IGMd2SQ9MGwJqR63Z/brmEmpE+mQ3oI4p8/gPI4oou0ybg/sSwFd2CQpoO/VQCtjV+WP64iZeHCE9wZxsovTre2VA82JX0x/F7cnlpEvHMtv79uynjw6B1CLtRWG7mLpBu0i/MT8CgoG+peQllPHmD2IzJEsPvvSOMYzwvb+nqHC6u0vzOhWAfKQnnAUM5/Y4UIBt5e112hF/8EHjbRMeuo0fjBH09GCPbhzRz2pMpJqO2hToVdqVLQVgvLscf+7dHCey62/tTffMG7nnEyOtP7/b1HVy1+QiM0ZnOdHzk+3cJTRLpxr6okdd++f907pdFkJq3L8kBDYqzNr4HulD4DBMRNjfz3O/Chs7jKfAmDZ/FoFHGTx9rGLlRcimalGFs0xAGqlH1/spGgy6mWn1qSqtl1D/
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(366004)(39860400002)(376002)(136003)(396003)(451199024)(186009)(1800799009)(2906002)(30864003)(52116002)(38350700002)(38100700002)(6506007)(6486002)(83380400001)(5660300002)(26005)(86362001)(8676002)(2616005)(8936002)(4326008)(316002)(66946007)(6512007)(6916009)(66556008)(66476007)(478600001)(6666004)(36756003)(41300700001)(1076003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?w5TubJyWs8ajKo1vuoFeMM5FNiFv0XpvbhRNjrPX9/lZTuIy53xWkbd+UKwH?=
- =?us-ascii?Q?EllQIqQM7LYlyIv3KZI15ziJo9NEB9jJFECFEXlExExF8A3ynZB3BOUAlD/K?=
- =?us-ascii?Q?/ZSJZoZoufPblmUj12r/mOwkW2JN+ETV4UA73cTREQMDiXsNmm1v9Y/OSo/d?=
- =?us-ascii?Q?Yj3u4fq+lA+gTKFgZH0ccq99rJrr90A88ic6pL0Wh7VBP7zywmUU43FF7fcB?=
- =?us-ascii?Q?+ClbI5t+qGx60ua3TexEpAh4jz6Inrfhp8VvXVvdOlrkzi8JgrQufptvFVTu?=
- =?us-ascii?Q?8wb+aBtszluDooE34K0lSe6ceVGl6Dyszvi4aqKdtgmIF7lwlCfBzhMC+U4C?=
- =?us-ascii?Q?e50NUB5ooAjLOyaLL2xslTz3mPcJtz5yyMizc43wZJCqrVzB0hrdlvHluo1o?=
- =?us-ascii?Q?vc5X0t9lGhk4BfxtrihPHMKF2V+k2+5PvaMzAdY+GAlZlhj1cWDhuaiNMGhg?=
- =?us-ascii?Q?jyMR30JfHYDwyEDrK3d3uRqILuQMG7/Ach7WyxBrfYaj8XnlVggIOZ+RMU/K?=
- =?us-ascii?Q?PBKyAhwAg7epYH5Eha7M/wPC20Pm08l3aInokh+JlRQizvb6/Enq+GFNOUQx?=
- =?us-ascii?Q?SDMaMidQ3NsgEYzq24RQn3J+904dJwkaCnvwg4gFQE+KU4QA26+wcinLEZuJ?=
- =?us-ascii?Q?WLkCLDLMN9xdnfoL40LmujQVc4c9X2jQiApuTqr5JP8pxFfVRlcrCZ3abxgJ?=
- =?us-ascii?Q?7K8kPV3U4peTZAq4c0+lFjmxxDY8n+L2dks2g+rTkqmGx7sqIa8IxC6fqGI7?=
- =?us-ascii?Q?ASfCcJJN8eu/FN+E2HXt+wpJvKkxGdoLcMd5CB8j70H2asZ8nHDHCdKReQf5?=
- =?us-ascii?Q?Rqvez3phGGghW07iPQwx+7xvT15tZCnZazP6FvETZdZ7PVH+gqx43Jmswlf9?=
- =?us-ascii?Q?Ym84Cqoj4821lspvPMMjGwaLRsd61c8P6o3Esv0UQYaz6pdutDitz2SZyFku?=
- =?us-ascii?Q?ugrnLSOkzh9ch7c35ZOoWI1Pzfv0F8Obm7SdP/lbbFkLs0cWet2MtIB7E+Vz?=
- =?us-ascii?Q?AzT5DGnBHjBzVIwRG5Ved4/k6xksL8XFoLl2T7OIHI4GsIuI/brUJvULK3iy?=
- =?us-ascii?Q?Vt/9p5l6xnRQoRwoSzw+zGHqI0RbO/Hpri5D/bG4IiFbB9dQTJLGm9q98nzS?=
- =?us-ascii?Q?hCAcmdGRnkVXUAtIWDM8eTpZsWQwRJ/YbrPF+Dnmb+OV1j40QzL1XkAGK3YY?=
- =?us-ascii?Q?jbxKFYBDAM9VsnZCSbsH0hJRTdJc/5TXgD/UirDaP7L9l9JYpbyNPT50/2XC?=
- =?us-ascii?Q?YlJT5BK7AwdiH4uAcVHFVP0nS7if43A4ma8X6R2HOPDXyUFVf0fCOiZaUfnZ?=
- =?us-ascii?Q?QfJHLTwXbcKHQzvrctP2fQ7d2Yfrv7E5I6K1uxDCHug+/F8GKqA/4mam6RnG?=
- =?us-ascii?Q?fg2vT7DnkAPQ4zlONwYGfkCtmGMigaBasRCzRQg9wJ8XYurRBhLVnNHxaoVQ?=
- =?us-ascii?Q?iZTQcMiOkFKV7F9yQvOOdK0fHTvDZ8NIG1vIWDBYwrx4KS/0iRRZ/F0hglZN?=
- =?us-ascii?Q?gzOr0p/elO8Gdzj/NEdP5ErSFOes/uj8twPo9PknyMiqEb0Unt9zwHEOOGY9?=
- =?us-ascii?Q?4eBNF7Xr9sTbm4+7QDvfkiGIFO4WQdqUPkEjF/YO?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gbGOSEkq93wQK9s/pnnbN1CF/I9sYzVFpWluIuRJrcc1TQtQdGQ3tsFJCQE3?=
+ =?us-ascii?Q?C6EjIdrltUWlWoXa+RKJKZKeXGvsys2s6QmIo8JgMN4PqrWoH1XsCZXIdGfZ?=
+ =?us-ascii?Q?lfTBQcg8FT8ycsUa/IfTrpVAoZ+R5Ce4ks5bFd3tlmrLyUEdG4B/bdltbErQ?=
+ =?us-ascii?Q?dvOJ12fUGdcAB31F6a0Muz7TpZBfaQGaZwVSnswdzH9m3xBL6QphcNCyDFW3?=
+ =?us-ascii?Q?Ozd4idWFHu8CQmLJ/mdPscm8QjENV5gASeCMvF+gsKLnhU/an/pu/c1dsVSf?=
+ =?us-ascii?Q?0aZdi5SKIMYR+khHeTiPSVOouR+kZHlTGGypncrflhX/C6IiYH92+aRYVYmJ?=
+ =?us-ascii?Q?z7pG4elN/2doMyvC7gZSs4LsU3P7dlt5QIVS1IDVRZKnu4OGCGpk9SIv9ZfG?=
+ =?us-ascii?Q?X2U8hKw3o3qXhC2NbKmube6Af5oRA0zRBZfgxYWMPJnMIVnFjnzVclzfq/TX?=
+ =?us-ascii?Q?YWqsLinYygfck+mwhQaY6kze4F6tDSs9Z4wESbc1z7EfhdB8XmiQUi8xDrQ1?=
+ =?us-ascii?Q?r/ACp303Ob0NYwjRlId/TbVV/v/fBFQT8Fri7447WXuHkRGVDhWtb2aLN+oU?=
+ =?us-ascii?Q?cmkjyAOtX/0veZqtQ3lVqmXWwR8u8cCgb00gz0r3aItDVl+0wz8IcjX5UTe6?=
+ =?us-ascii?Q?yuMShKkfosbJy+AqrviTK/K87NMpuqg5QArDBYx6a1M5qGE8U18hu6pKYt7K?=
+ =?us-ascii?Q?xNTrCOSqRouiswsUMw/tzOmPRgPqrycvC3ru6B3hOdV++vBuxCmamA/RBsFy?=
+ =?us-ascii?Q?9pCpY5i8ofvh0FxbbiHOx4/N/bWaRnXt6enSkmjLAuhZ8YH421CNYXHf90eY?=
+ =?us-ascii?Q?ZHwoUBVPdlLo2Li2jjK40l/gNFowKnzle3jkQZwEou+dJ+ptWsd5JCSpc/k0?=
+ =?us-ascii?Q?LAgc9Pz5oh79icby+EfRTsPQJ+MKl7qQY3nUDAw8ok+RUpf05dEMtUwoS/W5?=
+ =?us-ascii?Q?wfrJH0FVDzSoseHv4n33752XsesiUR6CXFwHuNwZ1E9asMvC8qhDMd2QxdKz?=
+ =?us-ascii?Q?IxveJM4Wa6jdIg9ByXHpDuBqT2j4X2IMOddihYuHTdHGIs6ObokGCqfYAgc3?=
+ =?us-ascii?Q?QEKvoqwqdPI+wQNcCglkmEp1dVKTOJlrmnMPlCsmX/YmGUBxDNbzC1rpzyLP?=
+ =?us-ascii?Q?P/4F8dgbtuH37gTwh9ibfREa03fyKNrt/eNszoBice+71csbRGhm3X6RqT1p?=
+ =?us-ascii?Q?ebMjHEonZveAe1dpGx8BjqY6L6T3WWNrWRplnPIYb692kv4G3fvxwxiOYDRB?=
+ =?us-ascii?Q?Yy7Xx8O6TCvEo53ybSexjTBXPDwBwAXmCdrs4pvJgXoN0pXS70yv6bhCKdDT?=
+ =?us-ascii?Q?7UJFdjfUtT9FWrmIq7RBmOi1sAT/z0yQda1mhq5cAfdfFDXH2+w6c0DEL4b3?=
+ =?us-ascii?Q?7JNFmm7IUDJCuFpDvctdwDptYovm35o2IIH4gMw6gF6ER/h6UvT0dBTbUBxH?=
+ =?us-ascii?Q?oh92ZYwLkHmsYS6GNJ1dKhCVfNNUFm3HfwfUO+7wxcO/4GKxCKtgQquH38mM?=
+ =?us-ascii?Q?vR7k/h+rp6Kd1Eh6sggyussU5SuZAYwFEG2iZebHx9jpwfPJDjVRJRi7s9vX?=
+ =?us-ascii?Q?N0kk4QOvcR5/ugm+XzYlcSZarTejgwdxR4AM04Ed?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2805cf0-6ca7-4903-b067-08dba25e7dc8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e007588-d7a4-4afd-a876-08dba25e7fbf
 X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 15:51:32.6154
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 15:51:35.8407
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: savBfgsPV6N9sZ/vHEQlMA/Oct4iBu4dBCSIseUuUrP2Z10kQ92OeR1xukJ8VNcG6RoTjEuMgl/46k1xxVQHvQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: GCg0wcpc0ZQFs2zzZ3UB9bTmEjGixueZwJeESXd2gZ5F3E9+pm3KOiKI3OQrsJ2VhL2z8eiH/4iz5S58lPOZxw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9952
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -123,470 +123,487 @@ This feature was tested using bluetoothctl with the following commands:
 /local/endpoint/ep0 16_2_1
 
 ---
- src/shared/bap.c | 266 ++++++++++++++++++++++++++++++++++++++++++-----
- src/shared/bap.h |  13 ++-
- 2 files changed, 251 insertions(+), 28 deletions(-)
+ profiles/audio/bap.c | 312 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 286 insertions(+), 26 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 72ce67c08..d548b7734 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -633,14 +633,18 @@ static struct bt_bap_endpoint *bap_endpoint_new(struct bt_bap_db *bdb,
- 	return ep;
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 922eac50d..187140232 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -34,6 +34,7 @@
+ #include "lib/hci.h"
+ #include "lib/sdp.h"
+ #include "lib/uuid.h"
++#include "lib/iso.h"
+ 
+ #include "src/btd.h"
+ #include "src/dbus-common.h"
+@@ -57,7 +58,9 @@
+ 
+ #define ISO_SOCKET_UUID "6fbaf188-05e0-496a-9885-d6ddfdb4e03e"
+ #define PACS_UUID_STR "00001850-0000-1000-8000-00805f9b34fb"
++#define BCAAS_UUID_STR "00001852-0000-1000-8000-00805f9b34fb"
+ #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
++#define MEDIA_INTERFACE "org.bluez.Media1"
+ 
+ struct bap_ep {
+ 	char *path;
+@@ -186,6 +189,9 @@ static gboolean get_uuid(const GDBusPropertyTable *property,
+ 		uuid = PAC_SINK_UUID;
+ 	else if (queue_find(ep->data->srcs, NULL, ep))
+ 		uuid = PAC_SOURCE_UUID;
++	else if ((queue_find(ep->data->bcast, NULL, ep)
++		&& (bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SINK)))
++		uuid = BCAA_SERVICE_UUID;
+ 	else
+ 		uuid = BAA_SERVICE_UUID;
+ 
+@@ -207,6 +213,19 @@ static gboolean get_codec(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
--static struct bt_bap_endpoint *bap_endpoint_new_broacast(struct bt_bap_db *bdb)
-+static struct bt_bap_endpoint *bap_endpoint_new_broadcast(struct bt_bap_db *bdb,
-+								uint8_t type)
- {
- 	struct bt_bap_endpoint *ep;
- 
- 	ep = new0(struct bt_bap_endpoint, 1);
- 	ep->bdb = bdb;
- 	ep->attr = NULL;
--	ep->dir = BT_BAP_BCAST_SOURCE;
-+	if (type == BT_BAP_BCAST_SINK)
-+		ep->dir = BT_BAP_BCAST_SOURCE;
-+	else
-+		ep->dir = BT_BAP_BCAST_SINK;
- 
- 	return ep;
- }
-@@ -667,22 +671,27 @@ static struct bt_bap_endpoint *bap_get_endpoint(struct queue *endpoints,
- 	return ep;
- }
- 
-+static bool match_ep_type(const void *data, const void *match_data)
++static gboolean has_capabilities(const GDBusPropertyTable *property, void *data)
 +{
-+	const struct bt_bap_endpoint *ep = data;
-+	const uint8_t type = PTR_TO_INT(match_data);
++	struct bap_ep *ep = data;
++	struct iovec *d = NULL;
 +
-+	return (ep->dir == type);
++	bt_bap_pac_get_codec(ep->rpac, NULL, &d, NULL);
++
++	if (d)
++		return TRUE;
++
++	return FALSE;
 +}
 +
- static struct bt_bap_endpoint *bap_get_endpoint_bcast(struct queue *endpoints,
--						struct bt_bap_db *db)
-+					struct bt_bap_db *db, uint8_t type)
+ static gboolean get_capabilities(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
  {
- 	struct bt_bap_endpoint *ep;
+@@ -248,7 +267,7 @@ static const GDBusPropertyTable ep_properties[] = {
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ "Codec", "y", get_codec, NULL, NULL,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+-	{ "Capabilities", "ay", get_capabilities, NULL, NULL,
++	{ "Capabilities", "ay", get_capabilities, NULL, has_capabilities,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+ 	{ "Device", "o", get_device, NULL, NULL,
+ 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+@@ -556,7 +575,7 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+ 	}
  
- 	if (!db)
- 		return NULL;
--	/*
--	 * We have support for only one stream so we will have
--	 * only one endpoint.
--	 * TO DO add support for more then one stream
--	 */
--	if (queue_length(endpoints) > 0)
--		return queue_peek_head(endpoints);
- 
--	ep = bap_endpoint_new_broacast(db);
-+	ep = queue_find(endpoints, match_ep_type, INT_TO_PTR(type));
-+	if (ep)
-+		return ep;
+ 	if (bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SOURCE) {
+-		/* Mark CIG and CIS to be auto assigned */
++		/* Mark BIG and BIS to be auto assigned */
+ 		ep->qos.bcast.big = BT_ISO_QOS_BIG_UNSET;
+ 		ep->qos.bcast.bis = BT_ISO_QOS_BIS_UNSET;
+ 	} else {
+@@ -597,13 +616,126 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+ 		break;
+ 	case BT_BAP_STREAM_TYPE_BCAST:
+ 		/* No message sent over the air for broadcast */
+-		ep->id = 0;
++		if (bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SINK)
++			ep->msg = dbus_message_ref(msg);
++		else
++			ep->id = 0;
 +
-+	ep = bap_endpoint_new_broadcast(db, type);
- 	if (!ep)
- 		return NULL;
- 
-@@ -1317,6 +1326,8 @@ static void stream_set_state_broadcast(struct bt_bap_stream *stream,
- 	struct bt_bap *bap = stream->bap;
- 	const struct queue_entry *entry;
- 
-+	if (ep->old_state == state)
-+		return;
- 	ep->old_state = ep->state;
- 	ep->state = state;
- 
-@@ -1348,6 +1359,9 @@ static void stream_set_state(struct bt_bap_stream *stream, uint8_t state)
- 	ep->old_state = ep->state;
- 	ep->state = state;
- 
-+	if (stream->lpac->type == BT_BAP_BCAST_SINK)
-+		goto done;
-+
- 	if (stream->client)
- 		goto done;
- 
-@@ -2379,6 +2393,10 @@ static struct bt_bap_pac *bap_pac_find(struct bt_bap_db *bdb, uint8_t type,
- 		return queue_find(bdb->sources, match_codec, codec);
- 	case BT_BAP_SINK:
- 		return queue_find(bdb->sinks, match_codec, codec);
-+	case BT_BAP_BCAST_SOURCE:
-+		return queue_find(bdb->broadcast_sources, match_codec, codec);
-+	case BT_BAP_BCAST_SINK:
-+		return queue_find(bdb->broadcast_sinks, match_codec, codec);
+ 		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  	}
  
  	return NULL;
-@@ -2428,10 +2446,12 @@ static struct bt_bap_pac *bap_pac_new(struct bt_bap_db *bdb, const char *name,
- 	pac->bdb = bdb;
- 	pac->name = name ? strdup(name) : NULL;
- 	pac->type = type;
--	pac->codec = *codec;
--	pac->data = util_iov_dup(data, 1);
--	pac->metadata = util_iov_dup(metadata, 1);
--
-+	if (codec)
-+		pac->codec = *codec;
-+	if (data)
-+		pac->data = util_iov_dup(data, 1);
-+	if (metadata)
-+		pac->metadata = util_iov_dup(metadata, 1);
- 	if (qos)
- 		pac->qos = *qos;
- 
-@@ -2518,7 +2538,7 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 					struct iovec *metadata)
- {
- 	struct bt_bap_db *bdb;
--	struct bt_bap_pac *pac, *pac_brodcast_sink;
-+	struct bt_bap_pac *pac, *pac_broadcast_sink;
- 	struct bt_bap_codec codec;
- 
- 	if (!db)
-@@ -2545,11 +2565,19 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
- 		bap_add_source(pac);
- 		break;
- 	case BT_BAP_BCAST_SOURCE:
--		// For broadcast add local pac and remote pac
- 		bap_add_broadcast_source(pac);
--		pac_brodcast_sink = bap_pac_new(bdb, name, type, &codec, qos,
-+		if (queue_isempty(bdb->broadcast_sinks)) {
-+			/* When adding a local broadcast source, add also a
-+			 * local broadcast sink
-+			 */
-+			pac_broadcast_sink = bap_pac_new(bdb, name,
-+					BT_BAP_BCAST_SINK, &codec, qos,
- 					data, metadata);
--		bap_add_broadcast_sink(pac_brodcast_sink);
-+			bap_add_broadcast_sink(pac_broadcast_sink);
-+		}
-+		break;
-+	case BT_BAP_BCAST_SINK:
-+		bap_add_broadcast_sink(pac);
- 		break;
- 	default:
- 		bap_pac_free(pac);
-@@ -2923,6 +2951,103 @@ bool bap_print_cc(void *data, size_t len, util_debug_func_t func,
- 	return bap_print_ltv("CC", data, len, func, user_data);
  }
  
-+bool bap_parse_base(void *data, size_t len, util_debug_func_t func,
-+		uint32_t *presDelay, uint8_t *numSubgroups, uint8_t *numBis,
-+		struct bt_bap_codec *codec, struct iovec **caps,
-+		struct iovec **meta)
++static void update_bcast_qos(struct bt_iso_qos *qos,
++			struct bt_bap_qos *bap_qos)
 +{
-+	struct iovec iov = {
-+		.iov_base = data,
-+		.iov_len = len,
-+	};
++	bap_qos->bcast.big = qos->bcast.big;
++	bap_qos->bcast.bis = qos->bcast.bis;
++	bap_qos->bcast.sync_interval = qos->bcast.sync_interval;
++	bap_qos->bcast.packing = qos->bcast.packing;
++	bap_qos->bcast.framing = qos->bcast.framing;
++	bap_qos->bcast.encryption = qos->bcast.encryption;
++	bap_qos->bcast.options = qos->bcast.options;
++	bap_qos->bcast.skip = qos->bcast.skip;
++	bap_qos->bcast.sync_timeout = qos->bcast.sync_timeout;
++	bap_qos->bcast.sync_cte_type = qos->bcast.sync_cte_type;
++	bap_qos->bcast.mse = qos->bcast.mse;
++	bap_qos->bcast.timeout = qos->bcast.timeout;
++	bap_qos->bcast.io_qos.interval = qos->bcast.in.interval;
++	bap_qos->bcast.io_qos.latency = qos->bcast.in.latency;
++	bap_qos->bcast.io_qos.phy = qos->bcast.in.phy;
++	bap_qos->bcast.io_qos.sdu = qos->bcast.in.sdu;
++	bap_qos->bcast.io_qos.rtn = qos->bcast.in.rtn;
 +
-+	uint8_t capsLen, metaLen;
-+	uint8_t *hexstream;
-+
-+	if (presDelay) {
-+		if (!util_iov_pull_le24(&iov, presDelay))
-+			return false;
-+		util_debug(func, NULL, "PresentationDelay %d", *presDelay);
-+	}
-+
-+	if (numSubgroups) {
-+		if (!util_iov_pull_u8(&iov, numSubgroups))
-+			return false;
-+		util_debug(func, NULL, "NumSubgroups %d", *numSubgroups);
-+	}
-+
-+	if (numBis) {
-+		if (!util_iov_pull_u8(&iov, numBis))
-+			return false;
-+		util_debug(func, NULL, "NumBis %d", *numBis);
-+	}
-+
-+	if (codec) {
-+		codec = util_iov_pull_mem(&iov, sizeof(*codec));
-+		if (!codec)
-+			return false;
-+		util_debug(func, NULL, "%s: ID %d CID 0x%2.2x VID 0x%2.2x",
-+				"Codec", codec->id, codec->cid, codec->vid);
-+	}
-+
-+	if (!util_iov_pull_u8(&iov, &capsLen))
-+		return false;
-+	util_debug(func, NULL, "CC Len %d", capsLen);
-+
-+	if (!capsLen)
-+		return false;
-+	if (caps) {
-+		if (!(*caps))
-+			*caps = new0(struct iovec, 1);
-+		(*caps)->iov_len = capsLen;
-+		(*caps)->iov_base = iov.iov_base;
-+	}
-+
-+	for (int i = 0; capsLen > 1; i++) {
-+		struct bt_ltv *ltv = util_iov_pull_mem(&iov, sizeof(*ltv));
-+		uint8_t *caps;
-+
-+		if (!ltv) {
-+			util_debug(func, NULL, "Unable to parse %s",
-+								"Capabilities");
-+			return false;
-+		}
-+
-+		util_debug(func, NULL, "%s #%u: len %u type %u",
-+					"CC", i, ltv->len, ltv->type);
-+
-+		caps = util_iov_pull_mem(&iov, ltv->len - 1);
-+		if (!caps) {
-+			util_debug(func, NULL, "Unable to parse %s",
-+								"CC");
-+			return false;
-+		}
-+		util_hexdump(' ', caps, ltv->len - 1, func, NULL);
-+
-+		capsLen -= (ltv->len + 1);
-+	}
-+
-+	if (!util_iov_pull_u8(&iov, &metaLen))
-+		return false;
-+	util_debug(func, NULL, "Metadata Len %d", metaLen);
-+
-+	if (!metaLen)
-+		return false;
-+	if (meta) {
-+		if (!(*meta))
-+			*meta = new0(struct iovec, 1);
-+		(*meta)->iov_len = metaLen;
-+		(*meta)->iov_base = iov.iov_base;
-+	}
-+
-+	hexstream = util_iov_pull_mem(&iov, metaLen);
-+	if (!hexstream)
-+		return false;
-+	util_hexdump(' ', hexstream, metaLen, func, NULL);
-+
-+	return true;
++	bap_qos->bcast.bcode = new0(struct iovec, 1);
++	util_iov_memcpy(bap_qos->bcast.bcode, qos->bcast.bcode,
++		sizeof(qos->bcast.bcode));
 +}
 +
- static void bap_parse_pacs(struct bt_bap *bap, uint8_t type,
- 				struct queue *queue,
- 				const uint8_t *value,
-@@ -4008,7 +4133,8 @@ bool bt_bap_attach_broadcast(struct bt_bap *bap)
- 
- 	queue_push_tail(sessions, bap);
- 
--	ep = bap_get_endpoint_bcast(bap->remote_eps, bap->ldb);
-+	ep = bap_get_endpoint_bcast(bap->remote_eps, bap->ldb,
-+				BT_BAP_BCAST_SOURCE);
- 	if (ep)
- 		ep->bap = bap;
- 
-@@ -4198,7 +4324,11 @@ static void bap_foreach_pac(struct queue *l, struct queue *r,
- 		for (er = queue_get_entries(r); er; er = er->next) {
- 			struct bt_bap_pac *rpac = er->data;
- 
--			if (!bap_codec_equal(&lpac->codec, &rpac->codec))
-+			/* Skip checking codec for bcast source,
-+			 * it will be checked when BASE info are received
-+			 */
-+			if ((rpac->type != BT_BAP_BCAST_SOURCE) &&
-+				(!bap_codec_equal(&lpac->codec, &rpac->codec)))
- 				continue;
- 
- 			if (!func(lpac, rpac, user_data))
-@@ -4221,9 +4351,19 @@ void bt_bap_foreach_pac(struct bt_bap *bap, uint8_t type,
- 		return bap_foreach_pac(bap->ldb->sinks, bap->rdb->sources,
- 							   func, user_data);
- 	case BT_BAP_BCAST_SOURCE:
--		return bap_foreach_pac(bap->ldb->broadcast_sources,
-+		if (queue_isempty(bap->rdb->broadcast_sources)
-+			&& queue_isempty(bap->rdb->broadcast_sinks))
-+			return bap_foreach_pac(bap->ldb->broadcast_sources,
- 					bap->ldb->broadcast_sinks,
- 					func, user_data);
++static bool match_ep_type(const void *data, const void *user_data)
++{
++	const struct bap_ep *ep = data;
 +
-+		return bap_foreach_pac(bap->ldb->broadcast_sinks,
-+					bap->rdb->broadcast_sources,
-+					func, user_data);
++	return (bt_bap_pac_get_type(ep->lpac) == PTR_TO_INT(user_data));
++}
++
++static void iso_bcast_confirm_cb(GIOChannel *io, GError *err, void *user_data)
++{
++	struct bap_data *data = user_data;
++	struct bt_iso_qos qos;
++	struct bt_iso_base base;
++	char address[18];
++	struct bap_ep *ep;
++	int fd;
++	struct iovec *base_io;
++	uint32_t presDelay;
++	uint8_t numSubgroups;
++	uint8_t numBis;
++	struct bt_bap_codec codec;
++
++	bt_io_get(io, &err,
++			BT_IO_OPT_DEST, address,
++			BT_IO_OPT_QOS, &qos,
++			BT_IO_OPT_BASE, &base,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_error_free(err);
++		goto drop;
++	}
++
++	g_io_channel_ref(io);
++	btd_service_connecting_complete(data->service, 0);
++	DBG("BCAST ISO: sync with %s (BIG 0x%02x BIS 0x%02x)",
++					address, qos.bcast.big, qos.bcast.bis);
++
++	ep = queue_find(data->bcast, match_ep_type,
++			INT_TO_PTR(BT_BAP_BCAST_SINK));
++	if (!ep)
++		return;
++
++	update_bcast_qos(&qos, &ep->qos);
++
++	base_io = new0(struct iovec, 1);
++	util_iov_memcpy(base_io, base.base, base.base_len);
++
++	bap_parse_base(base_io->iov_base, base_io->iov_len, bap_debug,
++			&presDelay, &numSubgroups, &numBis,
++			&codec, &ep->caps, &ep->metadata);
++
++	/* Update pac with BASE information */
++	bt_bap_update_bcast_source(ep->rpac, &codec, ep->caps, ep->metadata);
++	ep->id = bt_bap_stream_config(ep->stream, &ep->qos,
++					ep->caps, NULL, NULL);
++	data->listen_io = io;
++
++	bt_bap_stream_set_user_data(ep->stream, ep->path);
++
++	fd = g_io_channel_unix_get_fd(io);
++
++	if (bt_bap_stream_set_io(ep->stream, fd)) {
++		bt_bap_stream_enable(ep->stream, true, NULL, NULL, NULL);
++		g_io_channel_set_close_on_unref(io, FALSE);
++		return;
++	}
++
++
++	return;
++
++drop:
++	g_io_channel_shutdown(io, TRUE, NULL);
++
++}
++
++static bool match_data_bap_data(const void *data, const void *match_data)
++{
++	const struct bap_data *bdata = data;
++	const struct btd_adapter *adapter = match_data;
++
++	return bdata->user_data == adapter;
++}
++
+ static const GDBusMethodTable ep_methods[] = {
+ 	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("SetConfiguration",
+ 					GDBUS_ARGS({ "endpoint", "o" },
+@@ -649,15 +781,17 @@ static struct bap_ep *ep_register_bcast(struct bap_data *data,
+ 					struct bt_bap_pac *lpac,
+ 					struct bt_bap_pac *rpac)
+ {
+-	struct btd_adapter *adapter = data->user_data;
++	struct btd_adapter *adapter = data->adapter;
++	struct btd_device *device = data->device;
+ 	struct bap_ep *ep;
+ 	struct queue *queue;
+-	int i, err;
++	int i, err = 0;
+ 	const char *suffix;
+ 	struct match_ep match = { lpac, rpac };
+ 
+ 	switch (bt_bap_pac_get_type(rpac)) {
+ 	case BT_BAP_BCAST_SOURCE:
 +	case BT_BAP_BCAST_SINK:
-+		return bap_foreach_pac(bap->ldb->broadcast_sinks,
-+					bap->rdb->broadcast_sources,
-+					func, user_data);
+ 		queue = data->bcast;
+ 		i = queue_length(data->bcast);
+ 		suffix = "bcast";
+@@ -675,8 +809,20 @@ static struct bap_ep *ep_register_bcast(struct bap_data *data,
+ 	ep->lpac = lpac;
+ 	ep->rpac = rpac;
+ 
+-	err = asprintf(&ep->path, "%s/pac_%s%d", adapter_get_path(adapter),
+-		       suffix, i);
++	if (device)
++		ep->data->device = device;
++
++	switch (bt_bap_pac_get_type(rpac)) {
++	case BT_BAP_BCAST_SINK:
++		err = asprintf(&ep->path, "%s/pac_%s%d",
++			adapter_get_path(adapter), suffix, i);
++		break;
++	case BT_BAP_BCAST_SOURCE:
++		err = asprintf(&ep->path, "%s/pac_%s%d",
++				device_get_path(device), suffix, i);
++		break;
++	}
++
+ 	if (err < 0) {
+ 		error("Could not allocate path for remote pac %s/pac%d",
+ 				adapter_get_path(adapter), i);
+@@ -685,14 +831,13 @@ static struct bap_ep *ep_register_bcast(struct bap_data *data,
  	}
+ 
+ 	if (g_dbus_register_interface(btd_get_dbus_connection(),
+-				ep->path, MEDIA_ENDPOINT_INTERFACE,
+-				ep_methods, NULL, ep_properties,
+-				ep, ep_free) == FALSE) {
++			ep->path, MEDIA_ENDPOINT_INTERFACE,
++			ep_methods, NULL, ep_properties,
++			ep, ep_free) == FALSE) {
+ 		error("Could not register remote ep %s", ep->path);
+ 		ep_free(ep);
+ 		return NULL;
+ 	}
+-
+ 	bt_bap_pac_set_user_data(rpac, ep->path);
+ 
+ 	DBG("ep %p lpac %p rpac %p path %s", ep, ep->lpac, ep->rpac, ep->path);
+@@ -824,6 +969,7 @@ done:
+ 
+ 	queue_foreach(ep->data->srcs, bap_config, NULL);
+ 	queue_foreach(ep->data->snks, bap_config, NULL);
++	queue_foreach(ep->data->bcast, bap_config, NULL);
  }
  
-@@ -4243,10 +4383,10 @@ int bt_bap_pac_get_vendor_codec(struct bt_bap_pac *pac, uint8_t *id,
- 	if (vid)
- 		*vid = pac->codec.cid;
+ static bool pac_found(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
+@@ -1310,6 +1456,45 @@ static void bap_listen_io(struct bap_data *data, struct bt_bap_stream *stream,
+ 	data->listen_io = io;
+ }
  
--	if (data)
-+	if (data && pac->data)
- 		*data = pac->data;
++static void bap_listen_io_broadcast(struct bap_data *data, struct bap_ep *ep,
++			struct bt_bap_stream *stream, struct bt_iso_qos *qos)
++{
++	GIOChannel *io;
++	GError *err = NULL;
++	struct sockaddr_iso_bc iso_bc_addr;
++
++	iso_bc_addr.bc_bdaddr_type = btd_device_get_bdaddr_type(data->device);
++	memcpy(&iso_bc_addr.bc_bdaddr, device_get_address(data->device),
++			sizeof(bdaddr_t));
++	iso_bc_addr.bc_bis[0] = 1;
++	iso_bc_addr.bc_num_bis = 1;
++
++	DBG("stream %p", stream);
++
++	/* If IO already set skip creating it again */
++	if (bt_bap_stream_get_io(stream) || data->listen_io)
++		return;
++
++	io = bt_io_listen(iso_bcast_confirm_cb, NULL, ep->data, NULL, &err,
++			BT_IO_OPT_SOURCE_BDADDR,
++			btd_adapter_get_address(ep->data->adapter),
++			BT_IO_OPT_DEST_BDADDR,
++			device_get_address(data->device),
++			BT_IO_OPT_DEST_TYPE,
++			btd_device_get_bdaddr_type(data->device),
++			BT_IO_OPT_MODE, BT_IO_MODE_ISO,
++			BT_IO_OPT_QOS, &qos->bcast,
++			BT_IO_OPT_ISO_BC_NUM_BIS, iso_bc_addr.bc_num_bis,
++			BT_IO_OPT_ISO_BC_BIS, iso_bc_addr.bc_bis,
++			BT_IO_OPT_INVALID);
++	if (!io) {
++		error("%s", err->message);
++		g_error_free(err);
++	}
++
++	ep->data->listen_io = io;
++
++}
+ static void bap_create_ucast_io(struct bap_data *data, struct bap_ep *ep,
+ 				struct bt_bap_stream *stream, int defer)
+ {
+@@ -1364,10 +1549,10 @@ static void bap_create_bcast_io(struct bap_data *data, struct bap_ep *ep,
+ 	memcpy(&iso_qos.bcast.out, &ep->qos.bcast.io_qos,
+ 				sizeof(struct bt_iso_io_qos));
+ done:
+-	if (ep)
++	if (bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SOURCE)
+ 		bap_connect_io_broadcast(data, ep, stream, &iso_qos);
+ 	else
+-		bap_listen_io(data, stream, &iso_qos);
++		bap_listen_io_broadcast(data, ep, stream, &iso_qos);
+ }
  
--	if (metadata)
-+	if (metadata && pac->metadata)
- 		*metadata = pac->metadata;
+ static void bap_create_io(struct bap_data *data, struct bap_ep *ep,
+@@ -1417,6 +1602,11 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
+ 		break;
+ 	case BT_BAP_STREAM_STATE_CONFIG:
+ 		if (ep && !ep->id) {
++			if
++			(bt_bap_pac_get_type(ep->lpac) == BT_BAP_BCAST_SINK) {
++				bap_create_bcast_io(data, ep, stream, true);
++				return;
++			}
+ 			bap_create_io(data, ep, stream, true);
+ 			if (!ep->io) {
+ 				error("Unable to create io");
+@@ -1424,7 +1614,6 @@ static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
+ 				return;
+ 			}
+ 
+-
+ 			if (bt_bap_stream_get_type(stream) ==
+ 					BT_BAP_STREAM_TYPE_UCAST) {
+ 				/* Wait QoS response to respond */
+@@ -1475,12 +1664,12 @@ static void pac_added_broadcast(struct bt_bap_pac *pac, void *user_data)
+ {
+ 	struct bap_data *data = user_data;
+ 
+-	if (bt_bap_pac_get_type(pac) == BT_BAP_BCAST_SOURCE) {
+-		DBG("pac %p", pac);
+-
++	if (bt_bap_pac_get_type(pac) == BT_BAP_BCAST_SOURCE)
+ 		bt_bap_foreach_pac(data->bap, BT_BAP_BCAST_SOURCE,
+ 						pac_found_bcast, data);
+-	}
++	else if (bt_bap_pac_get_type(pac) == BT_BAP_BCAST_SINK)
++		bt_bap_foreach_pac(data->bap, BT_BAP_BCAST_SINK,
++						pac_found_bcast, data);
+ }
+ 
+ static bool ep_match_pac(const void *data, const void *match_data)
+@@ -1596,14 +1785,6 @@ static bool match_data(const void *data, const void *match_data)
+ 	return bdata->bap == bap;
+ }
+ 
+-static bool match_data_bap_data(const void *data, const void *match_data)
+-{
+-	const struct bap_data *bdata = data;
+-	const struct btd_adapter *adapter = match_data;
+-
+-	return bdata->user_data == adapter;
+-}
+-
+ static bool io_get_qos(GIOChannel *io, struct bt_iso_qos *qos)
+ {
+ 	GError *err = NULL;
+@@ -1733,6 +1914,71 @@ static void bap_detached(struct bt_bap *bap, void *user_data)
+ 	bap_data_remove(data);
+ }
+ 
++static int bap_bcast_probe(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct bap_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++
++	if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET)) {
++		error("BAP requires ISO Socket which is not enabled");
++		return -ENOTSUP;
++	}
++
++	/* Ignore, if we were probed for this device already */
++	if (data) {
++		error("Profile probed twice for the same device!");
++		return -EINVAL;
++	}
++
++	data = bap_data_new(device);
++	data->service = service;
++	data->adapter = adapter;
++	data->device = device;
++
++	data->bap = bt_bap_new(btd_gatt_database_get_db(database),
++			btd_gatt_database_get_db(database));
++	if (!data->bap) {
++		error("Unable to create BAP instance");
++		free(data);
++		return -EINVAL;
++	}
++
++	bap_data_add(data);
++
++	data->ready_id = bt_bap_ready_register(data->bap, bap_ready, service,
++								NULL);
++	data->state_id = bt_bap_state_register(data->bap, bap_state,
++						bap_connecting, data, NULL);
++	data->pac_id = bt_bap_pac_register(data->bap, pac_added_broadcast,
++				 pac_removed_broadcast, data, NULL);
++
++	bt_bap_set_user_data(data->bap, service);
++
++	bt_bap_new_bcast_source(data->bap, device_get_path(device));
++	return 0;
++}
++
++static void bap_bcast_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bap_data *data;
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	data = btd_service_get_user_data(service);
++	if (!data) {
++		error("BAP service not handled by profile");
++		return;
++	}
++}
++
+ static int bap_probe(struct btd_service *service)
+ {
+ 	struct btd_device *device = btd_service_get_device(service);
+@@ -1901,6 +2147,16 @@ static struct btd_profile bap_profile = {
+ 	.experimental	= true,
+ };
+ 
++static struct btd_profile bap_bcast_profile = {
++	.name		= "bcaa",
++	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.remote_uuid	= BCAAS_UUID_STR,
++	.device_probe	= bap_bcast_probe,
++	.device_remove	= bap_bcast_remove,
++	.auto_connect	= false,
++	.experimental	= true,
++};
++
+ static unsigned int bap_id = 0;
+ 
+ static int bap_init(void)
+@@ -1911,6 +2167,10 @@ static int bap_init(void)
+ 	if (err)
+ 		return err;
+ 
++	err = btd_profile_register(&bap_bcast_profile);
++	if (err)
++		return err;
++
+ 	bap_id = bt_bap_register(bap_attached, bap_detached, NULL);
  
  	return 0;
-@@ -4382,6 +4522,11 @@ unsigned int bt_bap_stream_config(struct bt_bap_stream *stream,
- 		return req->id;
- 	case BT_BAP_STREAM_TYPE_BCAST:
- 		stream->qos = *qos;
-+		if (stream->lpac->type == BT_BAP_BCAST_SINK) {
-+			if (data)
-+				stream_config(stream, data, NULL);
-+			stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
-+		}
- 		return 1;
- 	}
- 
-@@ -4434,7 +4579,8 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
- 		return NULL;
- 
- 	if (lpac && rpac) {
--		if (!bap_codec_equal(&lpac->codec, &rpac->codec))
-+		if ((rpac->type != BT_BAP_BCAST_SOURCE)
-+			&& (!bap_codec_equal(&lpac->codec, &rpac->codec)))
- 			return NULL;
- 	} else {
- 		uint8_t type;
-@@ -4446,13 +4592,19 @@ struct bt_bap_stream *bt_bap_stream_new(struct bt_bap *bap,
- 		if (rpac)
- 			type = rpac->type;
- 		else if (lpac) {
--			switch(lpac->type) {
-+			switch (lpac->type) {
- 			case BT_BAP_SINK:
- 				type = BT_BAP_SOURCE;
- 				break;
- 			case BT_BAP_SOURCE:
- 				type = BT_BAP_SINK;
- 				break;
-+			case BT_BAP_BCAST_SOURCE:
-+				type = BT_BAP_BCAST_SINK;
-+				break;
-+			case BT_BAP_BCAST_SINK:
-+				type = BT_BAP_BCAST_SOURCE;
-+				break;
- 			default:
- 				return NULL;
- 			}
-@@ -4913,6 +5065,13 @@ struct io *bt_bap_stream_get_io(struct bt_bap_stream *stream)
- 	return io->io;
- }
- 
-+bool bt_bap_match_bcast_sink_stream(const void *data, const void *user_data)
-+{
-+	const struct bt_bap_stream *stream = data;
-+
-+	return stream->lpac->type == BT_BAP_BCAST_SINK;
-+}
-+
- static bool stream_io_disconnected(struct io *io, void *user_data)
- {
- 	struct bt_bap_stream *stream = user_data;
-@@ -4944,6 +5103,14 @@ static bool match_req_id(const void *data, const void *match_data)
- 	return (req->id == id);
- }
- 
-+static bool match_name(const void *data, const void *match_data)
-+{
-+	const struct bt_bap_pac *pac = data;
-+	const char *name = match_data;
-+
-+	return (!strcmp(pac->name, name));
-+}
-+
- int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id)
- {
- 	struct bt_bap_req *req;
-@@ -5132,3 +5299,50 @@ bool bt_bap_stream_io_is_connecting(struct bt_bap_stream *stream, int *fd)
- 
- 	return io->connecting;
- }
-+
-+bool bt_bap_new_bcast_source(struct bt_bap *bap, const char *name)
-+{
-+	struct bt_bap_endpoint *ep;
-+	struct bt_bap_pac *pac_broadcast_source;
-+
-+	/* Add the remote source only if a local sink endpoint was registered */
-+	if (queue_isempty(bap->ldb->broadcast_sinks))
-+		return false;
-+
-+	/* Add the remote source only if a local sink endpoint was registered */
-+	if (queue_isempty(bap->ldb->broadcast_sinks))
-+		return false;
-+
-+	/* Add remote source endpoint */
-+	if (!bap->rdb->broadcast_sources)
-+		bap->rdb->broadcast_sources = queue_new();
-+
-+	if (queue_find(bap->rdb->broadcast_sources, match_name, name))
-+		return true;
-+
-+	pac_broadcast_source = bap_pac_new(bap->rdb, name, BT_BAP_BCAST_SOURCE,
-+			NULL, NULL, NULL, NULL);
-+	queue_push_tail(bap->rdb->broadcast_sources, pac_broadcast_source);
-+
-+	if (!pac_broadcast_source)
-+		return false;
-+
-+	queue_foreach(bap->pac_cbs, notify_pac_added, pac_broadcast_source);
-+
-+	/* Push remote endpoint with direction sink */
-+	ep = bap_endpoint_new_broadcast(bap->rdb, BT_BAP_BCAST_SINK);
-+
-+	if (ep)
-+		queue_push_tail(bap->remote_eps, ep);
-+
-+	return true;
-+}
-+
-+void bt_bap_update_bcast_source(struct bt_bap_pac *pac,
-+					struct bt_bap_codec *codec,
-+					struct iovec *data,
-+					struct iovec *metadata)
-+{
-+	bap_pac_merge(pac, data, metadata);
-+	pac->codec = *codec;
-+}
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index 50b567663..8a8be9495 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -194,7 +194,10 @@ bool bt_bap_set_debug(struct bt_bap *bap, bt_bap_debug_func_t cb,
- 
- bool bap_print_cc(void *data, size_t len, util_debug_func_t func,
- 						void *user_data);
--
-+bool bap_parse_base(void *data, size_t len, util_debug_func_t func,
-+		uint32_t *presDelay, uint8_t *numSubgroups, uint8_t *numBis,
-+		struct bt_bap_codec *codec, struct iovec **caps,
-+		struct iovec **meta);
- unsigned int bt_bap_pac_register(struct bt_bap *bap, bt_bap_pac_func_t added,
- 				bt_bap_pac_func_t removed, void *user_data,
- 				bt_bap_destroy_func_t destroy);
-@@ -289,7 +292,7 @@ struct bt_bap_qos *bt_bap_stream_get_qos(struct bt_bap_stream *stream);
- struct iovec *bt_bap_stream_get_metadata(struct bt_bap_stream *stream);
- 
- struct io *bt_bap_stream_get_io(struct bt_bap_stream *stream);
--
-+bool bt_bap_match_bcast_sink_stream(const void *data, const void *user_data);
- bool bt_bap_stream_set_io(struct bt_bap_stream *stream, int fd);
- 
- int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id);
-@@ -305,3 +308,9 @@ uint8_t bt_bap_stream_io_dir(struct bt_bap_stream *stream);
- 
- int bt_bap_stream_io_connecting(struct bt_bap_stream *stream, int fd);
- bool bt_bap_stream_io_is_connecting(struct bt_bap_stream *stream, int *fd);
-+
-+bool bt_bap_new_bcast_source(struct bt_bap *bap, const char *name);
-+void bt_bap_update_bcast_source(struct bt_bap_pac *pac,
-+					struct bt_bap_codec *codec,
-+					struct iovec *data,
-+					struct iovec *metadata);
 -- 
 2.34.1
 
