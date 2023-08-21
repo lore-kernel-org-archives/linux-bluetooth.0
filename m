@@ -2,141 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDA8EE4993
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 18:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D630EE4993
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 18:57:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232579AbjHUSTJ (ORCPT
+        id S229599AbjHUS5J (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Aug 2023 14:19:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32962 "EHLO
+        Mon, 21 Aug 2023 14:57:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235618AbjHUSTI (ORCPT
+        with ESMTP id S229574AbjHUS5I (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Aug 2023 14:19:08 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D546A12C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 11:18:51 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 41be03b00d2f7-54290603887so2080708a12.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 11:18:51 -0700 (PDT)
+        Mon, 21 Aug 2023 14:57:08 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4541FFE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 11:56:31 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id 46e09a7af769-6bda8559fddso1041248a34.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 11:56:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692641930; x=1693246730;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q4tBilxFsqpx53dJSqfTUWv5FbMg/2gW36SANu2YnhY=;
-        b=L3vmSX3AJkeNirpSq+tKvV6OyAXejhYCa7B/XSp65UpjuVJN0gzi+RCv8QqWXDB3vl
-         cah/V4hvlWWMHM1Ttgj5HNKX76YcerAV/A/H852nBZBBDVY83qRVztsvtqo9gXd0ATvi
-         s1s5q76CyXI4d5mxeKAd60bSXV6GRHwn9mFIQx+Aw6v4/rBfyV/DBTUpY4lYfYUNet3t
-         TdrgdRXVLpNsAaG0INmmB9oTw6F4+5VO9vj7Drg4SfPJdlA6uBXYWdvQfqqyTmAzSNKS
-         /y/UAkzwszuIH42Bk7VMNYd/+8bsc4sILWPOCE0HpxsQsFCdUuIzHRu005asm8oB4t2t
-         uT5w==
+        d=gmail.com; s=20221208; t=1692644153; x=1693248953;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EUVjODFl5J8mnUazYw0SUvEWLllQNMS1FBTBMdJEdX4=;
+        b=a3fsp85/tHTCxvAc++pgMqLS1enfN6Ks+iM8avPNyht3ImcVzvhhBBKHHqSrPgELSL
+         CgHHlclT00NxvIvi2eD5pg2CJK7CoBhDpgAMsGw8iR8lcg5Tt3nF+ydohAEbqiLGwsnY
+         nPao8O49QJYbvuZyUT1/hMz6CpPi6eP6oIIfczhPBSolR2QDjUyy5ZJFAtk5bwhpEPHO
+         hxm32usFGJOApaIvDog6QQofAtOHauX8zS8+W5YkmtW+9FSp/COc/oaoze/cEtaSdwmY
+         q9tpckOOVY+Y5W3oLX1d6b2Q1e5zZcJVvzEnkOrOh5aS+DwlSctZnhBeKmo76VAkgdQS
+         WK9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692641930; x=1693246730;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q4tBilxFsqpx53dJSqfTUWv5FbMg/2gW36SANu2YnhY=;
-        b=Yt4c5cLRoDOWh4YPdG6ktrylnoNauCIH84PzJC7KXPiQn+l9dvWUqtDij3LEQ+b4sP
-         PVHC7LoWHAe0kvr8dmXa1/wkc/LyN7j+V9nkeghQY46XPSE+O4njcJrep9KatLd1EFPj
-         w+vLNxHAVR+VpU71TM6Vv8g90+VGia7VJh/v4ZdImxdEXGZoxmhIU3bqiHyFXPm25gfn
-         OSE01DAFgGq2kLSfqPEBsc1FU44VYbVHu0fXmxAQk1FUhH+TqIqkEvztlAD3AnL+65hu
-         DY2nEexINRIScj0AO/UqKXt39vzPnmamdnudF4Kc7CXtk6Ks3ef+BeHV6wi/j68Pm1sd
-         nPEA==
-X-Gm-Message-State: AOJu0YyY4zXFsXHfm7o4V25c0tZuUd0fQMC5diZJ9uv/AZ5f74CZPBzW
-        WjnzAdESNhk6HrtbXYll4ehSD6FULpg=
-X-Google-Smtp-Source: AGHT+IF2S3J22T88DfXjxd8ImuWF+Mhkol0WTPbnSL6JIIR2nTcyfwn1YfWTLwEKg9IOjVpeeulgXg==
-X-Received: by 2002:a05:6a20:7da6:b0:148:1e47:3459 with SMTP id v38-20020a056a207da600b001481e473459mr6541366pzj.51.1692641930377;
-        Mon, 21 Aug 2023 11:18:50 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id i4-20020a63b304000000b0056420d3cd20sm5964312pgf.71.2023.08.21.11.18.49
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1692644153; x=1693248953;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EUVjODFl5J8mnUazYw0SUvEWLllQNMS1FBTBMdJEdX4=;
+        b=TXxlGAQTdUw/u8+Vk3BUj8VtEo3C8rww3nbZsCl8gzPbTtUYjKZTreRiKaehr8v+Mh
+         4/cD6l07u71sgnEkJrD1GMXYxPA8e783UEMh/YgZIXKLm7cphMTx8gYrOOi6wNVfojX7
+         ogkqUBPK0d+1WzZcP1yJuJ4JMFFjmWbqi0Tr2oCJpE7aYFLMnMkcr2PrgANRXDdjR95j
+         p/nCT/EOfWRQIn2J81ePQj22MPhDgGnT5XaAyz9BZ33dT4Ss9fkTBI2+AG7Gu7LnlZO/
+         xpO+sKXqEjkadBoOT4VaUXJunnm8Xwf0f9kzadGY+BmCa02XSbcipjDNueWMnqElRewk
+         /VWw==
+X-Gm-Message-State: AOJu0Yzo6m56LWfsj1xmYgwHbbeJIGE+ttKHZMDWml0Gdq7PM9VpJai1
+        xTNWCreN8ippouY6A9qzFQ6nqv0qHhk=
+X-Google-Smtp-Source: AGHT+IHyZs16Bydqh25RODA8kt9unsgR23jMtHb4WxdSfwCSUVZ0uolonLsVm+5gc7zXW9ZlVPDoSA==
+X-Received: by 2002:a05:6358:3398:b0:135:51a5:4da0 with SMTP id i24-20020a056358339800b0013551a54da0mr6519762rwd.1.1692644153232;
+        Mon, 21 Aug 2023 11:55:53 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.96.42])
+        by smtp.gmail.com with ESMTPSA id ev9-20020a05622a510900b004109d386323sm590641qtb.66.2023.08.21.11.55.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Aug 2023 11:18:49 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_core: Fix missing instances using HCI_MAX_AD_LENGTH
-Date:   Mon, 21 Aug 2023 11:18:48 -0700
-Message-ID: <20230821181848.3553863-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 21 Aug 2023 11:55:53 -0700 (PDT)
+Message-ID: <64e3b339.050a0220.4fca3.31c8@mx.google.com>
+Date:   Mon, 21 Aug 2023 11:55:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5777249199834957860=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
+Subject: RE: [Bluez,v1] adapter: check wake_override when setting device privacy
+In-Reply-To: <20230821102810.Bluez.v1.1.Ib819b0964a5b8339305d94611acab85774a6c8ce@changeid>
+References: <20230821102810.Bluez.v1.1.Ib819b0964a5b8339305d94611acab85774a6c8ce@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============5777249199834957860==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-There a few instances still using HCI_MAX_AD_LENGTH instead of using
-max_adv_len which takes care of detecting what is the actual maximum
-length depending on if the controller supports EA or not.
+This is automated email and please do not reply to this email!
 
-Fixes: 112b5090c219 ("Bluetooth: MGMT: Fix always using HCI_MAX_AD_LENGTH")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=777963
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.62 seconds
+GitLint                       PASS      0.38 seconds
+BuildEll                      PASS      33.46 seconds
+BluezMake                     PASS      1188.33 seconds
+MakeCheck                     PASS      13.16 seconds
+MakeDistcheck                 PASS      194.36 seconds
+CheckValgrind                 PASS      317.52 seconds
+CheckSmatch                   PASS      440.99 seconds
+bluezmakeextell               PASS      134.63 seconds
+IncrementalBuild              PASS      1031.74 seconds
+ScanBuild                     PASS      1340.51 seconds
+
+
+
 ---
- include/net/bluetooth/hci_core.h | 6 +++---
- net/bluetooth/eir.c              | 2 +-
- net/bluetooth/mgmt.c             | 6 +++---
- 3 files changed, 7 insertions(+), 7 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6fb055e3c595..6e2988b11f99 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -83,7 +83,7 @@ struct discovery_state {
- 	u8			last_adv_addr_type;
- 	s8			last_adv_rssi;
- 	u32			last_adv_flags;
--	u8			last_adv_data[HCI_MAX_AD_LENGTH];
-+	u8			last_adv_data[HCI_MAX_EXT_AD_LENGTH];
- 	u8			last_adv_data_len;
- 	bool			report_invalid_rssi;
- 	bool			result_filtering;
-@@ -290,7 +290,7 @@ struct adv_pattern {
- 	__u8 ad_type;
- 	__u8 offset;
- 	__u8 length;
--	__u8 value[HCI_MAX_AD_LENGTH];
-+	__u8 value[HCI_MAX_EXT_AD_LENGTH];
- };
- 
- struct adv_rssi_thresholds {
-@@ -726,7 +726,7 @@ struct hci_conn {
- 	__u16		le_conn_interval;
- 	__u16		le_conn_latency;
- 	__u16		le_supv_timeout;
--	__u8		le_adv_data[HCI_MAX_AD_LENGTH];
-+	__u8		le_adv_data[HCI_MAX_EXT_AD_LENGTH];
- 	__u8		le_adv_data_len;
- 	__u8		le_per_adv_data[HCI_MAX_PER_AD_LENGTH];
- 	__u8		le_per_adv_data_len;
-diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-index 8a85f6cdfbc1..9214189279e8 100644
---- a/net/bluetooth/eir.c
-+++ b/net/bluetooth/eir.c
-@@ -33,7 +33,7 @@ u8 eir_append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
- 	size_t complete_len;
- 
- 	/* no space left for name (+ NULL + type + len) */
--	if ((HCI_MAX_AD_LENGTH - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
-+	if ((max_adv_len(hdev) - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
- 		return ad_len;
- 
- 	/* use complete name if present and fits */
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d6c9b7bc8592..ba2e00646e8e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5381,9 +5381,9 @@ static u8 parse_adv_monitor_pattern(struct adv_monitor *m, u8 pattern_count,
- 	for (i = 0; i < pattern_count; i++) {
- 		offset = patterns[i].offset;
- 		length = patterns[i].length;
--		if (offset >= HCI_MAX_AD_LENGTH ||
--		    length > HCI_MAX_AD_LENGTH ||
--		    (offset + length) > HCI_MAX_AD_LENGTH)
-+		if (offset >= HCI_MAX_EXT_AD_LENGTH ||
-+		    length > HCI_MAX_EXT_AD_LENGTH ||
-+		    (offset + length) > HCI_MAX_EXT_AD_LENGTH)
- 			return MGMT_STATUS_INVALID_PARAMS;
- 
- 		p = kmalloc(sizeof(*p), GFP_KERNEL);
--- 
-2.41.0
 
+--===============5777249199834957860==--
