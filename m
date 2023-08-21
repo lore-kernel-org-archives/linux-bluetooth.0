@@ -2,95 +2,45 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92209EE49A0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 05:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB750EE49AF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 09:58:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233074AbjHUFC0 (ORCPT
+        id S234534AbjHUJ6A convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Aug 2023 01:02:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35800 "EHLO
+        Mon, 21 Aug 2023 05:58:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231553AbjHUFCZ (ORCPT
+        with ESMTP id S234521AbjHUJ57 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Aug 2023 01:02:25 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760FEA3;
-        Sun, 20 Aug 2023 22:02:23 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C1F961F9E;
-        Mon, 21 Aug 2023 05:02:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CBBDC433C7;
-        Mon, 21 Aug 2023 05:02:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1692594142;
-        bh=/n3hR5EYT3KBFmLwBg1A5O09p9o/K88PJFEoXgWvlvk=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=uhqtSgTEGCMi0cDV7OxE56LMj9UAbkte1OuhFDuMc0g5++q8Uf3fHQQcKR2CofiGg
-         u94JM9fWCOpqK2CTmVq3z0z1f/28d2Qb9m8m9UbD856x1lRHTjZA1OqguxMaMS2Vwx
-         n3foqpmQFCxFdQEe/HdKrskG/o+IoeapGcEjCJ1gtUa9pYKS6FzFhdZ4odHfL/wRsa
-         /LgljvaGKiJr+2Pdr6bzv+gfbAut43FIHFb4X2ZjF0CuplgBYUy3xT4E0aQl5K9OCt
-         bv0bcTnoHvIv+SQPNm6p7qlNJPrZ7RKzIDQ8DWTD/dAHnMF/UirvZr5pGiF+R2cPvi
-         pu8x9D06RDO3g==
-From:   Kalle Valo <kvalo@kernel.org>
-To:     Bagas Sanjaya <bagasdotme@gmail.com>
-Cc:     Jeff Johnson <quic_jjohnson@quicinc.com>,
-        =?utf-8?Q?Fran=C3=A7ois?= Armand <fanf42@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux ath11k <ath11k@lists.infradead.org>,
-        Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: Fwd: Qualcomm NFA725A on T14s AMD Gen3: Bluetooth: hci0: Failed
- to send headers (or body or access otp area)
-References: <a669d2d5-fee8-5841-eb5f-b7d047d3cdb2@gmail.com>
-Date:   Mon, 21 Aug 2023 08:02:18 +0300
-In-Reply-To: <a669d2d5-fee8-5841-eb5f-b7d047d3cdb2@gmail.com> (Bagas Sanjaya's
-        message of "Fri, 18 Aug 2023 17:16:17 +0700")
-Message-ID: <87il99j8dh.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+        Mon, 21 Aug 2023 05:57:59 -0400
+X-Greylist: delayed 1235 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 21 Aug 2023 02:57:56 PDT
+Received: from mail.bioind.com (unknown [212.199.63.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48F2E3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 02:57:56 -0700 (PDT)
+Received: from [94.156.102.149] (94.156.102.149) by mail.bioind.com
+ (192.168.20.202) with Microsoft SMTP Server (TLS) id 14.3.408.0; Mon, 21 Aug
+ 2023 12:01:57 +0300
+Reply-To: <davbrennanb@gmail.com>
+From:   David Brennan <info@bioind.com>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: Investment Consultation
+Date:   Mon, 21 Aug 2023 02:01:57 -0700
+Message-ID: <20230821020157.721C192E12F44EEB@bioind.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [94.156.102.149]
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Bagas Sanjaya <bagasdotme@gmail.com> writes:
+Attn:
+I'm an Investment Consultant in the United Kingdom, I specialize 
+in searching for potential investments opportunities for high 
+net-worth clients worldwide.
+Should this be of interest to you, please do not hesitate to 
+email me for further information. 
+Kind regards,
+David Brennan
+eMail:davbrennanb@gmail.com
 
-> Hi,
->
-> I notice a bug report on Bugzilla [1]. Quoting from it:
->
->> Hello,
->> 
->> (Sorry by advance if it's not the correct place to discuss that, but
->> I tried other place like my distro kernel forum
->> (https://bbs.archlinux.org/viewtopic.php?id=286929), interactive
->> chat, etc and nobody was able to help).
->> 
->> [1] == Short summary ==
->> 
->> I have a lenovo T14S AMD Gen 3 with a *Qualcomm NFA725A* Wi-Fi card
->> (which is actually reported by lspci as QCNFA765) and bluetooth
->> never worked on it, failing to load the rampatch with "failed to
->> send header" or "failed to send body" or "Failed to access otp area
->> (-71)".
->> 
->> Other people reports bluetooth as working
->> (https://wiki.archlinux.org/title/Lenovo_ThinkPad_T14s_(AMD)_Gen_3)
->> and a work friend has a T16 AMD gen1 which seems to have exactly the
->> same chipset and work flowlessly. So perhaps it's an hardware issue,
->> but I don't know how to qualify it if so.
->> 
->> => How can this be further qualified/debuged/workarounded?
->> 
->> Any help, even RTFM pointing to corresponding manuals would be very
->> much appreciated.
-
-This looks like a bluetooth bug so not related to ath11k (which is a
-Wi-Fi driver).
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
