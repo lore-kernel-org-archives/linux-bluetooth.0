@@ -2,54 +2,54 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AE2EE49AA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 12:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E80BEE49A6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Aug 2023 12:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234105AbjHUMBD (ORCPT
+        id S234123AbjHUMBF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Aug 2023 08:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53816 "EHLO
+        Mon, 21 Aug 2023 08:01:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232800AbjHUMBC (ORCPT
+        with ESMTP id S232800AbjHUMBE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Aug 2023 08:01:02 -0400
+        Mon, 21 Aug 2023 08:01:04 -0400
 Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2040.outbound.protection.outlook.com [40.107.21.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03D29C7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 05:01:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E65E90
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 05:01:02 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bTsDsM4UFK/ahIRlDgOieCqJ/LBh5BcHk+jsJGhaijuWn2zRFI94H2sv00dkkPCSoUND3fo9K0T+2ly8ayPdjwyXXSeiRX6M58SS4PgWY2UHHerD1NsRmL/z4v6nBFn05C/yM0URG0LYrvglzviQ2voLyjW+/kHgJANJv99ig0TuKZSsb0YNeas85YsVqDbdBAfcZWmc2Z8Q93sCw9dbFzkJ+1FWbuGzy1CVlnnfLg4KQhioZpj2p66u/nxWSQNT9mLJrBDotFfiRly4ROqHVuyJp4pnMRs5c679trCxbJh7ZdawaC2vb+YFwlVH4UicVKlJ+7Jhhzin4ul5+DpNXA==
+ b=ko/aKF6baFpx/0zC7WRl1fOEr0KErmhstlbGsKoOf59MQrnyMThhd6OF5nnAmg8Tzt+gqB3M+Pl9NOd9LyiC3g0V8sKleGqNLXI5UzZZ1OUrxHYsTtAE5IlAQ7QfyEy4m1QSy/pYv79z00mpinyWv2zC5Uc3NvxieNOF/jwlrqO8+IdOnk0xC476tvNx7O10113PpbX8qB0bfCDwNA6Gmuhu+Pq1Sq3a4cuOJD9i7MzMYRGbyiRf02gW+labaMcqOnD3XPRnYMBvkFnh+Ug4TBRaRvSjBid08P3RhcHc0Ue0zZ1ArWs5mFtmTkb+T67xjll2PY07oCU+RjYKNadk1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f3rMSqVvJS+dU5rAXtWWY/+V9j1dhE1y7FlyUlh0okA=;
- b=OE8LNQws9sGkyKzXTYn2lsbTewzscezkXvdnEQeDvzBS/Vezlf5G4Kv15LcQN4EnB3x1+okaD+ISaBkfpHxbKEfEOHfr2ByU8TshFI7VjlRZ3rXUghkZZQnXE5Q29C8t9wAdbngGmWmdqbOUhsxQ0IVai/66nKZM95EW8NGQTUP8o+MZDbYDAo87RgUK89MSrus9lvftMIeGybniRHrkZHsdHZUPCtNIHePxy6oYNRnH8X8LFvaBknvCVkTbcSpAGGEaUUSUMU2L7eY6k88kO5eO8olTk9YGjdEaUDiVR08dset5II+lERCEXm4lodeK1Px/67hgIcDxCR+z7mmcDw==
+ bh=Am3VOGNcf+iyHlW49B6gvGFG3cNYpq8YYJg/wk8U5YQ=;
+ b=nAHRHmUvQ7L8gXLpq7sLAdBP+WL75Wg8sVUqdHsZO4pWSZ1Wu1bjtK/PISNNLoo9lx7KeINPGYOpxt/nD4urzWi1uKuCRpF2j5OynsX2fHZ8ZUhoUXTK6uSSyhGOStFWdXeJvo5+SHD08mDHeWltdgNtfzGLQXftdaEyvsNUt6xN7fL+dGW132hSbI69NwERPIKc+mippIYRyfsgNUgObPopAt6Qt6OowCjI3S67srpw3+fb32cmEnEcyIJCrRAt+YEoRE8/4vol6n6oh1/78Pl4DAnJL2QAWbdOUjKuwt1rdBsPUGmk3AcwNTCSPcfbgD1n3okOnNRotk97HUl6iw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f3rMSqVvJS+dU5rAXtWWY/+V9j1dhE1y7FlyUlh0okA=;
- b=RojizRpzRjl7jXWSM9n5TMeT070JeqtBM6VnrLdThe6YmZhahS9ZzpctWFJUs6oSGGLAqzGNzwz60WdxYHsPNLmUQmzgUbvrAbWLT6QHFjc2Tygs7pU6ApX541rOgurEvliT7bkDz+4lCYVCkXh4ojcwPI84K7n5WIRufYpsmzo=
+ bh=Am3VOGNcf+iyHlW49B6gvGFG3cNYpq8YYJg/wk8U5YQ=;
+ b=hOhkog6KcWCPee5SS2rVJRT5KcuufwC43DtNr1BBb7lAx3pwJu/LP/jpj3LnRe2Ulf5R/Oe+I7ySEI0DPgAUXEWmkCLtWA2IcwCmLE+RsgFVYSsgrZqRlwzgtSjjDDOX0Q2xl6Gj6ALUjGkSIhm9TEX9nw+tdbrhlHv0SazEELo=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by AS8PR04MB7832.eurprd04.prod.outlook.com (2603:10a6:20b:2af::23) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.24; Mon, 21 Aug
- 2023 12:00:59 +0000
+ 2023 12:01:01 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::6e75:56f3:fc37:277b]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::6e75:56f3:fc37:277b%7]) with mapi id 15.20.6678.031; Mon, 21 Aug 2023
- 12:00:59 +0000
+ 12:01:01 +0000
 From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
         silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
         andrei.istodorescu@nxp.com,
         Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH 1/2] Bluetooth: ISO: Add MGMT event for BIGInfo adv report
-Date:   Mon, 21 Aug 2023 15:00:13 +0300
-Message-Id: <20230821120014.28654-2-iulia.tanasescu@nxp.com>
+Subject: [PATCH 2/2] Bluetooth: ISO: Pass sync_handle through iso qos
+Date:   Mon, 21 Aug 2023 15:00:14 +0300
+Message-Id: <20230821120014.28654-3-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230821120014.28654-1-iulia.tanasescu@nxp.com>
 References: <20230821120014.28654-1-iulia.tanasescu@nxp.com>
@@ -61,158 +61,193 @@ X-ClientProxiedBy: AM0PR06CA0124.eurprd06.prod.outlook.com
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS8PR04MB7832:EE_
-X-MS-Office365-Filtering-Correlation-Id: 908537ad-b320-45e5-8458-08dba23e488c
+X-MS-Office365-Filtering-Correlation-Id: 19987fdd-7dff-4f78-7f3a-08dba23e4997
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CRiouIMgOmWqdLpJWT8CzGHS9UKHFWshZ3TERYKpBW/0YkOS3IVWmBeOixDgHmVaIs7nvee4vt6w1GXu71QIRgUpThOzi+myaUvinTO/ymJ+wQMhEVb6+4lWFVLzvi53tw4hlsRdD9uUm1f67bevU8H0AAiQy8ZXOGDq9n0WIHIR0YXFF3mHwd5dx94UMtg5ARmvJ6kXBrRtFdmXCWwOxmV8zgbhtlPdZHbHSP1iRp/W+Iqd5bYN2UJ0raUES5MPRFOToQ2n0nxVCBa1jFmb9K9m/XlLnEsfjl77+KPBOHSpmwzVv5XtojrJjqKhcyOcY2emRuqTbsXXwt3tdxdvb+3PVLiN8Mti+PgDa4M27awnGMw4kg1hYz/F3zIZrZ3uQhIp1GIAAlF+TQIHUvcq+HxKXYLS0L4Wo2lICB43F3ZWCd3o3nQ0kh1060Asl9LZwZRMS2H10lWc4Xk7X0OzajLK36cxZh2E1kPJlLrXMMKpnoqp7yeFvYDUJ1wfysRfao9UNF5JmWo9876bUPSUD6YnZzDnCZfuj/1ueJPny/fXjcitnGXF7qAQAIhKkIPgnmygVdnJK2cJhH1i/V+PhABuIg/O6ZlnWv3WHme0JA8zeWmL6LDbIsoMOfGpOGvz
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(39860400002)(396003)(451199024)(186009)(1800799009)(2906002)(52116002)(38350700002)(55236004)(38100700002)(6506007)(6486002)(83380400001)(5660300002)(44832011)(26005)(86362001)(8676002)(2616005)(8936002)(4326008)(316002)(66946007)(6512007)(6916009)(66556008)(66476007)(478600001)(6666004)(36756003)(41300700001)(1076003)(2004002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: H6zlhpVhPm0VLH21S6AVffhVoyOo3/omNvMg6+vEDQj6ni0ug1WeCCP7XTE+Xxvd0lh3+eQLbgk7NfYQa8n9VDTHKFPfhMmUChdpTPXuskNCngpFpbXRRuclMrT4OCeGZlwNO2D7eb2PvZczH/L2nR2GY010ART0RLIc5dTsAkeRvxGSOSQSKVngEPAEJ7n+/KASE42SCeYsVxxY+b59X7dryqbX25wk+iFN5gS5Gn2ltCv7ovXESrRvvNsDGnZcfZ+/hdkz7OEE5yEWVFyvwN7M9z28uumA00JwgC0kmbAj8rRC75myAbWWoTCUc2gBN33rY4s/6pmDXGqRNA9nES0x7apEI6Zar6zKsjaP3VA9XnlAqH+5D1tGcA+UAYb8KucRTOeLlWkD5NFjlvF2CKoLYLxa0SPhFsenOj91Poy8eQGiA/wXcqner6MK+/gcCSMVpsL2mSkY9TfYdufUlJ1r59Q6yHV5r1EG7HTj8abepA4XRFp9LnDCiG2eQO+sXFKBjA+uZPQpyX7RsUIBgw50T8TVXJ+hfSKmRBXlgVHjYshUBl86Bi+03CDIPU1RuLaoj0mOJ0k1DfnkKoRmuv8vvzSLb9kEM3V7gtxCCcsSUbL3UFUveuGzZeCacK94
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(39860400002)(396003)(451199024)(186009)(1800799009)(2906002)(52116002)(38350700002)(55236004)(38100700002)(6506007)(6486002)(83380400001)(5660300002)(44832011)(26005)(86362001)(8676002)(2616005)(8936002)(4326008)(316002)(66946007)(6512007)(6916009)(66556008)(66476007)(478600001)(6666004)(36756003)(41300700001)(1076003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pr7Mtz6NTugQbLusbHT/DLRK9YHOnWFmzK4PnoRzv49/uUrkAxlbvSJUK45u?=
- =?us-ascii?Q?1Yz8vVbk82RKCynksYlVhQ9mI/z+Bvuv/UC/FGSGpFLpmgO8LUuyJgu9W4fg?=
- =?us-ascii?Q?+HXO9cjOZZ82m2Ww7/OwyjCl+otsaw7zRwjDna9Kklv0yAsieMQ7fJN+Je0o?=
- =?us-ascii?Q?cW865qZ0GQFASKhySXOWS4bbNxTDJ0rsxA2rATtf/8m21XMJ04QdIY0i4Ok5?=
- =?us-ascii?Q?15ZOu61sHJMgd2oFzuZDdGPAr6u9+K8MdaoZtgQMDwJ13ylHEQvEvUz7u8al?=
- =?us-ascii?Q?yfvXJdKo1+vmXpcxrUiWoKQeeqtgdgKcnYmVCqaLvqNWcus4rMiFEoVk4KnB?=
- =?us-ascii?Q?CuxH91Cbbai3VcC/HlFbCs2Z2vfL4va94EX3NnuPJTh+1xXYoYiRlyacWnQT?=
- =?us-ascii?Q?ywLmW8jIi6rJvRYYq42evbtbKXMKwSWvtF9Z1f+tmWNgdsDq7OFA+rpr14IY?=
- =?us-ascii?Q?+IFNOHSwFalSXLuTIDim18MTZXsCRT25+P8DfuNuD698pgvrtqPHmln8uvGE?=
- =?us-ascii?Q?g+U92LIVBGss8m5vsQYKijuNBN8nHu+2Yjf+08vjl3m7887RBd/O5NIoqd14?=
- =?us-ascii?Q?PnsMJkojG4Zpl7/0/Sqe4rjMEdajG1186Lsqys7vkR5Bhnt1E9plUPI5FzxS?=
- =?us-ascii?Q?QJSuIdg83QtaRao4Qt5nY1aIliu8NaDW2ZWpFX7vVhyfjizpm1mFQlnanE1r?=
- =?us-ascii?Q?X8UCyGXhMSIjyjwAM/1womNlrggc2PVEn4v+Ht+8V8XNL2p7vKgCwk3vfUUU?=
- =?us-ascii?Q?fTlnx6/5uotZSNNUvkeh4DdGh+wkZwEjprGBZntuJ9PxT2s35qZit7U1nxWG?=
- =?us-ascii?Q?QzNnA1hELq8PWR2wCDFC8HX/lapA7rO3rZv5/2MyEF2cm1QUxknwX4kWRQ0D?=
- =?us-ascii?Q?ppjX+8ydfa4N6o2pb8ux+eDSqtrgcq5wDo6aLkWuaIIxwDcEHjghjvwQqgeT?=
- =?us-ascii?Q?XDVGXG219jXS8HbhBDW2Wp56lvSXaRFHpOLrdZeRd67/lk/2XPbRDF64/i8/?=
- =?us-ascii?Q?AtQmHriiifi8Tp7iTaYjCW8JyIHztH+3k/FtM2FEF8rOgFucn6LwzP2Apu/Z?=
- =?us-ascii?Q?wxEA4OWMv/OF5uw0j5PDmBbbecBvu2o6+t7aMW7XYTE8o16+3tkpbtrETu0Y?=
- =?us-ascii?Q?MJsm01pEcwAYtOmX0ZEmAQgEggJ57DffALAulXIEGwPCd0nZ5Oo3SQxsk7Eh?=
- =?us-ascii?Q?VhUlDT3bx3nIWT5mauv3d2jYofrTk/Gsr0s/XSyaqzOrIauhiOY37YbqzYFw?=
- =?us-ascii?Q?mufEHRe/9hjQYDWKLY34rFjF+kSiO/vi64oAWfiBLpjHSGEIlXxOVd8QlmmS?=
- =?us-ascii?Q?JjbMj02Wj9lXfzxV8BLD7NHGC1WeWN64mHx3djZfxuAuS4unaU4MlrtZBNwx?=
- =?us-ascii?Q?PH4OMwp+oFAJiDgpCaUbP3+aN8Eu75TcxCGCGRKUpP0s77/FHvn1qhfrOPrC?=
- =?us-ascii?Q?/ZhfRrjD5e2U34eYrXbHP7uVGV05eRljTJcuFL6VJ5mGydTCcuUBDlVIEOV6?=
- =?us-ascii?Q?Yux7LTA6yNx9RIFLx4/HwV8sYFhRI7wFiYIeveP6Ygg72pqBGi4a6IIQxujf?=
- =?us-ascii?Q?CHccZVag7yvHYpW+p0MNiyT65kVCL44MSSl46Qa+g092xL4QQ+qfqzMXiEzT?=
- =?us-ascii?Q?3w=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zp9dR2PDMK0ydugMUEDCz8EMo3SGBcmreZjJCgmg3hXH5WgfdnHp8mWFqKyX?=
+ =?us-ascii?Q?J3AtgpLH9y8eFUoZngz5PFt/2E0ZgBq/KbvzkFuQCrLNpYrxZKLwy3+YXaQM?=
+ =?us-ascii?Q?uGC6b6KqwULchcX8ah7DtfZF+mlmiElY0fLL88a9ZYbX3Mxrqlg5dw8g45DY?=
+ =?us-ascii?Q?KDoghssTdSEm/Xsc0rTeCbvU9Al9JEwLXd6fVPnv0UKTwOhAFyFUaDVTWuVz?=
+ =?us-ascii?Q?/zbHe0QcEgEpdPKKMrNtEEKpyajj0PA2c4EtCVXoy6OzULkVy4Yangcrapg+?=
+ =?us-ascii?Q?GewscxiDatCNTpRjWKflaEJjiXOw95dcgJ8Af4TxIevtUWH00V1WO3S/P5E3?=
+ =?us-ascii?Q?uc69WrEez+hSu4uuizPSPiUwa4tPzW0ca0eI2eJvD5SG1RlsRp4g+oCnKMFL?=
+ =?us-ascii?Q?wm9pcgcM8AsKL/Y1HCFyLoC0f8Owo6jac76CwAJWaFG4U4g0WpHKxWDcADac?=
+ =?us-ascii?Q?ztOxDs5HZ+/JURyALWgBsSeAWl2yKm0XH07hpq5sai3SL//swVGCaxET8EAC?=
+ =?us-ascii?Q?DMQMnsa/6JN6qZ0OqDhQtfwIiqOJY3LtOKsqSRvanbphhH++PPErKrD3o+6i?=
+ =?us-ascii?Q?EdisnTeMMESCKjqTZxjG96o3qZ/Lzvo7KWeHOmwnYXWN6zLBGj/shdAXBmLg?=
+ =?us-ascii?Q?UkerxYJibJkixjnn87c3blcSZsIz8fWYvs5mSbZ9gJ8hV2SAtPLLITO7wOdM?=
+ =?us-ascii?Q?BwYvLjUh5zNLiacmgkPYTX8o8qgBZKDgYl+KAMDIIlHPuim/FT2PrLaVcweE?=
+ =?us-ascii?Q?eSoG45Psn2dc/TJ/3RR+uhD/BRK40irzyPY+qsnndXe3pu8FJchAUPzzVsR3?=
+ =?us-ascii?Q?TzSx6NnEDFUdIHiyWB9H7/9omzrivNdSv2P8SRtcJJD+pSpZCvd6tDCQfho9?=
+ =?us-ascii?Q?HByffCGthM4ihgaRH7id1Sfb4A4W2RF/qQP0xrnKcr9yZR5lKQ+v+V2CparP?=
+ =?us-ascii?Q?2Qu2IxvowPIkmU0oD5XRv9IjXvUH7k4u3YLI+PIvKX00+ToM3qj60LvH906E?=
+ =?us-ascii?Q?w8ACTbW2jTzM6mQt5yfaKkveMzWAln8w2XAl2WWsd6hvqe9s0f5fXMKd8NE5?=
+ =?us-ascii?Q?el9gs/+1lufYSmBngbUFReuFO/BzFLdfPpLtGkY5dWn4ot3rCbKhUa4AsyfZ?=
+ =?us-ascii?Q?nC24nGDUrGKFWtrPxWMV2lqdj/Lxz3eDjdIN8uIc8109JteJUC7CMr4/OUof?=
+ =?us-ascii?Q?0OnQHSdoCv2ZqWFHbbOiHo+OPIPCnXWlcnvSU0xcc7M0qcXEboxdsIGYavr9?=
+ =?us-ascii?Q?WUpI8xhmGBCHr7f/VZybCGfEuc2hggxkvvatJNPo+kJtFdCeDQ+PZbofLAQQ?=
+ =?us-ascii?Q?SeZHCBGSg8hbDeZPmQycnFtOMd/Yfr+ls5LXX7XdVcJdVhlBiGkw4jysbiAS?=
+ =?us-ascii?Q?456Agg3pBGAb2Ep2OOk6VkvFNqaKs+jDBoBUy2MFQy7KNDS6WLf0WnhUgFhG?=
+ =?us-ascii?Q?8+BsGBU2TcM0v2EO0JM0C6V9SZmZ7qwMaEvh/ntfAXPbwjpQj40x93MKfuPN?=
+ =?us-ascii?Q?S+lH+oYwk5XZZNAaC+JIxzOV5BmbsdMLcADsNXgAmm/NF/dHTsiTb+eFQJG6?=
+ =?us-ascii?Q?epFyyl7d2JDy2yhVOWhn9rlVLhzCDE4y9VvTIPiZXRJQpxXhNP6qh0md+75n?=
+ =?us-ascii?Q?Dw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 908537ad-b320-45e5-8458-08dba23e488c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19987fdd-7dff-4f78-7f3a-08dba23e4997
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 12:00:59.3189
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2023 12:01:01.0470
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: r2uLAA+9ljiDg8fqvIvaXV89vfUN3DsID8DVZOQJmResoTWVOwtSpFyrd2ObaUZ6TxgkFRRUckB0oKKokjasMw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: BY99TwARgulJPWVSuaxOCqDq+X0ib0LC+8YDnQ7G+5HHZhwTdOPoiSmIbZwI1FnE7pX9APze8MZ2Y5zJWhm8Tg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7832
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This introduces the MGMT_EV_LE_BIG_INFO_ADV_REPORT event.
+This moves the sync_handle parameter from the iso_pinfo struct to
+the bt_iso_bcast_qos struct, so that it can be retrieved by the user
+using getsockopt after PA is established.
 
 Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- include/net/bluetooth/mgmt.h     | 18 ++++++++++++++++++
- net/bluetooth/hci_event.c        |  7 ++++++-
- net/bluetooth/mgmt.c             |  8 ++++++++
- 4 files changed, 34 insertions(+), 1 deletion(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ include/net/bluetooth/hci_core.h  |  2 +-
+ net/bluetooth/hci_conn.c          |  5 ++---
+ net/bluetooth/iso.c               | 14 +++++---------
+ 4 files changed, 9 insertions(+), 13 deletions(-)
 
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index aa90adc3b2a4..ee284b9bcdd9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -198,6 +198,7 @@ struct bt_iso_bcast_qos {
+ 	__u8  sync_cte_type;
+ 	__u8  mse;
+ 	__u16 timeout;
++	__u16 sync_handle;
+ };
+ 
+ struct bt_iso_qos {
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 6fb055e3c595..ba2e1082b86f 100644
+index ba2e1082b86f..10322e09f875 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -2228,6 +2228,8 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
- void mgmt_suspending(struct hci_dev *hdev, u8 state);
- void mgmt_resuming(struct hci_dev *hdev, u8 reason, bdaddr_t *bdaddr,
- 		   u8 addr_type);
-+int mgmt_le_big_info_adv_report(struct hci_dev *hdev,
-+				struct hci_evt_le_big_info_adv_report *ev);
- bool mgmt_powering_down(struct hci_dev *hdev);
- void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
- void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk, bool persistent);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index d382679efd2b..5f7ad5bc5f73 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -3,6 +3,7 @@
- 
-    Copyright (C) 2010  Nokia Corporation
-    Copyright (C) 2011-2012  Intel Corporation
-+   Copyright 2023  NXP
- 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License version 2 as
-@@ -1177,3 +1178,20 @@ struct mgmt_ev_mesh_device_found {
- struct mgmt_ev_mesh_pkt_cmplt {
- 	__u8	handle;
- } __packed;
-+
-+#define MGMT_EV_LE_BIG_INFO_ADV_REPORT	0x0033
-+struct mgmt_ev_le_big_info_adv_report {
-+	__le16  sync_handle;
-+	__u8    num_bis;
-+	__u8    nse;
-+	__le16  iso_interval;
-+	__u8    bn;
-+	__u8    pto;
-+	__u8    irc;
-+	__le16  max_pdu;
-+	__u8    sdu_interval[3];
-+	__le16  max_sdu;
-+	__u8    phy;
-+	__u8    framing;
-+	__u8    encryption;
-+} __packed;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b4b72070f5f6..b794c8fb2238 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -7143,9 +7143,14 @@ static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_lock(hdev);
- 
- 	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, ISO_LINK, &flags);
--	if (!(mask & HCI_LM_ACCEPT))
-+	if (!(mask & HCI_LM_ACCEPT)) {
- 		hci_le_pa_term_sync(hdev, ev->sync_handle);
-+		goto unlock;
-+	}
- 
-+	mgmt_le_big_info_adv_report(hdev, ev);
-+
-+unlock:
- 	hci_dev_unlock(hdev);
+@@ -1462,7 +1462,7 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
+ 		       __u8 sid, struct bt_iso_qos *qos);
+ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
+ 			   struct bt_iso_qos *qos,
+-			   __u16 sync_handle, __u8 num_bis, __u8 bis[]);
++			   __u8 num_bis, __u8 bis[]);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 8b0c8e631324..2164c8b7b962 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2105,8 +2105,7 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
  }
  
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d6c9b7bc8592..db6d74c40ac3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3,6 +3,7 @@
+ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
+-			   struct bt_iso_qos *qos,
+-			   __u16 sync_handle, __u8 num_bis, __u8 bis[])
++			   struct bt_iso_qos *qos, __u8 num_bis, __u8 bis[])
+ {
+ 	struct _packed {
+ 		struct hci_cp_le_big_create_sync cp;
+@@ -2126,7 +2125,7 @@ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
  
-    Copyright (C) 2010  Nokia Corporation
-    Copyright (C) 2011-2012 Intel Corporation
-+   Copyright 2023 NXP
+ 	memset(&pdu, 0, sizeof(pdu));
+ 	pdu.cp.handle = qos->bcast.big;
+-	pdu.cp.sync_handle = cpu_to_le16(sync_handle);
++	pdu.cp.sync_handle = cpu_to_le16(qos->bcast.sync_handle);
+ 	pdu.cp.encryption = qos->bcast.encryption;
+ 	memcpy(pdu.cp.bcode, qos->bcast.bcode, sizeof(pdu.cp.bcode));
+ 	pdu.cp.mse = qos->bcast.mse;
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 9879f2349d48..47f7176c166a 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -63,7 +63,6 @@ struct iso_pinfo {
+ 	__u8			bc_sid;
+ 	__u8			bc_num_bis;
+ 	__u8			bc_bis[ISO_MAX_NUM_BIS];
+-	__u16			sync_handle;
+ 	unsigned long		flags;
+ 	struct bt_iso_qos	qos;
+ 	bool			qos_user_set;
+@@ -792,7 +791,7 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
  
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License version 2 as
-@@ -10523,6 +10524,13 @@ void mgmt_resuming(struct hci_dev *hdev, u8 reason, bdaddr_t *bdaddr,
- 	mgmt_event(MGMT_EV_CONTROLLER_RESUME, hdev, &ev, sizeof(ev), NULL);
+ 	bacpy(&iso_pi(sk)->dst, &sa->iso_bc->bc_bdaddr);
+ 	iso_pi(sk)->dst_type = sa->iso_bc->bc_bdaddr_type;
+-	iso_pi(sk)->sync_handle = -1;
++	iso_pi(sk)->qos.bcast.sync_handle = -1;
+ 	iso_pi(sk)->bc_sid = sa->iso_bc->bc_sid;
+ 	iso_pi(sk)->bc_num_bis = sa->iso_bc->bc_num_bis;
+ 
+@@ -1174,7 +1173,6 @@ static void iso_conn_big_sync(struct sock *sk)
+ 	if (!test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
+ 		err = hci_le_big_create_sync(hdev, iso_pi(sk)->conn->hcon,
+ 					     &iso_pi(sk)->qos,
+-					     iso_pi(sk)->sync_handle,
+ 					     iso_pi(sk)->bc_num_bis,
+ 					     iso_pi(sk)->bc_bis);
+ 		if (err)
+@@ -1643,11 +1641,10 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 		if (!bacmp(&hcon->dst, BDADDR_ANY)) {
+ 			bacpy(&hcon->dst, &iso_pi(parent)->dst);
+ 			hcon->dst_type = iso_pi(parent)->dst_type;
+-			hcon->sync_handle = iso_pi(parent)->sync_handle;
++			hcon->sync_handle = iso_pi(parent)->qos.bcast.sync_handle;
+ 		}
+ 
+ 		if (ev2 && !ev2->status) {
+-			iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
+ 			iso_pi(sk)->qos = iso_pi(parent)->qos;
+ 			iso_pi(sk)->bc_num_bis = iso_pi(parent)->bc_num_bis;
+ 			memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis, ISO_MAX_NUM_BIS);
+@@ -1689,7 +1686,7 @@ static bool iso_match_sync_handle(struct sock *sk, void *data)
+ {
+ 	struct hci_evt_le_big_info_adv_report *ev = data;
+ 
+-	return le16_to_cpu(ev->sync_handle) == iso_pi(sk)->sync_handle;
++	return le16_to_cpu(ev->sync_handle) == iso_pi(sk)->qos.bcast.sync_handle;
  }
  
-+int mgmt_le_big_info_adv_report(struct hci_dev *hdev,
-+				struct hci_evt_le_big_info_adv_report *ev)
-+{
-+	return mgmt_event(MGMT_EV_LE_BIG_INFO_ADV_REPORT, hdev,
-+			(struct mgmt_ev_le_big_info_adv_report *)ev, sizeof(*ev), NULL);
-+}
-+
- static struct hci_mgmt_chan chan = {
- 	.channel	= HCI_CHANNEL_CONTROL,
- 	.handler_count	= ARRAY_SIZE(mgmt_handlers),
+ /* ----- ISO interface with lower layer (HCI) ----- */
+@@ -1708,7 +1705,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	 *
+ 	 * 1. HCI_EV_LE_PA_SYNC_ESTABLISHED: The socket may specify a specific
+ 	 * SID to listen to and once sync is estabilished its handle needs to
+-	 * be stored in iso_pi(sk)->sync_handle so it can be matched once
++	 * be stored in iso_pi(sk)->qos.bcast.sync_handle so it can be matched once
+ 	 * receiving the BIG Info.
+ 	 * 2. HCI_EVT_LE_BIG_INFO_ADV_REPORT: When connect_ind is triggered by a
+ 	 * a BIG Info it attempts to check if there any listening socket with
+@@ -1719,7 +1716,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 		sk = iso_get_sock_listen(&hdev->bdaddr, bdaddr, iso_match_sid,
+ 					 ev1);
+ 		if (sk && !ev1->status)
+-			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
++			iso_pi(sk)->qos.bcast.sync_handle = le16_to_cpu(ev1->handle);
+ 
+ 		goto done;
+ 	}
+@@ -1742,7 +1739,6 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 			    !test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
+ 				err = hci_le_big_create_sync(hdev, NULL,
+ 							     &iso_pi(sk)->qos,
+-							     iso_pi(sk)->sync_handle,
+ 							     iso_pi(sk)->bc_num_bis,
+ 							     iso_pi(sk)->bc_bis);
+ 				if (err) {
 -- 
 2.34.1
 
