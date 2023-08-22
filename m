@@ -2,97 +2,111 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 000B3EE4996
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Aug 2023 11:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA78EE4993
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Aug 2023 13:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235174AbjHVLp5 convert rfc822-to-8bit (ORCPT
+        id S229967AbjHVNCG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Aug 2023 07:45:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54188 "EHLO
+        Tue, 22 Aug 2023 09:02:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235162AbjHVLp4 (ORCPT
+        with ESMTP id S235959AbjHVNCE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Aug 2023 07:45:56 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174BBE71
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Aug 2023 04:45:31 -0700 (PDT)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9CB2560009;
-        Tue, 22 Aug 2023 11:43:27 +0000 (UTC)
-Message-ID: <3c21153996077c50785660213a174f6a21519aa1.camel@hadess.net>
-Subject: Re: [PATCH] Bluetooth: btusb: Fix quirks table naming
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Tue, 22 Aug 2023 13:43:26 +0200
-In-Reply-To: <0c05b814-2ec0-4b54-80a3-fc54d753c0d3@molgen.mpg.de>
-References: <20230822102033.1169580-1-hadess@hadess.net>
-         <0c05b814-2ec0-4b54-80a3-fc54d753c0d3@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+        Tue, 22 Aug 2023 09:02:04 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B7ACE9;
+        Tue, 22 Aug 2023 06:02:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6436664C83;
+        Tue, 22 Aug 2023 13:02:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F5FC433BA;
+        Tue, 22 Aug 2023 13:01:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692709321;
+        bh=5wNvmmVUGipwdFV4DA5Qq+spVPdhC20+U8ualyHiEww=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=If6P8PLS1eHkLD5z6uQv3eMQ0eflflKqG0zQ/E7ehqhE9Ccgbgpuibkpy7IulplHp
+         iGsGdyaSo36LwFFEYMc3u15d35wD0ajPs9MQOvgogLcHhYnNLRwnQC1dOF1OsLsq/a
+         HacXXIROiENeIzBPt/QU12GeEi98/wOm53q+NinEQhu4n16dzIbeBYuBQz5gjvoOhv
+         BRYYDrYSrCfOW8j2idMQKHbre+FQ+uwC/kVQvqBemCZVebvENM9bu86E9MOQ23HzFq
+         j9eb1Ha5RWNbOYusxmQvzOs0FuWoAlhOI9N3oECwXjlOWNXwD1iIzw5qRxz8Oz7yhW
+         mcIfc8FsMY70A==
+From:   Kalle Valo <kvalo@kernel.org>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Jeff Johnson <quic_jjohnson@quicinc.com>,
+        =?utf-8?Q?Fran=C3=A7ois?= Armand <fanf42@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ath11k <ath11k@lists.infradead.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: Fwd: Qualcomm NFA725A on T14s AMD Gen3: Bluetooth: hci0: Failed
+ to send headers (or body or access otp area)
+References: <a669d2d5-fee8-5841-eb5f-b7d047d3cdb2@gmail.com>
+        <87il99j8dh.fsf@kernel.org>
+        <89c53213-cb9b-7a8c-bc9c-92cabfdbba4d@gmail.com>
+Date:   Tue, 22 Aug 2023 16:01:57 +0300
+In-Reply-To: <89c53213-cb9b-7a8c-bc9c-92cabfdbba4d@gmail.com> (Bagas Sanjaya's
+        message of "Tue, 22 Aug 2023 15:21:13 +0700")
+Message-ID: <87fs4bi62i.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 2023-08-22 at 12:41 +0200, Paul Menzel wrote:
-> Dear Bastian,
-> 
-> 
-> Thank you for the patch.
-> 
-> Am 22.08.23 um 12:20 schrieb Bastien Nocera:
-> > The quirks table was named "blacklist_table" which isn't a good
-> > description for that table as devices detected using it weren't
-> > ignored
-> > by the driver.
-> > 
-> > Rename the table to match what it actually does.
-> 
-> Maybe mention the new name also in the summary to be more specific?
-> Maybe:
-> 
-> Bluetooth: btusb: Rename blacklist_table to quirks_table
+Bagas Sanjaya <bagasdotme@gmail.com> writes:
 
-I think that's clear enough from the commit message itself.
+> On 21/08/2023 12:02, Kalle Valo wrote:
+>> Bagas Sanjaya <bagasdotme@gmail.com> writes:
+>> 
+>>> Hi,
+>>>
+>>> I notice a bug report on Bugzilla [1]. Quoting from it:
+>>>
+>>>> Hello,
+>>>>
+>>>> (Sorry by advance if it's not the correct place to discuss that, but
+>>>> I tried other place like my distro kernel forum
+>>>> (https://bbs.archlinux.org/viewtopic.php?id=286929), interactive
+>>>> chat, etc and nobody was able to help).
+>>>>
+>>>> [1] == Short summary ==
+>>>>
+>>>> I have a lenovo T14S AMD Gen 3 with a *Qualcomm NFA725A* Wi-Fi card
+>>>> (which is actually reported by lspci as QCNFA765) and bluetooth
+>>>> never worked on it, failing to load the rampatch with "failed to
+>>>> send header" or "failed to send body" or "Failed to access otp area
+>>>> (-71)".
+>>>>
+>>>> Other people reports bluetooth as working
+>>>> (https://wiki.archlinux.org/title/Lenovo_ThinkPad_T14s_(AMD)_Gen_3)
+>>>> and a work friend has a T16 AMD gen1 which seems to have exactly the
+>>>> same chipset and work flowlessly. So perhaps it's an hardware issue,
+>>>> but I don't know how to qualify it if so.
+>>>>
+>>>> => How can this be further qualified/debuged/workarounded?
+>>>>
+>>>> Any help, even RTFM pointing to corresponding manuals would be very
+>>>> much appreciated.
+>> 
+>> This looks like a bluetooth bug so not related to ath11k (which is a
+>> Wi-Fi driver).
+>> 
+>
+> Oops, I really can't guess which driver is the culprit in this case unless
+> the reporter also attaches lsmod output.
 
-> > Signed-off-by: Bastien Nocera <hadess@hadess.net>
-> > ---
-> >   drivers/bluetooth/btusb.c | 4 ++--
-> >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 764d176e9735..a1be66ef175c 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -175,7 +175,7 @@ static const struct usb_device_id btusb_table[]
-> > = {
-> >   
-> >   MODULE_DEVICE_TABLE(usb, btusb_table);
-> >   
-> > -static const struct usb_device_id blacklist_table[] = {
-> > +static const struct usb_device_id quirks_table[] = {
-> >         /* CSR BlueCore devices */
-> >         { USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
-> >   
-> > @@ -4113,7 +4113,7 @@ static int btusb_probe(struct usb_interface
-> > *intf,
-> >         if (!id->driver_info) {
-> >                 const struct usb_device_id *match;
-> >   
-> > -               match = usb_match_id(intf, blacklist_table);
-> > +               match = usb_match_id(intf, quirks_table);
-> >                 if (match)
-> >                         id = match;
-> >         }
-> 
-> Thank you for doing this.
-> 
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> 
-> Kind regards,
-> 
-> Paul
+No worries, it's understandable that it's not always clear where the
+problem is. And most likely the reporter also has ath11k driver loaded
+as the same chip has both Wi-Fi and Bluetooth functionality.
 
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
