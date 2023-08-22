@@ -2,434 +2,125 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AE8EE49A4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Aug 2023 04:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE6FEE4996
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Aug 2023 08:21:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232345AbjHVEKo (ORCPT
+        id S233760AbjHVIVa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Aug 2023 00:10:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55444 "EHLO
+        Tue, 22 Aug 2023 04:21:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbjHVEKn (ORCPT
+        with ESMTP id S229652AbjHVIV2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Aug 2023 00:10:43 -0400
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83F65133
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 21:10:41 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-40c72caec5cso193051cf.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Aug 2023 21:10:41 -0700 (PDT)
+        Tue, 22 Aug 2023 04:21:28 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DF2193;
+        Tue, 22 Aug 2023 01:21:27 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1bf7423ef3eso12925055ad.3;
+        Tue, 22 Aug 2023 01:21:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1692677440; x=1693282240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/U2ABHUFjqfM1yqKzJCAwnKh/zDXzD3C006UOLjw/Z0=;
-        b=a1NskRyl1BQKYiwc3oMAR1ig4w9z6Kndee3aeK5FeB+LKLkvQCiMmUJvhNh/YlghPT
-         GJnQ0kuRmtoWlIHyoneSeQ6Rwpt9NAEf9rm+JnuQYgEX27ZauVTA/5aQz9Tbr45sCz/Z
-         ugQebyKy7NbftQnkCTHzXGePi9KIq7W3iOAhIvlU6wMffncnyzT3DyJz0u93a6QLYDtj
-         RjhJtzeIM0INrkiam03XFOs58FHfzwfmJ7L0gNIQLxfFrqwv8mxqR4xZRFuIePDPt4Th
-         /qHiQDrhC/1r9/Wuh9X9jB8hwbJtC2u/Dn2e29Y9im2SBeIQOjSxMFvnj02CWoUqrIij
-         L05A==
+        d=gmail.com; s=20221208; t=1692692487; x=1693297287;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uI5wJ9ct8HbAPvV5fuCcTfn2AV2BtXUESKYHqH+gEZw=;
+        b=dmmVzhodRiHBaiBk2cTWwNeLD5MFk3SlNyeOdRVp3rZLKMfD3iSVt1Z6Du4MoEAu3C
+         VJRu+oVvutrc4I7CGNZZZPshYchrQO4wmwV7Y3suUfneMzz8yD1QkqG1lI5b++7A7aa+
+         orSuAMiMZyqXA+lQN97vF1/nTbmZ+5BDyC+LJ7Nvcd98oZCs6xmsoJmX/eIFZYP2jNLG
+         dKPM7tFQ7cJwC09BldNmZYtjNIch3mStTE313G3Keq55TIq+GYAcp1DUIYU0c0Evb0K0
+         vCFOYBZWYTnQdh+EYHzUVnUVIu7dcUwZRts1P1r45drWpWDNjQxyoo0WL2xDG0TG/BiK
+         X+2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692677440; x=1693282240;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/U2ABHUFjqfM1yqKzJCAwnKh/zDXzD3C006UOLjw/Z0=;
-        b=D9kB1VWXchyelNu9WsR5nyurZus+q7ok2JBH3GIJRURWDUCILxt0W/kHDF5KORI4Sa
-         tqkhJkfM2VZqXEFfgZVL+PBAI+5ts14tFoSEMlfeQ74qYdDC5PTOvcMdFqlgo1fjm3cS
-         4oLf8QJ4Xk/uA2Mtb2zIO1fIzmbp4MZKoQKbocNPa5qTVaGDgeyppNWgsZ296pRCfViA
-         Cx5CHupvGoJEGYoFSA1fZQsP2EaUevbslfkOiAri2A4CUQHCevgaKIMK4gvgXofnmg1S
-         DJQp2PV67TxyvRUp9rhi5LV9g7pBnYSOcXbCVzfxhp5CVueB3t4DIHjOE9DVVoUMCJS0
-         klTw==
-X-Gm-Message-State: AOJu0YxrFIZUk53PzW2czXlWehufuMAo3xFI8b5GW7DT9F75LECfxGJn
-        GRDn1aLFbT0+Vbb88CeC06Iiu3+y2c/6mmwpEoMPdA==
-X-Google-Smtp-Source: AGHT+IHLAgd1Q6hI9ENHDxQJgbzuOww9YXpt/GlYdwJXRdTgTMoaICVDPml/v138lCJMspIjfpHmFUz7+TMs4IxbFzQ=
-X-Received: by 2002:a05:622a:1823:b0:403:fdf1:e05e with SMTP id
- t35-20020a05622a182300b00403fdf1e05emr98577qtc.19.1692677440509; Mon, 21 Aug
- 2023 21:10:40 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692692487; x=1693297287;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uI5wJ9ct8HbAPvV5fuCcTfn2AV2BtXUESKYHqH+gEZw=;
+        b=ODv1ZdLFqDlZxHqD7TQupFAUhzM//KPJ4sw7UzOHAgTyUq8cvzdd2REdA9IDBj4/wQ
+         lG8PRFKR/OGY981faVj30xG4AAKOsenn091hGJojYImgA/0eICjQs/jiQQlVXa3MdzoW
+         B6IV3Rp4f3GuwFHtKYBZ6PSTYpBbOZ1lsp7DaAgWu0CXbzFQPbHOhL84Kx9hO+v7jfGw
+         /cGeCnmdys9LZU9Peb8a5glDJlVXSKsAUpphY5wjK9fsrLDsjv6zbuQfLanqwdacAr5l
+         Uq4O6Mrx/mM+0tgvU7k7pxZaYTp9dzHEA0QNfYCQl5RfQ9ASM0CEmdn8GVzr2QSupg3Q
+         Qshg==
+X-Gm-Message-State: AOJu0YwGDI6yIrg305CHOfTNb+4g0OjB1t4yjSEff1J5ylzsIsBUCwc6
+        UUDbcL6vTkpiiV9l/oUBhGI=
+X-Google-Smtp-Source: AGHT+IGkJqTPjxCrrWnjEwUbe4lmC/X6ykOLRTrv5yzolm6JCwBcEWYWVYQI6N7/AQ/ohx6Hz0hmcg==
+X-Received: by 2002:a17:903:25d4:b0:1bc:2c83:f770 with SMTP id jc20-20020a17090325d400b001bc2c83f770mr6068989plb.45.1692692486623;
+        Tue, 22 Aug 2023 01:21:26 -0700 (PDT)
+Received: from [192.168.0.105] ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id h3-20020a170902748300b001bbb8d5166bsm8358202pll.123.2023.08.22.01.21.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Aug 2023 01:21:26 -0700 (PDT)
+Message-ID: <89c53213-cb9b-7a8c-bc9c-92cabfdbba4d@gmail.com>
+Date:   Tue, 22 Aug 2023 15:21:13 +0700
 MIME-Version: 1.0
-References: <20230821102810.Bluez.v1.1.Ib819b0964a5b8339305d94611acab85774a6c8ce@changeid>
- <CABBYNZK8SW9aMHL-yrCQUN+72z_rDZWK83wAdutMA8xG-Zdo9A@mail.gmail.com>
- <CAB4PzUpL-FBU0tz1gXjqZXY1ZoJKNSCqcf92Q=yhGo0g5YbtEQ@mail.gmail.com>
- <CABBYNZKaaSjmJ4ZLOsBjHYRw8Uoou0XbJKKnZ07Y30+hQONqnQ@mail.gmail.com> <CABBYNZ+zbs7TP57pn==YPKy_8MUOLBkjiJRPATM3prvO==L1-g@mail.gmail.com>
-In-Reply-To: <CABBYNZ+zbs7TP57pn==YPKy_8MUOLBkjiJRPATM3prvO==L1-g@mail.gmail.com>
-From:   Zhengping Jiang <jiangzp@google.com>
-Date:   Mon, 21 Aug 2023 21:10:28 -0700
-Message-ID: <CAB4PzUoM=zxkNWy57N_nEucD_Q_9OotGnOHKb=yEXjnbBB-WGA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] adapter: check wake_override when setting device privacy
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.14.0
+Subject: Re: Fwd: Qualcomm NFA725A on T14s AMD Gen3: Bluetooth: hci0: Failed
+ to send headers (or body or access otp area)
+To:     Kalle Valo <kvalo@kernel.org>
+Cc:     Jeff Johnson <quic_jjohnson@quicinc.com>,
+        =?UTF-8?Q?Fran=c3=a7ois_Armand?= <fanf42@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ath11k <ath11k@lists.infradead.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <a669d2d5-fee8-5841-eb5f-b7d047d3cdb2@gmail.com>
+ <87il99j8dh.fsf@kernel.org>
+Content-Language: en-US
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+In-Reply-To: <87il99j8dh.fsf@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+On 21/08/2023 12:02, Kalle Valo wrote:
+> Bagas Sanjaya <bagasdotme@gmail.com> writes:
+> 
+>> Hi,
+>>
+>> I notice a bug report on Bugzilla [1]. Quoting from it:
+>>
+>>> Hello,
+>>>
+>>> (Sorry by advance if it's not the correct place to discuss that, but
+>>> I tried other place like my distro kernel forum
+>>> (https://bbs.archlinux.org/viewtopic.php?id=286929), interactive
+>>> chat, etc and nobody was able to help).
+>>>
+>>> [1] == Short summary ==
+>>>
+>>> I have a lenovo T14S AMD Gen 3 with a *Qualcomm NFA725A* Wi-Fi card
+>>> (which is actually reported by lspci as QCNFA765) and bluetooth
+>>> never worked on it, failing to load the rampatch with "failed to
+>>> send header" or "failed to send body" or "Failed to access otp area
+>>> (-71)".
+>>>
+>>> Other people reports bluetooth as working
+>>> (https://wiki.archlinux.org/title/Lenovo_ThinkPad_T14s_(AMD)_Gen_3)
+>>> and a work friend has a T16 AMD gen1 which seems to have exactly the
+>>> same chipset and work flowlessly. So perhaps it's an hardware issue,
+>>> but I don't know how to qualify it if so.
+>>>
+>>> => How can this be further qualified/debuged/workarounded?
+>>>
+>>> Any help, even RTFM pointing to corresponding manuals would be very
+>>> much appreciated.
+> 
+> This looks like a bluetooth bug so not related to ath11k (which is a
+> Wi-Fi driver).
+> 
 
-A few questions on the patch.
-(1) I checked in the new_irk_callback, the patch calls
-device_set_rpa(device, true). This feels like the assumption is still
-having IRK means using RPA. If I understand correctly, this is not
-true. For example, the MX Master 3 mouse I am using. It is using an
-identity address, but still having IRK.
+Oops, I really can't guess which driver is the culprit in this case unless
+the reporter also attaches lsmod output. To François: Can you show
+lsmod list as requested?
 
-This is from the pairing log, the RPA is empty in the callback.
-> src/adapter.c:new_irk_callback() hci0 new IRK for E3:C1:E3:A6:10:D9 RPA 0=
-0:00:00:00:00:00
+Also Cc: bluetooth people.
 
-I think we may need to check the type of the conn_bdaddr and make sure
-it is a RPA.
+-- 
+An old man doll... just what I always wanted! - Clara
 
-(2)
-> Note you need LL Privacy on the scanner side, not on the peripheral
-> that is advertising, so if you got this the other way around it will
-> not work. RPA resolution is required to be able to resolve the
-> advertisements using RPAs since the accept list can only be programmed
-> with the identity address.
-
-Regarding this, I have enabled privacy in both scanner and peripheral.
-As shown in the log, after the adapter is powered on. The identity
-address is added to the accept list and the IRK is added to the
-resolving list. Then the address resolution is enabled.
-
-< HCI Command: LE Add Device To Resolving List (0x08|0x0027) plen 39
-
-               #582 [hci0] 16:06:32.070202
-        Address type: Public (0x00)
-        Address: DC:A6:32:A4:09:DF (OUI DC-A6-32)
-        Peer identity resolving key: b724b925ee4e955d723fa2247bba24a0
-        Local identity resolving key: 00000000000000000000000000000000
-...
-< HCI Command: LE Set Privacy Mode (0x08|0x004e) plen 8
-
-               #584 [hci0] 16:06:32.071113
-        Peer Identity address type: Public (0x00)
-        Peer Identity address: DC:A6:32:A4:09:DF (OUI DC-A6-32)
-        Privacy Mode: Use Device Privacy (0x01)
-...
-< HCI Command: LE Add Device To Accept List (0x08|0x0011) plen 7
-
-               #586 [hci0] 16:06:32.072126
-        Address type: Public (0x00)
-        Address: DC:A6:32:A4:09:DF (OUI DC-A6-32)
-...
-< HCI Command: LE Set Address Resolution Enable (0x08|0x002d) plen 1
-
-               #588 [hci0] 16:06:32.073130
-        Address resolution: Enabled (0x01)
-> HCI Event: Command Complete (0x0e) plen 4                                =
-                                                                           =
-       #589 [hci0] 16:06:32.073986
-      LE Set Address Resolution Enable (0x08|0x002d) ncmd 1
-        Status: Success (0x00)
-
-The scan policy is set to 0x01.
-
-< HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 8
-
-               #590 [hci0] 16:06:32.074074
-        Own address type: Public (0x00)
-        Filter policy: Ignore not in accept list (0x01)
-        PHYs: 0x01
-        Entry 0: LE 1M
-          Type: Passive (0x00)
-          Interval: 367.500 msec (0x024c)
-          Window: 37.500 msec (0x003c)
-
-The advertisement also shows the address is resolved.
-
-> HCI Event: LE Meta Event (0x3e) plen 32                                  =
-                                                                           =
-       #604 [hci0] 16:07:05.292173
-      LE Extended Advertising Report (0x0d)
-...
-          Address type: Resolved Public (0x02)
-          Address: DC:A6:32:A4:09:DF (OUI DC-A6-32)
-
-(3) Given comment (2), when LL privacy is enabled both on scanner and
-peripheral, the issue still exists in hog_probe. The connection is
-built with the RPA, so the connection cannot be found before adding
-the device is done. It will fail at hci_conn_params_lookup. As
-set_device_flags is always called with identity address.
-
-params =3D hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
-le_addr_type(cp->addr.type));
-
-During add_device, a new hci_conn_params will be added with
-hci_conn_params_set. Then the following set_device_flags will not
-fail.
-
-Zhengping
-
-
-Thanks,
-Zhengping
-
-
-
-
-
-On Mon, Aug 21, 2023 at 12:59=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi,
->
-> On Mon, Aug 21, 2023 at 12:51=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi,
-> >
-> > On Mon, Aug 21, 2023 at 12:45=E2=80=AFPM Zhengping Jiang <jiangzp@googl=
-e.com> wrote:
-> > >
-> > > Hi Luiz,
-> > >
-> > > Thanks for the reply. I applied the above patch "device: Fix enabling
-> > > wake support without RPA Resolution" and tried again. I can see there
-> > > are still some things missing.
-> > > I have attached a btsnoop log for reference. Here I am using a rasp p=
-i
-> > > configured as a LE mouse which is in privacy mode.
-> > >
-> > > The ll privacy feature is enabled at the beginning.
-> > > @ MGMT Command: Set Experimental Feature (0x004a) plen 17
-> > >                                                {0x0003} [hci0]
-> > > 19:21:30.193783
-> > >         UUID: BlueZ Experimental LL privacy
-> > >         Action: Enabled (0x01)
-> > >
-> > > Later the LE advertisement with RPA is received.
->
-> Note you need LL Privacy on the scanner side, not on the peripheral
-> that is advertising, so if you got this the other way around it will
-> not work. RPA resolution is required to be able to resolve the
-> advertisements using RPAs since the accept list can only be programmed
-> with the identity address.
->
-> > >
-> > > > HCI Event: LE Meta Event (0x3e) plen 32                            =
-                                                     #311 [hci0] 19:22:36.6=
-33724
-> > >       LE Extended Advertising Report (0x0d)
-> > >         Num reports: 1
-> > >         Entry 0
-> > >           Event type: 0x0013
-> > >             Props: 0x0013
-> > >               Connectable
-> > >               Scannable
-> > >               Use legacy advertising PDUs
-> > >             Data status:  [0;32mComplete [0m
-> > >           Legacy PDU Type: ADV_IND (0x0013)
-> > >           Address type: Random (0x01)
-> > >           Address: 6F:CB:45:0C:AD:1F (Resolvable)
-> > >
-> > > But I still get the error for not being able to set wake_support. I
-> > > think this is not right as the address resolution is already enabled.
-> > > I haven't checked the details yet.
-> > >
-> > > =3D bluetoothd: Unable to set wake_support without RPA resolution
-> > >
-> > > 19:22:41.337325
-> > >
-> > > Then the wake up flag is not set as a result.
-> > >
-> > > @ MGMT Event: Device Flags Changed (0x002a) plen 15
-> > >                                                {0x0003} [hci0]
-> > > 19:22:41.372969
-> > >         LE Address: DC:A6:32:A4:08:BF (OUI DC-A6-32)
-> > >         Supported Flags: 0x00000003
-> > >           Remote Wakeup
-> > >           Device Privacy Mode
-> > >         Current Flags: 0x00000002
-> > >           Device Privacy Mode
-> > >
-> > > The address resolution is enabled as shown later in the log, after th=
-e
-> > > adapter reboot and the LE mouse can reconnect with RPA.
-> > >
-> > > < HCI Command: LE Set Address Resolution Enable (0x08|0x002d) plen 1
-> > >                                                    #601 [hci0]
-> > > 19:22:57.164690
-> > >         Address resolution: Disabled (0x00)
-> > > > HCI Event: Command Complete (0x0e) plen 4                          =
-                                                     #602 [hci0] 19:22:57.1=
-65530
-> > >       LE Set Address Resolution Enable (0x08|0x002d) ncmd 1
-> > >         Status: Success (0x00)
-> > > < HCI Command: LE Add Device To Resolving List (0x08|0x0027) plen 39
-> > >                                                    #603 [hci0]
-> > > 19:22:57.165663
-> > >         Address type: Public (0x00)
-> > >         Address: DC:A6:32:A4:08:BF (OUI DC-A6-32)
-> > >         Peer identity resolving key: 0bf179254f3b2eb51324711e416f22e8
-> > >         Local identity resolving key: 0000000000000000000000000000000=
-0
-> > > ...
-> > >
-> > > Before applying the above patch, there will be a set device flag
-> > > command in the place of the error, but the command will fail.
-> > >
-> > > @ MGMT Command: Set Device Flags (0x0050) plen 11
-> > >                                                {0x0003} [hci0]
-> > > 00:42:59.247080
-> > >         LE Address: E4:5F:01:89:8F:85 (OUI E4-5F-01)
-> > >         Current Flags: 0x00000001
-> > >           Remote Wakeup
-> > > @ MGMT Event: Command Complete (0x0001) plen 10
-> > >                                                {0x0003} [hci0]
-> > > 00:42:59.247129
-> > >       Set Device Flags (0x0050) plen 7
-> > >         Status: Invalid Parameters (0x0d)
-> > >         LE Address: E4:5F:01:89:8F:85 (OUI E4-5F-01)
-> > >
-> > > Please let me know your opinion.
-> >
-> > Perhaps we need the following patch in order to make sure the
-> > experimental flags are enabled _before_ wake_support logic is
-> > triggered:
-> >
-> > https://patchwork.kernel.org/project/bluetooth/patch/00052eaeb78774fd7b=
-e365805203cb0c8b189243.1692531437.git.pav@iki.fi/
-> >
-> > I'm in the process of applying it since it we do have similar problem
-> > with the likes of ISO sockets that needs to be enabled before loading
-> > drivers, etc.
-> >
-> > > Thanks,
-> > > Zhengping
-> > >
-> > > On Mon, Aug 21, 2023 at 11:00=E2=80=AFAM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > On Mon, Aug 21, 2023 at 10:28=E2=80=AFAM Zhengping Jiang <jiangzp@g=
-oogle.com> wrote:
-> > > > >
-> > > > > For the device using a RPA, hog_probe sets wake_override to true,=
- but
-> > > > > the command to set remote wakeup fails because the device has not=
- been
-> > > > > added to the kernel and the connection with the public address ca=
-nnot be
-> > > > > found.
-> > > >
-> > > > This is actually not true, hog_probe does call
-> > > > device_set_wake_support, also note that I had a fix on how we handl=
-e
-> > > > RPA with remote wakeup because that depends on LL Privacy/RPA
-> > > > Resolution:
-> > > >
-> > > > commit 7a4b67f9caa6bdc004c910f3a52108744a8cab74
-> > > > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > Date:   Thu May 12 16:40:49 2022 -0700
-> > > >
-> > > >     device: Fix enabling wake support without RPA Resolution
-> > > >
-> > > >     If device uses RPA it shall only enable wakeup if RPA Resolutio=
-n has
-> > > >     been enabled otherwise it cannot be programmed in the acceptlis=
-t which
-> > > >     can cause suspend to fail.
-> > > >
-> > > >     Link: https://bugzilla.kernel.org/show_bug.cgi?id=3D215768
-> > > >
-> > > >
-> > > > > When setting the device privacy flag, the wakeup flag should be s=
-et
-> > > > > according to the wake_override, instead of the current flags.
-> > > >
-> > > > Afaik wake_override is only set by the user via WakeAllowed, plugin=
-s
-> > > > shall not be using it directly, so it really sounds like this doesn=
-'t
-> > > > apply to current upstream.
-> > > >
-> > > > > Signed-off-by: Zhengping Jiang <jiangzp@google.com>
-> > > > > ---
-> > > > >
-> > > > > Changes in v1:
-> > > > > - Add function to fetch wake_override value
-> > > > > - Set the remote wakeup bit if privacy mode is used when setting =
-flags
-> > > > >
-> > > > >  src/adapter.c | 2 ++
-> > > > >  src/device.c  | 5 +++++
-> > > > >  src/device.h  | 1 +
-> > > > >  3 files changed, 8 insertions(+)
-> > > > >
-> > > > > diff --git a/src/adapter.c b/src/adapter.c
-> > > > > index 004062e7c..f63018495 100644
-> > > > > --- a/src/adapter.c
-> > > > > +++ b/src/adapter.c
-> > > > > @@ -5520,6 +5520,8 @@ static void add_device_complete(uint8_t sta=
-tus, uint16_t length,
-> > > > >         if (btd_opts.device_privacy) {
-> > > > >                 uint32_t flags =3D btd_device_get_current_flags(d=
-ev);
-> > > > >
-> > > > > +               if (device_get_wake_override(dev))
-> > > > > +                       flags |=3D DEVICE_FLAG_REMOTE_WAKEUP;
-> > > >
-> > > > We shall only use override if wake_support is set.
-> > > >
-> > > > >                 /* Set Device Privacy Mode has not set the flag y=
-et. */
-> > > > >                 if (!(flags & DEVICE_FLAG_DEVICE_PRIVACY)) {
-> > > > >                         adapter_set_device_flags(adapter, dev, fl=
-ags |
-> > > > > diff --git a/src/device.c b/src/device.c
-> > > > > index 9b58e0c4e..ae75f2fd1 100644
-> > > > > --- a/src/device.c
-> > > > > +++ b/src/device.c
-> > > > > @@ -1545,6 +1545,11 @@ void device_set_wake_override(struct btd_d=
-evice *device, bool wake_override)
-> > > > >         }
-> > > > >  }
-> > > > >
-> > > > > +bool device_get_wake_override(struct btd_device *device)
-> > > > > +{
-> > > > > +       return device->wake_override;
-> > > > > +}
-> > > > > +
-> > > > >  static void device_set_wake_allowed_complete(struct btd_device *=
-device)
-> > > > >  {
-> > > > >         if (device->wake_id !=3D -1U) {
-> > > > > diff --git a/src/device.h b/src/device.h
-> > > > > index 3252e14ef..79377a13a 100644
-> > > > > --- a/src/device.h
-> > > > > +++ b/src/device.h
-> > > > > @@ -141,6 +141,7 @@ void device_set_wake_support(struct btd_devic=
-e *device, bool wake_support);
-> > > > >  void device_set_wake_override(struct btd_device *device, bool wa=
-ke_override);
-> > > > >  void device_set_wake_allowed(struct btd_device *device, bool wak=
-e_allowed,
-> > > > >                              guint32 id);
-> > > > > +bool device_get_wake_override(struct btd_device *device);
-> > > > >  void device_set_refresh_discovery(struct btd_device *dev, bool r=
-efresh);
-> > > > >
-> > > > >  typedef void (*disconnect_watch) (struct btd_device *device, gbo=
-olean removal,
-> > > > > --
-> > > > > 2.42.0.rc1.204.g551eb34607-goog
-> > > > >
-> > > >
-> > > >
-> > > > --
-> > > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
