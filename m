@@ -2,230 +2,132 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33F5EE4993
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Aug 2023 18:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 458DDEE4993
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Aug 2023 19:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbjHVSF6 (ORCPT
+        id S230062AbjHVTOu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Aug 2023 14:05:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        Tue, 22 Aug 2023 15:14:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbjHVSF5 (ORCPT
+        with ESMTP id S229462AbjHVTOt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Aug 2023 14:05:57 -0400
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4061BC9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Aug 2023 11:05:34 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b703a0453fso80267241fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Aug 2023 11:05:34 -0700 (PDT)
+        Tue, 22 Aug 2023 15:14:49 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 686E4CED
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Aug 2023 12:14:48 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-34961362f67so14248855ab.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Aug 2023 12:14:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692727531; x=1693332331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9IhQdT3dkh2KEK8Jz6QktLd8PGIgU9IndPi0WIC/z3E=;
-        b=Vu4NQ/nSpJKQhO06vbCtAsAqkqmW2tHp9+Yco4mYo8nAQaJiBZ7Peqm33pL6lWa/fo
-         tpfxNm1D0ZzcdYK0uEDocIUD/wsWa0FibprVC3Mvm+8ucEJnC3vltMlysbGlyLIqLszG
-         qaO462N7x8vIdkR5uaE8ota+M2jepOLYUO5peP/+G26wXgrOqBnhlwsR7ZMk3K81Uj/d
-         /0friA8/B09TlHaNmZkwXjpaGQpUax5rucU2TH83Asn6Vt+/cOMvi3Tb64qvscAZwIZe
-         Tkr2fF+nmFY2S5ULaJ5WENoX/EpVUhmwobBabF5yITOMnP5DhWJSvDtR5ZrIrrRJysYF
-         KIgQ==
+        d=gmail.com; s=20221208; t=1692731687; x=1693336487;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=d1V1C+jXV+fsxNPrLox+oQIzkpdkp0HSaM2jWj5Scu4=;
+        b=YRcOvc4qgvhjSSX30C96fVMs7ECiamJaLKgJAHZp7Vnalnda9Jn1RBdIJX6JpZ+0Mk
+         Pk3q5BKE02WhCUINzOjWF9BdIlJvPMc0/9g7DAVSWWApYDl5F3hcS5humec7IQdNCHXn
+         x8ElchDY/+IvC8xgjsk5dX/1AQ+joKASev94YQBonFiBY8GRmyQ+Zu/3L5kVteL4ct4h
+         RsWByqSs2NqTaz+7oqV3QiG9pVP+PkmH8kV6/xuUe7ccTDxijmAktSS/4UgdbtRRyR9d
+         J+rs269czzNM47nqmw+h2HlNYftHe2gkkEEuf+vTEd5MDErfNF3IpWTBMSF4CKeP01we
+         42LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692727531; x=1693332331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9IhQdT3dkh2KEK8Jz6QktLd8PGIgU9IndPi0WIC/z3E=;
-        b=UcGJEf3W5E6wKvpRav7RHU9iZQxaPXZ3YyrDm1lHxSIkCwZmqophOPqAHcexavYHL/
-         EKosWAgjV91VL8+vK221ffAqV+JNWb5l4CM/YIMrL/4QKhkgRfcbut2+powW7KkMu+CH
-         pAFLMH607NqwwP1+KserjMYaPSWUnKWMtdur2Z7/wWvbYsFfkNhlc05j0DeME6rekRDE
-         eu94OeEi1wo3jLx6e6iBbogGm5srqPkTibuz3zQPsx/aaIQtW9tRZcfSEPMATHTHrHsq
-         71u1c84O6lR1qtCTutKrKJjOMVjKIkd7Njx3ykpsJOuaIbgVA7zYx+w3CXa1Lvb0ikvQ
-         59Yg==
-X-Gm-Message-State: AOJu0YwVd2tpSNjK2iA6eN/pvvXem3uPaZo8UsCuFhOKXcS1tdG5Q9hL
-        pOAu/3MvMKdmbjltTJD+1NfYKYsLqaJt5GHhlxA=
-X-Google-Smtp-Source: AGHT+IFLTk4JK6m4Cn7iKeUSa624fsEOCfdsx7S1j0HSwiT7o772267o28gh379GHHXIC1W1Y/31vUUQTLTBdsusCkE=
-X-Received: by 2002:a2e:2c18:0:b0:2bb:a6b0:cf66 with SMTP id
- s24-20020a2e2c18000000b002bba6b0cf66mr7864610ljs.2.1692727530980; Tue, 22 Aug
- 2023 11:05:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <2300626.ElGaqSPkdT@bruno-beit> <CABBYNZLo0WT+VovmB3AKPKNNLXPNPBdECNzf6MNu+aL6d91naQ@mail.gmail.com>
- <CABBYNZ+z_=ZfJQQJ=A-HC7Ox+1jueeb_oWwcerC0YKS8z0QMug@mail.gmail.com> <11520919.Tf534PAFkr@bruno-beit>
-In-Reply-To: <11520919.Tf534PAFkr@bruno-beit>
+        d=1e100.net; s=20221208; t=1692731687; x=1693336487;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d1V1C+jXV+fsxNPrLox+oQIzkpdkp0HSaM2jWj5Scu4=;
+        b=H28CcjWzDNHcLMz3XsiTt68foeIy6Hy89vCFRcX5cCRrUUjf04Hv6XxjwPSmLV/1qz
+         boE9Kk59t2NXbmPvrgEz0OGM8hXAmbcnNqm30mQ6eRqEI+Hd3UCxbNp097In8NhzuQ4W
+         0Y0h33ZDopZNiyIJgEKi0Cm1ghT8nyw3xuKRRt5Ly8dOknp7vZE9fjzxPMgDfht3s8rt
+         v8nV1scpWmS9+oiaEHZ6I7ej9suvH449qNsLxxNdPyQ3iOmSKvFQI4aT1H975A5dZrxr
+         qBIoYQx27QurEqpz25g7VYhJh0DW1I4T3EUPyxfF0OjwX+Jsd1WpJydWTWgJYNfvqs77
+         UdyQ==
+X-Gm-Message-State: AOJu0YwYquKrBUxM45bxe9a1zgIQUva052zx2E1vl1V2Ohj7alvGDH9z
+        59RlC9mK6h+rany0Z7t4ldmUteGvWdE=
+X-Google-Smtp-Source: AGHT+IG8EuG36uNuhS7CKuqeC9Ri1HGiuOWj/pkr5RQd3w3+jnUBb84EE3uze3W+hYeHl+wZ03VDtA==
+X-Received: by 2002:a05:6e02:1aa8:b0:349:46fa:3844 with SMTP id l8-20020a056e021aa800b0034946fa3844mr465423ilv.3.1692731687070;
+        Tue, 22 Aug 2023 12:14:47 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id h23-20020a02cd37000000b004302370a169sm3131289jaq.157.2023.08.22.12.14.45
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Aug 2023 12:14:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 22 Aug 2023 11:05:18 -0700
-Message-ID: <CABBYNZKco-v7wkjHHexxQbgwwSz-S=GZ=dZKbRE1qxT1h4fFbQ@mail.gmail.com>
-Subject: Re: regression: kernel 6.4.x breaks scanning/pairing (but not use) of
- LE devices
-To:     Bruno Pitrus <brunopitrus@hotmail.com>
-Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Takashi Iwai <tiwai@suse.de>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
+Date:   Tue, 22 Aug 2023 12:14:44 -0700
+Message-ID: <20230822191444.3741307-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bruno,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Aug 22, 2023 at 7:29=E2=80=AFAM Bruno Pitrus <brunopitrus@hotmail.c=
-om> wrote:
->
-> Dnia poniedzia=C5=82ek, 21 sierpnia 2023 22:08:45 CEST Luiz Augusto von D=
-entz pisze:
-> > Hi Bruno,
-> >
-> > On Mon, Aug 14, 2023 at 4:38=E2=80=AFPM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Bruno,
-> > >
-> > > On Mon, Aug 14, 2023 at 1:21=E2=80=AFPM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Bruno,
-> > > >
-> > > > On Mon, Aug 14, 2023 at 3:00=E2=80=AFAM Bruno Pitrus <brunopitrus@h=
-otmail.com> wrote:
-> > > > >
-> > > > > Dnia pi=C4=85tek, 11 sierpnia 2023 19:11:50 CEST Luiz Augusto von=
- Dentz pisze:
-> > > > > > Hi Bruno,
-> > > > > >
-> > > > > > On Fri, Aug 11, 2023 at 4:25=E2=80=AFAM Bruno Pitrus <brunopitr=
-us@hotmail.com> wrote:
-> > > > > > >
-> > > > > > > Dnia sobota, 5 sierpnia 2023 09:31:08 CEST Paul Menzel pisze:
-> > > > > > > > [Cc: +regressions@]
-> > > > > > > >
-> > > > > > > > #regzbot introduced v6.3.9..v6.4.2
-> > > > > > > >
-> > > > > > > > Dear Bruno,
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > Thank you for your report.
-> > > > > > > >
-> > > > > > > > Am 04.08.23 um 20:55 schrieb Bruno Pitrus:
-> > > > > > > > > I am using openSUSE Tumbleweed on a Dell Precision 3551 w=
-hich has a
-> > > > > > > > > bluetooth adapter of ID 8087:0026 (Intel AX201). I am usi=
-ng a
-> > > > > > > > > Logitech M575 trackball mouse which only supports Bluetoo=
-th LE.
-> > > > > > > > >
-> > > > > > > > > With kernel 6.4.2 or newer, scanning for devices =E2=80=
-=94 using either the
-> > > > > > > > > KDE gui or bluetoothctl =E2=80=94 most of the time return=
-s only =E2=80=9Cclassic
-> > > > > > > > > bluetooth=E2=80=9D devices like computers and phones, and=
- not the mouse. If
-> > > > > > > > > the mouse was paired before, it works correctly however.
-> > > > > > > > >
-> > > > > > > > > With previous kernel versions (6.3.9 and before), pairing=
- the mouse
-> > > > > > > > > worked correctly.
-> > > > > > > >
-> > > > > > > > Are you able to bisect the regression? Please also attach t=
-he Linux
-> > > > > > > > messages. (You can also create a ticket in the Linux kernel=
- Bugzilla [1]
-> > > > > > > > and attach everything there.)
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > Kind regards,
-> > > > > > > >
-> > > > > > > > Paul
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > [1]: https://bugzilla.kernel.org/
-> > > > > > > >
-> > > > > > >
-> > > > > > > The offending commit is https://github.com/SUSE/kernel/commit=
-/288c90224eec55d13e786844b7954ef060752089 :
-> > > > > > >
-> > > > > > > > Bluetooth: Enable all supported LE PHY by default
-> > > > > > > > This enables 2M and Coded PHY by default if they are marked=
- as supported
-> > > > > > > > in the LE features bits.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel=
-.com>
-> > > > > >
-> > > > > > Do you have the btmon/HCI traces showing this, we also need the
-> > > > > > firmware version as well since I suspect this is due to the con=
-troller
-> > > > > > setting the PHYs as supported but being unable to to use them
-> > > > > > properly.
-> > > > > >
-> > > > > >
-> > > > > hciconfig says the below: (I assume =E2=80=9CRevision=E2=80=9D is=
- the firmware version)
-> > > >
-> > > > You can find the firmware information on dmesg, e.g:
-> > > >
-> > > > [    7.982585] Bluetooth: hci1: Found Intel DDC parameters: intel/i=
-bt-20-1-3.ddc
-> > > > [    7.984113] Bluetooth: hci1: Applying Intel DDC parameters compl=
-eted
-> > > > [    7.985111] Bluetooth: hci1: Firmware revision 0.3 build 144 wee=
-k 11 2023
-> > > >
-> > > > > hci0:   Type: Primary  Bus: USB
-> > > > >         BD Address: F0:9E:4A:E6:62:15  ACL MTU: 1021:4  SCO MTU: =
-96:6
-> > > > >         UP RUNNING
-> > > > >         RX bytes:150050 acl:8114 sco:0 events:270 errors:0
-> > > > >         TX bytes:5970 acl:69 sco:0 commands:173 errors:0
-> > > > >         Features: 0xbf 0xfe 0x0f 0xfe 0xdb 0xff 0x7b 0x87
-> > > > >         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> > > > >         Link policy: RSWITCH SNIFF
-> > > > >         Link mode: PERIPHERAL ACCEPT
-> > > > >         Name: '[REDACTED]'
-> > > > >         Class: 0x6c010c
-> > > > >         Service Classes: Rendering, Capturing, Audio, Telephony
-> > > > >         Device Class: Computer, Laptop
-> > > > >         HCI Version: 5.2 (0xb)  Revision: 0x20ce
-> > > > >         LMP Version: 5.2 (0xb)  Subversion: 0x20ce
-> > > > >         Manufacturer: Intel Corp. (2)
-> > > > >
-> > > > > I'm unsure how to attach the btmon output as it is a binary file =
-that contains potentially private information (names of nearby devices)
-> > > >
-> > > > Well you can collect it manually and redacted the addresses, etc, u=
-p
-> > > > to you, I'm usually not that paranoid of sharing this kind of
-> > > > information if you scan for a short time, in the other hand I usual=
-ly
-> > > > use gist.github.com to do that so I can delete it later if needed.
-> > >
-> > > Seems to be working fine here (with AX201 and AX210):
-> > >
-> > > https://gist.github.com/Vudentz/d80ab63f4f62f9f216796edb4838c855
-> >
-> > Can you try with the following patch:
-> >
-> > https://patchwork.kernel.org/project/bluetooth/patch/20230821181848.355=
-3863-1-luiz.dentz@gmail.com/
-> >
-> > Looks like we were not storing the whole advertisement sometimes.
-> >
-> >
->
-> I applied your patch, along with https://www.spinics.net/lists/linux-blue=
-tooth/msg105443.html since that defines the needed max_adv_len macro, on to=
-p of the regression-introducting commit. Unfortunately, it did not help =E2=
-=80=94 LE devices are still not detected (either at all or after one-two su=
-ccessful pairings).
+This introduces HCI_QUIRK_BROKEN_LE_CODED is is used to indicate that
+LE Coded PHY shall not be used, it is then set for some Intel models
+that claims to support it but when used causes many problems.
 
-Seems I managed to reproduce:
+Link: https://github.com/bluez/bluez/issues/577
+Link: https://github.com/bluez/bluez/issues/582
+Link: https://lore.kernel.org/linux-bluetooth/CABBYNZKco-v7wkjHHexxQbgwwSz-S=GZ=dZKbRE1qxT1h4fFbQ@mail.gmail.com/T/#
+Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by default")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ drivers/bluetooth/btintel.c      |  2 ++
+ include/net/bluetooth/hci.h      | 10 ++++++++++
+ include/net/bluetooth/hci_core.h |  4 +++-
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
-https://gist.github.com/Vudentz/0988a78da9e5658a06edec159847db27
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 9b239ce96fa4..3ed60b2b0340 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2776,6 +2776,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		case 0x11:      /* JfP */
+ 		case 0x12:      /* ThP */
+ 		case 0x13:      /* HrP */
++			set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
++			fallthrough;
+ 		case 0x14:      /* CcP */
+ 			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 			fallthrough;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c58425d4c592..767921d7f5c1 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -319,6 +319,16 @@ enum {
+ 	 * This quirk must be set before hci_register_dev is called.
+ 	 */
+ 	HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER,
++
++	/*
++	 * When this quirk is set, LE Coded PHY is shall not be used. This is
++	 * required for some Intel controllers which erroneously claim to
++	 * support it but it causes problems with extended scanning.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_BROKEN_LE_CODED,
+ };
+ 
+ /* HCI device flags */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6e2988b11f99..e6359f7346f1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1817,7 +1817,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define scan_2m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_2M) || \
+ 		      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_2M))
+ 
+-#define le_coded_capable(dev) (((dev)->le_features[1] & HCI_LE_PHY_CODED))
++#define le_coded_capable(dev) (((dev)->le_features[1] & HCI_LE_PHY_CODED) && \
++			       !test_bit(HCI_QUIRK_BROKEN_LE_CODED, \
++					 &(dev)->quirks))
+ 
+ #define scan_coded(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_CODED) || \
+ 			 ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_CODED))
+-- 
+2.41.0
 
-Looks like ax201 is not generating SCAN_RSP for some reason, will need
-to follow up with Intel firmware folks to see what is going on.
-
---=20
-Luiz Augusto von Dentz
