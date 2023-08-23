@@ -2,170 +2,92 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BEBEE49AD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 12:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70733EE49A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 13:15:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235242AbjHWMyz (ORCPT
+        id S235583AbjHWNPc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Aug 2023 08:54:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36870 "EHLO
+        Wed, 23 Aug 2023 09:15:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232211AbjHWMyy (ORCPT
+        with ESMTP id S235534AbjHWNP1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Aug 2023 08:54:54 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77ECDE47
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 05:54:49 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-317c3ac7339so4812919f8f.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 05:54:49 -0700 (PDT)
+        Wed, 23 Aug 2023 09:15:27 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C277D10D0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 06:14:56 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-410a67193a9so10248111cf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 06:14:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1692795288; x=1693400088;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Kz3nv5YqHQjqTTShi+P/CzY2fv/kkQKSSZsOTw+wpGs=;
-        b=S2KO5V11etuXn3HjsyIp2y0q8iehMpZfFWzj43jBCKU0GRlT1Jel7jYYKyWW+MMcyS
-         3gO4D3Fbn/rJWULMXNyJRmzc68C1v13z0fT20MJ5qYQLBDDVsqEDYIfgbZEXfozjoZWj
-         +s1KPUCOMcyEILjbeW+kPzeYZsDkxUSQ4uHbyP30pbTCZTDdz/LMA6JevVYEUwgmnILh
-         RgBCaFsdv7Zz/3iwo8jV7EojrOx5MmTri1GxJDOkpA+NFWGxHu0XHeQ6UOzyH7up8Bbw
-         DlRHe4E2vniUvAiejIk0q6NU2gh0yHhRRp9HxZT2KHEQlTarpdD26SiBS7CKiATWVnJO
-         DwVw==
+        d=gmail.com; s=20221208; t=1692796495; x=1693401295;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+tSIw5mv6fgYFftBLatFHSQzM3BYq0jT8gz0f5+yI0I=;
+        b=Hu/uGiO6nz9x70isKmFnUbcym8bmR45nbZmtLzwXqCm3Olwxgeyb2efPwDgabEMyGe
+         eiTXOoMJa2F/wlvOBBZj1szJ7XrtcB9fVJ+3SQFBZcenY5ITh7hxs46//9WMa5IJS3Hx
+         kzPcpzLGAt5J4xykEXUvsD0gCjh5S+JBmaSSx/RkRPf+f6ay+rqWtBz1z2BUYYyMjRJZ
+         Vzpngw4bAMofwJkEdkm0nXHI9fYsJbM5JamKmZNn3Wn6QPrHvIuQpckEwMVb/DPVpTas
+         yTP09i8aSqBDbnZrpXUeFcL2wfoU4l0184r4yAl6aAg/Ys2lZrV706RQ8SU8kXFxwGCM
+         kt4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692795288; x=1693400088;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kz3nv5YqHQjqTTShi+P/CzY2fv/kkQKSSZsOTw+wpGs=;
-        b=i+nnZipsBPV/h7+UVeTQZmJ08VOqWpDMO4cd4IUjApZEk8GE2r942wX6Q8lwdx6Nio
-         WdY5rul7qYl2eaJRsCW1dUOpa1NTR7TDjryQ8X6hUwQVdnQNMubNKPn6lwOpmTkwclFr
-         bqzIH7vQwnC5BmIegFNTnN66v/c3g7fcvinTw56u00Bf3LHfnEW5MsYUCpZq5QLE3VuY
-         tNHYEVCpCD5ncgEeebWkXAOX7wyC3RPe4FPsiPO2HZYSHOVhgW/5W2V5G8gRDTGn0o5+
-         GyMTbikp86UG5KHl4v4fLLuB423zVIj7SKG6R2r+wnXP5JZ3/2DLKmTQrFXrREUZkZwT
-         2Q2Q==
-X-Gm-Message-State: AOJu0YzWxsEGeLJrprMX7FkrZ62zYq2LmG0Ynj+sBg8m/bc1wNA6nuCk
-        EzJPzL5dj/bRKYtxkkoUHXNLiA==
-X-Google-Smtp-Source: AGHT+IHQKaFYegnuMIRWnuoQvRvExhXrBSR1pihsYbjd0/1pzNKi0f5Kv08dlWImgQCO3gNfePncHQ==
-X-Received: by 2002:adf:f64d:0:b0:319:7722:30c with SMTP id x13-20020adff64d000000b003197722030cmr10892417wrp.22.1692795287957;
-        Wed, 23 Aug 2023 05:54:47 -0700 (PDT)
-Received: from ?IPV6:2a02:578:8593:1200:5b4:abda:ac34:eca0? ([2a02:578:8593:1200:5b4:abda:ac34:eca0])
-        by smtp.gmail.com with ESMTPSA id m14-20020adffe4e000000b00317b0155502sm19387258wrs.8.2023.08.23.05.54.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Aug 2023 05:54:45 -0700 (PDT)
-Message-ID: <4ddaaf1e-753d-42c3-afb6-6836fff6a428@tessares.net>
-Date:   Wed, 23 Aug 2023 14:53:56 +0200
+        d=1e100.net; s=20221208; t=1692796495; x=1693401295;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+tSIw5mv6fgYFftBLatFHSQzM3BYq0jT8gz0f5+yI0I=;
+        b=UhBmKniFzMQmd9KAmF8blkfiSjB/4dRcbI01nj7tUWBJoQovfVgFrk8jQfALdRYg66
+         ljpmIzSzHvszR+2YxVnss4TZNGi3PAo+0py+60Dzl3mqcPFe0/2jADrHPiTNr5cLNiVA
+         AbWdJ55x0cfurotq2flxqSRjg5lOuWfLhaDGU465548kytgaxcR7xPr4t/Sxy87/xcFY
+         XhJ98hB0RISqRFyD6aSb2/Ug37FmTRGuq48qpiJL0SBRh11nYIcAeWIj1crbCz3zzHgt
+         gLJnO9e1fEAG28PtnXWe1yjBu6a7YXFeq1F5esmJ/PHwrgYJkc+YR4JN8RC85vVI5u7a
+         nVHQ==
+X-Gm-Message-State: AOJu0Yx7w2vJhXIV8kmap4vy4npoZD/Tb249Koe6DB7+1dKuMgcz3jwJ
+        mpFmXs/8NWw73FvEdYN3zKKGuq+BVvA=
+X-Google-Smtp-Source: AGHT+IF+MV5ZLhJE72phkS6FlQESYJTqARbT3FKUHYUbBblFguU6fP4u9oyq94MOiDOUY3TfDkGVcQ==
+X-Received: by 2002:ac8:7d84:0:b0:403:df34:9575 with SMTP id c4-20020ac87d84000000b00403df349575mr13946663qtd.34.1692796495144;
+        Wed, 23 Aug 2023 06:14:55 -0700 (PDT)
+Received: from [172.17.0.2] ([172.177.246.179])
+        by smtp.gmail.com with ESMTPSA id b10-20020ac8678a000000b004009f6e7e7csm3687241qtp.31.2023.08.23.06.14.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Aug 2023 06:14:54 -0700 (PDT)
+Message-ID: <64e6064e.c80a0220.5768d.f922@mx.google.com>
+Date:   Wed, 23 Aug 2023 06:14:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6377231896421659983=="
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/12] mptcp: Do not include crypto/algapi.h
-Content-Language: en-GB
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
- <E1qYlA3-006vGH-1L@formenos.hmeau.com>
-From:   Matthieu Baerts <matthieu.baerts@tessares.net>
-Autocrypt: addr=matthieu.baerts@tessares.net; keydata=
- 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
-In-Reply-To: <E1qYlA3-006vGH-1L@formenos.hmeau.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, by2239112@buaa.edu.cn
+Subject: RE: net: bluetooth: fix consistent connection failure caused by the loss of HCI_Connection_Complete event
+In-Reply-To: <20230823125214.5910-1-by2239112@buaa.edu.cn>
+References: <20230823125214.5910-1-by2239112@buaa.edu.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============6377231896421659983==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 23/08/2023 12:32, Herbert Xu wrote:
-> The header file crypto/algapi.h is for internal use only.  Use the
-> header file crypto/utils.h instead.
+This is an automated email and please do not reply to this email.
 
-Thank you for the patch! It looks good to me:
+Dear Submitter,
 
-Acked-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-I understood that other patches will come later to make it clear
-crypto/algapi.h is for internal use only so that's good!
+----- Output -----
 
-> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
-> index 9ee3b7abbaf6..64bb200099dc 100644
-> --- a/net/mptcp/subflow.c
-> +++ b/net/mptcp/subflow.c
-> @@ -9,8 +9,8 @@
->  #include <linux/kernel.h>
->  #include <linux/module.h>
->  #include <linux/netdevice.h>
-> -#include <crypto/algapi.h>
->  #include <crypto/sha2.h>
-> +#include <crypto/utils.h>
+error: patch failed: net/bluetooth/hci_conn.c:2886
+error: net/bluetooth/hci_conn.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-It is fine for me if you carry this patch in your tree: this part here
-has not changed for a while and there is no ongoing work going to modify
-it. So there should not be any conflicts when merging the different
-trees later.
+Please resolve the issue and submit the patches again.
 
-Cheers,
-Matt
--- 
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6377231896421659983==--
