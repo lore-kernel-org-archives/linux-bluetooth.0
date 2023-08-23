@@ -2,101 +2,218 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D056EE4993
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 16:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE98EE4993
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 16:35:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237484AbjHWQOm (ORCPT
+        id S237403AbjHWQfp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Aug 2023 12:14:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39686 "EHLO
+        Wed, 23 Aug 2023 12:35:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237481AbjHWQOl (ORCPT
+        with ESMTP id S234628AbjHWQfo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Aug 2023 12:14:41 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFF33E78
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 09:14:38 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id 6a1803df08f44-64bd231c95cso32349336d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 09:14:38 -0700 (PDT)
+        Wed, 23 Aug 2023 12:35:44 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDCAC11F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 09:35:41 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-500760b296aso34026e87.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 09:35:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692807277; x=1693412077;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cVNjDB8QVmRQg29B/S9YmEE5ebA0PrL2Np3sasYzi0A=;
-        b=Oq2bPVAAlMLC8XufUpGqaqnpssykeEnZ2hsVYlOMc0lwD+b1whCdruOtBWank7VRWQ
-         8x49wHOCglgAFtr8hzsI1JSYwRqNOoHiF5hbSXgnIBdb1jdRWRDQSc9GH3wwjxWC0d5Y
-         cagVdJ8B1XKV5aaq+8VmV22ISNaZ78ghwc55+p1LTlZj1B2dHw5EpUEZs1tL+j9JnaO5
-         6OKZgLgucTXQQVlpAdr+XHZdW4fDiWlDMwCJa29wwvgjsoxIp+IMVKSQk4IQmL81rVpk
-         tpN8AEt8ig4eLwJmzIbnVY7Ai8V9SUAGznUGnYNESyUA2MmeD4QXDrqmfzEoqXq0Tf65
-         sKOA==
+        d=gmail.com; s=20221208; t=1692808540; x=1693413340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tcOGsSFzwOexHGZXlu9fcu+jFAU5soP6hYoX4xjCi8g=;
+        b=mPimZSy82wJDoDDEsyGNyO3Q7sCW9OlCiWg+zUY+62C4K1SmnrVS5lqTziF1mfU1S0
+         u4FzGPqGqT98CYLasp8KcLsTNqMSdoJT92mpc81TXsVltqJu+rKkr1vGZKCU45WftvyF
+         jmRMb9eawlVQp2gjThjrQE9lXE7eY/t/P6TJcPP7Pkqt/h3s3J/kpc19/e2+jy8sy4zN
+         3u7kf6NSGjGojcURUtkQkMw+pbgS/g6t4yi+XC13IQZMOyxezsiuOQCUlLju0v6h/WgH
+         1TAOXl7W6KW9J45yXQs98+zUq2ofk5oldZxcaKZJx610I0MH6eO21AHm3aJo61mnysZo
+         lQwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692807277; x=1693412077;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cVNjDB8QVmRQg29B/S9YmEE5ebA0PrL2Np3sasYzi0A=;
-        b=dRbNRZVwhQJEMCooMThZus/pnC6/Br06zmae3mlaIpBPFhvHdp1GdpdpwtbOfuSMC6
-         kbFVBtCJs4e5jkh/Cfyg4LZftRlm9EyjqBvnhQzdnLUtaAb0f+hYI4BM6GCEg577+qZv
-         l8hqrBdWCDRT6rJ3SLg9sU6IBAp3uc/943o7zdeAsns4uQWE/VG25fzmMoULaqbWN/Wx
-         EvSFHWox/At/XIymt5KPaCZZwWExzNuDAKi2ETKKmOUO1wB57+bk0kXR4mwJGvhf2DZH
-         /35vJmPkqVbSoCHGhhQMC480qJ12Ma44fVcxtn9JzruS+vfumY6dYaE/h3ix0d4Uy/AI
-         XjXA==
-X-Gm-Message-State: AOJu0YxNEV6IwMXUf1p1sYAZL2geICtofDX233BwNJvjP8d8te2EZnp8
-        vyqsXLaUuyHtcnpmUMJMijKKfRTC/BA=
-X-Google-Smtp-Source: AGHT+IFDU0yT2YFeZOnnd/Wyc/jFsR0tFGFeB+p5itfIAv4LVaxv5wl8bk1rvylOhinTsBCKkYzNxw==
-X-Received: by 2002:a0c:abc3:0:b0:635:f899:660b with SMTP id k3-20020a0cabc3000000b00635f899660bmr11585094qvb.36.1692807277649;
-        Wed, 23 Aug 2023 09:14:37 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.14.50])
-        by smtp.gmail.com with ESMTPSA id z16-20020a0cf250000000b0062fffa42cc5sm494001qvl.79.2023.08.23.09.14.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 09:14:37 -0700 (PDT)
-Message-ID: <64e6306d.0c0a0220.e850f.2485@mx.google.com>
-Date:   Wed, 23 Aug 2023 09:14:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1290277953486354624=="
+        d=1e100.net; s=20221208; t=1692808540; x=1693413340;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tcOGsSFzwOexHGZXlu9fcu+jFAU5soP6hYoX4xjCi8g=;
+        b=TdEZynfO+gYbVqznJMNnxU6VSDl/G32cLicN+vHb5N4+9zr+kvc8eBQl5d9A0Un1ZY
+         cVb+Ab1eOlFs3TItjZtPDa8l5lwjfEO9EmtsiRnCxwiGIcEqAuSrmjFEnOxmsn/+v2eA
+         x7I2pGOkMayYgMeFu2mZejPKESP7K8FqQcoNdissn+N1yF1EZfp8Br/lGhtvOadxQudZ
+         tKwJjp7KXvLp1ef0F71P+x6Ur6KjsGcKsVzFp704NVdiySv0deva/luOz80+oLwFKPPb
+         GSSKZQGI5sDa7M9aZ7FDK4iJriwze3kMRmzadusyKbRMGA0D2e342MvTfblmb7IVSxby
+         7gvQ==
+X-Gm-Message-State: AOJu0YwHw4Kx47dhCTJuVmxRC7lEBOJNe/n/6QwnGiOcDCHFyWABGakJ
+        J/2Y/Odj6Zke/iTrpIUXR5/NQ1SkaoR5in13knk=
+X-Google-Smtp-Source: AGHT+IGHkFF6qeNS25UVkQfsz0VlNEj++XGUb+tYE2tHcQ4YPMyTj4+bCvcQ6+hy49VFK8ZuM65nvDFL44Mw0J97VhY=
+X-Received: by 2002:a05:6512:ba7:b0:500:8676:aa7f with SMTP id
+ b39-20020a0565120ba700b005008676aa7fmr3071698lfv.23.1692808539677; Wed, 23
+ Aug 2023 09:35:39 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: isotest: Add defer setup support for Broadcast Receiver
-In-Reply-To: <20230823151125.16100-2-iulia.tanasescu@nxp.com>
-References: <20230823151125.16100-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20230822191444.3741307-1-luiz.dentz@gmail.com>
+ <CABBYNZ+2yrD3R+x2GeCdG+J25KkWoQX_FJuPNLMm9Fr7Tvab1A@mail.gmail.com>
+ <8c395313-5e2d-4c27-969c-019eabacd6cf@molgen.mpg.de> <5704690.DvuYhMxLoT@bruno-beit>
+In-Reply-To: <5704690.DvuYhMxLoT@bruno-beit>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 23 Aug 2023 09:35:27 -0700
+Message-ID: <CABBYNZ+6pRytUHfi68h4Q=A9urNR=JtuJ0mzG+615q0Lyyeg+w@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
+To:     Bruno Pitrus <brunopitrus@hotmail.com>
+Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1290277953486354624==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Bruno,
 
-This is automated email and please do not reply to this email!
+On Wed, Aug 23, 2023 at 2:21=E2=80=AFAM Bruno Pitrus <brunopitrus@hotmail.c=
+om> wrote:
+>
+> Dnia =C5=9Broda, 23 sierpnia 2023 10:26:31 CEST Paul Menzel pisze:
+> > Dear Luiz,
+> >
+> >
+> > Thank you for your answer.
+> >
+> > Am 22.08.23 um 22:20 schrieb Luiz Augusto von Dentz:
+> > > Hi Paul,
+> > >
+> > > On Tue, Aug 22, 2023 at 1:01=E2=80=AFPM Paul Menzel <pmenzel@molgen.m=
+pg.de> wrote:
+> > >>
+> > >> [CC: +Bruno]
+> > >>
+> > >> Dear Luiz,
+> > >>
+> > >>
+> > >> Thank you for the patch.
+> > >>
+> > >> Am 22.08.23 um 21:14 schrieb Luiz Augusto von Dentz:
+> > >>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >>>
+> > >>> This introduces HCI_QUIRK_BROKEN_LE_CODED is is used to indicate th=
+at
+> > >>
+> > >> =E2=80=A6. It is used =E2=80=A6
+> > >>
+> > >>> LE Coded PHY shall not be used, it is then set for some Intel model=
+s
+> > >>> that claims to support it but when used causes many problems.
+> > >>
+> > >> that claim to =E2=80=A6
+> > >>
+> > >>> Link: https://github.com/bluez/bluez/issues/577
+> > >>> Link: https://github.com/bluez/bluez/issues/582
+> > >>> Link: https://lore.kernel.org/linux-bluetooth/CABBYNZKco-v7wkjHHexx=
+QbgwwSz-S=3DGZ=3DdZKbRE1qxT1h4fFbQ@mail.gmail.com/T/#
+> > >>> Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by def=
+ault")
+> > >>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >>> ---
+> > >>>    drivers/bluetooth/btintel.c      |  2 ++
+> > >>>    include/net/bluetooth/hci.h      | 10 ++++++++++
+> > >>>    include/net/bluetooth/hci_core.h |  4 +++-
+> > >>>    3 files changed, 15 insertions(+), 1 deletion(-)
+> > >>>
+> > >>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btinte=
+l.c
+> > >>> index 9b239ce96fa4..3ed60b2b0340 100644
+> > >>> --- a/drivers/bluetooth/btintel.c
+> > >>> +++ b/drivers/bluetooth/btintel.c
+> > >>> @@ -2776,6 +2776,8 @@ static int btintel_setup_combined(struct hci_=
+dev *hdev)
+> > >>>                case 0x11:      /* JfP */
+> > >>>                case 0x12:      /* ThP */
+> > >>>                case 0x13:      /* HrP */
+> > >>> +                     set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->qui=
+rks);
+> > >>> +                     fallthrough;
+> > >>>                case 0x14:      /* CcP */
+> > >>>                        set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->qu=
+irks);
+> > >>>                        fallthrough;
+> > >>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hc=
+i.h
+> > >>> index c58425d4c592..767921d7f5c1 100644
+> > >>> --- a/include/net/bluetooth/hci.h
+> > >>> +++ b/include/net/bluetooth/hci.h
+> > >>> @@ -319,6 +319,16 @@ enum {
+> > >>>         * This quirk must be set before hci_register_dev is called.
+> > >>>         */
+> > >>>        HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER,
+> > >>> +
+> > >>> +     /*
+> > >>> +      * When this quirk is set, LE Coded PHY is shall not be used.=
+ This is
+> > >>
+> > >> s/is shall/shall/
+> > >>
+> > >>> +      * required for some Intel controllers which erroneously clai=
+m to
+> > >>> +      * support it but it causes problems with extended scanning.
+> > >>> +      *
+> > >>> +      * This quirk can be set before hci_register_dev is called or
+> > >>> +      * during the hdev->setup vendor callback.
+> > >>> +      */
+> > >>> +     HCI_QUIRK_BROKEN_LE_CODED,
+> > >>>    };
+> > >>>
+> > >>>    /* HCI device flags */
+> > >>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetoo=
+th/hci_core.h
+> > >>> index 6e2988b11f99..e6359f7346f1 100644
+> > >>> --- a/include/net/bluetooth/hci_core.h
+> > >>> +++ b/include/net/bluetooth/hci_core.h
+> > >>> @@ -1817,7 +1817,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn=
+);
+> > >>>    #define scan_2m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_2M=
+) || \
+> > >>>                      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_2M))
+> > >>>
+> > >>> -#define le_coded_capable(dev) (((dev)->le_features[1] & HCI_LE_PHY=
+_CODED))
+> > >>> +#define le_coded_capable(dev) (((dev)->le_features[1] & HCI_LE_PHY=
+_CODED) && \
+> > >>> +                            !test_bit(HCI_QUIRK_BROKEN_LE_CODED, \
+> > >>> +                                      &(dev)->quirks))
+> > >>>
+> > >>>    #define scan_coded(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY=
+_CODED) || \
+> > >>>                         ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_COD=
+ED))
+> > >>
+> > >> Will this be future proof, once firmware for the broken controllers =
+are
+> > >> fixed?
+> > >
+> > > Yes, it won't cause any regressions if the firmware is fixed in the
+> > > future, but LE coded PHY will need to be re-enabled by removing the
+> > > quirks, this is why we say it is broken but we can't depend on runtim=
+e
+> > > detection and should probably print a warning until we have a proper
+> > > fix for it lands at the firmware side. We could in theory set
+> > > HCI_QUIRK_BROKEN_LE_CODED based on the firmware version but firmware
+> > > versioning schemes tend to change so I'm afraid that could also cause
+> > > regression like this in the future.
+> >
+> > Understood. Maybe you could add the known broken firmware versions to
+> > the commit message for posterity though.
+> >
+> >
+> > Kind regards,
+> >
+> > Paul
+> >
+> Thanks,
+> This patch partly works for me. The mouse now takes several dozen seconds=
+ to detect where the computer did not find it at all before.
+> But note that in kernel 6.3.x it was always detected immediately.
 
-Dear submitter,
+What version did you try, v2 didn't have any effect for me, only v3
+worked which had the same behavior of AX210 so it discovered it quite
+quickly.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=778644
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.58 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      27.68 seconds
-BluezMake                     PASS      903.00 seconds
-MakeCheck                     PASS      12.11 seconds
-MakeDistcheck                 PASS      159.22 seconds
-CheckValgrind                 PASS      261.53 seconds
-CheckSmatch                   PASS      349.90 seconds
-bluezmakeextell               PASS      104.95 seconds
-IncrementalBuild              PASS      729.79 seconds
-ScanBuild                     PASS      1090.00 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1290277953486354624==--
+--=20
+Luiz Augusto von Dentz
