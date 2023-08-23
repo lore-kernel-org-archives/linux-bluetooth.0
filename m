@@ -2,119 +2,84 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BE7C71145
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 20:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F96BC3DA6F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 21:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236755AbjHWUxY (ORCPT
+        id S235594AbjHWVVs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Aug 2023 16:53:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48492 "EHLO
+        Wed, 23 Aug 2023 17:21:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236742AbjHWUxV (ORCPT
+        with ESMTP id S236673AbjHWVVQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Aug 2023 16:53:21 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FB510C8;
-        Wed, 23 Aug 2023 13:53:20 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3a84c228f26so139447b6e.1;
-        Wed, 23 Aug 2023 13:53:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692823999; x=1693428799;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JBzuOUokFnbIvdABYXgxVqx9GE8BaF/60yc9jGc5dow=;
-        b=ifnYBZ/z06PEthqsBU8HiWYT10InB2ZeB1Y6vsDDSct7lsEMYnCyzojld08QczG4y2
-         FUMvuJDrSG8gJxOkIJ1Xq8QOWi7EbXJY90L3J2ijoLRi7Oxne5kAutyRTZ8dhsKyJ8Tm
-         GgOm4JhvObKDz/DHO9zQxSv+Tnh3HclqbXCwiMmcyJl4CLfPY0Jm6mp7SQi8lHADhWQz
-         uWVAuTieWCuepOe/Wvdl3E5+v1MJN/4eKv134zQmdZsidL9G9nFqjtGGDyXeyTgAZTzK
-         /vjog61vWigYGhl/XZsB6Y/CuiNJ4DR6mdHS53x4CWoFyJ63JheDZnuwad+ipe5YsIPL
-         Voew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692823999; x=1693428799;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JBzuOUokFnbIvdABYXgxVqx9GE8BaF/60yc9jGc5dow=;
-        b=j/OYo9e9OWTOG6pVJx1cQdrQghYk+y0oOft5g3zccCxBtbispdqyyn1vcqDtq+foTT
-         k7R/5R3YfC75o1K4Hjyg6GRKDM7haKH1Dn2raiF4FP0GW11hJCFLbJpaA+quYHGvi2zf
-         kW+3gh5MwD60WJbS+3rA9s1GEje9EvYger3GQju7btWSby2nUv5eKCwktDzetA3BUJwk
-         mjsKLsvvJbWCQF8uU+lIKGHrrBYDELfrEQ/ArDp4ugF9/DVDfHwZ2q2JYE2o/h17Jptp
-         DrwTMC6R8qjEpAazyghk5LAE21LC883LsXq3efioUBuKcpsLzNpcadAQqUjX7i/86/BH
-         zOLw==
-X-Gm-Message-State: AOJu0YwHfXL+sPbUVnvefvYkZUrZSMktFmMkCxcoCcfxQftW4XxPdjc5
-        Mcthh7n3yBT2H57AhuVoB7oJmkiJXnHLX3r9+rE=
-X-Google-Smtp-Source: AGHT+IFEwtEKi0ASYKlkdJHjS3VmWFQAWnMsjK8W4r5tNoeTEcjoneObafNLHnT2CCsQ51YZgYhlBs6BkOpakYJXZGU=
-X-Received: by 2002:a05:6808:23c1:b0:3a7:7b7e:f309 with SMTP id
- bq1-20020a05680823c100b003a77b7ef309mr9358159oib.10.1692823999253; Wed, 23
- Aug 2023 13:53:19 -0700 (PDT)
+        Wed, 23 Aug 2023 17:21:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D289B10E4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 14:20:48 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D899665E89
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 21:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E50FC433C9;
+        Wed, 23 Aug 2023 21:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692825624;
+        bh=83DXrjL3lUhlsI5hlFVdzSFgCl0xwmwWiBmfDOdAf4s=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=KqqaInyBiDyYAlhqnvZyJURogZbvLVqXwWZO2jtHQin5N82998ue+FtXqOJR5MBEz
+         hVZLLiNpt87D6ilI84z7sTMQ79jeXdcn+KJ2Ty8zjgU3UzOYTaqehPj9Sz8Oiqx3+v
+         jlzAIb9quKNYApQTALxsuIZxiUoXh9QuUpSOqnVc8jGJH1yAPedIh9WQYFJzzN1puD
+         K0Ei653DTOVWHL+zhyPbLVRyaM5e1X1ysO+gakc+4IeNVSWKwZiK74K6PiT68uNVc+
+         nU3dVLWPjpVuEHhDVRk9fMRFfag1oYvkv4+nIew5+BOX1sfxWrcjP6KeBCxchw8Wq8
+         2+6oWkVfnp05Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 036ABE4EAF6;
+        Wed, 23 Aug 2023 21:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au> <E1qYl9w-006vEX-O3@formenos.hmeau.com>
-In-Reply-To: <E1qYl9w-006vEX-O3@formenos.hmeau.com>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Wed, 23 Aug 2023 22:53:07 +0200
-Message-ID: <CAOi1vP-n3tNgRWfOAYDaQvuC+781QGXxuT6wt+XEh7n2P4_3Ug@mail.gmail.com>
-Subject: Re: [PATCH 4/12] ceph: Do not include crypto/algapi.h
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Xiubo Li <xiubli@redhat.com>,
-        Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4] Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169282562400.8293.7219728296935052147.git-patchwork-notify@kernel.org>
+Date:   Wed, 23 Aug 2023 21:20:24 +0000
+References: <20230823194128.3893244-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230823194128.3893244-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 12:32=E2=80=AFPM Herbert Xu <herbert@gondor.apana.o=
-rg.au> wrote:
->
-> The header file crypto/algapi.h is for internal use only.  Use the
-> header file crypto/utils.h instead.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->
->  net/ceph/messenger_v2.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
-> index 1a888b86a494..4aab32144833 100644
-> --- a/net/ceph/messenger_v2.c
-> +++ b/net/ceph/messenger_v2.c
-> @@ -8,9 +8,9 @@
->  #include <linux/ceph/ceph_debug.h>
->
->  #include <crypto/aead.h>
-> -#include <crypto/algapi.h>  /* for crypto_memneq() */
->  #include <crypto/hash.h>
->  #include <crypto/sha2.h>
-> +#include <crypto/utils.h>
->  #include <linux/bvec.h>
->  #include <linux/crc32c.h>
->  #include <linux/net.h>
+Hello:
 
-Applied.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Thanks,
+On Wed, 23 Aug 2023 12:41:28 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This introduces HCI_QUIRK_BROKEN_LE_CODED which is used to indicate
+> that LE Coded PHY shall not be used, it is then set for some Intel
+> models that claim to support it but when used causes many problems.
+> 
+> Cc: stable@vger.kernel.org # 6.4.y+
+> Link: https://github.com/bluez/bluez/issues/577
+> Link: https://github.com/bluez/bluez/issues/582
+> Link: https://lore.kernel.org/linux-bluetooth/CABBYNZKco-v7wkjHHexxQbgwwSz-S=GZ=dZKbRE1qxT1h4fFbQ@mail.gmail.com/T/#
+> Fixes: 288c90224eec ("Bluetooth: Enable all supported LE PHY by default")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
 
-                Ilya
+Here is the summary with links:
+  - [v4] Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1098ecdb96b2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
