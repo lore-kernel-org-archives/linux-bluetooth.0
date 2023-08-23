@@ -2,223 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 795EFC27C40
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 20:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BE7C71145
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 20:53:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236681AbjHWUuo (ORCPT
+        id S236755AbjHWUxY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Aug 2023 16:50:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53814 "EHLO
+        Wed, 23 Aug 2023 16:53:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236660AbjHWUue (ORCPT
+        with ESMTP id S236742AbjHWUxV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Aug 2023 16:50:34 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DFBB10D8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 13:50:32 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-7925f7d5142so26074039f.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 13:50:32 -0700 (PDT)
+        Wed, 23 Aug 2023 16:53:21 -0400
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FB510C8;
+        Wed, 23 Aug 2023 13:53:20 -0700 (PDT)
+Received: by mail-oi1-x230.google.com with SMTP id 5614622812f47-3a84c228f26so139447b6e.1;
+        Wed, 23 Aug 2023 13:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692823831; x=1693428631;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4UsPp+xbVzCYKQo0/lcOt8d2P3tVnz34/NiijQi3jd0=;
-        b=gJvaK656DRFxXaMfjp5+kZeWpvjqyTXeJX0NBYXcqjn6srVLwmAxnwgwPwNwmiV95u
-         z8dbLzeh+ThnvbWzzBmwJfiSgxZVOb92YYfUKfIj+QYM0aC3FPAJF3KMWZTeX1Hfvp5n
-         1UgDS0BwQaU514I/bdcWPi1bMB6O2ZlQ1Lv51OW6hQiPmp8Am7NBvLdsjWSvL7BkdmzM
-         S/NRSc6mIN62seXYriXFDw3QqeTPVxttzme0VZD2cgSJ1yRJPK3JL9houd9L4AjMx6c2
-         CG0Kx8qmqlIYfr6a1oNSXekbiaWDOjqB33hl9iWNXJm5OCTDC//LjMFukQmzPNas5NYD
-         LDcw==
+        d=gmail.com; s=20221208; t=1692823999; x=1693428799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JBzuOUokFnbIvdABYXgxVqx9GE8BaF/60yc9jGc5dow=;
+        b=ifnYBZ/z06PEthqsBU8HiWYT10InB2ZeB1Y6vsDDSct7lsEMYnCyzojld08QczG4y2
+         FUMvuJDrSG8gJxOkIJ1Xq8QOWi7EbXJY90L3J2ijoLRi7Oxne5kAutyRTZ8dhsKyJ8Tm
+         GgOm4JhvObKDz/DHO9zQxSv+Tnh3HclqbXCwiMmcyJl4CLfPY0Jm6mp7SQi8lHADhWQz
+         uWVAuTieWCuepOe/Wvdl3E5+v1MJN/4eKv134zQmdZsidL9G9nFqjtGGDyXeyTgAZTzK
+         /vjog61vWigYGhl/XZsB6Y/CuiNJ4DR6mdHS53x4CWoFyJ63JheDZnuwad+ipe5YsIPL
+         Voew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692823831; x=1693428631;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4UsPp+xbVzCYKQo0/lcOt8d2P3tVnz34/NiijQi3jd0=;
-        b=F7DKge6/Vg3MK03HX10/vW5HJ/qXMU6HYAxr6KdzEv+gK6cSrbtC2V4WHyOipk87MN
-         9OdPUIARMyTqcSqTbQRFSc4O8qNEowdFGk/rkiX4iU/hBGIEqc3vWmUG1a3h7356sdBd
-         ltw6kUSRxwDiL/f1h5GfnLsolqtCMG/2nZ4e96A9Fc2ReCGB7lIJOdWYfbrTnYyIJJa9
-         i5F9vwGrebuRASlyjZyCF8ccAA3IKSjwMeFnKna78fa2oLahvMYSPT6c/s0u7sAhjjP5
-         tDSOTsxnpum0Ee9wfNfINj1AjdXKjM6hs/dpHny3LWeDrc4TiSMY6aO9zCckwiCfyqI6
-         jh4g==
-X-Gm-Message-State: AOJu0YwLSDgQPFb5+A2mOWzNVFp/I0x7CgZt23ghSg+/LMvg+1LJOfq7
-        /8lM1VFvug8l88vvMruvU8rl4GBdyhM=
-X-Google-Smtp-Source: AGHT+IGoXr8dI57fK4ZThNQ5fEpNTfWMgWr3eA/LrH0OjKKVcOoD36kT9o+9Z7qAQrpKCKa5bm5NYQ==
-X-Received: by 2002:a6b:f00e:0:b0:792:6963:df30 with SMTP id w14-20020a6bf00e000000b007926963df30mr1353812ioc.0.1692823830950;
-        Wed, 23 Aug 2023 13:50:30 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id gn16-20020a0566382c1000b0042b3a328ee0sm2802476jab.166.2023.08.23.13.50.29
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 13:50:30 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client: Add agent auto argument support
-Date:   Wed, 23 Aug 2023 13:50:28 -0700
-Message-ID: <20230823205028.3903879-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20221208; t=1692823999; x=1693428799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JBzuOUokFnbIvdABYXgxVqx9GE8BaF/60yc9jGc5dow=;
+        b=j/OYo9e9OWTOG6pVJx1cQdrQghYk+y0oOft5g3zccCxBtbispdqyyn1vcqDtq+foTT
+         k7R/5R3YfC75o1K4Hjyg6GRKDM7haKH1Dn2raiF4FP0GW11hJCFLbJpaA+quYHGvi2zf
+         kW+3gh5MwD60WJbS+3rA9s1GEje9EvYger3GQju7btWSby2nUv5eKCwktDzetA3BUJwk
+         mjsKLsvvJbWCQF8uU+lIKGHrrBYDELfrEQ/ArDp4ugF9/DVDfHwZ2q2JYE2o/h17Jptp
+         DrwTMC6R8qjEpAazyghk5LAE21LC883LsXq3efioUBuKcpsLzNpcadAQqUjX7i/86/BH
+         zOLw==
+X-Gm-Message-State: AOJu0YwHfXL+sPbUVnvefvYkZUrZSMktFmMkCxcoCcfxQftW4XxPdjc5
+        Mcthh7n3yBT2H57AhuVoB7oJmkiJXnHLX3r9+rE=
+X-Google-Smtp-Source: AGHT+IFEwtEKi0ASYKlkdJHjS3VmWFQAWnMsjK8W4r5tNoeTEcjoneObafNLHnT2CCsQ51YZgYhlBs6BkOpakYJXZGU=
+X-Received: by 2002:a05:6808:23c1:b0:3a7:7b7e:f309 with SMTP id
+ bq1-20020a05680823c100b003a77b7ef309mr9358159oib.10.1692823999253; Wed, 23
+ Aug 2023 13:53:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au> <E1qYl9w-006vEX-O3@formenos.hmeau.com>
+In-Reply-To: <E1qYl9w-006vEX-O3@formenos.hmeau.com>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Wed, 23 Aug 2023 22:53:07 +0200
+Message-ID: <CAOi1vP-n3tNgRWfOAYDaQvuC+781QGXxuT6wt+XEh7n2P4_3Ug@mail.gmail.com>
+Subject: Re: [PATCH 4/12] ceph: Do not include crypto/algapi.h
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+        linux-mtd@lists.infradead.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Xiubo Li <xiubli@redhat.com>,
+        Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-wireless@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Aug 23, 2023 at 12:32=E2=80=AFPM Herbert Xu <herbert@gondor.apana.o=
+rg.au> wrote:
+>
+> The header file crypto/algapi.h is for internal use only.  Use the
+> header file crypto/utils.h instead.
+>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>
+>  net/ceph/messenger_v2.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
+> index 1a888b86a494..4aab32144833 100644
+> --- a/net/ceph/messenger_v2.c
+> +++ b/net/ceph/messenger_v2.c
+> @@ -8,9 +8,9 @@
+>  #include <linux/ceph/ceph_debug.h>
+>
+>  #include <crypto/aead.h>
+> -#include <crypto/algapi.h>  /* for crypto_memneq() */
+>  #include <crypto/hash.h>
+>  #include <crypto/sha2.h>
+> +#include <crypto/utils.h>
+>  #include <linux/bvec.h>
+>  #include <linux/crc32c.h>
+>  #include <linux/net.h>
 
-This adds "auto" capability which behaves like "on" but instead of
-asking user to confirm/autorize it automatically accepts, which is
-not secure to be used thus a warning is printed when user selects it.
+Applied.
 
-Usage:
+Thanks,
 
-  [bluetoothctl]# agent auto
-  Warning: setting auto response is not secure, it bypass user
-  confirmation/authorization, it shall only be used for test automation.
-
-  or
-
-  client/bluetoothctl -a auto
----
- client/agent.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++-
- client/main.c  |  3 +-
- 2 files changed, 85 insertions(+), 2 deletions(-)
-
-diff --git a/client/agent.c b/client/agent.c
-index c8e1560e74a8..35b404114873 100644
---- a/client/agent.c
-+++ b/client/agent.c
-@@ -258,7 +258,7 @@ static DBusMessage *cancel_request(DBusConnection *conn,
- 	return dbus_message_new_method_return(msg);
- }
- 
--static const GDBusMethodTable methods[] = {
-+static const GDBusMethodTable agent_methods[] = {
- 	{ GDBUS_METHOD("Release", NULL, NULL, release_agent) },
- 	{ GDBUS_ASYNC_METHOD("RequestPinCode",
- 			GDBUS_ARGS({ "device", "o" }),
-@@ -286,6 +286,78 @@ static const GDBusMethodTable methods[] = {
- 	{ }
- };
- 
-+static DBusMessage *auto_confirmation(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	const char *device;
-+	dbus_uint32_t passkey;
-+
-+	bt_shell_printf("Request confirmation\n");
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-+				DBUS_TYPE_UINT32, &passkey, DBUS_TYPE_INVALID);
-+
-+	bt_shell_printf("Confirm passkey %06u (auto)", passkey);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *auto_authorization(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	const char *device;
-+
-+	bt_shell_printf("Request authorization\n");
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-+							DBUS_TYPE_INVALID);
-+
-+	bt_shell_printf("Accept pairing (auto)");
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *auto_authorize_service(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	const char *device, *uuid;
-+
-+	dbus_message_get_args(msg, NULL, DBUS_TYPE_OBJECT_PATH, &device,
-+				DBUS_TYPE_STRING, &uuid, DBUS_TYPE_INVALID);
-+
-+	bt_shell_printf("Authorize service %s (auto)", uuid);
-+
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable auto_methods[] = {
-+	{ GDBUS_METHOD("Release", NULL, NULL, release_agent) },
-+	{ GDBUS_ASYNC_METHOD("RequestPinCode",
-+			GDBUS_ARGS({ "device", "o" }),
-+			GDBUS_ARGS({ "pincode", "s" }), request_pincode) },
-+	{ GDBUS_METHOD("DisplayPinCode",
-+			GDBUS_ARGS({ "device", "o" }, { "pincode", "s" }),
-+			NULL, display_pincode) },
-+	{ GDBUS_ASYNC_METHOD("RequestPasskey",
-+			GDBUS_ARGS({ "device", "o" }),
-+			GDBUS_ARGS({ "passkey", "u" }), request_passkey) },
-+	{ GDBUS_METHOD("DisplayPasskey",
-+			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" },
-+							{ "entered", "q" }),
-+			NULL, display_passkey) },
-+	{ GDBUS_ASYNC_METHOD("RequestConfirmation",
-+			GDBUS_ARGS({ "device", "o" }, { "passkey", "u" }),
-+			NULL, auto_confirmation) },
-+	{ GDBUS_ASYNC_METHOD("RequestAuthorization",
-+			GDBUS_ARGS({ "device", "o" }),
-+			NULL, auto_authorization) },
-+	{ GDBUS_ASYNC_METHOD("AuthorizeService",
-+			GDBUS_ARGS({ "device", "o" }, { "uuid", "s" }),
-+			NULL,  auto_authorize_service) },
-+	{ GDBUS_METHOD("Cancel", NULL, NULL, cancel_request) },
-+	{ }
-+};
-+
- static void register_agent_setup(DBusMessageIter *iter, void *user_data)
- {
- 	const char *path = AGENT_PATH;
-@@ -319,6 +391,8 @@ void agent_register(DBusConnection *conn, GDBusProxy *manager,
- 						const char *capability)
- 
- {
-+	const GDBusMethodTable *methods = agent_methods;
-+
- 	if (agent_registered == TRUE) {
- 		bt_shell_printf("Agent is already registered\n");
- 		return;
-@@ -326,6 +400,14 @@ void agent_register(DBusConnection *conn, GDBusProxy *manager,
- 
- 	agent_capability = capability;
- 
-+	if (!strcasecmp(agent_capability, "auto")) {
-+		bt_shell_printf("Warning: setting auto response is not secure, "
-+				"it bypass user confirmation/authorization, it "
-+				"shall only be used for test automation.\n");
-+		agent_capability = "";
-+		methods = auto_methods;
-+	}
-+
- 	if (g_dbus_register_interface(conn, AGENT_PATH,
- 					AGENT_INTERFACE, methods,
- 					NULL, NULL, NULL, NULL) == FALSE) {
-diff --git a/client/main.c b/client/main.c
-index 0eac5bdf5015..a1c536c638d9 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -66,6 +66,7 @@ static GList *battery_proxies;
- static const char *agent_arguments[] = {
- 	"on",
- 	"off",
-+	"auto",
- 	"DisplayOnly",
- 	"DisplayYesNo",
- 	"KeyboardDisplay",
-@@ -3096,7 +3097,7 @@ static const struct bt_shell_menu main_menu = {
- 							NULL },
- 	{ "discoverable-timeout", "[value]", cmd_discoverable_timeout,
- 					"Set discoverable timeout", NULL },
--	{ "agent",        "<on/off/capability>", cmd_agent,
-+	{ "agent",        "<on/off/auto/capability>", cmd_agent,
- 				"Enable/disable agent with given capability",
- 							capability_generator},
- 	{ "default-agent",NULL,       cmd_default_agent,
--- 
-2.41.0
-
+                Ilya
