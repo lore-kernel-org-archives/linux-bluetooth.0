@@ -2,165 +2,103 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9613EEE49B2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 11:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5EEEE49A0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Aug 2023 12:52:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234587AbjHWLwQ (ORCPT
+        id S234995AbjHWMwq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Aug 2023 07:52:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50672 "EHLO
+        Wed, 23 Aug 2023 08:52:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234579AbjHWLwP (ORCPT
+        with ESMTP id S232211AbjHWMwq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Aug 2023 07:52:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A36C10E3;
-        Wed, 23 Aug 2023 04:51:54 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9A08D660C4;
-        Wed, 23 Aug 2023 11:51:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D6BBC433D9;
-        Wed, 23 Aug 2023 11:51:50 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HvlznVnN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-        t=1692791504;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=i9S50yEi/p2rCDiQFKotCIoS/umPPt7Pl2fEpLB+hPU=;
-        b=HvlznVnN4+nTE+9P5lkr2rPCYQplDgdO5TEv4CB+fveG2FN0HLeY+NAKhcNFA6GMXSUYPq
-        R8vqfNV1vDE9kWFG8KCRj+3M8C/lrcTsz5tgdrIKsIZ/EgSSCfZRt8uPFm8LgCHWdCfxEV
-        UQuclphoiHFSePfXFFvOomDkbQr3/xM=
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c56767ad (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 23 Aug 2023 11:51:44 +0000 (UTC)
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-44d5ac10c41so854545137.0;
-        Wed, 23 Aug 2023 04:51:44 -0700 (PDT)
-X-Gm-Message-State: AOJu0YxusXUY5obDP6tjt4IEgrt6n41c6CPK6h+LdHr5QGxUrieLlpmG
-        5z9b6I8BK1hxlOFHEoIbSfloTkZB5DLdQUZYUqQ=
-X-Google-Smtp-Source: AGHT+IFt7G1/ZeusTY56LT7aeMj6tJiORTuiaRW4q76XBgQu2EncKhol2bejM2ffQ7Afv6eCg3gMogdKzIe6mnDS5dk=
-X-Received: by 2002:a67:ba0c:0:b0:44d:40b1:9273 with SMTP id
- l12-20020a67ba0c000000b0044d40b19273mr8437282vsn.4.1692791501269; Wed, 23 Aug
- 2023 04:51:41 -0700 (PDT)
+        Wed, 23 Aug 2023 08:52:46 -0400
+Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1433CD2;
+        Wed, 23 Aug 2023 05:52:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=buaa.edu.cn; s=buaa; h=Received:From:To:Cc:Subject:Date:
+        Message-Id:MIME-Version:Content-Transfer-Encoding; bh=wyNeCKg8/s
+        oZoxHdvCQHzGHwLshE1piKoTbUovUYGFo=; b=uTRyrk5JFE069PU//T+FQMfIdW
+        UmD9030YFOf77bJXIZWapmpbIBPBBuzBVXylhy4StNZLd3eL5VCLSb/LoJI5yzDA
+        Lw3K84SbUAkRl5BW8UekmnxMW4FEXI9zE7ZVcjLNvmbWukyYA926DhLcGhFEVWNE
+        Iq2ujTq2hJ10skziA=
+Received: from localhost.localdomain (unknown [10.193.157.69])
+        by coremail-app1 (Coremail) with SMTP id OCz+CgAnbJv_AOZkVlAnAA--.23146S2;
+        Wed, 23 Aug 2023 20:52:18 +0800 (CST)
+From:   Xin-Yu Liu <by2239112@buaa.edu.cn>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     baijiaju@buaa.edu.cn, sy2239101@buaa.edu.cn,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Xin-Yu Liu <by2239112@buaa.edu.cn>
+Subject: [PATCH] net: bluetooth: fix consistent connection failure caused by the loss of HCI_Connection_Complete event
+Date:   Wed, 23 Aug 2023 20:52:14 +0800
+Message-Id: <20230823125214.5910-1-by2239112@buaa.edu.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au> <E1qYlAB-006vJI-Cv@formenos.hmeau.com>
-In-Reply-To: <E1qYlAB-006vJI-Cv@formenos.hmeau.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 23 Aug 2023 13:48:47 +0200
-X-Gmail-Original-Message-ID: <CAHmME9qwYhM55he7WyWQZXwSg9Ri6-9K31tHHqaKcMYFEJYxTw@mail.gmail.com>
-Message-ID: <CAHmME9qwYhM55he7WyWQZXwSg9Ri6-9K31tHHqaKcMYFEJYxTw@mail.gmail.com>
-Subject: Re: [PATCH 11/12] wireguard: Do not include crypto/algapi.h
-To:     herbert@gondor.apana.org.au
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-integrity@vger.kernel.org,
-        Ayush Sawal <ayush.sawal@chelsio.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: OCz+CgAnbJv_AOZkVlAnAA--.23146S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cr18uF45ZrW8JFyDXw1DJrb_yoW8Ww18pa
+        909ay3urWkJ3Z0gF17Aw1kXFyqkw1kuFWUtrWqv345ta98tr4vyr40yrW7t3y5WrZ5JF18
+        ZF40qrsrJF45C3DanT9S1TB71UUUUjUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUPj1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+        IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+        z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2kKe7AKxVWUXV
+        WUAwAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+        0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Gr0_Cr
+        1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+        rcIFxwCY1x0262kKe7AKxVWUAVWUtwCY02Avz4vE-syl42xK82IYc2Ij64vIr41l42xK82
+        IY6x8ErcxFaVAv8VW7tr1UJr1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+        xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+        kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+        6r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+        CI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUejgxUUUU
+        U
+X-CM-SenderInfo: te1sjjazrrjqpexdthxhgxhubq/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Aug 23, 2023 at 12:33=E2=80=AFPM Herbert Xu <herbert@gondor.apana.o=
-rg.au> wrote:
->
-> The header file crypto/algapi.h is for internal use only.  Use the
-> header file crypto/utils.h instead.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->
->  drivers/net/wireguard/cookie.c  |    2 +-
->  drivers/net/wireguard/netlink.c |    2 +-
->  drivers/net/wireguard/noise.c   |    2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/wireguard/cookie.c b/drivers/net/wireguard/cooki=
-e.c
-> index 4956f0499c19..f89581b5e8cb 100644
-> --- a/drivers/net/wireguard/cookie.c
-> +++ b/drivers/net/wireguard/cookie.c
-> @@ -12,9 +12,9 @@
->
->  #include <crypto/blake2s.h>
->  #include <crypto/chacha20poly1305.h>
-> +#include <crypto/utils.h>
->
->  #include <net/ipv6.h>
-> -#include <crypto/algapi.h>
->
->  void wg_cookie_checker_init(struct cookie_checker *checker,
->                             struct wg_device *wg)
-> diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netl=
-ink.c
-> index 6d1bd9f52d02..0a1502100e8b 100644
-> --- a/drivers/net/wireguard/netlink.c
-> +++ b/drivers/net/wireguard/netlink.c
-> @@ -12,10 +12,10 @@
->
->  #include <uapi/linux/wireguard.h>
->
-> +#include <crypto/utils.h>
->  #include <linux/if.h>
->  #include <net/genetlink.h>
->  #include <net/sock.h>
-> -#include <crypto/algapi.h>
->
->  static struct genl_family genl_family;
->
-> diff --git a/drivers/net/wireguard/noise.c b/drivers/net/wireguard/noise.=
-c
-> index 720952b92e78..e7ad81ca4a36 100644
-> --- a/drivers/net/wireguard/noise.c
-> +++ b/drivers/net/wireguard/noise.c
-> @@ -10,12 +10,12 @@
->  #include "queueing.h"
->  #include "peerlookup.h"
->
-> +#include <crypto/utils.h>
->  #include <linux/rcupdate.h>
->  #include <linux/slab.h>
->  #include <linux/bitmap.h>
->  #include <linux/scatterlist.h>
->  #include <linux/highmem.h>
-> -#include <crypto/algapi.h>
->
->  /* This implements Noise_IKpsk2:
->   *
+During a connection attempt, if the HCI_Connection_Complete event
+is lost and not received by the Host, it will result in
+a connection failure.
 
-Small nit - with the exception of the cookie.c reordering, could you
-maintain the existing #include ordering of the other files? No need to
-send a v2 for that if you don't want. And please make the entire
-commit subject lowercase. With those done,
+In that process, the hci_conn, the handle of which is still
+HCI_CONN_HANDLE_UNSET, will not be removed from the conn_hash
+as it would during a regular disconnection opration.
+Consequently, when an ACL connection is initiated for the same device,
+the hci_conn is found in hash_conn based on "ba", with its state remaining
+BT_CONNECT. Then the Host will send an HCI_Create_Connection_Cancel 
+command, which will result in subsequent Bluetooth connections 
+for the same device consistently failing.
 
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+In order to solve the potential bug, if the hci_conn's state is
+BT_CONNECT and handle is HCI_CONN_HANDLE_UNSET, remove this hci_conn
+from conn_hash. This adjustment could potentially help ensure that the
+specific conn is cleaned up at the appropriate times, then the subsequent
+connection for the same device will no longer experience failures.
 
-As a side note, you may want to eventually do something to make sure
-people don't add back algapi.h, like move it to internal/ or out of
-include/ all together. I figure you've already thought about this, and
-this series is just the first step.
+Signed-off-by: Xin-Yu Liu <by2239112@buaa.edu.cn>
+---
+ net/bluetooth/hci_conn.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Jason
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 76222565e..219c62579 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2886,6 +2886,10 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 		} else if (conn->type == ACL_LINK) {
+ 			if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
+ 				break;
++			if (conn->state == HCI_CONN_HANDLE_UNSET) {
++				hci_conn_cleanup(conn);
++				break;
++			}
+ 			r = hci_send_cmd(conn->hdev,
+ 					 HCI_OP_CREATE_CONN_CANCEL,
+ 					 6, &conn->dst);
+-- 
+2.25.1
+
