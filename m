@@ -2,101 +2,146 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4D5C6FA8F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 22:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BD2C88CB2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 23:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236827AbjHXWeV (ORCPT
+        id S239622AbjHXX6s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Aug 2023 18:34:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
+        Thu, 24 Aug 2023 19:58:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240429AbjHXWdy (ORCPT
+        with ESMTP id S244099AbjHXX6h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Aug 2023 18:33:54 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AABAB1BEB
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 15:33:42 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id 5614622812f47-3a88ef9444bso242016b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 15:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692916422; x=1693521222;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uMmZrCSlSbU/Xbhpr1P/31n8z40+ffREE+AIeSBRVqY=;
-        b=HdBjgIcpcKGGfjpws8yTKUORWIcCh05yv6F583S9Lqx25zAQ2Yk0b6QWaIO2zLCnS6
-         0hmGJaJ3hO2mf4tQR18iJqekDEkt4jt5eSjCy1rCRDlBBcd4uMPfnPS2/ir0TBuYY4SG
-         IWwdgGPnQiwwGS3yDkiL4qZmZxGUmleLFUiJhstc4lrU4sJaYnjJVSxvDklesaRAkE7T
-         2trzw9J3FATuo5RRBK8mtzRnPpUTUbshK3rQ8RCYL4fhHgnHk7J1+m71bZNnlQwEZgWb
-         1jRB2XdQvpSIAwsVoIFQkkWTR5PkAgK8SP/jFDq/fw0NMZE2a5FOL7MXbyc9dp6AuEKA
-         j/1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692916422; x=1693521222;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uMmZrCSlSbU/Xbhpr1P/31n8z40+ffREE+AIeSBRVqY=;
-        b=NO/Ljg0elpi8fLBcN2+slJQ+UVeS0XNx0vLMYaaOA0NUnmOf+W1DhMLsJr8o/gjSNL
-         urXtuRfPYfcKre2PMe1tDAln0aGmdUvq2U3s+oYECofFsiW8+ynsl5/9rphp2+W0LCMq
-         2MK4ww+/lDypMjyW/OIgZGY2Kpy2os7dqiojxHnfWlk5BXaz1NGxwsvdI0E0bptTcecT
-         1/93BEdGaRVtLNL/Nzj7HcLHTvjHZqxXqo4QidKxFYCIRryrqz0DxSIuryAgMzaGho04
-         0cC+VI+OIDim24YnRgVhRFV1FcNGZ1WzrXPwXFonn2oR5erFq6o23jObjI/BfnEwV7oq
-         nVww==
-X-Gm-Message-State: AOJu0YxRa72unUkweyOtpfd9Olorcxq8PfqLKwpOOASWBMAyjymKmMTq
-        If6Oy3hKkEUuFV15YK3zXaH7G4Ke6r8=
-X-Google-Smtp-Source: AGHT+IGkdoHhl5Rwwbpe1lrueAbmF2LdoP3PYR2BithslH2TECdqe4u6jKJCGkA5DBDAWSbnl/KrTw==
-X-Received: by 2002:a05:6808:210e:b0:3a8:6693:135d with SMTP id r14-20020a056808210e00b003a86693135dmr1266096oiw.49.1692916421747;
-        Thu, 24 Aug 2023 15:33:41 -0700 (PDT)
-Received: from [172.17.0.2] ([157.55.189.30])
-        by smtp.gmail.com with ESMTPSA id y9-20020a544d89000000b003a05ba0ccb2sm167499oix.39.2023.08.24.15.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 15:33:41 -0700 (PDT)
-Message-ID: <64e7dac5.540a0220.d569d.109e@mx.google.com>
-Date:   Thu, 24 Aug 2023 15:33:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6309778814979832060=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,RFC] media-api: Make QoS a single property
-In-Reply-To: <20230824212153.11050-1-luiz.dentz@gmail.com>
-References: <20230824212153.11050-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+        Thu, 24 Aug 2023 19:58:37 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA1C1FD3;
+        Thu, 24 Aug 2023 16:58:06 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37ONvGwO007768;
+        Thu, 24 Aug 2023 23:57:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : date : in-reply-to : references : content-type : mime-version
+ : content-transfer-encoding; s=pp1;
+ bh=oDLt9MGmCExq5NUMRyFjvZAr8DfskIv92nbC1tyNUVE=;
+ b=DnLnCzxivBeoZ8KXN2bBCDB/hHKf66oFtodTwucXnODDJwMQmU0nqQ4PfO2bdsvegT6a
+ Zd0JI8a8c2ioPHa8vjm2X1t6sB1Esix7BPUqYrpHZQb/MSsY5O+KT76WhhAsCCYZoSf6
+ smN4S11DPM0Fx2Q5LRQIr69CYH++vUL+gdtEp8UR3+hGTi4PHz846QD0TZaiQkvmAtUO
+ TU6w/6pwQVCETvlWeZDt2DOvYCCpRYptAnJUJQWbUckY/XhqernTFBNUgnn0mSSmnAZA
+ H5myYx8rPJrKRUL1+vvKIaPb6VT02GXsY+uG6uDZ2nv2T+9xnYAPDCjXLr6F7hpzwka5 gQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3spgad9eey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Aug 2023 23:57:22 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 37ONa97Y006045;
+        Thu, 24 Aug 2023 23:57:21 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3spgad9eep-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Aug 2023 23:57:21 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+        by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 37OLOkcn016727;
+        Thu, 24 Aug 2023 23:57:20 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+        by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3sn2283anj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 24 Aug 2023 23:57:20 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 37ONvJV1393924
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Aug 2023 23:57:20 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BDD9458054;
+        Thu, 24 Aug 2023 23:57:19 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 44BC95804E;
+        Thu, 24 Aug 2023 23:57:17 +0000 (GMT)
+Received: from li-f45666cc-3089-11b2-a85c-c57d1a57929f.ibm.com (unknown [9.61.163.153])
+        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 24 Aug 2023 23:57:17 +0000 (GMT)
+Message-ID: <fd2c26dd2c1e0ef5f4640d36e680f94ca064280e.camel@linux.ibm.com>
+Subject: Re: [PATCH 9/12] evm: Do not include crypto/algapi.h
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+        linux-mtd@lists.infradead.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+        ceph-devel@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-wireless@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Date:   Thu, 24 Aug 2023 19:57:16 -0400
+In-Reply-To: <E1qYlA7-006vHq-8B@formenos.hmeau.com>
+References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
+         <E1qYlA7-006vHq-8B@formenos.hmeau.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+X-Mailer: Evolution 3.28.5 (3.28.5-22.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fk1My-hZ_koWxDC0qnmYPIGtla-o51va
+X-Proofpoint-ORIG-GUID: H-MHHBlfn9DDClGPap9dlVrVP8XP4Ko1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
+ definitions=2023-08-24_18,2023-08-24_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 mlxscore=0 lowpriorityscore=0 adultscore=0
+ clxscore=1011 suspectscore=0 malwarescore=0 phishscore=0 impostorscore=0
+ mlxlogscore=999 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2308100000 definitions=main-2308240205
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6309778814979832060==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, 2023-08-23 at 18:32 +0800, Herbert Xu wrote:
+> The header file crypto/algapi.h is for internal use only.  Use the
+> header file crypto/utils.h instead.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-This is automated email and please do not reply to this email!
+Acked-by: Mimi Zohar <zohar@linux.ibm.com>
 
-Dear submitter,
+> ---
+> 
+>  security/integrity/evm/evm_main.c |    3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
+> index c9b6e2a43478..e635a8d18dae 100644
+> --- a/security/integrity/evm/evm_main.c
+> +++ b/security/integrity/evm/evm_main.c
+> @@ -14,7 +14,6 @@
+>  #define pr_fmt(fmt) "EVM: "fmt
+>  
+>  #include <linux/init.h>
+> -#include <linux/crypto.h>
+>  #include <linux/audit.h>
+>  #include <linux/xattr.h>
+>  #include <linux/integrity.h>
+> @@ -24,7 +23,7 @@
+>  
+>  #include <crypto/hash.h>
+>  #include <crypto/hash_info.h>
+> -#include <crypto/algapi.h>
+> +#include <crypto/utils.h>
+>  #include "evm.h"
+>  
+>  int evm_initialized;
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=779177
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.39 seconds
-GitLint                       PASS      0.29 seconds
-BuildEll                      PASS      26.84 seconds
-BluezMake                     PASS      780.95 seconds
-MakeCheck                     PASS      12.05 seconds
-MakeDistcheck                 PASS      156.04 seconds
-CheckValgrind                 PASS      251.09 seconds
-CheckSmatch                   PASS      340.10 seconds
-bluezmakeextell               PASS      102.47 seconds
-IncrementalBuild              PASS      656.04 seconds
-ScanBuild                     PASS      1031.51 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6309778814979832060==--
