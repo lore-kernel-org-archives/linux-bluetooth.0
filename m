@@ -2,215 +2,269 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13525C7EE43
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 09:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B8B3C3DA6F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 10:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234540AbjHXJDg (ORCPT
+        id S240161AbjHXKRV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Aug 2023 05:03:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42810 "EHLO
+        Thu, 24 Aug 2023 06:17:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240644AbjHXJDa (ORCPT
+        with ESMTP id S239591AbjHXKRJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Aug 2023 05:03:30 -0400
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2033.outbound.protection.outlook.com [40.92.74.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B07751708
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 02:03:27 -0700 (PDT)
+        Thu, 24 Aug 2023 06:17:09 -0400
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2053.outbound.protection.outlook.com [40.107.7.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB5A198B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 03:17:07 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lacvgaqGpqWH1pKfDP1ne55CWGFrIOytRKKCUuDy9RZkHdZSQUDzpNkctQT59JSg3OdEFMU8KESPuRCav/Tu602Uq9WSBuDPN1VpwKMLQAIDMy0KmcoPgauD7QLJ2rExAVNog4qV3Qtmh2yZjJKdZhiqALWi3IcPeyPI91EdCuWtNage6J3CliUmfP2qeFoa8SXU1WG3FgEPBQ+kPgWo4PiyoztEWw8lLVBx7OTkW91u9xSu8pNc5aDlKPk2TsjO/eBuWm/U19PhKLRIGM0Sbw3Wh0xngczksNkCFhkVvujWz57Xwq7apfXn+9OyPXRGdpr3WpsXghHK7ig/HrK2iA==
+ b=Yy5gUwTAc45A6vr3YRt3QvuywnXuwzFl0gMwKEtppVdZp4cNrge/0O8mS9UsxLJ8eQN4lIR7MoaHg71uOeMN2lhBaullb5opRzgoJzHdVMtkO9mGmUB/yohUXP0DitCP1RPQl4Pw1UdEPr6GSicp7UmRu7JAjWU9V/xNfsjzz7RL10ZbPGZ5Lft3YbuLo0e7dtcPWBW6m/g+l7fIPBp5mWZrOVYVak+O7Cp08JEQyZeoq9D/l+JUFCW3Wpka9x0Sl8003+HFjksfwIY6rZMvruxilPxi0bAmcXK+nFWM5NIHQUYduhB8qlB/wMZplirSAQh17TNfcX24GNwTYpCgLQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dUOO4lJNXTmCUFjXLTJ4eRm26RBIO15MwTYHEDMMTWA=;
- b=RGBv9OvH9iBdVGbkCO8btpAmetH8qqscnlhq953xeG0+ziDF1pJrwGsibkmjj83+8HdlrMB/EzpE9emQE/waYwSDGIrxJdExhI7DYIaT7pfvLHqL5lgicZXHsvsCw9pnpNz21hwcsRYNvPIwwZR/n/liLE9Mzkvwh4VahNZ82DTjXHZlNxqz7shmuOTiEAaFEODyfuWXHq46q6CQ/nwlG9M1YFpMaxcj1DnDMrqI+RCfLaZ//NMWqke3oN9JtvS59TvPGxk/EFYb/nMtQzshvE3rTvTBf5/SlhJNryZNPuCEU58f4y+Pncp0PeEVpNqhuhf8wrnhFgwP6o58j2GSnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
+ bh=39QJo3oWtPXxBM3eG4V3giNSIRMr2jUJVoSjYd21LEk=;
+ b=OxSwPr0nN08ZP45w6cQPR4rXd2xRXSJYR0FD6jRqHmFFN0plMwFt6tuaS5+1toLmIjCkW+xoUfqqV7ZntTFpWPwnNxfaG4f87j8b6dgs3HS9zoqQnlEvM0GYHUEdRlvInvsshJZWRTxHmBe+CF/WEFkFYBtUVqwmjQucccjmgjgjGRRgBwTKxOkqAyPLNDT9riBc14iI6sMDTtnAKlv4bteR5TWQpvf/OJvx09sSEJu7iYNDkWf1WSEUVtklo9xdflt6ARu2CBeSoCMabDbxIOi3P21b2fdySZoeyta3p8VjTZkrPHxwT8/Ra2rXN+Yh1NaFmRSAlayiYWfEvH3Now==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dUOO4lJNXTmCUFjXLTJ4eRm26RBIO15MwTYHEDMMTWA=;
- b=FUbCf/S+1Jojo9k4UsfOzVPyATKDSd+Q8WRoHk+1QkRGbRb8fe/Kyf9FSS8hKCrFXL7qBjEzafd2NdTBHqVycbpp7C+T3vt8oxXlqqVjILrRP/xQC/c12mTGPG+JDReT1GCfuwnDq8/9oRmehgE0bdmwbgugGAb7LZuOXIFa0Ya6McNbjFXOxTz21EbWcRe2z9WamYXEljXI0r+TnC4CzMSKn2sNnS3QrT3tF9Dtt5gNNBGmTar0JwmXyF645/isDUdUFrBEtmhBoSFzpLtKjnYlsKwQGoJVgYDc4aEoK2+Us6wZblvhlefEsd8vfgbAXa5+Q0jLYbjbyeqwRrUZNw==
-Received: from AM6P191MB0501.EURP191.PROD.OUTLOOK.COM (2603:10a6:209:30::18)
- by AS8P191MB1672.EURP191.PROD.OUTLOOK.COM (2603:10a6:20b:2e2::9) with
+ bh=39QJo3oWtPXxBM3eG4V3giNSIRMr2jUJVoSjYd21LEk=;
+ b=XHYIPBp7O0A82jEygnQZYYtrxq1rD7SqXVLFJE/FqUJQi833n8QWPXO3fCjGnkjYyEr2dpdsflUP/hh4Y5iT1x616ePVALKn/IGO3VKmzcWx1qWkdc1WuIJNA8M6VnbpNG9BdKjPCm2PPTfWhj6JRltasw1aVTZY28BhgEXwLK0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by DB8PR04MB7034.eurprd04.prod.outlook.com (2603:10a6:10:128::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.27; Thu, 24 Aug
- 2023 09:03:25 +0000
-Received: from AM6P191MB0501.EURP191.PROD.OUTLOOK.COM
- ([fe80::9f66:6cda:606:fa33]) by AM6P191MB0501.EURP191.PROD.OUTLOOK.COM
- ([fe80::9f66:6cda:606:fa33%4]) with mapi id 15.20.6699.027; Thu, 24 Aug 2023
- 09:03:25 +0000
-From:   Bruno Pitrus <brunopitrus@hotmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     Paul Menzel <pmenzel@molgen.mpg.de>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
-Thread-Topic: [PATCH] Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
-Thread-Index: AQHZ1TNtniBhsdYoPEWV9bmXCdZt4q/2wccAgADK24CAAA9pAIAAeTOAgAEUBoA=
-Date:   Thu, 24 Aug 2023 09:03:25 +0000
-Message-ID: <28219751.mYOd1jRtt3@bruno-beit>
-References: <20230822191444.3741307-1-luiz.dentz@gmail.com>
- <5704690.DvuYhMxLoT@bruno-beit>
- <CABBYNZ+6pRytUHfi68h4Q=A9urNR=JtuJ0mzG+615q0Lyyeg+w@mail.gmail.com>
-In-Reply-To: <CABBYNZ+6pRytUHfi68h4Q=A9urNR=JtuJ0mzG+615q0Lyyeg+w@mail.gmail.com>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-tmn:  [xh/lOAmW+yPDoEqsd/IBeOqJOOFZqYa+]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM6P191MB0501:EE_|AS8P191MB1672:EE_
-x-ms-office365-filtering-correlation-id: 2f3a4512-f30c-4b96-31a1-08dba480f9cb
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: yV331/Om4i1HK2gDFYBtvPMLydEFMRt4CKv5SmOGSni5Vl/YgaAND0GpeWpz5YNipQlNvd8me8tuS0x53goKM+jNm7TycUGaQPR+AxqoSxpEbrjcTy4M8WovXNYuq374f4BLIsMLB88Vj0l8FvoZTOJtmNgVty8ygA4q0emlX8P5lCX8SR2JfbLvwwXKcwytDZxuKoa5xTAgIs7uTposTwVxx9eC9eiSddM59ZtkhuUpb+PtBwM/Q6v5u9bOov2+ukwmTler5AphAUl4GFibfvBrVpcrPsl0qfvSlX7AvargDq8C2AQKPx9pLtbHlzmMA7OFacgFfNI5SwW3Edho1zfYaWR0lgSUviqOz8Jqi7J4fzn52pPmWlhKWRompJZo7BmAytE0hRQH3CXV0MRZgN7+QMCYS5a05cs4rvCsVJdNYyCMQEUC1URGcxwldEhDuQhLRjJLbPH5wBfulf1rHGbp/uKPz4xAzQBXbZyOOHC2sAaaLtgWZcrdKKuzMgL8n4FgKqNwnBIXWAPEasSha9hFS61N3O7GckmCKgH/0tbCkxNCGyfSHABIliOqd7VsJ2mR22i6cqQjSUdLyxdJMg==
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V1pkZUxUU1BHUEdIRm9WMGJDZkZWMVZHeVhOYmJJZFpvb2tPNmJuQ3hLcXdJ?=
- =?utf-8?B?NFhidFBQQnFORjkzSlUyQ2NjZGZxZjNnN2hpMVY5VWd1MUtOek5EUUNybys4?=
- =?utf-8?B?ejdKcTdvbTNxN1NKUnZFYTFweWs4V08wSDdmelkwZjVBeWkvNGVIQ0FMVVpl?=
- =?utf-8?B?SmdpMmtDb3ZXcXF4RjYzUVU2OVRwWHFYOFd4MDNKT0pHWnI0L2pqNlVFQnlu?=
- =?utf-8?B?andoUGdDaWF2dFpFeWVLaWZZTUswdlBPeC9EYjd0OXRnTFpGaklNbWxVVmNs?=
- =?utf-8?B?bjg3SnFnR0lNMHJwU2dLTHh3TEVvQjdFT01ZUUVnZ1JxSUF4QmpRNnBab3k4?=
- =?utf-8?B?VUswMmR5c1pJSDA3R1JsU1JzUU44dFJKZ2hNMzRxazNnZThqeGduZHk4azQ2?=
- =?utf-8?B?K1Yra213MSswcDZJZUdUSG8wMng3MDBESlZWU0duOStweXVjekZnc0xoZHZR?=
- =?utf-8?B?UXo0NWhZWnV3dFNzWHY1OXI3dy8vSklaV2pXVFJvUDVzZDNuUWd1L21obEdT?=
- =?utf-8?B?eDNSTGpRZnpuZ3p5engwemM3QytnWGZBYU5ERVZ5NVNsSzRyUEo3cUhUMGxa?=
- =?utf-8?B?ZnVjSnNBT0pXTmJWVWs4QlkvejBxN2ZuT1k0cENydjh2ZDJCc24vM3ZCdFFq?=
- =?utf-8?B?OG4ySThjanN0OEIxdTM5UTIrNmI5M1dqQzlhTk1YalNTQ0FnLzgvZFAxbjNB?=
- =?utf-8?B?UklCL1RUSGUrbi9mZEhNNldESmxQZ0pzQXhGVjMrUmxlQ2tSRkgwYXRGWVVo?=
- =?utf-8?B?bUxQdDUwa0p2SjBSdmZrQ3Nxem53ZkdMbk1aSitKbXNGSmRaWThPT0FZUFV2?=
- =?utf-8?B?RlNaYjVPQlpzOXJrTXlFMHhHRDcxdytmQk1ZdFo5U053WjVXdTFDUkNJaGZ5?=
- =?utf-8?B?Ymxtdi9DR3VEZHY5MG5SOW1ZZDRpdng3MlQrVGd1Njc4aEdXWXRvSVUvcC94?=
- =?utf-8?B?dEJaYzVFUys3K1BFc1RGUnFhdGtsM21WVk1nMTMwdU9NVFYrZXFibUxVVmxX?=
- =?utf-8?B?SHkwaFRraUVWNWpjdDh2cEhPemhqK2NkcFZTbnJ1QWhYbU9qZU5mTGZhRUZL?=
- =?utf-8?B?cW1reitEMitsYjBHSkJtTE9QSnFQT0ZLQ3VaRTZVbytqZlozbnlGcThkaTRp?=
- =?utf-8?B?L0dEai92R2wrbitaZmVKdmovN09uYUs1QVM4TnFsbjA2bGVTc0xTcVpoU0Zz?=
- =?utf-8?B?N1NNZGRJVkFhWjNKWU5pbEdJc1AwbWJ1VXk5aTVUdWkyZFZqZVp0eEZjMmk5?=
- =?utf-8?B?Ni9LRjdRdmhzdmVuNzFaTEd2NFdyeXZWNGtmMTQvZlhFWUExQUFKMm5WNmRC?=
- =?utf-8?B?K0ZmblBNNDA3OUdTTjk2eUJ2dEhZWmZiVzhFYkpmOHZQc2ppN3lhbFJ3d29j?=
- =?utf-8?B?VGVSTW5jaFgxMmZhYVhEbUZFcjd2N2ZsMHhsakJtVXpTOXJsQ1VzQ2IwcG5W?=
- =?utf-8?B?WXlrYytWd2NNUHVZTHRmSjBmb0lyYlBEM0NqWkNiS1hWUG9UZWNQdmxJQzNj?=
- =?utf-8?B?aVJpT05uTFZGbGRZOVNvNHNTZ0wxYVg3c0RlSG1ZZytPNzVxbU9GRWNuSkhF?=
- =?utf-8?B?aDdiMXJuOFdTV3B4N3NSaFZZYldaQXk2bDZ4T2RFUk4rTjZlY1pXejQ4eWRV?=
- =?utf-8?Q?UN66yhdkU+12qRLbnZConUe0Fomq6Vfb7+bwjcOX45eA=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8F98DD70CDE88947A6EDA6B48311598E@EURP191.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+ 2023 10:17:04 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::6e75:56f3:fc37:277b]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::6e75:56f3:fc37:277b%7]) with mapi id 15.20.6699.027; Thu, 24 Aug 2023
+ 10:17:04 +0000
+From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com,
+        Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH 2/2] Bluetooth: ISO: Pass sync_handle through iso qos
+Date:   Thu, 24 Aug 2023 13:16:35 +0300
+Message-Id: <20230824101635.25662-3-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230824101635.25662-1-iulia.tanasescu@nxp.com>
+References: <20230824101635.25662-1-iulia.tanasescu@nxp.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR07CA0005.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::18) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-50200.templateTenant
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DB8PR04MB7034:EE_
+X-MS-Office365-Filtering-Correlation-Id: c0ff0148-927d-475f-d5b9-08dba48b439b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9Pio5+4GNVg+9rQSRUgCVQPrAPXObtvCrohK0G2lZ2mZ114zHVLNQdJEBk5G5tE4vevmxt5pcUy27/ir4SNfVVJa6TGZQsgOggzgoB/WhU11AayqgP9gbkBg8EGJ78+3lBHcahctPOlrDfnM5TgLbcac97DdZQnkqQlmys974CUNptZ7UZNAcY+VPcMhXJoQ7slpfwCwcoYdOos3Kl4AbcXN4HN3yTVWoyb5JczgpvSp6N7ZD3L9VhY+Kys5GNPTjXeWM+rusAz9JXh3WIrWTLADFvIbtgwO2KsG4oeNt3o/uGtu4LFl6xR9Qva+zjO6sMoL6yamWZFQ6ucJEKkEu3Q+nctdgSGFwKaXJ6zTZipGYVQzbx59AxZp9P4H21eXx+5PF8kpf1rbU+I4/tUHGMbAYVNEk9a4lJltuPkOZ0VGJFeev5mj2yuzyoSsWrhVPM9hSRf2cQPmolLT4InGxhDbKFmJpgwB6TQDMrnfXTDSovvVbkgA2ghWxZr/OuHXeMSzFUaW70pOgJaPaKdqqtO4J+aTD9dWmZcaWZ/6dlWw6y7SYsNax+iO1tNtUtv21HNWDRqpRVUMz+qugDrN91tbgLmH+cvoleIFGX0cqdLiQL0hZjNfmD/827JT1yLJ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(366004)(39860400002)(376002)(346002)(451199024)(186009)(1800799009)(66946007)(66476007)(66556008)(6916009)(316002)(478600001)(38350700002)(26005)(44832011)(6666004)(38100700002)(41300700001)(52116002)(55236004)(86362001)(6486002)(6512007)(2906002)(6506007)(4326008)(8676002)(8936002)(1076003)(2616005)(5660300002)(83380400001)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UWkdv1EJUIxP4hBrs7ozjBWhd9XVaWvHXtIC0MYkp+OWSG06L/rtiLrYQvy6?=
+ =?us-ascii?Q?cLe6JE3q2DIKZtM3ko/KEie0edJ7YFt+GzWSL8TeMptTprCrWHuSEkkdQGQP?=
+ =?us-ascii?Q?dnMSp1Ayo9JxZnpLYp+8i4Rcte+R4KHzlm7u8bGK9YodB5A7gvJVP8BiTxaI?=
+ =?us-ascii?Q?Zciq/r5HuFSkHzZlIeW8BvD/OLmNXzWXP05YuUJORF2/HIDkAfbyraIdv96b?=
+ =?us-ascii?Q?BzLoQtQJQV24btz0yBRrugH2BurpL2dsdjcvUPwKAPcGL02tBTXlPXfRgxZr?=
+ =?us-ascii?Q?/22FrpuijaHN1IZuq1nCcBA1/bE8+gvYKnzcY/sJ1ylX5lKwTjfpujwzY0eD?=
+ =?us-ascii?Q?J3DkcYDHbno4kdI6FDz+vA5UIHntznV5Jcfy35uvQE80l+WyIxwgrxiF2EuZ?=
+ =?us-ascii?Q?M1FSGUFCEsM4cTY+MdUT1SYftaCrXSsxBUQsUpaJMuATT7qOjWcxqtvBPr6V?=
+ =?us-ascii?Q?Y4LYjTA1ZllJ3dV5xP4Ma7fnhrL84RQhcM9HD2mCk7Z2ctHnSbpGamsGmdEK?=
+ =?us-ascii?Q?fKc/4ReO0eLledgiDeJeKr3Jg2iNeg2hn2oKzMz1+wnHaXksSkDSQ5XiYw4r?=
+ =?us-ascii?Q?kNan7GEuJ75L0LkKA8eVXuAJUJfX9ma7iQcv6UHR7EJlJ5GFBJL74iPHdhk7?=
+ =?us-ascii?Q?Gls49UVn3m/r9rI/4oOpbGxgXsCyhr6oT7EYndJW8vPiYImPo4Vv66/RwAHc?=
+ =?us-ascii?Q?D6vgaYeGjTTmICKl6nW8UPvGGZJB46lBYvkHzipn5oBQkxqtoiW/UYNngRh/?=
+ =?us-ascii?Q?DzIn1kDmhT9cNwZfox3jY9Ml3oEAplpCUec+FuNt8ymoJN/y2nvHkJyM9bUf?=
+ =?us-ascii?Q?1qkCxJaYevNveRWm00rO4i/4q99G6czR/gKFJR5a69Q2O6aE7bpteP8XqvzO?=
+ =?us-ascii?Q?Z89QW3Xt2+JaF+4jLWk/mNkclLTPVKqOMrdEYhyvTLg6LvREihKdAKs7N9ho?=
+ =?us-ascii?Q?UIha/7HLz9mrXp6KnBtYzO6+HUr+bkCMmU0Zv4fwLugunn6dwAjZ6NwmEdZ5?=
+ =?us-ascii?Q?ZJbkiCi4fw/q+633OWdFBD3VNrm1skcRbAmUMMjyaeNCizOhRTMXiNx7FMn6?=
+ =?us-ascii?Q?n5RILe1eftyg6HqkfFcQXUIi+uFAl3d6tntA1clQrv56MrQM9rkR4qU1xX5E?=
+ =?us-ascii?Q?xt1+Mj/ZPsM4rfJBoFtd6Uripo9b/+TaCOImqF1h535uM3sOCZUaNvWsUEuv?=
+ =?us-ascii?Q?tcc5f0mkyqSta4HiauWswudGtSYfA/7SzYit33fq1DFTC6DniWgzsJeoCJY9?=
+ =?us-ascii?Q?+oIMzMevzrcIxJQWWlLMKsZXmGwtepzoOklr9IEpLgShpZhap/LOImby6IU3?=
+ =?us-ascii?Q?itgCHC3fmZGudlZEr1kTYttLP5mBXNGT25ZeuozBCipt8qVRv5jyUvdcWT8/?=
+ =?us-ascii?Q?EiIRyHG12oEwv5p81fK52RhifzMYIUrRPEfeXp96fa6YDPG8/prBu4h+pFIN?=
+ =?us-ascii?Q?wMJ1N+t5o3JpHJTIoIYbtHo5nrndBebf10IzKOIaHD6ZuW/cTXDsJqdBxxKI?=
+ =?us-ascii?Q?NWVZonvlUUZxTdIbv6uxQRq1WHW8XQkEsTnRC/MNJFSCfvtlRkW41TIeFNLN?=
+ =?us-ascii?Q?kFT0wxiaq834M8FHPMZcRkVGeimwg2o8IyV+40NKzLhi6VwBBNRzt8/ogqTq?=
+ =?us-ascii?Q?ew=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0ff0148-927d-475f-d5b9-08dba48b439b
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM6P191MB0501.EURP191.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f3a4512-f30c-4b96-31a1-08dba480f9cb
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2023 09:03:25.6578
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Aug 2023 10:17:04.6318
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P191MB1672
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B4DeBS3AM8eOfmh+e2BPAc1o2TjWnUnbeCw0pnWUmaFn3X6M/KDsIT4a6a2zoxtAZUcA13WJegGKmS/iHUj2uw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR04MB7034
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-RG5pYSDFm3JvZGEsIDIzIHNpZXJwbmlhIDIwMjMgMTg6MzU6MjcgQ0VTVCBMdWl6IEF1Z3VzdG8g
-dm9uIERlbnR6IHBpc3plOgo+IEhpIEJydW5vLAo+IAo+IE9uIFdlZCwgQXVnIDIzLCAyMDIzIGF0
-IDI6MjHigK9BTSBCcnVubyBQaXRydXMgPGJydW5vcGl0cnVzQGhvdG1haWwuY29tPiB3cm90ZToK
-PiA+Cj4gPiBEbmlhIMWbcm9kYSwgMjMgc2llcnBuaWEgMjAyMyAxMDoyNjozMSBDRVNUIFBhdWwg
-TWVuemVsIHBpc3plOgo+ID4gPiBEZWFyIEx1aXosCj4gPiA+Cj4gPiA+Cj4gPiA+IFRoYW5rIHlv
-dSBmb3IgeW91ciBhbnN3ZXIuCj4gPiA+Cj4gPiA+IEFtIDIyLjA4LjIzIHVtIDIyOjIwIHNjaHJp
-ZWIgTHVpeiBBdWd1c3RvIHZvbiBEZW50ejoKPiA+ID4gPiBIaSBQYXVsLAo+ID4gPiA+Cj4gPiA+
-ID4gT24gVHVlLCBBdWcgMjIsIDIwMjMgYXQgMTowMeKAr1BNIFBhdWwgTWVuemVsIDxwbWVuemVs
-QG1vbGdlbi5tcGcuZGU+IHdyb3RlOgo+ID4gPiA+Pgo+ID4gPiA+PiBbQ0M6ICtCcnVub10KPiA+
-ID4gPj4KPiA+ID4gPj4gRGVhciBMdWl6LAo+ID4gPiA+Pgo+ID4gPiA+Pgo+ID4gPiA+PiBUaGFu
-ayB5b3UgZm9yIHRoZSBwYXRjaC4KPiA+ID4gPj4KPiA+ID4gPj4gQW0gMjIuMDguMjMgdW0gMjE6
-MTQgc2NocmllYiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6Ogo+ID4gPiA+Pj4gRnJvbTogTHVpeiBB
-dWd1c3RvIHZvbiBEZW50eiA8bHVpei52b24uZGVudHpAaW50ZWwuY29tPgo+ID4gPiA+Pj4KPiA+
-ID4gPj4+IFRoaXMgaW50cm9kdWNlcyBIQ0lfUVVJUktfQlJPS0VOX0xFX0NPREVEIGlzIGlzIHVz
-ZWQgdG8gaW5kaWNhdGUgdGhhdAo+ID4gPiA+Pgo+ID4gPiA+PiDigKYuIEl0IGlzIHVzZWQg4oCm
-Cj4gPiA+ID4+Cj4gPiA+ID4+PiBMRSBDb2RlZCBQSFkgc2hhbGwgbm90IGJlIHVzZWQsIGl0IGlz
-IHRoZW4gc2V0IGZvciBzb21lIEludGVsIG1vZGVscwo+ID4gPiA+Pj4gdGhhdCBjbGFpbXMgdG8g
-c3VwcG9ydCBpdCBidXQgd2hlbiB1c2VkIGNhdXNlcyBtYW55IHByb2JsZW1zLgo+ID4gPiA+Pgo+
-ID4gPiA+PiB0aGF0IGNsYWltIHRvIOKApgo+ID4gPiA+Pgo+ID4gPiA+Pj4gTGluazogaHR0cHM6
-Ly9naXRodWIuY29tL2JsdWV6L2JsdWV6L2lzc3Vlcy81NzcKPiA+ID4gPj4+IExpbms6IGh0dHBz
-Oi8vZ2l0aHViLmNvbS9ibHVlei9ibHVlei9pc3N1ZXMvNTgyCj4gPiA+ID4+PiBMaW5rOiBodHRw
-czovL2xvcmUua2VybmVsLm9yZy9saW51eC1ibHVldG9vdGgvQ0FCQllOWktjby12N3drakhIZXh4
-UWJnd3dTei1TPUdaPWRaS2JSRTFxeFQxaDRmRmJRQG1haWwuZ21haWwuY29tL1QvIwo+ID4gPiA+
-Pj4gRml4ZXM6IDI4OGM5MDIyNGVlYyAoIkJsdWV0b290aDogRW5hYmxlIGFsbCBzdXBwb3J0ZWQg
-TEUgUEhZIGJ5IGRlZmF1bHQiKQo+ID4gPiA+Pj4gU2lnbmVkLW9mZi1ieTogTHVpeiBBdWd1c3Rv
-IHZvbiBEZW50eiA8bHVpei52b24uZGVudHpAaW50ZWwuY29tPgo+ID4gPiA+Pj4gLS0tCj4gPiA+
-ID4+PiAgICBkcml2ZXJzL2JsdWV0b290aC9idGludGVsLmMgICAgICB8ICAyICsrCj4gPiA+ID4+
-PiAgICBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggICAgICB8IDEwICsrKysrKysrKysKPiA+
-ID4gPj4+ICAgIGluY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oIHwgIDQgKysrLQo+ID4g
-PiA+Pj4gICAgMyBmaWxlcyBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0p
-Cj4gPiA+ID4+Pgo+ID4gPiA+Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50
-ZWwuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYwo+ID4gPiA+Pj4gaW5kZXggOWIyMzlj
-ZTk2ZmE0Li4zZWQ2MGIyYjAzNDAgMTAwNjQ0Cj4gPiA+ID4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0
-b290aC9idGludGVsLmMKPiA+ID4gPj4+ICsrKyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwu
-Ywo+ID4gPiA+Pj4gQEAgLTI3NzYsNiArMjc3Niw4IEBAIHN0YXRpYyBpbnQgYnRpbnRlbF9zZXR1
-cF9jb21iaW5lZChzdHJ1Y3QgaGNpX2RldiAqaGRldikKPiA+ID4gPj4+ICAgICAgICAgICAgICAg
-IGNhc2UgMHgxMTogICAgICAvKiBKZlAgKi8KPiA+ID4gPj4+ICAgICAgICAgICAgICAgIGNhc2Ug
-MHgxMjogICAgICAvKiBUaFAgKi8KPiA+ID4gPj4+ICAgICAgICAgICAgICAgIGNhc2UgMHgxMzog
-ICAgICAvKiBIclAgKi8KPiA+ID4gPj4+ICsgICAgICAgICAgICAgICAgICAgICBzZXRfYml0KEhD
-SV9RVUlSS19CUk9LRU5fTEVfQ09ERUQsICZoZGV2LT5xdWlya3MpOwo+ID4gPiA+Pj4gKyAgICAg
-ICAgICAgICAgICAgICAgIGZhbGx0aHJvdWdoOwo+ID4gPiA+Pj4gICAgICAgICAgICAgICAgY2Fz
-ZSAweDE0OiAgICAgIC8qIENjUCAqLwo+ID4gPiA+Pj4gICAgICAgICAgICAgICAgICAgICAgICBz
-ZXRfYml0KEhDSV9RVUlSS19WQUxJRF9MRV9TVEFURVMsICZoZGV2LT5xdWlya3MpOwo+ID4gPiA+
-Pj4gICAgICAgICAgICAgICAgICAgICAgICBmYWxsdGhyb3VnaDsKPiA+ID4gPj4+IGRpZmYgLS1n
-aXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgv
-aGNpLmgKPiA+ID4gPj4+IGluZGV4IGM1ODQyNWQ0YzU5Mi4uNzY3OTIxZDdmNWMxIDEwMDY0NAo+
-ID4gPiA+Pj4gLS0tIGEvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaS5oCj4gPiA+ID4+PiArKysg
-Yi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmgKPiA+ID4gPj4+IEBAIC0zMTksNiArMzE5LDE2
-IEBAIGVudW0gewo+ID4gPiA+Pj4gICAgICAgICAqIFRoaXMgcXVpcmsgbXVzdCBiZSBzZXQgYmVm
-b3JlIGhjaV9yZWdpc3Rlcl9kZXYgaXMgY2FsbGVkLgo+ID4gPiA+Pj4gICAgICAgICAqLwo+ID4g
-PiA+Pj4gICAgICAgIEhDSV9RVUlSS19VU0VfTVNGVF9FWFRfQUREUkVTU19GSUxURVIsCj4gPiA+
-ID4+PiArCj4gPiA+ID4+PiArICAgICAvKgo+ID4gPiA+Pj4gKyAgICAgICogV2hlbiB0aGlzIHF1
-aXJrIGlzIHNldCwgTEUgQ29kZWQgUEhZIGlzIHNoYWxsIG5vdCBiZSB1c2VkLiBUaGlzIGlzCj4g
-PiA+ID4+Cj4gPiA+ID4+IHMvaXMgc2hhbGwvc2hhbGwvCj4gPiA+ID4+Cj4gPiA+ID4+PiArICAg
-ICAgKiByZXF1aXJlZCBmb3Igc29tZSBJbnRlbCBjb250cm9sbGVycyB3aGljaCBlcnJvbmVvdXNs
-eSBjbGFpbSB0bwo+ID4gPiA+Pj4gKyAgICAgICogc3VwcG9ydCBpdCBidXQgaXQgY2F1c2VzIHBy
-b2JsZW1zIHdpdGggZXh0ZW5kZWQgc2Nhbm5pbmcuCj4gPiA+ID4+PiArICAgICAgKgo+ID4gPiA+
-Pj4gKyAgICAgICogVGhpcyBxdWlyayBjYW4gYmUgc2V0IGJlZm9yZSBoY2lfcmVnaXN0ZXJfZGV2
-IGlzIGNhbGxlZCBvcgo+ID4gPiA+Pj4gKyAgICAgICogZHVyaW5nIHRoZSBoZGV2LT5zZXR1cCB2
-ZW5kb3IgY2FsbGJhY2suCj4gPiA+ID4+PiArICAgICAgKi8KPiA+ID4gPj4+ICsgICAgIEhDSV9R
-VUlSS19CUk9LRU5fTEVfQ09ERUQsCj4gPiA+ID4+PiAgICB9Owo+ID4gPiA+Pj4KPiA+ID4gPj4+
-ICAgIC8qIEhDSSBkZXZpY2UgZmxhZ3MgKi8KPiA+ID4gPj4+IGRpZmYgLS1naXQgYS9pbmNsdWRl
-L25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaCBiL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29y
-ZS5oCj4gPiA+ID4+PiBpbmRleCA2ZTI5ODhiMTFmOTkuLmU2MzU5ZjczNDZmMSAxMDA2NDQKPiA+
-ID4gPj4+IC0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oCj4gPiA+ID4+PiAr
-KysgYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaAo+ID4gPiA+Pj4gQEAgLTE4MTcs
-NyArMTgxNyw5IEBAIHZvaWQgaGNpX2Nvbm5fZGVsX3N5c2ZzKHN0cnVjdCBoY2lfY29ubiAqY29u
-bik7Cj4gPiA+ID4+PiAgICAjZGVmaW5lIHNjYW5fMm0oZGV2KSAoKChkZXYpLT5sZV90eF9kZWZf
-cGh5cyAmIEhDSV9MRV9TRVRfUEhZXzJNKSB8fCBcCj4gPiA+ID4+PiAgICAgICAgICAgICAgICAg
-ICAgICAoKGRldiktPmxlX3J4X2RlZl9waHlzICYgSENJX0xFX1NFVF9QSFlfMk0pKQo+ID4gPiA+
-Pj4KPiA+ID4gPj4+IC0jZGVmaW5lIGxlX2NvZGVkX2NhcGFibGUoZGV2KSAoKChkZXYpLT5sZV9m
-ZWF0dXJlc1sxXSAmIEhDSV9MRV9QSFlfQ09ERUQpKQo+ID4gPiA+Pj4gKyNkZWZpbmUgbGVfY29k
-ZWRfY2FwYWJsZShkZXYpICgoKGRldiktPmxlX2ZlYXR1cmVzWzFdICYgSENJX0xFX1BIWV9DT0RF
-RCkgJiYgXAo+ID4gPiA+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAhdGVzdF9iaXQo
-SENJX1FVSVJLX0JST0tFTl9MRV9DT0RFRCwgXAo+ID4gPiA+Pj4gKyAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgJihkZXYpLT5xdWlya3MpKQo+ID4gPiA+Pj4KPiA+ID4gPj4+
-ICAgICNkZWZpbmUgc2Nhbl9jb2RlZChkZXYpICgoKGRldiktPmxlX3R4X2RlZl9waHlzICYgSENJ
-X0xFX1NFVF9QSFlfQ09ERUQpIHx8IFwKPiA+ID4gPj4+ICAgICAgICAgICAgICAgICAgICAgICAg
-ICgoZGV2KS0+bGVfcnhfZGVmX3BoeXMgJiBIQ0lfTEVfU0VUX1BIWV9DT0RFRCkpCj4gPiA+ID4+
-Cj4gPiA+ID4+IFdpbGwgdGhpcyBiZSBmdXR1cmUgcHJvb2YsIG9uY2UgZmlybXdhcmUgZm9yIHRo
-ZSBicm9rZW4gY29udHJvbGxlcnMgYXJlCj4gPiA+ID4+IGZpeGVkPwo+ID4gPiA+Cj4gPiA+ID4g
-WWVzLCBpdCB3b24ndCBjYXVzZSBhbnkgcmVncmVzc2lvbnMgaWYgdGhlIGZpcm13YXJlIGlzIGZp
-eGVkIGluIHRoZQo+ID4gPiA+IGZ1dHVyZSwgYnV0IExFIGNvZGVkIFBIWSB3aWxsIG5lZWQgdG8g
-YmUgcmUtZW5hYmxlZCBieSByZW1vdmluZyB0aGUKPiA+ID4gPiBxdWlya3MsIHRoaXMgaXMgd2h5
-IHdlIHNheSBpdCBpcyBicm9rZW4gYnV0IHdlIGNhbid0IGRlcGVuZCBvbiBydW50aW1lCj4gPiA+
-ID4gZGV0ZWN0aW9uIGFuZCBzaG91bGQgcHJvYmFibHkgcHJpbnQgYSB3YXJuaW5nIHVudGlsIHdl
-IGhhdmUgYSBwcm9wZXIKPiA+ID4gPiBmaXggZm9yIGl0IGxhbmRzIGF0IHRoZSBmaXJtd2FyZSBz
-aWRlLiBXZSBjb3VsZCBpbiB0aGVvcnkgc2V0Cj4gPiA+ID4gSENJX1FVSVJLX0JST0tFTl9MRV9D
-T0RFRCBiYXNlZCBvbiB0aGUgZmlybXdhcmUgdmVyc2lvbiBidXQgZmlybXdhcmUKPiA+ID4gPiB2
-ZXJzaW9uaW5nIHNjaGVtZXMgdGVuZCB0byBjaGFuZ2Ugc28gSSdtIGFmcmFpZCB0aGF0IGNvdWxk
-IGFsc28gY2F1c2UKPiA+ID4gPiByZWdyZXNzaW9uIGxpa2UgdGhpcyBpbiB0aGUgZnV0dXJlLgo+
-ID4gPgo+ID4gPiBVbmRlcnN0b29kLiBNYXliZSB5b3UgY291bGQgYWRkIHRoZSBrbm93biBicm9r
-ZW4gZmlybXdhcmUgdmVyc2lvbnMgdG8KPiA+ID4gdGhlIGNvbW1pdCBtZXNzYWdlIGZvciBwb3N0
-ZXJpdHkgdGhvdWdoLgo+ID4gPgo+ID4gPgo+ID4gPiBLaW5kIHJlZ2FyZHMsCj4gPiA+Cj4gPiA+
-IFBhdWwKPiA+ID4KPiA+IFRoYW5rcywKPiA+IFRoaXMgcGF0Y2ggcGFydGx5IHdvcmtzIGZvciBt
-ZS4gVGhlIG1vdXNlIG5vdyB0YWtlcyBzZXZlcmFsIGRvemVuIHNlY29uZHMgdG8gZGV0ZWN0IHdo
-ZXJlIHRoZSBjb21wdXRlciBkaWQgbm90IGZpbmQgaXQgYXQgYWxsIGJlZm9yZS4KPiA+IEJ1dCBu
-b3RlIHRoYXQgaW4ga2VybmVsIDYuMy54IGl0IHdhcyBhbHdheXMgZGV0ZWN0ZWQgaW1tZWRpYXRl
-bHkuCj4gCj4gV2hhdCB2ZXJzaW9uIGRpZCB5b3UgdHJ5LCB2MiBkaWRuJ3QgaGF2ZSBhbnkgZWZm
-ZWN0IGZvciBtZSwgb25seSB2Mwo+IHdvcmtlZCB3aGljaCBoYWQgdGhlIHNhbWUgYmVoYXZpb3Ig
-b2YgQVgyMTAgc28gaXQgZGlzY292ZXJlZCBpdCBxdWl0ZQo+IHF1aWNrbHkuCj4gCj4gCgpJIG9u
-bHkgdHJpZWQgdjEgcGF0Y2ggKCBodHRwczovL3d3dy5zcGluaWNzLm5ldC9saXN0cy9saW51eC1i
-bHVldG9vdGgvbXNnMTA2NDA2Lmh0bWwgKS4gU2hvdWxkIGkgdHJ5IGEgbGF0ZXIgdmVyc2lvbiBp
-bnN0ZWFkPwo=
+This moves the sync_handle parameter from the iso_pinfo struct to
+the bt_iso_bcast_qos struct, so that it can be retrieved by the user
+using getsockopt after PA is established.
+
+Signed-off-by: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+---
+ include/net/bluetooth/bluetooth.h |  1 +
+ include/net/bluetooth/hci_core.h  |  2 +-
+ net/bluetooth/hci_conn.c          |  5 ++---
+ net/bluetooth/iso.c               | 18 +++++++-----------
+ 4 files changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index aa90adc3b2a4..ee284b9bcdd9 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -198,6 +198,7 @@ struct bt_iso_bcast_qos {
+ 	__u8  sync_cte_type;
+ 	__u8  mse;
+ 	__u16 timeout;
++	__u16 sync_handle;
+ };
+ 
+ struct bt_iso_qos {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ad6d24f17b73..22992ae5668f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1462,7 +1462,7 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
+ 		       __u8 sid, struct bt_iso_qos *qos);
+ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
+ 			   struct bt_iso_qos *qos,
+-			   __u16 sync_handle, __u8 num_bis, __u8 bis[]);
++			   __u8 num_bis, __u8 bis[]);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 9d5057cef30a..1ea0f7efd212 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2121,8 +2121,7 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
+ }
+ 
+ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
+-			   struct bt_iso_qos *qos,
+-			   __u16 sync_handle, __u8 num_bis, __u8 bis[])
++			   struct bt_iso_qos *qos, __u8 num_bis, __u8 bis[])
+ {
+ 	struct _packed {
+ 		struct hci_cp_le_big_create_sync cp;
+@@ -2142,7 +2141,7 @@ int hci_le_big_create_sync(struct hci_dev *hdev, struct hci_conn *hcon,
+ 
+ 	memset(&pdu, 0, sizeof(pdu));
+ 	pdu.cp.handle = qos->bcast.big;
+-	pdu.cp.sync_handle = cpu_to_le16(sync_handle);
++	pdu.cp.sync_handle = cpu_to_le16(qos->bcast.sync_handle);
+ 	pdu.cp.encryption = qos->bcast.encryption;
+ 	memcpy(pdu.cp.bcode, qos->bcast.bcode, sizeof(pdu.cp.bcode));
+ 	pdu.cp.mse = qos->bcast.mse;
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index cb4ebd75d1c8..550dc01801de 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -63,7 +63,6 @@ struct iso_pinfo {
+ 	__u8			bc_sid;
+ 	__u8			bc_num_bis;
+ 	__u8			bc_bis[ISO_MAX_NUM_BIS];
+-	__u16			sync_handle;
+ 	unsigned long		flags;
+ 	struct bt_iso_qos	qos;
+ 	bool			qos_user_set;
+@@ -792,7 +791,7 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
+ 
+ 	bacpy(&iso_pi(sk)->dst, &sa->iso_bc->bc_bdaddr);
+ 	iso_pi(sk)->dst_type = sa->iso_bc->bc_bdaddr_type;
+-	iso_pi(sk)->sync_handle = -1;
++	iso_pi(sk)->qos.bcast.sync_handle = -1;
+ 	iso_pi(sk)->bc_sid = sa->iso_bc->bc_sid;
+ 	iso_pi(sk)->bc_num_bis = sa->iso_bc->bc_num_bis;
+ 
+@@ -1174,7 +1173,6 @@ static void iso_conn_big_sync(struct sock *sk)
+ 	if (!test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
+ 		err = hci_le_big_create_sync(hdev, iso_pi(sk)->conn->hcon,
+ 					     &iso_pi(sk)->qos,
+-					     iso_pi(sk)->sync_handle,
+ 					     iso_pi(sk)->bc_num_bis,
+ 					     iso_pi(sk)->bc_bis);
+ 		if (err)
+@@ -1644,11 +1642,10 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 		if (!bacmp(&hcon->dst, BDADDR_ANY)) {
+ 			bacpy(&hcon->dst, &iso_pi(parent)->dst);
+ 			hcon->dst_type = iso_pi(parent)->dst_type;
+-			hcon->sync_handle = iso_pi(parent)->sync_handle;
++			hcon->sync_handle = iso_pi(parent)->qos.bcast.sync_handle;
+ 		}
+ 
+ 		if (ev2 && !ev2->status) {
+-			iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
+ 			iso_pi(sk)->qos = iso_pi(parent)->qos;
+ 			iso_pi(sk)->bc_num_bis = iso_pi(parent)->bc_num_bis;
+ 			memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis, ISO_MAX_NUM_BIS);
+@@ -1656,7 +1653,7 @@ static void iso_conn_ready(struct iso_conn *conn)
+ 
+ 		bacpy(&iso_pi(sk)->dst, &hcon->dst);
+ 		iso_pi(sk)->dst_type = hcon->dst_type;
+-		iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
++		iso_pi(sk)->qos.bcast.sync_handle = iso_pi(parent)->qos.bcast.sync_handle;
+ 		memcpy(iso_pi(sk)->base, iso_pi(parent)->base, iso_pi(parent)->base_len);
+ 		iso_pi(sk)->base_len = iso_pi(parent)->base_len;
+ 
+@@ -1693,14 +1690,14 @@ static bool iso_match_sync_handle(struct sock *sk, void *data)
+ {
+ 	struct hci_evt_le_big_info_adv_report *ev = data;
+ 
+-	return le16_to_cpu(ev->sync_handle) == iso_pi(sk)->sync_handle;
++	return le16_to_cpu(ev->sync_handle) == iso_pi(sk)->qos.bcast.sync_handle;
+ }
+ 
+ static bool iso_match_sync_handle_pa_report(struct sock *sk, void *data)
+ {
+ 	struct hci_ev_le_per_adv_report *ev = data;
+ 
+-	return le16_to_cpu(ev->sync_handle) == iso_pi(sk)->sync_handle;
++	return le16_to_cpu(ev->sync_handle) == iso_pi(sk)->qos.bcast.sync_handle;
+ }
+ 
+ /* ----- ISO interface with lower layer (HCI) ----- */
+@@ -1720,7 +1717,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	 *
+ 	 * 1. HCI_EV_LE_PA_SYNC_ESTABLISHED: The socket may specify a specific
+ 	 * SID to listen to and once sync is estabilished its handle needs to
+-	 * be stored in iso_pi(sk)->sync_handle so it can be matched once
++	 * be stored in iso_pi(sk)->qos.bcast.sync_handle so it can be matched once
+ 	 * receiving the BIG Info.
+ 	 * 2. HCI_EVT_LE_BIG_INFO_ADV_REPORT: When connect_ind is triggered by a
+ 	 * a BIG Info it attempts to check if there any listening socket with
+@@ -1734,7 +1731,7 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 		sk = iso_get_sock_listen(&hdev->bdaddr, bdaddr, iso_match_sid,
+ 					 ev1);
+ 		if (sk && !ev1->status)
+-			iso_pi(sk)->sync_handle = le16_to_cpu(ev1->handle);
++			iso_pi(sk)->qos.bcast.sync_handle = le16_to_cpu(ev1->handle);
+ 
+ 		goto done;
+ 	}
+@@ -1757,7 +1754,6 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 			    !test_and_set_bit(BT_SK_BIG_SYNC, &iso_pi(sk)->flags)) {
+ 				err = hci_le_big_create_sync(hdev, NULL,
+ 							     &iso_pi(sk)->qos,
+-							     iso_pi(sk)->sync_handle,
+ 							     iso_pi(sk)->bc_num_bis,
+ 							     iso_pi(sk)->bc_bis);
+ 				if (err) {
+-- 
+2.34.1
+
