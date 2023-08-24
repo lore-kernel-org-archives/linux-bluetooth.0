@@ -2,68 +2,82 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5354C71153
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 15:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A346C71153
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 16:41:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236850AbjHXPTL (ORCPT
+        id S242581AbjHXQkp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Aug 2023 11:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37528 "EHLO
+        Thu, 24 Aug 2023 12:40:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231972AbjHXPSk (ORCPT
+        with ESMTP id S242679AbjHXQk1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Aug 2023 11:18:40 -0400
-X-Greylist: delayed 598 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 24 Aug 2023 08:18:36 PDT
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22FE19B4;
-        Thu, 24 Aug 2023 08:18:36 -0700 (PDT)
-Received: from [192.168.2.51] (p5dd0dcba.dip0.t-ipconnect.de [93.208.220.186])
+        Thu, 24 Aug 2023 12:40:27 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A1A810FE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 09:40:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 88B29C03A4;
-        Thu, 24 Aug 2023 17:03:13 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1692889393;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=RbA4Hzmbogps30G44qtaF2RIRLvuX4cRjMRVc/i1haA=;
-        b=J0StBk/P2UW+kFTK7AYQdExrb+owhDBMjl3aZrfx5MUJ/6nkWDYBJIxBXwpYjnCf3OKJd1
-        u5cDHfcOTyiI+682qC8e+dkYmezMaQUCEorSw+Af1dPdcqmJ6yCoZkwm2Kz1MOFbt51aBv
-        DDsIPr91K8RIWiqI3HGkEsdRQZYQ9PR3mA+iVMQs9AUHCozl2soV/+R/z5W9W40sAOsJgs
-        8E7Ost6qZ9WN67gRelct+gAMLgx0/dDDdF82yOC1sGSdFgS7bUFSaSZyHxqVYi38pRKVcj
-        EImx0if6RSfqqAGX1+tB1sAzb8h2Q4Ji3SC4TQtCP6IkDPzVDG9vhvtkiaQrmg==
-Message-ID: <40b9467b-a9e8-bff7-5291-6200fbe9dd34@datenfreihafen.org>
-Date:   Thu, 24 Aug 2023 17:03:13 +0200
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 09BEB673E1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 16:40:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 72BF5C433CC;
+        Thu, 24 Aug 2023 16:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1692895224;
+        bh=Hb8c8wTGFvZdjAZFVJfl3YmikqUU9JsxBmn/dslAEY4=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=eEE/VWkI4IfCQjpjSSC+gcl8Ttck712lPGkXlaBhH/pLQJJsjSZjJIAMUng7l5CfG
+         w5l86xhWYe2zx0hioNruPU4P8d+aMYYtVjWkqo4fqnVY1B7KLyFhkNXwqh1xZrREYU
+         r9hUQ443IXxLclcjexwMGNz6TPgZRHAUHl0hkjDmh9jl6WFGb2+ehezsbkAIzn5Kb1
+         B2JNBLDhKyoM0tUtnwALLEzDiiSzKtB8GSQptNyxko8Iu6WcX/3AkWtsIZ/UTHlTnf
+         RtZu4NMWiQAkWt1qNXGdxUMIPGI7nYaMmlUsXpE2uegGhds2eUd4ja21IfirLxClrA
+         lBdQnc1hoKTCw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 556F4E33093;
+        Thu, 24 Aug 2023 16:40:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.8.0
-Content-Language: en-US
-To:     "linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc:     Christopher Friedt <chris@friedt.co>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: Linux Plumber IoT micro conference call for submissions
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] transport: Fix crash with broadcast properties
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169289522434.24729.8894359712321736185.git-patchwork-notify@kernel.org>
+Date:   Thu, 24 Aug 2023 16:40:24 +0000
+References: <20230824050045.4019298-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230824050045.4019298-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hello:
 
-Chris Friedt and myself will host the fifth iteration of the IoT micro 
-conference at Linux Plumbers in November this year.
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-We are still looking for speakers and discussion topics to round out the 
-MC. Bluetooth and 802.15.4 being two of the usual suspects, we wanted to 
-bring this to your attention. If you have an interesting topic you want 
-to raise and discuss feel free to submit to the submission system before 
-September 15th.
+On Wed, 23 Aug 2023 22:00:45 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> When connecting a BAP unicast stream the followin crash can be observed:
+> 
+> Access not within mapped region at address 0x1D4C0000000A
+>   at 0x14F759: get_bcode (transport.c:1121)
+>   by 0x1E02E4: append_property.isra.0 (object.c:498)
+>   by 0x1E03B9: append_properties (object.c:527)
+>   by 0x1E2AAB: g_dbus_get_properties (object.c:1811)
+>   by 0x14B9B6: pac_config (media.c:1130)
+> 
+> [...]
 
-https://lpc.events/blog/current/index.php/2023/08/23/iot-mc-cfp/
+Here is the summary with links:
+  - [BlueZ] transport: Fix crash with broadcast properties
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c6741c40816b
 
-regards
-Chris & Stefan
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
