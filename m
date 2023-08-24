@@ -2,60 +2,59 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4AFC6FA8F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 20:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A02C27C40
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 21:23:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237013AbjHXUPQ (ORCPT
+        id S243028AbjHXVWc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Aug 2023 16:15:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47756 "EHLO
+        Thu, 24 Aug 2023 17:22:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243510AbjHXUPG (ORCPT
+        with ESMTP id S243694AbjHXVWF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Aug 2023 16:15:06 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B3D1BE6;
-        Thu, 24 Aug 2023 13:15:02 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-34961362f67so3391855ab.0;
-        Thu, 24 Aug 2023 13:15:02 -0700 (PDT)
+        Thu, 24 Aug 2023 17:22:05 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369A31FC1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 14:21:57 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-686be3cbea0so982204b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 14:21:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692908102; x=1693512902;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eV99/KwJCOXDWRzyS7YmiM7xdn/lqE3M72sQmP0DJtM=;
-        b=AQpYibZWJ0yjL4GWoHbavY/PKBXQqD7DSb2wKIY6UeyVX+6ooqIlEsb+sDJOrmwopE
-         0hiJzXag7WllokvR1y39Z+LjpK587czEkB5IlIru62oImC+zeWwVTVK5twbaHgrhF+Ed
-         uwQ3DLwhrdj6OQYGQELmIraNaTrE2YA6bvfwoT06YZ0aLkQosZjiigXRoT+G5tigPwME
-         D1DYRzjyWfANa0HfS4VkCIfVAwcEIiMN/2QJxuHA515G/1QoSS3Qq7w67vh8js5lZM5x
-         UPgqZlehx6uVFTLj7yG9a5at++pq9c0Cygzq6wgrmrWlbEZh+VmIcGQ2m6ZKwk39r0pe
-         EUBg==
+        d=gmail.com; s=20221208; t=1692912116; x=1693516916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7CAkLCjWmlXt0JI6pCukdBsLsITAIY1FAPuhF792QY=;
+        b=H1h2b/naBr4ckc3t8Xt1GgSW157LhEnRalEan07Pt0qLMq6lad+TeizswBA69EaksJ
+         281Osef56ba9ag6Xjqh+BAgs0/3/jF0xMxlquDwsc6Moz4+vRugn5jvrMKtLKFy+Ru02
+         LG3llsV75z2kG165+PYI4rT5XbJezEOZzRA6H+jm0vRQGfy7wpUi/E60qBN2tavE5Kr+
+         X9xmX24Lpc0vUdc4w8d+zkKnddCDj5lfT2H34lR4BrzpwWWg3Exhe7tr4BVFOOgAzI/p
+         hJnbCAQvQt8pAE95DeEqSIHDxxnFte+tAx18eXHN/x2Vo0m44N/wtSGRjAMce+NMVitb
+         /zMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692908102; x=1693512902;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eV99/KwJCOXDWRzyS7YmiM7xdn/lqE3M72sQmP0DJtM=;
-        b=foS/0sJI/9j6vongbRSEMPDYhUBG9DEyN3suj4MIlLf2w8XxwnTWT2AIvx1ykt0n/9
-         WFGH+jjdoXT9E0zEtJPsOOfDuK1qwqi6Q/3XRpZUMRJjpItK5fNu/Nu7CQRW2qKIEJq9
-         xL7CwmFlOAL3nl5hyrqQLuXTTJJfuHHBnCPTeVtoWJYO6IHeuQ8AYvT5oHV2TiTQ7Apw
-         pzgEH1zRz7yZ42bMoB2mnXlthNt+apXbwzjQH8fRYaACv5XUJFnKlrRGYDiR1cXMm6/q
-         lywhUcwzGLa6VRu6qqZntcbc1B7DTFTp4ZxAbTKQJyfwV3NkrtqbQhD296BR3n6ZRAla
-         ASNQ==
-X-Gm-Message-State: AOJu0YzxyArXVUeuUNaIAaGyf4F3bSBWMDhWM/fH7xCadvaf0Oa2Ir0b
-        SovELS91pxnd7j7korELWaY=
-X-Google-Smtp-Source: AGHT+IFGnQrYdYbQgSdLdXpVh2qj5TsbG97/gWpBB7COP/mgkL9HhDGRuBJ/r39i/BRgUGZ6grwjpw==
-X-Received: by 2002:a05:6e02:13cc:b0:348:76eb:17d8 with SMTP id v12-20020a056e0213cc00b0034876eb17d8mr6067482ilj.6.1692908102022;
-        Thu, 24 Aug 2023 13:15:02 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1692912116; x=1693516916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7CAkLCjWmlXt0JI6pCukdBsLsITAIY1FAPuhF792QY=;
+        b=AlYoUz+rAfsC1G17iuoG17QdkUw9XvY52aPqeVK/qpLT1sgr2pVLpeXL8n8yOwr5JQ
+         lOfbrmmACReJyrcvcwZ48REIW5zI0G/6ZreJqPcX8aOnfyMGFnvqrdNEKsGn7wkAqSvC
+         qzxjsRXiisy8qo68WT97KO7QXJJLtTv6U5Os3io0SOmnCwh2qyyJU2S1KqTOYXOXYJts
+         fd/5DQBaXKshazcv9wGwoMhPWhCeIwTpMAxj//VmUM6EsT3ZKhYxMJGuj+7O5dXPEuUY
+         Vc2eBsI76vMAZbxcuAXpfAD0I5PTmJqPQu8h/zahNDdo6AvJGhwf9XlXqtoZ56zm7Ae1
+         duLA==
+X-Gm-Message-State: AOJu0YxQ40kl4YxZYue7WCTwye8ic1kOkmcbKMEakVuG86+q9FEkuf8+
+        hrjjJPKYEtZtaR91oi8Z2Gjh7mY8m/Q=
+X-Google-Smtp-Source: AGHT+IEeoGG+ifKyglnYz23QM4IkcMF0pT0DBb9rsn05FsyZ54VuVoGa6uZyhjGwbCssRfkUZpbMKw==
+X-Received: by 2002:a05:6a20:7da9:b0:12c:3973:800d with SMTP id v41-20020a056a207da900b0012c3973800dmr23193068pzj.6.1692912115723;
+        Thu, 24 Aug 2023 14:21:55 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id x2-20020a920602000000b003459023deaasm63560ilg.30.2023.08.24.13.15.00
+        by smtp.gmail.com with ESMTPSA id t19-20020a63b253000000b005658d3a46d7sm63568pgo.84.2023.08.24.14.21.54
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Aug 2023 13:15:00 -0700 (PDT)
+        Thu, 24 Aug 2023 14:21:54 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2023-08-24
-Date:   Thu, 24 Aug 2023 13:14:58 -0700
-Message-ID: <20230824201458.2577-1-luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ RFC] media-api: Make QoS a single property
+Date:   Thu, 24 Aug 2023 14:21:53 -0700
+Message-ID: <20230824212153.11050-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -63,75 +62,81 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 59da9885767a75df697c84c06aaf2296e10d85a4:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  net: dsa: use capital "OR" for multiple licenses in SPDX (2023-08-24 12:02:53 -0700)
+This moves QoS related propertis to a single dictionary.
+---
+ doc/media-api.txt | 44 +++++++++++++++++++++-----------------------
+ 1 file changed, 21 insertions(+), 23 deletions(-)
 
-are available in the Git repository at:
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 3a0ec38e244d..9f2482e73ac1 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -816,42 +816,40 @@ Properties	object Device [readonly]
+ 			Linked transport objects which the transport is
+ 			associated with.
+ 
+-		byte CIG [ISO only, optional, experimental]
++		dict QoS [ISO only, optional, experimental]
+ 
+-			Indicates configured QoS CIG.
+ 			Only present when QoS is configured.
+ 
+-		byte CIS [ISO only, optional, experimental]
++			Possible values for Unicast:
+ 
+-			Indicates configured QoS CIS.
+-			Only present when QoS is configured.
++			byte CIG
+ 
+-		uint32 Interval [ISO only, optional, experimental]
++				Indicates configured QoS CIG.
+ 
+-			Indicates configured QoS interval.
+-			Only present when QoS is configured.
++			byte CIS
+ 
+-		boolean Framing [ISO only, optional, experimental]
++				Only present when QoS is configured.
+ 
+-			Indicates configured QoS framing.
+-			Only present when QoS is configured.
++			uint32 Interval
+ 
+-		byte PHY [ISO only, optional, experimental]
++				Indicates configured QoS interval.
+ 
+-			Indicates configured QoS PHY.
+-			Only present when QoS is configured.
++			boolean Framing
+ 
+-		uint16 SDU [ISO only, optional, experimental]
++				Indicates configured QoS framing.
+ 
+-			Indicates configured QoS SDU.
+-			Only present when QoS is configured.
++			byte PHY
+ 
+-		byte Retransmissions [ISO only, optional, experimental]
++				Indicates configured QoS PHY.
+ 
+-			Indicates configured QoS retransmissions.
+-			Only present when QoS is configured.
++			uint16 SDU
+ 
+-		uint16 Latency [ISO only, optional, experimental]
++				Indicates configured QoS SDU.
+ 
+-			Indicates configured QoS latency.
+-			Only present when QoS is configured.
++			byte Retransmissions
++
++				Indicates configured QoS retransmissions.
++
++			uint16 Latency
++
++				Indicates configured QoS latency.
+-- 
+2.41.0
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-08-24
-
-for you to fetch changes up to 2a05334d7f91ff189692089c05fc48cc1d8204de:
-
-  Bluetooth: btusb: Do not call kfree_skb() under spin_lock_irqsave() (2023-08-24 12:24:37 -0700)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Introduce HCI_QUIRK_BROKEN_LE_CODED
- - Add support for PA/BIG sync
- - Add support for NXP IW624 chipset
- - Add support for Qualcomm WCN7850
-
-----------------------------------------------------------------
-Bastien Nocera (1):
-      Bluetooth: btusb: Fix quirks table naming
-
-Claudia Draghicescu (1):
-      Bluetooth: ISO: Add support for periodic adv reports processing
-
-Iulia Tanasescu (1):
-      Bluetooth: ISO: Use defer setup to separate PA sync and BIG sync
-
-Jinjie Ruan (1):
-      Bluetooth: btusb: Do not call kfree_skb() under spin_lock_irqsave()
-
-Lokendra Singh (1):
-      Bluetooth: btintel: Send new command for PPAG
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync
-      Bluetooth: hci_conn: Fix sending BT_HCI_CMD_LE_CREATE_CONN_CANCEL
-      Bluetooth: hci_core: Fix missing instances using HCI_MAX_AD_LENGTH
-      Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
-
-Neeraj Sanjay Kale (3):
-      Bluetooth: btnxpuart: Remove check for CTS low after FW download
-      Bluetooth: btnxpuart: Add support for IW624 chipset
-      Bluetooth: btnxpuart: Improve inband Independent Reset handling
-
-Neil Armstrong (3):
-      dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
-      Bluetooth: qca: use switch case for soc type behavior
-      Bluetooth: qca: add support for WCN7850
-
-Pauli Virtanen (1):
-      Bluetooth: hci_conn: fail SCO/ISO via hci_conn_failed if ACL gone early
-
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  23 ++
- drivers/bluetooth/btintel.c                        |  31 ++-
- drivers/bluetooth/btintel.h                        |   7 +-
- drivers/bluetooth/btnxpuart.c                      | 216 ++++++++++-------
- drivers/bluetooth/btqca.c                          |  97 +++++---
- drivers/bluetooth/btqca.h                          |  37 +--
- drivers/bluetooth/btusb.c                          |   6 +-
- drivers/bluetooth/hci_qca.c                        | 264 ++++++++++++++++-----
- include/net/bluetooth/hci.h                        |  21 ++
- include/net/bluetooth/hci_core.h                   |  40 +++-
- net/bluetooth/eir.c                                |   2 +-
- net/bluetooth/hci_conn.c                           |  48 +++-
- net/bluetooth/hci_event.c                          |  64 ++++-
- net/bluetooth/hci_sync.c                           |  75 ++++--
- net/bluetooth/iso.c                                | 188 ++++++++++++---
- net/bluetooth/mgmt.c                               |   6 +-
- 16 files changed, 818 insertions(+), 307 deletions(-)
