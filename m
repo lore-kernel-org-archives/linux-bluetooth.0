@@ -2,101 +2,97 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED848C27C40
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 06:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AECC27C40
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 07:00:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236017AbjHXGbQ (ORCPT
+        id S240271AbjHXHAL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Aug 2023 02:31:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53586 "EHLO
+        Thu, 24 Aug 2023 03:00:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240187AbjHXGae (ORCPT
+        with ESMTP id S231968AbjHXG7l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Aug 2023 02:30:34 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A73B5101
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 23:30:26 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-40fd2f6bd7cso41455781cf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Aug 2023 23:30:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1692858625; x=1693463425;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AizPiOzTg7VqYLRlXCHWTGbg4QFoGdlkScFOO9+Snpk=;
-        b=sZ/TGWgyKlh1eljEjcKRRvDqsABac3rhKcltE5bzLgFT+R4YO7w1S0UHFySPOoEJsm
-         mZTj8MhLHRb+RQjjA39/c2AlnIA8BkqmPjXOcx2ZdixHXJp0+ciEutS78cKPjPgvqoHL
-         Xb4MuOULBcJErL0uEXrtDE9c1QEMUM7q3YLQghYK9onErf/lGRhWzrn8flrJn/LXmMbI
-         KTmFEEysHbRbHaUSbSC2WE8lkTwqnVleMUZUzSd5prCc5sHuXCvQkaAfn0JNqNn9K7rq
-         Bnp0La+CLS4RV0aHI4puF0UQIq16Xqtc59ciRQvG8dSUJIu56taHgfqftRmqZvtiF6Fw
-         bxyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1692858625; x=1693463425;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AizPiOzTg7VqYLRlXCHWTGbg4QFoGdlkScFOO9+Snpk=;
-        b=ePBRW4iPV8tb7igwXh6EQME/0wZBosjOs3if62TLdE23X50aPZUwE7LPBPp0CJAuLL
-         1ike74OVWl6BVoFDsjyiTtDFvI+ktg1koXNFlen2Wyl35eZA2iquGYxtt+kRJm5gQArQ
-         MjZqVmfASm59KZfHGXea6/vSlgQ0dtv884/KY644uuojcXatSDRaS8Ms+egEWzWuomjV
-         MndKrI/fdEUIs/sHFVw7t82h63VG/dtTSyAtawcHmVYknFLMoflbBaf+GN/zPprwORSE
-         188hEra0jy8B1PK1q+W6pJi/PQ1V60xbr5QcYEqELJA3lMx8n6XfRkCB2K+3ng4ND7BI
-         RBeA==
-X-Gm-Message-State: AOJu0YwmI9MGtXmcTow8ywC2xG7ecs/8Ql22wvuHlbaeBrsXce//G5vs
-        Q2P5drKM+M5rlV7qran7sflzhn0IySY=
-X-Google-Smtp-Source: AGHT+IFn9k7boMc0XX92EBh+v9CCVobI6nGzRSgUYwaYQF6zv7+cJFmoXjDIe5BgMoNAv6r7xZHf+A==
-X-Received: by 2002:ac8:7fcd:0:b0:40f:f435:1b27 with SMTP id b13-20020ac87fcd000000b0040ff4351b27mr17893665qtk.68.1692858625630;
-        Wed, 23 Aug 2023 23:30:25 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.155.158])
-        by smtp.gmail.com with ESMTPSA id d18-20020ac800d2000000b004108bebd1fcsm3332168qtg.24.2023.08.23.23.30.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Aug 2023 23:30:25 -0700 (PDT)
-Message-ID: <64e6f901.c80a0220.6f47b.d3b4@mx.google.com>
-Date:   Wed, 23 Aug 2023 23:30:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5603020488600762357=="
+        Thu, 24 Aug 2023 02:59:41 -0400
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64911AD;
+        Wed, 23 Aug 2023 23:59:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+        Resent-Cc:Resent-Message-ID; bh=HMhvBcrp05+CiarwI8trcnBfG30fJaYkCg7iyfQbXOI=;
+        t=1692860379; x=1694069979; b=b4q1VMhOQPp6dEcnGgonLJd9oflbReuCoEepd8EJxBoAayb
+        IuzdviKM/KZ3OojaY2a8QA3pOr1ZPmKRPgcRl1iORVAnUIbpC5LPVG8gpuz1ydzskdY2/Ccf4cWWC
+        lhqP3ScgVtLauXNJ8UF+xN6PRz7PuwEuWurb12wLPj31Z0G/CvQlYPZUQk9hrS2M/haKHxmx/vPF5
+        bPk75cuF5hmkjShpyOLYpDyHg7s9iANSfT/7vLUWoFOVIBsL+ipjS6rSM2J7a6lgmWHzQs/cELKpT
+        HaxIZjIVinwhXmZMtWzcGn+1+zO2nwNeVB5oEakvsZmQLvwkENpQTm4Vg/nUMnHw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.96)
+        (envelope-from <johannes@sipsolutions.net>)
+        id 1qZ4JB-008ia3-2s;
+        Thu, 24 Aug 2023 08:59:10 +0200
+Message-ID: <dbbd230e26245274d5a05c64c553c42574f15d4b.camel@sipsolutions.net>
+Subject: Re: [PATCH 6/12] wifi: mac80211: Do not include crypto/algapi.h
+From:   Johannes Berg <johannes@sipsolutions.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y.Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
+        linux-mtd@lists.infradead.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
+        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+        ceph-devel@vger.kernel.org,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Mat Martineau <martineau@kernel.org>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        linux-integrity@vger.kernel.org,
+        "Jason A.Donenfeld" <Jason@zx2c4.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Date:   Thu, 24 Aug 2023 08:59:08 +0200
+In-Reply-To: <ZObmLqztZ4vMFKnI@gondor.apana.org.au>
+References: <ZOXf3JTIqhRLbn5j@gondor.apana.org.au>
+         <E1qYlA0-006vFr-Ts@formenos.hmeau.com>
+         <d776152a79c9604f4f0743fe8d4ab16efd517926.camel@sipsolutions.net>
+         <ZObmLqztZ4vMFKnI@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] transport: Fix crash with broadcast properties
-In-Reply-To: <20230824050045.4019298-1-luiz.dentz@gmail.com>
-References: <20230824050045.4019298-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-malware-bazaar: not-scanned
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5603020488600762357==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 2023-08-24 at 13:10 +0800, Herbert Xu wrote:
+> On Wed, Aug 23, 2023 at 12:34:35PM +0200, Johannes Berg wrote:
+> >=20
+> > No objection, of course, but I don't think it's necessarily clear that
+> > it "is for internal use only", it literally says:
+> >=20
+> >  * Cryptographic API for algorithms (i.e., low-level API).
+> >=20
+> > which really isn't the same as "don't use this file".
+> >=20
+> > Might want to clarify that, or even move it into crypto/ from
+> > include/crypto/ or something?
+>=20
+> Yes it should be in include/crypto/internal.  Once the churn gets
+> small enough I'll move it there.
+>=20
 
-This is automated email and please do not reply to this email!
+Sounds good :)
 
-Dear submitter,
+I was kind of waiting to see - but now that others have applied some
+patches to their tree I've done the same.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=778839
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.61 seconds
-GitLint                       PASS      0.39 seconds
-BuildEll                      PASS      32.43 seconds
-BluezMake                     PASS      1199.55 seconds
-MakeCheck                     PASS      13.47 seconds
-MakeDistcheck                 PASS      201.26 seconds
-CheckValgrind                 PASS      315.99 seconds
-CheckSmatch                   PASS      423.94 seconds
-bluezmakeextell               PASS      126.42 seconds
-IncrementalBuild              PASS      1015.92 seconds
-ScanBuild                     PASS      1309.00 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5603020488600762357==--
+johannes
