@@ -2,94 +2,136 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4515CC71153
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 17:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C4AFC6FA8F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Aug 2023 20:15:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240088AbjHXRJu (ORCPT
+        id S237013AbjHXUPQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Aug 2023 13:09:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41926 "EHLO
+        Thu, 24 Aug 2023 16:15:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237601AbjHXRJr (ORCPT
+        with ESMTP id S243510AbjHXUPG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Aug 2023 13:09:47 -0400
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E021199D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 10:09:44 -0700 (PDT)
-Received: from github.com (hubbernetes-node-20fb906.ash1-iad.github.net [10.56.15.31])
-        by smtp.github.com (Postfix) with ESMTPA id 972D93411C4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Aug 2023 10:09:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1692896983;
-        bh=mpNVsHg9mUe026Cx+0l1xjBpeU/QnwApptRmjmCPtKg=;
-        h=Date:From:To:Subject:From;
-        b=EwGFJohSrO/20Oizrp1KYOeDLkWtEh+mNOZwdrv1so1qBTjOqqSTEEYvWih7eF2fk
-         IdspDlj3/aWHbD62ozb8qSKzxAvU0soZPI+t0D4xpqW5FtP+QiUtazNKVMnMi1d2sL
-         hq/CQyYI4dXL6B+TCA8EhqbxBR3hQlia15n9Unrk=
-Date:   Thu, 24 Aug 2023 10:09:43 -0700
-From:   Marcel Holtmann <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/176d01-6a8f7c@github.com>
-Subject: [bluez/bluez] c6741c: transport: Fix crash with broadcast properties
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Thu, 24 Aug 2023 16:15:06 -0400
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B3D1BE6;
+        Thu, 24 Aug 2023 13:15:02 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-34961362f67so3391855ab.0;
+        Thu, 24 Aug 2023 13:15:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1692908102; x=1693512902;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eV99/KwJCOXDWRzyS7YmiM7xdn/lqE3M72sQmP0DJtM=;
+        b=AQpYibZWJ0yjL4GWoHbavY/PKBXQqD7DSb2wKIY6UeyVX+6ooqIlEsb+sDJOrmwopE
+         0hiJzXag7WllokvR1y39Z+LjpK587czEkB5IlIru62oImC+zeWwVTVK5twbaHgrhF+Ed
+         uwQ3DLwhrdj6OQYGQELmIraNaTrE2YA6bvfwoT06YZ0aLkQosZjiigXRoT+G5tigPwME
+         D1DYRzjyWfANa0HfS4VkCIfVAwcEIiMN/2QJxuHA515G/1QoSS3Qq7w67vh8js5lZM5x
+         UPgqZlehx6uVFTLj7yG9a5at++pq9c0Cygzq6wgrmrWlbEZh+VmIcGQ2m6ZKwk39r0pe
+         EUBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1692908102; x=1693512902;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eV99/KwJCOXDWRzyS7YmiM7xdn/lqE3M72sQmP0DJtM=;
+        b=foS/0sJI/9j6vongbRSEMPDYhUBG9DEyN3suj4MIlLf2w8XxwnTWT2AIvx1ykt0n/9
+         WFGH+jjdoXT9E0zEtJPsOOfDuK1qwqi6Q/3XRpZUMRJjpItK5fNu/Nu7CQRW2qKIEJq9
+         xL7CwmFlOAL3nl5hyrqQLuXTTJJfuHHBnCPTeVtoWJYO6IHeuQ8AYvT5oHV2TiTQ7Apw
+         pzgEH1zRz7yZ42bMoB2mnXlthNt+apXbwzjQH8fRYaACv5XUJFnKlrRGYDiR1cXMm6/q
+         lywhUcwzGLa6VRu6qqZntcbc1B7DTFTp4ZxAbTKQJyfwV3NkrtqbQhD296BR3n6ZRAla
+         ASNQ==
+X-Gm-Message-State: AOJu0YzxyArXVUeuUNaIAaGyf4F3bSBWMDhWM/fH7xCadvaf0Oa2Ir0b
+        SovELS91pxnd7j7korELWaY=
+X-Google-Smtp-Source: AGHT+IFGnQrYdYbQgSdLdXpVh2qj5TsbG97/gWpBB7COP/mgkL9HhDGRuBJ/r39i/BRgUGZ6grwjpw==
+X-Received: by 2002:a05:6e02:13cc:b0:348:76eb:17d8 with SMTP id v12-20020a056e0213cc00b0034876eb17d8mr6067482ilj.6.1692908102022;
+        Thu, 24 Aug 2023 13:15:02 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id x2-20020a920602000000b003459023deaasm63560ilg.30.2023.08.24.13.15.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Aug 2023 13:15:00 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2023-08-24
+Date:   Thu, 24 Aug 2023 13:14:58 -0700
+Message-ID: <20230824201458.2577-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: c6741c40816bacb9a5c2a5d8f2d3b1ae5c4a6f36
-      https://github.com/bluez/bluez/commit/c6741c40816bacb9a5c2a5d8f2d3b1ae5c4a6f36
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2023-08-24 (Thu, 24 Aug 2023)
+The following changes since commit 59da9885767a75df697c84c06aaf2296e10d85a4:
 
-  Changed paths:
-    M profiles/audio/transport.c
+  net: dsa: use capital "OR" for multiple licenses in SPDX (2023-08-24 12:02:53 -0700)
 
-  Log Message:
-  -----------
-  transport: Fix crash with broadcast properties
+are available in the Git repository at:
 
-When connecting a BAP unicast stream the followin crash can be observed:
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-08-24
 
-Access not within mapped region at address 0x1D4C0000000A
-  at 0x14F759: get_bcode (transport.c:1121)
-  by 0x1E02E4: append_property.isra.0 (object.c:498)
-  by 0x1E03B9: append_properties (object.c:527)
-  by 0x1E2AAB: g_dbus_get_properties (object.c:1811)
-  by 0x14B9B6: pac_config (media.c:1130)
+for you to fetch changes up to 2a05334d7f91ff189692089c05fc48cc1d8204de:
 
+  Bluetooth: btusb: Do not call kfree_skb() under spin_lock_irqsave() (2023-08-24 12:24:37 -0700)
 
-  Commit: 55c07304ac92474ed287190eb08703fe7c56f0c1
-      https://github.com/bluez/bluez/commit/55c07304ac92474ed287190eb08703fe7c56f0c1
-  Author: Marcel Holtmann <marcel@holtmann.org>
-  Date:   2023-08-24 (Thu, 24 Aug 2023)
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
 
-  Changed paths:
-    M .gitignore
+ - Introduce HCI_QUIRK_BROKEN_LE_CODED
+ - Add support for PA/BIG sync
+ - Add support for NXP IW624 chipset
+ - Add support for Qualcomm WCN7850
 
-  Log Message:
-  -----------
-  build: Add generated manual pages to .gitignore
+----------------------------------------------------------------
+Bastien Nocera (1):
+      Bluetooth: btusb: Fix quirks table naming
 
+Claudia Draghicescu (1):
+      Bluetooth: ISO: Add support for periodic adv reports processing
 
-  Commit: 6a8f7c55dfdfed8136ba8b417d0d8ee45181001a
-      https://github.com/bluez/bluez/commit/6a8f7c55dfdfed8136ba8b417d0d8ee45181001a
-  Author: Marcel Holtmann <marcel@holtmann.org>
-  Date:   2023-08-24 (Thu, 24 Aug 2023)
+Iulia Tanasescu (1):
+      Bluetooth: ISO: Use defer setup to separate PA sync and BIG sync
 
-  Changed paths:
-    M ChangeLog
-    M configure.ac
+Jinjie Ruan (1):
+      Bluetooth: btusb: Do not call kfree_skb() under spin_lock_irqsave()
 
-  Log Message:
-  -----------
-  Release 5.69
+Lokendra Singh (1):
+      Bluetooth: btintel: Send new command for PPAG
 
+Luiz Augusto von Dentz (4):
+      Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync
+      Bluetooth: hci_conn: Fix sending BT_HCI_CMD_LE_CREATE_CONN_CANCEL
+      Bluetooth: hci_core: Fix missing instances using HCI_MAX_AD_LENGTH
+      Bluetooth: HCI: Introduce HCI_QUIRK_BROKEN_LE_CODED
 
-Compare: https://github.com/bluez/bluez/compare/176d0154b7f8...6a8f7c55dfdf
+Neeraj Sanjay Kale (3):
+      Bluetooth: btnxpuart: Remove check for CTS low after FW download
+      Bluetooth: btnxpuart: Add support for IW624 chipset
+      Bluetooth: btnxpuart: Improve inband Independent Reset handling
+
+Neil Armstrong (3):
+      dt-bindings: net: bluetooth: qualcomm: document WCN7850 chipset
+      Bluetooth: qca: use switch case for soc type behavior
+      Bluetooth: qca: add support for WCN7850
+
+Pauli Virtanen (1):
+      Bluetooth: hci_conn: fail SCO/ISO via hci_conn_failed if ACL gone early
+
+ .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  23 ++
+ drivers/bluetooth/btintel.c                        |  31 ++-
+ drivers/bluetooth/btintel.h                        |   7 +-
+ drivers/bluetooth/btnxpuart.c                      | 216 ++++++++++-------
+ drivers/bluetooth/btqca.c                          |  97 +++++---
+ drivers/bluetooth/btqca.h                          |  37 +--
+ drivers/bluetooth/btusb.c                          |   6 +-
+ drivers/bluetooth/hci_qca.c                        | 264 ++++++++++++++++-----
+ include/net/bluetooth/hci.h                        |  21 ++
+ include/net/bluetooth/hci_core.h                   |  40 +++-
+ net/bluetooth/eir.c                                |   2 +-
+ net/bluetooth/hci_conn.c                           |  48 +++-
+ net/bluetooth/hci_event.c                          |  64 ++++-
+ net/bluetooth/hci_sync.c                           |  75 ++++--
+ net/bluetooth/iso.c                                | 188 ++++++++++++---
+ net/bluetooth/mgmt.c                               |   6 +-
+ 16 files changed, 818 insertions(+), 307 deletions(-)
