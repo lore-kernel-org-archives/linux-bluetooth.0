@@ -2,132 +2,145 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B65B7C3DA66
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Aug 2023 14:30:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1721CC3DA6F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Aug 2023 15:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343650AbjHYO35 (ORCPT
+        id S243287AbjHYPoT convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Aug 2023 10:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52486 "EHLO
+        Fri, 25 Aug 2023 11:44:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343928AbjHYOR4 (ORCPT
+        with ESMTP id S244063AbjHYPoN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Aug 2023 10:17:56 -0400
-Received: from zg8tndyumtaxlji0oc4xnzya.icoremail.net (zg8tndyumtaxlji0oc4xnzya.icoremail.net [46.101.248.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9740E2D57;
-        Fri, 25 Aug 2023 07:17:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=buaa.edu.cn; s=buaa; h=Received:Message-ID:Date:MIME-Version:
-        User-Agent:Subject:To:Cc:References:From:In-Reply-To:
-        Content-Type:Content-Transfer-Encoding; bh=T2DqUhMnd4YMy7tglb4aX
-        fguTgMnQNfIx5OwUgrtPHU=; b=XJKmblM3T1icFRnJwpvV2edq2iM01nrQVVz4V
-        ezsVLQqp7XsPgdoywDmZYw52M/3U61ViDbGQ1IetH55s+6D73JwhkTEDHOqgCjC6
-        70AzUBtPpd3sb+Xszpa/r6FohI6d8ggC66lbR2fHniFZxwazVeHmFruXDvc38Oeu
-        T5Eo3g=
-Received: from [10.193.157.69] (unknown [10.193.157.69])
-        by coremail-app2 (Coremail) with SMTP id Nyz+CgDXm+Ejt+hkBuoUAA--.55443S3;
-        Fri, 25 Aug 2023 22:13:55 +0800 (CST)
-Message-ID: <e6662867-9296-4e40-ba1d-5bb56a80eaff@buaa.edu.cn>
-Date:   Fri, 25 Aug 2023 22:13:56 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: bluetooth: fix consistent connection failure caused
- by the loss of HCI_Connection_Complete event
+        Fri, 25 Aug 2023 11:44:13 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BB81FC7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Aug 2023 08:44:09 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id C27EC240028
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Aug 2023 17:44:06 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4RXPPx5lygz9rxL;
+        Fri, 25 Aug 2023 17:44:05 +0200 (CEST)
+Message-ID: <bb06322befebb5ce0164bc4b3cc5ee94e487f3ab.camel@iki.fi>
+Subject: Re: [BlueZ RFC] media-api: Make QoS a single property
+From:   Pauli Virtanen <pav@iki.fi>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Xin-Yu Liu <by2239112@buaa.edu.cn>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, baijiaju@buaa.edu.cn,
-        sy2239101@buaa.edu.cn, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <CABBYNZKQi+Ma3spkJcn-FrhojsMCVxQqhW_Mhp5Z42u8_f2vBw@mail.gmail.com>
-From:   Xin-Yu Liu <LXYbhu@buaa.edu.cn>
-In-Reply-To: <CABBYNZKQi+Ma3spkJcn-FrhojsMCVxQqhW_Mhp5Z42u8_f2vBw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: Nyz+CgDXm+Ejt+hkBuoUAA--.55443S3
-X-Coremail-Antispam: 1UD129KBjvJXoWxWr1DCFy3CFy5Cr4UKr4fGrg_yoW5GFWfpa
-        y0kFZxCFWkJwnxJF9rAw48XF1qkw1vgF43trWqvryrA390vrZ7KF40krZIvay5urZ5GF40
-        vF4jqrnxKF15C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUk2b7Iv0xC_Zr1lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-        cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
-        AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
-        6r4j6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
-        xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-        6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-        0_Gr1lF7xvr2IY64vIr41lc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v
-        1sIEY20_Aw1UJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr
-        4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxG
-        rwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8Jw
-        CI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2
-        z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU2-VyUUUUU
-X-CM-SenderInfo: te1sjjazrrjqpexdthxhgxhubq/
+        linux-bluetooth@vger.kernel.org
+Cc:     Claudia Draghicescu <claudia.rosu@nxp.com>,
+        iulia-tanasescu <iulia.tanasescu@nxp.com>,
+        Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+Date:   Fri, 25 Aug 2023 15:44:05 +0000
+In-Reply-To: <CABBYNZ+OcMjUsnJiehvnnAn-fZv+Tyy=ei3qWefJr4A3prSzbg@mail.gmail.com>
+References: <20230824212153.11050-1-luiz.dentz@gmail.com>
+         <CABBYNZ+OcMjUsnJiehvnnAn-fZv+Tyy=ei3qWefJr4A3prSzbg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Luiz,
 
-Thanks for your reply!
-
-After receiving your guidance, we implement the code changes you
-provided to us and find that the bug has indeed been resolved.
-
-Thank you for your time, support, and for sharing your knowledge.
-We look forward to continuing our involvement in the Linux community
-and hope to contribute positively, just as you have done.
-
-Best regards,
-Xin-Yu Liu
-
-2023/8/24 5:26, Luiz Augusto von Dentz wrote:
+to, 2023-08-24 kello 14:28 -0700, Luiz Augusto von Dentz kirjoitti:
 > Hi,
->
-> On Wed, Aug 23, 2023 at 5:52 AM Xin-Yu Liu <by2239112@buaa.edu.cn> wrote:
->> During a connection attempt, if the HCI_Connection_Complete event
->> is lost and not received by the Host, it will result in
->> a connection failure.
->> In that process, the hci_conn, the handle of which is still
->> HCI_CONN_HANDLE_UNSET, will not be removed from the conn_hash
->> as it would during a regular disconnection opration.
->> Consequently, when an ACL connection is initiated for the same device,
->> the hci_conn is found in hash_conn based on "ba", with its state remaining
->> BT_CONNECT. Then the Host will send an HCI_Create_Connection_Cancel
->> command, which will result in subsequent Bluetooth connections
->> for the same device consistently failing.
->>
->> In order to solve the potential bug, if the hci_conn's state is
->> BT_CONNECT and handle is HCI_CONN_HANDLE_UNSET, remove this hci_conn
->> from conn_hash. This adjustment could potentially help ensure that the
->> specific conn is cleaned up at the appropriate times, then the subsequent
->> connection for the same device will no longer experience failures.
->>
->> Signed-off-by: Xin-Yu Liu <by2239112@buaa.edu.cn>
->> ---
->>   net/bluetooth/hci_conn.c | 4 ++++
->>   1 file changed, 4 insertions(+)
->>
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index 76222565e..219c62579 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -2886,6 +2886,10 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
->>                  } else if (conn->type == ACL_LINK) {
->>                          if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
->>                                  break;
->> +                       if (conn->state == HCI_CONN_HANDLE_UNSET) {
->> +                               hci_conn_cleanup(conn);
->> +                               break;
->> +                       }
-> This won't apply upstream if you are wondering why CI hasn't managed
-> to pick it up, this should be fixed by the following line if
-> connection cannot be aborted:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_sync.c?id=c452805643ff9762626f2c87c2640ab7c7099eb8#n5432
->
->>                          r = hci_send_cmd(conn->hdev,
->>                                           HCI_OP_CREATE_CONN_CANCEL,
->>                                           6, &conn->dst);
->> --
->> 2.25.1
->>
->
+> 
+> On Thu, Aug 24, 2023 at 2:21 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> > 
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > 
+> > This moves QoS related propertis to a single dictionary.
+> > ---
+> >  doc/media-api.txt | 44 +++++++++++++++++++++-----------------------
+> >  1 file changed, 21 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/doc/media-api.txt b/doc/media-api.txt
+> > index 3a0ec38e244d..9f2482e73ac1 100644
+> > --- a/doc/media-api.txt
+> > +++ b/doc/media-api.txt
+> > @@ -816,42 +816,40 @@ Properties        object Device [readonly]
+> >                         Linked transport objects which the transport is
+> >                         associated with.
+> > 
+> > -               byte CIG [ISO only, optional, experimental]
+> > +               dict QoS [ISO only, optional, experimental]
+> > 
+> > -                       Indicates configured QoS CIG.
+> >                         Only present when QoS is configured.
+> > 
+> > -               byte CIS [ISO only, optional, experimental]
+> > +                       Possible values for Unicast:
+> > 
+> > -                       Indicates configured QoS CIS.
+> > -                       Only present when QoS is configured.
+> > +                       byte CIG
+> > 
+> > -               uint32 Interval [ISO only, optional, experimental]
+> > +                               Indicates configured QoS CIG.
+> > 
+> > -                       Indicates configured QoS interval.
+> > -                       Only present when QoS is configured.
+> > +                       byte CIS
+> > 
+> > -               boolean Framing [ISO only, optional, experimental]
+> > +                               Only present when QoS is configured.
+> > 
+> > -                       Indicates configured QoS framing.
+> > -                       Only present when QoS is configured.
+> > +                       uint32 Interval
+> > 
+> > -               byte PHY [ISO only, optional, experimental]
+> > +                               Indicates configured QoS interval.
+> > 
+> > -                       Indicates configured QoS PHY.
+> > -                       Only present when QoS is configured.
+> > +                       boolean Framing
 
+While we are breaking things, it would be useful to unify this API with
+SelectProperties/SetConfiguration, where PHY is string "1M" or "2M" not
+byte.
+
+Can we make it byte everywhere? I think the enum ultimately comes from
+Core spec, so not sure the string names are that useful.
+
+> > 
+> > -               uint16 SDU [ISO only, optional, experimental]
+> > +                               Indicates configured QoS framing.
+> > 
+> > -                       Indicates configured QoS SDU.
+> > -                       Only present when QoS is configured.
+> > +                       byte PHY
+> > 
+> > -               byte Retransmissions [ISO only, optional, experimental]
+> > +                               Indicates configured QoS PHY.
+> > 
+> > -                       Indicates configured QoS retransmissions.
+> > -                       Only present when QoS is configured.
+> > +                       uint16 SDU
+> > 
+> > -               uint16 Latency [ISO only, optional, experimental]
+> > +                               Indicates configured QoS SDU.
+> > 
+> > -                       Indicates configured QoS latency.
+> > -                       Only present when QoS is configured.
+> > +                       byte Retransmissions
+> > +
+> > +                               Indicates configured QoS retransmissions.
+> > +
+> > +                       uint16 Latency
+> > +
+> > +                               Indicates configured QoS latency.
+> > --
+> > 2.41.0
+> 
+> Let me know if you have anything against doing these changes, this
+> will break backward compatibility but since they are still marked as
+> experimental we can still do these changes.
+
+I think it's fine if Pipewire targets BlueZ master branch as long as
+the feature is experimental.
+
+-- 
+Pauli Virtanen
