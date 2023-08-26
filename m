@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BC2C83F18
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Aug 2023 09:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2747C83F01
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Aug 2023 09:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232163AbjHZJCw (ORCPT
+        id S232258AbjHZJfs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Aug 2023 05:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45486 "EHLO
+        Sat, 26 Aug 2023 05:35:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232173AbjHZJC3 (ORCPT
+        with ESMTP id S232245AbjHZJfn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Aug 2023 05:02:29 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21838268F
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Aug 2023 02:02:27 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id d75a77b69052e-4121b5334f3so1499761cf.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Aug 2023 02:02:27 -0700 (PDT)
+        Sat, 26 Aug 2023 05:35:43 -0400
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2FB31BF1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Aug 2023 02:35:40 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-76d9023c942so112237185a.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Aug 2023 02:35:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693040546; x=1693645346;
+        d=gmail.com; s=20221208; t=1693042540; x=1693647340;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kZ2ibpzQ+8fiDoSS/oUdE80stplFGVJx5b4GJ35X7Lk=;
-        b=EHJXsOQZAdDMbkausRb/MlACy6hlFbcP5+Fh3fqPqY+kFblc513dQnjCodKbwhHClR
-         w4f41x3qrQ7GdIEm0CuOImchJSF0LK9R6f4TRh9HW3r8q3+0U2VcqnLz4oYwjdffA/oJ
-         9SxFMKoUVNRLDqm1JqlRzOUbQT8dYTUQOmU+TCMnyCnEEZQwbAWVZk4ioTc0ur0zQTG1
-         D2Pb4TcAzB8CBDvHr7SRHGohAtctNRRvdpOhpGmu/NYqL0cWrAh4hVYpzfUAqbhmk9jK
-         RrZkv5SpJ/BVwrptoPfeT8A9Oa2MpBANNLuzaQ5yJM1yCKk8UkHmulYRag+K0f+kLrgZ
-         Gzzg==
+        bh=n5RB4Mc2BEs8aTjvUAQxohm74L6M0zxwY0BAhAlI4HE=;
+        b=hn0TYF7Cqcp/74h5JasjMI4L28boNoXi6jkn1OD0h0DGPr8onfqgMu3olvHVpBM3Td
+         5FaDiMO9T8XjodjFzqB2ZFTjAEib8pw/FkZVSa2Dh9l9GFdPqdUpdHOKbOKuDYnrUjNh
+         N9r0PkCNOFW75CeWvTSAv3gyC/BjnKGiKDg6lGxkWXuinGHgREvfiED6SjO9m5JkCy2x
+         eXNgN9uCnEOx4RXDLzoSjWKwiVoJUodZUYyK37xKU5gEtIt72T+nLyFBG37R2Y3Du2tF
+         +eMR5OA//28BmjKJwxcQWw7011b0wLY3uXJJbwrrQ7+dQ2EPAmP/iFKu/aYj2XGqVwIr
+         JB6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693040546; x=1693645346;
+        d=1e100.net; s=20221208; t=1693042540; x=1693647340;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=kZ2ibpzQ+8fiDoSS/oUdE80stplFGVJx5b4GJ35X7Lk=;
-        b=ZvNxtZGbwnhj46xcYWnmADEKQdTHcJX7oK+ac6t28Rqjom1qOIdF4EBODcXA3m1EB6
-         vaDyiLy/nDImRvuYQAMxUUnMitoZagQmT+IR7BHOegxF9QAwoKWh7svvtBRRi/WzsVq9
-         AC2kgrf1yHqYh1KIXZOdIc6/gu/JtDht/vZJCvf/CLJ8gQbcnZbxzDBrerm+1it1Fd/F
-         2bBg+IF1vUpwyYLg6I+x7QGYW2r8BGp8F4aI3ORyF17V11N8DlRh98CUjuSLqid0NXGu
-         YD8uRclTj6qLjS8jOAJGo0UvH1aTcJ3zw5mIe4VMXXRmTmU1uuX7YJ8hTpyjfTvGS6Wu
-         P/gQ==
-X-Gm-Message-State: AOJu0YzMujCtCzHztuwYJQV+Nxlogi6+hSrmK6lJl9cfbB7P/NYIZnVm
-        oBijDJ72ECeoEOXKZ3wzXfJWZuWwoC0=
-X-Google-Smtp-Source: AGHT+IGrtPf2wvH7aPTlwZeKv5g7XZN2csSp0qnij9IsknkDpi/MZl520lNiJ/cIDOdKjfPRkWon6g==
-X-Received: by 2002:ac8:7f47:0:b0:410:9c04:84eb with SMTP id g7-20020ac87f47000000b004109c0484ebmr17072298qtk.17.1693040546082;
-        Sat, 26 Aug 2023 02:02:26 -0700 (PDT)
-Received: from [172.17.0.2] ([52.226.126.61])
-        by smtp.gmail.com with ESMTPSA id z25-20020ac86b99000000b004108c610d08sm1009824qts.32.2023.08.26.02.02.25
+        bh=n5RB4Mc2BEs8aTjvUAQxohm74L6M0zxwY0BAhAlI4HE=;
+        b=bQiW5LH7KQ2hmmMsJG2MZYmaTj4ZKteRJSyFuzoLWS9omlBmpK4YfnjxUd4hPqwLaJ
+         pDxOzoLRf+70NHAsqaVbhoTFFhzKcI7MrVYCZmvdSkvEalOkRtpqvxGfYUOYhMPWGIJX
+         amOskL/PP6fcEUxDacQSFkVJn7CVc0ltH24Z7YLrWkCd6x+8eQ7Z76rhOTF73Oy+tp98
+         8wof9dUMbsC0hFWsYfa3TlqG9d0MEZ1+xVEbHEq6ruujcRvJZGfbJQhO64SNRR1fwF+u
+         KQk3jXyoyDR8dW+CYKx84wU/Z33nl2VytAoQ4CRBSjidNu1ajUzGj3vwhG9/BC4DzT+u
+         akSw==
+X-Gm-Message-State: AOJu0YyWeIDxWWaPeo4slVIGBxdyUgQ75k1MCVP/rX7NHlfp9jFq9GiF
+        wrzNGBf7ZnQ/wXGFXxp9m8pnfQl/NFDaOw==
+X-Google-Smtp-Source: AGHT+IE+gZLTGmjyeL17Sv7hbpuVb+B5ZtkuzOk8FEL8gbt9v5WbIL37kWdFNAsKqypi3L86z8D5Bw==
+X-Received: by 2002:a37:ad05:0:b0:76d:aa3b:d48 with SMTP id f5-20020a37ad05000000b0076daa3b0d48mr14824470qkm.66.1693042539800;
+        Sat, 26 Aug 2023 02:35:39 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.22.81])
+        by smtp.gmail.com with ESMTPSA id r16-20020a0ce290000000b0064f43efc844sm1142602qvl.32.2023.08.26.02.35.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Aug 2023 02:02:25 -0700 (PDT)
-Message-ID: <64e9bfa1.c80a0220.df015.44d2@mx.google.com>
-Date:   Sat, 26 Aug 2023 02:02:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5130158513878729622=="
+        Sat, 26 Aug 2023 02:35:39 -0700 (PDT)
+Message-ID: <64e9c76b.0c0a0220.7c741.4782@mx.google.com>
+Date:   Sat, 26 Aug 2023 02:35:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1509366458149519613=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
-Subject: RE: [1/1] Bluetooth: Delete unused hci_req_prepare_suspend() declaration
-In-Reply-To: <20230826081313.3431523-1-xiaokeqinhealth@126.com>
-References: <20230826081313.3431523-1-xiaokeqinhealth@126.com>
+To:     linux-bluetooth@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: RE: KEYS: Include linux/errno.h in linux/verification.h
+In-Reply-To: <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
+References: <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5130158513878729622==
+--===============1509366458149519613==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,32 +75,70 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=779560
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=779564
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.71 seconds
-GitLint                       PASS      0.37 seconds
-SubjectPrefix                 PASS      0.14 seconds
-BuildKernel                   PASS      34.55 seconds
-CheckAllWarning               PASS      37.56 seconds
-CheckSparse                   PASS      42.81 seconds
-CheckSmatch                   PASS      115.88 seconds
-BuildKernel32                 PASS      33.27 seconds
-TestRunnerSetup               PASS      503.60 seconds
-TestRunner_l2cap-tester       PASS      28.71 seconds
-TestRunner_iso-tester         PASS      55.72 seconds
+CheckPatch                    FAIL      1.18 seconds
+GitLint                       FAIL      0.64 seconds
+SubjectPrefix                 FAIL      0.37 seconds
+BuildKernel                   PASS      34.28 seconds
+CheckAllWarning               PASS      37.34 seconds
+CheckSparse                   PASS      42.76 seconds
+CheckSmatch                   PASS      115.58 seconds
+BuildKernel32                 PASS      32.92 seconds
+TestRunnerSetup               PASS      501.03 seconds
+TestRunner_l2cap-tester       PASS      28.86 seconds
+TestRunner_iso-tester         PASS      51.48 seconds
 TestRunner_bnep-tester        PASS      11.30 seconds
-TestRunner_mgmt-tester        PASS      226.50 seconds
-TestRunner_rfcomm-tester      PASS      16.89 seconds
-TestRunner_sco-tester         PASS      20.33 seconds
-TestRunner_ioctl-tester       PASS      19.27 seconds
-TestRunner_mesh-tester        PASS      14.27 seconds
-TestRunner_smp-tester         PASS      15.26 seconds
-TestRunner_userchan-tester    PASS      11.91 seconds
-IncrementalBuild              PASS      31.63 seconds
+TestRunner_mgmt-tester        PASS      225.81 seconds
+TestRunner_rfcomm-tester      PASS      16.97 seconds
+TestRunner_sco-tester         PASS      20.59 seconds
+TestRunner_ioctl-tester       PASS      19.16 seconds
+TestRunner_mesh-tester        PASS      14.39 seconds
+TestRunner_smp-tester         PASS      15.43 seconds
+TestRunner_userchan-tester    PASS      12.02 seconds
+IncrementalBuild              PASS      31.39 seconds
 
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+KEYS: Include linux/errno.h in linux/verification.h
+WARNING: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#77: 
+> >> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'
+
+total: 0 errors, 1 warnings, 7 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13366546.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+KEYS: Include linux/errno.h in linux/verification.h
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+6: B2 Line has trailing whitespace: "> "
+8: B1 Line exceeds max length (85>80): "> >> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'"
+15: B1 Line exceeds max length (82>80): "Closes: https://lore.kernel.org/oe-kbuild-all/202308261414.HKw1Mrip-lkp@intel.com/"
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
 
 
 ---
@@ -108,4 +146,4 @@ Regards,
 Linux Bluetooth
 
 
---===============5130158513878729622==--
+--===============1509366458149519613==--
