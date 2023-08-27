@@ -2,88 +2,187 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1DF9C83F11
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Aug 2023 15:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A77C83F01
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Aug 2023 21:08:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229740AbjH0P6Z (ORCPT
+        id S229947AbjH0VHz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 27 Aug 2023 11:58:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34670 "EHLO
+        Sun, 27 Aug 2023 17:07:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbjH0P6D (ORCPT
+        with ESMTP id S230243AbjH0VHl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 27 Aug 2023 11:58:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92739129
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Aug 2023 08:58:01 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 26E186118A
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Aug 2023 15:58:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 89EC5C433C7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Aug 2023 15:58:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693151880;
-        bh=soR9wTSeLpJ2aGbcmgoQOI06pKJIwt90+Sw1lIZAo6U=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qz5dlW6Zhc5RVQdiZc4kXPIIAYFX2eZt6AChoW7c7aUj4aL7Cx2QXi8gh+O2t+0EI
-         PmqG+dps41gtvk3cT7wN1CHzeL+xW08e0L4M7t93zugTd0KFcPeUkfFMjNfjDaYHQy
-         wZ3ILwGShJNCpa0R1VlzDHyB1bdiyE0XZwdi02to1gCIEhyn3abhzZKi0UjirC5Gad
-         lRhU6FsnSwTlXmEwGegx7pCDF2p2/X+ttjaZ7jI5J3o9XA5Hi27Y85H5Fb2B9W2Boh
-         smsK8czuFxC12JLCy0IXiLOiUMxJCc+yGdrM126RgiiA3YFdGKXmwXLClmnNlv30UW
-         UC/9A+28hKL/w==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 74CBAC4332E; Sun, 27 Aug 2023 15:58:00 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: =?UTF-8?B?W0J1ZyAyMTc4MzBdIGFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh?=
- =?UTF-8?B?YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh?=
- =?UTF-8?B?YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh?=
- =?UTF-8?B?YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh?=
- =?UTF-8?B?YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh?=
- =?UTF-8?B?YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh?=
- =?UTF-8?B?YWFhYQ==?=
-Date:   Sun, 27 Aug 2023 15:58:00 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pingo-power@hotmail.fr
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: INVALID
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-217830-62941-mV0U52BhJe@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217830-62941@https.bugzilla.kernel.org/>
-References: <bug-217830-62941@https.bugzilla.kernel.org/>
+        Sun, 27 Aug 2023 17:07:41 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32E0FC1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Aug 2023 14:07:37 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b962c226ceso38643051fa.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Aug 2023 14:07:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693170455; x=1693775255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2dNN775pjBsmgQViKDUVndjwBvvds/dteBMfLodcMtM=;
+        b=bUWMxjbct1t53caJgO/diQHh1ywjMLzfsIBpiQ4pEQ4IAIKhC9MuKF47O9A9GAk2vI
+         +AToCSLdZT8PRIfg2AdH8XsIEtSUBOUO9j6GjOMKlcwc7JEIvZIVCJ41zMBk6VnHOGL+
+         PPB4iquh6UmbDMp3RGhSrwwScXqAcboqWCUiaziricd887r5I878TYaUpsbVCugJx+70
+         JDb3v4peh4t0maOf8B5RSEXj1BZs6roBBC9ar8JP9YiFgIRTrDsJLsR2LfwLbELzQGv5
+         a382nw1yInSotFLv0/9/ZjJLcpGveqiiTVjHuypMJDC/0d3QnLVrYOpQY5hbN27wUFFR
+         7vqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693170455; x=1693775255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2dNN775pjBsmgQViKDUVndjwBvvds/dteBMfLodcMtM=;
+        b=D7SCNYpvOug6oEbvhmmvhogDkUo53KOqJr7d4bx59ExxRS1CXbL+xp4TE6AfufwZ2g
+         Rf3F3AfHpLMo+zeotF6tA11XSkow+9EUXEDobQEI6b9Sr62luBj0TzutLnA6zTXVuZ0R
+         rbsnJC+Y44+NV1K0gQFhV6PgE0XvzckOLNoiPDmRLruZ+DZXi3jkwHrRY80JKyOj7hd4
+         o9e/NYBSxK8TLfIgd3mKaqRRQ96t8wUVV3S4FAGCcEUzOAGUODBe/u1Wdo+3G1MwrbbG
+         PsxtpKfguJsP876rd7gXbMJmPtrO9LPX5ZmejqEAhiM+4kMx4lZLqK1jRFzWDIPfxTPm
+         0Tuw==
+X-Gm-Message-State: AOJu0YwE0JlHxAaytNZzz5x2qywWG7aD1MYEcceGlIaaRoTzD+x31Lmo
+        D0a4Xdr/b6lAhtVEqed7pG7w9GwNoHfe1aOppHYU5Qy3
+X-Google-Smtp-Source: AGHT+IFcB3oXZKrHsE2fztPDZ1CdDtJNtQJgo3OZNpD/4q3t5v2oIRHBaO3+7n1OV9QqTtpXN0/yj/vJgGAyfxFuoDE=
+X-Received: by 2002:a2e:b0d8:0:b0:2bc:f5a0:cc25 with SMTP id
+ g24-20020a2eb0d8000000b002bcf5a0cc25mr4995271ljl.2.1693170455033; Sun, 27 Aug
+ 2023 14:07:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230826192421.7032-1-dev.git@javispedro.com>
+In-Reply-To: <20230826192421.7032-1-dev.git@javispedro.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Sun, 27 Aug 2023 14:07:22 -0700
+Message-ID: <CABBYNZ+jDu9diWc4nB5Z=OTUM2G8=NCVo+t93sa0UUVGq1PUeA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/gatt-client: always send ATT confirmations
+To:     Javier de San Pedro <dev.git@javispedro.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217830
+Hi Javier,
 
-pingo-power@hotmail.fr changed:
+On Sat, Aug 26, 2023 at 1:08=E2=80=AFPM Javier de San Pedro
+<dev.git@javispedro.com> wrote:
+>
+> I noticed after upgrading 5.66->5.68 that Bluez was no longer sending
+> confirmations (ATT opcode 0x1E) in response to indication opcodes (0x1D).
+>
+> Commit fde32ff9c9c0 ("shared/gatt-client: Allow registering with NULL
+> callback") added an early return to the notify_cb function when the
+> current client's notify_list is empty. However, in this case, we will
+> also not send the confirmation back. This breaks protocol.
+>
+> The devices I have generally respond to this by stopping
+> any new indications until ~15sec timeout or disconnection.
+>
+> As far as I can see, when using D-Bus API all notify handlers are always
+> added on client clones, never on the 'root' client itself (the one
+> with !client->parent), so for the root client the notify_list is always
+> empty, making this issue very easy to trigger using D-Bus GATT API.
+>
+> Ensure that we always send the confirmation, even if notify_list is empty=
+.
+>
+> Fixes: fde32ff9c9c0 ("shared/gatt-client: Allow registering with NULL cal=
+lback")
+> ---
+>  src/shared/gatt-client.c | 57 ++++++++++++++++++++--------------------
+>  1 file changed, 29 insertions(+), 28 deletions(-)
+>
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index efc013a20..56ecc6a8f 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -2230,45 +2230,46 @@ static void notify_cb(struct bt_att_chan *chan, u=
+int8_t opcode,
+>                                         void *user_data)
+>  {
+>         struct bt_gatt_client *client =3D user_data;
+> -       struct value_data data;
+> -
+> -       if (queue_isempty(client->notify_list))
+> -               return;
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |INVALID
+Instead reversing the if logic here you could just use goto to where
+we handle the confirmation.
+
+>
+>         bt_gatt_client_ref(client);
+>
+> -       memset(&data, 0, sizeof(data));
+> +       if (!queue_isempty(client->notify_list)) {
+> +               struct value_data data;
+>
+> -       if (opcode =3D=3D BT_ATT_OP_HANDLE_NFY_MULT) {
+> -               while (length >=3D 4) {
+> -                       data.handle =3D get_le16(pdu);
+> -                       length -=3D 2;
+> -                       pdu +=3D 2;
+> +               memset(&data, 0, sizeof(data));
+>
+> -                       data.len =3D get_le16(pdu);
+> -                       length -=3D 2;
+> -                       pdu +=3D 2;
+> +               if (opcode =3D=3D BT_ATT_OP_HANDLE_NFY_MULT) {
+> +                       while (length >=3D 4) {
+> +                               data.handle =3D get_le16(pdu);
+> +                               length -=3D 2;
+> +                               pdu +=3D 2;
+>
+> -                       if (data.len > length)
+> -                               data.len =3D length;
+> +                               data.len =3D get_le16(pdu);
+> +                               length -=3D 2;
+> +                               pdu +=3D 2;
+>
+> -                       data.data =3D pdu;
+> +                               if (data.len > length)
+> +                                       data.len =3D length;
+>
+> -                       queue_foreach(client->notify_list, notify_handler=
+,
+> -                                                               &data);
+> +                               data.data =3D pdu;
+>
+> -                       length -=3D data.len;
+> -                       pdu +=3D data.len;
+> -               }
+> -       } else {
+> -               data.handle =3D get_le16(pdu);
+> -               length -=3D 2;
+> -               pdu +=3D 2;
+> +                               queue_foreach(client->notify_list,
+> +                                             notify_handler, &data);
+>
+> -               data.len =3D length;
+> -               data.data =3D pdu;
+> +                               length -=3D data.len;
+> +                               pdu +=3D data.len;
+> +                       }
+> +               } else {
+> +                       data.handle =3D get_le16(pdu);
+> +                       length -=3D 2;
+> +                       pdu +=3D 2;
+> +
+> +                       data.len =3D length;
+> +                       data.data =3D pdu;
+>
+> -               queue_foreach(client->notify_list, notify_handler, &data)=
+;
+> +                       queue_foreach(client->notify_list,
+> +                                     notify_handler, &data);
+> +               }
+>         }
+>
+>         if (opcode =3D=3D BT_ATT_OP_HANDLE_IND && !client->parent)
+> --
+> 2.41.0
+>
+
 
 --=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Luiz Augusto von Dentz
