@@ -2,173 +2,336 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BB5C83F16
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Aug 2023 06:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 301B4C83F11
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Aug 2023 07:09:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbjH1GML (ORCPT
+        id S229592AbjH1HI5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Aug 2023 02:12:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40132 "EHLO
+        Mon, 28 Aug 2023 03:08:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229672AbjH1GLn (ORCPT
+        with ESMTP id S229550AbjH1HI2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Aug 2023 02:11:43 -0400
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67887122;
-        Sun, 27 Aug 2023 23:11:41 -0700 (PDT)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 37S58iss008619;
-        Mon, 28 Aug 2023 06:11:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=qcppdkim1;
- bh=5EnDIpD58MQjb8GmShKqGpjcAAtxTc/UiNVzu6MCc7Q=;
- b=TZl5mZgS/59JuK2wL+JD4yWec7V791iQw4oWkZoFDMX/y8IO52FVzq5HquxikJ1gVKgF
- hnOYp/N/Zuq+FxyerOZlM1mI1XI6fFxoCBsPGGoye0Lep44qJ5WxIrWgG12QBDD6qiCJ
- prB9oj7FMeTClFzuqXD3kaO+iHpdWuliG5vXyjQn340TXihZTw1zMD9IZ1TZy6G14N6l
- cELM94Pn/Uqgk5P5uCy+52AI1E5auayUtR9oLnBwdp4nhFnpWDkxI++C5i4J3rsSPQmQ
- lf0SiAfFyEuR2AStaS1pbFPsYRiBx/4/VWyOmwt+eXYiuV+c+Bc5j5KGllOA9j80QVIU 4g== 
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2172.outbound.protection.outlook.com [104.47.59.172])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3sqapfjtvw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 28 Aug 2023 06:11:38 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TNqNwmwHP/zbR3ftn/LzZ9b/5fqpxpQ7U+CkikFXX69RTqx9EiX1lAG/xY5juvd1KU0NRumlSUl6++A1sw9/sex92NfNuzx2fiqeSY/n1IXQ7mXotK7QW2NrcykJj/7ZvsBqo7e4HaKgrh/LS4r/mgg81M5bwgR+wDDGmRIYUsRRWS4cHvoulMoeP6vvHfgk4sx40+FV0tsfAxiVIChCjMx3VGchsSq2PTxZ2o4va0YBHdDrgn2bN3u54j5vFFI+K8I9rnJzC1lxr1WzaLNy9Z+m8nWuYqXzgFUnvIqDjkHSTgFoulO0upbPjZepwJvSh3NIYskrIwOed78dOJ4I+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5EnDIpD58MQjb8GmShKqGpjcAAtxTc/UiNVzu6MCc7Q=;
- b=HIaU0ynRAqG0WWJDXw4wJwbmpN1KtCAv42GeRgSSjxlS9ZXdc1UFLgx0fQIG/QKkzN/zZNbM0n7EehkRBuerbOW/WPE5uAqXDgThF28Oz2VJ+WtCXvhcLq/Xtiwp8ORTgN2i77RH7gYMivdcU8GFKxCF04hCd4ZLWLgLOj2NSgGyB9GCDNOLvNd1+sk2md0AgX07IBDrAb9wLZG5aAElEj28jB7/d3csOb3w0QhdLMuJm6gW6HqnRNhp16MoXKxg+6IjsHXzuz6d7ykUz+nlBQRQSt6ZwRAuRiLl11HMhnhbMiAwecP7dOx6LJfLLzNcXwbqIxuEwoZIoJVOi/Wm8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=qti.qualcomm.com; dmarc=pass action=none
- header.from=qti.qualcomm.com; dkim=pass header.d=qti.qualcomm.com; arc=none
-Received: from BYAPR02MB4839.namprd02.prod.outlook.com (2603:10b6:a03:51::18)
- by DS7PR02MB9580.namprd02.prod.outlook.com (2603:10b6:8:e3::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Mon, 28 Aug
- 2023 06:11:35 +0000
-Received: from BYAPR02MB4839.namprd02.prod.outlook.com
- ([fe80::3f10:e59:1021:6558]) by BYAPR02MB4839.namprd02.prod.outlook.com
- ([fe80::3f10:e59:1021:6558%5]) with mapi id 15.20.6699.034; Mon, 28 Aug 2023
- 06:11:35 +0000
-From:   Rocky Liao <rjliao@qti.qualcomm.com>
-To:     "Rocky Liao (QUIC)" <quic_rjliao@quicinc.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>
-Subject: RE: [PATCH v1] Bluetooth: btusb: add shutdown function for QCA6174
-Thread-Topic: [PATCH v1] Bluetooth: btusb: add shutdown function for QCA6174
-Thread-Index: AQHZyPrzKtu0m8KOY0eFOa/6uwPNzq//Wt5Q
-Date:   Mon, 28 Aug 2023 06:11:34 +0000
-Message-ID: <BYAPR02MB4839DEB37CF4094145A74D8FE1E0A@BYAPR02MB4839.namprd02.prod.outlook.com>
-References: <20230807064626.980-1-quic_rjliao@quicinc.com>
-In-Reply-To: <20230807064626.980-1-quic_rjliao@quicinc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR02MB4839:EE_|DS7PR02MB9580:EE_
-x-ms-office365-filtering-correlation-id: 32813264-5411-469d-7079-08dba78da1ab
-x-ld-processed: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OUvhXmtMfI7m7F1k1oLVzJbVbltYSsSN1zpdzIKoRpCvCHKM2y+rOOhKpQSieTPfiq1jxxOYRtsKlp7PvjOIqu3W7sqzX1HJNHdN0lEM25S9cJ3v+tCu3SnoZLzRPkefMtxeXaNBy1VfzAtTiRt4sHZlnTUZsvYvyu3qfIU52rVSMY5fEDywkcUXxxQw81v8kY9AiWM3sV09wgrkJ61+CQ5i1D/fgzDqtfBZ4q5jmghATJengAlzZ2ep6RE4siK6fPt3eFCvgaiBOT0/eo2Qzs0mN4LDEPV3UD3p51Nff3ye0qZYhT4gEFKMTZGWjRfQhRQtoldu6rI8MT7uP5XCIUBm78N5RyvS5T6gV+cD6wxJ1tJZysJPfLBzLKIq0H8IS3aoLv3hmfw5JEAwB2GfWu+17uNNHTdVm4dPLP2P4Esg5WXtNtvIVJJzrw1CbKPiWkcdFCgnRV8DFjEVM2iblNz8wsVcyJG7GsGAsFhaEXxJvUoPeX7NEeoK8EX42Tj9u9UbOYOzkhO92IVJPSLxffYTFtLA/5biTAvHv59T2M5o/NufDncQHv9u27PeS0FjJ+30+/eRPCS/YuaWzkQTwRXCuMBffXTpndxmMCYxRQWaR9xpjqlNT0Wvlv5JyuTh
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR02MB4839.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39860400002)(376002)(346002)(366004)(186009)(451199024)(1800799009)(478600001)(33656002)(110136005)(4326008)(54906003)(76116006)(66946007)(8936002)(71200400001)(7696005)(122000001)(38100700002)(86362001)(38070700005)(26005)(53546011)(6506007)(66476007)(64756008)(41300700001)(66556008)(66446008)(8676002)(316002)(83380400001)(9686003)(2906002)(5660300002)(52536014)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?iJDLscttGQVT253mSq7VVHvK9blqZPJmObr8b7vezgp9R4JLNfC15hXzIDLo?=
- =?us-ascii?Q?kW8qeidU1sQLUOTq1SAFFMrlOZlX9SKKo+mF/5w2lnDTA28EjmgZFAY2hLQw?=
- =?us-ascii?Q?YNWAW/HrSCiWfS4X/m0vE9OWjnlvpZkCgCDURKg6nFeAlCkh0Kb/jqs7wV+W?=
- =?us-ascii?Q?jvfsXJVojjA6C9MDXa/tQDkLDRVMJ5z8dC3DMBYblWJN0hzEr572UyjxB8Ia?=
- =?us-ascii?Q?JP7CJZIgBhuATrLUqNaXL7kEEFfgKhN/kAbTFBCubonX077kAclSg//Fy7Tb?=
- =?us-ascii?Q?maPa5y9F1x9OjGwzMb+hQh8wI8qR3W7i7AlB5WmfYAjlJqYbC83V9Lbbsdu0?=
- =?us-ascii?Q?AqVRqPWrUfJR1qBtSgp8opY38GnJv+nO6C/aahoMVsz3GC9iYIZOZZyNxoeC?=
- =?us-ascii?Q?x5J4rwJ8N5qF9mDBsLqzN7cmJU8Ij6+GGk+oK8VxcaesF9tvI/2h5w57vq79?=
- =?us-ascii?Q?u4VafYtXRtJvm6zS0wNT3B2KQSgZK7FWmpfoRv3nwXJJr/vmPNOLYn6NP5OE?=
- =?us-ascii?Q?fvdj9kLd7PEGBtbQQYBSk/Xt/UH/Js6otbmtaO2Ig1NwCdAvhzvnW0/vAo2f?=
- =?us-ascii?Q?X+aRfe+xdrOV9GpUqPDe+JiW6ir57aCxOtgJBb+uifuIDlm2kTRFYS4Fjoig?=
- =?us-ascii?Q?LEv8nz6aC5Iv1A8XXJNbZPYKrTN8WHCuTJ96A2Ul2kHlVDyQvVk2pfQxTfm6?=
- =?us-ascii?Q?mejZUQ+HtXVfBgC3RirXRthpOK692erB8Lh+TfW6y6Wm4lsieaVmXMEEF7eK?=
- =?us-ascii?Q?xTqbDFC7eEHFPajrTyZXU/oQMw6hK/U+Dk9JfG8W3NoFsfvg/+z/0ssz7Hjx?=
- =?us-ascii?Q?vwkFFU1FqIbGseV3JKtDfjMhM8TF5y5J2mC2b1VMfqSUDZxeCzKCOjxGAbM2?=
- =?us-ascii?Q?d9frrsEq8odRT2+di/l+tTNwwMUYwcx9hVtyku5dqgkZtMjq4NxuTYZCLTPc?=
- =?us-ascii?Q?TRnrcWD9j5EWPurokXrJSlusm3XOcslInQShFarAjR74iZGnG9FIMAlG2eSL?=
- =?us-ascii?Q?P4+Ov84TXHZnHpXOr8S7zZ3tmCfEvFkfOeN8NyQwUyxrm8GdylDhtpf8PO1B?=
- =?us-ascii?Q?OfrBuHBJx62uvsuRaKNunnpkg7KDmZQQt0BXtJqg5+hKuqQJv0WQZHtVCliX?=
- =?us-ascii?Q?viq7/Qz305pBh4A8SlkTBOk0vqZfAll1F0EeTyCiXQJDc0BlDeAUj/e8FwdF?=
- =?us-ascii?Q?Pin8LIIRsEqIQ1j5q7/N7rUUdswW+vv9g1D5VX2INzCKwqb6Mte/Iy1bNl8S?=
- =?us-ascii?Q?kEFetEq+ch93dD5cHxA4QKSfk++HpAHzYzOBAjl1jr4K+FN8mpgtPSj0SuFD?=
- =?us-ascii?Q?cE35F5PEjp48CZXqOzo2RGuUNXO1G1I6oeL/Tw9OpjLh76CQMez6iyZV27AD?=
- =?us-ascii?Q?FwIwyUTwriqLPzxNMh5J2DCS345oxv0H5jOj9Vxew+d3evs+zZJQyAOhv+Jc?=
- =?us-ascii?Q?NwEzAPkOnVuPnEW3AMt2WDlQQUEuAskOezNvR+xrYGD2ShseZNZpy7IX/IgA?=
- =?us-ascii?Q?riSbg4LEgnckzXAKwm81B4ufH1vPD5Sr6j60uVDFlrU9Sr7yVEmUFP09e/6O?=
- =?us-ascii?Q?JATgNg3wSySFg80IjdRM6DdKkDCoX6AYcxQ13ANR?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 28 Aug 2023 03:08:28 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8194D8;
+        Mon, 28 Aug 2023 00:08:24 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b703a0453fso41735481fa.3;
+        Mon, 28 Aug 2023 00:08:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693206503; x=1693811303;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vf2Ih/LJ4UC8r1LAx8GgwcTGc19SInnmmDpTI9eqFeM=;
+        b=eHyc1VajUYW8D89VhvEX7HtoHkiPiImQq8mBi5WjW5UNd+iLh4ehOSmkeMotH7nCQ1
+         G9vZd5p6femrvoSademnupXtHAiMEdxPak8UBLoP71Vj5gqSKQdLEEVD3YXsspFgbXmQ
+         /OO5tR7ouSNFeuLkmaM/dU/1X92OHMBQkALlolatj2ECOuNGLyGwyFRIyKIJj9XgTTVI
+         BTd4Wf2Jc0y8+bGbuz3QamSRq/9iH4w9y6eTgBU55Nzfl4qts7vI68uX6ohsLIBZWTdT
+         P49sTR8hMmPomi1mXbkxxalFa+rZvqw7OfjGEVYRy3gCUAaTU11Tc20C8/LQiqUWm/zc
+         EtJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693206503; x=1693811303;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vf2Ih/LJ4UC8r1LAx8GgwcTGc19SInnmmDpTI9eqFeM=;
+        b=TKle3TLFiWyrWaZur9iYWf9VC4zBX0DeSq8TadoC8y03lj1RiUQcRqZO9JQ8+ORF3S
+         eZxsU2lmgPtVWgXEWLF52mJVacwGtl5GVoGkez0iONXGRJdcuS80T1VK8oqoWiBjnYYG
+         l4zWCA+xYoVJFahDIpIZwPLYRu5PeQci7yhJJxb2uJFr/WrWUcBOYIYmgNfKx9/nZtRd
+         FtWxUcmzxMNeWuziKDQcmhBdk8LJoQl/o3Nm675xs35ETyb5JtSOCGrhklmOqIqG78CT
+         nqWRa+FvWdyF2RewVbVGX1aNIjq6lA31plCz1Qni2cZMOHGlwxjBFHYIw8hscUYm/GbH
+         WqoQ==
+X-Gm-Message-State: AOJu0YwlWRo1T6o1X9FRoWVrHEJKT9l9DrmFPk7z1MAjt4OXYAKkBLiw
+        VNvjWkHWc2hiK3u6yzQySz5whfEeV1heMw==
+X-Google-Smtp-Source: AGHT+IEsbA/15NDQWP+2uicb+KIuMYb5FHg6EGP2TECewmFe9DHFkQhonhGh2OKYmOTQyi5AxbXp/Q==
+X-Received: by 2002:a05:6512:2029:b0:4fb:fe97:5e35 with SMTP id s9-20020a056512202900b004fbfe975e35mr15187491lfs.47.1693206502738;
+        Mon, 28 Aug 2023 00:08:22 -0700 (PDT)
+Received: from ?IPV6:2001:861:3283:cc70:67b:cbff:feb2:30bc? ([2001:861:3283:cc70:67b:cbff:feb2:30bc])
+        by smtp.gmail.com with ESMTPSA id f23-20020a7bc8d7000000b003fbc9d178a8sm12934025wml.4.2023.08.28.00.08.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Aug 2023 00:08:21 -0700 (PDT)
+Message-ID: <267f7083-6435-4fab-827f-f7309bcd913d@gmail.com>
+Date:   Mon, 28 Aug 2023 09:08:16 +0200
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: p+T+XMDUOyP+vm0SCPQMGDr3DbnG8acI/hE73fVNG9fa0IHs4GlcB6H8qYZKePxfdTE2Fkk/fwwIOCh0Ir3rJ56gRYVUi9e2kDUC9n+T/DK4k0CawGfDXlrWnl+GATmQyJCrWi25zMM5c5gls1VP3nPe2f1oefst4SCjXot2IOzgaH6v3Nkb2dfJ4aVrPX0Er7OxJ0/Xg81Xm8q9013wr3uawjaLPEZR9DlgTrVk8la49MYA96eS05js18Z1E139SJrkMSg3DH+taJZf2CQQcw9XxtXwQZfybuL08g0kQ8OIP0fLsHczAFUaoTIrlali0YZvh5cEpIfCPPfBJomaGglimnJjkk/v9y5sV80vIpPNIa03FZ7ydGUPtDPlNCckJOLroF1BoXsJ2Er/G1CSNO/zRcgybxagCFGbHPLcpgEGzG2q5O6Br5N5Wh6mI0FkO3PQQL7njuOh5q3D9yQ1mXKsZhj9Q//3K5z1H9+bjGwcW5+VC0gHmnp5r8prXa1ThBkMyue/qvqg8wiZOsR1mkOSe7ZYRPeUYvWQQ+AdZdMnBwrEoUJbIM4q1AIIWtisFznnKUB9vVJdPaqooMwFcLfwjUf74t2HlMpxOQwcPOz6kFvncPof10AdIIDfwRx9DGwnNIjnrVX+ddWGHKg7XbVSA3VkNfoXBW0VpB4LCwU4jTSWYYxEv+NlwKvnqM3QhYcytx+AuTUxHHdBuK1G0fD61HY69nNNF/5sOSXZqv9mBNc0n+KVmm/w/6sI2PUHDa3p80sIQEeMxd0uvx2RCVoVL5w3HwxdcSIDUYR+LouB7w6pmIpOR8yheD/c9Tv0
-X-OriginatorOrg: qti.qualcomm.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR02MB4839.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 32813264-5411-469d-7079-08dba78da1ab
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2023 06:11:34.7598
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FRTsUOOZ4mkopgX3zewdnyXeyznJDHl8u4hdPoIU49Rx/oP/HuEsgSYABZB/fHo3e5BZFn4EVJOqX6xRZcOLSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR02MB9580
-X-Proofpoint-ORIG-GUID: ynoLVdB5l43fbMTrCZ9RN7DyjrSud86M
-X-Proofpoint-GUID: ynoLVdB5l43fbMTrCZ9RN7DyjrSud86M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.267,Aquarius:18.0.957,Hydra:6.0.601,FMLib:17.11.176.26
- definitions=2023-08-28_02,2023-08-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 clxscore=1011 impostorscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=965 phishscore=0 adultscore=0 spamscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2308100000 definitions=main-2308280056
+User-Agent: Mozilla Thunderbird
+Subject: Re: Fwd: Qualcomm NFA725A on T14s AMD Gen3: Bluetooth: hci0: Failed
+ to send headers (or body or access otp area)
+To:     Bagas Sanjaya <bagasdotme@gmail.com>, Kalle Valo <kvalo@kernel.org>
+Cc:     Jeff Johnson <quic_jjohnson@quicinc.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux ath11k <ath11k@lists.infradead.org>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <a669d2d5-fee8-5841-eb5f-b7d047d3cdb2@gmail.com>
+ <87il99j8dh.fsf@kernel.org> <89c53213-cb9b-7a8c-bc9c-92cabfdbba4d@gmail.com>
+Content-Language: en-CA
+From:   =?UTF-8?B?RnJhbsOnb2lz?= <fanf42@gmail.com>
+In-Reply-To: <89c53213-cb9b-7a8c-bc9c-92cabfdbba4d@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Maintainers,
+On 22/08/2023 10:21, Bagas Sanjaya wrote:
+> On 21/08/2023 12:02, Kalle Valo wrote:
+>> Bagas Sanjaya <bagasdotme@gmail.com> writes:
+>>
+>>> Hi,
+>>>
+>>> I notice a bug report on Bugzilla [1]. Quoting from it:
+>>>
+>>>> Hello,
+>>>>
+>>>> (Sorry by advance if it's not the correct place to discuss that, but
+>>>> I tried other place like my distro kernel forum
+>>>> (https://bbs.archlinux.org/viewtopic.php?id=286929), interactive
+>>>> chat, etc and nobody was able to help).
+>>>>
+>>>> [1] == Short summary ==
+>>>>
+>>>> I have a lenovo T14S AMD Gen 3 with a *Qualcomm NFA725A* Wi-Fi card
+>>>> (which is actually reported by lspci as QCNFA765) and bluetooth
+>>>> never worked on it, failing to load the rampatch with "failed to
+>>>> send header" or "failed to send body" or "Failed to access otp area
+>>>> (-71)".
+>>>>
+>>>> Other people reports bluetooth as working
+>>>> (https://wiki.archlinux.org/title/Lenovo_ThinkPad_T14s_(AMD)_Gen_3)
+>>>> and a work friend has a T16 AMD gen1 which seems to have exactly the
+>>>> same chipset and work flowlessly. So perhaps it's an hardware issue,
+>>>> but I don't know how to qualify it if so.
+>>>>
+>>>> => How can this be further qualified/debuged/workarounded?
+>>>>
+>>>> Any help, even RTFM pointing to corresponding manuals would be very
+>>>> much appreciated.
+>> This looks like a bluetooth bug so not related to ath11k (which is a
+>> Wi-Fi driver).
+>>
+> Oops, I really can't guess which driver is the culprit in this case unless
+> the reporter also attaches lsmod output. To François: Can you show
+> lsmod list as requested?
+>
+> Also Cc: bluetooth people.
 
-Could you please help to merge this patch?
+Very sorry, I was AFK for a couple of days and totaly missed the request.
 
-Thanks,
-Rocky
------Original Message-----
-From: Rocky Liao (QUIC) <quic_rjliao@quicinc.com>=20
-Sent: Monday, August 7, 2023 2:46 PM
-To: marcel@holtmann.org
-Cc: linux-kernel@vger.kernel.org; linux-bluetooth@vger.kernel.org; linux-ar=
-m-msm@vger.kernel.org; Rocky Liao (QUIC) <quic_rjliao@quicinc.com>
-Subject: [PATCH v1] Bluetooth: btusb: add shutdown function for QCA6174
+# lsmod, just the ath11k part:
+❯ lsmod | grep -i ath
+ath11k_pci             24576  0
+ath11k                749568  1 ath11k_pci
+qmi_helpers            36864  1 ath11k
+mac80211             1527808  1 ath11k
+cfg80211             1286144  2 ath11k,mac80211
+mhi                   110592  2 ath11k_pci,qrtr_mhi
 
-We should send hci reset command before bt turn off, which can reset bt fir=
-mware status.
+# lsmod, just btusb
+❯ lsmod | grep -i btusb
+btusb                  81920  0
+btrtl                  28672  1 btusb
+btbcm                  24576  1 btusb
+btintel                53248  1 btusb
+btmtk                  12288  1 btusb
+bluetooth            1093632  14 btrtl,btmtk,btintel,btbcm,bnep,btusb
 
-Signed-off-by: Rocky Liao <quic_rjliao@quicinc.com>
----
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+# lsmod everything
+❯ lsmod
+Module                  Size  Used by
+bnep                   36864  2
+btusb                  81920  0
+btrtl                  28672  1 btusb
+btbcm                  24576  1 btusb
+btintel                53248  1 btusb
+btmtk                  12288  1 btusb
+bluetooth            1093632  14 btrtl,btmtk,btintel,btbcm,bnep,btusb
+ecdh_generic           16384  1 bluetooth
+hid_logitech_hidpp     77824  0
+hid_logitech_dj        40960  0
+hid_jabra              16384  0
+snd_usb_audio         438272  0
+snd_usbmidi_lib        49152  1 snd_usb_audio
+snd_rawmidi            53248  1 snd_usbmidi_lib
+usbhid                 77824  2 hid_logitech_dj,hid_logitech_hidpp
+tun                    69632  2
+snd_seq_dummy          12288  0
+snd_hrtimer            12288  1
+snd_seq               106496  7 snd_seq_dummy
+snd_seq_device         16384  2 snd_seq,snd_rawmidi
+ccm                    20480  6
+michael_mic            12288  1
+qrtr_mhi               16384  0
+iptable_nat            12288  0
+nf_nat                 61440  1 iptable_nat
+nf_conntrack          200704  1 nf_nat
+nf_defrag_ipv6         24576  1 nf_conntrack
+nf_defrag_ipv4         12288  1 nf_conntrack
+iptable_mangle         12288  0
+iptable_filter         12288  0
+uvcvideo              176128  0
+videobuf2_vmalloc      20480  1 uvcvideo
+uvc                    12288  1 uvcvideo
+videobuf2_memops       16384  1 videobuf2_vmalloc
+videobuf2_v4l2         40960  1 uvcvideo
+videodev              372736  2 videobuf2_v4l2,uvcvideo
+videobuf2_common       86016  4 
+videobuf2_vmalloc,videobuf2_v4l2,uvcvideo,videobuf2_memops
+mc                     86016  5 
+videodev,snd_usb_audio,videobuf2_v4l2,uvcvideo,videobuf2_common
+snd_acp6x_pdm_dma      16384  1
+snd_soc_acp6x_mach     24576  4
+snd_soc_dmic           12288  1
+snd_sof_amd_rembrandt    16384  0
+snd_sof_amd_renoir     16384  0
+ext4                 1150976  1
+snd_sof_amd_acp        57344  2 snd_sof_amd_rembrandt,snd_sof_amd_renoir
+snd_sof_pci            24576  2 snd_sof_amd_rembrandt,snd_sof_amd_renoir
+snd_sof_xtensa_dsp     16384  1 snd_sof_amd_acp
+qrtr                   57344  5 qrtr_mhi
+crc16                  12288  2 bluetooth,ext4
+snd_sof               409600  2 snd_sof_amd_acp,snd_sof_pci
+mbcache                16384  1 ext4
+joydev                 24576  0
+ath11k_pci             24576  0
+snd_sof_utils          16384  1 snd_sof
+mousedev               24576  0
+jbd2                  208896  1 ext4
+ath11k                749568  1 ath11k_pci
+snd_soc_core          438272  4 
+snd_soc_acp6x_mach,snd_sof,snd_acp6x_pdm_dma,snd_soc_dmic
+snd_ctl_led            24576  0
+snd_compress           28672  1 snd_soc_core
+intel_rapl_msr         20480  0
+qmi_helpers            36864  1 ath11k
+ac97_bus               12288  1 snd_soc_core
+snd_hda_codec_realtek   192512  1
+snd_pcm_dmaengine      16384  1 snd_soc_core
+intel_rapl_common      36864  1 intel_rapl_msr
+snd_hda_codec_generic   110592  1 snd_hda_codec_realtek
+snd_hda_codec_hdmi     94208  1
+snd_pci_ps             20480  0
+mac80211             1527808  1 ath11k
+edac_mce_amd           53248  0
+snd_rpl_pci_acp6x      16384  0
+snd_acp_pci            12288  0
+snd_hda_intel          61440  10
+snd_pci_acp6x          20480  0
+snd_intel_dspcfg       32768  2 snd_hda_intel,snd_sof
+kvm_amd               204800  0
+snd_pci_acp5x          16384  0
+snd_intel_sdw_acpi     16384  1 snd_intel_dspcfg
+libarc4                12288  1 mac80211
+snd_hda_codec         212992  4 
+snd_hda_codec_generic,snd_hda_codec_hdmi,snd_hda_intel,snd_hda_codec_realtek
+kvm                  1318912  1 kvm_amd
+ucsi_acpi              12288  0
+hid_multitouch         32768  0
+snd_rn_pci_acp3x       24576  0
+cfg80211             1286144  2 ath11k,mac80211
+snd_hda_core          139264  5 
+snd_hda_codec_generic,snd_hda_codec_hdmi,snd_hda_intel,snd_hda_codec,snd_hda_codec_realtek
+snd_acp_config         16384  6 
+snd_rn_pci_acp3x,snd_pci_acp6x,snd_sof_amd_rembrandt,snd_acp_pci,snd_pci_ps,snd_sof_amd_renoir
+think_lmi              36864  0
+typec_ucsi             61440  1 ucsi_acpi
+irqbypass              12288  1 kvm
+snd_soc_acpi           12288  2 snd_sof_amd_acp,snd_acp_config
+sp5100_tco             20480  0
+snd_hwdep              20480  2 snd_usb_audio,snd_hda_codec
+rapl                   20480  0
+psmouse               233472  0
+typec                 106496  1 typec_ucsi
+acpi_cpufreq           32768  0
+firmware_attributes_class    12288  1 think_lmi
+wmi_bmof               12288  0
+k10temp                16384  0
+thunderbolt           495616  0
+snd_pcm               196608  14 
+snd_sof_amd_acp,snd_hda_codec_hdmi,snd_pci_acp6x,snd_hda_intel,snd_usb_audio,snd_hda_codec,snd_sof,snd_acp6x_pdm_dma,snd_compress,snd_soc_core,snd_sof_utils,snd_hda_core,snd_pci_ps,snd_pcm_dmaengine
+snd_pci_acp3x          16384  0
+i2c_piix4              32768  0
+snd_timer              53248  3 snd_seq,snd_hrtimer,snd_pcm
+mhi                   110592  2 ath11k_pci,qrtr_mhi
+roles                  16384  1 typec_ucsi
+i2c_hid_acpi           12288  0
+i2c_hid                40960  1 i2c_hid_acpi
+amd_pmc                36864  0
+acpi_tad               20480  0
+mac_hid                12288  0
+vboxnetflt             40960  1
+vboxnetadp             28672  0
+vboxdrv               651264  4 vboxnetadp,vboxnetflt
+vfat                   20480  1
+fat                   102400  1 vfat
+pkcs8_key_parser       12288  0
+crypto_user            20480  0
+fuse                  204800  5
+loop                   40960  0
+bpf_preload            20480  0
+ip_tables              36864  3 iptable_filter,iptable_nat,iptable_mangle
+x_tables               61440  4 
+iptable_filter,ip_tables,iptable_nat,iptable_mangle
+btrfs                2035712  1
+blake2b_generic        24576  0
+libcrc32c              12288  3 nf_conntrack,nf_nat,btrfs
+crc32c_generic         12288  0
+xor                    20480  1 btrfs
+raid6_pq              122880  1 btrfs
+dm_crypt               65536  1
+cbc                    12288  0
+encrypted_keys         28672  1 dm_crypt
+trusted                53248  2 encrypted_keys,dm_crypt
+asn1_encoder           12288  1 trusted
+tee                    45056  1 trusted
+dm_mod                217088  3 dm_crypt
+serio_raw              16384  0
+atkbd                  40960  0
+crct10dif_pclmul       12288  1
+libps2                 20480  2 atkbd,psmouse
+crc32_pclmul           12288  0
+vivaldi_fmap           12288  1 atkbd
+crc32c_intel           16384  4
+polyval_clmulni        12288  0
+polyval_generic        12288  1 polyval_clmulni
+gf128mul               16384  1 polyval_generic
+nvme                   65536  4
+ghash_clmulni_intel    16384  0
+sha512_ssse3           45056  0
+thinkpad_acpi         200704  0
+aesni_intel           360448  6
+snd                   147456  48 
+snd_ctl_led,snd_hda_codec_generic,snd_seq,snd_seq_device,snd_hda_codec_hdmi,snd_hwdep,snd_hda_intel,snd_usb_audio,snd_usbmidi_lib,snd_hda_codec,snd_hda_codec_realtek,snd_sof,snd_timer,snd_compress,thinkpad_acpi,snd_soc_core,snd_pcm,snd_rawmidi
+crypto_simd            16384  1 aesni_intel
+cryptd                 28672  3 crypto_simd,ghash_clmulni_intel
+soundcore              16384  2 snd_ctl_led,snd
+xhci_pci               28672  0
+nvme_core             237568  6 nvme
+ledtrig_audio          12288  3 
+snd_ctl_led,snd_hda_codec_generic,thinkpad_acpi
+ccp                   155648  1 kvm_amd
+xhci_pci_renesas       24576  1 xhci_pci
+platform_profile       12288  1 thinkpad_acpi
+nvme_common            20480  1 nvme_core
+i8042                  53248  0
+rfkill                 40960  6 bluetooth,thinkpad_acpi,cfg80211
+serio                  28672  7 amd_pmc,serio_raw,atkbd,psmouse,i8042
+amdgpu              11882496  67
+i2c_algo_bit           20480  1 amdgpu
+drm_ttm_helper         12288  1 amdgpu
+ttm                    98304  2 amdgpu,drm_ttm_helper
+video                  77824  2 thinkpad_acpi,amdgpu
+wmi                    45056  3 video,wmi_bmof,think_lmi
+drm_suballoc_helper    12288  1 amdgpu
+drm_buddy              20480  1 amdgpu
+gpu_sched              53248  1 amdgpu
+drm_display_helper    204800  1 amdgpu
+cec                    86016  1 drm_display_helper
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c index 1b=
-b3b09013b0..ac4d8cf831df 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4419,6 +4419,7 @@ static int btusb_probe(struct usb_interface *intf,
-=20
- 	if (id->driver_info & BTUSB_QCA_ROME) {
- 		data->setup_on_usb =3D btusb_setup_qca;
-+		hdev->shutdown =3D btusb_shutdown_qca;
- 		hdev->set_bdaddr =3D btusb_set_bdaddr_ath3012;
- 		hdev->cmd_timeout =3D btusb_qca_cmd_timeout;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
---
-2.38.1.windows.1
+
+
+-- 
+François ARMAND
 
