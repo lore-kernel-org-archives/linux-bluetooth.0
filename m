@@ -2,122 +2,105 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8110C83F18
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Aug 2023 09:34:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2FCC83F15
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Aug 2023 17:56:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbjH1Jda (ORCPT
+        id S230049AbjH1R4V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Aug 2023 05:33:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55124 "EHLO
+        Mon, 28 Aug 2023 13:56:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230071AbjH1JdY (ORCPT
+        with ESMTP id S232564AbjH1R4A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Aug 2023 05:33:24 -0400
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10078FF;
-        Mon, 28 Aug 2023 02:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-        bh=uHxuq2I8/ZyhsPIJmnm5XYbNAhRPkS8ziwT5zTbeJps=; b=lO8mubL68pHZiPHcvvPCwSD50I
-        uex7iY0O9aXpWaBriDkeZBCETSv7sEcsAyNKdE/OHPrADmuQHX02Ze/3A6Mi8r92DsYCorXkBAH9C
-        PRVkyOCr/jR1d6nYpa3K3KVQGEPKyQI0Maa0WkE2MFYz/sjPUt35p8d6QCX6WaK/cJjK8p9U+j/a5
-        BiFLoXm+c4QvzqDbv2mYgaUyr4chWFHNNOfHfjJ5rFyllD3wZT0q+2HozNJw/+UGJ8S0qOZNV30GO
-        j5pw+8Hn6XbiAqG6geKRCBIfWB5toKYt68QhCVW085lRCPhWiewmJvE9UsI9zBCw8GPBY6UgTvpAL
-        6/puGIWw==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-        by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <daniel@iogearbox.net>)
-        id 1qaYcN-0007aY-A4; Mon, 28 Aug 2023 11:33:07 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-        by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <daniel@iogearbox.net>)
-        id 1qaYcM-0000ba-24; Mon, 28 Aug 2023 11:33:06 +0200
-Subject: Re: [PATCH] KEYS: Include linux/errno.h in linux/verification.h
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        kernel test robot <lkp@intel.com>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y.Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        linux-fscrypt@vger.kernel.org, Richard Weinberger <richard@nod.at>,
-        linux-mtd@lists.infradead.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, Ilya Dryomov <idryomov@gmail.com>,
-        Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-        ceph-devel@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-wireless@vger.kernel.org,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Mat Martineau <martineau@kernel.org>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        Neil Brown <neilb@suse.de>, linux-nfs@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        linux-inte@web.codeaurora.org, grity@vger.kernel.org,
-        "Jason A.Donenfeld" <Jason@zx2c4.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>, llvm@lists.linux.dev,
-        oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org
-References: <E1qYl9s-006vDm-IW@formenos.hmeau.com>
- <202308261414.HKw1Mrip-lkp@intel.com> <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
-From:   Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <8481f02f-7dad-0459-bd2e-536ff8ab6896@iogearbox.net>
-Date:   Mon, 28 Aug 2023 11:33:04 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        Mon, 28 Aug 2023 13:56:00 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B25106
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 10:55:57 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id e9e14a558f8ab-34baeb01942so12374725ab.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 10:55:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693245356; x=1693850156;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=73RN/26zgEFPB4xxZp9XOE1Fftz+5ZpcP2BpWv3kE9s=;
+        b=byJJcPTcFCRTBRmgXulZ3hc4Dy312obTQWiDU9THWQ3LHY3IZFgsHWjVZCq80JcYgY
+         7FGXx0dlpWNtY+zkFPr0B+tKGpKY+SPU1xdjbzzVevCgwmOkhcfP6dDj2/PzXAL0Ojrz
+         9eW8Samvi/K6gifrkt4Rj4rYTFvttMyeI2gcpFdRVataeMFRY11wOLOS+Dxu/zEVFEjX
+         T02MZBlazYwDgZY+N5sND3VpV+1GDnrPy02HoGHT2R3dHcmshxabiYixg/EkOR/rNbsR
+         wsMQtu8i7oJ+bNWMtbBwWOfP7MrcXqEaEraWID8WkoOpaYPjksayDb9Set93jRPgYZ5i
+         JNiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693245356; x=1693850156;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=73RN/26zgEFPB4xxZp9XOE1Fftz+5ZpcP2BpWv3kE9s=;
+        b=D8/N+BPUJxnZuWF6VLwu+rJh/NT+sMDExckL2N1EeC8bzQvEXrFh4aCWeiIV3M905P
+         hCYIvond3AHkQ1yMl4juslP1wEd1gjzKLlGtobRfc6Boc/4gzDGlGQsu7YlEE/tYrivx
+         C4IUPUEawd71RqkNJeMLUnESFKKW2HTSjLcSouo9SwCF6HPEMkHS99QQCK7+w8xXoYLe
+         XOj1QvrJeg9OlhQ6hNa+OwOVllnqV/Kd1dMq7fytK21h53ZkMDQ8BsJWOVQ6PlC1W0tx
+         eB8MIGSeTCYmYSpDBJ6/DOYLwLrBLGx/lEkWHq6eVI5HC3SBSPf3zwTkMBHBcf8WDnH6
+         eDIg==
+X-Gm-Message-State: AOJu0YzqGHtoqZqp5panR7Pf89T/JHqRJDrnqTWrL5H8AOBh4Hj3Lpv8
+        5VQ/pHj9xqn2qkOZZD0UttArTc8u/fM=
+X-Google-Smtp-Source: AGHT+IGWy1ShUYAl4ZkD7hzhjPU40T1CsBqH5Bb3CVvb1icqhOOF8A0ssk8cYbw9YciyQcDQpTwntQ==
+X-Received: by 2002:a05:6e02:13ea:b0:349:8811:fc48 with SMTP id w10-20020a056e0213ea00b003498811fc48mr16307457ilj.29.1693245356416;
+        Mon, 28 Aug 2023 10:55:56 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id q2-20020a920502000000b0034aa175c9c3sm2550311ile.87.2023.08.28.10.55.55
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Aug 2023 10:55:55 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-client: Fix not sending confirmations
+Date:   Mon, 28 Aug 2023 10:55:53 -0700
+Message-ID: <20230828175553.518129-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-In-Reply-To: <ZOm5mX0+oUGzO3xh@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/27014/Mon Aug 28 09:38:26 2023)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Herbert,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 8/26/23 10:36 AM, Herbert Xu wrote:
-> On Sat, Aug 26, 2023 at 02:58:48PM +0800, kernel test robot wrote:
->>
->> All errors (new ones prefixed by >>):
->>
->>     In file included from fs/ubifs/auth.c:12:
->>>> include/linux/verification.h:23:11: error: use of undeclared identifier 'EINVAL'
-> 
-> ---8<---
-> Add inclusion of linux/errno.h as otherwise the reference to EINVAL
-> may be invalid.
-> 
-> Fixes: f3cf4134c5c6 ("bpf: Add bpf_lookup_*_key() and bpf_key_put() kfuncs")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202308261414.HKw1Mrip-lkp@intel.com/
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/include/linux/verification.h b/include/linux/verification.h
-> index f34e50ebcf60..cb2d47f28091 100644
-> --- a/include/linux/verification.h
-> +++ b/include/linux/verification.h
-> @@ -8,6 +8,7 @@
->   #ifndef _LINUX_VERIFICATION_H
->   #define _LINUX_VERIFICATION_H
->   
-> +#include <linux/errno.h>
->   #include <linux/types.h>
->   
->   /*
-> 
+Commit fde32ff9c9c0 ("shared/gatt-client: Allow registering with NULL
+callback") added an early return to the notify_cb function when the
+current client's notify_list is empty which prevents sending
+confirmations to indications.
 
-Looks good, do you plan to route this fix to Linus?
+Reported-by: Javier de San Pedro <dev.git@javispedro.com>
+---
+ src/shared/gatt-client.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks,
-Daniel
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index efc013a20dcf..5de679c9b29c 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2232,11 +2232,11 @@ static void notify_cb(struct bt_att_chan *chan, uint8_t opcode,
+ 	struct bt_gatt_client *client = user_data;
+ 	struct value_data data;
+ 
+-	if (queue_isempty(client->notify_list))
+-		return;
+-
+ 	bt_gatt_client_ref(client);
+ 
++	if (queue_isempty(client->notify_list))
++		goto done;
++
+ 	memset(&data, 0, sizeof(data));
+ 
+ 	if (opcode == BT_ATT_OP_HANDLE_NFY_MULT) {
+@@ -2271,6 +2271,7 @@ static void notify_cb(struct bt_att_chan *chan, uint8_t opcode,
+ 		queue_foreach(client->notify_list, notify_handler, &data);
+ 	}
+ 
++done:
+ 	if (opcode == BT_ATT_OP_HANDLE_IND && !client->parent)
+ 		bt_att_chan_send(chan, BT_ATT_OP_HANDLE_CONF, NULL, 0,
+ 							NULL, NULL, NULL);
+-- 
+2.41.0
+
