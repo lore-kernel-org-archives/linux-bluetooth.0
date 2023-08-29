@@ -2,101 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9E2C83F11
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Aug 2023 00:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF2D2C83F14
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Aug 2023 11:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234833AbjH2A5F (ORCPT
+        id S231577AbjH2LAV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Aug 2023 20:57:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
+        Tue, 29 Aug 2023 07:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234036AbjH2A4o (ORCPT
+        with ESMTP id S233206AbjH2K74 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Aug 2023 20:56:44 -0400
-Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCA8132
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 17:56:41 -0700 (PDT)
-Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-64b98479a66so22636606d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 17:56:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693270601; x=1693875401;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=p62ART7/nUANkM0mxvG0haBZP9bY7eV00HRd5mM8lBs=;
-        b=rhjCSiEXMy0G7WWCcF/mKl+y7hNbDQxc19DD4RHK5ycCJPcHJZE3OJRg0vKjC281Is
-         avKb75ZYblM1NJLfYufczgX+RAK6dqvxsivUoeHWqMhtbVxHSWx+ihpUVBN8AL4egsZx
-         5zUAg6BgIxnx50O+WIyoY6xn1cbdL29qIrcBB/Sz3sywrKFrWRl0+y8HpqvZezlrqj0Q
-         SKm+7PFXMqJYvCe6vG9c6xKXilJTMJeRXWPmKy4cyRT5oQAvQ3T7TBaJ1bIa12VHSNOE
-         OCipiBCrNXgnx6gPvf/ehB0VWeqwOQDh1zZZuToSU3cBcakbPrORMOTp0k4JsFxETTZM
-         7dQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693270601; x=1693875401;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p62ART7/nUANkM0mxvG0haBZP9bY7eV00HRd5mM8lBs=;
-        b=gzGJZzBVe3sFRZbhfkN/ZLklZzt4NcKC8bKOhPet1f6IE42zw0YYpneRdF95UmDj9z
-         qIEJrZZnBbi5r8tKs4ePh36LBZe9+OB0uiyaTLwnwIy5UgqMsIPpQrpxkG9cNhrZ1c9/
-         Qotf3vvI+igQLLUNeujhaq6eZzdrwU9uABs3ibUc8u2c/STSYVBp1zbFt8jVHTTd6wCc
-         kmUzSKUXVAE+rBqi9sV9PyVG874PhNyGtVBsgt9uRbf2d0uCyFCB0GgqlJcpzcrWW/g2
-         4YBDKXkL8jd9IvUM9wbwOJCaZbqdc20V0iLDX9t30UoCh5Didb1IKi7Cbjrdr3b329SL
-         +gDA==
-X-Gm-Message-State: AOJu0YytgLOehoJdcCum7vXEVwHdOSW4MMn2PVwr6SxfhdFN7i3/ACIX
-        E6vKe6pIw0Y3VpndHl9u6x6PE1jrtac=
-X-Google-Smtp-Source: AGHT+IFKlMD4GzpumOFsWQrpMWacSre7cjoRXtZYPS8/B1Gzlbn5OuQ8/95VGsltdWghTBDFbc8FHw==
-X-Received: by 2002:a0c:e24c:0:b0:651:6a97:333f with SMTP id x12-20020a0ce24c000000b006516a97333fmr2644412qvl.19.1693270600752;
-        Mon, 28 Aug 2023 17:56:40 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.155.208])
-        by smtp.gmail.com with ESMTPSA id x18-20020a0ce0d2000000b0064f59ca89basm2975145qvk.45.2023.08.28.17.56.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 17:56:40 -0700 (PDT)
-Message-ID: <64ed4248.0c0a0220.e72a7.a9ca@mx.google.com>
-Date:   Mon, 28 Aug 2023 17:56:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3417206456313442168=="
+        Tue, 29 Aug 2023 06:59:56 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FB4CDE
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Aug 2023 03:59:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1693306779; x=1724842779;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZT6hhVojwin3qqpS0/uK9U2Ek7Yifv44ObKmE/gOKbA=;
+  b=QHYTBx+cM0ICDHP3mzOnjCinIgUbVGi5lyn9tpZQvz+sDsf9XU4taIRN
+   i0WuFCwKU5ExwSJUA0N5QNzzTRZt8e8UiWn8apzhJAi9TAECqXsxEXov2
+   VSKoSuU4cm4e5X6lxnDq3R8BEjSMyDkmJ+ORi1iFwCGoQEPJ9BL+UgePa
+   WkNormbdVeHtxFTPQ2j15j2RYClb3U2jqIWGU1r/oDX16QrvFvhfGW600
+   G+ormF71CVNAWrmmAUWSG/wnmT76SjNSbXx+omLytO/OpfW/ICUqAT7Hp
+   k5jmmyKxqTd8KoCNyhIuvFTXL8M1uK4H/5vnzlP+AYqnEx1AQE+rAcQLJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="439289214"
+X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
+   d="scan'208";a="439289214"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2023 03:59:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10816"; a="732175352"
+X-IronPort-AV: E=Sophos;i="6.02,210,1688454000"; 
+   d="scan'208";a="732175352"
+Received: from bsws3032.iind.intel.com ([10.66.226.27])
+  by orsmga007.jf.intel.com with ESMTP; 29 Aug 2023 03:59:37 -0700
+From:   Vijay Satija <vijay.satija@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, kiran.k@intel.com,
+        Vijay Satija <vijay.satija@intel.com>
+Subject: [PATCH] [v1] Bluetooth: btusb: Add support for Intel Misty Peak - 8087:0038
+Date:   Tue, 29 Aug 2023 22:25:01 +0530
+Message-Id: <20230829165501.9277-1-vijay.satija@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] media-api: Make QoS a single property
-In-Reply-To: <20230828233239.634106-1-luiz.dentz@gmail.com>
-References: <20230828233239.634106-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3417206456313442168==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+cat /sys/kernel/debug/usb/devices
 
-This is automated email and please do not reply to this email!
+T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0038 Rev= 0.00
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=780071
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.37 seconds
-BuildEll                      PASS      27.31 seconds
-BluezMake                     PASS      871.72 seconds
-MakeCheck                     PASS      11.96 seconds
-MakeDistcheck                 PASS      156.71 seconds
-CheckValgrind                 PASS      257.43 seconds
-CheckSmatch                   PASS      344.99 seconds
-bluezmakeextell               PASS      104.42 seconds
-IncrementalBuild              PASS      706.54 seconds
-ScanBuild                     PASS      1062.82 seconds
-
-
-
+Signed-off-by: Vijay Satija <vijay.satija@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 764d176e9735..18e7e16593dd 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -476,6 +476,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0033), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0035), .driver_info = BTUSB_INTEL_COMBINED },
++	{ USB_DEVICE(0x8087, 0x0038), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
+ 						     BTUSB_INTEL_NO_WBS_SUPPORT |
+-- 
+2.34.1
 
---===============3417206456313442168==--
