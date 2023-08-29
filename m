@@ -2,175 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF2AC83F11
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Aug 2023 23:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9E2C83F11
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Aug 2023 00:57:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234347AbjH1XdR (ORCPT
+        id S234833AbjH2A5F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Aug 2023 19:33:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60524 "EHLO
+        Mon, 28 Aug 2023 20:57:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232341AbjH1Xct (ORCPT
+        with ESMTP id S234036AbjH2A4o (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Aug 2023 19:32:49 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB194E8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 16:32:43 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id ca18e2360f4ac-79289fefdbeso100142339f.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 16:32:43 -0700 (PDT)
+        Mon, 28 Aug 2023 20:56:44 -0400
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCA8132
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 17:56:41 -0700 (PDT)
+Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-64b98479a66so22636606d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Aug 2023 17:56:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693265562; x=1693870362;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Poe815WILDMB0+KqUCOBswfAgZvSJpvrPH3qP52BnhI=;
-        b=ei21QNxr33sA9uJM/nip4MdgF35NDEjIvWUsZVP+P/zQN243kBA+LRYRCHtHB3k+ES
-         HSX4vfY1pLS3/2xKksldCnFrr5Gd2N+a9FV5TUFuVNdNOl7fo0m4Rvbe8pL2lHfXjT75
-         pnQlTde7znvJEXuDGflvB4h9LkFQwV+JktAQ3prlQRvpuUTtceiDjB2FL4nwl63m7NhN
-         owCzcw3TofBThfg9uMlwKglFgP9tNdBVuvvfPv1nXRgIr8a3R0ZvWTprqmH5SQUX3t7R
-         KMA4DKyuhkRbM4U7OhrvdfOxnZVKUHE/Nw8Rz9BfHBejJoMvR80/aXYo2aChItmM18lm
-         onWA==
+        d=gmail.com; s=20221208; t=1693270601; x=1693875401;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=p62ART7/nUANkM0mxvG0haBZP9bY7eV00HRd5mM8lBs=;
+        b=rhjCSiEXMy0G7WWCcF/mKl+y7hNbDQxc19DD4RHK5ycCJPcHJZE3OJRg0vKjC281Is
+         avKb75ZYblM1NJLfYufczgX+RAK6dqvxsivUoeHWqMhtbVxHSWx+ihpUVBN8AL4egsZx
+         5zUAg6BgIxnx50O+WIyoY6xn1cbdL29qIrcBB/Sz3sywrKFrWRl0+y8HpqvZezlrqj0Q
+         SKm+7PFXMqJYvCe6vG9c6xKXilJTMJeRXWPmKy4cyRT5oQAvQ3T7TBaJ1bIa12VHSNOE
+         OCipiBCrNXgnx6gPvf/ehB0VWeqwOQDh1zZZuToSU3cBcakbPrORMOTp0k4JsFxETTZM
+         7dQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693265562; x=1693870362;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Poe815WILDMB0+KqUCOBswfAgZvSJpvrPH3qP52BnhI=;
-        b=gbUtM/pKgHG10HjynUgjEpTeK6/iwQNWTKtKDtEdYYYkll8kOVlQhmMh8p+PB477oA
-         CIr7y4DNkR2IROU0MdaHpBW2fdboXTtVb6L0Op14zZzJssQmU88UMeP2eK38peCluvqp
-         KHSC3SQog5XxgGx6+YA5W0l5+x8ufFoMygtqYyktSH2QLN8y3f2j4OabpwfvAdgOVCBb
-         icfUjEfk0YKdB8dlGK6lh9nXI4drEERXW69gh/IZuaooSUzPvHFXH87sQFG8mdDGtFlk
-         BdwCNnhbgWKpfaTirtodqdjERD/lTWQAKjTCw51wuuiWsrZQyWnp4bvV1mHG1Fma51QA
-         7RAw==
-X-Gm-Message-State: AOJu0Yx96RtO3IFh4Vxt/nXY0jLnIKZO9KdOIGCMvLKNJKxFhDKlOgOt
-        EtmIBIZN90i5mD9wprUs2+jymx2QOrU=
-X-Google-Smtp-Source: AGHT+IHVvPuXAwB9GqIu0NpfPB3sIvYumvLxFrZpdKsMf32uZa5G/1q+uXIJJKj7PpjCkkBAH4rt0g==
-X-Received: by 2002:a5d:8550:0:b0:783:6272:afbb with SMTP id b16-20020a5d8550000000b007836272afbbmr19979789ios.9.1693265562461;
-        Mon, 28 Aug 2023 16:32:42 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id k4-20020a02ccc4000000b0042ad6abe0bbsm2819852jaq.20.2023.08.28.16.32.40
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20221208; t=1693270601; x=1693875401;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p62ART7/nUANkM0mxvG0haBZP9bY7eV00HRd5mM8lBs=;
+        b=gzGJZzBVe3sFRZbhfkN/ZLklZzt4NcKC8bKOhPet1f6IE42zw0YYpneRdF95UmDj9z
+         qIEJrZZnBbi5r8tKs4ePh36LBZe9+OB0uiyaTLwnwIy5UgqMsIPpQrpxkG9cNhrZ1c9/
+         Qotf3vvI+igQLLUNeujhaq6eZzdrwU9uABs3ibUc8u2c/STSYVBp1zbFt8jVHTTd6wCc
+         kmUzSKUXVAE+rBqi9sV9PyVG874PhNyGtVBsgt9uRbf2d0uCyFCB0GgqlJcpzcrWW/g2
+         4YBDKXkL8jd9IvUM9wbwOJCaZbqdc20V0iLDX9t30UoCh5Didb1IKi7Cbjrdr3b329SL
+         +gDA==
+X-Gm-Message-State: AOJu0YytgLOehoJdcCum7vXEVwHdOSW4MMn2PVwr6SxfhdFN7i3/ACIX
+        E6vKe6pIw0Y3VpndHl9u6x6PE1jrtac=
+X-Google-Smtp-Source: AGHT+IFKlMD4GzpumOFsWQrpMWacSre7cjoRXtZYPS8/B1Gzlbn5OuQ8/95VGsltdWghTBDFbc8FHw==
+X-Received: by 2002:a0c:e24c:0:b0:651:6a97:333f with SMTP id x12-20020a0ce24c000000b006516a97333fmr2644412qvl.19.1693270600752;
+        Mon, 28 Aug 2023 17:56:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.185.155.208])
+        by smtp.gmail.com with ESMTPSA id x18-20020a0ce0d2000000b0064f59ca89basm2975145qvk.45.2023.08.28.17.56.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Aug 2023 16:32:41 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] media-api: Make QoS a single property
-Date:   Mon, 28 Aug 2023 16:32:39 -0700
-Message-ID: <20230828233239.634106-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 28 Aug 2023 17:56:40 -0700 (PDT)
+Message-ID: <64ed4248.0c0a0220.e72a7.a9ca@mx.google.com>
+Date:   Mon, 28 Aug 2023 17:56:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3417206456313442168=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] media-api: Make QoS a single property
+In-Reply-To: <20230828233239.634106-1-luiz.dentz@gmail.com>
+References: <20230828233239.634106-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3417206456313442168==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This moves QoS related properties to a single dictionary.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=780071
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.51 seconds
+GitLint                       PASS      0.37 seconds
+BuildEll                      PASS      27.31 seconds
+BluezMake                     PASS      871.72 seconds
+MakeCheck                     PASS      11.96 seconds
+MakeDistcheck                 PASS      156.71 seconds
+CheckValgrind                 PASS      257.43 seconds
+CheckSmatch                   PASS      344.99 seconds
+bluezmakeextell               PASS      104.42 seconds
+IncrementalBuild              PASS      706.54 seconds
+ScanBuild                     PASS      1062.82 seconds
+
+
+
 ---
- doc/media-api.txt | 78 +++++++++++++++++++++++++++++++++--------------
- 1 file changed, 55 insertions(+), 23 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 3a0ec38e244d..cbcfac85c27b 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -816,42 +816,74 @@ Properties	object Device [readonly]
- 			Linked transport objects which the transport is
- 			associated with.
- 
--		byte CIG [ISO only, optional, experimental]
-+		dict QoS [readonly, optional, ISO only, experimental]
- 
--			Indicates configured QoS CIG.
- 			Only present when QoS is configured.
- 
--		byte CIS [ISO only, optional, experimental]
-+			Possible values for Unicast:
- 
--			Indicates configured QoS CIS.
--			Only present when QoS is configured.
-+			byte CIG
- 
--		uint32 Interval [ISO only, optional, experimental]
-+				Indicates configured CIG.
- 
--			Indicates configured QoS interval.
--			Only present when QoS is configured.
-+			byte CIS
- 
--		boolean Framing [ISO only, optional, experimental]
-+				Indicates configured CIS.
- 
--			Indicates configured QoS framing.
--			Only present when QoS is configured.
-+			uint32 Interval
- 
--		byte PHY [ISO only, optional, experimental]
-+				Indicates configured ISO interval.
- 
--			Indicates configured QoS PHY.
--			Only present when QoS is configured.
-+			boolean Framing
- 
--		uint16 SDU [ISO only, optional, experimental]
-+				Indicates configured framing.
- 
--			Indicates configured QoS SDU.
--			Only present when QoS is configured.
-+			byte PHY
- 
--		byte Retransmissions [ISO only, optional, experimental]
-+				Indicates configured PHY.
- 
--			Indicates configured QoS retransmissions.
--			Only present when QoS is configured.
-+			uint16 SDU
- 
--		uint16 Latency [ISO only, optional, experimental]
-+				Indicates configured SDU.
- 
--			Indicates configured QoS latency.
--			Only present when QoS is configured.
-+			byte Retransmissions
-+
-+				Indicates configured retransmissions.
-+
-+			uint16 Latency
-+
-+				Indicates configured transport latency.
-+
-+			Possible values for Broadcast:
-+
-+			byte BIG
-+
-+				Indicates configured QoS BIG.
-+
-+			byte BIS
-+
-+				Indicates configured BIS.
-+
-+			uint32 SyncInterval
-+
-+				Indicates configured broadcast sync interval.
-+
-+			uint32 Interval
-+
-+				Indicates configured ISO interval.
-+
-+			byte PHY
-+
-+				Indicates configured PHY.
-+
-+			uint16 SDU
-+
-+				Indicates configured maximum SDU.
-+
-+			byte SyncTimeout
-+
-+				Indicates configured broadcast sync timeout.
-+
-+			uint16 Latency
-+
-+				Indicates configured transport latency.
--- 
-2.41.0
 
+--===============3417206456313442168==--
