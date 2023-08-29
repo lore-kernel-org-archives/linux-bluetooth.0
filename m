@@ -2,110 +2,218 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF1D2C71153
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Aug 2023 13:21:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 552C0C6FA8F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Aug 2023 14:34:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235951AbjH2NUn (ORCPT
+        id S236932AbjH2OeZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Aug 2023 09:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59034 "EHLO
+        Tue, 29 Aug 2023 10:34:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235953AbjH2NUb (ORCPT
+        with ESMTP id S236955AbjH2OeU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Aug 2023 09:20:31 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B2A6184
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Aug 2023 06:20:28 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1c1ff5b741cso5302855ad.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Aug 2023 06:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693315228; x=1693920028;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iU9l/+Yc4Sb6CRES1zHDIgBUdkLfYg54/LO+9a0nGWs=;
-        b=F1Rugvf5s//XNd4FNhcOCvQdq9ZYtXfZ9Gl3j/OyBVdO0+lrGJwWcze0DNBusq8HDi
-         t19s5RgbVX7P7Q0WCpXpWEsm8puTVFMeAKLpn0b5hToRdEx8pMT9sMW3SQVg/G+IqWe1
-         2yM7Wxikpa/J4x3H9HufQWlKPgJJ49KuLPoVihXC8RcgYXO6eurMeDGBtudC0D3QAAQj
-         raMvAJChSSDAyfMf12lqfQtny8NdAdK8AxG5EAjE0vitxVfgrVpwL8nIdzQrtTKGW8ql
-         vxz2GIZnr0O4RNfX38WZGjuGzJfHL69ZwGw5WkCuZaOirw8E0UowG7nJwuW8tBeKYP0r
-         aFgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693315228; x=1693920028;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iU9l/+Yc4Sb6CRES1zHDIgBUdkLfYg54/LO+9a0nGWs=;
-        b=cqDgK1zm6NKIAN/DkDMxFfGvW6I8mP7m73quu3qTHX+ESD16Vh68jDPX1trurHfGhs
-         AohTmKvUFn7DwBdsYI6U28S7a8HGEkQjesTDXEmdy1SqbG1+JQ4xnSi2b+7NOWh/Yc3l
-         CfZa4BLgA3ZwYR0gwx9Z8zNCbzS31Tx7v7w24L1U7sTZBqyz/JZS9S+pM6abhhBDUp3A
-         S/b/LaW/KW0zeAfO75cXLhAibpggjBSTKOQIQgk1WN0HEXRztpHKs2wcekxoM0ylvG8c
-         n/XqoUqV+lGxLiponv3NmAoGpKxbEqAF4gRDOo+vIk/0iIEL5BSKLc82ipPmqcSdneIm
-         O8GA==
-X-Gm-Message-State: AOJu0Yw734gyE9F3tWBRsLAyffUNEjdc/xVehhMDsQFWIXBri8gGEO0I
-        yoMnn7vhGnVbPbTDUTvzh68ocL9/pxI=
-X-Google-Smtp-Source: AGHT+IGcQwXyHO73ZDaK9eHg9UvChrl+AlMk3766P5FIzHd/eK+5+2einzI0tKGT2V8Z2Pmk2Ma0pQ==
-X-Received: by 2002:a17:902:d4cb:b0:1c1:e258:7447 with SMTP id o11-20020a170902d4cb00b001c1e2587447mr7598716plg.22.1693315227535;
-        Tue, 29 Aug 2023 06:20:27 -0700 (PDT)
-Received: from [172.17.0.2] ([13.87.245.225])
-        by smtp.gmail.com with ESMTPSA id ft7-20020a17090b0f8700b0026b45fb4443sm10955629pjb.4.2023.08.29.06.20.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Aug 2023 06:20:27 -0700 (PDT)
-Message-ID: <64edf09b.170a0220.f7a66.18ee@mx.google.com>
-Date:   Tue, 29 Aug 2023 06:20:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5159454191252380712=="
+        Tue, 29 Aug 2023 10:34:20 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AB2ECC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Aug 2023 07:34:17 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qaznL-0001Uf-1U; Tue, 29 Aug 2023 16:34:15 +0200
+Message-ID: <637f0d6e-f30d-3741-fc3a-63713ac0f9ee@leemhuis.info>
+Date:   Tue, 29 Aug 2023 16:34:14 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, vijay.satija@intel.com
-Subject: RE: [v2] Bluetooth: btusb: Add support for Intel Misty Peak - 8087:0038
-In-Reply-To: <20230829124024.40592-1-vijay.satija@intel.com>
-References: <20230829124024.40592-1-vijay.satija@intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/4] Bluetooth: Rework le_scan_restart for hci_sync
+Content-Language: en-US, de-DE
+To:     Stefan Agner <stefan@agner.ch>,
+        Linux regressions mailing list <regressions@lists.linux.dev>
+Cc:     Brian Gix <brian.gix@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+References: <20220727135834.294184-1-brian.gix@intel.com>
+ <20220727135834.294184-3-brian.gix@intel.com>
+ <578e6d7afd676129decafba846a933f5@agner.ch>
+ <CABBYNZJGKfwTQM8WAdUGXueTPnFyus1a65UO5mg2g4PXVuCnpA@mail.gmail.com>
+ <CABBYNZLgG+zTsk-6ceqzLXXyVRnN6p-m8sFq9Ss7mveD0f9BsQ@mail.gmail.com>
+ <CABUQxGxBdAFncJ6YVb7a9gnU-_YZDGFDmpHJTtm5K1tDGEGRDQ@mail.gmail.com>
+ <0de3f0d0d5eb6d83cfc8d90cbb2b1ba1@agner.ch>
+ <fcdf856db8fd8e77558b4d82b843c51e@agner.ch>
+ <24bf25f7-314f-ca73-59e9-df757732f6a9@leemhuis.info>
+ <ac58995a00cb6ad6bb4ce4c74b006a2f@agner.ch>
+From:   "Linux regression tracking (Thorsten Leemhuis)" 
+        <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <ac58995a00cb6ad6bb4ce4c74b006a2f@agner.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1693319657;0fa21664;
+X-HE-SMSGID: 1qaznL-0001Uf-1U
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5159454191252380712==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 29.08.23 15:27, Stefan Agner wrote:
+> 
+> No, this hasn't been addressed so far.
 
-This is automated email and please do not reply to this email!
+Thx and aggh. It's vacation time, so sometimes things take longer, but
+that doesn't explain why nothing seems to have happened for 9 weeks now
+(at least that how it looks from here, but maybe I missed something).
 
-Dear submitter,
+Luiz, what's up here? What do you need to get down to this?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=780202
+CCing the other Bluetooth maintainers just to be sure. FWIW, the thread
+starts here:
+https://lore.kernel.org/linux-bluetooth/578e6d7afd676129decafba846a933f5@agner.ch/#t
 
----Test result---
+Jan saw similar problems:
+https://lore.kernel.org/linux-bluetooth/CAPa5EdBSzkuMRoHDJ5w9ESckvNvs68nAfvixyetKcQ5+YD50wA@mail.gmail.com/
 
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-GitLint                       PASS      0.25 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      39.35 seconds
-CheckAllWarning               PASS      43.28 seconds
-CheckSparse                   PASS      48.66 seconds
-CheckSmatch                   PASS      133.15 seconds
-BuildKernel32                 PASS      38.26 seconds
-TestRunnerSetup               PASS      580.94 seconds
-TestRunner_l2cap-tester       PASS      33.88 seconds
-TestRunner_iso-tester         PASS      74.23 seconds
-TestRunner_bnep-tester        PASS      13.19 seconds
-TestRunner_mgmt-tester        PASS      243.85 seconds
-TestRunner_rfcomm-tester      PASS      20.51 seconds
-TestRunner_sco-tester         PASS      23.15 seconds
-TestRunner_ioctl-tester       PASS      22.53 seconds
-TestRunner_mesh-tester        PASS      16.58 seconds
-TestRunner_smp-tester         PASS      17.65 seconds
-TestRunner_userchan-tester    PASS      13.80 seconds
-IncrementalBuild              PASS      35.80 seconds
+> I am also not sure how we can
+> help solving that particular issue.
 
+Let's see if this prodding helps to get things rolling. If not, I'll
+have to get higher level maintainers involved.
 
+> Besides this, we have other Bluetooth issues which seem to be Kernel
+> regressions (where downgrading to Linux 5.15 also helps), folks see
+> "hci0: unexpected event for opcode" on Intel but also other systems. We
+> haven't bisected that issue yet. But it seems that the Bluetooth stack
+> is really somewhat unstable in recent releases.
 
----
-Regards,
-Linux Bluetooth
+Might be wise to create a separate thread for those and asking the
+bluetooth maintainers if they might have an idea (please CC the
+regressions lists as well), maybe we are lucky; if not someone has to
+bisect this to get closer to a solution.
 
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
---===============5159454191252380712==--
+> On 2023-08-29 13:22, Linux regression tracking (Thorsten Leemhuis)
+> wrote:
+>> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+>> for once, to make this easily accessible to everyone.
+>>
+>> Stefan, was this regression ever addressed? Doesn't look like it from
+>> here, but maybe I'm missing something.
+>>
+>> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+>> --
+>> Everything you wanna know about Linux kernel regression tracking:
+>> https://linux-regtracking.leemhuis.info/about/#tldr
+>> If I did something stupid, please tell me, as explained on that page.
+>>
+>> #regzbot poke
+>>
+>> On 30.06.23 12:59, Stefan Agner wrote:
+>>> Hi Brian,
+>>>
+>>> Gentle ping on the issue below.
+>>>
+>>> On 2023-06-20 16:41, Stefan Agner wrote:
+>>>> On 2023-06-16 03:22, Brian Gix wrote:
+>>>>
+>>>>> On Thu, Jun 15, 2023 at 11:28 AM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>>>>
+>>>>>> +Brian Gix
+>>>>>>
+>>>>>> On Thu, Jun 15, 2023 at 10:27 AM Luiz Augusto von Dentz
+>>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>>>
+>>>>>>> Hi Stefan,
+>>>>>>>
+>>>>>>> On Thu, Jun 15, 2023 at 5:06 AM Stefan Agner <stefan@agner.ch> wrote:
+>>>>>>>>
+>>>>>>>> Hi Brian, hi all,
+>>>>>>>>
+>>>>>>>> We experienced quite some Bluetooth issues after moving from Linux 5.15
+>>>>>>>> to 6.1 on Home Assistant OS, especially on Intel NUC type systems (which
+>>>>>>>> is a popular choice in our community, so it might just be that). When
+>>>>>>>> continuously scanning/listening for BLE packets, the packet flow
+>>>>>>>> suddenly ends. Depending on which and how many devices (possibly also
+>>>>>>>> other factors) within minutes or hours.
+>>>>>>>>
+>>>>>>>> Jan (in cc) was able to bisect the issue, and was able to pinpoint the
+>>>>>>>> problem to this change.
+>>>>>>>>
+>>>>>>>> Meanwhile I was able to confirm, that reverting this single commit on
+>>>>>>>> the latest 6.1.34 seems to resolve the issue.
+>>>>>>>>
+>>>>>>>> I've reviewed the change and surrounding code, and one thing I've
+>>>>>>>> noticed is that the if statement to set cp.filter_dup in
+>>>>>>>> hci_le_set_ext_scan_enable_sync and hci_le_set_scan_enable_sync are
+>>>>>>>> different. Not sure if that needs to be the way it is, but my outside
+>>>>>>>> gut feeling says hci_le_set_ext_scan_enable_sync should use "if (val &&
+>>>>>>>> hci_dev_test_flag(hdev, HCI_MESH))" as well.
+>>>>>>>>
+>>>>>>>> However, that did not fix the problem (but maybe it is wrong
+>>>>>>>> nonetheless?).
+>>>>>>>>
+>>>>>>>> Anyone has an idea what could be the problem here?
+>>>>>>>
+>>>>>>> Are there any logs of the problem? Does any HCI command fails or
+>>>>>>> anything so that we can track down what could be wrong?
+>>>>
+>>>> No HCI command fails, there is also no issue reported in the kernel log.
+>>>> BlueZ just stops receiving BLE packets, at least from certain devices.
+>>>>
+>>>>>>
+>>>>>> @Brian Gix perhaps you have a better idea what is going wrong here?
+>>>>>
+>>>>> It seems unlikely that this is Mesh related. Mesh does need for filtering to
+>>>>> be FALSE, and Mesh does not use extended scanning in any case.
+>>>>>
+>>>>> But this was part of the final rewrite to retire the hci_req mechanism in
+>>>>> favor of the hci_sync mechanism. So my best guess off the top of my head is
+>>>>> that there was an unintended race condition that worked better than the
+>>>>> synchronous single-threading mechanism?  Filtering (or not) should not
+>>>>
+>>>> After review the code I concluded the same. What is a bit surprising to
+>>>> me is that it is so well reproducible. I guess it is nicer to have a
+>>>> reproducible one than a hard to reproduce one :)
+>>>>
+>>>>> prevent advertising packets from permanently wedging.  Does anyone have an
+>>>>> HCI flow log with and without the offending patch?  Ideally they should be
+>>>>> identical...  If they are not then I obviously did something wrong. As this
+>>>>> was not specifically Mesh related, I may have missed some non-mesh corner
+>>>>> cases.
+>>>>
+>>>>
+>>>> I've taken two btmon captures, I created them using:
+>>>> btmon -i hci0 -w /config/hcidump-hci-req-working.log
+>>>>
+>>>> You can find them at:
+>>>> https://os-builds.home-assistant.io/hcidump-hci-req-working.log
+>>>> https://os-builds.home-assistant.io/hcidump-hci-sync-non-working.log
+>>>
+>>> Could you gain any insights from these logs?
+>>>
+>>> --
+>>> Stefan
+>>>
+>>>
+>>>>
+>>>> This is while running our user space software (Home Assistant with
+>>>> Bluetooth integration). Besides some BLE devices (e.g. Xioami Mi
+>>>> Temperature & Humidity sensor) I have a ESP32 running which sends SPAM
+>>>> advertisements every 100ms (this accelerates the issue). In the
+>>>> non-working case you'll see that the system doesn't receive any SPAM
+>>>> advertisements after around 27 seconds. The working log shows that it
+>>>> continuously receives the same packets (capture 120s).
+>>>>
+>>>> Hope this helps.
+>>>>
+>>>> --
+>>>> Stefan
+>>>>
+>>>>
+>>>
+>>>
+> 
+> 
