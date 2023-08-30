@@ -2,127 +2,144 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26376C83F1E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F020BC83F27
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Aug 2023 18:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245651AbjH3Sxx (ORCPT
+        id S245675AbjH3SyC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:53:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58730 "EHLO
+        Wed, 30 Aug 2023 14:54:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244613AbjH3N3e (ORCPT
+        with ESMTP id S244353AbjH3NCf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Aug 2023 09:29:34 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2071.outbound.protection.outlook.com [40.107.8.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26A5198
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Aug 2023 06:29:31 -0700 (PDT)
+        Wed, 30 Aug 2023 09:02:35 -0400
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2087.outbound.protection.outlook.com [40.107.241.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1066132
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Aug 2023 06:02:32 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EVtaocUZcX/z0Ym6HJxMYE4ZfUlh7K5h9AVKrvdjjt0OaZqPNVEe2FrQDpznrtQF/2lS3wWHD9jle9ScFF65v11qAbx/slPd2RHpMJd3h0w4YORUWDFAQYTDab5JIzzfNyXf9nPWjJJYpPi8BigDN7Mim3AjDDPpqo9mkzQ+psC95NJQn52L6Y3Se1aVaHx4N5sp6tcjlfSUnS5KmTNzkUqm/dgwqIN8c7s4LbPqy6Vh7c6nwnITxVG6GwpZD4z29it/659X0dBgdCfuR2Z9p9XL24TcQx6e0tvfTZiDBmft5XvqN0dOCUxh97IduU6TKoQssLr3Xw4M+3BD25WVrQ==
+ b=UkjxdcNK2JfC5+q8F29NLIHmaKyyewsouQ+G8zgPMbw2dii9pZnlws85TEy7F1eKW8P8tBmRleqlNCWsbq91Y5Y0/YQhf6A5yMOXbe95iaGs61DCPUYIsAk1c93CFUCw50PxD17f7APHEtZJwbSOyJ/845wfSSbqdpPdRYzG8FHbikCpoiLuDcWDb9v9Jz5wydirnNA4ovxJ0U/mky2PeRKrdUTcmCzJxZy5M0RxI5nPvza2M5zyO4/Rl3+4RrBBTPlU+Pam2yxEuiTYAsr6SkDTZhxjTUGEQFHAHTDru8ItYKC3Y5U2pVJzad6OhH6egH34xV6GkT8cs6eC+cs5tg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lwSsqfNZXJxZCHPdoI06VZcLf/1WudT/XbrH56zFXf0=;
- b=XZ17z14bIkumbHfXC4gUy5GfFmrn7PWmZB9/tpE6+CO0Mipg8P5radN6HoykXrBjU8WwUcPVJMxqLnmUQa3GUDCyZMZ4qCG4Gt/L9pXKVlnTtTQSNIeMWT/PeEmcbiH/aNwKyNcLlljL0m81xnkU1g9KoI6LOV30+naXpDVsi2fUEkjrgS5KVFrWVtplkRhW3DDWbBJTuuRpcEjXzMw4rybeCQtSn3awGu9ROEEoWZwQlS1hGFfkN+T3BAH4BapU1/F8EEK7JgbJdjqtzxRDmXULbJPsenxg/5XznPBkEI6XfpQDkFp24SvQ5L+/8k682q56PR5B8LS85geWsowroA==
+ bh=YAvRVu50ui9wvSGICbgYS+zI/2EAM13IYuBhtJwbECg=;
+ b=hbyGlTzlW2oiikUfXy7/nCKhmJ/VPTXnFoIxySWpKA6k/ZoP0sgCkhkovZCwvxV6IOGHhJ7cZT0TM71ggnXcvmmfgBb+WB6bFWPV6Vrnzj27zGj6aNI4zmyj9n1dhdXV+Km44hplk7gUL8/2kAQddnswZWyy7Z9X7lwbDHsEzc2zsUnZnsE4gwWrODbK+sL0qTESF1DeKvxjuATSaYKKetoyWuatiTUAmN+IyOu/fTHVsbOLpfbU3ajHJIHlFckO3/NtYeDCFkemvV11BrrVKQ+FFulYe+jqtmlnx4XqPvJcya3vdr74f1NLLP8/DuUOqP76hkz5iHU2Cud4EekRGQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lwSsqfNZXJxZCHPdoI06VZcLf/1WudT/XbrH56zFXf0=;
- b=TxgA81Lzyg/H/SrXk0h2rWO9ajr34P2icG5ay1Ga3TgGRCjqT7fLuqasP3I3VynBRuJYywuoG9NGXhcr8I69FVuQ826zL1ZL6HGuoL+L7Rwfz4g4UhOqjmU6HZkkTUOecW8yMyJFVmwRsIaPuJmiJPUfu5nGE0HpqEIbXmj1lrs=
+ bh=YAvRVu50ui9wvSGICbgYS+zI/2EAM13IYuBhtJwbECg=;
+ b=FNPytTfvHSNfZhsvvERk7ET1HUvxAfDEfJsPmxOOlVuStxyp09yU834N9ZKjv1LXfyVPv/DR+IZ8FtqhqXNsKpwOQt+oy9WLp1B1zJYvAHyBS4WJ4pFNWUHvjJQ+cQR+OacQb7xjnAEBMm71oDh6EFDanBE9NWAywaHViMLp60M=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com (2603:10a6:803:4b::31)
- by DBAPR04MB7334.eurprd04.prod.outlook.com (2603:10a6:10:1aa::14) with
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by DU0PR04MB9442.eurprd04.prod.outlook.com (2603:10a6:10:35a::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.35; Wed, 30 Aug
- 2023 13:29:29 +0000
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::6831:19af:f6c0:5512]) by VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::6831:19af:f6c0:5512%3]) with mapi id 15.20.6745.020; Wed, 30 Aug 2023
- 13:29:28 +0000
-From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6699.34; Wed, 30 Aug
+ 2023 13:02:29 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::6e75:56f3:fc37:277b]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::6e75:56f3:fc37:277b%7]) with mapi id 15.20.6699.035; Wed, 30 Aug 2023
+ 13:02:28 +0000
+From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
         silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
-        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
-Subject: [PATCH 0/2] Set device non temp when synchronized with bcast source
-Date:   Wed, 30 Aug 2023 16:29:13 +0300
-Message-Id: <20230830132915.72153-1-silviu.barbulescu@nxp.com>
+        andrei.istodorescu@nxp.com,
+        Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH 0/1] Bluetooth: ISO: Pass BIG encryption info through QoS
+Date:   Wed, 30 Aug 2023 16:01:46 +0300
+Message-Id: <20230830130147.359016-1-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.34.1
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AM0PR03CA0102.eurprd03.prod.outlook.com
- (2603:10a6:208:69::43) To VI1PR04MB5344.eurprd04.prod.outlook.com
- (2603:10a6:803:4b::31)
+X-ClientProxiedBy: AM0PR08CA0010.eurprd08.prod.outlook.com
+ (2603:10a6:208:d2::23) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5344:EE_|DBAPR04MB7334:EE_
-X-MS-Office365-Filtering-Correlation-Id: e390e933-7c94-4484-c4de-08dba95d22c3
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DU0PR04MB9442:EE_
+X-MS-Office365-Filtering-Correlation-Id: 36cf3cc6-c31a-4ae3-01bc-08dba9595d52
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ewSyPhIavNNgC+fC3T3t/bdqWjhFi047dczghR9EJae28j3Pea39I7LUVnmda3S+XWCdlh/kVwmk9SXbzbSRgywogeEMDnPMaw7M3op6TC0qqmX0cOduGSewYn4dsqZMJW+Z4GrMF7YY9dlca8yixibQ0LtikthWa1LeqET6bCON9WttDZ5qmJ+n+b35+Ewtz/yaoO21+VD4Um/CnyKK99BRO9lQ9intCmOG8VG+Kjptz6fp6c8mvAXOhwm5OaG9FqxROA0WcHeVrUUHisCoIpSEVe5kDRX5rOAJcoBJCP+MVxL+DsfcSLk2XjXITsKYDw3oLveCEXH2OTN3O3oqFQ2XT7mLFPfzavOvPc/hhlS6C4ahngc0URurR5vPUSxrChWERMO6fB8a+Ixq9aLOXeDMcqgrMWSHQp2S2bL9inQ5RTrYYTjheuPk7OLbHq1OePt9E9C8MH1IDEkuVI9jNYDWX6jJWhkxTIX8ha6Mu1nFPZxEBudAXZkMd5I88cJ2Cxn+lVm2C02TCCbWvaOYErqF3lkMTT8awsKetq8mtPulVfP1e8ykXdbSgNFWZn7DtTjFCmSgC1EfR+yAGS5FFKekCk8PApkHfYgR034WSlE18b0/j9OksWxrVNzczHny
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(346002)(136003)(39860400002)(366004)(1800799009)(186009)(451199024)(8936002)(6666004)(52116002)(66946007)(478600001)(6506007)(66556008)(66476007)(6486002)(316002)(38100700002)(41300700001)(38350700002)(6512007)(5660300002)(8676002)(26005)(36756003)(1076003)(2906002)(83380400001)(2616005)(6916009)(86362001)(4744005)(4326008);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 3ILCa5bQPVagXz8c3XCSYc6pqgmv14FRIRQ3F6oHCe3R647Z9gJBSkiaQH8xINUwnMp47dhmJDykxL9QsDqP1OvLfTVj2YIVoH4IBhGgJzCTYPwScxM3n5vDKRHYP+PsD4AeVJ6GI3cy39AnCxxeU1ZCZomerQT1N19Y72catSKYOMqYUNiZdTYEK25+yd4z0+ZzGYoE0JdlBBKRQWlcAVZ0iVTJoAfEmMkSW/tXwGhjxaqLTDTFna5FA/HWEH0VYI2jiJd6PP7Za3CpmVQtfAMMsJJb+6UAkWEz+XqnRs64ghiZJfZNmjmHcsuylYKIz94nD5VPhxi6CcU+GeE82NfzSJEtMony3nrjsKc1235jMe38RBfhpSRx6DW7PNpeu/jTLzUj6hl1sza9ZEx8w4wbodzs7YupJOtT1Sdpw2bf7Lii8IdeLhT6CMak6d5L7mt4Y2iVkajvOpjp4fkOGsQIr1pgAQogNkIZ9gCaR2aB938KgzKiJq9Hf4NoHDzznsLUrDSD/uOMeECKHimB30nyVNV9XtWLV7BClA4ZXp82ODVNmjo0ZdNvAh6c2E4Pbx90sgZmwOamukVk6PeaB3wyPdCX3atiHCG69q8yOn0fvdEZiEPpfQpcYCb21RAb
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(366004)(136003)(396003)(186009)(451199024)(1800799009)(2906002)(66556008)(66476007)(66946007)(316002)(6916009)(36756003)(41300700001)(4326008)(8676002)(8936002)(5660300002)(44832011)(6666004)(6506007)(38350700002)(6486002)(52116002)(2616005)(6512007)(38100700002)(86362001)(1076003)(26005)(478600001)(83380400001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?OEFVz9d8UPq6GtlF9Y9jBsQT7pjmtQw0JIs3Bev3YuZC4L2EDmV7bJDJm2Sq?=
- =?us-ascii?Q?7BNguM9fWenIfv6Ggpq2XhZGCRUIJHCrjcWjuORgr0YSquWVxMy/ju66Ctvr?=
- =?us-ascii?Q?n01lvSHrfbZVE2sja/0xAMeFXA0Xbw0GVfzQTGjV4aLm1HZHiauW3zUVUBvx?=
- =?us-ascii?Q?KWljbQUPuyWMFEeFBJOqJQ1dCptR3l78N+pZPDhBKZOkofF2pfal6rDfFcHP?=
- =?us-ascii?Q?e2AHun0qfBTL0OKIX6EW4q6OPqfTd8SkkayMJQPPdg1/gjL/KuAqhPRKaJ5S?=
- =?us-ascii?Q?UCDULxKpnA8tao6H5nd8Kwxqidlyp1Zkc6WJuF2EXUYzULdKPEMghTeB/gK1?=
- =?us-ascii?Q?BQjnaXMSfNFQ/qwHo+NmnBiPIJDXl1CPVpIs/x32NvEk1cnTBBSO9ym+8n0K?=
- =?us-ascii?Q?7dbIZqFpwfc8NGffdJyLZtTsZ99AnW8F8bKAjJv4ZoGH0pyzxIVzO2BH30ID?=
- =?us-ascii?Q?6Bllz+LC3sKfPMlgTs+cedVl7z+vACrUz/bz0TWZqonSFa0hf6wXLNFgQPUs?=
- =?us-ascii?Q?0dcZtZtPOD5ukpOqdxBEfxySRu40OFLZFLfavDlTMRnVX6ENbbv2KxILv8ch?=
- =?us-ascii?Q?1OgQ2HABXz6ugSeWKVk0WqmnRm78l90tOGqD+UPs+FRPWHy9uoI62ONrzQ6b?=
- =?us-ascii?Q?86JQQuUAdn16CS0ZuaDzjK4oJ/TT6HFBO0tRmapy8EX1s1ZCUN/ZB3ef4FI3?=
- =?us-ascii?Q?7Iv67i+H+sNVUu1EG+v5mYYlteYzraUVg9nIr1l06owbxoUQ2j/YFRfhGIXq?=
- =?us-ascii?Q?FXgMd5c7P8bbI47B54rV3BDbBm209495/TlMQZLgOREv4p7vDi8xCbKL/SrD?=
- =?us-ascii?Q?hc2S5we2pnDflDbvTrYGKGYX1DSxD/KAiucyK//kd01Gah40ppIXS5AXe82q?=
- =?us-ascii?Q?wMtGAL2NaBstrTxjzw40yEJAmC2A7CIgVGL1cmx/fi7pyLT/MrIHojvcgtcV?=
- =?us-ascii?Q?kqvua7L8ALZQvruzKkI2LlfCoB4g5VAXC1A+NeDv2Mb4dAEi74Md5TdtsWQ6?=
- =?us-ascii?Q?0dl44RYwlDPKUd4h6EnArc+cjiHmKlNNvBlf6c9YPl9qIj6wLhrI2grlxzyy?=
- =?us-ascii?Q?GqBIXlmqtj68AMmY/4NZRWqApy+Xr75VK5tj3ZT7mrkf5T4GBFdQ97JNudpl?=
- =?us-ascii?Q?qBqqlMRcTOfC2QSqgh5wzBZ9uf4CebsaEE1VL6uYO55qtGpGWieQW9rfpIkd?=
- =?us-ascii?Q?nzVLNefOnmEnBf8SOC10jQyBnj0J3mD3QM58yLxrce8xbIO3ria6vE7Ba6oK?=
- =?us-ascii?Q?Z6EjsImtJu91EiN+RffCpI7pzbVEhLQry9pebDxV+6KQ15VbGmX0uTGao5mB?=
- =?us-ascii?Q?AJkAJCqW/K4LFiIVkBFo6/dIyMJMBnaJw8rcaengxulXoNFclU8yAHjufAyu?=
- =?us-ascii?Q?7CUZaLpKhEv/P7/DzH2taat3yVmyyUbS4cxndcRbfk/5Lw+UgECtnKDe5nCb?=
- =?us-ascii?Q?McvgVwFZ3WQrVz06KjzyJI5DoEsotdopL3DPjYLmIKK41QxPHDWDf43UGdH/?=
- =?us-ascii?Q?Lgv01W8scjXbmmV/WLTRZBE01RZwwgWnUgG79xH25p2fTUZilCl0FcO4HhP+?=
- =?us-ascii?Q?ji3HkXgovV97/gd/THiZJ6z7EX4F3+HdKDlFXSpnndMtTl9xROL5IeumM3Ha?=
- =?us-ascii?Q?KA=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?L02AZ+5GnyEWSNC0J0L1EAsHNcYrAVrm8p73F5lR/BwhtGSq/Fd7xkdQTX1r?=
+ =?us-ascii?Q?8oz8cFlDMkWKcngeg1uEL/YAo2/BV23qMxNHAtjDODApCfpsc+vJmy8cOhZm?=
+ =?us-ascii?Q?SpB1b+QizzuVFQ8fjrMC9H1DugYaNMTYHIpy+eFoc+hWAOOX1Us4A/9zdAZn?=
+ =?us-ascii?Q?XMw2PyXMKA9w8hqKMsqL7VEQ80bbdn57rgh5lxfIeFKeRIBvvhrRAn2KzC61?=
+ =?us-ascii?Q?/0MU2QfI7B7GskMRNlOfKns0+ltPHBxnLPJrvU+Unf2qNQchKqmXh9AQ/0sN?=
+ =?us-ascii?Q?t7PGg4gYKyUbkKfbEcE3okno6A16qX61jJy/rLtjiqgk8CxOu7ur1YAMQzB0?=
+ =?us-ascii?Q?6nngQZg7ULSHHQkcv5llOQkBlqrKMJRJMLkGR+4B/zF0hq5Bcx6vKEskIirg?=
+ =?us-ascii?Q?RaDP/QMXhruTNu2joyF7LBAtbARvFqucgfvbFZNHqsXW07WD3nx1o3FHQooz?=
+ =?us-ascii?Q?DgSBbS6S9ZQt5zMFGmeXSs5OBjA0k8YXP6KY9gKnMo55rReK+Zf0khUCBW0f?=
+ =?us-ascii?Q?I3Eccx0NS9gTio13JJMls/N7MqBuCBtKGRW09HRHKmJlly4q2U8R5vuY2OLp?=
+ =?us-ascii?Q?jx+iAaFgDaMyCJ6qmzjIvy+htwYte6hvX7ouYb9XCAxBXmUp5Hob1bx2KiU6?=
+ =?us-ascii?Q?5osFpvUASMNbw8/3eIiuufZbm5sBz80xQ7FSfNfi0SRscerCMhz78/hgmt46?=
+ =?us-ascii?Q?Xx1DwmvGPh/YQC/Z9PyK1dVoQ0Ag0xq+ggaDUh0i1BQoy2BMIFHunJJmCr4z?=
+ =?us-ascii?Q?FO/KTnahiRDOxru/3MBinm5GUgwgzgy81BECAI/prPCW2IRDxAEgTUfgsj8R?=
+ =?us-ascii?Q?3ytfJE2mRBzL/5OfzFtyuvJegOeomR5tfxglHcODj2iuI3V90zGdqCgLCivR?=
+ =?us-ascii?Q?pMZH3VzZB1UhzH5ulhGT6SHYTAlpxrXrn+pHc993v+mgklBl1CqefzxDhEow?=
+ =?us-ascii?Q?FqhXGOovPtc259Z8Xt1bl5EPUuvcijNsPVNthvXR0679GbSmFDUYD+yfZR+Y?=
+ =?us-ascii?Q?+H25kV/nXUw0dFTl5QpY1uDG4O222j7YeD7qmFh9VjC7oX4nWIYDQjoDwau9?=
+ =?us-ascii?Q?xlHO7JdMQozLwjU1vikX4S0tj1RkMvEAHkWCqsCAeP5UDty6di63VFU8WPKa?=
+ =?us-ascii?Q?n+WgoXXbcK342btPkbIvMR2YrwD9jgK2nYPD4jJFz4QCAduy9kqTzpzvnIln?=
+ =?us-ascii?Q?tZX+GFMZW2/TdmZpzhWm9H9cWIoaOyGKjS9aS6P5otsMfkSSwOZtwmsA3wdV?=
+ =?us-ascii?Q?vFAQ0rXlptjV/xGZZVsf19CcPxcAg7lk+g8G3iho8npKSMRb+Cvbecs+76k1?=
+ =?us-ascii?Q?NvBQu1K1KVl9uUdGdkEc/Ns9A31x3t5MTjfwqbMmR/88bD0A2n0S6tAPhMOk?=
+ =?us-ascii?Q?hv7u0q8mPsfma3UK4Yye4fNPwN4hRUENkCR+nt/eSdVQfYGxXQYYCW9otijU?=
+ =?us-ascii?Q?vko4RHSD8wKYEuKh+Qqmb4qyORg7oL4DWyW6D4I8tLFXNY6fkESR9b5q2MqD?=
+ =?us-ascii?Q?V+yZ6zEZkbzkha2wJUxJeF9XE7Dn39DezGO/rClEDGfkxiwNeP+xdJQZ4FGe?=
+ =?us-ascii?Q?kmVZaGAEHew8Ey/ARy8ULxDsbItTj2M2MIMaFT3jIBtrWgPSL+3AvNSAxZ5L?=
+ =?us-ascii?Q?Pg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e390e933-7c94-4484-c4de-08dba95d22c3
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5344.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 36cf3cc6-c31a-4ae3-01bc-08dba9595d52
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 13:29:28.5143
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 13:02:28.7438
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uPOuJNa2yeokSKMPHjKtgw2633ej+iniFem4ThtMImGf2O/Cigf6OXslPK1+1qcT+tlFa5VmPlxbPQAQOO0QUYnaxVLiwB4QWZA5As/8OlY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7334
+X-MS-Exchange-CrossTenant-UserPrincipalName: fzputod10REkoCLzNFMtITMPUEWRGzuQLADv7tapId67eTmkrzMHKWH2LGxoah7KoxnN6VG0X2MxauHV7WsaDw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9442
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Set scanned broadcast source device as nontemporary when broadcast
-sink synchronized with it
+This patch enables the ISO layer to set the encryption field of
+the broadcast QoS struct, according to a BIGInfo advertising report
+received after PA sync establishment.
 
-Silviu Florian Barbulescu (2):
-  For the audio LE broadcast, we need to set the device's temporary flag
-    even if the address is private.
-  Set the device temporarily false when sync is done with a broadcast
-    source so the device will not be removed on the temporary timer.
+This is useful for the broadcast sink scenario: the userspace
+opens a socket and starts listening for a PA sync connection.
+If the PA is associated with an encrypted BIG, the userspace
+needs to be informed.
 
- profiles/audio/bap.c |  5 +++++
- src/device.c         | 13 +++++++++++--
- 2 files changed, 16 insertions(+), 2 deletions(-)
+After PA sync has been successfully established and the first
+BIGInfo advertising report is received, a new hcon is added and
+notified to the ISO layer. The ISO layer sets the encryption
+field of the socket and hcon QoS according to the encryption
+parameter of the BIGInfo advertising report event.
+
+After that, the userspace is woken up, and the QoS of the new
+PA sync socket can be read, to inspect the encryption field
+and follow up accordingly.
+
+Iulia Tanasescu (1):
+  Bluetooth: ISO: Pass BIG encryption info through QoS
+
+ include/net/bluetooth/hci.h      |  3 ++
+ include/net/bluetooth/hci_core.h | 25 ++++++++++++++-
+ net/bluetooth/hci_conn.c         |  1 +
+ net/bluetooth/hci_event.c        | 54 +++++++++++++++++++++++---------
+ net/bluetooth/iso.c              | 19 ++++++++---
+ 5 files changed, 82 insertions(+), 20 deletions(-)
 
 
-base-commit: 670f0d0f618d3f122e6d95c34de53f59a343a15f
+base-commit: 75d095daab9fa1d299fa79ebc7ab5dfbead877ca
 -- 
 2.34.1
 
