@@ -2,128 +2,275 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE5CC83F29
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Aug 2023 18:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA815C83F25
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Aug 2023 18:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244202AbjH3SyE (ORCPT
+        id S245660AbjH3Sx4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Aug 2023 14:54:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56674 "EHLO
+        Wed, 30 Aug 2023 14:53:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245594AbjH3Pj1 (ORCPT
+        with ESMTP id S1343937AbjH3R2m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Aug 2023 11:39:27 -0400
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2043.outbound.protection.outlook.com [40.107.105.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 543CC132
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Aug 2023 08:39:24 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dw4GM/Kb6YrpIN83ahdrFdI5L3AHFYz7UwqtX2vO2MKPcXD0yXcmxRr2nbsSEstgtkTaBLTliLTvidIfT3zCwozq5k5SFkRoSZ9A6v0IPnWdNyHKZu1++he7K9M9xtyWLPFIXx2hsvUAY5Po/q+JGYlcpMC9RAi+TapYoIyoeXCvuzcktuacG/Q+7td7dmiA6AIMDroGnYcjhlWkNotSD+zcFRs+H5wvt++jFChej5GLYA1HjycMctK69ah6pjhczTQcE3EaBRBqI7mu2IhOkgnj0Mg6pkh8KsMPexwy1ZnXA4kBObuJGQC4dS0ZTPp8V2X531u3170sKJSS3lA2kQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XRw9DqH4/B278OIMRir43xNqbVjcHzrxoPUwU0L3oGM=;
- b=Z+T7QZD2yMGd/UJcIjQHOu5wH1ShOegpAQ0tJhB1UYI6GbwGEUJttBtHxjafrd22JLW8GQMV4HbKk7qq+e7pMs8rIH+3q7H41tiKBxlld1EO15vw+zMdWh6d7ixWJsv3OsovxueQjR9aG9hoa/Yltf1LiSnkU60mSxAR+ZBhg2yYrpaYJ7ii85lVxWagXZGFXwkJqoXjTiB02nB4JZUZy0O9qptqem+9prnnrvAYA9zVKoDizzL8e6Z5csLEbQKkb7vQH915rs2jBuddrxK63WE3gWgj8HMJftFgJSClk4xSKcCvMq/rVSrDQaeAqGbLOnEn7Th59DUcuWOyWhhguw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XRw9DqH4/B278OIMRir43xNqbVjcHzrxoPUwU0L3oGM=;
- b=MfjjmhZF4fO5uBFFenc7h+d8Hul0CKKybuLQv9Yy0N6cwUNXVx0OfsXlsDZDQBxQk1Zv63fCI4b70iILAxRFuWHOyemOb/cn/FP6nWH5QwFl0Q+BSC0HeO3fPg4EFArxk8Av1DKGgf37V6/hyVIjqZfd6U4nujJP7nURsauc8DE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by PR3PR04MB7481.eurprd04.prod.outlook.com (2603:10a6:102:87::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.20; Wed, 30 Aug
- 2023 15:39:21 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::6e75:56f3:fc37:277b]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::6e75:56f3:fc37:277b%7]) with mapi id 15.20.6699.035; Wed, 30 Aug 2023
- 15:39:20 +0000
-From:   Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
-        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
-        andrei.istodorescu@nxp.com,
-        Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH 0/1] Bluetooth: ISO: Fix master BIS cleanup
-Date:   Wed, 30 Aug 2023 18:38:39 +0300
-Message-Id: <20230830153840.518868-1-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0091.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:15::44) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+        Wed, 30 Aug 2023 13:28:42 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9030F193
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Aug 2023 10:28:38 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2bb9a063f26so1111211fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Aug 2023 10:28:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1693416517; x=1694021317; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e7Q6yLBWpq+0cHDNlXkrewgCyTyJH571bDs7gW4UFiI=;
+        b=XQ3L3A4jncKeDoosqNpkW6xQq2VqDlziQtYqiDwE781SudLe9zag9mmBsLKGHhLbVh
+         ZXxOksFP3wi4ofeFDwikssqB+WDTsfo506P9j/J87mf0NRupcusvrqx6CStn/hdoLhrX
+         8EZBmYx9LcAsOm2pLE3ohZsPgWHj19ovlSVVgI0qUuNe27E8LRUFXpu9zWEs1fQqt1Hp
+         w3biggwcnoVf5GduTTfLJmf+qq8+Ta3vBJR8BKi2RV48TyVRswT76+BegQzk6meTx+dZ
+         VisMaLoZ2E+MXlhYEQNCiWmsZYRXnRg1t/g8jIOgv+rl+O6wb7Be0WZ6omShD5mhiyP9
+         hX6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1693416517; x=1694021317;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e7Q6yLBWpq+0cHDNlXkrewgCyTyJH571bDs7gW4UFiI=;
+        b=cQCv9XUKsBAUS2cLx6zPAkNCesnJpDKoWeC0C9aDGPt5ldL/fNh5ELbLaqAAOhBNVp
+         lIpnwBrhYzSbMI5PjSea9IYLZo1KZbSb/rOnNxaJS5qE/gcnV9x36GfEcGjY5cIr8Iyj
+         T5A3Ep0fJdYFDXej1srjKzagRxgyJdezKC8BggdDe5RO39zbf5JbdRrFWigEnBVHrbfK
+         lXTzx9OK+VBlpZMsSUjmwlqXu35euDej2isNCynMNeEGJHy+woOSVDmklAhjzbSFmHIh
+         Ng6998Ju3jIjyRnXuV8FllhGhUsRuQhehnyJEOo4F6Yd5XcIJ/9YMHkMxWZy//UQC8ZR
+         ao3Q==
+X-Gm-Message-State: AOJu0Yz2bRqdLN6I4CKSA8TYDpPq14P1JoyLIQrC6dOeTfuWAcZQiaYC
+        8wT7RBYXSBju27KOlQPTOqnGemSzAeDLsAzmLR8=
+X-Google-Smtp-Source: AGHT+IEHENfxnJ7utzrHwU72Eldx3I/wFmAhJBiTlksgsJYsPSGG/SVz2t9KgZl0m9HD7zSrCTdESjAg2qzDi0FWm4g=
+X-Received: by 2002:a2e:8619:0:b0:2b7:31a:9d7c with SMTP id
+ a25-20020a2e8619000000b002b7031a9d7cmr2262356lji.33.1693416516483; Wed, 30
+ Aug 2023 10:28:36 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|PR3PR04MB7481:EE_
-X-MS-Office365-Filtering-Correlation-Id: faeeb23f-9779-44b6-14cc-08dba96f473d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MLfpWz9UYr17Lwvf4zg/uQwwWgixYt86N5Pwg24gL1XbOkpbyaSOLYNudeY6LdeWOtC2gXoilsTZfAVYo5guEl3ejr9lED1q1vPZo7IfeQPYKanstqcijtJHDdd4G2NGMPQbWVLjFuDxUYI3vEfc3Jp8IafdUx+oqM+8r5tInWoSU3n1z+oRyTXIRZjhv1nKg9nzxsf/61iCV4T8cw3qkKUVnx1EVuH553hOXxKhOER2nhgmbvlzDtU4V+h2b+nT7hSYd0e/JhIIn4tXrUs9Hiltbhil5ZLfB7MhcfvBvo4a/1EoXNm8sNGql24NXCjkkBDJbB3i4DzyKif9JkEekIElIXRRI+wrWn2cFqy3h8exyeVgAs8fL26nvuI0rtwgmZsfZlAlc1p5LuVlcp+T8qHJBnBiT/cJ/OLsNehCNRpCKkeGJS5NrPW7Kbvvcqa0mMmZRz8H8U/kz+2gR6X1QO0dObOJwBE89S+so8BBnXw0b0BOi9fAWk/JXO1Z/lEn4GrSGnhuW77HV7smbNZK/Ykv149Vjc29NGrqkE8Hlyz+hneYVYEF+mcwnEvScTKPFPZUXls/c3c1ZJ9QmKfOGBHiQ6w+5yKGLKX86x3rrG1NGBXq1C3Pn4M0IHpL/TBE
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(366004)(136003)(376002)(186009)(1800799009)(451199024)(6486002)(6666004)(6506007)(6512007)(36756003)(86362001)(38100700002)(38350700002)(1076003)(2616005)(4744005)(26005)(2906002)(52116002)(83380400001)(478600001)(8676002)(66946007)(66556008)(4326008)(8936002)(44832011)(41300700001)(5660300002)(66476007)(316002)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?lPNzHZ8HCkgsLjPdr0m+Kk9lMNNUTt19D6uFoGjXsiLclaG0VOCRJ6Pv84/t?=
- =?us-ascii?Q?7hxFdWG2ZqCnO5XvTm0i9uVafXpqETlai2gT7rC+U78N0AAvC9VVzZ6WQXUj?=
- =?us-ascii?Q?LWF6wEhkF6rwv9hAQQH0hrXU+y0AE1BDFRUXW6rG4unDu2pgBY6E+TynkPc4?=
- =?us-ascii?Q?Ot0LGcQCbnDmLZEYO0+0RLgCLiszyJ5nA6lf5zuJ5vC00qjyTOqqSUWg15ia?=
- =?us-ascii?Q?qp27LAsZltcKgsjWNTJHdei/G1uiJMVlWhYdvBsHEA3+cMCvBN/DiRsCl27D?=
- =?us-ascii?Q?dWu2coicPI3ynwXXv5k4DhqvvlIFd24VlVUhOl8zM3K2shmrl/73M+vRf8vt?=
- =?us-ascii?Q?zlMpwBuqwH8FxaI10cnxQF4OdrRlGNmEIQKa+H4PqzFAD3w2hPmzFKClx0ro?=
- =?us-ascii?Q?QOV0s/ag28LA2JBeHyTHAoeKuV7nWi+6WZtP3aKCYENUwjYir50UAegV/Mlp?=
- =?us-ascii?Q?PDxuO53nIK5VT2Aiw3e9SU7vgg5SyVRnZnxhES+JnY4nFZdXGZ6oerAQ7+8M?=
- =?us-ascii?Q?fEtbmAplPJdsr1vD5iVp/PkaqyD4aI9DArIGglEG1T0/NBWa0WSmktiKrSkA?=
- =?us-ascii?Q?v/yt6dPlzdWlNwYCuIjsWZ6Wr4AOrV+dr9ezCAHICjZ5IRlfAzVWUVN9Cx7j?=
- =?us-ascii?Q?J0DLxL+TzMM+Uy48rDbwR8QRHZb59a4Zy+0d7DHrSLOm1jq7S7nFXQQuNTOg?=
- =?us-ascii?Q?6vVCo4SQVPfUK4KrMmYRtmoAjctpkedK5L4kf5hKT4LQx2T0qj7EcxevIK9s?=
- =?us-ascii?Q?gNZxLNdt4zIombF+CXBOTy6l0ALuRt3Ijh2rZsjpUir4uNcl7vQkmqDFdf4Y?=
- =?us-ascii?Q?7q4OM0qjZAfHeREaTYbMm+MgNzPTw7cTQvFgjDoT18qBxbLHVCigzekSJ1gz?=
- =?us-ascii?Q?vbCe/h7tYrEol4Trsm3hdYFyI0vOxfzd12+VSRqs30Ib1NvVs+G7d+GIwxa+?=
- =?us-ascii?Q?eDqvIwenLBibHP9FWMDM5SPsg3WtDASarcgkFWL/qgY5RUvyRxH5NNoBaYvH?=
- =?us-ascii?Q?2Wzg3SeQjtHqVY8/VaPqeEGpPLnHoqw1Td08BNmRz4SkkruCqV+2s2p7qTiS?=
- =?us-ascii?Q?RS/DZveHezExJrhy7TPefND+YWp/42fNMVOO9zm5qtJq6Zg6G+atri53WrPB?=
- =?us-ascii?Q?kA4i6SWgv0opsaKyOL434SUGgJkgjdUdsrtyzRBMI2WdtH3i/c8l04BHc8zV?=
- =?us-ascii?Q?KRj3GGdyRGQEbWVLJBlTSC9j5xsHJdG2xWg2Bt1ZwrcGEtaLRZosgomjRsrb?=
- =?us-ascii?Q?MTq/sJdIE3ETsXlI4n5NiNM2M8/ZLeJWxRPEXK4zUkFImos8c2nHFL6vRCQp?=
- =?us-ascii?Q?QPSnQ/4hhuZAjfGlXMQpgekrdg5SFhTw/iCtZ0VmMVNR5ikn05a0jBfTJUan?=
- =?us-ascii?Q?XdvsBIlhUbjUYttDYpXNJ4WbkzwMZMYV/v+k8Ocq0dAYz/DOmgEauiAkmDPc?=
- =?us-ascii?Q?zVzSFCp7J7GvV0FiCDhnT9ASD5Kj2kwsSHGNnDUPPaWTxfwTvFEf8E589xlq?=
- =?us-ascii?Q?/hdP6QrsTkx8BQoVCcECPEULVh9UksH6nlqhEqTJvGAovc2NVzvdAg4Ktcxa?=
- =?us-ascii?Q?HuqfK0d+N5CWfcz29/gZ6yv7iHDRQXz3CvyXB1OJDXXvPoIher4YT982/Dmg?=
- =?us-ascii?Q?+g=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: faeeb23f-9779-44b6-14cc-08dba96f473d
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2023 15:39:20.5897
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dfoHd3dZ4slDjIBJjChT/1hjoqE6Y2KDM5r8lFcY94+aBvbs2XO89zd2BmIQpTrfxf43MTV1n/bMTlt4msb9uA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7481
+References: <20220727135834.294184-1-brian.gix@intel.com> <20220727135834.294184-3-brian.gix@intel.com>
+ <578e6d7afd676129decafba846a933f5@agner.ch> <CABBYNZJGKfwTQM8WAdUGXueTPnFyus1a65UO5mg2g4PXVuCnpA@mail.gmail.com>
+ <CABBYNZLgG+zTsk-6ceqzLXXyVRnN6p-m8sFq9Ss7mveD0f9BsQ@mail.gmail.com>
+ <CABUQxGxBdAFncJ6YVb7a9gnU-_YZDGFDmpHJTtm5K1tDGEGRDQ@mail.gmail.com>
+ <0de3f0d0d5eb6d83cfc8d90cbb2b1ba1@agner.ch> <fcdf856db8fd8e77558b4d82b843c51e@agner.ch>
+ <24bf25f7-314f-ca73-59e9-df757732f6a9@leemhuis.info> <ac58995a00cb6ad6bb4ce4c74b006a2f@agner.ch>
+ <CABBYNZ+5RMqNVMyYKi+gOVaV+K6k8Z-C37KnfGa=qRUORc3dWg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+5RMqNVMyYKi+gOVaV+K6k8Z-C37KnfGa=qRUORc3dWg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 30 Aug 2023 10:28:23 -0700
+Message-ID: <CABBYNZKoXd0+kLdD-FMz3UisrE03fzrt13Zk9-6+tWwuTsKF1g@mail.gmail.com>
+Subject: Re: [PATCH v4 2/4] Bluetooth: Rework le_scan_restart for hci_sync
+To:     Stefan Agner <stefan@agner.ch>
+Cc:     Linux regressions mailing list <regressions@lists.linux.dev>,
+        Brian Gix <brian.gix@gmail.com>,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        =?UTF-8?B?SmFuIMSMZXJtw6Fr?= <sairon@sairon.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the master BIS cleanup procedure - as opposed to CIS cleanup,
-no HCI disconnect command should be issued. A master BIS should only be
-terminated by disabling periodic and extended advertising, and terminating
-the BIG.
+Hi Stefan,
 
-Iulia Tanasescu (1):
-  Bluetooth: ISO: Fix master BIS cleanup
+On Tue, Aug 29, 2023 at 1:42=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Stefan, Brian,
+>
+> On Tue, Aug 29, 2023 at 6:27=E2=80=AFAM Stefan Agner <stefan@agner.ch> wr=
+ote:
+> >
+> > Hi Thorsten,
+> >
+> > No, this hasn't been addressed so far. I am also not sure how we can
+> > help solving that particular issue.
+> >
+> > Besides this, we have other Bluetooth issues which seem to be Kernel
+> > regressions (where downgrading to Linux 5.15 also helps), folks see
+> > "hci0: unexpected event for opcode" on Intel but also other systems. We
+> > haven't bisected that issue yet. But it seems that the Bluetooth stack
+> > is really somewhat unstable in recent releases.
+>
+>
+> I suspect the following change shall make it behave as before, the use
+> of hci_cmd_sync_queue is not equivalent to hci_req_sync:
+>
+> https://gist.github.com/Vudentz/b78f34e3775c8cd2db55b868e5c8ef42
+>
+> That said, I'm considering removing the whole custom handling for
+> HCI_QUIRK_STRICT_DUPLICATE_FILTER and just disable duplicate filtering
+> when this flag is set.
 
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_conn.c         |  1 +
- net/bluetooth/hci_sync.c         | 29 ++++++++++++++---------------
- 3 files changed, 17 insertions(+), 15 deletions(-)
+Any chance to tests the following changes:
+
+https://patchwork.kernel.org/project/bluetooth/patch/20230829205936.766544-=
+1-luiz.dentz@gmail.com/
+
+> > --
+> > Stefan
+> >
+> >
+> > On 2023-08-29 13:22, Linux regression tracking (Thorsten Leemhuis)
+> > wrote:
+> > > Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+> > > for once, to make this easily accessible to everyone.
+> > >
+> > > Stefan, was this regression ever addressed? Doesn't look like it from
+> > > here, but maybe I'm missing something.
+> > >
+> > > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' h=
+at)
+> > > --
+> > > Everything you wanna know about Linux kernel regression tracking:
+> > > https://linux-regtracking.leemhuis.info/about/#tldr
+> > > If I did something stupid, please tell me, as explained on that page.
+> > >
+> > > #regzbot poke
+> > >
+> > > On 30.06.23 12:59, Stefan Agner wrote:
+> > >> Hi Brian,
+> > >>
+> > >> Gentle ping on the issue below.
+> > >>
+> > >> On 2023-06-20 16:41, Stefan Agner wrote:
+> > >>> On 2023-06-16 03:22, Brian Gix wrote:
+> > >>>
+> > >>>> On Thu, Jun 15, 2023 at 11:28=E2=80=AFAM Luiz Augusto von Dentz <l=
+uiz.dentz@gmail.com> wrote:
+> > >>>>
+> > >>>>> +Brian Gix
+> > >>>>>
+> > >>>>> On Thu, Jun 15, 2023 at 10:27=E2=80=AFAM Luiz Augusto von Dentz
+> > >>>>> <luiz.dentz@gmail.com> wrote:
+> > >>>>>>
+> > >>>>>> Hi Stefan,
+> > >>>>>>
+> > >>>>>> On Thu, Jun 15, 2023 at 5:06=E2=80=AFAM Stefan Agner <stefan@agn=
+er.ch> wrote:
+> > >>>>>>>
+> > >>>>>>> Hi Brian, hi all,
+> > >>>>>>>
+> > >>>>>>> We experienced quite some Bluetooth issues after moving from Li=
+nux 5.15
+> > >>>>>>> to 6.1 on Home Assistant OS, especially on Intel NUC type syste=
+ms (which
+> > >>>>>>> is a popular choice in our community, so it might just be that)=
+. When
+> > >>>>>>> continuously scanning/listening for BLE packets, the packet flo=
+w
+> > >>>>>>> suddenly ends. Depending on which and how many devices (possibl=
+y also
+> > >>>>>>> other factors) within minutes or hours.
+> > >>>>>>>
+> > >>>>>>> Jan (in cc) was able to bisect the issue, and was able to pinpo=
+int the
+> > >>>>>>> problem to this change.
+> > >>>>>>>
+> > >>>>>>> Meanwhile I was able to confirm, that reverting this single com=
+mit on
+> > >>>>>>> the latest 6.1.34 seems to resolve the issue.
+> > >>>>>>>
+> > >>>>>>> I've reviewed the change and surrounding code, and one thing I'=
+ve
+> > >>>>>>> noticed is that the if statement to set cp.filter_dup in
+> > >>>>>>> hci_le_set_ext_scan_enable_sync and hci_le_set_scan_enable_sync=
+ are
+> > >>>>>>> different. Not sure if that needs to be the way it is, but my o=
+utside
+> > >>>>>>> gut feeling says hci_le_set_ext_scan_enable_sync should use "if=
+ (val &&
+> > >>>>>>> hci_dev_test_flag(hdev, HCI_MESH))" as well.
+> > >>>>>>>
+> > >>>>>>> However, that did not fix the problem (but maybe it is wrong
+> > >>>>>>> nonetheless?).
+> > >>>>>>>
+> > >>>>>>> Anyone has an idea what could be the problem here?
+> > >>>>>>
+> > >>>>>> Are there any logs of the problem? Does any HCI command fails or
+> > >>>>>> anything so that we can track down what could be wrong?
+> > >>>
+> > >>> No HCI command fails, there is also no issue reported in the kernel=
+ log.
+> > >>> BlueZ just stops receiving BLE packets, at least from certain devic=
+es.
+> > >>>
+> > >>>>>
+> > >>>>> @Brian Gix perhaps you have a better idea what is going wrong her=
+e?
+> > >>>>
+> > >>>> It seems unlikely that this is Mesh related. Mesh does need for fi=
+ltering to
+> > >>>> be FALSE, and Mesh does not use extended scanning in any case.
+> > >>>>
+> > >>>> But this was part of the final rewrite to retire the hci_req mecha=
+nism in
+> > >>>> favor of the hci_sync mechanism. So my best guess off the top of m=
+y head is
+> > >>>> that there was an unintended race condition that worked better tha=
+n the
+> > >>>> synchronous single-threading mechanism?  Filtering (or not) should=
+ not
+> > >>>
+> > >>> After review the code I concluded the same. What is a bit surprisin=
+g to
+> > >>> me is that it is so well reproducible. I guess it is nicer to have =
+a
+> > >>> reproducible one than a hard to reproduce one :)
+> > >>>
+> > >>>> prevent advertising packets from permanently wedging.  Does anyone=
+ have an
+> > >>>> HCI flow log with and without the offending patch?  Ideally they s=
+hould be
+> > >>>> identical...  If they are not then I obviously did something wrong=
+. As this
+> > >>>> was not specifically Mesh related, I may have missed some non-mesh=
+ corner
+> > >>>> cases.
+> > >>>
+> > >>>
+> > >>> I've taken two btmon captures, I created them using:
+> > >>> btmon -i hci0 -w /config/hcidump-hci-req-working.log
+> > >>>
+> > >>> You can find them at:
+> > >>> https://os-builds.home-assistant.io/hcidump-hci-req-working.log
+> > >>> https://os-builds.home-assistant.io/hcidump-hci-sync-non-working.lo=
+g
+> > >>
+> > >> Could you gain any insights from these logs?
+> > >>
+> > >> --
+> > >> Stefan
+> > >>
+> > >>
+> > >>>
+> > >>> This is while running our user space software (Home Assistant with
+> > >>> Bluetooth integration). Besides some BLE devices (e.g. Xioami Mi
+> > >>> Temperature & Humidity sensor) I have a ESP32 running which sends S=
+PAM
+> > >>> advertisements every 100ms (this accelerates the issue). In the
+> > >>> non-working case you'll see that the system doesn't receive any SPA=
+M
+> > >>> advertisements after around 27 seconds. The working log shows that =
+it
+> > >>> continuously receives the same packets (capture 120s).
+> > >>>
+> > >>> Hope this helps.
+> > >>>
+> > >>> --
+> > >>> Stefan
+> > >>>
+> > >>>
+> > >>
+> > >>
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
 
-base-commit: 75d095daab9fa1d299fa79ebc7ab5dfbead877ca
--- 
-2.34.1
 
+--=20
+Luiz Augusto von Dentz
