@@ -2,117 +2,100 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE3FC83F2F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Aug 2023 21:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7846AC83F2F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Aug 2023 21:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347488AbjHaVFO (ORCPT
+        id S1347488AbjHaVGG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Aug 2023 17:05:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47096 "EHLO
+        Thu, 31 Aug 2023 17:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244408AbjHaVFN (ORCPT
+        with ESMTP id S244408AbjHaVGG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Aug 2023 17:05:13 -0400
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5E7132
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Aug 2023 14:05:09 -0700 (PDT)
-Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2bcc4347d2dso22420951fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Aug 2023 14:05:09 -0700 (PDT)
+        Thu, 31 Aug 2023 17:06:06 -0400
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D03D6FF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Aug 2023 14:06:02 -0700 (PDT)
+Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-79545e141c7so479539f.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Aug 2023 14:06:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693515907; x=1694120707; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r3Ht40VKtWEeVqnpvoz8L3E4L30e+ozlxRYcmGDajcI=;
-        b=RzqWEXqrQATwdLGJveZOw3yRnXa/3PJOiEq0hImpKcUviqAxg8UGt9DBdp8jYAfkR9
-         P7ti/79Bthh1gPHc7NxEB/duef3Qf2woZiZI2lLrNSWnFMLt/UpsOZgNZuRzDAwFhNzW
-         wQV8hM0U2l0XLYrASP2+lYRkDAEN8Y8si9m1+pFEzwpoxslTHJnA1i1h4pMovK3+ls3A
-         Lx4MGpvtL4/DCW2ZM+3IRl7D6qm5waNxBCvs4u6hf9Pvb6ii0FnNO3CVlb7hmD8J02U9
-         BvKIjaNopxbp9U4pDjPezaMFFHMgvBGrh/TTc+d3YCpXApvO3R9bX8ftHA2GPHKwC3T4
-         cU+g==
+        d=gmail.com; s=20221208; t=1693515961; x=1694120761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=831ueawN1ZuY6C4hHW57A2awdydSD+F9hRNVyAv/uCo=;
+        b=NNIb9tDh0p1akxPV1i5JAC95RftN9dpDJrH7njcg0zuMPp62PQ88j8sFseAxxKRl/C
+         WCHV7E0PMOAi3LcNBsPFOKjqQKHVgc7bCbFqCY69czbbUr1nRwqqU5+yx9aTd83Ov/a7
+         XAmVMeO3V0+TuMJFjG8Gy/ymTfsSK2Ydp/DEqzn1Z+BgLMX4HEhn6ip/fSK92sagN028
+         +a70sT/A7cLB7CMmS/MksLuSpaXlxcTxVEOvJBIMX9AdERLwBAk+FiCmQLtYAs24aTUT
+         l6QHrnsNcrkJAPbRLZK7dB45r45UzqvZSq/+OEyhulvUMlos+6Bfrh42B3xLEa5wuYFi
+         CX5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693515907; x=1694120707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r3Ht40VKtWEeVqnpvoz8L3E4L30e+ozlxRYcmGDajcI=;
-        b=ANXChm7k0tnbR0GlmwFI1HvmCnWZzh1iJRF6q/VGlwk3o6CqutW31mVfLlXPWxQFip
-         Q3ONMFkpqF/1SBQwjUr9k550g/8Mw/z818oQvYhsHVNJPZ9dvggl8lMj2Lrp/QpZBFQl
-         T9T6glqrYEwUFiGxNQulUUSBhfi4U6QCyUWxXzbQRTWCcf34Jp5+/jAVPleBlpYu5/6I
-         cns5HaZafTANCNLztdOelvfqVR4297UR4GjGDTTvbeIrF+JBj0k+tyzxJFvPLouMN6b3
-         GKlZv7E48ndI0aIx2z8FSmS2N72WxP01Ksk3Pbs2drR+1HSZhlshuL4shru31fSpr8hY
-         Yytg==
-X-Gm-Message-State: AOJu0YzkM0tdoIn+r0J2LPvA7KlefF1HbT2/2sKgHgYPng79fxDGb4Wp
-        oljLGCWTgjnqc5uLfo4aC19vO35beder6q7tjNo=
-X-Google-Smtp-Source: AGHT+IGVTXoM99vlQcDWcK0E/2YkboDRo8HkVVrtW5VnAyhvaYy6X4vsUnD5CVqNCOYTT7czwoV6TpcVYzl1fo43ekA=
-X-Received: by 2002:a2e:8356:0:b0:2b9:f0b4:eaa1 with SMTP id
- l22-20020a2e8356000000b002b9f0b4eaa1mr266139ljh.16.1693515907233; Thu, 31 Aug
- 2023 14:05:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <09443d89e7486d890b346d47ebc5c6a8f5eb30af.1688323254.git.pav@iki.fi>
- <168858002504.7518.9584432839192702711.git-patchwork-notify@kernel.org>
-In-Reply-To: <168858002504.7518.9584432839192702711.git-patchwork-notify@kernel.org>
+        d=1e100.net; s=20221208; t=1693515961; x=1694120761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=831ueawN1ZuY6C4hHW57A2awdydSD+F9hRNVyAv/uCo=;
+        b=WHWBc9M3p1e+C4/blu2acf28937X65s4gng7utceyJiSiPeNrUA3e+xI67yVQnfw3D
+         lkx5dZIIp5WlXRPT2zQt02iFMjEUkC/Eb+FcTpiN68a9ARr5J2/Qi2rKc5NNXf0lOTtK
+         ybM5iIvshK1+XldGc/JmYz/FWzIiVO19O9qRwfR4JG+GMrsUYPScWlTR8s44gobVT01B
+         tA8zRJCAB6o9QQF2dzLPOqRHJB5vjOht9nieU+/ahkPtrhh7ppJc/Z6Az80b2hi0kRNH
+         rO5IXW2WgucSRIVJ59LCy5M19pb3lXIJoEHWgS9QzQ/iG29Ac3ealVqjm4y2bTPn1zLu
+         QMdw==
+X-Gm-Message-State: AOJu0YzBAHKa8Z9Tuz0qeJ8Z2HgkeO3m0CAxn/d0sRsKHRAVC/shL8Kv
+        sWu0RimQ1FdkNsgbN2ZCmqcP62e0nyI=
+X-Google-Smtp-Source: AGHT+IErC0gs3XJS41TyKnLcvxesi1KBDWmnHUzyBUMIMhGUz/138msLrVUpi1PYPFQptE5sKU1aPw==
+X-Received: by 2002:a6b:3b41:0:b0:794:e98c:30c9 with SMTP id i62-20020a6b3b41000000b00794e98c30c9mr2771983ioa.1.1693515961522;
+        Thu, 31 Aug 2023 14:06:01 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id eq10-20020a0566384e2a00b004290f6c15bfsm598184jab.145.2023.08.31.14.06.00
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Aug 2023 14:06:00 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 31 Aug 2023 14:04:55 -0700
-Message-ID: <CABBYNZ+7kcMqxMCH+VEJgk3x=37RU2Mchdxn3xFuU2uVp7nsqw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/2] shared/bap: detach io for source ASEs only
- after Stop Ready
-To:     patchwork-bot+bluetooth@kernel.org
-Cc:     Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] monitor: Fix runtime error
+Date:   Thu, 31 Aug 2023 14:05:54 -0700
+Message-ID: <20230831210554.1141646-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jul 5, 2023 at 11:18=E2=80=AFAM <patchwork-bot+bluetooth@kernel.org=
-> wrote:
->
-> Hello:
->
-> This series was applied to bluetooth/bluez.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
->
-> On Sun,  2 Jul 2023 21:43:04 +0300 you wrote:
-> > The Client may terminate a CIS when sink is in QOS and source in
-> > Disabling states (BAP v1.0.1 Sec 5.6.5).  It may also terminate it when
-> > Receiver Stop Ready has completed successfully (BAP v1.0.1 Sec 5.6.5.1)=
-.
-> >
-> > It appears Samsung Galaxy Buds2 Pro (R510XXUOAWA5) ignores the Receiver
-> > Stop Ready command if CIS is already disconnected, and then gets stuck
-> > in disabling state. It works if CIS is disconnected after Receiver Stop
-> > Ready.
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [BlueZ,v2,1/2] shared/bap: detach io for source ASEs only after Stop =
-Ready
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D7b10e72de6f4
->   - [BlueZ,v2,2/2] bap: wait for CIG to become configurable before recrea=
-ting CIS
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D8c3170190d6f
->
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
+This fixes the following runtime error:
 
-Looks like this one introduces a problem when using the emulator:
+monitor/packet.c:10476:2: runtime error: division by zero
+Floating point exception
+---
+ monitor/packet.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-https://gist.github.com/Vudentz/5c7ef940fc97b054227559dcd47b99f7?permalink_=
-comment_id=3D4677775#gistcomment-4677775
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 8eae8c9ea8fa..279f5408df42 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -10473,11 +10473,14 @@ static void packet_dequeue_tx(struct timeval *tv, uint16_t handle)
+ 
+ 	packet_latency_add(&conn->tx_l, &delta);
+ 
+-	print_field("#%zu: len %zu (%lld Kb/s)", frame->num, frame->len,
+-					frame->len * 8 / TV_MSEC(delta));
+-	print_field("Latency: %lld msec (%lld-%lld msec ~%lld msec)",
+-			TV_MSEC(delta), TV_MSEC(conn->tx_l.min),
+-			TV_MSEC(conn->tx_l.max), TV_MSEC(conn->tx_l.med));
++	if (TV_MSEC(delta)) {
++		print_field("#%zu: len %zu (%lld Kb/s)", frame->num, frame->len,
++				frame->len * 8 / TV_MSEC(delta));
++		print_field("Latency: %lld msec (%lld-%lld msec ~%lld msec)",
++				TV_MSEC(delta), TV_MSEC(conn->tx_l.min),
++				TV_MSEC(conn->tx_l.max),
++				TV_MSEC(conn->tx_l.med));
++	}
+ 
+ 	l2cap_dequeue_frame(&delta, conn);
+ 
+-- 
+2.41.0
 
-If I try to release then acquire then it won't trigger recreate logic,
-I suspect this is due to bap_io_disconnected being called ahead of
-states changes.
-
->
->
-
-
---=20
-Luiz Augusto von Dentz
