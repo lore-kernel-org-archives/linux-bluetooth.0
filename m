@@ -2,78 +2,81 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72344CA0FEB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Sep 2023 16:54:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7A0CA0FEC
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Sep 2023 17:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347850AbjIAQyQ (ORCPT
+        id S1350416AbjIARJz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Sep 2023 12:54:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
+        Fri, 1 Sep 2023 13:09:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230254AbjIAQyP (ORCPT
+        with ESMTP id S1350413AbjIARJy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Sep 2023 12:54:15 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58BD10F2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Sep 2023 09:54:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 05E41CE23D0
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Sep 2023 16:54:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 461DEC433CA;
-        Fri,  1 Sep 2023 16:54:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693587249;
-        bh=1uhn045Asw/dwlHsF6da/DbQtayP2JxEiy0KNdBXlaU=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=m1iLC/nHdGLDXu709saSphjWjq3UuzOjRuU1emecerK2uYkMD5KMFG/DVHqWNPKJH
-         foSmrfcfDFo2pu6JyAe/SjmkNdurbunxe1Icwb0kg5+ZEVt/dsoTh4ibOJYxXKRmMO
-         jEpkr/L27Q1zzk3TRlmMCyGL96fgkbBQcdcKWTwTd/AKJfLyX6/0r0LGS3BtWzuVx9
-         xRU4Yzz1DqZ4yoUYfu6VxmVDwUxuzJfhlNIRUuZ1wVSOuoa/NQzRbgzwi5ZLLp354v
-         LjVsxTZs3MmI3fFDbEW3hPyunnbCMPqyHqPNCMgjARkOhb/qC82Q/SR/8RNA5Le6HW
-         KQjjrq0R2/25Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 273ACE29F3C;
-        Fri,  1 Sep 2023 16:54:09 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] monitor: Fix runtime error
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169358724913.14770.14016822461438109038.git-patchwork-notify@kernel.org>
-Date:   Fri, 01 Sep 2023 16:54:09 +0000
-References: <20230831210554.1141646-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230831210554.1141646-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Fri, 1 Sep 2023 13:09:54 -0400
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3357010FE
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Sep 2023 10:09:34 -0700 (PDT)
+Received: from github.com (hubbernetes-node-20d75b3.ac4-iad.github.net [10.52.12.44])
+        by smtp.github.com (Postfix) with ESMTPA id 69BE11E06B0
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Sep 2023 10:09:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1693588173;
+        bh=vw5THHqGjue83LAx+rx+cSFPlNywW4C0EoS+2JGUUG8=;
+        h=Date:From:To:Subject:From;
+        b=W8ErkeHYRP1oX8CvH1+FD+Ad/7H/xcIgbLKNfLYSa1KPFrqAadozfxDa5oi7HULLa
+         Gw/ypBNIhvnSmRBTUM7R6IEIrFTeN1B2wjYep/F8JQRgRcbrLViSh6k8RSBzcmvGZ2
+         MyxhLML8ylPptvEVteV5ghdH43PO8KeS+cSj2WpY=
+Date:   Fri, 01 Sep 2023 10:09:33 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/530afa-d06b91@github.com>
+Subject: [bluez/bluez] c7fd93: monitor: Fix runtime error
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c7fd9310b925e2399be4e0e5fa23be5295b02d7e
+      https://github.com/bluez/bluez/commit/c7fd9310b925e2399be4e0e5fa23be5295b02d7e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-08-31 (Thu, 31 Aug 2023)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M monitor/packet.c
 
-On Thu, 31 Aug 2023 14:05:54 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes the following runtime error:
-> 
-> monitor/packet.c:10476:2: runtime error: division by zero
-> Floating point exception
-> 
-> [...]
+  Log Message:
+  -----------
+  monitor: Fix runtime error
 
-Here is the summary with links:
-  - [BlueZ] monitor: Fix runtime error
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c7fd9310b925
+This fixes the following runtime error:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+monitor/packet.c:10476:2: runtime error: division by zero
+Floating point exception
 
 
+  Commit: d06b912df5abbf1cc046389c36726edd28b373d3
+      https://github.com/bluez/bluez/commit/d06b912df5abbf1cc046389c36726edd28b373d3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-09-01 (Fri, 01 Sep 2023)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Fix not always calling bap_io_close on disconnect
+
+bap_io_disconnected was getting registered for all links while
+connecting which prevented bap_io_close to be called when ISO socket is
+disconnected thus the cig_active flag will remain set preventing the IO
+to be recreated.
+
+
+Compare: https://github.com/bluez/bluez/compare/530afa43ec29...d06b912df5ab
