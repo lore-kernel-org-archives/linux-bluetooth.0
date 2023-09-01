@@ -2,101 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFB5CA0FE1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Aug 2023 23:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0444BCA0FE6
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Sep 2023 08:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241061AbjHaXRY (ORCPT
+        id S1347211AbjIAIvF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Aug 2023 19:17:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
+        Fri, 1 Sep 2023 04:51:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230143AbjHaXRX (ORCPT
+        with ESMTP id S1345982AbjIAIvE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Aug 2023 19:17:23 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE8FE8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Aug 2023 16:17:21 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id 6a1803df08f44-64b8e1c739aso7780356d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Aug 2023 16:17:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693523840; x=1694128640; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hNcKnC/c30dRtjRVay40yApJqOA0fLNJAZkx9ByIjdo=;
-        b=QNcN8bsHXd/CS9dvVCwf5XwjEoxux5O/aqwHtDVKOP+OEsHoixQMs25Dnzafx1TUR/
-         N1uSkoEm4wWks0CfqJFbL5CoZ8XI9Idr/Bzkyh1sBE39VtTKK5RnJVNZtGM4yVgndsj6
-         JxTJiSBeiKdQtoI09ZgKIU/Cgll/inQZKVuTPhRswB+vzfT1AsJhORcLnOUJCEwBRjUd
-         zbMo0CfcWH9ijJHmfHxVebXVzx8Yj9Pki17ZkZHtfiwPxCildLqThnMtdGp2JmgUJa0X
-         fXmjGFdROXxtdglDJAchhnnZAzaJHeFeUncx1drZIa2UW2JZ1FRwv9Kmz2xhOIqmiUYw
-         ufxA==
+        Fri, 1 Sep 2023 04:51:04 -0400
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674E010D7
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Sep 2023 01:51:00 -0700 (PDT)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1bf78ff0745so20263135ad.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Sep 2023 01:51:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693523840; x=1694128640;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hNcKnC/c30dRtjRVay40yApJqOA0fLNJAZkx9ByIjdo=;
-        b=G2HPQSkwdGrSsHzEOuWGa07ppQAJvUgNbfO/JWMuUc1KqNgi2tvRj2sd7FkQm9m4P/
-         d4eXrHublQImspMhcTnXNinTDhjqA64Cp31Ljr5OULsn5R87/sMd9KrdBq3ZVmDhuCJM
-         RvuBLwnwM0bAFkj8kEeTd1ryD2zx8qG+hLaXVibCI2MH4y1gR4PbJ3xQ0Pc7uffz2g0J
-         sSwhpEMhH5qr5zPr5Nx++osasb5B8WuWKPHA384Ifn0EJbGw4ri1/Vhxl2CyH3bPPOvg
-         YpEAwGQSOC+4q3d+jFLdMUYwqh4yMTjN/HGUaikdAjOG8zPRGb40ni18OT56Gq9JSMHr
-         3jIg==
-X-Gm-Message-State: AOJu0Yz/D4nCRQezxpKRxyceU4AQ6iMjwB7m916m0AQb0SW6ciiyYtQ1
-        xWkOthlmQwmFogEbvaNNk+5147B/qFw=
-X-Google-Smtp-Source: AGHT+IGZDZKSEdfe0YJ8Ay5dCUJS/0BHlRRcndWFXdR0PoSjhZh0zic65QTh/4RqYwXNJb32HHDJ+A==
-X-Received: by 2002:a0c:da0d:0:b0:651:7fa7:b85c with SMTP id x13-20020a0cda0d000000b006517fa7b85cmr768568qvj.42.1693523840221;
-        Thu, 31 Aug 2023 16:17:20 -0700 (PDT)
-Received: from [172.17.0.2] ([172.177.65.70])
-        by smtp.gmail.com with ESMTPSA id t10-20020a0cde0a000000b0062de51d8a12sm976215qvk.26.2023.08.31.16.17.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Aug 2023 16:17:19 -0700 (PDT)
-Message-ID: <64f11f7f.0c0a0220.bac98.335a@mx.google.com>
-Date:   Thu, 31 Aug 2023 16:17:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2848214048872593722=="
+        d=1e100.net; s=20221208; t=1693558260; x=1694163060;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1JPBrIi1YcL7e89Gl1EkswK53QZiuLZ5XXe0Xsa1kO4=;
+        b=R+BoPwSdTek/82aGIK7aMDimLf2SYXO1ZejDby4KkRkQH6K6H/ouDOibf3rjLgIkqL
+         O//bEETY4ygZdpAJyoii4GHtDqthp2uPUCbLxPlZO+xybW5qBsB9FOrhvRGkXnjyQZn4
+         pTZ5+Z/Enk95B1doQFV6dYaYn4vrL+k9PQmtPfOb+AZZc0Q3U2J1SLjeWQKcfnEXVlYV
+         0vhAkm/W4D+AKfo8yRo+ilHlrS7YBcNZR9vwBvJur8P6uXLWCOL150/Q85ydR8BOrgrN
+         nK8CabVEKzKafbVSvOG53UiZBmsDctbz5nMOBEjTOjmGB7lwEGFB2RtV+pZCoeyD4jxf
+         sfdA==
+X-Gm-Message-State: AOJu0YwvyL91aWbCc0bCOeeR6kQTxbvzagbZ9VSsLtyHrWq3Ir/L4nPl
+        EGvOZxfbcRIqOOwlkG/oNeaXnG9Q4J+PbPmKM5gMhvbtRWoJ
+X-Google-Smtp-Source: AGHT+IGdMvUwSFkgk8ztcqPBglfZ1o2YcdWxhLDfDrX8aHtAkIJ0r/BBQ2jHGmSJQyONLVqUzaIwY9d05O5hFpXpEbRAURtzXVdx
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] bap: Fix not always calling bap_io_close on disconnect
-In-Reply-To: <20230831220137.1164891-1-luiz.dentz@gmail.com>
-References: <20230831220137.1164891-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a17:902:dad2:b0:1c3:19d6:3585 with SMTP id
+ q18-20020a170902dad200b001c319d63585mr214822plx.13.1693558259958; Fri, 01 Sep
+ 2023 01:50:59 -0700 (PDT)
+Date:   Fri, 01 Sep 2023 01:50:59 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007dc85106044842d8@google.com>
+Subject: [syzbot] Monthly bluetooth report (Sep 2023)
+From:   syzbot <syzbot+list89977501de2dccb36fe7@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2848214048872593722==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello bluetooth maintainers/developers,
 
-This is automated email and please do not reply to this email!
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-Dear submitter,
+During the period, 2 new issues were detected and 1 were fixed.
+In total, 20 issues are still open and 55 have been fixed so far.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=780965
+Some of the still happening issues:
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.35 seconds
-BuildEll                      PASS      27.49 seconds
-BluezMake                     PASS      1016.78 seconds
-MakeCheck                     PASS      12.13 seconds
-MakeDistcheck                 PASS      161.16 seconds
-CheckValgrind                 PASS      261.19 seconds
-CheckSmatch                   PASS      347.49 seconds
-bluezmakeextell               PASS      105.31 seconds
-IncrementalBuild              PASS      849.83 seconds
-ScanBuild                     PASS      1090.50 seconds
-
-
+Ref  Crashes Repro Title
+<1>  8940    Yes   possible deadlock in rfcomm_sk_state_change
+                   https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+<2>  4685    Yes   WARNING in hci_conn_timeout
+                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
+<3>  2847    Yes   possible deadlock in rfcomm_dlc_exists
+                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+<4>  1418    Yes   BUG: sleeping function called from invalid context in hci_cmd_sync_submit
+                   https://syzkaller.appspot.com/bug?extid=e7be5be00de0c3c2d782
+<5>  1064    Yes   INFO: task can't die in __lock_sock
+                   https://syzkaller.appspot.com/bug?extid=7d51f807c81b190a127d
+<6>  224     Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<7>  90      No    possible deadlock in hci_unregister_dev
+                   https://syzkaller.appspot.com/bug?extid=c933391d8e4089f1f53e
+<8>  65      Yes   KASAN: slab-use-after-free Read in hci_send_acl
+                   https://syzkaller.appspot.com/bug?extid=a0c80b06ae2cb8895bc4
+<9>  57      No    possible deadlock in discov_off
+                   https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
+<10> 8       Yes   BUG: sleeping function called from invalid context in __hci_cmd_sync_sk
+                   https://syzkaller.appspot.com/bug?extid=c715e1bd8dfbcb1ab176
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
---===============2848214048872593722==--
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
