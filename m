@@ -2,82 +2,65 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1183DCA0FFE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Sep 2023 16:22:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF13CA0FFC
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Sep 2023 16:22:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243264AbjIEQWq (ORCPT
+        id S239423AbjIEQWm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Sep 2023 12:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48106 "EHLO
+        Tue, 5 Sep 2023 12:22:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343981AbjIEDJ3 (ORCPT
+        with ESMTP id S1353833AbjIEIUl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Sep 2023 23:09:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 583B6CC6
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 20:09:26 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AC8A8B80DB0
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Sep 2023 03:09:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5ADB7C433C7
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Sep 2023 03:09:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1693883363;
-        bh=f/BhjgDPZdA7li+4CRomGleUFCGMgrhtLqQzbJw0ChQ=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=cgOFXORF/KeUZHqb/8wMUT2H0uJEoXYHeLv+0G6zocbqchlrGlhYrBmwHHk69SkYH
-         u1mH8ioaEnvbuxqcK7wkBv0Xig7MUn229n4Nm07R2MDEY+TsaImQqY0/kn7e8nAPfV
-         2Dy5j8Q3xPyidnAVEQ5HF3/rnFILnUarU3QtcOIjcBorYUlVNOlJVRDtlUT70eWECb
-         CasVAwKsZvN4u+2Vr/KE+Mfd5OwzbO9d/5LDH0euGt1NAO+OB1rnNyYKa3WNJhseFu
-         RNbRjVgH9SXpd9F0LfU7y4MBimqOCobZzBYdeAdWFd9M6ZVKeDPjPUu4T868qwt+hA
-         Enak8l6Safi3g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 4B879C4332E; Tue,  5 Sep 2023 03:09:23 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217870] ATS2851 chipset for Baseus BA07 Bluetooth does not
- connect, no bluetooth device connects, adapter does not turn on
-Date:   Tue, 05 Sep 2023 03:09:23 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mg-tatangelo@hotmail.com.br
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-217870-62941-pilEKhCfx7@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217870-62941@https.bugzilla.kernel.org/>
-References: <bug-217870-62941@https.bugzilla.kernel.org/>
+        Tue, 5 Sep 2023 04:20:41 -0400
+X-Greylist: delayed 86464 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Sep 2023 01:20:38 PDT
+Received: from mail.equinoxrise.pl (mail.equinoxrise.pl [217.61.112.157])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23B81AE
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Sep 2023 01:20:38 -0700 (PDT)
+Received: by mail.equinoxrise.pl (Postfix, from userid 1002)
+        id 5DE24835FD; Mon,  4 Sep 2023 09:41:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=equinoxrise.pl;
+        s=mail; t=1693813323;
+        bh=v6OgBfK5dN7P5dQ0wCu59rOfZaiqziJeLNblJ8dOcGI=;
+        h=Date:From:To:Subject:From;
+        b=IvK8EA5uQpMEvpEyJ9sKDVcGy2ODmaYRBZGXtRJi9K5JZD/jvZ+o/KmbeRdIas4+/
+         Nkya//Jc+EDf6EE2UYpcxI1YbgTcOBETjcTI+dxkjxmj7bL5E5UTfzy7V26XbPsGYa
+         yGHBK4hb5HsTYcntndzgKj7Lh2AJfSb1j/9OevpGgpM5kQpwK/4C8PccpkETMJ1Lca
+         ZUKKa1walY3ckRGoaP1B7z65x7pECDgt/oNF9KayUQ5do9x6L2tNOt9AIQGudJyxfw
+         3Esdf8LzTMxdBHRNh4H+Ewq7zCgDZOc4EA2RkjweCZQqytbzGl4ceSzXpCFz4hQ1PF
+         zQQj/+YGMvVEg==
+Received: by mail.equinoxrise.pl for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 07:40:34 GMT
+Message-ID: <20230904084500-0.1.7.roa.0.sx5ibda0h5@equinoxrise.pl>
+Date:   Mon,  4 Sep 2023 07:40:34 GMT
+From:   "Mateusz Talaga" <mateusz.talaga@equinoxrise.pl>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: Prezentacja
+X-Mailer: mail.equinoxrise.pl
+MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217870
+Dzie=C5=84 dobry!
 
-mg-tatangelo@hotmail.com.br (mg-tatangelo@hotmail.com.br) changed:
+Czy m=C3=B3g=C5=82bym przedstawi=C4=87 rozwi=C4=85zanie, kt=C3=B3re umo=C5=
+=BCliwia monitoring ka=C5=BCdego auta w czasie rzeczywistym w tym jego po=
+zycj=C4=99, zu=C5=BCycie paliwa i przebieg?
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|                            |5.16
+Dodatkowo nasze narz=C4=99dzie minimalizuje koszty utrzymania samochod=C3=
+=B3w, skraca czas przejazd=C3=B3w, a tak=C5=BCe tworzenie planu tras czy =
+dostaw.
 
---=20
-You may reply to this email to add a comment.
+Z naszej wiedzy i do=C5=9Bwiadczenia korzysta ju=C5=BC ponad 49 tys. Klie=
+nt=C3=B3w. Monitorujemy 809 000 pojazd=C3=B3w na ca=C5=82ym =C5=9Bwiecie,=
+ co jest nasz=C4=85 najlepsz=C4=85 wizyt=C3=B3wk=C4=85.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Bardzo prosz=C4=99 o e-maila zwrotnego, je=C5=9Bli mogliby=C5=9Bmy wsp=C3=
+=B3lnie om=C3=B3wi=C4=87 potencja=C5=82 wykorzystania takiego rozwi=C4=85=
+zania w Pa=C5=84stwa firmie.
+
+
+Pozdrawiam
+Mateusz Talaga
