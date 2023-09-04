@@ -2,64 +2,64 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C9CEC71153
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Sep 2023 22:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A661C83F33
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Sep 2023 22:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240466AbjIDWML (ORCPT
+        id S240582AbjIDWMM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Sep 2023 18:12:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37350 "EHLO
+        Mon, 4 Sep 2023 18:12:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240531AbjIDWMJ (ORCPT
+        with ESMTP id S240559AbjIDWMK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Sep 2023 18:12:09 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67A97A9
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 15:12:05 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-501be2d45e0so30366e87.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Sep 2023 15:12:05 -0700 (PDT)
+        Mon, 4 Sep 2023 18:12:10 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62CDBCDE
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 15:12:06 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-99bcf2de59cso277303766b.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Sep 2023 15:12:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mind.be; s=google; t=1693865523; x=1694470323; darn=vger.kernel.org;
+        d=mind.be; s=google; t=1693865525; x=1694470325; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wYo3dq3VK96vstXSFrFSQooJJuj3c4z/z/PjKdvJaEQ=;
-        b=MN6ABb25xKNcMu+0lza8J4u3BdgeBRaC6sdDtvbB7FUsImIIE0/i0ViJbF+mCRdWVo
-         Aho8Wqyu2bu84/YAxrGDoEN8bw7QvJCJff/NlIPncWrRtC9s06+oxMk2hCj6lsWko4Jm
-         pyw58+i6d7OisLTkm9uR0ulyl+ws+HT0p7sn4zPRdBu83KgTQBIRdUWuDtaC0VtZzetK
-         hr82Fm42ytbQq1ixRVphE6NFtz6271n2QxnCU6NlrhxVi0zHXtGnEB96fB2jwcM9lFVq
-         S8/VP+7yFjXZxyzL1ECCRFfXZvGMKPc/hm4PfAVQZxtIK9g6uR9dPhhQbtzWAJSmycH2
-         Iz6g==
+        bh=7D6jDdghy5xf6pMbgp+7uQJ09JEXfvhk/SVi6T9v3Ek=;
+        b=WsoowIIwsTH6gDRPIEkDlBzfhAef6vHyYooPMNQ0/R7UHg4NZ3ymFQHYAF5qH6nN5k
+         RMzOn18PqoR46Z5HBTFhZwZHEwfgye1gkuDaY5TdiTCBOR5/hueQ/nFQc96gILOg/+BE
+         J/ziIi0f4S8Y/OLPHCiTngez4jqK/prKEx1c12G9LbFLk6k9s6avb4sJu/HB9afb6NfL
+         rV48703CDaOAR6Z5etb7v2QeVvD+Zfi2xle3cHwOSUI6HKA9QzHw+TebZab6arybPAoj
+         Vp1VlVPQ+imypGgoZy4mXU1KcJO2AV0tne/ixYIuteRXYBiOJOEV8SVteFSBiOiifDB9
+         DvsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693865523; x=1694470323;
+        d=1e100.net; s=20221208; t=1693865525; x=1694470325;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wYo3dq3VK96vstXSFrFSQooJJuj3c4z/z/PjKdvJaEQ=;
-        b=iszIZ00gDqrcIxqe8QYUWY/t+74Vdbbyv0qFIKfDySrc9uWBxQ0A4hvxbo73LTEQyI
-         LsVO+U1XPN7nQRagTWhfajp+K74xwM3qJcBOYkzYZYvZ0J8d+u74LVd4n6vYQMnr+lFX
-         IwrICwlwKzTCU6mE9TdoTWUIL0jIjSs9hdm6OxM+wmVtaas8mBWDVyQsvVREN/RhVIHt
-         j3IBZY8U9mC/azpBwVLrRT+O2a8V7+g++dyX8xwYMY8sZZ0mtewUPOcKaRhqJDQ+dM16
-         Dy4C79vzaOhdqA1G4rPXGYHYgdCmrIL/R+YIkWfbKkyYoU9nnrGvs4wWgZlhVAiUNHvd
-         B4Ng==
-X-Gm-Message-State: AOJu0Yy8xQhGid3whdycg45WMFIMoTHpAQU544XM8/OjGPqfy0LJ299/
-        GYb5M50FC3VpGtyMI6goYhlH3g==
-X-Google-Smtp-Source: AGHT+IGWpcMIj9ryFTm84vfGakvVZw7X7Rz6JS5V+2fQaa3kiE//kN9E1jcd5aVC4tZ5XaUUqKgwTQ==
-X-Received: by 2002:a05:6512:2114:b0:4fd:d213:dfd4 with SMTP id q20-20020a056512211400b004fdd213dfd4mr6872963lfr.20.1693865523609;
-        Mon, 04 Sep 2023 15:12:03 -0700 (PDT)
+        bh=7D6jDdghy5xf6pMbgp+7uQJ09JEXfvhk/SVi6T9v3Ek=;
+        b=QxaBH2cWzIP/dQChuiUkr95ca0BCYV46IMBGc0C3On4todXl+ei3FRfB67kAGZTDlN
+         6NNiKf6Q2kz7OJbtULx+D90VHelzWeE4NOtmFrGxSpf6RyIH8QesVCz/maPnptiW5fC7
+         ZkEHUxHQJbMnO7CKDc9/yQns37OzZFmvfCyfuYItePlHxzVJImG0MOJMFP1Gm/M+yzpe
+         JwTQYbpk0TKOaKa9Q/NoyX/IB9mwFvqstZoBeaeV3X13j1yzai0hQAyoDlTo5P3lXlti
+         iS9Y4T7rBYFhltYfWDOG0WEfPvzFlk2bzvtjTdSA6OvShG4xg7WFj1rHIe1GfxOhAy3q
+         lpng==
+X-Gm-Message-State: AOJu0YxQK2IpjxYZXzCBJ7Luzq7MMS/cGP1z9sB1loS0sAMWc/p55Mls
+        SvZt/q27MfhK5ARj0HgTwtv87Q==
+X-Google-Smtp-Source: AGHT+IFL5FtEPkDGuZTZWB/Nd8VBwJtn8Tyx+gwnrjOR4xJEYJCQ0t5YGJjf7AMvoxlFwcyUvL3I4A==
+X-Received: by 2002:a17:906:3149:b0:9a5:cade:8044 with SMTP id e9-20020a170906314900b009a5cade8044mr7760863eje.21.1693865524929;
+        Mon, 04 Sep 2023 15:12:04 -0700 (PDT)
 Received: from olheureu-ThinkPad-E560.local.ess-mail.com ([2a02:578:85b9:1300:6c89:e61f:b837:7d81])
         by smtp.gmail.com with ESMTPSA id z16-20020a170906715000b00993cc1242d4sm6692673ejj.151.2023.09.04.15.12.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 15:12:03 -0700 (PDT)
+        Mon, 04 Sep 2023 15:12:04 -0700 (PDT)
 From:   Olivier L'Heureux <olivier.lheureux@mind.be>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org,
         Olivier L'Heureux <olivier.lheureux@mind.be>
-Subject: [PATCH 5/7] Bluetooth: introduce hci_conn_free() for better structure
-Date:   Tue,  5 Sep 2023 00:11:56 +0200
-Message-Id: <20230904221158.35425-6-olivier.lheureux@mind.be>
+Subject: [PATCH 6/7] Bluetooth: L2CAP: inc refcount if reuse struct l2cap_conn
+Date:   Tue,  5 Sep 2023 00:11:57 +0200
+Message-Id: <20230904221158.35425-7-olivier.lheureux@mind.be>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230904221158.35425-1-olivier.lheureux@mind.be>
 References: <20230904221158.35425-1-olivier.lheureux@mind.be>
@@ -69,97 +69,93 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The bluetooth subsystem uses different sources for different layers or
-objects. In particular, the "hci_conn.c" source regroups the handling
-of the "struct hci_conn" objects, amongst other things. "hci_conn.c"
-contains "hci_conn_add()" to allocate the "struct hci_conn",
-"hci_conn_del()" to delete them etc.
+Now that the "struct l2cap_conn" memory leak [1] is fixed, we observe
+use-after-free errors.
 
-One function is lacking: a "hci_conn_free()" to free the "struct
-hci_conn". The "kfree()" is in the "bt_link_release()" [1], in
-"hci_sysfs.c". "bt_link_release()" is the callback called when
-the "struct device" reference count reaches 0. It makes sense that
-"bt_link_release()" is in "hci_sysfs.c", with the other functions
-related to "struct device" and sysfs, but to respect the structure of
-the bluetooth subsystem, "bt_link_release()" should not directly call
-"kfree()" on the "struct hci_conn" object. It should call a freeing
-function located in "hci_conn.c", so that "hci_conn.c" contains both
-the allocation and free of "struct hci_conn" objects.
+Arnout Vandecappelle has found the root cause: the
 
-This improved structure becomes necessary if we want to do more than
-just calling "kfree()" in "bt_link_release()". We want to access the
-"struct l2cap_conn" associated to the "struct hci_conn", we can do
-this in "hci_conn.c", which includes "l2cap.h", while we can't do this
-in "hci_sysfs.c", for which "struct l2cap_conn" is opaque.
+    if (conn)
+            return conn;
 
-For those structural reasons:
+at the beginning of "l2cap_conn_add()". It reuses an existing "struct
+l2cap_conn *" instead of allocating a new one.
 
- 1. We create a new "hci_conn_free()" function in "hci_conn.c", whose
-    purpose is to free the "struct hci_conn".
- 2. We export it by declaring it in
-    "include/net/bluetooth/hci_core.h".
- 3. Instead of freeing the "struct hci_conn" in "bt_link_release()",
-    we call "hci_conn_free()" where we have moved the content of
-    "bt_link_release()".
+But there is an incoherence in the reference counting:
+
+ 1. In the normal case (no reuse), "l2cap_conn_add()" allocates a new
+    "struct l2cap_conn", initiates its "ref" reference counter to 1 and
+    returns it. The caller is responsible to eventually call
+    "l2cap_conn_put()" to free the returned "struct l2cap_conn".
+ 2. If "l2cap_conn_add()" reuses an existing "struct l2cap_conn", it
+    will return it immediately. But the caller, which can not know if
+    "l2cap_conn_add()" reused an existing "struct l2cap_conn" or not,
+    will eventually call "l2cap_conn_put()", for which there were no
+    corresponding "l2cap_conn_get()".
+
+Tracing the reuse showed the reuse was indeed the reason for the
+use-after-free:
+
+  [...]
+  [  960.331756] l2cap_conn_add:7719: hcon 1f5f8bdf reuse conn b69c7ec5
+  [  960.331798] ------------[ cut here ]------------
+  [  960.339480] WARNING: CPU: 0 PID: 173 at lib/refcount.c:25 l2cap_conn_get+0x8c/0x94
+  [  960.353863] refcount_t: addition on 0; use-after-free.
+  [  960.362924] Modules linked in:
+  [  960.368036] CPU: 0 PID: 173 Comm: ble-memleak-rep Not tainted 5.13.0 #19
+  [  960.380245] Hardware name: STM32 (Device Tree Support)
+  [  960.387449] [<c010e9a4>] (unwind_backtrace) from [<c010af48>] (show_stack+0x10/0x14)
+  [  960.400742] [<c010af48>] (show_stack) from [<c07f98dc>] (dump_stack+0xb4/0xc8)
+  [  960.413501] [<c07f98dc>] (dump_stack) from [<c07f6ee0>] (__warn+0xb8/0x114)
+  [  960.425994] [<c07f6ee0>] (__warn) from [<c07f6fb4>] (warn_slowpath_fmt+0x78/0xac)
+  [  960.439016] [<c07f6fb4>] (warn_slowpath_fmt) from [<c07d2690>] (l2cap_conn_get+0x8c/0x94)
+  [  960.452752] [<c07d2690>] (l2cap_conn_get) from [<c07d92b0>] (__l2cap_chan_add+0x3c/0x1e4)
+  [  960.466486] [<c07d92b0>] (__l2cap_chan_add) from [<c07da8d0>] (l2cap_chan_connect+0x514/0x9c8)
+  [  960.480656] [<c07da8d0>] (l2cap_chan_connect) from [<c07e12b8>] (l2cap_sock_connect+0x144/0x21c)
+  [  960.495023] [<c07e12b8>] (l2cap_sock_connect) from [<c065c5e0>] (__sys_connect+0xc8/0xe0)
+  [  960.508927] [<c065c5e0>] (__sys_connect) from [<c0100060>] (ret_fast_syscall+0x0/0x58)
+  [...]
+
+The solution to the incoherence is to strictly apply the rules of
+reference counting [2]. By returning a reference to the reused "struct
+l2cap_conn", "l2cap_conn_add()" creates a new reference, and this
+reference should be reference-counted. The:
+
+    if (conn)
+            return conn;
+
+must thus become:
+
+    if (conn)
+            return l2cap_conn_get(conn);
 
 References:
-- [1] "bt_link_release"
-      <https://elixir.bootlin.com/linux/v6.5/source/net/bluetooth/hci_sysfs.c#L13>
+- [1] "ble-memleak-repro"
+      <https://gitlab.com/essensium-mind/ble-memleak-repro.git>
+- [2] "Adding reference counters (krefs) to kernel objects"
+      <https://www.kernel.org/doc/html/latest/core-api/kref.html>
 
 Signed-off-by: Olivier L'Heureux <olivier.lheureux@fortrobotics.com>
 Signed-off-by: Olivier L'Heureux <olivier.lheureux@mind.be>
+Suggested-by: Arnout Vandecappelle <arnout.vandecappelle@mind.be>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_conn.c         | 7 +++++++
- net/bluetooth/hci_sysfs.c        | 4 ++--
- 3 files changed, 10 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index d8badb2a28cd..d5a9ef8909d4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1328,6 +1328,7 @@ int hci_le_create_cis(struct hci_conn *conn);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index f5dcb4a4fb15..5e4dd293b2a4 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7844,8 +7844,8 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 	struct hci_chan *hchan;
  
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			      u8 role);
-+void hci_conn_free(struct hci_conn *conn);
- void hci_conn_del(struct hci_conn *conn);
- void hci_conn_hash_flush(struct hci_dev *hdev);
- void hci_conn_check_pending(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 23e635600717..755125403331 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1134,6 +1134,13 @@ static void hci_conn_unlink(struct hci_conn *conn)
- 	conn->link = NULL;
- }
+ 	if (conn) {
+-		BT_DBG("hcon %p reuse conn %p", hcon, conn);
+-		return conn;
++		BT_DBG("hcon %p reuse conn %p with l2cap_conn_get()", hcon, conn);
++		return l2cap_conn_get(conn);
+ 	}
  
-+void hci_conn_free(struct hci_conn *conn)
-+{
-+	BT_DBG("kfree(conn %p)", conn);
-+
-+	kfree(conn);
-+}
-+
- void hci_conn_del(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index fc297b651881..b0d841dcf860 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -14,9 +14,9 @@ static void bt_link_release(struct device *dev)
- {
- 	struct hci_conn *conn = to_hci_conn(dev);
- 
--	BT_DBG("kfree(conn %p)", conn);
-+	BT_DBG("dev %p conn %p", dev, conn);
- 
--	kfree(conn);
-+	hci_conn_free(conn);
- }
- 
- static const struct device_type bt_link = {
+ 	hchan = hci_chan_create(hcon);
 -- 
 2.39.2
 
