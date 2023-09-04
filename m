@@ -2,110 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE3CC83F2C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Sep 2023 15:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A60C71153
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Sep 2023 22:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353182AbjIDPHt (ORCPT
+        id S239388AbjIDWMI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Sep 2023 11:07:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58884 "EHLO
+        Mon, 4 Sep 2023 18:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353169AbjIDPHt (ORCPT
+        with ESMTP id S229561AbjIDWMH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Sep 2023 11:07:49 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D52BD
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 08:07:45 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68bec3a1c0fso771364b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Sep 2023 08:07:45 -0700 (PDT)
+        Mon, 4 Sep 2023 18:12:07 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C34A9
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 15:12:02 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99357737980so280984866b.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Sep 2023 15:12:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693840065; x=1694444865; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hAoXiXMOqhYhQdqVm+Qr7OFmNQqwyt5wwiO9IlDBKrw=;
-        b=I8MN7DMOblw6BkzItJxUgZawBznlXEkO9BDZhA9Zv7dFIjyco5kLFLbaVcWhzSYK3K
-         TGylMN0IrwUgzC1utkYokCFTwaAasErV7YVjTku7GM2GUN2DCPVP/wah7y6RKgvcQU/v
-         ndexmRTF9e6+UYkgHGSoUGhClwP4ZdMsw567nThcklRD1vA5FzbXyau/CivZFJ+ydfdd
-         Bo8ZTMSwzzBfou3IlkJK6pcaSrgwKw4soS8qWNF3TH71NOxs+EqKv4jjej9n6hwCUyu5
-         F/qxwzxGjX+Iq43QGLOo53ZlSikuB5J/Cf5Kid7MBbDm2XxzJxUMDqoQfM3z+WRaxtk/
-         PlVA==
+        d=mind.be; s=google; t=1693865521; x=1694470321; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5FkFqWTL0Jd47n0sP0wy9R7v8p0d/aInwEtv/pW4v3Q=;
+        b=DD/ClJZflDtp/2f8S/HrpUx7xSJIP8iOqQZ0wvwKK4kGbT6lS536InwVACFNssbD7o
+         CIkQq8f4AWb0RDE9gobFDFlmTOMCdI95kwl8gXKt9lkDnuIZQkFlwqqSSNjbI0qccJCa
+         hhOwsSxrOWB/zdaFS/E9RkL3mTiA3taQXjI3223ga2fJAoLDt2HFsgSYXqilErSgnPsY
+         Tzut+/4McI7oLdLMSKBO2d+smJkPGl9RFUlLFAbHBd+SUt8ij1EUD2ABrSUqlab9l9/p
+         fJIBmaIlYbU2thut2GkTlDSdq0v92Z4cjvZ2e56wi+p+JSjx1v5hKldHvyVEIBUZWboV
+         mBjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693840065; x=1694444865;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hAoXiXMOqhYhQdqVm+Qr7OFmNQqwyt5wwiO9IlDBKrw=;
-        b=gKJkMu5PykvIqLVFHHuwqig2e8HdP5xTDHKzOcGyzBwt+lBtcB7UGi4CaBWuE3jkZR
-         hpI44nsTrPXXTWT6sGjnE5fT+YALHG7RXswt1KsUAAtEdtFze+XQvvHcaQLNTv3VvqtD
-         4qaLs87eL3L9lcIUjMZdHmq7oWXRSZrlEOZOkVIrtyRwIUZAIcpgrTQd/h0HQu6mECMY
-         Xa8pXX9K4LIW3cZziW08WN46A1L+WhQjR1SWdtbYe0XDGvD96JJ4ALDnLxqqFRb+almN
-         4bzV7qz4IgfuzDZw8axEfWyYNolNWos//Yex9DqYAvyh6QniQRQrbyRKUnyQ0UoLgMhH
-         8tbQ==
-X-Gm-Message-State: AOJu0YzEiD/Ini6hfLXf3h2PsW7zmKYG9Nvu6MoQe3iSc7I4QSSIiMuB
-        c7F7uPK2UO/9e5Ui/fUYLJJdae971bk=
-X-Google-Smtp-Source: AGHT+IFFlEOEJpZf6kR/ssJetNobZeVuKZ++owywV0WbaXlAIjMgbzkMJcRn3SF1coAM6pQMRO4cGg==
-X-Received: by 2002:a05:6a00:80f:b0:68b:e710:eea1 with SMTP id m15-20020a056a00080f00b0068be710eea1mr10029481pfk.33.1693840064785;
-        Mon, 04 Sep 2023 08:07:44 -0700 (PDT)
-Received: from [172.17.0.2] ([13.73.50.82])
-        by smtp.gmail.com with ESMTPSA id 25-20020aa79119000000b0062cf75a9e6bsm7416565pfh.131.2023.09.04.08.07.44
+        d=1e100.net; s=20221208; t=1693865521; x=1694470321;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5FkFqWTL0Jd47n0sP0wy9R7v8p0d/aInwEtv/pW4v3Q=;
+        b=Ui5GgWYg330hYrWqOn8OwqIef4pff2Pk/RAgm5CG/Q+uE8HQLjUhLYjdiSAOx58ny9
+         DJKyw2GiMefipmqRJLvIKfqTYU+vvx9R1OzjRPKivpJPSKuaZB8fLw3dZ4oFkCoV691/
+         IwYC6/OghPjNZ8aOjq5Pr8YgXP6c0YfpKB6Gq+a+2DhmGAir0a68X1hVHPmW+tKlhsDA
+         bzgVr91MmvHwQhFIFi9uo8AXrNVA3OTfQeCOU4qVJ0yXtcP6mi5s2K0VL4edapORoKby
+         3j7ifjIY9IuELCUC0wZdaUTQkssS8WdM9QbugKrzsJO7Es8/p8fV01goJCQC/GFqZxEF
+         RGaw==
+X-Gm-Message-State: AOJu0YxmGrVMl6oVAyTe4e6moOubnRn9o4HKjhi52rGs6OW1CiaiJjDf
+        ExsTVqJoYC+4UYnHlQeyKCWZAg==
+X-Google-Smtp-Source: AGHT+IGEnrtzRzPNnM00RY/+EBucUSgO/6PCzaxj80w8lTw5RfqEAF0mUsjC+sJHi2MdYAf8JlkcpA==
+X-Received: by 2002:a17:906:519d:b0:9a2:96d2:b1e8 with SMTP id y29-20020a170906519d00b009a296d2b1e8mr8404425ejk.54.1693865520950;
+        Mon, 04 Sep 2023 15:12:00 -0700 (PDT)
+Received: from olheureu-ThinkPad-E560.local.ess-mail.com ([2a02:578:85b9:1300:6c89:e61f:b837:7d81])
+        by smtp.gmail.com with ESMTPSA id z16-20020a170906715000b00993cc1242d4sm6692673ejj.151.2023.09.04.15.12.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Sep 2023 08:07:44 -0700 (PDT)
-Message-ID: <64f5f2c0.a70a0220.2540b.e349@mx.google.com>
-Date:   Mon, 04 Sep 2023 08:07:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4228555707721916927=="
+        Mon, 04 Sep 2023 15:12:00 -0700 (PDT)
+From:   Olivier L'Heureux <olivier.lheureux@mind.be>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Olivier L'Heureux <olivier.lheureux@mind.be>
+Subject: [PATCH 1/7] ARM: dts: stm32: Add Bluetooth (usart2) feature on stm32mp157x
+Date:   Tue,  5 Sep 2023 00:11:52 +0200
+Message-Id: <20230904221158.35425-2-olivier.lheureux@mind.be>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230904221158.35425-1-olivier.lheureux@mind.be>
+References: <20230904221158.35425-1-olivier.lheureux@mind.be>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
-Subject: RE: Bluetooth: Fix hci_link_tx_to RCU lock usage
-In-Reply-To: <20230904141155.1688673-1-yinghsu@chromium.org>
-References: <20230904141155.1688673-1-yinghsu@chromium.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4228555707721916927==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Christophe Roullier <christophe.roullier@st.com>
 
-This is automated email and please do not reply to this email!
+Add BT (usart2) config on stm32mp157x.
 
-Dear submitter,
+Signed-off-by: Christophe Roullier <christophe.roullier@st.com>
+Change-Id: I41cc7d60900e05d8bd4e3281abe170ef3fbbaee8
+Reviewed-on: https://gerrit.st.com/c/mpu/oe/st/linux-stm32/+/237115
+Reviewed-by: CITOOLS <MDG-smet-aci-reviews@list.st.com>
+Reviewed-by: Eric FOURMONT <eric.fourmont-ext@st.com>
+Tested-by: Eric FOURMONT <eric.fourmont-ext@st.com>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=781528
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.63 seconds
-GitLint                       PASS      0.25 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      43.81 seconds
-CheckAllWarning               PASS      47.96 seconds
-CheckSparse                   PASS      53.57 seconds
-CheckSmatch                   PASS      144.09 seconds
-BuildKernel32                 PASS      42.36 seconds
-TestRunnerSetup               PASS      638.67 seconds
-TestRunner_l2cap-tester       PASS      36.81 seconds
-TestRunner_iso-tester         PASS      72.23 seconds
-TestRunner_bnep-tester        PASS      13.51 seconds
-TestRunner_mgmt-tester        PASS      263.46 seconds
-TestRunner_rfcomm-tester      PASS      23.73 seconds
-TestRunner_sco-tester         PASS      29.06 seconds
-TestRunner_ioctl-tester       PASS      25.21 seconds
-TestRunner_mesh-tester        PASS      19.68 seconds
-TestRunner_smp-tester         PASS      19.87 seconds
-TestRunner_userchan-tester    PASS      15.92 seconds
-IncrementalBuild              PASS      39.59 seconds
-
-
-
+Cherry-picked for v5.13: dropped part of patch for absent
+"stm32mp157f-dk2.dts".
 ---
-Regards,
-Linux Bluetooth
+ arch/arm/boot/dts/st/stm32mp157c-dk2.dts | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm/boot/dts/st/stm32mp157c-dk2.dts b/arch/arm/boot/dts/st/stm32mp157c-dk2.dts
+index 4bef2300ed7c..680391433992 100644
+--- a/arch/arm/boot/dts/st/stm32mp157c-dk2.dts
++++ b/arch/arm/boot/dts/st/stm32mp157c-dk2.dts
+@@ -102,5 +102,14 @@ &usart2 {
+ 	pinctrl-0 = <&usart2_pins_c>;
+ 	pinctrl-1 = <&usart2_sleep_pins_c>;
+ 	pinctrl-2 = <&usart2_idle_pins_c>;
+-	status = "disabled";
++	uart-has-rtscts;
++	status = "okay";
++
++	bluetooth {
++		shutdown-gpios = <&gpioz 6 GPIO_ACTIVE_HIGH>;
++		compatible = "brcm,bcm43438-bt";
++		max-speed = <3000000>;
++		vbat-supply = <&v3v3>;
++		vddio-supply = <&v3v3>;
++	};
+ };
+-- 
+2.39.2
 
---===============4228555707721916927==--
