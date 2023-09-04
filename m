@@ -2,121 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 536D5C83F33
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Sep 2023 14:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE3CC83F2C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Sep 2023 15:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238417AbjIDOM3 (ORCPT
+        id S1353182AbjIDPHt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Sep 2023 10:12:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54742 "EHLO
+        Mon, 4 Sep 2023 11:07:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238237AbjIDOM2 (ORCPT
+        with ESMTP id S1353169AbjIDPHt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Sep 2023 10:12:28 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8FB81717
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 07:12:06 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1c0d5b16aacso8150235ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Sep 2023 07:12:06 -0700 (PDT)
+        Mon, 4 Sep 2023 11:07:49 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D52BD
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Sep 2023 08:07:45 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-68bec3a1c0fso771364b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Sep 2023 08:07:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1693836726; x=1694441526; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=77ZhpwyIbCl8NjNuWWA+XVZ5QXGSq69GvtqoZuQwP7E=;
-        b=GDbsmb/Ge4Rp6rzQD+Jgo0Yd3WpfvJQde4brKtMiNp+vAIqSNtU1gKbXSqku0DoDbl
-         xZwuoufX5fzDznY10m2TY6R2tou4ldVGHzxbrsS7ePlhFtbAXVQpgjmD5lyh5LythiPh
-         SXLCKQwyh98ni0Ak5l2A5lmza9+3HFRTZ3no4=
+        d=gmail.com; s=20221208; t=1693840065; x=1694444865; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hAoXiXMOqhYhQdqVm+Qr7OFmNQqwyt5wwiO9IlDBKrw=;
+        b=I8MN7DMOblw6BkzItJxUgZawBznlXEkO9BDZhA9Zv7dFIjyco5kLFLbaVcWhzSYK3K
+         TGylMN0IrwUgzC1utkYokCFTwaAasErV7YVjTku7GM2GUN2DCPVP/wah7y6RKgvcQU/v
+         ndexmRTF9e6+UYkgHGSoUGhClwP4ZdMsw567nThcklRD1vA5FzbXyau/CivZFJ+ydfdd
+         Bo8ZTMSwzzBfou3IlkJK6pcaSrgwKw4soS8qWNF3TH71NOxs+EqKv4jjej9n6hwCUyu5
+         F/qxwzxGjX+Iq43QGLOo53ZlSikuB5J/Cf5Kid7MBbDm2XxzJxUMDqoQfM3z+WRaxtk/
+         PlVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693836726; x=1694441526;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1693840065; x=1694444865;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=77ZhpwyIbCl8NjNuWWA+XVZ5QXGSq69GvtqoZuQwP7E=;
-        b=ACAA7iCHGNZa3BeRBclb8221l4pEspHHICN7WTO0YuA9tnkIkN3lGhu1FMThQRnG+L
-         SCCW7RKVEIMBy1WKPrjBJY0BRSJ1+ZttipCGlTwbz4C2u1OFqDFsKaXSi2Q0ScBSV41c
-         NUwa6S7m1hwWID2I+BpNq+8bzJwygoa8rC7bGFc7oUUXM8++md+yZH0DByL9M79VnoVF
-         IsbEAXpSdJquaDO5fIzQc0YhAeMEkKdgMVweQ1BDMz8KjsPtTapX9jLaZfEWcJm7dGIY
-         p+TLPJsj27QVnyKG6LnmA5WECiRD2YRsX3NY00gxYl7HSAzEgj/tRtJzt9BkiIzAbFA6
-         CutA==
-X-Gm-Message-State: AOJu0YwUuqOMtB0WWYzA/BHZLU+gacrZxvD4lOv5yR69IRpIyfsjaxUN
-        EDu9ze9WaAh7CYZoG6b5KRl0/9YfDue81rG1P44=
-X-Google-Smtp-Source: AGHT+IHNfsHxqWwK8aWr0T4UeeVFDMukWWnEolbAqXabOs3PsYsPCHigFjMRGaGr/8k5T/zgP2Z/eQ==
-X-Received: by 2002:a17:903:244c:b0:1bd:ea88:7b93 with SMTP id l12-20020a170903244c00b001bdea887b93mr9597339pls.54.1693836726142;
-        Mon, 04 Sep 2023 07:12:06 -0700 (PDT)
-Received: from localhost (21.160.199.104.bc.googleusercontent.com. [104.199.160.21])
-        by smtp.gmail.com with UTF8SMTPSA id u2-20020a170902e80200b001b9da42cd7dsm7578243plg.279.2023.09.04.07.12.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Sep 2023 07:12:05 -0700 (PDT)
-From:   Ying Hsu <yinghsu@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Ying Hsu <yinghsu@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix hci_link_tx_to RCU lock usage
-Date:   Mon,  4 Sep 2023 14:11:51 +0000
-Message-ID: <20230904141155.1688673-1-yinghsu@chromium.org>
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+        bh=hAoXiXMOqhYhQdqVm+Qr7OFmNQqwyt5wwiO9IlDBKrw=;
+        b=gKJkMu5PykvIqLVFHHuwqig2e8HdP5xTDHKzOcGyzBwt+lBtcB7UGi4CaBWuE3jkZR
+         hpI44nsTrPXXTWT6sGjnE5fT+YALHG7RXswt1KsUAAtEdtFze+XQvvHcaQLNTv3VvqtD
+         4qaLs87eL3L9lcIUjMZdHmq7oWXRSZrlEOZOkVIrtyRwIUZAIcpgrTQd/h0HQu6mECMY
+         Xa8pXX9K4LIW3cZziW08WN46A1L+WhQjR1SWdtbYe0XDGvD96JJ4ALDnLxqqFRb+almN
+         4bzV7qz4IgfuzDZw8axEfWyYNolNWos//Yex9DqYAvyh6QniQRQrbyRKUnyQ0UoLgMhH
+         8tbQ==
+X-Gm-Message-State: AOJu0YzEiD/Ini6hfLXf3h2PsW7zmKYG9Nvu6MoQe3iSc7I4QSSIiMuB
+        c7F7uPK2UO/9e5Ui/fUYLJJdae971bk=
+X-Google-Smtp-Source: AGHT+IFFlEOEJpZf6kR/ssJetNobZeVuKZ++owywV0WbaXlAIjMgbzkMJcRn3SF1coAM6pQMRO4cGg==
+X-Received: by 2002:a05:6a00:80f:b0:68b:e710:eea1 with SMTP id m15-20020a056a00080f00b0068be710eea1mr10029481pfk.33.1693840064785;
+        Mon, 04 Sep 2023 08:07:44 -0700 (PDT)
+Received: from [172.17.0.2] ([13.73.50.82])
+        by smtp.gmail.com with ESMTPSA id 25-20020aa79119000000b0062cf75a9e6bsm7416565pfh.131.2023.09.04.08.07.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Sep 2023 08:07:44 -0700 (PDT)
+Message-ID: <64f5f2c0.a70a0220.2540b.e349@mx.google.com>
+Date:   Mon, 04 Sep 2023 08:07:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4228555707721916927=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
+Subject: RE: Bluetooth: Fix hci_link_tx_to RCU lock usage
+In-Reply-To: <20230904141155.1688673-1-yinghsu@chromium.org>
+References: <20230904141155.1688673-1-yinghsu@chromium.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzbot found a bug "BUG: sleeping function called from invalid context
-at kernel/locking/mutex.c:580". It is because hci_link_tx_to holds an
-RCU read lock and calls hci_disconnect which would hold a mutex lock
-since the commit a13f316e90fd ("Bluetooth: hci_conn: Consolidate code
-for aborting connections"). Here's an example call trace:
+--===============4228555707721916927==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-   __dump_stack lib/dump_stack.c:88 [inline]
-   dump_stack_lvl+0xfc/0x174 lib/dump_stack.c:106
-   ___might_sleep+0x4a9/0x4d3 kernel/sched/core.c:9663
-   __mutex_lock_common kernel/locking/mutex.c:576 [inline]
-   __mutex_lock+0xc7/0x6e7 kernel/locking/mutex.c:732
-   hci_cmd_sync_queue+0x3a/0x287 net/bluetooth/hci_sync.c:388
-   hci_abort_conn+0x2cd/0x2e4 net/bluetooth/hci_conn.c:1812
-   hci_disconnect+0x207/0x237 net/bluetooth/hci_conn.c:244
-   hci_link_tx_to net/bluetooth/hci_core.c:3254 [inline]
-   __check_timeout net/bluetooth/hci_core.c:3419 [inline]
-   __check_timeout+0x310/0x361 net/bluetooth/hci_core.c:3399
-   hci_sched_le net/bluetooth/hci_core.c:3602 [inline]
-   hci_tx_work+0xe8f/0x12d0 net/bluetooth/hci_core.c:3652
-   process_one_work+0x75c/0xba1 kernel/workqueue.c:2310
-   worker_thread+0x5b2/0x73a kernel/workqueue.c:2457
-   kthread+0x2f7/0x30b kernel/kthread.c:319
-   ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
+This is automated email and please do not reply to this email!
 
-This patch releases RCU read lock before calling hci_disconnect and
-reacquires it afterward to fix the bug.
+Dear submitter,
 
-Fixes: a13f316e90fd ("Bluetooth: hci_conn: Consolidate code for aborting connections")
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=781528
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.63 seconds
+GitLint                       PASS      0.25 seconds
+SubjectPrefix                 PASS      0.07 seconds
+BuildKernel                   PASS      43.81 seconds
+CheckAllWarning               PASS      47.96 seconds
+CheckSparse                   PASS      53.57 seconds
+CheckSmatch                   PASS      144.09 seconds
+BuildKernel32                 PASS      42.36 seconds
+TestRunnerSetup               PASS      638.67 seconds
+TestRunner_l2cap-tester       PASS      36.81 seconds
+TestRunner_iso-tester         PASS      72.23 seconds
+TestRunner_bnep-tester        PASS      13.51 seconds
+TestRunner_mgmt-tester        PASS      263.46 seconds
+TestRunner_rfcomm-tester      PASS      23.73 seconds
+TestRunner_sco-tester         PASS      29.06 seconds
+TestRunner_ioctl-tester       PASS      25.21 seconds
+TestRunner_mesh-tester        PASS      19.68 seconds
+TestRunner_smp-tester         PASS      19.87 seconds
+TestRunner_userchan-tester    PASS      15.92 seconds
+IncrementalBuild              PASS      39.59 seconds
+
+
+
 ---
-Tested this commit using a C reproducer on qemu-x86_64 for 10 minutes.
+Regards,
+Linux Bluetooth
 
- net/bluetooth/hci_core.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a5992f1b3c9b..db4f28d68d71 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3418,7 +3418,12 @@ static void hci_link_tx_to(struct hci_dev *hdev, __u8 type)
- 		if (c->type == type && c->sent) {
- 			bt_dev_err(hdev, "killing stalled connection %pMR",
- 				   &c->dst);
-+			/* hci_disconnect might sleep, so, we have to release
-+			 * the RCU read lock before calling it.
-+			 */
-+			rcu_read_unlock();
- 			hci_disconnect(c, HCI_ERROR_REMOTE_USER_TERM);
-+			rcu_read_lock();
- 		}
- 	}
- 
--- 
-2.42.0.283.g2d96d420d3-goog
-
+--===============4228555707721916927==--
