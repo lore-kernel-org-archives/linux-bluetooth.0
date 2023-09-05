@@ -2,113 +2,74 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2017AC83F3E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Sep 2023 19:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A675CA100C
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Sep 2023 20:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239903AbjIET2o (ORCPT
+        id S242563AbjIEUIk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Sep 2023 15:28:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60592 "EHLO
+        Tue, 5 Sep 2023 16:08:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234895AbjIET2n (ORCPT
+        with ESMTP id S235180AbjIEUIk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Sep 2023 15:28:43 -0400
-X-Greylist: delayed 1089 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Sep 2023 12:28:23 PDT
-Received: from o3.sgmail.github.com (o3.sgmail.github.com [192.254.112.98])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381C31BE
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Sep 2023 12:28:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        h=from:subject:mime-version:content-type:content-transfer-encoding:to:
-        cc:content-type:from:subject:to;
-        s=smtpapi; bh=K98/9Aing/43Dq25KUJ6EJGTomO2Qmz2tej1VtEmlGw=;
-        b=CEBeg8JQdRIvspXD/Hpt3iv72RJWBefRFDVJLMg41asbIyhkgGxvH3EMsW4H+kRiGzfX
-        ysJZjpbBcv5ODcnIQQSgCOiVVUjfQHIcj5V51ixZND7xffjxTZIqsER2SatUnybmii/yZT
-        mOh9wQNGy7rCWbilLCbMc3oPmQb1DkYhY=
-Received: by filterdrecv-85c4c97bf5-8crrp with SMTP id filterdrecv-85c4c97bf5-8crrp-1-64F77CDE-52
-        2023-09-05 19:09:18.506707532 +0000 UTC m=+10179200.476901941
-Received: from out-20.smtp.github.com (unknown)
-        by geopod-ismtpd-2 (SG)
-        with ESMTP id Tg5qNHyfQKqWCz6o-S2DEA
-        for <linux-bluetooth@vger.kernel.org>;
-        Tue, 05 Sep 2023 19:09:18.469 +0000 (UTC)
-Received: from github.com (hubbernetes-node-51b2999.va3-iad.github.net [10.48.141.11])
-        by smtp.github.com (Postfix) with ESMTPA id 347498C0C00
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Sep 2023 12:08:35 -0700 (PDT)
-Date:   Tue, 05 Sep 2023 19:09:18 +0000 (UTC)
-From:   Nitin Jadhav <noreply@github.com>
-Message-ID: <bluez/bluez/push/refs/heads/master/d06b91-2e4771@github.com>
-Subject: [bluez/bluez] 94ea14: lib/uuid.h: Add UUID(s)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-X-SG-EID: =?us-ascii?Q?em4uxDjFTmK6HGA0dkTtYd7uB0ZF8ijVfgh847oM=2FOj6U4EIpgG4=2FynbSB75Yp?=
- =?us-ascii?Q?QW5EfiCKp7+AJ2dOAOrRaLthV37GwP757MJGYvS?=
- =?us-ascii?Q?=2FXB=2FBfQGkJXxyy9VDtLL6Xw=2FzkSRGjXrnMD2PCs?=
- =?us-ascii?Q?mRo+Jku6QYG3XqeRC22NECbbt8mXHddPgz+f0B7?=
- =?us-ascii?Q?iGUbZ+5KEv5d7wb9AkeUdJtFN7xei42hauB8cx7?=
- =?us-ascii?Q?7iyHKzZU4=2FfMBCaO7H4wVOmdWLuzUL9RKJdKmQl?=
- =?us-ascii?Q?ZSO8QQEJMwf9ndlwWTiAg=3D=3D?=
-To:     linux-bluetooth@vger.kernel.org
-X-Entity-ID: /f+S0XqulHHajbNb6hGdxg==
+        Tue, 5 Sep 2023 16:08:40 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1347D2
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Sep 2023 13:08:36 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89627C433C7;
+        Tue,  5 Sep 2023 18:01:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1693936913;
+        bh=uJuE9MBOxaoLEOwoMb5F/uJMKB7aL2COKluO1b+NTGA=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=pWku/Fglz1kxCtCGUXiJFNinmsbacef5otVUykgvvCCGSXXGlKJgZyJIYJq0DqsmA
+         vfPVt0ZAMJL6xF2DeVDIjj9A/SZYFPO9bNpaEBu5lgwqs3g6lkk3N21U2JK7oOsCS1
+         lYq2+21FOFXeTuMfXHUGRnfea3Y8+abBNIv/qm5JYrm0B//twppqeX46eXNn2hlpgx
+         tacCBU7/FnVF70MIb4Fkq/12rxnMSBjtSzLtsDukq5d7P9FGx2gwa/KDnAoBCszdyT
+         4Wo6Y7t42JwpXoPqdebf1VDG5K2J0DvMKY18Rx0mOpdO8s0fdrovqS817N3ldc5eTR
+         l/rHUFheffg6w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 77E01C595CB;
+        Tue,  5 Sep 2023 18:01:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: ISO: Fix handling of listen for unicast
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169393691348.22693.2684682455495633652.git-patchwork-notify@kernel.org>
+Date:   Tue, 05 Sep 2023 18:01:53 +0000
+References: <20230828200545.580103-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230828200545.580103-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 94ea14917ff99cffb2fb23b6a3867fc4b16b1b8d
-      https://github.com/bluez/bluez/commit/94ea14917ff99cffb2fb23b6a3867fc4b16b1b8d
-  Author: Nitin Jadhav <nitin.jadhav@nxp.com>
-  Date:   2023-09-05 (Tue, 05 Sep 2023)
+Hello:
 
-  Changed paths:
-    M lib/uuid.h
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  lib/uuid.h: Add UUID(s)
+On Mon, 28 Aug 2023 13:05:45 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> iso_listen_cis shall only return -EADDRINUSE if the listening socket has
+> the destination set to BDADDR_ANY otherwise if the destination is set to
+> a specific address it is for broadcast which shall be ignored.
+> 
+> Fixes: f764a6c2c1e4 ("Bluetooth: ISO: Add broadcast support")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
 
-Add MICS characteristic uuid(s)
+Here is the summary with links:
+  - [v2] Bluetooth: ISO: Fix handling of listen for unicast
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2595dd981e74
 
-
-  Commit: 5c788b73b8a5819ca2e7c6b5374807f6af1c5576
-      https://github.com/bluez/bluez/commit/5c788b73b8a5819ca2e7c6b5374807f6af1c5576
-  Author: Nitin Jadhav <nitin.jadhav@nxp.com>
-  Date:   2023-09-05 (Tue, 05 Sep 2023)
-
-  Changed paths:
-    M Makefile.am
-    A src/shared/micp.c
-    A src/shared/micp.h
-
-  Log Message:
-  -----------
-  src/shared/micp.c: To implement MICP profile MICS service
-
-- Implementation of functions related profile and service for MICS and MICP
-- Specifications referred for implementation:
-MICS - MICS_v1.0.pdf
-MICP - MICP_v1.0.pdf
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 2e47711d4d81d2a86751dc0403895b1d1554182c
-      https://github.com/bluez/bluez/commit/2e47711d4d81d2a86751dc0403895b1d1554182c
-  Author: Nitin Jadhav <nitin.jadhav@nxp.com>
-  Date:   2023-09-05 (Tue, 05 Sep 2023)
-
-  Changed paths:
-    M Makefile.plugins
-    M configure.ac
-    A profiles/audio/micp.c
-
-  Log Message:
-  -----------
-  micp: Add MICP plugin
-
-MICP profile level interface function have been implemented
-This adds initial code for MICP plugin.
-
-
-Compare: https://github.com/bluez/bluez/compare/d06b912df5ab...2e47711d4d81
