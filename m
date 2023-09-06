@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02166EB8FAF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Sep 2023 09:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17C0EB8FA5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Sep 2023 10:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231941AbjIFJm4 (ORCPT
+        id S236097AbjIFKlF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Sep 2023 05:42:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37432 "EHLO
+        Wed, 6 Sep 2023 06:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231947AbjIFJmz (ORCPT
+        with ESMTP id S230053AbjIFKlE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Sep 2023 05:42:55 -0400
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD2131723
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Sep 2023 02:42:49 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-6491907dbc3so21024846d6.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Sep 2023 02:42:49 -0700 (PDT)
+        Wed, 6 Sep 2023 06:41:04 -0400
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433F0E71
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Sep 2023 03:41:01 -0700 (PDT)
+Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-76f08e302a1so213536285a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Sep 2023 03:41:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693993368; x=1694598168; darn=vger.kernel.org;
+        d=gmail.com; s=20221208; t=1693996860; x=1694601660; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ngp6PioXMEcdVdajycKjcrpBi9ur6rwQ+PaEKC0CLLU=;
-        b=AQNVoHXjfd15VUUrohhMmzAgp3iBua+qOyhgeXx6zXjxFLfY9u4epzNsvKhCXLVGSr
-         JDMjdluxIFwcI5JJVJzM/2MKLhK1omQBbUdZNDX3KnemZXRwMbVf+Gyf7wnCK0+V2tGF
-         VdCk+dU6znsBtJHBxQ8uy8pok2Mo2FBmvD+6kpT2adWb+aO88h49bOfDYr4ca7EVzi03
-         MsKx31nuzlu3wAjapYAJTN482YLbqFUKJcF1k1YIZN6NuosxaZEXtDmt+whKbfm5HfzF
-         6aelTI9wwwVmRjSgSwvHbzL0jWyHBNK1ZO9OE3cfw8f/eo8DRsiozFjCbKh29XXw30xa
-         Po9g==
+        bh=MSBQFowxwiVzMWGKutiVCChXm2U86zNxZBtkcRPVuD0=;
+        b=La7AlCauH4piDbyF/5WOQOue6Cybi/nNlr+K73AHdsRdvushThtrTAaR1ZoU1XIZnS
+         46bpEOSryTgfLnqQYm0Foqut0MWmAfxhRLH3YiXfJqkEHFl/jZhUy5mhJ5ZvW4UJhFnT
+         +7gEmqikh1BjBDl0U+R6h95GZvViVBx0TfaFjNkbw276m8fVcBKX5OhvE/MEGvPwkCZh
+         SOEo72WPz+oj35nutolMAul6RCgHO6thpdgGikLR3LNHK6FPkH6JWLKr5xrheSVL/4ei
+         gs/t6qRps/8NKxKIO4Kq2sD36gu7hAFQ07tOVl7sPg3diFOT41ABLNZiq8gh6FyIyum+
+         7MEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693993368; x=1694598168;
+        d=1e100.net; s=20221208; t=1693996860; x=1694601660;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ngp6PioXMEcdVdajycKjcrpBi9ur6rwQ+PaEKC0CLLU=;
-        b=CAdqbI2WOM2J9Xh/dR1Qr8UmtcbCtup0HQUd9F9SBNU7oOc6whzPLOqOqeEgr/nh+7
-         nwum1mddd1zSUXYE8htq603yDhqQ3X7W88sbSyF/UkEYT8Ir6eeCFhmRfOiNpwKwXJe4
-         v8mLtwDNnww86MERZMY2f33F3vPTDPNDQXoD5o26mFDGx597MxgPgNCOltd6uDwX8Pmq
-         4PceprMECgLrV3fUx3wWGEJAHC3QaXsqjP8gBLPocAN4UEJxE5lYKRTQ9W+ArJkLTX7Z
-         KHwGV0TN5Klg9qpgFNxzq4GXihp2/PkrGaOjfP7jZ1J+bRNwwXJWO2jLvmSFvT5N7TLx
-         I3JQ==
-X-Gm-Message-State: AOJu0YwcMthuDHmZHy1Cfo4MZxWBZ9qXJW7gnM4Qy8pRYp8LTxvOcDH5
-        aM1YiJnVy/4/70JyHf1LNy6A2hH4gJM=
-X-Google-Smtp-Source: AGHT+IGkE8dO/4iFsQPl4MpgsbMJkd7HFslWxeOu7NRilda+HUl939Cz9/dlqua8zeoLXXui5MXZ4w==
-X-Received: by 2002:a0c:e00b:0:b0:636:1aae:1bcc with SMTP id j11-20020a0ce00b000000b006361aae1bccmr18125470qvk.39.1693993368397;
-        Wed, 06 Sep 2023 02:42:48 -0700 (PDT)
-Received: from [172.17.0.2] ([52.179.102.210])
-        by smtp.gmail.com with ESMTPSA id n8-20020a0ce488000000b0063f82020d8bsm5238646qvl.60.2023.09.06.02.42.48
+        bh=MSBQFowxwiVzMWGKutiVCChXm2U86zNxZBtkcRPVuD0=;
+        b=OmH9PGn3aVtfRWoXTvmsxVCnrb8F89gOpRraLAViCPm6Nd/GEPiIc7Qt7Pp3F4AAx8
+         QMG2SVaO5mPRa1s8SEGMmkogMCJPyPxzf0PWoesN6MbCtN9WE8KE+cpE5ptHVQTZnYHN
+         U6OcNiZ5IzQ4vkPnEVR2x5DQuV8XgrllZ5eC1j4B4gSaepnsvdE6CuRhQq9bT3gqDTJd
+         /97x689mL4Aur00oWBMl/MVKB6Og2Bn/3JHa/0zzvKJy9O4NgiLpeREkp3mwURzkfz37
+         XkAcIuQeB9GglP1UeWPIiEVgjTaCU7uu7j0sTUYeW6P1zNwJJP4CecYlZuAMW5612QKl
+         1RYA==
+X-Gm-Message-State: AOJu0Yy0LBKHrm+LJY2auP3UiXFlwkknrXYuEjrxHDkT1OXrXsYe2Z9y
+        B8fd3DJurqz9Lsl7KOAqqQvJMsgB2zisHQ==
+X-Google-Smtp-Source: AGHT+IFvKQyzhOvO1gvuxMjPIdVt2tZzDN00vYy2YXmaFPry/MHNeD+U6lwqOTXSCE89/SlQDO3y+w==
+X-Received: by 2002:a0c:8e45:0:b0:64c:3132:be13 with SMTP id w5-20020a0c8e45000000b0064c3132be13mr13495472qvb.55.1693996860142;
+        Wed, 06 Sep 2023 03:41:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.71.33])
+        by smtp.gmail.com with ESMTPSA id d10-20020a0cb2ca000000b0064f53943626sm5385936qvf.89.2023.09.06.03.40.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Sep 2023 02:42:48 -0700 (PDT)
-Message-ID: <64f84998.0c0a0220.7a5ff.110f@mx.google.com>
-Date:   Wed, 06 Sep 2023 02:42:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5160132364792211121=="
+        Wed, 06 Sep 2023 03:41:00 -0700 (PDT)
+Message-ID: <64f8573c.0c0a0220.5356.18d1@mx.google.com>
+Date:   Wed, 06 Sep 2023 03:41:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4568136511123768671=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wjy7717@126.com
-Subject: RE: Bluetooth: Add support ITTIM PE50-M75C
-In-Reply-To: <20230906083147.25298-1-wjy7717@126.com>
-References: <20230906083147.25298-1-wjy7717@126.com>
+To:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com
+Subject: RE: Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
+In-Reply-To: <20230906093305.11237-2-claudia.rosu@nxp.com>
+References: <20230906093305.11237-2-claudia.rosu@nxp.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5160132364792211121==
+--===============4568136511123768671==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,32 +75,46 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=781906
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=781929
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.81 seconds
-GitLint                       PASS      0.38 seconds
+CheckPatch                    PASS      0.90 seconds
+GitLint                       FAIL      0.62 seconds
 SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      41.80 seconds
-CheckAllWarning               PASS      47.11 seconds
-CheckSparse                   PASS      50.46 seconds
-CheckSmatch                   PASS      140.05 seconds
-BuildKernel32                 PASS      39.40 seconds
-TestRunnerSetup               PASS      619.64 seconds
-TestRunner_l2cap-tester       PASS      36.15 seconds
-TestRunner_iso-tester         PASS      89.15 seconds
-TestRunner_bnep-tester        PASS      14.15 seconds
-TestRunner_mgmt-tester        PASS      258.73 seconds
-TestRunner_rfcomm-tester      PASS      20.84 seconds
-TestRunner_sco-tester         PASS      24.32 seconds
-TestRunner_ioctl-tester       PASS      25.52 seconds
-TestRunner_mesh-tester        PASS      18.08 seconds
-TestRunner_smp-tester         PASS      18.68 seconds
-TestRunner_userchan-tester    PASS      14.80 seconds
-IncrementalBuild              PASS      37.58 seconds
+BuildKernel                   PASS      40.41 seconds
+CheckAllWarning               PASS      44.74 seconds
+CheckSparse                   WARNING   49.64 seconds
+CheckSmatch                   PASS      133.86 seconds
+BuildKernel32                 PASS      38.81 seconds
+TestRunnerSetup               PASS      567.33 seconds
+TestRunner_l2cap-tester       PASS      29.57 seconds
+TestRunner_iso-tester         PASS      53.80 seconds
+TestRunner_bnep-tester        PASS      11.43 seconds
+TestRunner_mgmt-tester        PASS      233.86 seconds
+TestRunner_rfcomm-tester      PASS      17.39 seconds
+TestRunner_sco-tester         PASS      21.31 seconds
+TestRunner_ioctl-tester       PASS      19.66 seconds
+TestRunner_mesh-tester        PASS      14.77 seconds
+TestRunner_smp-tester         PASS      15.49 seconds
+TestRunner_userchan-tester    PASS      12.22 seconds
+IncrementalBuild              PASS      31.29 seconds
 
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[1/1] Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+5: B2 Line has trailing whitespace: " "
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/iso.c:1466:18: warning: dereference of noderef expression
 
 
 ---
@@ -108,4 +122,4 @@ Regards,
 Linux Bluetooth
 
 
---===============5160132364792211121==--
+--===============4568136511123768671==--
