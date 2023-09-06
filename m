@@ -2,124 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B17C0EB8FA5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Sep 2023 10:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B07EEB8FA5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Sep 2023 11:48:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236097AbjIFKlF (ORCPT
+        id S240111AbjIFLsD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Sep 2023 06:41:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55442 "EHLO
+        Wed, 6 Sep 2023 07:48:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230053AbjIFKlE (ORCPT
+        with ESMTP id S240109AbjIFLsC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Sep 2023 06:41:04 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433F0E71
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Sep 2023 03:41:01 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id af79cd13be357-76f08e302a1so213536285a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Sep 2023 03:41:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1693996860; x=1694601660; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSBQFowxwiVzMWGKutiVCChXm2U86zNxZBtkcRPVuD0=;
-        b=La7AlCauH4piDbyF/5WOQOue6Cybi/nNlr+K73AHdsRdvushThtrTAaR1ZoU1XIZnS
-         46bpEOSryTgfLnqQYm0Foqut0MWmAfxhRLH3YiXfJqkEHFl/jZhUy5mhJ5ZvW4UJhFnT
-         +7gEmqikh1BjBDl0U+R6h95GZvViVBx0TfaFjNkbw276m8fVcBKX5OhvE/MEGvPwkCZh
-         SOEo72WPz+oj35nutolMAul6RCgHO6thpdgGikLR3LNHK6FPkH6JWLKr5xrheSVL/4ei
-         gs/t6qRps/8NKxKIO4Kq2sD36gu7hAFQ07tOVl7sPg3diFOT41ABLNZiq8gh6FyIyum+
-         7MEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1693996860; x=1694601660;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MSBQFowxwiVzMWGKutiVCChXm2U86zNxZBtkcRPVuD0=;
-        b=OmH9PGn3aVtfRWoXTvmsxVCnrb8F89gOpRraLAViCPm6Nd/GEPiIc7Qt7Pp3F4AAx8
-         QMG2SVaO5mPRa1s8SEGMmkogMCJPyPxzf0PWoesN6MbCtN9WE8KE+cpE5ptHVQTZnYHN
-         U6OcNiZ5IzQ4vkPnEVR2x5DQuV8XgrllZ5eC1j4B4gSaepnsvdE6CuRhQq9bT3gqDTJd
-         /97x689mL4Aur00oWBMl/MVKB6Og2Bn/3JHa/0zzvKJy9O4NgiLpeREkp3mwURzkfz37
-         XkAcIuQeB9GglP1UeWPIiEVgjTaCU7uu7j0sTUYeW6P1zNwJJP4CecYlZuAMW5612QKl
-         1RYA==
-X-Gm-Message-State: AOJu0Yy0LBKHrm+LJY2auP3UiXFlwkknrXYuEjrxHDkT1OXrXsYe2Z9y
-        B8fd3DJurqz9Lsl7KOAqqQvJMsgB2zisHQ==
-X-Google-Smtp-Source: AGHT+IFvKQyzhOvO1gvuxMjPIdVt2tZzDN00vYy2YXmaFPry/MHNeD+U6lwqOTXSCE89/SlQDO3y+w==
-X-Received: by 2002:a0c:8e45:0:b0:64c:3132:be13 with SMTP id w5-20020a0c8e45000000b0064c3132be13mr13495472qvb.55.1693996860142;
-        Wed, 06 Sep 2023 03:41:00 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.71.33])
-        by smtp.gmail.com with ESMTPSA id d10-20020a0cb2ca000000b0064f53943626sm5385936qvf.89.2023.09.06.03.40.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Sep 2023 03:41:00 -0700 (PDT)
-Message-ID: <64f8573c.0c0a0220.5356.18d1@mx.google.com>
-Date:   Wed, 06 Sep 2023 03:41:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4568136511123768671=="
+        Wed, 6 Sep 2023 07:48:02 -0400
+Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2076.outbound.protection.outlook.com [40.107.6.76])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5B8F1709
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Sep 2023 04:47:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fh1k3ECco8rAL1rkFQrD2VDCrrj4PVhcBWePqnX7RUN3PU3ewxBCQ/ugdLiwWymzGqFd1f4PP+pUwqh5Lc6H5ed8LdY5L7fCX/kjollW3mjwMzXo4D3U1XDAyT6e5V716PMgzVvvzEXsrhqLsI3inSflm/jOge9szJ0MDi+ZWuiU5Y71Kv4D3Q8+CAyWB+SjQTOQJlYeyQqnjDFqXSZ3wid2TwHeOE73B4Qo0w5UL2MO1eKCCIGo+ZGREsa8pdmBVpFmtz8KagooElClhWLqxKNUP16bRX1DH7YhpwPWe5NlQKd4uYiZiZrlk70sbdoS3R8prreTcdgRa/I9HxCpdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FAh8/u3NcoYVi+HTHkQ/1JvAmFjUHaYSHwWwJDvALLE=;
+ b=YJrlpFTW3zaVn58fQ9wR0hUPulk1ahj3wJQ8HsJTCtqjkhgET8+ZHeMpY/dCBZeOHeDCfvutC8aBPqNWJrpfzL5VKYbODisMPMjP/1RGQ9q5Mg6mqurTKs5JuaWbSQUSM3RAKT3CCDrdRstDTIG/S7+CIwINTkNS3/equ5DwtQmhHYrmHHrc+q+NjlVBvoJPyRHAAjO4D7hK/3zTkhy4IYZED/1Ywcajx9akkD+l4ndisR0LXKEXFVw2xG3XFvrsaf6n63B4frEWmN7PgleQsOkbrIbWT/L0NoZyzfstX8LhTouFyqBrV09GOfOggIUgHeYMJHdZTB0HIDNq9IY0ZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FAh8/u3NcoYVi+HTHkQ/1JvAmFjUHaYSHwWwJDvALLE=;
+ b=JOkdUTKj3DL3OBbiML5oQ2hNmXv9dd72lHaQlteVCLdgVuJPG3jZCPjRZco9dkqOOeSdsZx7rJJBeXQc17FlewnyJZnXxFvlXP8nWRvYxFIe7+tK/9a3bhywePE9rsMpCivqu2d8wF4pcMhvQ0W6RPALkYXcrtlRR/S1m7YxxYo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
+ by AM9PR04MB8353.eurprd04.prod.outlook.com (2603:10a6:20b:3ef::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Wed, 6 Sep
+ 2023 11:47:48 +0000
+Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
+ ([fe80::c2fe:9eef:61ea:36d9]) by GV1PR04MB9151.eurprd04.prod.outlook.com
+ ([fe80::c2fe:9eef:61ea:36d9%7]) with mapi id 15.20.6745.034; Wed, 6 Sep 2023
+ 11:47:48 +0000
+From:   Claudia Draghicescu <claudia.rosu@nxp.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     iulia.tanasescu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, luiz.dentz@gmail.com,
+        Claudia Draghicescu <claudia.rosu@nxp.com>
+Subject: [PATCH BlueZ 0/1] btio: Fix BASE copy from getsockopt()
+Date:   Wed,  6 Sep 2023 14:42:33 +0300
+Message-Id: <20230906114234.10617-1-claudia.rosu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: WA0P291CA0010.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::12) To GV1PR04MB9151.eurprd04.prod.outlook.com
+ (2603:10a6:150:26::9)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com
-Subject: RE: Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
-In-Reply-To: <20230906093305.11237-2-claudia.rosu@nxp.com>
-References: <20230906093305.11237-2-claudia.rosu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|AM9PR04MB8353:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5ced9dd-ff53-44e7-1d5d-08dbaecf1783
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: xPdHJnsmUa8gQAqVq5HfvW+yZl4sg1fyoKgAYfhj6sf1EnET29S82pSppZKr0mhceS94jkKs+FHQdoaGI22RXd6ENdBuJ4ffJFeelNRNKtu1cWI1i2qFlCaKeAGAVkdpn9F404tb778qJPLOt9HuNTDR5257knPxrRFkZLaO9aEkqvKRfB3a6w8P7p4gA/3FSBqrGlYrAp/69Jb7EHrMdwBxPoujgb2Qsa5CXpyNgmah/DDhJp7nVdilSFntOdc3tfvgeTKPJGnLymPXbIjYPdBpC5BkHRLcZPdb7AkZ0Wp5b7I/2vaiRDrM9g7dDT3a4OALDM1fy3chiClD7R90tUiISeNzcbcdvvmHI70fuG8eq0eslBLlbWvzMF0YB1tXdhAmptLe85e5acItle3vAxB1x3Pse0BOoZumpqrRUgEWjGd+oowsfHVldQRaQm64MwBBiJoB01szo2Il/8UxCz/To8rsiVykAmdeCJGuByv8t1LM6b0L6Kie9kXLV9QjP2zDVLuWv5gaBgNkqVwJtztd1fYBsyNbQmu5bIHpeDHOEShcR1oIue24MeT2j6XJtgMeOvc0RHQhUuyUlEYj4wPL9fPzO/WqzigKCud48lBojXtcjOiHbwzQPkMOPgn5
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(346002)(136003)(39860400002)(451199024)(186009)(1800799009)(558084003)(36756003)(38100700002)(86362001)(38350700002)(478600001)(6666004)(26005)(1076003)(5660300002)(52116002)(66946007)(66476007)(316002)(66556008)(6486002)(6506007)(6916009)(41300700001)(2616005)(6512007)(8676002)(4326008)(8936002)(2906002)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AnikbbIF7159jjeHFb6JWLmECDAN7rpOjxR3hkJPiAqC+MDEgtqNoNxDUvPW?=
+ =?us-ascii?Q?/hmIeX5CqLc1WMNu/bQ/9FUKiaC2LG/Sa3P5DmZdSfYuuCkuR9V2maUa1qbt?=
+ =?us-ascii?Q?ALrpNLyUpVd0MYKndWed8xCo5siqa+Up5s2GCF7WhRXJoEtO2UKt9RTm0vv2?=
+ =?us-ascii?Q?p+81L+p7b36pNydTM5GYTy4Qn/P1QPGuyqmhoOOsuvJkYoPj9lD0pAgB5Y0t?=
+ =?us-ascii?Q?QxuSTnbJ26doNB3+e6TazB5drSQ2KuTAq8U6n+9N3kf0VnfGk6jxIpAdiKhZ?=
+ =?us-ascii?Q?PW/aue3UoV+fhrI18ruWM7aaL4Y2MZpK8oRapNbe9bDJhFvZah2BrLoafKPL?=
+ =?us-ascii?Q?PlDOzjmjd7aso9Foleu+VZBYUbIx1rFbMLU+7t/qNG8PW89FYIucultxnNJC?=
+ =?us-ascii?Q?iCq/C2mKSFHXSnanKt42GNuK0bNIRaDvWx+ji0OOP309QCnSAz9ubioBP93Q?=
+ =?us-ascii?Q?9GrBXHjkPAEOn8Ll9RXtJOzztoTW5gBXyXFxITdYiyS4HFmTRDTPHAi4o/Xs?=
+ =?us-ascii?Q?MFSfLUB9bpDFIlxDBH2Q31ke9N3PyNW3JobzhadzsMxFdhL4Rks5jQAwACnR?=
+ =?us-ascii?Q?DnUB5v8JdbbMpFoNz0mkpJwJeXBp3RipTfZ4Ad3tl0nMPAVJ7ck+fO8w0aUg?=
+ =?us-ascii?Q?I8GkZcCZWMUodnIfl1wVbE2SB7vCbzxgTP7hBGxaX7LFm7nPrzc+1ruBcsuE?=
+ =?us-ascii?Q?MNynvYVrBeZNwEzO0AYjHNNZbUIXc5Lnxhf9zoPf20PjyGmoHjI4gGEVEs/q?=
+ =?us-ascii?Q?n9f0Z5yOiH8r3aJwxGF3TEs++zrDv/e/IB+gSKy2UAz2OYkM0wx4xqZ2Wk0d?=
+ =?us-ascii?Q?1RubzVHqgOnxCZ2IUdRcM58KImCd/5TX4b11YMcMNorCo53u6kbAiN+sRqAZ?=
+ =?us-ascii?Q?+NK5vJNX7FeubyMDKk+mc7yx7zo6vJnZeh4GgCqW5VWEYRERAHyddQH+1jgM?=
+ =?us-ascii?Q?HXRB84vfzftGyQQXzIJ3rCPB3OIayEBVlRbuzlHt5hKBBCrJt3AnBal1oPyo?=
+ =?us-ascii?Q?gFTCqA0pZuaORX37+eWNmIU8aGb0hd2E5qfwMzaULU3ZZNDRzugYhcinYlat?=
+ =?us-ascii?Q?5hSZsCqS55znnfRHt0EaTCUZjC7J59oW3UkgNo8gHQrz2LXHFd9zFiYr31VC?=
+ =?us-ascii?Q?26wHCfemkBKrWaY13OKbRfTjtsm6OI44wi0RNrFdqyET37YQtLj/ydr9JozW?=
+ =?us-ascii?Q?ec78kBfIbuwDSEwx1lm6ti/SYw30KD1fILo49IyrnPx1332+j/pD87cboJUv?=
+ =?us-ascii?Q?oPLIwL4nQcjc6bBAmEGJSVgH9CRHDZoMHw+3S2pPly6/0EYwHfIuzvgScqgp?=
+ =?us-ascii?Q?GJitk+B7ZBbHyQIW6gVGGtJKkXpzH4nbqkHx0BHGBGJEOFacL7dGEmSkrBo4?=
+ =?us-ascii?Q?iKbT8Fr1I9oeO39SqxPoErZTPVvKzgBdLZjVojHouCZpdPScSvhwU1qRW8aN?=
+ =?us-ascii?Q?aDLFGeb3m9rVz95BhFZpEx6Q6m73673akqYkfzNwztQ10VjLUZ6X7XHD77Ro?=
+ =?us-ascii?Q?1o+2uNFpjQPA0CgxOo+PpI71RYtHGr9WrVNmHVPSj4+cebHIV3yMEnkRFICY?=
+ =?us-ascii?Q?2qNPDIJydb2zqmOqZDMGcXEDMTCk1daV2GhsJWzt?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5ced9dd-ff53-44e7-1d5d-08dbaecf1783
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2023 11:47:48.1693
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PBf33xu+w19UJzB3KOTcI+NFKsw1o1JVr2weeEGlmNxg6nQiIS9zexZkdUuzLJh16hNL72kmDd0QskbBYFPcjA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8353
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4568136511123768671==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Fix copy of BASE from getsockopt() and update base length.
 
-This is automated email and please do not reply to this email!
+Claudia Draghicescu (1):
+  btio: Fix BASE copy from getsockopt()
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=781929
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.90 seconds
-GitLint                       FAIL      0.62 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      40.41 seconds
-CheckAllWarning               PASS      44.74 seconds
-CheckSparse                   WARNING   49.64 seconds
-CheckSmatch                   PASS      133.86 seconds
-BuildKernel32                 PASS      38.81 seconds
-TestRunnerSetup               PASS      567.33 seconds
-TestRunner_l2cap-tester       PASS      29.57 seconds
-TestRunner_iso-tester         PASS      53.80 seconds
-TestRunner_bnep-tester        PASS      11.43 seconds
-TestRunner_mgmt-tester        PASS      233.86 seconds
-TestRunner_rfcomm-tester      PASS      17.39 seconds
-TestRunner_sco-tester         PASS      21.31 seconds
-TestRunner_ioctl-tester       PASS      19.66 seconds
-TestRunner_mesh-tester        PASS      14.77 seconds
-TestRunner_smp-tester         PASS      15.49 seconds
-TestRunner_userchan-tester    PASS      12.22 seconds
-IncrementalBuild              PASS      31.29 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[1/1] Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-5: B2 Line has trailing whitespace: " "
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/iso.c:1466:18: warning: dereference of noderef expression
+ btio/btio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 
----
-Regards,
-Linux Bluetooth
+base-commit: 2e47711d4d81d2a86751dc0403895b1d1554182c
+-- 
+2.34.1
 
-
---===============4568136511123768671==--
