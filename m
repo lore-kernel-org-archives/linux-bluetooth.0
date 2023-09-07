@@ -2,181 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1255EC873D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 15:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DD4EC8740
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 15:42:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbjIGPm0 (ORCPT
+        id S233550AbjIGPm2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Sep 2023 11:42:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60040 "EHLO
+        Thu, 7 Sep 2023 11:42:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243543AbjIGPb7 (ORCPT
+        with ESMTP id S235484AbjIGPXM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Sep 2023 11:31:59 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on061a.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe0e::61a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C712B198E
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Sep 2023 08:31:31 -0700 (PDT)
+        Thu, 7 Sep 2023 11:23:12 -0400
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2071.outbound.protection.outlook.com [40.107.105.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C22CDE
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Sep 2023 08:23:04 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bvPSRpy4JDKYXv0XkyVVKaVpPl3TCMQNzb8BK2IRfmjp8xdGmgRRrH+JO9ADCWAKwgGWgfJksp7v+x7gRVwLbC0OmRn49/ETDTEbXxiZgrE9nZCPJoYj8HChYAQ9vgWWdIehKE1FfnC/Nxbrjnp0pYIFyTI4zA1yzgFWQOfXUvTD02ChkDhuKa4d567S1TKXB3xSU9bUQ1Z1Ob2mnJH7WUGXAj3BYrrcOawO2jcH6v9ChtN3x2YgJMMi/lK0Ak2Cn/DC6k3h2xvK/SN/8/KOcxM/LPjR20q7z2Ye5RBjm6OH0FXIPxeS1P2R2j/2oIbYlV3y80uYUG7YRHlQ2bEtqw==
+ b=nw3Br1BTb/urw7M2K81Eh2AZy7OaM/77fcEnLVS7tRQ65kantJG5qlljHggvHMZ6PE/Y0x0fOUhgIiGJyZBswrDoYvqJeKhmxAMLToE6PBYo2Blhi06V/vmLl05JBUFboE0Z6KvPHuDhmgmdgtaRacT8dT6L7s6tG6xsXAloRtYuUWbitVBabUaFIsgGnuMEuwZo7JWTl/swI+db0oXJtoYNPayS+QDoeMd75Uczy7LasbN1rfBdBWX3NQuJUj8jg5iBCbxmlK1XGl96sF9Uexk+Y2he2n8Az5OE6LB3XN5LHUQeApPEK4nOZ2AK1uwh0951nq7VIENUR66GVcas2g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yOsMwqbL1NP64qLKmI0jnf82HtEGaxZJqli8c/gmLcY=;
- b=JRIKaJVUIY0gV7O2/G9HZa/zgyyrMwc1ekzSKrSkbk0/PQ88a0S2+UIQa42eYrVlN6/bF7YpPgf95EzGMDfJr7IgO6VEkzTBiJ89aICB6+vdLyHpxHji62WKjwDqWfCVaRroJEbxq6Gse7u2Ki1xje1cH84N6t/WU078L8lzxycJfnrNoMQBQ/6Q/BGGbAx1T3O9JGkz5V+Ti4lSDEWapgQfcigB7qTHaaRAf12LfzdmKIloiXWt1/n1d4TxfLXwLO+WRXHWh79XkEC38JZzIBPvcy7iqMggBdTlfTWwtgLIwj47hjhgC+aH215aWZp851sTQ6rrqqtLc2hWrgOkSA==
+ bh=F/Cchi6Qpmfn46OO77oAu2s05v9yJPH0eJKrJ/2DDIk=;
+ b=GF4LmL1W+c8cidmqvDEz/zqF0qrHgB1RuR5FwTRYJUTe//UfaqecdNy4FX1XMOJtmrvTK55pw4CsTDPLBKu3A/MPErynGo/5mhCMUeSaH1VaVZddm1qhKpKMPj6W3yqP07c8R8n+3iO1HvUBP1/hItYHD7DLfTQDrK5Q3RDcZRKvaflSwEAG34IXFySgzBHL7DJ+w8fPbAOxp2JosexulXTUNZBWO/+xyvtC5mMhK1qiKiHXwG2hoiu6DSpmb3iUCweI6ODo9Ml3FcDUFym/USSJh2066g9llyvUrfLlGeulV0geHJlSn7dA70FFbjjL+ngpaZIPfkk3UBuMzeQHFA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yOsMwqbL1NP64qLKmI0jnf82HtEGaxZJqli8c/gmLcY=;
- b=NbQWmEWlGypYHDWy7SwO+gAhy5o5Of63EQ89vuZpqWyCljNDyRtY/h/1BKTbN/QSruKHnLcaRykqs2FNifkW1wINdzFPlpoBHBDkKSWZQxeUBMwUW21cSH7oMpT2G2tzxYV0tBV531omdk05t5eAmbiMvTjBEF55XcQwhmyjXEM=
+ bh=F/Cchi6Qpmfn46OO77oAu2s05v9yJPH0eJKrJ/2DDIk=;
+ b=OQvvNczaIxVi4w7od0NAtBmDdVA9MwT7OTBzwpmKkPS3o7rJTlQNSmBKv0c42S33Dh2ZCYp2nVNZCoyZB/XhsN4DkQT1nWCcRtu4JW2mAr+paJspvq/7B5g8BnPqlV8laz0UxjgcauuaLfO/Zxu47xvv8Pfyq1AJZ9FCdnQdpws=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com (2603:10a6:150:26::9)
- by PR3PR04MB7402.eurprd04.prod.outlook.com (2603:10a6:102:89::16) with
+Received: from PAXPR04MB9398.eurprd04.prod.outlook.com (2603:10a6:102:2b4::19)
+ by PAXPR04MB9140.eurprd04.prod.outlook.com (2603:10a6:102:22f::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.34; Thu, 7 Sep
- 2023 05:48:41 +0000
-Received: from GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::c2fe:9eef:61ea:36d9]) by GV1PR04MB9151.eurprd04.prod.outlook.com
- ([fe80::c2fe:9eef:61ea:36d9%7]) with mapi id 15.20.6745.034; Thu, 7 Sep 2023
- 05:48:41 +0000
-From:   Claudia Draghicescu <claudia.rosu@nxp.com>
+ 2023 09:30:54 +0000
+Received: from PAXPR04MB9398.eurprd04.prod.outlook.com
+ ([fe80::4131:3e13:f138:f636]) by PAXPR04MB9398.eurprd04.prod.outlook.com
+ ([fe80::4131:3e13:f138:f636%4]) with mapi id 15.20.6745.034; Thu, 7 Sep 2023
+ 09:30:54 +0000
+From:   Vlad Pruteanu <vlad.pruteanu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, Claudia Draghicescu <claudia.rosu@nxp.com>
-Subject: [PATCH v2 1/1] Bluetooth: ISO: Copy BASE if service data matches EIR_BAA_SERVICE_UUID
-Date:   Thu,  7 Sep 2023 08:47:58 +0300
-Message-Id: <20230907054758.4893-2-claudia.rosu@nxp.com>
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, iulia.tanasescu@nxp.com,
+        andrei.istodorescu@nxp.com, Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Subject: [PATCH 0/1] Bluetooth: ISO: Set CIS bit only for devices with CIS support
+Date:   Thu,  7 Sep 2023 12:30:04 +0300
+Message-Id: <20230907093005.58439-1-vlad.pruteanu@nxp.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230907054758.4893-1-claudia.rosu@nxp.com>
-References: <20230907054758.4893-1-claudia.rosu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: WA0P291CA0022.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1::22) To GV1PR04MB9151.eurprd04.prod.outlook.com
- (2603:10a6:150:26::9)
+X-ClientProxiedBy: AS4P192CA0025.EURP192.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e1::19) To PAXPR04MB9398.eurprd04.prod.outlook.com
+ (2603:10a6:102:2b4::19)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: GV1PR04MB9151:EE_|PR3PR04MB7402:EE_
-X-MS-Office365-Filtering-Correlation-Id: f1ec089a-dcdb-4cb0-f46a-08dbaf661714
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9398:EE_|PAXPR04MB9140:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3e9a90eb-f23a-44d9-5b23-08dbaf8521f7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zC4dav+WLYSlYMxDhDawzF1nVdssZVaO37h6z84WCnP12PJMlL7f/nAxx0SeRda6H6lZ3VK5RRG9bpGL9tZUp6P1tUecevJOTzllN8iq5FGmdXV9SBxDafa9m1qn3km4DQ8wPwavqV7fMHa2vbCzDjP1p/Nsyl/GpFy/SesklcVU7OySipfqYrKTVQ2jHO4dZJTUgB3OkTlqxf26TAf4cnor5qVhhcUvQbBl2MKf48bWCGidTrQ+MOVq7SxAOn/BhNkuNfXHEItJG+K147Kr6WgyGMyrP85Uqfm20AMkF1R2wfED7wJGfumX95LfAx8L5yk+nHo2+xlq/a4QIKfpUxM5QOB3vXSpDJwF2otKmljYRMT/jutwB9AZBac9rsGnXPQQ24bRHRD+ljTj12/6rPKmbcg2H9dwo3TrXGIiAs4HQ5i3bM+1ArQAtK750EtBFtC7rFUL7VqcvcsKdwj1rQXNqKrkx/23H5M19coqmEbO6BEYuLIddGhfvvXNzisOD1zJGKwYXsTFS3Aw6d35e3jxMeKDdlWXDwbkuYLvPi4EoJGiqfzDo15/ewyOLWNm/jpe5lThUp6uoxHOs9vd8KNBn1MSXCPP+zduGM8iKMgVe4+AGE7+oSC55QMZZBgbOm45YqelyYIcEt3aRuSWs4Q78T7ZEr7q0QKrxdzvh3U=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9151.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(136003)(376002)(346002)(186009)(451199024)(1800799009)(36756003)(316002)(38350700002)(2906002)(52116002)(41300700001)(86362001)(38100700002)(5660300002)(2616005)(8936002)(4326008)(8676002)(83380400001)(26005)(6512007)(1076003)(6486002)(6506007)(6666004)(478600001)(66946007)(6916009)(66556008)(66476007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: hvLTxCJpPsnDui2xO1PLPk+5QP5L0vh83xWDtnK17PmHfBbTFmd637jKMJ+7iOFazi1rf6glF2Dk6bEoxNdfwauKeJ1PDOvkVrLs3xCIAgyaeb/WYuvLMGPwCbWZaduTel7rNF8MouSLIiBQD//itadbWlmmdUYMR7tpvMTk0oAtYPth1GAnR3oBwApP7yCBbh2bV/j0cHW4OpsL1lGiF/+hopdgv31EB4CprIXs5hx/ciLEHVs/LsPk8JGTrnmEPrKVenZc5e/soTBuGQC4jSZgSLY6f+bic4LMEdu9ymoB6T28MpEHDUVh/G7n+jS2h1a+4rRvGjep3UR654dTqXWpYpnCp9JP4P8s3h/tDJv9lhxgnFej26agfq8TSDEl4aLoENFudQ+Z1UDJmoKwYGiWbkzDygGcZYbr3Sal6zESKtbmnDZ4J4JFeoEdZmM6mE8Knsjpt8C0oIlZQ89+dVojWFl8PZwMTg+pJvm0R6H81zUWfgwKgJKA+3A+LA1YFS5ybXKomSGvCeQzJ5JyGis1A7bUrkIJ0SRJRognyKGIIyHpRsZvQsuySzD/TFW4+0Sxe83y9d5qNbaeuqtq93FDTd/ZfFrgof858jomlLnM3GMUnHf5Uge0nOAFR4up
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9398.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(346002)(39860400002)(396003)(451199024)(186009)(1800799009)(4744005)(41300700001)(44832011)(5660300002)(86362001)(6666004)(478600001)(4326008)(2906002)(8936002)(8676002)(66556008)(6916009)(316002)(66476007)(66946007)(1076003)(26005)(6486002)(6506007)(52116002)(2616005)(38350700002)(38100700002)(36756003)(6512007)(83380400001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qZXs0x+cn6zS0oj5J3eOFfv1ndb0U8S7Inv9RiqEu5BgfeeWyBHdYSLP22co?=
- =?us-ascii?Q?Ppg1gu7k2ZVI6M64N047ICEluS8kRsmC0l5XmlM3T3A2/QFMwoYoz96dNkPA?=
- =?us-ascii?Q?/J/s6uZn0AcGSqIeg3feB13aV/vCg4eZY/9A4DgppyhF8rlYpxH6m85bK48D?=
- =?us-ascii?Q?e2YBQfazp+hYtm0ZVAuNVkVvQUzDYGjwiuFjMZPmCB/nBbNbERvnkufSGBR4?=
- =?us-ascii?Q?Wez6wuArLuqAsaWD/Dbou2H/t6tsSkjBOaeV9EqmRd4FWExYlz/A2Bm/PloL?=
- =?us-ascii?Q?oBk0w5h74Tj1bwvVHCGH3T8x9qW0uDHHFBS7kGyvQHAgqUEpGrq4Qe9g8C4q?=
- =?us-ascii?Q?EbK3lSqrQACXNok0Lf4lQSmWRCROBHIbTCSBlUS4Tux0SzOrf47EBs61HCd0?=
- =?us-ascii?Q?7SOsTFk/3FYbtlf5kuXKNfY3ELAkASB+41URtP0P/JHDJhvlPJa0lekOvemP?=
- =?us-ascii?Q?b50PJYgjG+L2ZcUMI1jt6J7pdPAH2pEjO8kIUQgK7gLYeCD5HiRYgh3dMQQ8?=
- =?us-ascii?Q?LIpJ92Db82c2G9lDUlaUGaOKKBLFObzcFc8CklC8KpvP+6Aw8KQ1RanFXqF8?=
- =?us-ascii?Q?836G7pqAjT2k+BWuLT4g6ZfDs0D38tqHeWc7hlf9FOrMgFowPVjpwl/FdWtM?=
- =?us-ascii?Q?QNTU9KxBZKccm6+U222jd7s+mh2MmkpUc7uv6s98v4+eZ9lCgbhRcOvrM2G8?=
- =?us-ascii?Q?iZYd7JWb7+rFNMBwS0yzkKklMU5rFNKvBOGFTjFBO6xYoBwCgHC363CjMQuM?=
- =?us-ascii?Q?3sRXcnNQgD6CsJmvku1yr5TmvCy2Fd2P4d6Pu4LAZzMt9rC7Txxg6GP/6Cp/?=
- =?us-ascii?Q?gia1qeOimU5OZEMMqf/n1Rw9MP70MIS0sgly+zdl5baoCEL5SCJUcqnoPqPw?=
- =?us-ascii?Q?vYirKbdoIP50uGG2HU9uCUf6+Koh4iV469Nu02pcRq75D36RANUi9t/ILNpm?=
- =?us-ascii?Q?+lhEggyg/urfOBOZyotk4bld7CnsWb03YruChKKsrEXLtixO1gFjx4k9ydWK?=
- =?us-ascii?Q?6s1EvHEooc1DYaMGSLFj6433jh7jPEbbd2dxolUbdhd8MWCipAISr0z+KVFt?=
- =?us-ascii?Q?Hk/vdUkHh8LakethjjobaEkNNBNkWdbk4xg1N6aRDzCBtYi2hgTuoeA8GNPh?=
- =?us-ascii?Q?F4D2G+D3Wut1RzPyG6b03wIYAqCRjZk1RC4JtYotw7vfyh0ejbkGCKdJE7Qg?=
- =?us-ascii?Q?rSR0RoeCrV9faNa5rpoVGWq0wXRrRNY6YhtzUX0hWa/lhu0N1OxadjRn/Tm7?=
- =?us-ascii?Q?WKy440Fj02kk5lpCK/el6Oo/1Y1XRRKw2Lc7JCDbA+rdiCWqwcfNnO++QlPq?=
- =?us-ascii?Q?iAd+yx9mK02O+YEKaMeZfstrfqd55nyDtewfOxArADcT24OLerhu29455qZr?=
- =?us-ascii?Q?aqDkvuwrJe8+LwIiY5vzNnikoPYGa1FTyxAZQ2IAbNOFoe34yJbirWPiRG1f?=
- =?us-ascii?Q?gegpTjeJkEVe5L9hIC72kgYy4klDmqrSUi+BtV71d3Vx4LlMwBwv5+cPDESE?=
- =?us-ascii?Q?jOHv19zqGL9HUeVY+sGwPWLnszU4Kh7m/S+4Ygd6Y4wMhDu7VrgsyTe7RHSn?=
- =?us-ascii?Q?RJemxzTrXxb3IA+HHyZ1psmqwPz0OCduMXG22JLy?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rl7D6QYWb0wjrqvpnycXfWVejK8FSdZV5u8pbVE3UY9b4a7T4gnjoQbp1AWz?=
+ =?us-ascii?Q?yNHee0VAxuJUCON6hPuvY+GOgOYo+m9v4hr6q4FfZ75QAHd5J8qvlGOTtxVJ?=
+ =?us-ascii?Q?7AMcHKo9l+NLQC44gqVTV3dZ51cM7lmeR+xhNflPdTSlj4CmsVrqWZsmOeou?=
+ =?us-ascii?Q?6lC1hfSFXMlV82HAsvKfk6aCEmeziF3XhGQv5ZOeimsmcpb9gZB2Xpgz+9i3?=
+ =?us-ascii?Q?RaBgOLuJCvjjeM7f08MZKaiuvzj2wD4hAyOktJNITyiiA9IhfFjyb9S+qKr5?=
+ =?us-ascii?Q?pFD6+XSFxjFLNPq7/Sc66y4FHGg5a5teAHfB1u5mZvQxyT6RnQBYSfyc/O90?=
+ =?us-ascii?Q?rE1qTdG+3ncR1wUcrD1WyLfUAAJLMHCcSWTyuJCrE2SoS1wvz8lLHtNMsazy?=
+ =?us-ascii?Q?GZY7wTVgwTURQm3KbNDQqaryq7ytrNDY8tRyrf6VloGuZBwOrvQCj+EabvG1?=
+ =?us-ascii?Q?flVtPHQS6xsFRZi/YOPrpbv6+LIYa14HHSI5ekKpoiPQ21bFCcS3iwf5JAnO?=
+ =?us-ascii?Q?ZmO5CKOlTF86X9ohmFK1j+OKOBvZJwCiIhLN8CJ+qZYHwniccPuK/C3sDDeh?=
+ =?us-ascii?Q?XN1tdvPs3+1uUhErxtH4356kTHIjEQGd+vDX5Q98ybG43G/YSEK7/f4IZV2j?=
+ =?us-ascii?Q?h0dhAELNyMneSrJUh4duu/bGPzytFAIEgdCc9iI7pQJ4TqEuFprW8Iu4cV6y?=
+ =?us-ascii?Q?uSiTJkjkWsgxmHNh8zp0J3iCdkv7P5WMSLqliU3GxuCLdsRCia4/UZy3zcHD?=
+ =?us-ascii?Q?bck0Pixm+oguBFSDne9o3mt2oym1a+bMe2YOAP8y6TPdOKXxMHwhBBUhv78B?=
+ =?us-ascii?Q?XXFCktFR6EiWNhiFADeTRlMaypkPz9xYxwunxerthSNBrTMPE7/k2Tcea14i?=
+ =?us-ascii?Q?JoPJddEFfwFwoG4BWXKUIzOIJK9xkqAKvgaDe0Kuj7ATFoP3hUTf+ZrTJjDS?=
+ =?us-ascii?Q?s3hULxv4UltHfNY7oAF37aJMTZ9Ml8N7GxTpHuIvugPk4MStZgTr+s17oYTZ?=
+ =?us-ascii?Q?MNEhAIBXoHEk5+A4WpOcUTEaXRgOtY8lvxFeo0DIxXVlS9RichdP+ZAtBIKK?=
+ =?us-ascii?Q?lWdR3NiQ0GhfN2XT5OVKswlJ35TQsel3fRC4EgFcnCN25OvzNwujx+UJCHL/?=
+ =?us-ascii?Q?/3uKj/7cSrEieSLYfo+f7Fx2EdQfNZ7qCF20IU2IDSJ5trLRKaFYLaTMMLHb?=
+ =?us-ascii?Q?4SHabLdzVHmTn9iEyW6wHyLYLzUSZbrjcu/cJO6XsiAmESj4S73YV5OrZ2Fv?=
+ =?us-ascii?Q?6ImELpC8gE9zdjdsNCvzhWV1Gh21bmtqrPenJZMbRhQYbFykE5NC07B6vKbe?=
+ =?us-ascii?Q?ZYnTLPiZPYS+/7xioIbB4TqtXNRs4IejwU1EM2hNAPttrWZ4hpaFjuLvToU/?=
+ =?us-ascii?Q?zXTy+sO/xsLFso3ad3E0NPD2LmeBf4vDj+H4RYOH0W2Gon1e7BnzqkuHjvjG?=
+ =?us-ascii?Q?36XDc3wTXLCDE6iPnbIvpTnvfZEk4jT12cV8Av9aw8dS+s7zyxV+ZrV0Rlrk?=
+ =?us-ascii?Q?iSyysvBM6DNYycwRS5x9D/1T5zw4y9x7sgWeYvRAD4vJegXTqLkBf3NO/4MY?=
+ =?us-ascii?Q?PmcbDmizgCp8Pcp1LskKU10Fv4zjeVLvQqUsvbRDMHkFfUquzWwLsjwBK+Rl?=
+ =?us-ascii?Q?Pg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1ec089a-dcdb-4cb0-f46a-08dbaf661714
-X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9151.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e9a90eb-f23a-44d9-5b23-08dbaf8521f7
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9398.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 05:48:41.3252
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2023 09:30:53.9907
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U8MsQs0QTf210R7lLtRekNq8qGN4fnzfY+x6Mo+oOp+ElcSsBOvm8YcIJmTgjit8b4P2zRfqxtStP8+lIGj4og==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7402
+X-MS-Exchange-CrossTenant-UserPrincipalName: kFNf7Fq0DQ3my3bp7ym08tWAkHT1DHDTj3QzjKiE1qxJTWrqOo1a+XwjsZLHQXtss2GvtCDSFMW2l+1jikaXrA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9140
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Copy the content of a Periodic Advertisement Report to BASE only if
-the service UUID is Basic Audio Announcement Service UUID.
+Currently the CIS bit that can be set by the host is set for any device
+that has CIS or BIS support. In reality, devices that support BIS may not
+allow that bit to be set and so, the HCI bring up fails for them.
 
-Signed-off-by: Claudia Draghicescu <claudia.rosu@nxp.com>
----
- net/bluetooth/iso.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+This commit fixes this by only setting the bit for CIS capable devices.
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 16da946f5881..33ce9df7f65d 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -14,6 +14,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/iso.h>
-+#include "eir.h"
- 
- static const struct proto_ops iso_sock_ops;
- 
-@@ -47,6 +48,7 @@ static void iso_sock_kill(struct sock *sk);
- 
- #define EIR_SERVICE_DATA_LENGTH 4
- #define BASE_MAX_LENGTH (HCI_MAX_PER_AD_LENGTH - EIR_SERVICE_DATA_LENGTH)
-+#define EIR_BAA_SERVICE_UUID	0x1851
- 
- /* iso_pinfo flags values */
- enum {
-@@ -1458,7 +1460,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- 		len = min_t(unsigned int, len, base_len);
- 		if (copy_to_user(optval, base, len))
- 			err = -EFAULT;
--
-+		*optlen = len;
- 		break;
- 
- 	default:
-@@ -1648,7 +1650,6 @@ static void iso_conn_ready(struct iso_conn *conn)
- 		}
- 
- 		if (ev2 && !ev2->status) {
--			iso_pi(sk)->sync_handle = iso_pi(parent)->sync_handle;
- 			iso_pi(sk)->qos = iso_pi(parent)->qos;
- 			iso_pi(sk)->bc_num_bis = iso_pi(parent)->bc_num_bis;
- 			memcpy(iso_pi(sk)->bc_bis, iso_pi(parent)->bc_bis, ISO_MAX_NUM_BIS);
-@@ -1771,13 +1772,20 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 
- 	ev3 = hci_recv_event_data(hdev, HCI_EV_LE_PER_ADV_REPORT);
- 	if (ev3) {
-+		size_t base_len = ev3->length;
-+		u8 *base;
-+
- 		sk = iso_get_sock_listen(&hdev->bdaddr, bdaddr,
- 					 iso_match_sync_handle_pa_report, ev3);
--
--		if (sk) {
--			memcpy(iso_pi(sk)->base, ev3->data, ev3->length);
--			iso_pi(sk)->base_len = ev3->length;
-+		base = eir_get_service_data(ev3->data, ev3->length,
-+					    EIR_BAA_SERVICE_UUID, &base_len);
-+		if (base) {
-+			if (sk) {
-+				memcpy(iso_pi(sk)->base, base, base_len);
-+				iso_pi(sk)->base_len = base_len;
-+			}
- 		}
-+
- 	} else {
- 		sk = iso_get_sock_listen(&hdev->bdaddr, BDADDR_ANY, NULL, NULL);
- 	}
+Vlad Pruteanu (1):
+  Bluetooth: ISO: Set CIS bit only for devices with CIS support
+
+ net/bluetooth/hci_sync.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 -- 
 2.34.1
 
