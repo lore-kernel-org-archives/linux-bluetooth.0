@@ -2,167 +2,110 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5D0EE14D4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 04:41:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1DFEE14D4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 05:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236799AbjIGElD (ORCPT
+        id S232665AbjIGFgR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Sep 2023 00:41:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36360 "EHLO
+        Thu, 7 Sep 2023 01:36:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232859AbjIGElD (ORCPT
+        with ESMTP id S229488AbjIGFgR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Sep 2023 00:41:03 -0400
-Received: from mail-oo1-xc36.google.com (mail-oo1-xc36.google.com [IPv6:2607:f8b0:4864:20::c36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E3B19B5
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Sep 2023 21:40:59 -0700 (PDT)
-Received: by mail-oo1-xc36.google.com with SMTP id 006d021491bc7-57325fcd970so319587eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Sep 2023 21:40:59 -0700 (PDT)
+        Thu, 7 Sep 2023 01:36:17 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BBF919B0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Sep 2023 22:36:14 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id ca18e2360f4ac-77a62a84855so22026639f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Sep 2023 22:36:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1694061659; x=1694666459; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=35GLpkIt6mujWl2+I1O0caFVu8TQ+zMPTz0lRmKFElM=;
-        b=l1TLFqK5GZajrbOHJ2aXXs4Xy18hnKABDqZrS4CuyoRkYY/sc/1NWAn+d1gRwGniy7
-         Bz8GWJR4l00mSeH6moXkkckVfReyLLumMj49LRY3sV6Q4ospEBalKOKDno7rJwF+d54y
-         9tp/WtXTcGSNjxAJpgTjvV05uxnqChNAZ/Ehk=
+        d=gmail.com; s=20221208; t=1694064973; x=1694669773; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6rE4NPBYZdDfVN3lcxXZKXYeqsYdfr3Z3a4VgkULuBc=;
+        b=CIA5H9Ku5uH43LDUXcxhHkYYIBQvc/5Dt+bMRwT7vwo4vlT7mHCfDIE7XgEpIBilqG
+         6IO30sdGOyq9asXUfsxm2f5L7rNrFndHez+iFu9LYnBeHOZIDykuBHow51ZMNLD6o4Ne
+         Nde3tVz+dEDsbUtBNK9kbpbYQ0eP2l7oZ1LjHTCbjmFjtFmaXGzFit/+nB3uxCZvLo81
+         bwE7Ac/25GffT62VYrpSNBhm/r+z/2FgURoZMtum6mn0T2i4Lk1+arbHHfVuL/gv+mLw
+         N6795kvEnrfD6IEbx/j7yvqBBBwiNEQb7WToRF1Mrkev9bsetV3TVGCyCDvHLa503//k
+         URFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1694061659; x=1694666459;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20221208; t=1694064973; x=1694669773;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=35GLpkIt6mujWl2+I1O0caFVu8TQ+zMPTz0lRmKFElM=;
-        b=fiWhs6VHNYImzBlMGe/Z0E6kl/uctj55BK3oxtkfoqxC9apvYIkNvc/00V5ESdyQtd
-         Te7SnD5eu3W0N47KsiS9vL3iwIri3E+s1iu3DLPkMWSoHTp/Ytdwqy9QDYvlwYAOFpCs
-         kwoywAxVcT/OtptUN2kt9xGA6A4GyUBJ+ZG1UQp16ie7w3vHCagDwhEV9vA27Z4ic/So
-         31+REKdNPBDzb9WqMHkApHrRqb7iJekXGrCKzuD7CDGTILacuYpKSrcFIgTqae7bKRKZ
-         67z2vwWms5bUizi3lVowqOgIhmv31eRWwdlEr19QYudkNGlwnGlVCLsjSiZPKyzeKgy8
-         4LnQ==
-X-Gm-Message-State: AOJu0YzAKKKMLtCQ2sIcDHMsBD3pmlbV3gKfX5xTlB4hTQ7ATbDouWZh
-        M5mt5woeU5oF5we+8/6vknnWq+LoQR3I55SwTjs=
-X-Google-Smtp-Source: AGHT+IFzlyg5QKlborvgxPU5wcPBCq1yrMAJZ+wHVqZ38R8CH4HjCjK/s1z+xHunn8lCvKhoiGGU2A==
-X-Received: by 2002:a05:6358:787:b0:132:d333:4a5c with SMTP id n7-20020a056358078700b00132d3334a5cmr5937699rwj.10.1694061658905;
-        Wed, 06 Sep 2023 21:40:58 -0700 (PDT)
-Received: from localhost (21.160.199.104.bc.googleusercontent.com. [104.199.160.21])
-        by smtp.gmail.com with UTF8SMTPSA id j17-20020a62b611000000b0066a2e8431a0sm11518344pff.183.2023.09.06.21.40.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Sep 2023 21:40:58 -0700 (PDT)
-From:   Ying Hsu <yinghsu@chromium.org>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Ying Hsu <yinghsu@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Avoid redundant authentication
-Date:   Thu,  7 Sep 2023 04:39:34 +0000
-Message-ID: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
-X-Mailer: git-send-email 2.42.0.283.g2d96d420d3-goog
+        bh=6rE4NPBYZdDfVN3lcxXZKXYeqsYdfr3Z3a4VgkULuBc=;
+        b=FWQXCAB43RQ7CtwcWWYkMcJw+4L8CdNGXjQNK3lyyEc2Qcxy6pbM5yighD6oEpQezj
+         r3hgjcZ1EnBWSJQAhk+CpmtEaluZsf4uLTg2jv6Le2yt43ok58cGUaIzTb5bYtVb6dCN
+         hsAW0cjl/GyeksB+0iiXeYspzVCYB6yDFnG2AX/uKNfvnUMe+kqeaGnlklymLwBRUmsl
+         KPW0h80TxR2u7AbXRTbjESwtLLAwIQKJtjJC9iGrPCEmzr8qhKPWdY+2ikcHwX41s3oQ
+         D+MEDpCIuo4QRsi59uypfu7LUWLKy1g3eN8OpvuWkOmSUl57XRmt3XvVpKUZr+4wMLBA
+         Ja4A==
+X-Gm-Message-State: AOJu0YzumgzkDsLON8egUxfEOn/msn5N8tXZgZ+RVMfjQMueSN6PveZ1
+        f30tKKcJHq8oOkiA/C2R+L/DRd8eAC4=
+X-Google-Smtp-Source: AGHT+IG8col4KVMTjcImM3whA7FnHRg7hiI7fOkKGmS0UrTin5iWuj8A1oXwTX4Oxn8gtAIz4jN2Cg==
+X-Received: by 2002:a92:c14d:0:b0:34f:3a72:c82a with SMTP id b13-20020a92c14d000000b0034f3a72c82amr2939494ilh.32.1694064973239;
+        Wed, 06 Sep 2023 22:36:13 -0700 (PDT)
+Received: from [172.17.0.2] ([40.86.13.184])
+        by smtp.gmail.com with ESMTPSA id o1-20020a92dac1000000b003492dfb8a02sm5415191ilq.8.2023.09.06.22.36.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Sep 2023 22:36:13 -0700 (PDT)
+Message-ID: <64f9614d.920a0220.201a5.5eb5@mx.google.com>
+Date:   Wed, 06 Sep 2023 22:36:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0138727294611851014=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
+Subject: RE: [v2] Bluetooth: Avoid redundant authentication
+In-Reply-To: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
+References: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-While executing the Android 13 CTS Verifier Secure Server test on a
-ChromeOS device, it was observed that the Bluetooth host initiates
-authentication for an RFCOMM connection after SSP completes.
-When this happens, some Intel Bluetooth controllers, like AC9560, would
-disconnect with "Connection Rejected due to Security Reasons (0x0e)".
+--===============0138727294611851014==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Historically, BlueZ did not mandate this authentication while an
-authenticated combination key was already in use for the connection.
-This behavior was changed since commit 7b5a9241b780
-("Bluetooth: Introduce requirements for security level 4").
-So, this patch addresses the aforementioned disconnection issue by
-restoring the previous behavior.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=782141
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.30 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      32.62 seconds
+CheckAllWarning               PASS      35.64 seconds
+CheckSparse                   PASS      40.47 seconds
+CheckSmatch                   PASS      113.20 seconds
+BuildKernel32                 PASS      30.92 seconds
+TestRunnerSetup               PASS      475.32 seconds
+TestRunner_l2cap-tester       PASS      26.90 seconds
+TestRunner_iso-tester         PASS      47.91 seconds
+TestRunner_bnep-tester        PASS      10.35 seconds
+TestRunner_mgmt-tester        PASS      220.23 seconds
+TestRunner_rfcomm-tester      PASS      15.73 seconds
+TestRunner_sco-tester         PASS      19.14 seconds
+TestRunner_ioctl-tester       PASS      17.48 seconds
+TestRunner_mesh-tester        PASS      13.01 seconds
+TestRunner_smp-tester         PASS      13.90 seconds
+TestRunner_userchan-tester    PASS      10.87 seconds
+IncrementalBuild              PASS      29.19 seconds
+
+
+
 ---
-- Tested CTS Verifier 13 Secure Server test on a chromebook with AC9560.
-- Manual tests on classic mouse/keyboard/headset, BLE keyboard/mouse.
+Regards,
+Linux Bluetooth
 
-Changes in v2:
-- Transitioned from multiple 'if' blocks to a 'switch-case' structure
-  for clarity and maintainability.
 
- net/bluetooth/hci_conn.c | 63 ++++++++++++++++++++++------------------
- 1 file changed, 35 insertions(+), 28 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 9d5057cef30a..7a6f20338db8 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2413,34 +2413,41 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
- 	if (!test_bit(HCI_CONN_AUTH, &conn->flags))
- 		goto auth;
- 
--	/* An authenticated FIPS approved combination key has sufficient
--	 * security for security level 4. */
--	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256 &&
--	    sec_level == BT_SECURITY_FIPS)
--		goto encrypt;
--
--	/* An authenticated combination key has sufficient security for
--	   security level 3. */
--	if ((conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
--	     conn->key_type == HCI_LK_AUTH_COMBINATION_P256) &&
--	    sec_level == BT_SECURITY_HIGH)
--		goto encrypt;
--
--	/* An unauthenticated combination key has sufficient security for
--	   security level 1 and 2. */
--	if ((conn->key_type == HCI_LK_UNAUTH_COMBINATION_P192 ||
--	     conn->key_type == HCI_LK_UNAUTH_COMBINATION_P256) &&
--	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
--		goto encrypt;
--
--	/* A combination key has always sufficient security for the security
--	   levels 1 or 2. High security level requires the combination key
--	   is generated using maximum PIN code length (16).
--	   For pre 2.1 units. */
--	if (conn->key_type == HCI_LK_COMBINATION &&
--	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW ||
--	     conn->pin_length == 16))
--		goto encrypt;
-+	switch (conn->key_type) {
-+	case HCI_LK_AUTH_COMBINATION_P256:
-+		/* An authenticated FIPS approved combination key has
-+		 * sufficient security for security level 4 or lower.
-+		 */
-+		if (sec_level <= BT_SECURITY_FIPS)
-+			goto encrypt;
-+		break;
-+	case HCI_LK_AUTH_COMBINATION_P192:
-+		/* An authenticated combination key has sufficient security for
-+		 * security level 3 or lower.
-+		 */
-+		if (sec_level <= BT_SECURITY_HIGH)
-+			goto encrypt;
-+		break;
-+	case HCI_LK_UNAUTH_COMBINATION_P192:
-+	case HCI_LK_UNAUTH_COMBINATION_P256:
-+		/* An unauthenticated combination key has sufficient security
-+		 * for security level 2 or lower.
-+		 */
-+		if (sec_level <= BT_SECURITY_MEDIUM)
-+			goto encrypt;
-+		break;
-+	case HCI_LK_COMBINATION:
-+		/* A combination key has always sufficient security for the
-+		 * security levels 2 or lower. High security level requires the
-+		 * combination key is generated using maximum PIN code length
-+		 * (16). For pre 2.1 units.
-+		 */
-+		if (sec_level <= BT_SECURITY_MEDIUM || conn->pin_length == 16)
-+			goto encrypt;
-+		break;
-+	default:
-+		break;
-+	}
- 
- auth:
- 	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
--- 
-2.42.0.283.g2d96d420d3-goog
-
+--===============0138727294611851014==--
