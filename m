@@ -2,213 +2,119 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 689C8EC874C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 18:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B63EC874B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 19:05:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238396AbjIGSVe (ORCPT
+        id S237896AbjIGTFm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Sep 2023 14:21:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54226 "EHLO
+        Thu, 7 Sep 2023 15:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231728AbjIGSVd (ORCPT
+        with ESMTP id S229838AbjIGTFk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Sep 2023 14:21:33 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A3BE92
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Sep 2023 11:21:28 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4RhJGT1hCVzVkXr;
-        Thu,  7 Sep 2023 20:20:01 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Thu, 7 Sep 2023 20:22:39 +0800
-From:   Ziyang Xuan <william.xuanziyang@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>
-CC:     <jiangzp@google.com>
-Subject: [PATCH] Bluetooth: Fix sleeping function called from invalid context in hci_cmd_sync_submit()
-Date:   Thu, 7 Sep 2023 20:22:34 +0800
-Message-ID: <20230907122234.146449-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 7 Sep 2023 15:05:40 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5177492
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Sep 2023 12:05:37 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id af79cd13be357-76dc77fd024so75993585a.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Sep 2023 12:05:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694113536; x=1694718336; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HfU4tv1H9RXqwmOwcSVZ1rcooj2a3eyFS6wrMHIv0wE=;
+        b=RaKPOJhc/aAD/SkYMqxz45jBp97mEiYxi+0OmlE4bWJ87lYm7nBUwnowz+49OXDKNw
+         d2wv5tksSHQ7ywYQeZbo/jOYS54C7o9k+rzuPSV59/gG5DyYHsUrnYPpFAE6ZGgF/9H2
+         zV/jSTeTT/oWB+rQ3Zl48BXACGvJJanHGSC8Q+uLmPJgFPNDtCt4/irPOLGSM4ziIG74
+         yRvSqAFgqyXm4CNcbCXgM+u5l5y/l71VivRt2GAnyDDCNU5LUItbAbkItkW4Ck2veNyZ
+         Fzgt0aoRT+8SdWD88RRWxH6RsO2zHjIJs9g0w1rBaqbwIZR8MWFF6o3thCbMol9kQdW4
+         i8bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694113536; x=1694718336;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HfU4tv1H9RXqwmOwcSVZ1rcooj2a3eyFS6wrMHIv0wE=;
+        b=aKxXAzxBvkyhvlVopwhAevETXAhtWKKgDA/OGjV2QGmSf7hekWvmLKN2Xc+y6I7BC+
+         +78iDwBnfAM4cwRu7A39UtvzzjZhyuJLfYTH5eT59Cq86ybsPnqFLPqS+D1abCNJ188i
+         TVBKNJdoNNRoj7MlGybNIqtw0Y5Y1DVdncGkWsmbnMGEdJ1KkzzI2kGXKewfYt9CoPJL
+         hhzLk/CjUyTuI+YWjlwU0UjmJLCVdMJnhK5u6mtQSRACu9sg+Ql28rn03us1WILJRo/y
+         +IRAVnu9ZxvTWU/8HmFi6Y/KwVXs+0hulqnh5nWTod6KMC2NuTHTGBYhA4/WwlwRDa+2
+         fuUA==
+X-Gm-Message-State: AOJu0YwxaOEb/GHsSlS49FEAX8c/55gM+3dV1qZ7vcXjQyyJHerO3QpP
+        cnUaD09CVf9L7tm9p99rJxXas9UUTSc=
+X-Google-Smtp-Source: AGHT+IFn4lDYhmbsX9LMFtetoXXXc8zgq5GymsAOb1S8xd4lzlAAtoKTHKABNj5ojkaZc8iy80lXHQ==
+X-Received: by 2002:a05:620a:2218:b0:76f:1dd4:101f with SMTP id m24-20020a05620a221800b0076f1dd4101fmr263842qkh.39.1694113536318;
+        Thu, 07 Sep 2023 12:05:36 -0700 (PDT)
+Received: from [172.17.0.2] ([20.42.8.243])
+        by smtp.gmail.com with ESMTPSA id h19-20020ac85493000000b003f6ac526568sm60081qtq.39.2023.09.07.12.05.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Sep 2023 12:05:36 -0700 (PDT)
+Message-ID: <64fa1f00.c80a0220.d9733.0568@mx.google.com>
+Date:   Thu, 07 Sep 2023 12:05:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3027839876065489981=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, william.xuanziyang@huawei.com
+Subject: RE: Bluetooth: Fix sleeping function called from invalid context in hci_cmd_sync_submit()
+In-Reply-To: <20230907122234.146449-1-william.xuanziyang@huawei.com>
+References: <20230907122234.146449-1-william.xuanziyang@huawei.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzbot reports a sleeping function called from invalid context problem.
+--===============3027839876065489981==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:580
-in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 4440, name: kworker/u5:1
-preempt_count: 0, expected: 0
-RCU nest depth: 1, expected: 0
-...
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
- __might_resched+0x3c3/0x5e0 kernel/sched/core.c:10187
- __mutex_lock_common kernel/locking/mutex.c:580 [inline]
- __mutex_lock+0xee/0x1340 kernel/locking/mutex.c:747
- hci_cmd_sync_submit+0x3f/0x340 net/bluetooth/hci_sync.c:699
- hci_cmd_sync_queue+0x79/0xa0 net/bluetooth/hci_sync.c:739
- hci_abort_conn+0x15b/0x330 net/bluetooth/hci_conn.c:2928
- hci_disconnect+0xc4/0x220 net/bluetooth/hci_conn.c:258
- hci_link_tx_to net/bluetooth/hci_core.c:3421 [inline]
- __check_timeout net/bluetooth/hci_core.c:3567 [inline]
- __check_timeout+0x331/0x4e0 net/bluetooth/hci_core.c:3547
- hci_sched_le net/bluetooth/hci_core.c:3750 [inline]
- hci_tx_work+0x818/0x1d30 net/bluetooth/hci_core.c:3828
- process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
- worker_thread+0x687/0x1110 kernel/workqueue.c:2751
- kthread+0x33a/0x430 kernel/kthread.c:389
- ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+This is automated email and please do not reply to this email!
 
-Use rcu_read_lock() to protect hci_conn_hash->list in hci_link_tx_to().
-rcu_read_lock() will disable preempt when CONFIG_PREEMPT_RCU is enabled.
-When it needs to abort connection, it will submit a command by
-hci_cmd_sync_submit() which has some sleeping functions like mutex_lock()
-and kmalloc(, GFP_KERNEL). That triggers the bug.
+Dear submitter,
 
-Convert cmd_sync_work_lock and unregister_lock to spin_lock type and
-replace GFP_KERNEL with GFP_ATOMIC to fix the bug.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=782320
 
-Fixes: 1857c19941c8 ("Bluetooth: hci_sync: add lock to protect HCI_UNREGISTER")
-Fixes: 6a98e3836fa2 ("Bluetooth: Add helper for serialized HCI command execution")
-Reported-by: syzbot+e7be5be00de0c3c2d782@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e7be5be00de0c3c2d782
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.26 seconds
+GitLint                       FAIL      0.69 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      40.08 seconds
+CheckAllWarning               PASS      42.91 seconds
+CheckSparse                   PASS      49.03 seconds
+CheckSmatch                   PASS      132.91 seconds
+BuildKernel32                 PASS      38.10 seconds
+TestRunnerSetup               PASS      572.79 seconds
+TestRunner_l2cap-tester       PASS      31.53 seconds
+TestRunner_iso-tester         PASS      73.02 seconds
+TestRunner_bnep-tester        PASS      12.11 seconds
+TestRunner_mgmt-tester        PASS      247.10 seconds
+TestRunner_rfcomm-tester      PASS      20.03 seconds
+TestRunner_sco-tester         PASS      22.58 seconds
+TestRunner_ioctl-tester       PASS      21.66 seconds
+TestRunner_mesh-tester        PASS      16.07 seconds
+TestRunner_smp-tester         PASS      16.94 seconds
+TestRunner_userchan-tester    PASS      14.02 seconds
+IncrementalBuild              PASS      34.24 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+Bluetooth: Fix sleeping function called from invalid context in hci_cmd_sync_submit()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (85>80): "Bluetooth: Fix sleeping function called from invalid context in hci_cmd_sync_submit()"
+
+
 ---
- include/net/bluetooth/hci_core.h |  4 ++--
- net/bluetooth/hci_core.c         |  4 ++--
- net/bluetooth/hci_sync.c         | 28 +++++++++++++++-------------
- 3 files changed, 19 insertions(+), 17 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e6359f7346f1..7a046a80a1ac 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -514,8 +514,8 @@ struct hci_dev {
- 	struct work_struct	error_reset;
- 	struct work_struct	cmd_sync_work;
- 	struct list_head	cmd_sync_work_list;
--	struct mutex		cmd_sync_work_lock;
--	struct mutex		unregister_lock;
-+	spinlock_t		cmd_sync_work_lock;
-+	spinlock_t		unregister_lock;
- 	struct work_struct	cmd_sync_cancel_work;
- 	struct work_struct	reenable_adv_work;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a5992f1b3c9b..c94bfde68228 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2716,9 +2716,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
- {
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
--	mutex_lock(&hdev->unregister_lock);
-+	spin_lock(&hdev->unregister_lock);
- 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
--	mutex_unlock(&hdev->unregister_lock);
-+	spin_unlock(&hdev->unregister_lock);
- 
- 	write_lock(&hci_dev_list_lock);
- 	list_del(&hdev->list);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9b93653c6197..4356ee29cd5f 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -286,13 +286,13 @@ static void hci_cmd_sync_work(struct work_struct *work)
- 	while (1) {
- 		struct hci_cmd_sync_work_entry *entry;
- 
--		mutex_lock(&hdev->cmd_sync_work_lock);
-+		spin_lock(&hdev->cmd_sync_work_lock);
- 		entry = list_first_entry_or_null(&hdev->cmd_sync_work_list,
- 						 struct hci_cmd_sync_work_entry,
- 						 list);
- 		if (entry)
- 			list_del(&entry->list);
--		mutex_unlock(&hdev->cmd_sync_work_lock);
-+		spin_unlock(&hdev->cmd_sync_work_lock);
- 
- 		if (!entry)
- 			break;
-@@ -629,8 +629,8 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
- {
- 	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
- 	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
--	mutex_init(&hdev->cmd_sync_work_lock);
--	mutex_init(&hdev->unregister_lock);
-+	spin_lock_init(&hdev->cmd_sync_work_lock);
-+	spin_lock_init(&hdev->unregister_lock);
- 
- 	INIT_WORK(&hdev->cmd_sync_cancel_work, hci_cmd_sync_cancel_work);
- 	INIT_WORK(&hdev->reenable_adv_work, reenable_adv);
-@@ -646,15 +646,17 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
- 	cancel_work_sync(&hdev->cmd_sync_work);
- 	cancel_work_sync(&hdev->reenable_adv_work);
- 
--	mutex_lock(&hdev->cmd_sync_work_lock);
-+	spin_lock(&hdev->cmd_sync_work_lock);
- 	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
-+		list_del(&entry->list);
-+		spin_unlock(&hdev->cmd_sync_work_lock);
-+
- 		if (entry->destroy)
- 			entry->destroy(hdev, entry->data, -ECANCELED);
--
--		list_del(&entry->list);
- 		kfree(entry);
-+		spin_lock(&hdev->cmd_sync_work_lock);
- 	}
--	mutex_unlock(&hdev->cmd_sync_work_lock);
-+	spin_unlock(&hdev->cmd_sync_work_lock);
- }
- 
- void __hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
-@@ -696,13 +698,13 @@ int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 	struct hci_cmd_sync_work_entry *entry;
- 	int err = 0;
- 
--	mutex_lock(&hdev->unregister_lock);
-+	spin_lock(&hdev->unregister_lock);
- 	if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
- 		err = -ENODEV;
- 		goto unlock;
- 	}
- 
--	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
-+	entry = kmalloc(sizeof(*entry), GFP_ATOMIC);
- 	if (!entry) {
- 		err = -ENOMEM;
- 		goto unlock;
-@@ -711,14 +713,14 @@ int hci_cmd_sync_submit(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 	entry->data = data;
- 	entry->destroy = destroy;
- 
--	mutex_lock(&hdev->cmd_sync_work_lock);
-+	spin_lock(&hdev->cmd_sync_work_lock);
- 	list_add_tail(&entry->list, &hdev->cmd_sync_work_list);
--	mutex_unlock(&hdev->cmd_sync_work_lock);
-+	spin_unlock(&hdev->cmd_sync_work_lock);
- 
- 	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
- 
- unlock:
--	mutex_unlock(&hdev->unregister_lock);
-+	spin_unlock(&hdev->unregister_lock);
- 	return err;
- }
- EXPORT_SYMBOL(hci_cmd_sync_submit);
--- 
-2.25.1
 
+--===============3027839876065489981==--
