@@ -2,47 +2,49 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D431AEEB56E
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 20:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDE2EEB572
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 20:50:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242014AbjIHUub (ORCPT
+        id S242212AbjIHUuc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 16:50:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49348 "EHLO
+        Fri, 8 Sep 2023 16:50:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230282AbjIHUu3 (ORCPT
+        with ESMTP id S235767AbjIHUub (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 16:50:29 -0400
+        Fri, 8 Sep 2023 16:50:31 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9CBA7
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Sep 2023 13:50:25 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EDFCAC433C7;
-        Fri,  8 Sep 2023 20:50:24 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECCDB2;
+        Fri,  8 Sep 2023 13:50:25 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 06D34C433C9;
+        Fri,  8 Sep 2023 20:50:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1694206225;
-        bh=BvlEcnESsevXKnAz7rl8A46jTef1ZZHATBDq9hN8j9w=;
+        bh=1oC3unuPY4W2Ce2yVgXMfOxQiB4DCDJ2bQBhfLNXz4M=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=NXEpkDT1D4G1txnqXWzPsA77Ufda8bWkP4m2fE3wmfROnLbBI6LZ+GN/Of5kDjzMs
-         +LON8GvVuvp6PLbedM+jHHp7N1HHKqcsIf2kl8hYY0WNCz8wm05ZFAm1bfEFOoxc3O
-         NKsTqtoiE5BrjLO/69hZr4J2Ximzp1bGC1pCasgT0SWe3RfdMvHLqhTGvYolw/rIo0
-         XZDAB2IL/xqm/onT547i6Y5ILONMsb1ek/rhP82y1rs7E8ZRFZQu6gEyGBvQl684Qq
-         SntAcNeWtU+aI2RAC8TZGofH5EZLyeIjS880tp9CSVsWkORyr4wilb5k2aeSkoAsf5
-         q4eZsYtkDBuDw==
+        b=hHxceuVbk/xIXsBVcXUE1q6lEUGsnk7d9ubmsHG2nBGhWNogevJVeiOC2lFSitXzj
+         iswWz/a4xVWsYwCYVC0fk8oCwIUMq8u3G9TyW5fiHLaMDG6HkOZwrdT/goow7FwKch
+         f9orgtYOEAIWkkeKxUIxg1U/756BY6gEroh4pdKHcGSYFCnP5AOvDiJubRx33xq0TZ
+         W1/FShTOEQiT7Ffw0XdDbnIB6adLOVwAtxCMCXSFHzYtgdKxPbuNyKJ28J6gdwxh9W
+         IjkPri5MWdcO1OeJwR8/NcDWa6lMmqkEQt80GvExNYZWrX4xj1FYSc/EXSvbCsVdZT
+         fpFDdrxrRmA9Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D129DF1D6A8;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E5EFDF1D6AA;
         Fri,  8 Sep 2023 20:50:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: Add support for Intel Misty Peak - 8087:0038
+Subject: Re: [PATCH v2] Bluetooth: Avoid redundant authentication
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169420622485.6163.17147278831548380422.git-patchwork-notify@kernel.org>
+Message-Id: <169420622493.6163.1195791709998663185.git-patchwork-notify@kernel.org>
 Date:   Fri, 08 Sep 2023 20:50:24 +0000
-References: <20230907091550.1957138-1-kiran.k@intel.com>
-In-Reply-To: <20230907091550.1957138-1-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
-        chethan.tumkur.narayan@intel.com, vijay.satija@intel.com
+References: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
+In-Reply-To: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
+To:     Ying Hsu <yinghsu@chromium.org>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -52,46 +54,25 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  7 Sep 2023 14:45:50 +0530 you wrote:
-> From: Vijay Satija <vijay.satija@intel.com>
+On Thu,  7 Sep 2023 04:39:34 +0000 you wrote:
+> While executing the Android 13 CTS Verifier Secure Server test on a
+> ChromeOS device, it was observed that the Bluetooth host initiates
+> authentication for an RFCOMM connection after SSP completes.
+> When this happens, some Intel Bluetooth controllers, like AC9560, would
+> disconnect with "Connection Rejected due to Security Reasons (0x0e)".
 > 
-> Devices from /sys/kernel/debug/usb/devices:
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=8087 ProdID=0038 Rev= 0.00
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> Historically, BlueZ did not mandate this authentication while an
+> authenticated combination key was already in use for the connection.
+> This behavior was changed since commit 7b5a9241b780
+> ("Bluetooth: Introduce requirements for security level 4").
+> So, this patch addresses the aforementioned disconnection issue by
+> restoring the previous behavior.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: Add support for Intel Misty Peak - 8087:0038
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ec63120307a6
+  - [v2] Bluetooth: Avoid redundant authentication
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4c8a783f3882
 
 You are awesome, thank you!
 -- 
