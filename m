@@ -2,206 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 136CBEC875E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Sep 2023 23:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E36EE57EB
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 09:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232356AbjIGXNw (ORCPT
+        id S241532AbjIHJQy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Sep 2023 19:13:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33344 "EHLO
+        Fri, 8 Sep 2023 05:16:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231308AbjIGXNv (ORCPT
+        with ESMTP id S236197AbjIHJQw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Sep 2023 19:13:51 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E1CBD
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Sep 2023 16:13:47 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E222C433C9
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Sep 2023 23:13:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694128427;
-        bh=fqtzpOwF01d9J5zGTxL2bsZ0fWi/0NNqv3VGCmSih2E=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ZLO0Ozh/q4YCb31dih2bpU4VAbkI53AgEvqtCc0nCKz7C42Bjg7ZSodK/XDBCLOlU
-         +E1nzGw1zHF0Svt74m78dnQwrys9iLB0u5iEo7RSqlfqztGe/xLH7zK6lH9Kjj00hT
-         AeAfb3lww0NWjHfpzflB48H4aWeT+XSTfFBu3J+brdl4gLYt7g1C/f695T8zcy6u7j
-         pAbrZWD/Q1QVJppx3k0n2WG1UJv1DRiQrrEGrpxr9upTkCiedPFv7z6K9IGl2IvWkx
-         vt5viArshVbP4AddiOJxjCxwNgKVg+E1knwdzBoYReYSE/rVQT8wmhRpdbtJmFYsly
-         Soezx4zgV3+lQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 68FFDC4332E; Thu,  7 Sep 2023 23:13:47 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Fri, 8 Sep 2023 05:16:52 -0400
+Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2078.outbound.protection.outlook.com [40.107.14.78])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9DE61997
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Sep 2023 02:16:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PDwUS0oLNPrRr0hkk/9TtlSSQ+6LfR6QR5/3hx1CaMM2q1RqCjLqXcYdjh2fatvu4FohJhx4z1CvH4eIrftujUkK36gxjvoXtjB9PAD86AoIy3XLK7bHGpBx9w01oUM96ryCdC/KTvgNeJsREaoX9EhshRn07vmrBSLggttoTogYY4FxnhyQVUVRU/BE9aCdkCe/sDh6I83F/maevMls7mHTvJrKWq3MJ/vKUM9j0UbDzZMbND6cS9F2NEp5hSGfQ8WmwgUVOQqOcINbFJ1/paNvnSvKLSVSD4ms1MdR+YQcUzO8jdhID/oqjynwMqtYimldaQPbE4t5sJCHdJrPug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F/Cchi6Qpmfn46OO77oAu2s05v9yJPH0eJKrJ/2DDIk=;
+ b=HsFZNykAKX8QZdmJ9km5C/Bw5qW6uwnZJF4uFMzCh2RBj11tzi/S4NJ6uIcSGdWoeMpH6h8/Jl6c5UC0ZKkAo5G6XqbLa+kWuXEaF9YqSHhMy9wTv4Ur/wnGtDkeJRKIALEvNlvUxa6lmfaSK49tJneYl4TE7ZpvrsROhAI8Ew568XBa8oxhoHQdPJ2gZtzXKizwsrhlWnYrixALlqUnu11w2phJMoM2Ya4un24M4mNQlHo1QXU3rWf6wbjbT2gKgh2wOn6FC6M8jFo+5H6dRX6jbjOxq2S2nMOVsIV5DSO/isRMirL6hD7myA8c5N5Livjcs7yd0Q7lMWDFE3/bqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F/Cchi6Qpmfn46OO77oAu2s05v9yJPH0eJKrJ/2DDIk=;
+ b=rGXc4+C4QTqiklcDGCpjBtr9KhsslZ3tN7Yoiu2UFmHx+G+mqLWqJsRnil6vX9VXlarCb5azShcslK/Mpi7IlkCAiL0nefxbOuh5X1v2Z/YrLKn0m7+S637Wxr5cijvsxbQ8xW7GGS8C6YxpVNejBPDeanrIwQqfr3xTQMmkD2I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB9398.eurprd04.prod.outlook.com (2603:10a6:102:2b4::19)
+ by VE1PR04MB7327.eurprd04.prod.outlook.com (2603:10a6:800:1ac::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6745.33; Fri, 8 Sep
+ 2023 09:16:44 +0000
+Received: from PAXPR04MB9398.eurprd04.prod.outlook.com
+ ([fe80::4131:3e13:f138:f636]) by PAXPR04MB9398.eurprd04.prod.outlook.com
+ ([fe80::4131:3e13:f138:f636%4]) with mapi id 15.20.6745.034; Fri, 8 Sep 2023
+ 09:16:44 +0000
+From:   Vlad Pruteanu <vlad.pruteanu@nxp.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217870] ATS2851 chipset for Baseus BA07 Bluetooth does not
- connect, no bluetooth device connects, adapter does not turn on
-Date:   Thu, 07 Sep 2023 23:13:47 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mg-tatangelo@hotmail.com.br
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-217870-62941-lFsZQyhQkX@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217870-62941@https.bugzilla.kernel.org/>
-References: <bug-217870-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
+        silviu.barbulescu@nxp.com, iulia.tanasescu@nxp.com,
+        andrei.istodorescu@nxp.com, Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Subject: [PATCH v2 0/1] Bluetooth: ISO: Set CIS bit only for devices with CIS support
+Date:   Fri,  8 Sep 2023 12:16:21 +0300
+Message-Id: <20230908091624.20040-1-vlad.pruteanu@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P189CA0040.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dd::9) To PAXPR04MB9398.eurprd04.prod.outlook.com
+ (2603:10a6:102:2b4::19)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB9398:EE_|VE1PR04MB7327:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38643e9f-7b31-4ede-205f-08dbb04c51ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CbKgWJ53p0eYhQ1wXjrqWFMPCrE7BcHrtmgQNH8t9wkbGKQeAaEbjpKVWadtS4W83fTy3wRGH3E1r/FQZlHpkCZPbwpMrwB+J+/soNWaHosedsZe5MzB++JP+K4Qd374EABusp0pJ4jFSdx9g9+5nut0EjnnXkHv5VGG0g4E0wl6svT2aX8Y9r5wcb16O+3DKraWi/hSUHdwExkysUQBJBMn0jGCAY7nw3YDUJ7eoeggs7K6TkHeNkZUtSRZx8DeHtuAnNRVZyFeQ7pEXDfZhnpGebfy49OG1etJ4DHJzn8VeZIMvcXC72ob8vmPtLlPRQQIO3U3nBQxiMwvY1VTb8iENf0B81GxWVTHzsGyQRWT+cVDf6jVifuMfWfgHSX3dqww+mgvPnCbtf2UbGliFhVDuZIy676OZkBOB8qOCM5EiuEeYf/51uOdYgZVlb7MEGIu0a9HLfhwZ5wn2N4O64QInLaplyXp7hCvhbGlWLYYYHCHcIy249Pey0aVfnMZGXx7KD0mQ2A/CcAS2oPhuTipo5MByi/KHyfG5UYRibc8I9zJfuUhrNaBLV57eRFklW2j9qNHTDOpVQjBJG6uC3pt99vZHKaj/SEkcUePGeh7oor8ry6PO47RUI2UAM8I
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9398.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(376002)(396003)(136003)(366004)(451199024)(1800799009)(186009)(1076003)(66476007)(66946007)(6916009)(316002)(66556008)(2906002)(4326008)(8936002)(44832011)(5660300002)(6666004)(83380400001)(8676002)(6506007)(52116002)(26005)(6486002)(41300700001)(6512007)(4744005)(478600001)(38350700002)(86362001)(2616005)(36756003)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Fu5xhc9ovu31pv+nmLH+dHKCAdMpDFaoMM3/NrwtBwUshG36t/eiBglnBMlF?=
+ =?us-ascii?Q?FxApFjBnXPnC9yBcBOzzeXKtKE3HYVa6wBUlcyR680kkD75qwhr4tK1M/YOQ?=
+ =?us-ascii?Q?I289Lh9yK5JwJvsaajawimV71pNUeITKE4Rh7A5yxvqgB5yJlc1FhtZhKZBu?=
+ =?us-ascii?Q?y3ER8vNDU5F+iYEwnrGM47ctSNup/fFT0NYTSYDgsUvpJjxBOJwWjG0+QG/G?=
+ =?us-ascii?Q?WGWr1yFdXJNITHn8E+MaDPESL2Pr5myWOnamdgdPWzeRWd9aZ/Kcwz4R62rX?=
+ =?us-ascii?Q?FaWf5nMMZhArz6HicOZeYu0rmjWcgS4PXb3sF/6w1y4kRyN0zQKKNcvIx/9V?=
+ =?us-ascii?Q?h7THBP01imeYM/LSocSQGvG7ic+A5vYwq7/OcTtGMfXFqor7J0a5rFRff3r2?=
+ =?us-ascii?Q?x6yCqkZ+QWqE4/cTA8kBbescXANinIU6Po3X6GN40Rb0fvPk6D1GuaggFY/D?=
+ =?us-ascii?Q?DFWTwW2LOzsThevQP8pKLWMZAOmzNOubhQdSkswvXg8UOTvLpeUXtIjUEEVm?=
+ =?us-ascii?Q?TbmOcfNARqyIjMk46qvaAcI77GJOwIH6BigFMCaZnw3q27fUrnF7muCUX3Xb?=
+ =?us-ascii?Q?Uts8tVCOax/rcyIKc9Oz6IzVxgRRFil+CMZXStID2TByJg1/krm/jGR2d2SB?=
+ =?us-ascii?Q?xhHdDuvGuStENVzzb1cX3NuY6Pdg0nwbJeDHiIu6Z5Qd81igglMhQOgLv8iq?=
+ =?us-ascii?Q?2apELheewCmdVy5rDR7Z2OLT/zlH7ZeOHtLE+o0wndmT869IuwuQbEKOW3fm?=
+ =?us-ascii?Q?64vEtihFurvsj+C0vUKXBTZp2Fv8wwG6k+ZKN3T0E9myVt+l6OFU75dUUYl7?=
+ =?us-ascii?Q?viljgMrcranYS5zt7bWKNhJIBQsVorSw5yLY9QxeghP59fQyc1bpHOUFjNLJ?=
+ =?us-ascii?Q?aHPOS2Fgi/hGx/0Bm1amR9lfdX93tVM/vLK/KuUlvFMsYm6K1ci/D2QsnjKj?=
+ =?us-ascii?Q?0/PVNFrsTfk72eUaHhaL0Fvn2ZhJm8/uGFZ/MNn92FolAQDYiEDQ7HS/WCOC?=
+ =?us-ascii?Q?3vqAsSm4huD1YdUR+CoBkyymjn6dhdn/5J70DwK2KuNwGj+WP6505H/yASE3?=
+ =?us-ascii?Q?BeZYwo+kFzUQxdIVIOb8a89v15MYEKcp7YH7jrAUAKJsiguXsNIOENDF3OOV?=
+ =?us-ascii?Q?vrAdZ/5X6APgD1zyjuDM6DUkrZvgC0Vt8XB26z0lIiQCYoYQDe2Z0ae3pmRb?=
+ =?us-ascii?Q?5bGh859yFD9jIj3mjrmIus+9cH54Yxny/s5J1bUq5z6WcWj/RrqGTDXjxfuF?=
+ =?us-ascii?Q?7Rpcdnh6lm9vasbLYyA6l2sSvQaCZgo13wcqL5vv/UdHEEe4DGjZvQL3M6l+?=
+ =?us-ascii?Q?UIvj36+b7RwABKGTlYTADK5ysmdNRaDDiVVQsu5aNrkoqT4G9q9ZbNOC5Qaa?=
+ =?us-ascii?Q?HoqEqb/zoVuOujBjPGew/F6fEDv+E6hu6C+0z8SxDFnofBgCdm9EvzoxA2L7?=
+ =?us-ascii?Q?zjZ+lrAmepRBTQaqQj+BJbsg2eiRe9hT4lbfoirHjlCRpfzv6dGBle9xfpj7?=
+ =?us-ascii?Q?6pgUfC4yNhItH2YllhIni9GROfNsOzu8OqbCRqUp8qTAon6QkoPTJ1a0ExsY?=
+ =?us-ascii?Q?3WV/iPMIZWmO2XTL/LgHbQRaX5nR+jcOKhlqIy7vuDgPxKTYq98w49oKllRk?=
+ =?us-ascii?Q?aw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38643e9f-7b31-4ede-205f-08dbb04c51ee
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9398.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2023 09:16:44.3414
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UkDu/6fkf6LJOL3g2okuG9j4uImTMHUo75BO0Kts2nt0X5g+b10nuGFubMIoH7SDIv9LC19ovj3V+4c7o+3+Ig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7327
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217870
+Currently the CIS bit that can be set by the host is set for any device
+that has CIS or BIS support. In reality, devices that support BIS may not
+allow that bit to be set and so, the HCI bring up fails for them.
 
---- Comment #2 from mg-tatangelo@hotmail.com.br (mg-tatangelo@hotmail.com.b=
-r) ---
-(In reply to Bagas Sanjaya from comment #1)
-> (In reply to mg-tatangelo@hotmail.com.br from comment #0)
-> > doesn't connect/bugs on linux, mainly on KDE, on KDE it doesn't even sh=
-ow
-> > that it's connected, on gnome it shows that the adapter is connected, b=
-ut
-> it
-> > looks like it's plugged in and not plugged in at the same time, like, it
-> > really, IT IS CONNECTED, but it appears that it is off, no device appea=
-rs
-> to
-> > pair and when it appears (rare occasions), it keeps loading infinitely =
-when
-> > I click to make the connection, an interesting fact that happened and I
-> will
-> > leave it here as a help: when I I use a virtual machine with Linux, THE
-> > SOUND CATCHES, the adapter picks up, I can hear what comes out of the
-> > virtual machine, with the same headphones that I try to connect to the
-> > bluetooth adapter and it does not go when Linux is my main OS, the only=
- The
-> > thing that doesn't work is the phone, through the virtual machine, but =
-the
-> > sound comes out! so probably the chipset works, but it must be
-> misconfigured
-> > or have little/no support for the chipset and that's it, I hope you can
-> help
-> > me, hugs!
->=20
-> Sorry but can you attach full dmesg output?
+This commit fixes this by only setting the bit for CIS capable devices.
 
-Sim, here it is or dmesg output:
-pop-os@pop-os:~$ sudo dmesg
-[    0.000000] Linux version 6.2.6-76060206-generic (jenkins@warp.pop-os.or=
-g)
-(x86_64-linux-gnu-gcc-12 (Ubuntu 12.1.0-2ubuntu1~22.04) 12.1.0, GNU ld (GNU
-Binutils for Ubuntu) 2.38) #202303130630~1689015125~22.04~ab2190e SMP
-PREEMPT_DYNAMIC Mon J
-[    0.000000] Command line:
-BOOT_IMAGE=3D/casper_pop-os_22.04_amd64_intel_debug_530/vmlinuz.efi boot=3D=
-casper
-live-media-path=3D/casper_pop-os_22.04_amd64_intel_debug_530 hostname=3Dpop=
--os
-username=3Dpop-os noprompt ---
-[    0.000000] KERNEL supported cpus:
-[    0.000000]   Intel GenuineIntel
-[    0.000000]   AMD AuthenticAMD
-[    0.000000]   Hygon HygonGenuine
-[    0.000000]   Centaur CentaurHauls
-[    0.000000]   zhaoxin   Shanghai=20=20
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x001: 'x87 floating point
-registers'
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x002: 'SSE registers'
-[    0.000000] x86/fpu: Supporting XSAVE feature 0x004: 'AVX registers'
-[    0.000000] x86/fpu: xstate_offset[2]:  576, xstate_sizes[2]:  256
-[    0.000000] x86/fpu: Enabled xstate features 0x7, context size is 832 by=
-tes,
-using 'compacted' format.
-[    0.000000] signal: max sigframe size: 1776
-[    0.000000] BIOS-provided physical RAM map:
-[   20.833658] eeepc-wmi eeepc-wmi: Detected ASUSWMI, use DCTS
-*[   20.834110] Bluetooth: Core ver 2.22*
-[   20.834129] NET: Registered PF_BLUETOOTH protocol family
-[   20.834130] Bluetooth: HCI device and connection manager initialized
-[   20.834135] Bluetooth: HCI socket layer initialized
-[   20.834137] Bluetooth: L2CAP socket layer initialized
-[   20.834140] Bluetooth: SCO socket layer initialized
-[   20.834474] input: Eee PC WMI hotkeys as
-/devices/platform/eeepc-wmi/input/input7
-[   21.275057] usbcore: registered new interface driver btusb
-[   21.275097] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
-command is advertised, but not supported.
-[   21.354618] intel_rapl_common: Found RAPL domain package
-[   21.354622] intel_rapl_common: Found RAPL domain core
-*[   21.362014] Bluetooth: hci0: Opcode 0x204b failed: -56*
-[   21.825364] snd_hda_intel 0000:07:00.1: enabling device (0000 -> 0002)
-[   21.825481] snd_hda_intel 0000:07:00.1: Force to non-snoop mode
-[   21.825525] snd_hda_intel 0000:09:00.4: enabling device (0000 -> 0002)
-[   21.919378] snd_hda_intel 0000:07:00.1: bound 0000:07:00.0 (ops
-amdgpu_dm_audio_component_bind_ops [amdgpu])
-[   21.983424] input: HDA ATI HDMI HDMI/DP,pcm=3D3 as
-/devices/pci0000:00/0000:00:03.1/0000:07:00.1/sound/card0/input8
-[   21.983505] input: HDA ATI HDMI HDMI/DP,pcm=3D7 as
-/devices/pci0000:00/0000:00:03.1/0000:07:00.1/sound/card0/input9
-[   21.984066] input: HDA ATI HDMI HDMI/DP,pcm=3D8 as
-/devices/pci0000:00/0000:00:03.1/0000:07:00.1/sound/card0/input10
-[   21.984133] input: HDA ATI HDMI HDMI/DP,pcm=3D9 as
-/devices/pci0000:00/0000:00:03.1/0000:07:00.1/sound/card0/input11
-[   21.984243] input: HDA ATI HDMI HDMI/DP,pcm=3D10 as
-/devices/pci0000:00/0000:00:03.1/0000:07:00.1/sound/card0/input12
-[   21.984345] input: HDA ATI HDMI HDMI/DP,pcm=3D11 as
-/devices/pci0000:00/0000:00:03.1/0000:07:00.1/sound/card0/input13
-[   22.116993] snd_hda_codec_realtek hdaudioC1D0: autoconfig for ALC887-VD:
-line_outs=3D1 (0x14/0x0/0x0/0x0/0x0) type:line
-[   22.116999] snd_hda_codec_realtek hdaudioC1D0:    speaker_outs=3D0
-(0x0/0x0/0x0/0x0/0x0)
-[   22.117001] snd_hda_codec_realtek hdaudioC1D0:    hp_outs=3D1
-(0x1b/0x0/0x0/0x0/0x0)
-[   22.117002] snd_hda_codec_realtek hdaudioC1D0:    mono: mono_out=3D0x0
-[   22.117003] snd_hda_codec_realtek hdaudioC1D0:    dig-out=3D0x11/0x0
-[   22.117004] snd_hda_codec_realtek hdaudioC1D0:    inputs:
-[   22.117005] snd_hda_codec_realtek hdaudioC1D0:      Front Mic=3D0x19
-[   22.117007] snd_hda_codec_realtek hdaudioC1D0:      Rear Mic=3D0x18
-[   22.117008] snd_hda_codec_realtek hdaudioC1D0:      Line=3D0x1a
-[   22.129878] input: HD-Audio Generic Front Mic as
-/devices/pci0000:00/0000:00:08.1/0000:09:00.4/sound/card1/input14
-[   22.129938] input: HD-Audio Generic Rear Mic as
-/devices/pci0000:00/0000:00:08.1/0000:09:00.4/sound/card1/input15
-[   22.129983] input: HD-Audio Generic Line as
-/devices/pci0000:00/0000:00:08.1/0000:09:00.4/sound/card1/input16
-[   22.130013] input: HD-Audio Generic Line Out as
-/devices/pci0000:00/0000:00:08.1/0000:09:00.4/sound/card1/input17
-[   22.130050] input: HD-Audio Generic Front Headphone as
-/devices/pci0000:00/0000:00:08.1/0000:09:00.4/sound/card1/input18
-[   25.163670] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   25.163675] Bluetooth: BNEP filters: protocol multicast
-[   25.163678] Bluetooth: BNEP socket layer initialized
-[   26.147876] zram: Added device: zram0
-[   27.981373] zram0: detected capacity change from 0 to 32587776
-[   28.056021] Generic FE-GE Realtek PHY r8169-0-500:00: attached PHY driver
-(mii_bus:phy_addr=3Dr8169-0-500:00, irq=3DMAC)
-[   28.101179] Dynamic Preempt: full
-[   28.260140] r8169 0000:05:00.0 enp5s0: Link is Down
-[   28.301326] Dynamic Preempt: full
-[   28.353893] Adding 16293884k swap on /dev/zram0.  Priority:1000 extents:1
-across:16293884k SSFS
-[   31.206641] r8169 0000:05:00.0 enp5s0: Link is Up - 1Gbps/Full - flow
-control rx/tx
-[   31.206657] IPv6: ADDRCONF(NETDEV_CHANGE): enp5s0: link becomes ready
-[   91.608218] rfkill: input handler disabled
-[   98.409533] EXT4-fs (sda1): VFS: Can't find ext4 filesystem
-[   98.409645] EXT4-fs (sda1): VFS: Can't find ext4 filesystem
-[   98.409739] EXT4-fs (sda1): VFS: Can't find ext4 filesystem
-[   98.409834] Can't find a SQUASHFS superblock on sda1
+Vlad Pruteanu (1):
+  Bluetooth: ISO: Set CIS bit only for devices with CIS support
 
---=20
-You may reply to this email to add a comment.
+ net/bluetooth/hci_sync.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+2.34.1
+
