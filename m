@@ -2,124 +2,127 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F40E1EE7FED
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 12:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 071DEEEB566
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:17:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231476AbjIHMq3 (ORCPT
+        id S241303AbjIHSR7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 08:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37194 "EHLO
+        Fri, 8 Sep 2023 14:17:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243317AbjIHMq2 (ORCPT
+        with ESMTP id S1343757AbjIHSRp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 08:46:28 -0400
-Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D011FEB
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Sep 2023 05:46:13 -0700 (PDT)
-Received: by mail-ua1-x92f.google.com with SMTP id a1e0cc1a2514c-7a4efcdab54so703242241.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Sep 2023 05:46:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694177173; x=1694781973; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=VUTy39sVS9j+F2cplcvaaA4JXZjCghHo6EucajImLw8=;
-        b=Ty0V5QF3CI4O/Uyv4V1soFQ8kZvgUlj/58+O3iBPtGo1sTOkAHhUyI+WJ6KKypCoAf
-         sdQMoi25Ai2B4NtY36Yc2VTZ6vkZx2XyWt3S0ws8OHNpT8fznd1h3rxDBfBSbf5SDmeS
-         beAvE9IfBm6sY0cYE+0j/gRZaQUGwmmxW8JwBdRDut359s/SPrVYaMrtScA1IRqPEsfi
-         h8zdCyE9/4mnih3WGLiWhDpLTZ69+XnPvnkgVloV2SCGELQ+o2/wXfJw7Fa7p9Mrd+pj
-         pJMLMUS+ZDliOjjx9bo6RSgKrNJNLFJua9aneLxiBCmjqBM3k6aEzr2eO/U7uTUdgME8
-         17+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694177173; x=1694781973;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VUTy39sVS9j+F2cplcvaaA4JXZjCghHo6EucajImLw8=;
-        b=pTZr1d0lSmAJPEuMmumadQQC3oRodT9NGxkMSF/qp85ACG0XNZ6VTs8odDrRO3ifUy
-         nODT9DA7ohYCP/DmNx1wFA8S/3NV/jhXuSznexT9Y7ITcLXu0wRCBtJT3+MeTyZr/rDs
-         TJOgxtwxuQDr4K1AqaKQkgKCev5zzHVap64oC6cgdvEiDtxeLEOT17hEVrppNXH8yhuL
-         BiPw+xfWRmmHgge6taGefssB9qEcxIplhqLoac0B5a6ZkjnZ1GleOGk8M6K8pqXUAa5P
-         0hVLCjoFeLYdm5U9l1P4dMawFl3UXxCf5PaKoMMj2tR9olYdmhTvVFx8CUTCNZYx7d0N
-         8MSw==
-X-Gm-Message-State: AOJu0YzOMEjHRCrt9D8ao76aNIKJNY7KSCEbbbzJRFjclpNSuHULI3W4
-        /XYkLR4tweHBwN0xu+4WIwosjwhkWGU=
-X-Google-Smtp-Source: AGHT+IE8d8wkb7A9JYa5wMr3iqT/ImpLPMZhGH6kE5bQS42kn3Cf7LllMW3mcZV5bRCBC/gHnAssHg==
-X-Received: by 2002:a67:f557:0:b0:44e:9afe:c5b9 with SMTP id z23-20020a67f557000000b0044e9afec5b9mr2359955vsn.23.1694177172669;
-        Fri, 08 Sep 2023 05:46:12 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.155.208])
-        by smtp.gmail.com with ESMTPSA id n3-20020a0ce543000000b006262de12a8csm664526qvm.65.2023.09.08.05.46.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Sep 2023 05:46:12 -0700 (PDT)
-Message-ID: <64fb1794.0c0a0220.94906.1f57@mx.google.com>
-Date:   Fri, 08 Sep 2023 05:46:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1338604991024709928=="
+        Fri, 8 Sep 2023 14:17:45 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19C6F26AB;
+        Fri,  8 Sep 2023 11:17:20 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BA9C116B0;
+        Fri,  8 Sep 2023 18:14:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1694196872;
+        bh=Nxm9lEz9AckHXn3tnaW6+S41PFKMFFXDXI01PrxrPkk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=i12EkFcbdHRzNtBg96t9p4CxHryCNh0p6ZoSCTPoJ+mJgtOX1arBluwsHlWVmdcLC
+         6XBOQ2uMJRZhcj1VvtVkrGSw+aTdeP2vu9+2E3VhRb80+Uw38E6kT04E4/7uk0MQEv
+         sKLM+My4pptbWjs8oA0eFMxE23CJQnniYSwdZ0UQay3/2Hj9L9F7bLTQoTlQj7o5mU
+         8I45WsNAYaEW4sQdy2oRQNZwWblOH/8Ho+zmN0DVcors7RnhQQT2xduPA0ynLTYHp8
+         bqW6XEuu+RRpXQQLjNfk8DML6mxD1o7XBkrSOQe5NPsn/nARwu1rjd9ZiXYGTozQhv
+         Pd+gS0w7IqvMQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Valentin David <valentin.david@gmail.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.5 21/45] Bluetooth: btusb: Add device 0489:e0f5 as MT7922 device
+Date:   Fri,  8 Sep 2023 14:13:02 -0400
+Message-Id: <20230908181327.3459042-21-sashal@kernel.org>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20230908181327.3459042-1-sashal@kernel.org>
+References: <20230908181327.3459042-1-sashal@kernel.org>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
-Subject: RE: bap: Use defer setup when syncing to a BIS source
-In-Reply-To: <20230908111208.121996-2-vlad.pruteanu@nxp.com>
-References: <20230908111208.121996-2-vlad.pruteanu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.5.2
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1338604991024709928==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Valentin David <valentin.david@gmail.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit e160a8f4e920e5cf4e16a17f57367954c9436aea ]
 
-Dear submitter,
+Asus ROG Ally gaming computer has a MediaTek MT7922 chip that uses USB id
+0489:e0f5 and needs to be added to the table. Without this, the device is
+not usable and gives the following error:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=782484
+Bluetooth: hci0: Opcode 0x c03 failed: -110
 
----Test result---
+Output from /sys/kernel/debug/usb/devices:
 
-Test Summary:
-CheckPatch                    FAIL      0.86 seconds
-GitLint                       PASS      0.40 seconds
-BuildEll                      PASS      33.31 seconds
-BluezMake                     PASS      980.29 seconds
-MakeCheck                     PASS      13.26 seconds
-MakeDistcheck                 PASS      190.89 seconds
-CheckValgrind                 PASS      311.09 seconds
-CheckSmatch                   PASS      411.43 seconds
-bluezmakeextell               PASS      126.22 seconds
-IncrementalBuild              PASS      804.16 seconds
-ScanBuild                     PASS      1273.31 seconds
+T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e0f5 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/1] bap: Use defer setup when syncing to a BIS source
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#118: FILE: profiles/audio/bap.c:847:
-+	if (!bt_io_bcast_accept(io, iso_bcast_confirm_cb, user_data, NULL, &err)) {
-
-/github/workspace/src/src/13377364.patch total: 0 errors, 1 warnings, 29 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13377364.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Valentin David <valentin.david@gmail.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 764d176e97351..0376437824b4b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -628,6 +628,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0f5), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Additional Realtek 8723AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+-- 
+2.40.1
 
---===============1338604991024709928==--
