@@ -2,126 +2,95 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71934EEB566
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F19A7EEB567
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:21:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344206AbjIHSUP (ORCPT
+        id S240371AbjIHSVT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 14:20:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51286 "EHLO
+        Fri, 8 Sep 2023 14:21:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344075AbjIHSTM (ORCPT
+        with ESMTP id S1344095AbjIHST4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 14:19:12 -0400
+        Fri, 8 Sep 2023 14:19:56 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA2C41FE3;
-        Fri,  8 Sep 2023 11:18:38 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF862C433CA;
-        Fri,  8 Sep 2023 18:14:32 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907CC2D51;
+        Fri,  8 Sep 2023 11:18:57 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 911E8C433C8;
+        Fri,  8 Sep 2023 18:17:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694196874;
-        bh=9usWPYj2WWcwLld+QaYFqKiKEqaXuomSppKk3+bhkPA=;
+        s=k20201202; t=1694197048;
+        bh=iLWsyO/8yGOb4h4DP+3FeDaNhvKc+MvC5XCSCjcZYV4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QPHFZZ4/EZfe9uS5l45xp3YTqFTNf8C72FZHylqYbtWGssQ20/uFkmyB0x2t9wFmc
-         m8ELz7GISw/ZIrQCabikBSkzoeg3chz0AtlkDfkTVjtpLKee1c2+wBviBbtE+EA8Vo
-         oMZP5HyfzXT4SI+Tle8AkTvj67rQte8+wWCindXq0hqbkqhVd5/t7cLZnY0Ae1Hryc
-         vNj+Oh4ESCX7+q4YJAlWVaqsQ/q4I9x3Cz45VZSx9EnhdTc3dOeB5iGxPtbMRGmVkO
-         jXgz2Ch+05JevkHfK6/tPRkRd8pNa8gRYBGVrHLNSP/lj2sClce2sKUun1RkHraUmW
-         hTKthYvqhogvA==
+        b=W17b0nshNKDHGM+1H/4+4ujkFd31rPkRGJmt2qa8XTQi3G36DWzyoJcdLODHJWhdO
+         /mUCKV6+82jWST2U6pxHSnbtAjgOeD120yMAAoPcVLU0GthnYR0jWdRF6VtsbSnTzI
+         mQRVMRlN0wxELGE32GVRjt1A2dOXzUKJSALAnJmaqb+upF8qWokNH6tkX+pmHsPEzI
+         hbY41ANfQ5UNWQM+q5HFOkWrNMeHoBazt5jyoaRDptSO/Fty25x1TQK67UwQudOdXM
+         /wRRwwdmmIb8eI9/8bSoSfddwHr8Ro/69GhwU6cYSzuoknXSKtk9/zJXJ29kZtLiSM
+         qwylXXvpqv4Jw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Chris Lu <chris.lu@mediatek.com>,
+Cc:     Bastien Nocera <hadess@hadess.net>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.5 22/45] Bluetooth: btusb: Add a new VID/PID 0489/e0f6 for MT7922
-Date:   Fri,  8 Sep 2023 14:13:03 -0400
-Message-Id: <20230908181327.3459042-22-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.4 37/41] Bluetooth: btusb: Fix quirks table naming
+Date:   Fri,  8 Sep 2023 14:15:51 -0400
+Message-Id: <20230908181555.3459640-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230908181327.3459042-1-sashal@kernel.org>
-References: <20230908181327.3459042-1-sashal@kernel.org>
+In-Reply-To: <20230908181555.3459640-1-sashal@kernel.org>
+References: <20230908181555.3459640-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.5.2
+X-stable-base: Linux 6.4.15
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chris Lu <chris.lu@mediatek.com>
+From: Bastien Nocera <hadess@hadess.net>
 
-[ Upstream commit b6cfa1c29afb6d527652938b0eb8db17b194bddc ]
+[ Upstream commit d831e3612111d385e8629104af5429808ef26e25 ]
 
-Add VID/PID 0489/e0f6 for MediaTek MT7922 USB Bluetooth chip.
+The quirks table was named "blacklist_table" which isn't a good
+description for that table as devices detected using it weren't ignored
+by the driver.
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+Rename the table to match what it actually does.
 
-T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0f6 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+Signed-off-by: Bastien Nocera <hadess@hadess.net>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/btusb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 0376437824b4b..ff6a1d9547be8 100644
+index 18b7847aa417c..b312479ec404f 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -631,6 +631,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0f5), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0f6), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
+@@ -175,7 +175,7 @@ static const struct usb_device_id btusb_table[] = {
  
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+ MODULE_DEVICE_TABLE(usb, btusb_table);
+ 
+-static const struct usb_device_id blacklist_table[] = {
++static const struct usb_device_id quirks_table[] = {
+ 	/* CSR BlueCore devices */
+ 	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
+ 
+@@ -4126,7 +4126,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (!id->driver_info) {
+ 		const struct usb_device_id *match;
+ 
+-		match = usb_match_id(intf, blacklist_table);
++		match = usb_match_id(intf, quirks_table);
+ 		if (match)
+ 			id = match;
+ 	}
 -- 
 2.40.1
 
