@@ -2,124 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 853CECCFA0A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 12:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F40E1EE7FED
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 12:46:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242995AbjIHMAG (ORCPT
+        id S231476AbjIHMq3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 08:00:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39998 "EHLO
+        Fri, 8 Sep 2023 08:46:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238565AbjIHMAD (ORCPT
+        with ESMTP id S243317AbjIHMq2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 08:00:03 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2921BE7
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Sep 2023 05:00:00 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2DB1C4167D
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Sep 2023 11:59:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694174399;
-        bh=iOJD02S/jfAio/q289+xispwxoGxrp1A9ERpYfKaLgI=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=A1sM1MBLxqUSB4TDDDjfjZJ64Wbk+7vI8xf9PSaNUukZu7+wB4X1vlDDdNwq+x2Pu
-         XV3P14oLpadDncz/4oU2P1+QPKSfdTMGB7DhEWAjR4fQqAKoANdPx2C1atdMWGX2Z5
-         MCY46zsFUsdxFlFqC7uZN05s5teWGoZXEr6F+hPmwzQxR9mmiQPLLpuLkypDUcphY7
-         JCYidwzggg8xX1SrNn9QB1XDaSjA+jNkaBDcgISVKCB4klBVvyLZRuV0DgM0FsMxWX
-         DDxPr8/F3En/+sSmqtFOmahAYM4llMSGG8Dsd250j9US8brLYexa0qW7OVBWBU1iVn
-         L4po0kegvZCSg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C40EEC53BCD; Fri,  8 Sep 2023 11:59:59 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Fri, 08 Sep 2023 11:59:58 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kernel@avee.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215167-62941-6kaftRD4zd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
-References: <bug-215167-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 8 Sep 2023 08:46:28 -0400
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D011FEB
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Sep 2023 05:46:13 -0700 (PDT)
+Received: by mail-ua1-x92f.google.com with SMTP id a1e0cc1a2514c-7a4efcdab54so703242241.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Sep 2023 05:46:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694177173; x=1694781973; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VUTy39sVS9j+F2cplcvaaA4JXZjCghHo6EucajImLw8=;
+        b=Ty0V5QF3CI4O/Uyv4V1soFQ8kZvgUlj/58+O3iBPtGo1sTOkAHhUyI+WJ6KKypCoAf
+         sdQMoi25Ai2B4NtY36Yc2VTZ6vkZx2XyWt3S0ws8OHNpT8fznd1h3rxDBfBSbf5SDmeS
+         beAvE9IfBm6sY0cYE+0j/gRZaQUGwmmxW8JwBdRDut359s/SPrVYaMrtScA1IRqPEsfi
+         h8zdCyE9/4mnih3WGLiWhDpLTZ69+XnPvnkgVloV2SCGELQ+o2/wXfJw7Fa7p9Mrd+pj
+         pJMLMUS+ZDliOjjx9bo6RSgKrNJNLFJua9aneLxiBCmjqBM3k6aEzr2eO/U7uTUdgME8
+         17+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694177173; x=1694781973;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VUTy39sVS9j+F2cplcvaaA4JXZjCghHo6EucajImLw8=;
+        b=pTZr1d0lSmAJPEuMmumadQQC3oRodT9NGxkMSF/qp85ACG0XNZ6VTs8odDrRO3ifUy
+         nODT9DA7ohYCP/DmNx1wFA8S/3NV/jhXuSznexT9Y7ITcLXu0wRCBtJT3+MeTyZr/rDs
+         TJOgxtwxuQDr4K1AqaKQkgKCev5zzHVap64oC6cgdvEiDtxeLEOT17hEVrppNXH8yhuL
+         BiPw+xfWRmmHgge6taGefssB9qEcxIplhqLoac0B5a6ZkjnZ1GleOGk8M6K8pqXUAa5P
+         0hVLCjoFeLYdm5U9l1P4dMawFl3UXxCf5PaKoMMj2tR9olYdmhTvVFx8CUTCNZYx7d0N
+         8MSw==
+X-Gm-Message-State: AOJu0YzOMEjHRCrt9D8ao76aNIKJNY7KSCEbbbzJRFjclpNSuHULI3W4
+        /XYkLR4tweHBwN0xu+4WIwosjwhkWGU=
+X-Google-Smtp-Source: AGHT+IE8d8wkb7A9JYa5wMr3iqT/ImpLPMZhGH6kE5bQS42kn3Cf7LllMW3mcZV5bRCBC/gHnAssHg==
+X-Received: by 2002:a67:f557:0:b0:44e:9afe:c5b9 with SMTP id z23-20020a67f557000000b0044e9afec5b9mr2359955vsn.23.1694177172669;
+        Fri, 08 Sep 2023 05:46:12 -0700 (PDT)
+Received: from [172.17.0.2] ([20.185.155.208])
+        by smtp.gmail.com with ESMTPSA id n3-20020a0ce543000000b006262de12a8csm664526qvm.65.2023.09.08.05.46.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Sep 2023 05:46:12 -0700 (PDT)
+Message-ID: <64fb1794.0c0a0220.94906.1f57@mx.google.com>
+Date:   Fri, 08 Sep 2023 05:46:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1338604991024709928=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
+Subject: RE: bap: Use defer setup when syncing to a BIS source
+In-Reply-To: <20230908111208.121996-2-vlad.pruteanu@nxp.com>
+References: <20230908111208.121996-2-vlad.pruteanu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
+--===============1338604991024709928==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Arjan Veenstra (kernel@avee.org) changed:
+This is automated email and please do not reply to this email!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |kernel@avee.org
+Dear submitter,
 
---- Comment #54 from Arjan Veenstra (kernel@avee.org) ---
-(In reply to matoro from comment #44)
-> 6.0.12 is good
-> 6.0.15 is bad
-> 6.1.1 is bad
->=20
-> Hardware:
-> 07:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
->       Subsystem: Intel Corporation Wi-Fi 6 AX200NGW
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=782484
 
-I have the same controller on an Asus B550M-A (Wi-Fi):
-09:00.0 Network controller: Intel Corporation Wi-Fi 6 AX200 (rev 1a)
+---Test result---
 
-And I got the same error on kernel 6.5:
-[   10.644458] Bluetooth: hci0: command 0xfc05 tx timeout
-[   10.644685] Bluetooth: hci0: Reading Intel version command failed (-110)
+Test Summary:
+CheckPatch                    FAIL      0.86 seconds
+GitLint                       PASS      0.40 seconds
+BuildEll                      PASS      33.31 seconds
+BluezMake                     PASS      980.29 seconds
+MakeCheck                     PASS      13.26 seconds
+MakeDistcheck                 PASS      190.89 seconds
+CheckValgrind                 PASS      311.09 seconds
+CheckSmatch                   PASS      411.43 seconds
+bluezmakeextell               PASS      126.22 seconds
+IncrementalBuild              PASS      804.16 seconds
+ScanBuild                     PASS      1273.31 seconds
 
-6.4.14 is good
-6.5.0 is bad
-6.5.1 is bad
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,1/1] bap: Use defer setup when syncing to a BIS source
+WARNING:LONG_LINE: line length of 83 exceeds 80 columns
+#118: FILE: profiles/audio/bap.c:847:
++	if (!bt_io_bcast_accept(io, iso_bcast_confirm_cb, user_data, NULL, &err)) {
 
-However, I checked back and for me kernel 6.0.14 and 6.0.15 both work, whic=
-h=20
-made me suspect a firmware difference. So I grabbed to latest version from=
-=20
-linux-firmware.git and tried again. Now 6.5.1 works again. So it seems the
-issue
-is specific to certain firmware / kernel combinations.
+/github/workspace/src/src/13377364.patch total: 0 errors, 1 warnings, 29 lines checked
 
-My previous firmware:
-[    8.528961] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.sfi
-[    8.528974] Bluetooth: hci0: Boot Address: 0x24800
-[    8.528976] Bluetooth: hci0: Firmware Version: 126-5.22
-...
-[   14.992585] Bluetooth: hci0: Found Intel DDC parameters:
-intel/ibt-20-1-3.ddc
-[   15.001435] Bluetooth: hci0: Applying Intel DDC parameters completed
-[   15.006447] Bluetooth: hci0: Firmware revision 0.3 build 126 week 5 2022
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-The new firmware:
-[    9.707218] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.sfi
-[    9.707231] Bluetooth: hci0: Boot Address: 0x24800
-[    9.707233] Bluetooth: hci0: Firmware Version: 255-255.255
-...
-[   16.179006] Bluetooth: hci0: Found Intel DDC parameters:
-intel/ibt-20-1-3.ddc
-[   16.187931] Bluetooth: hci0: Applying Intel DDC parameters completed
-[   16.192850] Bluetooth: hci0: Firmware revision 0.3 build 249 week 27 2023
+/github/workspace/src/src/13377364.patch has style problems, please review.
 
---=20
-You may reply to this email to add a comment.
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1338604991024709928==--
