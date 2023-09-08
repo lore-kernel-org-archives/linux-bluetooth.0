@@ -2,42 +2,43 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D220EEB569
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:17:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D829FEEB567
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:18:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343877AbjIHSSA (ORCPT
+        id S241036AbjIHSSr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 14:18:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51460 "EHLO
+        Fri, 8 Sep 2023 14:18:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343754AbjIHSRu (ORCPT
+        with ESMTP id S1343806AbjIHSSM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 14:17:50 -0400
+        Fri, 8 Sep 2023 14:18:12 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1141D1FDA;
-        Fri,  8 Sep 2023 11:17:22 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5918BC116AD;
-        Fri,  8 Sep 2023 18:14:40 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D72A2135;
+        Fri,  8 Sep 2023 11:17:47 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21731C116D7;
+        Fri,  8 Sep 2023 18:15:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694196881;
-        bh=/GQOGfaaI6gCjHS9DemWR037V5Alfjv5WKlABi6sHck=;
+        s=k20201202; t=1694196918;
+        bh=mS2Y+2T2w7eJv6E5wy3SHuKWCL7kTFVfjOuvmi0a3uY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kJGdnJk2hDa2E102aAYjCtM0UJqeFM/GxhlgUetbxN3Oo5SRjaqcXD0b2Lg9utnn/
-         QeG+IX5NeNVVOU4dtfnDCVnH0SxWwgRd4oFrCjkvDFLntebPwhxxbNlQxDI3NKU7p8
-         DxpTC7ODJrVkvX8vAeRBzpatwS7Qch6i3RYMPeqmaCOo+oQbEUIDP5gaizWrIedp5U
-         5JSMLNm+qOqNTew8JRZbRuHVEyHvp0QARUPGeb666J+Oaf5jFB5P6JgkTKH4vgSpXk
-         zMTwgqk3nt2CLUuXQxB2YD/9wA7GY+Bo552q66E+TFUffQSrDGfjI2xUkCJjkb5GXU
-         fsLmImIXEUfzg==
+        b=t18mCsNgxCWgwCmMR+jnpZfG2SMuoX0VSGWubK7ChFFQkGRhJfdi7q1OyHaPqqayr
+         eZYOkHFAJdB7+ADERgrvar2g5eJJXR+hzih0IV8EA3aeHm5HxakG0UiKn3fXGzJFWV
+         dG1r3OabteOvJWR5FKlxdLnpB0PHghOkw0Qimr1l3PsjFXFCbyH77G5ebicQWXNg0a
+         r4b27LLVD5nKJo52aWBO9hN2VDb9V1SBU9JZewHDNHpkGIONTb2RgxGkcSrqR+LSxS
+         Qgnl04JziP7Pl8pouCQaWFkmwZDSxewYddUZIn3vY4I6tMOVq/2JAA0dQQ6UBPrfzN
+         CV0+U0n2Z/1JA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Roger Gammans <rgammans@gammascience.co.uk>,
+Cc:     Bastien Nocera <hadess@hadess.net>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 26/45] Bluetooth: btusb: Add support for another MediaTek 7922 VID/PID
-Date:   Fri,  8 Sep 2023 14:13:07 -0400
-Message-Id: <20230908181327.3459042-26-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.5 41/45] Bluetooth: btusb: Fix quirks table naming
+Date:   Fri,  8 Sep 2023 14:13:22 -0400
+Message-Id: <20230908181327.3459042-41-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230908181327.3459042-1-sashal@kernel.org>
 References: <20230908181327.3459042-1-sashal@kernel.org>
@@ -50,76 +51,46 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Roger Gammans <rgammans@gammascience.co.uk>
+From: Bastien Nocera <hadess@hadess.net>
 
-[ Upstream commit 0cefdaed944d1617852762ff1f66364199cf5d7d ]
+[ Upstream commit d831e3612111d385e8629104af5429808ef26e25 ]
 
-This one is found on the Dell Inspiron 2-in-1 7435
+The quirks table was named "blacklist_table" which isn't a good
+description for that table as devices detected using it weren't ignored
+by the driver.
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+Rename the table to match what it actually does.
 
-T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0f1 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-
-Signed-off-by: Roger Gammans <rgammans@gammascience.co.uk>
+Signed-off-by: Bastien Nocera <hadess@hadess.net>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/btusb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 07da17c0dcafb..a38550df92b94 100644
+index a38550df92b94..baf6762cf1f33 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -625,6 +625,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0e4), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0f1), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
+@@ -175,7 +175,7 @@ static const struct usb_device_id btusb_table[] = {
+ 
+ MODULE_DEVICE_TABLE(usb, btusb_table);
+ 
+-static const struct usb_device_id blacklist_table[] = {
++static const struct usb_device_id quirks_table[] = {
+ 	/* CSR BlueCore devices */
+ 	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
+ 
+@@ -4128,7 +4128,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (!id->driver_info) {
+ 		const struct usb_device_id *match;
+ 
+-		match = usb_match_id(intf, blacklist_table);
++		match = usb_match_id(intf, quirks_table);
+ 		if (match)
+ 			id = match;
+ 	}
 -- 
 2.40.1
 
