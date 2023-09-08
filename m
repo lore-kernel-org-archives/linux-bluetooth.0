@@ -2,32 +2,32 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA3E3EEB560
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71934EEB566
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242979AbjIHSUF (ORCPT
+        id S1344206AbjIHSUP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 14:20:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45522 "EHLO
+        Fri, 8 Sep 2023 14:20:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344136AbjIHSTL (ORCPT
+        with ESMTP id S1344075AbjIHSTM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 14:19:11 -0400
+        Fri, 8 Sep 2023 14:19:12 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2307B2123;
-        Fri,  8 Sep 2023 11:18:31 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6361C32779;
-        Fri,  8 Sep 2023 18:16:44 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA2C41FE3;
+        Fri,  8 Sep 2023 11:18:38 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF862C433CA;
+        Fri,  8 Sep 2023 18:14:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694197006;
-        bh=AWqIuq/KztpdBzs6ucjQPnFCSbIpSLgr39U/dMIQVuA=;
+        s=k20201202; t=1694196874;
+        bh=9usWPYj2WWcwLld+QaYFqKiKEqaXuomSppKk3+bhkPA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Xf1WtbA8QDywqynmqzc0gGlXi90V5+XEmEz1/YrcNsAJAZ1YcYlEjOKg+zPN4/tkS
-         AcNzRQiJpmOKSBNvKHVV/Jd0uPY10whiYyspkNc+DSJjka0bttmanqaHxbUCYPrza2
-         e3j5zv1eJZKPc7vGJi4BOuRFuiabXahtBuzJsXNHK0JEVHonl5xptXqlejb3uy3Oiq
-         ocJJFd34d5KS4JRVVvszD7CiMQrQJxFb333GZ27sJPG+QbwZVw/NYLKQBN79JWE4qo
-         cSsAtI3aWsXguF/ZAo5trJ6Ldt+Cr072UexkWO43rFhHAPK9+L8bIG+pDCdBv+qF4A
-         XIHqb2ZY4JEvA==
+        b=QPHFZZ4/EZfe9uS5l45xp3YTqFTNf8C72FZHylqYbtWGssQ20/uFkmyB0x2t9wFmc
+         m8ELz7GISw/ZIrQCabikBSkzoeg3chz0AtlkDfkTVjtpLKee1c2+wBviBbtE+EA8Vo
+         oMZP5HyfzXT4SI+Tle8AkTvj67rQte8+wWCindXq0hqbkqhVd5/t7cLZnY0Ae1Hryc
+         vNj+Oh4ESCX7+q4YJAlWVaqsQ/q4I9x3Cz45VZSx9EnhdTc3dOeB5iGxPtbMRGmVkO
+         jXgz2Ch+05JevkHfK6/tPRkRd8pNa8gRYBGVrHLNSP/lj2sClce2sKUun1RkHraUmW
+         hTKthYvqhogvA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chris Lu <chris.lu@mediatek.com>,
@@ -37,16 +37,16 @@ Cc:     Chris Lu <chris.lu@mediatek.com>,
         matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.4 19/41] Bluetooth: btusb: Add a new VID/PID 0489/e0f6 for MT7922
-Date:   Fri,  8 Sep 2023 14:15:33 -0400
-Message-Id: <20230908181555.3459640-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.5 22/45] Bluetooth: btusb: Add a new VID/PID 0489/e0f6 for MT7922
+Date:   Fri,  8 Sep 2023 14:13:03 -0400
+Message-Id: <20230908181327.3459042-22-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230908181555.3459640-1-sashal@kernel.org>
-References: <20230908181555.3459640-1-sashal@kernel.org>
+In-Reply-To: <20230908181327.3459042-1-sashal@kernel.org>
+References: <20230908181327.3459042-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.15
+X-stable-base: Linux 6.5.2
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -109,7 +109,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index df2e454e9ad46..968e2eeff21e9 100644
+index 0376437824b4b..ff6a1d9547be8 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -631,6 +631,9 @@ static const struct usb_device_id blacklist_table[] = {
