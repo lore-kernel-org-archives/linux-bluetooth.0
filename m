@@ -2,32 +2,32 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD4DEEB56A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 19:07:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E63FEEB569
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 19:07:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245232AbjIHTHU (ORCPT
+        id S245633AbjIHTHV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 15:07:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34542 "EHLO
+        Fri, 8 Sep 2023 15:07:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234485AbjIHTHU (ORCPT
+        with ESMTP id S236218AbjIHTHU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 8 Sep 2023 15:07:20 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7794BE0;
-        Fri,  8 Sep 2023 12:07:15 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35B36C433D9;
-        Fri,  8 Sep 2023 18:20:43 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6025612C;
+        Fri,  8 Sep 2023 12:07:16 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B80C43140;
+        Fri,  8 Sep 2023 18:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694197244;
-        bh=1hdWCck4jn+KH3RcIdyPXBIfUoTUb1kDuxDPsoliRXE=;
+        s=k20201202; t=1694197200;
+        bh=OT9qY4WGcweGHCkRJsNJMwFhzYa5xqCOzNIcQS9Pz4Y=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KP/curU+IK56O4u0Hcz/K96Dvvyb+aGYFqjBMHWUz0QJVSJYgKYXi+1vgUPnrpuJj
-         NxuZtkwoSJCJKsT3XwIIOf1asqYs7A4F4Mbc11ilV07ZB09JiM3VmNIfW8QAv5r0Yo
-         QgiGtGtmEP0Yu3Id3crab795UAg0e+XBPikEn4NgYqzUnspUiJk7ie8n0L7mKgODFq
-         L1Kf/hIicgWjNSy0ZHVATHHM7CW/JT84LI8qvVq1r9cQzmn2W6emPWR5XyiX1eTRYn
-         EHpJSK+CttlVmGrwvM1mhXnTpS9u+/W4kZYAEliI48vbVtYxTEDNWy5rHoldsDrB/a
-         p8quNiHkS6+uQ==
+        b=L+BCWnpiRBEQZO3BhcelUlDus5B6vXglFCRl0Yt5HGe8B/l1Y7CtIKb5A4EqKI58L
+         Pt+7I5IksMDFDMbd///1wo8ShbyiO5+B4OFb/EZEHboPJ4ypGpqZrAt38HIskORNyy
+         dnszRrwPrewHs4zIA+UMKLkY5/ic2fCZCyQk2pF7KW7ohsH4K0/chYrEHw3DDf/Fco
+         ivA9PX54KWcLD93kcpfdUgh1z8rl1pYpPuJrJEOm8U99+KI3P0x8UiJ0lnb21fXhR8
+         nxhu79dbNLYV9vmZ2BBVraGnfem3QUOo6KJbUG/Hlainlq2Q5HILGofZsFRhOLZUv5
+         FDyz7NacmerWQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Bastien Nocera <hadess@hadess.net>,
@@ -36,16 +36,16 @@ Cc:     Bastien Nocera <hadess@hadess.net>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 14/14] Bluetooth: btusb: Fix quirks table naming
-Date:   Fri,  8 Sep 2023 14:20:01 -0400
-Message-Id: <20230908182003.3460721-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 15/15] Bluetooth: btusb: Fix quirks table naming
+Date:   Fri,  8 Sep 2023 14:19:18 -0400
+Message-Id: <20230908181920.3460520-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230908182003.3460721-1-sashal@kernel.org>
-References: <20230908182003.3460721-1-sashal@kernel.org>
+In-Reply-To: <20230908181920.3460520-1-sashal@kernel.org>
+References: <20230908181920.3460520-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.194
+X-stable-base: Linux 5.15.131
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -70,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 49d5375b04f40..139824637298a 100644
+index 15d253325fd8a..bad2a01021288 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -173,7 +173,7 @@ static const struct usb_device_id btusb_table[] = {
+@@ -172,7 +172,7 @@ static const struct usb_device_id btusb_table[] = {
  
  MODULE_DEVICE_TABLE(usb, btusb_table);
  
@@ -82,7 +82,7 @@ index 49d5375b04f40..139824637298a 100644
  	/* CSR BlueCore devices */
  	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
  
-@@ -4004,7 +4004,7 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -3738,7 +3738,7 @@ static int btusb_probe(struct usb_interface *intf,
  	if (!id->driver_info) {
  		const struct usb_device_id *match;
  
