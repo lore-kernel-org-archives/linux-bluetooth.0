@@ -2,42 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 071DEEEB566
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8368EEB567
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:17:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241303AbjIHSR7 (ORCPT
+        id S1343757AbjIHSR7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 8 Sep 2023 14:17:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44006 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343757AbjIHSRp (ORCPT
+        with ESMTP id S241000AbjIHSRq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 14:17:45 -0400
+        Fri, 8 Sep 2023 14:17:46 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19C6F26AB;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F9526B1;
         Fri,  8 Sep 2023 11:17:20 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06BA9C116B0;
-        Fri,  8 Sep 2023 18:14:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C696FC116B1;
+        Fri,  8 Sep 2023 18:14:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694196872;
-        bh=Nxm9lEz9AckHXn3tnaW6+S41PFKMFFXDXI01PrxrPkk=;
+        s=k20201202; t=1694196876;
+        bh=j1PAWE1cXHzS+0RlEM8pnadlGVZVVQcoezbmAvGHSWk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=i12EkFcbdHRzNtBg96t9p4CxHryCNh0p6ZoSCTPoJ+mJgtOX1arBluwsHlWVmdcLC
-         6XBOQ2uMJRZhcj1VvtVkrGSw+aTdeP2vu9+2E3VhRb80+Uw38E6kT04E4/7uk0MQEv
-         sKLM+My4pptbWjs8oA0eFMxE23CJQnniYSwdZ0UQay3/2Hj9L9F7bLTQoTlQj7o5mU
-         8I45WsNAYaEW4sQdy2oRQNZwWblOH/8Ho+zmN0DVcors7RnhQQT2xduPA0ynLTYHp8
-         bqW6XEuu+RRpXQQLjNfk8DML6mxD1o7XBkrSOQe5NPsn/nARwu1rjd9ZiXYGTozQhv
-         Pd+gS0w7IqvMQ==
+        b=H8CjYSp8y+Hnn0bIOaZR8JhqXYT5woeTzd5gEIswYoOj8Li2PK6a2Ur/Cae806Gsy
+         dcVcesEl3gQCuOOO9485aqAIG/03r2OxqDc20nN2aORy3v2TnTn37NPzJob2k2xHzB
+         Lr3TgBO9DKplcMeEi77qj6ooLb6c1q44iR2rVhTtkXXXeuTU/+DzLBC6IVkDONIOON
+         dL51TlvbMBkBxXAvxRhfO3ajcldjPWVYzJSMoX7Pr/Tb7T3JSb7TCUMu/Iv4z24Ir4
+         rwomiA0nUs9H4pT9mwZLCdVdqUEP0Pews7vflRmVZZmcK3w8i9cOZEZvTBRkRIRQqH
+         QQjbMkcgK/GaQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Valentin David <valentin.david@gmail.com>,
+Cc:     Chris Lu <chris.lu@mediatek.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.5 21/45] Bluetooth: btusb: Add device 0489:e0f5 as MT7922 device
-Date:   Fri,  8 Sep 2023 14:13:02 -0400
-Message-Id: <20230908181327.3459042-21-sashal@kernel.org>
+        matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 6.5 23/45] Bluetooth: btusb: Add new VID/PID 0489/e102 for MT7922
+Date:   Fri,  8 Sep 2023 14:13:04 -0400
+Message-Id: <20230908181327.3459042-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230908181327.3459042-1-sashal@kernel.org>
 References: <20230908181327.3459042-1-sashal@kernel.org>
@@ -50,21 +52,18 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Valentin David <valentin.david@gmail.com>
+From: Chris Lu <chris.lu@mediatek.com>
 
-[ Upstream commit e160a8f4e920e5cf4e16a17f57367954c9436aea ]
+[ Upstream commit bf809efdcc4df4132c8c261fbba7121909dc6211 ]
 
-Asus ROG Ally gaming computer has a MediaTek MT7922 chip that uses USB id
-0489:e0f5 and needs to be added to the table. Without this, the device is
-not usable and gives the following error:
+Add VID 0489 & PID e102 for MediaTek MT7922 USB Bluetooth chip.
 
-Bluetooth: hci0: Opcode 0x c03 failed: -110
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Output from /sys/kernel/debug/usb/devices:
-
-T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
+T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
 D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0f5 Rev= 1.00
+P:  Vendor=0489 ProdID=e102 Rev= 1.00
 S:  Manufacturer=MediaTek Inc.
 S:  Product=Wireless_Device
 S:  SerialNumber=000000000
@@ -102,7 +101,7 @@ I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
 E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
 E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
-Signed-off-by: Valentin David <valentin.david@gmail.com>
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
@@ -110,14 +109,14 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 764d176e97351..0376437824b4b 100644
+index ff6a1d9547be8..16d3a2608b4f4 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -628,6 +628,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
+@@ -634,6 +634,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0f6), .driver_info = BTUSB_MEDIATEK |
  						     BTUSB_WIDEBAND_SPEECH |
  						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0f5), .driver_info = BTUSB_MEDIATEK |
++	{ USB_DEVICE(0x0489, 0xe102), .driver_info = BTUSB_MEDIATEK |
 +						     BTUSB_WIDEBAND_SPEECH |
 +						     BTUSB_VALID_LE_STATES },
  
