@@ -2,95 +2,112 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F19A7EEB567
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:21:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B065EEB567
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 18:22:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240371AbjIHSVT (ORCPT
+        id S233121AbjIHSWK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 14:21:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
+        Fri, 8 Sep 2023 14:22:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344095AbjIHST4 (ORCPT
+        with ESMTP id S1343902AbjIHSVD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 14:19:56 -0400
+        Fri, 8 Sep 2023 14:21:03 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 907CC2D51;
-        Fri,  8 Sep 2023 11:18:57 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 911E8C433C8;
-        Fri,  8 Sep 2023 18:17:27 +0000 (UTC)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF9F12718;
+        Fri,  8 Sep 2023 11:19:16 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5AA8C433D9;
+        Fri,  8 Sep 2023 18:18:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694197048;
-        bh=iLWsyO/8yGOb4h4DP+3FeDaNhvKc+MvC5XCSCjcZYV4=;
+        s=k20201202; t=1694197127;
+        bh=IdQA7SAebVFhVC8OCYuj+C4VeCRGZDopFCvDA7B6W74=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=W17b0nshNKDHGM+1H/4+4ujkFd31rPkRGJmt2qa8XTQi3G36DWzyoJcdLODHJWhdO
-         /mUCKV6+82jWST2U6pxHSnbtAjgOeD120yMAAoPcVLU0GthnYR0jWdRF6VtsbSnTzI
-         mQRVMRlN0wxELGE32GVRjt1A2dOXzUKJSALAnJmaqb+upF8qWokNH6tkX+pmHsPEzI
-         hbY41ANfQ5UNWQM+q5HFOkWrNMeHoBazt5jyoaRDptSO/Fty25x1TQK67UwQudOdXM
-         /wRRwwdmmIb8eI9/8bSoSfddwHr8Ro/69GhwU6cYSzuoknXSKtk9/zJXJ29kZtLiSM
-         qwylXXvpqv4Jw==
+        b=V17oBKklP1uzKHYxopOq322kSYjfXJNVpcEEwnf9mqlFxelL2h/myAkIoXoCO1+J7
+         yHtUjOHuKRba95DE8xq9uiSNqxF8nLPtyC6ZtFCon7WlOI5khE9sQ8QenSZJASunjl
+         rJx4gGJAJedu/BR1p/k5uhVH2yWReyHm1ZuX6rMTfvzb0txJwsJQBiMncr7L9k6fwR
+         ZExLi7M1Ca6eeTU8hlKz5vrMjrw5xUmQxOdvbQRmGz6h0WwVd7xrOiT4gx3aL5Y8FY
+         fEO1vSaPa6xIe7XJzc0GTKOBfdaTZ4LFndCk/Qm4u+tU3oUxrNipb/b/R10o5LIgPD
+         BuiLnt8cOFtNg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Bastien Nocera <hadess@hadess.net>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
+Cc:     Ying Hsu <yinghsu@chromium.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 37/41] Bluetooth: btusb: Fix quirks table naming
-Date:   Fri,  8 Sep 2023 14:15:51 -0400
-Message-Id: <20230908181555.3459640-37-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 14/26] Bluetooth: Fix hci_suspend_sync crash
+Date:   Fri,  8 Sep 2023 14:17:52 -0400
+Message-Id: <20230908181806.3460164-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230908181555.3459640-1-sashal@kernel.org>
-References: <20230908181555.3459640-1-sashal@kernel.org>
+In-Reply-To: <20230908181806.3460164-1-sashal@kernel.org>
+References: <20230908181806.3460164-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.4.15
+X-stable-base: Linux 6.1.52
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Bastien Nocera <hadess@hadess.net>
+From: Ying Hsu <yinghsu@chromium.org>
 
-[ Upstream commit d831e3612111d385e8629104af5429808ef26e25 ]
+[ Upstream commit 573ebae162111063eedc6c838a659ba628f66a0f ]
 
-The quirks table was named "blacklist_table" which isn't a good
-description for that table as devices detected using it weren't ignored
-by the driver.
+If hci_unregister_dev() frees the hci_dev object but hci_suspend_notifier
+may still be accessing it, it can cause the program to crash.
+Here's the call trace:
+  <4>[102152.653246] Call Trace:
+  <4>[102152.653254]  hci_suspend_sync+0x109/0x301 [bluetooth]
+  <4>[102152.653259]  hci_suspend_dev+0x78/0xcd [bluetooth]
+  <4>[102152.653263]  hci_suspend_notifier+0x42/0x7a [bluetooth]
+  <4>[102152.653268]  notifier_call_chain+0x43/0x6b
+  <4>[102152.653271]  __blocking_notifier_call_chain+0x48/0x69
+  <4>[102152.653273]  __pm_notifier_call_chain+0x22/0x39
+  <4>[102152.653276]  pm_suspend+0x287/0x57c
+  <4>[102152.653278]  state_store+0xae/0xe5
+  <4>[102152.653281]  kernfs_fop_write+0x109/0x173
+  <4>[102152.653284]  __vfs_write+0x16f/0x1a2
+  <4>[102152.653287]  ? selinux_file_permission+0xca/0x16f
+  <4>[102152.653289]  ? security_file_permission+0x36/0x109
+  <4>[102152.653291]  vfs_write+0x114/0x21d
+  <4>[102152.653293]  __x64_sys_write+0x7b/0xdb
+  <4>[102152.653296]  do_syscall_64+0x59/0x194
+  <4>[102152.653299]  entry_SYSCALL_64_after_hwframe+0x5c/0xc1
 
-Rename the table to match what it actually does.
+This patch holds the reference count of the hci_dev object while
+processing it in hci_suspend_notifier to avoid potential crash
+caused by the race condition.
 
-Signed-off-by: Bastien Nocera <hadess@hadess.net>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Ying Hsu <yinghsu@chromium.org>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 18b7847aa417c..b312479ec404f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -175,7 +175,7 @@ static const struct usb_device_id btusb_table[] = {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d034bf2a999e1..146ad00ad1b9c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2436,6 +2436,9 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
+ 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
+ 		return NOTIFY_DONE;
  
- MODULE_DEVICE_TABLE(usb, btusb_table);
++	/* To avoid a potential race with hci_unregister_dev. */
++	hci_dev_hold(hdev);
++
+ 	if (action == PM_SUSPEND_PREPARE)
+ 		ret = hci_suspend_dev(hdev);
+ 	else if (action == PM_POST_SUSPEND)
+@@ -2445,6 +2448,7 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
+ 		bt_dev_err(hdev, "Suspend notifier action (%lu) failed: %d",
+ 			   action, ret);
  
--static const struct usb_device_id blacklist_table[] = {
-+static const struct usb_device_id quirks_table[] = {
- 	/* CSR BlueCore devices */
- 	{ USB_DEVICE(0x0a12, 0x0001), .driver_info = BTUSB_CSR },
++	hci_dev_put(hdev);
+ 	return NOTIFY_DONE;
+ }
  
-@@ -4126,7 +4126,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (!id->driver_info) {
- 		const struct usb_device_id *match;
- 
--		match = usb_match_id(intf, blacklist_table);
-+		match = usb_match_id(intf, quirks_table);
- 		if (match)
- 			id = match;
- 	}
 -- 
 2.40.1
 
