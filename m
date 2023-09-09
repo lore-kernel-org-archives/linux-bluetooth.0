@@ -2,81 +2,104 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDE2EEB572
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Sep 2023 20:50:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14499EEB580
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Sep 2023 05:28:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242212AbjIHUuc (ORCPT
+        id S243733AbjIIF2b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Sep 2023 16:50:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49364 "EHLO
+        Sat, 9 Sep 2023 01:28:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235767AbjIHUub (ORCPT
+        with ESMTP id S229925AbjIIF2a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Sep 2023 16:50:31 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ECCDB2;
-        Fri,  8 Sep 2023 13:50:25 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 06D34C433C9;
-        Fri,  8 Sep 2023 20:50:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694206225;
-        bh=1oC3unuPY4W2Ce2yVgXMfOxQiB4DCDJ2bQBhfLNXz4M=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=hHxceuVbk/xIXsBVcXUE1q6lEUGsnk7d9ubmsHG2nBGhWNogevJVeiOC2lFSitXzj
-         iswWz/a4xVWsYwCYVC0fk8oCwIUMq8u3G9TyW5fiHLaMDG6HkOZwrdT/goow7FwKch
-         f9orgtYOEAIWkkeKxUIxg1U/756BY6gEroh4pdKHcGSYFCnP5AOvDiJubRx33xq0TZ
-         W1/FShTOEQiT7Ffw0XdDbnIB6adLOVwAtxCMCXSFHzYtgdKxPbuNyKJ28J6gdwxh9W
-         IjkPri5MWdcO1OeJwR8/NcDWa6lMmqkEQt80GvExNYZWrX4xj1FYSc/EXSvbCsVdZT
-         fpFDdrxrRmA9Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E5EFDF1D6AA;
-        Fri,  8 Sep 2023 20:50:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Sat, 9 Sep 2023 01:28:30 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14B11BD3;
+        Fri,  8 Sep 2023 22:28:26 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id d2e1a72fcca58-68a529e1974so2328132b3a.3;
+        Fri, 08 Sep 2023 22:28:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694237306; x=1694842106; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AhGcYIVxPZwLXUPMQ7arLtBywPpQ4z3xctSy6TWk6XU=;
+        b=qzkiSbkk044CfPpNTsN4hI8HDDas2kRjLqqMQzopziv/4dbduQAGTjcbzAvMbt6Iqu
+         /dGSBOwG6FBBBaz/xz2cDsH4kvT/AyYmyhglWwXhQ52opY0ZOJk9XPpMQSMMjaUQrr37
+         qMQlIiZvnBm1y93+P4rFRWL2CRmqdBmiRqa7QJW1fJQUKntVpWlR145arqdRYuHqkF5/
+         leACPU0cf5WS2+kORfjx1J8Ne1tHPoxTjgT2NNME8WU+luGfDrwlysJCYj+3pSePLtxn
+         n0T3qnrPnVMbkleIw3hvwcVtw750eRz/ZhK7i3suk6PFIIXeynP9h0ZHAC8Qc8H3KgBS
+         /1DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694237306; x=1694842106;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AhGcYIVxPZwLXUPMQ7arLtBywPpQ4z3xctSy6TWk6XU=;
+        b=j8Hk0jHMnImoTIBWrNq08mycoXelz/3GpB02NFd/wkwcM01b7UJ63lBeAV4xgAP991
+         5zLQoURigmg2lK5u0nnvQUsV+rOAqir4bu2qiLvx7TiJ3DGakbkuGfzddh1c/AxwsMqd
+         Q8E5bxUzbyclnET6wEtIiOb68cXu0CFgL8zB9PvUAuzIGhzmtAA3bWYoeoFlIYKwdT5q
+         zq0Yt0cNDu/6mibpC7wv61TFRVGqtEGZ6vTGgmaBhhrr2M3QNSjpIAeEbbm0sPMUO3e4
+         Yd+7Jy8fpODvU3QKMUcfaC3V1P5Kehg7FNDJI/Z3fpK/za02veQTCpshQ/xXWL6Dlqd9
+         /FzQ==
+X-Gm-Message-State: AOJu0YzMBTYCBrnSoEqq8Tn6iZKJg7sDA3upgKIzQyvM/SvjO7qbSXej
+        +48tzxAh5muosGHmRtDZAms=
+X-Google-Smtp-Source: AGHT+IGw0ulupui94qNdMz252mwrFm6dOVwPF7ntkmtDhRPf3eauIShtH1mkNSqQIgh2r194qOvtMA==
+X-Received: by 2002:a05:6a00:15ca:b0:68a:4dfa:ea63 with SMTP id o10-20020a056a0015ca00b0068a4dfaea63mr4581797pfu.19.1694237306156;
+        Fri, 08 Sep 2023 22:28:26 -0700 (PDT)
+Received: from debian.me ([103.124.138.83])
+        by smtp.gmail.com with ESMTPSA id n26-20020aa78a5a000000b006828e49c04csm2088013pfa.75.2023.09.08.22.28.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Sep 2023 22:28:25 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+        id 89ED6803A58F; Sat,  9 Sep 2023 12:28:21 +0700 (WIB)
+Date:   Sat, 9 Sep 2023 12:28:21 +0700
+From:   Bagas Sanjaya <bagasdotme@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        TatriX <tatrics@gmail.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Regressions <regressions@lists.linux.dev>,
+        Linux Bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Build System <linux-kbuild@vger.kernel.org>
+Subject: Re: Fwd: Bluetooth LE scan doesn't show device name
+Message-ID: <ZPwCdd6lnOTbcDS0@debian.me>
+References: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: Avoid redundant authentication
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169420622493.6163.1195791709998663185.git-patchwork-notify@kernel.org>
-Date:   Fri, 08 Sep 2023 20:50:24 +0000
-References: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
-In-Reply-To: <20230907043933.v2.1.I0cd65c6ecb991a13b224614c32c1946f9eecea3d@changeid>
-To:     Ying Hsu <yinghsu@chromium.org>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="yHJYS4swNGsW/wbV"
+Content-Disposition: inline
+In-Reply-To: <97224321-c839-c0a7-52dd-3fb6e52fc15e@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+--yHJYS4swNGsW/wbV
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Thu,  7 Sep 2023 04:39:34 +0000 you wrote:
-> While executing the Android 13 CTS Verifier Secure Server test on a
-> ChromeOS device, it was observed that the Bluetooth host initiates
-> authentication for an RFCOMM connection after SSP completes.
-> When this happens, some Intel Bluetooth controllers, like AC9560, would
-> disconnect with "Connection Rejected due to Security Reasons (0x0e)".
-> 
-> Historically, BlueZ did not mandate this authentication while an
-> authenticated combination key was already in use for the connection.
-> This behavior was changed since commit 7b5a9241b780
-> ("Bluetooth: Introduce requirements for security level 4").
-> So, this patch addresses the aforementioned disconnection issue by
-> restoring the previous behavior.
-> 
-> [...]
+On Tue, Aug 08, 2023 at 08:44:36PM +0700, Bagas Sanjaya wrote:
+> #regzbot introduced: v5.9..v6.4 https://bugzilla.kernel.org/show_bug.cgi?=
+id=3D217773
+>=20
 
-Here is the summary with links:
-  - [v2] Bluetooth: Avoid redundant authentication
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4c8a783f3882
+#regzbot fix: 52bf4fd43f759a
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--yHJYS4swNGsW/wbV
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZPwCbwAKCRD2uYlJVVFO
+o3YPAQCu8g+OeR/FT4e0bLiH5epWupufFcZnNZzU0y5VYqsNqQD/Zy1WqYyTeb3n
+nOxfRLCWsV9IJ3KNPiTfR0i2jHbzKwU=
+=TM2y
+-----END PGP SIGNATURE-----
+
+--yHJYS4swNGsW/wbV--
