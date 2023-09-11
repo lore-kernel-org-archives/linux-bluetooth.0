@@ -2,230 +2,179 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F024EE7FF4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Sep 2023 07:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B78DEE57DF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Sep 2023 07:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232705AbjIKHtV (ORCPT
+        id S234205AbjIKHxD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Sep 2023 03:49:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34846 "EHLO
+        Mon, 11 Sep 2023 03:53:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231898AbjIKHtT (ORCPT
+        with ESMTP id S234971AbjIKHxB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Sep 2023 03:49:19 -0400
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2062.outbound.protection.outlook.com [40.107.105.62])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD44CE0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Sep 2023 00:48:47 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=duv42eWWoQhwjmUeWt0sD22L0RCxgG1gcWWME3lAPvJ3O2a32EozpfjfIlrF6kX1x5b4smF6zixUScmC/lwnOC3R+yxrE4zR1G23GqUw62wqhc+zBf0bhyhB1J4G2OqqdAskvjzkEIk+DTyOXyzh/4ZFOu381bqKlgm0rgXS7PZNdangMlHjXPSO0TC+eYJ4KehQ9TGLj3oOUqeK96QjG70hef0vn1VVOv82MDYxu0lGQh7K2v+BgQhfj/e54C6LUCfVcT85uS94fTw1HG14wPMTBuRUKcybbWh4g7bjuraHGKMQj5PzdWqoSpBmdO2gqXoNsSD54fcEcfDYXyATsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cyUqSDRdn1RXznAn/2YMacldZc54mKVRSE8QWr3tqaE=;
- b=bDXOHbs34l3kOb0n6sMKKs3OhYzgMDxdJO5xN5Cluy7L+Ntm/VmZVECew4Y+9d/9RbIBY89Ml7BmIAKn8s7rsf0NlJ3YlQfnkewm5ipmSzrr1L0h+WRzGiiIAoWqosVq9zFlh316OdsyMAdxdxBKIkGlABLKpwZ4+HtZiUEbvTnV76fGHhwiIcPfQjScjB8HBgYoF+VLR3rmP/gEkQabf1o5GVKdCQ533wj2A2Tdtl1fEnKjWmOcEyppNzhB7iZuXCUkC9futswFAtHsnHpffPt/vjAnf/8vAoSsBl5bkcwGZIyHBwGV/HGXY2nPOe6LOtZJLG2n5ukVQOS/MUPAzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cyUqSDRdn1RXznAn/2YMacldZc54mKVRSE8QWr3tqaE=;
- b=JCsgPp3p5N4dxfPv7x1+VR5wfvYx065PHEKgP/sRGFzuQyYLltJhp/4ZaowCy4Ms9VsMFYlDC4h5lstEZ2pf7b858AG7X5SOyZAKANqhoGV0ryRf2ec5V8A2TRcQWTMFCI/8TdrnpyPMS7F1N7pEayMjEi/G7sXoFYjlYFJKYi0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com (2603:10a6:803:4b::31)
- by PA4PR04MB7839.eurprd04.prod.outlook.com (2603:10a6:102:c9::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.34; Mon, 11 Sep
- 2023 07:47:32 +0000
-Received: from VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::7318:7662:8c18:ead5]) by VI1PR04MB5344.eurprd04.prod.outlook.com
- ([fe80::7318:7662:8c18:ead5%7]) with mapi id 15.20.6768.029; Mon, 11 Sep 2023
- 07:47:32 +0000
-From:   Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
-        silviu.barbulescu@nxp.com, vlad.pruteanu@nxp.com,
-        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com,
-        luiz.dentz@gmail.com
-Subject: [PATCH 1/2] shared/bap:Update stream enable/disable flow bcast source
-Date:   Mon, 11 Sep 2023 10:47:10 +0300
-Message-Id: <20230911074711.62493-2-silviu.barbulescu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230911074711.62493-1-silviu.barbulescu@nxp.com>
-References: <20230911074711.62493-1-silviu.barbulescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM9P193CA0018.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:21e::23) To VI1PR04MB5344.eurprd04.prod.outlook.com
- (2603:10a6:803:4b::31)
+        Mon, 11 Sep 2023 03:53:01 -0400
+Received: from mail-pg1-f206.google.com (mail-pg1-f206.google.com [209.85.215.206])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58941102
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Sep 2023 00:52:57 -0700 (PDT)
+Received: by mail-pg1-f206.google.com with SMTP id 41be03b00d2f7-56fb25fdf06so4087454a12.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Sep 2023 00:52:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694418777; x=1695023577;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tTOmsNMmeuo/1lVCyFK6ytK+wyTlVjQh3D5BzagJTY0=;
+        b=TTe9Nt4kZFbrRzccouXxevf5iGzKNJX/JTPRtbzl0JjxwK9GrdL/OjJPy2uf2/n1Er
+         3X9vd8yD7DKhfYh/MoGXXcHVx7fB+DwgAPK3pnbWBhC457wNSxjop2L5qsclNZ9GkobG
+         JEsCWKsSQBeWoFMRFXYvSSysjUMAE8V09t8IqaDbe7FuvcQexLamQ7i8J+yXt/yf3FOK
+         3CU6JNR6Uu1Rk7wiwEt+HhOy3zKpOKnsGnBsSerMKdB0XzQUikaoAPeMd/V9b/jrTZG/
+         xImujjcPRrl6d8YLjduxUoQdMbV0/0PvKHcbXpw9otjQgqu6VHY14GBzBwLc2OyWGd6Y
+         6kBA==
+X-Gm-Message-State: AOJu0YzbWTIw1MuCFomDM8uvlNAY+F3lzTjLB+c39NrgqgZ0+y+nOmxt
+        pBHaW78ER6jSbru0uABzeLirxWYwextJkXJYrOibZhm45Vpd
+X-Google-Smtp-Source: AGHT+IGO4oHtxOHXTtaMmFViq0Bf5Wn0QVGwfZaYZiWGKmbsylTvyfQTP/5byY6HS/I0G04Ep3uop8qYQAyIFjEXZf+m8WdKuwnR
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5344:EE_|PA4PR04MB7839:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0c9a9d96-2150-41e5-f6cd-08dbb29b5b5e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RDO4rZb0IT+pMr4BQkyz0+8bhJROFHiKOGsvJ5f5NhYLwX3DooDOtFmhOfwKd6UriA35+js4OzYbvxodUkfvQ6q+z5k2ZcQX5Zc1zmGvHeMZoJxjrk5rZZURdO1vORFFMrB6U5+zsRGCXkgCMVWDNUJxUJUm9bHwJipWvdRIVOgNxLCfciFuscUIHOhYCVlB06vL3HGJVFmUQMI9SEImI5Ai/tVWsIkVEL2R0RGCDP9ENKRoysGl8yEFOIaT7fkpjRoBMucStL0T2iX6jFXpJDxOv6ui8gIiEKZRymmETRGOsEATMZUv2zclqQmK/Rpln9gNC0GqVo5eCPi+8/Js9RPFUrlmSUHvAKxpLBnTkAMyhbqpV6qyGcWapVygiOMRfmRqKA3+7RbGOqtHX/iUUG8HxjiMznef8p+/Tjde0kqG6IJJchkXEx8sZOB8i0ukhv0RKGV/x5mf09BwzGdFSjT9Xd5EWVWTUhHNO7ros+9F79MzeoTK/B6iKNeTFX98XtDMdQXPRJn7M68UfNJbJH4QNA1Y8yOGPFV5wxbfwlgm2RNXxE3YmzpsqSDzSH6qvoOSh2ixkCo2mEV4go54c45cpQPg1P7hd0WJy+LMHkWVaEpQzO/UVApkDZFIt2Ei
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5344.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(346002)(376002)(39860400002)(451199024)(1800799009)(186009)(52116002)(6486002)(6666004)(6506007)(86362001)(36756003)(38350700002)(38100700002)(1076003)(2616005)(26005)(15650500001)(6512007)(83380400001)(478600001)(41300700001)(4326008)(316002)(2906002)(8936002)(8676002)(5660300002)(66476007)(6916009)(66946007)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SUg+6Q5WoURPR7JH8gLho3bU2k6lCIrdoWCbDkqvanjUyKA+6ThtNX62qgEJ?=
- =?us-ascii?Q?5rLEnLEGx74RbE+9FOcsUno3qqHX9oTJjM5CmiXJ2I0d13BrPngtLDcU1s4E?=
- =?us-ascii?Q?EfO4xsjqL3wJxMWTaShPxXz6NFE7a3hnyKa/UWX/8LDYoevcM1qnzBE1XRfm?=
- =?us-ascii?Q?Dcq/q4HVaYc72+qthTrz3gDK1+QUPKUbLXSrjia0Z1+45dqbO8QsEMZZaTcl?=
- =?us-ascii?Q?7zoM8ux7HgIPv4qTiwn3hpkEdJ/bWBzCNovKbwg3sFq9qrwauyJkuqF+L3qu?=
- =?us-ascii?Q?SqlTG+s0vxj1BGW9fMxxVwOlpdRySfWjSGRBPcNO3dJndiwaLmGTntS/yTw3?=
- =?us-ascii?Q?KAV/suPDs6X9mEVIgVtEG4kZO+eaaxnTfJ7174vAMzVwkCDFIHPxUggXGxVH?=
- =?us-ascii?Q?RJ2HFp06xIzDfbFUzYF9ikBMZBaFIicKIUnbMUKUvoFNNbQoL6N8unzQaNso?=
- =?us-ascii?Q?aihnvugxl1e36DbLLnaGH2TR39L3rsjykeKNNOXS2Y4GbGB0ByUc5LoVGmcP?=
- =?us-ascii?Q?2aAGeKG4w0bDFWekXUNDewcZzrA9JydZ1bzMEYwR0lnWsgjoN9kJCf12pniQ?=
- =?us-ascii?Q?f/G93j5ZjFANazGTLlCjyEGyC7wMa3hhrJ0jELyZJqQWo+4g7gJNG3+Zk8JP?=
- =?us-ascii?Q?DJo+2kL1P5zG9F4guPJvmc20Nfd0NJERyYMXoF6utXj1fSD64n3ma8/oQay8?=
- =?us-ascii?Q?euMzFaB+hFW/Kp1cSd1pBqDS58tijjg+zm7QjczRorIYo7V1j9TWJeU0DDVJ?=
- =?us-ascii?Q?Ib0B0VW8aDOz937k4FzkuS+AFnuuWbHKIDx3jTMVz+G1kFSB4NkOq3oCqzCk?=
- =?us-ascii?Q?lDoT+R2YTcq1I/o4jMM+iZYsH3rg0ZtylTKVI9utjwJbirethehYgF+Cz8kb?=
- =?us-ascii?Q?4yKsfETeFq+KqJCaqHmClf2/AzNrEhnR3xRUWCEgdAplshOcrVDiqypSUNeN?=
- =?us-ascii?Q?9CN74qHwHP3T4krpUOEBhSE91QWg3Cbf8gE7yOAXq6vm+Fnt+NTOfB75tdws?=
- =?us-ascii?Q?JREW/HH+gbIhYsaCAgBP6tj9kK6lnnkqLYlLeqT+JCxdYH1WSDRBdGKnKgZE?=
- =?us-ascii?Q?OIfkXbMwXE16ahCZeWhBLpfemMm91nocIIFWVDXdjM7GWZtipqA9KMeokBUJ?=
- =?us-ascii?Q?SAXYEL5LEWPSfUmKBquxH42qNlKwRxxPdCl+wFsQqb5hldnkpeeAW27njt8u?=
- =?us-ascii?Q?sSMhmS183mo9f+NFdgILQpPNYpcuQPR97fakZAVBZapm/d8+IbxN9MMavXUL?=
- =?us-ascii?Q?qf9imqjGr3u6PgLiUgEgjVpMncC6UGbMFUFXYhMB/hVGF1ERMc6TZmjSOocU?=
- =?us-ascii?Q?Vu+AWkldkE2/HEqW0bJajN+YCLD2MLjEJB3W+dI2Fgp0H8rPVArNwY2j26A9?=
- =?us-ascii?Q?WXz3DL8lEYYpR8jxf1OCHS4xTcSzQTDnsn6JNedQMZS6s2uCCOvL+cmAXE9a?=
- =?us-ascii?Q?+Wtln4UX4zpvyk5EywFl1oBhsnTOI40wOcVqL/GkcXssMSJhbgyFRbSJxjlX?=
- =?us-ascii?Q?2O2baUyeRH/NlpMKBgLtiO3DS7bfc8MT76tiOaS2F+4lPtbynp7a0iI6Mhjp?=
- =?us-ascii?Q?+Qv2XS/vCX+rQi+oCkTis1v/5JUg2s3pEWcpncXNnwPVqJ2yyRpii6poPKsp?=
- =?us-ascii?Q?wQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c9a9d96-2150-41e5-f6cd-08dbb29b5b5e
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5344.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 07:47:32.7028
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9J8BLYlqsGvU++13qoeD2FSW82zrd2SZuJb3dHvYajlnTuSFqxEhWe/y9W4NLMjjnI07tz43HOeUJWLrj+k8+cUlweV2jS3ylIvcUXwWeKg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7839
+X-Received: by 2002:a65:6a8c:0:b0:564:e80e:81c0 with SMTP id
+ q12-20020a656a8c000000b00564e80e81c0mr1978864pgu.2.1694418776901; Mon, 11 Sep
+ 2023 00:52:56 -0700 (PDT)
+Date:   Mon, 11 Sep 2023 00:52:56 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004c51dd0605109d19@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in lock_sock_nested
+From:   syzbot <syzbot+d3ccfb78a0dc16ffebe3@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        luiz.von.dentz@intel.com, marcel@holtmann.org,
+        netdev@vger.kernel.org, pav@iki.fi, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Update stream enable/disable flow for BAP broadcast source
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    ae074e2b2fd4 sfc: check for zero length in EF10 RX prefix
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=17d9e78fa80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=634e05b4025da9da
+dashboard link: https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13075977a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1012d447a80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/36dca89ab8e3/disk-ae074e2b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/935bb2b8e325/vmlinux-ae074e2b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d5ab72169cc9/bzImage-ae074e2b.xz
+
+The issue was bisected to:
+
+commit 94d9ba9f9888b748d4abd2aa1547af56ae85f772
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Aug 9 23:49:33 2023 +0000
+
+    Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10a8c6bfa80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12a8c6bfa80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14a8c6bfa80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d3ccfb78a0dc16ffebe3@syzkaller.appspotmail.com
+Fixes: 94d9ba9f9888 ("Bluetooth: hci_sync: Fix UAF in hci_disconnect_all_sync")
+
+general protection fault, probably for non-canonical address 0xdffffc0000000026: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000130-0x0000000000000137]
+CPU: 0 PID: 918 Comm: kworker/0:2 Not tainted 6.5.0-syzkaller-04011-gae074e2b2fd4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/26/2023
+Workqueue: events l2cap_info_timeout
+RIP: 0010:__lock_acquire+0x109/0x5de0 kernel/locking/lockdep.c:5012
+Code: 45 85 c9 0f 84 cc 0e 00 00 44 8b 05 a1 14 23 0b 45 85 c0 0f 84 be 0d 00 00 48 ba 00 00 00 00 00 fc ff df 4c 89 d1 48 c1 e9 03 <80> 3c 11 00 0f 85 e8 40 00 00 49 81 3a a0 a9 3e 90 0f 84 96 0d 00
+RSP: 0018:ffffc90004c8f8e8 EFLAGS: 00010002
+RAX: ffff8880206d8000 RBX: 1ffff92000991f4d RCX: 0000000000000026
+RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000130
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
+R10: 0000000000000130 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0da069df50 CR3: 000000007a80d000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ lock_acquire kernel/locking/lockdep.c:5761 [inline]
+ lock_acquire+0x1ae/0x510 kernel/locking/lockdep.c:5726
+ lock_sock_nested+0x3a/0xf0 net/core/sock.c:3505
+ lock_sock include/net/sock.h:1722 [inline]
+ l2cap_sock_ready_cb+0x41/0x160 net/bluetooth/l2cap_sock.c:1630
+ l2cap_chan_ready net/bluetooth/l2cap_core.c:1365 [inline]
+ l2cap_conn_start+0x15c/0xa40 net/bluetooth/l2cap_core.c:1640
+ process_one_work+0xaa2/0x16f0 kernel/workqueue.c:2600
+ worker_thread+0x687/0x1110 kernel/workqueue.c:2751
+ kthread+0x33a/0x430 kernel/kthread.c:389
+ ret_from_fork+0x2c/0x70 arch/x86/kernel/process.c:145
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:304
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__lock_acquire+0x109/0x5de0 kernel/locking/lockdep.c:5012
+Code: 45 85 c9 0f 84 cc 0e 00 00 44 8b 05 a1 14 23 0b 45 85 c0 0f 84 be 0d 00 00 48 ba 00 00 00 00 00 fc ff df 4c 89 d1 48 c1 e9 03 <80> 3c 11 00 0f 85 e8 40 00 00 49 81 3a a0 a9 3e 90 0f 84 96 0d 00
+RSP: 0018:ffffc90004c8f8e8 EFLAGS: 00010002
+RAX: ffff8880206d8000 RBX: 1ffff92000991f4d RCX: 0000000000000026
+RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000130
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000001
+R10: 0000000000000130 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0da069df50 CR3: 000000007a80d000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	45 85 c9             	test   %r9d,%r9d
+   3:	0f 84 cc 0e 00 00    	je     0xed5
+   9:	44 8b 05 a1 14 23 0b 	mov    0xb2314a1(%rip),%r8d        # 0xb2314b1
+  10:	45 85 c0             	test   %r8d,%r8d
+  13:	0f 84 be 0d 00 00    	je     0xdd7
+  19:	48 ba 00 00 00 00 00 	movabs $0xdffffc0000000000,%rdx
+  20:	fc ff df
+  23:	4c 89 d1             	mov    %r10,%rcx
+  26:	48 c1 e9 03          	shr    $0x3,%rcx
+* 2a:	80 3c 11 00          	cmpb   $0x0,(%rcx,%rdx,1) <-- trapping instruction
+  2e:	0f 85 e8 40 00 00    	jne    0x411c
+  34:	49 81 3a a0 a9 3e 90 	cmpq   $0xffffffff903ea9a0,(%r10)
+  3b:	0f                   	.byte 0xf
+  3c:	84                   	.byte 0x84
+  3d:	96                   	xchg   %eax,%esi
+  3e:	0d                   	.byte 0xd
+
 
 ---
- src/shared/bap.c | 51 +++++++++++++++++++++++++++++++++++-------------
- src/shared/bap.h |  2 ++
- 2 files changed, 39 insertions(+), 14 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 1c43680c2..801716dd9 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -1331,6 +1331,11 @@ static void stream_set_state_broadcast(struct bt_bap_stream *stream,
- 	ep->old_state = ep->state;
- 	ep->state = state;
- 
-+	DBG(bap, "stream %p dir 0x%02x: %s -> %s", stream,
-+			bt_bap_stream_get_dir(stream),
-+			bt_bap_stream_statestr(stream->ep->old_state),
-+			bt_bap_stream_statestr(stream->ep->state));
-+
- 	bt_bap_ref(bap);
- 
- 	for (entry = queue_get_entries(bap->state_cbs); entry;
-@@ -1492,7 +1497,7 @@ static void ep_config_cb(struct bt_bap_stream *stream, int err)
- 		return;
- 
- 	if (bt_bap_stream_get_type(stream) == BT_BAP_STREAM_TYPE_BCAST) {
--		stream_set_state_broadcast(stream, BT_BAP_STREAM_STATE_CONFIG);
-+		stream_set_state_broadcast(stream, BT_BAP_STREAM_STATE_QOS);
- 		return;
- 	}
- 
-@@ -4698,13 +4703,19 @@ unsigned int bt_bap_stream_enable(struct bt_bap_stream *stream,
- 		break;
- 	case BT_BAP_STREAM_TYPE_BCAST:
- 		stream_set_state_broadcast(stream,
--					BT_BAP_STREAM_STATE_STREAMING);
-+					BT_BAP_STREAM_STATE_CONFIG);
- 		return 1;
- 	}
- 
- 	return ret;
- }
- 
-+void bt_bap_stream_streaming(struct bt_bap_stream *stream)
-+{
-+		stream_set_state_broadcast(stream,
-+					BT_BAP_STREAM_STATE_STREAMING);
-+}
-+
- unsigned int bt_bap_stream_start(struct bt_bap_stream *stream,
- 					bt_bap_stream_func_t func,
- 					void *user_data)
-@@ -4779,24 +4790,36 @@ unsigned int bt_bap_stream_disable(struct bt_bap_stream *stream,
- 		return 0;
- 	}
- 
--	memset(&disable, 0, sizeof(disable));
-+	switch (bt_bap_stream_get_type(stream)) {
-+	case BT_BAP_STREAM_TYPE_UCAST:
-+		memset(&disable, 0, sizeof(disable));
- 
--	disable.ase = stream->ep->id;
-+		disable.ase = stream->ep->id;
- 
--	iov.iov_base = &disable;
--	iov.iov_len = sizeof(disable);
-+		iov.iov_base = &disable;
-+		iov.iov_len = sizeof(disable);
- 
--	req = bap_req_new(stream, BT_ASCS_DISABLE, &iov, 1, func, user_data);
-+		req = bap_req_new(stream, BT_ASCS_DISABLE, &iov, 1, func,
-+							user_data);
- 
--	if (!bap_queue_req(stream->bap, req)) {
--		bap_req_free(req);
--		return 0;
--	}
-+		if (!bap_queue_req(stream->bap, req)) {
-+			bap_req_free(req);
-+			return 0;
-+		}
- 
--	if (disable_links)
--		queue_foreach(stream->links, bap_stream_disable_link, NULL);
-+		if (disable_links)
-+			queue_foreach(stream->links, bap_stream_disable_link,
-+							NULL);
- 
--	return req->id;
-+		return req->id;
-+
-+	case BT_BAP_STREAM_TYPE_BCAST:
-+		stream_set_state_broadcast(stream,
-+					BT_BAP_STREAM_STATE_RELEASING);
-+		return 1;
-+	}
-+
-+	return 0;
- }
- 
- unsigned int bt_bap_stream_stop(struct bt_bap_stream *stream,
-diff --git a/src/shared/bap.h b/src/shared/bap.h
-index edb5c1bed..d3c9b241e 100644
---- a/src/shared/bap.h
-+++ b/src/shared/bap.h
-@@ -264,6 +264,8 @@ unsigned int bt_bap_stream_start(struct bt_bap_stream *stream,
- 					bt_bap_stream_func_t func,
- 					void *user_data);
- 
-+void bt_bap_stream_streaming(struct bt_bap_stream *stream);
-+
- unsigned int bt_bap_stream_disable(struct bt_bap_stream *stream,
- 					bool disable_links,
- 					bt_bap_stream_func_t func,
--- 
-2.34.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
