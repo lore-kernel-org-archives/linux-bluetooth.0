@@ -2,155 +2,170 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF6ECA0EC1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Sep 2023 21:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 274F0CA0EC7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Sep 2023 23:56:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239438AbjIKVRV (ORCPT
+        id S229863AbjIKX4v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Sep 2023 17:17:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59202 "EHLO
+        Mon, 11 Sep 2023 19:56:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbjIKJJr (ORCPT
+        with ESMTP id S238529AbjIKXyZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Sep 2023 05:09:47 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2082.outbound.protection.outlook.com [40.107.8.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55AA5CCC
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Sep 2023 02:09:42 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bcfjUzROYZMEA7wXhpFIvPsjcpr5PZeSSwrblFuk/WfXLf4DMxKuc76RIX7XqX12P0CulcLUUHRJjZbW/w+m+CwQ2j9uNxYoDKjJgpyokvOy1zOfmIIJOxmjlhjUQu3h+vLJjmjjsRgZXgsc3tuG5Y3Vw7sIakDVLl6tob8zyZjC1ZC8WNyv6mjMwC1dd0dHMuT1CJPdQNXn/2kpCD3HCUK82wQboePOombLMrmTxo4xLJ5GsmppDbd2FVqrg5c7O+SHeR/P11xqJOJGfNPZgrjXZH+N5H8k8hfMR23/dGvsTDihYav8yZdBcswEvZmn55NRnuW+Hc2mj2z7jwl+9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pmsJ8UXpBn9i4xaReJo8erWNR2XGN0HZrTxYW67PYV0=;
- b=Qp49JpucS4LSwfdo27RiKYRjeyrpUbSdZK2Zbw2rMs+Aok8ZO+juQ65DbZJOOPHHcx9oXm1vBZVEP+Yo5lEiJqV8czK94J0NNz8WWGbmcMZHszV9gjPZwrX33qaZhUpHx4uJSm+hi2RQw+lQGS+mk1yyPDYV8g/Tm6wEUumZoEpwQVRQNqc18D4b49KgQ1KO6AVI/bqculhuV61NxqvplCU8dhQipWJyXahSLT8CNaiN8i2mKU4bjTvgNiusThFmtjZARUsD9NKZzwHIiqQ7vs8gkNtd7LTzTjH49yjKRRNLbY2iyIxEXpofWXLuUsFQRXtWTsTdxonHXNsDNBTOQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pmsJ8UXpBn9i4xaReJo8erWNR2XGN0HZrTxYW67PYV0=;
- b=EE6eHja07/mYdlA02Qu2vhvPCdkHDhb5wrHepMfoD8TDE7iOhWhEyyJtLhCAAnoiSh9Ea0ADGYsu6bD1823RmqlQlKNXvzD0R5wMoj+HOYCkXsX0UgAA7Qbmtifdn2AKPnl3XcYb3dgKwJH/3LK4YDv80jgbuBeX0SYDYNbxSak=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9398.eurprd04.prod.outlook.com (2603:10a6:102:2b4::19)
- by DBAPR04MB7366.eurprd04.prod.outlook.com (2603:10a6:10:1a0::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6768.35; Mon, 11 Sep
- 2023 09:09:39 +0000
-Received: from PAXPR04MB9398.eurprd04.prod.outlook.com
- ([fe80::4131:3e13:f138:f636]) by PAXPR04MB9398.eurprd04.prod.outlook.com
- ([fe80::4131:3e13:f138:f636%4]) with mapi id 15.20.6745.034; Mon, 11 Sep 2023
- 09:09:39 +0000
-From:   Vlad Pruteanu <vlad.pruteanu@nxp.com>
+        Mon, 11 Sep 2023 19:54:25 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC28CAED2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Sep 2023 15:47:59 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id 6a1803df08f44-655d25f3678so19874736d6.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Sep 2023 15:47:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694472390; x=1695077190; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SPxTVKDfPnYcmDz+/Xp310u86Enj0uzeRFdQ4Ju+daI=;
+        b=ciQ4TnRy7RkGhRmZZU9acUuzCjx2xdZPbmukymXzLlLbhLj6N8XMzKIq3vlhkjmSLY
+         xFkMzxyaapWIAhrVqoXTJfP2LFJvGGU4wX9OoKzDmNmYO7RWqrVwWnSoCO8aSxp9fp9M
+         bJwXY8cYNOjo1zI2QsQYnPyjavzJOko1LfzkHT26eTVv07BXDwCj+dUrfxgnVJgtUx6C
+         iZCY8CcFn35yRIwjhe9xQrj5EnHWtqWE4JrTC+29nGtyki8FhobsbGzKQIm0+K19huPC
+         LDDPeJO2MkieP3VsDxuETxG2H8u+qb1SUGAL/Ilp5LvT25gL+cwBFtUiF/KM7jyrP6Xl
+         BO6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694472390; x=1695077190;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SPxTVKDfPnYcmDz+/Xp310u86Enj0uzeRFdQ4Ju+daI=;
+        b=nMETKjI8bvg6u6s44JX3TqErFDDSHYbvRQHFEYA14vUahf9te4+RNJgYlxiFnOtONl
+         SRawRl/L5Y0O6D578GnqCYGViH7vfTnIpuj3W6zucXThm1+d13Af5QleTt6UpwpYjN7F
+         kRBm1DqYYkogC3FZatgW74/fOFd2nq+MRav/hVt2gZQ1RdYLHo2c00j2nif51S7C6yBM
+         cLCPJ7tzajEhqxmdWG5aaI+MLtlDJk5QnUpwnkc/xX2nB8DjWK3lkr4vHg1nKIf/1Kuq
+         mN4RlqTdwiNVruKaKUk10ZX9iDPaY2fNNNRAtVqjIXrL6cqQY+Ju9Ttztb/K16MsvISV
+         KhNw==
+X-Gm-Message-State: AOJu0YwJEx4aKgGCfcm7tUsPdIj75VkLZpGhQdLoZS34/P2ipkF9RFuQ
+        9HT0Nt7Yv9nv8mWRJ6WfsM33NZUGLiU=
+X-Google-Smtp-Source: AGHT+IGKKiDPc936i0ZoBXURiu5Ui0sNuGvq0kN2SA83XSWu/gFqeir35SNBpPTgc1v2LLOS4RjiFg==
+X-Received: by 2002:a05:6a20:d425:b0:14a:7701:56df with SMTP id il37-20020a056a20d42500b0014a770156dfmr8868883pzb.21.1694471636733;
+        Mon, 11 Sep 2023 15:33:56 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
+        by smtp.gmail.com with ESMTPSA id o12-20020a170902778c00b001bc6536051bsm6965131pll.184.2023.09.11.15.33.55
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Sep 2023 15:33:55 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com,
-        silviu.barbulescu@nxp.com, iulia.tanasescu@nxp.com,
-        andrei.istodorescu@nxp.com, Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Subject: [PATCH BlueZ v3 1/1] bap: Use defer setup when syncing to a BIS source
-Date:   Mon, 11 Sep 2023 12:09:22 +0300
-Message-Id: <20230911090922.68822-2-vlad.pruteanu@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230911090922.68822-1-vlad.pruteanu@nxp.com>
-References: <20230911090922.68822-1-vlad.pruteanu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4PR10CA0003.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dc::16) To PAXPR04MB9398.eurprd04.prod.outlook.com
- (2603:10a6:102:2b4::19)
+Subject: [PATCH BlueZ] device: Fix not handling initiator properly
+Date:   Mon, 11 Sep 2023 15:33:55 -0700
+Message-ID: <20230911223355.2701293-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.41.0
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9398:EE_|DBAPR04MB7366:EE_
-X-MS-Office365-Filtering-Correlation-Id: cce3a47e-58bc-4730-dca6-08dbb2a6d3f4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: n8KnNdaC6jdJRQNslGdHc89YGtCqFyK6VbXcbG/7/LlYqYhM8keTGdEpdL1Aiwe2/fbHtxDWNOnepqUOdn4wPjRFqF9pZf6LX25z0piXZLxKGAY7eh1Ba+j+Jpa/VRi+WixRHfIyF+YgeQ09uJtlGECEgaTNCfuId3SGTDEfyav0IQq66kvdbIcZC/Q8YrEPs9K84SjyPeRYrKof4Nb3FZyN2Eild7Z8awN4TUbXpesingRFD4lajK8UY8Yc28gYmkHBt8Z4ecuMR7yN8NUGES/LXk2kozHFZnsmtD5IS9974/eUyOlaTp7eJMdMfKexNN8p80cEZP0Rrk2GziaU08ONEabMVZnzuIi6baB5jCb2v1u/HrUKhNXi58yOmrSqCpTXxcwEfo61tlgsAZLXs9+J/RA04oyAs1uTEBj2lCrNj+9lmFMbgMzJmAPKAx0IFSBhjN2EP1sX8Svior0jsNFT2WIzqOgexDfT67mD0e9nOnB7OSjoHnzEn8wKxC3KWRPs5sbuq55A1ofVsXQQxiL5lCWBUifsND17nAi6dlQomMmxd0jrWDyj3SNvIBLVHmuDSyf+QtqqOz8KxZPxg41u0r0qHZnGiiXR939sZPfQ/sW6tZbjm4m0PW5S+qsj
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9398.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(376002)(366004)(346002)(39860400002)(451199024)(186009)(1800799009)(6486002)(52116002)(6506007)(6666004)(41300700001)(36756003)(86362001)(38350700002)(38100700002)(1076003)(2616005)(2906002)(6512007)(83380400001)(478600001)(316002)(8936002)(8676002)(4326008)(5660300002)(26005)(44832011)(6916009)(66946007)(66556008)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?t/xCJ2/LNAVnjto55GE1njsSGUIeg9lDfKSYL9QGick3mWR+u5fCZujNk21e?=
- =?us-ascii?Q?lQkzGFQPNNIJC9K8Qd6pCx6FMarNXKm1c951th188B/HNTkZ73piyMBr+gde?=
- =?us-ascii?Q?wCgLrh3qqUdB3sSlYcoebpdbjuWMfvBv31T9VIGjrd09Hptdrr6mDn/4683N?=
- =?us-ascii?Q?6Lw+3fOOD8RrQWtkDBjfTMVh5F7xwD1iupRoQdwsjliBOEyxKI0SlENJjp5R?=
- =?us-ascii?Q?76iRSO+bUelRiibiEWG654q1UW2/oIMeuPRIABhahznkMSWzdaQxBJktHcMT?=
- =?us-ascii?Q?c6bHrd2+KP/GnlHFawXAGEsxB8LRF44JaGHb8DKjZBS+sQ7CLUrKIx25V2Mp?=
- =?us-ascii?Q?f6cFKEYvLa8nShc7QywK13DWWwxI1ujYa2jHTRzp6OthIu2asNvqYTHX8aXM?=
- =?us-ascii?Q?t3DxUFJ2jUc5L9JIDC7wus+SjoNUTpA+0iD8umnm/MC8Z0zYMsneXQ+0rm2j?=
- =?us-ascii?Q?1Fm9bF2iGhZ/svsMnpbcBDbfeEnjS53vbUIISd9Ek4eA5SEFKl+a0BUdCblW?=
- =?us-ascii?Q?iIU717kRiBgBJrJHacdh92pbAYTn2phdUDsuHgTzgjMLaUZ1CHmKxx1d4bcL?=
- =?us-ascii?Q?Ud1le8+UTyONjpaFy4XFOW0wetysNPrzRvmnlJ9Z/Dm2rFd6YWa6+qIrACtR?=
- =?us-ascii?Q?pY7Wvn2iqOAWORgX8tDMXtWnA4iOOpDeWH0ZMqpNvVujl5rPy76VHab+gyV8?=
- =?us-ascii?Q?mUQnnn9V4kJR6A5VSgCWsaXX/JdQQA5gRih2w04EYmDsNcleLxr+pUdJeC1P?=
- =?us-ascii?Q?eYPCiwxYb10zREZsgDON9iS0B11qkE8mu/YxXgJRj2z0Qck7yGER99AkfR0e?=
- =?us-ascii?Q?QQmozMaDy7gIFo26mSxL/v98Rlnl5msIHuHEagRnaX8piJ5si9b3aAmZBzlk?=
- =?us-ascii?Q?5pFcS82Tdt9aQfU74hg2571fUXvcWTjY7effYhwJ/7Pq98gcRMFrVUQ9lHb8?=
- =?us-ascii?Q?7wn8GNrFmtP0SAhmE0OdaHfGguthV7UOJLAogMUVm9PHvBF1kfEye9XhMhTp?=
- =?us-ascii?Q?TuxmobNVP62uit6iRbayYxEAd8xCu/R1HtUIUm1GOmPA3yUiKTLOStx6vVkv?=
- =?us-ascii?Q?pXyjYDw6Bqr0YbRuTCTtz88SZYQC6OqLQdRyR7u2BdzL47mFkaubVw5k16lU?=
- =?us-ascii?Q?yTaFLTyqTrrppDtwVX1LNmzKF43LHSnQ0oycGfS0HvluYEbeldpNrDYoAsQq?=
- =?us-ascii?Q?F1CpyVqCeusewskEBg/leMDIdyVUG1PK7MY2nGHcV8kSk7gUt8CsClbI6vIe?=
- =?us-ascii?Q?TeiN8rHcqV7zHj8/xDMRwy7Exb8pDGlWh6W+i8RBa64b+00yLiu7QTVqdTxv?=
- =?us-ascii?Q?HkWFKdbSzcgoWS+TUm0Z3SgDPjSvC++MkwMda35+Ick3k1Qt/JpFdz1kR1+C?=
- =?us-ascii?Q?mSeHTBIKP5zFF+IdxXa0nL4t70p8+sx35i5o+KaN5mm3htioz6glqBnG5XBE?=
- =?us-ascii?Q?112KdiiSrXervvvxUabMtCHmpf+Hll4j/oBdWI5nzLmJq/BSb6er3QCQ3+yy?=
- =?us-ascii?Q?Jfv8RTTgROzwAMOb/jfGaWKIGxJXQt73vMbXclEHrmKc8vfhNkeFA9rRiSJv?=
- =?us-ascii?Q?8wEF5g61BSSiHoU46f8XLDqfxeJwQLSEG6zFW6TCFun0cleP3SngpJBEHwOy?=
- =?us-ascii?Q?2w=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cce3a47e-58bc-4730-dca6-08dbb2a6d3f4
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9398.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2023 09:09:39.4869
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YcVMCkpeONF//DOGshHk1yy2QW7C8kdQLAyVXWo/hApom8G9s4nv0OWN3d7eX1fJSCk0a0P2ld/D29iSB203mA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7366
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This commit uses the newly added bt_io_bcast_accept function from
-btio.c to implement the defer setup for the BIS sync process.
-Now, information from the BIG Info advertising report can be
-used when sending the BIG Create Sync command.
----
- profiles/audio/bap.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index ee90426b9..d70ad872e 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -840,6 +840,19 @@ drop:
+Previously initiator would be set whenever a central key was found
+which turns out to be unreliable besides the MGMT New Connection event
+does in fact inform if the connection was initiated locally or not.
+
+Fixes: https://github.com/bluez/bluez/issues/598
+---
+ src/adapter.c | 10 ++++++----
+ src/device.c  | 15 +++++----------
+ src/device.h  |  3 ++-
+ 3 files changed, 13 insertions(+), 15 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 5ebfc4752a7e..8a7c53a9e3ce 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5163,9 +5163,10 @@ static void adapter_remove_device(struct btd_adapter *adapter,
  
+ static void adapter_add_connection(struct btd_adapter *adapter,
+ 						struct btd_device *device,
+-						uint8_t bdaddr_type)
++						uint8_t bdaddr_type,
++						uint32_t flags)
+ {
+-	device_add_connection(device, bdaddr_type);
++	device_add_connection(device, bdaddr_type, flags);
+ 
+ 	if (g_slist_find(adapter->connections, device)) {
+ 		btd_error(adapter->dev_id,
+@@ -5218,7 +5219,7 @@ static void get_connections_complete(uint8_t status, uint16_t length,
+ 		device = btd_adapter_get_device(adapter, &addr->bdaddr,
+ 								addr->type);
+ 		if (device)
+-			adapter_add_connection(adapter, device, addr->type);
++			adapter_add_connection(adapter, device, addr->type, 0);
+ 	}
  }
  
-+static void iso_pa_sync_confirm_cb(GIOChannel *io, void *user_data)
-+{
-+	GError *err = NULL;
-+
-+	if (!bt_io_bcast_accept(io, iso_bcast_confirm_cb,
-+				user_data, NULL, &err)) {
-+		error("bt_io_bcast_accept: %s", err->message);
-+		g_error_free(err);
-+		g_io_channel_shutdown(io, TRUE, NULL);
-+	}
-+
-+}
-+
- static bool match_data_bap_data(const void *data, const void *match_data)
- {
- 	const struct bap_data *bdata = data;
-@@ -1587,7 +1600,7 @@ static void bap_listen_io_broadcast(struct bap_data *data, struct bap_ep *ep,
- 	if (bt_bap_stream_get_io(stream) || data->listen_io)
- 		return;
+@@ -9426,7 +9427,8 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 	if (eir_data.class != 0)
+ 		device_set_class(device, eir_data.class);
  
--	io = bt_io_listen(iso_bcast_confirm_cb, NULL, ep->data, NULL, &err,
-+	io = bt_io_listen(NULL, iso_pa_sync_confirm_cb, ep->data, NULL, &err,
- 			BT_IO_OPT_SOURCE_BDADDR,
- 			btd_adapter_get_address(ep->data->adapter),
- 			BT_IO_OPT_DEST_BDADDR,
+-	adapter_add_connection(adapter, device, ev->addr.type);
++	adapter_add_connection(adapter, device, ev->addr.type,
++					le32_to_cpu(ev->flags));
+ 
+ 	name_known = device_name_known(device);
+ 
+diff --git a/src/device.c b/src/device.c
+index 9b58e0c4e6c5..35ce1df0fe74 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -312,16 +312,9 @@ static struct bearer_state *get_state(struct btd_device *dev,
+ 
+ bool btd_device_is_initiator(struct btd_device *dev)
+ {
+-	if (dev->le_state.connected) {
+-		/* Mark as initiator if not set yet and auto-connect flag is
+-		 * set and LTK key is for a peripheral.
+-		 */
+-		if (!dev->le_state.initiator && dev->auto_connect &&
+-					dev->ltk && !dev->ltk->central)
+-			dev->le_state.initiator = true;
+-
++	if (dev->le_state.connected)
+ 		return dev->le_state.initiator;
+-	} else if (dev->bredr_state.connected)
++	else if (dev->bredr_state.connected)
+ 		return dev->bredr_state.initiator;
+ 
+ 	return dev->att_io ? true : false;
+@@ -3226,7 +3219,8 @@ static void clear_temporary_timer(struct btd_device *dev)
+ 	}
+ }
+ 
+-void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
++void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type,
++							uint32_t flags)
+ {
+ 	struct bearer_state *state = get_state(dev, bdaddr_type);
+ 
+@@ -3249,6 +3243,7 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
+ 		device_set_le_support(dev, bdaddr_type);
+ 
+ 	state->connected = true;
++	state->initiator = flags & BIT(3);
+ 
+ 	if (dev->le_state.connected && dev->bredr_state.connected)
+ 		return;
+diff --git a/src/device.h b/src/device.h
+index 3252e14eff84..0a9e51533ca5 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -124,7 +124,8 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
+ 							const char *pincode);
+ void device_cancel_authentication(struct btd_device *device, gboolean aborted);
+ gboolean device_is_authenticating(struct btd_device *device);
+-void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type);
++void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type,
++							uint32_t flags);
+ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
+ 								bool *remove);
+ void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
 -- 
-2.34.1
+2.41.0
 
