@@ -2,49 +2,46 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D99EEE3F0E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 18:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0125EE3F0D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 18:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235863AbjILSud (ORCPT
+        id S235304AbjILSuc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Sep 2023 14:50:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55170 "EHLO
+        Tue, 12 Sep 2023 14:50:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbjILSua (ORCPT
+        with ESMTP id S232253AbjILSua (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 12 Sep 2023 14:50:30 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2D9C18D
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFCFE125
         for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 11:50:26 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9C552C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 975EEC433CB;
         Tue, 12 Sep 2023 18:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1694544626;
-        bh=CR2+aYXmULISGnWHYsM52nE0BYidwoSfFDX5Vm0WTsI=;
+        bh=2DGr4P4FTZCyI82ZyI17k1PXBOf2XaVnuzV2tfpR6E4=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Xz0weFzODZqQeCy5oU5hf9TNnL54vqQQhFDcXlrRA8Arj+QOQluwpfQ0hvD7Spiu5
-         oJ+wHbi7lDgde+P2+NVhYi9bGTVSTY/Wby2HdlRwLeNycTeA5vxJjY74XbttoHWo9A
-         HxU0q7/oDtr3cBdyEs5awdDUe0Fk1y3pyugs98zEFsvXBlquDe6oq6SEj5KUdgCV51
-         p072DKg8hKKW87vXRZJYnmQ057PVy4c1MtI9419e55TgdpyaV38x7nAKzziU6qxTOR
-         dpdr8z9GrNiSrG03ag/IfwlyrcdOW8JtxA23ooistCPo7Bb/Z86aw7C0Jomzi4y+vL
-         9e1R9Ioxwd+pA==
+        b=mn+e3+jhHOlS+OIpofOo4ErNdRRwO0gTa72T/qUW4vvdBiG4dlFR1iXPChEA32I9G
+         s6t+K/2wn9AjRUVuvI9VNifszzuIYaQyBkTXVkvh8WBLsTG/kIGcE0P0NFSHlegmVk
+         GGSmRMVMtRsMa8glTiiB8Ez82cOC1n4Oi+CxDS4ePAha75v00R428X5JzC+7/1RfD4
+         3VHu7Jq4dPO20QKfv7+Gsm/cQjYQjXZviPfQMKkIbJhLvNnFDZW94atBDSAqpftqXv
+         feEU/Uezuj5MAf8Yuz+WrivhpsmIQ8xvgAk1AXx68BFKRPb0P9blJc4uHJ6BqCqgBj
+         exPhdsBlgBLnQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8360AE49FA7;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B8D3C04DD9;
         Tue, 12 Sep 2023 18:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v4 0/1] bap: Use defer setup when syncing to a BIS
- source
+Subject: Re: [PATCH BlueZ] main.conf: Fix parsing of uint32_t values
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169454462653.13260.2986968091954754161.git-patchwork-notify@kernel.org>
+Message-Id: <169454462650.13260.8434369852731815958.git-patchwork-notify@kernel.org>
 Date:   Tue, 12 Sep 2023 18:50:26 +0000
-References: <20230912065526.1217334-1-vlad.pruteanu@nxp.com>
-In-Reply-To: <20230912065526.1217334-1-vlad.pruteanu@nxp.com>
-To:     Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
-        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
-        iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com
+References: <20230911205447.2689657-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230911205447.2689657-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -54,20 +51,19 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 12 Sep 2023 09:55:25 +0300 you wrote:
-> This commit uses the newly added bt_io_bcast_accept function from
-> btio.c to implement the defer setup for the BIS sync process.
-> Now, information from the BIG Info advertising report can be
-> used when sending the BIG Create Sync command.
+On Mon, 11 Sep 2023 13:54:47 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> Vlad Pruteanu (1):
->   bap: Use defer setup when syncing to a BIS source
+> Passing UINT32_MAX as int may overfollow causing errors such as:
+> 
+> bluetoothd[2688495]: src/main.c:parse_config_int()
+> General.TemporaryTimeout = 60 is out of range (> -1)
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v4,1/1] bap: Use defer setup when syncing to a BIS source
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=feadcbbed50d
+  - [BlueZ] main.conf: Fix parsing of uint32_t values
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=53542db3d6c6
 
 You are awesome, thank you!
 -- 
