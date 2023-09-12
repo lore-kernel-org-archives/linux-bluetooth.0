@@ -2,137 +2,205 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA76CEE3F09
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 18:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E16B5EE3F0B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 18:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237173AbjILS3M (ORCPT
+        id S232470AbjILSon (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Sep 2023 14:29:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53414 "EHLO
+        Tue, 12 Sep 2023 14:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232721AbjILS3L (ORCPT
+        with ESMTP id S229448AbjILSom (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Sep 2023 14:29:11 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DCEF189
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 11:29:07 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2bcc331f942so1625431fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 11:29:07 -0700 (PDT)
+        Tue, 12 Sep 2023 14:44:42 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E521C10D3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 11:44:37 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2bcb0b973a5so96637131fa.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 11:44:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694543346; x=1695148146; darn=vger.kernel.org;
+        d=gmail.com; s=20221208; t=1694544276; x=1695149076; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LBhQ9qOAt6jcxWqQxJRGLV08DPG1cn/4qLbmtM7lNXM=;
-        b=MrVTn3yRMW+2jdKjTXcp8D/gDziBU5pJAoEpxUNGrZ1lkhzbdTbHqHlBuF6U7fbZLv
-         idBFuDJz11c3u5CuUGXUAeKeh8z5ImdqBPhKLwtacpNxi/ICZNsQ5p5dZh4+oKZvqs2n
-         73C1D93DIvqIw+M4DgO96CX8Hmomy/Fmqh2dlgpltF0fyYgEg/fOMALilGBelTMHsU/R
-         hzF+cnmXXvCn8d5K44BlZ7PmZvIL5BbbvqDHHy435pf4HhlbvtMNqoPfajcN0iOd94zr
-         DNgT+KoCGrm8pBo5qqsozIUwHMrhUo2t3ZKvqYZTEjpJmJpJ41gxH+DIvKXUw6AK4k+E
-         6Uww==
+        bh=FHTeaXWUdZVddvHMf1/OUQRqRHd72N11rSxf4Q8vN/4=;
+        b=nDMl/6amUdWik/PVluTirekRUcvyqhk1BVRLFSVvHkKlGJbPZpthK7Sgbxw5li1ntS
+         iVAOlNcRH+6Xo+Ah71vJoN8bLyoqKv9XsP+4uEb25OutnkLPp7Dx6lVUaqaCqDmrQvix
+         qE5X9POrmAPGsx4QFqv3Zny8JcjzTEyVpXT3gc+aXL4aoY2GLs3XsLmnzvOQf2ti3WbG
+         NrFcyt36WBJt818VP970h+UM+4cF/JHoNTjs395yT1Tt35O7d8ZyoG/vbKcBRhHiwxWk
+         24b7SyWw306a7zn4+FjgskmXgTCPobx5nJxSDZdASu1B4rFGfI95yUXVo6RjFczwP9pE
+         /u6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694543346; x=1695148146;
+        d=1e100.net; s=20230601; t=1694544276; x=1695149076;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LBhQ9qOAt6jcxWqQxJRGLV08DPG1cn/4qLbmtM7lNXM=;
-        b=Xbn4jQdteUk87I0G181u392kmnWeKCuQXdf8DdEovxNcfQuLthBzTgemVRc796xduj
-         CeBlrlRMmCrrIer3bqaW1L2i74VsNFJn+p/svrFs7FphPhavn5OuSlDhmubcPIm3lqbc
-         rnE6cx9ImSncWDKjqzIvrtZwsL07Y90JCUIxk8NeOS/OHf5EEfLTqeSG/WEbNS3vtBee
-         IR9rdh1s9mGG1OmluM2NbkP2JackiTKmk4mdg04Z4KbFozLt8e8sYJ6tFvxMCj0bGiC0
-         ug+lNT3yX7vfMJKEwqyRK0oi9wKXkAutT5Cib0GpjKleTedrib8+IeEecAmLCGujMzBq
-         sZHQ==
-X-Gm-Message-State: AOJu0Ywc0xbYHrh0xGwYfliZhGqWvZ/c5js2G/lHGuHZS48Zs1zomzEt
-        WP35oJ8BV1tHDNqt0OWQFrM08gpSOuolhDB+Z2M=
-X-Google-Smtp-Source: AGHT+IFbCTgzLgsRS/2TiolhQK3v1u+YWQxABj2lQhzgsMN4j6agkLp65aF38tvJlDD4GFpr4sYTAMOVkTn+zfaU+hQ=
-X-Received: by 2002:a2e:380b:0:b0:2bc:bc6f:e296 with SMTP id
- f11-20020a2e380b000000b002bcbc6fe296mr140090lja.13.1694543345495; Tue, 12 Sep
- 2023 11:29:05 -0700 (PDT)
+        bh=FHTeaXWUdZVddvHMf1/OUQRqRHd72N11rSxf4Q8vN/4=;
+        b=UuQ5J95q2R75Aq/670XMcCBk5GpgcIY5JOOiYJI17np0biFDJjNfsMYxxb+A+Ke2t1
+         dmI7DS7Z2O+7TnhEN7/+lvRRyeD/tVQpPs4SZ0PU89X4RhjW3Qc8+aQtoMSzfgNQuJWF
+         6d2dGjES8zQoXN5llab1c9DiFHSkjbfV+0jMYhM5M3tUejz1nHuA1yr73AFhgdQ5fk2u
+         4UoNYE0uUJX4Pjn6JA+1Vbh5XiCCMUvJooQwoaDTllK4hzd35udNQ9bLYa/P82ASGz1f
+         /zX9hy/8v8N0lconT3eT1nqIXUief5oRhr1l4HyJcl8jZIrTymbkNZ8JKiWAp0XTQ3Tu
+         nWFQ==
+X-Gm-Message-State: AOJu0YxxaZdXEXSlY6kjmraS7xURmOZr8CVO6KKrRtk2n3fsJOzPi6oZ
+        ksSfQk9KhwDB3u73cwwWR0AFWyuyJ0yYhc1VJ+E=
+X-Google-Smtp-Source: AGHT+IFAkmLswHwtKyXQ9H3iYGqJhPI4VAiXzhc7Kf1dolrf1kJnua7/rUtXMd8AiXnocZ1qec/uj1Zp1HZw4AH8B3k=
+X-Received: by 2002:a2e:80d3:0:b0:2b6:df23:2117 with SMTP id
+ r19-20020a2e80d3000000b002b6df232117mr544988ljg.43.1694544276003; Tue, 12 Sep
+ 2023 11:44:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20230912064026.1203509-1-vlad.pruteanu@nxp.com> <20230912064026.1203509-2-vlad.pruteanu@nxp.com>
-In-Reply-To: <20230912064026.1203509-2-vlad.pruteanu@nxp.com>
+References: <20230911074711.62493-1-silviu.barbulescu@nxp.com> <20230911074711.62493-2-silviu.barbulescu@nxp.com>
+In-Reply-To: <20230911074711.62493-2-silviu.barbulescu@nxp.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 12 Sep 2023 11:28:53 -0700
-Message-ID: <CABBYNZLKx0_4w5uBuchqCVHL2bubev3bMcq7L-QOFE50DPZpzA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] client/player: Add command for control of BIS encryption
-To:     Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Date:   Tue, 12 Sep 2023 11:44:23 -0700
+Message-ID: <CABBYNZ+PaBnLr8tkaaXhvpBK4qf9hK4VMZc-Eji7xUwbWjQ9Xw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] shared/bap:Update stream enable/disable flow bcast source
+To:     Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
 Cc:     linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
-        mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
-        iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com
+        mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com,
+        andrei.istodorescu@nxp.com, iulia.tanasescu@nxp.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vlad,
+Hi Silviu,
 
-On Mon, Sep 11, 2023 at 11:44=E2=80=AFPM Vlad Pruteanu <vlad.pruteanu@nxp.c=
-om> wrote:
+On Mon, Sep 11, 2023 at 12:47=E2=80=AFAM Silviu Florian Barbulescu
+<silviu.barbulescu@nxp.com> wrote:
 >
-> Currently there is no way to set the BIS encryption from
-> the bluetoothctl application. This commit adds support
-> for one.
+> Update stream enable/disable flow for BAP broadcast source
 >
-> Usage:
->         encryption [on/off]
-
-Don't really like the idea of having encryption here, I'd prompt the
-user asking if he wants encryption as part of endpoint.config when we
-detect it is for broadcast and if he responds yes then we can prompt
-for the key as well.
-
 > ---
->  client/player.c | 26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
+>  src/shared/bap.c | 51 +++++++++++++++++++++++++++++++++++-------------
+>  src/shared/bap.h |  2 ++
+>  2 files changed, 39 insertions(+), 14 deletions(-)
 >
-> diff --git a/client/player.c b/client/player.c
-> index 42721c210..b1da5e839 100644
-> --- a/client/player.c
-> +++ b/client/player.c
-> @@ -3196,6 +3196,28 @@ done:
->         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> index 1c43680c2..801716dd9 100644
+> --- a/src/shared/bap.c
+> +++ b/src/shared/bap.c
+> @@ -1331,6 +1331,11 @@ static void stream_set_state_broadcast(struct bt_b=
+ap_stream *stream,
+>         ep->old_state =3D ep->state;
+>         ep->state =3D state;
+>
+> +       DBG(bap, "stream %p dir 0x%02x: %s -> %s", stream,
+> +                       bt_bap_stream_get_dir(stream),
+> +                       bt_bap_stream_statestr(stream->ep->old_state),
+> +                       bt_bap_stream_statestr(stream->ep->state));
+> +
+>         bt_bap_ref(bap);
+>
+>         for (entry =3D queue_get_entries(bap->state_cbs); entry;
+> @@ -1492,7 +1497,7 @@ static void ep_config_cb(struct bt_bap_stream *stre=
+am, int err)
+>                 return;
+>
+>         if (bt_bap_stream_get_type(stream) =3D=3D BT_BAP_STREAM_TYPE_BCAS=
+T) {
+> -               stream_set_state_broadcast(stream, BT_BAP_STREAM_STATE_CO=
+NFIG);
+> +               stream_set_state_broadcast(stream, BT_BAP_STREAM_STATE_QO=
+S);
+>                 return;
+>         }
+>
+> @@ -4698,13 +4703,19 @@ unsigned int bt_bap_stream_enable(struct bt_bap_s=
+tream *stream,
+>                 break;
+>         case BT_BAP_STREAM_TYPE_BCAST:
+>                 stream_set_state_broadcast(stream,
+> -                                       BT_BAP_STREAM_STATE_STREAMING);
+> +                                       BT_BAP_STREAM_STATE_CONFIG);
+>                 return 1;
+>         }
+>
+>         return ret;
 >  }
 >
-> +static void cmd_encryption_endpoint(int argc, char *argv[])
+> +void bt_bap_stream_streaming(struct bt_bap_stream *stream)
 > +{
-> +
-> +       uint8_t value;
-> +
-> +       if (argc < 2) {
-> +               bt_shell_printf("Encryption: %s\n",
-> +                               bcast_qos.bcast.encryption ? "on" : "off"=
-);
-> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +       }
-> +
-> +       if (!strcmp(argv[1], "on") || !strcmp(argv[1], "yes"))
-> +               value =3D 1;
-> +       else if (!strcmp(argv[1], "off") || !strcmp(argv[1], "no"))
-> +               value =3D 0;
-> +       else
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +
-> +       bcast_qos.bcast.encryption =3D value;
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +               stream_set_state_broadcast(stream,
+> +                                       BT_BAP_STREAM_STATE_STREAMING);
 > +}
 > +
->  static const struct bt_shell_menu endpoint_menu =3D {
->         .name =3D "endpoint",
->         .desc =3D "Media Endpoint Submenu",
-> @@ -3221,6 +3243,10 @@ static const struct bt_shell_menu endpoint_menu =
-=3D {
->                                                 cmd_presets_endpoint,
->                                                 "List available presets",
->                                                 uuid_generator },
-> +       { "encryption",    "[on/off]",
-> +                                               cmd_encryption_endpoint,
-> +                                               "Enable/disable BIS encry=
-ption (mode 3 security)",
-> +                                               NULL },
->         {} },
->  };
+>  unsigned int bt_bap_stream_start(struct bt_bap_stream *stream,
+>                                         bt_bap_stream_func_t func,
+>                                         void *user_data)
+> @@ -4779,24 +4790,36 @@ unsigned int bt_bap_stream_disable(struct bt_bap_=
+stream *stream,
+>                 return 0;
+>         }
 >
+> -       memset(&disable, 0, sizeof(disable));
+> +       switch (bt_bap_stream_get_type(stream)) {
+> +       case BT_BAP_STREAM_TYPE_UCAST:
+> +               memset(&disable, 0, sizeof(disable));
+>
+> -       disable.ase =3D stream->ep->id;
+> +               disable.ase =3D stream->ep->id;
+>
+> -       iov.iov_base =3D &disable;
+> -       iov.iov_len =3D sizeof(disable);
+> +               iov.iov_base =3D &disable;
+> +               iov.iov_len =3D sizeof(disable);
+>
+> -       req =3D bap_req_new(stream, BT_ASCS_DISABLE, &iov, 1, func, user_=
+data);
+> +               req =3D bap_req_new(stream, BT_ASCS_DISABLE, &iov, 1, fun=
+c,
+> +                                                       user_data);
+>
+> -       if (!bap_queue_req(stream->bap, req)) {
+> -               bap_req_free(req);
+> -               return 0;
+> -       }
+> +               if (!bap_queue_req(stream->bap, req)) {
+> +                       bap_req_free(req);
+> +                       return 0;
+> +               }
+>
+> -       if (disable_links)
+> -               queue_foreach(stream->links, bap_stream_disable_link, NUL=
+L);
+> +               if (disable_links)
+> +                       queue_foreach(stream->links, bap_stream_disable_l=
+ink,
+> +                                                       NULL);
+>
+> -       return req->id;
+> +               return req->id;
+> +
+> +       case BT_BAP_STREAM_TYPE_BCAST:
+> +               stream_set_state_broadcast(stream,
+> +                                       BT_BAP_STREAM_STATE_RELEASING);
+> +               return 1;
+> +       }
+> +
+> +       return 0;
+>  }
+>
+>  unsigned int bt_bap_stream_stop(struct bt_bap_stream *stream,
+> diff --git a/src/shared/bap.h b/src/shared/bap.h
+> index edb5c1bed..d3c9b241e 100644
+> --- a/src/shared/bap.h
+> +++ b/src/shared/bap.h
+> @@ -264,6 +264,8 @@ unsigned int bt_bap_stream_start(struct bt_bap_stream=
+ *stream,
+>                                         bt_bap_stream_func_t func,
+>                                         void *user_data);
+>
+> +void bt_bap_stream_streaming(struct bt_bap_stream *stream);
+> +
+
+Lets use bt_bap_stream_start and handle this internally instead of
+introducing new APIs specific to broadcast.
+
+>  unsigned int bt_bap_stream_disable(struct bt_bap_stream *stream,
+>                                         bool disable_links,
+>                                         bt_bap_stream_func_t func,
 > --
 > 2.34.1
 >
