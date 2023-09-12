@@ -2,136 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D6CCA0EC3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 07:46:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC493CA0ECA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 08:11:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbjILHqc (ORCPT
+        id S232022AbjILILj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Sep 2023 03:46:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35018 "EHLO
+        Tue, 12 Sep 2023 04:11:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbjILHqb (ORCPT
+        with ESMTP id S231971AbjILILi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Sep 2023 03:46:31 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB68FE78
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 00:46:27 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 549A9C433CA
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 07:46:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694504787;
-        bh=HO3V95A/LcjyhO0fdL1zhQj5iujp4axJ/HMvysWPh98=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=FnXLI77rQW9tyGEuSxzQc9n3zloYDGIXW2KInZ7LE5ow6OEWbp7qW8+uMKSLzLOHe
-         IgyagLkWACHB7cVA7SH6RLH4xWBwMu94+fLMm+JKbnmVVBoA5LOTBLx1qb2k8NaJJy
-         jHnPPRf0nIxuQhuU2N2AIYA9W9HEJrbd7c5LeHnxcDkAzLWVZZKNjbfgNO8l2Bp5PB
-         hwXhPU+UvVg41rZ4h8exSNRXWUgThHoz3D+M4JhrhfZOphlX7QLDb0A+s5BdEcA85A
-         ZRpIrxNBbm4Z32vebh4SbaaBr8nEXhIkLda3P6Ee92dwrERIcfmlQlSoge10MOcjmV
-         HXtl+icKDkazQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 40E4AC53BD3; Tue, 12 Sep 2023 07:46:27 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 217903] Bluetooth doesn't work after trigger bluetoothctl scan
- on
-Date:   Tue, 12 Sep 2023 07:46:27 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: koba.ko@canonical.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-217903-62941-dxizS5nA5L@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-217903-62941@https.bugzilla.kernel.org/>
-References: <bug-217903-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 12 Sep 2023 04:11:38 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A3FE78
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 01:11:34 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-792707f78b5so181332139f.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 01:11:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1694506293; x=1695111093; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MlXgdW+3vPqPVvU9LyZszNZEHsxEeH9ermUCAER+y5A=;
+        b=StMXiU96/Vz7AF5U+O4odQyNA1X1Oa59GEYZvizCqeJQAddtHbrdxtdFS/EUtgt8nz
+         q495rGNFEvfr266h6Vmz2TAVfMvv/KDTEMNRTWcc7Vmc+g+k9AtHHIbMzhD8bFuDcVUc
+         4iBvEWgqUy6G+5Om8OJeGgM4qlj5IvJ1UfWkg53WSjNrguZpfqNS0YkjMSFrq8aQ1VGg
+         3N9VSxMl02mZua+aB9mqjiJKzj4bpte4k3QFo58zGmj3MS7cnMX787U3gnVTeu7WJU7I
+         5I5CqOKyWgK+ZoMCWmPEnjVESIR+RFtypRXyCjsuh+8SDe9etFyXXKWbcaTI1eJAcyYh
+         ypPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1694506293; x=1695111093;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MlXgdW+3vPqPVvU9LyZszNZEHsxEeH9ermUCAER+y5A=;
+        b=Nsw2nxDFZayGvOREpLtoKX2geeXEcP+Z+c30CY+6Y18fUDChK5uMwOrAEKp5vuDv8T
+         o+xHbZzbrdg4IVirGGhnuPs8NQaaoFAYwApi5WiKu+lOolT63IBz8ClrcpOzXJm4O5oe
+         UU4jmxixSkPQtLNXyecSUM6L5hWY3ka7TxopiEcmgjR1muFbLYAhiVWlPv9NKTHIEbdY
+         v92/qXY0ow66PoIrDdcsc6nj9xwGbLEguKz6wc1UA3CCM63QuDDIWFRRdzQq3Sj59mOP
+         2WRqY6k3sKhlUMUtfzKmVEk/D9zUNwmosFNT05cp6qBSGAeuBKaoJ1fYmAtCt55XhCdW
+         c7Vg==
+X-Gm-Message-State: AOJu0Yyv/Ze8W2VQDwkz+fkYm0E9HBMwEmu+x7aehd+OdxrsyQUy7Dsr
+        pjGTrDuJsPbiXgOxhmRQj167DcfvA/I=
+X-Google-Smtp-Source: AGHT+IFW/keBe0D8+uIOnKdz4OzIvbuWPoZedL4kCmkAvbpDFBJpjDY8pxebafjvsluHOsNTysK4SA==
+X-Received: by 2002:a5e:aa10:0:b0:786:7389:51d7 with SMTP id s16-20020a5eaa10000000b00786738951d7mr14593745ioe.5.1694506293297;
+        Tue, 12 Sep 2023 01:11:33 -0700 (PDT)
+Received: from [172.17.0.2] ([13.86.66.98])
+        by smtp.gmail.com with ESMTPSA id t12-20020a5e990c000000b0079187c8524asm2729035ioj.3.2023.09.12.01.11.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Sep 2023 01:11:33 -0700 (PDT)
+Message-ID: <65001d35.5e0a0220.8be47.395f@mx.google.com>
+Date:   Tue, 12 Sep 2023 01:11:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1965639320946129183=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
+Subject: RE: bap: Use defer setup when syncing to a BIS source
+In-Reply-To: <20230912065526.1217334-2-vlad.pruteanu@nxp.com>
+References: <20230912065526.1217334-2-vlad.pruteanu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D217903
+--===============1965639320946129183==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-KobaKo (koba.ko@canonical.com) changed:
+This is automated email and please do not reply to this email!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |koba.ko@canonical.com
+Dear submitter,
 
---- Comment #1 from KobaKo (koba.ko@canonical.com) ---
-even the error isn't triggered,
-just switch power off/on and wait a while the devices were deleted.
-1. power off/on
-2. wait a while
-3. devices are deleted
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=783280
 
-*discovering: yes
-*hci0 rx counter keeps increasing
-~~~
-ubuntu@ubuntu:~$ hciconfig -a
-hci0: Type: Primary Bus: USB
-BD Address: 50:28:4A:FA:9D:11 ACL MTU: 1021:4 SCO MTU: 96:6
-UP RUNNING
-RX bytes:25930 acl:39 sco:0 events:828 errors:0
-TX bytes:10395 acl:36 sco:0 commands:598 errors:0
-Features: 0xbf 0xfe 0x0f 0xfe 0xdb 0xff 0x7b 0x87
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy: RSWITCH SNIFF
-Link mode: PERIPHERAL ACCEPT
-Name: 'ubuntu'
-Class: 0x6c0104
-Service Classes: Rendering, Capturing, Audio, Telephony
-Device Class: Computer, Desktop workstation
-HCI Version: (0xc) Revision: 0x46c8
-LMP Version: (0xc) Subversion: 0x46c8
-Manufacturer: Intel Corp. (2)
+---Test result---
 
-ubuntu@ubuntu:~$ hciconfig -a
-hci0: Type: Primary Bus: USB
-BD Address: 50:28:4A:FA:9D:11 ACL MTU: 1021:4 SCO MTU: 96:6
-UP RUNNING
-RX bytes:26207 acl:39 sco:0 events:831 errors:0
-TX bytes:10404 acl:36 sco:0 commands:601 errors:0
-Features: 0xbf 0xfe 0x0f 0xfe 0xdb 0xff 0x7b 0x87
-Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-Link policy: RSWITCH SNIFF
-Link mode: PERIPHERAL ACCEPT
-Name: 'ubuntu'
-Class: 0x6c0104
-Service Classes: Rendering, Capturing, Audio, Telephony
-Device Class: Computer, Desktop workstation
-HCI Version: (0xc) Revision: 0x46c8
-LMP Version: (0xc) Subversion: 0x46c8
-Manufacturer: Intel Corp. (2)
-~~~
-[bluetooth]# show
-Controller 50:28:4A:FA:9D:11 (public)
-Name: ubuntu
-Alias: ubuntu
-Class: 0x006c0104
-Powered: yes
-Discoverable: no
-DiscoverableTimeout: 0x000000b4
-Pairable: yes
-Modalias: usb:v1D6Bp0246d0540
-Discovering: yes
-Roles: central
-~~~
+Test Summary:
+CheckPatch                    PASS      0.46 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      29.06 seconds
+BluezMake                     PASS      840.08 seconds
+MakeCheck                     PASS      11.80 seconds
+MakeDistcheck                 PASS      157.82 seconds
+CheckValgrind                 PASS      257.94 seconds
+CheckSmatch                   PASS      345.20 seconds
+bluezmakeextell               PASS      104.53 seconds
+IncrementalBuild              PASS      680.51 seconds
+ScanBuild                     PASS      1071.01 seconds
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1965639320946129183==--
