@@ -2,72 +2,120 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0125EE3F0D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 18:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D550EE3F0C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Sep 2023 19:08:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235304AbjILSuc (ORCPT
+        id S232906AbjILTIr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Sep 2023 14:50:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
+        Tue, 12 Sep 2023 15:08:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232253AbjILSua (ORCPT
+        with ESMTP id S230204AbjILTIq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Sep 2023 14:50:30 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFCFE125
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 11:50:26 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 975EEC433CB;
-        Tue, 12 Sep 2023 18:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1694544626;
-        bh=2DGr4P4FTZCyI82ZyI17k1PXBOf2XaVnuzV2tfpR6E4=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=mn+e3+jhHOlS+OIpofOo4ErNdRRwO0gTa72T/qUW4vvdBiG4dlFR1iXPChEA32I9G
-         s6t+K/2wn9AjRUVuvI9VNifszzuIYaQyBkTXVkvh8WBLsTG/kIGcE0P0NFSHlegmVk
-         GGSmRMVMtRsMa8glTiiB8Ez82cOC1n4Oi+CxDS4ePAha75v00R428X5JzC+7/1RfD4
-         3VHu7Jq4dPO20QKfv7+Gsm/cQjYQjXZviPfQMKkIbJhLvNnFDZW94atBDSAqpftqXv
-         feEU/Uezuj5MAf8Yuz+WrivhpsmIQ8xvgAk1AXx68BFKRPb0P9blJc4uHJ6BqCqgBj
-         exPhdsBlgBLnQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7B8D3C04DD9;
-        Tue, 12 Sep 2023 18:50:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] main.conf: Fix parsing of uint32_t values
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169454462650.13260.8434369852731815958.git-patchwork-notify@kernel.org>
-Date:   Tue, 12 Sep 2023 18:50:26 +0000
-References: <20230911205447.2689657-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230911205447.2689657-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Tue, 12 Sep 2023 15:08:46 -0400
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B2A12E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 12:08:42 -0700 (PDT)
+Received: from github.com (hubbernetes-node-fe550a2.va3-iad.github.net [10.48.140.38])
+        by smtp.github.com (Postfix) with ESMTPA id 21D2040A9C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Sep 2023 12:08:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2023; t=1694545722;
+        bh=KndxHfSIaEFNVYDpXSddk2STJoaqQRcDZuaiQhL42xg=;
+        h=Date:From:To:Subject:From;
+        b=CeT/e9MtRLgZojWAAxoRExLU/VYoJ1d5FhtD50M103Ae895vxblyu+gZtWIT3FSI3
+         OE+IvEFWIm6bbHo2cgZpMJBBaaDwmBbWALPPNN9X0LNiwmTEYdTz7vbC+ADMsusCU6
+         GHbVCQ3qw872HFbpy1cHZXXh2j/S8whVzktL+INI=
+Date:   Tue, 12 Sep 2023 12:08:42 -0700
+From:   vlad-pruteanu <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/df658c-f83836@github.com>
+Subject: [bluez/bluez] 53542d: main.conf: Fix parsing of uint32_t values
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 53542db3d6c6bc9991e3f9b0ab05e6ea6cee753d
+      https://github.com/bluez/bluez/commit/53542db3d6c6bc9991e3f9b0ab05e6ea6cee753d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-09-12 (Tue, 12 Sep 2023)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/main.c
 
-On Mon, 11 Sep 2023 13:54:47 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Passing UINT32_MAX as int may overfollow causing errors such as:
-> 
-> bluetoothd[2688495]: src/main.c:parse_config_int()
-> General.TemporaryTimeout = 60 is out of range (> -1)
-> 
-> [...]
+  Log Message:
+  -----------
+  main.conf: Fix parsing of uint32_t values
 
-Here is the summary with links:
-  - [BlueZ] main.conf: Fix parsing of uint32_t values
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=53542db3d6c6
+Passing UINT32_MAX as int may overfollow causing errors such as:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+bluetoothd[2688495]: src/main.c:parse_config_int()
+General.TemporaryTimeout = 60 is out of range (> -1)
+
+Fixes: https://github.com/bluez/bluez/issues/583#issuecomment-1713447461
 
 
+  Commit: 2d2389d967025a5629f00f125abffa9d2c1b4771
+      https://github.com/bluez/bluez/commit/2d2389d967025a5629f00f125abffa9d2c1b4771
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2023-09-12 (Tue, 12 Sep 2023)
+
+  Changed paths:
+    M src/adapter.c
+    M src/device.c
+    M src/device.h
+
+  Log Message:
+  -----------
+  device: Fix not handling initiator properly
+
+Previously initiator would be set whenever a central key was found
+which turns out to be unreliable besides the MGMT New Connection event
+does in fact inform if the connection was initiated locally or not.
+
+Fixes: https://github.com/bluez/bluez/issues/598
+
+
+  Commit: feadcbbed50dc7c5b9c2334eeb73d8236797b53e
+      https://github.com/bluez/bluez/commit/feadcbbed50dc7c5b9c2334eeb73d8236797b53e
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2023-09-12 (Tue, 12 Sep 2023)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Use defer setup when syncing to a BIS source
+
+This commit uses the newly added bt_io_bcast_accept function from
+btio.c to implement the defer setup for the BIS sync process.
+Now, information from the BIG Info advertising report can be
+used when sending the BIG Create Sync command.
+
+
+  Commit: f838361bf0a306de0d0de33f0253e082ebeb10af
+      https://github.com/bluez/bluez/commit/f838361bf0a306de0d0de33f0253e082ebeb10af
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2023-09-12 (Tue, 12 Sep 2023)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Use proper name for CIS bit
+
+In the Bluetooth Specification the complete name for bit
+number 32 is "Connected Isochronous Stream (Host Support)".
+
+
+Compare: https://github.com/bluez/bluez/compare/df658c6c4ab5...f838361bf0a3
