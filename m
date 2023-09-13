@@ -2,306 +2,298 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 988B3EE3F3F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Sep 2023 00:04:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF85EDEC43
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Sep 2023 11:39:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231954AbjIMAE0 (ORCPT
+        id S240228AbjIMLjW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Sep 2023 20:04:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51918 "EHLO
+        Wed, 13 Sep 2023 07:39:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbjIMAEZ (ORCPT
+        with ESMTP id S238945AbjIMLjW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Sep 2023 20:04:25 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6852010E6;
-        Tue, 12 Sep 2023 17:04:21 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2b974031aeaso107061131fa.0;
-        Tue, 12 Sep 2023 17:04:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694563459; x=1695168259; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zYqtldXjaIbkofQ9EGajkaEKo3opUg1EXy6HgLBgrys=;
-        b=MkYsr5vvsV0lBXmZ/ruw5r9O1s35HL5o5FE3XtSZXsrf69vufiaghLu0suKc74A1l/
-         u3Xh+mIe9t53wVptK2DYcWfFEzCNjVQ2LqquAlokplu7cEgNgP0AkjJ91XOMpgu+F/Ip
-         6UgwKRl8EKfzbgmWavup/WF4klTC3iEulprA1wGdkpeex4fCpVS0Pi0XXhlsoVKNBbUI
-         Vh7LnTRYiWOMefXtUv4symCIs4lxg1YPZkO5xM4kU/Vcz3ShcpStRIs9xMeQbzIU84rO
-         iTRHGykXLLUX5QR6Iaa3OR7+2kOk9VRY+Djp1kyG5wEXOyJ1SqZbSBTK2WGGhU/PyWTf
-         wCBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694563459; x=1695168259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zYqtldXjaIbkofQ9EGajkaEKo3opUg1EXy6HgLBgrys=;
-        b=oZ5shopB9da07Yj7cHS3mIOaJp/mdeemtV7KG5JgcrLnhmelu45h11uEm2JVYqpzkM
-         CyjrmhhreqwGGRWL4zrSZWLZeeWiiW07zlZSUht/UwnwjQZ15BTRBXMCr/IOFwO9GnJE
-         F77bCqly9rCHCjdvqZk9y69B52bdTYVaFjtCbDvkoc49zLmeRnLnzvWKZG24ANx9Q4ap
-         afKC9a9u8mrAvPHiD5qS6AsoEc9avtnZaQXaTxFbtoubWfoGIN9Fnt872zT+RyQ4Wj8T
-         BU92ScYXYW1UNafuCajPCMAOomAhZ8kc1G2adPtGHGUEo+qp0SA8EOy3UvfboFiT44TT
-         Pvtg==
-X-Gm-Message-State: AOJu0YwBeuV/O+n8CDYdrHiGN0ki7tKRpNZnocuC79NdaBJ3zUJ9PU73
-        q8NvCUP9pysaR95MIbAdaDiaZLz0anrkaP/50sg=
-X-Google-Smtp-Source: AGHT+IGDjbjRS64pleRYqIUkKF+sXzxgCOVjZKZ8y6Foxytz4c8MWBDobr/hqybN7T3ELGZePV5/5G6D6aicP89fGoY=
-X-Received: by 2002:a2e:9c52:0:b0:2b9:e24d:21f6 with SMTP id
- t18-20020a2e9c52000000b002b9e24d21f6mr961461ljj.20.1694563459093; Tue, 12 Sep
- 2023 17:04:19 -0700 (PDT)
-MIME-Version: 1.0
-References: <BL0PR11MB3106630748E9A97C1E32A14EE1EEA@BL0PR11MB3106.namprd11.prod.outlook.com>
-In-Reply-To: <BL0PR11MB3106630748E9A97C1E32A14EE1EEA@BL0PR11MB3106.namprd11.prod.outlook.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 12 Sep 2023 17:04:06 -0700
-Message-ID: <CABBYNZLveT7S8+1CqZfp+O-Pp0GyRUEvy3gwovg+a1isUhr3BA@mail.gmail.com>
-Subject: Re: KASAN: slab-use-after-free Read in hci_conn_hash_flush
-To:     Sanan Hasanov <Sanan.Hasanov@ucf.edu>
-Cc:     "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
-        "contact@pgazz.com" <contact@pgazz.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 13 Sep 2023 07:39:22 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E7510E6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Sep 2023 04:39:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1694605158; x=1726141158;
+  h=date:from:to:cc:subject:message-id;
+  bh=akMhR3lVZ5T+KObzu89JwOFb18bwiPsvhxHVwyOLIlk=;
+  b=BYQMsSugil6coVGYlAnKw+X0CK+ims4Rsw/B3xSiAWwGfab4MQnKf0D8
+   gVWjiESa7V1FHeIFPNP6J3Q0tDty1ToUr/lzCxfYlh6MxaYMCoOIodjQ1
+   U7T/PKBPXPJIMAQsRTnFzOO1nf7i6ibZG4dBopTMc1thQtg1cGhJhwIUy
+   q46PgYi12/mxzKF9dpu3Vd60/GQwlGSLH5N4+uTMsoCy+ihBmrO/u9fEp
+   ckk4QlZuE0K1EeZCX4PPyf/512UGvnEtHas2LCcbU9+ASeesG43Nq5ssX
+   XqChNhK0Sl3h6kYGScWNJtEZ9Eu9K6qt4S1Wclz/V+FdfUuwb/7+0mR6d
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="363665390"
+X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
+   d="scan'208";a="363665390"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2023 04:39:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10831"; a="737468824"
+X-IronPort-AV: E=Sophos;i="6.02,143,1688454000"; 
+   d="scan'208";a="737468824"
+Received: from lkp-server02.sh.intel.com (HELO cf13c67269a2) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 13 Sep 2023 04:39:16 -0700
+Received: from kbuild by cf13c67269a2 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qgODC-0000SB-1u;
+        Wed, 13 Sep 2023 11:39:14 +0000
+Date:   Wed, 13 Sep 2023 19:38:37 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 58093c0b14a3f9ef05f966a04e36a0fe199a59ca
+Message-ID: <202309131935.6nAEQdiE-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sanan,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 58093c0b14a3f9ef05f966a04e36a0fe199a59ca  Bluetooth: ISO: Set CIS bit only for devices with CIS support
 
-On Tue, Sep 12, 2023 at 4:02=E2=80=AFPM Sanan Hasanov <Sanan.Hasanov@ucf.ed=
-u> wrote:
->
-> Good day, dear maintainers,
->
-> We found a bug using a modified kernel configuration file used by syzbot.
->
-> We enhanced the coverage of the configuration file using our tool, klocal=
-izer.
->
-> Kernel Branch: 6.3.0-next-20230426
-> Kernel Config: https://drive.google.com/file/d/19nzVDVMtaTo8fv7RMtXDGYQze=
-RnNpp-r/view?usp=3Dsharing
-> Reproducer: https://drive.google.com/file/d/1vzoYO_aW6XQqR6NAaJqvacOcJy9J=
-6R-0/view?usp=3Dsharing
->
-> Thank you!
->
-> Best regards,
-> Sanan Hasanov
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: slab-use-after-free in hci_conn_hash_flush+0x1fa/0x230
-> Read of size 8 at addr ffff8880780da000 by task syz-executor.7/5990
->
-> CPU: 3 PID: 5990 Comm: syz-executor.7 Not tainted 6.3.0-next-20230426 #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x178/0x260
->  print_report+0xc1/0x5e0
->  kasan_report+0xc0/0xf0
->  hci_conn_hash_flush+0x1fa/0x230
->  hci_dev_close_sync+0x5c2/0x1060
->  hci_unregister_dev+0x1ce/0x4a0
->  vhci_release+0x80/0xf0
->  __fput+0x27c/0xa90
->  task_work_run+0x168/0x260
->  do_exit+0xbd9/0x2b20
->  do_group_exit+0xd4/0x2a0
->  __x64_sys_exit_group+0x3e/0x50
->  do_syscall_64+0x39/0x80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7ff463e8edcd
-> Code: Unable to access opcode bytes at 0x7ff463e8eda3.
-> RSP: 002b:00007ffde1873c18 EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
-> RAX: ffffffffffffffda RBX: 00007ffde1874480 RCX: 00007ff463e8edcd
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000043
-> RBP: 0000000000000003 R08: 0000000000000026 R09: 00007ffde1874480
-> R10: 0000000000000026 R11: 0000000000000202 R12: 0000000000000000
-> R13: 00007ff463eeba70 R14: 0000000000000002 R15: 00007ffde18744c0
->  </TASK>
->
-> Allocated by task 24391:
->  kasan_save_stack+0x22/0x40
->  kasan_set_track+0x25/0x30
->  __kasan_kmalloc+0x7c/0x90
->  hci_conn_add+0xa5/0x1570
->  hci_connect_sco+0x3e4/0xf50
->  sco_sock_connect+0x2c0/0x9c0
->  __sys_connect_file+0x153/0x1a0
->  __sys_connect+0x165/0x1a0
->  __x64_sys_connect+0x72/0xb0
->  do_syscall_64+0x39/0x80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
-> Freed by task 5990:
->  kasan_save_stack+0x22/0x40
->  kasan_set_track+0x25/0x30
->  kasan_save_free_info+0x2b/0x40
->  ____kasan_slab_free+0x120/0x180
->  __kmem_cache_free+0xcf/0x280
->  device_release+0xa3/0x240
->  kobject_put+0x175/0x270
->  put_device+0x1f/0x30
->  hci_conn_del+0x2df/0x860
->  hci_conn_unlink+0x25b/0x3e0
->  hci_conn_unlink+0x2ef/0x3e0
->  hci_conn_hash_flush+0x18d/0x230
->  hci_dev_close_sync+0x5c2/0x1060
->  hci_unregister_dev+0x1ce/0x4a0
->  vhci_release+0x80/0xf0
->  __fput+0x27c/0xa90
->  task_work_run+0x168/0x260
->  do_exit+0xbd9/0x2b20
->  do_group_exit+0xd4/0x2a0
->  __x64_sys_exit_group+0x3e/0x50
->  do_syscall_64+0x39/0x80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
-> Last potentially related work creation:
->  kasan_save_stack+0x22/0x40
->  __kasan_record_aux_stack+0x60/0x70
->  insert_work+0x48/0x360
->  __queue_work+0x5bc/0xfe0
->  __queue_delayed_work+0x1c8/0x270
->  queue_delayed_work_on+0x162/0x1c0
->  sco_chan_del+0x1db/0x430
->  __sco_sock_close+0x11f/0x640
->  sco_sock_release+0x9f/0x2d0
->  __sock_release+0xcd/0x290
->  sock_close+0x1c/0x20
->  __fput+0x27c/0xa90
->  task_work_run+0x168/0x260
->  get_signal+0x1cb/0x2460
->  arch_do_signal_or_restart+0x79/0x5a0
->  exit_to_user_mode_prepare+0x128/0x1e0
->  syscall_exit_to_user_mode+0x1a/0x40
->  do_syscall_64+0x46/0x80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->
-> The buggy address belongs to the object at ffff8880780da000
->  which belongs to the cache kmalloc-4k of size 4096
-> The buggy address is located 0 bytes inside of
->  freed 4096-byte region [ffff8880780da000, ffff8880780db000)
->
-> The buggy address belongs to the physical page:
-> page:00000000fca63b13 refcount:1 mapcount:0 mapping:0000000000000000 inde=
-x:0x0 pfn:0x780da
-> head:00000000fca63b13 order:1 entire_mapcount:0 nr_pages_mapped:0 pincoun=
-t:0
-> flags: 0xfffe0000010200(slab|head|node=3D0|zone=3D1|lastcpupid=3D0x3fff)
-> page_type: 0x1()
-> raw: 00fffe0000010200 ffff888100040900 ffffea000438c110 ffffea0001323210
-> raw: 0000000000000000 ffff8880780da000 0000000100000001 0000000000000000
-> page dumped because: kasan: bad access detected
->
-> Memory state around the buggy address:
->  ffff8880780d9f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->  ffff8880780d9f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-> >ffff8880780da000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                    ^
->  ffff8880780da080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff8880780da100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> general protection fault, probably for non-canonical address 0xe0b5dc4c80=
-0002ec: 0000 [#1] PREEMPT SMP KASAN
-> KASAN: maybe wild-memory-access in range [0x05af026400001760-0x05af026400=
-001767]
-> CPU: 3 PID: 5990 Comm: syz-executor.7 Tainted: G    B              6.3.0-=
-next-20230426 #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
-> RIP: 0010:__list_del_entry_valid+0x91/0x1b0
-> Code: de 48 39 c2 0f 84 80 00 00 00 48 b8 22 01 00 00 00 00 ad de 48 39 c=
-1 74 7f 48 b8 00 00 00 00 00 fc ff df 48 89 cf 48 c1 ef 03 <80> 3c 07 00 0f=
- 85 e7 00 00 00 4c 8b 01 49 39 f0 75 6d 48 8d 7a 08
-> RSP: 0018:ffffc9000d81fae0 EFLAGS: 00010213
-> RAX: dffffc0000000000 RBX: ffff8880780da000 RCX: 05af026400001766
-> RDX: ffff888046d06800 RSI: ffff8880780da000 RDI: 00b5e04c800002ec
-> RBP: ffff8880780da260 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: ffffffff88e0008b R12: ffff8880780da008
-> R13: ffff8880780da260 R14: dffffc0000000000 R15: ffff88805f51c000
-> FS:  0000000000000000(0000) GS:ffff88811a180000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000055d74eb5c6a0 CR3: 000000010e5b2000 CR4: 0000000000350ee0
-> Call Trace:
->  <TASK>
->  hci_conn_cleanup+0x15d/0x7e0
->  hci_conn_del+0x2df/0x860
->  hci_conn_hash_flush+0x195/0x230
->  hci_dev_close_sync+0x5c2/0x1060
->  hci_unregister_dev+0x1ce/0x4a0
->  vhci_release+0x80/0xf0
->  __fput+0x27c/0xa90
->  task_work_run+0x168/0x260
->  do_exit+0xbd9/0x2b20
->  do_group_exit+0xd4/0x2a0
->  __x64_sys_exit_group+0x3e/0x50
->  do_syscall_64+0x39/0x80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7ff463e8edcd
-> Code: Unable to access opcode bytes at 0x7ff463e8eda3.
-> RSP: 002b:00007ffde1873c18 EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
-> RAX: ffffffffffffffda RBX: 00007ffde1874480 RCX: 00007ff463e8edcd
-> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000043
-> RBP: 0000000000000003 R08: 0000000000000026 R09: 00007ffde1874480
-> R10: 0000000000000026 R11: 0000000000000202 R12: 0000000000000000
-> R13: 00007ff463eeba70 R14: 0000000000000002 R15: 00007ffde18744c0
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:__list_del_entry_valid+0x91/0x1b0
-> Code: de 48 39 c2 0f 84 80 00 00 00 48 b8 22 01 00 00 00 00 ad de 48 39 c=
-1 74 7f 48 b8 00 00 00 00 00 fc ff df 48 89 cf 48 c1 ef 03 <80> 3c 07 00 0f=
- 85 e7 00 00 00 4c 8b 01 49 39 f0 75 6d 48 8d 7a 08
-> RSP: 0018:ffffc9000d81fae0 EFLAGS: 00010213
-> RAX: dffffc0000000000 RBX: ffff8880780da000 RCX: 05af026400001766
-> RDX: ffff888046d06800 RSI: ffff8880780da000 RDI: 00b5e04c800002ec
-> RBP: ffff8880780da260 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: ffffffff88e0008b R12: ffff8880780da008
-> R13: ffff8880780da260 R14: dffffc0000000000 R15: ffff88805f51c000
-> FS:  0000000000000000(0000) GS:ffff88811a180000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000055d74eb5c6a0 CR3: 000000010e5b2000 CR4: 0000000000350ee0
-> ----------------
-> Code disassembly (best guess), 1 bytes skipped:
->    0:   48 39 c2                cmp    %rax,%rdx
->    3:   0f 84 80 00 00 00       je     0x89
->    9:   48 b8 22 01 00 00 00    movabs $0xdead000000000122,%rax
->   10:   00 ad de
->   13:   48 39 c1                cmp    %rax,%rcx
->   16:   74 7f                   je     0x97
->   18:   48 b8 00 00 00 00 00    movabs $0xdffffc0000000000,%rax
->   1f:   fc ff df
->   22:   48 89 cf                mov    %rcx,%rdi
->   25:   48 c1 ef 03             shr    $0x3,%rdi
-> * 29:   80 3c 07 00             cmpb   $0x0,(%rdi,%rax,1) <-- trapping in=
-struction
->   2d:   0f 85 e7 00 00 00       jne    0x11a
->   33:   4c 8b 01                mov    (%rcx),%r8
->   36:   49 39 f0                cmp    %rsi,%r8
->   39:   75 6d                   jne    0xa8
->   3b:   48 8d 7a 08             lea    0x8(%rdx),%rdi
+elapsed time: 920m
 
-Are you guys checking if these bugs have not been fixed already, for
-example this one I suspect has been fixed by:
+configs tested: 226
+configs skipped: 2
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/commit/?id=3Da2ac591cb4d83e1f2d4b4adb3c14b2c79764650a
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
---=20
-Luiz Augusto von Dentz
+tested configs:
+alpha                             allnoconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r015-20230913   gcc  
+alpha                randconfig-r021-20230913   gcc  
+alpha                randconfig-r036-20230913   gcc  
+arc                              allmodconfig   gcc  
+arc                               allnoconfig   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                            hsdk_defconfig   gcc  
+arc                     nsimosci_hs_defconfig   gcc  
+arc                   randconfig-001-20230913   gcc  
+arc                  randconfig-r004-20230913   gcc  
+arc                  randconfig-r022-20230913   gcc  
+arc                  randconfig-r033-20230913   gcc  
+arm                              allmodconfig   gcc  
+arm                               allnoconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                        clps711x_defconfig   gcc  
+arm                                 defconfig   gcc  
+arm                        keystone_defconfig   gcc  
+arm                         lpc18xx_defconfig   gcc  
+arm                            mps2_defconfig   gcc  
+arm                  randconfig-r003-20230913   clang
+arm                           sunxi_defconfig   gcc  
+arm64                            allmodconfig   gcc  
+arm64                             allnoconfig   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r012-20230913   clang
+csky                             allmodconfig   gcc  
+csky                              allnoconfig   gcc  
+csky                             allyesconfig   gcc  
+csky                                defconfig   gcc  
+csky                 randconfig-r011-20230913   gcc  
+csky                 randconfig-r032-20230913   gcc  
+hexagon               randconfig-001-20230913   clang
+hexagon               randconfig-002-20230913   clang
+hexagon              randconfig-r005-20230913   clang
+hexagon              randconfig-r034-20230913   clang
+i386                             allmodconfig   gcc  
+i386                              allnoconfig   gcc  
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-001-20230913   gcc  
+i386         buildonly-randconfig-002-20230913   gcc  
+i386         buildonly-randconfig-003-20230913   gcc  
+i386         buildonly-randconfig-004-20230913   gcc  
+i386         buildonly-randconfig-005-20230913   gcc  
+i386         buildonly-randconfig-006-20230913   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                  randconfig-001-20230913   gcc  
+i386                  randconfig-002-20230913   gcc  
+i386                  randconfig-003-20230913   gcc  
+i386                  randconfig-004-20230913   gcc  
+i386                  randconfig-005-20230913   gcc  
+i386                  randconfig-006-20230913   gcc  
+i386                  randconfig-011-20230913   clang
+i386                  randconfig-012-20230913   clang
+i386                  randconfig-013-20230913   clang
+i386                  randconfig-014-20230913   clang
+i386                  randconfig-015-20230913   clang
+i386                  randconfig-016-20230913   clang
+i386                 randconfig-r004-20230913   gcc  
+i386                 randconfig-r005-20230913   gcc  
+i386                 randconfig-r035-20230913   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                        allyesconfig   gcc  
+loongarch                           defconfig   gcc  
+loongarch             randconfig-001-20230913   gcc  
+loongarch            randconfig-r002-20230913   gcc  
+loongarch            randconfig-r006-20230913   gcc  
+m68k                             allmodconfig   gcc  
+m68k                              allnoconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                       bvme6000_defconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                       m5275evb_defconfig   gcc  
+m68k                 randconfig-r003-20230913   gcc  
+m68k                 randconfig-r004-20230913   gcc  
+m68k                 randconfig-r013-20230913   gcc  
+m68k                 randconfig-r022-20230913   gcc  
+microblaze                       allmodconfig   gcc  
+microblaze                        allnoconfig   gcc  
+microblaze                       allyesconfig   gcc  
+microblaze                          defconfig   gcc  
+microblaze           randconfig-r002-20230913   gcc  
+microblaze           randconfig-r006-20230913   gcc  
+microblaze           randconfig-r013-20230913   gcc  
+microblaze           randconfig-r023-20230913   gcc  
+mips                             allmodconfig   gcc  
+mips                              allnoconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                 randconfig-r006-20230913   clang
+mips                 randconfig-r015-20230913   gcc  
+mips                 randconfig-r016-20230913   gcc  
+mips                 randconfig-r025-20230913   gcc  
+nios2                            alldefconfig   gcc  
+nios2                            allmodconfig   gcc  
+nios2                             allnoconfig   gcc  
+nios2                            allyesconfig   gcc  
+nios2                               defconfig   gcc  
+nios2                randconfig-r033-20230913   gcc  
+openrisc                         allmodconfig   gcc  
+openrisc                          allnoconfig   gcc  
+openrisc                         allyesconfig   gcc  
+openrisc                            defconfig   gcc  
+openrisc             randconfig-r006-20230913   gcc  
+openrisc             randconfig-r016-20230913   gcc  
+openrisc             randconfig-r032-20230913   gcc  
+parisc                           allmodconfig   gcc  
+parisc                            allnoconfig   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc                generic-64bit_defconfig   gcc  
+parisc               randconfig-r002-20230913   gcc  
+parisc               randconfig-r005-20230913   gcc  
+parisc               randconfig-r024-20230913   gcc  
+parisc               randconfig-r035-20230913   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                          allyesconfig   gcc  
+powerpc                      bamboo_defconfig   gcc  
+powerpc              randconfig-r001-20230913   gcc  
+powerpc              randconfig-r036-20230913   gcc  
+powerpc                     stx_gp3_defconfig   gcc  
+powerpc64            randconfig-r001-20230913   gcc  
+powerpc64            randconfig-r005-20230913   gcc  
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                    nommu_k210_defconfig   gcc  
+riscv                randconfig-r001-20230913   gcc  
+riscv                randconfig-r004-20230913   gcc  
+riscv                randconfig-r005-20230913   gcc  
+riscv                randconfig-r011-20230913   clang
+riscv                randconfig-r014-20230913   clang
+riscv                randconfig-r016-20230913   clang
+riscv                randconfig-r031-20230913   gcc  
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                              allnoconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                  randconfig-001-20230913   clang
+s390                 randconfig-r031-20230913   gcc  
+sh                               allmodconfig   gcc  
+sh                                allnoconfig   gcc  
+sh                               allyesconfig   gcc  
+sh                                  defconfig   gcc  
+sh                        edosk7705_defconfig   gcc  
+sh                   randconfig-r011-20230913   gcc  
+sh                          sdk7786_defconfig   gcc  
+sh                           se7619_defconfig   gcc  
+sh                           se7724_defconfig   gcc  
+sh                   secureedge5410_defconfig   gcc  
+sh                             sh03_defconfig   gcc  
+sh                            titan_defconfig   gcc  
+sparc                            allmodconfig   gcc  
+sparc                             allnoconfig   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r021-20230913   gcc  
+sparc                randconfig-r025-20230913   gcc  
+sparc                randconfig-r026-20230913   gcc  
+sparc                randconfig-r031-20230913   gcc  
+sparc                randconfig-r035-20230913   gcc  
+sparc                randconfig-r036-20230913   gcc  
+sparc64                          alldefconfig   gcc  
+sparc64                          allmodconfig   gcc  
+sparc64                          allyesconfig   gcc  
+sparc64                             defconfig   gcc  
+sparc64              randconfig-r003-20230913   gcc  
+sparc64              randconfig-r012-20230913   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                   randconfig-r026-20230913   gcc  
+um                           x86_64_defconfig   gcc  
+x86_64                            allnoconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-001-20230913   gcc  
+x86_64       buildonly-randconfig-002-20230913   gcc  
+x86_64       buildonly-randconfig-003-20230913   gcc  
+x86_64       buildonly-randconfig-004-20230913   gcc  
+x86_64       buildonly-randconfig-005-20230913   gcc  
+x86_64       buildonly-randconfig-006-20230913   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64                randconfig-001-20230913   clang
+x86_64                randconfig-002-20230913   clang
+x86_64                randconfig-003-20230913   clang
+x86_64                randconfig-004-20230913   clang
+x86_64                randconfig-005-20230913   clang
+x86_64                randconfig-006-20230913   clang
+x86_64                randconfig-011-20230913   gcc  
+x86_64                randconfig-012-20230913   gcc  
+x86_64                randconfig-013-20230913   gcc  
+x86_64                randconfig-014-20230913   gcc  
+x86_64                randconfig-015-20230913   gcc  
+x86_64                randconfig-016-20230913   gcc  
+x86_64                randconfig-071-20230913   gcc  
+x86_64                randconfig-072-20230913   gcc  
+x86_64                randconfig-073-20230913   gcc  
+x86_64                randconfig-074-20230913   gcc  
+x86_64                randconfig-075-20230913   gcc  
+x86_64                randconfig-076-20230913   gcc  
+x86_64               randconfig-r034-20230913   gcc  
+x86_64                           rhel-8.3-bpf   gcc  
+x86_64                         rhel-8.3-kunit   gcc  
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa                            allnoconfig   gcc  
+xtensa                           allyesconfig   gcc  
+xtensa                  cadence_csp_defconfig   gcc  
+xtensa                              defconfig   gcc  
+xtensa               randconfig-r014-20230913   gcc  
+xtensa               randconfig-r034-20230913   gcc  
+xtensa                    smp_lx200_defconfig   gcc  
+xtensa                         virt_defconfig   gcc  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
