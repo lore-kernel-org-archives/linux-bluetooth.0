@@ -2,185 +2,134 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38212EE0207
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Sep 2023 19:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0EBEE0207
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Sep 2023 20:35:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232445AbjIMTir (ORCPT
+        id S232525AbjIMUf6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Sep 2023 15:38:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54534 "EHLO
+        Wed, 13 Sep 2023 16:35:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230475AbjIMTiq (ORCPT
+        with ESMTP id S230205AbjIMUf5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Sep 2023 15:38:46 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D946191
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Sep 2023 12:38:42 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-34f27cf1786so621465ab.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Sep 2023 12:38:42 -0700 (PDT)
+        Wed, 13 Sep 2023 16:35:57 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84DA31BC8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Sep 2023 13:35:53 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-34baf19955cso807335ab.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Sep 2023 13:35:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694633921; x=1695238721; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8eeca0hO0P95yMfRCzUieziGcJehEd+4vAsn+h19zJw=;
-        b=AbqtkzAmQJyYjYWBqzz1Thb+/mQ2NNKx1vlx0OzLXWnrvTS3KAKtVuHta5HhTQMxHk
-         CY0LxyoeTdmzgX4KmkOtaUQCBBDaFHAPtfWPb2NBV+ww+1uUcsGqr3xQUlRlxA72jO6H
-         NELlBxk+HwqRqbm8qVlAulcipnHbgJIkarQl/mY6umGRc4EbKey3+UZXLZgJiewO1an7
-         sKM7zj9tXnCCvnEqHdzw0mDwRxA8pigP1OB+BdSP4f4JlCAcjj1qC+JuTLLsZec8eVNM
-         HkTPS8Rfmv8HDb714wd7ECtiY5/upSBMQK6z790+o0+nyYxXcJiV3ddDjRAboxq2ZRYB
-         rm0g==
+        d=gmail.com; s=20221208; t=1694637353; x=1695242153; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=t+PCTCEQeqEPNiqvOOfqRy21dLoddWdUn+Af9wQHbKw=;
+        b=Hu4aryZ4KX8KExcHONERIZBRHgBECXnRdiNCTVl3/w0P3CS4Y3GTh4uWugfTw0pCUp
+         kxa2YOkD4BnhDtdbwq5wbG3vovQEpJOO/ZRbiZP0Z/ARLY+LJpCH7P+ACvb6e1DXBx2W
+         3YU08k1enVJ1hayMCaFONA9kcbyz0SFslVNKlXc31Grn0HHaklEdJM878VYBAHI5nBva
+         XWN68pJ7YiZDCRQSYyQmcD3KsRVChom+xDcp8PMkAwE2kPTLApL1aSTdFAGI0FGpT9ma
+         UgNO5FwFeY+MsXsS5f6yf27uZR1nmmAkiZmVGtbHMnndrgoorhzqXkzz8J2BLo39majP
+         ehKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694633921; x=1695238721;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8eeca0hO0P95yMfRCzUieziGcJehEd+4vAsn+h19zJw=;
-        b=WBCqbfvV8FyWkvjJQpnLsnXBVJ+3FCqIwFdQopbBoccmNNNi/Q5YxcMIjhY1B6D3vL
-         w1NMjg45nkPo/liUfqF04RDL136eHE2p1+wt8tA5oK+Uu+IKOhTBr5jMZtWgFonoiDT8
-         Y1cAsgmcO0Z0/aZ5JXQ2mEBUs2OhgbofmPVFcrj6aTf8Oc21D+v47TZHSyov6vp/WZMH
-         oLlyEIgbp1ghOHAHQmzb7yj/DMtNOLU/6FvExcFMoj3C7AO5UuXeLz71dXWH+9+FlpyH
-         HfiHBFnl+vJz1xYw7phIpVKkPTE8b0GXS7muJdTOrGycld/Q/s1F9mQ3XsfkUjrDe/l4
-         sm9A==
-X-Gm-Message-State: AOJu0YwiK0u8WMKLJC+n0TgmkTOOEZCqXEMvzscU6KrWlBlhBvNml9ke
-        VyYP2SEd3lcl68VOrRz4O1eBE9cUYDs=
-X-Google-Smtp-Source: AGHT+IGibpv46kBh3RNnyQEXDLES8l+BH08rDHtit0TJXNenfc3Mp72EJ24qPvpY8P++c7vf832Eaw==
-X-Received: by 2002:a05:6e02:12b2:b0:348:797d:a94e with SMTP id f18-20020a056e0212b200b00348797da94emr3368498ilr.2.1694633921485;
-        Wed, 13 Sep 2023 12:38:41 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id h20-20020a056e020d5400b00345d10ea524sm2174301ilj.65.2023.09.13.12.38.40
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1694637353; x=1695242153;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t+PCTCEQeqEPNiqvOOfqRy21dLoddWdUn+Af9wQHbKw=;
+        b=mLeYxDV/bfKtOTUVV4j1oTupisrDzqQkH7Sc9zWGXqlYWyDpHtghrVb1aG2FHYRL0H
+         SdIaXMBcjJ8J4869uTpW6Fqrbjsv/xWQlbFsEdVPAq/OkKMLxGzmrHaD2aiEOFHBSKrP
+         +jFrg6MB9YSt1Aqh+Tu7L5y0f8BMDN4ymwAkyrDZgsw/CoTxPLOoLCy86i+mba+bDeSL
+         j93FenslJmfq9yIQaasAu6j7f1jsLT43cAPBTNdELilqMLNTcg41vbKxlowSN55t51dJ
+         cDSCYlYQrFlTU9BoIlv0mYHoC8msXq4343D2TdHFr059fggdfEKmDAJKe/UcP4CmtQhc
+         CbTg==
+X-Gm-Message-State: AOJu0YwucBbRbt9Zhuug/x4HgX+Dx16nqF8eEgY7QdUtDdin43UEdlnb
+        syoSqjOikUfk/hXNnBvBSi114D/WbEw=
+X-Google-Smtp-Source: AGHT+IEQM5v+LwSLnJ4SfE9LPhAYmFvQBwFMxHAncONlcc11LjuZ/JXePnyfAy2qxhJ0JgBLLsBMLA==
+X-Received: by 2002:a05:6e02:1c04:b0:34f:2484:64ce with SMTP id l4-20020a056e021c0400b0034f248464cemr4434741ilh.23.1694637352639;
+        Wed, 13 Sep 2023 13:35:52 -0700 (PDT)
+Received: from [172.17.0.2] ([40.83.5.19])
+        by smtp.gmail.com with ESMTPSA id a6-20020a029f86000000b00437a3c128dfsm3716284jam.108.2023.09.13.13.35.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Sep 2023 12:38:40 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix leaking l2cap_conn objects
-Date:   Wed, 13 Sep 2023 12:38:39 -0700
-Message-ID: <20230913193839.3029428-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Wed, 13 Sep 2023 13:35:52 -0700 (PDT)
+Message-ID: <65021d28.020a0220.6f2d9.5519@mx.google.com>
+Date:   Wed, 13 Sep 2023 13:35:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1651913900434636212=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: L2CAP: Fix leaking l2cap_conn objects
+In-Reply-To: <20230913193839.3029428-1-luiz.dentz@gmail.com>
+References: <20230913193839.3029428-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1651913900434636212==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-l2cap_conn objects must be cleanup whenever its hci_chan is deleted by
-hci_chan_list_flush since it means the connection attempt is being
-aborted prematurely thus no calls to connect_cfm/disconnect_cfm would
-be generated causing the l2cap_conn object to leak.
+This is automated email and please do not reply to this email!
 
-Fixes: 73d80deb7bdf ("Bluetooth: prioritizing data over HCI")
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=783902
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.28 seconds
+GitLint                       PASS      0.33 seconds
+SubjectPrefix                 PASS      0.10 seconds
+BuildKernel                   PASS      32.82 seconds
+CheckAllWarning               PASS      35.82 seconds
+CheckSparse                   PASS      40.91 seconds
+CheckSmatch                   PASS      115.39 seconds
+BuildKernel32                 PASS      31.58 seconds
+TestRunnerSetup               PASS      481.60 seconds
+TestRunner_l2cap-tester       PASS      27.15 seconds
+TestRunner_iso-tester         PASS      47.77 seconds
+TestRunner_bnep-tester        PASS      10.25 seconds
+TestRunner_mgmt-tester        PASS      217.08 seconds
+TestRunner_rfcomm-tester      PASS      15.95 seconds
+TestRunner_sco-tester         PASS      19.14 seconds
+TestRunner_ioctl-tester       PASS      17.60 seconds
+TestRunner_mesh-tester        PASS      13.02 seconds
+TestRunner_smp-tester         PASS      14.12 seconds
+TestRunner_userchan-tester    PASS      10.90 seconds
+IncrementalBuild              PASS      29.64 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: L2CAP: Fix leaking l2cap_conn objects
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#88: 
 Reported-by: Olivier L'Heureux <olivier.lheureux@fortrobotics.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+total: 0 errors, 1 warnings, 0 checks, 84 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13383710.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_conn.c         |  7 +++++++
- net/bluetooth/l2cap_core.c       | 29 ++++++++++++++++++++++++++---
- 3 files changed, 35 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index bbad301f5781..21459c38a074 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -795,6 +795,8 @@ struct hci_chan {
- 	unsigned int	sent;
- 	__u8		state;
- 	bool		amp;
-+
-+	void (*cleanup)(struct hci_chan *chan);
- };
- 
- struct hci_conn_params {
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index e62a5f368a51..814d8f3b029e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2737,6 +2737,9 @@ void hci_chan_del(struct hci_chan *chan)
- 	struct hci_conn *conn = chan->conn;
- 	struct hci_dev *hdev = conn->hdev;
- 
-+	if (!conn)
-+		return;
-+
- 	BT_DBG("%s hcon %p chan %p", hdev->name, conn, chan);
- 
- 	list_del_rcu(&chan->list);
-@@ -2746,6 +2749,10 @@ void hci_chan_del(struct hci_chan *chan)
- 	/* Prevent new hci_chan's to be created for this hci_conn */
- 	set_bit(HCI_CONN_DROP, &conn->flags);
- 
-+	if (chan->cleanup)
-+		chan->cleanup(chan);
-+
-+	chan->conn = NULL;
- 	hci_conn_put(conn);
- 
- 	skb_queue_purge(&chan->data_q);
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 17ca13e8c044..a791f28ccd6a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1896,6 +1896,8 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
- 
-+	hcon->l2cap_data = NULL;
-+
- 	kfree_skb(conn->rx_skb);
- 
- 	skb_queue_purge(&conn->pending_rx);
-@@ -1931,13 +1933,15 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	mutex_unlock(&conn->chan_lock);
- 
--	hci_chan_del(conn->hchan);
-+	if (conn->hchan) {
-+		conn->hchan->cleanup = NULL;
-+		hci_chan_del(conn->hchan);
-+		conn->hchan = NULL;
-+	}
- 
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
- 		cancel_delayed_work_sync(&conn->info_timer);
- 
--	hcon->l2cap_data = NULL;
--	conn->hchan = NULL;
- 	l2cap_conn_put(conn);
- }
- 
-@@ -7830,6 +7834,24 @@ static void process_pending_rx(struct work_struct *work)
- 		l2cap_recv_frame(conn, skb);
- }
- 
-+static void l2cap_conn_hchan_cleanup(struct hci_chan *hchan)
-+{
-+	struct hci_conn *hcon = hchan->conn;
-+	struct l2cap_conn *conn;
-+
-+	if (!hcon)
-+		return;
-+
-+	conn = hcon->l2cap_data;
-+	if (!conn)
-+		return;
-+
-+	/* hci_chan_del has been called so we shouldn't call it gain. */
-+	conn->hchan = NULL;
-+
-+	l2cap_conn_del(hcon, bt_to_errno(HCI_ERROR_LOCAL_HOST_TERM));
-+}
-+
- static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
-@@ -7852,6 +7874,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 	hcon->l2cap_data = conn;
- 	conn->hcon = hci_conn_get(hcon);
- 	conn->hchan = hchan;
-+	hchan->cleanup = l2cap_conn_hchan_cleanup;
- 
- 	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
- 
--- 
-2.41.0
 
+--===============1651913900434636212==--
