@@ -2,225 +2,134 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92490EEAA77
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Sep 2023 21:17:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D437BEEAA71
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Sep 2023 21:36:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbjINVR3 (ORCPT
+        id S229788AbjINVgf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Sep 2023 17:17:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56888 "EHLO
+        Thu, 14 Sep 2023 17:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbjINVR2 (ORCPT
+        with ESMTP id S229723AbjINVge (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Sep 2023 17:17:28 -0400
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB12A26B2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Sep 2023 14:17:23 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2bfb1167277so23402961fa.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Sep 2023 14:17:23 -0700 (PDT)
+        Thu, 14 Sep 2023 17:36:34 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E652708
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Sep 2023 14:36:30 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-770ef353b8fso95465885a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Sep 2023 14:36:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694726242; x=1695331042; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tfcL5xeSxjD/jHpkf123r5JPZ8uZu0YfkTDuBfy1ak0=;
-        b=sZJ0y7rHm/CgevwLP5pb9lB+0r2EvUirwxXBA4E24WhKhQM6+k1lO2qvakM8WR04D5
-         uRt3GKFuTbB3ypfXiWGuv+al0MumiQSwiKU44NnCJxVe6kwxpwMTMR5Rhb7uBMbnazos
-         gRiCbk5tsHSZ85932kTMo+p3j18ks6uwzD8gPXTvR7iy0DAF/wVkvd5ddSrTmFk4/jOd
-         IGHeku0wnWVAap3DYMbOo8BJ/op4zXqXrCk61Qq1HcTvPtvOUqCh441+uf1X8zmp9Eqc
-         DaJfDtDs98fOxjIVZfYWY45sJVa+hdymy4uzNaHrFxGUFmUZYO3ah9trr/R8kX5ZndZu
-         e3mQ==
+        d=gmail.com; s=20221208; t=1694727389; x=1695332189; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=07P4BlMWp9nK1g5GAZ4XeX8YnFPb4ZE8SK3CEqpTj14=;
+        b=oDASw0RE2nKBmfbT2Y4zfITDDyTH2fNVC0v3kIMyssllPsHJQghC253FxBvLVJOyWQ
+         GfC7gvSEypxt5J72OMoKTWWBHXVt29b4qVdfyRGrl7+criiL8enyUP/0LUyh3S0IFBNx
+         sSznUSP6iRYByxG11AFECGdcjjGbQj7LfNWQLqZLT3+O8iKWKV6cv9zcEupDqSzaq/RU
+         6/8X7zJWIEOZBrgnZoMDhs08RBrGqBCLo/trQETKTzm2+wkQtKNBrMZM4XTMJ6Cl0tE3
+         hw3XmuTbvWsM4UQO/SnM6j7ZS1xHfWdZ0eryYJTrdT1Ugl5B/ttGHVEsy4o2xkfr1Xl6
+         CAUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694726242; x=1695331042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tfcL5xeSxjD/jHpkf123r5JPZ8uZu0YfkTDuBfy1ak0=;
-        b=I6SYyfo9/UcY/rhvM5IhS/YcswSLBf2m4VGjQlpe1XC+lyRC1KTbHTL2vOB9Oh9EJ2
-         0Ql7xVV67cn5tjOzHWPJ/G2zKFPmeUtt/RWMSlKb3UEq931AAT5FdxrYGZRdtYhnsRWX
-         cyFPpp2wePH3fECE52QXJk/kY4owslsf0Y22Z0WhbSyLzir+XYgVBw+T0PuxOTS57ZDK
-         7v7QPeoeg6aUxbjJM5lyfaQxj3Zw28UxyFEPOaMSST3ZedIsHN7UUeuXWxL+SNhCEFwK
-         AqQxglBDh8dVJEoYAyau6RIVvycwyZnhsS0u0HcnV/AoaGbn5EuE//AehHzkczKzxV/D
-         BFBA==
-X-Gm-Message-State: AOJu0YwiJcFphDItcbEQ2PE31lrp8bL9bEbwafKwXENqftErWDuM3075
-        Kla5CNnLWjmmQ8JsUJzcSBzvAz4DvaXlkf8jOMY=
-X-Google-Smtp-Source: AGHT+IH+MvCkHxzBHI+zb1BAa8eCZWgj4MHLUm5VqErsxkBZZJ2lHMDiY2YqY9z/9CccnfMCPt+/Oq0Ox9m0l4rndso=
-X-Received: by 2002:a2e:8194:0:b0:2ba:6519:c50f with SMTP id
- e20-20020a2e8194000000b002ba6519c50fmr6048076ljg.52.1694726241717; Thu, 14
- Sep 2023 14:17:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1694727389; x=1695332189;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=07P4BlMWp9nK1g5GAZ4XeX8YnFPb4ZE8SK3CEqpTj14=;
+        b=APauPvjPzQ3VUrs3rPRA2cAJhz4FDkg1hDToSM0vrW8pl4DdAa9DfMMScJwodBAdVB
+         N7DFwzgONdvj8Hpji01CaU72Bl0Qs0O9LRaJvdr/kdd1J4+LbdpfrD7QIcB4BwCybEe6
+         ll/Ekd1cwkURfUWsJekYVhsiDKnijlXpowx/iGig+Huo+HgugfUvLGEFCot7lxVQDTk6
+         VvBqpTRjgQnlfhapQfxlDVuAFIEX/ADez22y/gjtJATfoFIwHIDxDdi3vlobAd+fxTOT
+         5UUJW+lAIqSkVIb4NJJ31Is9lvSZ6ptpoI0YIIetnh0HQPvIOnMoqGNAMMbM+hXTVT/H
+         Flcg==
+X-Gm-Message-State: AOJu0YyhAEuP+Bgd3I7siiKh9UbWeWpRmfhw9nrjKqwQP+E408274hVs
+        gT7aVLtmnjiF+4/2RkBx+/4bTXWbgt0=
+X-Google-Smtp-Source: AGHT+IHrn3JQUO3X9vrpAJGsRpisKzxQy2Ja+W3vC8cSfYn2/f7Ou4WPFysub/HIRJIKWlIRTFU+bQ==
+X-Received: by 2002:a05:620a:951:b0:76f:1707:bfe with SMTP id w17-20020a05620a095100b0076f17070bfemr6594780qkw.66.1694727389014;
+        Thu, 14 Sep 2023 14:36:29 -0700 (PDT)
+Received: from [172.17.0.2] ([20.57.44.3])
+        by smtp.gmail.com with ESMTPSA id v27-20020a05620a123b00b00767cd764ecfsm757971qkj.33.2023.09.14.14.36.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Sep 2023 14:36:28 -0700 (PDT)
+Message-ID: <65037cdc.050a0220.9f8c7.3d4a@mx.google.com>
+Date:   Thu, 14 Sep 2023 14:36:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3774313854794600348=="
 MIME-Version: 1.0
-References: <20230904221158.35425-1-olivier.lheureux@mind.be>
- <CABBYNZKRwLmio749-YqGsVaRiyfgfG4xFZWWY8Svt5rK1z4B6A@mail.gmail.com> <7f4eab50-2532-4975-8bee-3f38bfaee3e1@mind.be>
-In-Reply-To: <7f4eab50-2532-4975-8bee-3f38bfaee3e1@mind.be>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 14 Sep 2023 14:17:09 -0700
-Message-ID: <CABBYNZ+LopfJdjzBocxKTzbA1Qq8A8Y-t182cvqLe5cH0mM2Wg@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/7] Fix a memory leak in Bluetooth L2CAP
-To:     "Olivier L'Heureux" <olivier.lheureux@mind.be>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: L2CAP: Fix leaking l2cap_conn objects
+In-Reply-To: <20230914210358.3335206-1-luiz.dentz@gmail.com>
+References: <20230914210358.3335206-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Olivier,
+--===============3774313854794600348==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 13, 2023 at 3:25=E2=80=AFPM Olivier L'Heureux
-<olivier.lheureux@mind.be> wrote:
->
-> Hello Luiz,
->
-> Thanks for your review.
->
-> On 05/09/2023 22:42, Luiz Augusto von Dentz wrote:
-> > Hi Olivier,
-> >
-> > On Mon, Sep 4, 2023 at 3:12=E2=80=AFPM Olivier L'Heureux
-> > <olivier.lheureux@mind.be> wrote:
-> >>
-> >> Request for Comments
-> [...]
-> >>
-> >> The "ble-memleak-repro" program reproduces the memory leak, if the
-> >> kernel is not patched. Its source is in
-> >> "package/ble-memleak-repro/ble-memleak-repro.c" [18].
-> >
-> > We should probably create a test in l2cap-tester using SO_SNDTIMEO
-> > first, so we can make sure CI test such case and we are able to detect
-> > if the problem is reintroduced later:
-> >
-> > https://github.com/bluez/bluez/blob/master/tools/l2cap-tester.c
->
-> I didn't know about "l2cap-tester.c". Agree, it would be great to
-> integrate my test app into it. I could try, but I don't know the test
-> framework yet.
->
-> >> Memory Leak Fix
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>
-> >> We have fixed the memory leak, see the patch series in
-> >> "patches/linux/":
-> >>
-> >>   1. The first patch
-> >>      "0001-ARM-dts-stm32-Add-Bluetooth-usart2-feature-on-stm32m.patch"=
- [11]
-> >>      enables Bluetooth on the DK2.
-> >
-> > This above should probably be sent separately.
-> >
-> >>   2. The second patch
-> >>      "0002-Bluetooth-add-many-traces-for-allocation-free-refcou.patch"=
- [12]
-> >>      adds many dynamic debug traces that help understand the kernel
-> >>      behaviour and freeing problems.
-> >
-> > I'm fine with this change, but we better use the likes of bt_dev_dbg
-> > instead of BT_DBG.
->
-> This commit intended to increase the visibility during debugging, and
-> I was not intending it for a permanent presence in the kernel.
-> But if you find it useful, I can submit a patch RFC v2 with
-> "bt_dev_dbg()" instead of "BT_DBG()". Note that there is currently no
-> "bt_dev_dbg()" in "l2cap_core.c" yet.
->
-> >>      "0003-Bluetooth-L2CAP-use-refcount-on-struct-l2cap_chan-co.patch"=
- [13]
-> >>      and
-> >>      "0004-Bluetooth-L2CAP-free-the-leaking-struct-l2cap_conn.patch" [=
-14]
-> >>      fix the memory leak.
-> >>   4. Patches
-> >>      "0005-Bluetooth-introduce-hci_conn_free-for-better-structu.patch"=
- [15],
-> >>      "0006-Bluetooth-L2CAP-inc-refcount-if-reuse-struct-l2cap_c.patch"=
- [16]
-> >>      and
-> >>      "0007-Bluetooth-unlink-objects-to-avoid-use-after-free.patch" [17=
-]
-> >>      fixes the use-after-free that appears when the "struct l2cap_conn=
-"
-> >>      [5] and "struct hci_conn" [6] objects are freed.
-> >
-> > These I'm not very comfortable applying as they are, I'm afraid there
-> > could be regressions if they are not accompanied with proper tests,
-> > besides I think there are less intrusive ways to cleanup l2cap_conn,
-> > see below.
-> >
-> >> The commit messages explain why the commit is needed, which problem
-> >> the commit solves, and how.
-> >>
-> >> The first and second patches are present for the memory leak
-> >> reproduction only, they should not be part of a final fix.
-> >>
-> >> Patch Status
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>
-> >> As of writing, the memory leak is fixed. The fix opened the door to
-> >> other problems, especially use-after-free, sometimes followed by
-> >> crashes due to NULL dereferences. We think there are weak references
-> >> (i.e. pointers that don't increment the refcounter) previously
-> >> pointing to memory that was never freed, but now is freed. On kernels
-> >> v5.13 and v5.15, patches 0005, 0006 and 0007 seem to fix the
-> >> use-after-free and NULL dereferences, but not on kernel v6.5 yet.
-> >
-> > I think the problem is that the lifetime of l2cap_conn shall be hooked
-> > with hci_chan, but the likes of hci_chan_list_flush -> hci_chan_del
-> > don't actually trigger l2cap_conn_del, which imo is the culprit here,
-> > because connect_cfm/disconnect_cfm is not called when the connection
-> > procedure has been aborted prematurely, so perhaps we shall get rid of
-> > the likes of l2cap_connect_cfm/l2cap_disconn_cfm and instead do the
-> > cleanup with in the following order:
-> > hci_conn_cleanup->hci_chan_list_flush->hci_chan_del->l2cap_conn_del,
-> > that way we avoid having multiple code paths attempting to cleanup
-> > objects associated with hci_conn/hci_chan.
->
-> I fully agree with your analysis, which correspond to mine: we should
-> call "l2cap_conn_del()", it would properly clean the allocations in
-> "l2cap_conn_add()".
-> I have tried but it was not obvious to find the right place to call
-> "l2cap_conn_del()" with the proper locking.
-> As you write, connect_cfm/disconnect_cfm is not called when the
-> connection is aborted, and that is the root cause of the memory leak.
+This is automated email and please do not reply to this email!
 
-Btw, I was trying to reproduce it with the following test set, but at
-least kmemleak was not able to detect leaks of l2cap_conn:
+Dear submitter,
 
-https://patchwork.kernel.org/project/bluetooth/list/?series=3D784343
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=784341
 
-> Your proposal is most probably the best way to go.
->
-> > I'd change hci_chan_create to take a del callback to avoid having
-> > circular dependencies on one another though.
->
-> Interesting, could you explain how you would do it? Perhaps point on
-> a callback example?
->
-> >> Reproducing with Buildroot
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> >>
-> >> We have reproduced and fixed the memory leak with Buildroot [7] and a
-> >> "ble-memleak-repro" test application on an ST's Discovery Kit DK2 [4].
-> >>
-> >> The "ble-memleak-repro" repository [1] contains the sources of a
-> >> complete external Buildroot customisation [8], with the patches, a
-> >> README, and more explanations to reproduce the problem with Buildroot
-> >> on a DK2.
-> >>
-> >> References:
-> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >>
-> >> - [1]: <https://gitlab.com/essensium-mind/ble-memleak-repro.git>
-> >>         "ble-memleak-repro repository"
-> [...]
->
-> --
-> Olivier L'Heureux
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.43 seconds
+GitLint                       PASS      0.36 seconds
+SubjectPrefix                 PASS      0.14 seconds
+BuildKernel                   PASS      35.73 seconds
+CheckAllWarning               PASS      38.72 seconds
+CheckSparse                   PASS      44.91 seconds
+CheckSmatch                   PASS      117.19 seconds
+BuildKernel32                 PASS      34.18 seconds
+TestRunnerSetup               PASS      511.69 seconds
+TestRunner_l2cap-tester       PASS      27.94 seconds
+TestRunner_iso-tester         PASS      54.37 seconds
+TestRunner_bnep-tester        PASS      10.71 seconds
+TestRunner_mgmt-tester        PASS      222.67 seconds
+TestRunner_rfcomm-tester      PASS      16.36 seconds
+TestRunner_sco-tester         PASS      19.56 seconds
+TestRunner_ioctl-tester       PASS      18.24 seconds
+TestRunner_mesh-tester        PASS      13.59 seconds
+TestRunner_smp-tester         PASS      14.56 seconds
+TestRunner_userchan-tester    PASS      11.23 seconds
+IncrementalBuild              PASS      34.88 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Bluetooth: L2CAP: Fix leaking l2cap_conn objects
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#88: 
+Reported-by: Olivier L'Heureux <olivier.lheureux@fortrobotics.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+total: 0 errors, 1 warnings, 0 checks, 75 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13386049.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3774313854794600348==--
