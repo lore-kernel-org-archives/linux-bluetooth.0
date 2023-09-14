@@ -2,110 +2,129 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2EF8EEAA6E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Sep 2023 19:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1F59EEAA71
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Sep 2023 20:44:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229643AbjINT5v (ORCPT
+        id S229519AbjINUom (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Sep 2023 15:57:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55064 "EHLO
+        Thu, 14 Sep 2023 16:44:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242288AbjINSqV (ORCPT
+        with ESMTP id S229473AbjINUol (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Sep 2023 14:46:21 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3FB67AB8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Sep 2023 11:40:19 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-770819c1db6so85491185a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Sep 2023 11:40:19 -0700 (PDT)
+        Thu, 14 Sep 2023 16:44:41 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03CB42120;
+        Thu, 14 Sep 2023 13:44:37 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2bfb17435e4so22512061fa.0;
+        Thu, 14 Sep 2023 13:44:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1694716819; x=1695321619; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=49GAJ5WDJfgZ3wR3KUYJWmEAhFaW6vvj16rAdqHD/wk=;
-        b=q3MOLznYu8cHAEvN9y8jNI7ZHjwHs2Ehx65588EkDByVL+jkjcgSc2TY8slEVy3yIa
-         H7H39dO/gbpCpuHa/n2dwy6I9osH9oP/6nlkV+/fp3A9hrCg+iRISpXqx/aHwHJGzQhr
-         6o23gwQdzzwaw5PTLaZZckbS/BOYy5HTHRl4leURKo09VdOEIV9+1qEJMsLdP2IaPi8D
-         5OwyJPlYWey2t0pp+eu3LOaUqWDppqm3RRlUi4epaOn3K+hIK/+rkTt6jlyH6HCvhLfi
-         7CHvTi7TWjLq2l1ESfwCBr/XLzeXOIZsfh2fRlOmQwJzApd7iknd21EOKwsM0wqy3NDY
-         BNIA==
+        d=gmail.com; s=20221208; t=1694724275; x=1695329075; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hGJpt2wJkIR4MQJAzc96tFmQzqc/CQBVOhIv8wDwAYE=;
+        b=ruPE46ibVme2AXEW7PXuvSASUTj6essHetQQJr7sDYMXJV2yFO+MEWvu9oYhn/jn6/
+         uxbsDhuh3FFHZ7xtIL5QnoXd3KWk35JknbvaF0UrZwsIJ/mloXKYkUDxgPFqZrfDvsDW
+         9uPg+cGIiQ90uo4qAGdyXPBZcbMXtOXBnKL7eSm6ryCTsyTvc8sxl1iPE1flVz6wubQ4
+         BUKLfIMQYVnhzFSbtVyljJsEp5cAxKlPEjD3moY23oMcFtkmi4M7QI9hk5tkpNHRx021
+         jcuI5KYKQ9RBBK64m0Mj53msMmJdO7H2QFApj91NfyAWq0EF3FTpkkGtAsaNQJLf0RtU
+         3Cig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1694716819; x=1695321619;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1694724275; x=1695329075;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=49GAJ5WDJfgZ3wR3KUYJWmEAhFaW6vvj16rAdqHD/wk=;
-        b=REf/5umz9+FhosBxXPARAva/sqLpadGmZHO49QD4VpIL7AVsdcPrbocuJz32WtPWlw
-         qJOjgqS9s+wNN/shcPBNYtECDGu5gFrh2sPQ+Z0hW/CBmncOxLC3K38N7zU3+XEGj2Zr
-         0KilqnmXLS8A7lJmD0/68Ujkp7C+10LC7yF5aSzVxVikrnagAP54VfbmgRApYtT1F2wa
-         LOGmA0Y8PZjCDj9fs58ani2ZXI2I2KmPMZ6m1gGDONTaiLgLHKXnaX/5KfDIu1XdCuqF
-         2ApD+n7tKpt7QhKnu0civI2q5tkUWsuMOsCy5tx5LN/IZ4nIsYk6Jrhl62LphRT/RdgL
-         Llfw==
-X-Gm-Message-State: AOJu0YzGkIsYvemCrSpujHPpyKNpeUEqTa7a1GGTYT8BV3F3yVl+7GKK
-        /VKhEqGxFSHxbxzeXX71LQtv1u9aPi0=
-X-Google-Smtp-Source: AGHT+IHNEAptSPtsO4ij1LEB7zC01YSw3eEWK9oKJSQ3DjnVDOJVc3nXCTtWfcbaUCo4PTaoqzxeEA==
-X-Received: by 2002:a05:620a:3790:b0:773:a83f:4a66 with SMTP id pi16-20020a05620a379000b00773a83f4a66mr1280935qkn.36.1694716818931;
-        Thu, 14 Sep 2023 11:40:18 -0700 (PDT)
-Received: from [172.17.0.2] ([20.39.60.97])
-        by smtp.gmail.com with ESMTPSA id vq25-20020a05620a559900b007671cfe8a18sm659101qkn.13.2023.09.14.11.40.18
+        bh=hGJpt2wJkIR4MQJAzc96tFmQzqc/CQBVOhIv8wDwAYE=;
+        b=aw0ah4nwwk9bIiuhr6HlldJMxN+mjgkS3YuhQNZS91ZB8SP8syfFksfmNeIOv4252g
+         LQqg3Y1Xw3qgscRvRYPwgOTAQGwZF72DGy33a6Jns53yswIda/8y2VYs31DOBGqYaNb7
+         jbdPp6QlXaW+d3OBjdztsLn3II0riYZUVLDmcq6OqlUvE0fyXaZcLtw5UhQS4e57q9cZ
+         XMB6i+qcC/Jt6agCdBUDpnGOxkzXD31QxoMpYaUiNoJauQylo/utaqZbig1PKw6BNnHS
+         yMAR3Ay55+Lt31mr505vA9mqpQL3qBHYI/gn3OOILzqd1a1jWB3wtdBXi2NfDP4N4wOs
+         2/iA==
+X-Gm-Message-State: AOJu0YzFBvdDoqWC2OSiCiKBonwEfwC9+ZBNnlZCbe2mBx6BvTSx7yno
+        w/5EFAtUTFSXKGkGeSZgSyEME8zkJmGzznc+
+X-Google-Smtp-Source: AGHT+IETPtOzXU0Nd+S8djM58NlJ+Sc+WunET0zuRYBwPOgezcTukkxAzx0/GQwvAzZVYB8A6arxmw==
+X-Received: by 2002:a05:6512:3e0a:b0:4f8:e4e9:499e with SMTP id i10-20020a0565123e0a00b004f8e4e9499emr6230360lfv.12.1694724274569;
+        Thu, 14 Sep 2023 13:44:34 -0700 (PDT)
+Received: from localhost.localdomain ([2a05:3580:f312:6c00:826c:ae47:61a7:8af8])
+        by smtp.gmail.com with ESMTPSA id a28-20020ac2521c000000b005008cd93961sm396848lfl.192.2023.09.14.13.44.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Sep 2023 11:40:18 -0700 (PDT)
-Message-ID: <65035392.050a0220.9c6d.3520@mx.google.com>
-Date:   Thu, 14 Sep 2023 11:40:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2914474493939026862=="
+        Thu, 14 Sep 2023 13:44:34 -0700 (PDT)
+From:   Andrey Skvortsov <andrej.skvortzov@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hilda Wu <hildawu@realtek.com>, Max Chou <max.chou@realtek.com>
+Cc:     Andrey Skvortsov <andrej.skvortzov@gmail.com>
+Subject: [PATCH] Bluetooth: btrtl: reuse define enumeration values
+Date:   Thu, 14 Sep 2023 23:44:04 +0300
+Message-Id: <20230914204404.1253141-1-andrej.skvortzov@gmail.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] Bluetooth: hci_core: Remove le_restart_scan work
-In-Reply-To: <20230914180553.3264477-1-luiz.dentz@gmail.com>
-References: <20230914180553.3264477-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2914474493939026862==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+rtlbt_parse_firmware function sets project_id defined like unnamed
+integer constant. But later in the code (btrtl_set_quirks) project_id
+is compared against values in btrtl_chip_id enumeration.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=784276
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.10 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      34.26 seconds
-CheckAllWarning               PASS      38.22 seconds
-CheckSparse                   PASS      43.04 seconds
-CheckSmatch                   PASS      115.84 seconds
-BuildKernel32                 PASS      33.67 seconds
-TestRunnerSetup               PASS      507.36 seconds
-TestRunner_l2cap-tester       PASS      28.30 seconds
-TestRunner_iso-tester         PASS      62.87 seconds
-TestRunner_bnep-tester        PASS      10.74 seconds
-TestRunner_mgmt-tester        PASS      221.75 seconds
-TestRunner_rfcomm-tester      PASS      16.22 seconds
-TestRunner_sco-tester         PASS      19.86 seconds
-TestRunner_ioctl-tester       PASS      18.40 seconds
-TestRunner_mesh-tester        PASS      13.79 seconds
-TestRunner_smp-tester         PASS      14.86 seconds
-TestRunner_userchan-tester    PASS      11.46 seconds
-IncrementalBuild              PASS      32.34 seconds
-
-
-
+Signed-off-by: Andrey Skvortsov <andrej.skvortzov@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btrtl.c | 31 ++++++++++++++++---------------
+ 1 file changed, 16 insertions(+), 15 deletions(-)
 
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 84c2c2e1122f..018d86410b88 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -60,7 +60,8 @@ enum btrtl_chip_id {
+ 	CHIP_ID_8723B,
+ 	CHIP_ID_8821A,
+ 	CHIP_ID_8761A,
+-	CHIP_ID_8822B = 8,
++	CHIP_ID_8703B = 7,
++	CHIP_ID_8822B,
+ 	CHIP_ID_8723D,
+ 	CHIP_ID_8821C,
+ 	CHIP_ID_8822C = 13,
+@@ -631,20 +632,20 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 		__u16 lmp_subver;
+ 		__u8 id;
+ 	} project_id_to_lmp_subver[] = {
+-		{ RTL_ROM_LMP_8723A, 0 },
+-		{ RTL_ROM_LMP_8723B, 1 },
+-		{ RTL_ROM_LMP_8821A, 2 },
+-		{ RTL_ROM_LMP_8761A, 3 },
+-		{ RTL_ROM_LMP_8703B, 7 },
+-		{ RTL_ROM_LMP_8822B, 8 },
+-		{ RTL_ROM_LMP_8723B, 9 },	/* 8723D */
+-		{ RTL_ROM_LMP_8821A, 10 },	/* 8821C */
+-		{ RTL_ROM_LMP_8822B, 13 },	/* 8822C */
+-		{ RTL_ROM_LMP_8761A, 14 },	/* 8761B */
+-		{ RTL_ROM_LMP_8852A, 18 },	/* 8852A */
+-		{ RTL_ROM_LMP_8852A, 20 },	/* 8852B */
+-		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
+-		{ RTL_ROM_LMP_8851B, 36 },	/* 8851B */
++		{ RTL_ROM_LMP_8723A, CHIP_ID_8723A },
++		{ RTL_ROM_LMP_8723B, CHIP_ID_8723B },
++		{ RTL_ROM_LMP_8821A, CHIP_ID_8821A },
++		{ RTL_ROM_LMP_8761A, CHIP_ID_8761A },
++		{ RTL_ROM_LMP_8703B, CHIP_ID_8703B },
++		{ RTL_ROM_LMP_8822B, CHIP_ID_8822B },
++		{ RTL_ROM_LMP_8723B, CHIP_ID_8723D },
++		{ RTL_ROM_LMP_8821A, CHIP_ID_8821C },
++		{ RTL_ROM_LMP_8822B, CHIP_ID_8822C },
++		{ RTL_ROM_LMP_8761A, CHIP_ID_8761B },
++		{ RTL_ROM_LMP_8852A, CHIP_ID_8852A },
++		{ RTL_ROM_LMP_8852A, CHIP_ID_8852B },
++		{ RTL_ROM_LMP_8852A, CHIP_ID_8852C },
++		{ RTL_ROM_LMP_8851B, CHIP_ID_8851B },
+ 	};
+ 
+ 	if (btrtl_dev->fw_len <= 8)
+-- 
+2.40.1
 
---===============2914474493939026862==--
