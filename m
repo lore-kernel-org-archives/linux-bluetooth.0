@@ -2,182 +2,176 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1191C46CA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 16:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 871FDC46CA1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 16:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230311AbjIRQnm (ORCPT
+        id S230403AbjIRQqu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Sep 2023 12:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38136 "EHLO
+        Mon, 18 Sep 2023 12:46:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230450AbjIRQnT (ORCPT
+        with ESMTP id S230310AbjIRQqb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:43:19 -0400
-Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 313913C3A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 09:41:38 -0700 (PDT)
-Received: by mail-il1-x133.google.com with SMTP id e9e14a558f8ab-34df2a961a0so16671905ab.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 09:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695055297; x=1695660097; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3R+3hlNOdgMvG+3mi3EbKmj+m7LkDX0Y8Bv1pJCfYc=;
-        b=V+N9VqQqQozuB+7hZ/ccAq1XJBg2c7W38T+YfILUXMAY5aFtaRhWAnIGMynP2ihPf7
-         fswpWnbtZDfjx9xSI67jNQNmhvXuQjjBi6cQxkxX/Ns/lHLxbnu0sc99YSstNdOI/gL/
-         y2ipbKIuyJ0MYOiYUyT2RaQWxdMWdNUslMMQNjUGJaMlpBEocV4i7CSZPR3oAaNui7B5
-         Lw0r/GktUYqUwPsYyoIpbfziU2eaI/yZSlnq17HM/mU6uMTJuR8fKKTIeIBMFNEHrmkL
-         sPWa9ywzisnemZITann2LTkzEElU3SyU+UeUkdTe+BDzxAx7xscLwcVmzVZK4Ad5jFMi
-         tBsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695055297; x=1695660097;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K3R+3hlNOdgMvG+3mi3EbKmj+m7LkDX0Y8Bv1pJCfYc=;
-        b=i2CmvkFPZv+cgQr2lK67Eo2KtrGacMCGj+/Opvin78Rg10m5hSD+yAmEG4m3cUJewX
-         QJJiWoH7iskLje+TDbFcUt94OROxGFAg2QFvbOkM6flypQjiF0BWwFy4t+kCoNfZmT9R
-         KUFm3F0orAAaH6nbk+m54vsAzLqEwdQCg2vnhIaSQ7R0DQ2Eb9slRFrsySrn9+HHx1Yt
-         pOhzA5lr/Nk9NWZCrlik0n7sxWU7CJd3hhJa1cLcyxoBGPm5CYfgbQf4BLI6mQquFzt9
-         /bDDBo4CtVRDt7DyWo+BQTQiC7Vw7WUFOZL93HzULHvPMMgj6BxebHm66OmaR6Tw7mQj
-         7sLQ==
-X-Gm-Message-State: AOJu0YxwSc2eK4QjrOpSBSXWQZCFDL+JFKtpQMU8xdFNQ7KYXaioZg9j
-        rCnoOzAe/bMywJXnK3g4gRcXiCG+4d8=
-X-Google-Smtp-Source: AGHT+IGolSG6ahjATiqVaRpMJwqk/7G5/czVuUfFJDFTivkM8Vthpm9Tb9fwIItYINyawPtMDmH72g==
-X-Received: by 2002:a05:6e02:152:b0:34f:b296:168d with SMTP id j18-20020a056e02015200b0034fb296168dmr11463002ilr.26.1695055297178;
-        Mon, 18 Sep 2023 09:41:37 -0700 (PDT)
-Received: from [172.17.0.2] ([40.122.243.91])
-        by smtp.gmail.com with ESMTPSA id b3-20020a920b03000000b0034f4f8e43d8sm1188503ilf.36.2023.09.18.09.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 09:41:36 -0700 (PDT)
-Message-ID: <65087dc0.920a0220.d48f7.11b0@mx.google.com>
-Date:   Mon, 18 Sep 2023 09:41:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3175642460635643252=="
+        Mon, 18 Sep 2023 12:46:31 -0400
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D674A1FC9;
+        Mon, 18 Sep 2023 09:17:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1695053858; x=1726589858;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kDT+yWJAUHrBQ8ex5Uxk7tCrxharMirq80UQzoJeAvk=;
+  b=JubL0SGD129feTlxJbpEtLUy5fAs6Exf+tYTFgooSXcczDpaAndTVc2O
+   IF0Rux7dygTVLWBcC4nqidMxiFnC9c9tQTT7d/0L8LA6pH6wjY6QBCPt4
+   vfW9hx7c70IMqrxn6dvsW/jMsIbI77mMPrXEqzimjXBMRAH0wccmmY+b0
+   ljVmKf0zfF+ds94dkq8IEqhKersOT5Ic7MaP8L3ZF99+f5xWE8YLVQRQ2
+   mtUxcJiutcmG+YrkgBBt6b4bqxU2qPf0VtrarGrLJcyHzlajnCYICAAmf
+   4sOY5Oy5Ju7Rf1jzssP6IFHfna1L8EbF8G0neV4V4BgBdMppJOvGGBUfk
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446113624"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="446113624"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811343130"
+X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
+   d="scan'208";a="811343130"
+Received: from nprotaso-mobl1.ccr.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.252.49.156])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:47 -0700
+From:   =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        linux-kernel@vger.kernel.org,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org
+Cc:     ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org,
+        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Dean Luick <dean.luick@cornelisnetworks.com>
+Subject: [PATCH v2 12/13] RDMA/hfi1: Use pci_disable/enable_link_state()
+Date:   Mon, 18 Sep 2023 16:11:02 +0300
+Message-Id: <20230918131103.24119-13-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
+References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ilpo.jarvinen@linux.intel.com
-Subject: RE: PCI/ASPM: Make ASPM in core robust and remove driver workarounds
-In-Reply-To: <20230918131103.24119-2-ilpo.jarvinen@linux.intel.com>
-References: <20230918131103.24119-2-ilpo.jarvinen@linux.intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3175642460635643252==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+IB/hfi1 driver adjusts ASPM state itself which leaves ASPM service
+driver in PCI core unaware of the link state changes the driver
+implemented.
 
-This is automated email and please do not reply to this email!
+Call pci_disable_link_state() and pci_enable_link_state() instead of
+adjusting ASPMC field in LNKCTL directly in the driver and let PCI core
+handle the ASPM state management. Remove the functions that handled the
+ASPM changes that are now unnecessary.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=785259
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      9.87 seconds
-GitLint                       FAIL      3.51 seconds
-SubjectPrefix                 FAIL      1.40 seconds
-BuildKernel                   PASS      34.49 seconds
-CheckAllWarning               PASS      38.59 seconds
-CheckSparse                   PASS      43.62 seconds
-CheckSmatch                   PASS      115.93 seconds
-BuildKernel32                 PASS      33.25 seconds
-TestRunnerSetup               PASS      506.78 seconds
-TestRunner_l2cap-tester       PASS      31.00 seconds
-TestRunner_iso-tester         PASS      52.07 seconds
-TestRunner_bnep-tester        PASS      10.59 seconds
-TestRunner_mgmt-tester        PASS      222.47 seconds
-TestRunner_rfcomm-tester      PASS      16.18 seconds
-TestRunner_sco-tester         PASS      19.55 seconds
-TestRunner_ioctl-tester       PASS      18.32 seconds
-TestRunner_mesh-tester        PASS      13.60 seconds
-TestRunner_smp-tester         PASS      14.51 seconds
-TestRunner_userchan-tester    PASS      11.44 seconds
-IncrementalBuild              PASS      79.48 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,03/13] PCI/ASPM: Disable ASPM when driver requests it
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#188: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 141 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13389910.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-[v2,07/13] mt76: Remove unreliable pci_disable_link_state() workaround
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#226: 
-deleted file mode 100644
-
-total: 0 errors, 1 warnings, 62 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13389913.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2,01/13] PCI/ASPM: Rename pci_enable_link_state() to pci_set_default_link_state()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (83>80): "[v2,01/13] PCI/ASPM: Rename pci_enable_link_state() to pci_set_default_link_state()"
-[v2,03/13] PCI/ASPM: Disable ASPM when driver requests it
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-33: B1 Line exceeds max length (101>80): "Link: https://lore.kernel.org/all/CANUX_P3F5YhbZX3WGU-j1AGpbXb_T9Bis2ErhvKkFMtDvzatVQ@mail.gmail.com/"
-34: B1 Line exceeds max length (87>80): "Link: https://lore.kernel.org/all/20230511131441.45704-1-ilpo.jarvinen@linux.intel.com/"
-[v2,08/13] e1000e: Remove unreliable pci_disable_link_state{,_locked}() workaround
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (82>80): "[v2,08/13] e1000e: Remove unreliable pci_disable_link_state{,_locked}() workaround"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-
-
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Reviewed-by: Dean Luick <dean.luick@cornelisnetworks.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/infiniband/hw/hfi1/aspm.c | 38 +++----------------------------
+ drivers/infiniband/hw/hfi1/pcie.c |  2 +-
+ 2 files changed, 4 insertions(+), 36 deletions(-)
 
+diff --git a/drivers/infiniband/hw/hfi1/aspm.c b/drivers/infiniband/hw/hfi1/aspm.c
+index a3c53be4072c..8e3fc1d4c9c6 100644
+--- a/drivers/infiniband/hw/hfi1/aspm.c
++++ b/drivers/infiniband/hw/hfi1/aspm.c
+@@ -54,45 +54,13 @@ static void aspm_hw_set_l1_ent_latency(struct hfi1_devdata *dd)
+ 	pci_write_config_dword(dd->pcidev, PCIE_CFG_REG_PL3, reg32);
+ }
+ 
+-static void aspm_hw_enable_l1(struct hfi1_devdata *dd)
+-{
+-	struct pci_dev *parent = dd->pcidev->bus->self;
+-
+-	/*
+-	 * If the driver does not have access to the upstream component,
+-	 * it cannot support ASPM L1 at all.
+-	 */
+-	if (!parent)
+-		return;
+-
+-	/* Enable ASPM L1 first in upstream component and then downstream */
+-	pcie_capability_clear_and_set_word(parent, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC,
+-					   PCI_EXP_LNKCTL_ASPM_L1);
+-	pcie_capability_clear_and_set_word(dd->pcidev, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC,
+-					   PCI_EXP_LNKCTL_ASPM_L1);
+-}
+-
+-void aspm_hw_disable_l1(struct hfi1_devdata *dd)
+-{
+-	struct pci_dev *parent = dd->pcidev->bus->self;
+-
+-	/* Disable ASPM L1 first in downstream component and then upstream */
+-	pcie_capability_clear_and_set_word(dd->pcidev, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC, 0x0);
+-	if (parent)
+-		pcie_capability_clear_and_set_word(parent, PCI_EXP_LNKCTL,
+-						   PCI_EXP_LNKCTL_ASPMC, 0x0);
+-}
+-
+ static  void aspm_enable(struct hfi1_devdata *dd)
+ {
+ 	if (dd->aspm_enabled || aspm_mode == ASPM_MODE_DISABLED ||
+ 	    !dd->aspm_supported)
+ 		return;
+ 
+-	aspm_hw_enable_l1(dd);
++	pci_enable_link_state(dd->pcidev, PCI_EXP_LNKCTL_ASPM_L1);
+ 	dd->aspm_enabled = true;
+ }
+ 
+@@ -101,7 +69,7 @@ static  void aspm_disable(struct hfi1_devdata *dd)
+ 	if (!dd->aspm_enabled || aspm_mode == ASPM_MODE_ENABLED)
+ 		return;
+ 
+-	aspm_hw_disable_l1(dd);
++	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 	dd->aspm_enabled = false;
+ }
+ 
+@@ -254,7 +222,7 @@ void aspm_init(struct hfi1_devdata *dd)
+ 	/* Start with ASPM disabled */
+ 	aspm_hw_set_l1_ent_latency(dd);
+ 	dd->aspm_enabled = false;
+-	aspm_hw_disable_l1(dd);
++	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 
+ 	/* Now turn on ASPM if configured */
+ 	aspm_enable_all(dd);
+diff --git a/drivers/infiniband/hw/hfi1/pcie.c b/drivers/infiniband/hw/hfi1/pcie.c
+index 08732e1ac966..767f6cb770b6 100644
+--- a/drivers/infiniband/hw/hfi1/pcie.c
++++ b/drivers/infiniband/hw/hfi1/pcie.c
+@@ -1182,7 +1182,7 @@ int do_pcie_gen3_transition(struct hfi1_devdata *dd)
+ 	 * will be enabled if required later
+ 	 */
+ 	dd_dev_info(dd, "%s: clearing ASPM\n", __func__);
+-	aspm_hw_disable_l1(dd);
++	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 
+ 	/*
+ 	 * step 5f: clear DirectSpeedChange
+-- 
+2.30.2
 
---===============3175642460635643252==--
