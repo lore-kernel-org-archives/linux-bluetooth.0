@@ -2,118 +2,124 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4313C46CA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 21:22:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46801CD13DD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 22:38:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230086AbjIRVW3 (ORCPT
+        id S229608AbjIRWiM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Sep 2023 17:22:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46766 "EHLO
+        Mon, 18 Sep 2023 18:38:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjIRVW2 (ORCPT
+        with ESMTP id S229476AbjIRWiK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Sep 2023 17:22:28 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA4CF8E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 14:22:22 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-68fb79ef55eso4535534b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 14:22:22 -0700 (PDT)
+        Mon, 18 Sep 2023 18:38:10 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BBA8F
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 15:38:05 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-65806ba1221so7174206d6.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 15:38:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695072142; x=1695676942; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=im+os3Mo6S4wfMCi1pNrwf/gRient0FWc/dzcrjnrhg=;
-        b=KNTovDSlugQ3sGcg5GdHH33WfdiIRnZN/PvFwCXImfNU2YeAftGOCoKw2232wuUhNQ
-         E7mWs+iR+eDaF8hPW+gzXwbUOdIkHNj8BAvHWHLDv87Iw938egGt22dRZh/ZpedMimv6
-         nyLz3yfCi6rrYjPOYQqDj/BOVwW8Ih8O4pWnnnwSQAe22BrOMArAun4UXB/q4b7Ahvbf
-         1AuLpvuSX8paimskvPScVWF4yvSy8tQPMiqtpKvaJd4GTAKHlMq/ADuNlJSdzzqnUoP4
-         M/X+mdDTXB9N/FYiaMqh1EIPms6EWqAOSJVQGYDLojV0KiXZ9l5kAEoDFpaJeUl50x3k
-         gXJQ==
+        d=gmail.com; s=20230601; t=1695076684; x=1695681484; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PEuKqEQ6jkM1A6JtcJRXTLeHY+TjwdelmPX/pI7M/q0=;
+        b=LPB0tmjpvmqTCMe6G0KUlhjC99W6HbF+NC+/1gndKpkxvM2u/tWv9J16ZclMZbXHl4
+         NGYz602OFGOMjy8lG0YfyGo347bhBiEMLKXItJ6Vf20suRKqr+hEFhcnPq1SPZEh/saf
+         EtM1pu3OjvhpI0XrdvHqY9t8rHZMkk9DoWZQTxxuxhyO4UYIWOxKIn21M39n73snVU5L
+         AacAn8ngVltZvnai7ipZ8KEBhfb5qGGbfCVmuUCMmQ9GY1iyC6XG/lT83REwEV14sqOH
+         YMRjIPDqB6DLl+/DDm8K2PDEIZ87Hhpa8saxFYpBKQbQnkcSxmyUB6hFm9hEzZFw0ZYb
+         61hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695072142; x=1695676942;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=im+os3Mo6S4wfMCi1pNrwf/gRient0FWc/dzcrjnrhg=;
-        b=KC5LRKXjjKCTOB2AJGhoWJfo6OCa0HN4qao0eAoo/16bCuNPe4bMIo/efoHQLd5aQe
-         +ffe0pccGq83pcK9v9JxDpI2JxOg0mlmS9/AlQCJQi4DDRdzIGB0Bxc6xnREo4q+sB5p
-         31pDcAlFTLNuIaPwg9wGD9azyftXj+TgYki0VbvL6Glvf8TCua4OG94PK3P77VwsJfGk
-         DeqAE6cMIH18EHbuk9CKgDZkJY1IVDTjyW8uG4u/BVQX4h6mNTlJhMNRhblCRjQwvn+2
-         20tFLpd1nNHdz+OhfTldPKu5pMvT5h6cRRB3YQxPp+5LJMrRsxE8C2WRURfCX3Rk0OJW
-         KCiQ==
-X-Gm-Message-State: AOJu0YxBo1Q6WzHH88OEiWLZ7PhbXGLMkIRNGNhkyDocfVyDOCERwI+C
-        aU6HZinob8a9anxO9r2GA5ODmI217GM=
-X-Google-Smtp-Source: AGHT+IGFbe49E43Brhv3IdO5AlRzvQkv+vmXf3aTDbqgPoNGkZQF5vx9fbgoNBw5i2Y6+TFRgkLr8A==
-X-Received: by 2002:a05:6a20:8420:b0:132:2f7d:29ca with SMTP id c32-20020a056a20842000b001322f7d29camr13168451pzd.24.1695072141615;
-        Mon, 18 Sep 2023 14:22:21 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id s24-20020aa78298000000b0068be348e35fsm7533502pfm.166.2023.09.18.14.22.20
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1695076684; x=1695681484;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PEuKqEQ6jkM1A6JtcJRXTLeHY+TjwdelmPX/pI7M/q0=;
+        b=bsiIKWPn7w5Q0JaglBWfX49xwolcrTpbGDDwXwBPIaSUqS6xVZoHB8U21UK76MNziW
+         w3/w8LobAG3V0SGF+Z9NNHc3p2XZRSJstUbPYZ2E+szQq4ec5oWVu0um4Qtyga6Jhd4o
+         x2sv5zxdq2FBfFJL8fMNVl5CklsxHzR19BTRnBuN2tLTA1aDTQSSfbPUzdd5MIPzikB5
+         E44zcEWGtDAt0k6MI/qtqjP8azc3Kk+XEH+yDBfh09qzm2S87Gi78ZbhN4vv/oQ+MPAx
+         zAbIQ2lFWmqqMNup7VOp/0nyvJbJjOVABitOKtKS/OBTdTHKTI+eGbr0oQkYW+e4QhpI
+         4hng==
+X-Gm-Message-State: AOJu0YwZogtPRjZPdwvgzDeUhCEoVnPBQOn+TwWaLojzPUqRiKPNDVNn
+        Lil03N+O7eQQ8Mj/wLWBVUTsriahdPM=
+X-Google-Smtp-Source: AGHT+IGqJSbbrvSbftxjRMeZvISjZP2Qx4BYgUcaLjN/Za/lDjH+o1Q+hiNMmxmcYfLTr5xotz00tQ==
+X-Received: by 2002:ad4:4e8b:0:b0:63d:7214:638e with SMTP id dy11-20020ad44e8b000000b0063d7214638emr10642386qvb.56.1695076684405;
+        Mon, 18 Sep 2023 15:38:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.39.61.109])
+        by smtp.gmail.com with ESMTPSA id w25-20020a0cb559000000b0064f741d2a97sm3834335qvd.40.2023.09.18.15.38.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Sep 2023 14:22:20 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/log: Fix not checking vasprintf return
-Date:   Mon, 18 Sep 2023 14:22:19 -0700
-Message-ID: <20230918212219.190667-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        Mon, 18 Sep 2023 15:38:04 -0700 (PDT)
+Message-ID: <6508d14c.0c0a0220.1cb25.de76@mx.google.com>
+Date:   Mon, 18 Sep 2023 15:38:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6116580241794670869=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] shared/log: Fix not checking vasprintf return
+In-Reply-To: <20230918212219.190667-1-luiz.dentz@gmail.com>
+References: <20230918212219.190667-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6116580241794670869==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-It seems like some implementation of vasprintf set the content of the
-str to NULL rather then returning -1 causing the following errors:
+This is automated email and please do not reply to this email!
 
-=================================================================
-==216204==ERROR: AddressSanitizer: attempting free on address which
-was not malloc()-ed: 0x55e787722cf0 in thread T0
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=785362
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.74 seconds
+GitLint                       PASS      0.37 seconds
+BuildEll                      PASS      28.85 seconds
+BluezMake                     PASS      893.48 seconds
+MakeCheck                     PASS      12.88 seconds
+MakeDistcheck                 PASS      161.29 seconds
+CheckValgrind                 PASS      262.51 seconds
+CheckSmatch                   PASS      355.74 seconds
+bluezmakeextell               PASS      108.95 seconds
+IncrementalBuild              PASS      729.31 seconds
+ScanBuild                     PASS      1087.86 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] shared/log: Fix not checking vasprintf return
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#88: 
       #0 0x55e784f75872 in __interceptor_free.part.0 asan_malloc_linux.cpp.o
-      #1 0x55e7850e55f9 in bt_log_vprintf
-/usr/src/debug/bluez-git/bluez-git/src/shared/log.c:154:2
-      #2 0x55e78502db18 in monitor_log
-/usr/src/debug/bluez-git/bluez-git/src/log.c:40:2
-      #3 0x55e78502dab4 in info
-/usr/src/debug/bluez-git/bluez-git/src/log.c:52:2
-      #4 0x55e78502e314 in __btd_log_init
-/usr/src/debug/bluez-git/bluez-git/src/log.c:179:2
-      #5 0x55e78502aa63 in main
-/usr/src/debug/bluez-git/bluez-git/src/main.c:1388:2
-      #6 0x7f1d5fe27ccf  (/usr/lib/libc.so.6+0x27ccf) (BuildId:
-316d0d3666387f0e8fb98773f51aa1801027c5ab)
-      #7 0x7f1d5fe27d89 in __libc_start_main
-(/usr/lib/libc.so.6+0x27d89) (BuildId:
-316d0d3666387f0e8fb98773f51aa1801027c5ab)
-      #8 0x55e784e88084 in _start
-(/usr/lib/bluetooth/bluetoothd+0x36084) (BuildId:
-19348ea642303b701c033d773055becb623fe79a)
-  Address 0x55e787722cf0 is a wild pointer inside of access range of
-size 0x000000000001.
-  SUMMARY: AddressSanitizer: bad-free asan_malloc_linux.cpp.o in
-__interceptor_free.part.0
-  ==216204==ABORTING
-сен 18 13:10:02 archlinux systemd[1]: bluetooth.service: Main process
-exited, code=exited, status=1/FAILURE
+
+/github/workspace/src/src/13390493.patch total: 0 errors, 1 warnings, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13390493.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- src/shared/log.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/log.c b/src/shared/log.c
-index 3f18e803d8e9..22b9850f6f11 100644
---- a/src/shared/log.c
-+++ b/src/shared/log.c
-@@ -135,7 +135,7 @@ int bt_log_vprintf(uint16_t index, const char *label, int level,
- 	int len;
- 
- 	len = vasprintf(&str, format, ap);
--	if (len < 0)
-+	if (len < 0 || !str)
- 		return errno;
- 
- 	len = strlen(str);
--- 
-2.41.0
 
+--===============6116580241794670869==--
