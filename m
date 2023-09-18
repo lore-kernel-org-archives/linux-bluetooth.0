@@ -2,63 +2,79 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C87C46CA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 18:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA513CD37B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 18:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbjIRSgE (ORCPT
+        id S229635AbjIRSka (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Sep 2023 14:36:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38764 "EHLO
+        Mon, 18 Sep 2023 14:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbjIRSgD (ORCPT
+        with ESMTP id S229485AbjIRSka (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Sep 2023 14:36:03 -0400
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4897FF7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 11:35:57 -0700 (PDT)
-Received: from github.com (hubbernetes-node-906db76.va3-iad.github.net [10.48.205.121])
-        by smtp.github.com (Postfix) with ESMTPA id 76AEB94126B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 11:35:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2023; t=1695062156;
-        bh=mn64fg94xwUXXO6kR3D9oBpWvTNmsPqQp8mrr3Yjfog=;
-        h=Date:From:To:Subject:From;
-        b=KGQ6gC+2P3AP6ei+0jKOHajFNJGgK9gjO2bchw8P8d2pxbw1ePXaBcAQe5kO+/eIZ
-         EKoqFt0qykPNPJeXGFecfUjdFlfg34M4JDbaA5/fSQoydDnmcH2gMJ3TZzlKdgVjXN
-         GOAK3OWdixZg/h7HaI/ofoxEQIAptEgdXcFlmZso=
-Date:   Mon, 18 Sep 2023 11:35:56 -0700
-From:   KobaKo <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7b9d2f-04e18c@github.com>
-Subject: [bluez/bluez] 04e18c: configure.ac: Add enable_btpclient and
- enable_mesh...
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Mon, 18 Sep 2023 14:40:30 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB9DFC
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 11:40:24 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2737FC433CB;
+        Mon, 18 Sep 2023 18:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695062424;
+        bh=i/TvcXvN6MQLL9SYs9cdpLStLYbh/XomliG1sLLfuNA=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=qI77tnNutt7Dm8AwiFiqiS/JKCzaY8klBdKr1Pu5tD7BJUzvd3BFKlIg1s9sPwJKD
+         RIXcedPsjawfysaNGZYtLCXK4I8n+pYrFYVDBJBLca5CO50fwPOGLqNiWJMSrTjjWN
+         5/76Id5bjzGUK0Dx1Lc1PCefug5McNCCNjqRHBIAb/EO77dViDyOxdJa4oeiztnkXW
+         Iazx6NlUPvP7e3lmiH0LL47tValxTKXYjJsimSxE/Ix53JGcS0XYsmvRJe7/y8Lj+W
+         IYqisxpSSO6lmqN+XmAfGJkBcNIdcFuB0tkUWuNUK+WsjlV2g75EBobsBd4xVHfNlg
+         xTWsG8H63mz8Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0ECB3E11F40;
+        Mon, 18 Sep 2023 18:40:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] [BlueZ V2] configure.ac: Add enable_btpclient and enable_mesh
+ for internal ELL
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <169506242405.18411.2293762261732422715.git-patchwork-notify@kernel.org>
+Date:   Mon, 18 Sep 2023 18:40:24 +0000
+References: <20230917172520.46145-1-koba.ko@canonical.com>
+In-Reply-To: <20230917172520.46145-1-koba.ko@canonical.com>
+To:     Koba Ko <koba.ko@canonical.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 04e18c0dcbc108843b4e53075c55b873e2afb786
-      https://github.com/bluez/bluez/commit/04e18c0dcbc108843b4e53075c55b873e2afb786
-  Author: Koba Ko <koba.ko@canonical.com>
-  Date:   2023-09-18 (Mon, 18 Sep 2023)
+Hello:
 
-  Changed paths:
-    M configure.ac
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  configure.ac: Add enable_btpclient and enable_mesh for internal ELL
+On Mon, 18 Sep 2023 01:25:20 +0800 you wrote:
+> when checking enable_external_ell != 'yes',
+> even enable_btpclient and enable_mesh are not enabled.
+> configure still prompt the error.
+> Then ELL must be installed to pass the configure.
+> 
+> Signed-off-by: Koba Ko <koba.ko@canonical.com>
+> ~~~
+> V2:
+> * correct the wrong-spelling
+> * add BlueZ tag
+> * rephrase the commit description
+> * change the '&&' to '||' condition.
+> 
+> [...]
 
-when checking enable_external_ell != 'yes',
-even enable_btpclient and enable_mesh are not enabled.
-configure still prompt the error.
-Then ELL must be installed to pass the configure.
+Here is the summary with links:
+  - [BlueZ,V2] configure.ac: Add enable_btpclient and enable_mesh for internal ELL
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=04e18c0dcbc1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
