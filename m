@@ -2,176 +2,101 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 871FDC46CA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 16:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D10E9C46CA1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 17:37:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbjIRQqu (ORCPT
+        id S229916AbjIRRh3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Sep 2023 12:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57218 "EHLO
+        Mon, 18 Sep 2023 13:37:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230310AbjIRQqb (ORCPT
+        with ESMTP id S229608AbjIRRh2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Sep 2023 12:46:31 -0400
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D674A1FC9;
-        Mon, 18 Sep 2023 09:17:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695053858; x=1726589858;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kDT+yWJAUHrBQ8ex5Uxk7tCrxharMirq80UQzoJeAvk=;
-  b=JubL0SGD129feTlxJbpEtLUy5fAs6Exf+tYTFgooSXcczDpaAndTVc2O
-   IF0Rux7dygTVLWBcC4nqidMxiFnC9c9tQTT7d/0L8LA6pH6wjY6QBCPt4
-   vfW9hx7c70IMqrxn6dvsW/jMsIbI77mMPrXEqzimjXBMRAH0wccmmY+b0
-   ljVmKf0zfF+ds94dkq8IEqhKersOT5Ic7MaP8L3ZF99+f5xWE8YLVQRQ2
-   mtUxcJiutcmG+YrkgBBt6b4bqxU2qPf0VtrarGrLJcyHzlajnCYICAAmf
-   4sOY5Oy5Ju7Rf1jzssP6IFHfna1L8EbF8G0neV4V4BgBdMppJOvGGBUfk
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446113624"
-X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="446113624"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811343130"
-X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="811343130"
-Received: from nprotaso-mobl1.ccr.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.252.49.156])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:47 -0700
-From:   =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Rob Herring <robh@kernel.org>,
-        =?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        linux-kernel@vger.kernel.org,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org
-Cc:     ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org,
-        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Dean Luick <dean.luick@cornelisnetworks.com>
-Subject: [PATCH v2 12/13] RDMA/hfi1: Use pci_disable/enable_link_state()
-Date:   Mon, 18 Sep 2023 16:11:02 +0300
-Message-Id: <20230918131103.24119-13-ilpo.jarvinen@linux.intel.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
-References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
+        Mon, 18 Sep 2023 13:37:28 -0400
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A0D1DB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 10:37:23 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c00c0f11b2so20190681fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Sep 2023 10:37:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1695058641; x=1695663441; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NBefTqBgVyoSUAhFFxsBE+sgujgWPn4S3aI0Xo/uwRo=;
+        b=Axdp0+FN2s6Ki/CL9BRe3+M2E8Qg1xMOYmg37YO1SL2wLAjtwEIULFkXtz8l/VMyMX
+         iosffPHi7XQhrbC4LtUK7iVCBAmjKW5SrBqSrw5eMUENamkoytxRZSDAAzE//AKtbMkL
+         xPMCMZIGepRKMFGhBFxwKypZ4UrKG5lsxJa5vmhFPKdFgcFfttotQnvQ1QwYEm+XQkwn
+         fu8q/aniZnA7IeznXUkfTCuN314VgyMai2h78FvQvXq5VDRTAqe2ma0anLq9r248DAoV
+         pQRNMdWkdI8zk4c2bfgwJVmuBRD9hndV0npq7IUuqcHZqqvngBMZMOdO/qXY9DbNaQYu
+         /esw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695058641; x=1695663441;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NBefTqBgVyoSUAhFFxsBE+sgujgWPn4S3aI0Xo/uwRo=;
+        b=CQJPDf4OQDERciEHNteFsi6qkz96AeO6uek8J+UK8zLs5/4QMOy1LPkECcF/44SU3M
+         RuW2ukbijVS5TrHxz43jsWWlJn7FxV3eSU3MUQ7HUiTk0jC4He0gA1/pXhOs6dktcqe7
+         X2gAdVLT5elRzcZC0oT/8ENT9k6p1W550jGxZMyAyo/K8ANqtKGfLGig2TzFoV33WTnX
+         iISKY4KbR979/e74k8qWx9ezKLvrUZdkAuxfFn8L+arq2K3qkiPzqGdqjc2lnW5kp8l3
+         061F274tV6wSx/H6K7EVnhtSTgy8tYL0hhk0YERrDZ0z11bIDDc6OTk+aO/sGbD2O3Jk
+         ut6Q==
+X-Gm-Message-State: AOJu0Yz2qjq/c5oa31+SH3CZ5WF6oII/cwhXfOIduEMIf4gNUuSmygNq
+        /xLK1fU6+rEGdNRDOsIBC1WrVBqx4spuUCvgGMzgwos7LtU=
+X-Google-Smtp-Source: AGHT+IH7XTbQQHf5e4te/+oVRKNtPB+T4MaWOH0KJIeJz7oVFuq3eR1CJjLK5vQNwq8dohslI5dNrZsDR2TtS1RJ0x0=
+X-Received: by 2002:a2e:9556:0:b0:2b9:aa4d:3728 with SMTP id
+ t22-20020a2e9556000000b002b9aa4d3728mr8322158ljh.29.1695058641051; Mon, 18
+ Sep 2023 10:37:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20230918093517.2163899-1-kiran.k@intel.com>
+In-Reply-To: <20230918093517.2163899-1-kiran.k@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 18 Sep 2023 10:37:08 -0700
+Message-ID: <CABBYNZKTQc-aQg+Yxzt7euZ1uDF0eQr_ipkFAOjuq+iPGKH3SQ@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Release memory allocated to store supported codecs
+To:     Kiran K <kiran.k@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-IB/hfi1 driver adjusts ASPM state itself which leaves ASPM service
-driver in PCI core unaware of the link state changes the driver
-implemented.
+Hi Kiran,
 
-Call pci_disable_link_state() and pci_enable_link_state() instead of
-adjusting ASPMC field in LNKCTL directly in the driver and let PCI core
-handle the ASPM state management. Remove the functions that handled the
-ASPM changes that are now unnecessary.
+On Mon, Sep 18, 2023 at 5:04=E2=80=AFAM Kiran K <kiran.k@intel.com> wrote:
+>
+> Memory allocated to store local supported codecs needs to be freed
+> when BT is powered off.
+>
+> Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>  net/bluetooth/hci_sync.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 1be5763c261c..3640d73f9595 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5074,6 +5074,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>         memset(hdev->eir, 0, sizeof(hdev->eir));
+>         memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
+>         bacpy(&hdev->random_addr, BDADDR_ANY);
+> +       hci_codec_list_clear(&hdev->local_codecs);
+>
+>         hci_dev_put(hdev);
+>         return err;
+> --
+> 2.25.1
 
-Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
-Reviewed-by: Dean Luick <dean.luick@cornelisnetworks.com>
----
- drivers/infiniband/hw/hfi1/aspm.c | 38 +++----------------------------
- drivers/infiniband/hw/hfi1/pcie.c |  2 +-
- 2 files changed, 4 insertions(+), 36 deletions(-)
+Ive sent a similar fix already:
 
-diff --git a/drivers/infiniband/hw/hfi1/aspm.c b/drivers/infiniband/hw/hfi1/aspm.c
-index a3c53be4072c..8e3fc1d4c9c6 100644
---- a/drivers/infiniband/hw/hfi1/aspm.c
-+++ b/drivers/infiniband/hw/hfi1/aspm.c
-@@ -54,45 +54,13 @@ static void aspm_hw_set_l1_ent_latency(struct hfi1_devdata *dd)
- 	pci_write_config_dword(dd->pcidev, PCIE_CFG_REG_PL3, reg32);
- }
- 
--static void aspm_hw_enable_l1(struct hfi1_devdata *dd)
--{
--	struct pci_dev *parent = dd->pcidev->bus->self;
--
--	/*
--	 * If the driver does not have access to the upstream component,
--	 * it cannot support ASPM L1 at all.
--	 */
--	if (!parent)
--		return;
--
--	/* Enable ASPM L1 first in upstream component and then downstream */
--	pcie_capability_clear_and_set_word(parent, PCI_EXP_LNKCTL,
--					   PCI_EXP_LNKCTL_ASPMC,
--					   PCI_EXP_LNKCTL_ASPM_L1);
--	pcie_capability_clear_and_set_word(dd->pcidev, PCI_EXP_LNKCTL,
--					   PCI_EXP_LNKCTL_ASPMC,
--					   PCI_EXP_LNKCTL_ASPM_L1);
--}
--
--void aspm_hw_disable_l1(struct hfi1_devdata *dd)
--{
--	struct pci_dev *parent = dd->pcidev->bus->self;
--
--	/* Disable ASPM L1 first in downstream component and then upstream */
--	pcie_capability_clear_and_set_word(dd->pcidev, PCI_EXP_LNKCTL,
--					   PCI_EXP_LNKCTL_ASPMC, 0x0);
--	if (parent)
--		pcie_capability_clear_and_set_word(parent, PCI_EXP_LNKCTL,
--						   PCI_EXP_LNKCTL_ASPMC, 0x0);
--}
--
- static  void aspm_enable(struct hfi1_devdata *dd)
- {
- 	if (dd->aspm_enabled || aspm_mode == ASPM_MODE_DISABLED ||
- 	    !dd->aspm_supported)
- 		return;
- 
--	aspm_hw_enable_l1(dd);
-+	pci_enable_link_state(dd->pcidev, PCI_EXP_LNKCTL_ASPM_L1);
- 	dd->aspm_enabled = true;
- }
- 
-@@ -101,7 +69,7 @@ static  void aspm_disable(struct hfi1_devdata *dd)
- 	if (!dd->aspm_enabled || aspm_mode == ASPM_MODE_ENABLED)
- 		return;
- 
--	aspm_hw_disable_l1(dd);
-+	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
- 	dd->aspm_enabled = false;
- }
- 
-@@ -254,7 +222,7 @@ void aspm_init(struct hfi1_devdata *dd)
- 	/* Start with ASPM disabled */
- 	aspm_hw_set_l1_ent_latency(dd);
- 	dd->aspm_enabled = false;
--	aspm_hw_disable_l1(dd);
-+	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
- 
- 	/* Now turn on ASPM if configured */
- 	aspm_enable_all(dd);
-diff --git a/drivers/infiniband/hw/hfi1/pcie.c b/drivers/infiniband/hw/hfi1/pcie.c
-index 08732e1ac966..767f6cb770b6 100644
---- a/drivers/infiniband/hw/hfi1/pcie.c
-+++ b/drivers/infiniband/hw/hfi1/pcie.c
-@@ -1182,7 +1182,7 @@ int do_pcie_gen3_transition(struct hfi1_devdata *dd)
- 	 * will be enabled if required later
- 	 */
- 	dd_dev_info(dd, "%s: clearing ASPM\n", __func__);
--	aspm_hw_disable_l1(dd);
-+	pci_disable_link_state(dd->pcidev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
- 
- 	/*
- 	 * step 5f: clear DirectSpeedChange
--- 
-2.30.2
+https://patchwork.kernel.org/project/bluetooth/patch/20230915234742.3739283=
+-2-luiz.dentz@gmail.com/
 
+
+--=20
+Luiz Augusto von Dentz
