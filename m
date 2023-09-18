@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371B8CD13D8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 15:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A252CD37B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Sep 2023 16:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbjIRPtZ (ORCPT
+        id S229712AbjIRQce (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Sep 2023 11:49:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47414 "EHLO
+        Mon, 18 Sep 2023 12:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbjIRPtX (ORCPT
+        with ESMTP id S230050AbjIRQcY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Sep 2023 11:49:23 -0400
+        Mon, 18 Sep 2023 12:32:24 -0400
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 333382737;
-        Mon, 18 Sep 2023 08:46:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1236EF9;
+        Mon, 18 Sep 2023 09:17:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1695051968; x=1726587968;
+  t=1695053862; x=1726589862;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TVpIxZltjnz+Zaq4u2l7j7EaR5dq+4x3KCuX5f2+zQ8=;
-  b=S1NLiq1hUmfP6XxF9L222FRPcsNvI5gUKnm/wgZ6n8U00mZp3boY0zn7
-   RdOauE9ivA8OCUDABPS7HYXc9bkSNcYOIdYlsV2o3XrQ/3NzW0jKETdy/
-   Ht6SYte4qOCbFazRAaOYYl2sJCiz6/DIhJ69WfdzCNSG4Eu96fTI96rpP
-   9Xi4TYqe0/+sLpr7X8hL3TA4wPBBDs3l5wsC1F3uAYwQ5ljYzSggIesAH
-   2nlDFViYkSeVshQtRyEmQCspYJzL9J/iKr8U18gYijTGrLBsMGfkbsGVV
-   7QJtdFx+aEfa3NJHOqwAG37bDdKmHF4svH7o2KJF4DAqmoXNdoNZuy/k/
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446113535"
+  bh=/jlflr+zDO/ybJEIj9ZeNbSBAg1LjrmA0JjnTT6qqL0=;
+  b=NPsXbfSc9IPT94hOIIrNw/67t2VR+JhPjuDVykOsCKaDlVXy2p+FMbTA
+   GTb86C7h+BuEfgDYFoHleY31PYmFwn/JH8Z1iIw50IMRKQR1XxT7Sglow
+   iO58ySRv3gMvX59UGQVNeZ+Lrwfv1wAJgTIAyuMJHMlJ+kDDHAXYTmBBR
+   NLJh7geSMk+NKR69+b8rXsbggqJvVRD9Q4Wt3JQ0PtG6rj1NjBzMomEcZ
+   xc3dogm5JFgKGATaztjOSUtj9IudJWsZFo5qGdP2p6+6QXGWpWWgYtBvc
+   eBeG7AIRRca48GUX44UpUlqM7o9nm231xa//lVetXTgoWmsg+n4N4/B/F
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="446113641"
 X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="446113535"
+   d="scan'208";a="446113641"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:23 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:14:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811342781"
+X-IronPort-AV: E=McAfee;i="6600,9927,10837"; a="811343218"
 X-IronPort-AV: E=Sophos;i="6.02,156,1688454000"; 
-   d="scan'208";a="811342781"
+   d="scan'208";a="811343218"
 Received: from nprotaso-mobl1.ccr.corp.intel.com (HELO ijarvine-mobl2.ger.corp.intel.com) ([10.252.49.156])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:17 -0700
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2023 06:13:54 -0700
 From:   =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
 To:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
         Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
@@ -49,19 +49,18 @@ To:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
         "Rafael J . Wysocki" <rafael@kernel.org>,
         Heiner Kallweit <hkallweit1@gmail.com>,
         Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        linux-kernel@vger.kernel.org, Kalle Valo <kvalo@kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>,
-        ath11k@lists.infradead.org, linux-wireless@vger.kernel.org
-Cc:     ath10k@lists.infradead.org, ath12k@lists.infradead.org,
-        intel-wired-lan@lists.osuosl.org,
+        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
         linux-arm-kernel@lists.infradead.org,
         linux-bluetooth@vger.kernel.org,
         linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
-        netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
         =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v2 10/13] wifi: ath11k: Use pci_disable/enable_link_state()
-Date:   Mon, 18 Sep 2023 16:11:00 +0300
-Message-Id: <20230918131103.24119-11-ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH v2 13/13] misc: rtsx: Use pci_disable/enable_link_state()
+Date:   Mon, 18 Sep 2023 16:11:03 +0300
+Message-Id: <20230918131103.24119-14-ilpo.jarvinen@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
 References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
@@ -72,7 +71,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-ath11k driver adjusts ASPM state itself which leaves ASPM service
+rtsx driver adjusts ASPM state itself which leaves ASPM service
 driver in PCI core unaware of the link state changes the driver
 implemented.
 
@@ -82,36 +81,78 @@ handle the ASPM state management.
 
 Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
- drivers/net/wireless/ath/ath11k/pci.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ drivers/misc/cardreader/rts5228.c  | 6 ++----
+ drivers/misc/cardreader/rts5261.c  | 6 ++----
+ drivers/misc/cardreader/rtsx_pcr.c | 8 +++++---
+ 3 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/ath11k/pci.c b/drivers/net/wireless/ath/ath11k/pci.c
-index a5aa1857ec14..764cdf74b0e9 100644
---- a/drivers/net/wireless/ath/ath11k/pci.c
-+++ b/drivers/net/wireless/ath/ath11k/pci.c
-@@ -582,19 +582,15 @@ static void ath11k_pci_aspm_disable(struct ath11k_pci *ab_pci)
- 		   u16_get_bits(ab_pci->link_ctl, PCI_EXP_LNKCTL_ASPM_L1));
- 
- 	/* disable L0s and L1 */
--	pcie_capability_clear_word(ab_pci->pdev, PCI_EXP_LNKCTL,
--				   PCI_EXP_LNKCTL_ASPMC);
--
-+	pci_disable_link_state(ab_pci->pdev, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
- 	set_bit(ATH11K_PCI_ASPM_RESTORE, &ab_pci->flags);
+diff --git a/drivers/misc/cardreader/rts5228.c b/drivers/misc/cardreader/rts5228.c
+index f4ab09439da7..8d3216c64ad1 100644
+--- a/drivers/misc/cardreader/rts5228.c
++++ b/drivers/misc/cardreader/rts5228.c
+@@ -497,8 +497,7 @@ static void rts5228_enable_aspm(struct rtsx_pcr *pcr, bool enable)
+ 	val = FORCE_ASPM_CTL0 | FORCE_ASPM_CTL1;
+ 	val |= (pcr->aspm_en & 0x02);
+ 	rtsx_pci_write_register(pcr, ASPM_FORCE_CTL, mask, val);
+-	pcie_capability_clear_and_set_word(pcr->pci, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC, pcr->aspm_en);
++	pci_enable_link_state(pcr->pci, pcr->aspm_en);
+ 	pcr->aspm_enabled = enable;
  }
  
- static void ath11k_pci_aspm_restore(struct ath11k_pci *ab_pci)
- {
- 	if (test_and_clear_bit(ATH11K_PCI_ASPM_RESTORE, &ab_pci->flags))
--		pcie_capability_clear_and_set_word(ab_pci->pdev, PCI_EXP_LNKCTL,
--						   PCI_EXP_LNKCTL_ASPMC,
--						   ab_pci->link_ctl &
--						   PCI_EXP_LNKCTL_ASPMC);
-+		pci_enable_link_state(ab_pci->pdev, ab_pci->link_ctl &
-+				      (PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1));
+@@ -509,8 +508,7 @@ static void rts5228_disable_aspm(struct rtsx_pcr *pcr, bool enable)
+ 	if (pcr->aspm_enabled == enable)
+ 		return;
+ 
+-	pcie_capability_clear_and_set_word(pcr->pci, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC, 0);
++	pci_disable_link_state(pcr->pci, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 	mask = FORCE_ASPM_VAL_MASK | FORCE_ASPM_CTL0 | FORCE_ASPM_CTL1;
+ 	val = FORCE_ASPM_CTL0 | FORCE_ASPM_CTL1;
+ 	rtsx_pci_write_register(pcr, ASPM_FORCE_CTL, mask, val);
+diff --git a/drivers/misc/cardreader/rts5261.c b/drivers/misc/cardreader/rts5261.c
+index 94af6bf8a25a..f1ef15683a2f 100644
+--- a/drivers/misc/cardreader/rts5261.c
++++ b/drivers/misc/cardreader/rts5261.c
+@@ -578,8 +578,7 @@ static void rts5261_enable_aspm(struct rtsx_pcr *pcr, bool enable)
+ 
+ 	val |= (pcr->aspm_en & 0x02);
+ 	rtsx_pci_write_register(pcr, ASPM_FORCE_CTL, mask, val);
+-	pcie_capability_clear_and_set_word(pcr->pci, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC, pcr->aspm_en);
++	pci_enable_link_state(pcr->pci, pcr->aspm_en);
+ 	pcr->aspm_enabled = enable;
  }
  
- static int ath11k_pci_power_up(struct ath11k_base *ab)
+@@ -591,8 +590,7 @@ static void rts5261_disable_aspm(struct rtsx_pcr *pcr, bool enable)
+ 	if (pcr->aspm_enabled == enable)
+ 		return;
+ 
+-	pcie_capability_clear_and_set_word(pcr->pci, PCI_EXP_LNKCTL,
+-					   PCI_EXP_LNKCTL_ASPMC, 0);
++	pci_disable_link_state(pcr->pci, PCIE_LINK_STATE_L0S | PCIE_LINK_STATE_L1);
+ 	rtsx_pci_write_register(pcr, ASPM_FORCE_CTL, mask, val);
+ 	rtsx_pci_write_register(pcr, SD_CFG1, SD_ASYNC_FIFO_NOT_RST, 0);
+ 	udelay(10);
+diff --git a/drivers/misc/cardreader/rtsx_pcr.c b/drivers/misc/cardreader/rtsx_pcr.c
+index a3f4b52bb159..6efb792152f2 100644
+--- a/drivers/misc/cardreader/rtsx_pcr.c
++++ b/drivers/misc/cardreader/rtsx_pcr.c
+@@ -86,9 +86,11 @@ static void rtsx_comm_set_aspm(struct rtsx_pcr *pcr, bool enable)
+ 		return;
+ 
+ 	if (pcr->aspm_mode == ASPM_MODE_CFG) {
+-		pcie_capability_clear_and_set_word(pcr->pci, PCI_EXP_LNKCTL,
+-						PCI_EXP_LNKCTL_ASPMC,
+-						enable ? pcr->aspm_en : 0);
++		if (enable)
++			pci_enable_link_state(pcr->pci, pcr->aspm_en);
++		else
++			pci_disable_link_state(pcr->pci, PCIE_LINK_STATE_L0S |
++							 PCIE_LINK_STATE_L1);
+ 	} else if (pcr->aspm_mode == ASPM_MODE_REG) {
+ 		if (pcr->aspm_en & 0x02)
+ 			rtsx_pci_write_register(pcr, ASPM_FORCE_CTL, FORCE_ASPM_CTL0 |
 -- 
 2.30.2
 
