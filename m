@@ -2,189 +2,139 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DC7CE79A8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Sep 2023 20:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47878CE79A9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Sep 2023 20:34:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233118AbjISUKz (ORCPT
+        id S229988AbjISUeg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Sep 2023 16:10:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50248 "EHLO
+        Tue, 19 Sep 2023 16:34:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233139AbjISUKy (ORCPT
+        with ESMTP id S229627AbjISUef (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Sep 2023 16:10:54 -0400
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5944D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 13:10:47 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2ba1e9b1fa9so99903601fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 13:10:47 -0700 (PDT)
+        Tue, 19 Sep 2023 16:34:35 -0400
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87E9993
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 13:34:29 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id e9e14a558f8ab-34fdadf3f7aso9521255ab.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 13:34:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695154246; x=1695759046; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zxamuXa++dHcUm/bgd8P4v81tqGt/XvCU4ZkO3B8Uko=;
-        b=hIc4EXW3qy76IbYCqDPKa6XY3gO/k9yygNLIa3mZ3Ttp/1N957JHzxw4iXnYrKj04A
-         Y38qMRFYdkMtq5hwbcJ3UGBNQ/kGY82FbbbR5jXnz07TSRn8Y06u1Gk4UDldjI+v9jK9
-         dlT1+/6Ep2IjLH6VPpe88K/mjcp0jFiUTn/vFE9fss+r3NtQXDs+2iLZ1qG3isuKdO8D
-         ehxpwq1656HjB4Cz9snIwyD+9377r3mEGNJy11fjdv6vnbPjKUkWm8/DH2aygYNKaLnz
-         Ge4eD7NW+08i1JdXRZF6NB9nZkV2/XG0h5EpsCjMdGIrXPoG7VXuTS/dbCwpc4vpxYTs
-         XDAQ==
+        d=gmail.com; s=20230601; t=1695155668; x=1695760468; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=gI0JtyXjDGc3kfUvj93eh2Dze4hFKzgVAN5ODvM3XwI=;
+        b=DZ7iofsifyYCKJKhaJ8oy1d3QxnF7P3oXUrQS00Z1dd7RkMOIwejQ06i2rHomrld3v
+         wsVLfhKPyG+m8CUxVONZQX9h3YWstpM24n3FIBqLmwkDd7NX4sfQ6GtyGWjC/6wM4YaB
+         KnKuT6XwCWFZbqZoIwGfiXweT9EPhHqkRHudwQO94sI+sk2IR7B3S9IpS0uucqNLuS1r
+         UBR+Ju8ssl8N+DNCg2CC9H+ecG5mzzYUZoL3k/PVdCgIqLtpVZJt9Lxtmf1tfq4SuHX2
+         6l4jkEczmKzuZGHBtWd0oZ9yueY4dMgdeR4Yiij10pWyrtGSbCVw1HrnQj2ck4ySNNKm
+         18Mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695154246; x=1695759046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zxamuXa++dHcUm/bgd8P4v81tqGt/XvCU4ZkO3B8Uko=;
-        b=ob4qtR34N5AWpvIKJ+6D6iPCMs2gM2XUM6o7SJ5sg5K3GvfzkFojitt7Ekgy9Dxvb/
-         EgMUzG1xDSE8gjppEVgA/S5Yf53Tl9M1kTjJVIALJz434kWAoUrx49P3SvMsXn2ce2dF
-         qJJ6kT1XRC6I5Oqd3A1RCMdAXvfB/Kkni/GQcp+6gcPJHzdTTCWT+grqUKvB+JAvNL0a
-         t4E2fwc8+DpD2dpVfW6/wx8q6y0qyHKL36uYWU/TNFZt/NuXx65m+ukg8CXiwpLoXvjg
-         wOGN4MpD2EYeu7Rqzg/617Ee9DxbNzHbFbrfeTl5z5G7E5VPjGi4WaoRvt/7J/79Xqf5
-         GnhA==
-X-Gm-Message-State: AOJu0YxF12COUEGa8+Ex+0rFM3dkyhuSrj+PRDTgzn51xdZKxgQNsxpt
-        xxHfnfII/evQQzBpIQzHeUORj2ryhiIAzJF/xXBuFhLqB60=
-X-Google-Smtp-Source: AGHT+IGMqP4DSphhNe5pLFl1x5nJqVdIJBY6Vno1pxvbtaBAE8MWFHMbAMvkhGp5BaRnWmVnAcbr2B1MQuqt34EcOtw=
-X-Received: by 2002:a2e:9dcc:0:b0:2bc:b694:6d6e with SMTP id
- x12-20020a2e9dcc000000b002bcb6946d6emr401837ljj.27.1695154245954; Tue, 19 Sep
- 2023 13:10:45 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1695155668; x=1695760468;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gI0JtyXjDGc3kfUvj93eh2Dze4hFKzgVAN5ODvM3XwI=;
+        b=rae/3zYZ90bMRvqcm/eFfl5oh5Ov3JPYPFbcPH3SYFyLAYONwHR2vY5WPrxN+/YtJ9
+         3dTID6zymbyB1TWG1vG/yEDEk1+GfRrm6dNhObeLWTMOZw/BZKdAfN5R1/LS/Zd/YEbG
+         SYz+XSnkjjqJFtYimU4NvdOoC+luoz6BnHKhqTZ1QLeyDjfKxTiZVzcqh/g9+wNucw3y
+         jfbf8dj5WM43m8CovYC/S9STRcK1pdN2JmA26OwlWMxv3/BUaWlC8v0KQ+wnExGbZfjb
+         aanWerNFy+vJ0X8n0NbX/DRJYx5JIZwgzIKg48hNv/KyyqVjZZxiRQO6IEwRODfyVpLb
+         qyMg==
+X-Gm-Message-State: AOJu0Yw8CkdvkXbSmIi+y/dYLBD0SdLhIy44auP98j14NeVrS9PgLNlv
+        oZ0JtA26SPkF+RDfDDkNdhidGl+mF2o=
+X-Google-Smtp-Source: AGHT+IEzQxeZehQf4Q+UYktKSBSxvjTp0QsSsHuWl5nBNVOziCzBKxPEiLo6Gd51JqP16JlgKFf75w==
+X-Received: by 2002:a05:6e02:1c89:b0:34c:ceaf:b627 with SMTP id w9-20020a056e021c8900b0034cceafb627mr933614ill.29.1695155668631;
+        Tue, 19 Sep 2023 13:34:28 -0700 (PDT)
+Received: from [172.17.0.2] ([52.176.143.104])
+        by smtp.gmail.com with ESMTPSA id j14-20020a02cc6e000000b0042b16c005e9sm3742673jaq.124.2023.09.19.13.34.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Sep 2023 13:34:28 -0700 (PDT)
+Message-ID: <650a05d4.020a0220.5b15b.4b5b@mx.google.com>
+Date:   Tue, 19 Sep 2023 13:34:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2080573002386608243=="
 MIME-Version: 1.0
-References: <89ceb9e5d67485c19d0f139ac0825cf008491ebb.camel@gmail.com>
-In-Reply-To: <89ceb9e5d67485c19d0f139ac0825cf008491ebb.camel@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 19 Sep 2023 13:10:33 -0700
-Message-ID: <CABBYNZJHv8iw0ZvgWFCTpe6EAj0d92ghbimtAqzej+Jf7a9Bmw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ]: adapter: Add Version and Manufacturer props to org.bluez.Adapter1.
-To:     vibhavp@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] pbap: Fix not checking Primary/Secundary Counter length
+In-Reply-To: <20230919191401.311236-1-luiz.dentz@gmail.com>
+References: <20230919191401.311236-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vibhav,
+--===============2080573002386608243==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 19, 2023 at 12:59=E2=80=AFPM <vibhavp@gmail.com> wrote:
->
-> From: Vibhav Pant <vibhavp@gmail.com>
->
-> This allows DBus clients to find an adapter's version and
-> manufacturer company code without querying the management API.
+This is automated email and please do not reply to this email!
 
-We don't use Signed-off-by on userspace.
+Dear submitter,
 
-> Signed-off-by: Vibhav Pant <vibhavp@gmail.com>
-> ---
->  doc/adapter-api.txt | 11 +++++++++++
->  src/adapter.c       | 28 ++++++++++++++++++++++++++++
->  2 files changed, 39 insertions(+)
->
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index d38ce7171..10c290c62 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -360,3 +360,14 @@ Properties string Address [readonly]
->
->                         List of 128-bit UUIDs that represents the
-> experimental
->                         features currently enabled.
-> +
-> +               uint16 Manufacturer [readonly]
-> +
-> +                       The manufacturer of the device, as a uint16
-> company
-> +                       identifier defined by the Core Bluetooth
-> Specification.
-> +
-> +               byte Version [readonly]
-> +
-> +                       The Bluetooth version supported by the device,
-> as a
-> +                       core version code defined by the Core
-> Bluetooth
-> +                       Specification.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=785720
 
-Documentation should be submitted in a separate patch.
+---Test result---
 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 5ebfc4752..8f67a6826 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -260,6 +260,7 @@ struct btd_adapter {
->
->         bdaddr_t bdaddr;                /* controller Bluetooth
-> address */
->         uint8_t bdaddr_type;            /* address type */
-> +       uint8_t version;                /* controller core spec
-> version */
->         uint32_t dev_class;             /* controller class of device
-> */
->         char *name;                     /* controller device name */
->         char *short_name;               /* controller short name */
-> @@ -3540,6 +3541,29 @@ static gboolean
-> property_experimental_exists(const GDBusPropertyTable *property,
->         return !queue_isempty(adapter->exps);
->  }
->
-> +static gboolean property_get_manufacturer(const GDBusPropertyTable
-> *property,
-> +                                         DBusMessageIter *iter,
-> +                                         void *user_data)
-> +{
-> +       struct btd_adapter *adapter =3D user_data;
-> +       dbus_uint16_t val =3D adapter->manufacturer;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &val);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static gboolean property_get_version(const GDBusPropertyTable
-> *property,
-> +                                    DBusMessageIter *iter, void
-> *user_data)
-> +{
-> +       struct btd_adapter *adapter =3D user_data;
-> +       uint8_t val =3D adapter->version;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &val);
-> +
-> +       return TRUE;
-> +}
-> +
->  static DBusMessage *remove_device(DBusConnection *conn,
->                                         DBusMessage *msg, void
-> *user_data)
->  {
-> @@ -3898,6 +3922,8 @@ static const GDBusPropertyTable
-> adapter_properties[] =3D {
->         { "Roles", "as", property_get_roles },
->         { "ExperimentalFeatures", "as", property_get_experimental,
-> NULL,
->                                         property_experimental_exists
-> },
-> +       { "Manufacturer", "q", property_get_manufacturer },
-> +       { "Version", "y", property_get_version },
->         { }
->  };
->
-> @@ -10162,6 +10188,8 @@ static void read_info_complete(uint8_t status,
-> uint16_t length,
->         adapter->supported_settings =3D btohl(rp->supported_settings);
->         adapter->current_settings =3D btohl(rp->current_settings);
->
-> +       adapter->version =3D rp->version;
-> +
->         clear_uuids(adapter);
->         clear_devices(adapter);
->
-> --
-> 2.42.0
->
->
->
+Test Summary:
+CheckPatch                    FAIL      0.64 seconds
+GitLint                       FAIL      4.97 seconds
+BuildEll                      PASS      27.65 seconds
+BluezMake                     PASS      783.26 seconds
+MakeCheck                     PASS      11.51 seconds
+MakeDistcheck                 PASS      157.96 seconds
+CheckValgrind                 PASS      253.66 seconds
+CheckSmatch                   PASS      348.02 seconds
+bluezmakeextell               PASS      105.39 seconds
+IncrementalBuild              PASS      669.97 seconds
+ScanBuild                     PASS      1040.56 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] pbap: Fix not checking Primary/Secundary Counter length
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#91: 
+     #0 0x7f95a1575637 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:860
+
+/github/workspace/src/src/13391785.patch total: 0 errors, 1 warnings, 17 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13391785.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
---=20
-Luiz Augusto von Dentz
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ] pbap: Fix not checking Primary/Secundary Counter length
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+14: B1 Line exceeds max length (231>80): "     #0 0x7f95a1575637 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long) ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:860"
+15: B1 Line exceeds max length (130>80): "     #1 0x7f95a1575ba6 in __interceptor_memcmp ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:892"
+16: B1 Line exceeds max length (130>80): "     #2 0x7f95a1575ba6 in __interceptor_memcmp ../../../../src/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:887"
+24: B1 Line exceeds max length (99>80): "     #10 0x7f95a12fdc43 in g_main_context_dispatch (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x55c43)"
+26: B1 Line exceeds max length (91>80): "     #12 0x7f95a12fd2b2 in g_main_loop_run (/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x552b2)"
+28: B1 Line exceeds max length (91>80): "     #14 0x7f95a10a7d8f in __libc_start_call_main ../sysdeps/nptl/libc_start_call_main.h:58"
+31: B1 Line exceeds max length (97>80): " 0x607000001878 is located 0 bytes to the right of 72-byte region [0x607000001830,0x607000001878)"
+34: B1 Line exceeds max length (106>80): "     #0 0x7f95a1595a37 in __interceptor_calloc ../../../../src/libsanitizer/asan/asan_malloc_linux.cpp:154"
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2080573002386608243==--
