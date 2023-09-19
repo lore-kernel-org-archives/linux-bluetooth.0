@@ -2,52 +2,83 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EDDCD548C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Sep 2023 07:37:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4A8CD54AD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Sep 2023 09:40:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231817AbjISHhg (ORCPT
+        id S231600AbjISJkP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Sep 2023 03:37:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49318 "EHLO
+        Tue, 19 Sep 2023 05:40:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231799AbjISHhe (ORCPT
+        with ESMTP id S231274AbjISJkI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Sep 2023 03:37:34 -0400
-X-Greylist: delayed 348 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 19 Sep 2023 00:37:25 PDT
-Received: from mail.leeswilly.pl (mail.leeswilly.pl [89.116.26.225])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF492125
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 00:37:24 -0700 (PDT)
-Received: by mail.leeswilly.pl (Postfix, from userid 1001)
-        id 474A5761253; Tue, 19 Sep 2023 09:30:31 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=leeswilly.pl; s=mail;
-        t=1695108691; bh=qCQG4c3C0tvkuSSy6okg6Td4OKi9mrw7rI9pE9SwJ9g=;
-        h=Date:From:To:Subject:From;
-        b=xYH9wwyL5RB038q5aBpXzgOo/xcNtCJer7iAqPYCZJdH9qeLAlJ3L4pwbobhaG34n
-         OoJJMvVOFbpepgenEqzHfPWtQvzr2hlS4Z3GA89YxOt67+Hbxdnu/JUz+iysAwh6Ci
-         G3zI+pmNhLn5ldyE3Iluk9kGZ2Az6aNj+gm77pIpAMY6iBae82KvAVPDTx7TMGw6nv
-         8LQSDlG0nWvojOD4NVKEloQyRT52F08B6lUY2VSYl0xpySwYVP4Nfe0/20E5gWvMwE
-         4cSq5MzRdVK7e/0Pii7Oe2KQwgNt6raufN9aAprG9UOpweIgqoV+mz5EokqDzxIYsc
-         Xk7Q3tcl3f32w==
-Received: by mail.leeswilly.pl for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 07:30:18 GMT
-Message-ID: <20230919084500-0.1.3z.bc17.0.mn893qmalc@leeswilly.pl>
-Date:   Tue, 19 Sep 2023 07:30:18 GMT
-From:   "Jakub Lemczak" <jakub.lemczak@leeswilly.pl>
-To:     <linux-bluetooth@vger.kernel.org>
-Subject: =?UTF-8?Q?Pytanie_o_samoch=C3=B3d?=
-X-Mailer: mail.leeswilly.pl
+        Tue, 19 Sep 2023 05:40:08 -0400
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DD8F1;
+        Tue, 19 Sep 2023 02:40:01 -0700 (PDT)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDD7CC433C7;
+        Tue, 19 Sep 2023 09:39:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1695116401;
+        bh=xUSE25r0oJ3f4NH79rN7650LsxSaeIDs03u0Ela0NkA=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=B+8j6J653S7hN/P0sDXLfkZCrkXWcs/201tlLesCMKYeS27mE3L8IG2qk7AAKg+2e
+         BUNS5NZm5JBAjTmq3GDLC5ye8CNJyMrm7azjWAk6bw0E2F+XLRY4x0wrGB2V5MhQGZ
+         Ki0ZQJyaFcYSLGRFN9mojUPq91NN2dkqHVrCNogaFKSg+IjPuz9iWRlTBiZhZra0L8
+         2tygmWZJ+rUn+kQ9Qe2QrFu6h8s1oXtGd3sVDtGq9oQHu1k/JNmlsa4Ct7tWxiDVH+
+         e2yjQ23XCx79G/cwJvFmU478618R+x80XBRSqQcOjr+y9gCP5/il85H44EBc/vWHwF
+         CBum4FD6nQBdg==
+From:   Kalle Valo <kvalo@kernel.org>
+To:     Ilpo =?utf-8?Q?J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc:     linux-pci@vger.kernel.org, Bjorn Helgaas <helgaas@kernel.org>,
+        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+        linux-kernel@vger.kernel.org,
+        Jeff Johnson <quic_jjohnson@quicinc.com>,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        ath11k@lists.infradead.org, ath12k@lists.infradead.org,
+        intel-wired-lan@lists.osuosl.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-rdma@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v2 09/13] wifi: ath10k: Use pci_disable/enable_link_state()
+References: <20230918131103.24119-1-ilpo.jarvinen@linux.intel.com>
+        <20230918131103.24119-10-ilpo.jarvinen@linux.intel.com>
+Date:   Tue, 19 Sep 2023 12:39:54 +0300
+In-Reply-To: <20230918131103.24119-10-ilpo.jarvinen@linux.intel.com> ("Ilpo
+        =?utf-8?Q?J=C3=A4rvinen=22's?= message of "Mon, 18 Sep 2023 16:10:59
+ +0300")
+Message-ID: <87msxibixh.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dzie=C5=84 dobry,
+Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com> writes:
 
-Czy interesuje Pa=C5=84stwa rozwi=C4=85zanie umo=C5=BCliwiaj=C4=85ce moni=
-torowanie samochod=C3=B3w firmowych oraz optymalizacj=C4=99 koszt=C3=B3w =
-ich utrzymania?=20
+> ath10k driver adjusts ASPM state itself which leaves ASPM service
+> driver in PCI core unaware of the link state changes the driver
+> implemented.
+>
+> Call pci_disable_link_state() and pci_enable_link_state() instead of
+> adjusting ASPMC field in LNKCTL directly in the driver and let PCI core
+> handle the ASPM state management.
+>
+> Signed-off-by: Ilpo J=C3=A4rvinen <ilpo.jarvinen@linux.intel.com>
 
+Acked-by: Kalle Valo <kvalo@kernel.org>
 
-Pozdrawiam
-Jakub Lemczak
+--=20
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
+hes
