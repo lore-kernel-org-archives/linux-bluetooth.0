@@ -2,45 +2,45 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC18BCE79A8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Sep 2023 19:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA34CCE79A9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Sep 2023 19:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232759AbjISTUe (ORCPT
+        id S232524AbjISTUf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Sep 2023 15:20:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59630 "EHLO
+        Tue, 19 Sep 2023 15:20:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232773AbjISTUd (ORCPT
+        with ESMTP id S232400AbjISTUd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 19 Sep 2023 15:20:33 -0400
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7AC110
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E7F128
         for <linux-bluetooth@vger.kernel.org>; Tue, 19 Sep 2023 12:20:25 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FF8BC433CD;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 850D9C43391;
         Tue, 19 Sep 2023 19:20:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1695151225;
-        bh=1oLz7k8pTZrAbRV6JNViMXXiO64//omQe8hCyOTca7A=;
+        bh=DFAVVhQoifkm+qys3f7F+OLxGUywxmB/bcieoPxynTA=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=tV15wHjXNIpizVjfyw//S4zSJPw+5QEDO86VWtxNg/xrPFrvZY8m2FDZU/I0P9bS1
-         CvlAjhPycWJmqTpJ6hbXFoZUA0G/AWmGV0F9z/Sip4+V2DACn0+gTkMchfUq6x9Wju
-         T1IsBfU00ej2U8GXSOTPUemqiM2w8QpgRY/zy2A7BdMrqBerXIwipheGdlG438deDS
-         0sDevrnId37OKvXJsIdqbKri3QEUVaZ32E9MtxNRi3gFzZqo/6ghScxta8NZybl6s3
-         Bt87kppIcIu63xdDqSuY+tdWITeDlX9aH6tzbY1iQsnO1W2u9XyfXfSkz7kW7iAS8U
-         dNcWG2j18xfxA==
+        b=Eum/NnwoVACpCxW/eh3NiH/ZlFKpwbZANaAAsL6qSZQQkloS/V+HHwGFSfiLsXT/b
+         Hv5ui2I2mQHHmL3H2lh3ScFCeCQ/gMT7Q1sT4Q/uGi49tVld0iuAOdsevlU2fZ3MS3
+         353SJZVkpNqy1tQRF+SIQYojcqIVrouzDrLRfrOKmgkRQEjE/NmhLSe9UobHdptQPS
+         FdrRZxrVLI5PRaov1yW+xnGQTA8CidY8CkMvk38U/fcI/59dDrbNLIfwqXL3X907XE
+         rItNXJC6f25IO0ossHGWuA30jdlYwIeQnEvHDJ19sZetIm/hobJv/mD7OKxQtUXI8V
+         BKZupFm7vBCgQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65284E11F41;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E32DE1F671;
         Tue, 19 Sep 2023 19:20:25 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/2] emulator: Skip new line when using util_debug
+Subject: Re: [PATCH BlueZ] shared/log: Fix not checking vasprintf return
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169515122541.29274.14107504131963002768.git-patchwork-notify@kernel.org>
+Message-Id: <169515122544.29274.10299509749862719582.git-patchwork-notify@kernel.org>
 Date:   Tue, 19 Sep 2023 19:20:25 +0000
-References: <20230919162745.894828-1-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20230919162745.894828-1-arkadiusz.bokowy@gmail.com>
-To:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+References: <20230918212219.190667-1-luiz.dentz@gmail.com>
+In-Reply-To: <20230918212219.190667-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -48,22 +48,50 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 19 Sep 2023 18:27:44 +0200 you wrote:
-> The debug callback vhci_debug() already prints new line after each debug
-> string. Explicit new line in the util_debug call causes double new line
-> in the output.
-> ---
->  emulator/btdev.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
+On Mon, 18 Sep 2023 14:22:19 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> It seems like some implementation of vasprintf set the content of the
+> str to NULL rather then returning -1 causing the following errors:
+> 
+> =================================================================
+> ==216204==ERROR: AddressSanitizer: attempting free on address which
+> was not malloc()-ed: 0x55e787722cf0 in thread T0
+>       #0 0x55e784f75872 in __interceptor_free.part.0 asan_malloc_linux.cpp.o
+>       #1 0x55e7850e55f9 in bt_log_vprintf
+> /usr/src/debug/bluez-git/bluez-git/src/shared/log.c:154:2
+>       #2 0x55e78502db18 in monitor_log
+> /usr/src/debug/bluez-git/bluez-git/src/log.c:40:2
+>       #3 0x55e78502dab4 in info
+> /usr/src/debug/bluez-git/bluez-git/src/log.c:52:2
+>       #4 0x55e78502e314 in __btd_log_init
+> /usr/src/debug/bluez-git/bluez-git/src/log.c:179:2
+>       #5 0x55e78502aa63 in main
+> /usr/src/debug/bluez-git/bluez-git/src/main.c:1388:2
+>       #6 0x7f1d5fe27ccf  (/usr/lib/libc.so.6+0x27ccf) (BuildId:
+> 316d0d3666387f0e8fb98773f51aa1801027c5ab)
+>       #7 0x7f1d5fe27d89 in __libc_start_main
+> (/usr/lib/libc.so.6+0x27d89) (BuildId:
+> 316d0d3666387f0e8fb98773f51aa1801027c5ab)
+>       #8 0x55e784e88084 in _start
+> (/usr/lib/bluetooth/bluetoothd+0x36084) (BuildId:
+> 19348ea642303b701c033d773055becb623fe79a)
+>   Address 0x55e787722cf0 is a wild pointer inside of access range of
+> size 0x000000000001.
+>   SUMMARY: AddressSanitizer: bad-free asan_malloc_linux.cpp.o in
+> __interceptor_free.part.0
+>   ==216204==ABORTING
+> сен 18 13:10:02 archlinux systemd[1]: bluetooth.service: Main process
+> exited, code=exited, status=1/FAILURE
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,1/2] emulator: Skip new line when using util_debug
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=eb9eaf01d161
-  - [BlueZ,2/2] hciemu: Call btdev_receive_h4 unconditionally
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7f788a2c5162
+  - [BlueZ] shared/log: Fix not checking vasprintf return
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6169001a2b57
 
 You are awesome, thank you!
 -- 
