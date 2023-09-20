@@ -2,75 +2,78 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA394C05024
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 21:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CCBCD4934
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 22:54:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbjITVK3 (ORCPT
+        id S229627AbjITWyx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Sep 2023 17:10:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59166 "EHLO
+        Wed, 20 Sep 2023 18:54:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230179AbjITVK3 (ORCPT
+        with ESMTP id S229562AbjITWyw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Sep 2023 17:10:29 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF32B9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 14:10:23 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 20C64C433C9;
-        Wed, 20 Sep 2023 21:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695244223;
-        bh=wq8NbjSnqnabrwGS0bRqj24U15kzwhMpfVZd4361p5k=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=SFPspL53Bxpp3CxpAGA4JFLdTD4e1hZWAV0Ij9Sw0i0L78+j3jLZwnZ5SG+FHdA6T
-         NC0aLNF/4O0uLDB2xizg/6E6PsQ2xbr20sB7iLwp09IJmli52Jx6eSp8229Sr7YRY5
-         nq5MDo+NB2oIoCmlTWaEKCXFE61c2XAHabkAP5DkhKoF4FjCX9YXRJTGC829IvJgCb
-         J3+jOE/bJbrev8lZBLT1MZeSeUxNoPObUZuPpnBuHyj6VuyLhYGb60YVYaolQg25f5
-         uleEiNgEVJ9QDqJFB15pEnF6QypzWW8MHQDRbieoUXXQ8ezSKkmAQLnLMZSrE6S6Ps
-         6jec+D+mAt/8w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 089D5C595C4;
-        Wed, 20 Sep 2023 21:10:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 20 Sep 2023 18:54:52 -0400
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDA6E4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 15:54:46 -0700 (PDT)
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3adfeefb924so211611b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 15:54:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1695250485; x=1695855285;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2g79bcICkCCHdQM90cMC4akmu6VrqB/gBv3hd+fNQRM=;
+        b=dnzhM1DNphFIhLiwcIOC3usOCj0P/XNNFYuc2J4Kf6wdrQC4OXxrLOZeY9jkf+i1X2
+         DYhjEJcyU1BaxJQk8jndeeaGo97JNhfsD7yi0i2WTPprKOcTDUMueLxmwaAG9t+Y0sgx
+         cFePEwMp5P1iMS0VnmkN7nvCdymF4QosGNjdbd6oaObOU0KbkUvdUlZ97XkMQNTQHNEA
+         Rq+iqE23BfKBE2EwMyx2l6hoiwqCtIrn3fEejg/vkH1PSg/VDVoNRBxupq3os30SHk89
+         6ZG71cO4cd5LIT9CM66KWBhU2hxjPX443fTZXqLEp80qCKsD2eq3/DWxglx60rOgDblB
+         U2zg==
+X-Gm-Message-State: AOJu0Yx2L2cIQu4GdIyCoWnC6r8pkJuRkJ05IJ/+vWLfq13548cKUZzJ
+        jIANL4+F4WhRWPS6eiDPT8Bn31Y3qyGvMrsXcYyCUeJ2LmjW
+X-Google-Smtp-Source: AGHT+IEikjJmvx8UO8IMdN6a+9RMgVvnMxyC7pr1mrFDzf2WyUEBC1kduMH0LqlxWiVKOiNJ+Pk+swZS+bvkmRPzA6YhkYbkeqDB
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] pbap: Fix not checking Primary/Secundary Counter length
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <169524422303.13420.5457407864169782596.git-patchwork-notify@kernel.org>
-Date:   Wed, 20 Sep 2023 21:10:23 +0000
-References: <20230919191401.311236-1-luiz.dentz@gmail.com>
-In-Reply-To: <20230919191401.311236-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6808:1a1e:b0:3a7:9a19:332b with SMTP id
+ bk30-20020a0568081a1e00b003a79a19332bmr1845061oib.7.1695250485411; Wed, 20
+ Sep 2023 15:54:45 -0700 (PDT)
+Date:   Wed, 20 Sep 2023 15:54:45 -0700
+In-Reply-To: <000000000000a91cfe05fe5161f2@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000fd0b980605d242ed@google.com>
+Subject: Re: [syzbot] [bluetooth?] BUG: sleeping function called from invalid
+ context in __hci_cmd_sync_sk
+From:   syzbot <syzbot+c715e1bd8dfbcb1ab176@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, hdanton@sina.com,
+        iulia.tanasescu@nxp.com, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+syzbot has bisected this issue to:
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+commit 2e846cd83f6285f4fee49389954b1b1215f5e504
+Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Date:   Tue May 30 14:21:59 2023 +0000
 
-On Tue, 19 Sep 2023 12:14:01 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Primary/Secundary Counters are supposed to be 16 bytes values, if the
-> server has implemented them incorrectly it may lead to the following
-> crash:
-> 
-> =================================================================
-> ==31860==ERROR: AddressSanitizer: heap-buffer-overflow on address
-> 0x607000001878 at pc 0x7f95a1575638 bp 0x7fff58c6bb80 sp 0x7fff58c6b328
-> 
-> [...]
+    Bluetooth: ISO: Add support for connecting multiple BISes
 
-Here is the summary with links:
-  - [BlueZ] pbap: Fix not checking Primary/Secundary Counter length
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5ab5352531a9
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15636364680000
+start commit:   1f6ce8392d6f Add linux-next specific files for 20230613
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17636364680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13636364680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d103d5f9125e9fe9
+dashboard link: https://syzkaller.appspot.com/bug?extid=c715e1bd8dfbcb1ab176
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11287563280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14395963280000
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reported-by: syzbot+c715e1bd8dfbcb1ab176@syzkaller.appspotmail.com
+Fixes: 2e846cd83f62 ("Bluetooth: ISO: Add support for connecting multiple BISes")
 
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
