@@ -2,80 +2,122 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0082CE79C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 10:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B64CCE79CE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 14:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234346AbjITKxl (ORCPT
+        id S234934AbjITOCM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Sep 2023 06:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55744 "EHLO
+        Wed, 20 Sep 2023 10:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234306AbjITKxj (ORCPT
+        with ESMTP id S234057AbjITOCL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Sep 2023 06:53:39 -0400
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A7FD3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 03:53:33 -0700 (PDT)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 15E5EC433BC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 10:53:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1695207213;
-        bh=G+ojRwyDsenGbt25zoCp3kDjq+sJkYdTQ6AWLMu874M=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qK1NyF2QhTq38LV/lSFdke32bxCat/oxK+TgC3xj9ZQbZcOyuM9NWgpxjo4t62I4q
-         1/iH2rHgrrEMW26eFVhpj8NUNF7mo5qQ6sHDvMpIa/w3VAjGTryTjJddp4idqxWz49
-         noTYlRxDcjbQLUyZyfla1cfAC0QTGld5/+VMvAacFzNaxCLtpy9vutT3q4ThJa0IRO
-         S0Bw4ASltJB4l3+WZOJmz/TuJmAu8/1RGLJ4awqyZlSs0abWSg5ppXl4LjC0+BV7v9
-         188y7b45cMuaqZSUHMsuYFjCvx5m+2QiQo9HuE9+BbZXNjXSpUo1BEKfYX3aZQ35+T
-         tLQUxqgRWCgHw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id F3091C53BD4; Wed, 20 Sep 2023 10:53:32 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216936] First attempt to upload firmware for Intel Bluetooth
- fails (a timing issue?)
-Date:   Wed, 20 Sep 2023 10:53:32 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-216936-62941-IpfjiYRQvd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216936-62941@https.bugzilla.kernel.org/>
-References: <bug-216936-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 20 Sep 2023 10:02:11 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24034D7;
+        Wed, 20 Sep 2023 07:02:03 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1qixmD-0004OH-7z; Wed, 20 Sep 2023 16:02:01 +0200
+Message-ID: <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
+Date:   Wed, 20 Sep 2023 16:02:00 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of
+ HCI_QUIRK_STRICT_DUPLICATE_FILTER
+Content-Language: en-US, de-DE
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Linux regressions mailing list <regressions@lists.linux.dev>,
+        patchwork-bot+bluetooth@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        Stefan Agner <stefan@agner.ch>
+References: <20230829205936.766544-1-luiz.dentz@gmail.com>
+ <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
+ <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info>
+ <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
+ <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info>
+ <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
+ <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info>
+In-Reply-To: <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1695218523;629cc3e1;
+X-HE-SMSGID: 1qixmD-0004OH-7z
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216936
+Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+for once, to make this easily accessible to everyone.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+@Luiz Augusto von Dentz: did you make any progress to get this into net
+to make sure this rather sooner then later heads to mainline? Doesn't
+looks like it from here, but maybe I'm missing something.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |CODE_FIX
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
---- Comment #18 from Artem S. Tashkinov (aros@gmx.com) ---
-This looks to be fixed in 6.5.
+#regzbot poke
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+On 14.09.23 20:08, Thorsten Leemhuis wrote:
+> On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
+>> On Wed, Sep 13, 2023 at 10:13 PM Thorsten Leemhuis
+>> <regressions@leemhuis.info> wrote:
+>>> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
+>>>> On Mon, Sep 11, 2023 at 6:40 AM Linux regression tracking (Thorsten
+>>>> Leemhuis) <regressions@leemhuis.info> wrote:
+>>>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
+>>>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
+>>>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+>>>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
+>>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>>>>
+>>>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning requires
+>>>>>>> periodic restarts of the scanning procedure as the controller would
+>>>>>>> consider device previously found as duplicated despite of RSSI changes,
+>>>>>>> but in order to set the scan timeout properly set le_scan_restart needs
+>>>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which defers
+>>>>>>> the command processing to cmd_sync_work.
+>>>>>>> [...]
+>>>>>>
+>>>>>> Here is the summary with links:
+>>>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
+>>>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
+>>>>>
+>>>>> That is (maybe among others?) a fix for a regression from 6.1, so why
+>>>>> was this merged into a "for-next" branch instead of a branch that
+>>>>> targets the current cycle?
+>> [...]
+>>> That answer doesn't answer the question afaics, as both 6.1 and 6.4 were
+>>> released in the past year -- the fix thus should not wait till the next
+>>> merge window, unless it's high risk or something. See this statement
+>>> from Linus:
+>>> https://lore.kernel.org/all/CAHk-=wis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5wmB6SRUwQUBQ@mail.gmail.com/
+>> Thanks for the feedback, I will try to push fixes to net more often.
+> 
+> Great, many thx!
+> 
+>>>> but I could probably have it marked for stable just
+>>>> to make sure it would get backported to affected versions.
+>>> That would be great, too!
+>> Well now that it has already been merged via -next tree shall we still
+>> attempt to mark it as stable? Perhaps we need to check if it was not
+>> backported already based on the Fixes tag.
+> 
+> Changes only get backported once they hit mainline, which hasn't
+> happened yet. And to get them into the net branch (and from there to
+> mainline) a new commit is needed anyway, so you might as well add the
+> stable tag to it. Side note: And don't worry that identical commit is
+> already in -next, git handles that well afaik (but if you rebase
+> bluetooth-next for other reasons anyway you might as well remove it).
+> 
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> If I did something stupid, please tell me, as explained on that page.
