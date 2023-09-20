@@ -2,170 +2,121 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF76C04FD1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 18:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D09C8C04FE8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 18:44:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229831AbjITS1b (ORCPT
+        id S229481AbjITSoI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Sep 2023 14:27:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
+        Wed, 20 Sep 2023 14:44:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229806AbjITS1a (ORCPT
+        with ESMTP id S229461AbjITSoH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Sep 2023 14:27:30 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BFA212B;
-        Wed, 20 Sep 2023 11:27:17 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c008042211so1428471fa.2;
-        Wed, 20 Sep 2023 11:27:17 -0700 (PDT)
+        Wed, 20 Sep 2023 14:44:07 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66214CA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 11:44:00 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-404732a0700so1771295e9.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Sep 2023 11:44:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695234435; x=1695839235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1695235438; x=1695840238; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/B51hhManBxQCDJi8s/bZ6EVrxt2B6zMHpl9BIven/A=;
-        b=XxkB1F4mWNZ5hmEZIAL9RYt3aY48jFNLjmnb4ZC4///+Ca/tlZV0DiKfruR22tiThX
-         LEJhcgDoh2NvAB/lgYePIdx5fEiH60rhFHTt2CsFSfFJdjs42f7+sqAwb8yw/3YvdOKh
-         yuVa99B+pLt2atDesBJP7HIHUf4cqlGB4xc+yhbu0jwgzOS+42doXSQZcTrgMbVeMnV3
-         a2dmS3cd2LN5JB/aj6EujAKJ5mOm0uFCoaAWqcJaMHtcyUE1pOdth/C+cU1fkCOGU8Ly
-         EgVcg71sxIJqyx+uRvIU3BVn4aCPnGuASMsMiOLPjdLFeEe40P3N46qZOooIBG1oWsi7
-         tJ8Q==
+        bh=75R3CAT6QlBW4zu7W5P0EsSTTEapzv3VNfW7vaKod6Y=;
+        b=f8UT5Nn1Yc/QzSYFHh8S83nVTp3FX8Z63/l03Iuo1HStOtkl76DGeBM9oBKcS3Sjh0
+         twa65ZjFf5gtYW5kZuLFmgouMGa7hHI2A2WKW6KVqFQkiIaJmHO1uwrx2a6b8RJnkk+Z
+         Q1Wud9DSliQLPdvbZXbOkRWBkOvMTyLH4vIz3kyihzrFEeObuKmRKqk3rchkeRETDJ2w
+         mLprD97bx5cz55qZ0xGZJJBm3Zi5AzJ/UhHg5lw1d7nBs+zXs5wKo3tqGyVUqHe8IgFd
+         zS+eq+xDlOIqjWjh0bo5MWUktXOU6VINsOnbxRQ4nUzmfskvhkDku+Iy14hm4CHarJl/
+         1zrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695234435; x=1695839235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1695235438; x=1695840238;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/B51hhManBxQCDJi8s/bZ6EVrxt2B6zMHpl9BIven/A=;
-        b=hWdyjNoGpGHHOxm8jWYqq0QVW795D34QxEaPUgwTw7ja7bqGbT8feVcCeQj6zGJoep
-         5FGn5YKpfgIaJYE/e/n3PD8LnrklBwxtR7WVuG7UrUJWpNyek0WCnw758z6/q1IFsRky
-         x+QbFwCmah9KhG4PLj4YboFJrkOiZzA/MGeEkL8KV+5x97fHPwdt+RH36fTDp0LgQlv6
-         23r2zHt1PqgBPpm+7hIPsUgWw119AVkpRZUDiLeGtfo8FEvQ3s1a1yxi96RL8j/TtmAa
-         PqT90Sxhdf8YPUUfYHCYg+8LNkS9wOsfXLkSDlzkgRXDNwhqyvDkZcS7Hm6S9inkLaHd
-         YxlQ==
-X-Gm-Message-State: AOJu0Yw1Tdz8WSp9RYjRRklErzHNl2SeeZ4nG95m+nV2vHGWZa4Nugej
-        dpcKO7FDrtXou3Wi9a0bLBl0YkJ/qP+8osJKy8Q=
-X-Google-Smtp-Source: AGHT+IF0iUJNRicLpJin3ByiycK68Xagu/oZrfx1jraD/qFlUAPWvrmPcx4u8CUjgnhAlieVUWLkWumO10WZWKvzyDY=
-X-Received: by 2002:a05:651c:108:b0:2bd:133c:2d71 with SMTP id
- a8-20020a05651c010800b002bd133c2d71mr2718462ljb.52.1695234435115; Wed, 20 Sep
- 2023 11:27:15 -0700 (PDT)
+        bh=75R3CAT6QlBW4zu7W5P0EsSTTEapzv3VNfW7vaKod6Y=;
+        b=MfoxGO8r2sqV7e6HhI02plgl6lgp15YLPmJRAkW3LsbuGAXIv/We8hbeJ4bTSADTWl
+         8HE734kr0na32zfnLvBS6X+STKRTgsWUWQGqoaKKTHx9QzstNHsdmDNDEWhYlpQMNfGs
+         sv5DvtwOwySzXU8zlwVqt7jZ4/faKhV+NDSdWHx5yyM4kDTdE+oe/k+3PiEyhfZJNsyo
+         N0bxEBWXkd4+0om3Tnd7zyY7l5iOGcr/q+1ByPsb4G44E/rcUfMCwIBCc+POkMqylqsu
+         NxpzNjgRoEmiEQEeiM3f7rRmR/qhQTMGSlbpUm+pjRr9MsEHJbladNtY1u+brdfb6qGb
+         judg==
+X-Gm-Message-State: AOJu0Yy4NRrJa3FEEx9lUsYbvuojdPa7Gck/Q9OqaPJ3DhMyNocgOJSI
+        n8X3IheKQTyC6HblONRCe4f4spXmOd0=
+X-Google-Smtp-Source: AGHT+IEd6qlNtJ34XizWIXCWgeV0/IKpolt4zTKni47i5jpdQUhHzj19FjdO1oTvUjCa9O7Qb2XgDg==
+X-Received: by 2002:a7b:c4d3:0:b0:401:6800:703c with SMTP id g19-20020a7bc4d3000000b004016800703cmr3098221wmk.21.1695235438023;
+        Wed, 20 Sep 2023 11:43:58 -0700 (PDT)
+Received: from localhost.localdomain (46.205.192.105.nat.ftth.dynamic.t-mobile.pl. [46.205.192.105])
+        by smtp.gmail.com with ESMTPSA id 15-20020a05600c020f00b00401d8810c8bsm2669643wmi.15.2023.09.20.11.43.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Sep 2023 11:43:57 -0700 (PDT)
+From:   Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH BlueZ] vhci: Check whether vhci open setup succeeded
+Date:   Wed, 20 Sep 2023 20:43:13 +0200
+Message-Id: <20230920184313.973822-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230920153008.967330-1-arkadiusz.bokowy@gmail.com>
+References: <20230920153008.967330-1-arkadiusz.bokowy@gmail.com>
 MIME-Version: 1.0
-References: <20230829205936.766544-1-luiz.dentz@gmail.com> <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
- <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info> <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
- <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info> <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
- <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info> <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
-In-Reply-To: <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 20 Sep 2023 11:27:02 -0700
-Message-ID: <CABBYNZKg8dbD0CY2yR=JUYLjXcRm_Pq7GU3W5gPErx6-_7GAJQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
-To:     Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     Linux regressions mailing list <regressions@lists.linux.dev>,
-        patchwork-bot+bluetooth@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        Stefan Agner <stefan@agner.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Thorsten,
+Due to race condition in the vhci kernel driver, we might read not a
+vendor response packet, but a HCI reset command. This extra check will
+ensure that kernel driver behaves correctly. Otherwise, the HCI setup
+process will fail, because our controller will not respond to "missing"
+HCI reset command. In result the virtual HCI will be DOWN and without
+initialized Bluetooth address, e.g:
 
-On Wed, Sep 20, 2023 at 7:02=E2=80=AFAM Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
->
-> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-> for once, to make this easily accessible to everyone.
->
-> @Luiz Augusto von Dentz: did you make any progress to get this into net
-> to make sure this rather sooner then later heads to mainline? Doesn't
-> looks like it from here, but maybe I'm missing something.
+> hciconfig
+hci2:   Type: Primary  Bus: Virtual
+        BD Address: 00:AA:01:01:00:02  ACL MTU: 192:1  SCO MTU: 0:0
+        UP RUNNING
+        RX bytes:0 acl:0 sco:0 events:66 errors:0
+        TX bytes:3086 acl:0 sco:0 commands:66 errors:0
 
-Just sent the pull-request:
+hci1:   Type: Primary  Bus: Virtual
+        BD Address: 00:00:00:00:00:00  ACL MTU: 0:0  SCO MTU: 0:0
+        DOWN
+        RX bytes:0 acl:0 sco:0 events:0 errors:0
+        TX bytes:8 acl:0 sco:0 commands:1 errors:0
 
-https://patchwork.kernel.org/project/bluetooth/patch/20230920181344.571274-=
-1-luiz.dentz@gmail.com/
+> dmesg
+[1754256.640122] Bluetooth: MGMT ver 1.22
+[1754263.023806] Bluetooth: MGMT ver 1.22
+[1754265.043775] Bluetooth: hci1: Opcode 0x c03 failed: -110
+---
+ emulator/vhci.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
->
-> #regzbot poke
->
->
-> On 14.09.23 20:08, Thorsten Leemhuis wrote:
-> > On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
-> >> On Wed, Sep 13, 2023 at 10:13=E2=80=AFPM Thorsten Leemhuis
-> >> <regressions@leemhuis.info> wrote:
-> >>> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
-> >>>> On Mon, Sep 11, 2023 at 6:40=E2=80=AFAM Linux regression tracking (T=
-horsten
-> >>>> Leemhuis) <regressions@leemhuis.info> wrote:
-> >>>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
-> >>>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
-> >>>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >>>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
-> >>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >>>>>>>
-> >>>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning require=
-s
-> >>>>>>> periodic restarts of the scanning procedure as the controller wou=
-ld
-> >>>>>>> consider device previously found as duplicated despite of RSSI ch=
-anges,
-> >>>>>>> but in order to set the scan timeout properly set le_scan_restart=
- needs
-> >>>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which de=
-fers
-> >>>>>>> the command processing to cmd_sync_work.
-> >>>>>>> [...]
-> >>>>>>
-> >>>>>> Here is the summary with links:
-> >>>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICAT=
-E_FILTER
-> >>>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
-> >>>>>
-> >>>>> That is (maybe among others?) a fix for a regression from 6.1, so w=
-hy
-> >>>>> was this merged into a "for-next" branch instead of a branch that
-> >>>>> targets the current cycle?
-> >> [...]
-> >>> That answer doesn't answer the question afaics, as both 6.1 and 6.4 w=
-ere
-> >>> released in the past year -- the fix thus should not wait till the ne=
-xt
-> >>> merge window, unless it's high risk or something. See this statement
-> >>> from Linus:
-> >>> https://lore.kernel.org/all/CAHk-=3Dwis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5=
-wmB6SRUwQUBQ@mail.gmail.com/
-> >> Thanks for the feedback, I will try to push fixes to net more often.
-> >
-> > Great, many thx!
-> >
-> >>>> but I could probably have it marked for stable just
-> >>>> to make sure it would get backported to affected versions.
-> >>> That would be great, too!
-> >> Well now that it has already been merged via -next tree shall we still
-> >> attempt to mark it as stable? Perhaps we need to check if it was not
-> >> backported already based on the Fixes tag.
-> >
-> > Changes only get backported once they hit mainline, which hasn't
-> > happened yet. And to get them into the net branch (and from there to
-> > mainline) a new commit is needed anyway, so you might as well add the
-> > stable tag to it. Side note: And don't worry that identical commit is
-> > already in -next, git handles that well afaik (but if you rebase
-> > bluetooth-next for other reasons anyway you might as well remove it).
-> >
-> > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat=
-)
-> > --
-> > Everything you wanna know about Linux kernel regression tracking:
-> > https://linux-regtracking.leemhuis.info/about/#tldr
-> > If I did something stupid, please tell me, as explained on that page.
+diff --git a/emulator/vhci.c b/emulator/vhci.c
+index 7b363009a..355ab6389 100644
+--- a/emulator/vhci.c
++++ b/emulator/vhci.c
+@@ -122,14 +122,16 @@ struct vhci *vhci_open(uint8_t type)
+ 		break;
+ 	}
+ 
+-	if (write(fd, &req, sizeof(req)) < 0) {
++	if (write(fd, &req, sizeof(req)) != sizeof(req)) {
+ 		close(fd);
+ 		return NULL;
+ 	}
+ 
+ 	memset(&rsp, 0, sizeof(rsp));
+ 
+-	if (read(fd, &rsp, sizeof(rsp)) < 0) {
++	if (read(fd, &rsp, sizeof(rsp)) != sizeof(rsp) ||
++			rsp.pkt_type != HCI_VENDOR_PKT ||
++			rsp.opcode != req.opcode) {
+ 		close(fd);
+ 		return NULL;
+ 	}
+-- 
+2.39.2
 
-
-
---=20
-Luiz Augusto von Dentz
