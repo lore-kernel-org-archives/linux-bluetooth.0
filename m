@@ -2,114 +2,170 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BED1DC04FCE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 18:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF76C04FD1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Sep 2023 18:27:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229735AbjITSN5 (ORCPT
+        id S229831AbjITS1b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Sep 2023 14:13:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48038 "EHLO
+        Wed, 20 Sep 2023 14:27:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbjITSNy (ORCPT
+        with ESMTP id S229806AbjITS1a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Sep 2023 14:13:54 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1B7CF;
-        Wed, 20 Sep 2023 11:13:48 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id ca18e2360f4ac-79f292f0ac2so20751339f.1;
-        Wed, 20 Sep 2023 11:13:47 -0700 (PDT)
+        Wed, 20 Sep 2023 14:27:30 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BFA212B;
+        Wed, 20 Sep 2023 11:27:17 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c008042211so1428471fa.2;
+        Wed, 20 Sep 2023 11:27:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1695233627; x=1695838427; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=h1XbdgEmcO0SlJnN1RyDOHAwbdBCKSNfqwQQgVkoyPY=;
-        b=jkIZORlLeh8yvR1utpc3Qm7nQ9KbsbwWMiVC3qlPm0GGHVJt163HIQn2HONt4RFXwm
-         YNsguBMzxSdOL9w52DQk1dxkB5HhgDH5bsCwrhMD/YviNmZ8wSwYpD/B3Z61V+b2AuI1
-         uHAEnVsDCZwCbLWzsZVtahFUpVr62ZD0SwHIkmb84lXtSv89Am4piEpcIaN+t8ZhjvdD
-         3JFfMU6zb8vhmdhcgy/yk9S4CYD9AJgzSsroVaa9lcYiBijioMTkgtpoX+wWMYikwQp6
-         cay0Cpx8CtjqNWYhgOWuxqMo2QyrCCh13JIA9rR+fPcJJ5ywZG2FVk57Hm+e9itJpCbT
-         YNUQ==
+        d=gmail.com; s=20230601; t=1695234435; x=1695839235; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/B51hhManBxQCDJi8s/bZ6EVrxt2B6zMHpl9BIven/A=;
+        b=XxkB1F4mWNZ5hmEZIAL9RYt3aY48jFNLjmnb4ZC4///+Ca/tlZV0DiKfruR22tiThX
+         LEJhcgDoh2NvAB/lgYePIdx5fEiH60rhFHTt2CsFSfFJdjs42f7+sqAwb8yw/3YvdOKh
+         yuVa99B+pLt2atDesBJP7HIHUf4cqlGB4xc+yhbu0jwgzOS+42doXSQZcTrgMbVeMnV3
+         a2dmS3cd2LN5JB/aj6EujAKJ5mOm0uFCoaAWqcJaMHtcyUE1pOdth/C+cU1fkCOGU8Ly
+         EgVcg71sxIJqyx+uRvIU3BVn4aCPnGuASMsMiOLPjdLFeEe40P3N46qZOooIBG1oWsi7
+         tJ8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1695233627; x=1695838427;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h1XbdgEmcO0SlJnN1RyDOHAwbdBCKSNfqwQQgVkoyPY=;
-        b=f8U3/D1ve+tMYv46UmpdvkbJJpfPZwjvd5HyZbs1IOZblHr1c1NyW2V5gOLGd++IG7
-         +LE04ecDZuroyEXCn9u/irHMkwMrBYHYWpVLHP/kIGc9IlG+xJ4dpNN7y04dnxrx1Su/
-         JU1eRn2FqCtGZ1qPuIklfh8SgyXN5zblqpIbaRc6lhau4iQ7t/cUXupD1ic5ywIy26hp
-         EzpKld56T0CGw2WbRQFhs5v2xeqOQEwOrmtXn3yuTLUJ31BdiRuDjCCHQQVAaOWWrJMM
-         VKKP0qNwizDYh3obpLvqezDguIWqokKW2KoxuBJuOXa74DOSKFdREzd/krn5DZ7KkrTX
-         O4VQ==
-X-Gm-Message-State: AOJu0Yz4O7p+zfgtfbFBVckLeRCGGu0XRJ/MpohpTgaLb+PBcEGS7HAJ
-        CdAP+z1r7ruAcK43sR4MV5ameSkXbKA=
-X-Google-Smtp-Source: AGHT+IHDueg5FZ+O66xfqhMtsY1d+Q7M4m63UVoB1ydRhuv7OUWNR5dW8FNQHzELxcUDZJnf+kP5Zw==
-X-Received: by 2002:a92:c54a:0:b0:34f:963e:4484 with SMTP id a10-20020a92c54a000000b0034f963e4484mr5701905ilj.12.1695233627243;
-        Wed, 20 Sep 2023 11:13:47 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-98-232-221-87.hsd1.or.comcast.net. [98.232.221.87])
-        by smtp.gmail.com with ESMTPSA id q23-20020a02c8d7000000b0043a0d66a80csm738720jao.24.2023.09.20.11.13.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Sep 2023 11:13:46 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull-request: bluetooth 2023-09-20
-Date:   Wed, 20 Sep 2023 11:13:44 -0700
-Message-ID: <20230920181344.571274-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20230601; t=1695234435; x=1695839235;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/B51hhManBxQCDJi8s/bZ6EVrxt2B6zMHpl9BIven/A=;
+        b=hWdyjNoGpGHHOxm8jWYqq0QVW795D34QxEaPUgwTw7ja7bqGbT8feVcCeQj6zGJoep
+         5FGn5YKpfgIaJYE/e/n3PD8LnrklBwxtR7WVuG7UrUJWpNyek0WCnw758z6/q1IFsRky
+         x+QbFwCmah9KhG4PLj4YboFJrkOiZzA/MGeEkL8KV+5x97fHPwdt+RH36fTDp0LgQlv6
+         23r2zHt1PqgBPpm+7hIPsUgWw119AVkpRZUDiLeGtfo8FEvQ3s1a1yxi96RL8j/TtmAa
+         PqT90Sxhdf8YPUUfYHCYg+8LNkS9wOsfXLkSDlzkgRXDNwhqyvDkZcS7Hm6S9inkLaHd
+         YxlQ==
+X-Gm-Message-State: AOJu0Yw1Tdz8WSp9RYjRRklErzHNl2SeeZ4nG95m+nV2vHGWZa4Nugej
+        dpcKO7FDrtXou3Wi9a0bLBl0YkJ/qP+8osJKy8Q=
+X-Google-Smtp-Source: AGHT+IF0iUJNRicLpJin3ByiycK68Xagu/oZrfx1jraD/qFlUAPWvrmPcx4u8CUjgnhAlieVUWLkWumO10WZWKvzyDY=
+X-Received: by 2002:a05:651c:108:b0:2bd:133c:2d71 with SMTP id
+ a8-20020a05651c010800b002bd133c2d71mr2718462ljb.52.1695234435115; Wed, 20 Sep
+ 2023 11:27:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230829205936.766544-1-luiz.dentz@gmail.com> <169343402479.21564.11565149320234658166.git-patchwork-notify@kernel.org>
+ <de698d06-9784-43ed-9437-61d6edf9672b@leemhuis.info> <CABBYNZK2PPkLra8Au-fdN2nG2YLkfFRmPtEPQL0suLzBv=HHcA@mail.gmail.com>
+ <574ca8dd-ee97-4c8b-a154-51faf83cabdf@leemhuis.info> <CABBYNZJ=5VH2+my7Gw1fMCaGgdOQfbWNtBGOc27_XQqCP7jD-A@mail.gmail.com>
+ <ff2abfbe-a46b-414b-a757-8185495838b7@leemhuis.info> <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
+In-Reply-To: <cd12622b-bfc6-093d-5c10-493e10935440@leemhuis.info>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 20 Sep 2023 11:27:02 -0700
+Message-ID: <CABBYNZKg8dbD0CY2yR=JUYLjXcRm_Pq7GU3W5gPErx6-_7GAJQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Linux regressions mailing list <regressions@lists.linux.dev>,
+        patchwork-bot+bluetooth@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        Stefan Agner <stefan@agner.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 4a0f07d71b0483cc08c03cefa7c85749e187c214:
+Hi Thorsten,
 
-  net/handshake: Fix memory leak in __sock_create() and sock_alloc_file() (2023-09-20 11:54:49 +0100)
+On Wed, Sep 20, 2023 at 7:02=E2=80=AFAM Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
+>
+> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+> for once, to make this easily accessible to everyone.
+>
+> @Luiz Augusto von Dentz: did you make any progress to get this into net
+> to make sure this rather sooner then later heads to mainline? Doesn't
+> looks like it from here, but maybe I'm missing something.
 
-are available in the Git repository at:
+Just sent the pull-request:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2023-09-20
+https://patchwork.kernel.org/project/bluetooth/patch/20230920181344.571274-=
+1-luiz.dentz@gmail.com/
 
-for you to fetch changes up to b938790e70540bf4f2e653dcd74b232494d06c8f:
+> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> --
+> Everything you wanna know about Linux kernel regression tracking:
+> https://linux-regtracking.leemhuis.info/about/#tldr
+> If I did something stupid, please tell me, as explained on that page.
+>
+> #regzbot poke
+>
+>
+> On 14.09.23 20:08, Thorsten Leemhuis wrote:
+> > On 14.09.23 19:51, Luiz Augusto von Dentz wrote:
+> >> On Wed, Sep 13, 2023 at 10:13=E2=80=AFPM Thorsten Leemhuis
+> >> <regressions@leemhuis.info> wrote:
+> >>> On 12.09.23 21:09, Luiz Augusto von Dentz wrote:
+> >>>> On Mon, Sep 11, 2023 at 6:40=E2=80=AFAM Linux regression tracking (T=
+horsten
+> >>>> Leemhuis) <regressions@leemhuis.info> wrote:
+> >>>>> On 31.08.23 00:20, patchwork-bot+bluetooth@kernel.org wrote:
+> >>>>>> This patch was applied to bluetooth/bluetooth-next.git (master)
+> >>>>>> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> >>>>>> On Tue, 29 Aug 2023 13:59:36 -0700 you wrote:
+> >>>>>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>>>>>>
+> >>>>>>> When HCI_QUIRK_STRICT_DUPLICATE_FILTER is set LE scanning require=
+s
+> >>>>>>> periodic restarts of the scanning procedure as the controller wou=
+ld
+> >>>>>>> consider device previously found as duplicated despite of RSSI ch=
+anges,
+> >>>>>>> but in order to set the scan timeout properly set le_scan_restart=
+ needs
+> >>>>>>> to be synchronous so it shall not use hci_cmd_sync_queue which de=
+fers
+> >>>>>>> the command processing to cmd_sync_work.
+> >>>>>>> [...]
+> >>>>>>
+> >>>>>> Here is the summary with links:
+> >>>>>>   - Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICAT=
+E_FILTER
+> >>>>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/52bf4fd43f75
+> >>>>>
+> >>>>> That is (maybe among others?) a fix for a regression from 6.1, so w=
+hy
+> >>>>> was this merged into a "for-next" branch instead of a branch that
+> >>>>> targets the current cycle?
+> >> [...]
+> >>> That answer doesn't answer the question afaics, as both 6.1 and 6.4 w=
+ere
+> >>> released in the past year -- the fix thus should not wait till the ne=
+xt
+> >>> merge window, unless it's high risk or something. See this statement
+> >>> from Linus:
+> >>> https://lore.kernel.org/all/CAHk-=3Dwis_qQy4oDNynNKi5b7Qhosmxtoj1jxo5=
+wmB6SRUwQUBQ@mail.gmail.com/
+> >> Thanks for the feedback, I will try to push fixes to net more often.
+> >
+> > Great, many thx!
+> >
+> >>>> but I could probably have it marked for stable just
+> >>>> to make sure it would get backported to affected versions.
+> >>> That would be great, too!
+> >> Well now that it has already been merged via -next tree shall we still
+> >> attempt to mark it as stable? Perhaps we need to check if it was not
+> >> backported already based on the Fixes tag.
+> >
+> > Changes only get backported once they hit mainline, which hasn't
+> > happened yet. And to get them into the net branch (and from there to
+> > mainline) a new commit is needed anyway, so you might as well add the
+> > stable tag to it. Side note: And don't worry that identical commit is
+> > already in -next, git handles that well afaik (but if you rebase
+> > bluetooth-next for other reasons anyway you might as well remove it).
+> >
+> > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat=
+)
+> > --
+> > Everything you wanna know about Linux kernel regression tracking:
+> > https://linux-regtracking.leemhuis.info/about/#tldr
+> > If I did something stupid, please tell me, as explained on that page.
 
-  Bluetooth: hci_codec: Fix leaking content of local_codecs (2023-09-20 11:03:11 -0700)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
 
- - Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
- - Fix handling of listen for ISO unicast
- - Fix build warnings
- - Fix leaking content of local_codecs
- - Add shutdown function for QCA6174
- - Delete unused hci_req_prepare_suspend() declaration
- - Fix hci_link_tx_to RCU lock usage
- - Avoid redundant authentication
-
-----------------------------------------------------------------
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_sync: Fix handling of HCI_QUIRK_STRICT_DUPLICATE_FILTER
-      Bluetooth: ISO: Fix handling of listen for unicast
-      Bluetooth: hci_core: Fix build warnings
-      Bluetooth: hci_codec: Fix leaking content of local_codecs
-
-Rocky Liao (1):
-      Bluetooth: btusb: add shutdown function for QCA6174
-
-Yao Xiao (1):
-      Bluetooth: Delete unused hci_req_prepare_suspend() declaration
-
-Ying Hsu (2):
-      Bluetooth: Fix hci_link_tx_to RCU lock usage
-      Bluetooth: Avoid redundant authentication
-
- drivers/bluetooth/btusb.c        |  1 +
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/hci_conn.c         | 63 ++++++++++++++++++++++------------------
- net/bluetooth/hci_core.c         | 14 +++++++--
- net/bluetooth/hci_event.c        |  1 +
- net/bluetooth/hci_request.h      |  2 --
- net/bluetooth/hci_sync.c         | 14 ++++-----
- net/bluetooth/iso.c              |  9 ++++--
- 8 files changed, 60 insertions(+), 46 deletions(-)
+--=20
+Luiz Augusto von Dentz
